@@ -6,6 +6,7 @@ import Macro.BuildRequests.RequestAtLeast
 import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCountEverything
+import Planning.Composition.UnitMatchers.UnitMatchOr
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
@@ -104,38 +105,46 @@ class ZergSparkle extends GameplanModeTemplate {
             MatchingRatio(Protoss.Carrier, 6.0))),
   
         new TrainMatchingRatio(Zerg.Devourer, 0, 20, Seq(MatchingRatio(Protoss.Corsair, 0.25))),
+        new TrainMatchingRatio(Zerg.Scourge, 0, 8, Seq(MatchingRatio(Protoss.Corsair, 2.0))),
         
         new If(
           new UnitsAtLeast(3, Zerg.Mutalisk),
           new TrainMatchingRatio(Zerg.Scourge, 0, 20, Seq(MatchingRatio(Zerg.Mutalisk, 2.0)))),
   
         new If(
-          new UnitsAtLeast(24, Zerg.Mutalisk),
+          new And(
+            new UnitsAtLeast(12, Zerg.Mutalisk),
+            new Or(
+              new UnitsAtLeast(24, Zerg.Mutalisk),
+              new EnemyUnitsAtLeast(20, Terran.Marine),
+              new EnemyUnitsAtLeast(6, UnitMatchOr(Terran.Goliath, Terran.MissileTurret, Protoss.PhotonCannon)),
+              new EnemyUnitsAtLeast(2, UnitMatchOr(Zerg.SporeColony, Terran.Bunker)))),
           new Parallel(
             new TrainContinuously(Zerg.Guardian, 4),
             new Build(
               RequestAtLeast(1, Zerg.QueensNest),
               RequestAtLeast(1, Zerg.Hive),
               RequestAtLeast(1, Zerg.GreaterSpire)))),
-        
         new If(
-          new And(
-            new UpgradeComplete(Zerg.AirArmor, 2),
-            new Not(new UpgradeComplete(Zerg.AirDamage, 3))),
-          new UpgradeContinuously(Zerg.AirDamage),
-          new UpgradeContinuously(Zerg.AirArmor)),
+          new Or(
+            new UnitsAtLeast(1, Zerg.GreaterSpire),
+            new UnitsAtLeast(0, Zerg.Hive)),
+          new If(
+            new And(
+              new UpgradeComplete(Zerg.AirArmor, 2),
+              new Not(new UpgradeComplete(Zerg.AirDamage, 3))),
+            new UpgradeContinuously(Zerg.AirDamage),
+            new UpgradeContinuously(Zerg.AirArmor))),
         
         new If(
           new Check(() => With.self.gas >= Math.min(100, With.self.minerals)),
           new TrainContinuously(Zerg.Mutalisk),
           new TrainContinuously(Zerg.Drone, 25)),
-  
-        
         
         new If(
           new And(
-            new UnitsAtLeast(18, Zerg.Drone),
-            new FrameAtLeast(GameTime(6, 30)())), // Psi Disruptor won't die before this
+            new UnitsAtLeast(16, Zerg.Drone),
+            new FrameAtLeast(GameTime(6, 45)())), // Psi Disruptor won't die before this
           new Build(RequestAtLeast(3, Zerg.Extractor))),
         
         new If(

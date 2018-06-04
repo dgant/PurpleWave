@@ -1,5 +1,6 @@
 package ProxyBwapi.Races
 
+import Planning.Composition.UnitMatchers.UnitMatchOr
 import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.Upgrades.Upgrades
@@ -42,6 +43,9 @@ object Zerg {
   def NydusCanal            = UnitClasses.get(UnitType.Zerg_Nydus_Canal)
   def InfestedCommandCenter = UnitClasses.get(UnitType.Zerg_Infested_Command_Center)
   def DarkSwarmCloud        = UnitClasses.get(UnitType.Spell_Dark_Swarm)
+  def SpireOrGreaterSpire   = UnitMatchOr(Spire, GreaterSpire)
+  def HatcheryLairOrHive    = UnitMatchOr(Hatchery, Lair, Hive)
+  def LairOrHive            = UnitMatchOr(Lair, Hive)
   def ZerglingAttackSpeed   = Upgrades.get(UpgradeType.Adrenal_Glands)
   def UltraliskSpeed        = Upgrades.get(UpgradeType.Anabolic_Synthesis)
   def OverlordVisionRange   = Upgrades.get(UpgradeType.Antennae)

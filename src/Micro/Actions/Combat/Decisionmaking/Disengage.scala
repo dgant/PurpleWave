@@ -18,6 +18,7 @@ object Disengage extends Action {
     Weigh.consider(unit,
       Abuse,
       Aim,
+      Bomb,
       Avoid,
       FallBack,
       Ignore,

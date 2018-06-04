@@ -3,7 +3,7 @@ package Micro.Actions.Basic
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Decisionmaking.{Disengage, Engage, FightOrFlight}
+import Micro.Actions.Combat.Decisionmaking.{Disengage, Engage}
 import Micro.Actions.Combat.Tactics.Potshot
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
@@ -34,11 +34,7 @@ object Gather extends Action {
       && target.base.exists(_.units.exists(resource => resource.resourcesLeft > 0 && target.pixelDistanceCenter(resource) < With.configuration.workerDefenseRadiusPixels)))
     
     if (atResource && unit.totalHealth > damageMax && beckoned) {
-      FightOrFlight.delegate(unit)
-      // Unintuitive, but shouldEngage means we have sufficient army help
-      if ( ! unit.agent.shouldEngage) {
-        Engage.consider(unit)
-      }
+      Engage.consider(unit)
     }
     
     if (transferring && threatened && unit.visibleToOpponents && threatCloser) {

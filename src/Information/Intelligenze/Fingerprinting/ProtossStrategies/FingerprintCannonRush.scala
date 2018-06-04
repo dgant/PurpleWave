@@ -7,7 +7,6 @@ import ProxyBwapi.Races.Protoss
 class FingerprintCannonRush extends Fingerprint {
   override protected def investigate: Boolean = {
     if ( ! With.enemies.exists(_.isProtoss)) return false
-    lazy val opponentHasForge = With.units.enemy.exists(_.is(Protoss.Forge))
     With.units.enemy.exists(u =>
       u.is(Protoss.PhotonCannon)
       && (

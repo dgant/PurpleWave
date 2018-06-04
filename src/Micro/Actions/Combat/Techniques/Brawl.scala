@@ -6,6 +6,7 @@ import Micro.Actions.Combat.Targeting.{Target, TargetAction, TargetInRange}
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.Attack
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.ByOption
 
 object Brawl extends ActionTechnique {
   
@@ -31,7 +32,8 @@ object Brawl extends ActionTechnique {
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    lazy val targetsNear = unit.matchups.targets.filter(t => unit.framesBeforeAttacking(t) < With.reaction.agencyMax)
+    lazy val framesClosest = ByOption.min(unit.matchups.targets.map(unit.framesBeforeAttacking))
+    lazy val targetsNear = unit.matchups.targets.filter(t => framesClosest.exists(f => unit.framesBeforeAttacking(t) <= f))
     lazy val targetNear = new TargetAction(TargetFilterWhitelist(targetsNear))
     TargetInRange.delegate(unit)
     targetNear.delegate(unit)

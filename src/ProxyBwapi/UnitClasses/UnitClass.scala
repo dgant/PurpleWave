@@ -275,6 +275,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     addBuildUnitIf(output, Zerg.Zergling,               Zerg.SpawningPool)
     addBuildUnitIf(output, Zerg.Hydralisk,              Zerg.HydraliskDen)
     addBuildUnitIf(output, Zerg.Mutalisk,               Zerg.Spire)
+    addBuildUnitIf(output, Zerg.Scourge,                Zerg.Spire)
     addBuildUnitIf(output, Zerg.Queen,                  Zerg.QueensNest)
     addBuildUnitIf(output, Zerg.Ultralisk,              Zerg.UltraliskCavern)
     addBuildUnitIf(output, Zerg.Defiler,                Zerg.DefilerMound)
@@ -506,4 +507,12 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   
   // UnitMatcher
   def accept(unit: UnitInfo): Boolean = unit.unitClass == this
+  
+  override def acceptAsPrerequisite(unit: UnitInfo): Boolean = (
+    accept(unit)
+    || (unit.unitClass == Zerg.GreaterSpire && this == Zerg.Spire)
+    || (unit.unitClass == Zerg.Hive         && this == Zerg.Lair)
+    || (unit.unitClass == Zerg.Hive         && this == Zerg.Hatchery)
+    || (unit.unitClass == Zerg.Lair         && this == Zerg.Hatchery)
+  )
 }

@@ -1,7 +1,6 @@
 package Macro.Buildables
 
 import ProxyBwapi.Techs.Tech
-import ProxyBwapi.UnitClasses.UnitClasses
 
 case class BuildableTech(tech: Tech) extends Buildable {
   
@@ -13,13 +12,5 @@ case class BuildableTech(tech: Tech) extends Buildable {
   
   override def buildersOccupied: Iterable[BuildableUnit] = {
     Vector(BuildableUnit(tech.whatResearches))
-  }
-  override def requirements: Iterable[BuildableUnit] = {
-    if (tech.requiredUnit != UnitClasses.None) {
-      Vector(BuildableUnit(tech.requiredUnit))
-    }
-    else {
-      Vector.empty
-    }
   }
 }

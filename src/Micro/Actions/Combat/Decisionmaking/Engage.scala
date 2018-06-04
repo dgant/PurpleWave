@@ -17,6 +17,7 @@ object Engage extends Action {
       Abuse,
       Aim,
       Batter,
+      Bomb,
       Brawl,
       Breathe,
       Charge,

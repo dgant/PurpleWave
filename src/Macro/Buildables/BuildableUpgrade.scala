@@ -1,9 +1,8 @@
 package Macro.Buildables
 
-import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.Upgrades.Upgrade
 
-case class BuildableUpgrade(upgrade:Upgrade, level:Int=1) extends Buildable {
+case class BuildableUpgrade(upgrade:Upgrade, level: Int=1) extends Buildable {
   
   override def upgradeOption    : Option[Upgrade]       = Some(upgrade)
   override def upgradeLevel     : Int                   = level
@@ -14,15 +13,5 @@ case class BuildableUpgrade(upgrade:Upgrade, level:Int=1) extends Buildable {
       
   override def buildersOccupied: Iterable[BuildableUnit] = {
     Vector(BuildableUnit(upgrade.whatUpgrades))
-  }
-  
-  override def requirements: Iterable[BuildableUnit] = {
-    val requirement = upgrade.whatsRequired(upgradeLevel)
-    if (requirement != UnitClasses.None) {
-      Vector(BuildableUnit(requirement))
-    }
-    else {
-      Vector.empty
-    }
   }
 }

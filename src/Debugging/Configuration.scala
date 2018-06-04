@@ -57,7 +57,7 @@ class Configuration {
   var pickupRadiusPixels              = 48 //No idea what actual value is
   var enablePathRecalculation         = true
   var pathRecalculationDelayFrames    = GameTime(0, 2)()
-  var workerDefenseRadiusPixels       = 32.0 * 6.0
+  var workerDefenseRadiusPixels       = 32.0 * 4.0
   
   ///////////
   // Macro //

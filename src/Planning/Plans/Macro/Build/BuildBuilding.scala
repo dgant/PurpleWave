@@ -76,7 +76,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
       return
     }
   
-    currencyLock.framesPreordered = (buildingClass.buildUnitsEnabling.map(enablingClass => Project.framesToUnits(enablingClass, 1)) :+ 0).max
+    currencyLock.framesPreordered = (buildingClass.buildUnitsEnabling.map(Project.framesToUnits(_, 1)) :+ 0).max
     currencyLock.isSpent = building.isDefined
     currencyLock.acquire(this)
     if ( ! needBuilder) {

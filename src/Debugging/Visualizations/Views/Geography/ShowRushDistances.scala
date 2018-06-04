@@ -47,6 +47,7 @@ object ShowRushDistances extends View {
   
   Alchemist: 4073 - 4640 - 5151
   Arcadia: 4216 - 5216 - 6008
+  Blue Storm: 5821?!?
   Destination 1.1: 6604? 5216?
   Hitchhiker: 4438
   Pathfinder: 4716 - 4767 - 4850

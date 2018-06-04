@@ -10,7 +10,7 @@ class UnitCounter[T <: UnitInfo](source: () => Iterable [T]) {
   val units = new Cache(source)
   val counts = new Cache(() => new mutable.HashMap[UnitMatcher, Int] {
     override def default(key: UnitMatcher): Int = {
-      val count = units().count(_.is(key))
+      val count = units().count(_.isPrerequisite(key))
       put(key, count)
       count
     }

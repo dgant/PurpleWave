@@ -1,11 +1,14 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Lifecycle.With
+import Macro.Architecture.Blueprint
+import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitMatchers._
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
+import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, MeldArchons}
@@ -19,6 +22,10 @@ import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen4GateGoon
 
 object PvPIdeas {
+  
+  class PlaceShieldBatteryAtNexus extends ProposePlacement {
+    override lazy val blueprints = Vector(new Blueprint(this, building = Some(Protoss.ShieldBattery), placement = Some(PlacementProfiles.hugTownHall)))
+  }
   
   class EnemyCarriersOnly extends And(
     new EnemyCarriers,
@@ -37,19 +44,19 @@ object PvPIdeas {
         new Not(new EnemyDarkTemplarExists),
         new EnemyUnitsAtMost(0, Protoss.Arbiter)),
       new Or(
-        new EnemyStrategy(With.intelligence.fingerprints.fingerprintCannonRush),
+        new EnemyStrategy(With.intelligence.fingerprints.cannonRush),
         new Employing(PvPOpen4GateGoon),
         new SafeToMoveOut,
         new MiningBasesAtLeast(3),
         new EnemyBasesAtLeast(3)),
       new Or(
-        new Not(new EnemyStrategy(With.intelligence.fingerprints.fingerprint2Gate)),
+        new Not(new EnemyStrategy(With.intelligence.fingerprints.twoGate)),
         new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
         new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true))),
     new Attack)
   
   class ReactToCannonRush extends If(
-    new EnemyStrategy(With.intelligence.fingerprints.fingerprintCannonRush),
+    new EnemyStrategy(With.intelligence.fingerprints.cannonRush),
     new Parallel(
       new RequireSufficientSupply,
       new TrainWorkersContinuously,
@@ -86,7 +93,7 @@ object PvPIdeas {
   
   class ReactToTwoGate extends If(
     new And(
-      new EnemyStrategy(With.intelligence.fingerprints.fingerprint2Gate),
+      new EnemyStrategy(With.intelligence.fingerprints.twoGate),
       new UnitsAtMost(0, Protoss.Forge),
       new Or(
         new UnitsAtMost(1, Protoss.Gateway, complete = true),
@@ -98,6 +105,7 @@ object PvPIdeas {
           new RequireSufficientSupply,
           new TrainArmy)),
       new UpgradeContinuously(Protoss.DragoonRange),
+      new PlaceShieldBatteryAtNexus,
       new If(
         new UnitsAtLeast(1, Protoss.CyberneticsCore),
         new Build(

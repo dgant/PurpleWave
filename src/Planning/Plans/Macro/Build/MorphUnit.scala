@@ -5,6 +5,7 @@ import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Plan
+import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -29,10 +30,10 @@ class MorphUnit(val classToMorph: UnitClass) extends Plan {
   
     // Duplicated across TrainUnit
     currencyLock.framesPreordered = (
-      classToMorph.buildUnitsEnabling.map(enablingClass => Project.framesToUnits(enablingClass, 1))
+      classToMorph.buildUnitsEnabling.map(Project.framesToUnits(_, 1))
       :+ Project.framesToUnits(morpherClass, 1)).max
     
-    currencyLock.isSpent = morpher.exists(m => m.alive && m.unitClass != morpherClass)
+    currencyLock.isSpent = morpher.exists(m => m.alive && m.isAny(Zerg.Egg, Zerg.LurkerEgg, Zerg.Cocoon, classToMorph))
     currencyLock.acquire(this)
     
     if (currencyLock.satisfied && ! currencyLock.isSpent) {

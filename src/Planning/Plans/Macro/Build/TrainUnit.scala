@@ -56,7 +56,7 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
   
     // Duplicated across MorphUnit
     currencyLock.framesPreordered = (
-      traineeClass.buildUnitsEnabling.map(enablingClass => Project.framesToUnits(enablingClass, 1))
+      traineeClass.buildUnitsEnabling.map(Project.framesToUnits(_, 1))
       :+ Project.framesToUnits(trainerClass, 1)).max
     currencyLock.isSpent = trainee.isDefined || trainer.exists(_.trainingQueue.headOption.contains(traineeClass))
     currencyLock.acquire(this)

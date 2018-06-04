@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
-import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
@@ -56,8 +56,18 @@ class GoalFindExpansions extends GoalBasic {
   
   private def scoutPreference(unit: FriendlyUnitInfo): Double = {
     val scoutDestination = baseToPixel(With.intelligence.peekNextBaseToScout)
+    val typeMultiplier = if (unit.isAny(
+      Terran.Battlecruiser,
+      Terran.Valkyrie,
+      Protoss.Arbiter,
+      Protoss.Carrier,
+      Zerg.Devourer,
+      Zerg.Guardian))
+      10.0 else 1.0
+    
     if (unit.canMove) (
       unit.framesToTravelTo(scoutDestination)
+        * typeMultiplier
         * (if (unit.flying) 1.0 else 1.5)
         * (if (unit.cloaked) 1.0 else 1.5)
         * (if (unit.is(Protoss.Zealot) && With.enemies.map(With.intelligence.unitsShown(_, Terran.Vulture)).sum > 0) 3.0 else 1.0)

@@ -1,10 +1,9 @@
 package ProxyBwapi.UnitTracking
 
 import Lifecycle.With
-import Performance.UnitCounter
 import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.Terran
-import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, Orders}
+import ProxyBwapi.UnitInfo.{ForeignUnitInfo, Orders}
 import bwapi.Unit
 
 import scala.collection.JavaConverters._

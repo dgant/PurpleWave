@@ -16,7 +16,7 @@ object Project {
     quantity: Int = 1,
     unitsInCycle: Array[UnitClass] = Array.empty): Int = {
     
-    val unitsOfClass          = With.units.ours.filter(_.is(unitClass))
+    val unitsOfClass          = With.units.ours.filter(_.isPrerequisite(unitClass))
     val unitsOfClassComplete  = unitsOfClass.filter(_.complete)
     
     // Do we already have it?

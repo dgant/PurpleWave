@@ -12,11 +12,12 @@ import scala.collection.mutable
 
 class LockUnits extends ResourceLock {
   
-  var canPoach        = new Property[Boolean](false)
-  var interruptable   = new Property[Boolean](true)
-  val unitMatcher     = new Property[UnitMatcher](UnitMatchAnything)
-  val unitPreference  = new Property[UnitPreference](UnitPreferAnything)
-  val unitCounter     = new Property[UnitCounter](UnitCountEverything)
+  var canPoach          = new Property[Boolean](false)
+  var interruptable     = new Property[Boolean](true)
+  var acceptSubstitutes = new Property[Boolean](false)
+  val unitMatcher       = new Property[UnitMatcher](UnitMatchAnything)
+  val unitPreference    = new Property[UnitPreference](UnitPreferAnything)
+  val unitCounter       = new Property[UnitCounter](UnitCountEverything)
   
   var owner: Plan = _
   
@@ -46,7 +47,11 @@ class LockUnits extends ResourceLock {
   
     val desiredUnits    = With.recruiter.getUnits(this).to[mutable.Set]
     val candidateQueue  = new mutable.PriorityQueue[FriendlyUnitInfo]()(Ordering.by( - unitPreference.get.preference(_))) //Negative because priority queue is highest-first
-    candidateQueue      ++= candidates.filter(unitMatcher.get.accept)
+    candidateQueue ++= candidates.filter(c =>
+      if(acceptSubstitutes.get)
+        unitMatcher.get.acceptAsPrerequisite(c)
+      else
+        unitMatcher.get.accept(c))
     
     unitCounter.get.reset()
     

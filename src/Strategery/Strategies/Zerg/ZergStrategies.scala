@@ -1,7 +1,7 @@
 package Strategery.Strategies.Zerg
 
 import Planning.Plan
-import Planning.Plans.GamePlans.Zerg.ZvE.{NineHatchLings, NinePoolMuta, OneHatchLurker, ProxyHatch, TwoHatchHydra, Zerg4Pool, ZergSparkle}
+import Planning.Plans.GamePlans.Zerg.ZvE.{NineHatchLings, NinePoolMuta, OneHatchLurker, ProxyHatch, TwoHatchHydra, Zerg4Pool, ZergSparkle, ZergVsProtoss}
 import Planning.Plans.GamePlans.Zerg.ZvP.HydraBust
 import Planning.Plans.GamePlans.Zerg.ZvT.{ThirteenPoolMuta, TwoHatchMuta}
 import Planning.Plans.GamePlans.Zerg.ZvZ.Zerg5PoolProxySunkens
@@ -56,6 +56,10 @@ object ProxyHatchZerglings extends ZergStrategy {
 }
 object Zerg4Pool extends ZergStrategy {
   override def gameplan: Option[Plan] = Some(new Zerg4Pool)
+}
+object ZergVsProtoss extends ZergStrategy {
+  override def gameplan: Option[Plan] = { Some(new ZergVsProtoss) }
+  override def enemyRaces: Iterable[Race] = Vector(Race.Protoss)
 }
 object ZergSparkle extends ZergStrategy {
   override def gameplan: Option[Plan] = Some(new ZergSparkle)

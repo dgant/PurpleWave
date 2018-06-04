@@ -39,10 +39,10 @@ class PvP1GateReaverExpand extends GameplanModeTemplate {
     new PvPIdeas.TrainArmy,
   
     new If(
-      new EnemyStrategy(With.intelligence.fingerprints.fingerprintProxyGateway),
+      new EnemyStrategy(With.intelligence.fingerprints.proxyGateway),
       new Build(RequestAtLeast(3, Protoss.Gateway))),
     new If(
-      new EnemyStrategy(With.intelligence.fingerprints.fingerprint2Gate),
+      new EnemyStrategy(With.intelligence.fingerprints.twoGate),
       new Build(RequestAtLeast(2, Protoss.Gateway))),
     
     new Build(

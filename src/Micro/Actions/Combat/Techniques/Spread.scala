@@ -8,6 +8,7 @@ import Micro.Actions.Combat.Techniques.Common.Activators.{Activator, WeightedMax
 import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, AttackAsSoonAsPossible}
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Spread extends ActionTechnique {
@@ -30,6 +31,11 @@ object Spread extends ActionTechnique {
   }
   
   protected def isValidEnemy(enemy: UnitInfo): Boolean = {
+    if (enemy.isAny(
+      Terran.ScienceVessel,
+      Protoss.DarkArchon,
+      Protoss.HighTemplar)) return true
+    
     enemy.canAttack && enemy.unitClass.attacksAir && enemy.unitClass.dealsRadialSplashDamage
   }
   

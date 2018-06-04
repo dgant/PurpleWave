@@ -38,6 +38,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   }
   
   def is(unitMatcher: UnitMatcher): Boolean = unitMatcher.accept(this)
+  def isPrerequisite(unitMatcher: UnitMatcher): Boolean = unitMatcher.acceptAsPrerequisite(this)
   def isNone(unitMatchers: UnitMatcher*): Boolean = ! unitMatchers.exists(_.accept(this))
   def isAny(unitMatchers: UnitMatcher*): Boolean = unitMatchers.exists(_.accept(this))
   def isAll(unitMatchers: UnitMatcher*): Boolean = unitMatchers.forall(_.accept(this))

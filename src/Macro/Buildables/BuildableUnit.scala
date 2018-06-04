@@ -20,8 +20,4 @@ case class BuildableUnit(val unit: UnitClass) extends Buildable {
   override lazy val buildersConsumed: Iterable[BuildableUnit] = {
     unit.buildUnitsSpent.map(BuildableUnit)
   }
-  
-  override lazy val requirements: Iterable[Buildable] = {
-    unit.buildUnitsEnabling.map(BuildableUnit) ++ unit.buildTechEnabling.map(BuildableTech)
-  }
 }

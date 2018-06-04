@@ -32,23 +32,24 @@ class DumbQueue {
     val requestQueue = requestsByPlan.keys.toVector.sortBy(_.priority).flatten(requestsByPlan)
     val unitsWanted = new CountMap[UnitClass]
     val unitsActual = new CountMap[UnitClass]
-      With.units.ours.foreach(unit =>
+      With.units.ours.foreach(unit => {
         if (unit.aliveAndComplete) {
           unitsActual.add(unit.unitClass, 1)
-          if (unit.is(Terran.SiegeTankSieged)) {
-            unitsActual.add(Terran.SiegeTankUnsieged, 1)
-          }
-          if (unit.is(Zerg.GreaterSpire)) {
-            unitsActual.add(Zerg.Spire, 1)
-          }
-          if (unit.is(Zerg.Lair)) {
-            unitsActual.add(Zerg.Hatchery, 1)
-          }
-          if (unit.is(Zerg.Hive)) {
-            unitsActual.add(Zerg.Lair, 1)
-            unitsActual.add(Zerg.Hatchery, 1)
-          }
-        })
+        }
+        if (unit.is(Terran.SiegeTankSieged)) {
+          unitsActual.add(Terran.SiegeTankUnsieged, 1)
+        }
+        if (unit.is(Zerg.GreaterSpire)) {
+          unitsActual.add(Zerg.Spire, 1)
+        }
+        if (unit.is(Zerg.Lair)) {
+          unitsActual.add(Zerg.Hatchery, 1)
+        }
+        if (unit.is(Zerg.Hive)) {
+          unitsActual.add(Zerg.Lair, 1)
+          unitsActual.add(Zerg.Hatchery, 1)
+        }
+      })
     requestQueue.flatten(buildable => getUnfulfilledBuildables(buildable, unitsWanted, unitsActual))
   })
   

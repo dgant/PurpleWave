@@ -62,8 +62,8 @@ class TrainContinuously(
   
   protected def canBuild: Boolean = (
     unitClass.buildTechEnabling.forall(With.self.hasTech)
-    && unitClass.buildUnitsEnabling.forall(unitClass => With.units.existsOurs(unitClass))
-    && unitClass.buildUnitsBorrowed.forall(unitClass => With.units.existsOurs(unitClass))
+    && unitClass.buildUnitsEnabling.forall(With.units.existsOurs(_))
+    && unitClass.buildUnitsBorrowed.forall(With.units.existsOurs(_))
   )
   
   protected def currentCount: Int = {

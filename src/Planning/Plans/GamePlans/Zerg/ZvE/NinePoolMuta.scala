@@ -109,7 +109,9 @@ class NinePoolMuta extends GameplanModeTemplate {
         new Parallel(new TrainContinuously(Zerg.Zergling)))),
     new If(
       new MineralsAtLeast(300),
-      new BuildGasPumps,
+      new BuildGasPumps),
+    new If(
+      new GasAtMost(99),
       new TrainContinuously(Zerg.Hatchery, 8, 1))
   )
 }

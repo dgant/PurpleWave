@@ -7,9 +7,9 @@ import bwapi.Race
 class Fingerprint12Hatch extends FingerprintAnd(
   new FingerprintRace(Race.Zerg),
   new FingerprintScoutedEnemyBases(2),
-  new FingerprintNot(With.intelligence.fingerprints.fingerprint4Pool),
-  new FingerprintNot(With.intelligence.fingerprints.fingerprint9Pool),
-  new FingerprintNot(With.intelligence.fingerprints.fingerprintOverpool),
-  new FingerprintNot(With.intelligence.fingerprints.fingerprint10Hatch9Pool),
-  new FingerprintNot(With.intelligence.fingerprints.fingerprint12Pool)
+  new FingerprintNot(With.intelligence.fingerprints.fourPool),
+  new FingerprintNot(With.intelligence.fingerprints.ninePool),
+  new FingerprintNot(With.intelligence.fingerprints.overpool),
+  new FingerprintNot(With.intelligence.fingerprints.tenHatchNinePool),
+  new FingerprintNot(With.intelligence.fingerprints.twelvePool)
 )

@@ -23,7 +23,8 @@ object Gather extends Action {
     lazy val resource     = unit.agent.toGather.get
     lazy val zoneNow      = unit.zone
     lazy val zoneTo       = resource.zone
-    lazy val transferring = zoneNow != zoneTo && ! zoneNow.edges.exists(_.otherSideof(zoneNow) == zoneTo)
+    lazy val mainAndNat   = Vector(With.geography.ourMain, With.geography.ourNatural).map(_.zone)
+    lazy val transferring = zoneNow != zoneTo && ! (mainAndNat.contains(zoneNow) && mainAndNat.contains(zoneTo))
     lazy val threatened   = unit.battle.isDefined && unit.matchups.framesOfSafety < combatWindow
     lazy val damageMax    = ByOption.max(unit.matchups.threats.map(_.damageOnNextHitAgainst(unit))).getOrElse(11)
     lazy val threatCloser = unit.matchups.threats.exists(_.pixelDistanceCenter(resource.pixelCenter) < unit.pixelDistanceCenter(resource.pixelCenter))

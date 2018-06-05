@@ -5,7 +5,7 @@ import Lifecycle.With
 import ProxyBwapi.Races.Protoss
 import bwapi.Race
 
-class Fingerprint1GateCore extends FingerprintOr(
+class Fingerprint1GateCore extends FingerprintAnd(
   new FingerprintAnd(
     new FingerprintRace(Race.Protoss),
     new FingerprintScoutedEnemyBases(1),

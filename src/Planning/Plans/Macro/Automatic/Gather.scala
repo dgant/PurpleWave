@@ -8,6 +8,7 @@ import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCountEverything
 import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Plan
+import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 import scala.collection.mutable
@@ -47,41 +48,43 @@ class Gather extends Plan {
         workers.size
       else if (aboveCeiling)
         0
-      else
+        else
         (workers.size * With.blackboard.gasTargetRatio).toInt
-  }
+      }
   
-  private def countUnits() {
-    val activeBases = With.geography.ourBases.filter(_.townHall.exists(hall => hall.morphing || hall.remainingCompletionFrames < GameTime(0, 10)()))
-    calculateTransferPaths(activeBases)
-    minerals  = activeBases.flatMap(_.minerals).toSet
-    gasses    = activeBases.flatMap(_.gas.flatMap(_.friendly).filter(u => u.complete)).toSet
-    if (minerals.isEmpty) {
-      minerals = With.geography.bases.flatMap(_.minerals).toSet
-    }
-    if (gasses.isEmpty) {
-      gasses = With.units.ours.filter(_.unitClass.isGas)
-    }
-    resources = gasses ++ minerals
-    if (resources.isEmpty) {
-      return
-    }
+    private def countUnits() {
+      val activeBases = With.geography.ourBases.filter(_.townHall.exists(hall =>
+        hall.is(Zerg.LairOrHive)
+        || hall.remainingCompletionFrames < GameTime(0, 10)()))
+      calculateTransferPaths(activeBases)
+      minerals  = activeBases.flatMap(_.minerals).toSet
+      gasses    = activeBases.flatMap(_.gas.flatMap(_.friendly).filter(u => u.complete)).toSet
+      if (minerals.isEmpty) {
+        minerals = With.geography.bases.flatMap(_.minerals).toSet
+      }
+      if (gasses.isEmpty) {
+        gasses = With.units.ours.filter(_.unitClass.isGas)
+      }
+      resources = gasses ++ minerals
+      if (resources.isEmpty) {
+        return
+      }
     
-    workersByResource.clear()
-    resourceByWorker.clear()
-    resources.foreach(resource => workersByResource(resource) = new mutable.HashSet[FriendlyUnitInfo])
-    workers.foreach(unit => unit.agent.lastIntent.toGather.foreach(resource => assign(unit, resource)))
-    gasWorkersNow = resourceByWorker.count(_._2.unitClass.isGas)
-  }
+      workersByResource.clear()
+      resourceByWorker.clear()
+      resources.foreach(resource => workersByResource(resource) = new mutable.HashSet[FriendlyUnitInfo])
+      workers.foreach(unit => unit.agent.lastIntent.toGather.foreach(resource => assign(unit, resource)))
+      gasWorkersNow = resourceByWorker.count(_._2.unitClass.isGas)
+    }
   
-  private def calculateTransferPaths(bases: Iterable[Base]) {
-    transfersLegal.clear()
-    val baseZones = bases.map(_.zone).toSet
-    baseZones.foreach(zone1 =>
-      baseZones.foreach(zone2 => {
-        val path = With.paths.zonePath(zone1, zone2)
-        val pathZones: Iterable[Zone] = path.map(_.steps.map(_.to).filter(zone => zone != zone1 && zone != zone2)).getOrElse(Iterable.empty)
-        val pathZonesDanger = pathZones.filter(zone =>
+    private def calculateTransferPaths(bases: Iterable[Base]) {
+      transfersLegal.clear()
+      val baseZones = bases.map(_.zone).toSet
+      baseZones.foreach(zone1 =>
+        baseZones.foreach(zone2 => {
+          val path = With.paths.zonePath(zone1, zone2)
+          val pathZones: Iterable[Zone] = path.map(_.steps.map(_.to).filter(zone => zone != zone1 && zone != zone2)).getOrElse(Iterable.empty)
+          val pathZonesDanger = pathZones.filter(zone =>
                 zone.units.exists(e => e.isEnemy  && e.unitClass.attacksGround)
           && !  zone.units.exists(a => a.isOurs   && a.unitClass.attacksGround))
         if (pathZonesDanger.isEmpty) {
@@ -106,7 +109,7 @@ class Gather extends Plan {
   private def unassign(worker: FriendlyUnitInfo) {
     val resource = resourceByWorker.get(worker)
     if (resource.exists(isActiveGas)) {
-      gasWorkersNow += 1
+      gasWorkersNow -= 1
     }
     resource.foreach(workersByResource(_) -= worker)
     resourceByWorker.remove(worker)

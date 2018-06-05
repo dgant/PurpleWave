@@ -3,6 +3,7 @@ package Planning.Plans.Macro.Automatic
 import Lifecycle.With
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Plan
+import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClasses
 
 class RequireSufficientSupply extends Plan {
@@ -47,11 +48,14 @@ class RequireSufficientSupply extends Plan {
     val incomePerFrame            = With.economy.ourIncomePerFrameMinerals + With.economy.ourIncomePerFrameGas
     val supplyUsedPerFrame        = incomePerFrame * unitSpendingRatio / costPerUnitSupply
     val supplyBanked              = unitSpendingRatio * With.self.minerals / costPerUnitSupply
-  
-    val supplySpentBeforeDepotCompletion  = supplyBanked + supplyUsedPerFrame * depotCompletionFrames
-    val supplyUsedWhenDepotWouldFinish    = Math.min(400, currentSupplyUsed + supplySpentBeforeDepotCompletion)
-    val totalProvidersRequired            = Math.ceil((supplyUsedWhenDepotWouldFinish - currentSupplyOfTownHalls) / supplyPerProvider).toInt
-    val providersRequired                 = Math.max(0, totalProvidersRequired)
+    lazy val larva                = With.units.countOurs(Zerg.Larva)
+    lazy val hatcheries           = With.units.countOurs(Zerg.HatcheryLairOrHive)
+    lazy val larvaPerFrame        = hatcheries / 342.0
+    val supplyAddableBeforeDepotCompletion  = if (With.self.isZerg) larva + larvaPerFrame * depotCompletionFrames else 400
+    val supplySpentBeforeDepotCompletion    = supplyBanked + supplyUsedPerFrame * depotCompletionFrames
+    val supplyUsedWhenDepotWouldFinish      = Math.min(400, currentSupplyUsed + Math.min(supplySpentBeforeDepotCompletion, supplyAddableBeforeDepotCompletion))
+    val totalProvidersRequired              = Math.ceil((supplyUsedWhenDepotWouldFinish - currentSupplyOfTownHalls) / supplyPerProvider).toInt
+    val providersRequired                   = Math.max(0, totalProvidersRequired)
   
     providersRequired
   }

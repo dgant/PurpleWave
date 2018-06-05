@@ -9,7 +9,7 @@ import Information.Grids.Grids
 import Information._
 import Macro.Allocation._
 import Macro.Architecture.{Architecture, PlacementScheduler}
-import Macro.Scheduling.{MasterBuildOrder, Scheduler}
+import Macro.Scheduling.{MasterBuildOrderHistory, MasterBuildPlans, Scheduler}
 import Micro.Agency.{Agency, Commander}
 import Micro.Coordination.Coordinator
 import Micro.Matchups.MatchupGraph
@@ -28,42 +28,43 @@ import bwta.BWTA
 import scala.collection.JavaConverters._
 
 object With {
-  var game            : bwapi.Game          = _
-  var agents          : Agency              = _
-  var architecture    : Architecture        = _
-  var bank            : Bank                = _
-  var blackboard      : Blackboard          = _
-  var battles         : BattleClassifier    = _
-  var buildOrder      : MasterBuildOrder    = _
-  var bullets         : Bullets             = _
-  var camera          : Camera              = _
-  var commander       : Commander           = _
-  var coordinator     : Coordinator         = _
-  var configuration   : Configuration       = _
-  var damageCredit    : DamageCredit        = _
-  var economy         : Economy             = _
-  var geography       : Geography           = _
-  var grids           : Grids               = _
-  var groundskeeper   : Groundskeeper       = _
-  var history         : History             = _
-  var intelligence    : Intelligence        = _
-  var latency         : Latency             = _
-  var logger          : Logger              = _
-  var matchups        : MatchupGraph        = _
-  var paths           : Paths               = _
-  var performance     : PerformanceMonitor  = _
-  var placement       : PlacementScheduler  = _
-  var proxy           : ProxyBWMirror       = _
-  var prioritizer     : Prioritizer         = _
-  var reaction        : MicroReaction       = _
-  var recruiter       : Recruiter           = _
-  var scheduler       : Scheduler           = _
-  var strategy        : Strategist          = _
-  var squads          : Squads              = _
-  var tasks           : AbstractTaskQueue   = _
-  var units           : UnitTracker         = _
-  var viewport        : Viewport            = _
-  var visualization   : Visualization       = _
+  var game              : bwapi.Game              = _
+  var agents            : Agency                  = _
+  var architecture      : Architecture            = _
+  var bank              : Bank                    = _
+  var blackboard        : Blackboard              = _
+  var battles           : BattleClassifier        = _
+  var buildOrderHistory : MasterBuildOrderHistory = _
+  var buildPlans        : MasterBuildPlans        = _
+  var bullets           : Bullets                 = _
+  var camera            : Camera                  = _
+  var commander         : Commander               = _
+  var coordinator       : Coordinator             = _
+  var configuration     : Configuration           = _
+  var damageCredit      : DamageCredit            = _
+  var economy           : Economy                 = _
+  var geography         : Geography               = _
+  var grids             : Grids                   = _
+  var groundskeeper     : Groundskeeper           = _
+  var history           : History                 = _
+  var intelligence      : Intelligence            = _
+  var latency           : Latency                 = _
+  var logger            : Logger                  = _
+  var matchups          : MatchupGraph            = _
+  var paths             : Paths                   = _
+  var performance       : PerformanceMonitor      = _
+  var placement         : PlacementScheduler      = _
+  var proxy             : ProxyBWMirror           = _
+  var prioritizer       : Prioritizer             = _
+  var reaction          : MicroReaction           = _
+  var recruiter         : Recruiter               = _
+  var scheduler         : Scheduler               = _
+  var strategy          : Strategist              = _
+  var squads            : Squads                  = _
+  var tasks             : AbstractTaskQueue       = _
+  var units             : UnitTracker             = _
+  var viewport          : Viewport                = _
+  var visualization     : Visualization           = _
   
   var self    : PlayerInfo         = _
   var neutral : PlayerInfo         = _
@@ -104,7 +105,8 @@ object With {
     bank              = new Bank
     battles           = new BattleClassifier
     blackboard        = new Blackboard
-    buildOrder        = new MasterBuildOrder
+    buildOrderHistory = new MasterBuildOrderHistory
+    buildPlans        = new MasterBuildPlans
     bullets           = new Bullets
     camera            = new Camera
     commander         = new Commander

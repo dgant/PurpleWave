@@ -1,16 +1,12 @@
 package Information.Intelligenze.Fingerprinting.ProtossStrategies
 
-import Information.Intelligenze.Fingerprinting.Fingerprint
-import Lifecycle.With
+import Information.Intelligenze.Fingerprinting.Generic._
+import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchProxied}
 import ProxyBwapi.Races.Protoss
 
-class FingerprintCannonRush extends Fingerprint {
-  override protected def investigate: Boolean = {
-    if ( ! With.enemies.exists(_.isProtoss)) return false
-    With.units.enemy.exists(u =>
-      u.is(Protoss.PhotonCannon)
-      && (
-        u.base.exists(_.owner.isUs)
-        || u.zone.edges.exists(_.otherSideof(u.zone).bases.exists(_.owner.isUs))))
-  }
+class FingerprintCannonRush extends FingerprintCompleteBy(
+  UnitMatchAnd(Protoss.PhotonCannon, UnitMatchProxied),
+  GameTime(3,  0)) {
+  
+  override val sticky = true
 }

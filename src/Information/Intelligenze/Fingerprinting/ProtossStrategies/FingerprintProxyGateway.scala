@@ -1,11 +1,15 @@
 package Information.Intelligenze.Fingerprinting.ProtossStrategies
 
-import Information.Intelligenze.Fingerprinting.Generic.{FingerprintArrivesBy, FingerprintCompleteBy, FingerprintOr, GameTime}
+import Information.Intelligenze.Fingerprinting.Generic._
+import Lifecycle.With
+import Planning.Composition.UnitMatchers.UnitMatchProxied
 import ProxyBwapi.Races.Protoss
 
-class FingerprintProxyGateway extends FingerprintOr(
-  new FingerprintArrivesBy(Protoss.Zealot,    GameTime(2, 50)),
-  new FingerprintCompleteBy(Protoss.Gateway,  GameTime(2,  5))) {
+class FingerprintProxyGateway extends FingerprintAnd(
+  new FingerprintNot(With.intelligence.fingerprints.cannonRush),
+  new FingerprintOr(
+    new FingerprintArrivesBy(Protoss.Zealot,    GameTime(2, 50)),
+    new FingerprintCompleteBy(UnitMatchProxied,  GameTime(4,  0)))) {
   
   override val sticky = true
 }

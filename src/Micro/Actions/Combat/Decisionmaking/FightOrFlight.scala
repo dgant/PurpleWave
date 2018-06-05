@@ -49,11 +49,11 @@ object FightOrFlight extends Action {
     
     decide(true, "Anchors", () => unit.matchups.allies.exists(ally =>
       ! ally.unitClass.isWorker
-        && ally.canAttack
-        && ally.unitClass.topSpeed <= Protoss.HighTemplar.topSpeed
-        && ally.subjectiveValue > unit.subjectiveValue
-        && (ally.matchups.targetsInRange.nonEmpty || ( ! ally.canAttack && ally.matchups.enemies.exists(_.pixelDistanceEdge(ally) < ally.effectiveRangePixels)))
-        && ally.matchups.framesOfSafety < unit.matchups.framesOfSafety))
+      && (ally.canAttack || (ally.unitClass.rawCanAttack && ally.unitClass.isBuilding) || ally.is(Zerg.CreepColony))
+      && ally.unitClass.topSpeed <= Protoss.HighTemplar.topSpeed
+      && ally.subjectiveValue > unit.subjectiveValue
+      && (ally.matchups.targetsInRange.nonEmpty || ( ! ally.canAttack && ally.matchups.enemies.exists(_.pixelDistanceEdge(ally) < ally.effectiveRangePixels)))
+      && ally.matchups.framesOfSafety <= unit.matchups.framesOfSafety))
   
     if (decision.isDefined) {
       unit.agent.shouldEngage = decision.get

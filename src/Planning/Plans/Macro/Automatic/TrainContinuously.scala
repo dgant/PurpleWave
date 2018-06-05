@@ -30,7 +30,7 @@ class TrainContinuously(
     val buildersReadiness         = getBuilderReadiness(buildersExisting)
     val buildersTotal             = buildersExisting.size + buildersSpawning
     val buildersAllocatable       = Math.max(0, Math.min(buildersTotal * maximumConcurrentlyRatio, buildersTotal - buildersReserved))
-    val builderOutputCap          = Math.max(1, Math.round(buildersReadiness * buildersAllocatable))
+    val builderOutputCap          = Math.max(Math.round(buildersReadiness * buildersAllocatable), if (buildersExisting.nonEmpty) 1 else 0)
     
     val minerals                  = With.self.minerals  // To improve: Measure existing expediture commitments
     val gas                       = With.self.gas       // To improve: Measure existing expediture commitments

@@ -2,16 +2,14 @@ package Information.Intelligenze.Fingerprinting.Generic
 
 import Information.Intelligenze.Fingerprinting.Fingerprint
 import Lifecycle.With
-import ProxyBwapi.UnitClasses.UnitClass
+import Planning.Composition.UnitMatchers.UnitMatcher
 
 abstract class AbstractFingerprintQuantityBy(
-  unitClass : UnitClass,
+  unitMatcher : UnitMatcher,
   gameTime  : GameTime)
     extends Fingerprint {
 
   def observed: Int = {
-    With.units.countEnemy(u =>
-      u.is(unitClass)
-        && u.completionFrame <= gameTime.frames)
+    With.units.countEnemy(u => u.is(unitMatcher) && u.completionFrame <= gameTime.frames)
   }
 }

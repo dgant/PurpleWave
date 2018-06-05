@@ -17,6 +17,9 @@ object ShowRushDistances extends View {
   Heartbreak Ridge: 40
   Hitchhiker: 44 36
   
+  Gladiator: 36
+  Transistor: 43, 86
+  
   Alchemist: 128 (because it's cut incorrectly)
   Arcadia: 31
   Luna the Final: 38
@@ -44,6 +47,9 @@ object ShowRushDistances extends View {
   Python: 4096 -  4458 - 5312
   Roadrunner: 4567 - 4858 - 5402
   Tau Cross: 5433 - 5800 - 6236
+  
+  Gladiator: 4486 - 4917 - 5740
+  Transistor: 3925 - 4412 - 4693
   
   Alchemist: 4073 - 4640 - 5151
   Arcadia: 4216 - 5216 - 6008

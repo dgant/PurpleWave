@@ -7,7 +7,7 @@ object ShowStrategiesInterest extends View {
   
   override def renderScreen() {
     
-    val evaluations = With.strategy.permutationInterest
+    val evaluations = With.strategy.interest
       .toVector
       .sortBy( - _._2)
       .take(380 / With.visualization.lineHeightSmall)

@@ -1,7 +1,6 @@
 package Strategery
 
 import Lifecycle.With
-import Mathematics.PurpleMath
 import Planning.Plan
 import Planning.Plans.StandardGamePlan
 import ProxyBwapi.Players.Players
@@ -57,7 +56,7 @@ class Strategist {
     }
     val strategiesFiltered = filterForcedStrategies(strategiesUnfiltered.filter(isAppropriate))
     strategiesFiltered.foreach(evaluate)
-    chooseBest(strategiesFiltered).toSet
+    Playbook.strategySelectionPolicy.chooseBest(strategiesFiltered).toSet
   }
   
   private def filterForcedStrategies(strategies: Iterable[Strategy]): Iterable[Strategy] = {
@@ -113,9 +112,13 @@ class Strategist {
   private def heyIsThisFFA = {
     With.enemies.size > 1 && ! Players.all.exists(p => p.isAlly)
   }
+  
+  def filterStrategies(strategies: Iterable[Strategy]): Iterable[Strategy] = {
+    filterForcedStrategies(strategies.filter(isAppropriate))
+  }
 
   val evaluations = new mutable.HashMap[Strategy, StrategyEvaluation]
-  var permutationInterest: Map[Iterable[Strategy], Double] = Map.empty
+  var interest: Map[Iterable[Strategy], Double] = Map.empty
   
   def evaluate(strategy: Strategy): StrategyEvaluation = {
     if ( ! evaluations.contains(strategy)) {
@@ -123,88 +126,6 @@ class Strategist {
       strategy.choices.flatMap(choices => filterForcedStrategies(choices.filter(isAppropriate))).foreach(evaluate)
     }
     evaluations(strategy)
-  }
-  
-  private def chooseBest(topLevelStrategies: Iterable[Strategy]): Iterable[Strategy] = {
-    val permutations            = topLevelStrategies.flatMap(expandStrategy)
-    val strategies              = permutations.flatten.toVector.distinct
-    val strategyEvaluations     = strategies.map(strategy => (strategy, evaluate(strategy))).toMap
-    val permutationEvaluations  = permutations.map(p => (p, p.map(strategyEvaluations))).toMap
-        permutationInterest     = permutationEvaluations.map(p => (p._1, PurpleMath.geometricMean(p._2.map(_.interestTotal))))
-    val mostInterest            = permutationInterest.values.max
-    val bestPermutation         = permutationInterest.find(_._2 >= mostInterest).get
-    bestPermutation._1
-  }
-  
-  private def filterStrategies(strategies: Iterable[Strategy]): Iterable[Strategy] = {
-    filterForcedStrategies(strategies.filter(isAppropriate))
-  }
-  
-  private def expandStrategy(strategy: Strategy): Iterable[Iterable[Strategy]] = {
-    
-    /*
-    1. Start:
-    Groups of(Pick one of these strategies)
-    S:[[ABC],[DEF],[GHI],[JKL]
-    
-    2. Filter illegal choices I, JKL
-    Groups of(Pick one of these legal strategies)
-    S:[[ABC],[DEF],[GH],[]]
-    
-    3. Remove empty choice groups
-    Non-empty groups of (Pick one of these legal strategies)
-    S:
-    [
-      [ABC],
-      [DEF],
-      [GH]
-    ]
-    
-    4. Replace all choices with their expanded counterparts
-    Non-empty groups of(Pick one of these(Chain of strategies)))
-    S:
-    [
-      [
-        [A,A01,A11],
-        [A,A02,A11],
-        ...,
-        [B,B01,B11],
-        [B,B02,B11],
-        ...
-      ],
-      [
-        D...
-      ]
-    ]
-    
-    5. For each row of choices, choose one of each chain
-    */
-    
-    // 1. Groups of(Pick one of these strategies)
-    
-    val choices = strategy.choices
-    
-    // 2. Groups of(Pick one of these legal strategies)
-    val legalChoices = choices.map(filterStrategies)
-    
-    //3. Non-empty groups of (Pick one of these legal strategies)
-    val extantChoices = legalChoices.filter(_.nonEmpty)
-    if (extantChoices.isEmpty) {
-      return Iterable(Iterable(strategy))
-    }
-    
-    //4. Non-empty groups of(Pick one of these(Chain of strategies)))
-    val extantChoicesChains = extantChoices.map(_.flatMap(expandStrategy))
-    
-    var output = Iterable(Iterable(strategy))
-    extantChoicesChains.foreach(nextChoiceChain =>
-      output = output.flatMap(outputChain =>
-        nextChoiceChain.map(nextChoice =>
-          outputChain ++ nextChoice))
-    )
-    
-    output = output.map(_.toSet.toIterable)
-    output
   }
 }
 

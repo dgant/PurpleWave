@@ -12,7 +12,7 @@ import ProxyBwapi.UnitClasses.UnitClass
 class BuildZergStaticDefenseAtBases(
   towerClass: UnitClass,
   towersRequired: Int,
-  placement: PlacementProfile = PlacementProfiles.hugWorkersWithCannon)
+  placement: PlacementProfile = PlacementProfiles.wallCannon)
   extends Plan {
   
   override def onUpdate() {

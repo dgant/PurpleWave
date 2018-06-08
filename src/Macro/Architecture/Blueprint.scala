@@ -5,7 +5,7 @@ import Lifecycle.With
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
 import Mathematics.Points.{Tile, TileRectangle}
 import Planning.Plan
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 
 class Blueprint(
@@ -37,9 +37,13 @@ class Blueprint(
   requireTownHallTile         = requireTownHallTile         .orElse(Some(building.exists(_.isTownHall)))
   requireGasTile              = requireGasTile              .orElse(Some(building.exists(_.isRefinery)))
   requireResourceGap          = requireResourceGap          .orElse(Some(building.exists(_.isTownHall)))
-  marginPixels                = marginPixels                .orElse(building.filter(_.attacks).map(_.effectiveRangePixels.toDouble)).orElse(building.filter(_ == Protoss.ShieldBattery).map(b => 32.0 * 2.0)).orElse(Some(32.0 * 9.0))
   preferZone                  = preferZone                  .orElse(requireZone)
   placement                   = placement                   .orElse(Some(PlacementProfiles.default(this)))
+  marginPixels = marginPixels
+    .orElse(building.filter(_.attacks).map(_.effectiveRangePixels.toDouble))
+    .orElse(building.filter(_ == Protoss.ShieldBattery).map(b => 32.0 * 2.0))
+    .orElse(building.filter(_ == Zerg.CreepColony).map(b => 32.0 * 7.0))
+    .orElse(Some(32.0 * 9.0))
   
   def fulfilledBy(proposal: Blueprint): Boolean = {
     if (proposal == this) return true

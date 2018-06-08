@@ -5,6 +5,7 @@ import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.UnitMatchOr
 import Planning.Plan
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.{MatchingRatio, TrainContinuously, TrainMatchingRatio}
@@ -14,21 +15,20 @@ import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Macro.Zerg.BuildSunkensAtNatural
 import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
 import Planning.Plans.Predicates.Milestones._
-import Planning.Plans.Predicates.SafeAtHome
+import Planning.Plans.Predicates.Reactive.EnemyBasesAtLeast
+import Planning.Plans.Predicates.{Employing, SafeAtHome}
 import Planning.Plans.Predicates.Scenarios.EnemyStrategy
-import Planning.Plans.Scouting.Scout
+import Planning.Plans.Scouting.{CampExpansions, FindExpansions, Scout}
 import ProxyBwapi.Races.{Protoss, Zerg}
+import Strategery.Strategies.Zerg.ZergVsProtoss
 
 class ZergVsProtoss extends GameplanModeTemplate {
   
-  class DetectedStrategy extends EnemyStrategy(
+  override val activationCriteria: Plan = new Employing(ZergVsProtoss)
+  
+  class ShouldDoSpeedlingAllIn extends EnemyStrategy(
     With.intelligence.fingerprints.cannonRush,
-    With.intelligence.fingerprints.proxyGateway,
-    With.intelligence.fingerprints.twoGate,
-    With.intelligence.fingerprints.oneGateCore,
-    With.intelligence.fingerprints.gatewayFe,
-    With.intelligence.fingerprints.forgeFe,
-    With.intelligence.fingerprints.nexusFirst)
+    With.intelligence.fingerprints.proxyGateway)
   
   class ProceedWithTech extends Or(
       new Latch(new UnitsAtLeast(16, Zerg.Drone)),
@@ -49,15 +49,29 @@ class ZergVsProtoss extends GameplanModeTemplate {
     Protoss.CyberneticsCore),
     complete = true)
   
-  override def defaultScoutPlan: Plan = new Parallel(
-    new If(
-      new SafeForOverlords,
-      new Scout(20) { scouts.get.unitMatcher.set(Zerg.Overlord) }),
-    new Trigger(
-      new MineralsAtLeast(300),
+  override def priorityAttackPlan: Plan = new CampExpansions
+  
+  override def defaultAttackPlan: Plan = new If(
+    new Or(
+      new UnitsAtLeast(1, Zerg.Mutalisk, complete = true),
+      new ShouldDoSpeedlingAllIn,
+      new EnemyBasesAtLeast(2)),
+    new Attack)
+  
+  override def defaultScoutPlan: Plan = new If(
+    new Parallel(
       new If(
-        new Not(new DetectedStrategy)),
-        new Scout))
+        new SafeForOverlords,
+        new Scout { scouts.get.unitMatcher.set(Zerg.Overlord) }),
+      new Trigger(
+        new UnitsAtLeast(2, Zerg.Overlord),
+        new If(
+          new UnitsAtMost(0, UnitMatchOr(Protoss.Zealot, Protoss.PhotonCannon), complete = true),
+          new Scout))))
+  
+  override def defaultScoutExposPlan: Plan = new If(
+    new UnitsAtLeast(8, Zerg.Mutalisk),
+    new FindExpansions)
   
   override def defaultBuildOrder: Plan = new Parallel(
     new BuildOrder(
@@ -89,36 +103,38 @@ class ZergVsProtoss extends GameplanModeTemplate {
             initialBefore = new BuildSunkensAtNatural(2)),
           new BuildOrder(RequestAtLeast(10, Zerg.Zergling))))))
     
+  lazy val ZealotOrDragoon = UnitMatchOr(Protoss.Zealot, Protoss.Dragoon)
+  
   class ReactiveSunkensVsZealots extends If(
     new And(
       new UnitsAtLeast(12, Zerg.Drone),
       new UnitsAtMost(0, Zerg.Spire, complete = true)),
     new If(
-      new EnemyUnitsAtLeast(18, Protoss.Zealot),
+      new EnemyUnitsAtLeast(18, ZealotOrDragoon),
       new BuildSunkensAtNatural(7),
       new If(
-        new EnemyUnitsAtLeast(14, Protoss.Zealot),
+        new EnemyUnitsAtLeast(14, ZealotOrDragoon),
         new BuildSunkensAtNatural(6),
         new If(
-          new EnemyUnitsAtLeast(11, Protoss.Zealot),
+          new EnemyUnitsAtLeast(11, ZealotOrDragoon),
           new BuildSunkensAtNatural(5),
           new If(
-            new EnemyUnitsAtLeast(8, Protoss.Zealot),
+            new EnemyUnitsAtLeast(8, ZealotOrDragoon),
             new BuildSunkensAtNatural(4),
             new If(
-              new EnemyUnitsAtLeast(5, Protoss.Zealot),
+              new EnemyUnitsAtLeast(5, ZealotOrDragoon),
               new BuildSunkensAtNatural(3),
               new If(
-                new EnemyUnitsAtLeast(2, Protoss.Zealot),
+                new EnemyUnitsAtLeast(2, ZealotOrDragoon),
                 new BuildSunkensAtNatural(2))))))))
   
   class ReactiveZerglingsVsZealots extends If(
     new UnitsAtMost(0, Zerg.Spire, complete = true),
-    new TrainMatchingRatio(Zerg.Zergling, 0, 12, Seq(
-      MatchingRatio(Protoss.Zealot, 3.0),
-      MatchingRatio(Protoss.Gateway, 2.0))))
+    new TrainMatchingRatio(Zerg.Zergling, 0, 10, Seq(
+      MatchingRatio(Protoss.Zealot, 4.0))))
   
   class DoSpeedlingAllIn extends Parallel(
+    new Aggression(1.2),
     new BuildOrder(RequestAtLeast(10, Zerg.Zergling)),
     new If(
       new Or(
@@ -137,22 +153,23 @@ class ZergVsProtoss extends GameplanModeTemplate {
       new MineralsAtLeast(400),
       new RequireMiningBases(4)))
   
-  class ReactToProxyGates extends If(
-    new EnemyStrategy(With.intelligence.fingerprints.proxyGateway),
-    new DoSpeedlingAllIn)
-    
-  class ReactToNexusFirst extends If(
-    new EnemyStrategy(With.intelligence.fingerprints.nexusFirst),
-    new DoSpeedlingAllIn)
+  class NeedExpansion(droneCount: Int) extends Or(
+    new UnitsAtLeast(droneCount, Zerg.Drone),
+    new MineralsAtLeast(500))
   
-  class ReactToCannonRush extends If(
-    new EnemyStrategy(With.intelligence.fingerprints.cannonRush),
-    new DoSpeedlingAllIn)
+  class ReadyToExpand extends Or(
+    new UnitsAtLeast(1, Zerg.Spire, complete = true),
+    new MineralsAtLeast(300))
   
   override def emergencyPlans: Seq[Plan] = Vector(
     new TrainContinuously(Zerg.SunkenColony),
     new ReactiveSunkensVsZealots)
   override def buildPlans: Seq[Plan] = Vector(
+    new If(
+      new UnitsAtLeast(1, Zerg.Mutalisk, complete = true),
+      new Aggression(1.0),
+      new Aggression(0.8)),
+    
     new Do(() => With.blackboard.gasLimitFloor = 0),
     new If(
       new Not(new ProceedWithTech)),
@@ -161,26 +178,36 @@ class ZergVsProtoss extends GameplanModeTemplate {
         new UnitsAtMost(1, Zerg.Spire),
         new Do(() => With.blackboard.gasLimitCeiling = With.self.minerals + 50),
         new Do(() => With.blackboard.gasLimitCeiling = With.self.minerals + 200)),
-    new TrainMatchingRatio(Zerg.Scourge, 0, 8, Seq(MatchingRatio(UnitMatchOr(Protoss.Corsair, Protoss.Stargate), 2.0))),
+    new If(
+      new EnemyHasShown(Protoss.Corsair),
+      new TrainContinuously(Zerg.Scourge, 2)),
+    new TrainMatchingRatio(Zerg.Scourge, 0, 10, Seq(MatchingRatio(UnitMatchOr(Protoss.Corsair, Protoss.Stargate), 2.0))),
+    new If(
+      new And(
+        new MiningBasesAtLeast(3),
+        new UnitsAtLeast(6, Zerg.Mutalisk),
+        new UpgradeComplete(Zerg.ZerglingSpeed, 1, Zerg.Zergling.buildFrames)),
+      new TrainMatchingRatio(Zerg.Zergling, 0, 18, Seq(MatchingRatio(Protoss.Dragoon, 3.0)))),
     new If(
       new Check(() => With.self.gas >= Math.min(100, With.self.minerals)),
       new Parallel(
         new If(
-          new UnitsAtLeast(1, UnitMatchOr(Protoss.Corsair, Protoss.Stargate)),
+          new Or(
+            new EnemyHasShown(Protoss.Corsair),
+            new EnemyHasShown(Protoss.Stargate)),
           new UpgradeContinuously(Zerg.AirArmor),
           new If(
             new UnitsAtLeast(6, Zerg.Mutalisk),
             new UpgradeContinuously(Zerg.AirDamage))),
         new TrainContinuously(Zerg.Mutalisk))),
-   
-    new ReactToProxyGates,
-    new ReactToCannonRush,
-    new ReactToNexusFirst,
+    new If(
+      new ShouldDoSpeedlingAllIn,
+      new DoSpeedlingAllIn),
+    new ReactiveZerglingsVsZealots,
     new If(
       new ProceedWithDrones,
       new TrainContinuously(Zerg.Drone, 12),
       new TrainContinuously(Zerg.Drone, 9)),
-    new ReactiveZerglingsVsZealots,
     new If(
       new ProceedWithTech,
       new Build(
@@ -189,18 +216,42 @@ class ZergVsProtoss extends GameplanModeTemplate {
         RequestAtLeast(1, Zerg.Spire),
         RequestUpgrade(Zerg.ZerglingSpeed))),
     new If(
-      new UnitsAtLeast(16, Zerg.Drone),
-      new BuildGasPumps),
+      new UnitsAtLeast(1, Zerg.Spire),
+      new Parallel(
+        new If(
+          new UnitsAtLeast(18, Zerg.Drone),
+          new BuildGasPumps(2)),
+        new If(
+          new UnitsAtLeast(26, Zerg.Drone),
+          new BuildGasPumps(3)),
+        new If(
+          new UnitsAtLeast(34, Zerg.Drone),
+          new BuildGasPumps(5)))),
     new If(
-      new UnitsAtLeast(16, Zerg.Drone),
+      new And(
+        new NeedExpansion(16),
+        new ReadyToExpand),
       new RequireMiningBases(3)),
     new If(
-      new UnitsAtLeast(25, Zerg.Drone),
+      new And(
+        new NeedExpansion(20),
+        new ReadyToExpand),
       new RequireMiningBases(4)),
     new If(
-      new UnitsAtLeast(30, Zerg.Drone),
+      new And(
+        new NeedExpansion(25),
+        new ReadyToExpand),
       new RequireMiningBases(5)),
-    new Or(
+    new If(
+      new And(
+        new NeedExpansion(30),
+        new ReadyToExpand),
+      new RequireMiningBases(6)),
+    new If(
+      new ProceedWithDrones,
+      new TrainContinuously(Zerg.Drone, 16)),
+    new TrainContinuously(Zerg.Zergling, 4),
+    new If(
       new ProceedWithDrones,
       new TrainContinuously(Zerg.Drone, 24)),
     new IfOnMiningBases(3, new TrainContinuously(Zerg.Drone, 27)),

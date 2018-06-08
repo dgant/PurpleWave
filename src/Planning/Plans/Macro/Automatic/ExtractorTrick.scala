@@ -13,7 +13,7 @@ class ExtractorTrick extends Plan {
     lazy val extractors = With.units.ours.filter(e => e.is(Zerg.Extractor) && ! e.complete)
     val shouldBuildExtractor = (
       With.self.supplyTotal == 18
-      && With.self.supplyUsed == 18
+      && Vector(17, 18).contains(With.self.supplyUsed)
       && With.self.minerals >= 76
       && With.units.existsOurs(Zerg.Larva)
       && extractors.isEmpty)
@@ -21,10 +21,10 @@ class ExtractorTrick extends Plan {
     lazy val shouldCancelExtractor = (
       // Give time for our supply to update
       extractors.exists(e => With.framesSince(e.frameDiscovered) > 5 * 24)
-      && (extractors.exists(_.remainingCompletionFrames < 3 * 24)
-        || (
-          With.self.supplyTotal == 18
-          && With.self.supplyUsed >= 18)))
+      && (
+        extractors.exists(_.remainingCompletionFrames < 3 * 24)
+        || (With.self.supplyTotal == 18 && With.self.supplyUsed >= 18))
+      )
     
     if (shouldBuildExtractor) {
       With.scheduler.request(this, RequestAtLeast(1, Zerg.Extractor))

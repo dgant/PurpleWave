@@ -14,20 +14,20 @@ object TargetFilterIgnoreScouts extends TargetFilter {
       * We are being worker rushed, or
       * We can catch it and (there are no combat enemies or the worker is being violent)
      */
-    lazy val atHome             = actor.base.exists(_.owner.isUs)
+    lazy val targetIsWorker     = target.unitClass.isWorker
+    lazy val targetInOurBase    = target.base.exists(_.owner.isUs)
     lazy val canCatch           = actor.inRangeToAttack(target) || actor.pixelRangeAgainst(target) > 32.0 * 3.0 || actor.topSpeed > target.topSpeed * 1.25
     lazy val facingRealThreats  = actor.matchups.targets.exists(u => u.unitClass.attacksGround && ! u.unitClass.isWorker)
     lazy val beingWorkerRushed  = actor.matchups.targets.count(_.unitClass.isWorker) > 2
     lazy val beingProxied       = actor.matchups.targets.exists(_.unitClass.isBuilding)
-    
     
     lazy val hasFormation       = actor.agent.toForm.isDefined
     lazy val targetingWorker    = target.unitClass.isWorker
     lazy val combatThreats      = actor.matchups.enemies.exists(e => e.unitClass.attacksGround && ! e.unitClass.isWorker)
     lazy val targetViolent      = target.isBeingViolent
     
-    
-    if ( ! atHome)                          return true
+    if ( ! targetIsWorker)                  return true
+    if ( ! targetInOurBase)                 return true
     if (beingWorkerRushed)                  return true
     if (beingProxied)                       return true
     if (facingRealThreats && targetViolent) return true

@@ -36,7 +36,9 @@ class Agency {
     
     if (agentQueue.isEmpty) {
       runtimes.enqueue(With.framesSince(lastQueueCompletion))
-      while (runtimes.sum > 24 * 10) runtimes.dequeue()
+      while (runtimes.sum > 24 * 10) {
+        runtimes.dequeue()
+      }
       lastQueueCompletion = With.frame
       
       // Make sure our orderable units all have agents

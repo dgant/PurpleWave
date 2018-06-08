@@ -2,15 +2,16 @@ package Micro.Actions.Combat.Maneuvering
 
 import Lifecycle.With
 import Micro.Actions.Action
+import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object GooseChase extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    false
+    (unit.isAny(Terran.Vulture, Zerg.Zergling) || unit.agent.canScout)
     && unit.canMove
     && unit.matchups.threats.nonEmpty
-    && unit.matchups.threats.forall(unit.topSpeed > _.topSpeed * 1.5)
+    && unit.matchups.threats.forall(unit.topSpeed > _.topSpeed * 1.09) // Lets a Zergling just barely goose chase a Dragoon
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {

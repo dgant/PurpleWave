@@ -1,14 +1,14 @@
 package Planning.Plans.GamePlans.Zerg.ZvE
 
 import Lifecycle.With
-import Macro.BuildRequests.{BuildRequest, RequestAtLeast, RequestUpgrade}
+import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Plan
 import Planning.Plans.Army.{AllIn, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.TrainContinuously
-import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Macro.Automatic.{ExtractorTrick, TrainContinuously}
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
 import Planning.Plans.Predicates.Matchup.EnemyIsZerg
 import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast, UpgradeComplete}
@@ -16,13 +16,16 @@ import ProxyBwapi.Races.{Terran, Zerg}
 
 class NineHatchLings extends GameplanModeTemplate {
   
-  override def buildOrder: Seq[BuildRequest] = Vector(
-    RequestAtLeast(9, Zerg.Drone),
-    RequestAtLeast(2, Zerg.Hatchery),
-    RequestAtLeast(1, Zerg.SpawningPool),
-    RequestAtLeast(10, Zerg.Drone),
-    RequestAtLeast(2, Zerg.Overlord),
-    RequestAtLeast(6, Zerg.Zergling))
+  override def defaultBuildOrder: Plan = new Parallel(
+    new BuildOrder(RequestAtLeast(9, Zerg.Drone)),
+    new ExtractorTrick,
+    new BuildOrder(
+      RequestAtLeast(10, Zerg.Drone),
+      RequestAtLeast(2, Zerg.Hatchery),
+      RequestAtLeast(1, Zerg.SpawningPool),
+      RequestAtLeast(11, Zerg.Drone),
+      RequestAtLeast(2, Zerg.Overlord),
+      RequestAtLeast(6, Zerg.Zergling)))
   
   override def defaultScoutPlan: Plan = NoPlan()
   

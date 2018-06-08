@@ -32,7 +32,7 @@ class Economy {
   
   private val ourPatchesMineralsCache = new Cache(() => With.geography.ourBases.toSeq.map(_.minerals.size).sum)
   private val ourPatchesGasCache      = new Cache(() => With.geography.ourBases.toSeq.map(_.gas.count(g => g.complete && g.isOurs)).sum)
-  private val ourActiveMinersCache    = new Cache(() => With.units.countOurs(u => isActivelyMining(u) && u.gatheringMinerals))
+  private val ourActiveMinersCache    = new Cache(() => Math.max(0, With.units.countOurs(u => isActivelyMining(u) && u.gatheringMinerals) - 1)) // Subtract one to account for a lone miner+builder
   private val ourActiveDrillersCache  = new Cache(() => With.units.countOurs(u => isActivelyMining(u) && u.gatheringGas))
   private val ourIncomePerFrameMineralsCache  = new Cache(() => Math.min(2.0 * ourPatchesMineralsCache(), ourActiveMinersCache())   * incomePerFrameMinerals)
   private val ourIncomePerFrameGasCache       = new Cache(() => Math.min(3.0 * ourPatchesGasCache(),      ourActiveDrillersCache()) * incomePerFrameGas)

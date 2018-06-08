@@ -34,6 +34,7 @@ abstract class GameplanModeTemplate extends GameplanMode {
   def defaultSupplyPlan     : Plan              = new RequireSufficientSupply
   def defaultWorkerPlan     : Plan              = new If(new Not(new WeAreZerg), new TrainWorkersContinuously(superSaturate))
   def defaultScoutPlan      : Plan              = new ScoutAt(scoutAt)
+  def defaultScoutExposPlan : Plan              = new ScoutExpansionsAt(scoutExpansionsAt)
   def priorityDefensePlan   : Plan              = NoPlan()
   def priorityAttackPlan    : Plan              = NoPlan()
   def defaultNukePlan       : Plan              = new NukeBase
@@ -57,7 +58,7 @@ abstract class GameplanModeTemplate extends GameplanMode {
     new DefendAgainstProxy,
     new DefendAgainstWorkerRush,
     new EscortSettlers,
-    new ScoutExpansionsAt(scoutExpansionsAt),
+    defaultScoutExposPlan,
     defaultAttackPlan,
     new DefendEntrance,
     new Gather,

@@ -1,13 +1,18 @@
 package Macro.Architecture.Heuristics
 
+import Lifecycle.With
 import Macro.Architecture.Blueprint
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
 object PlacementProfiles {
   
   def default(blueprint: Blueprint): PlacementProfile = {
-    if (blueprint.requireTownHallTile.get)
-      townHall
+    if (blueprint.requireTownHallTile.get) {
+      if (With.self.isZerg)
+        townHallFar
+      else
+        townHallNearby
+    }
     else if (blueprint.requireGasTile.get)
       gas
     else if (blueprint.powers.get)
@@ -56,12 +61,20 @@ object PlacementProfiles {
     preferDistanceFromEnemy     = 1.0
   )
   
-  val townHall = new PlacementProfile("Town Hall",
+  val townHallNearby = new PlacementProfile("Town Hall Nearby",
     preferZone                  = 1000.0,
     preferNatural               = 1.0,
     preferResources             = 0.5,
-    preferDistanceFromEnemy     = 1.0,
-    avoidDistanceFromBase       = 1.0
+    preferDistanceFromEnemy     = 0.75,
+    avoidDistanceFromBase       = 1.25
+  )
+  
+  val townHallFar = new PlacementProfile("Town Hall Far",
+    preferZone                  = 1000.0,
+    preferNatural               = 1.0,
+    preferResources             = 0.5,
+    preferDistanceFromEnemy     = 1.25,
+    avoidDistanceFromBase       = 0.75
   )
   
   //////////////////////////

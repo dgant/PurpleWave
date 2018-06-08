@@ -74,8 +74,8 @@ object Potential {
     val allyNearestUseful     = ByOption.minBy(alliesUseful)(ally => ally.pixelDistanceCenter(unit) - ally.effectiveRangePixels)
     if (allyNearestUseful.isEmpty) return new Force
     val allyDistance          = allyNearestUseful.get.pixelDistanceCenter(unit)
-    val allyDistanceAlarming  = Math.max(32.0 * 2.0, Math.max(unit.effectiveRangePixels, allyNearestUseful.get.effectiveRangePixels))
-    val magnitude             = Math.min(1.0, allyDistance / allyDistanceAlarming)
+    val allyDistanceAlarming  = if (unit.flying) 1.0 else Math.max(32.0 * 2.0, Math.max(unit.effectiveRangePixels, allyNearestUseful.get.effectiveRangePixels))
+    val magnitude             = Math.min(1.0, PurpleMath.nanToOne(allyDistance / allyDistanceAlarming))
     val output                = unitAttraction(unit, allyNearestUseful.get, magnitude)
     output
   }

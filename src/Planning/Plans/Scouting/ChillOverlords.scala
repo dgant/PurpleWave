@@ -2,6 +2,7 @@ package Planning.Plans.Scouting
 
 import Lifecycle.With
 import Mathematics.PurpleMath
+import Mathematics.Shapes.Circle
 import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCountEverything
@@ -26,14 +27,15 @@ class ChillOverlords extends Plan {
       return
     }
     overlords.acquire(this)
-    overlords.units.foreach(chillOut)
+    overlords.units.foreach(chillOut(_, overlords.units.size))
   }
   
-  private def chillOut(overlord: FriendlyUnitInfo) {
+  private def chillOut(overlord: FriendlyUnitInfo, count: Int) {
     val base = ByOption.minBy(With.geography.ourBases.map(_.heart.pixelCenter))(overlord.pixelDistanceSquared)
-    val tile = base.map(b => PurpleMath.sample(b.zone.tiles.toVector)).getOrElse(With.geography.home)
+    val tile = base.map(b => PurpleMath.sample(Circle.points(Math.sqrt(count).toInt).map(b.tileIncluding.add))).getOrElse(With.geography.home)
     val intent = new Intention
     intent.toTravel = Some(tile.pixelCenter)
+    intent.canFlee = true
     overlord.agent.intend(this, intent)
   }
 }

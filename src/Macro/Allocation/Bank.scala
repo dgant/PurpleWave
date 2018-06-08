@@ -33,8 +33,8 @@ class Bank {
   }
   
   private def recountResources() {
-    mineralsLeft  = With.self.minerals
-    gasLeft       = With.self.gas
+    mineralsLeft  = With.self.minerals  + (With.reaction.planningAverage * With.economy.incomePerFrameMinerals).toInt
+    gasLeft       = With.self.gas       + (With.reaction.planningAverage * With.economy.incomePerFrameGas).toInt
     supplyLeft    = With.self.supplyTotal - With.self.supplyUsed
     prioritizedRequests.foreach(queueBuyer)
   }

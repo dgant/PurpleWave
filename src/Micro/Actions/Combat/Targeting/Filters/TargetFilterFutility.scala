@@ -1,6 +1,7 @@
 package Micro.Actions.Combat.Targeting.Filters
 
 import Lifecycle.With
+import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterFutility extends TargetFilter {
@@ -17,7 +18,7 @@ object TargetFilterFutility extends TargetFilter {
       && ally.framesBeforeAttacking(target) <= actor.framesBeforeAttacking(target))
   
     lazy val targetBusy       = target.gathering || target.constructing || target.repairing || ! target.canMove
-    lazy val targetCatchable  = actor.topSpeed >= target.topSpeed || actor.inRangeToAttack(target) || targetBusy || alliesAssisting
+    lazy val targetCatchable  = actor.topSpeed >= target.topSpeed * 1.2 || actor.inRangeToAttack(target) || targetBusy || alliesAssisting || actor.is(Zerg.Scourge)
     lazy val targetReachable  = target.visible || actor.flying || ! target.flying || With.grids.walkableTerrain.get(target.tileIncludingCenter)
     
     val output = targetReachable && (targetCatchable || atOurWorkers)

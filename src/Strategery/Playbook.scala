@@ -54,6 +54,7 @@ class AIST1Playbook extends EmptyPlaybook {
   override lazy val forced: Seq[Strategy] = Seq(
     ZergSparkle,
     ZergVsProtoss
+    //Zerg4Pool
   )
   
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionAIST1

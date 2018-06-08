@@ -69,9 +69,19 @@ class TrainContinuously(
   protected def currentCount: Int = {
     // Should this just be unit.alive?
     // Maybe this is compensating for a Scheduler
-    With.units.countOurs(unit =>
-      (unit.alive && matcher.accept(unit))
-      || (unit.is(Zerg.Egg) && unit.buildType == unitClass))
+    With.units.ours
+      .toVector
+      .map(unit =>
+        if (unit.alive && matcher.accept(unit)) {
+          1
+        }
+        else if (unit.is(Zerg.Egg) && unit.buildType == unitClass) {
+          if (unitClass.isTwoUnitsInOneEgg) 2 else 1
+        }
+        else {
+          0
+        })
+      .sum
   }
   
   protected val matcher =

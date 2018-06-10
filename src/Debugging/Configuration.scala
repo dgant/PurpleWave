@@ -8,18 +8,18 @@ class Configuration {
   // Manners //
   /////////////
   
-  var enableSurrenders            = true
-  var enablePerformanceStops      = true
+  var enableSurrenders            = false //true
+  var enablePerformanceStops      = true //false //true
   var enablePerformanceSurrender  = false
   var enableStdOut                = false // StdOut crashes bots on SSCAIT because it blocks forever
-  var enableChat                  = true
+  var enableChat                  = false //true
   
   ///////////////
   // Operation //
   ///////////////
   
   var gameSpeed           = 0
-  var identifyGhostUnits  = true
+  var identifyGhostUnits  = false //true
   
   //////////////
   // Strategy //

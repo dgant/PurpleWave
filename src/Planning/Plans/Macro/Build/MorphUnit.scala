@@ -4,6 +4,8 @@ import Macro.Scheduling.Project
 import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import Planning.Composition.UnitCounters.UnitCountOne
+import Planning.Composition.UnitMatchers.{UnitMatchMorphingInto, UnitMatchOr}
+import Planning.Composition.UnitPreferences.{UnitPreferBaseWithFewerWorkers, UnitPreferHatcheryWithMoreLarva}
 import Planning.Plan
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
@@ -16,7 +18,7 @@ class MorphUnit(val classToMorph: UnitClass) extends Plan {
   val currencyLock    = new LockCurrencyForUnit(classToMorph)
   val morpherClass    = classToMorph.whatBuilds._1
   val morpherLock     = new LockUnits {
-    unitMatcher.set(morpherClass)
+    unitMatcher.set(UnitMatchOr(morpherClass, UnitMatchMorphingInto(classToMorph)))
     unitCounter.set(UnitCountOne)
   }
   
@@ -37,6 +39,7 @@ class MorphUnit(val classToMorph: UnitClass) extends Plan {
     currencyLock.acquire(this)
     
     if (currencyLock.satisfied && ! currencyLock.isSpent) {
+      setPreference()
       morpherLock.acquire(this)
       morpher = morpherLock.units.headOption
       morpher.foreach(_.agent.intend(this, new Intention {
@@ -44,6 +47,17 @@ class MorphUnit(val classToMorph: UnitClass) extends Plan {
         canFlee = classToMorph == Zerg.Lurker
         canAttack = classToMorph != Zerg.Lurker
       }))
+    }
+  }
+  
+  protected def setPreference() {
+    if (classToMorph.isWorker) {
+      morpherLock.unitPreference.set(UnitPreferBaseWithFewerWorkers)
+    } else if (morpherClass == Zerg.Larva) {
+      morpherLock.unitPreference.set(UnitPreferHatcheryWithMoreLarva)
+    } else {
+      // AIST1 hack fix: Disabling this so we stop morphing all our Hatcheries into Lairs
+      //morpherLock.unitPreference.set(UnitPreferClose(With.geography.home.pixelCenter))
     }
   }
 }

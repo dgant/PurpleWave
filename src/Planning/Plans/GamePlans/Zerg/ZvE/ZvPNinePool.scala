@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvE
 
 import Lifecycle.With
-import Macro.BuildRequests.{RequestAnother, RequestAtLeast}
+import Macro.BuildRequests.{RequestAnother, RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack, EjectScout}
@@ -35,13 +35,13 @@ class ZvPNinePool extends GameplanModeTemplate {
   
   override def defaultAggressionPlan: Plan = new If(
     new If(
-      new UnitsAtLeast(40, UnitMatchWarriors),
+      new UnitsAtLeast(40, Zerg.Hydralisk),
       new Aggression(4.0),
       new If(
-        new UnitsAtLeast(30, UnitMatchWarriors),
+        new UnitsAtLeast(30, Zerg.Hydralisk),
         new Aggression(2.2),
         new If(
-          new UnitsAtLeast(16, UnitMatchWarriors),
+          new UnitsAtLeast(15, Zerg.Hydralisk),
           new Aggression(1.5),
           new Aggression(1.15)))))
   
@@ -61,14 +61,30 @@ class ZvPNinePool extends GameplanModeTemplate {
       RequestAtLeast(1, Zerg.Overlord),
       RequestAtLeast(6, Zerg.Zergling)))
   
-  private class TrainJustEnoughZerglings extends TrainMatchingRatio(Zerg.Zergling, 1, 12, Seq(MatchingRatio(Protoss.Zealot, 4.0)))
-  private class TwoHatchMutaTakeSecondGas extends If(
+  private class TrainJustEnoughZerglings extends TrainMatchingRatio(Zerg.Zergling, 2, 12, Seq(MatchingRatio(Protoss.Zealot, 4.5), MatchingRatio(Protoss.Dragoon, 3.0)))
+  private class TakeSecondGasForMuta extends If(
     new And(
-      new UnitsAtLeast(1, Zerg.Spire),
+      new UnitsAtLeast(1, Zerg.Lair),
       new Or(
-        new UnitsAtLeast(14, Zerg.Drone, countEggs = true),
+        new UnitsAtLeast(15, Zerg.Drone, countEggs = true),
         new MineralsAtLeast(250))),
+    new BuildGasPumps(2))
+  
+  private class TakeThirdGasForMuta extends If(
+    new And(
+      new UnitsAtLeast(1, Zerg.Lair),
+      new Or(
+        new MineralsAtLeast(550),
+        new UnitsAtLeast(21, Zerg.Drone, countEggs = true))),
     new BuildGasPumps)
+  
+  // AIST1 hack fix. Yuck
+  class BuildLairIfNoLair extends Build(RequestAtLeast(1, Zerg.Lair))
+  /*
+  class BuildLairIfNoLair extends If(
+    new UnitsAtMost(0, Zerg.LairOrHive),
+    new Build(RequestAtLeast(1, Zerg.Lair)))
+    */
   
   override def buildPlans: Seq[Plan] = Seq(
     new EjectScout,
@@ -77,101 +93,143 @@ class ZvPNinePool extends GameplanModeTemplate {
       new Parallel(
   
         // Post-transition: 3 Hatch Hydra
-        new Trigger(
-          new Or(
-            new UnitsAtLeast(1, Zerg.HydraliskDen, complete = true),
-            new UnitsAtLeast(1, Zerg.Spire, complete = true)),
-          new Trigger(
-            new UnitsAtLeast(1, Zerg.HydraliskDen),
+        new If(new UnitsAtLeast(1, Zerg.HydraliskDen, complete = true), new Parallel(
+          new CapGasAt(200),
+          new TrainContinuously(Zerg.Drone, 12),
+          new Build(RequestAtLeast(1, Zerg.SpawningPool), RequestAtLeast(1, Zerg.Extractor), RequestAtLeast(1, Zerg.HydraliskDen)),
+          new UpgradeContinuously(Zerg.HydraliskSpeed),
+          new TrainMatchingRatio(Zerg.Hydralisk, 0, 4, Seq(MatchingRatio(Protoss.Zealot, 1.0))),
+          new If(
+            new UpgradeComplete(Zerg.HydraliskSpeed),
+            new UpgradeContinuously(Zerg.HydraliskRange)),
+          new TrainContinuously(Zerg.Drone, 22),
+          new If(new UnitsAtLeast(18, Zerg.Drone), new BuildGasPumps(2)),
+          new TrainContinuously(Zerg.Hydralisk),
+          new If(
+            new MineralsAtLeast(400),
+            new Build(RequestAnother(1, Zerg.Hatchery)))
+        )),
+  
+        // 2/3 Hatch Muta
+        new If(new UnitsAtLeast(1, Zerg.Spire, complete = true), new Parallel(
+          new CapGasAtRatioToMinerals(1.0, 100),
+          /*
+          TODO: Test this
+          new If(
+            new And(
+              new UnitsAtLeast(1, Zerg.Spire, complete = false),
+              new UnitsAtMost(0, Zerg.Spire, complete = true),
+              new Check(() =>
+                With.self.supplyTotal
+                - With.self.supplyUsed
+                - 16 * With.units.ours.count(u => u.buildType == Zerg.Overlord)
+                < 24)),
+            new TrainContinuously(Zerg.Overlord, maximumConcurrently = 2)),
             
-            // 3 Hatch Hydra
+         */
+          new BuildOrder(RequestAtLeast(6, Zerg.Mutalisk)),
+          new If(
+            new UnitsAtLeast(6, Zerg.Mutalisk, complete = true),
+            new TrainContinuously(Zerg.Drone, 21)),
+          new TrainContinuously(Zerg.Drone, 16),
+          new Build(RequestAtLeast(1, Zerg.SpawningPool), RequestAtLeast(1, Zerg.Extractor)),
+          new BuildLairIfNoLair,
+          new Build(RequestAtLeast(1, Zerg.Spire), RequestAtLeast(2, Zerg.Extractor)),
+          new Trigger(
+            new EnemyUnitsAtLeast(1, UnitMatchOr(Protoss.Corsair, Protoss.Stargate)),
+            new TrainMatchingRatio(Zerg.Scourge, 2, 12, Seq(MatchingRatio(Protoss.Corsair, 2.0)))),
+          new If(
+            new Check(() => With.self.gas > Math.min(100, With.self.minerals)),
+            new TrainContinuously(Zerg.Mutalisk)),
+          new TrainContinuously(Zerg.Zergling),
+          new RequireMiningBases(3)
+        )),
+  
+      // Pre-transition: 2-Hatch Speedlings
+      new If(new UnitsAtMost(0, UnitMatchOr(Zerg.HydraliskDen, Zerg.Spire), complete = true), new Parallel(
+        new RequireMiningBases(2),
+        new TrainContinuously(Zerg.Drone, 11),
+
+        new If(
+          new TwoBaseProtoss,
+          new If(
+            new OnMap(Transistor),
+            
+            // Transition to 2-Hatch Muta
             new Parallel(
-              new CapGasAt(200),
-              new TrainContinuously(Zerg.Drone, 12),
-              new Build(RequestAtLeast(1, Zerg.SpawningPool), RequestAtLeast(1, Zerg.Extractor), RequestAtLeast(1, Zerg.HydraliskDen)),
-              new UpgradeContinuously(Zerg.HydraliskSpeed),
-              new TrainMatchingRatio(Zerg.Hydralisk, 0, 4, Seq(MatchingRatio(Protoss.Zealot, 1.0))),
+              new CapGasAtRatioToMinerals(1.0, 100),
+              new TrainContinuously(Zerg.Drone, 11),
+              new RequireBases(2),
               new If(
-                new UpgradeComplete(Zerg.HydraliskSpeed),
-                new UpgradeContinuously(Zerg.HydraliskRange)),
-              new TrainContinuously(Zerg.Drone, 22),
-              new If(new UnitsAtLeast(18, Zerg.Drone), new BuildGasPumps(2)),
-              new TrainContinuously(Zerg.Hydralisk),
+                new UnitsAtLeast(1, Zerg.Spire),
+                new Parallel(
+                  new TrainContinuously(Zerg.Drone, 18),
+                  new BuildOrder(RequestAtLeast(6, Zerg.Mutalisk)))), // Won't actually happen but ensures we save the larvae
+              new BuildGasPumps(1),
+              new TakeSecondGasForMuta,
+              new TakeThirdGasForMuta,
+              new TrainJustEnoughZerglings,
+              new TrainContinuously(Zerg.Drone, 25),
               new If(
-                new MineralsAtLeast(400),
-                new Build(RequestAnother(1, Zerg.Hatchery)))
+                new UnitsAtLeast(1, Zerg.Extractor, complete = true),
+                new Parallel(
+                  new BuildLairIfNoLair,
+                  new Build(
+                    RequestUpgrade(Zerg.ZerglingSpeed),
+                    RequestAtLeast(1, Zerg.Spire)))),
+              new RequireBases(3),
+              new TrainContinuously(Zerg.Zergling),
+              new Trigger(
+                new And(
+                  new MineralsAtLeast(800),
+                  new UnitsAtLeast(1, Zerg.Spire, complete = true)),
+                new RequireBases(4))
             ),
             
-            // 2 Hatch Muta
+            // Transition to 3-Hatch Hydra
             new Parallel(
               new If(
-                new UnitsAtLeast(16, Zerg.Drone),
-                new CapGasAt(500),
-                new CapGasAt(300)),
-              new TrainContinuously(Zerg.Drone, 12),
-              new Build(RequestAtLeast(1, Zerg.SpawningPool), RequestAtLeast(1, Zerg.Extractor), RequestAtLeast(1, Zerg.Lair), RequestAtLeast(1, Zerg.Spire)),
-              new TwoHatchMutaTakeSecondGas,
-              new Trigger(
-                new EnemyUnitsAtLeast(1, UnitMatchOr(Protoss.Corsair, Protoss.Stargate)),
-                new TrainMatchingRatio(Zerg.Scourge, 2, 12, Seq(MatchingRatio(Protoss.Corsair, 2.0)))),
-              new If(
-                new Check(() => With.self.gas > Math.min(100, With.self.minerals)),
-                new TrainContinuously(Zerg.Mutalisk)),
-              new TrainContinuously(Zerg.Drone, 18),
-              new TrainContinuously(Zerg.Zergling),
-              new RequireMiningBases(3)
-            ))),
-      
-          // Pre-transition: 3-Hatch Speedlings
+                new UnitsExactly(0, Zerg.HydraliskDen),
+                new CapGasAt(50),
+                new CapGasAt(175)),
+              new TrainContinuously(Zerg.Drone, 13),
+              new RequireBases(3),
+              new Build(
+                RequestAtLeast(1, Zerg.Extractor),
+                RequestAtLeast(1, Zerg.HydraliskDen)),
+              new TrainJustEnoughZerglings,
+              new TrainContinuously(Zerg.Drone))),
+
+          // Transition to 3-Hatch Muta
           new Parallel(
-            new RequireMiningBases(2),
-            new TrainContinuously(Zerg.Drone, 11),
-  
             new If(
-              new And(
-                new TwoBaseProtoss,
-                new Not(new OnMap(Transistor))),
-              
-              // Transition to 3-Hatch Hydra
-              new Parallel(
-                new If(
-                  new UnitsExactly(0, Zerg.HydraliskDen),
-                  new CapGasAt(50),
-                  new CapGasAt(175)),
-                new TrainContinuously(Zerg.Drone, 13),
-                new RequireBases(3),
-                new Build(
-                  RequestAtLeast(1, Zerg.Extractor),
-                  RequestAtLeast(1, Zerg.HydraliskDen)),
-                new TrainJustEnoughZerglings,
-                new TrainContinuously(Zerg.Drone)),
-  
-              // Vomit Zerglings while transitioning to 2-Hatch Muta
-              new Parallel(
-                new If(
-                  new UnitsAtMost(0, Zerg.Spire),
-                  new CapGasAt(200),
-                  new CapGasAt(700)),
-                new If(
-                  new UnitsAtLeast(12, Zerg.Zergling),
-                  new TrainContinuously(Zerg.Drone, 15)),
-                new If(
-                  new UnitsAtLeast(1, Zerg.Spire),
-                  new Parallel(
-                    new TrainContinuously(Zerg.Drone, 18),
-                    new BuildOrder(RequestAtLeast(6, Zerg.Mutalisk)))), // Won't actually happen but ensures we save the larvae
-                new TrainContinuously(Zerg.Zergling, 16),
-                new RequireBases(2),
-                new BuildGasPumps(1),
-                new FlipIf(
-                  new TwoBaseProtoss,
-                  new UpgradeContinuously(Zerg.ZerglingSpeed),
-                  new Build(RequestAtLeast(1, Zerg.Lair))),
-                new Build(RequestAtLeast(1, Zerg.Spire)),
-                new TwoHatchMutaTakeSecondGas,
-                new TrainContinuously(Zerg.Drone, 18),
-                new TrainContinuously(Zerg.Zergling))
-      )))))
+              new UnitsAtMost(0, Zerg.Lair),
+              new CapGasAt(100),
+              new If(
+                new UnitsAtMost(0, Zerg.Spire),
+                new CapGasAt(200),
+                new CapGasAtRatioToMinerals(1.0, 100))),
+            new If(
+              new UpgradeComplete(Zerg.ZerglingSpeed),
+              new TrainContinuously(Zerg.Drone, 16)),
+            new TrainContinuously(Zerg.Drone, 11),
+            new BuildOrder(
+              RequestAtLeast(12, Zerg.Zergling),
+              RequestAtLeast(13, Zerg.Drone)),
+            new TrainContinuously(Zerg.Zergling),
+            new RequireBases(3),
+            new If(
+              new Or(new MiningBasesAtLeast(3), new MineralsAtLeast(350)),
+              new BuildGasPumps(1)),
+            new TakeSecondGasForMuta,
+            new TakeThirdGasForMuta,
+            new Build(
+              RequestAtLeast(1, Zerg.Extractor),
+              RequestUpgrade(Zerg.ZerglingSpeed)),
+            new BuildLairIfNoLair,
+            new Build(RequestAtLeast(1, Zerg.Spire)))
+      )))
+    )))
   
 }
 

@@ -30,23 +30,22 @@ abstract class FingerprintFFE extends FingerprintAnd(
   private val expectedFFEGateway        = GameTime(3, 20)()
   private val expectedGatewayFEGateway  = GameTime(2, 24)()
   
-  private def readyToDecide(status: Status): Boolean = status.forgeCompletionFrame.isDefined && status.gatewayCompletionFrame.isDefined
+  private def readyToDecide(status: Status): Boolean = (
+    (status.forgeCompletionFrame.isDefined && status.gatewayCompletionFrame.isDefined)
+    || status.forgeOrCannon.exists(u => u.complete && With.framesSince(u.frameDiscovered) > 24 * 5)
+  )
   
   private def conclusivelyForge(status: Status): Boolean = {
-    if (status.forge.exists(_.complete) && ! status.gatewayOrZealot.exists(_.complete)) return true
-    if (status.cannon.nonEmpty && status.gatewayOrZealot.isEmpty) return true
     readyToDecide(status) && lossFFE(status) < lossGatewayFE(status)
   }
   
   private def conclusivelyGateway(status: Status): Boolean = {
-    if (status.gateway.exists(g => g.complete && ! g.base.exists(_.isStartLocation)) && ! status.forgeOrCannon.exists(_.complete)) return true
-    if (status.zealot.size > 2 && status.forgeOrCannon.isEmpty) return true
     readyToDecide(status) && lossFFE(status) >= lossGatewayFE(status)
   }
   
   private def lossFFE(status: Status): Int = (
-    Math.abs(status.forgeCompletionFrame.get - expectedFFEForge)
-    + Math.abs(status.gatewayCompletionFrame.get - expectedFFEGateway)
+    Math.abs(status.forgeCompletionFrame.getOrElse(With.frame + Protoss.Forge.buildFrames) - expectedFFEForge)
+    + status.gatewayCompletionFrame.map(f => Math.abs(f - expectedFFEGateway)).sum
   )
   
   private def lossGatewayFE(status: Status): Int = (

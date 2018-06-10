@@ -54,8 +54,7 @@ object PlacementProfiles {
   
   val gas = new PlacementProfile("Gas",
     preferZone                  = 1000.0,
-    avoidDistanceFromBase       = 1.0,
-    preferDistanceFromEnemy     = 1.0
+    avoidDistanceFromBase       = 1.0
   )
   
   val townHallNearby = new PlacementProfile("Town Hall Nearby",

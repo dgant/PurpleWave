@@ -55,7 +55,8 @@ class Gather extends Plan {
     private def countUnits() {
       val activeBases = With.geography.ourBases.filter(_.townHall.exists(hall =>
         hall.is(Zerg.LairOrHive)
-        || hall.remainingCompletionFrames < GameTime(0, 10)()))
+        || hall.remainingCompletionFrames < GameTime(0, 10)()
+        || hall.hasEverBeenCompleteHatch))
       calculateTransferPaths(activeBases)
       minerals  = activeBases.flatMap(_.minerals).toSet
       gasses    = activeBases.flatMap(_.gas.flatMap(_.friendly).filter(u => u.complete)).toSet

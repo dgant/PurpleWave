@@ -60,12 +60,13 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   var lastFrameStartingAttack   : Int = _
   var framesFailingToMove       : Int = 0
   var framesFailingToAttack     : Int = 0
+  var hasEverBeenCompleteHatch  : Boolean = false // Stupid AIST hack fix for detecting whether a base is mineable
   var lastAttacker              : Option[UnitInfo] = None
   def lastTotalHealthPoints: Int = lastHitPoints + lastShieldPoints + lastDefensiveMatrixPoints
   
   def creditKill(kill: Kill) { kills += kill }
   val kills: mutable.ArrayBuffer[Kill] = new mutable.ArrayBuffer[Kill]
-
+  
   def updateCommon() {
     val thisFrame = With.frame
     if (totalHealth < lastTotalHealthPoints) {
@@ -101,6 +102,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     lastShieldPoints          = shieldPoints
     lastDefensiveMatrixPoints = defensiveMatrixPoints
     lastCooldown              = cooldownLeft
+    hasEverBeenCompleteHatch ||= is(Zerg.Hatchery) && complete
   }
   
   private lazy val stuckMoveFrames    = 10

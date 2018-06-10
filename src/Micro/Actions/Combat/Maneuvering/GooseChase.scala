@@ -9,7 +9,8 @@ import Utilities.ByOption
 object GooseChase extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    (unit.isAny(Terran.Vulture, Zerg.Zergling) || unit.agent.canScout)
+    false
+    && (unit.isAny(Terran.Vulture, Zerg.Zergling) || unit.agent.canScout)
     && With.strategy.map.forall(_.trustGroundDistance)
     && unit.canMove
     && unit.matchups.threats.nonEmpty

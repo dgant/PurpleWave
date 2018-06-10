@@ -19,7 +19,7 @@ object ShowUnitsFriendly extends View {
   var showTargets     : Boolean = false
   var showFormation   : Boolean = true
   var showRayPaths    : Boolean = false
-  var showForces      : Boolean = false
+  var showForces      : Boolean = true
   var showDesire      : Boolean = true
   var showFightReason : Boolean = true
   var showDistance    : Boolean = false

@@ -5,6 +5,7 @@ import Planning.Plan
 import Planning.Plans.StandardGamePlan
 import ProxyBwapi.Players.Players
 import Strategery.History.HistoricalGame
+import Strategery.Maps.{Plasma, StarCraftMap, StarCraftMaps}
 import Strategery.Strategies.Protoss.ProtossChoices
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TerranChoices
@@ -16,6 +17,8 @@ import scala.collection.mutable
 class Strategist {
     
   lazy val selectedInitially: Set[Strategy] = selectInitialStrategies
+  
+  lazy val map: Option[StarCraftMap] = StarCraftMaps.all.find(_.matches)
    
   private var enemyRaceAtLastCheck: Race = With.enemy.raceInitial
   private var selectedLast: Option[Set[Strategy]] = None
@@ -32,7 +35,7 @@ class Strategist {
   }
   
   // Plasma is so weird we need to handle it separately.
-  lazy val isPlasma: Boolean = With.game.mapFileName.contains("Plasma")
+  lazy val isPlasma: Boolean = Plasma.matches
   lazy val isIslandMap: Boolean = heyIsThisAnIslandMap
   lazy val isFfa: Boolean = heyIsThisFFA
   

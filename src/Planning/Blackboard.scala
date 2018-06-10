@@ -15,4 +15,5 @@ class Blackboard {
   var yoloEnabled       : Boolean = true
   var lastScoutDeath    : Int     = -24 * 60
   var enemyUnitDied     : Boolean = false
+  var allowIslandBases  : Boolean = false
 }

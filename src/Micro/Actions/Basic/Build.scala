@@ -4,11 +4,12 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.Tile
 import Micro.Actions.Action
-import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
+import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Commands.{Attack, Move}
 import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Yolo
+import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
@@ -73,17 +74,26 @@ object Build extends Action {
     
     if ( ! unit.readyForMicro) return
     
-    blockersOurs.flatMap(_.friendly).filter(_.matchups.framesOfSafety > GameTime(0, 1)()).foreach(_.agent.shove(unit))
+    blockersOurs
+      .flatMap(_.friendly)
+      .filter(_.matchups.framesOfSafety > GameTime(0, 2)())
+      .foreach(_.agent.shove(unit))
     
-    val buildPixel = unit.agent.toBuildTile.get.pixelCenter
-    val waypoint = unit.agent.nextWaypoint(buildPixel)
+    val buildClass = unit.agent.toBuild.get
+    val buildPixel = unit.agent.lastIntent.toBuildTile.get
+    var movePixel = buildPixel.topLeftPixel
+    if (unit.is(Zerg.Drone)) {
+      movePixel = movePixel.add(buildClass.width / 2, buildClass.height / 2)
+    }
+      
+    val waypoint = unit.agent.nextWaypoint(movePixel)
     if (
-      unit.zone != buildPixel.zone
-      && unit.pixelDistanceCenter(buildPixel) > 32.0 * 5.0
+      unit.zone != movePixel.zone
+      && unit.pixelDistanceCenter(movePixel) > 32.0 * 5.0
       && unit.pixelDistanceCenter(waypoint) > unit.unitClass.haltPixels) {
       unit.agent.toTravel = Some(waypoint)
       Move.delegate(unit)
     }
-    With.commander.build(unit, unit.agent.toBuild.get, unit.agent.lastIntent.toBuildTile.get)
+    With.commander.build(unit, buildClass, buildPixel)
   }
 }

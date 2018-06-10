@@ -38,7 +38,7 @@ class Configuration {
   var battleMarginTileMinimum       = 12 + 2
   var battleMarginTileMaximum       = 12 * 2 + 2 // A bit over double Siege Tank range
   var battleEstimationFrames        = GameTime(0, 8)()
-  var battleHysteresisFrames        = GameTime(0, 5)()
+  var battleHysteresisFrames        = GameTime(0, 6)()
   var battleHysteresisRatio         = 0.15
   var battleValueTarget             = 0.55
   var bonusTankRange                = 64.0

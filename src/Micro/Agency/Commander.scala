@@ -147,8 +147,9 @@ class Commander {
     unit.agent.movingTo = Some(destination)
     
     // Mineral walk!
-    if (unit.unitClass.isWorker && ! unit.carryingMinerals
-      && ! With.mapFileName.toLowerCase.contains("barrier") //Hack -- Great Barrier Reef is ruinous for automatic mineral walking
+    if (unit.unitClass.isWorker
+      && ! unit.carryingMinerals
+      && With.strategy.map.forall(_.mineralWalkingOkay)
     ) {
       val from      = unit.pixelCenter
       val fromZone  = from.zone

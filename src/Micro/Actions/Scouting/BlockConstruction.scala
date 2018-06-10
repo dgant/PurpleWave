@@ -45,16 +45,13 @@ object BlockConstruction extends Action {
   )
   
   def blockableBuilders(unit: FriendlyUnitInfo): Iterable[UnitInfo] = {
-    lazy val enemyBase = With.geography.enemyBases.headOption
-      .getOrElse(With.geography.startBases.minBy(_.lastScoutedFrame))
-    
     unit.matchups.targets.filter(builder => {
-      lazy val hasBuildOrder  = buildOrders.contains(builder.order)
-      lazy val hasMoveOrder   = builder.order == Orders.Move
-      lazy val targetPixel    = builder.orderTargetPixel.orElse(builder.targetPixel).getOrElse(builder.pixelCenter)
-      lazy val movingToRelevantBase = hasBuildOrder && targetPixel.base.exists(base =>
-        (base.owner.isEnemy || (base.owner.isNeutral && ! base.isStartLocation)))
-      val output = builder.unitClass.isWorker && (hasBuildOrder || movingToRelevantBase)
+      lazy val hasBuildOrder        = buildOrders.contains(builder.order)
+      lazy val hasMoveOrder         = builder.order == Orders.Move
+      lazy val hasRelevantOrder     = hasBuildOrder  || hasMoveOrder
+      lazy val targetPixel          = builder.orderTargetPixel.orElse(builder.targetPixel).getOrElse(builder.pixelCenter)
+      lazy val movingToRelevantBase = hasRelevantOrder && targetPixel.base.exists(base => (base.owner.isEnemy || (base.owner.isNeutral && ! base.isStartLocation)))
+      val output                    = builder.unitClass.isWorker && (hasBuildOrder || movingToRelevantBase)
       output
     })
   }

@@ -14,7 +14,7 @@ import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtLeast, MineralsAtMost}
-import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtLeast, UnitsAtMost, UpgradeComplete}
+import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtLeast, IfOnMiningBases, UnitsAtMost, UpgradeComplete}
 import ProxyBwapi.Races.{Terran, Zerg}
 
 class TwoHatchMuta extends GameplanModeTemplate {

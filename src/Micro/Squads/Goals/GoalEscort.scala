@@ -17,6 +17,9 @@ class GoalEscort extends GoalBasic {
         ByOption
           .minBy(squad.enemies.filter(_.canAttack(thePrincipal)))(_.framesBeforeAttacking(thePrincipal))
           .map(_.pixelCenter)
-          .getOrElse(thePrincipal.pixelCenter))
+          .getOrElse(thePrincipal.projectFrames(24 * 5)))
         .getOrElse(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
+  
+  override protected def offerUseful(candidates: Iterable[FriendlyUnitInfo]) {}
+  override protected def offerUseless(candidates: Iterable[FriendlyUnitInfo]) {}
 }

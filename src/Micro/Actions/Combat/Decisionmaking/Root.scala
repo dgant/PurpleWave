@@ -24,7 +24,7 @@ object Root extends Action {
         
     private def distanceToGoal(u: FriendlyUnitInfo): Double = u.pixelDistanceTravelling(unit.agent.destination)
     private val pushSpacing = 32.0 * 3.0
-    private val framesToRoot = 18
+    private def framesToRoot = 18 + With.reaction.agencyAverage
     
     private lazy val weAreALurker         = Zerg.Lurker.accept(unit)
     private lazy val weAreATank           = UnitMatchSiegeTank.accept(unit)

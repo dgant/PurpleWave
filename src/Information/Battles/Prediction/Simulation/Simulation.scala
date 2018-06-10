@@ -64,6 +64,7 @@ class Simulation(
       && ! fleeing
       && unitsEnemy.exists(e => e.dead && ! e.realUnit.unitClass.suicides)) {
       fleeing = true
+      unitsOurs.foreach(_.cooldownMoving = 24)
     }
   }
   

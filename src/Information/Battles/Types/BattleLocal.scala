@@ -29,7 +29,12 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   lazy val ratioTarget    : Double  = Math.min(2.0, PurpleMath.nanToZero((With.battles.global.valueRatioTarget + hysteresis - urgency) / With.blackboard.aggressionRatio))
   lazy val shouldFight    : Boolean = ratioAttack > ratioTarget || (With.self.isZerg && ratioSnipe > ratioTarget)
   
-  private def estimateSimulation(battle: BattleLocal, weAttack: Boolean, weSnipe: Boolean): Prediction = {
+  private def estimateSimulation(
+    battle: BattleLocal,
+    weAttack: Boolean,
+    weSnipe: Boolean,
+    onlyFlyersAttack: Boolean = false,
+    onlyWalkersAttack: Boolean = false): Prediction = {
     val simulation = new Simulation(battle, weAttack, weSnipe)
     simulation.run()
     simulation.estimation

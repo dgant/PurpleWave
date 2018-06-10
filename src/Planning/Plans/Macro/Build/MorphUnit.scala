@@ -39,7 +39,11 @@ class MorphUnit(val classToMorph: UnitClass) extends Plan {
     if (currencyLock.satisfied && ! currencyLock.isSpent) {
       morpherLock.acquire(this)
       morpher = morpherLock.units.headOption
-      morpher.foreach(_.agent.intend(this, new Intention { toTrain = Some(classToMorph) }))
+      morpher.foreach(_.agent.intend(this, new Intention {
+        toTrain = Some(classToMorph)
+        canFlee = classToMorph == Zerg.Lurker
+        canAttack = classToMorph != Zerg.Lurker
+      }))
     }
   }
 }

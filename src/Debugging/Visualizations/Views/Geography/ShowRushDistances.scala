@@ -18,6 +18,7 @@ object ShowRushDistances extends View {
   Hitchhiker: 44 36
   
   Gladiator: 36
+  Third World: 20
   Transistor: 43, 86
   
   Alchemist: 128 (because it's cut incorrectly)
@@ -25,8 +26,8 @@ object ShowRushDistances extends View {
   Luna the Final: 38
   Match Point: 92
   Neo Chupung-Ryeong: 32
+  Plasma: 20 (probably)
   Tau Cross: 39
-  
   
   Known distances
   ---------------

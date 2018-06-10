@@ -7,6 +7,7 @@ import Mathematics.Points.{Tile, TileRectangle}
 import Planning.Plan
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
+import Strategery.Maps.Plasma
 
 class Blueprint(
   val proposer            : Plan,
@@ -75,7 +76,8 @@ class Blueprint(
     }
     val thisZone = tile.zone
     if (thisZone.island
-      && ! With.strategy.isPlasma
+      && ! Plasma.matches
+      && ( ! With.blackboard.allowIslandBases || ! thisZone.bases.exists(_.minerals.exists(_.visible)))
       && ! With.architecture.accessibleZones.contains(thisZone)) {
       return false
     }

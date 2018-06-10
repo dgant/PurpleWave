@@ -22,6 +22,12 @@ trait GroundPaths {
   
   def groundPixels(origin: Pixel, destination: Pixel): Double = {
     
+    // Some maps have broken ground distance (due to continued reliance on BWTA,
+    // which in particular seems to suffer on maps with narrow ramps, eg. Plasma, Third World
+    if (With.strategy.map.exists( ! _.trustGroundDistance)) {
+      return origin.pixelDistance(destination)
+    }
+    
     // Let's first check if we can use air distance. It's cheaper and more accurate.
     // We can "get away" with using air distance if:
     // A. We're in the same zone, or

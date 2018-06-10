@@ -4,14 +4,18 @@ import Lifecycle.With
 import Micro.Actions.Action
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.ByOption
 
 object GooseChase extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     (unit.isAny(Terran.Vulture, Zerg.Zergling) || unit.agent.canScout)
+    && With.strategy.map.forall(_.trustGroundDistance)
     && unit.canMove
     && unit.matchups.threats.nonEmpty
     && unit.matchups.threats.forall(unit.topSpeed > _.topSpeed * 1.09) // Lets a Zergling just barely goose chase a Dragoon
+    && ByOption.min(With.geography.ourBases   .map(base => unit.tileIncludingCenter.groundPixels(base.heart))).getOrElse(0.0) >
+       ByOption.min(With.geography.enemyBases .map(base => unit.tileIncludingCenter.groundPixels(base.heart))).getOrElse(32.0 * 256.0)
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {

@@ -8,7 +8,7 @@ import Strategery.Strategies.Terran.TvE._
 import Strategery.Strategies.Terran.TvR.{TvR1Rax, TvRTinfoil}
 import Strategery.Strategies.Terran.TvT.TvTStandard
 import Strategery.Strategies.Terran.TvZ._
-import Strategery.Strategies.Zerg.{FivePoolProxySunkens, ZergSparkle, ZergVsProtoss}
+import Strategery.Strategies.Zerg._
 
 class EmptyPlaybook {
   val none: Seq[Strategy] = Seq.empty
@@ -43,7 +43,7 @@ object StrategyGroups {
 }
 
 class TestingPlaybook extends EmptyPlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(ZergVsProtoss)
+  override lazy val forced: Seq[Strategy] = Seq(ZvPTwoHatchMuta)
 }
 
 class PurpleWavePlaybook extends EmptyPlaybook {
@@ -53,8 +53,10 @@ class PurpleWavePlaybook extends EmptyPlaybook {
 class AIST1Playbook extends EmptyPlaybook {
   override lazy val forced: Seq[Strategy] = Seq(
     ZergSparkle,
-    ZergVsProtoss
-    //Zerg4Pool
+    ZvPNinePoolThreeHatch,
+    ZvPTwoHatchMuta,
+    NinePoolMuta,
+    NineHatchLings
   )
   
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionAIST1

@@ -1,6 +1,5 @@
 package Micro.Actions.Scouting
 
-import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Targeting.Filters.TargetFilterWhitelist
 import Micro.Actions.Combat.Targeting.TargetAction
@@ -18,8 +17,8 @@ object Kindle extends Action {
     unit.agent.canScout
     && unit.agent.canFight
     && unit.canAttack
-    && With.strategy.selectedCurrently.contains(Zerg4Pool)
     && unit.matchups.framesOfSafety > safetyMarginFrames
+    && Zerg4Pool.active
   )
   
   def legalTarget(unit: FriendlyUnitInfo, target: UnitInfo): Boolean = (

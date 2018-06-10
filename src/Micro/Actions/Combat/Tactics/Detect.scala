@@ -16,11 +16,11 @@ object Detect extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     
-    val allSpookies = unit.teammates.flatMap(t =>
-      t.matchups.enemies.filter(e =>
-        t.unitClass.attacks(e.unitClass)
-        && e.cloaked
-        && t.framesToGetInRange(e) < GameTime(0, 5)()))
+    val allSpookies = unit.teammates.flatMap(teammate =>
+      teammate.matchups.enemies.filter(enemy =>
+        teammate.unitClass.attacks(enemy.unitClass)
+        && enemy.cloaked
+        && teammate.framesToGetInRange(enemy) < GameTime(0, 10)()))
     
     val superSpookies = allSpookies.filter(e =>
       e.effectivelyCloaked

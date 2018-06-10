@@ -25,7 +25,7 @@ object Gravitate extends Action {
   
   override def perform(unit: FriendlyUnitInfo) {
     val framesAhead = With.reaction.agencyAverage + 1
-    val minDistance = unit.unitClass.haltPixels + framesAhead * (unit.topSpeed + 0.5 * framesAhead * unit.topSpeed / Math.max(1, unit.unitClass.accelerationFrames))
+    val minDistance = Math.max(48, unit.unitClass.haltPixels + framesAhead * (unit.topSpeed + 0.5 * framesAhead * unit.topSpeed / Math.max(1, unit.unitClass.accelerationFrames)))
     val forces      = unit.agent.forces.values
     val origin      = unit.pixelCenter
     val forceSum    = ForceMath.sum(forces).normalize

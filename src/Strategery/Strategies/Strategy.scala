@@ -1,5 +1,6 @@
 package Strategery.Strategies
 
+import Lifecycle.With
 import Planning.Plan
 import Strategery.Maps.StarCraftMap
 import bwapi.Race
@@ -24,4 +25,6 @@ abstract class Strategy {
   def prohibitedMaps          : Iterable[StarCraftMap]    = Vector.empty
   def requiredMaps            : Iterable[StarCraftMap]    = Vector.empty
   def minimumGamesVsOpponent  : Int                       = 0
+  
+  def active: Boolean = With.strategy.selectedCurrently.contains(this)
 }

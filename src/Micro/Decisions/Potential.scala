@@ -4,7 +4,6 @@ import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Mathematics.PurpleMath
-import Micro.Actions.Commands.Gravitate
 import Micro.Agency.OldExplosion
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -209,19 +208,23 @@ object Potential {
       .filter(_.lengthSquared > 0)
   }
   
+  def collisionRepulsion(unit: FriendlyUnitInfo, other: UnitInfo): Force = {
+    if (unit.flying) return new Force
+    if (other.flying) return new Force
+    if (other.unitClass.isBuilding) return new Force
+  
+    val maximumDistance   = 12 * (unit.topSpeed + other.topSpeed)
+    val blockerDistance   = other.pixelDistanceEdge(unit)
+    val magnitudeDistance = 1.0 - PurpleMath.clampToOne(blockerDistance / (1.0 + maximumDistance))
+    val magnitudeSize     = unit.unitClass.dimensionMax * other.unitClass.dimensionMax / 32.0 / 32.0
+    val magnitude         = magnitudeSize * magnitudeDistance
+    unitAttraction(unit, other, -magnitude)
+  }
+  
   def avoidCollision(unit: FriendlyUnitInfo): Force = {
     if (unit.flying) return new Force
-    
-    val blockers        = unit.matchups.others.filter(u => ! u.flying && ! u.unitClass.isBuilding)
-    val nearestBlocker  = ByOption.minBy(blockers)(_.pixelDistanceEdge(unit))
-    
-    if (nearestBlocker.isEmpty) return new Force
-    
-    val maximumDistance = 12 * (unit.topSpeed + nearestBlocker.get.topSpeed)
-    val blockerDistance = nearestBlocker.get.pixelDistanceEdge(unit)
-    val magnitude       = 1.0 - PurpleMath.clampToOne(blockerDistance / (1.0 + maximumDistance))
-    val output          = unitAttraction(unit, nearestBlocker.get, - magnitude)
-    output
+    val repulsions = unit.matchups.others.filterNot(o => o.flying || o.unitClass.isBuilding).map(collisionRepulsion(unit, _))
+    ByOption.maxBy(repulsions)(_.lengthSquared).getOrElse(new Force)
   }
   
   /////////////

@@ -65,16 +65,16 @@ object PlacementProfiles {
     preferZone                  = 1000.0,
     preferNatural               = 1.0,
     preferResources             = 0.5,
-    preferDistanceFromEnemy     = 0.75,
-    avoidDistanceFromBase       = 1.25
+    preferDistanceFromEnemy     = 0.5,
+    avoidDistanceFromBase       = 1.5
   )
   
   val townHallFar = new PlacementProfile("Town Hall Far",
     preferZone                  = 1000.0,
     preferNatural               = 1.0,
     preferResources             = 0.5,
-    preferDistanceFromEnemy     = 1.25,
-    avoidDistanceFromBase       = 0.75
+    preferDistanceFromEnemy     = 1.5,
+    avoidDistanceFromBase       = 0.5
   )
   
   //////////////////////////
@@ -100,9 +100,7 @@ object PlacementProfiles {
     "Cannons for a wall",
     preferZone                  = 100.0,
     preferNatural               = 10.0,
-    preferCoveringWorkers       = 0.2,
     avoidDistanceFromEntrance   = 1.0,
-    avoidSurfaceArea            = 0.1,
     avoidDistanceFromEnemy      = 0.5,
     avoidDistanceFromIdealRange = 1.75)
   

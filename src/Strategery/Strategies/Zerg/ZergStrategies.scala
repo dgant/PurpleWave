@@ -1,7 +1,7 @@
 package Strategery.Strategies.Zerg
 
 import Planning.Plan
-import Planning.Plans.GamePlans.Zerg.ZvE.{NineHatchLings, NinePoolMuta, OneHatchLurker, ProxyHatch, TwoHatchHydra, Zerg4Pool, ZergSparkle, ZergVsProtoss}
+import Planning.Plans.GamePlans.Zerg.ZvE.{NineHatchLings, NinePoolMuta, ZvPNinePoolThreeHatch, OneHatchLurker, ProxyHatch, TwoHatchHydra, TwoHatchLurker, Zerg4Pool, ZergSparkle, ZvPTwoHatchMuta}
 import Planning.Plans.GamePlans.Zerg.ZvP.HydraBust
 import Planning.Plans.GamePlans.Zerg.ZvT.{ThirteenPoolMuta, TwoHatchMuta}
 import Planning.Plans.GamePlans.Zerg.ZvZ.Zerg5PoolProxySunkens
@@ -57,8 +57,16 @@ object ProxyHatchZerglings extends ZergStrategy {
 object Zerg4Pool extends ZergStrategy {
   override def gameplan: Option[Plan] = Some(new Zerg4Pool)
 }
-object ZergVsProtoss extends ZergStrategy {
-  override def gameplan: Option[Plan] = { Some(new ZergVsProtoss) }
+object ZvPTwoHatchMuta extends ZergStrategy {
+  override def gameplan: Option[Plan] = { Some(new ZvPTwoHatchMuta) }
+  override def enemyRaces: Iterable[Race] = Vector(Race.Protoss)
+}
+object ZvPNinePoolThreeHatch extends ZergStrategy {
+  override def gameplan: Option[Plan] = { Some(new ZvPNinePoolThreeHatch) }
+  override def enemyRaces: Iterable[Race] = Vector(Race.Protoss, Race.Terran, Race.Zerg)
+}
+object TwoHatchLurker extends ZergStrategy {
+  override def gameplan: Option[Plan] = { Some(new TwoHatchLurker) }
   override def enemyRaces: Iterable[Race] = Vector(Race.Protoss)
 }
 object ZergSparkle extends ZergStrategy {

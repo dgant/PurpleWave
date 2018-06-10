@@ -10,6 +10,7 @@ import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchNotHoldingResou
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Strategery.Strategies.Zerg.Zerg4Pool
 
 import scala.collection.mutable
 
@@ -35,9 +36,10 @@ class Scout(scoutCount: Int = 1) extends Plan {
     if (bases.isEmpty)                                                  return false
     if (With.blackboard.lastScoutDeath > 0)                             return true
     if (bases.exists(_.zone.walledIn))                                  return true
-    if (bases.exists(_.units.exists(_.unitClass.isStaticDefense)))      return true
     if (bases.exists(_.townHall.isDefined) && scouts.get.units.isEmpty) return true
-    if (With.geography.enemyBases.exists(_.units.exists(u => u.isOurs && ! u.unitClass.isWorker))) return true
+    // With 4Pool use the scout to help harass/distract
+    if ( ! Zerg4Pool.active && bases.exists(_.units.exists(_.unitClass.isStaticDefense))) return true
+    if ( ! Zerg4Pool.active && With.geography.enemyBases.exists(_.units.exists(u => u.isOurs && ! scouts.get.unitMatcher.get.accept(u)))) return true
     false
   }
   

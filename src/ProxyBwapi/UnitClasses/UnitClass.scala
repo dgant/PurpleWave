@@ -403,8 +403,8 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val gasValue         : Int = gasPrice      + buildUnitsSpent.map(_.gasValue).sum
   lazy val subjectiveValue  : Int = (
     (
-        1 * (mineralValue + (if (isTwoUnitsInOneEgg) 13 else if(isZerg) 25 else 0))
-      + 2 * gasValue
+        2 * (mineralValue + (if (isTwoUnitsInOneEgg) 13 else if(isZerg) 25 else 0))
+      + 3 * gasValue
     )
     * (if(isWorker) 4 else 3)
     * (if (this == Protoss.Carrier)     2 else 1)

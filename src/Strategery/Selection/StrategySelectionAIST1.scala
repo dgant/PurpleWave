@@ -27,7 +27,7 @@ object StrategySelectionAIST1 extends StrategySelectionPolicy {
         allowed = Vector(ZergSparkle)
       }
       else if (Gladiator.matches) {
-        allowed = Vector(ZvPTwoHatchMuta)
+        allowed = Vector(ZvPNinePoolThreeHatch)
       }
       else if (ThirdWorld.matches) {
         allowed = Vector(ZvPNinePoolThreeHatch)

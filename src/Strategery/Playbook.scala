@@ -53,7 +53,7 @@ class PurpleWavePlaybook extends EmptyPlaybook {
 class AIST1Playbook extends EmptyPlaybook {
   override lazy val forced: Seq[Strategy] = Seq(
     ZergSparkle,
-    ZvPNinePoolThreeHatch,
+    ZvPNinePool,
     ZvPTwoHatchMuta,
     NinePoolMuta,
     NineHatchLings

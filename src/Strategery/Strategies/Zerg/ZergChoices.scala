@@ -12,7 +12,7 @@ object ZergChoices {
     ProxyHatchSunkens,
     NineHatchLings,
     NinePoolMuta,
-    ZvPNinePoolThreeHatch,
+    ZvPNinePool,
     ThirteenPoolMuta,
     OneHatchLurker,
     HydraBust,

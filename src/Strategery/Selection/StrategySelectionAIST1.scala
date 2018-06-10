@@ -27,13 +27,13 @@ object StrategySelectionAIST1 extends StrategySelectionPolicy {
         allowed = Vector(ZergSparkle)
       }
       else if (Gladiator.matches) {
-        allowed = Vector(ZvPNinePoolThreeHatch)
+        allowed = Vector(ZvPNinePool)
       }
       else if (ThirdWorld.matches) {
-        allowed = Vector(ZvPNinePoolThreeHatch)
+        allowed = Vector(ZvPNinePool)
       }
       else if (Transistor.matches) {
-        allowed = Vector(ZvPNinePoolThreeHatch)
+        allowed = Vector(ZvPNinePool)
       }
     }
     

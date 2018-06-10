@@ -48,11 +48,8 @@ object PlacementProfiles {
   }
   
   val tech = new PlacementProfile("Tech", basic) {
-    preferSpace                 = 0.0
-    preferDistanceFromEnemy     = 3.0
-    preferSurfaceArea           = 0.1
-    avoidDistanceFromBase       = 1.0
-    avoidDistanceFromIdealRange = 0.0
+    preferZone                  = 1.0
+    preferDistanceFromEnemy     = 1.0
   }
   
   val gas = new PlacementProfile("Gas",

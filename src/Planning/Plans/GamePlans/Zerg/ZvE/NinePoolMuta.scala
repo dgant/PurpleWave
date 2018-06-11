@@ -15,6 +15,7 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Predicates.Economy.{GasAtMost, MineralsAtLeast}
 import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast, UnitsAtMost}
+import Planning.Plans.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.{Terran, Zerg}
 
@@ -40,6 +41,7 @@ class NinePoolMuta extends GameplanModeTemplate {
   
   override def defaultAttackPlan: Plan = new Trigger(
     new Or(
+      new EnemyBasesAtLeast(2),
       new UnitsAtLeast(1, Zerg.Mutalisk),
       new Not(new EnemyIsZerg)),
     new Attack)

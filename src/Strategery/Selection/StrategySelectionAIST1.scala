@@ -8,11 +8,15 @@ import Utilities.ByOption
 object StrategySelectionAIST1 extends StrategySelectionPolicy {
   
   override def chooseBest(topLevelStrategies: Iterable[Strategy]): Iterable[Strategy] = {
+    
+    if (Sparkle.matches) {
+      return Iterable(ZergSparkle)
+    }
   
     var allowed: Vector[Strategy] = topLevelStrategies.toVector
     
     if (With.enemy.isZerg) {
-      allowed = allowed.filter(strategy => Vector(ZergSparkle, NineHatchLings, NinePoolMuta).contains(strategy))
+      allowed = Vector(NineHatchLings, NinePoolMuta)
       
       val lastGame = ByOption.maxBy(With.history.games.filter(_.enemyName == With.enemy.name))(_.timestamp)
       if (lastGame.exists(_.strategies.contains(NineHatchLings.toString))) {

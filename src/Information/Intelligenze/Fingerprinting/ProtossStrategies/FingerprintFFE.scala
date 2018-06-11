@@ -50,7 +50,7 @@ abstract class FingerprintFFE extends FingerprintAnd(
   
   private def lossGatewayFE(status: Status): Int = (
     Math.abs(status.forgeCompletionFrame.get - expectedGatewayFEForge)
-    + Math.abs(status.gatewayCompletionFrame.get - expectedGatewayFEGateway)
+    + status.gatewayCompletionFrame.map(f => Math.abs(f - expectedGatewayFEGateway)).sum
   )
   
   var decidedForge = false

@@ -1,5 +1,7 @@
 package Micro.Actions.Combat.Targeting.Filters
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Lifecycle.With
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterIgnoreScouts extends TargetFilter {
@@ -16,7 +18,10 @@ object TargetFilterIgnoreScouts extends TargetFilter {
      */
     lazy val targetIsWorker     = target.unitClass.isWorker
     lazy val targetInOurBase    = target.base.exists(_.owner.isUs)
-    lazy val canCatch           = actor.inRangeToAttack(target) || actor.pixelRangeAgainst(target) > 32.0 * 3.0 || actor.topSpeed > target.topSpeed * 1.25
+    lazy val isEarlyGame        = With.frame < GameTime(6, 0)()
+    lazy val targetInEnemyBase  = target.base.exists(_.owner.isEnemy)
+    lazy val inRange            = actor.inRangeToAttack(target)
+    lazy val canCatch           = inRange || actor.pixelRangeAgainst(target) > 32.0 * 3.0 || actor.topSpeed > target.topSpeed * 1.25
     lazy val facingRealThreats  = actor.matchups.targets.exists(u => u.unitClass.attacksGround && ! u.unitClass.isWorker)
     lazy val beingWorkerRushed  = actor.matchups.targets.count(_.unitClass.isWorker) > 2
     lazy val beingProxied       = actor.matchups.targets.exists(_.unitClass.isBuilding)
@@ -31,6 +36,7 @@ object TargetFilterIgnoreScouts extends TargetFilter {
     if (beingWorkerRushed)                  return true
     if (beingProxied)                       return true
     if (facingRealThreats && targetViolent) return true
+    if (isEarlyGame && ! targetInEnemyBase && ! inRange) return false
     
     canCatch
   }

@@ -19,11 +19,11 @@ import Planning.Plans.Predicates.Scenarios.EnemyStrategy
 import Planning.Plans.Predicates.{Employing, StartPositionsAtLeast}
 import Planning.Plans.Scouting.{FoundEnemyBase, Scout}
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Zerg.Zerg4Pool
+import Strategery.Strategies.Zerg.ZvE4Pool
 
 class Zerg4Pool extends GameplanModeTemplate {
   
-  override val activationCriteria = new Employing(Zerg4Pool)
+  override val activationCriteria = new Employing(ZvE4Pool)
   
   override def defaultAggressionPlan: Plan = new If(
     new Latch(

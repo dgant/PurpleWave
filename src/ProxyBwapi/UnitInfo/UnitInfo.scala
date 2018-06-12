@@ -125,7 +125,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   
   lazy val isMineralBlocker: Boolean = unitClass.isMinerals && mineralsLeft < With.configuration.blockerMineralThreshold
   
-  def subjectiveValue: Int = subjectiveValueCache()
+  def subjectiveValue: Double = subjectiveValueCache()
   private val subjectiveValueCache = new Cache(() =>
     unitClass.subjectiveValue
       + scarabCount * Protoss.Scarab.subjectiveValue

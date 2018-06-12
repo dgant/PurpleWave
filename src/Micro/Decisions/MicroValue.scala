@@ -5,6 +5,8 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 object MicroValue {
   
+  val gasToMineralsRatio = 1.5
+  
   def valuePerDamageMaxHp(unit: UnitInfo): Double = {
     PurpleMath.nanToZero(unit.subjectiveValue / unit.totalHealth.toDouble)
   }

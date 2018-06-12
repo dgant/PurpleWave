@@ -7,7 +7,7 @@ import Micro.Actions.Commands.Attack
 import Micro.Matchups.{MatchupAnalysis, MatchupConditions}
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Strategery.Strategies.Zerg.Zerg4Pool
+import Strategery.Strategies.Zerg.ZvE4Pool
 
 object Kindle extends Action {
   
@@ -18,7 +18,7 @@ object Kindle extends Action {
     && unit.agent.canFight
     && unit.canAttack
     && unit.matchups.framesOfSafety > safetyMarginFrames
-    && Zerg4Pool.active
+    && ZvE4Pool.active
   )
   
   def legalTarget(unit: FriendlyUnitInfo, target: UnitInfo): Boolean = (

@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Zerg.ZvE
+package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAnother, RequestAtLeast, RequestUpgrade}
@@ -7,16 +7,18 @@ import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Compound.{If, Parallel, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
 import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas._
-import Planning.Plans.Macro.Automatic.{ExtractorTrick, MatchingRatio, TrainContinuously, TrainMatchingRatio}
+import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.MineralsAtLeast
+import Planning.Plans.Predicates.Matchup.EnemyIsTerran
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.{Employing, OnMap, StartPositionsAtMost}
 import Planning.Plans.Scouting.{CampExpansions, FoundEnemyBase}
-import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Maps.Transistor
 import Strategery.Strategies.Zerg.ZvPNinePool
 
@@ -61,7 +63,16 @@ class ZvPNinePool extends GameplanModeTemplate {
       RequestAtLeast(1, Zerg.Overlord),
       RequestAtLeast(6, Zerg.Zergling)))
   
-  private class TrainJustEnoughZerglings extends TrainMatchingRatio(Zerg.Zergling, 2, 12, Seq(MatchingRatio(Protoss.Zealot, 4.5), MatchingRatio(Protoss.Dragoon, 3.0)))
+  private class TrainJustEnoughZerglings extends TrainMatchingRatio(
+    Zerg.Zergling, 2, 12,
+    Seq(
+      MatchingRatio(Terran.Marine, 1.5),
+      MatchingRatio(Terran.Medic, 3.0),
+      MatchingRatio(Terran.Firebat, 3.0),
+      MatchingRatio(Protoss.Zealot, 4.5),
+      MatchingRatio(Protoss.Dragoon, 3.0),
+      MatchingRatio(Zerg.Zergling, 1.5)))
+  
   private class TakeSecondGasForMuta extends If(
     new And(
       new UnitsAtLeast(1, Zerg.Lair),
@@ -78,13 +89,11 @@ class ZvPNinePool extends GameplanModeTemplate {
         new UnitsAtLeast(21, Zerg.Drone, countEggs = true))),
     new BuildGasPumps)
   
-  // AIST1 hack fix. Yuck
-  class BuildLairIfNoLair extends Build(RequestAtLeast(1, Zerg.Lair))
-  /*
-  class BuildLairIfNoLair extends If(
-    new UnitsAtMost(0, Zerg.LairOrHive),
-    new Build(RequestAtLeast(1, Zerg.Lair)))
-    */
+  private class NeedTechTransition extends Or(
+    new TwoBaseProtoss,
+    new And(
+      new EnemyIsTerran,
+      new EnemyUnitsAtLeast(1, Terran.Bunker, complete = true)))
   
   override def buildPlans: Seq[Plan] = Seq(
     new EjectScout,
@@ -113,31 +122,32 @@ class ZvPNinePool extends GameplanModeTemplate {
         // 2/3 Hatch Muta
         new If(new UnitsAtLeast(1, Zerg.Spire, complete = true), new Parallel(
           new CapGasAtRatioToMinerals(1.0, 100),
-          /*
-          TODO: Test this
-          new If(
-            new And(
-              new UnitsAtLeast(1, Zerg.Spire, complete = false),
-              new UnitsAtMost(0, Zerg.Spire, complete = true),
-              new Check(() =>
-                With.self.supplyTotal
-                - With.self.supplyUsed
-                - 16 * With.units.ours.count(u => u.buildType == Zerg.Overlord)
-                < 24)),
-            new TrainContinuously(Zerg.Overlord, maximumConcurrently = 2)),
-            
-         */
+          // TODO: Need to add Overlords here so we have enough supply for banked Mutalisks
           new BuildOrder(RequestAtLeast(6, Zerg.Mutalisk)),
           new If(
             new UnitsAtLeast(6, Zerg.Mutalisk, complete = true),
             new TrainContinuously(Zerg.Drone, 21)),
           new TrainContinuously(Zerg.Drone, 16),
           new Build(RequestAtLeast(1, Zerg.SpawningPool), RequestAtLeast(1, Zerg.Extractor)),
-          new BuildLairIfNoLair,
+          new Build(RequestAtLeast(1, Zerg.Lair)),
           new Build(RequestAtLeast(1, Zerg.Spire), RequestAtLeast(2, Zerg.Extractor)),
           new Trigger(
-            new EnemyUnitsAtLeast(1, UnitMatchOr(Protoss.Corsair, Protoss.Stargate)),
-            new TrainMatchingRatio(Zerg.Scourge, 2, 12, Seq(MatchingRatio(Protoss.Corsair, 2.0)))),
+            new EnemyUnitsAtLeast(1, UnitMatchOr(
+              Terran.Wraith,
+              Terran.Valkyrie,
+              Terran.Starport,
+              Protoss.Corsair,
+              Protoss.Stargate,
+              Zerg.Mutalisk,
+              Zerg.Scourge,
+              Zerg.Spire)),
+            new TrainMatchingRatio(Zerg.Scourge, 2, 12, Seq(
+              MatchingRatio(Terran.Wraith, 2.0),
+              MatchingRatio(Terran.Valkyrie, 2.0),
+              MatchingRatio(Protoss.Corsair, 2.0),
+              MatchingRatio(Protoss.Scout, 3.0),
+              MatchingRatio(Zerg.Mutalisk, 2.0),
+              MatchingRatio(Zerg.Scourge, 1.0)))),
           new If(
             new Check(() => With.self.gas > Math.min(100, With.self.minerals)),
             new TrainContinuously(Zerg.Mutalisk)),
@@ -151,7 +161,7 @@ class ZvPNinePool extends GameplanModeTemplate {
         new TrainContinuously(Zerg.Drone, 11),
 
         new If(
-          new TwoBaseProtoss,
+          new NeedTechTransition,
           new If(
             new OnMap(Transistor),
             
@@ -173,7 +183,7 @@ class ZvPNinePool extends GameplanModeTemplate {
               new If(
                 new UnitsAtLeast(1, Zerg.Extractor, complete = true),
                 new Parallel(
-                  new BuildLairIfNoLair,
+                  new Build(RequestAtLeast(1, Zerg.Lair)),
                   new Build(
                     RequestUpgrade(Zerg.ZerglingSpeed),
                     RequestAtLeast(1, Zerg.Spire)))),
@@ -226,7 +236,7 @@ class ZvPNinePool extends GameplanModeTemplate {
             new Build(
               RequestAtLeast(1, Zerg.Extractor),
               RequestUpgrade(Zerg.ZerglingSpeed)),
-            new BuildLairIfNoLair,
+            new Build(RequestAtLeast(1, Zerg.Lair)),
             new Build(RequestAtLeast(1, Zerg.Spire)))
       )))
     )))

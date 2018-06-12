@@ -1,6 +1,6 @@
 package Strategery
 
-import Strategery.Selection.{StrategySelectionAIST1, StrategySelectionFree, StrategySelectionPolicy}
+import Strategery.Selection.{StrategySelectionFree, StrategySelectionPolicy}
 import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss._
 import Strategery.Strategies.Strategy
@@ -43,23 +43,11 @@ object StrategyGroups {
 }
 
 class TestingPlaybook extends EmptyPlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(ZvPTwoHatchMuta)
+  override lazy val forced: Seq[Strategy] = Seq()
 }
 
 class PurpleWavePlaybook extends EmptyPlaybook {
   override lazy val disabled  : Seq[Strategy] = StrategyGroups.disabled
 }
 
-class AIST1Playbook extends EmptyPlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(
-    ZergSparkle,
-    ZvPNinePool,
-    ZvPTwoHatchMuta,
-    NinePoolMuta,
-    NineHatchLings
-  )
-  
-  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionAIST1
-}
-
-object Playbook extends AIST1Playbook {}
+object Playbook extends PurpleWavePlaybook {}

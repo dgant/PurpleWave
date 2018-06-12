@@ -7,7 +7,7 @@ import ProxyBwapi.Players.Players
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
-import bwapi.{Position, UnitCommand}
+import bwapi.Position
 
 class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(originalBaseUnit, id) {
   

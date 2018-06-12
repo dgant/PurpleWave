@@ -21,7 +21,7 @@ class Visualization {
   
   var views = mutable.ArrayBuffer(
     // Evergreen views
-    ShowRushDistances,
+    ShowPerformanceSummary,
     ShowClock,
     ShowStrategy,
     ShowUnitsAll,

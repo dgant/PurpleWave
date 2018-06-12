@@ -2,6 +2,8 @@ package Performance
 
 import Lifecycle.With
 
+import scala.collection.mutable
+
 class PerformanceMonitor {
   
   private val framesToTrack = 24 * 3
@@ -17,11 +19,19 @@ class PerformanceMonitor {
   var enablePerformanceStops = With.configuration.enablePerformanceStops // For disabling performance stops while debugging
   var enablePerformanceSurrenders = With.configuration.enablePerformanceSurrender
   
+  var lastUniqueUnitIdCount: Int = 0
+  private val uniqueFriendlyUnitIds = new mutable.HashSet[Int]
+  def trackUnit(id: Int) {
+    uniqueFriendlyUnitIds += id
+  }
+  
   def startFrame() {
     millisecondsBefore = System.currentTimeMillis()
   }
   
   def endFrame() {
+    lastUniqueUnitIdCount = uniqueFriendlyUnitIds.size
+    uniqueFriendlyUnitIds.clear()
     val millisecondDifference = millisecondsSpentThisFrame
     frameTimes(With.frame % framesToTrack) = millisecondDifference
     if (millisecondDifference >= 85)    framesOver85    += 1

@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Zerg.ZvE
+package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Lifecycle.With
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
@@ -9,6 +9,7 @@ import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.Zerg.ZergIdeas.{ScoutSafelyWithDrone, ScoutSafelyWithOverlord}
 import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas._
 import Planning.Plans.Macro.Automatic.{MatchingRatio, TrainContinuously, TrainMatchingRatio}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -21,7 +22,7 @@ import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Predicates.Scenarios.EnemyStrategy
 import Planning.Plans.Scouting.{CampExpansions, FindExpansions}
-import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Maps.{StarCraftMap, Transistor}
 import Strategery.Strategies.Zerg.ZvPTwoHatchMuta
 
@@ -52,7 +53,6 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
       preferDistanceFromEnemy = 0.25)
   else
     PlacementProfiles.wallCannon
-  
   
   override def priorityAttackPlan: Plan = new If(
     new UnitsAtLeast(12, UnitMatchWarriors),
@@ -117,28 +117,35 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
       new UnitsAtLeast(12, Zerg.Drone),
       new UnitsAtMost(0, Zerg.Spire, complete = true)),
     new If(
-      new EnemyUnitsAtLeast(18, ZealotOrDragoon),
+      new EnemyUnitsAtLeast(17, ZealotOrDragoon),
       new BuildSunkensAtNatural(7, sunkenProfile),
       new If(
-        new EnemyUnitsAtLeast(14, ZealotOrDragoon),
+        new EnemyUnitsAtLeast(13, ZealotOrDragoon),
         new BuildSunkensAtNatural(6, sunkenProfile),
         new If(
-          new EnemyUnitsAtLeast(11, ZealotOrDragoon),
+          new EnemyUnitsAtLeast(10, ZealotOrDragoon),
           new BuildSunkensAtNatural(5, sunkenProfile),
           new If(
-            new EnemyUnitsAtLeast(8, ZealotOrDragoon),
+            new EnemyUnitsAtLeast(7, ZealotOrDragoon),
             new BuildSunkensAtNatural(4, sunkenProfile),
             new If(
               new EnemyUnitsAtLeast(5, ZealotOrDragoon),
               new BuildSunkensAtNatural(3, sunkenProfile),
               new If(
                 new EnemyUnitsAtLeast(3, ZealotOrDragoon),
-                new BuildSunkensAtNatural(2, sunkenProfile))))))))
+                new BuildSunkensAtNatural(2, sunkenProfile),
+                new If(
+                  new EnemyUnitsAtLeast(1, Terran.Vulture),
+                  new BuildSunkensAtNatural(1, sunkenProfile)))))))))
   
-  class ReactiveZerglingsVsZealots extends If(
+  class ReactiveZerglings extends If(
     new UnitsAtMost(0, Zerg.Spire, complete = true),
     new TrainMatchingRatio(Zerg.Zergling, 0, 10, Seq(
-      MatchingRatio(Protoss.Zealot, 4.0))))
+      MatchingRatio(Terran.Marine, 1.5),
+      MatchingRatio(Terran.Firebat, 3.0),
+      MatchingRatio(Terran.Vulture, 2.0),
+      MatchingRatio(Protoss.Zealot, 4.0),
+      MatchingRatio(Zerg.Zergling, 1.75))))
   
   class NeedExpansion(droneCount: Int) extends Or(
     new UnitsAtLeast(droneCount, Zerg.Drone),
@@ -153,8 +160,6 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
     new ReactiveSunkensVsZealots)
   
   override def buildPlans: Seq[Plan] = Vector(
-    new WatchIslandsOnThirdWorld,
-    new TakeThirdWorldIslandsAfter(2),
     new EjectScout,
     new If(
       new IfOnMiningBases(5),
@@ -178,13 +183,20 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
     new If(
       new EnemyHasShown(Protoss.Corsair),
       new TrainContinuously(Zerg.Scourge, 2)),
-    new TrainMatchingRatio(Zerg.Scourge, 0, 10, Seq(MatchingRatio(UnitMatchOr(Protoss.Corsair, Protoss.Stargate), 2.0))),
+    new TrainMatchingRatio(Zerg.Scourge, 0, 10,
+      Seq(
+        MatchingRatio(UnitMatchOr(Terran.Valkyrie, Terran.Wraith, Protoss.Corsair, Protoss.Stargate, Zerg.Mutalisk), 2.0),
+        MatchingRatio(UnitMatchOr(Zerg.Scourge), 1.0))),
     new If(
       new And(
         new MiningBasesAtLeast(3),
         new UnitsAtLeast(6, Zerg.Mutalisk),
         new UpgradeComplete(Zerg.ZerglingSpeed, 1, Zerg.Zergling.buildFrames)),
-      new TrainMatchingRatio(Zerg.Zergling, 0, 18, Seq(MatchingRatio(Protoss.Dragoon, 3.0)))),
+      new TrainMatchingRatio(Zerg.Zergling, 0, 18, Seq(
+        MatchingRatio(Terran.Marine, 1.5),
+        MatchingRatio(Terran.Goliath, 4.0),
+        MatchingRatio(Protoss.Dragoon, 3.0),
+        MatchingRatio(Zerg.Hydralisk, 3.0)))),
   
     new If(
       new UnitsAtLeast(1, Zerg.Hive),
@@ -226,8 +238,12 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
                 new Not(new UpgradeComplete(Zerg.AirDamage, 2)),
                 new UnitsAtMost(0, Zerg.Hive, complete = true))),
             new Or(
+              new EnemyHasShown(Terran.Marine),
+              new EnemyHasShown(Terran.Goliath),
+              new EnemyHasShown(Terran.Valkyrie),
               new EnemyHasShown(Protoss.Corsair),
               new EnemyHasShown(Protoss.Stargate),
+              new EnemyHasShown(Zerg.Mutalisk),
               new UpgradeComplete(Zerg.AirDamage, 3),
               new And(
                 new UpgradeComplete(Zerg.AirDamage, 3),
@@ -242,7 +258,7 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
       new ShouldDoSpeedlingAllIn,
       new DoSpeedlingAllIn),
     
-    new ReactiveZerglingsVsZealots,
+    new ReactiveZerglings,
     new If(
       new ProceedWithDrones,
       new TrainContinuously(Zerg.Drone, 12),

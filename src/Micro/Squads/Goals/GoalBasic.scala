@@ -99,7 +99,7 @@ trait GoalBasic extends SquadGoal {
   private def countUnit(unit: UnitInfo) {
     val counter = if (unit.isFriendly) recruitsByQuality else enemiesByQuality
     Qualities.all.foreach(quality =>
-      if (quality.matches(unit)) counter.add(quality, unit.subjectiveValue))
+      if (quality.matches(unit)) counter.add(quality, unit.subjectiveValue.toInt))
   }
   private def updateCounts() {
     if (lastUpdateFrame >= With.frame) return

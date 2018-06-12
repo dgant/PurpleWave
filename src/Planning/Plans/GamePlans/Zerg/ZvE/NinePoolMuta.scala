@@ -9,17 +9,21 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Predicates.Matchup.EnemyIsZerg
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Predicates.Economy.{GasAtMost, MineralsAtLeast}
+import Planning.Plans.Predicates.Employing
+import Planning.Plans.Predicates.Matchup.EnemyIsZerg
 import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.{Terran, Zerg}
+import Strategery.Strategies.Zerg.NinePoolMuta
 
 class NinePoolMuta extends GameplanModeTemplate {
+  
+  override val activationCriteria: Plan = new Employing(NinePoolMuta)
   
   override def buildOrder: Seq[BuildRequest] = Vector(
     RequestAtLeast(9, Zerg.Drone),

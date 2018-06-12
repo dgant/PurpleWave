@@ -14,9 +14,10 @@ object ShowPerformanceSummary extends View {
     With.game.drawTextScreen(5,   2 * With.visualization.lineHeightSmall, "+85ms: "     + With.performance.framesOver85     + "/320")
     With.game.drawTextScreen(80,  2 * With.visualization.lineHeightSmall, "+1000ms: "   + With.performance.framesOver1000   + "/10")
     With.game.drawTextScreen(155, 2 * With.visualization.lineHeightSmall, "+10000ms: "  + With.performance.framesOver10000  + "/1")
+    With.game.drawTextScreen(230, 2 * With.visualization.lineHeightSmall, "Units: " + With.performance.lastUniqueUnitIdCount)
     if (With.performance.disqualified) {
       With.game.setTextSize(bwapi.Text.Size.Enum.Large)
-      //With.game.drawTextScreen(230, 2 * With.visualization.lineHeightSmall, "Disqualified!")
+      With.game.drawTextScreen(230, 2 * With.visualization.lineHeightSmall, ":/")
       With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     }
   }

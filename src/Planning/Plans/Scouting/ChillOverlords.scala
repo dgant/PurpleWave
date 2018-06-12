@@ -5,7 +5,7 @@ import Mathematics.PurpleMath
 import Mathematics.Shapes.Circle
 import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitMatchers.{UnitMatchMobileDetectors, UnitMatchOr}
+import Planning.Composition.UnitMatchers.UnitMatchOr
 import Planning.Composition.{Latch, UnitCountEverything}
 import Planning.Plan
 import Planning.Plans.Predicates.Milestones.EnemyUnitsAtLeast
@@ -20,7 +20,6 @@ class ChillOverlords extends Plan {
   overlords.unitCounter.set(UnitCountEverything)
   
   val cloakedThreat = new Latch(new EnemyUnitsAtLeast(1, UnitMatchOr(
-    UnitMatchMobileDetectors,
     Terran.Wraith,
     Terran.Ghost,
     Protoss.DarkTemplar,

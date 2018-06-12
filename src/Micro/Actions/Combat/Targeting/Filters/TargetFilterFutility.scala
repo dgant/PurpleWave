@@ -8,7 +8,7 @@ object TargetFilterFutility extends TargetFilter {
   
   private def catchableBy(actor: UnitInfo, target: UnitInfo): Boolean = {
     lazy val targetBusy = target.gathering || target.constructing || target.repairing || ! target.canMove
-    actor.topSpeed >= target.topSpeed * 1.2 || actor.inRangeToAttack(target) || targetBusy || actor.is(Zerg.Scourge)
+    actor.topSpeed >= target.topSpeed || actor.inRangeToAttack(target) || targetBusy || actor.is(Zerg.Scourge)
   }
   // Target units according to our goals.
   // Ignore them if they're distractions.

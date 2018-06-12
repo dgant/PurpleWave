@@ -6,16 +6,19 @@ import Planning.Plan
 import Planning.Plans.Army.{AllIn, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas.CapGasAt
-import Planning.Plans.Macro.Automatic.{ExtractorTrick, TrainContinuously}
+import Planning.Plans.Macro.Automatic.{CapGasAt, ExtractorTrick, TrainContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Matchup.EnemyIsZerg
 import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast, UpgradeComplete}
 import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.{Terran, Zerg}
+import Strategery.Strategies.Zerg.NineHatchLings
 
 class NineHatchLings extends GameplanModeTemplate {
+  
+  override val activationCriteria: Plan = new Employing(NineHatchLings)
   
   override def defaultBuildOrder: Plan = new Parallel(
     new BuildOrder(RequestAtLeast(9, Zerg.Drone)),

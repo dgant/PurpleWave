@@ -75,8 +75,8 @@ object ShowBattleDetails extends View {
     ))
     
     val x2 = 200
-    val valueUsInitial    = battle.us.units.map(_.subjectiveValue).sum
-    val valueEnemyInitial = battle.enemy.units.map(_.subjectiveValue).sum
+    val valueUsInitial    = battle.us.units.map(_.subjectiveValue).sum.toInt
+    val valueEnemyInitial = battle.enemy.units.map(_.subjectiveValue).sum.toInt
     val valueUsLost       = estimation.costToUs.toInt
     val valueEnemyLost    = estimation.costToEnemy.toInt
     val valueUsKept       = Math.max(0, valueUsInitial - valueUsLost)

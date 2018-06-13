@@ -10,7 +10,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable
 
-class LockUnits extends ResourceLock {
+class LockUnits extends {
   
   var canPoach          = new Property[Boolean](false)
   var interruptable     = new Property[Boolean](true)
@@ -22,9 +22,9 @@ class LockUnits extends ResourceLock {
   var owner: Plan = _
   
   var isSatisfied:Boolean = false
-  override def satisfied: Boolean = isSatisfied
+  def satisfied: Boolean = isSatisfied
   
-  override def acquire(plan: Plan) {
+  def acquire(plan: Plan) {
     owner = plan
     With.recruiter.add(this)
   }
@@ -37,7 +37,7 @@ class LockUnits extends ResourceLock {
     output
   }
   
-  override def release() {
+  def release() {
     With.recruiter.remove(this)
   }
   

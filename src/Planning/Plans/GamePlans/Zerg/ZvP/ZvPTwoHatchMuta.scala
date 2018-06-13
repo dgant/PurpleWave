@@ -23,7 +23,7 @@ import Planning.Plans.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Predicates.Scenarios.EnemyStrategy
 import Planning.Plans.Scouting.{CampExpansions, FindExpansions}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import Strategery.Maps.{StarCraftMap, Transistor}
+import Strategery.{StarCraftMap, Transistor}
 import Strategery.Strategies.Zerg.ZvPTwoHatchMuta
 
 class ZvPTwoHatchMuta extends GameplanModeTemplate {

@@ -1,6 +1,6 @@
 package Strategery.Strategies.Protoss
 
-import Strategery.Maps.{MapGroups, StarCraftMap}
+import Strategery.{MapGroups, StarCraftMap}
 import Strategery.Strategies.Strategy
 import bwapi.Race
 

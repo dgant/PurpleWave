@@ -2,7 +2,7 @@ package Strategery.Strategies.Terran.TvE
 
 import Planning.Plan
 import Planning.Plans.GamePlans.Terran.Standard.TvE.Proxy8Fact
-import Strategery.Maps.{MapGroups, StarCraftMap}
+import Strategery.{MapGroups, StarCraftMap}
 import Strategery.Strategies.Strategy
 import bwapi.Race
 

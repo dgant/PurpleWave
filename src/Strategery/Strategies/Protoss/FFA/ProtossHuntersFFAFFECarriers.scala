@@ -2,7 +2,7 @@ package Strategery.Strategies.Protoss.FFA
 
 import Planning.Plan
 import Planning.Plans.GamePlans.Protoss.Standard.FFA.ProtossHuntersFFAFFECarriers
-import Strategery.Maps.{Hunters, StarCraftMap}
+import Strategery.{Hunters, StarCraftMap}
 import Strategery.Strategies.Strategy
 import bwapi.Race
 

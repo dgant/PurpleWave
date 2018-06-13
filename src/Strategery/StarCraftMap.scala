@@ -1,4 +1,4 @@
-package Strategery.Maps
+package Strategery
 
 import Lifecycle.With
 abstract class StarCraftMap {

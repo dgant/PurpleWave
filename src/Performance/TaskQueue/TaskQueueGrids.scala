@@ -1,6 +1,5 @@
 package Performance.TaskQueue
-import Performance.Tasks.AbstractTask
-import Performance.Tasks.Grids._
+import Performance.Tasks._
 
 class TaskQueueGrids extends AbstractTaskQueue {
   
@@ -9,7 +8,6 @@ class TaskQueueGrids extends AbstractTaskQueue {
     new TaskGridBuildable                   { urgency = 10  },
     new TaskGridBuildableTerrain            { urgency = 10  },
     new TaskGridBuildableTownHall           { urgency = 1   },
-    new TaskGridChokepoints                 { urgency = 1   },
     new TaskGridCreep                       { urgency = 1   },
     new TaskGridEnemyDetection              { urgency = 100 },
     new TaskGridEnemyVision                 { urgency = 100 },

@@ -6,7 +6,7 @@ import Mathematics.Points.{Tile, TileRectangle}
 import Mathematics.Shapes.Circle
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
-import Strategery.Maps.Hunters
+import Strategery.Hunters
 import Utilities.EnrichPixel._
 
 import scala.collection.JavaConverters._

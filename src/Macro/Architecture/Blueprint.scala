@@ -7,7 +7,7 @@ import Mathematics.Points.{Tile, TileRectangle}
 import Planning.Plan
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
-import Strategery.Maps.Plasma
+import Strategery.Plasma
 
 class Blueprint(
   val proposer            : Plan,

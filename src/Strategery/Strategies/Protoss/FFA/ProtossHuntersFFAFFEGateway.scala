@@ -2,8 +2,8 @@ package Strategery.Strategies.Protoss.FFA
 
 import Planning.Plan
 import Planning.Plans.GamePlans.Protoss.Standard.FFA.ProtossHuntersFFAFFEGateway
-import Strategery.Maps.{Hunters, StarCraftMap}
 import Strategery.Strategies.Strategy
+import Strategery.{Hunters, StarCraftMap}
 import bwapi.Race
 
 object ProtossHuntersFFAFFEGateway extends Strategy {

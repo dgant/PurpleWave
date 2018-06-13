@@ -3,7 +3,7 @@ package Planning.Composition.ResourceLocks
 import Lifecycle.With
 import Planning.Plan
 
-class LockCurrency extends ResourceLock {
+class LockCurrency {
   
   var framesPreordered  = 0
   var minerals          = 0
@@ -14,14 +14,14 @@ class LockCurrency extends ResourceLock {
   var expectedFrames    = 0
   var owner: Plan       = _
   
-  override def satisfied: Boolean = isSatisfied || isSpent
+  def satisfied: Boolean = isSatisfied || isSpent
   
-  override def acquire(plan:Plan) {
+  def acquire(plan:Plan) {
     owner = plan
     With.bank.request(this)
   }
   
-  override def release() {
+  def release() {
     With.bank.release(this)
   }
   

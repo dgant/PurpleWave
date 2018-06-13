@@ -11,7 +11,7 @@ object AttackDelay {
   Resident wizard jaj22 discovers a new way to make Dragoons stick:
   
   jaj22: goon chasing zealot on attack order. Give attack order against different zealot in range. Goon fires and sticks.
-   */
+  */
   
   /*
   Units get stuck when they execute a move order shortly after their attack animation finishes.

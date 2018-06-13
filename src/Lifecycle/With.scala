@@ -41,7 +41,7 @@ object With {
   var commander         : Commander               = _
   var coordinator       : Coordinator             = _
   var configuration     : Configuration           = _
-  var damageCredit      : DamageCredit            = _
+  
   var economy           : Economy                 = _
   var geography         : Geography               = _
   var grids             : Grids                   = _
@@ -111,7 +111,6 @@ object With {
     camera            = new Camera
     commander         = new Commander
     coordinator       = new Coordinator
-    damageCredit      = new DamageCredit
     economy           = new Economy
     groundskeeper     = new Groundskeeper
     geography         = new Geography

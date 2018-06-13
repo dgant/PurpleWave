@@ -19,8 +19,8 @@ import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.{Employing, OnMap, StartPositionsAtMost}
 import Planning.Plans.Scouting.{CampExpansions, FoundEnemyBase}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import Strategery.Maps.Transistor
 import Strategery.Strategies.Zerg.ZvPNinePool
+import Strategery.Transistor
 
 class ZvPNinePool extends GameplanModeTemplate {
   

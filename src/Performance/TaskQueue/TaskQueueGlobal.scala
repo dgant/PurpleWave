@@ -1,5 +1,4 @@
 package Performance.TaskQueue
-import Performance.Tasks.Global._
 import Performance.Tasks._
 
 class TaskQueueGlobal extends AbstractTaskQueue {

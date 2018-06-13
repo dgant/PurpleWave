@@ -5,7 +5,6 @@ import Planning.Plan
 import Planning.Plans.StandardGamePlan
 import ProxyBwapi.Players.Players
 import Strategery.History.HistoricalGame
-import Strategery.Maps.{Plasma, StarCraftMap, StarCraftMaps}
 import Strategery.Strategies.Protoss.ProtossChoices
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TerranChoices

@@ -5,7 +5,6 @@ import Information.Battles.Types.BattleLocal
 import Information.Geography.Types.{Base, Zone}
 import Information.Grids.AbstractGrid
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
-import Information.Kill
 import Lifecycle.With
 import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
@@ -17,8 +16,6 @@ import ProxyBwapi.Engine.Damage
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import bwapi._
-
-import scala.collection.mutable
 
 abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUnit, id) {
   
@@ -64,9 +61,6 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   var lastAttacker              : Option[UnitInfo] = None
   def lastTotalHealthPoints: Int = lastHitPoints + lastShieldPoints + lastDefensiveMatrixPoints
   
-  def creditKill(kill: Kill) { kills += kill }
-  val kills: mutable.ArrayBuffer[Kill] = new mutable.ArrayBuffer[Kill]
-  
   def updateCommon() {
     val thisFrame = With.frame
     if (totalHealth < lastTotalHealthPoints) {
@@ -91,9 +85,6 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     }
     else {
       framesFailingToAttack = 0
-    }
-    if (lastFrameStartingAttack == thisFrame && target.nonEmpty) {
-      With.damageCredit.onDamage(this, target.get)
     }
     if ( ! complete || completionFrame > 24 * 60 * 90) {
       completionFrame = With.frame + remainingCompletionFrames

@@ -4,7 +4,6 @@ import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Mathematics.PurpleMath
-import Micro.Agency.OldExplosion
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -113,18 +112,6 @@ object Potential {
     
     val forces  = splashAllies.map(Potential.unitAttraction(unit, _, magnifier = splashRepulsionMagnitude))
     val output  = ForceMath.sum(forces).normalize(forces.map(_.lengthFast).max)
-    output
-  }
-  
-  ////////////////
-  // Explosions //
-  ////////////////
-  
-  def explosionRepulsion(unit: FriendlyUnitInfo, explosion: OldExplosion): Force = {
-    val magnitudeDamage   = explosion.damage
-    val magnitudeDistance = explosion.safetyRadius / Math.max(1.0, unit.pixelDistanceCenter(explosion.pixelCenter))
-    val magnitudeFinal    = magnitudeDamage / magnitudeDistance
-    val output            = ForceMath.fromPixels(unit.pixelCenter, explosion.pixelCenter, -magnitudeFinal)
     output
   }
   

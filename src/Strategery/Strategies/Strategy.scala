@@ -2,7 +2,7 @@ package Strategery.Strategies
 
 import Lifecycle.With
 import Planning.Plan
-import Strategery.Maps.StarCraftMap
+import Strategery.StarCraftMap
 import bwapi.Race
 
 abstract class Strategy {

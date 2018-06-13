@@ -5,7 +5,6 @@ import Planning.Plans.GamePlans.ModalGameplan
 class ProtossVsTerran extends ModalGameplan(
   new PvT1015Expand,
   new PvT1015GateDT,
-  new PvT1GateReaver,
   new PvTStove,
   new PvTBasic
 )

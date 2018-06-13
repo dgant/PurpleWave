@@ -4,7 +4,7 @@ import Planning.Composition.UnitMatchers.{UnitMatchWarriors, UnitMatchWorkers}
 import Planning.Plans.Compound._
 import Planning.Plans.Predicates.OnMap
 import Planning.Plans.Predicates.Milestones.{MiningBasesAtMost, UnitsAtLeast}
-import Strategery.Maps.Hunters
+import Strategery.Hunters
 
 class RequireMiningBasesFFA(bases: Int = 1) extends If(
   // Expand, but be very careful about it if we're on The Hunters/BGH

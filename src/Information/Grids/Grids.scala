@@ -12,7 +12,6 @@ class Grids {
   val buildable               = new GridBuildable
   val buildableTerrain        = new GridBuildableTerrain
   val buildableTownHall       = new GridBuildableTownHall
-  val chokepoints             = new GridChokepoint
   val creep                   = new GridCreep
   val friendlyVision          = new GridFriendlyVision
   val enemyVision             = new GridEnemyVision

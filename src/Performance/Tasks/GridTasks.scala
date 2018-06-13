@@ -1,8 +1,7 @@
-package Performance.Tasks.Grids
+package Performance.Tasks
 
 import Information.Grids.AbstractGrid
 import Lifecycle.With
-import Performance.Tasks.AbstractTask
 
 abstract class GridTask[T](grid: AbstractGrid[T]) extends AbstractTask {
   override protected def onRun(): Unit = grid.update()
@@ -12,7 +11,6 @@ class TaskGridAltitudeBonus     extends GridTask(With.grids.altitudeBonus)
 class TaskGridBuildable         extends GridTask(With.grids.buildable)
 class TaskGridBuildableTerrain  extends GridTask(With.grids.buildableTerrain)
 class TaskGridBuildableTownHall extends GridTask(With.grids.buildableTownHall)
-class TaskGridChokepoints       extends GridTask(With.grids.chokepoints)
 class TaskGridCreep             extends GridTask(With.grids.creep)
 class TaskGridEnemyDetection    extends GridTask(With.grids.enemyDetection)
 class TaskGridEnemyVision       extends GridTask(With.grids.enemyVision)

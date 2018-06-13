@@ -2,7 +2,7 @@ package Strategery.Strategies.Protoss.PvE
 
 import Planning.Plan
 import Planning.Plans.GamePlans.Protoss.Standard.PvE.ProxyDarkTemplarRush
-import Strategery.Maps.{MapGroups, StarCraftMap}
+import Strategery.{MapGroups, StarCraftMap}
 import Strategery.Strategies.Strategy
 import bwapi.Race
 

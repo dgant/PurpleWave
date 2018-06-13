@@ -14,6 +14,9 @@ import scala.collection.mutable
 
 object BaseFinder {
   
+  val baseRadiusPixels        = 32.0 * 15.0
+  val baseMergingRadiusPixels = 32.0 * 12.0
+  
   def calculate: Iterable[Tile] = {
     
     // Start locations are free base placements.
@@ -25,7 +28,7 @@ object BaseFinder {
     
     // Get every resource that isn't a mineral block and isn't tied to a start location
     val baseResources = allResources.filterNot(_.isMineralBlocker)
-    val expoResources = baseResources.filterNot(r => startPixels.exists(_.pixelDistance(r.pixelCenter) <= With.configuration.baseRadiusPixels))
+    val expoResources = baseResources.filterNot(r => startPixels.exists(_.pixelDistance(r.pixelCenter) <= baseRadiusPixels))
     
     // Cluster the expansion resources
     val clusters = clusterResourcePatches(expoResources)
@@ -42,7 +45,7 @@ object BaseFinder {
     val shouldLimitRegion = ! Hunters.matches // Hack -- fix the top-right position on Hunters
     Clustering.group[ForeignUnitInfo](
       resources,
-      With.configuration.baseRadiusPixels,
+      baseRadiusPixels,
       limitRegion = shouldLimitRegion,
       (unit) => unit.pixelCenter).values
   }
@@ -106,7 +109,7 @@ object BaseFinder {
         output += base.startInclusive
     
         // Real lazy -- just remove all conflicting candidates (instead of, say, picking the best one or something)
-        val conflicts = basesLeft.filter(_.midPixel.pixelDistance(base.midPixel) < With.configuration.baseMergingRadiusPixels)
+        val conflicts = basesLeft.filter(_.midPixel.pixelDistance(base.midPixel) < baseMergingRadiusPixels)
         basesLeft --= conflicts
     })
     

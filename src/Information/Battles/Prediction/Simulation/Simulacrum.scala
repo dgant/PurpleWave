@@ -17,9 +17,9 @@ class Simulacrum(
   // Constant
   private val SIMULATION_STEP_FRAMES = 6
   
-  val movementDelay     : Int     = if (realUnit.isEnemy || simulation.weAttack)  0   else realUnit.unitClass.framesToTurn(Math.PI) + 2 * realUnit.unitClass.accelerationFrames + With.configuration.retreatMovementDelay
+  val movementDelay     : Int     = if (realUnit.isEnemy || simulation.weAttack)  0   else realUnit.unitClass.framesToTurn(Math.PI) + 2 * realUnit.unitClass.accelerationFrames + With.configuration.simulationRetreatDelay
   val speedMultiplier   : Double  = if (realUnit.isEnemy || realUnit.flying)      1.0 else Math.max(0.75, simulation.chokeMobility.getOrElse(realUnit.zone, 1.0))
-  val bonusRange        : Double  = if (realUnit.isOurs  || ! realUnit.unitClass.isSiegeTank || ! simulation.weAttack) 0.0 else With.configuration.bonusTankRange
+  val bonusRange        : Double  = if (realUnit.isOurs  || ! realUnit.unitClass.isSiegeTank || ! simulation.weAttack) 0.0 else With.configuration.simulationBonusTankRange
   val multiplierSplash  : Double  = realUnit.matchups.splashFactorMax
   
   // Unit state
@@ -148,7 +148,7 @@ class Simulacrum(
     val damageTotal       = Math.min(victim.hitPoints, damage)
     val damageToShields   = Math.min(victim.shieldPoints, damageTotal)
     val damageToHitPoints = damageTotal - damageToShields
-    val valueDamage       = damageTotal * victim.valuePerDamage * With.configuration.nonLethalDamageValue
+    val valueDamage       = damageTotal * victim.valuePerDamage * With.configuration.simulationDamageValueRatio
     val cooldownDivisor   = if (realUnit.canStim && ! realUnit.stimmed) 2 else 1
     cooldownShooting      = (realUnit.cooldownMaxAgainst(victim.realUnit) / splashFactor / cooldownDivisor).toInt
     cooldownMoving        += realUnit.unitClass.stopFrames + realUnit.unitClass.accelerationFrames / 2
@@ -160,7 +160,7 @@ class Simulacrum(
     victim.hitPoints      -= damageToHitPoints
     dead                  = realUnit.unitClass.suicides
     if (victimWasAlive && victim.hitPoints <= 0) {
-      val valueKill = victim.realUnit.subjectiveValue * (1.0 - With.configuration.nonLethalDamageValue)
+      val valueKill = victim.realUnit.subjectiveValue * (1.0 - With.configuration.simulationDamageValueRatio)
       kills += 1
       valueDealt += valueKill
       victim.valueReceived += valueKill

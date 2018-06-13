@@ -179,16 +179,15 @@ class Commander {
     // That means that if the unit got confused while executing the original order, it will remain confused.
     // Issuing an order to a slightly different position can cause Brood War to recalculate the path and un-stick the unit.
     //
-    // However, this recalculation can itslef sometimes cause units to get stuck on obstacles.
+    // However, this recalculation can itself sometimes cause units to get stuck on obstacles.
     // Specifically, units tend to get stuck on buildings this way.
     // The neutral buildings on Roadrunner frequently cause this.
     //
     // So we'll try to get the best of both worlds, and recalculate paths *occasionally*
     //
     // Also, give different units different paths to avoid "conga line" behavior
-    if (With.configuration.enablePathRecalculation) {
-      destination = destination.add((unit.id + With.frame / With.configuration.pathRecalculationDelayFrames) % 5 - 2, 0)
-    }
+    //
+    destination = destination.add((unit.id + With.frame / 36) % 5 - 2, 0)
     
     if (unit.pixelDistanceCenter(destination) > 3) {
       if (unit.is(Terran.Medic)) {

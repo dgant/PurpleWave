@@ -134,7 +134,7 @@ object With {
     viewport          = new Viewport
     visualization     = new Visualization
     
-    game.setLocalSpeed(configuration.gameSpeed)
+    game.setLocalSpeed(0)
   }
   
   def onEnd() {

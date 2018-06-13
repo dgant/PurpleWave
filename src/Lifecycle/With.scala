@@ -6,6 +6,7 @@ import Information.Battles.BattleClassifier
 import Information.Geography.Geography
 import Information.Geography.Pathfinding.Paths
 import Information.Grids.Grids
+import Information.Intelligenze.Fingerprinting.Fingerprints
 import Information._
 import Macro.Allocation._
 import Macro.Architecture.{Architecture, PlacementScheduler}
@@ -43,6 +44,7 @@ object With {
   var configuration     : Configuration           = _
   
   var economy           : Economy                 = _
+  var fingerprints      : Fingerprints            = _
   var geography         : Geography               = _
   var grids             : Grids                   = _
   var groundskeeper     : Groundskeeper           = _
@@ -112,6 +114,7 @@ object With {
     commander         = new Commander
     coordinator       = new Coordinator
     economy           = new Economy
+    fingerprints      = new Fingerprints
     groundskeeper     = new Groundskeeper
     geography         = new Geography
     grids             = new Grids

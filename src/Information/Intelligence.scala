@@ -14,7 +14,6 @@ import scala.collection.mutable
 class Intelligence {
   
   val unitsShown: UnitsShown = new UnitsShown
-  val fingerprints: Fingerprints = new Fingerprints
   var firstEnemyMain: Option[Base] = None
   
   def leastScoutedBases: Iterable[Base] = leastScoutedBasesCache()
@@ -95,7 +94,6 @@ class Intelligence {
     updateEnemyMain()
     flyingScout = false
     scoutTiles.clear()
-    fingerprints.all.foreach(_.update())
   }
   
   private def updateEnemyMain() {

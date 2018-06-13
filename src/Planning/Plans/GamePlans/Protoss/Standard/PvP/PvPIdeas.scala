@@ -44,19 +44,19 @@ object PvPIdeas {
         new Not(new EnemyDarkTemplarExists),
         new EnemyUnitsAtMost(0, Protoss.Arbiter)),
       new Or(
-        new EnemyStrategy(With.intelligence.fingerprints.cannonRush),
+        new EnemyStrategy(With.fingerprints.cannonRush),
         new Employing(PvPOpen4GateGoon),
         new SafeToMoveOut,
         new MiningBasesAtLeast(3),
         new EnemyBasesAtLeast(3)),
       new Or(
-        new Not(new EnemyStrategy(With.intelligence.fingerprints.twoGate)),
+        new Not(new EnemyStrategy(With.fingerprints.twoGate)),
         new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
         new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true))),
     new Attack)
   
   class ReactToCannonRush extends If(
-    new EnemyStrategy(With.intelligence.fingerprints.cannonRush),
+    new EnemyStrategy(With.fingerprints.cannonRush),
     new Parallel(
       new RequireSufficientSupply,
       new TrainWorkersContinuously,
@@ -93,7 +93,7 @@ object PvPIdeas {
   
   class ReactToTwoGate extends If(
     new And(
-      new EnemyStrategy(With.intelligence.fingerprints.twoGate),
+      new EnemyStrategy(With.fingerprints.twoGate),
       new UnitsAtMost(0, Protoss.Forge),
       new Or(
         new UnitsAtMost(1, Protoss.Gateway, complete = true),

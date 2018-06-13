@@ -35,8 +35,8 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
       new Latch(new UnitsAtLeast(8, Zerg.Zergling)),
       new Latch(new UnitsAtLeast(2, Zerg.SunkenColony)),
       new Not(new EnemyStrategy(
-        With.intelligence.fingerprints.twoGate,
-        With.intelligence.fingerprints.proxyGateway)))
+        With.fingerprints.twoGate,
+        With.fingerprints.proxyGateway)))
   
   class ProceedWithDrones extends Or(
     new ProceedWithTech,
@@ -86,8 +86,8 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
       RequestAtLeast(14, Zerg.Drone)),
     new If(
       new EnemyStrategy(
-        With.intelligence.fingerprints.forgeFe,
-        With.intelligence.fingerprints.nexusFirst),
+        With.fingerprints.forgeFe,
+        With.fingerprints.nexusFirst),
       new Parallel(
         new BuildOrder(
           RequestAtLeast(1, Zerg.Extractor),
@@ -102,7 +102,7 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
           RequestAtLeast(3, Zerg.Hatchery),
           RequestAtLeast(1, Zerg.Spire))),
       new If(
-        new EnemyStrategy(With.intelligence.fingerprints.gatewayFe),
+        new EnemyStrategy(With.fingerprints.gatewayFe),
         new BuildOrder(RequestAtLeast(8, Zerg.Zergling)),
         new Parallel(
           new Trigger(

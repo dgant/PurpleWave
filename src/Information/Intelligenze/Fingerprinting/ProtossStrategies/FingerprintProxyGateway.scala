@@ -6,7 +6,7 @@ import Planning.Composition.UnitMatchers.UnitMatchProxied
 import ProxyBwapi.Races.Protoss
 
 class FingerprintProxyGateway extends FingerprintAnd(
-  new FingerprintNot(With.intelligence.fingerprints.cannonRush),
+  new FingerprintNot(With.fingerprints.cannonRush),
   new FingerprintOr(
     new FingerprintArrivesBy(Protoss.Zealot,    GameTime(2, 50)),
     new FingerprintCompleteBy(UnitMatchProxied,  GameTime(4,  0)))) {

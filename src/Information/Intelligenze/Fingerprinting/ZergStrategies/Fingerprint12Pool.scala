@@ -5,8 +5,8 @@ import Lifecycle.With
 import ProxyBwapi.Races.Zerg
 
 class Fingerprint12Pool extends FingerprintAnd(
-  new FingerprintNot(With.intelligence.fingerprints.fourPool),
-  new FingerprintNot(With.intelligence.fingerprints.ninePool),
-  new FingerprintNot(With.intelligence.fingerprints.overpool),
+  new FingerprintNot(With.fingerprints.fourPool),
+  new FingerprintNot(With.fingerprints.ninePool),
+  new FingerprintNot(With.fingerprints.overpool),
   new FingerprintCompleteBy(Zerg.SpawningPool, GameTime(2, 40))
 )

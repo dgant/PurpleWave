@@ -19,8 +19,8 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   private val cachePlayer    = new Cache[PlayerInfo] (() =>  Players.get(base.getPlayer))
   private val cachePixel     = new Cache[Pixel]      (() =>  new Pixel(base.getPosition))
   private val cacheTile      = new Cache[Tile]       (() =>  new Tile(base.getTilePosition))
-  private val cacheCompleted = new Cache[Boolean]    (() =>  { With.performance.trackUnit(id); base.isCompleted })
-  private val cacheExists    = new Cache[Boolean]    (() =>  { With.performance.trackUnit(id); base.exists })
+  private val cacheCompleted = new Cache[Boolean]    (() =>  base.isCompleted)
+  private val cacheExists    = new Cache[Boolean]    (() =>  { val e = base.exists; With.performance.trackUnit(id, e); e })
   private val cacheSelected  = new Cache[Boolean]    (() =>  base.isSelected)
   
   ///////////////////

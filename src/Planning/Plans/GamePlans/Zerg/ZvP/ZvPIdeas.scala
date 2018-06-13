@@ -16,8 +16,8 @@ import ProxyBwapi.Races.Zerg
 object ZvPIdeas {
   
   class ShouldDoSpeedlingAllIn extends EnemyStrategy(
-    With.intelligence.fingerprints.cannonRush,
-    With.intelligence.fingerprints.proxyGateway)
+    With.fingerprints.cannonRush,
+    With.fingerprints.proxyGateway)
   
   class DoSpeedlingAllIn extends Parallel(
     new Aggression(1.2),
@@ -40,13 +40,13 @@ object ZvPIdeas {
       new RequireMiningBases(4)))
   
   class OneBaseProtoss extends EnemyStrategy(
-    With.intelligence.fingerprints.cannonRush,
-    With.intelligence.fingerprints.proxyGateway,
-    With.intelligence.fingerprints.twoGate,
-    With.intelligence.fingerprints.oneGateCore)
+    With.fingerprints.cannonRush,
+    With.fingerprints.proxyGateway,
+    With.fingerprints.twoGate,
+    With.fingerprints.oneGateCore)
   
   class TwoBaseProtoss extends EnemyStrategy(
-    With.intelligence.fingerprints.nexusFirst,
-    With.intelligence.fingerprints.forgeFe,
-    With.intelligence.fingerprints.gatewayFe)
+    With.fingerprints.nexusFirst,
+    With.fingerprints.forgeFe,
+    With.fingerprints.gatewayFe)
 }

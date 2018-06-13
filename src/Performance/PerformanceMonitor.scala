@@ -12,7 +12,7 @@ class PerformanceMonitor {
   private var millisecondsBefore = 0l
   private var lastFrameDelayUpdate = 0
   
-  var framesOver85    = 0
+  var framesOver55    = 0
   var framesOver1000  = 0
   var framesOver10000 = 0
   
@@ -20,9 +20,17 @@ class PerformanceMonitor {
   var enablePerformanceSurrenders = With.configuration.enablePerformanceSurrender
   
   var lastUniqueUnitIdCount: Int = 0
+  var lastUniqueDeadIdCount: Int = 0
+  var lastUniqueFriendlyUnitObjects: Int = 0
+  private var uniqueFriendlyUnitObjects: Int = 0
   private val uniqueFriendlyUnitIds = new mutable.HashSet[Int]
-  def trackUnit(id: Int) {
+  private val uniqueFriendlyDeadIds = new mutable.HashSet[Int]
+  def trackUnit(id: Int, alive: Boolean) {
+    uniqueFriendlyUnitObjects += 1
     uniqueFriendlyUnitIds += id
+    if ( ! alive) {
+      uniqueFriendlyDeadIds += id
+    }
   }
   
   def startFrame() {
@@ -31,10 +39,14 @@ class PerformanceMonitor {
   
   def endFrame() {
     lastUniqueUnitIdCount = uniqueFriendlyUnitIds.size
+    lastUniqueDeadIdCount = uniqueFriendlyDeadIds.size
+    lastUniqueFriendlyUnitObjects = uniqueFriendlyUnitObjects
+    uniqueFriendlyUnitObjects = 0
     uniqueFriendlyUnitIds.clear()
+    uniqueFriendlyDeadIds.clear()
     val millisecondDifference = millisecondsSpentThisFrame
     frameTimes(With.frame % framesToTrack) = millisecondDifference
-    if (millisecondDifference >= 85)    framesOver85    += 1
+    if (millisecondDifference >= 55)    framesOver55    += 1
     if (millisecondDifference >= 1000)  framesOver1000  += 1
     if (millisecondDifference >= 10000) framesOver10000 += 1
   }
@@ -56,11 +68,11 @@ class PerformanceMonitor {
   }
   
   def violatedRules: Boolean = {
-    millisecondsSpentThisFrame >= 85
+    millisecondsSpentThisFrame >= 55
   }
   
   def danger: Boolean = {
-    framesOver85    > 160 ||
+    framesOver55    > 160 ||
     framesOver1000  > 5   ||
     framesOver10000 > 1
   }
@@ -69,6 +81,6 @@ class PerformanceMonitor {
   def meanFrameMilliseconds : Long = frameTimes.sum / framesToTrack
   
   def disqualified: Boolean =
-    framesOver85    > 320 ||
-    framesOver1000  > 1
+    framesOver55    >= 320 ||
+    framesOver1000  >= 10
 }

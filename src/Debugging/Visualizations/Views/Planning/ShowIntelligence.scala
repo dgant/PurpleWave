@@ -10,8 +10,8 @@ object ShowIntelligence extends View {
       5,
       5 * With.visualization.lineHeightSmall,
       "Matched:\n\n"
-      + With.intelligence.fingerprints.all.filter(_.matches).mkString("\n")
+      + With.fingerprints.all.filter(_.matches).mkString("\n")
       + "\n\n\nUnmatched:\n\n"
-      + With.intelligence.fingerprints.all.filterNot(_.matches).mkString("\n"))
+      + With.fingerprints.all.filterNot(_.matches).mkString("\n"))
   }
 }

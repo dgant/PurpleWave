@@ -1,3 +1,4 @@
+
 package Micro.Actions.Combat.Decisionmaking
 
 import Lifecycle.With
@@ -35,7 +36,7 @@ object FightOrFlight extends Action {
     decide(false, "Useless",    () => unit.canAttack && unit.energyMax == 0 && unit.matchups.targets.isEmpty && unit.matchups.threats.nonEmpty)
     decide(true,  "Scourge",    () => unit.is(Zerg.Scourge) && unit.matchups.targets.exists(target => target.canAttack(unit) && target.matchups.targetsInRange.nonEmpty))
     decide(false, "Disrupted",  () => unit.underDisruptionWeb && ! unit.flying)
-    decide(false, "Swarmed",    () => unit.underDarkSwarm && !unit.unitClass.unaffectedByDarkSwarm && unit.matchups.targetsInRange.forall(t => !t.flying || t.underDarkSwarm))
+    decide(false, "Swarmed",    () => unit.underDarkSwarm && ! unit.unitClass.unaffectedByDarkSwarm && unit.matchups.targetsInRange.forall(t => ! t.flying || t.underDarkSwarm))
     decide(true,  "Workers",    () => unit.matchups.allies.exists(u => {
       val ally = u.friendly.get
       val base = u.base.filter(_.owner.isUs)

@@ -7,6 +7,8 @@ import scala.collection.mutable
 
 class Fingerprints {
   
+  def update() { all.foreach(_.update()) }
+  
   val all: mutable.ArrayBuffer[Fingerprint] = new mutable.ArrayBuffer[Fingerprint]
   
   private def addFingerprint(fingerprint: Fingerprint): Fingerprint = {

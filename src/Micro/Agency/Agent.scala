@@ -139,6 +139,9 @@ class Agent(val unit: FriendlyUnitInfo) {
   ///////////////
   
   def execute() {
+    // ie. Mind Control
+    if ( ! unit.isFriendly) return
+    
     resetState()
     followIntent()
     combatHysteresisFrames = Math.max(0, combatHysteresisFrames - With.framesSince(lastFrame))

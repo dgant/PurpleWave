@@ -9,10 +9,10 @@ import bwapi.Race
 
 abstract class FingerprintFFE extends FingerprintAnd(
   new FingerprintRace(Race.Protoss),
-  new FingerprintNot(With.intelligence.fingerprints.proxyGateway),
-  new FingerprintNot(With.intelligence.fingerprints.cannonRush),
-  new FingerprintNot(With.intelligence.fingerprints.twoGate),
-  new FingerprintNot(With.intelligence.fingerprints.nexusFirst)) {
+  new FingerprintNot(With.fingerprints.proxyGateway),
+  new FingerprintNot(With.fingerprints.cannonRush),
+  new FingerprintNot(With.fingerprints.twoGate),
+  new FingerprintNot(With.fingerprints.nexusFirst)) {
   
   private class Status {
     lazy val forge                  = With.units.enemy.find(_.is(Protoss.Forge))

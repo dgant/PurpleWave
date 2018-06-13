@@ -28,19 +28,19 @@ class PvZFFE extends GameplanModeTemplate {
   override def defaultScoutPlan: Plan = new If(
     new And(
       new Not(new Employing(PvZEarlyFFEConservative)),
-      new Not(new EnemyStrategy(With.intelligence.fingerprints.fourPool))),
+      new Not(new EnemyStrategy(With.fingerprints.fourPool))),
     new ScoutAt(6))
   
   override def defaultPlacementPlan: Plan = new PlacementForgeFastExpand
   
   override def defaultBuildOrder: Plan = new If(
-    new EnemyStrategy(With.intelligence.fingerprints.fourPool),
+    new EnemyStrategy(With.fingerprints.fourPool),
     new BuildOrder(ProtossBuilds.FFE_Vs4Pool: _*),
     new If(
       new Employing(PvZEarlyFFEConservative),
       new BuildOrder(ProtossBuilds.FFE_Conservative: _*),
       new If(
-        new EnemyStrategy(With.intelligence.fingerprints.twelveHatch),
+        new EnemyStrategy(With.fingerprints.twelveHatch),
         new BuildOrder(ProtossBuilds.FFE_NexusGatewayForge: _*),
         new BuildOrder(ProtossBuilds.FFE_ForgeCannonNexus: _*))))
   
@@ -48,12 +48,12 @@ class PvZFFE extends GameplanModeTemplate {
     new PvZIdeas.AddEarlyCannons,
     new If(
       new And(
-        new EnemyStrategy(With.intelligence.fingerprints.fourPool),
+        new EnemyStrategy(With.fingerprints.fourPool),
         new UnitsAtLeast(1, Protoss.Forge)),
       new Build(RequestAtLeast(4, Protoss.PhotonCannon))),
     new If(
       new And(
-        new EnemyStrategy(With.intelligence.fingerprints.fourPool),
+        new EnemyStrategy(With.fingerprints.fourPool),
         new FrameAtLeast(GameTime(2, 5)()),
         new FrameAtMost(GameTime(5, 0)()),
         new UnitsAtLeast(1, Protoss.PhotonCannon, complete = false),
@@ -62,8 +62,8 @@ class PvZFFE extends GameplanModeTemplate {
     new If(
       new And(
         new EnemyStrategy(
-          With.intelligence.fingerprints.ninePool,
-          With.intelligence.fingerprints.overpool),
+          With.fingerprints.ninePool,
+          With.fingerprints.overpool),
         new FrameAtLeast(GameTime(3, 0)()),
         new FrameAtMost(GameTime(6, 0)()),
         new UnitsAtMost(2, UnitMatchType(Protoss.PhotonCannon), complete = true)),

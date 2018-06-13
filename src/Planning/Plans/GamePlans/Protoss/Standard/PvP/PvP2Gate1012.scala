@@ -65,7 +65,7 @@ class PvP2Gate1012 extends GameplanModeTemplate {
         new If(
           new And(
             new SafeAtHome,
-            new Not(new EnemyStrategy(With.intelligence.fingerprints.twoGate))),
+            new Not(new EnemyStrategy(With.fingerprints.twoGate))),
           new TrainContinuously(Protoss.Zealot, 5),
           new Parallel(
             new Build(RequestAtLeast(1, Protoss.ShieldBattery)),

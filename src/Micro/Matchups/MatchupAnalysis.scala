@@ -39,7 +39,10 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val threatsInRange         : Vector[UnitInfo]      = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me, at) - me.pixelsTravelledMax(frame) - threat.pixelsTravelledMax(frame))
   lazy val targetsInRange         : Vector[UnitInfo]      = targets.filter(target => target.visible && me.pixelRangeAgainst(target) >= target.pixelDistanceEdge(me, at) - me.pixelsTravelledMax(frame) - target.pixelsTravelledMax(frame) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
   
-  private def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = shooter.canAttack(victim) && shooter.framesToGetInRange(victim) < With.configuration.simulationFrames
+  private def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = {
+    if ( ! shooter.canAttack(victim)) return false
+    true
+  }
   def repairers: ArrayBuffer[UnitInfo] = ArrayBuffer.empty ++ allies.filter(_.friendly.exists(_.agent.toRepair.contains(me)))
   
   lazy val valuePerDamage                 : Double                = MicroValue.valuePerDamageCurrentHp(me)

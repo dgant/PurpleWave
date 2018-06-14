@@ -7,11 +7,11 @@ import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
 import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Predicates.Employing
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Predicates.Milestones.UnitsAtLeast
+import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvP.TvPMidgameBioTank
 

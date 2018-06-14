@@ -6,13 +6,13 @@ import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Terran.Situational.TvZPlacement
-import Planning.Predicates.Employing
 import Planning.Predicates.Reactive.{EnemyLurkers, EnemyMutalisks}
 import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding._
 import Planning.Plans.Macro.Terran.BuildMissileTurretsAtBases
 import Planning.Predicates.Milestones.{IfOnMiningBases, OnGasPumps, UnitsAtLeast}
+import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran.TvZ.{TvZMidgameMech, TvZMidgameWraiths}
 

@@ -12,9 +12,9 @@ import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast, UpgradeComplete}
-import Planning.Predicates.Reactive.EnemyBasesAtLeast
-import Planning.Predicates.{Employing, SafeAtHome}
+import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeAtHome}
 import Planning.Plans.Scouting.Scout
+import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.PvT1015Expand
 

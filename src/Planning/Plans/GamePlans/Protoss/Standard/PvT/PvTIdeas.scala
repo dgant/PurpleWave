@@ -9,9 +9,9 @@ import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.{Enemy, Pump, TrainMatchingRatio}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
-import Planning.Predicates.Employing
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio}
+import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.{PvT1015Expand, PvT13Nexus, PvTEarly1015GateGoonDT, PvTEarly1GateStargateTemplar}
 

@@ -13,10 +13,9 @@ import Planning.Plans.GamePlans.Protoss.Situational.{DefendFFEWithProbesAgainst4
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Predicates.Employing
 import Planning.Predicates.Milestones.{FrameAtLeast, FrameAtMost, UnitsAtLeast, UnitsAtMost}
-import Planning.Predicates.Scenarios.EnemyStrategy
 import Planning.Plans.Scouting.ScoutAt
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvZEarlyFFEConservative, PvZEarlyFFEEconomic}
 

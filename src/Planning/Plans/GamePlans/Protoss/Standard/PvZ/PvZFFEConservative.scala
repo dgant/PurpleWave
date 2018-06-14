@@ -7,8 +7,8 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
 import Planning.Plans.Macro.BuildOrders.BuildOrder
-import Planning.Predicates.Employing
 import Planning.Predicates.Milestones.UnitsAtLeast
+import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvZEarlyFFEConservative
 

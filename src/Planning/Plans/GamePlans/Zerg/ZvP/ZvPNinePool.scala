@@ -14,9 +14,8 @@ import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Predicates.Economy.MineralsAtLeast
-import Planning.Predicates.Matchup.EnemyIsTerran
+import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, OnMap, StartPositionsAtMost}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.{Employing, OnMap, StartPositionsAtMost}
 import Planning.Plans.Scouting.{CampExpansions, FoundEnemyBase}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvPNinePool

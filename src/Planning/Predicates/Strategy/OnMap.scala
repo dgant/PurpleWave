@@ -1,4 +1,4 @@
-package Planning.Predicates
+package Planning.Predicates.Strategy
 
 import Planning.Predicate
 import Strategery.StarCraftMap

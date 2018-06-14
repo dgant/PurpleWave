@@ -3,8 +3,8 @@ package Planning.Plans.Macro.Expanding
 import Planning.Predicates.Compound.{And, Not}
 import Planning.UnitMatchers.{UnitMatchWarriors, UnitMatchWorkers}
 import Planning.Plans.Compound._
-import Planning.Predicates.OnMap
 import Planning.Predicates.Milestones.{MiningBasesAtMost, UnitsAtLeast}
+import Planning.Predicates.Strategy.OnMap
 import Strategery.Hunters
 
 class RequireMiningBasesFFA(bases: Int = 1) extends If(

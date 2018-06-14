@@ -8,12 +8,11 @@ import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound.{Or, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.PlaceGatewaysProxied
-import Planning.Predicates.Employing
 import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, RequireSufficientSupply}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Predicates.Economy.GasAtLeast
-import Planning.Predicates.Matchup.EnemyIsProtoss
+import Planning.Predicates.Strategy.{Employing, EnemyIsProtoss}
 import Planning.Predicates.Milestones._
 import Planning.Plans.Scouting.Scout
 import Planning.{Plan, ProxyPlanner}

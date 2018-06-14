@@ -14,9 +14,9 @@ import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
-import Planning.Predicates.Employing
 import Planning.Predicates.Milestones._
 import Planning.Plans.Scouting.ScoutOn
+import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss.{PvZ4Gate99, PvZ4GateDragoonAllIn}
 

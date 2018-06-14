@@ -7,7 +7,7 @@ import Planning.Plan
 import Planning.Plans.Army.{RecruitFreelancers, _}
 import Planning.Plans.Compound.{If, NoPlan}
 import Planning.Plans.GamePlans.Protoss.Situational.DefendAgainstProxy
-import Planning.Predicates.Matchup.WeAreZerg
+import Planning.Predicates.Strategy.WeAreZerg
 import Planning.Plans.Macro.Automatic.{Gather, PumpWorkers, RequireSufficientSupply}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{BuildOrder, FollowBuildOrder, RequireEssentials}

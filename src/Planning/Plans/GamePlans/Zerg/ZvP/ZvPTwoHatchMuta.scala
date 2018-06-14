@@ -16,11 +16,10 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Zerg.BuildSunkensAtNatural
 import Planning.Predicates.Economy.MineralsAtLeast
-import Planning.Predicates.Employing
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyBasesAtLeast
-import Planning.Predicates.Scenarios.EnemyStrategy
 import Planning.Plans.Scouting.{CampExpansions, FindExpansions}
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.{StarCraftMap, Transistor}
 import Strategery.Strategies.Zerg.ZvPTwoHatchMuta

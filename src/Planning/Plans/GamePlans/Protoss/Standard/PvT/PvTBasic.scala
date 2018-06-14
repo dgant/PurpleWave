@@ -15,9 +15,10 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio}
-import Planning.Predicates.{Employing, Never, SafeAtHome, SafeToMoveOut}
+import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio, SafeAtHome, SafeToMoveOut}
+import Planning.Predicates.Never
 import Planning.Plans.Scouting.ScoutOn
+import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
 

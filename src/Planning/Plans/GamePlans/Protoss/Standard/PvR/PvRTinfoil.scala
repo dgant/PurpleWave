@@ -9,8 +9,8 @@ import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Economy.GasAtLeast
-import Planning.Predicates.Employing
 import Planning.Predicates.Milestones.UnitsAtLeast
+import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvR.PvROpenTinfoil
 

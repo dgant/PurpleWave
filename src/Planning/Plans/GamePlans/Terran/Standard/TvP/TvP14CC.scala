@@ -6,10 +6,10 @@ import Planning.{Plan, Predicate}
 import Planning.Plans.Compound.{NoPlan, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
-import Planning.Predicates.Employing
 import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Milestones.UnitsAtLeast
+import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvP.TvPEarly14CC
 

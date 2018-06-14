@@ -13,8 +13,8 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, MatchMiningBases, RequireB
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.Predicates.Economy.GasAtMost
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.EnemyCarriers
-import Planning.Predicates.{Employing, SafeAtHome, SafeToMoveOut}
+import Planning.Predicates.Reactive.{EnemyCarriers, SafeAtHome, SafeToMoveOut}
+import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvPLateGameArbiter, PvPLateGameCarrier}
 

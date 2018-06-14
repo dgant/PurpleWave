@@ -12,8 +12,7 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones.{EnemyHasShownCloakedThreat, _}
-import Planning.Predicates.Reactive.EnemyMutalisks
-import Planning.Predicates.{SafeAtHome, SafeToMoveOut}
+import Planning.Predicates.Reactive.{EnemyMutalisks, SafeAtHome, SafeToMoveOut}
 import ProxyBwapi.Races.{Protoss, Zerg}
 
 object PvZIdeas {

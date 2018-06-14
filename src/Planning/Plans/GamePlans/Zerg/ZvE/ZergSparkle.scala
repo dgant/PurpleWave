@@ -17,8 +17,8 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireBases
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
-import Planning.Predicates.SafeAtHome
 import Planning.Plans.Scouting.{FoundEnemyBase, Scout}
+import Planning.Predicates.Reactive.SafeAtHome
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 
 class ZergSparkle extends GameplanModeTemplate {

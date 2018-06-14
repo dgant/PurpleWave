@@ -10,9 +10,9 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Predicates.Economy.MineralsAtLeast
-import Planning.Predicates.Employing
 import Planning.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Scouting.{FoundEnemyBase, ScoutAt}
+import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvE.TvESCVMarineAllIn
 

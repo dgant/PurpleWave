@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Predicates.Matchup.WeAreZerg
+import Planning.Predicates.Strategy.WeAreZerg
 import ProxyBwapi.Races.Zerg
 
 class RequireEssentials extends Parallel(

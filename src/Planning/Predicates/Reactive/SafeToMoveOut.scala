@@ -1,4 +1,4 @@
-package Planning.Predicates
+package Planning.Predicates.Reactive
 
 import Lifecycle.With
 import Planning.UnitMatchers.UnitMatcher

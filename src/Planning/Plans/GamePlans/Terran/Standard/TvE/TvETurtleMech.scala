@@ -15,9 +15,9 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Terran.{BuildBunkersAtExpansions, BuildMissileTurretsAtBases, PopulateBunkers}
 import Planning.Predicates.Economy.{GasAtLeast, MineralsAtMost}
-import Planning.Predicates.Matchup.{EnemyIsProtoss, EnemyIsZerg}
+import Planning.Predicates.Strategy.{Employing, EnemyIsProtoss, EnemyIsZerg}
 import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemyHasShownCloakedThreat, IfOnMiningBases, UnitsAtLeast}
-import Planning.Predicates.{Employing, SafeAtHome, SafeToMoveOut}
+import Planning.Predicates.Reactive.{SafeAtHome, SafeToMoveOut}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Terran.TvE.TvETurtleMech
 

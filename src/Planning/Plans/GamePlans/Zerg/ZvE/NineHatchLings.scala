@@ -10,8 +10,7 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, ExtractorTrick, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
-import Planning.Predicates.Employing
-import Planning.Predicates.Matchup.EnemyIsZerg
+import Planning.Predicates.Strategy.{Employing, EnemyIsZerg}
 import Planning.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast, UpgradeComplete}
 import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.{Terran, Zerg}

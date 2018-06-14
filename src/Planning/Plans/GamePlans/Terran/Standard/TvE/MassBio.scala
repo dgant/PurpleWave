@@ -13,8 +13,7 @@ import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Economy.MineralsAtLeast
-import Planning.Predicates.Employing
-import Planning.Predicates.Matchup.EnemyIsZerg
+import Planning.Predicates.Strategy.{Employing, EnemyIsZerg}
 import Planning.Predicates.Milestones._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Terran.TvE.TvEMassBio

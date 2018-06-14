@@ -12,8 +12,8 @@ import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.BuildGasPumps
 import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound.{And, Check, Not}
-import Planning.Predicates.Employing
 import Planning.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
+import Planning.Predicates.Strategy.Employing
 import Planning.UnitCounters.UnitCountExactly
 import Planning.UnitMatchers.{UnitMatchMobileFlying, UnitMatchWorkers}
 import Planning.{Plan, ProxyPlanner}

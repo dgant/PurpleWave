@@ -1,6 +1,6 @@
-package Planning.Predicates
+package Planning.Predicates.Strategy
 
-import Planning.{Plan, Predicate}
+import Planning.Predicate
 import Strategery.Strategies.Strategy
 
 class Employing(strategies: Strategy*) extends Predicate {

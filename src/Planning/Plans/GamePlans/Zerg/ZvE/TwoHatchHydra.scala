@@ -12,7 +12,7 @@ import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.SafeAtHome
+import Planning.Predicates.Reactive.SafeAtHome
 import ProxyBwapi.Races.Zerg
 
 class TwoHatchHydra extends GameplanModeTemplate {

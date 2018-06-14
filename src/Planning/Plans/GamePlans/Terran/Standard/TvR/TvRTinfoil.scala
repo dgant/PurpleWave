@@ -7,10 +7,10 @@ import Planning.UnitMatchers.UnitMatchSiegeTank
 import Planning.{Plan, Predicate}
 import Planning.Plans.Compound.{If, NoPlan}
 import Planning.Plans.GamePlans.GameplanModeTemplateVsRandom
-import Planning.Predicates.Employing
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Milestones.UnitsAtLeast
+import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvR.TvRTinfoil
 

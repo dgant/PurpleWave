@@ -11,8 +11,8 @@ import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Predicates.Economy.{GasAtMost, MineralsAtLeast}
-import Planning.Predicates.Employing
 import Planning.Predicates.Milestones.{EnemyHasShownCloakedThreat, UnitsAtLeast, UnitsAtMost}
+import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvE.TvEMassGoliath
 

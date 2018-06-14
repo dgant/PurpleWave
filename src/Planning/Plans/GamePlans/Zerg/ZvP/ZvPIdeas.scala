@@ -9,8 +9,8 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.SafeAtHome
-import Planning.Predicates.Scenarios.EnemyStrategy
+import Planning.Predicates.Reactive.SafeAtHome
+import Planning.Predicates.Strategy.EnemyStrategy
 import ProxyBwapi.Races.Zerg
 
 object ZvPIdeas {

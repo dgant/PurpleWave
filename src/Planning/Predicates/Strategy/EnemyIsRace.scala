@@ -1,4 +1,4 @@
-package Planning.Predicates.Matchup
+package Planning.Predicates.Strategy
 
 import Lifecycle.With
 import Planning.Predicate

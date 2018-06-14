@@ -7,11 +7,12 @@ import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplateVsRandom
 import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
-import Planning.Predicates.{Employing, SafeAtHome}
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Milestones.UnitsAtLeast
+import Planning.Predicates.Reactive.SafeAtHome
+import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvR.TvR1Rax
 

@@ -9,13 +9,13 @@ import Planning.Predicates.Compound.And
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Predicates.Employing
 import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, RequireSufficientSupply}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Economy.{GasAtLeast, SupplyBlocked}
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.Scouting.Scout
+import Planning.Predicates.Strategy.Employing
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvE.TvEProxy8Fact

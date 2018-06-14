@@ -15,9 +15,8 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, MeldArchons}
 import Planning.Predicates.Economy.GasAtMost
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyCarriers, EnemyDarkTemplarExists, EnemyDarkTemplarPossible}
-import Planning.Predicates.Scenarios.{EnemyStrategy, WeAreBeingProxied}
-import Planning.Predicates.{Employing, SafeAtHome, SafeToMoveOut}
+import Planning.Predicates.Reactive._
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy, WeAreBeingProxied}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen4GateGoon
 

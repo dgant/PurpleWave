@@ -1,4 +1,4 @@
-package Planning.Predicates.Scenarios
+package Planning.Predicates.Strategy
 
 import Lifecycle.With
 import Planning.Predicate

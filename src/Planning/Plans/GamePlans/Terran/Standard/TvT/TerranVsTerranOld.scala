@@ -12,8 +12,9 @@ import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Predicates.Economy.MineralsAtLeast
-import Planning.Predicates.{Employing, SafeToMoveOut}
 import Planning.Predicates.Milestones.{IfOnMiningBases, OnGasPumps, UnitsAtLeast}
+import Planning.Predicates.Reactive.SafeToMoveOut
+import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvT.TvTStandard
 

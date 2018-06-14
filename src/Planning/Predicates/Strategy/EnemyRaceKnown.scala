@@ -1,4 +1,4 @@
-package Planning.Predicates.Matchup
+package Planning.Predicates.Strategy
 
 import Planning.Plans.Compound.Or
 

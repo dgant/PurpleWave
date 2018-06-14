@@ -13,10 +13,8 @@ import Planning.Plans.Macro.Automatic.{ExtractorTrick, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Economy.MineralsAtLeast
-import Planning.Predicates.Matchup.EnemyIsTerran
+import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy, StartPositionsAtLeast}
 import Planning.Predicates.Milestones.{EnemyUnitsAtMost, UnitsAtLeast}
-import Planning.Predicates.Scenarios.EnemyStrategy
-import Planning.Predicates.{Employing, StartPositionsAtLeast}
 import Planning.Plans.Scouting.{FoundEnemyBase, Scout}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Zerg.ZvE4Pool

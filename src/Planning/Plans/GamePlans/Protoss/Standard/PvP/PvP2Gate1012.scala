@@ -15,10 +15,9 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.EnemyDarkTemplarPossible
-import Planning.Predicates.Scenarios.EnemyStrategy
-import Planning.Predicates.{Employing, SafeAtHome}
+import Planning.Predicates.Reactive.{EnemyDarkTemplarPossible, SafeAtHome}
 import Planning.Plans.Scouting.ScoutOn
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen2Gate1012
 

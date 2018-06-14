@@ -13,9 +13,9 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Predicates.Employing
 import Planning.Predicates.Milestones.{FrameAtLeast, UnitsAtLeast}
 import Planning.Plans.Scouting.Scout
+import Planning.Predicates.Strategy.Employing
 import Planning.{Plan, Predicate, ProxyPlanner}
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.FivePoolProxySunkens

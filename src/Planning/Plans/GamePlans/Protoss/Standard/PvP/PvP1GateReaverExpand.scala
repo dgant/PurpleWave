@@ -11,8 +11,8 @@ import Planning.Plans.Macro.Automatic.PumpWorkers
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Scenarios.EnemyStrategy
-import Planning.Predicates.{Employing, SafeAtHome}
+import Planning.Predicates.Reactive.SafeAtHome
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen1GateReaverExpand
 

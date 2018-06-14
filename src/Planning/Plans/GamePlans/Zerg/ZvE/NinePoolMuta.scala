@@ -14,8 +14,7 @@ import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Predicates.Economy.{GasAtMost, MineralsAtLeast}
-import Planning.Predicates.Employing
-import Planning.Predicates.Matchup.EnemyIsZerg
+import Planning.Predicates.Strategy.{Employing, EnemyIsZerg}
 import Planning.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Scouting.Scout

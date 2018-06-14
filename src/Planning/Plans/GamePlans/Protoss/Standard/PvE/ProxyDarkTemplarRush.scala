@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvE
 
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.{GetAtLeast, GetUpgrade}
+import Macro.BuildRequests.Get
 import Planning.Composition.UnitMatchers.UnitMatchMobileDetectors
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
@@ -40,36 +40,36 @@ class ProxyDarkTemplarRush extends Parallel {
         new Parallel(
           new RequireMiningBases(2),
           new Build(
-            GetUpgrade(Protoss.DragoonRange),
-            GetAtLeast(2, Protoss.DarkTemplar))),
+            Get(Protoss.DragoonRange),
+            Get(2, Protoss.DarkTemplar))),
         new TrainContinuously(Protoss.DarkTemplar))),
     
     new Build(
-      GetAtLeast(1, Protoss.Nexus),
-      GetAtLeast(8, Protoss.Probe),
-      GetAtLeast(1, Protoss.Pylon),
-      GetAtLeast(10, Protoss.Probe),
-      GetAtLeast(1, Protoss.Gateway),
-      GetAtLeast(11, Protoss.Probe),
-      GetAtLeast(1, Protoss.Assimilator),
-      GetAtLeast(13, Protoss.Probe),
-      GetAtLeast(1, Protoss.CyberneticsCore),
-      GetAtLeast(1, Protoss.Zealot),
-      GetAtLeast(1, Protoss.CitadelOfAdun),
-      GetAtLeast(2, Protoss.Zealot),
-      GetAtLeast(2, Protoss.Pylon),
-      GetAtLeast(1, Protoss.TemplarArchives),
-      GetAtLeast(3, Protoss.Gateway),
-      GetAtLeast(15, Protoss.Probe),
-      GetAtLeast(4, Protoss.Gateway)),
+      Get(1, Protoss.Nexus),
+      Get(8, Protoss.Probe),
+      Get(1, Protoss.Pylon),
+      Get(10, Protoss.Probe),
+      Get(1, Protoss.Gateway),
+      Get(11, Protoss.Probe),
+      Get(1, Protoss.Assimilator),
+      Get(13, Protoss.Probe),
+      Get(1, Protoss.CyberneticsCore),
+      Get(1, Protoss.Zealot),
+      Get(1, Protoss.CitadelOfAdun),
+      Get(2, Protoss.Zealot),
+      Get(2, Protoss.Pylon),
+      Get(1, Protoss.TemplarArchives),
+      Get(3, Protoss.Gateway),
+      Get(15, Protoss.Probe),
+      Get(4, Protoss.Gateway)),
     
     new RequireSufficientSupply,
     new TrainContinuously(Protoss.Dragoon),
     new TrainWorkersContinuously,
-    new Build(GetAtLeast(4, Protoss.Gateway)),
+    new Build(Get(4, Protoss.Gateway)),
     new RequireMiningBases(2),
     new BuildGasPumps,
-    new Build(GetAtLeast(8, Protoss.Gateway)),
+    new Build(Get(8, Protoss.Gateway)),
     
     new If(new Not(new FoundEnemyBase), new ScoutAt(11)),
     new Attack,

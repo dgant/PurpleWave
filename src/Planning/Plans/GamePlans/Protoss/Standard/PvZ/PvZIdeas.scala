@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
 import Lifecycle.With
-import Macro.BuildRequests.{GetAtLeast, GetUpgrade}
+import Macro.BuildRequests.Get
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
@@ -61,9 +61,9 @@ object PvZIdeas {
           new EnemyHasShown(Zerg.Lair))),
       new Parallel(
         new Build(
-          GetAtLeast(1, Protoss.CyberneticsCore),
-          GetAtLeast(1, Protoss.RoboticsFacility),
-          GetAtLeast(1, Protoss.Observatory)),
+          Get(1, Protoss.CyberneticsCore),
+          Get(1, Protoss.RoboticsFacility),
+          Get(1, Protoss.Observatory)),
         new TrainContinuously(Protoss.Observer, 1))),
     new If(
       new And(
@@ -80,13 +80,13 @@ object PvZIdeas {
     new EnemyMutalisks,
     new Parallel(
       new Build(
-        GetAtLeast(1, Protoss.Assimilator),
-        GetAtLeast(1, Protoss.CyberneticsCore)),
+        Get(1, Protoss.Assimilator),
+        Get(1, Protoss.CyberneticsCore)),
       new Parallel(
         new TrainMatchingRatio(Protoss.Corsair, 3, 8,   Seq(MatchingRatio(Zerg.Mutalisk, 0.9))),
         new TrainMatchingRatio(Protoss.Dragoon, 0, 10,  Seq(MatchingRatio(Zerg.Mutalisk, 1.25))),
         new TrainContinuously(Protoss.Stargate, 1),
-        new Build(GetUpgrade(Protoss.DragoonRange)))))
+        new Build(Get(Protoss.DragoonRange)))))
   
   class AddEarlyCannons extends If(
     new And(
@@ -101,11 +101,11 @@ object PvZIdeas {
           MatchingRatio(Zerg.Hydralisk, 0.75)))))
   
   class AddGateways extends Parallel(
-    new IfOnMiningBases(1, new Build(GetAtLeast(4, Protoss.Gateway))),
-    new IfOnMiningBases(2, new Build(GetAtLeast(8, Protoss.Gateway))),
-    new IfOnMiningBases(3, new Build(GetAtLeast(12, Protoss.Gateway))),
-    new IfOnMiningBases(4, new Build(GetAtLeast(16, Protoss.Gateway))),
-    new IfOnMiningBases(5, new Build(GetAtLeast(20, Protoss.Gateway))))
+    new IfOnMiningBases(1, new Build(Get(4, Protoss.Gateway))),
+    new IfOnMiningBases(2, new Build(Get(8, Protoss.Gateway))),
+    new IfOnMiningBases(3, new Build(Get(12, Protoss.Gateway))),
+    new IfOnMiningBases(4, new Build(Get(16, Protoss.Gateway))),
+    new IfOnMiningBases(5, new Build(Get(20, Protoss.Gateway))))
   
   class TrainAndUpgradeArmy extends Parallel(
     new If(
@@ -130,8 +130,8 @@ object PvZIdeas {
       new Parallel(
         new If(
           new UpgradeComplete(Protoss.GroundDamage),
-          new Build(GetUpgrade(Protoss.GroundArmor)),
-          new Build(GetUpgrade(Protoss.GroundDamage))))),
+          new Build(Get(Protoss.GroundArmor)),
+          new Build(Get(Protoss.GroundDamage))))),
     
     // Basic army
     new TrainContinuously(Protoss.DarkTemplar, 1),

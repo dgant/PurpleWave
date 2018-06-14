@@ -9,7 +9,7 @@ import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
-class TrainDynamic(
+class Pump(
   unitClass                 : UnitClass,
   maximumTotal              : Int = Int.MaxValue,
   maximumConcurrently       : Int = Int.MaxValue,
@@ -30,7 +30,7 @@ class TrainDynamic(
     val buildersReadiness         = getBuilderReadiness(buildersExisting)
     val buildersTotal             = buildersExisting.size + buildersSpawning
     val buildersAllocatable       = Math.max(0, Math.min(buildersTotal * maximumConcurrentlyRatio, buildersTotal - buildersReserved))
-    val builderOutputCap          = Math.max(1, Math.round(buildersReadiness * buildersAllocatable))
+    val builderOutputCap          = Math.max(Math.round(buildersReadiness * buildersAllocatable), if (buildersExisting.nonEmpty) 1 else 0)
     
     val minerals                  = With.self.minerals  // To improve: Measure existing expediture commitments
     val gas                       = With.self.gas       // To improve: Measure existing expediture commitments
@@ -43,10 +43,12 @@ class TrainDynamic(
     val buildersToConsume         = Math.max(0, Vector(maximumConcurrently, builderOutputCap, budgeted, unitsToAddCeiling / doubleEggMultiplier).min.toInt)
     val unitsToAdd                = buildersToConsume * doubleEggMultiplier
     val unitsToRequest            = unitsNow + unitsToAdd
+  
+    // This check is necessitated by our tendency to request Scourge even when unitsToAdd is 0
+    if (unitsToAdd == 0) return
     
     (unitClass.buildUnitsBorrowed ++ unitClass.buildUnitsSpent).foreach(builderClass =>
       With.scheduler.macroPumps.consume(builderClass, buildersToConsume))
-        
     With.scheduler.request(this, Get(unitsToRequest, unitClass))
   }
   
@@ -67,9 +69,19 @@ class TrainDynamic(
   protected def currentCount: Int = {
     // Should this just be unit.alive?
     // Maybe this is compensating for a Scheduler
-    With.units.countOurs(unit =>
-      (unit.alive && matcher.accept(unit))
-      || (unit.is(Zerg.Egg) && unit.buildType == unitClass))
+    With.units.ours
+      .toVector
+      .map(unit =>
+        if (unit.alive && matcher.accept(unit)) {
+          1
+        }
+        else if (unit.is(Zerg.Egg) && unit.buildType == unitClass) {
+          if (unitClass.isTwoUnitsInOneEgg) 2 else 1
+        }
+        else {
+          0
+        })
+      .sum
   }
   
   protected val matcher =

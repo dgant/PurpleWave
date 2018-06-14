@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvE
 
 import Lifecycle.With
-import Macro.BuildRequests.{GetAnother, GetAtLeast, GetTech, GetUpgradeNext}
+import Macro.BuildRequests.{GetAnother, Get, NextUpgrade}
 import Planning.Plans.Army.{Attack, ConsiderAttacking, DefendZones}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -25,31 +25,31 @@ class ThreeBaseCarriersWithNoDefense extends Parallel {
   }
   
   private class TechToCarriers extends Build(
-    GetAtLeast(1, Protoss.Gateway),
-    GetAtLeast(1, Protoss.CyberneticsCore),
-    GetAtLeast(1, Protoss.Stargate),
-    GetAtLeast(1, Protoss.FleetBeacon),
-    GetUpgradeNext(Protoss.AirDamage),
-    GetUpgradeNext(Protoss.CarrierCapacity),
-    GetAtLeast(1, Protoss.Forge)
+    Get(1, Protoss.Gateway),
+    Get(1, Protoss.CyberneticsCore),
+    Get(1, Protoss.Stargate),
+    Get(1, Protoss.FleetBeacon),
+    NextUpgrade(Protoss.AirDamage),
+    NextUpgrade(Protoss.CarrierCapacity),
+    Get(1, Protoss.Forge)
   )
   
   private class TechToArbiters extends Build(
-    GetAtLeast(1, Protoss.Gateway),
-    GetAtLeast(1, Protoss.CyberneticsCore),
-    GetAtLeast(1, Protoss.CitadelOfAdun),
-    GetAtLeast(1, Protoss.Stargate),
-    GetAtLeast(1, Protoss.TemplarArchives),
-    GetAtLeast(1, Protoss.ArbiterTribunal)
+    Get(1, Protoss.Gateway),
+    Get(1, Protoss.CyberneticsCore),
+    Get(1, Protoss.CitadelOfAdun),
+    Get(1, Protoss.Stargate),
+    Get(1, Protoss.TemplarArchives),
+    Get(1, Protoss.ArbiterTribunal)
   )
   
   private class TechToObservers extends Build(
-    GetAtLeast(1, Protoss.RoboticsFacility),
-    GetAtLeast(1, Protoss.Observatory)
+    Get(1, Protoss.RoboticsFacility),
+    Get(1, Protoss.Observatory)
   )
   
   private class SpamUpgrades extends Parallel(
-    new Build(GetAtLeast(2, Protoss.CyberneticsCore)),
+    new Build(Get(2, Protoss.CyberneticsCore)),
     new UpgradeContinuously(Protoss.AirDamage),
     new UpgradeContinuously(Protoss.AirArmor))
   
@@ -62,7 +62,7 @@ class ThreeBaseCarriersWithNoDefense extends Parallel {
     new TechToCarriers,
     new If(
       new UnitsAtLeast(1, Protoss.Arbiter),
-      new Build(GetTech(Protoss.Stasis))),
+      new Build(Get(Protoss.Stasis))),
     new If(
       new UnitsAtLeast(12, Protoss.Carrier),
       new Parallel(
@@ -75,10 +75,10 @@ class ThreeBaseCarriersWithNoDefense extends Parallel {
         new TrainContinuously(Protoss.Scout, 1),
         new TrainContinuously(Protoss.Carrier),
         new TrainContinuously(Protoss.Observer, 1))),
-    new OnGasPumps(1, new Build(GetAtLeast(3, Protoss.Stargate))),
-    new OnGasPumps(2, new Build(GetAtLeast(5, Protoss.Stargate))),
-    new OnGasPumps(3, new Build(GetAtLeast(8, Protoss.Stargate))),
-    new OnGasPumps(4, new Build(GetAtLeast(12, Protoss.Stargate))),
+    new OnGasPumps(1, new Build(Get(3, Protoss.Stargate))),
+    new OnGasPumps(2, new Build(Get(5, Protoss.Stargate))),
+    new OnGasPumps(3, new Build(Get(8, Protoss.Stargate))),
+    new OnGasPumps(4, new Build(Get(12, Protoss.Stargate))),
     new Build(
       GetAnother(6, Protoss.PhotonCannon),
       GetAnother(2, Protoss.Pylon)),

@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Lifecycle.With
-import Macro.BuildRequests.{GetAtLeast, GetUpgrade}
+import Macro.BuildRequests.Get
 import Planning.Plans.Army.Aggression
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.TrainContinuously
@@ -21,7 +21,7 @@ object ZvPIdeas {
   
   class DoSpeedlingAllIn extends Parallel(
     new Aggression(1.2),
-    new BuildOrder(GetAtLeast(10, Zerg.Zergling)),
+    new BuildOrder(Get(10, Zerg.Zergling)),
     new If(
       new Or(
         new GasAtLeast(100),
@@ -32,8 +32,8 @@ object ZvPIdeas {
       new TrainContinuously(Zerg.Zergling),
       new TrainContinuously(Zerg.Drone, 9)),
     new Build(
-      GetAtLeast(1, Zerg.Extractor),
-      GetUpgrade(Zerg.ZerglingSpeed)),
+      Get(1, Zerg.Extractor),
+      Get(Zerg.ZerglingSpeed)),
     new RequireMiningBases(3),
     new If(
       new MineralsAtLeast(400),

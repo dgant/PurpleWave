@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
-import Macro.BuildRequests.GetAtLeast
+import Macro.BuildRequests.Get
 import Planning.Composition.Latch
 import Planning.Plan
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -20,18 +20,18 @@ class TvZCCFirst extends GameplanModeTemplate {
   override def defaultPlacementPlan: Plan = new TvZPlacement
   
   override val buildOrder = Vector(
-    GetAtLeast(9,   Terran.SCV),
-    GetAtLeast(1,   Terran.SupplyDepot),
-    GetAtLeast(14,  Terran.SCV),
-    GetAtLeast(2,   Terran.CommandCenter),
-    GetAtLeast(15,  Terran.SCV),
-    GetAtLeast(1,   Terran.Barracks),
-    GetAtLeast(2,   Terran.SupplyDepot),
-    GetAtLeast(17,  Terran.SCV),
-    GetAtLeast(2,   Terran.Barracks))
+    Get(9,   Terran.SCV),
+    Get(1,   Terran.SupplyDepot),
+    Get(14,  Terran.SCV),
+    Get(2,   Terran.CommandCenter),
+    Get(15,  Terran.SCV),
+    Get(1,   Terran.Barracks),
+    Get(2,   Terran.SupplyDepot),
+    Get(17,  Terran.SCV),
+    Get(2,   Terran.Barracks))
   
   override def buildPlans: Seq[Plan] = Vector(
     new TrainContinuously(Terran.Marine),
-    new Build(GetAtLeast(5, Terran.Barracks))
+    new Build(Get(5, Terran.Barracks))
   )
 }

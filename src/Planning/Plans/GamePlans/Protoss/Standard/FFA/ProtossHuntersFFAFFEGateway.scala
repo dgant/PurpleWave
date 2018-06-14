@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.FFA
 
-import Macro.BuildRequests.{GetAtLeast, GetTech, GetUpgrade}
+import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -22,25 +22,25 @@ class ProtossHuntersFFAFFEGateway extends GameplanModeTemplate {
   override val aggression = 0.8
   
   override val buildOrder = Vector(
-    GetAtLeast(8,   Protoss.Probe),
-    GetAtLeast(1,   Protoss.Pylon),
-    GetAtLeast(14,  Protoss.Probe),
-    GetAtLeast(2,   Protoss.Nexus),
-    GetAtLeast(1,   Protoss.Forge),
-    GetAtLeast(17,  Protoss.Probe),
-    GetAtLeast(1,   Protoss.PhotonCannon),
-    GetAtLeast(18,  Protoss.Probe),
-    GetAtLeast(2,   Protoss.PhotonCannon),
-    GetAtLeast(1,   Protoss.Gateway))
+    Get(8,   Protoss.Probe),
+    Get(1,   Protoss.Pylon),
+    Get(14,  Protoss.Probe),
+    Get(2,   Protoss.Nexus),
+    Get(1,   Protoss.Forge),
+    Get(17,  Protoss.Probe),
+    Get(1,   Protoss.PhotonCannon),
+    Get(18,  Protoss.Probe),
+    Get(2,   Protoss.PhotonCannon),
+    Get(1,   Protoss.Gateway))
   
   override def buildPlans: Seq[Plan] = Vector(
-    new If(new UnitsAtLeast(1, Protoss.Dragoon),      new Build(GetUpgrade(Protoss.DragoonRange))),
-    new If(new UnitsAtLeast(1, Protoss.HighTemplar),  new Build(GetTech(Protoss.PsionicStorm))),
-    new If(new UnitsAtLeast(2, Protoss.HighTemplar),  new Build(GetUpgrade(Protoss.HighTemplarEnergy))),
-    new If(new UnitsAtLeast(1, Protoss.Shuttle),      new Build(GetUpgrade(Protoss.ShuttleSpeed))),
-    new If(new UnitsAtLeast(2, Protoss.Observatory),  new Build(GetUpgrade(Protoss.ObserverSpeed))),
-    new If(new UnitsAtLeast(4, Protoss.Zealot),       new Build(GetUpgrade(Protoss.ZealotSpeed))),
-    new If(new UnitsAtLeast(2, Protoss.Arbiter),      new Build(GetTech(Protoss.Stasis))),
+    new If(new UnitsAtLeast(1, Protoss.Dragoon),      new Build(Get(Protoss.DragoonRange))),
+    new If(new UnitsAtLeast(1, Protoss.HighTemplar),  new Build(Get(Protoss.PsionicStorm))),
+    new If(new UnitsAtLeast(2, Protoss.HighTemplar),  new Build(Get(Protoss.HighTemplarEnergy))),
+    new If(new UnitsAtLeast(1, Protoss.Shuttle),      new Build(Get(Protoss.ShuttleSpeed))),
+    new If(new UnitsAtLeast(2, Protoss.Observatory),  new Build(Get(Protoss.ObserverSpeed))),
+    new If(new UnitsAtLeast(4, Protoss.Zealot),       new Build(Get(Protoss.ZealotSpeed))),
+    new If(new UnitsAtLeast(2, Protoss.Arbiter),      new Build(Get(Protoss.Stasis))),
     new BuildCannonsAtExpansions(2),
     new RequireMiningBases(2),
     new TrainContinuously(Protoss.Arbiter,      2),
@@ -51,25 +51,25 @@ class ProtossHuntersFFAFFEGateway extends GameplanModeTemplate {
     new TrainContinuously(Protoss.Dragoon,      20, 6),
     new TrainContinuously(Protoss.Zealot),
     new Build(
-      GetAtLeast(3, Protoss.PhotonCannon),
-      GetAtLeast(1, Protoss.Assimilator),
-      GetAtLeast(1, Protoss.CyberneticsCore),
-      GetAtLeast(4, Protoss.Gateway)),
+      Get(3, Protoss.PhotonCannon),
+      Get(1, Protoss.Assimilator),
+      Get(1, Protoss.CyberneticsCore),
+      Get(4, Protoss.Gateway)),
     new BuildGasPumps(),
     new UpgradeContinuously(Protoss.GroundDamage),
     new Build(
-      GetAtLeast(1, Protoss.CitadelOfAdun),
-      GetAtLeast(1, Protoss.TemplarArchives),
-      GetAtLeast(6, Protoss.Gateway),
-      GetAtLeast(1, Protoss.RoboticsFacility),
-      GetAtLeast(1, Protoss.Observatory)),
+      Get(1, Protoss.CitadelOfAdun),
+      Get(1, Protoss.TemplarArchives),
+      Get(6, Protoss.Gateway),
+      Get(1, Protoss.RoboticsFacility),
+      Get(1, Protoss.Observatory)),
     new RequireMiningBasesFFA(3),
     new UpgradeContinuously(Protoss.GroundArmor),
     new Build(
-      GetAtLeast(10, Protoss.Gateway),
-      GetAtLeast(1, Protoss.Stargate),
-      GetAtLeast(1, Protoss.ArbiterTribunal),
-      GetAtLeast(20, Protoss.Gateway)),
+      Get(10, Protoss.Gateway),
+      Get(1, Protoss.Stargate),
+      Get(1, Protoss.ArbiterTribunal),
+      Get(20, Protoss.Gateway)),
     new UpgradeContinuously(Protoss.Shields),
     new RequireMiningBasesFFA(5)
   )

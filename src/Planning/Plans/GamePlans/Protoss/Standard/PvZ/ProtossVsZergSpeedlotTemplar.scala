@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
-import Macro.BuildRequests.{GetAtLeast, GetTech, GetUpgrade}
+import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
@@ -26,42 +26,42 @@ class ProtossVsZergSpeedlotTemplar extends GameplanModeTemplate {
   class AddPriorityTech extends Parallel(
     new If(
       new UnitsAtLeast(1, Protoss.HighTemplar),
-      new Build(GetTech(Protoss.PsionicStorm))),
+      new Build(Get(Protoss.PsionicStorm))),
       new If(
         new UnitsAtLeast(1, Protoss.Dragoon),
-        new Build(GetUpgrade(Protoss.DragoonRange))))
+        new Build(Get(Protoss.DragoonRange))))
   
   class AddTech extends Parallel(
     new Build(
-      GetAtLeast(1, Protoss.Gateway),
-      GetAtLeast(1, Protoss.Assimilator),
-      GetAtLeast(1, Protoss.CyberneticsCore)),
+      Get(1, Protoss.Gateway),
+      Get(1, Protoss.Assimilator),
+      Get(1, Protoss.CyberneticsCore)),
     new IfOnMiningBases(2,
       new Parallel(
       new Build(
-        GetAtLeast(1, Protoss.Forge),
-        GetAtLeast(1, Protoss.Stargate)),
+        Get(1, Protoss.Forge),
+        Get(1, Protoss.Stargate)),
       new BuildGasPumps,
       new BuildOrder(
-        GetAtLeast(1, Protoss.CitadelOfAdun),
-        GetUpgrade(Protoss.AirDamage),
-        GetUpgrade(Protoss.GroundDamage),
-        GetUpgrade(Protoss.ZealotSpeed),
-        GetAtLeast(1, Protoss.TemplarArchives),
-        GetUpgrade(Protoss.DragoonRange),
-        GetTech(Protoss.PsionicStorm),
-        GetAtLeast(4, Protoss.Gateway),
-        GetAtLeast(1, Protoss.RoboticsFacility),
-        GetAtLeast(1, Protoss.Observatory),
-        GetAtLeast(6, Protoss.Gateway)))),
+        Get(1, Protoss.CitadelOfAdun),
+        Get(Protoss.AirDamage),
+        Get(Protoss.GroundDamage),
+        Get(Protoss.ZealotSpeed),
+        Get(1, Protoss.TemplarArchives),
+        Get(Protoss.DragoonRange),
+        Get(Protoss.PsionicStorm),
+        Get(4, Protoss.Gateway),
+        Get(1, Protoss.RoboticsFacility),
+        Get(1, Protoss.Observatory),
+        Get(6, Protoss.Gateway)))),
     
     new IfOnMiningBases(3,
       new Build(
-        GetAtLeast(5, Protoss.Gateway),
-        GetAtLeast(2, Protoss.Forge),
-        GetUpgrade(Protoss.HighTemplarEnergy),
-        GetAtLeast(1, Protoss.RoboticsSupportBay),
-        GetUpgrade(Protoss.ScarabDamage))))
+        Get(5, Protoss.Gateway),
+        Get(2, Protoss.Forge),
+        Get(Protoss.HighTemplarEnergy),
+        Get(1, Protoss.RoboticsSupportBay),
+        Get(Protoss.ScarabDamage))))
   
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvZIdeas.ReactToLurkers,

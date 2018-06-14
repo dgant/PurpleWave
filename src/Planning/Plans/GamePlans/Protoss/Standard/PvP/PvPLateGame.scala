@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
-import Macro.BuildRequests.{GetAtLeast, GetTech, GetUpgrade}
+import Macro.BuildRequests.Get
 import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
@@ -43,25 +43,25 @@ class PvPLateGame extends GameplanModeTemplate {
   
   class RoboTech extends Parallel(
     new Build(
-      GetAtLeast(1, Protoss.RoboticsFacility),
-      GetAtLeast(1, Protoss.Observatory)),
+      Get(1, Protoss.RoboticsFacility),
+      Get(1, Protoss.Observatory)),
     new If(
       new UnitsAtMost(0, Protoss.TemplarArchives),
-      new Build(GetAtLeast(1, Protoss.RoboticsSupportBay))),
+      new Build(Get(1, Protoss.RoboticsSupportBay))),
     new If(
       new EnemyHasShownCloakedThreat,
       new UpgradeContinuously(Protoss.ObserverSpeed)))
   
   class TemplarTech extends Parallel(
     new Build(
-      GetAtLeast(1, Protoss.CitadelOfAdun),
-      GetAtLeast(1, Protoss.TemplarArchives)),
+      Get(1, Protoss.CitadelOfAdun),
+      Get(1, Protoss.TemplarArchives)),
     new If(
       new UnitsAtMost(0, Protoss.Observatory),
       new BuildCannonsAtNatural(2)))
   
   class Upgrades extends Parallel(
-    new Build(GetAtLeast(1, Protoss.Forge)),
+    new Build(Get(1, Protoss.Forge)),
     new If(
       new Or(
         new UnitsAtLeast(2, Protoss.Forge, complete = true),
@@ -71,14 +71,14 @@ class PvPLateGame extends GameplanModeTemplate {
           new UnitsAtMost(0, Protoss.TemplarArchives))),
       new UpgradeContinuously(Protoss.GroundArmor)),
     new UpgradeContinuously(Protoss.GroundDamage),
-    new Build(GetAtLeast(2, Protoss.Forge)))
+    new Build(Get(2, Protoss.Forge)))
   
   class BuildTech extends Parallel(
-    new Build(GetAtLeast(1, Protoss.Gateway)),
+    new Build(Get(1, Protoss.Gateway)),
     new Build(
-      GetAtLeast(1, Protoss.Assimilator),
-      GetAtLeast(1, Protoss.CyberneticsCore),
-      GetUpgrade(Protoss.DragoonRange)),
+      Get(1, Protoss.Assimilator),
+      Get(1, Protoss.CyberneticsCore),
+      Get(Protoss.DragoonRange)),
     new If(
       new GasAtMost(300),
       new BuildGasPumps),
@@ -93,41 +93,41 @@ class PvPLateGame extends GameplanModeTemplate {
       // Robo first (default)
       new Parallel(
         new RoboTech,
-        new Build(GetAtLeast(2, Protoss.Gateway)),
+        new Build(Get(2, Protoss.Gateway)),
         new BuildGasPumps,
-        new Build(GetAtLeast(5, Protoss.Gateway))),
+        new Build(Get(5, Protoss.Gateway))),
       
       // Citadel first (ie. DT follow-up)
       new Parallel(
-        new Build(GetAtLeast(3, Protoss.Gateway)),
+        new Build(Get(3, Protoss.Gateway)),
         new TemplarTech,
         new BuildGasPumps,
-        new Build(GetAtLeast(5, Protoss.Gateway)))),
+        new Build(Get(5, Protoss.Gateway)))),
     
     new If(
       new Not(new EnemyCarriers),
       new UpgradeContinuously(Protoss.ZealotSpeed)),
-    new OnGasPumps(3, new Build(GetUpgrade(Protoss.HighTemplarEnergy))))
+    new OnGasPumps(3, new Build(Get(Protoss.HighTemplarEnergy))))
   
   class ArbiterTransition extends Build(
-    GetAtLeast(1, Protoss.Stargate),
-    GetAtLeast(1, Protoss.ArbiterTribunal),
-    GetTech(Protoss.Stasis))
+    Get(1, Protoss.Stargate),
+    Get(1, Protoss.ArbiterTribunal),
+    Get(Protoss.Stasis))
   
   class CarrierTransition extends Parallel(
-    new Build(GetAtLeast(1, Protoss.Stargate)),
+    new Build(Get(1, Protoss.Stargate)),
     new UpgradeContinuously(Protoss.AirDamage),
     new Build(
-      GetAtLeast(1, Protoss.FleetBeacon),
-      GetAtLeast(2, Protoss.Stargate),
-      GetUpgrade(Protoss.CarrierCapacity),
-      GetAtLeast(3, Protoss.Stargate)))
+      Get(1, Protoss.FleetBeacon),
+      Get(2, Protoss.Stargate),
+      Get(Protoss.CarrierCapacity),
+      Get(3, Protoss.Stargate)))
   
   override val buildPlans = Vector(
-    new If(new UnitsAtLeast(1,  Protoss.Dragoon),         new Build(GetUpgrade(Protoss.DragoonRange))),
+    new If(new UnitsAtLeast(1,  Protoss.Dragoon),         new Build(Get(Protoss.DragoonRange))),
     new PvPIdeas.TakeBase2,
-    new If(new UnitsAtLeast(1,  Protoss.HighTemplar),     new Build(GetTech(Protoss.PsionicStorm))),
-    new If(new UnitsAtLeast(2,  Protoss.Reaver),          new Build(GetUpgrade(Protoss.ScarabDamage))),
+    new If(new UnitsAtLeast(1,  Protoss.HighTemplar),     new Build(Get(Protoss.PsionicStorm))),
+    new If(new UnitsAtLeast(2,  Protoss.Reaver),          new Build(Get(Protoss.ScarabDamage))),
     new PvPIdeas.TakeBase3,
     new If(new EnemiesAtLeast(1, Protoss.DarkTemplar), new UpgradeContinuously(Protoss.ObserverSpeed)),
   
@@ -148,13 +148,13 @@ class PvPLateGame extends GameplanModeTemplate {
       new SafeToMoveOut,
       new If(
         new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
-        new Build(GetAtLeast(6, Protoss.Gateway)),
-        new Build(GetAtLeast(8, Protoss.Gateway))),
+        new Build(Get(6, Protoss.Gateway)),
+        new Build(Get(8, Protoss.Gateway))),
       new RequireBases(3)),
   
     new BuildCannonsAtExpansions(3),
     
-    new Build(GetAtLeast(11, Protoss.Gateway)),
+    new Build(Get(11, Protoss.Gateway)),
     new RequireMiningBases(3),
   
     new If(
@@ -169,7 +169,7 @@ class PvPLateGame extends GameplanModeTemplate {
           new UnitsAtLeast(8, Protoss.Arbiter)),
         new HaveGasPumps(3)),
       new CarrierTransition,
-      new Build(GetAtLeast(12, Protoss.Gateway))),
+      new Build(Get(12, Protoss.Gateway))),
   
     new If(
       new And(
@@ -181,21 +181,21 @@ class PvPLateGame extends GameplanModeTemplate {
   
     new FlipIf(
       new SafeToMoveOut,
-      new Build(GetAtLeast(12, Protoss.Gateway)),
+      new Build(Get(12, Protoss.Gateway)),
       new RequireMiningBases(4)),
   
     new If(
       new EnemiesAtLeast(3, Protoss.Shuttle),
       new Build(
-        GetAtLeast(1, Protoss.Stargate),
-        GetAtLeast(1, Protoss.Corsair))),
+        Get(1, Protoss.Stargate),
+        Get(1, Protoss.Corsair))),
   
     new FlipIf(
       new SafeToMoveOut,
-      new Build(GetAtLeast(20, Protoss.Gateway)),
+      new Build(Get(20, Protoss.Gateway)),
       new RequireMiningBases(5)),
   
-    new Build(GetAtLeast(20, Protoss.Gateway)),
+    new Build(Get(20, Protoss.Gateway)),
     new RequireMiningBases(6),
     new UpgradeContinuously(Protoss.Shields)
   )

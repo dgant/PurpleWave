@@ -4,7 +4,7 @@ import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
-import Macro.BuildRequests.{GetAnother, GetAtLeast}
+import Macro.BuildRequests.{GetAnother, Get}
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
 
@@ -24,7 +24,7 @@ class BuildCannonsAtBases(
         With.scheduler.request(this, GetAnother(cannonsRequired, Protoss.PhotonCannon))
       }
       else {
-        With.scheduler.request(this, GetAtLeast(1, Protoss.Forge))
+        With.scheduler.request(this, Get(1, Protoss.Forge))
       }
     }
   }

@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.GetAtLeast
+import Macro.BuildRequests.Get
 import Planning.Composition.UnitMatchers._
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, _}
@@ -63,10 +63,10 @@ object PvPIdeas {
       new TrainContinuously(Protoss.Reaver, 2),
       new TrainDragoonsOrZealots,
       new Build(
-        GetAtLeast(1, Protoss.Gateway),
-        GetAtLeast(1, Protoss.CyberneticsCore),
-        GetAtLeast(1, Protoss.RoboticsFacility),
-        GetAtLeast(1, Protoss.RoboticsSupportBay))))
+        Get(1, Protoss.Gateway),
+        Get(1, Protoss.CyberneticsCore),
+        Get(1, Protoss.RoboticsFacility),
+        Get(1, Protoss.RoboticsSupportBay))))
   
   class ReactToDarkTemplarEmergencies extends Parallel(new ReactToDarkTemplarExisting, new ReactToDarkTemplarPossible)
   class ReactToDarkTemplarPossible extends If(
@@ -76,9 +76,9 @@ object PvPIdeas {
         new UnitsAtMost(0, Protoss.Observatory),
         new BuildCannonsAtBases(1)),
       new Build(
-        GetAtLeast(1, Protoss.RoboticsFacility),
-        GetAtLeast(1, Protoss.Observatory),
-        GetAtLeast(1, Protoss.Observer))))
+        Get(1, Protoss.RoboticsFacility),
+        Get(1, Protoss.Observatory),
+        Get(1, Protoss.Observer))))
   
   class ReactToDarkTemplarExisting extends If(
     new EnemyDarkTemplarExists,
@@ -87,8 +87,8 @@ object PvPIdeas {
         new UnitsAtMost(0, Protoss.Observatory),
         new BuildCannonsAtBases(1)),
       new Build(
-        GetAtLeast(1, Protoss.RoboticsFacility),
-        GetAtLeast(1, Protoss.Observatory)),
+        Get(1, Protoss.RoboticsFacility),
+        Get(1, Protoss.Observatory)),
       new TrainContinuously(Protoss.Observer, 3)))
   
   class ReactToTwoGate extends If(
@@ -109,8 +109,8 @@ object PvPIdeas {
       new If(
         new UnitsAtLeast(1, Protoss.CyberneticsCore),
         new Build(
-          GetAtLeast(2, Protoss.Gateway),
-          GetAtLeast(1, Protoss.ShieldBattery)))))
+          Get(2, Protoss.Gateway),
+          Get(1, Protoss.ShieldBattery)))))
   
   class ReactToArbiters extends If(
     new Or(
@@ -118,8 +118,8 @@ object PvPIdeas {
       new EnemiesAtLeast(1, Protoss.ArbiterTribunal)),
     new Parallel(
       new Build(
-        GetAtLeast(1, Protoss.RoboticsFacility),
-        GetAtLeast(1, Protoss.Observatory)),
+        Get(1, Protoss.RoboticsFacility),
+        Get(1, Protoss.Observatory)),
     new TrainContinuously(Protoss.Observer, 2)))
   
   class ReactToFFE extends If(
@@ -145,7 +145,7 @@ object PvPIdeas {
         new SafeAtHome,
         new Parallel(
           new TrainContinuously(Protoss.Probe, 19),
-          new Build(GetAtLeast(4, Protoss.Gateway))),
+          new Build(Get(4, Protoss.Gateway))),
         new Parallel(
           new PvPIdeas.TrainDragoonsOrZealots,
           new UpgradeContinuously(Protoss.DragoonRange)))))

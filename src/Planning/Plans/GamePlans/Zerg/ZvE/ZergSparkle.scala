@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Macro.BuildRequests.GetAtLeast
+import Macro.BuildRequests.Get
 import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCountEverything
@@ -43,28 +43,28 @@ class ZergSparkle extends GameplanModeTemplate {
   
   override def defaultBuildOrder: Plan = new Parallel (
     new BuildOrder(
-      GetAtLeast(9, Zerg.Drone),
-      GetAtLeast(2, Zerg.Overlord),
-      GetAtLeast(13, Zerg.Drone),
-      GetAtLeast(1, Zerg.SpawningPool), // -1 Drone
-      GetAtLeast(1, Zerg.Extractor), // -2 Drone
-      GetAtLeast(15, Zerg.Drone)),
+      Get(9, Zerg.Drone),
+      Get(2, Zerg.Overlord),
+      Get(13, Zerg.Drone),
+      Get(1, Zerg.SpawningPool), // -1 Drone
+      Get(1, Zerg.Extractor), // -2 Drone
+      Get(15, Zerg.Drone)),
     new RequireBases(2), // -3 Drone
     new BuildOrder(
-      GetAtLeast(1, Zerg.Lair),
-      GetAtLeast(21, Zerg.Drone),
-      GetAtLeast(1, Zerg.Spire), // -4 Drone
-      GetAtLeast(2, Zerg.Overlord), // TODO: We hit 120/58 while trying to build 6th Mutalisk -- get Extractor a little earlier
-      GetAtLeast(23, Zerg.Drone),
-      GetAtLeast(4, Zerg.Overlord), // 34 supply available
-      GetAtLeast(2, Zerg.Extractor), // -5 Drone
-      GetAtLeast(24, Zerg.Drone)), // 20 drones -- if we use larva intelligently we can fit one more in here
+      Get(1, Zerg.Lair),
+      Get(21, Zerg.Drone),
+      Get(1, Zerg.Spire), // -4 Drone
+      Get(2, Zerg.Overlord), // TODO: We hit 120/58 while trying to build 6th Mutalisk -- get Extractor a little earlier
+      Get(23, Zerg.Drone),
+      Get(4, Zerg.Overlord), // 34 supply available
+      Get(2, Zerg.Extractor), // -5 Drone
+      Get(24, Zerg.Drone)), // 20 drones -- if we use larva intelligently we can fit one more in here
     
     // For whatever reason, this is required in order to not build it too early
     new Trigger(
       new UnitsAtLeast(1, Zerg.Spire),
       new RequireBases(3)),
-    new BuildOrder(GetAtLeast(7, Zerg.Mutalisk))
+    new BuildOrder(Get(7, Zerg.Mutalisk))
   )
   
   override def defaultScoutPlan = new If(
@@ -84,8 +84,8 @@ class ZergSparkle extends GameplanModeTemplate {
             new EnemyUnitsAtMost(0, Zerg.Mutalisk),
             new UnitsAtLeast(10, Zerg.Mutalisk)),
           // We would like to build another Drone here but this is technically difficult due to limitations on how BuildOrder works
-          new Build(GetAtLeast(3, Zerg.Zergling)),
-          new BuildOrder(GetAtLeast(6, Zerg.Overlord))),
+          new Build(Get(3, Zerg.Zergling)),
+          new BuildOrder(Get(6, Zerg.Overlord))),
         
         super.defaultSupplyPlan,
         
@@ -122,9 +122,9 @@ class ZergSparkle extends GameplanModeTemplate {
           new Parallel(
             new TrainContinuously(Zerg.Guardian, 4),
             new Build(
-              GetAtLeast(1, Zerg.QueensNest),
-              GetAtLeast(1, Zerg.Hive),
-              GetAtLeast(1, Zerg.GreaterSpire)))),
+              Get(1, Zerg.QueensNest),
+              Get(1, Zerg.Hive),
+              Get(1, Zerg.GreaterSpire)))),
         new If(
           new Or(
             new UnitsAtLeast(1, Zerg.GreaterSpire),
@@ -145,7 +145,7 @@ class ZergSparkle extends GameplanModeTemplate {
           new And(
             new UnitsAtLeast(16, Zerg.Drone),
             new FrameAtLeast(GameTime(6, 45)())), // Psi Disruptor won't die before this
-          new Build(GetAtLeast(3, Zerg.Extractor))),
+          new Build(Get(3, Zerg.Extractor))),
         
         new If(
           new And(
@@ -157,7 +157,7 @@ class ZergSparkle extends GameplanModeTemplate {
               new TrainContinuously(Zerg.SunkenColony),
               new TrainContinuously(Zerg.SporeColony)),
             new TrainContinuously(Zerg.Zergling, 50, 3),
-            new Build(GetAtLeast(1, Zerg.EvolutionChamber)),
+            new Build(Get(1, Zerg.EvolutionChamber)),
             new If(
               new UnitsAtLeast(24, Zerg.Drone),
               new TrainContinuously(Zerg.CreepColony, 2)))

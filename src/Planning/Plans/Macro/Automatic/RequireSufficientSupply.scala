@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
-import Macro.BuildRequests.GetAtLeast
+import Macro.BuildRequests.Get
 import Planning.Plan
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClasses
@@ -13,7 +13,7 @@ class RequireSufficientSupply extends Plan {
   val supplyProvider =  UnitClasses.get(With.self.raceInitial.getSupplyProvider)
   
   override def onUpdate() {
-    With.scheduler.request(this, GetAtLeast(totalRequiredRecalculate, supplyProvider))
+    With.scheduler.request(this, Get(totalRequiredRecalculate, supplyProvider))
   }
   
   def totalRequiredRecalculate: Int = {

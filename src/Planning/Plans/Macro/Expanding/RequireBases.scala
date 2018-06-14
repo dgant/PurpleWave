@@ -2,7 +2,7 @@ package Planning.Plans.Macro.Expanding
 
 import Debugging.English
 import Lifecycle.With
-import Macro.BuildRequests.GetAtLeast
+import Macro.BuildRequests.Get
 import Planning.Composition.Property
 import Planning.Plan
 import ProxyBwapi.Races.Zerg
@@ -22,7 +22,7 @@ class RequireBases(basesInitial: Int = 1) extends Plan {
     val goal        = basesDesired.get + basesAll - basesNow
     
     if (goal > 0) {
-      With.scheduler.request(this, GetAtLeast(goal, With.self.townHallClass))
+      With.scheduler.request(this, Get(goal, With.self.townHallClass))
     }
   }
 }

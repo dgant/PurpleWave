@@ -2,7 +2,7 @@ package Planning.Plans.Macro.Expanding
 
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Macro.BuildRequests.GetAtLeast
+import Macro.BuildRequests.Get
 import Planning.Plan
 import ProxyBwapi.UnitClasses.UnitClass
 
@@ -29,6 +29,6 @@ class BuildGasPumps(quantity: Int = Int.MaxValue, pumpType: UnitClass = With.sel
     val finalBlueprints     = eligibleBlueprints.take(quantity)
     val gasToRequest        = Math.min(quantity, eligibleGas.size)
     finalBlueprints.foreach(With.groundskeeper.propose)
-    With.scheduler.request(this, GetAtLeast(gasToRequest, pumpType))
+    With.scheduler.request(this, Get(gasToRequest, pumpType))
   }
 }

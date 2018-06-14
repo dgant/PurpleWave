@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvE
 
 import Lifecycle.With
-import Macro.BuildRequests.{BuildRequest, GetAtLeast, GetTech}
+import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.Attack
@@ -19,14 +19,14 @@ class TwoHatchHydra extends GameplanModeTemplate {
   
   override def aggression: Double = 1.25
   override def buildOrder: Seq[BuildRequest] = Vector(
-    GetAtLeast(9, Zerg.Drone),
-    GetAtLeast(2, Zerg.Overlord),
-    GetAtLeast(1, Zerg.SpawningPool),
-    GetAtLeast(11, Zerg.Drone),
-    GetAtLeast(6, Zerg.Zergling),
-    GetAtLeast(2, Zerg.Hatchery),
-    GetAtLeast(1, Zerg.Extractor),
-    GetAtLeast(12, Zerg.Zergling))
+    Get(9, Zerg.Drone),
+    Get(2, Zerg.Overlord),
+    Get(1, Zerg.SpawningPool),
+    Get(11, Zerg.Drone),
+    Get(6, Zerg.Zergling),
+    Get(2, Zerg.Hatchery),
+    Get(1, Zerg.Extractor),
+    Get(12, Zerg.Zergling))
   
   override def defaultAttackPlan: Plan = new Attack
   override def defaultScoutPlan: Plan = NoPlan()
@@ -54,8 +54,8 @@ class TwoHatchHydra extends GameplanModeTemplate {
       new TrainContinuously(Zerg.Zergling),
       new TrainContinuously(Zerg.Hydralisk)),
     new Build(
-      GetAtLeast(1, Zerg.Extractor),
-      GetAtLeast(1, Zerg.HydraliskDen)),
+      Get(1, Zerg.Extractor),
+      Get(1, Zerg.HydraliskDen)),
     new UpgradeContinuously(Zerg.HydraliskSpeed),
     new UpgradeContinuously(Zerg.HydraliskRange),
     new FlipIf(
@@ -63,18 +63,18 @@ class TwoHatchHydra extends GameplanModeTemplate {
       new Parallel(
         new BuildGasPumps,
         new Build(
-          GetAtLeast(1, Zerg.Lair),
-          GetTech(Zerg.LurkerMorph))),
+          Get(1, Zerg.Lair),
+          Get(Zerg.LurkerMorph))),
       new RequireMiningBases(3)),
-    new Build(GetTech(Zerg.Burrow)),
+    new Build(Get(Zerg.Burrow)),
     new UpgradeContinuously(Zerg.GroundRangeDamage),
-    new Build(GetAtLeast(1, Zerg.EvolutionChamber)),
+    new Build(Get(1, Zerg.EvolutionChamber)),
     new RequireMiningBases(4),
-    new Build(GetAtLeast(2, Zerg.EvolutionChamber)),
+    new Build(Get(2, Zerg.EvolutionChamber)),
     new UpgradeContinuously(Zerg.GroundRangeDamage),
     new UpgradeContinuously(Zerg.GroundArmor),
     new RequireMiningBases(5),
-    new Build(GetAtLeast(1, Zerg.Hive)),
+    new Build(Get(1, Zerg.Hive)),
     new RequireMiningBases(8)
   )
 }

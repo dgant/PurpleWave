@@ -4,7 +4,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.{GetAnother, GetAtLeast}
+import Macro.BuildRequests.{GetAnother, Get}
 import Planning.Composition.Property
 import Planning.Plan
 import ProxyBwapi.Races.Terran
@@ -20,7 +20,7 @@ class BuildMissileTurretsAtBases(initialCount: Int) extends Plan {
         eligibleBases.foreach(turretBase)
       }
       else {
-        With.scheduler.request(this, GetAtLeast(1, Terran.EngineeringBay))
+        With.scheduler.request(this, Get(1, Terran.EngineeringBay))
       }
     }
   }

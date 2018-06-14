@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Lifecycle.With
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
-import Macro.BuildRequests.{GetAtLeast, GetUpgrade}
+import Macro.BuildRequests.Get
 import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import Planning.Plan
@@ -78,37 +78,37 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
   
   override def defaultBuildOrder: Plan = new Parallel(
     new BuildOrder(
-      GetAtLeast(9, Zerg.Drone),
-      GetAtLeast(2, Zerg.Overlord),
-      GetAtLeast(12, Zerg.Drone),
-      GetAtLeast(2, Zerg.Hatchery),
-      GetAtLeast(1, Zerg.SpawningPool),
-      GetAtLeast(14, Zerg.Drone)),
+      Get(9, Zerg.Drone),
+      Get(2, Zerg.Overlord),
+      Get(12, Zerg.Drone),
+      Get(2, Zerg.Hatchery),
+      Get(1, Zerg.SpawningPool),
+      Get(14, Zerg.Drone)),
     new If(
       new EnemyStrategy(
         With.fingerprints.forgeFe,
         With.fingerprints.nexusFirst),
       new Parallel(
         new BuildOrder(
-          GetAtLeast(1, Zerg.Extractor),
-          GetAtLeast(17, Zerg.Drone),
-          GetAtLeast(1, Zerg.Lair)),
+          Get(1, Zerg.Extractor),
+          Get(17, Zerg.Drone),
+          Get(1, Zerg.Lair)),
         new If(
           new UnitsAtLeast(16, Zerg.Drone),
-          new Build(GetAtLeast(2, Zerg.Extractor))),
+          new Build(Get(2, Zerg.Extractor))),
         new BuildOrder(
-          GetAtLeast(21, Zerg.Drone),
-          GetAtLeast(3, Zerg.Overlord),
-          GetAtLeast(3, Zerg.Hatchery),
-          GetAtLeast(1, Zerg.Spire))),
+          Get(21, Zerg.Drone),
+          Get(3, Zerg.Overlord),
+          Get(3, Zerg.Hatchery),
+          Get(1, Zerg.Spire))),
       new If(
         new EnemyStrategy(With.fingerprints.gatewayFe),
-        new BuildOrder(GetAtLeast(8, Zerg.Zergling)),
+        new BuildOrder(Get(8, Zerg.Zergling)),
         new Parallel(
           new Trigger(
             new UnitsAtLeast(2, UnitMatchOr(Zerg.SunkenColony, Zerg.CreepColony)),
             initialBefore = new BuildSunkensAtNatural(2, sunkenProfile)),
-          new BuildOrder(GetAtLeast(10, Zerg.Zergling))))))
+          new BuildOrder(Get(10, Zerg.Zergling))))))
     
   lazy val ZealotOrDragoon = UnitMatchOr(Protoss.Zealot, Protoss.Dragoon)
   
@@ -207,9 +207,9 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
         new MiningBasesAtLeast(4),
         new UnitsAtLeast(32, Zerg.Drone)),
       new Build(
-        GetAtLeast(1, Zerg.QueensNest),
-        GetAtLeast(1, Zerg.Hive),
-        GetAtLeast(2, Zerg.EvolutionChamber))),
+        Get(1, Zerg.QueensNest),
+        Get(1, Zerg.Hive),
+        Get(2, Zerg.EvolutionChamber))),
   
     new If(
       new And(
@@ -225,7 +225,7 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
               new UpgradeComplete(Zerg.GroundArmor, 2),
               new UnitsAtMost(0, Zerg.Hive))),
           new UpgradeContinuously(Zerg.GroundMeleeDamage)),
-        new Build(GetAtLeast(1, Zerg.EvolutionChamber)))),
+        new Build(Get(1, Zerg.EvolutionChamber)))),
     
     new If(
       new Check(() => With.self.gas >= Math.min(100, With.self.minerals)),
@@ -266,10 +266,10 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
     new If(
       new ProceedWithTech,
       new Build(
-        GetAtLeast(1, Zerg.Extractor),
-        GetAtLeast(1, Zerg.Lair),
-        GetAtLeast(1, Zerg.Spire),
-        GetUpgrade(Zerg.ZerglingSpeed))),
+        Get(1, Zerg.Extractor),
+        Get(1, Zerg.Lair),
+        Get(1, Zerg.Spire),
+        Get(Zerg.ZerglingSpeed))),
     new If(
       new UnitsAtLeast(1, Zerg.Spire),
       new Parallel(

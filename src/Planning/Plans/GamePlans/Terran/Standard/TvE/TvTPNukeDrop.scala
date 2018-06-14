@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvE
 
-import Macro.BuildRequests.{GetAtLeast, GetTech, GetUpgrade}
+import Macro.BuildRequests.Get
 import Planning.Composition.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors}
 import Planning.Plan
 import Planning.Plans.Army.NukeBase
@@ -28,12 +28,12 @@ class TvTPNukeDrop extends GameplanModeTemplate {
   override def defaultDropPlan: Plan = NoPlan()
   
   override val buildOrder = Vector(
-    GetAtLeast(9, Terran.SCV),
-    GetAtLeast(1, Terran.SupplyDepot),
-    GetAtLeast(10, Terran.SCV),
-    GetAtLeast(1, Terran.Barracks),
-    GetAtLeast(11, Terran.SCV),
-    GetAtLeast(1, Terran.Refinery))
+    Get(9, Terran.SCV),
+    Get(1, Terran.SupplyDepot),
+    Get(10, Terran.SCV),
+    Get(1, Terran.Barracks),
+    Get(11, Terran.SCV),
+    Get(1, Terran.Refinery))
   
   override def defaultWorkerPlan: Plan = NoPlan()
   
@@ -49,8 +49,8 @@ class TvTPNukeDrop extends GameplanModeTemplate {
         new EnemiesAtLeast(1, Protoss.Scout)),
       new TrainContinuously(Terran.Wraith),
       new Build(
-        GetTech(Terran.WraithCloak),
-        GetAtLeast(2, Terran.Starport))
+        Get(Terran.WraithCloak),
+        Get(2, Terran.Starport))
     ),
     new FlipIf(
       new And(
@@ -66,35 +66,35 @@ class TvTPNukeDrop extends GameplanModeTemplate {
         new UnitsAtLeast(3, UnitMatchSiegeTank),
         new SafeAtHome),
       new Build(
-        GetAtLeast(1, Terran.Bunker),
-        GetAtLeast(1, Terran.Factory),
-        GetAtLeast(1, Terran.MachineShop),
-        GetAtLeast(1, Terran.Starport),
-        GetTech(Terran.SiegeMode),
-        GetAtLeast(1, Terran.EngineeringBay),
-        GetAtLeast(1, Terran.MissileTurret),
-        GetAtLeast(1, Terran.ScienceFacility),
-        GetAtLeast(1, Terran.CovertOps),
-        GetAtLeast(1, Terran.Academy),
-        GetTech(Terran.GhostCloak),
-        GetAtLeast(1, Terran.ControlTower),
-        GetAtLeast(2, Terran.Barracks),
-        GetUpgrade(Terran.GhostVisionRange)))),
+        Get(1, Terran.Bunker),
+        Get(1, Terran.Factory),
+        Get(1, Terran.MachineShop),
+        Get(1, Terran.Starport),
+        Get(Terran.SiegeMode),
+        Get(1, Terran.EngineeringBay),
+        Get(1, Terran.MissileTurret),
+        Get(1, Terran.ScienceFacility),
+        Get(1, Terran.CovertOps),
+        Get(1, Terran.Academy),
+        Get(Terran.GhostCloak),
+        Get(1, Terran.ControlTower),
+        Get(2, Terran.Barracks),
+        Get(Terran.GhostVisionRange)))),
     new Build(
-      GetAtLeast(2, Terran.CommandCenter),
-      GetAtLeast(2, Terran.Bunker),
-      GetAtLeast(2, Terran.MissileTurret)),
+      Get(2, Terran.CommandCenter),
+      Get(2, Terran.Bunker),
+      Get(2, Terran.MissileTurret)),
     new Build(
-      GetUpgrade(Terran.MarineRange),
-      GetAtLeast(2, Terran.EngineeringBay)),
+      Get(Terran.MarineRange),
+      Get(2, Terran.EngineeringBay)),
     new UpgradeContinuously(Terran.BioDamage),
     new UpgradeContinuously(Terran.BioArmor),
     new Build(
-      GetTech(Terran.Stim),
-      GetAtLeast(4, Terran.Factory),
-      GetAtLeast(4, Terran.MachineShop),
-      GetAtLeast(8, Terran.Barracks)),
+      Get(Terran.Stim),
+      Get(4, Terran.Factory),
+      Get(4, Terran.MachineShop),
+      Get(8, Terran.Barracks)),
     new RequireMiningBases(3),
-    new Build(GetAtLeast(15, Terran.Barracks))
+    new Build(Get(15, Terran.Barracks))
   )
 }

@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.GetAtLeast
+import Macro.BuildRequests.Get
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Plan
 import Planning.Plans.Army.Attack
@@ -28,24 +28,24 @@ class ThirteenPoolMuta extends GameplanModeTemplate {
   
   override def defaultBuildOrder: Plan = new Parallel (
     new BuildOrder(
-      GetAtLeast(9, Zerg.Drone),
-      GetAtLeast(2, Zerg.Overlord),
-      GetAtLeast(13, Zerg.Drone),
-      GetAtLeast(1, Zerg.SpawningPool),
-      GetAtLeast(1, Zerg.Extractor),
-      GetAtLeast(14, Zerg.Drone)),
+      Get(9, Zerg.Drone),
+      Get(2, Zerg.Overlord),
+      Get(13, Zerg.Drone),
+      Get(1, Zerg.SpawningPool),
+      Get(1, Zerg.Extractor),
+      Get(14, Zerg.Drone)),
     new RequireMiningBases(2),
     new BuildOrder(
-      GetAtLeast(1, Zerg.Lair),
-      GetAtLeast(4, Zerg.Zergling),
-      GetAtLeast(15, Zerg.Drone),
-      GetAtLeast(1, Zerg.Spire),
-      GetAtLeast(16, Zerg.Drone)),
+      Get(1, Zerg.Lair),
+      Get(4, Zerg.Zergling),
+      Get(15, Zerg.Drone),
+      Get(1, Zerg.Spire),
+      Get(16, Zerg.Drone)),
     new Trigger(
       new UnitsAtLeast(1, Zerg.CreepColony),
-      initialBefore = new Build(GetAtLeast(1, Zerg.CreepColony))),
+      initialBefore = new Build(Get(1, Zerg.CreepColony))),
     new BuildOrder(
-      GetAtLeast(3, Zerg.Overlord)))
+      Get(3, Zerg.Overlord)))
   
   override def blueprints: Seq[Blueprint] = Vector(
     new Blueprint(this, building = Some(Zerg.CreepColony), requireZone = Some(With.geography.ourNatural.zone), placement = Some(PlacementProfiles.hugTownHall)),
@@ -56,7 +56,7 @@ class ThirteenPoolMuta extends GameplanModeTemplate {
     new TrainContinuously(Zerg.Mutalisk),
     new TrainContinuously(Zerg.SunkenColony),
     new TrainContinuously(Zerg.Drone, 16),
-    new Build(GetAtLeast(5, Zerg.Overlord)),
+    new Build(Get(5, Zerg.Overlord)),
     new Trigger(
       new UnitsAtLeast(4, Zerg.Overlord, complete = true),
       new BuildGasPumps)

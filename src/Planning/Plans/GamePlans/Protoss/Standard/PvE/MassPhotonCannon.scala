@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvE
 
 import Lifecycle.With
-import Macro.BuildRequests.{BuildRequest, GetAtLeast, GetTech}
+import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
@@ -24,38 +24,38 @@ class MassPhotonCannon extends GameplanModeTemplate {
   override val buildOrder: Seq[BuildRequest] =
     if (With.enemy.isTerran)
       Vector(
-        GetAtLeast(8, Protoss.Probe),
-        GetAtLeast(1, Protoss.Pylon),
-        GetAtLeast(14, Protoss.Probe),
-        GetAtLeast(1, Protoss.Nexus),
-        GetAtLeast(1, Protoss.Gateway),
-        GetAtLeast(1, Protoss.Forge),
-        GetAtLeast(1, Protoss.Zealot),
-        GetAtLeast(1, Protoss.PhotonCannon))
+        Get(8, Protoss.Probe),
+        Get(1, Protoss.Pylon),
+        Get(14, Protoss.Probe),
+        Get(1, Protoss.Nexus),
+        Get(1, Protoss.Gateway),
+        Get(1, Protoss.Forge),
+        Get(1, Protoss.Zealot),
+        Get(1, Protoss.PhotonCannon))
     else if (With.enemy.isProtoss)
       Vector(
-        GetAtLeast(8, Protoss.Probe),
-        GetAtLeast(1, Protoss.Pylon),
-        GetAtLeast(10, Protoss.Probe),
-        GetAtLeast(1, Protoss.Forge),
-        GetAtLeast(12, Protoss.Probe),
-        GetAtLeast(1, Protoss.PhotonCannon),
-        GetAtLeast(14, Protoss.Probe),
-        GetAtLeast(2, Protoss.PhotonCannon),
-        GetAtLeast(16, Protoss.Probe),
-        GetAtLeast(2, Protoss.Nexus),
-        GetAtLeast(1, Protoss.Gateway))
+        Get(8, Protoss.Probe),
+        Get(1, Protoss.Pylon),
+        Get(10, Protoss.Probe),
+        Get(1, Protoss.Forge),
+        Get(12, Protoss.Probe),
+        Get(1, Protoss.PhotonCannon),
+        Get(14, Protoss.Probe),
+        Get(2, Protoss.PhotonCannon),
+        Get(16, Protoss.Probe),
+        Get(2, Protoss.Nexus),
+        Get(1, Protoss.Gateway))
     else
       Vector(
-        GetAtLeast(8, Protoss.Probe),
-        GetAtLeast(1, Protoss.Pylon),
-        GetAtLeast(9, Protoss.Probe),
-        GetAtLeast(1, Protoss.Forge),
-        GetAtLeast(10, Protoss.Probe),
-        GetAtLeast(2, Protoss.PhotonCannon),
-        GetAtLeast(12, Protoss.Probe),
-        GetAtLeast(2, Protoss.Nexus),
-        GetAtLeast(3, Protoss.PhotonCannon))
+        Get(8, Protoss.Probe),
+        Get(1, Protoss.Pylon),
+        Get(9, Protoss.Probe),
+        Get(1, Protoss.Forge),
+        Get(10, Protoss.Probe),
+        Get(2, Protoss.PhotonCannon),
+        Get(12, Protoss.Probe),
+        Get(2, Protoss.Nexus),
+        Get(3, Protoss.PhotonCannon))
   
   private def pylonCount = With.units.countOurs(Protoss.Pylon)
   private def cannonCount = With.units.countOurs(Protoss.PhotonCannon)
@@ -76,7 +76,7 @@ class MassPhotonCannon extends GameplanModeTemplate {
       new UpgradeContinuously(Protoss.CarrierCapacity)),
     new If(
       new UnitsAtLeast(1, Protoss.HighTemplar),
-      new Build(GetTech(Protoss.PsionicStorm))),
+      new Build(Get(Protoss.PsionicStorm))),
     new If(
       new UnitsAtLeast(3, Protoss.Reaver),
       new UpgradeContinuously(Protoss.ScarabDamage)),
@@ -128,48 +128,48 @@ class MassPhotonCannon extends GameplanModeTemplate {
           new TrainContinuously(Protoss.Pylon, 200, 2)),
         new TrainContinuously(Protoss.PhotonCannon, 400, 6)),
       new Parallel(
-        new Build(GetAtLeast(1, Protoss.Gateway)),
+        new Build(Get(1, Protoss.Gateway)),
         new BuildGasPumps,
-        new Build(GetAtLeast(1, Protoss.CyberneticsCore)),
+        new Build(Get(1, Protoss.CyberneticsCore)),
         new If(
           new EnemyHasShownCloakedThreat,
           new Build(
-            GetAtLeast(1, Protoss.RoboticsFacility),
-            GetAtLeast(1, Protoss.Observatory),
-            GetAtLeast(2, Protoss.Observer))),
+            Get(1, Protoss.RoboticsFacility),
+            Get(1, Protoss.Observatory),
+            Get(2, Protoss.Observer))),
         new If(
           new And(
             new MineralsAtMost(400),
             new GasAtLeast(500)),
           new Build(
-            GetAtLeast(1, Protoss.CitadelOfAdun),
-            GetAtLeast(1, Protoss.TemplarArchives),
-            GetAtLeast(2, Protoss.Gateway))),
+            Get(1, Protoss.CitadelOfAdun),
+            Get(1, Protoss.TemplarArchives),
+            Get(2, Protoss.Gateway))),
         new Build(
-          GetAtLeast(1, Protoss.RoboticsFacility),
-          GetAtLeast(1, Protoss.RoboticsSupportBay),
-          GetAtLeast(1, Protoss.Stargate),
-          GetAtLeast(1, Protoss.FleetBeacon),
-          GetAtLeast(1, Protoss.Stargate)),
+          Get(1, Protoss.RoboticsFacility),
+          Get(1, Protoss.RoboticsSupportBay),
+          Get(1, Protoss.Stargate),
+          Get(1, Protoss.FleetBeacon),
+          Get(1, Protoss.Stargate)),
         new IfOnMiningBases(2,
           new Parallel(
             new Build(
-              GetAtLeast(2, Protoss.Stargate),
-              GetAtLeast(2, Protoss.Gateway),
-              GetAtLeast(3, Protoss.Stargate)),
+              Get(2, Protoss.Stargate),
+              Get(2, Protoss.Gateway),
+              Get(3, Protoss.Stargate)),
             new UpgradeContinuously(Protoss.AirDamage))),
         new IfOnMiningBases(3,
           new Parallel(
             new UpgradeContinuously(Protoss.AirArmor),
             new Build(
-              GetAtLeast(2, Protoss.CyberneticsCore),
-              GetAtLeast(2, Protoss.RoboticsFacility),
-              GetAtLeast(4, Protoss.Stargate),
-              GetAtLeast(3, Protoss.Gateway))),
+              Get(2, Protoss.CyberneticsCore),
+              Get(2, Protoss.RoboticsFacility),
+              Get(4, Protoss.Stargate),
+              Get(3, Protoss.Gateway))),
         new IfOnMiningBases(4,
           new Parallel(
             new UpgradeContinuously(Protoss.Shields),
-            new Build(GetAtLeast(8, Protoss.Stargate))),
+            new Build(Get(8, Protoss.Stargate))),
         new RequireMiningBases(4)
       ))))
   )

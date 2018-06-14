@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
-import Macro.BuildRequests.{BuildRequest, GetAtLeast, GetUpgrade}
+import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Compound._
@@ -32,43 +32,43 @@ class PvP2GateRobo extends GameplanModeTemplate {
   
   override val buildOrder: Seq[BuildRequest] = Vector(
     // http://wiki.teamliquid.net/starcraft/2_Gate_Reaver_(vs._Protoss)
-    GetAtLeast(8,   Protoss.Probe),
-    GetAtLeast(1,   Protoss.Pylon),             // 8
-    GetAtLeast(10,  Protoss.Probe),
-    GetAtLeast(1,   Protoss.Gateway),           // 10
-    GetAtLeast(12,  Protoss.Probe),
-    GetAtLeast(1,   Protoss.Assimilator),       // 12
-    GetAtLeast(13,  Protoss.Probe),
-    GetAtLeast(1,   Protoss.Zealot),            // 13
-    GetAtLeast(14,  Protoss.Probe),
-    GetAtLeast(2,   Protoss.Pylon),             // 16 = 14 + Z
-    GetAtLeast(16,  Protoss.Probe),
-    GetAtLeast(1,   Protoss.CyberneticsCore),   // 18 = 16 + Z
-    GetAtLeast(17,  Protoss.Probe),
-    GetAtLeast(2,   Protoss.Zealot),            // 19 = 17 + Z
-    GetAtLeast(18,  Protoss.Probe),
-    GetAtLeast(3,   Protoss.Pylon),             // 22 = 18 + ZZ
-    GetAtLeast(19,  Protoss.Probe),
-    GetAtLeast(1,   Protoss.Dragoon),           // 23 = 19 + ZZ
-    GetAtLeast(20,  Protoss.Probe),
-    GetAtLeast(2,   Protoss.Gateway),           // 26 = 20 + ZZ + D
-    GetAtLeast(21,  Protoss.Probe),
-    GetAtLeast(2,   Protoss.Dragoon),           // 27 = 21 + ZZ + D
-    GetAtLeast(22,  Protoss.Probe),
-    GetAtLeast(3,   Protoss.Pylon),
-    GetUpgrade(Protoss.DragoonRange))
+    Get(8,   Protoss.Probe),
+    Get(1,   Protoss.Pylon),             // 8
+    Get(10,  Protoss.Probe),
+    Get(1,   Protoss.Gateway),           // 10
+    Get(12,  Protoss.Probe),
+    Get(1,   Protoss.Assimilator),       // 12
+    Get(13,  Protoss.Probe),
+    Get(1,   Protoss.Zealot),            // 13
+    Get(14,  Protoss.Probe),
+    Get(2,   Protoss.Pylon),             // 16 = 14 + Z
+    Get(16,  Protoss.Probe),
+    Get(1,   Protoss.CyberneticsCore),   // 18 = 16 + Z
+    Get(17,  Protoss.Probe),
+    Get(2,   Protoss.Zealot),            // 19 = 17 + Z
+    Get(18,  Protoss.Probe),
+    Get(3,   Protoss.Pylon),             // 22 = 18 + ZZ
+    Get(19,  Protoss.Probe),
+    Get(1,   Protoss.Dragoon),           // 23 = 19 + ZZ
+    Get(20,  Protoss.Probe),
+    Get(2,   Protoss.Gateway),           // 26 = 20 + ZZ + D
+    Get(21,  Protoss.Probe),
+    Get(2,   Protoss.Dragoon),           // 27 = 21 + ZZ + D
+    Get(22,  Protoss.Probe),
+    Get(3,   Protoss.Pylon),
+    Get(Protoss.DragoonRange))
   
   override val buildPlans = Vector(
     new If(
       new EnemiesAtLeast(1, Protoss.DarkTemplar),
-      new Build(GetAtLeast(1, Protoss.Observer))),
+      new Build(Get(1, Protoss.Observer))),
     new Trigger(new UnitsAtLeast(1, Protoss.Reaver), new RequireMiningBases(2)),
     new PvPIdeas.TrainArmy,
     new Build(
-      GetAtLeast(1, Protoss.RoboticsFacility),
-      GetAtLeast(1, Protoss.Observatory),
-      GetAtLeast(1, Protoss.RoboticsSupportBay),
-      GetAtLeast(3, Protoss.Gateway),
-      GetAtLeast(2, Protoss.Nexus),
-      GetAtLeast(1, Protoss.Observer)))
+      Get(1, Protoss.RoboticsFacility),
+      Get(1, Protoss.Observatory),
+      Get(1, Protoss.RoboticsSupportBay),
+      Get(3, Protoss.Gateway),
+      Get(2, Protoss.Nexus),
+      Get(1, Protoss.Observer)))
 }

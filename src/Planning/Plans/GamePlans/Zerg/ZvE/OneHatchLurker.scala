@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvE
 
 import Lifecycle.With
-import Macro.BuildRequests.{BuildRequest, GetAtLeast, GetTech, GetUpgrade}
+import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{Do, If, NoPlan, Parallel}
@@ -15,13 +15,13 @@ import ProxyBwapi.Races.Zerg
 class OneHatchLurker extends GameplanModeTemplate {
   
   override def buildOrder: Seq[BuildRequest] = Vector(
-    GetAtLeast(9, Zerg.Drone),
-    GetAtLeast(1, Zerg.SpawningPool),
-    GetAtLeast(10, Zerg.Drone),
-    GetAtLeast(1, Zerg.Extractor),
-    GetAtLeast(2, Zerg.Overlord),
-    GetAtLeast(11, Zerg.Drone),
-    GetAtLeast(6, Zerg.Zergling))
+    Get(9, Zerg.Drone),
+    Get(1, Zerg.SpawningPool),
+    Get(10, Zerg.Drone),
+    Get(1, Zerg.Extractor),
+    Get(2, Zerg.Overlord),
+    Get(11, Zerg.Drone),
+    Get(6, Zerg.Zergling))
   
   override def defaultScoutPlan: Plan = NoPlan()
   
@@ -45,25 +45,25 @@ class OneHatchLurker extends GameplanModeTemplate {
         With.blackboard.gasLimitCeiling = 250
       })),
     new Build(
-      GetAtLeast(9, Zerg.Drone),
-      GetAtLeast(1, Zerg.Lair),
-      GetAtLeast(11, Zerg.Drone),
-      GetAtLeast(1, Zerg.HydraliskDen)),
+      Get(9, Zerg.Drone),
+      Get(1, Zerg.Lair),
+      Get(11, Zerg.Drone),
+      Get(1, Zerg.HydraliskDen)),
     new If(
       new UnitsAtMost(0, Zerg.HydraliskDen),
       new TrainContinuously(Zerg.Zergling)),
     new If(
       new UnitsAtMost(4, Zerg.Lurker),
       new Parallel(
-        new Build(GetTech(Zerg.LurkerMorph)),
+        new Build(Get(Zerg.LurkerMorph)),
         new TrainContinuously(Zerg.Lurker),
         new TrainContinuously(Zerg.Hydralisk, 4, 2),
         new RequireMiningBases(2),
         new TrainContinuously(Zerg.Zergling),
-        new Build(GetUpgrade(Zerg.ZerglingSpeed))),
+        new Build(Get(Zerg.ZerglingSpeed))),
       new Parallel(
         new RequireMiningBases(2),
-        new Build(GetAtLeast(1, Zerg.Spire)),
+        new Build(Get(1, Zerg.Spire)),
         new TrainContinuously(Zerg.Mutalisk),
         new TrainContinuously(Zerg.Drone))),
     new BuildGasPumps,

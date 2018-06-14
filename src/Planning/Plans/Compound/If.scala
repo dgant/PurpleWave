@@ -30,6 +30,4 @@ class If(
     else
       delegate(whenFalse.get)
   }
-  
-  override def toString: String = super.toString + ": " + predicate.get.toString
 }

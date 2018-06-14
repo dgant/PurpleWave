@@ -33,12 +33,13 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val allUnits               : Vector[UnitInfo]      = enemies ++ alliesInclSelf
   lazy val allyDetectors          : Vector[UnitInfo]      = allies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
   lazy val enemyDetectors         : Vector[UnitInfo]      = enemies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
-  lazy val threats                : Vector[UnitInfo]      = enemies.filter(_.canAttack(me))
-  lazy val targets                : Vector[UnitInfo]      = enemies.filter(me.canAttack)
+  lazy val threats                : Vector[UnitInfo]      = enemies.filter(threatens(_, me))
+  lazy val targets                : Vector[UnitInfo]      = enemies.filter(threatens(me, _))
   lazy val threatsViolent         : Vector[UnitInfo]      = threats.filter(_.isBeingViolentTo(me))
   lazy val threatsInRange         : Vector[UnitInfo]      = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me, at) - me.pixelsTravelledMax(frame) - threat.pixelsTravelledMax(frame))
   lazy val targetsInRange         : Vector[UnitInfo]      = targets.filter(target => target.visible && me.pixelRangeAgainst(target) >= target.pixelDistanceEdge(me, at) - me.pixelsTravelledMax(frame) - target.pixelsTravelledMax(frame) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
   
+  private def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = shooter.canAttack(victim) && shooter.framesToGetInRange(victim) < With.configuration.simulationFrames
   def repairers: ArrayBuffer[UnitInfo] = ArrayBuffer.empty ++ allies.filter(_.friendly.exists(_.agent.toRepair.contains(me)))
   
   lazy val valuePerDamage                 : Double                = MicroValue.valuePerDamageCurrentHp(me)

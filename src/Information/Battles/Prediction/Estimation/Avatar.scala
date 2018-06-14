@@ -49,7 +49,7 @@ class Avatar {
     val range         = unit.pixelRangeMax + 32.0 * (if (attacking || ! unit.canMove) 1.0 else 3.0)
     val pixelsAway    = if (geometric) unit.pixelDistanceCenter(nearestEnemy.get) else With.configuration.avatarBattleDistancePixels
     val framesAway    = if (pixelsAway <= range) 0.0 else if (chasing) Double.PositiveInfinity else PurpleMath.nanToInfinity(Math.max(0.0, pixelsAway - range) / unit.topSpeed * 0.5)
-    val framesTotal   = With.configuration.battleEstimationFrames
+    val framesTotal   = With.configuration.simulationFrames
     var efficacy      = if (retreating) 0.0 else splashFactor * Math.max(0.0, (framesTotal - framesAway) / framesTotal)
     val altitudeBonus = if (unit.flying || ! geometric) 1.0 else With.grids.altitudeBonus.get(unit.tileIncludingCenter)
     var fortitude     = altitudeBonus * (if (geometric && unit.effectivelyCloaked) 5.0 else 1.0)

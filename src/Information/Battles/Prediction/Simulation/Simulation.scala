@@ -38,7 +38,7 @@ class Simulation(
       .toMap
   
   def complete: Boolean = (
-    estimation.frames > With.configuration.battleEstimationFrames
+    estimation.frames > With.configuration.simulationFrames
     || ! updated
     || unitsOurs.forall(_.dead)
     || unitsEnemy.forall(_.dead)

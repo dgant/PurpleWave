@@ -5,11 +5,10 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Composition.Property
 import Planning.Plan
-import ProxyBwapi.Races.Zerg
 
 class RequireBases(basesInitial: Int = 1) extends Plan {
   
-  override def toString: String = "Require " + basesDesired.get + English.pluralize(" bases", basesDesired.get)
+  description.set("Require " + basesDesired.get + English.pluralize(" bases", basesDesired.get))
   
   val basesDesired = new Property(basesInitial)
   

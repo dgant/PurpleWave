@@ -21,7 +21,7 @@ object EstimateAvatar {
         // Yeah, we need to do better than this.
         24 * 3
       else
-        With.configuration.battleEstimationFrames
+        With.configuration.simulationFrames
         
     val frameStep = 24
     while (output.frames < maxFrames && output.weSurvive && output.enemySurvives) {
@@ -43,7 +43,7 @@ object EstimateAvatar {
     val airFocus        = to.totalFlyers / to.totalUnits
     val groundFocus     = 1.0 - airFocus
     
-    val seconds = With.configuration.battleEstimationFrames / 24.0
+    val seconds = With.configuration.simulationFrames / 24.0
     
     val damagePerFramePerUnit =
       to.vulnerabilityGroundConcussive  * (from.dpfGroundConcussiveFocused + from.dpfGroundConcussiveUnfocused * groundFocus) +

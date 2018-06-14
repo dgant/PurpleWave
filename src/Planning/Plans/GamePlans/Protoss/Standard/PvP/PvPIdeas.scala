@@ -7,7 +7,7 @@ import Macro.BuildRequests.Get
 import Planning.Composition.UnitMatchers._
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
+import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, Pump, PumpWorkers}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -59,8 +59,8 @@ object PvPIdeas {
     new EnemyStrategy(With.fingerprints.cannonRush),
     new Parallel(
       new RequireSufficientSupply,
-      new TrainWorkersContinuously,
-      new TrainContinuously(Protoss.Reaver, 2),
+      new PumpWorkers,
+      new Pump(Protoss.Reaver, 2),
       new TrainDragoonsOrZealots,
       new Build(
         Get(1, Protoss.Gateway),
@@ -89,7 +89,7 @@ object PvPIdeas {
       new Build(
         Get(1, Protoss.RoboticsFacility),
         Get(1, Protoss.Observatory)),
-      new TrainContinuously(Protoss.Observer, 3)))
+      new Pump(Protoss.Observer, 3)))
   
   class ReactToTwoGate extends If(
     new And(
@@ -120,7 +120,7 @@ object PvPIdeas {
       new Build(
         Get(1, Protoss.RoboticsFacility),
         Get(1, Protoss.Observatory)),
-    new TrainContinuously(Protoss.Observer, 2)))
+    new Pump(Protoss.Observer, 2)))
   
   class ReactToFFE extends If(
     new And(
@@ -144,7 +144,7 @@ object PvPIdeas {
       new FlipIf(
         new SafeAtHome,
         new Parallel(
-          new TrainContinuously(Protoss.Probe, 19),
+          new Pump(Protoss.Probe, 19),
           new Build(Get(4, Protoss.Gateway))),
         new Parallel(
           new PvPIdeas.TrainDragoonsOrZealots,
@@ -189,36 +189,36 @@ object PvPIdeas {
           new Or(
             new UnitsAtLeast(12, Protoss.Dragoon),
             new Check(() => With.self.minerals > With.self.gas * 3))))),
-    new TrainContinuously(Protoss.Zealot),
-    new TrainContinuously(Protoss.Dragoon))
+    new Pump(Protoss.Zealot),
+    new Pump(Protoss.Dragoon))
     
   class TrainDarkTemplar extends If(
     new And(
       new EnemyUnitsAtMost(0, Protoss.PhotonCannon),
       new EnemyUnitsAtMost(0, Protoss.Observer)),
-    new TrainContinuously(Protoss.DarkTemplar, 3),
-    new TrainContinuously(Protoss.DarkTemplar, 1))
+    new Pump(Protoss.DarkTemplar, 3),
+    new Pump(Protoss.DarkTemplar, 1))
     
   class TrainArmy extends Parallel(
-    new TrainContinuously(Protoss.Carrier),
+    new Pump(Protoss.Carrier),
     new If(
       new And(
         new Not(new EnemyCarriersOnly),
         new UnitsAtMost(0, Protoss.PhotonCannon)),
-      new TrainContinuously(Protoss.Observer, 1)),
+      new Pump(Protoss.Observer, 1)),
     new If(
       new Not(new EnemyCarriersOnly),
       new TrainDarkTemplar),
-    new TrainContinuously(Protoss.Arbiter),
+    new Pump(Protoss.Arbiter),
     new If(
       new And(
         new Not(new EnemyCarriersOnly),
         new UnitsAtMost(0, Protoss.TemplarArchives)),
-      new TrainContinuously(Protoss.Reaver, 2)),
+      new Pump(Protoss.Reaver, 2)),
     new If(
       new UnitsAtLeast(12, UnitMatchWarriors),
-      new TrainContinuously(Protoss.HighTemplar, 6, 2)),
+      new Pump(Protoss.HighTemplar, 6, 2)),
     new TrainDragoonsOrZealots,
-    new TrainContinuously(Protoss.Observer, 2)
+    new Pump(Protoss.Observer, 2)
   )
 }

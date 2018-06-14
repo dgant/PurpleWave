@@ -7,7 +7,7 @@ import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Not, Or, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast, UpgradeComplete}
@@ -32,7 +32,7 @@ class PvT1015Expand extends GameplanModeTemplate {
         new EnemyBasesAtLeast(2),
         new EnemiesAtLeast(1, UnitMatchAnd(Terran.Bunker, UnitMatchInNatural))),
       new RequireMiningBases(3)),
-    new TrainContinuously(Protoss.Dragoon),
+    new Pump(Protoss.Dragoon),
     new If(
       new Not(new SafeAtHome),
       new Build(

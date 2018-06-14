@@ -9,7 +9,7 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Predicates.Milestones.UnitsAtLeast
@@ -53,9 +53,9 @@ class ThirteenPoolMuta extends GameplanModeTemplate {
     new Blueprint(this, building = Some(Zerg.CreepColony), requireZone = Some(With.geography.ourNatural.zone), placement = Some(PlacementProfiles.hugTownHall)))
 
   override def buildPlans: Seq[Plan] = Vector(
-    new TrainContinuously(Zerg.Mutalisk),
-    new TrainContinuously(Zerg.SunkenColony),
-    new TrainContinuously(Zerg.Drone, 16),
+    new Pump(Zerg.Mutalisk),
+    new Pump(Zerg.SunkenColony),
+    new Pump(Zerg.Drone, 16),
     new Build(Get(5, Zerg.Overlord)),
     new Trigger(
       new UnitsAtLeast(4, Zerg.Overlord, complete = true),

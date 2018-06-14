@@ -56,7 +56,7 @@ class ThreeBaseCarriersWithNoDefense extends Parallel {
   children.set(Vector(
     new Build(ProtossBuilds.Opening13Nexus_NoZealot_OneGateCore: _*),
     new RequireSufficientSupply,
-    new TrainWorkersContinuously,
+    new PumpWorkers,
     new BuildGasPumps,
     new ExpandOverIsland(3),
     new TechToCarriers,
@@ -68,13 +68,13 @@ class ThreeBaseCarriersWithNoDefense extends Parallel {
       new Parallel(
         new IfOnMiningBases(2, new Parallel(new SpamUpgrades, new TechToObservers)),
         new IfOnMiningBases(3, new Parallel(new TechToArbiters)),
-        new TrainContinuously(Protoss.Observer, 2),
-        new TrainContinuously(Protoss.Arbiter, 2),
-        new TrainContinuously(Protoss.Carrier)),
+        new Pump(Protoss.Observer, 2),
+        new Pump(Protoss.Arbiter, 2),
+        new Pump(Protoss.Carrier)),
       new Parallel(
-        new TrainContinuously(Protoss.Scout, 1),
-        new TrainContinuously(Protoss.Carrier),
-        new TrainContinuously(Protoss.Observer, 1))),
+        new Pump(Protoss.Scout, 1),
+        new Pump(Protoss.Carrier),
+        new Pump(Protoss.Observer, 1))),
     new OnGasPumps(1, new Build(Get(3, Protoss.Stargate))),
     new OnGasPumps(2, new Build(Get(5, Protoss.Stargate))),
     new OnGasPumps(3, new Build(Get(8, Protoss.Stargate))),

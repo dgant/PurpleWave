@@ -7,7 +7,7 @@ import Planning.Plan
 import Planning.Plans.Army.DefendZones
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.TrainWorkersContinuously
+import Planning.Plans.Macro.Automatic.PumpWorkers
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, MatchMiningBases, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
@@ -31,8 +31,8 @@ class PvPLateGame extends GameplanModeTemplate {
   
   override def defaultWorkerPlan: Plan = new If(
     new SafeAtHome,
-    new TrainWorkersContinuously(true),
-    new TrainWorkersContinuously(false))
+    new PumpWorkers(true),
+    new PumpWorkers(false))
   
   override def priorityAttackPlan: Plan = new PvPIdeas.AttackWithDarkTemplar
   override val defaultAttackPlan = new PvPIdeas.AttackSafely

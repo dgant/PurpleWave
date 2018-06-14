@@ -9,7 +9,7 @@ import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Predicates.Employing
-import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
+import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, Pump, PumpWorkers}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
 import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtMost, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
@@ -79,9 +79,9 @@ class PvP2GateDarkTemplar extends GameplanModeTemplate {
         new EnemyUnitsAtMost(0, Protoss.Observer),
         new EnemyUnitsAtMost(0, Protoss.Observatory),
         new UnitsAtMost(2, Protoss.DarkTemplar)),
-        new TrainContinuously(Protoss.DarkTemplar, 3, 1)),
-    new TrainContinuously(Protoss.Dragoon),
-    new TrainWorkersContinuously,
+        new Pump(Protoss.DarkTemplar, 3, 1)),
+    new Pump(Protoss.Dragoon),
+    new PumpWorkers,
     new BuildCannonsAtNatural(2),
     new RequireMiningBases(2))
 }

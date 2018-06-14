@@ -8,7 +8,7 @@ import Planning.Plan
 import Planning.Plans.Compound.{If, NoPlan}
 import Planning.Plans.GamePlans.GameplanModeTemplateVsRandom
 import Planning.Plans.Predicates.Employing
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Predicates.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Terran
@@ -41,11 +41,11 @@ class TvRTinfoil extends GameplanModeTemplateVsRandom {
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(new UnitsAtLeast(1, UnitMatchSiegeTank), new Build(Get(Terran.SiegeMode))),
-    new TrainContinuously(Terran.SiegeTankUnsieged),
+    new Pump(Terran.SiegeTankUnsieged),
     new If(
       new UnitsAtLeast(6, Terran.Marine),
-      new TrainContinuously(Terran.Medic, 3, 1)),
-    new TrainContinuously(Terran.Marine),
+      new Pump(Terran.Medic, 3, 1)),
+    new Pump(Terran.Marine),
     new Build(
       Get(2, Terran.Barracks),
       Get(1, Terran.Refinery),

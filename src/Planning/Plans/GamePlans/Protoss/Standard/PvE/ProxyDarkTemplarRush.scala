@@ -6,7 +6,7 @@ import Macro.BuildRequests.Get
 import Planning.Composition.UnitMatchers.UnitMatchMobileDetectors
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
-import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
+import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, Pump, PumpWorkers}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -42,7 +42,7 @@ class ProxyDarkTemplarRush extends Parallel {
           new Build(
             Get(Protoss.DragoonRange),
             Get(2, Protoss.DarkTemplar))),
-        new TrainContinuously(Protoss.DarkTemplar))),
+        new Pump(Protoss.DarkTemplar))),
     
     new Build(
       Get(1, Protoss.Nexus),
@@ -64,8 +64,8 @@ class ProxyDarkTemplarRush extends Parallel {
       Get(4, Protoss.Gateway)),
     
     new RequireSufficientSupply,
-    new TrainContinuously(Protoss.Dragoon),
-    new TrainWorkersContinuously,
+    new Pump(Protoss.Dragoon),
+    new PumpWorkers,
     new Build(Get(4, Protoss.Gateway)),
     new RequireMiningBases(2),
     new BuildGasPumps,

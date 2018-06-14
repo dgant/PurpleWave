@@ -7,7 +7,7 @@ import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, BuildCannonsAtExpansions}
@@ -86,9 +86,9 @@ class MassPhotonCannon extends GameplanModeTemplate {
     new If(
       new UnitsAtLeast(8, Protoss.Zealot),
       new UpgradeContinuously(Protoss.ZealotSpeed)),
-    new TrainContinuously(Protoss.HighTemplar, 12),
-    new TrainContinuously(Protoss.Carrier),
-    new TrainContinuously(Protoss.Reaver),
+    new Pump(Protoss.HighTemplar, 12),
+    new Pump(Protoss.Carrier),
+    new Pump(Protoss.Reaver),
     new If(
       new Or(
         new UnitsAtMost(0, Protoss.FleetBeacon),
@@ -97,8 +97,8 @@ class MassPhotonCannon extends GameplanModeTemplate {
         new Or(
           new UnitsAtMost(0, Protoss.CyberneticsCore, complete = true),
           new Check(() => With.self.minerals > 3 * With.self.gas)),
-        new TrainContinuously(Protoss.Zealot),
-        new TrainContinuously(Protoss.Dragoon))),
+        new Pump(Protoss.Zealot),
+        new Pump(Protoss.Dragoon))),
     new If(
       new Or(
         new UnitsAtLeast(12, Protoss.PhotonCannon),
@@ -125,8 +125,8 @@ class MassPhotonCannon extends GameplanModeTemplate {
           new Check(() =>
             pylonCount * 4 < cannonCount
             && (cannonCount < 4 || With.units.existsOurs(Protoss.CyberneticsCore))),
-          new TrainContinuously(Protoss.Pylon, 200, 2)),
-        new TrainContinuously(Protoss.PhotonCannon, 400, 6)),
+          new Pump(Protoss.Pylon, 200, 2)),
+        new Pump(Protoss.PhotonCannon, 400, 6)),
       new Parallel(
         new Build(Get(1, Protoss.Gateway)),
         new BuildGasPumps,

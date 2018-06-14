@@ -6,7 +6,7 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
@@ -43,7 +43,7 @@ class MassGoliath extends GameplanModeTemplate {
     new Attack(Terran.Vulture))
   
   override def emergencyPlans: Seq[Plan] = Seq(
-    new TrainContinuously(Terran.Comsat),
+    new Pump(Terran.Comsat),
     new If(
       new EnemyHasShownCloakedThreat,
       new Parallel(
@@ -51,8 +51,8 @@ class MassGoliath extends GameplanModeTemplate {
           Get(1, Terran.Academy),
           Get(1, Terran.EngineeringBay),
           Get(1, Terran.MissileTurret)),
-        new TrainContinuously(Terran.ControlTower),
-        new TrainContinuously(Terran.ScienceVessel, 2))))
+        new Pump(Terran.ControlTower),
+        new Pump(Terran.ScienceVessel, 2))))
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(
@@ -89,17 +89,17 @@ class MassGoliath extends GameplanModeTemplate {
       new UnitsAtLeast(70, UnitMatchWarriors),
       new RequireMiningBases(5)),
   
-    new TrainContinuously(Terran.Marine, 4),
+    new Pump(Terran.Marine, 4),
     new If(
       new Or(
         new UnitsAtMost(0, Terran.Armory, complete = true),
         new And(new MineralsAtLeast(600), new GasAtMost(50))),
-      new TrainContinuously(Terran.Vulture),
-      new TrainContinuously(Terran.Goliath)),
+      new Pump(Terran.Vulture),
+      new Pump(Terran.Goliath)),
   
     new Build(Get(1, Terran.Armory)),
     new BuildGasPumps,
-    new TrainContinuously(Terran.Factory, 30, 3),
+    new Pump(Terran.Factory, 30, 3),
     new RequireMiningBases(3)
   )
 }

@@ -9,7 +9,7 @@ import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.{ExtractorTrick, TrainContinuously}
+import Planning.Plans.Macro.Automatic.{ExtractorTrick, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Predicates.Economy.MineralsAtLeast
@@ -67,7 +67,7 @@ class Zerg4Pool extends GameplanModeTemplate {
       With.blackboard.gasLimitCeiling = 0
     }),
   
-    new TrainContinuously(Zerg.Drone, 3),
+    new Pump(Zerg.Drone, 3),
     
     new BuildOrder(
       Get(1, Zerg.SpawningPool),
@@ -75,7 +75,7 @@ class Zerg4Pool extends GameplanModeTemplate {
     new Build(Get(1, Zerg.Overlord)),
     
     new ExtractorTrick,
-    new TrainContinuously(Zerg.Zergling),
+    new Pump(Zerg.Zergling),
     new If(
       new And(
         new MineralsAtLeast(450),

@@ -6,7 +6,7 @@ import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Predicates.Always
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases, RequireMiningBasesFFA}
 import Planning.Plans.Predicates.Milestones.UnitsAtLeast
@@ -46,16 +46,16 @@ class ProtossHuntersFFAFFEGatewayCarriers extends GameplanModeTemplate {
     new If(new UnitsAtLeast(2, Protoss.Arbiter),      new Build(Get(Protoss.Stasis))),
     new BuildCannonsAtExpansions(2),
     new RequireMiningBases(2),
-    new TrainContinuously(Protoss.Arbiter,        2, 1),
-    new TrainContinuously(Protoss.Observer,       2),
-    new TrainContinuously(Protoss.Reaver,         2),
-    new TrainContinuously(Protoss.Carrier),
-    new TrainContinuously(Protoss.DarkTemplar,    1),
+    new Pump(Protoss.Arbiter,        2, 1),
+    new Pump(Protoss.Observer,       2),
+    new Pump(Protoss.Reaver,         2),
+    new Pump(Protoss.Carrier),
+    new Pump(Protoss.DarkTemplar,    1),
     new If(
       new UnitsAtLeast(8, UnitMatchWarriors),
-      new TrainContinuously(Protoss.HighTemplar,  4, 1)),
-    new TrainContinuously(Protoss.Dragoon,        12, 6),
-    new TrainContinuously(Protoss.Zealot),
+      new Pump(Protoss.HighTemplar,  4, 1)),
+    new Pump(Protoss.Dragoon,        12, 6),
+    new Pump(Protoss.Zealot),
     new Build(
       Get(3, Protoss.PhotonCannon),
       Get(1, Protoss.Assimilator),

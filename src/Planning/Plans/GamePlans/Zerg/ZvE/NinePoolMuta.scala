@@ -9,7 +9,7 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Predicates.Economy.{GasAtMost, MineralsAtLeast}
@@ -73,19 +73,19 @@ class NinePoolMuta extends GameplanModeTemplate {
     new Build(
       Get(8, Zerg.Drone),
       Get(1, Zerg.Lair)),
-    new TrainContinuously(Zerg.SunkenColony),
+    new Pump(Zerg.SunkenColony),
     new If(
       new UnitsAtMost(0, Zerg.Spire),
       new Parallel(
         new If(
           new Not(new EnemyIsZerg),
-          new TrainContinuously(Zerg.Drone, 16)),
-        new TrainContinuously(Zerg.Zergling))),
+          new Pump(Zerg.Drone, 16)),
+        new Pump(Zerg.Zergling))),
     new Build(Get(1, Zerg.Spire)),
     new If(
       new UnitsAtMost(1, Zerg.Extractor),
-      new TrainContinuously(Zerg.Mutalisk, 100, 2),
-      new TrainContinuously(Zerg.Mutalisk)),
+      new Pump(Zerg.Mutalisk, 100, 2),
+      new Pump(Zerg.Mutalisk)),
     new If(
       new And(
         new Or(
@@ -115,13 +115,13 @@ class NinePoolMuta extends GameplanModeTemplate {
           new Check(() =>
             With.units.countOurs(Zerg.Drone) / 9 <
             With.geography.ourBases.size)),
-        new TrainContinuously(Zerg.Drone),
-        new Parallel(new TrainContinuously(Zerg.Zergling)))),
+        new Pump(Zerg.Drone),
+        new Parallel(new Pump(Zerg.Zergling)))),
     new If(
       new MineralsAtLeast(300),
       new BuildGasPumps),
     new If(
       new GasAtMost(99),
-      new TrainContinuously(Zerg.Hatchery, 8, 1))
+      new Pump(Zerg.Hatchery, 8, 1))
   )
 }

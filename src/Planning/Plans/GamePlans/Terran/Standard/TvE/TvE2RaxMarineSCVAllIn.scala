@@ -7,7 +7,7 @@ import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Predicates.Economy.MineralsAtLeast
 import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
@@ -50,7 +50,7 @@ class TvE2RaxMarineSCVAllIn extends GameplanModeTemplate {
     Get(2, Terran.SupplyDepot))
   
   override def buildPlans: Seq[Plan] = Vector(
-    new TrainContinuously(Terran.Marine),
-    new TrainContinuously(Terran.SCV)
+    new Pump(Terran.Marine),
+    new Pump(Terran.SCV)
   )
 }

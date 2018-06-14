@@ -11,7 +11,7 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.{MatchingRatio, TrainContinuously, TrainMatchingRatio}
+import Planning.Plans.Macro.Automatic.{Enemy, Pump, TrainMatchingRatio}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireBases
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
@@ -91,8 +91,8 @@ class ZergSparkle extends GameplanModeTemplate {
         
         new If(
           new SafeAtHome,
-          new TrainContinuously(Zerg.Drone, 18),
-          new TrainContinuously(Zerg.Drone, 10)),
+          new Pump(Zerg.Drone, 18),
+          new Pump(Zerg.Drone, 10)),
   
         new If(
           new EnemyHasShownWraithCloak,
@@ -100,16 +100,16 @@ class ZergSparkle extends GameplanModeTemplate {
   
         new TrainMatchingRatio(Zerg.Scourge, 0, 20,
           Seq(
-            MatchingRatio(Terran.Wraith, 2.0),
-            MatchingRatio(Terran.Battlecruiser, 4.0),
-            MatchingRatio(Protoss.Carrier, 6.0))),
+            Enemy(Terran.Wraith, 2.0),
+            Enemy(Terran.Battlecruiser, 4.0),
+            Enemy(Protoss.Carrier, 6.0))),
   
-        new TrainMatchingRatio(Zerg.Devourer, 0, 20, Seq(MatchingRatio(Protoss.Corsair, 0.25))),
-        new TrainMatchingRatio(Zerg.Scourge, 0, 8, Seq(MatchingRatio(Protoss.Corsair, 2.0))),
+        new TrainMatchingRatio(Zerg.Devourer, 0, 20, Seq(Enemy(Protoss.Corsair, 0.25))),
+        new TrainMatchingRatio(Zerg.Scourge, 0, 8, Seq(Enemy(Protoss.Corsair, 2.0))),
         
         new If(
           new UnitsAtLeast(3, Zerg.Mutalisk),
-          new TrainMatchingRatio(Zerg.Scourge, 0, 20, Seq(MatchingRatio(Zerg.Mutalisk, 2.0)))),
+          new TrainMatchingRatio(Zerg.Scourge, 0, 20, Seq(Enemy(Zerg.Mutalisk, 2.0)))),
   
         new If(
           new And(
@@ -120,7 +120,7 @@ class ZergSparkle extends GameplanModeTemplate {
               new EnemiesAtLeast(6, UnitMatchOr(Terran.Goliath, Terran.MissileTurret, Protoss.PhotonCannon)),
               new EnemiesAtLeast(2, UnitMatchOr(Zerg.SporeColony, Terran.Bunker)))),
           new Parallel(
-            new TrainContinuously(Zerg.Guardian, 4),
+            new Pump(Zerg.Guardian, 4),
             new Build(
               Get(1, Zerg.QueensNest),
               Get(1, Zerg.Hive),
@@ -138,8 +138,8 @@ class ZergSparkle extends GameplanModeTemplate {
         
         new If(
           new Check(() => With.self.gas >= Math.min(100, With.self.minerals)),
-          new TrainContinuously(Zerg.Mutalisk),
-          new TrainContinuously(Zerg.Drone, 25)),
+          new Pump(Zerg.Mutalisk),
+          new Pump(Zerg.Drone, 25)),
         
         new If(
           new And(
@@ -154,12 +154,12 @@ class ZergSparkle extends GameplanModeTemplate {
           new Parallel(
             new If(
               new Check(() => With.units.countOurs(Zerg.SporeColony) > 4 * With.units.countOurs(Zerg.SunkenColony) + 3),
-              new TrainContinuously(Zerg.SunkenColony),
-              new TrainContinuously(Zerg.SporeColony)),
-            new TrainContinuously(Zerg.Zergling, 50, 3),
+              new Pump(Zerg.SunkenColony),
+              new Pump(Zerg.SporeColony)),
+            new Pump(Zerg.Zergling, 50, 3),
             new Build(Get(1, Zerg.EvolutionChamber)),
             new If(
               new UnitsAtLeast(24, Zerg.Drone),
-              new TrainContinuously(Zerg.CreepColony, 2)))
+              new Pump(Zerg.CreepColony, 2)))
         ))))
 }

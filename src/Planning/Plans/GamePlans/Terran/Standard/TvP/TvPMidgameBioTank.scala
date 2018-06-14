@@ -7,7 +7,7 @@ import Planning.Plan
 import Planning.Plans.Compound.{Check, If, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Predicates.Employing
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Predicates.Milestones.UnitsAtLeast
@@ -32,18 +32,18 @@ class TvPMidgameBioTank extends GameplanModeTemplate {
   
   override def buildPlans = Vector(
     new RequireMiningBases(2),
-    new TrainContinuously(Terran.MachineShop),
+    new Pump(Terran.MachineShop),
     
     new If(
       new UnitsAtLeast(50, UnitMatchWarriors),
       new RequireMiningBases(3)),
-    new TrainContinuously(Terran.SiegeTankUnsieged),
+    new Pump(Terran.SiegeTankUnsieged),
     new If(
       new Check(() =>
         With.units.countOurs(Terran.Marine) / 7 >
         With.units.countOurs(Terran.Medic)),
-      new TrainContinuously(Terran.Medic, 8, 2)),
-    new TrainContinuously(Terran.Marine),
+      new Pump(Terran.Medic, 8, 2)),
+    new Pump(Terran.Marine),
     new Build(
       Get(1, Terran.Barracks),
       Get(1, Terran.Factory),

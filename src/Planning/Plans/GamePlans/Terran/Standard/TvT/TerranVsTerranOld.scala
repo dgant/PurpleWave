@@ -73,32 +73,32 @@ class TerranVsTerranOld extends GameplanModeTemplate {
     new If(new UnitsAtLeast(5,  Terran.Vulture),            new Build(Get(Terran.VultureSpeed))),
     new If(new UnitsAtLeast(10, Terran.Marine),             new Build(Get(Terran.MarineRange))),
     new If(new UnitsAtLeast(4,  Terran.Goliath),            new Build(Get(Terran.GoliathAirRange))),
-    new If(new UnitsAtLeast(1,  Terran.PhysicsLab),         new TrainContinuously(Terran.ControlTower)),
+    new If(new UnitsAtLeast(1,  Terran.PhysicsLab),         new Pump(Terran.ControlTower)),
     new If(new UnitsAtLeast(3,  Terran.Battlecruiser),      new UpgradeContinuously(Terran.AirDamage)),
     new If(new UnitsAtLeast(3,  Terran.Battlecruiser),      new UpgradeContinuously(Terran.AirArmor)),
     new If(new UnitsAtLeast(20, UnitMatchWarriors),         new UpgradeContinuously(Terran.MechDamage)),
     new If(new UnitsAtLeast(30, UnitMatchWarriors),         new Build(Get(1, Terran.ScienceFacility), Get(2, Terran.Armory))),
     new If(new UnitsAtLeast(30, UnitMatchWarriors),         new UpgradeContinuously(Terran.MechArmor)),
   
-    new TrainContinuously(Terran.Comsat),
+    new Pump(Terran.Comsat),
     new TrainMatchingRatio(Terran.Goliath, 1, Int.MaxValue, Seq(
-        MatchingRatio(Terran.Battlecruiser, 3.0),
-        MatchingRatio(Terran.Wraith,        0.75),
-        MatchingRatio(Terran.Vulture,       0.5))),
+        Enemy(Terran.Battlecruiser, 3.0),
+        Enemy(Terran.Wraith,        0.75),
+        Enemy(Terran.Vulture,       0.5))),
     
-    new TrainContinuously(Terran.Battlecruiser),
+    new Pump(Terran.Battlecruiser),
     new TrainMatchingRatio(Terran.SiegeTankUnsieged, 3, Int.MaxValue, Seq(
-      MatchingRatio(UnitMatchSiegeTank, 1.25),
-      MatchingRatio(Terran.Goliath,     0.75),
-      MatchingRatio(Terran.Wraith,      0.75),
-      MatchingRatio(Terran.Vulture,     0.5))),
+      Enemy(UnitMatchSiegeTank, 1.25),
+      Enemy(Terran.Goliath,     0.75),
+      Enemy(Terran.Wraith,      0.75),
+      Enemy(Terran.Vulture,     0.5))),
   
     new TrainMatchingRatio(Terran.Wraith, 3, Int.MaxValue, Seq(
-      MatchingRatio(Terran.Wraith,      1.5),
-      MatchingRatio(Terran.Vulture,     0.25))),
+      Enemy(Terran.Wraith,      1.5),
+      Enemy(Terran.Vulture,     0.25))),
     
-    new TrainContinuously(Terran.Marine),
-    new TrainContinuously(Terran.Vulture),
+    new Pump(Terran.Marine),
+    new Pump(Terran.Vulture),
   
     new IfOnMiningBases(2, new Build(Get(1, Terran.Starport),  Get(3, Terran.Factory), Get(2, Terran.Starport), Get(1, Terran.Armory), Get(1, Terran.Academy), Get(5, Terran.Factory))),
     new IfOnMiningBases(3, new Build(Get(5, Terran.Factory),   Get(1, Terran.Academy), Get(8, Terran.Factory))),

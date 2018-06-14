@@ -10,7 +10,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational.{DefendFFEWithProbesAgainst4Pool, DefendFFEWithProbesAgainst9Pool, PlacementForgeFastExpand}
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Predicates.Employing
@@ -71,7 +71,7 @@ class PvZFFE extends GameplanModeTemplate {
   )
   
   override def buildPlans: Seq[Plan] = Vector(
-    new TrainContinuously(Protoss.Zealot),
+    new Pump(Protoss.Zealot),
     new Build(
       Get(1, Protoss.Pylon),
       Get(1, Protoss.Forge),

@@ -6,7 +6,7 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{Do, If, NoPlan, Parallel}
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
@@ -51,22 +51,22 @@ class OneHatchLurker extends GameplanModeTemplate {
       Get(1, Zerg.HydraliskDen)),
     new If(
       new UnitsAtMost(0, Zerg.HydraliskDen),
-      new TrainContinuously(Zerg.Zergling)),
+      new Pump(Zerg.Zergling)),
     new If(
       new UnitsAtMost(4, Zerg.Lurker),
       new Parallel(
         new Build(Get(Zerg.LurkerMorph)),
-        new TrainContinuously(Zerg.Lurker),
-        new TrainContinuously(Zerg.Hydralisk, 4, 2),
+        new Pump(Zerg.Lurker),
+        new Pump(Zerg.Hydralisk, 4, 2),
         new RequireMiningBases(2),
-        new TrainContinuously(Zerg.Zergling),
+        new Pump(Zerg.Zergling),
         new Build(Get(Zerg.ZerglingSpeed))),
       new Parallel(
         new RequireMiningBases(2),
         new Build(Get(1, Zerg.Spire)),
-        new TrainContinuously(Zerg.Mutalisk),
-        new TrainContinuously(Zerg.Drone))),
+        new Pump(Zerg.Mutalisk),
+        new Pump(Zerg.Drone))),
     new BuildGasPumps,
-    new TrainContinuously(Zerg.Hatchery, 5, 1)
+    new Pump(Zerg.Hatchery, 5, 1)
   )
 }

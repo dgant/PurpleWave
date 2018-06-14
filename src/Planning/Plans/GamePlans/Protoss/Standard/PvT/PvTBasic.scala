@@ -9,7 +9,7 @@ import Planning.Plans.Compound.{And, Or, Parallel, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTIdeas.TrainMinimumDragoons
-import Planning.Plans.Macro.Automatic.TrainWorkersContinuously
+import Planning.Plans.Macro.Automatic.PumpWorkers
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
@@ -26,7 +26,7 @@ class PvTBasic extends GameplanModeTemplate {
   override val activationCriteria     = new Employing(PvT13Nexus, PvT21Nexus, PvTDTExpand, PvT2BaseCarrier, PvT2BaseArbiter, PvT3BaseCarrier, PvT3BaseArbiter)
   override val completionCriteria     = new Never
   override val buildOrder             = ProtossBuilds.OpeningDTExpand
-  override val defaultWorkerPlan      = new TrainWorkersContinuously(oversaturate = true)
+  override val defaultWorkerPlan      = new PumpWorkers(oversaturate = true)
   override val priorityAttackPlan     = new PvTIdeas.PriorityAttacks
   
   override def defaultAggressionPlan: Plan =

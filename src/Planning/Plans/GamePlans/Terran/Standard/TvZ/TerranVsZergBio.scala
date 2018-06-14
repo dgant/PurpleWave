@@ -8,7 +8,7 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Terran.Situational.TvZPlacement
 import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Reactive.EnemyMutalisks
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding._
 import Planning.Plans.Macro.Terran.BuildMissileTurretsAtBases
@@ -24,16 +24,16 @@ class TerranVsZergBio extends GameplanModeTemplate {
   override def defaultPlacementPlan: Plan = new TvZPlacement
   
   override def buildPlans: Seq[Plan] = Vector(
-    new TrainContinuously(Terran.Comsat),
-    new TrainContinuously(Terran.ScienceVessel),
+    new Pump(Terran.Comsat),
+    new Pump(Terran.ScienceVessel),
     new If(
       new And(
         new UnitsAtLeast(1, Terran.Academy, complete = true),
         new UnitsAtLeast(3, Terran.Marine, complete = true),
         new Check(() => With.units.countOurs(Terran.Marine) > 6 * With.units.countOurs(Terran.Medic))
       ),
-      new TrainContinuously(Terran.Medic, 12),
-      new TrainContinuously(Terran.Marine)
+      new Pump(Terran.Medic, 12),
+      new Pump(Terran.Marine)
     ),
     new RequireMiningBases(2),
     new Build(
@@ -56,14 +56,14 @@ class TerranVsZergBio extends GameplanModeTemplate {
       Get(2, Terran.EngineeringBay)),
     new UpgradeContinuously(Terran.BioArmor),
     new UpgradeContinuously(Terran.BioDamage),
-    new TrainContinuously(Terran.Comsat),
+    new Pump(Terran.Comsat),
     new Build(
       Get(2, Terran.Starport),
       Get(2, Terran.ControlTower),
       Get(Terran.Irradiate),
       Get(Terran.ScienceVesselEnergy)),
     new RequireMiningBases(3),
-    new TrainContinuously(Terran.Vulture),
+    new Pump(Terran.Vulture),
     new IfOnMiningBases(2, new Build(Get(10, Terran.Barracks))),
     new IfOnMiningBases(3, new Build(Get(15, Terran.Barracks))),
     new IfOnMiningBases(4, new Build(Get(20, Terran.Barracks)))

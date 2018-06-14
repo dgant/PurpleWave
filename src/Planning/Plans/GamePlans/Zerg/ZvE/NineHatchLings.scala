@@ -6,7 +6,7 @@ import Planning.Plan
 import Planning.Plans.Army.{AllIn, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.{CapGasAt, ExtractorTrick, TrainContinuously}
+import Planning.Plans.Macro.Automatic.{CapGasAt, ExtractorTrick, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
 import Planning.Plans.Predicates.Employing
@@ -59,8 +59,8 @@ class NineHatchLings extends GameplanModeTemplate {
         new EnemiesAtLeast(1, Zerg.Mutalisk),
         new EnemiesAtLeast(1, Terran.Vulture))),
     
-    new TrainContinuously(Zerg.Drone, 9),
-    new TrainContinuously(Zerg.Zergling),
+    new Pump(Zerg.Drone, 9),
+    new Pump(Zerg.Zergling),
     new Trigger(
       new UnitsAtLeast(1, Zerg.SpawningPool, complete = true),
       new Parallel(

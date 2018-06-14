@@ -6,7 +6,7 @@ import Planning.Plan
 import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Predicates.Employing
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Predicates.Milestones.UnitsAtLeast
@@ -45,12 +45,12 @@ class TvPFDStrong extends GameplanModeTemplate {
   
   override def buildPlans: Seq[Plan] = Vector(
     // TODO: Gas cut
-    new TrainContinuously(Terran.SiegeTankUnsieged),
-    new TrainContinuously(Terran.Marine),
+    new Pump(Terran.SiegeTankUnsieged),
+    new Pump(Terran.Marine),
     new Build(Get(1, Terran.MachineShop)),
     new If(
       new UnitsAtLeast(2, Terran.Factory, complete = true),
-      new TrainContinuously(Terran.Vulture)),
+      new Pump(Terran.Vulture)),
     new Build(Get(Terran.SpiderMinePlant)),
     new RequireMiningBases(2),
     new BuildGasPumps,

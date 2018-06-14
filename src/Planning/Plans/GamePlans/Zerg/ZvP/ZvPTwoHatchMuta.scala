@@ -11,7 +11,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{ScoutSafelyWithDrone, ScoutSafelyWithOverlord}
 import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas._
-import Planning.Plans.Macro.Automatic.{MatchingRatio, TrainContinuously, TrainMatchingRatio}
+import Planning.Plans.Macro.Automatic.{Enemy, Pump, TrainMatchingRatio}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
@@ -141,11 +141,11 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
   class ReactiveZerglings extends If(
     new UnitsAtMost(0, Zerg.Spire, complete = true),
     new TrainMatchingRatio(Zerg.Zergling, 0, 10, Seq(
-      MatchingRatio(Terran.Marine, 1.5),
-      MatchingRatio(Terran.Firebat, 3.0),
-      MatchingRatio(Terran.Vulture, 2.0),
-      MatchingRatio(Protoss.Zealot, 4.0),
-      MatchingRatio(Zerg.Zergling, 1.75))))
+      Enemy(Terran.Marine, 1.5),
+      Enemy(Terran.Firebat, 3.0),
+      Enemy(Terran.Vulture, 2.0),
+      Enemy(Protoss.Zealot, 4.0),
+      Enemy(Zerg.Zergling, 1.75))))
   
   class NeedExpansion(droneCount: Int) extends Or(
     new UnitsAtLeast(droneCount, Zerg.Drone),
@@ -156,7 +156,7 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
     new MineralsAtLeast(300))
   
   override def emergencyPlans: Seq[Plan] = Vector(
-    new TrainContinuously(Zerg.SunkenColony),
+    new Pump(Zerg.SunkenColony),
     new ReactiveSunkensVsZealots)
   
   override def buildPlans: Seq[Plan] = Vector(
@@ -182,21 +182,21 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
         new Do(() => With.blackboard.gasLimitCeiling = With.self.minerals + 200)),
     new If(
       new EnemyHasShown(Protoss.Corsair),
-      new TrainContinuously(Zerg.Scourge, 2)),
+      new Pump(Zerg.Scourge, 2)),
     new TrainMatchingRatio(Zerg.Scourge, 0, 10,
       Seq(
-        MatchingRatio(UnitMatchOr(Terran.Valkyrie, Terran.Wraith, Protoss.Corsair, Protoss.Stargate, Zerg.Mutalisk), 2.0),
-        MatchingRatio(UnitMatchOr(Zerg.Scourge), 1.0))),
+        Enemy(UnitMatchOr(Terran.Valkyrie, Terran.Wraith, Protoss.Corsair, Protoss.Stargate, Zerg.Mutalisk), 2.0),
+        Enemy(UnitMatchOr(Zerg.Scourge), 1.0))),
     new If(
       new And(
         new MiningBasesAtLeast(3),
         new UnitsAtLeast(6, Zerg.Mutalisk),
         new UpgradeComplete(Zerg.ZerglingSpeed, 1, Zerg.Zergling.buildFrames)),
       new TrainMatchingRatio(Zerg.Zergling, 0, 18, Seq(
-        MatchingRatio(Terran.Marine, 1.5),
-        MatchingRatio(Terran.Goliath, 4.0),
-        MatchingRatio(Protoss.Dragoon, 3.0),
-        MatchingRatio(Zerg.Hydralisk, 3.0)))),
+        Enemy(Terran.Marine, 1.5),
+        Enemy(Terran.Goliath, 4.0),
+        Enemy(Protoss.Dragoon, 3.0),
+        Enemy(Zerg.Hydralisk, 3.0)))),
   
     new If(
       new UnitsAtLeast(1, Zerg.Hive),
@@ -252,7 +252,7 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
           new If(
             new UnitsAtLeast(6, Zerg.Mutalisk),
             new UpgradeContinuously(Zerg.AirDamage))),
-        new TrainContinuously(Zerg.Mutalisk))),
+        new Pump(Zerg.Mutalisk))),
     
     new If(
       new ShouldDoSpeedlingAllIn,
@@ -261,8 +261,8 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
     new ReactiveZerglings,
     new If(
       new ProceedWithDrones,
-      new TrainContinuously(Zerg.Drone, 12),
-      new TrainContinuously(Zerg.Drone, 9)),
+      new Pump(Zerg.Drone, 12),
+      new Pump(Zerg.Drone, 9)),
     new If(
       new ProceedWithTech,
       new Build(
@@ -309,16 +309,16 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
       new RequireBases(7)),
     new If(
       new ProceedWithDrones,
-      new TrainContinuously(Zerg.Drone, 16)),
-    new TrainContinuously(Zerg.Zergling, 4),
+      new Pump(Zerg.Drone, 16)),
+    new Pump(Zerg.Zergling, 4),
     new If(
       new ProceedWithDrones,
-      new TrainContinuously(Zerg.Drone, 24)),
-    new IfOnMiningBases(3, new TrainContinuously(Zerg.Drone, 24)),
-    new IfOnMiningBases(4, new TrainContinuously(Zerg.Drone, 32)),
-    new IfOnMiningBases(5, new TrainContinuously(Zerg.Drone, 40)),
-    new IfOnMiningBases(6, new TrainContinuously(Zerg.Drone, 48)),
+      new Pump(Zerg.Drone, 24)),
+    new IfOnMiningBases(3, new Pump(Zerg.Drone, 24)),
+    new IfOnMiningBases(4, new Pump(Zerg.Drone, 32)),
+    new IfOnMiningBases(5, new Pump(Zerg.Drone, 40)),
+    new IfOnMiningBases(6, new Pump(Zerg.Drone, 48)),
         
-    new TrainContinuously(Zerg.Zergling)
+    new Pump(Zerg.Zergling)
   )
 }

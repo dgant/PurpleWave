@@ -9,15 +9,20 @@ class TrainMatchingRatio(
   minimum       : Int,
   maximum       : Int,
   ratios        : Seq[MatchingRatio])
-  extends TrainContinuously(unitClass) {
+  extends Pump(unitClass) {
   
-  description.set("Train " + unitClass + " based on enemies")
+  description.set("Train " + unitClass + " based onratios")
   
   override def maxDesirable: Int = {
     Math.max(minimum, Math.min(maximum, Math.ceil(ratios.map(_.quantity).sum).toInt))
   }
 }
 
-case class MatchingRatio (enemyMatcher: UnitMatcher,  ratio: Double) {
+trait MatchingRatio { def quantity: Double }
+
+case class Enemy(enemyMatcher: UnitMatcher, ratio: Double = 1.0) extends MatchingRatio {
   def quantity: Double = With.units.countEnemy(enemyMatcher) * ratio
+}
+case class Friendly(enemyMatcher: UnitMatcher, ratio: Double = 1.0) extends MatchingRatio {
+  def quantity: Double = With.units.countOurs(enemyMatcher) * ratio
 }

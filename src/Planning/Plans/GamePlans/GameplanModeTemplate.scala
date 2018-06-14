@@ -7,7 +7,7 @@ import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, NoPlan, Not}
 import Planning.Plans.GamePlans.Protoss.Situational.DefendAgainstProxy
 import Planning.Plans.Predicates.Matchup.WeAreZerg
-import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainWorkersContinuously}
+import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, PumpWorkers}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{BuildOrder, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.RemoveMineralBlocksAt
@@ -32,7 +32,7 @@ abstract class GameplanModeTemplate extends GameplanMode {
   def defaultArchonPlan     : Plan              = new MeldArchons(meldArchonsAt)
   def defaultBuildOrder     : Plan              = new BuildOrder(buildOrder: _*)
   def defaultSupplyPlan     : Plan              = new RequireSufficientSupply
-  def defaultWorkerPlan     : Plan              = new If(new Not(new WeAreZerg), new TrainWorkersContinuously(superSaturate))
+  def defaultWorkerPlan     : Plan              = new If(new Not(new WeAreZerg), new PumpWorkers(superSaturate))
   def defaultScoutPlan      : Plan              = new ScoutAt(scoutAt)
   def defaultScoutExposPlan : Plan              = new ScoutExpansionsAt(scoutExpansionsAt)
   def priorityDefensePlan   : Plan              = NoPlan()

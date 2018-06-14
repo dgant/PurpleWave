@@ -7,7 +7,7 @@ import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.Macro.Automatic.TrainWorkersContinuously
+import Planning.Plans.Macro.Automatic.PumpWorkers
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Predicates.Milestones._
@@ -21,7 +21,7 @@ class PvP1GateReaverExpand extends GameplanModeTemplate {
   override val activationCriteria: Plan = new Employing(PvPOpen1GateReaverExpand)
   override val completionCriteria: Plan = new Latch(new And(new UnitsAtLeast(2, Protoss.Nexus), new UnitsAtLeast(1, Protoss.RoboticsSupportBay)))
   
-  override def defaultWorkerPlan: Plan = new TrainWorkersContinuously(true)
+  override def defaultWorkerPlan: Plan = new PumpWorkers(true)
   override val defaultAttackPlan: Plan = new PvPIdeas.AttackSafely
   
   override def emergencyPlans: Seq[Plan] = Vector(

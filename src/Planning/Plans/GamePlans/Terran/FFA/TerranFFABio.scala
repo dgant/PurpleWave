@@ -7,7 +7,7 @@ import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBasesFFA}
 import Planning.Plans.Predicates.Milestones.{EnemyHasShownCloakedThreat, UnitsAtLeast}
@@ -50,7 +50,7 @@ class TerranFFABio extends GameplanModeTemplate {
   override def emergencyPlans: Seq[Plan] = Vector(
     new If(
       new UnitsAtLeast(1, Terran.Academy, complete = true),
-      new TrainContinuously(Terran.Comsat, 2)),
+      new Pump(Terran.Comsat, 2)),
     new If(
       new EnemyHasShownCloakedThreat,
       new Build(
@@ -61,7 +61,7 @@ class TerranFFABio extends GameplanModeTemplate {
         Get(4, Terran.MissileTurret))),
     new If(
       new UnitsAtLeast(1, Terran.Ghost),
-      new TrainContinuously(Terran.NuclearSilo))
+      new Pump(Terran.NuclearSilo))
   )
   
   override def buildPlans: Seq[Plan] = Vector(
@@ -69,27 +69,27 @@ class TerranFFABio extends GameplanModeTemplate {
     new If(new UnitsAtLeast(12, UnitMatchWarriors),     new RequireMiningBasesFFA(2)),
     new If(new UnitsAtLeast(60, UnitMatchWarriors),     new RequireMiningBasesFFA(3)),
     new If(new UnitsAtLeast(90, UnitMatchWarriors),     new RequireMiningBasesFFA(4)),
-    new If(new UnitsAtLeast(50, UnitMatchWarriors),     new TrainContinuously(Terran.Dropship, 2)),
-    new TrainContinuously(Terran.CovertOps, 1),
-    new TrainContinuously(Terran.Comsat, 2),
-    new TrainContinuously(Terran.MachineShop),
+    new If(new UnitsAtLeast(50, UnitMatchWarriors),     new Pump(Terran.Dropship, 2)),
+    new Pump(Terran.CovertOps, 1),
+    new Pump(Terran.Comsat, 2),
+    new Pump(Terran.MachineShop),
     new If(new UnitsAtLeast(1, Terran.NuclearMissile),  new Build(Get(Terran.GhostCloak))),
     new If(new UnitsAtLeast(1, Terran.NuclearMissile),  new Build(Get(Terran.GhostVisionRange))),
     new If(new UnitsAtLeast(3, Terran.Ghost),           new Build(Get(Terran.Lockdown))),
     new If(new UnitsAtLeast(8, Terran.Ghost),           new Build(Get(Terran.GhostEnergy))),
     new If(new UnitsAtLeast(3, UnitMatchSiegeTank),     new UpgradeMech),
-    new TrainContinuously(Terran.NuclearMissile),
-    new TrainContinuously(Terran.NuclearSilo),
-    new TrainContinuously(Terran.ScienceVessel, 2),
-    new TrainContinuously(Terran.SiegeTankUnsieged, 30),
-    new TrainContinuously(Terran.Ghost, 5, 2),
+    new Pump(Terran.NuclearMissile),
+    new Pump(Terran.NuclearSilo),
+    new Pump(Terran.ScienceVessel, 2),
+    new Pump(Terran.SiegeTankUnsieged, 30),
+    new Pump(Terran.Ghost, 5, 2),
     new If(
       new Check(() =>
         With.units.countOurs(Terran.Marine).toDouble /
         (1 + With.units.countOurs(Terran.Medic))
         >= 4.0),
-      new TrainContinuously(Terran.Medic, 20, 2)),
-    new TrainContinuously(Terran.Marine),
+      new Pump(Terran.Medic, 20, 2)),
+    new Pump(Terran.Marine),
     new Build(
       Get(1, Terran.Refinery),
       Get(1, Terran.Academy),

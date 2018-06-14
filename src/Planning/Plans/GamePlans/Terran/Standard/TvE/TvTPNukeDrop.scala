@@ -7,7 +7,7 @@ import Planning.Plans.Army.NukeBase
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Predicates.{Employing, SafeAtHome}
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Predicates.Milestones._
@@ -38,16 +38,16 @@ class TvTPNukeDrop extends GameplanModeTemplate {
   override def defaultWorkerPlan: Plan = NoPlan()
   
   override def buildPlans: Seq[Plan] = Vector(
-    new TrainContinuously(Terran.NuclearSilo),
-    new TrainContinuously(Terran.NuclearMissile),
-    new TrainContinuously(Terran.SCV),
-    new TrainContinuously(Terran.Ghost, 2, 1),
-    new TrainContinuously(Terran.Dropship, 2, 1),
+    new Pump(Terran.NuclearSilo),
+    new Pump(Terran.NuclearMissile),
+    new Pump(Terran.SCV),
+    new Pump(Terran.Ghost, 2, 1),
+    new Pump(Terran.Dropship, 2, 1),
     new If(
       new Or(
         new EnemiesAtLeast(1, Terran.Wraith),
         new EnemiesAtLeast(1, Protoss.Scout)),
-      new TrainContinuously(Terran.Wraith),
+      new Pump(Terran.Wraith),
       new Build(
         Get(Terran.WraithCloak),
         Get(2, Terran.Starport))
@@ -57,9 +57,9 @@ class TvTPNukeDrop extends GameplanModeTemplate {
         new SafeAtHome,
         new UnitsAtLeast(20, UnitMatchWarriors)),
     new Parallel(
-      new IfOnMiningBases(2, new TrainContinuously(Terran.ScienceVessel, 2, 1)),
-      new TrainContinuously(Terran.SiegeTankUnsieged),
-      new TrainContinuously(Terran.Marine)),
+      new IfOnMiningBases(2, new Pump(Terran.ScienceVessel, 2, 1)),
+      new Pump(Terran.SiegeTankUnsieged),
+      new Pump(Terran.Marine)),
     new FlipIf(
       new And(
         new UnitsAtLeast(8, UnitMatchWarriors),

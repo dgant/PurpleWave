@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.Aggression
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
@@ -29,8 +29,8 @@ object ZvPIdeas {
       new Do(() => { With.blackboard.gasLimitFloor = 0; With.blackboard.gasLimitCeiling = 0 })),
     new FlipIf(
       new SafeAtHome,
-      new TrainContinuously(Zerg.Zergling),
-      new TrainContinuously(Zerg.Drone, 9)),
+      new Pump(Zerg.Zergling),
+      new Pump(Zerg.Drone, 9)),
     new Build(
       Get(1, Zerg.Extractor),
       Get(Zerg.ZerglingSpeed)),

@@ -98,10 +98,10 @@ class ProxyHatch extends Parallel {
     new Employ(ProxyHatchZerglings,
       new Parallel(
         new AddSupplyWhenSupplyBlocked,
-        new TrainContinuously(Zerg.Zergling),
+        new Pump(Zerg.Zergling),
         new Trigger(
           new WeKnowWhereToProxy,
-          new TrainContinuously(Zerg.Hatchery, 5, 1)))),
+          new Pump(Zerg.Hatchery, 5, 1)))),
   
     new Employ(ProxyHatchHydras,
       new Parallel(
@@ -114,35 +114,35 @@ class ProxyHatch extends Parallel {
         new RequireSufficientSupply,
         new If(
           new UnitsAtLeast(1, Zerg.HydraliskDen, complete = false),
-          new TrainContinuously(Zerg.Hydralisk),
-          new TrainContinuously(Zerg.Zergling)),
+          new Pump(Zerg.Hydralisk),
+          new Pump(Zerg.Zergling)),
         new UpgradeContinuously(Zerg.HydraliskSpeed),
         new UpgradeContinuously(Zerg.HydraliskRange))),
   
     new Employ(ProxyHatchSunkens,
       new Parallel(
-        new TrainContinuously(Zerg.SunkenColony),
+        new Pump(Zerg.SunkenColony),
         new Trigger(
           new UnitsAtLeast(2, Zerg.Hatchery, complete = true),
           initialAfter = new Trigger(
             new WeHaveEnoughSunkens,
             initialBefore = new Parallel(
-              new TrainContinuously(Zerg.CreepColony, 2),
-              new TrainContinuously(Zerg.Zergling)),
+              new Pump(Zerg.CreepColony, 2),
+              new Pump(Zerg.Zergling)),
             initialAfter = new Parallel(
               new RequireSufficientSupply,
-              new TrainContinuously(Zerg.Mutalisk),
+              new Pump(Zerg.Mutalisk),
               new Build(Get(24, Zerg.Drone)),
               new BuildGasPumps,
-              new TrainContinuously(Zerg.Zergling),
+              new Pump(Zerg.Zergling),
               new Build(
                 Get(1, Zerg.Lair),
                 Get(Zerg.ZerglingSpeed),
                 Get(1, Zerg.Spire)),
               new If(
                 new UnitsAtMost(6, Zerg.SunkenColony),
-                new TrainContinuously(Zerg.CreepColony, 1)),
-              new TrainContinuously(Zerg.Hatchery, 8)
+                new Pump(Zerg.CreepColony, 1)),
+              new Pump(Zerg.Hatchery, 8)
             ))))),
       
     new If(new Not(new WeKnowWhereToProxy), new ScoutAt(8, 2)),

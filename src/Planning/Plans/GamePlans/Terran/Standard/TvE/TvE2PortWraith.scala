@@ -6,7 +6,7 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
@@ -40,22 +40,22 @@ class TvE2PortWraith extends GameplanModeTemplate {
     Get(1, Terran.Factory))
   
   override def emergencyPlans: Seq[Plan] = Seq(
-    new TrainContinuously(Terran.Comsat),
+    new Pump(Terran.Comsat),
     new If(
       new EnemyHasShownCloakedThreat,
       new Parallel(
         new Build(
           Get(1, Terran.Academy),
           Get(1, Terran.EngineeringBay)),
-        new TrainContinuously(Terran.MissileTurret, 2)
+        new Pump(Terran.MissileTurret, 2)
     )))
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(
       new GasAtMost(300),
       new BuildGasPumps),
-    new TrainContinuously(Terran.Comsat),
-    new TrainContinuously(Terran.ControlTower, 1),
+    new Pump(Terran.Comsat),
+    new Pump(Terran.ControlTower, 1),
     new If(
       new UnitsAtLeast(6, UnitMatchOr(UnitMatchSiegeTank, Terran.Wraith)),
       new RequireMiningBases(2)),
@@ -65,16 +65,16 @@ class TvE2PortWraith extends GameplanModeTemplate {
     new If(
       new UnitsAtLeast(1, Terran.ControlTower),
       new Build(Get(Terran.WraithCloak))),
-    new TrainContinuously(Terran.Wraith),
+    new Pump(Terran.Wraith),
     new If(
       new UnitsAtLeast(4, Terran.Vulture),
       new Parallel(
-        new TrainContinuously(Terran.MachineShop, 1),
+        new Pump(Terran.MachineShop, 1),
         new Build(Get(Terran.SpiderMinePlant)),
         new UpgradeContinuously(Terran.VultureSpeed))),
-    new TrainContinuously(Terran.Marine, 4),
+    new Pump(Terran.Marine, 4),
     new Build(Get(2, Terran.Starport)),
-    new TrainContinuously(Terran.Vulture),
+    new Pump(Terran.Vulture),
     new Build(
       Get(1, Terran.Academy),
       Get(3, Terran.Factory)),

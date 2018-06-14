@@ -8,7 +8,7 @@ import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
@@ -59,15 +59,15 @@ class MassBio extends GameplanModeTemplate {
       new Or(
         new EnemyHasShownCloakedThreat,
         new TechComplete(Terran.Stim, Terran.Stim.researchFrames)),
-      new TrainContinuously(Terran.Comsat)),
+      new Pump(Terran.Comsat)),
     new If(
       new EnemiesAtLeast(2, Zerg.Lurker),
-      new TrainContinuously(Terran.MissileTurret, 2)))
+      new Pump(Terran.MissileTurret, 2)))
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(
       new EnemyIsZerg,
-      new TrainContinuously(Terran.ScienceVessel, 12)),
+      new Pump(Terran.ScienceVessel, 12)),
     new If(
       new UnitsAtLeast(2, Terran.ScienceVessel),
       new Build(Get(Terran.Irradiate))),
@@ -124,22 +124,22 @@ class MassBio extends GameplanModeTemplate {
       new UnitsAtLeast(65, UnitMatchWarriors),
       new RequireMiningBases(5)),
   
-    new TrainContinuously(Terran.SiegeTankUnsieged),
+    new Pump(Terran.SiegeTankUnsieged),
     new If(
       new UnitsAtMost(0, Terran.Academy, complete = true),
-      new TrainContinuously(Terran.Marine),
+      new Pump(Terran.Marine),
       new Parallel(
         new If(
           new Check(() =>
             With.units.countOurs(Terran.Marine, Terran.Firebat) >
             8 * With.units.countOurs(Terran.Medic)),
-          new TrainContinuously(Terran.Medic, maximumConcurrentlyRatio = 0.67)),
+          new Pump(Terran.Medic, maximumConcurrentlyRatio = 0.67)),
         new If(
           new Or(
             new EnemiesAtLeast(3, Protoss.Zealot),
             new EnemiesAtLeast(1, Zerg.Zergling)),
-          new TrainContinuously(Terran.Firebat, maximumConcurrentlyRatio = 0.34, maximumTotal = 2)),
-        new TrainContinuously(Terran.Marine)
+          new Pump(Terran.Firebat, maximumConcurrentlyRatio = 0.34, maximumTotal = 2)),
+        new Pump(Terran.Marine)
         )),
   
     new IfOnMiningBases(2,
@@ -175,6 +175,6 @@ class MassBio extends GameplanModeTemplate {
         new Or(
           new Check(() => With.units.countOurs(Terran.Barracks) < 5 * With.geography.ourBases.size),
           new MineralsAtLeast(600)),
-        new TrainContinuously(Terran.Barracks, 30, 3)))
+        new Pump(Terran.Barracks, 30, 3)))
   )
 }

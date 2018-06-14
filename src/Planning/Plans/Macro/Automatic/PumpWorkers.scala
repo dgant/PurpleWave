@@ -2,12 +2,12 @@ package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
 
-class TrainWorkersContinuously(oversaturate: Boolean = false) extends TrainContinuously(With.self.workerClass) {
+class PumpWorkers(oversaturate: Boolean = false) extends Pump(With.self.workerClass) {
   
   protected def builderCount: Int = {
     if (With.self.isTerran)
       4
-    if (With.self.isProtoss)
+    else if (With.self.isProtoss)
       2
     else
       3

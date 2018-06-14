@@ -7,7 +7,7 @@ import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plans.Army.AttackWithWorkers
 import Planning.Plans.Compound.{And, _}
-import Planning.Plans.Macro.Automatic.{Gather, TrainContinuously}
+import Planning.Plans.Macro.Automatic.{Gather, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Predicates.Milestones.{EnemiesAtLeast, EnemyUnitsAtMost, UnitsAtLeast}
 import Planning.Plans.StandardGamePlan
@@ -23,7 +23,7 @@ class WorkerRush extends Trigger {
       new Check(() => With.self.supplyUsed == With.self.supplyTotal),
       new Build(GetAnother(1, With.self.supplyClass))
     ),
-    new TrainContinuously(With.self.workerClass),
+    new Pump(With.self.workerClass),
     new FollowBuildOrder,
     new Trigger(
       new UnitsAtLeast(5, UnitMatchWorkers, complete = true),

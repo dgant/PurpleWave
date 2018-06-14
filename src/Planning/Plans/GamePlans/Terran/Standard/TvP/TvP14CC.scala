@@ -7,7 +7,7 @@ import Planning.Plans.Compound.{NoPlan, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
 import Planning.Plans.Predicates.Employing
-import Planning.Plans.Macro.Automatic.{TrainContinuously, TrainWorkersContinuously}
+import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Predicates.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Terran
@@ -39,9 +39,9 @@ class TvP14CC extends GameplanModeTemplate {
   
   override def buildPlans: Seq[Plan] = Vector(
     new Build(Get(1, Terran.Barracks)),
-    new TrainContinuously(Terran.SiegeTankUnsieged),
-    new TrainContinuously(Terran.Marine),
-    new TrainWorkersContinuously,
+    new Pump(Terran.SiegeTankUnsieged),
+    new Pump(Terran.Marine),
+    new PumpWorkers,
     new Build(
       Get(1, Terran.Bunker),
       Get(2, Terran.SupplyDepot),

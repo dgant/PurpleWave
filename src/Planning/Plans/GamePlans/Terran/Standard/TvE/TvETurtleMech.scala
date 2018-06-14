@@ -8,7 +8,7 @@ import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -133,9 +133,9 @@ class TvETurtleMech extends GameplanModeTemplate {
         new If(
           new UnitsAtLeast(2, Terran.Factory),
           new Build(Get(1, Terran.Starport))),
-        new TrainContinuously(Terran.ScienceFacility, 1),
-        new TrainContinuously(Terran.ControlTower, 2),
-        new TrainContinuously(Terran.ScienceVessel, 2)
+        new Pump(Terran.ScienceFacility, 1),
+        new Pump(Terran.ControlTower, 2),
+        new Pump(Terran.ScienceVessel, 2)
       )),
     new If(
       new Check(() => {
@@ -158,23 +158,23 @@ class TvETurtleMech extends GameplanModeTemplate {
       new Parallel(
         new Build(Get(1, Terran.Armory)),
         new BuildGasPumps,
-        new If (new EnemyFlyers, new TrainContinuously(Terran.Valkyrie, 4)),
-        new TrainContinuously(Terran.Goliath),
+        new If (new EnemyFlyers, new Pump(Terran.Valkyrie, 4)),
+        new Pump(Terran.Goliath),
         new If (new EnemyFlyers, new UpgradeContinuously(Terran.GoliathAirRange)),
-        new If (new EnemyFlyers, new TrainContinuously(Terran.Marine)))),
+        new If (new EnemyFlyers, new Pump(Terran.Marine)))),
     new If(
       new Or(
         new MineralsAtMost(400),
         new GasAtLeast(200)),
       new Parallel(
-        new TrainContinuously(Terran.Wraith, 2),
-        new TrainContinuously(Terran.SiegeTankUnsieged))),
+        new Pump(Terran.Wraith, 2),
+        new Pump(Terran.SiegeTankUnsieged))),
     new If(
       new And(
         new EnemyIsZerg,
         new UnitsAtLeast(1, Terran.Armory, complete = true)),
-      new TrainContinuously(Terran.Goliath),
-      new TrainContinuously(Terran.Vulture))
+      new Pump(Terran.Goliath),
+      new Pump(Terran.Vulture))
   )
   
   private class BuildProduction extends Parallel(
@@ -203,7 +203,7 @@ class TvETurtleMech extends GameplanModeTemplate {
       new Check(() =>
         With.units.countOurs(Terran.Marine)
         < 4 * With.units.countOurs(Terran.Bunker)),
-      new TrainContinuously(Terran.Marine)),
+      new Pump(Terran.Marine)),
     
     new BuildOrder(
       Get(1, Terran.Factory),

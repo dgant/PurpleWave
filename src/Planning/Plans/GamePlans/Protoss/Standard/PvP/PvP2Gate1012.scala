@@ -9,7 +9,7 @@ import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -52,7 +52,7 @@ class PvP2Gate1012 extends GameplanModeTemplate {
   override val buildOrder = ProtossBuilds.OpeningTwoGate1012Expand
   override def buildPlans = Vector(
     new RequireMiningBases(2),
-    new TrainContinuously(Protoss.Observer, 1),
+    new Pump(Protoss.Observer, 1),
     new FlipIf(
       new Or(
         new SafeAtHome,
@@ -61,15 +61,15 @@ class PvP2Gate1012 extends GameplanModeTemplate {
         new EnemyHasShown(Protoss.CyberneticsCore)),
       new If(
         new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
-        new TrainContinuously(Protoss.Dragoon),
+        new Pump(Protoss.Dragoon),
         new If(
           new And(
             new SafeAtHome,
             new Not(new EnemyStrategy(With.fingerprints.twoGate))),
-          new TrainContinuously(Protoss.Zealot, 5),
+          new Pump(Protoss.Zealot, 5),
           new Parallel(
             new Build(Get(1, Protoss.ShieldBattery)),
-            new TrainContinuously(Protoss.Zealot, 7)))),
+            new Pump(Protoss.Zealot, 7)))),
       new Build(
         Get(1, Protoss.Assimilator),
         Get(1, Protoss.CyberneticsCore))),

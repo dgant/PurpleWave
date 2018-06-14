@@ -10,7 +10,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational.BuildHuggingNexus
-import Planning.Plans.Macro.Automatic.{TrainContinuously, TrainWorkersContinuously}
+import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers}
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
@@ -76,9 +76,9 @@ class PvZ4Gate extends GameplanModeTemplate {
           new UnitsAtLeast(15, Protoss.Zealot),
           new Check(() => With.units.countOurs(Protoss.Zealot) > With.units.countOurs(Protoss.Dragoon)),
           new Check(() => With.units.countEnemy(Zerg.Mutalisk) * 1.5 > With.units.countOurs(Protoss.Dragoon)))),
-      new TrainContinuously(Protoss.Dragoon),
-      new TrainContinuously(Protoss.Zealot)),
-    new TrainWorkersContinuously,
+      new Pump(Protoss.Dragoon),
+      new Pump(Protoss.Zealot)),
+    new PumpWorkers,
     
     new Build(
       Get(1, Protoss.CyberneticsCore), // Of course, the Assimilator SHOULD go first but then we mine too much gas from it

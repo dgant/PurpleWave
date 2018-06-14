@@ -9,7 +9,7 @@ import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Predicates.Employing
-import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
+import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, Pump, PumpWorkers}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Predicates.Economy.{GasAtLeast, SupplyBlocked}
@@ -75,10 +75,10 @@ class Proxy8Fact extends GameplanModeTemplate {
         new If(
           new SupplyBlocked,
           new RequireSufficientSupply),
-        new TrainContinuously(Terran.Wraith),
-        new TrainContinuously(Terran.Vulture),
-        new TrainContinuously(Terran.Marine),
-        new TrainWorkersContinuously,
+        new Pump(Terran.Wraith),
+        new Pump(Terran.Vulture),
+        new Pump(Terran.Marine),
+        new PumpWorkers,
         new Build(
           Get(1, Terran.Starport),
           Get(3, Terran.Barracks))))

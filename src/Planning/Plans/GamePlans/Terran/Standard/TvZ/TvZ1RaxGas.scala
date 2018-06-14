@@ -8,7 +8,7 @@ import Planning.Plans.Compound.{And, FlipIf}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Terran.Situational.TvZPlacement
 import Planning.Plans.Predicates.{Employing, SafeAtHome}
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
@@ -38,8 +38,8 @@ class TvZ1RaxGas extends GameplanModeTemplate {
     Get(1,   Terran.Factory))
   
   override def buildPlans: Seq[Plan] = Vector(
-    new TrainContinuously(Terran.Vulture),
-    new TrainContinuously(Terran.Marine),
+    new Pump(Terran.Vulture),
+    new Pump(Terran.Marine),
     new FlipIf(
       new And(
         new SafeAtHome,

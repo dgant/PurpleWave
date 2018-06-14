@@ -66,12 +66,12 @@ class ZvPNinePool extends GameplanModeTemplate {
   private class TrainJustEnoughZerglings extends TrainMatchingRatio(
     Zerg.Zergling, 2, 12,
     Seq(
-      MatchingRatio(Terran.Marine, 1.5),
-      MatchingRatio(Terran.Medic, 3.0),
-      MatchingRatio(Terran.Firebat, 3.0),
-      MatchingRatio(Protoss.Zealot, 4.5),
-      MatchingRatio(Protoss.Dragoon, 3.0),
-      MatchingRatio(Zerg.Zergling, 1.5)))
+      Enemy(Terran.Marine, 1.5),
+      Enemy(Terran.Medic, 3.0),
+      Enemy(Terran.Firebat, 3.0),
+      Enemy(Protoss.Zealot, 4.5),
+      Enemy(Protoss.Dragoon, 3.0),
+      Enemy(Zerg.Zergling, 1.5)))
   
   private class TakeSecondGasForMuta extends If(
     new And(
@@ -104,16 +104,16 @@ class ZvPNinePool extends GameplanModeTemplate {
         // Post-transition: 3 Hatch Hydra
         new If(new UnitsAtLeast(1, Zerg.HydraliskDen, complete = true), new Parallel(
           new CapGasAt(200),
-          new TrainContinuously(Zerg.Drone, 12),
+          new Pump(Zerg.Drone, 12),
           new Build(Get(1, Zerg.SpawningPool), Get(1, Zerg.Extractor), Get(1, Zerg.HydraliskDen)),
           new UpgradeContinuously(Zerg.HydraliskSpeed),
-          new TrainMatchingRatio(Zerg.Hydralisk, 0, 4, Seq(MatchingRatio(Protoss.Zealot, 1.0))),
+          new TrainMatchingRatio(Zerg.Hydralisk, 0, 4, Seq(Enemy(Protoss.Zealot, 1.0))),
           new If(
             new UpgradeComplete(Zerg.HydraliskSpeed),
             new UpgradeContinuously(Zerg.HydraliskRange)),
-          new TrainContinuously(Zerg.Drone, 22),
+          new Pump(Zerg.Drone, 22),
           new If(new UnitsAtLeast(18, Zerg.Drone), new BuildGasPumps(2)),
-          new TrainContinuously(Zerg.Hydralisk),
+          new Pump(Zerg.Hydralisk),
           new If(
             new MineralsAtLeast(400),
             new Build(GetAnother(1, Zerg.Hatchery)))
@@ -126,8 +126,8 @@ class ZvPNinePool extends GameplanModeTemplate {
           new BuildOrder(Get(6, Zerg.Mutalisk)),
           new If(
             new UnitsAtLeast(6, Zerg.Mutalisk, complete = true),
-            new TrainContinuously(Zerg.Drone, 21)),
-          new TrainContinuously(Zerg.Drone, 16),
+            new Pump(Zerg.Drone, 21)),
+          new Pump(Zerg.Drone, 16),
           new Build(Get(1, Zerg.SpawningPool), Get(1, Zerg.Extractor)),
           new Build(Get(1, Zerg.Lair)),
           new Build(Get(1, Zerg.Spire), Get(2, Zerg.Extractor)),
@@ -142,23 +142,23 @@ class ZvPNinePool extends GameplanModeTemplate {
               Zerg.Scourge,
               Zerg.Spire)),
             new TrainMatchingRatio(Zerg.Scourge, 2, 12, Seq(
-              MatchingRatio(Terran.Wraith, 2.0),
-              MatchingRatio(Terran.Valkyrie, 2.0),
-              MatchingRatio(Protoss.Corsair, 2.0),
-              MatchingRatio(Protoss.Scout, 3.0),
-              MatchingRatio(Zerg.Mutalisk, 2.0),
-              MatchingRatio(Zerg.Scourge, 1.0)))),
+              Enemy(Terran.Wraith, 2.0),
+              Enemy(Terran.Valkyrie, 2.0),
+              Enemy(Protoss.Corsair, 2.0),
+              Enemy(Protoss.Scout, 3.0),
+              Enemy(Zerg.Mutalisk, 2.0),
+              Enemy(Zerg.Scourge, 1.0)))),
           new If(
             new Check(() => With.self.gas > Math.min(100, With.self.minerals)),
-            new TrainContinuously(Zerg.Mutalisk)),
-          new TrainContinuously(Zerg.Zergling),
+            new Pump(Zerg.Mutalisk)),
+          new Pump(Zerg.Zergling),
           new RequireMiningBases(3)
         )),
   
       // Pre-transition: 2-Hatch Speedlings
       new If(new UnitsAtMost(0, UnitMatchOr(Zerg.HydraliskDen, Zerg.Spire), complete = true), new Parallel(
         new RequireMiningBases(2),
-        new TrainContinuously(Zerg.Drone, 11),
+        new Pump(Zerg.Drone, 11),
 
         new If(
           new NeedTechTransition,
@@ -168,18 +168,18 @@ class ZvPNinePool extends GameplanModeTemplate {
             // Transition to 2-Hatch Muta
             new Parallel(
               new CapGasAtRatioToMinerals(1.0, 100),
-              new TrainContinuously(Zerg.Drone, 11),
+              new Pump(Zerg.Drone, 11),
               new RequireBases(2),
               new If(
                 new UnitsAtLeast(1, Zerg.Spire),
                 new Parallel(
-                  new TrainContinuously(Zerg.Drone, 18),
+                  new Pump(Zerg.Drone, 18),
                   new BuildOrder(Get(6, Zerg.Mutalisk)))), // Won't actually happen but ensures we save the larvae
               new BuildGasPumps(1),
               new TakeSecondGasForMuta,
               new TakeThirdGasForMuta,
               new TrainJustEnoughZerglings,
-              new TrainContinuously(Zerg.Drone, 25),
+              new Pump(Zerg.Drone, 25),
               new If(
                 new UnitsAtLeast(1, Zerg.Extractor, complete = true),
                 new Parallel(
@@ -188,7 +188,7 @@ class ZvPNinePool extends GameplanModeTemplate {
                     Get(Zerg.ZerglingSpeed),
                     Get(1, Zerg.Spire)))),
               new RequireBases(3),
-              new TrainContinuously(Zerg.Zergling),
+              new Pump(Zerg.Zergling),
               new Trigger(
                 new And(
                   new MineralsAtLeast(800),
@@ -202,13 +202,13 @@ class ZvPNinePool extends GameplanModeTemplate {
                 new UnitsExactly(0, Zerg.HydraliskDen),
                 new CapGasAt(50),
                 new CapGasAt(175)),
-              new TrainContinuously(Zerg.Drone, 13),
+              new Pump(Zerg.Drone, 13),
               new RequireBases(3),
               new Build(
                 Get(1, Zerg.Extractor),
                 Get(1, Zerg.HydraliskDen)),
               new TrainJustEnoughZerglings,
-              new TrainContinuously(Zerg.Drone))),
+              new Pump(Zerg.Drone))),
 
           // Transition to 3-Hatch Muta
           new Parallel(
@@ -221,12 +221,12 @@ class ZvPNinePool extends GameplanModeTemplate {
                 new CapGasAtRatioToMinerals(1.0, 100))),
             new If(
               new UpgradeComplete(Zerg.ZerglingSpeed),
-              new TrainContinuously(Zerg.Drone, 16)),
-            new TrainContinuously(Zerg.Drone, 11),
+              new Pump(Zerg.Drone, 16)),
+            new Pump(Zerg.Drone, 11),
             new BuildOrder(
               Get(12, Zerg.Zergling),
               Get(13, Zerg.Drone)),
-            new TrainContinuously(Zerg.Zergling),
+            new Pump(Zerg.Zergling),
             new RequireBases(3),
             new If(
               new Or(new MiningBasesAtLeast(3), new MineralsAtLeast(350)),

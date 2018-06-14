@@ -8,7 +8,7 @@ import Planning.Plans.Compound.{Or, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.PlaceGatewaysProxied
 import Planning.Plans.Predicates.Employing
-import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
+import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, Pump, PumpWorkers}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Predicates.Economy.GasAtLeast
@@ -63,16 +63,16 @@ class Proxy2Gate extends GameplanModeTemplate {
     new BuildOrder(
       Get(1, Protoss.Gateway),
       Get(2, Protoss.Zealot)),
-    new TrainContinuously(Protoss.Observer, 2),
+    new Pump(Protoss.Observer, 2),
     new If(
       new And(
         new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeFrames(1)),
         new GasAtLeast(50)),
-      new TrainContinuously(Protoss.Dragoon),
+      new Pump(Protoss.Dragoon),
       new If(
         new Not(new MustSwitchToDragoons),
-        new TrainContinuously(Protoss.Zealot, 8))),
-    new TrainWorkersContinuously,
+        new Pump(Protoss.Zealot, 8))),
+    new PumpWorkers,
     new Trigger(
       new Or(
         new UnitsAtLeast(15, Protoss.Probe),

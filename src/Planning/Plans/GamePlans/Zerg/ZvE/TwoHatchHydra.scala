@@ -7,7 +7,7 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.{TrainContinuously, TrainWorkersContinuously}
+import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
@@ -47,12 +47,12 @@ class TwoHatchHydra extends GameplanModeTemplate {
           new Do(() => With.blackboard.gasLimitCeiling = 225)))),
     new If(
       new Check(() => With.units.countOurs(UnitMatchWarriors) < 8 * With.geography.ourBases.size),
-      new TrainWorkersContinuously),
-    new TrainContinuously(Zerg.Lurker, 8, 2),
+      new PumpWorkers),
+    new Pump(Zerg.Lurker, 8, 2),
     new If(
       new UnitsAtMost(0, Zerg.HydraliskDen, complete = true),
-      new TrainContinuously(Zerg.Zergling),
-      new TrainContinuously(Zerg.Hydralisk)),
+      new Pump(Zerg.Zergling),
+      new Pump(Zerg.Hydralisk)),
     new Build(
       Get(1, Zerg.Extractor),
       Get(1, Zerg.HydraliskDen)),

@@ -9,7 +9,7 @@ import Planning.Composition.UnitCountEverything
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Predicates.Employing
@@ -59,7 +59,7 @@ class Zerg5PoolProxySunkens extends GameplanModeTemplate {
   
   override def buildPlans: Seq[Plan] = Vector(
     new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
-    new TrainContinuously(Zerg.SunkenColony),
+    new Pump(Zerg.SunkenColony),
     new If(
       new UnitsAtLeast(4, Zerg.Drone)),
       new Trigger(
@@ -72,6 +72,6 @@ class Zerg5PoolProxySunkens extends GameplanModeTemplate {
           new Parallel(
             new Scout(1),
             new Scout(1)))),
-    new TrainContinuously(Zerg.Zergling)
+    new Pump(Zerg.Zergling)
   )
 }

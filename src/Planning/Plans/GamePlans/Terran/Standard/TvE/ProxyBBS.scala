@@ -10,7 +10,7 @@ import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Predicates.Employing
@@ -54,7 +54,7 @@ class ProxyBBS extends GameplanModeTemplate {
         new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = false, placement = Some(PlacementProfiles.proxyBuilding)),
         new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = false, placement = Some(PlacementProfiles.proxyBuilding)))
     },
-    new TrainContinuously(Terran.Marine),
+    new Pump(Terran.Marine),
     new Build(Get(10, Terran.SCV)),
     new If(
       new And(
@@ -69,7 +69,7 @@ class ProxyBBS extends GameplanModeTemplate {
             new Blueprint(this, building = Some(Terran.Bunker), preferZone = With.geography.enemyBases.headOption.map(_.zone), respectHarvesting = false)
           )
         },
-        new TrainContinuously(Terran.Bunker, 3, 1)
+        new Pump(Terran.Bunker, 3, 1)
       ))
   )
 }

@@ -5,7 +5,7 @@ import Planning.Plan
 import Planning.Plans.Compound.{And, If}
 import Planning.Plans.GamePlans.GameplanModeTemplateVsRandom
 import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Predicates.Economy.GasAtLeast
 import Planning.Plans.Predicates.Employing
@@ -36,8 +36,8 @@ class PvRTinfoil extends GameplanModeTemplateVsRandom {
         new GasAtLeast(50),
         new UnitsAtLeast(1, Protoss.CyberneticsCore),
         new UnitsAtLeast(1, Protoss.Assimilator)),
-      new TrainContinuously(Protoss.Dragoon),
-      new TrainContinuously(Protoss.Zealot, 4)),
+      new Pump(Protoss.Dragoon),
+      new Pump(Protoss.Zealot, 4)),
     new Build(
       Get(1, Protoss.Gateway),
       Get(1, Protoss.Assimilator),

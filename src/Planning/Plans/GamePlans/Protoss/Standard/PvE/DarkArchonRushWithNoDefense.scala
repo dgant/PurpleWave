@@ -22,7 +22,7 @@ class DarkArchonRushWithNoDefense extends Parallel {
     new Build(ProtossBuilds.Opening13Nexus_NoZealot_OneGateCore: _*),
     new RequireMiningBases(2),
     new RequireSufficientSupply,
-    new TrainWorkersContinuously,
+    new PumpWorkers,
     new Build(
       Get(1, Protoss.Gateway),
       Get(2, Protoss.Assimilator),
@@ -35,7 +35,7 @@ class DarkArchonRushWithNoDefense extends Parallel {
       Get(Protoss.MindControl)),
     new If(
       new UnitsAtMost(12, Protoss.DarkArchon),
-      new TrainContinuously(Protoss.DarkTemplar),
+      new Pump(Protoss.DarkTemplar),
       new Parallel(
         new Build(
           Get(3, Protoss.RoboticsFacility),
@@ -44,7 +44,7 @@ class DarkArchonRushWithNoDefense extends Parallel {
           Get(1, Protoss.RoboticsSupportBay),
           Get(1, Protoss.Dragoon),
           Get(Protoss.ScarabDamage)),
-        new TrainContinuously(Protoss.Reaver))),
+        new Pump(Protoss.Reaver))),
     new RequireMiningBases(3),
     new Build(Get(10, Protoss.Gateway)),
     new BuildGasPumps,

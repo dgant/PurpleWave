@@ -5,7 +5,7 @@ import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Predicates.Always
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases, RequireMiningBasesFFA}
 import Planning.Plans.Predicates.Milestones.UnitsAtLeast
@@ -38,10 +38,10 @@ class ProtossHuntersFFAFFECarriers extends GameplanModeTemplate {
     new If(new UnitsAtLeast(1, Protoss.HighTemplar),  new Build(Get(Protoss.PsionicStorm))),
     new If(new UnitsAtLeast(4, Protoss.Zealot),       new Build(Get(Protoss.ZealotSpeed))),
     new RequireMiningBases(2),
-    new TrainContinuously(Protoss.Arbiter,        2, 1),
-    new TrainContinuously(Protoss.Observer,       2, 1),
-    new TrainContinuously(Protoss.Reaver,         4, 1),
-    new TrainContinuously(Protoss.Carrier),
+    new Pump(Protoss.Arbiter,        2, 1),
+    new Pump(Protoss.Observer,       2, 1),
+    new Pump(Protoss.Reaver,         4, 1),
+    new Pump(Protoss.Carrier),
     new Build(
       Get(3, Protoss.PhotonCannon),
       Get(1, Protoss.Assimilator),
@@ -66,8 +66,8 @@ class ProtossHuntersFFAFFECarriers extends GameplanModeTemplate {
       Get(1, Protoss.RoboticsFacility),
       Get(1, Protoss.Observatory)),
     new RequireMiningBasesFFA(4),
-    new TrainContinuously(Protoss.HighTemplar),
-    new TrainContinuously(Protoss.Zealot),
+    new Pump(Protoss.HighTemplar),
+    new Pump(Protoss.Zealot),
     new UpgradeContinuously(Protoss.GroundDamage),
     new UpgradeContinuously(Protoss.GroundArmor),
     new Build(

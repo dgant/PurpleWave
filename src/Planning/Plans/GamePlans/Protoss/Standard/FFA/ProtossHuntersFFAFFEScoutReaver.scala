@@ -8,7 +8,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
 import Planning.Plans.Predicates.Always
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases, RequireMiningBasesFFA}
 import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
@@ -54,16 +54,16 @@ class ProtossHuntersFFAFFEScoutReaver extends GameplanModeTemplate {
     new If(new UnitsAtLeast(8, Protoss.Scout),        new Build(Get(Protoss.ScoutVisionRange))),
     new BuildCannonsAtExpansions(4),
     new RequireMiningBases(2),
-    new TrainContinuously(Protoss.HighTemplar,  6,  1),
+    new Pump(Protoss.HighTemplar,  6,  1),
     new FlipIf(
       new UnitsAtLeast(4, Protoss.Reaver),
-      new TrainContinuously(Protoss.Reaver,     8),
+      new Pump(Protoss.Reaver,     8),
       new Parallel(
-        new TrainContinuously(Protoss.Shuttle, 1),
-        new TrainContinuously(Protoss.Scout))),
-    new TrainContinuously(Protoss.DarkTemplar,  2,  1),
-    new TrainContinuously(Protoss.Dragoon,      8,  4),
-    new TrainContinuously(Protoss.Zealot),
+        new Pump(Protoss.Shuttle, 1),
+        new Pump(Protoss.Scout))),
+    new Pump(Protoss.DarkTemplar,  2,  1),
+    new Pump(Protoss.Dragoon,      8,  4),
+    new Pump(Protoss.Zealot),
     new Build(
       Get(3, Protoss.PhotonCannon),
       Get(1, Protoss.Assimilator),

@@ -26,9 +26,9 @@ class TerranVsZergMech extends  GameplanModeTemplate {
   override def defaultPlacementPlan: Plan = new TvZPlacement
   
   override def buildPlans: Seq[Plan] = Vector(
-    new TrainContinuously(Terran.Comsat),
+    new Pump(Terran.Comsat),
     new BuildGasPumps,
-    new TrainContinuously(Terran.Marine),
+    new Pump(Terran.Marine),
     new Build(Get(1, Terran.Bunker)),
     new IfOnMiningBases(2,
       new Build(
@@ -36,7 +36,7 @@ class TerranVsZergMech extends  GameplanModeTemplate {
         Get(1, Terran.Refinery),
         Get(1, Terran.Factory),
         Get(1, Terran.MachineShop))),
-    new If(new EnemyMutalisks, new Parallel(new BuildMissileTurretsAtBases(3), new TrainContinuously(Terran.Armory, 1), new TrainContinuously(Terran.Starport, 1), new TrainContinuously(Terran.ControlTower, 1))),
+    new If(new EnemyMutalisks, new Parallel(new BuildMissileTurretsAtBases(3), new Pump(Terran.Armory, 1), new Pump(Terran.Starport, 1), new Pump(Terran.ControlTower, 1))),
     new If(new EnemyLurkers, new Build(Get(1, Terran.EngineeringBay), Get(1, Terran.MissileTurret), Get(1, Terran.Academy))),
       
     new If(new UnitsAtLeast(2,  Terran.SiegeTankUnsieged),  new Build(Get(Terran.SiegeMode))),
@@ -54,27 +54,27 @@ class TerranVsZergMech extends  GameplanModeTemplate {
     new If(new UnitsAtLeast(30, UnitMatchWarriors),         new RequireMiningBases(4)),
   
     new TrainMatchingRatio(Terran.Valkyrie, 0, 4, Seq(
-      MatchingRatio(Zerg.Mutalisk,  0.25),
-      MatchingRatio(Zerg.Guardian,  0.25))),
+      Enemy(Zerg.Mutalisk,  0.25),
+      Enemy(Zerg.Guardian,  0.25))),
     
     new If(
       new Employing(TvZMidgameWraiths),
       new If(
         new UnitsAtLeast(2, Terran.ScienceVessel),
-        new TrainContinuously(Terran.ScienceVessel, 2),
-        new TrainContinuously(Terran.Wraith)),
-      new TrainContinuously(Terran.ScienceVessel, 4)),
+        new Pump(Terran.ScienceVessel, 2),
+        new Pump(Terran.Wraith)),
+      new Pump(Terran.ScienceVessel, 4)),
   
     new TrainMatchingRatio(Terran.Goliath, 1, Int.MaxValue, Seq(
-      MatchingRatio(Zerg.Mutalisk,  1.0),
-      MatchingRatio(Zerg.Guardian,  2.0))),
+      Enemy(Zerg.Mutalisk,  1.0),
+      Enemy(Zerg.Guardian,  2.0))),
   
     new TrainMatchingRatio(Terran.SiegeTankUnsieged, 3, Int.MaxValue, Seq(
-      MatchingRatio(Zerg.Ultralisk,        2.0),
-      MatchingRatio(Zerg.Hydralisk,        0.4),
-      MatchingRatio(Zerg.Lurker,           0.6))),
+      Enemy(Zerg.Ultralisk,        2.0),
+      Enemy(Zerg.Hydralisk,        0.4),
+      Enemy(Zerg.Lurker,           0.6))),
     
-    new TrainContinuously(Terran.Vulture),
+    new Pump(Terran.Vulture),
   
     new If(
       new Employing(TvZMidgameWraiths),
@@ -120,7 +120,7 @@ class TerranVsZergMech extends  GameplanModeTemplate {
     new Build(Get(16, Terran.Factory)),
     
     new RequireMiningBases(3),
-    new TrainContinuously(Terran.Vulture),
+    new Pump(Terran.Vulture),
     new Build(Get(16, Terran.Barracks))
   )
 }

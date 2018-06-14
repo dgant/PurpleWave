@@ -16,8 +16,8 @@ class RequireBases(basesInitial: Int = 1) extends Plan {
   }
   
   override def onUpdate() {
-    val basesAll    = With.geography.ourBases.size
-    val goal        = basesDesired.get + basesAll - basesNow
+    val basesAll  = With.geography.ourBases.size
+    val goal      = basesDesired.get + basesAll - basesNow
     
     if (goal > 0) {
       With.scheduler.request(this, Get(goal, With.self.townHallClass))

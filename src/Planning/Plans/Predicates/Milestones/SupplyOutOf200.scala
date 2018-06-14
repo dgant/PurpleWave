@@ -1,10 +1,10 @@
 package Planning.Plans.Predicates.Milestones
 
-import Planning.Composition.Property
-import Planning.Plan
 import Lifecycle.With
+import Planning.Composition.Property
+import Planning.Predicate
 
-class SupplyOutOf200(defaultQuantity: Int = 0) extends Plan {
+class SupplyOutOf200(defaultQuantity: Int = 0) extends Predicate {
   
   description.set("Require a minimum supply count")
   

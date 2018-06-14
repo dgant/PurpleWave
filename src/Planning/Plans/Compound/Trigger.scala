@@ -1,10 +1,11 @@
 package Planning.Plans.Compound
 
-import Planning.Composition.{Latch, Property}
-import Planning.Plan
+import Planning.Composition.Property
+import Planning.Plans.Predicates.Never
+import Planning.{Plan, Predicate}
 
 class Trigger(
-  initialPredicate : Plan = NoPlan(),
+  initialPredicate : Predicate = new Never,
   initialAfter     : Plan = NoPlan(),
   initialBefore    : Plan = NoPlan())
     extends Plan {

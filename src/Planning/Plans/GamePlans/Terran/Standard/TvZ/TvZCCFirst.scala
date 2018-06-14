@@ -1,8 +1,8 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Macro.BuildRequests.Get
-import Planning.Composition.Latch
 import Planning.Plan
+import Planning.Plans.Compound.Latch
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Terran.Situational.TvZPlacement
 import Planning.Plans.Predicates.Employing

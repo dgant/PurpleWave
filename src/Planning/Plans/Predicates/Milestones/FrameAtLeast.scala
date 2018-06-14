@@ -1,9 +1,9 @@
 package Planning.Plans.Predicates.Milestones
 
 import Lifecycle.With
-import Planning.Plan
+import Planning.Predicate
 
-class FrameAtLeast(frame: Int) extends Plan {
+class FrameAtLeast(frame: Int) extends Predicate {
   
   override def isComplete: Boolean = With.frame >= frame
   

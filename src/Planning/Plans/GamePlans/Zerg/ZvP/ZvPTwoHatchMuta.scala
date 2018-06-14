@@ -3,11 +3,10 @@ package Planning.Plans.GamePlans.Zerg.ZvP
 import Lifecycle.With
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
 import Macro.BuildRequests.Get
-import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack, EjectScout}
-import Planning.Plans.Compound._
+import Planning.Plans.Compound.{Latch, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{ScoutSafelyWithDrone, ScoutSafelyWithOverlord}
 import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas._
@@ -161,10 +160,10 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
   override def buildPlans: Seq[Plan] = Vector(
     new EjectScout,
     new If(
-      new IfOnMiningBases(5),
+      new MiningBasesAtLeast(5),
       new Aggression(1.3),
       new If(
-        new IfOnMiningBases(4),
+        new MiningBasesAtLeast(4),
         new Aggression(1.15),
         new If(
           new UnitsAtLeast(1, Zerg.Mutalisk, complete = true),

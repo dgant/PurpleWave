@@ -67,9 +67,8 @@ class ZergSparkle extends GameplanModeTemplate {
   )
   
   override def defaultScoutPlan = new If(
-    new If(
-      new Not(new FoundEnemyBase),
-      new Scout(15) { scouts.get.unitMatcher.set(Zerg.Overlord) }))
+    new Not(new FoundEnemyBase),
+    new Scout(15) { scouts.get.unitMatcher.set(Zerg.Overlord) })
   
   override def defaultSupplyPlan: Plan = NoPlan()
   override def buildPlans: Seq[Plan] = Vector(

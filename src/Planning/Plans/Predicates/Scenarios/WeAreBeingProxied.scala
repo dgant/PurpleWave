@@ -1,10 +1,10 @@
 package Planning.Plans.Predicates.Scenarios
 
 import Lifecycle.With
-import Planning.Plan
+import Planning.Predicate
 import Utilities.ByOption
 
-class WeAreBeingProxied extends Plan {
+class WeAreBeingProxied extends Predicate {
   
   override def isComplete: Boolean = {
     With.units.enemy.exists(unit => {

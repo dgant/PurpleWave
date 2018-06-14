@@ -1,17 +1,15 @@
 package Planning.Plans.Compound
 
 import Planning.Composition.Property
-import Planning.Plan
+import Planning.{Plan, Predicate}
 
-class Not(initialChild: Plan = NoPlan()) extends Plan {
+class Not(initialChild: Predicate) extends Predicate {
   
   description.set("Not")
   
   val child = new Property[Plan](initialChild)
   
   override def isComplete: Boolean = ! child.get.isComplete
-  
-  override def onUpdate() { delegate(child.get) }
   
   override def toString: String = super.toString + ": " + child.get
 }

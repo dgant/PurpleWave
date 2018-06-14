@@ -2,10 +2,10 @@ package Planning.Plans.Predicates.Reactive
 
 import Lifecycle.With
 import Planning.Composition.UnitMatchers.UnitMatchSiegeTank
-import Planning.Plan
+import Planning.Predicate
 import ProxyBwapi.Races.Terran
 
-class EnemyBio extends Plan {
+class EnemyBio extends Predicate {
   
   description.set("Is the enemy threatening Terran Bio?")
   

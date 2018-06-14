@@ -1,9 +1,9 @@
 package Planning.Plans.Predicates.Milestones
 
 import Lifecycle.With
-import Planning.Plan
+import Planning.Predicate
 
-class BasesAtLeast(requiredBases: Int) extends Plan {
+class BasesAtLeast(requiredBases: Int) extends Predicate {
   
   override def isComplete: Boolean = With.geography.ourBases.size >= requiredBases
   

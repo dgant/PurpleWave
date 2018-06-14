@@ -1,10 +1,10 @@
 package Planning.Plans.Predicates.Reactive
 
 import Lifecycle.With
-import Planning.Plan
+import Planning.Predicate
 import ProxyBwapi.Races.Zerg
 
-class EnemyMutalisks extends Plan {
+class EnemyMutalisks extends Predicate {
   
   description.set("Is the enemy threatening Mutalisks?")
   

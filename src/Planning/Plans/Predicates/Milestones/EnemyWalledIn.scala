@@ -1,9 +1,9 @@
 package Planning.Plans.Predicates.Milestones
 
 import Lifecycle.With
-import Planning.Plan
+import Planning.Predicate
 
-class EnemyWalledIn extends Plan {
+class EnemyWalledIn extends Predicate {
   
   override def isComplete: Boolean = With.geography.enemyZones.exists(_.walledIn)
   

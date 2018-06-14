@@ -1,10 +1,10 @@
 package Planning.Plans.Predicates.Milestones
 
 import Lifecycle.With
-import Planning.Plan
+import Planning.Predicate
 import ProxyBwapi.Upgrades.Upgrade
 
-class UpgradeComplete(upgrade: Upgrade, level: Int = 1, withinFrames: Int = 0) extends Plan {
+class UpgradeComplete(upgrade: Upgrade, level: Int = 1, withinFrames: Int = 0) extends Predicate {
   
   description.set("Require an upgrade")
   

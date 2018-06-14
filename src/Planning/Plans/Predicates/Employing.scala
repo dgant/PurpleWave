@@ -1,9 +1,9 @@
 package Planning.Plans.Predicates
 
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Strategery.Strategies.Strategy
 
-class Employing(strategies: Strategy*) extends Plan {
+class Employing(strategies: Strategy*) extends Predicate {
   
   override def toString: String = "Employing " + strategies.mkString("/")
   

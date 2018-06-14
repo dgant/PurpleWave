@@ -1,7 +1,7 @@
 package Planning.Plans.Compound
 
-import Planning.Plan
+import Planning.{Plan, Predicate}
 
 object NoPlan {
-  def apply(): Plan = new Plan { description.set("[Empty]") }
+  def apply(): Plan = new Predicate { description.set("[Empty]") }
 }

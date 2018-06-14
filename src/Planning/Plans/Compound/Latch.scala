@@ -1,11 +1,12 @@
-package Planning.Composition
+package Planning.Plans.Compound
 
 import Lifecycle.With
-import Planning.Plan
-import Planning.Plans.Compound.NoPlan
+import Planning.Composition.Property
+import Planning.Plans.Predicates.Never
+import Planning.{Plan, Predicate}
 import Utilities.Forever
 
-class Latch(initialPredicate: Plan = NoPlan(), duration: Int = Forever()) extends Plan {
+class Latch(initialPredicate: Predicate = new Never, duration: Int = Forever()) extends Predicate {
   
   val predicate = new Property[Plan](initialPredicate)
   
@@ -16,12 +17,6 @@ class Latch(initialPredicate: Plan = NoPlan(), duration: Int = Forever()) extend
       lastCompletedFrame = With.frame
     }
     lastCompletedFrame > 0 && With.framesSince(lastCompletedFrame) < duration
-  }
-  
-  override def onUpdate(): Unit = {
-    if ( ! isComplete) {
-      predicate.get.update()
-    }
   }
   
   override def getChildren: Iterable[Plan] = {

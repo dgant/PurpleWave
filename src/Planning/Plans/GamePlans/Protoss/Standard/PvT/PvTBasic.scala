@@ -1,11 +1,10 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Macro.BuildRequests.Get
-import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.Aggression
-import Planning.Plans.Compound.{And, Or, Parallel, _}
+import Planning.Plans.Compound.{And, Latch, Or, Parallel, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTIdeas.TrainMinimumDragoons
@@ -196,7 +195,7 @@ class PvTBasic extends GameplanModeTemplate {
           new EmployingCarriers,
           new Parallel(
             new If(
-              new IfOnMiningBases(3),
+              new MiningBasesAtLeast(3),
               new Build(Get(4, Protoss.Gateway))),
             new Build(
               Get(1, Protoss.Stargate),
@@ -205,7 +204,7 @@ class PvTBasic extends GameplanModeTemplate {
               new UnitsAtLeast(1, Protoss.FleetBeacon),
               new If(
                 new And(
-                  new IfOnMiningBases(3),
+                  new MiningBasesAtLeast(3),
                   new EnemyBasesAtLeast(2),
                   new Or(
                     new Employing(PvT13Nexus),
@@ -232,14 +231,14 @@ class PvTBasic extends GameplanModeTemplate {
     new If(
       new And(
         new EmployingArbiters,
-        new OnGasPumps(3)),
+        new HaveGasPumps(3)),
       new Build(
         Get(2, Protoss.Stargate),
         Get(2, Protoss.Forge))),
     new If(
       new And(
         new EmployingCarriers,
-        new OnGasPumps(3)),
+        new HaveGasPumps(3)),
       new Parallel(
         new Build(
           Get(2, Protoss.CyberneticsCore),

@@ -1,10 +1,9 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Macro.BuildRequests.Get
-import Planning.Composition.Latch
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Plans.Army.{ConsiderAttacking, DefendEntrance}
-import Planning.Plans.Compound.{If, Or}
+import Planning.Plans.Compound.{If, Latch, Or}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}

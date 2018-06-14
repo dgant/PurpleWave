@@ -2,11 +2,10 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.Aggression
-import Planning.Plans.Compound._
+import Planning.Plans.Compound.{Latch, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational.BuildHuggingNexus

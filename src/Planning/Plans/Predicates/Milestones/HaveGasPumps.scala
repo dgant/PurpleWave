@@ -1,9 +1,9 @@
 package Planning.Plans.Predicates.Milestones
 
 import Lifecycle.With
-import Planning.Plan
+import Planning.Predicate
 
-class HaveGasPumps(requiredPumps: Int) extends Plan {
+class HaveGasPumps(requiredPumps: Int) extends Predicate {
   
   description.set("We have " + requiredPumps + "+ gas pumps.")
   

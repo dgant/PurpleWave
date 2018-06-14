@@ -2,10 +2,10 @@ package Planning.Plans.Predicates
 
 import Lifecycle.With
 import Planning.Composition.UnitMatchers.UnitMatcher
-import Planning.{Plan, Yolo}
+import Planning.{Predicate, Yolo}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
-class SafeToMoveOut extends Plan {
+class SafeToMoveOut extends Predicate {
   override def isComplete: Boolean = {
     if (Yolo.active) return true
     

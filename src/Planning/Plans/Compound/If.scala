@@ -1,10 +1,11 @@
 package Planning.Plans.Compound
 
 import Planning.Composition.Property
-import Planning.Plan
+import Planning.Plans.Predicates.Never
+import Planning.{Plan, Predicate}
 
 class If(
-  initialPredicate : Plan = NoPlan(),
+  initialPredicate : Predicate = new Never,
   initialWhenTrue  : Plan = NoPlan(),
   initialWhenFalse : Plan = NoPlan())
     extends Plan {

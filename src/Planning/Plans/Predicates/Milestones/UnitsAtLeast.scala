@@ -1,8 +1,8 @@
 package Planning.Plans.Predicates.Milestones
 
-import Planning.Plan
 import Lifecycle.With
 import Planning.Composition.UnitMatchers._
+import Planning.Predicate
 import ProxyBwapi.Races.Zerg
 
 class UnitsAtLeast(
@@ -11,7 +11,7 @@ class UnitsAtLeast(
   complete  : Boolean     = false,
   countEggs : Boolean     = false) // TMP: Resolve after AIST1
   
-  extends Plan {
+  extends Predicate {
   
   description.set("Have at least " + quantity + " " + matcher)
   

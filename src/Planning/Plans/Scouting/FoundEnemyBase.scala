@@ -1,9 +1,9 @@
 package Planning.Plans.Scouting
 
 import Lifecycle.With
-import Planning.Plan
+import Planning.Predicate
 
-class FoundEnemyBase extends Plan {
+class FoundEnemyBase extends Predicate {
   
   description.set("Do we know where an enemy base is?")
   

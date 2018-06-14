@@ -3,11 +3,10 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.UnitMatchOr
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
-import Planning.Plans.Compound.{If, _}
+import Planning.Plans.Compound.{If, Latch, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.{ExtractorTrick, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}

@@ -6,8 +6,9 @@ import Mathematics.Shapes.Circle
 import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitMatchers.UnitMatchOr
-import Planning.Composition.{Latch, UnitCountEverything}
+import Planning.Composition.UnitCountEverything
 import Planning.Plan
+import Planning.Plans.Compound.Latch
 import Planning.Plans.Predicates.Milestones.EnemiesAtLeast
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo

@@ -1,7 +1,7 @@
 package Planning.Plans.Predicates
 
-import Planning.Plan
+import Planning.Predicate
 
-class Always extends Plan {
+class Always extends Predicate {
   override def isComplete: Boolean = true
 }

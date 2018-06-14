@@ -1,11 +1,10 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Macro.BuildRequests.Get
-import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.DefendZones
-import Planning.Plans.Compound._
+import Planning.Plans.Compound.{Latch, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.{PumpWorkers, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
@@ -83,7 +82,7 @@ class PvPLateGame extends GameplanModeTemplate {
       new BuildGasPumps),
   
     new If(
-      new IfOnMiningBases(3),
+      new MiningBasesAtLeast(3),
       new Upgrades),
     
     new FlipIf(

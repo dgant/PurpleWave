@@ -1,10 +1,10 @@
 package Planning.Plans.Predicates.Reactive
 
 import Lifecycle.With
-import Planning.Plan
+import Planning.Predicate
 import ProxyBwapi.Races.Protoss
 
-class EnemyCarriers extends Plan {
+class EnemyCarriers extends Predicate {
   
   description.set("Is the enemy threatening Carriers?")
   

@@ -1,10 +1,11 @@
 package Planning.Plans.Compound
 
 import Planning.Composition.Property
-import Planning.Plan
+import Planning.Plans.Predicates.Never
+import Planning.{Plan, Predicate}
 
 class FlipIf(
-  initialPredicate  : Plan = NoPlan(),
+  initialPredicate  : Predicate = new Never,
   inititialFirst    : Plan = NoPlan(),
   initialSecond     : Plan = NoPlan())
     extends Plan {

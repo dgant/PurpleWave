@@ -1,9 +1,9 @@
 package Planning.Plans.Predicates.Economy
 
 import Lifecycle.With
-import Planning.Plan
+import Planning.Predicate
 
-class SupplyBlocked extends Plan {
+class SupplyBlocked extends Predicate {
   
   override def isComplete: Boolean = With.self.supplyUsed >= With.self.supplyTotal
   

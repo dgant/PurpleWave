@@ -1,10 +1,12 @@
 package Planning.Plans.Compound
 
-import Planning.Plan
+import Planning.Predicate
 
-class Or(initialChildren: Plan*) extends Parallel(initialChildren: _*) {
+class Or(initialChildren: Predicate*) extends Predicate{
+  
+  final override val getChildren: Iterable[Predicate] = initialChildren
   
   override def isComplete: Boolean = getChildren.exists(_.isComplete)
   
-  override def toString: String = "(" + children.get.map(_.toString).mkString(" OR ") + ")"
+  override def toString: String = "(" + getChildren.map(_.toString).mkString(" OR ") + ")"
 }

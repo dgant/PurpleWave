@@ -1,9 +1,9 @@
 package Planning.Plans.Predicates.Economy
 
 import Lifecycle.With
-import Planning.Plan
+import Planning.Predicate
 
-class GasAtLeast(value: Int) extends Plan {
+class GasAtLeast(value: Int) extends Predicate {
   
   override def isComplete: Boolean = With.self.gas >= value
   

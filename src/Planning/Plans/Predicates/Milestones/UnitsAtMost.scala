@@ -2,14 +2,14 @@ package Planning.Plans.Predicates.Milestones
 
 import Lifecycle.With
 import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchAnything, UnitMatchComplete, UnitMatcher}
-import Planning.Plan
+import Planning.Predicate
 
 class UnitsAtMost(
   quantity:   Int,
   matcher:    UnitMatcher = UnitMatchAnything,
   complete:   Boolean     = false)
   
-  extends Plan {
+  extends Predicate {
   
   description.set("Have at most " + quantity + " " + matcher)
   

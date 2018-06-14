@@ -38,7 +38,7 @@ object PvTIdeas {
       new Employing(PvT1015Expand),
       new Employing(PvTEarly1015GateGoonDT),
       new Employing(PvTEarly1GateStargateTemplar),
-      new IfOnMiningBases(3),
+      new MiningBasesAtLeast(3),
       new EnemyBio,
       new Not(new EnemyHasShown(Terran.Vulture)),
       new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true),

@@ -1,8 +1,12 @@
 package Planning.Plans.Compound
 
-import Planning.Plan
+import Planning.Predicate
 
-class And(initialChildren: Plan*) extends Serial(initialChildren: _*) {
+class And(initialChildren: Predicate*) extends Predicate {
   
-  override def toString: String = "(" + children.get.map(_.toString).mkString(" AND ") + ")"
+  final override val getChildren: Iterable[Predicate] = initialChildren
+  
+  override def isComplete: Boolean = getChildren.forall(_.isComplete)
+  
+  override def toString: String = "(" + getChildren.map(_.toString).mkString(" AND ") + ")"
 }

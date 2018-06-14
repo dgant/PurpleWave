@@ -2,9 +2,8 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Composition.Latch
 import Planning.Plan
-import Planning.Plans.Compound._
+import Planning.Plans.Compound.{Latch, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.PumpWorkers

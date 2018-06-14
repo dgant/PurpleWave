@@ -35,16 +35,15 @@ class ZvPNinePool extends GameplanModeTemplate {
     new CampExpansions)
   
   override def defaultAggressionPlan: Plan = new If(
+    new UnitsAtLeast(40, Zerg.Hydralisk),
+    new Aggression(4.0),
     new If(
-      new UnitsAtLeast(40, Zerg.Hydralisk),
-      new Aggression(4.0),
+      new UnitsAtLeast(30, Zerg.Hydralisk),
+      new Aggression(2.2),
       new If(
-        new UnitsAtLeast(30, Zerg.Hydralisk),
-        new Aggression(2.2),
-        new If(
-          new UnitsAtLeast(15, Zerg.Hydralisk),
-          new Aggression(1.5),
-          new Aggression(1.15)))))
+        new UnitsAtLeast(15, Zerg.Hydralisk),
+        new Aggression(1.5),
+        new Aggression(1.15))))
   
   override def defaultAttackPlan: Plan = new Attack
   

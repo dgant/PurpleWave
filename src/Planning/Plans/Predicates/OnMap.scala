@@ -1,9 +1,9 @@
 package Planning.Plans.Predicates
 
-import Planning.Plan
+import Planning.Predicate
 import Strategery.StarCraftMap
 
-class OnMap(map: StarCraftMap) extends Plan {
+class OnMap(map: StarCraftMap) extends Predicate {
   
   override def isComplete: Boolean = map.matches
   

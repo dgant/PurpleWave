@@ -1,10 +1,10 @@
 package Planning.Plans.Predicates.Milestones
 
 import Lifecycle.With
-import Planning.Plan
+import Planning.Predicate
 import ProxyBwapi.Techs.Tech
 
-class TechComplete(tech: Tech, withinFrames: Int = 0) extends Plan {
+class TechComplete(tech: Tech, withinFrames: Int = 0) extends Predicate {
   
   description.set("Require a tech")
   

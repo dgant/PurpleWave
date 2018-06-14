@@ -1,10 +1,10 @@
 package Planning.Plans.Predicates.Reactive
 
 import Lifecycle.With
-import Planning.Plan
+import Planning.Predicate
 import ProxyBwapi.Races.Protoss
 
-class EnemyDarkTemplarPossible extends Plan {
+class EnemyDarkTemplarPossible extends Predicate {
   
   override def isComplete: Boolean = {
     With.units.enemy.exists(_.isAny(

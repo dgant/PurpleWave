@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvE
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
-import Macro.BuildRequests.Get
+import Macro.BuildRequests.GetAtLeast
 import Mathematics.Points.{Pixel, Tile}
 import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.LockUnits
@@ -19,7 +19,7 @@ class WorkerRushLiftoff extends Parallel {
   
   children.set(Vector(
     new AttackWithWorkers,
-    new BuildOrder(Get(5, Terran.SCV)),
+    new BuildOrder(GetAtLeast(5, Terran.SCV)),
     new FollowBuildOrder
   ))
   

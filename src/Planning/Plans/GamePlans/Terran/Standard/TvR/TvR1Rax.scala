@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvR
 
-import Macro.BuildRequests.Get
+import Macro.BuildRequests.GetAtLeast
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Compound._
@@ -20,11 +20,11 @@ class TvR1Rax extends GameplanModeTemplateVsRandom {
   override val completionCriteria: Plan = new UnitsAtLeast(2, UnitMatchWarriors)
   
   override val buildOrder = Vector(
-    Get(1,   Terran.CommandCenter),
-    Get(9,   Terran.SCV),
-    Get(1,   Terran.SupplyDepot),
-    Get(11,  Terran.SCV),
-    Get(1,   Terran.Barracks))
+    GetAtLeast(1,   Terran.CommandCenter),
+    GetAtLeast(9,   Terran.SCV),
+    GetAtLeast(1,   Terran.SupplyDepot),
+    GetAtLeast(11,  Terran.SCV),
+    GetAtLeast(1,   Terran.Barracks))
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(
@@ -38,7 +38,7 @@ class TvR1Rax extends GameplanModeTemplateVsRandom {
     new If(
       new Not(new SafeAtHome),
       new Build(
-        Get(1, Terran.Bunker),
-        Get(4, Terran.Barracks))),
+        GetAtLeast(1, Terran.Bunker),
+        GetAtLeast(4, Terran.Barracks))),
     new RequireMiningBases(2))
 }

@@ -4,7 +4,7 @@ import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
-import Macro.BuildRequests.Another
+import Macro.BuildRequests.GetAnother
 import Planning.Plan
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
@@ -21,7 +21,7 @@ class BuildZergStaticDefenseAtBases(
     
     if (zones.nonEmpty) {
       val creepColoniesRequired = zones.map(placeBuildingsInZone).sum
-      With.scheduler.request(this, Another(creepColoniesRequired, Zerg.CreepColony))
+      With.scheduler.request(this, GetAnother(creepColoniesRequired, Zerg.CreepColony))
     }
   }
   

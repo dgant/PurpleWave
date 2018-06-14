@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Zerg.ZvE
 
-import Macro.BuildRequests.{Get, Upgrade}
+import Macro.BuildRequests.{GetAtLeast, GetUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchOr
 import Planning.Plan
 import Planning.Plans.Army.{AllIn, Attack}
@@ -21,17 +21,17 @@ class NineHatchLings extends GameplanModeTemplate {
   override val activationCriteria: Plan = new Employing(NineHatchLings)
   
   override def defaultBuildOrder: Plan = new Parallel(
-    new BuildOrder(Get(9, Zerg.Drone)),
+    new BuildOrder(GetAtLeast(9, Zerg.Drone)),
     new Trigger(
       new UnitsAtLeast(2, Zerg.Hatchery),
       initialBefore = new ExtractorTrick),
     new BuildOrder(
-      Get(10, Zerg.Drone),
-      Get(2, Zerg.Hatchery),
-      Get(1, Zerg.SpawningPool),
-      Get(11, Zerg.Drone),
-      Get(2, Zerg.Overlord),
-      Get(6, Zerg.Zergling)))
+      GetAtLeast(10, Zerg.Drone),
+      GetAtLeast(2, Zerg.Hatchery),
+      GetAtLeast(1, Zerg.SpawningPool),
+      GetAtLeast(11, Zerg.Drone),
+      GetAtLeast(2, Zerg.Overlord),
+      GetAtLeast(6, Zerg.Zergling)))
   
   override def defaultScoutPlan: Plan = new If(
     new Not(new EnemiesAtLeast(1, UnitMatchOr(Zerg.Spire, Zerg.Mutalisk, Zerg.Hydralisk))),
@@ -64,9 +64,9 @@ class NineHatchLings extends GameplanModeTemplate {
     new Trigger(
       new UnitsAtLeast(1, Zerg.SpawningPool, complete = true),
       new Parallel(
-        new Build(Get(1, Zerg.Extractor), Upgrade(Zerg.ZerglingSpeed)),
+        new Build(GetAtLeast(1, Zerg.Extractor), GetUpgrade(Zerg.ZerglingSpeed)),
         new If(
           new MineralsAtLeast(280),
-          new Build(Get(3, Zerg.Hatchery)))))
+          new Build(GetAtLeast(3, Zerg.Hatchery)))))
   )
 }

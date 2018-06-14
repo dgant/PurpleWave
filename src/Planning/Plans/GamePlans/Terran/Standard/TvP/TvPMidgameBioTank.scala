@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Lifecycle.With
-import Macro.BuildRequests.{Get, Tech, Upgrade}
+import Macro.BuildRequests.{GetAtLeast, GetTech, GetUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Compound.{Check, If, Trigger}
@@ -45,31 +45,31 @@ class TvPMidgameBioTank extends GameplanModeTemplate {
       new TrainContinuously(Terran.Medic, 8, 2)),
     new TrainContinuously(Terran.Marine),
     new Build(
-      Get(1, Terran.Barracks),
-      Get(1, Terran.Factory),
-      Tech(Terran.SiegeMode),
-      Get(1, Terran.EngineeringBay),
-      Get(2, Terran.Barracks),
-      Get(1, Terran.MissileTurret)),
+      GetAtLeast(1, Terran.Barracks),
+      GetAtLeast(1, Terran.Factory),
+      GetTech(Terran.SiegeMode),
+      GetAtLeast(1, Terran.EngineeringBay),
+      GetAtLeast(2, Terran.Barracks),
+      GetAtLeast(1, Terran.MissileTurret)),
     new BuildGasPumps,
     new Build(
-      Get(2, Terran.Factory),
-      Upgrade(Terran.BioDamage),
-      Get(1, Terran.Academy),
-      Tech(Terran.Stim),
-      Upgrade(Terran.MarineRange),
-      Upgrade(Terran.BioArmor),
-      Get(4, Terran.Barracks),
-      Get(6, Terran.Factory)),
+      GetAtLeast(2, Terran.Factory),
+      GetUpgrade(Terran.BioDamage),
+      GetAtLeast(1, Terran.Academy),
+      GetTech(Terran.Stim),
+      GetUpgrade(Terran.MarineRange),
+      GetUpgrade(Terran.BioArmor),
+      GetAtLeast(4, Terran.Barracks),
+      GetAtLeast(6, Terran.Factory)),
     new RequireMiningBases(3),
     new Build(
-      Get(1, Terran.Starport),
-      Get(2, Terran.Armory)),
+      GetAtLeast(1, Terran.Starport),
+      GetAtLeast(2, Terran.Armory)),
     new UpgradeContinuously(Terran.MechDamage),
     new UpgradeContinuously(Terran.MechArmor),
     new Build(
-      Get(1, Terran.ScienceFacility),
-      Get(8, Terran.Factory)),
+      GetAtLeast(1, Terran.ScienceFacility),
+      GetAtLeast(8, Terran.Factory)),
     new UpgradeContinuously(Terran.BioDamage),
     new UpgradeContinuously(Terran.BioArmor))
 }

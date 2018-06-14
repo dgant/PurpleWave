@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Lifecycle.With
-import Macro.BuildRequests.{Another, Get, Upgrade}
+import Macro.BuildRequests.{GetAnother, GetAtLeast, GetUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack, EjectScout}
@@ -51,17 +51,17 @@ class ZvPNinePool extends GameplanModeTemplate {
   
   override def defaultBuildOrder: Plan = new Parallel(
     new BuildOrder(
-      Get(9, Zerg.Drone),
-      Get(1, Zerg.SpawningPool)),
+      GetAtLeast(9, Zerg.Drone),
+      GetAtLeast(1, Zerg.SpawningPool)),
     new If(
       new UnitsAtLeast(1, Zerg.SpawningPool),
       new Trigger(
         new UnitsAtLeast(10, Zerg.Drone),
         initialBefore = new ExtractorTrick)),
     new BuildOrder(
-      Get(11, Zerg.Drone),
-      Get(1, Zerg.Overlord),
-      Get(6, Zerg.Zergling)))
+      GetAtLeast(11, Zerg.Drone),
+      GetAtLeast(1, Zerg.Overlord),
+      GetAtLeast(6, Zerg.Zergling)))
   
   private class TrainJustEnoughZerglings extends TrainMatchingRatio(
     Zerg.Zergling, 2, 12,
@@ -105,7 +105,7 @@ class ZvPNinePool extends GameplanModeTemplate {
         new If(new UnitsAtLeast(1, Zerg.HydraliskDen, complete = true), new Parallel(
           new CapGasAt(200),
           new TrainContinuously(Zerg.Drone, 12),
-          new Build(Get(1, Zerg.SpawningPool), Get(1, Zerg.Extractor), Get(1, Zerg.HydraliskDen)),
+          new Build(GetAtLeast(1, Zerg.SpawningPool), GetAtLeast(1, Zerg.Extractor), GetAtLeast(1, Zerg.HydraliskDen)),
           new UpgradeContinuously(Zerg.HydraliskSpeed),
           new TrainMatchingRatio(Zerg.Hydralisk, 0, 4, Seq(MatchingRatio(Protoss.Zealot, 1.0))),
           new If(
@@ -116,21 +116,21 @@ class ZvPNinePool extends GameplanModeTemplate {
           new TrainContinuously(Zerg.Hydralisk),
           new If(
             new MineralsAtLeast(400),
-            new Build(Another(1, Zerg.Hatchery)))
+            new Build(GetAnother(1, Zerg.Hatchery)))
         )),
   
         // 2/3 Hatch Muta
         new If(new UnitsAtLeast(1, Zerg.Spire, complete = true), new Parallel(
           new CapGasAtRatioToMinerals(1.0, 100),
           // TODO: Need to add Overlords here so we have enough supply for banked Mutalisks
-          new BuildOrder(Get(6, Zerg.Mutalisk)),
+          new BuildOrder(GetAtLeast(6, Zerg.Mutalisk)),
           new If(
             new UnitsAtLeast(6, Zerg.Mutalisk, complete = true),
             new TrainContinuously(Zerg.Drone, 21)),
           new TrainContinuously(Zerg.Drone, 16),
-          new Build(Get(1, Zerg.SpawningPool), Get(1, Zerg.Extractor)),
-          new Build(Get(1, Zerg.Lair)),
-          new Build(Get(1, Zerg.Spire), Get(2, Zerg.Extractor)),
+          new Build(GetAtLeast(1, Zerg.SpawningPool), GetAtLeast(1, Zerg.Extractor)),
+          new Build(GetAtLeast(1, Zerg.Lair)),
+          new Build(GetAtLeast(1, Zerg.Spire), GetAtLeast(2, Zerg.Extractor)),
           new Trigger(
             new EnemiesAtLeast(1, UnitMatchOr(
               Terran.Wraith,
@@ -174,7 +174,7 @@ class ZvPNinePool extends GameplanModeTemplate {
                 new UnitsAtLeast(1, Zerg.Spire),
                 new Parallel(
                   new TrainContinuously(Zerg.Drone, 18),
-                  new BuildOrder(Get(6, Zerg.Mutalisk)))), // Won't actually happen but ensures we save the larvae
+                  new BuildOrder(GetAtLeast(6, Zerg.Mutalisk)))), // Won't actually happen but ensures we save the larvae
               new BuildGasPumps(1),
               new TakeSecondGasForMuta,
               new TakeThirdGasForMuta,
@@ -183,10 +183,10 @@ class ZvPNinePool extends GameplanModeTemplate {
               new If(
                 new UnitsAtLeast(1, Zerg.Extractor, complete = true),
                 new Parallel(
-                  new Build(Get(1, Zerg.Lair)),
+                  new Build(GetAtLeast(1, Zerg.Lair)),
                   new Build(
-                    Upgrade(Zerg.ZerglingSpeed),
-                    Get(1, Zerg.Spire)))),
+                    GetUpgrade(Zerg.ZerglingSpeed),
+                    GetAtLeast(1, Zerg.Spire)))),
               new RequireBases(3),
               new TrainContinuously(Zerg.Zergling),
               new Trigger(
@@ -205,8 +205,8 @@ class ZvPNinePool extends GameplanModeTemplate {
               new TrainContinuously(Zerg.Drone, 13),
               new RequireBases(3),
               new Build(
-                Get(1, Zerg.Extractor),
-                Get(1, Zerg.HydraliskDen)),
+                GetAtLeast(1, Zerg.Extractor),
+                GetAtLeast(1, Zerg.HydraliskDen)),
               new TrainJustEnoughZerglings,
               new TrainContinuously(Zerg.Drone))),
 
@@ -224,8 +224,8 @@ class ZvPNinePool extends GameplanModeTemplate {
               new TrainContinuously(Zerg.Drone, 16)),
             new TrainContinuously(Zerg.Drone, 11),
             new BuildOrder(
-              Get(12, Zerg.Zergling),
-              Get(13, Zerg.Drone)),
+              GetAtLeast(12, Zerg.Zergling),
+              GetAtLeast(13, Zerg.Drone)),
             new TrainContinuously(Zerg.Zergling),
             new RequireBases(3),
             new If(
@@ -234,10 +234,10 @@ class ZvPNinePool extends GameplanModeTemplate {
             new TakeSecondGasForMuta,
             new TakeThirdGasForMuta,
             new Build(
-              Get(1, Zerg.Extractor),
-              Upgrade(Zerg.ZerglingSpeed)),
-            new Build(Get(1, Zerg.Lair)),
-            new Build(Get(1, Zerg.Spire)))
+              GetAtLeast(1, Zerg.Extractor),
+              GetUpgrade(Zerg.ZerglingSpeed)),
+            new Build(GetAtLeast(1, Zerg.Lair)),
+            new Build(GetAtLeast(1, Zerg.Spire)))
       )))
     )))
   

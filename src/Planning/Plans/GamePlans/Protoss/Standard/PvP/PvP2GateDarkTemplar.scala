@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.Get
+import Macro.BuildRequests.GetAtLeast
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
@@ -35,37 +35,37 @@ class PvP2GateDarkTemplar extends GameplanModeTemplate {
   override val buildOrder = Vector(
     // http://wiki.teamliquid.net/starcraft/2_Gateway_Dark_Templar_(vs._Protoss)
     // We get gas/core faster because of mineral locking + later scout
-    Get(8,   Protoss.Probe),
-    Get(1,   Protoss.Pylon),             // 8
-    Get(10,  Protoss.Probe),
-    Get(1,   Protoss.Gateway),           // 10
-    Get(11,  Protoss.Probe),
-    Get(1,   Protoss.Assimilator),       // 11
-    Get(13,  Protoss.Probe),
-    Get(1,   Protoss.Zealot),            // 13
-    Get(14,  Protoss.Probe),
-    Get(2,   Protoss.Pylon),             // 16 = 14 + Z
-    Get(16,  Protoss.Probe),
-    Get(1,   Protoss.CyberneticsCore),   // 18 = 16 + Z
-    Get(17,  Protoss.Probe),
-    Get(2,   Protoss.Zealot),            // 19 = 17 + Z
-    Get(18,  Protoss.Probe),
-    Get(3,   Protoss.Pylon),             // 22 = 18 + ZZ
-    Get(19,  Protoss.Probe),
-    Get(1,   Protoss.Dragoon),           // 23 = 19 + ZZ
-    Get(20,  Protoss.Probe),
-    Get(1,   Protoss.CitadelOfAdun),     // 26 = 20 + ZZ + D
-    Get(21,  Protoss.Probe),
-    Get(2,   Protoss.Dragoon),           // 27 = 21 + ZZ + D
-    Get(2,   Protoss.Gateway),           // 29 = 21 + ZZ + DD
-    Get(3,   Protoss.Pylon),
-    Get(1,   Protoss.TemplarArchives),
-    Get(4,   Protoss.Zealot),            // 33 = 21 + ZZZZ + DD
-    Get(22,  Protoss.Probe),
-    Get(4,   Protoss.Pylon),             // 34 = 22 + ZZZZ + DD
-    Get(23,  Protoss.Probe),
-    Get(2,   Protoss.DarkTemplar),
-    Get(24,  Protoss.Probe))
+    GetAtLeast(8,   Protoss.Probe),
+    GetAtLeast(1,   Protoss.Pylon),             // 8
+    GetAtLeast(10,  Protoss.Probe),
+    GetAtLeast(1,   Protoss.Gateway),           // 10
+    GetAtLeast(11,  Protoss.Probe),
+    GetAtLeast(1,   Protoss.Assimilator),       // 11
+    GetAtLeast(13,  Protoss.Probe),
+    GetAtLeast(1,   Protoss.Zealot),            // 13
+    GetAtLeast(14,  Protoss.Probe),
+    GetAtLeast(2,   Protoss.Pylon),             // 16 = 14 + Z
+    GetAtLeast(16,  Protoss.Probe),
+    GetAtLeast(1,   Protoss.CyberneticsCore),   // 18 = 16 + Z
+    GetAtLeast(17,  Protoss.Probe),
+    GetAtLeast(2,   Protoss.Zealot),            // 19 = 17 + Z
+    GetAtLeast(18,  Protoss.Probe),
+    GetAtLeast(3,   Protoss.Pylon),             // 22 = 18 + ZZ
+    GetAtLeast(19,  Protoss.Probe),
+    GetAtLeast(1,   Protoss.Dragoon),           // 23 = 19 + ZZ
+    GetAtLeast(20,  Protoss.Probe),
+    GetAtLeast(1,   Protoss.CitadelOfAdun),     // 26 = 20 + ZZ + D
+    GetAtLeast(21,  Protoss.Probe),
+    GetAtLeast(2,   Protoss.Dragoon),           // 27 = 21 + ZZ + D
+    GetAtLeast(2,   Protoss.Gateway),           // 29 = 21 + ZZ + DD
+    GetAtLeast(3,   Protoss.Pylon),
+    GetAtLeast(1,   Protoss.TemplarArchives),
+    GetAtLeast(4,   Protoss.Zealot),            // 33 = 21 + ZZZZ + DD
+    GetAtLeast(22,  Protoss.Probe),
+    GetAtLeast(4,   Protoss.Pylon),             // 34 = 22 + ZZZZ + DD
+    GetAtLeast(23,  Protoss.Probe),
+    GetAtLeast(2,   Protoss.DarkTemplar),
+    GetAtLeast(24,  Protoss.Probe))
   
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvPIdeas.ReactToCannonRush,

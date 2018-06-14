@@ -4,7 +4,7 @@ import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
-import Macro.BuildRequests.{Another, Get}
+import Macro.BuildRequests.{GetAnother, GetAtLeast}
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
 
@@ -21,10 +21,10 @@ class BuildCannonsAtBases(
     if (zones.nonEmpty) {
       if (With.units.existsOurs(Protoss.Forge)) {
         val cannonsRequired = zones.map(cannonZone).sum
-        With.scheduler.request(this, Another(cannonsRequired, Protoss.PhotonCannon))
+        With.scheduler.request(this, GetAnother(cannonsRequired, Protoss.PhotonCannon))
       }
       else {
-        With.scheduler.request(this, Get(1, Protoss.Forge))
+        With.scheduler.request(this, GetAtLeast(1, Protoss.Forge))
       }
     }
   }
@@ -65,7 +65,7 @@ class BuildCannonsAtBases(
     
     if (pylonsInZone.isEmpty) {
       With.groundskeeper.propose(pylonBlueprintByZone(zone))
-      With.scheduler.request(this, Another(1, Protoss.Pylon))
+      With.scheduler.request(this, GetAnother(1, Protoss.Pylon))
     }
     else if (pylonsInZone.exists(_.aliveAndComplete)) {
       // Defensive programming measure. If we try re-proposing fulfilled blueprints we may just build cannons forever.

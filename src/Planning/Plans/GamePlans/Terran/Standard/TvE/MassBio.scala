@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvE
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Macro.BuildRequests.{Get, Tech, Upgrade}
+import Macro.BuildRequests.{GetAtLeast, GetTech, GetUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchOr, UnitMatchSiegeTank, UnitMatchWarriors}
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
@@ -25,17 +25,17 @@ class MassBio extends GameplanModeTemplate {
   
   override val buildOrder =
     Vector(
-      Get(9, Terran.SCV),
-      Get(1, Terran.SupplyDepot),
-      Get(10, Terran.SCV),
-      Get(1, Terran.Barracks),
-      Get(12, Terran.SCV),
-      Get(2, Terran.Barracks),
-      Get(13, Terran.SCV),
-      Get(1, Terran.Marine),
-      Get(14, Terran.SCV),
-      Get(2, Terran.SupplyDepot),
-      Get(2, Terran.Marine))
+      GetAtLeast(9, Terran.SCV),
+      GetAtLeast(1, Terran.SupplyDepot),
+      GetAtLeast(10, Terran.SCV),
+      GetAtLeast(1, Terran.Barracks),
+      GetAtLeast(12, Terran.SCV),
+      GetAtLeast(2, Terran.Barracks),
+      GetAtLeast(13, Terran.SCV),
+      GetAtLeast(1, Terran.Marine),
+      GetAtLeast(14, Terran.SCV),
+      GetAtLeast(2, Terran.SupplyDepot),
+      GetAtLeast(2, Terran.Marine))
   
   private val stimThreshold = 24 * 15
   
@@ -70,17 +70,17 @@ class MassBio extends GameplanModeTemplate {
       new TrainContinuously(Terran.ScienceVessel, 12)),
     new If(
       new UnitsAtLeast(2, Terran.ScienceVessel),
-      new Build(Tech(Terran.Irradiate))),
+      new Build(GetTech(Terran.Irradiate))),
     new Trigger(
       new SupplyOutOf200(24),
       new Build(
-        Get(1, Terran.Refinery),
-        Get(1, Terran.Academy))),
+        GetAtLeast(1, Terran.Refinery),
+        GetAtLeast(1, Terran.Academy))),
     new Trigger(
       new SupplyOutOf200(27),
       new Build(
-        Get(3, Terran.Barracks),
-        Tech(Terran.Stim))),
+        GetAtLeast(3, Terran.Barracks),
+        GetTech(Terran.Stim))),
     new Trigger(
       new Or(
         new EnemiesAtLeast(1, Terran.Vulture),
@@ -101,19 +101,19 @@ class MassBio extends GameplanModeTemplate {
       new RequireMiningBases(2)),
     new If(
       new UnitsAtLeast(1, UnitMatchSiegeTank),
-      new Build(Tech(Terran.SiegeMode))),
+      new Build(GetTech(Terran.SiegeMode))),
     new IfOnMiningBases(3,
       new If(
         new UnitsAtLeast(60, UnitMatchWarriors),
         new Parallel(
           new Build(
-            Get(2, Terran.Refinery),
-            Get(1, Terran.Factory),
-            Get(1, Terran.Starport),
-            Get(1, Terran.ScienceFacility),
-            Get(1, Terran.ControlTower),
-            Get(2, Terran.EngineeringBay),
-            Get(1, Terran.Dropship))))),
+            GetAtLeast(2, Terran.Refinery),
+            GetAtLeast(1, Terran.Factory),
+            GetAtLeast(1, Terran.Starport),
+            GetAtLeast(1, Terran.ScienceFacility),
+            GetAtLeast(1, Terran.ControlTower),
+            GetAtLeast(2, Terran.EngineeringBay),
+            GetAtLeast(1, Terran.Dropship))))),
     new If(
       new UnitsAtLeast(40, UnitMatchWarriors),
       new RequireMiningBases(3)),
@@ -148,23 +148,23 @@ class MassBio extends GameplanModeTemplate {
         new If(
           new EnemiesAtLeast(1, UnitMatchSiegeTank),
           new Build(
-            Get(3, Terran.Factory),
-            Get(3, Terran.MachineShop),
-            Get(1, Terran.Starport)),
+            GetAtLeast(3, Terran.Factory),
+            GetAtLeast(3, Terran.MachineShop),
+            GetAtLeast(1, Terran.Starport)),
           new Build(
-            Get(5, Terran.Barracks))),
+            GetAtLeast(5, Terran.Barracks))),
         new If(
           new EnemyIsZerg,
           new Build(
-            Get(1, Terran.EngineeringBay),
-            Get(1, Terran.Factory),
-            Upgrade(Terran.BioDamage),
-            Get(2, Terran.Refinery),
-            Get(1, Terran.Starport),
-            Get(1, Terran.ScienceFacility),
-            Get(2, Terran.Starport),
-            Get(2, Terran.ControlTower)),
-          new Build(Get(1, Terran.EngineeringBay))),
+            GetAtLeast(1, Terran.EngineeringBay),
+            GetAtLeast(1, Terran.Factory),
+            GetUpgrade(Terran.BioDamage),
+            GetAtLeast(2, Terran.Refinery),
+            GetAtLeast(1, Terran.Starport),
+            GetAtLeast(1, Terran.ScienceFacility),
+            GetAtLeast(2, Terran.Starport),
+            GetAtLeast(2, Terran.ControlTower)),
+          new Build(GetAtLeast(1, Terran.EngineeringBay))),
         new UpgradeContinuously(Terran.BioDamage),
         new UpgradeContinuously(Terran.BioArmor))),
     new Trigger(

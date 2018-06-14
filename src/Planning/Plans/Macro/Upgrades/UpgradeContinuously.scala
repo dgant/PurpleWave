@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Upgrades
 
 import Lifecycle.With
-import Macro.BuildRequests.Upgrade
+import Macro.BuildRequests.GetUpgrade
 import Planning.Plan
 
 class UpgradeContinuously(upgrade: ProxyBwapi.Upgrades.Upgrade, maxLevel: Int = 3) extends Plan {
@@ -13,6 +13,6 @@ class UpgradeContinuously(upgrade: ProxyBwapi.Upgrades.Upgrade, maxLevel: Int = 
   override def onUpdate() {
     if (isComplete) return
     if ( ! With.units.existsOurs(upgrade.whatUpgrades)) return
-    With.scheduler.request(this, Upgrade(upgrade, With.self.getUpgradeLevel(upgrade) + 1))
+    With.scheduler.request(this, GetUpgrade(upgrade, With.self.getUpgradeLevel(upgrade) + 1))
   }
 }

@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvR
 
-import Macro.BuildRequests.Get
+import Macro.BuildRequests.GetAtLeast
 import Planning.Plan
 import Planning.Plans.GamePlans.GameplanModeTemplateVsRandom
 import Planning.Plans.Predicates.Employing
@@ -22,6 +22,6 @@ class PvR2Gate1012 extends GameplanModeTemplateVsRandom {
   override def buildPlans = Vector(
     new TrainContinuously(Protoss.Zealot, 4),
     new Build(
-      Get(1, Protoss.Assimilator),
-      Get(1, Protoss.CyberneticsCore)))
+      GetAtLeast(1, Protoss.Assimilator),
+      GetAtLeast(1, Protoss.CyberneticsCore)))
 }

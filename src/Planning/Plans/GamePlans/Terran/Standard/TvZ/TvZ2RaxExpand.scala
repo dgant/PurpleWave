@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
-import Macro.BuildRequests.Get
+import Macro.BuildRequests.GetAtLeast
 import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
@@ -23,15 +23,15 @@ class TvZ2RaxExpand extends GameplanModeTemplate {
   override def defaultPlacementPlan: Plan = new TvZPlacement
   
   override val buildOrder = Vector(
-    Get(1,   Terran.CommandCenter),
-    Get(9,   Terran.SCV),
-    Get(1,   Terran.SupplyDepot),
-    Get(11,  Terran.SCV),
-    Get(1,   Terran.Barracks),
-    Get(13,  Terran.SCV),
-    Get(2,   Terran.Barracks),
-    Get(14,  Terran.SCV),
-    Get(2,   Terran.SupplyDepot))
+    GetAtLeast(1,   Terran.CommandCenter),
+    GetAtLeast(9,   Terran.SCV),
+    GetAtLeast(1,   Terran.SupplyDepot),
+    GetAtLeast(11,  Terran.SCV),
+    GetAtLeast(1,   Terran.Barracks),
+    GetAtLeast(13,  Terran.SCV),
+    GetAtLeast(2,   Terran.Barracks),
+    GetAtLeast(14,  Terran.SCV),
+    GetAtLeast(2,   Terran.SupplyDepot))
   
   override def buildPlans: Seq[Plan] = Vector(
     new TrainContinuously(Terran.Marine),
@@ -39,7 +39,7 @@ class TvZ2RaxExpand extends GameplanModeTemplate {
       new And(
         new SafeAtHome,
         new UnitsAtLeast(4, UnitMatchWarriors)),
-      new Build(Get(4, Terran.Barracks)),
+      new Build(GetAtLeast(4, Terran.Barracks)),
       new RequireMiningBases(2))
   )
 }

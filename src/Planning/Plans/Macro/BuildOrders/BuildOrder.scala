@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.BuildOrders
 
 import Lifecycle.With
-import Macro.BuildRequests.{BuildRequest, Get}
+import Macro.BuildRequests.{BuildRequest, GetAtLeast}
 import Planning.Composition.Property
 import Planning.Plan
 
@@ -25,7 +25,7 @@ class BuildOrder(initialRequests: BuildRequest*) extends Plan {
           None
         }
         else {
-          Some(Get(quantityNew, unit.get))
+          Some(GetAtLeast(quantityNew, unit.get))
         }
       } else {
         Some(request)

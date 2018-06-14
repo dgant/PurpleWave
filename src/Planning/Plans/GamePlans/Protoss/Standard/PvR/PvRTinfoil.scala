@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvR
 
-import Macro.BuildRequests.{BuildRequest, Get}
+import Macro.BuildRequests.{BuildRequest, GetAtLeast}
 import Planning.Plan
 import Planning.Plans.Compound.{And, If}
 import Planning.Plans.GamePlans.GameplanModeTemplateVsRandom
@@ -23,12 +23,12 @@ class PvRTinfoil extends GameplanModeTemplateVsRandom {
   override def defaultPlacementPlan: Plan = new PlacementForgeFastExpand
   
   override def buildOrder: Seq[BuildRequest] = Vector(
-    Get(8, Protoss.Probe),
-    Get(1, Protoss.Pylon),
-    Get(9, Protoss.Probe),
-    Get(1, Protoss.Forge),
-    Get(10, Protoss.Probe),
-    Get(2, Protoss.PhotonCannon))
+    GetAtLeast(8, Protoss.Probe),
+    GetAtLeast(1, Protoss.Pylon),
+    GetAtLeast(9, Protoss.Probe),
+    GetAtLeast(1, Protoss.Forge),
+    GetAtLeast(10, Protoss.Probe),
+    GetAtLeast(2, Protoss.PhotonCannon))
   
   override def buildPlans = Vector(
     new If(
@@ -39,7 +39,7 @@ class PvRTinfoil extends GameplanModeTemplateVsRandom {
       new TrainContinuously(Protoss.Dragoon),
       new TrainContinuously(Protoss.Zealot, 4)),
     new Build(
-      Get(1, Protoss.Gateway),
-      Get(1, Protoss.Assimilator),
-      Get(1, Protoss.CyberneticsCore)))
+      GetAtLeast(1, Protoss.Gateway),
+      GetAtLeast(1, Protoss.Assimilator),
+      GetAtLeast(1, Protoss.CyberneticsCore)))
 }

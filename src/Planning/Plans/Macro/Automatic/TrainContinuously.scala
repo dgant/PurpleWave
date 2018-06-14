@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
-import Macro.BuildRequests.Get
+import Macro.BuildRequests.GetAtLeast
 import Planning.Composition.UnitMatchers._
 import Planning.Plan
 import ProxyBwapi.Races.{Terran, Zerg}
@@ -49,7 +49,7 @@ class TrainContinuously(
     
     (unitClass.buildUnitsBorrowed ++ unitClass.buildUnitsSpent).foreach(builderClass =>
       With.scheduler.macroPumps.consume(builderClass, buildersToConsume))
-    With.scheduler.request(this, Get(unitsToRequest, unitClass))
+    With.scheduler.request(this, GetAtLeast(unitsToRequest, unitClass))
   }
   
   private def getBuilderReadiness(builders: Vector[FriendlyUnitInfo]): Double = {

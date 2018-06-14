@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvE
 
 import Lifecycle.With
-import Macro.BuildRequests.{Get, Upgrade}
+import Macro.BuildRequests.{GetAtLeast, GetUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchOr
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound.{Or, _}
@@ -32,11 +32,11 @@ class Proxy2Gate extends GameplanModeTemplate {
   private class BeforeProxy extends Parallel(
     new PlaceGatewaysProxied(2, () => ProxyPlanner.proxyAutomaticSneaky),
     new BuildOrder(
-      Get(8, Protoss.Probe),
-      Get(1, Protoss.Pylon),
-      Get(9, Protoss.Probe)),
-    new If(new UnitsAtLeast(1, Protoss.Pylon),    new Build(Get(1, Protoss.Gateway))),
-    new If(new UnitsAtLeast(1, Protoss.Gateway),  new Build(Get(2, Protoss.Gateway))))
+      GetAtLeast(8, Protoss.Probe),
+      GetAtLeast(1, Protoss.Pylon),
+      GetAtLeast(9, Protoss.Probe)),
+    new If(new UnitsAtLeast(1, Protoss.Pylon),    new Build(GetAtLeast(1, Protoss.Gateway))),
+    new If(new UnitsAtLeast(1, Protoss.Gateway),  new Build(GetAtLeast(2, Protoss.Gateway))))
   
   private class MustSwitchToDragoons extends Or(
     new UnitsAtLeast(15, Protoss.Probe),
@@ -61,8 +61,8 @@ class Proxy2Gate extends GameplanModeTemplate {
         new Aggression(1.9))),
     new RequireSufficientSupply,
     new BuildOrder(
-      Get(1, Protoss.Gateway),
-      Get(2, Protoss.Zealot)),
+      GetAtLeast(1, Protoss.Gateway),
+      GetAtLeast(2, Protoss.Zealot)),
     new TrainContinuously(Protoss.Observer, 2),
     new If(
       new And(
@@ -79,18 +79,18 @@ class Proxy2Gate extends GameplanModeTemplate {
         new MustSwitchToDragoons),
       initialAfter = new Parallel(
         new BuildGasPumps,
-        new Build(Get(1, Protoss.CyberneticsCore)),
+        new Build(GetAtLeast(1, Protoss.CyberneticsCore)),
         new If(
           new EnemyHasShownCloakedThreat,
           new Parallel(
             new Build(
-              Get(1, Protoss.RoboticsFacility),
-              Get(1, Protoss.Observatory)))),
+              GetAtLeast(1, Protoss.RoboticsFacility),
+              GetAtLeast(1, Protoss.Observatory)))),
         new Build(
-          Upgrade(Protoss.DragoonRange),
-          Get(3, Protoss.Gateway)),
+          GetUpgrade(Protoss.DragoonRange),
+          GetAtLeast(3, Protoss.Gateway)),
         new RequireMiningBases(2),
-        new Build(Get(5, Protoss.Gateway)))))
+        new Build(GetAtLeast(5, Protoss.Gateway)))))
   
   override def buildPlans = Vector(
     new Do(() =>  With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),

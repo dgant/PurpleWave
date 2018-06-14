@@ -4,7 +4,7 @@ import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
-import Macro.BuildRequests.Another
+import Macro.BuildRequests.GetAnother
 import Planning.Plan
 import ProxyBwapi.Races.Terran
 
@@ -19,7 +19,7 @@ class BuildBunkersAtBases(
     
     if (zones.nonEmpty) {
       val bunkersRequired = zones.map(placeBuildingsInZone).sum
-      With.scheduler.request(this, Another(bunkersRequired, Terran.Bunker))
+      With.scheduler.request(this, GetAnother(bunkersRequired, Terran.Bunker))
     }
   }
   

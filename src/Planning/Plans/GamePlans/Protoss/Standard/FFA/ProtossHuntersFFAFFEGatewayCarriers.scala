@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.FFA
 
-import Macro.BuildRequests.{Get, Tech, Upgrade}
+import Macro.BuildRequests.{GetAtLeast, GetTech, GetUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Compound._
@@ -23,27 +23,27 @@ class ProtossHuntersFFAFFEGatewayCarriers extends GameplanModeTemplate {
   override val aggression = 0.6
   
   override val buildOrder = Vector(
-    Get(8,   Protoss.Probe),
-    Get(1,   Protoss.Pylon),
-    Get(14,  Protoss.Probe),
-    Get(2,   Protoss.Nexus),
-    Get(1,   Protoss.Forge),
-    Get(17,  Protoss.Probe),
-    Get(1,   Protoss.PhotonCannon),
-    Get(18,  Protoss.Probe),
-    Get(2,   Protoss.PhotonCannon),
-    Get(1,   Protoss.Gateway))
+    GetAtLeast(8,   Protoss.Probe),
+    GetAtLeast(1,   Protoss.Pylon),
+    GetAtLeast(14,  Protoss.Probe),
+    GetAtLeast(2,   Protoss.Nexus),
+    GetAtLeast(1,   Protoss.Forge),
+    GetAtLeast(17,  Protoss.Probe),
+    GetAtLeast(1,   Protoss.PhotonCannon),
+    GetAtLeast(18,  Protoss.Probe),
+    GetAtLeast(2,   Protoss.PhotonCannon),
+    GetAtLeast(1,   Protoss.Gateway))
   
   override def buildPlans: Seq[Plan] = Vector(
-    new If(new UnitsAtLeast(1, Protoss.Carrier),      new Build(Upgrade(Protoss.CarrierCapacity))),
-    new If(new UnitsAtLeast(1, Protoss.HighTemplar),  new Build(Tech(Protoss.PsionicStorm))),
+    new If(new UnitsAtLeast(1, Protoss.Carrier),      new Build(GetUpgrade(Protoss.CarrierCapacity))),
+    new If(new UnitsAtLeast(1, Protoss.HighTemplar),  new Build(GetTech(Protoss.PsionicStorm))),
     new If(new UnitsAtLeast(1, Protoss.Carrier),      new UpgradeContinuously(Protoss.AirDamage)),
     new If(new UnitsAtLeast(3, Protoss.Carrier),      new UpgradeContinuously(Protoss.AirArmor)),
-    new If(new UnitsAtLeast(1, Protoss.Dragoon),      new Build(Upgrade(Protoss.DragoonRange))),
-    new If(new UnitsAtLeast(2, Protoss.Reaver),       new Build(Upgrade(Protoss.ScarabDamage))),
-    new If(new UnitsAtLeast(2, Protoss.Observatory),  new Build(Upgrade(Protoss.ObserverSpeed))),
-    new If(new UnitsAtLeast(4, Protoss.Zealot),       new Build(Upgrade(Protoss.ZealotSpeed))),
-    new If(new UnitsAtLeast(2, Protoss.Arbiter),      new Build(Tech(Protoss.Stasis))),
+    new If(new UnitsAtLeast(1, Protoss.Dragoon),      new Build(GetUpgrade(Protoss.DragoonRange))),
+    new If(new UnitsAtLeast(2, Protoss.Reaver),       new Build(GetUpgrade(Protoss.ScarabDamage))),
+    new If(new UnitsAtLeast(2, Protoss.Observatory),  new Build(GetUpgrade(Protoss.ObserverSpeed))),
+    new If(new UnitsAtLeast(4, Protoss.Zealot),       new Build(GetUpgrade(Protoss.ZealotSpeed))),
+    new If(new UnitsAtLeast(2, Protoss.Arbiter),      new Build(GetTech(Protoss.Stasis))),
     new BuildCannonsAtExpansions(2),
     new RequireMiningBases(2),
     new TrainContinuously(Protoss.Arbiter,        2, 1),
@@ -57,31 +57,31 @@ class ProtossHuntersFFAFFEGatewayCarriers extends GameplanModeTemplate {
     new TrainContinuously(Protoss.Dragoon,        12, 6),
     new TrainContinuously(Protoss.Zealot),
     new Build(
-      Get(3, Protoss.PhotonCannon),
-      Get(1, Protoss.Assimilator),
-      Get(1, Protoss.CyberneticsCore),
-      Get(4, Protoss.Gateway)),
+      GetAtLeast(3, Protoss.PhotonCannon),
+      GetAtLeast(1, Protoss.Assimilator),
+      GetAtLeast(1, Protoss.CyberneticsCore),
+      GetAtLeast(4, Protoss.Gateway)),
     new BuildGasPumps(),
     new UpgradeContinuously(Protoss.GroundDamage),
     new Build(
-      Get(1, Protoss.RoboticsFacility),
-      Get(1, Protoss.RoboticsSupportBay),
-      Get(1, Protoss.CitadelOfAdun),
-      Get(1, Protoss.TemplarArchives),
-      Get(1, Protoss.Observatory),
-      Get(1, Protoss.Stargate),
-      Get(5, Protoss.PhotonCannon),
-      Get(1, Protoss.FleetBeacon),
-      Get(2, Protoss.CyberneticsCore),
-      Get(3, Protoss.Stargate)),
+      GetAtLeast(1, Protoss.RoboticsFacility),
+      GetAtLeast(1, Protoss.RoboticsSupportBay),
+      GetAtLeast(1, Protoss.CitadelOfAdun),
+      GetAtLeast(1, Protoss.TemplarArchives),
+      GetAtLeast(1, Protoss.Observatory),
+      GetAtLeast(1, Protoss.Stargate),
+      GetAtLeast(5, Protoss.PhotonCannon),
+      GetAtLeast(1, Protoss.FleetBeacon),
+      GetAtLeast(2, Protoss.CyberneticsCore),
+      GetAtLeast(3, Protoss.Stargate)),
     new RequireMiningBasesFFA(3),
     new UpgradeContinuously(Protoss.AirDamage),
     new UpgradeContinuously(Protoss.AirArmor),
     new UpgradeContinuously(Protoss.GroundArmor),
     new Build(
-      Get(1, Protoss.ArbiterTribunal),
-      Get(5, Protoss.Stargate)),
-    new Build(Get(12, Protoss.Gateway)),
+      GetAtLeast(1, Protoss.ArbiterTribunal),
+      GetAtLeast(5, Protoss.Stargate)),
+    new Build(GetAtLeast(12, Protoss.Gateway)),
     new UpgradeContinuously(Protoss.Shields),
     new RequireMiningBasesFFA(4)
   )

@@ -6,8 +6,6 @@ import ProxyBwapi.Races.Terran
 
 class EnemyHasShownWraithCloak extends Predicate {
   
-  description.set("Enemy has wraith cloak")
-  
   var triggered = false
   
   override def isComplete: Boolean = {

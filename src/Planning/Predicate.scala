@@ -1,5 +1,3 @@
 package Planning
 
-class Predicate extends Plan {
-  final override def onUpdate() {}
-}
+trait Predicate { def isComplete: Boolean }

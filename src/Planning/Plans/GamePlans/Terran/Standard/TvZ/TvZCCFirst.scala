@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Macro.BuildRequests.Get
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Compound.Latch
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Terran.Situational.TvZPlacement
@@ -14,8 +14,8 @@ import Strategery.Strategies.Terran.TvZ.TvZEarlyCCFirst
 
 class TvZCCFirst extends GameplanModeTemplate {
   
-  override val activationCriteria: Plan = new Employing(TvZEarlyCCFirst)
-  override val completionCriteria: Plan = new Latch(new UnitsAtLeast(2, Terran.Barracks))
+  override val activationCriteria: Predicate = new Employing(TvZEarlyCCFirst)
+  override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(2, Terran.Barracks))
   
   override def defaultPlacementPlan: Plan = new TvZPlacement
   

@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.FFA
 
 import Macro.BuildRequests.Get
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -15,7 +15,7 @@ import ProxyBwapi.Races.Protoss
 
 class ProtossHuntersFFAGatewayAggro extends GameplanModeTemplate {
   
-  override val activationCriteria   : Plan = new Always
+  override val activationCriteria   : Predicate = new Always
   override val defaultScoutPlan     : Plan = NoPlan()
   
   override val buildOrder = ProtossBuilds.Opening_10Gate12Gas14Core

@@ -11,8 +11,6 @@ class UnitsAtMost(
   
   extends Predicate {
   
-  description.set("Have at most " + quantity + " " + matcher)
-  
   override def isComplete: Boolean = {
     val quantityFound =
       if (complete) {

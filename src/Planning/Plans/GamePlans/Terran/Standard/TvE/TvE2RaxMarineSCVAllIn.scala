@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvE
 import Macro.BuildRequests.Get
 import Planning.Composition.UnitCounters.UnitCountExcept
 import Planning.Composition.UnitMatchers.UnitMatchWorkers
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -17,7 +17,7 @@ import Strategery.Strategies.Terran.TvE.TvESCVMarineAllIn
 
 class TvE2RaxMarineSCVAllIn extends GameplanModeTemplate {
   
-  override val activationCriteria: Plan = new Employing(TvESCVMarineAllIn)
+  override val activationCriteria: Predicate = new Employing(TvESCVMarineAllIn)
   
   override def defaultScoutPlan: Plan = new If(
     new Not(new FoundEnemyBase),

@@ -2,11 +2,7 @@ package Planning.Plans.Compound
 
 import Planning.Predicate
 
-class Or(initialChildren: Predicate*) extends Predicate{
+class Or(children: Predicate*) extends Predicate{
   
-  final override val getChildren: Iterable[Predicate] = initialChildren
-  
-  override def isComplete: Boolean = getChildren.exists(_.isComplete)
-  
-  override def toString: String = "(" + getChildren.map(_.toString).mkString(" OR ") + ")"
+  override def isComplete: Boolean = children.exists(_.isComplete)
 }

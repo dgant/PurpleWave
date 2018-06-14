@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Macro.BuildRequests.BuildRequest
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Compound.{Latch, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -15,8 +15,8 @@ import Strategery.Strategies.Protoss.PvPOpen4GateGoon
 
 class PvP4GateGoon extends GameplanModeTemplate {
   
-  override val activationCriteria : Plan = new Employing(PvPOpen4GateGoon)
-  override val completionCriteria : Plan = new Latch(new MiningBasesAtLeast(2))
+  override val activationCriteria : Predicate = new Employing(PvPOpen4GateGoon)
+  override val completionCriteria : Predicate = new Latch(new MiningBasesAtLeast(2))
   override def defaultAttackPlan  : Plan = new PvPIdeas.AttackSafely
   override def defaultScoutPlan   : Plan = new ScoutOn(Protoss.Pylon)
   override val defaultWorkerPlan  : Plan = NoPlan()

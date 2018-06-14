@@ -12,12 +12,12 @@ class If(
   
   description.set("If")
   
-  val predicate = new Property[Plan](initialPredicate)
+  val predicate = new Property[Predicate](initialPredicate)
   val whenTrue  = new Property[Plan](initialWhenTrue)
   val whenFalse = new Property[Plan](initialWhenFalse)
   
   override def getChildren: Iterable[Plan] = {
-    Vector(predicate.get, whenTrue.get, whenFalse.get)
+    Vector(whenTrue.get, whenFalse.get)
   }
   
   override def isComplete: Boolean = {
@@ -25,7 +25,6 @@ class If(
   }
   
   override def onUpdate() {
-    delegate(predicate.get)
     if (predicate.get.isComplete)
       delegate(whenTrue.get)
     else

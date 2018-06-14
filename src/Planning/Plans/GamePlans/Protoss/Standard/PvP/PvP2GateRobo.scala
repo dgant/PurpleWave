@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.BuildOrders.Build
@@ -15,15 +15,16 @@ import Strategery.Strategies.Protoss.PvPOpen2GateRobo
 
 class PvP2GateRobo extends GameplanModeTemplate {
   
-  override val activationCriteria : Plan    = new Employing(PvPOpen2GateRobo)
-  override def defaultAttackPlan  : Plan    = new PvPIdeas.AttackSafely
-  override val scoutAt            : Int     = 14
-  override def aggression         : Double  = 0.85
-  override val completionCriteria : Plan = new Or(
+  override val activationCriteria: Predicate = new Employing(PvPOpen2GateRobo)
+  override val completionCriteria: Predicate = new Or(
     new EnemyBasesAtLeast(2),
     new UnitsAtLeast(2, Protoss.Nexus),
     new UnitsAtLeast(40, UnitMatchWarriors))
   
+  override def defaultAttackPlan  : Plan    = new PvPIdeas.AttackSafely
+  override val scoutAt            : Int     = 14
+  override def aggression         : Double  = 0.85
+
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToFFE,

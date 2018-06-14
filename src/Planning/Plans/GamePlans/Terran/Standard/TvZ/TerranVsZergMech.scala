@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Macro.BuildRequests.Get
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Terran.Situational.TvZPlacement
@@ -18,7 +18,7 @@ import Strategery.Strategies.Terran.TvZ.{TvZMidgameMech, TvZMidgameWraiths}
 
 class TerranVsZergMech extends  GameplanModeTemplate {
   
-  override val activationCriteria: Plan = new Or(
+  override val activationCriteria: Predicate = new Or(
     new Employing(TvZMidgameMech),
     new Employing(TvZMidgameWraiths))
   

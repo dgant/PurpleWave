@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 
 import Macro.BuildRequests.Get
 import Planning.Composition.UnitMatchers.UnitMatchOr
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Army.{AllIn, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -18,7 +18,7 @@ import Strategery.Strategies.Zerg.NineHatchLings
 
 class NineHatchLings extends GameplanModeTemplate {
   
-  override val activationCriteria: Plan = new Employing(NineHatchLings)
+  override val activationCriteria: Predicate = new Employing(NineHatchLings)
   
   override def defaultBuildOrder: Plan = new Parallel(
     new BuildOrder(Get(9, Zerg.Drone)),

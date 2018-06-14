@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Composition.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors}
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Predicates.Employing
@@ -15,8 +15,8 @@ import Strategery.Strategies.Terran.TvP.TvPEarlyFDStrong
 
 class TvPFDStrong extends GameplanModeTemplate {
   
-  override val activationCriteria: Plan = new Employing(TvPEarlyFDStrong)
-  override val completionCriteria: Plan = new UnitsAtLeast(15, UnitMatchWarriors)
+  override val activationCriteria: Predicate = new Employing(TvPEarlyFDStrong)
+  override val completionCriteria: Predicate = new UnitsAtLeast(15, UnitMatchWarriors)
   
   override val aggression = 0.8
   

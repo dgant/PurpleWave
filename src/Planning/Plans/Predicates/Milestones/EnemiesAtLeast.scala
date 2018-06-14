@@ -11,8 +11,6 @@ class EnemiesAtLeast(
   
   extends Predicate {
   
-  description.set("Enemy has at least " + quantity + " " + matcher)
-  
   override def isComplete: Boolean = {
     val quantityFound =
       if (complete) {

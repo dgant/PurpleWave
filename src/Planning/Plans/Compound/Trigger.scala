@@ -12,18 +12,18 @@ class Trigger(
   
   description.set("Trigger when")
   
-  val predicate = new Property[Plan](initialPredicate)
+  val predicate = new Property[Predicate](initialPredicate)
   val after     = new Property[Plan](initialAfter)
   val before    = new Property[Plan](initialBefore)
   val latch     = new Latch
+  
   latch.predicate.inherit(predicate)
   
   var triggered: Boolean = false
   
-  override def getChildren: Iterable[Plan] = Vector(latch, after.get, before.get)
+  override def getChildren: Iterable[Plan] = Vector(after.get, before.get)
   
   override def onUpdate() {
-    delegate(latch)
     triggered = triggered || latch.isComplete
     if (triggered)
       delegate(after.get)

@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvP
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Compound.{Check, If, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Predicates.Employing
@@ -16,7 +16,7 @@ import Strategery.Strategies.Terran.TvP.TvPMidgameBioTank
 
 class TvPMidgameBioTank extends GameplanModeTemplate {
   
-  override val activationCriteria: Plan = new Employing(TvPMidgameBioTank)
+  override val activationCriteria: Predicate = new Employing(TvPMidgameBioTank)
   
   override val aggression = 0.8
   

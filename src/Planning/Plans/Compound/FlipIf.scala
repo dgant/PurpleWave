@@ -12,15 +12,14 @@ class FlipIf(
   
   description.set("Flip if")
   
-  val predicate = new Property[Plan](initialPredicate)
+  val predicate = new Property[Predicate](initialPredicate)
   val first  = new Property[Plan](inititialFirst)
   val second = new Property[Plan](initialSecond)
   
-  override def getChildren: Iterable[Plan] = Vector(predicate.get, first.get, second.get)
+  override def getChildren: Iterable[Plan] = Vector(first.get, second.get)
   override def isComplete: Boolean = predicate.get.isComplete && first.get.isComplete
   
   override def onUpdate() {
-    delegate(predicate.get)
     if (predicate.get.isComplete) {
       delegate(second.get)
       delegate(first.get)

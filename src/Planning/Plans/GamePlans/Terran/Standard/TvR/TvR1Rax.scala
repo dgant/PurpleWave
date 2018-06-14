@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvR
 
 import Macro.BuildRequests.Get
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplateVsRandom
 import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
@@ -16,8 +16,8 @@ import Strategery.Strategies.Terran.TvR.TvR1Rax
 
 class TvR1Rax extends GameplanModeTemplateVsRandom {
   
-  override val activationCriteria: Plan = new Employing(TvR1Rax)
-  override val completionCriteria: Plan = new UnitsAtLeast(2, UnitMatchWarriors)
+  override val activationCriteria: Predicate = new Employing(TvR1Rax)
+  override val completionCriteria: Predicate = new UnitsAtLeast(2, UnitMatchWarriors)
   
   override val buildOrder = Vector(
     Get(1,   Terran.CommandCenter),

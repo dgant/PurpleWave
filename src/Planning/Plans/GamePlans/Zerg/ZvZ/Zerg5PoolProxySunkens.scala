@@ -15,13 +15,13 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones.{FrameAtLeast, UnitsAtLeast}
 import Planning.Plans.Scouting.Scout
-import Planning.{Plan, ProxyPlanner}
+import Planning.{Plan, Predicate, ProxyPlanner}
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.FivePoolProxySunkens
 
 class Zerg5PoolProxySunkens extends GameplanModeTemplate {
   
-  override val activationCriteria: Plan = new Employing(FivePoolProxySunkens)
+  override val activationCriteria: Predicate = new Employing(FivePoolProxySunkens)
   
   override def defaultOverlordPlan: Plan = NoPlan()
   override def defaultSupplyPlan: Plan = NoPlan()

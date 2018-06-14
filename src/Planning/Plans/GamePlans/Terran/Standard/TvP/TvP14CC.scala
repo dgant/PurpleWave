@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Composition.UnitMatchers.UnitMatchSiegeTank
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Compound.{NoPlan, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
@@ -15,8 +15,8 @@ import Strategery.Strategies.Terran.TvP.TvPEarly14CC
 
 class TvP14CC extends GameplanModeTemplate {
   
-  override val activationCriteria: Plan = new Employing(TvPEarly14CC)
-  override val completionCriteria: Plan = new UnitsAtLeast(1, Terran.SiegeTankSieged)
+  override val activationCriteria: Predicate = new Employing(TvPEarly14CC)
+  override val completionCriteria: Predicate = new UnitsAtLeast(1, Terran.SiegeTankSieged)
   
   override val aggression = 0.8
   

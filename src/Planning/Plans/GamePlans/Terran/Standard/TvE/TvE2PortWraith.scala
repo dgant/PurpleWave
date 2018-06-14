@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvE
 
 import Macro.BuildRequests.Get
 import Planning.Composition.UnitMatchers.{UnitMatchOr, UnitMatchSiegeTank}
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -17,7 +17,7 @@ import Strategery.Strategies.Terran.TvE.TvE2PortWraith
 
 class TvE2PortWraith extends GameplanModeTemplate {
   
-  override val activationCriteria: Plan = new Employing(TvE2PortWraith)
+  override val activationCriteria: Predicate = new Employing(TvE2PortWraith)
   override def defaultAttackPlan = new Parallel(
     new Attack(Terran.Wraith),
     new Attack(Terran.Vulture)

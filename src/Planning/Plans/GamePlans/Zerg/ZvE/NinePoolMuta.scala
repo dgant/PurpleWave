@@ -5,7 +5,7 @@ import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Composition.UnitMatchers.UnitMatchOr
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -23,7 +23,7 @@ import Strategery.Strategies.Zerg.NinePoolMuta
 
 class NinePoolMuta extends GameplanModeTemplate {
   
-  override val activationCriteria: Plan = new Employing(NinePoolMuta)
+  override val activationCriteria: Predicate = new Employing(NinePoolMuta)
   
   override def buildOrder: Seq[BuildRequest] = Vector(
     Get(9, Zerg.Drone),

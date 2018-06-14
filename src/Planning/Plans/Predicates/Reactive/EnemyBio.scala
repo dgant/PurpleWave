@@ -7,8 +7,6 @@ import ProxyBwapi.Races.Terran
 
 class EnemyBio extends Predicate {
   
-  description.set("Is the enemy threatening Terran Bio?")
-  
   override def isComplete: Boolean = {
     val enemyMech = (
         2 * With.units.countEnemy(UnitMatchSiegeTank)

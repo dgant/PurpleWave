@@ -4,7 +4,7 @@ import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
 import Planning.Composition.UnitMatchers.UnitMatchSiegeTank
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Compound.{If, NoPlan}
 import Planning.Plans.GamePlans.GameplanModeTemplateVsRandom
 import Planning.Plans.Predicates.Employing
@@ -16,8 +16,8 @@ import Strategery.Strategies.Terran.TvR.TvRTinfoil
 
 class TvRTinfoil extends GameplanModeTemplateVsRandom {
   
-  override val activationCriteria: Plan = new Employing(TvRTinfoil)
-  override val completionCriteria: Plan = new UnitsAtLeast(8, UnitMatchSiegeTank, complete = true)
+  override val activationCriteria: Predicate = new Employing(TvRTinfoil)
+  override val completionCriteria: Predicate = new UnitsAtLeast(8, UnitMatchSiegeTank, complete = true)
   
   override lazy val blueprints = Vector(
     new Blueprint(this, building = Some(Terran.Bunker),       placement = Some(PlacementProfiles.hugTownHall)),

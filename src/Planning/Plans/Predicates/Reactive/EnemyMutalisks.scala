@@ -6,8 +6,6 @@ import ProxyBwapi.Races.Zerg
 
 class EnemyMutalisks extends Predicate {
   
-  description.set("Is the enemy threatening Mutalisks?")
-  
   override def isComplete: Boolean = {
     With.units.enemy.exists(unit => unit.is(Zerg.Mutalisk))
   }

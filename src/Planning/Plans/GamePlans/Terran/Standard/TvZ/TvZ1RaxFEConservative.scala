@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Macro.BuildRequests.Get
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Compound.{And, FlipIf, Latch}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Terran.Situational.TvZPlacement
@@ -16,8 +16,8 @@ import Strategery.Strategies.Terran.TvZ.TvZEarly1RaxFEConservative
 
 class TvZ1RaxFEConservative extends GameplanModeTemplate {
   
-  override val activationCriteria: Plan = new Employing(TvZEarly1RaxFEConservative)
-  override val completionCriteria: Plan = new Latch(new MiningBasesAtLeast(2))
+  override val activationCriteria: Predicate = new Employing(TvZEarly1RaxFEConservative)
+  override val completionCriteria: Predicate = new Latch(new MiningBasesAtLeast(2))
   
   override def defaultPlacementPlan: Plan = new TvZPlacement
   

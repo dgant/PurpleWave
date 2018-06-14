@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Compound.{Latch, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -13,8 +13,8 @@ import Strategery.Strategies.Protoss.PvZEarlyFFEConservative
 
 class PvZFFEConservative extends GameplanModeTemplate {
   
-  override val activationCriteria: Plan = new Employing(PvZEarlyFFEConservative)
-  override val completionCriteria: Plan = new Latch(new UnitsAtLeast(2, Protoss.PhotonCannon))
+  override val activationCriteria: Predicate = new Employing(PvZEarlyFFEConservative)
+  override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(2, Protoss.PhotonCannon))
   
   override def defaultScoutPlan     : Plan = NoPlan()
   override def defaultWorkerPlan    : Plan = NoPlan()

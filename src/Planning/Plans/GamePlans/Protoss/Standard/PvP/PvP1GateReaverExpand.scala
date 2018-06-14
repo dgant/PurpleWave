@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Compound.{Latch, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -17,8 +17,8 @@ import Strategery.Strategies.Protoss.PvPOpen1GateReaverExpand
 
 class PvP1GateReaverExpand extends GameplanModeTemplate {
   
-  override val activationCriteria: Plan = new Employing(PvPOpen1GateReaverExpand)
-  override val completionCriteria: Plan = new Latch(new And(new UnitsAtLeast(2, Protoss.Nexus), new UnitsAtLeast(1, Protoss.RoboticsSupportBay)))
+  override val activationCriteria: Predicate = new Employing(PvPOpen1GateReaverExpand)
+  override val completionCriteria: Predicate = new Latch(new And(new UnitsAtLeast(2, Protoss.Nexus), new UnitsAtLeast(1, Protoss.RoboticsSupportBay)))
   
   override def defaultWorkerPlan: Plan = new PumpWorkers(true)
   override val defaultAttackPlan: Plan = new PvPIdeas.AttackSafely

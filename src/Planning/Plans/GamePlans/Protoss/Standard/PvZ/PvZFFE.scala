@@ -4,7 +4,7 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Composition.UnitMatchers.UnitMatchType
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Compound.{Latch, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -21,8 +21,8 @@ import Strategery.Strategies.Protoss.{PvZEarlyFFEConservative, PvZEarlyFFEEconom
 
 class PvZFFE extends GameplanModeTemplate {
   
-  override val activationCriteria: Plan = new Employing(PvZEarlyFFEEconomic, PvZEarlyFFEConservative)
-  override val completionCriteria: Plan = new Latch(new And(new UnitsAtLeast(1, Protoss.CyberneticsCore)))
+  override val activationCriteria: Predicate = new Employing(PvZEarlyFFEEconomic, PvZEarlyFFEConservative)
+  override val completionCriteria: Predicate = new Latch(new And(new UnitsAtLeast(1, Protoss.CyberneticsCore)))
   
   override def defaultScoutPlan: Plan = new If(
     new And(

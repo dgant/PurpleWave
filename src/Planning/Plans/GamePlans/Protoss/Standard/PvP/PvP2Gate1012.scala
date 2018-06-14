@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Compound.{Latch, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -30,10 +30,10 @@ class PvP2Gate1012 extends GameplanModeTemplate {
     )
   }
   
-  override val activationCriteria : Plan  = new Employing(PvPOpen2Gate1012)
-  override val completionCriteria : Plan  = new Latch(new UnitsAtLeast(5, Protoss.Gateway))
-  override def defaultAttackPlan  : Plan  = new PvPIdeas.AttackSafely
-  override val defaultScoutPlan   : Plan  = new ScoutOn(Protoss.Pylon)
+  override val activationCriteria: Predicate = new Employing(PvPOpen2Gate1012)
+  override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(5, Protoss.Gateway))
+  override def defaultAttackPlan: Plan = new PvPIdeas.AttackSafely
+  override val defaultScoutPlan: Plan = new ScoutOn(Protoss.Pylon)
   
   override def defaultPlacementPlan: Plan = new Trigger(
     new UnitsAtLeast(3, Protoss.Pylon),

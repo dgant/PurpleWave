@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvE
 
 import Macro.BuildRequests.Get
 import Planning.Composition.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors}
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Army.NukeBase
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -16,7 +16,7 @@ import Strategery.Strategies.Terran.TvE.TvTPNukeDrop
 
 class TvTPNukeDrop extends GameplanModeTemplate {
   
-  override val activationCriteria: Plan = new Employing(TvTPNukeDrop)
+  override val activationCriteria: Predicate = new Employing(TvTPNukeDrop)
   override def defaultAttackPlan = new If(
     new And(
       new UnitsAtLeast(40, UnitMatchWarriors),

@@ -34,8 +34,6 @@ class Zerg4Pool extends GameplanModeTemplate {
     new Aggression(1.5))
   
   override def defaultScoutPlan: Plan = new Parallel(
-    // Hack: Force detection of fingerprint
-    new EnemyStrategy(With.fingerprints.twoGate),
     new If(
       new And(
         new Or(

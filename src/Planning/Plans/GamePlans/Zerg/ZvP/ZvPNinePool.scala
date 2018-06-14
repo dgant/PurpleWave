@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Zerg.ZvP
 import Lifecycle.With
 import Macro.BuildRequests.{Get, GetAnother}
 import Planning.Composition.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Compound.{If, Parallel, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -23,7 +23,7 @@ import Strategery.Transistor
 
 class ZvPNinePool extends GameplanModeTemplate {
   
-  override val activationCriteria: Plan = new Employing(ZvPNinePool)
+  override val activationCriteria: Predicate = new Employing(ZvPNinePool)
   override def defaultScoutPlan: Plan = new If(
     new Or(
       new StartPositionsAtMost(2),

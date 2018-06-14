@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Terran.Situational.TvZPlacement
@@ -18,7 +18,7 @@ import Strategery.Strategies.Terran.TvZ.TvZMidgameBio
 
 class TerranVsZergBio extends GameplanModeTemplate {
   
-  override val activationCriteria: Plan = new Employing(TvZMidgameBio)
+  override val activationCriteria: Predicate = new Employing(TvZMidgameBio)
   
   override def defaultPlacementPlan: Plan = new TvZPlacement
   

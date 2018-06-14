@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
 import Macro.BuildRequests.Get
 import Planning.Composition.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Compound.{Latch, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -26,7 +26,7 @@ import Strategery.Strategies.Zerg.ZvPTwoHatchMuta
 
 class ZvPTwoHatchMuta extends GameplanModeTemplate {
   
-  override val activationCriteria: Plan = new Employing(ZvPTwoHatchMuta)
+  override val activationCriteria: Predicate = new Employing(ZvPTwoHatchMuta)
   
   class ProceedWithTech extends Or(
       new Latch(new UnitsAtLeast(16, Zerg.Drone)),

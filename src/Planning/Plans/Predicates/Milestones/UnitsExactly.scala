@@ -11,8 +11,6 @@ class UnitsExactly(
   
   extends Predicate {
   
-  description.set("Have exactly " + quantity + " " + matcher)
-  
   override def isComplete: Boolean = {
     val quantityFound =
       if (complete) {

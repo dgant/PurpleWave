@@ -13,8 +13,6 @@ class UnitsAtLeast(
   
   extends Predicate {
   
-  description.set("Have at least " + quantity + " " + matcher)
-  
   override def isComplete: Boolean = {
     val quantityFound =
       if (complete) {

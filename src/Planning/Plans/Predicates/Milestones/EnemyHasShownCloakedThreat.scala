@@ -12,7 +12,4 @@ class EnemyHasShownCloakedThreat extends Or(
   new EnemyHasShown(Protoss.CitadelOfAdun),
   new EnemyHasShown(Protoss.TemplarArchives),
   new EnemyHasShown(Zerg.LurkerEgg),
-  new EnemyHasShown(Zerg.Lurker)) {
-  
-  description.set("Enemy has a cloaked threat")
-}
+  new EnemyHasShown(Zerg.Lurker))

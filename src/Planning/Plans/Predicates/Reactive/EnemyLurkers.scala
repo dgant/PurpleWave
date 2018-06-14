@@ -6,8 +6,6 @@ import ProxyBwapi.Races.Zerg
 
 class EnemyLurkers extends Predicate {
   
-  description.set("Is the enemy threatening Lurkers?")
-  
   override def isComplete: Boolean = {
     With.units.enemy.exists(_.is(Zerg.Lurker)) ||
     With.units.enemy.exists(_.is(Zerg.LurkerEgg)) ||

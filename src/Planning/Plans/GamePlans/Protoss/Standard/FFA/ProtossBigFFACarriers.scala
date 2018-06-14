@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.FFA
 
-import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
+import Macro.BuildRequests.{Get, Tech, Upgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Compound._
@@ -24,26 +24,26 @@ class ProtossBigFFACarriers extends GameplanModeTemplate {
   override val aggression = 0.6
   
   override val buildOrder = Vector(
-    RequestAtLeast(8,   Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Pylon),
-    RequestAtLeast(14,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Nexus),
-    RequestAtLeast(15,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Forge),
-    RequestAtLeast(17,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.PhotonCannon),
-    RequestAtLeast(18,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.PhotonCannon),
-    RequestAtLeast(1,   Protoss.Gateway))
+    Get(8,   Protoss.Probe),
+    Get(1,   Protoss.Pylon),
+    Get(14,  Protoss.Probe),
+    Get(2,   Protoss.Nexus),
+    Get(15,  Protoss.Probe),
+    Get(1,   Protoss.Forge),
+    Get(17,  Protoss.Probe),
+    Get(1,   Protoss.PhotonCannon),
+    Get(18,  Protoss.Probe),
+    Get(2,   Protoss.PhotonCannon),
+    Get(1,   Protoss.Gateway))
   
   private class CanBuildZealots extends Or(
     new UnitsExactly(0, Protoss.CyberneticsCore, complete = true),
     new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.Zealot.buildFrames))
   
   override def buildPlans: Seq[Plan] = Vector(
-    new If(new UnitsAtLeast(1, Protoss.Carrier), new Build(RequestUpgrade(Protoss.CarrierCapacity))),
-    new If(new UnitsAtLeast(1, Protoss.Dragoon), new Build(RequestUpgrade(Protoss.DragoonRange))),
-    new If(new UnitsAtLeast(2, Protoss.Arbiter), new Build(RequestTech(Protoss.Stasis))),
+    new If(new UnitsAtLeast(1, Protoss.Carrier), new Build(Upgrade(Protoss.CarrierCapacity))),
+    new If(new UnitsAtLeast(1, Protoss.Dragoon), new Build(Upgrade(Protoss.DragoonRange))),
+    new If(new UnitsAtLeast(2, Protoss.Arbiter), new Build(Tech(Protoss.Stasis))),
     new BuildCannonsAtExpansions(2),
     new RequireMiningBases(2),
     new TrainContinuously(Protoss.Arbiter,      3, 1),
@@ -64,45 +64,45 @@ class ProtossBigFFACarriers extends GameplanModeTemplate {
           new TrainContinuously(Protoss.Dragoon,  24)),
       new Parallel(
         new Build(
-          RequestAtLeast(3, Protoss.PhotonCannon),
-          RequestAtLeast(1, Protoss.Assimilator),
-          RequestAtLeast(1, Protoss.CyberneticsCore),
-          RequestAtLeast(4, Protoss.Gateway),
-          RequestAtLeast(3, Protoss.Nexus)),
+          Get(3, Protoss.PhotonCannon),
+          Get(1, Protoss.Assimilator),
+          Get(1, Protoss.CyberneticsCore),
+          Get(4, Protoss.Gateway),
+          Get(3, Protoss.Nexus)),
         new BuildGasPumps(),
         new RequireMiningBases(2),
         new Build(
-          RequestAtLeast(1, Protoss.CitadelOfAdun),
-          RequestAtLeast(5, Protoss.Gateway),
-          RequestAtLeast(1, Protoss.TemplarArchives),
-          RequestAtLeast(2, Protoss.Forge)),
+          Get(1, Protoss.CitadelOfAdun),
+          Get(5, Protoss.Gateway),
+          Get(1, Protoss.TemplarArchives),
+          Get(2, Protoss.Forge)),
         new UpgradeContinuously(Protoss.GroundDamage),
         new UpgradeContinuously(Protoss.GroundArmor),
         new Build(
-          RequestUpgrade(Protoss.ZealotSpeed),
-          RequestAtLeast(1, Protoss.Stargate),
-          RequestAtLeast(4, Protoss.Nexus),
-          RequestAtLeast(1, Protoss.FleetBeacon),
-          RequestAtLeast(2, Protoss.CyberneticsCore),
-          RequestAtLeast(3, Protoss.Stargate)),
+          Upgrade(Protoss.ZealotSpeed),
+          Get(1, Protoss.Stargate),
+          Get(4, Protoss.Nexus),
+          Get(1, Protoss.FleetBeacon),
+          Get(2, Protoss.CyberneticsCore),
+          Get(3, Protoss.Stargate)),
         new UpgradeContinuously(Protoss.AirDamage),
         new UpgradeContinuously(Protoss.AirArmor),
         new BuildCannonsAtExpansions(3), // In addition to earlier
         new RequireMiningBases(3),
         new Build(
-          RequestAtLeast(8, Protoss.Gateway),
-          RequestAtLeast(4, Protoss.Stargate),
-          RequestAtLeast(1, Protoss.RoboticsFacility),
-          RequestAtLeast(1, Protoss.Observatory)),
+          Get(8, Protoss.Gateway),
+          Get(4, Protoss.Stargate),
+          Get(1, Protoss.RoboticsFacility),
+          Get(1, Protoss.Observatory)),
         new RequireMiningBases(5))),
       new Build(
-        RequestAtLeast(1, Protoss.RoboticsSupportBay),
-        RequestAtLeast(1, Protoss.ArbiterTribunal),
-        RequestAtLeast(10, Protoss.Gateway),
-        RequestAtLeast(5, Protoss.Stargate)),
+        Get(1, Protoss.RoboticsSupportBay),
+        Get(1, Protoss.ArbiterTribunal),
+        Get(10, Protoss.Gateway),
+        Get(5, Protoss.Stargate)),
       new RequireMiningBases(5),
       new UpgradeContinuously(Protoss.Shields),
-      new Build(RequestAtLeast(15, Protoss.Gateway)),
+      new Build(Get(15, Protoss.Gateway)),
       new RequireMiningBases(6)
   )
 }

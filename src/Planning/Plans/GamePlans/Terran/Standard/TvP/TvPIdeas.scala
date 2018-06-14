@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Lifecycle.With
-import Macro.BuildRequests.RequestAtLeast
+import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Compound.{Check, If, Parallel}
 import Planning.Plans.Macro.Automatic.{TrainContinuously, TrainWorkersContinuously}
@@ -27,14 +27,14 @@ object TvPIdeas {
           new UpgradeContinuously(Terran.GoliathAirRange),
           new TrainContinuously(Terran.Goliath),
           new TrainContinuously(Terran.Marine),
-          new Build(RequestAtLeast(1, Terran.Armory)))),
+          new Build(Get(1, Terran.Armory)))),
       new If(
         new EnemyHasShownCloakedThreat,
         new Parallel(
           new TrainContinuously(Terran.Comsat),
           new TrainContinuously(Terran.ScienceVessel, 2, 1),
           new Build(
-            RequestAtLeast(1, Terran.EngineeringBay),
-            RequestAtLeast(3, Terran.MissileTurret),
-            RequestAtLeast(1, Terran.Academy)))))
+            Get(1, Terran.EngineeringBay),
+            Get(3, Terran.MissileTurret),
+            Get(1, Terran.Academy)))))
 }

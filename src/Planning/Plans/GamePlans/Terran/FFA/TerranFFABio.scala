@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.FFA
 
 import Lifecycle.With
-import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
+import Macro.BuildRequests.{Get, Tech, Upgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors}
 import Planning.Plan
 import Planning.Plans.Compound._
@@ -24,28 +24,28 @@ class TerranFFABio extends GameplanModeTemplate {
   private class UpgradeMech extends Parallel(
     new BuildGasPumps,
     new Build(
-      RequestAtLeast(1, Terran.Factory),
-      RequestAtLeast(2, Terran.Armory)),
+      Get(1, Terran.Factory),
+      Get(2, Terran.Armory)),
     new UpgradeContinuously(Terran.MechDamage),
     new UpgradeContinuously(Terran.MechArmor),
     new Build(
-      RequestAtLeast(1, Terran.Starport),
-      RequestAtLeast(1, Terran.ScienceFacility)))
+      Get(1, Terran.Starport),
+      Get(1, Terran.ScienceFacility)))
   
   override def defaultAttackPlan: Plan = new If(
     new UnitsAtLeast(20, UnitMatchWarriors),
     super.defaultAttackPlan)
   
   override lazy val buildOrder = Vector(
-      RequestAtLeast(1,   Terran.CommandCenter),
-      RequestAtLeast(9,   Terran.SCV),
-      RequestAtLeast(1,   Terran.SupplyDepot),
-      RequestAtLeast(11,  Terran.SCV),
-      RequestAtLeast(1,   Terran.Barracks),
-      RequestAtLeast(13,  Terran.SCV),
-      RequestAtLeast(2,   Terran.Barracks),
-      RequestAtLeast(14,  Terran.SCV),
-      RequestAtLeast(2,   Terran.SupplyDepot))
+      Get(1,   Terran.CommandCenter),
+      Get(9,   Terran.SCV),
+      Get(1,   Terran.SupplyDepot),
+      Get(11,  Terran.SCV),
+      Get(1,   Terran.Barracks),
+      Get(13,  Terran.SCV),
+      Get(2,   Terran.Barracks),
+      Get(14,  Terran.SCV),
+      Get(2,   Terran.SupplyDepot))
   
   override def emergencyPlans: Seq[Plan] = Vector(
     new If(
@@ -54,18 +54,18 @@ class TerranFFABio extends GameplanModeTemplate {
     new If(
       new EnemyHasShownCloakedThreat,
       new Build(
-        RequestAtLeast(1, Terran.ScienceVessel),
-        RequestAtLeast(1, Terran.Refinery),
-        RequestAtLeast(1, Terran.Academy),
-        RequestAtLeast(1, Terran.EngineeringBay),
-        RequestAtLeast(4, Terran.MissileTurret))),
+        Get(1, Terran.ScienceVessel),
+        Get(1, Terran.Refinery),
+        Get(1, Terran.Academy),
+        Get(1, Terran.EngineeringBay),
+        Get(4, Terran.MissileTurret))),
     new If(
       new UnitsAtLeast(1, Terran.Ghost),
       new TrainContinuously(Terran.NuclearSilo))
   )
   
   override def buildPlans: Seq[Plan] = Vector(
-    new If(new UnitsAtLeast(1,  UnitMatchSiegeTank),    new Build(RequestTech(Terran.SiegeMode))),
+    new If(new UnitsAtLeast(1,  UnitMatchSiegeTank),    new Build(Tech(Terran.SiegeMode))),
     new If(new UnitsAtLeast(12, UnitMatchWarriors),     new RequireMiningBasesFFA(2)),
     new If(new UnitsAtLeast(60, UnitMatchWarriors),     new RequireMiningBasesFFA(3)),
     new If(new UnitsAtLeast(90, UnitMatchWarriors),     new RequireMiningBasesFFA(4)),
@@ -73,10 +73,10 @@ class TerranFFABio extends GameplanModeTemplate {
     new TrainContinuously(Terran.CovertOps, 1),
     new TrainContinuously(Terran.Comsat, 2),
     new TrainContinuously(Terran.MachineShop),
-    new If(new UnitsAtLeast(1, Terran.NuclearMissile),  new Build(RequestTech(Terran.GhostCloak))),
-    new If(new UnitsAtLeast(1, Terran.NuclearMissile),  new Build(RequestUpgrade(Terran.GhostVisionRange))),
-    new If(new UnitsAtLeast(3, Terran.Ghost),           new Build(RequestTech(Terran.Lockdown))),
-    new If(new UnitsAtLeast(8, Terran.Ghost),           new Build(RequestUpgrade(Terran.GhostEnergy))),
+    new If(new UnitsAtLeast(1, Terran.NuclearMissile),  new Build(Tech(Terran.GhostCloak))),
+    new If(new UnitsAtLeast(1, Terran.NuclearMissile),  new Build(Upgrade(Terran.GhostVisionRange))),
+    new If(new UnitsAtLeast(3, Terran.Ghost),           new Build(Tech(Terran.Lockdown))),
+    new If(new UnitsAtLeast(8, Terran.Ghost),           new Build(Upgrade(Terran.GhostEnergy))),
     new If(new UnitsAtLeast(3, UnitMatchSiegeTank),     new UpgradeMech),
     new TrainContinuously(Terran.NuclearMissile),
     new TrainContinuously(Terran.NuclearSilo),
@@ -91,34 +91,34 @@ class TerranFFABio extends GameplanModeTemplate {
       new TrainContinuously(Terran.Medic, 20, 2)),
     new TrainContinuously(Terran.Marine),
     new Build(
-      RequestAtLeast(1, Terran.Refinery),
-      RequestAtLeast(1, Terran.Academy),
-      RequestAtLeast(1, Terran.EngineeringBay),
-      RequestTech(Terran.Stim)),
+      Get(1, Terran.Refinery),
+      Get(1, Terran.Academy),
+      Get(1, Terran.EngineeringBay),
+      Tech(Terran.Stim)),
     new UpgradeContinuously(Terran.BioDamage),
     new RequireMiningBasesFFA(2),
     new Build(
-      RequestAtLeast(2, Terran.Bunker),
-      RequestAtLeast(2, Terran.EngineeringBay),
-      RequestUpgrade(Terran.MarineRange),
-      RequestAtLeast(6, Terran.Barracks)),
+      Get(2, Terran.Bunker),
+      Get(2, Terran.EngineeringBay),
+      Upgrade(Terran.MarineRange),
+      Get(6, Terran.Barracks)),
     new UpgradeContinuously(Terran.BioArmor),
     new BuildGasPumps,
     new Build(
-      RequestAtLeast(1, Terran.Factory),
-      RequestAtLeast(1, Terran.Starport),
-      RequestAtLeast(1, Terran.ScienceFacility),
-      RequestAtLeast(4, Terran.Factory),
-      RequestAtLeast(10, Terran.Barracks),
-      RequestAtLeast(2, Terran.Armory)),
+      Get(1, Terran.Factory),
+      Get(1, Terran.Starport),
+      Get(1, Terran.ScienceFacility),
+      Get(4, Terran.Factory),
+      Get(10, Terran.Barracks),
+      Get(2, Terran.Armory)),
     new UpgradeContinuously(Terran.MechDamage),
     new UpgradeContinuously(Terran.MechArmor),
     new Build(
-      RequestAtLeast(1, Terran.CovertOps),
-      RequestUpgrade(Terran.GhostEnergy),
-      RequestUpgrade(Terran.GhostVisionRange),
-      RequestTech(Terran.GhostCloak),
-      RequestTech(Terran.Lockdown),
-      RequestAtLeast(8, Terran.Factory))
+      Get(1, Terran.CovertOps),
+      Upgrade(Terran.GhostEnergy),
+      Upgrade(Terran.GhostVisionRange),
+      Tech(Terran.GhostCloak),
+      Tech(Terran.Lockdown),
+      Get(8, Terran.Factory))
   )
 }

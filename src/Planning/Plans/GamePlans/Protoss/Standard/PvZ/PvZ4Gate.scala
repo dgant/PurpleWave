@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
 import Lifecycle.With
-import Macro.BuildRequests.RequestAtLeast
+import Macro.BuildRequests.Get
 import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
@@ -51,11 +51,11 @@ class PvZ4Gate extends GameplanModeTemplate {
     new If(
       new EnemyHasShownCloakedThreat,
       new Build(
-        RequestAtLeast(1, Protoss.Assimilator),
-        RequestAtLeast(1, Protoss.CyberneticsCore),
-        RequestAtLeast(1, Protoss.RoboticsFacility),
-        RequestAtLeast(1, Protoss.Observatory),
-        RequestAtLeast(2, Protoss.Observer))),
+        Get(1, Protoss.Assimilator),
+        Get(1, Protoss.CyberneticsCore),
+        Get(1, Protoss.RoboticsFacility),
+        Get(1, Protoss.Observatory),
+        Get(2, Protoss.Observer))),
   
     new Trigger(
       new Or(
@@ -81,9 +81,9 @@ class PvZ4Gate extends GameplanModeTemplate {
     new TrainWorkersContinuously,
     
     new Build(
-      RequestAtLeast(1, Protoss.CyberneticsCore), // Of course, the Assimilator SHOULD go first but then we mine too much gas from it
-      RequestAtLeast(1, Protoss.Assimilator),
-      RequestAtLeast(4, Protoss.Gateway))
+      Get(1, Protoss.CyberneticsCore), // Of course, the Assimilator SHOULD go first but then we mine too much gas from it
+      Get(1, Protoss.Assimilator),
+      Get(4, Protoss.Gateway))
   )
 }
 

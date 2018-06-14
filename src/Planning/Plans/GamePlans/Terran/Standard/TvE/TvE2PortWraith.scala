@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvE
 
-import Macro.BuildRequests.{RequestAtLeast, RequestTech}
+import Macro.BuildRequests.{Get, Tech}
 import Planning.Composition.UnitMatchers.{UnitMatchOr, UnitMatchSiegeTank}
 import Planning.Plan
 import Planning.Plans.Army.Attack
@@ -25,19 +25,19 @@ class TvE2PortWraith extends GameplanModeTemplate {
   )
   
   override val buildOrder = Vector(
-    RequestAtLeast(9, Terran.SCV),
-    RequestAtLeast(1, Terran.SupplyDepot),
-    RequestAtLeast(11, Terran.SCV),
-    RequestAtLeast(1, Terran.Barracks),
-    RequestAtLeast(12, Terran.SCV),
-    RequestAtLeast(1, Terran.Refinery),
-    RequestAtLeast(13, Terran.SCV),
-    RequestAtLeast(1, Terran.Marine),
-    RequestAtLeast(1, Terran.Bunker),
-    RequestAtLeast(14, Terran.SCV),
-    RequestAtLeast(2, Terran.SupplyDepot),
-    RequestAtLeast(2, Terran.Marine),
-    RequestAtLeast(1, Terran.Factory))
+    Get(9, Terran.SCV),
+    Get(1, Terran.SupplyDepot),
+    Get(11, Terran.SCV),
+    Get(1, Terran.Barracks),
+    Get(12, Terran.SCV),
+    Get(1, Terran.Refinery),
+    Get(13, Terran.SCV),
+    Get(1, Terran.Marine),
+    Get(1, Terran.Bunker),
+    Get(14, Terran.SCV),
+    Get(2, Terran.SupplyDepot),
+    Get(2, Terran.Marine),
+    Get(1, Terran.Factory))
   
   override def emergencyPlans: Seq[Plan] = Seq(
     new TrainContinuously(Terran.Comsat),
@@ -45,8 +45,8 @@ class TvE2PortWraith extends GameplanModeTemplate {
       new EnemyHasShownCloakedThreat,
       new Parallel(
         new Build(
-          RequestAtLeast(1, Terran.Academy),
-          RequestAtLeast(1, Terran.EngineeringBay)),
+          Get(1, Terran.Academy),
+          Get(1, Terran.EngineeringBay)),
         new TrainContinuously(Terran.MissileTurret, 2)
     )))
   
@@ -64,33 +64,33 @@ class TvE2PortWraith extends GameplanModeTemplate {
       new RequireMiningBases(3)),
     new If(
       new UnitsAtLeast(1, Terran.ControlTower),
-      new Build(RequestTech(Terran.WraithCloak))),
+      new Build(Tech(Terran.WraithCloak))),
     new TrainContinuously(Terran.Wraith),
     new If(
       new UnitsAtLeast(4, Terran.Vulture),
       new Parallel(
         new TrainContinuously(Terran.MachineShop, 1),
-        new Build(RequestTech(Terran.SpiderMinePlant)),
+        new Build(Tech(Terran.SpiderMinePlant)),
         new UpgradeContinuously(Terran.VultureSpeed))),
     new TrainContinuously(Terran.Marine, 4),
-    new Build(RequestAtLeast(2, Terran.Starport)),
+    new Build(Get(2, Terran.Starport)),
     new TrainContinuously(Terran.Vulture),
     new Build(
-      RequestAtLeast(1, Terran.Academy),
-      RequestAtLeast(3, Terran.Factory)),
+      Get(1, Terran.Academy),
+      Get(3, Terran.Factory)),
     new RequireMiningBases(2),
     new Build(
-      RequestAtLeast(4, Terran.Starport),
-      RequestAtLeast(3, Terran.Factory)),
+      Get(4, Terran.Starport),
+      Get(3, Terran.Factory)),
     new RequireMiningBases(3),
-    new Build(RequestAtLeast(2, Terran.Armory)),
+    new Build(Get(2, Terran.Armory)),
     new UpgradeContinuously(Terran.AirDamage),
     new UpgradeContinuously(Terran.AirArmor),
     new Build(
-      RequestAtLeast(1, Terran.ScienceFacility),
-      RequestAtLeast(6, Terran.Starport),
-      RequestAtLeast(6, Terran.Factory)),
+      Get(1, Terran.ScienceFacility),
+      Get(6, Terran.Starport),
+      Get(6, Terran.Factory)),
     new RequireMiningBases(4),
-    new Build(RequestAtLeast(12, Terran.Starport))
+    new Build(Get(12, Terran.Starport))
   )
 }

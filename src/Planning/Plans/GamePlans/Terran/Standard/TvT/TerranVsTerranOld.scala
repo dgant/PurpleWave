@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvT
 
-import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
+import Macro.BuildRequests.{Get, Tech, Upgrade}
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors, UnitMatchWorkers}
 import Planning.Plan
@@ -35,49 +35,49 @@ class TerranVsTerranOld extends GameplanModeTemplate {
         new Attack(UnitMatchWorkers, UnitCountOne))))
   
   override val buildOrder = Vector(
-    RequestAtLeast(1,   Terran.CommandCenter),
-    RequestAtLeast(9,   Terran.SCV),
-    RequestAtLeast(1,   Terran.SupplyDepot),
-    RequestAtLeast(11,  Terran.SCV),
-    RequestAtLeast(1,   Terran.Barracks),
-    RequestAtLeast(12,  Terran.SCV),
-    RequestAtLeast(1,   Terran.Refinery),
-    RequestAtLeast(15,  Terran.SCV),
-    RequestAtLeast(2,   Terran.SupplyDepot),
-    RequestAtLeast(16,  Terran.SCV),
-    RequestAtLeast(1,   Terran.Factory),
-    RequestAtLeast(20,  Terran.SCV))
+    Get(1,   Terran.CommandCenter),
+    Get(9,   Terran.SCV),
+    Get(1,   Terran.SupplyDepot),
+    Get(11,  Terran.SCV),
+    Get(1,   Terran.Barracks),
+    Get(12,  Terran.SCV),
+    Get(1,   Terran.Refinery),
+    Get(15,  Terran.SCV),
+    Get(2,   Terran.SupplyDepot),
+    Get(16,  Terran.SCV),
+    Get(1,   Terran.Factory),
+    Get(20,  Terran.SCV))
   
   override def buildPlans: Seq[Plan] = Vector(
     new Build(
-      RequestAtLeast(1, Terran.Bunker),
-      RequestAtLeast(1, Terran.MachineShop),
-      RequestAtLeast(1, Terran.Starport)),
+      Get(1, Terran.Bunker),
+      Get(1, Terran.MachineShop),
+      Get(1, Terran.Starport)),
     
     new If(
       new MineralsAtLeast(800),
       new Parallel(
-        new IfOnMiningBases(2, new Build(RequestAtLeast(5, Terran.Factory)), new Build(RequestAtLeast(2, Terran.Barracks))),
-        new IfOnMiningBases(3, new Build(RequestAtLeast(8, Terran.Factory)), new Build(RequestAtLeast(3, Terran.Barracks)))
+        new IfOnMiningBases(2, new Build(Get(5, Terran.Factory)), new Build(Get(2, Terran.Barracks))),
+        new IfOnMiningBases(3, new Build(Get(8, Terran.Factory)), new Build(Get(3, Terran.Barracks)))
       )),
     
     new If(new UnitsAtLeast(1, UnitMatchSiegeTank, complete = true), new RequireMiningBases(2)),
     new If(new UnitsAtLeast(20, UnitMatchWarriors), new RequireMiningBases(3)),
     new If(new UnitsAtLeast(30, UnitMatchWarriors), new RequireMiningBases(4)),
     new BuildGasPumps,
-    new If(new UnitsAtLeast(2,  Terran.SiegeTankUnsieged),  new Build(RequestTech(Terran.SiegeMode))),
-    new If(new UnitsAtLeast(3,  Terran.Wraith),             new Build(RequestAtLeast(1, Terran.ControlTower), RequestTech(Terran.WraithCloak))),
-    new If(new UnitsAtLeast(2,  Terran.Goliath),            new Build(RequestUpgrade(Terran.GoliathAirRange))),
-    new If(new UnitsAtLeast(3,  Terran.Battlecruiser),      new Build(RequestTech(Terran.Yamato))),
-    new If(new UnitsAtLeast(3,  Terran.Vulture),            new Build(RequestTech(Terran.SpiderMinePlant))),
-    new If(new UnitsAtLeast(5,  Terran.Vulture),            new Build(RequestUpgrade(Terran.VultureSpeed))),
-    new If(new UnitsAtLeast(10, Terran.Marine),             new Build(RequestUpgrade(Terran.MarineRange))),
-    new If(new UnitsAtLeast(4,  Terran.Goliath),            new Build(RequestUpgrade(Terran.GoliathAirRange))),
+    new If(new UnitsAtLeast(2,  Terran.SiegeTankUnsieged),  new Build(Tech(Terran.SiegeMode))),
+    new If(new UnitsAtLeast(3,  Terran.Wraith),             new Build(Get(1, Terran.ControlTower), Tech(Terran.WraithCloak))),
+    new If(new UnitsAtLeast(2,  Terran.Goliath),            new Build(Upgrade(Terran.GoliathAirRange))),
+    new If(new UnitsAtLeast(3,  Terran.Battlecruiser),      new Build(Tech(Terran.Yamato))),
+    new If(new UnitsAtLeast(3,  Terran.Vulture),            new Build(Tech(Terran.SpiderMinePlant))),
+    new If(new UnitsAtLeast(5,  Terran.Vulture),            new Build(Upgrade(Terran.VultureSpeed))),
+    new If(new UnitsAtLeast(10, Terran.Marine),             new Build(Upgrade(Terran.MarineRange))),
+    new If(new UnitsAtLeast(4,  Terran.Goliath),            new Build(Upgrade(Terran.GoliathAirRange))),
     new If(new UnitsAtLeast(1,  Terran.PhysicsLab),         new TrainContinuously(Terran.ControlTower)),
     new If(new UnitsAtLeast(3,  Terran.Battlecruiser),      new UpgradeContinuously(Terran.AirDamage)),
     new If(new UnitsAtLeast(3,  Terran.Battlecruiser),      new UpgradeContinuously(Terran.AirArmor)),
     new If(new UnitsAtLeast(20, UnitMatchWarriors),         new UpgradeContinuously(Terran.MechDamage)),
-    new If(new UnitsAtLeast(30, UnitMatchWarriors),         new Build(RequestAtLeast(1, Terran.ScienceFacility), RequestAtLeast(2, Terran.Armory))),
+    new If(new UnitsAtLeast(30, UnitMatchWarriors),         new Build(Get(1, Terran.ScienceFacility), Get(2, Terran.Armory))),
     new If(new UnitsAtLeast(30, UnitMatchWarriors),         new UpgradeContinuously(Terran.MechArmor)),
   
     new TrainContinuously(Terran.Comsat),
@@ -100,31 +100,31 @@ class TerranVsTerranOld extends GameplanModeTemplate {
     new TrainContinuously(Terran.Marine),
     new TrainContinuously(Terran.Vulture),
   
-    new IfOnMiningBases(2, new Build(RequestAtLeast(1, Terran.Starport),  RequestAtLeast(3, Terran.Factory), RequestAtLeast(2, Terran.Starport), RequestAtLeast(1, Terran.Armory), RequestAtLeast(1, Terran.Academy), RequestAtLeast(5, Terran.Factory))),
-    new IfOnMiningBases(3, new Build(RequestAtLeast(5, Terran.Factory),   RequestAtLeast(1, Terran.Academy), RequestAtLeast(8, Terran.Factory))),
-    new OnGasPumps(2, new Build(RequestAtLeast(3, Terran.MachineShop))),
+    new IfOnMiningBases(2, new Build(Get(1, Terran.Starport),  Get(3, Terran.Factory), Get(2, Terran.Starport), Get(1, Terran.Armory), Get(1, Terran.Academy), Get(5, Terran.Factory))),
+    new IfOnMiningBases(3, new Build(Get(5, Terran.Factory),   Get(1, Terran.Academy), Get(8, Terran.Factory))),
+    new OnGasPumps(2, new Build(Get(3, Terran.MachineShop))),
     new OnGasPumps(3, new Build(
-      RequestAtLeast(5, Terran.MachineShop),
-      RequestAtLeast(1, Terran.ScienceFacility),
-      RequestAtLeast(2, Terran.Starport),
-      RequestAtLeast(1, Terran.PhysicsLab),
-      RequestUpgrade(Terran.BattlecruiserEnergy))),
+      Get(5, Terran.MachineShop),
+      Get(1, Terran.ScienceFacility),
+      Get(2, Terran.Starport),
+      Get(1, Terran.PhysicsLab),
+      Upgrade(Terran.BattlecruiserEnergy))),
     new RequireMiningBases(2),
     new Build(
-      RequestAtLeast(3, Terran.Factory),
-      RequestAtLeast(2, Terran.Starport),
-      RequestAtLeast(1, Terran.Armory),
-      RequestAtLeast(5, Terran.Factory),
-      RequestAtLeast(1, Terran.Academy),
-      RequestAtLeast(8, Terran.Factory)),
+      Get(3, Terran.Factory),
+      Get(2, Terran.Starport),
+      Get(1, Terran.Armory),
+      Get(5, Terran.Factory),
+      Get(1, Terran.Academy),
+      Get(8, Terran.Factory)),
     new RequireMiningBases(3),
     new UpgradeContinuously(Terran.MechDamage),
     new UpgradeContinuously(Terran.MechArmor),
     new UpgradeContinuously(Terran.AirDamage),
     new UpgradeContinuously(Terran.AirArmor),
     new RequireMiningBases(4),
-    new Build(RequestAtLeast(12, Terran.Factory)),
+    new Build(Get(12, Terran.Factory)),
     new RequireMiningBases(5),
-    new Build(RequestAtLeast(16, Terran.Factory))
+    new Build(Get(16, Terran.Factory))
   )
 }

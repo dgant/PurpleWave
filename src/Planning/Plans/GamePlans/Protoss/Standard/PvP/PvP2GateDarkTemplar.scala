@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.RequestAtLeast
+import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
@@ -35,37 +35,37 @@ class PvP2GateDarkTemplar extends GameplanModeTemplate {
   override val buildOrder = Vector(
     // http://wiki.teamliquid.net/starcraft/2_Gateway_Dark_Templar_(vs._Protoss)
     // We get gas/core faster because of mineral locking + later scout
-    RequestAtLeast(8,   Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Pylon),             // 8
-    RequestAtLeast(10,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Gateway),           // 10
-    RequestAtLeast(11,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Assimilator),       // 11
-    RequestAtLeast(13,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Zealot),            // 13
-    RequestAtLeast(14,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Pylon),             // 16 = 14 + Z
-    RequestAtLeast(16,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.CyberneticsCore),   // 18 = 16 + Z
-    RequestAtLeast(17,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Zealot),            // 19 = 17 + Z
-    RequestAtLeast(18,  Protoss.Probe),
-    RequestAtLeast(3,   Protoss.Pylon),             // 22 = 18 + ZZ
-    RequestAtLeast(19,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Dragoon),           // 23 = 19 + ZZ
-    RequestAtLeast(20,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.CitadelOfAdun),     // 26 = 20 + ZZ + D
-    RequestAtLeast(21,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Dragoon),           // 27 = 21 + ZZ + D
-    RequestAtLeast(2,   Protoss.Gateway),           // 29 = 21 + ZZ + DD
-    RequestAtLeast(3,   Protoss.Pylon),
-    RequestAtLeast(1,   Protoss.TemplarArchives),
-    RequestAtLeast(4,   Protoss.Zealot),            // 33 = 21 + ZZZZ + DD
-    RequestAtLeast(22,  Protoss.Probe),
-    RequestAtLeast(4,   Protoss.Pylon),             // 34 = 22 + ZZZZ + DD
-    RequestAtLeast(23,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.DarkTemplar),
-    RequestAtLeast(24,  Protoss.Probe))
+    Get(8,   Protoss.Probe),
+    Get(1,   Protoss.Pylon),             // 8
+    Get(10,  Protoss.Probe),
+    Get(1,   Protoss.Gateway),           // 10
+    Get(11,  Protoss.Probe),
+    Get(1,   Protoss.Assimilator),       // 11
+    Get(13,  Protoss.Probe),
+    Get(1,   Protoss.Zealot),            // 13
+    Get(14,  Protoss.Probe),
+    Get(2,   Protoss.Pylon),             // 16 = 14 + Z
+    Get(16,  Protoss.Probe),
+    Get(1,   Protoss.CyberneticsCore),   // 18 = 16 + Z
+    Get(17,  Protoss.Probe),
+    Get(2,   Protoss.Zealot),            // 19 = 17 + Z
+    Get(18,  Protoss.Probe),
+    Get(3,   Protoss.Pylon),             // 22 = 18 + ZZ
+    Get(19,  Protoss.Probe),
+    Get(1,   Protoss.Dragoon),           // 23 = 19 + ZZ
+    Get(20,  Protoss.Probe),
+    Get(1,   Protoss.CitadelOfAdun),     // 26 = 20 + ZZ + D
+    Get(21,  Protoss.Probe),
+    Get(2,   Protoss.Dragoon),           // 27 = 21 + ZZ + D
+    Get(2,   Protoss.Gateway),           // 29 = 21 + ZZ + DD
+    Get(3,   Protoss.Pylon),
+    Get(1,   Protoss.TemplarArchives),
+    Get(4,   Protoss.Zealot),            // 33 = 21 + ZZZZ + DD
+    Get(22,  Protoss.Probe),
+    Get(4,   Protoss.Pylon),             // 34 = 22 + ZZZZ + DD
+    Get(23,  Protoss.Probe),
+    Get(2,   Protoss.DarkTemplar),
+    Get(24,  Protoss.Probe))
   
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvPIdeas.ReactToCannonRush,

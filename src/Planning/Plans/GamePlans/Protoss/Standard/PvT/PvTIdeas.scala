@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Lifecycle.With
-import Macro.BuildRequests.RequestAtLeast
+import Macro.BuildRequests.Get
 import Planning.Composition.UnitMatchers.{UnitMatchCustom, UnitMatchOr, UnitMatchWarriors}
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound.{If, _}
@@ -50,7 +50,7 @@ object PvTIdeas {
       new And(new Employing(PvT13Nexus), new EnemyUnitsAtLeast(1, Terran.Marine), new UnitsAtMost(0, Protoss.CyberneticsCore, complete = true)),
       new Parallel(
         new TrainContinuously(Protoss.Zealot),
-        new Build(RequestAtLeast(2, Protoss.Gateway)))))
+        new Build(Get(2, Protoss.Gateway)))))
   
   class TrainMinimumDragoons extends TrainMatchingRatio(
     Protoss.Dragoon, 1, 20,
@@ -129,8 +129,8 @@ object PvTIdeas {
     new EnemyHasShownWraithCloak,
     new Parallel(
       new Build(
-        RequestAtLeast(1, Protoss.RoboticsFacility),
-        RequestAtLeast(1, Protoss.Observatory)),
+        Get(1, Protoss.RoboticsFacility),
+        Get(1, Protoss.Observatory)),
       new PvTIdeas.TrainObservers))
 }
 

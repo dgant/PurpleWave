@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Macro.BuildRequests.RequestAtLeast
+import Macro.BuildRequests.Get
 import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.UnitMatchOr
 import Planning.Plan
@@ -70,9 +70,9 @@ class Zerg4Pool extends GameplanModeTemplate {
     new TrainContinuously(Zerg.Drone, 3),
     
     new BuildOrder(
-      RequestAtLeast(1, Zerg.SpawningPool),
-      RequestAtLeast(5, Zerg.Drone)),
-    new Build(RequestAtLeast(1, Zerg.Overlord)),
+      Get(1, Zerg.SpawningPool),
+      Get(5, Zerg.Drone)),
+    new Build(Get(1, Zerg.Overlord)),
     
     new ExtractorTrick,
     new TrainContinuously(Zerg.Zergling),

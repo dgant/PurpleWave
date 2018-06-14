@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.AllRaces
 
 import Lifecycle.With
-import Macro.BuildRequests.RequestAnother
+import Macro.BuildRequests.Another
 import Planning.Composition.UnitCounters.UnitCountExactly
 import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Composition.UnitPreferences.UnitPreferClose
@@ -21,7 +21,7 @@ class WorkerRush extends Trigger {
     new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = 0),
     new If(
       new Check(() => With.self.supplyUsed == With.self.supplyTotal),
-      new Build(RequestAnother(1, With.self.supplyClass))
+      new Build(Another(1, With.self.supplyClass))
     ),
     new TrainContinuously(With.self.workerClass),
     new FollowBuildOrder,

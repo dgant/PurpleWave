@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
-import Macro.BuildRequests.RequestAtLeast
+import Macro.BuildRequests.Get
 import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchInNatural}
 import Planning.Plan
 import Planning.Plans.Army.Attack
@@ -36,8 +36,8 @@ class PvT1015Expand extends GameplanModeTemplate {
     new If(
       new Not(new SafeAtHome),
       new Build(
-        RequestAtLeast(1, Protoss.RoboticsFacility),
-        RequestAtLeast(1, Protoss.Observatory))),
+        Get(1, Protoss.RoboticsFacility),
+        Get(1, Protoss.Observatory))),
     new RequireMiningBases(3)
   )
 }

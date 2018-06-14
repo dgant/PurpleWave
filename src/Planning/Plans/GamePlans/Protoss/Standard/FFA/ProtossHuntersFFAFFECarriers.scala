@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.FFA
 
-import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
+import Macro.BuildRequests.{Get, Tech, Upgrade}
 import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -22,57 +22,57 @@ class ProtossHuntersFFAFFECarriers extends GameplanModeTemplate {
   override val aggression = 0.6
   
   override val buildOrder = Vector(
-    RequestAtLeast(8,   Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Pylon),
-    RequestAtLeast(14,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Nexus),
-    RequestAtLeast(1,   Protoss.Forge),
-    RequestAtLeast(17,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.PhotonCannon),
-    RequestAtLeast(18,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.PhotonCannon),
-    RequestAtLeast(1,   Protoss.Gateway))
+    Get(8,   Protoss.Probe),
+    Get(1,   Protoss.Pylon),
+    Get(14,  Protoss.Probe),
+    Get(2,   Protoss.Nexus),
+    Get(1,   Protoss.Forge),
+    Get(17,  Protoss.Probe),
+    Get(1,   Protoss.PhotonCannon),
+    Get(18,  Protoss.Probe),
+    Get(2,   Protoss.PhotonCannon),
+    Get(1,   Protoss.Gateway))
   
   override def buildPlans: Seq[Plan] = Vector(
-    new If(new UnitsAtLeast(1, Protoss.Carrier),      new Build(RequestUpgrade(Protoss.CarrierCapacity))),
-    new If(new UnitsAtLeast(1, Protoss.HighTemplar),  new Build(RequestTech(Protoss.PsionicStorm))),
-    new If(new UnitsAtLeast(4, Protoss.Zealot),       new Build(RequestUpgrade(Protoss.ZealotSpeed))),
+    new If(new UnitsAtLeast(1, Protoss.Carrier),      new Build(Upgrade(Protoss.CarrierCapacity))),
+    new If(new UnitsAtLeast(1, Protoss.HighTemplar),  new Build(Tech(Protoss.PsionicStorm))),
+    new If(new UnitsAtLeast(4, Protoss.Zealot),       new Build(Upgrade(Protoss.ZealotSpeed))),
     new RequireMiningBases(2),
     new TrainContinuously(Protoss.Arbiter,        2, 1),
     new TrainContinuously(Protoss.Observer,       2, 1),
     new TrainContinuously(Protoss.Reaver,         4, 1),
     new TrainContinuously(Protoss.Carrier),
     new Build(
-      RequestAtLeast(3, Protoss.PhotonCannon),
-      RequestAtLeast(1, Protoss.Assimilator),
-      RequestAtLeast(1, Protoss.CyberneticsCore)),
+      Get(3, Protoss.PhotonCannon),
+      Get(1, Protoss.Assimilator),
+      Get(1, Protoss.CyberneticsCore)),
     new BuildGasPumps(),
     new BuildCannonsAtExpansions(4),
     new Build(
-      RequestAtLeast(8, Protoss.PhotonCannon),
-      RequestAtLeast(1, Protoss.RoboticsFacility),
-      RequestAtLeast(1, Protoss.Stargate),
-      RequestAtLeast(1, Protoss.RoboticsSupportBay),
-      RequestAtLeast(1, Protoss.FleetBeacon),
-      RequestAtLeast(2, Protoss.CyberneticsCore),
-      RequestAtLeast(3, Protoss.Stargate)),
+      Get(8, Protoss.PhotonCannon),
+      Get(1, Protoss.RoboticsFacility),
+      Get(1, Protoss.Stargate),
+      Get(1, Protoss.RoboticsSupportBay),
+      Get(1, Protoss.FleetBeacon),
+      Get(2, Protoss.CyberneticsCore),
+      Get(3, Protoss.Stargate)),
     new UpgradeContinuously(Protoss.AirDamage),
     new UpgradeContinuously(Protoss.AirArmor),
     new RequireMiningBasesFFA(3),
     new Build(
-      RequestAtLeast(1, Protoss.CitadelOfAdun),
-      RequestAtLeast(1, Protoss.TemplarArchives),
-      RequestAtLeast(1, Protoss.ArbiterTribunal),
-      RequestAtLeast(1, Protoss.RoboticsFacility),
-      RequestAtLeast(1, Protoss.Observatory)),
+      Get(1, Protoss.CitadelOfAdun),
+      Get(1, Protoss.TemplarArchives),
+      Get(1, Protoss.ArbiterTribunal),
+      Get(1, Protoss.RoboticsFacility),
+      Get(1, Protoss.Observatory)),
     new RequireMiningBasesFFA(4),
     new TrainContinuously(Protoss.HighTemplar),
     new TrainContinuously(Protoss.Zealot),
     new UpgradeContinuously(Protoss.GroundDamage),
     new UpgradeContinuously(Protoss.GroundArmor),
     new Build(
-      RequestAtLeast(5, Protoss.Stargate),
-      RequestAtLeast(12, Protoss.Gateway)),
+      Get(5, Protoss.Stargate),
+      Get(12, Protoss.Gateway)),
     new RequireMiningBasesFFA(5)
   )
 }

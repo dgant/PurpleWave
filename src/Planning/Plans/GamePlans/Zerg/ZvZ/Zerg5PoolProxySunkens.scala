@@ -4,7 +4,7 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.RequestAtLeast
+import Macro.BuildRequests.Get
 import Planning.Composition.UnitCountEverything
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, _}
@@ -51,11 +51,11 @@ class Zerg5PoolProxySunkens extends GameplanModeTemplate {
       })
   
   override val buildOrder = Vector(
-    RequestAtLeast(1, Zerg.Hatchery),
-    RequestAtLeast(5, Zerg.Drone),
-    RequestAtLeast(1, Zerg.SpawningPool),
-    RequestAtLeast(6, Zerg.Drone),
-    RequestAtLeast(6, Zerg.Zergling))
+    Get(1, Zerg.Hatchery),
+    Get(5, Zerg.Drone),
+    Get(1, Zerg.SpawningPool),
+    Get(6, Zerg.Drone),
+    Get(6, Zerg.Zergling))
   
   override def buildPlans: Seq[Plan] = Vector(
     new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
@@ -66,7 +66,7 @@ class Zerg5PoolProxySunkens extends GameplanModeTemplate {
         new And(
           new FrameAtLeast(GameTime(2, 30)()),
           new Check(() => With.geography.enemyBases.exists(_.lastScoutedFrame > 0))),
-        new Build(RequestAtLeast(2, Zerg.CreepColony)),
+        new Build(Get(2, Zerg.CreepColony)),
         new If(
           new FrameAtLeast(GameTime(1, 10)()),
           new Parallel(

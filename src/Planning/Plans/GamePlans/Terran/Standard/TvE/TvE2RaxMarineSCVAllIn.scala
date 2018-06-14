@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvE
 
-import Macro.BuildRequests.RequestAtLeast
+import Macro.BuildRequests.Get
 import Planning.Composition.UnitCounters.UnitCountExcept
 import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Plan
@@ -39,15 +39,15 @@ class TvE2RaxMarineSCVAllIn extends GameplanModeTemplate {
   override def defaultWorkerPlan: Plan = NoPlan()
   
   override val buildOrder = Vector(
-    RequestAtLeast(9, Terran.SCV),
-    RequestAtLeast(1, Terran.SupplyDepot),
-    RequestAtLeast(10, Terran.SCV),
-    RequestAtLeast(1, Terran.Barracks),
-    RequestAtLeast(11, Terran.SCV),
-    RequestAtLeast(2, Terran.Barracks),
-    RequestAtLeast(13, Terran.SCV),
-    RequestAtLeast(1, Terran.Marine),
-    RequestAtLeast(2, Terran.SupplyDepot))
+    Get(9, Terran.SCV),
+    Get(1, Terran.SupplyDepot),
+    Get(10, Terran.SCV),
+    Get(1, Terran.Barracks),
+    Get(11, Terran.SCV),
+    Get(2, Terran.Barracks),
+    Get(13, Terran.SCV),
+    Get(1, Terran.Marine),
+    Get(2, Terran.SupplyDepot))
   
   override def buildPlans: Seq[Plan] = Vector(
     new TrainContinuously(Terran.Marine),

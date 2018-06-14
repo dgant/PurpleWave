@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Lifecycle.With
-import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
+import Macro.BuildRequests.{Get, Tech, Upgrade}
 import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -37,35 +37,35 @@ class TerranVsZergBio extends GameplanModeTemplate {
     ),
     new RequireMiningBases(2),
     new Build(
-      RequestAtLeast(1, Terran.Refinery),
-      RequestAtLeast(1, Terran.Academy),
-      RequestAtLeast(2, Terran.Barracks),
-      RequestAtLeast(2, Terran.Bunker),
-      RequestTech(Terran.Stim),
-      RequestAtLeast(1, Terran.EngineeringBay),
-      RequestAtLeast(2, Terran.Comsat),
-      RequestAtLeast(5, Terran.Barracks),
-      RequestAtLeast(1, Terran.MissileTurret)),
+      Get(1, Terran.Refinery),
+      Get(1, Terran.Academy),
+      Get(2, Terran.Barracks),
+      Get(2, Terran.Bunker),
+      Tech(Terran.Stim),
+      Get(1, Terran.EngineeringBay),
+      Get(2, Terran.Comsat),
+      Get(5, Terran.Barracks),
+      Get(1, Terran.MissileTurret)),
     new BuildGasPumps,
     new If(new EnemyMutalisks, new BuildMissileTurretsAtBases(2)),
     new Build(
-      RequestUpgrade(Terran.MarineRange),
-      RequestAtLeast(1, Terran.Factory),
-      RequestAtLeast(1, Terran.Starport),
-      RequestAtLeast(1, Terran.ScienceFacility),
-      RequestAtLeast(2, Terran.EngineeringBay)),
+      Upgrade(Terran.MarineRange),
+      Get(1, Terran.Factory),
+      Get(1, Terran.Starport),
+      Get(1, Terran.ScienceFacility),
+      Get(2, Terran.EngineeringBay)),
     new UpgradeContinuously(Terran.BioArmor),
     new UpgradeContinuously(Terran.BioDamage),
     new TrainContinuously(Terran.Comsat),
     new Build(
-      RequestAtLeast(2, Terran.Starport),
-      RequestAtLeast(2, Terran.ControlTower),
-      RequestTech(Terran.Irradiate),
-      RequestUpgrade(Terran.ScienceVesselEnergy)),
+      Get(2, Terran.Starport),
+      Get(2, Terran.ControlTower),
+      Tech(Terran.Irradiate),
+      Upgrade(Terran.ScienceVesselEnergy)),
     new RequireMiningBases(3),
     new TrainContinuously(Terran.Vulture),
-    new IfOnMiningBases(2, new Build(RequestAtLeast(10, Terran.Barracks))),
-    new IfOnMiningBases(3, new Build(RequestAtLeast(15, Terran.Barracks))),
-    new IfOnMiningBases(4, new Build(RequestAtLeast(20, Terran.Barracks)))
+    new IfOnMiningBases(2, new Build(Get(10, Terran.Barracks))),
+    new IfOnMiningBases(3, new Build(Get(15, Terran.Barracks))),
+    new IfOnMiningBases(4, new Build(Get(20, Terran.Barracks)))
   )
 }

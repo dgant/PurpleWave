@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
-import Macro.BuildRequests.RequestAtLeast
+import Macro.BuildRequests.Get
 import Micro.Agency.Intention
 import Planning.Plan
 import ProxyBwapi.Races.Zerg
@@ -27,7 +27,7 @@ class ExtractorTrick extends Plan {
       )
     
     if (shouldBuildExtractor) {
-      With.scheduler.request(this, RequestAtLeast(1, Zerg.Extractor))
+      With.scheduler.request(this, Get(1, Zerg.Extractor))
     }
     else if (shouldCancelExtractor) {
       extractors.foreach(unit => {

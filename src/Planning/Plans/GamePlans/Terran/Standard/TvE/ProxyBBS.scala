@@ -4,7 +4,7 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.{BuildRequest, RequestAtLeast}
+import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Composition.UnitCounters.UnitCountExactly
 import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Plans.Army.Attack
@@ -40,12 +40,12 @@ class ProxyBBS extends GameplanModeTemplate {
   override def defaultSupplyPlan: Plan = NoPlan()
   
   override def buildOrder: Seq[BuildRequest] = Vector(
-    RequestAtLeast(1, Terran.CommandCenter),
-    RequestAtLeast(8, Terran.SCV),
-    RequestAtLeast(2, Terran.Barracks),
-    RequestAtLeast(1, Terran.SupplyDepot),
-    RequestAtLeast(9, Terran.SCV),
-    RequestAtLeast(1, Terran.Marine))
+    Get(1, Terran.CommandCenter),
+    Get(8, Terran.SCV),
+    Get(2, Terran.Barracks),
+    Get(1, Terran.SupplyDepot),
+    Get(9, Terran.SCV),
+    Get(1, Terran.Marine))
   
   override def buildPlans: Seq[Plan] = Vector(
     new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
@@ -55,7 +55,7 @@ class ProxyBBS extends GameplanModeTemplate {
         new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = false, placement = Some(PlacementProfiles.proxyBuilding)))
     },
     new TrainContinuously(Terran.Marine),
-    new Build(RequestAtLeast(10, Terran.SCV)),
+    new Build(Get(10, Terran.SCV)),
     new If(
       new And(
         new UnitsAtLeast(9, Terran.SCV),

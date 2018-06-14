@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.{BuildRequest, RequestAtLeast}
+import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Composition.UnitMatchers.UnitMatchOr
 import Planning.Plan
 import Planning.Plans.Army.Attack
@@ -26,13 +26,13 @@ class NinePoolMuta extends GameplanModeTemplate {
   override val activationCriteria: Plan = new Employing(NinePoolMuta)
   
   override def buildOrder: Seq[BuildRequest] = Vector(
-    RequestAtLeast(9, Zerg.Drone),
-    RequestAtLeast(1, Zerg.SpawningPool),
-    RequestAtLeast(10, Zerg.Drone),
-    RequestAtLeast(1, Zerg.Extractor),
-    RequestAtLeast(2, Zerg.Overlord),
-    RequestAtLeast(11, Zerg.Drone),
-    RequestAtLeast(6, Zerg.Zergling))
+    Get(9, Zerg.Drone),
+    Get(1, Zerg.SpawningPool),
+    Get(10, Zerg.Drone),
+    Get(1, Zerg.Extractor),
+    Get(2, Zerg.Overlord),
+    Get(11, Zerg.Drone),
+    Get(6, Zerg.Zergling))
   
   override def blueprints: Seq[Blueprint] = Vector(
     new Blueprint(this, building = Some(Zerg.CreepColony), requireZone = Some(With.geography.ourMain.zone),    placement = Some(PlacementProfiles.hugTownHall)),
@@ -71,8 +71,8 @@ class NinePoolMuta extends GameplanModeTemplate {
           With.blackboard.gasLimitCeiling = 300
         }))),
     new Build(
-      RequestAtLeast(8, Zerg.Drone),
-      RequestAtLeast(1, Zerg.Lair)),
+      Get(8, Zerg.Drone),
+      Get(1, Zerg.Lair)),
     new TrainContinuously(Zerg.SunkenColony),
     new If(
       new UnitsAtMost(0, Zerg.Spire),
@@ -81,7 +81,7 @@ class NinePoolMuta extends GameplanModeTemplate {
           new Not(new EnemyIsZerg),
           new TrainContinuously(Zerg.Drone, 16)),
         new TrainContinuously(Zerg.Zergling))),
-    new Build(RequestAtLeast(1, Zerg.Spire)),
+    new Build(Get(1, Zerg.Spire)),
     new If(
       new UnitsAtMost(1, Zerg.Extractor),
       new TrainContinuously(Zerg.Mutalisk, 100, 2),
@@ -92,13 +92,13 @@ class NinePoolMuta extends GameplanModeTemplate {
           new EnemyUnitsAtLeast(1, Terran.Vulture),
           new EnemyUnitsAtLeast(1, Terran.Factory)),
         new UnitsAtMost(1, Zerg.SunkenColony)),
-      new Build(RequestAtLeast(1, Zerg.CreepColony))),
+      new Build(Get(1, Zerg.CreepColony))),
     new If(
       new And(
         new UnitsAtLeast(1, Zerg.Spire),
         new UnitsAtMost(0, Zerg.SunkenColony),
         new EnemyIsZerg),
-      new Build(RequestAtLeast(1, Zerg.CreepColony))),
+      new Build(Get(1, Zerg.CreepColony))),
     new If(
       new Or(
         new MineralsAtLeast(350),

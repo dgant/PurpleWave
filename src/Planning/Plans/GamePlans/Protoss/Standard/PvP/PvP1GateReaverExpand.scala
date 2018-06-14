@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Lifecycle.With
-import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
+import Macro.BuildRequests.{Get, Upgrade}
 import Planning.Composition.Latch
 import Planning.Plan
 import Planning.Plans.Compound._
@@ -40,25 +40,25 @@ class PvP1GateReaverExpand extends GameplanModeTemplate {
   
     new If(
       new EnemyStrategy(With.fingerprints.proxyGateway),
-      new Build(RequestAtLeast(3, Protoss.Gateway))),
+      new Build(Get(3, Protoss.Gateway))),
     new If(
       new EnemyStrategy(With.fingerprints.twoGate),
-      new Build(RequestAtLeast(2, Protoss.Gateway))),
+      new Build(Get(2, Protoss.Gateway))),
     
     new Build(
-      RequestUpgrade(Protoss.DragoonRange),
-      RequestAtLeast(1, Protoss.RoboticsFacility)),
+      Upgrade(Protoss.DragoonRange),
+      Get(1, Protoss.RoboticsFacility)),
     
     new FlipIf(
       new SafeAtHome,
       new Build(
-        RequestAtLeast(1, Protoss.RoboticsSupportBay),
-        RequestAtLeast(2, Protoss.Gateway),
-        RequestAtLeast(1, Protoss.Observatory)),
+        Get(1, Protoss.RoboticsSupportBay),
+        Get(2, Protoss.Gateway),
+        Get(1, Protoss.Observatory)),
       new Build(
-        RequestAtLeast(2, Protoss.Nexus),
-        RequestAtLeast(1, Protoss.RoboticsFacility),
-        RequestAtLeast(1, Protoss.Observatory),
-        RequestAtLeast(1, Protoss.RoboticsSupportBay)))
+        Get(2, Protoss.Nexus),
+        Get(1, Protoss.RoboticsFacility),
+        Get(1, Protoss.Observatory),
+        Get(1, Protoss.RoboticsSupportBay)))
   )
 }

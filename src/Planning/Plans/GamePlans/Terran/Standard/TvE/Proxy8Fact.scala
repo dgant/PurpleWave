@@ -4,7 +4,7 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.{BuildRequest, RequestAtLeast}
+import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -38,13 +38,13 @@ class Proxy8Fact extends GameplanModeTemplate {
   }
   
   override val buildOrder: Seq[BuildRequest] = Vector(
-    RequestAtLeast(1, Terran.CommandCenter),
-    RequestAtLeast(8, Terran.SCV),
-    RequestAtLeast(1, Terran.Barracks),
-    RequestAtLeast(1, Terran.Refinery),
-    RequestAtLeast(1, Terran.Factory),
-    RequestAtLeast(1, Terran.SupplyDepot),
-    RequestAtLeast(10, Terran.SCV))
+    Get(1, Terran.CommandCenter),
+    Get(8, Terran.SCV),
+    Get(1, Terran.Barracks),
+    Get(1, Terran.Refinery),
+    Get(1, Terran.Factory),
+    Get(1, Terran.SupplyDepot),
+    Get(10, Terran.SCV))
   
   override def defaultWorkerPlan: Plan = NoPlan()
   
@@ -80,7 +80,7 @@ class Proxy8Fact extends GameplanModeTemplate {
         new TrainContinuously(Terran.Marine),
         new TrainWorkersContinuously,
         new Build(
-          RequestAtLeast(1, Terran.Starport),
-          RequestAtLeast(3, Terran.Barracks))))
+          Get(1, Terran.Starport),
+          Get(3, Terran.Barracks))))
   )
 }

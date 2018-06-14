@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
-import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
+import Macro.BuildRequests.{Get, Tech, Upgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.Aggression
@@ -21,24 +21,24 @@ class ProtossVsZerg8Gate extends GameplanModeTemplate {
     
   class GatewayTech extends Parallel(
     new Build(
-      RequestAtLeast(1, Protoss.Gateway),
-      RequestAtLeast(1, Protoss.Forge),
-      RequestAtLeast(1, Protoss.Assimilator),
-      RequestAtLeast(1, Protoss.CyberneticsCore),
-      RequestAtLeast(1, Protoss.CitadelOfAdun),
-      RequestUpgrade(Protoss.GroundDamage),
-      RequestUpgrade(Protoss.ZealotSpeed),
-      RequestUpgrade(Protoss.DragoonRange),
-      RequestAtLeast(5, Protoss.Gateway),
-      RequestAtLeast(2, Protoss.Assimilator),
-      RequestAtLeast(1, Protoss.RoboticsFacility),
-      RequestAtLeast(1, Protoss.Observatory),
-      RequestAtLeast(1, Protoss.TemplarArchives),
-      RequestAtLeast(8, Protoss.Gateway)),
+      Get(1, Protoss.Gateway),
+      Get(1, Protoss.Forge),
+      Get(1, Protoss.Assimilator),
+      Get(1, Protoss.CyberneticsCore),
+      Get(1, Protoss.CitadelOfAdun),
+      Upgrade(Protoss.GroundDamage),
+      Upgrade(Protoss.ZealotSpeed),
+      Upgrade(Protoss.DragoonRange),
+      Get(5, Protoss.Gateway),
+      Get(2, Protoss.Assimilator),
+      Get(1, Protoss.RoboticsFacility),
+      Get(1, Protoss.Observatory),
+      Get(1, Protoss.TemplarArchives),
+      Get(8, Protoss.Gateway)),
     new BuildGasPumps)
       
   class LateTech extends Parallel(
-    new Build(RequestTech(Protoss.PsionicStorm)),
+    new Build(Tech(Protoss.PsionicStorm)),
     new UpgradeContinuously(Protoss.GroundArmor),
     new UpgradeContinuously(Protoss.ObserverSpeed))
   

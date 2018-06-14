@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvP
 
-import Macro.BuildRequests.{BuildRequest, RequestAtLeast, RequestTech}
+import Macro.BuildRequests.{BuildRequest, Get, Tech}
 import Planning.Composition.UnitMatchers.UnitMatchSiegeTank
 import Planning.Plan
 import Planning.Plans.Compound.{NoPlan, Trigger}
@@ -32,24 +32,24 @@ class TvP14CC extends GameplanModeTemplate {
   override def defaultWorkerPlan = NoPlan()
   
   override def buildOrder: Seq[BuildRequest] = Vector(
-    RequestAtLeast(9, Terran.SCV),
-    RequestAtLeast(1, Terran.SupplyDepot),
-    RequestAtLeast(14, Terran.SCV),
-    RequestAtLeast(2, Terran.CommandCenter))
+    Get(9, Terran.SCV),
+    Get(1, Terran.SupplyDepot),
+    Get(14, Terran.SCV),
+    Get(2, Terran.CommandCenter))
   
   override def buildPlans: Seq[Plan] = Vector(
-    new Build(RequestAtLeast(1, Terran.Barracks)),
+    new Build(Get(1, Terran.Barracks)),
     new TrainContinuously(Terran.SiegeTankUnsieged),
     new TrainContinuously(Terran.Marine),
     new TrainWorkersContinuously,
     new Build(
-      RequestAtLeast(1, Terran.Bunker),
-      RequestAtLeast(2, Terran.SupplyDepot),
-      RequestAtLeast(1, Terran.Refinery),
-      RequestAtLeast(1, Terran.Factory),
-      RequestAtLeast(1, Terran.MachineShop),
-      RequestTech(Terran.SiegeMode),
-      RequestAtLeast(2, Terran.Factory),
-      RequestAtLeast(2, Terran.Refinery),
-      RequestAtLeast(4, Terran.Factory)))
+      Get(1, Terran.Bunker),
+      Get(2, Terran.SupplyDepot),
+      Get(1, Terran.Refinery),
+      Get(1, Terran.Factory),
+      Get(1, Terran.MachineShop),
+      Tech(Terran.SiegeMode),
+      Get(2, Terran.Factory),
+      Get(2, Terran.Refinery),
+      Get(4, Terran.Factory)))
 }

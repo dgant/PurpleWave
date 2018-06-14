@@ -4,7 +4,7 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.{BuildRequest, RequestAtLeast}
+import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Composition.UnitCounters.UnitCountExcept
 import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Plans.Army.Attack
@@ -37,12 +37,12 @@ class Proxy5Rax extends GameplanModeTemplate {
   override def defaultSupplyPlan: Plan = NoPlan()
   
   override def buildOrder: Seq[BuildRequest] = Vector(
-    RequestAtLeast(1, Terran.CommandCenter),
-    RequestAtLeast(5, Terran.SCV),
-    RequestAtLeast(1, Terran.Barracks),
-    RequestAtLeast(7, Terran.SCV),
-    RequestAtLeast(1, Terran.SupplyDepot),
-    RequestAtLeast(1, Terran.Marine)
+    Get(1, Terran.CommandCenter),
+    Get(5, Terran.SCV),
+    Get(1, Terran.Barracks),
+    Get(7, Terran.SCV),
+    Get(1, Terran.SupplyDepot),
+    Get(1, Terran.Marine)
   )
   
   override def buildPlans: Seq[Plan] = Vector(

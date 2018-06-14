@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvR
 
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.{RequestAtLeast, RequestTech}
+import Macro.BuildRequests.{Get, Tech}
 import Planning.Composition.UnitMatchers.UnitMatchSiegeTank
 import Planning.Plan
 import Planning.Plans.Compound.{If, NoPlan}
@@ -31,33 +31,33 @@ class TvRTinfoil extends GameplanModeTemplateVsRandom {
   override def defaultAttackPlan: Plan = NoPlan()
   
   override val buildOrder = Vector(
-    RequestAtLeast(1,   Terran.CommandCenter),
-    RequestAtLeast(9,   Terran.SCV),
-    RequestAtLeast(1,   Terran.Barracks),
-    RequestAtLeast(1,   Terran.SupplyDepot),
-    RequestAtLeast(11,  Terran.SCV),
-    RequestAtLeast(1,   Terran.Marine),
-    RequestAtLeast(1,   Terran.Bunker))
+    Get(1,   Terran.CommandCenter),
+    Get(9,   Terran.SCV),
+    Get(1,   Terran.Barracks),
+    Get(1,   Terran.SupplyDepot),
+    Get(11,  Terran.SCV),
+    Get(1,   Terran.Marine),
+    Get(1,   Terran.Bunker))
   
   override def buildPlans: Seq[Plan] = Vector(
-    new If(new UnitsAtLeast(1, UnitMatchSiegeTank), new Build(RequestTech(Terran.SiegeMode))),
+    new If(new UnitsAtLeast(1, UnitMatchSiegeTank), new Build(Tech(Terran.SiegeMode))),
     new TrainContinuously(Terran.SiegeTankUnsieged),
     new If(
       new UnitsAtLeast(6, Terran.Marine),
       new TrainContinuously(Terran.Medic, 3, 1)),
     new TrainContinuously(Terran.Marine),
     new Build(
-      RequestAtLeast(2, Terran.Barracks),
-      RequestAtLeast(1, Terran.Refinery),
-      RequestAtLeast(1, Terran.Factory),
-      RequestAtLeast(1, Terran.MachineShop),
-      RequestAtLeast(2, Terran.Bunker),
-      RequestAtLeast(1, Terran.Academy),
-      RequestAtLeast(1, Terran.Comsat),
-      RequestAtLeast(1, Terran.EngineeringBay),
-      RequestAtLeast(2, Terran.MissileTurret),
-      RequestAtLeast(2, Terran.Factory),
-      RequestTech(Terran.Stim),
-      RequestAtLeast(2, Terran.MachineShop))
+      Get(2, Terran.Barracks),
+      Get(1, Terran.Refinery),
+      Get(1, Terran.Factory),
+      Get(1, Terran.MachineShop),
+      Get(2, Terran.Bunker),
+      Get(1, Terran.Academy),
+      Get(1, Terran.Comsat),
+      Get(1, Terran.EngineeringBay),
+      Get(2, Terran.MissileTurret),
+      Get(2, Terran.Factory),
+      Tech(Terran.Stim),
+      Get(2, Terran.MachineShop))
   )
 }

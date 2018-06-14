@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
-import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
+import Macro.BuildRequests.{Get, Tech, Upgrade}
 import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
@@ -99,17 +99,17 @@ class PvTBasic extends GameplanModeTemplate {
   
   class BasicTech extends Parallel(
     new Build(
-      RequestAtLeast(1, Protoss.Gateway),
-      RequestAtLeast(1, Protoss.Assimilator),
-      RequestAtLeast(1, Protoss.CyberneticsCore),
-      RequestAtLeast(2, Protoss.Gateway),
-      RequestUpgrade(Protoss.DragoonRange)))
+      Get(1, Protoss.Gateway),
+      Get(1, Protoss.Assimilator),
+      Get(1, Protoss.CyberneticsCore),
+      Get(2, Protoss.Gateway),
+      Upgrade(Protoss.DragoonRange)))
   
   class ObserverTech extends Parallel(
     new BasicTech,
     new Build(
-      RequestAtLeast(1, Protoss.RoboticsFacility),
-      RequestAtLeast(1, Protoss.Observatory)),
+      Get(1, Protoss.RoboticsFacility),
+      Get(1, Protoss.Observatory)),
     new If(
       new And(
         new EnemyUnitsAtLeast(3, Terran.SpiderMine),
@@ -140,10 +140,10 @@ class PvTBasic extends GameplanModeTemplate {
     new UpgradeContinuously(Protoss.ArbiterEnergy),
     new If(
       new UnitsAtLeast(1, Protoss.Arbiter, complete = true),
-      new Build(RequestTech(Protoss.Stasis))),
+      new Build(Tech(Protoss.Stasis))),
     new If(
       new UnitsAtLeast(1, Protoss.HighTemplar),
-      new Build(RequestTech(Protoss.PsionicStorm))),
+      new Build(Tech(Protoss.PsionicStorm))),
     new If(
       new UnitsAtLeast(4, Protoss.Zealot),
       new UpgradeContinuously(Protoss.ZealotSpeed)),
@@ -184,24 +184,24 @@ class PvTBasic extends GameplanModeTemplate {
             new UnitsExactly(0, Protoss.TemplarArchives),
             new UnitsAtLeast(1, Protoss.RoboticsFacility)),
           new Build(
-            RequestAtLeast(1, Protoss.RoboticsSupportBay),
-            RequestAtLeast(5, Protoss.Gateway))),
+            Get(1, Protoss.RoboticsSupportBay),
+            Get(5, Protoss.Gateway))),
         new Build(
-            RequestAtLeast(1, Protoss.CitadelOfAdun),
-            RequestAtLeast(5, Protoss.Gateway),
-            RequestAtLeast(1, Protoss.TemplarArchives),
-            RequestAtLeast(2, Protoss.Forge),
-            RequestUpgrade(Protoss.HighTemplarEnergy))),
+            Get(1, Protoss.CitadelOfAdun),
+            Get(5, Protoss.Gateway),
+            Get(1, Protoss.TemplarArchives),
+            Get(2, Protoss.Forge),
+            Upgrade(Protoss.HighTemplarEnergy))),
       new Parallel(
         new If(
           new EmployingCarriers,
           new Parallel(
             new If(
               new IfOnMiningBases(3),
-              new Build(RequestAtLeast(4, Protoss.Gateway))),
+              new Build(Get(4, Protoss.Gateway))),
             new Build(
-              RequestAtLeast(1, Protoss.Stargate),
-              RequestAtLeast(1, Protoss.FleetBeacon)),
+              Get(1, Protoss.Stargate),
+              Get(1, Protoss.FleetBeacon)),
             new If(
               new UnitsAtLeast(1, Protoss.FleetBeacon),
               new If(
@@ -212,8 +212,8 @@ class PvTBasic extends GameplanModeTemplate {
                     new Employing(PvT13Nexus),
                     new Employing(PvT21Nexus),
                     new Employing(PvT1015Expand))),
-                new Build(RequestAtLeast(3, Protoss.Stargate)),
-                new Build(RequestAtLeast(2, Protoss.Stargate)))))),
+                new Build(Get(3, Protoss.Stargate)),
+                new Build(Get(2, Protoss.Stargate)))))),
         new If(
           new Or(
             new EmployingArbiters,
@@ -222,12 +222,12 @@ class PvTBasic extends GameplanModeTemplate {
               new UnitsAtLeast(8, Protoss.Carrier))),
           new Parallel(
             new Build(
-              RequestAtLeast(1, Protoss.CitadelOfAdun),
-              RequestAtLeast(1, Protoss.TemplarArchives)),
+              Get(1, Protoss.CitadelOfAdun),
+              Get(1, Protoss.TemplarArchives)),
               new Build(
-                RequestAtLeast(1, Protoss.Stargate),
-                RequestAtLeast(3, Protoss.Gateway),
-                RequestAtLeast(1, Protoss.ArbiterTribunal)))))))
+                Get(1, Protoss.Stargate),
+                Get(3, Protoss.Gateway),
+                Get(1, Protoss.ArbiterTribunal)))))))
   
   class BonusTech extends Parallel(
     new If(
@@ -235,16 +235,16 @@ class PvTBasic extends GameplanModeTemplate {
         new EmployingArbiters,
         new OnGasPumps(3)),
       new Build(
-        RequestAtLeast(2, Protoss.Stargate),
-        RequestAtLeast(2, Protoss.Forge))),
+        Get(2, Protoss.Stargate),
+        Get(2, Protoss.Forge))),
     new If(
       new And(
         new EmployingCarriers,
         new OnGasPumps(3)),
       new Parallel(
         new Build(
-          RequestAtLeast(2, Protoss.CyberneticsCore),
-          RequestAtLeast(3, Protoss.Stargate)))))
+          Get(2, Protoss.CyberneticsCore),
+          Get(3, Protoss.Stargate)))))
       
   override val buildPlans = Vector(
     
@@ -278,15 +278,15 @@ class PvTBasic extends GameplanModeTemplate {
         new LateGameTech,
         new FlipIf(
           new SafeAtHome,
-          new Build(RequestAtLeast(6, Protoss.Gateway)),
+          new Build(Get(6, Protoss.Gateway)),
           new BonusTech
         ))),
   
     new RequireMiningBases(3),
-    new Build(RequestAtLeast(1, Protoss.CitadelOfAdun)),
-    new Build(RequestAtLeast(10, Protoss.Gateway)),
+    new Build(Get(1, Protoss.CitadelOfAdun)),
+    new Build(Get(10, Protoss.Gateway)),
     new RequireMiningBases(4),
-    new Build(RequestAtLeast(24, Protoss.Gateway))
+    new Build(Get(24, Protoss.Gateway))
   )
 }
 

@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvP
 
-import Macro.BuildRequests.{BuildRequest, RequestAtLeast, RequestTech, RequestUpgrade}
+import Macro.BuildRequests.{BuildRequest, Get, Tech, Upgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors}
 import Planning.Plan
 import Planning.Plans.Compound.{If, Trigger}
@@ -31,47 +31,47 @@ class TvPFDStrong extends GameplanModeTemplate {
   override def defaultWorkerPlan: Plan = TvPIdeas.workerPlan
   
   override def buildOrder: Seq[BuildRequest] = Vector(
-    RequestAtLeast(10, Terran.SCV),
-    RequestAtLeast(1, Terran.SupplyDepot),
-    RequestAtLeast(1, Terran.Barracks),
-    RequestAtLeast(1, Terran.Refinery),
-    RequestAtLeast(12, Terran.SCV),
-    RequestAtLeast(1, Terran.Marine),
-    RequestAtLeast(13, Terran.SCV),
-    RequestAtLeast(2, Terran.Marine),
-    RequestAtLeast(1, Terran.Factory),
-    RequestAtLeast(14, Terran.SCV),
-    RequestAtLeast(2, Terran.SupplyDepot))
+    Get(10, Terran.SCV),
+    Get(1, Terran.SupplyDepot),
+    Get(1, Terran.Barracks),
+    Get(1, Terran.Refinery),
+    Get(12, Terran.SCV),
+    Get(1, Terran.Marine),
+    Get(13, Terran.SCV),
+    Get(2, Terran.Marine),
+    Get(1, Terran.Factory),
+    Get(14, Terran.SCV),
+    Get(2, Terran.SupplyDepot))
   
   override def buildPlans: Seq[Plan] = Vector(
     // TODO: Gas cut
     new TrainContinuously(Terran.SiegeTankUnsieged),
     new TrainContinuously(Terran.Marine),
-    new Build(RequestAtLeast(1, Terran.MachineShop)),
+    new Build(Get(1, Terran.MachineShop)),
     new If(
       new UnitsAtLeast(2, Terran.Factory, complete = true),
       new TrainContinuously(Terran.Vulture)),
-    new Build(RequestTech(Terran.SpiderMinePlant)),
+    new Build(Tech(Terran.SpiderMinePlant)),
     new RequireMiningBases(2),
     new BuildGasPumps,
     new Build(
-      RequestAtLeast(4, Terran.Factory),
-      RequestAtLeast(3, Terran.MachineShop),
-      RequestUpgrade(Terran.VultureSpeed),
-      RequestAtLeast(6, Terran.Factory)),
+      Get(4, Terran.Factory),
+      Get(3, Terran.MachineShop),
+      Upgrade(Terran.VultureSpeed),
+      Get(6, Terran.Factory)),
     new RequireMiningBases(3),
     new Build(
-      RequestAtLeast(1, Terran.Academy),
-      RequestAtLeast(2, Terran.Armory),
-      RequestAtLeast(1, Terran.Starport)),
+      Get(1, Terran.Academy),
+      Get(2, Terran.Armory),
+      Get(1, Terran.Starport)),
     new UpgradeContinuously(Terran.MechDamage),
     new UpgradeContinuously(Terran.MechArmor),
     new Build(
-      RequestAtLeast(1, Terran.ScienceFacility),
-      RequestAtLeast(8, Terran.Factory),
-      RequestAtLeast(5, Terran.MachineShop)),
+      Get(1, Terran.ScienceFacility),
+      Get(8, Terran.Factory),
+      Get(5, Terran.MachineShop)),
     new RequireMiningBases(4),
   new Build(
-    RequestAtLeast(12, Terran.Factory),
-    RequestAtLeast(5, Terran.MachineShop)))
+    Get(12, Terran.Factory),
+    Get(5, Terran.MachineShop)))
 }

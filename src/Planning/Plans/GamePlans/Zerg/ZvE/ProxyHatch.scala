@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
+import Macro.BuildRequests.{Get, Upgrade}
 import Planning.Composition.UnitCounters.UnitCountExactly
 import Planning.Composition.UnitMatchers.{UnitMatchMobileFlying, UnitMatchWorkers}
 import Planning.Plans.Army.{Aggression, Attack}
@@ -44,10 +44,10 @@ class ProxyHatch extends Parallel {
       requireZone = Some(With.geography.ourMain.zone))) },
     
     new Build(
-      RequestAtLeast(1,   Zerg.Hatchery),
-      RequestAtLeast(1,   Zerg.Drone),
-      RequestAtLeast(1,   Zerg.Overlord),
-      RequestAtLeast(9,   Zerg.Drone)),
+      Get(1,   Zerg.Hatchery),
+      Get(1,   Zerg.Drone),
+      Get(1,   Zerg.Overlord),
+      Get(9,   Zerg.Drone)),
   
     new If(
       new WeKnowWhereToProxy,
@@ -74,23 +74,23 @@ class ProxyHatch extends Parallel {
           blueprintCreepColonyNatural)},
         new Employ(ProxyHatchHydras,
           new Build(
-            RequestAtLeast(2,   Zerg.Hatchery),
-            RequestAtLeast(1,   Zerg.SpawningPool),
-            RequestAtLeast(2,   Zerg.Overlord),
-            RequestAtLeast(1,   Zerg.Extractor),
-            RequestAtLeast(12,  Zerg.Drone))),
+            Get(2,   Zerg.Hatchery),
+            Get(1,   Zerg.SpawningPool),
+            Get(2,   Zerg.Overlord),
+            Get(1,   Zerg.Extractor),
+            Get(12,  Zerg.Drone))),
         new Employ(ProxyHatchZerglings,
           new Build(
-            RequestAtLeast(2,   Zerg.Hatchery),
-            RequestAtLeast(1,   Zerg.SpawningPool),
-            RequestAtLeast(2,   Zerg.Overlord))),
+            Get(2,   Zerg.Hatchery),
+            Get(1,   Zerg.SpawningPool),
+            Get(2,   Zerg.Overlord))),
         new Employ(ProxyHatchSunkens,
           new Build(
-            RequestAtLeast(2,   Zerg.Overlord),
-            RequestAtLeast(2,   Zerg.Hatchery),
-            RequestAtLeast(12,  Zerg.Drone),
-            RequestAtLeast(1,   Zerg.SpawningPool),
-            RequestAtLeast(14,  Zerg.Drone))))),
+            Get(2,   Zerg.Overlord),
+            Get(2,   Zerg.Hatchery),
+            Get(12,  Zerg.Drone),
+            Get(1,   Zerg.SpawningPool),
+            Get(14,  Zerg.Drone))))),
   
     new Employ(ProxyHatchZerglings,
       new Parallel(
@@ -107,7 +107,7 @@ class ProxyHatch extends Parallel {
           With.blackboard.gasLimitFloor = 50
           With.blackboard.gasLimitCeiling = 175
         }),
-        new Build(RequestAtLeast(1, Zerg.HydraliskDen)),
+        new Build(Get(1, Zerg.HydraliskDen)),
         new RequireSufficientSupply,
         new If(
           new UnitsAtLeast(1, Zerg.HydraliskDen, complete = false),
@@ -129,13 +129,13 @@ class ProxyHatch extends Parallel {
             initialAfter = new Parallel(
               new RequireSufficientSupply,
               new TrainContinuously(Zerg.Mutalisk),
-              new Build(RequestAtLeast(24, Zerg.Drone)),
+              new Build(Get(24, Zerg.Drone)),
               new BuildGasPumps,
               new TrainContinuously(Zerg.Zergling),
               new Build(
-                RequestAtLeast(1, Zerg.Lair),
-                RequestUpgrade(Zerg.ZerglingSpeed),
-                RequestAtLeast(1, Zerg.Spire)),
+                Get(1, Zerg.Lair),
+                Upgrade(Zerg.ZerglingSpeed),
+                Get(1, Zerg.Spire)),
               new If(
                 new UnitsAtMost(6, Zerg.SunkenColony),
                 new TrainContinuously(Zerg.CreepColony, 1)),

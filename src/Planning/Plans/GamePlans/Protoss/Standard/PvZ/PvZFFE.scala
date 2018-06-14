@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Macro.BuildRequests.RequestAtLeast
+import Macro.BuildRequests.Get
 import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plan
@@ -50,7 +50,7 @@ class PvZFFE extends GameplanModeTemplate {
       new And(
         new EnemyStrategy(With.fingerprints.fourPool),
         new UnitsAtLeast(1, Protoss.Forge)),
-      new Build(RequestAtLeast(4, Protoss.PhotonCannon))),
+      new Build(Get(4, Protoss.PhotonCannon))),
     new If(
       new And(
         new EnemyStrategy(With.fingerprints.fourPool),
@@ -73,14 +73,14 @@ class PvZFFE extends GameplanModeTemplate {
   override def buildPlans: Seq[Plan] = Vector(
     new TrainContinuously(Protoss.Zealot),
     new Build(
-      RequestAtLeast(1, Protoss.Pylon),
-      RequestAtLeast(1, Protoss.Forge),
-      RequestAtLeast(2, Protoss.PhotonCannon),
-      RequestAtLeast(2, Protoss.Nexus),
-      RequestAtLeast(1, Protoss.Gateway),
-      RequestAtLeast(2, Protoss.Pylon),
-      RequestAtLeast(1, Protoss.Assimilator),
-      RequestAtLeast(1, Protoss.CyberneticsCore)),
+      Get(1, Protoss.Pylon),
+      Get(1, Protoss.Forge),
+      Get(2, Protoss.PhotonCannon),
+      Get(2, Protoss.Nexus),
+      Get(1, Protoss.Gateway),
+      Get(2, Protoss.Pylon),
+      Get(1, Protoss.Assimilator),
+      Get(1, Protoss.CyberneticsCore)),
     new RequireMiningBases(2)
   )
 }

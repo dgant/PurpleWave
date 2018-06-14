@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvE
 
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Macro.BuildRequests.{BuildRequest, RequestAtLeast, RequestTech, RequestUpgrade}
+import Macro.BuildRequests.{BuildRequest, Get, Tech, Upgrade}
 import Planning.Composition.UnitMatchers._
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
@@ -52,78 +52,78 @@ class TvETurtleMech extends GameplanModeTemplate {
     new EnemyHasShownCloakedThreat,
     new Parallel(
       new Build(
-        RequestAtLeast(1, Terran.EngineeringBay),
-        RequestAtLeast(1, Terran.MissileTurret),
-        RequestAtLeast(1, Terran.Academy),
-        RequestAtLeast(2, Terran.Comsat),
-        RequestAtLeast(2, Terran.MissileTurret))
+        Get(1, Terran.EngineeringBay),
+        Get(1, Terran.MissileTurret),
+        Get(1, Terran.Academy),
+        Get(2, Terran.Comsat),
+        Get(2, Terran.MissileTurret))
     )
   ))
   
   override lazy val buildOrder: Vector[BuildRequest] =
     if (With.enemy.isProtoss)
       Vector(
-        RequestAtLeast(9,   Terran.SCV),
-        RequestAtLeast(1,   Terran.SupplyDepot),
-        RequestAtLeast(11,  Terran.SCV),
-        RequestAtLeast(1,   Terran.Barracks),
-        RequestAtLeast(13,  Terran.SCV),
-        RequestAtLeast(1,   Terran.Marine),
-        RequestAtLeast(14,  Terran.SCV),
-        RequestAtLeast(2,   Terran.Marine),
-        RequestAtLeast(15,  Terran.SCV),
-        RequestAtLeast(2,   Terran.SupplyDepot),
-        RequestAtLeast(16,  Terran.SCV),
-        RequestAtLeast(1,   Terran.Bunker),
-        RequestAtLeast(17,  Terran.SCV),
-        RequestAtLeast(2,   Terran.CommandCenter),
-        RequestAtLeast(18,  Terran.SCV),
-        RequestAtLeast(1,   Terran.Refinery),
-        RequestAtLeast(3,   Terran.Marine),
-        RequestAtLeast(19,  Terran.SCV),
-        RequestAtLeast(4,   Terran.Marine),
-        RequestAtLeast(21,  Terran.SCV),
-        RequestAtLeast(1,   Terran.Factory),
-        RequestAtLeast(2,   Terran.Refinery))
+        Get(9,   Terran.SCV),
+        Get(1,   Terran.SupplyDepot),
+        Get(11,  Terran.SCV),
+        Get(1,   Terran.Barracks),
+        Get(13,  Terran.SCV),
+        Get(1,   Terran.Marine),
+        Get(14,  Terran.SCV),
+        Get(2,   Terran.Marine),
+        Get(15,  Terran.SCV),
+        Get(2,   Terran.SupplyDepot),
+        Get(16,  Terran.SCV),
+        Get(1,   Terran.Bunker),
+        Get(17,  Terran.SCV),
+        Get(2,   Terran.CommandCenter),
+        Get(18,  Terran.SCV),
+        Get(1,   Terran.Refinery),
+        Get(3,   Terran.Marine),
+        Get(19,  Terran.SCV),
+        Get(4,   Terran.Marine),
+        Get(21,  Terran.SCV),
+        Get(1,   Terran.Factory),
+        Get(2,   Terran.Refinery))
     else if (With.enemy.isTerran)
       Vector(
-        RequestAtLeast(9,   Terran.SCV),
-        RequestAtLeast(1,   Terran.SupplyDepot),
-        RequestAtLeast(14,  Terran.SCV),
-        RequestAtLeast(2,   Terran.CommandCenter),
-        RequestAtLeast(15,  Terran.SCV),
-        RequestAtLeast(1,   Terran.Barracks),
-        RequestAtLeast(16,  Terran.SCV),
-        RequestAtLeast(1,   Terran.Refinery),
-        RequestAtLeast(2,   Terran.SupplyDepot),
-        RequestAtLeast(20,  Terran.SCV),
-        RequestAtLeast(1,   Terran.Marine),
-        RequestAtLeast(1,   Terran.Factory),
-        RequestAtLeast(21,  Terran.SCV),
-        RequestAtLeast(2,   Terran.Marine),
-        RequestAtLeast(1,   Terran.Bunker),
-        RequestAtLeast(23,  Terran.SCV),
-        RequestAtLeast(3,   Terran.Marine),
-        RequestAtLeast(1,   Terran.Refinery))
+        Get(9,   Terran.SCV),
+        Get(1,   Terran.SupplyDepot),
+        Get(14,  Terran.SCV),
+        Get(2,   Terran.CommandCenter),
+        Get(15,  Terran.SCV),
+        Get(1,   Terran.Barracks),
+        Get(16,  Terran.SCV),
+        Get(1,   Terran.Refinery),
+        Get(2,   Terran.SupplyDepot),
+        Get(20,  Terran.SCV),
+        Get(1,   Terran.Marine),
+        Get(1,   Terran.Factory),
+        Get(21,  Terran.SCV),
+        Get(2,   Terran.Marine),
+        Get(1,   Terran.Bunker),
+        Get(23,  Terran.SCV),
+        Get(3,   Terran.Marine),
+        Get(1,   Terran.Refinery))
     else
       Vector(
-        RequestAtLeast(1,   Terran.CommandCenter),
-        RequestAtLeast(9,   Terran.SCV),
-        RequestAtLeast(1,   Terran.SupplyDepot),
-        RequestAtLeast(10,  Terran.SCV),
-        RequestAtLeast(1,   Terran.Barracks),
-        RequestAtLeast(12,  Terran.SCV),
-        RequestAtLeast(1,   Terran.Bunker),
-        RequestAtLeast(1,   Terran.Marine),
-        RequestAtLeast(14,  Terran.SCV),
-        RequestAtLeast(2,   Terran.Marine),
-        RequestAtLeast(15,  Terran.SCV),
-        RequestAtLeast(3,   Terran.Marine),
-        RequestAtLeast(2,   Terran.SupplyDepot),
-        RequestAtLeast(2,   Terran.CommandCenter),
-        RequestAtLeast(4,   Terran.Marine),
-        RequestAtLeast(16,  Terran.SCV),
-        RequestAtLeast(1,   Terran.Refinery))
+        Get(1,   Terran.CommandCenter),
+        Get(9,   Terran.SCV),
+        Get(1,   Terran.SupplyDepot),
+        Get(10,  Terran.SCV),
+        Get(1,   Terran.Barracks),
+        Get(12,  Terran.SCV),
+        Get(1,   Terran.Bunker),
+        Get(1,   Terran.Marine),
+        Get(14,  Terran.SCV),
+        Get(2,   Terran.Marine),
+        Get(15,  Terran.SCV),
+        Get(3,   Terran.Marine),
+        Get(2,   Terran.SupplyDepot),
+        Get(2,   Terran.CommandCenter),
+        Get(4,   Terran.Marine),
+        Get(16,  Terran.SCV),
+        Get(1,   Terran.Refinery))
   
   private class EnemyFlyers extends Check(() => With.units.existsEnemy(UnitMatchAnd(UnitMatchWarriors, UnitMatchMobileFlying)))
   private class TrainArmy extends Parallel(
@@ -132,7 +132,7 @@ class TvETurtleMech extends GameplanModeTemplate {
       new Parallel(
         new If(
           new UnitsAtLeast(2, Terran.Factory),
-          new Build(RequestAtLeast(1, Terran.Starport))),
+          new Build(Get(1, Terran.Starport))),
         new TrainContinuously(Terran.ScienceFacility, 1),
         new TrainContinuously(Terran.ControlTower, 2),
         new TrainContinuously(Terran.ScienceVessel, 2)
@@ -156,7 +156,7 @@ class TvETurtleMech extends GameplanModeTemplate {
         output
       }),
       new Parallel(
-        new Build(RequestAtLeast(1, Terran.Armory)),
+        new Build(Get(1, Terran.Armory)),
         new BuildGasPumps,
         new If (new EnemyFlyers, new TrainContinuously(Terran.Valkyrie, 4)),
         new TrainContinuously(Terran.Goliath),
@@ -178,19 +178,19 @@ class TvETurtleMech extends GameplanModeTemplate {
   )
   
   private class BuildProduction extends Parallel(
-    new IfOnMiningBases(1, new Build(RequestAtLeast(1, Terran.Factory))),
-    new IfOnMiningBases(1, new Build(RequestAtLeast(1, Terran.MachineShop))),
-    new If(new EnemyUnitsAtLeast(1, UnitMatchSiegeTank),  new Build(RequestAtLeast(1, Terran.Starport))),
-    new If(new EnemyUnitsAtLeast(1, Protoss.Reaver),      new Build(RequestAtLeast(1, Terran.Starport))),
-    new If(new EnemyUnitsAtLeast(1, Protoss.Shuttle),     new Build(RequestAtLeast(1, Terran.Starport))),
-    new If(new EnemyIsZerg, new Build(RequestAtLeast(1, Terran.Armory))),
-    new IfOnMiningBases(1, new Build(RequestAtLeast(2, Terran.Factory))),
-    new If(new Not(new EnemyIsProtoss), new Build(RequestAtLeast(1, Terran.Starport))),
-    new IfOnMiningBases(2, new Build(RequestAtLeast(4, Terran.Factory))),
-    new IfOnMiningBases(2, new Build(RequestAtLeast(2, Terran.MachineShop))),
-    new IfOnMiningBases(2, new Build(RequestAtLeast(5, Terran.Factory))),
-    new IfOnMiningBases(3, new Build(RequestAtLeast(8, Terran.Factory))),
-    new IfOnMiningBases(4, new Build(RequestAtLeast(12, Terran.Factory)))
+    new IfOnMiningBases(1, new Build(Get(1, Terran.Factory))),
+    new IfOnMiningBases(1, new Build(Get(1, Terran.MachineShop))),
+    new If(new EnemyUnitsAtLeast(1, UnitMatchSiegeTank),  new Build(Get(1, Terran.Starport))),
+    new If(new EnemyUnitsAtLeast(1, Protoss.Reaver),      new Build(Get(1, Terran.Starport))),
+    new If(new EnemyUnitsAtLeast(1, Protoss.Shuttle),     new Build(Get(1, Terran.Starport))),
+    new If(new EnemyIsZerg, new Build(Get(1, Terran.Armory))),
+    new IfOnMiningBases(1, new Build(Get(2, Terran.Factory))),
+    new If(new Not(new EnemyIsProtoss), new Build(Get(1, Terran.Starport))),
+    new IfOnMiningBases(2, new Build(Get(4, Terran.Factory))),
+    new IfOnMiningBases(2, new Build(Get(2, Terran.MachineShop))),
+    new IfOnMiningBases(2, new Build(Get(5, Terran.Factory))),
+    new IfOnMiningBases(3, new Build(Get(8, Terran.Factory))),
+    new IfOnMiningBases(4, new Build(Get(12, Terran.Factory)))
   )
   
   override def buildPlans: Seq[Plan] = Vector(
@@ -206,14 +206,14 @@ class TvETurtleMech extends GameplanModeTemplate {
       new TrainContinuously(Terran.Marine)),
     
     new BuildOrder(
-      RequestAtLeast(1, Terran.Factory),
-      RequestAtLeast(1, Terran.MachineShop),
-      RequestAtLeast(1, Terran.EngineeringBay),
-      RequestAtLeast(2, Terran.Factory),
-      RequestAtLeast(1, Terran.SiegeTankUnsieged),
-      RequestTech(Terran.SiegeMode),
-      RequestAtLeast(1, Terran.MissileTurret),
-      RequestAtLeast(2, Terran.Refinery)),
+      Get(1, Terran.Factory),
+      Get(1, Terran.MachineShop),
+      Get(1, Terran.EngineeringBay),
+      Get(2, Terran.Factory),
+      Get(1, Terran.SiegeTankUnsieged),
+      Tech(Terran.SiegeMode),
+      Get(1, Terran.MissileTurret),
+      Get(2, Terran.Refinery)),
     
     new BuildGasPumps,
   
@@ -227,7 +227,7 @@ class TvETurtleMech extends GameplanModeTemplate {
   
     new If(
       new UnitsAtLeast(3, Terran.Vulture),
-      new Build(RequestTech(Terran.SpiderMinePlant))),
+      new Build(Tech(Terran.SpiderMinePlant))),
   
     new RequireMiningBases(2),
     
@@ -241,30 +241,30 @@ class TvETurtleMech extends GameplanModeTemplate {
     new BuildMissileTurretsAtBases(1),
     new BuildBunkersAtExpansions,
     new Build(
-      RequestAtLeast(1, Terran.EngineeringBay),
-      RequestAtLeast(1, Terran.Armory),
-      RequestAtLeast(1, Terran.Academy),
-      RequestAtLeast(2, Terran.Comsat)),
+      Get(1, Terran.EngineeringBay),
+      Get(1, Terran.Armory),
+      Get(1, Terran.Academy),
+      Get(2, Terran.Comsat)),
     new UpgradeContinuously(Terran.MechDamage),
     new If(
       new UnitsAtLeast(12, UnitMatchOr(UnitMatchSiegeTank, Terran.Goliath)),
       new RequireMiningBases(3)),
     new Build(
-      RequestAtLeast(6, Terran.Factory),
-      RequestAtLeast(3, Terran.MachineShop),
-      RequestAtLeast(1, Terran.Academy),
-      RequestAtLeast(3, Terran.Comsat),
-      RequestUpgrade(Terran.MechArmor),
-      RequestAtLeast(1, Terran.Starport),
-      RequestAtLeast(1, Terran.ScienceFacility),
-      RequestAtLeast(2, Terran.Armory),
-      RequestAtLeast(8, Terran.Factory)),
+      Get(6, Terran.Factory),
+      Get(3, Terran.MachineShop),
+      Get(1, Terran.Academy),
+      Get(3, Terran.Comsat),
+      Upgrade(Terran.MechArmor),
+      Get(1, Terran.Starport),
+      Get(1, Terran.ScienceFacility),
+      Get(2, Terran.Armory),
+      Get(8, Terran.Factory)),
     new UpgradeContinuously(Terran.MechArmor),
     new If(
       new UnitsAtLeast(20, UnitMatchOr(UnitMatchSiegeTank, Terran.Goliath)),
       new RequireMiningBases(4)),
     new Build(
-      RequestAtLeast(14, Terran.Factory),
-      RequestAtLeast(6, Terran.MachineShop))
+      Get(14, Terran.Factory),
+      Get(6, Terran.MachineShop))
   )
 }

@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
+import Macro.BuildRequests.{Get, Upgrade}
 import Planning.Composition.Latch
 import Planning.Plan
 import Planning.Plans.Compound._
@@ -68,21 +68,21 @@ class PvP2Gate1012 extends GameplanModeTemplate {
             new Not(new EnemyStrategy(With.fingerprints.twoGate))),
           new TrainContinuously(Protoss.Zealot, 5),
           new Parallel(
-            new Build(RequestAtLeast(1, Protoss.ShieldBattery)),
+            new Build(Get(1, Protoss.ShieldBattery)),
             new TrainContinuously(Protoss.Zealot, 7)))),
       new Build(
-        RequestAtLeast(1, Protoss.Assimilator),
-        RequestAtLeast(1, Protoss.CyberneticsCore))),
+        Get(1, Protoss.Assimilator),
+        Get(1, Protoss.CyberneticsCore))),
     new BuildCannonsAtNatural(2),
     new Build(
-      RequestAtLeast(1, Protoss.Forge),
-      RequestAtLeast(2, Protoss.Gateway),
-      RequestUpgrade(Protoss.DragoonRange),
-      RequestAtLeast(1, Protoss.RoboticsFacility),
-      RequestAtLeast(4, Protoss.Gateway),
-      RequestUpgrade(Protoss.GroundDamage),
-      RequestAtLeast(2, Protoss.Assimilator),
-      RequestAtLeast(1, Protoss.Observatory),
-      RequestAtLeast(6, Protoss.Gateway))
+      Get(1, Protoss.Forge),
+      Get(2, Protoss.Gateway),
+      Upgrade(Protoss.DragoonRange),
+      Get(1, Protoss.RoboticsFacility),
+      Get(4, Protoss.Gateway),
+      Upgrade(Protoss.GroundDamage),
+      Get(2, Protoss.Assimilator),
+      Get(1, Protoss.Observatory),
+      Get(6, Protoss.Gateway))
   )
 }

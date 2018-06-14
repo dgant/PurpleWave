@@ -8,7 +8,7 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Predicates.Employing
-import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
+import Planning.Plans.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast}
 import Planning.Plans.Predicates.Reactive.EnemyBasesAtLeast
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen2GateRobo
@@ -60,7 +60,7 @@ class PvP2GateRobo extends GameplanModeTemplate {
   
   override val buildPlans = Vector(
     new If(
-      new EnemyUnitsAtLeast(1, Protoss.DarkTemplar),
+      new EnemiesAtLeast(1, Protoss.DarkTemplar),
       new Build(Get(1, Protoss.Observer))),
     new Trigger(new UnitsAtLeast(1, Protoss.Reaver), new RequireMiningBases(2)),
     new PvPIdeas.TrainArmy,

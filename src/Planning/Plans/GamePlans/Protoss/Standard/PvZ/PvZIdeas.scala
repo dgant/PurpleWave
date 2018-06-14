@@ -70,8 +70,8 @@ object PvZIdeas {
         new SafeAtHome,
         new MiningBasesAtLeast(2),
         new Or(
-          new EnemyUnitsAtLeast(1, Zerg.Lurker),
-          new EnemyUnitsAtLeast(1, Zerg.LurkerEgg))),
+          new EnemiesAtLeast(1, Zerg.Lurker),
+          new EnemiesAtLeast(1, Zerg.LurkerEgg))),
       new Parallel(
         new TrainContinuously(Protoss.Observer, 3),
         new UpgradeContinuously(Protoss.ObserverSpeed))))

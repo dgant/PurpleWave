@@ -114,8 +114,8 @@ object PvPIdeas {
   
   class ReactToArbiters extends If(
     new Or(
-      new EnemyUnitsAtLeast(1, Protoss.Arbiter),
-      new EnemyUnitsAtLeast(1, Protoss.ArbiterTribunal)),
+      new EnemiesAtLeast(1, Protoss.Arbiter),
+      new EnemiesAtLeast(1, Protoss.ArbiterTribunal)),
     new Parallel(
       new Build(
         Get(1, Protoss.RoboticsFacility),
@@ -125,7 +125,7 @@ object PvPIdeas {
   class ReactToFFE extends If(
     new And(
       new Not(new WeAreBeingProxied),
-      new EnemyUnitsAtLeast(1, Protoss.PhotonCannon),
+      new EnemiesAtLeast(1, Protoss.PhotonCannon),
       new SafeAtHome),
     new RequireMiningBases(2))
   

@@ -45,8 +45,8 @@ class TvTPNukeDrop extends GameplanModeTemplate {
     new TrainContinuously(Terran.Dropship, 2, 1),
     new If(
       new Or(
-        new EnemyUnitsAtLeast(1, Terran.Wraith),
-        new EnemyUnitsAtLeast(1, Protoss.Scout)),
+        new EnemiesAtLeast(1, Terran.Wraith),
+        new EnemiesAtLeast(1, Protoss.Scout)),
       new TrainContinuously(Terran.Wraith),
       new Build(
         Tech(Terran.WraithCloak),

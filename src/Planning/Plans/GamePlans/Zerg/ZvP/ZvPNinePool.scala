@@ -93,7 +93,7 @@ class ZvPNinePool extends GameplanModeTemplate {
     new TwoBaseProtoss,
     new And(
       new EnemyIsTerran,
-      new EnemyUnitsAtLeast(1, Terran.Bunker, complete = true)))
+      new EnemiesAtLeast(1, Terran.Bunker, complete = true)))
   
   override def buildPlans: Seq[Plan] = Seq(
     new EjectScout,
@@ -132,7 +132,7 @@ class ZvPNinePool extends GameplanModeTemplate {
           new Build(Get(1, Zerg.Lair)),
           new Build(Get(1, Zerg.Spire), Get(2, Zerg.Extractor)),
           new Trigger(
-            new EnemyUnitsAtLeast(1, UnitMatchOr(
+            new EnemiesAtLeast(1, UnitMatchOr(
               Terran.Wraith,
               Terran.Valkyrie,
               Terran.Starport,

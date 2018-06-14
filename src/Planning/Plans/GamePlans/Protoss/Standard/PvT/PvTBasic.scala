@@ -66,7 +66,7 @@ class PvTBasic extends GameplanModeTemplate {
   
   class NeedObservers extends Or(
     new EnemyHasShownCloakedThreat,
-    new Latch(new EnemyUnitsAtLeast(4, Terran.Vulture)))
+    new Latch(new EnemiesAtLeast(4, Terran.Vulture)))
   
   class PreparedForBio extends Latch(
     new Or(
@@ -112,7 +112,7 @@ class PvTBasic extends GameplanModeTemplate {
       Get(1, Protoss.Observatory)),
     new If(
       new And(
-        new EnemyUnitsAtLeast(3, Terran.SpiderMine),
+        new EnemiesAtLeast(3, Terran.SpiderMine),
         new Or(
           new MiningBasesAtLeast(3),
           new EmployingThreeBase)),
@@ -270,7 +270,7 @@ class PvTBasic extends GameplanModeTemplate {
             new EnemyHasShownCloakedThreat,
             new And(
               new Not(new EnemyBio),
-              new EnemyUnitsAtLeast(1, Terran.Vulture))),
+              new EnemiesAtLeast(1, Terran.Vulture))),
           new ObserverTech)),
       new Parallel(
         new TrainMinimumDragoons,

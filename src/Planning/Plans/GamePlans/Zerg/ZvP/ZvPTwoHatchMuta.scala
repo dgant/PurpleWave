@@ -117,25 +117,25 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
       new UnitsAtLeast(12, Zerg.Drone),
       new UnitsAtMost(0, Zerg.Spire, complete = true)),
     new If(
-      new EnemyUnitsAtLeast(17, ZealotOrDragoon),
+      new EnemiesAtLeast(17, ZealotOrDragoon),
       new BuildSunkensAtNatural(7, sunkenProfile),
       new If(
-        new EnemyUnitsAtLeast(13, ZealotOrDragoon),
+        new EnemiesAtLeast(13, ZealotOrDragoon),
         new BuildSunkensAtNatural(6, sunkenProfile),
         new If(
-          new EnemyUnitsAtLeast(10, ZealotOrDragoon),
+          new EnemiesAtLeast(10, ZealotOrDragoon),
           new BuildSunkensAtNatural(5, sunkenProfile),
           new If(
-            new EnemyUnitsAtLeast(7, ZealotOrDragoon),
+            new EnemiesAtLeast(7, ZealotOrDragoon),
             new BuildSunkensAtNatural(4, sunkenProfile),
             new If(
-              new EnemyUnitsAtLeast(5, ZealotOrDragoon),
+              new EnemiesAtLeast(5, ZealotOrDragoon),
               new BuildSunkensAtNatural(3, sunkenProfile),
               new If(
-                new EnemyUnitsAtLeast(3, ZealotOrDragoon),
+                new EnemiesAtLeast(3, ZealotOrDragoon),
                 new BuildSunkensAtNatural(2, sunkenProfile),
                 new If(
-                  new EnemyUnitsAtLeast(1, Terran.Vulture),
+                  new EnemiesAtLeast(1, Terran.Vulture),
                   new BuildSunkensAtNatural(1, sunkenProfile)))))))))
   
   class ReactiveZerglings extends If(

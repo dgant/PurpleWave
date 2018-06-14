@@ -13,7 +13,7 @@ import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.BuildGasPumps
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import Planning.Plans.Predicates.Employ
+import Planning.Plans.Predicates.{Employ, Employing}
 import Planning.Plans.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Scouting.ScoutAt
 import Planning.{Plan, ProxyPlanner}
@@ -72,25 +72,28 @@ class ProxyHatch extends Parallel {
           blueprintCreepColonyNatural,
           blueprintCreepColonyNatural,
           blueprintCreepColonyNatural)},
-        new Employ(ProxyHatchHydras,
+        new If(
+          new Employing(ProxyHatchHydras),
           new Build(
-            Get(2,   Zerg.Hatchery),
-            Get(1,   Zerg.SpawningPool),
-            Get(2,   Zerg.Overlord),
-            Get(1,   Zerg.Extractor),
-            Get(12,  Zerg.Drone))),
-        new Employ(ProxyHatchZerglings,
+            Get(2,  Zerg.Hatchery),
+            Get(1,  Zerg.SpawningPool),
+            Get(2,  Zerg.Overlord),
+            Get(1,  Zerg.Extractor),
+            Get(12, Zerg.Drone))),
+        new If(
+          new Employing(ProxyHatchZerglings),
           new Build(
-            Get(2,   Zerg.Hatchery),
-            Get(1,   Zerg.SpawningPool),
-            Get(2,   Zerg.Overlord))),
-        new Employ(ProxyHatchSunkens,
+            Get(2,  Zerg.Hatchery),
+            Get(1,  Zerg.SpawningPool),
+            Get(2,  Zerg.Overlord))),
+        new If(
+          new Employing(ProxyHatchSunkens),
           new Build(
-            Get(2,   Zerg.Overlord),
-            Get(2,   Zerg.Hatchery),
-            Get(12,  Zerg.Drone),
-            Get(1,   Zerg.SpawningPool),
-            Get(14,  Zerg.Drone))))),
+            Get(2,  Zerg.Overlord),
+            Get(2,  Zerg.Hatchery),
+            Get(12, Zerg.Drone),
+            Get(1,  Zerg.SpawningPool),
+            Get(14, Zerg.Drone))))),
   
     new Employ(ProxyHatchZerglings,
       new Parallel(

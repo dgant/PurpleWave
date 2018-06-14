@@ -11,7 +11,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
 import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Matchup.EnemyIsZerg
-import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast, UpgradeComplete}
+import Planning.Plans.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast, UpgradeComplete}
 import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.NineHatchLings
@@ -34,7 +34,7 @@ class NineHatchLings extends GameplanModeTemplate {
       Get(6, Zerg.Zergling)))
   
   override def defaultScoutPlan: Plan = new If(
-    new Not(new EnemyUnitsAtLeast(1, UnitMatchOr(Zerg.Spire, Zerg.Mutalisk, Zerg.Hydralisk))),
+    new Not(new EnemiesAtLeast(1, UnitMatchOr(Zerg.Spire, Zerg.Mutalisk, Zerg.Hydralisk))),
     new Scout(3) { scouts.get.unitMatcher.set(Zerg.Overlord) })
   
   override def defaultAttackPlan: Plan = new If(
@@ -55,9 +55,9 @@ class NineHatchLings extends GameplanModeTemplate {
   
     new AllIn(
       new Or(
-        new EnemyUnitsAtLeast(1, Zerg.Spire, complete = true),
-        new EnemyUnitsAtLeast(1, Zerg.Mutalisk),
-        new EnemyUnitsAtLeast(1, Terran.Vulture))),
+        new EnemiesAtLeast(1, Zerg.Spire, complete = true),
+        new EnemiesAtLeast(1, Zerg.Mutalisk),
+        new EnemiesAtLeast(1, Terran.Vulture))),
     
     new TrainContinuously(Zerg.Drone, 9),
     new TrainContinuously(Zerg.Zergling),

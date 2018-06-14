@@ -47,7 +47,7 @@ object PvTIdeas {
   
   class EmergencyBuilds extends Parallel(
     new If(
-      new And(new Employing(PvT13Nexus), new EnemyUnitsAtLeast(1, Terran.Marine), new UnitsAtMost(0, Protoss.CyberneticsCore, complete = true)),
+      new And(new Employing(PvT13Nexus), new EnemiesAtLeast(1, Terran.Marine), new UnitsAtMost(0, Protoss.CyberneticsCore, complete = true)),
       new Parallel(
         new TrainContinuously(Protoss.Zealot),
         new Build(Get(2, Protoss.Gateway)))))

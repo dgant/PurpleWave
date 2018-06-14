@@ -16,7 +16,7 @@ import Planning.Plans.Macro.Terran.{BuildBunkersAtExpansions, BuildMissileTurret
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtMost}
 import Planning.Plans.Predicates.Matchup.{EnemyIsProtoss, EnemyIsZerg}
-import Planning.Plans.Predicates.Milestones.{EnemyHasShownCloakedThreat, EnemyUnitsAtLeast, IfOnMiningBases, UnitsAtLeast}
+import Planning.Plans.Predicates.Milestones.{EnemyHasShownCloakedThreat, EnemiesAtLeast, IfOnMiningBases, UnitsAtLeast}
 import Planning.Plans.Predicates.{Employing, SafeAtHome, SafeToMoveOut}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Terran.TvE.TvETurtleMech
@@ -180,9 +180,9 @@ class TvETurtleMech extends GameplanModeTemplate {
   private class BuildProduction extends Parallel(
     new IfOnMiningBases(1, new Build(Get(1, Terran.Factory))),
     new IfOnMiningBases(1, new Build(Get(1, Terran.MachineShop))),
-    new If(new EnemyUnitsAtLeast(1, UnitMatchSiegeTank),  new Build(Get(1, Terran.Starport))),
-    new If(new EnemyUnitsAtLeast(1, Protoss.Reaver),      new Build(Get(1, Terran.Starport))),
-    new If(new EnemyUnitsAtLeast(1, Protoss.Shuttle),     new Build(Get(1, Terran.Starport))),
+    new If(new EnemiesAtLeast(1, UnitMatchSiegeTank),  new Build(Get(1, Terran.Starport))),
+    new If(new EnemiesAtLeast(1, Protoss.Reaver),      new Build(Get(1, Terran.Starport))),
+    new If(new EnemiesAtLeast(1, Protoss.Shuttle),     new Build(Get(1, Terran.Starport))),
     new If(new EnemyIsZerg, new Build(Get(1, Terran.Armory))),
     new IfOnMiningBases(1, new Build(Get(2, Terran.Factory))),
     new If(new Not(new EnemyIsProtoss), new Build(Get(1, Terran.Starport))),

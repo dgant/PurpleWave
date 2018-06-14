@@ -15,7 +15,7 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Predicates.Economy.{GasAtMost, MineralsAtLeast}
 import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Matchup.EnemyIsZerg
-import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast, UnitsAtMost}
+import Planning.Plans.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.{Terran, Zerg}
@@ -40,7 +40,7 @@ class NinePoolMuta extends GameplanModeTemplate {
     new Blueprint(this, building = Some(Zerg.CreepColony), requireZone = Some(With.geography.ourNatural.zone), placement = Some(PlacementProfiles.hugTownHall)))
   
   override def defaultScoutPlan: Plan = new If(
-    new Not(new EnemyUnitsAtLeast(1, UnitMatchOr(Zerg.Spire, Zerg.Mutalisk, Zerg.Hydralisk))),
+    new Not(new EnemiesAtLeast(1, UnitMatchOr(Zerg.Spire, Zerg.Mutalisk, Zerg.Hydralisk))),
     new Scout(3) { scouts.get.unitMatcher.set(Zerg.Overlord) })
   
   override def defaultAttackPlan: Plan = new Trigger(
@@ -89,8 +89,8 @@ class NinePoolMuta extends GameplanModeTemplate {
     new If(
       new And(
         new Or(
-          new EnemyUnitsAtLeast(1, Terran.Vulture),
-          new EnemyUnitsAtLeast(1, Terran.Factory)),
+          new EnemiesAtLeast(1, Terran.Vulture),
+          new EnemiesAtLeast(1, Terran.Factory)),
         new UnitsAtMost(1, Zerg.SunkenColony)),
       new Build(Get(1, Zerg.CreepColony))),
     new If(

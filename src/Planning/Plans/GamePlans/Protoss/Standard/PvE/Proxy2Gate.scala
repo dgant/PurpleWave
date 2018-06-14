@@ -42,8 +42,8 @@ class Proxy2Gate extends GameplanModeTemplate {
     new UnitsAtLeast(15, Protoss.Probe),
     new EnemyHasShown(Terran.Vulture),
     new EnemyHasShown(Protoss.Dragoon),
-    new EnemyUnitsAtLeast(1, Zerg.Spire, complete = true),
-    new EnemyUnitsAtLeast(1, Terran.Factory, complete = true),
+    new EnemiesAtLeast(1, Zerg.Spire, complete = true),
+    new EnemiesAtLeast(1, Terran.Factory, complete = true),
     new EnemyWalledIn)
   
   private class AfterProxy extends Parallel(
@@ -53,7 +53,7 @@ class Proxy2Gate extends GameplanModeTemplate {
       new If(
         new And(
           new EnemyIsProtoss,
-          new EnemyUnitsAtLeast(1, UnitMatchOr(
+          new EnemiesAtLeast(1, UnitMatchOr(
             Protoss.CyberneticsCore,
             Protoss.Assimilator,
             Protoss.Dragoon))),

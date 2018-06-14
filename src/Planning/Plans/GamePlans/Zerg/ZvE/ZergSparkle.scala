@@ -116,9 +116,9 @@ class ZergSparkle extends GameplanModeTemplate {
             new UnitsAtLeast(12, Zerg.Mutalisk),
             new Or(
               new UnitsAtLeast(24, Zerg.Mutalisk),
-              new EnemyUnitsAtLeast(20, Terran.Marine),
-              new EnemyUnitsAtLeast(6, UnitMatchOr(Terran.Goliath, Terran.MissileTurret, Protoss.PhotonCannon)),
-              new EnemyUnitsAtLeast(2, UnitMatchOr(Zerg.SporeColony, Terran.Bunker)))),
+              new EnemiesAtLeast(20, Terran.Marine),
+              new EnemiesAtLeast(6, UnitMatchOr(Terran.Goliath, Terran.MissileTurret, Protoss.PhotonCannon)),
+              new EnemiesAtLeast(2, UnitMatchOr(Zerg.SporeColony, Terran.Bunker)))),
           new Parallel(
             new TrainContinuously(Zerg.Guardian, 4),
             new Build(

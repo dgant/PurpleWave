@@ -8,7 +8,7 @@ import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitMatchers.UnitMatchOr
 import Planning.Composition.{Latch, UnitCountEverything}
 import Planning.Plan
-import Planning.Plans.Predicates.Milestones.EnemyUnitsAtLeast
+import Planning.Plans.Predicates.Milestones.EnemiesAtLeast
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
@@ -19,7 +19,7 @@ class ChillOverlords extends Plan {
   overlords.unitMatcher.set(Zerg.Overlord)
   overlords.unitCounter.set(UnitCountEverything)
   
-  val cloakedThreat = new Latch(new EnemyUnitsAtLeast(1, UnitMatchOr(
+  val cloakedThreat = new Latch(new EnemiesAtLeast(1, UnitMatchOr(
     Terran.Wraith,
     Terran.Ghost,
     Protoss.DarkTemplar,

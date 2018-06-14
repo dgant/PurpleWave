@@ -129,7 +129,7 @@ class PvPLateGame extends GameplanModeTemplate {
     new If(new UnitsAtLeast(1,  Protoss.HighTemplar),     new Build(Tech(Protoss.PsionicStorm))),
     new If(new UnitsAtLeast(2,  Protoss.Reaver),          new Build(Upgrade(Protoss.ScarabDamage))),
     new PvPIdeas.TakeBase3,
-    new If(new EnemyUnitsAtLeast(1, Protoss.DarkTemplar), new UpgradeContinuously(Protoss.ObserverSpeed)),
+    new If(new EnemiesAtLeast(1, Protoss.DarkTemplar), new UpgradeContinuously(Protoss.ObserverSpeed)),
   
     new If(
       new SafeAtHome,
@@ -185,7 +185,7 @@ class PvPLateGame extends GameplanModeTemplate {
       new RequireMiningBases(4)),
   
     new If(
-      new EnemyUnitsAtLeast(3, Protoss.Shuttle),
+      new EnemiesAtLeast(3, Protoss.Shuttle),
       new Build(
         Get(1, Protoss.Stargate),
         Get(1, Protoss.Corsair))),

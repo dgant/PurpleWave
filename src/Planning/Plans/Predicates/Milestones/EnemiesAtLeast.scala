@@ -4,7 +4,7 @@ import Lifecycle.With
 import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchAnything, UnitMatchComplete, UnitMatcher}
 import Planning.Plan
 
-class EnemyUnitsAtLeast(
+class EnemiesAtLeast(
   quantity  : Int         = 0,
   matcher   : UnitMatcher = UnitMatchAnything,
   complete  : Boolean     = false)

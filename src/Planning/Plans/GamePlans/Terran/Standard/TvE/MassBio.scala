@@ -61,7 +61,7 @@ class MassBio extends GameplanModeTemplate {
         new TechComplete(Terran.Stim, Terran.Stim.researchFrames)),
       new TrainContinuously(Terran.Comsat)),
     new If(
-      new EnemyUnitsAtLeast(2, Zerg.Lurker),
+      new EnemiesAtLeast(2, Zerg.Lurker),
       new TrainContinuously(Terran.MissileTurret, 2)))
   
   override def buildPlans: Seq[Plan] = Vector(
@@ -83,8 +83,8 @@ class MassBio extends GameplanModeTemplate {
         Tech(Terran.Stim))),
     new Trigger(
       new Or(
-        new EnemyUnitsAtLeast(1, Terran.Vulture),
-        new EnemyUnitsAtLeast(1, Protoss.Dragoon)),
+        new EnemiesAtLeast(1, Terran.Vulture),
+        new EnemiesAtLeast(1, Protoss.Dragoon)),
       new UpgradeContinuously(Terran.MarineRange)),
     new Trigger(
       new MiningBasesAtLeast(3),
@@ -136,8 +136,8 @@ class MassBio extends GameplanModeTemplate {
           new TrainContinuously(Terran.Medic, maximumConcurrentlyRatio = 0.67)),
         new If(
           new Or(
-            new EnemyUnitsAtLeast(3, Protoss.Zealot),
-            new EnemyUnitsAtLeast(1, Zerg.Zergling)),
+            new EnemiesAtLeast(3, Protoss.Zealot),
+            new EnemiesAtLeast(1, Zerg.Zergling)),
           new TrainContinuously(Terran.Firebat, maximumConcurrentlyRatio = 0.34, maximumTotal = 2)),
         new TrainContinuously(Terran.Marine)
         )),
@@ -146,7 +146,7 @@ class MassBio extends GameplanModeTemplate {
       new Parallel(
         new UpgradeContinuously(Terran.MarineRange),
         new If(
-          new EnemyUnitsAtLeast(1, UnitMatchSiegeTank),
+          new EnemiesAtLeast(1, UnitMatchSiegeTank),
           new Build(
             Get(3, Terran.Factory),
             Get(3, Terran.MachineShop),

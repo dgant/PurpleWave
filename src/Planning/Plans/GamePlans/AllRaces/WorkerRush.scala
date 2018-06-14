@@ -9,7 +9,7 @@ import Planning.Plans.Army.AttackWithWorkers
 import Planning.Plans.Compound.{And, _}
 import Planning.Plans.Macro.Automatic.{Gather, TrainContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
-import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtLeast, EnemyUnitsAtMost, UnitsAtLeast}
+import Planning.Plans.Predicates.Milestones.{EnemiesAtLeast, EnemyUnitsAtMost, UnitsAtLeast}
 import Planning.Plans.StandardGamePlan
 import ProxyBwapi.Races.{Protoss, Zerg}
 
@@ -37,8 +37,8 @@ class WorkerRush extends Trigger {
   private class TimeToEndTheRush extends And(
     new EnemyUnitsAtMost(1, UnitMatchWorkers),
     new Or(
-      new EnemyUnitsAtLeast(1, Protoss.PhotonCannon, complete = true),
-      new EnemyUnitsAtLeast(1, Zerg.SunkenColony, complete = true)))
+      new EnemiesAtLeast(1, Protoss.PhotonCannon, complete = true),
+      new EnemiesAtLeast(1, Zerg.SunkenColony, complete = true)))
   
   predicate.set(new TimeToEndTheRush)
   before.set(new ExecuteRush)

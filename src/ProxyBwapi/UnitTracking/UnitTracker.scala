@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.Shapes.Circle
 import Performance.UnitCounter
-import Planning.Composition.UnitMatchers.UnitMatcher
+import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 
 class UnitTracker {

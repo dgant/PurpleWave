@@ -1,17 +1,18 @@
 package Planning.Plans.GamePlans.Zerg.ZvE
 
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitMatchers.UnitMatchOr
+import Planning.Predicates.Compound.Not
+import Planning.UnitMatchers.UnitMatchOr
 import Planning.{Plan, Predicate}
 import Planning.Plans.Army.{AllIn, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, ExtractorTrick, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Predicates.Matchup.EnemyIsZerg
-import Planning.Plans.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast, UpgradeComplete}
+import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
+import Planning.Predicates.Employing
+import Planning.Predicates.Matchup.EnemyIsZerg
+import Planning.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast, UpgradeComplete}
 import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.NineHatchLings

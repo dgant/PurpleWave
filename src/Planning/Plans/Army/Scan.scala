@@ -4,9 +4,8 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
-import Planning.Composition.Property
-import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Plan
+import Planning.ResourceLocks.LockUnits
+import Planning.{Plan, Property}
 import ProxyBwapi.Races.Terran
 
 class Scan extends Plan {

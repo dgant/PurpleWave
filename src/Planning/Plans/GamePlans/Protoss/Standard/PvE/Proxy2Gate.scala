@@ -2,18 +2,19 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvE
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitMatchers.UnitMatchOr
+import Planning.Predicates.Compound.{And, Not}
+import Planning.UnitMatchers.UnitMatchOr
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound.{Or, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.PlaceGatewaysProxied
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, Pump, PumpWorkers}
+import Planning.Predicates.Employing
+import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, RequireSufficientSupply}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Predicates.Economy.GasAtLeast
-import Planning.Plans.Predicates.Matchup.EnemyIsProtoss
-import Planning.Plans.Predicates.Milestones._
+import Planning.Predicates.Economy.GasAtLeast
+import Planning.Predicates.Matchup.EnemyIsProtoss
+import Planning.Predicates.Milestones._
 import Planning.Plans.Scouting.Scout
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}

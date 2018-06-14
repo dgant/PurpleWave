@@ -2,9 +2,9 @@ package Planning.Plans.Macro.Protoss
 
 import Lifecycle.With
 import Micro.Agency.Intention
-import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitCounters.UnitCountBetween
-import Planning.Composition.UnitPreferences.UnitPreferLowEnergy
+import Planning.ResourceLocks.LockUnits
+import Planning.UnitCounters.UnitCountBetween
+import Planning.UnitPreferences.UnitPreferLowEnergy
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
 

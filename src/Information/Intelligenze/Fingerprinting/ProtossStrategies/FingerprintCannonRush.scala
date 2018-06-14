@@ -1,7 +1,7 @@
 package Information.Intelligenze.Fingerprinting.ProtossStrategies
 
 import Information.Intelligenze.Fingerprinting.Generic._
-import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchProxied}
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchProxied}
 import ProxyBwapi.Races.Protoss
 
 class FingerprintCannonRush extends FingerprintCompleteBy(

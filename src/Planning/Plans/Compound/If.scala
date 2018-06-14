@@ -1,8 +1,7 @@
 package Planning.Plans.Compound
 
-import Planning.Composition.Property
-import Planning.Plans.Predicates.Never
-import Planning.{Plan, Predicate}
+import Planning.Predicates.Never
+import Planning.{Plan, Predicate, Property}
 
 class If(
   initialPredicate : Predicate = new Never,

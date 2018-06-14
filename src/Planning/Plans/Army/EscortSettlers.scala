@@ -3,8 +3,8 @@ package Planning.Plans.Army
 import Lifecycle.With
 import Micro.Squads.Goals.GoalEscort
 import Planning.Composition.UnitCountEverything
-import Planning.Composition.UnitCounters.UnitCounter
-import Planning.Composition.UnitMatchers._
+import Planning.UnitCounters.UnitCounter
+import Planning.UnitMatchers._
 import Utilities.ByOption
 
 class EscortSettlers(

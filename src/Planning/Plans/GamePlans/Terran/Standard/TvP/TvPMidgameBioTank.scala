@@ -2,15 +2,16 @@ package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitMatchers.UnitMatchWarriors
+import Planning.Predicates.Compound.Check
+import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
-import Planning.Plans.Compound.{Check, If, Trigger}
+import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Predicates.Employing
+import Planning.Predicates.Employing
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Predicates.Milestones.UnitsAtLeast
+import Planning.Predicates.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvP.TvPMidgameBioTank
 

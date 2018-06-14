@@ -1,7 +1,7 @@
 package Macro.Allocation
 
 import Lifecycle.With
-import Planning.Composition.ResourceLocks.LockUnits
+import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable

@@ -6,10 +6,10 @@ import Lifecycle.With
 import Macro.Scheduling.Project
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
-import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
-import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitMatchers._
-import Planning.Composition.UnitPreferences.{UnitPreferIdle, UnitPreference}
+import Planning.ResourceLocks.{LockCurrencyForUnit, LockUnits}
+import Planning.UnitCounters.UnitCountOne
+import Planning.UnitMatchers._
+import Planning.UnitPreferences.{UnitPreferIdle, UnitPreference}
 import Planning.Plan
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClasses.UnitClass

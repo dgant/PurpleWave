@@ -3,7 +3,7 @@ package Information.Geography.Calculations
 import Information.Geography.Types.Base
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Planning.Composition.UnitMatchers.UnitMatchWorkers
+import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.Protoss
 import Utilities.ByOption
 import Utilities.EnrichPixel._

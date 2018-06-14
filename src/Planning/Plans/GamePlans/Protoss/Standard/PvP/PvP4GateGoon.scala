@@ -1,14 +1,15 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Macro.BuildRequests.BuildRequest
+import Planning.Predicates.Compound.Latch
 import Planning.{Plan, Predicate}
-import Planning.Plans.Compound.{Latch, _}
+import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
+import Planning.Predicates.Employing
+import Planning.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Plans.Scouting.ScoutOn
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen4GateGoon

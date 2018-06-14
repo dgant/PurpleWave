@@ -2,8 +2,7 @@ package Planning.Plans.Macro.BuildOrders
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Composition.Property
-import Planning.Plan
+import Planning.{Plan, Property}
 
 class BuildOrder(initialRequests: BuildRequest*) extends Plan {
   

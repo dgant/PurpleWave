@@ -3,14 +3,15 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvE
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitMatchers.UnitMatchMobileDetectors
+import Planning.Predicates.Compound.Not
+import Planning.UnitMatchers.UnitMatchMobileDetectors
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
-import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, Pump, PumpWorkers}
+import Planning.Plans.Macro.Automatic.{Gather, Pump, PumpWorkers, RequireSufficientSupply}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast}
+import Planning.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast}
 import Planning.Plans.Scouting.{FoundEnemyBase, ScoutAt}
 import Planning.ProxyPlanner
 import ProxyBwapi.Races.Protoss

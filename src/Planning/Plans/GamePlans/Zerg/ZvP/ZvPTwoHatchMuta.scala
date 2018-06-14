@@ -3,10 +3,11 @@ package Planning.Plans.GamePlans.Zerg.ZvP
 import Lifecycle.With
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
+import Planning.Predicates.Compound.{And, Check, Latch, Not}
+import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
 import Planning.Plans.Army.{Aggression, Attack, EjectScout}
-import Planning.Plans.Compound.{Latch, _}
+import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{ScoutSafelyWithDrone, ScoutSafelyWithOverlord}
 import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas._
@@ -14,11 +15,11 @@ import Planning.Plans.Macro.Automatic.{Enemy, Pump, TrainMatchingRatio, UpgradeC
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Zerg.BuildSunkensAtNatural
-import Planning.Plans.Predicates.Economy.MineralsAtLeast
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Predicates.Milestones._
-import Planning.Plans.Predicates.Reactive.EnemyBasesAtLeast
-import Planning.Plans.Predicates.Scenarios.EnemyStrategy
+import Planning.Predicates.Economy.MineralsAtLeast
+import Planning.Predicates.Employing
+import Planning.Predicates.Milestones._
+import Planning.Predicates.Reactive.EnemyBasesAtLeast
+import Planning.Predicates.Scenarios.EnemyStrategy
 import Planning.Plans.Scouting.{CampExpansions, FindExpansions}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.{StarCraftMap, Transistor}

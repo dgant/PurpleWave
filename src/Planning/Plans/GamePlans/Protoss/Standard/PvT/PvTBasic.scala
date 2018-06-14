@@ -1,10 +1,11 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitMatchers.UnitMatchWarriors
+import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.Aggression
-import Planning.Plans.Compound.{And, Latch, Or, Parallel, _}
+import Planning.Plans.Compound.{Or, Parallel, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTIdeas.TrainMinimumDragoons
@@ -12,10 +13,10 @@ import Planning.Plans.Macro.Automatic.{PumpWorkers, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
-import Planning.Plans.Predicates.Economy.MineralsAtLeast
-import Planning.Plans.Predicates.Milestones._
-import Planning.Plans.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio}
-import Planning.Plans.Predicates.{Employing, Never, SafeAtHome, SafeToMoveOut}
+import Planning.Predicates.Economy.MineralsAtLeast
+import Planning.Predicates.Milestones._
+import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio}
+import Planning.Predicates.{Employing, Never, SafeAtHome, SafeToMoveOut}
 import Planning.Plans.Scouting.ScoutOn
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._

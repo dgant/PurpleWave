@@ -1,8 +1,8 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvT
 
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors, UnitMatchWorkers}
+import Planning.UnitCounters.UnitCountOne
+import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors, UnitMatchWorkers}
 import Planning.Plan
 import Planning.Plans.Army._
 import Planning.Plans.Compound._
@@ -11,9 +11,9 @@ import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
 import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Predicates.Economy.MineralsAtLeast
-import Planning.Plans.Predicates.{Employing, SafeToMoveOut}
-import Planning.Plans.Predicates.Milestones.{IfOnMiningBases, OnGasPumps, UnitsAtLeast}
+import Planning.Predicates.Economy.MineralsAtLeast
+import Planning.Predicates.{Employing, SafeToMoveOut}
+import Planning.Predicates.Milestones.{IfOnMiningBases, OnGasPumps, UnitsAtLeast}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvT.TvTStandard
 

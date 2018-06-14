@@ -2,7 +2,7 @@ package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitMatchers._
+import Planning.UnitMatchers._
 import Planning.Plan
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass

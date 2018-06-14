@@ -1,16 +1,17 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvE
 
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors}
+import Planning.Predicates.Compound.And
+import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
 import Planning.Plans.Army.NukeBase
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Predicates.{Employing, SafeAtHome}
+import Planning.Predicates.{Employing, SafeAtHome}
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Predicates.Milestones._
+import Planning.Predicates.Milestones._
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvE.TvTPNukeDrop
 

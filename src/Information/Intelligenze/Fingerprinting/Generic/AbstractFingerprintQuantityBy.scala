@@ -2,7 +2,7 @@ package Information.Intelligenze.Fingerprinting.Generic
 
 import Information.Intelligenze.Fingerprinting.Fingerprint
 import Lifecycle.With
-import Planning.Composition.UnitMatchers.UnitMatcher
+import Planning.UnitMatchers.UnitMatcher
 
 abstract class AbstractFingerprintQuantityBy(
   unitMatcher : UnitMatcher,

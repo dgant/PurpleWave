@@ -2,15 +2,16 @@ package Planning.Plans.GamePlans.AllRaces
 
 import Lifecycle.With
 import Macro.BuildRequests.GetAnother
-import Planning.Composition.UnitCounters.UnitCountExactly
-import Planning.Composition.UnitMatchers.UnitMatchWorkers
-import Planning.Composition.UnitPreferences.UnitPreferClose
+import Planning.Predicates.Compound.{And, Check}
+import Planning.UnitCounters.UnitCountExactly
+import Planning.UnitMatchers.UnitMatchWorkers
+import Planning.UnitPreferences.UnitPreferClose
 import Planning.Plans.Army.AttackWithWorkers
-import Planning.Plans.Compound.{And, _}
+import Planning.Plans.Compound._
+import Planning.Plans.GamePlans.StandardGamePlan
 import Planning.Plans.Macro.Automatic.{Gather, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
-import Planning.Plans.Predicates.Milestones.{EnemiesAtLeast, EnemyUnitsAtMost, UnitsAtLeast}
-import Planning.Plans.StandardGamePlan
+import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemyUnitsAtMost, UnitsAtLeast}
 import ProxyBwapi.Races.{Protoss, Zerg}
 
 class WorkerRush extends Trigger {

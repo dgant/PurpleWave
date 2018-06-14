@@ -2,11 +2,10 @@ package Planning.Plans.GamePlans.Protoss.Situational
 
 import Lifecycle.With
 import Micro.Agency.{Intention, Leash}
-import Planning.Composition.Property
-import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitCounters.UnitCountBetween
-import Planning.Composition.UnitMatchers.UnitMatchWorkers
-import Planning.Plan
+import Planning.ResourceLocks.LockUnits
+import Planning.UnitCounters.UnitCountBetween
+import Planning.UnitMatchers.UnitMatchWorkers
+import Planning.{Plan, Property}
 import ProxyBwapi.Races.{Protoss, Zerg}
 
 abstract class DefendFFEWithProbes extends Plan {

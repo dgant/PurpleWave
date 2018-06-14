@@ -6,9 +6,9 @@ import Macro.Architecture.Blueprint
 import Macro.Scheduling.Project
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
-import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
-import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitPreferences.UnitPreferCloseAndNotMining
+import Planning.ResourceLocks.{LockCurrencyForUnit, LockUnits}
+import Planning.UnitCounters.UnitCountOne
+import Planning.UnitPreferences.UnitPreferCloseAndNotMining
 import Planning.Plan
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo

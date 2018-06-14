@@ -5,12 +5,11 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Squads.Goals.GoalPush
 import Micro.Squads.Squad
-import Planning.Composition.Property
-import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitCounters.UnitCountBetween
-import Planning.Composition.UnitMatchers.{UnitMatchOr, UnitMatchWarriors, UnitMatchWorkers}
-import Planning.Composition.UnitPreferences.UnitPreferClose
-import Planning.Plan
+import Planning.ResourceLocks.LockUnits
+import Planning.UnitCounters.UnitCountBetween
+import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors, UnitMatchWorkers}
+import Planning.UnitPreferences.UnitPreferClose
+import Planning.{Plan, Property}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption

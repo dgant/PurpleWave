@@ -5,15 +5,15 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Composition.UnitCounters.UnitCountExcept
-import Planning.Composition.UnitMatchers.UnitMatchWorkers
+import Planning.UnitCounters.UnitCountExcept
+import Planning.UnitMatchers.UnitMatchWorkers
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Predicates.Milestones.UnitsAtLeast
+import Planning.Predicates.Employing
+import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvE.TvEProxy5Rax

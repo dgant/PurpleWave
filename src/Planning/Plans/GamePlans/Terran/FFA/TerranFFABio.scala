@@ -2,7 +2,8 @@ package Planning.Plans.GamePlans.Terran.FFA
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors}
+import Planning.Predicates.Compound.Check
+import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors}
 import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -10,7 +11,7 @@ import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBasesFFA}
-import Planning.Plans.Predicates.Milestones.{EnemyHasShownCloakedThreat, UnitsAtLeast}
+import Planning.Predicates.Milestones.{EnemyHasShownCloakedThreat, UnitsAtLeast}
 import ProxyBwapi.Races.Terran
 
 class TerranFFABio extends GameplanModeTemplate {

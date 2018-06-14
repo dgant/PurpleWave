@@ -7,7 +7,7 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Commands.{Attack, Move}
-import Planning.Composition.UnitMatchers.UnitMatchWorkers
+import Planning.UnitMatchers.UnitMatchWorkers
 import Planning.Yolo
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo

@@ -4,12 +4,12 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Circle
 import Micro.Agency.Intention
-import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitMatchers.UnitMatchOr
+import Planning.Predicates.Compound.Latch
+import Planning.ResourceLocks.LockUnits
+import Planning.UnitMatchers.UnitMatchOr
 import Planning.Composition.UnitCountEverything
 import Planning.Plan
-import Planning.Plans.Compound.Latch
-import Planning.Plans.Predicates.Milestones.EnemiesAtLeast
+import Planning.Predicates.Milestones.EnemiesAtLeast
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption

@@ -2,7 +2,7 @@ package Information.Intelligenze.Fingerprinting.ProtossStrategies
 
 import Information.Intelligenze.Fingerprinting.Generic._
 import Lifecycle.With
-import Planning.Composition.UnitMatchers.{UnitMatchNot, UnitMatchProxied}
+import Planning.UnitMatchers.{UnitMatchNot, UnitMatchProxied}
 import ProxyBwapi.Races.Protoss
 import Utilities.ByOption
 import bwapi.Race

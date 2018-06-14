@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans
 
 import Planning.{Plan, Predicate}
 import Planning.Plans.Compound.Parallel
-import Planning.Plans.Predicates.{Always, Never}
+import Planning.Predicates.{Always, Never}
 
 abstract class GameplanMode extends Parallel {
   

@@ -5,8 +5,8 @@ import Planning.Plans.Compound.Trigger
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
+import Planning.Predicates.Employing
+import Planning.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvTEarly1015GateGoonDT
 

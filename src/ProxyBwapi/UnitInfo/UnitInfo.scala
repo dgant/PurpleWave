@@ -11,7 +11,7 @@ import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.PurpleMath
 import Micro.Matchups.MatchupAnalysis
 import Performance.Cache
-import Planning.Composition.UnitMatchers.{UnitMatchSiegeTank, UnitMatcher}
+import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatcher}
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass

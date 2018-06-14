@@ -1,18 +1,19 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchInNatural}
+import Planning.Predicates.Compound.Not
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchInNatural}
 import Planning.Plan
 import Planning.Plans.Army.Attack
-import Planning.Plans.Compound.{If, Not, Or, Trigger}
+import Planning.Plans.Compound.{If, Or, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast, UpgradeComplete}
-import Planning.Plans.Predicates.Reactive.EnemyBasesAtLeast
-import Planning.Plans.Predicates.{Employing, SafeAtHome}
+import Planning.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast, UpgradeComplete}
+import Planning.Predicates.Reactive.EnemyBasesAtLeast
+import Planning.Predicates.{Employing, SafeAtHome}
 import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.PvT1015Expand

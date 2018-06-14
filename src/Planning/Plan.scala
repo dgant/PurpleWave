@@ -1,7 +1,6 @@
 package Planning
 
 import Lifecycle.With
-import Planning.Composition.Property
 
 class Plan {
   

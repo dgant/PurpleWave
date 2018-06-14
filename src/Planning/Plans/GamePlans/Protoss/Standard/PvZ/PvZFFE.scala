@@ -3,18 +3,19 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitMatchers.UnitMatchType
+import Planning.Plans.Compound.If
+import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.UnitMatchers.UnitMatchType
 import Planning.{Plan, Predicate}
-import Planning.Plans.Compound.{Latch, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational.{DefendFFEWithProbesAgainst4Pool, DefendFFEWithProbesAgainst9Pool, PlacementForgeFastExpand}
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Predicates.Milestones.{FrameAtLeast, FrameAtMost, UnitsAtLeast, UnitsAtMost}
-import Planning.Plans.Predicates.Scenarios.EnemyStrategy
+import Planning.Predicates.Employing
+import Planning.Predicates.Milestones.{FrameAtLeast, FrameAtMost, UnitsAtLeast, UnitsAtMost}
+import Planning.Predicates.Scenarios.EnemyStrategy
 import Planning.Plans.Scouting.ScoutAt
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvZEarlyFFEConservative, PvZEarlyFFEEconomic}

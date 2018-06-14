@@ -4,7 +4,8 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitMatchers._
+import Planning.Predicates.Compound.{And, Check, Not}
+import Planning.UnitMatchers._
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, RequireSufficientSupply, UpgradeContinuously}
@@ -12,11 +13,11 @@ import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, MeldArchons}
-import Planning.Plans.Predicates.Economy.GasAtMost
-import Planning.Plans.Predicates.Milestones._
-import Planning.Plans.Predicates.Reactive.{EnemyBasesAtLeast, EnemyCarriers, EnemyDarkTemplarExists, EnemyDarkTemplarPossible}
-import Planning.Plans.Predicates.Scenarios.{EnemyStrategy, WeAreBeingProxied}
-import Planning.Plans.Predicates.{Employing, SafeAtHome, SafeToMoveOut}
+import Planning.Predicates.Economy.GasAtMost
+import Planning.Predicates.Milestones._
+import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyCarriers, EnemyDarkTemplarExists, EnemyDarkTemplarPossible}
+import Planning.Predicates.Scenarios.{EnemyStrategy, WeAreBeingProxied}
+import Planning.Predicates.{Employing, SafeAtHome, SafeToMoveOut}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen4GateGoon
 

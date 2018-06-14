@@ -3,7 +3,8 @@ package Planning.Plans.GamePlans.Terran.Standard.TvE
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Composition.UnitMatchers._
+import Planning.Predicates.Compound.{And, Check, Not}
+import Planning.UnitMatchers._
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
@@ -13,10 +14,10 @@ import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Terran.{BuildBunkersAtExpansions, BuildMissileTurretsAtBases, PopulateBunkers}
-import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtMost}
-import Planning.Plans.Predicates.Matchup.{EnemyIsProtoss, EnemyIsZerg}
-import Planning.Plans.Predicates.Milestones.{EnemiesAtLeast, EnemyHasShownCloakedThreat, IfOnMiningBases, UnitsAtLeast}
-import Planning.Plans.Predicates.{Employing, SafeAtHome, SafeToMoveOut}
+import Planning.Predicates.Economy.{GasAtLeast, MineralsAtMost}
+import Planning.Predicates.Matchup.{EnemyIsProtoss, EnemyIsZerg}
+import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemyHasShownCloakedThreat, IfOnMiningBases, UnitsAtLeast}
+import Planning.Predicates.{Employing, SafeAtHome, SafeToMoveOut}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Terran.TvE.TvETurtleMech
 

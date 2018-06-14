@@ -4,17 +4,18 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitCounters.UnitCountExactly
-import Planning.Composition.UnitMatchers.{UnitMatchMobileFlying, UnitMatchWorkers}
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.BuildGasPumps
-import Planning.Plans.Predicates.{Employ, Employing}
-import Planning.Plans.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Scouting.ScoutAt
+import Planning.Predicates.Compound.{And, Check, Not}
+import Planning.Predicates.Employing
+import Planning.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
+import Planning.UnitCounters.UnitCountExactly
+import Planning.UnitMatchers.{UnitMatchMobileFlying, UnitMatchWorkers}
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.{ProxyHatchHydras, ProxyHatchSunkens, ProxyHatchZerglings}
@@ -94,7 +95,8 @@ class ProxyHatch extends Parallel {
             Get(1,  Zerg.SpawningPool),
             Get(14, Zerg.Drone))))),
   
-    new Employ(ProxyHatchZerglings,
+    new If(
+      new Employing(ProxyHatchZerglings),
       new Parallel(
         new AddSupplyWhenSupplyBlocked,
         new Pump(Zerg.Zergling),
@@ -102,7 +104,8 @@ class ProxyHatch extends Parallel {
           new WeKnowWhereToProxy,
           new Pump(Zerg.Hatchery, 5, 1)))),
   
-    new Employ(ProxyHatchHydras,
+    new If(
+      new Employing(ProxyHatchHydras),
       new Parallel(
         new Do(() => {
           With.blackboard.gasTargetRatio = 2.0 / 12.0
@@ -118,7 +121,8 @@ class ProxyHatch extends Parallel {
         new UpgradeContinuously(Zerg.HydraliskSpeed),
         new UpgradeContinuously(Zerg.HydraliskRange))),
   
-    new Employ(ProxyHatchSunkens,
+    new If(
+      new Employing(ProxyHatchSunkens),
       new Parallel(
         new Pump(Zerg.SunkenColony),
         new Trigger(
@@ -150,7 +154,8 @@ class ProxyHatch extends Parallel {
     new Attack,
     new FollowBuildOrder,
   
-    new Employ(ProxyHatchSunkens,
+    new If(
+      new Employing(ProxyHatchSunkens),
       new If(
         new And(
           new UnitsAtLeast(2, Zerg.Hatchery,      complete = false),

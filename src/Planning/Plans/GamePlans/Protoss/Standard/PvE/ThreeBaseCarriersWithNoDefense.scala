@@ -2,14 +2,13 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvE
 
 import Lifecycle.With
 import Macro.BuildRequests.{Get, GetAnother, NextUpgrade}
-import Planning.Plans.Army.{Attack, ConsiderAttacking, DefendZones}
+import Planning.Plans.Army.{Attack, ConsiderAttacking, DefendZones, RecruitFreelancers}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
-import Planning.Plans.Predicates.Milestones.{IfOnMiningBases, OnGasPumps, UnitsAtLeast}
-import Planning.Plans.Recruitment.RecruitFreelancers
+import Planning.Predicates.Milestones.{IfOnMiningBases, OnGasPumps, UnitsAtLeast}
 import ProxyBwapi.Races.Protoss
 
 class ThreeBaseCarriersWithNoDefense extends Parallel {

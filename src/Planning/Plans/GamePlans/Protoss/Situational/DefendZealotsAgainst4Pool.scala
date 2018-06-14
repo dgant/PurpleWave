@@ -2,12 +2,11 @@ package Planning.Plans.GamePlans.Protoss.Situational
 
 import Lifecycle.With
 import Micro.Agency.Intention
-import Planning.Composition.Property
-import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitCounters.UnitCountExactly
-import Planning.Composition.UnitMatchers.UnitMatchWorkers
-import Planning.Composition.UnitPreferences.UnitPreferClose
-import Planning.Plan
+import Planning.ResourceLocks.LockUnits
+import Planning.UnitCounters.UnitCountExactly
+import Planning.UnitMatchers.UnitMatchWorkers
+import Planning.UnitPreferences.UnitPreferClose
+import Planning.{Plan, Property}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 

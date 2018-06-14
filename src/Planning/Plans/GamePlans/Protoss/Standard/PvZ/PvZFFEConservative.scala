@@ -1,13 +1,14 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
+import Planning.Predicates.Compound.Latch
 import Planning.{Plan, Predicate}
-import Planning.Plans.Compound.{Latch, _}
+import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
 import Planning.Plans.Macro.BuildOrders.BuildOrder
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Predicates.Milestones.UnitsAtLeast
+import Planning.Predicates.Employing
+import Planning.Predicates.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvZEarlyFFEConservative
 

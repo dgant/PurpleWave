@@ -1,7 +1,8 @@
 package Planning.Plans.GamePlans.Protoss.Standard.FFA
 
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitMatchers.UnitMatchWarriors
+import Planning.Predicates.Compound.{And, Not}
+import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -10,9 +11,9 @@ import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
-import Planning.Plans.Predicates.Always
-import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtMost}
-import Planning.Plans.Predicates.Milestones.{UnitsAtLeast, UnitsExactly, UpgradeComplete}
+import Planning.Predicates.Always
+import Planning.Predicates.Economy.{GasAtLeast, MineralsAtMost}
+import Planning.Predicates.Milestones.{UnitsAtLeast, UnitsExactly, UpgradeComplete}
 import ProxyBwapi.Races.Protoss
 
 class ProtossBigFFACarriers extends GameplanModeTemplate {

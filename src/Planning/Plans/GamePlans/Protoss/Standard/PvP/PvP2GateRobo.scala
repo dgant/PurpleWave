@@ -1,15 +1,15 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Composition.UnitMatchers.UnitMatchWarriors
+import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast}
-import Planning.Plans.Predicates.Reactive.EnemyBasesAtLeast
+import Planning.Predicates.Employing
+import Planning.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast}
+import Planning.Predicates.Reactive.EnemyBasesAtLeast
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen2GateRobo
 

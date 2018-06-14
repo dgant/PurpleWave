@@ -1,8 +1,8 @@
 package Planning.Plans.Compound
 
-import Planning.Composition.Property
-import Planning.Plans.Predicates.Never
-import Planning.{Plan, Predicate}
+import Planning.Predicates.Compound.Latch
+import Planning.Predicates.Never
+import Planning.{Plan, Predicate, Property}
 
 class Trigger(
   initialPredicate : Predicate = new Never,

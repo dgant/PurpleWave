@@ -1,7 +1,6 @@
 package Planning.Plans.Compound
 
-import Planning.Composition.Property
-import Planning.Plan
+import Planning.{Plan, Property}
 
 abstract class AbstractAll(initialChildren: Plan*) extends Plan {
   val children = new Property[Seq[Plan]](initialChildren.toVector)

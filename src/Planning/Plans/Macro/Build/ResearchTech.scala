@@ -3,9 +3,9 @@ package Planning.Plans.Macro.Build
 import Lifecycle.With
 import Macro.Scheduling.Project
 import Micro.Agency.Intention
-import Planning.Composition.ResourceLocks.{LockCurrencyForTech, LockUnits}
-import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitPreferences.UnitPreferIdle
+import Planning.ResourceLocks.{LockCurrencyForTech, LockUnits}
+import Planning.UnitCounters.UnitCountOne
+import Planning.UnitPreferences.UnitPreferIdle
 import Planning.Plan
 import ProxyBwapi.Techs.Tech
 

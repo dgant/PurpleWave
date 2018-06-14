@@ -2,8 +2,8 @@ package Planning.Plans.Army
 
 import Lifecycle.With
 import Micro.Squads.Goals.GoalEjectScout
-import Planning.Composition.UnitCounters.{UnitCountOne, UnitCounter}
-import Planning.Composition.UnitMatchers._
+import Planning.UnitCounters.{UnitCountOne, UnitCounter}
+import Planning.UnitMatchers._
 import ProxyBwapi.Races.Zerg
 import Utilities.ByOption
 

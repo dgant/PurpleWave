@@ -1,16 +1,17 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvE
 
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitCounters.UnitCountExcept
-import Planning.Composition.UnitMatchers.UnitMatchWorkers
+import Planning.Predicates.Compound.Not
+import Planning.UnitCounters.UnitCountExcept
+import Planning.UnitMatchers.UnitMatchWorkers
 import Planning.{Plan, Predicate}
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.Pump
-import Planning.Plans.Predicates.Economy.MineralsAtLeast
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
+import Planning.Predicates.Economy.MineralsAtLeast
+import Planning.Predicates.Employing
+import Planning.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Scouting.{FoundEnemyBase, ScoutAt}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvE.TvESCVMarineAllIn

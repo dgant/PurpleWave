@@ -1,19 +1,20 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitMatchers.UnitMatchWarriors
+import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.DefendZones
-import Planning.Plans.Compound.{Latch, _}
+import Planning.Plans.Compound.{FlipIf, If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.{PumpWorkers, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, MatchMiningBases, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
-import Planning.Plans.Predicates.Economy.GasAtMost
-import Planning.Plans.Predicates.Milestones._
-import Planning.Plans.Predicates.Reactive.EnemyCarriers
-import Planning.Plans.Predicates.{Employing, SafeAtHome, SafeToMoveOut}
+import Planning.Predicates.Economy.GasAtMost
+import Planning.Predicates.Milestones._
+import Planning.Predicates.Reactive.EnemyCarriers
+import Planning.Predicates.{Employing, SafeAtHome, SafeToMoveOut}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvPLateGameArbiter, PvPLateGameCarrier}
 

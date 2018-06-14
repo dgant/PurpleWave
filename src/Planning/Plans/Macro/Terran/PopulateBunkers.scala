@@ -2,9 +2,9 @@ package Planning.Plans.Macro.Terran
 
 import Lifecycle.With
 import Micro.Agency.Intention
-import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitCounters.UnitCountBetween
-import Planning.Composition.UnitPreferences.UnitPreferClose
+import Planning.ResourceLocks.LockUnits
+import Planning.UnitCounters.UnitCountBetween
+import Planning.UnitPreferences.UnitPreferClose
 import Planning.Plan
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo

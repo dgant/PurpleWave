@@ -4,9 +4,8 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.{GetAnother, Get}
-import Planning.Composition.Property
-import Planning.Plan
+import Macro.BuildRequests.{Get, GetAnother}
+import Planning.{Plan, Property}
 import ProxyBwapi.Races.Terran
 
 class BuildMissileTurretsAtBases(initialCount: Int) extends Plan {

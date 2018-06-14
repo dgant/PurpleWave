@@ -3,7 +3,7 @@ package ProxyBwapi.UnitClasses
 import Mathematics.Points.{Point, Tile, TileRectangle}
 import Mathematics.PurpleMath
 import Micro.Decisions.MicroValue
-import Planning.Composition.UnitMatchers.UnitMatcher
+import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}

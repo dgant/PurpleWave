@@ -1,6 +1,6 @@
 package Macro.Allocation
 
-import Planning.Composition.ResourceLocks.LockCurrency
+import Planning.ResourceLocks.LockCurrency
 import Lifecycle.With
 
 import scala.collection.mutable

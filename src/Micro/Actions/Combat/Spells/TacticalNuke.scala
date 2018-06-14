@@ -1,7 +1,7 @@
 package Micro.Actions.Combat.Spells
 
 import Lifecycle.With
-import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchComplete}
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete}
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass

@@ -7,8 +7,8 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Predicates.Milestones._
+import Planning.Predicates.Employing
+import Planning.Predicates.Milestones._
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvZMidgameCorsairSpeedlot
 

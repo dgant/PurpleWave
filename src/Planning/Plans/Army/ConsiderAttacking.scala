@@ -1,7 +1,7 @@
 package Planning.Plans.Army
 
 import Planning.Plans.Compound.If
-import Planning.Plans.Predicates.SafeToMoveOut
+import Planning.Predicates.SafeToMoveOut
 
 class ConsiderAttacking extends If(new SafeToMoveOut) {
   val attack: Attack = new Attack

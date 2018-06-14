@@ -2,7 +2,7 @@ package Planning.Plans.Macro.Protoss
 
 import Lifecycle.With
 import Micro.Agency.Intention
-import Planning.Composition.ResourceLocks.LockUnits
+import Planning.ResourceLocks.LockUnits
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
 

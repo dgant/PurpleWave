@@ -5,9 +5,9 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Mathematics.Points.{Pixel, Tile}
 import Micro.Agency.Intention
-import Planning.Composition.ResourceLocks.LockUnits
+import Planning.ResourceLocks.LockUnits
 import Planning.Composition.UnitCountEverything
-import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchComplete, UnitMatchWorkers, UnitMatcher}
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete, UnitMatchWorkers, UnitMatcher}
 import Planning.Plans.Army.AttackWithWorkers
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.BuildOrders.{BuildOrder, FollowBuildOrder}

@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Expanding
 
 import Planning.Plans.Compound.If
-import Planning.Plans.Predicates.Milestones.SupplyOutOf200
+import Planning.Predicates.Milestones.SupplyOutOf200
 
 class RemoveMineralBlocksAt(minimumSupply:Int)
   extends If(

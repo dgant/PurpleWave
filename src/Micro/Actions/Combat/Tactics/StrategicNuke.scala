@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Tactics
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchComplete}
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete}
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 

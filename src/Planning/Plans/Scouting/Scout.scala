@@ -3,12 +3,11 @@ package Planning.Plans.Scouting
 import Lifecycle.With
 import Mathematics.Points.SpecificPoints
 import Micro.Agency.Intention
-import Planning.Composition.Property
-import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitCounters.{UnitCountBetween, UnitCountExactly}
-import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchNotHoldingResources, UnitMatchWorkers}
-import Planning.Composition.UnitPreferences.UnitPreferClose
-import Planning.Plan
+import Planning.ResourceLocks.LockUnits
+import Planning.UnitCounters.{UnitCountBetween, UnitCountExactly}
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchNotHoldingResources, UnitMatchWorkers}
+import Planning.UnitPreferences.UnitPreferClose
+import Planning.{Plan, Property}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Strategery.Strategies.Zerg.ZvE4Pool
 

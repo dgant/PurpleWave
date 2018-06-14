@@ -2,12 +2,11 @@ package Planning.Plans.Macro.Expanding
 
 import Lifecycle.With
 import Micro.Agency.Intention
-import Planning.Composition.Property
-import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitMatchers.UnitMatchWorkers
-import Planning.Composition.UnitPreferences.UnitPreferClose
-import Planning.Plan
+import Planning.ResourceLocks.LockUnits
+import Planning.UnitCounters.UnitCountOne
+import Planning.UnitMatchers.UnitMatchWorkers
+import Planning.UnitPreferences.UnitPreferClose
+import Planning.{Plan, Property}
 
 class RemoveMineralBlocks extends Plan {
   

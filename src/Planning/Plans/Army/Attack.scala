@@ -3,8 +3,8 @@ package Planning.Plans.Army
 
 import Micro.Squads.Goals.GoalAttack
 import Planning.Composition.UnitCountEverything
-import Planning.Composition.UnitCounters.UnitCounter
-import Planning.Composition.UnitMatchers._
+import Planning.UnitCounters.UnitCounter
+import Planning.UnitMatchers._
 
 class Attack(
   attackerMatcher: UnitMatcher = UnitMatchAnd(UnitMatchRecruitableForCombat, UnitMatchNot(UnitMatchWorkers)),

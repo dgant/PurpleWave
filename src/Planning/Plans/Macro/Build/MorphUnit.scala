@@ -2,10 +2,10 @@ package Planning.Plans.Macro.Build
 
 import Macro.Scheduling.Project
 import Micro.Agency.Intention
-import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
-import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitMatchers.{UnitMatchMorphingInto, UnitMatchOr}
-import Planning.Composition.UnitPreferences.{UnitPreferBaseWithFewerWorkers, UnitPreferHatcheryWithMoreLarva}
+import Planning.ResourceLocks.{LockCurrencyForUnit, LockUnits}
+import Planning.UnitCounters.UnitCountOne
+import Planning.UnitMatchers.{UnitMatchMorphingInto, UnitMatchOr}
+import Planning.UnitPreferences.{UnitPreferBaseWithFewerWorkers, UnitPreferHatcheryWithMoreLarva}
 import Planning.Plan
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass

@@ -1,9 +1,10 @@
 package Planning.Plans.GamePlans.Zerg
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
-import Planning.Composition.UnitMatchers.{UnitMatchAntiAir, UnitMatchAntiGround, UnitMatchOr}
-import Planning.Plans.Compound.{And, If}
-import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtMost, FrameAtMost}
+import Planning.Predicates.Compound.And
+import Planning.UnitMatchers.{UnitMatchAntiAir, UnitMatchAntiGround, UnitMatchOr}
+import Planning.Plans.Compound.If
+import Planning.Predicates.Milestones.{EnemyUnitsAtMost, FrameAtMost}
 import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 

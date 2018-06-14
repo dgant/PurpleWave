@@ -4,9 +4,10 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Micro.Agency.Intention
-import Planning.Composition.ResourceLocks.LockUnits
+import Planning.Predicates.Compound.{And, Check, Not}
+import Planning.ResourceLocks.LockUnits
 import Planning.Composition.UnitCountEverything
-import Planning.Composition.UnitMatchers.UnitMatchOr
+import Planning.UnitMatchers.UnitMatchOr
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
@@ -14,9 +15,9 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.{Enemy, Pump, TrainMatchingRatio, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireBases
-import Planning.Plans.Predicates.Economy.MineralsAtLeast
-import Planning.Plans.Predicates.Milestones._
-import Planning.Plans.Predicates.SafeAtHome
+import Planning.Predicates.Economy.MineralsAtLeast
+import Planning.Predicates.Milestones._
+import Planning.Predicates.SafeAtHome
 import Planning.Plans.Scouting.{FoundEnemyBase, Scout}
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 

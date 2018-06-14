@@ -5,15 +5,16 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
+import Planning.Predicates.Compound.And
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, Pump, PumpWorkers}
+import Planning.Predicates.Employing
+import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, RequireSufficientSupply}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Predicates.Economy.{GasAtLeast, SupplyBlocked}
-import Planning.Plans.Predicates.Milestones.UnitsAtLeast
+import Planning.Predicates.Economy.{GasAtLeast, SupplyBlocked}
+import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.Scouting.Scout
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.Terran

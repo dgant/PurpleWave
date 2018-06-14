@@ -2,7 +2,7 @@ package Strategery
 
 import Lifecycle.With
 import Planning.Plan
-import Planning.Plans.StandardGamePlan
+import Planning.Plans.GamePlans.StandardGamePlan
 import ProxyBwapi.Players.Players
 import Strategery.History.HistoricalGame
 import Strategery.Strategies.Protoss.ProtossChoices

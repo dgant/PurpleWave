@@ -3,14 +3,13 @@ package Planning.Plans.Macro.Expanding
 import Debugging.English
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Composition.Property
-import Planning.Plan
+import Planning.{Plan, Property}
 
 class RequireBases(basesInitial: Int = 1) extends Plan {
   
-  description.set("Require " + basesDesired.get + English.pluralize(" bases", basesDesired.get))
-  
   val basesDesired = new Property(basesInitial)
+  
+  description.set("Require " + basesDesired.get + English.pluralize(" bases", basesDesired.get))
   
   protected def basesNow: Int = {
     With.geography.ourBases.size

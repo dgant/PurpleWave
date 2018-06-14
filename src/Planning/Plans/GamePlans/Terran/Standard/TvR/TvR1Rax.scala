@@ -1,16 +1,17 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvR
 
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitMatchers.UnitMatchWarriors
+import Planning.Predicates.Compound.Not
+import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplateVsRandom
 import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
-import Planning.Plans.Predicates.{Employing, SafeAtHome}
+import Planning.Predicates.{Employing, SafeAtHome}
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Predicates.Milestones.UnitsAtLeast
+import Planning.Predicates.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvR.TvR1Rax
 

@@ -1,14 +1,15 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitCounters.UnitCountOne
+import Planning.Predicates.Compound.Latch
+import Planning.UnitCounters.UnitCountOne
 import Planning.Plans.Army.{ConsiderAttacking, DefendEntrance}
-import Planning.Plans.Compound.{If, Latch, Or}
+import Planning.Plans.Compound.{If, Or}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Predicates.Milestones.{EnemyHasShown, MiningBasesAtLeast, UnitsAtLeast}
+import Planning.Predicates.Employing
+import Planning.Predicates.Milestones.{EnemyHasShown, MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Plans.Scouting.ScoutOn
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.PvTEarly1GateStargateTemplar

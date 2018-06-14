@@ -2,19 +2,20 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitMatchers.UnitMatchWarriors
+import Planning.Predicates.Compound.{And, Check, Latch}
+import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.Aggression
-import Planning.Plans.Compound.{Latch, _}
+import Planning.Plans.Compound.{If, NoPlan, Or, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational.BuildHuggingNexus
 import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Predicates.Milestones._
+import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
+import Planning.Predicates.Employing
+import Planning.Predicates.Milestones._
 import Planning.Plans.Scouting.ScoutOn
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss.{PvZ4Gate99, PvZ4GateDragoonAllIn}

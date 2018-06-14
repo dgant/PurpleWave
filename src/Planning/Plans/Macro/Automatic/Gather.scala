@@ -4,9 +4,9 @@ import Information.Geography.Types.{Base, Zone}
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Agency.Intention
-import Planning.Composition.ResourceLocks.LockUnits
+import Planning.ResourceLocks.LockUnits
 import Planning.Composition.UnitCountEverything
-import Planning.Composition.UnitMatchers.UnitMatchWorkers
+import Planning.UnitMatchers.UnitMatchWorkers
 import Planning.Plan
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}

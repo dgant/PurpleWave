@@ -4,15 +4,16 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
+import Planning.Predicates.Compound.And
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, Pump, PumpWorkers}
+import Planning.Predicates.Employing
+import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, RequireSufficientSupply}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
-import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtMost, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
+import Planning.Predicates.Milestones.{EnemyUnitsAtMost, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Scouting.ScoutOn
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen2GateDTExpand

@@ -3,19 +3,20 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitMatchers.UnitMatchOr
+import Planning.Predicates.Compound.{And, Check, Latch, Not}
+import Planning.UnitMatchers.UnitMatchOr
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
-import Planning.Plans.Compound.{If, Latch, _}
+import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.{ExtractorTrick, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Predicates.Economy.MineralsAtLeast
-import Planning.Plans.Predicates.Matchup.EnemyIsTerran
-import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtMost, UnitsAtLeast}
-import Planning.Plans.Predicates.Scenarios.EnemyStrategy
-import Planning.Plans.Predicates.{Employing, StartPositionsAtLeast}
+import Planning.Predicates.Economy.MineralsAtLeast
+import Planning.Predicates.Matchup.EnemyIsTerran
+import Planning.Predicates.Milestones.{EnemyUnitsAtMost, UnitsAtLeast}
+import Planning.Predicates.Scenarios.EnemyStrategy
+import Planning.Predicates.{Employing, StartPositionsAtLeast}
 import Planning.Plans.Scouting.{FoundEnemyBase, Scout}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Zerg.ZvE4Pool

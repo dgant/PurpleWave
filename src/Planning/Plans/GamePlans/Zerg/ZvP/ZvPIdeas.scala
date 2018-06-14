@@ -7,10 +7,10 @@ import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
-import Planning.Plans.Predicates.Milestones._
-import Planning.Plans.Predicates.SafeAtHome
-import Planning.Plans.Predicates.Scenarios.EnemyStrategy
+import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
+import Planning.Predicates.Milestones._
+import Planning.Predicates.SafeAtHome
+import Planning.Predicates.Scenarios.EnemyStrategy
 import ProxyBwapi.Races.Zerg
 
 object ZvPIdeas {

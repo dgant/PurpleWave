@@ -2,6 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvE
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
+import Planning.Predicates.Compound.{And, Check}
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
@@ -11,8 +12,8 @@ import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, BuildCannonsAtExpansions}
-import Planning.Plans.Predicates.Milestones._
-import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtLeast, MineralsAtMost}
+import Planning.Predicates.Milestones._
+import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast, MineralsAtMost}
 import ProxyBwapi.Races.Protoss
 
 class MassPhotonCannon extends GameplanModeTemplate {

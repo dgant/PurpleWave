@@ -2,7 +2,8 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Composition.UnitMatchers.UnitMatchWarriors
+import Planning.Predicates.Compound.{And, Check}
+import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
@@ -10,8 +11,8 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Predicates.Milestones._
-import Planning.Plans.Predicates.SafeAtHome
+import Planning.Predicates.Milestones._
+import Planning.Predicates.SafeAtHome
 import ProxyBwapi.Races.Zerg
 
 class TwoHatchHydra extends GameplanModeTemplate {

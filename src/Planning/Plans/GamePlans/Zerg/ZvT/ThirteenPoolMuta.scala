@@ -4,7 +4,8 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitCounters.UnitCountOne
+import Planning.Predicates.Compound.Not
+import Planning.UnitCounters.UnitCountOne
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
@@ -12,7 +13,7 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Predicates.Milestones.UnitsAtLeast
+import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.Scouting.FoundEnemyBase
 import ProxyBwapi.Races.Zerg
 

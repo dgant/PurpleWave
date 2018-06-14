@@ -2,16 +2,17 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
+import Planning.Plans.Compound.{FlipIf, If}
+import Planning.Predicates.Compound.{And, Latch}
 import Planning.{Plan, Predicate}
-import Planning.Plans.Compound.{Latch, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.PumpWorkers
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Predicates.Milestones._
-import Planning.Plans.Predicates.Scenarios.EnemyStrategy
-import Planning.Plans.Predicates.{Employing, SafeAtHome}
+import Planning.Predicates.Milestones._
+import Planning.Predicates.Scenarios.EnemyStrategy
+import Planning.Predicates.{Employing, SafeAtHome}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen1GateReaverExpand
 

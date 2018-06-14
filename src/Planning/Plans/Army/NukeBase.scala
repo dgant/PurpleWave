@@ -5,11 +5,10 @@ import Lifecycle.With
 import Micro.Agency.Intention
 import Micro.Squads.Goals.GoalDrop
 import Micro.Squads.Squad
-import Planning.Composition.Property
-import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitMatchers.UnitMatchTransport
-import Planning.Plan
+import Planning.ResourceLocks.LockUnits
+import Planning.UnitCounters.UnitCountOne
+import Planning.UnitMatchers.UnitMatchTransport
+import Planning.{Plan, Property}
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption

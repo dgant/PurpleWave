@@ -9,7 +9,7 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
+import Planning.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
 import ProxyBwapi.Races.Zerg
 
 class OneHatchLurker extends GameplanModeTemplate {

@@ -1,15 +1,15 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Composition.UnitMatchers.UnitMatchSiegeTank
+import Planning.UnitMatchers.UnitMatchSiegeTank
 import Planning.{Plan, Predicate}
 import Planning.Plans.Compound.{NoPlan, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
-import Planning.Plans.Predicates.Employing
+import Planning.Predicates.Employing
 import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers}
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Predicates.Milestones.UnitsAtLeast
+import Planning.Predicates.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvP.TvPEarly14CC
 

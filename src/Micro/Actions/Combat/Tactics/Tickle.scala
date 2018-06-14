@@ -6,7 +6,7 @@ import Micro.Actions.Action
 import Micro.Actions.Basic.MineralWalk
 import Micro.Actions.Combat.Techniques.Avoid
 import Micro.Actions.Commands.{Attack, Move}
-import Planning.Composition.UnitMatchers.UnitMatchWorkers
+import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 

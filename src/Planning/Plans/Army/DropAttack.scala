@@ -5,12 +5,11 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Squads.Goals.GoalDrop
 import Micro.Squads.Squad
-import Planning.Composition.Property
-import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitCounters.{UnitCountOne, UnitCountTransportable}
-import Planning.Composition.UnitMatchers.{UnitMatchDroppable, UnitMatchTransport, UnitMatcher}
-import Planning.Composition.UnitPreferences.UnitPreferClose
-import Planning.Plan
+import Planning.ResourceLocks.LockUnits
+import Planning.UnitCounters.{UnitCountOne, UnitCountTransportable}
+import Planning.UnitMatchers.{UnitMatchDroppable, UnitMatchTransport, UnitMatcher}
+import Planning.UnitPreferences.UnitPreferClose
+import Planning.{Plan, Property}
 
 class DropAttack extends Plan {
   

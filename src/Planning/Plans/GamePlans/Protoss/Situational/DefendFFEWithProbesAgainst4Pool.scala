@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Situational
 
 import Lifecycle.With
-import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchComplete, UnitMatchWorkers}
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete, UnitMatchWorkers}
 import ProxyBwapi.Races.{Protoss, Zerg}
 
 class DefendFFEWithProbesAgainst4Pool extends DefendFFEWithProbes {

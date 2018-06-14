@@ -2,7 +2,8 @@ package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Lifecycle.With
 import Macro.BuildRequests.{Get, GetAnother}
-import Planning.Composition.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
+import Planning.Predicates.Compound.{And, Check, Not}
+import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
 import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Compound.{If, Parallel, _}
@@ -12,10 +13,10 @@ import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas._
 import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
-import Planning.Plans.Predicates.Economy.MineralsAtLeast
-import Planning.Plans.Predicates.Matchup.EnemyIsTerran
-import Planning.Plans.Predicates.Milestones._
-import Planning.Plans.Predicates.{Employing, OnMap, StartPositionsAtMost}
+import Planning.Predicates.Economy.MineralsAtLeast
+import Planning.Predicates.Matchup.EnemyIsTerran
+import Planning.Predicates.Milestones._
+import Planning.Predicates.{Employing, OnMap, StartPositionsAtMost}
 import Planning.Plans.Scouting.{CampExpansions, FoundEnemyBase}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvPNinePool

@@ -3,7 +3,7 @@ package Micro.Squads.Goals
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
-import Planning.Composition.UnitMatchers.UnitMatchWorkers
+import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class GoalEjectScout extends GoalBasic {

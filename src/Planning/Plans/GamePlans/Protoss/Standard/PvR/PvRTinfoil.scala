@@ -1,15 +1,16 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvR
 
 import Macro.BuildRequests.{BuildRequest, Get}
+import Planning.Predicates.Compound.And
 import Planning.Plan
-import Planning.Plans.Compound.{And, If}
+import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanModeTemplateVsRandom
 import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Predicates.Economy.GasAtLeast
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Predicates.Milestones.UnitsAtLeast
+import Planning.Predicates.Economy.GasAtLeast
+import Planning.Predicates.Employing
+import Planning.Predicates.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvR.PvROpenTinfoil
 

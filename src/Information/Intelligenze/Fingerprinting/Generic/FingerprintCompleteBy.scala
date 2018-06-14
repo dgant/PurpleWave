@@ -1,6 +1,6 @@
 package Information.Intelligenze.Fingerprinting.Generic
 
-import Planning.Composition.UnitMatchers.UnitMatcher
+import Planning.UnitMatchers.UnitMatcher
 
 class FingerprintCompleteBy(
   unitMatcher : UnitMatcher,

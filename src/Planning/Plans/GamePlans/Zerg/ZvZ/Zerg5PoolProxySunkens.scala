@@ -5,6 +5,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
+import Planning.Predicates.Compound.{And, Check}
 import Planning.Composition.UnitCountEverything
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, _}
@@ -12,8 +13,8 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Predicates.Milestones.{FrameAtLeast, UnitsAtLeast}
+import Planning.Predicates.Employing
+import Planning.Predicates.Milestones.{FrameAtLeast, UnitsAtLeast}
 import Planning.Plans.Scouting.Scout
 import Planning.{Plan, Predicate, ProxyPlanner}
 import ProxyBwapi.Races.Zerg

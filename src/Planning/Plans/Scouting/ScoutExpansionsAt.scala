@@ -1,7 +1,7 @@
 package Planning.Plans.Scouting
 
 import Planning.Plans.Compound.If
-import Planning.Plans.Predicates.Milestones.SupplyOutOf200
+import Planning.Predicates.Milestones.SupplyOutOf200
 
 class ScoutExpansionsAt(minimumSupply: Int)
   extends If(

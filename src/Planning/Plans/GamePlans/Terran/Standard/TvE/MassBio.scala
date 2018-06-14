@@ -3,7 +3,8 @@ package Planning.Plans.GamePlans.Terran.Standard.TvE
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Composition.UnitMatchers.{UnitMatchOr, UnitMatchSiegeTank, UnitMatchWarriors}
+import Planning.Predicates.Compound.{And, Check}
+import Planning.UnitMatchers.{UnitMatchOr, UnitMatchSiegeTank, UnitMatchWarriors}
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
@@ -11,10 +12,10 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Predicates.Economy.MineralsAtLeast
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Predicates.Matchup.EnemyIsZerg
-import Planning.Plans.Predicates.Milestones._
+import Planning.Predicates.Economy.MineralsAtLeast
+import Planning.Predicates.Employing
+import Planning.Predicates.Matchup.EnemyIsZerg
+import Planning.Predicates.Milestones._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Terran.TvE.TvEMassBio
 

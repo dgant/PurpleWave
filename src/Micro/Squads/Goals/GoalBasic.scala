@@ -6,8 +6,8 @@ import Micro.Agency.Intention
 import Micro.Squads.RecruitmentLevel
 import Micro.Squads.RecruitmentLevel.RecruitmentLevel
 import Planning.Composition.UnitCountEverything
-import Planning.Composition.UnitCounters.UnitCounter
-import Planning.Composition.UnitMatchers._
+import Planning.UnitCounters.UnitCounter
+import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.CountMap

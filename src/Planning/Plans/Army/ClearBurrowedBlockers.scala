@@ -3,12 +3,11 @@ package Planning.Plans.Army
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Agency.Intention
-import Planning.Composition.Property
-import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitMatchers.{UnitMatchCustom, UnitMatchMobileDetectors}
-import Planning.Composition.UnitPreferences.UnitPreferClose
-import Planning.Plan
+import Planning.ResourceLocks.LockUnits
+import Planning.UnitCounters.UnitCountOne
+import Planning.UnitMatchers.{UnitMatchCustom, UnitMatchMobileDetectors}
+import Planning.UnitPreferences.UnitPreferClose
+import Planning.{Plan, Property}
 import ProxyBwapi.Races.Terran
 
 import scala.util.Random

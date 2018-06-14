@@ -2,7 +2,7 @@ package Information.Intelligenze.Fingerprinting.ProtossStrategies
 
 import Information.Intelligenze.Fingerprinting.Generic._
 import Lifecycle.With
-import Planning.Composition.UnitMatchers.UnitMatchProxied
+import Planning.UnitMatchers.UnitMatchProxied
 import ProxyBwapi.Races.Protoss
 
 class FingerprintProxyGateway extends FingerprintAnd(

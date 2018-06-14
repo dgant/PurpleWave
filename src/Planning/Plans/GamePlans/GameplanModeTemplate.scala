@@ -2,17 +2,17 @@ package Planning.Plans.GamePlans
 
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.BuildRequest
+import Planning.Predicates.Compound.Not
 import Planning.Plan
-import Planning.Plans.Army._
-import Planning.Plans.Compound.{If, NoPlan, Not}
+import Planning.Plans.Army.{RecruitFreelancers, _}
+import Planning.Plans.Compound.{If, NoPlan}
 import Planning.Plans.GamePlans.Protoss.Situational.DefendAgainstProxy
-import Planning.Plans.Predicates.Matchup.WeAreZerg
-import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, PumpWorkers}
+import Planning.Predicates.Matchup.WeAreZerg
+import Planning.Plans.Macro.Automatic.{Gather, PumpWorkers, RequireSufficientSupply}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{BuildOrder, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.RemoveMineralBlocksAt
 import Planning.Plans.Macro.Protoss.MeldArchons
-import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.{ChillOverlords, ScoutAt, ScoutExpansionsAt}
 
 abstract class GameplanModeTemplate extends GameplanMode {

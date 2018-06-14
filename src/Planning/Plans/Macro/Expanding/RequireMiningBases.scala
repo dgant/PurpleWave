@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Expanding
 
 import Debugging.English
-import Planning.Plans.Predicates.Milestones.AllMiningBases
+import Planning.Predicates.Milestones.AllMiningBases
 
 class RequireMiningBases(basesInitial: Int = 1) extends RequireBases(basesInitial) {
   

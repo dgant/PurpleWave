@@ -3,11 +3,10 @@ package Planning.Plans.Army
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
-import Planning.Composition.Property
-import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitCounters.UnitCountBetween
-import Planning.Composition.UnitMatchers.{UnitMatchWarriors, UnitMatchWorkers}
-import Planning.Plan
+import Planning.ResourceLocks.LockUnits
+import Planning.UnitCounters.UnitCountBetween
+import Planning.UnitMatchers.{UnitMatchWarriors, UnitMatchWorkers}
+import Planning.{Plan, Property}
 
 class DefendAgainstWorkerRush extends Plan {
   

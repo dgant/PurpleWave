@@ -1,9 +1,10 @@
 package Planning.Plans.Macro.Expanding
 
-import Planning.Composition.UnitMatchers.{UnitMatchWarriors, UnitMatchWorkers}
+import Planning.Predicates.Compound.{And, Not}
+import Planning.UnitMatchers.{UnitMatchWarriors, UnitMatchWorkers}
 import Planning.Plans.Compound._
-import Planning.Plans.Predicates.OnMap
-import Planning.Plans.Predicates.Milestones.{MiningBasesAtMost, UnitsAtLeast}
+import Planning.Predicates.OnMap
+import Planning.Predicates.Milestones.{MiningBasesAtMost, UnitsAtLeast}
 import Strategery.Hunters
 
 class RequireMiningBasesFFA(bases: Int = 1) extends If(

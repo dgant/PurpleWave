@@ -2,9 +2,8 @@ package Planning.Plans.Army
 
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
-import Planning.Composition.Property
-import Planning.Composition.UnitMatchers.{UnitMatchWarriors, UnitMatcher}
-import Planning.Plan
+import Planning.UnitMatchers.{UnitMatchWarriors, UnitMatcher}
+import Planning.{Plan, Property}
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 
 class DefendZones extends Plan {

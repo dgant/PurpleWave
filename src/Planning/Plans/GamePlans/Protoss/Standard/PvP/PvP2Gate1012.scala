@@ -4,8 +4,9 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
+import Planning.Plans.Compound._
+import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.{Plan, Predicate}
-import Planning.Plans.Compound.{Latch, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.Pump
@@ -13,10 +14,10 @@ import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
-import Planning.Plans.Predicates.Milestones._
-import Planning.Plans.Predicates.Reactive.EnemyDarkTemplarPossible
-import Planning.Plans.Predicates.Scenarios.EnemyStrategy
-import Planning.Plans.Predicates.{Employing, SafeAtHome}
+import Planning.Predicates.Milestones._
+import Planning.Predicates.Reactive.EnemyDarkTemplarPossible
+import Planning.Predicates.Scenarios.EnemyStrategy
+import Planning.Predicates.{Employing, SafeAtHome}
 import Planning.Plans.Scouting.ScoutOn
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen2Gate1012

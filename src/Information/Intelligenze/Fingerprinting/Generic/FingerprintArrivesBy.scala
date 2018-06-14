@@ -3,7 +3,7 @@ package Information.Intelligenze.Fingerprinting.Generic
 import Information.Intelligenze.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Mathematics.PurpleMath
-import Planning.Composition.UnitMatchers.UnitMatcher
+import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class FingerprintArrivesBy(

@@ -4,9 +4,9 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Scheduling.Project
 import Micro.Agency.Intention
-import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
-import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatcher}
+import Planning.ResourceLocks.{LockCurrencyForUnit, LockUnits}
+import Planning.UnitCounters.UnitCountOne
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatcher}
 import Planning.Plan
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.UnitInfo

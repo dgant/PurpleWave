@@ -9,7 +9,7 @@ import Micro.Actions.Action
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
 import Micro.Heuristics.Spells.TargetAOE
-import Planning.Composition.UnitMatchers.UnitMatchBuilding
+import Planning.UnitMatchers.UnitMatchBuilding
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 

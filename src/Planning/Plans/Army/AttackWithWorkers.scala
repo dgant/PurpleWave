@@ -4,9 +4,9 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Micro.Agency.Intention
-import Planning.Composition.ResourceLocks.LockUnits
+import Planning.ResourceLocks.LockUnits
 import Planning.Composition.UnitCountEverything
-import Planning.Composition.UnitMatchers.UnitMatchWorkers
+import Planning.UnitMatchers.UnitMatchWorkers
 import Planning.Plan
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 

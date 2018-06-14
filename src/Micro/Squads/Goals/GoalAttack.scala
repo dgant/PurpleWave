@@ -2,10 +2,10 @@ package Micro.Squads.Goals
 
 import Lifecycle.With
 import Mathematics.Points.Pixel
+import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
-import Utilities.EnrichPixel._
 
 class GoalAttack extends GoalBasic {
   
@@ -31,7 +31,7 @@ class GoalAttack extends GoalBasic {
   }
   
   protected def chooseTarget(): Unit = {
-    val attackerCenter = squad.units.map(_.pixelCenter).centroid
+    val attackerCenter = PurpleMath.centroid(squad.units.map(_.pixelCenter))
     target =
       ByOption
         .maxBy(With.geography.enemyBases)(base => {

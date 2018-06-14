@@ -1,8 +1,8 @@
 package Information.Battles.Types
 
 import Mathematics.Points.Pixel
+import Mathematics.PurpleMath
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.EnrichPixel.EnrichedPixelCollection
 
 abstract class Battle(
   val us    : Team,
@@ -13,5 +13,5 @@ abstract class Battle(
   
   def teams: Vector[Team] = Vector(us, enemy)
   def teamOf(unit: UnitInfo): Team = if (unit.isFriendly) us else enemy
-  def focus: Pixel = teams.map(_.vanguard).centroid
+  def focus: Pixel = PurpleMath.centroid(teams.map(_.vanguard))
 }

@@ -1,6 +1,6 @@
 package Mathematics
 
-import Mathematics.Points.AbstractPoint
+import Mathematics.Points.{AbstractPoint, Pixel, SpecificPoints}
 
 import scala.util.Random
 
@@ -13,6 +13,15 @@ object PurpleMath {
       0.0
     else
       values.sum / values.size
+  }
+  
+  def centroid(values: Iterable[Pixel]): Pixel = {
+    if (values.isEmpty)
+      SpecificPoints.middle
+    else
+      Pixel(
+        values.view.map(_.x).sum / values.size,
+        values.view.map(_.y).sum / values.size)
   }
   
   def nanToZero(value: Double): Double = {

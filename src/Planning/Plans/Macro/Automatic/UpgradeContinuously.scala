@@ -1,4 +1,4 @@
-package Planning.Plans.Macro.Upgrades
+package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
 import Macro.BuildRequests.Get

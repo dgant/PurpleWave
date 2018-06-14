@@ -4,12 +4,12 @@ import Information.Geography.Types.{Edge, Zone}
 import Lifecycle.With
 import Mathematics.Formations.Formation
 import Mathematics.Points.{Pixel, SpecificPoints}
+import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Performance.Cache
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
-import Utilities.EnrichPixel.EnrichedPixelCollection
 
 class GoalDefendZone extends GoalBasic {
   
@@ -84,7 +84,7 @@ class GoalDefendZone extends GoalBasic {
   
   def defendWall(walls: Seq[UnitInfo]) {
     val centroidSources = Seq(squad.enemies.toSeq.map(_.pixelCenter), zone.exit.map(_.pixelCenter).toSeq, Seq(SpecificPoints.middle))
-    val enemyCentroid   = centroidSources.find(_.nonEmpty).head.centroid
+    val enemyCentroid   = PurpleMath.centroid(centroidSources.find(_.nonEmpty).head)
     val wall            = walls.minBy(_.pixelDistanceTravelling(enemyCentroid))
     val concaveOrigin   = wall.pixelCenter.project(enemyCentroid, 96.0)
     val concaveAxis     = wall.pixelCenter.radiansTo(enemyCentroid)

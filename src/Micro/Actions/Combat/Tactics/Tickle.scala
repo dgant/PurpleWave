@@ -1,6 +1,7 @@
 package Micro.Actions.Combat.Tactics
 
 import Lifecycle.With
+import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Basic.MineralWalk
 import Micro.Actions.Combat.Techniques.Avoid
@@ -8,7 +9,6 @@ import Micro.Actions.Commands.{Attack, Move}
 import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.EnrichPixel._
 
 object Tickle extends Action {
   
@@ -43,8 +43,8 @@ object Tickle extends Action {
     val enemyFighterStrength  = strength(enemyFighters)
   
     // We want to avoid big drilling stacks
-    val centroidSoft    = enemies.map(_.pixelCenter).centroid
-    val centroidHard    = if (enemies.size > 3) enemies.sortBy(_.pixelDistanceCenter(centroidSoft)).take(enemies.size/2).map(_.pixelCenter).centroid else centroidSoft //Don't centroid an empty list
+    val centroidSoft  = PurpleMath.centroid(enemies.map(_.pixelCenter))
+    val centroidHard  = if (enemies.size > 3) PurpleMath.centroid(enemies.sortBy(_.pixelDistanceCenter(centroidSoft)).take(enemies.size/2).map(_.pixelCenter)) else centroidSoft //Don't centroid an empty list
     
     // Get in their base!
     if ( ! unit.zone.bases.exists(_.owner.isEnemy)

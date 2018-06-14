@@ -1,13 +1,12 @@
 package Information.Geography.Calculations
 
 import Lifecycle.With
-import Mathematics.Clustering
 import Mathematics.Points.{Tile, TileRectangle}
 import Mathematics.Shapes.Circle
+import Mathematics.{Clustering, PurpleMath}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 import Strategery.Hunters
-import Utilities.EnrichPixel._
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -59,7 +58,7 @@ object BaseFinder {
     exclusions  : Set[Tile])
       : Option[Tile] = {
   
-    val centroid      = resources.map(_.pixelCenter).centroid.tileIncluding
+    val centroid      = PurpleMath.centroid(resources.map(_.pixelCenter)).tileIncluding
     val altitude      = With.game.getGroundHeight(centroid.bwapi)
     val searchRadius  = 10
     val candidates =

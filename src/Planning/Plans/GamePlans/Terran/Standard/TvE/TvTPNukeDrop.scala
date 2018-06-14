@@ -7,11 +7,10 @@ import Planning.Plans.Army.NukeBase
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Predicates.{Employing, SafeAtHome}
-import Planning.Plans.Macro.Automatic.Pump
+import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Predicates.Milestones._
-import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvE.TvTPNukeDrop
 

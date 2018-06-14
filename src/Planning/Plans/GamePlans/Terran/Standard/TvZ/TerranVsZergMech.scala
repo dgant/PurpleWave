@@ -8,12 +8,11 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Terran.Situational.TvZPlacement
 import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Reactive.{EnemyLurkers, EnemyMutalisks}
-import Planning.Plans.Macro.Automatic._
+import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding._
 import Planning.Plans.Macro.Terran.BuildMissileTurretsAtBases
 import Planning.Plans.Predicates.Milestones.{IfOnMiningBases, OnGasPumps, UnitsAtLeast}
-import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran.TvZ.{TvZMidgameMech, TvZMidgameWraiths}
 

@@ -6,11 +6,10 @@ import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Predicates.Always
-import Planning.Plans.Macro.Automatic.Pump
+import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases, RequireMiningBasesFFA}
 import Planning.Plans.Predicates.Milestones.UnitsAtLeast
-import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
 import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
 import ProxyBwapi.Races.Protoss

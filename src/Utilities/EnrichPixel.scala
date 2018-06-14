@@ -5,39 +5,6 @@ import Mathematics.Points.{Pixel, SpecificPoints, Tile, TileRectangle}
 case object EnrichPixel {
   
   implicit class EnrichedPixelCollection(positions: Traversable[Pixel]) {
-    
-    def minBound: Pixel =
-      if (positions.isEmpty)
-        SpecificPoints.middle
-      else
-        Pixel(
-          positions.view.map(_.x).min,
-          positions.view.map(_.y).min)
-    
-    def maxBound: Pixel =
-      if (positions.isEmpty)
-        SpecificPoints.middle
-      else
-        Pixel(
-          positions.view.map(_.x).max,
-          positions.view.map(_.y).max)
-    
-    def bottomLeftBound: Pixel =
-      if (positions.isEmpty)
-        SpecificPoints.middle
-      else
-        Pixel(
-          positions.view.map(_.x).min,
-          positions.view.map(_.y).max)
-    
-    def topRightBound: Pixel =
-      if (positions.isEmpty)
-        SpecificPoints.middle
-      else
-        Pixel(
-          positions.view.map(_.x).max,
-          positions.view.map(_.y).min)
-    
     def centroid: Pixel =
       if (positions.isEmpty)
         SpecificPoints.middle
@@ -56,32 +23,5 @@ case object EnrichPixel {
         Tile(
           rectangles.map(_.endExclusive.x).max,
           rectangles.map(_.endExclusive.y).max))
-  }
-  
-  implicit class EnrichedTileCollection(positions: Traversable[Tile]) {
-    
-    def minBound: Tile =
-      if (positions.isEmpty)
-        SpecificPoints.tileMiddle
-      else
-        Tile(
-          positions.view.map(_.x).min,
-          positions.view.map(_.y).min)
-    
-    def maxBound: Tile =
-      if (positions.isEmpty)
-        SpecificPoints.tileMiddle
-      else
-        Tile(
-          positions.view.map(_.x).max,
-          positions.view.map(_.y).max)
-    
-    def centroid: Tile =
-      if (positions.isEmpty)
-        SpecificPoints.tileMiddle
-      else
-        Tile(
-          positions.view.map(_.x).sum / positions.size,
-          positions.view.map(_.y).sum / positions.size)
   }
 }

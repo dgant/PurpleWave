@@ -5,11 +5,10 @@ import Macro.BuildRequests.Get
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
-import Planning.Plans.Macro.Automatic.{Enemy, Pump, TrainMatchingRatio}
+import Planning.Plans.Macro.Automatic.{Enemy, Pump, TrainMatchingRatio, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
-import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.GasAtLeast
 import Planning.Plans.Predicates.Milestones.{EnemyHasShownCloakedThreat, _}
 import Planning.Plans.Predicates.Reactive.EnemyMutalisks

@@ -1,8 +1,8 @@
 package Micro.Heuristics.Spells
 
 import Mathematics.Points.{Pixel, Tile}
+import Mathematics.PurpleMath
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.EnrichPixel.EnrichedPixelCollection
 
 object TargetAOE {
   
@@ -45,7 +45,7 @@ object TargetAOE {
         val finalTargets  = tiles.flatMap(targetsByTile.get).flatten.toSet
         val finalPixels   = finalTargets.map(_.pixelCenter)
         if (finalPixels.nonEmpty) { // Safety valve check
-          val centroid = finalPixels.centroid
+          val centroid = PurpleMath.centroid(finalPixels)
           return Some(centroid)
         }
       }

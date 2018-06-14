@@ -4,6 +4,7 @@ import Information.Battles.Clustering.BattleClustering
 import Information.Battles.Types.{Battle, BattleGlobal, BattleLocal, Team}
 import Lifecycle.With
 import Mathematics.Points.SpecificPoints
+import Mathematics.PurpleMath
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 import Utilities.EnrichPixel._
@@ -86,7 +87,7 @@ class BattleClassifier {
   
   private def updateBattle(battle: Battle) {
     battle.teams.foreach(group => {
-      val airCentroid = group.units.map(_.pixelCenter).centroid
+      val airCentroid = PurpleMath.centroid(group.units.map(_.pixelCenter))
       val hasGround   = group.units.exists( ! _.flying)
       group.centroid  = ByOption
         .minBy(group.units.filterNot(_.flying && hasGround))(_.pixelDistanceSquared(airCentroid))

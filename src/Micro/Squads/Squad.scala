@@ -2,10 +2,10 @@ package Micro.Squads
 
 import Lifecycle.With
 import Mathematics.Points.Pixel
+import Mathematics.PurpleMath
 import Micro.Squads.Goals.{GoalChill, SquadGoal}
 import Planning.Plan
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.EnrichPixel.EnrichedPixelCollection
 
 trait SquadWithGoal {
   private var ourGoal: SquadGoal = _
@@ -39,6 +39,6 @@ class Squad(val client: Plan) extends SquadWithGoal {
     if (units.isEmpty)
       With.geography.home.pixelCenter
     else
-      units.map(_.pixelCenter).centroid
+      PurpleMath.centroid(units.map(_.pixelCenter))
   }
 }

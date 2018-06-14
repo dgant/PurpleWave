@@ -1,5 +1,6 @@
 package Micro.Actions.Transportation
 
+import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.Leave
 import Micro.Actions.Commands.Move
@@ -38,7 +39,7 @@ object Pickup extends Action {
     })
     
     if (passengersAccepted.nonEmpty) {
-      val passengerCentroid = passengersAccepted.map(_.pixelCenter).centroid
+      val passengerCentroid = PurpleMath.centroid(passengersAccepted.map(_.pixelCenter))
       val passengerCentral  = passengersAccepted.minBy(_.pixelDistanceCenter(passengerCentroid))
       unit.agent.toTravel = Some(passengerCentral.pixelCenter)
       Move.delegate(unit)

@@ -1,13 +1,13 @@
 package Planning.Plans.Army
 
 import Lifecycle.With
+import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCounters.UnitCountBetween
 import Planning.Composition.UnitMatchers.{UnitMatchWarriors, UnitMatchWorkers}
 import Planning.Plan
-import Utilities.EnrichPixel._
 
 class DefendAgainstWorkerRush extends Plan {
   
@@ -19,7 +19,7 @@ class DefendAgainstWorkerRush extends Plan {
       .flatMap(_.units.filter(u => u.isEnemy && u.unitClass.isWorker))
       .toSet
   
-    lazy val attackingCentroid = attackingWorkers.map(_.pixelCenter).centroid
+    lazy val attackingCentroid = PurpleMath.centroid(attackingWorkers.map(_.pixelCenter))
     lazy val ourWorkers = With.units.countOurs(UnitMatchWorkers)
     lazy val ourCombatUnits = With.units.countOurs(UnitMatchWarriors)
     

@@ -6,10 +6,10 @@ import Planning.Plan
 import Planning.Plans.Army.Aggression
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.Macro.Automatic.UpgradeContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural, MeldArchons}
-import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones._
 import ProxyBwapi.Races.Protoss

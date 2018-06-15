@@ -10,6 +10,6 @@ class Fingerprint12Hatch extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.fourPool),
   new FingerprintNot(With.fingerprints.ninePool),
   new FingerprintNot(With.fingerprints.overpool),
-  new FingerprintNot(With.fingerprints.tenHatchNinePool),
+  new FingerprintNot(With.fingerprints.tenHatch),
   new FingerprintNot(With.fingerprints.twelvePool)
 )

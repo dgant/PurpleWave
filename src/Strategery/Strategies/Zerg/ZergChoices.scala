@@ -14,6 +14,7 @@ object ZergChoices {
     ThirteenPoolMuta,
     OneHatchLurker,
     TwoHatchHydra,
+    ZvPThreeHatchHydra,
     ZvPTwoHatchMuta,
     ZvPNinePool,
     ZvE4Pool,

@@ -16,18 +16,21 @@ class Fingerprints {
     fingerprint
   }
   
-  lazy val proxyGateway     = addFingerprint(new FingerprintProxyGateway)
-  lazy val cannonRush       = addFingerprint(new FingerprintCannonRush)
-  lazy val twoGate          = addFingerprint(new Fingerprint2Gate)
-  lazy val oneGateCore      = addFingerprint(new Fingerprint1GateCore)
-  lazy val nexusFirst       = addFingerprint(new FingerprintNexusFirst)
-  lazy val forgeFe          = addFingerprint(new FingerprintForgeFE)
-  lazy val gatewayFe        = addFingerprint(new FingerprintGatewayFE)
+  // Protoss
+  lazy val gatewayFirst = addFingerprint(new FingerprintGatewayFirst)
+  lazy val proxyGateway = addFingerprint(new FingerprintProxyGateway)
+  lazy val cannonRush   = addFingerprint(new FingerprintCannonRush)
+  lazy val twoGate      = addFingerprint(new Fingerprint2Gate)
+  lazy val oneGateCore  = addFingerprint(new Fingerprint1GateCore)
+  lazy val nexusFirst   = addFingerprint(new FingerprintNexusFirst)
+  lazy val forgeFe      = addFingerprint(new FingerprintForgeFE)
+  lazy val gatewayFe    = addFingerprint(new FingerprintGatewayFE)
   
-  lazy val fourPool         = addFingerprint(new Fingerprint4Pool)
-  lazy val ninePool         = addFingerprint(new Fingerprint9Pool)
-  lazy val overpool         = addFingerprint(new FingerprintOverpool)
-  lazy val tenHatchNinePool = addFingerprint(new Fingerprint10Hatch9Pool)
-  lazy val twelvePool       = addFingerprint(new Fingerprint12Pool)
-  lazy val twelveHatch      = addFingerprint(new Fingerprint12Hatch)
+  // Zerg
+  lazy val fourPool     = addFingerprint(new Fingerprint4Pool)
+  lazy val ninePool     = addFingerprint(new Fingerprint9Pool)
+  lazy val overpool     = addFingerprint(new FingerprintOverpool)
+  lazy val tenHatch     = addFingerprint(new Fingerprint10Hatch9Pool)
+  lazy val twelvePool   = addFingerprint(new Fingerprint12Pool)
+  lazy val twelveHatch  = addFingerprint(new Fingerprint12Hatch)
 }

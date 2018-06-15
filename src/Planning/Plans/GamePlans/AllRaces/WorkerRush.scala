@@ -11,7 +11,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.StandardGamePlan
 import Planning.Plans.Macro.Automatic.{Gather, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
-import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemyUnitsAtMost, UnitsAtLeast}
+import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemiesAtMost, UnitsAtLeast}
 import ProxyBwapi.Races.{Protoss, Zerg}
 
 class WorkerRush extends Trigger {
@@ -36,7 +36,7 @@ class WorkerRush extends Trigger {
     new AttackWithWorkers)
  
   private class TimeToEndTheRush extends And(
-    new EnemyUnitsAtMost(1, UnitMatchWorkers),
+    new EnemiesAtMost(1, UnitMatchWorkers),
     new Or(
       new EnemiesAtLeast(1, Protoss.PhotonCannon, complete = true),
       new EnemiesAtLeast(1, Zerg.SunkenColony, complete = true)))

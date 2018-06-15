@@ -42,7 +42,7 @@ class PvZ4Gate extends GameplanModeTemplate {
   
   override def defaultAttackPlan: Plan = new If(
     new Or(
-      new EnemyUnitsAtMost(0, UnitMatchWarriors),
+      new EnemiesAtMost(0, UnitMatchWarriors),
       new UnitsAtLeast(4, UnitMatchWarriors, complete = true)),
     super.defaultAttackPlan)
   

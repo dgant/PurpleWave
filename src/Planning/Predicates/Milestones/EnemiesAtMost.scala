@@ -4,7 +4,7 @@ import Lifecycle.With
 import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchAnything, UnitMatchComplete, UnitMatcher}
 import Planning.Predicate
 
-class EnemyUnitsAtMost(
+class EnemiesAtMost(
   quantity  : Int          = 0,
   matcher   : UnitMatcher  = UnitMatchAnything,
   complete  : Boolean       = false)

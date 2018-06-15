@@ -63,7 +63,7 @@ object PvTIdeas {
     new UnitsAtMost(0, UnitMatchOr(Protoss.Arbiter, Protoss.ArbiterTribunal)),
     new If(
       new And(
-        new EnemyUnitsAtMost(5, Terran.Vulture),
+        new EnemiesAtMost(5, Terran.Vulture),
         new EnemyUnitsNone(Terran.ScienceVessel),
         new EnemyUnitsNone(UnitMatchCustom((unit) => unit.is(Terran.MissileTurret) && unit.zone.owner.isNeutral))),
       new Pump(Protoss.DarkTemplar, 3)))
@@ -93,9 +93,9 @@ object PvTIdeas {
   
   class TrainScouts extends If(
     new And(
-      new EnemyUnitsAtMost(0, Terran.Goliath),
-      new EnemyUnitsAtMost(6, Terran.Marine),
-      new EnemyUnitsAtMost(8, Terran.MissileTurret),
+      new EnemiesAtMost(0, Terran.Goliath),
+      new EnemiesAtMost(6, Terran.Marine),
+      new EnemiesAtMost(8, Terran.MissileTurret),
       new UnitsExactly(0, Protoss.FleetBeacon),
       new UnitsExactly(0, Protoss.ArbiterTribunal),
       new Employing(PvTEarly1GateStargateTemplar)),

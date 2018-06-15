@@ -80,7 +80,7 @@ class ZergSparkle extends GameplanModeTemplate {
         
         new If(
           new Or(
-            new EnemyUnitsAtMost(0, Zerg.Mutalisk),
+            new EnemiesAtMost(0, Zerg.Mutalisk),
             new UnitsAtLeast(10, Zerg.Mutalisk)),
           // We would like to build another Drone here but this is technically difficult due to limitations on how BuildOrder works
           new Build(Get(3, Zerg.Zergling)),

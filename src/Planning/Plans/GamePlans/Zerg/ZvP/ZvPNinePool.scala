@@ -1,22 +1,21 @@
 package Planning.Plans.GamePlans.Zerg.ZvP
 
-import Lifecycle.With
 import Macro.BuildRequests.{Get, GetAnother}
-import Planning.Predicates.Compound.{And, Check, Not}
-import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
-import Planning.{Plan, Predicate}
 import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Compound.{If, Parallel, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
+import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpMutalisks, ScoutSafelyWithOverlord, TrainJustEnoughScourge, TrainJustEnoughZerglings}
 import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas._
 import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
-import Planning.Predicates.Economy.MineralsAtLeast
-import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, OnMap, StartPositionsAtMost}
-import Planning.Predicates.Milestones._
 import Planning.Plans.Scouting.{CampExpansions, FoundEnemyBase}
+import Planning.Predicates.Compound.{And, Not}
+import Planning.Predicates.Economy.MineralsAtLeast
+import Planning.Predicates.Milestones._
+import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, OnMap, StartPositionsAtMost}
+import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
+import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvPNinePool
 import Strategery.Transistor
@@ -60,16 +59,6 @@ class ZvPNinePool extends GameplanModeTemplate {
       Get(11, Zerg.Drone),
       Get(1, Zerg.Overlord),
       Get(6, Zerg.Zergling)))
-  
-  private class TrainJustEnoughZerglings extends TrainMatchingRatio(
-    Zerg.Zergling, 2, 12,
-    Seq(
-      Enemy(Terran.Marine, 1.5),
-      Enemy(Terran.Medic, 3.0),
-      Enemy(Terran.Firebat, 3.0),
-      Enemy(Protoss.Zealot, 4.5),
-      Enemy(Protoss.Dragoon, 3.0),
-      Enemy(Zerg.Zergling, 1.5)))
   
   private class TakeSecondGasForMuta extends If(
     new And(
@@ -129,26 +118,8 @@ class ZvPNinePool extends GameplanModeTemplate {
           new Build(Get(1, Zerg.SpawningPool), Get(1, Zerg.Extractor)),
           new Build(Get(1, Zerg.Lair)),
           new Build(Get(1, Zerg.Spire), Get(2, Zerg.Extractor)),
-          new Trigger(
-            new EnemiesAtLeast(1, UnitMatchOr(
-              Terran.Wraith,
-              Terran.Valkyrie,
-              Terran.Starport,
-              Protoss.Corsair,
-              Protoss.Stargate,
-              Zerg.Mutalisk,
-              Zerg.Scourge,
-              Zerg.Spire)),
-            new TrainMatchingRatio(Zerg.Scourge, 2, 12, Seq(
-              Enemy(Terran.Wraith, 2.0),
-              Enemy(Terran.Valkyrie, 2.0),
-              Enemy(Protoss.Corsair, 2.0),
-              Enemy(Protoss.Scout, 3.0),
-              Enemy(Zerg.Mutalisk, 2.0),
-              Enemy(Zerg.Scourge, 1.0)))),
-          new If(
-            new Check(() => With.self.gas > Math.min(100, With.self.minerals)),
-            new Pump(Zerg.Mutalisk)),
+          new TrainJustEnoughScourge,
+          new PumpMutalisks,
           new Pump(Zerg.Zergling),
           new RequireMiningBases(3)
         )),

@@ -28,7 +28,7 @@ object PvPIdeas {
   
   class EnemyCarriersOnly extends And(
     new EnemyCarriers,
-    new EnemyUnitsAtMost(6, UnitMatchAnd(UnitMatchWarriors,  UnitMatchNot(UnitMatchMobileFlying))))
+    new EnemiesAtMost(6, UnitMatchAnd(UnitMatchWarriors,  UnitMatchNot(UnitMatchMobileFlying))))
   
   class AttackWithDarkTemplar extends If(
     new Or(
@@ -41,7 +41,7 @@ object PvPIdeas {
       new Or(
         new UnitsAtLeast(1, Protoss.Observer, complete = true),
         new Not(new EnemyDarkTemplarExists),
-        new EnemyUnitsAtMost(0, Protoss.Arbiter)),
+        new EnemiesAtMost(0, Protoss.Arbiter)),
       new Or(
         new EnemyStrategy(With.fingerprints.cannonRush),
         new Employing(PvPOpen4GateGoon),
@@ -193,8 +193,8 @@ object PvPIdeas {
     
   class TrainDarkTemplar extends If(
     new And(
-      new EnemyUnitsAtMost(0, Protoss.PhotonCannon),
-      new EnemyUnitsAtMost(0, Protoss.Observer)),
+      new EnemiesAtMost(0, Protoss.PhotonCannon),
+      new EnemiesAtMost(0, Protoss.Observer)),
     new Pump(Protoss.DarkTemplar, 3),
     new Pump(Protoss.DarkTemplar, 1))
     

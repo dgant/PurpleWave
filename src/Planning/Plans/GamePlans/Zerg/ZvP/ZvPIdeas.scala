@@ -7,6 +7,7 @@ import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Predicates.Compound.Latch
 import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
@@ -49,4 +50,24 @@ object ZvPIdeas {
     With.fingerprints.nexusFirst,
     With.fingerprints.forgeFe,
     With.fingerprints.gatewayFe)
+  
+  class OverpoolSpendLarva extends Latch(new Or(new OverpoolSpendLarvaOnDrones, new OverpoolSpendLarvaOnZerglings))
+  
+  class OverpoolSpendLarvaOnDrones extends EnemyStrategy(With.fingerprints.forgeFe, With.fingerprints.nexusFirst)
+  
+  class OverpoolSpendLarvaOnZerglings extends Or(
+    new EnemyStrategy(
+      With.fingerprints.cannonRush,
+      With.fingerprints.proxyGateway,
+      With.fingerprints.twoGate,
+      With.fingerprints.gatewayFirst,
+      With.fingerprints.oneGateCore,
+      With.fingerprints.gatewayFe))
+  
+  class OverpoolBuildLarvaOrDrones extends Trigger(
+    new OverpoolSpendLarva,
+    new Trigger(
+      new OverpoolSpendLarvaOnZerglings,
+      new BuildOrder(Get(12, Zerg.Zergling)),
+      new BuildOrder(Get(14, Zerg.Drone))))
 }

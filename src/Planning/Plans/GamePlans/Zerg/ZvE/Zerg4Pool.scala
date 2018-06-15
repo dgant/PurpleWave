@@ -14,7 +14,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy, StartPositionsAtLeast}
-import Planning.Predicates.Milestones.{EnemyUnitsAtMost, UnitsAtLeast}
+import Planning.Predicates.Milestones.{EnemiesAtMost, UnitsAtLeast}
 import Planning.Plans.Scouting.{FoundEnemyBase, Scout}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Zerg.ZvE4Pool
@@ -40,7 +40,7 @@ class Zerg4Pool extends GameplanModeTemplate {
           new Not(new EnemyIsTerran)),
         new Or(
           new Not(new FoundEnemyBase),
-          new EnemyUnitsAtMost(0, UnitMatchOr(Protoss.PhotonCannon, Protoss.CyberneticsCore, Protoss.Assimilator, Protoss.Dragoon, Protoss.Corsair)))),
+          new EnemiesAtMost(0, UnitMatchOr(Protoss.PhotonCannon, Protoss.CyberneticsCore, Protoss.Assimilator, Protoss.Dragoon, Protoss.Corsair)))),
       new Scout(2) { scouts.get.unitMatcher.set(Zerg.Overlord) }),
     new If(
       new And(

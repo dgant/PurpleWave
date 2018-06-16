@@ -13,6 +13,8 @@ class Configuration {
   var enablePerformanceSurrender  = false
   var enableChat                  = true
   var enableHistoryChat           = false
+  var enableVisualizations        = false
+  var enableHumanManners          = true
   var identifyGhostUnits          = false
   
   //////////////
@@ -95,7 +97,6 @@ class Configuration {
   // Visualization //
   ///////////////////
   
-  var visualize                           = true
   var visualizeScreen                     = true
   var visualizeMap                        = true
   var visualizationProbabilityHappyVision = 0.05

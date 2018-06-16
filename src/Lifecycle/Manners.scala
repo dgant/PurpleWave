@@ -21,8 +21,13 @@ object Manners {
       With.logger.error("Quitting due to performance failure")
       surrender()
     }
-    if (With.configuration.enableHistoryChat && With.frame == GameTime(0, 20)()) {
-      With.history.message.foreach(chat)
+    if (With.frame == GameTime(0, 20)()) {
+      if (With.configuration.enableHumanManners) {
+        chat("Good luck, " + With.enemy.name + ", and have fun!")
+      }
+      else {
+        With.history.message.foreach(chat)
+      }
     }
   }
   
@@ -32,14 +37,16 @@ object Manners {
   
   def chat(text: String) {
     if (enabled) {
-      //With.game.sendText(text)
-      With.game.printf(text)
+      With.game.sendText(text)
+      //With.game.printf(text)
     }
   }
   
   def onEnd(isWinner: Boolean) {
     chat(
-      if (isWinner)
+      if (With.configuration.enableHumanManners)
+        "Good game, " + With.enemy.name
+      else if (isWinner)
         "Good game! I still think you're beautiful."
       else
         "Good game! Let's pretend this never happened.")

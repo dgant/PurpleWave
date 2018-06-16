@@ -19,13 +19,19 @@ object StrategySelectionShowmatch extends StrategySelectionPolicy {
   
     if (With.enemy.isProtoss) {
       if (games.isEmpty) {
-        return Iterable(ZvPHydraRush)
+        return Iterable(ZvPNinePool)
       }
       if (games.size == 2) {
-        return Iterable(ZvPNinePool)
+        return Iterable(ZvPHydraRush)
       }
       if (games.size == 3) {
         return Iterable(ZvPThirteenPoolMuta)
+      }
+      if (games.size == 5) {
+        return Iterable(ZvPNinePool)
+      }
+      if (games.size == 6) {
+        return Iterable(ZvPHydraRush)
       }
       return Random.shuffle(Iterable(ZvPHydraRush, ZvPNinePool, ZvPThirteenPoolMuta, ZvE4Pool, NinePoolMuta, WorkerRush)).headOption
     }

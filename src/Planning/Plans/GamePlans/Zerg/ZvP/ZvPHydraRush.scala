@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas._
@@ -65,6 +65,7 @@ class ZvPHydraRush extends GameplanModeTemplate {
       Get(Zerg.Spire)))
   
   override def buildPlans: Seq[Plan] = Seq(new Trigger(new OverpoolSpendLarva, new Parallel(
+    new EjectScout,
     new If(
       new And(
         new UnitsAtLeast(24, Zerg.Drone),
@@ -98,7 +99,7 @@ class ZvPHydraRush extends GameplanModeTemplate {
     new Trigger(new GasAtLeast(75), new UpgradeContinuously(Zerg.ZerglingSpeed)),
     new Trigger(new UpgradeStarted(Zerg.ZerglingSpeed), new Build(Get(Zerg.HydraliskDen))),
     new If(new UnitsAtLeast(24, Zerg.Drone), new BuildGasPumps),
-    new If(new MineralsAtLeast(500), new BuildGasPumps),
+    new If(new MineralsAtLeast(600), new BuildGasPumps),
     
     // Transition to Mutalisks
     new If(

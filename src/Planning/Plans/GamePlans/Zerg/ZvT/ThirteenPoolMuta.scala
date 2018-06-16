@@ -6,24 +6,31 @@ import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
 import Planning.Predicates.Compound.Not
 import Planning.UnitCounters.UnitCountOne
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.Scouting.FoundEnemyBase
+import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Zerg
+import Strategery.Strategies.Zerg.{ZvPThirteenPoolMuta}
 
 class ThirteenPoolMuta extends GameplanModeTemplate {
   
+  override val activationCriteria: Predicate = new Employing(ZvPThirteenPoolMuta)
+  
   override def aggression: Double = 0.6
   
-  override def defaultScoutPlan: Plan = new If(
-    new Not(new FoundEnemyBase),
-    new Attack(Zerg.Zergling, UnitCountOne))
+  override def defaultScoutPlan: Plan = new Parallel(
+    new ScoutSafelyWithOverlord,
+    new If(
+      new Not(new FoundEnemyBase),
+      new Attack(Zerg.Zergling, UnitCountOne)))
   
   override def defaultAttackPlan: Plan = new Attack(Zerg.Mutalisk)
   

@@ -18,7 +18,7 @@ import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvPNinePool
-import Strategery.Transistor
+import Strategery.{ThirdWorld, Transistor}
 
 class ZvPNinePool extends GameplanModeTemplate {
   
@@ -132,7 +132,9 @@ class ZvPNinePool extends GameplanModeTemplate {
         new If(
           new NeedTechTransition,
           new If(
-            new OnMap(Transistor),
+            new Or(
+              new OnMap(Transistor),
+              new OnMap(ThirdWorld)), // For showmatch only -- remove afterwards
             
             // Transition to 2-Hatch Muta
             new Parallel(

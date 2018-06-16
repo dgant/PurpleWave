@@ -12,7 +12,7 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.{Enemy, Pump, TrainMatchingRatio, UpgradeContinuously}
+import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireBases
 import Planning.Predicates.Economy.MineralsAtLeast
@@ -73,6 +73,9 @@ class ZergSparkle extends GameplanModeTemplate {
   
   override def defaultSupplyPlan: Plan = NoPlan()
   override def buildPlans: Seq[Plan] = Vector(
+    new If(
+      new UnitsAtLeast(12, Zerg.Drone),
+      new CapGasAtRatioToMinerals(1.0, 400)),
     new KillNeutralBlocker,
     new Trigger(
       new UnitsAtLeast(1, Zerg.Spire, complete = true),

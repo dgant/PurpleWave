@@ -272,4 +272,7 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   
   def spaceRemaining: Int = spaceRemainingCache()
   private val spaceRemainingCache = new Cache(() => base.getSpaceRemaining)
+  
+  def kills: Int = killsCache()
+  private val killsCache = new Cache(() => base.getKillCount)
 }

@@ -47,6 +47,8 @@ object Avoid extends ActionTechnique {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
+    unit.agent.toTravel = Some(unit.agent.origin)
+    
     val bonusAvoidThreats = PurpleMath.clamp(With.reaction.agencyAverage + unit.matchups.framesOfEntanglement, 12.0, 24.0) / 12.0
     val bonusPreferExit   = if (unit.agent.origin.zone == unit.zone) 0.5 else 1.0
     val bonusRegrouping   = 18.0 / Math.max(24.0, unit.matchups.framesOfEntanglement)
@@ -54,18 +56,18 @@ object Avoid extends ActionTechnique {
     
     val forceThreat     = Potential.avoidThreats(unit)      * bonusAvoidThreats
     val forceSpacing    = Potential.avoidCollision(unit)
-    val forceExiting    = Potential.preferExit(unit)        * bonusPreferExit
+    val forceExiting    = Potential.preferTravelling(unit)        * bonusPreferExit
     val forceSpreading  = Potential.preferSpreading(unit)
     val forceRegrouping = Potential.preferRegrouping(unit)  * bonusRegrouping
     val forceMobility   = Potential.preferMobility(unit)    * bonusMobility
     val resistancesTerran = Potential.resistTerrain(unit)
     
-    unit.agent.forces.put(ForceColors.threat,     forceThreat)
-    unit.agent.forces.put(ForceColors.traveling,  forceExiting)
-    unit.agent.forces.put(ForceColors.spreading,  forceSpreading)
-    unit.agent.forces.put(ForceColors.regrouping, forceRegrouping)
-    unit.agent.forces.put(ForceColors.spacing,    forceSpacing)
-    unit.agent.forces.put(ForceColors.mobility,   forceMobility)
+    unit.agent.forces.put(ForceColors.threat,         forceThreat)
+    unit.agent.forces.put(ForceColors.traveling,      forceExiting)
+    unit.agent.forces.put(ForceColors.spreading,      forceSpreading)
+    unit.agent.forces.put(ForceColors.regrouping,     forceRegrouping)
+    unit.agent.forces.put(ForceColors.spacing,        forceSpacing)
+    unit.agent.forces.put(ForceColors.mobility,       forceMobility)
     unit.agent.resistances.put(ForceColors.mobility,  resistancesTerran)
     Gravitate.delegate(unit)
     Move.delegate(unit)

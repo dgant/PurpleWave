@@ -42,11 +42,11 @@ object StrategyGroups {
 }
 
 class TestingPlaybook extends EmptyPlaybook {
-  override lazy val forced: Seq[Strategy] = Seq()
+  override lazy val forced: Seq[Strategy] = Seq(ZvPThirteenPoolMuta)
 }
 
 class PurpleWavePlaybook extends EmptyPlaybook {
   override lazy val disabled  : Seq[Strategy] = StrategyGroups.disabled
 }
 
-object Playbook extends PurpleWavePlaybook {}
+object Playbook extends TestingPlaybook {}

@@ -17,8 +17,12 @@ object PlacementProfiles {
       gas
     else if (blueprint.powers.get)
       pylon
-    else if (blueprint.building.exists(_.trainsGroundUnits))
-      if (blueprint.building.contains(Terran.Barracks)) factoryNoSpace else factory
+    else if (blueprint.building.exists(_.trainsGroundUnits)) {
+      if (blueprint.building.contains(Terran.Barracks))
+        factoryNoSpace
+      else
+        factory
+    }
     else if (blueprint.building.exists(building => building.attacks || building == Zerg.CreepColony || building == Protoss.ShieldBattery))
       wallCannon
     else

@@ -4,6 +4,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Performance.Cache
+import Planning.UnitMatchers.UnitMatchAntiGround
 import Utilities.ByOption
 
 class GoalCampExpansions extends GoalAssignToBases {
@@ -32,6 +33,7 @@ class GoalCampExpansions extends GoalAssignToBases {
     output
   })
   
+  unitMatcher = UnitMatchAntiGround
   
   override def peekNextBase: Base = takeNextBase
   override def takeNextBase: Base = likelyBasesCache()(squad.units.size % likelyBasesCache().size)

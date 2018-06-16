@@ -35,12 +35,14 @@ abstract class FingerprintFFE extends FingerprintAnd(
     || status.forgeOrCannon.exists(u => u.complete && With.framesSince(u.frameDiscovered) > 24 * 5)
   )
   
+  private def gatewayUnlikely(status: Status): Boolean = status.gatewayOrZealot.isEmpty
+  
   private def conclusivelyForge(status: Status): Boolean = {
-    readyToDecide(status) && lossFFE(status) < lossGatewayFE(status)
+    readyToDecide(status) && (gatewayUnlikely(status) || lossFFE(status) < lossGatewayFE(status))
   }
   
   private def conclusivelyGateway(status: Status): Boolean = {
-    readyToDecide(status) && lossFFE(status) >= lossGatewayFE(status)
+    readyToDecide(status) && ! gatewayUnlikely(status) && lossFFE(status) >= lossGatewayFE(status)
   }
   
   private def lossFFE(status: Status): Int = (

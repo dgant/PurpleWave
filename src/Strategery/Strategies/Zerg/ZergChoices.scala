@@ -11,12 +11,12 @@ object ZergChoices {
     ProxyHatchSunkens,
     NineHatchLings,
     NinePoolMuta,
-    ThirteenPoolMuta,
     OneHatchLurker,
     TwoHatchHydra,
-    ZvPThreeHatchHydra,
-    ZvPTwoHatchMuta,
+    ZvPHydraRush,
     ZvPNinePool,
+    ZvPThirteenPoolMuta,
+    ZvPTwoHatchMuta,
     ZvE4Pool,
     ZergSparkle
   )

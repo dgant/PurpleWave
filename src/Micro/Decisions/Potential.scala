@@ -200,7 +200,7 @@ object Potential {
     if (other.flying) return new Force
     if (other.unitClass.isBuilding) return new Force
   
-    val maximumDistance   = 12 * (unit.topSpeed + other.topSpeed)
+    val maximumDistance   = 6 * (unit.topSpeed + other.topSpeed)
     val blockerDistance   = other.pixelDistanceEdge(unit)
     val magnitudeDistance = 1.0 - PurpleMath.clampToOne(blockerDistance / (1.0 + maximumDistance))
     val magnitudeSize     = unit.unitClass.dimensionMax * other.unitClass.dimensionMax / 32.0 / 32.0
@@ -218,24 +218,23 @@ object Potential {
   // Exiting //
   /////////////
   
-  def preferExit(unit: FriendlyUnitInfo): Force = {
-    if (unit.flying) exitAttractionAir(unit) else exitAttractionGround(unit)
+  def preferTravelling(unit: FriendlyUnitInfo): Force = {
+    if (unit.flying) travelAttractionAir(unit) else travelAttractionGround(unit)
   }
   
-  protected def exitAttractionAir(unit: FriendlyUnitInfo): Force = {
-    val zoneNow       = unit.zone
-    val zoneOrigin    = unit.agent.origin.zone
-    val origin        = if (zoneNow == zoneOrigin) SpecificPoints.middle else unit.agent.origin
+  protected def travelAttractionAir(unit: FriendlyUnitInfo): Force = {
+    val zoneNow   = unit.zone
+    val zoneTo    = unit.agent.destination.zone
+    val origin    = if (zoneNow == zoneTo) SpecificPoints.middle else unit.agent.origin
     
     ForceMath.fromPixels(unit.pixelCenter, origin).normalize
   }
   
-  protected def exitAttractionGround(unit: FriendlyUnitInfo): Force = {
-    val path          = unit.agent.zonePath(unit.agent.origin)
-    val origin        = if (path.isEmpty || path.get.steps.isEmpty) unit.agent.origin.zone.centroid.pixelCenter else path.get.steps.head.edge.pixelCenter
-    val forceExiting  = ForceMath.fromPixels(unit.pixelCenter, origin)
-    val forceNormal   = forceExiting.normalize
-    forceNormal
+  protected def travelAttractionGround(unit: FriendlyUnitInfo): Force = {
+    val path          = unit.agent.zonePath(unit.agent.destination)
+    val destination   = if (path.isEmpty || path.get.steps.isEmpty) unit.agent.destination.zone.centroid.pixelCenter else path.get.steps.head.edge.pixelCenter
+    val forceExiting  = ForceMath.fromPixels(unit.pixelCenter, destination, 1.0)
+    forceExiting
   }
   
   ///////////////

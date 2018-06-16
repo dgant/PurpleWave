@@ -9,26 +9,22 @@ import Planning.Plans.GamePlans.Zerg.ZergIdeas._
 import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas.{OverpoolBuildLarvaOrDrones, OverpoolSpendLarva, TwoBaseProtoss}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases}
-import Planning.Plans.Scouting.{CampExpansions, FoundEnemyBase}
-import Planning.Predicates.Compound.{And, Check, Not}
+import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
+import Planning.Plans.Scouting.CampExpansions
+import Planning.Predicates.Compound.{And, Check}
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
-import Planning.Predicates.Milestones.{UnitsAtLeast, UpgradeComplete, UpgradeStarted}
+import Planning.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast, UpgradeComplete, UpgradeStarted}
 import Planning.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Predicates.Strategy.{Employing, StartPositionsAtMost}
 import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchMobileFlying, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
-import ProxyBwapi.Races.Zerg
-import Strategery.Strategies.Zerg.ZvPThreeHatchHydra
+import ProxyBwapi.Races.{Protoss, Zerg}
+import Strategery.Strategies.Zerg.ZvPHydraRush
 
-class ZvPThreeHatchHydra extends GameplanModeTemplate {
+class ZvPHydraRush extends GameplanModeTemplate {
   
-  override val activationCriteria: Predicate = new Employing(ZvPThreeHatchHydra)
-  override def defaultScoutPlan: Plan = new If(
-    new Or(
-      new StartPositionsAtMost(2),
-      new Not(new FoundEnemyBase)),
-    new ScoutSafelyWithOverlord)
+  override val activationCriteria: Predicate = new Employing(ZvPHydraRush)
+  override def defaultScoutPlan: Plan = new ScoutSafelyWithOverlord
   
   override def priorityAttackPlan: Plan = new If(
     new UnitsAtLeast(13, UnitMatchAnd(UnitMatchMobileFlying, UnitMatchWarriors)),
@@ -58,7 +54,8 @@ class ZvPThreeHatchHydra extends GameplanModeTemplate {
         new StartPositionsAtMost(2),
         new Check(() => With.geography.ourNatural.units.exists(u => u.isEnemy && ! u.flying))),
       new BuildOrder(Get(2, Zerg.Hatchery)),
-      new BuildOrder(Get(6, Zerg.Zergling))))
+      new BuildOrder(Get(6, Zerg.Zergling))),
+    new BuildOrder(Get(12, Zerg.Drone)))
   
   private class TransitionToMutalisks extends Parallel(
     new Pump(Zerg.Drone, 33),
@@ -67,7 +64,7 @@ class ZvPThreeHatchHydra extends GameplanModeTemplate {
       Get(Zerg.Lair),
       Get(Zerg.Spire)))
   
-  override def buildPlans: Seq[Plan] = Seq(new Trigger(new OverpoolSpendLarva), new Parallel(
+  override def buildPlans: Seq[Plan] = Seq(new Trigger(new OverpoolSpendLarva, new Parallel(
     new If(
       new And(
         new UnitsAtLeast(24, Zerg.Drone),
@@ -78,7 +75,7 @@ class ZvPThreeHatchHydra extends GameplanModeTemplate {
         new CapGasAtRatioToMinerals(1.0, 50),
         new If(
           new UpgradeStarted(Zerg.HydraliskRange),
-          new CapGasAt(125),
+          new CapGasAt(100),
           new If(
             new UnitsAtLeast(1, Zerg.HydraliskDen),
             new CapGasAt(175),
@@ -101,11 +98,13 @@ class ZvPThreeHatchHydra extends GameplanModeTemplate {
     new Trigger(new GasAtLeast(75), new UpgradeContinuously(Zerg.ZerglingSpeed)),
     new Trigger(new UpgradeStarted(Zerg.ZerglingSpeed), new Build(Get(Zerg.HydraliskDen))),
     new If(new UnitsAtLeast(24, Zerg.Drone), new BuildGasPumps),
-    new If(new MineralsAtLeast(600), new BuildGasPumps),
+    new If(new MineralsAtLeast(500), new BuildGasPumps),
     
     // Transition to Mutalisks
     new If(
-      new UnitsAtLeast(20, UnitMatchWarriors),
+      new Or(
+        new EnemiesAtLeast(4, Protoss.PhotonCannon, complete = true),
+        new UnitsAtLeast(20, UnitMatchWarriors)),
       new TransitionToMutalisks),
   
     new Trigger(
@@ -116,10 +115,10 @@ class ZvPThreeHatchHydra extends GameplanModeTemplate {
       // Vs. two base
       new Parallel(
         new Pump(Zerg.Drone, 13),
-        new RequireBases(3),
-        new Trigger(new UnitsAtLeast(15, Zerg.Drone), new BuildGasPumps(1)),
+        new RequireMiningBases(3),
+        new Trigger(new UnitsAtLeast(13, Zerg.Drone, countEggs = true), new BuildGasPumps(1)),
         new Trigger(new UnitsAtLeast(1, Zerg.Extractor, complete = true), new Build(Get(Zerg.HydraliskDen))),
-        new Trigger(new UpgradeStarted(Zerg.HydraliskSpeed), new BuildGasPumps(2)),
+        new Trigger(new UnitsAtLeast(18, Zerg.Drone, countEggs = true), new BuildGasPumps(2)),
         new Pump(Zerg.Drone, 23),
         new Pump(Zerg.Hydralisk),
         new Pump(Zerg.Drone, 33)
@@ -130,7 +129,7 @@ class ZvPThreeHatchHydra extends GameplanModeTemplate {
         new BuildGasPumps(1),
         new Pump(Zerg.Drone, 9),
         new Pump(Zerg.Drone, 13),
-        new RequireBases(3),
+        new RequireMiningBases(3),
         new Pump(Zerg.Drone, 19),
         new If(
           new And(
@@ -139,7 +138,12 @@ class ZvPThreeHatchHydra extends GameplanModeTemplate {
           new Pump(Zerg.Zergling)),
         new Pump(Zerg.Hydralisk),
         new Pump(Zerg.Zergling)
-      )
-    
+      )),
+      
+    new Trigger(
+      new UnitsAtLeast(12, Zerg.Hydralisk),
+      new Parallel(
+        new RequireBases(5),
+        new TransitionToMutalisks))
   )))
 }

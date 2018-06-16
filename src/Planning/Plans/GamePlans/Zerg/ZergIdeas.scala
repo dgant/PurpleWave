@@ -17,10 +17,14 @@ object ZergIdeas {
     new EnemiesAtMost(0, UnitMatchOr(
       UnitMatchAntiAir,
       Terran.Barracks,
+      Terran.Marine,
       Protoss.Stargate,
       Protoss.CyberneticsCore,
+      Protoss.Dragoon,
       Zerg.HydraliskDen,
-      Zerg.Spire)))
+      Zerg.Spire,
+      Zerg.Mutalisk,
+      Zerg.Scourge)))
   
   class ScoutSafelyWithOverlord extends If(
     new SafeForOverlords,
@@ -52,7 +56,7 @@ object ZergIdeas {
       Enemy(UnitMatchAnd(UnitMatchProxied, Zerg.SunkenColony), 8.0)))
   
   class TrainJustEnoughHydralisks(minimum: Int = 0, maximum: Int = 100) extends TrainMatchingRatio(
-    Zerg.Zergling, minimum, maximum,
+    Zerg.Hydralisk, minimum, maximum,
     Seq(
       Enemy(Terran.Marine, 0.75),
       Enemy(Terran.Medic, 1.0),
@@ -99,7 +103,7 @@ object ZergIdeas {
       Enemy(Zerg.Mutalisk, 2.0),
       Enemy(Zerg.Scourge, 1.0))))
   
-  class PumpMutalisks extends If(
+  class PumpMutalisks(maximumConcurrently: Int = 100) extends If(
     new Check(() => With.self.gas > Math.min(100, With.self.minerals)),
-    new Pump(Zerg.Mutalisk))
+    new Pump(Zerg.Mutalisk, maximumConcurrently = maximumConcurrently))
 }

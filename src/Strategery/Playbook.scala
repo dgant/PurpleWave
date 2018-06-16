@@ -1,6 +1,6 @@
 package Strategery
 
-import Strategery.Selection.{StrategySelectionFree, StrategySelectionPolicy}
+import Strategery.Selection.{StrategySelectionFree, StrategySelectionPolicy, StrategySelectionShowmatch}
 import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss._
 import Strategery.Strategies.Strategy
@@ -49,4 +49,8 @@ class PurpleWavePlaybook extends EmptyPlaybook {
   override lazy val disabled  : Seq[Strategy] = StrategyGroups.disabled
 }
 
-object Playbook extends TestingPlaybook {}
+class AISTShowmatchPlaybook extends EmptyPlaybook {
+  override val strategySelectionPolicy = StrategySelectionShowmatch
+}
+
+object Playbook extends AISTShowmatchPlaybook {}

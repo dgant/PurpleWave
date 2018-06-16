@@ -12,7 +12,8 @@ class Configuration {
   var enablePerformanceStops      = true
   var enablePerformanceSurrender  = false
   var enableChat                  = true
-  var identifyGhostUnits          = true
+  var enableHistoryChat           = false
+  var identifyGhostUnits          = false
   
   //////////////
   // Strategy //

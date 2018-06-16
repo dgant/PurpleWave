@@ -21,7 +21,7 @@ object Manners {
       With.logger.error("Quitting due to performance failure")
       surrender()
     }
-    if (With.frame == GameTime(0, 20)()) {
+    if (With.configuration.enableHistoryChat && With.frame == GameTime(0, 20)()) {
       With.history.message.foreach(chat)
     }
   }

@@ -1,9 +1,6 @@
 package Planning.Plans.Army
 
 import Lifecycle.With
-import Planning.Plans.Compound.Do
+import Planning.Plans.Basic.Write
 
-class Aggression(aggressionRatio: Double) extends Do(() => With.blackboard.aggressionRatio = aggressionRatio) {
-  
-  description.set("Aggression: " + aggressionRatio)
-}
+class Aggression(aggressionRatio: Double) extends Write(With.blackboard.aggressionRatio, aggressionRatio)

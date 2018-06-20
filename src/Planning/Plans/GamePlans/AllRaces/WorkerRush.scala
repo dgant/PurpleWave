@@ -7,6 +7,7 @@ import Planning.UnitCounters.UnitCountExactly
 import Planning.UnitMatchers.UnitMatchWorkers
 import Planning.UnitPreferences.UnitPreferClose
 import Planning.Plans.Army.AttackWithWorkers
+import Planning.Plans.Basic.Do
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.StandardGamePlan
 import Planning.Plans.Macro.Automatic.{Gather, Pump}

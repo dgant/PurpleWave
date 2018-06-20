@@ -41,7 +41,7 @@ class SafeToMoveOut extends Predicate {
       + 0.2 * zealots
       + scouts
     )
-    val delta   = us - vultures * With.blackboard.aggressionRatio
+    val delta   = us - vultures * With.blackboard.aggressionRatio()
     val output  = vultures == 0 || delta > 0
     output
   }
@@ -82,7 +82,7 @@ class SafeToMoveOut extends Predicate {
       + archonsEnemy   * scoreArchon
       + shuttlesEnemy * scoreShuttle
     )
-    val output = scoreEnemy == 0 || scoreEnemy <= scoreUs * With.blackboard.aggressionRatio
+    val output = scoreEnemy == 0 || scoreEnemy <= scoreUs * With.blackboard.aggressionRatio()
     output 
   }
   
@@ -136,8 +136,8 @@ class SafeToMoveOut extends Predicate {
       + 6 * defilers
     )
   
-    val safeInAir     = airThem     == 0 || airThem     <= airUs     * With.blackboard.aggressionRatio
-    val safeOnGround  = groundThem  == 0 || groundThem  <= groundUs  * With.blackboard.aggressionRatio
+    val safeInAir     = airThem     == 0 || airThem     <= airUs     * With.blackboard.aggressionRatio()
+    val safeOnGround  = groundThem  == 0 || groundThem  <= groundUs  * With.blackboard.aggressionRatio()
     val output        = safeInAir && safeOnGround
     output
   }

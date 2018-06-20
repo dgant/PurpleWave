@@ -10,6 +10,7 @@ import Planning.Composition.UnitCountEverything
 import Planning.UnitMatchers.UnitMatchOr
 import Planning.Plan
 import Planning.Plans.Army.Attack
+import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic._

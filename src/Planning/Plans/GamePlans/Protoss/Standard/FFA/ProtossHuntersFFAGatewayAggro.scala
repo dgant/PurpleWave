@@ -1,6 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.FFA
 
 import Macro.BuildRequests.Get
+import Planning.Plans.Basic.NoPlan
 import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate

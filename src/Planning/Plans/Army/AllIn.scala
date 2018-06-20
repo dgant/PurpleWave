@@ -9,6 +9,6 @@ class AllIn(initialPredicate: Predicate = new Always) extends Plan {
   val predicate: Property[Predicate] = new Property(initialPredicate)
   
   override def onUpdate() {
-    With.blackboard.allIn = predicate.get.isComplete
+    With.blackboard.allIn.set(predicate.get.isComplete)
   }
 }

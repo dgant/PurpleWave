@@ -65,7 +65,7 @@ class WorkerRushLiftoff extends Parallel {
     }
   
     // We want units to be able to flee
-    With.blackboard.yoloEnabled = false
+    With.blackboard.yoloEnabled.set(false)
     
     hiderLock.acquire(this)
     hiderLock.units.foreach(runAway)

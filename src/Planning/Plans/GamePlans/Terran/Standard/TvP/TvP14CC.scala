@@ -1,9 +1,10 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Macro.BuildRequests.{BuildRequest, Get}
+import Planning.Plans.Basic.NoPlan
 import Planning.UnitMatchers.UnitMatchSiegeTank
 import Planning.{Plan, Predicate}
-import Planning.Plans.Compound.{NoPlan, Trigger}
+import Planning.Plans.Compound.Trigger
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
 import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers}

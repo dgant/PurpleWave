@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views.Planning
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import Planning.Plan
-import Planning.Plans.Compound.NoPlan
+import Planning.Plans.Basic.NoPlan
 
 object ShowPlans extends View {
   

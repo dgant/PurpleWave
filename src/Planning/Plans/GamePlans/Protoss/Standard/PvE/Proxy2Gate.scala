@@ -5,6 +5,7 @@ import Macro.BuildRequests.Get
 import Planning.Predicates.Compound.{And, Not}
 import Planning.UnitMatchers.UnitMatchOr
 import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound.{Or, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.PlaceGatewaysProxied

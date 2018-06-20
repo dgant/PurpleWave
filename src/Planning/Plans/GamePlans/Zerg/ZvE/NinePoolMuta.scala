@@ -4,20 +4,20 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Predicates.Compound.{And, Check, Not}
-import Planning.UnitMatchers.UnitMatchOr
-import Planning.{Plan, Predicate}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.Pump
+import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
+import Planning.Plans.Scouting.Scout
+import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.Predicates.Economy.{GasAtMost, MineralsAtLeast}
-import Planning.Predicates.Strategy.{Employing, EnemyIsZerg}
 import Planning.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Reactive.EnemyBasesAtLeast
-import Planning.Plans.Scouting.Scout
+import Planning.Predicates.Strategy.{Employing, EnemyIsZerg}
+import Planning.UnitMatchers.UnitMatchOr
+import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.NinePoolMuta
 
@@ -53,23 +53,11 @@ class NinePoolMuta extends GameplanModeTemplate {
   override def buildPlans: Seq[Plan] = Vector(
     new If(
       new UnitsAtMost(0, Zerg.Lair),
-      new Do(() => {
-        With.blackboard.gasTargetRatio = 3.0 / 9.0
-        With.blackboard.gasLimitFloor = 100
-        With.blackboard.gasLimitCeiling = 100
-      }),
+      new CapGasAt(100, 100, 3.0 / 9.0),
       new If(
         new UnitsAtMost(0, Zerg.Spire),
-        new Do(() => {
-          With.blackboard.gasTargetRatio = 2.0 / 9.0
-          With.blackboard.gasLimitFloor = 200
-          With.blackboard.gasLimitCeiling = 200
-        }),
-        new Do(() => {
-          With.blackboard.gasTargetRatio = (if (With.self.gas > With.self.minerals) 1.0 else 3.0) / 9.0
-          With.blackboard.gasLimitFloor = 100
-          With.blackboard.gasLimitCeiling = 300
-        }))),
+        new CapGasAt(200, 200, 2.0 / 9.0),
+        new CapGasAt(100, 300, (if (With.self.gas > With.self.minerals) 1.0 else 3.0) / 9.0))),
     new Build(
       Get(8, Zerg.Drone),
       Get(1, Zerg.Lair)),

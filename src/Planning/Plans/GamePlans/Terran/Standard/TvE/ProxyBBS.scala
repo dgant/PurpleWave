@@ -9,6 +9,7 @@ import Planning.Predicates.Compound.And
 import Planning.UnitCounters.UnitCountExactly
 import Planning.UnitMatchers.UnitMatchWorkers
 import Planning.Plans.Army.Attack
+import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.Pump

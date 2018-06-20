@@ -2,17 +2,18 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Predicates.Compound.{And, Check}
-import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.Attack
+import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, UpgradeContinuously}
+import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, PumpWorkers, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
+import Planning.Predicates.Compound.{And, Check}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
+import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.Zerg
 
 class TwoHatchHydra extends GameplanModeTemplate {
@@ -32,19 +33,19 @@ class TwoHatchHydra extends GameplanModeTemplate {
   override def defaultScoutPlan: Plan = NoPlan()
   
   override def buildPlans: Seq[Plan] = Vector(
-    new Do(() => With.blackboard.gasLimitCeiling = 200),
+    new CapGasAt(200),
     new If(
       new And(
         new UpgradeComplete(Zerg.ZerglingSpeed, 1, Zerg.ZerglingSpeed.upgradeFrames(1)),
         new UnitsAtMost(1, Zerg.Hatchery)),
-      new Do(() => With.blackboard.gasLimitCeiling = 0),
+      new CapGasAt(0),
       new If(
         new UnitsAtMost(0, Zerg.HydraliskDen),
-        new Do(() => With.blackboard.gasLimitCeiling = 100),
+        new CapGasAt(100),
         new If(
           new UnitsAtMost(0, Zerg.Lair),
-          new Do(() => With.blackboard.gasLimitCeiling = 175),
-          new Do(() => With.blackboard.gasLimitCeiling = 225)))),
+          new CapGasAt(175),
+          new CapGasAt(225)))),
     new If(
       new Check(() => With.units.countOurs(UnitMatchWarriors) < 8 * With.geography.ourBases.size),
       new PumpWorkers),

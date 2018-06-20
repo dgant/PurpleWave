@@ -1,5 +1,6 @@
 package Planning.Plans.Compound
 
+import Planning.Plans.Basic.NoPlan
 import Planning.Predicates.Never
 import Planning.{Plan, Predicate, Property}
 

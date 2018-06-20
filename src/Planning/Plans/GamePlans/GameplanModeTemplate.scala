@@ -5,7 +5,8 @@ import Macro.BuildRequests.BuildRequest
 import Planning.Predicates.Compound.Not
 import Planning.Plan
 import Planning.Plans.Army.{RecruitFreelancers, _}
-import Planning.Plans.Compound.{If, NoPlan}
+import Planning.Plans.Basic.NoPlan
+import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.Protoss.Situational.DefendAgainstProxy
 import Planning.Predicates.Strategy.WeAreZerg
 import Planning.Plans.Macro.Automatic.{Gather, PumpWorkers, RequireSufficientSupply}

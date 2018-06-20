@@ -70,7 +70,6 @@ class ZvPHydraRush extends GameplanModeTemplate {
       new And(
         new UnitsAtLeast(24, Zerg.Drone),
         new UnitsAtLeast(3, Zerg.Hatchery)),
-      new UncapGas,
       new If(
         new UnitsAtLeast(1, Zerg.Lair),
         new CapGasAtRatioToMinerals(1.0, 50),

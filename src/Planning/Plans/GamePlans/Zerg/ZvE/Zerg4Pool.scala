@@ -3,19 +3,20 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Predicates.Compound.{And, Check, Latch, Not}
-import Planning.UnitMatchers.UnitMatchOr
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.{ExtractorTrick, Pump}
+import Planning.Plans.Macro.Automatic.{CapGasAt, ExtractorTrick, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Predicates.Economy.MineralsAtLeast
-import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy, StartPositionsAtLeast}
-import Planning.Predicates.Milestones.{EnemiesAtMost, UnitsAtLeast}
 import Planning.Plans.Scouting.{FoundEnemyBase, Scout}
+import Planning.Predicates.Compound.{And, Check, Latch, Not}
+import Planning.Predicates.Economy.MineralsAtLeast
+import Planning.Predicates.Milestones.{EnemiesAtMost, UnitsAtLeast}
+import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy, StartPositionsAtLeast}
+import Planning.UnitMatchers.UnitMatchOr
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Zerg.ZvE4Pool
 
@@ -57,11 +58,7 @@ class Zerg4Pool extends GameplanModeTemplate {
   override def defaultAttackPlan: Plan = new Attack
   
   override def buildPlans: Seq[Plan] = Vector(
-    new Do(() => {
-      With.blackboard.gasTargetRatio = 0
-      With.blackboard.gasLimitFloor = 0
-      With.blackboard.gasLimitCeiling = 0
-    }),
+    new CapGasAt(0, 0, 0.0),
   
     new Pump(Zerg.Drone, 3),
     

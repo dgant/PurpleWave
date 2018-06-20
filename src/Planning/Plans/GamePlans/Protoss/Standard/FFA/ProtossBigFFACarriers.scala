@@ -1,6 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.FFA
 
 import Macro.BuildRequests.Get
+import Planning.Plans.Basic.NoPlan
 import Planning.Predicates.Compound.{And, Not}
 import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}

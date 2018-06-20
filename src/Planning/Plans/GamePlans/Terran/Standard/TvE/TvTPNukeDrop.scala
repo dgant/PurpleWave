@@ -5,6 +5,7 @@ import Planning.Predicates.Compound.And
 import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
 import Planning.Plans.Army.NukeBase
+import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}

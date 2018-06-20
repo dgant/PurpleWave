@@ -1,7 +1,8 @@
 package Planning.Predicates.Milestones
 
 import Planning.Plan
-import Planning.Plans.Compound.{If, NoPlan}
+import Planning.Plans.Basic.NoPlan
+import Planning.Plans.Compound.If
 
 class IfOnMiningBases(
   requiredBases : Int,

@@ -8,6 +8,7 @@ import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.UnitCounters.UnitCountExcept
 import Planning.UnitMatchers.UnitMatchWorkers
 import Planning.Plans.Army.Attack
+import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.Pump

@@ -7,9 +7,10 @@ import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Predicates.Compound.And
 import Planning.Plans.Army.Attack
+import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, RequireSufficientSupply}
+import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, PumpWorkers, RequireSufficientSupply}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Economy.{GasAtLeast, SupplyBlocked}
@@ -60,16 +61,8 @@ class Proxy8Fact extends GameplanModeTemplate {
         new Or(
           new GasAtLeast(100),
           new UnitsAtLeast(1, Terran.Factory))),
-      new Do(() => {
-        With.blackboard.gasTargetRatio = 0
-        With.blackboard.gasLimitFloor = 0
-        With.blackboard.gasLimitCeiling = 0
-      }),
-      new Do(() => {
-        With.blackboard.gasTargetRatio = 1.0
-        With.blackboard.gasLimitFloor = 100
-        With.blackboard.gasLimitCeiling = 100
-      })),
+      new CapGasAt(0),
+      new CapGasAt(100)),
     new Trigger(
       new UnitsAtLeast(1, Terran.Factory, complete = false),
       initialAfter = new Parallel(

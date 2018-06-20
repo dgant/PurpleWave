@@ -1,6 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Macro.BuildRequests.BuildRequest
+import Planning.Plans.Basic.NoPlan
 import Planning.Predicates.Compound.Latch
 import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._

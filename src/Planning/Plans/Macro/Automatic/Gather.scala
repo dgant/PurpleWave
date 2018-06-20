@@ -41,15 +41,15 @@ class Gather extends Plan {
   }
   
   private def setGoals() {
-    val belowFloor    = With.self.gas < Math.min(With.blackboard.gasLimitFloor, With.blackboard.gasLimitCeiling)
-    val aboveCeiling  = With.self.gas > Math.max(With.blackboard.gasLimitFloor, With.blackboard.gasLimitCeiling)
+    val belowFloor    = With.self.gas < Math.min(With.blackboard.gasLimitFloor(), With.blackboard.gasLimitCeiling())
+    val aboveCeiling  = With.self.gas > Math.max(With.blackboard.gasLimitFloor(), With.blackboard.gasLimitCeiling())
     gasWorkersMax =
       if (belowFloor)
         workers.size
       else if (aboveCeiling)
         0
         else
-        (workers.size * With.blackboard.gasTargetRatio).toInt
+        (workers.size * With.blackboard.gasTargetRatio()).toInt
       }
   
     private def countUnits() {

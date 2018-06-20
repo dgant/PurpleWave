@@ -3,9 +3,10 @@ package Planning.Plans.GamePlans.Terran.Standard.TvR
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
+import Planning.Plans.Basic.NoPlan
 import Planning.UnitMatchers.UnitMatchSiegeTank
 import Planning.{Plan, Predicate}
-import Planning.Plans.Compound.{If, NoPlan}
+import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanModeTemplateVsRandom
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build

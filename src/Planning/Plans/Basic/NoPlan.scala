@@ -1,4 +1,4 @@
-package Planning.Plans.Compound
+package Planning.Plans.Basic
 
 import Planning.Plan
 

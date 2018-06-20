@@ -7,6 +7,7 @@ import Macro.BuildRequests.Get
 import Planning.Predicates.Compound.And
 import Planning.Plan
 import Planning.Plans.Army.Attack
+import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, RequireSufficientSupply}

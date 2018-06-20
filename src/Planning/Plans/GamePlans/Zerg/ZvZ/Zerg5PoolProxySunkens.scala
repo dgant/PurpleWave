@@ -8,6 +8,7 @@ import Macro.BuildRequests.Get
 import Planning.Predicates.Compound.{And, Check}
 import Planning.Composition.UnitCountEverything
 import Planning.Plans.Army.Attack
+import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.Pump

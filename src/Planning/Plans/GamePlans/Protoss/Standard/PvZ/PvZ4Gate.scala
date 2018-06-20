@@ -6,7 +6,8 @@ import Planning.Predicates.Compound.{And, Check, Latch}
 import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.Aggression
-import Planning.Plans.Compound.{If, NoPlan, Or, Trigger}
+import Planning.Plans.Basic.NoPlan
+import Planning.Plans.Compound.{If, Or, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational.BuildHuggingNexus

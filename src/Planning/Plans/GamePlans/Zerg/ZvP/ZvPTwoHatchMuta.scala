@@ -3,26 +3,26 @@ package Planning.Plans.GamePlans.Zerg.ZvP
 import Lifecycle.With
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
 import Macro.BuildRequests.Get
-import Planning.Predicates.Compound.{And, Check, Latch, Not}
-import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
-import Planning.{Plan, Predicate}
 import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{ScoutSafelyWithDrone, ScoutSafelyWithOverlord}
 import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas._
-import Planning.Plans.Macro.Automatic.{Enemy, Pump, TrainMatchingRatio, UpgradeContinuously}
+import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Zerg.BuildSunkensAtNatural
+import Planning.Plans.Scouting.{CampExpansions, FindExpansions}
+import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyBasesAtLeast
-import Planning.Plans.Scouting.{CampExpansions, FindExpansions}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
+import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import Strategery.{StarCraftMap, Transistor}
 import Strategery.Strategies.Zerg.ZvPTwoHatchMuta
+import Strategery.{StarCraftMap, Transistor}
 
 class ZvPTwoHatchMuta extends GameplanModeTemplate {
   
@@ -169,15 +169,15 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
           new UnitsAtLeast(1, Zerg.Mutalisk, complete = true),
           new Aggression(1.0),
           new Aggression(0.8)))),
-    
-    new Do(() => With.blackboard.gasLimitFloor = 0),
+  
+    new CapGasAt(0),
     new If(
       new Not(new ProceedWithTech)),
-      new Do(() => With.blackboard.gasLimitCeiling = 0),
+      new CapGasAt(0),
       new If(
         new UnitsAtMost(1, Zerg.Spire),
-        new Do(() => With.blackboard.gasLimitCeiling = With.self.minerals + 50),
-        new Do(() => With.blackboard.gasLimitCeiling = With.self.minerals + 200)),
+        new CapGasAtRatioToMinerals(1.0, 50),
+        new CapGasAtRatioToMinerals(1.0, 200)),
     new If(
       new EnemyHasShown(Protoss.Corsair),
       new Pump(Zerg.Scourge, 2)),

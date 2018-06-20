@@ -1,20 +1,15 @@
 package Planning
 
-class Property[T](default:T) {
+class Property[T](default: T) {
   
-  private var _parent:Option[Property[T]] = None
-  private var _value:T = default
+  private var _parent: Option[Property[T]] = None
+  private var _value: T = default
   
-  def get:T = {
+  def get: T = {
     if (_parent.contains(this)) {
       throw new Exception("Cyclical inheritance for " + this.getClass.toString)
     }
-    
     _parent.map(_.get).getOrElse(_value)
-  }
-  
-  def set(value:T) {
-    _value = value
   }
   
   def inherit(parent: Property[T]) {
@@ -23,6 +18,16 @@ class Property[T](default:T) {
     }
     
     _parent = Some(parent)
+  }
+  
+  def apply(): T = get
+  
+  def reset() {
+    set(default)
+  }
+  
+  def set(value: T) {
+    _value = value
   }
   
   override def toString: String = "Property: " + get.toString

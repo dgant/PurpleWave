@@ -1,6 +1,7 @@
 package Planning.Plans.Compound
 
 import Lifecycle.With
+import Planning.Plans.Basic.NoPlan
 import Planning.{Plan, Property}
 import bwapi.Race
 

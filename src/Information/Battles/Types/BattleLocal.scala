@@ -26,7 +26,7 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   lazy val snipeLosses    : Double  = estimationSimulationSnipe.costToUs
   lazy val ratioAttack    : Double  = PurpleMath.nanToInfinity(attackGains / (attackGains + attackLosses))
   lazy val ratioSnipe     : Double  = PurpleMath.nanToInfinity(snipeGains / (snipeGains + snipeLosses))
-  lazy val ratioTarget    : Double  = Math.min(2.0, PurpleMath.nanToZero((With.battles.global.valueRatioTarget + hysteresis - urgency) / With.blackboard.aggressionRatio))
+  lazy val ratioTarget    : Double  = Math.min(2.0, PurpleMath.nanToZero((With.battles.global.valueRatioTarget + hysteresis - urgency) / With.blackboard.aggressionRatio()))
   lazy val shouldFight    : Boolean = ratioAttack > ratioTarget || (With.self.isZerg && ratioSnipe > ratioTarget)
   
   private def estimateSimulation(

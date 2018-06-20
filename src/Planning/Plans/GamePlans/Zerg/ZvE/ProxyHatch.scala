@@ -14,9 +14,9 @@ import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.Employing
+import Planning.ProxyPlanner
 import Planning.UnitCounters.UnitCountExactly
 import Planning.UnitMatchers.{UnitMatchMobileFlying, UnitMatchWorkers}
-import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.{ProxyHatchHydras, ProxyHatchSunkens, ProxyHatchZerglings}
 
@@ -36,9 +36,10 @@ class ProxyHatch extends Parallel {
     placement    = Some(PlacementProfiles.proxyCannon))
   
   children.set(Vector(
-    new Plan { override def onUpdate(): Unit = {
-      With.blackboard.gasLimitFloor = if (With.units.existsOurs(Zerg.Lair)) 400 else 100
-    }},
+    new If(
+      new UnitsAtLeast(1, Zerg.Lair),
+      new CapGasAt(400),
+      new CapGasAt(100)),
     new ProposePlacement { override lazy val blueprints = Vector(new Blueprint(this,
       building = Some(Zerg.Extractor),
       requireZone = Some(With.geography.ourMain.zone))) },
@@ -107,11 +108,7 @@ class ProxyHatch extends Parallel {
     new If(
       new Employing(ProxyHatchHydras),
       new Parallel(
-        new Do(() => {
-          With.blackboard.gasTargetRatio = 2.0 / 12.0
-          With.blackboard.gasLimitFloor = 50
-          With.blackboard.gasLimitCeiling = 175
-        }),
+        new CapGasAt(50, 175, 2.0 / 12.0),
         new Build(Get(1, Zerg.HydraliskDen)),
         new RequireSufficientSupply,
         new If(

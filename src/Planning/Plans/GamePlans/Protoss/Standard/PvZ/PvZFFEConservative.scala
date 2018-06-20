@@ -1,5 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
+import Planning.Plans.Basic.NoPlan
 import Planning.Predicates.Compound.Latch
 import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._

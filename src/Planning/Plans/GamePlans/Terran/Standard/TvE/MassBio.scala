@@ -3,18 +3,18 @@ package Planning.Plans.GamePlans.Terran.Standard.TvE
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Predicates.Compound.{And, Check}
-import Planning.UnitMatchers.{UnitMatchOr, UnitMatchSiegeTank, UnitMatchWarriors}
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
+import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Predicates.Compound.{And, Check}
 import Planning.Predicates.Economy.MineralsAtLeast
-import Planning.Predicates.Strategy.{Employing, EnemyIsZerg}
 import Planning.Predicates.Milestones._
+import Planning.Predicates.Strategy.{Employing, EnemyIsZerg}
+import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Terran.TvE.TvEMassBio
 
@@ -87,14 +87,8 @@ class MassBio extends GameplanModeTemplate {
       new UpgradeContinuously(Terran.MarineRange)),
     new Trigger(
       new MiningBasesAtLeast(3),
-      new Do(() => {
-        With.blackboard.gasLimitFloor = 0
-        With.blackboard.gasLimitCeiling = 300
-      }),
-      new Do(() => {
-        With.blackboard.gasLimitFloor = 100
-        With.blackboard.gasLimitCeiling = 150
-      })),
+      new CapGasAt(0, 300),
+      new CapGasAt(100, 150)),
     new If(
       new TechComplete(Terran.Stim),
       new RequireMiningBases(2)),

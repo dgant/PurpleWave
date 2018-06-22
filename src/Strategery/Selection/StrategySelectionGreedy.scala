@@ -3,7 +3,7 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Strategery.Strategies.Strategy
 
-object StrategySelectionFree extends StrategySelectionPolicy {
+object StrategySelectionGreedy extends StrategySelectionPolicy {
   def chooseBest(topLevelStrategies: Iterable[Strategy]): Iterable[Strategy] = {
     val permutations            = topLevelStrategies.flatMap(expandStrategy)
     val strategies              = permutations.flatten.toVector.distinct

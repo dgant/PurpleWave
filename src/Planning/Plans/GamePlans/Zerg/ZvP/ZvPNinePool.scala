@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Macro.BuildRequests.{Get, GetAnother}
-import Planning.Plans.Army.{Aggression, Attack, EjectScout}
+import Planning.Plans.Army.{Aggression, AllIn, Attack, EjectScout}
 import Planning.Plans.Compound.{If, Parallel, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpMutalisks, ScoutSafelyWithOverlord, TrainJustEnoughScourge, TrainJustEnoughZerglings}
@@ -47,6 +47,10 @@ class ZvPNinePool extends GameplanModeTemplate {
   override def defaultAttackPlan: Plan = new Attack
   
   override def defaultBuildOrder: Plan = new Parallel(
+    new AllIn(
+      new And(
+        new EnemiesAtLeast(1, Zerg.Mutalisk),
+        new UnitsAtMost(0, Zerg.Spire))),
     new BuildOrder(
       Get(9, Zerg.Drone),
       Get(1, Zerg.SpawningPool)),

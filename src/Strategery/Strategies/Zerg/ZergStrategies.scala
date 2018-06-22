@@ -37,26 +37,25 @@ object OneHatchLurker extends ZergStrategy {
 }
 object ProxyHatchSunkens extends ZergStrategy {
   override def gameplan: Option[Plan] = Some(new ProxyHatch)
-  override def enemyRaces: Iterable[Race] = Vector(Race.Unknown, Race.Terran)
+  override def enemyRaces: Iterable[Race] = Vector(Race.Terran)
 }
 object ProxyHatchHydras extends ZergStrategy {
   override def gameplan: Option[Plan] = Some(new ProxyHatch)
-  override def enemyRaces: Iterable[Race] = Vector(Race.Unknown, Race.Terran)
+  override def enemyRaces: Iterable[Race] = Vector(Race.Terran)
 }
 object ProxyHatchZerglings extends ZergStrategy {
   override def gameplan: Option[Plan] = Some(new ProxyHatch)
-  override def enemyRaces: Iterable[Race] = Vector(Race.Unknown, Race.Terran)
+  override def enemyRaces: Iterable[Race] = Vector(Race.Terran)
 }
 object ZvE4Pool extends ZergStrategy {
   override def gameplan: Option[Plan] = Some(new Zerg4Pool)
 }
 object ZvPTwoHatchMuta extends ZergStrategy {
   override def gameplan: Option[Plan] = { Some(new ZvPTwoHatchMuta) }
-  override def enemyRaces: Iterable[Race] = Vector(Race.Unknown, Race.Protoss)
+  override def enemyRaces: Iterable[Race] = Vector(Race.Protoss)
 }
 object ZvPNinePool extends ZergStrategy {
   override def gameplan: Option[Plan] = { Some(new ZvPNinePool) }
-  override def enemyRaces: Iterable[Race] = Vector(Race.Unknown, Race.Protoss, Race.Terran)
 }
 object ZvPHydraRush extends ZergStrategy {
   override def gameplan: Option[Plan] = { Some(new ZvPHydraRush) }

@@ -1,6 +1,6 @@
 package Strategery
 
-import Strategery.Selection.{StrategySelectionFree, StrategySelectionPolicy}
+import Strategery.Selection.{StrategySelectionGreedy, StrategySelectionPolicy}
 import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss._
 import Strategery.Strategies.Strategy
@@ -15,7 +15,7 @@ class EmptyPlaybook {
   lazy val forced   : Seq[Strategy] = none
   lazy val disabled : Seq[Strategy] = none
   val strategyOrder: Seq[Strategy] = none
-  def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionFree
+  def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy
 }
 
 object StrategyGroups {

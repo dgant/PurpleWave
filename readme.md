@@ -43,6 +43,7 @@ Steps:
 * In IntelliJ IDEA: File -> Settings -> Plugins -> Check off Scala
 * In IntelliJ IDEA: File -> Open -> Select the PurpleWave directory
 * In IntelliJ IDEA: File -> Project Structure -> Select the Java Development Kit directory (like c:\Program Files\Java\jdk\1.8.0_121)
+* In IntelliJ IDEA: File -> Project Structure -> Modules -> The green "+" -> Scala -> Create... -> Download... -> 2.12.6... -> OK
 * In IntelliJ IDEA: Build -> Build Artifacts... -> Build
 
 This will produce PurpleWave.jar. See below for "How to run PurpleWave"

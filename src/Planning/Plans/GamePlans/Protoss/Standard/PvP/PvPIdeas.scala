@@ -36,6 +36,21 @@ object PvPIdeas {
       new EnemyBasesAtLeast(3)),
     new Attack(Protoss.DarkTemplar))
   
+  /*
+  TODO: What about safety?
+  TODO: What about when we expand?
+  TODO: What about when opening 1 Gate vs 2+?
+  TODO: What about when we do all-in builds?
+  
+  
+  Attack if any of these things are true:
+  They don't have Dragoons or Speedlots
+  They opened Nexus-first
+  They opened Cannon rush
+  We have a Dark Templar and they don't have detection
+  We have three bases
+  They have more bases than us
+  */
   class AttackSafely extends If(
     new And(
       new Or(
@@ -129,9 +144,7 @@ object PvPIdeas {
     new RequireMiningBases(2))
   
   class ReactToExpansion extends If(
-    new And(
-      new EnemyBasesAtLeast(2),
-      new MiningBasesAtMost(1)),
+    new EnemyStrategy(With.fingerprints.nexusFirst),
     new Trigger(
       new And(
         new SafeAtHome,

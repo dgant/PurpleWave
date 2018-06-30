@@ -4,7 +4,7 @@ import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
-object UnitMatchProxied extends UnitMatcher {
+abstract class UnitMatchAnyProxy extends UnitMatcher {
   
   override def accept(unit: UnitInfo): Boolean = {
     if (unit.isFriendly) return false
@@ -18,4 +18,18 @@ object UnitMatchProxied extends UnitMatcher {
     
     distanceFriendly < distanceEnemy * 1.25
   }
+  
+  val distanceRatio: Double
+}
+
+object UnitMatchProxied extends UnitMatchAnyProxy {
+  
+  override val distanceRatio = 1.25
+  
+}
+
+object UnitMatchProxiedInOurBase extends UnitMatchAnyProxy {
+  
+  override val distanceRatio = 0.7
+  
 }

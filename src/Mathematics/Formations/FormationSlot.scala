@@ -7,7 +7,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 class FormationSlot(unit: UnitInfo) {
   val unitClass           : UnitClass = unit.unitClass
-  val idealDistancePixels : Double    = unit.effectiveRangePixels.toInt + unit.unitClass.radialHypotenuse
+  val idealDistancePixels : Double      = range(unit)
   
   var pixelAfter: Pixel = _
   

@@ -49,7 +49,7 @@ class Proxy5Rax extends GameplanModeTemplate {
   override def buildPlans: Seq[Plan] = Vector(
     new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
     new ProposePlacement{
-      override lazy val blueprints = Vector(new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = false, placement = Some(PlacementProfiles.proxyBuilding)))
+      override lazy val blueprints = Vector(new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)))
     },
     new Pump(Terran.Marine)
   )

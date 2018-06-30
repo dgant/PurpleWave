@@ -51,7 +51,7 @@ abstract class FingerprintFFE extends FingerprintAnd(
   )
   
   private def lossGatewayFE(status: Status): Int = (
-    Math.abs(status.forgeCompletionFrame.get - expectedGatewayFEForge)
+    Math.abs(status.forgeCompletionFrame.getOrElse(With.frame + Protoss.Forge.buildFrames) - expectedGatewayFEForge)
     + status.gatewayCompletionFrame.map(f => Math.abs(f - expectedGatewayFEGateway)).sum
   )
   

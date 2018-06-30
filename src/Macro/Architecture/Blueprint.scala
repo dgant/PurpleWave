@@ -25,7 +25,7 @@ class Blueprint(
   val requireCandidates   : Option[Iterable[Tile]]    = None,
   var preferZone          : Option[Zone]              = None,
   val requireZone         : Option[Zone]              = None,
-  var respectHarvesting   : Boolean                   = true) {
+  var respectHarvesting   : Option[Boolean]           = None) {
   
   var id: Option[Int] = None
   val frameCreated: Int = With.frame
@@ -40,6 +40,7 @@ class Blueprint(
   requireResourceGap          = requireResourceGap          .orElse(Some(building.exists(_.isTownHall)))
   preferZone                  = preferZone                  .orElse(requireZone)
   placement                   = placement                   .orElse(Some(PlacementProfiles.default(this)))
+  respectHarvesting           = respectHarvesting           .orElse(Some( ! requireTownHallTile.get))
   marginPixels = marginPixels
     .orElse(building.filter(_.attacks).map(_.effectiveRangePixels.toDouble))
     .orElse(building.filter(_ == Protoss.ShieldBattery).map(b => 32.0 * 2.0))
@@ -62,7 +63,15 @@ class Blueprint(
   def relativeBuildEnd    : Tile  = Tile(widthTiles.get, heightTiles.get)
   def relativeBuildArea   : TileRectangle = TileRectangle(relativeBuildStart, relativeBuildEnd)
   
-  def accepts(tile: Tile): Boolean = {
+  def matches(tile: Tile): Boolean = {
+    val thisZone = tile.zone
+    if (requireZone.isDefined && ! requireZone.contains(thisZone)) {
+      return false
+    }
+    true
+  }
+  
+  def buildable(tile: Tile): Boolean = {
     if ( ! tile.valid) {
       return false
     }
@@ -74,6 +83,20 @@ class Blueprint(
         return false
       }
     }
+    
+    true
+  }
+  
+  def accepts(tile: Tile): Boolean = {
+    if ( ! matches(tile)) {
+      return false
+    }
+    if ( ! buildable(tile)) {
+      return false
+    }
+    
+    // TODO: Migrate the rest out into matches/buildable
+    
     val thisZone = tile.zone
     if (thisZone.island
       && ! Plasma.matches
@@ -81,28 +104,25 @@ class Blueprint(
       && ! With.architecture.accessibleZones.contains(thisZone)) {
       return false
     }
-    if (requireZone.isDefined && ! requireZone.contains(thisZone)) {
-      return false
-    }
-    if (requireTownHallTile.get) {
-      val legal   = thisZone.bases.exists(_.townHallTile == tile)
-      val blocked = With.architecture.untownhallable.contains(tile)
-      return legal && ! blocked
-    }
     if (requireGasTile.get) {
       val legal   = thisZone.bases.exists(_.gas.exists(_.tileTopLeft == tile))
       val blocked = With.architecture.ungassable.contains(tile)
       return legal && ! blocked
     }
+    if (requireTownHallTile.get) {
+      if ( ! thisZone.bases.exists(_.townHallTile == tile)) return false
+      if (With.architecture.untownhallable.contains(tile)) return false
+    }
+
     val buildArea = relativeBuildArea.add(tile)
   
     def violatesBuildArea(nextTile: Tile): Boolean = (
       nextTile.zone.perimeter.contains(nextTile)
       || ! With.architecture.buildable(nextTile)
       || (requireCreep.get != With.grids.creep.get(nextTile))
-      || (respectHarvesting && With.architecture.isHarvestingArea(nextTile))
+      || (respectHarvesting.get && With.architecture.isHarvestingArea(nextTile))
       || (requireResourceGap.get && ! With.grids.buildableTownHall.get(nextTile))
-      || ( ! requireTownHallTile.get &&With.grids.units.get(nextTile).exists(u => ! u.flying && u.isEnemy || ! u.canMove))
+      || ( ! requireTownHallTile.get && With.grids.units.get(nextTile).exists(u => ! u.flying && u.isEnemy || ! u.canMove))
     )
     
     val violator = buildArea.tiles.find(violatesBuildArea)

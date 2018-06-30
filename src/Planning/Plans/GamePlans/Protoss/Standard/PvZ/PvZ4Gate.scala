@@ -5,7 +5,7 @@ import Macro.BuildRequests.Get
 import Planning.Predicates.Compound.{And, Check, Latch}
 import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
-import Planning.Plans.Army.Aggression
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Or, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -25,7 +25,7 @@ class PvZ4Gate extends GameplanModeTemplate {
   
   override val activationCriteria     = new Employing(PvZ4GateDragoonAllIn)
   override val completionCriteria     = new Latch(new MiningBasesAtLeast(2))
-  override val scoutExpansionsAt      = 90
+  override val scoutExpansionsAt      = 55
   override def buildOrder             = ProtossBuilds.OpeningTwoGate1012
   override def defaultWorkerPlan      = NoPlan()
   override def defaultScoutPlan       = new ScoutOn(Protoss.Pylon)
@@ -45,6 +45,7 @@ class PvZ4Gate extends GameplanModeTemplate {
     new Or(
       new EnemiesAtMost(0, UnitMatchWarriors),
       new UnitsAtLeast(4, UnitMatchWarriors, complete = true)),
+    new Attack,
     super.defaultAttackPlan)
   
   override def buildPlans = Vector(

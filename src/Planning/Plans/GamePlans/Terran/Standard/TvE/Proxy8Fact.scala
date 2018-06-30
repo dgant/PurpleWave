@@ -36,7 +36,7 @@ class Proxy8Fact extends GameplanModeTemplate {
   lazy val proxyZone: Option[Zone] = ProxyPlanner.proxyAutomaticSneaky
   override def defaultPlacementPlan: Plan = new ProposePlacement {
     override lazy val blueprints = Vector(
-      new Blueprint(this, building = Some(Terran.Factory),  preferZone = proxyZone, respectHarvesting = false, placement = Some(PlacementProfiles.proxyBuilding)))
+      new Blueprint(this, building = Some(Terran.Factory),  preferZone = proxyZone, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)))
   }
   
   override val buildOrder: Seq[BuildRequest] = Vector(

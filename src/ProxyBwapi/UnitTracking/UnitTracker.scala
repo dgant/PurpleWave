@@ -21,13 +21,13 @@ class UnitTracker {
   private val counterOurs = new UnitCounter(() => ours)
   def existsOurs(matcher: UnitMatcher*): Boolean = countOurs(matcher: _*) > 0
   def countOurs(matcher: UnitMatcher*): Int = counterOurs(matcher: _*)
-  def countOurs(predicate: (FriendlyUnitInfo) => Boolean): Int = counterOurs(predicate)
+  def countOursP(predicate: (FriendlyUnitInfo) => Boolean): Int = counterOurs(predicate)
   def ours: Set[FriendlyUnitInfo] = friendlyUnitTracker.ourUnits
   
   private val counterEnemy = new UnitCounter(() => enemy)
   def existsEnemy(matcher: UnitMatcher*): Boolean = countEnemy(matcher: _*) > 0
   def countEnemy(matcher: UnitMatcher*): Int = counterEnemy(matcher: _*)
-  def countEnemy(predicate: (ForeignUnitInfo) => Boolean): Int = counterEnemy(predicate)
+  def countEnemyP(predicate: (ForeignUnitInfo) => Boolean): Int = counterEnemy(predicate)
   def enemy: Set[ForeignUnitInfo] = foreignUnitTracker.enemyUnits
   
   def neutral: Set[ForeignUnitInfo] = foreignUnitTracker.neutralUnits

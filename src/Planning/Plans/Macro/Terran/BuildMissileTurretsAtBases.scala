@@ -30,7 +30,7 @@ class BuildMissileTurretsAtBases(initialCount: Int) extends Plan {
   
   private def turretBase(base: Base) {
     val zone          = base.zone
-    val turretsInBase = With.units.countOurs(unit => unit.is(Terran.MissileTurret) && unit.zone == zone)
+    val turretsInBase = With.units.countOursP(unit => unit.is(Terran.MissileTurret) && unit.zone == zone)
     val turretsToAdd  = count.get - turretsInBase
     
     if (turretsToAdd <= 0) return

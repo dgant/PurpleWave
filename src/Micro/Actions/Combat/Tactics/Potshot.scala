@@ -24,8 +24,6 @@ object Potshot extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-    
-    4
     PotshotTarget.delegate(unit)
     Attack.delegate(unit)
   }

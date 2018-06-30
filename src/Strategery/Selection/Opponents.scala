@@ -1,6 +1,6 @@
 package Strategery.Selection
 
-import Strategery.Strategies.Protoss.{PvTEarly1015GateGoonDT, PvZ4Gate99}
+import Strategery.Strategies.Protoss.{PvT2BaseCarrier, PvTEarly1015GateGoonDT, PvZ4Gate99}
 
 case class Opponent(name: String, policy: StrategySelectionPolicy = StrategySelectionGreedy) {
   def matches(otherName: String): Boolean = {
@@ -30,7 +30,7 @@ object Opponents {
   val titaniron     : Opponent = add(Opponent("TitanIron",    StrategySelectionDynamic))
   val locutus       : Opponent = add(Opponent("Locutus",      StrategySelectionDynamic))
   val tscmoo        : Opponent = add(Opponent("tscmoo",       StrategySelectionGreedy))
-  val iron          : Opponent = add(Opponent("Iron",         StrategySelectionFixed(PvTEarly1015GateGoonDT)))
+  val iron          : Opponent = add(Opponent("Iron",         StrategySelectionFixed(PvTEarly1015GateGoonDT, PvT2BaseCarrier)))
   val letabot       : Opponent = add(Opponent("LetaBot",      StrategySelectionGreedy))
   val steamhammer   : Opponent = add(Opponent("Steamhammer",  StrategySelectionDynamic))
   val microwave     : Opponent = add(Opponent("Microwave",    StrategySelectionDynamic))

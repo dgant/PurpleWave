@@ -70,7 +70,7 @@ class Configuration {
   
   var foreignUnitUpdatePeriod             = 4
   var garbageCollectionThresholdMs        = 5
-  var initialTaskLengthMilliseconds       = 20
+  var initialTaskLengthMilliseconds       = 12
   var performanceMinimumUnitSleep         = 2
   var maximumGamesHistoryPerOpponent      = 500
   

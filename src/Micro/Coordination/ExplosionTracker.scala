@@ -68,8 +68,11 @@ class ExplosionTracker {
     if (unit.irradiated) {
       addToBattle(unit, new ExplosionIrradiateSplash(unit))
     }
-    else if (unit.is(Terran.SpiderMine)) {
-      addToBattle(unit, new ExplosionSpiderMineTrigger(unit))
+    else if (unit.is(Terran.SpiderMine)
+      && ! unit.burrowed
+      && unit.isFriendly
+      && unit.orderTarget.nonEmpty) {
+      // Only auto-dodge our own triggered mines
       addToBattle(unit, new ExplosionSpiderMineBlast(unit))
     }
     else if (unit.is(Zerg.InfestedTerran)) {

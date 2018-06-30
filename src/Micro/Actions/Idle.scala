@@ -2,7 +2,7 @@ package Micro.Actions
 
 import Micro.Actions.Basic._
 import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
-import Micro.Actions.Combat.Maneuvering.{Dodge, Yank}
+import Micro.Actions.Combat.Maneuvering.{DodgeAll, Yank}
 import Micro.Actions.Combat.Tactics.{Detect, Tickle, Unbunk}
 import Micro.Actions.Commands.{Attack, Move}
 import Micro.Actions.Protoss.Meld
@@ -29,7 +29,7 @@ object Idle extends Action {
     Finish,
     FightOrFlight,
     Yank,
-    Dodge,
+    DodgeAll,
     Tickle,
     EmergencyRepair,
     Gather,

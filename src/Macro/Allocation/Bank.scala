@@ -2,6 +2,7 @@ package Macro.Allocation
 
 import Planning.ResourceLocks.LockCurrency
 import Lifecycle.With
+import Planning.Plan
 
 import scala.collection.mutable
 
@@ -30,6 +31,10 @@ class Bank {
     request.isSatisfied = false
     requests.remove(request)
     recountResources()
+  }
+
+  def release(plan: Plan): Unit = {
+    requests.foreach(request => if (request.owner == plan) release(request))
   }
   
   private def recountResources() {

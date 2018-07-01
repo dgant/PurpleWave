@@ -30,7 +30,7 @@ object TargetHeuristicVpfEnemy extends TargetHeuristic {
   override def evaluate(unit: FriendlyUnitInfo, candidate: UnitInfo): Double = {
     
     val numerator =
-      if (candidate.gathering) {
+      if (candidate.gathering || candidate.base.exists(_.harvestingArea.contains(candidate.tileIncludingCenter))) {
         With.economy.incomePerFrameMinerals
       }
       else if (candidate.repairing && candidate.target.isDefined) {
@@ -47,7 +47,7 @@ object TargetHeuristicVpfEnemy extends TargetHeuristic {
       else {
         val vpfNow = candidate.matchups.vpfDealingInRange
         val vpfMax = candidate.matchups.vpfDealingMax
-        vpfNow + vpfMax
+        vpfNow + 0.1 * vpfMax
       }
     
     val output = numerator / baselineVpf

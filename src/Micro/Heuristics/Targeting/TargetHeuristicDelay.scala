@@ -13,7 +13,9 @@ object TargetHeuristicDelay extends TargetHeuristic {
     val range = unit.pixelRangeAgainst(candidate)
     val freePixels = unit.cooldownLeft * unit.topSpeed
     def adjust(distance: Double): Double = Math.max(0.0, distance - range - freePixels)
-    
+
+    val theyCanKite       = candidate.canAttack(unit) && candidate.pixelRangeAgainst(unit) > unit.pixelRangeAgainst(candidate) + 16
+    val distanceBonus     = if(theyCanKite) Math.max(0, candidate.topSpeed - unit.topSpeed) * Math.max(0, unit.pixelDistanceEdge(candidate) - unit.pixelRangeAgainst(candidate)) else 0
     val distanceUs        = adjust(unit.pixelDistanceEdge(candidate) - range)
     val distanceTeamUs    = adjust(candidate.battle.map(_.teamOf(unit)     .centroid.pixelDistance(candidate.pixelCenter)).getOrElse(0.0))
     val distanceTeamEnemy = adjust(candidate.battle.map(_.teamOf(candidate).centroid.pixelDistance(candidate.pixelCenter)).getOrElse(0.0))

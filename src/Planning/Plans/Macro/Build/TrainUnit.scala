@@ -40,7 +40,7 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
   private var trainer: Option[FriendlyUnitInfo] = None
   private var trainee: Option[FriendlyUnitInfo] = None
   
-  override def isComplete: Boolean = trainee.exists(_.aliveAndComplete)
+  override def isComplete: Boolean = trainee.exists(_.remainingCompletionFrames <= With.reaction.planningMax)
   
   override def onUpdate() {
     if (isComplete) return

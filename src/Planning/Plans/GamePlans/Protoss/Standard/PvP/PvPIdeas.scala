@@ -143,25 +143,6 @@ object PvPIdeas {
       new SafeAtHome),
     new RequireMiningBases(2))
   
-  class ReactToExpansion extends If(
-    new EnemyStrategy(With.fingerprints.nexusFirst),
-    new Trigger(
-      new And(
-        new SafeAtHome,
-        new UnitsAtLeast(1, Protoss.CyberneticsCore),
-        new UnitsAtLeast(1, Protoss.Assimilator)),
-      // Match if it we're already on Dragoon tech
-      new RequireMiningBases(2),
-      // Otherwise, let's go all in with Zealots
-      new FlipIf(
-        new SafeAtHome,
-        new Parallel(
-          new Pump(Protoss.Probe, 19),
-          new Build(Get(4, Protoss.Gateway))),
-        new Parallel(
-          new PvPIdeas.TrainDragoonsOrZealots,
-          new UpgradeContinuously(Protoss.DragoonRange)))))
-  
   class TakeBase2 extends If(
     new Or(
       new UnitsAtLeast(2, Protoss.Reaver, complete = true),

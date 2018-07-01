@@ -207,7 +207,7 @@ object Potential {
     if (other.flying) return new Force
     if (other.unitClass.isBuilding) return new Force
   
-    val maximumDistance   = 6 * (unit.topSpeed + other.topSpeed)
+    val maximumDistance   = 32
     val blockerDistance   = other.pixelDistanceEdge(unit)
     val magnitudeDistance = 1.0 - PurpleMath.clampToOne(blockerDistance / (1.0 + maximumDistance))
     val magnitudeSize     = unit.unitClass.dimensionMax * other.unitClass.dimensionMax / 32.0 / 32.0

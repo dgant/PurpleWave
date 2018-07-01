@@ -38,7 +38,7 @@ class LockUnits extends {
   }
   
   def release() {
-    With.recruiter.remove(this)
+    With.recruiter.release(this)
   }
   
   def units: Set[FriendlyUnitInfo] = With.recruiter.getUnits(this)

@@ -12,7 +12,7 @@ import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyDarkTemplarPossible, SafeAtHome}
@@ -44,14 +44,14 @@ class PvP2Gate1012 extends GameplanModeTemplate {
       new EnemyDarkTemplarPossible,
       new BuildCannonsAtNatural(2)),
     new PvPIdeas.ReactToCannonRush,
-    new PvPIdeas.ReactToFFE,
-    new PvPIdeas.ReactToExpansion
+    new PvPIdeas.ReactToFFE
   )
   
   override val buildOrder = ProtossBuilds.OpeningTwoGate1012Expand
   override def buildPlans = Vector(
     new RequireMiningBases(2),
     new Pump(Protoss.Observer, 1),
+    new Pump(Protoss.Reaver, 3),
     new FlipIf(
       new Or(
         new SafeAtHome,
@@ -76,11 +76,13 @@ class PvP2Gate1012 extends GameplanModeTemplate {
     new Build(
       Get(1, Protoss.Forge),
       Get(2, Protoss.Gateway),
-      Get(Protoss.DragoonRange),
+      Get(Protoss.DragoonRange)),
+    new BuildGasPumps,
+    new Build(
+      Get(3, Protoss.Gateway),
       Get(1, Protoss.RoboticsFacility),
       Get(4, Protoss.Gateway),
-      Get(Protoss.GroundDamage),
-      Get(2, Protoss.Assimilator),
+      Get(1, Protoss.RoboticsSupportBay),
       Get(1, Protoss.Observatory),
       Get(6, Protoss.Gateway))
   )

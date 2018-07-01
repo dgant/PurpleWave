@@ -8,7 +8,14 @@ object TargetFilterFutility extends TargetFilter {
   
   private def catchableBy(actor: UnitInfo, target: UnitInfo): Boolean = {
     lazy val targetBusy = target.gathering || target.constructing || target.repairing || ! target.canMove
-    actor.topSpeed >= target.topSpeed || actor.inRangeToAttack(target) || targetBusy || actor.is(Zerg.Scourge)
+    val output = (
+      actor.topSpeed >= target.topSpeed
+      || actor.inRangeToAttack(target)
+      || targetBusy
+      || actor.is(Zerg.Scourge)
+      || target.framesToGetInRange(target) < 8
+      || (target.unitClass.isWorker && target.base.exists(_.harvestingArea.contains(target.tileIncludingCenter))))
+    output
   }
   // Target units according to our goals.
   // Ignore them if they're distractions.
@@ -21,7 +28,11 @@ object TargetFilterFutility extends TargetFilter {
       && ally.framesBeforeAttacking(target) <= actor.framesBeforeAttacking(target))
     
     lazy val targetCatchable  = catchableBy(actor, target) || alliesAssisting
-    lazy val targetReachable  = target.framesToGetInRange(target) < 8 || target.visible || actor.flying || ! target.flying || With.grids.walkableTerrain.get(target.tileIncludingCenter)
+    lazy val targetReachable  = (
+      target.visible
+      || actor.flying
+      || ! target.flying
+      || Vector(actor.pixelToFireAt(target).tileIncluding, target.tileIncludingCenter).exists(With.grids.walkableTerrain.get))
     
     val output = targetReachable && (targetCatchable || atOurWorkers)
     

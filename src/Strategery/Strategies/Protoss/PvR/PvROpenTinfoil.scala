@@ -1,11 +1,15 @@
 package Strategery.Strategies.Protoss.PvR
 
+import Planning.Plan
+import Planning.Plans.GamePlans.Protoss.Standard.PvR.PvRTinfoil
 import Strategery.Strategies.Protoss.ProtossChoices
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
 object PvROpenTinfoil extends Strategy {
-  
+
+  override def gameplan: Option[Plan] = Some(new PvRTinfoil)
+
   override lazy val choices = Vector(
     ProtossChoices.pvtOpenersTransitioningFrom2Gate,
     ProtossChoices.pvpOpenersTransitioningFrom2Gate,

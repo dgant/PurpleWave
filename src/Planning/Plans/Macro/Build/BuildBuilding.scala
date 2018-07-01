@@ -32,7 +32,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     
   description.set("Build a " + buildingClass)
   
-  override def isComplete: Boolean = building.exists(_.aliveAndComplete)
+  override def isComplete: Boolean = building.exists(_.remainingCompletionFrames <= With.reaction.planningMax)
   
   def startedBuilding: Boolean = building.isDefined
   

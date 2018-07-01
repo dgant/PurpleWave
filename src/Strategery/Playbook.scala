@@ -50,7 +50,6 @@ object StrategyGroups {
     TvZEarly1RaxFEEconomic,
     TvZEarly1RaxFEConservative,
     TvZEarly2Rax,
-    PvZ4Gate99,
     MassPhotonCannon,
     CarriersWithNoDefense,
     ProxyDarkTemplar,
@@ -75,7 +74,7 @@ class CIGPlaybook extends PurpleWavePlaybook {
 }
 
 class TestingCIGPlaybook extends CIGPlaybook {
-  override def enemyName: String = "Iron"
+  override def enemyName: String = "ZZZKBot"
 }
 
 object Playbook extends CIGPlaybook {}

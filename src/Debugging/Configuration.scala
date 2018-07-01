@@ -22,7 +22,7 @@ class Configuration {
   // Strategy //
   //////////////
   
-  var targetWinrate       = 0.6
+  var targetWinrate       = 0.8
   var strategyRandomness  = 0.0
   var historyHalfLife     = 50.0
   
@@ -34,7 +34,7 @@ class Configuration {
   var battleMarginTileBase          = 12 + 2
   var battleMarginTileMinimum       = 12 + 2
   var battleMarginTileMaximum       = 12 * 2 + 2 // A bit over double Siege Tank range
-  var simulationFrames        = GameTime(0, 8)()
+  var simulationFrames              = GameTime(0, 8)()
   var battleHysteresisFrames        = GameTime(0, 6)()
   var battleHysteresisRatio         = 0.15
   var battleValueTarget             = 0.55
@@ -46,7 +46,7 @@ class Configuration {
   // Micro //
   ///////////
   
-  var concaveMarginPixels             = 16.0
+  var concaveMarginPixels             = 20.0
   var assumedBuilderTravelSpeed       = 0.65
   var fogPositionDurationFrames       = GameTime(0, 20)()
   var violenceThresholdFrames         = GameTime(0, 2)()

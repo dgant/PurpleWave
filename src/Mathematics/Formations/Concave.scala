@@ -28,7 +28,7 @@ object Concave {
       centerToArcRadians,
       targetStart.pixelDistance(targetEnd))
     
-    val arcPlacement = new ArcPlacementState(arc, targetStart.pixelDistance(targetEnd))
+    val arcPlacement = new ArcPlacementState(arc)
     
     val walkers = units.filterNot(_.flying)
     val flyers  = units.filter(_.flying)

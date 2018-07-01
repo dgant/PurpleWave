@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 
-class ArcPlacementState(arc: Arc, minimumRadius: Double) {
+class ArcPlacementState(arc: Arc) {
   
   // All measurements in pixels/radius
   

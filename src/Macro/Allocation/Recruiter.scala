@@ -1,6 +1,7 @@
 package Macro.Allocation
 
 import Lifecycle.With
+import Planning.Plan
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -18,31 +19,31 @@ class Recruiter {
     unitsByLock.values.foreach(_.filterNot(eligible).foreach(unassign))
     
     // Free units held by inactive locks
-    unitsByLock.keys.filterNot(activeLocks.contains).foreach(remove)
+    unitsByLock.keys.filterNot(activeLocks.contains).foreach(release)
     activeLocks.clear()
-    
+
     // Populate unassigned units
     unassignedUnits.clear()
     With.units.ours
       .filter(unit => eligible(unit) && ! unitsByLock.values.exists(_.contains(unit)))
       .foreach(unassignedUnits.add)
   }
-  
+
   def eligible(unit: FriendlyUnitInfo): Boolean = unit.aliveAndComplete && unit.unitClass.orderable
-  
+
   def onUnitDestroyed(unit: FriendlyUnitInfo) {
     unassign(unit)
     unassignedUnits.remove(unit)
   }
-  
+
   def add(lock: LockUnits) {
     activeLocks.add(lock)
     unitsByLock(lock) = unitsByLock.getOrElse(lock, mutable.Set.empty)
     tryToSatisfy(lock)
   }
-  
+
   def inquire(lock: LockUnits): Option[Iterable[FriendlyUnitInfo]] = {
-  
+
     // Offer batches of unit for the lock to choose.
     //  Batch 0: Current units
     //  Batch 1: Unassigned units
@@ -54,20 +55,20 @@ class Recruiter {
         (otherRequest.interruptable.get || lock.canPoach.get)
         && lock.owner.priority < otherRequest.owner.priority)
       .flatMap(getUnits)
-    
+
     lock.offerUnits(
       Iterable.empty
         ++ unitsByLock.getOrElse(lock, Iterable.empty)
         ++ unassignedUnits
         ++ assignedToLowerPriority)
   }
-  
+
   private def tryToSatisfy(lock: LockUnits) {
 
     val requiredUnits = inquire(lock)
 
     if (requiredUnits.isEmpty) {
-      remove(lock)
+      release(lock)
     }
     else {
       // 1. Unassign all the current units
@@ -77,16 +78,20 @@ class Recruiter {
       val unitsAfter    = requiredUnits.get.toSet
       val unitsObsolete = unitsBefore.diff(unitsAfter)
       val unitsNew      = unitsAfter.diff(unitsBefore)
-      
+
       unitsObsolete.foreach(unassign)
       unitsNew.foreach(unassign)
       unitsNew.foreach(assign(_, lock))
     }
   }
-  
-  def remove(lock: LockUnits) {
+
+  def release(lock: LockUnits) {
     unitsByLock.get(lock).foreach(_.foreach(unassign))
     unitsByLock.remove(lock)
+  }
+
+  def release(plan: Plan): Unit = {
+    unitsByLock.keys.foreach(lock => if (lock.owner == plan) release(lock))
   }
   
   private def assign(unit: FriendlyUnitInfo, lock: LockUnits) {

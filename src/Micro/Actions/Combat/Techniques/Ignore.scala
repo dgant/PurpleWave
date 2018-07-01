@@ -18,7 +18,7 @@ object Ignore extends ActionTechnique {
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = (
     (if (With.grids.enemyVision.isSet(unit.tileIncludingCenter)) 1.0 else 2.0)
     * unit.matchups.framesOfSafety
-    / GameTime(0, 12)()
+    / GameTime(0, 16)()
   )
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {

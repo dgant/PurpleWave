@@ -31,20 +31,32 @@ class MasterBuildPlans {
   }
   
   def update(invoker: FollowBuildOrder) {
+
     //Remove complete plans
-    plans.values.foreach(plans => plans.indices.foreach(i => while (i < plans.size && plans(i).isComplete) plans.remove(i)))
-    
+    plans.values.foreach(plans => {
+      var i = 0
+      while (i < plans.size) {
+        val plan = plans(i)
+        if (plan.isComplete) {
+          With.bank.release(plan)
+          With.recruiter.release(plan)
+          plans.remove(i)
+        }
+        else {
+          i += 1
+        }
+      }})
+
     //Add plans to match number of builds we need
-    //queue = With.scheduler.queueOptimized.filter(_.frameStart <= With.frame).map(_.buildable)
     queue = With.scheduler.queue.take(maxToFollow)
-    
+
     val buildsNeeded =
       queue
         .groupBy(buildable => buildable)
         .map(buildable => (
           buildable._1,
           buildable._2.size))
-    
+
     buildsNeeded.keys.foreach(build => {
       if ( ! plans.contains(build)) {
         plans.put(build, new ListBuffer[Plan])
@@ -52,9 +64,10 @@ class MasterBuildPlans {
       while (plans(build).size < buildsNeeded(build)) {
         plans(build).append(buildPlan(build))
       }
+
       //Consider removing excess plans
     })
-    
+
     getChildrenCache.invalidate()
   }
   

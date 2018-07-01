@@ -11,8 +11,9 @@ object TargetFilterStayCloaked extends TargetFilter {
     lazy val cloaked  = actor.effectivelyCloaked
     lazy val range    = actor.pixelRangeAgainst(target)
     lazy val distance = actor.pixelDistanceEdge(target)
-    lazy val pixel    = actor.pixelCenter.project(target.pixelCenter, distance - range)
+    lazy val pixel    = actor.pixelToFireAt(target)
     lazy val reveals  = With.grids.enemyDetection.isSet(pixel.tileIncluding)
+
     val output = ! cloaked || ! reveals
     output
   }

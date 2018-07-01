@@ -10,6 +10,7 @@ import Planning.UnitMatchers.UnitMatchWorkers
 import Planning.Plan
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.ByOption
 
 import scala.collection.mutable
 
@@ -37,20 +38,24 @@ class Gather extends Plan {
     workers = workerLock.units
     setGoals()
     countUnits()
-    workers.foreach(updateWorker)
+    val workersSorted = workers.toVector.sortBy(w => ByOption.min(resources.map(w.pixelDistanceCenter)).getOrElse(0.0))
+    workersSorted.foreach(updateWorker)
   }
   
   private def setGoals() {
     val belowFloor    = With.self.gas < Math.min(With.blackboard.gasLimitFloor(), With.blackboard.gasLimitCeiling())
     val aboveCeiling  = With.self.gas > Math.max(With.blackboard.gasLimitFloor(), With.blackboard.gasLimitCeiling())
+
     gasWorkersMax =
-      if (belowFloor)
-        workers.size
-      else if (aboveCeiling)
-        0
+      Math.min(
+        workers.size - 3,
+        if (belowFloor)
+          workers.size
+        else if (aboveCeiling)
+          0
         else
-        (workers.size * With.blackboard.gasTargetRatio()).toInt
-      }
+          (workers.size * With.blackboard.gasTargetRatio()).toInt)
+  }
   
     private def countUnits() {
       val activeBases = With.geography.ourBases.filter(_.townHall.exists(hall =>
@@ -139,7 +144,9 @@ class Gather extends Plan {
     val safety      = if ( ! worker.zone.bases.exists(_.owner.isUs) || transfersLegal.contains((worker.zone, resource.zone))) 100.0 else 1.0
     val continuity  = if (resourceByWorker.get(worker).contains(resource)) 10.0 else 1.0
     val proximity   = resource.base.flatMap(_.townHall).map(_.pixelDistanceEdge(resource)).getOrElse(32 * 12)
-    val distance    = Math.log(worker.pixelDistanceEdge(resource) + Math.max(0, resource.remainingCompletionFrames - worker.pixelDistanceEdge(resource) / Math.max(1.0, worker.topSpeed)))
+    val distance    = Math.max(resource.remainingCompletionFrames * worker.topSpeed, worker.pixelDistanceEdge(resource))
+    val distanceFactor = 32 * 180 + distance
+
     val currentWorkerCount = workersByResource(resource).count(_ != worker)
     val saturation  =
       if (resource.unitClass.isMinerals) {

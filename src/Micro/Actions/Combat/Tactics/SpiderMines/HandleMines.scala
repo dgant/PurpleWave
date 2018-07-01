@@ -25,25 +25,31 @@ object HandleMines extends Action{
     val mine = mines.minBy(_.pixelDistanceEdge(unit))
 
     lazy val canKillForFree   = ! mine.effectivelyCloaked & unit.pixelRangeAgainst(mine) > 96 && unit.readyForAttackOrder
+    lazy val canClear         = unit.agent.shouldEngage || mine.base.exists(_.owner.isUs)
     lazy val canSnipeAlone    = unit.damageOnNextHitAgainst(mine) >= mine.unitClass.maxTotalHealth
     lazy val canSnipeTogether = mine.matchups.threatsInRange.map(t => if (t.readyForAttackOrder) t.damageOnNextHitAgainst(mine) else 0).sum > mine.unitClass.maxTotalHealth
     lazy val dragTargets =
       if (unit.unitClass.floats)
         Iterable.empty
       else
-        unit.matchups.enemies.filter(e => ! e.flying && ! e.unitClass.isBuilding && e.pixelDistanceEdge(mine) < 96)
+        unit.matchups.enemies.filter(e =>
+          ! e.flying
+          && ! e.unitClass.isBuilding
+          && e.pixelDistanceEdge(mine) < 96)
+    lazy val dragTargetValue = dragTargets.map(_.subjectiveValue).sum
+    lazy val dragWorthwhile = dragTargetValue >= unit.subjectiveValue - Terran.Vulture.subjectiveValue / 3.0
 
     if (canKillForFree) {
       unit.agent.toAttack = Some(mine)
       Attack.delegate(unit)
     }
-    else if (canSnipeAlone) {
-      new Defuse(unit, mine).delegate(unit)
+    else if (canClear && canSnipeAlone) {
+      new Defuse(unit, mine).consider(unit)
     }
-    else if (canSnipeTogether) {
-      new Defuse(unit, mine).delegate(unit)
+    else if (canClear && canSnipeTogether) {
+      new Defuse(unit, mine).consider(unit)
     }
-    else if (dragTargets.nonEmpty) {
+    else if (dragTargets.nonEmpty && dragWorthwhile) {
       new Drag(dragTargets).consider(unit)
     }
     else {

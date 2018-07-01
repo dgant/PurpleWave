@@ -50,7 +50,11 @@ object BlockConstruction extends Action {
       lazy val hasMoveOrder         = builder.order == Orders.Move
       lazy val hasRelevantOrder     = hasBuildOrder  || hasMoveOrder
       lazy val targetPixel          = builder.orderTargetPixel.orElse(builder.targetPixel).getOrElse(builder.pixelCenter)
-      lazy val movingToRelevantBase = hasRelevantOrder && targetPixel.base.exists(base => (base.owner.isEnemy || (base.owner.isNeutral && ! base.isStartLocation)))
+      lazy val movingToRelevantBase = (
+        hasRelevantOrder
+        && targetPixel.base.exists(base =>
+          (base.owner.isEnemy
+          || (base.owner.isNeutral && ! base.isStartLocation && (unit.player.isZerg || base.isNaturalOf.exists(_.owner.isEnemy))))))
       val output                    = builder.unitClass.isWorker && (hasBuildOrder || movingToRelevantBase)
       output
     })

@@ -44,11 +44,18 @@ object Potential {
   /////////////
   // Threats //
   /////////////
-  
+
+  def avoidThreatsWhileCloaked(unit: FriendlyUnitInfo): Force = {
+    val threats = unit.matchups.enemies.filter(e => if (unit.flying) e.unitClass.attacksAir else e.unitClass.attacksGround)
+    val forces  = threats.map(threatRepulsion(unit, _))
+    val output  = ForceMath.sum(forces).normalize
+    output
+  }
+
   def avoidThreats(unit: FriendlyUnitInfo): Force = {
-    val threats     = unit.matchups.threats.filterNot(_.is(Protoss.Interceptor))
-    val forces      = threats.map(threatRepulsion(unit, _))
-    val output      = ForceMath.sum(forces).normalize
+    val threats = unit.matchups.threats.filterNot(_.is(Protoss.Interceptor))
+    val forces  = threats.map(threatRepulsion(unit, _))
+    val output  = ForceMath.sum(forces).normalize
     output
   }
   

@@ -1,7 +1,7 @@
 package Micro.Matchups
 
 import Information.Battles.BattleClassificationFilters
-import Information.Battles.Types.{Battle, Team}
+import Information.Battles.Types.{Battle, BattleLocal, Team}
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
@@ -22,15 +22,14 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val frame  : Int   = conditions.framesAhead
   
   // Default is necessary for killing empty bases because no Battle is happening
-  lazy val defaultUnits           : Vector[UnitInfo]      = if (me.canAttack) me.zone.units.toVector.filter(u => u.isEnemy && BattleClassificationFilters.isEligibleLocal(u)) else Vector.empty
-  lazy val battle                 : Option[Battle]        = me.battle.orElse(With.matchups.entrants.find(_._2.contains(me)).map(_._1))
-  lazy val team                   : Option[Team]          = battle.map(_.teamOf(me))
-  lazy val enemies                : Vector[UnitInfo]      = team.map(_.opponent.units).getOrElse(defaultUnits.filter(_.isEnemyOf(me)))
-  lazy val alliesInclSelf         : Vector[UnitInfo]      = team.map(_.units).getOrElse(defaultUnits.filter(u => u.isFriendly && u != me) :+ me)
+  private lazy val defaultUnits   : Vector[UnitInfo]      = if (me.canAttack) me.zone.units.toVector.filter(u => u.isEnemy && BattleClassificationFilters.isEligibleLocal(u)) else Vector.empty
+  lazy val battle                 : Option[BattleLocal]   = me.battle.orElse(With.matchups.entrants.find(_._2.contains(me)).map(_._1))
+  lazy val allUnits               : Vector[UnitInfo]      = battle.map(b => b.teams.flatMap(_.units) ++ With.matchups.entrants.getOrElse(b, Set.empty)).getOrElse(defaultUnits)
+  lazy val enemies                : Vector[UnitInfo]      = allUnits.filter(_.isEnemyOf(me))
+  lazy val alliesInclSelf         : Vector[UnitInfo]      = allUnits.filter(_.isAllyOf(me))
   lazy val alliesInclSelfCloaked  : Vector[UnitInfo]      = alliesInclSelf.filter(_.cloaked)
   lazy val allies                 : Vector[UnitInfo]      = alliesInclSelf.filterNot(_.id == me.id)
   lazy val others                 : Vector[UnitInfo]      = enemies ++ allies
-  lazy val allUnits               : Vector[UnitInfo]      = enemies ++ alliesInclSelf
   lazy val allyDetectors          : Vector[UnitInfo]      = allies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
   lazy val enemyDetectors         : Vector[UnitInfo]      = enemies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
   lazy val threats                : Vector[UnitInfo]      = enemies.filter(threatens(_, me))

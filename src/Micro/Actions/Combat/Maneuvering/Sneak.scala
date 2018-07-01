@@ -19,16 +19,22 @@ object Sneak extends Action {
     && ! Yolo.active
     && ! unit.matchups.allies.exists(_.is(Protoss.Arbiter))
     && ! unit.agent.canBerzerk
-    && ! unit.matchups.threats.forall(_.unitClass.isWorker)
-    && ( ! unit.effectivelyCloaked || unit.matchups.enemyDetectors.exists(e => e.pixelDistanceEdge(unit) < 32.0 * (if(e.unitClass.canMove) 15.0 else 12.0)))
+    && unit.matchups.enemies.exists(e => e.unitClass.attacksGround && e.complete && ! e.unitClass.isWorker)
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {
     Potshot.delegate(unit)
-    if (unit.readyForMicro) {
+
+    if ( ! unit.readyForMicro) return
+
+    val needsToFlee = (
+      ! unit.effectivelyCloaked
+        || unit.matchups.enemyDetectors.exists(e => e.pixelDistanceEdge(unit) < 32.0 * (if(e.unitClass.canMove) 15.0 else 12.0))
+    )
+
+    if (needsToFlee) {
       Target.delegate(unit)
-      val forceTarget     = unit.agent.toAttack.map(target => new Force(target.pixelCenter - unit.pixelCenter).normalize).getOrElse(new Force)
-      val forceThreat     = Potential.avoidThreats(unit)
+      val forceThreat     = Potential.avoidThreatsWhileCloaked(unit)
       val forceSneaking   = Potential.detectionRepulsion(unit)
       unit.agent.forces.put(ForceColors.threat,     forceThreat)
       unit.agent.forces.put(ForceColors.bypassing,  forceSneaking)

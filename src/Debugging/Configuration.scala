@@ -8,21 +8,22 @@ class Configuration {
   // Tournament Settings //
   /////////////////////////
   
-  var enableSurrenders            = true
-  var enablePerformanceStops      = true
-  var enablePerformanceSurrender  = false
-  var enableChat                  = true
-  var enableHistoryChat           = false
-  var enableVisualizations        = false
-  var enableHumanManners          = true
-  var identifyGhostUnits          = false
+  var enableSurrenders                = false
+  var enablePerformanceStops          = true
+  var enablePerformanceSurrender      = false
+  var enableChat                      = false
+  var enableHistoryChat               = false
+  var enableVisualizations            = false
+  var enableHumanManners              = false
+  var identifyGhostUnits              = false
+  var targetFrameDurationMilliseconds = 15
   
   //////////////
   // Strategy //
   //////////////
   
-  var targetWinrate       = 0.7
-  var strategyRandomness  = 0.1
+  var targetWinrate       = 0.6
+  var strategyRandomness  = 0.0
   var historyHalfLife     = 50.0
   
   /////////////
@@ -70,7 +71,6 @@ class Configuration {
   
   var foreignUnitUpdatePeriod             = 4
   var garbageCollectionThresholdMs        = 5
-  var initialTaskLengthMilliseconds       = 12
   var performanceMinimumUnitSleep         = 2
   var maximumGamesHistoryPerOpponent      = 500
   

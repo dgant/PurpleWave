@@ -66,7 +66,7 @@ class Intelligence {
         val heartMain = base.heart.pixelCenter
         val heartNatural = base.natural.getOrElse(base).heart.pixelCenter
         val hearts = Vector(heartMain, heartNatural)
-        val distanceFromEnemyBase = ByOption.min(enemyBaseHearts.map(_.groundPixels(heartMain))).getOrElse(1.0)
+        val distanceFromEnemyBase = ByOption.min(enemyBaseHearts.map(_.groundPixels(heartMain))).getOrElse(With.mapPixelWidth.toDouble)
         val distanceFromScout =
           if (flyingScout) {
             hearts.map(heart => scoutTiles.map(_.pixelCenter.pixelDistance(heart)).min).sum

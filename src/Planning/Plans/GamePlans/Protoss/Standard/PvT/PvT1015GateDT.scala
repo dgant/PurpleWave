@@ -1,10 +1,12 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
-import Planning.Plans.Army.Attack
+import Planning.Plan
+import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Compound.Trigger
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
@@ -18,10 +20,10 @@ class PvT1015GateDT extends GameplanModeTemplate {
   override val superSaturate      = true
   override val defaultAttackPlan  = new Attack
   override val buildOrder         = ProtossBuilds.Opening10Gate15GateDragoonDT
-  
-  override def scoutAt: Int = super.scoutAt
+  override def defaultScoutPlan   = new ScoutOn(Protoss.Gateway, 2)
   
   override val buildPlans = Vector(
+    new EjectScout,
     new Trigger(
       new UnitsAtLeast(2, Protoss.DarkTemplar),
       new RequireMiningBases(2)),

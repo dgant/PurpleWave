@@ -15,9 +15,9 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio, SafeAtHome, SafeToMoveOut}
+import Planning.Predicates.Reactive._
 import Planning.Predicates.Never
-import Planning.Plans.Scouting.ScoutOn
+import Planning.Plans.Scouting.{Scout, ScoutOn}
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
@@ -45,20 +45,22 @@ class PvTBasic extends GameplanModeTemplate {
         new Aggression(1.0)))
   
   override def defaultScoutPlan: Plan = new Parallel(
-    new If(new Employing(PvT13Nexus),       new ScoutOn(Protoss.Nexus, quantity = 2)),
-    new If(new Employing(PvT21Nexus),       new ScoutOn(Protoss.Gateway)),
-    new If(new Employing(PvT2GateObserver), new ScoutOn(Protoss.Pylon)),
-    new If(new Employing(PvTDTExpand),      new ScoutOn(Protoss.Pylon)))
+    new If(new Employing(PvT13Nexus),             new ScoutOn(Protoss.Nexus, quantity = 2)),
+    new If(new Employing(PvT21Nexus),             new ScoutOn(Protoss.Gateway)),
+    new If(new Employing(PvT2GateObserver),       new ScoutOn(Protoss.Pylon)),
+    new If(new Employing(PvTEarly1015GateGoonDT), new If(new UpgradeStarted(Protoss.DragoonRange), new Scout)),
+    new If(new Employing(PvTDTExpand),            new ScoutOn(Protoss.Pylon)))
   
   override val defaultAttackPlan = new PvTIdeas.AttackRespectingMines
   
   override def emergencyPlans: Seq[Plan] = Vector(new PvTIdeas.EmergencyBuilds)
   
   override def defaultBuildOrder: Plan = new Parallel(
-    new If(new Employing(PvT13Nexus),       new BuildOrder(ProtossBuilds.Opening13Nexus_NoZealot_TwoGateways: _*)),
-    new If(new Employing(PvT21Nexus),       new BuildOrder(ProtossBuilds.Opening21Nexus_Robo: _*)),
-    new If(new Employing(PvT2GateObserver), new BuildOrder(ProtossBuilds.Opening2GateObserver: _*)),
-    new If(new Employing(PvTDTExpand),      new BuildOrder(ProtossBuilds.OpeningDTExpand: _*)))
+    new If(new Employing(PvT13Nexus),             new BuildOrder(ProtossBuilds.Opening13Nexus_NoZealot_TwoGateways: _*)),
+    new If(new Employing(PvT21Nexus),             new BuildOrder(ProtossBuilds.Opening21Nexus_Robo: _*)),
+    new If(new Employing(PvT2GateObserver),       new BuildOrder(ProtossBuilds.Opening2GateObserver: _*)),
+    new If(new Employing(PvTEarly1015GateGoonDT), new BuildOrder(ProtossBuilds.Opening10Gate15GateDragoonDT: _*)),
+    new If(new Employing(PvTDTExpand),            new BuildOrder(ProtossBuilds.OpeningDTExpand: _*)))
   
   class EmployingThreeBase extends Employing(PvT3BaseCarrier, PvT3BaseArbiter)
   class EmployingCarriers extends Employing(PvT2BaseCarrier, PvT3BaseCarrier)
@@ -197,7 +199,9 @@ class PvTBasic extends GameplanModeTemplate {
           new EmployingCarriers,
           new Parallel(
             new If(
-              new MiningBasesAtLeast(3),
+              new Or(
+                new MiningBasesAtLeast(3),
+                new EnemyBasesAtMost(1)),
               new Build(Get(4, Protoss.Gateway))),
             new Build(
               Get(1, Protoss.Stargate),

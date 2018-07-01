@@ -68,7 +68,7 @@ class Strategist {
       strategies
   }
   
-  private def isAppropriate(strategy: Strategy): Boolean = {
+  def isAppropriate(strategy: Strategy): Boolean = {
     lazy val ourRace                  = With.self.raceInitial
     lazy val enemyRacesCurrent        = With.enemies.map(_.raceCurrent).toSet
     lazy val enemyRaceWasUnknown      = With.enemies.exists(_.raceInitial == Race.Unknown)

@@ -25,7 +25,7 @@ class MatchupGraph {
     assignEntrants()
   }
   
-  def resetAnalyses() {
+  private def resetAnalyses() {
     var i = 0
     while (i < maxUnitId) {
       analyses(i) = null
@@ -33,7 +33,7 @@ class MatchupGraph {
     }
   }
   
-  def assignEntrants() {
+  private def assignEntrants() {
     // Battle clustering is slow and can take 1-2 seconds.
     // Sometimes we need to include units faster than that.
     // For example: Spider mines that just popped up, or Siege Tanks/Lurkers that just started shooting at us unexpectedly.
@@ -49,15 +49,15 @@ class MatchupGraph {
     })
   }
   
-  def assignToBattle(unit: UnitInfo): Option[BattleLocal] = {
+  private def assignToBattle(unit: UnitInfo): Option[BattleLocal] = {
     val neighbors = With.units.inTileRadius(unit.tileIncludingCenter, 15).filter(_.battle.isDefined).groupBy(_.battle)
     if (neighbors.nonEmpty) {
       neighbors.maxBy(_._2.size)._1
     }
     else None
   }
-  
-  def newEntrants: Seq[UnitInfo] = {
+
+  private def newEntrants: Seq[UnitInfo] = {
     With.units.all.filter(unit =>
       unit.aliveAndComplete
         &&  unit.battle.isEmpty

@@ -16,8 +16,8 @@ class PerformanceMonitor {
   var framesOver1000  = 0
   var framesOver10000 = 0
   
-  var enablePerformanceStops = With.configuration.enablePerformanceStops // For disabling performance stops while debugging
-  var enablePerformanceSurrenders = With.configuration.enablePerformanceSurrender
+  var enablePerformanceStops: Boolean = With.configuration.enablePerformanceStops // For disabling performance stops while debugging
+  var enablePerformanceSurrenders: Boolean = With.configuration.enablePerformanceSurrender
   
   var lastUniqueUnitIdCount: Int = 0
   var lastUniqueDeadIdCount: Int = 0
@@ -52,7 +52,7 @@ class PerformanceMonitor {
   }
   
   def millisecondsLeftThisFrame: Long = {
-    Math.max(0, With.configuration.initialTaskLengthMilliseconds - millisecondsSpentThisFrame)
+    Math.max(0, With.configuration.targetFrameDurationMilliseconds - millisecondsSpentThisFrame)
   }
   
   def millisecondsSpentThisFrame: Long = {

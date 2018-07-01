@@ -15,7 +15,8 @@ class EjectScout(
   override val goal: GoalEjectScout = new GoalEjectScout
   
   override def onUpdate() {
-    val scouts = With.geography.ourZones.flatMap(_.units.filter(u => u.possiblyStillThere && u.isEnemy && u.isAny(UnitMatchWorkers, Zerg.Overlord)))
+    val eligibleZones = With.geography.ourZones.toSet ++ Seq(With.geography.ourNatural.zone) ++ With.geography.ourMain.zone.edges.flatMap(_.zones)
+    val scouts = eligibleZones.flatMap(_.units.filter(u => u.possiblyStillThere && u.isEnemy && u.isAny(UnitMatchWorkers, Zerg.Overlord)))
     val scout = ByOption.minBy(scouts)(_.id)
     
     if (scouts.isEmpty) return

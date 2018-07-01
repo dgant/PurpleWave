@@ -23,8 +23,9 @@ object KeyboardCommands {
       case _            => With.visualization.tryToggle(text)
     }
   }
-  
+
+  private var breakpointFodder = 1
   def breakpoint() {
-    val setABreakpointHere = 12345
+    breakpointFodder = -breakpointFodder
   }
 }

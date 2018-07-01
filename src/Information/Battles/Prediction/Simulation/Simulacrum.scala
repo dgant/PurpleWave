@@ -137,6 +137,9 @@ class Simulacrum(
   
   def tryToRunAway() {
     if (fighting) return
+    // Assume units at home are trapped
+    // Prevents us from thinking workers can easily escape
+    if (pixel.base.exists(_.owner == realUnit.player)) return
     pathBendiness = 1.0
     moveTowards(fleePixel)
   }
@@ -165,14 +168,17 @@ class Simulacrum(
       valueDealt += valueKill
       victim.valueReceived += valueKill
     }
-    
-    addEvent(() => SimulationEventAttack(
+
+    val buildEvent = () => SimulationEventAttack(
       simulation.estimation.frames,
       this,
       victim,
       damageToHitPoints + damageToShields,
       victim.hitPoints <= 0
-    ))
+    )
+
+    addEvent(buildEvent)
+    victim.addEvent(buildEvent)
   }
   
   private def moveTowards(destination: Pixel) {

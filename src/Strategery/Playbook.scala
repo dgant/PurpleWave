@@ -1,7 +1,9 @@
 package Strategery
 
-import Strategery.Selection.{StrategySelectionGreedy, StrategySelectionPolicy}
+import Lifecycle.With
+import Strategery.Selection.{StrategySelectionCIG, StrategySelectionGreedy, StrategySelectionPolicy}
 import Strategery.Strategies.Protoss.PvE._
+import Strategery.Strategies.Protoss.PvR.{PvROpen2Gate1012, PvROpen2Gate910}
 import Strategery.Strategies.Protoss._
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TvE._
@@ -14,8 +16,23 @@ class EmptyPlaybook {
   val none: Seq[Strategy] = Seq.empty
   lazy val forced   : Seq[Strategy] = none
   lazy val disabled : Seq[Strategy] = none
-  val strategyOrder: Seq[Strategy] = none
+  val strategyOrder: Seq[Strategy] = Vector(
+    PvTEarly1015GateGoonDT,
+    PvT2GateObserver,
+    PvT13Nexus,
+    PvT21Nexus,
+    PvT3BaseArbiter,
+    PvT2BaseCarrier,
+    PvPOpen2Gate1012,
+    PvPOpen2GateDTExpand,
+    PvZ4Gate99,
+    PvZEarlyFFEEconomic,
+    PvZMidgameGatewayAttack,
+    PvROpen2Gate910,
+    PvROpen2Gate1012
+  )
   def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy
+  def enemyName: String = With.enemy.name
 }
 
 object StrategyGroups {
@@ -49,4 +66,12 @@ class PurpleWavePlaybook extends EmptyPlaybook {
   override lazy val disabled  : Seq[Strategy] = StrategyGroups.disabled
 }
 
-object Playbook extends PurpleWavePlaybook {}
+class CIGPlaybook extends PurpleWavePlaybook {
+  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionCIG
+}
+
+class TestingCIGPlaybook extends CIGPlaybook {
+  override def enemyName: String = "Iron"
+}
+
+object Playbook extends TestingCIGPlaybook {}

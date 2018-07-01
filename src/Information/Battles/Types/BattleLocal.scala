@@ -9,8 +9,12 @@ import Utilities.ByOption
 
 class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   
-  lazy val estimationSimulationAttack   : Prediction  = estimateSimulation(this, weAttack = true,   weSnipe = false)
-  lazy val estimationSimulationSnipe    : Prediction  = estimateSimulation(this, weAttack = true,   weSnipe = true)
+  lazy val estimationSimulationAttack: Prediction = estimateSimulation(this, weAttack = true, weSnipe = false)
+  lazy val estimationSimulationSnipe: Prediction =
+    if (With.self.isZerg)
+      estimateSimulation(this, weAttack = true,   weSnipe = true)
+    else
+      estimationSimulationAttack
   
   lazy val turrets                  = us.units.filter(u => ! u.canMove && ! u.canAttack)
   lazy val canTurtle      : Boolean = turrets.nonEmpty && turrets.forall(t => t.matchups.targetsInRange.isEmpty && t.matchups.threatsInRange.isEmpty)

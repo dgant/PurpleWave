@@ -68,10 +68,14 @@ class PurpleWavePlaybook extends EmptyPlaybook {
 
 class CIGPlaybook extends PurpleWavePlaybook {
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionCIG
+
+  override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled ++ Seq(
+    PvZProxy2Gate
+  )
 }
 
 class TestingCIGPlaybook extends CIGPlaybook {
   override def enemyName: String = "Iron"
 }
 
-object Playbook extends TestingCIGPlaybook {}
+object Playbook extends CIGPlaybook {}

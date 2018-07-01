@@ -5,13 +5,15 @@ case class Opponent(name: String, policy: StrategySelectionPolicy = StrategySele
     name == otherName
   }
   def matchesLoosely(otherName: String): Boolean = {
-    val n1 = name.toLowerCase
-    val n2 = otherName.toLowerCase
+    val n1 = withoutWhitespace(name.toLowerCase)
+    val n2 = withoutWhitespace(otherName.toLowerCase)
     n1 == n2
   }
   def matchesVeryLoosely(otherName: String): Boolean = {
-    val n1 = name.toLowerCase
-    val n2 = otherName.toLowerCase
+    val n1 = withoutWhitespace(name.toLowerCase)
+    val n2 = withoutWhitespace(otherName.toLowerCase)
     n1.contains(n2) || n2.contains(n1)
   }
+
+  protected def withoutWhitespace(value: String): String = value.replaceAll(" ", "")
 }

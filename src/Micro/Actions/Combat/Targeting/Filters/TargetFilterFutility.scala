@@ -21,7 +21,7 @@ object TargetFilterFutility extends TargetFilter {
       && ally.framesBeforeAttacking(target) <= actor.framesBeforeAttacking(target))
     
     lazy val targetCatchable  = catchableBy(actor, target) || alliesAssisting
-    lazy val targetReachable  = target.visible || actor.flying || ! target.flying || With.grids.walkableTerrain.get(target.tileIncludingCenter)
+    lazy val targetReachable  = target.framesToGetInRange(target) < 8 || target.visible || actor.flying || ! target.flying || With.grids.walkableTerrain.get(target.tileIncludingCenter)
     
     val output = targetReachable && (targetCatchable || atOurWorkers)
     

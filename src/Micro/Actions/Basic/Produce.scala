@@ -6,14 +6,15 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Produce extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.trainingQueue.isEmpty &&
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
+
     (
       unit.agent.toTrain.isDefined  ||
       unit.agent.toTech.isDefined   ||
       unit.agent.toUpgrade.isDefined
     )
-  }
+    && (unit.trainingQueue.isEmpty || unit.remainingTrainFrames < With.reaction.agencyMax)
+  )
   
   override def perform(unit: FriendlyUnitInfo) {
     

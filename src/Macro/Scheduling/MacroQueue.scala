@@ -33,7 +33,7 @@ class MacroQueue {
     val unitsWanted = new CountMap[UnitClass]
     val unitsActual = new CountMap[UnitClass]
       With.units.ours.foreach(unit => {
-        if (unit.aliveAndComplete) {
+        if (unit.completeOrNearlyComplete) {
           unitsActual.add(unit.unitClass, 1)
         }
         if (unit.is(Terran.SiegeTankSieged)) {

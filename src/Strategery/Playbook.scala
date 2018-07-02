@@ -2,6 +2,7 @@ package Strategery
 
 import Lifecycle.With
 import Strategery.Selection.{StrategySelectionCIG, StrategySelectionGreedy, StrategySelectionPolicy}
+import Strategery.Strategies.AllRaces.WorkerRush
 import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss.PvR.{PvROpen2Gate1012, PvROpen2Gate910}
 import Strategery.Strategies.Protoss._
@@ -37,6 +38,7 @@ class EmptyPlaybook {
 
 object StrategyGroups {
   val disabled = Vector[Strategy](
+    WorkerRush,
     WorkerRushLiftoff,
     TvR1Rax,
     TvRTinfoil,

@@ -19,7 +19,7 @@ abstract class AbstractTask {
   
   var urgency             : Int = 1
   def maxConsecutiveSkips : Int = 48
-  def due             : Boolean = framesSinceRunning > maxConsecutiveSkips
+  def due                 : Boolean = framesSinceRunning > maxConsecutiveSkips
   
   private var alreadyViolatedThreshold  = false
   private var alreadyViolatedRules      = false

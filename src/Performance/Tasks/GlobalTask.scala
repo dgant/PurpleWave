@@ -48,6 +48,7 @@ class TaskMicro extends AbstractTask {
 }
 class TaskPlanning extends AbstractTask {
   urgency = With.configuration.urgencyPlanning
+  override def maxConsecutiveSkips: Int = 12
   override protected def onRun() {
     With.intelligence.update()
     With.fingerprints.update()

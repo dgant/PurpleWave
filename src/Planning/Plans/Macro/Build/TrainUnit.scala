@@ -40,7 +40,7 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
   private var trainer: Option[FriendlyUnitInfo] = None
   private var trainee: Option[FriendlyUnitInfo] = None
   
-  override def isComplete: Boolean = trainee.exists(_.remainingCompletionFrames <= With.reaction.planningMax)
+  override def isComplete: Boolean = trainee.exists(_.completeOrNearlyComplete)
   
   override def onUpdate() {
     if (isComplete) return
@@ -51,8 +51,9 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
     trainee = trainee.filter(theTrainee => trainer.exists(_.trainee.exists(_.is(traineeClass))))
     
     if (trainer.isDefined && trainee.isEmpty) {
-      trainee = trainer.flatMap(_.trainee.filter(_.is(traineeClass)))
+      trainee = trainer.flatMap(_.trainee.filter(t => t.is(traineeClass) && t.trainerPlan.forall(_ == this)))
     }
+    trainee.foreach(_.setTrainerPlan(this))
   
     // Duplicated across MorphUnit
     currencyLock.framesPreordered = (

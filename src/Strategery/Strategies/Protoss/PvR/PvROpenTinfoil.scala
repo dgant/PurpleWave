@@ -14,7 +14,14 @@ object PvROpenTinfoil extends Strategy {
     ProtossChoices.pvtOpenersTransitioningFrom2Gate,
     ProtossChoices.pvpOpenersTransitioningFrom2Gate,
     ProtossChoices.pvzOpenersTransitioningFrom2Gate)
-  
+
+  // CIG: Allow for UAB or Opprimo only
+  override def restrictedOpponents: Option[Iterable[String]] = Some(Iterable(
+    "Dave Churchill",
+    "UAlbertaBot",
+    "OpprimoBot"
+  ))
+
   override def ourRaces   : Iterable[Race]  = Vector(Race.Protoss)
   override def enemyRaces : Iterable[Race]  = Vector(Race.Unknown)
 }

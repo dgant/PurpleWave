@@ -4,6 +4,7 @@ import Lifecycle.With
 import Micro.Agency.Agent
 import Micro.Squads.Squad
 import Performance.Cache
+import Planning.Plan
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
@@ -46,7 +47,17 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
   //////////////
   // Statuses //
   //////////////
-  
+
+  def completeOrNearlyComplete: Boolean = complete || remainingCompletionFrames < With.reaction.planningMax
+
+  private var _trainerPlan: Option[Plan] = None
+  def trainerPlan: Option[Plan] = _trainerPlan
+  def setTrainerPlan(myTrainer: Plan): Unit = {
+    if (trainerPlan.isEmpty) {
+      _trainerPlan = Some(myTrainer)
+    }
+  }
+
   def trainee: Option[FriendlyUnitInfo] = traineeCache()
   private val traineeCache = new Cache[Option[FriendlyUnitInfo]](() =>
     if (training)

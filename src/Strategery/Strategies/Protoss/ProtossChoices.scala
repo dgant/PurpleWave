@@ -21,7 +21,8 @@ object ProtossChoices {
     ProtossHuntersFFAAggroGateway,
     ProtossHuntersFFAFFEScoutReaver,
     ProtossHuntersFFAFFECarriers,
-    CarriersFromAnIsland
+    PvEIslandPlasmaCarriers3Base,
+    PvEIslandPlasmaCarriers1Base
   )
   
   /////////
@@ -113,7 +114,7 @@ object ProtossChoices {
     WorkerRush,
     MassPhotonCannon,
     ProxyDarkTemplar,
-    CarriersFromAnIsland,
+    PvEIslandPlasmaCarriers3Base,
     CarriersWithNoDefense,
     DarkArchonsWithNoDefense,
     ProtossBigFFACarriers)

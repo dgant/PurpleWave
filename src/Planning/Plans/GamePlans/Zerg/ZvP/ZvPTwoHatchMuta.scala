@@ -138,7 +138,7 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
   
   class ReactiveZerglings extends If(
     new UnitsAtMost(0, Zerg.Spire, complete = true),
-    new TrainMatchingRatio(Zerg.Zergling, 0, 10, Seq(
+    new PumpMatchingRatio(Zerg.Zergling, 0, 10, Seq(
       Enemy(Terran.Marine, 1.5),
       Enemy(Terran.Firebat, 3.0),
       Enemy(Terran.Vulture, 2.0),
@@ -181,7 +181,7 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
     new If(
       new EnemyHasShown(Protoss.Corsair),
       new Pump(Zerg.Scourge, 2)),
-    new TrainMatchingRatio(Zerg.Scourge, 0, 10,
+    new PumpMatchingRatio(Zerg.Scourge, 0, 10,
       Seq(
         Enemy(UnitMatchOr(Terran.Valkyrie, Terran.Wraith, Protoss.Corsair, Protoss.Stargate, Zerg.Mutalisk), 2.0),
         Enemy(UnitMatchOr(Zerg.Scourge), 1.0))),
@@ -190,7 +190,7 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
         new MiningBasesAtLeast(3),
         new UnitsAtLeast(6, Zerg.Mutalisk),
         new UpgradeComplete(Zerg.ZerglingSpeed, 1, Zerg.Zergling.buildFrames)),
-      new TrainMatchingRatio(Zerg.Zergling, 0, 18, Seq(
+      new PumpMatchingRatio(Zerg.Zergling, 0, 18, Seq(
         Enemy(Terran.Marine, 1.5),
         Enemy(Terran.Goliath, 4.0),
         Enemy(Protoss.Dragoon, 3.0),

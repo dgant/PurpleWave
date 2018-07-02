@@ -8,7 +8,7 @@ import Planning.Plans.Army.Aggression
 import Planning.Plans.Compound.{Or, Parallel, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTIdeas.TrainMinimumDragoons
+import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTIdeas.PumpMinimumDragoons
 import Planning.Plans.Macro.Automatic.{PumpWorkers, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -277,7 +277,7 @@ class PvTBasic extends GameplanModeTemplate {
               new EnemiesAtLeast(1, Terran.Vulture))),
           new ObserverTech)),
       new Parallel(
-        new TrainMinimumDragoons,
+        new PumpMinimumDragoons,
         new ObserverTech,
         new LateGameTech,
         new FlipIf(

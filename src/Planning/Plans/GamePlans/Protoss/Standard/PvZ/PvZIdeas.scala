@@ -6,7 +6,7 @@ import Planning.Predicates.Compound.{And, Check}
 import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
-import Planning.Plans.Macro.Automatic.{Enemy, Pump, TrainMatchingRatio, UpgradeContinuously}
+import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpMatchingRatio, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
@@ -82,8 +82,8 @@ object PvZIdeas {
         Get(1, Protoss.Assimilator),
         Get(1, Protoss.CyberneticsCore)),
       new Parallel(
-        new TrainMatchingRatio(Protoss.Corsair, 3, 8,   Seq(Enemy(Zerg.Mutalisk, 0.9))),
-        new TrainMatchingRatio(Protoss.Dragoon, 0, 10,  Seq(Enemy(Zerg.Mutalisk, 1.25))),
+        new PumpMatchingRatio(Protoss.Corsair, 3, 8,   Seq(Enemy(Zerg.Mutalisk, 0.9))),
+        new PumpMatchingRatio(Protoss.Dragoon, 0, 10,  Seq(Enemy(Zerg.Mutalisk, 1.25))),
         new Pump(Protoss.Stargate, 1),
         new Build(Get(Protoss.DragoonRange)))))
   
@@ -94,7 +94,7 @@ object PvZIdeas {
       new UnitsAtMost(8, UnitMatchWarriors)),
     new Parallel(
       new PlacementForgeFastExpand,
-      new TrainMatchingRatio(Protoss.PhotonCannon, 2, 8,
+      new PumpMatchingRatio(Protoss.PhotonCannon, 2, 8,
         Seq(
           Enemy(Zerg.Zergling, 0.3),
           Enemy(Zerg.Hydralisk, 0.75)))))

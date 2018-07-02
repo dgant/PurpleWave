@@ -6,7 +6,7 @@ import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.UnitMatchers.{UnitMatchCustom, UnitMatchOr, UnitMatchWarriors}
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Macro.Automatic.{Enemy, Pump, TrainMatchingRatio}
+import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpMatchingRatio}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
 import Planning.Predicates.Milestones._
@@ -53,7 +53,7 @@ object PvTIdeas {
         new Pump(Protoss.Zealot),
         new Build(Get(2, Protoss.Gateway)))))
   
-  class TrainMinimumDragoons extends TrainMatchingRatio(
+  class PumpMinimumDragoons extends PumpMatchingRatio(
     Protoss.Dragoon, 1, 20,
     Seq(
       Enemy(Terran.Vulture, 0.6),
@@ -81,7 +81,7 @@ object PvTIdeas {
           new UnitsAtLeast(3, UnitMatchWarriors),
           new Pump(Protoss.Observer, 1)))))
   
-  class TrainReaversAgainstBio extends TrainMatchingRatio(Protoss.Reaver, 0, 5, Seq(Enemy(Terran.Marine, 1.0/6.0)))
+  class PumpReaversAgainstBio extends PumpMatchingRatio(Protoss.Reaver, 0, 5, Seq(Enemy(Terran.Marine, 1.0/6.0)))
   
   class TrainHighTemplarWithSpareGas extends If(
     new GasAtLeast(800),
@@ -89,7 +89,7 @@ object PvTIdeas {
   
   class TrainHighTemplarAgainstBio extends If(
     new EnemyBio,
-    new TrainMatchingRatio(Protoss.HighTemplar, 1, 6, Seq(Enemy(Terran.Marine, 1.0/5.0))))
+    new PumpMatchingRatio(Protoss.HighTemplar, 1, 6, Seq(Enemy(Terran.Marine, 1.0/5.0))))
   
   class TrainScouts extends If(
     new And(
@@ -114,9 +114,9 @@ object PvTIdeas {
   
   class TrainArmy extends Parallel(
     new TrainDarkTemplar,
-    new TrainReaversAgainstBio,
+    new PumpReaversAgainstBio,
     new TrainObservers,
-    new TrainMinimumDragoons,
+    new PumpMinimumDragoons,
     new TrainHighTemplarAgainstBio,
     new FlipIf(
       new Check(() => With.units.countOurs(Protoss.Carrier) >= Math.max(8, 4 * With.units.countOurs(Protoss.Arbiter))),

@@ -16,7 +16,8 @@ object Move extends Action {
     
     if (unit.agent.shouldEngage
       && With.reaction.agencyAverage > 12
-      && ! unit.unitClass.isWorker) {
+      && ! unit.unitClass.isWorker
+      && unit.canAttack) {
       With.commander.attackMove(unit, pixelToMove)
     }
     else {

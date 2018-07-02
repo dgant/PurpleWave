@@ -1,6 +1,6 @@
 package Strategery.Strategies.Protoss
 
-import Strategery.{MapGroups, StarCraftMap}
+import Strategery.{BlueStorm, MapGroups, StarCraftMap}
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
@@ -21,4 +21,6 @@ object PvPOpenProxy2Gate          extends PvPOpening {
 }
 
 object PvPLateGameCarrier extends Strategy
-object PvPLateGameArbiter extends Strategy
+object PvPLateGameArbiter extends Strategy {
+  override def prohibitedMaps: Iterable[StarCraftMap] = Iterable(BlueStorm)
+}

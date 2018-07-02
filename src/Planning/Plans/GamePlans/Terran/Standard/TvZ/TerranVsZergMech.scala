@@ -52,7 +52,7 @@ class TerranVsZergMech extends  GameplanModeTemplate {
     new If(new UnitsAtLeast(20, UnitMatchWarriors),         new RequireMiningBases(3)),
     new If(new UnitsAtLeast(30, UnitMatchWarriors),         new RequireMiningBases(4)),
   
-    new TrainMatchingRatio(Terran.Valkyrie, 0, 4, Seq(
+    new PumpMatchingRatio(Terran.Valkyrie, 0, 4, Seq(
       Enemy(Zerg.Mutalisk,  0.25),
       Enemy(Zerg.Guardian,  0.25))),
     
@@ -64,11 +64,11 @@ class TerranVsZergMech extends  GameplanModeTemplate {
         new Pump(Terran.Wraith)),
       new Pump(Terran.ScienceVessel, 4)),
   
-    new TrainMatchingRatio(Terran.Goliath, 1, Int.MaxValue, Seq(
+    new PumpMatchingRatio(Terran.Goliath, 1, Int.MaxValue, Seq(
       Enemy(Zerg.Mutalisk,  1.0),
       Enemy(Zerg.Guardian,  2.0))),
   
-    new TrainMatchingRatio(Terran.SiegeTankUnsieged, 3, Int.MaxValue, Seq(
+    new PumpMatchingRatio(Terran.SiegeTankUnsieged, 3, Int.MaxValue, Seq(
       Enemy(Zerg.Ultralisk,        2.0),
       Enemy(Zerg.Hydralisk,        0.4),
       Enemy(Zerg.Lurker,           0.6))),

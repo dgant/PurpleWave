@@ -1,6 +1,6 @@
 package Strategery.Strategies.Protoss
 
-import Strategery.{MapGroups, StarCraftMap}
+import Strategery.{BlueStorm, MapGroups, StarCraftMap}
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
@@ -34,9 +34,9 @@ object PvTEarly1015GateGoonDT extends PvTStrategy {
       PvT3BaseArbiter,
       PvT3BaseCarrier))
 }
-object PvT2BaseCarrier extends PvTStrategy
+object PvT2BaseCarrier extends PvTStrategy  { override val prohibitedMaps = Iterable(BlueStorm) }
 object PvT3BaseCarrier extends PvTStrategy { override val prohibitedMaps = MapGroups.badForFastThirdBases }
-object PvT2BaseArbiter extends PvTStrategy
+object PvT2BaseArbiter extends PvTStrategy { override val prohibitedMaps = Iterable(BlueStorm) }
 object PvT3BaseArbiter extends PvTStrategy { override val prohibitedMaps = MapGroups.badForFastThirdBases }
 
 object PvTEarly1GateStargateTemplar extends PvTStrategy {

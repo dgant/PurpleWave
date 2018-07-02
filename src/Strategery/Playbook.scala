@@ -18,6 +18,7 @@ class EmptyPlaybook {
   lazy val forced   : Seq[Strategy] = none
   lazy val disabled : Seq[Strategy] = none
   val strategyOrder: Seq[Strategy] = Vector(
+    PvEIslandPlasmaCarriers1Base,
     PvTEarly1015GateGoonDT,
     PvT2GateObserver,
     PvT13Nexus,

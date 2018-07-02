@@ -29,7 +29,7 @@ object BaseUpdater {
     // Assume ownership of occupied base we haven't seen lately
     if (base.owner.isNeutral && With.framesSince(base.lastScoutedFrame) > Protoss.Nexus.buildFrames) {
       val building = base.zone.units.find(unit => unit.isEnemy && ! unit.flying && unit.unitClass.isBuilding)
-      if (building.exists(_.lastSeen > base.lastScoutedFrame + GameTime(0, 15)())) {
+      if (building.exists(_.lastSeen > base.lastScoutedFrame + GameTime(2, 0)())) {
         base.owner = building.get.player
       }
     }

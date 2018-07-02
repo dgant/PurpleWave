@@ -91,6 +91,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   
   def nextWaypoint(to: Pixel): Pixel = {
     if (unit.flying) return to
+    if ( ! With.strategy.map.forall(_.trustGroundDistance)) return to
     if ( ! cachedWaypoint.contains(to)) {
       val path = zonePath(to)
       cachedWaypoint(to) =

@@ -81,19 +81,19 @@ class TerranVsTerranOld extends GameplanModeTemplate {
     new If(new UnitsAtLeast(30, UnitMatchWarriors),         new UpgradeContinuously(Terran.MechArmor)),
   
     new Pump(Terran.Comsat),
-    new TrainMatchingRatio(Terran.Goliath, 1, Int.MaxValue, Seq(
+    new PumpMatchingRatio(Terran.Goliath, 1, Int.MaxValue, Seq(
         Enemy(Terran.Battlecruiser, 3.0),
         Enemy(Terran.Wraith,        0.75),
         Enemy(Terran.Vulture,       0.5))),
     
     new Pump(Terran.Battlecruiser),
-    new TrainMatchingRatio(Terran.SiegeTankUnsieged, 3, Int.MaxValue, Seq(
+    new PumpMatchingRatio(Terran.SiegeTankUnsieged, 3, Int.MaxValue, Seq(
       Enemy(UnitMatchSiegeTank, 1.25),
       Enemy(Terran.Goliath,     0.75),
       Enemy(Terran.Wraith,      0.75),
       Enemy(Terran.Vulture,     0.5))),
   
-    new TrainMatchingRatio(Terran.Wraith, 3, Int.MaxValue, Seq(
+    new PumpMatchingRatio(Terran.Wraith, 3, Int.MaxValue, Seq(
       Enemy(Terran.Wraith,      1.5),
       Enemy(Terran.Vulture,     0.25))),
     

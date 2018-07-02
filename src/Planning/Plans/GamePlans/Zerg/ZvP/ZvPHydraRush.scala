@@ -93,8 +93,8 @@ class ZvPHydraRush extends GameplanModeTemplate {
       new UpgradeContinuously(Zerg.HydraliskRange)),
     new If(
       new UnitsAtLeast(1, Zerg.HydraliskDen, complete = true),
-      new TrainJustEnoughHydralisks,
-      new TrainJustEnoughZerglings),
+      new PumpJustEnoughHydralisks,
+      new PumpJustEnoughZerglings),
     new Trigger(new GasAtLeast(75), new UpgradeContinuously(Zerg.ZerglingSpeed)),
     new Trigger(new UpgradeStarted(Zerg.ZerglingSpeed), new Build(Get(Zerg.HydraliskDen))),
     new If(new UnitsAtLeast(24, Zerg.Drone), new BuildGasPumps),

@@ -7,7 +7,7 @@ import Micro.Squads.Goals.GoalDroneBlockRamp
 import Planning.Plans.Army.{Attack, EjectScout, SquadPlan}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpMutalisks, ScoutSafelyWithOverlord, TrainJustEnoughScourge, TrainJustEnoughZerglings}
+import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpMutalisks, ScoutSafelyWithOverlord, TrainJustEnoughScourge, PumpJustEnoughZerglings}
 import Planning.Plans.Macro.Automatic.{CapGasAtRatioToMinerals, Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.BuildOrder
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases}
@@ -101,7 +101,7 @@ class ZvPThirteenPoolMuta extends GameplanModeTemplate {
               With.fingerprints.gatewayFe,
               With.fingerprints.oneGateCore),
             new Parallel(
-              new TrainJustEnoughZerglings(3, 7),
+              new PumpJustEnoughZerglings(3, 7),
               new BuildSunkensAtNatural(1)))))),
     new BuildOrder(
       Get(23, Zerg.Drone),

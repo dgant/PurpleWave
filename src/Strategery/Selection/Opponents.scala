@@ -20,7 +20,7 @@ object Opponents {
   
   val mcrave        : Opponent = add(Opponent("McRave",       StrategySelectionDynamic))
   val titaniron     : Opponent = add(Opponent("TitanIron",    new StrategySelectionRecommended(StrategySelectionDynamic, PvTEarly1015GateGoonDT, PvT2BaseCarrier)))
-  val locutus       : Opponent = add(Opponent("Locutus",      StrategySelectionDynamic))
+  val locutus       : Opponent = add(Opponent("Locutus",      new StrategySelectionRecommended(StrategySelectionDynamic, PvPOpenProxy2Gate, PvPOpen2Gate1012, PvPLateGameArbiter)))
   val tscmoo        : Opponent = add(Opponent("tscmoo",       StrategySelectionGreedy))
   val iron          : Opponent = add(Opponent("Iron",         new StrategySelectionFixed(PvTEarly1015GateGoonDT, PvT2BaseCarrier)))
   val letabot       : Opponent = add(Opponent("LetaBot",      new StrategySelectionRecommended(StrategySelectionGreedy, PvT13Nexus, PvT2BaseCarrier)))

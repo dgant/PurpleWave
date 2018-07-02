@@ -7,7 +7,7 @@ import Mathematics.PurpleMath
 
 object ShowRushDistances extends View {
   
-  /*
+  /****************
   Known ramp widths
   -----------------
   Andromeda: 160 (because it's cut incorrectly)
@@ -63,9 +63,10 @@ object ShowRushDistances extends View {
   Neo Aztec: 5107 - 5305 - 5484
   Neo Chupung-Ryeong: 4569
   Neo Sniper Ridge: 4640 - 5163 - 5881
+  Plasma: 2440 - 2659 - 3072
   Ride of the Valkyries: ???
   Tau Cross: 5318 - 5538 - 5731
-  */
+  *****************************/
   override def renderScreen() {
     val x = 5
     val y = 1 * With.visualization.lineHeightSmall

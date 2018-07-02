@@ -101,18 +101,18 @@ class ZergSparkle extends GameplanModeTemplate {
           new EnemyHasShownWraithCloak,
           new UpgradeContinuously(Zerg.OverlordSpeed)),
   
-        new TrainMatchingRatio(Zerg.Scourge, 0, 20,
+        new PumpMatchingRatio(Zerg.Scourge, 0, 20,
           Seq(
             Enemy(Terran.Wraith, 2.0),
             Enemy(Terran.Battlecruiser, 4.0),
             Enemy(Protoss.Carrier, 6.0))),
   
-        new TrainMatchingRatio(Zerg.Devourer, 0, 20, Seq(Enemy(Protoss.Corsair, 0.25))),
-        new TrainMatchingRatio(Zerg.Scourge, 0, 8, Seq(Enemy(Protoss.Corsair, 2.0))),
+        new PumpMatchingRatio(Zerg.Devourer, 0, 20, Seq(Enemy(Protoss.Corsair, 0.25))),
+        new PumpMatchingRatio(Zerg.Scourge, 0, 8, Seq(Enemy(Protoss.Corsair, 2.0))),
         
         new If(
           new UnitsAtLeast(3, Zerg.Mutalisk),
-          new TrainMatchingRatio(Zerg.Scourge, 0, 20, Seq(Enemy(Zerg.Mutalisk, 2.0)))),
+          new PumpMatchingRatio(Zerg.Scourge, 0, 20, Seq(Enemy(Zerg.Mutalisk, 2.0)))),
   
         new If(
           new And(

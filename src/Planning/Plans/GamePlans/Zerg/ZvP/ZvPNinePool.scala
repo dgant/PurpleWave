@@ -4,7 +4,7 @@ import Macro.BuildRequests.{Get, GetAnother}
 import Planning.Plans.Army.{Aggression, AllIn, Attack, EjectScout}
 import Planning.Plans.Compound.{If, Parallel, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpMutalisks, ScoutSafelyWithOverlord, TrainJustEnoughScourge, TrainJustEnoughZerglings}
+import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpMutalisks, ScoutSafelyWithOverlord, TrainJustEnoughScourge, PumpJustEnoughZerglings}
 import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas._
 import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -98,7 +98,7 @@ class ZvPNinePool extends GameplanModeTemplate {
           new Pump(Zerg.Drone, 12),
           new Build(Get(1, Zerg.SpawningPool), Get(1, Zerg.Extractor), Get(1, Zerg.HydraliskDen)),
           new UpgradeContinuously(Zerg.HydraliskSpeed),
-          new TrainMatchingRatio(Zerg.Hydralisk, 0, 4, Seq(Enemy(Protoss.Zealot, 1.0))),
+          new PumpMatchingRatio(Zerg.Hydralisk, 0, 4, Seq(Enemy(Protoss.Zealot, 1.0))),
           new If(
             new UpgradeComplete(Zerg.HydraliskSpeed),
             new UpgradeContinuously(Zerg.HydraliskRange)),
@@ -153,7 +153,7 @@ class ZvPNinePool extends GameplanModeTemplate {
               new BuildGasPumps(1),
               new TakeSecondGasForMuta,
               new TakeThirdGasForMuta,
-              new TrainJustEnoughZerglings,
+              new PumpJustEnoughZerglings,
               new Pump(Zerg.Drone, 25),
               new If(
                 new UnitsAtLeast(1, Zerg.Extractor, complete = true),
@@ -182,7 +182,7 @@ class ZvPNinePool extends GameplanModeTemplate {
               new Build(
                 Get(1, Zerg.Extractor),
                 Get(1, Zerg.HydraliskDen)),
-              new TrainJustEnoughZerglings,
+              new PumpJustEnoughZerglings,
               new Pump(Zerg.Drone))),
 
           // Transition to 3-Hatch Muta

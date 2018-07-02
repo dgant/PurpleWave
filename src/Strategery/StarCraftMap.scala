@@ -20,6 +20,7 @@ abstract class StarCraftMap {
   val trustGroundDistance: Boolean = true
 }
 object Benzene extends StarCraftMap
+object BlueStorm extends StarCraftMap
 object EmpireOfTheSun extends StarCraftMap
 object Gladiator extends StarCraftMap
 object GreatBarrierReef extends StarCraftMap { override val mineralWalkingOkay = false }
@@ -53,7 +54,7 @@ object StarCraftMaps {
 }
 
 object MapGroups {
-  val badForProxying = Vector(Roadrunner, EmpireOfTheSun, TauCross, LaMancha)
+  val badForProxying = Vector(Roadrunner, EmpireOfTheSun, TauCross, LaMancha, BlueStorm)
   val badForFastThirdBases = Vector(Benzene, HeartbreakRidge)
 }
 

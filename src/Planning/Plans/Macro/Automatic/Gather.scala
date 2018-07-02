@@ -142,10 +142,9 @@ class Gather extends Plan {
       )
     
     val safety      = if ( ! worker.zone.bases.exists(_.owner.isUs) || transfersLegal.contains((worker.zone, resource.zone))) 100.0 else 1.0
-    val continuity  = if (resourceByWorker.get(worker).contains(resource)) 10.0 else 1.0
-    val proximity   = resource.base.flatMap(_.townHall).map(_.pixelDistanceEdge(resource)).getOrElse(32 * 12)
+    val continuity  = if (resourceByWorker.get(worker).contains(resource)) 2.0 else 1.0
     val distance    = Math.max(resource.remainingCompletionFrames * worker.topSpeed, worker.pixelDistanceEdge(resource))
-    val distanceFactor = 32 * 180 + distance
+    val distanceFactor = 32 * 30 + distance
 
     val currentWorkerCount = workersByResource(resource).count(_ != worker)
     val saturation  =

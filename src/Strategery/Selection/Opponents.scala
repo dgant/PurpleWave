@@ -23,7 +23,7 @@ object Opponents {
   val locutus       : Opponent = add(Opponent("Locutus",      new StrategySelectionRecommended(StrategySelectionDynamic, PvPOpenProxy2Gate, PvPOpen2Gate1012, PvPLateGameArbiter)))
   val tscmoo        : Opponent = add(Opponent("tscmoo",       StrategySelectionGreedy))
   val iron          : Opponent = add(Opponent("Iron",         new StrategySelectionFixed(PvTEarly1015GateGoonDT, PvT2BaseCarrier)))
-  val letabot       : Opponent = add(Opponent("LetaBot",      new StrategySelectionRecommended(StrategySelectionGreedy, PvT13Nexus, PvT2BaseCarrier)))
+  val letabot       : Opponent = add(Opponent("LetaBot",      new StrategySelectionRecommended(StrategySelectionGreedy, PvTReaverCarrierCheese)))
   val steamhammer   : Opponent = add(Opponent("Steamhammer",  new StrategySelectionRecommended(StrategySelectionDynamic, PvZ4Gate99, PvZMidgameGatewayAttack)))
   val microwave     : Opponent = add(Opponent("Microwave",    new StrategySelectionRecommended(StrategySelectionDynamic, PvZ4Gate99, PvZMidgameGatewayAttack)))
   val megabot       : Opponent = add(Opponent("MegaBot",      defaultPvP)) // TODO: Fixed

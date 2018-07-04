@@ -4,9 +4,12 @@ import Strategery.{BlueStorm, MapGroups, StarCraftMap}
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
-class PvPOpening extends Strategy {
+class PvPStrategy extends Strategy {
   override def ourRaces   : Iterable[Race]  = Vector(Race.Protoss)
   override def enemyRaces : Iterable[Race]  = Vector(Race.Protoss)
+}
+
+class PvPOpening extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(PvPLateGameCarrier, PvPLateGameArbiter))
 }
 
@@ -20,7 +23,7 @@ object PvPOpenProxy2Gate          extends PvPOpening {
   override def prohibitedMaps: Iterable[StarCraftMap] = MapGroups.badForProxying
 }
 
-object PvPLateGameCarrier extends Strategy
-object PvPLateGameArbiter extends Strategy {
+object PvPLateGameCarrier extends PvPStrategy
+object PvPLateGameArbiter extends PvPStrategy {
   override def prohibitedMaps: Iterable[StarCraftMap] = Iterable(BlueStorm)
 }

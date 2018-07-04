@@ -25,6 +25,7 @@ object EmpireOfTheSun extends StarCraftMap
 object Gladiator extends StarCraftMap
 object GreatBarrierReef extends StarCraftMap { override val mineralWalkingOkay = false }
 object HeartbreakRidge extends StarCraftMap
+object Hitchhiker extends StarCraftMap
 object Hunters extends StarCraftMap
 object LaMancha extends StarCraftMap
 object Plasma extends StarCraftMap { override val trustGroundDistance: Boolean = false }

@@ -71,7 +71,7 @@ class PvPLateGame extends GameplanModeTemplate {
       new UpgradeContinuously(Protoss.GroundArmor)),
     new UpgradeContinuously(Protoss.GroundDamage),
     new Build(Get(2, Protoss.Forge)))
-  
+
   class BuildTech extends Parallel(
     new Build(Get(1, Protoss.Gateway)),
     new Build(

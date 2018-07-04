@@ -1,6 +1,8 @@
 package Strategery.Strategies.Protoss
 
-import Strategery.{BlueStorm, MapGroups, StarCraftMap}
+import Planning.Plan
+import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTReaverCarrierCheese
+import Strategery.{BlueStorm, Hitchhiker, MapGroups, StarCraftMap}
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
@@ -47,4 +49,9 @@ object PvTEarly1GateStargateTemplar extends PvTStrategy {
 object PvTProxy2Gate extends PvTStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(ProtossChoices.pvtOpenersTransitioningFrom2Gate)
   override def prohibitedMaps: Iterable[StarCraftMap] = MapGroups.badForProxying
+}
+
+object PvTReaverCarrierCheese extends PvTStrategy {
+  override def gameplan: Option[Plan] = Some(new PvTReaverCarrierCheese)
+  override def restrictedOpponents: Option[Iterable[String]] = Some(Vector("Rooijackers", "Leta"))
 }

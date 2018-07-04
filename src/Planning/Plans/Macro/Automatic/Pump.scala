@@ -30,7 +30,7 @@ class Pump(
     val buildersReadiness         = getBuilderReadiness(buildersExisting)
     val buildersTotal             = buildersExisting.size + buildersSpawning
     val buildersAllocatable       = Math.max(0, Math.min(buildersTotal * maximumConcurrentlyRatio, buildersTotal - buildersReserved))
-    val builderOutputCap          = Math.max(Math.round(buildersReadiness * buildersAllocatable), if (buildersExisting.nonEmpty) 1 else 0)
+    val builderOutputCap          = Math.round(buildersReadiness * buildersAllocatable)
     
     val minerals                  = With.self.minerals  // To improve: Measure existing expediture commitments
     val gas                       = With.self.gas       // To improve: Measure existing expediture commitments
@@ -109,7 +109,7 @@ class Pump(
       && builder.remainingCompletionFrames < unitClass.buildFrames
       && ( unitClass != Terran.NuclearMissile                           || ! builder.hasNuke)
       && ( ! unitClass.isAddon                                          || builder.addon.isEmpty)
-      && ( ! unitClass.isAddon                                          || unitClass.buildUnitsEnabling.forall(t => With.units.ours.exists(u => u.complete && u.is(t)))) // Hack -- don't reserve buildings before we have the tech to build the addon.
+      && ( ! unitClass.isAddon                                          || unitClass.buildUnitsEnabling.forall(t => With.units.ours.exists(u => u.completeOrNearlyComplete && u.is(t)))) // Hack -- don't reserve buildings before we have the tech to build the addon.
       && ( ! unitClass.buildUnitsEnabling.contains(Terran.MachineShop)  || builder.addon.isDefined)
       && ( ! unitClass.buildUnitsEnabling.contains(Terran.ControlTower) || builder.addon.isDefined))
   

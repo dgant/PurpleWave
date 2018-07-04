@@ -31,7 +31,8 @@ object ProtossChoices {
   
   val pvtOpenersWithoutTransitions = Vector(
     PvTProxy2Gate,
-    PvT13Nexus
+    PvT13Nexus,
+    PvTReaverCarrierCheese
   )
   
   val pvtOpenersTransitioningFrom1Gate = Vector(

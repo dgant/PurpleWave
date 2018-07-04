@@ -77,7 +77,7 @@ class CIGPlaybook extends PurpleWavePlaybook {
 }
 
 class TestingCIGPlaybook extends CIGPlaybook {
-  override def enemyName: String = "ZZZKBot"
+  override def enemyName: String = "LetaBot"
 }
 
-object Playbook extends CIGPlaybook {}
+object Playbook extends TestingCIGPlaybook {}

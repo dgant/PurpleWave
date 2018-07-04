@@ -7,11 +7,11 @@ import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.NoPlan
-import Planning.Plans.Compound.{FlipIf, If, Or, Trigger}
+import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational.BuildHuggingNexus
-import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, UpgradeContinuously}
+import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
@@ -72,7 +72,8 @@ class PvZ4Gate extends GameplanModeTemplate {
     new Trigger(
       new Or(
         new MineralsAtLeast(800),
-        new UnitsAtLeast(24, UnitMatchWarriors)),
+        new UnitsAtLeast(24, UnitMatchWarriors),
+        new EnemiesAtLeast(4, Zerg.SunkenColony, complete = true)),
       new RequireMiningBases(2)),
   
     new If(
@@ -81,24 +82,16 @@ class PvZ4Gate extends GameplanModeTemplate {
 
     new FlipIf(
       new UnitsAtLeast(6, UnitMatchWarriors),
-      new If(
-        new And(
-          new GasAtLeast(50),
-          new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
-          new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeFrames(1)),
-          new Or(
-            new UnitsAtLeast(15, Protoss.Zealot),
-            new Check(() => With.units.countOurs(Protoss.Zealot) > With.units.countOurs(Protoss.Dragoon)),
-            new Check(() => With.units.countEnemy(Zerg.Mutalisk) * 1.5 > With.units.countOurs(Protoss.Dragoon)),
-            new And(
-              new RespectMutalisks,
-              new UnitsAtMost(10, Protoss.Dragoon)))),
-        new Pump(Protoss.Dragoon),
+      new Parallel(
+        new PumpMatchingRatio(Protoss.Dragoon, 0, 20, Seq(Enemy(Zerg.Mutalisk, 1.0), Enemy(Zerg.Lurker, 1.0))),
+        new PumpMatchingRatio(Protoss.Zealot, 0, 20, Seq(Enemy(Zerg.Zergling, 0.3))),
         new If(
-          new Or(
-            new Not(new RespectMutalisks),
-            new UnitsAtLeast(6, Protoss.Dragoon)),
-          new Pump(Protoss.Zealot))),
+          new And(
+            new GasAtLeast(50),
+            new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
+            new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeFrames(1))),
+          new Pump(Protoss.Dragoon)),
+        new Pump(Protoss.Zealot)),
       new PumpWorkers),
 
     new Build(

@@ -1,6 +1,7 @@
 package Strategery.History
 
 import Lifecycle.With
+import Strategery.Playbook
 import Utilities.CountMap
 import bwapi.Race
 
@@ -12,7 +13,7 @@ class History {
   
   lazy val currentMapName   : String  = With.game.mapFileName
   lazy val currentStarts    : Int     = With.game.getStartLocations.size
-  lazy val currentEnemyName : String  = With.enemy.name
+  lazy val currentEnemyName : String  = Playbook.enemyName
   lazy val currentEnemyRace : Race    = With.enemy.raceInitial
   
   var message = new mutable.ArrayBuffer[String]

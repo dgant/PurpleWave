@@ -21,13 +21,15 @@ class MeldArchons(maxEnergy: Int = 250) extends Plan {
     // Fast check
     val proceed = With.self.isProtoss && With.units.existsOurs(Protoss.HighTemplar)
     if ( ! proceed) return
-    
+
+    val templarNow    = With.units.countOurs(Protoss.HighTemplar)
     val templarLow    = With.units.countOursP(u => u.is(Protoss.HighTemplar) && u.energy < maxEnergy)
-    val templarExcess = With.units.countOurs(Protoss.HighTemplar) - maximumTemplar
+    val templarExcess = templarNow - maximumTemplar
     val archonsNow    = With.units.countOurs(Protoss.Archon)
     val archonsToAdd  = Vector(0, minimumArchons - archonsNow, templarExcess / 2).max
     val templarToMeld = Math.max(templarLow, 2 * archonsToAdd)
     templar.unitCounter.set(new UnitCountBetween(0, templarToMeld))
+    With.blackboard.keepingHighTemplar.set(templarExcess < templarNow)
     
     templar.release()
     templar.acquire(this)

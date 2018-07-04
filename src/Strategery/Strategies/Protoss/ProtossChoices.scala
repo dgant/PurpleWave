@@ -32,7 +32,6 @@ object ProtossChoices {
   val pvtOpenersWithoutTransitions = Vector(
     PvTProxy2Gate,
     PvT13Nexus,
-    PvTReaverCarrierCheese
   )
   
   val pvtOpenersTransitioningFrom1Gate = Vector(
@@ -118,7 +117,8 @@ object ProtossChoices {
     PvEIslandPlasmaCarriers3Base,
     CarriersWithNoDefense,
     DarkArchonsWithNoDefense,
-    ProtossBigFFACarriers)
+    ProtossBigFFACarriers,
+    PvTReaverCarrierCheese)
   
   val standardOpeners: Vector[Strategy] = (pvr ++ pvtOpenersAll ++ pvpOpenersAll ++ pvzOpenersAll).distinct
   

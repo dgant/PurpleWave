@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Predicates.Compound.{And, Check, Not}
+import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.UnitMatchers._
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, _}
@@ -153,17 +153,20 @@ object PvPIdeas {
     new RequireMiningBases(2))
   
   class TakeBase3 extends If(
-    new Or(
-      new UnitsAtLeast(40, UnitMatchWarriors),
-      new And(
-        new SafeAtHome,
-        new Or(
-          new EnemyCarriers,
-          new EnemyBasesAtLeast(3)))),
-    new RequireMiningBases(2))
+    new And(
+      new Latch(new UnitsAtLeast(1, Protoss.Observer, complete = true)),
+      new Or(
+        new UnitsAtLeast(40, UnitMatchWarriors),
+        new And(
+          new SafeAtHome,
+          new Or(
+            new EnemyCarriers,
+            new EnemyBasesAtLeast(3))))),
+    new RequireMiningBases(3))
   
   class MeldArchonsPvP extends MeldArchons(49) {
     override def minimumArchons: Int = Math.min(8, With.units.countEnemy(Protoss.Zealot) / 3)
+    override def maximumTemplar: Int = Math.max(0, (With.units.countEnemy(UnitMatchWarriors) - 20) / 6)
     templar.unitMatcher.set(UnitMatchAnd(Protoss.HighTemplar, UnitMatchEnergyAtMost(75)))
   }
   

@@ -237,14 +237,14 @@ class PvTBasic extends GameplanModeTemplate {
     new If(
       new And(
         new EmployingArbiters,
-        new HaveGasPumps(3)),
+        new GasPumpsAtLeast(3)),
       new Build(
         Get(2, Protoss.Stargate),
         Get(2, Protoss.Forge))),
     new If(
       new And(
         new EmployingCarriers,
-        new HaveGasPumps(3)),
+        new GasPumpsAtLeast(3)),
       new Parallel(
         new Build(
           Get(2, Protoss.CyberneticsCore),

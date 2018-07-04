@@ -84,9 +84,11 @@ class Strategist {
     lazy val appropriateForEnemyRace  = strategy.enemyRaces.exists(race => if (race == Race.Unknown) enemyRaceWasUnknown else (enemyRaceStillUnknown || enemyRacesCurrent.contains(race)))
     lazy val allowedForOpponent       = strategy.restrictedOpponents.isEmpty ||
       strategy.restrictedOpponents.get
-        .map(_.toLowerCase)
-        .exists(key => With.enemies.map(_.name.toLowerCase).exists(_.contains(key)))
-    
+        .map(formatName)
+        .exists(name =>
+          nameMatches(name, Playbook.enemyName)
+          || With.enemies.map(e => formatName(e.name)).exists(nameMatches(_, name)))
+
     val output = (
           ! disabledOnMap
       &&  ! disabledInPlaybook
@@ -102,6 +104,12 @@ class Strategist {
     )
     
     output
+  }
+
+  def formatName(name: String): String = name.toLowerCase.replaceAllLiterally(" ", "")
+
+  def nameMatches(a: String, b: String): Boolean = {
+    formatName(a).contains(formatName(b)) || formatName(b).contains(formatName(a))
   }
   
   private def heyIsThisAnIslandMap = {

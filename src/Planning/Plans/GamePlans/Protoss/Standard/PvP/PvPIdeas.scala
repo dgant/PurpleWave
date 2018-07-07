@@ -54,9 +54,8 @@ object PvPIdeas {
   class AttackSafely extends If(
     new And(
       new Or(
-        new UnitsAtLeast(1, Protoss.Observer, complete = true),
-        new Not(new EnemyDarkTemplarExists),
-        new EnemiesAtMost(0, Protoss.Arbiter)),
+        new UnitsAtLeast(2, Protoss.Observer, complete = true),
+        new Not(new EnemyHasShown(Protoss.DarkTemplar))),
       new Or(
         new EnemyStrategy(With.fingerprints.cannonRush),
         new Employing(PvPOpen4GateGoon),
@@ -77,10 +76,10 @@ object PvPIdeas {
       new Pump(Protoss.Reaver, 2),
       new PumpDragoonsOrZealots,
       new Build(
-        Get(1, Protoss.Gateway),
-        Get(1, Protoss.CyberneticsCore),
-        Get(1, Protoss.RoboticsFacility),
-        Get(1, Protoss.RoboticsSupportBay))))
+        Get(Protoss.Gateway),
+        Get(Protoss.CyberneticsCore),
+        Get(Protoss.RoboticsFacility),
+        Get(Protoss.RoboticsSupportBay))))
 
   class ReactToDarkTemplarEmergencies extends Parallel(new ReactToDarkTemplarExisting, new ReactToDarkTemplarPossible)
   class ReactToDarkTemplarPossible extends If(
@@ -88,11 +87,16 @@ object PvPIdeas {
     new Parallel(
       new If(
         new UnitsAtMost(0, Protoss.Observatory),
+        new Build(Get(Protoss.Forge))),
+      new If(
+        new And(
+          new UnitsAtMost(0, Protoss.Observer, complete = true),
+          new UnitsAtLeast(1, Protoss.Forge)),
         new BuildCannonsAtBases(1)),
       new Build(
-        Get(1, Protoss.RoboticsFacility),
-        Get(1, Protoss.Observatory),
-        Get(1, Protoss.Observer))))
+        Get(Protoss.RoboticsFacility),
+        Get(Protoss.Observatory),
+        Get(Protoss.Observer))))
 
   class ReactToDarkTemplarExisting extends If(
     new EnemyDarkTemplarExists,
@@ -244,6 +248,7 @@ object PvPIdeas {
       new If(
         new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.Zealot.buildFrames),
         new Parallel(
+          new Pump(Protoss.Reaver, 1),
           new Pump(Protoss.HighTemplar),
           new Pump(Protoss.Zealot, 30),
           new PumpDragoonsOrZealots),

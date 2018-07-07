@@ -61,6 +61,7 @@ object StarCraftMaps {
 }
 
 object MapGroups {
+  val badForBigUnits = Vector(BlueStorm)
   val badForProxying = Vector(Alchemist, BlueStorm, ChupungRyeong, EmpireOfTheSun, GreatBarrierReef, LaMancha, Roadrunner, TauCross)
   val badForWalling = Vector(Alchemist)
   val badForFastThirdBases = Vector(Benzene, HeartbreakRidge)

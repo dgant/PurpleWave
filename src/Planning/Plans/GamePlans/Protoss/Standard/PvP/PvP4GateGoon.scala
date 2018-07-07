@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
-import Macro.BuildRequests.BuildRequest
+import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Basic.NoPlan
 import Planning.Predicates.Compound.Latch
 import Planning.{Plan, Predicate}
@@ -8,6 +8,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.Pump
+import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Plans.Scouting.ScoutOn
@@ -32,9 +33,9 @@ class PvP4GateGoon extends GameplanModeTemplate {
   
   override val buildPlans = Vector(
     new If(
-      new UnitsAtLeast(20, Protoss.Dragoon),
+      new UnitsAtLeast(12, Protoss.Dragoon),
       new RequireMiningBases(2)),
-    new Pump(Protoss.Dragoon)
+    new Pump(Protoss.Dragoon),
+    new Build(Get(Protoss.Forge))
   )
-    
 }

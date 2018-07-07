@@ -2,8 +2,8 @@ package Strategery.Strategies.Protoss
 
 import Planning.Plan
 import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTReaverCarrierCheese
-import Strategery.{BlueStorm, Hitchhiker, MapGroups, StarCraftMap}
 import Strategery.Strategies.Strategy
+import Strategery.{BlueStorm, MapGroups, StarCraftMap}
 import bwapi.Race
 
 abstract class PvTStrategy extends Strategy {
@@ -20,7 +20,9 @@ abstract class PvTBasicOpener extends PvTStrategy {
 }
 object PvT13Nexus extends PvTBasicOpener
 object PvT21Nexus extends PvTBasicOpener
-object PvT1015Expand extends PvTBasicOpener
+object PvT1015Expand extends PvTBasicOpener {
+  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
+}
 object PvT2GateObserver extends PvTBasicOpener
 object PvTDTExpand extends PvTBasicOpener {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
@@ -33,8 +35,10 @@ object PvTEarly1015GateGoonDT extends PvTStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     Vector(
       PvT2BaseArbiter,
+      PvT2BaseCarrier,
       PvT3BaseArbiter,
       PvT3BaseCarrier))
+  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
 }
 object PvT2BaseCarrier extends PvTStrategy  { override val mapsBlacklisted = Iterable(BlueStorm) }
 object PvT3BaseCarrier extends PvTStrategy { override val mapsBlacklisted = MapGroups.badForFastThirdBases }

@@ -2,13 +2,14 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
+import Planning.Plans.Army.EjectScout
 import Planning.Plans.Compound.{FlipIf, If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.PumpWorkers
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.{And, Latch}
+import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBasesAtMost, EnemyDarkTemplarLikely, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
@@ -23,7 +24,7 @@ class PvP1GateReaverExpand extends GameplanModeTemplate {
   
   override def defaultWorkerPlan: Plan = new PumpWorkers(true)
   override val defaultAttackPlan: Plan = new PvPIdeas.AttackSafely
-  override def defaultScoutPlan: Plan = new ScoutOn(Protoss.CyberneticsCore)
+  override def defaultScoutPlan: Plan = new ScoutOn(Protoss.Gateway)
   
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvPIdeas.ReactToDarkTemplarEmergencies,
@@ -64,7 +65,9 @@ class PvP1GateReaverExpand extends GameplanModeTemplate {
   )
 
   override def buildPlans = Vector(
-    
+
+    new EjectScout,
+
     new If(
       new UnitsAtLeast(2, Protoss.Reaver, complete = true),
       new RequireMiningBases(2)),
@@ -75,13 +78,15 @@ class PvP1GateReaverExpand extends GameplanModeTemplate {
       new EnemyStrategy(With.fingerprints.twoGate),
       new Build(Get(Protoss.ShieldBattery))),
 
-    new If(
+    new FlipIf(
       new Or(
         new EnemyDarkTemplarLikely,
-        new Latch(new UnitsAtLeast(1, Protoss.Reaver))),
-      new Build(Get(Protoss.Observatory))),
-
-    new Build(Get(Protoss.RoboticsSupportBay)),
+        new EnemyHasShown(Protoss.Forge),
+        new EnemyHasShown(Protoss.PhotonCannon)),
+      new Build(Get(Protoss.RoboticsSupportBay)),
+      new If(
+        new Not(new EnemyHasShown(Protoss.RoboticsFacility)),
+        new Build(Get(Protoss.Observatory)))),
 
     new If(
       new EnemyBasesAtLeast(2),

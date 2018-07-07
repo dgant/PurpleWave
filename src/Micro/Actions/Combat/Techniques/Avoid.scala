@@ -18,10 +18,10 @@ object Avoid extends ActionTechnique {
     && unit.matchups.threats.nonEmpty
   )
   
-  override val applicabilityBase: Double = 0.675
+  override val applicabilityBase: Double = 0.75
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
-    val meleeFactor   = if (unit.unitClass.ranged) 1.0 else 0.75
+    val meleeFactor   = if (unit.unitClass.ranged) 1.0 else 0.7
     val visionFactor  = if (unit.visibleToOpponents) 1.0 else 0.5
     val safetyFactor  = PurpleMath.clampToOne((36.0 + unit.matchups.framesOfEntanglement) / 24.0)
     val output        = meleeFactor * visionFactor * safetyFactor
@@ -54,12 +54,12 @@ object Avoid extends ActionTechnique {
     val bonusRegrouping   = 9.0 / Math.max(24.0, unit.matchups.framesOfEntanglement)
     val bonusMobility     = 1.0
     
-    val forceThreat     = Potential.avoidThreats(unit)      * bonusAvoidThreats
-    val forceSpacing    = Potential.avoidCollision(unit)
-    val forceExiting    = Potential.preferTravelling(unit)  * bonusPreferExit
-    val forceSpreading  = Potential.preferSpreading(unit)
-    val forceRegrouping = Potential.preferRegrouping(unit)  * bonusRegrouping
-    val forceMobility   = Potential.preferMobility(unit)    * bonusMobility
+    val forceThreat       = Potential.avoidThreats(unit)      * bonusAvoidThreats
+    val forceSpacing      = Potential.avoidCollision(unit)
+    val forceExiting      = Potential.preferTravelling(unit)  * bonusPreferExit
+    val forceSpreading    = Potential.preferSpreading(unit)
+    val forceRegrouping   = Potential.preferRegrouping(unit)  * bonusRegrouping
+    val forceMobility     = Potential.preferMobility(unit)    * bonusMobility
     val resistancesTerran = Potential.resistTerrain(unit)
     
     unit.agent.forces.put(ForceColors.threat,         forceThreat)

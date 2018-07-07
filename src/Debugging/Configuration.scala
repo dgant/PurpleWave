@@ -16,7 +16,7 @@ class Configuration {
   var enableVisualizations            = false
   var enableHumanManners              = false
   var identifyGhostUnits              = false
-  var targetFrameDurationMilliseconds = 15
+  var targetFrameDurationMilliseconds = 40
   
   //////////////
   // Strategy //
@@ -24,7 +24,7 @@ class Configuration {
   
   var targetWinrate       = 0.75
   var strategyRandomness  = 0.0
-  var historyHalfLife     = 50.0
+  var historyHalfLife     = 96.0
   
   /////////////
   // Battles //

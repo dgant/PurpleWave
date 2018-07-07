@@ -1,12 +1,12 @@
 package Micro.Actions.Combat.Maneuvering
 
 import Debugging.Visualizations.ForceColors
-import Mathematics.Physics.Force
 import Micro.Actions.Action
-import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Combat.Tactics.Potshot
+import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
+import Planning.UnitMatchers.UnitMatchMobileDetectors
 import Planning.Yolo
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -19,7 +19,8 @@ object Sneak extends Action {
     && ! Yolo.active
     && ! unit.matchups.allies.exists(_.is(Protoss.Arbiter))
     && ! unit.agent.canBerzerk
-    && unit.matchups.enemies.exists(e => e.unitClass.attacksGround && e.complete && ! e.unitClass.isWorker)
+    && unit.matchups.enemies.exists(e => e.complete && ! e.unitClass.isWorker && (if (unit.flying) e.unitClass.attacksGround else e.unitClass.attacksAir))
+    && ! unit.matchups.enemies.exists(_.is(UnitMatchMobileDetectors))
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {

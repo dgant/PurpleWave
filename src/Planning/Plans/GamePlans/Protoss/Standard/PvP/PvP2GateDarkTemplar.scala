@@ -6,15 +6,16 @@ import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
 import Planning.Predicates.Compound.{And, Latch}
 import Planning.Plan
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, RequireSufficientSupply}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
+import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
 import Planning.Predicates.Milestones.{EnemiesAtMost, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Scouting.ScoutOn
+import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen2GateDTExpand
@@ -78,6 +79,7 @@ class PvP2GateDarkTemplar extends GameplanModeTemplate {
   )
   
   override val buildPlans = Vector(
+    new EjectScout,
     new RequireSufficientSupply,
     new If(
       new And(
@@ -85,8 +87,13 @@ class PvP2GateDarkTemplar extends GameplanModeTemplate {
         new EnemiesAtMost(0, Protoss.Observatory),
         new UnitsAtMost(2, Protoss.DarkTemplar)),
         new Pump(Protoss.DarkTemplar, 3, 1)),
-    new Pump(Protoss.Dragoon),
     new PumpWorkers,
-    new BuildCannonsAtNatural(2),
+    new If(
+      new EnemyDarkTemplarLikely,
+      new Parallel(
+        new BuildCannonsAtNatural(3),
+        new BuildCannonsInMain(2)),
+      new BuildCannonsAtNatural(2)),
+    new Pump(Protoss.Dragoon),
     new RequireMiningBases(2))
 }

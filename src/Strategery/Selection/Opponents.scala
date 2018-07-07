@@ -60,6 +60,8 @@ object Opponents {
   val ziabot2           : Opponent = add(Opponent("Zia bot",            ziabot.policy))
   val johankayser       : Opponent = add(Opponent("Johan Kayser",       srbotone.policy))
   val bryanweber        : Opponent = add(Opponent("Bryan Weber",        cunybot.policy))
+
+  val jadien: Opponent = add(Opponent("Jadien", locutus.policy))
   
   val all: Vector[Opponent] = allKnown
 }

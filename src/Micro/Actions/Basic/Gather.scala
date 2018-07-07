@@ -17,7 +17,13 @@ object Gather extends Action {
   private val combatWindow = GameTime(0, 2)()
   
   override def perform(unit: FriendlyUnitInfo) {
-  
+
+    // Performance optimization
+    if (unit.battle.isEmpty) {
+      With.commander.gather(unit, unit.agent.toGather.get)
+      return
+    }
+
     Potshot.consider(unit)
     
     lazy val resource     = unit.agent.toGather.get

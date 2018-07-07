@@ -1,6 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Macro.BuildRequests.{BuildRequest, Get}
+import Planning.Plans.Army.EjectScout
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.BuildOrders.Build
@@ -60,6 +61,8 @@ class PvP2GateRobo extends GameplanModeTemplate {
     Get(Protoss.DragoonRange))
   
   override val buildPlans = Vector(
+
+    new EjectScout,
 
     new Trigger(
       new UnitsAtLeast(2, Protoss.Reaver, complete = true),

@@ -27,12 +27,17 @@ class PvP2BaseReaverCarrier extends GameplanModeTemplate {
     new PvPIdeas.ReactToDarkTemplarEmergencies
   )
 
-  override val defaultAttackPlan = new If(new UnitsAtLeast(24, Protoss.Interceptor), new Attack)
+  override val defaultAttackPlan = new If(
+    new UnitsAtMost(0, Protoss.FleetBeacon),
+    new PvPIdeas.AttackSafely,
+    new If(
+      new UnitsAtLeast(24, Protoss.Interceptor),
+      new Attack))
 
   class TrainCarrierArmy extends Parallel(
     new FlipIf(
-      new UnitsAtLeast(4, Protoss.Reaver),
-      new Pump(Protoss.Reaver),
+      new UnitsAtLeast(3, Protoss.Reaver),
+      new Pump(Protoss.Reaver, 5),
       new Pump(Protoss.Carrier)),
     new If(
       new GasAtLeast(200),
@@ -66,6 +71,6 @@ class PvP2BaseReaverCarrier extends GameplanModeTemplate {
       new UpgradeComplete(Protoss.AirDamage, 3),
       new UpgradeContinuously(Protoss.AirArmor),
       new UpgradeContinuously(Protoss.AirDamage)),
-    new Build(Get(3, Protoss.Gateway))
+    new Build(Get(5, Protoss.Gateway))
   )
 }

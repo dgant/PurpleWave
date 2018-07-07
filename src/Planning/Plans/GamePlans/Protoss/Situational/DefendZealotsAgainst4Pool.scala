@@ -1,6 +1,8 @@
 package Planning.Plans.GamePlans.Protoss.Situational
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
+import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountExactly
@@ -22,7 +24,7 @@ class DefendZealotsAgainst4Pool extends Plan {
     def inOurBase(unit: UnitInfo): Boolean = unit.zone.bases.exists(_.owner.isUs)
     
     val cannons           = With.units.ours .filter(u => u.aliveAndComplete && u.is(Protoss.PhotonCannon))
-    val zealots           = With.units.ours .filter(u => u.aliveAndComplete && u.is(Protoss.Zealot) && inOurBase(u))
+    val zealots           = With.units.ours .filter(u => u.is(Protoss.Zealot) && inOurBase(u) && u.remainingCompletionFrames < GameTime(0, 3)())
     lazy val zerglings    = With.units.enemy.filter(u => u.aliveAndComplete && u.is(Zerg.Zergling)  && inOurBase(u))
     lazy val workers      = With.units.ours.filter(u => u.aliveAndComplete && u.unitClass.isWorker)
     lazy val threatening  = zerglings.filter(_.inPixelRadius(32 * 4).exists(n => n.isOurs && n.totalHealth < 200))
@@ -45,7 +47,7 @@ class DefendZealotsAgainst4Pool extends Plan {
     
     val workersNeeded   = 1 + 3 * zerglings.size - 3 * zealots.size
     val workerCap       = workers.size - 4
-    val workersToFight  = Math.max(0, Math.min(workerCap, workersNeeded))
+    val workersToFight  = PurpleMath.clamp(workersNeeded, 0, workerCap)
     val target          = zealots.minBy(zealot => zerglings.map(_.pixelDistanceEdge(zealot)).min).pixelCenter
     
     defenders.get.unitCounter.set(UnitCountExactly(workersToFight))
@@ -53,6 +55,7 @@ class DefendZealotsAgainst4Pool extends Plan {
     defenders.get.acquire(this)
     defenders.get.units.foreach(_.agent.intend(this, new Intention {
       toTravel = Some(target)
+      canFlee = false
       canBerzerk = true
     }))
   }

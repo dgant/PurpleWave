@@ -2,20 +2,19 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Predicates.Compound.{And, Check, Latch, Not}
-import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.DefendZones
 import Planning.Plans.Compound.{FlipIf, If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.{PumpWorkers, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Expanding.{BuildGasPumps, MatchMiningBases, RequireBases, RequireMiningBases}
-import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
-import Planning.Predicates.Economy.GasAtMost
+import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
+import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, BuildCannonsAtExpansions, BuildCannonsAtNatural}
+import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyCarriers, SafeAtHome, SafeToMoveOut}
 import Planning.Predicates.Strategy.Employing
+import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvPLateGameArbiter, PvPLateGameCarrier}
 
@@ -53,7 +52,8 @@ class PvPLateGame extends GameplanModeTemplate {
   class TemplarTech extends Parallel(
     new Build(
       Get(Protoss.CitadelOfAdun),
-      Get(Protoss.TemplarArchives)),
+      Get(Protoss.TemplarArchives),
+      Get(Protoss.Forge)),
     new If(
       new UnitsAtMost(0, Protoss.Observatory),
       new BuildCannonsAtNatural(2)))
@@ -95,13 +95,16 @@ class PvPLateGame extends GameplanModeTemplate {
       new RoboTech,
       new TemplarTech),
 
-    new If(
-      new Not(new EnemyCarriers),
-      new UpgradeContinuously(Protoss.ZealotSpeed)),
-
     new Build(Get(5, Protoss.Gateway)),
 
-    new OnGasPumps(3, new Upgrades),
+    new If(
+      new Or(
+        new GasPumpsAtLeast(3),
+        new And(
+          new GasPumpsAtLeast(2),
+          new UnitsAtLeast(15, UnitMatchWarriors))),
+        new OnGasPumps(3, new Upgrades)),
+
     new OnGasPumps(4, new Build(Get(Protoss.HighTemplarEnergy))))
 
   class ArbiterTransition extends Build(
@@ -121,9 +124,22 @@ class PvPLateGame extends GameplanModeTemplate {
 
   override val buildPlans = Vector(
 
-    new If(new UnitsAtLeast(1, Protoss.Dragoon), new UpgradeContinuously(Protoss.DragoonRange)),
+    new If(
+      new Not(new EnemyCarriers),
+      new UpgradeContinuously(Protoss.ZealotSpeed)),
+    new If(
+      new Or(
+        new UnitsAtLeast(3, Protoss.Dragoon),
+        new And(
+          new UnitsAtMost(0, Protoss.CitadelOfAdun, complete = true),
+          new Not(new UpgradeComplete(Protoss.ZealotSpeed)))),
+        new UpgradeContinuously(Protoss.DragoonRange)),
 
     new PvPIdeas.TakeBase2,
+
+    new If(
+      new EnemyHasShown(Protoss.DarkTemplar),
+      new BuildCannonsAtBases(1)),
 
     new If(
       new Check(() => With.blackboard.keepingHighTemplar.get),

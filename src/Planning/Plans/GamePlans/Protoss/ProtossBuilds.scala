@@ -93,7 +93,34 @@ object ProtossBuilds {
     Get(2,   Protoss.Zealot),
     Get(16,  Protoss.Probe),
     Get(1,   Protoss.CyberneticsCore))
-  
+
+  // As recommended by Antiga
+  // The pro-style version gets the third Gateway a bit later, at 26
+  // This accepts a slight worker cut, but with mineral locking should
+  // be barely behind on Probes in exchange for a much faster third Gateway
+  val Opening_3GateDragoon = Vector[BuildRequest] (
+    Get(8,  Protoss.Probe),
+    Get(Protoss.Pylon),
+    Get(10, Protoss.Probe),
+    Get(Protoss.Gateway),
+    Get(12, Protoss.Probe),
+    Get(Protoss.Assimilator),
+    Get(13, Protoss.Probe),
+    Get(Protoss.CyberneticsCore),
+    Get(15, Protoss.Probe),
+    Get(2,  Protoss.Pylon),
+    Get(17, Protoss.Probe),
+    Get(1,  Protoss.Dragoon),
+    Get(Protoss.DragoonRange),
+    Get(19, Protoss.Probe),
+    Get(2,  Protoss.Gateway),
+    Get(20, Protoss.Probe),
+    Get(3,  Protoss.Pylon),
+    Get(3,  Protoss.Gateway),
+    Get(3,  Protoss.Dragoon),
+    Get(21, Protoss.Probe)
+  )
+
   val Opening_4GateDragoon = Vector[BuildRequest] (
     Get(1,   Protoss.Nexus),
     Get(8,   Protoss.Probe),

@@ -28,12 +28,16 @@ class PvPOpeningIntoCarriers extends PvPStrategy {
 object PvPOpen1GateReaverExpand   extends PvPOpeningIntoCarriers {
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.nexusFirst)
 }
-object PvPOpen2Gate1012           extends PvPOpeningIntoCarriers
-object PvPOpen2GateDTExpand       extends PvPOpening {
+
+object PvPOpen2GateRobo extends PvPOpeningIntoCarriers
+
+object PvPOpen2Gate1012 extends PvPOpeningIntoCarriers
+
+object PvPOpen2GateDTExpand extends PvPOpening {
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.twoGate)
 }
-object PvPOpen2GateRobo           extends PvPOpeningIntoCarriers
-object PvPOpen3GateGoon           extends PvPOpening {
+
+object PvPOpen3GateGoon extends PvPOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
 }

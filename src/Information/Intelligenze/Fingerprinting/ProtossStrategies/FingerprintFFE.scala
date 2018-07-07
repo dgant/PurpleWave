@@ -31,8 +31,10 @@ abstract class FingerprintFFE extends FingerprintAnd(
   private val expectedGatewayFEGateway  = GameTime(2, 24)()
   
   private def readyToDecide(status: Status): Boolean = (
-    (status.forgeCompletionFrame.isDefined && status.gatewayCompletionFrame.isDefined)
-    || status.forgeOrCannon.exists(u => u.complete && With.framesSince(u.frameDiscovered) > 24 * 5)
+    With.frame < GameTime(5, 0)() && (
+      (status.forgeCompletionFrame.isDefined && status.gatewayCompletionFrame.isDefined)
+      || status.forgeOrCannon.exists(u => u.complete && With.framesSince(u.frameDiscovered) > 24 * 5)
+    )
   )
   
   private def gatewayUnlikely(status: Status): Boolean = status.gatewayOrZealot.isEmpty

@@ -7,7 +7,7 @@ import Planning.Plan
 import Planning.Plans.Army.{RecruitFreelancers, _}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.If
-import Planning.Plans.GamePlans.Protoss.Situational.DefendAgainstProxy
+import Planning.Plans.GamePlans.Protoss.Situational.{CatchDTRunby, DefendAgainstProxy}
 import Planning.Predicates.Strategy.WeAreZerg
 import Planning.Plans.Macro.Automatic.{Gather, PumpWorkers, RequireSufficientSupply}
 import Planning.Plans.Macro.Build.ProposePlacement
@@ -58,6 +58,7 @@ abstract class GameplanModeTemplate extends GameplanMode {
     new DefendZones,
     new DefendAgainstProxy,
     new DefendAgainstWorkerRush,
+    new CatchDTRunby,
     new EscortSettlers,
     defaultScoutExposPlan,
     defaultAttackPlan,

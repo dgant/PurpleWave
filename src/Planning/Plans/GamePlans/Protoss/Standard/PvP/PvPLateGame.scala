@@ -12,7 +12,7 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMinin
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyCarriers, SafeAtHome, SafeToMoveOut}
+import Planning.Predicates.Reactive.{EnemyCarriers, EnemyDarkTemplarLikely, SafeAtHome, SafeToMoveOut}
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.Protoss
@@ -138,7 +138,7 @@ class PvPLateGame extends GameplanModeTemplate {
     new PvPIdeas.TakeBase2,
 
     new If(
-      new EnemyHasShown(Protoss.DarkTemplar),
+      new EnemyDarkTemplarLikely,
       new BuildCannonsAtBases(1)),
 
     new If(
@@ -175,7 +175,7 @@ class PvPLateGame extends GameplanModeTemplate {
     new Build(Get(8, Protoss.Gateway)),
     new RequireMiningBases(3),
     new Build(Get(11, Protoss.Gateway)),
-    new BuildCannonsAtExpansions(3),
+    new BuildCannonsAtExpansions(1),
 
     new If(
       new EnemiesAtLeast(3, Protoss.Shuttle),

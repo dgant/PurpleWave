@@ -2,7 +2,6 @@ package Strategery.History
 
 import Lifecycle.With
 import Strategery.Playbook
-import Utilities.CountMap
 import bwapi.Race
 
 import scala.collection.mutable
@@ -50,34 +49,13 @@ class History {
       ourRace         = With.self.raceInitial,
       enemyRace       = currentEnemyRace,
       won             = weWon,
-      strategies      = With.strategy.selectedCurrently.map(_.toString))
+      strategies =
+        With.strategy.selectedCurrently.map(_.toString)
+        ++ With.fingerprints.all.filter(_.matches).map(_.toString))
     HistoryLoader.save(games.toVector :+ thisGame)
   }
-  
-  def getMapHistory(mapName: String): ContextualHistory = {
-    getHistory(games.filter(_.mapName == mapName))
-  }
-  
-  def getEnemyHistory(opponentName: String): ContextualHistory = {
-    getHistory(games.filter(_.enemyName == opponentName))
-  }
-    
-  private def getHistory(matchingGames: Iterable[HistoricalGame]): ContextualHistory = {
-    val wins        = matchingGames.filter(_.won)
-    val losses      = matchingGames.filterNot(_.won)
-    val strategies  = matchingGames.flatMap(_.strategies).toSet
-    val output      = ContextualHistory(
-      countByStrategy(strategies, wins),
-      countByStrategy(strategies, losses))
-    output
-  }
-  
-  private def countByStrategy(
-    allStrategies : Set[String],
-    games         : Iterable[HistoricalGame])
-      : CountMap[String] = {
-    val output = new CountMap[String]
-    games.foreach(game => game.strategies.foreach(output(_) += 1))
-    output
+
+  def gamesVsEnemies: Iterable[HistoricalGame] = {
+    games.filter(game => With.enemies.exists(_.name == game.enemyName))
   }
 }

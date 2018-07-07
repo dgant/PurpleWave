@@ -9,6 +9,7 @@ import Strategery.Strategies.Protoss.ProtossChoices
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TerranChoices
 import Strategery.Strategies.Zerg.ZergChoices
+import Utilities.ByOption
 import bwapi.Race
 
 import scala.collection.mutable
@@ -47,6 +48,13 @@ class Strategist {
     game,
     1.0 / (1.0 + (game.order / With.configuration.historyHalfLife))
   )).toMap
+
+  lazy val enemyLastFingerprints: Vector[String] = {
+    ByOption.maxBy(With.history.gamesVsEnemies)(_.timestamp)
+      .map(_.strategies.toVector)
+      .getOrElse(Vector.empty)
+      .filter(_.startsWith("Finger"))
+  }
   
   def selectInitialStrategies: Set[Strategy] = {
     val enemyHasKnownRace = With.enemies.exists(_.raceInitial != Race.Unknown)
@@ -73,7 +81,7 @@ class Strategist {
     lazy val enemyRacesCurrent        = With.enemies.map(_.raceCurrent).toSet
     lazy val enemyRaceWasUnknown      = With.enemies.exists(_.raceInitial == Race.Unknown)
     lazy val enemyRaceStillUnknown    = With.enemies.exists(_.raceCurrent == Race.Unknown)
-    lazy val gamesVsEnemy             = With.history.games.count(game => With.enemies.exists(_.name == game.enemyName))
+    lazy val gamesVsEnemy             = With.history.gamesVsEnemies.size
     lazy val playedEnemyOftenEnough   = gamesVsEnemy >= strategy.minimumGamesVsOpponent
     lazy val isIsland                 = isIslandMap
     lazy val isGround                 = ! isIsland
@@ -82,6 +90,7 @@ class Strategist {
     lazy val disabledOnMap            = strategy.mapsBlacklisted.exists(_.matches) || ! strategy.mapsWhitelisted.forall(_.exists(_.matches))
     lazy val appropriateForOurRace    = strategy.ourRaces.exists(_ == ourRace)
     lazy val appropriateForEnemyRace  = strategy.enemyRaces.exists(race => if (race == Race.Unknown) enemyRaceWasUnknown else (enemyRaceStillUnknown || enemyRacesCurrent.contains(race)))
+    lazy val allowedGivenHistory      = ! strategy.responsesBlacklisted.map(_.toString).exists(enemyLastFingerprints.contains)
     lazy val allowedForOpponent       = strategy.opponentsWhitelisted.forall(_
       .map(formatName)
       .exists(name =>
@@ -98,6 +107,7 @@ class Strategist {
       &&  strategy.startLocationsMax >= startLocations
       &&  appropriateForOurRace
       &&  appropriateForEnemyRace
+      &&  allowedGivenHistory
       &&  allowedForOpponent
       &&  playedEnemyOftenEnough
     )

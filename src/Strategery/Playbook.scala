@@ -5,7 +5,7 @@ import Strategery.Selection.{StrategySelectionCIG, StrategySelectionGreedy, Stra
 import Strategery.Strategies.AllRaces.WorkerRush
 import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss.PvR.{PvROpen2Gate1012, PvROpen2Gate910}
-import Strategery.Strategies.Protoss._
+import Strategery.Strategies.Protoss.{PvPOpen3GateGoon, _}
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TvE._
 import Strategery.Strategies.Terran.TvR.{TvR1Rax, TvRTinfoil}
@@ -28,6 +28,7 @@ class EmptyPlaybook {
     PvT2BaseCarrier,
     PvPOpen2Gate1012,
     PvPOpen2GateDTExpand,
+    PvPOpen3GateGoon,
     PvZ4Gate99,
     PvZEarlyFFEEconomic,
     PvZMidgameGatewayAttack,
@@ -57,7 +58,8 @@ object StrategyGroups {
     MassPhotonCannon,
     CarriersWithNoDefense,
     ProxyDarkTemplar,
-    FivePoolProxySunkens
+    FivePoolProxySunkens,
+    PvPOpen4GateGoon
   )
 }
 

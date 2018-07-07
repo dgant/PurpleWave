@@ -2,12 +2,34 @@ package Information.Intelligenze.Fingerprinting
 
 import Information.Intelligenze.Fingerprinting.ProtossStrategies._
 import Information.Intelligenze.Fingerprinting.ZergStrategies._
+import Lifecycle.With
 
 import scala.collection.mutable
 
 class Fingerprints {
   
-  def update() { all.foreach(_.update()) }
+  def update() {
+    if (With.enemies.exists(_.isProtoss)) {
+      gatewayFirst
+      proxyGateway
+      cannonRush
+      twoGate
+      oneGateCore
+      nexusFirst
+      forgeFe
+      gatewayFe
+      dtRush
+    }
+    if (With.enemies.exists(_.isZerg)) {
+      fourPool
+      ninePool
+      overpool
+      tenHatch
+      twelvePool
+      twelveHatch
+    }
+    all.foreach(_.update())
+  }
   
   val all: mutable.ArrayBuffer[Fingerprint] = new mutable.ArrayBuffer[Fingerprint]
   
@@ -25,6 +47,7 @@ class Fingerprints {
   lazy val nexusFirst   = addFingerprint(new FingerprintNexusFirst)
   lazy val forgeFe      = addFingerprint(new FingerprintForgeFE)
   lazy val gatewayFe    = addFingerprint(new FingerprintGatewayFE)
+  lazy val dtRush       = addFingerprint(new FingerprintDTRush)
   
   // Zerg
   lazy val fourPool     = addFingerprint(new Fingerprint4Pool)

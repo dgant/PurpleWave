@@ -43,9 +43,6 @@ class PvPLateGame extends GameplanModeTemplate {
       Get(Protoss.RoboticsFacility),
       Get(Protoss.Observatory)),
     new If(
-      new UnitsAtMost(0, Protoss.TemplarArchives),
-      new Build(Get(Protoss.RoboticsSupportBay))),
-    new If(
       new EnemyHasShownCloakedThreat,
       new UpgradeContinuously(Protoss.ObserverSpeed)))
   

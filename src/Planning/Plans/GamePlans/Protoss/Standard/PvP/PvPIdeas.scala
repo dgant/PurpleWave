@@ -53,19 +53,21 @@ object PvPIdeas {
   */
   class AttackSafely extends If(
     new And(
+      // Are we safe against Dark Templar?
       new Or(
         new UnitsAtLeast(2, Protoss.Observer, complete = true),
         new Not(new EnemyHasShown(Protoss.DarkTemplar))),
+      // Are we obligated to move (or want to move out?
       new Or(
         new EnemyStrategy(With.fingerprints.cannonRush),
         new Employing(PvPOpen4GateGoon),
-        new SafeToMoveOut,
         new MiningBasesAtLeast(3),
-        new EnemyBasesAtLeast(3)),
+        new EnemyBasesAtLeast(3),
+        new SafeToMoveOut),
+      // Can we hurt them?
       new Or(
-        new Not(new EnemyStrategy(With.fingerprints.twoGate)),
-        new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
-        new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true))),
+        new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
+        new SafeToMoveOut)),
     new Attack)
   
   class ReactToCannonRush extends If(

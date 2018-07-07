@@ -2,6 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Macro.BuildRequests.Get
 import Planning.Plan
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -19,7 +20,8 @@ class PvTReaverCarrierCheese extends GameplanModeTemplate {
   override val defaultWorkerPlan      = new PumpWorkers(oversaturate = true)
   override val priorityAttackPlan     = new PvTIdeas.PriorityAttacks
   override val scoutExpansionsAt      = 150
-  override def defaultScoutPlan: Plan = new ScoutOn(Protoss.CyberneticsCore)
+  override def defaultScoutPlan       = new ScoutOn(Protoss.CyberneticsCore)
+  override def defaultAttackPlan      = new Trigger(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new Attack)
 
   override def buildPlans: Seq[Plan] = Vector(
     new Build(
@@ -53,6 +55,7 @@ class PvTReaverCarrierCheese extends GameplanModeTemplate {
     new Build(Get(8, Protoss.Gateway)),
     new RequireMiningBases(5),
     new Build(Get(20, Protoss.Gateway)),
+    new RequireMiningBases(7)
   )
 }
 

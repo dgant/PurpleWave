@@ -54,8 +54,9 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val framesToTurn180: Int = framesToTurn(Math.PI)
   
   def framesToTurn(radians: Double): Int = Math.abs(PurpleMath.nanToZero(Math.ceil(128.0 * radians / Math.PI / turnRadius))).toInt
-  
-  lazy val framesToTurnAndShootAndTurnBackAndAccelerate: Int = stopFrames + accelerationFrames + framesToTurn180
+
+  lazy val needsToTurnToShoot = ! Vector(Terran.SiegeTankUnsieged, Protoss.Dragoon).contains(this)
+  lazy val framesToTurnAndShootAndTurnBackAndAccelerate: Int = stopFrames + accelerationFrames + (if (needsToTurnToShoot) framesToTurn180 else 0)
   
   ////////////
   // Combat //

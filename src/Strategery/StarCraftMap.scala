@@ -19,8 +19,10 @@ abstract class StarCraftMap {
   val mineralWalkingOkay: Boolean = true
   val trustGroundDistance: Boolean = true
 }
+object Alchemist extends StarCraftMap
 object Benzene extends StarCraftMap
 object BlueStorm extends StarCraftMap
+object ChupungRyeong extends StarCraftMap
 object EmpireOfTheSun extends StarCraftMap
 object Gladiator extends StarCraftMap
 object GreatBarrierReef extends StarCraftMap { override val mineralWalkingOkay = false }
@@ -30,19 +32,23 @@ object Hunters extends StarCraftMap
 object LaMancha extends StarCraftMap
 object Plasma extends StarCraftMap { override val trustGroundDistance: Boolean = false }
 object Roadrunner extends StarCraftMap
-object TauCross extends StarCraftMap
 object Sparkle extends StarCraftMap
+object TauCross extends StarCraftMap
 object ThirdWorld extends StarCraftMap { override val trustGroundDistance: Boolean = false }
 object Transistor extends StarCraftMap
 
 object StarCraftMaps {
  
   val all: Vector[StarCraftMap] = Vector(
+    Alchemist,
     Benzene,
+    BlueStorm,
+    ChupungRyeong,
     EmpireOfTheSun,
     Gladiator,
     GreatBarrierReef,
     HeartbreakRidge,
+    Hitchhiker,
     Hunters,
     LaMancha,
     Plasma,
@@ -55,7 +61,8 @@ object StarCraftMaps {
 }
 
 object MapGroups {
-  val badForProxying = Vector(Roadrunner, EmpireOfTheSun, TauCross, LaMancha, BlueStorm)
+  val badForProxying = Vector(Alchemist, BlueStorm, ChupungRyeong, EmpireOfTheSun, GreatBarrierReef, LaMancha, Roadrunner, TauCross)
+  val badForWalling = Vector(Alchemist)
   val badForFastThirdBases = Vector(Benzene, HeartbreakRidge)
 }
 

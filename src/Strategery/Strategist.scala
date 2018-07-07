@@ -79,15 +79,14 @@ class Strategist {
     lazy val isGround                 = ! isIsland
     lazy val startLocations           = With.geography.startLocations.size
     lazy val disabledInPlaybook       = Playbook.disabled.contains(strategy)
-    lazy val disabledOnMap            = strategy.prohibitedMaps.exists(_.matches) || (strategy.requiredMaps.nonEmpty && ! strategy.requiredMaps.exists(_.matches))
+    lazy val disabledOnMap            = strategy.mapsBlacklisted.exists(_.matches) || ! strategy.mapsWhitelisted.forall(_.exists(_.matches))
     lazy val appropriateForOurRace    = strategy.ourRaces.exists(_ == ourRace)
     lazy val appropriateForEnemyRace  = strategy.enemyRaces.exists(race => if (race == Race.Unknown) enemyRaceWasUnknown else (enemyRaceStillUnknown || enemyRacesCurrent.contains(race)))
-    lazy val allowedForOpponent       = strategy.restrictedOpponents.isEmpty ||
-      strategy.restrictedOpponents.get
-        .map(formatName)
-        .exists(name =>
-          nameMatches(name, Playbook.enemyName)
-          || With.enemies.map(e => formatName(e.name)).exists(nameMatches(_, name)))
+    lazy val allowedForOpponent       = strategy.opponentsWhitelisted.forall(_
+      .map(formatName)
+      .exists(name =>
+        nameMatches(name, Playbook.enemyName)
+        || With.enemies.map(e => formatName(e.name)).exists(nameMatches(_, name))))
 
     val output = (
           ! disabledOnMap

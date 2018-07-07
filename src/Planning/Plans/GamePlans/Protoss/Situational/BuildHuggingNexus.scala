@@ -8,6 +8,7 @@ class BuildHuggingNexus extends ProposePlacement {
   override lazy val blueprints = Vector(
     new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)),
     new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)),
     new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)))
 }
 

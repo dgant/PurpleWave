@@ -73,6 +73,7 @@ class PvP2GateDarkTemplar extends GameplanModeTemplate {
   
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvPIdeas.ReactToCannonRush,
+    new PvPIdeas.ReactToProxyGateways,
     new PvPIdeas.ReactToFFE
   )
   

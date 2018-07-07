@@ -13,5 +13,5 @@ object ProtossBigFFACarriers extends Strategy {
   override def ourRaces: Iterable[Race] = Vector(Race.Protoss)
   override def ffa = true
   
-  override def prohibitedMaps: Iterable[StarCraftMap] = Vector(Hunters)
+  override def mapsBlacklisted: Iterable[StarCraftMap] = Vector(Hunters)
 }

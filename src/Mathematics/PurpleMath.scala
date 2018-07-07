@@ -1,5 +1,6 @@
 package Mathematics
 
+import Lifecycle.With
 import Mathematics.Points.{AbstractPoint, Pixel, SpecificPoints}
 
 import scala.util.Random
@@ -187,14 +188,41 @@ object PurpleMath {
     if (x.isNegInfinity) return -1.0
     x / (1.0 + Math.abs(x))
   }
-  
-  private val piOver4 = Math.PI / 4.0
-  private val pi3Over4 = 3 * Math.PI / 4.0
+
   def atan2(y: Double, x: Double): Double = {
    normalizeAngle(Math.atan2(y, x))
   }
-  
+
+  def softmax[T](values: Seq[T], extract: (T) => Double): Seq[(T, Double)] = {
+    val sum = values.map(value => Math.pow(Math.E, extract(value))).sum
+    values.map(value => (value, Math.pow(Math.E, extract(value)) / sum))
+  }
+
   def sample[T](seq: Seq[T]): T = {
     seq(Random.nextInt(seq.size))
   }
+
+  def sampleWeighted[T](seq: Seq[T], extract: (T) => Double): Option[T] = {
+    if (seq.isEmpty) return None
+    val denominator = seq.map(extract).sum
+    val numerator   = Random.nextDouble() * denominator
+    val shuffled    = Random.shuffle(seq).toVector
+    var passed      = 0.0
+    var index       = 0
+    for (value <- seq) {
+      passed += extract(value)
+      if (passed > numerator) {
+        return Some(value)
+      }
+    }
+    // Oops, we screwed up.
+    With.logger.warn("Failed to get weighted sample!")
+    Some(seq.maxBy(extract))
+  }
+
+  def softmaxSample[T](seq: Seq[T], extract: (T) => Double): Option[T] = {
+    val softmaxed: Seq[(T, Double)] = softmax(seq, extract)
+    sampleWeighted[(T, Double)](softmaxed, v => v._2).map(_._1)
+  }
+
 }

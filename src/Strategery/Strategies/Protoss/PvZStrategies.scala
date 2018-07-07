@@ -13,6 +13,8 @@ class PvZFFEOpening extends PvZStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     ProtossChoices.pvzMidgameTransitioningFromTwoBases
   )
+
+  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForWalling
 }
 class PvZ2GateOpening extends PvZStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(
@@ -21,7 +23,7 @@ class PvZ2GateOpening extends PvZStrategy {
 }
 object PvZ2Gate99 extends PvZ2GateOpening
 object PvZProxy2Gate extends PvZ2GateOpening {
-  override def prohibitedMaps: Iterable[StarCraftMap] = MapGroups.badForProxying
+  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
 }
 object PvZ4GateDragoonAllIn extends PvZStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(ProtossChoices.pvzMidgameTransitioningFromOneBase)
@@ -33,7 +35,3 @@ object PvZEarlyFFEConservative      extends PvZFFEOpening
 object PvZEarlyFFEEconomic          extends PvZFFEOpening
 object PvZMidgameCorsairSpeedlot    extends PvZStrategy
 object PvZMidgameGatewayAttack      extends PvZStrategy
-//object PvZMidgameCorsairDarkTemplar extends PvZStrategy
-//object PvZMidgameCorsairReaver extends PvZStrategy
-
-

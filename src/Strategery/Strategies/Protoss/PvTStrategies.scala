@@ -36,10 +36,10 @@ object PvTEarly1015GateGoonDT extends PvTStrategy {
       PvT3BaseArbiter,
       PvT3BaseCarrier))
 }
-object PvT2BaseCarrier extends PvTStrategy  { override val prohibitedMaps = Iterable(BlueStorm) }
-object PvT3BaseCarrier extends PvTStrategy { override val prohibitedMaps = MapGroups.badForFastThirdBases }
-object PvT2BaseArbiter extends PvTStrategy { override val prohibitedMaps = Iterable(BlueStorm) }
-object PvT3BaseArbiter extends PvTStrategy { override val prohibitedMaps = MapGroups.badForFastThirdBases }
+object PvT2BaseCarrier extends PvTStrategy  { override val mapsBlacklisted = Iterable(BlueStorm) }
+object PvT3BaseCarrier extends PvTStrategy { override val mapsBlacklisted = MapGroups.badForFastThirdBases }
+object PvT2BaseArbiter extends PvTStrategy { override val mapsBlacklisted = Iterable(BlueStorm) }
+object PvT3BaseArbiter extends PvTStrategy { override val mapsBlacklisted = MapGroups.badForFastThirdBases }
 
 object PvTEarly1GateStargateTemplar extends PvTStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(
@@ -48,10 +48,10 @@ object PvTEarly1GateStargateTemplar extends PvTStrategy {
 
 object PvTProxy2Gate extends PvTStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(ProtossChoices.pvtOpenersTransitioningFrom2Gate)
-  override def prohibitedMaps: Iterable[StarCraftMap] = MapGroups.badForProxying
+  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
 }
 
 object PvTReaverCarrierCheese extends PvTStrategy {
   override def gameplan: Option[Plan] = Some(new PvTReaverCarrierCheese)
-  override def restrictedOpponents: Option[Iterable[String]] = Some(Vector("Rooijackers", "Leta"))
+  override def opponentsWhitelisted: Option[Iterable[String]] = Some(Vector("Rooijackers", "Leta"))
 }

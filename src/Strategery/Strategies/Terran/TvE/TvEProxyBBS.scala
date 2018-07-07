@@ -12,5 +12,5 @@ object TvEProxyBBS extends Strategy {
   
   override def ourRaces: Iterable[Race] = Vector(Race.Terran)
 
-  override def prohibitedMaps: Vector[StarCraftMap] = MapGroups.badForProxying
+  override def mapsBlacklisted: Vector[StarCraftMap] = MapGroups.badForProxying
 }

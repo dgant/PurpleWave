@@ -3,18 +3,26 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Strategery.Strategies.Strategy
 
-object StrategySelectionGreedy extends StrategySelectionPolicy {
+object StrategySelectionGreedy extends StrategySelectionBasic {
+  override protected def chooseBasedOnInterest: Iterable[Strategy] = {
+    val mostInterest = With.strategy.interest.values.max
+    val bestPermutation = With.strategy.interest.find(_._2 >= mostInterest).get
+    bestPermutation._1
+  }
+}
+
+abstract class StrategySelectionBasic extends StrategySelectionPolicy {
   def chooseBest(topLevelStrategies: Iterable[Strategy]): Iterable[Strategy] = {
     val permutations            = topLevelStrategies.flatMap(expandStrategy)
     val strategies              = permutations.flatten.toVector.distinct
     val strategyEvaluations     = strategies.map(strategy => (strategy, With.strategy.evaluate(strategy))).toMap
     val permutationEvaluations  = permutations.map(p => (p, p.map(strategyEvaluations))).toMap
     With.strategy.interest      = permutationEvaluations.map(p => (p._1, PurpleMath.geometricMean(p._2.map(_.interestTotal))))
-    val mostInterest            = With.strategy.interest.values.max
-    val bestPermutation         = With.strategy.interest.find(_._2 >= mostInterest).get
-    bestPermutation._1
+    chooseBasedOnInterest
   }
-  
+
+  protected def chooseBasedOnInterest: Iterable[Strategy]
+
   private def expandStrategy(strategy: Strategy): Iterable[Iterable[Strategy]] = {
     
     /*

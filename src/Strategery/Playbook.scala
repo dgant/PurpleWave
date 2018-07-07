@@ -19,6 +19,7 @@ class EmptyPlaybook {
   lazy val disabled : Seq[Strategy] = none
   val strategyOrder: Seq[Strategy] = Vector(
     PvEIslandPlasmaCarriers1Base,
+    PvPLateGame2BaseReaverCarrier_SpecificMaps,
     PvTEarly1015GateGoonDT,
     PvT2GateObserver,
     PvT13Nexus,
@@ -80,4 +81,4 @@ class TestingCIGPlaybook extends CIGPlaybook {
   override def enemyName: String = "LetaBot"
 }
 
-object Playbook extends TestingCIGPlaybook {}
+object Playbook extends CIGPlaybook {}

@@ -14,5 +14,5 @@ object ProxyDarkTemplar extends Strategy {
   
   override def enemyRaces: Iterable[Race] = Vector(Race.Terran, Race.Protoss)
   
-  override def prohibitedMaps: Vector[StarCraftMap] = MapGroups.badForProxying
+  override def mapsBlacklisted: Vector[StarCraftMap] = MapGroups.badForProxying
 }

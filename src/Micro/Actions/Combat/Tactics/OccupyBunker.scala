@@ -9,7 +9,8 @@ import Utilities.ByOption
 object OccupyBunker extends Action {
   
   override def allowed(unit: FriendlyUnitInfo) = (
-    unit.agent.toForm.isDefined
+    With.self.isTerran
+    && unit.agent.toForm.isDefined
     && Bunk.classAllowedToBunk(unit)
     && unit.transport.isEmpty
     && unit.matchups.threatsInRange.isEmpty)

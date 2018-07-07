@@ -1,23 +1,22 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
-import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Predicates.Compound.{And, Check, Latch, Not}
-import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.GamePlans.Protoss.Situational.BuildHuggingNexus
+import Planning.Plans.GamePlans.Protoss.Situational.{BuildHuggingNexus, DefendZealotsAgainst4Pool}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Scouting.ScoutOn
+import Planning.Predicates.Compound.{And, Latch}
 import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
 import Planning.Predicates.Milestones._
-import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Strategy.Employing
+import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss.{PvZ4Gate99, PvZ4GateDragoonAllIn}
 
@@ -54,6 +53,7 @@ class PvZ4Gate extends GameplanModeTemplate {
     new EnemyHasShown(Zerg.Mutalisk))
 
   override def buildPlans = Vector(
+   new DefendZealotsAgainst4Pool,
     new If(
       new EnemyHasShownCloakedThreat,
       new Build(

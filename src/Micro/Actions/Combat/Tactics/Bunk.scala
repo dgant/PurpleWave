@@ -22,7 +22,7 @@ object Bunk extends Action {
   }
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.canMove && openBunkersFor(unit).nonEmpty
+    With.self.isTerran && unit.canMove && openBunkersFor(unit).nonEmpty
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {

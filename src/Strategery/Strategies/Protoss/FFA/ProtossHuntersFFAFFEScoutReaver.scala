@@ -13,5 +13,5 @@ object ProtossHuntersFFAFFEScoutReaver extends Strategy {
   override def ourRaces: Iterable[Race] = Vector(Race.Protoss)
   override def ffa = true
   
-  override def requiredMaps: Iterable[StarCraftMap] = Vector(Hunters)
+  override def mapsWhitelisted: Option[Iterable[StarCraftMap]] = Some(Vector(Hunters))
 }

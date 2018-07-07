@@ -9,13 +9,14 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.{Plan, Predicate}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
+import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.ReactToProxyGateways
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyDarkTemplarPossible, SafeAtHome}
+import Planning.Predicates.Reactive.{EnemyDarkTemplarLikely, SafeAtHome}
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import ProxyBwapi.Races.Protoss
@@ -41,45 +42,65 @@ class PvP2Gate1012 extends GameplanModeTemplate {
   
   override def emergencyPlans: Seq[Plan] = Seq(
     new If(
-      new EnemyDarkTemplarPossible,
+      new EnemyDarkTemplarLikely,
       new BuildCannonsAtNatural(2)),
     new PvPIdeas.ReactToCannonRush,
-    new PvPIdeas.ReactToFFE
-  )
-  
-  override val buildOrder = ProtossBuilds.OpeningTwoGate1012Expand
-  override def buildPlans = Vector(
+    new PvPIdeas.ReactToProxyGateways,
+    new PvPIdeas.ReactToFFE)
+
+  class FollowUpVsTwoGate extends Parallel(
     new RequireMiningBases(2),
-    new Pump(Protoss.Observer, 1),
-    new Pump(Protoss.Reaver, 3),
-    new FlipIf(
-      new Or(
-        new SafeAtHome,
-        new EnemyHasShown(Protoss.Dragoon),
-        new EnemyHasShown(Protoss.Assimilator),
-        new EnemyHasShown(Protoss.CyberneticsCore)),
-      new If(
-        new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
-        new Pump(Protoss.Dragoon),
-        new If(
-          new And(
-            new SafeAtHome,
-            new Not(new EnemyStrategy(With.fingerprints.twoGate))),
-          new Pump(Protoss.Zealot, 5),
-          new Parallel(
-            new Build(Get(1, Protoss.ShieldBattery)),
-            new Pump(Protoss.Zealot, 7)))),
-      new Build(
-        Get(1, Protoss.Assimilator),
-        Get(1, Protoss.CyberneticsCore))),
-    new BuildCannonsAtNatural(2),
-    new Build(
-      Get(1, Protoss.Forge),
-      Get(2, Protoss.Gateway),
-      Get(Protoss.DragoonRange)),
-    new BuildGasPumps,
+    new PvPIdeas.TrainArmy,
     new Build(
       Get(3, Protoss.Gateway),
+      Get(Protoss.ShieldBattery),
+      Get(Protoss.Assimilator),
+      Get(Protoss.CyberneticsCore),
+      Get(Protoss.DragoonRange)))
+
+  class FollowUpVsOneGateCore extends Parallel(
+    new RequireMiningBases(2),
+    new Build(
+      Get(Protoss.Assimilator),
+      Get(Protoss.CyberneticsCore)),
+    new BuildCannonsAtNatural(2),
+    new If(
+      new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.Dragoon.buildFrames),
+      new PvPIdeas.TrainArmy,
+      new Pump(Protoss.Zealot)),
+    new Build(Get(Protoss.DragoonRange)),
+    new If(
+      new EnemiesAtLeast(3, Protoss.Dragoon),
+      new BuildCannonsAtNatural(5),
+      new If(
+        new EnemiesAtLeast(2, Protoss.Dragoon),
+        new BuildCannonsAtNatural(3))))
+
+  class FollowUpVsFE extends Parallel(
+    new PvPIdeas.TrainArmy,
+    new RequireMiningBases(2),
+    new Build(
+      Get(Protoss.Assimilator),
+      Get(Protoss.CyberneticsCore),
+      Get(Protoss.DragoonRange),
+      Get(3, Protoss.Gateway)))
+  
+  override val buildOrder = ProtossBuilds.OpeningTwoGate1012FiveZealot
+  override def buildPlans = Vector(
+
+    new If(
+      new EnemyStrategy(With.fingerprints.nexusFirst),
+      new FollowUpVsFE,
+      new If(
+        new And(
+          new EnemyStrategy(With.fingerprints.twoGate),
+          new Not(new EnemyHasShown(Protoss.Dragoon))),
+        new FollowUpVsTwoGate,
+        new FollowUpVsOneGateCore)),
+
+    new Build(Get(3, Protoss.Gateway)),
+    new BuildGasPumps,
+    new Build(
       Get(1, Protoss.RoboticsFacility),
       Get(4, Protoss.Gateway),
       Get(1, Protoss.RoboticsSupportBay),

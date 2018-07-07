@@ -18,7 +18,7 @@ object Avoid extends ActionTechnique {
     && unit.matchups.threats.nonEmpty
   )
   
-  override val applicabilityBase: Double = 0.7
+  override val applicabilityBase: Double = 0.675
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
     val meleeFactor   = if (unit.unitClass.ranged) 1.0 else 0.75
@@ -48,9 +48,9 @@ object Avoid extends ActionTechnique {
   
   override def perform(unit: FriendlyUnitInfo) {
     unit.agent.toTravel = Some(unit.agent.origin)
-    
+
     val bonusAvoidThreats = PurpleMath.clamp(With.reaction.agencyAverage + unit.matchups.framesOfEntanglement, 12.0, 24.0) / 12.0
-    val bonusPreferExit   = if (unit.agent.origin.zone == unit.zone) 0.5 else 1.0
+    val bonusPreferExit   = if (unit.agent.origin.zone != unit.zone) 1.0 else if (unit.matchups.threats.exists(_.topSpeed < unit.topSpeed)) 0.0 else 0.5
     val bonusRegrouping   = 9.0 / Math.max(24.0, unit.matchups.framesOfEntanglement)
     val bonusMobility     = 1.0
     

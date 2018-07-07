@@ -86,7 +86,12 @@ class PvPLateGame extends GameplanModeTemplate {
     new Build(Get(3, Protoss.Gateway)),
     new BuildGasPumps,
     new FlipIf(
-      new Latch(new UnitsAtLeast(1, Protoss.TemplarArchives)),
+      new Latch(
+        new Or(
+          new UnitsAtLeast(1, Protoss.TemplarArchives),
+          new And(
+            new UnitsAtLeast(1, Protoss.PhotonCannon),
+            new UnitsAtLeast(8, Protoss.Zealot)))),
       new RoboTech,
       new TemplarTech),
 

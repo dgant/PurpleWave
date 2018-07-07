@@ -1,15 +1,15 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.UnitMatchers.UnitMatchWarriors
-import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast}
-import Planning.Predicates.Reactive.EnemyBasesAtLeast
+import Planning.Predicates.Milestones.UnitsAtLeast
+import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeAtHome}
 import Planning.Predicates.Strategy.Employing
+import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen2GateRobo
 
@@ -28,8 +28,8 @@ class PvP2GateRobo extends GameplanModeTemplate {
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToFFE,
-    new PvPIdeas.ReactToTwoGate
-  )
+    new PvPIdeas.ReactToProxyGateways,
+    new PvPIdeas.ReactToTwoGate)
   
   override val buildOrder: Seq[BuildRequest] = Vector(
     // http://wiki.teamliquid.net/starcraft/2_Gate_Reaver_(vs._Protoss)
@@ -60,16 +60,21 @@ class PvP2GateRobo extends GameplanModeTemplate {
     Get(Protoss.DragoonRange))
   
   override val buildPlans = Vector(
-    new If(
-      new EnemiesAtLeast(1, Protoss.DarkTemplar),
-      new Build(Get(1, Protoss.Observer))),
-    new Trigger(new UnitsAtLeast(1, Protoss.Reaver), new RequireMiningBases(2)),
+
+    new Trigger(
+      new UnitsAtLeast(2, Protoss.Reaver, complete = true),
+      new RequireMiningBases(2)),
+
     new PvPIdeas.TrainArmy,
+
     new Build(
-      Get(1, Protoss.RoboticsFacility),
-      Get(1, Protoss.Observatory),
-      Get(1, Protoss.RoboticsSupportBay),
-      Get(3, Protoss.Gateway),
-      Get(2, Protoss.Nexus),
-      Get(1, Protoss.Observer)))
+      Get(Protoss.RoboticsFacility),
+      Get(Protoss.Observatory),
+      Get(Protoss.RoboticsSupportBay)),
+
+    new FlipIf(
+      new SafeAtHome,
+      new Build(Get(3, Protoss.Gateway)),
+      new RequireMiningBases(2))
+  )
 }

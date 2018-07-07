@@ -15,5 +15,5 @@ object PvROpenProxy2Gate extends Strategy {
   override def ourRaces   : Iterable[Race]  = Vector(Race.Protoss)
   override def enemyRaces : Iterable[Race]  = Vector(Race.Unknown)
   
-  override def prohibitedMaps: Iterable[StarCraftMap] = MapGroups.badForProxying
+  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
 }

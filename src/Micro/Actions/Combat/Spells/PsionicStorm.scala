@@ -19,20 +19,20 @@ object PsionicStorm extends TargetedSpell {
   
   override protected def valueTarget(target: UnitInfo): Double = {
     if (With.grids.psionicStorm.isSet(target.tileIncludingCenter)) return 0.0
-    if (target.unitClass.isBuilding)  return 0.0
-    if (target.underStorm)            return 0.0
-    if (target.invincible)            return 0.0
-    if (target.is(Zerg.Larva))        return 0.0
-    if (target.is(Zerg.Egg))          return 0.0
-    if (target.is(Zerg.LurkerEgg))    return 0.0
-    
-    val multiplierSpeed   = 1.0 - 0.4 * PurpleMath.clamp((target.velocity.lengthFast / 1.5 * Terran.Vulture.topSpeed), 0.0, 1.0)
+    if (target.unitClass.isBuilding)    return 0.0
+    if (target.underStorm)              return 0.0
+    if (target.invincible)              return 0.0
+    if (target.isAny(
+      Protoss.Interceptor,
+      Zerg.Larva,
+      Zerg.Egg,
+      Zerg.LurkerEgg)) return 0.0
+
     val multiplierValue   = Math.min(target.subjectiveValue, Protoss.Observer.subjectiveValue)
     val multiplierDamage  = (Math.min(112.0, target.totalHealth) / target.unitClass.maxTotalHealth)
     val multiplierPlayer  = (if (target.isEnemy) 1.0 else -3.0)
     val output = (
       multiplierValue
-      * multiplierSpeed
       * multiplierDamage
       * multiplierPlayer)
     

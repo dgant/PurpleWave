@@ -11,5 +11,5 @@ object DarkArchonsWithNoDefense extends Strategy {
   
   override def ourRaces: Iterable[Race] = Vector(Race.Protoss)
   
-  override def restrictedOpponents: Option[Iterable[String]] = Some(Iterable("Vajda", "Ximp"))
+  override def opponentsWhitelisted: Option[Iterable[String]] = Some(Iterable("Vajda", "Ximp"))
 }

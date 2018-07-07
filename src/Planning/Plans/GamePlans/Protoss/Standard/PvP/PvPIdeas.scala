@@ -4,8 +4,6 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Predicates.Compound.{And, Check, Latch, Not}
-import Planning.UnitMatchers._
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, RequireSufficientSupply, UpgradeContinuously}
@@ -13,10 +11,12 @@ import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, MeldArchons}
+import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Economy.GasAtMost
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._
-import Planning.Predicates.Strategy.{Employing, EnemyStrategy, WeAreBeingProxied}
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.UnitMatchers._
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen4GateGoon
 
@@ -75,16 +75,16 @@ object PvPIdeas {
       new RequireSufficientSupply,
       new PumpWorkers,
       new Pump(Protoss.Reaver, 2),
-      new TrainDragoonsOrZealots,
+      new PumpDragoonsOrZealots,
       new Build(
         Get(1, Protoss.Gateway),
         Get(1, Protoss.CyberneticsCore),
         Get(1, Protoss.RoboticsFacility),
         Get(1, Protoss.RoboticsSupportBay))))
-  
+
   class ReactToDarkTemplarEmergencies extends Parallel(new ReactToDarkTemplarExisting, new ReactToDarkTemplarPossible)
   class ReactToDarkTemplarPossible extends If(
-    new EnemyDarkTemplarPossible,
+    new EnemyDarkTemplarLikely,
     new Parallel(
       new If(
         new UnitsAtMost(0, Protoss.Observatory),
@@ -93,7 +93,7 @@ object PvPIdeas {
         Get(1, Protoss.RoboticsFacility),
         Get(1, Protoss.Observatory),
         Get(1, Protoss.Observer))))
-  
+
   class ReactToDarkTemplarExisting extends If(
     new EnemyDarkTemplarExists,
     new Parallel(
@@ -104,7 +104,7 @@ object PvPIdeas {
         Get(1, Protoss.RoboticsFacility),
         Get(1, Protoss.Observatory)),
       new Pump(Protoss.Observer, 3)))
-  
+
   class ReactToTwoGate extends If(
     new And(
       new EnemyStrategy(With.fingerprints.twoGate),
@@ -119,13 +119,12 @@ object PvPIdeas {
           new RequireSufficientSupply,
           new TrainArmy)),
       new UpgradeContinuously(Protoss.DragoonRange),
-      new PlaceShieldBatteryAtNexus,
       new If(
         new UnitsAtLeast(1, Protoss.CyberneticsCore),
         new Build(
           Get(2, Protoss.Gateway),
           Get(1, Protoss.ShieldBattery)))))
-  
+
   class ReactToArbiters extends If(
     new Or(
       new EnemiesAtLeast(1, Protoss.Arbiter),
@@ -135,14 +134,29 @@ object PvPIdeas {
         Get(1, Protoss.RoboticsFacility),
         Get(1, Protoss.Observatory)),
     new Pump(Protoss.Observer, 2)))
-  
+
+  class ReactToProxyGateways extends If(
+    new EnemyStrategy(With.fingerprints.proxyGateway),
+    new Parallel(
+      new Pump(Protoss.Probe, 8),
+      new Build(Get(Protoss.Gateway)),
+      new TrainArmy,
+      new Build(Get(Protoss.ShieldBattery)),
+      new Pump(Protoss.Probe, 14),
+      new Build(Get(2, Protoss.Gateway)),
+      new Pump(Protoss.Probe, 21),
+      new Build(
+        Get(Protoss.Assimilator),
+        Get(Protoss.CyberneticsCore),
+        Get(3, Protoss.Gateway),
+        Get(Protoss.DragoonRange),
+        Get(Protoss.CitadelOfAdun),
+        Get(Protoss.TemplarArchives))))
+
   class ReactToFFE extends If(
-    new And(
-      new Not(new WeAreBeingProxied),
-      new EnemiesAtLeast(1, Protoss.PhotonCannon),
-      new SafeAtHome),
+    new EnemyStrategy(With.fingerprints.forgeFe),
     new RequireMiningBases(2))
-  
+
   class TakeBase2 extends If(
     new Or(
       new UnitsAtLeast(2, Protoss.Reaver, complete = true),
@@ -151,7 +165,7 @@ object PvPIdeas {
         new UnitsAtLeast(8, UnitMatchWarriors, complete = true)),
       new UnitsAtLeast(16, UnitMatchWarriors, complete = true)),
     new RequireMiningBases(2))
-  
+
   class TakeBase3 extends If(
     new And(
       new Latch(new UnitsAtLeast(1, Protoss.Observer, complete = true)),
@@ -163,14 +177,31 @@ object PvPIdeas {
             new EnemyCarriers,
             new EnemyBasesAtLeast(3))))),
     new RequireMiningBases(3))
-  
+
   class MeldArchonsPvP extends MeldArchons(49) {
     override def minimumArchons: Int = Math.min(8, With.units.countEnemy(Protoss.Zealot) / 3)
     override def maximumTemplar: Int = Math.max(0, (With.units.countEnemy(UnitMatchWarriors) - 20) / 6)
     templar.unitMatcher.set(UnitMatchAnd(Protoss.HighTemplar, UnitMatchEnergyAtMost(75)))
   }
-  
-  class TrainDragoonsOrZealots extends If(
+
+  class GetObserversIfDarkTemplarPossible extends If(
+    new And(
+      new EnemyBasesAtMost(1),
+      new EnemiesAtMost(0,
+        UnitMatchOr(
+          Protoss.RoboticsFacility,
+          Protoss.RoboticsSupportBay,
+          Protoss.Observatory,
+          Protoss.Observer,
+          Protoss.Shuttle,
+          Protoss.Reaver))),
+    new Build(
+      Get(Protoss.Assimilator),
+      Get(Protoss.CyberneticsCore),
+      Get(Protoss.RoboticsFacility),
+      Get(Protoss.Observatory)))
+
+  class PumpDragoonsOrZealots extends If(
     new And(
       new Not(new EnemyCarriersOnly),
       new Or(
@@ -187,34 +218,38 @@ object PvPIdeas {
             new Check(() => With.self.minerals > With.self.gas * 3))))),
     new Pump(Protoss.Zealot),
     new Pump(Protoss.Dragoon))
-    
+
   class TrainDarkTemplar extends If(
     new And(
       new EnemiesAtMost(0, Protoss.PhotonCannon),
       new EnemiesAtMost(0, Protoss.Observer)),
     new Pump(Protoss.DarkTemplar, 3),
-    new Pump(Protoss.DarkTemplar, 1))
-    
+    new IfOnMiningBases(3, new Pump(Protoss.DarkTemplar, 1)))
+
   class TrainArmy extends Parallel(
     new Pump(Protoss.Carrier),
     new If(
       new And(
         new Not(new EnemyCarriersOnly),
-        new UnitsAtMost(0, Protoss.PhotonCannon)),
+        new UnitsAtMost(0, Protoss.PhotonCannon),
+        new Or(
+          new SafeAtHome,
+          new UnitsAtMost(0, Protoss.RoboticsSupportBay))),
       new Pump(Protoss.Observer, 1)),
-    new If(
-      new Not(new EnemyCarriersOnly),
-      new TrainDarkTemplar),
+    new If(new Not(new EnemyCarriersOnly), new TrainDarkTemplar),
     new Pump(Protoss.Arbiter),
     new If(
-      new And(
-        new Not(new EnemyCarriersOnly),
-        new UnitsAtMost(0, Protoss.TemplarArchives)),
-      new Pump(Protoss.Reaver, 2)),
-    new If(
-      new UnitsAtLeast(12, UnitMatchWarriors),
-      new Pump(Protoss.HighTemplar, 6, 2)),
-    new TrainDragoonsOrZealots,
+      new EnemyCarriersOnly,
+      new Parallel(new Pump(Protoss.Dragoon), new Pump(Protoss.HighTemplar)),
+      new If(
+        new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.Zealot.buildFrames),
+        new Parallel(
+          new Pump(Protoss.HighTemplar),
+          new Pump(Protoss.Zealot, 30),
+          new PumpDragoonsOrZealots),
+        new Parallel(
+          new Pump(Protoss.Reaver, 4),
+          new PumpDragoonsOrZealots))),
     new Pump(Protoss.Observer, 2)
   )
 }

@@ -24,7 +24,7 @@ trait GoalBasic extends SquadGoal {
     def counterScaling(input: Double): Double = input
   }
   
-  final protected object Qualities {
+  final object Qualities {
     object Cloaked extends Quality {
       def matches(u: UnitInfo): Boolean = u.burrowed || u.isAny(
         Terran.Ghost, Terran.Wraith, Terran.SpiderMine,
@@ -108,6 +108,11 @@ trait GoalBasic extends SquadGoal {
     recruitsByQuality.clear()
     squad.units.foreach(countUnit)
     squad.enemies.foreach(countUnit)
+
+    // Bit of a hack -- if we have lots of units, demand detection
+    if (squad.previousUnits.size > 4) {
+      enemiesByQuality(Qualities.Cloaked) = Math.max(1, enemiesByQuality(Qualities.Cloaked))
+    }
   }
   
   /////////////////////////////

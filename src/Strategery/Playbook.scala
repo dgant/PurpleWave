@@ -84,4 +84,4 @@ class TestingCIGPlaybook extends CIGPlaybook {
   override def enemyName: String = "LetaBot"
 }
 
-object Playbook extends TestingPlaybook {}
+object Playbook extends CIGPlaybook {}

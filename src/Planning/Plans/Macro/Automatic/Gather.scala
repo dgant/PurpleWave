@@ -4,13 +4,12 @@ import Information.Geography.Types.{Base, Zone}
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Agency.Intention
-import Planning.ResourceLocks.LockUnits
 import Planning.Composition.UnitCountEverything
-import Planning.UnitMatchers.UnitMatchWorkers
 import Planning.Plan
+import Planning.ResourceLocks.LockUnits
+import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.ByOption
 
 import scala.collection.mutable
 
@@ -38,8 +37,7 @@ class Gather extends Plan {
     workers = workerLock.units
     setGoals()
     countUnits()
-    val workersSorted = workers.toVector.sortBy(w => ByOption.min(resources.map(w.pixelDistanceCenter)).getOrElse(0.0))
-    workersSorted.foreach(updateWorker)
+    workers.foreach(updateWorker)
   }
   
   private def setGoals() {

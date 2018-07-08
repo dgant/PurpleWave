@@ -21,19 +21,19 @@ class ProtossVsZerg8Gate extends GameplanModeTemplate {
     
   class GatewayTech extends Parallel(
     new Build(
-      Get(1, Protoss.Gateway),
-      Get(1, Protoss.Forge),
-      Get(1, Protoss.Assimilator),
-      Get(1, Protoss.CyberneticsCore),
-      Get(1, Protoss.CitadelOfAdun),
+      Get(Protoss.Gateway),
+      Get(Protoss.Forge),
+      Get(Protoss.Assimilator),
+      Get(Protoss.CyberneticsCore),
+      Get(Protoss.CitadelOfAdun),
       Get(Protoss.GroundDamage),
       Get(Protoss.ZealotSpeed),
       Get(Protoss.DragoonRange),
       Get(5, Protoss.Gateway),
       Get(2, Protoss.Assimilator),
-      Get(1, Protoss.RoboticsFacility),
-      Get(1, Protoss.Observatory),
-      Get(1, Protoss.TemplarArchives),
+      Get(Protoss.RoboticsFacility),
+      Get(Protoss.Observatory),
+      Get(Protoss.TemplarArchives),
       Get(8, Protoss.Gateway)),
     new BuildGasPumps)
       
@@ -60,6 +60,10 @@ class ProtossVsZerg8Gate extends GameplanModeTemplate {
       new Aggression(0.5)),
     new PvZIdeas.TakeSafeNatural,
     new PvZIdeas.AddEarlyCannons,
+    new UpgradeContinuously(Protoss.ZealotSpeed),
+    new If(
+      new UnitsAtLeast(8, Protoss.Gateway),
+      new BuildGasPumps),
     new BuildCannonsAtExpansions(5),
     new If(
       new UnitsAtLeast(3, Protoss.Nexus),

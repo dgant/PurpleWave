@@ -10,7 +10,7 @@ import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Predicates.Compound.And
-import Planning.Predicates.Economy.GasAtLeast
+import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.Employing
@@ -57,9 +57,13 @@ class PvP2BaseReaverCarrier extends GameplanModeTemplate {
     new BuildGasPumps,
     new PvPIdeas.GetObserversIfDarkTemplarPossible,
     new FlipIf(
-      new UnitsAtLeast(2, Protoss.Reaver, complete = true),
+      new Or(
+        new UnitsAtLeast(2, Protoss.Reaver, complete = true),
+        new MineralsAtLeast(500)),
       new FlipIf(
-        new SafeAtHome,
+        new Or(
+          new SafeAtHome,
+          new MineralsAtLeast(500)),
         new If(
           new UnitsAtMost(0, Protoss.FleetBeacon),
           new TrainArmy,

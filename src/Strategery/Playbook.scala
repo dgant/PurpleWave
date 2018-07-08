@@ -59,6 +59,7 @@ object StrategyGroups {
     CarriersWithNoDefense,
     ProxyDarkTemplar,
     FivePoolProxySunkens,
+    PvPOpen2GateRobo,
     PvPOpen4GateGoon
   )
 }

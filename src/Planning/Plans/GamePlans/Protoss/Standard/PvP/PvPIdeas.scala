@@ -248,15 +248,24 @@ object PvPIdeas {
       new EnemyCarriersOnly,
       new Parallel(new Pump(Protoss.Dragoon), new Pump(Protoss.HighTemplar)),
       new If(
-        new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.Zealot.buildFrames),
+        new And(
+          new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.Zealot.buildFrames),
+          new UnitsAtLeast(1, Protoss.TemplarArchives, complete = true)),
         new Parallel(
-          new Pump(Protoss.Reaver, 1),
+          new If(
+            new UnitsAtMost(12, UnitMatchWarriors),
+            new Pump(Protoss.Reaver, 2)),
           new Pump(Protoss.HighTemplar),
           new Pump(Protoss.Zealot, 30),
           new PumpDragoonsOrZealots),
         new Parallel(
           new Pump(Protoss.Reaver, 4),
           new PumpDragoonsOrZealots))),
-    new Pump(Protoss.Observer, 2)
+    new If(
+      new Or(
+        new EnemyDarkTemplarLikely,
+        new BasesAtLeast(2),
+        new SafeAtHome),
+      new Pump(Protoss.Observer, 2))
   )
 }

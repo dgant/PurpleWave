@@ -200,7 +200,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   }
   
   private def calculateOrigin: Pixel = {
-    lazy val anchors = unit.matchups.allies.filter(isAnchor)
     if (toReturn.isDefined) {
       toReturn.get
     }
@@ -209,9 +208,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     }
     else if (toLeash.isDefined) {
       toLeash.get.pixelCenter
-    }
-    else if (anchors.nonEmpty) {
-      anchors.minBy(_.pixelDistanceEdge(unit)).pixelCenter
     }
     else if (With.geography.ourBases.nonEmpty) {
       With.geography.ourBases.map(_.heart.pixelCenter).minBy(unit.pixelDistanceTravelling)
@@ -238,10 +234,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     
     // Don't retreat to a Missile Turret against Zerglings, for example
     if (ally.matchups.enemies.nonEmpty && ally.matchups.targets.isEmpty) return false
-    
-    if (ally.topSpeed < unit.topSpeed && ally.unitClass.subjectiveValue > unit.unitClass.subjectiveValue) {
-      return true
-    }
     
     if ( ! ally.unitClass.canMove && ally.canAttack) {
       return true

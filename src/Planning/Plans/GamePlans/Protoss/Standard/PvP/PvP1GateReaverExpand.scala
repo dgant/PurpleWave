@@ -11,7 +11,7 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBasesAtMost, EnemyDarkTemplarLikely, SafeAtHome}
+import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
@@ -40,11 +40,11 @@ class PvP1GateReaverExpand extends GameplanModeTemplate {
       Get(10,  Protoss.Probe),
       Get(Protoss.Gateway),
       Get(12,  Protoss.Probe),
-      Get(Protoss.Assimilator),
+      Get(2,   Protoss.Pylon),
       Get(13,  Protoss.Probe),
       Get(1,   Protoss.Zealot),
       Get(14,  Protoss.Probe),
-      Get(2,   Protoss.Pylon),
+      Get(Protoss.Assimilator),
       Get(15,  Protoss.Probe),
       Get(Protoss.CyberneticsCore),
       Get(16,  Protoss.Probe),
@@ -56,7 +56,7 @@ class PvP1GateReaverExpand extends GameplanModeTemplate {
       Get(Protoss.RoboticsFacility),
       Get(3,   Protoss.Pylon)),
     new If(
-      new EnemyBasesAtMost(1),
+      new Not(new EnemyStrategy(With.fingerprints.nexusFirst)),
       new BuildOrder(
         Get(2,   Protoss.Gateway),
         Get(20,  Protoss.Probe),
@@ -69,7 +69,9 @@ class PvP1GateReaverExpand extends GameplanModeTemplate {
     new EjectScout,
 
     new If(
-      new UnitsAtLeast(2, Protoss.Reaver, complete = true),
+      new Or(
+        new EnemyStrategy(With.fingerprints.nexusFirst),
+        new UnitsAtLeast(2, Protoss.Reaver, complete = true)),
       new RequireMiningBases(2)),
   
     new PvPIdeas.TrainArmy,
@@ -95,6 +97,8 @@ class PvP1GateReaverExpand extends GameplanModeTemplate {
     new FlipIf(
       new SafeAtHome,
       new Build(Get(3, Protoss.Gateway)),
-      new RequireMiningBases(2))
+      new RequireMiningBases(2)),
+
+    new Build(Get(5, Protoss.Gateway))
   )
 }

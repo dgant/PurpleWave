@@ -171,7 +171,7 @@ class PvPLateGame extends GameplanModeTemplate {
 
     new Build(Get(8, Protoss.Gateway)),
     new RequireMiningBases(3),
-    new Build(Get(11, Protoss.Gateway)),
+    new Build(Get(13, Protoss.Gateway)),
     new BuildCannonsAtExpansions(1),
 
     new If(

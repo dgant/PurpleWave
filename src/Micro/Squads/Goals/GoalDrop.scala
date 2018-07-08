@@ -34,8 +34,8 @@ class GoalDrop(destination: Pixel) extends GoalBasic {
     }))
   
     passengersArrived.foreach(_.agent.intend(squad.client, new Intention {
-      toTravel    = Some(destinationArrived)
-      canBerzerk  = true
+      toTravel  = Some(destinationArrived)
+      canFlee   = false
     }))
     
     convoys.foreach(_.agent.intend(squad.client, new Intention {

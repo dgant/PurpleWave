@@ -8,8 +8,8 @@ import Planning.UnitMatchers._
 import Utilities.ByOption
 
 class EscortSettlers(
-    attackerMatcher: UnitMatcher = UnitMatchAnd(UnitMatchRecruitableForCombat, UnitMatchNot(UnitMatchWorkers)),
-    attackerCounter: UnitCounter = UnitCountEverything)
+  matcher: UnitMatcher = UnitMatchAnd(UnitMatchRecruitableForCombat, UnitMatchNot(UnitMatchWorkers)),
+  counter: UnitCounter = UnitCountEverything)
   extends SquadPlan[GoalEscort] {
   
   override val goal: GoalEscort = new GoalEscort

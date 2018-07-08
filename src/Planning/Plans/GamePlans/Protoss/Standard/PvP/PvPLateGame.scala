@@ -122,6 +122,10 @@ class PvPLateGame extends GameplanModeTemplate {
   override val buildPlans = Vector(
 
     new If(
+      new EnemyDarkTemplarLikely,
+      new BuildCannonsAtBases(1)),
+
+    new If(
       new Not(new EnemyCarriers),
       new UpgradeContinuously(Protoss.ZealotSpeed)),
     new If(
@@ -133,10 +137,6 @@ class PvPLateGame extends GameplanModeTemplate {
         new UpgradeContinuously(Protoss.DragoonRange)),
 
     new PvPIdeas.TakeBase2,
-
-    new If(
-      new EnemyDarkTemplarLikely,
-      new BuildCannonsAtBases(1)),
 
     new If(
       new Check(() => With.blackboard.keepingHighTemplar.get),

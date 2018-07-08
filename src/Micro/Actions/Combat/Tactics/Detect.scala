@@ -1,10 +1,10 @@
 package Micro.Actions.Combat.Tactics
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Micro.Actions.Action
-import Micro.Actions.Combat.Decisionmaking.Disengage
+import Micro.Actions.Combat.Decisionmaking.Leave
 import Micro.Actions.Commands.Move
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.ByOption
 
 object Detect extends Action {
   
@@ -15,28 +15,35 @@ object Detect extends Action {
   )
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    
-    val allSpookies = unit.teammates.flatMap(teammate =>
-      teammate.matchups.enemies.filter(enemy =>
-        teammate.unitClass.attacks(enemy.unitClass)
-        && enemy.cloaked
-        && teammate.framesToGetInRange(enemy) < GameTime(0, 10)()))
-    
-    val superSpookies = allSpookies.filter(e =>
-      e.effectivelyCloaked
-      && e.matchups.targets.nonEmpty)
-    
-    if (superSpookies.isEmpty && unit.matchups.framesOfSafety <= 0) {
-      Disengage.delegate(unit)
+
+    val spookiestSpooky =
+      pickBestSpooky(unit, unit.squad.map(_.enemies.filter(_.effectivelyCloaked)).getOrElse(Iterable.empty)).orElse(
+        pickBestSpooky(unit, unit.squad.map(_.enemies.filter(_.cloaked)).getOrElse(Iterable.empty))).orElse(
+          if (unit.agent.canFocus) None else pickBestSpooky(unit, unit.matchups.enemies.filter(_.effectivelyCloaked))).orElse(
+            if (unit.agent.canFocus) None else pickBestSpooky(unit, unit.matchups.enemies.filter(_.cloaked)))
+
+    if (spookiestSpooky.isEmpty) {
+      return
     }
-    
-    val finalSpookies = if (superSpookies.isEmpty) allSpookies else superSpookies
-    
-    if (finalSpookies.isEmpty) return
-    
-    val spookiest = finalSpookies.minBy(x => ( ! x.canAttack, ! x.effectivelyCloaked, x.pixelDistanceEdge(unit)))
-    val vantage   = spookiest.pixelCenter.project(unit.agent.destination, 32.0 * 5.0)
-    unit.agent.toTravel = Some(vantage)
-    Move.delegate(unit)
+
+    val spooky = spookiestSpooky.get
+    val ghostbusters = spooky.matchups.enemies.filter(e => e.canMove && (if (spooky.flying) e.unitClass.attacksAir else e.unitClass.attacksGround))
+    val ghostbuster = ByOption.minBy(ghostbusters)(_.framesBeforeAttacking(spooky))
+
+    unit.agent.toTravel = ghostbuster.map(_.pixelCenter).orElse(Some(spooky.pixelCenter))
+
+    if (unit.matchups.framesOfSafety <= 0) {
+      Leave.delegate(unit)
+    }
+    else {
+      Move.delegate(unit)
+    }
+  }
+
+  def pickBestSpooky(detector: FriendlyUnitInfo, spookies: Iterable[UnitInfo]): Option[UnitInfo] = {
+    ByOption.minBy(spookies)(s =>
+      ByOption
+        .min(s.matchups.targets.map(s.pixelDistanceSquared))
+        .getOrElse(s.pixelDistanceSquared(detector)))
   }
 }

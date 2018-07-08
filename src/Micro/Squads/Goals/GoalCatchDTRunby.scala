@@ -25,7 +25,7 @@ class GoalCatchDTRunby extends GoalBasic {
   override protected def offerCritical(candidates: Iterable[FriendlyUnitInfo]): Unit = {}
   override protected def offerImportant(candidates: Iterable[FriendlyUnitInfo]): Unit = {
     if (acceptsHelp) {
-      ByOption.minBy(candidates)(_.pixelDistanceEdge(destination)).foreach(addCandidate)
+      ByOption.minBy(candidates.filter(unitMatcher.accept))(_.pixelDistanceEdge(destination)).foreach(addCandidate)
     }
   }
   override protected def offerUseful(candidates: Iterable[FriendlyUnitInfo]): Unit =  {}

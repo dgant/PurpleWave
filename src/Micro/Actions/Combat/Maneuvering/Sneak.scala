@@ -16,11 +16,11 @@ object Sneak extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.cloaked
     && unit.canMove
+    && unit.agent.canFlee
     && ! Yolo.active
     && ! unit.matchups.allies.exists(_.is(Protoss.Arbiter))
-    && ! unit.agent.canBerzerk
-    && unit.matchups.enemies.exists(e => e.complete && ! e.unitClass.isWorker && (if (unit.flying) e.unitClass.attacksGround else e.unitClass.attacksAir))
     && ! unit.matchups.enemies.exists(_.is(UnitMatchMobileDetectors))
+    && unit.matchups.enemies.exists(e => e.complete && ! e.unitClass.isWorker && (if (unit.flying) e.unitClass.attacksGround else e.unitClass.attacksAir))
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {

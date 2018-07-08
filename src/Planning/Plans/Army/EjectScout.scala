@@ -8,23 +8,23 @@ import ProxyBwapi.Races.Zerg
 import Utilities.ByOption
 
 class EjectScout(
-  attackerMatcher: UnitMatcher = UnitMatchAnd(UnitMatchRecruitableForCombat, UnitMatchNot(UnitMatchWorkers)),
-  attackerCounter: UnitCounter = UnitCountOne)
+  matcher: UnitMatcher = UnitMatchCanCatchScouts,
+  counter: UnitCounter = UnitCountOne)
   extends SquadPlan[GoalEjectScout] {
-  
+
   override val goal: GoalEjectScout = new GoalEjectScout
-  
+
   override def onUpdate() {
     val eligibleZones = With.geography.ourZones.toSet ++ Seq(With.geography.ourNatural.zone) ++ With.geography.ourMain.zone.edges.flatMap(_.zones)
     val scouts = eligibleZones.flatMap(_.units.filter(u => u.possiblyStillThere && u.isEnemy && u.isAny(UnitMatchWorkers, Zerg.Overlord)))
     val scout = ByOption.minBy(scouts)(_.id)
-    
+
     if (scouts.isEmpty) return
-  
+
     squad.enemies = scout
     goal.scout = scout
-    goal.unitMatcher = attackerMatcher
-    goal.unitCounter = attackerCounter
+    goal.unitMatcher = matcher
+    goal.unitCounter = counter
     super.onUpdate()
   }
 }

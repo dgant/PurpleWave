@@ -49,15 +49,15 @@ class PvP2BaseReaverCarrier extends GameplanModeTemplate {
     new If(
       new UnitsAtLeast(2, Protoss.Carrier),
       new UpgradeContinuously(Protoss.CarrierCapacity)),
-    new If(
-      new UnitsAtMost(0, Protoss.FleetBeacon),
-      new TrainArmy,
-      new TrainCarrierArmy),
     new Build(
       Get(2, Protoss.Gateway),
       Get(Protoss.Assimilator),
       Get(Protoss.CyberneticsCore)),
     new BuildGasPumps,
+    new If(
+      new UnitsAtMost(0, Protoss.FleetBeacon),
+      new TrainArmy,
+      new TrainCarrierArmy),
     new Build(
       Get(Protoss.DragoonRange),
       Get(Protoss.RoboticsFacility)),

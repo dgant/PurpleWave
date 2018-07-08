@@ -56,7 +56,6 @@ class DefendZealotsAgainst4Pool extends Plan {
     defenders.get.units.foreach(_.agent.intend(this, new Intention {
       toTravel = Some(target)
       canFlee = false
-      canBerzerk = true
     }))
   }
 }

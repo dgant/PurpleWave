@@ -68,10 +68,10 @@ class Agent(val unit: FriendlyUnitInfo) {
   var canMeld       : Boolean                       = false
   var canScout      : Boolean                       = false
   var canPillage    : Boolean                       = false
-  var canBerzerk    : Boolean                       = false
   var canLiftoff    : Boolean                       = false
   var canCast       : Boolean                       = false
   var canCancel     : Boolean                       = false
+  var canFocus      : Boolean                       = false
   
   var targetingProfile: TargetingProfile = TargetingProfiles.default
   
@@ -189,10 +189,10 @@ class Agent(val unit: FriendlyUnitInfo) {
     canFight      = intent.canAttack
     canMeld       = intent.canMeld
     canScout      = intent.canScout
-    canBerzerk    = intent.canBerzerk
     canLiftoff    = intent.canLiftoff
     canCast       = false
     canCancel     = intent.canCancel
+    canFocus      = intent.canFocus
   }
   
   private def cleanUp() {

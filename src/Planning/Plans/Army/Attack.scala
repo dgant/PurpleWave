@@ -7,15 +7,15 @@ import Planning.UnitCounters.UnitCounter
 import Planning.UnitMatchers._
 
 class Attack(
-  attackerMatcher: UnitMatcher = UnitMatchAnd(UnitMatchRecruitableForCombat, UnitMatchNot(UnitMatchWorkers)),
-  attackerCounter: UnitCounter = UnitCountEverything)
+  matcher: UnitMatcher = UnitMatchAnd(UnitMatchRecruitableForCombat, UnitMatchNot(UnitMatchWorkers)),
+  counter: UnitCounter = UnitCountEverything)
   extends SquadPlan[GoalAttack] {
-  
+
   override val goal: GoalAttack = new GoalAttack
-  
+
   override def onUpdate() {
-    goal.unitMatcher = attackerMatcher
-    goal.unitCounter = attackerCounter
+    goal.unitMatcher = matcher
+    goal.unitCounter = counter
     super.onUpdate()
   }
 }

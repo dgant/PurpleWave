@@ -25,7 +25,7 @@ class PvP2GateDarkTemplar extends GameplanModeTemplate {
   override val activationCriteria = new Employing(PvPOpen2GateDTExpand)
   override val completionCriteria = new Latch(new MiningBasesAtLeast(2))
   override val defaultWorkerPlan  = NoPlan()
-  override val defaultScoutPlan   = new ScoutOn(Protoss.Gateway)
+  override val defaultScoutPlan   = new ScoutOn(Protoss.CyberneticsCore)
   override val defaultAttackPlan  = new Trigger(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true), initialAfter = new Attack)
   override def blueprints = Vector(
     new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.backPylon)),
@@ -70,7 +70,8 @@ class PvP2GateDarkTemplar extends GameplanModeTemplate {
     Get(2,   Protoss.DarkTemplar),
     Get(24,  Protoss.Probe),
     Get(1,   Protoss.Forge),
-    Get(25,  Protoss.Probe))
+    Get(25,  Protoss.Probe),
+    Get(5,   Protoss.Pylon))
   
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvPIdeas.ReactToCannonRush,
@@ -91,8 +92,8 @@ class PvP2GateDarkTemplar extends GameplanModeTemplate {
     new If(
       new EnemyDarkTemplarLikely,
       new Parallel(
-        new BuildCannonsAtNatural(3),
-        new BuildCannonsInMain(2)),
+        new BuildCannonsInMain(1),
+        new BuildCannonsAtNatural(3)),
       new BuildCannonsAtNatural(2)),
     new Pump(Protoss.Dragoon),
     new RequireMiningBases(2))

@@ -12,7 +12,6 @@ class GoalAttack extends GoalBasic {
   override def toString: String = "Attack " + target.zone.name
   
   var target: Pixel = With.intelligence.mostBaselikeEnemyTile.pixelCenter
-  var berzerk: Boolean = false
   
   override def run() {
     chooseTarget()
@@ -20,7 +19,6 @@ class GoalAttack extends GoalBasic {
       With.intelligence.highlightScout(attacker)
       attacker.agent.intend(squad.client, new Intention {
         toTravel = Some(target)
-        canBerzerk = berzerk
       })
     })
     

@@ -23,8 +23,7 @@ object FightOrFlight extends Action {
         decision = Some(shouldEngage)
       }
     }
-  
-    decide(true,  "Berzerk",    () => unit.agent.canBerzerk)
+
     decide(true,  "YOLO",       () => Yolo.active)
     decide(true,  "Bored",      () => unit.battle.isEmpty)
     decide(true,  "No threats", () => unit.matchups.threats.isEmpty)

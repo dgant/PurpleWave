@@ -16,8 +16,7 @@ class Simulacrum(
   
   // Constant
   private val SIMULATION_STEP_FRAMES = 6
-  
-  val movementDelay     : Int     = if (realUnit.isEnemy || simulation.weAttack)  0   else realUnit.unitClass.framesToTurn(Math.PI) + 2 * realUnit.unitClass.accelerationFrames + With.configuration.simulationRetreatDelay
+
   val speedMultiplier   : Double  = if (realUnit.isEnemy || realUnit.flying)      1.0 else Math.max(0.75, simulation.chokeMobility.getOrElse(realUnit.zone, 1.0))
   val bonusRange        : Double  = if (realUnit.isOurs  || ! realUnit.unitClass.isSiegeTank || ! simulation.weAttack) 0.0 else With.configuration.simulationBonusTankRange
   val multiplierSplash  : Double  = realUnit.matchups.splashFactorMax
@@ -28,7 +27,7 @@ class Simulacrum(
   var shieldPoints        : Int                         = realUnit.shieldPoints + realUnit.defensiveMatrixPoints
   var hitPoints           : Int                         = realUnit.hitPoints
   var cooldownShooting    : Int                         = 1 + realUnit.cooldownLeft
-  var cooldownMoving      : Int                         = movementDelay
+  var cooldownMoving      : Int                         = 0
   var pixel               : Pixel                       = realUnit.pixelCenter
   var dead                : Boolean                     = false
   var target              : Option[Simulacrum]          = None

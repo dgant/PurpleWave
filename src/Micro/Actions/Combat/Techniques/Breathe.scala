@@ -4,6 +4,7 @@ import Micro.Actions.Combat.Decisionmaking.Leave
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Techniques.Common.Activators.WeightedMean
 import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, AttackAsSoonAsPossible}
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Breathe extends ActionTechnique {
@@ -17,6 +18,7 @@ object Breathe extends ActionTechnique {
     && unit.matchups.targets.nonEmpty
     && unit.matchups.threats.nonEmpty
     && ! unit.unitClass.melee
+    && unit.is(Protoss.Corsair) // Try to find a better generalizer
   )
   
   override val activator = new WeightedMean(this)

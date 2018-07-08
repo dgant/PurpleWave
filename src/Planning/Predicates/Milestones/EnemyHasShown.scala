@@ -8,7 +8,7 @@ class EnemyHasShown(unitClass: UnitClass, quantity: Int = 1) extends Predicate {
   
   override def isComplete: Boolean = {
     val shown   = With.enemies.map(With.intelligence.unitsShown(_, unitClass)).sum
-    val output  = shown > quantity
+    val output  = shown >= quantity
     output
   }
 }

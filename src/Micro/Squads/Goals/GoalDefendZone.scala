@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Formations.Formation
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Mathematics.PurpleMath
-import Micro.Agency.Intention
+import Micro.Agency.{Intention, Leash}
 import Performance.Cache
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -25,13 +25,13 @@ class GoalDefendZone extends GoalBasic {
       u.isOurs
       && u.unitClass.isStaticDefense
       && (squad.enemies.isEmpty || squad.enemies.exists(u.canAttack)))
+
+    lazy val allowWandering = ! With.enemies.exists(_.isZerg) || squad.units.size >= 3 || squad.enemies.exists(_.unitClass.ranged)
+    lazy val canHuntEnemies = huntableEnemies().nonEmpty
+    lazy val canDefendWall  = walls.nonEmpty
+    lazy val canDefendChoke = choke.isDefined
     
-    lazy val canHuntEnemies  = huntableEnemies().nonEmpty
-    lazy val canDefendWall   = walls.nonEmpty
-    lazy val canDefendChoke  = choke.isDefined && ( ! With.enemies.exists(_.isZerg) || squad.units.size >= 6)
-    lazy val canDefendHeart  = base.isDefined
-    
-    if (canHuntEnemies) {
+    if (allowWandering && canHuntEnemies) {
       lastAction = "Scour "
       huntEnemies()
     }
@@ -39,11 +39,11 @@ class GoalDefendZone extends GoalBasic {
       lastAction = "Protect wall of "
       defendWall(walls)
     }
-    else if (canDefendChoke) {
+    else if (allowWandering && canDefendChoke) {
       lastAction = "Protect choke of "
       defendChoke(choke.get)
     }
-    else if (canDefendHeart) {
+    else {
       lastAction = "Protect heart of "
       defendHeart(base.map(_.heart.pixelCenter).getOrElse(zone.centroid.pixelCenter))
     }
@@ -73,9 +73,12 @@ class GoalDefendZone extends GoalBasic {
   }
   
   def defendHeart(center: Pixel) {
+    val protectables = center.zone.units.toVector.filter(u => u.isOurs && u.unitClass.isBuilding && u.hitPoints < 300 && u.visibleToOpponents)
+    val protectRange = ByOption.max(protectables.map(_.pixelDistanceCenter(center))).getOrElse(32.0 * 8.0)
     squad.units.foreach(_.agent.intend(squad.client, new Intention {
       toTravel = Some(center)
       toReturn = if (zone.bases.exists(_.owner.isUs)) Some(center) else None
+      toLeash = Some(Leash(center, protectRange))
     }))
   }
   

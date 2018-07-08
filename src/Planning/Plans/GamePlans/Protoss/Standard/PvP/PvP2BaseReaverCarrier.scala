@@ -9,8 +9,10 @@ import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.TrainArmy
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
+import Planning.Predicates.Compound.And
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
+import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvPLateGame2BaseReaverCarrier_SpecificMaps, PvPLateGame2BaseReaverCarrier_SpecificOpponents}
@@ -28,11 +30,8 @@ class PvP2BaseReaverCarrier extends GameplanModeTemplate {
   )
 
   override val defaultAttackPlan = new If(
-    new UnitsAtMost(0, Protoss.FleetBeacon),
-    new PvPIdeas.AttackSafely,
-    new If(
-      new UnitsAtLeast(24, Protoss.Interceptor),
-      new Attack))
+    new UnitsAtLeast(24, Protoss.Interceptor),
+    new Attack)
 
   class TrainCarrierArmy extends Parallel(
     new FlipIf(
@@ -40,7 +39,9 @@ class PvP2BaseReaverCarrier extends GameplanModeTemplate {
       new Pump(Protoss.Reaver, 5),
       new Pump(Protoss.Carrier)),
     new If(
-      new GasAtLeast(200),
+      new And(
+        new UnitsAtLeast(2, Protoss.Stargate, complete = true),
+        new GasAtLeast(200)),
       new PvPIdeas.PumpDragoonsOrZealots,
       new Pump(Protoss.Zealot)))
 
@@ -54,19 +55,23 @@ class PvP2BaseReaverCarrier extends GameplanModeTemplate {
       Get(Protoss.Assimilator),
       Get(Protoss.CyberneticsCore)),
     new BuildGasPumps,
-    new If(
-      new UnitsAtMost(0, Protoss.FleetBeacon),
-      new TrainArmy,
-      new TrainCarrierArmy),
-    new Build(
-      Get(Protoss.DragoonRange),
-      Get(Protoss.RoboticsFacility)),
     new PvPIdeas.GetObserversIfDarkTemplarPossible,
-    new Build(
-      Get(Protoss.RoboticsSupportBay),
-      Get(Protoss.Stargate),
-      Get(Protoss.FleetBeacon),
-      Get(2, Protoss.Stargate)),
+    new FlipIf(
+      new UnitsAtLeast(2, Protoss.Reaver, complete = true),
+      new FlipIf(
+        new SafeAtHome,
+        new If(
+          new UnitsAtMost(0, Protoss.FleetBeacon),
+          new TrainArmy,
+          new TrainCarrierArmy),
+        new Build(
+          Get(Protoss.DragoonRange),
+          Get(Protoss.RoboticsFacility),
+          Get(Protoss.RoboticsSupportBay))),
+      new Build(
+        Get(Protoss.Stargate),
+        Get(Protoss.FleetBeacon),
+        Get(2, Protoss.Stargate))),
     new If(
       new UpgradeComplete(Protoss.AirDamage, 3),
       new UpgradeContinuously(Protoss.AirArmor),

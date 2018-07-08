@@ -13,7 +13,7 @@ object TargetFilterFutility extends TargetFilter {
       || actor.inRangeToAttack(target)
       || targetBusy
       || actor.is(Zerg.Scourge)
-      || target.framesToGetInRange(target) < 8
+      || actor.framesToGetInRange(target) < 8
       || (target.unitClass.isWorker && target.base.exists(_.harvestingArea.contains(target.tileIncludingCenter))))
     output
   }

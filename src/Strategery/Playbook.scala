@@ -65,7 +65,7 @@ object StrategyGroups {
 }
 
 class TestingPlaybook extends EmptyPlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvPOpen1GateReaverExpand, PvPLateGame2BaseReaverCarrier_SpecificOpponents)
+  override lazy val forced: Seq[Strategy] = Seq(PvZ4Gate99)
 }
 
 class PurpleWavePlaybook extends EmptyPlaybook {
@@ -84,4 +84,4 @@ class TestingCIGPlaybook extends CIGPlaybook {
   override def enemyName: String = "LetaBot"
 }
 
-object Playbook extends CIGPlaybook {}
+object Playbook extends TestingPlaybook {}

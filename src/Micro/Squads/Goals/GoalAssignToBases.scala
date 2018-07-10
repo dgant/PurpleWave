@@ -32,6 +32,7 @@ abstract class GoalAssignToBases extends GoalBasic {
       val scoutPixel = destinationByScout.find(_._1 == unit).map(_._2).getOrElse(destination)
       unit.agent.intend(squad.client, new Intention {
         toTravel = Some(scoutPixel)
+        canFocus = true
       })
     })
   }

@@ -42,14 +42,17 @@ class ClearBurrowedBlockers extends Plan {
     if (detector.get.units.nonEmpty) {
       detector.get.units.foreach(_.agent.intend(this, new Intention {
         toTravel = target
+        canFocus = true
       }))
     }
   
     if (With.enemies.exists(_.isTerran) && detector.get.units.forall(_.framesToTravelTo(target.get) > GameTime(0, 5)())) {
       decoy.get.unitPreference.set(UnitPreferClose(target.get))
+
       decoy.get.acquire(this)
       decoy.get.units.foreach(_.agent.intend(this, new Intention {
         toTravel = Some(target.get.add(Random.nextInt(160) - 80, Random.nextInt(128) - 64))
+        canFocus = true
       }))
     }
   }

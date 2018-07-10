@@ -25,7 +25,7 @@ Thanks to:
 * @vjurenka for BWMirror and Luke Perkins for BWTA
 
 ## How to build PurpleWave
-[See build instructions in install.md](install.md)
+[See build instructions in install.md](install/install.md)
 
 Steps: 
 * Clone or download this repository (I keep it in c:\p\pw but it should work from anywhere)

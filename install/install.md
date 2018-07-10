@@ -8,6 +8,16 @@ What you'll need:
 * 32-bit (x86) Java Development Kit 8:http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 * IntelliJ IDEA Community Edition: https://www.jetbrains.com/idea/download/#section=windows
 
+## Extract BWMirror
+
+If you've acquired PurpleWave from GitHub, these files should already be present and you can skip this step.
+
+* Locate Purplewave's /lib directory, wihch contains several bwapi_bridge2_5.dll
+* Get BWMirror 2.5 via https://github.com/vjurenka/BWMirror/blob/master/dist/bwmirror_v2_5.jar
+* Make a copy of bwmirror_v2_5.jar called bwmirror_v2_5.zip
+* From bwmirror_v2_5.zip, extract bwapi_bridge2_5.dll, libgmp-10.dll, and libmpfr-4.dll to PurpleWave's /lib
+* Copy bwmirror_v2_5.jar to PurpleWave's /lib
+
 ## Configuring IntelliJ project
 
 Some of these steps may already be complete. If so, great!
@@ -48,6 +58,7 @@ Some of these steps may already be complete. If so, great!
 * **Verify:** You should see "PurpleWave"
 * **Verify:** You should see bwmirror_v2_5, with "Export" checked off
 * **Verify:** You should see scala-sdk-2.12.6, with "Export" checked off
+* If you don't see scala-sdk-212.6: Click "+" -> Scala -> Use Library: scala-sdk-212.6 -> OK
 
 ![Screenshot of instructions](instructions4.png)
 

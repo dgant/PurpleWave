@@ -61,7 +61,7 @@ object Opponents {
   val johankayser       : Opponent = add(Opponent("Johan Kayser",       srbotone.policy))
   val bryanweber        : Opponent = add(Opponent("Bryan Weber",        cunybot.policy))
 
-  val jadien: Opponent = add(Opponent("Jadien", locutus.policy))
+  val jadien: Opponent = add(Opponent("Jadien", new StrategySelectionFixed(PvT13Nexus, PvT2BaseArbiter)))
   
   val all: Vector[Opponent] = allKnown
 }

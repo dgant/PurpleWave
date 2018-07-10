@@ -104,8 +104,8 @@ object PvPIdeas {
     new EnemyDarkTemplarExists,
     new Parallel(
       new If(
-        new UnitsAtMost(0, Protoss.Observatory),
-        new BuildCannonsAtBases(1)),
+        new UnitsAtMost(0, Protoss.Observer, complete = true),
+        new BuildCannonsAtBases(2)),
       new Build(
         Get(1, Protoss.RoboticsFacility),
         Get(1, Protoss.Observatory)),
@@ -186,8 +186,7 @@ object PvPIdeas {
 
   class MeldArchonsPvP extends MeldArchons(49) {
     override def minimumArchons: Int = Math.min(8, With.units.countEnemy(Protoss.Zealot) / 3)
-    override def maximumTemplar: Int = Math.max(0, (With.units.countEnemy(UnitMatchWarriors) - 20) / 6)
-    templar.unitMatcher.set(UnitMatchAnd(Protoss.HighTemplar, UnitMatchEnergyAtMost(75)))
+    override def maximumTemplar: Int = Math.max(0, (With.units.countEnemy(UnitMatchWarriors) - 6) / 6)
   }
 
   class GetObserversIfDarkTemplarPossible extends If(

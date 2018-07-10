@@ -2,7 +2,7 @@ package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
 
-class PumpWorkers(oversaturate: Boolean = false) extends Pump(With.self.workerClass) {
+class PumpWorkers(oversaturate: Boolean = false, cap: Int = 85) extends Pump(With.self.workerClass) {
   
   protected def builderCount: Int = {
     if (With.self.isTerran)
@@ -13,7 +13,7 @@ class PumpWorkers(oversaturate: Boolean = false) extends Pump(With.self.workerCl
       3
   }
   override def maxDesirable: Int = Math.min(
-    85,
+    cap,
     (if (oversaturate) 18 else 0) +
     /* Builders */  builderCount * With.geography.ourBases.size +
     /* Minerals */  3 * With.geography.ourBases.toVector.map(base => base.gas.size).sum +

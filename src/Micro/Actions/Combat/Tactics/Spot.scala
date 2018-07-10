@@ -1,6 +1,7 @@
 package Micro.Actions.Combat.Tactics
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Actions.Commands.Move
@@ -27,7 +28,14 @@ object Spot extends Action {
     }
   }
 
+  def bonusDistance: Double = {
+    if (With.enemies.exists(_.isTerran))
+      5.0 * 32.0
+    else
+      3.0 * 32.0
+  }
+
   protected def destinationFromTeammates(unit: FriendlyUnitInfo, teammates: Iterable[UnitInfo]): Option[Pixel] = {
-    ByOption.minBy(unit.squadmates.filter(_.canAttack).map(_.pixelCenter))(_.pixelDistance(unit.agent.destination))
+    ByOption.minBy(unit.squadmates.filter(_.canAttack).map(u => u.pixelCenter.project(u.agent.destination, bonusDistance)))(_.pixelDistance(unit.agent.destination))
   }
 }

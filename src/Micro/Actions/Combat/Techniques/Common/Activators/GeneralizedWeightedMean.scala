@@ -20,7 +20,7 @@ abstract class GeneralizedWeightedMean(technique: ActionTechnique) extends Weigh
       // Dunno.
       return 0.0
     }
-    
+
     val elements  = applicabilitySignificance.map(p => Math.pow(p._1, tension) * p._2 / totalSignificance)
     val output    = Math.pow(elements.sum, 1.0/tension)
     output

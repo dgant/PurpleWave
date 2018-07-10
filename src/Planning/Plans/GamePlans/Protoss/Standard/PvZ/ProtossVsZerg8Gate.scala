@@ -10,6 +10,7 @@ import Planning.Plans.Macro.Automatic.UpgradeContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural, MeldArchons}
+import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
@@ -62,7 +63,9 @@ class ProtossVsZerg8Gate extends GameplanModeTemplate {
     new PvZIdeas.AddEarlyCannons,
     new UpgradeContinuously(Protoss.ZealotSpeed),
     new If(
-      new UnitsAtLeast(8, Protoss.Gateway),
+      new Or(
+        new UnitsAtLeast(8, Protoss.Gateway),
+        new MineralsAtLeast(400)),
       new BuildGasPumps),
     new BuildCannonsAtExpansions(5),
     new If(

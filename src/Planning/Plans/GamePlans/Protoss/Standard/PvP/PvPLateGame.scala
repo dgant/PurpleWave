@@ -16,7 +16,7 @@ import Planning.Predicates.Reactive.{EnemyCarriers, EnemyDarkTemplarLikely, Safe
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.{PvPLateGameArbiter, PvPLateGameCarrier}
+import Strategery.Strategies.Protoss.{PvPLateGameArbiter, PvPLateGameCarrier, PvPOpen2GateDTExpand}
 
 class PvPLateGame extends GameplanModeTemplate {
   
@@ -30,8 +30,8 @@ class PvPLateGame extends GameplanModeTemplate {
   
   override def defaultWorkerPlan: Plan = new If(
     new SafeAtHome,
-    new PumpWorkers(true),
-    new PumpWorkers(false))
+    new PumpWorkers(true, cap = 75),
+    new PumpWorkers(false, cap = 75))
   
   override def priorityAttackPlan   : Plan = new PvPIdeas.AttackWithDarkTemplar
   override def priorityDefensePlan  : Plan = new DefendZones { defenderMatcher.set(Protoss.Corsair) }
@@ -92,7 +92,7 @@ class PvPLateGame extends GameplanModeTemplate {
       new RoboTech,
       new TemplarTech),
 
-    new Build(Get(5, Protoss.Gateway)),
+    new Build(Get(6, Protoss.Gateway)),
 
     new If(
       new Or(
@@ -121,6 +121,11 @@ class PvPLateGame extends GameplanModeTemplate {
 
   override val buildPlans = Vector(
 
+    // We're dead to DTs if we don't
+    new If(
+      new Employing(PvPOpen2GateDTExpand),
+      new BuildCannonsAtNatural(2)),
+
     new If(
       new EnemyDarkTemplarLikely,
       new BuildCannonsAtBases(1)),
@@ -145,10 +150,6 @@ class PvPLateGame extends GameplanModeTemplate {
     new PvPIdeas.TakeBase3,
 
     new If(
-      new UnitsAtLeast(3,  Protoss.Reaver),
-      new Build(Get(Protoss.ScarabDamage))),
-
-    new If(
       new EnemiesAtLeast(1, Protoss.DarkTemplar),
       new UpgradeContinuously(Protoss.ObserverSpeed)),
 
@@ -163,10 +164,7 @@ class PvPLateGame extends GameplanModeTemplate {
 
     new FlipIf(
       new SafeToMoveOut,
-      new If(
-        new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
-        new Build(Get(6, Protoss.Gateway)),
-        new Build(Get(8, Protoss.Gateway))),
+      new Build(Get(8, Protoss.Gateway)),
       new RequireBases(3)),
 
     new Build(Get(8, Protoss.Gateway)),

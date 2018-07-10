@@ -8,7 +8,7 @@ object PlacementProfiles {
   
   def default(blueprint: Blueprint): PlacementProfile = {
     if (blueprint.requireTownHallTile.get) {
-      if (With.self.isZerg)
+      if (With.self.isZerg || With.enemies.forall(_.isTerran))
         townHallFar
       else
         townHallNearby

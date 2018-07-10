@@ -1,7 +1,7 @@
 package Micro.Matchups
 
 import Information.Battles.BattleClassificationFilters
-import Information.Battles.Types.{Battle, BattleLocal, Team}
+import Information.Battles.Types.BattleLocal
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
@@ -27,7 +27,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val allUnits               : Vector[UnitInfo]      = battle.map(b => b.teams.flatMap(_.units) ++ With.matchups.entrants.getOrElse(b, Set.empty)).getOrElse(defaultUnits)
   lazy val enemies                : Vector[UnitInfo]      = allUnits.filter(_.isEnemyOf(me))
   lazy val alliesInclSelf         : Vector[UnitInfo]      = allUnits.filter(_.isAllyOf(me))
-  lazy val alliesInclSelfCloaked  : Vector[UnitInfo]      = alliesInclSelf.filter(_.cloaked)
+  lazy val alliesInclSelfCloaked  : Vector[UnitInfo]      = alliesInclSelf.filter(_.cloakedOrBurrowed)
   lazy val allies                 : Vector[UnitInfo]      = alliesInclSelf.filterNot(_.id == me.id)
   lazy val others                 : Vector[UnitInfo]      = enemies ++ allies
   lazy val allyDetectors          : Vector[UnitInfo]      = allies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)

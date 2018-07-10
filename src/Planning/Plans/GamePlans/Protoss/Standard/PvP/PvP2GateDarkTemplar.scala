@@ -16,7 +16,7 @@ import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
 import Planning.Predicates.Milestones.{EnemiesAtMost, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
-import Planning.Predicates.Strategy.Employing
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen2GateDTExpand
 
@@ -26,7 +26,11 @@ class PvP2GateDarkTemplar extends GameplanModeTemplate {
   override val completionCriteria = new Latch(new MiningBasesAtLeast(2))
   override val defaultWorkerPlan  = NoPlan()
   override val defaultScoutPlan   = new ScoutOn(Protoss.CyberneticsCore)
-  override val defaultAttackPlan  = new Trigger(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true), initialAfter = new Attack)
+  override val defaultAttackPlan  = new Trigger(
+    new Or(
+      new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
+      new EnemyStrategy(With.fingerprints.nexusFirst)),
+    new Attack)
   override def blueprints = Vector(
     new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.backPylon)),
     new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.backPylon)),
@@ -34,7 +38,7 @@ class PvP2GateDarkTemplar extends GameplanModeTemplate {
     new Blueprint(this, building = Some(Protoss.Pylon)),
     new Blueprint(this, building = Some(Protoss.Pylon)),
     new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
-  
+
   override val buildOrder = Vector(
     // http://wiki.teamliquid.net/starcraft/2_Gateway_Dark_Templar_(vs._Protoss)
     // We get gas/core faster because of mineral locking + later scout

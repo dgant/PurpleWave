@@ -18,9 +18,9 @@ object Detect extends Action {
 
     val spookiestSpooky =
       pickBestSpooky(unit, unit.squad.map(_.enemies.filter(_.effectivelyCloaked)).getOrElse(Iterable.empty)).orElse(
-        pickBestSpooky(unit, unit.squad.map(_.enemies.filter(_.cloaked)).getOrElse(Iterable.empty))).orElse(
+        pickBestSpooky(unit, unit.squad.map(_.enemies.filter(_.cloakedOrBurrowed)).getOrElse(Iterable.empty))).orElse(
           if (unit.agent.canFocus) None else pickBestSpooky(unit, unit.matchups.enemies.filter(_.effectivelyCloaked))).orElse(
-            if (unit.agent.canFocus) None else pickBestSpooky(unit, unit.matchups.enemies.filter(_.cloaked)))
+            if (unit.agent.canFocus) None else pickBestSpooky(unit, unit.matchups.enemies.filter(_.cloakedOrBurrowed)))
 
     if (spookiestSpooky.isEmpty) {
       return

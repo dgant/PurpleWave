@@ -27,21 +27,22 @@ object BeAnArbiter extends Action {
       Protoss.Observer,
       UnitMatchBuilding)
   
-  protected def evaluateForCloaking(target: UnitInfo): Double = {
-    if ( ! target.isFriendly) return 0.0
-    if ( ! needsUmbrella(target)) return 0.0
-    val value       = target.subjectiveValue
-    val multiplier  = 2.0 + PurpleMath.fastTanh(Math.max(-48, target.matchups.framesOfEntanglement))
-    val output      = value * multiplier
-    output
-  }
-  
   override protected def perform(unit: FriendlyUnitInfo) {
     val umbrellaSearchRadius  = 32.0 * 20.0
     val threatened            = unit.matchups.framesOfSafety <= 12.0
     val needUmbrella          = unit.teammates.filter(needsUmbrella)
     val needUmbrellaNearby    = needUmbrella.filter(_.pixelDistanceCenter(unit) < umbrellaSearchRadius)
-    
+
+    def evaluateForCloaking(target: UnitInfo): Double = {
+      if ( ! target.isFriendly) return 0.0
+      if ( ! needsUmbrella(target)) return 0.0
+      if (target.battle.isEmpty && unit.squad.exists(ourSquad => ! target.friendly.map(_.squad).exists(_.contains(ourSquad)))) return 0.0
+      val value       = target.subjectiveValue
+      val multiplier  = 2.0 + PurpleMath.fastTanh(Math.max(-48, target.matchups.framesOfEntanglement))
+      val output      = value * multiplier
+      output
+    }
+
     if (needUmbrella.nonEmpty) {
       val destination = TargetAOE.chooseTargetPixel(
         unit,
@@ -62,8 +63,8 @@ object BeAnArbiter extends Action {
     if (unit.matchups.framesOfSafety <= framesOfSafetyRequired) {
       val forceThreat = Potential.avoidThreats(unit)
       val resistancesTerrain = Potential.resistTerrain(unit)
-      unit.agent.forces.put(ForceColors.threat, forceThreat)
       unit.agent.forces.put(ForceColors.regrouping, forceUmbrella)
+      unit.agent.forces.put(ForceColors.threat,     forceThreat)
       unit.agent.resistances.put(ForceColors.mobility, resistancesTerrain)
       Gravitate.consider(unit)
       Move.delegate(unit)
@@ -76,10 +77,12 @@ object BeAnArbiter extends Action {
             enemy,
                     enemy.matchups.targets.size
             + 2.0 * enemy.matchups.targetsInRange.size))
-  
-      val forceThreats  = ForceMath.sum(forcesThreats).normalize
+
+      if (forcesThreats.exists(_.lengthSquared > 0.0)) {
+        val forceThreats = ForceMath.sum(forcesThreats).normalize
+        unit.agent.forces.put(ForceColors.threat, forceThreats)
+      }
       unit.agent.forces.put(ForceColors.regrouping, forceUmbrella)
-      unit.agent.forces.put(ForceColors.target,     forceThreats)
       Gravitate.consider(unit)
       Move.delegate(unit)
     }

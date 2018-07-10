@@ -4,8 +4,7 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
-import Micro.Actions.Combat.Techniques.Common.ActionTechnique
-import Micro.Actions.Commands.{Attack, AttackMove, Move, Patrol}
+import Micro.Actions.Commands.{Attack, Patrol}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 import scala.collection.mutable
@@ -66,7 +65,7 @@ class Defuse(defuser: UnitInfo, mine: UnitInfo) extends Action {
         attackMine(unit, mine)
       }
     }
-    else {
+    else if (unit.matchups.targetsInRange.isEmpty) {
       unit.agent.toTravel = Some(mine.pixelCenter)
       Patrol.delegate(unit)
     }

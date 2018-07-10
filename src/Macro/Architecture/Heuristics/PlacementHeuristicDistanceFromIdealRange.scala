@@ -12,7 +12,7 @@ object PlacementHeuristicDistanceFromIdealRange extends PlacementHeuristic {
     val candidatePixel  = candidate.topLeftPixel.add(16 * blueprint.widthTiles.get, 16 * blueprint.heightTiles.get)
     val zone            = candidate.zone
     
-    if (zone.exit.isEmpty) HeuristicMathMultiplicative.default
+    if (zone.exit.isEmpty) return HeuristicMathMultiplicative.default
     
     // TODO: Once we add some better math tools use distance from line instead
     

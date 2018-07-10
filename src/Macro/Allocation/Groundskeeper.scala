@@ -25,10 +25,10 @@ class Groundskeeper {
   ///////////
   
   def update() {
-    proposalsFulfilled.filterNot(_._2.alive).foreach(pair => flagUnfulfilled(pair._1))
-    proposals.diff(updated).foreach(removeBlueprint)
-    proposalPlacements.keySet.diff(updated).foreach(removeBlueprint)
-    requirementMatches.map(_.requirement).diff(updated).foreach(removeBlueprint)
+    proposalsFulfilled.foreach(pair => if ( ! pair._2.alive) flagUnfulfilled(pair._1))
+    proposals.foreach(proposal => if ( ! updated.contains(proposal)) removeBlueprint(proposal))
+    proposalPlacements.foreach(pair => if ( ! updated.contains(pair._1)) removeBlueprint(pair._1))
+    requirementMatches.foreach(m => if ( ! updated.contains(m.requirement)) removeBlueprint(m.requirement))
     updated.clear()
   }
   

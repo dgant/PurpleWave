@@ -41,11 +41,11 @@ object PvPOpen3GateGoon extends PvPOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
 }
-object PvPOpen4GateGoon           extends PvPOpening {
+object PvPOpen4GateGoon extends PvPOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
 }
-object PvPOpenProxy2Gate          extends PvPOpening {
+object PvPOpenProxy2Gate extends PvPOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.twoGate)
 }
@@ -55,7 +55,7 @@ object PvPLateGameArbiter extends PvPStrategy {
   override def mapsBlacklisted: Iterable[StarCraftMap] = Iterable(BlueStorm)
 }
 object PvPLateGame2BaseReaverCarrier_SpecificOpponents extends PvPStrategy {
-  //override def opponentsWhitelisted: Option[Iterable[String]] = Some(Vector("McRave"))
+  override def opponentsWhitelisted: Option[Iterable[String]] = Some(Vector("McRave"))
 }
 object PvPLateGame2BaseReaverCarrier_SpecificMaps extends PvPStrategy {
   override def mapsWhitelisted: Option[Iterable[StarCraftMap]] = Some(Vector(BlueStorm, Hitchhiker))

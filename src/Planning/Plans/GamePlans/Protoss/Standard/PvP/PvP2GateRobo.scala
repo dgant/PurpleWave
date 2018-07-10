@@ -1,14 +1,16 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
+import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.EjectScout
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeAtHome}
-import Planning.Predicates.Strategy.Employing
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
@@ -64,6 +66,13 @@ class PvP2GateRobo extends GameplanModeTemplate {
 
     new EjectScout,
 
+    // Can't afford for this to be delayed
+    new If(
+      new And(
+        new UnitsAtLeast(1, Protoss.RoboticsFacility),
+        new Not(new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway, With.fingerprints.cannonRush))),
+      new Build(Get(Protoss.Observatory))),
+
     new Trigger(
       new UnitsAtLeast(2, Protoss.Reaver, complete = true),
       new RequireMiningBases(2)),
@@ -72,7 +81,6 @@ class PvP2GateRobo extends GameplanModeTemplate {
 
     new Build(
       Get(Protoss.RoboticsFacility),
-      Get(Protoss.Observatory),
       Get(Protoss.RoboticsSupportBay)),
 
     new FlipIf(

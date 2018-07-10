@@ -518,7 +518,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
         GameTime(5, 0)()
     )
   )
-  
+
+  def cloakedOrBurrowed: Boolean = cloaked || burrowed
   def effectivelyCloaked: Boolean =
     (burrowed || cloaked) && (
       if (isFriendly)

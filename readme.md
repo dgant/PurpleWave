@@ -25,17 +25,10 @@ Thanks to:
 * @vjurenka for BWMirror and Luke Perkins for BWTA
 
 ## How to build PurpleWave
-What you'll need:
-* Windows
-* BWMirror 2.5, via https://github.com/vjurenka/BWMirror/blob/master/dist/bwmirror_v2_5.jar 
-* 32-bit (x86) Java Runtime Environment 8: http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html
-* 32-bit (x86) Java Development Kit 8:http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
-* IntelliJ IDEA Community Edition: https://www.jetbrains.com/idea/download/#section=windows
-* (Optional) Git: Git-2.13.2-64-bit.exe
-* (Very optional, if you'd like to package PurpleWave as an EXE) Launch4j: http://launch4j.sourceforge.net/
+[See build instructions in install.md](install.md)
 
 Steps: 
-* Clone or download this repository (I keep it in c:\prog\pw but it should work from anywhere)
+* Clone or download this repository (I keep it in c:\p\pw but it should work from anywhere)
 * Put bwmirror_v2_5.jar in /lib
 * Make a copy of bwmirror_v2_5.jar called bwmirror_v2_5.zip
 * From bwmirror_v2_5.zip, extract bwapi_bridge2_5.dll, libgmp-10.dll, and libmpfr-4.dll to /lib
@@ -49,13 +42,6 @@ Steps:
 
 This will produce PurpleWave.jar. See below for "How to run PurpleWave"
 
-(Optional) If you'd like to run or distribute PurpleWave as a standalone executable, here's how:
-* Run Launch4j (see link above for download)
-* In Launch4j: Open -> From the PurpleWave directory, launch4j/PurpleWave-launch4j.xml
-* In Launch4j: Point the Jar to the Jar you just built.
-* In Launch4j: Double-check the Output file and Jar directories
-* In Launch4j: Click build. This will producePurpleWave.exe
-
 You should find PurpleWave.exe in a directory with several DLLs which it needs to run:
 * BWAPI.dll
 * bwapi_bridge2_5.dll
@@ -64,11 +50,10 @@ You should find PurpleWave.exe in a directory with several DLLs which it needs t
 
 ## How to run PurpleWave
 * From IntelliJ IDEA: Run -> Run 'PurpleWave' or Debug 'PurpleWave'
-* As a JAR: java.exe -jar ./out/artifacts/PurpleWave.jar <-- Make sure you use a 32-bit version of java.exe! 
-* As an EXE: Just double-click it! Make sure if you move the EXE that you move the aforementioned DLLs along with it
+* As a JAR: java.exe -jar ./out/artifacts/PurpleWave.jar <-- Make sure you use a 32-bit version of java.exe!
 
 ## Questions and feedback
 Say hi! Post an issue here on Github or email dsgant at gmail
 
 ## License
-PurpleWave is published under the MIT License.
+PurpleWave is published under the MIT License. Make PurpleWave your own!

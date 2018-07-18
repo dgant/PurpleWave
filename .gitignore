@@ -13,3 +13,5 @@ out/
 src/META-INF
 bwapi-data/
 bin/
+.gradle/
+build/

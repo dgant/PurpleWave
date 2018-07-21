@@ -1,7 +1,7 @@
 package Strategery
 
 import Lifecycle.With
-import Strategery.Selection.{StrategySelectionCIG, StrategySelectionGreedy, StrategySelectionPolicy}
+import Strategery.Selection.{StrategySelectionCIG, StrategySelectionGreedy, StrategySelectionPolicy, StrategySelectionSSCAIT}
 import Strategery.Strategies.AllRaces.WorkerRush
 import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss.PvR.{PvROpen2Gate1012, PvROpen2Gate910}
@@ -80,8 +80,8 @@ class CIGPlaybook extends PurpleWavePlaybook {
   )
 }
 
-class TestingCIGPlaybook extends CIGPlaybook {
-  //override def enemyName: String = "LetaBot"
+class SSCAITPlaybook extends PurpleWavePlaybook {
+  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionSSCAIT
 }
 
 object Playbook extends CIGPlaybook {}

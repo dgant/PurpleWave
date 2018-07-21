@@ -6,7 +6,7 @@ import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, RequireSufficientSupply, UpgradeContinuously}
+import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -254,6 +254,13 @@ object PvPIdeas {
           new If(
             new UnitsAtMost(12, UnitMatchWarriors),
             new Pump(Protoss.Reaver, 2)),
+          // Due to bot kiting (and combat sim weakness), pure Speedlot+Archon is at some risk of getting excessively kited
+          new PumpMatchingRatio(Protoss.Dragoon, 0, 24, Seq(
+            Enemy(Protoss.Carrier, 6.0),
+            Enemy(Protoss.Shuttle, 2.0),
+            Enemy(Protoss.Arbiter, 1.0),
+            Enemy(Protoss.Scout, 1.0),
+            Friendly(Protoss.Zealot, 0.6))),
           new Pump(Protoss.HighTemplar),
           new Pump(Protoss.Zealot, 30),
           new PumpDragoonsOrZealots),

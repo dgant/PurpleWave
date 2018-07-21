@@ -18,7 +18,7 @@ object Breathe extends ActionTechnique {
     && unit.matchups.targets.nonEmpty
     && unit.matchups.threats.nonEmpty
     && ! unit.unitClass.melee
-    && unit.is(Protoss.Corsair) // Try to find a better generalizer
+    && ! unit.is(Protoss.Corsair) // Try to find a better generalizer; maybe cooldown vs. turn rate
   )
   
   override val activator = new WeightedMean(this)

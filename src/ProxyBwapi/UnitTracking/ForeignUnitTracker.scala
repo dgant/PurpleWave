@@ -4,7 +4,6 @@ import Lifecycle.With
 import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, Orders}
-import bwapi.Unit
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.HashSet
@@ -22,29 +21,32 @@ class ForeignUnitTracker {
   
   def update() {
     initialize()
+
+    val unitsByIdVisible = Players.all.filterNot(_.isFriendly).flatMap(_.rawUnits)
+      .map(unit => (unit.getID, unit))
+      .filter(isValidForeignUnit)
+
+    unitsByIdKnown.foreach(pair => pair._2.flagInvisible())
+    for (pair <- unitsByIdVisible) {
+      val knownUnit = unitsByIdKnown.get(pair._1)
+      if (knownUnit.isDefined) {
+        knownUnit.get.flagVisible()
+        knownUnit.get.update(pair._2)
+      }
+      else {
+        add(pair._2, pair._1).flagVisible()
+      }
+    }
+
+    unitsByIdKnown.values.foreach(updateMissing)
   
-    val unitsByIdVisible      = mapValidForeignUnits(Players.all.filterNot(_.isFriendly).flatMap(_.rawUnits))
-    val unitsToAdd            = unitsByIdVisible.toSeq.filterNot(pair => unitsByIdKnown   .contains(pair._1))
-    val unitsToUpdate         = unitsByIdVisible.toSeq.filter   (pair => unitsByIdKnown   .contains(pair._1))
-    val unitsToFlagInvisible  = unitsByIdKnown  .toSeq.filterNot(pair => unitsByIdVisible .contains(pair._1))
-    
-    unitsToAdd.foreach(pair => add(pair._2))
-    unitsToUpdate.foreach(pair => unitsByIdKnown(pair._1).update(pair._2))
-  
-    //Could speed things up by diffing instead of recreating these
+    // TODO: Let's stop making these sets by default.
     enemyUnits   = unitsByIdKnown.values.filter(_.player.isEnemy).toSet
     neutralUnits = unitsByIdKnown.values.filter(_.player.isNeutral).toSet
-  
-    unitsToFlagInvisible.foreach(_._2.flagInvisible())
-    invalidatePositions()
   }
   
   def onUnitDestroy(unit: bwapi.Unit) {
     unitsByIdKnown.get(unit.getID).foreach(remove)
-  }
-  
-  private def invalidatePositions() {
-    unitsByIdKnown.values.foreach(updateMissing)
   }
   
   private def initialize() {
@@ -72,11 +74,16 @@ class ForeignUnitTracker {
   private def trackStaticUnits() {
     With.game.getStaticNeutralUnits.asScala.foreach(add)
   }
+
+  private def add(unit: bwapi.Unit): ForeignUnitInfo = {
+    add(unit, unit.getID)
+  }
   
-  private def add(unit: bwapi.Unit) {
-    val knownUnit = new ForeignUnitInfo(unit, unit.getID)
-    knownUnit.update(unit)
-    unitsByIdKnown.put(knownUnit.id, knownUnit)
+  private def add(unit: bwapi.Unit, id: Int): ForeignUnitInfo = {
+    val proxyUnit = new ForeignUnitInfo(unit, unit.getID)
+    proxyUnit.update(unit)
+    unitsByIdKnown.put(id, proxyUnit)
+    proxyUnit
   }
   
   private def updateMissing(unit: ForeignUnitInfo) {
@@ -118,13 +125,6 @@ class ForeignUnitTracker {
   private def remove(unit: ForeignUnitInfo) {
     unit.flagDead()
     unitsByIdKnown.remove(unit.id)
-  }
-  
-  private def mapValidForeignUnits(units: Iterable[bwapi.Unit]): Map[Int, Unit] = {
-    units
-      .map(unit => (unit.getID, unit))
-      .filter(isValidForeignUnit)
-      .toMap
   }
   
   private def isValidForeignUnit(unitPair: (Int, bwapi.Unit)): Boolean = {

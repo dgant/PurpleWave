@@ -16,7 +16,7 @@ class Configuration {
   var enableVisualizations            = false
   var enableHumanManners              = false
   var identifyGhostUnits              = false
-  var targetFrameDurationMilliseconds = 40
+  var targetFrameDurationMilliseconds = 20
   
   //////////////
   // Strategy //
@@ -59,7 +59,7 @@ class Configuration {
   ///////////
   
   var maxMineralsBeforeMinedOut       = 300 * 8
-  var maxFramesToSendAdvanceBuilder   = GameTime(0, 40)()
+  var maxFramesToSendAdvanceBuilder   = GameTime(0, 20)()
   var maxFramesToTrustBuildRequest    = GameTime(10, 0)()
   var blockerMineralThreshold         = 250 // Setting this goofily high as an AIIDE hack to account for the 249-mineral patches on Fortress
   var maxPlacementAgeFrames           = GameTime(0, 3)()

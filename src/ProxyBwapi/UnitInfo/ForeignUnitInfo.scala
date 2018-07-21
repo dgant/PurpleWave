@@ -15,6 +15,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
   
   def flagDead()        { _alive              = false }
   def flagMissing()     { _possiblyStillThere = false }
+  def flagVisible()     { _visible            = true  }
   def flagInvisible()   { _visible            = false }
   def flagBurrowed()    { _burrowed           = true  }
   def flagCloaked()     { _cloaked            = true  }
@@ -230,7 +231,6 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
     _burrowed = unitClass.canBurrow && baseUnit.isBurrowed
     _cloaked  = baseUnit.isCloaked
     _detected = baseUnit.isDetected
-    _visible  = baseUnit.isVisible
   }
   
   private var _burrowed  : Boolean  = _

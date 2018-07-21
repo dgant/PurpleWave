@@ -20,7 +20,7 @@ class TargetAction(val additionalFiltersRequired: TargetFilter*) extends Action 
   
   override protected def perform(unit: FriendlyUnitInfo) {
     var filtersOptional = additionalFiltersOptional ++ Vector(TargetFilterCombatants, TargetFilterIgnoreScouts)
-    val filtersRequired = Vector(TargetFilterStayCloaked, TargetFilterFutility, TargetFilterScourge, TargetFilterAlmostAnything) ++ additionalFiltersRequired
+    val filtersRequired = Vector(TargetFilterFocus, TargetFilterStayCloaked, TargetFilterFutility, TargetFilterScourge, TargetFilterAlmostAnything) ++ additionalFiltersRequired
     
     val targetsRequired = new mutable.ListBuffer[UnitInfo]
     for (target <- unit.matchups.targets) {

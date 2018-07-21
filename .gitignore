@@ -9,6 +9,7 @@
 .idea/codeStyles
 .idea/hydra.xml
 .idea/libraries/scala_sdk_2_12_6.xml
+.idea/scala_settings.xml
 out/
 src/META-INF
 bwapi-data/

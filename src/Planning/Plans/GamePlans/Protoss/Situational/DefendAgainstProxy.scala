@@ -37,19 +37,22 @@ class DefendAgainstProxy extends Plan {
     val workersRequired = proxies.map(proxy =>
       (
         proxy,
-        if (proxy.unitClass.rawCanAttack)
+        if (proxy.attacksAgainstGround > 0)
           if (proxy.complete)
             6
           else
             4
+        else if (proxy.unitClass.isGas)
+          3 // Dubious, but we need real gas steal reactions to avoid this
         else
-          3
+          1 // We shouldn't pull for other buildings in general; this is mostly just to keep eyes on them
       )).toMap
-    val totalWorkersRequired = workersRequired.values.sum
-    val maxWorkers = With.units.countOurs(UnitMatchWorkers) - 5
-    val finalWorkers = Math.min(totalWorkersRequired, maxWorkers)
+    val totalWorkersRequired  = workersRequired.values.sum
+    val maxWorkers            = With.units.countOurs(UnitMatchWorkers) - 5
+    val finalWorkers          = Math.min(totalWorkersRequired, maxWorkers)
+    val squadDestination      = proxies.head.pixelCenter
     defenders.get.unitCounter.set(new UnitCountBetween(0, finalWorkers))
-    defenders.get.unitPreference.set(UnitPreferClose(proxies.head.pixelCenter))
+    defenders.get.unitPreference.set(UnitPreferClose(squadDestination))
     if (lastProxyCount > proxies.size) {
       defenders.get.release()
     }
@@ -59,7 +62,7 @@ class DefendAgainstProxy extends Plan {
     squad.enemies = proxies
     squad.commission()
     defenders.get.units.foreach(squad.recruit)
-    squad.setGoal(new GoalSmash(proxies.head.pixelCenter))
+    squad.setGoal(new GoalSmash(squadDestination))
   }
   
   private def getProxies: Seq[UnitInfo] = {

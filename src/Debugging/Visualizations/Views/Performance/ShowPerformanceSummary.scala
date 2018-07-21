@@ -15,7 +15,10 @@ object ShowPerformanceSummary extends View {
     With.game.drawTextScreen(80,  2 * With.visualization.lineHeightSmall, "+1000ms: "   + With.performance.framesOver1000   + "/10")
     With.game.drawTextScreen(155, 2 * With.visualization.lineHeightSmall, "+10000ms: "  + With.performance.framesOver10000  + "/1")
     With.game.drawTextScreen(230, 2 * With.visualization.lineHeightSmall, "Units: " +
-      Vector(With.performance.lastUniqueFriendlyUnitObjects, With.performance.lastUniqueUnitIdCount , With.performance.lastUniqueDeadIdCount).mkString(", "))
+      Vector(
+        With.performance.lastUniqueFriendlyUnitObjects,
+        With.performance.lastUniqueUnitIdCount,
+        With.performance.lastUniqueDeadIdCount).mkString(", "))
     if (With.performance.disqualified) {
       With.game.setTextSize(bwapi.Text.Size.Enum.Large)
       DrawScreen.header(295, ":/")

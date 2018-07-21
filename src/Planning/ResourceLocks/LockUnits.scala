@@ -45,8 +45,15 @@ class LockUnits extends {
   
   def offerUnits(candidates: Iterable[FriendlyUnitInfo]): Option[Iterable[FriendlyUnitInfo]] = {
   
-    val desiredUnits    = With.recruiter.getUnits(this).to[mutable.Set]
-    val candidateQueue  = new mutable.PriorityQueue[FriendlyUnitInfo]()(Ordering.by( - unitPreference.get.preference(_))) //Negative because priority queue is highest-first
+    val desiredUnits = With.recruiter.getUnits(this).to[mutable.Set]
+    val (candidateQueue, dequeue) =
+      if (unitPreference.get == UnitPreferAnything) {
+        val output = new mutable.Queue[FriendlyUnitInfo]()
+        (output, () => output.dequeue())
+      } else {
+        val output = new mutable.PriorityQueue[FriendlyUnitInfo]()(Ordering.by( - unitPreference.get.preference(_))) // Negative because priority queue is highest-first
+        (output, () => output.dequeue())
+      }
     candidateQueue ++= candidates.filter(c =>
       if(acceptSubstitutes.get)
         unitMatcher.get.acceptAsPrerequisite(c)
@@ -56,7 +63,7 @@ class LockUnits extends {
     unitCounter.get.reset()
     
     while (unitCounter.get.continue(desiredUnits) && candidateQueue.nonEmpty) {
-      desiredUnits += candidateQueue.dequeue()
+      desiredUnits += dequeue()
     }
     
     isSatisfied = unitCounter.get.accept(desiredUnits)

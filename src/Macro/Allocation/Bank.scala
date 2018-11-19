@@ -2,7 +2,6 @@ package Macro.Allocation
 
 import Planning.ResourceLocks.LockCurrency
 import Lifecycle.With
-import Planning.Plan
 
 import scala.collection.mutable
 
@@ -11,37 +10,25 @@ class Bank {
   private var mineralsLeft    = 0
   private var gasLeft         = 0
   private var supplyLeft      = 0
-  private val requests        = new mutable.HashSet[LockCurrency]()
+
+  val requests = new mutable.PriorityQueue[LockCurrency]()(Ordering.by( - _.owner.priority))
   
   def update() {
     requests.clear()
     recountResources()
   }
   
-  def prioritizedRequests: Iterable[LockCurrency] = {
-    requests.toVector.sortBy(_.owner.priority)
-  }
-  
   def request(request: LockCurrency) {
-    requests.add(request)
+    requests += request
     recountResources()
-  }
-  
-  def release(request: LockCurrency) {
-    request.isSatisfied = false
-    requests.remove(request)
-    recountResources()
-  }
-
-  def release(plan: Plan): Unit = {
-    requests.foreach(request => if (request.owner == plan) release(request))
   }
   
   private def recountResources() {
-    mineralsLeft  = With.self.minerals  + (2 * With.reaction.planningAverage * With.economy.incomePerFrameMinerals).toInt
-    gasLeft       = With.self.gas       + (2 * With.reaction.planningAverage * With.economy.incomePerFrameGas).toInt
+    val framesAhead = 2 * With.reaction.planningAverage
+    mineralsLeft  = With.self.minerals  + (framesAhead * With.economy.incomePerFrameMinerals).toInt
+    gasLeft       = With.self.gas       + (framesAhead * With.economy.incomePerFrameGas).toInt
     supplyLeft    = With.self.supplyTotal - With.self.supplyUsed
-    prioritizedRequests.foreach(queueBuyer)
+    requests.foreach(queueBuyer)
   }
   
   private def queueBuyer(request: LockCurrency) {

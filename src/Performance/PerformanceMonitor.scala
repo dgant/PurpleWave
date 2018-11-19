@@ -71,11 +71,13 @@ class PerformanceMonitor {
     millisecondsSpentThisFrame >= 55
   }
   
-  def danger: Boolean = {
-    framesOver55    > 160 ||
-    framesOver1000  > 5   ||
-    framesOver10000 > 1
-  }
+  def danger: Boolean = (
+    (With.configuration.enableStreamManners || With.configuration.enablePerformanceSurrender)
+    && (
+      framesOver55    > 160 ||
+      framesOver1000  > 5   ||
+      framesOver10000 > 1)
+  )
   
   def maxFrameMilliseconds  : Long = frameTimes.max
   def meanFrameMilliseconds : Long = frameTimes.sum / framesToTrack

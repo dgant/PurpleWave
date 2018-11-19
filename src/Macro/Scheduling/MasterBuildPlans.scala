@@ -38,7 +38,6 @@ class MasterBuildPlans {
       while (i < plans.size) {
         val plan = plans(i)
         if (plan.isComplete) {
-          With.bank.release(plan)
           With.recruiter.release(plan)
           plans.remove(i)
         }

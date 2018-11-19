@@ -10,7 +10,7 @@ import scala.collection.mutable.ArrayBuffer
 object ShowResources extends View {
   override def renderScreen() {
     
-    val rawText = With.bank.prioritizedRequests
+    val rawText = With.bank.requests
       .take(25)
       .map(request =>
         Iterable(

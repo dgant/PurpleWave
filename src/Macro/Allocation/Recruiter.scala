@@ -42,7 +42,7 @@ class Recruiter {
     tryToSatisfy(lock)
   }
 
-  def inquire(lock: LockUnits): Option[Iterable[FriendlyUnitInfo]] = {
+  def inquire(lock: LockUnits, isDryRun: Boolean): Option[Iterable[FriendlyUnitInfo]] = {
 
     // Offer batches of unit for the lock to choose.
     //  Batch 0: Current units
@@ -60,12 +60,13 @@ class Recruiter {
       Iterable.empty
         ++ unitsByLock.getOrElse(lock, Iterable.empty)
         ++ unassignedUnits
-        ++ assignedToLowerPriority)
+        ++ assignedToLowerPriority,
+      isDryRun)
   }
 
   private def tryToSatisfy(lock: LockUnits) {
 
-    val requiredUnits = inquire(lock)
+    val requiredUnits = inquire(lock, isDryRun = false)
 
     if (requiredUnits.isEmpty) {
       release(lock)
@@ -101,7 +102,7 @@ class Recruiter {
   
   private def unassign(unit: FriendlyUnitInfo) {
     unassignedUnits.add(unit)
-    unitsByLock.find(pair => pair._2.contains(unit)).foreach(pair => unitsByLock.remove(pair._1))
+    unitsByLock.find(_._2.contains(unit)).foreach(pair => unitsByLock(pair._1).remove(unit))
   }
   
   def getUnits(lock: LockUnits): Set[FriendlyUnitInfo] = {

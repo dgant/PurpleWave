@@ -3,10 +3,11 @@ package Planning.ResourceLocks
 import Planning.{Plan, Property}
 import Lifecycle.With
 import Planning.Composition.UnitCountEverything
-import Planning.UnitCounters.UnitCounter
+import Planning.UnitCounters.{UnitCountExactly, UnitCounter}
 import Planning.UnitMatchers.{UnitMatchAnything, UnitMatcher}
 import Planning.UnitPreferences.{UnitPreferAnything, UnitPreference}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.ByOption
 
 import scala.collection.mutable
 
@@ -30,9 +31,9 @@ class LockUnits extends {
   }
   
   def inquire(plan: Plan): Option[Iterable[FriendlyUnitInfo]] = {
-    val ownerBefore = owner //This is supposed to be free of side-effects so retain the owner
+    val ownerBefore = owner // This is supposed to be free of side-effects so retain the owner
     owner = plan
-    val output = With.recruiter.inquire(this)
+    val output = With.recruiter.inquire(this, isDryRun = true)
     owner = ownerBefore
     output
   }
@@ -42,10 +43,50 @@ class LockUnits extends {
   }
   
   def units: Set[FriendlyUnitInfo] = With.recruiter.getUnits(this)
-  
-  def offerUnits(candidates: Iterable[FriendlyUnitInfo]): Option[Iterable[FriendlyUnitInfo]] = {
-  
+
+  protected def weAccept(unit: FriendlyUnitInfo): Boolean = {
+    if(acceptSubstitutes.get)
+      unitMatcher.get.acceptAsPrerequisite(unit)
+    else
+      unitMatcher.get.accept(unit)
+  }
+
+  def offerUnits(candidates: Iterable[FriendlyUnitInfo], dryRun: Boolean): Option[Iterable[FriendlyUnitInfo]] = {
+    unitCounter.get.reset()
+    val finalists = findFinalists(candidates)
+    val finalistsSatisfy = unitCounter.get.accept(finalists)
+    if ( ! dryRun) isSatisfied = finalistsSatisfy
+    if (finalistsSatisfy) Some(finalists) else None
+  }
+
+  def findFinalists(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
+    // Here's a bunch of special-case performance improvements.
+    // offerMultipleUnits()
+    if (unitCounter.get == UnitCountEverything) {
+      if (unitMatcher.get == UnitMatchAnything) {
+        candidates
+      }
+      else {
+        candidates.filter(weAccept)
+      }
+    }
+    else if (unitCounter.get == UnitCountExactly(1)) {
+      findSingleFinalist(candidates)
+    }
+    else {
+      findMultipleFinalists(candidates)
+    }
+  }
+
+  protected def findSingleFinalist(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
+    ByOption.minBy(candidates.filter(weAccept))(unitPreference.get.preference)
+  }
+
+  protected def findMultipleFinalists(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
+
     val desiredUnits = With.recruiter.getUnits(this).to[mutable.Set]
+
+    // Build a queue based on whether we ned to sort it
     val (candidateQueue, dequeue) =
       if (unitPreference.get == UnitPreferAnything) {
         val output = new mutable.Queue[FriendlyUnitInfo]()
@@ -54,22 +95,11 @@ class LockUnits extends {
         val output = new mutable.PriorityQueue[FriendlyUnitInfo]()(Ordering.by( - unitPreference.get.preference(_))) // Negative because priority queue is highest-first
         (output, () => output.dequeue())
       }
-    candidateQueue ++= candidates.filter(c =>
-      if(acceptSubstitutes.get)
-        unitMatcher.get.acceptAsPrerequisite(c)
-      else
-        unitMatcher.get.accept(c))
-    
-    unitCounter.get.reset()
-    
+
+    candidateQueue ++= candidates.filter(weAccept)
     while (unitCounter.get.continue(desiredUnits) && candidateQueue.nonEmpty) {
       desiredUnits += dequeue()
     }
-    
-    isSatisfied = unitCounter.get.accept(desiredUnits)
-    if (isSatisfied)
-      Some(desiredUnits)
-    else
-      None
+    desiredUnits
   }
 }

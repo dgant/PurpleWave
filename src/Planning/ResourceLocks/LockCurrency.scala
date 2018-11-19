@@ -21,9 +21,5 @@ class LockCurrency {
     With.bank.request(this)
   }
   
-  def release() {
-    With.bank.release(this)
-  }
-  
   def onSchedule: Boolean = expectedFrames <= framesPreordered
 }

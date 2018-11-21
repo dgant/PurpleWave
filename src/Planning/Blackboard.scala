@@ -18,6 +18,7 @@ class Blackboard {
   
   var aggressionRatio     : Property[Double]  = add(new Property(1.0))
   var safetyRatio         : Property[Double]  = add(new Property(1.2))
+  var gasWorkerCeiling    : Property[Int]     = add(new Property(200))
   var gasLimitFloor       : Property[Int]     = add(new Property(450))
   var gasLimitCeiling     : Property[Int]     = add(new Property(100000))
   var gasTargetRatio      : Property[Double]  = add(new Property(if (With.self.isProtoss) 3.0 / 10.0 else 3.0 / 8.0))

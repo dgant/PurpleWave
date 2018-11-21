@@ -58,6 +58,7 @@ class TaskPlanning extends AbstractTask {
     With.scheduler.reset()
     With.squads.reset()
     With.buildOrderHistory.update()
+    With.blackboard.reset()
     With.strategy.gameplan.update()
     With.groundskeeper.update()
     With.squads.update()

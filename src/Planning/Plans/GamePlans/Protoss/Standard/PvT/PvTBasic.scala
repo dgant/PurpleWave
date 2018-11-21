@@ -270,11 +270,13 @@ class PvTBasic extends GameplanModeTemplate {
       new Parallel(
         new PvTIdeas.TrainArmy,
         new If(
-          new Or(
-            new EnemyHasShownCloakedThreat,
-            new And(
-              new Not(new EnemyBio),
-              new EnemiesAtLeast(1, Terran.Vulture))),
+          new And(
+            new Not(new Employing(PvTFastCarrier)),
+            new Or(
+              new EnemyHasShownCloakedThreat,
+              new And(
+                new Not(new EnemyBio),
+                new EnemiesAtLeast(1, Terran.Vulture)))),
           new ObserverTech)),
       new Parallel(
         new PumpMinimumDragoons,

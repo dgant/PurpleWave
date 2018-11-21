@@ -54,8 +54,8 @@ object BeACarrier extends Action {
   object CarrierTarget extends TargetAction(CarrierTargetFilterIgnoreInterceptors) {
     override val additionalFiltersOptional = Vector(
       CarrierTargetFilterInRange,
-      CarrierTargetFilterInLeash
-      //CarrierTargetFilterShootsUp
+      CarrierTargetFilterInLeash,
+      CarrierTargetFilterShootsUp
     )
   }
   

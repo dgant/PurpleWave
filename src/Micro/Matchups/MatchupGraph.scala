@@ -4,7 +4,7 @@ import Information.Battles.Types.BattleLocal
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
 
-import scala.collection.mutable
+import scala.collection.{SeqView, mutable}
 
 class MatchupGraph {
   
@@ -57,8 +57,8 @@ class MatchupGraph {
     else None
   }
 
-  private def newEntrants: Seq[UnitInfo] = {
-    With.units.all.filter(unit =>
+  private def newEntrants: SeqView[UnitInfo, IndexedSeq[UnitInfo]] = {
+    With.units.all.view.filter(unit =>
       unit.aliveAndComplete
         &&  unit.battle.isEmpty
         &&  With.framesSince(unit.frameDiscovered) < 72

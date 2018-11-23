@@ -43,7 +43,7 @@ class Groundskeeper {
   //
   private val blueprintMatchOrdering = Ordering.by { b : BlueprintMatch  => (b.proposal.proposer.priority, b.proposal.id) }
   
-  def proposalQueue: Iterable[Blueprint] = {
+  def proposalQueue: Seq[Blueprint] = {
     val ordered = requirementMatches
       .toVector
       .filter(_.requirement.proposer.isPrioritized)

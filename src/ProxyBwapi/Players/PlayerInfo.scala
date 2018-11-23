@@ -16,9 +16,12 @@ case class PlayerInfo(basePlayer: Player) extends PlayerProxy(basePlayer) {
     permanentRace.getOrElse(raceInitial)
   })
   
-  def isTerran   : Boolean = raceCurrent == Race.Terran
-  def isProtoss  : Boolean = raceCurrent == Race.Protoss
-  def isZerg     : Boolean = raceCurrent == Race.Zerg
+def isTerran              : Boolean = raceCurrent == Race.Terran
+  def isProtoss           : Boolean = raceCurrent == Race.Protoss
+  def isZerg              : Boolean = raceCurrent == Race.Zerg
+  def isUnknownOrTerran   : Boolean = raceCurrent == Race.Unknown || raceCurrent == Race.Terran
+  def isUnknownOrProtoss  : Boolean = raceCurrent == Race.Unknown || raceCurrent == Race.Protoss
+  def isUnknownOrZerg     : Boolean = raceCurrent == Race.Unknown || raceCurrent == Race.Zerg
   lazy val isFriendly : Boolean = isUs || isAlly
   
   def hasUpgrade(upgrade: Upgrade): Boolean = getUpgradeLevel(upgrade) > 0

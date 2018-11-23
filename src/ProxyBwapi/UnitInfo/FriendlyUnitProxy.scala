@@ -51,15 +51,15 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   def shieldPoints          : Int       = getShieldsCache()
   def energy                : Int       = getEnergyCache()
   def plagued               : Boolean   = isPlaguedCache()
-  
-  private val getDefenseMatrixPointsCache   = new Cache(() => base.getDefenseMatrixPoints)
+
   private val getHitPointsCache             = new Cache(() => base.getHitPoints)
-  private val getInitialResourcesCache      = new Cache(() => base.getInitialResources)
   private val isInvincibleCache             = new Cache(() => base.isInvincible)
-  private val getResourcesCache             = new Cache(() => base.getResources)
-  private val getShieldsCache               = new Cache(() => base.getShields)
-  private val getEnergyCache                = new Cache(() => base.getEnergy)
   private val isPlaguedCache                = new Cache(() => base.isPlagued)
+  private val getDefenseMatrixPointsCache   = new Cache(() => if (unitClass.isBuilding) 0 else base.getDefenseMatrixPoints)
+  private val getInitialResourcesCache      = new Cache(() => if (unitClass.isResource) base.getInitialResources else 0)
+  private val getResourcesCache             = new Cache(() => if (unitClass.isResource) base.getResources else 0)
+  private val getShieldsCache               = new Cache(() => if (unitClass.isProtoss) base.getShields else 0)
+  private val getEnergyCache                = new Cache(() => if (unitClass.maxEnergy > 0) base.getEnergy else 0)
   
   ////////////
   // Combat //
@@ -215,7 +215,7 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   private val cachedIsSieged        = new Cache(() => unitClass.canSiege            && base.isSieged)
   private val cachedIsStimmed       = new Cache(() => unitClass.canBeStasised       && base.isStimmed)
   private val cachedIsLockedDown    = new Cache(() => unitClass.canBeLockedDown     && base.isLockedDown)
-  private val cachedStasised        = new Cache(() => unitClass.canBeStasised       && base.isStasised)
+  private val cachedStasised        = new Cache(() => unitClass.canBeStasised       && base.getStasisTimer > 0) //isStasised is BIZARRELY expensive in BWMirror -- trying this alternative
   private val cachedIsEnsnared      = new Cache(() => unitClass.canBeEnsnared       && base.isEnsnared)
   private val cachedIsMaelstrommed  = new Cache(() => unitClass.canBeMaelstrommed   && base.isMaelstrommed)
   

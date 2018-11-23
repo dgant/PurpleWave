@@ -14,7 +14,7 @@ import scala.collection.mutable
 
 class Geography {
   lazy val mapArea            : TileRectangle           = TileRectangle(Tile(0, 0), Tile(With.mapTileWidth, With.mapTileHeight))
-  lazy val allTiles           : Array[Tile]             = mapArea.tiles
+  lazy val allTiles           : Array[Tile]             = mapArea.tiles.toArray
   lazy val startBases         : Iterable[Base]          = bases.filter(_.isStartLocation)
   lazy val startLocations     : Iterable[Tile]          = With.game.getStartLocations.asScala.map(new Tile(_))
   lazy val zones              : Iterable[Zone]          = ZoneBuilder.zones

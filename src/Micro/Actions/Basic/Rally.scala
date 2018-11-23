@@ -40,7 +40,7 @@ object Rally extends Action {
         return
       }
     }
-    
+
     With.commander.rally(unit, With.intelligence.mostBaselikeEnemyTile.pixelCenter)
   }
 }

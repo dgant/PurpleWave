@@ -42,6 +42,7 @@ class ExplosionTracker {
   
   def run() {
     byBattle.clear()
+    if (With.performance.enablePerformanceStops && With.performance.danger) return
     With.bullets.all.foreach(explosionFromBullet)
     With.units.all.foreach(explosionFromUnit)
     With.game.getNukeDots.asScala.map(new Pixel(_)).foreach(explosionFromNuke)
@@ -63,7 +64,7 @@ class ExplosionTracker {
     }
   }
   
-  def explosionFromUnit(unit: UnitInfo): Vector[Explosion] = {
+  def explosionFromUnit(unit: UnitInfo): Seq[Explosion] = {
     val output = new mutable.ArrayBuffer[Explosion]
     if (unit.irradiated) {
       addToBattle(unit, new ExplosionIrradiateSplash(unit))
@@ -96,7 +97,7 @@ class ExplosionTracker {
       // * Associate these explosions with the unit so we don't spam-check this explosion for the whole map
       // unit.matchups.targetsInRange.foreach(target => output += new ExplosionLurkerSoon(unit, target))
     }
-    output.toVector
+    output
   }
   
   def explosionFromNuke(dot: Pixel) {

@@ -7,6 +7,8 @@ import Performance.UnitCounter
 import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 
+import scala.collection.immutable
+
 class UnitTracker {
   
   private val friendlyUnitTracker = new FriendlyUnitTracker
@@ -16,7 +18,7 @@ class UnitTracker {
   
   def get(unit: bwapi.Unit): Option[UnitInfo] = if (unit == null) None else getId(unit.getID)
   
-  def all: Seq[UnitInfo] = ours.toVector ++ enemy ++ neutral
+  def all: IndexedSeq[UnitInfo] = ours.toIndexedSeq ++ enemy.toIndexedSeq ++ neutral.toIndexedSeq
   
   private val counterOurs = new UnitCounter(() => ours)
   def existsOurs(matcher: UnitMatcher*): Boolean = countOurs(matcher: _*) > 0
@@ -32,22 +34,22 @@ class UnitTracker {
   
   def neutral: Set[ForeignUnitInfo] = foreignUnitTracker.neutralUnits
   
-  def inTileRadius(tile: Tile, tiles: Int): Traversable[UnitInfo] = {
+  def inTileRadius(tile: Tile, tiles: Int): immutable.IndexedSeq[UnitInfo] = {
     inTiles(Circle.points(tiles).map(tile.add).filter(_.valid))
   }
   
-  def inPixelRadius(pixel: Pixel, pixels: Int): Traversable[UnitInfo] = {
+  def inPixelRadius(pixel: Pixel, pixels: Int): immutable.IndexedSeq[UnitInfo] = {
     val tile = pixel.tileIncluding
     val pixelsSquared = pixels * pixels
     inTiles(Circle.points(pixels / 32 + 1).map(tile.add).filter(_.valid))
       .filter(_.pixelCenter.pixelDistanceSquared(pixel) <= pixelsSquared)
   }
   
-  def inRectangle(rectangle: TileRectangle): Traversable[UnitInfo] = {
-    inTiles(rectangle.tiles).toSet
+  def inRectangle(rectangle: TileRectangle): immutable.IndexedSeq[UnitInfo] = {
+    inTiles(rectangle.tiles)
   }
   
-  private def inTiles(tiles: Traversable[Tile]): Traversable[UnitInfo] = {
+  private def inTiles(tiles: immutable.IndexedSeq[Tile]): immutable.IndexedSeq[UnitInfo] = {
     tiles.flatten(tile => With.grids.units.get(tile))
   }
   

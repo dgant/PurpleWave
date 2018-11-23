@@ -24,12 +24,10 @@ class Visualization {
     ShowPerformanceSummary,
     ShowClock,
     ShowStrategy,
-    //ShowUnitsAll,
-    //ShowUnitsFriendly,
-    //ShowUnitsForeign,
-    //ShowExplosions,
-    ShowReactionTime,
-    ShowCarriers
+    ShowUnitsAll,
+    ShowUnitsFriendly,
+    ShowUnitsForeign,
+    ShowExplosions
   )
   
   var enabled   : Boolean = _
@@ -121,6 +119,7 @@ class Visualization {
     ShowArchitectureHeuristics,
     ShowArchitecturePaths,
     ShowBases,
+    ShowCarriers,
     ShowClustering,
     ShowDesire,
     ShowGroundskeeper,

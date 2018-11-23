@@ -1,5 +1,7 @@
 package Mathematics.Points
 
+import scala.collection.immutable
+
 case class TileRectangle(
   startInclusive : Tile,
   endExclusive   : Tile) {
@@ -52,23 +54,10 @@ case class TileRectangle(
   
   lazy val cornerPixels: Array[Pixel] = Array(startPixel, topRightPixel, endPixel, bottomleftPixel)
   
-  lazy val tiles: Array[Tile] = {
-    // Scala while-loops are way faster than for-loops because they don't create Range objects
-    val startX = startInclusive.x
-    val startY = startInclusive.y
-    val sizeX = endExclusive.x - startX
-    val sizeY = endExclusive.y - startY
-    val output = new Array[Tile](sizeX * sizeY)
-    var x = 0
-    while (x < sizeX) {
-      var y = 0
-      while (y < sizeY) {
-        output(x + sizeX * y) = Tile(startX + x, startY + y)
-        y += 1
-      }
-      x += 1
-    }
-    output
+  lazy val tiles: immutable.IndexedSeq[Tile] = {
+    (0 until endExclusive.x - startInclusive.x).flatMap(x =>
+      (0 until endExclusive.y - startInclusive.y).map(y =>
+        Tile(startInclusive.x + x, startInclusive.y + y)))
   }
   
   lazy val tilesSurrounding: Iterable[Tile] = {

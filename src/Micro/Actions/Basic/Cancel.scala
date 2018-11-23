@@ -2,6 +2,8 @@ package Micro.Actions.Basic
 
 import Lifecycle.With
 import Micro.Actions.Action
+import Planning.UnitMatchers.UnitMatchBuilding
+import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Cancel extends Action {
@@ -15,15 +17,16 @@ object Cancel extends Action {
     lazy val framesToFinish   = Seq(unit.remainingTechFrames, unit.remainingUpgradeFrames, unit.remainingTrainFrames).max
     lazy val doomed           = unit.matchups.threatsInRange.nonEmpty && framesToLive < framesCutoff
     lazy val willNeverFinish  = unit.matchups.threatsInRange.nonEmpty && framesToLive < framesToFinish
+    lazy val canCancel        = unit.isAny(UnitMatchBuilding, Zerg.LurkerEgg, Zerg.Egg, Zerg.Cocoon) // Performance hack to avoid accessing .training, etc.
     lazy val producing        = unit.training || unit.upgrading || unit.teching
     lazy val beingBorn        = unit.remainingCompletionFrames > 0
     lazy val isDecoy          = unit.unitClass.attacks && unit.matchups.allies.exists(_.isBeingViolent) // Is this correct?
     lazy val shouldCancel     = (unpowered || beingBorn || (producing && willNeverFinish)) && ! isDecoy
     
     val output = (
-      (unit.unitClass.isBuilding || beingBorn)
-      && shouldCancel
+      canCancel
       && (doomed || unpowered)
+      && shouldCancel
     )
     
     output

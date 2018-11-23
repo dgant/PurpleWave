@@ -1,6 +1,7 @@
 
 package Micro.Actions.Combat.Decisionmaking
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Actions.Action
 import Planning.Yolo
@@ -31,6 +32,7 @@ object FightOrFlight extends Action {
     decide(false, "Scarabs",    () => unit.is(Protoss.Reaver) && unit.scarabCount == 0)
     decide(true,  "Cloaked",    () => unit.effectivelyCloaked)
     decide(true,  "Lurking",    () => unit.is(Zerg.Lurker) && unit.matchups.enemyDetectors.isEmpty)
+    decide(true,  "Focused",    () => unit.agent.canFocus && (! unit.visibleToOpponents || unit.matchups.framesOfSafety > GameTime(0, 2)()) && With.framesSince(unit.lastFrameTakingDamage) > GameTime(0, 10)())
     decide(false, "Pacifist",   () => ! unit.agent.canFight)
     decide(false, "Useless",    () => unit.canAttack && unit.energyMax == 0 && unit.matchups.targets.isEmpty && unit.matchups.threats.nonEmpty)
     decide(true,  "Scourge",    () => unit.is(Zerg.Scourge) && unit.matchups.targets.exists(target => target.canAttack(unit) && target.matchups.targetsInRange.nonEmpty))

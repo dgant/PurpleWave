@@ -14,6 +14,7 @@ object Produce extends Action {
       unit.agent.toUpgrade.isDefined
     )
     && (unit.trainingQueue.isEmpty || unit.remainingTrainFrames < With.reaction.agencyMax)
+
   )
   
   override def perform(unit: FriendlyUnitInfo) {

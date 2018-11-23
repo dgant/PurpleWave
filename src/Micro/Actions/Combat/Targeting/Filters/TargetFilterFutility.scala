@@ -1,13 +1,14 @@
 package Micro.Actions.Combat.Targeting.Filters
 
 import Lifecycle.With
+import Micro.Actions.Scouting.BlockConstruction
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterFutility extends TargetFilter {
   
   private def catchableBy(actor: UnitInfo, target: UnitInfo): Boolean = {
-    lazy val targetBusy = target.gathering || target.constructing || target.repairing || ! target.canMove
+    lazy val targetBusy = target.gathering || target.constructing || target.repairing || ! target.canMove || BlockConstruction.buildOrders.contains(target.order)
     val output = (
       actor.topSpeed >= target.topSpeed
       || actor.inRangeToAttack(target)

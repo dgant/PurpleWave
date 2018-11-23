@@ -36,7 +36,7 @@ object BlockConstruction extends Action {
     }
   }
   
-  private val buildOrders = Vector(
+  val buildOrders = Vector(
     Orders.PlaceBuilding,
     Orders.ZergBuildingMorph,
     Orders.ConstructingBuilding,

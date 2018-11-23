@@ -4,7 +4,7 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 
 object ProxyPlanner {
-  
+
   def proxyAutomaticAggressive: Option[Zone] = {
     proxyEnemyNatural.orElse(proxyMiddle)
   }

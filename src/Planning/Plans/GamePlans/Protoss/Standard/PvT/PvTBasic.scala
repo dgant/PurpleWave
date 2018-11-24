@@ -4,7 +4,7 @@ import Macro.BuildRequests.Get
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
-import Planning.Plans.Army.Aggression
+import Planning.Plans.Army.{Aggression, EjectScout}
 import Planning.Plans.Compound.{Or, Parallel, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -251,7 +251,7 @@ class PvTBasic extends GameplanModeTemplate {
           Get(3, Protoss.Stargate)))))
       
   override val buildPlans = Vector(
-    
+    new EjectScout,
     new RequireMiningBases(2),
     new If(
       new ReadyForThirdBase,
@@ -259,7 +259,7 @@ class PvTBasic extends GameplanModeTemplate {
     new If(
       new ReadyForFourthBase,
       new RequireMiningBases(4)),
-    new BuildCannonsAtExpansions(2),
+    new BuildCannonsAtExpansions(1),
   
     new BasicTech,
     new CriticalUpgrades,
@@ -270,13 +270,9 @@ class PvTBasic extends GameplanModeTemplate {
       new Parallel(
         new PvTIdeas.TrainArmy,
         new If(
-          new And(
-            new Not(new Employing(PvTFastCarrier)),
-            new Or(
-              new EnemyHasShownCloakedThreat,
-              new And(
-                new Not(new EnemyBio),
-                new EnemiesAtLeast(1, Terran.Vulture)))),
+          new Or(
+            new EmployingArbiters,
+            new EnemyHasShown(Terran.Wraith)),
           new ObserverTech)),
       new Parallel(
         new PumpMinimumDragoons,
@@ -285,8 +281,7 @@ class PvTBasic extends GameplanModeTemplate {
         new FlipIf(
           new SafeAtHome,
           new Build(Get(6, Protoss.Gateway)),
-          new BonusTech
-        ))),
+          new BonusTech))),
   
     new RequireMiningBases(3),
     new Build(Get(1, Protoss.CitadelOfAdun)),

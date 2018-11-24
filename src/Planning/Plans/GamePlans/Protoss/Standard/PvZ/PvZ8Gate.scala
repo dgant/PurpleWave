@@ -1,24 +1,29 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
 import Macro.BuildRequests.Get
-import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
-import Planning.Plans.Army.Aggression
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.UpgradeContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural, MeldArchons}
+import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.Employing
+import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvZMidgameGatewayAttack
 
-class ProtossVsZerg8Gate extends GameplanModeTemplate {
+class PvZ8Gate extends GameplanModeTemplate {
   
   override val activationCriteria = new Employing(PvZMidgameGatewayAttack)
+  override def defaultArchonPlan: Plan = new PvZIdeas.MeldArchonsUntilStorm
+  override def defaultAttackPlan: Plan = new Trigger(
+    new UnitsAtLeast(6, Protoss.Gateway),
+    new Attack,
+    new PvZIdeas.ConditionalAttack)
     
   class GatewayTech extends Parallel(
     new Build(
@@ -42,12 +47,6 @@ class ProtossVsZerg8Gate extends GameplanModeTemplate {
     new Build(Get(Protoss.PsionicStorm)),
     new UpgradeContinuously(Protoss.GroundArmor),
     new UpgradeContinuously(Protoss.ObserverSpeed))
-  
-  override def defaultArchonPlan: Plan = new If(
-    new TechComplete(Protoss.PsionicStorm),
-    new MeldArchons(49) { override def maximumTemplar = 8 },
-    new MeldArchons
-  )
   
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvZIdeas.ReactToLurkers,

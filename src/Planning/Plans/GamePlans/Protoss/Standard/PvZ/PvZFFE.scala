@@ -3,32 +3,34 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Compound.If
-import Planning.Predicates.Compound.{And, Latch, Not}
-import Planning.UnitMatchers.UnitMatchType
-import Planning.{Plan, Predicate}
+import Planning.Plans.Basic.NoPlan
+import Planning.Plans.Compound.{If, Or}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational.{DefendFFEWithProbesAgainst4Pool, DefendFFEWithProbesAgainst9Pool, PlacementForgeFastExpand}
-import Planning.Plans.Macro.Automatic.Pump
+import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Scouting.ScoutOn
+import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones.{FrameAtLeast, FrameAtMost, UnitsAtLeast, UnitsAtMost}
-import Planning.Plans.Scouting.ScoutAt
+import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.UnitMatchers.{UnitMatchType, UnitMatchWorkers}
+import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.{PvZEarlyFFEConservative, PvZEarlyFFEEconomic}
+import Strategery.Strategies.Protoss.{PvZEarlyFFEConservative, PvZEarlyFFEEconomic, PvZEarlyFFEGreedy}
 
 class PvZFFE extends GameplanModeTemplate {
   
-  override val activationCriteria: Predicate = new Employing(PvZEarlyFFEEconomic, PvZEarlyFFEConservative)
-  override val completionCriteria: Predicate = new Latch(new And(new UnitsAtLeast(1, Protoss.CyberneticsCore)))
+  override val activationCriteria: Predicate = new Employing(PvZEarlyFFEGreedy, PvZEarlyFFEEconomic, PvZEarlyFFEConservative)
+  override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(1, Protoss.CyberneticsCore))
   
   override def defaultScoutPlan: Plan = new If(
     new And(
       new Not(new Employing(PvZEarlyFFEConservative)),
       new Not(new EnemyStrategy(With.fingerprints.fourPool))),
-    new ScoutAt(6))
+    new ScoutOn(Protoss.Pylon))
   
   override def defaultPlacementPlan: Plan = new PlacementForgeFastExpand
   
@@ -40,8 +42,21 @@ class PvZFFE extends GameplanModeTemplate {
       new BuildOrder(ProtossBuilds.FFE_Conservative: _*),
       new If(
         new EnemyStrategy(With.fingerprints.twelveHatch),
-        new BuildOrder(ProtossBuilds.FFE_NexusGatewayForge: _*),
-        new BuildOrder(ProtossBuilds.FFE_ForgeCannonNexus: _*))))
+        new BuildOrder(ProtossBuilds.FFE_GatewayNexusForge: _*),
+        new If(
+          new EnemyStrategy(With.fingerprints.twelvePool),
+          new BuildOrder(ProtossBuilds.FFE_NexusForgeCannons: _*),
+          new If(
+            new EnemyStrategy(With.fingerprints.overpool),
+            new BuildOrder(ProtossBuilds.FFE_ForgeNexusCannon: _*),
+            new If(
+              new EnemyStrategy(With.fingerprints.ninePool),
+              new BuildOrder(ProtossBuilds.FFE_ForgeCannonNexus: _*),
+              new If(
+                new Employing(PvZEarlyFFEGreedy),
+                new BuildOrder(ProtossBuilds.FFE_GatewayNexusForge: _*),
+                new BuildOrder(ProtossBuilds.FFE_ForgeCannonNexus: _*)
+              )))))))
   
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvZIdeas.AddEarlyCannons,
@@ -60,23 +75,37 @@ class PvZFFE extends GameplanModeTemplate {
       new DefendFFEWithProbesAgainst4Pool),
     new If(
       new And(
-        new EnemyStrategy(
-          With.fingerprints.ninePool,
-          With.fingerprints.overpool),
+        new EnemyStrategy(With.fingerprints.ninePool, With.fingerprints.overpool),
         new FrameAtLeast(GameTime(3, 0)()),
         new FrameAtMost(GameTime(6, 0)()),
         new UnitsAtMost(2, UnitMatchType(Protoss.PhotonCannon), complete = true)),
       new DefendFFEWithProbesAgainst9Pool)
   )
+
+  override def defaultWorkerPlan: Plan = NoPlan()
   
   override def buildPlans: Seq[Plan] = Vector(
+    new If(
+      new UnitsAtLeast(20, UnitMatchWorkers),
+      new Build(
+        Get(1, Protoss.Assimilator),
+        Get(1, Protoss.CyberneticsCore))),
+    new PumpWorkers,
+    new Pump(Protoss.Dragoon, maximumTotal = 1),
     new Pump(Protoss.Zealot),
     new Build(
       Get(1, Protoss.Pylon),
-      Get(1, Protoss.Forge),
-      Get(2, Protoss.PhotonCannon),
+      Get(1, Protoss.Forge)),
+    new RequireMiningBases(2),
+    new Build(
       Get(2, Protoss.Nexus),
-      Get(1, Protoss.Gateway),
+      Get(1, Protoss.Gateway)),
+    new If(
+      new Or(
+        new EnemyStrategy(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.overpool, With.fingerprints.twelvePool),
+        new Not(new SafeAtHome)),
+      new PvZIdeas.AddEarlyCannons),
+    new Build(
       Get(2, Protoss.Pylon),
       Get(1, Protoss.Assimilator),
       Get(1, Protoss.CyberneticsCore)),

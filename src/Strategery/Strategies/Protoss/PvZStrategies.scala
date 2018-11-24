@@ -1,5 +1,6 @@
 package Strategery.Strategies.Protoss
 
+import Lifecycle.With
 import Strategery.{MapGroups, StarCraftMap}
 import Strategery.Strategies.Strategy
 import bwapi.Race
@@ -33,5 +34,9 @@ object PvZ4Gate99 extends PvZStrategy {
 }
 object PvZEarlyFFEConservative      extends PvZFFEOpening
 object PvZEarlyFFEEconomic          extends PvZFFEOpening
+object PvZEarlyFFEGreedy            extends PvZFFEOpening {
+  override def responsesBlacklisted = Iterable(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.overpool, With.fingerprints.twelvePool)
+}
+object PvZMidgame4Gate2Archon       extends PvZStrategy
 object PvZMidgameCorsairSpeedlot    extends PvZStrategy
 object PvZMidgameGatewayAttack      extends PvZStrategy

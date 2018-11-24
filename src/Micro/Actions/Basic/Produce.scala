@@ -13,7 +13,7 @@ object Produce extends Action {
       unit.agent.toTech.isDefined   ||
       unit.agent.toUpgrade.isDefined
     )
-    && (unit.trainingQueue.isEmpty || unit.remainingTrainFrames < With.reaction.agencyMax)
+    && (unit.trainingQueue.isEmpty || (unit.trainingQueue.size == 1 && unit.remainingTrainFrames < With.reaction.agencyMax))
 
   )
   
@@ -28,6 +28,7 @@ object Produce extends Action {
     }
     else if (unit.agent.toUpgrade.isDefined) {
       With.commander.upgrade(unit, unit.agent.toUpgrade.get)
+      unit.agent.lastIntent.toUpgrade = None //Avoid building repeatedly
     }
   }
 }

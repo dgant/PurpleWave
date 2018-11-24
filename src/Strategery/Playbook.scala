@@ -43,6 +43,7 @@ object StrategyGroups {
   val disabled = Vector[Strategy](
     WorkerRush,
     WorkerRushLiftoff,
+    PvZEarlyFFEConservative,
     TvR1Rax,
     TvRTinfoil,
     TvEProxy5Rax,
@@ -65,7 +66,7 @@ object StrategyGroups {
 }
 
 class TestingPlaybook extends EmptyPlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvTFastCarrier, PvT3BaseCarrier)
+  override lazy val forced: Seq[Strategy] = Seq(PvZEarlyFFEGreedy, PvZMidgame4Gate2Archon)
 }
 
 class PurpleWavePlaybook extends EmptyPlaybook {

@@ -66,7 +66,7 @@ object PvTIdeas {
         new EnemiesAtMost(5, Terran.Vulture),
         new EnemyUnitsNone(Terran.ScienceVessel),
         new EnemyUnitsNone(UnitMatchCustom((unit) => unit.is(Terran.MissileTurret) && unit.zone.owner.isNeutral))),
-      new Pump(Protoss.DarkTemplar, 3)))
+      new Pump(Protoss.DarkTemplar, 4)))
   
   private class TrainObservers extends If(
     new UnitsAtLeast(24, UnitMatchWarriors),

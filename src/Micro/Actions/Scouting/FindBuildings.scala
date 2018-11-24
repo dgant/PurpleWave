@@ -5,8 +5,9 @@ import Lifecycle.With
 import Mathematics.Physics.Gravity
 import Micro.Actions.Action
 import Micro.Actions.Commands.Move
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import bwapi.{Race, UnitCommandType}
+import ProxyBwapi.Races.Zerg
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import bwapi.Race
 
 object FindBuildings extends AbstractFindBuildings {
   override protected val boredomFrames = 24 * 30
@@ -27,12 +28,14 @@ abstract class AbstractFindBuildings extends Action {
   override protected def perform(unit: FriendlyUnitInfo) {
     def nearestNeutralBases(count: Int): Iterable[Base] = {
       With.geography.neutralBases.toVector
-        .sortBy(_.townHallTile.groundPixels(With.intelligence.mostBaselikeEnemyTile))
+        .sortBy(b =>
+          b.townHallTile.groundPixels(With.intelligence.mostBaselikeEnemyTile)
+          - b.townHallTile.groundPixels(With.geography.home))
         .take(count)
     }
     
     val basesToScout =
-      With.geography.enemyBases ++ (
+      With.geography.enemyBases.filter(b => With.intelligence.unitsShown(b.owner, Zerg.SpawningPool) == 0) ++ (
         if (With.geography.enemyBases.size == 1)
           With.geography.enemyBases.head.natural.map(Vector(_)).getOrElse(nearestNeutralBases(1))
         else if (With.geography.enemyBases.size <= With.geography.ourBases.size)

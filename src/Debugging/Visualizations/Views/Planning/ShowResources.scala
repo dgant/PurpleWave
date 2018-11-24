@@ -8,13 +8,23 @@ import Planning.UnitMatchers.UnitMatchWorkers
 import scala.collection.mutable.ArrayBuffer
 
 object ShowResources extends View {
+
+  val dropColumns = 4
+
   override def renderScreen() {
-    
+
+    var minerals = With.self.minerals
+    var gas = With.self.gas
+    var supply = With.self.supplyTotal - With.self.supplyUsed
     val rawText = With.bank.requests
-      .take(25)
+      .toVector
+      .sortBy(_.expectedFrames)
       .map(request =>
         Iterable(
           "",
+          {minerals  -= (if (request.isSpent) 0 else request.minerals); minerals  }.toString,
+          {gas       -= (if (request.isSpent) 0 else request.gas);      gas       }.toString,
+          {supply    -= (if (request.isSpent) 0 else request.supply);   supply / 2}.toString,
           if (request.isSpent)
             "Spent"
           else if (request.satisfied)
@@ -26,16 +36,20 @@ object ShowResources extends View {
           if (request.expectedFrames > 0 && request.expectedFrames < 24 * 60 * 5) (request.expectedFrames/24).toString + " seconds" else "",
             (if (request.minerals > 0)  request.minerals + "m " else "") +
             (if (request.gas      > 0)  request.gas      + "g " else "") +
-            (if (request.supply   > 0)  request.supply   + "s " else ""),
-          request.owner.toString
+            (if (request.supply   > 0)  request.supply/2 + "s " else ""),
+          "   " + request.owner.toString
+            .replace("Build a ", "")
+            .replace("Train a ", "")
+            .replace("Upgrade ", "")
+            .replace("Research ", "")
         ))
           
     var lineLast = Iterable("not happenin")
     val output = new ArrayBuffer[Iterable[String]]()
-    output += Vector("", "", "", "Workers:", With.units.countOurs(UnitMatchWorkers).toString)
+    output += Vector("Copies", "M", "G", "S", "", "Workers:", With.units.countOurs(UnitMatchWorkers).toString)
     rawText.foreach(lineNext => {
       var lineFinal = lineNext
-      if (lineFinal.drop(1) == lineLast.drop(1)) {
+      if (lineFinal.drop(dropColumns) == lineLast.drop(dropColumns)) {
         output.trimEnd(1)
         lineFinal = lineLast
         if (lineFinal.head == "") {
@@ -52,7 +66,7 @@ object ShowResources extends View {
     })
     
     DrawScreen.table(
-      240,
+      5,
       4 * With.visualization.lineHeightSmall,
       output)
   }

@@ -2,21 +2,36 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Predicates.Compound.{And, Check}
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
 import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpMatchingRatio, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
+import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, MeldArchons}
+import Planning.Predicates.Compound.{And, Check}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones.{EnemyHasShownCloakedThreat, _}
 import Planning.Predicates.Reactive.{EnemyMutalisks, SafeAtHome, SafeToMoveOut}
+import Planning.Predicates.Strategy.Employing
+import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
+import Strategery.Strategies.Protoss.{PvZ4Gate99, PvZ4GateDragoonAllIn}
 
 object PvZIdeas {
-  
+
+  class ConditionalAttack extends If(
+    new Or(
+      new SafeToMoveOut,
+      new BasesAtLeast(3),
+      new Employing(PvZ4Gate99, PvZ4GateDragoonAllIn)),
+    new Attack)
+
+  class MeldArchonsUntilStorm extends If(
+    new TechStarted(Protoss.PsionicStorm),
+    new MeldArchons(49) { override def maximumTemplar = 8 },
+    new MeldArchons)
+
   class TakeSafeNatural extends If(
     new Or(
       new And(
@@ -118,19 +133,21 @@ object PvZIdeas {
     
     // Upgrades
     new If(
-      new UnitsAtLeast(1, Protoss.TemplarArchives),
+      new UnitsAtLeast(2, Protoss.Forge),
       new Parallel(
+        new UpgradeContinuously(Protoss.GroundDamage),
+        new UpgradeContinuously(Protoss.GroundArmor)),
+      new If(
+        new UnitsAtLeast(1, Protoss.TemplarArchives),
         new If(
-          new Or(
-            new UnitsAtLeast(2, Protoss.Forge),
-            new UpgradeComplete(Protoss.GroundDamage, 3)),
+          new UpgradeComplete(Protoss.GroundDamage, 3),
           new UpgradeContinuously(Protoss.GroundArmor),
-          new UpgradeContinuously(Protoss.GroundDamage))),
-      new Parallel(
-        new If(
-          new UpgradeComplete(Protoss.GroundDamage),
-          new Build(Get(Protoss.GroundArmor)),
-          new Build(Get(Protoss.GroundDamage))))),
+          new UpgradeContinuously(Protoss.GroundDamage)),
+        new Parallel(
+          new If(
+            new UpgradeComplete(Protoss.GroundDamage),
+            new Build(Get(Protoss.GroundArmor)),
+            new Build(Get(Protoss.GroundDamage)))))),
     
     // Basic army
     new Pump(Protoss.DarkTemplar, 1),

@@ -3,6 +3,7 @@ package Micro.Actions.Combat.Tactics
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.Leave
 import Micro.Actions.Commands.Move
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
@@ -13,14 +14,21 @@ object Detect extends Action {
     && unit.unitClass.isDetector
     && unit.teammates.exists(_.canAttack)
   )
+
+  private def canEventuallyCloak(unit: UnitInfo): Boolean = {
+    unit.isAny(Terran.Wraith, Terran.Ghost, Protoss.Arbiter, Zerg.Lurker)
+  }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
 
     val spookiestSpooky =
       pickBestSpooky(unit, unit.squad.map(_.enemies.filter(_.effectivelyCloaked)).getOrElse(Iterable.empty)).orElse(
         pickBestSpooky(unit, unit.squad.map(_.enemies.filter(_.cloakedOrBurrowed)).getOrElse(Iterable.empty))).orElse(
-          if (unit.agent.canFocus) None else pickBestSpooky(unit, unit.matchups.enemies.filter(_.effectivelyCloaked))).orElse(
-            if (unit.agent.canFocus) None else pickBestSpooky(unit, unit.matchups.enemies.filter(_.cloakedOrBurrowed)))
+          pickBestSpooky(unit, unit.squad.map(_.enemies.filter(canEventuallyCloak)).getOrElse(Iterable.empty))).orElse(
+          if (unit.agent.canFocus) None else
+            pickBestSpooky(unit, unit.matchups.enemies.filter(_.effectivelyCloaked)).orElse(
+              pickBestSpooky(unit, unit.matchups.enemies.filter(_.cloakedOrBurrowed)).orElse(
+                pickBestSpooky(unit, unit.matchups.enemies.filter(canEventuallyCloak)))))
 
     if (spookiestSpooky.isEmpty) {
       return

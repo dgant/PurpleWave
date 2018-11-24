@@ -30,7 +30,8 @@ class Configuration {
   /////////////
   // Battles //
   /////////////
-  
+
+  var localSim                      = false
   var avatarBattleDistancePixels    = 32.0 * 6.0
   var battleMarginTileBase          = 12 + 2
   var battleMarginTileMinimum       = 12 + 2

@@ -440,14 +440,17 @@ object ProtossBuilds {
   //////////////////////
   
   val FFE_Vs4Pool = Vector[BuildRequest] (
-    Get(1,   Protoss.Nexus),
     Get(8,   Protoss.Probe),
     Get(1,   Protoss.Pylon),
     Get(1,   Protoss.Forge),
-    Get(2,   Protoss.PhotonCannon))
+    Get(10,  Protoss.Probe),
+    Get(3,   Protoss.PhotonCannon),
+    Get(12,  Protoss.Probe),
+    Get(1,   Protoss.Gateway),
+    Get(13,  Protoss.Probe),
+    Get(2,   Protoss.Gateway))
   
   val FFE_Conservative = Vector[BuildRequest] (
-    Get(1,   Protoss.Nexus),
     Get(8,   Protoss.Probe),
     Get(1,   Protoss.Pylon),
     Get(9,   Protoss.Probe),
@@ -455,18 +458,48 @@ object ProtossBuilds {
     Get(2,   Protoss.PhotonCannon))
   
   val FFE_ForgeCannonNexus = Vector[BuildRequest] (
-    Get(1,   Protoss.Nexus),
     Get(8,   Protoss.Probe),
     Get(1,   Protoss.Pylon),
     Get(10,  Protoss.Probe),
     Get(1,   Protoss.Forge),
     Get(12,  Protoss.Probe),
     Get(2,   Protoss.PhotonCannon),
-    Get(16,  Protoss.Probe),
+    Get(14,  Protoss.Probe),
+    Get(2,   Protoss.Nexus))
+
+  val FFE_ForgeNexusCannon = Vector[BuildRequest] (
+    Get(8,   Protoss.Probe),
+    Get(1,   Protoss.Pylon),
+    Get(10,  Protoss.Probe),
+    Get(1,   Protoss.Forge),
+    Get(12,  Protoss.Probe),
     Get(2,   Protoss.Nexus),
-    Get(3,   Protoss.PhotonCannon),
-    Get(2,   Protoss.Pylon))
-  
+    Get(2,   Protoss.PhotonCannon))
+
+  val FFE_NexusForgeCannons = Vector[BuildRequest] (
+    Get(1,   Protoss.Nexus),
+    Get(8,   Protoss.Probe),
+    Get(1,   Protoss.Pylon),
+    Get(14,  Protoss.Probe),
+    Get(1,   Protoss.Forge),
+    Get(15,  Protoss.Probe),
+    Get(2,   Protoss.PhotonCannon))
+
+  val FFE_GatewayNexusForge = Vector[BuildRequest] (
+    Get(1,   Protoss.Nexus),
+    Get(8,   Protoss.Probe),
+    Get(1,   Protoss.Pylon),
+    Get(9,   Protoss.Probe),
+    Get(1,   Protoss.Gateway),
+    Get(11,  Protoss.Probe),
+    Get(1,   Protoss.Zealot),
+    Get(12,  Protoss.Probe),
+    Get(2,   Protoss.Pylon),
+    Get(14,  Protoss.Probe),
+    Get(2,   Protoss.Zealot),
+    Get(15,  Protoss.Probe),
+    Get(2,   Protoss.Nexus))
+
   val FFE_NexusGatewayForge = Vector[BuildRequest] (
     Get(1,   Protoss.Nexus),
     Get(8,   Protoss.Probe),

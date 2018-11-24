@@ -59,7 +59,7 @@ class Scout(scoutCount: Int = 1) extends Plan {
     
     val getNextScoutBase = () => {
       if (enemyStartBases.isEmpty) {
-        With.intelligence.dequeueNextBaseToScout
+        With.intelligence.claimBaseToScout
       }
       else {
         enemyStartBases.head
@@ -71,7 +71,7 @@ class Scout(scoutCount: Int = 1) extends Plan {
     }
     
     scouts.get.unitCounter.set(new UnitCountBetween(1, scoutsDesired))
-    scouts.get.unitPreference.set(UnitPreferClose(With.intelligence.leastScoutedBases.head.heart.pixelCenter))
+    scouts.get.unitPreference.set(UnitPreferClose(With.intelligence.mostIntriguingBases().head.heart.pixelCenter))
     scouts.get.acquire(this)
     acquiredScouts = scouts.get.units
     
@@ -79,7 +79,7 @@ class Scout(scoutCount: Int = 1) extends Plan {
     unassignedScouts ++= acquiredScouts
     
     while (unassignedScouts.nonEmpty) {
-      val destination = With.intelligence.dequeueNextBaseToScout.heart.pixelCenter
+      val destination = With.intelligence.claimBaseToScout.heart.pixelCenter
       val scout = unassignedScouts.minBy(_.pixelDistanceTravelling(destination))
       unassignedScouts -= scout
       

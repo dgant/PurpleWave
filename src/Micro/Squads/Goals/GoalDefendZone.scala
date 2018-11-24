@@ -49,10 +49,13 @@ class GoalDefendZone extends GoalBasic {
     }
   }
 
-  private val pointsOfInterest = new Cache(() => (
+  private val pointsOfInterest = new Cache[Array[Pixel]](() => {
+    val output = (
       zone.bases.filter(_.owner.isUs).map(_.heart.pixelCenter)
-      ++ zone.units.view.filter(u => u.isOurs && u.unitClass.isBuilding).map(_.pixelCenter).toVector
-    ).take(10) // For performance
+        ++ zone.units.view.filter(u => u.isOurs && u.unitClass.isBuilding).map(_.pixelCenter).toVector
+      ).take(10)
+    if (output.isEmpty) Array(zone.centroid.pixelCenter) else output
+  } // For performance
   )
   
   private val huntableEnemies = new Cache(() => {
@@ -64,17 +67,24 @@ class GoalDefendZone extends GoalBasic {
   })
   
   def huntEnemies() {
-    lazy val center        = zone.bases.find(_.owner.isUs).map(_.heart.pixelCenter).getOrElse(zone.centroid.pixelCenter)
-    lazy val target        = huntableEnemies().minBy(_.pixelDistanceCenter(center))
-    lazy val targetAir     = ByOption.minBy(huntableEnemies().filter   (_.flying))(_.pixelDistanceCenter(center)).getOrElse(target)
-    lazy val targetGround  = ByOption.minBy(huntableEnemies().filterNot(_.flying))(_.pixelDistanceCenter(center)).getOrElse(target)
+    lazy val home = ByOption.minBy(zone.bases.filter(_.owner.isUs).map(_.heart))(_.groundPixels(zone.centroid))
+      .orElse(ByOption.minBy(With.geography.ourBases.map(_.heart))(_.groundPixels(zone.centroid)))
+      .getOrElse(With.geography.home)
+      .pixelCenter
+
+    def distance(enemy: UnitInfo): Double = {
+      ByOption.min(pointsOfInterest().map(_.pixelDistance(enemy.pixelCenter))).getOrElse(enemy.pixelDistanceCenter(home))
+    }
+    lazy val target        = huntableEnemies().minBy(distance)
+    lazy val targetAir     = ByOption.minBy(huntableEnemies().filter   (_.flying))(distance).getOrElse(target)
+    lazy val targetGround  = ByOption.minBy(huntableEnemies().filterNot(_.flying))(distance).getOrElse(target)
     squad.units.foreach(recruit => {
       val onlyAir     = recruit.canAttack && ! recruit.unitClass.attacksGround
       val onlyGround  = recruit.canAttack && ! recruit.unitClass.attacksAir
       val thisTarget  = if (onlyAir) targetAir else if (onlyGround) targetGround else target
       recruit.agent.intend(squad.client, new Intention {
         toTravel = Some(thisTarget.pixelCenter)
-        toReturn = Some(center)
+        toReturn = Some(home)
       })
     })
   }

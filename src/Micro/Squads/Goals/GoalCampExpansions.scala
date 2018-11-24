@@ -5,6 +5,7 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Performance.Cache
 import Planning.UnitMatchers.UnitMatchAntiGround
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
 class GoalCampExpansions extends GoalAssignToBases {
@@ -29,12 +30,12 @@ class GoalCampExpansions extends GoalAssignToBases {
       .toMap
     var output = candidateBases.sortBy(base => distancesTheirs(base) / (1.0 + distancesOurs(base)))
     if (output.isEmpty) output = With.geography.neutralBases.toVector
-    if (output.isEmpty) output = With.intelligence.leastScoutedBases.toVector
+    if (output.isEmpty) output = With.intelligence.mostIntriguingBases()
     output
   })
   
   unitMatcher = UnitMatchAntiGround
   
-  override def peekNextBase: Base = takeNextBase
-  override def takeNextBase: Base = likelyBasesCache()(squad.units.size % likelyBasesCache().size)
+  override def peekNextBase: Base = likelyBasesCache()(squad.units.size % likelyBasesCache().size)
+  override def takeNextBase(unit: FriendlyUnitInfo): Base = peekNextBase
 }

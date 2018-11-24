@@ -8,6 +8,7 @@ import Micro.Actions.Combat.Techniques.Avoid
 import Micro.Actions.Commands.{Attack, Move}
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.ByOption
 
 object Poke extends Action {
   
@@ -25,8 +26,14 @@ object Poke extends Action {
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    val targets       = unit.matchups.targets.filter(_.unitClass.isWorker)
-    val target        = targets.minBy(_.pixelDistanceCenter(unit.zone.exit.map(_.pixelCenter).getOrElse(unit.pixelCenter)))
+    val targets = unit.matchups.targets.filter(_.unitClass.isWorker)
+    if (targets.isEmpty) return
+
+    val targetHeart = unit.base.map(_.heart.pixelCenter).getOrElse(unit.zone.centroid)
+    val target = targets.minBy(target =>
+      target.pixelDistanceEdge(unit)
+      - ByOption.min(unit.matchups.threats.filter(_ != target).map(_.pixelDistanceEdge(target))).getOrElse(0.0))
+
     val exit          = unit.zone.exit.map(_.pixelCenter).getOrElse(With.geography.home.pixelCenter)
     val otherThreats  = targets.filter(t => t != target && t.pixelDistanceCenter(exit) <= unit.pixelDistanceCenter(exit))
     val targetAction  = new TargetAction(TargetFilterWhitelist(targets))

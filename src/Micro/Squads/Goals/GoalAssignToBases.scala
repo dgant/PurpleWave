@@ -13,7 +13,7 @@ import scala.collection.mutable
 abstract class GoalAssignToBases extends GoalBasic {
   
   def peekNextBase: Base
-  def takeNextBase: Base
+  def takeNextBase(scout: FriendlyUnitInfo): Base
   
   protected var destinationByScout: mutable.ArrayBuffer[(FriendlyUnitInfo, Pixel)] = new mutable.ArrayBuffer[(FriendlyUnitInfo, Pixel)]
   protected var destinationFrame: Int = 0
@@ -46,7 +46,7 @@ abstract class GoalAssignToBases extends GoalBasic {
       foundCandidate = ByOption.minBy(filterCandidates(candidates))(scoutPreference)
       foundCandidate.foreach(newScout => {
         addCandidate(newScout)
-        destinationByScout.append((newScout, baseToPixel(takeNextBase)))
+        destinationByScout.append((newScout, baseToPixel(takeNextBase(newScout))))
       })
     } while(foundCandidate.nonEmpty && acceptsHelp)
   }
@@ -59,6 +59,7 @@ abstract class GoalAssignToBases extends GoalBasic {
       Terran.Battlecruiser,
       Terran.Valkyrie,
       Protoss.Arbiter,
+      Protoss.Archon,
       Protoss.Carrier,
       Zerg.Devourer,
       Zerg.Guardian))
@@ -70,7 +71,6 @@ abstract class GoalAssignToBases extends GoalBasic {
         * (if (unit.flying) 1.0 else 1.5)
         * (if (unit.cloaked) 1.0 else 1.5)
         * (if (unit.is(Protoss.Zealot) && With.enemies.map(With.intelligence.unitsShown(_, Terran.Vulture)).sum > 0) 3.0 else 1.0)
-        / unit.pixelDistanceCenter(scoutDestination)
       )
     else
       Double.MaxValue
@@ -78,11 +78,11 @@ abstract class GoalAssignToBases extends GoalBasic {
   
   private def getNextScoutingBase: Option[Base] = {
     def acceptable(base: Base) = base.owner.isNeutral && ( ! base.zone.island || With.strategy.isPlasma)
-    val baseFirst = With.intelligence.dequeueNextBaseToScout
+    val baseFirst = With.intelligence.claimBaseToScout
     var baseNext = baseFirst
     do {
       if (acceptable(baseNext)) return Some(baseNext)
-      baseNext = With.intelligence.dequeueNextBaseToScout
+      baseNext = With.intelligence.claimBaseToScout
     } while (baseNext != baseFirst)
     None
   }

@@ -38,5 +38,6 @@ object PvZEarlyFFEGreedy            extends PvZFFEOpening {
   override def responsesBlacklisted = Iterable(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.overpool, With.fingerprints.twelvePool)
 }
 object PvZMidgame4Gate2Archon       extends PvZStrategy
-object PvZMidgameCorsairSpeedlot    extends PvZStrategy
-object PvZMidgameGatewayAttack      extends PvZStrategy
+object PvZMidgameBisu               extends PvZStrategy
+object PvZMidgameNeoBisu    extends PvZStrategy
+object PvZ5GateGoon      extends PvZStrategy

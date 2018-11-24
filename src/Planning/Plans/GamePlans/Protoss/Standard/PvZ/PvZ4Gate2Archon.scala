@@ -28,6 +28,8 @@ class PvZ4Gate2Archon extends GameplanModeTemplate {
   
   override def buildPlans: Seq[Plan] = Vector(
     new EjectScout,
+    new PvZIdeas.TakeSafeNatural,
+    new PvZIdeas.AddEarlyCannons,
     new If(
       new Or(
         new UnitsAtLeast(2, Protoss.Archon),

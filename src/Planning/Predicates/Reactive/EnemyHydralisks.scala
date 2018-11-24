@@ -4,9 +4,9 @@ import Lifecycle.With
 import Planning.Predicate
 import ProxyBwapi.Races.Zerg
 
-class EnemyMutalisks extends Predicate {
+class EnemyHydralisks extends Predicate {
   
   override def isComplete: Boolean = {
-    With.units.existsEnemy(Zerg.Mutalisk, Zerg.Spire)
+    With.units.existsEnemy(Zerg.Hydralisk, Zerg.HydraliskDen)
   }
 }

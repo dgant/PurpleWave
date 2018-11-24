@@ -97,7 +97,7 @@ object PvZIdeas {
         Get(1, Protoss.Assimilator),
         Get(1, Protoss.CyberneticsCore)),
       new Parallel(
-        new PumpMatchingRatio(Protoss.Corsair, 3, 8,   Seq(Enemy(Zerg.Mutalisk, 0.9))),
+        new PumpMatchingRatio(Protoss.Corsair, 1, 8,   Seq(Enemy(Zerg.Mutalisk, 0.9))),
         new PumpMatchingRatio(Protoss.Dragoon, 0, 10,  Seq(Enemy(Zerg.Mutalisk, 1.25))),
         new Pump(Protoss.Stargate, 1),
         new Build(Get(Protoss.DragoonRange)))))
@@ -116,10 +116,10 @@ object PvZIdeas {
   
   class AddGateways extends Parallel(
     new IfOnMiningBases(1, new Build(Get(4, Protoss.Gateway))),
-    new IfOnMiningBases(2, new Build(Get(8, Protoss.Gateway))),
-    new IfOnMiningBases(3, new Build(Get(12, Protoss.Gateway))),
-    new IfOnMiningBases(4, new Build(Get(16, Protoss.Gateway))),
-    new IfOnMiningBases(5, new Build(Get(20, Protoss.Gateway))))
+    new IfOnMiningBases(2, new Build(Get(9, Protoss.Gateway))),
+    new IfOnMiningBases(3, new Build(Get(13, Protoss.Gateway))),
+    new IfOnMiningBases(4, new Build(Get(18, Protoss.Gateway))),
+    new IfOnMiningBases(5, new Build(Get(24, Protoss.Gateway))))
   
   class TrainAndUpgradeArmy extends Parallel(
     new If(

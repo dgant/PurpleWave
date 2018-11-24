@@ -100,13 +100,14 @@ object ProtossChoices {
   
   val pvzMidgameTransitioningFromOneBase = Vector(
     PvZMidgame4Gate2Archon,
-    PvZMidgameGatewayAttack
+    PvZ5GateGoon
   )
   
   val pvzMidgameTransitioningFromTwoBases = Vector(
     PvZMidgame4Gate2Archon,
-    PvZMidgameGatewayAttack,
-    PvZMidgameCorsairSpeedlot
+    PvZMidgameBisu,
+    PvZ5GateGoon,
+    PvZMidgameNeoBisu
   )
   
   val pvzOpenersAll: Vector[Strategy] = (pvzOpenersWithoutTransitions ++ pvzOpenersTransitioningFrom1Gate ++ pvzOpenersTransitioningFrom2Gate).distinct

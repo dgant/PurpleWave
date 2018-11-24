@@ -7,6 +7,7 @@ import Planning.ResourceLocks._
 import Planning.UnitCounters.UnitCountOne
 import Planning.UnitPreferences.UnitPreferIdle
 import Planning.Plan
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchIdle}
 import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.Upgrades.Upgrade
 
@@ -16,7 +17,7 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {
   val currency = new LockCurrencyForUpgrade(upgrade, level)
   val upgraders = new LockUnits {
     unitCounter.set(UnitCountOne)
-    unitMatcher.set(upgraderClass)
+    unitMatcher.set(UnitMatchAnd(upgraderClass, UnitMatchIdle))
     unitPreference.set(UnitPreferIdle)
   }
   

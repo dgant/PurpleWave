@@ -31,7 +31,7 @@ class EmptyPlaybook {
     PvPOpen3GateGoon,
     PvZ4Gate99,
     PvZEarlyFFEEconomic,
-    PvZMidgameGatewayAttack,
+    PvZ5GateGoon,
     PvROpen2Gate910,
     PvROpen2Gate1012
   )
@@ -44,6 +44,7 @@ object StrategyGroups {
     WorkerRush,
     WorkerRushLiftoff,
     PvZEarlyFFEConservative,
+    PvZMidgameNeoBisu,
     TvR1Rax,
     TvRTinfoil,
     TvEProxy5Rax,
@@ -66,7 +67,7 @@ object StrategyGroups {
 }
 
 class TestingPlaybook extends EmptyPlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvZEarlyFFEGreedy, PvZMidgame4Gate2Archon)
+  override lazy val forced: Seq[Strategy] = Seq(PvZEarlyFFEGreedy, PvZ5GateGoon)
 }
 
 class PurpleWavePlaybook extends EmptyPlaybook {

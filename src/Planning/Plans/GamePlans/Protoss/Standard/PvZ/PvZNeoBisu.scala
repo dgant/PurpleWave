@@ -11,16 +11,15 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Predicates.Compound.Latch
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyHydralisks, EnemyMutalisks}
+import Planning.Predicates.Reactive.EnemyMutalisks
 import Planning.Predicates.Strategy.Employing
-import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Protoss.PvZMidgameBisu
+import Strategery.Strategies.Protoss.PvZMidgameNeoBisu
 
-class PvZBisu extends GameplanModeTemplate {
-  
-  override val activationCriteria = new Employing(PvZMidgameBisu)
-  override val completionCriteria = new Latch(new Or(new MiningBasesAtLeast(3), new TechComplete(Protoss.PsionicStorm)))
+class PvZNeoBisu extends GameplanModeTemplate {
+
+  override val activationCriteria = new Employing(PvZMidgameNeoBisu)
+  override val completionCriteria = new Latch(new MiningBasesAtLeast(3))
   override def defaultArchonPlan: Plan = new MeldArchons(49)
   override def defaultAttackPlan: Plan = new Parallel(
     new Attack(Protoss.Corsair),
@@ -30,34 +29,22 @@ class PvZBisu extends GameplanModeTemplate {
       new PvZIdeas.ConditionalAttack))
 
   override def emergencyPlans: Seq[Plan] = Seq(new PvZIdeas.ReactToLurkers)
-  
+
   override def buildPlans: Seq[Plan] = Vector(
     new EjectScout,
     new Pump(Protoss.DarkTemplar, 3),
     new PvZIdeas.TakeSafeNatural,
     new PvZIdeas.AddEarlyCannons,
+    new PumpMatchingRatio(Protoss.Corsair, 1, 12, Seq(Enemy(Zerg.Mutalisk, 1.0))),
     new If(
-      new UnitsAtLeast(1, Protoss.Stargate, complete = true),
-      new If(
-        new EnemyMutalisks,
-        new Parallel(
-          new PumpMatchingRatio(Protoss.Corsair, 1, 12, Seq(Enemy(Zerg.Mutalisk, 1.0))),
-          new UpgradeContinuously(Protoss.AirDamage)),
-        new If(
-          new EnemyHydralisks,
-          new Pump(Protoss.Corsair, 1),
-          new Parallel(
-            new Pump(Protoss.Corsair, 6),
-            new UpgradeContinuously(Protoss.AirDamage))))),
+      new EnemyMutalisks,
+      new UpgradeContinuously(Protoss.AirDamage)),
     new If(
       new UnitsAtLeast(1, Protoss.HighTemplar),
       new Build(Get(Protoss.PsionicStorm))),
     new If(
       new UnitsAtLeast(2, Protoss.Dragoon),
       new UpgradeContinuously(Protoss.DragoonRange)),
-    new If(
-      new UnitsAtLeast(15, UnitMatchWarriors),
-      new RequireMiningBases(3)),
     new PumpMatchingRatio(Protoss.Dragoon, 1, 8, Seq(Enemy(Zerg.Mutalisk, 1.0))),
     new Pump(Protoss.HighTemplar),
     new Pump(Protoss.Zealot),
@@ -65,16 +52,21 @@ class PvZBisu extends GameplanModeTemplate {
       Get(1, Protoss.Gateway),
       Get(1, Protoss.Assimilator),
       Get(1, Protoss.CyberneticsCore),
-      Get(2, Protoss.Assimilator),
       Get(1, Protoss.Stargate),
+      Get(2, Protoss.Assimilator),
       Get(1, Protoss.CitadelOfAdun)),
+    new Pump(Protoss.Corsair),
+    new UpgradeContinuously(Protoss.AirDamage),
     new UpgradeContinuously(Protoss.GroundDamage),
+    new UpgradeContinuously(Protoss.ZealotSpeed),
+    new Build(Get(Protoss.TemplarArchives)),
+    new UpgradeContinuously(Protoss.DragoonRange),
     new Build(
-      Get(1, Protoss.TemplarArchives),
-      Get(4, Protoss.Gateway),
-      Get(Protoss.ZealotSpeed),
       Get(Protoss.PsionicStorm),
-      Get(8, Protoss.Gateway)),
+      Get(4, Protoss.Gateway),
+      Get(Protoss.RoboticsFacility),
+      Get(Protoss.Observatory)),
+    new Build(Get(6, Protoss.Gateway)),
     new RequireMiningBases(3)
   )
 }

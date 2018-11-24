@@ -470,6 +470,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     val output  = - velocity.lengthFast * (deltaXY.normalize * velocity.normalize)
     output
   }
+  def speedApproachingEachOther(other: UnitInfo): Double = speedApproaching(other) + other.speedApproaching(this)
   
   ////////////
   // Orders //

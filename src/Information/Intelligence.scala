@@ -39,7 +39,7 @@ class Intelligence {
         val heartMain = base.heart.pixelCenter
         val heartNatural = base.natural.getOrElse(base).heart.pixelCenter
         val hearts = Vector(heartMain, heartNatural)
-        val distanceFromEnemyBase = 1.0 + ByOption.min(enemyBaseHearts.map(_.groundPixels(heartMain))).getOrElse(With.mapPixelWidth.toDouble)
+        val distanceFromEnemyBase = 32.0 * 32.0 + ByOption.min(enemyBaseHearts.map(_.groundPixels(heartMain))).getOrElse(With.mapPixelWidth.toDouble)
         val informationAge = 1.0 + With.framesSince(base.lastScoutedFrame)
         val startPositionBonus = if (base.isStartLocation && base.lastScoutedFrame <= 0) 100.0 else 1.0
         val output = startPositionBonus * informationAge / distanceFromEnemyBase

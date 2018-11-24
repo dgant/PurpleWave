@@ -21,7 +21,7 @@ object Poke extends Action {
     && ( // Save our strength for blocking Hatcheries
       ! With.enemy.isZerg
       || unit.matchups.threats.size <= 5
-      || unit.matchups.threats.size <= 9 && unit.totalHealth > 25)
+      || unit.totalHealth > 25)
     
   )
   

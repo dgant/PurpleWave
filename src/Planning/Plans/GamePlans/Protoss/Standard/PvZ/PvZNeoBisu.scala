@@ -50,6 +50,7 @@ class PvZNeoBisu extends GameplanModeTemplate {
     new Pump(Protoss.Zealot),
     new Build(
       Get(1, Protoss.Gateway),
+      Get(1, Protoss.Forge),
       Get(1, Protoss.Assimilator),
       Get(1, Protoss.CyberneticsCore),
       Get(1, Protoss.Stargate),

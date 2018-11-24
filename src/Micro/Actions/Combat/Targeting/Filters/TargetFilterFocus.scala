@@ -8,6 +8,7 @@ object TargetFilterFocus extends TargetFilter {
     ! actor.agent.canFocus
     || target.zone == actor.agent.destination.zone
     || (target.canAttack(actor) && target.inRangeToAttack(actor))
+    || (target.visible && target.topSpeed < actor.topSpeed * 0.75 && actor.matchups.threats.isEmpty)
   )
   
 }

@@ -48,7 +48,7 @@ object Chase extends ActionTechnique {
     val readyToAttack = unit.readyForAttackOrder
     val canEscape = target.canMove
     val nearEscaping = target.matchups.framesOfEntanglementWith(unit) < With.reaction.agencyAverage + unit.unitClass.accelerationFrames
-    val speedEscaping = - target.speedApproaching(unit.pixelCenter)
+    val speedEscaping = - unit.speedApproachingEachOther(target)
 
     def attack() { Attack.delegate(unit) }
     def pursue(){

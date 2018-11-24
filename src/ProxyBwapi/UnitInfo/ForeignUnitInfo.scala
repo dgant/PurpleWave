@@ -302,6 +302,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
   //////////////
   
   private def updateStatuses() {
+    _remainingTrainFrames   = baseUnit.getRemainingTrainTime
     _remainingUpgradeFrames = baseUnit.getRemainingUpgradeTime
     _remainingTechFrames    = baseUnit.getRemainingResearchTime
     _beingConstructed       = baseUnit.isBeingConstructed
@@ -319,7 +320,8 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
     _underStorm             = baseUnit.isUnderStorm
     _addon                  = With.units.get(baseUnit.getAddon)
   }
-  
+
+  private var _remainingTrainFrames   : Int = _
   private var _remainingUpgradeFrames : Int = _
   private var _remainingTechFrames    : Int = _
   private var _beingConstructed       : Boolean = _
@@ -345,7 +347,8 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
     val output        = progressLeft * unitClass.buildFrames - With.framesSince(lastSeen)
     output.toInt
   }
-  
+
+  def remainingTrainFrames    : Int     = _remainingTrainFrames
   def remainingUpgradeFrames  : Int     = _remainingUpgradeFrames
   def remainingTechFrames     : Int     = _remainingTechFrames
   def beingConstructed        : Boolean = _beingConstructed

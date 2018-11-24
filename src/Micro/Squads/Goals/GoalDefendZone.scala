@@ -19,9 +19,9 @@ class GoalDefendZone extends GoalBasic {
   var zone: Zone = _
   
   override def run() {
-    lazy val base       = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.intelligence.mostBaselikeEnemyTile))
-    lazy val choke      = zone.exit
-    lazy val walls      = zone.units.toSeq.filter(u =>
+    lazy val base   = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.intelligence.mostBaselikeEnemyTile))
+    lazy val choke  = zone.exit
+    lazy val walls  = zone.units.toSeq.filter(u =>
       u.isOurs
       && u.unitClass.isStaticDefense
       && (squad.enemies.isEmpty || squad.enemies.exists(u.canAttack)))
@@ -48,12 +48,19 @@ class GoalDefendZone extends GoalBasic {
       defendHeart(base.map(_.heart.pixelCenter).getOrElse(zone.centroid.pixelCenter))
     }
   }
+
+  private val pointsOfInterest = new Cache(() => (
+      zone.bases.filter(_.owner.isUs).map(_.heart.pixelCenter)
+      ++ zone.units.view.filter(u => u.isOurs && u.unitClass.isBuilding).map(_.pixelCenter).toVector
+    ).take(10) // For performance
+  )
   
   private val huntableEnemies = new Cache(() => {
     squad.enemies.filter(enemy =>
       enemy.visible
       && (enemy.zone == zone || enemy.zone.edges.exists(edge => edge.zones.contains(zone)))
-      && ! enemy.is(Zerg.Drone))
+      && pointsOfInterest().exists(p => enemy.pixelDistanceCenter(p) < 32 * 15)
+      && ! (enemy.is(Zerg.Drone) && With.fingerprints.fourPool.matches))
   })
   
   def huntEnemies() {

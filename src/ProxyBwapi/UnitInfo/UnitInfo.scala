@@ -123,6 +123,13 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
       + interceptorCount * Protoss.Interceptor.subjectiveValue
       + friendly.map(_.loadedUnits.map(_.subjectiveValue).sum).sum
   )
+
+  def remainingOccupationFrames: Int = Vector(
+    remainingCompletionFrames,
+    remainingTechFrames,
+    remainingUpgradeFrames,
+    remainingTrainFrames
+  ).max
   
   //////////////
   // Geometry //

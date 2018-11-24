@@ -43,20 +43,15 @@ object Chase extends ActionTechnique {
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     Target.delegate(unit)
     if (unit.agent.toAttack.isEmpty) return
-    
-    if (unit.readyForAttackOrder) {
-      Attack.delegate(unit)
-    }
-  
+
     val target = unit.agent.toAttack.get
-    if ( ! target.canMove) {
-      return
-    }
-    
-    // Chase the target down
-    // TODO: Queue up a move order ASAP; we can't wait for latency
-    
-    if (target.speedApproaching(unit.pixelCenter) < 0.0) {
+    val readyToAttack = unit.readyForAttackOrder
+    val canEscape = target.canMove
+    val nearEscaping = target.matchups.framesOfEntanglementWith(unit) < With.reaction.agencyAverage + unit.unitClass.accelerationFrames
+    val speedEscaping = - target.speedApproaching(unit.pixelCenter)
+
+    def attack() { Attack.delegate(unit) }
+    def pursue(){
       val targetProjected = target.projectFrames(unit.framesToBeReadyForAttackOrder)
       val distanceToTravel = Math.max(
         unit.pixelDistanceCenter(targetProjected),
@@ -65,5 +60,19 @@ object Chase extends ActionTechnique {
       unit.agent.toTravel = Some(targetPixel)
       Move.delegate(unit)
     }
+
+    if (canEscape && speedEscaping > 0 && (nearEscaping || unit.is(Protoss.Corsair))) {
+      pursue()
+    }
+
+    if (readyToAttack) {
+      attack()
+    }
+
+    if (nearEscaping || speedEscaping > 0) {
+      pursue()
+    }
+
+    attack()
   }
 }

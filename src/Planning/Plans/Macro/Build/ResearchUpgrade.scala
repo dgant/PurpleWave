@@ -3,11 +3,11 @@ package Planning.Plans.Macro.Build
 import Lifecycle.With
 import Macro.Scheduling.Project
 import Micro.Agency.Intention
+import Planning.Plan
 import Planning.ResourceLocks._
 import Planning.UnitCounters.UnitCountOne
-import Planning.UnitPreferences.UnitPreferIdle
-import Planning.Plan
 import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchIdle}
+import Planning.UnitPreferences.UnitPreferIdle
 import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.Upgrades.Upgrade
 
@@ -33,7 +33,9 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {
     // Don't even stick a projected expenditure in the queue if we're this far out.
     if (requiredClasses.exists(c => ! With.units.existsOurs(c))) return
     
-    currency.framesPreordered = requiredClasses.map(Project.framesToUnits(_)).max
+    currency.framesPreordered = (
+      requiredClasses.map(Project.framesToUnits(_))
+      ++ upgraders.units.map(_.remainingOccupationFrames)).max
     currency.acquire(this)
     currency.isSpent = With.units.ours.exists(upgrader => upgrader.upgrading && upgrader.upgradingType == upgrade)
     if ( ! currency.satisfied) return

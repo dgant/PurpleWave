@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Decisionmaking
 
 import Micro.Actions.Action
 import Micro.Actions.Combat.Duck
-import Micro.Actions.Combat.Maneuvering.{GooseChase, Sneak}
+import Micro.Actions.Combat.Maneuvering.{GooseChase, Sneak, Support}
 import Micro.Actions.Combat.Spells.{SpiderMine, Stim}
 import Micro.Actions.Combat.Tactics.SpiderMines.HandleMines
 import Micro.Actions.Combat.Tactics._
@@ -19,6 +19,7 @@ object Fight extends Action {
   
   override def perform(unit: FriendlyUnitInfo) {
     GooseChase.consider(unit)
+    Support.consider(unit)
     StrategicNuke.consider(unit)
     Cast.consider(unit)
     Stim.consider(unit)

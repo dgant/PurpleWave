@@ -1,22 +1,20 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
-import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
-import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpMatchingRatio, UpgradeContinuously}
+import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, MeldArchons}
-import Planning.Predicates.Compound.{And, Check}
-import Planning.Predicates.Economy.GasAtLeast
+import Planning.Predicates.Compound.And
 import Planning.Predicates.Milestones.{EnemyHasShownCloakedThreat, _}
 import Planning.Predicates.Reactive.{EnemyMutalisks, SafeAtHome, SafeToMoveOut}
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Protoss.{PvZ4Gate99, PvZ4GateDragoonAllIn}
+import Strategery.Strategies.Protoss.{PvZ4Gate99, PvZ4GateDragoonAllIn, PvZProxy2Gate}
 
 object PvZIdeas {
 
@@ -24,7 +22,7 @@ object PvZIdeas {
     new Or(
       new SafeToMoveOut,
       new BasesAtLeast(3),
-      new Employing(PvZ4Gate99, PvZ4GateDragoonAllIn)),
+      new Employing(PvZProxy2Gate, PvZ4Gate99, PvZ4GateDragoonAllIn)),
     new Attack)
 
   class MeldArchonsUntilStorm extends If(
@@ -150,31 +148,22 @@ object PvZIdeas {
             new Build(Get(Protoss.GroundDamage)))))),
     
     // Basic army
-    new Pump(Protoss.DarkTemplar, 1),
+    new If(
+      new EnemyHasUpgrade(Zerg.OverlordSpeed),
+      new Pump(Protoss.DarkTemplar, 3),
+      new Pump(Protoss.DarkTemplar, 1)),
     new IfOnMiningBases(2, new Pump(Protoss.Reaver, 6)),
     new Pump(Protoss.Observer, 1),
-    new If(
-      new Check(() => With.units.countOurs(Protoss.Dragoon) < With.units.countEnemy(Zerg.Lurker) * 3),
-      new Pump(Protoss.Dragoon),
-      new If(
-        new Check(() => With.units.countOurs(Protoss.Dragoon) < With.units.countOurs(Protoss.Zealot) * 3 - 24),
-        new Pump(Protoss.Dragoon, maximumConcurrentlyRatio = 0.5))),
-    new If(
-      new Or(
-        new UnitsAtMost(10, Protoss.HighTemplar),
-        new UnitsAtMost(8, Protoss.Archon)),
-      new If(
-        new GasAtLeast(200),
-        new Pump(Protoss.HighTemplar, 20, 3),
-        new Pump(Protoss.HighTemplar, 20, 1))),
+    new PumpMatchingRatio(Protoss.HighTemplar, 1, 20, Seq(Friendly(UnitMatchWarriors, 0.3))),
+    new PumpMatchingRatio(Protoss.Dragoon, 1, 100, Seq(
+      Enemy(Zerg.Lurker, 1.0),
+      Enemy(Zerg.Mutalisk, 1.0),
+      Friendly(Protoss.Zealot, 0.5),
+      Friendly(Protoss.Archon, -1.0),
+      Friendly(Protoss.Corsair, -1.0))),
+    new PumpMatchingRatio(Protoss.Corsair, 1, 12, Seq(Enemy(Zerg.Mutalisk, 1.0))),
     new BuildCannonsAtExpansions(5),
-    new Pump(Protoss.Zealot),
-    new If(
-      new And(
-        new SafeAtHome,
-        new UnitsAtMost(8, Zerg.Hydralisk),
-        new UnitsAtMost(1, Zerg.SporeColony)),
-      new Pump(Protoss.Corsair, 6),
-      new Pump(Protoss.Corsair, 1))
+    new Pump(Protoss.HighTemplar),
+    new Pump(Protoss.Zealot)
   )
 }

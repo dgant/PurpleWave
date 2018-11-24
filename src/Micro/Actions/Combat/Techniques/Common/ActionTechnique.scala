@@ -16,7 +16,13 @@ abstract class ActionTechnique extends Action {
     val framesOfInvolvement = unit.matchups
       .framesOfEntanglementPerThreat
       .getOrElse(other, Double.NegativeInfinity)
-    
-    0.5 + PurpleMath.fastTanh(framesOfInvolvement / 12.0) / 2.0
+
+    // A floor of significance
+    (
+      0.8 * (0.5 + PurpleMath.fastTanh(framesOfInvolvement / 12.0) / 2.0)
+      + (if (unit.canAttack(other)) 0.1 else 0.0)
+      + (if (other.canAttack(unit)) 0.1 else 0.0)
+    )
+
   }
 }

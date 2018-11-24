@@ -8,6 +8,7 @@ import Planning.UnitCounters.UnitCountOne
 import Planning.UnitPreferences.UnitPreferIdle
 import Planning.Plan
 import ProxyBwapi.Techs.Tech
+import Utilities.ByOption
 
 class ResearchTech(tech: Tech) extends Plan {
 
@@ -29,7 +30,9 @@ class ResearchTech(tech: Tech) extends Plan {
     // Don't even stick a projected expenditure in the queue if we're this far out.
     if ( ! With.units.existsOurs(techerClass)) return
     
-    currency.framesPreordered = Project.framesToUnits(techerClass)
+    currency.framesPreordered = Math.max(
+      ByOption.max(techers.units.map(_.remainingOccupationFrames)).getOrElse(0),
+      Project.framesToUnits(techerClass))
     currency.acquire(this)
     currency.isSpent = With.units.ours.exists(techer => techer.teching && techer.techingType == tech)
     if ( ! currency.satisfied) return

@@ -78,27 +78,28 @@ trait GoalBasic extends SquadGoal {
       lazy val counteredBy: Array[Quality] = Array.empty
       override def counterScaling(input: Double): Double = 5.0 * input
     }
-    val all: Vector[Quality] = Vector(
+    val threats: Array[Quality] = Array(
       Cloaked,
       SpiderMine,
-      AntiSpiderMine,
       Vulture,
-      AntiVulture,
       Air,
       Ground,
+    )
+    val answers: Array[Quality] = Array(
+      Detector,
+      AntiSpiderMine,
+      AntiVulture,
       AntiAir,
       AntiGround,
-      Combat,
-      Detector
     )
   }
   
   final protected val enemiesByQuality  = new CountMap[Quality]
   final protected val recruitsByQuality = new CountMap[Quality]
   private var lastUpdateFrame: Int = -1
-  private def countUnit(unit: UnitInfo) {
+  private def countUnit(unit: UnitInfo, qualities: Seq[Quality]) {
     val counter = if (unit.isFriendly) recruitsByQuality else enemiesByQuality
-    Qualities.all.foreach(quality =>
+    qualities.foreach(quality =>
       if (quality.matches(unit)) counter.add(quality, unit.subjectiveValue.toInt))
   }
   private def updateCounts() {
@@ -106,8 +107,8 @@ trait GoalBasic extends SquadGoal {
     lastUpdateFrame = With.frame
     enemiesByQuality.clear()
     recruitsByQuality.clear()
-    squad.units.foreach(countUnit)
-    squad.enemies.foreach(countUnit)
+    squad.units.foreach(countUnit(_, Qualities.answers))
+    squad.enemies.foreach(countUnit(_, Qualities.threats))
 
     // Bit of a hack -- if we have lots of units, demand detection
     if (squad.previousUnits.size > 4) {
@@ -207,7 +208,7 @@ trait GoalBasic extends SquadGoal {
   protected def addCandidate(unit: FriendlyUnitInfo) {
     if (unit.squad.isDefined) return
     squad.recruit(unit)
-    countUnit(unit)
+    countUnit(unit, Qualities.answers)
   }
   
   //////////////////

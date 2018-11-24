@@ -4,11 +4,12 @@ import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Basic.NoPlan
-import Planning.Plans.Compound._
+import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Predicates.Compound.{And, Latch}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.Employing
@@ -20,8 +21,14 @@ class PvZ4Gate2Archon extends GameplanModeTemplate {
   
   override val activationCriteria = new Employing(PvZMidgame4Gate2Archon)
   override val completionCriteria = new Latch(new Or(new MiningBasesAtLeast(3), new TechComplete(Protoss.PsionicStorm)))
-  override def defaultArchonPlan: Plan = new PvZIdeas.MeldArchonsUntilStorm
   override def defaultAttackPlan: Plan = new Trigger(new UnitsAtLeast(2, Protoss.Archon), new Attack, new PvZIdeas.ConditionalAttack)
+  override def defaultArchonPlan: Plan = new If(
+    new TechStarted(Protoss.PsionicStorm),
+    new MeldArchons(49) {
+      override def maximumTemplar = 8
+      override def minimumArchons = 2 },
+    new MeldArchons)
+
 
   override def defaultWorkerPlan: Plan = NoPlan()
   override def emergencyPlans: Seq[Plan] = Seq(new PvZIdeas.ReactToLurkers, new PvZIdeas.ReactToMutalisks)

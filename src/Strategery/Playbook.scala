@@ -1,7 +1,7 @@
 package Strategery
 
 import Lifecycle.With
-import Strategery.Selection.{StrategySelectionCIG, StrategySelectionGreedy, StrategySelectionPolicy, StrategySelectionSSCAIT}
+import Strategery.Selection._
 import Strategery.Strategies.AllRaces.WorkerRush
 import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss.PvR.{PvROpen2Gate1012, PvROpen2Gate910}
@@ -62,24 +62,18 @@ object StrategyGroups {
     ProxyDarkTemplar,
     FivePoolProxySunkens,
     PvPOpen2GateRobo,
-    PvPOpen4GateGoon
+    PvPOpen2Gate1012
   )
 }
 
 class TestingPlaybook extends EmptyPlaybook {
   override lazy val forced: Seq[Strategy] = Seq(PvZEarlyFFEEconomic, PvZMidgame4Gate2Archon)
+  override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled
+  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionDynamic
 }
 
 class PurpleWavePlaybook extends EmptyPlaybook {
   override lazy val disabled  : Seq[Strategy] = StrategyGroups.disabled
-}
-
-class CIGPlaybook extends PurpleWavePlaybook {
-  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionCIG
-
-  override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled ++ Seq(
-    PvZProxy2Gate
-  )
 }
 
 class SSCAITPlaybook extends PurpleWavePlaybook {

@@ -158,8 +158,8 @@ trait GoalBasic extends SquadGoal {
     })
   }
   
-  protected val counterMin = 1.5
-  protected val counterMax = 3.0
+  protected val counterMin = 1.2
+  protected val counterMax = 2.0
   
   protected def offerCritical(candidates: Iterable[FriendlyUnitInfo]) {
     offerConditional(

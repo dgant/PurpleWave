@@ -7,7 +7,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Predicates.Compound.{And, Not}
+import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
@@ -19,10 +19,10 @@ import Strategery.Strategies.Protoss.PvPOpen2GateRobo
 class PvP2GateRobo extends GameplanModeTemplate {
   
   override val activationCriteria: Predicate = new Employing(PvPOpen2GateRobo)
-  override val completionCriteria: Predicate = new Or(
+  override val completionCriteria: Predicate = new Latch(new Or(
     new EnemyBasesAtLeast(2),
     new UnitsAtLeast(2, Protoss.Nexus),
-    new UnitsAtLeast(40, UnitMatchWarriors))
+    new UnitsAtLeast(40, UnitMatchWarriors)))
   
   override def defaultAttackPlan  : Plan    = new PvPIdeas.AttackSafely
   override val scoutAt            : Int     = 14

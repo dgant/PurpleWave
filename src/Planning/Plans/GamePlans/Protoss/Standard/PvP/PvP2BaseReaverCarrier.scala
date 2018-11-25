@@ -42,7 +42,7 @@ class PvP2BaseReaverCarrier extends GameplanModeTemplate {
       new And(
         new UnitsAtLeast(2, Protoss.Stargate, complete = true),
         new GasAtLeast(200)),
-      new PvPIdeas.PumpDragoonsOrZealots,
+      new PvPIdeas.PumpDragoonsAndZealots,
       new Pump(Protoss.Zealot)))
 
   override def buildPlans: Seq[Plan] = Vector(

@@ -15,7 +15,7 @@ class FingerprintArrivesBy(
   override val sticky = true
   
   override def investigate: Boolean = {
-    val units           = With.units.enemy.filter(_.is(unitMatcher))
+    val units           = With.units.ever.filter(u => u.isEnemy && unitMatcher.accept(u))
     val targetFrame     = gameTime.frames
     val arrivalTimes    = units.map(u => (u, arrivaltime(u))).toMap
     val arrivingOnTime  = arrivalTimes.count(_._2 < targetFrame)

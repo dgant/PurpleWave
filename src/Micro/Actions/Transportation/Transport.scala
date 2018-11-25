@@ -1,9 +1,9 @@
 package Micro.Actions.Transportation
 
+import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Smuggle
 import Micro.Actions.Commands.Move
-import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Transport extends Action {
@@ -13,11 +13,13 @@ object Transport extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    Evacuate.consider(unit)
-    DropOff.consider(unit)
-    Pickup.consider(unit)
-    val fast = unit.player.hasUpgrade(Protoss.ShuttleSpeed)
-    Smuggle.consider(unit)
-    Move.delegate(unit)
+    // TODO: restore these once we have everything working
+    if ( ! With.self.isProtoss) {
+      Evacuate.consider(unit)
+      DropOff.consider(unit)
+      Pickup.consider(unit)
+      Smuggle.consider(unit)
+      Move.delegate(unit)
+    }
   }
 }

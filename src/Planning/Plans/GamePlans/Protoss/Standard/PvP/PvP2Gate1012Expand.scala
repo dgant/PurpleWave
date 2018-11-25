@@ -5,24 +5,23 @@ import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
 import Planning.Plans.Compound._
-import Planning.Predicates.Compound.{And, Latch, Not}
-import Planning.{Plan, Predicate}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.ReactToProxyGateways
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
-import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyDarkTemplarLikely, SafeAtHome}
 import Planning.Plans.Scouting.ScoutOn
+import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Milestones._
+import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen2Gate1012
 
-class PvP2Gate1012 extends GameplanModeTemplate {
+class PvP2Gate1012Expand extends GameplanModeTemplate {
   
   class PylonAtNatural extends ProposePlacement {
     override lazy val blueprints: Seq[Blueprint] = Vector(

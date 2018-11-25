@@ -125,6 +125,7 @@ class ForeignUnitTracker {
   private def remove(unit: ForeignUnitInfo) {
     unit.flagDead()
     unitsByIdKnown.remove(unit.id)
+    With.units.historicalUnitTracker.add(unit)
   }
   
   private def isValidForeignUnit(unitPair: (Int, bwapi.Unit)): Boolean = {

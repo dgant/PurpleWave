@@ -10,7 +10,7 @@ import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
+import Planning.Predicates.Milestones.{EnemiesAtLeast, MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
@@ -21,7 +21,7 @@ class PvP4GateGoon extends GameplanModeTemplate {
   override val activationCriteria : Predicate = new Employing(PvPOpen4GateGoon)
   override val completionCriteria : Predicate = new Latch(new MiningBasesAtLeast(2))
   override def defaultAttackPlan  : Plan = new PvPIdeas.AttackSafely
-  override def defaultScoutPlan   : Plan = new ScoutOn(Protoss.Pylon)
+  override def defaultScoutPlan   : Plan = new ScoutOn(Protoss.CyberneticsCore)
   override val defaultWorkerPlan  : Plan = NoPlan()
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvPIdeas.ReactToDarkTemplarEmergencies,
@@ -33,9 +33,12 @@ class PvP4GateGoon extends GameplanModeTemplate {
   
   override val buildPlans = Vector(
     new If(
-      new UnitsAtLeast(12, Protoss.Dragoon),
+      new Or(
+        new UnitsAtLeast(15, Protoss.Dragoon),
+        new EnemiesAtLeast(1, Protoss.PhotonCannon)),
       new RequireMiningBases(2)),
     new Pump(Protoss.Dragoon),
-    new Build(Get(Protoss.Forge))
+    new Build(Get(Protoss.Forge)),
+    new RequireMiningBases(2)
   )
 }

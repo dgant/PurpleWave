@@ -22,6 +22,10 @@ class UnitCounter[T <: UnitInfo](source: () => Iterable [T]) {
   
   def apply(predicate: (T) => Boolean): Int = {
     // How can we speed this up?
+    p(predicate)
+  }
+
+  def p(predicate: (T) => Boolean): Int = {
     units().count(predicate)
   }
 }

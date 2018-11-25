@@ -15,6 +15,7 @@ class Fingerprints {
       cannonRush
       twoGate
       oneGateCore
+      fourGateGoon
       nexusFirst
       forgeFe
       gatewayFe
@@ -44,6 +45,7 @@ class Fingerprints {
   lazy val cannonRush   = addFingerprint(new FingerprintCannonRush)
   lazy val twoGate      = addFingerprint(new Fingerprint2Gate)
   lazy val oneGateCore  = addFingerprint(new Fingerprint1GateCore)
+  lazy val fourGateGoon = addFingerprint(new Fingerprint4GateGoon)
   lazy val nexusFirst   = addFingerprint(new FingerprintNexusFirst)
   lazy val forgeFe      = addFingerprint(new FingerprintForgeFE)
   lazy val gatewayFe    = addFingerprint(new FingerprintGatewayFE)

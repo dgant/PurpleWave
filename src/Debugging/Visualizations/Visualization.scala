@@ -27,7 +27,8 @@ class Visualization {
     ShowUnitsAll,
     ShowUnitsFriendly,
     ShowUnitsForeign,
-    ShowExplosions
+    ShowExplosions,
+    ShowFingerprints
   )
   
   var enabled   : Boolean = _
@@ -102,29 +103,27 @@ class Visualization {
   }
   
   lazy val knownViews: Vector[View] = Vector[View](
-    ShowArchitecturePlacements,
     ShowArchitectureHeuristics,
     ShowArchitecturePaths,
+    ShowArchitecturePlacements,
     ShowBases,
-    ShowBattleSummary,
     ShowBattleDetails,
+    ShowBattleSummary,
     ShowBlackScreen,
+    ShowBulletsAsHearts,
     ShowCarriers,
     ShowClustering,
     ShowDesire,
     ShowEconomy,
-
-    ShowBulletsAsHearts,
     ShowExplosions,
+    ShowFingerprints,
+    ShowGrids,
+    ShowGroundskeeper,
     ShowHappyUnits,
     ShowHappyVision,
     ShowHistory,
-    ShowFingerprints,
-    ShowGroundskeeper,
-    ShowGrids,
     ShowIntelligence,
     ShowMobility,
-
     ShowUnitsAll,
     ShowUnitsForeign,
     ShowUnitsFriendly,

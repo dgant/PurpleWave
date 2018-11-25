@@ -1,6 +1,7 @@
 package Strategery
 
 import Lifecycle.With
+import Mathematics.PurpleMath
 import Planning.Plan
 import Planning.Plans.GamePlans.StandardGamePlan
 import ProxyBwapi.Players.Players
@@ -38,6 +39,13 @@ class Strategist {
   lazy val isPlasma: Boolean = Plasma.matches
   lazy val isIslandMap: Boolean = heyIsThisAnIslandMap
   lazy val isFfa: Boolean = heyIsThisFFA
+
+  private lazy val heightMain = With.grids.altitudeBonus.get(With.self.startTile)
+  private lazy val heightNatural = With.grids.altitudeBonus.get(With.geography.ourNatural.townHallTile)
+  lazy val isRamped: Boolean = heightMain > heightNatural
+  lazy val isFlat: Boolean = heightMain == heightNatural
+  lazy val isInverted: Boolean = heightMain < heightNatural
+  lazy val rushDistanceMean: Double = PurpleMath.mean(With.geography.rushDistances)
   
   lazy val gameplan: Plan = selectedInitially
     .find(_.gameplan.isDefined)
@@ -85,6 +93,8 @@ class Strategist {
     lazy val playedEnemyOftenEnough   = gamesVsEnemy >= strategy.minimumGamesVsOpponent
     lazy val isIsland                 = isIslandMap
     lazy val isGround                 = ! isIsland
+    lazy val rampOkay                 = (strategy.entranceInverted || ! isInverted) && (strategy.entranceFlat || ! isFlat) && (strategy.entranceRamped || ! isRamped)
+    lazy val rushOkay                 = rushDistanceMean > strategy.rushDistanceMinimum && rushDistanceMean < strategy.rushDistanceMaximum
     lazy val startLocations           = With.geography.startLocations.size
     lazy val disabledInPlaybook       = Playbook.disabled.contains(strategy)
     lazy val disabledOnMap            = strategy.mapsBlacklisted.exists(_.matches) || ! strategy.mapsWhitelisted.forall(_.exists(_.matches))

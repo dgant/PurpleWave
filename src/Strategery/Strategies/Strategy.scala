@@ -16,6 +16,11 @@ abstract class Strategy {
   
   def islandMaps              : Boolean                         = false
   def groundMaps              : Boolean                         = true
+  def entranceRamped          : Boolean                         = true
+  def entranceFlat            : Boolean                         = true
+  def entranceInverted        : Boolean                         = true
+  def rushDistanceMinimum     : Int                             = Int.MinValue
+  def rushDistanceMaximum     : Int                             = Int.MaxValue
   def multipleEntrances       : Boolean                         = true
   def ourRaces                : Iterable[Race]                  = Vector(Race.Terran, Race.Protoss, Race.Zerg)
   def enemyRaces              : Iterable[Race]                  = Vector(Race.Terran, Race.Protoss, Race.Zerg, Race.Unknown)

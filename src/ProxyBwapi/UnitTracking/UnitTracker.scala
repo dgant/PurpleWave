@@ -5,7 +5,7 @@ import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.Shapes.Circle
 import Performance.UnitCounter
 import Planning.UnitMatchers.UnitMatcher
-import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, HistoricalUnitInfo, UnitInfo}
 
 import scala.collection.immutable
 
@@ -13,6 +13,7 @@ class UnitTracker {
   
   private val friendlyUnitTracker = new FriendlyUnitTracker
   private val foreignUnitTracker = new ForeignUnitTracker
+  val historicalUnitTracker = new HistoricalUnitTracker
   
   def getId(id: Int): Option[UnitInfo] = friendlyUnitTracker.get(id).orElse(foreignUnitTracker.get(id))
   
@@ -23,14 +24,20 @@ class UnitTracker {
   private val counterOurs = new UnitCounter(() => ours)
   def existsOurs(matcher: UnitMatcher*): Boolean = countOurs(matcher: _*) > 0
   def countOurs(matcher: UnitMatcher*): Int = counterOurs(matcher: _*)
-  def countOursP(predicate: (FriendlyUnitInfo) => Boolean): Int = counterOurs(predicate)
+  def countOursP(predicate: (UnitInfo) => Boolean): Int = counterOurs.p(predicate)
   def ours: Set[FriendlyUnitInfo] = friendlyUnitTracker.ourUnits
   
   private val counterEnemy = new UnitCounter(() => enemy)
   def existsEnemy(matcher: UnitMatcher*): Boolean = countEnemy(matcher: _*) > 0
   def countEnemy(matcher: UnitMatcher*): Int = counterEnemy(matcher: _*)
-  def countEnemyP(predicate: (ForeignUnitInfo) => Boolean): Int = counterEnemy(predicate)
+  def countEnemyP(predicate: (UnitInfo) => Boolean): Int = counterEnemy.p(predicate)
   def enemy: Set[ForeignUnitInfo] = foreignUnitTracker.enemyUnits
+
+  private val counterEver = new UnitCounter(() => ever)
+  def existsEver(matcher: UnitMatcher*): Boolean = countEver(matcher: _*) > 0
+  def countEver(matcher: UnitMatcher*): Int = counterEver(matcher: _*) + countOurs(matcher: _*) + countEnemy(matcher: _*)
+  def countEverP(predicate: (UnitInfo) => Boolean): Int = counterEver.p(predicate) + countOursP(predicate) + countEnemyP(predicate)
+  def ever: Iterable[HistoricalUnitInfo] = historicalUnitTracker.all
   
   def neutral: Set[ForeignUnitInfo] = foreignUnitTracker.neutralUnits
   
@@ -56,14 +63,17 @@ class UnitTracker {
   def update() {
     friendlyUnitTracker.update()
     foreignUnitTracker.update()
+    all.foreach(historicalUnitTracker.remove)
   }
   
   def onUnitDestroy(unit: bwapi.Unit) {
-    get(unit).foreach(unitInfo => if (unitInfo.isEnemy) {
-      With.blackboard.enemyUnitDied = true
+    get(unit).foreach(unitInfo => {
+      historicalUnitTracker.add(unitInfo)
+      if (unitInfo.isEnemy) {
+        With.blackboard.enemyUnitDied = true
+      }
     })
     friendlyUnitTracker.onUnitDestroy(unit)
     foreignUnitTracker.onUnitDestroy(unit)
-    
   }
 }

@@ -8,16 +8,17 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpMatchingRatio, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
+import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.Predicates.Compound.Latch
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Protoss.PvZ5GateGoon
+import Strategery.Strategies.Protoss.PvZMidgame5GateGoon
 
 class PvZ5GateGoon extends GameplanModeTemplate {
 
-  override val activationCriteria = new Employing(PvZ5GateGoon)
+  override val activationCriteria = new Employing(PvZMidgame5GateGoon)
   override val completionCriteria = new Latch(new UnitsAtLeast(1, Protoss.TemplarArchives))
   override def defaultAttackPlan: Plan = new Trigger(
     new UpgradeComplete(Protoss.DragoonRange),
@@ -53,6 +54,8 @@ class PvZ5GateGoon extends GameplanModeTemplate {
     new Build(
       Get(Protoss.CitadelOfAdun),
       Get(Protoss.TemplarArchives)),
+    new BuildCannonsAtExpansions(5),
+    new BuildCannonsAtNatural(2),
     new RequireMiningBases(3),
     new Build(Get(Protoss.Gateway, 8))
   )

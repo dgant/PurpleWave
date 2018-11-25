@@ -61,6 +61,11 @@ object Chase extends ActionTechnique {
       Move.delegate(unit)
     }
 
+    // Don't get TOO fancy
+    if (readyToAttack && unit.pixelDistanceEdge(target) < unit.pixelRangeAgainst(target) / 3) {
+      attack()
+    }
+
     if (canEscape && speedEscaping > 0 && (nearEscaping || unit.is(Protoss.Corsair))) {
       pursue()
     }

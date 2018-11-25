@@ -107,10 +107,11 @@ object PvZIdeas {
       new UnitsAtMost(8, UnitMatchWarriors)),
     new Parallel(
       new PlacementForgeFastExpand,
-      new PumpMatchingRatio(Protoss.PhotonCannon, 2, 8,
+      new PumpMatchingRatio(Protoss.PhotonCannon, 1, 8,
         Seq(
           Enemy(Zerg.Zergling, 0.3),
-          Enemy(Zerg.Hydralisk, 0.75)))))
+          Enemy(Zerg.Hydralisk, 0.75),
+          Friendly(Protoss.Zealot, -1.0)))))
   
   class AddGateways extends Parallel(
     new IfOnMiningBases(1, new Build(Get(4, Protoss.Gateway))),

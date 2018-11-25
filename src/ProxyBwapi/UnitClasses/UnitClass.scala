@@ -511,15 +511,16 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val canBeStasised        : Boolean = Players.all.exists(_.isUnknownOrProtoss) && ! isBuilding
   lazy val canBeTransported     : Boolean = ! isBuilding && spaceRequired <= 8 // BWAPI gives 255 for unloadable units
   lazy val spells: Array[Tech] =
+    if (this == Terran.Battlecruiser)   Array(Terran.Yamato)                                                          else
     if (this == Terran.Ghost)           Array(Terran.GhostCloak,      Terran.Lockdown,          Terran.NuclearStrike) else
     if (this == Terran.Medic)           Array(Terran.Healing,         Terran.OpticalFlare,      Terran.Restoration)   else
     if (this == Terran.ScienceVessel)   Array(Terran.DefensiveMatrix, Terran.EMP,               Terran.Irradiate)     else
-    if (this == Terran.Wraith)          Array(Terran.WraithCloak, Terran.EMP,               Terran.Irradiate)     else
+    if (this == Terran.Wraith)          Array(Terran.WraithCloak)                                                     else
     if (this == Protoss.Arbiter)        Array(Protoss.Recall,         Protoss.Stasis)                                 else
     if (this == Protoss.DarkArchon)     Array(Protoss.Feedback,       Protoss.Maelstrom,        Protoss.MindControl)  else
     if (this == Protoss.HighTemplar)    Array(Protoss.Hallucination,  Protoss.PsionicStorm)                           else
     if (this == Zerg.Defiler)           Array(Zerg.Consume,           Zerg.DarkSwarm,           Zerg.Plague)          else
-    if (this == Zerg.Queen)             Array(Zerg.Ensnare,           Zerg.InfestCommandCenter, Zerg.SpawnBroodlings) else
+    if (this == Zerg.Queen)             Array(Zerg.Ensnare,           Zerg.InfestCommandCenter, Zerg.Parasite, Zerg.SpawnBroodlings) else
     Array()
   
   /////////////////

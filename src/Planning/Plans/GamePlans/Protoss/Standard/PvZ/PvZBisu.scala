@@ -74,6 +74,7 @@ class PvZBisu extends GameplanModeTemplate {
       Get(4, Protoss.Gateway),
       Get(Protoss.ZealotSpeed),
       Get(Protoss.PsionicStorm),
+      Get(Protoss.DragoonRange),
       Get(8, Protoss.Gateway)),
     new RequireMiningBases(3)
   )

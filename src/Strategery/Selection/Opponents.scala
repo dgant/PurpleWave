@@ -13,9 +13,9 @@ object Opponents {
 
   val defaultPvT  = new StrategySelectionRecommended(StrategySelectionGreedy, PvTEarly1015GateGoonDT, PvT3BaseCarrier)
   val defaultPvP  = new StrategySelectionRecommended(StrategySelectionGreedy, PvPOpen2Gate1012, PvPLateGameArbiter)
-  val defaultPvZ  = new StrategySelectionRecommended(StrategySelectionGreedy, PvZ4Gate99, PvZ5GateGoon)
+  val defaultPvZ  = new StrategySelectionRecommended(StrategySelectionGreedy, PvZ4Gate99, PvZMidgame5GateGoon)
   val fixedPvT    = new StrategySelectionFixed(PvTEarly1015GateGoonDT, PvT3BaseArbiter)
-  val fixedPvZ    = new StrategySelectionFixed(PvZ4Gate99, PvZ5GateGoon)
+  val fixedPvZ    = new StrategySelectionFixed(PvZ4Gate99, PvZMidgame5GateGoon)
   val fixedPvR    = new StrategySelectionFixed(PvROpenTinfoil)
   
   val mcrave        : Opponent = add(Opponent("McRave",       StrategySelectionDynamic))
@@ -24,8 +24,8 @@ object Opponents {
   val tscmoo        : Opponent = add(Opponent("tscmoo",       StrategySelectionGreedy))
   val iron          : Opponent = add(Opponent("Iron",         new StrategySelectionFixed(PvTEarly1015GateGoonDT, PvT2BaseCarrier)))
   val letabot       : Opponent = add(Opponent("LetaBot",      new StrategySelectionRecommended(StrategySelectionGreedy, PvTReaverCarrierCheese)))
-  val steamhammer   : Opponent = add(Opponent("Steamhammer",  new StrategySelectionRecommended(StrategySelectionDynamic, PvZ4Gate99, PvZ5GateGoon)))
-  val microwave     : Opponent = add(Opponent("Microwave",    new StrategySelectionRecommended(StrategySelectionDynamic, PvZ4Gate99, PvZ5GateGoon)))
+  val steamhammer   : Opponent = add(Opponent("Steamhammer",  new StrategySelectionRecommended(StrategySelectionDynamic, PvZ4Gate99, PvZMidgame5GateGoon)))
+  val microwave     : Opponent = add(Opponent("Microwave",    new StrategySelectionRecommended(StrategySelectionDynamic, PvZ4Gate99, PvZMidgame5GateGoon)))
   val megabot       : Opponent = add(Opponent("MegaBot",      defaultPvP)) // TODO: Fixed
   val zzzkbot       : Opponent = add(Opponent("ZZZKBot",      fixedPvZ))
   val ualbertabot   : Opponent = add(Opponent("UAlbertaBot",  fixedPvR))

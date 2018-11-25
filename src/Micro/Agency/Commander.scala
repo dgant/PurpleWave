@@ -87,7 +87,7 @@ class Commander {
       
       if (shouldOrder) {
         unit.baseUnit.attack(target.baseUnit)
-        if (ShowUnitsFriendly.inUse) {
+        if (ShowUnitsFriendly.inUse && With.visualization.map) {
           ShowUnitsFriendly.drawAttackCommand(unit, target)
         }
       }

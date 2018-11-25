@@ -84,7 +84,7 @@ object ProtossChoices {
   val pvzOpenersWithoutTransitions = Vector(
     PvZEarlyFFEConservative,
     PvZEarlyFFEEconomic,
-    PvZEarlyFFEGreedy,
+    PvZEarlyGatewayFE,
     PvZProxy2Gate
   )
   
@@ -100,13 +100,13 @@ object ProtossChoices {
   
   val pvzMidgameTransitioningFromOneBase = Vector(
     PvZMidgame4Gate2Archon,
-    PvZ5GateGoon
+    PvZMidgame5GateGoon
   )
   
   val pvzMidgameTransitioningFromTwoBases = Vector(
     PvZMidgame4Gate2Archon,
     PvZMidgameBisu,
-    PvZ5GateGoon,
+    PvZMidgame5GateGoon,
     PvZMidgameNeoBisu
   )
   

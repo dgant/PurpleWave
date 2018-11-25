@@ -477,7 +477,6 @@ object ProtossBuilds {
     Get(2,   Protoss.PhotonCannon))
 
   val FFE_NexusForgeCannons = Vector[BuildRequest] (
-    Get(1,   Protoss.Nexus),
     Get(8,   Protoss.Probe),
     Get(1,   Protoss.Pylon),
     Get(14,  Protoss.Probe),
@@ -485,23 +484,7 @@ object ProtossBuilds {
     Get(15,  Protoss.Probe),
     Get(2,   Protoss.PhotonCannon))
 
-  val FFE_GatewayNexusForge = Vector[BuildRequest] (
-    Get(1,   Protoss.Nexus),
-    Get(8,   Protoss.Probe),
-    Get(1,   Protoss.Pylon),
-    Get(9,   Protoss.Probe),
-    Get(1,   Protoss.Gateway),
-    Get(11,  Protoss.Probe),
-    Get(1,   Protoss.Zealot),
-    Get(12,  Protoss.Probe),
-    Get(2,   Protoss.Pylon),
-    Get(14,  Protoss.Probe),
-    Get(2,   Protoss.Zealot),
-    Get(15,  Protoss.Probe),
-    Get(2,   Protoss.Nexus))
-
   val FFE_NexusGatewayForge = Vector[BuildRequest] (
-    Get(1,   Protoss.Nexus),
     Get(8,   Protoss.Probe),
     Get(1,   Protoss.Pylon),
     Get(12,  Protoss.Probe),
@@ -513,4 +496,46 @@ object ProtossBuilds {
     Get(16,  Protoss.Probe),
     Get(1,   Protoss.Zealot),
     Get(2,   Protoss.PhotonCannon))
+
+  val FFE_GatewayForgeCannonsConservative = Vector[BuildRequest] (
+    Get(8,   Protoss.Probe),
+    Get(1,   Protoss.Pylon),
+    Get(9,   Protoss.Probe),
+    Get(1,   Protoss.Gateway),
+    Get(1,   Protoss.Forge),
+    Get(11,  Protoss.Probe),
+    Get(1,   Protoss.Zealot),
+    Get(2,   Protoss.PhotonCannon),
+    Get(13,  Protoss.Probe),
+    Get(2,   Protoss.Zealot))
+
+  val FFE_GatewayForgeCannonsEconomic = Vector[BuildRequest] (
+    Get(8,   Protoss.Probe),
+    Get(1,   Protoss.Pylon),
+    Get(9,   Protoss.Probe),
+    Get(1,   Protoss.Gateway),
+    Get(11,  Protoss.Probe),
+    Get(1,   Protoss.Forge),
+    Get(12,  Protoss.Probe),
+    Get(1,   Protoss.Zealot),
+    Get(2,   Protoss.PhotonCannon),
+    Get(2,   Protoss.Pylon),
+    Get(2,   Protoss.Zealot),
+    Get(13,  Protoss.Probe))
+
+  val FFE_GatewayNexusForge = Vector[BuildRequest] (
+    Get(8,   Protoss.Probe),
+    Get(1,   Protoss.Pylon),
+    Get(9,   Protoss.Probe),
+    Get(1,   Protoss.Gateway),
+    Get(11,  Protoss.Probe),
+    Get(2,   Protoss.Pylon),
+    Get(12,  Protoss.Probe),
+    Get(1,   Protoss.Zealot),
+    Get(14,  Protoss.Probe),
+    Get(2,   Protoss.Zealot),
+    Get(17,  Protoss.Probe),
+    Get(2,   Protoss.Nexus))
+
+
 }

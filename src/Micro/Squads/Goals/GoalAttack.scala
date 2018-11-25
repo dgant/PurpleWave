@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
 class GoalAttack extends GoalBasic {
@@ -21,10 +21,14 @@ class GoalAttack extends GoalBasic {
         toTravel = Some(target)
       })
     })
-    
-    val allEnemies = With.units.enemy.filter(e => e.likelyStillAlive && e.possiblyStillThere)
-    val defenders = allEnemies.filter(e => e.unitClass.dealsDamage && ( ! e.unitClass.isBuilding || e.zone == target.zone))
-    squad.enemies = defenders
+
+    def targetFilter(unit: UnitInfo): Boolean = (
+      unit.isEnemy
+      && unit.likelyStillAlive
+      && unit.possiblyStillThere
+      && unit.unitClass.dealsDamage)
+
+    squad.enemies = With.units.enemy.view.filter(u => targetFilter(u) && u.zone == target.zone || u.canMove || u.unitClass.isSiegeTank).toVector
   }
   
   protected def chooseTarget(): Unit = {

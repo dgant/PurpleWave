@@ -6,7 +6,7 @@ import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, UpgradeContinuously}
+import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.MeldArchons
@@ -39,8 +39,8 @@ class PvZ4Gate2Archon extends GameplanModeTemplate {
     new PvZIdeas.AddEarlyCannons,
     new If(
       new Or(
-        new UnitsAtLeast(2, Protoss.Archon),
-        new UnitsAtLeast(15, UnitMatchWarriors)),
+        new UnitsAtLeast(3, Protoss.Archon),
+        new UnitsAtLeast(20, UnitMatchWarriors)),
       new Parallel(
         new Build(Get(Protoss.PsionicStorm)),
         new RequireMiningBases(3))),
@@ -56,6 +56,7 @@ class PvZ4Gate2Archon extends GameplanModeTemplate {
         new Pump(Protoss.Dragoon, 8),
         new UpgradeContinuously(Protoss.DragoonRange))),
     new Pump(Protoss.Dragoon, 1),
+    new PumpMatchingRatio(Protoss.Dragoon, 0, 12, Seq(Enemy(Zerg.Mutalisk, 1.0), Friendly(Protoss.Corsair, -1.0), Friendly(Protoss.Archon, -2.0))),
     new Pump(Protoss.Zealot),
     new Build(
       Get(1, Protoss.Gateway),

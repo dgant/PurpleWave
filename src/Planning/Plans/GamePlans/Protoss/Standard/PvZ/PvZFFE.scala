@@ -4,7 +4,7 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Basic.NoPlan
-import Planning.Plans.Compound.{If, Or}
+import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational.{DefendFFEWithProbesAgainst4Pool, DefendFFEWithProbesAgainst9Pool, PlacementForgeFastExpand}
@@ -14,16 +14,15 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones.{FrameAtLeast, FrameAtMost, UnitsAtLeast, UnitsAtMost}
-import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchType, UnitMatchWorkers}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.{PvZEarlyFFEConservative, PvZEarlyFFEEconomic, PvZEarlyFFEGreedy}
+import Strategery.Strategies.Protoss.{PvZEarlyFFEConservative, PvZEarlyFFEEconomic, PvZEarlyGatewayFE}
 
 class PvZFFE extends GameplanModeTemplate {
   
-  override val activationCriteria: Predicate = new Employing(PvZEarlyFFEGreedy, PvZEarlyFFEEconomic, PvZEarlyFFEConservative)
+  override val activationCriteria: Predicate = new Employing(PvZEarlyGatewayFE, PvZEarlyFFEEconomic, PvZEarlyFFEConservative)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(1, Protoss.CyberneticsCore))
   
   override def defaultScoutPlan: Plan = new If(
@@ -35,31 +34,41 @@ class PvZFFE extends GameplanModeTemplate {
   override def defaultPlacementPlan: Plan = new PlacementForgeFastExpand
   
   override def defaultBuildOrder: Plan = new If(
-    new EnemyStrategy(With.fingerprints.fourPool),
-    new BuildOrder(ProtossBuilds.FFE_Vs4Pool: _*),
+    new Employing(PvZEarlyGatewayFE),
     new If(
-      new Employing(PvZEarlyFFEConservative),
-      new BuildOrder(ProtossBuilds.FFE_Conservative: _*),
+      new EnemyStrategy(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.overpool),
+      new BuildOrder(ProtossBuilds.FFE_GatewayForgeCannonsConservative: _*),
       new If(
-        new EnemyStrategy(With.fingerprints.twelveHatch),
-        new BuildOrder(ProtossBuilds.FFE_GatewayNexusForge: _*),
+        new EnemyStrategy(With.fingerprints.twelvePool, With.fingerprints.tenHatch),
+        new BuildOrder(ProtossBuilds.FFE_GatewayForgeCannonsEconomic: _*),
+        new BuildOrder(ProtossBuilds.FFE_GatewayNexusForge: _*))),
+    new If(
+      new EnemyStrategy(With.fingerprints.fourPool),
+      new BuildOrder(ProtossBuilds.FFE_Vs4Pool: _*),
+      new If(
+        new Employing(PvZEarlyFFEConservative),
+        new BuildOrder(ProtossBuilds.FFE_Conservative: _*),
         new If(
-          new EnemyStrategy(With.fingerprints.twelvePool),
-          new BuildOrder(ProtossBuilds.FFE_NexusForgeCannons: _*),
+          new EnemyStrategy(With.fingerprints.twelveHatch),
+          new BuildOrder(ProtossBuilds.FFE_GatewayNexusForge: _*),
           new If(
-            new EnemyStrategy(With.fingerprints.overpool),
-            new BuildOrder(ProtossBuilds.FFE_ForgeNexusCannon: _*),
+            new EnemyStrategy(With.fingerprints.twelvePool),
+            new BuildOrder(ProtossBuilds.FFE_NexusForgeCannons: _*),
             new If(
-              new EnemyStrategy(With.fingerprints.ninePool),
-              new BuildOrder(ProtossBuilds.FFE_ForgeCannonNexus: _*),
+              new EnemyStrategy(With.fingerprints.overpool),
+              new BuildOrder(ProtossBuilds.FFE_ForgeNexusCannon: _*),
               new If(
-                new Employing(PvZEarlyFFEGreedy),
-                new BuildOrder(ProtossBuilds.FFE_GatewayNexusForge: _*),
-                new BuildOrder(ProtossBuilds.FFE_ForgeCannonNexus: _*)
-              )))))))
+                new EnemyStrategy(With.fingerprints.ninePool),
+                new BuildOrder(ProtossBuilds.FFE_ForgeCannonNexus: _*),
+                new BuildOrder(ProtossBuilds.FFE_ForgeCannonNexus: _*))))))))
   
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvZIdeas.AddEarlyCannons,
+    new If(
+      new And(
+        new EnemyStrategy(With.fingerprints.fourPool, With.fingerprints.ninePool),
+        new UnitsAtLeast(8, Protoss.Probe)),
+      new Pump(Protoss.Zealot)),
     new If(
       new And(
         new EnemyStrategy(With.fingerprints.fourPool),
@@ -100,11 +109,6 @@ class PvZFFE extends GameplanModeTemplate {
     new Build(
       Get(2, Protoss.Nexus),
       Get(1, Protoss.Gateway)),
-    new If(
-      new Or(
-        new EnemyStrategy(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.overpool, With.fingerprints.twelvePool),
-        new Not(new SafeAtHome)),
-      new PvZIdeas.AddEarlyCannons),
     new Build(
       Get(2, Protoss.Pylon),
       Get(1, Protoss.Assimilator),

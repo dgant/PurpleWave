@@ -49,7 +49,7 @@ trait GoalBasic extends SquadGoal {
       override val counteredBy: Array[Quality] = Array(AntiVulture)
     }
     object AntiVulture extends Quality {
-      override def matches(u: UnitInfo): Boolean = (u.is(UnitMatchWarriors)
+      override def matches(u: UnitInfo): Boolean = (AntiGround.matches(u)
         && ! u.isAny(Protoss.Zealot, Protoss.DarkTemplar, Protoss.Scout, Protoss.Arbiter, Protoss.Carrier, Zerg.Zergling))
       override val counteredBy: Array[Quality] = Array.empty
     }
@@ -167,10 +167,11 @@ trait GoalBasic extends SquadGoal {
       (candidate, quality) =>
         // Enemy quality is represented
         enemiesByQuality(quality) > 0
-        // Candidate counters it
-        && quality.counteredBy.exists(_.matches(candidate))
-        // And we have no recruits countering it
-        && recruitsByQuality(quality) == 0)
+        && quality.counteredBy.exists(counter =>
+          // Candidate counters it
+          counter.matches(candidate)
+          // And we have no recruits countering it
+          && recruitsByQuality(counter) == 0))
   }
   
   protected def offerImportant(candidates: Iterable[FriendlyUnitInfo]) {
@@ -179,10 +180,11 @@ trait GoalBasic extends SquadGoal {
       (candidate, quality) =>
         // Enemy quality is represented
         enemiesByQuality(quality) > 0
-        // Candidate counters it
-        && quality.counteredBy.exists(_.matches(candidate))
-        // And we have no recruits countering it
-        && quality.counterScaling(recruitsByQuality(quality)) <= enemiesByQuality(quality) * counterMin)
+        && quality.counteredBy.exists(counter =>
+          // Candidate counters it
+          counter.matches(candidate)
+          // And we have insufficiently many recruits countering it
+          && quality.counterScaling(recruitsByQuality(counter)) <= enemiesByQuality(quality) * counterMin))
   }
   
   protected def offerUseful(candidates: Iterable[FriendlyUnitInfo]) {
@@ -191,10 +193,11 @@ trait GoalBasic extends SquadGoal {
       (candidate, quality) =>
         // Enemy quality is represented
         enemiesByQuality(quality) > 0
-        // Candidate counters it
-        && quality.counteredBy.exists(_.matches(candidate))
-        // And we have no recruits countering it
-        && quality.counterScaling(recruitsByQuality(quality)) <= enemiesByQuality(quality) * counterMax)
+        && quality.counteredBy.exists(counter =>
+          // Candidate counters it
+          counter.matches(candidate)
+          // And we coulduse more recruits to counter it
+          && quality.counterScaling(recruitsByQuality(counter)) <= enemiesByQuality(quality) * counterMax))
   }
   
   protected def offerUseless(candidates: Iterable[FriendlyUnitInfo]) {

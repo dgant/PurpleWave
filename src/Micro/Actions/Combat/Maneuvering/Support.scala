@@ -1,5 +1,6 @@
 package Micro.Actions.Combat.Maneuvering
 
+import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -12,17 +13,20 @@ object Support extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = isSupport(unit)
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    // If useless, just go home
-    //if (unit.)
+    // If useless, just go home as normal
+    if (unit.unitClass.spells.forall(tech => ! With.self.hasTech(tech) || unit.energy < tech.energyCost)) {
+      return
+    }
 
-
+    // Who can we support?
     val supportables = unit.teammates.view.filterNot(isSupport)
     if (supportables.isEmpty) return
     val destination = PurpleMath.centroid(supportables.map(_.pixelCenter))
 
-
     // Retreat to help
-    unit.agent.toReturn = Some(destination)
+    if (!unit.visibleToOpponents) {
+      unit.agent.toReturn = Some(destination)
+    }
 
     // Travel to team
     if (unit.isAny(Terran.Medic, Protoss.Arbiter, Protoss.DarkArchon, Protoss.HighTemplar, Zerg.Defiler, Zerg.Queen)) {

@@ -58,10 +58,9 @@ class PvP2GateDarkTemplar extends GameplanModeTemplate {
     Get(2,   Protoss.Zealot),           // 19 = 17 + Z
     Get(18,  Protoss.Probe),
     Get(3,   Protoss.Pylon),            // 22 = 18 + ZZ
-    Get(19,  Protoss.Probe),
-    Get(1,   Protoss.Dragoon),          // 23 = 19 + ZZ
-    Get(20,  Protoss.Probe),
-    Get(1,   Protoss.CitadelOfAdun),    // 26 = 20 + ZZ + D
+    Get(20,  Protoss.Probe),            // 24 = 20 + ZZ
+    Get(1,   Protoss.CitadelOfAdun),
+    Get(1,   Protoss.Dragoon),          // 26 = 20 + ZZ + D
     Get(21,  Protoss.Probe),
     Get(2,   Protoss.Dragoon),          // 27 = 21 + ZZ + D
     Get(2,   Protoss.Gateway),          // 29 = 21 + ZZ + DD

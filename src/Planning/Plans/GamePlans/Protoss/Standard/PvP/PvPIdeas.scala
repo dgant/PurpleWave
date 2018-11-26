@@ -70,7 +70,7 @@ object PvPIdeas {
         new SafeToMoveOut),
       // Don't mess with 4-Gates
       new Or(
-        new EnemyStrategy(With.fingerprints.fourGateGoon),
+        new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),
         new Employing(PvPOpen4GateGoon, PvPOpen2GateDTExpand))),
     new Attack)
   
@@ -188,7 +188,7 @@ object PvPIdeas {
             new EnemyBasesAtLeast(3))))),
     new RequireMiningBases(3))
 
-  class MeldArchonsPvP extends MeldArchons(49) {
+  class MeldArchonsPvP extends MeldArchons(24) {
     override def minimumArchons: Int = Math.min(6, With.units.countEnemy(Protoss.Zealot) / 3)
   }
 

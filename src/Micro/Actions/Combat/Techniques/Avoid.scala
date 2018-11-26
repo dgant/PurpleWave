@@ -18,7 +18,7 @@ object Avoid extends ActionTechnique {
     && unit.matchups.threats.nonEmpty
   )
   
-  override val applicabilityBase: Double = 0.75
+  override val applicabilityBase: Double = 0.5
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
     val meleeFactor   = if (unit.unitClass.ranged) 1.0 else 0.7
@@ -34,16 +34,8 @@ object Avoid extends ActionTechnique {
     
     lazy val path = unit.agent.zonePath(unit.agent.origin)
     if ( ! unit.flying && path.isEmpty) return None
-    
-    val pixelStep       = 16.0
-    val baseValue       = 0.25
-    val here            = unit.pixelCenter
-    val there           = unit.pixelCenter.project(unit.agent.nextWaypoint(unit.agent.origin), pixelStep)
-    val distanceHere    = other.pixelDistanceCenter(here)
-    val distanceThere   = other.pixelDistanceCenter(there)
-    val blockingFactor  = (distanceHere - distanceThere) / pixelStep
-    val output          = baseValue + (1.0 - baseValue) * Math.max(blockingFactor, 0)
-    Some(output)
+
+    Some(1.0)
   }
   
   override def perform(unit: FriendlyUnitInfo) {

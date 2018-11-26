@@ -5,6 +5,7 @@ import Lifecycle.With
 import Mathematics.Points.Tile
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
+import Micro.Actions.Combat.Maneuvering.Path
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Commands.{Attack, Move}
 import Planning.UnitMatchers.UnitMatchWorkers
@@ -80,20 +81,19 @@ object Build extends Action {
       .foreach(_.agent.shove(unit))
     
     val buildClass = unit.agent.toBuild.get
-    val buildPixel = unit.agent.lastIntent.toBuildTile.get
-    var movePixel = buildPixel.topLeftPixel
+    val buildTile = unit.agent.lastIntent.toBuildTile.get
+    if (unit.tileIncludingCenter.tileDistanceFast(buildTile) < 5 && With.grids.friendlyVision.isSet(buildTile)) {
+      With.commander.build(unit, buildClass, buildTile)
+      return
+    }
+
+    var movePixel = buildTile.topLeftPixel
     if (unit.is(Zerg.Drone)) {
       movePixel = movePixel.add(buildClass.width / 2, buildClass.height / 2)
     }
-      
-    val waypoint = unit.agent.nextWaypoint(movePixel)
-    if (
-      unit.zone != movePixel.zone
-      && unit.pixelDistanceCenter(movePixel) > 32.0 * 5.0
-      && unit.pixelDistanceCenter(waypoint) > unit.unitClass.haltPixels) {
-      unit.agent.toTravel = Some(waypoint)
-      Move.delegate(unit)
-    }
-    With.commander.build(unit, buildClass, buildPixel)
+
+    unit.agent.toTravel = Some(movePixel)
+    Path.delegate(unit)
+    Move.delegate(unit)
   }
 }

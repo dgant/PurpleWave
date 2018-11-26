@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Targeting.Filters
 
 import Lifecycle.With
 import Micro.Actions.Scouting.BlockConstruction
-import ProxyBwapi.Races.Zerg
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterFutility extends TargetFilter {
@@ -15,7 +15,9 @@ object TargetFilterFutility extends TargetFilter {
       || targetBusy
       || actor.is(Zerg.Scourge)
       || actor.framesToGetInRange(target) < 8
-      || (target.unitClass.isWorker && target.base.exists(_.harvestingArea.contains(target.tileIncludingCenter))))
+      || (target.unitClass.isWorker && target.base.exists(_.harvestingArea.contains(target.tileIncludingCenter)))
+      || (actor.is(Protoss.Zealot) && target.is(Protoss.Dragoon) && ! target.player.hasUpgrade(Protoss.DragoonRange))
+      || (actor.is(Protoss.DarkTemplar) && target.is(Protoss.Dragoon)))
     output
   }
   // Target units according to our goals.

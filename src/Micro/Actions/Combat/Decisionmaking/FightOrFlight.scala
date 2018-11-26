@@ -35,6 +35,7 @@ object FightOrFlight extends Action {
     decide(true,  "Focused",    () => unit.agent.canFocus && (! unit.visibleToOpponents || unit.matchups.framesOfSafety > GameTime(0, 2)()) && With.framesSince(unit.lastFrameTakingDamage) > GameTime(0, 10)())
     decide(false, "Pacifist",   () => ! unit.agent.canFight)
     decide(false, "Useless",    () => unit.canAttack && unit.energyMax == 0 && unit.matchups.targets.isEmpty && unit.matchups.threats.nonEmpty)
+    decide(false, "Drained",    () => ! unit.canAttack && unit.energyMax > 0 && ! unit.unitClass.spells.forall(s => s.energyCost > unit.energy || ! With.self.hasTech(s)))
     decide(true,  "Scourge",    () => unit.is(Zerg.Scourge) && unit.matchups.targets.exists(target => target.canAttack(unit) && target.matchups.targetsInRange.nonEmpty))
     decide(false, "Disrupted",  () => unit.underDisruptionWeb && ! unit.flying)
     decide(true,  "Hodor",      () => unit.matchups.alliesInclSelf.forall(_.base.exists(_.isOurMain)) && unit.matchups.threats.exists(_.base.exists(_.isOurMain)) && unit.matchups.threats.exists(!_.base.exists(_.isOurMain)))

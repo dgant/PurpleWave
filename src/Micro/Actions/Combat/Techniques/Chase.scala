@@ -61,6 +61,10 @@ object Chase extends ActionTechnique {
       Move.delegate(unit)
     }
 
+    if (readyToAttack && (unit.unitClass.accelerationFrames <= 1 || unit.is(Protoss.DarkTemplar))) {
+      attack()
+    }
+
     // Don't get TOO fancy
     if (readyToAttack && unit.pixelDistanceEdge(target) < unit.pixelRangeAgainst(target) / 3) {
       attack()

@@ -63,12 +63,13 @@ class PvPLateGame extends GameplanModeTemplate {
         new UpgradeComplete(Protoss.GroundDamage, 1),
         new Build(Get(Protoss.GroundArmor)),
         new Build(Get(Protoss.GroundDamage))),
-      new Parallel(
-        new UpgradeContinuously(Protoss.GroundDamage),
+      new If(
+        new UnitsAtLeast(2, Protoss.Forge),
+        new Parallel(
+          new UpgradeContinuously(Protoss.GroundArmor),
+          new UpgradeContinuously(Protoss.GroundDamage)),
         new If(
-          new Or(
-            new UnitsAtLeast(2, Protoss.Forge, complete = true),
-            new UpgradeComplete(Protoss.GroundDamage, 3)),
+          new UpgradeComplete(Protoss.GroundDamage, 3),
           new UpgradeContinuously(Protoss.GroundArmor)))),
     new TemplarTech,
     new IfOnMiningBases(3, new Build(Get(2, Protoss.Forge))))

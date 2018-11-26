@@ -115,6 +115,8 @@ class Strategist {
       &&  (strategy.groundMaps  || ! isGround)
       &&  strategy.startLocationsMin <= startLocations
       &&  strategy.startLocationsMax >= startLocations
+      &&  rampOkay
+      &&  rushOkay
       &&  appropriateForOurRace
       &&  appropriateForEnemyRace
       &&  allowedGivenHistory

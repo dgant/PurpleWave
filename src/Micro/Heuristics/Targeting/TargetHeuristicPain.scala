@@ -13,6 +13,7 @@ object TargetHeuristicPain extends TargetHeuristic {
     
     if (threats.isEmpty) return HeuristicMathMultiplicative.default
     val distance        = unit.pixelDistanceEdge(candidate)
+    val framesToKill    = candidate.totalHealth / Math.max(0.001, unit.dpfOnNextHitAgainst(candidate))
     val travelPixels    = Math.max(0.0, distance - unit.pixelRangeAgainst(candidate))
     val firingPosition  = candidate.pixelCenter.project(unit.pixelCenter, unit.pixelRangeAgainst(candidate))
     val painStanding = threats
@@ -23,7 +24,7 @@ object TargetHeuristicPain extends TargetHeuristic {
         .sum / threats.size
     val painWalking = PurpleMath.nanToZero(travelPixels / unit.unitClass.topSpeed) * unit.matchups.vpfReceiving
     
-    val output = 24.0 * (painWalking + painStanding) / threats.size
+    val output = (painWalking + framesToKill * painStanding) / threats.size
     output
   }
   

@@ -8,10 +8,7 @@ import scala.collection.mutable
 
 class Agency {
   
-  private val agents = new mutable.HashMap[FriendlyUnitInfo, Agent]
   private var finishedExecutingLastTime = true
-  
-  def all: Iterable[Agent] = agents.values
   
   //////////////
   // Batching //
@@ -24,8 +21,6 @@ class Agency {
   def run() {
   
     if ( ! With.latency.isLastFrameOfTurn && finishedExecutingLastTime) return
-  
-    agents.keys.filterNot(validAgent).foreach(agents.remove)
     
     if (agentQueue.isEmpty) {
       runtimes.enqueue(With.framesSince(lastQueueCompletion))

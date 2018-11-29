@@ -20,10 +20,7 @@ object BlockConstruction extends Action {
     unit.agent.toAttack = Some(builder)
     
     if (unit.framesToGetInRange(builder) > With.reaction.agencyAverage) {
-      unit.agent.toTravel = Some(unit.pixelCenter.project(builder.pixelCenter,
-        unit.pixelDistanceCenter(builder)
-        + unit.unitClass.haltPixels
-        + unit.topSpeed * With.reaction.agencyAverage))
+      unit.agent.toTravel = Some(unit.pixelCenter.project(builder.pixelCenter, unit.pixelDistanceCenter(builder) + 48))
       Move.delegate(unit)
     }
     else if (unit.readyForAttackOrder

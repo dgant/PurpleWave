@@ -67,7 +67,7 @@ object FightOrFlight extends Action {
       unit.agent.combatHysteresisFrames = 0
       return
     }
-    
+
     applyEstimation(unit)
   }
   
@@ -82,5 +82,9 @@ object FightOrFlight extends Action {
     unit.agent.fightReason = ""
     unit.agent.netEngagementValue = 0.0 // TODO
     unit.agent.shouldEngage = shouldEngage
+
+    if (With.configuration.enableMCRS) {
+      unit.agent.shouldEngage = unit.mcrs.shouldFight
+    }
   }
 }

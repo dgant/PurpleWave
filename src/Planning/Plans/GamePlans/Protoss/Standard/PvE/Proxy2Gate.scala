@@ -2,23 +2,23 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvE
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound.{Or, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.PlaceGatewaysProxied
-import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, RequireSufficientSupply, UpgradeContinuously}
+import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
-import Planning.Predicates.Strategy.{Employing, EnemyIsProtoss, EnemyStrategy}
-import Planning.Predicates.Milestones._
 import Planning.Plans.Scouting.Scout
+import Planning.Predicates.Compound.{Latch, Not}
+import Planning.Predicates.Economy.MineralsAtLeast
+import Planning.Predicates.Milestones._
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import Strategery.Strategies.Protoss.{PvPOpenProxy2Gate, PvTProxy2Gate, PvZProxy2Gate}
 import Strategery.Strategies.Protoss.PvR.PvROpenProxy2Gate
+import Strategery.Strategies.Protoss.{PvPOpenProxy2Gate, PvTProxy2Gate, PvZProxy2Gate}
 
 class Proxy2Gate extends GameplanModeTemplate {
   
@@ -31,9 +31,8 @@ class Proxy2Gate extends GameplanModeTemplate {
   private class BeforeProxy extends Parallel(
     new PlaceGatewaysProxied(2, () => ProxyPlanner.proxyAutomaticSneaky),
     new BuildOrder(
-      Get(8, Protoss.Probe),
-      Get(1, Protoss.Pylon),
-      Get(9, Protoss.Probe)),
+      Get(9, Protoss.Probe),
+      Get(1, Protoss.Pylon)),
     new If(new UnitsAtLeast(1, Protoss.Pylon),    new Build(Get(1, Protoss.Gateway))),
     new If(new UnitsAtLeast(1, Protoss.Gateway),  new Build(Get(2, Protoss.Gateway))))
   
@@ -65,6 +64,9 @@ class Proxy2Gate extends GameplanModeTemplate {
         new Pump(Protoss.Observatory, 1))),
 
     new UpgradeContinuously(Protoss.DragoonRange),
+    new If(
+      new Not(new UpgradeStarted(Protoss.DragoonRange)),
+      new CapGasAt(150)),
 
     new FlipIf(
       new MustTech,
@@ -76,18 +78,16 @@ class Proxy2Gate extends GameplanModeTemplate {
           new Parallel(
             new BuildGasPumps(1),
             new Build(Get(1, Protoss.CyberneticsCore)),
-            new If(
-              new And(
-                new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.Dragoon.buildFrames),
-                new GasAtLeast(50)),
-              new Pump(Protoss.Dragoon)))))),
+            new Pump(Protoss.Dragoon))))),
     new If(
       new Or(
         new UnitsAtLeast(15, Protoss.Probe),
         new MineralsAtLeast(300)),
       new Parallel(
         new Build(Get(3, Protoss.Gateway)),
-        new RequireMiningBases(2)))
+        new RequireMiningBases(2))),
+
+    new Pump(Protoss.Zealot)
   )
   
   override def buildPlans = Vector(

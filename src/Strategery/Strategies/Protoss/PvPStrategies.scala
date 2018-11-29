@@ -36,7 +36,7 @@ object PvPOpen2Gate1012 extends PvPOpeningIntoCarriers {
 }
 
 object PvPOpen2Gate1012Goon extends PvPOpeningIntoCarriers {
-  override def rushDistanceMinimum: Int = 5000
+  override def rushDistanceMaximum: Int = 5000
 }
 
 object PvPOpen2GateDTExpand extends PvPOpening {

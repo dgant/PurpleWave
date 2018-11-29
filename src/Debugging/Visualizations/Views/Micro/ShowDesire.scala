@@ -5,31 +5,36 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Micro.Agency.Agent
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import bwapi.Color
 
 object ShowDesire extends View {
   
   override def renderMap() {
-    With.agents.all.foreach(renderUnitState)
+    With.units.ours.foreach(renderUnitState)
   }
   
-  def renderUnitState(agent: Agent) {
-    if ( ! With.viewport.contains(agent.unit.pixelCenter)) return
-    if ( ! agent.unit.unitClass.orderable) return
-    if (agent.unit.battle.isEmpty) return
+  def renderUnitState(unit: FriendlyUnitInfo) {
+    val agent = unit.agent
+    if ( ! With.viewport.contains(unit.pixelCenter)) return
+    if ( ! unit.unitClass.orderable) return
+    if (unit.battle.isEmpty) return
+
+    if (With.configuration.enableMCRS) {
+      DrawMap.label("%1.1f".format(unit.mcrs.sim().simValue).replace("inity", ""), unit.pixelCenter, true, if (unit.mcrs.shouldFight) Colors.DarkGreen else Colors.DarkRed)
+      return
+    }
     
-    
-    var x = agent.unit.pixelCenter.x
-    var y = agent.unit.pixelCenter.y + 28
+    var x = unit.pixelCenter.x
+    var y = unit.pixelCenter.y + 28
     var width = 18
     drawDesire(agent.netEngagementValue, x - width / 2, y, width)
     
     width = 27
-    x = agent.unit.pixelCenter.x
-    y = agent.unit.pixelCenter.y + 28 + With.visualization.lineHeightSmall + 2
-    drawNumber(agent.unit.matchups.vpfDealingInRange,    x - width,  y, width, With.self.colorMedium)
-    drawNumber(agent.unit.matchups.vpfReceiving,  x,          y, width, With.enemy.colorMedium)
+    x = unit.pixelCenter.x
+    y = unit.pixelCenter.y + 28 + With.visualization.lineHeightSmall + 2
+    drawNumber(unit.matchups.vpfDealingInRange, x - width,  y, width, With.self.colorMedium)
+    drawNumber(unit.matchups.vpfReceiving,      x,          y, width, With.enemy.colorMedium)
   }
   
   def drawDesire(desire: Double, x: Int, y: Int, width: Int) {

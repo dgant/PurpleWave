@@ -23,15 +23,14 @@ class PvP1GateReaverExpand extends GameplanModeTemplate {
   override val completionCriteria: Predicate = new Latch(new And(new UnitsAtLeast(2, Protoss.Nexus), new UnitsAtLeast(1, Protoss.RoboticsSupportBay)))
   
   override def defaultWorkerPlan: Plan = new PumpWorkers(true)
-  override val defaultAttackPlan: Plan = new PvPIdeas.AttackSafely
   override def defaultScoutPlan: Plan = new ScoutOn(Protoss.Gateway)
+  override val defaultAttackPlan: Plan = new PvPIdeas.AttackSafely
   
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvPIdeas.ReactToDarkTemplarEmergencies,
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToProxyGateways,
-    new PvPIdeas.ReactToFFE
-  )
+    new PvPIdeas.ReactToFFE)
 
   override def defaultBuildOrder: Plan = new Parallel(
     new BuildOrder(

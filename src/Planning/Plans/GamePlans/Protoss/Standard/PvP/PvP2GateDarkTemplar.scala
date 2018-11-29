@@ -49,26 +49,25 @@ class PvP2GateDarkTemplar extends GameplanModeTemplate {
     Get(12,  Protoss.Probe),
     Get(2,   Protoss.Pylon),            // 11
     Get(13,  Protoss.Probe),
-    Get(1,   Protoss.Zealot),           // 13
+    Get(1,   Protoss.Zealot),           // 13 = 11 + Z
     Get(14,  Protoss.Probe),
-    Get(1,   Protoss.Assimilator),     // 16 = 14 + Z
+    Get(1,   Protoss.Assimilator),      // 16 = 14 + Z
     Get(16,  Protoss.Probe),
     Get(1,   Protoss.CyberneticsCore),  // 18 = 16 + Z
     Get(17,  Protoss.Probe),
-    Get(2,   Protoss.Zealot),           // 19 = 17 + Z
+    Get(2,   Protoss.Zealot),           // 21 = 17 + ZZ
     Get(18,  Protoss.Probe),
     Get(3,   Protoss.Pylon),            // 22 = 18 + ZZ
     Get(20,  Protoss.Probe),            // 24 = 20 + ZZ
     Get(1,   Protoss.CitadelOfAdun),
     Get(1,   Protoss.Dragoon),          // 26 = 20 + ZZ + D
     Get(21,  Protoss.Probe),
-    Get(2,   Protoss.Dragoon),          // 27 = 21 + ZZ + D
-    Get(2,   Protoss.Gateway),          // 29 = 21 + ZZ + DD
+    Get(2,   Protoss.Dragoon),          // 29 = 21 + ZZ + DD
+    Get(2,   Protoss.Gateway),
     Get(3,   Protoss.Pylon),
     Get(1,   Protoss.TemplarArchives),
-    Get(4,   Protoss.Zealot),           // 33 = 21 + ZZZZ + DD
-    Get(22,  Protoss.Probe),
-    Get(4,   Protoss.Pylon),            // 34 = 22 + ZZZZ + DD
+    Get(22,  Protoss.Probe),            // 30 = 22 + ZZZZ + DD
+    Get(4,   Protoss.Pylon),            // 32 = 22 + ZZZZ + DD
     Get(23,  Protoss.Probe),
     Get(2,   Protoss.DarkTemplar),
     Get(24,  Protoss.Probe),

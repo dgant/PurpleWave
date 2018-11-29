@@ -1,6 +1,7 @@
 package ProxyBwapi.UnitInfo
 
 import Debugging.Visualizations.Colors
+import Information.Battles.MCRS.MCRSUnit
 import Information.Battles.Types.BattleLocal
 import Information.Geography.Types.{Base, Zone}
 import Information.Grids.AbstractGrid
@@ -40,10 +41,11 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def isAny(unitMatchers: UnitMatcher*): Boolean = unitMatchers.exists(_.accept(this))
   def isAll(unitMatchers: UnitMatcher*): Boolean = unitMatchers.forall(_.accept(this))
   
-  
   //////////////////
   // Statefulness //
   //////////////////
+
+  val mcrs: MCRSUnit = new MCRSUnit(this)
   
   val frameDiscovered           : Int = With.frame
   var completionFrame           : Int = Int.MaxValue // Can't use unitClass during construction

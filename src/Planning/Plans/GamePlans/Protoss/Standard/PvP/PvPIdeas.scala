@@ -12,7 +12,7 @@ import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, MeldArchons}
-import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
@@ -71,7 +71,15 @@ object PvPIdeas {
       // Don't mess with 4-Gates
       new Or(
         new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),
-        new Employing(PvPOpen4GateGoon, PvPOpen2GateDTExpand))),
+        new UnitsAtLeast(5, Protoss.Gateway, complete = true),
+        new Employing(PvPOpen2GateDTExpand),
+        new And(
+          new Employing(PvPOpen4GateGoon),
+          new Check(() => {
+            val deadCombatUnits = With.units.ever.filter(_.isAny(Protoss.Zealot, Protoss.Dragoon))
+            deadCombatUnits.count(_.isFriendly) < deadCombatUnits.size
+          })
+        ))),
     new Attack)
   
   class ReactToCannonRush extends If(
@@ -164,7 +172,14 @@ object PvPIdeas {
         Get(Protoss.TemplarArchives))))
 
   class ReactToFFE extends If(
-    new EnemyStrategy(With.fingerprints.forgeFe),
+    new Or(
+      new EnemyStrategy(With.fingerprints.forgeFe),
+      new And(
+        new EnemyStrategy(With.fingerprints.gatewayFe),
+        new UnitsAtLeast(1, Protoss.Gateway)),
+      new And(
+        new Not(new EnemyStrategy(With.fingerprints.cannonRush)),
+        new EnemiesAtLeast(1, Protoss.PhotonCannon))),
     new RequireMiningBases(2))
 
   class TakeBase2 extends If(

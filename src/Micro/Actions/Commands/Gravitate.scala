@@ -71,5 +71,16 @@ object Gravitate extends Action {
     unit.agent.pathsTruncated = pathsTruncated
     unit.agent.pathsAcceptable = Vector(pathAccepted)
     unit.agent.toTravel = Some(commandPixel)
+
+    if (!unit.flying) {
+      unit.zone.edges.find(e => unit.pixelDistanceCenter(e.pixelCenter) < e.radiusPixels).foreach(edge => {
+        unit.agent.toTravel = Some(
+          unit.pixelCenter.project(
+            edge.sidePixels.minBy(ep => PurpleMath.radiansTo(
+              unit.pixelCenter.radiansTo(commandPixel),
+              edge.pixelCenter.radiansTo(ep))),
+          128))
+      })
+    }
   }
 }

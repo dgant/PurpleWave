@@ -70,7 +70,8 @@ class PvPLateGame extends GameplanModeTemplate {
           new UpgradeContinuously(Protoss.GroundDamage)),
         new If(
           new UpgradeComplete(Protoss.GroundDamage, 3),
-          new UpgradeContinuously(Protoss.GroundArmor)))),
+          new UpgradeContinuously(Protoss.GroundArmor),
+          new UpgradeContinuously(Protoss.GroundDamage)))),
     new TemplarTech,
     new IfOnMiningBases(3, new Build(Get(2, Protoss.Forge))))
 

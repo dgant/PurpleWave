@@ -62,6 +62,7 @@ object Avoid extends ActionTechnique {
     unit.agent.forces.put(ForceColors.mobility,       forceMobility)
     unit.agent.resistances.put(ForceColors.mobility,  resistancesTerran)
     Gravitate.delegate(unit)
+
     Move.delegate(unit)
   }
 }

@@ -28,7 +28,8 @@ class Visualization {
     ShowUnitsFriendly,
     ShowUnitsForeign,
     ShowExplosions,
-    ShowFingerprints
+    ShowFingerprints,
+    ShowDesire
   )
   
   var enabled   : Boolean = _

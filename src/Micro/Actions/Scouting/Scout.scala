@@ -1,6 +1,7 @@
 package Micro.Actions.Scouting
 
 import Micro.Actions.Action
+import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -18,6 +19,7 @@ object Scout extends Action {
     FindBuildings.consider(unit)
     Poke.consider(unit)
     FindBuildingsWhenBored.consider(unit)
+    Potshot.consider(unit)
     Move.consider(unit)
   }
 }

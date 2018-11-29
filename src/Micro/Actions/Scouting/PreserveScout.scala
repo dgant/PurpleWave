@@ -8,9 +8,9 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object PreserveScout extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    (unit.matchups.framesOfSafety <= 18
+    (unit.matchups.framesOfSafety <= 12
       && unit.matchups.threats.exists( ! _.unitClass.isWorker))
-      || unit.totalHealth < 10
+      || unit.totalHealth < 6
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {

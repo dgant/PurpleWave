@@ -6,6 +6,7 @@ import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Circle
 import Micro.Actions.Action
+import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
 import Micro.Heuristics.Spells.TargetAOE
@@ -14,7 +15,14 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object BeAnArbiter extends Action {
-  
+
+  def moveOrPotshot(unit: FriendlyUnitInfo): Unit = {
+    if (unit.agent.toTravel.forall(_.pixelDistance(unit.pixelCenter) < 64)) {
+      Potshot.delegate(unit)
+    }
+    Move.delegate(unit)
+  }
+
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.aliveAndComplete && unit.is(Protoss.Arbiter)
   )
@@ -26,7 +34,7 @@ object BeAnArbiter extends Action {
       Protoss.Interceptor,
       Protoss.Observer,
       UnitMatchBuilding)
-  
+
   override protected def perform(unit: FriendlyUnitInfo) {
     val umbrellaSearchRadius  = 32.0 * 20.0
     val threatened            = unit.matchups.framesOfSafety <= 12.0
@@ -67,7 +75,7 @@ object BeAnArbiter extends Action {
       unit.agent.forces.put(ForceColors.threat,     forceThreat)
       unit.agent.resistances.put(ForceColors.mobility, resistancesTerrain)
       Gravitate.consider(unit)
-      Move.delegate(unit)
+      moveOrPotshot(unit)
     }
     else if (needUmbrella.nonEmpty) {
       val forcesThreats = unit.matchups.enemies
@@ -84,7 +92,7 @@ object BeAnArbiter extends Action {
       }
       unit.agent.forces.put(ForceColors.regrouping, forceUmbrella)
       Gravitate.consider(unit)
-      Move.delegate(unit)
+      moveOrPotshot(unit)
     }
     if (unit.matchups.framesOfSafety < 48 || unit.matchups.threats.exists(_.topSpeed > unit.topSpeed)) {
       unit.agent.shouldEngage = false

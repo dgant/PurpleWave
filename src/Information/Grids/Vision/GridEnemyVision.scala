@@ -19,7 +19,7 @@ class GridEnemyVision extends AbstractGridTimestamp {
                 unit.flying
                 || With.grids.altitudeBonus.get(unit.tileIncludingCenter)
                   >= With.grids.altitudeBonus.get(tile)))
-              set(tile, frameUpdated)
+              stamp(tile)
           }))
   }
 }

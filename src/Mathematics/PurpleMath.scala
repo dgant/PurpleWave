@@ -24,18 +24,14 @@ object PurpleMath {
         values.view.map(_.x).sum / values.size,
         values.view.map(_.y).sum / values.size)
   }
-  
-  def nanToZero(value: Double): Double = {
-    if (value.isNaN || value.isInfinity) 0.0 else value
+
+  def nanToN(value: Double, n: Double): Double = {
+    if (value.isNaN || value.isInfinity) n else value
   }
-  
-  def nanToOne(value: Double): Double = {
-    if (value.isNaN || value.isInfinity) 1.0 else value
-  }
-  
-  def nanToInfinity(value: Double): Double = {
-    if (value.isNaN || value.isInfinity) Double.PositiveInfinity else value
-  }
+
+  def nanToZero(value: Double): Double = nanToN(value, 0)
+  def nanToOne(value: Double): Double = nanToN(value, 1)
+  def nanToInfinity(value: Double): Double = nanToN(value, Double.PositiveInfinity)
   
   def clampRatio(value: Double, ratio: Double): Double = clamp(value, ratio, 1.0 / ratio)
   
@@ -192,6 +188,8 @@ object PurpleMath {
   def atan2(y: Double, x: Double): Double = {
    normalizeAngle(Math.atan2(y, x))
   }
+
+  def weightedMean(values: Seq[(Double, Double)]): Double = values.view.map(p => p._1 * p._2).sum / values.view.map(_._2).sum
 
   def softmax[T](values: Seq[T], extract: (T) => Double): Seq[(T, Double)] = {
     val sum = values.map(value => Math.pow(Math.E, extract(value))).sum

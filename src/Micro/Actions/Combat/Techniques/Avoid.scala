@@ -1,12 +1,18 @@
 package Micro.Actions.Combat.Techniques
 
-import Debugging.Visualizations.ForceColors
+import Debugging.Visualizations.{Colors, ForceColors}
+import Debugging.Visualizations.Rendering.DrawMap
+import Debugging.Visualizations.Views.Micro.ShowUnitsFriendly
 import Lifecycle.With
+import Mathematics.Points.Tile
 import Mathematics.PurpleMath
+import Mathematics.Shapes.Ring
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+
+import scala.collection.mutable.ArrayBuffer
 
 object Avoid extends ActionTechnique {
   
@@ -37,8 +43,63 @@ object Avoid extends ActionTechnique {
 
     Some(1.0)
   }
+
+  override def perform(unit: FriendlyUnitInfo): Unit = {
+    if (unit.flying) {
+      oldPerform(unit)
+      return
+    }
+
+    var pathLengthMax = 2 + (unit.unitClass.haltPixels + With.reaction.agencyMax * unit.topSpeed) / 32
+    val path = new ArrayBuffer[Tile]
+    path += unit.tileIncludingCenter
+    var bestScore = Int.MinValue
+    def tileDistance(tile: Tile): Int = if(tile.zone == unit.agent.origin.zone) 0 else unit.agent.origin.zone.distanceGrid.get(tile)
+    def tileScore(tile: Tile): Int = (
+      - 20 * tileDistance(tile)
+      - 10 * With.grids.enemyRange.get(tile)
+      - PurpleMath.clamp(With.grids.occupancy(tile), 0, 9)
+    )
+    while (path.length < pathLengthMax) {
+      val origin = unit.agent.origin.zone
+      val here = path.last
+      var bestScore = tileScore(here)
+      var bestTile = here
+      for (p <- Ring.points(1)) {
+        val there = here.add(p)
+        if (there.valid && With.grids.walkable.get(there) && ! path.contains(there)) {
+          val score = tileScore(there)
+          if (score > bestScore) {
+            bestScore = score
+            bestTile = there
+          }
+        }
+      }
+      if (bestTile == here) {
+        // Makeshift "break"
+        pathLengthMax = -1
+      } else {
+        path += bestTile
+      }
+    }
+
+    unit.agent.toTravel = {
+      if (path.length < Math.max(2, With.grids.enemyRange.get(unit.tileIncludingCenter))) {
+        // We're stuck. Just go home.
+        Some(unit.agent.origin)
+      } else {
+        if (ShowUnitsFriendly.inUse) {
+          for (i <- 0 until path.length - 1) {
+            DrawMap.arrow(path(i).pixelCenter, path(i + 1).pixelCenter, Colors.DarkTeal)
+          }
+        }
+        Some(path.last.pixelCenter)
+      }
+    }
+    Move.delegate(unit)
+  }
   
-  override def perform(unit: FriendlyUnitInfo) {
+  def oldPerform(unit: FriendlyUnitInfo): Unit = {
     unit.agent.toTravel = Some(unit.agent.origin)
 
     val bonusAvoidThreats = PurpleMath.clamp(With.reaction.agencyAverage + unit.matchups.framesOfEntanglement, 12.0, 24.0) / 12.0

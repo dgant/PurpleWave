@@ -19,7 +19,7 @@ object Formation {
     val formationSlots = new mutable.HashMap[UnitClass, ListBuffer[Pixel]]
     
     Concave
-      .generate(units, targetStart, targetEnd, origin)
+      .static(units, targetStart, targetEnd, origin)
       .groupBy(_.unitClass)
       .foreach(pair => {
         if (!formationSlots.contains(pair._1)) {

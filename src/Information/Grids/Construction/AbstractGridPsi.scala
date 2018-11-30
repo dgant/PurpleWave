@@ -26,7 +26,7 @@ abstract class AbstractGridPsi extends AbstractGridTimestamp {
         if (tile.valid
           && Math.abs(tile.x - pylonTile.x) < wrapThreshold
           && Math.abs(tile.y - pylonTile.y) < wrapThreshold) {
-          set(tile, frameUpdated)
+          stamp(tile)
         }
       })})
   }

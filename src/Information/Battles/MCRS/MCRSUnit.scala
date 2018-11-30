@@ -15,11 +15,12 @@ class MCRSUnit(val unit: UnitInfo) {
   val sim = new Cache(() => MCRSim.getSimValue(unit))
 
   def percentHealth: Double = MCRSMath.percentHealth(unit)
-  val visibleGroundStrength = new Cache(() => MCRSMath.visGroundStrength(unit))
-  val visibleAirStrength = new Cache(() => MCRSMath.visAirStrength(unit))
-  val maxGroundStrength = new Cache(() => MCRSMath.maxGroundStrength(unit))
-  val maxAirStrength = new Cache(() => MCRSMath.maxAirStrength(unit))
+  val survivability = new Cache(() => MCRSMath.survivability(unit))
+  val dpsGround = new Cache(() => MCRSMath.dpfGround(unit))
+  val dpsAir = new Cache(() => MCRSMath.dpfAir(unit))
+  val strengthGround = new Cache(() => MCRSMath.strengthGround(unit))
+  val strengthAir = new Cache(() => MCRSMath.strengthAir(unit))
 
-  def fightThreshold: Double = With.blackboard.aggressionRatio() * (if (With.enemy.isTerran) .75 else 1.0)
+  def fightThreshold: Double = With.blackboard.aggressionRatio() * (if (With.enemy.isTerran) .75 else 0.9)
   def shouldFight: Boolean = sim().simValue >= fightThreshold
 }

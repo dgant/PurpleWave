@@ -5,13 +5,31 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Mathematics.PurpleMath
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import bwapi.Color
 
 object ShowDesire extends View {
   
   override def renderMap() {
-    With.units.ours.foreach(renderUnitState)
+    if (With.configuration.enableMCRS) {
+      With.units.playerOwned.foreach(renderMCRS)
+    } else {
+      With.units.ours.foreach(renderUnitState)
+    }
+  }
+
+  def renderMCRS(unit: UnitInfo): Unit = {
+    if (!unit.possiblyStillThere) return
+    DrawMap.label(
+      "%d: %ds %dd %dt".format(
+        PurpleMath.nanToN(10 * unit.mcrs.sim().simValue, 10).toInt,
+        unit.mcrs.survivability().toInt / 50,
+        unit.mcrs.dpsGround().toInt * 10,
+        unit.mcrs.strengthGround().toInt / 100),
+      unit.pixelCenter,
+      true,
+      if (unit.mcrs.shouldFight) Colors.DarkGreen else Colors.DarkRed)
   }
   
   def renderUnitState(unit: FriendlyUnitInfo) {
@@ -19,11 +37,6 @@ object ShowDesire extends View {
     if ( ! With.viewport.contains(unit.pixelCenter)) return
     if ( ! unit.unitClass.orderable) return
     if (unit.battle.isEmpty) return
-
-    if (With.configuration.enableMCRS) {
-      DrawMap.label("%1.1f".format(unit.mcrs.sim().simValue).replace("inity", ""), unit.pixelCenter, true, if (unit.mcrs.shouldFight) Colors.DarkGreen else Colors.DarkRed)
-      return
-    }
     
     var x = unit.pixelCenter.x
     var y = unit.pixelCenter.y + 28

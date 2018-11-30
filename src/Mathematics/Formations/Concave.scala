@@ -6,7 +6,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 object Concave {
   
-  def generate(
+  def static(
     units       : Iterable[UnitInfo],
     targetStart : Pixel,
     targetEnd   : Pixel,

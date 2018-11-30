@@ -8,6 +8,7 @@ import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
+import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackWithDarkTemplar
 import Planning.Plans.Macro.Automatic.PumpWorkers
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -24,6 +25,7 @@ class PvP3GateGoon extends GameplanModeTemplate {
   
   override val activationCriteria : Predicate = new Employing(PvPOpen3GateGoon)
   override val completionCriteria : Predicate = new Latch(new Or(new UnitsAtLeast(1, Protoss.RoboticsFacility), new UnitsAtLeast(5, Protoss.Gateway)))
+  override def priorityAttackPlan : Plan = new AttackWithDarkTemplar
   override def defaultAttackPlan  : Plan = new If(new Or(new EnemyBasesAtLeast(2), new EnemiesAtMost(0, Protoss.Dragoon)), new PvPIdeas.AttackSafely)
   override def defaultScoutPlan   : Plan = new ScoutOn(Protoss.CyberneticsCore)
   override def defaultWorkerPlan  : Plan = NoPlan()
@@ -55,18 +57,19 @@ class PvP3GateGoon extends GameplanModeTemplate {
     new If(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new RequireMiningBases(2)),
 
     new If(new SafeAtHome, new PumpWorkers(oversaturate = true), new PumpWorkers),
-    new PvPIdeas.TrainArmy,
 
-    new If(new EnemyDarkTemplarLikely, new Build(Get(Protoss.Forge))),
-    new If(
+     new If(
       new EnemyStrategy(With.fingerprints.fourGateGoon),
       new Parallel(
         new EjectScout,
-        new Build(Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives))),
-      new If(
-        new SafeAtHome,
-        new RequireMiningBases(2),
-        new Build(Get(Protoss.RoboticsFacility), Get(Protoss.RoboticsSupportBay)))),
+        new Build(Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives)))),
+
+    new PvPIdeas.TrainArmy,
+
+    new If(
+      new SafeAtHome,
+      new RequireMiningBases(2),
+      new Build(Get(Protoss.RoboticsFacility), Get(Protoss.RoboticsSupportBay))),
 
     new If(
       new Or(

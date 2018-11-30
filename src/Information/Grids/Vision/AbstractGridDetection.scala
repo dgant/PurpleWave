@@ -9,9 +9,9 @@ abstract class AbstractGridDetection extends AbstractGridTimestamp {
   override protected def updateTimestamps() {
     detectors
       .foreach(detector =>
-        Circle.points(11) // All detectors have an 11-tile detection range regardless of sight range
+        Circle.points(1 + (if (detector.unitClass.isBuilding) 9 else 11))
           .map(detector.tileIncludingCenter.add)
-          .foreach(set(_, frameUpdated)))
+          .foreach(stamp))
   }
   
   protected def detectors: Traversable[UnitInfo]

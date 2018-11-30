@@ -1,7 +1,6 @@
 package Information.Battles.MCRS
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
-import Lifecycle.With
 import Mathematics.PurpleMath
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -19,10 +18,10 @@ object MCRSim {
     // McRave uses 5s and thinks scaling with fight size is a good idea
     val simulationTime = GameTime(0, 5)() + Math.max(0.0, unit.pixelDistanceCenter(unit.mcrs.engagePosition()) / unit.topSpeed)
 
-    var enemyGroundStrength: Double = 0.0
-    var enemyAirStrength: Double = 0.0
-    var friendlyGroundStrength: Double = 0.0
-    var friendlyAirStrength: Double = 0.0
+    var enemyStrengthGround: Double = 0.0
+    var enemyStrengthAir: Double = 0.0
+    var friendlyStrengthGround: Double = 0.0
+    var friendlyStrengthAir: Double = 0.0
 
     // Check every enemy unit being in range of the target
     def countEnemy(enemy: UnitInfo) {
@@ -50,13 +49,8 @@ object MCRSim {
 
       var simRatio = Math.max(0.0, simulationTime - enemyToEngage)
 
-      // High ground check
-      if (enemy.flying && With.grids.altitudeBonus.get(enemy.tileIncludingCenter) > With.grids.altitudeBonus.get(unit.mcrs.engagePosition().tileIncluding)) {
-        simRatio *= 2
-      }
-
-      enemyGroundStrength += enemy.mcrs.visibleGroundStrength() * simRatio
-      enemyAirStrength += enemy.mcrs.visibleAirStrength() * simRatio
+      enemyStrengthGround += simRatio * enemy.mcrs.strengthGround()
+      enemyStrengthAir += simRatio * enemy.mcrs.strengthAir()
     }
 
     // Check every ally being in range of the target
@@ -72,25 +66,19 @@ object MCRSim {
       val allyToEngage = PurpleMath.nanToInfinity(Math.max(0.0, (distance / ally.topSpeed)))
       var simRatio = Math.max(0.0, simulationTime - allyToEngage)
 
-      // High ground check
-      // TODO: This is kind of nonsensical -- punishes air units for no reason, right?
-      if (!ally.flying && With.grids.altitudeBonus.get(ally.tileIncludingCenter) > With.grids.altitudeBonus.get(ally.mcrs.target().get.tileIncludingCenter)) {
-        simRatio *= 2
-      }
-
       // Synchronize check
       output.synchronizeAirAndGround = output.synchronizeAirAndGround || (simRatio > 0.0 && unit.flying != ally.flying)
 
-      friendlyGroundStrength += ally.mcrs.visibleGroundStrength() * simRatio
-      friendlyAirStrength += ally.mcrs.visibleAirStrength() * simRatio
+      friendlyStrengthGround += ally.mcrs.strengthGround() * simRatio
+      friendlyStrengthAir += ally.mcrs.strengthAir() * simRatio
     }
 
     unit.matchups.alliesInclSelf.foreach(countAlly)
     unit.matchups.enemies.foreach(countEnemy)
 
-    output.attackAirAsAir = PurpleMath.nanToInfinity(friendlyAirStrength / enemyAirStrength)
-    output.attackAirAsGround = PurpleMath.nanToInfinity(friendlyAirStrength / enemyGroundStrength)
-    output.attackGroundAsAir = PurpleMath.nanToInfinity(friendlyGroundStrength / enemyAirStrength)
-    output.attackGroundasGround = PurpleMath.nanToInfinity(friendlyGroundStrength / enemyGroundStrength)
+    output.attackAirAsAir = PurpleMath.nanToInfinity(friendlyStrengthAir / enemyStrengthAir)
+    output.attackAirAsGround = PurpleMath.nanToInfinity(friendlyStrengthAir / enemyStrengthGround)
+    output.attackGroundAsAir = PurpleMath.nanToInfinity(friendlyStrengthGround / enemyStrengthAir)
+    output.attackGroundasGround = PurpleMath.nanToInfinity(friendlyStrengthGround / enemyStrengthGround)
   }
 }

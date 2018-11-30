@@ -1,38 +1,29 @@
 package Information.Battles.MCRS
 
+import Mathematics.PurpleMath
+import ProxyBwapi.Engine.Size
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object MCRSMath {
 
-	// McRave's tuning: https://docs.google.com/spreadsheets/d/15_2BlFi27EguWciAGbWKCxLLacCnh9QFl1zSkc799Xo/edit#gid=135581064
-	
 	def survivability(unit: UnitInfo): Double = {
-		val speed = if (unit.unitClass.isBuilding) 0.5 else Math.max(1.0, Math.log(unit.topSpeed))
-		val armor = 2.0 + unit.armorHealth
-		val health = Math.log(unit.unitClass.maxTotalHealth / 20.0)
-		speed * armor * health
+		val damageIn = unit.battle.map(_.teamOf(unit).opponent.meanDamageAgainst(unit)).getOrElse(0.0)
+		val armor = if (unit.totalHealth > 0) (unit.armorHealth * unit.hitPoints + unit.armorShield * unit.shieldPoints) / unit.totalHealth else 0
+		val armorBonus = 1.0 + PurpleMath.nanToOne(Math.max(0.5, damageIn - armor.toDouble) / damageIn)
+		val typeBonus = if (unit.unitClass.size == Size.Small || unit.unitClass.size == Size.Large) 1.3 else 1.0 // TODO: Base on threat damage type
+		armorBonus * typeBonus * unit.unitClass.maxTotalHealth
 	}
 
-	def splashModifier(unit: UnitInfo): Double = {
-		if (unit.is(Protoss.Archon)) return 1.25
-    if (unit.is(Terran.Firebat)) return 1.25
-		if (unit.is(Protoss.Reaver)) return 1.25
-		if (unit.is(Protoss.HighTemplar)) return 6
-		if (unit.is(Terran.SiegeTankSieged)) return 2.5
-		if (unit.is(Terran.Valkyrie)) return 1.5
-    if (unit.is(Zerg.Mutalisk)) return 1.5
-		if (unit.is(Zerg.Lurker)) return 2
-		1
-	}
+	def splashModifier(unit: UnitInfo): Double = unit.matchups.splashFactorMax
 
-	def groundDamage(unit: UnitInfo): Double = {
+	def damage(unit: UnitInfo, flying: Boolean): Double = {
 		if (unit.is(Protoss.HighTemplar)) return 112
-    unit.damageOnHitGround
-	}
-	def airDamage(unit: UnitInfo): Double = {
-		if (unit.is(Protoss.HighTemplar)) return 112
-		unit.damageOnHitAir
+		unit.mcrs.target()
+  		.filter(_.flying == flying)
+			.map(t => unit.damageOnNextHitAgainst(t, from = Some(unit.mcrs.engagePosition())))
+			.getOrElse(if (flying) unit.damageOnHitAir else unit.damageOnHitGround)
+  		.toDouble
 	}
 
 	def groundRange(unit: UnitInfo): Double = {
@@ -44,56 +35,50 @@ object MCRSMath {
 		unit.pixelRangeAir
 	}
 
-	def gWeaponCooldown(unit: UnitInfo): Double = {
+	def cooldownGround(unit: UnitInfo): Double = {
 		if (unit.is(Protoss.HighTemplar)) return 224.0
 		if (unit.is(Zerg.InfestedTerran)) return 500
 		unit.cooldownMaxGround
 	}
-	def aWeaponCooldown(unit: UnitInfo): Double = {
+	def cooldownAir(unit: UnitInfo): Double = {
     if (unit.is(Protoss.HighTemplar)) return 224
     if (unit.is(Zerg.Scourge)) return 110
 		unit.cooldownMaxAir
 	}
 
-	def groundDPS(unit: UnitInfo): Double = {
-		val damage = groundDamage(unit)
-		if (damage <= 0) return 0.0
-		(splashModifier(unit)
-			* splashModifier(unit)
-			* groundDamage(unit)
-			* Math.log(unit.pixelRangeGround)
-			/ gWeaponCooldown(unit))
+	def dpfGround(unit: UnitInfo): Double = {
+		val damageNext = damage(unit, flying = false)
+		if (damageNext <= 0) return 0.0
+		unit.matchups.splashFactorMax * damageNext / cooldownGround(unit)
 	}
-	def airDPS(unit: UnitInfo): Double = {
-		val damage = airDamage(unit)
-		if (damage <= 0) return 0.0
-		(splashModifier(unit)
-			* airDamage (unit)
-			* Math.log(unit.pixelRangeAir)
-			/ aWeaponCooldown(unit))
+	def dpfAir(unit: UnitInfo): Double = {
+		val damageNext = damage(unit, flying = true)
+		if (damageNext<= 0) return 0.0
+		unit.matchups.splashFactorMax * damageNext / cooldownAir(unit)
 	}
 
-	def visGroundStrength(unit: UnitInfo): Double = {
+	def strengthGround(unit: UnitInfo): Double = {
 		if (!unit.canDoAnything) return 0
-		unit.mcrs.percentHealth * unit.mcrs.maxGroundStrength()
+		unit.mcrs.percentHealth * maxGroundStrength(unit)
 	}
-	def visAirStrength(unit: UnitInfo): Double = {
+	def strengthAir(unit: UnitInfo): Double = {
     if (!unit.canDoAnything) return 0
-		unit.mcrs.percentHealth * unit.mcrs.maxAirStrength()
+		unit.mcrs.percentHealth * maxAirStrength(unit)
 	}
 
 	def maxGroundStrength(unit: UnitInfo): Double = {
+		if (unit.attacksAgainstGround == 0) return 0
 		if (unit.is(Terran.Medic)) return 5.0
 		if (unit.isAny(Protoss.Scarab, Terran.SpiderMine, Zerg.Egg, Zerg.Larva)) return 0
-    if (unit.pixelRangeGround <= 0) return 0
 		if (unit.is(Protoss.Interceptor)) return 4 // Originally 2 with Carrier-specific weight
-		groundDPS(unit) * Math.log(survivability(unit))
+		unit.mcrs.dpsGround() * unit.mcrs.survivability()
 	}
 	def maxAirStrength(unit: UnitInfo): Double = {
+		if (unit.attacksAgainstAir == 0) return 0
 		if (unit.isAny(Protoss.Scarab, Terran.SpiderMine, Zerg.Egg, Zerg.Larva)) return 0
-    if (unit.pixelRangeAir <= 0) return 0
+
 		if (unit.is(Protoss.Interceptor)) return 4 // Originally 2 with Carrier-specific weight
-		airDPS(unit) * Math.log(survivability(unit))
+		unit.mcrs.dpsAir() * unit.mcrs.survivability()
 	}
 
 	def percentHealth(unit: UnitInfo): Double = {

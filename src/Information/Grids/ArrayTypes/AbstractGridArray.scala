@@ -18,12 +18,13 @@ abstract class AbstractGridArray[T] extends AbstractGrid[T] {
       i += 1
     }
   }
-  
+
+  final def isInitialized: Boolean = initialized
   final def initialize()        { if ( ! initialized) { onInitialization(); initialized = true } }
   override def update()         { initialize() }
   def onInitialization()        {}
-  def indices: Iterable[Int]    = values.indices
-  def tiles: Iterable[Tile]     = indices.map(i => new Tile(i))
+  val indices: Range            = 0 until length
+  val tiles                     = indices.map(i => new Tile(i))
   def get(i: Int): T            = if (valid(i)) values(i) else defaultValue
   def set(i: Int, value: T)     { if (valid(i)) values(i) = value }
   def set(tile: Tile, value: T) { set(tile.i, value) }

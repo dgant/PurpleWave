@@ -53,7 +53,16 @@ object FightOrFlight extends Action {
       )
       output
     }))
-    
+    /*
+    decide(false, "Stand", () =>
+      unit.agent.toForm.exists(form =>
+        unit.matchups.targets.forall(target =>
+          target.unitClass.isWorker
+          || target.matchups.targets.view.filter(_.friendly.exists(_.agent.toForm.isDefined)).forall(victim =>
+            target.inRangeToAttack(victim, victim.friendly.flatMap(_.agent.toForm).getOrElse(victim.pixelCenter))
+        ))))
+        */
+
     decide(true, "Anchors", () => unit.matchups.allies.exists(ally =>
       ! ally.unitClass.isWorker
       && (ally.canAttack || (ally.unitClass.rawCanAttack && ally.unitClass.isBuilding) || ally.is(Zerg.CreepColony))

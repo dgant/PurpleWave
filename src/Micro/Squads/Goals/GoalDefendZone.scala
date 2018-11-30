@@ -61,9 +61,10 @@ class GoalDefendZone extends GoalBasic {
   private val huntableEnemies = new Cache(() => {
     squad.enemies.filter(enemy =>
       enemy.visible
-      && (enemy.zone == zone || enemy.zone.edges.exists(edge => edge.zones.contains(zone)))
+      && (enemy.zone.edges.exists(edge => edge.zones.contains(zone)))
       && pointsOfInterest().exists(p => enemy.pixelDistanceCenter(p) < 32 * 15)
-      && ! (enemy.is(Zerg.Drone) && With.fingerprints.fourPool.matches))
+      && ! (enemy.is(Zerg.Drone) && With.fingerprints.fourPool.matches)
+      && zone.edges.forall(edge => enemy.pixelDistanceCenter(edge.pixelCenter) > 32.0 * 8.0)) // Arbitrary number
   })
   
   def huntEnemies() {

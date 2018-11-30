@@ -24,7 +24,7 @@ class PvP1GateReaverExpand extends GameplanModeTemplate {
   
   override def defaultWorkerPlan: Plan = new PumpWorkers(true)
   override def defaultScoutPlan: Plan = new ScoutOn(Protoss.Gateway)
-  override val defaultAttackPlan: Plan = new PvPIdeas.AttackSafely
+  override val defaultAttackPlan: Plan = new If(new EnemyStrategy(With.fingerprints.nexusFirst), new PvPIdeas.AttackSafely)
   
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvPIdeas.ReactToDarkTemplarEmergencies,
@@ -72,12 +72,6 @@ class PvP1GateReaverExpand extends GameplanModeTemplate {
         new EnemyStrategy(With.fingerprints.nexusFirst),
         new UnitsAtLeast(2, Protoss.Reaver, complete = true)),
       new RequireMiningBases(2)),
-  
-    new PvPIdeas.TrainArmy,
-
-    new If(
-      new EnemyStrategy(With.fingerprints.twoGate),
-      new Build(Get(Protoss.ShieldBattery))),
 
     new FlipIf(
       new Or(
@@ -88,6 +82,12 @@ class PvP1GateReaverExpand extends GameplanModeTemplate {
       new If(
         new Not(new EnemyHasShown(Protoss.RoboticsFacility)),
         new Build(Get(Protoss.Observatory)))),
+
+    new PvPIdeas.TrainArmy,
+
+    new If(
+      new EnemyStrategy(With.fingerprints.twoGate),
+      new Build(Get(Protoss.ShieldBattery))),
 
     new If(
       new EnemyBasesAtLeast(2),

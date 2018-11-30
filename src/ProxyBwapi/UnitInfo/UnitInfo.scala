@@ -273,8 +273,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   
   def stimAttackSpeedBonus: Int = if (stimmed) 2 else 1
   
-  def airDpf    : Double = damageOnHitAir     * attacksAgainstAir     / cooldownMaxAir.toDouble
-  def groundDpf : Double = damageOnHitGround  * attacksAgainstGround  / cooldownMaxGround.toDouble
+  def dpfAir    : Double = damageOnHitAir     * attacksAgainstAir     / cooldownMaxAir.toDouble
+  def dpfGround : Double = damageOnHitGround  * attacksAgainstGround  / cooldownMaxGround.toDouble
   
   def attacksAgainstAir: Int = attacksAgainstAirCache()
   private val attacksAgainstAirCache = new Cache(() => {
@@ -334,8 +334,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def attacksAgainst    (enemy: UnitInfo)  : Int          = if (enemy.flying) attacksAgainstAir          else attacksAgainstGround
   
   def damageScaleAgainstHitPoints(enemy: UnitInfo): Double = {
-    if (airDpf    <= 0 && enemy.flying)   return 0.0
-    if (groundDpf <= 0&& ! enemy.flying)  return 0.0
+    if (dpfAir    <= 0 && enemy.flying)   return 0.0
+    if (dpfGround <= 0&& ! enemy.flying)  return 0.0
     Damage.scaleBySize(damageTypeAgainst(enemy), enemy.unitClass.size)
   }
   

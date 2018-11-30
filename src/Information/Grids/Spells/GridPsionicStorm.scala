@@ -14,7 +14,7 @@ class GridPsionicStorm extends AbstractGridTimestamp {
     val tile = pixel.tileIncluding
     for (dx <- Array(-1, 0, 1)) {
       for (dy <- Array(-1, 0, 1)) {
-        set(tile.add(dx, dy), With.frame)
+        stamp(tile.add(dx, dy))
       }
     }
   }

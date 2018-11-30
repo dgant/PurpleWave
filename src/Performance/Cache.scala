@@ -21,4 +21,6 @@ class Cache[T](recalculator: () => T, refreshPeriod: Int = 1) {
     lastValue = defaultValue
     invalidStartingOnThisFrame = With.frame
   }
+
+  override def toString: String = apply().toString
 }

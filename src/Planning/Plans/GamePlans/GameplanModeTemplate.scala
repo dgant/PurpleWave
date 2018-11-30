@@ -15,6 +15,7 @@ import Planning.Plans.Macro.BuildOrders.{BuildOrder, FollowBuildOrder, RequireEs
 import Planning.Plans.Macro.Expanding.RemoveMineralBlocksAt
 import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Plans.Scouting.{ChillOverlords, ScoutAt, ScoutExpansionsAt}
+import Planning.Predicates.Milestones.BasesAtLeast
 
 abstract class GameplanModeTemplate extends GameplanMode {
   
@@ -35,7 +36,7 @@ abstract class GameplanModeTemplate extends GameplanMode {
   def defaultSupplyPlan     : Plan              = new RequireSufficientSupply
   def defaultWorkerPlan     : Plan              = new If(new Not(new WeAreZerg), new PumpWorkers(superSaturate))
   def defaultScoutPlan      : Plan              = new ScoutAt(scoutAt)
-  def defaultScoutExposPlan : Plan              = new ScoutExpansionsAt(scoutExpansionsAt)
+  def defaultScoutExposPlan : Plan              = new If(new BasesAtLeast(2), new ScoutExpansionsAt(scoutExpansionsAt))
   def priorityDefensePlan   : Plan              = NoPlan()
   def priorityAttackPlan    : Plan              = NoPlan()
   def defaultNukePlan       : Plan              = new NukeBase

@@ -33,6 +33,8 @@ object Retreat extends ActionTechnique {
   }
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
+    Avoid.delegate(unit)
+    return
     unit.agent.toTravel = Some(unit.agent.origin)
     //Path.delegate(unit)
     Move.delegate(unit)

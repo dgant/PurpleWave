@@ -18,8 +18,9 @@ class UnitTracker {
   def getId(id: Int): Option[UnitInfo] = friendlyUnitTracker.get(id).orElse(foreignUnitTracker.get(id))
   
   def get(unit: bwapi.Unit): Option[UnitInfo] = if (unit == null) None else getId(unit.getID)
-  
-  def all: IndexedSeq[UnitInfo] = ours.toIndexedSeq ++ enemy.toIndexedSeq ++ neutral.toIndexedSeq
+
+  def playerOwned: IndexedSeq[UnitInfo] = ours.toIndexedSeq ++ enemy.toIndexedSeq
+  def all: IndexedSeq[UnitInfo] = playerOwned ++ neutral.toIndexedSeq
   
   private val counterOurs = new UnitCounter(() => ours)
   def existsOurs(matcher: UnitMatcher*): Boolean = countOurs(matcher: _*) > 0

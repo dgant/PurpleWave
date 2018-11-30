@@ -14,7 +14,7 @@ import Planning.Plans.Scouting.Scout
 import Planning.Predicates.Compound.{Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy}
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Protoss.PvR.PvROpenProxy2Gate
@@ -30,9 +30,10 @@ class Proxy2Gate extends GameplanModeTemplate {
   
   private class BeforeProxy extends Parallel(
     new PlaceGatewaysProxied(2, () => ProxyPlanner.proxyAutomaticSneaky),
-    new BuildOrder(
-      Get(9, Protoss.Probe),
-      Get(1, Protoss.Pylon)),
+    new If(
+      new EnemyIsTerran,
+      new BuildOrder(Get(8, Protoss.Probe), Get(1, Protoss.Pylon)),
+      new BuildOrder(Get(9, Protoss.Probe), Get(1, Protoss.Pylon))),
     new If(new UnitsAtLeast(1, Protoss.Pylon),    new Build(Get(1, Protoss.Gateway))),
     new If(new UnitsAtLeast(1, Protoss.Gateway),  new Build(Get(2, Protoss.Gateway))))
   

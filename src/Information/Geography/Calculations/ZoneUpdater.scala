@@ -56,9 +56,8 @@ object ZoneUpdater {
   }
   
   def updateZone(zone: Zone) {
-  
+    zone.distanceGrid.initialize()
     zone.units = With.units.all.filter(_.zone == zone).toSet
-    
     zone.bases.foreach(BaseUpdater.updateBase)
   
     val exitBuildings = zone.exit.map(exit =>

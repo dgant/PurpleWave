@@ -4,16 +4,18 @@ import Lifecycle.With
 import Mathematics.Points.Tile
 
 abstract class AbstractGridTimestamp extends AbstractGridInt {
-  
-  def isSet(tile: Tile): Boolean = get(tile) >= frameUpdated
+
+  def isSet(i: Int): Boolean = get(i) >= frameUpdated
+  def isSet(tile: Tile): Boolean = isSet(tile.i)
   
   var frameUpdated = 0
   val never: Int = -24 * 60 * 60
   
   override val defaultValue: Int = never
   reset()
-  
-  def everFlagged(tile: Tile): Boolean = get(tile) > 0
+
+  def stamp(i: Int) { set(i, With.frame)}
+  def stamp(tile: Tile) { stamp(tile.i) }
   def framesSince(tile: Tile): Int = frameUpdated - get(tile)
   
   protected def needsUpdate: Boolean = true

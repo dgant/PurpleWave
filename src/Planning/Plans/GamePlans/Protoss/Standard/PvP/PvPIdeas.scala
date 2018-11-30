@@ -25,6 +25,8 @@ object PvPIdeas {
   class PlaceShieldBatteryAtNexus extends ProposePlacement {
     override lazy val blueprints = Vector(new Blueprint(this, building = Some(Protoss.ShieldBattery), placement = Some(PlacementProfiles.hugTownHall)))
   }
+
+  class StealGasSelectively extends If(new Not(new EnemyStrategy(With.fingerprints.twoGate)), new StealGas)
   
   class EnemyCarriersOnly extends And(
     new EnemyCarriers,

@@ -1,13 +1,18 @@
 package Micro.Heuristics.Targeting
 
+import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.PurpleMath
 import Micro.Decisions.MicroValue
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetHeuristicPain extends TargetHeuristic {
-  
+
   override def evaluate(unit: FriendlyUnitInfo, candidate: UnitInfo): Double = {
+    With.grids.enemyRange.get(candidate.pixelCenter.project(unit.pixelCenter, unit.pixelRangeAgainst(candidate)).tileIncluding)
+  }
+
+  def oldEvaluate(unit: FriendlyUnitInfo, candidate: UnitInfo): Double = {
   
     val threats = unit.matchups.threats.take(20)
     

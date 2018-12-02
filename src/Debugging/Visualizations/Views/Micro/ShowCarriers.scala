@@ -14,14 +14,14 @@ object ShowCarriers extends View {
       if (carrier.complete && carrier.is(Protoss.Carrier)) {
         carrier.orderTarget.foreach(target => DrawMap.line(carrier.pixelCenter, target.pixelCenter, Colors.MediumRed))
         DrawMap.box(carrier.pixelCenter.subtract(32, 16), carrier.pixelCenter.add(32, 16), Colors.DarkViolet, true)
-        With.game.setTextSize(bwapi.Text.Size.Enum.Large)
+        With.game.setTextSize(bwapi.TextSize.Large)
         carrier.agent.lastAction.foreach(action => DrawMap.label(action.name, carrier.pixelCenter.subtract(16, 16)))
         DrawMap.label(
           + carrier.interceptors.count(_.order == Orders.InterceptorAttack)
           + "/"
           + carrier.interceptors.count(_.complete),
           carrier.pixelCenter.subtract(16, 0))
-        With.game.setTextSize(bwapi.Text.Size.Enum.Small)
+        With.game.setTextSize(bwapi.TextSize.Small)
         if (carrier.interceptors.exists(_.complete)) {
           DrawMap.circle(carrier.pixelCenter, 32*8, Colors.BrightGray)
           DrawMap.circle(carrier.pixelCenter, 32*10, Colors.DarkGray)

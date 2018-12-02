@@ -38,7 +38,7 @@ object ShowArchitectureHeuristics extends View {
   }
   
   private def renderPlacementHeuristicsScreen(blueprint: Blueprint, placement: Placement) = {
-    With.game.setTextSize(bwapi.Text.Size.Enum.Default)
+    With.game.setTextSize(bwapi.TextSize.Default)
     DrawScreen.column(
       5,
       5 * With.visualization.lineHeightSmall,
@@ -50,7 +50,7 @@ object ShowArchitectureHeuristics extends View {
           .zipWithIndex
           .map(pair => "#" + pair._2 + " " + pair._1._1 + " (" + (-pair._1._2) + ")"))
         .flatten)
-    With.game.setTextSize(bwapi.Text.Size.Enum.Small)
+    With.game.setTextSize(bwapi.TextSize.Small)
   }
   
   private def renderPlacementHeuristicsMap(blueprint: Blueprint, placement: Placement) = {

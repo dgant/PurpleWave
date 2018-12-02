@@ -20,9 +20,9 @@ object ShowPerformanceSummary extends View {
         With.performance.lastUniqueUnitIdCount,
         With.performance.lastUniqueDeadIdCount).mkString(", "))
     if (With.performance.disqualified) {
-      With.game.setTextSize(bwapi.Text.Size.Enum.Large)
+      With.game.setTextSize(bwapi.TextSize.Large)
       DrawScreen.header(295, ":/")
-      With.game.setTextSize(bwapi.Text.Size.Enum.Small)
+      With.game.setTextSize(bwapi.TextSize.Small)
     }
   }
 }

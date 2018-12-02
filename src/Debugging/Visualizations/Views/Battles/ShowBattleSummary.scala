@@ -75,12 +75,12 @@ object ShowBattleSummary extends View {
   }
   
   private def drawEstimationReport(estimation: Prediction) {
-    With.game.setTextSize(bwapi.Text.Size.Enum.Large)
+    With.game.setTextSize(bwapi.TextSize.Large)
     With.game.drawTextScreen(tableHeader0.bwapi, With.self.name)
     With.game.drawTextScreen(tableHeader1.bwapi, With.enemy.name)
     With.game.drawTextScreen(tableStart0.bwapi, "+" + estimation.costToEnemy.toInt)
     With.game.drawTextScreen(tableStart1.bwapi, "-" + estimation.costToUs.toInt)
-    With.game.setTextSize(bwapi.Text.Size.Enum.Small)
+    With.game.setTextSize(bwapi.TextSize.Small)
   }
 }
 

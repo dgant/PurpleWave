@@ -84,7 +84,7 @@ class PvP2Gate1012Expand extends GameplanModeTemplate {
       Get(Protoss.DragoonRange),
       Get(3, Protoss.Gateway)))
   
-  override val buildOrder = ProtossBuilds.OpeningTwoGate1012FiveZealot
+  override val buildOrder = ProtossBuilds.OpeningTwoGate1012
   override def buildPlans = Vector(
 
     new If(

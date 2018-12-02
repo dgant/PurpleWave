@@ -7,8 +7,6 @@ import Performance.UnitCounter
 import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, HistoricalUnitInfo, UnitInfo}
 
-import scala.collection.immutable
-
 class UnitTracker {
   
   private val friendlyUnitTracker = new FriendlyUnitTracker
@@ -42,23 +40,32 @@ class UnitTracker {
   
   def neutral: Set[ForeignUnitInfo] = foreignUnitTracker.neutralUnits
   
-  def inTileRadius(tile: Tile, tiles: Int): immutable.IndexedSeq[UnitInfo] = {
-    inTiles(Circle.points(tiles).map(tile.add).filter(_.valid))
+  def inTileRadius(tile: Tile, tiles: Int): Seq[UnitInfo] = {
+    inTiles(
+      Circle
+        .points(tiles)
+        .view
+        .map(tile.add).filter(_.valid))
   }
   
-  def inPixelRadius(pixel: Pixel, pixels: Int): immutable.IndexedSeq[UnitInfo] = {
+  def inPixelRadius(pixel: Pixel, pixels: Int): Seq[UnitInfo] = {
     val tile = pixel.tileIncluding
     val pixelsSquared = pixels * pixels
-    inTiles(Circle.points(pixels / 32 + 1).map(tile.add).filter(_.valid))
+    inTiles(
+      Circle
+        .points(pixels / 32 + 1)
+        .view
+        .map(tile.add)
+        .filter(_.valid))
       .filter(_.pixelCenter.pixelDistanceSquared(pixel) <= pixelsSquared)
   }
   
-  def inRectangle(rectangle: TileRectangle): immutable.IndexedSeq[UnitInfo] = {
+  def inRectangle(rectangle: TileRectangle): Seq[UnitInfo] = {
     inTiles(rectangle.tiles)
   }
   
-  private def inTiles(tiles: immutable.IndexedSeq[Tile]): immutable.IndexedSeq[UnitInfo] = {
-    tiles.flatten(tile => With.grids.units.get(tile))
+  private def inTiles(tiles: Seq[Tile]) = {
+    tiles.view.flatMap(With.grids.units.get)
   }
   
   def update() {

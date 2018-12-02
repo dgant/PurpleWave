@@ -32,33 +32,12 @@ object ProtossBuilds {
     Get(2,   Protoss.Gateway),
     Get(13,  Protoss.Probe),
     Get(1,   Protoss.Zealot),
-    Get(14,  Protoss.Probe),
     Get(2,   Protoss.Pylon),
-    Get(16,  Protoss.Probe),
+    Get(14,  Protoss.Probe),
     Get(3,   Protoss.Zealot),
     Get(3,   Protoss.Pylon),
     Get(17,  Protoss.Probe),
     Get(5,   Protoss.Zealot))
-  
-  val OpeningTwoGate1012FiveZealot = Vector[BuildRequest] (
-    Get(1,   Protoss.Nexus),
-    Get(8,   Protoss.Probe),
-    Get(1,   Protoss.Pylon),
-    Get(10,  Protoss.Probe),
-    Get(1,   Protoss.Gateway),
-    Get(12,  Protoss.Probe),
-    Get(2,   Protoss.Gateway),
-    Get(13,  Protoss.Probe),
-    Get(1,   Protoss.Zealot),
-    Get(14,  Protoss.Probe),
-    Get(2,   Protoss.Pylon),
-    Get(16,  Protoss.Probe),
-    Get(3,   Protoss.Zealot),
-    Get(3,   Protoss.Pylon),
-    Get(17,  Protoss.Probe),
-    Get(5,   Protoss.Zealot),
-    Get(18,  Protoss.Probe))
-  
   
   val OpeningZCoreZ = Vector[BuildRequest] (
     Get(1,   Protoss.Nexus),

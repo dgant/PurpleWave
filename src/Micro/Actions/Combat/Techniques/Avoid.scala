@@ -50,16 +50,19 @@ object Avoid extends ActionTechnique {
       return
     }
 
-    var pathLengthMax = 2 + (unit.unitClass.haltPixels + With.reaction.agencyMax * unit.topSpeed) / 32
+    var pathLengthMax = 6
     val path = new ArrayBuffer[Tile]
     path += unit.tileIncludingCenter
     var bestScore = Int.MinValue
     def tileDistance(tile: Tile): Int = if(tile.zone == unit.agent.origin.zone) 0 else unit.agent.origin.zone.distanceGrid.get(tile)
-    def tileScore(tile: Tile): Int = (
-      - 20 * tileDistance(tile)
-      - 10 * With.grids.enemyRange.get(tile)
-      - PurpleMath.clamp(With.grids.occupancy(tile), 0, 9)
-    )
+    def tileScore(tile: Tile): Int = {
+      val enemyRange = With.grids.enemyRange.get(tile)
+      (
+        - 10 * tileDistance(tile)
+        - 10 * enemyRange * (if (enemyRange > With.grids.enemyRange.addedRange) 2 else 1)
+        - PurpleMath.clamp(With.grids.occupancy(tile), 0, 9)
+      )
+    }
     while (path.length < pathLengthMax) {
       val origin = unit.agent.origin.zone
       val here = path.last

@@ -15,7 +15,7 @@ object Cancel extends Action {
     lazy val framesCutoff     = 12 + With.reaction.agencyAverage
     lazy val framesToLive     = unit.matchups.framesToLive
     lazy val framesToFinish   = Seq(unit.remainingTechFrames, unit.remainingUpgradeFrames, unit.remainingTrainFrames).max
-    lazy val doomed           = unit.matchups.threatsInRange.nonEmpty && framesToLive < framesCutoff
+    lazy val doomed           = unit.battle.isDefined && unit.matchups.threatsInRange.nonEmpty && framesToLive < framesCutoff
     lazy val willNeverFinish  = unit.matchups.threatsInRange.nonEmpty && framesToLive < framesToFinish
     lazy val canCancel        = unit.isAny(UnitMatchBuilding, Zerg.LurkerEgg, Zerg.Egg, Zerg.Cocoon) // Performance hack to avoid accessing .training, etc.
     lazy val producing        = unit.training || unit.upgrading || unit.teching

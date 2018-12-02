@@ -175,13 +175,16 @@ object PvPIdeas {
 
   class ReactToFFE extends If(
     new Or(
-      new EnemyStrategy(With.fingerprints.forgeFe),
       new And(
-        new EnemyStrategy(With.fingerprints.gatewayFe),
+        new EnemyStrategy(With.fingerprints.forgeFe),
         new UnitsAtLeast(1, Protoss.Gateway)),
       new And(
+        new EnemyStrategy(With.fingerprints.gatewayFe),
+        new UnitsAtLeast(2, Protoss.Gateway)),
+      new And(
         new Not(new EnemyStrategy(With.fingerprints.cannonRush)),
-        new EnemiesAtLeast(1, Protoss.PhotonCannon))),
+        new EnemiesAtLeast(1, Protoss.PhotonCannon),
+        new UnitsAtLeast(1, Protoss.Gateway))),
     new RequireMiningBases(2))
 
   class TakeBase2 extends If(

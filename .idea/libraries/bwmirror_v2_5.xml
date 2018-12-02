@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="bwmirror_v2_5">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

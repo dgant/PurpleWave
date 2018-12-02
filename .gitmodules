@@ -1,0 +1,3 @@
+[submodule "3rdparty/jbwapi"]
+	path = 3rdparty/jbwapi
+	url = https://github.com/JasperGeurtz/JBWAPI.git

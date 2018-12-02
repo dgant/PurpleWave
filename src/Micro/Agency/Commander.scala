@@ -107,7 +107,7 @@ class Commander {
     if (unready(unit)) return
     
     val alreadyAttackMovingThere = unit.command.exists(c =>
-      c.getUnitCommandType.toString == UnitCommandType.Attack_Move.toString &&
+      c.getType.toString == UnitCommandType.Attack_Move.toString &&
       new Pixel(c.getTargetPosition).pixelDistance(destination) < 128)
     
     if ( ! alreadyAttackMovingThere || unit.seeminglyStuck) {

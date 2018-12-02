@@ -7,12 +7,6 @@ import Lifecycle.With
 object ShowZones extends View {
   
   override def renderMap() {
-    
-    With.geography.zones.foreach(zone => {
-      DrawMap.polygonPixels(
-        zone.points,
-        zone.owner.colorDark)
-    })
   
     With.geography.zones.foreach(zone => {
       zone.edges.foreach(edge => {

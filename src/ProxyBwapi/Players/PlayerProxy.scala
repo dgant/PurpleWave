@@ -34,7 +34,7 @@ abstract class PlayerProxy(base:Player) {
   def supplyUsed        : Int = supplyUsedCache()
   def supplyTotal       : Int = supplyTotalCache()
   
-  def rawUnits: mutable.Buffer[Unit] = unitsCache()
+  def rawUnits: Vector[Unit] = unitsCache()
   
   private lazy val maxUpgradeLevels = new mutable.HashMap[Upgrade, Int] ++ Upgrades.all.map(upgrade => (upgrade, 0))
   def getUpgradeLevel(upgrade: Upgrade): Int = {
@@ -67,7 +67,7 @@ abstract class PlayerProxy(base:Player) {
   private val gatheredMineralsCache   = new Cache(() => base.gatheredMinerals)
   private val supplyUsedCache         = new Cache(() => if (!isUs) 0 else               With.units.ours.toSeq.filter(u =>               u.unitClass.race == raceInitial).map(_.unitClass.supplyRequired).sum)
   private val supplyTotalCache        = new Cache(() => if (!isUs) 0 else Math.min(400, With.units.ours.toSeq.filter(u => u.complete && u.unitClass.race == raceInitial).map(_.unitClass.supplyProvided).sum))
-  private val unitsCache              = new Cache(() => base.getUnits.asScala)
+  private val unitsCache              = new Cache(() => base.getUnits.asScala.toVector)
   private val upgradeLevelCaches      = new mutable.HashMap[Upgrade, Cache[Int]]
   private val techsResearchedCaches   = new mutable.HashMap[Tech, Cache[Boolean]]
 }

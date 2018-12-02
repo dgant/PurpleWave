@@ -59,7 +59,7 @@ object ShowUnitsFriendly extends View {
     }
     if (showCommand) {
       DrawMap.label(
-        unit.command.map(_.getUnitCommandType.toString).getOrElse(""),
+        unit.command.map(_.getType.toString).getOrElse(""),
         unit.pixelCenter.add(0, labelY),
         drawBackground = false)
       labelY += 7

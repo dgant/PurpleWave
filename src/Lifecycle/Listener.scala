@@ -1,39 +1,24 @@
 package Lifecycle
 
-import bwapi.{BWEventListener, Player}
+import bwapi.{BWListener, Player}
 
-object Listener extends BWEventListener{
-  val mirror:bwapi.Mirror = new bwapi.Mirror()
-  var bot:Option[Bot] = None
+object Listener extends BWListener {
+
+  var bot: Option[Bot] = None
 
   var lastException: Option[Exception] = None
   var lastStackTrace: Option[String] = None
   var doesThisCodeEvenGetExecuted: Int = 0
-  
-  def initialize(): Unit = {
-    try {
-      mirror.getModule.setEventListener(this)
-      mirror.startGame()
-    }
-    catch { case exception: Exception =>
-      lastException = Some(exception)
-      lastStackTrace = Some(exception.getStackTrace.toString)
-      doesThisCodeEvenGetExecuted = 123
-      val setABreakpointHere = 12345
-    }
-  }
 
   override def onStart(): Unit = {
     try {
-      With.game = mirror.getGame
+      With.game = JBWAPIClient.getGame
       bot = Some(new Bot())
       bot.get.onStart()
     }
     catch { case exception: Exception =>
       lastException = Some(exception)
       lastStackTrace = Some(exception.getStackTrace.toString)
-      doesThisCodeEvenGetExecuted = 456
-      val setABreakpointHere = 12345
     }
   }
 

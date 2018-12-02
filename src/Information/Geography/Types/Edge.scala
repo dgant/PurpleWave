@@ -16,11 +16,11 @@ class Edge(choke: Chokepoint) {
   
   lazy val pixelCenter  : Pixel = new Pixel(choke.getCenter)
   lazy val radiusPixels : Double = choke.getWidth / 2
-  lazy val sidePixels   : Seq[Pixel] = Vector(new Pixel(choke.getSides.first), new Pixel(choke.getSides.second))
+  lazy val sidePixels   : Seq[Pixel] = Vector(new Pixel(choke.getSides.getLeft), new Pixel(choke.getSides.getRight))
   lazy val zones        : Vector[Zone] =
     Vector(
-      choke.getRegions.first,
-      choke.getRegions.second)
+      choke.getRegions.getLeft,
+      choke.getRegions.getRight)
     .map(region => With.geography.zones.minBy(
       _.centroid.pixelCenter.pixelDistanceSquared(
         new Pixel(region.getCenter))))

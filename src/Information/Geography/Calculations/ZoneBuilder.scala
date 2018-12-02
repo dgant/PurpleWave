@@ -2,10 +2,10 @@ package Information.Geography.Calculations
 
 import Information.Geography.Types.{Base, Edge, Zone}
 import Lifecycle.With
-import Mathematics.Points.{Pixel, Tile, TileRectangle}
+import Mathematics.Points.{Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
 import Utilities.ByOption
-import bwta.{BWTA, Polygon, Region}
+import bwta.{BWTA, Region}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -66,47 +66,19 @@ object ZoneBuilder {
   }
   
   def buildZone(thisRegion: Region, name: String): Zone = {
-    
-    // The goal:        We want to check if two regions are the same.
-    // The problem:     BWMirror gives its proxy objects no unique identifiers, hashcodes, or equality comparisons for objects.
-    // The workaround:  Use properties of the polygon to construct a hopefully-unique identifier
-    
-    val thisIdentifier = new RegionIdentifier(thisRegion)
+    val tiles = With.geography.allTiles.filter(tile => BWTA.getRegion(tile.bwapi) == thisRegion)
+    val x = tiles.map(_.x)
+    val y = tiles.map(_.y)
     val boundingBox = TileRectangle(
-      Pixel(
-        thisIdentifier.polygon.getPoints.asScala.map(_.getX).min,
-        thisIdentifier.polygon.getPoints.asScala.map(_.getY).min)
-        .tileIncluding,
-      Pixel(
-        32 + thisIdentifier.polygon.getPoints.asScala.map(_.getX).max,
-        32 + thisIdentifier.polygon.getPoints.asScala.map(_.getY).max)
-        .tileIncluding)
-    val tiles = new mutable.HashSet[Tile]
-    tiles ++= boundingBox.tiles
-      .filter(tile => {
-        val thatRegion = BWTA.getRegion(tile.bwapi)
-        if (thatRegion == null) {
-          false
-        }
-        else {
-          val thatIdentifier = new RegionIdentifier(thatRegion)
-          thatIdentifier.same(thisIdentifier)
-        }
-      })
-      .toSet
-    
-    new Zone(name, thisRegion, boundingBox, tiles)
+      Tile(
+        ByOption.min(x).getOrElse(0),
+        ByOption.min(y).getOrElse(0)),
+      Tile(
+        ByOption.max(x).getOrElse(0),
+        ByOption.max(y).getOrElse(0)))
+
+    val tileSet = new mutable.HashSet[Tile]
+    tileSet ++= tiles
+    new Zone(name, thisRegion, boundingBox, tileSet)
   }
-  
-  private class RegionIdentifier(region: Region) {
-    val polygon    : Polygon = region.getPolygon
-    val area       : Double  = polygon.getArea
-    val perimeter  : Double  = polygon.getPerimeter
-    
-    def same(other: RegionIdentifier): Boolean = {
-      area == other.area &&
-      perimeter == other.perimeter
-    }
-  }
-  
 }

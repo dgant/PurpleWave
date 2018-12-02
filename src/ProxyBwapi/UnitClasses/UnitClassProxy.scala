@@ -82,7 +82,7 @@ class UnitClassProxy(val baseType: UnitType) {
   lazy val turnRadius               = baseType.turnRadius
   lazy val upgrades                 = baseType.upgrades.asScala.map(Upgrades.get)
   lazy val upgradesWhat             = baseType.upgradesWhat.asScala.map(Upgrades.get)
-  lazy val whatBuilds               = new Pair(UnitClasses.get(baseType.whatBuilds.first), baseType.whatBuilds.second)
+  lazy val whatBuilds               = new Pair(UnitClasses.get(baseType.whatBuilds.getKey), baseType.whatBuilds.getValue)
   lazy val width                    = baseType.width
   lazy val race                     = baseType.getRace
   lazy val sizeRaw                  = size

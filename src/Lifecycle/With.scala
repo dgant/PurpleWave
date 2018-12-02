@@ -24,6 +24,7 @@ import ProxyBwapi.UnitTracking.UnitTracker
 import Strategery.History.History
 import Strategery.Strategist
 import _root_.Performance.{Latency, MicroReaction, PerformanceMonitor}
+import bwapi.Flag
 import bwta.BWTA
 
 import scala.collection.JavaConverters._
@@ -89,7 +90,7 @@ object With {
   
   def onStart() {
     game.setLatCom(false)
-    game.enableFlag(1) //Enable unit control
+    game.enableFlag(Flag.UserInput)
     game.setLocalSpeed(0)
     
     proxy             = new ProxyBWMirror
@@ -141,15 +142,11 @@ object With {
   
   def onEnd() {
     With.logger.flush()
-    BWTA.cleanMemory()
   }
   
   private def initializeBWTA() {
     With.logger.debug("Loading BWTA for " + With.game.mapName + " at " + With.game.mapFileName())
-    BWTA.readMap()
+    BWTA.readMap(With.game)
     BWTA.analyze()
-    //These may not be necessary or helpful since BWTA2 doesn't seem to work in BWMirror
-    BWTA.computeDistanceTransform()
-    BWTA.buildChokeNodes()
   }
 }

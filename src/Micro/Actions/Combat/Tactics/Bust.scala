@@ -4,7 +4,7 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
-import Micro.Actions.Combat.Decisionmaking.Leave
+import Micro.Actions.Combat.Techniques.Avoid
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import bwapi.Race
@@ -54,7 +54,7 @@ object Bust extends Action {
     // If we're getting shot at by the bunker, back off.
     val bunkers = unit.matchups.threats.filter(_.is(Terran.Bunker))
     if (With.framesSince(unit.lastFrameTakingDamage) < GameTime(0, 1)()) {
-      Leave.delegate(unit)
+      Avoid.delegate(unit)
     }
     else if (unit.matchups.targetsInRange.nonEmpty) {
       With.commander.hold(unit)

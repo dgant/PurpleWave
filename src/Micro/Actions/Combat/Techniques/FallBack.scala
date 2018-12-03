@@ -1,6 +1,5 @@
 package Micro.Actions.Combat.Techniques
 
-import Micro.Actions.Combat.Decisionmaking.Leave
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import ProxyBwapi.Races.{Protoss, Terran}
@@ -41,6 +40,6 @@ object FallBack extends ActionTechnique {
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     Potshot.delegate(unit)
-    Leave.delegate(unit)
+    Avoid.delegate(unit)
   }
 }

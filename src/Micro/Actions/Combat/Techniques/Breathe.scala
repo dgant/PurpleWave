@@ -1,6 +1,5 @@
 package Micro.Actions.Combat.Techniques
 
-import Micro.Actions.Combat.Decisionmaking.Leave
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Techniques.Common.Activators.WeightedMean
 import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, AttackAsSoonAsPossible}
@@ -46,7 +45,7 @@ object Breathe extends ActionTechnique {
     Potshot.delegate(unit)
     AttackAsSoonAsPossible.delegate(unit)
     if ( ! unit.readyForAttackOrder) {
-      Leave.delegate(unit)
+      Avoid.delegate(unit)
     }
   }
 }

@@ -182,7 +182,7 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   private val isBurrowedCache = new Cache(() => base.isBurrowed)
   private val cachedCloaked   = new Cache(() => base.isCloaked)
   private val isDetectedCache = new Cache(() => base.isDetected)
-  private val isVisibleCache  = new Cache(() => base.isVisible)
+  private val isVisibleCache  = new Cache(() => true || base.isVisible) // Performance hack -- when wouldn't it be visible?
   
   //////////////
   // Movement //

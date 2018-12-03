@@ -37,10 +37,6 @@ object Avoid extends ActionTechnique {
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
     if (other.isFriendly) return None
     if ( ! other.canAttack(unit)) return None
-    
-    lazy val path = unit.agent.zonePath(unit.agent.origin)
-    if ( ! unit.flying && path.isEmpty) return None
-
     Some(1.0)
   }
 

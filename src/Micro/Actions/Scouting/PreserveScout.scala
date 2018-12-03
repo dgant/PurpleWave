@@ -1,8 +1,8 @@
 package Micro.Actions.Scouting
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Decisionmaking.Leave
 import Micro.Actions.Combat.Maneuvering.GooseChase
+import Micro.Actions.Combat.Techniques.Avoid
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object PreserveScout extends Action {
@@ -15,6 +15,6 @@ object PreserveScout extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     GooseChase.consider(unit)
-    Leave.delegate(unit)
+    Avoid.delegate(unit)
   }
 }

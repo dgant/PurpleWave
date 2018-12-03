@@ -10,6 +10,13 @@ import ProxyBwapi.Races.Terran
 object ZoneUpdater {
   
   def update() {
+    // Grid tasks update for the first time after Geography because many need to understand zones
+    // But for us to initialize zones properly, we need the unit grid ready.
+    if (With.frame == 0) {
+      With.grids.units.initialize()
+      With.grids.units.update()
+    }
+
     With.geography.zones.foreach(updateZone)
   
     if ( ! With.geography.naturalsSearched) {
@@ -57,7 +64,7 @@ object ZoneUpdater {
   
   def updateZone(zone: Zone) {
     zone.distanceGrid.initialize()
-    zone.units = With.units.all.filter(_.zone == zone).toSet
+    zone.units = With.units.all.filter(_.zone == zone)
     zone.bases.foreach(BaseUpdater.updateBase)
   
     val exitBuildings = zone.exit.map(exit =>

@@ -13,26 +13,26 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 class Geography {
-  lazy val mapArea            : TileRectangle           = TileRectangle(Tile(0, 0), Tile(With.mapTileWidth, With.mapTileHeight))
-  lazy val allTiles           : Array[Tile]             = mapArea.tiles.toArray
-  lazy val startBases         : Iterable[Base]          = bases.filter(_.isStartLocation)
-  lazy val startLocations     : Iterable[Tile]          = With.game.getStartLocations.asScala.map(new Tile(_))
-  lazy val zones              : Iterable[Zone]          = ZoneBuilder.zones
-  lazy val edges              : Iterable[Edge]          = ZoneBuilder.edges
-  lazy val bases              : Iterable[Base]          = ZoneBuilder.bases
-  lazy val ourMain            : Base                    = With.geography.ourBases.find(_.isStartLocation).getOrElse(With.geography.bases.minBy(_.heart.tileDistanceFast(With.self.startTile)))
-  lazy val rushDistances      : Vector[Double]          = startLocations.flatMap(s1 => startLocations.filterNot(_ == s1).map(s2 => s1.groundPixels(s2))).toSet.toVector
-  def ourNatural              : Base                    = ourNaturalCache()
-  def ourZones                : Iterable[Zone]          = ourZonesCache()
-  def ourBases                : Iterable[Base]          = ourBasesCache()
-  def ourSettlements          : Iterable[Base]          = ourSettlementsCache()
-  def ourBasesAndSettlements  : Iterable[Base]          = (ourBases ++ ourSettlements).toSet.toVector
-  def ourTownHalls            : Iterable[UnitInfo]      = ourTownHallsCache()
-  def ourHarvestingAreas      : Iterable[TileRectangle] = ourHarvestingAreasCache()
-  def ourBorder               : Iterable[Edge]          = ourBorderCache()
-  def enemyZones              : Iterable[Zone]          = enemyZonesCache()
-  def enemyBases              : Iterable[Base]          = enemyBasesCache()
-  def neutralBases            : Iterable[Base]          = With.geography.bases.filter(_.owner.isNeutral)
+  lazy val mapArea            : TileRectangle         = TileRectangle(Tile(0, 0), Tile(With.mapTileWidth, With.mapTileHeight))
+  lazy val allTiles           : Array[Tile]           = mapArea.tiles.toArray
+  lazy val startBases         : Vector[Base]          = bases.filter(_.isStartLocation)
+  lazy val startLocations     : Vector[Tile]          = With.game.getStartLocations.asScala.map(new Tile(_)).toVector
+  lazy val zones              : Vector[Zone]          = ZoneBuilder.zones.toVector
+  lazy val edges              : Vector[Edge]          = ZoneBuilder.edges.toVector
+  lazy val bases              : Vector[Base]          = ZoneBuilder.bases.toVector
+  lazy val ourMain            : Base                  = With.geography.ourBases.find(_.isStartLocation).getOrElse(With.geography.bases.minBy(_.heart.tileDistanceFast(With.self.startTile)))
+  lazy val rushDistances      : Vector[Double]        = startLocations.flatMap(s1 => startLocations.filterNot(_ == s1).map(s2 => s1.groundPixels(s2))).toSet.toVector
+  def ourNatural              : Base                  = ourNaturalCache()
+  def ourZones                : Vector[Zone]          = ourZonesCache()
+  def ourBases                : Vector[Base]          = ourBasesCache()
+  def ourSettlements          : Vector[Base]          = ourSettlementsCache()
+  def ourBasesAndSettlements  : Vector[Base]          = (ourBases ++ ourSettlements)
+  def ourTownHalls            : Vector[UnitInfo]      = ourTownHallsCache()
+  def ourHarvestingAreas      : Vector[TileRectangle] = ourHarvestingAreasCache()
+  def ourBorder               : Vector[Edge]          = ourBorderCache()
+  def enemyZones              : Vector[Zone]          = enemyZonesCache()
+  def enemyBases              : Vector[Base]          = enemyBasesCache()
+  def neutralBases            : Vector[Base]          = With.geography.bases.filter(_.owner.isNeutral)
   
   private val ourZonesCache           = new Cache(() => zones.filter(_.owner.isUs))
   private val ourBasesCache           = new Cache(() => bases.filter(_.owner.isUs))
@@ -69,13 +69,14 @@ class Geography {
       }
     }
   
-  private def getSettlements: Iterable[Base] = (Set.empty
-  ++ With.geography.bases.toVector.filter(_.units.exists(u => u.isOurs && u.unitClass.isBuilding))
+  private def getSettlements: Vector[Base] = (Vector.empty
+  ++ With.geography.bases.filter(_.units.exists(u => u.isOurs && u.unitClass.isBuilding))
   ++ With.units.ours
     .filter(u => u.agent.toBuild.exists(_.isTownHall))
     .flatMap(u => u.agent.toBuildTile.map(tile => tile.zone.bases.find(base => base.townHallTile == tile)))
     .flatten
     .filterNot(_.owner.isUs)
+    .toVector
   )
   
   var home: Tile = SpecificPoints.tileMiddle

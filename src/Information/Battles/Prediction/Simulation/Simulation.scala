@@ -46,7 +46,9 @@ class Simulation(
   )
   
   def run() {
-    while ( ! complete) step()
+    if (!With.configuration.enableMCRS) {
+      while (!complete) step()
+    }
     cleanup()
   }
   

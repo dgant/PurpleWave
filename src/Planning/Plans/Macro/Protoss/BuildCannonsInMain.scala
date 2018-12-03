@@ -9,10 +9,10 @@ class BuildCannonsInMain(initialCount: Int) extends BuildCannonsAtBases(
   PlacementProfiles.hugTownHall,
   PlacementProfiles.hugTownHall) {
   
-  override def eligibleBases: Iterable[Base] = {
+  override def eligibleBases: Vector[Base] = {
     var output = With.geography.ourBasesAndSettlements.filter(_ == With.geography.ourMain)
     if (output.isEmpty) {
-      output = Iterable(With.geography.ourMain)
+      output = Vector(With.geography.ourMain)
     }
     output
   }

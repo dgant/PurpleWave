@@ -3,7 +3,7 @@ package ProxyBwapi.UnitTracking
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.Shapes.Circle
-import Performance.UnitCounter
+import Performance.{Cache, UnitCounter}
 import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, HistoricalUnitInfo, UnitInfo}
 
@@ -17,8 +17,11 @@ class UnitTracker {
   
   def get(unit: bwapi.Unit): Option[UnitInfo] = if (unit == null) None else getId(unit.getID)
 
-  def playerOwned: IndexedSeq[UnitInfo] = ours.toIndexedSeq ++ enemy.toIndexedSeq
-  def all: IndexedSeq[UnitInfo] = playerOwned ++ neutral.toIndexedSeq
+  def playerOwned = playedOwnedCache()
+  private val playedOwnedCache = new Cache(() => ours ++ enemy)
+
+  def all = allCache()
+  private val allCache = new Cache(() => playerOwned ++ neutral)
   
   private val counterOurs = new UnitCounter(() => ours)
   def existsOurs(matcher: UnitMatcher*): Boolean = countOurs(matcher: _*) > 0

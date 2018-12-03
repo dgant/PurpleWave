@@ -189,7 +189,15 @@ object PurpleMath {
    normalizeAngle(Math.atan2(y, x))
   }
 
-  def weightedMean(values: Seq[(Double, Double)]): Double = values.view.map(p => p._1 * p._2).sum / values.view.map(_._2).sum
+  def weightedMean(values: Seq[(Double, Double)]): Double = {
+    var numerator = 0.0
+    var denominator = 0.0
+    for (value <- values) {
+      numerator += value._1 * value._2
+      denominator += value._2
+    }
+    numerator / denominator
+  }
 
   def softmax[T](values: Seq[T], extract: (T) => Double): Seq[(T, Double)] = {
     val sum = values.map(value => Math.pow(Math.E, extract(value))).sum

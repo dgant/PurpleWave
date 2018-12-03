@@ -5,7 +5,6 @@ import Micro.Agency.Agent
 import Micro.Squads.Squad
 import Performance.Cache
 import Planning.Plan
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 
@@ -71,13 +70,12 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
   
   def loadedUnits: Vector[FriendlyUnitInfo] = loadedUnitsCache()
   private val loadedUnitsCache = new Cache(() =>
-    if (isAny(Terran.Bunker, Terran.Dropship, Protoss.Shuttle, Zerg.Overlord))
+    if (unitClass.canLoadUnits)
       base.getLoadedUnits.asScala.flatMap(With.units.get).flatMap(_.friendly).toVector
     else
       Vector.empty)
   
   def transport: Option[FriendlyUnitInfo] = transportCache()
-  //isBuilding check: Performance optimization
   private val transportCache = new Cache(() =>
     if (unitClass.isBuilding)
       None

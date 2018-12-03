@@ -80,8 +80,8 @@ class BattleClassifier {
   private def replaceBattleGlobal() {
     nextBattleGlobal.foreach(global = _)
     global = new BattleGlobal(
-      new Team(asVectorUs     (With.units.ours  .filter(BattleClassificationFilters.isEligibleGlobal))),
-      new Team(asVectorEnemy  (With.units.enemy .filter(BattleClassificationFilters.isEligibleGlobal))))
+      new Team(asVectorUs     (With.units.ours  .view.filter(BattleClassificationFilters.isEligibleGlobal))),
+      new Team(asVectorEnemy  (With.units.enemy .view.filter(BattleClassificationFilters.isEligibleGlobal))))
   }
   
   private def updateBattle(battle: Battle) {

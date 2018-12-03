@@ -6,6 +6,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Decisions.MicroValue
+import Micro.Heuristics.Targeting.TargetHeuristicVpfEnemy
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.{ByOption, Forever}
@@ -50,6 +51,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val dpfReceiving                   : Double                = threatsInRange.map(_.matchups.dpfDealingDiffused(me)).sum
   lazy val vpfReceiving                   : Double                = valuePerDamage * dpfReceiving
   lazy val vpfNet                         : Double                = vpfDealingInRange - vpfReceiving
+  lazy val vpfTargetHeuristic             : Double                = TargetHeuristicVpfEnemy.calculate(me)
   lazy val framesToLive                   : Double                = PurpleMath.nanToInfinity(me.totalHealth / dpfReceiving)
   lazy val doomed                         : Boolean               = framesToLive <= framesOfEntanglement
   lazy val framesOfEntanglementPerThreat  : Map[UnitInfo, Double] = threats.map(threat => (threat, framesOfEntanglementWith(threat))).toMap

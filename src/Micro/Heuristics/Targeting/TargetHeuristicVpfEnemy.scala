@@ -26,8 +26,12 @@ object TargetHeuristicVpfEnemy extends TargetHeuristic {
     val output    = Math.max(vpfAir, vpfGround) * discount
     output
   }
-  
+
   override def evaluate(unit: FriendlyUnitInfo, candidate: UnitInfo): Double = {
+    candidate.matchups.vpfTargetHeuristic
+  }
+
+  def calculate(candidate: UnitInfo): Double = {
     
     val numerator =
       if (candidate.gathering || candidate.base.exists(_.harvestingArea.contains(candidate.tileIncludingCenter))) {

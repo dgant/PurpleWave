@@ -33,6 +33,8 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   
   lazy val dimensionMin: Int = Math.min(width, height)
   lazy val dimensionMax: Int = Math.max(width, height)
+  lazy val area: Int = dimensionMin * dimensionMax
+  lazy val sqrtArea: Int = Math.sqrt(area).toInt
   lazy val radialHypotenuse: Double = Math.sqrt(width.toDouble * width.toDouble + height.toDouble * height.toDouble)/2.0
   
   def topLeft     : Point = Point(dimensionLeft, dimensionUp)
@@ -511,6 +513,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val canBeMaelstrommed    : Boolean = Players.all.exists(_.isUnknownOrProtoss) && ! isBuilding && isOrganic
   lazy val canBeEnsnared        : Boolean = Players.all.exists(_.isUnknownOrZerg)    && ! isBuilding
   lazy val canBeStasised        : Boolean = Players.all.exists(_.isUnknownOrProtoss) && ! isBuilding
+  lazy val canLoadUnits         : Boolean = Vector(Terran.Bunker, Terran.Dropship, Protoss.Shuttle, Zerg.Overlord).contains(this)
   lazy val canBeTransported     : Boolean = ! isBuilding && spaceRequired <= 8 // BWAPI gives 255 for unloadable units
   lazy val spells: Array[Tech] =
     if (this == Terran.Battlecruiser)   Array(Terran.Yamato)                                                          else

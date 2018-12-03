@@ -17,7 +17,7 @@ object Manners {
     if (With.configuration.enableSurrenders
       && With.performance.enablePerformanceStops
       && With.performance.enablePerformanceSurrenders
-      && With.performance.framesOver55 > 1000) {
+      && With.performance.framesOver85 > 1000) {
       With.logger.error("Quitting due to performance failure")
       surrender()
     }

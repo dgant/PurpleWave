@@ -54,9 +54,10 @@ object Avoid extends ActionTechnique {
     def tileScore(tile: Tile): Int = {
       val enemyRange = With.grids.enemyRange.get(tile)
       (
-        - 10 * tileDistance(tile)
-        - 10 * enemyRange * (if (enemyRange > With.grids.enemyRange.addedRange) 2 else 1)
-        - PurpleMath.clamp(With.grids.occupancy(tile), 0, 9)
+        - 20 * tileDistance(tile)
+        - 20 * enemyRange * (if (enemyRange > With.grids.enemyRange.addedRange) 2 else 1)
+        - PurpleMath.clamp(With.grids.occupancy(tile) / 2, 0, 4)
+        - PurpleMath.clamp(With.coordinator.gridPathOccupancy.get(tile) / 2, 0, 15)
       )
     }
     while (path.length < pathLengthMax) {
@@ -92,6 +93,7 @@ object Avoid extends ActionTechnique {
             DrawMap.arrow(path(i).pixelCenter, path(i + 1).pixelCenter, Colors.DarkTeal)
           }
         }
+        path.foreach(With.coordinator.gridPathOccupancy.addUnit(unit, _))
         Some(path.last.pixelCenter)
       }
     }

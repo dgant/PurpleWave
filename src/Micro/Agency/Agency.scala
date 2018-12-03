@@ -29,7 +29,13 @@ class Agency {
       }
       lastQueueCompletion = With.frame
 
-      agentQueue ++= With.units.ours.view.filter(validAgent).map(_.agent).toVector.sortBy(_.lastFrame)
+      With.coordinator.clear()
+      agentQueue ++= With.units.ours.view
+        .filter(validAgent)
+        .map(_.agent)
+        .toVector
+        .sortBy(_.lastFrame)
+        .sortBy(_.unit.matchups.framesOfSafety)
     }
     
     var doContinue = true

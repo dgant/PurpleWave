@@ -163,10 +163,11 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     else if (this == Protoss.Arbiter)       32.0 * 9.0
     else if (this == Protoss.DarkArchon)    32.0 * 10.0
     else pixelRangeMax
-  
+
   lazy val tileArea               : TileRectangle = TileRectangle(Tile(0, 0), tileSize)
-  lazy val targetsMatter          : Boolean = this != Protoss.Interceptor
-  lazy val targetPositionsMatter  : Boolean = this != Protoss.Interceptor
+  lazy val ordersMatter           : Boolean = ! this.isResource
+  lazy val targetsMatter          : Boolean = this != Protoss.Interceptor && ! this.isResource
+  lazy val targetPositionsMatter  : Boolean = this != Protoss.Interceptor && ! this.isResource && (this.isFlyingBuilding || ! this.isBuilding)
   lazy val orderable              : Boolean = ! isSpell && ! Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
   lazy val isResource             : Boolean = isMinerals || isGas
   lazy val isMinerals             : Boolean = isMineralField

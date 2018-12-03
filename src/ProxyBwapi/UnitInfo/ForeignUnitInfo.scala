@@ -136,11 +136,11 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
   var _spellCooldownLeft        : Int                 = _
   
   def interceptors              : Iterable[UnitInfo]  = Iterable.empty // BWAPI doesn't publish this for enemy interceptors
-  def attackStarting            : Boolean             = _attackStarting
-  def attackAnimationHappening  : Boolean             = _attackAnimationHappening
-  def airCooldownLeft           : Int                 = _airWeaponCooldownLeft
-  def groundCooldownLeft        : Int                 = _groundWeaponCooldownLeft
-  def spellCooldownLeft         : Int                 = _spellCooldownLeft
+  def attackStarting            : Boolean             = ! player.isNeutral && _attackStarting
+  def attackAnimationHappening  : Boolean             = ! player.isNeutral && _attackAnimationHappening
+  def airCooldownLeft           : Int                 = if (! player.isNeutral) _airWeaponCooldownLeft else 0
+  def groundCooldownLeft        : Int                 = if (! player.isNeutral) _groundWeaponCooldownLeft  else 0
+  def spellCooldownLeft         : Int                 = if (! player.isNeutral) _spellCooldownLeft  else 0
   
   //////////////
   // Geometry //
@@ -158,25 +158,25 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
   
   private def updateOrders() {
     //Performance enhancement -- spare the expensive target calls for irrelevant units
-    _target               = if (unitClass.targetsMatter)         baseUnit.getTarget         else null
-    _targetPosition       = if (unitClass.targetPositionsMatter) baseUnit.getTargetPosition else null
-    _order                = baseUnit.getOrder.toString
-    _orderTarget          = baseUnit.getOrderTarget
-    _orderTargetPosition  = baseUnit.getOrderTargetPosition
-    _gatheringMinerals    = baseUnit.isGatheringMinerals
-    _gatheringGas         = baseUnit.isGatheringGas
-    _attacking            = baseUnit.isAttacking
-    _constructing         = _order == Orders.ConstructingBuilding // baseUnit.isConstructing
-    _following            = baseUnit.isFollowing
-    _holdingPosition      = baseUnit.isHoldingPosition
-    _idle                 = baseUnit.isIdle
-    _interruptible        = baseUnit.isInterruptible
-    _morphing             = baseUnit.isMorphing
-    _repairing            = _order == Orders.Repair // baseUnit.isRepairing doesn't seem to work
-    _researching          = baseUnit.isResearching
-    _patrolling           = baseUnit.isPatrolling
-    _training             = baseUnit.isTraining
-    _upgrading            = baseUnit.isUpgrading
+    _target               = if (unitClass.targetsMatter)         baseUnit.getTarget               else null
+    _targetPosition       = if (unitClass.targetPositionsMatter) baseUnit.getTargetPosition       else null
+    _order                = if (unitClass.ordersMatter)          baseUnit.getOrder.toString       else Orders.Nothing
+    _orderTarget          = if (unitClass.targetsMatter)         baseUnit.getOrderTarget          else null
+    _orderTargetPosition  = if (unitClass.targetPositionsMatter) baseUnit.getOrderTargetPosition  else null
+    _gatheringMinerals    = unitClass.ordersMatter && baseUnit.isGatheringMinerals
+    _gatheringGas         = unitClass.ordersMatter && baseUnit.isGatheringGas
+    _attacking            = unitClass.ordersMatter && baseUnit.isAttacking
+    _constructing         = unitClass.ordersMatter && _order == Orders.ConstructingBuilding // baseUnit.isConstructing
+    _following            = unitClass.ordersMatter && baseUnit.isFollowing
+    _holdingPosition      = unitClass.ordersMatter && baseUnit.isHoldingPosition
+    _idle                 = unitClass.ordersMatter && baseUnit.isIdle
+    _interruptible        = unitClass.ordersMatter && baseUnit.isInterruptible
+    _morphing             = unitClass.ordersMatter && baseUnit.isMorphing
+    _repairing            = unitClass.ordersMatter && _order == Orders.Repair // baseUnit.isRepairing doesn't seem to work
+    _researching          = unitClass.ordersMatter && baseUnit.isResearching
+    _patrolling           = unitClass.ordersMatter && baseUnit.isPatrolling
+    _training             = unitClass.ordersMatter && baseUnit.isTraining
+    _upgrading            = unitClass.ordersMatter && baseUnit.isUpgrading
   }
   
   private var _target               : bwapi.Unit  = _
@@ -195,7 +195,6 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
   def orderTargetPixel  : Option[Pixel]       = if (badPositions.contains(_orderTargetPosition)) None else Some(new Pixel(_orderTargetPosition))
   def gatheringMinerals : Boolean             = _gatheringMinerals
   def gatheringGas      : Boolean             = _gatheringGas
-  
   
   private var _attacking        : Boolean = _
   private var _constructing     : Boolean = _
@@ -229,8 +228,8 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
   
   private def updateVisibility() {
     _burrowed = unitClass.canBurrow && baseUnit.isBurrowed
-    _cloaked  = baseUnit.isCloaked
-    _detected = baseUnit.isDetected
+    _cloaked  = ! player.isNeutral && baseUnit.isCloaked
+    _detected = player.isNeutral || baseUnit.isDetected
   }
   
   private var _burrowed  : Boolean  = _
@@ -249,7 +248,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
   
   private def updateMovement() {
     _accelerating = unitClass.canMove           &&  baseUnit.isAccelerating
-    _angle        =                                 baseUnit.getAngle
+    _angle        = if (unitClass.canMove || unitClass.rawCanAttack) baseUnit.getAngle else 0
     _braking      = unitClass.canMove           &&  baseUnit.isBraking
     _ensnared     = ! unitClass.isBuilding      &&  baseUnit.isEnsnared
     _flying       = unitClass.canFly            &&  baseUnit.isFlying
@@ -302,23 +301,23 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
   //////////////
   
   private def updateStatuses() {
-    _remainingTrainFrames   = baseUnit.getRemainingTrainTime
-    _remainingUpgradeFrames = baseUnit.getRemainingUpgradeTime
-    _remainingTechFrames    = baseUnit.getRemainingResearchTime
-    _beingConstructed       = baseUnit.isBeingConstructed
-    _beingGathered          = baseUnit.isBeingGathered
-    _beingHealed            = baseUnit.isBeingHealed
-    _blind                  = baseUnit.isBlind
-    _carryingMinerals       = baseUnit.isCarryingMinerals
-    _carryingGas            = baseUnit.isCarryingGas
-    _powered                = baseUnit.isPowered
-    _selected               = baseUnit.isSelected
+    _remainingTrainFrames   = if (unitClass.trainsUnits) baseUnit.getRemainingTrainTime else 0
+    _remainingUpgradeFrames = if (unitClass.upgradesWhat.nonEmpty) baseUnit.getRemainingUpgradeTime else 0
+    _remainingTechFrames    = if (unitClass.techsWhat.nonEmpty) baseUnit.getRemainingResearchTime else 0
+    _beingConstructed       = ! player.isNeutral && baseUnit.isBeingConstructed
+    _beingGathered          = ! player.isNeutral && baseUnit.isBeingGathered
+    _beingHealed            = ! player.isNeutral && baseUnit.isBeingHealed
+    _blind                  = ! player.isNeutral && baseUnit.isBlind
+    _carryingMinerals       = unitClass.isWorker && baseUnit.isCarryingMinerals
+    _carryingGas            = unitClass.isWorker && baseUnit.isCarryingGas
+    _powered                = unitClass.requiresPsi && baseUnit.isPowered
+    _selected               = false
     _targetable             = baseUnit.isTargetable
-    _underAttack            = baseUnit.isUnderAttack
-    _underDarkSwarm         = baseUnit.isUnderDarkSwarm
-    _underDisruptionWeb     = baseUnit.isUnderDisruptionWeb
-    _underStorm             = baseUnit.isUnderStorm
-    _addon                  = With.units.get(baseUnit.getAddon)
+    _underAttack            = ! player.isNeutral && baseUnit.isUnderAttack
+    _underDarkSwarm         = ! player.isNeutral && baseUnit.isUnderDarkSwarm
+    _underDisruptionWeb     = ! player.isNeutral && baseUnit.isUnderDisruptionWeb
+    _underStorm             = ! player.isNeutral && baseUnit.isUnderStorm
+    _addon                  = if (unitClass.canBuildAddon) With.units.get(baseUnit.getAddon) else None
   }
 
   private var _remainingTrainFrames   : Int = _

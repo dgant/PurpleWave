@@ -49,7 +49,7 @@ object BaseUpdater {
     base.defenders      = base.units.filter(u => u.player == base.owner && u.unitClass.rawCanAttack)
     base.mineralsLeft   = base.minerals.iterator.map(_.mineralsLeft).sum
     base.gasLeft        = base.gas.iterator.map(_.gasLeft).sum
-    base.harvestingArea = (Vector(base.townHallArea) ++ (base.minerals.filter(_.mineralsLeft > With.configuration.blockerMineralThreshold) ++ base.gas).map(_.tileArea)).boundary
+    base.harvestingArea = (Vector(base.townHallArea) ++ (base.minerals.toSeq.filter(_.mineralsLeft > With.configuration.blockerMineralThreshold) ++ base.gas).map(_.tileArea)).boundary
     base.heart          = base.harvestingArea.midpoint
   }
 }

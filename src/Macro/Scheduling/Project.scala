@@ -4,6 +4,7 @@ import Lifecycle.With
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
+import Utilities.ByOption
 
 object Project {
   
@@ -14,21 +15,25 @@ object Project {
   def framesToUnits(
     unitClass: UnitClass,
     quantity: Int = 1,
-    unitsInCycle: Array[UnitClass] = Array.empty): Int = {
-    
-    val unitsOfClass          = With.units.ours.filter(_.isPrerequisite(unitClass))
-    val unitsOfClassComplete  = unitsOfClass.filter(_.complete)
+    // Performance: Avoid creating an empty array if necessary
+    unitsInCycle: Array[UnitClass] = _): Int = {
+
+    val unitsOfClass          = With.units.ours.view.filter(_.isPrerequisite(unitClass))
+    val unitsOfClassComplete  = unitsOfClass.count(_.complete)
     
     // Do we already have it?
-    val shortfall = quantity - unitsOfClassComplete.size
+    val shortfall = quantity - unitsOfClassComplete
     if (shortfall <= 0) {
       return 0
     }
     
     // Are we building what we need already?
-    val incomplete = unitsOfClass.filterNot(_.complete).toVector.sortBy(_.remainingCompletionFrames)
-    if (incomplete.size >= shortfall) {
-      return incomplete
+    val incompleteCount = unitsOfClass.count(!_.complete)
+    if (incompleteCount >= shortfall) {
+      return unitsOfClass
+        .toArray
+        .filter(!_.complete)
+        .sortBy(_.remainingCompletionFrames)
         .take(shortfall)
         .last
         .remainingCompletionFrames
@@ -39,14 +44,17 @@ object Project {
       (unitClass.buildUnitsEnabling ++
         unitClass.buildUnitsBorrowed ++
         unitClass.buildUnitsSpent)
-          .toSet[UnitClass]
+          .distinct
           .map(requiredClass =>
-            if (unitsInCycle.contains(requiredClass))
+            if (unitsInCycle != null && unitsInCycle.contains(requiredClass))
               forever
             else
-              framesToUnits(requiredClass, 1, unitsInCycle :+ requiredClass))
+              framesToUnits(
+                requiredClass,
+                1,
+                if (unitsInCycle == null) Array(requiredClass) else unitsInCycle :+ requiredClass))
     
-    unitClass.buildFrames + (frameLimits + 0).max
+    unitClass.buildFrames + ByOption.max(frameLimits).getOrElse(0)
   }
   
   // Frames before we could possibly have this Tech, not considering income

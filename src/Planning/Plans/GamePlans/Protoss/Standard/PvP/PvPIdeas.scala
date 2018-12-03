@@ -37,22 +37,7 @@ object PvPIdeas {
       new EnemyUnitsNone(Protoss.Observer),
       new EnemyBasesAtLeast(3)),
     new Attack(Protoss.DarkTemplar))
-  
-  /*
-  TODO: What about safety?
-  TODO: What about when we expand?
-  TODO: What about when opening 1 Gate vs 2+?
-  TODO: What about when we do all-in builds?
-  
-  
-  Attack if any of these things are true:
-  They don't have Dragoons or Speedlots
-  They opened Nexus-first
-  They opened Cannon rush
-  We have a Dark Templar and they don't have detection
-  We have three bases
-  They have more bases than us
-  */
+
   class AttackSafely extends If(
     new And(
       // Are we safe against Dark Templar?
@@ -158,6 +143,7 @@ object PvPIdeas {
   class ReactToProxyGateways extends If(
     new EnemyStrategy(With.fingerprints.proxyGateway),
     new Parallel(
+      new RequireSufficientSupply,
       new Pump(Protoss.Probe, 9),
       new Build(Get(Protoss.Gateway)),
       new TrainArmy,

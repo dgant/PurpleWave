@@ -16,11 +16,11 @@ class Base(val townHallTile: Tile)
   var       townHall        : Option[UnitInfo]  = None
   var       harvestingArea  : TileRectangle     = townHallArea
   var       heart           : Tile              = harvestingArea.midpoint
-  var       units           : Set[UnitInfo]     = Set.empty
-  var       gas             : Set[UnitInfo]     = Set.empty
-  var       minerals        : Set[UnitInfo]     = Set.empty
-  var       workers         : Set[UnitInfo]     = Set.empty
-  var       defenders       : Set[UnitInfo]     = Set.empty
+  var       units           : Vector[UnitInfo]  = Vector.empty
+  var       gas             : Vector[UnitInfo]  = Vector.empty
+  var       minerals        : Vector[UnitInfo]  = Vector.empty
+  var       workers         : Vector[UnitInfo]  = Vector.empty
+  var       defenders       : Vector[UnitInfo]  = Vector.empty
   var       owner           : PlayerInfo        = With.neutral
   var       name            : String            = "Nowhere"
   
@@ -29,7 +29,7 @@ class Base(val townHallTile: Tile)
   var lastScoutedFrame  = 0
   
   def scouted: Boolean = lastScoutedFrame > 0
-  def resources: Set[UnitInfo] = minerals ++ gas
+  def resources: Vector[UnitInfo] = minerals ++ gas
   def natural: Option[Base] = With.geography.bases.find(_.isNaturalOf.contains(this))
   
   override def toString: String = name + ", " + zone.name + " " + heart

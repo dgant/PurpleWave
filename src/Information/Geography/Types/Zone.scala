@@ -39,10 +39,10 @@ class Zone(
       Some(edges.minBy(edge => With.geography.startLocations.map(_.groundPixels(edge.pixelCenter)).max))
   }
   
-  var units     : Set[UnitInfo] = Set.empty
-  var owner     : PlayerInfo    = With.neutral
-  var contested : Boolean       = false
-  var walledIn  : Boolean       = false
+  var units     : Vector[UnitInfo]  = Vector.empty
+  var owner     : PlayerInfo        = With.neutral
+  var contested : Boolean           = false
+  var walledIn  : Boolean           = false
   
   def contains(tile: Tile)    : Boolean = boundary.contains(tile) && tiles.contains(tile)
   def contains(pixel: Pixel)  : Boolean = contains(pixel.tileIncluding)

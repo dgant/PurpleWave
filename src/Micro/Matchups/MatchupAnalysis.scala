@@ -22,7 +22,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val frame  : Int   = conditions.framesAhead
   
   // Default is necessary for killing empty bases because no Battle is happening
-  private lazy val defaultUnits   : Vector[UnitInfo]      = if (me.canAttack) me.zone.units.toVector.filter(u => u.isEnemy && BattleClassificationFilters.isEligibleLocal(u)) else Vector.empty
+  private lazy val defaultUnits   : Vector[UnitInfo]      = if (me.canAttack) me.zone.units.filter(u => u.isEnemy && BattleClassificationFilters.isEligibleLocal(u)) else Vector.empty
   lazy val battle                 : Option[BattleLocal]   = me.battle.orElse(With.matchups.entrants.find(_._2.contains(me)).map(_._1))
   lazy val allUnits               : Vector[UnitInfo]      = battle.map(b => b.teams.flatMap(_.units) ++ With.matchups.entrants.getOrElse(b, Set.empty)).getOrElse(defaultUnits)
   lazy val enemies                : Vector[UnitInfo]      = allUnits.filter(_.isEnemyOf(me))

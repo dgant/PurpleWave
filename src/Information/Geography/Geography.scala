@@ -45,9 +45,11 @@ class Geography {
   private val ourBorderCache          = new Cache(() => ourZones.flatMap(_.edges).filter(_.zones.exists( ! _.owner.isFriendly)))
   
   def zoneByTile(tile: Tile): Zone = if (tile.valid) zoneByTileCacheValid(tile.i) else zoneByTileCacheInvalid(tile)
+  def baseByTile(tile: Tile): Option[Base] = if (tile.valid) baseByTileCacheValid(tile.i) else getBaseForTile(tile)
 
   private lazy val zoneByTileCacheValid = allTiles.map(tile =>
     zones.find(_.tiles.contains(tile)).getOrElse(getZoneForTile(tile)))
+  private lazy val baseByTileCacheValid = allTiles.map(getBaseForTile)
 
   private val zoneByTileCacheInvalid = new mutable.HashMap[Tile, Zone] {
     override def default(key: Tile): Zone = {
@@ -70,7 +72,9 @@ class Geography {
           .groupBy(x => x))(_._2.size)
       .map(_._1)
       .getOrElse(zones.minBy(_.centroid.tileDistanceSquared(tile)))
-  
+  private def getBaseForTile(tile: Tile): Option[Base] = ByOption.minBy(tile.zone.bases)(_.heart.tileDistanceSquared(tile))
+
+
   private def getSettlements: Vector[Base] = (Vector.empty
   ++ With.geography.bases.filter(_.units.exists(u => u.isOurs && u.unitClass.isBuilding))
   ++ With.units.ours

@@ -21,7 +21,7 @@ class GoalDefendZone extends GoalBasic {
   override def run() {
     lazy val base   = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.intelligence.mostBaselikeEnemyTile))
     lazy val choke  = zone.exit
-    lazy val walls  = zone.units.toSeq.filter(u =>
+    lazy val walls  = zone.units.filter(u =>
       u.isOurs
       && u.unitClass.isStaticDefense
       && (squad.enemies.isEmpty || squad.enemies.exists(u.canAttack)))
@@ -91,7 +91,7 @@ class GoalDefendZone extends GoalBasic {
   }
   
   def defendHeart(center: Pixel) {
-    val protectables = center.zone.units.toVector.filter(u => u.isOurs && u.unitClass.isBuilding && u.hitPoints < 300 && u.visibleToOpponents)
+    val protectables = center.zone.units.filter(u => u.isOurs && u.unitClass.isBuilding && u.hitPoints < 300 && u.visibleToOpponents)
     val protectRange = ByOption.max(protectables.map(_.pixelDistanceCenter(center))).getOrElse(32.0 * 8.0)
     squad.units.foreach(_.agent.intend(squad.client, new Intention {
       toTravel = Some(center)

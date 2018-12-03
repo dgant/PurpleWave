@@ -20,7 +20,12 @@ object TargetHeuristicPain extends TargetHeuristic {
     val distance        = unit.pixelDistanceEdge(candidate)
     val framesToKill    = candidate.totalHealth / Math.max(0.001, unit.dpfOnNextHitAgainst(candidate))
     val travelPixels    = Math.max(0.0, distance - unit.pixelRangeAgainst(candidate))
-    val firingPosition  = candidate.pixelCenter.project(unit.pixelCenter, unit.pixelRangeAgainst(candidate))
+    val firingPosition  = candidate.pixelCenter.project(
+      unit.pixelCenter,
+      unit.pixelRangeAgainst(candidate)
+      + unit.pixelDistanceCenter(candidate)
+      - unit.pixelDistanceEdge(candidate))
+
     val painStanding = threats
         .map(threat =>
           if (threat.inRangeToAttack(unit, firingPosition))

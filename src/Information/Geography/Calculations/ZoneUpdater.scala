@@ -64,7 +64,7 @@ object ZoneUpdater {
   
   def updateZone(zone: Zone) {
     zone.distanceGrid.initialize()
-    zone.units = With.units.all.filter(_.zone == zone)
+    zone.units = With.units.all.view.filter(_.zone == zone).toVector
     zone.bases.foreach(BaseUpdater.updateBase)
   
     val exitBuildings = zone.exit.map(exit =>

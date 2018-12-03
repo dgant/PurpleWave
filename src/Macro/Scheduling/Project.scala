@@ -16,7 +16,7 @@ object Project {
     unitClass: UnitClass,
     quantity: Int = 1,
     // Performance: Avoid creating an empty array if necessary
-    unitsInCycle: Array[UnitClass] = _): Int = {
+    unitsInCycle: Array[UnitClass] = null): Int = {
 
     val unitsOfClass          = With.units.ours.view.filter(_.isPrerequisite(unitClass))
     val unitsOfClassComplete  = unitsOfClass.count(_.complete)

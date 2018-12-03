@@ -12,13 +12,13 @@ import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, MeldArchons}
-import Planning.Predicates.Compound.{And, Check, Latch, Not}
+import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.{PvPOpen2GateDTExpand, PvPOpen4GateGoon}
+import Strategery.Strategies.Protoss.PvPOpen4GateGoon
 
 object PvPIdeas {
   
@@ -44,29 +44,19 @@ object PvPIdeas {
       new Or(
         new UnitsAtLeast(2, Protoss.Observer, complete = true),
         new Not(new EnemyHasShown(Protoss.DarkTemplar))),
-      // Are we obligated to move (or want to move out?
+      // Are we obligated to (or want to) move out?
       new Or(
+        new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
         new EnemyStrategy(With.fingerprints.cannonRush),
         new Employing(PvPOpen4GateGoon),
         new MiningBasesAtLeast(3),
         new EnemyBasesAtLeast(3),
         new SafeToMoveOut),
-      // Can we hurt them?
-      new Or(
-        new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
-        new SafeToMoveOut),
       // Don't mess with 4-Gates
       new Or(
-        new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),
-        new UnitsAtLeast(5, Protoss.Gateway, complete = true),
-        new Employing(PvPOpen2GateDTExpand),
-        new And(
-          new Employing(PvPOpen4GateGoon),
-          new Check(() => {
-            val deadCombatUnits = With.units.ever.filter(_.isAny(Protoss.Zealot, Protoss.Dragoon))
-            deadCombatUnits.count(_.isFriendly) < deadCombatUnits.size
-          })
-        ))),
+        new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
+        new UnitsAtLeast(4, Protoss.Gateway, complete = true),
+        new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)))),
     new Attack)
   
   class ReactToCannonRush extends If(

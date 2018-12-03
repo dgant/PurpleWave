@@ -13,6 +13,11 @@ object HeuristicMathMultiplicative extends HeuristicMath {
     heuristics    : Iterable[THeuristicWeight],
     candidate     : TCandidate)
       : Double = {
-    - heuristics.map(_.weighMultiplicatively(context, candidate)).product
+
+    var output = -1.0
+    for (h <- heuristics) {
+      output *= h.apply(context, candidate)
+    }
+    output
   }
 }

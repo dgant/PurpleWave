@@ -48,7 +48,7 @@ object EvaluatePlacements {
     candidate           : Tile,
     heuristicWeight     : PlacementHeuristicWeight)
       : Double =
-        heuristicWeight.weighMultiplicatively(
+        heuristicWeight.apply(
           buildingDescriptor,
           candidate)
 }

@@ -12,9 +12,11 @@ object EvaluateTargets {
   }
   
   def evaluate(unit: FriendlyUnitInfo, target: UnitInfo): Double = {
-    unit.agent.targetingProfile.weightedHeuristics
-      .map(_.weighMultiplicatively(unit, target))
-      .product
+    var output = 1.0
+    for (h <- unit.agent.targetingProfile.weightedHeuristics) {
+      output *= h.apply(unit, target)
+    }
+    output
   }
   
   def audit(unit: FriendlyUnitInfo): Seq[(UnitInfo, Double, Iterable[(Heuristic[FriendlyUnitInfo, UnitInfo], Double, Double)])] = {
@@ -25,7 +27,7 @@ object EvaluateTargets {
         unit.agent.targetingProfile.weightedHeuristics.map(h =>
         (
           h.heuristic,
-          h.weighMultiplicatively(unit, target),
+          h.apply(unit, target),
           h.heuristic.evaluate(unit, target)
         ))
       )

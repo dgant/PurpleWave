@@ -14,7 +14,7 @@ import scala.collection.mutable
 
 class Geography {
   lazy val mapArea            : TileRectangle         = TileRectangle(Tile(0, 0), Tile(With.mapTileWidth, With.mapTileHeight))
-  lazy val allTiles           : Array[Tile]           = mapArea.tiles.toArray
+  lazy val allTiles           : Array[Tile]           = mapArea.tiles.indices.map(new Tile(_)).toArray
   lazy val startBases         : Vector[Base]          = bases.filter(_.isStartLocation)
   lazy val startLocations     : Vector[Tile]          = With.game.getStartLocations.asScala.map(new Tile(_)).toVector
   lazy val zones              : Vector[Zone]          = ZoneBuilder.zones.toVector
@@ -44,30 +44,32 @@ class Geography {
   private val ourNaturalCache         = new Cache(() => bases.find(_.isNaturalOf.exists(_.owner.isUs)).getOrElse(bases.minBy(_.townHallTile.groundPixels(ourMain.townHallTile))))
   private val ourBorderCache          = new Cache(() => ourZones.flatMap(_.edges).filter(_.zones.exists( ! _.owner.isFriendly)))
   
-  def zoneByTile(tile: Tile): Zone = zoneByTileCache(tile)
-  private lazy val zoneByTileCache =
-    new mutable.HashMap[Tile, Zone] {
-      override def default(key: Tile): Zone = {
-        val zone: Zone = zones
-          .find(_.tiles.contains(key))
-          .orElse(
-            ByOption
-              .maxBy(
-                Spiral
-                  .points(8)
-                  .map(point => {
-                    val neighbor = key.add(point)
-                    if (neighbor.valid) zones.find(_.tiles.contains(neighbor)) else None
-                  })
-                  .filter(_.isDefined)
-                  .map(z => z.get)
-                  .groupBy(x => x))(_._2.size)
-              .map(_._1))
-          .getOrElse(zones.minBy(_.centroid.tileDistanceSquared(key)))
-        put(key, zone)
-        zone
-      }
+  def zoneByTile(tile: Tile): Zone = if (tile.valid) zoneByTileCacheValid(tile.i) else zoneByTileCacheInvalid(tile)
+
+  private lazy val zoneByTileCacheValid = allTiles.map(tile =>
+    zones.find(_.tiles.contains(tile)).getOrElse(getZoneForTile(tile)))
+
+  private val zoneByTileCacheInvalid = new mutable.HashMap[Tile, Zone] {
+    override def default(key: Tile): Zone = {
+      val zone: Zone = getZoneForTile(key)
+      put(key, zone)
+      zone
     }
+  }
+  private def getZoneForTile(tile: Tile): Zone =
+    ByOption
+      .maxBy(
+        Spiral
+          .points(8)
+          .map(point => {
+            val neighbor = tile.add(point)
+            if (neighbor.valid) zones.find(_.tiles.contains(neighbor)) else None
+          })
+          .filter(_.isDefined)
+          .map(z => z.get)
+          .groupBy(x => x))(_._2.size)
+      .map(_._1)
+      .getOrElse(zones.minBy(_.centroid.tileDistanceSquared(tile)))
   
   private def getSettlements: Vector[Base] = (Vector.empty
   ++ With.geography.bases.filter(_.units.exists(u => u.isOurs && u.unitClass.isBuilding))

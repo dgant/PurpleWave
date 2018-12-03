@@ -30,7 +30,8 @@ object Abuse extends ActionTechnique {
     if (other.isFriendly) return None
     if ( ! other.canAttack(unit)) return None
     if ( ! unit.canAttack(other)) return None
-    
+    if (other.gathering && other.pixelDistanceEdge(unit) > 32) return None
+
     lazy val deltaThreats = other.matchups.threats.size - unit.matchups.threats.size
     lazy val deltaSpeed = unit.topSpeed - other.topSpeed
     lazy val canOle = (

@@ -63,7 +63,7 @@ object PvPIdeas {
         new UnitsAtLeast(4, Protoss.Gateway, complete = true),
         new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)))),
     new Attack)
-  
+
   class ReactToCannonRush extends If(
     new EnemyStrategy(With.fingerprints.cannonRush),
     new Parallel(

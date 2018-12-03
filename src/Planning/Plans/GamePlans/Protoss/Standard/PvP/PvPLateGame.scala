@@ -12,7 +12,7 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMinin
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyCarriers, EnemyDarkTemplarLikely, SafeAtHome, SafeToMoveOut}
+import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.Protoss
@@ -87,7 +87,9 @@ class PvPLateGame extends GameplanModeTemplate {
     new FlipIf(
       new Latch(
         new Or(
+          new UnitsAtLeast(1, Protoss.CitadelOfAdun),
           new UnitsAtLeast(1, Protoss.TemplarArchives),
+          new Not(new EnemyRobo),
           new And(
             new UnitsAtLeast(1, Protoss.PhotonCannon),
             new UnitsAtLeast(8, Protoss.Zealot)))),

@@ -7,7 +7,6 @@ import Mathematics.Points.SpecificPoints
 import Mathematics.PurpleMath
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
-import Utilities.EnrichPixel._
 
 import scala.collection.mutable
 
@@ -52,12 +51,12 @@ class BattleClassifier {
   
   def trackPerformance() {
     estimationRuntimes.enqueue(With.framesSince(lastEstimationCompletion))
-    while (estimationRuntimes.sum > 24 * 30) estimationRuntimes.dequeue()
+    while (estimationRuntimes.sum > 24 * 2) estimationRuntimes.dequeue()
     lastEstimationCompletion = With.frame
   }
   
   def runClustering() {
-    clustering.enqueue(With.units.all.filter(BattleClassificationFilters.isEligibleLocal))
+    clustering.enqueue(With.units.playerOwned.filter(BattleClassificationFilters.isEligibleLocal))
     clustering.run()
   }
   

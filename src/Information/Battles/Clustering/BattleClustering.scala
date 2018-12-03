@@ -20,7 +20,7 @@ class BattleClustering {
   
   def clusters: Vector[Set[UnitInfo]] = clusterComplete.clusters
   
-  def enqueue(units: Traversable[UnitInfo]) {
+  def enqueue(units: Set[UnitInfo]) {
     nextUnits = units
   }
   

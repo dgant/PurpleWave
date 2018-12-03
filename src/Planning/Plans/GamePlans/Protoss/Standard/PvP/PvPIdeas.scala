@@ -52,6 +52,11 @@ object PvPIdeas {
         new MiningBasesAtLeast(3),
         new EnemyBasesAtLeast(3),
         new SafeToMoveOut),
+      // Can our army contend with theirs?
+      new Or(
+        new UnitsAtLeast(1, UnitMatchAnd(UnitMatchWarriors, UnitMatchNot(Protoss.Dragoon))),
+        new UpgradeComplete(Protoss.DragoonRange),
+        new Not(new EnemyHasUpgrade(Protoss.DragoonRange))),
       // Don't mess with 4-Gates
       new Or(
         new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),

@@ -259,14 +259,12 @@ class Architecture {
       .find(walkable)
       .getOrElse(zone.centroid)
   }
-  
+
+  private def isOurBuilder(u: UnitInfo) = u.isOurs && u.unitClass.isWorker
+
   private def recalculateBuilderAccess() {
-    val zonesWithBuilder = With.geography.zones.filter(_.units.exists(u => u.isOurs && u.unitClass.isWorker))
-    accessibleZones = With.geography.zones
-      .filter(zone =>
-        ! zone.unwalkable
-        && zonesWithBuilder.exists(builderZone =>
-          With.paths.zonePath(builderZone, zone).isDefined))
-      .toVector
+    val hasBuilder = With.geography.zones.filter(_.units.exists(isOurBuilder))
+    val accessible = With.geography.zones.filter(z => hasBuilder.exists(_.distanceGrid.get(z.centroid) < Int.MaxValue))
+    accessibleZones = (hasBuilder ++ accessible).distinct
   }
 }

@@ -29,7 +29,7 @@ class Zone(
   lazy val  tilesBuildable  : Array[Tile]         = { With.grids.buildableTerrain.initialize(); tiles.filter(With.grids.buildableTerrain.get).toArray }
   lazy val  maxMobility     : Int                 = ByOption.max(tiles.map(With.grids.mobilityGround.get)).getOrElse(0)
   lazy val  unwalkable      : Boolean             = ! tiles.exists(With.grids.walkable.get)
-  lazy val  distanceGrid        : GridGroundDistance  = new GridGroundDistance(if (bases.size == 1) bases.head.heart else centroid)
+  lazy val  distanceGrid    : GridGroundDistance  = new GridGroundDistance(if (bases.size == 1) bases.head.heart else centroid)
   
   lazy val exit: Option[Edge] = {
     if (edges.isEmpty)

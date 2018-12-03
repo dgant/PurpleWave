@@ -4,7 +4,8 @@ import Information.Grids.AbstractGrid
 import Mathematics.Points.Tile
 
 abstract class AbstractGridArray[T] extends AbstractGrid[T] {
-  
+
+  def rawValues: Array[T] = values
   protected var values: Array[T]
   private var initialized = false
   

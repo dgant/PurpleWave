@@ -7,6 +7,8 @@ import Performance.{Cache, UnitCounter}
 import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, HistoricalUnitInfo, UnitInfo}
 
+import scala.collection.mutable.ListBuffer
+
 class UnitTracker {
   
   private val friendlyUnitTracker = new FriendlyUnitTracker
@@ -43,15 +45,16 @@ class UnitTracker {
   
   def neutral: Set[ForeignUnitInfo] = foreignUnitTracker.neutralUnits
   
-  def inTileRadius(tile: Tile, tiles: Int): Seq[UnitInfo] = {
+  def inTileRadius(tile: Tile, tiles: Int): Vector[UnitInfo] = {
     inTiles(
       Circle
         .points(tiles)
         .view
-        .map(tile.add).filter(_.valid))
+        .map(tile.add)
+        .filter(_.valid))
   }
   
-  def inPixelRadius(pixel: Pixel, pixels: Int): Seq[UnitInfo] = {
+  def inPixelRadius(pixel: Pixel, pixels: Int): Vector[UnitInfo] = {
     val tile = pixel.tileIncluding
     val pixelsSquared = pixels * pixels
     inTiles(
@@ -63,12 +66,21 @@ class UnitTracker {
       .filter(_.pixelCenter.pixelDistanceSquared(pixel) <= pixelsSquared)
   }
   
-  def inRectangle(rectangle: TileRectangle): Seq[UnitInfo] = {
+  def inRectangle(rectangle: TileRectangle): Vector[UnitInfo] = {
     inTiles(rectangle.tiles)
   }
   
-  private def inTiles(tiles: Seq[Tile]) = {
+  private def inTiles(tiles: Seq[Tile]): Vector[UnitInfo] = {
+    val output = new ListBuffer[UnitInfo]
+    for (tile <- tiles) {
+      if (tile.valid) {
+        if (With.grids.units.rawValues(tile.i).nonEmpty) {
+          output ++= With.grids.units.rawValues(tile.i)
+        }
+      }
+    }
     tiles.view.flatMap(With.grids.units.get)
+    output.toVector
   }
   
   def update() {

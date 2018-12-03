@@ -39,7 +39,9 @@ class Zone(
       Some(edges.minBy(edge => With.geography.startLocations.map(_.groundPixels(edge.pixelCenter)).max))
   }
   
-  var units     : Vector[UnitInfo]  = Vector.empty
+  var units: Vector[UnitInfo]  = Vector.empty
+  var unitBuffer: mutable.ArrayBuffer[UnitInfo] = new mutable.ArrayBuffer[UnitInfo]()
+
   var owner     : PlayerInfo        = With.neutral
   var contested : Boolean           = false
   var walledIn  : Boolean           = false

@@ -17,6 +17,11 @@ object ZoneUpdater {
       With.grids.units.update()
     }
 
+    With.geography.zones.foreach(_.unitBuffer.clear())
+    for (unit <- With.units.all) {
+      unit.zone.unitBuffer += unit
+    }
+    With.geography.zones.foreach(z => z.units = z.unitBuffer.toVector)
     With.geography.zones.foreach(updateZone)
   
     if ( ! With.geography.naturalsSearched) {
@@ -64,12 +69,11 @@ object ZoneUpdater {
   
   def updateZone(zone: Zone) {
     zone.distanceGrid.initialize()
-    zone.units = With.units.all.view.filter(_.zone == zone).toVector
     zone.bases.foreach(BaseUpdater.updateBase)
   
     val exitBuildings = zone.exit.map(exit =>
-      With.units
-        .inTileRadius(exit.pixelCenter.tileIncluding, 10)
+      zone.units
+        .filter(_.pixelDistanceSquared(exit.pixelCenter) < 100)
         .filter(u => u.unitClass.isBuilding && ! u.flying))
       .getOrElse(List.empty)
   

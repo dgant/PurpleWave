@@ -28,12 +28,14 @@ class PvPOpeningIntoCarriers extends PvPStrategy {
 object PvPOpen1GateReaverExpand extends PvPOpeningIntoCarriers {
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.nexusFirst)
   override def entranceInverted: Boolean = false
+  override def entranceFlat: Boolean = false
 }
+
+object PvPOpen3GateRobo extends PvPOpeningIntoCarriers
 
 object PvPOpen2GateRobo extends PvPOpeningIntoCarriers
 
-object PvPOpen2Gate1012 extends PvPOpeningIntoCarriers {
-}
+object PvPOpen2Gate1012 extends PvPOpeningIntoCarriers
 
 object PvPOpen2Gate1012Goon extends PvPOpeningIntoCarriers {
   override def rushDistanceMaximum: Int = 5000

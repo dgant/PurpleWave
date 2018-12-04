@@ -15,7 +15,7 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeAtHome}
+import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, EnemyRobo, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
@@ -59,7 +59,12 @@ class PvP3GateGoon extends GameplanModeTemplate {
     new If(new SafeAtHome, new PumpWorkers(oversaturate = true), new PumpWorkers),
 
      new If(
-      new EnemyStrategy(With.fingerprints.fourGateGoon),
+       new Or(
+         new EnemyStrategy(With.fingerprints.fourGateGoon),
+         new And(
+           new Not(new EnemyRobo),
+           new Not(new SafeAtHome),
+           new UnitsAtLeast(7, Protoss.Dragoon))),
       new Parallel(
         new EjectScout,
         new Build(Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives)))),

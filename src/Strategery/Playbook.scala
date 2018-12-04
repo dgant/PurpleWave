@@ -57,6 +57,8 @@ object StrategyGroups {
     TvZEarly1RaxFEEconomic,
     TvZEarly1RaxFEConservative,
     TvZEarly2Rax,
+    PvPLateGame2BaseReaverCarrier_SpecificOpponents,
+    PvPLateGame2BaseReaverCarrier_SpecificMaps,
     MassPhotonCannon,
     CarriersWithNoDefense,
     ProxyDarkTemplar,
@@ -67,7 +69,7 @@ object StrategyGroups {
 }
 
 class TestingPlaybook extends EmptyPlaybook {
-  override lazy val forced: Seq[Strategy] = Seq()
+  override lazy val forced: Seq[Strategy] = Seq(PvPOpen3GateRobo)
   override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
 }

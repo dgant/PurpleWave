@@ -148,9 +148,9 @@ class Commander {
     
     // Mineral walk!
     if (unit.unitClass.isWorker
-      && ! unit.carryingMinerals
-      && ! unit.agent.toBuild.isDefined
       && With.strategy.map.forall(_.mineralWalkingOkay)
+      && unit.agent.toBuild.isEmpty
+      && ! unit.carryingMinerals
     ) {
       val from      = unit.pixelCenter
       val fromZone  = from.zone

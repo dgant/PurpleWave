@@ -77,9 +77,9 @@ class SafeToMoveOut extends Predicate {
       + carriersUs  * scoreCarrier
     )
     val scoreEnemy = (
-        dragoonsEnemy  * (if (rangeEnemy) scoreDragoon else 0.0)
-      + zealotsEnemy   * (if (speedEnemy) scoreSpeedlot else 0.0)
-      + archonsEnemy   * scoreArchon
+        dragoonsEnemy * (if (rangeEnemy) scoreDragoon else 0.0)
+      + zealotsEnemy  * (if (speedEnemy) scoreSpeedlot else 0.0)
+      + archonsEnemy  * scoreArchon
       + shuttlesEnemy * scoreShuttle
     )
     val output = scoreEnemy == 0 || scoreEnemy <= scoreUs * With.blackboard.aggressionRatio()

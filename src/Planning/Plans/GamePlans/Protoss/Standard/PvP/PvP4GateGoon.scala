@@ -1,5 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
+import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
@@ -9,9 +10,10 @@ import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.Latch
+import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones.{EnemiesAtLeast, MiningBasesAtLeast, UnitsAtLeast}
-import Planning.Predicates.Strategy.Employing
+import Planning.Predicates.Reactive.EnemyRobo
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen4GateGoon
@@ -39,7 +41,11 @@ class PvP4GateGoon extends GameplanModeTemplate {
         new EnemiesAtLeast(1, Protoss.PhotonCannon)),
       new RequireMiningBases(2)),
     new Pump(Protoss.Dragoon),
-    new Build(Get(Protoss.Forge)),
+    new If(
+      new And(
+        new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),
+        new Not(new EnemyRobo)),
+      new Build(Get(Protoss.Forge))),
     new RequireMiningBases(2)
   )
 }

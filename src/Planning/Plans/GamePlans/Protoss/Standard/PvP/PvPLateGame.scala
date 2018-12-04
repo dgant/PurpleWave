@@ -82,6 +82,10 @@ class PvPLateGame extends GameplanModeTemplate {
       Get(1, Protoss.CyberneticsCore),
       Get(Protoss.DragoonRange)),
 
+    new If(
+      new Not(new EnemyCarriers),
+      new UpgradeContinuously(Protoss.ZealotSpeed)),
+
     new Build(Get(3, Protoss.Gateway)),
     new BuildGasPumps,
     new FlipIf(
@@ -135,9 +139,6 @@ class PvPLateGame extends GameplanModeTemplate {
       new BuildCannonsAtBases(1)),
 
     new If(
-      new Not(new EnemyCarriers),
-      new UpgradeContinuously(Protoss.ZealotSpeed)),
-    new If(
       new Or(
         new UnitsAtLeast(3, Protoss.Dragoon),
         new And(
@@ -148,7 +149,9 @@ class PvPLateGame extends GameplanModeTemplate {
     new PvPIdeas.TakeBase2,
 
     new If(
-      new Check(() => With.blackboard.keepingHighTemplar.get),
+      new And(
+        new UnitsAtLeast(8, UnitMatchWarriors),
+        new Check(() => With.blackboard.keepingHighTemplar.get)),
       new Build(Get(Protoss.PsionicStorm))),
 
     new PvPIdeas.TakeBase3,

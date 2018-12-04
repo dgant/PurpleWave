@@ -38,6 +38,7 @@ object FightOrFlight extends Action {
     decide(false, "Drained",    () => ! unit.canAttack && unit.energyMax > 0 && ! unit.unitClass.spells.forall(s => s.energyCost > unit.energy || ! With.self.hasTech(s)))
     decide(true,  "Scourge",    () => unit.is(Zerg.Scourge) && unit.matchups.targets.exists(target => target.canAttack(unit) && target.matchups.targetsInRange.nonEmpty))
     decide(false, "Disrupted",  () => unit.underDisruptionWeb && ! unit.flying)
+    decide(false, "Hazard",     () => { val o = With.coordinator.gridPathOccupancy.get(unit.tileIncludingCenter); o > 0 && o + unit.unitClass.sqrtArea > 24 })
     decide(true,  "Hodor",      () => unit.matchups.alliesInclSelf.forall(_.base.exists(_.isOurMain)) && unit.matchups.threats.exists(_.base.exists(_.isOurMain)) && unit.matchups.threats.exists(!_.base.exists(_.isOurMain)))
     decide(false, "Swarmed",    () => unit.underDarkSwarm && ! unit.unitClass.unaffectedByDarkSwarm && unit.matchups.targetsInRange.forall(t => ! t.flying || t.underDarkSwarm))
     decide(true,  "Workers",    () => unit.matchups.allies.exists(u => u.friendly.isDefined && {
@@ -69,7 +70,7 @@ object FightOrFlight extends Action {
       && ally.unitClass.topSpeed <= Protoss.HighTemplar.topSpeed
       && (ally.subjectiveValue > unit.subjectiveValue || ally.unitClass.isBuilding)
       && (ally.matchups.targetsInRange.nonEmpty || ( ! ally.canAttack && ally.matchups.enemies.exists(_.pixelDistanceEdge(ally) < ally.effectiveRangePixels)))
-      && ally.matchups.framesOfSafety <= unit.matchups.framesOfSafety))
+      && ally.matchups.framesOfSafety <= unit.matchups.framesOfSafety + 24))
   
     if (decision.isDefined) {
       unit.agent.shouldEngage = decision.get

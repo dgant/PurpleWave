@@ -2,7 +2,8 @@ package Micro.Squads.Goals
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
-import Mathematics.Formations.{FormationAssigned, Formations}
+import Mathematics.Formations.Designers.FormationArc
+import Mathematics.Formations.FormationAssigned
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Mathematics.PurpleMath
 import Micro.Agency.{Intention, Leash}
@@ -134,12 +135,7 @@ class GoalDefendZone extends GoalBasic {
   }
   
   def concave(start: Pixel, end: Pixel, origin: Pixel) {
-    val formation =
-      Formations.concave(
-        squad.units,
-        start,
-        end,
-        origin)
+    val formation = new FormationArc(start, end, origin).form(squad.units.toSeq)
   }
 
   def assignToFormation(formation: FormationAssigned): Unit = {

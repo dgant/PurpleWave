@@ -1,7 +1,7 @@
 package Information.Geography.Types
 
 import Lifecycle.With
-import Mathematics.Formations.BaseFormation
+import Mathematics.Formations.Designers.FormationBase
 import Mathematics.Points.{Tile, TileRectangle}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
@@ -13,7 +13,7 @@ class Base(val townHallTile: Tile)
   lazy val  townHallArea    : TileRectangle     = Protoss.Nexus.tileArea.add(townHallTile)
   lazy val  isStartLocation : Boolean           = With.geography.startLocations.exists(_ == townHallTile)
   lazy val  isOurMain       : Boolean           = With.geography.ourMain == this
-  lazy val  formations      : BaseFormation     = new BaseFormation(this)
+  lazy val  formations      : FormationBase     = new FormationBase(this)
   var       isNaturalOf     : Option[Base]      = None
   var       townHall        : Option[UnitInfo]  = None
   var       harvestingArea  : TileRectangle     = townHallArea

@@ -1,11 +1,12 @@
-package Mathematics.Formations
+package Mathematics.Formations.Designers
 
 import Information.Geography.Types.Zone
+import Mathematics.Formations.FormationAssigned
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable.ArrayBuffer
 
-class ZoneFormation(zone: Zone) extends FormationDesigner {
+class FormationZone(zone: Zone) extends FormationDesigner {
 
   def zoneScore(someZone: Zone, rangedUnits: Boolean): Double = {
     val exitWidth = Math.max(1.0, someZone.exit.map(_.radiusPixels).getOrElse(1.0))
@@ -39,7 +40,7 @@ class ZoneFormation(zone: Zone) extends FormationDesigner {
     val shouldArc = zone.centroid.altitudeBonus > exit.otherSideof(zone).centroid.altitudeBonus
 
     //if (shouldArc) {
-      return Formations.concave(units, exit.sidePixels.head, exit.sidePixels.last, zone.centroid.pixelCenter)
+      new FormationArc(exit.sidePixels.head, exit.sidePixels.last, zone.centroid.pixelCenter).form(units)
     //}
   }
 }

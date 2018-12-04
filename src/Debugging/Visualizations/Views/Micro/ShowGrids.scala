@@ -9,8 +9,12 @@ import Mathematics.Points.TileRectangle
 object ShowGrids extends View {
   
   override def renderMap() {
-    //val distanceGrid = With.units.ours.find(_.selected).map(_.agent.origin.zone).getOrElse(With.geography.home.zone).distanceGrid
-    renderGridArray(With.coordinator.gridPathOccupancy, 0, 1)
+    val distanceGridZone = With.units.ours.find(_.selected).map(_.agent.origin.zone).getOrElse(With.geography.home.zone)
+    val distanceGrid = distanceGridZone.distanceGrid
+    val exitGrid = distanceGridZone.exitDistanceGrid
+    renderGridArray(distanceGrid, 0, 0)
+    renderGridArray(exitGrid, 0, 1)
+    renderGridArray(With.coordinator.gridPathOccupancy, 1, 1)
   }
   
   private def renderGridArray[T](map: AbstractGrid[T], offsetX: Int = 0, offsetY: Int = 0) {

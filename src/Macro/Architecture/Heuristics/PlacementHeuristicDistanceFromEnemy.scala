@@ -7,26 +7,22 @@ import Mathematics.Points.Tile
 object PlacementHeuristicDistanceFromEnemy extends PlacementHeuristic {
   
   override def evaluate(blueprint: Blueprint, candidate: Tile): Double = {
-  
-    val enemyBases =
-    if (With.geography.enemyBases.isEmpty)
+
+    var seedTiles = With.geography.enemyBases.map(_.heart)
+    if (seedTiles.isEmpty) {
       With.geography.startBases.filterNot(_.owner.isUs)
-    else
-      With.geography.enemyBases
+    }
+    if (seedTiles.isEmpty) {
+      seedTiles = Vector(With.intelligence.mostBaselikeEnemyTile)
+    }
+
+    val distanceMin = seedTiles
+      .map(_.zone.distanceGrid.get(
+        candidate.add(
+          blueprint.widthTiles.get / 2,
+          blueprint.heightTiles.get / 2)))
+      .min
     
-    var totalDistance = 0.0
-    enemyBases.foreach(base => {
-      val from = base.townHallArea.midPixel
-      val to = candidate.pixelCenter
-  
-      // Performance optimization.
-      if (blueprint.requireTownHallTile.get || blueprint.building.exists(_.dealsDamage)) {
-        totalDistance += from.zone.distancePixels(to.zone)
-      }
-      
-      totalDistance += from.pixelDistance(to)
-    })
-    
-    Math.max(128.0, totalDistance)
+    Math.max(128.0, 32 * distanceMin)
   }
 }

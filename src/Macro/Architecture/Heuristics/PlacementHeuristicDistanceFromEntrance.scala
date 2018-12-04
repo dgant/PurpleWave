@@ -1,18 +1,17 @@
 package Macro.Architecture.Heuristics
 
-import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Mathematics.Points.Tile
-import Utilities.ByOption
 
 object PlacementHeuristicDistanceFromEntrance extends PlacementHeuristic {
   
   override def evaluate(blueprint: Blueprint, candidate: Tile): Double = {
-    val zone      = candidate.zone
-    val entrances = zone.edges.filter(edge => edge.otherSideof(zone).exit.contains(edge))
-    val distances = entrances.map(_.pixelCenter.pixelDistance(With.geography.home.pixelCenter))
-    val distance  = ByOption.min(distances).getOrElse(0.0)
-    val output    = Math.max(32.0, distance)
+    val output = 32 * Math.max(
+      1.0,
+      candidate.zone.exitDistanceGrid.get(
+        candidate.add(
+          blueprint.widthTiles.get / 2,
+          blueprint.heightTiles.get / 2)))
     output
   }
 }

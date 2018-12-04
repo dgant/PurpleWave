@@ -10,6 +10,9 @@ import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
 import bwapi.Position
 
 class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(originalBaseUnit, id) {
+
+  // Update foreign units
+  // Lots of shortcuts are taken here to avoid unnecessary updates
   
   override val foreign: Option[ForeignUnitInfo] = Some(this)
   
@@ -55,7 +58,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
     _hitPoints          = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxHitPoints  else _hitPoints     else baseUnit.getHitPoints
     _shieldPoints       = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxShields    else _shieldPoints  else baseUnit.getShields
     _pixelCenter        = new Pixel(baseUnit.getPosition)
-    _tileTopLeft        = new Tile(baseUnit.getTilePosition)
+    _tileTopLeft        = _pixelCenter.subtract(unitClass.dimensionLeft, unitClass.dimensionUp).tileNearest
   }
   
   private def updateTracking() {
@@ -304,15 +307,15 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
     _remainingTrainFrames   = if (unitClass.trainsUnits) baseUnit.getRemainingTrainTime else 0
     _remainingUpgradeFrames = if (unitClass.upgradesWhat.nonEmpty) baseUnit.getRemainingUpgradeTime else 0
     _remainingTechFrames    = if (unitClass.techsWhat.nonEmpty) baseUnit.getRemainingResearchTime else 0
-    _beingConstructed       = ! player.isNeutral && baseUnit.isBeingConstructed
-    _beingGathered          = ! player.isNeutral && baseUnit.isBeingGathered
-    _beingHealed            = ! player.isNeutral && baseUnit.isBeingHealed
-    _blind                  = ! player.isNeutral && baseUnit.isBlind
+    _beingConstructed       = ! player.isNeutral && unitClass.isBuilding && ! complete && (! unitClass.isTerran || baseUnit.isBeingConstructed)
+    _beingGathered          = ! player.isNeutral && unitClass.isResource && baseUnit.isBeingGathered
+    _beingHealed            = ! player.isNeutral && unitClass.isOrganic && baseUnit.isBeingHealed
+    _blind                  = ! player.isNeutral && ! unitClass.isBuilding && baseUnit.isBlind
     _carryingMinerals       = unitClass.isWorker && baseUnit.isCarryingMinerals
-    _carryingGas            = unitClass.isWorker && baseUnit.isCarryingGas
+    _carryingGas            = unitClass.isWorker && ! carryingMinerals && baseUnit.isCarryingGas
     _powered                = unitClass.requiresPsi && baseUnit.isPowered
-    _selected               = false
-    _targetable             = baseUnit.isTargetable
+    _selected               = false && baseUnit.isSelected
+    _targetable             = true || baseUnit.isTargetable // Shortcut for performance; we don't use this anyway
     _underAttack            = ! player.isNeutral && baseUnit.isUnderAttack
     _underDarkSwarm         = ! player.isNeutral && baseUnit.isUnderDarkSwarm
     _underDisruptionWeb     = ! player.isNeutral && baseUnit.isUnderDisruptionWeb

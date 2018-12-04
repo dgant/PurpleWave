@@ -41,7 +41,7 @@ object BaseUpdater {
   }
   
   private def updateAssets(base: Base) {
-    base.units          = base.zone.units.filter(_.base.contains(base)).toVector
+    base.units          = base.zone.units.filter(_.base.contains(base))
     base.townHall       = ByOption.minBy(base.units.filter(u => u.unitClass.isTownHall && ! u.flying))(_.tileTopLeft.tileDistanceManhattan(base.townHallTile))
     base.minerals       = base.units.filter(u => u.mineralsLeft > 0 && ! u.isMineralBlocker)
     base.gas            = base.units.filter(_.unitClass.isGas)
@@ -49,7 +49,7 @@ object BaseUpdater {
     base.defenders      = base.units.filter(u => u.player == base.owner && u.unitClass.rawCanAttack)
     base.mineralsLeft   = base.minerals.iterator.map(_.mineralsLeft).sum
     base.gasLeft        = base.gas.iterator.map(_.gasLeft).sum
-    base.harvestingArea = (Vector(base.townHallArea) ++ (base.minerals.toSeq.filter(_.mineralsLeft > With.configuration.blockerMineralThreshold) ++ base.gas).map(_.tileArea)).boundary
+    base.harvestingArea = (Vector(base.townHallArea) ++ (base.minerals.filter(_.mineralsLeft > With.configuration.blockerMineralThreshold) ++ base.gas).map(_.tileArea)).boundary
     base.heart          = base.harvestingArea.midpoint
   }
 }

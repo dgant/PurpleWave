@@ -38,10 +38,10 @@ object FightOrFlight extends Action {
     decide(false, "Drained",    () => ! unit.canAttack && unit.energyMax > 0 && ! unit.unitClass.spells.forall(s => s.energyCost > unit.energy || ! With.self.hasTech(s)))
     decide(true,  "Scourge",    () => unit.is(Zerg.Scourge) && unit.matchups.targets.exists(target => target.canAttack(unit) && target.matchups.targetsInRange.nonEmpty))
     decide(false, "Disrupted",  () => unit.underDisruptionWeb && ! unit.flying)
-    decide(false, "Hazard",     () => { val o = With.coordinator.gridPathOccupancy.get(unit.tileIncludingCenter); o > 0 && o + unit.unitClass.sqrtArea > 24 })
-    decide(true,  "Hodor",      () => unit.matchups.alliesInclSelf.forall(_.base.exists(_.isOurMain)) && unit.matchups.threats.exists(_.base.exists(_.isOurMain)) && unit.matchups.threats.exists(!_.base.exists(_.isOurMain)))
     decide(false, "Swarmed",    () => unit.underDarkSwarm && ! unit.unitClass.unaffectedByDarkSwarm && unit.matchups.targetsInRange.forall(t => ! t.flying || t.underDarkSwarm))
-    decide(true,  "Workers",    () => unit.matchups.allies.exists(u => u.friendly.isDefined && {
+    decide(true,  "Hodor",      () => unit.matchups.alliesInclSelf.forall(_.base.exists(_.isOurMain)) && unit.matchups.threats.exists(_.base.exists(_.isOurMain)) && unit.matchups.threats.exists(!_.base.exists(_.isOurMain)))
+
+    decide(true, "Workers", () => unit.matchups.allies.exists(u => u.friendly.isDefined && {
       val ally = u.friendly.get
       val base = u.base.filter(_.owner.isUs)
       val output = (
@@ -54,6 +54,18 @@ object FightOrFlight extends Action {
       )
       output
     }))
+
+    decide(false, "Hazard", () => {
+      val occupancy = With.coordinator.gridPathOccupancy.get(unit.tileIncludingCenter)
+      (
+        ! unit.flying
+          && occupancy > 0
+          && occupancy + unit.unitClass.sqrtArea > 24
+          && unit.matchups.allies.exists(ally =>
+            ! ally.flying
+            && ! ally.friendly.exists(_.agent.shouldEngage)
+            && ally.pixelDistanceEdge(unit) < 32))
+    })
     /*
     decide(false, "Stand", () =>
       unit.agent.toForm.exists(form =>

@@ -175,7 +175,9 @@ object PvPIdeas {
         new SafeAtHome,
         new UnitsAtLeast(8, UnitMatchWarriors, complete = true)),
       new UnitsAtLeast(16, UnitMatchWarriors, complete = true)),
-    new RequireMiningBases(2))
+    new Parallel(
+      new Build(Get(2, Protoss.Gateway)),
+      new RequireMiningBases(2)))
 
   class TakeBase3 extends If(
     new And(
@@ -187,7 +189,9 @@ object PvPIdeas {
           new Or(
             new EnemyCarriers,
             new EnemyBasesAtLeast(3))))),
-    new RequireMiningBases(3))
+    new Parallel(
+      new Build(Get(7, Protoss.Gateway)),
+      new RequireMiningBases(3)))
 
   class MeldArchonsPvP extends MeldArchons(24) {
     override def minimumArchons: Int = Math.min(6, With.units.countEnemy(Protoss.Zealot) / 3)
@@ -267,8 +271,7 @@ object PvPIdeas {
     new If(
       new Or(
         new EnemyDarkTemplarLikely,
-        new BasesAtLeast(2),
-        new SafeAtHome),
+        new BasesAtLeast(2)),
       new Pump(Protoss.Observer, 2))
   )
 }

@@ -2,9 +2,8 @@ package Mathematics.Formations
 
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitClasses.UnitClass
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 object Formations {
@@ -15,21 +14,18 @@ object Formations {
     targetEnd   : Pixel,
     origin      : Pixel)
       : FormationAssigned = {
-    
-    val formationSlots = new mutable.HashMap[UnitClass, ListBuffer[Pixel]]
-    
+
+    val formationSlots = units
+      .map(_.unitClass)
+      .toSet[UnitClass]
+      .map(uc => (uc, new ListBuffer[Pixel]))
+      .toMap
+
     Concave
       .static(units, targetStart, targetEnd, origin)
       .groupBy(_.unitClass)
-      .foreach(pair => {
-        if (!formationSlots.contains(pair._1)) {
-          formationSlots.put(pair._1, new ListBuffer[Pixel])
-        }
-        pair._2.map(_.pixelAfter).foreach(pixel => formationSlots(pair._1).append(pixel))
-      })
-  
-    val center = targetStart.midpoint(targetEnd)
+      .foreach(pair =>  pair._2.map(_.pixelAfter).foreach(pixel => formationSlots(pair._1).append(pixel)))
 
-    new FormationUnassigned(formationSlots.toMap).assign(units)
+    new FormationUnassigned(formationSlots).assign(units)
   }
 }

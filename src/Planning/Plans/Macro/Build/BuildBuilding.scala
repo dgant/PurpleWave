@@ -6,10 +6,11 @@ import Macro.Architecture.Blueprint
 import Macro.Scheduling.Project
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
+import Planning.Plan
 import Planning.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.UnitCountOne
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchCustom}
 import Planning.UnitPreferences.UnitPreferCloseAndNotMining
-import Planning.Plan
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -81,6 +82,16 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     currencyLock.acquire(this)
     if ( ! needBuilder) {
       return
+    }
+
+    val nearbyGatherers = desiredTile.map(_.zone.friendlyGatherers).getOrElse(Set.empty)
+    if (nearbyGatherers.size > 5 && nearbyGatherers.exists(builderMatcher.accept)) {
+      builderLock.unitMatcher.set(UnitMatchAnd(
+        UnitMatchCustom(_.friendly.exists(nearbyGatherers.contains)),
+        builderMatcher
+      ))
+    } else {
+      builderLock.unitMatcher.set(builderMatcher)
     }
   
     // When building placement changes we want a builder closer to the new placement

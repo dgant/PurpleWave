@@ -1,5 +1,6 @@
 package Information.Intelligenze.Fingerprinting
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Information.Intelligenze.Fingerprinting.ProtossStrategies._
 import Information.Intelligenze.Fingerprinting.ZergStrategies._
 import Lifecycle.With
@@ -29,7 +30,9 @@ class Fingerprints {
       twelvePool
       twelveHatch
     }
-    all.foreach(_.update())
+    if (With.frame < GameTime(10, 0)()) {
+      all.foreach(_.update())
+    }
   }
   
   val all: mutable.ArrayBuffer[Fingerprint] = new mutable.ArrayBuffer[Fingerprint]

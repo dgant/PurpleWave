@@ -5,7 +5,7 @@ import Macro.Architecture.Blueprint
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.EjectScout
 import Planning.Plans.Basic.NoPlan
-import Planning.Plans.Compound.{If, Or, Parallel}
+import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackWithDarkTemplar
@@ -40,7 +40,7 @@ class PvP3GateGoon extends GameplanModeTemplate {
     new PvPIdeas.ReactToDarkTemplarEmergencies,
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToProxyGateways,
-    new PvPIdeas.ReactToFFE)
+    new Trigger(new UnitsAtLeast(1, Protoss.Reaver), new PvPIdeas.ReactToFFE))
   
   override val buildOrder: Seq[BuildRequest] = ProtossBuilds.Opening_3GateDragoon
   

@@ -81,7 +81,8 @@ object FightOrFlight extends Action {
       && (ally.canAttack || (ally.unitClass.rawCanAttack && ally.unitClass.isBuilding) || ally.is(Zerg.CreepColony))
       && ally.unitClass.topSpeed <= Protoss.HighTemplar.topSpeed
       && (ally.subjectiveValue > unit.subjectiveValue || ally.unitClass.isBuilding)
-      && (ally.matchups.targetsInRange.nonEmpty || ( ! ally.canAttack && ally.matchups.enemies.exists(_.pixelDistanceEdge(ally) < ally.effectiveRangePixels)))
+      // Disabling to try to avoid abandoning Reavers
+      // && (ally.matchups.targetsInRange.nonEmpty || ( ! ally.canAttack && ally.matchups.enemies.exists(_.pixelDistanceEdge(ally) < ally.effectiveRangePixels)))
       && ally.matchups.framesOfSafety <= unit.matchups.framesOfSafety + 24))
   
     if (decision.isDefined) {

@@ -124,6 +124,9 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   def groundPixels(other: Tile): Double = {
     With.paths.groundPixels(pixelCenter, other.pixelCenter)
   }
+  def altitudeBonus: Double = {
+    With.grids.altitudeBonus.get(this)
+  }
   def toRectangle: TileRectangle = {
     TileRectangle(this, this.add(1, 1))
   }

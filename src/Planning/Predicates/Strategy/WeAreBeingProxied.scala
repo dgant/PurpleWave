@@ -8,7 +8,7 @@ class WeAreBeingProxied extends Predicate {
   
   override def isComplete: Boolean = {
     With.units.enemy.exists(unit => {
-      lazy val isBuilding     = unit.unitClass.isBuilding
+      lazy val scaryBuilding  = unit.unitClass.isBuilding && ! unit.unitClass.isGas
       lazy val tileBuilding   = unit.tileIncludingCenter
       lazy val tileComparison = With.geography.enemyBases.headOption
         .orElse(ByOption.maxBy(With.geography.startBases.filterNot(_.owner.isUs))(_.heart.tileDistanceFast(With.geography.home)))
@@ -17,7 +17,7 @@ class WeAreBeingProxied extends Predicate {
       lazy val distanceEnemy  = tileComparison.map(_.tileDistanceSquared(tileBuilding)).getOrElse(0)
       lazy val closerToUs     = distanceUs < distanceEnemy
       
-      isBuilding && closerToUs
+      scaryBuilding && closerToUs
     })
   }
 }

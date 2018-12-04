@@ -3,9 +3,10 @@ package Information.Geography.Types
 import Information.Geography.Pathfinding.ZonePath
 import Information.Grids.Movement.GridGroundDistance
 import Lifecycle.With
+import Mathematics.Formations.ZoneFormation
 import Mathematics.Points.{Pixel, PixelRay, Tile, TileRectangle}
 import ProxyBwapi.Players.PlayerInfo
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 import bwta.Region
 
@@ -30,20 +31,16 @@ class Zone(
   lazy val  maxMobility       : Int                 = ByOption.max(tiles.map(With.grids.mobilityGround.get)).getOrElse(0)
   lazy val  unwalkable        : Boolean             = ! tiles.exists(With.grids.walkable.get)
   lazy val  distanceGrid      : GridGroundDistance  = new GridGroundDistance(if (bases.size == 1) bases.head.heart else centroid)
+  lazy val  formation         : ZoneFormation       = new ZoneFormation(this)
 
   lazy val exitDistanceGrid: GridGroundDistance = new GridGroundDistance(
     exit.map(e => PixelRay(e.sidePixels.head, e.sidePixels.last).tilesIntersected).getOrElse(Array(centroid)): _*)
   
-  lazy val exit: Option[Edge] = {
-    if (edges.isEmpty)
-      None
-    else
-      // Uses ground distance, but seems to work okay
-      Some(edges.minBy(edge => With.geography.startLocations.map(_.groundPixels(edge.pixelCenter)).max))
-  }
+  lazy val exit: Option[Edge] = ByOption.minBy(edges)(edge => With.geography.startLocations.map(_.groundPixels(edge.pixelCenter)).max)
   
   var units: Vector[UnitInfo]  = Vector.empty
   var unitBuffer: mutable.ArrayBuffer[UnitInfo] = new mutable.ArrayBuffer[UnitInfo]()
+  var friendlyGatherers: Set[FriendlyUnitInfo] = Set.empty
 
   var owner     : PlayerInfo        = With.neutral
   var contested : Boolean           = false

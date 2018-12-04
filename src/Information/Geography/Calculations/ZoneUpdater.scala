@@ -21,7 +21,6 @@ object ZoneUpdater {
     for (unit <- With.units.all) {
       unit.zone.unitBuffer += unit
     }
-    With.geography.zones.foreach(z => z.units = z.unitBuffer.toVector)
     With.geography.zones.foreach(updateZone)
   
     if ( ! With.geography.naturalsSearched) {
@@ -68,7 +67,10 @@ object ZoneUpdater {
   }
   
   def updateZone(zone: Zone) {
+    zone.units = zone.unitBuffer.toVector
+    zone.friendlyGatherers = zone.units.view.flatMap(_.friendly).filter(_.agent.toGather.isDefined).toSet
     zone.distanceGrid.initialize()
+    zone.exitDistanceGrid.initialize()
     zone.bases.foreach(BaseUpdater.updateBase)
   
     val exitBuildings = zone.exit.map(exit =>

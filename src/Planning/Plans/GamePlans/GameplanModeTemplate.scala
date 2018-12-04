@@ -2,8 +2,8 @@ package Planning.Plans.GamePlans
 
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.BuildRequest
-import Planning.Predicates.Compound.Not
-import Planning.Plan
+import Planning.Predicates.Compound.{Check, Not}
+import Planning.{Plan, Yolo}
 import Planning.Plans.Army.{RecruitFreelancers, _}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.If
@@ -50,6 +50,7 @@ abstract class GameplanModeTemplate extends GameplanMode {
     new RemoveMineralBlocksAt(removeMineralBlocksAt))
   
   def defaultTacticsPlans: Vector[Plan] = Vector(
+    new If(new Check(() => Yolo.active), new Attack),
     defaultAggressionPlan,
     priorityDefensePlan,
     priorityAttackPlan,

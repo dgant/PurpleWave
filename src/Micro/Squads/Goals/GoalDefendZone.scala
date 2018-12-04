@@ -1,8 +1,8 @@
 package Micro.Squads.Goals
 
-import Information.Geography.Types.{Edge, Zone}
+import Information.Geography.Types.Zone
 import Lifecycle.With
-import Mathematics.Formations.Formation
+import Mathematics.Formations.{Formation, Formations}
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Mathematics.PurpleMath
 import Micro.Agency.{Intention, Leash}
@@ -41,7 +41,7 @@ class GoalDefendZone extends GoalBasic {
     }
     else if (allowWandering && canDefendChoke) {
       lastAction = "Protect choke of "
-      defendChoke(choke.get)
+      defendChoke()
     }
     else {
       lastAction = "Protect heart of "
@@ -114,8 +114,8 @@ class GoalDefendZone extends GoalBasic {
     defendLine(concaveStart, concaveEnd)
   }
   
-  def defendChoke(choke: Edge) {
-    defendLine(choke.sidePixels.head, choke.sidePixels.last)
+  def defendChoke() {
+    assignToFormation(zone.formation.form(squad.units.toSeq))
   }
   
   def defendLine(from: Pixel, to: Pixel) {
@@ -135,19 +135,21 @@ class GoalDefendZone extends GoalBasic {
   
   def concave(start: Pixel, end: Pixel, origin: Pixel) {
     val formation =
-      Formation.concave(
+      Formations.concave(
         squad.units,
         start,
         end,
         origin)
-  
+  }
+
+  def assignToFormation(formation: Formation): Unit = {
     squad.units.foreach(
       defender => {
-        val spot = formation(defender)
+        val spot = formation.placements.get(defender)
         defender.agent.intend(squad.client, new Intention {
-          toForm    = Some(spot)
-          toReturn  = Some(spot)
-          toTravel  = Some(spot) })
+          toForm    = spot
+          toReturn  = spot
+          toTravel  = spot.orElse(Some(zone.centroid.pixelCenter)) })
       })
   }
   

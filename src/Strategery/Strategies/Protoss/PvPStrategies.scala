@@ -26,7 +26,7 @@ class PvPOpeningIntoCarriers extends PvPStrategy {
 }
 
 object PvPOpen1GateReaverExpand extends PvPOpeningIntoCarriers {
-  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.nexusFirst)
+  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.nexusFirst, With.fingerprints.fourGateGoon)
   override def entranceInverted: Boolean = false
   override def entranceFlat: Boolean = false
 }

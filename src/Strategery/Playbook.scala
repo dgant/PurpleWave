@@ -64,7 +64,8 @@ object StrategyGroups {
     ProxyDarkTemplar,
     FivePoolProxySunkens,
     PvPOpen2GateRobo,
-    PvPOpen2Gate1012
+    PvPOpen2Gate1012,
+    PvPOpen1GateReaverExpand
   )
 }
 

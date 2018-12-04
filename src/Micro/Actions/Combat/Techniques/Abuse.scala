@@ -57,7 +57,7 @@ object Abuse extends ActionTechnique {
       Attack.delegate(unit)
       if (unit.agent.toAttack.isEmpty) return
     }
-    if (unit.matchups.framesOfSafety < GameTime(0, 2)()) {
+    if (unit.matchups.framesOfSafety < GameTime(0, 1)()) {
       Avoid.delegate(unit)
     }
   }

@@ -87,7 +87,7 @@ object Avoid extends ActionTechnique {
         // We're stuck. Just go home.
         Some(unit.agent.origin)
       } else {
-        if (ShowUnitsFriendly.inUse) {
+        if (ShowUnitsFriendly.inUse && With.visualization.map) {
           for (i <- 0 until path.length - 1) {
             DrawMap.arrow(path(i).pixelCenter, path(i + 1).pixelCenter, Colors.DarkTeal)
           }

@@ -3,5 +3,5 @@ package Mathematics.Formations
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 trait FormationDesigner {
-  def form(units: Seq[FriendlyUnitInfo]): Formation
+  def form(units: Seq[FriendlyUnitInfo]): FormationAssigned
 }

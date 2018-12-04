@@ -5,7 +5,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class BaseFormation(base: Base) extends FormationDesigner {
 
-  def form(units: Seq[FriendlyUnitInfo]): Formation = {
+  def form(units: Seq[FriendlyUnitInfo]): FormationAssigned = {
     base.zone.formation.form(units)
   }
 }

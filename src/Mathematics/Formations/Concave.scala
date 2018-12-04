@@ -1,6 +1,7 @@
 package Mathematics.Formations
 
 import Lifecycle.With
+import Mathematics.Formations.Arcs.{Arc, ArcPlacementState}
 import Mathematics.Points.{Pixel, SpecificPoints}
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -18,9 +19,8 @@ object Concave {
     val centerToArcRadians = List(
       targetRadians - Math.PI / 2.0,
       targetRadians + Math.PI / 2.0)
-        .sortBy(radians => -  targetCenter.radiateRadians(radians, 128.0).pixelDistance(SpecificPoints.middle))
-        .sortBy(radians =>    targetCenter.radiateRadians(radians, 128.0).zone != origin.zone)
-        .head
+      .sortBy(radians => -targetCenter.radiateRadians(radians, 128.0).pixelDistance(SpecificPoints.middle))
+      .minBy(radians => targetCenter.radiateRadians(radians, 128.0).zone != origin.zone)
     
     val arc = Arc(
       Math.PI, // Configurable.

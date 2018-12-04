@@ -1,4 +1,4 @@
-package Mathematics.Formations
+package Mathematics.Formations.Arcs
 
 import Lifecycle.With
 import Mathematics.Points.Pixel

@@ -17,7 +17,7 @@ class ZoneFormation(zone: Zone) extends FormationDesigner {
     output
   }
 
-  def form(units: Seq[FriendlyUnitInfo]): Formation = {
+  def form(units: Seq[FriendlyUnitInfo]): FormationAssigned = {
     // Find which zone we should actually defend
     // This is pretty hacky.
     val zoneCandidates = new ArrayBuffer[Zone]
@@ -29,17 +29,17 @@ class ZoneFormation(zone: Zone) extends FormationDesigner {
     zoneCandidates.maxBy(zoneScore(_, true)).formation.buildFormation(units)
   }
 
-  def buildFormation(units: Seq[FriendlyUnitInfo]): Formation = {
+  def buildFormation(units: Seq[FriendlyUnitInfo]): FormationAssigned = {
     if (zone.exit.isEmpty) {
       // TODO: Island base?
-      return Formation(Map.empty)
+      return new FormationAssigned(Map.empty)
     }
     val exit = zone.exit.get
 
     val shouldArc = zone.centroid.altitudeBonus > exit.otherSideof(zone).centroid.altitudeBonus
 
     //if (shouldArc) {
-      return Formation(Formations.concave(units, exit.sidePixels.head, exit.sidePixels.last, zone.centroid.pixelCenter))
+      return Formations.concave(units, exit.sidePixels.head, exit.sidePixels.last, zone.centroid.pixelCenter)
     //}
   }
 }

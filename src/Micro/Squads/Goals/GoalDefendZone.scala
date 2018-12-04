@@ -2,7 +2,7 @@ package Micro.Squads.Goals
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
-import Mathematics.Formations.{Formation, Formations}
+import Mathematics.Formations.{FormationAssigned, Formations}
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Mathematics.PurpleMath
 import Micro.Agency.{Intention, Leash}
@@ -142,7 +142,7 @@ class GoalDefendZone extends GoalBasic {
         origin)
   }
 
-  def assignToFormation(formation: Formation): Unit = {
+  def assignToFormation(formation: FormationAssigned): Unit = {
     squad.units.foreach(
       defender => {
         val spot = formation.placements.get(defender)

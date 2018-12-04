@@ -14,7 +14,7 @@ object Formations {
     targetStart : Pixel,
     targetEnd   : Pixel,
     origin      : Pixel)
-      : Map[UnitInfo, Pixel] = {
+      : FormationAssigned = {
     
     val formationSlots = new mutable.HashMap[UnitClass, ListBuffer[Pixel]]
     
@@ -29,16 +29,7 @@ object Formations {
       })
   
     val center = targetStart.midpoint(targetEnd)
-  
-    units
-      .toArray
-      .sortBy(_.pixelDistanceCenter(center))
-      .map(unit => {
-        val groupSlots = formationSlots(unit.unitClass)
-        val bestSlot = groupSlots.minBy(unit.pixelDistanceCenter)
-        groupSlots -= bestSlot
-        (unit, bestSlot)
-      })
-      .toMap
+
+    new FormationUnassigned(formationSlots.toMap).assign(units)
   }
 }

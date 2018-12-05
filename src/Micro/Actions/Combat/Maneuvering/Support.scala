@@ -13,8 +13,10 @@ object Support extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = isSupport(unit)
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
+
     // If useless, just go home as normal
-    if (unit.unitClass.spells.forall(tech => ! With.self.hasTech(tech) || unit.energy < tech.energyCost)) {
+    if ( ! unit.unitClass.isTransport
+      && unit.unitClass.spells.forall(tech => ! With.self.hasTech(tech) || unit.energy < tech.energyCost)) {
       return
     }
 

@@ -3,7 +3,7 @@ package Micro.Squads.Goals
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.PurpleMath
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class GoalFindExpansions extends GoalAssignToBases {
   

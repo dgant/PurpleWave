@@ -56,6 +56,7 @@ object FightOrFlight extends Action {
     }))
 
     decide(false, "Hazard", () => {
+      if ( ! With.configuration.enableMCRS) return false
       val occupancy = With.coordinator.gridPathOccupancy.get(unit.tileIncludingCenter)
       (
         ! unit.flying

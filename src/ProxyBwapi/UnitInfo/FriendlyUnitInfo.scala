@@ -83,11 +83,10 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
       With.units.get(base.getTransport).flatMap(_.friendly))
   
   def canTransport(passenger: FriendlyUnitInfo): Boolean =
-    isTransport                       &&
-    ! passenger.flying                &&
-    ! passenger.unitClass.isBuilding  &&
-    passenger.canMove                 &&
-    passenger.transport.isEmpty       &&
+    isTransport                           &&
+    passenger.unitClass.canBeTransported  &&
+    passenger.canMove                     &&
+    passenger.transport.isEmpty           &&
     spaceRemaining >= passenger.unitClass.spaceRequired
 
   // More accurate, but avoiding for performance reasons

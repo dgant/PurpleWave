@@ -6,7 +6,7 @@ import Micro.Actions.Combat.Techniques.{Sally, Hunker}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Phalanx extends Action {
-  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.agent.toForm.isDefined
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.agent.toForm.isDefined && ! unit.flying
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     Weigh.consider(unit, Sally, Hunker)

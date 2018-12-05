@@ -20,6 +20,7 @@ object PlacementHeuristicDistanceFromBase extends PlacementHeuristic {
           blueprint.heightTiles.get / 2)))
       .sum
 
-    Math.max(128.0, 32 * distanceTotal)
+    val output = 6 + distanceTotal
+    output
   }
 }

@@ -2,7 +2,7 @@ package Micro.Actions.Transportation.Caddy
 
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Caddying {
 
@@ -10,8 +10,12 @@ object Caddying {
     transport.isTransport
   }
 
+  def canPickUp(transport: FriendlyUnitInfo, passenger: UnitInfo): Boolean = {
+    passenger.unitClass.canBeTransported && passenger.unitClass.spaceRequired < transport.spaceRemaining
+  }
+
   def targets(transport: FriendlyUnitInfo): Vector[FriendlyUnitInfo] = {
-    transport.teammates.toVector.flatMap(_.friendly).filter(transport.canTransport)
+    transport.teammates.view.flatMap(_.friendly).filter(transport.canTransport).toVector
   }
 
   def pickupNeed(hailer: FriendlyUnitInfo): Double = {

@@ -20,7 +20,7 @@ trait GoalBasic extends SquadGoal {
   
   protected trait Quality {
     def matches(u: UnitInfo): Boolean
-    val counteredBy: Array[Quality]
+    val counteredBy: Array[Quality] = Array.empty
     def counterScaling(input: Double): Double = input
   }
   
@@ -30,7 +30,7 @@ trait GoalBasic extends SquadGoal {
         Terran.Ghost, Terran.Wraith, Terran.SpiderMine,
         Protoss.Arbiter, Protoss.DarkTemplar, Protoss.Observer,
         Zerg.Lurker, Zerg.LurkerEgg) || (u.is(Terran.Vulture) && u.player.hasTech(Terran.SpiderMinePlant))
-      lazy val counteredBy: Array[Quality] = Array(Detector)
+      override val counteredBy: Array[Quality] = Array(Detector)
     }
     object SpiderMine extends Quality {
       override def matches(u: UnitInfo): Boolean = u.is(Terran.SpiderMine)
@@ -55,28 +55,31 @@ trait GoalBasic extends SquadGoal {
     }
     object Air extends Quality {
       def matches(u: UnitInfo): Boolean = u.flying
-      lazy val counteredBy: Array[Quality] = Array(AntiAir)
+      override val counteredBy: Array[Quality] = Array(AntiAir)
     }
     object Ground extends Quality {
       def matches(u: UnitInfo): Boolean = ! u.flying
-      lazy val counteredBy: Array[Quality] = Array(AntiGround)
+      override val counteredBy: Array[Quality] = Array(AntiGround)
     }
     object AntiAir extends Quality {
       def matches(u: UnitInfo): Boolean = u.is(UnitMatchCombatSpellcaster) || u.attacksAgainstAir > 0
-      lazy val counteredBy: Array[Quality] = Array.empty
     }
     object AntiGround extends Quality {
       def matches(u: UnitInfo): Boolean = u.is(UnitMatchCombatSpellcaster) || (u.attacksAgainstGround > 0 && ! u.unitClass.isWorker)
-      lazy val counteredBy: Array[Quality] = Array.empty
     }
     object Combat extends Quality {
       def matches(u: UnitInfo): Boolean = (u.canAttack && ! u.unitClass.isWorker)
-      lazy val counteredBy: Array[Quality] = Array(Combat)
+      override val counteredBy: Array[Quality] = Array(Combat)
     }
     object Detector extends Quality {
       def matches(u: UnitInfo): Boolean = u.unitClass.isDetector
-      lazy val counteredBy: Array[Quality] = Array.empty
       override def counterScaling(input: Double): Double = 5.0 * input
+    }
+    object Transport extends Quality {
+      def matches(u: UnitInfo): Boolean = u.isAny(Terran.Dropship, Protoss.Shuttle, Zerg.Overlord)
+    }
+    object Transportable extends Quality {
+      def matches(u: UnitInfo): Boolean = u.isAny(Protoss.HighTemplar, Protoss.Reaver, Zerg.Defiler)
     }
     val threats: Array[Quality] = Array(
       Cloaked,
@@ -91,6 +94,10 @@ trait GoalBasic extends SquadGoal {
       AntiVulture,
       AntiAir,
       AntiGround,
+    )
+    val roles: Array[Quality] = Array(
+      Transport,
+      Transportable
     )
   }
   
@@ -107,6 +114,7 @@ trait GoalBasic extends SquadGoal {
     lastUpdateFrame = With.frame
     enemiesByQuality.clear()
     recruitsByQuality.clear()
+    squad.units.foreach(countUnit(_, Qualities.roles))
     squad.units.foreach(countUnit(_, Qualities.answers))
     squad.enemies.foreach(countUnit(_, Qualities.threats))
 
@@ -191,13 +199,19 @@ trait GoalBasic extends SquadGoal {
     offerConditional(
       candidates,
       (candidate, quality) =>
-        // Enemy quality is represented
-        enemiesByQuality(quality) > 0
-        && quality.counteredBy.exists(counter =>
-          // Candidate counters it
-          counter.matches(candidate)
-          // And we coulduse more recruits to counter it
-          && quality.counterScaling(recruitsByQuality(counter)) <= enemiesByQuality(quality) * counterMax))
+        if (Qualities.Transport.matches(candidate) && recruitsByQuality(Qualities.Transportable) < recruitsByQuality(Qualities.Transport)) {
+          true
+        } else {
+          (
+            // Enemy quality is represented
+            enemiesByQuality(quality) > 0
+              && quality.counteredBy.exists(counter =>
+              // Candidate counters it
+              counter.matches(candidate)
+                // And we coulduse more recruits to counter it
+                && quality.counterScaling(recruitsByQuality(counter)) <= enemiesByQuality(quality) * counterMax)
+          )
+      })
   }
   
   protected def offerUseless(candidates: Iterable[FriendlyUnitInfo]) {

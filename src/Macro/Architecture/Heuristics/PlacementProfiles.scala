@@ -34,11 +34,12 @@ object PlacementProfiles {
     preferZone                  = 1.0,
     preferNatural               = 0.0,
     preferResources             = 0.0,
+    preferRhythm                = 1.0,
     preferSpace                 = 0.05,
-    preferPowering              = 0.1,
+    preferPowering              = 0.15,
     preferDistanceFromEnemy     = 0.6,
     preferCoveringWorkers       = 0.0,
-    preferSurfaceArea           = 0.5,
+    preferSurfaceArea           = 0.25,
     avoidDistanceFromBase       = 0.3,
     avoidDistanceFromEnemy      = 0.0,
     avoidDistanceFromIdealRange = 0.05,
@@ -59,6 +60,7 @@ object PlacementProfiles {
   
   val gas = new PlacementProfile("Gas",
     preferZone                  = 1000.0,
+    preferRhythm                = 0.0,
     avoidDistanceFromBase       = 1.0
   )
   
@@ -66,6 +68,7 @@ object PlacementProfiles {
     preferZone                  = 1000.0,
     preferNatural               = 1.0,
     preferResources             = 0.5,
+    preferRhythm                = 0.0,
     preferDistanceFromEnemy     = 0.5,
     avoidDistanceFromBase       = 1.5
   )
@@ -74,6 +77,7 @@ object PlacementProfiles {
     preferZone                  = 1000.0,
     preferNatural               = 1.0,
     preferResources             = 0.5,
+    preferRhythm                = 0.0,
     preferDistanceFromEnemy     = 1.5,
     avoidDistanceFromBase       = 0.5
   )

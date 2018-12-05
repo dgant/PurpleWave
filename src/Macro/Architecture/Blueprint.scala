@@ -45,7 +45,7 @@ class Blueprint(
     .orElse(building.filter(_.attacks).map(_.effectiveRangePixels.toDouble))
     .orElse(building.filter(_ == Protoss.ShieldBattery).map(b => 32.0 * 2.0))
     .orElse(building.filter(_ == Zerg.CreepColony).map(b => 32.0 * 7.0))
-    .orElse(Some(32.0 * 9.0))
+    .orElse(Some(32.0 * 11.0))
   
   def fulfilledBy(proposal: Blueprint): Boolean = {
     if (proposal == this) return true

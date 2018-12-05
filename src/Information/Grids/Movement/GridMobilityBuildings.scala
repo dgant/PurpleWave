@@ -22,6 +22,10 @@ class GridMobilityBuildings extends AbstractGridArray[Int] {
   val modifiedIndices = new ArrayBuffer[Int]
   
   override def update() {
+
+    // DISABLED due to disuse and for performance
+    return
+
     for (modifiedI <- modifiedIndices) {
       set(modifiedI, defaultValue)
     }

@@ -131,7 +131,7 @@ class Commander {
     
     // Send flying units past their destination to maximize acceleration
     var destination = to
-    if (unit.flying && unit.pixelDistanceSquared(to) < Math.pow(flyingOvershoot, 2)) {
+    if (unit.flying && unit.pixelDistanceSquared(to) < flyingOvershoot * flyingOvershoot) {
       destination = unit.pixelCenter.project(to, flyingOvershoot)
       if (destination == unit.pixelCenter) {
         val signX = PurpleMath.forcedSignum(SpecificPoints.middle.x - destination.x)

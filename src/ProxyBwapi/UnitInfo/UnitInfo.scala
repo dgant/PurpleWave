@@ -416,7 +416,6 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     && enemy.canBeAttacked
     && (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround)
     && ! enemy.effectivelyCloaked
-    && ! friendly.exists(_.loaded)
     && (enemy.unitClass.triggersSpiderMines || ! isSpiderMine())
     && (unitClass.unaffectedByDarkSwarm || ! enemy.underDarkSwarm)
   )

@@ -23,6 +23,7 @@ object PlacementHeuristicDistanceFromEnemy extends PlacementHeuristic {
           blueprint.heightTiles.get / 2)))
       .min
     
-    Math.max(128.0, 32 * distanceMin)
+    val output = 6 + distanceMin
+    output
   }
 }

@@ -57,10 +57,12 @@ abstract class GoalAssignToBases extends GoalBasic {
     val scoutDestination = baseToPixel(peekNextBase)
     val typeMultiplier = if (unit.isAny(
       Terran.Battlecruiser,
+      Terran.Dropship,
       Terran.Valkyrie,
       Protoss.Arbiter,
       Protoss.Archon,
       Protoss.Carrier,
+      Protoss.Shuttle,
       Zerg.Devourer,
       Zerg.Guardian))
       10.0 else 1.0

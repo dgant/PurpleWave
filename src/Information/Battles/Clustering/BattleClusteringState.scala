@@ -31,13 +31,22 @@ class BattleClusteringState(seedUnits: Set[UnitInfo]) {
     val tileRadius  = radiusTiles(nextUnit)
     val tileCenter  = nextUnit.tileIncludingCenter
     val isFriendly  = nextUnit.isFriendly
-    for (point <- Circle.points(tileRadius)) {
-      val nextTile = tileCenter.add(point)
+    val points      = Circle.points(tileRadius)
+    val nPoints     = points.size
+    var iPoint      = 0
+    while (iPoint < nPoints) {
+      val nextTile = tileCenter.add(points(iPoint))
+      iPoint += 1
       if (nextTile.valid) {
         val exploredGrid = if (isFriendly) exploredFriendly else exploredEnemy
         if ( ! exploredGrid(nextTile.i)) {
           exploredGrid(nextTile.i) = true
-          for (neighbor <- With.grids.units.get(nextTile)) {
+          val neighbors = With.grids.units.get(nextTile)
+          val nNeighbors = neighbors.size
+          var iNeighbor = 0
+          while (iNeighbor < nNeighbors) {
+            val neighbor = neighbors(iNeighbor)
+            iNeighbor += 1
             if (areOppositeTeams(nextUnit, neighbor) && seedUnits.contains(neighbor)) {
               if (unitLinks.contains(neighbor)) {
                 if (oldFoe.isEmpty) {
@@ -52,8 +61,11 @@ class BattleClusteringState(seedUnits: Set[UnitInfo]) {
         }
       }
     }
-    for (newFoe <- newFoes) {
-      unitLinks.put(newFoe, nextUnit)
+    val nFoes = newFoes.size
+    var iFoe = 0
+    while (iFoe < nFoes) {
+      unitLinks.put(newFoes(iFoe), nextUnit)
+      iFoe += 1
     }
     if ( ! unitLinks.contains(nextUnit)) {
       unitLinks.put(nextUnit, oldFoe.getOrElse(nextUnit))

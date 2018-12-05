@@ -54,7 +54,7 @@ class GoalAttack extends GoalBasic {
   }
   
   override protected def offerUseful(candidates: Iterable[FriendlyUnitInfo]) {
-    candidates.foreach(addCandidate)
+    candidates.foreach(c => if (unitMatcher.accept(c)) addCandidate(c))
   }
   override protected def offerUseless(candidates: Iterable[FriendlyUnitInfo]) {}
 }

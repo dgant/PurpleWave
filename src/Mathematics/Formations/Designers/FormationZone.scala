@@ -14,7 +14,8 @@ class FormationZone(zone: Zone) extends FormationDesigner {
     val altitudeBonus = if (rangedUnits) {
       if (altitudeDelta < 0) 0.1 else if (altitudeDelta > 0) 10.0 else 1.0
     } else 1.0
-    val output = altitudeBonus / exitWidth
+    val distance = Math.pow(Math.max(30, someZone.centroid.tileDistanceManhattan(zone.centroid)), 2)
+    val output = altitudeBonus / exitWidth / distance
     output
   }
 

@@ -19,6 +19,10 @@ import ProxyBwapi.UnitClasses.UnitClass
 import bwapi._
 
 abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUnit, id) {
+
+  protected val cd1: Int = Math.min(
+    With.configuration.foreignUnitUpdatePeriod,
+    With.configuration.friendlyUnitUpdatePeriod)
   
   //////////////
   // Identity //
@@ -175,7 +179,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
       (if (isMarine()     && player.hasUpgrade(Terran.MarineRange))     32.0 else 0.0) +
       (if (isGoliath()    && player.hasUpgrade(Terran.GoliathAirRange)) 96.0 else 0.0) +
       (if (isDragoon()    && player.hasUpgrade(Protoss.DragoonRange))   64.0 else 0.0) +
-      (if (isHydralisk()  && player.hasUpgrade(Zerg.HydraliskRange))    32.0 else 0.0))
+      (if (isHydralisk()  && player.hasUpgrade(Zerg.HydraliskRange))    32.0 else 0.0),
+    24) // Cache to avoid a bunch of IS calls
   
   def pixelRangeGround: Double = pixelRangeGroundCache()
   private val pixelRangeGroundCache = new Cache(() =>
@@ -184,7 +189,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
       (if (isBunker()     && player.hasUpgrade(Terran.MarineRange))   32.0 else 0.0) +
       (if (isMarine()     && player.hasUpgrade(Terran.MarineRange))   32.0 else 0.0) +
       (if (isDragoon()    && player.hasUpgrade(Protoss.DragoonRange)) 64.0 else 0.0) +
-      (if (isHydralisk()  && player.hasUpgrade(Zerg.HydraliskRange))  32.0 else 0.0))
+      (if (isHydralisk()  && player.hasUpgrade(Zerg.HydraliskRange))  32.0 else 0.0),
+    24)  // Cache to avoid a bunch of IS calls
   
   def pixelRangeMax: Double = Math.max(pixelRangeAir, pixelRangeGround)
   
@@ -213,14 +219,16 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     (unitClass.canMove || (unitClass.isBuilding && flying))
     && unitClass.topSpeed > 0
     && canDoAnything
-    && ! burrowed)
+    && ! burrowed,
+    cd1)
   
   def topSpeedChasing: Double = topSpeedChasingCache()
   private val topSpeedChasingCache = new Cache(() =>
     topSpeed
     * PurpleMath.nanToOne(
       Math.max(0, cooldownMaxAirGround - unitClass.stopFrames)
-      / cooldownMaxAirGround.toDouble))
+      / cooldownMaxAirGround.toDouble),
+    cd1)
   
   def topSpeed: Double = topSpeedCache()
   private val topSpeedCache = new Cache(() =>
@@ -228,32 +236,33 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
       (if (ensnared) 0.5 else 1.0) * // TODO: Is this the multiplier?
       (if (stimmed) 1.5 else 1.0) * (
       unitClass.topSpeed * (if (
-        (is(Terran.Vulture)   && player.hasUpgrade(Terran.VultureSpeed))    ||
-        (is(Protoss.Observer) && player.hasUpgrade(Protoss.ObserverSpeed))  ||
-        (is(Protoss.Scout)    && player.hasUpgrade(Protoss.ScoutSpeed))     ||
-        (is(Protoss.Shuttle)  && player.hasUpgrade(Protoss.ShuttleSpeed))   ||
-        (is(Protoss.Zealot)   && player.hasUpgrade(Protoss.ZealotSpeed))    ||
-        (is(Zerg.Overlord)    && player.hasUpgrade(Zerg.ZerglingSpeed))     ||
-        (is(Zerg.Hydralisk)   && player.hasUpgrade(Zerg.HydraliskSpeed))    ||
-        (is(Zerg.Ultralisk)   && player.hasUpgrade(Zerg.UltraliskSpeed)))
-        1.5 else 1.0)))
+        (isVulture()    && player.hasUpgrade(Terran.VultureSpeed))    ||
+        (isObserver()   && player.hasUpgrade(Protoss.ObserverSpeed))  ||
+        (isScout()      && player.hasUpgrade(Protoss.ScoutSpeed))     ||
+        (isShuttle()    && player.hasUpgrade(Protoss.ShuttleSpeed))   ||
+        (isZealot()     && player.hasUpgrade(Protoss.ZealotSpeed))    ||
+        (isOverlord()   && player.hasUpgrade(Zerg.ZerglingSpeed))     ||
+        (isHydralisk()  && player.hasUpgrade(Zerg.HydraliskSpeed))    ||
+        (isUltralisk()  && player.hasUpgrade(Zerg.UltraliskSpeed)))
+        1.5 else 1.0)),
+  cd1)
   
   def projectFrames(framesToLookAhead: Double): Pixel = pixelCenter.add((velocityX * framesToLookAhead).toInt, (velocityY * framesToLookAhead).toInt)
   
   def inTileRadius  (tiles: Int)  : Traversable[UnitInfo] = With.units.inTileRadius(tileIncludingCenter, tiles)
   def inPixelRadius (pixels: Int) : Traversable[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)
   
-  def isTransport: Boolean = unitClass.isTransport && ( ! is(Zerg.Overlord) || player.hasUpgrade(Zerg.OverlordDrops))
+  def isTransport: Boolean = unitClass.isTransport && ( ! isOverlord() || player.hasUpgrade(Zerg.OverlordDrops))
   
   def sightRangePixels: Int = sightRangePixelsCache()
   private val sightRangePixelsCache = new Cache(() =>
     if (blind) 32 else
     unitClass.sightRangePixels +
       (if (
-        (is(Terran.Ghost)     && player.hasUpgrade(Terran.GhostVisionRange))      ||
-        (is(Protoss.Observer) && player.hasUpgrade(Protoss.ObserverVisionRange))  ||
-        (is(Protoss.Scout)    && player.hasUpgrade(Protoss.ScoutVisionRange))     ||
-        (is(Zerg.Overlord)    && player.hasUpgrade(Zerg.OverlordVisionRange)))
+        (isGhost()    && player.hasUpgrade(Terran.GhostVisionRange))      ||
+        (isObserver() && player.hasUpgrade(Protoss.ObserverVisionRange))  ||
+        (isScout()    && player.hasUpgrade(Protoss.ScoutVisionRange))     ||
+        (isOverlord() && player.hasUpgrade(Zerg.OverlordVisionRange)))
       64 else 0))
   
   ////////////
@@ -279,17 +288,17 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def attacksAgainstAir: Int = attacksAgainstAirCache()
   private val attacksAgainstAirCache = new Cache(() => {
     var output = unitClass.airDamageFactorRaw * unitClass.maxAirHitsRaw
-    if (output == 0  && is(Terran.Bunker))    output = 4
-    if (output == 0  && is(Protoss.Carrier))  output = interceptorCount
+    if (output == 0  && isBunker())    output = 4
+    if (output == 0  && isCarrier())  output = interceptorCount
     output
   })
   
   def attacksAgainstGround: Int = attacksAgainstGroundCache()
   private val attacksAgainstGroundCache = new Cache(() => {
     var output = unitClass.groundDamageFactorRaw * unitClass.maxGroundHitsRaw
-    if (output == 0  && is(Terran.Bunker))    output = 4
-    if (output == 0  && is(Protoss.Carrier))  output = interceptorCount
-    if (output == 0  && is(Protoss.Reaver))   output = 1
+    if (output == 0  && isBunker())   output = 4
+    if (output == 0  && isCarrier())  output = interceptorCount
+    if (output == 0  && isReaver())   output = 1
     output
   })
   
@@ -404,11 +413,10 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     && ( ! unitClass.shootsScarabs || scarabCount > 0)
     && (
       unitClass.rawCanAttack
-      || (is(Terran.Bunker)
-      || (is(Protoss.Carrier) && interceptorCount > 0)
-      || (is(Protoss.Reaver)  && scarabCount > 0)
-      || (is(Zerg.Lurker)     && burrowed)
-    ))
+      || isBunker()
+      || (isCarrier() && interceptorCount > 0)
+      || (isReaver()  && scarabCount > 0)
+      || (isLurker()  && burrowed))
     && (flying || ! underDisruptionWeb))
   
   def canAttack(enemy: UnitInfo): Boolean = (
@@ -420,16 +428,27 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     && (unitClass.unaffectedByDarkSwarm || ! enemy.underDarkSwarm)
   )
   
-  // Stupid, but helps performance
+  // Stupid, but helps performance due to costliness of comparing unit classes with BWMirror limitations
   protected class CacheIs(unitClass: UnitClass) extends Cache(() => is(unitClass))
-  protected lazy val isSpiderMine         : CacheIs = new CacheIs(Terran.SpiderMine)
-  protected lazy val isBunker             : CacheIs = new CacheIs(Terran.Bunker)
-  protected lazy val isMarine             : CacheIs = new CacheIs(Terran.Marine)
-  protected lazy val isGoliath            : CacheIs = new CacheIs(Terran.Goliath)
-  protected lazy val isSiegeTankUnsieged  : CacheIs = new CacheIs(Terran.SiegeTankUnsieged)
-  protected lazy val isDragoon            : CacheIs = new CacheIs(Protoss.Dragoon)
-  protected lazy val isInterceptor        : CacheIs = new CacheIs(Protoss.Interceptor)
-  protected lazy val isHydralisk          : CacheIs = new CacheIs(Zerg.Hydralisk)
+  lazy val isSpiderMine         : CacheIs = new CacheIs(Terran.SpiderMine)
+  lazy val isBunker             : CacheIs = new CacheIs(Terran.Bunker)
+  lazy val isMarine             : CacheIs = new CacheIs(Terran.Marine)
+  lazy val isGhost              : CacheIs = new CacheIs(Terran.Ghost)
+  lazy val isVulture            : CacheIs = new CacheIs(Terran.Vulture)
+  lazy val isGoliath            : CacheIs = new CacheIs(Terran.Goliath)
+  lazy val isSiegeTankUnsieged  : CacheIs = new CacheIs(Terran.SiegeTankUnsieged)
+  lazy val isZealot             : CacheIs = new CacheIs(Protoss.Zealot)
+  lazy val isDragoon            : CacheIs = new CacheIs(Protoss.Dragoon)
+  lazy val isObserver           : CacheIs = new CacheIs(Protoss.Observer)
+  lazy val isShuttle            : CacheIs = new CacheIs(Protoss.Shuttle)
+  lazy val isScout              : CacheIs = new CacheIs(Protoss.Scout)
+  lazy val isCarrier            : CacheIs = new CacheIs(Protoss.Carrier)
+  lazy val isInterceptor        : CacheIs = new CacheIs(Protoss.Interceptor)
+  lazy val isReaver             : CacheIs = new CacheIs(Protoss.Reaver)
+  lazy val isOverlord           : CacheIs = new CacheIs(Zerg.Overlord)
+  lazy val isHydralisk          : CacheIs = new CacheIs(Zerg.Hydralisk)
+  lazy val isLurker             : CacheIs = new CacheIs(Zerg.Lurker)
+  lazy val isUltralisk          : CacheIs = new CacheIs(Zerg.Ultralisk)
   
   // Frame X:     Unit's cooldown is 0.   Unit starts attacking.
   // Frame X-1:   Unit's cooldown is 1.   Unit receives attack order.

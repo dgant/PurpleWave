@@ -42,7 +42,7 @@ class LockUnits extends {
     With.recruiter.release(this)
   }
   
-  def units: Set[FriendlyUnitInfo] = With.recruiter.getUnits(this)
+  def units: collection.Set[FriendlyUnitInfo] = With.recruiter.getUnits(this)
 
   protected def weAccept(unit: FriendlyUnitInfo): Boolean = {
     if(acceptSubstitutes.get)

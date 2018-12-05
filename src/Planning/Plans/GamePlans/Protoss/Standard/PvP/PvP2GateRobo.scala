@@ -5,6 +5,7 @@ import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.EjectScout
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.Macro.Automatic.PumpWorkers
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
@@ -97,7 +98,7 @@ class PvP2GateRobo extends GameplanModeTemplate {
       new RequireMiningBases(2)),
 
     new PvPIdeas.TrainArmy,
-
+    new PumpWorkers(oversaturate = true),
     new Build(
       Get(5, Protoss.Gateway),
       Get(2, Protoss.Assimilator))

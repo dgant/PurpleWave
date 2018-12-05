@@ -15,7 +15,7 @@ import scala.collection.mutable
 
 class Architecture {
   
-  lazy val harvestingTiles: Set[Tile] = With.geography.bases.flatMap(_.harvestingArea.tiles).toSet
+  lazy val harvestingTiles: Array[TileRectangle] = With.geography.bases.map(_.harvestingArea).toArray
   
   val exclusions        : mutable.ArrayBuffer[Exclusion]            = new mutable.ArrayBuffer[Exclusion]
   val unbuildable       : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
@@ -78,7 +78,7 @@ class Architecture {
   }
   
   def isHarvestingArea(tile: Tile): Boolean = {
-    harvestingTiles.contains(tile)
+    harvestingTiles.exists(_.contains(tile))
   }
   
   def walkable(tile: Tile): Boolean = {

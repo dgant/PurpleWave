@@ -24,7 +24,7 @@ class Gather extends Plan {
   var minerals  : Set[UnitInfo] = Set.empty
   var gasses    : Set[FriendlyUnitInfo] = Set.empty
   var resources : Set[UnitInfo] = Set.empty
-  var workers   : Set[FriendlyUnitInfo] = Set.empty
+  var workers   : collection.Set[FriendlyUnitInfo] = Set.empty
   var gasWorkersNow = 0
   var gasWorkersMax = 0
   var workersByResource = new mutable.HashMap[UnitInfo, mutable.HashSet[FriendlyUnitInfo]]

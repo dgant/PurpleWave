@@ -16,6 +16,7 @@ class Intelligence {
   var firstEnemyMain: Option[Base] = None
 
   def mostBaselikeEnemyTile: Tile = mostBaselikeEnemyTileCache()
+  def threatOrigin: Tile = enemyThreatOriginCache()
   
   private val scoutTiles = new mutable.ListBuffer[Tile]
   private var lastScoutFrame = 0
@@ -87,7 +88,24 @@ class Intelligence {
       .map(_.tileIncludingCenter)
       .headOption
       .getOrElse(baseIntrigue().maxBy(_._2)._1.townHallArea.midpoint))
-  
+
+  private val enemyThreatOriginBaseFactor = 3
+  private val enemyThreatOriginCache = new Cache(() => {
+    var x = 0
+    var y = 0
+    var n = 0
+    With.units.enemy.foreach(u => if (u.attacksAgainstGround > 0) {
+      x += 32 * u.x
+      y += 32 * u.y
+      n += 1
+    })
+
+    x += enemyThreatOriginBaseFactor * mostBaselikeEnemyTile.x
+    y += enemyThreatOriginBaseFactor * mostBaselikeEnemyTile.y
+    n += enemyThreatOriginBaseFactor
+    Tile(x/n, y/n)
+  })
+
   def enemyMain: Option[Base] = {
     firstEnemyMain.filter(base => ! base.scouted || base.owner.isEnemy)
   }

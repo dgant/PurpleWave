@@ -11,12 +11,15 @@ object ShuttlePickup extends Action {
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
     val pickupCandidates = shuttle.teammates
       .view
-      .filter(p => p.is(Protoss.Reaver) && (p.scarabCount > 0 || p.training)) // TODO -- other units
+      .filter(p =>
+        p.is(Protoss.Reaver)
+        && (p.scarabCount > 0 || p.training)) // TODO -- other units
       .flatMap(_.friendly)
-      .filter(shuttle.canTransport)
-      .filter(p => p.matchups.targets.forall(p.framesBeforeAttacking(_) > Math.min(72, p.matchups.framesOfSafety)))
+      .filter(
+        p => shuttle.canTransport(p)
+        && p.pixelDistanceCenter(Shuttling.passengerDestination(p)) > Shuttling.dropoffRadius + 64)
       .toSeq
-    val pickupCandidate = ByOption.maxBy(pickupCandidates)(c => Caddying.pickupNeed(c) / (1.0 + c.pixelDistanceSquared(shuttle)))
+    val pickupCandidate = ByOption.maxBy(pickupCandidates)(c => Shuttling.pickupNeed(c) / (1.0 + c.pixelDistanceSquared(shuttle)))
     pickupCandidate.foreach(hailer => {
       With.commander.rightClick(hailer, shuttle)
       With.commander.move(shuttle, hailer.pixelCenter)

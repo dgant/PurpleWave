@@ -266,6 +266,8 @@ object PvPIdeas {
         new Pump(Protoss.HighTemplar),
         new PumpDragoonsAndZealots),
       new Parallel(
+        new Pump(Protoss.Reaver, 1),
+        new PumpMatchingRatio(Protoss.Shuttle, 1, 3, Seq(Friendly(Protoss.Reaver, 0.5))),
         new Pump(Protoss.Reaver, 4),
         new PumpDragoonsAndZealots)),
     new If(

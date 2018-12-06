@@ -2,12 +2,11 @@ package Planning.Plans.Macro.Build
 
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Macro.Scheduling.Project
 import Micro.Agency.Intention
+import Planning.Plan
 import Planning.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.UnitCountOne
 import Planning.UnitMatchers.{UnitMatchAnd, UnitMatcher}
-import Planning.Plan
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -39,7 +38,7 @@ class BuildAddon(val addonClass: UnitClass) extends Plan {
       return
     }
       
-    currencyLock.framesPreordered = (addonClass.buildUnitsEnabling.map(Project.framesToUnits(_, 1)) :+ 0).max
+    currencyLock.framesPreordered = (addonClass.buildUnitsEnabling.map(With.projections.unit) :+ 0).max
     currencyLock.isSpent = addon.isDefined
     currencyLock.acquire(this)
     

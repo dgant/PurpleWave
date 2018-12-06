@@ -10,7 +10,7 @@ import Information.Intelligenze.Fingerprinting.Fingerprints
 import Information._
 import Macro.Allocation._
 import Macro.Architecture.{Architecture, PlacementScheduler}
-import Macro.Scheduling.{MasterBuildOrderHistory, MasterBuildPlans, Scheduler}
+import Macro.Scheduling.{MasterBuildOrderHistory, MasterBuildPlans, Projections, Scheduler}
 import Micro.Agency.{Agency, Commander}
 import Micro.Coordination.Coordinator
 import Micro.Matchups.MatchupGraph
@@ -42,7 +42,6 @@ object With {
   var commander         : Commander               = _
   var coordinator       : Coordinator             = _
   var configuration     : Configuration           = _
-  
   var economy           : Economy                 = _
   var fingerprints      : Fingerprints            = _
   var geography         : Geography               = _
@@ -56,6 +55,7 @@ object With {
   var paths             : Paths                   = _
   var performance       : PerformanceMonitor      = _
   var placement         : PlacementScheduler      = _
+  var projections       : Projections             = _
   var proxy             : ProxyBWMirror           = _
   var prioritizer       : Prioritizer             = _
   var reaction          : MicroReaction           = _
@@ -126,6 +126,7 @@ object With {
     performance       = new PerformanceMonitor
     placement         = new PlacementScheduler
     prioritizer       = new Prioritizer
+    projections       = new Projections
     reaction          = new MicroReaction
     recruiter         = new Recruiter
     scheduler         = new Scheduler

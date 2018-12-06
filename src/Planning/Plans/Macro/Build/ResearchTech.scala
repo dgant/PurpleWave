@@ -1,12 +1,11 @@
 package Planning.Plans.Macro.Build
 
 import Lifecycle.With
-import Macro.Scheduling.Project
 import Micro.Agency.Intention
+import Planning.Plan
 import Planning.ResourceLocks.{LockCurrencyForTech, LockUnits}
 import Planning.UnitCounters.UnitCountOne
 import Planning.UnitPreferences.UnitPreferIdle
-import Planning.Plan
 import ProxyBwapi.Techs.Tech
 import Utilities.ByOption
 
@@ -32,7 +31,7 @@ class ResearchTech(tech: Tech) extends Plan {
     
     currency.framesPreordered = Math.max(
       ByOption.max(techers.units.map(_.remainingOccupationFrames)).getOrElse(0),
-      Project.framesToUnits(techerClass))
+      With.projections.unit(techerClass))
     currency.acquire(this)
     currency.isSpent = With.units.ours.exists(techer => techer.teching && techer.techingType == tech)
     if ( ! currency.satisfied) return

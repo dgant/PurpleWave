@@ -3,14 +3,13 @@ package Planning.Plans.Macro.Build
 import Debugging.Visualizations.Rendering.DrawMap
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Macro.Scheduling.Project
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
+import Planning.Plan
 import Planning.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.UnitCountOne
 import Planning.UnitMatchers._
 import Planning.UnitPreferences.{UnitPreferIdle, UnitPreference}
-import Planning.Plan
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -57,8 +56,8 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
   
     // Duplicated across MorphUnit
     currencyLock.framesPreordered = (
-      traineeClass.buildUnitsEnabling.map(Project.framesToUnits(_, 1))
-      :+ Project.framesToUnits(trainerClass, 1)
+      traineeClass.buildUnitsEnabling.map(With.projections.unit)
+      :+ With.projections.unit(trainerClass)
       :+ trainer.map(_.remainingOccupationFrames).getOrElse(0)).max
     currencyLock.isSpent = trainee.isDefined || trainer.exists(_.trainingQueue.headOption.contains(traineeClass))
     currencyLock.acquire(this)

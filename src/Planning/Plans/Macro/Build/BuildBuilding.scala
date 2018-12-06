@@ -3,7 +3,6 @@ package Planning.Plans.Macro.Build
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Macro.Scheduling.Project
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
 import Planning.Plan
@@ -77,7 +76,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
       return
     }
   
-    currencyLock.framesPreordered = (buildingClass.buildUnitsEnabling.map(Project.framesToUnits(_, 1)) :+ 0).max
+    currencyLock.framesPreordered = (buildingClass.buildUnitsEnabling.map(With.projections.unit) :+ 0).max
     currencyLock.isSpent = building.isDefined
     currencyLock.acquire(this)
     if ( ! needBuilder) {

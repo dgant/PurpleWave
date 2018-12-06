@@ -17,7 +17,7 @@ object ShowPerformanceDetails extends View {
         " " + (100 * (1.0 + task.totalRuns) / (1.0 + task.totalSkips + task.totalRuns)).toInt.toString + "%%",
         (task.runMillisecondsTotal / 1000).toString,
         task.runMillisecondsMean.toString,
-        task.runMillisecondsMaxRecent.toString,
+        task.runMillisecondsMaxRecent().toString,
         task.runMillisecondsMaxAllTime.toString,
         task.totalViolatedThreshold.toString,
         task.totalViolatedRules.toString

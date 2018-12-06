@@ -32,7 +32,7 @@ abstract class AbstractTaskQueue {
       val expectedMilliseconds =
         Math.max(
           if (task.totalRuns < 10) 5 else 0, // Arbitrary assumption before we have much data
-          if (With.performance.danger) task.runMillisecondsMaxAllTime else 2 * task.runMillisecondsMaxRecent)
+          if (With.performance.danger) task.runMillisecondsMaxAllTime else 2 * task.runMillisecondsMaxRecent())
     
       if (task.framesSinceRunning > task.maxConsecutiveSkips
           || With.performance.millisecondsLeftThisFrame > expectedMilliseconds

@@ -1,6 +1,6 @@
 package Planning.Plans.Macro.Build
 
-import Macro.Scheduling.Project
+import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.UnitCountOne
@@ -32,8 +32,8 @@ class MorphUnit(val classToMorph: UnitClass) extends Plan {
   
     // Duplicated across TrainUnit
     currencyLock.framesPreordered = (
-      classToMorph.buildUnitsEnabling.map(Project.framesToUnits(_, 1))
-      :+ Project.framesToUnits(morpherClass, 1)).max
+      classToMorph.buildUnitsEnabling.map(With.projections.unit)
+      :+ With.projections.unit(morpherClass)).max
     
     currencyLock.isSpent = morpher.exists(m => m.alive && m.isAny(Zerg.Egg, Zerg.LurkerEgg, Zerg.Cocoon, classToMorph))
     currencyLock.acquire(this)

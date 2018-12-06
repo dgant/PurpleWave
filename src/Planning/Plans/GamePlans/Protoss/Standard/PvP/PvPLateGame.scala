@@ -87,6 +87,7 @@ class PvPLateGame extends GameplanModeTemplate {
       new UpgradeContinuously(Protoss.ZealotSpeed)),
 
     new Build(Get(3, Protoss.Gateway)),
+
     new BuildGasPumps,
     new FlipIf(
       new Latch(
@@ -100,6 +101,8 @@ class PvPLateGame extends GameplanModeTemplate {
       new RoboTech,
       new TemplarTech),
 
+    new Build(Get(5, Protoss.Gateway)),
+    new UpgradeContinuously(Protoss.ShuttleSpeed),
     new Build(Get(6, Protoss.Gateway)),
 
     new If(

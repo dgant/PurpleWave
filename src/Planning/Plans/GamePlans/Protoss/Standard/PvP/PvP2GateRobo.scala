@@ -93,14 +93,20 @@ class PvP2GateRobo extends GameplanModeTemplate {
         new EnemyStrategy(With.fingerprints.nexusFirst),
         new UnitsAtLeast(3, Protoss.Reaver),
         new And(
+          new UnitsAtLeast(2, Protoss.Reaver),
+          new UnitsAtLeast(1, Protoss.Shuttle)
+        ),
+        new And(
           new EnemyStrategy(With.fingerprints.dtRush),
           new UnitsAtLeast(2, Protoss.Observer, complete = true))),
       new RequireMiningBases(2)),
 
     new PvPIdeas.TrainArmy,
-    new PumpWorkers(oversaturate = true),
+
     new Build(
       Get(5, Protoss.Gateway),
-      Get(2, Protoss.Assimilator))
+      Get(2, Protoss.Assimilator)),
+
+    new PumpWorkers(oversaturate = true)
   )
 }

@@ -74,7 +74,9 @@ class PvP3GateRobo extends GameplanModeTemplate {
       Get(4,   Protoss.Pylon)),
     new If(
       new EnemyStrategy(With.fingerprints.fourGateGoon, With.fingerprints.robo),
-      new BuildOrder(Get(Protoss.RoboticsSupportBay)),
+      new BuildOrder(
+        Get(Protoss.Shuttle),
+        Get(Protoss.RoboticsSupportBay)),
       new BuildOrder(Get(Protoss.Observatory))))
 
   override def buildPlans = Vector(
@@ -93,7 +95,9 @@ class PvP3GateRobo extends GameplanModeTemplate {
     new FlipIf(
       new UnitsAtLeast(6, UnitMatchWarriors, complete = true),
       new PvPIdeas.TrainArmy,
-      new Build(Get(Protoss.RoboticsSupportBay))),
+      new Build(
+        Get(Protoss.Shuttle),
+        Get(Protoss.RoboticsSupportBay))),
 
     new PumpWorkers(oversaturate = true, 40),
     new RequireMiningBases(2),

@@ -92,6 +92,8 @@ class Geography {
   
   def update() {
     ZoneUpdater.update()
+    zones.foreach(_.distanceGrid.initialize())
+    zones.foreach(_.edges.foreach(_.distanceGrid.initialize()))
     bases.filter(base => With.game.isVisible(base.townHallArea.midpoint.bwapi)).foreach(base => base.lastScoutedFrame = With.frame)
   }
 }

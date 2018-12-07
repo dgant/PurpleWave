@@ -4,7 +4,7 @@ import Information.Geography.Pathfinding.ZonePath
 import Information.Grids.Movement.GridGroundDistance
 import Lifecycle.With
 import Mathematics.Formations.Designers.FormationZone
-import Mathematics.Points.{Pixel, PixelRay, Tile, TileRectangle}
+import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -32,9 +32,7 @@ class Zone(
   lazy val  unwalkable        : Boolean             = ! tiles.exists(With.grids.walkable.get)
   lazy val  formation         : FormationZone       = new FormationZone(this)
 
-  lazy val exitDistanceGrid: GridGroundDistance = new GridGroundDistance(
-    exit.map(e => PixelRay(e.sidePixels.head, e.sidePixels.last).tilesIntersected).getOrElse(Array(centroid)): _*)
-  
+  lazy val exitDistanceGrid: GridGroundDistance = new GridGroundDistance(exit.map(_.tiles).getOrElse(Vector(centroid)): _*)
   lazy val exit: Option[Edge] = ByOption.minBy(edges)(edge => With.geography.startLocations.map(_.groundPixels(edge.pixelCenter)).max)
 
   lazy val distanceGrid: GridGroundDistance = new GridGroundDistance(if (bases.size == 1) bases.head.heart else centroid)

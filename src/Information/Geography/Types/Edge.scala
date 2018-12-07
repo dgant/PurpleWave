@@ -2,10 +2,8 @@ package Information.Geography.Types
 
 import Information.Grids.Movement.GridGroundDistance
 import Lifecycle.With
-import Mathematics.Points.Pixel
+import Mathematics.Points.{Pixel, PixelRay, Tile}
 import bwta.Chokepoint
-
-import scala.collection.immutable.Seq
 
 class Edge(choke: Chokepoint) {
   
@@ -17,7 +15,8 @@ class Edge(choke: Chokepoint) {
   
   lazy val pixelCenter  : Pixel = new Pixel(choke.getCenter)
   lazy val radiusPixels : Double = choke.getWidth / 2
-  lazy val sidePixels   : Seq[Pixel] = Vector(new Pixel(choke.getSides.first), new Pixel(choke.getSides.second))
+  lazy val sidePixels   : Vector[Pixel] = Vector(new Pixel(choke.getSides.first), new Pixel(choke.getSides.second))
+  lazy val tiles        : Vector[Tile] = PixelRay(sidePixels.head, sidePixels.last).tilesIntersected.toVector
   lazy val zones        : Vector[Zone] =
     Vector(
       choke.getRegions.first,
@@ -26,7 +25,7 @@ class Edge(choke: Chokepoint) {
       _.centroid.pixelCenter.pixelDistanceSquared(
         new Pixel(region.getCenter))))
 
-  val distanceGrid: GridGroundDistance = new GridGroundDistance(pixelCenter.tileIncluding)
+  val distanceGrid: GridGroundDistance = new GridGroundDistance(tiles: _*)
   
   def contains(pixel: Pixel): Boolean = pixelCenter.pixelDistance(pixel) <= radiusPixels
 }

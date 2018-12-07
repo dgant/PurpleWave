@@ -84,12 +84,7 @@ class PvP3GateRobo extends GameplanModeTemplate {
     new EjectScout,
 
     new If(
-      new Or(
-        new EnemyStrategy(With.fingerprints.nexusFirst),
-        new UnitsAtLeast(3, Protoss.Reaver),
-        new And(
-          new EnemyStrategy(With.fingerprints.dtRush),
-          new UnitsAtLeast(2, Protoss.Observer, complete = true))),
+      new PvPIdeas.PvPSafeToAttack,
       new RequireMiningBases(2)),
 
     new FlipIf(

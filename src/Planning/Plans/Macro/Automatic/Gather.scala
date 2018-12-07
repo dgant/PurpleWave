@@ -15,19 +15,18 @@ import scala.collection.mutable
 
 class Gather extends Plan {
   
-  val workerLock = new LockUnits {
+  val workerLock: LockUnits = new LockUnits {
     unitMatcher.set(UnitMatchWorkers)
     unitCounter.set(UnitCountEverything)
   }
   
-  var resource  : Set[UnitInfo] = Set.empty
-  var minerals  : Set[UnitInfo] = Set.empty
-  var gasses    : Set[FriendlyUnitInfo] = Set.empty
-  var resources : Set[UnitInfo] = Set.empty
+  var minerals  : Vector[UnitInfo] = Vector.empty
+  var gasses    : Vector[FriendlyUnitInfo] = Vector.empty
+  var resources : Vector[UnitInfo] = Vector.empty
   var workers   : collection.Set[FriendlyUnitInfo] = Set.empty
   var gasWorkersNow = 0
   var gasWorkersMax = 0
-  var workersByResource = new mutable.HashMap[UnitInfo, mutable.HashSet[FriendlyUnitInfo]]
+  var workersByResource = new mutable.HashMap[UnitInfo, mutable.ArrayBuffer[FriendlyUnitInfo]]
   var resourceByWorker = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
   
   private val transfersLegal = new mutable.HashSet[(Zone, Zone)]
@@ -35,9 +34,19 @@ class Gather extends Plan {
   override def onUpdate() {
     workerLock.acquire(this)
     workers = workerLock.units
+    if (workers.isEmpty) {
+      return
+    }
     setGoals()
     countUnits()
-    workers.foreach(updateWorker)
+    if (resources.nonEmpty) {
+      updateWorker(workers.minBy(_.lastGatheringUpdate), true)
+      workers.foreach(updateWorker(_, false))
+    }
+  }
+
+  def isLegalResource(resource: UnitInfo): Boolean = {
+    resource.alive && (resource.unitClass.isMinerals || (resource.unitClass.isGas && resource.isOurs))
   }
   
   private def setGoals() {
@@ -57,55 +66,48 @@ class Gather extends Plan {
         .min
   }
   
-    private def countUnits() {
-      val activeBases = With.geography.ourBases.filter(_.townHall.exists(hall =>
-        hall.is(Zerg.LairOrHive)
-        || hall.remainingCompletionFrames < GameTime(0, 10)()
-        || hall.hasEverBeenCompleteHatch))
-      calculateTransferPaths(activeBases)
-      minerals  = activeBases.flatMap(_.minerals).toSet
-      gasses    = activeBases.flatMap(_.gas.flatMap(_.friendly).filter(u => u.complete)).toSet
-      if (minerals.isEmpty) {
-        minerals = With.geography.bases.flatMap(_.minerals).toSet
-      }
-      if (gasses.isEmpty) {
-        gasses = With.units.ours.filter(_.unitClass.isGas)
-      }
-      resources = gasses ++ minerals
-      if (resources.isEmpty) {
-        return
-      }
-    
-      workersByResource.clear()
-      resourceByWorker.clear()
-      resources.foreach(resource => workersByResource(resource) = new mutable.HashSet[FriendlyUnitInfo])
-      workers.foreach(unit => unit.agent.lastIntent.toGather.foreach(resource => assign(unit, resource)))
-      gasWorkersNow = resourceByWorker.count(_._2.unitClass.isGas)
+  private def countUnits() {
+    val activeBases = With.geography.ourBases.filter(_.townHall.exists(hall =>
+      hall.is(Zerg.LairOrHive)
+      || hall.remainingCompletionFrames < GameTime(0, 10)()
+      || hall.hasEverBeenCompleteHatch))
+    calculateTransferPaths(activeBases)
+    minerals  = activeBases.flatMap(_.minerals)
+    gasses    = activeBases.flatMap(_.gas.view.filter(_.complete).flatMap(_.friendly))
+    if (minerals.isEmpty) {
+      minerals = With.geography.bases.flatMap(_.minerals)
     }
-  
-    private def calculateTransferPaths(bases: Iterable[Base]) {
-      transfersLegal.clear()
-      val baseZones = bases.map(_.zone).toSet
-      baseZones.foreach(zone1 =>
-        baseZones.foreach(zone2 => {
-          val path = With.paths.zonePath(zone1, zone2)
-          val pathZones: Iterable[Zone] = path.map(_.steps.map(_.to).filter(zone => zone != zone1 && zone != zone2)).getOrElse(Iterable.empty)
-          val pathZonesDanger = pathZones.filter(zone =>
-                zone.units.exists(e => e.isEnemy  && e.unitClass.attacksGround)
-          && !  zone.units.exists(a => a.isOurs   && a.unitClass.attacksGround))
-        if (pathZonesDanger.isEmpty) {
-          transfersLegal += ((zone1, zone2))
-          transfersLegal += ((zone2, zone1))
-        }
-      }))
+    if (gasses.isEmpty) {
+      gasses = With.units.ours.view.filter(_.unitClass.isGas).toVector
+    }
+    resources = gasses ++ minerals
+    workersByResource.clear()
+    resourceByWorker.clear()
+    resources.foreach(resource => workersByResource(resource) = new mutable.ArrayBuffer[FriendlyUnitInfo])
+    workers.foreach(w => w.agent.lastIntent.toGather.foreach(resource => if (workersByResource.contains(resource)) assign(w, resource)))
+    gasWorkersNow = resourceByWorker.count(_._2.unitClass.isGas)
   }
-  
-  private def isActiveGas(resource: UnitInfo): Boolean = resource.unitClass.isGas
-  
+
+  private def calculateTransferPaths(bases: Iterable[Base]) {
+    transfersLegal.clear()
+    val baseZones = bases.map(_.zone).toSet
+    baseZones.foreach(zone1 =>
+      baseZones.foreach(zone2 => {
+        val path = With.paths.zonePath(zone1, zone2)
+        val pathZones: Iterable[Zone] = path.map(_.steps.map(_.to).filter(zone => zone != zone1 && zone != zone2)).getOrElse(Iterable.empty)
+        val pathZonesDanger = pathZones.filter(zone =>
+              zone.units.exists(e => e.isEnemy  && e.unitClass.attacksGround)
+        && !  zone.units.exists(a => a.isOurs   && a.unitClass.attacksGround))
+      if (pathZonesDanger.isEmpty) {
+        transfersLegal += ((zone1, zone2))
+        transfersLegal += ((zone2, zone1))
+      }
+    }))
+  }
+
   private def assign(worker: FriendlyUnitInfo, resource: UnitInfo) {
     unassign(worker)
-    if ( ! resources.contains(resource)) return
-    if (isActiveGas(resource)) {
+    if (resource.unitClass.isGas) {
       gasWorkersNow += 1
     }
     resourceByWorker(worker) = resource
@@ -114,16 +116,20 @@ class Gather extends Plan {
   
   private def unassign(worker: FriendlyUnitInfo) {
     val resource = resourceByWorker.get(worker)
-    if (resource.exists(isActiveGas)) {
-      gasWorkersNow -= 1
-    }
+    gasWorkersNow -= resource.count(_.unitClass.isGas)
     resource.foreach(workersByResource(_) -= worker)
     resourceByWorker.remove(worker)
   }
   
-  private def updateWorker(worker: FriendlyUnitInfo) {
-    val bestResource = resources.maxBy(utility(worker, _))
-    assign(worker, bestResource)
+  private def updateWorker(worker: FriendlyUnitInfo, forceUpdate: Boolean) {
+    if (forceUpdate
+      || With.framesSince(worker.lastGatheringUpdate) > GameTime(0, 5)()
+      || ! resourceByWorker.get(worker).exists(_.aliveAndComplete)
+      ) {
+      worker.lastGatheringUpdate = With.frame
+      val bestResource = resources.maxBy(utility(worker, _))
+      assign(worker, bestResource)
+    }
     worker.agent.intend(this, new Intention {
       toGather = resourceByWorker.get(worker)
     })
@@ -143,7 +149,7 @@ class Gather extends Plan {
     
     val safety      = if ( ! worker.zone.bases.exists(_.owner.isUs) || transfersLegal.contains((worker.zone, resource.zone))) 100.0 else 1.0
     val continuity  = if (resourceByWorker.get(worker).contains(resource)) 2.0 else 1.0
-    val distance    = Math.max(resource.remainingCompletionFrames * worker.topSpeed, worker.pixelDistanceEdge(resource))
+    val distance    = Math.max(resource.remainingCompletionFrames * worker.topSpeed, worker.pixelDistanceCenter(resource))
     val distanceFactor = 32 * 30 + distance
 
     val currentWorkerCount = workersByResource(resource).count(_ != worker)

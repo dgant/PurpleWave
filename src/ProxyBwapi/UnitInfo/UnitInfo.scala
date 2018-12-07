@@ -23,7 +23,9 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   protected val cd1: Int = Math.min(
     With.configuration.foreignUnitUpdatePeriod,
     With.configuration.friendlyUnitUpdatePeriod)
-  
+  protected val cd2: Int = 2 * cd1
+  protected val cd4: Int = 4 * cd1
+
   //////////////
   // Identity //
   //////////////
@@ -65,6 +67,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   var framesFailingToAttack     : Int = 0
   var hasEverBeenCompleteHatch  : Boolean = false // Stupid AIST hack fix for detecting whether a base is mineable
   var lastAttacker              : Option[UnitInfo] = None
+  var lastGatheringUpdate       : Int = Int.MinValue
   def lastTotalHealthPoints: Int = lastHitPoints + lastShieldPoints + lastDefensiveMatrixPoints
   
   def updateCommon() {
@@ -222,14 +225,6 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     && ! burrowed,
     cd1)
   
-  def topSpeedChasing: Double = topSpeedChasingCache()
-  private val topSpeedChasingCache = new Cache(() =>
-    topSpeed
-    * PurpleMath.nanToOne(
-      Math.max(0, cooldownMaxAirGround - unitClass.stopFrames)
-      / cooldownMaxAirGround.toDouble),
-    cd1)
-  
   def topSpeed: Double = topSpeedCache()
   private val topSpeedCache = new Cache(() =>
     if ( ! canMove) 0 else
@@ -245,7 +240,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
         (isHydralisk()  && player.hasUpgrade(Zerg.HydraliskSpeed))    ||
         (isUltralisk()  && player.hasUpgrade(Zerg.UltraliskSpeed)))
         1.5 else 1.0)),
-  cd1)
+    cd4)
   
   def projectFrames(framesToLookAhead: Double): Pixel = pixelCenter.add((velocityX * framesToLookAhead).toInt, (velocityY * framesToLookAhead).toInt)
   

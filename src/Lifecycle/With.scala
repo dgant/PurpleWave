@@ -22,7 +22,7 @@ import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.ProxyBWMirror
 import ProxyBwapi.UnitTracking.UnitTracker
 import Strategery.History.History
-import Strategery.Strategist
+import Strategery.{StarCraftMapMatcher, Strategist}
 import _root_.Performance.{Latency, MicroReaction, PerformanceMonitor}
 import bwta.BWTA
 
@@ -77,6 +77,7 @@ object With {
   var mapTileWidth    : Int     = 0
   var mapTileHeight   : Int     = 0
   var mapFileName     : String  = _
+  var mapId           : String  = _
   def mapPixelWidth   : Int     = mapTileWidth * 32
   def mapPixelHeight  : Int     = mapTileHeight * 32
   
@@ -99,6 +100,7 @@ object With {
     mapTileWidth      = game.mapWidth
     mapTileHeight     = game.mapHeight
     mapFileName       = game.mapFileName
+    mapId             = StarCraftMapMatcher.clean(mapFileName)
     configuration     = new Configuration
     logger            = new Logger
     initializeBWTA()

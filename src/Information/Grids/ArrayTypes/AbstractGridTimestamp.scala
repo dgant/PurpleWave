@@ -15,6 +15,7 @@ abstract class AbstractGridTimestamp extends AbstractGridInt {
   reset()
 
   def stamp(i: Int) { set(i, With.frame)}
+  def stamp(x: Int, y: Int) { set(x + y * With.mapTileWidth, With.frame)}
   def stamp(tile: Tile) { stamp(tile.i) }
   def framesSince(tile: Tile): Int = frameUpdated - get(tile)
   

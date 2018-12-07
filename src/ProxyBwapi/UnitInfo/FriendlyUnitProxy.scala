@@ -13,8 +13,8 @@ import scala.collection.JavaConverters._
 abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(base, id) {
 
   override protected val cd1: Int = With.configuration.friendlyUnitUpdatePeriod
-  protected val cd2 = cd1 * 2
-  protected val cd4 = cd1 * 4
+  override protected val cd2: Int = cd1 * 2
+  override protected val cd4: Int = cd1 * 4
   
   override def equals(obj: Any): Boolean = obj.isInstanceOf[FriendlyUnitProxy] && obj.asInstanceOf[FriendlyUnitProxy].id == id
   override def hashCode(): Int = id.hashCode

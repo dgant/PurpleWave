@@ -55,6 +55,7 @@ class SafeToMoveOut extends Predicate {
     val zealotsUs     = countOurs(Protoss.Zealot)
     val dragoonsUs    = countOurs(Protoss.Dragoon)
     val reaversUs     = countOurs(Protoss.Reaver)
+    val shuttlesUs    = countOurs(Protoss.Shuttle)
     val archonsUs     = countOurs(Protoss.Archon)
     val carriersUs    = countOurs(Protoss.Carrier)
     val zealotsEnemy  = countEnemy(Protoss.Zealot)
@@ -73,6 +74,7 @@ class SafeToMoveOut extends Predicate {
         dragoonsUs  * (if (rangeUs) scoreDragoon else 0.0)
       + zealotsUs   * (if (speedUs) scoreSpeedlot else 0.0)
       + reaversUs   * scoreReaver
+      + Math.min(shuttlesUs, reaversUs) * scoreShuttle
       + archonsUs   * scoreArchon
       + carriersUs  * scoreCarrier
     )

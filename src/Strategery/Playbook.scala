@@ -76,7 +76,7 @@ class TestingPlaybook extends EmptyPlaybook {
 }
 
 class PurpleWavePlaybook extends EmptyPlaybook {
-  override lazy val disabled  : Seq[Strategy] = StrategyGroups.disabled
+  override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled
 }
 
 class SSCAITPlaybook extends PurpleWavePlaybook {

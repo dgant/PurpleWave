@@ -29,6 +29,9 @@ class ChillOverlords extends Plan {
   )))
   
   override def onUpdate() {
+    if ( ! With.self.isZerg) {
+      return
+    }
     if (With.self.hasUpgrade(Zerg.OverlordSpeed)) {
       return
     }

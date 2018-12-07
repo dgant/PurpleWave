@@ -38,31 +38,35 @@ object PvPIdeas {
       new EnemyBasesAtLeast(3)),
     new Attack(Protoss.DarkTemplar))
 
-  class AttackSafely extends If(
-    new And(
-      // Are we safe against Dark Templar?
-      new Or(
-        new UnitsAtLeast(2, Protoss.Observer, complete = true),
-        new Not(new EnemyHasShown(Protoss.DarkTemplar))),
-      // Are we obligated to (or want to) move out?
-      new Or(
-        new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
-        new EnemyStrategy(With.fingerprints.cannonRush),
-        new Employing(PvPOpen4GateGoon),
-        new MiningBasesAtLeast(3),
-        new EnemyBasesAtLeast(3),
-        new SafeToMoveOut),
-      // Can our army contend with theirs?
-      new Or(
-        new UnitsAtLeast(1, UnitMatchAnd(UnitMatchWarriors, UnitMatchNot(Protoss.Dragoon))),
-        new UpgradeComplete(Protoss.DragoonRange),
-        new Not(new EnemyHasUpgrade(Protoss.DragoonRange))),
-      // Don't mess with 4-Gates
-      new Or(
-        new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
-        new UnitsAtLeast(4, Protoss.Gateway, complete = true),
-        new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)))),
-    new Attack)
+  class PvPSafeToAttack extends And(
+    // Are we safe against Dark Templar?
+    new Or(
+      new UnitsAtLeast(2, Protoss.Observer, complete = true),
+      new Not(new EnemyHasShown(Protoss.DarkTemplar))),
+    // Are we obligated to (or want to) move out?
+    new Or(
+      new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
+      new EnemyStrategy(With.fingerprints.cannonRush),
+      new Employing(PvPOpen4GateGoon),
+      new MiningBasesAtLeast(3),
+      new EnemyBasesAtLeast(3),
+      new SafeToMoveOut),
+    // Can our army contend with theirs?
+    new Or(
+      new UnitsAtLeast(1, UnitMatchAnd(UnitMatchWarriors, UnitMatchNot(Protoss.Dragoon))),
+      new UpgradeComplete(Protoss.DragoonRange),
+      new Not(new EnemyHasUpgrade(Protoss.DragoonRange))),
+    // Don't mess with 4-Gates
+    new Or(
+      new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
+      new UnitsAtLeast(4, Protoss.Gateway, complete = true),
+      new And(
+        new UnitsAtLeast(1, Protoss.Reaver, complete = true),
+        new UnitsAtLeast(1, Protoss.Shuttle, complete = true)),
+      new Not(new EnemyStrategy(With.fingerprints.fourGateGoon))))
+  { override def isComplete: Boolean = super.isComplete } // Easier debugging
+
+  class AttackSafely extends If(new PvPIdeas.PvPSafeToAttack, new Attack)
 
   class ReactToCannonRush extends If(
     new EnemyStrategy(With.fingerprints.cannonRush),

@@ -41,7 +41,6 @@ object Shuttling {
         .points(7)
         .map(targetSnipeStart.add)
         .filter(tile => tile.valid && With.grids.walkable.get(tile))
-        .filter(With.grids.walkable.get)
     val targetSnipeFinal = ByOption.minBy(targetSnipeTiles)(tile => {
       val enemyRange = 1.0 + Math.max(0.0, With.grids.enemyRange.get(tile) - With.grids.enemyRange.addedRange)
       val enemyFactor = enemyRange * enemyRange
@@ -49,17 +48,17 @@ object Shuttling {
       val distanceIdeal = passenger.effectiveRangePixels //+ passenger.topSpeed * passenger.cooldownMaxAgainst(target.get)
       val distanceOff = 1.0 + Math.max(0.0, distanceIdeal - distanceTarget)
       val distanceFactor = distanceOff * distanceOff
-      enemyFactor * distanceFactor
+      val visionFactor = if (With.grids.enemyVision.isSet(tile)) 3 else 2
+      enemyFactor * distanceFactor * visionFactor
     }).map(_.pixelCenter)
     targetSnipeFinal.getOrElse(passenger.agent.destination)
   }
 
-  def pickupNeed(hailer: FriendlyUnitInfo): Double = {
+  def pickupNeed(shuttle: FriendlyUnitInfo, hailer: FriendlyUnitInfo): Double = {
     val targetedByScarab = hailer.matchups.enemies.exists(r => r.is(Protoss.Reaver) && r.cooldownLeft > 0) &&
       With.units.inPixelRadius(hailer.pixelCenter, 32*7).exists(s => s.orderTarget.contains(hailer) && s.is(Protoss.Scarab))
-    val endangered = hailer.effectiveRangePixels > 32 * 5 && hailer.matchups.threatsInRange.exists(threat => hailer.effectiveRangePixels > threat.effectiveRangePixels)
+    val endangered = hailer.matchups.framesOfSafety < shuttle.framesToTravelTo(hailer.pixelCenter) + 2 * shuttle.unitClass.framesToTurn180
     val sojourning = hailer.agent.toTravel.exists(_.pixelDistance(hailer.pixelCenter) > 32.0 * 20)
-
     (if(targetedByScarab) 100 else 1) + (if (endangered) 10 else 1) + (if (sojourning) 1 else 0)
   }
 }

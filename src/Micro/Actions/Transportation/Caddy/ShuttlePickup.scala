@@ -19,7 +19,7 @@ object ShuttlePickup extends Action {
         p => shuttle.canTransport(p)
         && p.pixelDistanceCenter(Shuttling.passengerDestination(p)) > Shuttling.dropoffRadius + 64)
       .toSeq
-    val pickupCandidate = ByOption.maxBy(pickupCandidates)(c => Shuttling.pickupNeed(c) / (1.0 + c.pixelDistanceSquared(shuttle)))
+    val pickupCandidate = ByOption.maxBy(pickupCandidates)(c => Shuttling.pickupNeed(shuttle, c) / (1.0 + c.pixelDistanceSquared(shuttle)))
     pickupCandidate.foreach(hailer => {
       With.commander.rightClick(hailer, shuttle)
       With.commander.move(shuttle, hailer.pixelCenter)

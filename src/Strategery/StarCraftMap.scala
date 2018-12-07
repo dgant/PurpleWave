@@ -3,18 +3,10 @@ package Strategery
 import Lifecycle.With
 abstract class StarCraftMap {
   
-  def name: String = this.getClass.getSimpleName
-  
-  def matches: Boolean = {
-    val nameStub  = clean(name)
-    val fileStub  = clean(With.mapFileName)
-    val output    = nameStub.contains(fileStub) || fileStub.contains(nameStub)
-    output
-  }
-  
-  private def clean(mapString: String): String = {
-    mapString.toLowerCase.replaceAll("[^a-z]", "")
-  }
+  val name: String = this.getClass.getSimpleName
+  val nameStub  = StarCraftMapMatcher.clean(name)
+
+  def matches: Boolean = nameStub.contains(With.mapId) || With.mapId.contains(nameStub)
   
   val mineralWalkingOkay: Boolean = true
   val trustGroundDistance: Boolean = true

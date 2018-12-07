@@ -78,6 +78,7 @@ class Geography {
   private def getSettlements: Vector[Base] = (Vector.empty
   ++ With.geography.bases.filter(_.units.exists(u => u.isOurs && u.unitClass.isBuilding))
   ++ With.units.ours
+    .view
     .filter(u => u.agent.toBuild.exists(_.isTownHall))
     .flatMap(u => u.agent.toBuildTile.map(tile => tile.zone.bases.find(base => base.townHallTile == tile)))
     .flatten

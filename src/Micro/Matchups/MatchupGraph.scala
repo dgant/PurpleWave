@@ -38,13 +38,17 @@ class MatchupGraph {
     // Sometimes we need to include units faster than that.
     // For example: Spider mines that just popped up, or Siege Tanks/Lurkers that just started shooting at us unexpectedly.
     entrants.clear
-    newEntrants.foreach(entrant => {
-      val battle = assignToBattle(entrant)
-      if (battle.isDefined) {
-        if ( ! entrants.contains(battle.get)) {
-          entrants.put(battle.get, new mutable.HashSet[UnitInfo])
+    With.units.playerOwned.foreach(entrant => {
+      if (entrant.aliveAndComplete
+        &&  entrant.battle.isEmpty
+        &&  With.framesSince(entrant.frameDiscovered) < 72) {
+        val battle = assignToBattle(entrant)
+        if (battle.isDefined) {
+          if ( ! entrants.contains(battle.get)) {
+            entrants.put(battle.get, new mutable.HashSet[UnitInfo])
+          }
+          entrants(battle.get) += entrant
         }
-        entrants(battle.get) += entrant
       }
     })
   }
@@ -55,14 +59,6 @@ class MatchupGraph {
       neighbors.maxBy(_._2.size)._1
     }
     else None
-  }
-
-  private def newEntrants: Seq[UnitInfo] = {
-    With.units.all.view.filter(unit =>
-      unit.aliveAndComplete
-        &&  unit.battle.isEmpty
-        &&  With.framesSince(unit.frameDiscovered) < 72
-        && ! unit.isNeutral).toSeq
   }
   
 }

@@ -37,6 +37,7 @@ abstract class GameplanModeTemplate extends GameplanMode {
   def defaultWorkerPlan     : Plan              = new If(new Not(new WeAreZerg), new PumpWorkers(superSaturate))
   def defaultScoutPlan      : Plan              = new ScoutAt(scoutAt)
   def defaultScoutExposPlan : Plan              = new If(new BasesAtLeast(2), new ScoutExpansionsAt(scoutExpansionsAt))
+  def defaultYoloPlan       : Plan              = new If(new Check(() => Yolo.active), new Attack)
   def priorityDefensePlan   : Plan              = NoPlan()
   def priorityAttackPlan    : Plan              = NoPlan()
   def defaultNukePlan       : Plan              = new NukeBase
@@ -50,8 +51,8 @@ abstract class GameplanModeTemplate extends GameplanMode {
     new RemoveMineralBlocksAt(removeMineralBlocksAt))
   
   def defaultTacticsPlans: Vector[Plan] = Vector(
-    new If(new Check(() => Yolo.active), new Attack),
     defaultAggressionPlan,
+    defaultYoloPlan,
     priorityDefensePlan,
     priorityAttackPlan,
     defaultNukePlan,

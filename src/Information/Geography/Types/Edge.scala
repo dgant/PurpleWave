@@ -1,5 +1,6 @@
 package Information.Geography.Types
 
+import Information.Grids.Movement.GridGroundDistance
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import bwta.Chokepoint
@@ -24,6 +25,8 @@ class Edge(choke: Chokepoint) {
     .map(region => With.geography.zones.minBy(
       _.centroid.pixelCenter.pixelDistanceSquared(
         new Pixel(region.getCenter))))
+
+  val distanceGrid: GridGroundDistance = new GridGroundDistance(pixelCenter.tileIncluding)
   
   def contains(pixel: Pixel): Boolean = pixelCenter.pixelDistance(pixel) <= radiusPixels
 }

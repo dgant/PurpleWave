@@ -32,7 +32,7 @@ class Simulation(
   lazy val ourWidth         : Double              = battle.us.units.filterNot(_.flying).map(unit => if (unit.flying) 0.0 else unit.unitClass.dimensionMin + unit.unitClass.dimensionMax).sum
   lazy val chokeMobility    : Map[Zone, Double]   = battle.us.units.map(_.zone).distinct.map(zone => (zone, getChokeMobility(zone))).toMap
   
-  val simulacra: Map[UnitInfo, Simulacrum] =
+  val simulacra: Map[UnitInfo, Simulacrum] = if (With.configuration.enableMCRS) Map.empty else
     (unitsOurs.filter(_.canMove) ++ unitsEnemy)
       .map(simulacrum => (simulacrum.realUnit, simulacrum))
       .toMap

@@ -6,15 +6,19 @@ import Lifecycle.With
 import Mathematics.Points.SpecificPoints
 import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.Terran
+import Utilities.ByOption
 
 object ZoneUpdater {
   
   def update() {
-    // Grid tasks update for the first time after Geography because many need to understand zones
-    // But for us to initialize zones properly, we need the unit grid ready.
     if (With.frame == 0) {
+      // Grid tasks update for the first time after Geography because many need to understand zones
+      // But for us to initialize zones properly, we need the unit grid ready.
       With.grids.units.initialize()
       With.grids.units.update()
+      // Precalculate these
+      With.geography.zones.foreach(_.distanceGrid)
+      With.geography.zones.foreach(_.edges.foreach(_.distanceGrid))
     }
 
     With.geography.zones.foreach(_.unitBuffer.clear())
@@ -30,7 +34,6 @@ object ZoneUpdater {
         .foreach(startLocationBase =>
           With.geography.bases
             .filter(otherBase => otherBase != startLocationBase && otherBase.gas.nonEmpty)
-            .toVector
             .sortBy(_.zone.distancePixels(startLocationBase.zone))
             .headOption
             .foreach(_.isNaturalOf = Some(startLocationBase)))
@@ -42,7 +45,7 @@ object ZoneUpdater {
       .filter(_.owner.isNeutral)
       .toSet
   
-    With.geography.zones.foreach(zone =>  { zone.owner = With.neutral; zone.contested = false })
+    With.geography.zones.foreach(zone => { zone.owner = With.neutral; zone.contested = false })
     val playerBorders = Players.all
       .filterNot(_.isNeutral)
       .map(player => (player, BorderFinder.claimedZones(player)))
@@ -58,10 +61,7 @@ object ZoneUpdater {
       }
     }))
   
-    With.geography.home = With.geography.ourBases
-      .toVector
-      .sortBy( ! _.isStartLocation)
-      .headOption
+    With.geography.home = ByOption.minBy(With.geography.ourBases)(_.isStartLocation)
       .map(_.townHallArea.startInclusive)
       .getOrElse(SpecificPoints.tileMiddle)
   }

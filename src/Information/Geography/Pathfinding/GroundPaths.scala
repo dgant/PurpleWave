@@ -2,26 +2,20 @@ package Information.Geography.Pathfinding
 
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
-import bwta.BWTA
+import Utilities.ByOption
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 trait GroundPaths {
+
+  val impossiblyLargeDistance: Int = 32 * 32 * 256 * 256 * 100
   
-  //Cache ground distances with a LRU (Least-recently used) cache
-  private val maxCacheSize  = 1000000
-  private val distanceCache = new mutable.HashMap[(Tile, Tile), Double]
-  private val distanceAge   = new mutable.HashMap[(Tile, Tile), Double]
-  
-  val impossiblyLargeDistance: Double = 32.0 * 32.0 * 256.0 * 256.0 * 100.0
-  
-  def groundPathExists(origin: Tile, destination: Tile, requireBwta: Boolean = false): Boolean = {
-    groundPixelsByTile(origin, destination, requireBwta) < impossiblyLargeDistance
+  def groundPathExists(origin: Tile, destination: Tile): Boolean = {
+    groundPixelsByTile(origin, destination) < impossiblyLargeDistance
   }
   
   def groundPixels(origin: Pixel, destination: Pixel): Double = {
-    
     // Some maps have broken ground distance (due to continued reliance on BWTA,
     // which in particular seems to suffer on maps with narrow ramps, eg. Plasma, Third World
     if (With.strategy.map.exists( ! _.trustGroundDistance)) {
@@ -29,15 +23,8 @@ trait GroundPaths {
     }
     
     // Let's first check if we can use air distance. It's cheaper and more accurate.
-    // We can "get away" with using air distance if:
-    // A. We're in the same zone, or
-    // B. We're in adjacent zones with the chokepoint between us
-    
-    var useAirDistance  = false
-    val zoneOrigin      = origin.zone
-    val zoneDestination = destination.zone
-    
-    if (zoneOrigin == zoneDestination) {
+    // We can "get away" with using air distance if we're in the same zone
+    if (origin.zone == destination.zone) {
       return origin.pixelDistance(destination)
     }
     
@@ -46,88 +33,18 @@ trait GroundPaths {
     // before which we're getting pixel-resolution distance and after which we're getting tile-resolution distance
     groundPixelsByTile(origin.tileIncluding, destination.tileIncluding)
   }
-  
-  def groundPixelsByTile(
-    origin: Tile,
-    destination: Tile,
-    requireBwta: Boolean = false): Double = {
 
-    if (origin.zone == destination.zone) {
-      return origin.pixelCenter.pixelDistance(destination.pixelCenter)
-    }
-    
-    val request = (origin, destination)
-    if ( ! distanceCache.contains(request)) {
-      calculateDistance(request, requireBwta)
-    }
-    distanceAge.put(request, With.frame)
-    val result = distanceCache(request)
-    limitCacheSize()
-    
-    if (result < 0) {
-      return impossiblyLargeDistance
-    }
-    
-    result
-  }
-  
-  private def calculateDistance(request: (Tile, Tile), requireBwta: Boolean) {
-    val distance =
-      if (With.frame > 0 && ! requireBwta)
-        With.paths.groundDistanceFast(request._1.pixelCenter, request._2.pixelCenter)
-      else
-        BWTA.getGroundDistance(request._1.bwapi, request._2.bwapi)
-    
-    distanceCache.put(request, distance)
-  }
-  
-  private def limitCacheSize() {
-    if (distanceCache.keys.size > maxCacheSize) {
-      val cutoff = With.frame - 24 * 60
-      for(p <- distanceAge) {
-        if (p._2 < cutoff) {
-          distanceCache.remove(p._1)
-          distanceAge.remove(p._1)
-        }
-      }
-    }
+  protected def groundPixelsByTile(origin: Tile, destination: Tile): Int = {
+    ByOption
+      .min(destination.zone.edges.map(edge =>
+        edge.distanceGrid.get(destination) + edge.distanceGrid.get(origin)))
+      .getOrElse(impossiblyLargeDistance)
   }
   
   ////////////////////////////////////////////////////////////
   // From the old GroundPathFinder -- this can be split out //
   ////////////////////////////////////////////////////////////
-  
-  def groundDistanceFast(from: Pixel, to: Pixel): Double = {
-    
-    val fromZone = from.zone
-    val toZone = to.zone
-    
-    if (fromZone == toZone) {
-      return from.pixelDistance(to)
-    }
-    
-    if ( ! With.paths.groundPathExists(
-      fromZone.centroid,
-      toZone.centroid,
-      requireBwta = true)) {
-      return With.paths.impossiblyLargeDistance
-    }
-    
-    val fromEdgeTiles = fromZone.edges.map(_.pixelCenter.tileIncluding)
-    val toEdgeTiles   =   toZone.edges.map(_.pixelCenter.tileIncluding)
-    
-    fromEdgeTiles.map(fromEdgeTile =>
-      toEdgeTiles.map(toEdgeTile =>
-        from.pixelDistance(fromEdgeTile.pixelCenter) +
-          to.pixelDistance(  toEdgeTile.pixelCenter) +
-          With.paths.groundPixelsByTile(
-            fromEdgeTile,
-            toEdgeTile,
-            requireBwta = true))
-        .min)
-      .min
-  }
-  
+
   private val defaultId = -1
   private val maximumMapTiles = 256 * 256
   private var currentTileStateId = 0

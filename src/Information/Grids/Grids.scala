@@ -19,6 +19,7 @@ class Grids {
   val enemyVision             = new GridEnemyVision
   val friendlyDetection       = new GridFriendlyDetection
   val friendlyVision          = new GridFriendlyVision
+  val harvestingArea          = new GridHarvestingArea
   val mobilityAir             = new GridMobilityAir
   val mobilityBuildings       = new GridMobilityBuildings
   val mobilityGround          = new GridMobilityGround

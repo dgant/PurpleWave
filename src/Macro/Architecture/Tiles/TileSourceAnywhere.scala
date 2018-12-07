@@ -10,7 +10,7 @@ object TileSourceAnywhere extends TileSource {
     true
   }
   
-  override def tiles(blueprint: Blueprint): Iterable[Tile] = {
-    With.geography.allTiles.filter(With.grids.buildable.get)
+  override def tiles(blueprint: Blueprint): Seq[Tile] = {
+    With.geography.allTiles.indices.filter(With.grids.buildable.get).map(new Tile(_))
   }
 }

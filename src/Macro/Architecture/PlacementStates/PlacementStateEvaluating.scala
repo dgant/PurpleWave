@@ -26,9 +26,9 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
     val nanosecondsOnStart = System.nanoTime()
     if (stillSurveying) {
       val sources = Surveyor.candidates(blueprint)
-      candidatesUnfiltered      = Some(new ArrayBuffer[Tile])
-      candidatesFiltered        = Some(new ArrayBuffer[Tile])
-      candidatesUnfiltered.get  ++= sources.flatMap(_.tiles(blueprint))
+      candidatesUnfiltered = Some(new ArrayBuffer[Tile])
+      candidatesFiltered   = Some(new ArrayBuffer[Tile])
+      sources.foreach(source => candidatesUnfiltered.get ++= source.tiles(blueprint))
       updateStepNanoseconds(nanosecondsOnStart)
     }
     else if (stillFiltering) {

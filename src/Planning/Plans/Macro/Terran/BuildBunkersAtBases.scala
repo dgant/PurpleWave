@@ -30,7 +30,7 @@ class BuildBunkersAtBases(
         new Blueprint(this,
           building          = Some(Terran.Bunker),
           requireZone       = Some(zone),
-          requireCandidates = Some(zone.tiles),
+          requireCandidates = Some(zone.tilesSeq),
           placement         = Some(placement)))))
     .toMap
   

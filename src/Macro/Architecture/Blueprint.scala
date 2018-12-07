@@ -22,7 +22,7 @@ class Blueprint(
   var requireResourceGap  : Option[Boolean]           = None,
   var placement           : Option[PlacementProfile]  = None,
   var marginPixels        : Option[Double]            = None,
-  val requireCandidates   : Option[Iterable[Tile]]    = None,
+  val requireCandidates   : Option[Seq[Tile]]         = None,
   var preferZone          : Option[Zone]              = None,
   val requireZone         : Option[Zone]              = None,
   var respectHarvesting   : Option[Boolean]           = None) {
@@ -94,9 +94,7 @@ class Blueprint(
     if ( ! buildable(tile)) {
       return false
     }
-    
-    // TODO: Migrate the rest out into matches/buildable
-    
+
     val thisZone = tile.zone
     if (thisZone.island
       && ! Plasma.matches
@@ -120,14 +118,25 @@ class Blueprint(
       nextTile.zone.perimeter.contains(nextTile)
       || ! With.architecture.buildable(nextTile)
       || (requireCreep.get != With.grids.creep.get(nextTile))
-      || (respectHarvesting.get && With.architecture.isHarvestingArea(nextTile))
+      || (respectHarvesting.get && With.grids.harvestingArea.get((nextTile)))
       || (requireResourceGap.get && ! With.grids.buildableTownHall.get(nextTile))
       || ( ! requireTownHallTile.get && With.grids.units.get(nextTile).exists(u => ! u.flying && u.isEnemy || ! u.canMove))
     )
-    
-    val violator = buildArea.tiles.find(violatesBuildArea)
-    
-    violator.isEmpty
+
+    var x = buildArea.startInclusive.x
+    var xMax = buildArea.endExclusive.x
+    var yMax = buildArea.endExclusive.y
+    while (x < xMax) {
+      var y = buildArea.startInclusive.y
+      while (y < yMax) {
+        if (violatesBuildArea(Tile(x, y))) {
+          return false
+        }
+        y += 1
+      }
+      x += 1
+    }
+    true
   }
   
   override def toString: String =

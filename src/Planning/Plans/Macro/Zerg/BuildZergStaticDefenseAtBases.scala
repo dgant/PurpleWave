@@ -32,7 +32,7 @@ class BuildZergStaticDefenseAtBases(
         new Blueprint(this,
           building          = Some(Zerg.CreepColony),
           requireZone       = Some(zone),
-          requireCandidates = Some(zone.tiles),
+          requireCandidates = Some(zone.tilesSeq),
           placement         = Some(placement)))))
     .toMap
   

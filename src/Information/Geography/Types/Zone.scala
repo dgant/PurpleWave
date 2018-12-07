@@ -18,7 +18,8 @@ class Zone(
   val bwtaRegion  : Region,
   val boundary    : TileRectangle,
   val tiles       : mutable.Set[Tile]) {
-  
+
+  val tilesSeq = tiles.toSeq
   lazy val  edges             : Array[Edge]         = With.geography.edges.filter(_.zones.contains(this)).toArray
   lazy val  bases             : Array[Base]         = With.geography.bases.filter(_.townHallTile.zone == this).toArray
   lazy val  border            : Set[Tile]           = tiles.filter(_.adjacent8.exists( ! tiles.contains(_))).toSet
@@ -26,7 +27,7 @@ class Zone(
   lazy val  centroid          : Tile                = if (tiles.isEmpty) new Pixel(bwtaRegion.getCenter).tileIncluding else tiles.minBy(_.tileDistanceSquared(new Pixel(bwtaRegion.getCenter).tileIncluding))
   lazy val  area              : Double              = bwtaRegion.getPolygon.getArea
   lazy val  points            : Iterable[Pixel]     = bwtaRegion.getPolygon.getPoints.asScala.map(new Pixel(_)).toVector
-  lazy val  island            : Boolean             = With.geography.startBases.count(base => With.paths.zonePath(this, base.zone).isDefined) < 2
+  lazy val  island            : Boolean             = With.geography.startBases.count(st => With.paths.groundPathExists(st.heart, centroid)) < 2
   lazy val  tilesBuildable    : Array[Tile]         = { With.grids.buildableTerrain.initialize(); tiles.filter(With.grids.buildableTerrain.get).toArray }
   lazy val  maxMobility       : Int                 = ByOption.max(tiles.map(With.grids.mobilityGround.get)).getOrElse(0)
   lazy val  unwalkable        : Boolean             = ! tiles.exists(With.grids.walkable.get)
@@ -50,7 +51,7 @@ class Zone(
   
   def pathTo          (to: Zone): Option[ZonePath]  = With.paths.zonePath(this, to)
   def canWalkTo       (to: Zone): Boolean           = pathTo(to).isDefined
-  def distancePixels  (to: Zone): Double            = With.paths.zoneDistance(this, to)
+  def distancePixels  (to: Zone): Double            = centroid.groundPixels(to.centroid)
   
   override def toString: String = (
     name

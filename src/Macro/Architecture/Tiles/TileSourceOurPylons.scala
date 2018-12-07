@@ -13,14 +13,14 @@ object TileSourceOurPylons extends TileSource {
     blueprint.requirePower.get
   }
   
-  override def tiles(blueprint: Blueprint): Iterable[Tile] = {
-    val output = new mutable.HashSet[Tile]
+  override def tiles(blueprint: Blueprint): Seq[Tile] = {
+    val output = new mutable.ArrayBuffer[Tile]
     With.units.ours
       .foreach(pylon =>
         if (pylon.is(Protoss.Pylon))
           With.grids.psi3Height.psiPoints.foreach(point =>
             pylon.tileTopLeft.add(point)
           ))
-    output
+    output.distinct
   }
 }

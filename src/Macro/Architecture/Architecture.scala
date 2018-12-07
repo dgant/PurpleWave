@@ -14,9 +14,6 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import scala.collection.mutable
 
 class Architecture {
-  
-  lazy val harvestingTiles: Array[TileRectangle] = With.geography.bases.map(_.harvestingArea).toArray
-  
   val exclusions        : mutable.ArrayBuffer[Exclusion]            = new mutable.ArrayBuffer[Exclusion]
   val unbuildable       : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
   val unwalkable        : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
@@ -75,10 +72,6 @@ class Architecture {
   
   def buildable(tile: Tile): Boolean = {
     With.grids.buildable.get(tile) && ! unbuildable.contains(tile)
-  }
-  
-  def isHarvestingArea(tile: Tile): Boolean = {
-    harvestingTiles.exists(_.contains(tile))
   }
   
   def walkable(tile: Tile): Boolean = {
@@ -203,13 +196,16 @@ class Architecture {
   }
 
   private def recalculateExclusions() {
-    val forUnbuildable  = With.units.all.filter(isGroundBuilding)
+    def forUnbuildable  = With.units.all.view.filter(isGroundBuilding)
     val forUnwalkable   = With.units.ours.toSeq.filter(unit => isGroundBuilding(unit) && usuallyNeedsMargin(unit.unitClass))
-    val expansionAddons = if (With.self.isTerran) With.geography.bases.map(base => { val start = base.townHallTile.add(4, 1); TileRectangle(start, start.add(2, 2)) }) else Seq.empty
+    val expansionAddons = if (With.self.isTerran) With.geography.bases.map(base => {
+      val start = base.townHallTile.add(4, 1)
+      TileRectangle(start, start.add(2, 2))
+    }) else Seq.empty
     
-    unbuildable     ++= forUnbuildable.flatMap(_.tileArea.tiles)
-    unbuildable     ++= forUnbuildable.filter(_.unitClass.canBuildAddon).flatMap(_.addonArea.tiles)
-    unbuildable     ++= expansionAddons.flatMap(_.tiles)
+    forUnbuildable.foreach(unbuildable ++= _.tileArea.tiles)
+    forUnbuildable.filter(_.unitClass.canBuildAddon).foreach(unbuildable ++= _.addonArea.tiles)
+    expansionAddons.foreach(unbuildable ++= _.tiles)
     unwalkable      ++= unbuildable
     unwalkable      ++= forUnwalkable.flatMap(_.tileArea.expand(1, 1).tiles)
     untownhallable  ++= unbuildable

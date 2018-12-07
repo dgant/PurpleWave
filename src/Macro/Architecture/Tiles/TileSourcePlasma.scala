@@ -10,10 +10,9 @@ object TileSourcePlasma extends TileSource {
     With.strategy.isPlasma
   }
   
-  override def tiles(blueprint: Blueprint): Iterable[Tile] = {
+  override def tiles(blueprint: Blueprint): Seq[Tile] = {
     if (blueprint.requireTownHallTile.get) {
       With.geography.bases
-        .toVector
         .sortBy(_.heart.tileDistanceFast(With.self.startTile))
         .take(3)
         .map(_.townHallArea.startInclusive)

@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.EjectScout
-import Planning.Plans.Compound.{FlipIf, If, Or, Parallel}
+import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.PumpWorkers
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -83,9 +83,13 @@ class PvP3GateRobo extends GameplanModeTemplate {
 
     new EjectScout,
 
-    new If(
-      new PvPIdeas.PvPSafeToAttack,
-      new RequireMiningBases(2)),
+    new Trigger(
+      new And(
+        new UnitsAtLeast(1, Protoss.Shuttle, complete = true),
+        new UnitsAtLeast(1, Protoss.Reaver, complete = true)),
+      new If(
+        new PvPIdeas.PvPSafeToAttack,
+        new RequireMiningBases(2))),
 
     new FlipIf(
       new UnitsAtLeast(6, UnitMatchWarriors, complete = true),

@@ -64,7 +64,7 @@ class Configuration {
   var maxFramesToSendAdvanceBuilder   = GameTime(0, 40)()
   var maxFramesToTrustBuildRequest    = GameTime(10, 0)()
   var blockerMineralThreshold         = 250 // Setting this goofily high as an AIIDE hack to account for the 249-mineral patches on Fortress
-  var maxPlacementAgeFrames           = GameTime(0, 3)()
+  var maxPlacementAgeFrames           = GameTime(0, 8)()
   var enableTightBuildingPlacement    = false
   
   /////////////////
@@ -85,7 +85,6 @@ class Configuration {
   var buildingPlacementBatchSize          = 300
   var buildingPlacementBatchingStartFrame = GameTime(4, 0)()
   var buildingPlacementMaximumQueue       = 12
-  var buildingPlacementTestsPathing       = false
   
   var urgencyManners            = 1
   var urgencyEconomy            = 1

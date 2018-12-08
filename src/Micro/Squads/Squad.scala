@@ -19,7 +19,7 @@ trait SquadWithGoal {
 
 class Squad(val client: Plan) extends SquadWithGoal {
   
-  var enemies: Iterable[UnitInfo] = Iterable.empty
+  var enemies: Seq[UnitInfo] = Seq.empty
   var previousUnits: Set[FriendlyUnitInfo] = Set.empty
   def units: Set[FriendlyUnitInfo] = With.squads.units(this)
   

@@ -1,14 +1,13 @@
 package Macro.Architecture.PlacementStates
 
 import Lifecycle.With
-import Macro.Architecture.{Architect, Blueprint}
+import Macro.Architecture.Blueprint
 
 class PlacementStateValidating(blueprint: Blueprint) extends PlacementState {
   override def step() {
     val placement = placements.get(blueprint)
-    val validatedPlacement = Architect.validate(blueprint, placement)
-    if (validatedPlacement.isDefined) {
-      With.architecture.assumePlacement(validatedPlacement.get)
+    if (placement.exists(_.satisfies(blueprint))) {
+      With.architecture.assumePlacement(placement.get)
       transition(new PlacementStateReady)
     }
     else {

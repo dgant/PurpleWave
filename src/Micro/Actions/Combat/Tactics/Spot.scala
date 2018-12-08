@@ -21,6 +21,15 @@ object Spot extends Action {
   override protected def perform(unit: FriendlyUnitInfo) {
     val goal: Option[Pixel] = destinationFromTeammates(unit, unit.squadmates)
       .orElse(destinationFromTeammates(unit, unit.battle.map(_.teamOf(unit).units).getOrElse(Iterable.empty)))
+      .map(p =>
+        if (With.grids.friendlyVision.isSet(p.tileIncluding))
+          ByOption.minBy(unit.squadenemies.view.filter(!_.visible))(_.pixelDistanceCenter(p)).orElse(
+            ByOption.minBy(unit.squadenemies)(_.pixelDistanceCenter(p)).orElse(
+              ByOption.minBy(unit.matchups.enemies.view.filter(!_.visible))(_.pixelDistanceCenter(p)).orElse(
+                ByOption.minBy(unit.matchups.enemies)(_.pixelDistanceCenter(p)))))
+              .map(_.pixelCenter)
+              .getOrElse(p)
+        else p)
 
     if (goal.isDefined) {
       unit.agent.toTravel = goal

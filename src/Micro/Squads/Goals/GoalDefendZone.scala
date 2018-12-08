@@ -2,7 +2,7 @@ package Micro.Squads.Goals
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
-import Mathematics.Formations.Designers.FormationArc
+import Mathematics.Formations.Designers.{FormationArc, FormationZoneNew}
 import Mathematics.Formations.FormationAssigned
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Mathematics.PurpleMath
@@ -116,7 +116,7 @@ class GoalDefendZone extends GoalBasic {
   }
   
   def defendChoke() {
-    assignToFormation(zone.formation.form(squad.units.toSeq))
+    assignToFormation(new FormationZoneNew(zone, squad.enemies).form(squad.units.toSeq))
   }
   
   def defendLine(from: Pixel, to: Pixel) {

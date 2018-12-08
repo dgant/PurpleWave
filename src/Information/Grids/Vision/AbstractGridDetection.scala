@@ -1,10 +1,10 @@
 package Information.Grids.Vision
 
-import Information.Grids.ArrayTypes.AbstractGridTimestamp
+import Information.Grids.ArrayTypes.AbstractGridFramestamp
 import Mathematics.Shapes.Circle
 import ProxyBwapi.UnitInfo.UnitInfo
 
-abstract class AbstractGridDetection extends AbstractGridTimestamp {
+abstract class AbstractGridDetection extends AbstractGridFramestamp {
   
   override protected def updateTimestamps() {
     detectors

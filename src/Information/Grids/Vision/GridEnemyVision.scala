@@ -1,10 +1,10 @@
 package Information.Grids.Vision
 
-import Information.Grids.ArrayTypes.AbstractGridTimestamp
+import Information.Grids.ArrayTypes.AbstractGridFramestamp
 import Lifecycle.With
 import Mathematics.Shapes.Circle
 
-class GridEnemyVision extends AbstractGridTimestamp {
+class GridEnemyVision extends AbstractGridFramestamp {
   
   override protected def updateTimestamps() {
     With.units.enemy

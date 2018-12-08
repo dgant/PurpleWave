@@ -1,6 +1,7 @@
 package Information.Geography.Types
 
-import Information.Geography.Pathfinding.ZonePath
+import Information.Geography.Pathfinding.Types.ZonePath
+import Information.Grids.Lambda.GridFixedLambdaBoolean
 import Information.Grids.Movement.GridGroundDistance
 import Lifecycle.With
 import Mathematics.Formations.Designers.FormationZone
@@ -19,7 +20,8 @@ class Zone(
   val boundary    : TileRectangle,
   val tiles       : mutable.Set[Tile]) {
 
-  val tilesSeq = tiles.toSeq
+  val tilesSeq: Seq[Tile] = tiles.toSeq
+  val tileGrid = new GridFixedLambdaBoolean(i => tiles.contains(new Tile(i)))
   lazy val  edges             : Array[Edge]         = With.geography.edges.filter(_.zones.contains(this)).toArray
   lazy val  bases             : Array[Base]         = With.geography.bases.filter(_.townHallTile.zone == this).toArray
   lazy val  border            : Set[Tile]           = tiles.filter(_.adjacent8.exists( ! tiles.contains(_))).toSet
@@ -33,10 +35,10 @@ class Zone(
   lazy val  unwalkable        : Boolean             = ! tiles.exists(With.grids.walkable.get)
   lazy val  formation         : FormationZone       = new FormationZone(this)
 
-  lazy val exitDistanceGrid: GridGroundDistance = new GridGroundDistance(exit.map(_.tiles).getOrElse(Vector(centroid)): _*)
+  lazy val exitDistanceGrid: GridGroundDistance = exit.map(_.distanceGrid).getOrElse(new GridGroundDistance(centroid))
   lazy val exit: Option[Edge] = ByOption.minBy(edges)(edge => With.geography.startLocations.map(_.groundPixels(edge.pixelCenter)).max)
 
-  lazy val distanceGrid: GridGroundDistance = new GridGroundDistance(if (bases.size == 1) bases.head.heart else centroid)
+  lazy val distanceGrid: GridGroundDistance = new GridGroundDistance(if (bases.length == 1) bases.head.heart else centroid)
 
   var units: Vector[UnitInfo]  = Vector.empty
   var unitBuffer: mutable.ArrayBuffer[UnitInfo] = new mutable.ArrayBuffer[UnitInfo]()

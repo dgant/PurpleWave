@@ -57,13 +57,13 @@ class FormationArc(
     val flyers  = units.filter(_.flying)
     val ranks   = walkers
       .map(new FormationSlot(_))
-      .groupBy(_.idealDistancePixels)
+      .groupBy(_.idealPixels)
       .values
       .toList
-      .sortBy(_.head.idealDistancePixels)
+      .sortBy(_.head.idealPixels)
 
     ranks.foreach(rank => {
-      arcPlacement.startRank(rank.head.idealDistancePixels)
+      arcPlacement.startRank(rank.head.idealPixels)
       rank.foreach(participant => {
         participant.pixelAfter = arcPlacement.reserveSpace(With.configuration.concaveMarginPixels + 2.0 * participant.unitClass.radialHypotenuse)
       })
@@ -71,7 +71,7 @@ class FormationArc(
 
     val walkerSlots = ranks.flatten
     val flyerSlots  = flyers.map(flyer => new FormationSlot(flyer))
-    flyerSlots.foreach(slot => slot.pixelAfter = targetCenter.radiateRadians(centerToArcRadians, slot.idealDistancePixels))
+    flyerSlots.foreach(slot => slot.pixelAfter = targetCenter.radiateRadians(centerToArcRadians, slot.idealPixels))
 
     val output = walkerSlots ++ flyerSlots
     output

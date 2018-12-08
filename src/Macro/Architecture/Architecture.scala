@@ -1,7 +1,7 @@
 package Macro.Architecture
 
 import Debugging.Visualizations.Views.Geography.ShowArchitecturePlacements
-import Information.Geography.Pathfinding.TilePath
+import Information.Geography.Pathfinding.Types.TilePath
 import Information.Geography.Types.{Edge, Zone}
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With

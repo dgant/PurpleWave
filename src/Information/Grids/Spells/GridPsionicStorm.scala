@@ -1,10 +1,10 @@
 package Information.Grids.Spells
 
-import Information.Grids.ArrayTypes.AbstractGridTimestamp
+import Information.Grids.ArrayTypes.AbstractGridFramestamp
 import Lifecycle.With
 import Mathematics.Points.Pixel
 
-class GridPsionicStorm extends AbstractGridTimestamp {
+class GridPsionicStorm extends AbstractGridFramestamp {
   
   override protected def updateTimestamps(): Unit = {
     With.bullets.all.foreach(bullet => addPsionicStorm(bullet.pixel))

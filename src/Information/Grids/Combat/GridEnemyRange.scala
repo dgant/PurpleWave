@@ -1,13 +1,13 @@
 package Information.Grids.Combat
 
-import Information.Grids.ArrayTypes.AbstractGridTimestampedValue
+import Information.Grids.ArrayTypes.AbstractGridVersionedValue
 import Lifecycle.With
 import Mathematics.Shapes.Ring
 
-class GridEnemyRange extends AbstractGridTimestampedValue[Int] {
+class GridEnemyRange extends AbstractGridVersionedValue[Int] {
 
   override val defaultValue = 0
-  override protected var values: Array[Int] = Array.fill(width * height)(defaultValue)
+  override protected var values: Array[Int] = Array.fill(length)(defaultValue)
 
   // How far to extend the reach of range into negative territory
   val addedRange = 5

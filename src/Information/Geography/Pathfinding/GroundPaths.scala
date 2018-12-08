@@ -1,5 +1,6 @@
 package Information.Geography.Pathfinding
 
+import Information.Geography.Pathfinding.Types.TilePath
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
 import Utilities.ByOption

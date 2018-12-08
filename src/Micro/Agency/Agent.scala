@@ -1,6 +1,6 @@
 package Micro.Agency
 
-import Information.Geography.Pathfinding.ZonePath
+import Information.Geography.Pathfinding.Types.ZonePath
 import Lifecycle.With
 import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, PixelRay, Tile}

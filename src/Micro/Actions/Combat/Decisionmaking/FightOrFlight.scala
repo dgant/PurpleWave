@@ -58,7 +58,7 @@ object FightOrFlight extends Action {
     decide(false, "Hazard", () => {
       if ( ! With.configuration.enableMCRS) return false
       val occupancy = With.coordinator.gridPathOccupancy.get(unit.tileIncludingCenter)
-      (
+      val output: Boolean = (
         ! unit.flying
           && occupancy > 0
           && occupancy + unit.unitClass.sqrtArea > 24
@@ -66,6 +66,7 @@ object FightOrFlight extends Action {
             ! ally.flying
             && ! ally.friendly.exists(_.agent.shouldEngage)
             && ally.pixelDistanceEdge(unit) < 32))
+      output
     })
     /*
     decide(false, "Stand", () =>

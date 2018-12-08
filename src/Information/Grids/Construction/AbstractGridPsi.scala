@@ -1,25 +1,22 @@
 package Information.Grids.Construction
 
-import Information.Grids.ArrayTypes.AbstractGridTimestamp
+import Information.Grids.ArrayTypes.AbstractGridFramestamp
 import Lifecycle.With
 import Mathematics.Points.Point
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-abstract class AbstractGridPsi extends AbstractGridTimestamp {
-  
-  private var lastPylons: Set[FriendlyUnitInfo] = Set.empty
-  
-  override def needsUpdate: Boolean = {
-    val newPylons = pylons
-    val output = newPylons == lastPylons
-    lastPylons = newPylons
-    output
-  }
-  
+abstract class AbstractGridPsi extends AbstractGridFramestamp {
+
+  val psiPoints: Array[Point]
+
+  private var lastPylons: Seq[FriendlyUnitInfo] = Seq.empty
+
   private val wrapThreshold = 18
-  override def updateTimestamps() {
-    pylons.foreach(pylon => {
+  override def update(): Unit = {
+    val newPylons = With.units.ours.view.filter(unit => unit.aliveAndComplete && unit.is(Protoss.Pylon)).toSeq
+    if (newPylons != lastPylons) {
+      newPylons.foreach(pylon => {
       val pylonTile = pylon.tileIncludingCenter
       psiPoints.foreach(point => {
         val tile = pylon.tileTopLeft.add(point)
@@ -29,8 +26,7 @@ abstract class AbstractGridPsi extends AbstractGridTimestamp {
           stamp(tile)
         }
       })})
+    }
+    lastPylons = newPylons
   }
-  
-  val psiPoints: Array[Point]
-  def pylons: Set[FriendlyUnitInfo] = With.units.ours.filter(unit => unit.aliveAndComplete && unit.is(Protoss.Pylon))
 }

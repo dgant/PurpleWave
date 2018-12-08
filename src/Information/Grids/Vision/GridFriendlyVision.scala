@@ -1,9 +1,9 @@
 package Information.Grids.Vision
 
-import Information.Grids.ArrayTypes.AbstractGridTimestamp
+import Information.Grids.ArrayTypes.AbstractGridFramestamp
 import Lifecycle.With
 
-class GridFriendlyVision extends AbstractGridTimestamp {
+class GridFriendlyVision extends AbstractGridFramestamp {
   
   override protected def updateTimestamps() {
     var x = 0

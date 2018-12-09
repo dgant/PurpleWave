@@ -28,7 +28,10 @@ object Sally extends ActionTechnique {
   }
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    Engage.delegate(unit)
-    Hunker.delegate(unit)
+    if (unit.matchups.targets.nonEmpty) {
+      Engage.delegate(unit)
+    } else {
+      Hunker.delegate(unit)
+    }
   }
 }

@@ -12,6 +12,7 @@ import scala.collection.mutable.ArrayBuffer
 
 class BattleClusteringState(seedUnits: Vector[UnitInfo]) {
 
+  val unitLinks = new mutable.HashMap[UnitInfo, UnitInfo]
   val horizon: mutable.Stack[UnitInfo] = mutable.Stack[UnitInfo]()
   horizon.pushAll(seedUnits.filter(_.isEnemy))
   
@@ -33,17 +34,17 @@ class BattleClusteringState(seedUnits: Vector[UnitInfo]) {
       val nextTile = tileCenter.add(points(iPoint))
       iPoint += 1
       if (nextTile.valid) {
-        val exploredGrid = if (isFriendly) With.battles.clustering.exploredFriendly else With.battles.clustering.exploredEnemy
-        if ( ! exploredGrid.get(nextTile.i)) {
-          exploredGrid.set(nextTile.i, true)
+        val explorationGrid = if (isFriendly) With.battles.clustering.exploredFriendly else With.battles.clustering.exploredEnemy
+        if ( ! explorationGrid.get(nextTile.i)) {
+          explorationGrid.set(nextTile.i, true)
           val neighbors = With.grids.units.get(nextTile)
           val nNeighbors = neighbors.size
           var iNeighbor = 0
           while (iNeighbor < nNeighbors) {
             val neighbor = neighbors(iNeighbor)
             iNeighbor += 1
-            if (areOppositeTeams(nextUnit, neighbor) && neighbor.clusteringEnabled) {
-              if (neighbor.clusterParent.isDefined) {
+            if (neighbor.clusteringEnabled && nextUnit.isFriendly != neighbor.isFriendly) {
+              if (unitLinks.contains(neighbor)) {
                 if (linkedFoe.isEmpty) {
                   linkedFoe = Some(neighbor)
                 }
@@ -59,29 +60,25 @@ class BattleClusteringState(seedUnits: Vector[UnitInfo]) {
     val nFoes = newFoes.size
     var iFoe = 0
     while (iFoe < nFoes) {
-      newFoes(iFoe).clusterChild = Some(nextUnit)
-      nextUnit.clusterParent = Some(newFoes(iFoe))
+      unitLinks.put(newFoes(iFoe), nextUnit)
       iFoe += 1
     }
-    if (nextUnit.clusterParent.isEmpty) {
-      nextUnit.clusterParent = linkedFoe.orElse(Some(nextUnit))
+    if ( ! unitLinks.contains(nextUnit)) {
+      unitLinks.put(nextUnit, linkedFoe.getOrElse(nextUnit))
     }
     horizon.pushAll(newFoes.filter(seedUnits.contains))
   }
-  
-  private lazy val finalClusters: Vector[Vector[UnitInfo]] = {
-    val roots = seedUnits.view.filter(_.clusterRoot).toArray
-    val nRoots = roots.length
-    var iRoot = 0
-    while (iRoot < nRoots) {
-      val unit = roots(iRoot)
-      unit.cluster.clear()
-      iRoot += 1
-    }
 
+  private lazy val finalClusters: Vector[Vector[UnitInfo]] = {
+    val roots = unitLinks.toSeq.filter(p => p._1 == p._2).map(_._1)
+    val clusters = roots.map(root => (root, new ArrayBuffer[UnitInfo] :+ root)).toMap
     // This could be faster if we didn't have to find more
-    seedUnits.foreach(unit => getRoot(unit).cluster += unit)
-    roots.view.map(_.cluster.toVector).toVector
+    unitLinks.keys.foreach(unit => {
+      val unitRoot = getRoot(unit)
+      clusters(unitRoot) += unit
+    })
+    val output = clusters.toVector.map(_._2.toVector)
+    output
   }
   
   def clusters: Vector[Vector[UnitInfo]] = {
@@ -93,7 +90,8 @@ class BattleClusteringState(seedUnits: Vector[UnitInfo]) {
   
   @tailrec
   private def getRoot(unit: UnitInfo): UnitInfo = {
-    val linkedUnit = unit.clusterParent.getOrElse(unit)
+    //val linkedUnit = unit.clusterParent.getOrElse(unit)
+    val linkedUnit = unitLinks(unit)
     if (linkedUnit == unit) unit else getRoot(linkedUnit)
   }
   

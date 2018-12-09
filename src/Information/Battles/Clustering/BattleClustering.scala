@@ -33,15 +33,12 @@ class BattleClustering {
       runtimes.enqueue(With.framesSince(lastClusterCompletion))
       while (runtimes.length > 10) runtimes.dequeue()
       lastClusterCompletion = With.frame
+      clusterComplete.clusters // Acquire the clusters before we wipe away the data required to produce them
       clusterComplete       = clusterInProgress
       clusterInProgress     = new BattleClusteringState(nextUnits)
       exploredFriendly.update()
       exploredEnemy.update()
-      With.units.all.foreach(u => {
-        u.clusteringEnabled = false
-        u.clusterParent = None
-        u.clusterChild = None
-      })
+      With.units.playerOwned.foreach(_.clusteringEnabled = false)
       nextUnits.foreach(_.clusteringEnabled = true)
     }
     else {

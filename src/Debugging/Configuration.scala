@@ -74,7 +74,6 @@ class Configuration {
   var doAbsolutelyNothing                 = false
   var foreignUnitUpdatePeriod             = 4
   val friendlyUnitUpdatePeriod            = 4
-  var garbageCollectionThresholdMs        = 5
   var performanceMinimumUnitSleep         = 2
   var maximumGamesHistoryPerOpponent      = 500
   
@@ -101,7 +100,7 @@ class Configuration {
   ///////////////////
   
   var visualizeScreen                     = true
-  var visualizeMap                        = false
+  var visualizeMap                        = true
   var visualizationProbabilityHappyVision = 0.05
   var visualizationProbabilityTextOnly    = 0.01
   var visualizationCullViewport           = true

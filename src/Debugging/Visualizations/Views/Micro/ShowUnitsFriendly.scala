@@ -96,7 +96,10 @@ object ShowUnitsFriendly extends View {
     }
     if (showFormation) {
       if (agent.toForm.isDefined) {
-        DrawMap.circle(agent.toForm.get, unit.unitClass.radialHypotenuse.toInt, Colors.MidnightTeal)
+        DrawMap.box(
+          agent.toForm.get.subtract (unit.unitClass.width / 2, unit.unitClass.height / 2),
+          agent.toForm.get.add      (unit.unitClass.width / 2, unit.unitClass.height / 2),
+        Colors.BrightViolet)
       }
     }
     

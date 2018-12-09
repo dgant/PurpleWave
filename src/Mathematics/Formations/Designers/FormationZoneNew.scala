@@ -24,10 +24,10 @@ class FormationZoneNew(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesi
     val startTile = start.tileIncluding
     val end       = zone.exit.map(_.pixelTowards(zone)).getOrElse(zone.centroid.pixelCenter)
 
-    val enemyRangeMin : Int = ByOption.min(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(0)
-    val enemyRangeMax : Int = ByOption.max(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(0)
-    val meleeSize     : Int = Math.max(16, slots.map(s => if (s.idealPixels > 32) 0 else s.unitClass.radialHypotenuse.toInt).max)
-    val meleeRowWidth : Int = Math.max(1, zone.exit.map(_.radiusPixels.toInt).getOrElse(0) / meleeSize)
+    val enemyRangePixelsMin : Int = ByOption.min(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(0)
+    val enemyRangePixelsMax : Int = ByOption.max(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(0)
+    val meleeSizePixels     : Int = Math.max(16, slots.map(s => if (s.idealPixels > 32) 0 else s.unitClass.radialHypotenuse.toInt).max)
+    val meleeRowWidthUnits  : Int = Math.max(1, zone.exit.map(_.radiusPixels.toInt).getOrElse(0) / meleeSizePixels)
 
     val meleeSlots    = new mutable.ArrayBuffer[(UnitClass, Pixel)]
     val arcSlots      = new mutable.ArrayBuffer[(UnitClass, Pixel)]
@@ -38,18 +38,18 @@ class FormationZoneNew(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesi
     slots.sortBy(_.idealPixels).foreach(slot => {
       val idealPixels = slot.idealPixels.toInt
       val idealTiles = (idealPixels + 16) / 32
-      if (enemyRangeMin < 32 && zone.exit.isDefined && idealPixels <= Math.max(32, enemyRangeMin)) {
+      if (enemyRangePixelsMin < 32 && zone.exit.isDefined && idealPixels <= Math.max(32, enemyRangePixelsMin)) {
         // Against enemy melee units, place melee units directly into the exit
         val nextPixel = start
           .project(
             // Point towards the left/right side of the choke
             zone.exit.get.sidePixels(meleeSlots.size % 2),
             // If odd-sized row: First unit goes in the middle; otherwise offset by half a melee radius
-            (if (meleeRowWidth % 2 == 0) meleeSize / 2 else 0)
+            (if (meleeRowWidthUnits % 2 == 0) meleeSizePixels / 2 else 0)
             // Project unit towards the current side
-            +  meleeSize * (meleeSlots.size / 2) % meleeRowWidth) +
+            +  meleeSizePixels * (meleeSlots.size / 2) % meleeRowWidthUnits) +
           // Fill in rows from front to back
-          Pixel(0, 0).project(end, meleeSize * (meleeSlots.size / meleeRowWidth))
+          Pixel(0, 0).project(end, meleeSizePixels * (meleeSlots.size / meleeRowWidthUnits))
 
         meleeSlots += ((slot.unitClass, nextPixel))
         occupied.set(nextPixel.tileIncluding, true)
@@ -65,7 +65,7 @@ class FormationZoneNew(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesi
             if (tile.valid && zone.tileGrid.get(tile) && ! occupied.get(tile) && With.grids.walkable.get(tile)) {
               val exitDistance = zone.exitDistanceGrid.get(tile)
               val distanceIntoEnemyRangeNow   = 1 + With.grids.enemyRange.get(tile) - With.grids.enemyRange.addedRange
-              val distanceIntoEnemyRangeExit  = Math.max(0, enemyRangeMax - exitDistance)
+              val distanceIntoEnemyRangeExit  = Math.max(0, enemyRangePixelsMax / 32 - exitDistance)
               val distanceOutOfOurRange       = Math.max(0, exitDistance - idealTiles)
               5 * distanceIntoEnemyRangeNow + 4 * distanceIntoEnemyRangeExit + 3 * distanceOutOfOurRange
             } else {

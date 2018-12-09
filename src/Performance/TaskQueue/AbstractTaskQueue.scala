@@ -43,9 +43,5 @@ abstract class AbstractTaskQueue {
       }
       i += 1
     }
-    
-    if (With.performance.millisecondsSpentThisFrame < With.configuration.garbageCollectionThresholdMs) {
-      System.gc()
-    }
   }
 }

@@ -23,6 +23,7 @@ class Zone(
   val tilesSeq: Seq[Tile] = tiles.toSeq
   val tileGrid = new GridFixedLambdaBoolean(i => tiles.contains(new Tile(i)))
   lazy val  edges             : Array[Edge]         = With.geography.edges.filter(_.zones.contains(this)).toArray
+  lazy val  adjacentZones     : Array[Zone]         = edges.map(_.otherSideof(this))
   lazy val  bases             : Array[Base]         = With.geography.bases.filter(_.townHallTile.zone == this).toArray
   lazy val  border            : Set[Tile]           = tiles.filter(_.adjacent8.exists( ! tiles.contains(_))).toSet
   lazy val  perimeter         : Set[Tile]           = tiles.filter(tile => tile.tileDistanceFromEdge <= 1 || ! tile.adjacent8.forall(With.grids.walkableTerrain.get)).toSet

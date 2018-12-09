@@ -71,7 +71,7 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
     }
     else {
       // We've evaluated all the tiles! Return our placement conclusions.
-      val best = ByOption.maxBy(evaluationValues)(_._2).map(_._1)
+      val best = ByOption.minBy(evaluationValues)(_._2).map(_._1)
       updateStepNanoseconds(nanosecondsOnStart)
       val placement = Placement(
         blueprint,

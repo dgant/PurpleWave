@@ -1,6 +1,7 @@
 package Planning.Plans.Army
 
 import Information.Geography.Types.{Base, Zone}
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Planning.UnitMatchers.{UnitMatchWarriors, UnitMatcher}
 import Planning.{Plan, Property}
@@ -52,11 +53,12 @@ class DefendZones extends Plan {
     (5.0 + base.workers.size) * (if (base.owner.isFriendly) 1.0 else 0.0)
   }
   
-  private def isThreatening(enemy: ForeignUnitInfo, zone: Zone): Boolean = {
-    (
-      enemy.likelyStillAlive
-      && (enemy.unitClass.dealsDamage || enemy.isTransport)
-      && enemy.zone == zone
-    )
-  }
+  private def isThreatening(enemy: ForeignUnitInfo, zone: Zone): Boolean = (
+    enemy.likelyStillAlive
+    && (enemy.unitClass.dealsDamage || enemy.isTransport || enemy.unitClass.spells.nonEmpty)
+    && (enemy.zone == zone || (
+      if (enemy.flying)
+        enemy.framesToTravelTo(zone.centroid.pixelCenter) < GameTime(0, 10)()
+      else
+        zone.adjacentZones.contains(enemy.zone))))
 }

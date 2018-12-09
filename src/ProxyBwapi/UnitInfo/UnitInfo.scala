@@ -18,6 +18,8 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import bwapi._
 
+import scala.collection.mutable.ArrayBuffer
+
 abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUnit, id) {
 
   protected val cd1: Int = Math.min(
@@ -52,7 +54,14 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   //////////////////
 
   val mcrs: MCRSUnit = new MCRSUnit(this)
-  
+
+  // Used in clustering; attached to unit for performance to avoid use of sets/maps
+  var clusteringEnabled: Boolean = false
+  val cluster = new ArrayBuffer[UnitInfo]
+  var clusterParent: Option[UnitInfo] = None
+  var clusterChild: Option[UnitInfo] = None
+  def clusterRoot: Boolean = clusterParent.contains(this)
+
   val frameDiscovered           : Int = With.frame
   var completionFrame           : Int = Int.MaxValue // Can't use unitClass during construction
   var lastHitPoints             : Int = _

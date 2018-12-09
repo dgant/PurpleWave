@@ -12,11 +12,9 @@ class Base(val townHallTile: Tile)
 {
   lazy val  zone            : Zone              = With.geography.zoneByTile(townHallTile)
   lazy val  townHallArea    : TileRectangle     = Protoss.Nexus.tileArea.add(townHallTile)
-  lazy val  isStartLocation : Boolean           = With.geography.startLocations.exists(_ == townHallTile)
+  lazy val  isStartLocation : Boolean           = With.geography.startLocations.contains(townHallTile)
   lazy val  isOurMain       : Boolean           = With.geography.ourMain == this
   lazy val  formations      : FormationBase     = new FormationBase(this)
-  lazy val  harvestingArea  : TileRectangle     = (Vector(townHallArea) ++ (minerals.filter(_.mineralsLeft > With.configuration.blockerMineralThreshold) ++ gas).map(_.tileArea)).boundary
-  lazy val  heart           : Tile              = harvestingArea.midpoint
   var       isNaturalOf     : Option[Base]      = None
   var       townHall        : Option[UnitInfo]  = None
   var       units           : Vector[UnitInfo]  = Vector.empty
@@ -26,6 +24,27 @@ class Base(val townHallTile: Tile)
   var       name            : String            = "Nowhere"
   var       defenseValue    : Double            = _
   var       workerCount     : Int               = _
+
+  private var calculatedHarvestingArea: Option[TileRectangle] = None
+  private var calculatedHeart: Option[Tile] = None
+  def harvestingArea: TileRectangle = {
+    if (calculatedHarvestingArea.isDefined) calculatedHarvestingArea.get else {
+      val output = (Vector(townHallArea) ++ (minerals.filter(_.mineralsLeft > With.configuration.blockerMineralThreshold) ++ gas).map(_.tileArea)).boundary
+      if (minerals.nonEmpty || gas.nonEmpty) {
+        calculatedHarvestingArea = Some(output)
+      }
+      output
+    }
+  }
+  def heart: Tile = {
+    if (calculatedHeart.isDefined) calculatedHeart.get else {
+      val output = harvestingArea.midpoint
+      if (calculatedHarvestingArea.isDefined) {
+        calculatedHeart = Some(output)
+      }
+      output
+    }
+  }
   
   var mineralsLeft      = 0
   var gasLeft           = 0

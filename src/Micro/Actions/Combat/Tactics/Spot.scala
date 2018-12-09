@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Tactics
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Mathematics.Points.Pixel
+import Mathematics.Points.{Pixel, SpecificPoints}
 import Micro.Actions.Action
 import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -28,7 +28,7 @@ object Spot extends Action {
               ByOption.minBy(unit.matchups.enemies.view.filter(!_.visible))(_.pixelDistanceCenter(p)).orElse(
                 ByOption.minBy(unit.matchups.enemies)(_.pixelDistanceCenter(p)))))
               .map(_.pixelCenter)
-              .getOrElse(p)
+              .getOrElse(p.project(SpecificPoints.middle, unit.sightRangePixels))
         else p)
 
     if (goal.isDefined) {

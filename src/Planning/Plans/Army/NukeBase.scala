@@ -65,9 +65,9 @@ class NukeBase extends Plan {
   }
   
   private def evaluateBase(nuker: FriendlyUnitInfo, base: Base): Double = {
-    val value     = base.workers.size.toDouble
+    val value     = base.workerCount.toDouble
     val distance  = 1.0 + nuker.pixelDistanceTravelling(base.heart.pixelCenter.project(nuker.pixelCenter, 32.0 * 7.5))
-    val safety    = (1.0 +  base.defenders.size) * (1.0 + base.units.count(_.unitClass.isDetector))
+    val safety    = (1.0 +  base.defenseValue) * (1.0 + base.units.count(_.unitClass.isDetector))
     val output    = value / safety / distance
     output
   }

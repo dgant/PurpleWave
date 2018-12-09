@@ -161,9 +161,11 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val effectiveRangePixels: Double =
     if (isDetector)                         32.0 * 11.0
     else if (this == Terran.Battlecruiser)  32.0 * 10.0
-    else if (this == Protoss.HighTemplar)   32.0 * 9.0
     else if (this == Protoss.Arbiter)       32.0 * 9.0
     else if (this == Protoss.DarkArchon)    32.0 * 10.0
+    else if (this == Protoss.HighTemplar)   32.0 * 9.0
+    else if (this == Zerg.Defiler)          32.0 * 9.0
+    else if (this == Zerg.Queen)            32.0 * 9.0
     else pixelRangeMax
 
   lazy val tileArea               : TileRectangle = TileRectangle(Tile(0, 0), tileSize)

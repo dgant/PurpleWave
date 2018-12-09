@@ -18,7 +18,7 @@ class BattleClustering {
   // Batch processing //
   //////////////////////
   
-  def clusters: Vector[Set[UnitInfo]] = clusterComplete.clusters
+  def clusters: Vector[Vector[UnitInfo]] = clusterComplete.clusters
   
   def enqueue(units: Set[UnitInfo]) {
     nextUnits = units
@@ -27,7 +27,7 @@ class BattleClustering {
   def run() {
     if (clusterInProgress.isComplete) {
       runtimes.enqueue(With.framesSince(lastClusterCompletion))
-      while (runtimes.sum > 24 * 30) runtimes.dequeue()
+      while (runtimes.length > 10) runtimes.dequeue()
       lastClusterCompletion = With.frame
       clusterComplete       = clusterInProgress
       clusterInProgress     = new BattleClusteringState(nextUnits.toSet)

@@ -84,7 +84,7 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
         val framesToLive    = measureSafety(() => unit.matchups.framesToLive)
         val framesOfSafety  = measureSafety(() => unit.matchups.framesOfSafety)
         val distance        = Math.max(1.0, unit.pixelDistanceCenter(With.intelligence.mostBaselikeEnemyTile.pixelCenter))
-        val workers         = Math.max(1.0, if (traineeClass.isWorker) unit.base.map(_.workers.size).sum else 1.0)
+        val workers         = Math.max(1.0, if (traineeClass.isWorker) unit.base.map(_.workerCount).sum else 1.0)
         val addons          = if (addonsRequired.isEmpty && traineeClass != Terran.SCV) 1.0 + 10.0 * unit.addon.size else 1.0
         addons * distance * workers / framesToLive / framesOfSafety
       }

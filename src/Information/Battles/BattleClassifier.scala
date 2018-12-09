@@ -66,8 +66,8 @@ class BattleClassifier {
     nextBattlesLocal = clustering.clusters
       .map(cluster =>
         new BattleLocal(
-          new Team(cluster.filter(_.isOurs).toVector),
-          new Team(cluster.filter(_.isEnemy).toVector)))
+          new Team(cluster.filter(_.isOurs)),
+          new Team(cluster.filter(_.isEnemy))))
       .filter(_.teams.forall(_.units.exists(u =>
         u.canAttack
         || u.unitClass.isSpellcaster

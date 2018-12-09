@@ -2,7 +2,6 @@ package Micro.Actions.Combat.Techniques.Common
 
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-
 class ActionTechniqueEvaluation(
   val unit: FriendlyUnitInfo,
   val technique: ActionTechnique) {

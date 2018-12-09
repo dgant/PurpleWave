@@ -68,7 +68,6 @@ object ZoneUpdater {
   
   def updateZone(zone: Zone) {
     zone.units = zone.unitBuffer.toVector
-    zone.friendlyGatherers = zone.units.view.flatMap(_.friendly).filter(_.agent.toGather.isDefined).toSet
     zone.distanceGrid.initialize()
     zone.edges.foreach(_.distanceGrid.initialize())
     zone.exitDistanceGrid.initialize()

@@ -40,10 +40,9 @@ object ActionTechniqueEvaluator {
 
     val totalOther = totalApplicabilitiesOther(unit, technique)
 
-    val output = PurpleMath.clampToOne(
+    PurpleMath.clampToOne(
       PurpleMath.clampToOne(technique.applicabilityBase)
       * totalSelf
       * totalOther)
-    output
   }
 }

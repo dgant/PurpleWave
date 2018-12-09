@@ -6,7 +6,7 @@ abstract class GeneralizedWeightedMean(technique: ActionTechnique) extends Weigh
   
   protected val tension: Double
   
-  override protected def aggregate(applicabilitySignificance: Seq[(Double, Double)]): Double = {
+  override protected def aggregate(applicabilitySignificance: Seq[(Double, Double)]): Option[Double] = {
     /*
     Generalized weighted mean:
     https://www.jstor.org/stable/2099874?seq=1#page_scan_tab_contents
@@ -15,14 +15,16 @@ abstract class GeneralizedWeightedMean(technique: ActionTechnique) extends Weigh
     2. Sum(weight * element^r)^1/r
     3. Use large R for max, small R for min
     */
-    val totalSignificance = applicabilitySignificance.map(_._2).sum
-    if (totalSignificance == 0) {
-      // Dunno.
-      return 0.0
-    }
+    var aggregateApplicability = 0.0
+    var totalSignificance = 0.0
 
-    val elements  = applicabilitySignificance.map(p => Math.pow(p._1, tension) * p._2 / totalSignificance)
-    val output    = Math.pow(elements.sum, 1.0/tension)
-    output
+    applicabilitySignificance.foreach(as => {
+      aggregateApplicability += Math.pow(as._1, tension) * as._2
+      totalSignificance += as._2
+    })
+
+    if (totalSignificance <= 0.0) return None
+    val output = Math.pow(aggregateApplicability / totalSignificance, 1.0 / tension)
+    Some(output)
   }
 }

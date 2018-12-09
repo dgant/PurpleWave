@@ -83,10 +83,10 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
       return
     }
 
-    val nearbyGatherers = desiredTile.map(_.zone.friendlyGatherers).getOrElse(Set.empty)
-    if ( ! builderLock.satisfied && nearbyGatherers.size > 5 && nearbyGatherers.exists(builderMatcher.accept)) {
+    val desiredZone = desiredTile.map(_.zone)
+    if ( ! builderLock.satisfied && desiredZone.exists(_.bases.exists(_.workerCount > 5))) {
       builderLock.unitMatcher.set(UnitMatchAnd(
-        UnitMatchCustom(_.friendly.exists(nearbyGatherers.contains)),
+        UnitMatchCustom(_.zone == desiredZone.get),
         builderMatcher
       ))
     } else {

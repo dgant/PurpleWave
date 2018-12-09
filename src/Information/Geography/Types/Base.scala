@@ -6,6 +6,7 @@ import Mathematics.Points.{Tile, TileRectangle}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.EnrichPixel._
 
 class Base(val townHallTile: Tile)
 {
@@ -14,17 +15,17 @@ class Base(val townHallTile: Tile)
   lazy val  isStartLocation : Boolean           = With.geography.startLocations.exists(_ == townHallTile)
   lazy val  isOurMain       : Boolean           = With.geography.ourMain == this
   lazy val  formations      : FormationBase     = new FormationBase(this)
+  lazy val  harvestingArea  : TileRectangle     = (Vector(townHallArea) ++ (minerals.filter(_.mineralsLeft > With.configuration.blockerMineralThreshold) ++ gas).map(_.tileArea)).boundary
+  lazy val  heart           : Tile              = harvestingArea.midpoint
   var       isNaturalOf     : Option[Base]      = None
   var       townHall        : Option[UnitInfo]  = None
-  var       harvestingArea  : TileRectangle     = townHallArea
-  var       heart           : Tile              = harvestingArea.midpoint
   var       units           : Vector[UnitInfo]  = Vector.empty
   var       gas             : Vector[UnitInfo]  = Vector.empty
   var       minerals        : Vector[UnitInfo]  = Vector.empty
-  var       workers         : Vector[UnitInfo]  = Vector.empty
-  var       defenders       : Vector[UnitInfo]  = Vector.empty
   var       owner           : PlayerInfo        = With.neutral
   var       name            : String            = "Nowhere"
+  var       defenseValue    : Double            = _
+  var       workerCount     : Int               = _
   
   var mineralsLeft      = 0
   var gasLeft           = 0

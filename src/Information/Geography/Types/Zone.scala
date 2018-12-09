@@ -43,8 +43,6 @@ class Zone(
 
   var units: Vector[UnitInfo]  = Vector.empty
   var unitBuffer: mutable.ArrayBuffer[UnitInfo] = new mutable.ArrayBuffer[UnitInfo]()
-  var friendlyGatherers: Set[FriendlyUnitInfo] = Set.empty
-
   var owner     : PlayerInfo        = With.neutral
   var contested : Boolean           = false
   var walledIn  : Boolean           = false

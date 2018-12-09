@@ -40,10 +40,9 @@ class GoalAttack extends GoalBasic {
           val age                 = With.framesSince(base.lastScoutedFrame)
           val resources           = base.mineralsLeft + base.gasLeft
           val distance            = attackerCenter.pixelDistance(base.heart.pixelCenter)
-          val defenders           = base.defenders.map(_.subjectiveValue).sum
           val resourcesProjected  = Math.max(resources / 4.0, resources - With.economy.incomePerFrameMinerals * 20 * age)
           val distanceLog         = 1 + Math.log(1 + distance)
-          val defendersLog        = 1 + Math.log(1 + defenders)
+          val defendersLog        = 1 + Math.log(1 + base.defenseValue)
           val output              = (1.0 + resourcesProjected) / distanceLog / defendersLog
           output
         })

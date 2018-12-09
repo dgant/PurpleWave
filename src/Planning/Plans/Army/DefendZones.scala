@@ -50,7 +50,7 @@ class DefendZones extends Plan {
   }
   
   private def baseValue(base: Base): Double = {
-    (5.0 + base.workers.size) * (if (base.owner.isFriendly) 1.0 else 0.0)
+    (5.0 + base.workerCount) * (if (base.owner.isFriendly) 1.0 else 0.0)
   }
   
   private def isThreatening(enemy: ForeignUnitInfo, zone: Zone): Boolean = (

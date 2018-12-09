@@ -1,47 +1,26 @@
 package Macro.Architecture
 
 import Debugging.Visualizations.Views.Geography.ShowArchitecturePlacements
-import Information.Geography.Pathfinding.Types.TilePath
-import Information.Geography.Types.{Edge, Zone}
+import Information.Geography.Types.Zone
+import Information.Grids.Disposable.GridDisposableBoolean
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.{Tile, TileRectangle}
-import Mathematics.Shapes.Spiral
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
-import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
 
 class Architecture {
   val exclusions        : mutable.ArrayBuffer[Exclusion]            = new mutable.ArrayBuffer[Exclusion]
-  val unbuildable       : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
-  val unwalkable        : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
-  val ungassable        : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
-  val untownhallable    : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
-  val creep             : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
-  val powered2Height    : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
-  val powered3Height    : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
-  val existingPaths     : mutable.HashMap[Edge, TilePathCache]      = new mutable.HashMap[Edge, TilePathCache]
+  val unbuildable       : GridDisposableBoolean                     = new GridDisposableBoolean
+  val unwalkable        : GridDisposableBoolean                     = new GridDisposableBoolean
+  val ungassable        : GridDisposableBoolean                     = new GridDisposableBoolean
+  val untownhallable    : GridDisposableBoolean                     = new GridDisposableBoolean
+  val creep             : GridDisposableBoolean                     = new GridDisposableBoolean
+  val powered2Height    : GridDisposableBoolean                     = new GridDisposableBoolean
+  val powered3Height    : GridDisposableBoolean                     = new GridDisposableBoolean
   var accessibleZones   : Vector[Zone]                              = Vector.empty
-  
-  class TilePathCache {
-    var path  : Option[TilePath]  = None
-    var tiles : Set[Tile]         = Set.empty
-    var valid : Boolean           = false
-    
-    def set(newPath: TilePath) {
-      path  = Some(newPath)
-      tiles = newPath.tiles.map(_.toSet).getOrElse(Set.empty)
-      valid = true
-    }
-  
-    def update() {
-      if (valid && ! path.exists(_.tiles.exists(_.forall(With.architecture.walkable)))) {
-        valid = false
-      }
-    }
-  }
     
   def usuallyNeedsMargin(unitClass: UnitClass): Boolean = {
     if (With.configuration.enableTightBuildingPlacement) {
@@ -54,29 +33,24 @@ class Architecture {
   
   def reboot() {
     exclusions      .clear()
-    unbuildable     .clear()
-    unwalkable      .clear()
-    ungassable      .clear()
-    untownhallable  .clear()
-    powered2Height  .clear()
-    powered3Height  .clear()
+    unbuildable     .update()
+    unwalkable      .update()
+    ungassable      .update()
+    untownhallable  .update()
+    powered2Height  .update()
+    powered3Height  .update()
     recalculateExclusions()
     recalculatePower()
     recalculateBuilderAccess()
-    updatePaths()
-  }
-  
-  private def updatePaths() {
-    existingPaths.values.foreach(_.update())
   }
   
   def buildable(tile: Tile): Boolean = {
-    With.grids.buildable.get(tile) && ! unbuildable.contains(tile)
+    With.grids.buildable.get(tile) && ! unbuildable.get(tile)
   }
   
   def walkable(tile: Tile): Boolean = {
     With.grids.walkable.get(tile) &&
-      ! unwalkable.contains(tile) &&
+      ! unwalkable.get(tile) &&
       ! tile.zone.bases.exists(_.townHallArea.contains(tile))
   }
   
@@ -88,17 +62,22 @@ class Architecture {
     val area = TileRectangle(
       tile.add(placement.blueprint.relativeBuildStart),
       tile.add(placement.blueprint.relativeBuildEnd))
-    
-    unbuildable     ++= area.tiles
-    unwalkable      ++= area.tiles
-    untownhallable  ++= area.tiles
-    ungassable      ++= area.tiles
-  
+
+    val nTiles = area.tiles.size
+    var iTile = 0
+    while (iTile < nTiles) {
+      val tile = area.tiles(iTile)
+      unbuildable.set(tile, true)
+      unwalkable.set(tile, true)
+      untownhallable.set(tile, true)
+      ungassable.set(tile, true)
+      iTile += 1
+    }
+
+    // If we have no Pylons, place in advance of our first completing
     if (placement.blueprint.powers.get && ! With.units.existsOurs(Protoss.Pylon)) {
       addPower(tile)
     }
-  
-    updatePaths() //Invalidate any paths which no longer work
     
     if (ShowArchitecturePlacements.inUse) {
       exclusions += Exclusion(placement.blueprint.toString, area)
@@ -108,52 +87,57 @@ class Architecture {
   /////////////
   // Margins //
   /////////////
-  
-  private def recalculateUnwalkable() {
-    unwalkable ++= With.units.all
-      .filter(unit => unit.unitClass.isBuilding && ! unit.flying)
-      .flatMap(_.tileArea.tiles)
-  }
-  
-  private def recalculateUnbuildable() {
-    unbuildable ++= With.units.ours
-      .filter(unit =>
-        ! unit.flying && (
-          unit.isEnemy
-          || unit.is(Zerg.Larva)
-          || unit.is(Zerg.Egg)
-          || unit.is(Zerg.Lurker)
-          || unit.unitClass.isBuilding))
-      .flatMap(unit =>
-        if (usuallyNeedsMargin(unit.unitClass))
-          unit.tileArea.expand(1, 1).tiles
-        else
-          unit.tileArea.tiles)
-  }
 
   private def recalculateExclusions() {
-    def forUnbuildable  = With.units.all.view.filter(isGroundBuilding)
-    val forUnwalkable   = With.units.ours.toSeq.filter(unit => isGroundBuilding(unit) && usuallyNeedsMargin(unit.unitClass))
-    val expansionAddons = if (With.self.isTerran) With.geography.bases.map(base => {
+
+    // Reserve addon space in bases
+    if (With.self.isTerran) With.geography.bases.map(base => {
       val start = base.townHallTile.add(4, 1)
-      TileRectangle(start, start.add(2, 2))
-    }) else Seq.empty
-    
-    forUnbuildable.foreach(unbuildable ++= _.tileArea.tiles)
-    forUnbuildable.filter(_.unitClass.canBuildAddon).foreach(unbuildable ++= _.addonArea.tiles)
-    expansionAddons.foreach(unbuildable ++= _.tiles)
-    unwalkable      ++= unbuildable
-    unwalkable      ++= forUnwalkable.flatMap(_.tileArea.expand(1, 1).tiles)
-    untownhallable  ++= unbuildable
-    ungassable      ++= With.units.all.filter(unit => ! unit.player.isNeutral && unit.alive && unit.unitClass.isGas).map(_.tileTopLeft)
-      
-    if (ShowArchitecturePlacements.inUse) {
-      exclusions ++= forUnwalkable.map(unit => Exclusion("Margin for " + unit, unit.tileArea.expand(1, 1)))
-    }
-  }
-  
-  private def isGroundBuilding(unit: UnitInfo): Boolean = {
-    ( ! unit.flying && unit.unitClass.isBuilding) || unit.is(Zerg.Egg) || unit.is(Zerg.LurkerEgg) //Commonly used as map blocks
+      val addonArea = TileRectangle(start, start.add(2, 2))
+      addonArea.tiles.foreach(unbuildable.set(_, true))
+      if (ShowArchitecturePlacements.inUse) {
+        exclusions += Exclusion("Addon for " + base, addonArea)
+      }
+    })
+
+    With.units.ours.foreach(unit => {
+
+      // Reserve unit's addon space
+      if (unit.unitClass.canBuildAddon) {
+        unit.addonArea.tiles.foreach(unbuildable.set(_, true))
+        if (ShowArchitecturePlacements.inUse) {
+          exclusions += Exclusion("Addon for " + unit, unit.addonArea)
+        }
+      }
+
+      // Reserve margins for buildings which produce ground units
+      if ( ! unit.flying && (unit.isAny(Zerg.Egg, Zerg.LurkerEgg) || (unit.unitClass.isBuilding && usuallyNeedsMargin(unit.unitClass)))) {
+        val w = 2 + unit.unitClass.tileWidth
+        val h = 2 + unit.unitClass.tileHeight
+        var x = 0
+        while(x < w) {
+          unbuildable.set(unit.tileTopLeft.add(x-1, -1), true)
+          unbuildable.set(unit.tileTopLeft.add(x-1, h), true)
+          x += 1
+        }
+        var y = 0
+        while(y < w) {
+          unbuildable.set(unit.tileTopLeft.add(-1, y-1), true)
+          unbuildable.set(unit.tileTopLeft.add(w,  y-1), true)
+          y += 1
+        }
+        if (ShowArchitecturePlacements.inUse) {
+          exclusions += Exclusion("Margin for " + unit, unit.tileArea.expand(1, 1))
+        }
+      }
+    })
+
+    // Flag places where we can't build gas
+    With.geography.bases.foreach(_.gas.foreach(gas =>
+      if (gas.alive && ! gas.player.isNeutral && gas.alive) {
+        ungassable.set(gas.tileTopLeft, true)
+      }
+    ))
   }
   
   ///////////
@@ -162,41 +146,21 @@ class Architecture {
   
   private def recalculatePower() {
     With.units.ours.foreach(unit =>
-      if (
-        unit.is(Protoss.Pylon)
-        && (
-          With.framesSince(unit.completionFrame) < GameTime(0, 5)()
-          || (
-            ! unit.complete
-            && unit.zone.units.forall(other => ! other.is(Protoss.Pylon) || ! other.complete)
-          )
-        )) {
+      if (unit.is(Protoss.Pylon)
+        && (With.framesSince(unit.completionFrame) < GameTime(0, 5)()
+          || unit.zone.units.forall(other => ! other.is(Protoss.Pylon) || other.completionFrame >= unit.completionFrame))) {
         addPower(unit.tileTopLeft)
       })
   }
   
   private def addPower(tile: Tile) {
-    With.grids.psi2Height.psiPoints.map(tile.add).map(neighbor => if (neighbor.valid) powered2Height += neighbor)
-    With.grids.psi3Height.psiPoints.map(tile.add).map(neighbor => if (neighbor.valid) powered3Height += neighbor)
+    With.grids.psi2Height.psiPoints.map(tile.add).foreach(neighbor => if (neighbor.valid) powered2Height.set(neighbor, true))
+    With.grids.psi3Height.psiPoints.map(tile.add).foreach(neighbor => if (neighbor.valid) powered3Height.set(neighbor, true))
   }
-  
-  /////////////////
-  // Walkability //
-  /////////////////
-  
-  private def canaryTile(zone: Zone): Tile = {
-    Spiral.points(20)
-      .map(zone.centroid.add)
-      .filter(_.valid)
-      .find(walkable)
-      .getOrElse(zone.centroid)
-  }
-
-  private def isOurBuilder(u: UnitInfo) = u.isOurs && u.unitClass.isWorker
 
   private def recalculateBuilderAccess() {
-    val hasBuilder = With.geography.zones.filter(_.units.exists(isOurBuilder))
-    val accessible = With.geography.zones.filter(z => hasBuilder.exists(_.distanceGrid.get(z.centroid) < Int.MaxValue))
+    val hasBuilder = With.geography.zones.filter(_.units.exists(u => u.isOurs && u.unitClass.isWorker))
+    val accessible = With.geography.zones.filter(z => hasBuilder.exists(_.distancePixels(z) < Int.MaxValue))
     accessibleZones = (hasBuilder ++ accessible).distinct
   }
 }

@@ -103,7 +103,6 @@ class Visualization {
   
   lazy val knownViews: Vector[View] = Vector[View](
     ShowArchitectureHeuristics,
-    ShowArchitecturePaths,
     ShowArchitecturePlacements,
     ShowBases,
     ShowBattleDetails,

@@ -54,7 +54,8 @@ class ArcPlacementState(arc: Arc) {
     val tile = output.tileIncluding
     if (tile.valid
       && With.grids.walkable.get(tile)
-      && ! With.architecture.unwalkable.contains(tile) // Don't concave on reserved tiles
+      && ! With.architecture.unbuildable.get(tile) // Don't concave on reserved tiles
+      && ! With.architecture.unwalkable.get(tile) // Don't concave on reserved tiles
       && (lastPlacement == arc.centerPixel || tile.zone == lastPlacement.zone))
       Some(output)
     else

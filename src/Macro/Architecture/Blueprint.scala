@@ -76,10 +76,10 @@ class Blueprint(
       return false
     }
     if (requirePower.get) {
-      if (heightTiles.get == 3 && ! With.grids.psi3Height.isSet(tile) && ! With.architecture.powered3Height.contains(tile)) {
+      if (heightTiles.get == 3 && ! With.grids.psi3Height.isSet(tile) && ! With.architecture.powered3Height.get(tile)) {
         return false
       }
-      if (heightTiles.get == 2 && ! With.grids.psi2Height.isSet(tile) && ! With.architecture.powered2Height.contains(tile)) {
+      if (heightTiles.get == 2 && ! With.grids.psi2Height.isSet(tile) && ! With.architecture.powered2Height.get(tile)) {
         return false
       }
     }
@@ -104,12 +104,12 @@ class Blueprint(
     }
     if (requireGasTile.get) {
       val legal   = thisZone.bases.exists(_.gas.exists(_.tileTopLeft == tile))
-      val blocked = With.architecture.ungassable.contains(tile)
+      val blocked = With.architecture.ungassable.get(tile)
       return legal && ! blocked
     }
     if (requireTownHallTile.get) {
       if ( ! thisZone.bases.exists(_.townHallTile == tile)) return false
-      if (With.architecture.untownhallable.contains(tile)) return false
+      if (With.architecture.untownhallable.get(tile)) return false
     }
 
     val buildArea = relativeBuildArea.add(tile)

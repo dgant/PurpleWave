@@ -56,7 +56,7 @@ class BattleClassifier {
   }
   
   def runClustering() {
-    clustering.enqueue(With.units.playerOwned.view.filter(BattleClassificationFilters.isEligibleLocal).toSeq)
+    clustering.enqueue(With.units.playerOwned.view.filter(BattleClassificationFilters.isEligibleLocal).toVector)
     clustering.run()
   }
   

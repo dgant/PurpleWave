@@ -28,7 +28,7 @@ object Spot extends Action {
               ByOption.minBy(unit.matchups.enemies.view.filter(!_.visible))(_.pixelDistanceCenter(p)).orElse(
                 ByOption.minBy(unit.matchups.enemies)(_.pixelDistanceCenter(p)))))
               .map(_.pixelCenter)
-              .getOrElse(p.project(SpecificPoints.middle, unit.sightRangePixels))
+              .getOrElse(p.project(SpecificPoints.middle, 2 * unit.sightRangePixels))
         else p)
 
     if (goal.isDefined) {

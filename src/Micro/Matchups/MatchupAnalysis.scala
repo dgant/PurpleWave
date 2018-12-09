@@ -1,6 +1,5 @@
 package Micro.Matchups
 
-import Information.Battles.BattleClassificationFilters
 import Information.Battles.Types.BattleLocal
 import Lifecycle.With
 import Mathematics.Points.Pixel
@@ -23,21 +22,20 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val frame  : Int   = conditions.framesAhead
   
   // Default is necessary for killing empty bases because no Battle is happening
-  private lazy val defaultUnits   : Vector[UnitInfo]      = if (me.canAttack) me.zone.units.filter(u => u.isEnemy && BattleClassificationFilters.isEligibleLocal(u)) else Vector.empty
-  lazy val battle                 : Option[BattleLocal]   = me.battle.orElse(With.matchups.entrants.find(_._2.contains(me)).map(_._1))
-  lazy val allUnits               : Vector[UnitInfo]      = battle.map(b => b.teams.flatMap(_.units) ++ With.matchups.entrants.getOrElse(b, Set.empty)).getOrElse(defaultUnits)
-  lazy val enemies                : Vector[UnitInfo]      = allUnits.filter(_.isEnemyOf(me))
-  lazy val alliesInclSelf         : Vector[UnitInfo]      = allUnits.filter(_.isAllyOf(me))
-  lazy val alliesInclSelfCloaked  : Vector[UnitInfo]      = alliesInclSelf.filter(_.cloakedOrBurrowed)
-  lazy val allies                 : Vector[UnitInfo]      = alliesInclSelf.filterNot(_.id == me.id)
-  lazy val others                 : Vector[UnitInfo]      = enemies ++ allies
-  lazy val allyDetectors          : Vector[UnitInfo]      = allies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
-  lazy val enemyDetectors         : Vector[UnitInfo]      = enemies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
-  lazy val threats                : Vector[UnitInfo]      = enemies.filter(threatens(_, me))
-  lazy val targets                : Vector[UnitInfo]      = enemies.filter(threatens(me, _))
-  lazy val threatsViolent         : Vector[UnitInfo]      = threats.filter(_.isBeingViolentTo(me))
-  lazy val threatsInRange         : Vector[UnitInfo]      = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me, at) - me.pixelsTravelledMax(frame) - threat.pixelsTravelledMax(frame))
-  lazy val targetsInRange         : Vector[UnitInfo]      = targets.filter(target => target.visible && me.pixelRangeAgainst(target) >= target.pixelDistanceEdge(me, at) - me.pixelsTravelledMax(frame) - target.pixelsTravelledMax(frame) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
+  lazy val battle                 : Option[BattleLocal] = me.battle.orElse(With.matchups.entrants.find(_._2.contains(me)).map(_._1))
+  lazy val allUnits               : Vector[UnitInfo]    = battle.map(b => b.teams.flatMap(_.units)    ++ With.matchups.entrants.getOrElse(b, Set.empty)).getOrElse(Vector.empty)
+  lazy val enemies                : Vector[UnitInfo]    = battle.map(b => b.teamOf(me).opponent.units ++ With.matchups.entrants.getOrElse(b, Set.empty).filter(   _.isEnemyOf(me))).getOrElse(Vector.empty)
+  lazy val alliesInclSelf         : Vector[UnitInfo]    = battle.map(b => b.teamOf(me).units          ++ With.matchups.entrants.getOrElse(b, Set.empty).filter( ! _.isEnemyOf(me))).getOrElse(Vector.empty)
+  lazy val alliesInclSelfCloaked  : Vector[UnitInfo]    = alliesInclSelf.filter(_.cloakedOrBurrowed)
+  lazy val allies                 : Vector[UnitInfo]    = alliesInclSelf.filterNot(_.id == me.id)
+  lazy val others                 : Vector[UnitInfo]    = enemies ++ allies
+  lazy val allyDetectors          : Vector[UnitInfo]    = allies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
+  lazy val enemyDetectors         : Vector[UnitInfo]    = enemies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
+  lazy val threats                : Vector[UnitInfo]    = enemies.filter(threatens(_, me))
+  lazy val targets                : Vector[UnitInfo]    = enemies.filter(threatens(me, _))
+  lazy val threatsViolent         : Vector[UnitInfo]    = threats.filter(_.isBeingViolentTo(me))
+  lazy val threatsInRange         : Vector[UnitInfo]    = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me, at) - me.pixelsTravelledMax(frame) - threat.pixelsTravelledMax(frame))
+  lazy val targetsInRange         : Vector[UnitInfo]    = targets.filter(target => target.visible && me.pixelRangeAgainst(target) >= target.pixelDistanceEdge(me, at) - me.pixelsTravelledMax(frame) - target.pixelsTravelledMax(frame) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
   
   private def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = {
     if ( ! shooter.canAttack(victim)) return false

@@ -23,6 +23,6 @@ class TaskQueueGrids extends AbstractTaskQueue {
     new TaskGridUnits                       { urgency = 100 },
     new TaskGridWalkable                    { urgency = 1   },
     new TaskGridWalkableTerrain             { urgency = 1   },
-    new TaskGridWalkableUnits               { urgency = 1   }
+    new TaskGridUnwalkableUnits               { urgency = 1   }
   )
 }

@@ -5,8 +5,10 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 class GridFriendlyDetection extends AbstractGridDetection {
   
-  override protected def detectors: Seq[UnitInfo] =
-    With.units.ours.toSeq.filter(unit =>
-      unit.aliveAndComplete
-      && unit.unitClass.isDetector)
+  override protected def detectors: Iterable[UnitInfo] =
+    With.units.ours
+      .view
+      .filter(unit =>
+        unit.aliveAndComplete
+        && unit.unitClass.isDetector)
 }

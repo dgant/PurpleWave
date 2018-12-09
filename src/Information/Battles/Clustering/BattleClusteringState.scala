@@ -10,13 +10,9 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-class BattleClusteringState(seedUnits: Seq[UnitInfo]) {
+class BattleClusteringState(seedUnits: Vector[UnitInfo]) {
 
   val horizon: mutable.Stack[UnitInfo] = mutable.Stack[UnitInfo]()
-  
-  lazy val exploredFriendly  : Array[Boolean] = new Array(With.geography.allTiles.length)
-  lazy val exploredEnemy     : Array[Boolean] = new Array(With.geography.allTiles.length)
-  
   horizon.pushAll(seedUnits.filter(_.isEnemy))
   
   def isComplete: Boolean = horizon.isEmpty
@@ -37,9 +33,9 @@ class BattleClusteringState(seedUnits: Seq[UnitInfo]) {
       val nextTile = tileCenter.add(points(iPoint))
       iPoint += 1
       if (nextTile.valid) {
-        val exploredGrid = if (isFriendly) exploredFriendly else exploredEnemy
-        if ( ! exploredGrid(nextTile.i)) {
-          exploredGrid(nextTile.i) = true
+        val exploredGrid = if (isFriendly) With.battles.clustering.exploredFriendly else With.battles.clustering.exploredEnemy
+        if ( ! exploredGrid.get(nextTile.i)) {
+          exploredGrid.set(nextTile.i, true)
           val neighbors = With.grids.units.get(nextTile)
           val nNeighbors = neighbors.size
           var iNeighbor = 0
@@ -97,7 +93,7 @@ class BattleClusteringState(seedUnits: Seq[UnitInfo]) {
   
   @tailrec
   private def getRoot(unit: UnitInfo): UnitInfo = {
-    val linkedUnit = unit.clusterParent.get
+    val linkedUnit = unit.clusterParent.getOrElse(unit)
     if (linkedUnit == unit) unit else getRoot(linkedUnit)
   }
   

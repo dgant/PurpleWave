@@ -1,5 +1,6 @@
 package Information.Battles.Clustering
 
+import Information.Grids.Disposable.GridDisposableBoolean
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -10,17 +11,20 @@ class BattleClustering {
   var lastClusterCompletion = 0
   val runtimes = new mutable.Queue[Int]
   
-  private var nextUnits:          Seq[UnitInfo] = Seq.empty
-  private var clusterInProgress:  BattleClusteringState = new BattleClusteringState(Seq.empty)
-  private var clusterComplete:    BattleClusteringState = new BattleClusteringState(Seq.empty)
-  
+  private var nextUnits:          Vector[UnitInfo] = Vector.empty
+  private var clusterInProgress:  BattleClusteringState = new BattleClusteringState(Vector.empty)
+  private var clusterComplete:    BattleClusteringState = new BattleClusteringState(Vector.empty)
+
+  val exploredFriendly = new GridDisposableBoolean
+  val exploredEnemy    = new GridDisposableBoolean
+
   //////////////////////
   // Batch processing //
   //////////////////////
   
   def clusters: Vector[Vector[UnitInfo]] = clusterComplete.clusters
   
-  def enqueue(units: Seq[UnitInfo]) {
+  def enqueue(units: Vector[UnitInfo]) {
     nextUnits = units
   }
   
@@ -31,13 +35,14 @@ class BattleClustering {
       lastClusterCompletion = With.frame
       clusterComplete       = clusterInProgress
       clusterInProgress     = new BattleClusteringState(nextUnits)
-
+      exploredFriendly.update()
+      exploredEnemy.update()
       With.units.all.foreach(u => {
         u.clusteringEnabled = false
         u.clusterParent = None
         u.clusterChild = None
       })
-      nextUnits.foreach(_.clusteringEnabled)
+      nextUnits.foreach(_.clusteringEnabled = true)
     }
     else {
       while ( ! clusterInProgress.isComplete && With.performance.continueRunning) {

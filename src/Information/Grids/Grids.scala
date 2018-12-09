@@ -34,7 +34,7 @@ class Grids {
   val units                   = new GridUnits
   val walkable                = new GridWalkable
   val walkableTerrain         = new GridWalkableTerrain
-  val walkableUnits           = new GridWalkableUnits
+  val unwalkableUnits         = new GridUnwalkableUnits
 
   private val _disposableBoolean1 = new GridDisposableBoolean
   private val _disposableBoolean2 = new GridDisposableBoolean

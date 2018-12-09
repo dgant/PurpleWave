@@ -112,18 +112,18 @@ class Architecture {
 
       // Reserve margins for buildings which produce ground units
       if ( ! unit.flying && (unit.isAny(Zerg.Egg, Zerg.LurkerEgg) || (unit.unitClass.isBuilding && usuallyNeedsMargin(unit.unitClass)))) {
-        val w = 2 + unit.unitClass.tileWidth
-        val h = 2 + unit.unitClass.tileHeight
+        val w = 1 + unit.unitClass.tileWidth
+        val h = 1 + unit.unitClass.tileHeight
         var x = 0
         while(x < w) {
           unbuildable.set(unit.tileTopLeft.add(x-1, -1), true)
-          unbuildable.set(unit.tileTopLeft.add(x-1, h), true)
+          unbuildable.set(unit.tileTopLeft.add(x-1, h-1), true)
           x += 1
         }
         var y = 0
         while(y < w) {
-          unbuildable.set(unit.tileTopLeft.add(-1, y-1), true)
-          unbuildable.set(unit.tileTopLeft.add(w,  y-1), true)
+          unbuildable.set(unit.tileTopLeft.add(-1,  y-1), true)
+          unbuildable.set(unit.tileTopLeft.add(w-1, y-1), true)
           y += 1
         }
         if (ShowArchitecturePlacements.inUse) {

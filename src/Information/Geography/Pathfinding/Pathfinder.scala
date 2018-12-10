@@ -134,12 +134,12 @@ trait Pathfinder {
 
   def goalDistance(end: Tile): (Tile) => Boolean = _ == end
   def goalThreatAware(unit: FriendlyUnitInfo, end: Option[Tile]): (Tile) => Boolean = tile => {
-    With.grids.enemyRange.get(tile) <= 0 && end.forall(_ == tile)
+    With.grids.enemyRange.get(tile) <= 0 && end.forall(theEnd => goalDistance(theEnd)(tile) < goalDistance(theEnd)(unit.tileIncludingCenter))
   }
 
   def costAtDistance(end: Tile): (Tile) => Int = tile => 1
   def costAtThreatAware(unit: FriendlyUnitInfo, end: Option[Tile]): (Tile) => Int = tile => {
-     threatCostAt(unit, tile) + end.map(costAtDistance(_)(tile)).getOrElse(0)
+     threatCostAt(unit, tile) + end.map(costAtDistance(_)(tile)).getOrElse(0) + With.coordinator.gridPathOccupancy.get(tile) / 3
   }
 
   def costToDistance(end: Tile): (Tile) => Int = _.tileDistanceManhattan(end)
@@ -185,7 +185,7 @@ trait Pathfinder {
     if ( ! start.valid) return failure(start)
 
     startNextSearch()
-    val horizon = new mutable.PriorityQueue[Tile]()(Ordering.by(costTo))
+    val horizon = new mutable.PriorityQueue[Tile]()(Ordering.by(-costTo(_)))
     tiles(start.i).setCostTo(0)
     tiles(start.i).setCostFrom(costTo(start))
     horizon += start

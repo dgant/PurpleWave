@@ -38,9 +38,20 @@ class PvP4GateGoon extends GameplanModeTemplate {
     new If(
       new Or(
         new UnitsAtLeast(15, Protoss.Dragoon),
+        new UnitsAtLeast(3, Protoss.DarkTemplar),
         new EnemiesAtLeast(1, Protoss.PhotonCannon)),
       new RequireMiningBases(2)),
-    new Pump(Protoss.Dragoon),
+
+    new Pump(Protoss.DarkTemplar),
+    new If(
+      new EnemyStrategy(With.fingerprints.fourGateGoon),
+      new Parallel(
+        new Build(
+          Get(Protoss.CitadelOfAdun),
+          Get(Protoss.TemplarArchives)),
+        new PvPIdeas.TrainArmy),
+      new Pump(Protoss.Dragoon)),
+
     new If(
       new And(
         new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),

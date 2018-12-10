@@ -47,18 +47,19 @@ object Avoid extends ActionTechnique {
     }
 
     var pathLengthMax = 6
-    val useAStar = true
-    if (useAStar) {
+    if (With.configuration.enableThreatAwarePathfinding) {
       val path = With.paths.aStarThreatAware(unit, if (unit.agent.origin.zone == unit.zone) None else Some(unit.agent.origin.tileIncluding))
       if (path.pathExists && path.tiles.exists(_.size > 3)) {
-         if (ShowUnitsFriendly.inUse && With.visualization.map) {
+        // Path tiles are in REVERSE
+        if (ShowUnitsFriendly.inUse && With.visualization.map) {
           for (i <- 0 until path.tiles.get.size - 1) {
             DrawMap.arrow(
-              path.tiles.get(i).pixelCenter,
               path.tiles.get(i + 1).pixelCenter,
+              path.tiles.get(i).pixelCenter,
               Colors.MediumOrange)
           }
         }
+        path.tiles.get.foreach(With.coordinator.gridPathOccupancy.addUnit(unit, _))
         unit.agent.toTravel = Some(path.end.pixelCenter)
         Move.delegate(unit)
         return

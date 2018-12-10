@@ -56,27 +56,19 @@ object FightOrFlight extends Action {
     }))
 
     decide(false, "Hazard", () => {
-      if ( ! With.configuration.enableMCRS) return false
-      val occupancy = With.coordinator.gridPathOccupancy.get(unit.tileIncludingCenter)
-      val output: Boolean = (
-        ! unit.flying
-          && occupancy > 0
-          && occupancy + unit.unitClass.sqrtArea > 24
-          && unit.matchups.allies.exists(ally =>
-            ! ally.flying
-            && ! ally.friendly.exists(_.agent.shouldEngage)
-            && ally.pixelDistanceEdge(unit) < 32))
-      output
+      With.configuration.enableMCRS && {
+        val occupancy = With.coordinator.gridPathOccupancy.get(unit.tileIncludingCenter)
+        val output: Boolean = (
+          ! unit.flying
+            && occupancy > 0
+            && occupancy + unit.unitClass.sqrtArea > 24
+            && unit.matchups.allies.exists(ally =>
+              ! ally.flying
+              && ! ally.friendly.exists(_.agent.shouldEngage)
+              && ally.pixelDistanceEdge(unit) < 32))
+        output
+      }
     })
-    /*
-    decide(false, "Stand", () =>
-      unit.agent.toForm.exists(form =>
-        unit.matchups.targets.forall(target =>
-          target.unitClass.isWorker
-          || target.matchups.targets.view.filter(_.friendly.exists(_.agent.toForm.isDefined)).forall(victim =>
-            target.inRangeToAttack(victim, victim.friendly.flatMap(_.agent.toForm).getOrElse(victim.pixelCenter))
-        ))))
-        */
 
     decide(true, "Anchors", () => unit.matchups.allies.exists(ally =>
       ! ally.unitClass.isWorker

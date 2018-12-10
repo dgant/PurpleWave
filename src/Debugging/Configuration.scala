@@ -31,7 +31,8 @@ class Configuration {
   // Battles //
   /////////////
 
-  var enableMCRS                    = true
+  var enableMCRS                    = false
+  var enableThreatAwarePathfinding  = false
   var avatarBattleDistancePixels    = 32.0 * 6.0
   var battleMarginTileBase          = 12 + 2
   var battleMarginTileMinimum       = 12 + 2

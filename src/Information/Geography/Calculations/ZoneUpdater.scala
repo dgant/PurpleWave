@@ -87,11 +87,10 @@ object ZoneUpdater {
       && exitBuildings.exists(_.is(Terran.Barracks))
       && canaryTileInside.exists(tileInside =>
           canaryTileOutside.exists(tileOutside =>
-            ! With.paths.manhattanGroundDistanceThroughObstacles(
+            ! With.paths.aStarBasic(
               tileInside,
               tileOutside,
-              obstacles = Set.empty,
-              maximumDistance = 100).pathExists)))
+              100).pathExists)))
   }
   
   

@@ -7,7 +7,9 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
 object ShuttlePickup extends Action {
+
   override def allowed(shuttle: FriendlyUnitInfo): Boolean = BeAShuttle.allowed(shuttle)
+
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
     val pickupCandidates = shuttle.teammates
       .view

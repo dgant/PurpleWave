@@ -4,10 +4,9 @@ import Information.Geography.Pathfinding.Types.ZonePath
 import Information.Grids.Lambda.GridFixedLambdaBoolean
 import Information.Grids.Movement.GridGroundDistance
 import Lifecycle.With
-import Mathematics.Formations.Designers.FormationZone
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import ProxyBwapi.Players.PlayerInfo
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 import bwta.Region
 
@@ -34,7 +33,6 @@ class Zone(
   lazy val  tilesBuildable    : Array[Tile]         = { With.grids.buildableTerrain.initialize(); tiles.filter(With.grids.buildableTerrain.get).toArray }
   lazy val  maxMobility       : Int                 = ByOption.max(tiles.map(With.grids.mobilityGround.get)).getOrElse(0)
   lazy val  unwalkable        : Boolean             = ! tiles.exists(With.grids.walkable.get)
-  lazy val  formation         : FormationZone       = new FormationZone(this)
 
   lazy val exitDistanceGrid: GridGroundDistance = exit.map(_.distanceGrid).getOrElse(new GridGroundDistance(centroid))
   lazy val exit: Option[Edge] = ByOption.minBy(edges)(edge => With.geography.startLocations.map(_.groundPixels(edge.pixelCenter)).max)
@@ -53,7 +51,10 @@ class Zone(
   def pathTo          (to: Zone): Option[ZonePath]  = With.paths.zonePath(this, to)
   def canWalkTo       (to: Zone): Boolean           = pathTo(to).isDefined
   def distancePixels  (to: Zone): Double            = centroid.groundPixels(to.centroid)
-  
+
+  // Cached information for pathfinding
+  var lastPathfindId: Long = Long.MinValue
+
   override def toString: String = (
     name
     + " "

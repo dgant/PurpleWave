@@ -123,7 +123,7 @@ class Gather extends Plan {
   
   private def updateWorker(worker: FriendlyUnitInfo, forceUpdate: Boolean) {
     if (forceUpdate
-      || With.framesSince(worker.lastGatheringUpdate) > GameTime(0, 5)()
+      || With.framesSince(worker.lastGatheringUpdate) > GameTime(0, 1)()
       || ! resourceByWorker.get(worker).exists(_.aliveAndComplete)
       ) {
       worker.lastGatheringUpdate = With.frame

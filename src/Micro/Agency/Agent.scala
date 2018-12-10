@@ -94,9 +94,11 @@ class Agent(val unit: FriendlyUnitInfo) {
     if ( ! With.strategy.map.forall(_.trustGroundDistance)) return to
     if ( ! cachedWaypoint.contains(to)) {
       val path = zonePath(to)
-      cachedWaypoint(to) = path.get.steps
-        .map(_.edge.pixelCenter)
-        .find(step => unit.pixelDistanceCenter(step) > 128)
+      cachedWaypoint(to) = path
+        .map(_.steps
+          .map(_.edge.pixelCenter)
+          .find(step => unit.pixelDistanceCenter(step) > 128)
+          .getOrElse(to))
         .getOrElse(to)
     }
     cachedWaypoint(to)

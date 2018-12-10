@@ -12,10 +12,13 @@ class GridEnemyRange extends AbstractGridVersionedValue[Int] {
   // How far to extend the reach of range into negative territory
   val addedRange = 5
 
+  // How many frames ahead to project positions
+  val framesAhead = 12
+
   override def onUpdate(): Unit = {
     for (unit <- With.units.enemy) {
       if (unit.likelyStillThere && (unit.canAttack || unit.unitClass.spells.nonEmpty)) {
-        val tileUnit = unit.tileIncludingCenter
+        val tileUnit = unit.projectFrames(framesAhead).tileIncluding
         val rangeMax = addedRange + unit.effectiveRangePixels.toInt/32
         for (d <- 1 to rangeMax) {
           for (point <- Ring.points(d)) {

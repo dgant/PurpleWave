@@ -2,10 +2,9 @@ package Micro.Squads.Goals
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
-import Mathematics.Formations.Designers.{FormationArc, FormationZoneNew}
+import Mathematics.Formations.Designers.FormationZone
 import Mathematics.Formations.FormationAssigned
-import Mathematics.Points.{Pixel, SpecificPoints}
-import Mathematics.PurpleMath
+import Mathematics.Points.Pixel
 import Micro.Agency.{Intention, Leash}
 import Performance.Cache
 import ProxyBwapi.Races.Zerg
@@ -29,16 +28,11 @@ class GoalDefendZone extends GoalBasic {
 
     lazy val allowWandering = ! With.enemies.exists(_.isZerg) || squad.units.size >= 3 || squad.enemies.exists(_.unitClass.ranged)
     lazy val canHuntEnemies = huntableEnemies().nonEmpty
-    lazy val canDefendWall  = walls.nonEmpty
     lazy val canDefendChoke = choke.isDefined
     
     if (allowWandering && canHuntEnemies) {
       lastAction = "Scour "
       huntEnemies()
-    }
-    else if (canDefendWall) {
-      lastAction = "Protect wall of "
-      defendWall(walls)
     }
     else if (allowWandering && canDefendChoke) {
       lastAction = "Protect choke of "
@@ -101,41 +95,8 @@ class GoalDefendZone extends GoalBasic {
     }))
   }
   
-  val wallConcaveWidthRadians : Double = Math.PI / 2.0
-  val wallConcaveWidthPixels  : Double = 32.0 * 3.0
-  
-  def defendWall(walls: Seq[UnitInfo]) {
-    val centroidSources = Seq(squad.enemies.toSeq.map(_.pixelCenter), zone.exit.map(_.pixelCenter).toSeq, Seq(SpecificPoints.middle))
-    val enemyCentroid   = PurpleMath.centroid(centroidSources.find(_.nonEmpty).head)
-    val wall            = walls.minBy(_.pixelDistanceTravelling(enemyCentroid))
-    val concaveOrigin   = wall.pixelCenter.project(enemyCentroid, 96.0)
-    val concaveAxis     = wall.pixelCenter.radiansTo(enemyCentroid)
-    val concaveStart    = concaveOrigin.radiateRadians(concaveAxis + wallConcaveWidthRadians, wallConcaveWidthPixels)
-    val concaveEnd      = concaveOrigin.radiateRadians(concaveAxis - wallConcaveWidthRadians, wallConcaveWidthPixels)
-    defendLine(concaveStart, concaveEnd)
-  }
-  
   def defendChoke() {
-    assignToFormation(new FormationZoneNew(zone, squad.enemies).form(squad.units.toSeq))
-  }
-  
-  def defendLine(from: Pixel, to: Pixel) {
-    val concaveMidpoint = from.midpoint(to)
-    val concaveRadians  = from.radiansTo(to)
-    val someDistance    = 96.0
-    val rightAngle      = Math.PI / 2.0
-    val origins         = Vector(
-      concaveMidpoint.radiateRadians(concaveRadians + rightAngle, someDistance),
-      concaveMidpoint.radiateRadians(concaveRadians - rightAngle, someDistance))
-    val origin = origins.minBy(o =>
-      if (With.geography.ourBases.isEmpty) 0.0
-      else With.geography.ourBases.map(_.heart.pixelCenter.groundPixels(o)).min)
-  
-    concave(from, to, origin)
-  }
-  
-  def concave(start: Pixel, end: Pixel, origin: Pixel) {
-    val formation = new FormationArc(start, end, origin).form(squad.units.toSeq)
+    assignToFormation(new FormationZone(zone, squad.enemies).form(squad.units.toSeq))
   }
 
   def assignToFormation(formation: FormationAssigned): Unit = {
@@ -148,5 +109,4 @@ class GoalDefendZone extends GoalBasic {
           toTravel  = spot.orElse(Some(zone.centroid.pixelCenter)) })
       })
   }
-  
 }

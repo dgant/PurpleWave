@@ -47,6 +47,25 @@ object Avoid extends ActionTechnique {
     }
 
     var pathLengthMax = 6
+    val useAStar = true
+    if (useAStar) {
+      val path = With.paths.aStarThreatAware(unit, if (unit.agent.origin.zone == unit.zone) None else Some(unit.agent.origin.tileIncluding))
+      if (path.pathExists && path.tiles.exists(_.size > 3)) {
+         if (ShowUnitsFriendly.inUse && With.visualization.map) {
+          for (i <- 0 until path.tiles.get.size - 1) {
+            DrawMap.arrow(
+              path.tiles.get(i).pixelCenter,
+              path.tiles.get(i + 1).pixelCenter,
+              Colors.MediumOrange)
+          }
+        }
+        unit.agent.toTravel = Some(path.end.pixelCenter)
+        Move.delegate(unit)
+        return
+      }
+    }
+
+
     val path = new ArrayBuffer[Tile]
     path += unit.tileIncludingCenter
     var bestScore = Int.MinValue
@@ -89,7 +108,10 @@ object Avoid extends ActionTechnique {
       } else {
         if (ShowUnitsFriendly.inUse && With.visualization.map) {
           for (i <- 0 until path.length - 1) {
-            DrawMap.arrow(path(i).pixelCenter, path(i + 1).pixelCenter, Colors.DarkTeal)
+            DrawMap.arrow(
+              path(i).pixelCenter,
+              path(i + 1).pixelCenter,
+              Colors.DarkTeal)
           }
         }
         path.foreach(With.coordinator.gridPathOccupancy.addUnit(unit, _))

@@ -6,8 +6,7 @@ case class TilePath(
   start     : Tile,
   end       : Tile,
   distance  : Int,
-  visited   : Int,
-  tiles     : Option[Iterable[Tile]]) {
+  tiles     : Option[IndexedSeq[Tile]]) {
   
   def pathExists: Boolean = tiles.isDefined
 }

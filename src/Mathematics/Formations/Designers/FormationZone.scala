@@ -1,47 +1,106 @@
 package Mathematics.Formations.Designers
 
 import Information.Geography.Types.Zone
-import Mathematics.Formations.FormationAssigned
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Lifecycle.With
+import Mathematics.Formations.{FormationAssigned, FormationSlot, FormationUnassigned}
+import Mathematics.Points.{Pixel, Point}
+import Mathematics.Shapes.Spiral
+import ProxyBwapi.UnitClasses.UnitClass
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.ByOption
 
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable
 
-class FormationZone(zone: Zone) extends FormationDesigner {
+class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigner {
 
-  def zoneScore(someZone: Zone, rangedUnits: Boolean): Double = {
-    val exitWidth = Math.max(1.0, someZone.exit.map(_.radiusPixels).getOrElse(1.0))
-    val altitudeDelta = someZone.centroid.altitudeBonus - zone.centroid.altitudeBonus
-    val altitudeBonus = if (rangedUnits) {
-      if (altitudeDelta < 0) 0.1 else if (altitudeDelta > 0) 10.0 else 1.0
-    } else 1.0
-    val distance = Math.pow(Math.max(30, someZone.centroid.tileDistanceManhattan(zone.centroid)), 2)
-    val output = altitudeBonus / exitWidth / distance
-    output
+  def edgeDistance(pixel: Pixel): Double = zone.exitDistanceGrid.get(pixel.tileIncluding)
+
+  override def form(units: Seq[FriendlyUnitInfo]): FormationAssigned = {
+    if (units.isEmpty) return new FormationAssigned(Map.empty)
+
+    val occupied  = With.grids.disposableBoolean1()
+    val slots     = units.map(new FormationSlot(_))
+    val start     = zone.exit.map(_.pixelCenter).getOrElse(zone.centroid.pixelCenter)
+    val startTile = start.tileIncluding
+    val end       = zone.exit.map(_.pixelTowards(zone)).getOrElse(zone.centroid.pixelCenter)
+
+    val enemyRangePixelsMin : Int = ByOption.min(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(0)
+    val enemyRangePixelsMax : Int = ByOption.max(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(0)
+    val meleeSizePixels     : Int = Math.max(16, slots.map(s => if (s.idealPixels > 32) 0 else s.unitClass.radialHypotenuse.toInt).max)
+    val meleeRowWidthUnits  : Int = Math.max(1, zone.exit.map(_.radiusPixels.toInt).getOrElse(0) / meleeSizePixels)
+
+    val meleeSlots = new mutable.ArrayBuffer[(UnitClass, Pixel)]
+    val arcSlots   = new mutable.ArrayBuffer[(UnitClass, Pixel)]
+
+    val nullPoint   = Point(1000, 1000)
+    val nullPoints  = Vector(nullPoint)
+    val nullValue   = Int.MaxValue - 1
+    slots.sortBy(_.idealPixels).foreach(slot => {
+      val idealPixels = slot.idealPixels.toInt
+      val idealTiles = (idealPixels + 16) / 32
+      val flyer = slot.unitClass.isFlyer && ! slot.unitClass.isFlyingBuilding
+      if (enemyRangePixelsMin < 32 && zone.exit.isDefined && idealPixels <= Math.max(32, enemyRangePixelsMin)) {
+        // Against enemy melee units, place melee units directly into the exit
+        val nextPixel = start
+          .project(
+            // Point towards the left/right side of the choke
+            zone.exit.get.sidePixels(meleeSlots.size % 2),
+            // If odd-sized row: First unit goes in the middle; otherwise offset by half a melee radius
+            (if (meleeRowWidthUnits % 2 == 0) meleeSizePixels / 2 else 0)
+            // Project unit towards the current side
+            +  meleeSizePixels * (meleeSlots.size / 2) % meleeRowWidthUnits) +
+          // Fill in rows from front to back
+          Pixel(0, 0).project(end, meleeSizePixels * (meleeSlots.size / meleeRowWidthUnits))
+
+        meleeSlots += ((slot.unitClass, nextPixel))
+        if ( ! flyer) {
+          val w = slot.unitClass.width / 2
+          val h = slot.unitClass.height / 2
+          occupied.set(nextPixel.add(+w, +h).tileIncluding, true)
+          occupied.set(nextPixel.add(-w, +h).tileIncluding, true)
+          occupied.set(nextPixel.add(+w, -h).tileIncluding, true)
+          occupied.set(nextPixel.add(-w, -h).tileIncluding, true)
+        }
+      }
+      else {
+        // Apply arc positioning
+        // Find the best point for this unit
+        val point = (Spiral.points(11) ++ nullPoints).minBy(p => {
+          if (p == nullPoint) {
+            nullValue
+          } else {
+            val tile = startTile.add(p)
+            if (tile.valid
+              && (flyer || (
+                zone.tileGrid.get(tile)
+                && ! occupied.get(tile)
+                && With.grids.walkable.get(tile)
+                && ! With.architecture.unbuildable.get(tile)
+                && ! With.architecture.untownhallable.get(tile)))) {
+              val exitDistance = zone.exitDistanceGrid.get(tile)
+              val distanceIntoEnemyRangeNow   = 1 + With.grids.enemyRange.get(tile) - With.grids.enemyRange.addedRange
+              val distanceIntoEnemyRangeExit  = Math.max(0, enemyRangePixelsMax / 32 - exitDistance)
+              val distanceOutOfOurRange       = Math.max(0, exitDistance - idealTiles)
+              5 * distanceIntoEnemyRangeNow + 4 * distanceIntoEnemyRangeExit + 3 * distanceOutOfOurRange
+            } else {
+              Int.MaxValue
+            }
+          }})
+        if (point != nullPoint) {
+          // Assign the unit
+          val tile = startTile.add(point)
+          if ( ! flyer) {
+            occupied.set(tile, true)
+          }
+          arcSlots += ((slot.unitClass, tile.pixelCenter))
+        }
+      }
+    })
+    new FormationUnassigned(
+      (meleeSlots.view ++ arcSlots.view)
+        .groupBy(_._1)
+        .mapValues(_.map(_._2)))
+      .assign(units)
   }
 
-  def form(units: Seq[FriendlyUnitInfo]): FormationAssigned = {
-    // Find which zone we should actually defend
-    // This is pretty hacky.
-    val zoneCandidates = new ArrayBuffer[Zone]
-    zoneCandidates += zone
-    for (i <- 0 until 3) {
-      val tail = zoneCandidates.last
-      tail.exit.map(_.otherSideof(tail)).foreach(zoneCandidates.append(_))
-    }
-    zoneCandidates.maxBy(zoneScore(_, true)).formation.buildFormation(units)
-  }
-
-  def buildFormation(units: Seq[FriendlyUnitInfo]): FormationAssigned = {
-    if (zone.exit.isEmpty) {
-      // TODO: Island base?
-      return new FormationAssigned(Map.empty)
-    }
-    val exit = zone.exit.get
-
-    val shouldArc = zone.centroid.altitudeBonus > exit.otherSideof(zone).centroid.altitudeBonus
-
-    //if (shouldArc) {
-      new FormationArc(exit.sidePixels.head, exit.sidePixels.last, zone.centroid.pixelCenter).form(units)
-    //}
-  }
 }

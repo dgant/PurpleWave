@@ -12,6 +12,7 @@ class Fingerprints {
   def update() {
     if (With.enemies.exists(_.isProtoss)) {
       gatewayFirst
+      earlyForge
       proxyGateway
       cannonRush
       twoGate
@@ -44,6 +45,7 @@ class Fingerprints {
   
   // Protoss
   lazy val gatewayFirst = addFingerprint(new FingerprintGatewayFirst)
+  lazy val earlyForge   = addFingerprint(new FingerprintEarlyForge)
   lazy val proxyGateway = addFingerprint(new FingerprintProxyGateway)
   lazy val cannonRush   = addFingerprint(new FingerprintCannonRush)
   lazy val twoGate      = addFingerprint(new Fingerprint2Gate)

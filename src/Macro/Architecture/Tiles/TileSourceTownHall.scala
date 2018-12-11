@@ -14,6 +14,6 @@ object TileSourceTownHall extends TileSource {
       .view
       .filter(b => b.mineralsLeft > 3000 || b.gasLeft > 1000)
       .filterNot(base => base.owner.isEnemy || base.zone.island)
-      .map(_.townHallArea.startInclusive)
+      .map(_.townHallTile)
   }
 }

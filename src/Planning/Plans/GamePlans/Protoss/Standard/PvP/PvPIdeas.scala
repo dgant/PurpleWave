@@ -6,7 +6,7 @@ import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.Attack
-import Planning.Plans.Compound.{If, _}
+import Planning.Plans.Compound.{If, Parallel, _}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
@@ -38,35 +38,37 @@ object PvPIdeas {
       new EnemyBasesAtLeast(3)),
     new Attack(Protoss.DarkTemplar))
 
-  class PvPSafeToAttack extends And(
-    // Are we safe against Dark Templar?
-    new Or(
-      new UnitsAtLeast(2, Protoss.Observer, complete = true),
-      new Not(new EnemyHasShown(Protoss.DarkTemplar))),
-    // Are we obligated to (or want to) move out?
-    new Or(
-      new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
-      new EnemyStrategy(With.fingerprints.cannonRush),
-      new Employing(PvPOpen4GateGoon),
-      new MiningBasesAtLeast(3),
-      new EnemyBasesAtLeast(3),
-      new SafeToMoveOut),
-    // Can our army contend with theirs?
-    new Or(
-      new UnitsAtLeast(1, UnitMatchAnd(UnitMatchWarriors, UnitMatchNot(Protoss.Dragoon))),
-      new UpgradeComplete(Protoss.DragoonRange),
-      new Not(new EnemyHasUpgrade(Protoss.DragoonRange))),
-    // Don't mess with 4-Gates
-    new Or(
-      new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
-      new UnitsAtLeast(4, Protoss.Gateway, complete = true),
-      new And(
-        new UnitsAtLeast(1, Protoss.Reaver, complete = true),
-        new UnitsAtLeast(1, Protoss.Shuttle, complete = true)),
-      new Not(new EnemyStrategy(With.fingerprints.fourGateGoon))))
+  class PvPSafeToMoveOut extends Or(
+    new BasesAtLeast(3),
+    new And(
+      // Are we safe against Dark Templar?
+      new Or(
+        new UnitsAtLeast(2, Protoss.Observer, complete = true),
+        new Not(new EnemyHasShown(Protoss.DarkTemplar))),
+      // Are we obligated to (or want to) move out?
+      new Or(
+        new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
+        new EnemyStrategy(With.fingerprints.cannonRush),
+        new Employing(PvPOpen4GateGoon),
+        new MiningBasesAtLeast(3),
+        new EnemyBasesAtLeast(3),
+        new SafeToMoveOut),
+      // Can our army contend with theirs?
+      new Or(
+        new UnitsAtLeast(1, UnitMatchAnd(UnitMatchWarriors, UnitMatchNot(Protoss.Dragoon))),
+        new UpgradeComplete(Protoss.DragoonRange),
+        new Not(new EnemyHasUpgrade(Protoss.DragoonRange))),
+      // Don't mess with 4-Gates
+      new Or(
+        new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
+        new UnitsAtLeast(4, Protoss.Gateway, complete = true),
+        new And(
+          new UnitsAtLeast(1, Protoss.Reaver, complete = true),
+          new UnitsAtLeast(1, Protoss.Shuttle, complete = true)),
+        new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)))))
   { override def isComplete: Boolean = super.isComplete } // Easier debugging
 
-  class AttackSafely extends If(new PvPIdeas.PvPSafeToAttack, new Attack)
+  class AttackSafely extends If(new PvPIdeas.PvPSafeToMoveOut, new Attack)
 
   class ReactToCannonRush extends If(
     new EnemyStrategy(With.fingerprints.cannonRush),
@@ -185,7 +187,9 @@ object PvPIdeas {
 
   class TakeBase3 extends If(
     new And(
-      new Latch(new UnitsAtLeast(1, Protoss.Observer, complete = true)),
+      new Or(
+        new Latch(new UnitsAtLeast(1, Protoss.Observer, complete = true)),
+        new EnemyRobo),
       new Or(
         new UnitsAtLeast(40, UnitMatchWarriors),
         new And(
@@ -194,8 +198,8 @@ object PvPIdeas {
             new EnemyCarriers,
             new EnemyBasesAtLeast(3))))),
     new Parallel(
-      new Build(Get(7, Protoss.Gateway)),
-      new RequireMiningBases(3)))
+      new RequireMiningBases(3),
+      new Build(Get(7, Protoss.Gateway))))
 
   class MeldArchonsPvP extends MeldArchons(24) {
     override def minimumArchons: Int = Math.min(6, With.units.countEnemy(Protoss.Zealot) / 3)
@@ -263,21 +267,44 @@ object PvPIdeas {
       new And(
         new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.Zealot.buildFrames),
         new UnitsAtLeast(1, Protoss.TemplarArchives, complete = true)),
+      // Speedlot-Templar composition
       new Parallel(
-        new If(
-          new UnitsAtMost(12, UnitMatchWarriors),
-          new Pump(Protoss.Reaver, 2)),
+        new PumpMatchingRatio(Protoss.Reaver, 0, 2, Seq(Friendly(Protoss.Shuttle, 2.0))),
+        new PumpMatchingRatio(Protoss.Shuttle, 0, 1, Seq(Friendly(Protoss.Reaver, 1.0))),
+        new PumpMatchingRatio(Protoss.Dragoon, 3, 24, Seq(Friendly(Protoss.Zealot, 1.0))),
         new Pump(Protoss.HighTemplar),
-        new PumpDragoonsAndZealots),
+        new Pump(Protoss.Zealot)),
+      // Dragoon-Reaver composition
       new Parallel(
         new Pump(Protoss.Reaver, 1),
-        new PumpMatchingRatio(Protoss.Shuttle, 1, 3, Seq(Friendly(Protoss.Reaver, 0.5))),
+        new If(
+          new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
+          new PumpMatchingRatio(Protoss.Shuttle, 0, 1, Seq(Friendly(Protoss.Reaver, 0.5)))),
         new Pump(Protoss.Reaver, 4),
         new PumpDragoonsAndZealots)),
     new If(
       new Or(
         new EnemyDarkTemplarLikely,
         new BasesAtLeast(2)),
-      new Pump(Protoss.Observer, 2))
-  )
+      new Pump(Protoss.Observer, 2)))
+
+  class ForgeUpgrades extends Parallel(
+    new Build(Get(Protoss.Forge)),
+    new If(
+      new UnitsAtMost(0, Protoss.TemplarArchives, complete = true),
+      new If(
+        new UpgradeComplete(Protoss.GroundDamage, 1),
+        new Build(Get(Protoss.GroundArmor, 1)),
+        new Build(Get(Protoss.GroundDamage, 1))),
+      new If(
+        new UnitsAtLeast(2, Protoss.Forge),
+        new Parallel(
+          new UpgradeContinuously(Protoss.GroundArmor),
+          new UpgradeContinuously(Protoss.GroundDamage)),
+        new If(
+          new UpgradeComplete(Protoss.GroundDamage, 3),
+          new UpgradeContinuously(Protoss.GroundArmor),
+          new UpgradeContinuously(Protoss.GroundDamage)))),
+    new Build(Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives)),
+    new IfOnMiningBases(3, new Build(Get(2, Protoss.Forge))))
 }

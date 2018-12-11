@@ -7,6 +7,7 @@ import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
+import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvR.PvROpen2Gate1012
@@ -16,7 +17,7 @@ class PvR2Gate1012 extends GameplanModeTemplateVsRandom {
   override val activationCriteria = new Employing(PvROpen2Gate1012)
   override val completionCriteria = new UnitsAtLeast(2, Protoss.Zealot)
   override val buildOrder         = ProtossBuilds.OpeningTwoGate1012
-  override def scoutAt            = 9
+  override def defaultScoutPlan   = new ScoutOn(Protoss.Pylon)
   override def defaultAttackPlan  = new Plan
   
   override def buildPlans = Vector(

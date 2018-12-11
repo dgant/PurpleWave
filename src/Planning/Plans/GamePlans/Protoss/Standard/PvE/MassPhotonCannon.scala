@@ -60,8 +60,6 @@ class MassPhotonCannon extends GameplanModeTemplate {
   private def pylonCount = With.units.countOurs(Protoss.Pylon)
   private def cannonCount = With.units.countOurs(Protoss.PhotonCannon)
   
-  override def scoutExpansionsAt: Int = 400
-  
   override def defaultAttackPlan: Plan = new If(
     new Or(
       new UnitsAtLeast(40, Protoss.Interceptor),

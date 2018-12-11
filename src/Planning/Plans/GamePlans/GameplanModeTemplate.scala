@@ -22,8 +22,6 @@ abstract class GameplanModeTemplate extends GameplanMode {
   def meldArchonsAt         : Int               = 40
   def aggression            : Double            = 1.0
   def removeMineralBlocksAt : Int               = 40
-  def scoutAt               : Int               = 14
-  def scoutExpansionsAt     : Int               = 60
   def superSaturate         : Boolean           = false
   def blueprints            : Seq[Blueprint]    = Seq.empty
   def buildOrder            : Seq[BuildRequest] = Vector.empty
@@ -35,8 +33,8 @@ abstract class GameplanModeTemplate extends GameplanMode {
   def defaultBuildOrder     : Plan              = new BuildOrder(buildOrder: _*)
   def defaultSupplyPlan     : Plan              = new RequireSufficientSupply
   def defaultWorkerPlan     : Plan              = new If(new Not(new WeAreZerg), new PumpWorkers(superSaturate))
-  def defaultScoutPlan      : Plan              = new ScoutAt(scoutAt)
-  def defaultScoutExposPlan : Plan              = new If(new BasesAtLeast(2), new ScoutExpansionsAt(scoutExpansionsAt))
+  def defaultScoutPlan      : Plan              = new ScoutAt(14)
+  def defaultScoutExposPlan : Plan              = new If(new BasesAtLeast(2), new ScoutExpansionsAt(60))
   def defaultYoloPlan       : Plan              = new If(new Check(() => Yolo.active), new Attack)
   def priorityDefensePlan   : Plan              = NoPlan()
   def priorityAttackPlan    : Plan              = NoPlan()

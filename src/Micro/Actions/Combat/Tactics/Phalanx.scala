@@ -17,9 +17,11 @@ object Phalanx extends Action {
     if (unit.matchups.targets.nonEmpty
       && unit.agent.canFight
       && unit.matchups.threats.exists(threat =>
-      threat.matchups.targets.exists(ally =>
-        ally.friendly.exists(_.agent.toForm.exists(post =>
-          threat.inRangeToAttack(ally, post)))))) {
+        threat.matchups.targetsInRange.exists(_.unitClass.isBuilding)
+        || threat.matchups.targets.exists(ally =>
+          ally.friendly.exists(_.agent.toForm.exists(post =>
+            threat.inRangeToAttack(ally)
+            && threat.inRangeToAttack(ally, post)))))) {
       Engage.delegate(unit)
     }
     Disengage.delegate(unit)

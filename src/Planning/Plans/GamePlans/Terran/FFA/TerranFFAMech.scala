@@ -22,7 +22,6 @@ class TerranFFAMech extends GameplanModeTemplate {
   override def defaultPlacementPlan : Plan  = new BunkersAtNatural(2)
   override val defaultScoutPlan     : Plan  = NoPlan()
   override val aggression                   = 0.8
-  override val scoutExpansionsAt            = 150
   
   private class UpgradeMech extends Parallel(
     new BuildGasPumps,

@@ -31,7 +31,9 @@ object PvPOpen1GateReaverExpand extends PvPOpeningIntoCarriers {
   override def entranceFlat: Boolean = false
 }
 
-object PvPOpen3GateRobo extends PvPOpeningIntoCarriers
+object PvPOpen3GateRobo extends PvPOpeningIntoCarriers {
+  override def entranceInverted: Boolean = false
+}
 
 object PvPOpen2GateRobo extends PvPOpeningIntoCarriers
 
@@ -47,7 +49,7 @@ object PvPOpen2GateDTExpand extends PvPOpening {
 
 object PvPOpen3GateGoon extends PvPOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
-  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
+  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.twoGate, With.fingerprints.dtRush, With.fingerprints.proxyGateway)
 }
 object PvPOpen4GateGoon extends PvPOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits

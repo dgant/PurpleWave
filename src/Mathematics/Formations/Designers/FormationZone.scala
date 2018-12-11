@@ -22,12 +22,13 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
     val slots     = units.map(new FormationSlot(_))
     val start     = zone.exit.map(_.pixelCenter).getOrElse(zone.centroid.pixelCenter)
     val startTile = start.tileIncluding
-    val end       = zone.exit.map(_.pixelTowards(zone)).getOrElse(zone.centroid.pixelCenter)
+    val end       = start.project(zone.exit.map(_.pixelTowards(zone)).getOrElse(zone.centroid.pixelCenter), 300)
 
-    val enemyRangePixelsMin : Int = ByOption.min(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(0)
-    val enemyRangePixelsMax : Int = ByOption.max(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(0)
-    val meleeSizePixels     : Int = Math.max(16, slots.map(s => if (s.idealPixels > 32) 0 else s.unitClass.radialHypotenuse.toInt).max)
-    val meleeRowWidthUnits  : Int = Math.max(1, zone.exit.map(_.radiusPixels.toInt).getOrElse(0) / meleeSizePixels)
+    val allEnemies = (enemies.view ++ units.flatMap(_.battle).distinct.map(_.enemy)).distinct
+    val enemyRangePixelsMin   : Int = ByOption.min(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(0)
+    val enemyRangePixelsMax   : Int = ByOption.max(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(0)
+    val meleeUnitDiameter     : Int = Math.max(16, 2 * slots.map(s => if (s.idealPixels > 32) 0 else s.unitClass.radialHypotenuse.toInt).max)
+    val meleeChokeWidthUnits  : Int = Math.max(1, 2 * zone.exit.map(_.radiusPixels.toInt).getOrElse(0) / meleeUnitDiameter)
 
     val meleeSlots = new mutable.ArrayBuffer[(UnitClass, Pixel)]
     val arcSlots   = new mutable.ArrayBuffer[(UnitClass, Pixel)]
@@ -46,11 +47,12 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
             // Point towards the left/right side of the choke
             zone.exit.get.sidePixels(meleeSlots.size % 2),
             // If odd-sized row: First unit goes in the middle; otherwise offset by half a melee radius
-            (if (meleeRowWidthUnits % 2 == 0) meleeSizePixels / 2 else 0)
+            (if (meleeChokeWidthUnits % 2 == 0) meleeUnitDiameter / 2 else 0)
             // Project unit towards the current side
-            +  meleeSizePixels * (meleeSlots.size / 2) % meleeRowWidthUnits) +
+            +  meleeUnitDiameter * ((meleeSlots.size / 2) % meleeChokeWidthUnits)) +
           // Fill in rows from front to back
-          Pixel(0, 0).project(end, meleeSizePixels * (meleeSlots.size / meleeRowWidthUnits))
+          start.project(end, meleeUnitDiameter * (meleeSlots.size / meleeChokeWidthUnits)) -
+          start
 
         meleeSlots += ((slot.unitClass, nextPixel))
         if ( ! flyer) {

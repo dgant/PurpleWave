@@ -124,8 +124,8 @@ class Blueprint(
     )
 
     var x = buildArea.startInclusive.x
-    var xMax = buildArea.endExclusive.x
-    var yMax = buildArea.endExclusive.y
+    val xMax = buildArea.endExclusive.x
+    val yMax = buildArea.endExclusive.y
     while (x < xMax) {
       var y = buildArea.startInclusive.y
       while (y < yMax) {

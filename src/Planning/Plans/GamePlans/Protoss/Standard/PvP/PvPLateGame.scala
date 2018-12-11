@@ -3,7 +3,6 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.DefendZones
 import Planning.Plans.Compound.{FlipIf, If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.{PumpWorkers, UpgradeContinuously}
@@ -19,67 +18,39 @@ import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvPLateGameArbiter, PvPLateGameCarrier, PvPOpen2GateDTExpand}
 
 class PvPLateGame extends GameplanModeTemplate {
-  
-  override val scoutExpansionsAt = 90
+
   override val emergencyPlans: Vector[Plan] = Vector(
     new PvPIdeas.ReactToDarkTemplarEmergencies,
     new PvPIdeas.ReactToCannonRush
   )
   
-  override def aggression: Double = 0.92
-  
-  override def defaultWorkerPlan: Plan = new If(
-    new SafeAtHome,
-    new PumpWorkers(true, cap = 75),
+  override def defaultWorkerPlan: Plan = new Parallel(
+    new If(new SafeAtHome, new PumpWorkers(true, cap = 44)),
     new PumpWorkers(false, cap = 75))
   
   override def priorityAttackPlan   : Plan = new PvPIdeas.AttackWithDarkTemplar
-  override def priorityDefensePlan  : Plan = new DefendZones { defenderMatcher.set(Protoss.Corsair) }
   override val defaultAttackPlan    : Plan = new PvPIdeas.AttackSafely
   override def defaultArchonPlan    : Plan = new PvPIdeas.MeldArchonsPvP
   
   class RoboTech extends Parallel(
     new Build(
       Get(Protoss.RoboticsFacility),
-      Get(Protoss.Observatory)),
-    new If(
-      new EnemyHasShownCloakedThreat,
-      new UpgradeContinuously(Protoss.ObserverSpeed)))
+      Get(Protoss.Observatory),
+      Get(Protoss.RoboticsSupportBay)))
   
   class TemplarTech extends Parallel(
     new Build(
       Get(Protoss.CitadelOfAdun),
-      Get(Protoss.TemplarArchives),
-      Get(Protoss.Forge)),
+      Get(Protoss.TemplarArchives)),
     new If(
       new UnitsAtMost(0, Protoss.Observatory),
       new BuildCannonsAtNatural(2)))
-  
-  class Upgrades extends Parallel(
-    new Build(Get(Protoss.Forge)),
-    new If(
-      new UnitsAtMost(0, Protoss.TemplarArchives, complete = true),
-      new If(
-        new UpgradeComplete(Protoss.GroundDamage, 1),
-        new Build(Get(Protoss.GroundArmor)),
-        new Build(Get(Protoss.GroundDamage))),
-      new If(
-        new UnitsAtLeast(2, Protoss.Forge),
-        new Parallel(
-          new UpgradeContinuously(Protoss.GroundArmor),
-          new UpgradeContinuously(Protoss.GroundDamage)),
-        new If(
-          new UpgradeComplete(Protoss.GroundDamage, 3),
-          new UpgradeContinuously(Protoss.GroundArmor),
-          new UpgradeContinuously(Protoss.GroundDamage)))),
-    new TemplarTech,
-    new IfOnMiningBases(3, new Build(Get(2, Protoss.Forge))))
 
   class BuildTech extends Parallel(
-    new Build(Get(1, Protoss.Gateway)),
     new Build(
-      Get(1, Protoss.Assimilator),
-      Get(1, Protoss.CyberneticsCore),
+      Get(Protoss.Gateway),
+      Get(Protoss.Assimilator),
+      Get(Protoss.CyberneticsCore),
       Get(Protoss.DragoonRange)),
 
     new If(
@@ -87,8 +58,9 @@ class PvPLateGame extends GameplanModeTemplate {
       new UpgradeContinuously(Protoss.ZealotSpeed)),
 
     new Build(Get(3, Protoss.Gateway)),
-
     new BuildGasPumps,
+
+    // Robo or Templar tech (or both?)
     new FlipIf(
       new Latch(
         new Or(
@@ -98,11 +70,15 @@ class PvPLateGame extends GameplanModeTemplate {
           new And(
             new UnitsAtLeast(1, Protoss.PhotonCannon),
             new UnitsAtLeast(8, Protoss.Zealot)))),
-      new RoboTech,
-      new TemplarTech),
+      new Parallel(
+        new RoboTech,
+        new Build(Get(5, Protoss.Gateway))),
+      new Parallel(
+        new TemplarTech,
+        new Build(Get(5, Protoss.Gateway)))),
 
-    new Build(Get(5, Protoss.Gateway)),
-    new UpgradeContinuously(Protoss.ShuttleSpeed),
+    // Shuttle speed
+    new If(new UnitsAtLeast(2, Protoss.Shuttle), new UpgradeContinuously(Protoss.ShuttleSpeed)),
     new Build(Get(6, Protoss.Gateway)),
 
     new If(
@@ -111,7 +87,7 @@ class PvPLateGame extends GameplanModeTemplate {
         new And(
           new GasPumpsAtLeast(2),
           new UnitsAtLeast(15, UnitMatchWarriors))),
-        new OnGasPumps(3, new Upgrades)),
+        new OnGasPumps(3, new PvPIdeas.ForgeUpgrades)),
 
     new OnGasPumps(4, new Build(Get(Protoss.HighTemplarEnergy))))
 
@@ -141,6 +117,7 @@ class PvPLateGame extends GameplanModeTemplate {
       new EnemyDarkTemplarLikely,
       new BuildCannonsAtBases(1)),
 
+    // Dragoon Range?
     new If(
       new Or(
         new UnitsAtLeast(3, Protoss.Dragoon),
@@ -151,73 +128,58 @@ class PvPLateGame extends GameplanModeTemplate {
 
     new PvPIdeas.TakeBase2,
 
+    // Psi Storm?
     new If(
       new And(
+        new UnitsAtLeast(1, Protoss.TemplarArchives),
+        new UnitsAtLeast(5, Protoss.Gateway),
         new UnitsAtLeast(8, UnitMatchWarriors),
         new Check(() => With.blackboard.keepingHighTemplar.get)),
       new Build(Get(Protoss.PsionicStorm))),
 
-    new PvPIdeas.TakeBase3,
+    // Observer Speed?
+    new If(new EnemiesAtLeast(1, Protoss.DarkTemplar), new UpgradeContinuously(Protoss.ObserverSpeed)),
 
-    new If(
-      new EnemiesAtLeast(1, Protoss.DarkTemplar),
-      new UpgradeContinuously(Protoss.ObserverSpeed)),
-
+    // Army/Tech
+    //
+    // Abuse lack of detection
+    new If(new Not(new EnemyRobo), new TemplarTech),
+    //
+    // Normal army/tech
+    //
     new FlipIf(
       new Or(
         new UnitsAtLeast(40, UnitMatchWarriors),
-        new And(
-          new UnitsAtLeast(25, UnitMatchWarriors),
-          new SafeAtHome)),
+        new And(new UnitsAtLeast(25, UnitMatchWarriors), new SafeAtHome)),
       new PvPIdeas.TrainArmy,
       new BuildTech),
 
-    new FlipIf(
-      new SafeToMoveOut,
-      new Build(Get(8, Protoss.Gateway)),
-      new RequireBases(3)),
+    new If(
+      new Not(new PvPIdeas.PvPSafeToMoveOut),
+      new Build(Get(8, Protoss.Gateway))),
+    new RequireBases(3),
+
+    // Crazy Shuttle defense
+    new If(new EnemiesAtLeast(3, Protoss.Shuttle), new Build(Get(Protoss.Stargate), Get(Protoss.Corsair))),
 
     new Build(Get(8, Protoss.Gateway)),
     new RequireMiningBases(3),
-    new Build(Get(13, Protoss.Gateway)),
+    new Build(Get(12, Protoss.Gateway)),
     new BuildCannonsAtExpansions(1),
+    new RequireMiningBases(4),
 
+    // Arbiter/Carrier transitions
     new If(
-      new EnemiesAtLeast(3, Protoss.Shuttle),
-      new Build(Get(Protoss.Stargate), Get(Protoss.Corsair))),
-
-    new If(new SafeToMoveOut, new RequireMiningBases(4)),
-
+      new Or(new Employing(PvPLateGameCarrier), new UnitsAtLeast(8, Protoss.Arbiter)),
+      new CarrierTransition),
     new If(
-      new And(
-        new SafeAtHome,
-        new Or(
-          new Employing(PvPLateGameCarrier),
-          new UnitsAtLeast(8, Protoss.Arbiter)),
-        new GasPumpsAtLeast(3)),
-      new CarrierTransition,
-      new Build(Get(12, Protoss.Gateway))),
-
-    new If(
-      new And(
-        new Or(
-          new Employing(PvPLateGameArbiter),
-          new UnitsAtLeast(8, Protoss.Carrier)),
-        new GasPumpsAtLeast(3)),
+      new Or(new Employing(PvPLateGameArbiter), new UnitsAtLeast(8, Protoss.Carrier)),
       new ArbiterTransition),
-  
+
+    new Build(Get(14, Protoss.Gateway)),
     new FlipIf(
-      new SafeToMoveOut,
-      new Build(Get(12, Protoss.Gateway)),
-      new RequireMiningBases(4)),
-  
-    new FlipIf(
-      new SafeToMoveOut,
-      new Build(Get(20, Protoss.Gateway)),
+      new PvPIdeas.PvPSafeToMoveOut,
+      new Build(Get(22, Protoss.Gateway)),
       new RequireMiningBases(5)),
-  
-    new Build(Get(20, Protoss.Gateway)),
-    new RequireMiningBases(6),
-    new UpgradeContinuously(Protoss.Shields)
   )
 }

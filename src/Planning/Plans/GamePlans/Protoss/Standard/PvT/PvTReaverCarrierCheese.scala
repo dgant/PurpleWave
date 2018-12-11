@@ -19,7 +19,6 @@ class PvTReaverCarrierCheese extends GameplanModeTemplate {
   override val buildOrder             = ProtossBuilds.Opening13Nexus_NoZealot_OneGateCore
   override val defaultWorkerPlan      = new PumpWorkers(oversaturate = true)
   override val priorityAttackPlan     = new PvTIdeas.PriorityAttacks
-  override val scoutExpansionsAt      = 150
   override def defaultScoutPlan       = new ScoutOn(Protoss.CyberneticsCore)
   override def defaultAttackPlan      = new Trigger(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new Attack)
 

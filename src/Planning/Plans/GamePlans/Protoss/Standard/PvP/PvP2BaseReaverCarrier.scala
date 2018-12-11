@@ -23,7 +23,6 @@ class PvP2BaseReaverCarrier extends GameplanModeTemplate {
     new Employing(PvPLateGame2BaseReaverCarrier_SpecificOpponents),
     new Employing(PvPLateGame2BaseReaverCarrier_SpecificMaps))
 
-  override val scoutExpansionsAt = 150
   override val removeMineralBlocksAt = 80
   override val emergencyPlans: Vector[Plan] = Vector(
     new PvPIdeas.ReactToDarkTemplarEmergencies

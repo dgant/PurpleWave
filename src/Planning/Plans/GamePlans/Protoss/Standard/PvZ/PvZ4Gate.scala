@@ -15,7 +15,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Scouting.ScoutOn
+import Planning.Plans.Scouting.{ScoutExpansionsAt, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
@@ -29,10 +29,10 @@ class PvZ4Gate extends GameplanModeTemplate {
   
   override val activationCriteria     = new Employing(PvZ4GateDragoonAllIn)
   override val completionCriteria     = new Latch(new MiningBasesAtLeast(2))
-  override val scoutExpansionsAt      = 55
   override def buildOrder             = ProtossBuilds.OpeningTwoGate1012
   override def defaultWorkerPlan      = NoPlan()
   override def defaultScoutPlan       = new ScoutOn(Protoss.Pylon)
+  override def defaultScoutExposPlan  = new ScoutExpansionsAt(55)
   override def defaultPlacementPlan   = new ProposePlacement {
     override lazy val blueprints = Vector(
       new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.hugTownHall)),

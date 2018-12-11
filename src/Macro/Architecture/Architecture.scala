@@ -115,15 +115,15 @@ class Architecture {
         val w = 1 + unit.unitClass.tileWidth
         val h = 1 + unit.unitClass.tileHeight
         var x = 0
-        while(x < w) {
-          unbuildable.set(unit.tileTopLeft.add(x-1, -1), true)
-          unbuildable.set(unit.tileTopLeft.add(x-1, h-1), true)
+        while(x < w+1) {
+          unwalkable.set(unit.tileTopLeft.add(x-1, -1), true)
+          unwalkable.set(unit.tileTopLeft.add(x-1, h-1), true)
           x += 1
         }
         var y = 0
-        while(y < w) {
-          unbuildable.set(unit.tileTopLeft.add(-1,  y-1), true)
-          unbuildable.set(unit.tileTopLeft.add(w-1, y-1), true)
+        while(y < h+1) {
+          unwalkable.set(unit.tileTopLeft.add(-1,  y-1), true)
+          unwalkable.set(unit.tileTopLeft.add(w-1, y-1), true)
           y += 1
         }
         if (ShowArchitecturePlacements.inUse) {

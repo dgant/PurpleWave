@@ -314,7 +314,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
     _carryingMinerals       = unitClass.isWorker && baseUnit.isCarryingMinerals
     _carryingGas            = unitClass.isWorker && ! carryingMinerals && baseUnit.isCarryingGas
     _powered                = unitClass.requiresPsi && baseUnit.isPowered
-    _selected               = false && baseUnit.isSelected
+    _selected               = baseUnit.isSelected
     _targetable             = true || baseUnit.isTargetable // Shortcut for performance; we don't use this anyway
     _underAttack            = ! player.isNeutral && baseUnit.isUnderAttack
     _underDarkSwarm         = ! player.isNeutral && baseUnit.isUnderDarkSwarm

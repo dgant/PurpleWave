@@ -81,7 +81,7 @@ class PvP3GateGoon extends GameplanModeTemplate {
         new SafeAtHome,
         new EnemyHasShown(Protoss.Forge),
         new EnemyDarkTemplarLikely),
-      new Build(Get(Protoss.RoboticsFacility)),
-      new Build(Get(5, Protoss.Gateway)))
+      new Build(Get(Protoss.RoboticsFacility))),
+    new Build(Get(5, Protoss.Gateway))
   )
 }

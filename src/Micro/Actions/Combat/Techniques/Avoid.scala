@@ -79,13 +79,18 @@ object Avoid extends ActionTechnique {
         - PurpleMath.clamp(With.coordinator.gridPathOccupancy.get(tile) / 3, 0, 9)
       )
     }
+    val directions = Ring.points(1)
+    var directionModifier = 0 // Rotate the first direction we try to discover diagonals
     while (path.length < pathLengthMax) {
       val origin = unit.agent.origin.zone
       val here = path.last
       var bestScore = tileScore(here)
       var bestTile = here
-      for (p <- Ring.points(1)) {
-        val there = here.add(p)
+      directionModifier += 1
+      var iDirection = 0
+      while (iDirection < 4) {
+        val there = here.add(directions((iDirection + directionModifier) % 4))
+        iDirection += 1
         if (there.valid && With.grids.walkable.get(there) && ! path.contains(there)) {
           val score = tileScore(there)
           if (score > bestScore) {

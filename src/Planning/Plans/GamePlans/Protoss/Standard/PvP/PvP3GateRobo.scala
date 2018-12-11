@@ -8,12 +8,11 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.PumpWorkers
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Scouting.{FoundEnemyBase, ScoutOn}
-import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Plans.Scouting.ScoutOn
+import Planning.Predicates.Compound.{And, Latch}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
+import Planning.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen3GateRobo
@@ -22,12 +21,8 @@ class PvP3GateRobo extends GameplanModeTemplate {
 
   override val activationCriteria: Predicate = new Employing(PvPOpen3GateRobo)
   override val completionCriteria: Predicate = new Latch(
-    new And(
-      new UnitsAtLeast(2, Protoss.Nexus),
-      new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
-      new UnitsAtLeast(5, Protoss.Gateway)))
+    new And(new UnitsAtLeast(2, Protoss.Nexus), new UnitsAtLeast(5, Protoss.Gateway)))
 
-  override def defaultWorkerPlan: Plan = new PumpWorkers(true)
   override def defaultScoutPlan: Plan = new ScoutOn(Protoss.Gateway)
   override val defaultAttackPlan: Plan = new If(new EnemyStrategy(With.fingerprints.nexusFirst), new PvPIdeas.AttackSafely)
 
@@ -36,14 +31,6 @@ class PvP3GateRobo extends GameplanModeTemplate {
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToProxyGateways,
     new PvPIdeas.ReactToFFE)
-
-  private class DelayObservers extends And(
-    new FoundEnemyBase,
-    new Not(new EnemyDarkTemplarLikely),
-    new Or(
-      new EnemyHasShown(Protoss.Zealot),
-      new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.forgeFe, With.fingerprints.gatewayFe)
-    ))
 
   override def defaultBuildOrder: Plan = new Parallel(
     new BuildOrder(
@@ -71,37 +58,48 @@ class PvP3GateRobo extends GameplanModeTemplate {
       Get(3,   Protoss.Gateway),
       Get(4,   Protoss.Dragoon),
       Get(22,  Protoss.Probe),
-      Get(4,   Protoss.Pylon)),
-    new If(
-      new EnemyStrategy(With.fingerprints.fourGateGoon, With.fingerprints.robo),
-      new BuildOrder(
-        Get(Protoss.Shuttle),
-        Get(Protoss.RoboticsSupportBay)),
-      new BuildOrder(Get(Protoss.Observatory))))
+      Get(4,   Protoss.Pylon)))
+
 
   override def buildPlans = Vector(
 
     new EjectScout,
 
     new Trigger(
-      new And(
-        new UnitsAtLeast(1, Protoss.Shuttle, complete = true),
-        new UnitsAtLeast(1, Protoss.Reaver, complete = true)),
+      new Or(
+        new EnemyBasesAtLeast(2),
+        new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
+        new And(
+          new UnitsAtLeast(1, Protoss.Shuttle, complete = true),
+          new UnitsAtLeast(1, Protoss.Reaver, complete = true))),
       new If(
-        new PvPIdeas.PvPSafeToAttack,
+        new PvPIdeas.PvPSafeToMoveOut,
         new RequireMiningBases(2))),
 
-    new FlipIf(
-      new UnitsAtLeast(6, UnitMatchWarriors, complete = true),
-      new PvPIdeas.TrainArmy,
-      new Build(
-        Get(Protoss.Shuttle),
-        Get(Protoss.RoboticsSupportBay))),
+    new If(
+      new EnemyStrategy(With.fingerprints.fourGateGoon),
+      new BuildOrder(
+        Get(Protoss.CitadelOfAdun),
+        Get(Protoss.TemplarArchives)),
+      new If(
+        new EnemyStrategy(With.fingerprints.robo),
+        new Build(
+          Get(Protoss.Shuttle),
+          Get(Protoss.RoboticsSupportBay)),
+        new BuildOrder(
+          Get(Protoss.Observatory),
+          Get(Protoss.Observer),
+          Get(Protoss.Shuttle),
+          Get(Protoss.RoboticsSupportBay)))),
+
+    new PvPIdeas.TrainArmy,
 
     new PumpWorkers(oversaturate = true, 40),
     new RequireMiningBases(2),
     new Build(
       Get(5, Protoss.Gateway),
-      Get(2, Protoss.Assimilator))
+      Get(2, Protoss.Assimilator),
+      Get(Protoss.Observatory),
+      Get(Protoss.RoboticsSupportBay))
   )
 }

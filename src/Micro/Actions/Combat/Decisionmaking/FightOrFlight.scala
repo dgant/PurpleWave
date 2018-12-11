@@ -77,7 +77,7 @@ object FightOrFlight extends Action {
       && (ally.subjectiveValue > unit.subjectiveValue || ally.unitClass.isBuilding)
       // Disabling to try to avoid abandoning Reavers
       // && (ally.matchups.targetsInRange.nonEmpty || ( ! ally.canAttack && ally.matchups.enemies.exists(_.pixelDistanceEdge(ally) < ally.effectiveRangePixels)))
-      && ally.matchups.framesOfSafety <= unit.matchups.framesOfSafety + 24))
+      && ally.matchups.framesOfSafety <= 24 + Math.max(0, unit.matchups.framesOfSafety)))
   
     if (decision.isDefined) {
       unit.agent.shouldEngage = decision.get

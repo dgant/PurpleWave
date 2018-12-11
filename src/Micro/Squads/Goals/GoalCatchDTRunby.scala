@@ -11,7 +11,11 @@ class GoalCatchDTRunby extends GoalBasic {
   override def toString: String = "Detect DT runbys"
   
   var scout: Option[UnitInfo] = None
-  
+
+  var needed: Boolean = true
+  override def run(): Unit = {
+    needed = With.geography.ourBasesAndSettlements.exists(_.units.forall(u => ! u.isFriendly || ! u.unitClass.isDetector || ! u.complete))
+  }
   override def destination: Pixel = {
     val dts = With.units.enemy.filter(_.is(Protoss.DarkTemplar))
     ByOption.minBy(With.geography.ourBases.map(_.heart.pixelCenter))(heart =>
@@ -20,7 +24,7 @@ class GoalCatchDTRunby extends GoalBasic {
       .getOrElse(With.geography.home.pixelCenter)
   }
 
-  override def acceptsHelp: Boolean = squad.units.isEmpty
+  override def acceptsHelp: Boolean = needed && squad.units.isEmpty
 
   override protected def offerCritical(candidates: Iterable[FriendlyUnitInfo]): Unit = {}
   override protected def offerImportant(candidates: Iterable[FriendlyUnitInfo]): Unit = {

@@ -19,14 +19,14 @@ class GoalDefendZone extends GoalBasic {
   var zone: Zone = _
   
   override def run() {
-    lazy val base   = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.intelligence.mostBaselikeEnemyTile))
+    lazy val base   = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.intelligence.threatOrigin))
     lazy val choke  = zone.exit
     lazy val walls  = zone.units.filter(u =>
       u.isOurs
       && u.unitClass.isStaticDefense
       && (squad.enemies.isEmpty || squad.enemies.exists(u.canAttack)))
 
-    lazy val allowWandering = ! With.enemies.exists(_.isZerg) || squad.units.size >= 3 || squad.enemies.exists(_.unitClass.ranged)
+    lazy val allowWandering = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || squad.units.size >= 3 || squad.enemies.exists(_.unitClass.ranged)
     lazy val canHuntEnemies = huntableEnemies().nonEmpty
     lazy val canDefendChoke = choke.isDefined
     
@@ -53,14 +53,9 @@ class GoalDefendZone extends GoalBasic {
   } // For performance
   )
   
-  private val huntableEnemies = new Cache(() => {
-    squad.enemies.filter(enemy =>
-      enemy.visible
-      && (enemy.zone.edges.exists(edge => edge.zones.contains(zone)))
-      && pointsOfInterest().exists(p => enemy.pixelDistanceCenter(p) < 32 * 15)
-      && ! (enemy.is(Zerg.Drone) && With.fingerprints.fourPool.matches)
-      && zone.edges.forall(edge => enemy.pixelDistanceCenter(edge.pixelCenter) > 32.0 * 8.0)) // Arbitrary number
-  })
+  private val huntableEnemies = new Cache(() =>
+    squad.enemies.filter(enemy => ! (enemy.is(Zerg.Drone) && With.fingerprints.fourPool.matches))
+  )
   
   def huntEnemies() {
     lazy val home = ByOption.minBy(zone.bases.filter(_.owner.isUs).map(_.heart))(_.groundPixels(zone.centroid))

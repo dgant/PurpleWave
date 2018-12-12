@@ -47,7 +47,7 @@ object Shuttling {
       val enemyRange = 1.0 + Math.max(0.0, With.grids.enemyRange.get(tile) - With.grids.enemyRange.addedRange)
       val enemyFactor = enemyRange * enemyRange
       val distanceTarget = target.get.pixelCenter.groundPixels(tile.pixelCenter)
-      val distanceIdeal = passenger.effectiveRangePixels //+ passenger.topSpeed * passenger.cooldownMaxAgainst(target.get)
+      val distanceIdeal = if (passenger.matchups.framesOfSafety < 12) passenger.effectiveRangePixels else distanceTarget
       val distanceOff = 1.0 + Math.max(0.0, distanceIdeal - distanceTarget)
       val distanceFactor = distanceOff * distanceOff
       val visionFactor = if (With.grids.enemyVision.isSet(tile)) 3 else 2

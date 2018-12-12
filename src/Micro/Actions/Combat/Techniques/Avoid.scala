@@ -70,7 +70,13 @@ object Avoid extends ActionTechnique {
     val path = new ArrayBuffer[Tile]
     path += unit.tileIncludingCenter
     var bestScore = Int.MinValue
-    def tileDistance(tile: Tile): Int = if(tile.zone == unit.agent.origin.zone) 0 else unit.agent.origin.zone.distanceGrid.get(tile)
+    def tileDistance(tile: Tile): Int =
+      if (unit.agent.canScout)
+        0
+      else if(tile.zone == unit.agent.origin.zone)
+        0
+      else
+        unit.agent.origin.zone.distanceGrid.get(tile)
     def tileScore(tile: Tile): Int = {
       val enemyRange = With.grids.enemyRange.get(tile)
       (

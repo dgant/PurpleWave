@@ -12,7 +12,6 @@ import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.UnitMatchOr
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen3GateRobo
@@ -20,8 +19,7 @@ import Strategery.Strategies.Protoss.PvPOpen3GateRobo
 class PvP3GateRobo extends GameplanModeTemplate {
 
   override val activationCriteria: Predicate = new Employing(PvPOpen3GateRobo)
-  override val completionCriteria: Predicate = new Latch(
-    new And(new UnitsAtLeast(2, Protoss.Nexus), new UnitsAtLeast(5, Protoss.Gateway)))
+  override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(2, Protoss.Nexus))
 
   override def defaultScoutPlan: Plan = new ScoutOn(Protoss.Gateway)
   override val defaultAttackPlan: Plan = new If(
@@ -88,16 +86,12 @@ class PvP3GateRobo extends GameplanModeTemplate {
           Get(Protoss.RoboticsSupportBay)))),
 
     new Trigger(
-      new And(
-        new UnitsAtLeast(1, UnitMatchOr(Protoss.RoboticsSupportBay, Protoss.TemplarArchives)),
-        new Or(
+      new Or(
+        new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
+        new And(
           new UnitsAtMost(0, Protoss.TemplarArchives),
-          new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true)),
-        new Or(
-          new UnitsAtMost(0, Protoss.RoboticsSupportBay),
-          new And(
-            new UnitsAtLeast(1, Protoss.Shuttle, complete = true),
-            new UnitsAtLeast(1, Protoss.Reaver, complete = true)))),
+          new UnitsAtLeast(1, Protoss.Shuttle, complete = true),
+          new UnitsAtLeast(1, Protoss.Reaver, complete = true))),
       new RequireBases(2)),
 
     new PvPIdeas.TrainArmy,

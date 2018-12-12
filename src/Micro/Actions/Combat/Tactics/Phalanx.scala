@@ -1,5 +1,6 @@
 package Micro.Actions.Combat.Tactics
 
+import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Disengage, Engage}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -21,7 +22,8 @@ object Phalanx extends Action {
         || threat.matchups.targets.exists(ally =>
           ally.friendly.exists(_.agent.toForm.exists(post =>
             threat.inRangeToAttack(ally)
-            && threat.inRangeToAttack(ally, post)))))) {
+            && threat.inRangeToAttack(ally, post)
+            && With.grids.enemyVision.isSet(post.tileIncluding)))))) {
       Engage.delegate(unit)
     }
     Disengage.delegate(unit)

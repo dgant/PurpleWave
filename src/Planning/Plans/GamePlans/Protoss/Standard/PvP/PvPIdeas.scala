@@ -269,19 +269,16 @@ object PvPIdeas {
         new UnitsAtLeast(1, Protoss.TemplarArchives, complete = true)),
       // Speedlot-Templar composition
       new Parallel(
-        new PumpMatchingRatio(Protoss.Reaver, 0, 2, Seq(Friendly(Protoss.Shuttle, 2.0))),
-        new PumpMatchingRatio(Protoss.Shuttle, 0, 1, Seq(Friendly(Protoss.Reaver, 1.0))),
+        new PumpMatchingRatio(Protoss.Reaver, 0, 4, Seq(Friendly(Protoss.Shuttle, 2.0))),
+        new PumpMatchingRatio(Protoss.Shuttle, 0, 2, Seq(Friendly(Protoss.Reaver, 0.5))),
         new PumpMatchingRatio(Protoss.Dragoon, 3, 24, Seq(Friendly(Protoss.Zealot, 1.0))),
         new PumpMatchingRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-1), Enemy(Protoss.Dragoon, 0.2), Enemy(UnitMatchWarriors, 0.1))),
         new Pump(Protoss.Dragoon),
         new Pump(Protoss.Zealot)),
       // Dragoon-Reaver composition
       new Parallel(
-        new Pump(Protoss.Reaver, 1),
-        new If(
-          new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
-          new PumpMatchingRatio(Protoss.Shuttle, 0, 1, Seq(Friendly(Protoss.Reaver, 0.5)))),
-        new Pump(Protoss.Reaver, 4),
+        new PumpMatchingRatio(Protoss.Reaver, 1, 4, Seq(Friendly(Protoss.Shuttle, 3.0))),
+        new PumpMatchingRatio(Protoss.Shuttle, 0, 2, Seq(Friendly(Protoss.Reaver, 1.0))),
         new PumpDragoonsAndZealots)),
     new If(
       new Or(

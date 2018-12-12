@@ -56,7 +56,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val doomed                         : Boolean               = framesToLive <= framesOfEntanglement
   lazy val framesOfEntanglementPerThreat  : Map[UnitInfo, Double] = threats.map(threat => (threat, framesOfEntanglementWith(threat))).toMap
   lazy val framesOfEntanglement           : Double                = ByOption.max(framesOfEntanglementPerThreat.values).getOrElse(- Forever())
-  lazy val framesOfSafety                 : Double                = - With.latency.latencyFrames - With.reaction.agencyMax - ByOption.max(framesOfEntanglementPerThreat.values).getOrElse(- Forever().toDouble)
+  lazy val framesOfSafety                 : Double                = - With.latency.latencyFrames - With.reaction.agencyAverage - ByOption.max(framesOfEntanglementPerThreat.values).getOrElse(- Forever().toDouble)
   
   def dpfDealingDiffused(target: UnitInfo): Double = splashFactorInRange * me.dpfOnNextHitAgainst(target) / Math.max(1.0, targetsInRange.size)
   

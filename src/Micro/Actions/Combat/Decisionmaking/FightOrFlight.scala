@@ -77,9 +77,7 @@ object FightOrFlight extends Action {
       && (ally.canAttack || (ally.unitClass.rawCanAttack && ally.unitClass.isBuilding) || ally.is(Zerg.CreepColony))
       && ally.unitClass.topSpeed <= Protoss.HighTemplar.topSpeed
       && (ally.subjectiveValue > unit.subjectiveValue || ally.unitClass.isBuilding)
-      // Disabling to try to avoid abandoning Reavers
-      // && (ally.matchups.targetsInRange.nonEmpty || ( ! ally.canAttack && ally.matchups.enemies.exists(_.pixelDistanceEdge(ally) < ally.effectiveRangePixels)))
-      && ally.matchups.framesOfSafety <= 24 + Math.max(0, unit.matchups.framesOfSafety)))
+      && ally.matchups.framesOfSafety <= 12 + Math.max(0, unit.matchups.framesOfSafety)))
 
     decide(true, "Escape", () => unit.agent.ride.exists(ride => {
       val rideDistance = Math.max(0.0, ride.pixelDistanceCenter(unit) - Shuttling.pickupRadius)

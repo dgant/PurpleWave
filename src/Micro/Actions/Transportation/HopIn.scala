@@ -10,9 +10,11 @@ object HopIn extends Action {
     unit.canMove
     && unit.agent.ride.isDefined
     && unit.agent.shouldHopIn
+    && ! unit.loaded
   )
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
+    unit.agent.shouldHopIn = false
     unit.agent.ride.foreach(With.commander.rightClick(unit, _))
   }
 }

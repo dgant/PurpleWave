@@ -16,17 +16,17 @@ object ShuttlePickup extends Action {
         && (passenger.scarabCount > 0 || passenger.training || passenger.matchups.framesOfSafety < 0))
       .flatMap(_.friendly)
       .filter(passenger =>
-          (passenger.transport.contains(shuttle) || shuttle.canTransport(passenger))
+          shuttle.canTransport(passenger)
+          && passenger.transport.isEmpty
           && passenger.agent.ride.forall(_ == shuttle)
-          && passenger.unitClass.spaceRequired + shuttle.agent.passengers.view.filterNot(_ == passenger).map(_.unitClass.spaceRequired).sum
-            <= shuttle.unitClass.spaceProvided
+          && shuttle.agent.passengers.view.map(_.unitClass.spaceRequired).sum <= shuttle.unitClass.spaceProvided
       ).toSeq
 
     val pickupCandidate = ByOption.maxBy(pickupCandidates)(c => Shuttling.pickupNeed(shuttle, c) / (1.0 + c.pixelDistanceSquared(shuttle)))
     pickupCandidate.foreach(hailer => {
       shuttle.agent.claimPassenger(hailer)
       if (hailer.pixelDistanceTravelling(Shuttling.passengerDestination(hailer)) > Shuttling.dropoffRadius + 96
-        || hailer.matchups.framesOfSafety + 24 < hailer.cooldownLeft) {
+        || hailer.matchups.threatsInRange.nonEmpty) {
         shuttle.agent.pickup(hailer)
       }
     })

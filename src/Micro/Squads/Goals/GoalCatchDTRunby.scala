@@ -15,6 +15,7 @@ class GoalCatchDTRunby extends GoalBasic {
   var needed: Boolean = true
   override def run(): Unit = {
     needed = With.geography.ourBasesAndSettlements.exists(_.units.forall(u => ! u.isFriendly || ! u.unitClass.isDetector || ! u.complete))
+    super.run()
   }
   override def destination: Pixel = {
     val dts = With.units.enemy.filter(_.is(Protoss.DarkTemplar))

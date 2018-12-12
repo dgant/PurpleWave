@@ -89,8 +89,8 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
     isTransport                           &&
     passenger.unitClass.canBeTransported  &&
     passenger.canMove                     &&
-    passenger.transport.isEmpty           &&
-    spaceRemaining >= passenger.unitClass.spaceRequired
+    passenger.transport.forall(_ == this) &&
+    loadedUnits.view.filterNot(_ == passenger).map(_.unitClass.spaceRequired).sum <= unitClass.spaceProvided
 
   // More accurate, but avoiding for performance reasons
   // override def subjectiveValue: Double = super.subjectiveValue + trainee.map(_.subjectiveValue).sum

@@ -29,7 +29,7 @@ class Agency {
       }
       lastQueueCompletion = With.frame
 
-      With.coordinator.clear()
+      With.coordinator.runPerAgentCycle()
       agentQueue ++= With.units.ours.view
         .filter(validAgent)
         .map(_.agent)

@@ -10,6 +10,7 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackWithDarkTemplar
 import Planning.Plans.Macro.Automatic.PumpWorkers
+import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
@@ -29,12 +30,9 @@ class PvP3GateGoon extends GameplanModeTemplate {
   override def defaultAttackPlan  : Plan = new If(new Or(new EnemyBasesAtLeast(2), new EnemiesAtMost(0, Protoss.Dragoon)), new PvPIdeas.AttackSafely)
   override def defaultScoutPlan   : Plan = new ScoutOn(Protoss.CyberneticsCore)
   override def defaultWorkerPlan  : Plan = NoPlan()
-  override def blueprints = Vector(
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon), preferZone = Some(With.geography.ourNatural.zone)))
+  override def defaultPlacementPlan: Plan = new If(
+    new BasesAtLeast(2),
+    new ProposePlacement(new Blueprint(this, building = Some(Protoss.Pylon), preferZone = Some(With.geography.ourNatural.zone))))
 
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvPIdeas.ReactToDarkTemplarEmergencies,

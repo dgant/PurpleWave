@@ -1,8 +1,6 @@
 package Micro.Actions.Transportation.Caddy
 
-import Lifecycle.With
 import Micro.Actions.Action
-import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
@@ -13,18 +11,24 @@ object ShuttlePickup extends Action {
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
     val pickupCandidates = shuttle.teammates
       .view
-      .filter(p =>
-        p.is(Protoss.Reaver)
-        && (p.scarabCount > 0 || p.training)) // TODO -- other units
+      .filter(passenger =>
+        passenger.unitClass.isReaver
+        && (passenger.scarabCount > 0 || passenger.training || passenger.matchups.framesOfSafety < 0))
       .flatMap(_.friendly)
-      .filter(
-        p => shuttle.canTransport(p)
-        && p.pixelDistanceCenter(Shuttling.passengerDestination(p)) > Shuttling.dropoffRadius + 64)
-      .toSeq
+      .filter(passenger =>
+          (passenger.transport.contains(shuttle) || shuttle.canTransport(passenger))
+          && passenger.agent.ride.forall(_ == shuttle)
+          && passenger.unitClass.spaceRequired + shuttle.agent.passengers.view.filterNot(_ == passenger).map(_.unitClass.spaceRequired).sum
+            <= shuttle.unitClass.spaceProvided
+      ).toSeq
+
     val pickupCandidate = ByOption.maxBy(pickupCandidates)(c => Shuttling.pickupNeed(shuttle, c) / (1.0 + c.pixelDistanceSquared(shuttle)))
     pickupCandidate.foreach(hailer => {
-      With.commander.rightClick(hailer, shuttle)
-      With.commander.move(shuttle, hailer.pixelCenter)
+      shuttle.agent.claimPassenger(hailer)
+      if (hailer.pixelDistanceTravelling(Shuttling.passengerDestination(hailer)) > Shuttling.dropoffRadius + 96
+        || hailer.matchups.framesOfSafety + 24 < hailer.cooldownLeft) {
+        shuttle.agent.pickup(hailer)
+      }
     })
   }
 }

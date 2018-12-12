@@ -19,7 +19,6 @@ class Simulation(
     ! unit.invincible             // No stasised units
     && ! unit.is(Protoss.Carrier) // Simulate the Interceptors only -- produces more reliable results
     && ! unit.is(Protoss.Scarab)
-    && ( ! unit.is(Protoss.DarkTemplar) || ! unit.isFriendly) // Dark Templar ignore simulation, and when one is cloaked it can throw off the whole simulation
   )
   
   val estimation            : Prediction          = new Prediction

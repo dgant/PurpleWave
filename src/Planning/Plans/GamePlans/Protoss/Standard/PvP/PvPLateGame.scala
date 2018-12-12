@@ -35,8 +35,10 @@ class PvPLateGame extends GameplanModeTemplate {
   class RoboTech extends Parallel(
     new Build(
       Get(Protoss.RoboticsFacility),
-      Get(Protoss.Observatory),
-      Get(Protoss.RoboticsSupportBay)))
+      Get(Protoss.Observatory)),
+    new If(
+      new UnitsAtMost(0, Protoss.TemplarArchives),
+      new Build(Get(Protoss.RoboticsSupportBay))))
   
   class TemplarTech extends Parallel(
     new Build(
@@ -89,7 +91,10 @@ class PvPLateGame extends GameplanModeTemplate {
           new UnitsAtLeast(15, UnitMatchWarriors))),
         new OnGasPumps(3, new PvPIdeas.ForgeUpgrades)),
 
-    new OnGasPumps(4, new Build(Get(Protoss.HighTemplarEnergy))))
+    new OnGasPumps(4,
+      new If(
+        new UnitsAtLeast(2, Protoss.HighTemplar),
+        new UpgradeContinuously(Protoss.HighTemplarEnergy))))
 
   class ArbiterTransition extends Build(
     Get(Protoss.Stargate),

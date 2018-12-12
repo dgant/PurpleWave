@@ -9,6 +9,8 @@ import Utilities.ByOption
 
 object Shuttling {
 
+  // How far is the pickup radius for a Shuttle? Just a guess here
+  val pickupRadius = 32
   val dropoffRadius = 32
 
   def canCaddy(transport: FriendlyUnitInfo): Boolean = {
@@ -38,7 +40,7 @@ object Shuttling {
     val targetSnipeStart = target.get.pixelCenter.project(passenger.pixelCenter, passenger.effectiveRangePixels).tileIncluding
     val targetSnipeTiles =
       Spiral
-        .points(7)
+        .points(9)
         .map(targetSnipeStart.add)
         .filter(tile => tile.valid && With.grids.walkable.get(tile))
     val targetSnipeFinal = ByOption.minBy(targetSnipeTiles)(tile => {

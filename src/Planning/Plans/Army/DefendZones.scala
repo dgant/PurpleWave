@@ -3,14 +3,14 @@ package Planning.Plans.Army
 import Information.Geography.Types.{Base, Zone}
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Planning.UnitMatchers.{UnitMatchWarriors, UnitMatcher}
+import Planning.UnitMatchers.{UnitMatchRecruitableForCombat, UnitMatcher}
 import Planning.{Plan, Property}
 
 class DefendZones extends Plan {
   
   private lazy val zones = With.geography.zones.map(zone => (zone, new DefendZone(zone))).toMap
   
-  val defenderMatcher = new Property[UnitMatcher](UnitMatchWarriors)
+  val defenderMatcher = new Property[UnitMatcher](UnitMatchRecruitableForCombat)
   
   override def getChildren: Iterable[Plan] = zones.values
   

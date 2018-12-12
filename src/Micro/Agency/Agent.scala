@@ -148,6 +148,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     followIntent()
     combatHysteresisFrames = Math.max(0, combatHysteresisFrames - With.framesSince(lastFrame))
     lastFrame = With.frame
+    updateRide()
     Idle.consider(unit)
     cleanUp()
   }
@@ -229,17 +230,40 @@ class Agent(val unit: FriendlyUnitInfo) {
       origin
     }
   }
-  
-  private def isAnchor(ally: UnitInfo): Boolean = {
-    if ( ! ally.unitClass.dealsDamage) return false
-    
-    // Don't retreat to a Missile Turret against Zerglings, for example
-    if (ally.matchups.enemies.nonEmpty && ally.matchups.targets.isEmpty) return false
-    
-    if ( ! ally.unitClass.canMove && ally.canAttack) {
-      return true
+
+  /////////////////
+  // Ridesharing //
+  /////////////////
+
+  var shouldHopIn: Boolean = false
+  private var rideAge: Int = 0
+  private var _ride: Option[FriendlyUnitInfo] = None
+  private val _passengers: ArrayBuffer[FriendlyUnitInfo] = new ArrayBuffer[FriendlyUnitInfo]
+  def ride: Option[FriendlyUnitInfo] = _ride
+  def passengers: Seq[FriendlyUnitInfo] = (_passengers ++ unit.loadedUnits).distinct
+  def pickup(passenger: FriendlyUnitInfo): Unit = {
+    passenger.agent.shouldHopIn = true
+  }
+  def claimPassenger(passenger: FriendlyUnitInfo): Unit = {
+    passenger.agent._ride = Some(unit)
+    passenger.agent.rideAge = 0
+    if ( ! _passengers.contains(passenger)) {
+      _passengers += passenger
     }
-    
-    false
+  }
+  def releasePassenger(passenger: FriendlyUnitInfo): Unit = {
+    passenger.agent._ride = passenger.agent._ride.filterNot(_ == unit)
+    _passengers -= passenger
+    passenger.agent.shouldHopIn = false
+  }
+  def updateRide(): Unit = {
+    if (unit.transport.isDefined) {
+      unit.transport.foreach(_.agent.claimPassenger(unit))
+    } else {
+      rideAge += 1
+      if (rideAge > 2 || _ride.exists(!_.alive)) {
+        _ride.foreach(_.agent.releasePassenger(unit))
+      }
+    }
   }
 }

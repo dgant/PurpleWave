@@ -5,16 +5,15 @@ import Micro.Coordination.Pathing.GridPathOccupancy
 class Coordinator {
   
   val explosions = new ExplosionTracker
-
   val gridPathOccupancy = new GridPathOccupancy
-  //val gridPsionicStorm = new GridPsionicStorm
+  val ridesharing = new Ridesharing
 
-  def clear(): Unit = {
+  def runPerAgentCycle(): Unit = {
     gridPathOccupancy.update()
-    //gridPsionicStorm.update()
+    ridesharing.run()
   }
 
-  def run() {
+  def runPerTask() {
     explosions.run()
   }
 }

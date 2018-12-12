@@ -13,9 +13,12 @@ object PsionicStorm extends TargetedSpell {
   override protected def tech             : Tech      = Protoss.PsionicStorm
   override protected def aoe              : Boolean   = true
   override protected def castRangeTiles   : Int       = 9
-  override protected def thresholdValue   : Double    = casterClass.subjectiveValue / 3.0
+  override protected def thresholdValue   : Double    = casterClass.subjectiveValue / 4.0
   override protected def lookaheadFrames  : Int       = 6 + With.latency.latencyFrames
-  
+
+  // How much of the Psionic Storm's damage do we expect to land
+  private val expectedAccuracy: Double = 0.5
+
   override protected def valueTarget(target: UnitInfo): Double = {
     if (With.grids.psionicStorm.isSet(target.tileIncludingCenter)) return 0.0
     if (target.unitClass.isBuilding)    return 0.0
@@ -28,7 +31,7 @@ object PsionicStorm extends TargetedSpell {
       Zerg.LurkerEgg)) return 0.0
 
     val multiplierValue   = Math.min(target.subjectiveValue, Protoss.Observer.subjectiveValue)
-    val multiplierDamage  = (Math.min(112.0, target.totalHealth) / target.unitClass.maxTotalHealth)
+    val multiplierDamage  = (Math.min(expectedAccuracy * 112.0, target.totalHealth) / target.unitClass.maxTotalHealth)
     val multiplierPlayer  = (if (target.isEnemy) 1.0 else -3.0)
     val output = (
       multiplierValue

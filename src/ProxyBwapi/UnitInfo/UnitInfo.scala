@@ -208,7 +208,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def pixelEndAt              (at: Pixel)                       : Pixel   = at.subtract(pixelCenter).add(right, bottom)
   def pixelDistanceCenter     (otherPixel:  Pixel)              : Double  = pixelCenter.pixelDistance(otherPixel)
   def pixelDistanceCenter     (otherUnit:   UnitInfo)           : Double  = pixelDistanceCenter(otherUnit.pixelCenter)
-  def pixelDistanceShooting   (other:       UnitInfo)           : Double  = if (unitClass.shootsAlongGround && zone != other.zone) pixelDistanceTravelling(other.pixelCenter) else pixelDistanceEdge(other.pixelStart, other.pixelEnd)
+  def pixelDistanceShooting   (other:       UnitInfo)           : Double  = if (unitClass.isReaver && zone != other.zone) pixelDistanceTravelling(other.pixelCenter) else pixelDistanceEdge(other.pixelStart, other.pixelEnd)
   def pixelDistanceEdge       (other:       UnitInfo)           : Double  = pixelDistanceEdge(other.pixelStart, other.pixelEnd)
   def pixelDistanceEdge       (other: UnitInfo, otherAt: Pixel) : Double  = pixelDistanceEdge(otherAt.subtract(other.unitClass.dimensionLeft, other.unitClass.dimensionUp), otherAt.add(other.unitClass.dimensionRight, other.unitClass.dimensionDown))
   def pixelDistanceEdge       (oStart: Pixel, oEnd: Pixel)      : Double  = PurpleMath.broodWarDistanceBox(pixelStart, pixelEnd, oStart, oEnd)
@@ -218,9 +218,9 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def pixelDistanceTravelling (destination: Pixel)              : Double  = pixelDistanceTravelling(pixelCenter, destination)
   def pixelDistanceTravelling (destination: Tile)               : Double  = pixelDistanceTravelling(pixelCenter, destination.pixelCenter)
   def pixelDistanceTravelling (from: Pixel, to: Pixel)          : Double  = if (flying) from.pixelDistance(to) else from.groundPixels(to)
-  
+
   def velocity: Force = Force(velocityX, velocityY)
-  
+
   def canMove: Boolean = canMoveCache()
   private val canMoveCache = new Cache(() =>
     (unitClass.canMove || (unitClass.isBuilding && flying))
@@ -228,7 +228,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     && canDoAnything
     && ! burrowed,
     cd1)
-  
+
   def topSpeed: Double = topSpeedCache()
   private val topSpeedCache = new Cache(() =>
     if ( ! canMove) 0 else
@@ -245,14 +245,14 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
         (isUltralisk()  && player.hasUpgrade(Zerg.UltraliskSpeed)))
         1.5 else 1.0)),
     cd4)
-  
+
   def projectFrames(framesToLookAhead: Double): Pixel = pixelCenter.add((velocityX * framesToLookAhead).toInt, (velocityY * framesToLookAhead).toInt)
-  
+
   def inTileRadius  (tiles: Int)  : Traversable[UnitInfo] = With.units.inTileRadius(tileIncludingCenter, tiles)
   def inPixelRadius (pixels: Int) : Traversable[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)
-  
+
   def isTransport: Boolean = unitClass.isTransport && ( ! isOverlord() || player.hasUpgrade(Zerg.OverlordDrops))
-  
+
   def sightRangePixels: Int = sightRangePixelsCache()
   private val sightRangePixelsCache = new Cache(() =>
     if (blind) 32 else
@@ -263,27 +263,27 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
         (isScout()    && player.hasUpgrade(Protoss.ScoutVisionRange))     ||
         (isOverlord() && player.hasUpgrade(Zerg.OverlordVisionRange)))
       64 else 0))
-  
+
   ////////////
   // Combat //
   ////////////
-  
+
   def battle: Option[BattleLocal] = With.battles.byUnit.get(this).orElse(With.matchups.entrants.find(_._2.contains(this)).map(_._1))
   def matchups: MatchupAnalysis = With.matchups.get(this)
-  
+
   def armorHealth: Int = armorHealthCache()
   def armorShield: Int = armorShieldsCache()
-  
+
   lazy val armorHealthCache   = new Cache(() => unitClass.armor + unitClass.armorUpgrade.map(player.getUpgradeLevel).getOrElse(0))
   lazy val armorShieldsCache  = new Cache(() => player.getUpgradeLevel(Protoss.Shields))
-  
+
   def totalHealth: Int = hitPoints + shieldPoints + defensiveMatrixPoints
-  
+
   def stimAttackSpeedBonus: Int = if (stimmed) 2 else 1
-  
+
   def dpfAir    : Double = damageOnHitAir     * attacksAgainstAir     / cooldownMaxAir.toDouble
   def dpfGround : Double = damageOnHitGround  * attacksAgainstGround  / cooldownMaxGround.toDouble
-  
+
   def attacksAgainstAir: Int = attacksAgainstAirCache()
   private val attacksAgainstAirCache = new Cache(() => {
     var output = unitClass.airDamageFactorRaw * unitClass.maxAirHitsRaw
@@ -291,7 +291,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     if (output == 0  && isCarrier())  output = interceptorCount
     output
   })
-  
+
   def attacksAgainstGround: Int = attacksAgainstGroundCache()
   private val attacksAgainstGroundCache = new Cache(() => {
     var output = unitClass.groundDamageFactorRaw * unitClass.maxGroundHitsRaw
@@ -300,21 +300,21 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     if (output == 0  && isReaver())   output = 1
     output
   })
-  
+
   //TODO: Ensnare
   def cooldownLeft      : Int = Math.max(airCooldownLeft, groundCooldownLeft)
   def cooldownMaxAir    : Int = (2 + unitClass.airDamageCooldown)     / stimAttackSpeedBonus // +2 is the RNG
   def cooldownMaxGround : Int = (2 + unitClass.groundDamageCooldown)  / stimAttackSpeedBonus // +2 is the RNG
-  
+
   def cooldownMaxAirGround: Int = Math.max(
     if (unitClass.attacksAir)     cooldownMaxAir    else 0,
     if (unitClass.attacksGround)  cooldownMaxGround else 0)
-  
+
   def cooldownMaxAgainst(enemy: UnitInfo): Int = if (enemy.flying) cooldownMaxAir else cooldownMaxGround
-  
+
   def pixelRangeAgainst(enemy: UnitInfo): Double = if (enemy.flying) pixelRangeAir else pixelRangeGround
   def effectiveRangePixels: Double = Math.max(pixelRangeMax, unitClass.effectiveRangePixels)
-  
+
   def hitChanceAgainst(
     enemy : UnitInfo,
     from  : Option[Pixel] = None,
@@ -322,7 +322,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   : Double = {
     if (guaranteedToHit(enemy, from, to)) 1.0 else 0.47
   }
-  
+
   def guaranteedToHit(
     enemy : UnitInfo,
     from  : Option[Pixel] = None,
@@ -333,6 +333,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     (
       flying
       || enemy.flying
+      || unitClass.isReaver
       || unitClass.unaffectedByDarkSwarm
       || With.grids.altitudeBonus.get(tileFrom) >= With.grids.altitudeBonus.get(tileTo)
     )

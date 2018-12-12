@@ -7,12 +7,12 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.PumpWorkers
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Macro.Expanding.{RequireBases, RequireMiningBases}
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.UnitMatchers.UnitMatchOr
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen3GateRobo
@@ -65,17 +65,6 @@ class PvP3GateRobo extends GameplanModeTemplate {
 
     new EjectScout,
 
-    new Trigger(
-      new Or(
-        new EnemyBasesAtLeast(2),
-        new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
-        new And(
-          new UnitsAtLeast(1, Protoss.Shuttle, complete = true),
-          new UnitsAtLeast(1, Protoss.Reaver, complete = true))),
-      new If(
-        new PvPIdeas.PvPSafeToMoveOut,
-        new RequireMiningBases(2))),
-
     new If(
       new EnemyStrategy(With.fingerprints.fourGateGoon),
       new BuildOrder(
@@ -91,6 +80,19 @@ class PvP3GateRobo extends GameplanModeTemplate {
           Get(Protoss.Observer),
           Get(Protoss.Shuttle),
           Get(Protoss.RoboticsSupportBay)))),
+
+    new Trigger(
+      new And(
+        new UnitsAtLeast(1, UnitMatchOr(Protoss.RoboticsSupportBay, Protoss.TemplarArchives)),
+        new Or(
+          new UnitsAtMost(0, Protoss.TemplarArchives),
+          new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true)),
+        new Or(
+          new UnitsAtMost(0, Protoss.RoboticsSupportBay),
+          new And(
+            new UnitsAtLeast(1, Protoss.Shuttle, complete = true),
+            new UnitsAtLeast(1, Protoss.Reaver, complete = true)))),
+      new RequireBases(2)),
 
     new PvPIdeas.TrainArmy,
 

@@ -7,7 +7,7 @@ import Micro.Actions.Combat.Tactics.{Detect, Tickle, Unbunk}
 import Micro.Actions.Commands.{Attack, Move}
 import Micro.Actions.Protoss.Meld
 import Micro.Actions.Scouting.Scout
-import Micro.Actions.Transportation.Transport
+import Micro.Actions.Transportation.{HopIn, Transport}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Idle extends Action {
@@ -24,6 +24,7 @@ object Idle extends Action {
     Liftoff,
     Cancel,
     Unbunk,
+    HopIn,
     Meld,
     Build,
     Finish,

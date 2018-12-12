@@ -272,7 +272,8 @@ object PvPIdeas {
         new PumpMatchingRatio(Protoss.Reaver, 0, 2, Seq(Friendly(Protoss.Shuttle, 2.0))),
         new PumpMatchingRatio(Protoss.Shuttle, 0, 1, Seq(Friendly(Protoss.Reaver, 1.0))),
         new PumpMatchingRatio(Protoss.Dragoon, 3, 24, Seq(Friendly(Protoss.Zealot, 1.0))),
-        new Pump(Protoss.HighTemplar),
+        new PumpMatchingRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-1), Enemy(Protoss.Dragoon, 0.2), Enemy(UnitMatchWarriors, 0.1))),
+        new Pump(Protoss.Dragoon),
         new Pump(Protoss.Zealot)),
       // Dragoon-Reaver composition
       new Parallel(

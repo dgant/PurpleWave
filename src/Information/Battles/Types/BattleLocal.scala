@@ -18,7 +18,7 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   
   lazy val turrets                  = us.units.filter(u => ! u.canMove && ! u.canAttack)
   lazy val canTurtle      : Boolean = turrets.nonEmpty && turrets.forall(t => t.matchups.targetsInRange.isEmpty && t.matchups.threatsInRange.isEmpty)
-  lazy val hysteresis     : Double  = ByOption.mean(us.units.filter(_.canMove).map(hysteresisRatio)).getOrElse(0.0)
+  lazy val hysteresis     : Double  = PurpleMath.weightedMean(us.units.filter(_.canMove).map(u => (hysteresisRatio(u), u.subjectiveValue)))
   lazy val rangeEnemy     : Double  = ByOption.max(enemy.units.map(_.pixelRangeMax)).getOrElse(0.0) // Sally out to meet siege units
   lazy val distanceUs     : Double  = focus.pixelDistance(With.geography.home.pixelCenter)
   lazy val distanceEnemy  : Double  = focus.pixelDistance(With.intelligence.mostBaselikeEnemyTile.pixelCenter) + 2 * rangeEnemy

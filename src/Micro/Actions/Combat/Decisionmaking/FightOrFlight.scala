@@ -3,7 +3,9 @@ package Micro.Actions.Combat.Decisionmaking
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
+import Mathematics.PurpleMath
 import Micro.Actions.Action
+import Micro.Actions.Transportation.Caddy.Shuttling
 import Planning.Yolo
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -78,7 +80,13 @@ object FightOrFlight extends Action {
       // Disabling to try to avoid abandoning Reavers
       // && (ally.matchups.targetsInRange.nonEmpty || ( ! ally.canAttack && ally.matchups.enemies.exists(_.pixelDistanceEdge(ally) < ally.effectiveRangePixels)))
       && ally.matchups.framesOfSafety <= 24 + Math.max(0, unit.matchups.framesOfSafety)))
-  
+
+    decide(true, "Escape", () => unit.agent.ride.exists(ride => {
+      val rideDistance = Math.max(0.0, ride.pixelDistanceCenter(unit) - Shuttling.pickupRadius)
+      val rideWait = PurpleMath.nanToInfinity(rideDistance / ride.topSpeed)
+      rideWait <= Math.max(0.0, unit.matchups.framesOfSafety)
+    }))
+
     if (decision.isDefined) {
       unit.agent.shouldEngage = decision.get
       unit.agent.combatHysteresisFrames = 0

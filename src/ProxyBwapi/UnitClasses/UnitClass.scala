@@ -68,7 +68,6 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val ranged     : Boolean = rawCanAttack && pixelRangeMax > 32 * 2
   lazy val melee      : Boolean = rawCanAttack && ! ranged
   lazy val castsSpells: Boolean = spells.nonEmpty
-  lazy val shootsAlongGround: Boolean = this == Protoss.Reaver
 
   lazy val suicides: Boolean = Array(
     Terran.SpiderMine,
@@ -109,7 +108,9 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
       Zerg.Devourer, // Well, SORT of
       Zerg.InfestedTerran)
     .contains(this)
-  
+
+  lazy val isReaver: Boolean = this == Protoss.Reaver
+
   lazy val maxTotalHealth: Int = maxHitPoints + maxShields
   
   // Via http://www.starcraftai.com/wiki/Regeneration
@@ -211,7 +212,6 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val trainsUnits        : Boolean = UnitClasses.all.exists(unit => unit.whatBuilds._1 == this)
   lazy val trainsAirUnits     : Boolean = UnitClasses.all.exists(unit => unit.whatBuilds._1 == this && unit.isFlyer)
   lazy val trainsGroundUnits  : Boolean = UnitClasses.all.exists(unit => unit.whatBuilds._1 == this && ! unit.isFlyer && ! unit.isBuilding)
-  
   
   lazy val isProtoss : Boolean = race == Race.Protoss
   lazy val isTerran  : Boolean = race == Race.Terran

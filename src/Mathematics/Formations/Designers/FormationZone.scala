@@ -27,7 +27,7 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
     val allEnemies = (enemies.view ++ units.flatMap(_.battle).distinct.map(_.enemy)).distinct
     val enemyRangePixelsMin   : Int = ByOption.min(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(0)
     val enemyRangePixelsMax   : Int = ByOption.max(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(0)
-    val meleeUnitDiameter     : Int = Math.max(16, slots.map(s => if (s.idealPixels > 32) 0 else s.unitClass.radialHypotenuse.toInt).max)
+    val meleeUnitDiameter     : Int = Math.max(16, slots.map(s => if (s.idealPixels > 32) 0 else s.unitClass.dimensionMax.toInt).max)
     val meleeChokeWidthUnits  : Int = Math.max(1, 2 * zone.exit.map(_.radiusPixels.toInt).getOrElse(0) / meleeUnitDiameter)
 
     val meleeSlots = new mutable.ArrayBuffer[(UnitClass, Pixel)]

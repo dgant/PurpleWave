@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
-import Planning.Plan
 import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Compound.Trigger
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -20,7 +19,7 @@ class PvT1015GateDT extends GameplanModeTemplate {
   override val superSaturate      = true
   override val defaultAttackPlan  = new Attack
   override val buildOrder         = ProtossBuilds.Opening10Gate15GateDragoonDT
-  override def defaultScoutPlan   = new ScoutOn(Protoss.Gateway, 2)
+  override def defaultScoutPlan   = new ScoutOn(Protoss.Gateway, quantity = 2)
   
   override val buildPlans = Vector(
     new EjectScout,

@@ -44,7 +44,7 @@ object BeACarrier extends Action {
     lazy val exitingLeash       = unit.matchups.targets.filter(_.matchups.framesToLive > 48).forall(_.pixelDistanceEdge(unit) > 32.0 * 7.0)
     lazy val inRangeNeedlessly  = unit.matchups.threatsInRange.exists(shouldNeverHitUs)
     lazy val safeFromThreats    = unit.matchups.threats.forall(threat => threat.pixelDistanceCenter(unit) > threat.pixelRangeAir + 8 * 32) // Protect interceptors!
-    lazy val shouldFight        = interceptors > 0 && ! inRangeNeedlessly && (Yolo.active || safeFromThreats || unit.matchups.framesOfSafety >= 0 || (interceptors > 1 && ! canLeave))
+    lazy val shouldFight        = interceptors > 0 && ! inRangeNeedlessly && (Yolo.active || safeFromThreats || unit.agent.shouldEngage || (interceptors > 1 && ! canLeave))
 
     if (shouldFight) {
       // Avoid changing targets (causes interceptors to not attack)

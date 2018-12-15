@@ -5,18 +5,20 @@ import Lifecycle.With
 import Mathematics.Points.Tile
 import Mathematics.Shapes.Spiral
 
-class GridGroundDistance(origin: Tile*) extends AbstractGridInt {
+class GridGroundDistance(initialOrigins: Tile*) extends AbstractGridInt {
+
+  def origins: Seq[Tile] = initialOrigins
 
   override def onInitialization(): Unit = {
-    var seeds = origin.filter(With.grids.walkable.get)
+    var seeds = origins.filter(With.grids.walkable.get)
     if (seeds.isEmpty) {
       seeds = seeds.flatMap(seed => Spiral.points.view.map(seed.add).find(With.grids.walkable.get))
     }
 
     var distance = 0
     var openSize = 0
-    val tilesA = new Array[Int](tiles.size)
-    val tilesB = new Array[Int](tiles.size)
+    val tilesA = new Array[Int](tiles.size * 100)
+    val tilesB = new Array[Int](tiles.size * 100)
     var open = tilesA
     val width = With.mapTileWidth
     def expand(iTile: Int): Unit = {

@@ -76,9 +76,9 @@ trait Pathfinder {
     var visitedId     : Long    = defaultId
     var cameFromValue : Tile    = _
     var cameFromId    : Long    = defaultId
-    var costFromValue : Int     = _
+    var costFromValue : Float   = _
     var costFromId    : Long    = defaultId
-    var costToValue   : Int     = _
+    var costToValue   : Float   = _
     var costToId      : Long    = defaultId
     def setVisited() {
       visitedId = currentTileStateId
@@ -87,18 +87,18 @@ trait Pathfinder {
       cameFromValue = value
       cameFromId = currentTileStateId
     }
-    def setCostFrom(value: Int) {
+    def setCostFrom(value: Float) {
       costFromValue = value
       costFromId = currentTileStateId
     }
-    def setCostTo(value: Int) {
+    def setCostTo(value: Float) {
       costToValue = value
       costToId = currentTileStateId
     }
     def getVisited  : Boolean       =     visitedId   == currentTileStateId
     def getCameFrom : Option[Tile]  = if (cameFromId  == currentTileStateId)  Some(cameFromValue) else None
-    def getCostFrom : Int           = if (costFromId  == currentTileStateId)  costFromValue       else Int.MaxValue
-    def getCostTo   : Int           = if (costToId    == currentTileStateId)  costToValue         else Int.MaxValue
+    def getCostFrom : Float         = if (costFromId  == currentTileStateId)  costFromValue       else Float.MaxValue
+    def getCostTo   : Float         = if (costToId    == currentTileStateId)  costToValue         else Float.MaxValue
   }
 
   private var tiles: Array[TileState] = Array.empty
@@ -118,10 +118,10 @@ trait Pathfinder {
   /////////////////////////////
 
   val threatCostMultiplier = 2
-  def threatCostAt(unit: FriendlyUnitInfo, tile: Tile): Int = {
+  def threatCostAt(unit: FriendlyUnitInfo, tile: Tile): Float = {
     threatCostMultiplier * With.grids.enemyRange.get(tile)
   }
-  def threatCostMax(unit: FriendlyUnitInfo, tile: Tile): Int = {
+  def threatCostMax(unit: FriendlyUnitInfo, tile: Tile): Float = {
     val c = With.grids.enemyRange.get(tile)
     threatCostMultiplier * (
       // Gaussian expansion of N+(N-1)+...+1
@@ -137,26 +137,27 @@ trait Pathfinder {
     With.grids.enemyRange.get(tile) <= 0 && end.forall(theEnd => goalDistance(theEnd)(tile) < goalDistance(theEnd)(unit.tileIncludingCenter))
   }
 
-  def costAtDistance(end: Tile): (Tile) => Int = tile => 1
-  def costAtThreatAware(unit: FriendlyUnitInfo, end: Option[Tile]): (Tile) => Int = tile => {
-     threatCostAt(unit, tile) + end.map(costAtDistance(_)(tile)).getOrElse(0) + With.coordinator.gridPathOccupancy.get(tile) / 3
+  private val sqrt2f: Float = Math.sqrt(2).toFloat
+  def costToTileDistance(to: Tile): (Tile) => Float = from => if (from.x == to.x || from.y == to.y) 1f else sqrt2f
+  def costToTileAware(unit: FriendlyUnitInfo, to: Option[Tile]): (Tile) => Float = from => {
+     threatCostAt(unit, from) + to.map(costToTileDistance(_)(from)).getOrElse(0f) + With.coordinator.gridPathOccupancy.get(from) / 3f
   }
 
-  def costToDistance(end: Tile): (Tile) => Int = _.tileDistanceManhattan(end)
-  def costToThreatAware(unit: FriendlyUnitInfo, end: Option[Tile]): (Tile) => Int = tile => {
-    threatCostMax(unit, tile) + end.map(costToDistance(_)(tile)).getOrElse(0)
+  def costToEndDistance(end: Tile): (Tile) => Float = _.tileDistanceFast(end).toInt
+  def costToEndThreatAware(unit: FriendlyUnitInfo, end: Option[Tile]): (Tile) => Float = tile => {
+    threatCostMax(unit, tile) + end.map(costToEndDistance(_)(tile)).getOrElse(0f)
   }
 
-  def maximumCostDefault: Int = 2 * (With.mapTileWidth + With.mapTileHeight)
+  val maximumCostDefault: Float = 2 * (With.mapTileWidth + With.mapTileHeight)
   private def failure(tile: Tile) = TilePath(tile, tile, Int.MaxValue, None)
 
-  def aStarBasic(start: Tile, end: Tile, maximumCost: Int = maximumCostDefault): TilePath = {
+  def aStarBasic(start: Tile, end: Tile, maximumCost: Float = maximumCostDefault): TilePath = {
     if ( ! end.valid) return failure(start)
     aStar(
       start,
       goalDistance(end),
-      costAtDistance(end),
-      costToDistance(end),
+      costToTileDistance(end),
+      costToEndDistance(end),
       maximumCost)
   }
 
@@ -165,17 +166,17 @@ trait Pathfinder {
     aStar(
       unit.tileIncludingCenter,
       goalThreatAware(unit, realEnd),
-      costAtThreatAware(unit, end),
-      costToThreatAware(unit, end),
+      costToTileAware(unit, end),
+      costToEndThreatAware(unit, end),
       maximumCostDefault)
   }
 
   def aStar(
-    start: Tile,
-    isGoal: (Tile) => Boolean,
-    costAt: (Tile) => Int,
-    costTo: (Tile) => Int,
-    costMaximum : Int)
+    start       : Tile,
+    isGoal      : (Tile) => Boolean,
+    costToTile  : (Tile) => Float,
+    costToEnd   : (Tile) => Float,
+    costMaximum : Float)
     : TilePath = {
 
     // I don't want to stop
@@ -185,9 +186,9 @@ trait Pathfinder {
     if ( ! start.valid) return failure(start)
 
     startNextSearch()
-    val horizon = new mutable.PriorityQueue[Tile]()(Ordering.by(-costTo(_)))
+    val horizon = new mutable.PriorityQueue[Tile]()(Ordering.by(t => -costToEnd(t) - tiles(t.i).getCostFrom))
     tiles(start.i).setCostTo(0)
-    tiles(start.i).setCostFrom(costTo(start))
+    tiles(start.i).setCostFrom(costToEnd(start))
     horizon += start
 
     while (horizon.nonEmpty) {
@@ -195,30 +196,39 @@ trait Pathfinder {
       if ( ! tiles(thisTile.i).getVisited) {
         tiles(thisTile.i).setVisited()
         if (isGoal(thisTile)) {
-          return TilePath(start, thisTile, tiles(thisTile.i).getCostFrom, Some(assemblePath(thisTile)))
+          return TilePath(
+            start,
+            thisTile,
+            tiles(thisTile.i).getCostFrom,
+            Some(assemblePath(thisTile)))
         }
 
-        val neighbors = thisTile.adjacent4
+        val neighbors = thisTile.adjacent8
         var i = 0
-        while (i < 4) {
+        while (i < 8) {
           val neighbor = neighbors(i)
           i += 1
 
           if (neighbor.valid
             && With.grids.walkable.get(neighbor)
             && ! tiles(neighbor.i).getVisited
-            && costTo(thisTile) < costMaximum) {
+            && costToEnd(thisTile) < costMaximum
+            // Verify diagonal walkability
+            && (neighbor.x == thisTile.x
+              || neighbor.y == thisTile.y
+              || With.grids.walkable.get(Tile(neighbor.x, thisTile.y))
+              || With.grids.walkable.get(Tile(thisTile.x, neighbor.y)))) {
 
-            horizon += neighbor
-
-            val neighborCostFrom = tiles(thisTile.i).getCostFrom + costAt(thisTile)
+            val neighborCostFrom = tiles(thisTile.i).getCostFrom + costToTile(thisTile)
 
             if (neighborCostFrom < tiles(neighbor.i).getCostFrom) {
               val tileState = tiles(neighbor.i)
               tileState.setCameFrom(thisTile)
               tileState.setCostFrom(neighborCostFrom)
-              tileState.setCostTo(neighborCostFrom + costTo(neighbor))
+              tileState.setCostTo(neighborCostFrom + costToEnd(neighbor))
             }
+
+            horizon += neighbor
           }
         }
       }

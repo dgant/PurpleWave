@@ -242,13 +242,12 @@ object PvPIdeas {
     new Pump(Protoss.Zealot))
 
   class TrainDarkTemplar extends If(
-    new Not(new EnemyCarriersOnly),
+    new EnemiesAtMost(0, Protoss.Observer),
     new If(
-      new And(
-        new EnemiesAtMost(0, Protoss.PhotonCannon),
-        new EnemiesAtMost(0, Protoss.Observer)),
+      new EnemiesAtMost(0, Protoss.PhotonCannon),
       new Pump(Protoss.DarkTemplar, 3),
-      new IfOnMiningBases(3, new Pump(Protoss.DarkTemplar, 1))))
+      new Pump(Protoss.DarkTemplar, 2)),
+    new IfOnMiningBases(3, new Pump(Protoss.DarkTemplar, 1)))
 
   class TrainArmy extends Parallel(
     new Pump(Protoss.Carrier),

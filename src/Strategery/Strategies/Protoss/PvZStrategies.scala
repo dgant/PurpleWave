@@ -23,7 +23,7 @@ class PvZ2GateOpening extends PvZStrategy {
 }
 object PvZProxy2Gate extends PvZ2GateOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
-  override def responsesBlacklisted = Iterable(With.fingerprints.fourPool, With.fingerprints.tenHatch)
+  override def responsesBlacklisted = Iterable(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.tenHatch)
 }
 object PvZ4GateDragoonAllIn extends PvZ2GateOpening {
   override def choices: Iterable[Iterable[Strategy]] = Vector(ProtossChoices.pvzMidgameTransitioningFromOneBase)

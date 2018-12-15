@@ -1,12 +1,12 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Lifecycle.With
-import Macro.BuildRequests.Get
-import Planning.{Plan, ProxyPlanner}
+import Macro.BuildRequests.{BuildRequest, Get}
+import Planning.Plan
 import Planning.Plans.Army.EjectScout
 import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.GamePlans.Protoss.Situational.PlaceGatewaysProxied
+import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -33,7 +33,8 @@ class PvTFastCarrier extends GameplanModeTemplate {
   override val priorityAttackPlan     = new PvTIdeas.PriorityAttacks
   override def defaultScoutPlan: Plan = new If(new CanProxy, new ScoutOn(Protoss.Gateway), new ScoutOn(Protoss.Pylon))
   override val removeMineralBlocksAt  = 24
-  override val buildOrder = Vector(
+
+  private val buildOrderProxyGate = Vector(
     Get(8,  Protoss.Probe),
     Get(1,  Protoss.Pylon),
     Get(10, Protoss.Probe),
@@ -52,13 +53,17 @@ class PvTFastCarrier extends GameplanModeTemplate {
     Get(21, Protoss.Probe),
     Get(2,  Protoss.Nexus))
 
+  override val buildOrder: Vector[BuildRequest] = ProtossBuilds.Opening28Nexus
+
   override def buildPlans: Seq[Plan] = Vector(
+    /*
     new Trigger(
       new UnitsAtLeast(1, Protoss.Gateway),
       initialBefore = new If(
         new CanProxy,
         new PlaceGatewaysProxied(1, () => ProxyPlanner.proxyAutomaticSneaky),
         new PlaceGatewaysProxied(1, () => Some(With.geography.ourNatural.zone), allowBlockingBase = false))),
+        */
     new EjectScout,
     new RequireMiningBases(2),
     new If(new EnemyBasesAtLeast(2), new RequireMiningBases(3)),

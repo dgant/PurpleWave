@@ -5,7 +5,7 @@ import Macro.Architecture.Blueprint
 import Mathematics.Points.Tile
 import Performance.Cache
 import Planning.Plan
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitClasses.UnitClass
 
 import scala.collection.mutable.ArrayBuffer
@@ -30,13 +30,17 @@ abstract class PlaceProxies(buildings: UnitClass*) extends Plan {
     proxyTargets().map(_.tileDistanceFast(tile)).max
   }
 
+  val minSight: Double = Terran.SCV.sightRangePixels / 32
+  val minDistance: Double = 40
   val groundProxyScore: Tile => Double = tile => {
     (
       (if (With.grids.enemyVision.isSet(tile)) 1 else 10)
       * With.grids.altitudeBonus.get(tile)
-      * Math.max(1, With.grids.scoutingPathsBases.get(tile))
-      * Math.max(1, With.grids.scoutingPathsStartLocations.get(tile))
-      / Math.max(1.0, groundDistanceMax(tile))
+      * Math.max(minSight, With.grids.scoutingPathsBases.get(tile))
+      * Math.max(minSight, With.grids.scoutingPathsStartLocations.get(tile))
+      / Math.max(minDistance, groundDistanceMax(tile))
+      / Math.max(minDistance, groundDistanceMax(tile))
+      / Math.max(minDistance, groundDistanceMax(tile))
     )
   }
 
@@ -45,11 +49,12 @@ abstract class PlaceProxies(buildings: UnitClass*) extends Plan {
     (
       (if (With.grids.enemyVision.isSet(tile)) 1 else 10)
       * With.grids.altitudeBonus.get(tile)
-      * Math.max(1, With.grids.scoutingPathsBases.get(tile))
-      * Math.max(1, With.grids.scoutingPathsStartLocations.get(tile))
-      * Math.max(1.0, groundDistanceMax(tile))
-      / Math.max(1.0, airDistanceMax)
-      / Math.max(1.0, airDistanceMax)
+      * Math.max(minSight, With.grids.scoutingPathsBases.get(tile))
+      * Math.max(minSight, With.grids.scoutingPathsStartLocations.get(tile))
+      * Math.max(minDistance, groundDistanceMax(tile))
+      / Math.max(minDistance, airDistanceMax)
+      / Math.max(minDistance, airDistanceMax)
+      / Math.max(minDistance, airDistanceMax)
     )
   }
 
@@ -58,14 +63,17 @@ abstract class PlaceProxies(buildings: UnitClass*) extends Plan {
     (
       (if (With.grids.enemyVision.isSet(tile)) 1 else 10)
       * With.grids.altitudeBonus.get(tile)
-      * Math.max(1, With.grids.scoutingPathsBases.get(tile))
-      * Math.max(1, With.grids.scoutingPathsStartLocations.get(tile))
-      * Math.max(1, groundDistanceMax(tile))
+      * Math.max(minSight, With.grids.scoutingPathsBases.get(tile))
+      * Math.max(minSight, With.grids.scoutingPathsStartLocations.get(tile))
+      * Math.max(minDistance, groundDistanceMax(tile))
     )
   }
 
   var placements: Option[Seq[Blueprint]] = None
   override def onUpdate(): Unit = {
+    // HACK: Why are these not initialized?
+    With.grids.scoutingPathsBases.update()
+    With.grids.scoutingPathsStartLocations.update()
     placements = placements.orElse(Some(calculatePlacements))
     placements.foreach(_.foreach(With.groundskeeper.propose))
   }
@@ -116,7 +124,8 @@ abstract class PlaceProxies(buildings: UnitClass*) extends Plan {
           var areaY = 0
           while (areaY < walkableHeight) {
             val i = x + areaX + mapTileWidth * (y + areaY)
-            valid =
+            valid = (
+              (! new Tile(i).zone.island) && (
               if (areaX < walkableMargin
                 || areaY < walkableMargin
                 || areaX >= walkableWidth - walkableMargin
@@ -124,7 +133,7 @@ abstract class PlaceProxies(buildings: UnitClass*) extends Plan {
                 With.grids.walkable.get(i)
               } else {
                 With.grids.buildable.get(i)
-              }
+              }))
             if (!valid) {
               // Break out of the loop
               areaX = walkableWidth

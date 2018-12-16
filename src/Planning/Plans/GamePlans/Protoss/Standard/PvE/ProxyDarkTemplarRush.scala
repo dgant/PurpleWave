@@ -1,5 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvE
 
+import Macro.Architecture.Blueprint
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
 import Planning.Plans.Army.{Attack, EjectScout}
@@ -7,7 +8,7 @@ import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.Build.PlaceGroundProxies
+import Planning.Plans.Macro.Build.{PlaceGroundProxies, ProposePlacement}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Scouting.{FoundEnemyBase, ScoutOn}
@@ -35,16 +36,19 @@ class ProxyDarkTemplarRush extends GameplanModeTemplate {
       new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.proxyBuilding), preferZone = ProxyPlanner.proxyAutomaticSneaky))
   }*/
 
-  override def defaultPlacementPlan: Plan = new Trigger(
-    new Or(
-      new Always, // TEMPORARY
-      new FoundEnemyBase,
-      new UnitsAtLeast(1, Protoss.Gateway, complete = true)),
-    new PlaceGroundProxies(
-      Protoss.CitadelOfAdun,
-      Protoss.TemplarArchives,
-      Protoss.Gateway,
-      Protoss.Gateway))
+  override def defaultPlacementPlan: Plan = new Parallel(
+    new ProposePlacement(
+      new Blueprint(this, building = Some(Protoss.Pylon)),
+      new Blueprint(this, building = Some(Protoss.Gateway))),
+    new Trigger(
+      new Or(
+        new Always, // TEMPORARY
+        new FoundEnemyBase,
+        new UnitsAtLeast(1, Protoss.Gateway, complete = true)),
+      new PlaceGroundProxies(
+        Protoss.Pylon,
+        Protoss.Gateway,
+        Protoss.Gateway)))
 
   override def buildOrder: Seq[BuildRequest] = Seq(
     Get(8,  Protoss.Probe),

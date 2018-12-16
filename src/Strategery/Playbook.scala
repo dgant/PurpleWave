@@ -62,7 +62,6 @@ object StrategyGroups {
     PvPLateGame2BaseReaverCarrier_SpecificMaps,
     MassPhotonCannon,
     CarriersWithNoDefense,
-    ProxyDarkTemplar,
     FivePoolProxySunkens,
     PvPOpen2Gate1012,
     PvPOpen1GateReaverExpand,
@@ -71,7 +70,7 @@ object StrategyGroups {
 }
 
 class TestingPlaybook extends EmptyPlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvTFastCarrier)
+  override lazy val forced: Seq[Strategy] = Seq(ProxyDarkTemplar)
   override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
 }

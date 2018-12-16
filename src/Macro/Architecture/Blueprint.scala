@@ -25,7 +25,8 @@ class Blueprint(
   val requireCandidates   : Option[Seq[Tile]]         = None,
   var preferZone          : Option[Zone]              = None,
   val requireZone         : Option[Zone]              = None,
-  var respectHarvesting   : Option[Boolean]           = None) {
+  var respectHarvesting   : Option[Boolean]           = None,
+  var forcePlacement      : Boolean                   = false) {
   
   var id: Option[Int] = None
   val frameCreated: Int = With.frame

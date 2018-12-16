@@ -1,7 +1,6 @@
 
 package Micro.Actions.Combat.Decisionmaking
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
@@ -34,7 +33,7 @@ object FightOrFlight extends Action {
     decide(false, "Scarabs",    () => unit.is(Protoss.Reaver) && unit.scarabCount == 0)
     decide(true,  "Cloaked",    () => unit.effectivelyCloaked)
     decide(true,  "Lurking",    () => unit.is(Zerg.Lurker) && unit.matchups.enemyDetectors.isEmpty)
-    decide(true,  "Focused",    () => unit.agent.canFocus && (! unit.visibleToOpponents || unit.matchups.framesOfSafety > GameTime(0, 2)()) && With.framesSince(unit.lastFrameTakingDamage) > GameTime(0, 10)())
+    //decide(true,  "Focused",    () => unit.agent.canFocus && (! unit.visibleToOpponents || unit.matchups.framesOfSafety > GameTime(0, 2)()) && With.framesSince(unit.lastFrameTakingDamage) > GameTime(0, 10)())
     decide(false, "Pacifist",   () => ! unit.agent.canFight)
     decide(false, "Useless",    () => unit.canAttack && unit.energyMax == 0 && unit.matchups.targets.isEmpty && unit.matchups.threats.nonEmpty)
     decide(false, "Drained",    () => ! unit.canAttack && unit.energyMax > 0 && ! unit.unitClass.spells.forall(s => s.energyCost > unit.energy || ! With.self.hasTech(s)))

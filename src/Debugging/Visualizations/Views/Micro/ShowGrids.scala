@@ -1,6 +1,5 @@
 package Debugging.Visualizations.Views.Micro
 
-import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Information.Grids.AbstractGrid
@@ -26,6 +25,7 @@ object ShowGrids extends View {
     With.grids.scoutingPathsStartLocations.update()
     renderGridArray(With.grids.scoutingPathsBases, 0, 0)
     renderGridArray(With.grids.scoutingPathsStartLocations, 0, 1)
+    /*
     basePaths.foreach(path => {
       var i = 0
       while (i < path.length - 1) {
@@ -40,6 +40,7 @@ object ShowGrids extends View {
         i += 1
       }
     })
+    */
   }
   
   private def renderGridArray[T](map: AbstractGrid[T], offsetX: Int = 0, offsetY: Int = 0) {

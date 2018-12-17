@@ -71,8 +71,7 @@ object StrategyGroups {
 }
 
 class TestingPlaybook extends EmptyPlaybook {
-  //override lazy val forced: Seq[Strategy] = Seq(PvTDTExpand, PvT2BaseArbiter)
-  override lazy val forced: Seq[Strategy] = Seq(PvT13Nexus, PvT2BaseCarrier)
+  override lazy val forced: Seq[Strategy] = Seq(PvTDTExpand, PvT2BaseArbiter)
   override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
 }

@@ -26,6 +26,7 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {
   
   override def onUpdate() {
     if (isComplete) return
+    if (With.units.ours.exists(u => u.upgradingType == upgrade && ! upgraders.units.contains(u))) return
     
     val requiredClasses = (upgrade.whatsRequired.get(level).toVector :+ upgraderClass).filterNot(_ == UnitClasses.None)
     

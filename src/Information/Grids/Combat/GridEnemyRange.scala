@@ -17,7 +17,7 @@ class GridEnemyRange extends AbstractGridVersionedValue[Int] {
 
   override def onUpdate(): Unit = {
     for (unit <- With.units.enemy) {
-      if (unit.likelyStillThere && (unit.canAttack || unit.unitClass.spells.nonEmpty)) {
+      if (unit.likelyStillThere && (unit.canAttack || unit.unitClass.spells.nonEmpty) && unit.battle.nonEmpty) {
         val tileUnit = unit.projectFrames(framesAhead).tileIncluding
         val rangeMax = addedRange + unit.effectiveRangePixels.toInt/32
         for (d <- 1 to rangeMax) {
@@ -32,6 +32,4 @@ class GridEnemyRange extends AbstractGridVersionedValue[Int] {
       }
     }
   }
-
-
 }

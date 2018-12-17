@@ -15,14 +15,10 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import scala.collection.mutable.ArrayBuffer
 
 object Avoid extends ActionTechnique {
+
+  // Run away!
   
-  // If our path home is blocked by enemies,
-  // try to find an alternate escape route.
-  
-  override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.canMove
-    && unit.matchups.threats.nonEmpty
-  )
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove && (unit.matchups.threats.nonEmpty || (unit.effectivelyCloaked && unit.matchups.enemyDetectors.nonEmpty))
   
   override val applicabilityBase: Double = 0.5
   
@@ -42,10 +38,20 @@ object Avoid extends ActionTechnique {
 
   override def perform(unit: FriendlyUnitInfo): Unit = {
     if (unit.flying) {
-      oldPerform(unit)
+      avoidPotential(unit)
       return
     }
+    if (With.configuration.enableThreatAwarePathfinding) {
+      avoidRealPath(unit)
+    }
+    avoidGreedyPath(unit)
+  }
 
+  def avoidRealPath(unit: FriendlyUnitInfo): Unit = {
+
+  }
+
+  def avoidGreedyPath(unit: FriendlyUnitInfo): Unit = {
     var pathLengthMax = 13
     if (With.configuration.enableThreatAwarePathfinding) {
       val path = With.paths.aStarThreatAware(unit, if (unit.agent.origin.zone == unit.zone) None else Some(unit.agent.origin.tileIncluding))
@@ -66,7 +72,6 @@ object Avoid extends ActionTechnique {
       }
     }
 
-
     val path = new ArrayBuffer[Tile]
     path += unit.tileIncludingCenter
     var bestScore = Int.MinValue
@@ -82,6 +87,9 @@ object Avoid extends ActionTechnique {
       (
         - 10 * tileDistance(tile)
         - 10 * enemyRange * (if (enemyRange > With.grids.enemyRange.addedRange) 2 else 1)
+        - (if (unit.cloaked)
+          10 * With.grids.enemyDetection.get(tile) * (if (With.grids.enemyDetection.isDetected(tile)) 2 else 1)
+          else 0)
         - PurpleMath.clamp(With.coordinator.gridPathOccupancy.get(tile) / 3, 0, 9)
       )
     }
@@ -132,21 +140,22 @@ object Avoid extends ActionTechnique {
     }
     Move.delegate(unit)
   }
-  
-  def oldPerform(unit: FriendlyUnitInfo): Unit = {
+
+  def avoidPotential(unit: FriendlyUnitInfo): Unit = {
     unit.agent.toTravel = Some(unit.agent.origin)
 
     val bonusAvoidThreats = PurpleMath.clamp(With.reaction.agencyAverage + unit.matchups.framesOfEntanglement, 12.0, 24.0) / 12.0
     val bonusPreferExit   = if (unit.agent.origin.zone != unit.zone) 1.0 else if (unit.matchups.threats.exists(_.topSpeed < unit.topSpeed)) 0.0 else 0.5
     val bonusRegrouping   = 9.0 / Math.max(24.0, unit.matchups.framesOfEntanglement)
     val bonusMobility     = 1.0
-    
+
     val forceThreat       = Potential.avoidThreats(unit)      * bonusAvoidThreats
     val forceSpacing      = Potential.avoidCollision(unit)
     val forceExiting      = Potential.preferTravelling(unit)  * bonusPreferExit
     val forceSpreading    = Potential.preferSpreading(unit)
     val forceRegrouping   = Potential.preferRegrouping(unit)  * bonusRegrouping
     val forceMobility     = Potential.preferMobility(unit)    * bonusMobility
+    val forceSneaking     = Potential.detectionRepulsion(unit)
     val resistancesTerran = Potential.resistTerrain(unit)
     
     unit.agent.forces.put(ForceColors.threat,         forceThreat)
@@ -155,6 +164,7 @@ object Avoid extends ActionTechnique {
     unit.agent.forces.put(ForceColors.regrouping,     forceRegrouping)
     unit.agent.forces.put(ForceColors.spacing,        forceSpacing)
     unit.agent.forces.put(ForceColors.mobility,       forceMobility)
+    unit.agent.forces.put(ForceColors.sneaking,       forceSneaking)
     unit.agent.resistances.put(ForceColors.mobility,  resistancesTerran)
     Gravitate.delegate(unit)
 

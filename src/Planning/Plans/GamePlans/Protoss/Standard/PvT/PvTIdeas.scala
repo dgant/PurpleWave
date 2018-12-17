@@ -7,11 +7,11 @@ import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.{Enemy, Friendly, Pump, PumpMatchingRatio}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Compound.{And, Not}
-import Planning.Predicates.Economy.{GasAtMost, MineralsAtLeast}
+import Planning.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio}
 import Planning.Predicates.Strategy.Employing
-import Planning.UnitMatchers.{UnitMatchCustom, UnitMatchOr, UnitMatchWarriors}
+import Planning.UnitMatchers.{UnitMatchCustom, UnitMatchOr, UnitMatchSiegeTank, UnitMatchWarriors}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.{PvT1015Expand, PvTEarly1015GateGoonDT, PvTEarly1GateStargateTemplar}
 
@@ -77,7 +77,10 @@ object PvTIdeas {
           new UnitsAtLeast(3, UnitMatchWarriors),
           new Pump(Protoss.Observer, 1)))))
 
-  class TrainReaversAgainstBio extends PumpMatchingRatio(Protoss.Reaver, 0, 5, Seq(Enemy(Terran.Marine, 1.0/6.0)))
+  class TrainReavers extends PumpMatchingRatio(Protoss.Reaver, 0, 6, Seq(
+    Enemy(Terran.Marine, 1.0/6.0),
+    Enemy(Terran.Goliath, 1.0/6.0),
+    Enemy(Terran.Vulture, 1.0/8.0)))
 
   class TrainHighTemplarAgainstBio extends If(
     new EnemyBio,
@@ -94,27 +97,33 @@ object PvTIdeas {
     new Pump(Protoss.Scout, 5))
 
   class TrainZealotsOrDragoons extends Parallel(
-    new FlipIf(
+    new PumpMatchingRatio(Protoss.Dragoon, 0, 24, Seq(Friendly(Protoss.Zealot, .75))),
+    new If(
       new Or(
         new And(
           new MineralsAtLeast(600),
           new GasAtMost(200)),
-        new And(
-          new UnitsAtLeast(12, Protoss.Dragoon),
-          new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.ZealotSpeed.upgradeFrames.head._2))),
-      new Pump(Protoss.Dragoon),
-      new Pump(Protoss.Zealot)),
-    new IfOnMiningBases(3, new Pump(Protoss.Zealot)))
+        new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.ZealotSpeed.upgradeFrames.head._2)),
+      new PumpMatchingRatio(Protoss.Zealot, 0, 24, Seq(
+        Enemy(UnitMatchSiegeTank, 3.0),
+        Enemy(Terran.Goliath,     2.0),
+        Enemy(Terran.Marine,      1.0),
+        Enemy(Terran.Vulture,     -0.75)))),
+    new Pump(Protoss.Dragoon),
+    new If(new BasesAtLeast(3), new Pump(Protoss.Zealot)))
 
   class TrainArmy extends Parallel(
     new TrainDarkTemplar,
-    new TrainReaversAgainstBio,
+    new PumpMatchingRatio(Protoss.Shuttle, 0, 2, Seq(Friendly(Protoss.Reaver, 0.5))),
+    new TrainReavers,
     new TrainObservers,
     new TrainMinimumDragoons,
     new TrainHighTemplarAgainstBio,
     new PumpMatchingRatio(Protoss.Arbiter, 0, 2, Seq(Friendly(Protoss.Carrier, 1.0 / 8.0))),
     new PumpMatchingRatio(Protoss.HighTemplar, 0, 2, Seq(Friendly(Protoss.Carrier, 1.0 / 8.0))),
     new Pump(Protoss.Carrier),
+    new Pump(Protoss.Arbiter),
+    new If(new GasAtLeast(400), new Pump(Protoss.HighTemplar, maximumConcurrently = 4)),
     new TrainScouts,
     new TrainZealotsOrDragoons)
   

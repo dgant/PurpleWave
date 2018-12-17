@@ -167,6 +167,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     cachedWaypoint.clear()
     techniques.clear()
     fightReason = ""
+    _umbrellas.clear()
   }
   
   private def followIntent() {
@@ -230,6 +231,16 @@ class Agent(val unit: FriendlyUnitInfo) {
       origin
     }
   }
+
+  //////////////////////
+  // Arbiter coverage //
+  //////////////////////
+
+  private var _umbrellas = new ArrayBuffer[FriendlyUnitInfo]
+  def addUmbrella(umbrella: FriendlyUnitInfo): Unit = {
+    _umbrellas += umbrella
+  }
+  def umbrellas: Seq[FriendlyUnitInfo] = _umbrellas
 
   /////////////////
   // Ridesharing //

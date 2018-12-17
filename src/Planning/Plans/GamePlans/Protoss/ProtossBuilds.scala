@@ -421,60 +421,46 @@ object ProtossBuilds {
     Get(30,  Protoss.Probe))
 
   val OpeningDTExpand_BeforeCitadel = Vector[BuildRequest] (
-    // 2-Gate DT Expand based on PvP 2-Gate DT from http://wiki.teamliquid.net/starcraft/2_Gate_DT
-    // We get gas/core faster because of mineral locking + later scout
     Get(8,   Protoss.Probe),
-    Get(1,   Protoss.Pylon),             // 8
+    Get(Protoss.Pylon),
     Get(10,  Protoss.Probe),
-    Get(Protoss.Gateway),           // 10
+    Get(Protoss.Gateway),
     Get(11,  Protoss.Probe),
-    Get(Protoss.Assimilator),       // 11
+    Get(Protoss.Assimilator),
     Get(13,  Protoss.Probe),
-    Get(1,   Protoss.Zealot),            // 13 -- this is important to deny scouting
-    Get(14,  Protoss.Probe),
-    Get(2,   Protoss.Pylon),             // 16 = 14 + Z
-    Get(16,  Protoss.Probe),
-    Get(Protoss.CyberneticsCore),   // 18 = 16 + Z
-    Get(18,  Protoss.Probe),
-    Get(3,   Protoss.Pylon),             // 20 = 18 + Z
-    Get(19,  Protoss.Probe),
-    Get(1,   Protoss.Dragoon),           // 21 = 19 + Z
-    Get(20,  Protoss.Probe))
+    Get(Protoss.CyberneticsCore),
+    Get(15,  Protoss.Probe),
+    Get(2,   Protoss.Pylon),
+    Get(17,  Protoss.Probe),
+    Get(1,   Protoss.Dragoon))
 
   val OpeningDTExpand_AfterCitadel = Vector[BuildRequest] (
-    Get(Protoss.CitadelOfAdun),     // 24 = 20 + Z + D
-    Get(21,  Protoss.Probe),
-    Get(2,   Protoss.Dragoon),           // 25 = 21 + Z + D
-    Get(2,   Protoss.Gateway),           // 27 = 21 + Z + DD
-    Get(3,   Protoss.Pylon),
+    Get(Protoss.CitadelOfAdun),
+    Get(21, Protoss.Probe),
+    Get(3,  Protoss.Pylon),
     Get(Protoss.TemplarArchives),
-    Get(21,  Protoss.Probe),
-    Get(2,   Protoss.Gateway),
-    Get(22,  Protoss.Probe),
-    Get(2,   Protoss.Dragoon),
-    Get(23,  Protoss.Probe),
-    Get(4,   Protoss.Pylon),
-    Get(2,   Protoss.DarkTemplar),
-    Get(24,  Protoss.Probe),
-    Get(2,   Protoss.Nexus))
+    Get(23, Protoss.Probe),
+    Get(2,  Protoss.Nexus),
+    Get(25, Protoss.Probe),
+    Get(1,  Protoss.DarkTemplar))
 
   val OpeningDTExpand_WithoutCitadel = Vector[BuildRequest] (
     // Do stuff without building Citadel right away until we eject the scout
-    Get(21,  Protoss.Probe),
-    Get(2,   Protoss.Dragoon),           // 25 = 21 + Z + D
-    Get(2,   Protoss.Gateway),           // 27 = 21 + Z + DD
-    Get(3,   Protoss.Pylon),
+    Get(18, Protoss.Probe),
+    Get(Protoss.DragoonRange),
+    Get(20, Protoss.Probe),
+    Get(3,  Protoss.Pylon),
+    Get(2,  Protoss.Dragoon),
+    Get(23, Protoss.Probe),
+    Get(3,  Protoss.Dragoon),
+    Get(4,  Protoss.Pylon),
+    Get(2,  Protoss.Nexus),
+    Get(24, Protoss.Probe),
+    Get(4,  Protoss.Dragoon),
+    Get(25, Protoss.Probe),
     Get(Protoss.CitadelOfAdun),
-    Get(Protoss.TemplarArchives),
-    Get(21,  Protoss.Probe),
-    Get(2,   Protoss.Gateway),
-    Get(22,  Protoss.Probe),
-    Get(2,   Protoss.Dragoon),
-    Get(23,  Protoss.Probe),
-    Get(4,   Protoss.Pylon),
-    Get(2,   Protoss.DarkTemplar),
-    Get(24,  Protoss.Probe),
-    Get(2,   Protoss.Nexus))
+    Get(2,  Protoss.Assimilator),
+    Get(Protoss.TemplarArchives))
   
   //////////////////////
   // Protoss vs. Zerg //

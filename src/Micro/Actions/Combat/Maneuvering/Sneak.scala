@@ -1,14 +1,10 @@
 package Micro.Actions.Combat.Maneuvering
 
-import Debugging.Visualizations.ForceColors
+import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Actions.Combat.Targeting.Target
-import Micro.Actions.Commands.{Gravitate, Move}
-import Micro.Decisions.Potential
-import Planning.UnitMatchers.UnitMatchMobileDetectors
+import Micro.Actions.Combat.Techniques.Avoid
 import Planning.Yolo
-import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Sneak extends Action {
@@ -19,8 +15,8 @@ object Sneak extends Action {
     && unit.agent.canFlee
     && ! Yolo.active
     && ! unit.agent.shouldEngage
-    && ! unit.matchups.allies.exists(_.is(Protoss.Arbiter))
-    && ! unit.matchups.enemies.exists(_.is(UnitMatchMobileDetectors))
+    && unit.matchups.nearestArbiter.isEmpty
+    && unit.matchups.enemyDetectors.isEmpty
     && unit.matchups.enemies.exists(e => e.complete && ! e.unitClass.isWorker && (if (unit.flying) e.unitClass.attacksGround else e.unitClass.attacksAir))
   )
   
@@ -29,19 +25,8 @@ object Sneak extends Action {
 
     if ( ! unit.readyForMicro) return
 
-    val needsToFlee = (
-      ! unit.effectivelyCloaked
-        || unit.matchups.enemyDetectors.exists(e => e.pixelDistanceEdge(unit) < 32.0 * (if(e.unitClass.canMove) 15.0 else 12.0))
-    )
-
-    if (needsToFlee) {
-      Target.delegate(unit)
-      val forceThreat     = Potential.avoidThreatsWhileCloaked(unit)
-      val forceSneaking   = Potential.detectionRepulsion(unit)
-      unit.agent.forces.put(ForceColors.threat,     forceThreat)
-      unit.agent.forces.put(ForceColors.bypassing,  forceSneaking)
-      Gravitate.delegate(unit)
-      Move.delegate(unit)
+    if ( ! unit.effectivelyCloaked || With.grids.enemyDetection.get(unit.tileIncludingCenter) - With.grids.enemyDetection.addedRange + 1 > 0) {
+      Avoid.delegate(unit)
     }
   }
 }

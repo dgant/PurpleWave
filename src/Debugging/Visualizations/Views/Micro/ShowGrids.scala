@@ -18,13 +18,14 @@ object ShowGrids extends View {
 
   override def renderMap() {
     val zone = With.units.ours.find(_.selected).map(_.zone).getOrElse(With.viewport.center.tileIncluding.zone)
+    renderGridArray(With.grids.enemyDetection, 0, 0)
     //renderGridArray(zone.distanceGrid, 0, 0)
     //renderGridArray(zone.exitDistanceGrid, 1, 0)
     //zone.exit.foreach(e => renderGridArray(e.distanceGrid, 0, 1))
-    With.grids.scoutingPathsBases.update()
-    With.grids.scoutingPathsStartLocations.update()
-    renderGridArray(With.grids.scoutingPathsBases, 0, 0)
-    renderGridArray(With.grids.scoutingPathsStartLocations, 0, 1)
+    //With.grids.scoutingPathsBases.update()
+    //With.grids.scoutingPathsStartLocations.update()
+    //renderGridArray(With.grids.scoutingPathsBases, 0, 0)
+    //renderGridArray(With.grids.scoutingPathsStartLocations, 0, 1)
     /*
     basePaths.foreach(path => {
       var i = 0

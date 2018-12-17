@@ -11,17 +11,10 @@ import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
 import Micro.Heuristics.Spells.TargetAOE
 import Planning.UnitMatchers.UnitMatchBuilding
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object BeAnArbiter extends Action {
-
-  def moveOrPotshot(unit: FriendlyUnitInfo): Unit = {
-    if (unit.agent.toTravel.forall(_.pixelDistance(unit.pixelCenter) < 64)) {
-      Potshot.delegate(unit)
-    }
-    Move.delegate(unit)
-  }
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.aliveAndComplete && unit.is(Protoss.Arbiter)
@@ -35,67 +28,78 @@ object BeAnArbiter extends Action {
       Protoss.Observer,
       UnitMatchBuilding)
 
-  override protected def perform(unit: FriendlyUnitInfo) {
-    val umbrellaSearchRadius  = 32.0 * 20.0
-    val threatened            = unit.matchups.framesOfSafety <= 12.0
-    val needUmbrella          = unit.teammates.filter(needsUmbrella)
-    val needUmbrellaNearby    = needUmbrella.filter(_.pixelDistanceCenter(unit) < umbrellaSearchRadius)
+  override protected def perform(arbiter: FriendlyUnitInfo) {
+    val umbrellaSearchRadius    = 32.0 * 20.0
+    val threatened              = arbiter.matchups.framesOfSafety <= 12.0
+    val arbiters                = arbiter.teammates.filter(_.is(Protoss.Arbiter))
+    val needUmbrella            = arbiter.teammates.toSeq.filter(needsUmbrella)
+    val needUmbrellaNearby      = needUmbrella.filter(_.pixelDistanceCenter(arbiter) < umbrellaSearchRadius)
+    lazy val needUmbrellaBadly  = needUmbrellaNearby.filter(_.friendly.forall(_.agent.umbrellas.isEmpty))
+    val toUmbrella              = if (arbiter.matchups.enemies.exists(_.is(Terran.ScienceVessel))) needUmbrellaBadly else needUmbrellaNearby
 
     def evaluateForCloaking(target: UnitInfo): Double = {
       if ( ! target.isFriendly) return 0.0
       if ( ! needsUmbrella(target)) return 0.0
-      if (target.battle.isEmpty && unit.squad.exists(ourSquad => ! target.friendly.map(_.squad).exists(_.contains(ourSquad)))) return 0.0
-      val value       = target.subjectiveValue
-      val multiplier  = 2.0 + PurpleMath.fastTanh(Math.max(-48, target.matchups.framesOfEntanglement))
-      val output      = value * multiplier
+      if (target.battle.isEmpty && arbiter.squad.exists(ourSquad => ! target.friendly.map(_.squad).exists(_.contains(ourSquad)))) return 0.0
+      val value           = target.subjectiveValue
+      val dangerFactor    = 2.0 + PurpleMath.fastTanh(Math.max(-48, target.matchups.framesOfEntanglement))
+      val isolationFactor = if (target.friendly.exists(_.agent.umbrellas.nonEmpty) && target.matchups.nearestArbiter.exists(_ != arbiter)) 0.0 else 1.0
+      val output          = value * dangerFactor * isolationFactor
       output
     }
 
     if (needUmbrella.nonEmpty) {
       val destination = TargetAOE.chooseTargetPixel(
-        unit,
+        arbiter,
         umbrellaSearchRadius,
         Protoss.Zealot.subjectiveValue,
         evaluateForCloaking,
         12,
         (tile) => Circle.points(2).map(tile.add).filter(_.valid),
         Some(needUmbrellaNearby))
-      unit.agent.toTravel = destination.orElse(
+      destination.foreach(someDestination =>
+        needUmbrella.foreach(ally => if (ally.pixelDistanceCenter(someDestination) < 32 * 7) {
+          ally.friendly.foreach(_.agent.addUmbrella(arbiter))
+        }))
+      arbiter.agent.toTravel = destination.orElse(
         Some(needUmbrella
-          .minBy(_.pixelDistanceCenter(unit.agent.destination))
+          .minBy(_.pixelDistanceCenter(arbiter.agent.destination))
           .pixelCenter))
     }
-  
-    val forceUmbrella = new Force(unit.agent.destination.subtract(unit.pixelCenter)).normalize
-    val framesOfSafetyRequired = Math.max(0, 48 - With.framesSince(unit.lastFrameTakingDamage))
-    if (unit.matchups.framesOfSafety <= framesOfSafetyRequired) {
-      val forceThreat = Potential.avoidThreats(unit)
-      val resistancesTerrain = Potential.resistTerrain(unit)
-      unit.agent.forces.put(ForceColors.regrouping, forceUmbrella)
-      unit.agent.forces.put(ForceColors.threat,     forceThreat)
-      unit.agent.resistances.put(ForceColors.mobility, resistancesTerrain)
-      Gravitate.consider(unit)
-      moveOrPotshot(unit)
-    }
-    else if (needUmbrella.nonEmpty) {
-      val forcesThreats = unit.matchups.enemies
+
+    val forceUmbrella = new Force(arbiter.agent.destination.subtract(arbiter.pixelCenter)).normalize
+    val framesOfSafetyRequired = Math.max(0, 48 - With.framesSince(arbiter.lastFrameTakingDamage))
+    if (arbiter.matchups.framesOfSafety <= framesOfSafetyRequired) {
+      val forceThreat = Potential.avoidThreats(arbiter)
+      val forceEMP = Potential.avoidEmp(arbiter)
+      val resistancesTerrain = Potential.resistTerrain(arbiter)
+      arbiter.agent.forces.put(ForceColors.regrouping,  forceUmbrella)
+      arbiter.agent.forces.put(ForceColors.spacing,     forceEMP)
+      arbiter.agent.forces.put(ForceColors.threat,      forceThreat)
+      arbiter.agent.resistances.put(ForceColors.mobility, resistancesTerrain)
+      Gravitate.consider(arbiter)
+      Move.delegate(arbiter)
+      arbiter.agent.fightReason = "Unsafe"
+    } else if (needUmbrella.nonEmpty) {
+      Potshot.delegate(arbiter)
+      val forcesThreats = arbiter.matchups.enemies
         .map(enemy =>
           Potential.unitAttraction(
-            unit,
+            arbiter,
             enemy,
                     enemy.matchups.targets.size
             + 2.0 * enemy.matchups.targetsInRange.size))
-
-      if (forcesThreats.exists(_.lengthSquared > 0.0)) {
-        val forceThreats = ForceMath.sum(forcesThreats).normalize
-        unit.agent.forces.put(ForceColors.threat, forceThreats)
-      }
-      unit.agent.forces.put(ForceColors.regrouping, forceUmbrella)
-      Gravitate.consider(unit)
-      moveOrPotshot(unit)
+      val forceThreats = ForceMath.sum(forcesThreats).normalize
+      val forceEMP = Potential.avoidEmp(arbiter)
+      arbiter.agent.forces.put(ForceColors.threat,      forceThreats)
+      arbiter.agent.forces.put(ForceColors.spacing,     forceEMP)
+      arbiter.agent.forces.put(ForceColors.regrouping,  forceUmbrella)
+      Gravitate.consider(arbiter)
+      Move.delegate(arbiter)
+      arbiter.agent.fightReason = "Umbrella"
     }
-    if (unit.matchups.framesOfSafety < 48 || unit.matchups.threats.exists(_.topSpeed > unit.topSpeed)) {
-      unit.agent.shouldEngage = false
+    if (arbiter.matchups.framesOfSafety < 48 || arbiter.matchups.threats.exists(_.topSpeed > arbiter.topSpeed)) {
+      arbiter.agent.shouldEngage = false
     }
   }
 }

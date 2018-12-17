@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Mathematics.PurpleMath
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
@@ -121,12 +121,30 @@ object Potential {
     val output  = ForceMath.sum(forces).normalize(forces.map(_.lengthFast).max)
     output
   }
+
+  def avoidEmp(arbiter: FriendlyUnitInfo): Force = {
+    if ( ! arbiter.is(Protoss.Arbiter)) return new Force
+    if (arbiter.matchups.nearestArbiter.isEmpty) return new Force
+
+    val vessels = arbiter.matchups.enemyDetectors.filter(_.is(Terran.ScienceVessel))
+    if ( ! vessels.exists(_.pixelDistanceEdge(arbiter) < 320)) return new Force
+
+    val arbiters = arbiter.matchups.allies.filter(a => a.is(Protoss.Arbiter) && a.matchups.framesOfSafety >= arbiter.matchups.framesOfSafety)
+
+    val forcesArbiter = arbiters.map(a  => Potential.unitAttraction(arbiter, a, -1.0 / a.pixelDistanceEdge(arbiter)))
+    val forcesVessel  = vessels.map(v   => Potential.unitAttraction(arbiter, v, -1.0 / v.pixelDistanceEdge(arbiter)))
+    val output = (
+      ForceMath.sum(forcesArbiter).normalize.clipMin(96.0 / Math.max(1.0, arbiter.matchups.nearestArbiter.get.pixelDistanceEdge(arbiter)))
+      + ForceMath.sum(forcesVessel).normalize)
+    output
+  }
   
   ///////////////
   // Detection //
   ///////////////
   
   def detectionRepulsion(unit: FriendlyUnitInfo): Force = {
+    if ( ! unit.cloaked) return new Force
     val detectors   = unit.matchups.enemies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
     val forces      = detectors.map(detectorRepulsion(unit, _))
     val output      = ForceMath.sum(forces).normalize

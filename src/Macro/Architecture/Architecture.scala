@@ -147,7 +147,7 @@ class Architecture {
   private def recalculatePower() {
     With.units.ours.foreach(unit =>
       if (unit.is(Protoss.Pylon)
-        && (With.framesSince(unit.completionFrame) < GameTime(0, 5)()
+        && (With.framesSince(unit.completionFrame) < GameTime(0, 3)()
           || unit.zone.units.forall(other => ! other.is(Protoss.Pylon) || other.completionFrame >= unit.completionFrame))) {
         addPower(unit.tileTopLeft)
       })

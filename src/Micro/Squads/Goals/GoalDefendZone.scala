@@ -52,9 +52,13 @@ class GoalDefendZone extends GoalBasic {
     if (output.isEmpty) Array(zone.centroid.pixelCenter) else output
   } // For performance
   )
-  
-  private val huntableEnemies = new Cache(() =>
-    squad.enemies.filter(enemy => ! (enemy.is(Zerg.Drone) && With.fingerprints.fourPool.matches))
+
+  private def huntableFilter(enemy: UnitInfo): Boolean = ! (enemy.is(Zerg.Drone) && With.fingerprints.fourPool.matches)
+  private val huntableEnemies = new Cache(() => {
+    val huntableInZone = squad.enemies.filter(e => e.zone == zone && huntableFilter(e))
+    if (huntableInZone.nonEmpty) huntableInZone else squad.enemies.filter(huntableFilter)
+  }
+
   )
   
   def huntEnemies() {
@@ -74,6 +78,7 @@ class GoalDefendZone extends GoalBasic {
       val onlyGround  = recruit.canAttack && ! recruit.unitClass.attacksAir
       val thisTarget  = if (onlyAir) targetAir else if (onlyGround) targetGround else target
       recruit.agent.intend(squad.client, new Intention {
+        canFocus = true
         toTravel = Some(thisTarget.pixelCenter)
         toReturn = Some(home)
       })

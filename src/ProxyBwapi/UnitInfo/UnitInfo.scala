@@ -549,16 +549,16 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
 
   def cloakedOrBurrowed: Boolean = cloaked || burrowed
   def effectivelyCloaked: Boolean =
-    (burrowed || cloaked) && (
+    (burrowed || cloaked) &&
+    ( ! ensnared && ! plagued) && (
       if (isFriendly)
-        ! With.grids.enemyDetection.isSet(tileIncludingCenter)
+        ! With.grids.enemyDetection.isDetected(tileIncludingCenter)
         && (
           // We can't see Scanner Sweeps due to BWAPI 4.1.2 limitations
           // Let's try to infer scans
           (
             Math.min(With.framesSince(friendly.map(_.agent.lastCloak).getOrElse(0)), With.framesSince(lastFrameTakingDamage)) > 162 + 2
-            // Disabled for performance considerations
-            //&& ! matchups.enemies.exists(e => e.visible && e.orderTarget.contains(this))
+            && ! matchups.enemies.exists(e => e.visible && e.orderTarget.contains(this))
           )
           || ! With.enemies.exists(_.isTerran))
           // Scanner sweep.

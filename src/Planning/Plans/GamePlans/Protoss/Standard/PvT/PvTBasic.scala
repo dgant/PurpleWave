@@ -47,12 +47,13 @@ class PvTBasic extends GameplanModeTemplate {
     new If(new Employing(PvT28Nexus),             new ScoutOn(Protoss.Gateway)),
     new If(new Employing(PvT2GateObserver),       new ScoutOn(Protoss.Pylon)),
     new If(new Employing(PvTEarly1015GateGoonDT), new If(new UpgradeStarted(Protoss.DragoonRange), new Scout)),
-    new If(new Employing(PvTDTExpand),            new ScoutOn(Protoss.Pylon)))
+    new If(new Employing(PvTDTExpand),            new ScoutOn(Protoss.CyberneticsCore)))
   
   override val defaultAttackPlan = new If(
     new Or(
       new Not(new Employing(PvTDTExpand)),
-      new Latch(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true))),
+      new Latch(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true)),
+      new UpgradeStarted(Protoss.DragoonRange)),
     new PvTIdeas.AttackRespectingMines)
   
   override def emergencyPlans: Seq[Plan] = Vector(new PvTIdeas.EmergencyBuilds)
@@ -65,10 +66,13 @@ class PvTBasic extends GameplanModeTemplate {
     new If(new Employing(PvTEarly1015GateGoonDT), new BuildOrder(ProtossBuilds.Opening10Gate15GateDragoonDT: _*)),
     new If(new Employing(PvTDTExpand),            new Parallel(
       new BuildOrder(ProtossBuilds.OpeningDTExpand_BeforeCitadel: _*),
-      new If(
-        new ScoutCleared,
+      new Trigger(
+        new UnitsAtLeast(1, Protoss.CitadelOfAdun),
         new BuildOrder(ProtossBuilds.OpeningDTExpand_AfterCitadel: _*),
-        new BuildOrder(ProtossBuilds.OpeningDTExpand_WithoutCitadel: _*)))))
+        new Trigger(
+          new Not(new ScoutCleared),
+          new BuildOrder(ProtossBuilds.OpeningDTExpand_WithoutCitadel: _*),
+          new BuildOrder(ProtossBuilds.OpeningDTExpand_AfterCitadel: _*))))))
 
   class EmployingTwoBase    extends Employing(PvT2BaseCarrier, PvT2BaseArbiter)
   class EmployingThreeBase  extends Employing(PvT3BaseCarrier, PvT3BaseArbiter)
@@ -142,8 +146,9 @@ class PvTBasic extends GameplanModeTemplate {
             new UpgradeContinuously(Protoss.AirArmor),
             new UpgradeContinuously(Protoss.AirDamage))),
         new UpgradeContinuously(Protoss.CarrierCapacity))),
-    new If(new UnitsAtLeast(1, Protoss.Arbiter), new Build(Get(Protoss.Stasis))),
-    new UpgradeContinuously(Protoss.ArbiterEnergy),
+    new If(new UnitsAtLeast(1, Protoss.ArbiterTribunal), new Build(Get(Protoss.ArbiterEnergy))),
+    new If(new UpgradeComplete(Protoss.ArbiterEnergy), new Build(Get(Protoss.Stasis))),
+    new If(new UnitsAtLeast(1, Protoss.Shuttle), new UpgradeContinuously(Protoss.ShuttleSpeed)),
     new If(new UnitsAtLeast(1, Protoss.HighTemplar), new Build(Get(Protoss.PsionicStorm))),
     new If(new UnitsAtLeast(4, Protoss.Zealot), new UpgradeContinuously(Protoss.ZealotSpeed)),
     
@@ -227,17 +232,18 @@ class PvTBasic extends GameplanModeTemplate {
               Get(7, Protoss.Gateway)))))))
   
   class BonusTech extends Parallel(
+    new Build(
+      Get(Protoss.CitadelOfAdun),
+      Get(Protoss.ZealotSpeed)),
     new If(
       new And(
         new EmployingArbiters,
         new GasPumpsAtLeast(3)),
-      new Build(
-        Get(2, Protoss.Stargate),
-        Get(2, Protoss.Forge))),
-    // Zealot speed for Carrier builds
-    new Build(
-      Get(Protoss.CitadelOfAdun),
-      Get(Protoss.ZealotSpeed)),
+      new Parallel(
+        new Build(
+          Get(2, Protoss.Stargate),
+          Get(2, Protoss.Forge)),
+        new ObserverTech)),
     new If(
       new And(
         new EmployingCarriers,
@@ -270,7 +276,8 @@ class PvTBasic extends GameplanModeTemplate {
     new BonusTech,
     new Build(Get(10, Protoss.Gateway)),
     new RequireMiningBases(4),
-    new Build(Get(24, Protoss.Gateway))
+    new Build(Get(24, Protoss.Gateway)),
+    new RequireMiningBases(5)
   )
 }
 

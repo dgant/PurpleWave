@@ -20,6 +20,7 @@ abstract class PvTBasicOpener extends PvTStrategy {
 }
 object PvT13Nexus extends PvTBasicOpener
 object PvT21Nexus extends PvTBasicOpener
+object PvT28Nexus extends PvTBasicOpener
 object PvTFastCarrier extends PvTBasicOpener {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
     PvT3BaseCarrier

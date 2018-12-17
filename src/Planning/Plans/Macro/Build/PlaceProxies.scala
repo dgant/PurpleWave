@@ -128,8 +128,8 @@ abstract class PlaceProxies(buildings: UnitClass*) extends Plan {
               (! new Tile(i).zone.island) && (
               if (areaX < walkableMargin
                 || areaY < walkableMargin
-                || areaX >= walkableWidth - walkableMargin
-                || areaY >= walkableHeight - walkableMargin) {
+                || areaX > walkableWidth - walkableMargin
+                || areaY > walkableHeight - walkableMargin) {
                 With.grids.walkable.get(i)
               } else {
                 With.grids.buildable.get(i)

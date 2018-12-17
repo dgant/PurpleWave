@@ -2,18 +2,18 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Predicates.Compound.{And, Check, Not}
-import Planning.UnitMatchers.{UnitMatchCustom, UnitMatchOr, UnitMatchWarriors}
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpMatchingRatio}
+import Planning.Plans.Macro.Automatic.{Enemy, Friendly, Pump, PumpMatchingRatio}
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
+import Planning.Predicates.Compound.{And, Not}
+import Planning.Predicates.Economy.{GasAtMost, MineralsAtLeast}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio}
 import Planning.Predicates.Strategy.Employing
+import Planning.UnitMatchers.{UnitMatchCustom, UnitMatchOr, UnitMatchWarriors}
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Protoss.{PvT1015Expand, PvT13Nexus, PvTEarly1015GateGoonDT, PvTEarly1GateStargateTemplar}
+import Strategery.Strategies.Protoss.{PvT1015Expand, PvTEarly1015GateGoonDT, PvTEarly1GateStargateTemplar}
 
 object PvTIdeas {
   
@@ -40,25 +40,21 @@ object PvTIdeas {
       new Employing(PvTEarly1015GateGoonDT),
       new Employing(PvTEarly1GateStargateTemplar),
       new MiningBasesAtLeast(3),
+      new EnemyBasesAtLeast(2),
       new EnemyBio,
       new Not(new EnemyHasShown(Terran.Vulture)),
-      new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true),
-      new UnitsAtLeast(20, UnitMatchWarriors, complete = true)),
+      new UnitsAtLeast(12, UnitMatchWarriors, complete = true),
+      new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true)),
     new ConsiderAttacking)
-  
+
   class EmergencyBuilds extends Parallel(
-    new If(
-      new And(new Employing(PvT13Nexus), new EnemiesAtLeast(1, Terran.Marine), new UnitsAtMost(0, Protoss.CyberneticsCore, complete = true)),
-      new Parallel(
-        new Pump(Protoss.Zealot),
-        new Build(Get(2, Protoss.Gateway)))))
+    // Should add 2-Fac/BBS/Bunker rush/Worker rush reactions
+  )
   
-  class PumpMinimumDragoons extends PumpMatchingRatio(
-    Protoss.Dragoon, 1, 20,
-    Seq(
-      Enemy(Terran.Vulture, 0.6),
-      Enemy(Terran.Wraith, 0.5)))
-  
+  class TrainMinimumDragoons extends Parallel(
+    new PumpMatchingRatio(Protoss.Dragoon, 1, 3, Seq(Enemy(Terran.Vulture, 1.0), Enemy(Terran.Wraith, 1.0))),
+    new PumpMatchingRatio(Protoss.Dragoon, 1, 20, Seq(Enemy(Terran.Vulture, 0.6), Enemy(Terran.Wraith, 0.5))))
+
   class TrainDarkTemplar extends If(
     new UnitsAtMost(0, UnitMatchOr(Protoss.Arbiter, Protoss.ArbiterTribunal)),
     new If(
@@ -67,7 +63,7 @@ object PvTIdeas {
         new EnemyUnitsNone(Terran.ScienceVessel),
         new EnemyUnitsNone(UnitMatchCustom((unit) => unit.is(Terran.MissileTurret) && unit.zone.owner.isNeutral))),
       new Pump(Protoss.DarkTemplar, 4)))
-  
+
   private class TrainObservers extends If(
     new UnitsAtLeast(24, UnitMatchWarriors),
     new Pump(Protoss.Observer, 4),
@@ -80,17 +76,13 @@ object PvTIdeas {
         new If(
           new UnitsAtLeast(3, UnitMatchWarriors),
           new Pump(Protoss.Observer, 1)))))
-  
-  class PumpReaversAgainstBio extends PumpMatchingRatio(Protoss.Reaver, 0, 5, Seq(Enemy(Terran.Marine, 1.0/6.0)))
-  
-  class TrainHighTemplarWithSpareGas extends If(
-    new GasAtLeast(800),
-    new Pump(Protoss.HighTemplar, maximumConcurrently = 1))
-  
+
+  class TrainReaversAgainstBio extends PumpMatchingRatio(Protoss.Reaver, 0, 5, Seq(Enemy(Terran.Marine, 1.0/6.0)))
+
   class TrainHighTemplarAgainstBio extends If(
     new EnemyBio,
     new PumpMatchingRatio(Protoss.HighTemplar, 1, 6, Seq(Enemy(Terran.Marine, 1.0/5.0))))
-  
+
   class TrainScouts extends If(
     new And(
       new EnemiesAtMost(0, Terran.Goliath),
@@ -100,7 +92,7 @@ object PvTIdeas {
       new UnitsExactly(0, Protoss.ArbiterTribunal),
       new Employing(PvTEarly1GateStargateTemplar)),
     new Pump(Protoss.Scout, 5))
-  
+
   class TrainZealotsOrDragoons extends FlipIf(
     new Or(
       new And(
@@ -111,18 +103,16 @@ object PvTIdeas {
         new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.ZealotSpeed.upgradeFrames.head._2))),
     new Pump(Protoss.Dragoon),
     new Pump(Protoss.Zealot))
-  
+
   class TrainArmy extends Parallel(
     new TrainDarkTemplar,
-    new PumpReaversAgainstBio,
+    new TrainReaversAgainstBio,
     new TrainObservers,
-    new PumpMinimumDragoons,
+    new TrainMinimumDragoons,
     new TrainHighTemplarAgainstBio,
-    new FlipIf(
-      new Check(() => With.units.countOurs(Protoss.Carrier) >= Math.max(8, 4 * With.units.countOurs(Protoss.Arbiter))),
-      new Pump(Protoss.Carrier),
-      new Pump(Protoss.Arbiter)),
-    new TrainHighTemplarWithSpareGas,
+    new PumpMatchingRatio(Protoss.Arbiter, 0, 2, Seq(Friendly(Protoss.Carrier, 1.0 / 8.0))),
+    new PumpMatchingRatio(Protoss.HighTemplar, 0, 2, Seq(Friendly(Protoss.Carrier, 1.0 / 8.0))),
+    new Pump(Protoss.Carrier),
     new TrainScouts,
     new TrainZealotsOrDragoons)
   

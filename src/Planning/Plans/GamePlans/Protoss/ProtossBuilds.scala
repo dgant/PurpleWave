@@ -270,7 +270,7 @@ object ProtossBuilds {
     Get(1,   Protoss.CyberneticsCore)
   )
   
-  val Opening13Nexus = Vector[BuildRequest] (
+  val Opening13Nexus_NoZealot_2Gate = Vector[BuildRequest] (
     Get(1,   Protoss.Nexus),
     Get(8,   Protoss.Probe),
     Get(1,   Protoss.Pylon),
@@ -313,6 +313,23 @@ object ProtossBuilds {
     Get(20,  Protoss.Probe),
     Get(4,   Protoss.Dragoon),
     Get(1,   Protoss.RoboticsFacility))
+
+  val Opening21Nexus = Vector[BuildRequest] (
+    Get(8,   Protoss.Probe),
+    Get(1,   Protoss.Pylon),
+    Get(10,  Protoss.Probe),
+    Get(1,   Protoss.Gateway),
+    Get(12,  Protoss.Probe),
+    Get(1,   Protoss.Assimilator),
+    Get(13,  Protoss.Probe),
+    Get(1,   Protoss.CyberneticsCore),
+    Get(15,  Protoss.Probe),
+    Get(2,   Protoss.Pylon),
+    Get(16,  Protoss.Probe),
+    Get(Protoss.DragoonRange),
+    Get(19,  Protoss.Probe),
+    Get(1,   Protoss.Dragoon),
+    Get(2,   Protoss.Nexus))
 
   val Opening28Nexus = Vector[BuildRequest] (
     Get(8,  Protoss.Probe),

@@ -83,7 +83,7 @@ object ZoneUpdater {
     lazy val canaryTileOutside  = zone.exit.map(_.otherSideof(zone)).flatMap(_.tiles.find(With.grids.walkable.get))
     zone.walledIn = (
       With.frame < GameTime(10, 0)()
-      && exitBuildings.exists(_.is(Terran.SupplyDepot))
+      && exitBuildings.exists(_.isAny(Terran.SupplyDepot, Terran.EngineeringBay))
       && exitBuildings.exists(_.is(Terran.Barracks))
       && canaryTileInside.exists(tileInside =>
           canaryTileOutside.exists(tileOutside =>

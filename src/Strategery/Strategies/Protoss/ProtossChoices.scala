@@ -36,6 +36,7 @@ object ProtossChoices {
   
   val pvtOpenersTransitioningFrom1Gate = Vector(
     PvT21Nexus,
+    PvT28Nexus,
     PvTFastCarrier,
     PvTDTExpand,
     PvT2GateObserver,

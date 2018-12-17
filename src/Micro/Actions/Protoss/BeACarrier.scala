@@ -31,10 +31,9 @@ object BeACarrier extends Action {
       // We can't always run from faster flying units
       if (threat.flying && threat.topSpeed >= unit.topSpeed)  return false
       
-      // We can't kite Goliaths, but we should only take shots from them when we actually want to fight
-      if (unit.agent.shouldEngage
-        && unit.interceptorCount > 2
-        && threat.pixelRangeAgainst(unit) > 32.0 * 6.0) return false
+      // We can't kite Goliaths, but we should only take shots from them when launching interceptors
+      if (interceptorsActive && ! threat.flying) return true
+      if (unit.agent.shouldEngage && threat.pixelRangeAgainst(unit) > 32.0 * 6.0) return false
       
       true
     }
@@ -45,6 +44,7 @@ object BeACarrier extends Action {
     lazy val inRangeNeedlessly  = unit.matchups.threatsInRange.exists(shouldNeverHitUs)
     lazy val safeFromThreats    = unit.matchups.threats.forall(threat => threat.pixelDistanceCenter(unit) > threat.pixelRangeAir + 8 * 32) // Protect interceptors!
     lazy val shouldFight        = interceptors > 0 && ! inRangeNeedlessly && (Yolo.active || safeFromThreats || unit.agent.shouldEngage || (interceptors > 1 && ! canLeave))
+    lazy val interceptorsActive = unit.interceptors.forall(i => interceptorActive(i) || ! i.complete)
 
     if (shouldFight) {
       // Avoid changing targets (causes interceptors to not attack)
@@ -62,7 +62,7 @@ object BeACarrier extends Action {
       }
       else {
         CarrierTarget.consider(unit)
-        if (safeFromThreats && unit.interceptors.forall(interceptorActive)) {
+        if (safeFromThreats && interceptorsActive) {
           CarrierChase.consider(unit)
         }
         Attack.consider(unit)

@@ -46,7 +46,7 @@ object Avoid extends ActionTechnique {
       return
     }
 
-    var pathLengthMax = 6
+    var pathLengthMax = 13
     if (With.configuration.enableThreatAwarePathfinding) {
       val path = With.paths.aStarThreatAware(unit, if (unit.agent.origin.zone == unit.zone) None else Some(unit.agent.origin.tileIncluding))
       if (path.pathExists && path.tiles.exists(_.size > 3)) {

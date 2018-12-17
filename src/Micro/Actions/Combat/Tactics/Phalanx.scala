@@ -3,6 +3,7 @@ package Micro.Actions.Combat.Tactics
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Disengage, Engage}
+import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Phalanx extends Action {
@@ -26,6 +27,13 @@ object Phalanx extends Action {
             && With.grids.enemyVision.isSet(post.tileIncluding)))))) {
       Engage.delegate(unit)
     }
-    Disengage.delegate(unit)
+    if (unit.matchups.threats.exists(t => ! unit.canAttack(t) || t.pixelRangeAgainst(unit) > unit.pixelRangeAgainst(t))) {
+      Disengage.delegate(unit)
+    } else if (unit.agent.toForm.forall(_.pixelDistance(unit.pixelCenter) < 2)){
+      With.commander.hold(unit)
+    } else {
+      unit.agent.toTravel = unit.agent.toForm
+      Move.delegate(unit)
+    }
   }
 }

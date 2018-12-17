@@ -11,7 +11,7 @@ import Planning.Plans.Macro.Automatic.UpgradeContinuously
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
-import Planning.Plans.Scouting.{Scout, ScoutOn}
+import Planning.Plans.Scouting.{Scout, ScoutCleared, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Never
@@ -63,7 +63,12 @@ class PvTBasic extends GameplanModeTemplate {
     new If(new Employing(PvT28Nexus),             new BuildOrder(ProtossBuilds.Opening28Nexus: _*)),
     new If(new Employing(PvT2GateObserver),       new BuildOrder(ProtossBuilds.Opening2GateObserver: _*)),
     new If(new Employing(PvTEarly1015GateGoonDT), new BuildOrder(ProtossBuilds.Opening10Gate15GateDragoonDT: _*)),
-    new If(new Employing(PvTDTExpand),            new BuildOrder(ProtossBuilds.OpeningDTExpand: _*)))
+    new If(new Employing(PvTDTExpand),            new Parallel(
+      new BuildOrder(ProtossBuilds.OpeningDTExpand_BeforeCitadel: _*),
+      new If(
+        new ScoutCleared,
+        new BuildOrder(ProtossBuilds.OpeningDTExpand_AfterCitadel: _*),
+        new BuildOrder(ProtossBuilds.OpeningDTExpand_WithoutCitadel: _*)))))
 
   class EmployingTwoBase    extends Employing(PvT2BaseCarrier, PvT2BaseArbiter)
   class EmployingThreeBase  extends Employing(PvT3BaseCarrier, PvT3BaseArbiter)
@@ -190,7 +195,9 @@ class PvTBasic extends GameplanModeTemplate {
       // No bio? Normal game plan
       new Parallel(
         new If(
-          new EmployingCarriers,
+          new And(
+            new EmployingCarriers,
+            new ScoutCleared),
           new Parallel(
             new Build(Get(Protoss.Stargate), Get(Protoss.FleetBeacon), Get(Protoss.AirDamage)),
             new If(
@@ -199,8 +206,14 @@ class PvTBasic extends GameplanModeTemplate {
                 new And(
                   new MiningBasesAtLeast(3),
                   new Employing(PvT13Nexus, PvT21Nexus, PvT28Nexus, PvT1015Expand)),
-                new Build(Get(3, Protoss.Stargate), Get(3, Protoss.Carrier)),
-                new Build(Get(2, Protoss.Stargate), Get(2, Protoss.Carrier)))))),
+                new Build(
+                  Get(3, Protoss.Stargate),
+                  Get(3, Protoss.Carrier),
+                  Get(6, Protoss.Gateway)),
+                new Build(
+                  Get(2, Protoss.Stargate),
+                  Get(2, Protoss.Carrier),
+                  Get(4, Protoss.Gateway)))))),
         new If(
           new Or(
             new EmployingArbiters,
@@ -251,11 +264,7 @@ class PvTBasic extends GameplanModeTemplate {
         new If(new EnemyHasShown(Terran.Wraith), new ObserverTech)),
       new Parallel(
         new TrainMinimumDragoons,
-        new LateGameTech,
-        new FlipIf(
-          new SafeAtHome,
-          new Build(Get(6, Protoss.Gateway)),
-          ))),
+        new LateGameTech)),
   
     new RequireMiningBases(3),
     new BonusTech,

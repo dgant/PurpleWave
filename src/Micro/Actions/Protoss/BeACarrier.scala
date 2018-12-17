@@ -19,7 +19,7 @@ object BeACarrier extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     def interceptorActive(interceptor: UnitInfo): Boolean = {
-      ! unit.complete || unit.order == Orders.InterceptorAttack
+      ! unit.complete || (unit.order == Orders.InterceptorAttack)
     }
     def airToAirSupply(units: Seq[UnitInfo]): Double = {
       units.map(u => if (u.flying) u.unitClass.supplyRequired else 0).sum
@@ -32,7 +32,8 @@ object BeACarrier extends Action {
       if (threat.flying && threat.topSpeed >= unit.topSpeed)  return false
       
       // We can't kite Goliaths, but we should only take shots from them when launching interceptors
-      if (interceptorsActive && ! threat.flying) return true
+      // and if we can afford to take some damage
+      if ((interceptorsActive || unit.totalHealth < unit.unitClass.maxHitPoints) && ! threat.flying) return true
       if (unit.agent.shouldEngage && threat.pixelRangeAgainst(unit) > 32.0 * 6.0) return false
       
       true
@@ -44,7 +45,7 @@ object BeACarrier extends Action {
     lazy val inRangeNeedlessly  = unit.matchups.threatsInRange.exists(shouldNeverHitUs)
     lazy val safeFromThreats    = unit.matchups.threats.forall(threat => threat.pixelDistanceCenter(unit) > threat.pixelRangeAir + 8 * 32) // Protect interceptors!
     lazy val shouldFight        = interceptors > 0 && ! inRangeNeedlessly && (Yolo.active || safeFromThreats || unit.agent.shouldEngage || (interceptors > 1 && ! canLeave))
-    lazy val interceptorsActive = unit.interceptors.forall(i => interceptorActive(i) || ! i.complete)
+    lazy val interceptorsActive = unit.interceptors.count(interceptorActive) >= unit.interceptors.size / 2
 
     if (shouldFight) {
       // Avoid changing targets (causes interceptors to not attack)

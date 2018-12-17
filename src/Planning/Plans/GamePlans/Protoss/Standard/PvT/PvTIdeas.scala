@@ -93,16 +93,18 @@ object PvTIdeas {
       new Employing(PvTEarly1GateStargateTemplar)),
     new Pump(Protoss.Scout, 5))
 
-  class TrainZealotsOrDragoons extends FlipIf(
-    new Or(
-      new And(
-        new MineralsAtLeast(600),
-        new GasAtMost(200)),
-      new And(
-        new UnitsAtLeast(12, Protoss.Dragoon),
-        new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.ZealotSpeed.upgradeFrames.head._2))),
-    new Pump(Protoss.Dragoon),
-    new Pump(Protoss.Zealot))
+  class TrainZealotsOrDragoons extends Parallel(
+    new FlipIf(
+      new Or(
+        new And(
+          new MineralsAtLeast(600),
+          new GasAtMost(200)),
+        new And(
+          new UnitsAtLeast(12, Protoss.Dragoon),
+          new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.ZealotSpeed.upgradeFrames.head._2))),
+      new Pump(Protoss.Dragoon),
+      new Pump(Protoss.Zealot)),
+    new IfOnMiningBases(3, new Pump(Protoss.Zealot)))
 
   class TrainArmy extends Parallel(
     new TrainDarkTemplar,

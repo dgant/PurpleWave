@@ -11,6 +11,7 @@ abstract class AbstractFingerprintQuantityBy(
 
   def observed: Int = {
     With.units.countEverP(u => u.isEnemy
-      && (u.is(unitMatcher) && u.completionFrame <= gameTime.frames)
+      && (u.is(unitMatcher) && u.completionFrame <= gameTime.frames))
+      //TODO: Maybe use completion/arrival time of produced units
   }
 }

@@ -72,7 +72,7 @@ object StrategyGroups {
 }
 
 class TestingPlaybook extends EmptyPlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvTDTExpand, PvT2BaseArbiter)
+  override lazy val forced: Seq[Strategy] = Seq(PvZGatewayFE, PvZMidgame5GateGoon)
   override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
 }
@@ -85,4 +85,4 @@ class SSCAITPlaybook extends PurpleWavePlaybook {
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionSSCAIT
 }
 
-object Playbook extends SSCAITPlaybook {}
+object Playbook extends TestingPlaybook {}

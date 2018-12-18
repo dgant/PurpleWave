@@ -57,9 +57,7 @@ class GoalDefendZone extends GoalBasic {
   private val huntableEnemies = new Cache(() => {
     val huntableInZone = squad.enemies.filter(e => e.zone == zone && huntableFilter(e))
     if (huntableInZone.nonEmpty) huntableInZone else squad.enemies.filter(huntableFilter)
-  }
-
-  )
+  })
   
   def huntEnemies() {
     lazy val home = ByOption.minBy(zone.bases.filter(_.owner.isUs).map(_.heart))(_.groundPixels(zone.centroid))

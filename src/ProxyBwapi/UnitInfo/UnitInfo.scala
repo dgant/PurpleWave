@@ -166,7 +166,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def addonArea:            TileRectangle = TileRectangle(Tile(0, 0), Tile(2, 2)).add(tileTopLeft).add(4,1)
   
   def zone: Zone = cacheZone()
-  private val cacheZone = new Cache(() => pixelCenter.zone)
+  // Hack to get buildings categorized in zone they were intended to be constructed in
+  private val cacheZone = new Cache(() => if (unitClass.isBuilding) topLeft.zone else pixelCenter.zone)
   
   def base: Option[Base] = cacheBase()
   private val cacheBase = new Cache(() => pixelCenter.base)

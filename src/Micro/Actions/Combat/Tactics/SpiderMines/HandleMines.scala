@@ -57,7 +57,10 @@ object HandleMines extends Action{
     }
   }
 
-  protected def isRelevantMine(unit: FriendlyUnitInfo, other: UnitInfo): Boolean = {
-    other.isEnemy && other.is(Terran.SpiderMine) && unit.pixelDistanceEdge(other) < 32 * 5
-  }
+  protected def isRelevantMine(unit: FriendlyUnitInfo, other: UnitInfo): Boolean = (
+    other.isEnemy
+    && other.is(Terran.SpiderMine)
+    && unit.pixelDistanceEdge(other) < 32 * 5
+    && ( ! unit.agent.canFocus || ! other.effectivelyCloaked)
+  )
 }

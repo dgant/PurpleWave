@@ -48,6 +48,8 @@ class PvTBasic extends GameplanModeTemplate {
           new UnitsAtMost(1, Protoss.Arbiter, complete = true)),
         new Aggression(0.9),
         new Aggression(1.0)))
+
+  override def meldArchonsAt: Int = 25
   
   override def defaultScoutPlan: Plan = new Parallel(
     new If(new Employing(PvT13Nexus),             new ScoutOn(Protoss.Nexus, quantity = 2)),
@@ -295,6 +297,7 @@ class PvTBasic extends GameplanModeTemplate {
     new Build(Get(10, Protoss.Gateway)),
     new RequireMiningBases(4),
     new Build(Get(16, Protoss.Gateway)),
+    new Build(Get(3, Protoss.Stargate)),
     new RequireMiningBases(5),
     new Build(Get(24, Protoss.Gateway)),
     new UpgradeContinuously(Protoss.HighTemplarEnergy),

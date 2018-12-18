@@ -5,7 +5,7 @@ import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.Shapes.Circle
 import Performance.{Cache, UnitCounter}
 import Planning.UnitMatchers.UnitMatcher
-import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, HistoricalUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 
 import scala.collection.mutable.ListBuffer
 
@@ -41,7 +41,7 @@ class UnitTracker {
   def existsEver(matcher: UnitMatcher*): Boolean = countEver(matcher: _*) > 0
   def countEver(matcher: UnitMatcher*): Int = counterEver(matcher: _*) + countOurs(matcher: _*) + countEnemy(matcher: _*)
   def countEverP(predicate: (UnitInfo) => Boolean): Int = counterEver.p(predicate) + countOursP(predicate) + countEnemyP(predicate)
-  def ever: Iterable[HistoricalUnitInfo] = historicalUnitTracker.all
+  def ever: Iterable[UnitInfo] = all ++ historicalUnitTracker.all
   
   def neutral: Set[ForeignUnitInfo] = foreignUnitTracker.neutralUnits
   

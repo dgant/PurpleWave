@@ -432,6 +432,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   protected class CacheIs(unitClass: UnitClass) extends Cache(() => is(unitClass))
   lazy val isSpiderMine         : CacheIs = new CacheIs(Terran.SpiderMine)
   lazy val isBunker             : CacheIs = new CacheIs(Terran.Bunker)
+  lazy val isCommandCenter      : CacheIs = new CacheIs(Terran.CommandCenter)
   lazy val isMarine             : CacheIs = new CacheIs(Terran.Marine)
   lazy val isGhost              : CacheIs = new CacheIs(Terran.Ghost)
   lazy val isVulture            : CacheIs = new CacheIs(Terran.Vulture)

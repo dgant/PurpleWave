@@ -40,13 +40,10 @@ class GoalAttack extends GoalBasic {
     target =
       ByOption
         .maxBy(With.geography.enemyBases)(base => {
-          val age                 = With.framesSince(base.lastScoutedFrame)
-          val resources           = base.mineralsLeft + base.gasLeft
           val distance            = With.intelligence.threatOrigin.pixelCenter.pixelDistance(base.heart.pixelCenter)
-          val resourcesProjected  = Math.max(resources / 4.0, resources - With.economy.incomePerFrameMinerals * 20 * age)
           val distanceLog         = 1 + Math.log(1 + distance)
           val defendersLog        = 1 + Math.log(1 + base.defenseValue)
-          val output              = (1.0 + resourcesProjected) / distanceLog / defendersLog
+          val output              = distanceLog / defendersLog
           output
         })
         .map(base => ByOption.minBy(base.units.filter(u => u.isEnemy && u.unitClass.isBuilding))(_.pixelDistanceCenter(base.townHallArea.midPixel))

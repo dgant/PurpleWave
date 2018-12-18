@@ -10,10 +10,10 @@ import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio}
-import Planning.Predicates.Strategy.Employing
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchCustom, UnitMatchOr, UnitMatchSiegeTank, UnitMatchWarriors}
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Protoss.{PvT1015Expand, PvT1015DT, PvTStove}
+import Strategery.Strategies.Protoss.{PvT1015DT, PvT1015Expand, PvTStove}
 
 object PvTIdeas {
   
@@ -56,10 +56,14 @@ object PvTIdeas {
     new PumpMatchingRatio(Protoss.Dragoon, 1, 20, Seq(Enemy(Terran.Vulture, 0.6), Enemy(Terran.Wraith, 0.5))))
 
   class TrainDarkTemplar extends If(
-    new UnitsAtMost(0, UnitMatchOr(Protoss.Arbiter, Protoss.ArbiterTribunal)),
+    new Or(
+      new UnitsAtMost(0, UnitMatchOr(Protoss.Arbiter, Protoss.ArbiterTribunal)),
+      new And(
+        new UnitsAtMost(0, Protoss.Arbiter, complete = true),
+        new EnemyStrategy(With.fingerprints.twoFac))),
     new If(
       new And(
-        new EnemiesAtMost(5, Terran.Vulture),
+        new EnemiesAtMost(8, Terran.Vulture),
         new EnemyUnitsNone(Terran.ScienceVessel),
         new EnemyUnitsNone(UnitMatchCustom((unit) => unit.is(Terran.MissileTurret) && unit.zone.owner.isNeutral))),
       new Pump(Protoss.DarkTemplar, 4)))

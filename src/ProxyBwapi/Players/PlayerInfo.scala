@@ -1,8 +1,10 @@
 package ProxyBwapi.Players
 
 import Debugging.Visualizations.Colors
+import Information.Geography.Types.Base
 import Lifecycle.With
 import Performance.Cache
+import ProxyBwapi.UnitInfo.UnitInfo
 import ProxyBwapi.Upgrades.Upgrade
 import bwapi.{Player, Race}
 
@@ -16,7 +18,7 @@ case class PlayerInfo(basePlayer: Player) extends PlayerProxy(basePlayer) {
     permanentRace.getOrElse(raceInitial)
   })
   
-def isTerran              : Boolean = raceCurrent == Race.Terran
+  def isTerran            : Boolean = raceCurrent == Race.Terran
   def isProtoss           : Boolean = raceCurrent == Race.Protoss
   def isZerg              : Boolean = raceCurrent == Race.Zerg
   def isUnknownOrTerran   : Boolean = raceCurrent == Race.Unknown || raceCurrent == Race.Terran
@@ -61,6 +63,8 @@ def isTerran              : Boolean = raceCurrent == Race.Terran
     else if (isNeutral) Colors.NeonTeal
     else if (isAlly)    Colors.NeonBlue
     else                Colors.NeonRed
-  
+
+  def bases: Vector[Base] = With.geography.bases.filter(_.owner == this)
+
   override def toString: String = name
 }

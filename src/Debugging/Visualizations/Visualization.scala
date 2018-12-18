@@ -27,7 +27,8 @@ class Visualization {
     ShowUnitsAll,
     ShowUnitsFriendly,
     ShowUnitsForeign,
-    ShowExplosions
+    ShowExplosions,
+    ShowFingerprints
   )
   
   var enabled   : Boolean = _

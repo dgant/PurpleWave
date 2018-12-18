@@ -65,7 +65,8 @@ object ZoneUpdater {
       .map(_.townHallArea.startInclusive)
       .getOrElse(SpecificPoints.tileMiddle)
   }
-  
+
+  private val wallBuildingThresholdDistanceSquared = Math.pow(32 * 6, 2)
   def updateZone(zone: Zone) {
     zone.units = zone.unitBuffer.toVector
     zone.distanceGrid.initialize()
@@ -75,7 +76,7 @@ object ZoneUpdater {
   
     val exitBuildings = zone.exit.map(exit =>
       zone.units
-        .filter(_.pixelDistanceSquared(exit.pixelCenter) < 100)
+        .filter(_.pixelDistanceSquared(exit.pixelCenter) < wallBuildingThresholdDistanceSquared)
         .filter(u => u.unitClass.isBuilding && ! u.flying))
       .getOrElse(List.empty)
   

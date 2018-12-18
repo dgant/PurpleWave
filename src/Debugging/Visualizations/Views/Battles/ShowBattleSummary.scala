@@ -18,7 +18,7 @@ object ShowBattleSummary extends View {
   private val army0         = Pixel(438, 18)
   private val army1         = Pixel(521, 18)
   private val army2         = Pixel(589, 18)
-  private val yolo          = Pixel(310, 230)
+  private val yolo          = Pixel(610, 230)
   private val tacticsRanks  = Pixel(235, 18)
   
   override def renderScreen() {

@@ -254,7 +254,7 @@ trait GoalBasic extends SquadGoal {
       filterCandidates(candidates, enemyQuality)
         .toVector
         .sortBy(unit =>
-          (if (squad.previousUnits.contains(unit)) 1.0 else 1.75) // stickiness
+          (if (squad.previousUnits.contains(unit)) 1.0 else 2.0) // stickiness
           * unit.pixelDistanceTravelling(destination))
   }
   

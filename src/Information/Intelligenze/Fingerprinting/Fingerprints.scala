@@ -2,6 +2,7 @@ package Information.Intelligenze.Fingerprinting
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Information.Intelligenze.Fingerprinting.ProtossStrategies._
+import Information.Intelligenze.Fingerprinting.TerranStrategies._
 import Information.Intelligenze.Fingerprinting.ZergStrategies._
 import Lifecycle.With
 
@@ -10,6 +11,13 @@ import scala.collection.mutable
 class Fingerprints {
   
   def update() {
+    if (With.enemies.exists(_.isTerran)) {
+      twoFac
+      twoFacVultures
+      threeFac
+      threeFacVultures
+      siegeExpand
+    }
     if (With.enemies.exists(_.isProtoss)) {
       gatewayFirst
       earlyForge
@@ -35,14 +43,21 @@ class Fingerprints {
       all.foreach(_.update())
     }
   }
-  
+
   val all: mutable.ArrayBuffer[Fingerprint] = new mutable.ArrayBuffer[Fingerprint]
-  
+
   private def addFingerprint(fingerprint: Fingerprint): Fingerprint = {
     all += fingerprint
     fingerprint
   }
-  
+
+  // Terran
+  lazy val twoFac           = addFingerprint(new Fingerprint2Fac)
+  lazy val twoFacVultures   = addFingerprint(new Fingerprint2FacVultures)
+  lazy val threeFac         = addFingerprint(new Fingerprint3Fac)
+  lazy val threeFacVultures = addFingerprint(new Fingerprint3FacVultures)
+  lazy val siegeExpand      = addFingerprint(new FingerprintSiegeExpand)
+
   // Protoss
   lazy val gatewayFirst = addFingerprint(new FingerprintGatewayFirst)
   lazy val earlyForge   = addFingerprint(new FingerprintEarlyForge)

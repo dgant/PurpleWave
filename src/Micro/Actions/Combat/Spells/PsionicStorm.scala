@@ -29,7 +29,7 @@ object PsionicStorm extends TargetedSpell {
       Zerg.Egg,
       Zerg.LurkerEgg)) return 0.0
 
-    val expectedAccuracy  = PurpleMath.clamp(Terran.Marine.topSpeed / target.topSpeed, 0.3, 1.0)
+    val expectedAccuracy  = PurpleMath.clamp(Terran.Marine.topSpeed / target.topSpeed, 0.2, 1.0)
     val multiplierValue   = Math.min(target.subjectiveValue, Protoss.Observer.subjectiveValue)
     val multiplierDamage  = (Math.min(expectedAccuracy * 112.0, target.totalHealth) / target.unitClass.maxTotalHealth)
     val multiplierPlayer  = (if (target.isEnemy) 1.0 else -3.0)

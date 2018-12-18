@@ -25,7 +25,7 @@ object ShuttlePickup extends Action {
     val pickupCandidate = ByOption.maxBy(pickupCandidates)(c => Shuttling.pickupNeed(shuttle, c) / (1.0 + c.pixelDistanceSquared(shuttle)))
     pickupCandidate.foreach(hailer => {
       shuttle.agent.claimPassenger(hailer)
-      if (hailer.pixelDistanceTravelling(Shuttling.passengerDestination(hailer)) > Shuttling.dropoffRadius + 96
+      if (hailer.pixelDistanceTravelling(Shuttling.passengerDestination(hailer)) > Shuttling.dropoffRadius + 128
         || hailer.matchups.threatsInRange.nonEmpty) {
         shuttle.agent.pickup(hailer)
       }

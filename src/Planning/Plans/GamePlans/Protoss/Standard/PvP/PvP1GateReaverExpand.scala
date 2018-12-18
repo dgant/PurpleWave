@@ -15,11 +15,11 @@ import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, 
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvPOpen1GateReaverExpand
+import Strategery.Strategies.Protoss.PvP1GateReaverExpand
 
 class PvP1GateReaverExpand extends GameplanModeTemplate {
   
-  override val activationCriteria: Predicate = new Employing(PvPOpen1GateReaverExpand)
+  override val activationCriteria: Predicate = new Employing(PvP1GateReaverExpand)
   override val completionCriteria: Predicate = new Latch(new And(new UnitsAtLeast(2, Protoss.Nexus), new UnitsAtLeast(1, Protoss.RoboticsSupportBay)))
   
   override def defaultWorkerPlan: Plan = new PumpWorkers(true)

@@ -20,16 +20,16 @@ class EmptyPlaybook {
   val strategyOrder: Seq[Strategy] = Vector(
     PvEIslandPlasmaCarriers1Base,
     PvPLateGame2BaseReaverCarrier_SpecificMaps,
-    PvTEarly1015GateGoonDT,
+    PvT1015DT,
     PvT2GateObserver,
     PvT13Nexus,
     PvT21Nexus,
     PvT3BaseArbiter,
     PvT2BaseCarrier,
-    PvPOpen2Gate1012,
-    PvPOpen2GateDTExpand,
+    PvP2Gate1012,
+    PvPGateDTExpand,
     PvZ4Gate99,
-    PvZEarlyFFEEconomic,
+    PvZFFEEconomic,
     PvZMidgame5GateGoon,
     PvROpen2Gate910,
     PvROpen2Gate1012
@@ -43,7 +43,7 @@ object StrategyGroups {
     WorkerRush,
     WorkerRushLiftoff,
     ProxyDarkTemplar,
-    PvZEarlyFFEConservative,
+    PvZFFEConservative,
     PvZMidgameNeoBisu,
     TvR1Rax,
     TvRTinfoil,
@@ -57,21 +57,22 @@ object StrategyGroups {
     TvZEarly1RaxFEEconomic,
     TvZEarly1RaxFEConservative,
     TvZEarly2Rax,
-    PvPOpen2Gate1012,
-    PvPOpen2GateRobo,
+    PvP2Gate1012,
+    PvP2GateRobo,
     PvPLateGame2BaseReaverCarrier_SpecificOpponents,
     PvPLateGame2BaseReaverCarrier_SpecificMaps,
     MassPhotonCannon,
     CarriersWithNoDefense,
     FivePoolProxySunkens,
-    PvPOpen2Gate1012,
-    PvPOpen1GateReaverExpand,
-    PvPLateGameCarrier
+    PvP2Gate1012,
+    PvP1GateReaverExpand,
+    PvPLateGameCarrier,
+    PvT1GateRobo
   )
 }
 
 class TestingPlaybook extends EmptyPlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvT1GateRobo, PvT2BaseCarrier)
+  override lazy val forced: Seq[Strategy] = Seq(PvTDTExpand, PvT2BaseArbiter)
   override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
 }

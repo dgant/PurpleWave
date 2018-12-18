@@ -25,7 +25,7 @@ object Stasis extends TargetedSpell {
           -2.0
         else if (target.isEnemy) (
           1.0
-          + (if (target.unitClass.isDetector) 1.5 else 0.0)
+          + (if (target.unitClass.isDetector) 2.0 else 0.0)
           + (if (target.isSiegeTankSieged()) 0.5 else if (target.isSiegeTankUnsieged()) 0.25 else 0.0)
         )
       else 0.0)

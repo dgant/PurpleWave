@@ -20,11 +20,11 @@ import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, 
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvPOpen3GateGoon
+import Strategery.Strategies.Protoss.PvP3GateGoon
 
 class PvP3GateGoon extends GameplanModeTemplate {
   
-  override val activationCriteria : Predicate = new Employing(PvPOpen3GateGoon)
+  override val activationCriteria : Predicate = new Employing(PvP3GateGoon)
   override val completionCriteria : Predicate = new Latch(new Or(new UnitsAtLeast(1, Protoss.RoboticsFacility), new UnitsAtLeast(5, Protoss.Gateway)))
   override def priorityAttackPlan : Plan = new AttackWithDarkTemplar
   override def defaultAttackPlan  : Plan = new If(new Or(new EnemyBasesAtLeast(2), new EnemiesAtMost(0, Protoss.Dragoon)), new PvPIdeas.AttackSafely)

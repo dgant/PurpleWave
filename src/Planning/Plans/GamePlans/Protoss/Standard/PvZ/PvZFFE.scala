@@ -18,23 +18,23 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchType, UnitMatchWorkers}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.{PvZEarlyFFEConservative, PvZEarlyFFEEconomic, PvZEarlyGatewayFE}
+import Strategery.Strategies.Protoss.{PvZFFEConservative, PvZFFEEconomic, PvZGatewayFE}
 
 class PvZFFE extends GameplanModeTemplate {
   
-  override val activationCriteria: Predicate = new Employing(PvZEarlyGatewayFE, PvZEarlyFFEEconomic, PvZEarlyFFEConservative)
+  override val activationCriteria: Predicate = new Employing(PvZGatewayFE, PvZFFEEconomic, PvZFFEConservative)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(1, Protoss.CyberneticsCore))
   
   override def defaultScoutPlan: Plan = new If(
     new And(
-      new Not(new Employing(PvZEarlyFFEConservative)),
+      new Not(new Employing(PvZFFEConservative)),
       new Not(new EnemyStrategy(With.fingerprints.fourPool))),
     new ScoutOn(Protoss.Pylon))
   
   override def defaultPlacementPlan: Plan = new PlacementForgeFastExpand
   
   override def defaultBuildOrder: Plan = new If(
-    new Employing(PvZEarlyGatewayFE),
+    new Employing(PvZGatewayFE),
     new If(
       new EnemyStrategy(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.overpool),
       new BuildOrder(ProtossBuilds.FFE_GatewayForgeCannonsConservative: _*),
@@ -46,7 +46,7 @@ class PvZFFE extends GameplanModeTemplate {
       new EnemyStrategy(With.fingerprints.fourPool),
       new BuildOrder(ProtossBuilds.FFE_Vs4Pool: _*),
       new If(
-        new Employing(PvZEarlyFFEConservative),
+        new Employing(PvZFFEConservative),
         new BuildOrder(ProtossBuilds.FFE_Conservative: _*),
         new If(
           new EnemyStrategy(With.fingerprints.twelveHatch),

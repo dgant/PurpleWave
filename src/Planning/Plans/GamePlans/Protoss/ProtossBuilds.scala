@@ -382,9 +382,10 @@ object ProtossBuilds {
     Get(Protoss.RoboticsSupportBay),
     Get(3,  Protoss.Dragoon),
     Get(21, Protoss.Probe),
-    Get(Protoss.Reaver),
+    Get(Protoss.ShuttleSpeed),
     Get(22, Protoss.Probe),
     Get(5,  Protoss.Pylon),
+    Get(Protoss.Reaver),
     Get(2, Protoss.Zealot),
     Get(25, Protoss.Probe),
     Get(2, Protoss.Nexus)

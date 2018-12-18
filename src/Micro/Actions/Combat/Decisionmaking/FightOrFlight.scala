@@ -73,12 +73,13 @@ object FightOrFlight extends Action {
 
     decide(true, "Anchors", () => unit.matchups.allies.exists(ally =>
       ! ally.unitClass.isWorker
+      && ! ally.friendly.exists(_.loaded)
       && (ally.canAttack || (ally.unitClass.rawCanAttack && ally.unitClass.isBuilding) || ally.is(Zerg.CreepColony))
       && ally.unitClass.topSpeed <= Protoss.HighTemplar.topSpeed
       && (ally.subjectiveValue > unit.subjectiveValue || ally.unitClass.isBuilding)
       && ally.matchups.framesOfSafety <= 12 + Math.max(0, unit.matchups.framesOfSafety)))
 
-    decide(true, "Escape", () => unit.agent.ride.exists(ride => {
+    decide(true, "Getaway", () => unit.agent.ride.exists(ride => {
       val rideDistance = Math.max(0.0, ride.pixelDistanceCenter(unit) - Shuttling.pickupRadius)
       val rideWait = PurpleMath.nanToInfinity(rideDistance / ride.topSpeed)
       rideWait <= Math.max(0.0, unit.matchups.framesOfSafety)

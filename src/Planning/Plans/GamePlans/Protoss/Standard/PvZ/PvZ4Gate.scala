@@ -23,11 +23,11 @@ import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchWarriors, UnitMatchWorkers}
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Protoss.PvZ4GateDragoonAllIn
+import Strategery.Strategies.Protoss.PvZ4Gate1012
 
 class PvZ4Gate extends GameplanModeTemplate {
   
-  override val activationCriteria     = new Employing(PvZ4GateDragoonAllIn)
+  override val activationCriteria     = new Employing(PvZ4Gate1012)
   override val completionCriteria     = new Latch(new MiningBasesAtLeast(2))
   override def buildOrder             = ProtossBuilds.OpeningTwoGate1012
   override def defaultWorkerPlan      = NoPlan()

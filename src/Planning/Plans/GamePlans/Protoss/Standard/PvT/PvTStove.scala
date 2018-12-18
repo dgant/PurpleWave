@@ -12,11 +12,11 @@ import Planning.Predicates.Milestones.{EnemyHasShown, MiningBasesAtLeast, UnitsA
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Protoss.PvTEarly1GateStargateTemplar
+import Strategery.Strategies.Protoss.PvTStove
 
 class PvTStove extends GameplanModeTemplate {
   
-  override val activationCriteria   = new Employing(PvTEarly1GateStargateTemplar)
+  override val activationCriteria   = new Employing(PvTStove)
   override val completionCriteria   = new Latch(new Or(new MiningBasesAtLeast(3), new UnitsAtLeast(1, Protoss.ArbiterTribunal)))
   override def priorityAttackPlan   = new PvTIdeas.PriorityAttacks
   override def priorityDefensePlan  = new If(new EnemyHasShown(Terran.Vulture), new DefendEntrance(Protoss.Dragoon, UnitCountOne))

@@ -14,9 +14,9 @@ object Transport extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
+    Evacuate.consider(unit)
     // TODO: restore these once we have everything working
     if ( ! With.self.isProtoss) {
-      Evacuate.consider(unit)
       DropOff.consider(unit)
       Pickup.consider(unit)
       Smuggle.consider(unit)

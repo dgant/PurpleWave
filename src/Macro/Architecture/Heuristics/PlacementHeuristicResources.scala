@@ -14,6 +14,6 @@ object PlacementHeuristicResources extends PlacementHeuristic {
     
     if (base.isEmpty) return HeuristicMathMultiplicative.default
     
-    base.get.mineralsLeft + 4 * base.get.gasLeft
+    base.get.mineralsLeft + 6 * base.get.gasLeft
   }
 }

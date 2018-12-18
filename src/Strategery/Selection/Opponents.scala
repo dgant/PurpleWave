@@ -11,18 +11,18 @@ object Opponents {
     opponent
   }
 
-  val defaultPvT  = new StrategySelectionRecommended(StrategySelectionGreedy, PvTEarly1015GateGoonDT, PvT3BaseCarrier)
-  val defaultPvP  = new StrategySelectionRecommended(StrategySelectionGreedy, PvPOpen2Gate1012, PvPLateGameArbiter)
+  val defaultPvT  = new StrategySelectionRecommended(StrategySelectionGreedy, PvT1015DT, PvT3BaseCarrier)
+  val defaultPvP  = new StrategySelectionRecommended(StrategySelectionGreedy, PvP2Gate1012, PvPLateGameArbiter)
   val defaultPvZ  = new StrategySelectionRecommended(StrategySelectionGreedy, PvZ4Gate99, PvZMidgame5GateGoon)
-  val fixedPvT    = new StrategySelectionFixed(PvTEarly1015GateGoonDT, PvT3BaseArbiter)
+  val fixedPvT    = new StrategySelectionFixed(PvT1015DT, PvT3BaseArbiter)
   val fixedPvZ    = new StrategySelectionFixed(PvZ4Gate99, PvZMidgame5GateGoon)
   val fixedPvR    = new StrategySelectionFixed(PvROpenTinfoil)
   
   val mcrave        : Opponent = add(Opponent("McRave",       StrategySelectionDynamic))
-  val titaniron     : Opponent = add(Opponent("TitanIron",    new StrategySelectionRecommended(StrategySelectionDynamic, PvTEarly1015GateGoonDT, PvT2BaseCarrier)))
-  val locutus       : Opponent = add(Opponent("Locutus",      new StrategySelectionRecommended(StrategySelectionDynamic, PvPOpenProxy2Gate, PvPLateGameArbiter)))
+  val titaniron     : Opponent = add(Opponent("TitanIron",    new StrategySelectionRecommended(StrategySelectionDynamic, PvT1015DT, PvT2BaseCarrier)))
+  val locutus       : Opponent = add(Opponent("Locutus",      new StrategySelectionRecommended(StrategySelectionDynamic, PvPProxy2Gate, PvPLateGameArbiter)))
   val tscmoo        : Opponent = add(Opponent("tscmoo",       StrategySelectionGreedy))
-  val iron          : Opponent = add(Opponent("Iron",         new StrategySelectionFixed(PvTEarly1015GateGoonDT, PvT2BaseCarrier)))
+  val iron          : Opponent = add(Opponent("Iron",         new StrategySelectionFixed(PvT1015DT, PvT2BaseCarrier)))
   val letabot       : Opponent = add(Opponent("LetaBot",      new StrategySelectionRecommended(StrategySelectionGreedy, PvTReaverCarrierCheese)))
   val steamhammer   : Opponent = add(Opponent("Steamhammer",  new StrategySelectionRecommended(StrategySelectionDynamic, PvZ4Gate99, PvZMidgame5GateGoon)))
   val microwave     : Opponent = add(Opponent("Microwave",    new StrategySelectionRecommended(StrategySelectionDynamic, PvZ4Gate99, PvZMidgame5GateGoon)))
@@ -30,7 +30,7 @@ object Opponents {
   val zzzkbot       : Opponent = add(Opponent("ZZZKBot",      fixedPvZ))
   val ualbertabot   : Opponent = add(Opponent("UAlbertaBot",  fixedPvR))
   val aiur          : Opponent = add(Opponent("Aiur",         defaultPvP)) // TODO: Fixed
-  val tyr           : Opponent = add(Opponent("Tyr",          new StrategySelectionRecommended(StrategySelectionGreedy, PvPOpen2GateDTExpand, PvPLateGameArbiter)))
+  val tyr           : Opponent = add(Opponent("Tyr",          new StrategySelectionRecommended(StrategySelectionGreedy, PvPGateDTExpand, PvPLateGameArbiter)))
   val ecgberht      : Opponent = add(Opponent("Ecgberht",     defaultPvT))
   val overkill      : Opponent = add(Opponent("Overkill",     fixedPvZ))
   val ziabot        : Opponent = add(Opponent("Ziabot",       fixedPvZ))

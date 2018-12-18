@@ -19,7 +19,7 @@ import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvPOpen2Gate1012
+import Strategery.Strategies.Protoss.PvP2Gate1012
 
 class PvP2Gate1012Expand extends GameplanModeTemplate {
   
@@ -30,7 +30,7 @@ class PvP2Gate1012Expand extends GameplanModeTemplate {
     )
   }
   
-  override val activationCriteria: Predicate = new Employing(PvPOpen2Gate1012)
+  override val activationCriteria: Predicate = new Employing(PvP2Gate1012)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(5, Protoss.Gateway))
   override def defaultAttackPlan: Plan = new PvPIdeas.AttackSafely
   override val defaultScoutPlan: Plan = new ScoutOn(Protoss.Pylon)

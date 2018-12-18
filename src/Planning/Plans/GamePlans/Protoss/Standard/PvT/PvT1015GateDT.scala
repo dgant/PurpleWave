@@ -9,11 +9,11 @@ import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvTEarly1015GateGoonDT
+import Strategery.Strategies.Protoss.PvT1015DT
 
 class PvT1015GateDT extends GameplanModeTemplate {
   
-  override val activationCriteria = new Employing(PvTEarly1015GateGoonDT)
+  override val activationCriteria = new Employing(PvT1015DT)
   override val completionCriteria = new MiningBasesAtLeast(2)
   override val aggression         = 1.2
   override val superSaturate      = true

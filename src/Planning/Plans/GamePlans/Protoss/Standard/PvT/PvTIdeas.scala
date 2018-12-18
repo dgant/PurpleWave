@@ -13,7 +13,7 @@ import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio}
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.{UnitMatchCustom, UnitMatchOr, UnitMatchSiegeTank, UnitMatchWarriors}
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Protoss.{PvT1015Expand, PvTEarly1015GateGoonDT, PvTEarly1GateStargateTemplar}
+import Strategery.Strategies.Protoss.{PvT1015Expand, PvT1015DT, PvTStove}
 
 object PvTIdeas {
   
@@ -37,8 +37,8 @@ object PvTIdeas {
   class AttackRespectingMines extends If(
     new Or(
       new Employing(PvT1015Expand),
-      new Employing(PvTEarly1015GateGoonDT),
-      new Employing(PvTEarly1GateStargateTemplar),
+      new Employing(PvT1015DT),
+      new Employing(PvTStove),
       new MiningBasesAtLeast(3),
       new EnemyBasesAtLeast(2),
       new EnemyBio,
@@ -83,7 +83,7 @@ object PvTIdeas {
       Enemy(Terran.Goliath, 1.0/6.0),
       Enemy(Terran.Vulture, 1.0/8.0))),
     new If(
-      new EnemiesAtMost(0, Terran.Wraith),
+      new EnemiesAtMost(0, UnitMatchOr(Terran.Wraith, Terran.Goliath)),
       new PumpMatchingRatio(Protoss.Reaver, 1, 4, Seq(Friendly(Protoss.Shuttle, 0.5)))))
 
   class TrainHighTemplarAgainstBio extends If(
@@ -97,7 +97,7 @@ object PvTIdeas {
       new EnemiesAtMost(8, Terran.MissileTurret),
       new UnitsExactly(0, Protoss.FleetBeacon),
       new UnitsExactly(0, Protoss.ArbiterTribunal),
-      new Employing(PvTEarly1GateStargateTemplar)),
+      new Employing(PvTStove)),
     new Pump(Protoss.Scout, 5))
 
   class TrainZealotsOrDragoons extends Parallel(
@@ -118,6 +118,7 @@ object PvTIdeas {
 
   class TrainArmy extends Parallel(
     new TrainDarkTemplar,
+    new PumpMatchingRatio(Protoss.Shuttle, 0, 1, Seq(Friendly(Protoss.Reaver, 1.0))),
     new PumpMatchingRatio(Protoss.Shuttle, 0, 2, Seq(Friendly(Protoss.Reaver, 0.5))),
     new TrainReavers,
     new TrainObservers,

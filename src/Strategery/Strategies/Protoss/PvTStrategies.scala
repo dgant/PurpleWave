@@ -21,7 +21,7 @@ abstract class PvTBasicOpener extends PvTStrategy {
 object PvT13Nexus extends PvTBasicOpener
 object PvT21Nexus extends PvTBasicOpener
 object PvT28Nexus extends PvTBasicOpener
-object PvTFastCarrier extends PvTBasicOpener {
+object PvT25BaseCarrier extends PvTBasicOpener {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
     PvT3BaseCarrier
   ))
@@ -38,7 +38,7 @@ object PvTDTExpand extends PvTBasicOpener {
     PvT3BaseCarrier
   ))
 }
-object PvTEarly1015GateGoonDT extends PvTStrategy {
+object PvT1015DT extends PvTStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     Vector(
       PvT2BaseArbiter,
@@ -52,7 +52,7 @@ object PvT3BaseCarrier extends PvTStrategy { override val mapsBlacklisted = MapG
 object PvT2BaseArbiter extends PvTStrategy { override val mapsBlacklisted = Iterable(BlueStorm) }
 object PvT3BaseArbiter extends PvTStrategy { override val mapsBlacklisted = MapGroups.badForFastThirdBases }
 
-object PvTEarly1GateStargateTemplar extends PvTStrategy {
+object PvTStove extends PvTStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     Vector(PvT2BaseArbiter))
 }

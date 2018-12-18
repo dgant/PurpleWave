@@ -27,7 +27,7 @@ class PvTFastCarrier extends GameplanModeTemplate {
   class CanProxy extends Check(() => ! With.strategy.map.exists(MapGroups.badForProxying.contains))
   class CanGoCarriers extends Check(() => 4 * Math.max(4, With.units.countOurs(Protoss.Carrier)) > With.units.countEnemy(Terran.Goliath))
 
-  override val activationCriteria     = new Employing(PvTFastCarrier)
+  override val activationCriteria     = new Employing(PvT25BaseCarrier)
   override val completionCriteria     = new Never //new Latch(new UnitsAtLeast(1, Protoss.FleetBeacon))
   override val defaultWorkerPlan      = new PumpWorkers(oversaturate = true)
   override val priorityAttackPlan     = new PvTIdeas.PriorityAttacks

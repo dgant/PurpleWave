@@ -14,7 +14,7 @@ import Planning.Predicates.Reactive.{EnemyMutalisks, SafeAtHome, SafeToMoveOut}
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Protoss.{PvZ4Gate99, PvZ4GateDragoonAllIn, PvZProxy2Gate}
+import Strategery.Strategies.Protoss.{PvZ4Gate99, PvZ4Gate1012, PvZProxy2Gate}
 
 object PvZIdeas {
 
@@ -22,7 +22,7 @@ object PvZIdeas {
     new Or(
       new SafeToMoveOut,
       new BasesAtLeast(3),
-      new Employing(PvZProxy2Gate, PvZ4Gate99, PvZ4GateDragoonAllIn)),
+      new Employing(PvZProxy2Gate, PvZ4Gate99, PvZ4Gate1012)),
     new Attack)
 
   class MeldArchonsUntilStorm extends If(

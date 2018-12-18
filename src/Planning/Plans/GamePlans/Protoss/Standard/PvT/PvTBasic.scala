@@ -16,7 +16,7 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.Employing
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
 
@@ -53,15 +53,16 @@ class PvTBasic extends GameplanModeTemplate {
     new If(new Employing(PvT13Nexus),             new ScoutOn(Protoss.Nexus, quantity = 2)),
     new If(new Employing(PvT21Nexus),             new ScoutOn(Protoss.Gateway)),
     new If(new Employing(PvT28Nexus),             new ScoutOn(Protoss.Gateway)),
+    new If(new Employing(PvT1GateRobo),           new ScoutOn(Protoss.CyberneticsCore)),
     new If(new Employing(PvT2GateObserver),       new ScoutOn(Protoss.Pylon)),
-    new If(new Employing(PvTEarly1015GateGoonDT), new If(new UpgradeStarted(Protoss.DragoonRange), new Scout)),
+    new If(new Employing(PvT1015DT), new If(new UpgradeStarted(Protoss.DragoonRange), new Scout)),
     new If(new Employing(PvTDTExpand),            new ScoutOn(Protoss.CyberneticsCore)))
   
   override val defaultAttackPlan = new Parallel(
     new If(
       new Or(
-        new Not(new Employing(PvTDTExpand)),
-        new Latch(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true)),
+        new Not(new Employing(PvTDTExpand, PvT1GateRobo)),
+        new Latch(new UnitsAtLeast(1, UnitMatchOr(Protoss.DarkTemplar, Protoss.Reaver), complete = true)),
         new UpgradeStarted(Protoss.DragoonRange)),
       new PvTIdeas.AttackRespectingMines))
   
@@ -72,7 +73,8 @@ class PvTBasic extends GameplanModeTemplate {
     new If(new Employing(PvT21Nexus),             new BuildOrder(ProtossBuilds.Opening21Nexus: _*)),
     new If(new Employing(PvT28Nexus),             new BuildOrder(ProtossBuilds.Opening28Nexus: _*)),
     new If(new Employing(PvT2GateObserver),       new BuildOrder(ProtossBuilds.Opening2GateObserver: _*)),
-    new If(new Employing(PvTEarly1015GateGoonDT), new BuildOrder(ProtossBuilds.Opening10Gate15GateDragoonDT: _*)),
+    new If(new Employing(PvT1015DT), new BuildOrder(ProtossBuilds.Opening10Gate15GateDragoonDT: _*)),
+    new If(new Employing(PvT1GateRobo),           new BuildOrder(ProtossBuilds.Opening1GateReaverPvT: _*)),
     // DT expand, but don't build a Citadel in the enemy's face
     new If(new Employing(PvTDTExpand), new Parallel(
       new BuildOrder(ProtossBuilds.OpeningDTExpand_BeforeCitadel: _*),
@@ -105,7 +107,7 @@ class PvTBasic extends GameplanModeTemplate {
     new Or(
       new EmployingThreeBase,
       new And(new EnemyBio, new PreparedForBio),
-      new Latch(new UnitsAtLeast(1, Protoss.Arbiter, complete = true)),
+      new Latch(new UnitsAtLeast(1, Protoss.Arbiter)),
       new Latch(new UnitsAtLeast(4, Protoss.Carrier))),
     new Or(
       new EnemyBasesAtLeast(2),
@@ -293,11 +295,10 @@ class PvTBasic extends GameplanModeTemplate {
     new Build(Get(10, Protoss.Gateway)),
     new RequireMiningBases(4),
     new Build(Get(16, Protoss.Gateway)),
-    new UpgradeContinuously(Protoss.HighTemplarEnergy),
-    new UpgradeContinuously(Protoss.AirDamage),
-    new UpgradeContinuously(Protoss.AirArmor),
     new RequireMiningBases(5),
     new Build(Get(24, Protoss.Gateway)),
+    new UpgradeContinuously(Protoss.HighTemplarEnergy),
+    new UpgradeContinuously(Protoss.AirDamage),
     new RequireMiningBases(6),
   )
 }

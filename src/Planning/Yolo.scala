@@ -15,7 +15,7 @@ class Yolo {
   private var lastUpdate: Int = 0
   private var maxoutFramesCharged: Int = 0
   private var maxoutYolo: Boolean = false
-  private val maxoutYoloFrameThreshold = GameTime(0, 20)()
+  private val maxoutYoloFrameThreshold = GameTime(0, 40)()
 
   private def maxouted = With.self.supplyUsed / 2 >= 192 && With.units.ours.forall(u => ! u.unitClass.isCarrier || u.interceptorCount > 7)
 

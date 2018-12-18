@@ -84,7 +84,9 @@ class Gather extends Plan {
     workersByResource.clear()
     resourceByWorker.clear()
     resources.foreach(resource => workersByResource(resource) = new mutable.ArrayBuffer[FriendlyUnitInfo])
-    workers.foreach(w => w.agent.lastIntent.toGather.foreach(resource => if (workersByResource.contains(resource)) assign(w, resource)))
+    workers.foreach(w =>
+      w.agent.lastIntent.toGather
+        .foreach(resource => if (workersByResource.contains(resource)) assign(w, resource)))
     gasWorkersNow = resourceByWorker.count(_._2.unitClass.isGas)
   }
 

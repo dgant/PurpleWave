@@ -14,11 +14,11 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvPOpen3GateRobo
+import Strategery.Strategies.Protoss.PvP3GateRobo
 
 class PvP3GateRobo extends GameplanModeTemplate {
 
-  override val activationCriteria: Predicate = new Employing(PvPOpen3GateRobo)
+  override val activationCriteria: Predicate = new Employing(PvP3GateRobo)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(2, Protoss.Nexus))
 
   override def defaultScoutPlan: Plan = new ScoutOn(Protoss.Gateway)

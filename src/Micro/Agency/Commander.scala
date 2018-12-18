@@ -167,7 +167,7 @@ class Commander {
               Math.abs(from.degreesTo(to) - from.degreesTo(mineral.pixelCenter)) < 30
             ))
         if (walkableMineral.isDefined) {
-          gather(unit, walkableMineral.get)
+          gather(unit, walkableMineral.get, allowReturningCargo = false)
           return
         }
       }
@@ -244,10 +244,10 @@ class Commander {
     sleep(unit, 24)
   }
   
-  def gather(unit: FriendlyUnitInfo, resource: UnitInfo) {
+  def gather(unit: FriendlyUnitInfo, resource: UnitInfo, allowReturningCargo: Boolean = true) {
     if (unready(unit)) return
     
-    if (unit.carryingMinerals || unit.carryingGas) {
+    if (allowReturningCargo && (unit.carryingMinerals || unit.carryingGas)) {
       if ( ! unit.gatheringGas && ! unit.gatheringMinerals) {
         unit.baseUnit.returnCargo
         sleepReturnCargo(unit)

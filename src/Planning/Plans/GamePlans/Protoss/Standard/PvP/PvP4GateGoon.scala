@@ -16,11 +16,11 @@ import Planning.Predicates.Reactive.EnemyRobo
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvPOpen4GateGoon
+import Strategery.Strategies.Protoss.PvP4GateGoon
 
 class PvP4GateGoon extends GameplanModeTemplate {
   
-  override val activationCriteria : Predicate = new Employing(PvPOpen4GateGoon)
+  override val activationCriteria : Predicate = new Employing(PvP4GateGoon)
   override val completionCriteria : Predicate = new Latch(new MiningBasesAtLeast(2))
   override def defaultAttackPlan  : Plan      = new PvPIdeas.AttackSafely
 

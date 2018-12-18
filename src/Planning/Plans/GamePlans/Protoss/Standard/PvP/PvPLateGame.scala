@@ -15,7 +15,7 @@ import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.{PvPLateGameArbiter, PvPLateGameCarrier, PvPOpen2GateDTExpand}
+import Strategery.Strategies.Protoss.{PvPLateGameArbiter, PvPLateGameCarrier, PvPGateDTExpand}
 
 class PvPLateGame extends GameplanModeTemplate {
 
@@ -115,7 +115,7 @@ class PvPLateGame extends GameplanModeTemplate {
 
     // We're dead to DTs if we don't
     new If(
-      new Employing(PvPOpen2GateDTExpand),
+      new Employing(PvPGateDTExpand),
       new BuildCannonsAtNatural(2)),
 
     new If(

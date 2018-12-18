@@ -147,11 +147,11 @@ class Agent(val unit: FriendlyUnitInfo) {
     followIntent()
     combatHysteresisFrames = Math.max(0, combatHysteresisFrames - With.framesSince(lastFrame))
     lastFrame = With.frame
-    updateRide()
+    updateRidesharing()
     Idle.consider(unit)
     cleanUp()
   }
-  
+
   private def resetState() {
     forces.clear()
     resistances.clear()
@@ -167,7 +167,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     fightReason = ""
     _umbrellas.clear()
   }
-  
+
   private def followIntent() {
     val intent    = lastIntent
     toReturn      = intent.toReturn
@@ -195,11 +195,11 @@ class Agent(val unit: FriendlyUnitInfo) {
     canCancel     = intent.canCancel
     canFocus      = intent.canFocus
   }
-  
+
   private def cleanUp() {
     shovers.clear()
   }
-  
+
   private def calculateOrigin: Pixel = {
     if (toReturn.isDefined) {
       toReturn.get
@@ -217,7 +217,7 @@ class Agent(val unit: FriendlyUnitInfo) {
       With.geography.home.pixelCenter
     }
   }
-  
+
   private def calculateDestination: Pixel = {
     if (toTravel.isDefined) {
       toTravel.get
@@ -265,7 +265,8 @@ class Agent(val unit: FriendlyUnitInfo) {
     _passengers -= passenger
     passenger.agent.shouldHopIn = false
   }
-  def updateRide(): Unit = {
+  def updateRidesharing(): Unit = {
+    _passengers --= passengers.filter(u => u.alive && u.isOurs)
     if (unit.transport.isDefined) {
       unit.transport.foreach(_.agent.claimPassenger(unit))
     } else {

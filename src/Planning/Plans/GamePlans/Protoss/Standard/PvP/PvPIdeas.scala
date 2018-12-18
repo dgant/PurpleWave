@@ -18,7 +18,7 @@ import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvPOpen4GateGoon
+import Strategery.Strategies.Protoss.PvP4GateGoon
 
 object PvPIdeas {
   
@@ -49,7 +49,7 @@ object PvPIdeas {
       new Or(
         new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
         new EnemyStrategy(With.fingerprints.cannonRush),
-        new Employing(PvPOpen4GateGoon),
+        new Employing(PvP4GateGoon),
         new MiningBasesAtLeast(3),
         new EnemyBasesAtLeast(3),
         new SafeToMoveOut),

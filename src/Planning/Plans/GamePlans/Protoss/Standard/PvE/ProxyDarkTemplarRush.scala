@@ -1,8 +1,9 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvE
 
 import Macro.Architecture.Blueprint
+import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plan
+import Planning.{Plan, ProxyPlanner}
 import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, _}
@@ -26,17 +27,14 @@ class ProxyDarkTemplarRush extends GameplanModeTemplate {
 
   // Might be the fastest possible DT rush.
   // An example: https://youtu.be/ca40eQ1s7iw
-  /*
   override def defaultPlacementPlan: Plan = new ProposePlacement {
     override lazy val blueprints: Seq[Blueprint] = Vector(
-      new Blueprint(this, building = Some(Protoss.Pylon)),
-      new Blueprint(this, building = Some(Protoss.Gateway)),
-      new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.proxyPylon),    preferZone = ProxyPlanner.proxyAutomaticSneaky),
-      new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.proxyBuilding), preferZone = ProxyPlanner.proxyAutomaticSneaky),
-      new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.proxyBuilding), preferZone = ProxyPlanner.proxyAutomaticSneaky))
-  }*/
+      new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.proxyPylon),    preferZone = ProxyPlanner.proxyMiddle),
+      new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.proxyBuilding), preferZone = ProxyPlanner.proxyMiddle),
+      new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.proxyBuilding), preferZone = ProxyPlanner.proxyMiddle))
+  }
 
-  override def defaultPlacementPlan: Plan = new Parallel(
+  def defaultPlacementPlanNewfangled: Plan = new Parallel(
     new ProposePlacement(
       new Blueprint(this, building = Some(Protoss.Pylon)),
       new Blueprint(this, building = Some(Protoss.Gateway))),
@@ -64,7 +62,7 @@ class ProxyDarkTemplarRush extends GameplanModeTemplate {
     Get(2,  Protoss.Zealot),
     Get(2,  Protoss.Pylon),
     Get(1,  Protoss.TemplarArchives),
-    Get(3,  Protoss.Gateway),
+    Get(2,  Protoss.Gateway),
     Get(15, Protoss.Probe),
     Get(4, Protoss.Gateway))
 

@@ -37,20 +37,20 @@ object ProtossChoices {
   val pvtOpenersTransitioningFrom1Gate = Vector(
     PvT21Nexus,
     PvT28Nexus,
-    PvTFastCarrier,
+    PvT25BaseCarrier,
     PvTDTExpand,
     PvT1GateRobo,
     PvT2GateObserver,
     PvT1015Expand,
-    PvTEarly1015GateGoonDT,
-    PvTEarly1GateStargateTemplar
+    PvT1015DT,
+    PvTStove
   )
   
   val pvtOpenersTransitioningFrom2Gate = Vector(
     PvT21Nexus,
     PvT2GateObserver,
     PvT1015Expand,
-    PvTEarly1015GateGoonDT
+    PvT1015DT
   )
   
   val pvtOpenersWithTransitions: Vector[Strategy] = (pvtOpenersTransitioningFrom1Gate ++ pvtOpenersTransitioningFrom2Gate).distinct
@@ -62,21 +62,21 @@ object ProtossChoices {
   /////////
   
   val pvpOpenersWithoutTransitions = Vector(
-    PvPOpen2GateDTExpand,
-    PvPOpenProxy2Gate
+    PvPGateDTExpand,
+    PvPProxy2Gate
   )
   
   val pvpOpenersTransitioningFrom2Gate = Vector(
-    PvPOpen2Gate1012,
-    PvPOpen2Gate1012Goon
+    PvP2Gate1012,
+    PvP2Gate1012Goon
   )
   
   val pvpOpenersTransitioningFrom1GateCore = Vector(
-    PvPOpen1GateReaverExpand,
-    PvPOpen2GateRobo,
-    PvPOpen3GateRobo,
-    PvPOpen3GateGoon,
-    PvPOpen4GateGoon
+    PvP1GateReaverExpand,
+    PvP2GateRobo,
+    PvP3GateRobo,
+    PvP3GateGoon,
+    PvP4GateGoon
   )
   
   val pvpOpenersAll: Vector[Strategy] = (pvpOpenersWithoutTransitions ++ pvpOpenersTransitioningFrom2Gate ++ pvpOpenersTransitioningFrom1GateCore).distinct
@@ -86,20 +86,20 @@ object ProtossChoices {
   /////////
   
   val pvzOpenersWithoutTransitions = Vector(
-    PvZEarlyFFEConservative,
-    PvZEarlyFFEEconomic,
-    PvZEarlyGatewayFE,
+    PvZFFEConservative,
+    PvZFFEEconomic,
+    PvZGatewayFE,
     PvZProxy2Gate
   )
   
   val pvzOpenersTransitioningFrom1Gate = Vector(
     PvZ4Gate99,
-    PvZ4GateDragoonAllIn
+    PvZ4Gate1012
   )
-  
+
   val pvzOpenersTransitioningFrom2Gate = Vector(
     PvZ4Gate99,
-    PvZ4GateDragoonAllIn
+    PvZ4Gate1012
   )
   
   val pvzMidgameTransitioningFromOneBase = Vector(

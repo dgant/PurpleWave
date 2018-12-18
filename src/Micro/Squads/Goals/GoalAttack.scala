@@ -2,7 +2,6 @@ package Micro.Squads.Goals
 
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -34,7 +33,6 @@ class GoalAttack extends GoalBasic {
   }
   
   protected def chooseTarget(): Unit = {
-    val attackerCenter = PurpleMath.centroid(squad.units.map(_.pixelCenter))
     if (With.enemies.exists( ! _.isZerg) && With.units.countEnemy(UnitMatchWarriors) > 10 && With.geography.ourBases.exists(_.heart.tileDistanceFast(With.intelligence.threatOrigin) < With.mapTileWidth / 2)) {
       target = With.intelligence.threatOrigin.pixelCenter
       return
@@ -44,7 +42,7 @@ class GoalAttack extends GoalBasic {
         .maxBy(With.geography.enemyBases)(base => {
           val age                 = With.framesSince(base.lastScoutedFrame)
           val resources           = base.mineralsLeft + base.gasLeft
-          val distance            = attackerCenter.pixelDistance(base.heart.pixelCenter)
+          val distance            = With.intelligence.threatOrigin.pixelCenter.pixelDistance(base.heart.pixelCenter)
           val resourcesProjected  = Math.max(resources / 4.0, resources - With.economy.incomePerFrameMinerals * 20 * age)
           val distanceLog         = 1 + Math.log(1 + distance)
           val defendersLog        = 1 + Math.log(1 + base.defenseValue)

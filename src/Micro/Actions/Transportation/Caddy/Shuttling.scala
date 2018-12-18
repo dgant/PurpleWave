@@ -3,6 +3,7 @@ package Micro.Actions.Transportation.Caddy
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.Shapes.Spiral
+import Micro.Actions.Combat.Targeting.Target
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -30,7 +31,12 @@ object Shuttling {
   }
 
   def passengerTarget(passenger: FriendlyUnitInfo): Option[UnitInfo] = {
-    passenger.agent.toAttack.orElse(ByOption.minBy(passenger.matchups.targets)(_.pixelDistanceCenter(passenger)))
+    if (passenger.agent.toAttack.isDefined) return passenger.agent.toAttack
+
+    Target.delegate(passenger)
+    val output = passenger.agent.toAttack
+
+    output
   }
 
   def passengerDestination(passenger: FriendlyUnitInfo): Pixel = {
@@ -44,13 +50,14 @@ object Shuttling {
         .map(targetSnipeStart.add)
         .filter(tile => tile.valid && With.grids.walkable.get(tile))
     val targetSnipeFinal = ByOption.minBy(targetSnipeTiles)(tile => {
-      val enemyRange = 1.0 + Math.max(0.0, With.grids.enemyRange.get(tile) - With.grids.enemyRange.addedRange)
-      val enemyFactor = enemyRange * enemyRange
-      val distanceTarget = target.get.pixelCenter.groundPixels(tile.pixelCenter)
-      val distanceIdeal = if (passenger.matchups.framesOfSafety < 12) passenger.effectiveRangePixels else distanceTarget
-      val distanceOff = 1.0 + Math.max(0.0, distanceIdeal - distanceTarget)
-      val distanceFactor = distanceOff * distanceOff
-      val visionFactor = if (With.grids.enemyVision.isSet(tile)) 3 else 2
+      val enemyRange        = 1.0 + Math.max(0.0, With.grids.enemyRange.get(tile))
+      val enemyFactor       = enemyRange
+      val distanceTarget    = target.get.pixelCenter.groundPixels(tile.pixelCenter)
+      val distanceIdeal     = passenger.effectiveRangePixels
+      val distanceOff       = 1.0 + Math.abs(distanceIdeal - distanceTarget)
+      val distanceFromHere  = 1.0 + passenger.tileIncludingCenter.tileDistanceFast(tile)
+      val distanceFactor    = distanceFromHere * distanceOff * (if (passenger.loaded) 1.0 else distanceFromHere)
+      val visionFactor      = if (With.grids.enemyVision.isSet(tile)) 3 else 2
       enemyFactor * distanceFactor * visionFactor
     }).map(_.pixelCenter)
     targetSnipeFinal.getOrElse(passenger.agent.destination)

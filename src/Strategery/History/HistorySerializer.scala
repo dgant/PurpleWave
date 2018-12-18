@@ -13,11 +13,12 @@ object HistorySerializer {
   //                                                                                                  //
   //////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  val formatVersion: Int = 2
+  val formatVersion: Int = 3
   
   
   
-  // Let's roll our own half-baked CSV because the CIG deadline is in two weeks and json4s is being stubborn and we are wise, experienced developers.
+  // "Let's roll our own half-baked CSV because the CIG deadline is in two weeks and json4s is being stubborn and we are wise, experienced developers."
+  // The half-backed CSV has lasted 1.5 years now.
   val separator = ",,,"
   
   def readGames(serializedHistory: Iterable[String]): Vector[HistoricalGame] = {

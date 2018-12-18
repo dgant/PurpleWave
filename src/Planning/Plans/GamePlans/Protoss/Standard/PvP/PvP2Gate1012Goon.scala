@@ -16,11 +16,11 @@ import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvPOpen2Gate1012Goon
+import Strategery.Strategies.Protoss.PvP2Gate1012Goon
 
 class PvP2Gate1012Goon extends GameplanModeTemplate {
 
-  override val activationCriteria: Predicate = new Employing(PvPOpen2Gate1012Goon)
+  override val activationCriteria: Predicate = new Employing(PvP2Gate1012Goon)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(5, Protoss.Gateway))
   override def priorityAttackPlan: Plan = new AttackWithDarkTemplar
   override def defaultAttackPlan: Plan = new PvPIdeas.AttackSafely

@@ -1,9 +1,10 @@
 package Micro.Actions.Combat.Tactics
 
+import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Targeting.Filters.{TargetFilter, TargetFilterCombatants, TargetFilterVisibleInRange}
 import Micro.Actions.Combat.Targeting.TargetAction
-import Micro.Actions.Commands.Attack
+import Micro.Actions.Commands.{Attack, Patrol}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Potshot extends Action {
@@ -25,6 +26,11 @@ object Potshot extends Action {
   
   override def perform(unit: FriendlyUnitInfo) {
     PotshotTarget.delegate(unit)
+    unit.target.foreach(target =>
+      if (unit.unitClass.isArbiter && PurpleMath.radiansTo(unit.angleRadians, unit.pixelCenter.radiansTo(target.pixelCenter)) > Math.PI / 2) {
+        unit.agent.toTravel = Some(target.pixelCenter)
+        Patrol.delegate(unit)
+      })
     Attack.delegate(unit)
   }
 }

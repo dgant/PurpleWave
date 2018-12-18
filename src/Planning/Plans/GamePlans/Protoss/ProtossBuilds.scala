@@ -355,6 +355,40 @@ object ProtossBuilds {
     Get(22, Protoss.Probe),
     Get(2,  Protoss.Nexus),
   )
+
+  // Reference: Movie vs. Sharp: https://youtu.be/1pxD_HLpImg?t=4883
+  val Opening1GateReaverPvT = Vector[BuildRequest] (
+    Get(8,  Protoss.Probe),
+    Get(Protoss.Pylon),
+    Get(10, Protoss.Probe),
+    Get(Protoss.Gateway),
+    Get(11, Protoss.Probe),
+    Get(Protoss.Assimilator),
+    Get(13, Protoss.Probe),
+    Get(Protoss.CyberneticsCore),
+    Get(14, Protoss.Probe),
+    Get(Protoss.Zealot),
+    Get(2,  Protoss.Pylon),
+    Get(16, Protoss.Probe),
+    Get(Protoss.RoboticsFacility),
+    Get(Protoss.Dragoon),
+    Get(18, Protoss.Probe),
+    Get(3,  Protoss.Pylon),
+    Get(19, Protoss.Probe),
+    Get(2,  Protoss.Dragoon),
+    Get(20, Protoss.Probe),
+    Get(Protoss.Shuttle),
+    Get(4,  Protoss.Pylon),
+    Get(Protoss.RoboticsSupportBay),
+    Get(3,  Protoss.Dragoon),
+    Get(21, Protoss.Probe),
+    Get(Protoss.Reaver),
+    Get(22, Protoss.Probe),
+    Get(5,  Protoss.Pylon),
+    Get(2, Protoss.Zealot),
+    Get(25, Protoss.Probe),
+    Get(2, Protoss.Nexus)
+  )
   
   val Opening2GateRoboPvT = Vector[BuildRequest] (
     Get(8,   Protoss.Probe),

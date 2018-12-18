@@ -9,8 +9,6 @@ object TargetFilterStayCloaked extends TargetFilter {
   //
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
     lazy val cloaked  = actor.effectivelyCloaked
-    lazy val range    = actor.pixelRangeAgainst(target)
-    lazy val distance = actor.pixelDistanceEdge(target)
     lazy val pixel    = actor.pixelToFireAt(target)
     lazy val reveals  = With.grids.enemyDetection.isDetected(pixel.tileIncluding)
 

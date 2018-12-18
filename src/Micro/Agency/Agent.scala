@@ -123,8 +123,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   var lastFrame   : Int             = 0
   var lastClient  : Option[Plan]    = None
   var lastAction  : Option[Action]  = None
-  
-  var netEngagementValue: Double = _
+
   var movingTo: Option[Pixel] = None
   
   var pathsAll        : Traversable[PixelRay] = Seq.empty
@@ -156,7 +155,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   private def resetState() {
     forces.clear()
     resistances.clear()
-    netEngagementValue  = 1.0
     movingTo            = None
     targetingProfile    = TargetingProfiles.default
     pathsAll            = Seq.empty

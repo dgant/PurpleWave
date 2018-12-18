@@ -3,7 +3,6 @@ package Micro.Actions.Combat.Tactics.SpiderMines
 import Micro.Actions.Action
 import Micro.Actions.Combat.Targeting.Filters.TargetFilterWhitelist
 import Micro.Actions.Combat.Targeting.TargetAction
-import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Attack, Move}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 

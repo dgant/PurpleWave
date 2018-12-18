@@ -14,11 +14,12 @@ abstract class GoalAssignToBases extends GoalBasic {
   
   def peekNextBase: Base
   def takeNextBase(scout: FriendlyUnitInfo): Base
-  
+
+  protected def baseFilter: Base => Boolean = base => base.owner.isNeutral
   protected var destinationByScout: mutable.ArrayBuffer[(FriendlyUnitInfo, Pixel)] = new mutable.ArrayBuffer[(FriendlyUnitInfo, Pixel)]
   protected var destinationFrame: Int = 0
   override protected def destination: Pixel = {
-    destinationByScout.headOption.map(_._2).getOrElse(baseToPixel(With.intelligence.peekNextBaseToScout))
+    destinationByScout.headOption.map(_._2).getOrElse(baseToPixel(With.intelligence.peekNextBaseToScout(baseFilter)))
   }
   protected def baseToPixel(base: Base): Pixel = base.heart.pixelCenter
   
@@ -76,16 +77,5 @@ abstract class GoalAssignToBases extends GoalBasic {
       )
     else
       Double.MaxValue
-  }
-  
-  private def getNextScoutingBase: Option[Base] = {
-    def acceptable(base: Base) = base.owner.isNeutral && ( ! base.zone.island || With.strategy.isPlasma)
-    val baseFirst = With.intelligence.claimBaseToScout
-    var baseNext = baseFirst
-    do {
-      if (acceptable(baseNext)) return Some(baseNext)
-      baseNext = With.intelligence.claimBaseToScout
-    } while (baseNext != baseFirst)
-    None
   }
 }

@@ -48,13 +48,7 @@ object Avoid extends ActionTechnique {
   }
 
   def avoidRealPath(unit: FriendlyUnitInfo): Unit = {
-
-  }
-
-  def avoidGreedyPath(unit: FriendlyUnitInfo): Unit = {
-    var pathLengthMax = 13
-    if (With.configuration.enableThreatAwarePathfinding) {
-      val path = With.paths.aStarThreatAware(unit, if (unit.agent.origin.zone == unit.zone) None else Some(unit.agent.origin.tileIncluding))
+    val path = With.paths.aStarThreatAware(unit, if (unit.agent.origin.zone == unit.zone) None else Some(unit.agent.origin.tileIncluding))
       if (path.pathExists && path.tiles.exists(_.size > 3)) {
         // Path tiles are in REVERSE
         if (ShowUnitsFriendly.inUse && With.visualization.map) {
@@ -70,8 +64,10 @@ object Avoid extends ActionTechnique {
         Move.delegate(unit)
         return
       }
-    }
+  }
 
+  def avoidGreedyPath(unit: FriendlyUnitInfo): Unit = {
+    var pathLengthMax = 6
     val path = new ArrayBuffer[Tile]
     path += unit.tileIncludingCenter
     var bestScore = Int.MinValue

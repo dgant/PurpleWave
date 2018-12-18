@@ -14,7 +14,6 @@ import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
 import Planning.Plans.Scouting.{Scout, ScoutCleared, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Never
 import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.UnitMatchWarriors
@@ -22,9 +21,18 @@ import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
 
 class PvTBasic extends GameplanModeTemplate {
-  override val activationCriteria     = new Employing(PvT13Nexus, PvT21Nexus, PvT28Nexus, PvTDTExpand, PvT2BaseCarrier, PvT2BaseArbiter, PvT3BaseCarrier, PvT3BaseArbiter)
-  override val completionCriteria     = new Never
-  override val priorityAttackPlan     = new PvTIdeas.PriorityAttacks
+  override val activationCriteria = new Employing(
+    PvT13Nexus,
+    PvT21Nexus,
+    PvT28Nexus,
+    PvTDTExpand,
+    PvT1GateRobo,
+    PvT2BaseCarrier,
+    PvT2BaseArbiter,
+    PvT3BaseCarrier,
+    PvT3BaseArbiter)
+
+  override val priorityAttackPlan = new PvTIdeas.PriorityAttacks
   
   override def defaultAggressionPlan: Plan =
     new If(
@@ -49,12 +57,13 @@ class PvTBasic extends GameplanModeTemplate {
     new If(new Employing(PvTEarly1015GateGoonDT), new If(new UpgradeStarted(Protoss.DragoonRange), new Scout)),
     new If(new Employing(PvTDTExpand),            new ScoutOn(Protoss.CyberneticsCore)))
   
-  override val defaultAttackPlan = new If(
-    new Or(
-      new Not(new Employing(PvTDTExpand)),
-      new Latch(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true)),
-      new UpgradeStarted(Protoss.DragoonRange)),
-    new PvTIdeas.AttackRespectingMines)
+  override val defaultAttackPlan = new Parallel(
+    new If(
+      new Or(
+        new Not(new Employing(PvTDTExpand)),
+        new Latch(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true)),
+        new UpgradeStarted(Protoss.DragoonRange)),
+      new PvTIdeas.AttackRespectingMines))
   
   override def emergencyPlans: Seq[Plan] = Vector(new PvTIdeas.EmergencyBuilds)
   
@@ -64,15 +73,21 @@ class PvTBasic extends GameplanModeTemplate {
     new If(new Employing(PvT28Nexus),             new BuildOrder(ProtossBuilds.Opening28Nexus: _*)),
     new If(new Employing(PvT2GateObserver),       new BuildOrder(ProtossBuilds.Opening2GateObserver: _*)),
     new If(new Employing(PvTEarly1015GateGoonDT), new BuildOrder(ProtossBuilds.Opening10Gate15GateDragoonDT: _*)),
-    new If(new Employing(PvTDTExpand),            new Parallel(
+    // DT expand, but don't build a Citadel in the enemy's face
+    new If(new Employing(PvTDTExpand), new Parallel(
       new BuildOrder(ProtossBuilds.OpeningDTExpand_BeforeCitadel: _*),
       new Trigger(
         new UnitsAtLeast(1, Protoss.CitadelOfAdun),
         new BuildOrder(ProtossBuilds.OpeningDTExpand_AfterCitadel: _*),
         new Trigger(
-          new Not(new ScoutCleared),
+          new And(
+            new UnitsAtLeast(2, Protoss.Nexus),
+            new Not(new ScoutCleared)),
           new BuildOrder(ProtossBuilds.OpeningDTExpand_WithoutCitadel: _*),
-          new BuildOrder(ProtossBuilds.OpeningDTExpand_AfterCitadel: _*))))))
+          new If(
+            new ScoutCleared,
+            new BuildOrder(ProtossBuilds.OpeningDTExpand_AfterCitadel: _*),
+            new BuildOrder(ProtossBuilds.OpeningDTExpand_WithoutCitadel: _*)))))))
 
   class EmployingTwoBase    extends Employing(PvT2BaseCarrier, PvT2BaseArbiter)
   class EmployingThreeBase  extends Employing(PvT3BaseCarrier, PvT3BaseArbiter)
@@ -229,7 +244,7 @@ class PvTBasic extends GameplanModeTemplate {
               Get(Protoss.TemplarArchives),
               Get(Protoss.Stargate),
               Get(Protoss.ArbiterTribunal),
-              Get(7, Protoss.Gateway)))))))
+              Get(5, Protoss.Gateway)))))))
   
   class BonusTech extends Parallel(
     new Build(
@@ -241,6 +256,7 @@ class PvTBasic extends GameplanModeTemplate {
         new GasPumpsAtLeast(3)),
       new Parallel(
         new Build(
+          Get(7, Protoss.Gateway),
           Get(2, Protoss.Stargate),
           Get(2, Protoss.Forge)),
         new ObserverTech)),
@@ -276,8 +292,13 @@ class PvTBasic extends GameplanModeTemplate {
     new BonusTech,
     new Build(Get(10, Protoss.Gateway)),
     new RequireMiningBases(4),
+    new Build(Get(16, Protoss.Gateway)),
+    new UpgradeContinuously(Protoss.HighTemplarEnergy),
+    new UpgradeContinuously(Protoss.AirDamage),
+    new UpgradeContinuously(Protoss.AirArmor),
+    new RequireMiningBases(5),
     new Build(Get(24, Protoss.Gateway)),
-    new RequireMiningBases(5)
+    new RequireMiningBases(6),
   )
 }
 

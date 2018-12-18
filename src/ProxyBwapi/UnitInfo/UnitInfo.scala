@@ -436,6 +436,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   lazy val isGhost              : CacheIs = new CacheIs(Terran.Ghost)
   lazy val isVulture            : CacheIs = new CacheIs(Terran.Vulture)
   lazy val isGoliath            : CacheIs = new CacheIs(Terran.Goliath)
+  lazy val isSiegeTankSieged    : CacheIs = new CacheIs(Terran.SiegeTankSieged)
   lazy val isSiegeTankUnsieged  : CacheIs = new CacheIs(Terran.SiegeTankUnsieged)
   lazy val isZealot             : CacheIs = new CacheIs(Protoss.Zealot)
   lazy val isDragoon            : CacheIs = new CacheIs(Protoss.Dragoon)
@@ -461,7 +462,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def pixelReachGround  (framesAhead: Int): Double = pixelsTravelledMax(framesAhead) + pixelRangeGround
   def pixelReachMax     (framesAhead: Int): Double = Math.max(pixelReachAir(framesAhead), pixelReachGround(framesAhead))
   def pixelReachAgainst (framesAhead: Int, enemy: UnitInfo): Double = if (enemy.flying) pixelReachAir(framesAhead) else pixelReachGround(framesAhead)
-  def pixelToFireAt(enemy: UnitInfo): Pixel = pixelCenter.project(enemy.pixelCenter, pixelRangeAgainst(enemy))
+  def pixelToFireAt(enemy: UnitInfo): Pixel = enemy.pixelCenter.project(pixelCenter, Math.min(pixelDistanceEdge(enemy), pixelRangeAgainst(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse))
   def inRangeToAttack(enemy: UnitInfo)                    : Boolean = pixelDistanceEdge(enemy)          <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy)          > pixelRangeMin)
   def inRangeToAttack(enemy: UnitInfo, enemyAt: Pixel)    : Boolean = pixelDistanceEdge(enemy, enemyAt) <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy, enemyAt) > pixelRangeMin)
   def inRangeToAttack(enemy: UnitInfo, framesAhead: Int)  : Boolean = inRangeToAttack(enemy, enemy.projectFrames(framesAhead))

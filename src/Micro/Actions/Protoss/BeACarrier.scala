@@ -3,7 +3,6 @@ package Micro.Actions.Protoss
 import Micro.Actions.Action
 import Micro.Actions.Commands.{Attack, AttackMove}
 import Micro.Actions.Protoss.Carrier._
-import Planning.Yolo
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
 
@@ -44,7 +43,7 @@ object BeACarrier extends Action {
     lazy val exitingLeash       = unit.matchups.targets.filter(_.matchups.framesToLive > 48).forall(_.pixelDistanceEdge(unit) > 32.0 * 7.0)
     lazy val inRangeNeedlessly  = unit.matchups.threatsInRange.exists(shouldNeverHitUs)
     lazy val safeFromThreats    = unit.matchups.threats.forall(threat => threat.pixelDistanceCenter(unit) > threat.pixelRangeAir + 8 * 32) // Protect interceptors!
-    lazy val shouldFight        = interceptors > 0 && ! inRangeNeedlessly && (Yolo.active || safeFromThreats || unit.agent.shouldEngage || (interceptors > 1 && ! canLeave))
+    lazy val shouldFight        = interceptors > 0 && ! inRangeNeedlessly && (unit.agent.shouldEngage || safeFromThreats  || (interceptors > 1 && ! canLeave))
     lazy val interceptorsActive = unit.interceptors.count(interceptorActive) >= unit.interceptors.size / 2
 
     if (shouldFight) {

@@ -39,6 +39,7 @@ object ProtossChoices {
     PvT28Nexus,
     PvTFastCarrier,
     PvTDTExpand,
+    PvT1GateRobo,
     PvT2GateObserver,
     PvT1015Expand,
     PvTEarly1015GateGoonDT,

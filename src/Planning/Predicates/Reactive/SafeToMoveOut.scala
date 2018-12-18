@@ -1,13 +1,13 @@
 package Planning.Predicates.Reactive
 
 import Lifecycle.With
+import Planning.Predicate
 import Planning.UnitMatchers.UnitMatcher
-import Planning.{Predicate, Yolo}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
 class SafeToMoveOut extends Predicate {
   override def isComplete: Boolean = {
-    if (Yolo.active) return true
+    if (With.yolo.active()) return true
     
     if (With.self.isProtoss && With.enemies.forall(_.isTerran))   return pvtSafeToAttack
     if (With.self.isProtoss && With.enemies.forall(_.isProtoss))  return pvpSafeToAttack

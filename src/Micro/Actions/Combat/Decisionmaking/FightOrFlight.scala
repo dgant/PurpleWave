@@ -5,7 +5,6 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Transportation.Caddy.Shuttling
-import Planning.Yolo
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -26,10 +25,11 @@ object FightOrFlight extends Action {
       }
     }
 
-    decide(true,  "YOLO",       () => Yolo.active)
+    decide(true,  "YOLO",       () => With.yolo.active())
     decide(true,  "Bored",      () => unit.battle.isEmpty)
     decide(true,  "No threats", () => unit.matchups.threats.isEmpty)
     decide(true,  "CantFlee",   () => ! unit.agent.canFlee)
+    decide(true,  "Hug",        () => ! unit.flying && unit.matchups.targets.exists(t => unit.pixelDistanceEdge(t) < t.pixelRangeMin))
     decide(false, "Scarabs",    () => unit.is(Protoss.Reaver) && unit.scarabCount == 0)
     decide(true,  "Cloaked",    () => unit.effectivelyCloaked)
     decide(true,  "Lurking",    () => unit.is(Zerg.Lurker) && unit.matchups.enemyDetectors.isEmpty)
@@ -101,8 +101,7 @@ object FightOrFlight extends Action {
     if (unit.agent.shouldEngage != shouldEngage) {
       unit.agent.combatHysteresisFrames = With.configuration.battleHysteresisFrames
     }
-    unit.agent.fightReason = ""
-    unit.agent.netEngagementValue = 0.0 // TODO
+    unit.agent.fightReason = "Sim"
     unit.agent.shouldEngage = shouldEngage
 
     if (With.configuration.enableMCRS) {

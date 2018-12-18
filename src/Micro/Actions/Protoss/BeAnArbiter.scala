@@ -34,8 +34,9 @@ object BeAnArbiter extends Action {
     val arbiters                = arbiter.teammates.filter(_.is(Protoss.Arbiter))
     val needUmbrella            = arbiter.teammates.toSeq.filter(needsUmbrella)
     val needUmbrellaNearby      = needUmbrella.filter(_.pixelDistanceCenter(arbiter) < umbrellaSearchRadius)
-    lazy val needUmbrellaBadly  = needUmbrellaNearby.filter(_.friendly.forall(_.agent.umbrellas.isEmpty))
+    val needUmbrellaBadly       = needUmbrellaNearby.filter(_.friendly.forall(_.agent.umbrellas.isEmpty))
     val toUmbrella              = if (arbiter.matchups.enemies.exists(_.is(Terran.ScienceVessel))) needUmbrellaBadly else needUmbrellaNearby
+    var amCovering              = false
 
     def evaluateForCloaking(target: UnitInfo): Double = {
       if ( ! target.isFriendly) return 0.0
@@ -48,7 +49,7 @@ object BeAnArbiter extends Action {
       output
     }
 
-    if (needUmbrella.nonEmpty) {
+    if (needUmbrella.nonEmpty && arbiter.battle.isDefined) {
       val destination = TargetAOE.chooseTargetPixel(
         arbiter,
         umbrellaSearchRadius,
@@ -56,31 +57,37 @@ object BeAnArbiter extends Action {
         evaluateForCloaking,
         12,
         (tile) => Circle.points(2).map(tile.add).filter(_.valid),
-        Some(needUmbrellaNearby))
-      destination.foreach(someDestination =>
+        Some(toUmbrella))
+      destination.foreach(someDestination => {
+        amCovering = true
         needUmbrella.foreach(ally => if (ally.pixelDistanceCenter(someDestination) < 32 * 7) {
           ally.friendly.foreach(_.agent.addUmbrella(arbiter))
-        }))
-      arbiter.agent.toTravel = destination.orElse(
+        })})
+
+      arbiter.agent.toReturn = destination.orElse(
         Some(needUmbrella
           .minBy(_.pixelDistanceCenter(arbiter.agent.destination))
           .pixelCenter))
+      arbiter.agent.toTravel = arbiter.agent.toReturn
     }
 
     val forceUmbrella = new Force(arbiter.agent.destination.subtract(arbiter.pixelCenter)).normalize
     val framesOfSafetyRequired = Math.max(0, 48 - With.framesSince(arbiter.lastFrameTakingDamage))
-    if (arbiter.matchups.framesOfSafety <= framesOfSafetyRequired) {
-      val forceThreat = Potential.avoidThreats(arbiter)
-      val forceEMP = Potential.avoidEmp(arbiter)
-      val resistancesTerrain = Potential.resistTerrain(arbiter)
-      arbiter.agent.forces.put(ForceColors.regrouping,  forceUmbrella)
+    if (arbiter.matchups.framesOfSafety <= framesOfSafetyRequired
+      || (arbiter.energy > 40 && arbiter.matchups.enemyDetectors.exists(e => e.is(Terran.ScienceVessel) && e.pixelDistanceEdge(arbiter) < 32 * 6))) {
+      val forceThreat         = Potential.avoidThreats(arbiter)
+      val forceEMP            = Potential.avoidEmp(arbiter)
+      val resistancesTerrain  = Potential.resistTerrain(arbiter)
+      if (amCovering) {
+        arbiter.agent.forces.put(ForceColors.regrouping, forceUmbrella)
+      }
       arbiter.agent.forces.put(ForceColors.spacing,     forceEMP)
       arbiter.agent.forces.put(ForceColors.threat,      forceThreat)
       arbiter.agent.resistances.put(ForceColors.mobility, resistancesTerrain)
       Gravitate.consider(arbiter)
       Move.delegate(arbiter)
       arbiter.agent.fightReason = "Unsafe"
-    } else if (needUmbrella.nonEmpty) {
+    } else if (amCovering) {
       Potshot.delegate(arbiter)
       val forcesThreats = arbiter.matchups.enemies
         .map(enemy =>

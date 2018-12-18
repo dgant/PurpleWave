@@ -180,6 +180,8 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val isMinerals             : Boolean = isMineralField
   lazy val isGas                  : Boolean = Vector(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this)
   lazy val isTownHall             : Boolean = Vector(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this)
+  lazy val isArbiter              : Boolean = this == Protoss.Arbiter
+  lazy val isCarrier              : Boolean = this == Protoss.Carrier
   lazy val isSiegeTank            : Boolean = this == Terran.SiegeTankSieged || this == Terran.SiegeTankUnsieged
   lazy val isStaticDefense        : Boolean = (isBuilding && attacks || this == Terran.Bunker || this == Protoss.ShieldBattery) && this != Terran.SiegeTankSieged
   lazy val isTransport            : Boolean = spaceProvided > 0 && isFlyer && this != Protoss.Carrier

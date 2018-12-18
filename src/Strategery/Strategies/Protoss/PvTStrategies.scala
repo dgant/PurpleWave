@@ -29,6 +29,7 @@ object PvTFastCarrier extends PvTBasicOpener {
 object PvT1015Expand extends PvTBasicOpener {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
 }
+object PvT1GateRobo extends PvTBasicOpener
 object PvT2GateObserver extends PvTBasicOpener
 object PvTDTExpand extends PvTBasicOpener {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(

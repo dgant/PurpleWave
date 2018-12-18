@@ -4,7 +4,6 @@ import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Techniques.Avoid
-import Planning.Yolo
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Sneak extends Action {
@@ -13,7 +12,7 @@ object Sneak extends Action {
     unit.cloaked
     && unit.canMove
     && unit.agent.canFlee
-    && ! Yolo.active
+    && ! With.yolo.active()
     && ! unit.agent.shouldEngage
     && unit.matchups.nearestArbiter.isEmpty
     && unit.matchups.enemyDetectors.isEmpty

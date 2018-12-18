@@ -58,16 +58,17 @@ class Intelligence {
        nextBasesToScoutCache.invalidate()
      }
   }
-  def peekNextBaseToScout: Base = {
+  def peekNextBaseToScout(filter: Base => Boolean = b => true): Base = {
     populateNextBasesToScout()
-    nextBasesToScoutCache().head
+    nextBasesToScoutCache().find(filter).getOrElse(nextBasesToScoutCache().head)
   }
-  def claimBaseToScout: Base = {
+  def claimBaseToScout(filter: Base => Boolean = b => true): Base = {
     populateNextBasesToScout()
-    val output = nextBasesToScoutCache().remove(0)
+    val output = peekNextBaseToScout(filter)
+    nextBasesToScoutCache() -= output
     output
   }
-  def claimBaseToScout(unit: FriendlyUnitInfo): Base = {
+  def claimBaseToScoutForUnit(unit: FriendlyUnitInfo, filter: Base => Boolean = b => true): Base = {
     populateNextBasesToScout()
     val base = nextBasesToScoutCache().maxBy(base => {
       var distance = 32.0 * 10 + unit.pixelDistanceCenter(base.heart.pixelCenter)
@@ -94,7 +95,7 @@ class Intelligence {
     var x = 0
     var y = 0
     var n = 0
-    With.units.enemy.foreach(u => if (u.attacksAgainstGround > 0) {
+    With.units.enemy.foreach(u => if (u.likelyStillThere && u.attacksAgainstGround > 0) {
       x += 32 * u.x
       y += 32 * u.y
       n += 1

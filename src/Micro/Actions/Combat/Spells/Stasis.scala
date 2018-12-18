@@ -20,13 +20,13 @@ object Stasis extends TargetedSpell {
 
     val teamValue = (
       Math.min(1.0, target.matchups.targets.size / 3.0)
-      * (if (target.base.exists(_.owner.isEnemy) && ! target.unitClass.isWorker && target.matchups.threatsInRange.isEmpty) 0.3 else 1.0)
+      * (if (target.base.exists(_.owner.isEnemy) && ! target.unitClass.isWorker && target.matchups.targetsInRange.isEmpty) 0.3 else 1.0)
       * (if (target.isFriendly)
           -2.0
         else if (target.isEnemy) (
           1.0
-          + (if (target.unitClass.isDetector) 1.0 / (1.0 + target.matchups.allyDetectors.size) else 0.0)
-          + (if (target.unitClass.isSiegeTank) 0.5 else 0.0)
+          + (if (target.unitClass.isDetector) 1.5 else 0.0)
+          + (if (target.isSiegeTankSieged()) 0.5 else if (target.isSiegeTankUnsieged()) 0.25 else 0.0)
         )
       else 0.0)
       )

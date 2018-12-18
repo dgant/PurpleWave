@@ -77,10 +77,14 @@ object PvTIdeas {
           new UnitsAtLeast(3, UnitMatchWarriors),
           new Pump(Protoss.Observer, 1)))))
 
-  class TrainReavers extends PumpMatchingRatio(Protoss.Reaver, 0, 6, Seq(
-    Enemy(Terran.Marine, 1.0/6.0),
-    Enemy(Terran.Goliath, 1.0/6.0),
-    Enemy(Terran.Vulture, 1.0/8.0)))
+  class TrainReavers extends Parallel(
+    new PumpMatchingRatio(Protoss.Reaver, 0, 6, Seq(
+      Enemy(Terran.Marine, 1.0/6.0),
+      Enemy(Terran.Goliath, 1.0/6.0),
+      Enemy(Terran.Vulture, 1.0/8.0))),
+    new If(
+      new EnemiesAtMost(0, Terran.Wraith),
+      new PumpMatchingRatio(Protoss.Reaver, 1, 4, Seq(Friendly(Protoss.Shuttle, 0.5)))))
 
   class TrainHighTemplarAgainstBio extends If(
     new EnemyBio,
@@ -123,7 +127,7 @@ object PvTIdeas {
     new PumpMatchingRatio(Protoss.HighTemplar, 0, 2, Seq(Friendly(Protoss.Carrier, 1.0 / 8.0))),
     new Pump(Protoss.Carrier),
     new Pump(Protoss.Arbiter),
-    new If(new GasAtLeast(400), new Pump(Protoss.HighTemplar, maximumConcurrently = 4)),
+    new If(new GasAtLeast(500), new Pump(Protoss.HighTemplar, maximumConcurrently = 4)),
     new TrainScouts,
     new TrainZealotsOrDragoons)
   

@@ -46,10 +46,12 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   
   private def hysteresisRatio(unit: UnitInfo): Double = {
     if (unit.friendly.isEmpty) return 0.0
-    val agent     = unit.friendly.get.agent
-    val patience  = agent.combatHysteresisFrames.toDouble / With.configuration.battleHysteresisFrames
-    val sign      = if (agent.shouldEngage) -1.0 else 1.0
-    val output    = patience * sign * With.configuration.battleHysteresisRatio * (if(unit.unitClass.melee) 2.0 else 1.0)
+    val agent               = unit.friendly.get.agent
+    val patienceHysteresis  = agent.combatHysteresisFrames.toDouble / With.configuration.battleHysteresisFrames
+    val patienceEntangled   = if (agent.shouldEngage) Math.max(0.0, unit.matchups.framesOfEntanglement) / With.configuration.battleHysteresisFrames else 0.0
+    val patienceTotal       = Math.max(patienceEntangled, patienceHysteresis)
+    val sign                = if (agent.shouldEngage) -1.0 else 1.0
+    val output              = patienceTotal * sign * With.configuration.battleHysteresisRatio * (if(unit.unitClass.melee) 2.0 else 1.0)
     output
   }
 }

@@ -16,7 +16,7 @@ import Micro.Coordination.Coordinator
 import Micro.Matchups.MatchupGraph
 import Micro.Squads.Squads
 import Performance.TaskQueue.{AbstractTaskQueue, TaskQueueGlobal}
-import Planning.Blackboard
+import Planning.{Blackboard, Yolo}
 import ProxyBwapi.Bullets.Bullets
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.ProxyBWMirror
@@ -67,6 +67,7 @@ object With {
   var units             : UnitTracker             = _
   var viewport          : Viewport                = _
   var visualization     : Visualization           = _
+  var yolo              : Yolo                    = _
   
   var self    : PlayerInfo         = _
   var neutral : PlayerInfo         = _
@@ -138,6 +139,7 @@ object With {
     units             = new UnitTracker
     viewport          = new Viewport
     visualization     = new Visualization
+    yolo              = new Yolo
     
     game.setLocalSpeed(0)
   }

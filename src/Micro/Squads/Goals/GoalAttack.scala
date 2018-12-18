@@ -4,6 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
+import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
@@ -34,6 +35,10 @@ class GoalAttack extends GoalBasic {
   
   protected def chooseTarget(): Unit = {
     val attackerCenter = PurpleMath.centroid(squad.units.map(_.pixelCenter))
+    if (With.enemies.exists( ! _.isZerg) && With.units.countEnemy(UnitMatchWarriors) > 10 && With.geography.ourBases.exists(_.heart.tileDistanceFast(With.intelligence.threatOrigin) < With.mapTileWidth / 2)) {
+      target = With.intelligence.threatOrigin.pixelCenter
+      return
+    }
     target =
       ByOption
         .maxBy(With.geography.enemyBases)(base => {

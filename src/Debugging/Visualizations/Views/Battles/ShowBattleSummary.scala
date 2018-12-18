@@ -7,7 +7,6 @@ import Information.Battles.Prediction.Prediction
 import Information.Battles.Types.BattleLocal
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Planning.Yolo
 import Utilities.ByOption
 
 object ShowBattleSummary extends View {
@@ -27,7 +26,7 @@ object ShowBattleSummary extends View {
     With.game.drawTextScreen(army1.bwapi, "+" + With.battles.global.estimationAbstractOffense.costToEnemy.toInt + " x " + "%1.2f".format(With.blackboard.aggressionRatio.get))
     With.game.drawTextScreen(army2.bwapi, "-" + With.battles.global.estimationAbstractOffense.costToUs.toInt)
     localBattle.foreach(battle => drawEstimationReport(battle.estimationSimulationAttack))
-    if (Yolo.active && With.frame / 24 % 2 == 0) {
+    if (With.yolo.active() && With.frame / 24 % 2 == 0) {
       With.game.drawTextScreen(yolo.bwapi, "YOLO")
     }
   }

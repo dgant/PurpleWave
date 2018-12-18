@@ -1,21 +1,22 @@
 package Planning.Plans.GamePlans
 
+import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.BuildRequest
-import Planning.Predicates.Compound.{Check, Not}
-import Planning.{Plan, Yolo}
+import Planning.Plan
 import Planning.Plans.Army.{RecruitFreelancers, _}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.Protoss.Situational.{CatchDTRunby, DefendAgainstProxy}
-import Planning.Predicates.Strategy.WeAreZerg
 import Planning.Plans.Macro.Automatic.{Gather, PumpWorkers, RequireSufficientSupply}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{BuildOrder, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.RemoveMineralBlocksAt
 import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Plans.Scouting.{ChillOverlords, ScoutAt, ScoutExpansionsAt}
+import Planning.Predicates.Compound.{Check, Not}
 import Planning.Predicates.Milestones.BasesAtLeast
+import Planning.Predicates.Strategy.WeAreZerg
 
 abstract class GameplanModeTemplate extends GameplanMode {
   
@@ -35,7 +36,7 @@ abstract class GameplanModeTemplate extends GameplanMode {
   def defaultWorkerPlan     : Plan              = new If(new Not(new WeAreZerg), new PumpWorkers(superSaturate))
   def defaultScoutPlan      : Plan              = new ScoutAt(14)
   def defaultScoutExposPlan : Plan              = new If(new BasesAtLeast(2), new ScoutExpansionsAt(60))
-  def defaultYoloPlan       : Plan              = new If(new Check(() => Yolo.active), new Attack)
+  def defaultYoloPlan       : Plan              = new If(new Check(() => With.yolo.active()), new Attack)
   def priorityDefensePlan   : Plan              = NoPlan()
   def priorityAttackPlan    : Plan              = NoPlan()
   def defaultNukePlan       : Plan              = new NukeBase

@@ -67,7 +67,7 @@ class PvTBasic extends GameplanModeTemplate {
         new Not(new Employing(PvTDTExpand, PvT1GateRobo)),
         new Latch(new UnitsAtLeast(1, UnitMatchOr(Protoss.DarkTemplar, Protoss.Reaver), complete = true)),
         new UpgradeStarted(Protoss.DragoonRange)),
-      new PvTIdeas.AttackRespectingMines))
+      new PvTIdeas.AttackSafely))
   
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvTIdeas.ReactToBBS,

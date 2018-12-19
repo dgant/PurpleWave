@@ -8,7 +8,7 @@ import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.CancelAll
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Predicates.Compound.{And, Not}
+import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio}
@@ -36,18 +36,22 @@ object PvTIdeas {
     new AttackWithScouts,
     new AttackWithCarrierFleet)
   
-  class AttackRespectingMines extends If(
+  class AttackSafely extends If(
     new Or(
-      new Employing(PvT1015Expand),
-      new Employing(PvT1015DT),
-      new Employing(PvTStove),
-      new MiningBasesAtLeast(3),
-      new EnemyBasesAtLeast(2),
-      new EnemyBio,
-      new Not(new EnemyHasShown(Terran.Vulture)),
-      new UnitsAtLeast(12, UnitMatchWarriors, complete = true),
-      new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true)),
-    new ConsiderAttacking)
+      new Not(new EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113)),
+      new Latch(new UnitsAtLeast(12, UnitMatchWarriors))),
+    new If(
+      new Or(
+        new Employing(PvT1015Expand),
+        new Employing(PvT1015DT),
+        new Employing(PvTStove),
+        new MiningBasesAtLeast(3),
+        new EnemyBasesAtLeast(2),
+        new EnemyBio,
+        new Not(new EnemyHasShown(Terran.Vulture)),
+        new UnitsAtLeast(12, UnitMatchWarriors, complete = true),
+        new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true)),
+      new ConsiderAttacking))
 
   class ReactToBBS extends If(
     new And(
@@ -56,10 +60,10 @@ object PvTIdeas {
     new Parallel(
       new If(
         new UnitsAtMost(1, Protoss.Gateway),
-        new CancelAll(Protoss.Nexus)),
+        new CancelAll(UnitMatchOr(Protoss.Nexus, Protoss.Stargate))),
       new RequireSufficientSupply,
       new Pump(Protoss.DarkTemplar),
-      new If(
+      new Trigger(
         new And(
           new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
           new UnitsAtLeast(7, Protoss.Zealot)),
@@ -71,15 +75,17 @@ object PvTIdeas {
         Get(12, Protoss.Probe),
         Get(2, Protoss.Gateway),
         Get(18, Protoss.Probe),
-        Get(3, Protoss.Gateway)),
-      new UpgradeContinuously(Protoss.DragoonRange),
+        Get(Protoss.ShieldBattery)),
+      new If(
+        new UnitsAtLeast(1, Protoss.Dragoon),
+        new UpgradeContinuously(Protoss.DragoonRange)),
       new Pump(Protoss.Probe),
       new Build(
         Get(Protoss.Assimilator),
         Get(Protoss.CyberneticsCore),
-        Get(Protoss.DragoonRange),
         Get(Protoss.CitadelOfAdun),
-        Get(Protoss.TemplarArchives))))
+        Get(Protoss.TemplarArchives),
+        Get(3, Protoss.Gateway))))
 
   class ReactTo2Fac extends If(
     new And(

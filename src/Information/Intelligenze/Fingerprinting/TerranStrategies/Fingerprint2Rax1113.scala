@@ -11,6 +11,11 @@ class Fingerprint2Rax1113 extends FingerprintAnd(
     new FingerprintCompleteBy(Terran.Marine,    GameTime(3,  5), 3),
     new FingerprintCompleteBy(Terran.Marine,    GameTime(3, 20), 5),
     new FingerprintCompleteBy(Terran.Marine,    GameTime(3, 40), 7),
+    new FingerprintCompleteBy(Terran.Marine,    GameTime(3, 55), 9),
+    new FingerprintCompleteBy(Terran.Marine,    GameTime(4, 10), 11),
+    new FingerprintCompleteBy(Terran.Marine,    GameTime(4, 25), 13),
     new FingerprintArrivesBy(Terran.Marine,     GameTime(3, 40), 3),
     new FingerprintArrivesBy(Terran.Marine,     GameTime(3, 55), 5),
-    new FingerprintArrivesBy(Terran.Marine,     GameTime(4, 10), 7)))
+    new FingerprintArrivesBy(Terran.Marine,     GameTime(4, 10), 7),
+    new FingerprintArrivesBy(Terran.Marine,     GameTime(4, 25), 9),
+    new FingerprintArrivesBy(Terran.Marine,     GameTime(4, 40), 11)))

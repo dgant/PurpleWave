@@ -55,8 +55,7 @@ class ExplosionTracker {
     lazy val sourceUnit   = bullet.sourceUnit
     if (someTerran && sourceUnit.exists(_.is(Terran.ScienceVessel)))
       addToBattle(sourceUnit.get, new ExplosionEMP(bullet))
-    else if (someZerg
-      && sourceUnit.exists(u => u.is(Zerg.Lurker) && u.isEnemy && u.effectivelyCloaked)) {
+    else if (someZerg && sourceUnit.exists(u => u.is(Zerg.Lurker) && u.isEnemy && u.effectivelyCloaked)) {
       addToBattle(sourceUnit.get, new ExplosionLurkerNow(bullet))
     }
     else if (someProtoss && sourceUnit.exists(_.is(Protoss.HighTemplar))) {

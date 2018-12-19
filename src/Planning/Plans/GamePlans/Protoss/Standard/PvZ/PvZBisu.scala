@@ -8,7 +8,6 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Predicates.Compound.Latch
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyHydralisks, EnemyMutalisks}
@@ -21,7 +20,7 @@ class PvZBisu extends GameplanModeTemplate {
   
   override val activationCriteria = new Employing(PvZMidgameBisu)
   override val completionCriteria = new Latch(new Or(new MiningBasesAtLeast(3), new TechComplete(Protoss.PsionicStorm)))
-  override def defaultArchonPlan: Plan = new MeldArchons(49)
+  override def defaultArchonPlan: Plan = new PvZIdeas.TemplarUpToEight
   override def defaultAttackPlan: Plan = new Parallel(
     new Attack(Protoss.Corsair),
     new Trigger(

@@ -25,10 +25,11 @@ object PvZIdeas {
       new Employing(PvZProxy2Gate, PvZ4Gate99, PvZ4Gate1012)),
     new Attack)
 
+  class TemplarUpToEight extends MeldArchons(49) { override def maximumTemplar = 8 }
+
   class MeldArchonsUntilStorm extends If(
     new TechStarted(Protoss.PsionicStorm),
-    new MeldArchons(49) {
-      override def maximumTemplar = 8 },
+    new TemplarUpToEight,
     new MeldArchons)
 
   class TakeSafeNatural extends If(
@@ -66,17 +67,12 @@ object PvZIdeas {
   
   class ReactToLurkers extends Parallel(
     new If(
-      new Or(
-        new EnemyHasShownCloakedThreat,
-        new And(
-          new SafeAtHome,
-          new EnemyHasShown(Zerg.Hydralisk),
-          new EnemyHasShown(Zerg.Lair))),
+      new EnemyHasShown(Zerg.Lurker),
       new Parallel(
         new Build(
-          Get(1, Protoss.CyberneticsCore),
-          Get(1, Protoss.RoboticsFacility),
-          Get(1, Protoss.Observatory)),
+          Get(Protoss.CyberneticsCore),
+          Get(Protoss.RoboticsFacility),
+          Get(Protoss.Observatory)),
         new Pump(Protoss.Observer, 1))),
     new If(
       new And(
@@ -96,8 +92,8 @@ object PvZIdeas {
         Get(1, Protoss.Assimilator),
         Get(1, Protoss.CyberneticsCore)),
       new Parallel(
-        new PumpMatchingRatio(Protoss.Corsair, 1, 8,   Seq(Enemy(Zerg.Mutalisk, 0.9))),
-        new PumpMatchingRatio(Protoss.Dragoon, 0, 10,  Seq(Enemy(Zerg.Mutalisk, 1.25))),
+        new PumpMatchingRatio(Protoss.Corsair, 1, 8,   Seq(Enemy(Zerg.Mutalisk, 0.8))),
+        new PumpMatchingRatio(Protoss.Dragoon, 0, 10,  Seq(Enemy(Zerg.Mutalisk, 1.25), Friendly(Protoss.Corsair, -1.0))),
         new Pump(Protoss.Stargate, 1),
         new Build(Get(Protoss.DragoonRange)))))
   

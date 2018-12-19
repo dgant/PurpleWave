@@ -96,9 +96,8 @@ object PlacementProfiles {
     preferZone                  = 100.0,
     preferNatural               = 10.0,
     preferPowering              = 0.2,
-    preferRhythm                = 0.2,
     avoidDistanceFromBase       = 1.0,
-    avoidDistanceFromIdealRange = 2.0)
+    avoidDistanceFromIdealRange = 4.0)
   
   val proxyBuilding = new PlacementProfile(
     "Proxy",

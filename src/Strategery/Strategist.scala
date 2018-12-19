@@ -10,7 +10,6 @@ import Strategery.Strategies.Protoss.ProtossChoices
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TerranChoices
 import Strategery.Strategies.Zerg.ZergChoices
-import Utilities.ByOption
 import bwapi.Race
 
 import scala.collection.mutable
@@ -57,13 +56,16 @@ class Strategist {
     1.0 / (1.0 + (game.order / With.configuration.historyHalfLife))
   )).toMap
 
-  lazy val enemyLastFingerprints: Vector[String] = {
-    ByOption.maxBy(With.history.gamesVsEnemies)(_.timestamp)
-      .map(_.strategies.toVector)
-      .getOrElse(Vector.empty)
+  lazy val enemyRecentFingerprints: Vector[String] = {
+    With.history.gamesVsEnemies
+      .toVector
+      .sortBy(-_.timestamp)
+      .take(With.configuration.recentFingerprints)
+      .flatMap(_.strategies.toVector)
       .filter(_.startsWith("Finger"))
+      .distinct
   }
-  
+
   def selectInitialStrategies: Set[Strategy] = {
     val enemyHasKnownRace = With.enemies.exists(_.raceInitial != Race.Unknown)
     val strategiesUnfiltered = if (enemyHasKnownRace) {
@@ -76,14 +78,14 @@ class Strategist {
     strategiesFiltered.foreach(evaluate)
     Playbook.strategySelectionPolicy.chooseBest(strategiesFiltered).toSet
   }
-  
+
   private def filterForcedStrategies(strategies: Iterable[Strategy]): Iterable[Strategy] = {
     if (strategies.exists(Playbook.forced.contains))
       strategies.filter(Playbook.forced.contains)
     else
       strategies
   }
-  
+
   def isAppropriate(strategy: Strategy): Boolean = {
     lazy val ourRace                  = With.self.raceInitial
     lazy val enemyRacesCurrent        = With.enemies.map(_.raceCurrent).toSet
@@ -100,7 +102,7 @@ class Strategist {
     lazy val disabledOnMap            = strategy.mapsBlacklisted.exists(_.matches) || ! strategy.mapsWhitelisted.forall(_.exists(_.matches))
     lazy val appropriateForOurRace    = strategy.ourRaces.exists(_ == ourRace)
     lazy val appropriateForEnemyRace  = strategy.enemyRaces.exists(race => if (race == Race.Unknown) enemyRaceWasUnknown else (enemyRaceStillUnknown || enemyRacesCurrent.contains(race)))
-    lazy val allowedGivenHistory      = ! strategy.responsesBlacklisted.map(_.toString).exists(enemyLastFingerprints.contains)
+    lazy val allowedGivenHistory      = ! strategy.responsesBlacklisted.map(_.toString).exists(enemyRecentFingerprints.contains)
     lazy val allowedForOpponent       = strategy.opponentsWhitelisted.forall(_
       .map(formatName)
       .exists(name =>

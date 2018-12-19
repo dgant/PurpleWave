@@ -9,5 +9,5 @@ import Strategery.Strategies.Protoss.PvZ4Gate99
 class PvZ4Gate99 extends PvZ4Gate {
   override val activationCriteria = new Employing(PvZ4Gate99)
   override def defaultScoutPlan   = new ScoutOn(Protoss.Gateway, quantity = 2)
-  override def buildOrder         = ProtossBuilds.OpeningTwoGate99
+  override def buildOrder         = ProtossBuilds.OpeningTwoGate999
 }

@@ -5,7 +5,6 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
@@ -14,14 +13,14 @@ import ProxyBwapi.Races.Protoss
 
 class PvZLateGame extends GameplanModeTemplate {
 
-  override def defaultPlacementPlan: Plan = new PlacementForgeFastExpand
-
   override def defaultAttackPlan: Plan = new Parallel(
     new Attack(Protoss.Corsair),
     new Attack(Protoss.DarkTemplar),
     new PvZIdeas.ConditionalAttack)
 
   override def emergencyPlans: Seq[Plan] = Seq(new PvZIdeas.ReactToLurkers, new PvZIdeas.ReactToMutalisks)
+
+  override def defaultArchonPlan: Plan = new PvZIdeas.TemplarUpToEight
 
   class AddPriorityTech extends Parallel(
     new Build(

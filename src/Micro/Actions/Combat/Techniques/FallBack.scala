@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Techniques
 
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
-import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object FallBack extends ActionTechnique {
@@ -18,7 +18,7 @@ object FallBack extends ActionTechnique {
   )
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
-    if (unit.is(Protoss.Zealot) && unit.matchups.threats.forall(t => t.unitClass.melee && t.topSpeed > unit.topSpeed)) return 1.0
+    if (unit.is(Protoss.Zealot) && unit.matchups.threats.exists(_.is(Zerg.Zergling))) return 1.0
     if (unit.is(Protoss.Dragoon)) return 1.0
     if (unit.is(Protoss.Reaver)) return 1.0
     if (unit.is(Terran.Vulture)) return 1.0

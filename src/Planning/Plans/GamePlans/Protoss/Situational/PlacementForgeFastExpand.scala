@@ -13,9 +13,11 @@ class PlacementForgeFastExpand extends ProposePlacement {
     val naturalZone   = naturalBase.zone
     val marginPixels  = naturalZone.exit.map(_.pixelCenter.pixelDistance(naturalBase.townHallArea.midPixel) - Protoss.Nexus.radialHypotenuse).getOrElse(128.0)
     val output = Vector(
-      new Blueprint(this, building = Some(Protoss.Pylon),           requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.defensive), marginPixels = Some(32*6)),
+      new Blueprint(this, building = Some(Protoss.Pylon),           requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.defensive), marginPixels = Some(32*4)),
       new Blueprint(this, building = Some(Protoss.Forge),           preferZone  = Some(naturalZone),  placement = Some(PlacementProfiles.defensive), marginPixels = Some(0)),
       new Blueprint(this, building = Some(Protoss.Gateway),         preferZone  = Some(naturalZone),  placement = Some(PlacementProfiles.defensive), marginPixels = Some(0)),
+      new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.defensive), marginPixels = Some(32*6)),
+      new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.defensive), marginPixels = Some(32*6)),
       new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.defensive), marginPixels = Some(32*6)),
       new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.defensive), marginPixels = Some(32*6)),
       new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.defensive), marginPixels = Some(32*6)),

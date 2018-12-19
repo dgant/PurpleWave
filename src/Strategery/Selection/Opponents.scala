@@ -30,7 +30,7 @@ object Opponents {
   val zzzkbot       : Opponent = add(Opponent("ZZZKBot",      fixedPvZ))
   val ualbertabot   : Opponent = add(Opponent("UAlbertaBot",  fixedPvR))
   val aiur          : Opponent = add(Opponent("Aiur",         defaultPvP)) // TODO: Fixed
-  val tyr           : Opponent = add(Opponent("Tyr",          new StrategySelectionRecommended(StrategySelectionGreedy, PvPGateDTExpand, PvPLateGameArbiter)))
+  val tyr           : Opponent = add(Opponent("Tyr",          new StrategySelectionRecommended(StrategySelectionGreedy, PvP2GateDTExpand, PvPLateGameArbiter)))
   val ecgberht      : Opponent = add(Opponent("Ecgberht",     defaultPvT))
   val overkill      : Opponent = add(Opponent("Overkill",     fixedPvZ))
   val ziabot        : Opponent = add(Opponent("Ziabot",       fixedPvZ))

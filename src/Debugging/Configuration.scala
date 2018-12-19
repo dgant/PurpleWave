@@ -12,7 +12,6 @@ class Configuration {
   var enablePerformanceStops          = true
   var enablePerformanceSurrender      = false
   var enableChat                      = false
-  var enableHistoryChat               = true
   var enableVisualizations            = true
   var enableStreamManners             = true
   var enableHumanManners              = false
@@ -22,10 +21,12 @@ class Configuration {
   //////////////
   // Strategy //
   //////////////
-  
+
+  var dynamicStickiness   = 3.0
   var targetWinrate       = 0.75
   var strategyRandomness  = 0.0
   var historyHalfLife     = 96.0
+  var recentFingerprints  = 3
   
   /////////////
   // Battles //

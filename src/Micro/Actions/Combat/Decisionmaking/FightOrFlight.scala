@@ -39,7 +39,7 @@ object FightOrFlight extends Action {
     decide(true,  "Scourge",    () => unit.is(Zerg.Scourge) && unit.matchups.targets.exists(target => target.canAttack(unit) && target.matchups.targetsInRange.nonEmpty))
     decide(false, "Disrupted",  () => unit.underDisruptionWeb && ! unit.flying)
     decide(false, "Swarmed",    () => unit.underDarkSwarm && ! unit.unitClass.unaffectedByDarkSwarm && unit.matchups.targetsInRange.forall(t => ! t.flying || t.underDarkSwarm))
-    decide(true,  "Hodor",      () => unit.matchups.alliesInclSelf.forall(_.base.exists(_.isOurMain)) && unit.matchups.threats.exists(_.base.exists(_.isOurMain)) && unit.matchups.threats.exists(!_.base.exists(_.isOurMain)))
+    decide(true,  "Hodor",      () => unit.matchups.alliesInclSelf.forall(_.base.exists(_.isOurMain)) && unit.matchups.threats.exists(t => ! t.flying && t.base.exists(_.isOurMain)) && unit.matchups.threats.exists(t => ! t.flying && ! t.base.exists(_.isOurMain)))
 
     decide(true, "Workers", () => unit.matchups.allies.exists(u => u.friendly.isDefined && {
       val ally = u.friendly.get

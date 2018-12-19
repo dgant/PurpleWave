@@ -9,7 +9,7 @@ import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpMatchingRatio, UpgradeCo
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
-import Planning.Predicates.Compound.Latch
+import Planning.Predicates.Compound.{And, Latch}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.Employing
@@ -25,14 +25,20 @@ class PvZ5GateGoon extends GameplanModeTemplate {
     new UpgradeComplete(Protoss.DragoonRange),
     new Attack,
     new PvZIdeas.ConditionalAttack)
-      
+
+  override def defaultArchonPlan: Plan = new PvZIdeas.MeldArchonsUntilStorm
+
   class LateTech extends Parallel(
     new Build(Get(Protoss.PsionicStorm)),
     new UpgradeContinuously(Protoss.GroundArmor),
     new UpgradeContinuously(Protoss.ObserverSpeed))
   
   override def emergencyPlans: Seq[Plan] = Seq(new PvZIdeas.ReactToLurkers)
-  
+
+  class NeedCorsairs extends And(
+    new EnemiesAtLeast(3, Zerg.Mutalisk),
+    new EnemiesAtMost(0, Zerg.Hydralisk))
+
   override def buildPlans: Seq[Plan] = Vector(
     new PvZIdeas.TakeSafeNatural,
     new PvZIdeas.AddEarlyCannons,
@@ -51,17 +57,20 @@ class PvZ5GateGoon extends GameplanModeTemplate {
         new If(
           new UnitsAtLeast(18, UnitMatchWarriors),
           new RequireMiningBases(3)),
-        new PumpMatchingRatio(Protoss.Corsair, 0, 12, Seq(Enemy(Zerg.Mutalisk, 1.0))),
+        new If(
+          new NeedCorsairs,
+          new PumpMatchingRatio(Protoss.Corsair, 0, 12, Seq(Enemy(Zerg.Mutalisk, 0.6)))),
         new PumpMatchingRatio(Protoss.Dragoon, 0, 12, Seq(Enemy(Zerg.Mutalisk, 1.0))),
         new PumpMatchingRatio(Protoss.Zealot, 2, 12, Seq(Enemy(Zerg.Zergling, 0.25))),
         new Pump(Protoss.Dragoon)),
       new Trigger(
-        new EnemiesAtLeast(3, Zerg.Mutalisk),
+        new NeedCorsairs,
         new Parallel(
           new BuildGasPumps,
           new PumpMatchingRatio(Protoss.Stargate, 0, 2, Seq(Enemy(Zerg.Mutalisk, 0.2))),
           new UpgradeContinuously(Protoss.AirDamage)))),
     new Build(Get(5, Protoss.Gateway)),
+    new BuildCannonsAtNatural(1),
     new UpgradeContinuously(Protoss.GroundDamage),
     new Build(
       Get(Protoss.CitadelOfAdun),

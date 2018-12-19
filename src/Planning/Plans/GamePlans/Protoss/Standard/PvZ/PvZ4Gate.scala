@@ -101,7 +101,9 @@ class PvZ4Gate extends GameplanModeTemplate {
       new Or(
         new MineralsAtLeast(800),
         new UnitsAtLeast(24, UnitMatchWarriors),
-        new EnemiesAtLeast(3, Zerg.SunkenColony, complete = true)),
+        new And(
+          new UnitsAtLeast(6, Protoss.Dragoon),
+          new EnemiesAtLeast(3, Zerg.SunkenColony, complete = true))),
       new RequireMiningBases(2)),
 
     new FlipIf(

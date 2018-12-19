@@ -20,7 +20,7 @@ class PvZNeoBisu extends GameplanModeTemplate {
 
   override val activationCriteria = new Employing(PvZMidgameNeoBisu)
   override val completionCriteria = new Latch(new BasesAtLeast(3))
-  override def defaultArchonPlan: Plan = new MeldArchons(49)
+  override def defaultArchonPlan: Plan = new PvZIdeas.TemplarUpToEight
   override def defaultAttackPlan: Plan = new Parallel(
     new Attack(Protoss.Corsair),
     new Trigger(

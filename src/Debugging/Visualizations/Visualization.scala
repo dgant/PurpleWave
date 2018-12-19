@@ -134,7 +134,7 @@ class Visualization {
     ShowRushDistances,
     ShowScheduler,
     ShowSquads,
-    ShowStrategiesInterest,
+    ShowStrategyInterest,
     ShowStrategy,
     ShowStrategyEvaluations,
     ShowTechniques,

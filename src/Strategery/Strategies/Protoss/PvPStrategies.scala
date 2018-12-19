@@ -43,7 +43,7 @@ object PvP2Gate1012Goon extends PvPOpeningIntoCarriers {
   override def rushDistanceMaximum: Int = 5000
 }
 
-object PvPGateDTExpand extends PvPOpening {
+object PvP2GateDTExpand extends PvPOpening {
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.twoGate)
 }
 

@@ -27,7 +27,7 @@ class EmptyPlaybook {
     PvT3BaseArbiter,
     PvT2BaseCarrier,
     PvP2Gate1012,
-    PvPGateDTExpand,
+    PvP2GateDTExpand,
     PvZ4Gate99,
     PvZFFEEconomic,
     PvZMidgame5GateGoon,
@@ -68,12 +68,26 @@ object StrategyGroups {
     PvPLateGameCarrier,
     PvT1GateRobo
   )
-}
 
-class TestingPlaybook extends EmptyPlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvZGatewayFE, PvZMidgameNeoBisu)
-  override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled
-  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
+  val sscaitWhitelisted = Vector[Strategy](
+    // Zerg
+    //
+    // Openers
+    PvZ4Gate99,
+    PvZGatewayFE,
+    PvZFFEEconomic,
+    // Midgames
+    PvZMidgame5GateGoon,
+    PvZMidgameNeoBisu,
+
+    // Protoss
+    //
+    // Openers
+    PvP3GateGoon,
+    PvP3GateRobo,
+    PvP2GateDTExpand,
+    PvPProxy2Gate
+  )
 }
 
 class PurpleWavePlaybook extends EmptyPlaybook {
@@ -81,7 +95,14 @@ class PurpleWavePlaybook extends EmptyPlaybook {
 }
 
 class SSCAITPlaybook extends PurpleWavePlaybook {
+  override lazy val forced: Seq[Strategy] = StrategyGroups.sscaitWhitelisted
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionSSCAIT
 }
 
-object Playbook extends TestingPlaybook {}
+class TestingPlaybook extends PurpleWavePlaybook {
+  override lazy val forced: Seq[Strategy] = StrategyGroups.sscaitWhitelisted
+  override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled
+  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
+}
+
+object Playbook extends SSCAITPlaybook {}

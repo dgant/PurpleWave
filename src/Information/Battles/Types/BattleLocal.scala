@@ -53,7 +53,10 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
     val patienceEntangled   = if (agent.shouldEngage) Math.max(0.0, unit.matchups.framesOfEntanglement) / With.configuration.battleHysteresisFrames else 0.0
     val patienceTotal       = Math.max(patienceEntangled, patienceHysteresis)
     val sign                = if (agent.shouldEngage) -1.0 else 1.0
-    val output              = patienceTotal * sign * With.configuration.battleHysteresisRatio * (if(unit.unitClass.melee) 2.0 else 1.0)
+    var output              = patienceTotal * sign * With.configuration.battleHysteresisRatio * (if(unit.unitClass.melee) 2.0 else 1.0)
+    if (output < 0 && unit.matchups.framesOfSafety > 0) {
+      output = 0
+    }
     output
   }
 }

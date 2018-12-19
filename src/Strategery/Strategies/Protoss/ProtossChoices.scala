@@ -62,7 +62,7 @@ object ProtossChoices {
   /////////
   
   val pvpOpenersWithoutTransitions = Vector(
-    PvPGateDTExpand,
+    PvP2GateDTExpand,
     PvPProxy2Gate
   )
   

@@ -18,11 +18,11 @@ import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvPGateDTExpand
+import Strategery.Strategies.Protoss.PvP2GateDTExpand
 
 class PvP2GateDarkTemplar extends GameplanModeTemplate {
   
-  override val activationCriteria = new Employing(PvPGateDTExpand)
+  override val activationCriteria = new Employing(PvP2GateDTExpand)
   override val completionCriteria = new Latch(new MiningBasesAtLeast(2))
   override val defaultWorkerPlan  = NoPlan()
   override val defaultScoutPlan   = new ScoutOn(Protoss.CyberneticsCore)

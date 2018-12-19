@@ -4,7 +4,7 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Basic.NoPlan
-import Planning.Plans.Compound.If
+import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational.{DefendFFEWithProbesAgainst4Pool, DefendFFEWithProbesAgainst9Pool, PlacementForgeFastExpand}
@@ -50,17 +50,17 @@ class PvZFFE extends GameplanModeTemplate {
         new BuildOrder(ProtossBuilds.FFE_Conservative: _*),
         new If(
           new EnemyStrategy(With.fingerprints.twelveHatch),
-          new BuildOrder(ProtossBuilds.FFE_GatewayNexusForge: _*),
+          new Trigger(
+            new UnitsAtMost(0, Protoss.Forge),
+            new BuildOrder(ProtossBuilds.FFE_NexusGatewayForge: _*),
+            new BuildOrder(ProtossBuilds.FFE_NexusForgeCannons: _*)),
           new If(
             new EnemyStrategy(With.fingerprints.twelvePool),
             new BuildOrder(ProtossBuilds.FFE_NexusForgeCannons: _*),
             new If(
               new EnemyStrategy(With.fingerprints.overpool),
               new BuildOrder(ProtossBuilds.FFE_ForgeNexusCannon: _*),
-              new If(
-                new EnemyStrategy(With.fingerprints.ninePool),
-                new BuildOrder(ProtossBuilds.FFE_ForgeCannonNexus: _*),
-                new BuildOrder(ProtossBuilds.FFE_ForgeCannonNexus: _*))))))))
+              new BuildOrder(ProtossBuilds.FFE_ForgeCannonNexus: _*)))))))
   
   override def emergencyPlans: Seq[Plan] = Seq(
     new If(

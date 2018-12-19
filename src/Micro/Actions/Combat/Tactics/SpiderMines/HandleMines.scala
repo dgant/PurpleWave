@@ -53,7 +53,7 @@ object HandleMines extends Action{
       new Drag(dragTargets).consider(unit)
     }
     else {
-     new DodgeMines(mines).consider(unit)
+      new DodgeMines(mines).consider(unit)
     }
   }
 

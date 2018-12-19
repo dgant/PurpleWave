@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Macro.Automatic.{Enemy, Friendly, Pump, PumpMatchingRatio}
+import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
@@ -47,9 +47,24 @@ object PvTIdeas {
       new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true)),
     new ConsiderAttacking)
 
-  class EmergencyBuilds extends Parallel(
-    // Should add 2-Fac/BBS/Bunker rush/Worker rush reactions
-  )
+  class ReactTo2Fac extends If(
+    new EnemyStrategy(With.fingerprints.twoFac),
+    new Parallel(
+      new RequireSufficientSupply,
+      new Pump(Protoss.Dragoon, 7),
+      new Build(
+        Get(9, Protoss.Probe),
+        Get(Protoss.Gateway),
+        Get(Protoss.Assimilator),
+        Get(Protoss.CyberneticsCore),
+        Get(18, Protoss.Probe),
+        Get(Protoss.DragoonRange),
+        Get(2, Protoss.Gateway)),
+      new PumpWorkers,
+      new Build(
+        Get(3, Protoss.Gateway),
+        Get(Protoss.RoboticsFacility),
+        Get(Protoss.Observatory))))
   
   class TrainMinimumDragoons extends Parallel(
     new PumpMatchingRatio(Protoss.Dragoon, 1, 3, Seq(Enemy(Terran.Vulture, 1.0), Enemy(Terran.Wraith, 1.0))),

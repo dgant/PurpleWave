@@ -6,6 +6,9 @@ import Lifecycle.With
 
 class FingerprintNFactories(thresholdFactories: Double) extends Fingerprint {
   override protected def investigate: Boolean = {
+    if (With.frame < GameTime(5, 20)()) {
+      return false
+    }
     if (With.frame > GameTime(7, 0)()) {
       return matched
     }
@@ -13,8 +16,8 @@ class FingerprintNFactories(thresholdFactories: Double) extends Fingerprint {
     With.units.ever.foreach(u => if (u.isEnemy && u.unitClass.whatBuilds._1.isFactory) {
       factoryUnitTime += u.unitClass.buildFrames
     })
-    val discoveryRatio      = 0.75
-    val expectedFactoryTime = With.framesSince(GameTime(5, 0)())
+    val discoveryRatio      = 1.0
+    val expectedFactoryTime = With.framesSince(GameTime(4, 40)())
     val expectedFactories   = factoryUnitTime.toDouble / expectedFactoryTime / discoveryRatio
     val output              = expectedFactories > thresholdFactories - 0.5
     output

@@ -1,5 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
+import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, EjectScout}
@@ -15,7 +16,7 @@ import Planning.Plans.Scouting.{Scout, ScoutCleared, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._
-import Planning.Predicates.Strategy.Employing
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
@@ -68,7 +69,10 @@ class PvTBasic extends GameplanModeTemplate {
         new UpgradeStarted(Protoss.DragoonRange)),
       new PvTIdeas.AttackRespectingMines))
   
-  override def emergencyPlans: Seq[Plan] = Vector(new PvTIdeas.EmergencyBuilds)
+  override def emergencyPlans: Seq[Plan] = Vector(
+    new If(
+      new Employing(PvT13Nexus, PvT21Nexus, PvT28Nexus),
+      new PvTIdeas.ReactTo2Fac))
   
   override def defaultBuildOrder: Plan = new Parallel(
     new If(new Employing(PvT13Nexus),             new BuildOrder(ProtossBuilds.Opening13Nexus_NoZealot_OneGateCore: _*)),
@@ -219,11 +223,24 @@ class PvTBasic extends GameplanModeTemplate {
       // No bio? Normal game plan
       new Parallel(
         new If(
+          new EnemyStrategy(With.fingerprints.twoFac),
+          new Build(
+            Get(2, Protoss.Gateway),
+            Get(Protoss.RoboticsFacility),
+            Get(Protoss.Observatory),
+            Get(3, Protoss.Gateway))),
+        new If(
           new And(
             new EmployingCarriers,
             new ScoutCleared),
           new Parallel(
-            new Build(Get(Protoss.Stargate), Get(Protoss.FleetBeacon), Get(Protoss.AirDamage)),
+            new Build(
+              Get(Protoss.Stargate),
+              Get(Protoss.FleetBeacon)),
+            new If(
+              new EnemyStrategy(With.fingerprints.twoFac),
+              new Build(Get(3, Protoss.Gateway))),
+            new UpgradeContinuously(Protoss.AirDamage),
             new If(
               new UnitsAtLeast(1, Protoss.FleetBeacon),
               new If(

@@ -34,7 +34,6 @@ class Scout(scoutCount: Int = 1) extends Plan {
     if (With.units.countOurs(UnitMatchWorkers) < 3)                     return true
     if (bases.isEmpty)                                                  return false
     if (With.blackboard.lastScoutDeath > 0)                             return true
-    if (bases.exists(_.zone.walledIn))                                  return true
     if (bases.exists(_.townHall.isDefined) && scouts.get.units.isEmpty) return true
     // With 4Pool use the scout to help harass/distract
     if ( ! ZvE4Pool.active && bases.exists(_.units.exists(_.unitClass.isStaticDefense))) return true

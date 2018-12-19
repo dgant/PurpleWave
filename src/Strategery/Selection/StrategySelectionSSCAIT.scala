@@ -12,9 +12,13 @@ object StrategySelectionSSCAIT extends StrategySelectionPolicy {
     // TODO: Enable ReaverCarrierCheese, etc
     if (With.enemy.isTerran) {
       if (history.size % 2 == 0) {
-        return Vector(PvT13Nexus, PvT2BaseCarrier)
+        return Vector(
+          if (With.strategy.allowedGivenOpponentHistory(PvT13Nexus)) PvT13Nexus else PvT21Nexus,
+          PvT2BaseCarrier)
       } else {
-        return Vector(PvTDTExpand, PvT2BaseArbiter)
+        return Vector(
+          if (With.strategy.allowedGivenOpponentHistory(PvTDTExpand)) PvTDTExpand else PvT21Nexus,
+          PvT2BaseArbiter)
       }
     }
 

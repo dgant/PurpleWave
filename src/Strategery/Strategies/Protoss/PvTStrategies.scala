@@ -1,5 +1,7 @@
 package Strategery.Strategies.Protoss
 
+import Information.Intelligenze.Fingerprinting.Fingerprint
+import Lifecycle.With
 import Planning.Plan
 import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTReaverCarrierCheese
 import Strategery.Strategies.Strategy
@@ -18,7 +20,13 @@ abstract class PvTBasicOpener extends PvTStrategy {
     PvT3BaseCarrier
   ))
 }
-object PvT13Nexus extends PvTBasicOpener
+object PvT13Nexus extends PvTBasicOpener {
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.twoFac,
+    With.fingerprints.twoFacVultures,
+    With.fingerprints.threeFac,
+    With.fingerprints.threeFacVultures)
+}
 object PvT21Nexus extends PvTBasicOpener
 object PvT28Nexus extends PvTBasicOpener
 object PvT25BaseCarrier extends PvTBasicOpener {
@@ -37,6 +45,9 @@ object PvTDTExpand extends PvTBasicOpener {
     PvT3BaseArbiter,
     PvT3BaseCarrier
   ))
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.twoFacVultures,
+    With.fingerprints.threeFacVultures)
 }
 object PvT1015DT extends PvTStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(

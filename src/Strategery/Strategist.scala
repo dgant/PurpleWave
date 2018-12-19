@@ -86,6 +86,10 @@ class Strategist {
       strategies
   }
 
+  def allowedGivenOpponentHistory(strategy: Strategy): Boolean = {
+    ! strategy.responsesBlacklisted.map(_.toString).exists(enemyRecentFingerprints.contains)
+  }
+
   def isAppropriate(strategy: Strategy): Boolean = {
     lazy val ourRace                  = With.self.raceInitial
     lazy val enemyRacesCurrent        = With.enemies.map(_.raceCurrent).toSet
@@ -102,7 +106,7 @@ class Strategist {
     lazy val disabledOnMap            = strategy.mapsBlacklisted.exists(_.matches) || ! strategy.mapsWhitelisted.forall(_.exists(_.matches))
     lazy val appropriateForOurRace    = strategy.ourRaces.exists(_ == ourRace)
     lazy val appropriateForEnemyRace  = strategy.enemyRaces.exists(race => if (race == Race.Unknown) enemyRaceWasUnknown else (enemyRaceStillUnknown || enemyRacesCurrent.contains(race)))
-    lazy val allowedGivenHistory      = ! strategy.responsesBlacklisted.map(_.toString).exists(enemyRecentFingerprints.contains)
+    lazy val allowedGivenHistory      = allowedGivenOpponentHistory(strategy)
     lazy val allowedForOpponent       = strategy.opponentsWhitelisted.forall(_
       .map(formatName)
       .exists(name =>

@@ -25,7 +25,7 @@ class PvT1015Expand extends GameplanModeTemplate {
   override def defaultScoutPlan   = new If(new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeFrames(1)), new Scout)
   override val defaultAttackPlan  = new Attack
   
-  override val buildOrder = ProtossBuilds.Opening10Gate15GateExpand
+  override val buildOrder = ProtossBuilds.PvT1015GateGoonExpand
   
   override def buildPlans: Seq[Plan] = Vector(
     new Trigger(

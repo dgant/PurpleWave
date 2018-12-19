@@ -20,6 +20,8 @@ class Fingerprints {
       threeFac
       threeFacVultures
       siegeExpand
+      oneRaxFE
+      fourteenCC
     }
     if (With.enemies.exists(_.isUnknownOrProtoss)) {
       gatewayFirst
@@ -63,6 +65,8 @@ class Fingerprints {
   lazy val threeFac         = addFingerprint(new Fingerprint3Fac)
   lazy val threeFacVultures = addFingerprint(new Fingerprint3FacVultures)
   lazy val siegeExpand      = addFingerprint(new FingerprintSiegeExpand)
+  lazy val oneRaxFE         = addFingerprint(new Fingerprint1RaxFE)
+  lazy val fourteenCC       = addFingerprint(new Fingerprint14CC)
 
   // Protoss
   lazy val gatewayFirst = addFingerprint(new FingerprintGatewayFirst)

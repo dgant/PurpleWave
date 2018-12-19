@@ -19,7 +19,7 @@ class ProtossHuntersFFAGatewayAggro extends GameplanModeTemplate {
   override val activationCriteria   : Predicate = new Always
   override val defaultScoutPlan     : Plan = NoPlan()
   
-  override val buildOrder = ProtossBuilds.Opening_10Gate12Gas14Core
+  override val buildOrder = ProtossBuilds.NZ12Gas14Core
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(new UnitsAtLeast(1, Protoss.Dragoon),      new Build(Get(Protoss.DragoonRange))),

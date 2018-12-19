@@ -40,10 +40,7 @@ class DefendAgainstProxy extends Plan {
         if (proxy.is(Terran.Bunker) && proxy.complete)
           0
         else if (proxy.attacksAgainstGround > 0)
-          if (proxy.complete)
-            6
-          else
-            4
+          4
         else if (proxy.unitClass.isGas)
           3 // Dubious, but we need real gas steal reactions to avoid this
         else

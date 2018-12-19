@@ -52,7 +52,7 @@ class ThreeBaseCarriersWithNoDefense extends Parallel {
     new UpgradeContinuously(Protoss.AirArmor))
   
   children.set(Vector(
-    new Build(ProtossBuilds.Opening13Nexus_NoZealot_OneGateCore: _*),
+    new Build(ProtossBuilds.PvT13Nexus_NZ1GateCore: _*),
     new RequireSufficientSupply,
     new PumpWorkers,
     new BuildGasPumps,

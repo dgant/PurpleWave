@@ -1,11 +1,13 @@
 package Information.Intelligenze.Fingerprinting.TerranStrategies
 
 import Information.Intelligenze.Fingerprinting.Fingerprint
-import Information.Intelligenze.Fingerprinting.Generic.{FingerprintAnd, GameTime}
+import Information.Intelligenze.Fingerprinting.Generic.{FingerprintAnd, FingerprintNot, GameTime}
 import Lifecycle.With
 import ProxyBwapi.Races.Terran
 
 class FingerprintSiegeExpand extends FingerprintAnd(
+  new FingerprintNot(With.fingerprints.oneRaxFE),
+  new FingerprintNot(With.fingerprints.fourteenCC),
   new Fingerprint {
     override protected def investigate: Boolean = {
       With.enemies.exists(e => {

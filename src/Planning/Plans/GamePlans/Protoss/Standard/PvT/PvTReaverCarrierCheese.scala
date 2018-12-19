@@ -16,7 +16,7 @@ import ProxyBwapi.Races.Protoss
 
 class PvTReaverCarrierCheese extends GameplanModeTemplate {
 
-  override val buildOrder             = ProtossBuilds.Opening13Nexus_NoZealot_OneGateCore
+  override val buildOrder             = ProtossBuilds.PvT13Nexus_NZ1GateCore
   override val defaultWorkerPlan      = new PumpWorkers(oversaturate = true)
   override val priorityAttackPlan     = new PvTIdeas.PriorityAttacks
   override def defaultScoutPlan       = new ScoutOn(Protoss.CyberneticsCore)

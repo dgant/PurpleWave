@@ -20,7 +20,7 @@ abstract class PvTBasicOpener extends PvTStrategy {
     PvT3BaseCarrier
   ))
 }
-object PvT13Nexus extends PvTBasicOpener {
+object PvT13NexusNZ extends PvTBasicOpener {
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fiveRax,
     With.fingerprints.bbs,
@@ -30,7 +30,17 @@ object PvT13Nexus extends PvTBasicOpener {
     With.fingerprints.threeFacVultures)
 }
 object PvT21Nexus extends PvTBasicOpener
+object PvT23Nexus extends PvTBasicOpener {
+  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.fourteenCC
+  )
+}
 object PvT28Nexus extends PvTBasicOpener
+object PvT2GateRangeExpand extends PvTBasicOpener {
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.fourteenCC,
+    With.fingerprints.oneRaxFE)
+}
 object PvT25BaseCarrier extends PvTBasicOpener {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
     PvT3BaseCarrier
@@ -60,7 +70,7 @@ object PvT1015DT extends PvTStrategy {
       PvT3BaseCarrier))
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
 }
-object PvT2BaseCarrier extends PvTStrategy  { override val mapsBlacklisted = Iterable(BlueStorm) }
+object PvT2BaseCarrier extends PvTStrategy { override val mapsBlacklisted = Iterable(BlueStorm) }
 object PvT3BaseCarrier extends PvTStrategy { override val mapsBlacklisted = MapGroups.badForFastThirdBases }
 object PvT2BaseArbiter extends PvTStrategy { override val mapsBlacklisted = Iterable(BlueStorm) }
 object PvT3BaseArbiter extends PvTStrategy { override val mapsBlacklisted = MapGroups.badForFastThirdBases }

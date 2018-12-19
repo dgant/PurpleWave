@@ -12,8 +12,8 @@ object StrategySelectionGreedy extends StrategySelectionBasic {
 }
 
 abstract class StrategySelectionBasic extends StrategySelectionPolicy {
-  def chooseBest(topLevelStrategies: Iterable[Strategy]): Iterable[Strategy] = {
-    val permutations            = topLevelStrategies.flatMap(expandStrategy)
+  def chooseBest(topLevelStrategies: Iterable[Strategy], expand: Boolean = true): Iterable[Strategy] = {
+    val permutations            = if (expand) topLevelStrategies.flatMap(expandStrategy) else topLevelStrategies.map(Vector(_))
     val strategies              = permutations.flatten.toVector.distinct
     val strategyEvaluations     = strategies.map(strategy => (strategy, With.strategy.evaluate(strategy))).toMap
     val permutationEvaluations  = permutations.map(p => (p, p.map(strategyEvaluations))).toMap

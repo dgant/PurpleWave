@@ -87,7 +87,10 @@ class Strategist {
   }
 
   def allowedGivenOpponentHistory(strategy: Strategy): Boolean = {
-    ! strategy.responsesBlacklisted.map(_.toString).exists(enemyRecentFingerprints.contains)
+    if (strategy.responsesBlacklisted.map(_.toString).exists(enemyRecentFingerprints.contains)) return false
+    if (strategy.responsesWhitelisted.nonEmpty
+      && ! strategy.responsesWhitelisted.map(_.toString).exists(enemyRecentFingerprints.contains)) return false
+    true
   }
 
   def isAppropriate(strategy: Strategy): Boolean = {

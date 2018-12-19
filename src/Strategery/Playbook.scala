@@ -4,7 +4,6 @@ import Lifecycle.With
 import Strategery.Selection._
 import Strategery.Strategies.AllRaces.WorkerRush
 import Strategery.Strategies.Protoss.PvE._
-import Strategery.Strategies.Protoss.PvR.{PvROpen2Gate1012, PvROpen2Gate910}
 import Strategery.Strategies.Protoss._
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TvE._
@@ -18,21 +17,22 @@ class EmptyPlaybook {
   lazy val forced   : Seq[Strategy] = none
   lazy val disabled : Seq[Strategy] = none
   val strategyOrder: Seq[Strategy] = Vector(
-    PvEIslandPlasmaCarriers1Base,
-    PvPLateGame2BaseReaverCarrier_SpecificMaps,
-    PvT1015DT,
-    PvT2GateObserver,
-    PvT13Nexus,
+    PvT13NexusNZ,
+    PvTDTExpand,
     PvT21Nexus,
-    PvT3BaseArbiter,
     PvT2BaseCarrier,
-    PvP2Gate1012,
+    PvT2BaseArbiter,
+
     PvP2GateDTExpand,
+    PvPProxy2Gate,
+    PvP3GateGoon,
+    PvP3GateRobo,
+
     PvZ4Gate99,
     PvZFFEEconomic,
+    PvZGatewayFE,
     PvZMidgame5GateGoon,
-    PvROpen2Gate910,
-    PvROpen2Gate1012
+    PvZMidgameNeoBisu
   )
   def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy
   def enemyName: String = With.enemy.name
@@ -100,7 +100,7 @@ class SSCAITPlaybook extends PurpleWavePlaybook {
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvT13Nexus, PvT2BaseCarrier)
+  override lazy val forced: Seq[Strategy] = Seq(PvT13NexusNZ, PvT2BaseCarrier)
   //override lazy val forced: Seq[Strategy] = StrategyGroups.sscaitWhitelisted
   override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom

@@ -37,30 +37,30 @@ class PvZFFE extends GameplanModeTemplate {
     new Employing(PvZGatewayFE),
     new If(
       new EnemyStrategy(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.overpool),
-      new BuildOrder(ProtossBuilds.FFE_GatewayForgeCannonsConservative: _*),
+      new BuildOrder(ProtossBuilds.PvZFFE_GatewayForgeCannonsConservative: _*),
       new If(
         new EnemyStrategy(With.fingerprints.twelvePool, With.fingerprints.tenHatch),
-        new BuildOrder(ProtossBuilds.FFE_GatewayForgeCannonsEconomic: _*),
-        new BuildOrder(ProtossBuilds.FFE_GatewayNexusForge: _*))),
+        new BuildOrder(ProtossBuilds.PvZFFE_GatewayForgeCannonsEconomic: _*),
+        new BuildOrder(ProtossBuilds.PvZFFE_GatewayNexusForge: _*))),
     new If(
       new EnemyStrategy(With.fingerprints.fourPool),
-      new BuildOrder(ProtossBuilds.FFE_Vs4Pool: _*),
+      new BuildOrder(ProtossBuilds.PvZFFE_Vs4Pool: _*),
       new If(
         new Employing(PvZFFEConservative),
-        new BuildOrder(ProtossBuilds.FFE_Conservative: _*),
+        new BuildOrder(ProtossBuilds.PvZFFE_Conservative: _*),
         new If(
           new EnemyStrategy(With.fingerprints.twelveHatch),
           new Trigger(
             new UnitsAtMost(0, Protoss.Forge),
-            new BuildOrder(ProtossBuilds.FFE_NexusGatewayForge: _*),
-            new BuildOrder(ProtossBuilds.FFE_NexusForgeCannons: _*)),
+            new BuildOrder(ProtossBuilds.PvZFFE_NexusGatewayForge: _*),
+            new BuildOrder(ProtossBuilds.PvZFFE_NexusForgeCannons: _*)),
           new If(
             new EnemyStrategy(With.fingerprints.twelvePool),
-            new BuildOrder(ProtossBuilds.FFE_NexusForgeCannons: _*),
+            new BuildOrder(ProtossBuilds.PvZFFE_NexusForgeCannons: _*),
             new If(
               new EnemyStrategy(With.fingerprints.overpool),
-              new BuildOrder(ProtossBuilds.FFE_ForgeNexusCannon: _*),
-              new BuildOrder(ProtossBuilds.FFE_ForgeCannonNexus: _*)))))))
+              new BuildOrder(ProtossBuilds.PvZFFE_ForgeNexusCannon: _*),
+              new BuildOrder(ProtossBuilds.PvZFFE_ForgeCannonNexus: _*)))))))
   
   override def emergencyPlans: Seq[Plan] = Seq(
     new If(

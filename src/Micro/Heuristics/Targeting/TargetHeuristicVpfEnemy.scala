@@ -3,7 +3,7 @@ package Micro.Heuristics.Targeting
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Decisions.MicroValue
-import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
@@ -11,7 +11,7 @@ object TargetHeuristicVpfEnemy extends TargetHeuristic {
   
   // Divisor to make vpfs scale on 1.0+
   // Based on the lowest VPF in the game: Arbiter against Zergling :)
-  lazy val baselineVpf = Vector(
+  lazy val baselineVpf: Double = Vector(
     Zerg.Zergling.subjectiveValue * 0.5 * Protoss.Arbiter.effectiveGroundDamage / Protoss.Arbiter.groundDamageCooldown,
     With.economy.incomePerFrameMinerals,
     With.economy.incomePerFrameGas * MicroValue.gasToMineralsRatio).min
@@ -28,11 +28,23 @@ object TargetHeuristicVpfEnemy extends TargetHeuristic {
   }
 
   override def evaluate(unit: FriendlyUnitInfo, candidate: UnitInfo): Double = {
-    candidate.matchups.vpfTargetHeuristic
+    lazy val maxTeamVpf = ByOption.max(unit.matchups.enemies.view.filter(_ != candidate).map(calculate)).getOrElse(0.0)
+
+    var bonusVpf = 0.0
+
+    // Bunker builders are super high priority
+    if (candidate.constructing && candidate.orderTarget.exists(_.is(Terran.Bunker))) {
+      bonusVpf += 2.0 * maxTeamVpf
+    }
+    // Turret builders too, if detection is important to them
+    if (candidate.constructing && candidate.orderTarget.exists(_.is(Terran.MissileTurret)) && unit.matchups.alliesInclSelfCloaked.exists(_.canAttack)) {
+      bonusVpf += maxTeamVpf
+    }
+
+    candidate.matchups.vpfTargetHeuristic + bonusVpf
   }
 
   def calculate(candidate: UnitInfo): Double = {
-    
     val numerator =
       if (candidate.gathering || candidate.base.exists(_.harvestingArea.contains(candidate.tileIncludingCenter))) {
         With.economy.incomePerFrameMinerals

@@ -18,7 +18,7 @@ class PvT1015GateDT extends GameplanModeTemplate {
   override val aggression         = 1.2
   override val superSaturate      = true
   override val defaultAttackPlan  = new Attack
-  override val buildOrder         = ProtossBuilds.Opening10Gate15GateDragoonDT
+  override val buildOrder         = ProtossBuilds.PvT1015GateGoonDT
   override def defaultScoutPlan   = new ScoutOn(Protoss.Gateway, quantity = 2)
   
   override val buildPlans = Vector(

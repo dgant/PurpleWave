@@ -10,5 +10,5 @@ class PvRZZCore extends PvR2Gate1012 {
   
   override val activationCriteria = new Employing(PvROpenZZCore)
   override val completionCriteria = new UnitsAtLeast(1, Protoss.CyberneticsCore)
-  override val buildOrder         = ProtossBuilds.OpeningZZCore
+  override val buildOrder         = ProtossBuilds.ZZCore
 }

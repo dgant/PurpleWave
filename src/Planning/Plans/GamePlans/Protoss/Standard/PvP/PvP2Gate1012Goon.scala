@@ -32,7 +32,7 @@ class PvP2Gate1012Goon extends GameplanModeTemplate {
     new PvPIdeas.ReactToProxyGateways,
     new PvPIdeas.ReactToFFE)
   
-  override val buildOrder = ProtossBuilds.OpeningTwoGate1012
+  override val buildOrder = ProtossBuilds.TwoGate1012
   override def buildPlans = Vector(
     new Build(
       Get(Protoss.Assimilator),

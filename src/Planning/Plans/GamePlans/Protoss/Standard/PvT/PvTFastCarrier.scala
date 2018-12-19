@@ -53,7 +53,7 @@ class PvTFastCarrier extends GameplanModeTemplate {
     Get(21, Protoss.Probe),
     Get(2,  Protoss.Nexus))
 
-  override val buildOrder: Vector[BuildRequest] = ProtossBuilds.Opening28Nexus
+  override val buildOrder: Vector[BuildRequest] = ProtossBuilds.PvT28Nexus
 
   override def buildPlans: Seq[Plan] = Vector(
     /*

@@ -59,14 +59,18 @@ object PvTIdeas {
       new EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113)),
     new Parallel(
       new If(
+        new UnitsAtMost(5, UnitMatchWarriors),
+        new CancelAll(Protoss.Nexus)),
+      new If(
         new UnitsAtMost(1, Protoss.Gateway),
-        new CancelAll(UnitMatchOr(Protoss.Nexus, Protoss.Stargate))),
+        new CancelAll(UnitMatchOr(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Nexus, Protoss.Stargate))),
       new RequireSufficientSupply,
-      new Pump(Protoss.DarkTemplar),
-      new Trigger(
-        new And(
-          new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
-          new UnitsAtLeast(7, Protoss.Zealot)),
+      new Pump(Protoss.DarkTemplar, 3),
+      new If(
+        new UnitsAtLeast(3, Protoss.Dragoon),
+        new Build(Get(Protoss.DragoonRange))),
+      new If(
+        new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
         new Pump(Protoss.Dragoon),
         new Pump(Protoss.Zealot)),
       new Build(
@@ -75,7 +79,8 @@ object PvTIdeas {
         Get(12, Protoss.Probe),
         Get(2, Protoss.Gateway),
         Get(18, Protoss.Probe),
-        Get(Protoss.ShieldBattery)),
+        Get(Protoss.ShieldBattery),
+        Get(3, Protoss.Gateway)),
       new If(
         new UnitsAtLeast(1, Protoss.Dragoon),
         new UpgradeContinuously(Protoss.DragoonRange)),
@@ -85,7 +90,8 @@ object PvTIdeas {
         Get(Protoss.CyberneticsCore),
         Get(Protoss.CitadelOfAdun),
         Get(Protoss.TemplarArchives),
-        Get(3, Protoss.Gateway))))
+        Get(3, Protoss.Gateway),
+        Get(2, Protoss.Nexus))))
 
   class ReactTo2Fac extends If(
     new And(
@@ -118,7 +124,12 @@ object PvTIdeas {
       new UnitsAtMost(0, UnitMatchOr(Protoss.Arbiter, Protoss.ArbiterTribunal)),
       new And(
         new UnitsAtMost(0, Protoss.Arbiter, complete = true),
-        new EnemyStrategy(With.fingerprints.twoFac))),
+        new EnemyStrategy(
+          With.fingerprints.fiveRax,
+          With.fingerprints.bbs,
+          With.fingerprints.twoRax1113,
+          With.fingerprints.twoFac,
+          With.fingerprints.threeFac))),
     new If(
       new And(
         new EnemiesAtMost(8, Terran.Vulture),

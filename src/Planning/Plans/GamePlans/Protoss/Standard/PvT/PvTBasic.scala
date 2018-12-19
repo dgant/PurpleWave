@@ -23,9 +23,11 @@ import Strategery.Strategies.Protoss._
 
 class PvTBasic extends GameplanModeTemplate {
   override val activationCriteria = new Employing(
-    PvT13Nexus,
+    PvT13NexusNZ,
     PvT21Nexus,
+    PvT23Nexus,
     PvT28Nexus,
+    PvT2GateRangeExpand,
     PvTDTExpand,
     PvT1GateRobo,
     PvT2BaseCarrier,
@@ -53,12 +55,14 @@ class PvTBasic extends GameplanModeTemplate {
   override def meldArchonsAt: Int = 25
   
   override def defaultScoutPlan: Plan = new Parallel(
-    new If(new Employing(PvT13Nexus),             new ScoutOn(Protoss.Nexus, quantity = 2)),
+    new If(new Employing(PvT13NexusNZ),           new ScoutOn(Protoss.Nexus, quantity = 2)),
     new If(new Employing(PvT21Nexus),             new ScoutOn(Protoss.Gateway)),
+    new If(new Employing(PvT23Nexus),             new ScoutOn(Protoss.Pylon)),
     new If(new Employing(PvT28Nexus),             new ScoutOn(Protoss.Gateway)),
+    new If(new Employing(PvT2GateRangeExpand),    new ScoutOn(Protoss.Pylon)),
     new If(new Employing(PvT1GateRobo),           new ScoutOn(Protoss.CyberneticsCore)),
     new If(new Employing(PvT2GateObserver),       new ScoutOn(Protoss.Pylon)),
-    new If(new Employing(PvT1015DT), new If(new UpgradeStarted(Protoss.DragoonRange), new Scout)),
+    new If(new Employing(PvT1015DT),              new If(new UpgradeStarted(Protoss.DragoonRange), new Scout)),
     new If(new Employing(PvTDTExpand),            new ScoutOn(Protoss.CyberneticsCore)))
   
   override val defaultAttackPlan = new Parallel(
@@ -72,31 +76,33 @@ class PvTBasic extends GameplanModeTemplate {
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvTIdeas.ReactToBBS,
     new If(
-      new Employing(PvT13Nexus, PvT21Nexus, PvT28Nexus),
+      new Employing(PvT13NexusNZ, PvT21Nexus, PvT23Nexus, PvT28Nexus),
       new PvTIdeas.ReactTo2Fac))
   
   override def defaultBuildOrder: Plan = new Parallel(
-    new If(new Employing(PvT13Nexus),             new BuildOrder(ProtossBuilds.Opening13Nexus_NoZealot_OneGateCore: _*)),
-    new If(new Employing(PvT21Nexus),             new BuildOrder(ProtossBuilds.Opening21Nexus: _*)),
-    new If(new Employing(PvT28Nexus),             new BuildOrder(ProtossBuilds.Opening28Nexus: _*)),
-    new If(new Employing(PvT2GateObserver),       new BuildOrder(ProtossBuilds.Opening2GateObserver: _*)),
-    new If(new Employing(PvT1015DT),              new BuildOrder(ProtossBuilds.Opening10Gate15GateDragoonDT: _*)),
-    new If(new Employing(PvT1GateRobo),           new BuildOrder(ProtossBuilds.Opening1GateReaverPvT: _*)),
+    new If(new Employing(PvT13NexusNZ),         new BuildOrder(ProtossBuilds.PvT13Nexus_NZ1GateCore: _*)),
+    new If(new Employing(PvT21Nexus),           new BuildOrder(ProtossBuilds.PvT21Nexus: _*)),
+    new If(new Employing(PvT23Nexus),           new BuildOrder(ProtossBuilds.PvT23Nexus: _*)),
+    new If(new Employing(PvT28Nexus),           new BuildOrder(ProtossBuilds.PvT28Nexus: _*)),
+    new If(new Employing(PvT2GateRangeExpand),  new BuildOrder(ProtossBuilds.PvT2GateRangeExpand: _*)),
+    new If(new Employing(PvT2GateObserver),     new BuildOrder(ProtossBuilds.PvT2GateObs: _*)),
+    new If(new Employing(PvT1015DT),            new BuildOrder(ProtossBuilds.PvT1015GateGoonDT: _*)),
+    new If(new Employing(PvT1GateRobo),         new BuildOrder(ProtossBuilds.PvT1GateReaver: _*)),
     // DT expand, but don't build a Citadel in the enemy's face
     new If(new Employing(PvTDTExpand), new Parallel(
-      new BuildOrder(ProtossBuilds.OpeningDTExpand_BeforeCitadel: _*),
+      new BuildOrder(ProtossBuilds.PvTDTExpand_BeforeCitadel: _*),
       new Trigger(
         new UnitsAtLeast(1, Protoss.CitadelOfAdun),
-        new BuildOrder(ProtossBuilds.OpeningDTExpand_AfterCitadel: _*),
+        new BuildOrder(ProtossBuilds.PvTDTExpand_WithCitadel: _*),
         new Trigger(
           new And(
             new UnitsAtLeast(2, Protoss.Nexus),
             new Not(new ScoutCleared)),
-          new BuildOrder(ProtossBuilds.OpeningDTExpand_WithoutCitadel: _*),
+          new BuildOrder(ProtossBuilds.PvTDTExpand_WithoutCitadel: _*),
           new If(
             new ScoutCleared,
-            new BuildOrder(ProtossBuilds.OpeningDTExpand_AfterCitadel: _*),
-            new BuildOrder(ProtossBuilds.OpeningDTExpand_WithoutCitadel: _*)))))))
+            new BuildOrder(ProtossBuilds.PvTDTExpand_WithCitadel: _*),
+            new BuildOrder(ProtossBuilds.PvTDTExpand_WithoutCitadel: _*)))))))
 
   class EmployingTwoBase    extends Employing(PvT2BaseCarrier, PvT2BaseArbiter)
   class EmployingThreeBase  extends Employing(PvT3BaseCarrier, PvT3BaseArbiter)
@@ -247,7 +253,8 @@ class PvTBasic extends GameplanModeTemplate {
               new If(
                 new And(
                   new MiningBasesAtLeast(3),
-                  new Employing(PvT13Nexus, PvT21Nexus, PvT28Nexus, PvT1015Expand)),
+                  // TODO: Document: why this list?
+                  new Employing(PvT13NexusNZ, PvT21Nexus, PvT23Nexus, PvT28Nexus, PvT1015Expand)),
                 new Build(
                   Get(3, Protoss.Stargate),
                   Get(3, Protoss.Carrier),

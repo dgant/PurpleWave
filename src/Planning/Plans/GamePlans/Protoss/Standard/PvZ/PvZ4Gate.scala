@@ -29,7 +29,7 @@ class PvZ4Gate extends GameplanModeTemplate {
   
   override val activationCriteria     = new Employing(PvZ4Gate1012)
   override val completionCriteria     = new Latch(new MiningBasesAtLeast(2))
-  override def buildOrder             = ProtossBuilds.OpeningTwoGate1012
+  override def buildOrder             = ProtossBuilds.TwoGate1012
   override def defaultWorkerPlan      = NoPlan()
   override def defaultScoutPlan       = new ScoutOn(Protoss.Pylon)
   override def defaultScoutExposPlan  = new ScoutExpansionsAt(55)

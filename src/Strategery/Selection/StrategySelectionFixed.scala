@@ -5,10 +5,10 @@ import Strategery.Strategies.Strategy
 
 class StrategySelectionFixed(fixedStrategies: Strategy*) extends StrategySelectionPolicy {
   
-  override def chooseBest(topLevelStrategies: Iterable[Strategy]): Iterable[Strategy] = {
+  override def chooseBest(topLevelStrategies: Iterable[Strategy], expand: Boolean = true): Iterable[Strategy] = {
     val output = topLevelStrategies.filter(With.strategy.isAppropriate)
     if (output.isEmpty) {
-      StrategySelectionGreedy.chooseBest(topLevelStrategies)
+      StrategySelectionGreedy.chooseBest(topLevelStrategies, expand)
     }
     fixedStrategies
   }

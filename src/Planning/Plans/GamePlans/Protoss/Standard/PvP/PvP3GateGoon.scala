@@ -40,7 +40,7 @@ class PvP3GateGoon extends GameplanModeTemplate {
     new PvPIdeas.ReactToProxyGateways,
     new Trigger(new UnitsAtLeast(1, Protoss.Reaver), new PvPIdeas.ReactToFFE))
   
-  override val buildOrder: Seq[BuildRequest] = ProtossBuilds.Opening_3GateDragoon
+  override val buildOrder: Seq[BuildRequest] = ProtossBuilds.ThreeGateGoon
   
   override val buildPlans = Vector(
 

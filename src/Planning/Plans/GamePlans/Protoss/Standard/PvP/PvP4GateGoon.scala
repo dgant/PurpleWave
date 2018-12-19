@@ -32,7 +32,7 @@ class PvP4GateGoon extends GameplanModeTemplate {
     new PvPIdeas.ReactToProxyGateways,
     new PvPIdeas.ReactToTwoGate)
   
-  override val buildOrder: Seq[BuildRequest] = ProtossBuilds.Opening_4GateDragoon
+  override val buildOrder: Seq[BuildRequest] = ProtossBuilds.FourGateGoon
   
   override val buildPlans = Vector(
     new If(

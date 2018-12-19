@@ -6,6 +6,8 @@ import ProxyBwapi.Races.Terran
 
 class Fingerprint2Rax1113 extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.bbs),
+  new FingerprintNot(With.fingerprints.oneRaxFE),
+  new FingerprintNot(With.fingerprints.fourteenCC),
   new FingerprintOr(
     new FingerprintCompleteBy(Terran.Barracks,  GameTime(3,  0), 2), // Normally about 2:45
     new FingerprintCompleteBy(Terran.Marine,    GameTime(3,  5), 3),

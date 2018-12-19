@@ -5,13 +5,13 @@ import Strategery.Strategies.Strategy
 
 class StrategySelectionRecommended(fallback: StrategySelectionPolicy, strategies: Strategy*) extends StrategySelectionFixed(strategies: _*) {
 
-  override def chooseBest(topLevelStrategies: Iterable[Strategy]): Iterable[Strategy] = {
+  override def chooseBest(topLevelStrategies: Iterable[Strategy], expand: Boolean = true): Iterable[Strategy] = {
     val gamesAgainst = With.history.gamesVsEnemies
     if (gamesAgainst.size < 5 && strategies.forall(With.strategy.isAppropriate)) {
-      super.chooseBest(topLevelStrategies)
+      super.chooseBest(topLevelStrategies, expand)
     }
     else {
-      fallback.chooseBest(topLevelStrategies)
+      fallback.chooseBest(topLevelStrategies, expand)
     }
   }
 }

@@ -189,7 +189,7 @@ object PvTIdeas {
     new PumpMatchingRatio(Protoss.Arbiter, 0, 2, Seq(Friendly(Protoss.Carrier, 1.0 / 8.0))),
     new PumpMatchingRatio(Protoss.HighTemplar, 0, 2, Seq(Friendly(Protoss.Carrier, 1.0 / 8.0))),
     new Pump(Protoss.Carrier),
-    new Pump(Protoss.Arbiter),
+    new Pump(Protoss.Arbiter, 12),
     new If(new GasAtLeast(500), new Pump(Protoss.HighTemplar, maximumConcurrently = 4)),
     new TrainScouts,
     new TrainZealotsOrDragoons)

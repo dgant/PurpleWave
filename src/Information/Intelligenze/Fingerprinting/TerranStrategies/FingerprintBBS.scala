@@ -13,7 +13,7 @@ class FingerprintBBS extends FingerprintOr(
   new FingerprintCompleteBy(Terran.Marine,    GameTime(4,  5), 12),
   new FingerprintArrivesBy(Terran.Marine,     GameTime(3, 10), 2),
   new FingerprintArrivesBy(Terran.Marine,     GameTime(3, 25), 4),
-  new FingerprintArrivesBy(Terran.Marine,     GameTime(3, 40), 6),
-  new FingerprintArrivesBy(Terran.Marine,     GameTime(3, 55), 8),
-  new FingerprintArrivesBy(Terran.Marine,     GameTime(4, 10), 10),
-  new FingerprintArrivesBy(Terran.Marine,     GameTime(4, 25), 12))
+  new FingerprintArrivesBy(Terran.Marine,     GameTime(3, 45), 6),
+  new FingerprintArrivesBy(Terran.Marine,     GameTime(5,  5), 8),
+  new FingerprintArrivesBy(Terran.Marine,     GameTime(4, 25), 10),
+  new FingerprintArrivesBy(Terran.Marine,     GameTime(4, 45), 12))

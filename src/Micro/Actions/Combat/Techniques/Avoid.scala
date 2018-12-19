@@ -72,7 +72,7 @@ object Avoid extends ActionTechnique {
   }
 
   def avoidGreedyPath(unit: FriendlyUnitInfo): Unit = {
-    var pathLengthMax = 8
+    var pathLengthMax = PurpleMath.clamp(unit.matchups.framesOfEntanglement * unit.topSpeed + 3, 4, 8)
     val path = new ArrayBuffer[Tile]
     path += unit.tileIncludingCenter
     var bestScore = Int.MinValue

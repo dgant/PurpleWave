@@ -14,11 +14,11 @@ object FallBack extends ActionTechnique {
     unit.canMove
     && unit.canAttack
     && unit.agent.canFight
-    && unit.unitClass.ranged
     && unit.matchups.targets.nonEmpty
   )
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
+    if (unit.is(Protoss.Zealot) && unit.matchups.threats.forall(t => t.unitClass.melee && t.topSpeed > unit.topSpeed)) return 1.0
     if (unit.is(Protoss.Dragoon)) return 1.0
     if (unit.is(Protoss.Reaver)) return 1.0
     if (unit.is(Terran.Vulture)) return 1.0
@@ -26,15 +26,15 @@ object FallBack extends ActionTechnique {
     0.0
   }
   
-  override val applicabilityBase: Double = 0.75
+  override val applicabilityBase: Double = 0.8
   
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
     if (other.isFriendly) return None
     if ( ! other.canAttack(unit)) return None
     if ( ! unit.canAttack(other)) return Some(0.0)
-    
+
     if (unit.topSpeed >= other.topSpeed) return Some(0.0)
-    if (unit.pixelRangeAgainst(other) <= other.pixelRangeAgainst(unit)) return Some(0.0)
+    if (unit.pixelRangeAgainst(other) < other.pixelRangeAgainst(unit)) return Some(0.0)
     Some(1.0)
   }
   

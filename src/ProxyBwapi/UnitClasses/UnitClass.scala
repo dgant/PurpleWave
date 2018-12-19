@@ -189,6 +189,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val isCarrier    : Boolean = this == Protoss.Carrier
   lazy val isSiegeTank  : Boolean = this == Terran.SiegeTankSieged || this == Terran.SiegeTankUnsieged
   lazy val isFactory    : Boolean = this == Terran.Factory
+  lazy val isZergling   : Boolean = this == Zerg.Zergling
   
   lazy val unaffectedByDarkSwarm: Boolean = Vector(
     Terran.SiegeTankSieged,

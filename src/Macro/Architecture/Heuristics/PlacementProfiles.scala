@@ -24,7 +24,7 @@ object PlacementProfiles {
         factory
     }
     else if (blueprint.building.exists(building => building.attacks || building == Zerg.CreepColony || building == Protoss.ShieldBattery))
-      wallCannon
+      defensive
     else
       tech
   }
@@ -91,23 +91,14 @@ object PlacementProfiles {
     avoidDistanceFromIdealRange = 0.0
   }
   
-  val wallPylon = new PlacementProfile(
-    "Pylon for a wall",
+  val defensive = new PlacementProfile(
+    "Forge wall",
     preferZone                  = 100.0,
     preferNatural               = 10.0,
-    preferPowering              = 1.0,
-    preferCoveringWorkers       = 0.5,
-    avoidDistanceFromEntrance   = 0.5,
-    avoidSurfaceArea            = 0.05,
-    avoidDistanceFromIdealRange = 0.5)
-  
-  val wallCannon = new PlacementProfile(
-    "Cannons for a wall",
-    preferZone                  = 100.0,
-    preferNatural               = 10.0,
-    avoidDistanceFromEntrance   = 1.0,
-    avoidDistanceFromEnemy      = 0.5,
-    avoidDistanceFromIdealRange = 1.75)
+    preferPowering              = 0.2,
+    preferRhythm                = 0.2,
+    avoidDistanceFromBase       = 1.0,
+    avoidDistanceFromIdealRange = 2.0)
   
   val proxyBuilding = new PlacementProfile(
     "Proxy",

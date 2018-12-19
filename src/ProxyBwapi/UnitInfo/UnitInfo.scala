@@ -71,6 +71,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   var hasEverBeenCompleteHatch  : Boolean = false // Stupid AIST hack fix for detecting whether a base is mineable
   var lastAttacker              : Option[UnitInfo] = None
   var lastGatheringUpdate       : Int = Int.MinValue
+  var discoveredByEnemy         : Boolean = false
   def lastTotalHealthPoints: Int = lastHitPoints + lastShieldPoints + lastDefensiveMatrixPoints
   
   def updateCommon() {
@@ -80,6 +81,9 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     }
     if (cooldownLeft > lastCooldown) {
       lastFrameStartingAttack = thisFrame
+    }
+    if (visibleToOpponents) {
+      discoveredByEnemy = true
     }
     val moving = velocityX != 0 || velocityY != 0
     lazy val couldMove          = unitClass.canMove

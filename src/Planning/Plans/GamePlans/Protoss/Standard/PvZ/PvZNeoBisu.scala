@@ -19,7 +19,7 @@ import Strategery.Strategies.Protoss.PvZMidgameNeoBisu
 class PvZNeoBisu extends GameplanModeTemplate {
 
   override val activationCriteria = new Employing(PvZMidgameNeoBisu)
-  override val completionCriteria = new Latch(new MiningBasesAtLeast(3))
+  override val completionCriteria = new Latch(new BasesAtLeast(3))
   override def defaultArchonPlan: Plan = new MeldArchons(49)
   override def defaultAttackPlan: Plan = new Parallel(
     new Attack(Protoss.Corsair),
@@ -49,25 +49,23 @@ class PvZNeoBisu extends GameplanModeTemplate {
     new Pump(Protoss.HighTemplar),
     new Pump(Protoss.Zealot),
     new Build(
-      Get(1, Protoss.Gateway),
-      Get(1, Protoss.Forge),
-      Get(1, Protoss.Assimilator),
-      Get(1, Protoss.CyberneticsCore),
-      Get(1, Protoss.Stargate),
+      Get(Protoss.Gateway),
+      Get(Protoss.Forge),
+      Get(Protoss.Assimilator),
+      Get(Protoss.CyberneticsCore),
+      Get(Protoss.Stargate),
       Get(2, Protoss.Assimilator),
-      Get(1, Protoss.CitadelOfAdun)),
+      Get(Protoss.CitadelOfAdun)),
     new Pump(Protoss.Corsair),
     new UpgradeContinuously(Protoss.AirDamage),
     new UpgradeContinuously(Protoss.GroundDamage),
     new UpgradeContinuously(Protoss.ZealotSpeed),
+    new PumpMatchingRatio(Protoss.Stargate, 0, 2, Seq(Enemy(Zerg.Mutalisk, 1/5.0))),
     new Build(Get(Protoss.TemplarArchives)),
     new UpgradeContinuously(Protoss.DragoonRange),
     new Build(
       Get(Protoss.PsionicStorm),
-      Get(4, Protoss.Gateway),
-      Get(Protoss.RoboticsFacility),
-      Get(Protoss.Observatory)),
-    new Build(Get(6, Protoss.Gateway)),
+      Get(6, Protoss.Gateway)),
     new RequireMiningBases(3)
   )
 }

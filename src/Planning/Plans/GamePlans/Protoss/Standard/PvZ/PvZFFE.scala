@@ -13,7 +13,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
-import Planning.Predicates.Milestones.{FrameAtLeast, FrameAtMost, UnitsAtLeast, UnitsAtMost}
+import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchType, UnitMatchWorkers}
 import Planning.{Plan, Predicate}
@@ -23,7 +23,7 @@ import Strategery.Strategies.Protoss.{PvZFFEConservative, PvZFFEEconomic, PvZGat
 class PvZFFE extends GameplanModeTemplate {
   
   override val activationCriteria: Predicate = new Employing(PvZGatewayFE, PvZFFEEconomic, PvZFFEConservative)
-  override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(1, Protoss.CyberneticsCore))
+  override val completionCriteria: Predicate = new Latch(new And(new BasesAtLeast(2), new UnitsAtLeast(1, Protoss.CyberneticsCore)))
   
   override def defaultScoutPlan: Plan = new If(
     new And(
@@ -63,12 +63,12 @@ class PvZFFE extends GameplanModeTemplate {
                 new BuildOrder(ProtossBuilds.FFE_ForgeCannonNexus: _*))))))))
   
   override def emergencyPlans: Seq[Plan] = Seq(
-    new PvZIdeas.AddEarlyCannons,
     new If(
       new And(
         new EnemyStrategy(With.fingerprints.fourPool, With.fingerprints.ninePool),
         new UnitsAtLeast(8, Protoss.Probe)),
       new Pump(Protoss.Zealot)),
+    new PvZIdeas.AddEarlyCannons,
     new If(
       new And(
         new EnemyStrategy(With.fingerprints.fourPool),

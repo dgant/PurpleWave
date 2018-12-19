@@ -44,7 +44,12 @@ object Avoid extends ActionTechnique {
     if (With.configuration.enableThreatAwarePathfinding) {
       avoidRealPath(unit)
     }
-    avoidGreedyPath(unit)
+    if (unit.readyForMicro) {
+      avoidGreedyPath(unit)
+    }
+    if (unit.readyForMicro) {
+      avoidPotential(unit)
+    }
   }
 
   def avoidRealPath(unit: FriendlyUnitInfo): Unit = {
@@ -67,7 +72,7 @@ object Avoid extends ActionTechnique {
   }
 
   def avoidGreedyPath(unit: FriendlyUnitInfo): Unit = {
-    var pathLengthMax = 6
+    var pathLengthMax = 8
     val path = new ArrayBuffer[Tile]
     path += unit.tileIncludingCenter
     var bestScore = Int.MinValue
@@ -117,11 +122,7 @@ object Avoid extends ActionTechnique {
       }
     }
 
-    unit.agent.toTravel = {
-      if (path.length < Math.max(2, With.grids.enemyRange.get(unit.tileIncludingCenter))) {
-        // We're stuck. Just go home.
-        Some(unit.agent.origin)
-      } else {
+    if (path.length >= Math.max(2, With.grids.enemyRange.get(unit.tileIncludingCenter))) {
         if (ShowUnitsFriendly.inUse && With.visualization.map) {
           for (i <- 0 until path.length - 1) {
             DrawMap.arrow(
@@ -131,10 +132,9 @@ object Avoid extends ActionTechnique {
           }
         }
         path.foreach(With.coordinator.gridPathOccupancy.addUnit(unit, _))
-        Some(path.last.pixelCenter)
-      }
+        unit.agent.toTravel = Some(path.last.pixelCenter)
+      Move.delegate(unit)
     }
-    Move.delegate(unit)
   }
 
   def avoidPotential(unit: FriendlyUnitInfo): Unit = {

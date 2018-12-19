@@ -12,7 +12,7 @@ object PlacementHeuristicDistanceFromIdealRange extends PlacementHeuristic {
           blueprint.widthTiles.get / 2,
           blueprint.heightTiles.get / 2))
 
-    val output = 6 + Math.abs(blueprint.marginPixels.get / 32 - tileDistance)
+    val output = 2 + Math.abs(blueprint.marginPixels.get / 32 - tileDistance)
     output
   }
 }

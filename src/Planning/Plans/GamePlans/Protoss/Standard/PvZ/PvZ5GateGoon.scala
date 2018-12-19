@@ -11,6 +11,7 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.Predicates.Compound.Latch
 import Planning.Predicates.Milestones._
+import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -24,7 +25,6 @@ class PvZ5GateGoon extends GameplanModeTemplate {
     new UpgradeComplete(Protoss.DragoonRange),
     new Attack,
     new PvZIdeas.ConditionalAttack)
-
       
   class LateTech extends Parallel(
     new Build(Get(Protoss.PsionicStorm)),
@@ -34,29 +34,45 @@ class PvZ5GateGoon extends GameplanModeTemplate {
   override def emergencyPlans: Seq[Plan] = Seq(new PvZIdeas.ReactToLurkers)
   
   override def buildPlans: Seq[Plan] = Vector(
-    new If(
-      new UnitsAtLeast(15,  UnitMatchWarriors),
-      new RequireMiningBases(3)),
     new PvZIdeas.TakeSafeNatural,
     new PvZIdeas.AddEarlyCannons,
     new UpgradeContinuously(Protoss.DragoonRange),
-    new PumpMatchingRatio(Protoss.Dragoon, 0, 12, Seq(Enemy(Zerg.Mutalisk, 1.0))),
-    new PumpMatchingRatio(Protoss.Zealot, 2, 12, Seq(Enemy(Zerg.Zergling, 0.25))),
-    new Pump(Protoss.Dragoon),
     new Build(
       Get(Protoss.Gateway),
       Get(Protoss.Forge),
       Get(Protoss.Assimilator),
-      Get(Protoss.CyberneticsCore),
-      Get(5, Protoss.Gateway)),
-    new BuildGasPumps,
+      Get(Protoss.CyberneticsCore)),
+    new If(
+      new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeFrames(1) / 2),
+      new BuildGasPumps),
+    new FlipIf(
+      new SafeAtHome,
+      new Parallel(
+        new If(
+          new UnitsAtLeast(18, UnitMatchWarriors),
+          new RequireMiningBases(3)),
+        new PumpMatchingRatio(Protoss.Corsair, 0, 12, Seq(Enemy(Zerg.Mutalisk, 1.0))),
+        new PumpMatchingRatio(Protoss.Dragoon, 0, 12, Seq(Enemy(Zerg.Mutalisk, 1.0))),
+        new PumpMatchingRatio(Protoss.Zealot, 2, 12, Seq(Enemy(Zerg.Zergling, 0.25))),
+        new Pump(Protoss.Dragoon)),
+      new Trigger(
+        new EnemiesAtLeast(3, Zerg.Mutalisk),
+        new Parallel(
+          new BuildGasPumps,
+          new PumpMatchingRatio(Protoss.Stargate, 0, 2, Seq(Enemy(Zerg.Mutalisk, 0.2))),
+          new UpgradeContinuously(Protoss.AirDamage)))),
+    new Build(Get(5, Protoss.Gateway)),
     new UpgradeContinuously(Protoss.GroundDamage),
     new Build(
       Get(Protoss.CitadelOfAdun),
       Get(Protoss.TemplarArchives)),
+    new Pump(Protoss.Zealot),
     new BuildCannonsAtExpansions(5),
     new BuildCannonsAtNatural(2),
     new RequireMiningBases(3),
-    new Build(Get(Protoss.Gateway, 8))
+    new Build(
+      Get(Protoss.ZealotSpeed),
+      Get(Protoss.Gateway, 12)),
+    new Pump(Protoss.Zealot),
   )
 }

@@ -111,6 +111,7 @@ class Architecture {
       }
 
       // Reserve margins for buildings which produce ground units
+      val expandMargin =
       if ( ! unit.flying && (unit.isAny(Zerg.Egg, Zerg.LurkerEgg) || (unit.unitClass.isBuilding && usuallyNeedsMargin(unit.unitClass)))) {
         val w = 1 + unit.unitClass.tileWidth
         val h = 1 + unit.unitClass.tileHeight

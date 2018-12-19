@@ -14,7 +14,7 @@ import Planning.Predicates.Reactive.{EnemyMutalisks, SafeAtHome, SafeToMoveOut}
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Protoss.{PvZ4Gate99, PvZ4Gate1012, PvZProxy2Gate}
+import Strategery.Strategies.Protoss.{PvZ4Gate1012, PvZ4Gate99, PvZProxy2Gate}
 
 object PvZIdeas {
 
@@ -27,7 +27,8 @@ object PvZIdeas {
 
   class MeldArchonsUntilStorm extends If(
     new TechStarted(Protoss.PsionicStorm),
-    new MeldArchons(49) { override def maximumTemplar = 8 },
+    new MeldArchons(49) {
+      override def maximumTemplar = 8 },
     new MeldArchons)
 
   class TakeSafeNatural extends If(
@@ -147,13 +148,24 @@ object PvZIdeas {
             new UpgradeComplete(Protoss.GroundDamage),
             new Build(Get(Protoss.GroundArmor)),
             new Build(Get(Protoss.GroundDamage)))))),
-    
+    new If(
+      new Or(
+        new UnitsAtLeast(5, Protoss.Corsair),
+        new And(
+          new UnitsAtLeast(1, Protoss.Stargate),
+          new EnemiesAtLeast(1, Zerg.Mutalisk))),
+      new Parallel(
+        new UpgradeContinuously(Protoss.AirDamage),
+        new UpgradeContinuously(Protoss.AirArmor))),
+
     // Basic army
     new If(
       new EnemyHasUpgrade(Zerg.OverlordSpeed),
       new Pump(Protoss.DarkTemplar, 3),
       new Pump(Protoss.DarkTemplar, 1)),
-    new IfOnMiningBases(2, new Pump(Protoss.Reaver, 6)),
+    new PumpMatchingRatio(Protoss.Shuttle, 0, 1, Seq(Friendly(Protoss.Reaver, 1.0))),
+    new PumpMatchingRatio(Protoss.Shuttle, 0, 2, Seq(Friendly(Protoss.Reaver, 0.5))),
+    //new IfOnMiningBases(2, new Pump(Protoss.Reaver, 6)),
     new Pump(Protoss.Observer, 1),
     new PumpMatchingRatio(Protoss.HighTemplar, 1, 20, Seq(Friendly(UnitMatchWarriors, 0.3))),
     new PumpMatchingRatio(Protoss.Dragoon, 1, 100, Seq(

@@ -19,6 +19,8 @@ object Reposition extends ActionTechnique {
     unit.canMove
     && unit.canAttack
     && unit.unitClass.ranged
+    && unit.matchups.targetsInRange.nonEmpty
+    && unit.cooldownLeft > 0
   )
   
   override val activator = One

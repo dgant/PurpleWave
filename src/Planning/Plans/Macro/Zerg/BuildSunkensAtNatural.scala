@@ -7,7 +7,7 @@ import ProxyBwapi.Races.Zerg
 
 class BuildSunkensAtNatural(
   towersRequired: Int,
-  placement: PlacementProfile = PlacementProfiles.wallCannon)
+  placement: PlacementProfile = PlacementProfiles.defensive)
   extends BuildZergStaticDefenseAtBases(
     Zerg.SunkenColony,
     towersRequired,

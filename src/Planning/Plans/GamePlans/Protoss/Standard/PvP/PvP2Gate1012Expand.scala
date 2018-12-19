@@ -25,8 +25,8 @@ class PvP2Gate1012Expand extends GameplanModeTemplate {
   
   class PylonAtNatural extends ProposePlacement {
     override lazy val blueprints: Seq[Blueprint] = Vector(
-      new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone), placement = Some(PlacementProfiles.wallPylon)),
-      new Blueprint(this, building = Some(Protoss.ShieldBattery), requireZone = Some(With.geography.ourNatural.zone), placement = Some(PlacementProfiles.wallPylon))
+      new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone), placement = Some(PlacementProfiles.defensive)),
+      new Blueprint(this, building = Some(Protoss.ShieldBattery), requireZone = Some(With.geography.ourNatural.zone), placement = Some(PlacementProfiles.defensive))
     )
   }
   

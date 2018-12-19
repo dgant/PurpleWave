@@ -44,7 +44,6 @@ object StrategyGroups {
     WorkerRushLiftoff,
     ProxyDarkTemplar,
     PvZFFEConservative,
-    PvZMidgameNeoBisu,
     TvR1Rax,
     TvRTinfoil,
     TvEProxy5Rax,
@@ -72,7 +71,7 @@ object StrategyGroups {
 }
 
 class TestingPlaybook extends EmptyPlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvZGatewayFE, PvZMidgame5GateGoon)
+  override lazy val forced: Seq[Strategy] = Seq(PvZGatewayFE, PvZMidgameNeoBisu)
   override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
 }

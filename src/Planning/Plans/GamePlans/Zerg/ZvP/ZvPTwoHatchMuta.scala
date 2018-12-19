@@ -50,7 +50,7 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
       avoidDistanceFromBase = 1.0,
       preferDistanceFromEnemy = 0.25)
   else
-    PlacementProfiles.wallCannon
+    PlacementProfiles.defensive
   
   override def priorityAttackPlan: Plan = new If(
     new UnitsAtLeast(12, UnitMatchWarriors),

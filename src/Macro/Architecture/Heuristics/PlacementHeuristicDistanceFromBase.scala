@@ -8,9 +8,9 @@ object PlacementHeuristicDistanceFromBase extends PlacementHeuristic {
   
   override def evaluate(blueprint: Blueprint, candidate: Tile): Double = {
 
-    var seedTiles = With.geography.ourBases.map(_.heart)
+    var seedTiles = (candidate.zone.bases ++ With.geography.ourBases).map(_.heart)
     if (seedTiles.isEmpty) {
-      seedTiles = Vector(With.geography.home)
+      seedTiles = Array(With.geography.home)
     }
 
     val distanceTotal = seedTiles

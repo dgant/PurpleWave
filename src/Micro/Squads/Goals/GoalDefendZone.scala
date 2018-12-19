@@ -84,11 +84,12 @@ class GoalDefendZone extends GoalBasic {
   }
   
   def defendHeart(center: Pixel) {
-    val protectables = center.zone.units.filter(u => u.isOurs && u.unitClass.isBuilding && u.hitPoints < 300 && u.visibleToOpponents)
-    val protectRange = ByOption.max(protectables.map(_.pixelDistanceCenter(center))).getOrElse(32.0 * 8.0)
+    val protectables  = center.zone.units.filter(u => u.isOurs && u.unitClass.isBuilding && u.hitPoints < 300 && (u.discoveredByEnemy || u.canAttack))
+    val protectRange  = ByOption.max(protectables.map(_.pixelDistanceCenter(center))).getOrElse(32.0 * 8.0)
+    val destination   = ByOption.minBy(protectables)(_.matchups.framesOfSafety).map(_.pixelCenter).getOrElse(center)
     squad.units.foreach(_.agent.intend(squad.client, new Intention {
-      toTravel = Some(center)
-      toReturn = if (zone.bases.exists(_.owner.isUs)) Some(center) else None
+      toTravel = Some(destination)
+      toReturn = if (zone.bases.exists(_.owner.isUs)) Some(destination) else None
       toLeash = Some(Leash(center, protectRange))
     }))
   }

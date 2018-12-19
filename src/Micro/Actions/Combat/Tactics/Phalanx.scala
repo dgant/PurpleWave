@@ -1,5 +1,6 @@
 package Micro.Actions.Combat.Tactics
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Disengage, Engage}
@@ -7,7 +8,9 @@ import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Phalanx extends Action {
-  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.agent.toForm.isDefined && ! unit.flying
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
+    ! unit.flying
+    && unit.agent.toForm.exists(p => unit.framesToTravelTo(p) < GameTime(0, 10)()))
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     unit.agent.toTravel = unit.agent.toForm

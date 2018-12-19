@@ -40,12 +40,12 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
       val idealPixels = slot.idealPixels.toInt
       val idealTiles = (idealPixels + 16) / 32
       val flyer = slot.unitClass.isFlyer && ! slot.unitClass.isFlyingBuilding
-      if (enemyRangePixelsMin < 32 && zone.exit.isDefined && idealPixels <= Math.max(32, enemyRangePixelsMin)) {
+      if (enemyRangePixelsMin < 32 && zone.exitNow.isDefined && idealPixels <= Math.max(32, enemyRangePixelsMin)) {
         // Against enemy melee units, place melee units directly into the exit
         val nextPixel = start
           .project(
             // Point towards the left/right side of the choke
-            zone.exit.get.sidePixels(meleeSlots.size % 2),
+            zone.exitNow.get.sidePixels(meleeSlots.size % 2),
             // If odd-sized row: First unit goes in the middle; otherwise offset by half a melee radius
             (if (meleeChokeWidthUnits % 2 == 0) meleeUnitDiameter / 2 else 0)
             // Project unit towards the current side

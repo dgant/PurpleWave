@@ -35,8 +35,7 @@ class Zone(
   lazy val  unwalkable        : Boolean             = ! tiles.exists(With.grids.walkable.get)
 
   lazy val exitDistanceGrid: GridGroundDistance = exit.map(_.distanceGrid).getOrElse(new GridGroundDistance(centroid))
-  lazy val exit: Option[Edge] = ByOption.minBy(edges)(edge => With.geography.startLocations.map(_.groundPixels(edge.pixelCenter)).max)
-
+  lazy val exit: Option[Edge] = calculateExit
   lazy val distanceGrid: GridGroundDistance = new GridGroundDistance(if (bases.length == 1) bases.head.heart else centroid)
 
   var units: Vector[UnitInfo]  = Vector.empty
@@ -44,6 +43,12 @@ class Zone(
   var owner     : PlayerInfo        = With.neutral
   var contested : Boolean           = false
   var walledIn  : Boolean           = false
+  var exitNow   : Option[Edge]      = None
+
+  def calculateExit: Option[Edge] =
+    ByOption.minBy(edges)(edge =>
+      ByOption.min(With.geography.enemyBases.map(enemyBase => edge.distanceGrid.get(enemyBase.heart)))
+        .getOrElse(edge.distanceGrid.get(With.intelligence.threatOrigin)))
   
   def contains(tile: Tile)    : Boolean = boundary.contains(tile) && tiles.contains(tile)
   def contains(pixel: Pixel)  : Boolean = contains(pixel.tileIncluding)

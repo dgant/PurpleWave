@@ -2,6 +2,7 @@ package Information.Geography.Types
 
 import Lifecycle.With
 import Mathematics.Points.{Tile, TileRectangle}
+import Mathematics.PurpleMath
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -27,7 +28,28 @@ class Base(val townHallTile: Tile)
   private var calculatedHeart: Option[Tile] = None
   def harvestingArea: TileRectangle = {
     if (calculatedHarvestingArea.isDefined) calculatedHarvestingArea.get else {
-      val output = (Vector(townHallArea) ++ (minerals.filter(_.mineralsLeft > With.configuration.blockerMineralThreshold) ++ gas).map(_.tileArea)).boundary
+      // This is called during initialization! So variables like heart aren't populated yet
+      val centroid = PurpleMath.centroidTiles(minerals.map(_.tileTopLeft))
+      val townHall = townHallTile.add(2, 1)
+      val dx = centroid.x - townHall.x
+      val dy = centroid.y - townHall.y
+      val dxBigger = Math.abs(dx) > Math.abs(dy)
+      val boxInitial = (Vector(townHallArea) ++ (minerals.filter(_.mineralsLeft > With.configuration.blockerMineralThreshold) ++ gas)
+        .map(_.tileArea))
+        .boundary
+      val output = TileRectangle(
+        boxInitial
+          .startInclusive
+          .add(
+            if (   dxBigger) PurpleMath.clamp(dx, -1, 0) else 0,
+            if ( ! dxBigger) PurpleMath.clamp(dy, -1, 0) else 0)
+          .clip,
+      boxInitial
+        .endExclusive
+        .add(
+          if (   dxBigger) PurpleMath.clamp(dx, 0, 1) else 0,
+          if ( ! dxBigger) PurpleMath.clamp(dy, 0, 1) else 0)
+        .clip)
       if (minerals.nonEmpty || gas.nonEmpty) {
         calculatedHarvestingArea = Some(output)
       }

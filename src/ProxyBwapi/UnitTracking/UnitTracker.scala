@@ -39,8 +39,8 @@ class UnitTracker {
 
   private val counterEver = new UnitCounter(() => ever)
   def existsEver(matcher: UnitMatcher*): Boolean = countEver(matcher: _*) > 0
-  def countEver(matcher: UnitMatcher*): Int = counterEver(matcher: _*) + countOurs(matcher: _*) + countEnemy(matcher: _*)
-  def countEverP(predicate: (UnitInfo) => Boolean): Int = counterEver.p(predicate) + countOursP(predicate) + countEnemyP(predicate)
+  def countEver(matcher: UnitMatcher*): Int = counterEver(matcher: _*)
+  def countEverP(predicate: (UnitInfo) => Boolean): Int = counterEver.p(predicate)
   def ever: Iterable[UnitInfo] = all ++ historicalUnitTracker.all
   
   def neutral: Set[ForeignUnitInfo] = foreignUnitTracker.neutralUnits

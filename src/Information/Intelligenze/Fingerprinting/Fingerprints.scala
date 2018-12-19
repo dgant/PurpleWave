@@ -11,14 +11,17 @@ import scala.collection.mutable
 class Fingerprints {
   
   def update() {
-    if (With.enemies.exists(_.isTerran)) {
+    if (With.enemies.exists(_.isUnknownOrTerran)) {
+      fiveRax
+      bbs
+      twoRax1113
       twoFac
       twoFacVultures
       threeFac
       threeFacVultures
       siegeExpand
     }
-    if (With.enemies.exists(_.isProtoss)) {
+    if (With.enemies.exists(_.isUnknownOrProtoss)) {
       gatewayFirst
       earlyForge
       proxyGateway
@@ -31,7 +34,7 @@ class Fingerprints {
       gatewayFe
       dtRush
     }
-    if (With.enemies.exists(_.isZerg)) {
+    if (With.enemies.exists(_.isUnknownOrZerg)) {
       fourPool
       ninePool
       overpool
@@ -52,6 +55,9 @@ class Fingerprints {
   }
 
   // Terran
+  lazy val fiveRax          = addFingerprint(new Fingerprint5Rax)
+  lazy val bbs              = addFingerprint(new FingerprintBBS)
+  lazy val twoRax1113       = addFingerprint(new Fingerprint2Rax1113)
   lazy val twoFac           = addFingerprint(new Fingerprint2Fac)
   lazy val twoFacVultures   = addFingerprint(new Fingerprint2FacVultures)
   lazy val threeFac         = addFingerprint(new Fingerprint3Fac)

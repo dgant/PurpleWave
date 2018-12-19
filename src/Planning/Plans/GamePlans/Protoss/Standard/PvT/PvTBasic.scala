@@ -70,6 +70,7 @@ class PvTBasic extends GameplanModeTemplate {
       new PvTIdeas.AttackRespectingMines))
   
   override def emergencyPlans: Seq[Plan] = Vector(
+    new PvTIdeas.ReactToBBS,
     new If(
       new Employing(PvT13Nexus, PvT21Nexus, PvT28Nexus),
       new PvTIdeas.ReactTo2Fac))
@@ -79,7 +80,7 @@ class PvTBasic extends GameplanModeTemplate {
     new If(new Employing(PvT21Nexus),             new BuildOrder(ProtossBuilds.Opening21Nexus: _*)),
     new If(new Employing(PvT28Nexus),             new BuildOrder(ProtossBuilds.Opening28Nexus: _*)),
     new If(new Employing(PvT2GateObserver),       new BuildOrder(ProtossBuilds.Opening2GateObserver: _*)),
-    new If(new Employing(PvT1015DT), new BuildOrder(ProtossBuilds.Opening10Gate15GateDragoonDT: _*)),
+    new If(new Employing(PvT1015DT),              new BuildOrder(ProtossBuilds.Opening10Gate15GateDragoonDT: _*)),
     new If(new Employing(PvT1GateRobo),           new BuildOrder(ProtossBuilds.Opening1GateReaverPvT: _*)),
     // DT expand, but don't build a Citadel in the enemy's face
     new If(new Employing(PvTDTExpand), new Parallel(

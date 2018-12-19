@@ -9,7 +9,7 @@ class FingerprintNFactories(thresholdFactories: Double) extends Fingerprint {
     if (With.frame < GameTime(5, 20)()) {
       return false
     }
-    if (With.frame > GameTime(7, 0)()) {
+    if (With.frame > GameTime(8, 0)()) {
       return matched
     }
     var factoryUnitTime: Int = 0

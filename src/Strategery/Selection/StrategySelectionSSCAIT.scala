@@ -22,7 +22,12 @@ object StrategySelectionSSCAIT extends StrategySelectionPolicy {
       }
     }
 
-    val recentHistory = history.toVector.sortBy(-_.timestamp).take(5)
+    // Explore during the round robin
+    if (history.size < 3) {
+      return StrategySelectionRandom.chooseBest(topLevelStrategies)
+    }
+
+    val recentHistory = history.toVector.sortBy(-_.timestamp).take(2)
     if (recentHistory.forall(_.won)) {
       StrategySelectionGreedy.chooseBest(topLevelStrategies)
     }

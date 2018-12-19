@@ -1,10 +1,12 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic._
+import Planning.Plans.Macro.Build.CancelAll
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
@@ -47,8 +49,42 @@ object PvTIdeas {
       new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true)),
     new ConsiderAttacking)
 
+  class ReactToBBS extends If(
+    new And(
+      new FrameAtMost(GameTime(10, 0)()),
+      new EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113)),
+    new Parallel(
+      new If(
+        new UnitsAtMost(1, Protoss.Gateway),
+        new CancelAll(Protoss.Nexus)),
+      new RequireSufficientSupply,
+      new Pump(Protoss.DarkTemplar),
+      new If(
+        new And(
+          new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
+          new UnitsAtLeast(7, Protoss.Zealot)),
+        new Pump(Protoss.Dragoon),
+        new Pump(Protoss.Zealot)),
+      new Build(
+        Get(9, Protoss.Probe),
+        Get(Protoss.Pylon),
+        Get(12, Protoss.Probe),
+        Get(2, Protoss.Gateway),
+        Get(18, Protoss.Probe),
+        Get(3, Protoss.Gateway)),
+      new UpgradeContinuously(Protoss.DragoonRange),
+      new Pump(Protoss.Probe),
+      new Build(
+        Get(Protoss.Assimilator),
+        Get(Protoss.CyberneticsCore),
+        Get(Protoss.DragoonRange),
+        Get(Protoss.CitadelOfAdun),
+        Get(Protoss.TemplarArchives))))
+
   class ReactTo2Fac extends If(
-    new EnemyStrategy(With.fingerprints.twoFac),
+    new And(
+      new FrameAtMost(GameTime(10, 0)()),
+      new EnemyStrategy(With.fingerprints.twoFac)),
     new Parallel(
       new RequireSufficientSupply,
       new Pump(Protoss.Dragoon, 7),
@@ -59,7 +95,8 @@ object PvTIdeas {
         Get(Protoss.CyberneticsCore),
         Get(18, Protoss.Probe),
         Get(Protoss.DragoonRange),
-        Get(2, Protoss.Gateway)),
+        Get(2, Protoss.Gateway),
+        Get(2, Protoss.Nexus)),
       new PumpWorkers,
       new Build(
         Get(3, Protoss.Gateway),

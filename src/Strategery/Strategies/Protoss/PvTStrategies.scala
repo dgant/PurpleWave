@@ -22,6 +22,8 @@ abstract class PvTBasicOpener extends PvTStrategy {
 }
 object PvT13Nexus extends PvTBasicOpener {
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.fiveRax,
+    With.fingerprints.bbs,
     With.fingerprints.twoFac,
     With.fingerprints.twoFacVultures,
     With.fingerprints.threeFac,

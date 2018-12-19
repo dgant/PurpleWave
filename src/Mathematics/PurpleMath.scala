@@ -1,7 +1,7 @@
 package Mathematics
 
 import Lifecycle.With
-import Mathematics.Points.{AbstractPoint, Pixel, SpecificPoints}
+import Mathematics.Points.{AbstractPoint, Pixel, SpecificPoints, Tile}
 
 import scala.util.Random
 
@@ -21,6 +21,15 @@ object PurpleMath {
       SpecificPoints.middle
     else
       Pixel(
+        values.view.map(_.x).sum / values.size,
+        values.view.map(_.y).sum / values.size)
+  }
+
+  def centroidTiles(values: Iterable[Tile]): Tile = {
+    if (values.isEmpty)
+      SpecificPoints.tileMiddle
+    else
+      Tile(
         values.view.map(_.x).sum / values.size,
         values.view.map(_.y).sum / values.size)
   }

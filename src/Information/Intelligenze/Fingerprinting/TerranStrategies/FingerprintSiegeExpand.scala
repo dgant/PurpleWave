@@ -20,5 +20,5 @@ class FingerprintSiegeExpand extends FingerprintAnd(
       })
     }
     override val sticky: Boolean = true
-    override protected def lockAfter: Int = GameTime(8, 0)()
+    override protected def lockAfter: Int = GameTime(7, 0)()
   })

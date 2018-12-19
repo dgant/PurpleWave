@@ -2,6 +2,7 @@ package Mathematics.Points
 
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
+import Mathematics.PurpleMath
 import bwapi.TilePosition
 
 case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
@@ -24,6 +25,10 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     x < With.mapTileWidth &&
     y < With.mapTileHeight
   }
+  def clip: Tile = Tile(
+    PurpleMath.clamp(x, 0, With.mapTileWidth - 1),
+    PurpleMath.clamp(y, 0, With.mapTileHeight - 1))
+
   def tileDistanceFromEdge: Int = {
     var min = x
     if (y < min) min = y

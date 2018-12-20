@@ -29,7 +29,7 @@ class EmptyPlaybook {
 
     PvP2GateDTExpand,
     PvP2Gate1012Goon,
-    PvP3GateGoon,
+    //PvP3GateGoon,
     PvP3GateRobo,
 
     PvZ4Gate99,
@@ -86,4 +86,4 @@ class TestingPlaybook extends SSCAITPlaybook {
   override lazy val forced: Seq[Strategy] = Seq(PvP3GateRobo)
 }
 
-object Playbook extends TestingPlaybook {}
+object Playbook extends SSCAITPlaybook {}

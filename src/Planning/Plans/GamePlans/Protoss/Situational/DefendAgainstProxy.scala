@@ -41,7 +41,7 @@ class DefendAgainstProxy extends Plan {
           && proxy.is(Protoss.Pylon)
           && proxy.matchups.allies.exists(_.is(Protoss.Gateway)))
           6
-        else if (proxy.is(Terran.Bunker) && proxy.complete)
+        else if (proxy.isBunker() && (proxy.complete || ! proxy.matchups.allies.exists(a => a.unitClass.isWorker && a.pixelDistanceEdge(proxy) < 256)))
           0
         else if (proxy.attacksAgainstGround > 0)
           4

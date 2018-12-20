@@ -243,14 +243,20 @@ class Commander {
     unit.baseUnit.repair(target.baseUnit)
     sleep(unit, 24)
   }
+
+  def returnCargo(unit: FriendlyUnitInfo): Unit = {
+    if (unit.carryingResources) {
+      unit.baseUnit.returnCargo
+      sleepReturnCargo(unit)
+    }
+  }
   
   def gather(unit: FriendlyUnitInfo, resource: UnitInfo, allowReturningCargo: Boolean = true) {
     if (unready(unit)) return
     
     if (allowReturningCargo && (unit.carryingMinerals || unit.carryingGas)) {
       if ( ! unit.gatheringGas && ! unit.gatheringMinerals) {
-        unit.baseUnit.returnCargo
-        sleepReturnCargo(unit)
+        returnCargo(unit)
       }
       else {
         sleep(unit)

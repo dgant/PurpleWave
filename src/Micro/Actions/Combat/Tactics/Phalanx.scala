@@ -4,6 +4,7 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Disengage, Engage}
+import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Phalanx extends Action {
@@ -33,5 +34,6 @@ object Phalanx extends Action {
       Engage.delegate(unit)
     }
     Disengage.delegate(unit)
+    Move.delegate(unit)
   }
 }

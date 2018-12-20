@@ -47,7 +47,7 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
             // If odd-sized row: First unit goes in the middle; otherwise offset by half a melee radius
             (if (meleeChokeWidthUnits % 2 == 0) meleeUnitDiameter / 2 else 0)
             // Project unit towards the current side
-            +  meleeUnitDiameter * ((meleeSlots.size / 2) % meleeChokeWidthUnits)) +
+            +  meleeUnitDiameter * (2 + (meleeSlots.size / 2) % meleeChokeWidthUnits)) +
           // Fill in rows from front to back
           start.project(end, meleeUnitDiameter * (meleeSlots.size / meleeChokeWidthUnits)) -
           start

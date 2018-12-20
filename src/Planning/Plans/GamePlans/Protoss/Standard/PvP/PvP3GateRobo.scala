@@ -27,6 +27,7 @@ class PvP3GateRobo extends GameplanModeTemplate {
       new EnemyStrategy(With.fingerprints.nexusFirst),
       new And(
         new EnemyStrategy(With.fingerprints.twoGate),
+        new EnemyHasShown(Protoss.Gateway), // Don't abandon base vs. proxies
         new UnitsAtLeast(1, Protoss.Dragoon, complete = true)),
       new And(
         new EnemyStrategy(With.fingerprints.dtRush),
@@ -90,7 +91,7 @@ class PvP3GateRobo extends GameplanModeTemplate {
         new And(
           new UnitsAtMost(0, Protoss.TemplarArchives),
           new UnitsAtLeast(1, Protoss.Shuttle, complete = true),
-          new UnitsAtLeast(1, Protoss.Reaver, complete = true))),
+          new UnitsAtLeast(2, Protoss.Reaver, complete = true))),
       new RequireBases(2)),
 
     new PvPIdeas.TrainArmy,

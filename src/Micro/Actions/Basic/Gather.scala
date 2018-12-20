@@ -63,7 +63,10 @@ object Gather extends Action {
         unit.agent.toGather = bestResource
       }
     }
-    
+
+    if (transferring && unit.carryingResources) {
+      With.commander.returnCargo(unit)
+    }
     if (transferring
       && threatened
       && threatCloser

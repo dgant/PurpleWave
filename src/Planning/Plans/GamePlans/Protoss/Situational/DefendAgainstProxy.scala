@@ -50,6 +50,11 @@ class DefendAgainstProxy extends Plan {
     val maxWorkers            = With.units.countOurs(UnitMatchWorkers) - 5
     val finalWorkers          = Math.min(totalWorkersRequired, maxWorkers)
     val squadDestination      = proxies.head.pixelCenter
+
+    if (totalWorkersRequired <= 0) {
+      defenders.get.release()
+      return
+    }
     defenders.get.unitCounter.set(new UnitCountBetween(0, finalWorkers))
     defenders.get.unitPreference.set(UnitPreferClose(squadDestination))
     if (lastProxyCount > proxies.size) {

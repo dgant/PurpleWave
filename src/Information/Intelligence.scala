@@ -83,8 +83,9 @@ class Intelligence {
 
   private val mostBaselikeEnemyTileCache = new Cache(() =>
     With.units.enemy
-      .toVector
+      .view
       .filter(unit => unit.possiblyStillThere && ! unit.flying && unit.unitClass.isBuilding)
+      .toVector
       .sortBy(unit => ! unit.unitClass.isTownHall)
       .map(_.tileIncludingCenter)
       .headOption

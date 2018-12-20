@@ -82,11 +82,8 @@ class SSCAITPlaybook extends PurpleWavePlaybook {
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionSSCAIT
 }
 
-class TestingPlaybook extends PurpleWavePlaybook {
+class TestingPlaybook extends SSCAITPlaybook {
   override lazy val forced: Seq[Strategy] = Seq(PvP2Gate1012Goon)
-  //override lazy val forced: Seq[Strategy] = new EmptyPlaybook().strategyOrder
-  override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled
-  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionSSCAIT
 }
 
-object Playbook extends PurpleWavePlaybook {}
+object Playbook extends SSCAITPlaybook {}

@@ -13,22 +13,20 @@ import scala.collection.mutable
 
 class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigner {
 
-  def edgeDistance(pixel: Pixel): Double = zone.exitDistanceGrid.get(pixel.tileIncluding)
-
   override def form(units: Seq[FriendlyUnitInfo]): FormationAssigned = {
     if (units.isEmpty) return new FormationAssigned(Map.empty)
 
     val occupied  = With.grids.disposableBoolean1()
     val slots     = units.map(new FormationSlot(_))
-    val start     = zone.exit.map(_.pixelCenter).getOrElse(zone.centroid.pixelCenter)
+    val start     = zone.exitNow.map(_.pixelCenter).getOrElse(zone.centroid.pixelCenter)
     val startTile = start.tileIncluding
-    val end       = start.project(zone.exit.map(_.pixelTowards(zone)).getOrElse(zone.centroid.pixelCenter), 300)
+    val end       = start.project(zone.exitNow.map(_.pixelTowards(zone)).getOrElse(zone.centroid.pixelCenter), 300)
 
     val allEnemies = (enemies.view ++ units.flatMap(_.battle).distinct.map(_.enemy)).distinct
     val enemyRangePixelsMin   : Int = ByOption.min(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(0)
     val enemyRangePixelsMax   : Int = ByOption.max(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(0)
     val meleeUnitDiameter     : Int = Math.max(16, slots.map(s => if (s.idealPixels > 32) 0 else s.unitClass.dimensionMax.toInt).max)
-    val meleeChokeWidthUnits  : Int = Math.max(1, 2 * zone.exit.map(_.radiusPixels.toInt).getOrElse(0) / meleeUnitDiameter)
+    val meleeChokeWidthUnits  : Int = Math.max(1, 2 * zone.exitNow.map(_.radiusPixels.toInt).getOrElse(0) / meleeUnitDiameter)
 
     val meleeSlots = new mutable.ArrayBuffer[(UnitClass, Pixel)]
     val arcSlots   = new mutable.ArrayBuffer[(UnitClass, Pixel)]
@@ -67,6 +65,7 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
       else {
         // Apply arc positioning
         // Find the best point for this unit
+        val distanceGrid = zone.exitNow.map(_.distanceGrid).getOrElse(zone.exitDistanceGrid)
         val point = (Spiral.points(11) ++ nullPoints).minBy(p => {
           if (p == nullPoint) {
             nullValue
@@ -79,7 +78,7 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
                 && With.grids.walkable.get(tile)
                 && ! With.architecture.unbuildable.get(tile)
                 && ! With.architecture.untownhallable.get(tile)))) {
-              val exitDistance                = zone.exitDistanceGrid.get(tile)
+              val exitDistance                = distanceGrid.get(tile)
               val distanceIntoEnemyRangeNow   = 1 + With.grids.enemyRange.get(tile) - With.grids.enemyRange.addedRange
               val distanceIntoEnemyRangeExit  = Math.max(0, enemyRangePixelsMax / 32 - exitDistance)
               val distanceOutOfOurRange       = Math.max(0, exitDistance - idealTiles)

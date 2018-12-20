@@ -3,7 +3,6 @@ package Micro.Squads.Goals
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
-import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
@@ -33,7 +32,16 @@ class GoalAttack extends GoalBasic {
   }
   
   protected def chooseTarget(): Unit = {
-    if (With.enemies.exists( ! _.isZerg) && With.units.countEnemy(UnitMatchWarriors) > 10 && With.geography.ourBases.exists(_.heart.tileDistanceFast(With.intelligence.threatOrigin) < With.mapTileWidth / 2)) {
+    val focusEnemy = With.intelligence.threatOrigin
+    val focusUs = squad.centroid.tileIncluding
+    val threatDistanceToUs =
+      ByOption.min(With.geography.ourBases.map(_.heart.tileDistanceFast(focusEnemy)))
+        .getOrElse(With.geography.home.tileDistanceFast(focusEnemy))
+    val threatDistanceToEnemy =
+      ByOption.min(With.geography.enemyBases.map(_.heart.tileDistanceFast(focusUs)))
+        .getOrElse(With.intelligence.mostBaselikeEnemyTile.tileDistanceFast(focusUs))
+
+    if (With.enemies.exists( ! _.isZerg) && threatDistanceToUs < threatDistanceToEnemy) {
       target = With.intelligence.threatOrigin.pixelCenter
       return
     }

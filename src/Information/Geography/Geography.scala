@@ -26,7 +26,7 @@ class Geography {
   def ourZones                : Vector[Zone]          = ourZonesCache()
   def ourBases                : Vector[Base]          = ourBasesCache()
   def ourSettlements          : Vector[Base]          = ourSettlementsCache()
-  def ourBasesAndSettlements  : Vector[Base]          = (ourBases ++ ourSettlements)
+  def ourBasesAndSettlements  : Vector[Base]          = (ourBases ++ ourSettlements).distinct
   def ourTownHalls            : Vector[UnitInfo]      = ourTownHallsCache()
   def ourHarvestingAreas      : Vector[TileRectangle] = ourHarvestingAreasCache()
   def ourBorder               : Vector[Edge]          = ourBorderCache()

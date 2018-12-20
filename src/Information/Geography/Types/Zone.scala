@@ -45,11 +45,12 @@ class Zone(
   var walledIn  : Boolean           = false
   var exitNow   : Option[Edge]      = None
 
-  def calculateExit: Option[Edge] =
+  def calculateExit: Option[Edge] = {
     ByOption.minBy(edges)(edge =>
       ByOption.min(With.geography.enemyBases.map(enemyBase => edge.distanceGrid.get(enemyBase.heart)))
         .getOrElse(edge.distanceGrid.get(With.intelligence.threatOrigin)))
-  
+  }
+
   def contains(tile: Tile)    : Boolean = boundary.contains(tile) && tiles.contains(tile)
   def contains(pixel: Pixel)  : Boolean = contains(pixel.tileIncluding)
   

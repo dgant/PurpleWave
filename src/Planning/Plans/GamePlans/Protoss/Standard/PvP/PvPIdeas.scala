@@ -18,7 +18,7 @@ import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvP4GateGoon
+import Strategery.Strategies.Protoss.{PvP2Gate1012Goon, PvP4GateGoon}
 
 object PvPIdeas {
   
@@ -60,6 +60,7 @@ object PvPIdeas {
         new Not(new EnemyHasUpgrade(Protoss.DragoonRange))),
       // Don't mess with 4-Gates
       new Or(
+        new Employing(PvP2Gate1012Goon, PvP4GateGoon),
         new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
         new UnitsAtLeast(4, Protoss.Gateway, complete = true),
         new And(

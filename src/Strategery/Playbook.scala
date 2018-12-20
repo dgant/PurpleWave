@@ -20,6 +20,7 @@ class EmptyPlaybook {
     PvT13NexusNZ,
     PvTDTExpand,
     PvT21Nexus,
+    PvT23Nexus,
     PvT28Nexus,
     PvT2GateRangeExpand,
     PvT23Nexus,
@@ -27,9 +28,9 @@ class EmptyPlaybook {
     PvT2BaseCarrier,
     PvT2BaseArbiter,
 
-    PvP2GateDTExpand,
     PvP2Gate1012Goon,
-    //PvP3GateGoon,
+    PvP2GateDTExpand,
+    PvP3GateGoon,
     PvP3GateRobo,
 
     PvZ4Gate99,
@@ -86,4 +87,8 @@ class TestingPlaybook extends SSCAITPlaybook {
   override lazy val forced: Seq[Strategy] = Seq(PvP3GateRobo)
 }
 
-object Playbook extends SSCAITPlaybook {}
+class TrainingPlaybook extends SSCAITPlaybook {
+override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
+}
+
+object Playbook extends TrainingPlaybook {}

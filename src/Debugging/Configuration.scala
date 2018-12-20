@@ -12,7 +12,7 @@ class Configuration {
   var enablePerformanceStops          = true
   var enablePerformanceSurrender      = false
   var enableChat                      = false
-  var enableVisualizations            = true
+  var enableVisualizations            = false
   var enableStreamManners             = true
   var enableHumanManners              = false
   var identifyGhostUnits              = false

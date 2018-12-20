@@ -1,3 +1,4 @@
+
 package Micro.Agency
 
 import Information.Geography.Pathfinding.Types.ZonePath
@@ -278,7 +279,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     _rideGoal = None
     output
   }
-  def setMyRideGoal(to: Pixel): Unit = {
+  def directRide(to: Pixel): Unit = {
     _rideGoal = Some(to)
   }
 }

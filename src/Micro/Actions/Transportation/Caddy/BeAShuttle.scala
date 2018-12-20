@@ -1,8 +1,6 @@
 package Micro.Actions.Transportation.Caddy
 
-import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Techniques.Avoid
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -12,11 +10,9 @@ object BeAShuttle extends Action {
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
     ShuttleAcceptRider.consider(shuttle)
+    ShuttleRegroup.consider(shuttle)
     ShuttleCarry.consider(shuttle)
     ShuttlePark.consider(shuttle)
-    if (shuttle.matchups.framesOfSafety < With.reaction.agencyMax + shuttle.unitClass.framesToTurn180) {
-      Avoid.consider(shuttle)
-    }
     ShuttleCircle.consider(shuttle)
   }
 }

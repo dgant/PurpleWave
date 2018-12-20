@@ -9,21 +9,20 @@ object StrategySelectionSSCAIT extends StrategySelectionPolicy {
   def chooseBest(topLevelStrategies: Iterable[Strategy], expand: Boolean = true): Iterable[Strategy] = {
     val history = With.history.gamesVsEnemies
 
-    // TODO: Enable ReaverCarrierCheese, etc
     if (With.enemy.isTerran) {
       if (history.size % 2 == 0) {
         return (
           if (With.strategy.allowedGivenOpponentHistory(PvT13NexusNZ))
             Vector(PvT13NexusNZ)
           else
-            StrategySelectionGreedy.chooseBest(Vector(PvT28Nexus, PvT2GateRangeExpand), expand = false)
+            StrategySelectionGreedy.chooseBest(Vector(PvT23Nexus, PvT28Nexus, PvT2GateRangeExpand), expand = false)
           ) ++ Vector(PvT2BaseCarrier)
       } else {
         return (
           if (With.strategy.allowedGivenOpponentHistory(PvTDTExpand))
             Vector(PvTDTExpand)
           else
-            StrategySelectionGreedy.chooseBest(Vector(PvT21Nexus, PvT2GateRangeExpand), expand = false)
+            StrategySelectionGreedy.chooseBest(Vector(PvT23Nexus, PvT28Nexus, PvT2GateRangeExpand), expand = false)
           ) ++ Vector(PvT2BaseArbiter)
       }
     }

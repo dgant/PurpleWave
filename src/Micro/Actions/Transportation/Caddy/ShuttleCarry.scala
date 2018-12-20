@@ -4,6 +4,7 @@ import Micro.Actions.Action
 import Micro.Actions.Commands.Move
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.ByOption
 
 object ShuttleCarry extends Action {
 
@@ -11,9 +12,13 @@ object ShuttleCarry extends Action {
     shuttle.is(Protoss.Shuttle) && shuttle.loadedUnits.nonEmpty
   }
 
+  protected def mainPassenger(shuttle: FriendlyUnitInfo): Option[FriendlyUnitInfo] = {
+    ByOption.maxBy(shuttle.loadedUnits)(p => p.subjectiveValue + p.frameDiscovered / 10000.0)
+  }
+
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
     shuttle.agent.passengers
-      .sortBy(_ != Shuttling.mainPassenger(shuttle))
+      .sortBy(_ != mainPassenger(shuttle))
       .flatMap(_.agent.consumePassengerRideGoal)
       .foreach(goal => {
         shuttle.agent.toTravel = Some(goal)

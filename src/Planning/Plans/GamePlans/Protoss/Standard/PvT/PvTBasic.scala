@@ -1,5 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
@@ -55,15 +56,15 @@ class PvTBasic extends GameplanModeTemplate {
   override def meldArchonsAt: Int = 25
   
   override def defaultScoutPlan: Plan = new Parallel(
-    new If(new Employing(PvT13NexusNZ),           new ScoutOn(Protoss.Nexus, quantity = 2)),
-    new If(new Employing(PvT21Nexus),             new ScoutOn(Protoss.Gateway)),
-    new If(new Employing(PvT23Nexus),             new ScoutOn(Protoss.Pylon)),
-    new If(new Employing(PvT28Nexus),             new ScoutOn(Protoss.Gateway)),
-    new If(new Employing(PvT2GateRangeExpand),    new ScoutOn(Protoss.Pylon)),
-    new If(new Employing(PvT1GateRobo),           new ScoutOn(Protoss.CyberneticsCore)),
-    new If(new Employing(PvT2GateObserver),       new ScoutOn(Protoss.Pylon)),
-    new If(new Employing(PvT1015DT),              new If(new UpgradeStarted(Protoss.DragoonRange), new Scout)),
-    new If(new Employing(PvTDTExpand),            new ScoutOn(Protoss.CyberneticsCore)))
+    new If(new Employing(PvT13NexusNZ),         new ScoutOn(Protoss.Nexus, quantity = 2)),
+    new If(new Employing(PvT21Nexus),           new ScoutOn(Protoss.Gateway)),
+    new If(new Employing(PvT23Nexus),           new ScoutOn(Protoss.Pylon)),
+    new If(new Employing(PvT28Nexus),           new ScoutOn(Protoss.Gateway)),
+    new If(new Employing(PvT2GateRangeExpand),  new ScoutOn(Protoss.Pylon)),
+    new If(new Employing(PvT1GateRobo),         new ScoutOn(Protoss.CyberneticsCore)),
+    new If(new Employing(PvT2GateObserver),     new ScoutOn(Protoss.Pylon)),
+    new If(new Employing(PvT1015DT),            new If(new UpgradeStarted(Protoss.DragoonRange), new Scout)),
+    new If(new Employing(PvTDTExpand),          new ScoutOn(Protoss.CyberneticsCore)))
   
   override val defaultAttackPlan = new Parallel(
     new If(
@@ -239,7 +240,9 @@ class PvTBasic extends GameplanModeTemplate {
         new If(
           new And(
             new EmployingCarriers,
-            new ScoutCleared),
+            new Or(
+              new ScoutCleared,
+              new FrameAtLeast(GameTime(4, 45)()))),
           new Parallel(
             new Build(
               Get(Protoss.Stargate),
@@ -295,6 +298,12 @@ class PvTBasic extends GameplanModeTemplate {
         new GasPumpsAtLeast(3)),
       new Parallel(
         new Build(
+          // These two Gets are unnecessary.
+          // SSCAIT Hack fix for weird case of never building a Fleet Beacon
+          // which was probably caused by ScoutCleared considering missing units, but just to be sure:
+          Get(Protoss.FleetBeacon),
+          Get(Protoss.CarrierCapacity),
+
           Get(2, Protoss.CyberneticsCore),
           Get(3, Protoss.Stargate)))))
       

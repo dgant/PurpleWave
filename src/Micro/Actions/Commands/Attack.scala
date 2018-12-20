@@ -18,7 +18,7 @@ object Attack extends Action {
     val dropship = unit.transport.find(_.isAny(Terran.Dropship, Protoss.Shuttle, Zerg.Overlord))
     val delay = unit.cooldownMaxAirGround
     if (dropship.isDefined
-      && unit.pixelDistanceEdge(target.projectFrames(delay))
+      && Math.min(unit.pixelDistanceEdge(target), unit.pixelDistanceEdge(target.projectFrames(delay)))
       <= unit.pixelRangeAgainst(target)
         + With.reaction.agencyAverage
         + delay * unit.topSpeed) {

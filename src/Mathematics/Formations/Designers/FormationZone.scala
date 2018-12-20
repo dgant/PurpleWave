@@ -5,6 +5,7 @@ import Lifecycle.With
 import Mathematics.Formations.{FormationAssigned, FormationSlot, FormationUnassigned}
 import Mathematics.Points.{Pixel, Point}
 import Mathematics.Shapes.Spiral
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -23,8 +24,8 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
     val end       = start.project(zone.exitNow.map(_.pixelTowards(zone)).getOrElse(zone.centroid.pixelCenter), 300)
 
     val allEnemies = (enemies.view ++ units.flatMap(_.battle).distinct.map(_.enemy)).distinct
-    val enemyRangePixelsMin   : Int = ByOption.min(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(0)
-    val enemyRangePixelsMax   : Int = ByOption.max(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(0)
+    val enemyRangePixelsMin   : Int = ByOption.min(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(32 * 5)
+    val enemyRangePixelsMax   : Int = ByOption.max(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(32 * 5)
     val meleeUnitDiameter     : Int = Math.max(16, slots.map(s => if (s.idealPixels > 32) 0 else s.unitClass.dimensionMax.toInt).max)
     val meleeChokeWidthUnits  : Int = Math.max(1, 2 * zone.exitNow.map(_.radiusPixels.toInt).getOrElse(0) / meleeUnitDiameter)
 
@@ -37,7 +38,7 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
     slots.sortBy(_.idealPixels).foreach(slot => {
       val idealPixels = slot.idealPixels.toInt
       val idealTiles = (idealPixels + 16) / 32
-      val flyer = slot.unitClass.isFlyer && ! slot.unitClass.isFlyingBuilding
+      val flyer = slot.unitClass.isFlyer && ! slot.unitClass.isFlyingBuilding && slot.unitClass != Protoss.Shuttle
       if (enemyRangePixelsMin < 32 && zone.exitNow.isDefined && idealPixels <= Math.max(32, enemyRangePixelsMin)) {
         // Against enemy melee units, place melee units directly into the exit
         val nextPixel = start
@@ -47,9 +48,9 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
             // If odd-sized row: First unit goes in the middle; otherwise offset by half a melee radius
             (if (meleeChokeWidthUnits % 2 == 0) meleeUnitDiameter / 2 else 0)
             // Project unit towards the current side
-            +  meleeUnitDiameter * (2 + (meleeSlots.size / 2) % meleeChokeWidthUnits)) +
+            +  meleeUnitDiameter * ((meleeSlots.size / 2) % meleeChokeWidthUnits)) +
           // Fill in rows from front to back
-          start.project(end, meleeUnitDiameter * (meleeSlots.size / meleeChokeWidthUnits)) -
+          start.project(end, meleeUnitDiameter * (2 + (meleeSlots.size / meleeChokeWidthUnits))) -
           start
 
         meleeSlots += ((slot.unitClass, nextPixel))

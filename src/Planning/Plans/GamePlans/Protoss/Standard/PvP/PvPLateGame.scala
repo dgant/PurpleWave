@@ -71,7 +71,6 @@ class PvPLateGame extends GameplanModeTemplate {
         new Or(
           new UnitsAtLeast(1, Protoss.CitadelOfAdun),
           new UnitsAtLeast(1, Protoss.TemplarArchives),
-          new Not(new EnemyRobo),
           new And(
             new UnitsAtLeast(1, Protoss.PhotonCannon),
             new UnitsAtLeast(8, Protoss.Zealot)))),

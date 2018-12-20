@@ -20,5 +20,5 @@ class PvPVsForge extends PvP3GateRobo {
   // Proposed answer: One base speedlots?!?
 
   override val activationCriteria: Predicate = new And(new EnemyStrategy(With.fingerprints.earlyForge), new UnitsAtMost(0, Protoss.CitadelOfAdun))
-  override val completionCriteria: Predicate = new Latch(new BasesAtLeast(3))
+  override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
 }

@@ -97,8 +97,8 @@ class Intelligence {
     var y = 0
     var n = 0
     With.units.enemy.foreach(u => if (u.likelyStillThere && u.attacksAgainstGround > 0) {
-      x += 32 * u.x
-      y += 32 * u.y
+      x += u.x / 32
+      y += u.y / 32
       n += 1
     })
 

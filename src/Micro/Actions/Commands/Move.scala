@@ -21,9 +21,7 @@ object Move extends Action {
       With.commander.attackMove(unit, pixelToMove)
     }
     else if (unit.agent.ride.isDefined
-      && ( ! unit.agent.shouldEngage
-        || unit.matchups.threatsInRange.nonEmpty
-        || unit.framesToTravelTo(pixelToMove) > unit.unitClass.groundDamageCooldown * 3)) {
+      && (unit.matchups.threatsInRange.nonEmpty || unit.framesToTravelTo(pixelToMove) > unit.unitClass.groundDamageCooldown * 4)) {
       With.commander.rightClick(unit, unit.agent.ride.get)
     }
     else {

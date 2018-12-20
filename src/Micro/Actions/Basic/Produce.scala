@@ -19,7 +19,9 @@ object Produce extends Action {
   override def perform(unit: FriendlyUnitInfo) {
     
     if (unit.agent.toTrain.isDefined) {
-      With.commander.build(unit, unit.agent.toTrain.get)
+      if (With.framesSince(unit.agent.lastIntent.frameCreated) < Math.max(128, unit.agent.toTrain.get.buildFrames / 2)) {
+        With.commander.build(unit, unit.agent.toTrain.get)
+      }
       unit.agent.lastIntent.toTrain = None //Avoid building repeatedly
     }
     else if (unit.agent.toTech.isDefined) {

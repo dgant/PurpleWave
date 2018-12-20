@@ -62,6 +62,9 @@ class PvPLateGame extends GameplanModeTemplate {
     new Build(Get(3, Protoss.Gateway)),
     new BuildGasPumps,
 
+    // Shuttle speed
+    new If(new UnitsAtLeast(1, Protoss.Shuttle), new UpgradeContinuously(Protoss.ShuttleSpeed)),
+
     // Robo or Templar tech (or both?)
     new FlipIf(
       new Latch(
@@ -79,8 +82,6 @@ class PvPLateGame extends GameplanModeTemplate {
         new Build(Get(5, Protoss.Gateway)),
         new TemplarTech)),
 
-    // Shuttle speed
-    new If(new UnitsAtLeast(2, Protoss.Shuttle), new UpgradeContinuously(Protoss.ShuttleSpeed)),
     new Build(Get(6, Protoss.Gateway)),
 
     new If(

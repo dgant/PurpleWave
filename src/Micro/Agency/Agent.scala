@@ -262,7 +262,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     _passengers -= passenger
   }
   def updateRidesharing(): Unit = {
-    _passengers --= passengers.filter(u => u.alive && u.isOurs)
+    _passengers --= passengers.filter(u => ! u.alive || ! u.isOurs)
     if (unit.transport.isDefined) {
       unit.transport.foreach(_.agent.claimPassenger(unit))
     } else {

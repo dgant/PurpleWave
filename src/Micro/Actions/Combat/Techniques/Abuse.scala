@@ -32,8 +32,9 @@ object Abuse extends ActionTechnique {
     if ( ! unit.canAttack(other)) return None
     if (other.unitClass.isWorker && other.pixelDistanceEdge(unit) > 32) return None
 
+    lazy val ourSpeed     = Math.max(unit.topSpeed, unit.agent.ride.map(_.topSpeed).getOrElse(0.0))
     lazy val deltaThreats = other.matchups.threats.size - unit.matchups.threats.size
-    lazy val deltaSpeed = unit.topSpeed - other.topSpeed
+    lazy val deltaSpeed   = ourSpeed - other.topSpeed
     lazy val canOle = (
       deltaSpeed == 0.0
         && deltaThreats > 0

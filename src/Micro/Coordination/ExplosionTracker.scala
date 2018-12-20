@@ -42,7 +42,6 @@ class ExplosionTracker {
   
   def run() {
     byBattle.clear()
-    if (With.performance.enablePerformanceStops && With.performance.danger) return
     With.bullets.all.foreach(explosionFromBullet)
     With.units.all.foreach(explosionFromUnit)
     With.game.getNukeDots.asScala.map(new Pixel(_)).foreach(explosionFromNuke)
@@ -73,7 +72,9 @@ class ExplosionTracker {
       && unit.isFriendly
       && unit.orderTarget.nonEmpty) {
       // Only auto-dodge our own triggered mines
-      addToBattle(unit, new ExplosionSpiderMineBlast(unit))
+      if ( ! With.performance.enablePerformanceStops && ! With.performance.danger) {
+        addToBattle(unit, new ExplosionSpiderMineBlast(unit))
+      }
     }
     else if (unit.is(Zerg.InfestedTerran)) {
       addToBattle(unit, new ExplosionInfestedTerran(unit))

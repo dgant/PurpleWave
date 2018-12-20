@@ -77,6 +77,7 @@ object FightOrFlight extends Action {
       && ally.unitClass.topSpeed <= Protoss.HighTemplar.topSpeed
       && (ally.subjectiveValue > unit.subjectiveValue || ally.unitClass.isBuilding)
       && ( ! ally.unitClass.isBuilding || ally.matchups.threatsInRange.nonEmpty)
+      && (ally.friendly.forall(_.agent.ride.exists(_.pixelDistanceEdge(ally) > 96)) || ally.matchups.threatsInRange.nonEmpty)
       && ally.matchups.framesOfSafety <= 12 + Math.max(0, unit.matchups.framesOfSafety)))
 
     decide(true, "Getaway", () => unit.agent.ride.exists(ride => {

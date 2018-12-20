@@ -4,6 +4,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchNot, UnitMatchRecruitableForCombat}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
@@ -53,7 +54,8 @@ abstract class GoalAssignToBases extends GoalBasic {
   }
   override protected def offerUseful(candidates: Iterable[FriendlyUnitInfo]): Unit = {}
   override protected def offerUseless(candidates: Iterable[FriendlyUnitInfo]): Unit = {}
-  
+
+  unitMatcher = UnitMatchAnd(UnitMatchRecruitableForCombat, UnitMatchNot(Protoss.Shuttle))
   private def scoutPreference(unit: FriendlyUnitInfo): Double = {
     val scoutDestination = baseToPixel(peekNextBase)
     val typeMultiplier = if (unit.isAny(

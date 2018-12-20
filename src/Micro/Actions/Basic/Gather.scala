@@ -7,6 +7,7 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Disengage, Engage}
 import Micro.Actions.Combat.Tactics.Potshot
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Strategery.Benzene
 import Utilities.ByOption
 
 object Gather extends Action {
@@ -69,6 +70,11 @@ object Gather extends Action {
       && (unit.visibleToOpponents || unit.matchups.framesOfSafety < unit.unitClass.framesToTurn180)) {
       unit.agent.canFight = false
       Disengage.consider(unit)
+    }
+
+    // Total hack
+    if (transferring && Benzene.matches && unit.base.exists(_.isOurMain)) {
+      unit.agent.toGather = With.geography.ourNatural.minerals.find(_.visible).orElse(unit.agent.toGather)
     }
     
     With.commander.gather(unit, unit.agent.toGather.get)

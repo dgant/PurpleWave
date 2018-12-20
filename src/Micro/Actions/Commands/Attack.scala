@@ -20,7 +20,8 @@ object Attack extends Action {
     if (dropship.isDefined
       && unit.pixelDistanceEdge(target.projectFrames(delay))
       <= unit.pixelRangeAgainst(target)
-        + With.reaction.agencyAverage) {
+        + With.reaction.agencyAverage
+        + delay * unit.topSpeed) {
       With.commander.unload(dropship.get, unit)
       return
     }

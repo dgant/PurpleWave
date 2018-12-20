@@ -5,7 +5,7 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Macro.Automatic._
+import Planning.Plans.Macro.Automatic.{PumpWorkers, _}
 import Planning.Plans.Macro.Build.CancelAll
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Compound.{And, Latch, Not}
@@ -70,16 +70,15 @@ object PvTIdeas {
         new UnitsAtLeast(3, Protoss.Dragoon),
         new Build(Get(Protoss.DragoonRange))),
       new If(
+        new UnitsAtLeast(2, Protoss.Gateway),
+        new PumpWorkers,
+        new PumpWorkers(cap = 12)),
+      new If(
         new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
         new Pump(Protoss.Dragoon),
-        new If(
-          new UnitsAtMost(0, Terran.Bunker, complete = true),
-          new Pump(Protoss.Zealot),
-          new Pump(Protoss.Zealot, 5))),
+        new Pump(Protoss.Zealot, 7)),
       new Build(
-        Get(9, Protoss.Probe),
         Get(Protoss.Pylon),
-        Get(12, Protoss.Probe),
         Get(2, Protoss.Gateway),
         Get(18, Protoss.Probe),
         Get(Protoss.ShieldBattery),

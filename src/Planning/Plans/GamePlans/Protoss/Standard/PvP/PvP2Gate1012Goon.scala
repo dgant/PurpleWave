@@ -29,8 +29,7 @@ class PvP2Gate1012Goon extends GameplanModeTemplate {
   
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvPIdeas.ReactToDarkTemplarEmergencies,
-    new PvPIdeas.ReactToCannonRush,
-    new PvPIdeas.ReactToFFE)
+    new PvPIdeas.ReactToCannonRush)
   
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.TwoGate1012
   override def buildPlans = Vector(
@@ -38,6 +37,12 @@ class PvP2Gate1012Goon extends GameplanModeTemplate {
       Get(Protoss.Assimilator),
       Get(Protoss.CyberneticsCore),
       Get(Protoss.DragoonRange)),
+
+    new If(
+      new EnemyStrategy(With.fingerprints.forgeFe),
+      new Build(
+        Get(Protoss.RoboticsFacility),
+        Get(Protoss.RoboticsSupportBay))),
 
     new If(
       new Or(

@@ -4,9 +4,12 @@ import Micro.Actions.Action
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
-object ShuttlePickup extends Action {
+object ShuttleAcceptRider extends Action {
 
-  override def allowed(shuttle: FriendlyUnitInfo): Boolean = BeAShuttle.allowed(shuttle)
+  override def allowed(shuttle: FriendlyUnitInfo): Boolean = (
+    BeAShuttle.allowed(shuttle)
+    && (shuttle.agent.passengers.isEmpty || shuttle.matchups.framesOfSafety > 0)
+  )
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
     val pickupCandidates = shuttle.teammates
@@ -25,10 +28,6 @@ object ShuttlePickup extends Action {
     val pickupCandidate = ByOption.maxBy(pickupCandidates)(c => Shuttling.pickupNeed(shuttle, c) / (1.0 + c.pixelDistanceSquared(shuttle)))
     pickupCandidate.foreach(hailer => {
       shuttle.agent.claimPassenger(hailer)
-      if (hailer.pixelDistanceTravelling(Shuttling.passengerDestination(hailer)) > Shuttling.dropoffRadius + 128
-        || hailer.matchups.threatsInRange.nonEmpty) {
-        shuttle.agent.pickup(hailer)
-      }
     })
   }
 }

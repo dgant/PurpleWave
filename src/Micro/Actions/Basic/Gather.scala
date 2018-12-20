@@ -2,6 +2,7 @@ package Micro.Actions.Basic
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
+import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Disengage, Engage}
 import Micro.Actions.Combat.Tactics.Potshot
@@ -43,8 +44,29 @@ object Gather extends Action {
     if (atResource && unit.totalHealth > damageMax && beckoned) {
       Engage.consider(unit)
     }
+
+    val lethalStabbers = unit.matchups.threatsInRange.filter(t => t.unitClass.melee && t.damageOnNextHitAgainst(unit) >= unit.totalHealth)
+    if (lethalStabbers.nonEmpty && unit.base.isDefined) {
+      val walkableResources = unit.base.get.resources
+        .filter(resource =>
+          ( ! unit.carryingGas && resource.unitClass.isGas && resource.isOurs) ||
+          ( ! unit.carryingMinerals && resource.unitClass.isMinerals))
+      val bestResource =
+        ByOption.minBy(walkableResources)(resource =>
+          lethalStabbers.map(stabber =>
+            PurpleMath.radiansTo(
+              stabber.pixelCenter.radiansTo(unit.pixelCenter),
+              stabber.pixelCenter.radiansTo(resource.pixelCenter))
+          ).max)
+      if (bestResource.isDefined) {
+        unit.agent.toGather = bestResource
+      }
+    }
     
-    if (transferring && threatened && unit.visibleToOpponents && threatCloser) {
+    if (transferring
+      && threatened
+      && threatCloser
+      && (unit.visibleToOpponents || unit.matchups.framesOfSafety < unit.unitClass.framesToTurn180)) {
       unit.agent.canFight = false
       Disengage.consider(unit)
     }

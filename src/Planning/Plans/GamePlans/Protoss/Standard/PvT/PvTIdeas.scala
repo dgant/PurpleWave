@@ -72,7 +72,10 @@ object PvTIdeas {
       new If(
         new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
         new Pump(Protoss.Dragoon),
-        new Pump(Protoss.Zealot)),
+        new If(
+          new UnitsAtMost(0, Terran.Bunker, complete = true),
+          new Pump(Protoss.Zealot),
+          new Pump(Protoss.Zealot, 5))),
       new Build(
         Get(9, Protoss.Probe),
         Get(Protoss.Pylon),

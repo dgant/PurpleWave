@@ -37,7 +37,11 @@ class DefendAgainstProxy extends Plan {
     val workersRequired = proxies.map(proxy =>
       (
         proxy,
-        if (proxy.is(Terran.Bunker) && proxy.complete)
+        if (With.frame < GameTime(2, 45)()
+          && proxy.is(Protoss.Pylon)
+          && proxy.matchups.allies.exists(_.is(Protoss.Gateway)))
+          6
+        else if (proxy.is(Terran.Bunker) && proxy.complete)
           0
         else if (proxy.attacksAgainstGround > 0)
           4

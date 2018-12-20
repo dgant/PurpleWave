@@ -83,7 +83,7 @@ class SSCAITPlaybook extends PurpleWavePlaybook {
 }
 
 class TestingPlaybook extends SSCAITPlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvP2Gate1012Goon)
+  override lazy val forced: Seq[Strategy] = Seq(PvP3GateRobo)
 }
 
-object Playbook extends SSCAITPlaybook {}
+object Playbook extends TestingPlaybook {}

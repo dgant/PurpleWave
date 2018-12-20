@@ -43,6 +43,9 @@ object TargetHeuristicVpfEnemy extends TargetHeuristic {
     if (candidate.repairing) {
       candidate.orderTarget.foreach(bonusVpf += calculate(_))
     }
+    if (candidate.is(Protoss.Arbiter) && unit.matchups.allyDetectors.isEmpty) {
+      bonusVpf += maxTeamVpf
+    }
 
     candidate.matchups.vpfTargetHeuristic + bonusVpf
   }

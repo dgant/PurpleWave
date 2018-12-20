@@ -2,7 +2,7 @@ package Micro.Actions.Commands
 
 import Lifecycle.With
 import Micro.Actions.Action
-import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Attack extends Action {
@@ -13,6 +13,13 @@ object Attack extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
+
+    val dropship = unit.transport.find(_.isAny(Terran.Dropship, Protoss.Shuttle, Zerg.Overlord))
+    if (dropship.isDefined) {
+      With.commander.unload(dropship.get, unit)
+      return
+    }
+
     if (unit.is(Zerg.Lurker) && ! unit.burrowed) {
       unit.agent.toTravel = Some(unit.agent.toAttack.get.pixelCenter)
       Move.delegate(unit)

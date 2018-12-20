@@ -1,8 +1,6 @@
 package Micro.Actions.Transportation.Caddy
 
 import Lifecycle.With
-import Mathematics.Points.Pixel
-import Mathematics.Shapes.Spiral
 import Micro.Actions.Combat.Targeting.Target
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -37,30 +35,6 @@ object Shuttling {
     val output = passenger.agent.toAttack
 
     output
-  }
-
-  def passengerDestination(passenger: FriendlyUnitInfo): Pixel = {
-    val target = passengerTarget(passenger)
-    if (target.isEmpty) return passenger.agent.destination
-
-    val targetSnipeStart = target.get.pixelCenter.project(passenger.pixelCenter, passenger.effectiveRangePixels).tileIncluding
-    val targetSnipeTiles =
-      Spiral
-        .points(9)
-        .map(targetSnipeStart.add)
-        .filter(tile => tile.valid && With.grids.walkable.get(tile))
-    val targetSnipeFinal = ByOption.minBy(targetSnipeTiles)(tile => {
-      val enemyRange        = 1.0 + Math.max(0.0, With.grids.enemyRange.get(tile))
-      val enemyFactor       = enemyRange
-      val distanceTarget    = target.get.pixelCenter.groundPixels(tile.pixelCenter)
-      val distanceIdeal     = passenger.effectiveRangePixels
-      val distanceOff       = 1.0 + Math.abs(distanceIdeal - distanceTarget)
-      val distanceFromHere  = 1.0 + passenger.tileIncludingCenter.tileDistanceFast(tile)
-      val distanceFactor    = distanceFromHere * distanceOff * (if (passenger.loaded) 1.0 else distanceFromHere)
-      val visionFactor      = if (With.grids.enemyVision.isSet(tile)) 3 else 2
-      enemyFactor * distanceFactor * visionFactor
-    }).map(_.pixelCenter)
-    targetSnipeFinal.getOrElse(passenger.agent.destination)
   }
 
   def pickupNeed(shuttle: FriendlyUnitInfo, hailer: FriendlyUnitInfo): Double = {

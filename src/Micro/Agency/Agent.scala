@@ -245,15 +245,11 @@ class Agent(val unit: FriendlyUnitInfo) {
   // Ridesharing //
   /////////////////
 
-  var shouldHopIn: Boolean = false
   private var rideAge: Int = 0
   private var _ride: Option[FriendlyUnitInfo] = None
   private val _passengers: ArrayBuffer[FriendlyUnitInfo] = new ArrayBuffer[FriendlyUnitInfo]
   def ride: Option[FriendlyUnitInfo] = _ride
   def passengers: Seq[FriendlyUnitInfo] = (_passengers ++ unit.loadedUnits).distinct
-  def pickup(passenger: FriendlyUnitInfo): Unit = {
-    passenger.agent.shouldHopIn = true
-  }
   def claimPassenger(passenger: FriendlyUnitInfo): Unit = {
     passenger.agent._ride = Some(unit)
     passenger.agent.rideAge = 0
@@ -264,7 +260,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   def releasePassenger(passenger: FriendlyUnitInfo): Unit = {
     passenger.agent._ride = passenger.agent._ride.filterNot(_ == unit)
     _passengers -= passenger
-    passenger.agent.shouldHopIn = false
   }
   def updateRidesharing(): Unit = {
     _passengers --= passengers.filter(u => u.alive && u.isOurs)
@@ -276,5 +271,14 @@ class Agent(val unit: FriendlyUnitInfo) {
         _ride.foreach(_.agent.releasePassenger(unit))
       }
     }
+  }
+  private var _rideGoal: Option[Pixel] = None
+  def consumeRideGoal: Option[Pixel] = {
+    val output = _rideGoal
+    _rideGoal = None
+    output
+  }
+  def setRideGoal(to: Pixel): Unit = {
+    _rideGoal = Some(to)
   }
 }

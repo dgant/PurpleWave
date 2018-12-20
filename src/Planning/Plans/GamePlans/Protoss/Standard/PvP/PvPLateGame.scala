@@ -76,8 +76,8 @@ class PvPLateGame extends GameplanModeTemplate {
         new RoboTech,
         new Build(Get(5, Protoss.Gateway))),
       new Parallel(
-        new TemplarTech,
-        new Build(Get(5, Protoss.Gateway)))),
+        new Build(Get(5, Protoss.Gateway)),
+        new TemplarTech)),
 
     // Shuttle speed
     new If(new UnitsAtLeast(2, Protoss.Shuttle), new UpgradeContinuously(Protoss.ShuttleSpeed)),
@@ -115,12 +115,14 @@ class PvPLateGame extends GameplanModeTemplate {
 
     // We're dead to DTs if we don't
     new If(
-      new Or(
-        new Employing(PvP2GateDTExpand),
-        new And(
-          new Employing(PvP2Gate1012Goon),
-          new Not(new EnemyStrategy(With.fingerprints.robo)))),
-      new BuildCannonsAtNatural(2)),
+      new And(
+        new UnitsAtMost(0, Protoss.Observatory),
+        new Or(
+          new Employing(PvP2GateDTExpand),
+          new And(
+            new Employing(PvP2Gate1012Goon),
+            new Not(new EnemyStrategy(With.fingerprints.robo))))),
+        new BuildCannonsAtNatural(2)),
 
     new If(
       new EnemyDarkTemplarLikely,
@@ -149,11 +151,6 @@ class PvPLateGame extends GameplanModeTemplate {
     // Observer Speed?
     new If(new EnemiesAtLeast(1, Protoss.DarkTemplar), new UpgradeContinuously(Protoss.ObserverSpeed)),
 
-    // Army/Tech
-    //
-    // Abuse lack of detection
-    new If(new Not(new EnemyRobo), new TemplarTech),
-    //
     // Normal army/tech
     //
     new FlipIf(

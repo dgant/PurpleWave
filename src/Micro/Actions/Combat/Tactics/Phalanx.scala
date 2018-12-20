@@ -1,6 +1,7 @@
 package Micro.Actions.Combat.Tactics
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Disengage, Engage}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -13,8 +14,12 @@ object Phalanx extends Action {
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val spot      = unit.agent.toForm.get
     val hoplites  = unit.matchups.allies.flatMap(_.friendly).filter(_.agent.toForm.isDefined)
-    val besieged  = hoplites.exists(h => h.matchups.threats.exists(t => t.inRangeToAttack(h, h.agent.toForm.get) && h.pixelRangeAgainst(t) < t.pixelRangeAgainst(h)))
     val openFire  = unit.matchups.targets.exists(t => t.pixelDistanceEdge(unit, unit.agent.toForm.get) <= unit.pixelRangeAgainst(t))
+    val besieged = hoplites.exists(hoplite =>
+      hoplite.matchups.threats.exists(threat =>
+        threat.inRangeToAttack(hoplite, hoplite.agent.toForm.get)
+        && hoplite.pixelRangeAgainst(threat) < threat.pixelRangeAgainst(hoplite)
+        && With.grids.enemyVision.isSet(hoplite.agent.toForm.get.tileIncluding)))
 
     unit.agent.toTravel = Some(spot)
     unit.agent.toReturn = Some(spot)

@@ -18,7 +18,7 @@ class GridEnemyVision extends AbstractGridFramestamp {
           while (iPoint < nPoints) {
             val tile = start.add(points(iPoint))
             iPoint += 1
-            if (tile.valid && (unit.flying || altitude >= With.grids.altitudeBonus.rawValues(start.i))) {
+            if (tile.valid && (unit.flying || altitude >= With.grids.altitudeBonus.rawValues(tile.i))) {
               stamp(tile)
             }
           }

@@ -2,13 +2,10 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Macro.Architecture.Blueprint
-import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Parallel, _}
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, MeldArchons}
@@ -21,13 +18,7 @@ import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvP2Gate1012Goon, PvP4GateGoon}
 
 object PvPIdeas {
-  
-  class PlaceShieldBatteryAtNexus extends ProposePlacement {
-    override lazy val blueprints = Vector(new Blueprint(this, building = Some(Protoss.ShieldBattery), placement = Some(PlacementProfiles.hugTownHall)))
-  }
 
-  class StealGasSelectively extends If(new Not(new EnemyStrategy(With.fingerprints.twoGate)), new StealGas)
-  
   class EnemyCarriersOnly extends And(
     new EnemyCarriers,
     new EnemiesAtMost(6, UnitMatchAnd(UnitMatchWarriors,  UnitMatchNot(UnitMatchMobileFlying))))
@@ -142,22 +133,36 @@ object PvPIdeas {
         Get(1, Protoss.Observatory)),
     new Pump(Protoss.Observer, 2)))
 
+  class PerformReactionTo2Gate extends Parallel(
+    new If(
+      new UnitsAtMost(5, UnitMatchWarriors, complete = true),
+      new CapGasAt(200)),
+    new RequireSufficientSupply,
+    new Pump(Protoss.Probe, 9),
+    new Build(Get(Protoss.Gateway)),
+    new If(
+      new UnitsAtLeast(5, UnitMatchWarriors, complete = true),
+      new PumpWorkers),
+    new TrainArmy,
+    new Pump(Protoss.Probe, 12),
+    new Build(Get(2, Protoss.Gateway)),
+    new Build(Get(Protoss.ShieldBattery)),
+    new Pump(Protoss.Probe, 21),
+    new Build(
+      Get(Protoss.Assimilator),
+      Get(Protoss.CyberneticsCore),
+      Get(Protoss.DragoonRange),
+      Get(3, Protoss.Gateway)))
+
+  class ReactTo2Gate extends If(
+    new EnemyStrategy(With.fingerprints.twoGate),
+    new PerformReactionTo2Gate)
+
   class ReactToProxyGateways extends If(
     new EnemyStrategy(With.fingerprints.proxyGateway),
     new Parallel(
-      new RequireSufficientSupply,
-      new Pump(Protoss.Probe, 9),
-      new Build(Get(Protoss.Gateway)),
-      new TrainArmy,
-      new Build(Get(2, Protoss.Gateway)),
-      new Pump(Protoss.Probe, 12),
-      new Build(Get(Protoss.ShieldBattery)),
-      new Pump(Protoss.Probe, 21),
+      new PerformReactionTo2Gate,
       new Build(
-        Get(Protoss.Assimilator),
-        Get(Protoss.CyberneticsCore),
-        Get(3, Protoss.Gateway),
-        Get(Protoss.DragoonRange),
         Get(Protoss.CitadelOfAdun),
         Get(Protoss.TemplarArchives))))
 

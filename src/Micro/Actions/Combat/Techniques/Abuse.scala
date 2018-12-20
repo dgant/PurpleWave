@@ -49,7 +49,16 @@ object Abuse extends ActionTechnique {
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    lazy val safeToShoot = unit.matchups.framesOfSafety > unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate
+    val safetyFrames = unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate
+    lazy val safeToShoot = (
+      unit.matchups.framesOfSafety > safetyFrames
+      || unit.matchups.framesOfEntanglementPerThreat.forall(threatPair =>
+        threatPair._2 > safetyFrames
+        || threatPair._1.orderTarget.exists(_ != unit)
+        || threatPair._1.matchups.targets.exists(ally =>
+          threatPair._1.pixelDistanceEdge(ally) <
+          threatPair._1.pixelDistanceEdge(unit) - 32)
+      ))
     lazy val lastChanceToShoot = unit.matchups.targetsInRange.isEmpty || unit.matchups.targets.forall(t => t.pixelDistanceEdge(unit) > unit.pixelRangeAgainst(t) - 32.0)
     if (unit.readyForAttackOrder && (safeToShoot || lastChanceToShoot)) {
       Potshot.delegate(unit)

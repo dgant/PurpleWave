@@ -40,7 +40,9 @@ object Detect extends Action {
 
     unit.agent.toTravel = ghostbuster.map(_.pixelCenter).orElse(Some(spooky.pixelCenter))
 
-    if (unit.matchups.framesOfSafety <= 0) {
+    if (unit.matchups.framesOfSafety <= 0 && spookiestSpooky.forall(s =>
+      s.detected
+      || (s.matchups.targetsInRange.isEmpty && s.matchups.threatsInRange.isEmpty))) {
       Avoid.delegate(unit)
     }
     else {

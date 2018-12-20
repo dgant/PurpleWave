@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Situational
 import Information.Geography.Types.Base
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Micro.Squads.Goals.GoalSmash
+import Micro.Squads.Goals.GoalRazeProxies
 import Micro.Squads.Squad
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountBetween
@@ -70,7 +70,7 @@ class DefendAgainstProxy extends Plan {
     squad.enemies = proxies
     squad.commission()
     defenders.get.units.foreach(squad.recruit)
-    squad.setGoal(new GoalSmash(squadDestination))
+    squad.setGoal(new GoalRazeProxies(squadDestination))
   }
   
   private def getProxies: Seq[UnitInfo] = {
@@ -84,7 +84,7 @@ class DefendAgainstProxy extends Plan {
   
   private def isProxied(enemy: UnitInfo): Boolean = {
     val pixel                     = enemy.pixelCenter
-    val thresholdDistance         = 32.0 * 50.0
+    val thresholdDistance         = 32.0 * 60.0
     def baseDistance(base: Base)  = base.heart.pixelCenter.pixelDistance(pixel)
     lazy val closestEnemyBase     = ByOption.minBy(With.geography.enemyBases)(_.heart.pixelCenter.pixelDistance(pixel))
     lazy val closestOurBase       = ByOption.minBy(With.geography.ourBases)(_.heart.pixelCenter.pixelDistance(pixel))

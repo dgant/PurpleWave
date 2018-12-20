@@ -7,7 +7,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.PumpWorkers
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Expanding.{RequireBases, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.RequireBases
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch}
 import Planning.Predicates.Milestones._
@@ -24,7 +24,10 @@ class PvP3GateRobo extends GameplanModeTemplate {
   override def defaultScoutPlan: Plan = new ScoutOn(Protoss.Gateway)
   override val defaultAttackPlan: Plan = new If(
     new Or(
-      new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.twoGate),
+      new EnemyStrategy(With.fingerprints.nexusFirst),
+      new And(
+        new EnemyStrategy(With.fingerprints.twoGate),
+        new UnitsAtLeast(1, Protoss.Dragoon, complete = true)),
       new And(
         new EnemyStrategy(With.fingerprints.dtRush),
         new UnitsAtLeast(2, Protoss.Observer, complete = true))),
@@ -34,7 +37,8 @@ class PvP3GateRobo extends GameplanModeTemplate {
     new PvPIdeas.ReactToDarkTemplarEmergencies,
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToProxyGateways,
-    new PvPIdeas.ReactToFFE)
+    new PvPIdeas.ReactToFFE,
+    new PvPIdeas.ReactTo2Gate)
 
   override def defaultBuildOrder: Plan = new Parallel(
     new BuildOrder(
@@ -70,20 +74,15 @@ class PvP3GateRobo extends GameplanModeTemplate {
     new EjectScout,
 
     new If(
-      new EnemyStrategy(With.fingerprints.fourGateGoon),
+      new EnemyStrategy(With.fingerprints.robo, With.fingerprints.fourGateGoon, With.fingerprints.nexusFirst),
+      new Build(
+        Get(Protoss.Shuttle),
+        Get(Protoss.RoboticsSupportBay)),
       new BuildOrder(
-        Get(Protoss.CitadelOfAdun),
-        Get(Protoss.TemplarArchives)),
-      new If(
-        new EnemyStrategy(With.fingerprints.robo),
-        new Build(
-          Get(Protoss.Shuttle),
-          Get(Protoss.RoboticsSupportBay)),
-        new BuildOrder(
-          Get(Protoss.Observatory),
-          Get(Protoss.Observer),
-          Get(Protoss.Shuttle),
-          Get(Protoss.RoboticsSupportBay)))),
+        Get(Protoss.Observatory),
+        Get(Protoss.Observer),
+        Get(Protoss.Shuttle),
+        Get(Protoss.RoboticsSupportBay))),
 
     new Trigger(
       new Or(
@@ -97,7 +96,7 @@ class PvP3GateRobo extends GameplanModeTemplate {
     new PvPIdeas.TrainArmy,
 
     new PumpWorkers(oversaturate = true, 40),
-    new RequireMiningBases(2),
+    new RequireBases(2),
     new Build(
       Get(5, Protoss.Gateway),
       Get(2, Protoss.Assimilator),

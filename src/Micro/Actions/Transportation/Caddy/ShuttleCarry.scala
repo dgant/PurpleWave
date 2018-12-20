@@ -12,9 +12,12 @@ object ShuttleCarry extends Action {
   }
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
-    shuttle.agent.consumeRideGoal.foreach(goal => {
-      shuttle.agent.toTravel = Some(goal)
-      Move.delegate(shuttle)
-    })
+    shuttle.agent.passengers
+      .sortBy(_ != Shuttling.mainPassenger(shuttle))
+      .flatMap(_.agent.consumePassengerRideGoal)
+      .foreach(goal => {
+        shuttle.agent.toTravel = Some(goal)
+        Move.delegate(shuttle)
+      })
   }
 }

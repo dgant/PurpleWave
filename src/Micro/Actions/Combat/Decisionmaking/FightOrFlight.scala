@@ -82,7 +82,7 @@ object FightOrFlight extends Action {
     decide(true, "Getaway", () => unit.agent.ride.exists(ride => {
       val rideDistance = Math.max(0.0, ride.pixelDistanceCenter(unit) - Shuttling.pickupRadius)
       val rideWait = PurpleMath.nanToInfinity(rideDistance / ride.topSpeed)
-      rideWait <= Math.max(0.0, unit.matchups.framesOfSafety)
+      rideWait <= Math.max(0.0, unit.matchups.framesOfSafety) || (unit.loaded && unit.matchups.framesOfSafety > unit.cooldownMaxAirGround)
     }))
 
     if (decision.isDefined) {

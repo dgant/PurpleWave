@@ -12,7 +12,7 @@ object ShuttleCircle extends Action {
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
     shuttle.agent.toTravel =
-      ByOption.minBy(With.units.ours.view.filter(_.is(Protoss.RoboticsFacility)))(_.pixelDistanceCenter(shuttle))
+      ByOption.minBy(With.units.ours.view.filter(u => u.is(Protoss.RoboticsFacility)))(_.pixelDistanceCenter(shuttle))
         .map(_.pixelCenter)
         .orElse(shuttle.agent.toTravel)
     Move.delegate(shuttle)

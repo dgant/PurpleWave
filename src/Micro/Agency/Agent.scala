@@ -273,12 +273,12 @@ class Agent(val unit: FriendlyUnitInfo) {
     }
   }
   private var _rideGoal: Option[Pixel] = None
-  def consumeRideGoal: Option[Pixel] = {
+  def consumePassengerRideGoal: Option[Pixel] = {
     val output = _rideGoal
     _rideGoal = None
     output
   }
-  def setRideGoal(to: Pixel): Unit = {
+  def setMyRideGoal(to: Pixel): Unit = {
     _rideGoal = Some(to)
   }
 }

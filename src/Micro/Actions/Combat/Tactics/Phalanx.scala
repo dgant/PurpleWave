@@ -23,7 +23,11 @@ object Phalanx extends Action {
 
     unit.agent.toTravel = Some(spot)
     unit.agent.toReturn = Some(spot)
-    if (besieged && unit.agent.shouldEngage) {
+    if (unit.pixelDistanceCenter(unit.agent.toForm.get) <= (if (unit.matchups.framesOfSafety > 24) 8 else 0)
+      && unit.unitClass.melee
+      && unit.matchups.threats.forall(_.unitClass.melee) ) {
+      With.commander.hold(unit)
+    } else if (besieged && unit.agent.shouldEngage) {
       Engage.delegate(unit)
     } else if (openFire) {
       Engage.delegate(unit)

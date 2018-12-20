@@ -29,6 +29,6 @@ object Move extends Action {
     else {
       With.commander.move(unit, pixelToMove)
     }
-    unit.agent.setRideGoal(pixelToMove)
+    unit.agent.setMyRideGoal(pixelToMove)
   }
 }

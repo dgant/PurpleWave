@@ -13,9 +13,14 @@ object Attack extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
+    val target = unit.agent.toAttack.get
 
     val dropship = unit.transport.find(_.isAny(Terran.Dropship, Protoss.Shuttle, Zerg.Overlord))
-    if (dropship.isDefined) {
+    val delay = unit.cooldownMaxAirGround
+    if (dropship.isDefined
+      && unit.pixelDistanceEdge(target.projectFrames(delay))
+      <= unit.pixelRangeAgainst(target)
+        + With.reaction.agencyAverage) {
       With.commander.unload(dropship.get, unit)
       return
     }
@@ -25,9 +30,9 @@ object Attack extends Action {
       Move.delegate(unit)
     }
     
-    if (unit.agent.toAttack.get.is(Protoss.Interceptor)
-    || (unit.agent.toAttack.get.is(Protoss.Carrier) && ! unit.inRangeToAttack(unit.agent.toAttack.get))) {
-      unit.agent.toTravel = unit.agent.toAttack.map(_.pixelCenter)
+    if (target.is(Protoss.Interceptor)
+    || (target.is(Protoss.Carrier) && ! unit.inRangeToAttack(target))) {
+      unit.agent.toTravel = Some(target.pixelCenter)
       AttackMove.delegate(unit)
     }
     

@@ -11,12 +11,7 @@ object StrategySelectionSSCAIT extends StrategySelectionPolicy {
 
     if (With.enemy.isTerran) {
       if (history.size % 2 == 0) {
-        return (
-          if (With.strategy.allowedGivenOpponentHistory(PvT13NexusNZ))
-            Vector(PvT13NexusNZ)
-          else
-            StrategySelectionGreedy.chooseBest(Vector(PvT23Nexus, PvT28Nexus, PvT2GateRangeExpand), expand = false)
-          ) ++ Vector(PvT2BaseCarrier)
+        return StrategySelectionGreedy.chooseBest(Vector(PvT23Nexus, PvT28Nexus, PvT2GateRangeExpand), expand = false) ++ Vector(PvT2BaseCarrier)
       } else {
         return (
           if (With.strategy.allowedGivenOpponentHistory(PvTDTExpand))

@@ -43,10 +43,10 @@ class Blueprint(
   placement                   = placement                   .orElse(Some(PlacementProfiles.default(this)))
   respectHarvesting           = respectHarvesting           .orElse(Some( ! requireTownHallTile.get))
   marginPixels = marginPixels
-    .orElse(building.filter(_.attacks).map(_.effectiveRangePixels.toDouble))
     .orElse(building.filter(_ == Protoss.ShieldBattery).map(b => 32.0 * 2.0))
-    .orElse(building.filter(_ == Zerg.CreepColony).map(b => 32.0 * 7.0))
-    .orElse(Some(32.0 * 11.0))
+    .orElse(building.filter(_ == Protoss.Pylon).map(b => 32.0 * 12.0))
+    .orElse(building.filter(b => b.attacks || b == Zerg.CreepColony).map(b => 32.0 * 7.0))
+    .orElse(Some(32.0 * 12.0))
   
   def fulfilledBy(proposal: Blueprint): Boolean = {
     if (proposal == this) return true

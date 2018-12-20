@@ -20,11 +20,15 @@ class EmptyPlaybook {
     PvT13NexusNZ,
     PvTDTExpand,
     PvT21Nexus,
+    PvT28Nexus,
+    PvT2GateRangeExpand,
+    PvT23Nexus,
+
     PvT2BaseCarrier,
     PvT2BaseArbiter,
 
     PvP2GateDTExpand,
-    PvPProxy2Gate,
+    PvP2Gate1012Goon,
     PvP3GateGoon,
     PvP3GateRobo,
 
@@ -63,39 +67,9 @@ object StrategyGroups {
     MassPhotonCannon,
     CarriersWithNoDefense,
     FivePoolProxySunkens,
-    PvP2Gate1012,
     PvP1GateReaverExpand,
     PvPLateGameCarrier,
     PvT1GateRobo
-  )
-
-  val sscaitWhitelisted = Vector[Strategy](
-    // Terran
-    PvT13NexusNZ,
-    PvTDTExpand,
-    PvT21Nexus,
-    PvT28Nexus,
-    PvT2GateRangeExpand,
-    PvT2BaseCarrier,
-    PvT2BaseArbiter,
-
-    // Zerg
-    //
-    // Openers
-    PvZ4Gate99,
-    PvZGatewayFE,
-    PvZFFEEconomic,
-    // Midgames
-    PvZMidgame5GateGoon,
-    PvZMidgameNeoBisu,
-
-    // Protoss
-    //
-    // Openers
-    PvP3GateGoon,
-    PvP3GateRobo,
-    PvP2GateDTExpand,
-    PvPProxy2Gate
   )
 }
 
@@ -104,15 +78,15 @@ class PurpleWavePlaybook extends EmptyPlaybook {
 }
 
 class SSCAITPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = StrategyGroups.sscaitWhitelisted
+  override lazy val forced: Seq[Strategy] = new EmptyPlaybook().strategyOrder
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionSSCAIT
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvT13NexusNZ, PvT2BaseCarrier)
-  //override lazy val forced: Seq[Strategy] = StrategyGroups.sscaitWhitelisted
+  override lazy val forced: Seq[Strategy] = Seq(PvP2Gate1012Goon)
+  //override lazy val forced: Seq[Strategy] = new EmptyPlaybook().strategyOrder
   override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled
-  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
+  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionSSCAIT
 }
 
-object Playbook extends SSCAITPlaybook {}
+object Playbook extends PurpleWavePlaybook {}

@@ -7,7 +7,6 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Produce extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-
     (
       unit.agent.toTrain.isDefined  ||
       unit.agent.toTech.isDefined   ||

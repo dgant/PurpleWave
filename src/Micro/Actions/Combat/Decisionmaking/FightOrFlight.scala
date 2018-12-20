@@ -56,7 +56,7 @@ object FightOrFlight extends Action {
     }))
 
     decide(false, "Hazard", () => {
-      With.configuration.enableMCRS && {
+      With.blackboard.mcrs() && {
         val occupancy = With.coordinator.gridPathOccupancy.get(unit.tileIncludingCenter)
         val output: Boolean = (
           ! unit.flying
@@ -104,7 +104,7 @@ object FightOrFlight extends Action {
     unit.agent.fightReason = "Sim"
     unit.agent.shouldEngage = shouldEngage
 
-    if (With.configuration.enableMCRS) {
+    if (With.blackboard.mcrs()) {
       unit.agent.shouldEngage = unit.mcrs.shouldFight
     }
   }

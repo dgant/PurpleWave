@@ -14,7 +14,7 @@ class Simulation(
   val weAttack  : Boolean,
   val weSnipe   : Boolean) {
   
-  private def buildSimulacra(team: Team) = if (With.configuration.enableMCRS) Vector.empty else team.units.filter(legalForSimulation).map(new Simulacrum(this, _))
+  private def buildSimulacra(team: Team) = if (With.blackboard.mcrs()) Vector.empty else team.units.filter(legalForSimulation).map(new Simulacrum(this, _))
   private def legalForSimulation(unit: UnitInfo): Boolean = (
     ! unit.invincible             // No stasised units
     && ! unit.is(Protoss.Carrier) // Simulate the Interceptors only -- produces more reliable results
@@ -31,7 +31,7 @@ class Simulation(
   lazy val ourWidth         : Double              = battle.us.units.filterNot(_.flying).map(unit => if (unit.flying) 0.0 else unit.unitClass.dimensionMin + unit.unitClass.dimensionMax).sum
   lazy val chokeMobility    : Map[Zone, Double]   = battle.us.units.map(_.zone).distinct.map(zone => (zone, getChokeMobility(zone))).toMap
   
-  val simulacra: Map[UnitInfo, Simulacrum] = if (With.configuration.enableMCRS) Map.empty else
+  val simulacra: Map[UnitInfo, Simulacrum] = if (With.blackboard.mcrs()) Map.empty else
     (unitsOurs.filter(_.canMove) ++ unitsEnemy)
       .map(simulacrum => (simulacrum.realUnit, simulacrum))
       .toMap
@@ -45,7 +45,7 @@ class Simulation(
   )
   
   def run() {
-    if (!With.configuration.enableMCRS) {
+    if (!With.blackboard.mcrs()) {
       while (!complete) step()
     }
     cleanup()

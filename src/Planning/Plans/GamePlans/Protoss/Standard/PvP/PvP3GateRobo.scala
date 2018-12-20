@@ -24,7 +24,7 @@ class PvP3GateRobo extends GameplanModeTemplate {
   override def defaultScoutPlan: Plan = new ScoutOn(Protoss.Gateway)
   override val defaultAttackPlan: Plan = new If(
     new Or(
-      new EnemyStrategy(With.fingerprints.nexusFirst),
+      new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.twoGate),
       new And(
         new EnemyStrategy(With.fingerprints.dtRush),
         new UnitsAtLeast(2, Protoss.Observer, complete = true))),

@@ -22,8 +22,6 @@ object Engage extends Action {
       Breathe,
       Charge,
       Chase,
-      //Fill,
-      //Hug,
       Purr,
       Reposition,
       Spread

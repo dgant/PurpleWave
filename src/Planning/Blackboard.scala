@@ -27,6 +27,7 @@ class Blackboard {
   var allowIslandBases    : Property[Boolean] = add(new Property(false))
   var keepingHighTemplar  : Property[Boolean] = add(new Property(true))
   var stealGas            : Property[Boolean] = add(new Property(false))
+  var mcrs                : Property[Boolean] = add(new Property(With.configuration.enableMCRS))
   
   var lastScoutDeath: Int = -24 * 60
   var enemyUnitDied: Boolean = false

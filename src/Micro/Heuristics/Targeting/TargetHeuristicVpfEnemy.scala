@@ -40,6 +40,9 @@ object TargetHeuristicVpfEnemy extends TargetHeuristic {
     if (candidate.constructing && candidate.orderTarget.exists(_.is(Terran.MissileTurret)) && unit.matchups.alliesInclSelfCloaked.exists(_.canAttack)) {
       bonusVpf += maxTeamVpf
     }
+    if (candidate.repairing) {
+      candidate.orderTarget.foreach(bonusVpf += calculate(_))
+    }
 
     candidate.matchups.vpfTargetHeuristic + bonusVpf
   }
@@ -48,9 +51,6 @@ object TargetHeuristicVpfEnemy extends TargetHeuristic {
     val numerator =
       if (candidate.gathering || candidate.base.exists(_.harvestingArea.contains(candidate.tileIncludingCenter))) {
         With.economy.incomePerFrameMinerals
-      }
-      else if (candidate.repairing && candidate.target.isDefined) {
-        MicroValue.valuePerFrameRepairing(candidate.target.get)
       }
       else if (candidate.constructing && candidate.target.isDefined) {
         Math.max(

@@ -12,7 +12,7 @@ import bwapi.Color
 object ShowDesire extends View {
   
   override def renderMap() {
-    if (With.configuration.enableMCRS) {
+    if (With.blackboard.mcrs()) {
       With.units.playerOwned.foreach(renderMCRS)
     } else {
       With.units.ours.foreach(renderUnitState)

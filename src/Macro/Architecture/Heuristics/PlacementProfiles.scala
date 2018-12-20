@@ -36,13 +36,13 @@ object PlacementProfiles {
     preferResources             = 0.0,
     preferRhythm                = 1.0,
     preferSpace                 = 0.05,
-    preferPowering              = 0.15,
-    preferDistanceFromEnemy     = 0.6,
+    preferPowering              = 0.5,
+    preferDistanceFromEnemy     = 0.2,
     preferCoveringWorkers       = 0.0,
-    preferSurfaceArea           = 0.25,
+    preferSurfaceArea           = 0.1,
     avoidDistanceFromBase       = 0.3,
     avoidDistanceFromEnemy      = 0.0,
-    avoidDistanceFromIdealRange = 0.05,
+    avoidDistanceFromIdealRange = 0.2,
     avoidSurfaceArea            = 0.0
   )
   
@@ -90,12 +90,18 @@ object PlacementProfiles {
     preferDistanceFromEnemy     = 1.0
     avoidDistanceFromIdealRange = 0.0
   }
+
+  val frontPylon = new PlacementProfile("Pylon for the front of your base", basic) {
+    preferDistanceFromEnemy     = 0.0
+    avoidDistanceFromIdealRange = 1.0
+  }
   
   val defensive = new PlacementProfile(
     "Forge wall",
     preferZone                  = 100.0,
     preferNatural               = 10.0,
     preferPowering              = 0.2,
+    preferDistanceFromEnemy     = 0.0,
     avoidDistanceFromBase       = 1.0,
     avoidDistanceFromIdealRange = 4.0)
   

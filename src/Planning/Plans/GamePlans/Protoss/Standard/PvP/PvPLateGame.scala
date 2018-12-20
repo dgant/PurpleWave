@@ -12,10 +12,10 @@ import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, BuildCannonsAtExpansio
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._
-import Planning.Predicates.Strategy.Employing
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.{PvPLateGameArbiter, PvPLateGameCarrier, PvP2GateDTExpand}
+import Strategery.Strategies.Protoss.{PvP2Gate1012Goon, PvP2GateDTExpand, PvPLateGameArbiter, PvPLateGameCarrier}
 
 class PvPLateGame extends GameplanModeTemplate {
 
@@ -115,7 +115,11 @@ class PvPLateGame extends GameplanModeTemplate {
 
     // We're dead to DTs if we don't
     new If(
-      new Employing(PvP2GateDTExpand),
+      new Or(
+        new Employing(PvP2GateDTExpand),
+        new And(
+          new Employing(PvP2Gate1012Goon),
+          new Not(new EnemyStrategy(With.fingerprints.robo)))),
       new BuildCannonsAtNatural(2)),
 
     new If(

@@ -70,6 +70,15 @@ object StrategyGroups {
   )
 
   val sscaitWhitelisted = Vector[Strategy](
+    // Terran
+    PvT13NexusNZ,
+    PvTDTExpand,
+    PvT21Nexus,
+    PvT28Nexus,
+    PvT2GateRangeExpand,
+    PvT2BaseCarrier,
+    PvT2BaseArbiter,
+
     // Zerg
     //
     // Openers

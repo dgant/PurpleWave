@@ -29,7 +29,7 @@ class Proxy2Gate extends GameplanModeTemplate {
   override def defaultAttackPlan: Plan = new Attack
   
   private class BeforeProxy extends Parallel(
-    new PlaceGatewaysProxied(2, () => ProxyPlanner.proxyAutomaticSneaky),
+    new PlaceGatewaysProxied(2, () => ProxyPlanner.proxyMiddle),
     new If(
       new EnemyIsTerran,
       new BuildOrder(Get(8, Protoss.Probe), Get(1, Protoss.Pylon)),

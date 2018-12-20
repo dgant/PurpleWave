@@ -16,7 +16,7 @@ object StrategySelectionSSCAIT extends StrategySelectionPolicy {
           if (With.strategy.allowedGivenOpponentHistory(PvT13NexusNZ))
             Vector(PvT13NexusNZ)
           else
-            StrategySelectionGreedy.chooseBest(Vector(PvT21Nexus, PvT2GateRangeExpand), expand = false)
+            StrategySelectionGreedy.chooseBest(Vector(PvT28Nexus, PvT2GateRangeExpand), expand = false)
           ) ++ Vector(PvT2BaseCarrier)
       } else {
         return (

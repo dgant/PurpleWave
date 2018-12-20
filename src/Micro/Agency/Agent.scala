@@ -188,6 +188,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     toRepair      = None
     toBoard       = None
     canFight      = intent.canAttack
+    canFlee       = intent.canFlee
     canMeld       = intent.canMeld
     canScout      = intent.canScout
     canLiftoff    = intent.canLiftoff

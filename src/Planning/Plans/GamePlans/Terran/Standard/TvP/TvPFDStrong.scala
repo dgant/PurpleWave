@@ -46,7 +46,7 @@ class TvPFDStrong extends GameplanModeTemplate {
     // TODO: Gas cut
     new Pump(Terran.SiegeTankUnsieged),
     new Pump(Terran.Marine),
-    new Build(Get(1, Terran.MachineShop)),
+    new Build(Get(Terran.MachineShop)),
     new If(
       new UnitsAtLeast(2, Terran.Factory, complete = true),
       new Pump(Terran.Vulture)),
@@ -60,13 +60,13 @@ class TvPFDStrong extends GameplanModeTemplate {
       Get(6, Terran.Factory)),
     new RequireMiningBases(3),
     new Build(
-      Get(1, Terran.Academy),
+      Get(Terran.Academy),
       Get(2, Terran.Armory),
       Get(1, Terran.Starport)),
     new UpgradeContinuously(Terran.MechDamage),
     new UpgradeContinuously(Terran.MechArmor),
     new Build(
-      Get(1, Terran.ScienceFacility),
+      Get(Terran.ScienceFacility),
       Get(8, Terran.Factory),
       Get(5, Terran.MachineShop)),
     new RequireMiningBases(4),

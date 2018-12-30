@@ -3,7 +3,7 @@ package ProxyBwapi.Techs
 import ProxyBwapi.UnitClasses.UnitClasses
 import bwapi.TechType
 
-case class Tech(val baseType:TechType) {
+case class Tech(baseType: TechType) {
   
   lazy val energyCost       = baseType.energyCost
   lazy val getOrder         = baseType.getOrder

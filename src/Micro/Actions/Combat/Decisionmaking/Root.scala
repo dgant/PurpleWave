@@ -48,18 +48,20 @@ object Root extends Action {
     private lazy val combatTargets        = unit.matchups.enemies.filter(e => (unit.canAttack(e) && e.unitClass.dealsDamage) || (e.is(Zerg.Lurker) && ! e.inRangeToAttack(unit)))
     private lazy val targetsInRange       = combatTargets.filter(t => unit.pixelDistanceEdge(t) < maxRange)
     private lazy val targetsNearingRange  = combatTargets.filter(t => { val p = t.projectFrames(framesToRoot); unit.pixelDistanceEdge(t.pixelStartAt(p), t.pixelEndAt(p)) < maxRange - 32})
-    private lazy val girdForCombat        = targetsInRange.nonEmpty || targetsNearingRange.nonEmpty
+    private lazy val girdForCombat        = targetsInRange.nonEmpty || targetsNearingRange.size > 3
     private lazy val artilleryOutOfRange  = unit.matchups.targets.filter(t => t.canAttack(unit) && t.pixelRangeAgainst(unit) >unit.pixelRangeAgainst(t) && t.inRangeToAttack(unit))
     private lazy val duckForCover         = false && (weAreALurker && unit.matchups.enemyDetectors.isEmpty && unit.matchups.framesOfSafety < framesToRoot && (artilleryOutOfRange.isEmpty || ! With.enemy.isTerran)) // Root for safety, but not in range of Tanks if they can scan us
     private lazy val letsKillThemAlready  = weAreALurker && unit.agent.toAttack.exists(_.pixelDistanceEdge(unit) < 64.0)
     private lazy val leadingPush          = ! unit.agent.destination.zone.owner.isUs && (rootersInPush.size + 1) / 3 > rootersInPushCloser
     private lazy val destinationFarAway   = unit.pixelDistanceCenter(unit.agent.destination) > 32.0 * 4.0 && ! nearFormationPoint
+    private lazy val hugged               = weAreATank && unit.matchups.threats.exists(t => ! t.flying && t.pixelDistanceEdge(unit) <= 96) && unit.matchups.targets.nonEmpty && unit.matchups.targets.forall(_.pixelDistanceEdge(unit) <= 96)
     
     lazy val mustBeUnrooted = (
           (threatsButNoTargets              )
       ||  (weAreATank && insideNarrowChoke  )
       ||  (beingPickedUp                    )
       ||  (outOfCombat && inTheWay          )
+      ||  hugged
     )
     lazy val mustNotRoot = (
           (retreating && ! protectingBase   )
@@ -69,7 +71,7 @@ object Root extends Action {
           (nearFormationPoint               )
       ||  (turretsInRange                   )
       ||  (weAreATank && buildingInRange    )
-      ||  (leadingPush                      )
+      //||  (leadingPush                      )
       ||  (girdForCombat                    )
       ||  (duckForCover                     )
       ||  (letsKillThemAlready              )
@@ -87,6 +89,7 @@ object Root extends Action {
       && unit.order != Orders.Sieging
       && unit.order != Orders.Unsieging
       && unit.order != Orders.Burrowing
+      && ! unit.morphing
     )
     
     override def perform(unit: FriendlyUnitInfo) {

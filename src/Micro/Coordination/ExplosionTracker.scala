@@ -68,13 +68,9 @@ class ExplosionTracker {
       addToBattle(unit, new ExplosionIrradiateSplash(unit))
     }
     else if (unit.is(Terran.SpiderMine)
-      && ! unit.burrowed
-      && unit.isFriendly
-      && unit.orderTarget.nonEmpty) {
-      // Only auto-dodge our own triggered mines
-      if ( ! With.performance.enablePerformanceStops && ! With.performance.danger) {
-        addToBattle(unit, new ExplosionSpiderMineBlast(unit))
-      }
+      && ( ! unit.burrowed || unit.matchups.enemies.exists(e => e.unitClass.triggersSpiderMines && e.pixelDistanceEdge(unit) < 64))
+      && unit.isFriendly) {
+      addToBattle(unit, new ExplosionSpiderMineBlast(unit))
     }
     else if (unit.is(Zerg.InfestedTerran)) {
       addToBattle(unit, new ExplosionInfestedTerran(unit))

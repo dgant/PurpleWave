@@ -14,5 +14,6 @@ object TvPEarly14CC extends TvPStrategy {
   ))
 }
 
+object TvPJoyO extends TvPStrategy
 object TvPEarlyFDStrong extends TvPStrategy
 object TvPMidgameBioTank extends TvPStrategy

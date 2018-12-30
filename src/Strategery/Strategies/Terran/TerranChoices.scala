@@ -41,6 +41,7 @@ object TerranChoices {
   /////////
   
   val tvpOpeners = Vector(
+    TvPJoyO
     //TvPEarly14CC,
     //TvPEarlyFDStrong
     //TvTPNukeDrop

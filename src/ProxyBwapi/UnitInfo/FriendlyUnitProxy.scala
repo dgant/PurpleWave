@@ -1,5 +1,4 @@
 package ProxyBwapi.UnitInfo
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
 import Performance.Cache
@@ -19,7 +18,7 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   override def equals(obj: Any): Boolean = obj.isInstanceOf[FriendlyUnitProxy] && obj.asInstanceOf[FriendlyUnitProxy].id == id
   override def hashCode(): Int = id.hashCode
   
-  private val cacheClass     = new Cache[UnitClass]  (() =>  UnitClasses.get(base.getType), GameTime(0, 1)())
+  private val cacheClass     = new Cache[UnitClass]  (() =>  UnitClasses.get(base.getType))
   private val cachePlayer    = new Cache[PlayerInfo] (() =>  Players.get(base.getPlayer), 24)
   private val cachePixel     = new Cache[Pixel]      (() =>  new Pixel(base.getPosition))
   private val cacheTile      = new Cache[Tile]       (() =>  new Tile(base.getTilePosition))

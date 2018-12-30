@@ -32,7 +32,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     
   description.set("Build a " + buildingClass)
   
-  override def isComplete: Boolean = building.exists(_.remainingCompletionFrames <= With.reaction.planningMax)
+  override def isComplete: Boolean = building.exists(_.complete)
   
   def startedBuilding: Boolean = building.isDefined
   
@@ -40,7 +40,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   
   override def onUpdate() {
     
-    if (isComplete) {
+    if (building.exists(b => b.remainingCompletionFrames <= With.reaction.planningMax || ! b.unitClass.isTerran)) {
       builderLock.release()
       With.groundskeeper.flagFulfilled(buildingDescriptor, building.get)
       return

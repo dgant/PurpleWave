@@ -8,66 +8,48 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
-import Planning.Predicates.Milestones.{GasPumpsAtLeast, IfOnMiningBases, TechComplete, UnitsAtLeast}
+import Planning.Predicates.Milestones._
+import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
+import Strategery.Strategies.Protoss.PvZLateGameReaver
 
-class PvZLateGame extends GameplanModeTemplate {
+class PvZLateGameReaver extends GameplanModeTemplate {
+
+  override val activationCriteria = new Employing(PvZLateGameReaver)
 
   override def defaultAttackPlan: Plan = new Parallel(
     new Attack(Protoss.Corsair),
-    new Attack(Protoss.DarkTemplar),
     new PvZIdeas.ConditionalAttack)
 
-  override def emergencyPlans: Seq[Plan] = Seq(new PvZIdeas.ReactToLurkers, new PvZIdeas.ReactToMutalisks)
-
-  override def defaultArchonPlan: Plan = new PvZIdeas.TemplarUpToEight
+  override def emergencyPlans: Seq[Plan] = Seq(new PvZIdeas.ReactToLurkers)
 
   class AddPriorityTech extends Parallel(
     new Build(
       Get(Protoss.Gateway),
       Get(Protoss.Assimilator),
-      Get(Protoss.CyberneticsCore)),
-    new If(
-      new UnitsAtLeast(1, Protoss.Dragoon),
-      new Build(Get(Protoss.DragoonRange))),
+      Get(Protoss.CyberneticsCore),
+      Get(Protoss.DragoonRange)),
     new IfOnMiningBases(2,
       new Parallel(
         new Build(Get(Protoss.Forge)),
-        new BuildGasPumps,
         new BuildOrder(
-          Get(Protoss.CitadelOfAdun),
+          Get(5, Protoss.Gateway),
           Get(Protoss.GroundDamage),
-          Get(Protoss.ZealotSpeed),
-          Get(Protoss.TemplarArchives),
-          Get(Protoss.DragoonRange),
-          Get(Protoss.PsionicStorm),
-          Get(4, Protoss.Gateway)))))
-
-  class AddTech extends Parallel(
-    new Build(
-      Get(Protoss.RoboticsFacility),
-      Get(Protoss.Observatory),
-      Get(6, Protoss.Gateway)),
-    new If(
-      new GasPumpsAtLeast(3),
-      new Parallel(
-        new Build(
-          Get(2, Protoss.Forge),
-          Get(Protoss.HighTemplarEnergy)),
-        new If(
-          new UnitsAtLeast(8, Protoss.Corsair),
-          new Build(
-            Get(Protoss.FleetBeacon),
-            Get(Protoss.DisruptionWeb))))))
+          Get(Protoss.GroundArmor),
+          Get(Protoss.RoboticsFacility),
+          Get(Protoss.RoboticsSupportBay),
+          Get(Protoss.Observatory),
+          Get(6, Protoss.Gateway)),
+        new BuildGasPumps)))
 
   override def buildPlans: Seq[Plan] = Vector(
     new RequireMiningBases(2),
+    new IfOnMiningBases(2, new If(new UnitsAtLeast(3, Protoss.Reaver), new RequireMiningBases(3))),
     new IfOnMiningBases(2, new If(new TechComplete(Protoss.PsionicStorm), new RequireMiningBases(3))),
     new IfOnMiningBases(3, new If(new UnitsAtLeast(10, Protoss.Gateway), new RequireMiningBases(4))),
     new AddPriorityTech,
     new PvZIdeas.TrainAndUpgradeArmy,
     new BuildCannonsAtExpansions(5),
-    new AddTech,
     new PvZIdeas.AddGateways,
     new RequireMiningBases(5)
   )

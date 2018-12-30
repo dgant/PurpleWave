@@ -7,14 +7,14 @@ import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, MeldArchons}
+import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Predicates.Compound.And
 import Planning.Predicates.Milestones.{EnemyHasShownCloakedThreat, _}
 import Planning.Predicates.Reactive.{EnemyMutalisks, SafeAtHome, SafeToMoveOut}
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Protoss.{PvZ4Gate1012, PvZ4Gate99, PvZProxy2Gate}
+import Strategery.Strategies.Protoss._
 
 object PvZIdeas {
 
@@ -146,6 +146,7 @@ object PvZIdeas {
             new Build(Get(Protoss.GroundDamage)))))),
     new If(
       new Or(
+        new UnitsAtLeast(2, Protoss.Carrier),
         new UnitsAtLeast(5, Protoss.Corsair),
         new And(
           new UnitsAtLeast(1, Protoss.Stargate),
@@ -159,11 +160,16 @@ object PvZIdeas {
       new EnemyHasUpgrade(Zerg.OverlordSpeed),
       new Pump(Protoss.DarkTemplar, 3),
       new Pump(Protoss.DarkTemplar, 1)),
-    new PumpMatchingRatio(Protoss.Shuttle, 0, 1, Seq(Friendly(Protoss.Reaver, 1.0))),
-    new PumpMatchingRatio(Protoss.Shuttle, 0, 2, Seq(Friendly(Protoss.Reaver, 0.5))),
-    //new IfOnMiningBases(2, new Pump(Protoss.Reaver, 6)),
+    new If(
+      new Employing(PvZLateGameReaver, PvZLateGameCarrier),
+      new PumpShuttleAndReavers(6)),
+    new Pump(Protoss.Carrier),
+    new PumpMatchingRatio(Protoss.Corsair, 0, 12, Seq(Friendly(Protoss.Carrier, 3.0))),
     new Pump(Protoss.Observer, 1),
-    new PumpMatchingRatio(Protoss.HighTemplar, 1, 20, Seq(Friendly(UnitMatchWarriors, 0.3))),
+    new Pump(Protoss.Arbiter, 12),
+    new If(
+      new Employing(PvZLateGameTemplar),
+      new PumpMatchingRatio(Protoss.HighTemplar, 1, 20, Seq(Friendly(UnitMatchWarriors, 0.3)))),
     new PumpMatchingRatio(Protoss.Dragoon, 1, 100, Seq(
       Enemy(Zerg.Lurker, 1.0),
       Enemy(Zerg.Mutalisk, 1.0),
@@ -171,8 +177,10 @@ object PvZIdeas {
       Friendly(Protoss.Archon, -1.0),
       Friendly(Protoss.Corsair, -1.0))),
     new PumpMatchingRatio(Protoss.Corsair, 1, 12, Seq(Enemy(Zerg.Mutalisk, 1.0))),
-    new BuildCannonsAtExpansions(5),
-    new Pump(Protoss.HighTemplar),
+    new If(
+      new Employing(PvZLateGameReaver),
+      new Pump(Protoss.Dragoon),
+      new Pump(Protoss.HighTemplar)),
     new Pump(Protoss.Zealot)
   )
 }

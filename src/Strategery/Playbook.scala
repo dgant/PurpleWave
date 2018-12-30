@@ -1,7 +1,7 @@
 package Strategery
 
 import Lifecycle.With
-import Strategery.Selection._
+import Strategery.Selection.{StrategySelectionDynamic, _}
 import Strategery.Strategies.AllRaces.WorkerRush
 import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss._
@@ -29,14 +29,14 @@ class EmptyPlaybook {
 
     PvP2Gate1012Goon,
     PvP2GateDTExpand,
-    //PvP3GateGoon,
-    //PvP3GateRobo,
+    PvP3GateGoon,
+    PvP3GateRobo,
 
     PvZ4Gate99,
     PvZFFEEconomic,
     PvZGatewayFE,
     PvZMidgame5GateGoon,
-    PvZMidgameNeoBisu
+    PvZMidgameNeoBisu,
   )
   def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy
   def enemyName: String = With.enemy.name
@@ -47,7 +47,9 @@ object StrategyGroups {
     WorkerRush,
     WorkerRushLiftoff,
     ProxyDarkTemplar,
-    PvZFFEConservative,
+    PvTProxy2Gate,
+    PvPProxy2Gate,
+    PvZProxy2Gate,
     TvR1Rax,
     TvRTinfoil,
     TvEProxy5Rax,
@@ -70,24 +72,17 @@ object StrategyGroups {
     PvP1GateReaverExpand,
     PvPLateGameCarrier,
     PvT1GateRobo
-  )
+  )1
 }
 
 class PurpleWavePlaybook extends EmptyPlaybook {
   override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled
-}
-
-class SSCAITPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = new EmptyPlaybook().strategyOrder
-  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionSSCAIT
+  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionDynamic
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvP3GateRobo)
-}
-
-class TrainingPlaybook extends SSCAITPlaybook {
+  override lazy val forced: Seq[Strategy] = Seq(PvZFFEEconomic, PvZMidgameCorsairReaverZealot, PvZMidgameCorsairReaverGoon, PvZMidgame5GateGoonReaver)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
 }
 
-object Playbook extends SSCAITPlaybook  {}
+object Playbook extends TestingPlaybook {}

@@ -56,11 +56,9 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
         else None
       )
       .orElse(
-        orderedTile
-          .map(tile => With.units.ours.find(unit =>
-            unit.is(buildingClass) &&
-            unit.tileTopLeft == tile))
-          .getOrElse(None))
+        orderedTile.flatMap(tile => With.units.ours.find(unit =>
+          unit.is(buildingClass) &&
+            unit.tileTopLeft == tile)))
       .filter(b =>
         b.isOurs  &&
         b.alive   &&
@@ -170,9 +168,8 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     if (proposedBuilder.isEmpty) {
       return false
     }
-    val travelFrames    = proposedBuilder.get.framesToTravelTo(desiredTile.get.pixelCenter) / With.configuration.assumedBuilderTravelSpeed
-    val expectedFrames  = currencyLock.expectedFrames
-    travelFrames + 24 >= expectedFrames
+    val travelFrames = (if (builderLock.units.isEmpty) 1.4 else 1.25) * proposedBuilder.get.framesToTravelTo(desiredTile.get.pixelCenter)
+    travelFrames + 24 >= currencyLock.expectedFrames
   }
   
   override def visualize() {

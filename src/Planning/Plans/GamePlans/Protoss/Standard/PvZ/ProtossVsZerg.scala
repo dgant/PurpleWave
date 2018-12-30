@@ -11,7 +11,11 @@ class ProtossVsZerg extends ModalGameplan(
   new PvZ4Gate2Archon,
   new PvZBisu,
   new PvZNeoBisu,
+  new PvZNeoNeoBisu,
   new PvZ5GateGoon,
+  new PvZCorsairReaver,
+
   // Late game
-  new PvZLateGame
+  new PvZLateGameTemplar,
+  new PvZLateGameCarrier,
 )

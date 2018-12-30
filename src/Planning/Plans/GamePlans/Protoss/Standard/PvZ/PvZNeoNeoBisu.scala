@@ -13,13 +13,12 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyMutalisks
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Protoss.PvZMidgameNeoBisu
+import Strategery.Strategies.Protoss.PvZMidgameNeoNeoBisu
 
-class PvZNeoBisu extends GameplanModeTemplate {
+class PvZNeoNeoBisu extends GameplanModeTemplate {
 
-  override val activationCriteria = new Employing(PvZMidgameNeoBisu)
+  override val activationCriteria = new Employing(PvZMidgameNeoNeoBisu)
   override val completionCriteria = new Latch(new BasesAtLeast(3))
-  override def defaultArchonPlan: Plan = new PvZIdeas.TemplarUpToEight
   override def defaultAttackPlan: Plan = new Parallel(
     new Attack(Protoss.Corsair),
     new PvZIdeas.ConditionalAttack)
@@ -32,12 +31,13 @@ class PvZNeoBisu extends GameplanModeTemplate {
     new PvZIdeas.AddEarlyCannons,
     new PumpMatchingRatio(Protoss.Corsair, 1, 12, Seq(Enemy(Zerg.Mutalisk, 1.0))),
     new If(new EnemyMutalisks, new UpgradeContinuously(Protoss.AirDamage)),
-    new If(new UnitsAtLeast(1, Protoss.HighTemplar), new Build(Get(Protoss.PsionicStorm))),
     new If(new UnitsAtLeast(2, Protoss.Dragoon), new UpgradeContinuously(Protoss.DragoonRange)),
-    new If(new TechComplete(Protoss.PsionicStorm), new RequireMiningBases(3)),
+    new If(new UnitsAtLeast(1, Protoss.Arbiter, complete = true), new RequireMiningBases(3)),
     new PumpMatchingRatio(Protoss.Dragoon, 1, 8, Seq(Enemy(Zerg.Mutalisk, 1.0), Friendly(Protoss.Corsair, -1.0))),
-    new Pump(Protoss.HighTemplar),
+    new UpgradeContinuously(Protoss.ArbiterEnergy),
+    new Pump(Protoss.Arbiter),
     new Pump(Protoss.Zealot),
+    new If(new UnitsAtLeast(1, Protoss.HighTemplar), new Build(Get(Protoss.PsionicStorm))),
     new Build(
       Get(Protoss.Gateway),
       Get(Protoss.Forge),
@@ -46,15 +46,14 @@ class PvZNeoBisu extends GameplanModeTemplate {
       Get(Protoss.Stargate),
       Get(2, Protoss.Assimilator),
       Get(Protoss.CitadelOfAdun)),
-    new Pump(Protoss.Corsair, 6),
-    new UpgradeContinuously(Protoss.AirDamage),
     new UpgradeContinuously(Protoss.GroundDamage),
     new UpgradeContinuously(Protoss.ZealotSpeed),
-    new PumpMatchingRatio(Protoss.Stargate, 0, 2, Seq(Enemy(Zerg.Mutalisk, 1/5.0))),
+    new PumpMatchingRatio(Protoss.Stargate, 0, 2, Seq(Enemy(Zerg.Mutalisk, 1 / 5.0))),
     new Build(
       Get(Protoss.TemplarArchives),
-      Get(Protoss.PsionicStorm),
+      Get(Protoss.ArbiterTribunal),
       Get(6, Protoss.Gateway)),
+    new Pump(Protoss.HighTemplar),
     new RequireMiningBases(3)
   )
 }

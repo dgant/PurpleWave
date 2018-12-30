@@ -21,8 +21,8 @@ object ShowUnitsFriendly extends View {
   var showRayPaths    : Boolean = false
   var showForces      : Boolean = true
   var showDesire      : Boolean = true
+  var showDistance    : Boolean = true
   var showFightReason : Boolean = true
-  var showDistance    : Boolean = false
   
   override def renderMap() { With.units.ours.foreach(renderUnitState) }
   
@@ -143,7 +143,7 @@ object ShowUnitsFriendly extends View {
       DrawMap.circle(pixel, 3, Color.Black, solid = true)
       DrawMap.circle(pixel, 2, color,       solid = true)
     }
-    
+
     if (showDistance) {
       DrawMap.arrow(unit.pixelCenter, agent.destination, Color.Black)
       DrawMap.label(

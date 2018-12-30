@@ -1,6 +1,5 @@
 package Strategery.Selection
 
-import Strategery.Strategies.Protoss.PvR.PvROpenTinfoil
 import Strategery.Strategies.Protoss._
 
 object Opponents {

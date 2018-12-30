@@ -17,8 +17,7 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy}
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import Strategery.Strategies.Protoss.PvR.PvROpenProxy2Gate
-import Strategery.Strategies.Protoss.{PvPProxy2Gate, PvTProxy2Gate, PvZProxy2Gate}
+import Strategery.Strategies.Protoss.{PvPProxy2Gate, PvROpenProxy2Gate, PvTProxy2Gate, PvZProxy2Gate}
 
 class Proxy2Gate extends GameplanModeTemplate {
   

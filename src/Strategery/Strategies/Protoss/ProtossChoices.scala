@@ -3,7 +3,6 @@ package Strategery.Strategies.Protoss
 import Strategery.Strategies.AllRaces.WorkerRush
 import Strategery.Strategies.Protoss.FFA._
 import Strategery.Strategies.Protoss.PvE._
-import Strategery.Strategies.Protoss.PvR._
 import Strategery.Strategies._
 
 object ProtossChoices {
@@ -34,7 +33,7 @@ object ProtossChoices {
     PvT13NexusNZ,
   )
   
-  val pvtOpenersTransitioningFrom1Gate = Vector(
+  val pvtOpenersTransitioningFrom1GateCore = Vector(
     PvT21Nexus,
     PvT23Nexus,
     PvT28Nexus,
@@ -54,9 +53,9 @@ object ProtossChoices {
     PvT1015DT
   )
   
-  val pvtOpenersWithTransitions: Vector[Strategy] = (pvtOpenersTransitioningFrom1Gate ++ pvtOpenersTransitioningFrom2Gate).distinct
+  val pvtOpenersWithTransitions: Vector[Strategy] = (pvtOpenersTransitioningFrom1GateCore ++ pvtOpenersTransitioningFrom2Gate).distinct
   
-  val pvtOpenersAll: Vector[Strategy] = (pvtOpenersWithoutTransitions ++ pvtOpenersTransitioningFrom1Gate ++ pvtOpenersTransitioningFrom2Gate).distinct
+  val pvtOpenersAll: Vector[Strategy] = (pvtOpenersWithoutTransitions ++ pvtOpenersTransitioningFrom1GateCore ++ pvtOpenersTransitioningFrom2Gate).distinct
   
   /////////
   // PvP //
@@ -92,7 +91,7 @@ object ProtossChoices {
     PvZProxy2Gate
   )
   
-  val pvzOpenersTransitioningFrom1Gate = Vector(
+  val pvzOpenersTransitioningFrom1GateCore = Vector(
     PvZ4Gate99,
     PvZ4Gate1012
   )
@@ -119,7 +118,7 @@ object ProtossChoices {
     PvZMidgameNeoNeoBisu
   )
   
-  val pvzOpenersAll: Vector[Strategy] = (pvzOpenersWithoutTransitions ++ pvzOpenersTransitioningFrom1Gate ++ pvzOpenersTransitioningFrom2Gate).distinct
+  val pvzOpenersAll: Vector[Strategy] = (pvzOpenersWithoutTransitions ++ pvzOpenersTransitioningFrom1GateCore ++ pvzOpenersTransitioningFrom2Gate).distinct
   
   /////////
   // All //

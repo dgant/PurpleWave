@@ -4,7 +4,7 @@ import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvR.PvROpenZCoreZ
+import Strategery.Strategies.Protoss.PvROpenZCoreZ
 
 class PvRZCoreZ extends PvR2Gate1012 {
   

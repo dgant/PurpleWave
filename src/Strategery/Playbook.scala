@@ -72,7 +72,7 @@ object StrategyGroups {
     PvP1GateReaverExpand,
     PvPLateGameCarrier,
     PvT1GateRobo
-  )1
+  )
 }
 
 class PurpleWavePlaybook extends EmptyPlaybook {

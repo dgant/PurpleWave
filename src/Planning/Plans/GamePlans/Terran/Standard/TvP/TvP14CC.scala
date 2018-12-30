@@ -12,7 +12,7 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Terran
-import Strategery.Strategies.Terran.TvP.TvPEarly14CC
+import Strategery.Strategies.Terran.TvPEarly14CC
 
 class TvP14CC extends GameplanModeTemplate {
   

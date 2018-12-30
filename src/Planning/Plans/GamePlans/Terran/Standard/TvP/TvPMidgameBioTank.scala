@@ -13,7 +13,7 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Terran
-import Strategery.Strategies.Terran.TvP.TvPMidgameBioTank
+import Strategery.Strategies.Terran.TvPMidgameBioTank
 
 class TvPMidgameBioTank extends GameplanModeTemplate {
   

@@ -11,7 +11,7 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Terran
-import Strategery.Strategies.Terran.TvP.TvPEarlyFDStrong
+import Strategery.Strategies.Terran.TvPEarlyFDStrong
 
 class TvPFDStrong extends GameplanModeTemplate {
   
@@ -31,14 +31,14 @@ class TvPFDStrong extends GameplanModeTemplate {
   
   override def buildOrder: Seq[BuildRequest] = Vector(
     Get(10, Terran.SCV),
-    Get(1, Terran.SupplyDepot),
-    Get(1, Terran.Barracks),
-    Get(1, Terran.Refinery),
+    Get(Terran.SupplyDepot),
+    Get(Terran.Barracks),
+    Get(Terran.Refinery),
     Get(12, Terran.SCV),
     Get(1, Terran.Marine),
     Get(13, Terran.SCV),
     Get(2, Terran.Marine),
-    Get(1, Terran.Factory),
+    Get(Terran.Factory),
     Get(14, Terran.SCV),
     Get(2, Terran.SupplyDepot))
   

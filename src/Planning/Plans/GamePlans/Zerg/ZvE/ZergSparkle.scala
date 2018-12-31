@@ -6,7 +6,6 @@ import Macro.BuildRequests.Get
 import Micro.Agency.Intention
 import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.ResourceLocks.LockUnits
-import Planning.Composition.UnitCountEverything
 import Planning.UnitMatchers.UnitMatchOr
 import Planning.Plan
 import Planning.Plans.Army.Attack
@@ -20,6 +19,7 @@ import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Plans.Scouting.{FoundEnemyBase, Scout}
 import Planning.Predicates.Reactive.SafeAtHome
+import Planning.UnitCounters.UnitCountEverything
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 
 class ZergSparkle extends GameplanModeTemplate {

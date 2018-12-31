@@ -5,7 +5,7 @@ import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Micro.Squads.RecruitmentLevel
 import Micro.Squads.RecruitmentLevel.RecruitmentLevel
-import Planning.Composition.UnitCountEverything
+import Planning.UnitCounters.UnitCountEverything
 import Planning.UnitCounters.UnitCounter
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -135,6 +135,7 @@ trait GoalBasic extends SquadGoal {
   }
   
   final override def offer(candidates: Iterable[FriendlyUnitInfo], recruitmentNeed: RecruitmentLevel) {
+    unitCounter.reset()
     updateCounts()
     if ( ! acceptsHelp) return
     recruitmentNeed match {

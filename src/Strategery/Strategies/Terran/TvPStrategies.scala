@@ -8,12 +8,17 @@ abstract class TvPStrategy extends Strategy {
   override def enemyRaces: Iterable[Race] = Vector(Race.Protoss)
 }
 
-object TvPEarly14CC extends TvPStrategy {
+abstract class TvPOpening extends TvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
-    TvPMidgameBioTank
+    TvP6Fac,
+    TvPDeep4,
+    TvP2Armory
   ))
 }
 
-object TvPJoyO extends TvPStrategy
-object TvPEarlyFDStrong extends TvPStrategy
-object TvPMidgameBioTank extends TvPStrategy
+object TvPEarly14CC extends TvPOpening
+object TvPJoyO extends TvPOpening
+object TvPFDStrong extends TvPOpening
+object TvP6Fac extends TvPStrategy
+object TvPDeep4 extends TvPStrategy
+object TvP2Armory extends TvPStrategy

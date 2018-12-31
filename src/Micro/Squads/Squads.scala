@@ -57,6 +57,7 @@ class Squads {
   }
   
   def update() {
+    assignFreelancers()
     allByPriority.foreach(_.update())
   }
 }

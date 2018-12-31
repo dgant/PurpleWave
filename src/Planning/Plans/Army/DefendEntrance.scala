@@ -2,8 +2,7 @@ package Planning.Plans.Army
 
 import Lifecycle.With
 import Micro.Squads.Goals.GoalDefendZone
-import Planning.Composition.UnitCountEverything
-import Planning.UnitCounters.UnitCounter
+import Planning.UnitCounters.{UnitCountEverything, UnitCounter}
 import Planning.UnitMatchers._
 import Utilities.ByOption
 

@@ -2,8 +2,7 @@
 package Planning.Plans.Army
 
 import Micro.Squads.Goals.GoalAttack
-import Planning.Composition.UnitCountEverything
-import Planning.UnitCounters.UnitCounter
+import Planning.UnitCounters.{UnitCountEverything, UnitCounter}
 import Planning.UnitMatchers._
 
 class Attack(

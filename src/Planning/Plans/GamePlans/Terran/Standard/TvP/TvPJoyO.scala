@@ -9,7 +9,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.BuildGasPumps
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
+import Planning.Predicates.Milestones.{BasesAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchOr, UnitMatchSiegeTank}
 import Planning.{Plan, Predicate}
@@ -19,7 +19,7 @@ import Strategery.Strategies.Terran.TvPJoyO
 class TvPJoyO extends GameplanModeTemplate {
   
   override val activationCriteria: Predicate = new Employing(TvPJoyO)
-  //override val completionCriteria: Predicate = new TechComplete(Terran.SiegeMode)
+  override val completionCriteria: Predicate = new BasesAtLeast(2)
 
   override def defaultScoutPlan: Plan = new ScoutOn(Terran.SupplyDepot, quantity = 2)
   override def aggression: Double = 1.5
@@ -84,14 +84,10 @@ class TvPJoyO extends GameplanModeTemplate {
             new Pump(Terran.SiegeTankUnsieged, maximumConcurrently = 1))),
         new Pump(Terran.Vulture),
         new Build(
-          Get(3, Terran.Factory),
           Get(Terran.SiegeMode),
           Get(2, Terran.CommandCenter),
-          Get(5, Terran.Factory),
-          Get(3, Terran.MachineShop),
-          Get(3, Terran.CommandCenter),
-          Get(8, Terran.Factory),
-          Get(5, Terran.MachineShop))),
+          Get(Terran.Academy),
+          Get(Terran.EngineeringBay))),
       new Parallel(
         new FlipIf(
           new UnitsAtLeast(2, Terran.MachineShop),

@@ -2,22 +2,22 @@ package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Predicates.Compound.Check
-import Planning.UnitMatchers.UnitMatchWarriors
-import Planning.{Plan, Predicate}
 import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
+import Planning.Predicates.Compound.Check
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy.Employing
+import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Terran
-import Strategery.Strategies.Terran.TvPMidgameBioTank
+import Strategery.Strategies.Terran.TvPDeep4
 
-class TvPMidgameBioTank extends GameplanModeTemplate {
+class TvPDeep4 extends GameplanModeTemplate {
   
-  override val activationCriteria: Predicate = new Employing(TvPMidgameBioTank)
+  override val activationCriteria: Predicate = new Employing(TvPDeep4)
   
   override val aggression = 0.8
   

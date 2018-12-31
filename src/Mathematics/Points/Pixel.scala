@@ -1,7 +1,5 @@
 package Mathematics.Points
 
-import Debugging.Visualizations.Colors
-import Debugging.Visualizations.Rendering.DrawMap
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Mathematics.PurpleMath
@@ -132,7 +130,6 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
       .orElse(Spiral.points(16).map(ti.add).filter(_.valid).find(t => With.grids.walkableTerrain.values(t.i)))
       .getOrElse(tileIncluding)
 
-    DrawMap.line(this, output.pixelCenter, Colors.NeonYellow)
     output
   }
 }

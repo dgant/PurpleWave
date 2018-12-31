@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.{Attack, ConsiderAttacking, EjectScout}
 import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic._
@@ -28,7 +28,10 @@ class TvPFDStrong extends GameplanModeTemplate {
     new Attack(Terran.Vulture),
     new Trigger(
       new UnitsAtLeast(2, UnitMatchSiegeTank, complete = true),
-      super.defaultAttackPlan))
+      new If(
+        new EnemiesAtLeast(2, Protoss.Gateway),
+        new ConsiderAttacking,
+        new Attack)))
   
   override def emergencyPlans: Seq[Plan] = super.emergencyPlans ++
     TvPIdeas.emergencyPlans
@@ -58,6 +61,7 @@ class TvPFDStrong extends GameplanModeTemplate {
       Get(3,  Terran.SupplyDepot)))
   
   override def buildPlans: Seq[Plan] = Vector(
+    new EjectScout,
     new If(
       new And(
         new UnitsAtMost(0, Terran.Factory, complete = true),
@@ -79,9 +83,6 @@ class TvPFDStrong extends GameplanModeTemplate {
     new Build(Get(Terran.SpiderMinePlant)),
     new Pump(Terran.Vulture),
     new Build(Get(Terran.SiegeMode)),
-    new RequireBases(2),
-    new Build(
-      Get(2, Terran.Factory),
-      Get(Terran.EngineeringBay)),
+    new RequireBases(2)
   )
 }

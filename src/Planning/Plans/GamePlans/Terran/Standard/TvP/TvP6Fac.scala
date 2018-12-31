@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Attack, ConsiderAttacking}
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic._
@@ -23,7 +23,15 @@ class TvP6Fac extends GameplanModeTemplate {
 
   override def defaultAttackPlan: Plan = new Parallel(
     new Attack(Terran.Vulture),
-    new ConsiderAttacking)
+    new Trigger(
+      new Or(
+        new MiningBasesAtLeast(3),
+        new EnemyHasShown(Protoss.Carrier),
+        new EnemyHasShown(Protoss.Interceptor),
+        new EnemyHasShown(Protoss.FleetBeacon),
+        new UnitsAtLeast(6, Terran.Factory, complete = true),
+        new UnitsAtLeast(8, UnitMatchSiegeTank, complete = true)),
+      new Attack))
 
   override def defaultWorkerPlan: Plan = new Parallel(
     new Pump(Terran.Comsat),
@@ -84,10 +92,13 @@ class TvP6Fac extends GameplanModeTemplate {
       Get(Terran.Starport),
       Get(Terran.ScienceFacility),
       Get(Terran.ScienceVessel)),
-    new RequireMiningBases(3),
-    new Build(
-      Get(2, Terran.Armory),
-      Get(10, Terran.Factory),
-      Get(4, Terran.MachineShop))
+    new Trigger(
+      new UnitsAtLeast(6, Terran.Factory, complete = true),
+      new Parallel(
+        new RequireMiningBases(3),
+        new Build(
+          Get(2, Terran.Armory),
+          Get(10, Terran.Factory),
+          Get(4, Terran.MachineShop))))
   )
 }

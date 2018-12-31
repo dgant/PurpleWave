@@ -1,19 +1,19 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvE
 
 import Macro.BuildRequests.Get
-import Planning.Predicates.Compound.{Latch, Not}
-import Planning.UnitCounters.UnitCountExcept
-import Planning.UnitMatchers.UnitMatchWorkers
-import Planning.{Plan, Predicate}
-import Planning.Plans.Army.{Aggression, Attack, RecruitFreelancers}
+import Planning.Plans.Army.{Aggression, Attack, EjectScout, RecruitFreelancers}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.Pump
+import Planning.Plans.Scouting.{FoundEnemyBase, ScoutAt}
+import Planning.Predicates.Compound.{Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
-import Planning.Plans.Scouting.{FoundEnemyBase, ScoutAt}
 import Planning.Predicates.Strategy.Employing
+import Planning.UnitCounters.UnitCountExcept
+import Planning.UnitMatchers.UnitMatchWorkers
+import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvE.TvE2RaxSCVMarine
 
@@ -58,6 +58,7 @@ class TvE2RaxSCVMarine extends GameplanModeTemplate {
     new Pump(Terran.SCV),
     new If(
       new ReadyToAttack,
-      new RecruitFreelancers(UnitMatchWorkers, new UnitCountExcept(5, UnitMatchWorkers)))
+      new RecruitFreelancers(UnitMatchWorkers, new UnitCountExcept(5, UnitMatchWorkers)),
+      new EjectScout)
   )
 }

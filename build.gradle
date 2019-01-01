@@ -1,0 +1,32 @@
+apply plugin: 'scala'
+sourceCompatibility = 1.8
+repositories {
+    mavenCentral()
+}
+dependencies {
+    compile 'org.scala-lang:scala-library:2.12.6'
+}
+sourceSets {
+    main {
+         scala {
+              srcDirs = ['src/']
+              }
+         }
+}
+repositories {
+    flatDir {
+        dirs 'lib'
+    }
+}
+dependencies {
+    compile fileTree(dir: 'lib', include: ['*.jar'], exclude: ['*-javadoc.jar'])
+}
+
+task fatJar(type: Jar) {
+    baseName = 'PurpleWave'
+    manifest {
+        attributes 'Main-Class': 'Lifecycle.Main'
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}

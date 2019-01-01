@@ -8,7 +8,7 @@ import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.UnitCountOne
-import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchCustom}
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchCustom, UnitMatchSpecific}
 import Planning.UnitPreferences.UnitPreferCloseAndNotMining
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -49,10 +49,13 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     building = building
       .orElse(
         if (buildingClass.isTerran)
-          With.units.ours.find(unit =>
-            ! unit.complete
-            && unit.is(buildingClass)
-            && unit.buildUnit.isEmpty)
+          With.units.ours.find(scaffolding =>
+            ! scaffolding.complete
+            && scaffolding.is(buildingClass)
+            && ! scaffolding.buildUnit.exists(_.friendly.forall(builder =>
+              builder.agent.toFinish.contains(scaffolding)
+              || builder.agent.toBuildTile.contains(scaffolding.tileTopLeft)
+            )))
         else None
       )
       .orElse(
@@ -60,9 +63,9 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
           unit.is(buildingClass) &&
             unit.tileTopLeft == tile)))
       .filter(b =>
-        b.isOurs  &&
-        b.alive   &&
-        b.buildUnit.forall(_.friendly.forall(_.agent.lastClient.contains(this)))) //Don't jack another (Terran) building
+        b.isOurs
+        && b.alive
+        && b.buildUnit.forall(_.friendly.forall(_.agent.lastClient.contains(this)))) //Don't jack another (Terran) building
     
     desiredTile = acquireDesiredTile()
   
@@ -82,7 +85,9 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     }
 
     val desiredZone = desiredTile.map(_.zone)
-    if ( ! builderLock.satisfied && desiredZone.exists(_.bases.exists(_.workerCount > 5))) {
+    if (building.exists(_.buildUnit.isDefined)) {
+      builderLock.unitMatcher.set(new UnitMatchSpecific(Set(building.get.buildUnit.get)))
+    } else if ( ! builderLock.satisfied && desiredZone.exists(_.bases.exists(_.workerCount > 5))) {
       builderLock.unitMatcher.set(UnitMatchAnd(
         UnitMatchCustom(_.zone == desiredZone.get),
         builderMatcher

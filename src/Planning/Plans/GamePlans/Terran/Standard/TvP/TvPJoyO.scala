@@ -9,6 +9,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.BuildGasPumps
 import Planning.Plans.Scouting.ScoutOn
+import Planning.Predicates.Compound.Latch
 import Planning.Predicates.Milestones.{BasesAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchOr, UnitMatchSiegeTank}
@@ -19,7 +20,7 @@ import Strategery.Strategies.Terran.TvPJoyO
 class TvPJoyO extends GameplanModeTemplate {
   
   override val activationCriteria: Predicate = new Employing(TvPJoyO)
-  override val completionCriteria: Predicate = new BasesAtLeast(2)
+  override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
 
   override def defaultScoutPlan: Plan = new ScoutOn(Terran.SupplyDepot, quantity = 2)
   override def aggression: Double = 1.5

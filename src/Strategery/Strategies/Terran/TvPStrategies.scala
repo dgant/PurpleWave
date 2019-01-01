@@ -17,8 +17,9 @@ abstract class TvPOpening extends TvPStrategy {
 }
 
 object TvPEarly14CC extends TvPOpening
-object TvPJoyO extends TvPOpening
+object TvPSiegeExpandBunker extends TvPOpening
 object TvPFDStrong extends TvPOpening
+object TvPJoyO extends TvPOpening
 object TvP6Fac extends TvPStrategy
 object TvPDeep4 extends TvPStrategy
 object TvP2Armory extends TvPStrategy

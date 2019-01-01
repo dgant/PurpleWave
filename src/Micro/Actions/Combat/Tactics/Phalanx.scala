@@ -33,7 +33,9 @@ object Phalanx extends Action {
     } else if (openFire) {
       Engage.delegate(unit)
     }
-    Disengage.delegate(unit)
+    if (unit.matchups.threats.exists(! _.unitClass.isWorker)) {
+      Disengage.delegate(unit)
+    }
     Move.delegate(unit)
   }
 }

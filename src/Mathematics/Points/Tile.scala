@@ -135,5 +135,4 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   def toRectangle: TileRectangle = {
     TileRectangle(this, this.add(1, 1))
   }
-  
 }

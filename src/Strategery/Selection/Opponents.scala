@@ -1,6 +1,5 @@
 package Strategery.Selection
 
-import Strategery.Strategies.Protoss.PvR.PvROpenTinfoil
 import Strategery.Strategies.Protoss._
 
 object Opponents {
@@ -26,10 +25,10 @@ object Opponents {
   val letabot       : Opponent = add(Opponent("LetaBot",      new StrategySelectionRecommended(StrategySelectionGreedy, PvTReaverCarrierCheese)))
   val steamhammer   : Opponent = add(Opponent("Steamhammer",  new StrategySelectionRecommended(StrategySelectionDynamic, PvZ4Gate99, PvZMidgame5GateGoon)))
   val microwave     : Opponent = add(Opponent("Microwave",    new StrategySelectionRecommended(StrategySelectionDynamic, PvZ4Gate99, PvZMidgame5GateGoon)))
-  val megabot       : Opponent = add(Opponent("MegaBot",      defaultPvP)) // TODO: Fixed
+  val megabot       : Opponent = add(Opponent("MegaBot",      defaultPvP))
   val zzzkbot       : Opponent = add(Opponent("ZZZKBot",      fixedPvZ))
   val ualbertabot   : Opponent = add(Opponent("UAlbertaBot",  fixedPvR))
-  val aiur          : Opponent = add(Opponent("Aiur",         defaultPvP)) // TODO: Fixed
+  val aiur          : Opponent = add(Opponent("Aiur",         defaultPvP))
   val tyr           : Opponent = add(Opponent("Tyr",          new StrategySelectionRecommended(StrategySelectionGreedy, PvP2GateDTExpand, PvPLateGameArbiter)))
   val ecgberht      : Opponent = add(Opponent("Ecgberht",     defaultPvT))
   val overkill      : Opponent = add(Opponent("Overkill",     fixedPvZ))
@@ -60,8 +59,6 @@ object Opponents {
   val ziabot2           : Opponent = add(Opponent("Zia bot",            ziabot.policy))
   val johankayser       : Opponent = add(Opponent("Johan Kayser",       srbotone.policy))
   val bryanweber        : Opponent = add(Opponent("Bryan Weber",        cunybot.policy))
-
-  val jadien: Opponent = add(Opponent("Jadien", new StrategySelectionFixed(PvT13NexusNZ, PvT2BaseArbiter)))
   
   val all: Vector[Opponent] = allKnown
 }

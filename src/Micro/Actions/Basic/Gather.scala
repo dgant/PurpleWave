@@ -74,7 +74,7 @@ object Gather extends Action {
     if (unit.agent.toGather.exists(_.zone != unit.zone)
       && (unit.tileIncludingCenter.y < 64)
         != (unit.agent.toGather.exists(_.tileIncludingCenter.y < 64))
-      && (unit.tileIncludingCenter.x < 30 || unit.tileIncludingCenter.x > With.mapTileWidth - 30)
+      && (unit.tileIncludingCenter.x < 15 || unit.tileIncludingCenter.x > With.mapTileWidth - 15)
       && Benzene.matches) {
       unit.agent.toTravel = Some(SpecificPoints.middle)
       Move.delegate(unit)

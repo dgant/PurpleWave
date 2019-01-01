@@ -50,28 +50,35 @@ object PvT25BaseCarrier extends PvTBasicOpener {
 }
 object PvT1015Expand extends PvTBasicOpener {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
+  override def entranceRamped: Boolean = false
+}
+object PvT1015DT extends PvTStrategy {
+  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
+  override def choices: Iterable[Iterable[Strategy]] = Vector(
+    Vector(
+      PvT2BaseArbiter,
+      PvT3BaseArbiter,
+      PvT3BaseCarrier))
+  override def entranceRamped: Boolean = false
 }
 object PvT1GateRobo extends PvTBasicOpener
-object PvT2GateObserver extends PvTBasicOpener
+object PvT2GateObserver extends PvTBasicOpener {
+  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.fiveRax,
+    With.fingerprints.bbs,
+    With.fingerprints.twoRax1113,
+    With.fingerprints.threeFac,
+    With.fingerprints.threeFacVultures,
+  )
+}
 object PvTDTExpand extends PvTBasicOpener {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
     PvT2BaseArbiter,
     PvT3BaseArbiter,
     PvT3BaseCarrier
   ))
-  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
-    With.fingerprints.twoFacVultures,
-    With.fingerprints.threeFacVultures)
 }
-object PvT1015DT extends PvTStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(
-    Vector(
-      PvT2BaseArbiter,
-      PvT2BaseCarrier,
-      PvT3BaseArbiter,
-      PvT3BaseCarrier))
-  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
-}
+
 object PvT2BaseCarrier extends PvTStrategy { override val mapsBlacklisted = Iterable(BlueStorm) }
 object PvT3BaseCarrier extends PvTStrategy { override val mapsBlacklisted = MapGroups.badForFastThirdBases }
 object PvT2BaseArbiter extends PvTStrategy { override val mapsBlacklisted = Iterable(BlueStorm) }

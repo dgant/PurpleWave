@@ -137,8 +137,8 @@ class PvTBasic extends GameplanModeTemplate {
     new Or(
       new EnemyBasesAtLeast(3),
       new And(new EnemyBio, new PreparedForBio),
-      new Latch(new UnitsAtLeast(4, Protoss.Carrier, complete = true)),
-      new Latch(new UnitsAtLeast(2, Protoss.Arbiter, complete = true))))
+      new Latch(new UnitsAtLeast(2, Protoss.Arbiter, complete = true)),
+      new Latch(new UnitsAtLeast(4, Protoss.Carrier, complete = true))))
   
   class BasicTech extends Parallel(
     new BuildOrder(
@@ -231,7 +231,9 @@ class PvTBasic extends GameplanModeTemplate {
       // No bio? Normal game plan
       new Parallel(
         new If(
-          new EnemyStrategy(With.fingerprints.twoFac),
+          new Or(
+            new EnemyStrategy(With.fingerprints.twoFac, With.fingerprints.twoFacVultures, With.fingerprints.threeFac, With.fingerprints.threeFacVultures),
+            new EmployingThreeBase),
           new Build(
             Get(2, Protoss.Gateway),
             Get(Protoss.RoboticsFacility),
@@ -247,9 +249,6 @@ class PvTBasic extends GameplanModeTemplate {
             new Build(
               Get(Protoss.Stargate),
               Get(Protoss.FleetBeacon)),
-            new If(
-              new EnemyStrategy(With.fingerprints.twoFac),
-              new Build(Get(3, Protoss.Gateway))),
             new UpgradeContinuously(Protoss.AirDamage),
             new If(
               new UnitsAtLeast(1, Protoss.FleetBeacon),
@@ -296,17 +295,10 @@ class PvTBasic extends GameplanModeTemplate {
       new And(
         new EmployingCarriers,
         new GasPumpsAtLeast(3)),
-      new Parallel(
-        new Build(
-          // These two Gets are unnecessary.
-          // SSCAIT Hack fix for weird case of never building a Fleet Beacon
-          // which was probably caused by ScoutCleared considering missing units, but just to be sure:
-          Get(Protoss.FleetBeacon),
-          Get(Protoss.CarrierCapacity),
+      new Build(
+        Get(2, Protoss.CyberneticsCore),
+        Get(3, Protoss.Stargate))))
 
-          Get(2, Protoss.CyberneticsCore),
-          Get(3, Protoss.Stargate)))))
-      
   override val buildPlans = Vector(
     new EjectScout,
     new RequireMiningBases(2),

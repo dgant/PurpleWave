@@ -15,11 +15,11 @@ import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Protoss.PvZMidgame5GateGoon
+import Strategery.Strategies.Protoss.{PvZMidgame5GateGoon, PvZMidgame5GateGoonReaver}
 
 class PvZ5GateGoon extends GameplanModeTemplate {
 
-  override val activationCriteria = new Employing(PvZMidgame5GateGoon)
+  override val activationCriteria = new Employing(PvZMidgame5GateGoon, PvZMidgame5GateGoonReaver)
   override val completionCriteria = new Latch(new UnitsAtLeast(1, Protoss.TemplarArchives))
   override def defaultAttackPlan: Plan = new Trigger(
     new UpgradeComplete(Protoss.DragoonRange),
@@ -55,7 +55,13 @@ class PvZ5GateGoon extends GameplanModeTemplate {
       new SafeAtHome,
       new Parallel(
         new If(
-          new UnitsAtLeast(18, UnitMatchWarriors),
+          new Or(
+            new And(
+              new Employing(PvZMidgame5GateGoon),
+              new UnitsAtLeast(18, UnitMatchWarriors)),
+            new And(
+              new Employing(PvZMidgame5GateGoonReaver),
+              new UnitsAtLeast(4, Protoss.Reaver))),
           new RequireMiningBases(3)),
         new If(
           new NeedCorsairs,
@@ -71,11 +77,18 @@ class PvZ5GateGoon extends GameplanModeTemplate {
           new UpgradeContinuously(Protoss.AirDamage)))),
     new Build(Get(5, Protoss.Gateway)),
     new BuildCannonsAtNatural(1),
-    new UpgradeContinuously(Protoss.GroundDamage),
-    new Build(
-      Get(Protoss.CitadelOfAdun),
-      Get(Protoss.TemplarArchives)),
-    new Pump(Protoss.Zealot),
+    new If(
+      new Employing(PvZMidgame5GateGoon),
+      new Parallel(
+        new UpgradeContinuously(Protoss.GroundDamage),
+        new Build(
+          Get(Protoss.CitadelOfAdun),
+          Get(Protoss.TemplarArchives))),
+      new Parallel(
+        new Build(
+          Get(Protoss.RoboticsFacility),
+          Get(Protoss.Shuttle),
+          Get(Protoss.RoboticsSupportBay)))),
     new BuildCannonsAtExpansions(5),
     new BuildCannonsAtNatural(2),
     new RequireMiningBases(3),

@@ -8,11 +8,11 @@ class Configuration {
   // Tournament Settings //
   /////////////////////////
   
-  var enableSurrenders                = false
+  var enableSurrenders                = true
   var enablePerformanceStops          = true
   var enablePerformanceSurrender      = false
-  var enableChat                      = false
-  var enableVisualizations            = false
+  var enableChat                      = true
+  var enableVisualizations            = true
   var enableStreamManners             = true
   var enableHumanManners              = false
   var identifyGhostUnits              = false
@@ -51,7 +51,6 @@ class Configuration {
   ///////////
   
   var concaveMarginPixels             = 20.0
-  var assumedBuilderTravelSpeed       = 0.65
   var fogPositionDurationFrames       = GameTime(0, 20)()
   var violenceThresholdFrames         = GameTime(0, 2)()
   var pickupRadiusPixels              = 48 //No idea what actual value is

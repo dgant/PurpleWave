@@ -18,7 +18,7 @@ object TerranChoices {
     TvEProxy5Rax,
     TvEProxy8Fact,
     TvEProxyBBS,
-    TvESCVMarineAllIn,
+    TvE2RaxSCVMarine,
     TvEMassBio,
     TvETurtleMech,
     TvR1Rax,
@@ -41,9 +41,10 @@ object TerranChoices {
   /////////
   
   val tvpOpeners = Vector(
-    //TvPEarly14CC,
-    //TvPEarlyFDStrong
-    //TvTPNukeDrop
+    TvP1RaxFE,
+    TvPSiegeExpandBunker,
+    TvPFDStrong,
+    TvP2FacJoyO,
   )
   
   /////////

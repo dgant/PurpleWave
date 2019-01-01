@@ -6,7 +6,6 @@ import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
 import Planning.Predicates.Compound.{And, Check}
-import Planning.Composition.UnitCountEverything
 import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound.{If, _}
@@ -17,6 +16,7 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Milestones.{FrameAtLeast, UnitsAtLeast}
 import Planning.Plans.Scouting.Scout
 import Planning.Predicates.Strategy.Employing
+import Planning.UnitCounters.UnitCountEverything
 import Planning.{Plan, Predicate, ProxyPlanner}
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.FivePoolProxySunkens

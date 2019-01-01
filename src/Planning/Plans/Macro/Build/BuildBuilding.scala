@@ -8,7 +8,7 @@ import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.UnitCountOne
-import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchCustom}
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchCustom, UnitMatchSpecific}
 import Planning.UnitPreferences.UnitPreferCloseAndNotMining
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -32,7 +32,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     
   description.set("Build a " + buildingClass)
   
-  override def isComplete: Boolean = building.exists(_.remainingCompletionFrames <= With.reaction.planningMax)
+  override def isComplete: Boolean = building.exists(_.complete)
   
   def startedBuilding: Boolean = building.isDefined
   
@@ -40,7 +40,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   
   override def onUpdate() {
     
-    if (isComplete) {
+    if (building.exists(b => b.remainingCompletionFrames <= With.reaction.planningMax || ! b.unitClass.isTerran)) {
       builderLock.release()
       With.groundskeeper.flagFulfilled(buildingDescriptor, building.get)
       return
@@ -49,22 +49,24 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     building = building
       .orElse(
         if (buildingClass.isTerran)
-          With.units.ours.find(unit =>
-            ! unit.complete
-            && unit.is(buildingClass)
-            && unit.buildUnit.isEmpty)
+          With.units.ours.find(scaffolding =>
+            ! scaffolding.complete
+            && scaffolding.is(buildingClass)
+            && ! scaffolding.buildUnit.exists(_.friendly.forall(builder =>
+              // This probably doesn't handle addon construction correctly
+              builder.agent.toFinish.contains(scaffolding)
+              || builder.agent.toBuildTile.contains(scaffolding.tileTopLeft)
+            )))
         else None
       )
       .orElse(
-        orderedTile
-          .map(tile => With.units.ours.find(unit =>
-            unit.is(buildingClass) &&
-            unit.tileTopLeft == tile))
-          .getOrElse(None))
+        orderedTile.flatMap(tile => With.units.ours.find(unit =>
+          unit.is(buildingClass) &&
+            unit.tileTopLeft == tile)))
       .filter(b =>
-        b.isOurs  &&
-        b.alive   &&
-        b.buildUnit.forall(_.friendly.forall(_.agent.lastClient.contains(this)))) //Don't jack another (Terran) building
+        b.isOurs
+        && b.alive
+        && b.buildUnit.forall(_.friendly.forall(_.agent.lastClient.contains(this)))) //Don't jack another (Terran) building
     
     desiredTile = acquireDesiredTile()
   
@@ -84,7 +86,9 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     }
 
     val desiredZone = desiredTile.map(_.zone)
-    if ( ! builderLock.satisfied && desiredZone.exists(_.bases.exists(_.workerCount > 5))) {
+    if (building.exists(_.buildUnit.isDefined)) {
+      builderLock.unitMatcher.set(new UnitMatchSpecific(Set(building.get.buildUnit.get)))
+    } else if ( ! builderLock.satisfied && desiredZone.exists(_.bases.exists(_.workerCount > 5))) {
       builderLock.unitMatcher.set(UnitMatchAnd(
         UnitMatchCustom(_.zone == desiredZone.get),
         builderMatcher
@@ -170,9 +174,8 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     if (proposedBuilder.isEmpty) {
       return false
     }
-    val travelFrames    = proposedBuilder.get.framesToTravelTo(desiredTile.get.pixelCenter) / With.configuration.assumedBuilderTravelSpeed
-    val expectedFrames  = currencyLock.expectedFrames
-    travelFrames + 24 >= expectedFrames
+    val travelFrames = (if (builderLock.units.isEmpty) 1.4 else 1.25) * proposedBuilder.get.framesToTravelTo(desiredTile.get.pixelCenter)
+    travelFrames + 24 >= currencyLock.expectedFrames
   }
   
   override def visualize() {

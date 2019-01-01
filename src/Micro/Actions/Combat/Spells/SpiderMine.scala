@@ -3,12 +3,14 @@ package Micro.Actions.Combat.Spells
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
 import Micro.Actions.Action
+import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Targeting.Filters.TargetFilter
-import Micro.Actions.Combat.Targeting.TargetAction
-import ProxyBwapi.Races.Terran
+import Micro.Actions.Commands.Move
+import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWorkers}
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.ByOption
 
 import scala.collection.mutable
 
@@ -59,29 +61,35 @@ object SpiderMine extends Action {
   }
   
   protected def sabotage(vulture: FriendlyUnitInfo) {
-    if (vulture.cooldownLeft <= 0) return
-    val rangeMinimum = if (vulture.matchups.doomed) 64.0 else 0.0
-    val range = vulture.topSpeed * (vulture.matchups.framesToLive - 12)
-    val maxRangeTiles = PurpleMath.clamp(range, rangeMinimum, 8.0 * 32.0)
-  
-    //TODO: This is a good candidate for Coordinator since every Vulture will want to recalculate this
-    val victims = vulture.matchups.enemies.filter(_.unitClass.triggersSpiderMines)
-    if (victims.isEmpty) return
-    
-    // TODO: Also capture other threats in range of targets like siege tanks
+    // TODO: Do it if we have enough Vultures with mines
+    if ( ! vulture.agent.shouldEngage && ! vulture.enemies.exists(e => e.is(Protoss.DarkTemplar) && e.effectivelyCloaked)) return
+
+    val victims = vulture.matchups.enemies.filter(e =>
+      e.unitClass.triggersSpiderMines
+      && ! e.matchups.threatsInRange.exists(t => t.isAny(UnitMatchSiegeTank, UnitMatchWorkers) && t.pixelDistanceEdge(e) < 32 * 5))
+
+    vulture.agent.toAttack = ByOption.minBy(victims)(_.pixelDistanceEdge(vulture))
+    if (vulture.agent.toAttack.isEmpty) return
+    val target = vulture.agent.toAttack.get
+
+    Potshot.delegate(vulture)
+    if ( ! vulture.readyForMicro) return
+
     val saboteurs = vulture.matchups.alliesInclSelf.filter(u => u.is(Terran.Vulture) && u.friendly.exists(_.spiderMines > 0))
-    val minesweepers = vulture.matchups.threats.count(_.pixelRangeGround > 32 * 4)
-    if (saboteurs.size < minesweepers) return
-    
     val saboteursInitial  = new mutable.PriorityQueue[UnitInfo]()(Ordering.by(v => victims.map(_.pixelDistanceEdge(v)).min)) ++ saboteurs
     val saboteursFinal    = saboteursInitial.take(2 * victims.size).toVector
     if ( ! saboteursFinal.contains(vulture)) return
-    
-    new TargetAction(TargetFilterTriggersMines).delegate(vulture)
-    val mineDistance = 20 + vulture.unitClass.radialHypotenuse
-    val targetPixel = vulture.agent.toAttack.map(target => target.pixelCenter.project(vulture.pixelCenter, mineDistance))
-    targetPixel.foreach(placeMine(vulture, _))
-    vulture.agent.toAttack = None
+
+    if (vulture.pixelDistanceEdge(target) < 32) {
+      placeMine(vulture, vulture.projectFrames(1))
+    } else {
+      vulture.agent.toTravel = Some(
+        vulture.pixelCenter
+          .project(target .pixelCenter, vulture.pixelDistanceEdge(target) + 64)
+          .nearestWalkableTerrain
+          .pixelCenter)
+      Move.delegate(vulture)
+    }
   }
   
   private class Targeter(vulture: FriendlyUnitInfo) {

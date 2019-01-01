@@ -10,7 +10,7 @@ import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvR.PvROpen2Gate1012
+import Strategery.Strategies.Protoss.PvROpen2Gate1012
 
 class PvR2Gate1012 extends GameplanModeTemplateVsRandom {
   
@@ -21,8 +21,8 @@ class PvR2Gate1012 extends GameplanModeTemplateVsRandom {
   override def defaultAttackPlan  = new Plan
   
   override def buildPlans = Vector(
-    new Pump(Protoss.Zealot, 4),
+    new Pump(Protoss.Zealot, 5),
     new Build(
-      Get(1, Protoss.Assimilator),
-      Get(1, Protoss.CyberneticsCore)))
+      Get(Protoss.Assimilator),
+      Get(Protoss.CyberneticsCore)))
 }

@@ -3,12 +3,15 @@ package Planning.Plans.Macro.Terran
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Macro.Architecture.Heuristics.PlacementProfiles
+import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
 import Macro.BuildRequests.{Get, GetAnother}
 import Planning.{Plan, Property}
 import ProxyBwapi.Races.Terran
 
-class BuildMissileTurretsAtBases(initialCount: Int) extends Plan {
+class BuildMissileTurretsAtBases(
+  initialCount: Int,
+  placement: PlacementProfile = PlacementProfiles.hugWorkersWithCannon)
+    extends Plan {
   
   val count: Property[Int] = new Property(initialCount)
   
@@ -19,7 +22,7 @@ class BuildMissileTurretsAtBases(initialCount: Int) extends Plan {
         eligibleBases.foreach(turretBase)
       }
       else {
-        With.scheduler.request(this, Get(1, Terran.EngineeringBay))
+        With.scheduler.request(this, Get(Terran.EngineeringBay))
       }
     }
   }
@@ -36,7 +39,7 @@ class BuildMissileTurretsAtBases(initialCount: Int) extends Plan {
     if (turretsToAdd <= 0) return
     
     for (i <- 0 to turretsToAdd) {
-      val blueprint = new Blueprint(this, building = Some(Terran.MissileTurret), requireZone = Some(base.zone), placement = Some(PlacementProfiles.hugTownHall))
+      val blueprint = new Blueprint(this, building = Some(Terran.MissileTurret), requireZone = Some(base.zone), placement = Some(placement))
       With.groundskeeper.propose(blueprint)
     }
     With.scheduler.request(this, GetAnother(turretsToAdd, Terran.MissileTurret))

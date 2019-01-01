@@ -3,6 +3,7 @@ package Mathematics.Points
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Mathematics.PurpleMath
+import Mathematics.Shapes.Spiral
 import bwapi.Position
 
 case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
@@ -109,5 +110,26 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   }
   def groundPixels(other: Pixel): Double = {
     With.paths.groundPixels(this, other)
+  }
+  def nearestWalkableTerrain: Tile = {
+    val ti = tileIncluding
+    if (ti.valid && With.grids.walkableTerrain.values(ti.i)) return ti
+    val tx = x / 32
+    val ty = y / 32
+    val dx = if (x % 32 < 16) -1 else 1
+    val dy = if (y % 32 < 16) -1 else 1
+    val xFirst = Math.abs(16 - (x % 32)) > Math.abs(16 - (y % 32))
+    def test(tile: Tile): Option[Tile] = if (tile.valid && With.grids.walkableTerrain.values(tile.i)) Some(tile) else None
+    def flip(t0: Tile, t1: Tile): Option[Tile] = if (xFirst) test(t0).orElse(test(t1)) else test(t1).orElse(test(t0))
+
+    val output =
+              flip(Tile(tx + dx, ty), Tile(tx, ty + dy))
+      .orElse(test(Tile(tx + dx, ty + dy)))
+      .orElse(flip(Tile(tx + dx, ty - dy), Tile(tx - dx, ty + dy)))
+      .orElse(test(Tile(tx - dx, ty - dy)))
+      .orElse(Spiral.points(16).map(ti.add).filter(_.valid).find(t => With.grids.walkableTerrain.values(t.i)))
+      .getOrElse(tileIncluding)
+
+    output
   }
 }

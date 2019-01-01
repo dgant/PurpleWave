@@ -2,8 +2,7 @@ package Planning.ResourceLocks
 
 import Planning.{Plan, Property}
 import Lifecycle.With
-import Planning.Composition.UnitCountEverything
-import Planning.UnitCounters.{UnitCountExactly, UnitCounter}
+import Planning.UnitCounters.{UnitCountEverything, UnitCountExactly, UnitCounter}
 import Planning.UnitMatchers.{UnitMatchAnything, UnitMatcher}
 import Planning.UnitPreferences.{UnitPreferAnything, UnitPreference}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo

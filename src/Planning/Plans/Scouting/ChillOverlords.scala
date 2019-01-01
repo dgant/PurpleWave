@@ -7,9 +7,9 @@ import Micro.Agency.Intention
 import Planning.Predicates.Compound.Latch
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitMatchers.UnitMatchOr
-import Planning.Composition.UnitCountEverything
 import Planning.Plan
 import Planning.Predicates.Milestones.EnemiesAtLeast
+import Planning.UnitCounters.UnitCountEverything
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption

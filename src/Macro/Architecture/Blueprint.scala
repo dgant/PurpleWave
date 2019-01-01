@@ -31,7 +31,7 @@ class Blueprint(
   var id: Option[Int] = None
   val frameCreated: Int = With.frame
   
-  widthTiles                  = widthTiles                  .orElse(building.map(b => b.tileWidth + (if (b.canBuildAddon) 2 else 0))).orElse(Some(1))
+  widthTiles                  = widthTiles                  .orElse(building.map(b => b.tileWidth + (if (b.canBuildAddon && ! b.isTownHall) 2 else 0))).orElse(Some(1))
   heightTiles                 = heightTiles                 .orElse(building.map(_.tileHeight)).orElse(Some(1))
   powers                      = powers                      .orElse(Some(building.contains(Protoss.Pylon)))
   requirePower                = requirePower                .orElse(Some(building.exists(_.requiresPsi)))
@@ -47,6 +47,39 @@ class Blueprint(
     .orElse(building.filter(_ == Protoss.ShieldBattery).map(b => 32.0 * 2.0))
     .orElse(building.filter(_ == Zerg.CreepColony).map(b => 32.0 * 7.0))
     .orElse(Some(32.0 * 11.0))
+
+  val rhythmsX: Vector[Int] =
+    if (With.self.isTerran) {
+      if (widthTiles.get > 3)
+        Vector(0)
+      else if (widthTiles.get == 3)
+        Vector(0, 3)
+      else
+        Vector(0, 2, 4)
+    } else if (With.self.isProtoss) {
+      if (widthTiles.get == 2)
+        Vector(0)
+      else
+        Vector(2)
+    } else {
+      Vector(0)
+    }
+  val rhythmsY: Vector[Int] =
+    if (With.self.isTerran) {
+      if (heightTiles.get == 3)
+        Vector(0, 3)
+      else
+        Vector(0, 2, 4)
+    } else if (With.self.isProtoss) {
+      if (widthTiles.get == 2)
+        Vector(0, 2, 4)
+      else
+        Vector(0, 3)
+    } else {
+      Vector(0)
+    }
+
+
   
   def fulfilledBy(proposal: Blueprint): Boolean = {
     if (proposal == this) return true

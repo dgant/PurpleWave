@@ -3,24 +3,20 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvR
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Predicates.Compound.{And, Latch}
-import Planning.Plan
-import Planning.Plans.Army.{Attack, ConsiderAttacking}
+import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplateVsRandom
-import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.GamePlans.Protoss.Situational.{BuildHuggingNexus, DefendFFEWithProbesAgainst4Pool, DefendZealotsAgainst4Pool, PlacementForgeFastExpand}
-import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, PumpWorkers, UpgradeContinuously}
+import Planning.Plans.GamePlans.Protoss.Situational.{DefendFFEWithProbesAgainst4Pool, DefendZealotsAgainst4Pool}
+import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, PumpShuttleAndReavers, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Scouting.ScoutOn
+import Planning.Predicates.Compound.And
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Strategy.{Employing, EnemyIsProtoss, EnemyStrategy}
-import Planning.UnitMatchers.{UnitMatchWarriors, UnitMatchWorkers}
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvR.PvROpenTinfoil
+import Strategery.Strategies.Protoss.PvROpenTinfoil
 
 class PvRTinfoil extends GameplanModeTemplateVsRandom {
   
@@ -31,13 +27,13 @@ class PvRTinfoil extends GameplanModeTemplateVsRandom {
 
   override def buildOrder: Seq[BuildRequest] = Vector(
     Get(8, Protoss.Probe),
-    Get(1, Protoss.Pylon),
+    Get(Protoss.Pylon),
     Get(9, Protoss.Probe),
-    Get(1, Protoss.Forge),
+    Get(Protoss.Forge),
     Get(10, Protoss.Probe),
     Get(2, Protoss.PhotonCannon),
     Get(12, Protoss.Probe),
-    Get(1, Protoss.Gateway),
+    Get(Protoss.Gateway),
     Get(13, Protoss.Probe),
     Get(3, Protoss.PhotonCannon),
     Get(14, Protoss.Probe))
@@ -54,7 +50,8 @@ class PvRTinfoil extends GameplanModeTemplateVsRandom {
         new UnitsAtMost(2, Protoss.PhotonCannon, complete = true)),
       new DefendFFEWithProbesAgainst4Pool),
     new Pump(Protoss.Observer, 1),
-    new Pump(Protoss.Reaver, 3),
+    new PumpShuttleAndReavers(4),
+    new UpgradeContinuously(Protoss.ShuttleSpeed),
     new If(
       new And(
         new UnitsAtLeast(1, Protoss.Observer, complete = true),

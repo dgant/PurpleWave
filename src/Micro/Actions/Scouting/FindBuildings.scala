@@ -35,7 +35,7 @@ abstract class AbstractFindBuildings extends Action {
     }
     
     val basesToScout =
-      With.geography.enemyBases.filter(b => With.intelligence.unitsShown(b.owner, Zerg.SpawningPool) == 0) ++ (
+      With.geography.enemyBases.filter(b => ! b.zone.island && With.intelligence.unitsShown(b.owner, Zerg.SpawningPool) == 0) ++ (
         if (With.geography.enemyBases.size == 1)
           With.geography.enemyBases.head.natural.map(Vector(_)).getOrElse(nearestNeutralBases(1))
         else if (With.geography.enemyBases.size <= With.geography.ourBases.size)

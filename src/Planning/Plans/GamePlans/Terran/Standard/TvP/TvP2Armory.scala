@@ -28,7 +28,7 @@ class TvP2Armory extends GameplanModeTemplate {
 
   override def defaultWorkerPlan: Plan = new Parallel(
     new Pump(Terran.Comsat),
-    new PumpWorkers)
+    new PumpWorkers(oversaturate = false))
 
   override def buildPlans: Seq[Plan] = Vector(
     new If(
@@ -65,6 +65,7 @@ class TvP2Armory extends GameplanModeTemplate {
     new ReactiveDetection,
     new BuildMissileTurretsAtBases(1),
     new RequireMiningBases(3),
+    new PumpWorkers,
     new Build(
       Get(Terran.Starport),
       Get(Terran.ScienceFacility),

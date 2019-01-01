@@ -53,6 +53,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
             ! scaffolding.complete
             && scaffolding.is(buildingClass)
             && ! scaffolding.buildUnit.exists(_.friendly.forall(builder =>
+              // This probably doesn't handle addon construction correctly
               builder.agent.toFinish.contains(scaffolding)
               || builder.agent.toBuildTile.contains(scaffolding.tileTopLeft)
             )))

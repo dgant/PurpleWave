@@ -13,9 +13,9 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.BuildGasPumps
 import Planning.Plans.Macro.Terran.{BuildBunkersAtNatural, BuildMissileTurretsAtNatural}
 import Planning.Plans.Scouting.ScoutOn
+import Planning.Predicates.Always
 import Planning.Predicates.Compound.{And, Latch}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvP1RaxFE
@@ -68,7 +68,8 @@ class TvP1RaxFE extends GameplanModeTemplate {
     new Pump(Terran.SiegeTankUnsieged),
     new Build(Get(Terran.MachineShop)),
     new FlipIf(
-      new EnemyDarkTemplarLikely,
+      new Always,
+      //new EnemyDarkTemplarLikely,
       new Parallel(
         new Build(Get(2, Terran.Factory)),
         new BuildGasPumps,

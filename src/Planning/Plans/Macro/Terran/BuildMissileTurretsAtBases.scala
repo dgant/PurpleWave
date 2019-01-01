@@ -22,7 +22,7 @@ class BuildMissileTurretsAtBases(
         eligibleBases.foreach(turretBase)
       }
       else {
-        With.scheduler.request(this, Get(1, Terran.EngineeringBay))
+        With.scheduler.request(this, Get(Terran.EngineeringBay))
       }
     }
   }

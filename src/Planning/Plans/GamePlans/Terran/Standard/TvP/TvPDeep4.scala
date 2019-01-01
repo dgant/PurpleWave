@@ -8,10 +8,11 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Terran.{BuildBunkersAtNatural, BuildMissileTurretsAtNatural}
-import Planning.Predicates.Milestones.{TechComplete, UnitsAtLeast}
+import Planning.Plans.Macro.Terran.{BuildBunkersAtNatural, BuildMissileTurretsAtBases, BuildMissileTurretsAtNatural}
+import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
 import Planning.Predicates.Strategy.Employing
+import Planning.UnitMatchers.UnitMatchOr
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvPDeep4
@@ -20,14 +21,12 @@ class TvPDeep4 extends GameplanModeTemplate {
 
   override val activationCriteria: Predicate = new Employing(TvPDeep4)
 
-
-
   override def defaultScoutExposPlan: Plan = NoPlan()
 
   override def defaultAttackPlan: Plan = new Parallel(
     new TvPIdeas.TvPAttack,
     new Trigger(
-      new TechComplete(Terran.Stim),
+      new UnitsAtLeast(12, UnitMatchOr(Terran.Marine, Terran.Medic), complete = true),
       new Attack))
 
   override def defaultWorkerPlan: Plan = new Parallel(
@@ -65,8 +64,9 @@ class TvPDeep4 extends GameplanModeTemplate {
       Get(Terran.Stim),
       Get(Terran.MarineRange),
       Get(Terran.BioDamage)),
-    new PumpMatchingRatio(Terran.Medic, 0, 12, Seq(Friendly(Terran.Marine, 0.25))),
+    new PumpMatchingRatio(Terran.Medic, 4, 12, Seq(Friendly(Terran.Marine, 0.25))),
     new Pump(Terran.Marine),
+    new BuildMissileTurretsAtBases(2),
     new Build(Get(8, Terran.Barracks))
   )
 }

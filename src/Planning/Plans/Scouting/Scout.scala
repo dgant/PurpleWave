@@ -24,7 +24,7 @@ class Scout(scoutCount: Int = 1) extends Plan {
     unitMatcher.set(UnitMatchAnd(UnitMatchWorkers, UnitMatchNotHoldingResources))
     unitPreference.set(UnitPreferClose(SpecificPoints.middle))
     interruptable.set(false)
-    canPoach.set(true)
+    //canPoach.set(true)
   })
   
   var acquiredScouts: Iterable[FriendlyUnitInfo] = Iterable.empty

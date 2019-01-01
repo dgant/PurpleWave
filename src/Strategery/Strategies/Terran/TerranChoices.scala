@@ -42,9 +42,10 @@ object TerranChoices {
   
   val tvpOpeners = Vector(
     TvPEarly14CC,
-    TvPJoyO,
+    TvP1RaxFE,
+    TvPSiegeExpandBunker,
     TvPFDStrong,
-    TvPSiegeExpandBunker
+    TvP2FacJoyO,
   )
   
   /////////

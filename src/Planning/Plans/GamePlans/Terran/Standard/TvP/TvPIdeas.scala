@@ -8,8 +8,10 @@ import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Compound.{And, Check, Not}
-import Planning.Predicates.Milestones.{EnemyHasShown, EnemyHasShownCloakedThreat, MiningBasesAtLeast, UnitsAtLeast}
+import Planning.Predicates.Economy.GasAtLeast
+import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeToMoveOut
+import Planning.Predicates.Strategy.EnemyStrategy
 import Planning.UnitMatchers.UnitMatchSiegeTank
 import ProxyBwapi.Races.{Protoss, Terran}
 
@@ -54,6 +56,14 @@ object TvPIdeas {
         new EnemyHasShown(Protoss.FleetBeacon)),
       new Attack))
 
+  class CutGasDuringFactory extends If(
+    new And(
+      new UnitsAtMost(0, Terran.Factory, complete = true),
+      new Or(
+        new GasAtLeast(100),
+        new UnitsAtLeast(1, Terran.Factory))),
+    new CapGasWorkersAt(1))
+
   class ReactiveDetection extends If(
     new And(
       new Or(
@@ -69,6 +79,14 @@ object TvPIdeas {
         Get(Terran.ScienceFacility),
         Get(Terran.ControlTower)),
       new Pump(Terran.ControlTower)))
+
+  class ReactiveEarlyVulture extends If(
+    new And(
+      new UnitsAtMost(0, Terran.MachineShop),
+      new Or(
+        new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway, With.fingerprints.nexusFirst),
+        new EnemiesAtLeast(1, Protoss.Zealot))),
+    new PumpMatchingRatio(Terran.Vulture, 1, 2, Seq(Enemy(Protoss.Zealot, 0.5))))
 
   class PumpScienceVessels extends PumpMatchingRatio(Terran.ScienceVessel, 1, 3, Seq(
     Enemy(Protoss.Arbiter, 1.0),

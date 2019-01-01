@@ -1,75 +1,72 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvP
 
-import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Compound.{If, Trigger}
+import Planning.Plans.Army.Attack
+import Planning.Plans.Basic.NoPlan
+import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
+import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Predicates.Compound.Check
-import Planning.Predicates.Milestones.UnitsAtLeast
+import Planning.Plans.Macro.Terran.{BuildBunkersAtNatural, BuildMissileTurretsAtNatural}
+import Planning.Predicates.Milestones.{TechComplete, UnitsAtLeast}
+import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
 import Planning.Predicates.Strategy.Employing
-import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvPDeep4
 
 class TvPDeep4 extends GameplanModeTemplate {
-  
+
   override val activationCriteria: Predicate = new Employing(TvPDeep4)
-  
-  override val aggression = 0.8
-  
-  override def defaultAttackPlan: Plan = new Trigger(
-    new UnitsAtLeast(50, UnitMatchWarriors),
-    super.defaultAttackPlan)
-  
-  override def emergencyPlans: Seq[Plan] = super.emergencyPlans ++
-    TvPIdeas.emergencyPlans
-  
-  override def defaultWorkerPlan: Plan = TvPIdeas.workerPlan
-  
-  override def buildPlans = Vector(
+
+
+
+  override def defaultScoutExposPlan: Plan = NoPlan()
+
+  override def defaultAttackPlan: Plan = new Parallel(
+    new TvPIdeas.TvPAttack,
+    new Trigger(
+      new TechComplete(Terran.Stim),
+      new Attack))
+
+  override def defaultWorkerPlan: Plan = new Parallel(
+    new If(
+      new Or(
+        new EnemyDarkTemplarLikely,
+        new UnitsAtLeast(4, Terran.Barracks)),
+      new Pump(Terran.Comsat)),
+    new Pump(Terran.SCV, 38))
+
+  override def buildPlans: Seq[Plan] = Vector(
     new RequireMiningBases(2),
-    new Pump(Terran.MachineShop),
-    
-    new If(
-      new UnitsAtLeast(50, UnitMatchWarriors),
-      new RequireMiningBases(3)),
-    new Pump(Terran.SiegeTankUnsieged),
-    new If(
-      new Check(() =>
-        With.units.countOurs(Terran.Marine) / 7 >
-        With.units.countOurs(Terran.Medic)),
-      new Pump(Terran.Medic, 8, 2)),
-    new Pump(Terran.Marine),
     new Build(
-      Get(1, Terran.Barracks),
-      Get(1, Terran.Factory),
-      Get(Terran.SiegeMode),
-      Get(1, Terran.EngineeringBay),
-      Get(2, Terran.Barracks),
-      Get(1, Terran.MissileTurret)),
+      Get(Terran.Barracks),
+      Get(Terran.Refinery),
+      Get(Terran.Factory),
+      Get(Terran.MachineShop)),
+    new BuildBunkersAtNatural(1),
     new BuildGasPumps,
+    new Pump(Terran.SiegeTankUnsieged, 2),
+    new Build(Get(Terran.SiegeMode)),
+    new FlipIf(
+      new EnemyDarkTemplarLikely,
+      new Build(
+        Get(2, Terran.Factory),
+        Get(2, Terran.MachineShop)),
+      new Parallel(
+        new Build(Get(Terran.EngineeringBay)),
+        new BuildMissileTurretsAtNatural(1),
+        new Build(Get(Terran.Academy)))),
+    new Pump(Terran.SiegeTankUnsieged),
     new Build(
-      Get(2, Terran.Factory),
-      Get(Terran.BioDamage),
-      Get(1, Terran.Academy),
+      Get(4, Terran.Barracks),
+      Get(Terran.BioArmor),
       Get(Terran.Stim),
       Get(Terran.MarineRange),
-      Get(Terran.BioArmor),
-      Get(4, Terran.Barracks),
-      Get(6, Terran.Factory)),
-    new RequireMiningBases(3),
-    new Build(
-      Get(1, Terran.Starport),
-      Get(2, Terran.Armory)),
-    new UpgradeContinuously(Terran.MechDamage),
-    new UpgradeContinuously(Terran.MechArmor),
-    new Build(
-      Get(1, Terran.ScienceFacility),
-      Get(8, Terran.Factory)),
-    new UpgradeContinuously(Terran.BioDamage),
-    new UpgradeContinuously(Terran.BioArmor))
+      Get(Terran.BioDamage)),
+    new PumpMatchingRatio(Terran.Medic, 0, 12, Seq(Friendly(Terran.Marine, 0.25))),
+    new Pump(Terran.Marine),
+    new Build(Get(8, Terran.Barracks))
+  )
 }

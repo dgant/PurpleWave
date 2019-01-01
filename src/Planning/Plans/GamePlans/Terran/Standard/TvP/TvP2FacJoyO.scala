@@ -15,11 +15,11 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchOr, UnitMatchSiegeTank}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Terran.TvPJoyO
+import Strategery.Strategies.Terran.TvP2FacJoyO
 
-class TvPJoyO extends GameplanModeTemplate {
+class TvP2FacJoyO extends GameplanModeTemplate {
   
-  override val activationCriteria: Predicate = new Employing(TvPJoyO)
+  override val activationCriteria: Predicate = new Employing(TvP2FacJoyO)
   override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
 
   override def defaultScoutPlan: Plan = new ScoutOn(Terran.SupplyDepot, quantity = 2)

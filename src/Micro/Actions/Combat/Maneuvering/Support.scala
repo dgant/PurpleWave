@@ -24,7 +24,15 @@ object Support extends Action {
     var supportables = unit.matchups.allies.filterNot(isSupport)
     if (supportables.isEmpty) supportables = unit.squad.map(_.units.toVector.filterNot(isSupport)).getOrElse(Vector.empty)
     if (supportables.isEmpty) return
-    val destination = unit.battle.map(_.us.vanguard).getOrElse(PurpleMath.centroid(supportables.map(_.pixelCenter)))
+    val destination = unit.battle
+      .map(_.us.vanguard)
+      .getOrElse({
+        val centroid = PurpleMath.centroid(supportables.map(_.pixelCenter))
+        if (unit.flying)
+          centroid
+        else
+          (unit.teammates.toSeq :+ unit).minBy(_.pixelDistanceCenter(centroid)).pixelCenter
+      })
 
     // Retreat to help
     if (!unit.visibleToOpponents) {

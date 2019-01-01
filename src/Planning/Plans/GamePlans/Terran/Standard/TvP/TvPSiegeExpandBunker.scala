@@ -4,15 +4,14 @@ import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
 import Planning.Plans.Army.{ConsiderAttacking, EjectScout, RecruitFreelancers}
-import Planning.Plans.Compound.{FlipIf, If, Or, Parallel}
+import Planning.Plans.Compound.{FlipIf, If, Parallel}
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Enemy, Pump, PumpMatchingRatio}
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Terran.{BuildBunkersAtEnemyNatural, BuildBunkersAtMain, BuildBunkersAtNatural, BuildMissileTurretsAtNatural}
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch}
-import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitCounters.UnitCountExactly
@@ -53,20 +52,8 @@ class TvPSiegeExpandBunker extends GameplanModeTemplate {
     Get(18, Terran.SCV))
 
   override def buildPlans: Seq[Plan] = Seq(
-    new If(
-      new And(
-        new UnitsAtMost(0, Terran.Factory, complete = true),
-        new Or(
-          new GasAtLeast(100),
-          new UnitsAtLeast(1, Terran.Factory))),
-      new CapGasWorkersAt(1)),
-    new If(
-      new And(
-        new UnitsAtMost(0, Terran.MachineShop),
-        new Or(
-          new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway, With.fingerprints.nexusFirst),
-          new EnemiesAtLeast(1, Protoss.Zealot))),
-      new PumpMatchingRatio(Terran.Vulture, 1, 2, Seq(Enemy(Protoss.Zealot, 0.5)))),
+    new TvPIdeas.CutGasDuringFactory,
+    new TvPIdeas.ReactiveEarlyVulture,
 
     new If(
       new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway),
@@ -104,5 +91,4 @@ class TvPSiegeExpandBunker extends GameplanModeTemplate {
       Get(2, Terran.Factory),
       Get(2, Terran.MachineShop))
   )
-
 }

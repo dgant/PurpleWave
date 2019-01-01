@@ -1,18 +1,17 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvP
 
-import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Attack, ConsiderAttacking, EjectScout}
-import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
+import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireBases
 import Planning.Plans.Scouting.ScoutAt
-import Planning.Predicates.Compound.{And, Latch}
-import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
-import Planning.Predicates.Milestones.{BasesAtLeast, EnemiesAtLeast, UnitsAtLeast, UnitsAtMost}
-import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.Predicates.Compound.Latch
+import Planning.Predicates.Economy.MineralsAtLeast
+import Planning.Predicates.Milestones.{BasesAtLeast, EnemiesAtLeast, UnitsAtLeast}
+import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.UnitMatchSiegeTank
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran}
@@ -62,21 +61,8 @@ class TvPFDStrong extends GameplanModeTemplate {
   
   override def buildPlans: Seq[Plan] = Vector(
     new EjectScout,
-    new If(
-      new And(
-        new UnitsAtMost(0, Terran.Factory, complete = true),
-        new Or(
-          new GasAtLeast(100),
-          new UnitsAtLeast(1, Terran.Factory))),
-      new CapGasWorkersAt(1)),
-    new If(
-      new And(
-        new UnitsAtMost(0, Terran.MachineShop),
-        new Or(
-          new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway),
-          new EnemiesAtLeast(1, Protoss.Zealot))),
-      new PumpMatchingRatio(Terran.Vulture, 1, 2, Seq(Enemy(Protoss.Zealot, 0.5)))),
-
+    new TvPIdeas.CutGasDuringFactory,
+    new TvPIdeas.ReactiveEarlyVulture,
     new Pump(Terran.MachineShop, 1),
     new BuildOrder(Get(2, Terran.SiegeTankUnsieged)),
     new Pump(Terran.Marine),

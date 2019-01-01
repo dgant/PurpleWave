@@ -8,16 +8,16 @@ class PumpWorkers(oversaturate: Boolean = false, cap: Int = 85) extends Pump(Wit
     if (With.self.isTerran)
       4
     else if (With.self.isProtoss)
-      2
+      1
     else
-      3
+      2
   }
   override def maxDesirable: Int = Math.min(
     cap,
     {
       var sum = (if (oversaturate) 18 else 0)
       With.geography.ourBases.foreach(base => {
-        sum += builderCount + 3 * base.minerals.size + 2 * base.gas.size
+        sum += builderCount + 2 * base.minerals.size + 3 * base.gas.size
       })
       sum
     })

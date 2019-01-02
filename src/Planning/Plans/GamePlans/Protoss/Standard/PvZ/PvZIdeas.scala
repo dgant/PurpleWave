@@ -162,13 +162,21 @@ object PvZIdeas {
       new Pump(Protoss.DarkTemplar, 1)),
     new If(
       new Employing(PvZLateGameReaver, PvZLateGameCarrier),
-      new PumpShuttleAndReavers(6)),
+      new Parallel(
+        new PumpShuttleAndReavers(6),
+        new If(
+          new Or(
+            new EnemyHasShown(Zerg.Scourge),
+            new EnemyHasShown(Zerg.Mutalisk),
+            new EnemiesAtLeast(1, Zerg.Spire)),
+          new PumpMatchingRatio(Protoss.Corsair, 6, 12, Seq(Friendly(Protoss.Carrier, 3.0)))))),
     new Pump(Protoss.Carrier),
-    new PumpMatchingRatio(Protoss.Corsair, 0, 12, Seq(Friendly(Protoss.Carrier, 3.0))),
     new Pump(Protoss.Observer, 1),
     new Pump(Protoss.Arbiter, 12),
     new If(
-      new Employing(PvZLateGameTemplar),
+      new Or(
+        new Employing(PvZLateGameTemplar),
+        new TechStarted(Protoss.PsionicStorm)),
       new PumpMatchingRatio(Protoss.HighTemplar, 1, 20, Seq(Friendly(UnitMatchWarriors, 0.3)))),
     new PumpMatchingRatio(Protoss.Dragoon, 1, 100, Seq(
       Enemy(Zerg.Lurker, 1.0),

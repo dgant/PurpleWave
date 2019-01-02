@@ -27,7 +27,8 @@ abstract class AbstractFindBuildings extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     def nearestNeutralBases(count: Int): Iterable[Base] = {
-      With.geography.neutralBases.toVector
+      With.geography.neutralBases
+        .filterNot(_.zone.island)
         .sortBy(b =>
           b.townHallTile.groundPixels(With.intelligence.mostBaselikeEnemyTile)
           - b.townHallTile.groundPixels(With.geography.home))

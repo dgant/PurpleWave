@@ -3,11 +3,12 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.Attack
-import Planning.Plans.Compound.{If, Parallel}
+import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
+import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
@@ -38,6 +39,7 @@ class PvZLateGameReaver extends GameplanModeTemplate {
           Get(Protoss.GroundArmor),
           Get(Protoss.RoboticsFacility),
           Get(Protoss.RoboticsSupportBay),
+          Get(Protoss.ShuttleSpeed),
           Get(Protoss.Observatory),
           Get(6, Protoss.Gateway)),
         new BuildGasPumps)))
@@ -48,6 +50,12 @@ class PvZLateGameReaver extends GameplanModeTemplate {
     new IfOnMiningBases(2, new If(new TechComplete(Protoss.PsionicStorm), new RequireMiningBases(3))),
     new IfOnMiningBases(3, new If(new UnitsAtLeast(10, Protoss.Gateway), new RequireMiningBases(4))),
     new AddPriorityTech,
+    new Trigger(
+      new GasAtLeast(500),
+      new Build(
+        Get(Protoss.CitadelOfAdun),
+        Get(Protoss.TemplarArchives),
+        Get(Protoss.PsionicStorm))),
     new PvZIdeas.TrainAndUpgradeArmy,
     new BuildCannonsAtExpansions(5),
     new PvZIdeas.AddGateways,

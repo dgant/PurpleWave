@@ -230,8 +230,30 @@ object ProtossBuilds {
     Get(3,   Protoss.Pylon),
     Get(6,   Protoss.Dragoon)
   )
+
+  val PvT13Nexus_GateCoreGateZ = Vector[BuildRequest] (
+    Get(8,  Protoss.Probe),
+    Get(1,  Protoss.Pylon),
+    Get(13, Protoss.Probe),
+    Get(2,  Protoss.Nexus),
+    Get(14, Protoss.Probe),
+    Get(1,  Protoss.Gateway),
+    Get(15, Protoss.Probe),
+    Get(Protoss.Assimilator),
+    Get(17, Protoss.Probe),
+    Get(Protoss.CyberneticsCore),
+    Get(2,  Protoss.Gateway),
+    Get(Protoss.Zealot),
+    Get(19, Protoss.Probe),
+    Get(2,  Protoss.Pylon),
+    Get(2,  Protoss.Dragoon),
+    Get(21, Protoss.Probe),
+    Get(Protoss.DragoonRange),
+    Get(3, Protoss.Pylon),
+    Get(4, Protoss.Dragoon))
+
   
-  val PvT13Nexus_NZ1GateCore = Vector[BuildRequest] (
+  val PvT13Nexus_GateCore = Vector[BuildRequest] (
     Get(8,   Protoss.Probe),
     Get(1,   Protoss.Pylon),
     Get(13,  Protoss.Probe),

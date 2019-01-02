@@ -9,8 +9,7 @@ import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TvE._
 import Strategery.Strategies.Terran.TvR.{TvR1Rax, TvRTinfoil}
 import Strategery.Strategies.Terran.TvT.TvTStandard
-import Strategery.Strategies.Terran.TvZ._
-import Strategery.Strategies.Terran.{TvP6Fac, TvPFDStrong}
+import Strategery.Strategies.Terran.TvZ.{TvZ1RaxFE, TvZProxy8Fact, TvZSK}
 import Strategery.Strategies.Zerg._
 
 class EmptyPlaybook {
@@ -18,7 +17,7 @@ class EmptyPlaybook {
   lazy val forced   : Seq[Strategy] = none
   lazy val disabled : Seq[Strategy] = none
   val strategyOrder: Seq[Strategy] = Vector(
-    PvT13NexusNZ,
+    PvT13Nexus,
     PvTDTExpand,
     PvT21Nexus,
     PvT23Nexus,
@@ -51,22 +50,15 @@ object StrategyGroups {
     PvTProxy2Gate,
     PvPProxy2Gate,
     PvZProxy2Gate,
+    TvZProxy8Fact,
     TvR1Rax,
     TvRTinfoil,
-    TvEProxy5Rax,
-    TvEProxy8Fact,
-    TvEMassGoliath,
-    TvE2PortWraith,
     TvTStandard,
-    TvZEarlyCCFirst,
-    TvZEarly1RaxGas,
-    TvZEarly1RaxFEEconomic,
-    TvZEarly1RaxFEConservative,
-    TvZEarly2Rax,
     PvP2Gate1012,
     PvP2GateRobo,
     PvPLateGame2BaseReaverCarrier_SpecificOpponents,
     PvPLateGame2BaseReaverCarrier_SpecificMaps,
+    PvZLateGameCarrier, // Needs island tech
     MassPhotonCannon,
     CarriersWithNoDefense,
     FivePoolProxySunkens,
@@ -83,7 +75,7 @@ class PurpleWavePlaybook extends EmptyPlaybook {
 
 class TestingPlaybook extends PurpleWavePlaybook {
   //override lazy val forced: Seq[Strategy] = Seq(PvZFFEEconomic, PvZMidgameCorsairReaverZealot, PvZMidgameCorsairReaverGoon, PvZMidgame5GateGoonReaver)
-  override lazy val forced: Seq[Strategy] = Seq(TvPFDStrong, TvP6Fac)
+  override lazy val forced: Seq[Strategy] = Seq(TvZ1RaxFE, TvZSK)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
 }
 

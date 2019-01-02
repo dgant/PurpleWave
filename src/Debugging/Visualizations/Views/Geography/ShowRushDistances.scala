@@ -31,22 +31,22 @@ object ShowRushDistances extends View {
   
   Known distances
   ---------------
-  Andromeda: 4940 - 5404 - 6083
+  Andromeda: 4940 - 5404 - 6083                     --- Manhattan: 5280 - 6196 - 7520
   Arcadia: 4216 - 5216 - 6008
   Benzene: 6140
   Circuit Breakers: 4396 - 5098 - 5696
-  Destination: 5216
-  Empire of the Sun: 4211 - 4894 - 5600
-  Fighting Spirit: 4563 - 5043 - 5776
+  Destination: 5216                                 --- Manhattan: 5952
+  Empire of the Sun: 4211 - 4894 - 5600             --- Manhattan: 5184 - 5843 - 7135
+  Fighting Spirit: 4563 - 5043 - 5776               --- Manhattan: 4280 - 6090 - 7104
   Great Barrier Reef: 4507 - 2679 - 4798
   Heartbreak Ridge: 5066
   Icarus: 4492 - 4900 - 5278
   Jade: 4559 - 5102 - 5634
-  La Mancha: 4441 - 4950 - 5715; 4441 - 4998 - 6003
+  La Mancha: 4441 - 4950 - 5715; 4441 - 4998 - 6003 --- Manhattan: 5312 - 6128 - 7168
   Luna: 4559 - 5102 - 5634
   Neo Moon Glaive: 4687 - 4750 - 4846
-  Python: 4096 -  4458 - 5312
-  Roadrunner: 4567 - 4858 - 5402
+  Python: 4096 -  4458 - 5312                       --- Manhattan: 5024 - 4216 - 5600
+  Roadrunner: 4567 - 4858 - 5402                    --- Manhattan: 5696 - 5961 - 6688
   Tau Cross: 5433 - 5800 - 6236
   
   Gladiator: 4486 - 4917 - 5740

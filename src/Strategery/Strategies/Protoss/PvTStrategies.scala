@@ -20,14 +20,13 @@ abstract class PvTBasicOpener extends PvTStrategy {
     PvT3BaseCarrier
   ))
 }
-object PvT13NexusNZ extends PvTBasicOpener {
+object PvT13Nexus extends PvTBasicOpener {
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fiveRax,
-    With.fingerprints.bbs,
-    With.fingerprints.twoFac,
-    With.fingerprints.twoFacVultures,
-    With.fingerprints.threeFac,
-    With.fingerprints.threeFacVultures)
+    With.fingerprints.bbs)
+  override def startLocationsMin: Int = 4
+
+  override def rushDistanceMinimum: Int = super.rushDistanceMinimum
 }
 object PvT21Nexus extends PvTBasicOpener
 object PvT23Nexus extends PvTBasicOpener {

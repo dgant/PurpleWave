@@ -111,6 +111,7 @@ class Pump(
         && builder.is(unitClass.whatBuilds._1)
         && builder.remainingCompletionFrames < unitClass.buildFrames
         && ( unitClass != Terran.NuclearMissile                           || ! builder.hasNuke)
+        && ( ! unitClass.requiresPsi                                      || builder.powered)
         && ( ! unitClass.isAddon                                          || builder.addon.isEmpty)
         && ( ! unitClass.isAddon                                          || unitClass.buildUnitsEnabling.forall(t => With.units.ours.exists(u => u.completeOrNearlyComplete && u.is(t)))) // Hack -- don't reserve buildings before we have the tech to build the addon.
         && ( ! unitClass.buildUnitsEnabling.contains(Terran.MachineShop)  || builder.addon.isDefined)

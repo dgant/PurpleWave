@@ -6,7 +6,7 @@ import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplateVsRandom
-import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
+import Planning.Plans.GamePlans.Terran.Situational.PlaceBunkersAtNatural
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -34,7 +34,7 @@ class TvR1Rax extends GameplanModeTemplateVsRandom {
         new SafeAtHome,
         new UnitsAtLeast(1, Terran.Bunker),
         new UnitsAtLeast(8, Terran.Marine)),
-      new BunkersAtNatural(2)),
+      new PlaceBunkersAtNatural(2)),
   
     new Pump(Terran.Marine),
     new If(

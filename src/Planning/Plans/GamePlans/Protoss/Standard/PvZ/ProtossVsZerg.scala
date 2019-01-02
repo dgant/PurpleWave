@@ -16,6 +16,7 @@ class ProtossVsZerg extends ModalGameplan(
   new PvZCorsairReaver,
 
   // Late game
+  new PvZLateGameReaver,
   new PvZLateGameTemplar,
   new PvZLateGameCarrier,
 )

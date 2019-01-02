@@ -17,7 +17,7 @@ class DarkArchonRushWithNoDefense extends Parallel {
   children.set(Vector(
     new MeldDarkArchons,
     new RequireEssentials,
-    new Build(ProtossBuilds.PvT13Nexus_NZ1GateCore: _*),
+    new Build(ProtossBuilds.PvT13Nexus_GateCore: _*),
     new RequireMiningBases(2),
     new RequireSufficientSupply,
     new PumpWorkers,

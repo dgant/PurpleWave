@@ -61,12 +61,13 @@ class TvPDeep4 extends GameplanModeTemplate {
     new Build(
       Get(4, Terran.Barracks),
       Get(Terran.BioArmor),
-      Get(Terran.Stim),
-      Get(Terran.MarineRange),
-      Get(Terran.BioDamage)),
+      Get(Terran.Stim)),
     new PumpMatchingRatio(Terran.Medic, 4, 12, Seq(Friendly(Terran.Marine, 0.25))),
     new Pump(Terran.Marine),
     new BuildMissileTurretsAtBases(2),
+    new Build(
+      Get(Terran.MarineRange),
+      Get(Terran.BioDamage)),
     new Build(Get(8, Terran.Barracks))
   )
 }

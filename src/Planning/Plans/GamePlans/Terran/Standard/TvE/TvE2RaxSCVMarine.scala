@@ -26,11 +26,14 @@ class TvE2RaxSCVMarine extends GameplanModeTemplate {
     new ScoutAt(10))
 
   class ReadyToAttack extends Latch(new UnitsAtLeast(8, Terran.Marine))
-  
+
+  override def defaultAggressionPlan: Plan = new If(
+    new ReadyToAttack,
+    new Aggression(2.0),
+    super.defaultAggressionPlan)
   override def defaultAttackPlan: Plan = new If(
     new ReadyToAttack,
     new Parallel(
-      new Aggression(2.0),
       new Attack,
       new Attack(Terran.SCV)))
   
@@ -39,7 +42,7 @@ class TvE2RaxSCVMarine extends GameplanModeTemplate {
       new UnitsAtMost(2, Terran.SupplyDepot),
       new MineralsAtLeast(400)),
     super.defaultSupplyPlan)
-  
+
   override def defaultWorkerPlan: Plan = NoPlan()
   
   override val buildOrder = Vector(

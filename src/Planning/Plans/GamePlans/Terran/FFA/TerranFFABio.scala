@@ -8,7 +8,7 @@ import Planning.Plan
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
+import Planning.Plans.GamePlans.Terran.Situational.PlaceBunkersAtNatural
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBasesFFA}
@@ -17,7 +17,7 @@ import ProxyBwapi.Races.Terran
 
 class TerranFFABio extends GameplanModeTemplate {
   
-  override def defaultPlacementPlan : Plan  = new BunkersAtNatural(2)
+  override def defaultPlacementPlan : Plan  = new PlaceBunkersAtNatural(2)
   override val defaultScoutPlan     : Plan  = NoPlan()
   override val aggression                   = 0.8
   

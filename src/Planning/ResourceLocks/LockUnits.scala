@@ -91,7 +91,11 @@ class LockUnits extends {
         val output = new mutable.Queue[FriendlyUnitInfo]()
         (output, () => output.dequeue())
       } else {
-        val output = new mutable.PriorityQueue[FriendlyUnitInfo]()(Ordering.by( - unitPreference.get.preference(_))) // Negative because priority queue is highest-first
+        val output = new mutable.PriorityQueue[FriendlyUnitInfo]()(Ordering.by(candidate =>
+          // Negative because priority queue is highest-first
+          - unitPreference.get.preference(candidate)
+          * (if (units.contains(candidate)) 1.0 else 1.5)
+        ))
         (output, () => output.dequeue())
       }
 

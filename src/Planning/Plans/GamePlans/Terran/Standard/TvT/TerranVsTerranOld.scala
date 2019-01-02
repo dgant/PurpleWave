@@ -7,7 +7,7 @@ import Planning.Plan
 import Planning.Plans.Army._
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
+import Planning.Plans.GamePlans.Terran.Situational.PlaceBunkersAtNatural
 import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -24,7 +24,7 @@ class TerranVsTerranOld extends GameplanModeTemplate {
   
   
   
-  override def defaultPlacementPlan: Plan = new BunkersAtNatural(1)
+  override def defaultPlacementPlan: Plan = new PlaceBunkersAtNatural(1)
   
   override def defaultAttackPlan: Plan = new Trigger(
     new UnitsAtLeast(1, Terran.Wraith, complete = true),

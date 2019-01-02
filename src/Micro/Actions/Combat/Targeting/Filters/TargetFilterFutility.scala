@@ -1,8 +1,9 @@
 package Micro.Actions.Combat.Targeting.Filters
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Actions.Scouting.BlockConstruction
-import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterFutility extends TargetFilter {
@@ -37,7 +38,9 @@ object TargetFilterFutility extends TargetFilter {
       || actor.flying
       || ! target.flying
       || Vector(actor.pixelToFireAt(target).tileIncluding, target.tileIncludingCenter).exists(With.grids.walkableTerrain.get))
-    
+
+    if (actor.is(Terran.Vulture) && target.unitClass.isBuilding && With.frame < GameTime(0, 4)()) return false
+
     val output = targetReachable && (targetCatchable || atOurWorkers)
     
     output

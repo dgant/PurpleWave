@@ -30,9 +30,11 @@ object Chase extends ActionTechnique {
     
     lazy val weCanAttack    = unit.canAttack(other)
     lazy val theyCanAttack  = other.canAttack(unit)
+    lazy val theyCanMove    = other.canMove
     lazy val rangeUs        = unit.pixelRangeAgainst(other)
     lazy val rangeEnemy     = other.pixelRangeAgainst(unit)
-  
+
+    if ( ! theyCanAttack && ! theyCanMove)                    return None
     if ( ! weCanAttack  && ! theyCanAttack)                   return None
     if (theyCanAttack   && ! weCanAttack)                     return Some(0.0)
     if (weCanAttack     && ! theyCanAttack)                   return Some(1.0)
@@ -43,6 +45,7 @@ object Chase extends ActionTechnique {
         other.angleRadians,
         other.pixelCenter.radiansTo(unit.pixelCenter)) < Math.PI / 2)
       return Some(0.0)
+    if (other.framesToGetInRange(unit) < 12) return Some(0.0)
     Some(1.0)
   }
   

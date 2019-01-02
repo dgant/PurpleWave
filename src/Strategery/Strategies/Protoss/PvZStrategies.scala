@@ -1,8 +1,8 @@
 package Strategery.Strategies.Protoss
 
 import Lifecycle.With
-import Strategery.{MapGroups, StarCraftMap}
 import Strategery.Strategies.Strategy
+import Strategery.{MapGroups, StarCraftMap}
 import bwapi.Race
 
 abstract class PvZStrategy extends Strategy {
@@ -40,7 +40,8 @@ object PvZ4Gate99 extends PvZ2GateOpening {
 object PvZFFEEconomic          extends PvZFFEOpening
 object PvZGatewayFE            extends PvZFFEOpening {
   override def minimumGamesVsOpponent: Int = 1
-  override def responsesBlacklisted = Iterable(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.overpool, With.fingerprints.twelvePool)
+  override def responsesWhitelisted = Seq(With.fingerprints.twelveHatch, With.fingerprints.tenHatch)
+  override def responsesBlacklisted = Seq(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.overpool, With.fingerprints.twelvePool)
 }
 
 object PvZLateGameTemplar extends PvZStrategy

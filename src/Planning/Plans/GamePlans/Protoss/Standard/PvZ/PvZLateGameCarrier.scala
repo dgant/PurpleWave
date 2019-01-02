@@ -3,11 +3,12 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.Attack
-import Planning.Plans.Compound.{If, Parallel}
+import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
+import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural, MeldArchons}
+import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
@@ -20,11 +21,14 @@ class PvZLateGameCarrier extends GameplanModeTemplate {
   override def defaultAttackPlan: Plan = new Parallel(
     new Attack(Protoss.Corsair),
     new If(
-      new UnitsAtLeast(80, Protoss.Interceptor),
+      new Or(
+        new UnitsAtLeast(80, Protoss.Interceptor),
+        new MiningBasesAtMost(1),
+        new BasesAtLeast(4)),
       new PvZIdeas.ConditionalAttack))
 
   override def emergencyPlans: Seq[Plan] = Seq(new PvZIdeas.ReactToLurkers)
-  override def defaultArchonPlan: Plan = new PvZIdeas.TemplarUpToEight
+  override def defaultArchonPlan: Plan = new MeldArchons(49) { override def maximumTemplar = 12 }
 
   class AddPriorityTech extends Parallel(
     new Build(
@@ -40,7 +44,8 @@ class PvZLateGameCarrier extends GameplanModeTemplate {
         new BuildOrder(
           Get(Protoss.Stargate),
           Get(Protoss.RoboticsFacility),
-          Get(Protoss.RoboticsSupportBay)),
+          Get(Protoss.RoboticsSupportBay),
+          Get(Protoss.ShuttleSpeed)),
         new If(new UnitsAtLeast(2, Protoss.Carrier), new Build(Get(Protoss.CarrierCapacity))),
         new If(new UnitsAtLeast(2, Protoss.Dragoon), new Build(Get(Protoss.DragoonRange))),
         new Build(Get(5, Protoss.Gateway)))))
@@ -66,6 +71,12 @@ class PvZLateGameCarrier extends GameplanModeTemplate {
     new If(new UnitsAtLeast(4, Protoss.Reaver), new RequireMiningBases(3)),
     new If(new UnitsAtLeast(30, Protoss.Interceptor), new RequireMiningBases(3)),
     new AddPriorityTech,
+    new Trigger(
+      new GasAtLeast(1000),
+      new Build(
+        Get(Protoss.CitadelOfAdun),
+        Get(Protoss.TemplarArchives),
+        Get(Protoss.PsionicStorm))),
     new PvZIdeas.TrainAndUpgradeArmy,
     new BuildCannonsAtExpansions(6),
     new BuildCannonsAtNatural(5),

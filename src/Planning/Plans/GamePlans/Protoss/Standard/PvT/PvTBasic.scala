@@ -24,7 +24,7 @@ import Strategery.Strategies.Protoss._
 
 class PvTBasic extends GameplanModeTemplate {
   override val activationCriteria = new Employing(
-    PvT13NexusNZ,
+    PvT13Nexus,
     PvT21Nexus,
     PvT23Nexus,
     PvT28Nexus,
@@ -36,8 +36,6 @@ class PvTBasic extends GameplanModeTemplate {
     PvT3BaseCarrier,
     PvT3BaseArbiter)
 
-  override val priorityAttackPlan = new PvTIdeas.PriorityAttacks
-  
   override def defaultAggressionPlan: Plan =
     new If(
       new And(
@@ -54,9 +52,9 @@ class PvTBasic extends GameplanModeTemplate {
         new Aggression(1.0)))
 
   override def meldArchonsAt: Int = 25
-  
+
   override def defaultScoutPlan: Plan = new Parallel(
-    new If(new Employing(PvT13NexusNZ),         new ScoutOn(Protoss.Nexus, quantity = 2)),
+    new If(new Employing(PvT13Nexus),           new ScoutOn(Protoss.Nexus, quantity = 2)),
     new If(new Employing(PvT21Nexus),           new ScoutOn(Protoss.Gateway)),
     new If(new Employing(PvT23Nexus),           new ScoutOn(Protoss.Pylon)),
     new If(new Employing(PvT28Nexus),           new ScoutOn(Protoss.Gateway)),
@@ -65,7 +63,8 @@ class PvTBasic extends GameplanModeTemplate {
     new If(new Employing(PvT2GateObserver),     new ScoutOn(Protoss.Pylon)),
     new If(new Employing(PvT1015DT),            new If(new UpgradeStarted(Protoss.DragoonRange), new Scout)),
     new If(new Employing(PvTDTExpand),          new ScoutOn(Protoss.CyberneticsCore)))
-  
+
+  override val priorityAttackPlan = new PvTIdeas.PriorityAttacks
   override val defaultAttackPlan = new Parallel(
     new If(
       new Or(
@@ -73,15 +72,15 @@ class PvTBasic extends GameplanModeTemplate {
         new Latch(new UnitsAtLeast(1, UnitMatchOr(Protoss.DarkTemplar, Protoss.Reaver), complete = true)),
         new UpgradeStarted(Protoss.DragoonRange)),
       new PvTIdeas.AttackSafely))
-  
+
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvTIdeas.ReactToBBS,
     new If(
-      new Employing(PvT13NexusNZ, PvT21Nexus, PvT23Nexus, PvT28Nexus),
+      new Employing(PvT13Nexus, PvT21Nexus, PvT23Nexus, PvT28Nexus),
       new PvTIdeas.ReactTo2Fac))
-  
+
   override def defaultBuildOrder: Plan = new Parallel(
-    new If(new Employing(PvT13NexusNZ),         new BuildOrder(ProtossBuilds.PvT13Nexus_NZ1GateCore: _*)),
+    new If(new Employing(PvT13Nexus),           new BuildOrder(ProtossBuilds.PvT13Nexus_GateCoreGateZ: _*)),
     new If(new Employing(PvT21Nexus),           new BuildOrder(ProtossBuilds.PvT21Nexus: _*)),
     new If(new Employing(PvT23Nexus),           new BuildOrder(ProtossBuilds.PvT23Nexus: _*)),
     new If(new Employing(PvT28Nexus),           new BuildOrder(ProtossBuilds.PvT28Nexus: _*)),
@@ -109,14 +108,14 @@ class PvTBasic extends GameplanModeTemplate {
   class EmployingThreeBase  extends Employing(PvT3BaseCarrier, PvT3BaseArbiter)
   class EmployingCarriers   extends Employing(PvT2BaseCarrier, PvT3BaseCarrier)
   class EmployingArbiters   extends Employing(PvT2BaseArbiter, PvT3BaseArbiter)
-  
+
   class NeedObservers extends Or(
     new EnemyHasShownCloakedThreat,
     new Latch(new EnemiesAtLeast(4, Terran.Vulture)))
-  
+
   class PreparedForBio extends Latch(
     new Or(new UnitsAtLeast(1, Protoss.Reaver), new TechComplete(Protoss.PsionicStorm)))
-  
+
   class ReadyForThirdBase extends And(
     new Or(
       new EmployingThreeBase,
@@ -130,7 +129,7 @@ class PvTBasic extends GameplanModeTemplate {
     new Or(
       new Not(new NeedObservers),
       new UnitsAtLeast(1, Protoss.Observer, complete = true)))
-  
+
   class ReadyForFourthBase extends And(
     new ReadyForThirdBase,
     new SafeToMoveOut,
@@ -139,7 +138,7 @@ class PvTBasic extends GameplanModeTemplate {
       new And(new EnemyBio, new PreparedForBio),
       new Latch(new UnitsAtLeast(2, Protoss.Arbiter, complete = true)),
       new Latch(new UnitsAtLeast(4, Protoss.Carrier, complete = true))))
-  
+
   class BasicTech extends Parallel(
     new BuildOrder(
       Get(Protoss.Gateway),
@@ -147,7 +146,7 @@ class PvTBasic extends GameplanModeTemplate {
       Get(Protoss.CyberneticsCore),
       Get(1, Protoss.Dragoon),
       Get(Protoss.DragoonRange)))
-  
+
   class ObserverTech extends Parallel(
     new Build(Get(Protoss.RoboticsFacility), Get(Protoss.Observatory)),
     new If(
@@ -157,7 +156,7 @@ class PvTBasic extends GameplanModeTemplate {
           new MiningBasesAtLeast(3),
           new EmployingThreeBase)),
       new UpgradeContinuously(Protoss.ObserverSpeed)))
-  
+
   class CriticalUpgrades extends Parallel(
     new If(
       new UnitsAtLeast(2, Protoss.Carrier),
@@ -182,7 +181,7 @@ class PvTBasic extends GameplanModeTemplate {
     new If(new UnitsAtLeast(1, Protoss.Shuttle), new UpgradeContinuously(Protoss.ShuttleSpeed)),
     new If(new UnitsAtLeast(1, Protoss.HighTemplar), new Build(Get(Protoss.PsionicStorm))),
     new If(new UnitsAtLeast(4, Protoss.Zealot), new UpgradeContinuously(Protoss.ZealotSpeed)),
-    
+
     // Get upgrades with Arbiter builds, vs. Bio, or when maxed on air upgrades
     // Double-spin, or prioritize armor vs. bio
     new If(
@@ -208,7 +207,7 @@ class PvTBasic extends GameplanModeTemplate {
               new EnemyBio)),
           new UpgradeContinuously(Protoss.GroundArmor),
           new UpgradeContinuously(Protoss.GroundDamage)))))
-  
+
   class LateGameTech extends Parallel(
     new BuildGasPumps,
     new If(
@@ -256,7 +255,7 @@ class PvTBasic extends GameplanModeTemplate {
                 new And(
                   new MiningBasesAtLeast(3),
                   // TODO: Document: why this list?
-                  new Employing(PvT13NexusNZ, PvT21Nexus, PvT23Nexus, PvT28Nexus, PvT1015Expand)),
+                  new Employing(PvT13Nexus, PvT21Nexus, PvT23Nexus, PvT28Nexus, PvT1015Expand)),
                 new Build(
                   Get(3, Protoss.Stargate),
                   Get(3, Protoss.Carrier),

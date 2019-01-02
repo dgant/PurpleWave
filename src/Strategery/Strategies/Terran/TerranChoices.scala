@@ -16,15 +16,13 @@ object TerranChoices {
   val tvr = Vector(
     WorkerRushLiftoff,
     TvEProxy5Rax,
-    TvEProxy8Fact,
+    TvZProxy8Fact,
     TvEProxyBBS,
+    TvE1RaxSCVMarine,
     TvE2RaxSCVMarine,
-    TvEMassBio,
     TvETurtleMech,
     TvR1Rax,
     TvRTinfoil,
-    TvEMassGoliath,
-    TvE2PortWraith,
     TerranFFABio)
   
   /////////
@@ -52,11 +50,7 @@ object TerranChoices {
   /////////
   
   val tvzOpeners = Vector(
-    TvZEarlyCCFirst,
-    TvZEarly1RaxGas,
-    TvZEarly1RaxFEEconomic,
-    TvZEarly1RaxFEConservative,
-    TvZEarly2Rax
+    TvZ1RaxFE
   )
   
   val normalOpeners: Vector[Strategy] = (tvr ++ tvtOpeners ++ tvpOpeners ++ tvzOpeners).distinct

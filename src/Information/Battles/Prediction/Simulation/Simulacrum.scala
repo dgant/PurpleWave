@@ -61,7 +61,7 @@ class Simulacrum(
       false
     }
     else if (realUnit.unitClass.isWorker) {
-      realUnit.attacking
+      realUnit.attacking || realUnit.friendly.exists(_.squad.isDefined)
     }
     else if (realUnit.isEnemy) {
       true

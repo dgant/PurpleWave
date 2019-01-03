@@ -234,22 +234,22 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     && ! burrowed,
     cd1)
 
-  def topSpeed: Double = topSpeedCache()
-  private val topSpeedCache = new Cache(() =>
-    if ( ! canMove) 0 else
-      (if (ensnared) 0.5 else 1.0) * // TODO: Is this the multiplier?
-      (if (stimmed) 1.5 else 1.0) * (
-      unitClass.topSpeed * (if (
-        (isVulture()    && player.hasUpgrade(Terran.VultureSpeed))    ||
-        (isObserver()   && player.hasUpgrade(Protoss.ObserverSpeed))  ||
-        (isScout()      && player.hasUpgrade(Protoss.ScoutSpeed))     ||
-        (isShuttle()    && player.hasUpgrade(Protoss.ShuttleSpeed))   ||
-        (isZealot()     && player.hasUpgrade(Protoss.ZealotSpeed))    ||
-        (isOverlord()   && player.hasUpgrade(Zerg.ZerglingSpeed))     ||
-        (isHydralisk()  && player.hasUpgrade(Zerg.HydraliskSpeed))    ||
-        (isUltralisk()  && player.hasUpgrade(Zerg.UltraliskSpeed)))
-        1.5 else 1.0)),
-    cd4)
+  def topSpeed: Double = if (canMove) topSpeedPossibleCache() else 0
+  def topSpeedPossible: Double = topSpeedPossibleCache()
+  private val topSpeedPossibleCache = new Cache(() =>
+    (if (ensnared) 0.5 else 1.0) * // TODO: Is this the multiplier?
+    (if (stimmed) 1.5 else 1.0) * (
+    unitClass.topSpeed * (if (
+      (isVulture()    && player.hasUpgrade(Terran.VultureSpeed))    ||
+      (isObserver()   && player.hasUpgrade(Protoss.ObserverSpeed))  ||
+      (isScout()      && player.hasUpgrade(Protoss.ScoutSpeed))     ||
+      (isShuttle()    && player.hasUpgrade(Protoss.ShuttleSpeed))   ||
+      (isZealot()     && player.hasUpgrade(Protoss.ZealotSpeed))    ||
+      (isOverlord()   && player.hasUpgrade(Zerg.ZerglingSpeed))     ||
+      (isHydralisk()  && player.hasUpgrade(Zerg.HydraliskSpeed))    ||
+      (isUltralisk()  && player.hasUpgrade(Zerg.UltraliskSpeed)))
+      1.5 else 1.0)),
+  cd4)
 
   def projectFrames(framesToLookAhead: Double): Pixel = pixelCenter.add((velocityX * framesToLookAhead).toInt, (velocityY * framesToLookAhead).toInt)
 
@@ -472,9 +472,9 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def inRangeToAttack(enemy: UnitInfo)                    : Boolean = pixelDistanceEdge(enemy)          <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy)          > pixelRangeMin)
   def inRangeToAttack(enemy: UnitInfo, enemyAt: Pixel)    : Boolean = pixelDistanceEdge(enemy, enemyAt) <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy, enemyAt) > pixelRangeMin)
   def inRangeToAttack(enemy: UnitInfo, framesAhead: Int)  : Boolean = inRangeToAttack(enemy, enemy.projectFrames(framesAhead))
-  
+
   def framesToTravelTo(destination: Pixel)  : Int = framesToTravelPixels(pixelDistanceTravelling(destination))
-  def framesToTravelPixels(pixels: Double)  : Int = if (pixels <= 0.0) 0 else if (canMove) Math.max(0, Math.ceil(pixels/topSpeed).toInt) else Int.MaxValue
+  def framesToTravelPixels(pixels: Double)  : Int = (if (pixels <= 0.0) 0 else if (canMove) Math.max(0, Math.ceil(pixels / topSpeedPossible).toInt) else Int.MaxValue) + (if (burrowed || sieged) 24 else 0)
   
   def framesToGetInRange(enemy: UnitInfo)                 : Int = if (canAttack(enemy)) framesToTravelPixels(pixelDistanceEdge(enemy)           - pixelRangeAgainst(enemy)) else Int.MaxValue
   def framesToGetInRange(enemy: UnitInfo, enemyAt: Pixel) : Int = if (canAttack(enemy)) framesToTravelPixels(pixelDistanceEdge(enemy, enemyAt)  - pixelRangeAgainst(enemy)) else Int.MaxValue

@@ -37,7 +37,7 @@ class TvZ1RaxFE extends GameplanModeTemplate {
 
   override def buildPlans: Seq[Plan] = Seq(
     new If(
-      new EnemyStrategy(With.fingerprints.twelveHatch),
+      new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.tenHatch),
       new RequireMiningBases(2)),
     new Pump(Terran.Marine),
     new If(

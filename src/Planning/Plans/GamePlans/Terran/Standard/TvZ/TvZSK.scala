@@ -76,18 +76,16 @@ class TvZSK extends GameplanModeTemplate {
     new BuildMissileTurretsAtBases(3),
 
     new BuildGasPumps,
-    new Pump(Terran.ControlTower),
     new Build(
       Get(Terran.Factory),
       Get(Terran.Starport),
       Get(Terran.ScienceFacility),
-      Get(2, Terran.Starport),
-      Get(2, Terran.EngineeringBay),
-      Get(3, Terran.Starport)),
+      Get(2, Terran.Starport)),
+    new Pump(Terran.ControlTower),
 
     new IfOnMiningBases(2, new Build(Get(6, Terran.Barracks))),
-    new IfOnMiningBases(3, new Build(Get(11, Terran.Barracks))),
-    new IfOnMiningBases(4, new Build(Get(16, Terran.Barracks))),
+    new IfOnMiningBases(3, new Build(Get(2, Terran.EngineeringBay), Get(3, Terran.Starport), Get(9, Terran.Barracks))),
+    new IfOnMiningBases(4, new Build(Get(14, Terran.Barracks))),
     new RequireMiningBases(4)
   )
 }

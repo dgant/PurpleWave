@@ -63,8 +63,6 @@ class MasterBuildPlans {
       while (plans(build).size < buildsNeeded(build)) {
         plans(build).append(buildPlan(build))
       }
-
-      //Consider removing excess plans
     })
 
     getChildrenCache.invalidate()

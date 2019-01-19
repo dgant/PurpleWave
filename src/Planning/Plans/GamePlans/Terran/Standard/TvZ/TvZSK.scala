@@ -16,11 +16,11 @@ import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
-import Strategery.Strategies.Terran.TvZSK
+import Strategery.Strategies.Terran.{TvZ2RaxNuke, TvZ3RaxTank, TvZ5Rax, TvZSK}
 
 class TvZSK extends GameplanModeTemplate {
   
-  override val activationCriteria: Predicate = new Employing(TvZSK)
+  override val activationCriteria: Predicate = new Employing(TvZ5Rax, TvZ3RaxTank, TvZ2RaxNuke, TvZSK)
 
   class CanAttack extends And(
     new Latch(new UnitsAtLeast(20, UnitMatchWarriors)),
@@ -56,6 +56,7 @@ class TvZSK extends GameplanModeTemplate {
     new TechContinuously(Terran.Stim),
     new UpgradeContinuously(Terran.MarineRange),
     new TechContinuously(Terran.Irradiate),
+    new TechContinuously(Terran.SiegeMode),
     new UpgradeContinuously(Terran.ScienceVesselEnergy),
     new UpgradeContinuously(Terran.BioDamage),
     new UpgradeContinuously(Terran.BioArmor),
@@ -77,7 +78,10 @@ class TvZSK extends GameplanModeTemplate {
     new Build(
       Get(Terran.Academy),
       Get(Terran.BioDamage),
-      Get(5, Terran.Barracks)),
+      Get(2, Terran.Barracks)),
+    new If(
+      new Employing(TvZ5Rax),
+      new Build(Get(5, Terran.Barracks))),
 
     new FlipIf(
       new LurkerLikely,

@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.{Attack, EjectScout, FloatBuildings}
 import Planning.Plans.Compound.If
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump}
 import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound.{And, Latch}
@@ -14,13 +14,13 @@ import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvT1FacFE
 
-class TvT1FacFE extends GameplanModeTemplate {
+class TvT1FacFE extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(TvT1FacFE)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(2, Terran.Factory))
 
-  override def defaultScoutPlan = new ScoutAt(13)
-  override def defaultAttackPlan = new If(new EnemyStrategy(With.fingerprints.fourteenCC), new Attack)
+  override def scoutPlan = new ScoutAt(13)
+  override def attackPlan = new If(new EnemyStrategy(With.fingerprints.fourteenCC), new Attack)
 
   override def buildOrder: Seq[BuildRequest] = Seq(
     Get(9, Terran.SCV),

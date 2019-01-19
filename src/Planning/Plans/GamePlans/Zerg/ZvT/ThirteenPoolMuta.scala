@@ -9,7 +9,7 @@ import Planning.UnitCounters.UnitCountOne
 import Planning.{Plan, Predicate}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -18,23 +18,23 @@ import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.Scouting.FoundEnemyBase
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Zerg
-import Strategery.Strategies.Zerg.{ZvPThirteenPoolMuta}
+import Strategery.Strategies.Zerg.ZvPThirteenPoolMuta
 
-class ThirteenPoolMuta extends GameplanModeTemplate {
+class ThirteenPoolMuta extends GameplanTemplate {
   
   override val activationCriteria: Predicate = new Employing(ZvPThirteenPoolMuta)
   
-  override def aggression: Double = 0.6
+  override val aggression: Double = 0.6
   
-  override def defaultScoutPlan: Plan = new Parallel(
+  override def scoutPlan: Plan = new Parallel(
     new ScoutSafelyWithOverlord,
     new If(
       new Not(new FoundEnemyBase),
       new Attack(Zerg.Zergling, UnitCountOne)))
   
-  override def defaultAttackPlan: Plan = new Attack(Zerg.Mutalisk)
+  override def attackPlan: Plan = new Attack(Zerg.Mutalisk)
   
-  override def defaultBuildOrder: Plan = new Parallel (
+  override def buildOrderPlan: Plan = new Parallel (
     new BuildOrder(
       Get(9, Zerg.Drone),
       Get(2, Zerg.Overlord),

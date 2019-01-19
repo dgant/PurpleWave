@@ -6,7 +6,7 @@ import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -21,7 +21,7 @@ import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.NinePoolMuta
 
-class NinePoolMuta extends GameplanModeTemplate {
+class NinePoolMuta extends GameplanTemplate {
   
   override val activationCriteria: Predicate = new Employing(NinePoolMuta)
   
@@ -39,11 +39,11 @@ class NinePoolMuta extends GameplanModeTemplate {
     new Blueprint(this, building = Some(Zerg.CreepColony), requireZone = Some(With.geography.ourNatural.zone), placement = Some(PlacementProfiles.hugTownHall)),
     new Blueprint(this, building = Some(Zerg.CreepColony), requireZone = Some(With.geography.ourNatural.zone), placement = Some(PlacementProfiles.hugTownHall)))
   
-  override def defaultScoutPlan: Plan = new If(
+  override def scoutPlan: Plan = new If(
     new Not(new EnemiesAtLeast(1, UnitMatchOr(Zerg.Spire, Zerg.Mutalisk, Zerg.Hydralisk))),
     new Scout(3) { scouts.get.unitMatcher.set(Zerg.Overlord) })
   
-  override def defaultAttackPlan: Plan = new Trigger(
+  override def attackPlan: Plan = new Trigger(
     new Or(
       new EnemyBasesAtLeast(2),
       new UnitsAtLeast(1, Zerg.Mutalisk),

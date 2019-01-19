@@ -7,7 +7,7 @@ import Planning.Plans.Basic.NoPlan
 import Planning.UnitMatchers.UnitMatchSiegeTank
 import Planning.{Plan, Predicate}
 import Planning.Plans.Compound.If
-import Planning.Plans.GamePlans.GameplanModeTemplateVsRandom
+import Planning.Plans.GamePlans.GameplanTemplateVsRandom
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Milestones.UnitsAtLeast
@@ -15,7 +15,7 @@ import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvR.TvRTinfoil
 
-class TvRTinfoil extends GameplanModeTemplateVsRandom {
+class TvRTinfoil extends GameplanTemplateVsRandom {
   
   override val activationCriteria: Predicate = new Employing(TvRTinfoil)
   override val completionCriteria: Predicate = new UnitsAtLeast(8, UnitMatchSiegeTank, complete = true)
@@ -29,7 +29,7 @@ class TvRTinfoil extends GameplanModeTemplateVsRandom {
     new Blueprint(this, building = Some(Terran.Factory),      placement = Some(PlacementProfiles.hugTownHall)),
     new Blueprint(this, building = Some(Terran.SupplyDepot),  placement = Some(PlacementProfiles.hugTownHall)))
   
-  override def defaultAttackPlan: Plan = NoPlan()
+  override def attackPlan: Plan = NoPlan()
   
   override val buildOrder = Vector(
     Get(1,   Terran.CommandCenter),

@@ -11,7 +11,7 @@ import Planning.UnitMatchers.UnitMatchWorkers
 import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
@@ -22,24 +22,24 @@ import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvE.TvEProxyBBS
 
-class TvEProxyBBS extends GameplanModeTemplate {
+class TvEProxyBBS extends GameplanTemplate {
   
   override val activationCriteria = new Employing(TvEProxyBBS)
   
-  override def aggression: Double = 1.5
+  override val aggression: Double = 1.5
   
   lazy val proxyZone: Option[Zone] = ProxyPlanner.proxyAutomaticAggressive
   
-  override def defaultScoutPlan: Plan = NoPlan()
+  override def scoutPlan: Plan = NoPlan()
   
-  override def defaultAttackPlan: Plan = new Parallel(
+  override def attackPlan: Plan = new Parallel(
     new Attack,
     new Trigger(
       new UnitsAtLeast(1, Terran.Marine, complete = false),
       new Attack(UnitMatchWorkers, UnitCountExactly(2))))
   
-  override def defaultWorkerPlan: Plan = NoPlan()
-  override def defaultSupplyPlan: Plan = NoPlan()
+  override def workerPlan: Plan = NoPlan()
+  override def supplyPlan: Plan = NoPlan()
   
   override def buildOrder: Seq[BuildRequest] = Vector(
     Get(1, Terran.CommandCenter),

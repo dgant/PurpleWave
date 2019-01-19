@@ -4,7 +4,7 @@ import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{FlipIf, If, Or, Parallel}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.TrainArmy
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
@@ -17,7 +17,7 @@ import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvPLateGame2BaseReaverCarrier_SpecificMaps, PvPLateGame2BaseReaverCarrier_SpecificOpponents}
 
-class PvP2BaseReaverCarrier extends GameplanModeTemplate {
+class PvP2BaseReaverCarrier extends GameplanTemplate {
 
   override val activationCriteria = new Or(
     new Employing(PvPLateGame2BaseReaverCarrier_SpecificOpponents),
@@ -28,7 +28,7 @@ class PvP2BaseReaverCarrier extends GameplanModeTemplate {
     new PvPIdeas.ReactToDarkTemplarEmergencies
   )
 
-  override val defaultAttackPlan = new If(
+  override val attackPlan = new If(
     new UnitsAtLeast(24, Protoss.Interceptor),
     new Attack)
 

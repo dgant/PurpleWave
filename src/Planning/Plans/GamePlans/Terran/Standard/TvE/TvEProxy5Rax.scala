@@ -7,7 +7,7 @@ import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Attack, RecruitFreelancers}
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound.{If, Parallel}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Scouting.{FoundEnemyBase, ScoutAt}
@@ -20,11 +20,11 @@ import Planning.{Plan, Predicate, ProxyPlanner}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvE.TvEProxy5Rax
 
-class TvEProxy5Rax extends GameplanModeTemplate {
+class TvEProxy5Rax extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(TvEProxy5Rax)
 
-  override def defaultPlacementPlan: Plan = new ProposePlacement{
+  override def placementPlan: Plan = new ProposePlacement{
     override lazy val blueprints = Vector(
       new Blueprint(this,
         building = Some(Terran.Barracks),
@@ -32,7 +32,7 @@ class TvEProxy5Rax extends GameplanModeTemplate {
         placement = Some(PlacementProfiles.proxyBuilding)))
   }
 
-  override def defaultScoutPlan: Plan = new If(
+  override def scoutPlan: Plan = new If(
     new StartPositionsAtLeast(3),
     new If(
       new Not(new FoundEnemyBase),
@@ -41,10 +41,10 @@ class TvEProxy5Rax extends GameplanModeTemplate {
         new ScoutAt(10, 2),
         new ScoutAt(10))))
 
-  override def aggression: Double = 1.5
-  override def defaultWorkerPlan: Plan = NoPlan()
-  override def defaultSupplyPlan: Plan = NoPlan()
-  override def defaultAttackPlan: Plan = new Parallel(new Attack, new Attack(Terran.SCV))
+  override val aggression: Double = 1.5
+  override def workerPlan: Plan = NoPlan()
+  override def supplyPlan: Plan = NoPlan()
+  override def attackPlan: Plan = new Parallel(new Attack, new Attack(Terran.SCV))
 
   override val buildOrder = Vector(
     Get(5, Terran.SCV),

@@ -4,7 +4,7 @@ import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural, MeldArchons}
@@ -14,11 +14,11 @@ import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvZLateGameCarrier
 
-class PvZLateGameCarrier extends GameplanModeTemplate {
+class PvZLateGameCarrier extends GameplanTemplate {
 
   override val activationCriteria = new Employing(PvZLateGameCarrier)
 
-  override def defaultAttackPlan: Plan = new Parallel(
+  override def attackPlan: Plan = new Parallel(
     new Attack(Protoss.Corsair),
     new If(
       new Or(
@@ -28,7 +28,7 @@ class PvZLateGameCarrier extends GameplanModeTemplate {
       new PvZIdeas.ConditionalAttack))
 
   override def emergencyPlans: Seq[Plan] = Seq(new PvZIdeas.ReactToLurkers)
-  override def defaultArchonPlan: Plan = new MeldArchons(49) { override def maximumTemplar = 12 }
+  override def archonPlan: Plan = new MeldArchons(49) { override def maximumTemplar = 12 }
 
   class AddPriorityTech extends Parallel(
     new Build(

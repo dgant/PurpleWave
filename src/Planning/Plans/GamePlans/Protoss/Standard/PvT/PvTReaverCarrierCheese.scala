@@ -4,7 +4,7 @@ import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
@@ -14,13 +14,13 @@ import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import ProxyBwapi.Races.Protoss
 
-class PvTReaverCarrierCheese extends GameplanModeTemplate {
+class PvTReaverCarrierCheese extends GameplanTemplate {
 
   override val buildOrder             = ProtossBuilds.PvT13Nexus_GateCore
-  override val defaultWorkerPlan      = new PumpWorkers(oversaturate = true)
+  override val workerPlan      = new PumpWorkers(oversaturate = true)
   override val priorityAttackPlan     = new PvTIdeas.PriorityAttacks
-  override def defaultScoutPlan       = new ScoutOn(Protoss.CyberneticsCore)
-  override def defaultAttackPlan      = new Trigger(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new Attack)
+  override def scoutPlan       = new ScoutOn(Protoss.CyberneticsCore)
+  override def attackPlan      = new Trigger(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new Attack)
 
   override def buildPlans: Seq[Plan] = Vector(
     new Build(

@@ -6,7 +6,7 @@ import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchInNatural}
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Or, Trigger}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
@@ -18,12 +18,12 @@ import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.PvT1015Expand
 
-class PvT1015Expand extends GameplanModeTemplate {
+class PvT1015Expand extends GameplanTemplate {
   
   override val activationCriteria = new Employing(PvT1015Expand)
   override val completionCriteria = new Or(new UnitsAtLeast(3, Protoss.Nexus), new UnitsAtLeast(1, Protoss.Observatory))
-  override def defaultScoutPlan   = new If(new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeFrames(1)), new Scout)
-  override val defaultAttackPlan  = new Attack
+  override def scoutPlan   = new If(new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeFrames(1)), new Scout)
+  override val attackPlan  = new Attack
   
   override val buildOrder = ProtossBuilds.PvT1015GateGoonExpand
   

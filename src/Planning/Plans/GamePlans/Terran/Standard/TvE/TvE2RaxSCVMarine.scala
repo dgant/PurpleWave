@@ -4,7 +4,9 @@ import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Aggression, Attack, EjectScout, RecruitFreelancers}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainst4Pool
+import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Scouting.{FoundEnemyBase, ScoutAt}
 import Planning.Predicates.Compound.{Latch, Not}
@@ -17,33 +19,37 @@ import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvE.TvE2RaxSCVMarine
 
-class TvE2RaxSCVMarine extends GameplanModeTemplate {
-  
+class TvE2RaxSCVMarine extends GameplanTemplate {
+
   override val activationCriteria: Predicate = new Employing(TvE2RaxSCVMarine)
 
-  override def defaultScoutPlan: Plan = new If(
+  override def scoutPlan: Plan = new If(
     new Not(new FoundEnemyBase),
     new ScoutAt(10))
 
   class ReadyToAttack extends Latch(new UnitsAtLeast(8, Terran.Marine))
 
-  override def defaultAggressionPlan: Plan = new If(
+  override def aggressionPlan: Plan = new If(
     new ReadyToAttack,
     new Aggression(2.0),
-    super.defaultAggressionPlan)
-  override def defaultAttackPlan: Plan = new If(
+    super.aggressionPlan)
+  override def attackPlan: Plan = new If(
     new ReadyToAttack,
     new Parallel(
       new Attack,
       new Attack(Terran.SCV)))
-  
-  override def defaultSupplyPlan: Plan = new If(
+
+  override def supplyPlan: Plan = new If(
     new Or(
       new UnitsAtMost(2, Terran.SupplyDepot),
       new MineralsAtLeast(400)),
-    super.defaultSupplyPlan)
+    super.supplyPlan)
 
-  override def defaultWorkerPlan: Plan = NoPlan()
+  override def workerPlan: Plan = NoPlan()
+
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new TvZFourPoolEmergency
+  )
   
   override val buildOrder = Vector(
     Get(9, Terran.SCV),
@@ -57,6 +63,7 @@ class TvE2RaxSCVMarine extends GameplanModeTemplate {
     Get(2, Terran.SupplyDepot))
   
   override def buildPlans: Seq[Plan] = Vector(
+    new DefendFightersAgainst4Pool,
     new Pump(Terran.Marine),
     new Pump(Terran.SCV),
     new If(

@@ -6,7 +6,7 @@ import Planning.Predicates.Compound.{And, Check}
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
@@ -16,7 +16,7 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast, MineralsAtMost}
 import ProxyBwapi.Races.Protoss
 
-class MassPhotonCannon extends GameplanModeTemplate {
+class MassPhotonCannon extends GameplanTemplate {
   
   // Maybe?
   // override def defaultWorkerPlan: Plan = new TrainWorkersContinuously(oversaturate = true)
@@ -60,13 +60,13 @@ class MassPhotonCannon extends GameplanModeTemplate {
   private def pylonCount = With.units.countOurs(Protoss.Pylon)
   private def cannonCount = With.units.countOurs(Protoss.PhotonCannon)
   
-  override def defaultAttackPlan: Plan = new If(
+  override def attackPlan: Plan = new If(
     new Or(
       new UnitsAtLeast(40, Protoss.Interceptor),
       new SupplyOutOf200(190)),
     new Attack)
   
-  override def defaultPlacementPlan: Plan = new PlacementForgeFastExpand
+  override def placementPlan: Plan = new PlacementForgeFastExpand
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(

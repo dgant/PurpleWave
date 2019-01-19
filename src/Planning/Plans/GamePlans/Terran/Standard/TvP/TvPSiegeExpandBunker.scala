@@ -5,7 +5,7 @@ import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
 import Planning.Plans.Army.{ConsiderAttacking, EjectScout, RecruitFreelancers}
 import Planning.Plans.Compound.{FlipIf, If, Parallel}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -18,7 +18,7 @@ import Planning.UnitCounters.UnitCountExactly
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvPSiegeExpandBunker
 
-class TvPSiegeExpandBunker extends GameplanModeTemplate {
+class TvPSiegeExpandBunker extends GameplanTemplate {
 
   override val activationCriteria = new Employing(TvPSiegeExpandBunker)
   override val completionCriteria = new Latch(new And(
@@ -27,9 +27,9 @@ class TvPSiegeExpandBunker extends GameplanModeTemplate {
     new UnitsAtLeast(1, Terran.EngineeringBay)
   ))
 
-  override def defaultScoutPlan: Plan = new ScoutOn(Terran.Factory)
+  override def scoutPlan: Plan = new ScoutOn(Terran.Factory)
 
-  override def defaultAttackPlan = new If(
+  override def attackPlan = new If(
     new EnemyStrategy(With.fingerprints.nexusFirst),
     new ConsiderAttacking)
 

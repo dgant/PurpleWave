@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.EjectScout
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.PumpWorkers
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireBases
@@ -16,13 +16,13 @@ import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP3GateRobo
 
-class PvP3GateRobo extends GameplanModeTemplate {
+class PvP3GateRobo extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(PvP3GateRobo)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(2, Protoss.Nexus))
 
-  override def defaultScoutPlan: Plan = new ScoutOn(Protoss.Gateway)
-  override val defaultAttackPlan: Plan = new If(
+  override def scoutPlan: Plan = new ScoutOn(Protoss.Gateway)
+  override val attackPlan: Plan = new If(
     new Or(
       new EnemyStrategy(With.fingerprints.nexusFirst),
       new And(
@@ -41,7 +41,7 @@ class PvP3GateRobo extends GameplanModeTemplate {
     new PvPIdeas.ReactToFFE,
     new PvPIdeas.ReactTo2Gate)
 
-  override def defaultBuildOrder: Plan = new Parallel(
+  override def buildOrderPlan: Plan = new Parallel(
     new BuildOrder(
       Get(8,   Protoss.Probe),
       Get(Protoss.Pylon),

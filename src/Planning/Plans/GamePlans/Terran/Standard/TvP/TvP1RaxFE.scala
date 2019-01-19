@@ -6,7 +6,7 @@ import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Compound.{FlipIf, If, Or, Parallel}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -20,7 +20,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvP1RaxFE
 
-class TvP1RaxFE extends GameplanModeTemplate {
+class TvP1RaxFE extends GameplanTemplate {
 
   override val activationCriteria = new Employing(TvP1RaxFE)
   override val completionCriteria = new Latch(new And(
@@ -29,19 +29,19 @@ class TvP1RaxFE extends GameplanModeTemplate {
     new UnitsAtLeast(1, Terran.EngineeringBay)
   ))
 
-   override def defaultPlacementPlan: Plan = new ProposePlacement {
+   override def placementPlan: Plan = new ProposePlacement {
      override lazy val blueprints: Seq[Blueprint] = Vector(
        new Blueprint(this, building = Some(Terran.Barracks), preferZone = Some(With.geography.ourNatural.zone)),
        new Blueprint(this, building = Some(Terran.SupplyDepot), preferZone = Some(With.geography.ourNatural.zone)))
    }
 
-  override def defaultScoutPlan: Plan = new ScoutOn(Terran.Factory)
+  override def scoutPlan: Plan = new ScoutOn(Terran.Factory)
 
-  override def defaultAttackPlan = new If(
+  override def attackPlan = new If(
     new EnemyStrategy(With.fingerprints.nexusFirst),
     new ConsiderAttacking)
 
-  override def defaultBuildOrder = new Parallel(
+  override def buildOrderPlan = new Parallel(
     new BuildOrder(
       Get(9,  Terran.SCV),
       Get(Terran.SupplyDepot),

@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvP
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Attack, ConsiderAttacking, EjectScout}
 import Planning.Plans.Compound.{If, Parallel, Trigger}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireBases
@@ -17,13 +17,13 @@ import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvPFDStrong
 
-class TvPFDStrong extends GameplanModeTemplate {
+class TvPFDStrong extends GameplanTemplate {
   
   override val activationCriteria: Predicate = new Employing(TvPFDStrong)
   override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
 
-  override def defaultScoutPlan: Plan = new ScoutAt(13)
-  override def defaultAttackPlan: Plan = new Parallel(
+  override def scoutPlan: Plan = new ScoutAt(13)
+  override def attackPlan: Plan = new Parallel(
     new Attack(Terran.Vulture),
     new Trigger(
       new UnitsAtLeast(2, UnitMatchSiegeTank, complete = true),
@@ -35,9 +35,9 @@ class TvPFDStrong extends GameplanModeTemplate {
   override def emergencyPlans: Seq[Plan] = super.emergencyPlans ++
     TvPIdeas.emergencyPlans
   
-  override def defaultWorkerPlan: Plan = TvPIdeas.workerPlan
+  override def workerPlan: Plan = TvPIdeas.workerPlan
 
-  override def defaultBuildOrder: Plan = new Parallel(
+  override def buildOrderPlan: Plan = new Parallel(
     new BuildOrder(
       Get(10, Terran.SCV),
       Get(Terran.SupplyDepot)),

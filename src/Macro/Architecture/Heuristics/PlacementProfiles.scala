@@ -133,6 +133,7 @@ object PlacementProfiles {
   
   val hugWorkersWithCannon = new PlacementProfile(
     "Hug workers with cannon",
+    avoidDistanceFromBase       = 1.0,
     preferCoveringWorkers       = 1.0,
     avoidDistanceFromEnemy      = 0.00001)
   

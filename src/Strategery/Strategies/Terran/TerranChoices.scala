@@ -55,7 +55,8 @@ object TerranChoices {
   /////////
   
   val tvzOpeners = Vector(
-    TvZ1RaxFE
+    TvZ1RaxFE,
+    TvZ2RaxAcademy
   )
   
   val normalOpeners: Vector[Strategy] = (tvr ++ tvtOpeners ++ tvpOpeners ++ tvzOpeners).distinct

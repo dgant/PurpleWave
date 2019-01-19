@@ -86,13 +86,13 @@ object TvPIdeas {
       new Or(
         new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway, With.fingerprints.nexusFirst),
         new EnemiesAtLeast(1, Protoss.Zealot))),
-    new PumpMatchingRatio(Terran.Vulture, 1, 2, Seq(Enemy(Protoss.Zealot, 0.5))))
+    new PumpRatio(Terran.Vulture, 1, 2, Seq(Enemy(Protoss.Zealot, 0.5))))
 
-  class PumpScienceVessels extends PumpMatchingRatio(Terran.ScienceVessel, 1, 3, Seq(
+  class PumpScienceVessels extends PumpRatio(Terran.ScienceVessel, 1, 3, Seq(
     Enemy(Protoss.Arbiter, 1.0),
     Enemy(Protoss.DarkTemplar, 1.0)))
 
-  class PumpGoliaths extends PumpMatchingRatio(Terran.Goliath, 0, 30, Seq(
+  class PumpGoliaths extends PumpRatio(Terran.Goliath, 0, 30, Seq(
       Enemy(Protoss.Carrier,  6.0),
       Enemy(Protoss.Arbiter,  2.0),
       Enemy(Protoss.Scout,    2.0),

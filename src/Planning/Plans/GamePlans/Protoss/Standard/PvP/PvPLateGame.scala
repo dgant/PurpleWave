@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Compound.{FlipIf, If, Or, Parallel}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{PumpWorkers, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
@@ -17,20 +17,20 @@ import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvP2Gate1012Goon, PvP2GateDTExpand, PvPLateGameArbiter, PvPLateGameCarrier}
 
-class PvPLateGame extends GameplanModeTemplate {
+class PvPLateGame extends GameplanTemplate {
 
   override val emergencyPlans: Vector[Plan] = Vector(
     new PvPIdeas.ReactToDarkTemplarEmergencies,
     new PvPIdeas.ReactToCannonRush
   )
   
-  override def defaultWorkerPlan: Plan = new Parallel(
+  override def workerPlan: Plan = new Parallel(
     new If(new SafeAtHome, new PumpWorkers(true, cap = 44)),
     new PumpWorkers(false, cap = 75))
   
   override def priorityAttackPlan   : Plan = new PvPIdeas.AttackWithDarkTemplar
-  override val defaultAttackPlan    : Plan = new PvPIdeas.AttackSafely
-  override def defaultArchonPlan    : Plan = new PvPIdeas.MeldArchonsPvP
+  override val attackPlan    : Plan = new PvPIdeas.AttackSafely
+  override def archonPlan    : Plan = new PvPIdeas.MeldArchonsPvP
   
   class RoboTech extends Parallel(
     new Build(

@@ -4,7 +4,7 @@ import Macro.BuildRequests.Get
 import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -17,19 +17,19 @@ import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvPDeep4
 
-class TvPDeep4 extends GameplanModeTemplate {
+class TvPDeep4 extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(TvPDeep4)
 
-  override def defaultScoutExposPlan: Plan = NoPlan()
+  override def scoutExposPlan: Plan = NoPlan()
 
-  override def defaultAttackPlan: Plan = new Parallel(
+  override def attackPlan: Plan = new Parallel(
     new TvPIdeas.TvPAttack,
     new Trigger(
       new UnitsAtLeast(12, UnitMatchOr(Terran.Marine, Terran.Medic), complete = true),
       new Attack))
 
-  override def defaultWorkerPlan: Plan = new Parallel(
+  override def workerPlan: Plan = new Parallel(
     new If(
       new Or(
         new EnemyDarkTemplarLikely,
@@ -62,7 +62,7 @@ class TvPDeep4 extends GameplanModeTemplate {
       Get(4, Terran.Barracks),
       Get(Terran.BioArmor),
       Get(Terran.Stim)),
-    new PumpMatchingRatio(Terran.Medic, 4, 12, Seq(Friendly(Terran.Marine, 0.25))),
+    new PumpRatio(Terran.Medic, 4, 12, Seq(Friendly(Terran.Marine, 0.25))),
     new Pump(Terran.Marine),
     new BuildMissileTurretsAtBases(2),
     new Build(

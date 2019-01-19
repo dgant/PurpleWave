@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Compound.{If, Parallel, Trigger}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutAt
@@ -15,13 +15,13 @@ import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvT1FacPort
 
-class TvT1FacPort extends GameplanModeTemplate {
+class TvT1FacPort extends GameplanTemplate {
 
   override val activationCriteria = new Employing(TvT1FacPort)
   override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
 
-  override def defaultScoutPlan = new ScoutAt(13)
-  override def defaultAttackPlan = new Parallel(
+  override def scoutPlan = new ScoutAt(13)
+  override def attackPlan = new Parallel(
     new If(new EnemyStrategy(With.fingerprints.fourteenCC), new Attack),
     new Trigger(
       new UnitsAtLeast(1, Terran.Wraith, complete = true),

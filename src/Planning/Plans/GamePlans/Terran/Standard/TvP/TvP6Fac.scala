@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvP
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Terran.Standard.TvP.TvPIdeas.ReactiveDetection
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
@@ -18,11 +18,11 @@ import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvP6Fac
 
-class TvP6Fac extends GameplanModeTemplate {
+class TvP6Fac extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(TvP6Fac)
 
-  override def defaultAttackPlan: Plan = new Parallel(
+  override def attackPlan: Plan = new Parallel(
     new TvPIdeas.TvPAttack,
     new If(
       new Or(
@@ -30,7 +30,7 @@ class TvP6Fac extends GameplanModeTemplate {
         new UnitsAtLeast(8, UnitMatchSiegeTank, complete = true)),
     new Attack))
 
-  override def defaultWorkerPlan: Plan = new Parallel(
+  override def workerPlan: Plan = new Parallel(
     new Pump(Terran.Comsat),
     new PumpWorkers)
 

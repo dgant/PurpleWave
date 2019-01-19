@@ -9,7 +9,7 @@ import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TvE._
 import Strategery.Strategies.Terran.TvR.{TvR1Rax, TvRTinfoil}
 import Strategery.Strategies.Terran.TvZ.TvZProxy8Fact
-import Strategery.Strategies.Terran.{TvT1FacPort, TvT5Fac}
+import Strategery.Strategies.Terran._
 import Strategery.Strategies.Zerg._
 
 class EmptyPlaybook {
@@ -74,7 +74,7 @@ class PurpleWavePlaybook extends EmptyPlaybook {
 
 class TestingPlaybook extends PurpleWavePlaybook {
   //override lazy val forced: Seq[Strategy] = Seq(PvZFFEEconomic, PvZMidgameCorsairReaverZealot, PvZMidgameCorsairReaverGoon, PvZMidgame5GateGoonReaver)
-  override lazy val forced: Seq[Strategy] = Seq(TvT1FacPort, TvT5Fac)
+  override lazy val forced: Seq[Strategy] = Seq(TvZ1RaxFE, TvZ5Rax, TvZSK)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
 }
 

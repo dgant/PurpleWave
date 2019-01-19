@@ -5,7 +5,7 @@ import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
 import Planning.Plans.Army.EjectScout
 import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
@@ -22,16 +22,16 @@ import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.MapGroups
 import Strategery.Strategies.Protoss._
 
-class PvTFastCarrier extends GameplanModeTemplate {
+class PvTFastCarrier extends GameplanTemplate {
 
   class CanProxy extends Check(() => ! With.strategy.map.exists(MapGroups.badForProxying.contains))
   class CanGoCarriers extends Check(() => 4 * Math.max(4, With.units.countOurs(Protoss.Carrier)) > With.units.countEnemy(Terran.Goliath))
 
   override val activationCriteria     = new Employing(PvT25BaseCarrier)
   override val completionCriteria     = new Never //new Latch(new UnitsAtLeast(1, Protoss.FleetBeacon))
-  override val defaultWorkerPlan      = new PumpWorkers(oversaturate = true)
+  override val workerPlan      = new PumpWorkers(oversaturate = true)
   override val priorityAttackPlan     = new PvTIdeas.PriorityAttacks
-  override def defaultScoutPlan: Plan = new If(new CanProxy, new ScoutOn(Protoss.Gateway), new ScoutOn(Protoss.Pylon))
+  override def scoutPlan: Plan = new If(new CanProxy, new ScoutOn(Protoss.Gateway), new ScoutOn(Protoss.Pylon))
   override val removeMineralBlocksAt  = 24
 
   private val buildOrderProxyGate = Vector(

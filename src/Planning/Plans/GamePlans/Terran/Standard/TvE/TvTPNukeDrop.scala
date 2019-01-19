@@ -7,7 +7,7 @@ import Planning.{Plan, Predicate}
 import Planning.Plans.Army.NukeBase
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -17,17 +17,17 @@ import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvE.TvTPNukeDrop
 
-class TvTPNukeDrop extends GameplanModeTemplate {
+class TvTPNukeDrop extends GameplanTemplate {
   
   override val activationCriteria: Predicate = new Employing(TvTPNukeDrop)
-  override def defaultAttackPlan = new If(
+  override def attackPlan = new If(
     new And(
       new UnitsAtLeast(40, UnitMatchWarriors),
       new MiningBasesAtLeast(2)),
-    super.defaultAttackPlan)
+    super.attackPlan)
   
   override def priorityAttackPlan: Plan = new NukeBase
-  override def defaultDropPlan: Plan = NoPlan()
+  override def dropPlan: Plan = NoPlan()
   
   override val buildOrder = Vector(
     Get(9, Terran.SCV),
@@ -37,7 +37,7 @@ class TvTPNukeDrop extends GameplanModeTemplate {
     Get(11, Terran.SCV),
     Get(1, Terran.Refinery))
   
-  override def defaultWorkerPlan: Plan = NoPlan()
+  override def workerPlan: Plan = NoPlan()
   
   override def buildPlans: Seq[Plan] = Vector(
     new Pump(Terran.NuclearSilo),

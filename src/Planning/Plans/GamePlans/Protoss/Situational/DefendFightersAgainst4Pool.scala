@@ -12,7 +12,7 @@ import Planning.{Plan, Property}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class DefendZealotsAgainst4Pool extends Plan {
+class DefendFightersAgainst4Pool extends Plan {
   
   val defenders = new Property[LockUnits](new LockUnits)
   defenders.get.unitMatcher.set(UnitMatchWorkers)
@@ -24,15 +24,15 @@ class DefendZealotsAgainst4Pool extends Plan {
     def inOurBase(unit: UnitInfo): Boolean = unit.zone.bases.exists(_.owner.isUs)
     
     val cannons           = With.units.ours .filter(u => u.aliveAndComplete && u.is(Protoss.PhotonCannon))
-    val zealots           = With.units.ours .filter(u => u.is(Protoss.Zealot) && inOurBase(u) && u.remainingCompletionFrames < GameTime(0, 3)())
+    val fighters          = With.units.ours .filter(u => u.canAttack && ! u.unitClass.isWorker && inOurBase(u) && u.remainingCompletionFrames < GameTime(0, 3)())
     lazy val zerglings    = With.units.enemy.filter(u => u.aliveAndComplete && u.is(Zerg.Zergling)  && inOurBase(u))
     lazy val workers      = With.units.ours.filter(u => u.aliveAndComplete && u.unitClass.isWorker)
     lazy val threatening  = zerglings.filter(_.inPixelRadius(32 * 4).exists(n => n.isOurs && n.totalHealth < 200))
     
-    if (zealots.isEmpty) {
+    if (fighters.isEmpty) {
       return
     }
-    if (zealots.size > 4) {
+    if (fighters.size > 4) {
       return
     }
     if (cannons.nonEmpty) {
@@ -45,12 +45,12 @@ class DefendZealotsAgainst4Pool extends Plan {
       return
     }
     
-    val workersNeeded   = 1 + 3 * zerglings.size - 3 * zealots.size
+    val workersNeeded   = 1 + 3 * zerglings.size - 3 * fighters.map(_.unitClass.mineralValue).sum / 100.0
     val workerCap       = workers.size - 4
     val workersToFight  = PurpleMath.clamp(workersNeeded, 0, workerCap)
-    val target          = zealots.minBy(zealot => zerglings.map(_.pixelDistanceEdge(zealot)).min).pixelCenter
+    val target          = fighters.minBy(zealot => zerglings.map(_.pixelDistanceEdge(zealot)).min).pixelCenter
     
-    defenders.get.unitCounter.set(UnitCountExactly(workersToFight))
+    defenders.get.unitCounter.set(UnitCountExactly(workersToFight.toInt))
     defenders.get.unitPreference.set(UnitPreferClose(target))
     defenders.get.acquire(this)
     defenders.get.units.foreach(_.agent.intend(this, new Intention {

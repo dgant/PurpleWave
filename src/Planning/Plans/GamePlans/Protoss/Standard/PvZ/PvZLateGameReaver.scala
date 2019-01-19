@@ -4,7 +4,7 @@ import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Parallel, Trigger}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
@@ -14,11 +14,11 @@ import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvZLateGameReaver
 
-class PvZLateGameReaver extends GameplanModeTemplate {
+class PvZLateGameReaver extends GameplanTemplate {
 
   override val activationCriteria = new Employing(PvZLateGameReaver)
 
-  override def defaultAttackPlan: Plan = new Parallel(
+  override def attackPlan: Plan = new Parallel(
     new Attack(Protoss.Corsair),
     new PvZIdeas.ConditionalAttack)
 

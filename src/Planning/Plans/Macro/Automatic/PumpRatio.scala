@@ -5,7 +5,7 @@ import Mathematics.PurpleMath
 import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitClasses.UnitClass
 
-class PumpMatchingRatio(
+class PumpRatio(
   unitClass     : UnitClass,
   minimum       : Int,
   maximum       : Int,

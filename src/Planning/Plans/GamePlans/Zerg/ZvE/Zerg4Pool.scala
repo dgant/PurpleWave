@@ -7,7 +7,7 @@ import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, ExtractorTrick, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -20,11 +20,11 @@ import Planning.UnitMatchers.UnitMatchOr
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Zerg.ZvE4Pool
 
-class Zerg4Pool extends GameplanModeTemplate {
+class Zerg4Pool extends GameplanTemplate {
   
   override val activationCriteria = new Employing(ZvE4Pool)
   
-  override def defaultAggressionPlan: Plan = new If(
+  override def aggressionPlan: Plan = new If(
     new Latch(
       new And(
         new Check(() => With.self.supplyUsed >= 18),
@@ -33,7 +33,7 @@ class Zerg4Pool extends GameplanModeTemplate {
     new Aggression(99),
     new Aggression(1.5))
   
-  override def defaultScoutPlan: Plan = new Parallel(
+  override def scoutPlan: Plan = new Parallel(
     new If(
       new And(
         new Or(
@@ -53,9 +53,9 @@ class Zerg4Pool extends GameplanModeTemplate {
         new UnitsAtLeast(4, UnitMatchOr(Zerg.Drone, Zerg.Extractor))),
       new Scout))
   
-  override def defaultSupplyPlan: Plan = NoPlan()
+  override def supplyPlan: Plan = NoPlan()
   
-  override def defaultAttackPlan: Plan = new Attack
+  override def attackPlan: Plan = new Attack
   
   override def buildPlans: Seq[Plan] = Vector(
     new CapGasAt(0, 0, 0.0),

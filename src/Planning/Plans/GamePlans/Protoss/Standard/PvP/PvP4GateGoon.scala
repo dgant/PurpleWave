@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
@@ -18,14 +18,14 @@ import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP4GateGoon
 
-class PvP4GateGoon extends GameplanModeTemplate {
+class PvP4GateGoon extends GameplanTemplate {
   
   override val activationCriteria : Predicate = new Employing(PvP4GateGoon)
   override val completionCriteria : Predicate = new Latch(new MiningBasesAtLeast(2))
-  override def defaultAttackPlan  : Plan      = new PvPIdeas.AttackSafely
+  override def attackPlan  : Plan      = new PvPIdeas.AttackSafely
 
-  override def defaultScoutPlan   : Plan = new ScoutOn(Protoss.CyberneticsCore)
-  override val defaultWorkerPlan  : Plan = NoPlan()
+  override def scoutPlan   : Plan = new ScoutOn(Protoss.CyberneticsCore)
+  override val workerPlan  : Plan = NoPlan()
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvPIdeas.ReactToDarkTemplarEmergencies,
     new PvPIdeas.ReactToCannonRush,

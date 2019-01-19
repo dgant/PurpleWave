@@ -11,7 +11,7 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireBases
@@ -22,7 +22,7 @@ import Planning.Predicates.Reactive.SafeAtHome
 import Planning.UnitCounters.UnitCountEverything
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 
-class ZergSparkle extends GameplanModeTemplate {
+class ZergSparkle extends GameplanTemplate {
   
   class KillNeutralBlocker extends Plan() {
     val killers = new LockUnits
@@ -38,11 +38,11 @@ class ZergSparkle extends GameplanModeTemplate {
     }
   }
   
-  override def aggression: Double = 0.8
+  override val aggression: Double = 0.8
   
-  override def defaultAttackPlan: Plan = new Attack(Zerg.Mutalisk)
+  override def attackPlan: Plan = new Attack(Zerg.Mutalisk)
   
-  override def defaultBuildOrder: Plan = new Parallel (
+  override def buildOrderPlan: Plan = new Parallel (
     new BuildOrder(
       Get(9, Zerg.Drone),
       Get(2, Zerg.Overlord),
@@ -68,11 +68,11 @@ class ZergSparkle extends GameplanModeTemplate {
     new BuildOrder(Get(7, Zerg.Mutalisk))
   )
   
-  override def defaultScoutPlan = new If(
+  override def scoutPlan = new If(
     new Not(new FoundEnemyBase),
     new Scout(15) { scouts.get.unitMatcher.set(Zerg.Overlord) })
   
-  override def defaultSupplyPlan: Plan = NoPlan()
+  override def supplyPlan: Plan = NoPlan()
   override def buildPlans: Seq[Plan] = Vector(
     new If(
       new UnitsAtLeast(12, Zerg.Drone),
@@ -90,7 +90,7 @@ class ZergSparkle extends GameplanModeTemplate {
           new Build(Get(3, Zerg.Zergling)),
           new BuildOrder(Get(6, Zerg.Overlord))),
         
-        super.defaultSupplyPlan,
+        super.supplyPlan,
         
         new If(
           new SafeAtHome,
@@ -101,18 +101,18 @@ class ZergSparkle extends GameplanModeTemplate {
           new EnemyHasShownWraithCloak,
           new UpgradeContinuously(Zerg.OverlordSpeed)),
   
-        new PumpMatchingRatio(Zerg.Scourge, 0, 20,
+        new PumpRatio(Zerg.Scourge, 0, 20,
           Seq(
             Enemy(Terran.Wraith, 2.0),
             Enemy(Terran.Battlecruiser, 4.0),
             Enemy(Protoss.Carrier, 6.0))),
   
-        new PumpMatchingRatio(Zerg.Devourer, 0, 20, Seq(Enemy(Protoss.Corsair, 0.25))),
-        new PumpMatchingRatio(Zerg.Scourge, 0, 8, Seq(Enemy(Protoss.Corsair, 2.0))),
+        new PumpRatio(Zerg.Devourer, 0, 20, Seq(Enemy(Protoss.Corsair, 0.25))),
+        new PumpRatio(Zerg.Scourge, 0, 8, Seq(Enemy(Protoss.Corsair, 2.0))),
         
         new If(
           new UnitsAtLeast(3, Zerg.Mutalisk),
-          new PumpMatchingRatio(Zerg.Scourge, 0, 20, Seq(Enemy(Zerg.Mutalisk, 2.0)))),
+          new PumpRatio(Zerg.Scourge, 0, 20, Seq(Enemy(Zerg.Mutalisk, 2.0)))),
   
         new If(
           new And(

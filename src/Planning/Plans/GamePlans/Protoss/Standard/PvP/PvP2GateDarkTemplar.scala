@@ -9,7 +9,7 @@ import Planning.Plan
 import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, RequireSufficientSupply}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
@@ -20,13 +20,13 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP2GateDTExpand
 
-class PvP2GateDarkTemplar extends GameplanModeTemplate {
+class PvP2GateDarkTemplar extends GameplanTemplate {
   
   override val activationCriteria = new Employing(PvP2GateDTExpand)
   override val completionCriteria = new Latch(new MiningBasesAtLeast(2))
-  override val defaultWorkerPlan  = NoPlan()
-  override val defaultScoutPlan   = new ScoutOn(Protoss.CyberneticsCore)
-  override val defaultAttackPlan  = new Trigger(
+  override val workerPlan  = NoPlan()
+  override val scoutPlan   = new ScoutOn(Protoss.CyberneticsCore)
+  override val attackPlan  = new Trigger(
     new Or(
       new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
       new EnemyStrategy(With.fingerprints.nexusFirst)),

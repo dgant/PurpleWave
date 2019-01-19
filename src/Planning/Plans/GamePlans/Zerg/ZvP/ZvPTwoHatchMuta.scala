@@ -5,7 +5,7 @@ import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{ScoutSafelyWithDrone, ScoutSafelyWithOverlord}
 import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas._
 import Planning.Plans.Macro.Automatic._
@@ -24,7 +24,7 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvPTwoHatchMuta
 import Strategery.{StarCraftMap, Transistor}
 
-class ZvPTwoHatchMuta extends GameplanModeTemplate {
+class ZvPTwoHatchMuta extends GameplanTemplate {
   
   override val activationCriteria: Predicate = new Employing(ZvPTwoHatchMuta)
   
@@ -56,7 +56,7 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
     new UnitsAtLeast(12, UnitMatchWarriors),
     new CampExpansions)
   
-  override def defaultAttackPlan: Plan = new If(
+  override def attackPlan: Plan = new If(
     new Or(
       new UnitsAtLeast(1, Zerg.Mutalisk, complete = true),
       new UpgradeComplete(Zerg.ZerglingSpeed),
@@ -64,17 +64,17 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
       new EnemyBasesAtLeast(2)),
     new Attack)
   
-  override def defaultScoutPlan: Plan = new Parallel(
+  override def scoutPlan: Plan = new Parallel(
     new ScoutSafelyWithOverlord,
     new Trigger(
       new UnitsAtLeast(2, Zerg.Overlord),
       new ScoutSafelyWithDrone))
   
-  override def defaultScoutExposPlan: Plan = new If(
+  override def scoutExposPlan: Plan = new If(
     new UnitsAtLeast(8, Zerg.Mutalisk),
     new FindExpansions)
   
-  override def defaultBuildOrder: Plan = new Parallel(
+  override def buildOrderPlan: Plan = new Parallel(
     new BuildOrder(
       Get(9, Zerg.Drone),
       Get(2, Zerg.Overlord),
@@ -138,7 +138,7 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
   
   class ReactiveZerglings extends If(
     new UnitsAtMost(0, Zerg.Spire, complete = true),
-    new PumpMatchingRatio(Zerg.Zergling, 0, 10, Seq(
+    new PumpRatio(Zerg.Zergling, 0, 10, Seq(
       Enemy(Terran.Marine, 1.5),
       Enemy(Terran.Firebat, 3.0),
       Enemy(Terran.Vulture, 2.0),
@@ -181,7 +181,7 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
     new If(
       new EnemyHasShown(Protoss.Corsair),
       new Pump(Zerg.Scourge, 2)),
-    new PumpMatchingRatio(Zerg.Scourge, 0, 10,
+    new PumpRatio(Zerg.Scourge, 0, 10,
       Seq(
         Enemy(UnitMatchOr(Terran.Valkyrie, Terran.Wraith, Protoss.Corsair, Protoss.Stargate, Zerg.Mutalisk), 2.0),
         Enemy(UnitMatchOr(Zerg.Scourge), 1.0))),
@@ -190,7 +190,7 @@ class ZvPTwoHatchMuta extends GameplanModeTemplate {
         new MiningBasesAtLeast(3),
         new UnitsAtLeast(6, Zerg.Mutalisk),
         new UpgradeComplete(Zerg.ZerglingSpeed, 1, Zerg.Zergling.buildFrames)),
-      new PumpMatchingRatio(Zerg.Zergling, 0, 18, Seq(
+      new PumpRatio(Zerg.Zergling, 0, 18, Seq(
         Enemy(Terran.Marine, 1.5),
         Enemy(Terran.Goliath, 4.0),
         Enemy(Protoss.Dragoon, 3.0),

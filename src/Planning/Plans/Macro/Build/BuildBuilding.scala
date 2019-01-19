@@ -40,7 +40,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   
   override def onUpdate() {
     
-    if (building.exists(b => b.remainingCompletionFrames <= With.reaction.planningMax || ! b.unitClass.isTerran)) {
+    if (building.exists(b => ! b.unitClass.isTerran)) {
       builderLock.release()
       With.groundskeeper.flagFulfilled(buildingDescriptor, building.get)
       return

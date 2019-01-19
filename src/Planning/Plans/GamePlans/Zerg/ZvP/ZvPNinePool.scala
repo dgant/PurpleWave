@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Zerg.ZvP
 import Macro.BuildRequests.{Get, GetAnother}
 import Planning.Plans.Army.{Aggression, AllIn, Attack, EjectScout}
 import Planning.Plans.Compound.{If, Parallel, _}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpMutalisks, ScoutSafelyWithOverlord, TrainJustEnoughScourge, PumpJustEnoughZerglings}
 import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas._
 import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
@@ -20,10 +20,10 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvPNinePool
 import Strategery.{ThirdWorld, Transistor}
 
-class ZvPNinePool extends GameplanModeTemplate {
+class ZvPNinePool extends GameplanTemplate {
   
   override val activationCriteria: Predicate = new Employing(ZvPNinePool)
-  override def defaultScoutPlan: Plan = new If(
+  override def scoutPlan: Plan = new If(
     new Or(
       new StartPositionsAtMost(2),
       new Not(new FoundEnemyBase)),
@@ -33,7 +33,7 @@ class ZvPNinePool extends GameplanModeTemplate {
     new UnitsAtLeast(24, UnitMatchWarriors),
     new CampExpansions)
   
-  override def defaultAggressionPlan: Plan = new If(
+  override def aggressionPlan: Plan = new If(
     new UnitsAtLeast(40, Zerg.Hydralisk),
     new Aggression(4.0),
     new If(
@@ -44,9 +44,9 @@ class ZvPNinePool extends GameplanModeTemplate {
         new Aggression(1.5),
         new Aggression(1.15))))
   
-  override def defaultAttackPlan: Plan = new Attack
+  override def attackPlan: Plan = new Attack
   
-  override def defaultBuildOrder: Plan = new Parallel(
+  override def buildOrderPlan: Plan = new Parallel(
     new AllIn(
       new And(
         new EnemiesAtLeast(1, Zerg.Mutalisk),
@@ -98,7 +98,7 @@ class ZvPNinePool extends GameplanModeTemplate {
           new Pump(Zerg.Drone, 12),
           new Build(Get(1, Zerg.SpawningPool), Get(1, Zerg.Extractor), Get(1, Zerg.HydraliskDen)),
           new UpgradeContinuously(Zerg.HydraliskSpeed),
-          new PumpMatchingRatio(Zerg.Hydralisk, 0, 4, Seq(Enemy(Protoss.Zealot, 1.0))),
+          new PumpRatio(Zerg.Hydralisk, 0, 4, Seq(Enemy(Protoss.Zealot, 1.0))),
           new If(
             new UpgradeComplete(Zerg.HydraliskSpeed),
             new UpgradeContinuously(Zerg.HydraliskRange)),

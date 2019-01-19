@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.EjectScout
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.PumpWorkers
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -16,7 +16,7 @@ import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP2GateRobo
 
-class PvP2GateRobo extends GameplanModeTemplate {
+class PvP2GateRobo extends GameplanTemplate {
   
   override val activationCriteria: Predicate = new Employing(PvP2GateRobo)
   override val completionCriteria: Predicate = new Latch(
@@ -25,9 +25,9 @@ class PvP2GateRobo extends GameplanModeTemplate {
       new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
       new UnitsAtLeast(5, Protoss.Gateway)))
   
-  override def defaultAttackPlan  : Plan    = new If(new EnemyStrategy(With.fingerprints.nexusFirst), new PvPIdeas.AttackSafely)
-  override def defaultScoutPlan   : Plan    = new ScoutOn(Protoss.Pylon)
-  override def aggression         : Double  = 0.85
+  override def attackPlan  : Plan    = new If(new EnemyStrategy(With.fingerprints.nexusFirst), new PvPIdeas.AttackSafely)
+  override def scoutPlan   : Plan    = new ScoutOn(Protoss.Pylon)
+  override val aggression  : Double  = 0.85
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvPIdeas.ReactToCannonRush,

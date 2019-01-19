@@ -23,7 +23,7 @@ class Pump(
   
     val doubleEggMultiplier       = if (unitClass.isTwoUnitsInOneEgg) 2 else 1
     val unitsNow                  = currentCount
-    val unitsToAddCeiling         = Math.max(0, Math.min(maximumTotal, maxDesirable) - unitsNow)
+    val unitsToAddCeiling         = Math.max(0, Math.min(maximumTotal, maxDesirable) - unitsNow) // TODO: Clamp Nukes to #Silos
     val buildersSpawning          = if (unitClass.whatBuilds._1 == Zerg.Larva) With.units.countOurs(UnitMatchAnd(UnitMatchHatchery, UnitMatchComplete)) else 0
     val buildersExisting          = builders.toVector
     val buildersReserved          = buildersExisting.map(_.unitClass).distinct.map(With.scheduler.macroPumps.consumed).sum

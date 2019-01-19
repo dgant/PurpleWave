@@ -6,7 +6,7 @@ import Macro.BuildRequests.Get
 import Micro.Squads.Goals.GoalDroneBlockRamp
 import Planning.Plans.Army.{Attack, EjectScout, SquadPlan}
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpMutalisks, ScoutSafelyWithOverlord, TrainJustEnoughScourge, PumpJustEnoughZerglings}
 import Planning.Plans.Macro.Automatic.{CapGasAtRatioToMinerals, Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.BuildOrder
@@ -23,11 +23,11 @@ import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.ZvPThirteenPoolMuta
 import Strategery.ThirdWorld
 
-class ZvPThirteenPoolMuta extends GameplanModeTemplate {
+class ZvPThirteenPoolMuta extends GameplanTemplate {
   
   override val activationCriteria: Predicate = new Employing(ZvPThirteenPoolMuta)
   
-  override def defaultScoutPlan: Plan = new ScoutSafelyWithOverlord
+  override def scoutPlan: Plan = new ScoutSafelyWithOverlord
   
   class DroneBlockRamp extends SquadPlan[GoalDroneBlockRamp] {
     val goal: GoalDroneBlockRamp = new GoalDroneBlockRamp
@@ -53,9 +53,9 @@ class ZvPThirteenPoolMuta extends GameplanModeTemplate {
       new FrameAtMost(GameTime(3, 10)())),
     new DroneBlockRamp)
   
-  override def defaultAttackPlan: Plan = new Attack
+  override def attackPlan: Plan = new Attack
   
-  override def defaultBuildOrder: Plan = new Parallel (
+  override def buildOrderPlan: Plan = new Parallel (
     new BuildOrder(
       Get(9, Zerg.Drone),
       Get(2, Zerg.Overlord),

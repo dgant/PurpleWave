@@ -8,7 +8,8 @@ import Planning.UnitMatchers._
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -21,11 +22,11 @@ import Planning.Predicates.Reactive.{SafeAtHome, SafeToMoveOut}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Terran.TvE.TvETurtleMech
 
-class TvETurtleMech extends GameplanModeTemplate {
+class TvETurtleMech extends GameplanTemplate {
   
   override val activationCriteria = new Employing(TvETurtleMech)
   
-  override def defaultPlacementPlan: Plan = new ProposePlacement {
+  override def placementPlan: Plan = new ProposePlacement {
     override lazy val blueprints: Seq[Blueprint] = Vector(
       new Blueprint(this, building = Some(Terran.Bunker),         requireZone = Some(With.geography.ourNatural.zone)),
       new Blueprint(this, building = Some(Terran.Barracks),       preferZone  = Some(With.geography.ourNatural.zone)),
@@ -38,7 +39,7 @@ class TvETurtleMech extends GameplanModeTemplate {
   
   override def priorityAttackPlan: Plan = new PopulateBunkers
   
-  override def defaultAttackPlan: Plan = new Parallel(
+  override def attackPlan: Plan = new Parallel(
     new If(
       new UnitsAtLeast(5, UnitMatchSiegeTank, complete = true),
       new If(new SafeToMoveOut, new Attack)),
@@ -48,17 +49,17 @@ class TvETurtleMech extends GameplanModeTemplate {
   )
   
   override def emergencyPlans: Seq[Plan] = Vector(
+    new TvZFourPoolEmergency,
     new If(
-    new EnemyHasShownCloakedThreat,
-    new Parallel(
-      new Build(
-        Get(1, Terran.EngineeringBay),
-        Get(1, Terran.MissileTurret),
-        Get(1, Terran.Academy),
-        Get(2, Terran.Comsat),
-        Get(2, Terran.MissileTurret))
-    )
-  ))
+      new EnemyHasShownCloakedThreat,
+      new Parallel(
+        new Build(
+          Get(Terran.EngineeringBay),
+          Get(Terran.MissileTurret),
+          Get(Terran.Academy),
+          Get(2, Terran.Comsat),
+          Get(2, Terran.MissileTurret))))
+  )
   
   override lazy val buildOrder: Vector[BuildRequest] =
     if (With.enemy.isProtoss)

@@ -6,7 +6,6 @@ import Performance.Cache
 import Planning.Plan
 import Planning.Plans.Macro.Build._
 import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
-import ProxyBwapi.UnitClasses.UnitClass
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer

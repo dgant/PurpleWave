@@ -5,14 +5,14 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Parallel}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
 import ProxyBwapi.Races.Zerg
 
-class OneHatchLurker extends GameplanModeTemplate {
+class OneHatchLurker extends GameplanTemplate {
   
   override def buildOrder: Seq[BuildRequest] = Vector(
     Get(9, Zerg.Drone),
@@ -23,12 +23,12 @@ class OneHatchLurker extends GameplanModeTemplate {
     Get(11, Zerg.Drone),
     Get(6, Zerg.Zergling))
   
-  override def defaultScoutPlan: Plan = NoPlan()
+  override def scoutPlan: Plan = NoPlan()
   
-  override def defaultAttackPlan: Plan = new If(
+  override def attackPlan: Plan = new If(
     new UnitsAtLeast(1, Zerg.Lurker),
     new Attack,
-    super.defaultAttackPlan
+    super.attackPlan
   )
   
   override def buildPlans: Seq[Plan] = Vector(

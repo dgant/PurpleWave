@@ -8,7 +8,7 @@ import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.EjectScout
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Parallel}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.BuildGasPumps
@@ -21,13 +21,13 @@ import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvT14CC
 
-class TvT14CC extends GameplanModeTemplate {
+class TvT14CC extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(TvT14CC)
   override val completionCriteria: Predicate = new Latch(new And(new UnitsAtLeast(1, Terran.Bunker, complete = true), new UnitsAtLeast(2, Terran.Refinery)))
 
-  override def defaultScoutPlan = new ScoutOn(Terran.CommandCenter, quantity = 2)
-  override def defaultAttackPlan = NoPlan()
+  override def scoutPlan = new ScoutOn(Terran.CommandCenter, quantity = 2)
+  override def attackPlan = NoPlan()
 
   val naturalZone: Zone = With.geography.ourNatural.zone
   override lazy val blueprints: Seq[Blueprint] = Seq(

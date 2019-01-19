@@ -7,7 +7,7 @@ import Planning.{Plan, ProxyPlanner}
 import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.{PlaceGroundProxies, ProposePlacement}
 import Planning.Plans.Macro.BuildOrders.Build
@@ -21,13 +21,13 @@ import Planning.UnitMatchers.UnitMatchMobileDetectors
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.PvE.ProxyDarkTemplar
 
-class ProxyDarkTemplarRush extends GameplanModeTemplate {
+class ProxyDarkTemplarRush extends GameplanTemplate {
 
   override val activationCriteria = new Employing(ProxyDarkTemplar)
 
   // Might be the fastest possible DT rush.
   // An example: https://youtu.be/ca40eQ1s7iw
-  override def defaultPlacementPlan: Plan = new ProposePlacement {
+  override def placementPlan: Plan = new ProposePlacement {
     override lazy val blueprints: Seq[Blueprint] = Vector(
       new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.proxyPylon),    preferZone = ProxyPlanner.proxyMiddle),
       new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.proxyBuilding), preferZone = ProxyPlanner.proxyMiddle),
@@ -66,11 +66,11 @@ class ProxyDarkTemplarRush extends GameplanModeTemplate {
     Get(15, Protoss.Probe),
     Get(4, Protoss.Gateway))
 
-  override def defaultScoutPlan: Plan = new If(new Not(new FoundEnemyBase), new ScoutOn(Protoss.Pylon))
+  override def scoutPlan: Plan = new If(new Not(new FoundEnemyBase), new ScoutOn(Protoss.Pylon))
   override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
-  override def defaultAttackPlan: Plan = new Trigger(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true), super.defaultAttackPlan)
-  override def defaultWorkerPlan: Plan = NoPlan()
-  override def defaultSupplyPlan: Plan = NoPlan()
+  override def attackPlan: Plan = new Trigger(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true), super.attackPlan)
+  override def workerPlan: Plan = NoPlan()
+  override def supplyPlan: Plan = NoPlan()
 
   private class EmergencyDragoon extends If(
     new EnemiesAtLeast(1, Terran.Vulture),
@@ -88,7 +88,7 @@ class ProxyDarkTemplarRush extends GameplanModeTemplate {
         new Pump(Protoss.DarkTemplar, maximumTotal = 6)),
     new EmergencyDragoon),
 
-    super.defaultSupplyPlan,
+    super.supplyPlan,
     new PumpWorkers,
     new RequireMiningBases(2),
     new UpgradeContinuously(Protoss.DragoonRange),

@@ -118,8 +118,8 @@ object PvTIdeas {
         Get(Protoss.Observatory))))
   
   class TrainMinimumDragoons extends Parallel(
-    new PumpMatchingRatio(Protoss.Dragoon, 1, 3, Seq(Enemy(Terran.Vulture, 1.0), Enemy(Terran.Wraith, 1.0))),
-    new PumpMatchingRatio(Protoss.Dragoon, 1, 20, Seq(Enemy(Terran.Vulture, 0.6), Enemy(Terran.Wraith, 0.5))))
+    new PumpRatio(Protoss.Dragoon, 1, 3, Seq(Enemy(Terran.Vulture, 1.0), Enemy(Terran.Wraith, 1.0))),
+    new PumpRatio(Protoss.Dragoon, 1, 20, Seq(Enemy(Terran.Vulture, 0.6), Enemy(Terran.Wraith, 0.5))))
 
   class TrainDarkTemplar extends If(
     new Or(
@@ -153,17 +153,17 @@ object PvTIdeas {
           new Pump(Protoss.Observer, 1)))))
 
   class TrainReavers extends Parallel(
-    new PumpMatchingRatio(Protoss.Reaver, 0, 6, Seq(
+    new PumpRatio(Protoss.Reaver, 0, 6, Seq(
       Enemy(Terran.Marine, 1.0/6.0),
       Enemy(Terran.Goliath, 1.0/6.0),
       Enemy(Terran.Vulture, 1.0/8.0))),
     new If(
       new EnemiesAtMost(0, UnitMatchOr(Terran.Wraith, Terran.Goliath)),
-      new PumpMatchingRatio(Protoss.Reaver, 1, 4, Seq(Friendly(Protoss.Shuttle, 0.5)))))
+      new PumpRatio(Protoss.Reaver, 1, 4, Seq(Friendly(Protoss.Shuttle, 0.5)))))
 
   class TrainHighTemplarAgainstBio extends If(
     new EnemyBio,
-    new PumpMatchingRatio(Protoss.HighTemplar, 1, 6, Seq(Enemy(Terran.Marine, 1.0/5.0))))
+    new PumpRatio(Protoss.HighTemplar, 1, 6, Seq(Enemy(Terran.Marine, 1.0/5.0))))
 
   class TrainScouts extends If(
     new And(
@@ -176,14 +176,14 @@ object PvTIdeas {
     new Pump(Protoss.Scout, 5))
 
   class TrainZealotsOrDragoons extends Parallel(
-    new PumpMatchingRatio(Protoss.Dragoon, 0, 24, Seq(Friendly(Protoss.Zealot, .75))),
+    new PumpRatio(Protoss.Dragoon, 0, 24, Seq(Friendly(Protoss.Zealot, .75))),
     new If(
       new Or(
         new And(
           new MineralsAtLeast(600),
           new GasAtMost(200)),
         new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.ZealotSpeed.upgradeFrames.head._2)),
-      new PumpMatchingRatio(Protoss.Zealot, 0, 24, Seq(
+      new PumpRatio(Protoss.Zealot, 0, 24, Seq(
         Enemy(UnitMatchSiegeTank, 3.0),
         Enemy(Terran.Goliath,     2.0),
         Enemy(Terran.Marine,      1.0),
@@ -193,14 +193,14 @@ object PvTIdeas {
 
   class TrainArmy extends Parallel(
     new TrainDarkTemplar,
-    new PumpMatchingRatio(Protoss.Shuttle, 0, 1, Seq(Friendly(Protoss.Reaver, 1.0))),
-    new PumpMatchingRatio(Protoss.Shuttle, 0, 2, Seq(Friendly(Protoss.Reaver, 0.5))),
+    new PumpRatio(Protoss.Shuttle, 0, 1, Seq(Friendly(Protoss.Reaver, 1.0))),
+    new PumpRatio(Protoss.Shuttle, 0, 2, Seq(Friendly(Protoss.Reaver, 0.5))),
     new TrainReavers,
     new TrainObservers,
     new TrainMinimumDragoons,
     new TrainHighTemplarAgainstBio,
-    new PumpMatchingRatio(Protoss.Arbiter, 0, 2, Seq(Friendly(Protoss.Carrier, 1.0 / 8.0))),
-    new PumpMatchingRatio(Protoss.HighTemplar, 0, 2, Seq(Friendly(Protoss.Carrier, 1.0 / 8.0))),
+    new PumpRatio(Protoss.Arbiter, 0, 2, Seq(Friendly(Protoss.Carrier, 1.0 / 8.0))),
+    new PumpRatio(Protoss.HighTemplar, 0, 2, Seq(Friendly(Protoss.Carrier, 1.0 / 8.0))),
     new Pump(Protoss.Carrier),
     new Pump(Protoss.Arbiter, 12),
     new If(new GasAtLeast(500), new Pump(Protoss.HighTemplar, maximumConcurrently = 4)),

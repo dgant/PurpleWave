@@ -5,7 +5,7 @@ import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound.{Or, _}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.PlaceGatewaysProxied
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -19,13 +19,13 @@ import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Protoss.{PvPProxy2Gate, PvROpenProxy2Gate, PvTProxy2Gate, PvZProxy2Gate}
 
-class Proxy2Gate extends GameplanModeTemplate {
+class Proxy2Gate extends GameplanTemplate {
   
   override val activationCriteria = new Employing(PvROpenProxy2Gate, PvTProxy2Gate, PvPProxy2Gate, PvZProxy2Gate)
   override val completionCriteria = new Latch(new BasesAtLeast(2))
-  override def defaultScoutPlan   = new If(new UnitsAtLeast(2, Protoss.Gateway), new Scout)
-  override def defaultWorkerPlan: Plan = NoPlan()
-  override def defaultAttackPlan: Plan = new Attack
+  override def scoutPlan   = new If(new UnitsAtLeast(2, Protoss.Gateway), new Scout)
+  override def workerPlan: Plan = NoPlan()
+  override def attackPlan: Plan = new Attack
   
   private class BeforeProxy extends Parallel(
     new PlaceGatewaysProxied(2, () => ProxyPlanner.proxyMiddle),

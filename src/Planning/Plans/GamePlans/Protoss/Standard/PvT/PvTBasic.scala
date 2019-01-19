@@ -6,7 +6,7 @@ import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, EjectScout}
 import Planning.Plans.Compound.{Or, Parallel, _}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTIdeas.TrainMinimumDragoons
 import Planning.Plans.Macro.Automatic.UpgradeContinuously
@@ -22,7 +22,7 @@ import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
 
-class PvTBasic extends GameplanModeTemplate {
+class PvTBasic extends GameplanTemplate {
   override val activationCriteria = new Employing(
     PvT13Nexus,
     PvT21Nexus,
@@ -36,7 +36,7 @@ class PvTBasic extends GameplanModeTemplate {
     PvT3BaseCarrier,
     PvT3BaseArbiter)
 
-  override def defaultAggressionPlan: Plan =
+  override def aggressionPlan: Plan =
     new If(
       new And(
         new EmployingCarriers,
@@ -51,9 +51,9 @@ class PvTBasic extends GameplanModeTemplate {
         new Aggression(0.9),
         new Aggression(1.0)))
 
-  override def meldArchonsAt: Int = 25
+  override val meldArchonsAt: Int = 25
 
-  override def defaultScoutPlan: Plan = new Parallel(
+  override def scoutPlan: Plan = new Parallel(
     new If(new Employing(PvT13Nexus),           new ScoutOn(Protoss.Nexus, quantity = 2)),
     new If(new Employing(PvT21Nexus),           new ScoutOn(Protoss.Gateway)),
     new If(new Employing(PvT23Nexus),           new ScoutOn(Protoss.Pylon)),
@@ -65,7 +65,7 @@ class PvTBasic extends GameplanModeTemplate {
     new If(new Employing(PvTDTExpand),          new ScoutOn(Protoss.CyberneticsCore)))
 
   override val priorityAttackPlan = new PvTIdeas.PriorityAttacks
-  override val defaultAttackPlan = new Parallel(
+  override val attackPlan = new Parallel(
     new If(
       new Or(
         new Not(new Employing(PvTDTExpand, PvT1GateRobo)),
@@ -79,7 +79,7 @@ class PvTBasic extends GameplanModeTemplate {
       new Employing(PvT13Nexus, PvT21Nexus, PvT23Nexus, PvT28Nexus),
       new PvTIdeas.ReactTo2Fac))
 
-  override def defaultBuildOrder: Plan = new Parallel(
+  override def buildOrderPlan: Plan = new Parallel(
     new If(new Employing(PvT13Nexus),           new BuildOrder(ProtossBuilds.PvT13Nexus_GateCoreGateZ: _*)),
     new If(new Employing(PvT21Nexus),           new BuildOrder(ProtossBuilds.PvT21Nexus: _*)),
     new If(new Employing(PvT23Nexus),           new BuildOrder(ProtossBuilds.PvT23Nexus: _*)),

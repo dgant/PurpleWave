@@ -5,7 +5,7 @@ import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
@@ -21,7 +21,7 @@ import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP2Gate1012
 
-class PvP2Gate1012Expand extends GameplanModeTemplate {
+class PvP2Gate1012Expand extends GameplanTemplate {
   
   class PylonAtNatural extends ProposePlacement {
     override lazy val blueprints: Seq[Blueprint] = Vector(
@@ -32,10 +32,10 @@ class PvP2Gate1012Expand extends GameplanModeTemplate {
   
   override val activationCriteria: Predicate = new Employing(PvP2Gate1012)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(5, Protoss.Gateway))
-  override def defaultAttackPlan: Plan = new PvPIdeas.AttackSafely
-  override val defaultScoutPlan: Plan = new ScoutOn(Protoss.Pylon)
+  override def attackPlan: Plan = new PvPIdeas.AttackSafely
+  override val scoutPlan: Plan = new ScoutOn(Protoss.Pylon)
   
-  override def defaultPlacementPlan: Plan = new Trigger(
+  override def placementPlan: Plan = new Trigger(
     new UnitsAtLeast(3, Protoss.Pylon),
     new PylonAtNatural)
   

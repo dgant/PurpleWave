@@ -8,7 +8,7 @@ import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -18,10 +18,10 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{EnemyIsProtoss, EnemyIsTerran}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
-class OneBaseIslandCarrier extends GameplanModeTemplate {
+class OneBaseIslandCarrier extends GameplanTemplate {
 
-  override def defaultScoutPlan: Plan = NoPlan()
-  override def defaultWorkerPlan: Plan = NoPlan()
+  override def scoutPlan: Plan = NoPlan()
+  override def workerPlan: Plan = NoPlan()
 
   protected def extraSpaceZone: Zone = {
     val mainZone = With.geography.ourMain.zone
@@ -29,13 +29,13 @@ class OneBaseIslandCarrier extends GameplanModeTemplate {
     val output = other.getOrElse(With.geography.ourNatural.zone)
     output
   }
-  override def defaultPlacementPlan: Plan = new ProposePlacement {
+  override def placementPlan: Plan = new ProposePlacement {
     override lazy val blueprints = Vector(
       new Blueprint(this, building = Some(Protoss.Pylon), preferZone = Some(With.geography.ourMain.zone)),
       new Blueprint(this, building = Some(Protoss.Pylon), preferZone = Some(extraSpaceZone))
   )}
 
-  override def defaultBuildOrder: Plan = new Parallel(
+  override def buildOrderPlan: Plan = new Parallel(
     new BuildOrder(
       Get(8, Protoss.Probe),
       Get(Protoss.Pylon),
@@ -86,7 +86,7 @@ class OneBaseIslandCarrier extends GameplanModeTemplate {
       new RequireMiningBases(2)),
 
     new UpgradeContinuously(Protoss.CarrierCapacity),
-    new PumpMatchingRatio(Protoss.Corsair, 0, 12, Seq(Enemy(Zerg.Mutalisk, 1.0), Enemy(Terran.Wraith, 1.0))),
+    new PumpRatio(Protoss.Corsair, 0, 12, Seq(Enemy(Zerg.Mutalisk, 1.0), Enemy(Terran.Wraith, 1.0))),
     new Pump(Protoss.Carrier, 4, 30),
 
     new If(

@@ -39,7 +39,7 @@ class BuildBunkersAtBases(
   }
   
   private def placeBuildingsInZone(zone: Zone): Int = {
-    lazy val towersInZone = With.units.countOursP(u => u.is(Terran.Bunker) && u.zone == zone)
+    lazy val towersInZone = With.units.countOursP(u => u.is(Terran.Bunker) && u.zone == zone && u.complete)
     lazy val bunkersToAdd = bunkersRequired - towersInZone
     
     if (bunkersToAdd <= 0) {

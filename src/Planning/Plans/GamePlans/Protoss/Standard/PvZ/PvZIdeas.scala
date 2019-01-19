@@ -92,8 +92,8 @@ object PvZIdeas {
         Get(1, Protoss.Assimilator),
         Get(1, Protoss.CyberneticsCore)),
       new Parallel(
-        new PumpMatchingRatio(Protoss.Corsair, 1, 8,   Seq(Enemy(Zerg.Mutalisk, 0.8))),
-        new PumpMatchingRatio(Protoss.Dragoon, 0, 10,  Seq(Enemy(Zerg.Mutalisk, 1.25), Friendly(Protoss.Corsair, -1.0))),
+        new PumpRatio(Protoss.Corsair, 1, 8,   Seq(Enemy(Zerg.Mutalisk, 0.8))),
+        new PumpRatio(Protoss.Dragoon, 0, 10,  Seq(Enemy(Zerg.Mutalisk, 1.25), Friendly(Protoss.Corsair, -1.0))),
         new Pump(Protoss.Stargate, 1),
         new Build(Get(Protoss.DragoonRange)))))
   
@@ -104,7 +104,7 @@ object PvZIdeas {
       new UnitsAtMost(8, UnitMatchWarriors)),
     new Parallel(
       new PlacementForgeFastExpand,
-      new PumpMatchingRatio(Protoss.PhotonCannon, 1, 8,
+      new PumpRatio(Protoss.PhotonCannon, 1, 8,
         Seq(
           Enemy(Zerg.Zergling, 0.3),
           Enemy(Zerg.Hydralisk, 0.75),
@@ -169,7 +169,7 @@ object PvZIdeas {
             new EnemyHasShown(Zerg.Scourge),
             new EnemyHasShown(Zerg.Mutalisk),
             new EnemiesAtLeast(1, Zerg.Spire)),
-          new PumpMatchingRatio(Protoss.Corsair, 6, 12, Seq(Friendly(Protoss.Carrier, 3.0)))))),
+          new PumpRatio(Protoss.Corsair, 6, 12, Seq(Friendly(Protoss.Carrier, 3.0)))))),
     new Pump(Protoss.Carrier),
     new Pump(Protoss.Observer, 1),
     new Pump(Protoss.Arbiter, 12),
@@ -177,14 +177,14 @@ object PvZIdeas {
       new Or(
         new Employing(PvZLateGameTemplar),
         new TechStarted(Protoss.PsionicStorm)),
-      new PumpMatchingRatio(Protoss.HighTemplar, 1, 20, Seq(Friendly(UnitMatchWarriors, 0.3)))),
-    new PumpMatchingRatio(Protoss.Dragoon, 1, 100, Seq(
+      new PumpRatio(Protoss.HighTemplar, 1, 20, Seq(Friendly(UnitMatchWarriors, 0.3)))),
+    new PumpRatio(Protoss.Dragoon, 1, 100, Seq(
       Enemy(Zerg.Lurker, 1.0),
       Enemy(Zerg.Mutalisk, 1.0),
       Friendly(Protoss.Zealot, 0.5),
       Friendly(Protoss.Archon, -1.0),
       Friendly(Protoss.Corsair, -1.0))),
-    new PumpMatchingRatio(Protoss.Corsair, 1, 12, Seq(Enemy(Zerg.Mutalisk, 1.0))),
+    new PumpRatio(Protoss.Corsair, 1, 12, Seq(Enemy(Zerg.Mutalisk, 1.0))),
     new If(
       new Employing(PvZLateGameReaver),
       new Pump(Protoss.Dragoon),

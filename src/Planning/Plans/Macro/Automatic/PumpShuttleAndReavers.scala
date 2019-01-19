@@ -12,7 +12,7 @@ class PumpShuttleAndReavers(reavers: Int = 50, shuttleFirst: Boolean = true) ext
       new Pump(Protoss.Shuttle, 1))
   else NoPlan()
   ),
-  new PumpMatchingRatio(Protoss.Shuttle, 0, 1, Seq(Friendly(Protoss.Reaver, 1.0))),
-  new PumpMatchingRatio(Protoss.Shuttle, 0, reavers / 2, Seq(Friendly(Protoss.Reaver, 0.5))),
+  new PumpRatio(Protoss.Shuttle, 0, 1, Seq(Friendly(Protoss.Reaver, 1.0))),
+  new PumpRatio(Protoss.Shuttle, 0, reavers / 2, Seq(Friendly(Protoss.Reaver, 0.5))),
   new Pump(Protoss.Reaver, reavers)
 )

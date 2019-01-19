@@ -15,8 +15,17 @@ abstract class TvZMidgame extends Strategy {
 
 object TvZ1RaxFE extends TvZStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(
+    Vector(TvZRaxCCAcademy, TvZRaxCCRax),
     Vector(TvZ5Rax, TvZ2RaxNuke, TvZ3RaxTank))
 }
+
+object TvZ2RaxAcademy extends TvZStrategy {
+  override def choices: Iterable[Iterable[Strategy]] = Vector(
+    Vector(TvZ5Rax))
+}
+
+object TvZRaxCCAcademy extends TvZStrategy
+object TvZRaxCCRax extends TvZStrategy
 
 object TvZ5Rax extends TvZMidgame
 object TvZ2RaxNuke extends TvZMidgame

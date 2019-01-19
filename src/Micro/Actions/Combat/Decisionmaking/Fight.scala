@@ -22,6 +22,7 @@ object Fight extends Action {
     Support.consider(unit)
     StrategicNuke.consider(unit)
     Cast.consider(unit)
+    Detect.consider(unit)
     Stim.consider(unit)
     HandleMines.consider(unit)
     Bunk.consider(unit)

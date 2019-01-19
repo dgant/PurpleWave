@@ -5,7 +5,7 @@ import Planning.Predicates.Compound.Not
 import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplateVsRandom
+import Planning.Plans.GamePlans.GameplanTemplateVsRandom
 import Planning.Plans.GamePlans.Terran.Situational.PlaceBunkersAtNatural
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
@@ -16,7 +16,7 @@ import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvR.TvR1Rax
 
-class TvR1Rax extends GameplanModeTemplateVsRandom {
+class TvR1Rax extends GameplanTemplateVsRandom {
   
   override val activationCriteria: Predicate = new Employing(TvR1Rax)
   override val completionCriteria: Predicate = new UnitsAtLeast(2, UnitMatchWarriors)

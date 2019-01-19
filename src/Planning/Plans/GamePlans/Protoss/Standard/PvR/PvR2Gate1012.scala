@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvR
 
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.GamePlans.GameplanModeTemplateVsRandom
+import Planning.Plans.GamePlans.GameplanTemplateVsRandom
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Milestones.UnitsAtLeast
@@ -12,13 +12,13 @@ import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvROpen2Gate1012
 
-class PvR2Gate1012 extends GameplanModeTemplateVsRandom {
+class PvR2Gate1012 extends GameplanTemplateVsRandom {
   
   override val activationCriteria = new Employing(PvROpen2Gate1012)
   override val completionCriteria = new UnitsAtLeast(2, Protoss.Zealot)
   override val buildOrder         = ProtossBuilds.TwoGate1012
-  override def defaultScoutPlan   = new ScoutOn(Protoss.Pylon)
-  override def defaultAttackPlan  = new Plan
+  override def scoutPlan   = new ScoutOn(Protoss.Pylon)
+  override def attackPlan  = new Plan
   
   override def buildPlans = Vector(
     new Pump(Protoss.Zealot, 5),

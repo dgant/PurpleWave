@@ -6,7 +6,7 @@ import Planning.UnitMatchers.UnitMatchOr
 import Planning.{Plan, Predicate}
 import Planning.Plans.Army.{AllIn, Attack}
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, ExtractorTrick, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
@@ -16,11 +16,11 @@ import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.NineHatchLings
 
-class NineHatchLings extends GameplanModeTemplate {
+class NineHatchLings extends GameplanTemplate {
   
   override val activationCriteria: Predicate = new Employing(NineHatchLings)
   
-  override def defaultBuildOrder: Plan = new Parallel(
+  override def buildOrderPlan: Plan = new Parallel(
     new BuildOrder(Get(9, Zerg.Drone)),
     new Trigger(
       new UnitsAtLeast(2, Zerg.Hatchery),
@@ -33,11 +33,11 @@ class NineHatchLings extends GameplanModeTemplate {
       Get(2, Zerg.Overlord),
       Get(6, Zerg.Zergling)))
   
-  override def defaultScoutPlan: Plan = new If(
+  override def scoutPlan: Plan = new If(
     new Not(new EnemiesAtLeast(1, UnitMatchOr(Zerg.Spire, Zerg.Mutalisk, Zerg.Hydralisk))),
     new Scout(3) { scouts.get.unitMatcher.set(Zerg.Overlord) })
   
-  override def defaultAttackPlan: Plan = new If(
+  override def attackPlan: Plan = new If(
     new Or(
       new UpgradeComplete(Zerg.ZerglingSpeed),
       new Not(new EnemyIsZerg)),

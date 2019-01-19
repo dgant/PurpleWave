@@ -4,7 +4,7 @@ import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -15,12 +15,12 @@ import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss.{PvZLateGameCarrier, PvZMidgameCorsairReaverGoon, PvZMidgameCorsairReaverZealot}
 
-class PvZCorsairReaver extends GameplanModeTemplate {
+class PvZCorsairReaver extends GameplanTemplate {
 
   override val activationCriteria = new Employing(PvZMidgameCorsairReaverZealot, PvZMidgameCorsairReaverGoon)
   override val completionCriteria = new Latch(new BasesAtLeast(3))
-  override def defaultArchonPlan: Plan = new PvZIdeas.TemplarUpToEight
-  override def defaultAttackPlan: Plan = new Attack(Protoss.Corsair)
+  override def archonPlan: Plan = new PvZIdeas.TemplarUpToEight
+  override def attackPlan: Plan = new Attack(Protoss.Corsair)
 
   override def emergencyPlans: Seq[Plan] = Seq(new PvZIdeas.ReactToLurkers)
 
@@ -29,9 +29,9 @@ class PvZCorsairReaver extends GameplanModeTemplate {
     new PvZIdeas.TakeSafeNatural,
     new PvZIdeas.AddEarlyCannons,
     // TODO: Skip reavers when doing 2-Base Goon Reaver
-    new PumpMatchingRatio(Protoss.Corsair, 1, 12, Seq(Enemy(Zerg.Mutalisk, 1.0))),
-    new PumpMatchingRatio(Protoss.Dragoon, 1, 8, Seq(Enemy(Zerg.Mutalisk, 1.0), Friendly(Protoss.Corsair, -1.0))),
-    new PumpMatchingRatio(Protoss.Stargate, 0, 2, Seq(Enemy(Zerg.Mutalisk, 1/5.0))),
+    new PumpRatio(Protoss.Corsair, 1, 12, Seq(Enemy(Zerg.Mutalisk, 1.0))),
+    new PumpRatio(Protoss.Dragoon, 1, 8, Seq(Enemy(Zerg.Mutalisk, 1.0), Friendly(Protoss.Corsair, -1.0))),
+    new PumpRatio(Protoss.Stargate, 0, 2, Seq(Enemy(Zerg.Mutalisk, 1/5.0))),
     new If(new UnitsAtLeast(16, Protoss.Dragoon), new RequireMiningBases(3)),
     new If(
       new Employing(PvZLateGameCarrier),

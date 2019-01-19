@@ -7,7 +7,7 @@ import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors}
 import Planning.Plan
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Terran.Situational.PlaceBunkersAtNatural
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
@@ -17,10 +17,10 @@ import Planning.Predicates.Economy.GasAtLeast
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClasses.UnitClass
 
-class TerranFFAMech extends GameplanModeTemplate {
+class TerranFFAMech extends GameplanTemplate {
   
-  override def defaultPlacementPlan : Plan  = new PlaceBunkersAtNatural(2)
-  override val defaultScoutPlan     : Plan  = NoPlan()
+  override def placementPlan : Plan  = new PlaceBunkersAtNatural(2)
+  override val scoutPlan     : Plan  = NoPlan()
   override val aggression                   = 0.8
   
   private class UpgradeMech extends Parallel(
@@ -60,9 +60,9 @@ class TerranFFAMech extends GameplanModeTemplate {
     }
   }
   
-  override def defaultAttackPlan: Plan = new If(
+  override def attackPlan: Plan = new If(
     new UnitsAtLeast(20, UnitMatchWarriors),
-    super.defaultAttackPlan)
+    super.attackPlan)
   
   override lazy val buildOrder = Vector(
       Get(1,   Terran.CommandCenter),

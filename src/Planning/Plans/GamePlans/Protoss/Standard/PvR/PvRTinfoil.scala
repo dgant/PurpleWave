@@ -6,8 +6,8 @@ import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplateVsRandom
-import Planning.Plans.GamePlans.Protoss.Situational.{DefendFFEWithProbesAgainst4Pool, DefendZealotsAgainst4Pool}
+import Planning.Plans.GamePlans.GameplanTemplateVsRandom
+import Planning.Plans.GamePlans.Protoss.Situational.{DefendFFEWithProbesAgainst4Pool, DefendFightersAgainst4Pool}
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, PumpShuttleAndReavers, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -18,12 +18,12 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvROpenTinfoil
 
-class PvRTinfoil extends GameplanModeTemplateVsRandom {
+class PvRTinfoil extends GameplanTemplateVsRandom {
   
   override val activationCriteria = new Employing(PvROpenTinfoil)
-  override def defaultScoutPlan   = NoPlan()
+  override def scoutPlan   = NoPlan()
 
-  override def defaultAttackPlan = new If(new UnitsAtLeast(6, Protoss.Gateway, complete = true), new ConsiderAttacking)
+  override def attackPlan = new If(new UnitsAtLeast(6, Protoss.Gateway, complete = true), new ConsiderAttacking)
 
   override def buildOrder: Seq[BuildRequest] = Vector(
     Get(8, Protoss.Probe),
@@ -40,7 +40,7 @@ class PvRTinfoil extends GameplanModeTemplateVsRandom {
   
   override def buildPlans = Vector(
     new CapGasAt(300),
-    new DefendZealotsAgainst4Pool,
+    new DefendFightersAgainst4Pool,
     new If(
       new And(
         new EnemyStrategy(With.fingerprints.fourPool),

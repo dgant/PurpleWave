@@ -9,7 +9,7 @@ import Planning.Predicates.Compound.{And, Check}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
@@ -21,14 +21,14 @@ import Planning.{Plan, Predicate, ProxyPlanner}
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.FivePoolProxySunkens
 
-class Zerg5PoolProxySunkens extends GameplanModeTemplate {
+class Zerg5PoolProxySunkens extends GameplanTemplate {
   
   override val activationCriteria: Predicate = new Employing(FivePoolProxySunkens)
   
-  override def defaultOverlordPlan: Plan = NoPlan()
-  override def defaultSupplyPlan: Plan = NoPlan()
-  override def defaultAttackPlan: Plan = new Attack
-  override def defaultScoutPlan: Plan = new Scout {
+  override def overlordPlan: Plan = NoPlan()
+  override def supplyPlan: Plan = NoPlan()
+  override def attackPlan: Plan = new Attack
+  override def scoutPlan: Plan = new Scout {
     scouts.get.unitMatcher.set(Zerg.Overlord)
     scouts.get.unitCounter.set(UnitCountEverything)
   }
@@ -38,7 +38,7 @@ class Zerg5PoolProxySunkens extends GameplanModeTemplate {
     requireZone = ProxyPlanner.proxyEnemyMain,
     placement   = Some(PlacementProfiles.tech))
   
-  override def defaultPlacementPlan: Plan =
+  override def placementPlan: Plan =
     new If(
       new Check(() => ProxyPlanner.proxyEnemyMain.isDefined),
       new ProposePlacement {

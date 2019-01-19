@@ -6,7 +6,7 @@ import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.EjectScout
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackWithDarkTemplar
 import Planning.Plans.Macro.Automatic.PumpWorkers
@@ -22,15 +22,15 @@ import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP3GateGoon
 
-class PvP3GateGoon extends GameplanModeTemplate {
+class PvP3GateGoon extends GameplanTemplate {
   
   override val activationCriteria : Predicate = new Employing(PvP3GateGoon)
   override val completionCriteria : Predicate = new Latch(new Or(new UnitsAtLeast(1, Protoss.RoboticsFacility), new UnitsAtLeast(5, Protoss.Gateway)))
   override def priorityAttackPlan : Plan = new AttackWithDarkTemplar
-  override def defaultAttackPlan  : Plan = new If(new Or(new EnemyBasesAtLeast(2), new EnemiesAtMost(0, Protoss.Dragoon)), new PvPIdeas.AttackSafely)
-  override def defaultScoutPlan   : Plan = new ScoutOn(Protoss.CyberneticsCore)
-  override def defaultWorkerPlan  : Plan = NoPlan()
-  override def defaultPlacementPlan: Plan = new If(
+  override def attackPlan  : Plan = new If(new Or(new EnemyBasesAtLeast(2), new EnemiesAtMost(0, Protoss.Dragoon)), new PvPIdeas.AttackSafely)
+  override def scoutPlan   : Plan = new ScoutOn(Protoss.CyberneticsCore)
+  override def workerPlan  : Plan = NoPlan()
+  override def placementPlan: Plan = new If(
     new BasesAtLeast(2),
     new ProposePlacement(new Blueprint(this, building = Some(Protoss.Pylon), preferZone = Some(With.geography.ourNatural.zone))))
 

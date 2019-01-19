@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.BuildGasPumps
@@ -17,15 +17,15 @@ import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvP2FacJoyO
 
-class TvP2FacJoyO extends GameplanModeTemplate {
+class TvP2FacJoyO extends GameplanTemplate {
   
   override val activationCriteria: Predicate = new Employing(TvP2FacJoyO)
   override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
 
-  override def defaultScoutPlan: Plan = new ScoutOn(Terran.SupplyDepot, quantity = 2)
-  override def aggression: Double = 1.5
+  override def scoutPlan: Plan = new ScoutOn(Terran.SupplyDepot, quantity = 2)
+  override val aggression: Double = 1.5
   
-  override def defaultAttackPlan: Plan = new Parallel(
+  override def attackPlan: Plan = new Parallel(
     new Attack(Terran.Vulture),
     new Trigger(
       new Or(
@@ -35,10 +35,10 @@ class TvP2FacJoyO extends GameplanModeTemplate {
 
   override def emergencyPlans: Seq[Plan] = Seq(new If(
     new EnemyStrategy(With.fingerprints.twoGate),
-    new PumpMatchingRatio(Terran.Vulture, 0, 3, Seq(Enemy(Protoss.Zealot, 1.0)))
+    new PumpRatio(Terran.Vulture, 0, 3, Seq(Enemy(Protoss.Zealot, 1.0)))
   ))
 
-  override def defaultWorkerPlan: Plan = new PumpWorkers
+  override def workerPlan: Plan = new PumpWorkers
 
   // https://liquipedia.net/starcraft/JoyO_Rush
   override def buildOrder: Seq[BuildRequest] = Vector(
@@ -68,14 +68,14 @@ class TvP2FacJoyO extends GameplanModeTemplate {
           new UnitsAtMost(2, Terran.Factory, complete = true),
           new Pump(Terran.Marine)),
         new Build(Get(Terran.VultureSpeed), Get(Terran.SpiderMinePlant)),
-        new PumpMatchingRatio(Terran.Armory, 0, 1, Seq(Enemy(UnitMatchOr(Protoss.Stargate, Protoss.Carrier, Protoss.Scout, Protoss.Arbiter), 1.0))),
+        new PumpRatio(Terran.Armory, 0, 1, Seq(Enemy(UnitMatchOr(Protoss.Stargate, Protoss.Carrier, Protoss.Scout, Protoss.Arbiter), 1.0))),
         new If(
           new UnitsAtLeast(1, Terran.Armory),
           new Parallel(
             new UpgradeContinuously(Terran.GoliathAirRange),
             new UpgradeContinuously(Terran.MechArmor, 1),
             new UpgradeContinuously(Terran.MechDamage, 1),
-            new PumpMatchingRatio(Terran.Goliath, 4, 50, Seq(Enemy(Protoss.Carrier, 6.0), Enemy(Protoss.Scout, 1.0), Enemy(Protoss.Arbiter, 1.0))),
+            new PumpRatio(Terran.Goliath, 4, 50, Seq(Enemy(Protoss.Carrier, 6.0), Enemy(Protoss.Scout, 1.0), Enemy(Protoss.Arbiter, 1.0))),
           )),
         new If(
           new UnitsAtLeast(5, Terran.Factory, complete = true),

@@ -228,7 +228,7 @@ object PvPIdeas {
       Get(Protoss.RoboticsFacility),
       Get(Protoss.Observatory)))
 
-  class PumpSufficientDragoons extends PumpMatchingRatio(Protoss.Dragoon, 0, 100, Seq(
+  class PumpSufficientDragoons extends PumpRatio(Protoss.Dragoon, 0, 100, Seq(
     Enemy(Protoss.Carrier, 5.0),
     Enemy(Protoss.Scout, 2.0),
     Enemy(Protoss.Shuttle, 2.0),
@@ -236,10 +236,10 @@ object PvPIdeas {
     Friendly(Protoss.Archon, 3.0)))
 
   class PumpDragoonsAndZealots extends Parallel(
-    new PumpMatchingRatio(Protoss.Dragoon, 0, 100, Seq(Enemy(Protoss.Carrier, 5.0))),
+    new PumpRatio(Protoss.Dragoon, 0, 100, Seq(Enemy(Protoss.Carrier, 5.0))),
     new If(
       new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.Zealot.buildFrames + GameTime(10, 0)()),
-      new PumpMatchingRatio(Protoss.Zealot, 3, 100, Seq(
+      new PumpRatio(Protoss.Zealot, 3, 100, Seq(
         Enemy(Protoss.Carrier, -2.0),
         Friendly(Protoss.Dragoon, 2.0),
         Friendly(Protoss.Reaver, 4.0),
@@ -274,15 +274,15 @@ object PvPIdeas {
         new UnitsAtLeast(1, Protoss.TemplarArchives, complete = true)),
       // Speedlot-Templar composition
       new Parallel(
-        new PumpMatchingRatio(Protoss.Reaver, 0, 4, Seq(Friendly(Protoss.Shuttle, 2.0))),
-        new PumpMatchingRatio(Protoss.Shuttle, 0, 2, Seq(Friendly(Protoss.Reaver, 0.5))),
-        new PumpMatchingRatio(Protoss.Dragoon, 3, 24, Seq(Friendly(Protoss.Zealot, 1.5))),
-        new PumpMatchingRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-1), Enemy(Protoss.Dragoon, 0.2), Enemy(UnitMatchWarriors, 0.1))),
+        new PumpRatio(Protoss.Reaver, 0, 4, Seq(Friendly(Protoss.Shuttle, 2.0))),
+        new PumpRatio(Protoss.Shuttle, 0, 2, Seq(Friendly(Protoss.Reaver, 0.5))),
+        new PumpRatio(Protoss.Dragoon, 3, 24, Seq(Friendly(Protoss.Zealot, 1.5))),
+        new PumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-1), Enemy(Protoss.Dragoon, 0.2), Enemy(UnitMatchWarriors, 0.1))),
         new Pump(Protoss.Zealot)),
       // Dragoon-Reaver composition
       new Parallel(
-        new PumpMatchingRatio(Protoss.Reaver, 1, 4, Seq(Friendly(Protoss.Shuttle, 3.0))),
-        new PumpMatchingRatio(Protoss.Shuttle, 0, 2, Seq(Friendly(Protoss.Reaver, 1.0))),
+        new PumpRatio(Protoss.Reaver, 1, 4, Seq(Friendly(Protoss.Shuttle, 3.0))),
+        new PumpRatio(Protoss.Shuttle, 0, 2, Seq(Friendly(Protoss.Reaver, 1.0))),
         new PumpDragoonsAndZealots)),
     new If(
       new Or(

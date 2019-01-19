@@ -8,7 +8,7 @@ import Micro.Agency.Intention
 import Planning.Plans.Army.{Attack, RecruitFreelancers}
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, PumpWorkers, RequireSufficientSupply}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
@@ -24,18 +24,18 @@ import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran.TvZ.TvZProxy8Fact
 
-class TvZProxy8Fact extends GameplanModeTemplate {
+class TvZProxy8Fact extends GameplanTemplate {
 
   override val activationCriteria = new Employing(TvZProxy8Fact)
   
   override val aggression = 1.5
   
-  override def defaultAttackPlan: Plan = new Parallel(new Attack, new Attack(Terran.SCV))
-  override def defaultScoutPlan: Plan = new ScoutOn(Terran.SCV, quantity = 9)
-  override def defaultWorkerPlan: Plan = NoPlan()
-  override def defaultSupplyPlan: Plan = NoPlan()
+  override def attackPlan: Plan = new Parallel(new Attack, new Attack(Terran.SCV))
+  override def scoutPlan: Plan = new ScoutOn(Terran.SCV, quantity = 9)
+  override def workerPlan: Plan = NoPlan()
+  override def supplyPlan: Plan = NoPlan()
 
-  override def defaultPlacementPlan: Plan = new ProposePlacement {
+  override def placementPlan: Plan = new ProposePlacement {
     override lazy val blueprints = Vector(
       new Blueprint(this, building = Some(Terran.Factory),  preferZone = ProxyPlanner.proxyAutomaticAggressive, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)))
   }

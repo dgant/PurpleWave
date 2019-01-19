@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvP
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Parallel}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Terran.Standard.TvP.TvPIdeas.ReactiveDetection
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
@@ -16,17 +16,17 @@ import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvP2Armory
 
-class TvP2Armory extends GameplanModeTemplate {
+class TvP2Armory extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(TvP2Armory)
 
-  override def defaultAttackPlan: Plan = new Parallel(
+  override def attackPlan: Plan = new Parallel(
     new TvPIdeas.TvPAttack,
     new If(
       new UpgradeComplete(Terran.MechDamage, 2),
       new Attack))
 
-  override def defaultWorkerPlan: Plan = new Parallel(
+  override def workerPlan: Plan = new Parallel(
     new Pump(Terran.Comsat),
     new PumpWorkers(oversaturate = false))
 

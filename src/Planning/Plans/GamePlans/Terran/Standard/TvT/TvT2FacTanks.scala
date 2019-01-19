@@ -5,8 +5,8 @@ import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.{Attack, FloatBuildings}
 import Planning.Plans.Compound.{If, Parallel, Trigger}
-import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpMatchingRatio, UpgradeContinuously}
+import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpRatio, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Compound.Latch
@@ -18,12 +18,12 @@ import Planning.UnitMatchers.UnitMatchSiegeTank
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvT2FacTanks
 
-class TvT2FacTanks extends GameplanModeTemplate {
+class TvT2FacTanks extends GameplanTemplate {
 
   override val activationCriteria = new Employing(TvT2FacTanks)
   override val completionCriteria = new Latch(new BasesAtLeast(2))
 
-  override def defaultBuildOrder: Plan = new Parallel(
+  override def buildOrderPlan: Plan = new Parallel(
     new BuildOrder(
       Get(9, Terran.SCV),
       Get(Terran.SupplyDepot),
@@ -42,19 +42,19 @@ class TvT2FacTanks extends GameplanModeTemplate {
       Get(18, Terran.SCV),
       Get(2, Terran.Factory)))
 
-  override def defaultAttackPlan: Plan = new Attack
+  override def attackPlan: Plan = new Attack
 
   override def buildPlans: Seq[Plan] = Seq(
     new If(
       new EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs),
       new Parallel(
-        new PumpMatchingRatio(Terran.Vulture, 0, 3, Seq(Enemy(Terran.Marine, 1.0))),
-        new PumpMatchingRatio(Terran.Marine, 0, 8, Seq(Enemy(Terran.Marine, 2.0))))),
+        new PumpRatio(Terran.Vulture, 0, 3, Seq(Enemy(Terran.Marine, 1.0))),
+        new PumpRatio(Terran.Marine, 0, 8, Seq(Enemy(Terran.Marine, 2.0))))),
     new Pump(Terran.MachineShop),
     new If(
       new UnitsAtLeast(4, UnitMatchSiegeTank),
       new Build(Get(Terran.SiegeMode))),
-    new PumpMatchingRatio(Terran.Goliath, 0, 8, Seq(Enemy(Terran.Vulture, 1.0), Enemy(Terran.Wraith, 2.9))),
+    new PumpRatio(Terran.Goliath, 0, 8, Seq(Enemy(Terran.Vulture, 1.0), Enemy(Terran.Wraith, 2.9))),
     new If(
       new EnemiesAtLeast(1, Terran.Wraith),
       new UpgradeContinuously(Terran.GoliathAirRange)),

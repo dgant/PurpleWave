@@ -5,7 +5,7 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Trigger}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational.{DefendFFEWithProbesAgainst4Pool, DefendFFEWithProbesAgainst9Pool, PlacementForgeFastExpand}
 import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers}
@@ -20,18 +20,18 @@ import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvZFFEEconomic, PvZGatewayFE}
 
-class PvZFFE extends GameplanModeTemplate {
+class PvZFFE extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(PvZGatewayFE, PvZFFEEconomic)
   override val completionCriteria: Predicate = new Latch(new And(new BasesAtLeast(2), new UnitsAtLeast(1, Protoss.CyberneticsCore)))
   
-  override def defaultScoutPlan: Plan = new If(
+  override def scoutPlan: Plan = new If(
     new Not(new EnemyStrategy(With.fingerprints.fourPool)),
     new ScoutOn(Protoss.Pylon))
   
-  override def defaultPlacementPlan: Plan = new PlacementForgeFastExpand
+  override def placementPlan: Plan = new PlacementForgeFastExpand
   
-  override def defaultBuildOrder: Plan = new If(
+  override def buildOrderPlan: Plan = new If(
     new Employing(PvZGatewayFE),
     new If(
       new EnemyStrategy(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.overpool),
@@ -86,7 +86,7 @@ class PvZFFE extends GameplanModeTemplate {
       new DefendFFEWithProbesAgainst9Pool)
   )
 
-  override def defaultWorkerPlan: Plan = NoPlan()
+  override def workerPlan: Plan = NoPlan()
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(

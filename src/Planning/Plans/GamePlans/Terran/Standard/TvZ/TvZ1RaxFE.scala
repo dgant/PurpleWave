@@ -3,27 +3,29 @@ package Planning.Plans.GamePlans.Terran.Standard.TvZ
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Basic.NoPlan
-import Planning.{Plan, Predicate}
 import Planning.Plans.Compound.If
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainst4Pool
+import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Terran.BuildBunkersAtNatural
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.Latch
-import Planning.Predicates.Milestones.MiningBasesAtLeast
+import Planning.Predicates.Compound.{And, Latch}
+import Planning.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
+import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvZ1RaxFE
 
-class TvZ1RaxFE extends GameplanModeTemplate {
+class TvZ1RaxFE extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(TvZ1RaxFE)
   override val completionCriteria: Predicate = new Latch(new MiningBasesAtLeast(2))
 
-  override def defaultAttackPlan: Plan = NoPlan()
-  override def defaultScoutPlan: Plan = new If(
+  override def attackPlan: Plan = NoPlan()
+  override def scoutPlan: Plan = new If(
     new StartPositionsAtLeast(4),
     new ScoutOn(Terran.Barracks, scoutCount = 2),
     new ScoutOn(Terran.Barracks))
@@ -35,7 +37,12 @@ class TvZ1RaxFE extends GameplanModeTemplate {
     Get(Terran.Barracks),
     Get(15, Terran.SCV))
 
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new TvZFourPoolEmergency
+  )
+
   override def buildPlans: Seq[Plan] = Seq(
+    new DefendFightersAgainst4Pool,
     new If(
       new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.tenHatch),
       new RequireMiningBases(2)),
@@ -46,7 +53,11 @@ class TvZ1RaxFE extends GameplanModeTemplate {
     new If(
       new EnemyStrategy(With.fingerprints.fourPool),
       new Build(Get(4, Terran.Barracks))),
-    new BuildBunkersAtNatural(1),
+    new If(
+      new And(
+        new EnemyStrategy(With.fingerprints.ninePool, With.fingerprints.overpool, With.fingerprints.fourPool),
+        new UnitsAtLeast(2, Terran.Barracks, complete = true)),
+      new BuildBunkersAtNatural(1)),
     new RequireMiningBases(2),
     new Build(
       Get(Terran.Refinery),

@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.EjectScout
 import Planning.Plans.Compound.{FlipIf, If, Or, Parallel}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.PumpWorkers
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -17,14 +17,14 @@ import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP1GateReaverExpand
 
-class PvP1GateReaverExpand extends GameplanModeTemplate {
+class PvP1GateReaverExpand extends GameplanTemplate {
   
   override val activationCriteria: Predicate = new Employing(PvP1GateReaverExpand)
   override val completionCriteria: Predicate = new Latch(new And(new UnitsAtLeast(2, Protoss.Nexus), new UnitsAtLeast(1, Protoss.RoboticsSupportBay)))
   
-  override def defaultWorkerPlan: Plan = new PumpWorkers(true)
-  override def defaultScoutPlan: Plan = new ScoutOn(Protoss.Gateway)
-  override val defaultAttackPlan: Plan = new If(new EnemyStrategy(With.fingerprints.nexusFirst), new PvPIdeas.AttackSafely)
+  override def workerPlan: Plan = new PumpWorkers(true)
+  override def scoutPlan: Plan = new ScoutOn(Protoss.Gateway)
+  override val attackPlan: Plan = new If(new EnemyStrategy(With.fingerprints.nexusFirst), new PvPIdeas.AttackSafely)
   
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvPIdeas.ReactToDarkTemplarEmergencies,
@@ -32,7 +32,7 @@ class PvP1GateReaverExpand extends GameplanModeTemplate {
     new PvPIdeas.ReactToProxyGateways,
     new PvPIdeas.ReactToFFE)
 
-  override def defaultBuildOrder: Plan = new Parallel(
+  override def buildOrderPlan: Plan = new Parallel(
     new BuildOrder(
       Get(8,   Protoss.Probe),
       Get(Protoss.Pylon),

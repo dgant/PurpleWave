@@ -6,7 +6,7 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, PumpWorkers, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -16,9 +16,9 @@ import Planning.Predicates.Reactive.SafeAtHome
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.Zerg
 
-class TwoHatchHydra extends GameplanModeTemplate {
+class TwoHatchHydra extends GameplanTemplate {
   
-  override def aggression: Double = 1.25
+  override val aggression: Double = 1.25
   override def buildOrder: Seq[BuildRequest] = Vector(
     Get(9, Zerg.Drone),
     Get(2, Zerg.Overlord),
@@ -29,8 +29,8 @@ class TwoHatchHydra extends GameplanModeTemplate {
     Get(1, Zerg.Extractor),
     Get(12, Zerg.Zergling))
   
-  override def defaultAttackPlan: Plan = new Attack
-  override def defaultScoutPlan: Plan = NoPlan()
+  override def attackPlan: Plan = new Attack
+  override def scoutPlan: Plan = NoPlan()
   
   override def buildPlans: Seq[Plan] = Vector(
     new CapGasAt(200),

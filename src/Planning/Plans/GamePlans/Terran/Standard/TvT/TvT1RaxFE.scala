@@ -7,7 +7,7 @@ import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Compound.{If, Or, Parallel}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Terran.BuildBunkersAtNatural
@@ -19,7 +19,7 @@ import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvT1RaxFE
 
-class TvT1RaxFE extends GameplanModeTemplate {
+class TvT1RaxFE extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(TvT1RaxFE)
   override val completionCriteria: Predicate = new Latch(new Or(
@@ -28,8 +28,8 @@ class TvT1RaxFE extends GameplanModeTemplate {
       new EnemyStrategy(With.fingerprints.fourteenCC, With.fingerprints.oneRaxFE),
       new UnitsAtLeast(1, Terran.Factory))))
 
-  override def defaultScoutPlan = new ScoutAt(12)
-  override def defaultAttackPlan = new If(new EnemyStrategy(With.fingerprints.fourteenCC), new Attack)
+  override def scoutPlan = new ScoutAt(12)
+  override def attackPlan = new If(new EnemyStrategy(With.fingerprints.fourteenCC), new Attack)
 
   val naturalZone: Zone = With.geography.ourNatural.zone
   override lazy val blueprints: Seq[Blueprint] = Seq(

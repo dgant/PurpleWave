@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Compound.{FlipIf, If, Or, Parallel}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackWithDarkTemplar
 import Planning.Plans.Macro.BuildOrders.Build
@@ -19,13 +19,13 @@ import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP2Gate1012Goon
 
-class PvP2Gate1012Goon extends GameplanModeTemplate {
+class PvP2Gate1012Goon extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(PvP2Gate1012Goon)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(2, Protoss.Nexus))
   override def priorityAttackPlan: Plan = new AttackWithDarkTemplar
-  override def defaultAttackPlan: Plan = new PvPIdeas.AttackSafely
-  override val defaultScoutPlan: Plan = new ScoutOn(Protoss.Pylon)
+  override def attackPlan: Plan = new PvPIdeas.AttackSafely
+  override val scoutPlan: Plan = new ScoutOn(Protoss.Pylon)
   
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvPIdeas.ReactToDarkTemplarEmergencies,

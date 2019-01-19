@@ -7,7 +7,9 @@ import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Attack, RecruitFreelancers}
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainst4Pool
+import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
@@ -23,11 +25,11 @@ import ProxyBwapi.Races.Terran
 import Strategery.MapGroups
 import Strategery.Strategies.Terran.TvE.TvE1RaxSCVMarine
 
-class TvE1RaxSCVMarine extends GameplanModeTemplate {
+class TvE1RaxSCVMarine extends GameplanTemplate {
   
   override val activationCriteria: Predicate = new Employing(TvE1RaxSCVMarine)
 
-  override def defaultPlacementPlan: Plan = new If(
+  override def placementPlan: Plan = new If(
     new Check(() => ! MapGroups.badForProxying.exists(_.matches)),
     new ProposePlacement{
       override lazy val blueprints = Vector(
@@ -38,7 +40,7 @@ class TvE1RaxSCVMarine extends GameplanModeTemplate {
           placement = Some(PlacementProfiles.proxyBuilding)))
     })
 
-  override def defaultScoutPlan: Plan = new If(
+  override def scoutPlan: Plan = new If(
     new StartPositionsAtLeast(3),
     new If(
       new Not(new FoundEnemyBase),
@@ -47,10 +49,14 @@ class TvE1RaxSCVMarine extends GameplanModeTemplate {
         new ScoutAt(10, 2),
         new ScoutAt(10))))
 
-    override def aggression: Double = 1.5
-  override def defaultWorkerPlan: Plan = NoPlan()
-  override def defaultSupplyPlan: Plan = NoPlan()
-  override def defaultAttackPlan: Plan = new Parallel(new Attack, new Attack(Terran.SCV))
+  override val aggression: Double = 1.5
+  override def workerPlan: Plan = NoPlan()
+  override def supplyPlan: Plan = NoPlan()
+  override def attackPlan: Plan = new Parallel(new Attack, new Attack(Terran.SCV))
+
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new TvZFourPoolEmergency
+  )
   
   override val buildOrder = Vector(
     Get(8, Terran.SCV),
@@ -62,6 +68,7 @@ class TvE1RaxSCVMarine extends GameplanModeTemplate {
     Get(11, Terran.SCV))
   
   override def buildPlans: Seq[Plan] = Vector(
+    new DefendFightersAgainst4Pool,
     new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
     new Pump(Terran.Marine),
     new BuildBunkersAtEnemy(1),

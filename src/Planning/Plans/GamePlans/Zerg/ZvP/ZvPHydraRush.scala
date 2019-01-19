@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas._
 import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas.{OverpoolBuildLarvaOrDrones, OverpoolSpendLarva, TwoBaseProtoss}
 import Planning.Plans.Macro.Automatic._
@@ -21,16 +21,16 @@ import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Zerg.ZvPHydraRush
 
-class ZvPHydraRush extends GameplanModeTemplate {
+class ZvPHydraRush extends GameplanTemplate {
   
   override val activationCriteria: Predicate = new Employing(ZvPHydraRush)
-  override def defaultScoutPlan: Plan = new ScoutSafelyWithOverlord
+  override def scoutPlan: Plan = new ScoutSafelyWithOverlord
   
   override def priorityAttackPlan: Plan = new If(
     new UnitsAtLeast(13, UnitMatchAnd(UnitMatchMobileFlying, UnitMatchWarriors)),
     new CampExpansions)
   
-  override def defaultAggressionPlan: Plan = new If(
+  override def aggressionPlan: Plan = new If(
     new UnitsAtLeast(40, Zerg.Hydralisk),
     new Aggression(4.0),
     new If(
@@ -41,9 +41,9 @@ class ZvPHydraRush extends GameplanModeTemplate {
         new Aggression(1.5),
         new Aggression(1.15))))
   
-  override def defaultAttackPlan: Plan = new Attack
+  override def attackPlan: Plan = new Attack
   
-  override def defaultBuildOrder: Plan = new Parallel(
+  override def buildOrderPlan: Plan = new Parallel(
     new BuildOrder(
       Get(9, Zerg.Drone),
       Get(2, Zerg.Overlord),

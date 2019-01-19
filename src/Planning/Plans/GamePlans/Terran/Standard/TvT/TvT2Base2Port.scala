@@ -4,7 +4,7 @@ import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.{Attack, ConsiderAttacking, FloatBuildings}
 import Planning.Plans.Compound.{If, Parallel}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -14,16 +14,16 @@ import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvT2Base2Port
 
-class TvT2Base2Port extends GameplanModeTemplate {
+class TvT2Base2Port extends GameplanTemplate {
 
   override val activationCriteria = new Employing(TvT2Base2Port)
   override val completionCriteria = new Latch(new MiningBasesAtLeast(3))
 
-  override def defaultAttackPlan: Plan = new Parallel(
+  override def attackPlan: Plan = new Parallel(
     new Attack(Terran.Wraith),
     new ConsiderAttacking)
 
-  override def defaultWorkerPlan: Plan = new Parallel(
+  override def workerPlan: Plan = new Parallel(
     new Pump(Terran.Comsat),
     new PumpWorkers(oversaturate = false))
 

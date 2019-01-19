@@ -3,7 +3,6 @@ package Strategery.Strategies.Terran
 import Strategery.Strategies.Terran.FFA.TerranFFABio
 import Strategery.Strategies.Terran.TvE._
 import Strategery.Strategies.Terran.TvR.{TvR1Rax, TvRTinfoil}
-import Strategery.Strategies.Terran.TvT.TvTStandard
 import Strategery.Strategies.Terran.TvZ._
 import Strategery.Strategies._
 
@@ -30,7 +29,13 @@ object TerranChoices {
   /////////
   
   val tvtOpeners = Vector(
-    TvTStandard
+    TvT14CC,
+    TvT1RaxFE,
+    TvT1FacFE,
+    TvT1FacPort,
+    TvT2FacTanks,
+    TvT2Port
+    //TvTStandard
     //TvTPNukeDrop
   )
   

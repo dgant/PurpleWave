@@ -12,10 +12,10 @@ object Spot extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.canMove
-    && ! unit.unitClass.isTransport
     && unit.flying
+    && ! unit.unitClass.isTransport
     && ! unit.canAttack
-    && ! unit.agent.canFocus
+    && ( ! unit.agent.canFocus || unit.unitClass.isFlyingBuilding)
     && (unit.matchups.framesOfSafety > GameTime(0, 2)() || unit.totalHealth > 500)
   )
   

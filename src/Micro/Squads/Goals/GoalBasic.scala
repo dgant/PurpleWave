@@ -57,6 +57,9 @@ trait GoalBasic extends SquadGoal {
       def matches(u: UnitInfo): Boolean = u.flying
       override val counteredBy: Array[Quality] = Array(AntiAir)
     }
+    object FlyingBuilding extends Quality {
+      def matches(u: UnitInfo): Boolean = u.unitClass.isFlyingBuilding
+    }
     object Ground extends Quality {
       def matches(u: UnitInfo): Boolean = ! u.flying
       override val counteredBy: Array[Quality] = Array(AntiGround)
@@ -74,6 +77,9 @@ trait GoalBasic extends SquadGoal {
     object Detector extends Quality {
       def matches(u: UnitInfo): Boolean = u.unitClass.isDetector
       override def counterScaling(input: Double): Double = 5.0 * input
+    }
+    object SiegeTank extends Quality {
+      def matches(u: UnitInfo): Boolean = u.unitClass.isSiegeTank
     }
     object Transport extends Quality {
       def matches(u: UnitInfo): Boolean = u.isAny(Terran.Dropship, Protoss.Shuttle, Zerg.Overlord)
@@ -96,6 +102,8 @@ trait GoalBasic extends SquadGoal {
       AntiGround,
     )
     val roles: Array[Quality] = Array(
+      FlyingBuilding,
+      SiegeTank,
       Transport,
       Transportable
     )
@@ -201,6 +209,8 @@ trait GoalBasic extends SquadGoal {
       candidates,
       (candidate, quality) =>
         if (Qualities.Transport.matches(candidate) && recruitsByQuality(Qualities.Transportable) < recruitsByQuality(Qualities.Transport)) {
+          true
+        } else if (Qualities.FlyingBuilding.matches(candidate) && recruitsByQuality(Qualities.SiegeTank) > 0) {
           true
         } else {
           (

@@ -56,6 +56,9 @@ class TvPSiegeExpandBunker extends GameplanModeTemplate {
     new TvPIdeas.ReactiveEarlyVulture,
 
     new If(
+      new EnemyStrategy(With.fingerprints.nexusFirst),
+      new RequireMiningBases(2)),
+    new If(
       new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway),
       new BuildBunkersAtMain(1)),
 

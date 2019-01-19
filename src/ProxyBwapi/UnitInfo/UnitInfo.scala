@@ -231,7 +231,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     (unitClass.canMove || (unitClass.isBuilding && flying))
     && unitClass.topSpeed > 0
     && canDoAnything
-    && ! burrowed,
+    && ! burrowed
+    && ! sieged,
     cd1)
 
   def topSpeed: Double = if (canMove) topSpeedPossibleCache() else 0
@@ -239,7 +240,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   private val topSpeedPossibleCache = new Cache(() =>
     (if (ensnared) 0.5 else 1.0) * // TODO: Is this the multiplier?
     (if (stimmed) 1.5 else 1.0) * (
-    unitClass.topSpeed * (if (
+    (if (isSiegeTankSieged()) Terran.SiegeTankSieged.topSpeed else unitClass.topSpeed)
+    * (if (
       (isVulture()    && player.hasUpgrade(Terran.VultureSpeed))    ||
       (isObserver()   && player.hasUpgrade(Protoss.ObserverSpeed))  ||
       (isScout()      && player.hasUpgrade(Protoss.ScoutSpeed))     ||

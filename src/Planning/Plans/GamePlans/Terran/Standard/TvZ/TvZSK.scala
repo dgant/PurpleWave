@@ -8,15 +8,15 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Terran.{BuildBunkersAtNatural, BuildMissileTurretsAtBases}
+import Planning.Plans.Macro.Terran.{BuildBunkersAtNatural, BuildMissileTurretsAtBases, BuildMissileTurretsAtNatural}
 import Planning.Predicates.Compound.{And, Latch}
-import Planning.Predicates.Milestones.{BasesAtLeast, IfOnMiningBases, UnitsAtLeast}
+import Planning.Predicates.Milestones.{BasesAtLeast, EnemyHasShown, IfOnMiningBases, UnitsAtLeast}
 import Planning.Predicates.Reactive.{EnemyLurkers, SafeToMoveOut}
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
-import Strategery.Strategies.Terran.TvZ.TvZSK
+import Strategery.Strategies.Terran.TvZSK
 
 class TvZSK extends GameplanModeTemplate {
   
@@ -27,6 +27,12 @@ class TvZSK extends GameplanModeTemplate {
     new Or(
       new SafeToMoveOut,
       new BasesAtLeast(3)))
+
+  class LurkerLikely extends Or(
+    new EnemyHasShown(Zerg.Hydralisk),
+    new EnemyHasShown(Zerg.HydraliskDen),
+    new EnemyHasShown(Zerg.Lurker),
+    new EnemyHasShown(Zerg.LurkerEgg))
 
   override def defaultScoutPlan: Plan = NoPlan()
   override def defaultAttackPlan: Plan = new If(new CanAttack, new Attack)
@@ -73,15 +79,21 @@ class TvZSK extends GameplanModeTemplate {
       Get(Terran.BioDamage),
       Get(5, Terran.Barracks)),
 
-    new BuildMissileTurretsAtBases(3),
-
-    new BuildGasPumps,
-    new Build(
-      Get(Terran.Factory),
-      Get(Terran.Starport),
-      Get(Terran.ScienceFacility),
-      Get(2, Terran.Starport)),
-    new Pump(Terran.ControlTower),
+    new FlipIf(
+      new LurkerLikely,
+      new BuildMissileTurretsAtBases(3),
+      new Parallel(
+        new BuildGasPumps,
+        new If(
+          new LurkerLikely,
+          new BuildMissileTurretsAtNatural(2),
+          new BuildBunkersAtNatural(2)),
+        new Build(
+          Get(Terran.Factory),
+          Get(Terran.Starport),
+          Get(Terran.ScienceFacility),
+          Get(2, Terran.Starport)),
+        new Pump(Terran.ControlTower))),
 
     new IfOnMiningBases(2, new Build(Get(6, Terran.Barracks))),
     new IfOnMiningBases(3, new Build(Get(2, Terran.EngineeringBay), Get(3, Terran.Starport), Get(9, Terran.Barracks))),

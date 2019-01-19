@@ -15,7 +15,7 @@ import Planning.Predicates.Compound.Latch
 import Planning.Predicates.Milestones.MiningBasesAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
 import ProxyBwapi.Races.Terran
-import Strategery.Strategies.Terran.TvZ.TvZ1RaxFE
+import Strategery.Strategies.Terran.TvZ1RaxFE
 
 class TvZ1RaxFE extends GameplanModeTemplate {
 

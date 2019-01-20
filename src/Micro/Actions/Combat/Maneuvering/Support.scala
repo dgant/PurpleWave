@@ -31,7 +31,7 @@ object Support extends Action {
         if (unit.flying)
           centroid
         else
-          (unit.teammates.toSeq :+ unit).minBy(_.pixelDistanceCenter(centroid)).pixelCenter
+          supportables.minBy(_.pixelDistanceCenter(centroid)).pixelCenter
       })
 
     // Retreat to help

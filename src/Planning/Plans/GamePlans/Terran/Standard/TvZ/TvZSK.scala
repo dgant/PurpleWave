@@ -11,7 +11,7 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Terran.{BuildBunkersAtNatural, BuildMissileTurretsAtBases, BuildMissileTurretsAtNatural}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyLurkers, SafeToMoveOut}
+import Planning.Predicates.Reactive.{EnemyLurkers, EnemyMutalisks, SafeToMoveOut}
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.{UnitMatchOr, UnitMatchSiegeTank, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
@@ -20,7 +20,7 @@ import Strategery.Strategies.Terran._
 
 class TvZSK extends GameplanTemplate {
   
-  override val activationCriteria: Predicate = new Employing(TvZ5Rax, TvZ3RaxTank, TvZ2RaxNuke, TvZSK)
+  override val activationCriteria: Predicate = new Employing(TvZ5Rax, TvZ2RaxTank, TvZ2RaxNuke, TvZSK)
 
   class CanAttack extends And(
     new Latch(new UnitsAtLeast(20, UnitMatchWarriors)),
@@ -82,7 +82,7 @@ class TvZSK extends GameplanTemplate {
       new UnitsAtLeast(1, Terran.Factory),
       new UpgradeContinuously(Terran.MarineRange)),
     new If(new Employing(TvZ2RaxNuke), new Pump(Terran.CovertOps, 1)),
-    new If(new Employing(TvZ3RaxTank), new Pump(Terran.MachineShop, 1)),
+    new If(new Employing(TvZ2RaxTank), new Pump(Terran.MachineShop, 1)),
     new Pump(Terran.NuclearMissile, 1),
     new If(
       new Or(
@@ -94,21 +94,24 @@ class TvZSK extends GameplanTemplate {
       new UnitsAtLeast(1, Terran.ScienceVessel),
       new Parallel(
         new TechContinuously(Terran.SiegeMode),
-        new UpgradeContinuously(Terran.ScienceVesselEnergy),
         new TechContinuously(Terran.Irradiate),
+        new UpgradeContinuously(Terran.BioDamage, 1),
+        new UpgradeContinuously(Terran.BioArmor, 1),
         new UpgradeContinuously(Terran.BioDamage),
-        new UpgradeContinuously(Terran.BioArmor))),
+        new UpgradeContinuously(Terran.BioArmor),
+        new UpgradeContinuously(Terran.ScienceVesselEnergy))),
 
     new Pump(Terran.Ghost, 2),
     new Pump(Terran.SiegeTankUnsieged, 3),
+    new Pump(Terran.ControlTower),
     new Pump(Terran.ScienceVessel, 20),
-    new PumpRatio(Terran.Medic, 2, 20, Seq(Friendly(Terran.Marine, 0.2))),
+    new PumpRatio(Terran.Medic, 2, 20, Seq(Friendly(Terran.Marine, 1.0/6.0))),
     new PumpRatio(Terran.Marine, 0, 120, Seq(Enemy(Zerg.Mutalisk, 5.0))),
     new If(
       new CanAttack,
       new Parallel(
         new PumpRatio(Terran.Firebat, 0, 2, Seq(Enemy(Zerg.Zergling, 1.0))),
-        new PumpRatio(Terran.Firebat, 0, 10, Seq(Friendly(Terran.Marine, 0.1), Enemy(Zerg.Defiler, 1.0))))),
+        new PumpRatio(Terran.Firebat, 0, 10, Seq(Enemy(Zerg.Zergling, 0.1), Enemy(Zerg.Defiler, 1.0))))),
     new Pump(Terran.Marine),
     new Pump(Terran.Vulture, 1),
 
@@ -118,7 +121,11 @@ class TvZSK extends GameplanTemplate {
     new BuildBunkersAtNatural(1),
     new If(
       new LurkerLikely,
-      new BuildMissileTurretsAtNatural(1)),
+      new Parallel(
+        new BuildMissileTurretsAtNatural(1),
+        new If(
+          new UnitsAtMost(2, Terran.Barracks, complete = true),
+          new BuildBunkersAtNatural(2)))),
     new Build(
       Get(Terran.Barracks),
       Get(Terran.Refinery),
@@ -129,24 +136,21 @@ class TvZSK extends GameplanTemplate {
       Get(2, Terran.Barracks)),
 
     new FlipIf(
-      new LurkerLikely,
+      new EnemyLurkers,
+      new If(new Employing(TvZ5Rax), new Build(Get(5, Terran.Barracks))),
       new Parallel(
+        new Build(Get(Terran.Factory)),
+        new If(new Employing(TvZ2RaxTank), new Build(Get(3, Terran.Barracks))),
+        new BuildGasPumps,
         new If(
-          new LurkerLikely,
-          new BuildBunkersAtNatural(2)),
-        new BuildMissileTurretsAtBases(3)),
-      new FlipIf(
-        new EnemyLurkers,
-        new If(new Employing(TvZ5Rax), new Build(Get(5, Terran.Barracks))),
-        new Parallel(
-          new Build(Get(Terran.Factory)),
-          new If(new Employing(TvZ3RaxTank), new Build(Get(3, Terran.Barracks))),
-          new BuildGasPumps,
-          new Build(
-            Get(Terran.Starport),
-            Get(Terran.ScienceFacility),
-            Get(2, Terran.Starport)),
-          new Pump(Terran.ControlTower)))),
+          new Or(
+            new EnemyMutalisks,
+            new Not(new EnemyLurkers)),
+          new BuildMissileTurretsAtBases(3)),
+        new Build(
+          Get(Terran.Starport),
+          Get(Terran.ScienceFacility),
+          Get(2, Terran.Starport)))),
 
     new Trigger(
       new UnitsAtLeast(1, Terran.ScienceFacility),

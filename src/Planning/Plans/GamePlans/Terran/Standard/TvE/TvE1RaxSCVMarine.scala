@@ -8,7 +8,7 @@ import Planning.Plans.Army.{Attack, RecruitFreelancers}
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainst4Pool
+import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPool
 import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
@@ -68,7 +68,7 @@ class TvE1RaxSCVMarine extends GameplanTemplate {
     Get(11, Terran.SCV))
   
   override def buildPlans: Seq[Plan] = Vector(
-    new DefendFightersAgainst4Pool,
+    new DefendFightersAgainstEarlyPool,
     new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
     new Pump(Terran.Marine),
     new BuildBunkersAtEnemy(1),

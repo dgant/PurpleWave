@@ -6,7 +6,7 @@ import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.{Attack, RecruitFreelancers}
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainst4Pool
+import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPool
 import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
@@ -40,10 +40,13 @@ class TvZ8Rax extends GameplanTemplate {
     new Parallel(
       new Attack,
       new If(
-        new UnitsAtMost(0, Terran.Bunker, complete = true),
-        new RecruitFreelancers(UnitMatchWorkers, new UnitCountExcept(8, UnitMatchWorkers)),
-        new RecruitFreelancers(UnitMatchWorkers, UnitCountExactly(2))),
-      new If(new CanBunkerRush, new Attack(Terran.SCV))))
+        new CanBunkerRush,
+        new Parallel(
+          new If(
+            new UnitsAtMost(0, Terran.Bunker, complete = true),
+            new RecruitFreelancers(UnitMatchWorkers, new UnitCountExcept(8, UnitMatchWorkers)),
+            new RecruitFreelancers(UnitMatchWorkers, UnitCountExactly(2))),
+          new Attack(Terran.SCV)))))
 
   override def scoutPlan: Plan = new If(
     new Not(new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.fourPool)),
@@ -61,14 +64,14 @@ class TvZ8Rax extends GameplanTemplate {
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new TvZFourPoolEmergency,
-    new If(
-      new CanBunkerRush,
-      new BuildBunkersAtEnemyNatural(1)),
   )
 
   override def buildPlans: Seq[Plan] = Seq(
-    new DefendFightersAgainst4Pool,
+    new DefendFightersAgainstEarlyPool,
 
+    new If(
+      new CanBunkerRush,
+      new BuildBunkersAtEnemyNatural(1)),
     new Pump(Terran.Marine),
 
     new If(

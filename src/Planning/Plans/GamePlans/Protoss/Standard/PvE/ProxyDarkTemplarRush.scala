@@ -19,11 +19,11 @@ import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemiesAtMost, UnitsAtLea
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.UnitMatchMobileDetectors
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Protoss.PvE.ProxyDarkTemplar
+import Strategery.Strategies.Protoss.PvE.PvTProxyDarkTemplar
 
 class ProxyDarkTemplarRush extends GameplanTemplate {
 
-  override val activationCriteria = new Employing(ProxyDarkTemplar)
+  override val activationCriteria = new Employing(PvTProxyDarkTemplar)
 
   // Might be the fastest possible DT rush.
   // An example: https://youtu.be/ca40eQ1s7iw

@@ -12,13 +12,17 @@ import Planning.{Plan, Property}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class DefendFightersAgainst4Pool extends Plan {
+class DefendFightersAgainstEarlyPool extends Plan {
   
   val defenders = new Property[LockUnits](new LockUnits)
   defenders.get.unitMatcher.set(UnitMatchWorkers)
   
   override def onUpdate() {
-    
+
+    if ( ! With.fingerprints.fourPool.matches && ! With.fingerprints.ninePool.matches) {
+      return
+    }
+
     def inOurBase(unit: UnitInfo): Boolean = unit.zone.bases.exists(_.owner.isUs)
     
     val cannons           = With.units.ours .filter(u => u.aliveAndComplete && u.isAny(Terran.Bunker, Protoss.PhotonCannon))

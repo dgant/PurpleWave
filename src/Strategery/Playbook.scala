@@ -45,14 +45,15 @@ class EmptyPlaybook {
 object StrategyGroups {
   val disabled = Vector[Strategy](
     WorkerRush,
-    WorkerRushLiftoff,
-    ProxyDarkTemplar,
+    TvEWorkerRushLiftoff,
+    TvR1Rax,
+    TvRTinfoil,
+    TvZProxy8Fact,
+    TvZ2RaxNuke,
+    PvTProxyDarkTemplar,
     PvTProxy2Gate,
     PvPProxy2Gate,
     PvZProxy2Gate,
-    TvZProxy8Fact,
-    TvR1Rax,
-    TvRTinfoil,
     PvP2Gate1012,
     PvP2GateRobo,
     PvPLateGame2BaseReaverCarrier_SpecificOpponents,
@@ -74,7 +75,7 @@ class PurpleWavePlaybook extends EmptyPlaybook {
 
 class TestingPlaybook extends PurpleWavePlaybook {
   //override lazy val forced: Seq[Strategy] = Seq(PvZFFEEconomic, PvZMidgameCorsairReaverZealot, PvZMidgameCorsairReaverGoon, PvZMidgame5GateGoonReaver)
-  override lazy val forced: Seq[Strategy] = Seq(TvZ8Rax, TvZ5Rax, TvZSK)
+  override lazy val forced: Seq[Strategy] = Seq(TvZ1RaxFE, TvZRaxCCAcademy, TvZ2RaxTech, TvZSK)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
 }
 

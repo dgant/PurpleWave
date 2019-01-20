@@ -18,13 +18,13 @@ abstract class TvZMidgame extends Strategy {
 object TvZ8Rax extends TvZStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     Vector(TvZRaxCCAcademy, TvZRaxCCRax),
-    Vector(TvZ5Rax, TvZ2RaxNuke, TvZ3RaxTank))
+    Vector(TvZ5Rax, TvZ2RaxNuke, TvZ2RaxTech, TvZ2RaxTank))
 }
 
 object TvZ1RaxFE extends TvZStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     Vector(TvZRaxCCAcademy, TvZRaxCCRax),
-    Vector(TvZ5Rax, TvZ2RaxNuke, TvZ3RaxTank))
+    Vector(TvZ5Rax, TvZ2RaxNuke, TvZ2RaxTech, TvZ2RaxTank))
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.fourPool)
 }
 
@@ -38,7 +38,8 @@ object TvZRaxCCRax extends TvZStrategy
 
 object TvZ5Rax extends TvZMidgame
 object TvZ2RaxNuke extends TvZMidgame
-object TvZ3RaxTank extends TvZMidgame
+object TvZ2RaxTech extends TvZMidgame
+object TvZ2RaxTank extends TvZMidgame
 
 object TvZSK extends TvZStrategy
 

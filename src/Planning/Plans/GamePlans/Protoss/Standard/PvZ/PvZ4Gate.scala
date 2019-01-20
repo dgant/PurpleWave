@@ -10,7 +10,7 @@ import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainst4Pool
+import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPool
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders._
@@ -70,7 +70,7 @@ class PvZ4Gate extends GameplanTemplate {
     new EnemyHasShown(Zerg.Mutalisk))
 
   override def buildPlans = Vector(
-    new DefendFightersAgainst4Pool,
+    new DefendFightersAgainstEarlyPool,
 
     new If(
       new EnemyHasShownCloakedThreat,

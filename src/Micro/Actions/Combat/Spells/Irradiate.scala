@@ -20,6 +20,8 @@ object Irradiate extends TargetedSpell {
       0.0
     else if (target.irradiated)
       0.0
+    else if (target.is(Zerg.LurkerEgg))
+      0.0
     else if (target.isEnemy)
       target.subjectiveValue
     else if (target.isFriendly)

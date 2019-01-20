@@ -7,7 +7,7 @@ import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplateVsRandom
-import Planning.Plans.GamePlans.Protoss.Situational.{DefendFFEWithProbesAgainst4Pool, DefendFightersAgainst4Pool}
+import Planning.Plans.GamePlans.Protoss.Situational.{DefendFFEWithProbesAgainst4Pool, DefendFightersAgainstEarlyPool}
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, PumpShuttleAndReavers, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -40,7 +40,7 @@ class PvRTinfoil extends GameplanTemplateVsRandom {
   
   override def buildPlans = Vector(
     new CapGasAt(300),
-    new DefendFightersAgainst4Pool,
+    new DefendFightersAgainstEarlyPool,
     new If(
       new And(
         new EnemyStrategy(With.fingerprints.fourPool),

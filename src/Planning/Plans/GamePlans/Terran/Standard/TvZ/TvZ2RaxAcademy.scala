@@ -5,7 +5,7 @@ import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Or, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainst4Pool
+import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPool
 import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
@@ -52,7 +52,7 @@ class TvZ2RaxAcademy extends GameplanTemplate {
     Get(Terran.Academy))
 
   override def buildPlans: Seq[Plan] = Seq(
-    new DefendFightersAgainst4Pool,
+    new DefendFightersAgainstEarlyPool,
     new TechContinuously(Terran.Stim),
     new PumpRatio(Terran.Medic, 2, 6, Seq(Friendly(Terran.Marine, 0.2))),
     new PumpRatio(Terran.Firebat, 0, 2, Seq(Friendly(Terran.Marine, 0.1))),

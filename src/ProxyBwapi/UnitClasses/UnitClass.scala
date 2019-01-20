@@ -518,7 +518,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val canStim              : Boolean = this == Terran.Marine || this == Terran.Firebat
   lazy val canSiege             : Boolean = this == Terran.SiegeTankUnsieged || this == Terran.SiegeTankSieged
   lazy val canBeIrradiated      : Boolean = Players.all.exists(_.isUnknownOrTerran)  && ! isBuilding
-  lazy val canBeIrradiateBurned : Boolean = Players.all.exists(_.isUnknownOrTerran)  && ! isBuilding && isOrganic
+  lazy val canBeIrradiateBurned : Boolean = Players.all.exists(_.isUnknownOrTerran)  && ! isBuilding && isOrganic && this != Zerg.LurkerEgg && this != Zerg.Egg
   lazy val canBeLockedDown      : Boolean = Players.all.exists(_.isUnknownOrTerran)  && ! isBuilding && isMechanical
   lazy val canBeMaelstrommed    : Boolean = Players.all.exists(_.isUnknownOrProtoss) && ! isBuilding && isOrganic
   lazy val canBeEnsnared        : Boolean = Players.all.exists(_.isUnknownOrZerg)    && ! isBuilding

@@ -7,7 +7,7 @@ import Strategery.{MapGroups, StarCraftMap}
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
-object ProxyDarkTemplar extends Strategy {
+object PvTProxyDarkTemplar extends Strategy {
 
   override def gameplan: Option[Plan] = { Some(new ProxyDarkTemplarRush) }
 

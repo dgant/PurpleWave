@@ -5,7 +5,7 @@ import Planning.Plans.Army.{Aggression, Attack, EjectScout, RecruitFreelancers}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainst4Pool
+import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPool
 import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Scouting.{FoundEnemyBase, ScoutAt}
@@ -63,7 +63,7 @@ class TvE2RaxSCVMarine extends GameplanTemplate {
     Get(2, Terran.SupplyDepot))
   
   override def buildPlans: Seq[Plan] = Vector(
-    new DefendFightersAgainst4Pool,
+    new DefendFightersAgainstEarlyPool,
     new Pump(Terran.Marine),
     new Pump(Terran.SCV),
     new If(

@@ -4,10 +4,10 @@ import Lifecycle.With
 import Planning.Plan
 import Planning.UnitMatchers.UnitMatcher
 
-class CancelAll(matcher: UnitMatcher) extends Plan {
+class CancelAll(matchers: UnitMatcher*) extends Plan {
 
   override def onUpdate(): Unit = {
     // TODO: Crude
-    With.units.ours.view.filter(u => ! u.complete && u.is(matcher)).foreach(With.commander.cancel)
+    With.units.ours.view.filter(u => ! u.complete && u.isAny(matchers: _*)).foreach(With.commander.cancel)
   }
 }

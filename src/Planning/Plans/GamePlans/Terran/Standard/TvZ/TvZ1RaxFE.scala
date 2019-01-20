@@ -12,7 +12,7 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Terran.BuildBunkersAtNatural
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.{And, Latch}
+import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
 import Planning.{Plan, Predicate}
@@ -26,9 +26,11 @@ class TvZ1RaxFE extends GameplanTemplate {
 
   override def attackPlan: Plan = NoPlan()
   override def scoutPlan: Plan = new If(
-    new StartPositionsAtLeast(4),
-    new ScoutOn(Terran.Barracks, scoutCount = 2),
-    new ScoutOn(Terran.Barracks))
+    new Not(new EnemyStrategy(With.fingerprints.fourPool)),
+    new If(
+      new StartPositionsAtLeast(3),
+      new ScoutOn(Terran.Barracks, scoutCount = 2),
+      new ScoutOn(Terran.Barracks)))
 
   override def buildOrder: Seq[BuildRequest] = Seq(
     Get(9, Terran.SCV),

@@ -9,7 +9,7 @@ import Planning.UnitCounters.UnitCountExactly
 import Planning.UnitMatchers.UnitMatchWorkers
 import Planning.UnitPreferences.UnitPreferClose
 import Planning.{Plan, Property}
-import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class DefendFightersAgainst4Pool extends Plan {
@@ -19,12 +19,10 @@ class DefendFightersAgainst4Pool extends Plan {
   
   override def onUpdate() {
     
-    if (With.units.ours.exists(u => u.aliveAndComplete && u.is(Protoss.PhotonCannon))) return
-    
     def inOurBase(unit: UnitInfo): Boolean = unit.zone.bases.exists(_.owner.isUs)
     
-    val cannons           = With.units.ours .filter(u => u.aliveAndComplete && u.is(Protoss.PhotonCannon))
-    val fighters          = With.units.ours .filter(u => u.canAttack && ! u.unitClass.isWorker && inOurBase(u) && u.remainingCompletionFrames < GameTime(0, 3)())
+    val cannons           = With.units.ours .filter(u => u.aliveAndComplete && u.isAny(Terran.Bunker, Protoss.PhotonCannon))
+    val fighters          = With.units.ours .filter(u => u.unitClass.canMove && u.canAttack && ! u.unitClass.isWorker && inOurBase(u) && u.remainingCompletionFrames < GameTime(0, 5)())
     lazy val zerglings    = With.units.enemy.filter(u => u.aliveAndComplete && u.is(Zerg.Zergling)  && inOurBase(u))
     lazy val workers      = With.units.ours.filter(u => u.aliveAndComplete && u.unitClass.isWorker)
     lazy val threatening  = zerglings.filter(_.inPixelRadius(32 * 4).exists(n => n.isOurs && n.totalHealth < 200))
@@ -45,7 +43,7 @@ class DefendFightersAgainst4Pool extends Plan {
       return
     }
     
-    val workersNeeded   = 1 + 3 * zerglings.size - 3 * fighters.map(_.unitClass.mineralValue).sum / 100.0
+    val workersNeeded   = 1 + 3 * zerglings.size - 3 * fighters.filter(_.complete).map(_.unitClass.mineralValue).sum / 100.0
     val workerCap       = workers.size - 4
     val workersToFight  = PurpleMath.clamp(workersNeeded, 0, workerCap)
     val target          = fighters.minBy(zealot => zerglings.map(_.pixelDistanceEdge(zealot)).min).pixelCenter

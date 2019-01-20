@@ -26,7 +26,7 @@ class GoalDefendZone extends GoalBasic {
       && u.unitClass.isStaticDefense
       && (squad.enemies.isEmpty || squad.enemies.exists(u.canAttack)))
 
-    lazy val allowWandering = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || squad.units.size >= 3 || squad.enemies.exists(_.unitClass.ranged)
+    lazy val allowWandering = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || squad.units.size > 3 || squad.enemies.exists(_.unitClass.ranged)
     lazy val canHuntEnemies = huntableEnemies().nonEmpty
     lazy val canDefendChoke = choke.isDefined
     
@@ -37,6 +37,10 @@ class GoalDefendZone extends GoalBasic {
     else if (allowWandering && canDefendChoke) {
       lastAction = "Protect choke of "
       defendChoke()
+    }
+    else if (walls.nonEmpty) {
+      lastAction = "Protect wall of "
+      defendHeart(walls.minBy(_.pixelCenter.groundPixels(With.intelligence.mostBaselikeEnemyTile)).pixelCenter)
     }
     else {
       lastAction = "Protect heart of "

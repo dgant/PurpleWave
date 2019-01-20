@@ -55,6 +55,7 @@ object TerranChoices {
   /////////
   
   val tvzOpeners = Vector(
+    TvZ8Rax,
     TvZ1RaxFE,
     TvZ2RaxAcademy
   )

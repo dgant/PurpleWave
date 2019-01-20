@@ -1,5 +1,6 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
+import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Or, Trigger}
@@ -10,10 +11,10 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.Latch
+import Planning.Predicates.Compound.{Latch, Not}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones.{MiningBasesAtLeast, TechStarted, UnitsAtLeast}
-import Planning.Predicates.Strategy.{Employing, StartPositionsAtLeast}
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvZ2RaxAcademy
@@ -25,9 +26,11 @@ class TvZ2RaxAcademy extends GameplanTemplate {
 
   override def attackPlan: Plan = new Trigger(new UnitsAtLeast(1, Terran.Medic, complete = true), new Attack)
   override def scoutPlan: Plan = new If(
-    new StartPositionsAtLeast(4),
-    new ScoutOn(Terran.Barracks, scoutCount = 2),
-    new ScoutOn(Terran.Barracks))
+    new Not(new EnemyStrategy(With.fingerprints.fourPool)),
+    new If(
+      new StartPositionsAtLeast(3),
+      new ScoutOn(Terran.Barracks, scoutCount = 2),
+      new ScoutOn(Terran.Barracks)))
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new TvZFourPoolEmergency

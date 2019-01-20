@@ -116,6 +116,9 @@ class TvZSK extends GameplanTemplate {
       new Employing(TvZRaxCCRax),
       new Build(Get(2, Terran.Barracks))),
     new BuildBunkersAtNatural(1),
+    new If(
+      new LurkerLikely,
+      new BuildMissileTurretsAtNatural(1)),
     new Build(
       Get(Terran.Barracks),
       Get(Terran.Refinery),
@@ -128,7 +131,6 @@ class TvZSK extends GameplanTemplate {
     new FlipIf(
       new LurkerLikely,
       new Parallel(
-        new BuildMissileTurretsAtNatural(1),
         new If(
           new LurkerLikely,
           new BuildBunkersAtNatural(2)),

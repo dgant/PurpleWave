@@ -1,5 +1,7 @@
 package Strategery.Strategies.Terran
 
+import Information.Intelligenze.Fingerprinting.Fingerprint
+import Lifecycle.With
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
@@ -13,10 +15,17 @@ abstract class TvZMidgame extends Strategy {
     Vector(TvZSK))
 }
 
+object TvZ8Rax extends TvZStrategy {
+  override def choices: Iterable[Iterable[Strategy]] = Vector(
+    Vector(TvZRaxCCAcademy, TvZRaxCCRax),
+    Vector(TvZ5Rax, TvZ2RaxNuke, TvZ3RaxTank))
+}
+
 object TvZ1RaxFE extends TvZStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     Vector(TvZRaxCCAcademy, TvZRaxCCRax),
     Vector(TvZ5Rax, TvZ2RaxNuke, TvZ3RaxTank))
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.fourPool)
 }
 
 object TvZ2RaxAcademy extends TvZStrategy {

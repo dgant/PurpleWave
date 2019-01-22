@@ -18,11 +18,11 @@ import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.Scouting.FoundEnemyBase
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Zerg
-import Strategery.Strategies.Zerg.ZvPThirteenPoolMuta
+import Strategery.Strategies.Zerg.ZvT13PoolMuta
 
-class ThirteenPoolMuta extends GameplanTemplate {
-  
-  override val activationCriteria: Predicate = new Employing(ZvPThirteenPoolMuta)
+class ZvT13PoolMuta extends GameplanTemplate {
+
+  override val activationCriteria: Predicate = new Employing(ZvT13PoolMuta)
   
   override val aggression: Double = 0.6
   

@@ -21,12 +21,12 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import Strategery.Strategies.Zerg.ZvPTwoHatchMuta
+import Strategery.Strategies.Zerg.ZvP2HatchMuta
 import Strategery.{StarCraftMap, Transistor}
 
-class ZvPTwoHatchMuta extends GameplanTemplate {
+class ZvP2HatchMuta extends GameplanTemplate {
   
-  override val activationCriteria: Predicate = new Employing(ZvPTwoHatchMuta)
+  override val activationCriteria: Predicate = new Employing(ZvP2HatchMuta)
   
   class ProceedWithTech extends Or(
       new Latch(new UnitsAtLeast(16, Zerg.Drone)),

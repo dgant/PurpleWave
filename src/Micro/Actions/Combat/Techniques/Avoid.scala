@@ -44,15 +44,21 @@ object Avoid extends ActionTechnique {
     if (With.configuration.enableThreatAwarePathfinding) {
       avoidRealPath(unit)
     }
-    if (unit.readyForMicro) {
-      avoidGreedyPath(unit)
+    avoidGreedyPath(unit)
+    if (unit.zone == unit.agent.destination.zone || unit.agent.canScout) {
+      avoidGreedyPath(unit, distanceValue = 0)
+      avoidGreedyPath(unit, safetyValue = 0)
+    } else {
+      avoidGreedyPath(unit, safetyValue = 0)
+      avoidGreedyPath(unit, distanceValue = 0)
     }
-    if (unit.readyForMicro) {
-      avoidPotential(unit)
-    }
+    avoidPotential(unit)
   }
 
   def avoidRealPath(unit: FriendlyUnitInfo): Unit = {
+
+    if (! unit.readyForMicro) return
+
     val path = With.paths.aStarThreatAware(unit, if (unit.agent.origin.zone == unit.zone) None else Some(unit.agent.origin.tileIncluding))
       if (path.pathExists && path.tiles.exists(_.size > 3)) {
         // Path tiles are in REVERSE
@@ -71,8 +77,14 @@ object Avoid extends ActionTechnique {
       }
   }
 
-  def avoidGreedyPath(unit: FriendlyUnitInfo): Unit = {
-    var pathLengthMax = PurpleMath.clamp(unit.matchups.framesOfEntanglement * unit.topSpeed + 3, 5, 8)
+  def avoidGreedyPath(
+    unit: FriendlyUnitInfo,
+    distanceValue: Int = 1,
+    safetyValue: Int = 1): Unit = {
+
+    if (! unit.readyForMicro) return
+
+    var pathLengthMax = PurpleMath.clamp(unit.matchups.framesOfEntanglement * unit.topSpeed + 3, 6, 10)
     val path = new ArrayBuffer[Tile]
     path += unit.tileIncludingCenter
     var bestScore = Int.MinValue
@@ -86,10 +98,10 @@ object Avoid extends ActionTechnique {
     def tileScore(tile: Tile): Int = {
       val enemyRange = With.grids.enemyRange.get(tile)
       (
-        - 10 * tileDistance(tile)
-        - 10 * enemyRange * (if (enemyRange > With.grids.enemyRange.addedRange) 2 else 1)
+        - 10 * distanceValue * tileDistance(tile)
+        - 10 * safetyValue * enemyRange * (if (enemyRange > With.grids.enemyRange.addedRange) 2 else 1)
         - (if (unit.cloaked)
-          10 * With.grids.enemyDetection.get(tile) * (if (With.grids.enemyDetection.isDetected(tile)) 2 else 1)
+          10 * safetyValue * With.grids.enemyDetection.get(tile) * (if (With.grids.enemyDetection.isDetected(tile)) 2 else 1)
           else 0)
         - PurpleMath.clamp(With.coordinator.gridPathOccupancy.get(tile) / 3, 0, 9)
       )
@@ -138,6 +150,9 @@ object Avoid extends ActionTechnique {
   }
 
   def avoidPotential(unit: FriendlyUnitInfo): Unit = {
+
+    if (! unit.readyForMicro) return
+
     unit.agent.toTravel = Some(unit.agent.origin)
 
     val bonusAvoidThreats = PurpleMath.clamp(With.reaction.agencyAverage + unit.matchups.framesOfEntanglement, 12.0, 24.0) / 12.0

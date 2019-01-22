@@ -12,7 +12,7 @@ import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.EnemyStrategy
-import ProxyBwapi.Races.Zerg
+import ProxyBwapi.Races.{Protoss, Zerg}
 
 object ZvPIdeas {
   
@@ -70,4 +70,38 @@ object ZvPIdeas {
       new OverpoolSpendLarvaOnZerglings,
       new BuildOrder(Get(12, Zerg.Zergling)),
       new BuildOrder(Get(14, Zerg.Drone))))
+
+  class OverlordSpeedVsDarkTemplar extends If(
+    new Or(
+      new EnemyHasShown(Protoss.DarkTemplar),
+      new EnemyHasShown(Protoss.HighTemplar),
+      new EnemyHasShown(Protoss.Archon),
+      new EnemyHasShown(Protoss.TemplarArchives)),
+    new Build(
+      Get(Zerg.Extractor),
+      Get(Zerg.SpawningPool),
+      Get(Zerg.Lair),
+      Get(Zerg.OverlordSpeed)))
+
+  class NeedAntiAir extends Or(
+    new EnemyHasShown(Protoss.Corsair),
+    new EnemyHasShown(Protoss.Scout),
+    new EnemyHasShown(Protoss.Carrier),
+    new EnemyHasShown(Protoss.Interceptor),
+    new EnemyHasShown(Protoss.Stargate))
+
+  class TechToSpireVsAir extends If(
+    new NeedAntiAir,
+    new Build(
+      Get(Zerg.Extractor),
+      Get(Zerg.SpawningPool),
+      Get(Zerg.Lair),
+      Get(Zerg.Spire)))
+
+  class TechToHydrasVsAir extends If(
+    new NeedAntiAir,
+    new Build(
+      Get(Zerg.Extractor),
+      Get(Zerg.SpawningPool),
+      Get(Zerg.HydraliskDen)))
 }

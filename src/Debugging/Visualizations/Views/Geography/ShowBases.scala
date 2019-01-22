@@ -12,11 +12,11 @@ object ShowBases extends View {
       
       zone.bases.foreach(base => {
         DrawMap.tileRectangle(base.harvestingArea,  Colors.DarkGreen)
-        DrawMap.tileRectangle(base.townHallArea,    base.zone.owner.colorDark)
+        DrawMap.tileRectangle(base.townHallArea,    base.owner.colorDark)
         DrawMap.labelBox(
           Vector(
             base.name + ", " + zone.name,
-            base.zone.owner.name,
+            base.owner.name,
             Vector(
               if (base.isStartLocation)       Some("Start location")  else None,
               if (base.isNaturalOf.isDefined) Some("Natural")         else None,

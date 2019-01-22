@@ -2,12 +2,12 @@ package Planning.Plans.GamePlans.Zerg
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Planning.Predicates.Compound.{And, Check}
-import Planning.UnitMatchers._
-import Planning.Plans.Compound.{If, Trigger}
-import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpRatio}
-import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemiesAtMost, FrameAtMost}
+import Planning.Plans.Compound.{If, Or, Trigger}
+import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpRatio, UpgradeContinuously}
 import Planning.Plans.Scouting.Scout
+import Planning.Predicates.Compound.{And, Check}
+import Planning.Predicates.Milestones.{EnemiesAtMost, EnemyHasShown, FrameAtMost, UpgradeComplete}
+import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
 object ZergIdeas {
@@ -21,6 +21,9 @@ object ZergIdeas {
       Protoss.Stargate,
       Protoss.CyberneticsCore,
       Protoss.Dragoon,
+      Protoss.Stargate,
+      Protoss.Corsair,
+      Protoss.Scout,
       Zerg.HydraliskDen,
       Zerg.Spire,
       Zerg.Mutalisk,
@@ -83,16 +86,16 @@ object ZergIdeas {
       Enemy(UnitMatchAnd(UnitMatchProxied, Zerg.CreepColony), 2.0),
       Enemy(UnitMatchAnd(UnitMatchProxied, Zerg.SunkenColony), 4.0)))
   
-  class TrainJustEnoughScourge extends Trigger(
-    new EnemiesAtLeast(1, UnitMatchOr(
-      Terran.Wraith,
-      Terran.Valkyrie,
-      Terran.Starport,
-      Protoss.Corsair,
-      Protoss.Stargate,
-      Zerg.Mutalisk,
-      Zerg.Scourge,
-      Zerg.Spire)),
+  class PumpJustEnoughScourge extends Trigger(
+    new Or(
+      new EnemyHasShown(Terran.Wraith),
+      new EnemyHasShown(Terran.Valkyrie),
+      new EnemyHasShown(Terran.Starport),
+      new EnemyHasShown(Protoss.Corsair),
+      new EnemyHasShown(Protoss.Stargate),
+      new EnemyHasShown(Zerg.Mutalisk),
+      new EnemyHasShown(Zerg.Scourge),
+      new EnemyHasShown(Zerg.Spire)),
     new PumpRatio(Zerg.Scourge, 2, 12, Seq(
       Enemy(Terran.Wraith, 2.0),
       Enemy(Terran.Valkyrie, 2.0),
@@ -102,7 +105,17 @@ object ZergIdeas {
       Enemy(Protoss.Carrier, 6.0),
       Enemy(Zerg.Mutalisk, 2.0),
       Enemy(Zerg.Scourge, 1.0))))
-  
+
+  class UpgradeHydraSpeedThenRange extends If(
+    new UpgradeComplete(Zerg.HydraliskSpeed),
+    new UpgradeContinuously(Zerg.HydraliskRange),
+    new UpgradeContinuously(Zerg.HydraliskSpeed))
+
+  class UpgradeHydraRangeThenSpeed extends If(
+    new UpgradeComplete(Zerg.HydraliskSpeed),
+    new UpgradeContinuously(Zerg.HydraliskSpeed),
+    new UpgradeContinuously(Zerg.HydraliskRange))
+
   class PumpMutalisks(maximumConcurrently: Int = 100) extends If(
     new Check(() => With.self.gas > Math.min(100, With.self.minerals)),
     new Pump(Zerg.Mutalisk, maximumConcurrently = maximumConcurrently))

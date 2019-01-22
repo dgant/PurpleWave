@@ -13,17 +13,17 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMinin
 import Planning.Plans.Scouting.CampExpansions
 import Planning.Predicates.Compound.{And, Check}
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
-import Planning.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast, UpgradeComplete, UpgradeStarted}
+import Planning.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast, UpgradeStarted}
 import Planning.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Predicates.Strategy.{Employing, StartPositionsAtMost}
 import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchMobileFlying, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Zerg.ZvPHydraRush
+import Strategery.Strategies.Zerg.ZvPOverpool
 
-class ZvPHydraRush extends GameplanTemplate {
-  
-  override val activationCriteria: Predicate = new Employing(ZvPHydraRush)
+class ZvPOverpool extends GameplanTemplate {
+
+  override val activationCriteria: Predicate = new Employing(ZvPOverpool)
   override def scoutPlan: Plan = new ScoutSafelyWithOverlord
   
   override def priorityAttackPlan: Plan = new If(
@@ -66,6 +66,8 @@ class ZvPHydraRush extends GameplanTemplate {
   
   override def buildPlans: Seq[Plan] = Seq(new Trigger(new OverpoolSpendLarva, new Parallel(
     new EjectScout,
+
+    // Cap gas
     new If(
       new And(
         new UnitsAtLeast(24, Zerg.Drone),
@@ -83,14 +85,12 @@ class ZvPHydraRush extends GameplanTemplate {
               new UpgradeStarted(Zerg.ZerglingSpeed),
               new CapGasAt(50),
               new CapGasAt(100)))))),
+
     new OverpoolBuildLarvaOrDrones,
-    new TrainJustEnoughScourge,
+    new PumpJustEnoughScourge,
     new Trigger(new UnitsAtLeast(6, Zerg.Mutalisk), new UpgradeContinuously(Zerg.AirArmor)),
     new PumpMutalisks,
-    new UpgradeContinuously(Zerg.HydraliskSpeed),
-    new If(
-      new UpgradeComplete(Zerg.HydraliskSpeed),
-      new UpgradeContinuously(Zerg.HydraliskRange)),
+    new UpgradeHydraSpeedThenRange,
     new If(
       new UnitsAtLeast(1, Zerg.HydraliskDen, complete = true),
       new PumpJustEnoughHydralisks,
@@ -127,7 +127,6 @@ class ZvPHydraRush extends GameplanTemplate {
       // Vs. one base
       new Parallel(
         new BuildGasPumps(1),
-        new Pump(Zerg.Drone, 9),
         new Pump(Zerg.Drone, 13),
         new RequireMiningBases(3),
         new Pump(Zerg.Drone, 19),

@@ -22,7 +22,7 @@ import Planning.Predicates.Reactive.SafeAtHome
 import Planning.UnitCounters.UnitCountEverything
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 
-class ZergSparkle extends GameplanTemplate {
+class ZvESparkle extends GameplanTemplate {
   
   class KillNeutralBlocker extends Plan() {
     val killers = new LockUnits

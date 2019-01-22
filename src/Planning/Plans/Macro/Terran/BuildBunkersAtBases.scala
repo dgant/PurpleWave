@@ -49,6 +49,6 @@ class BuildBunkersAtBases(
     // Defensive programming measure. If we try re-proposing fulfilled blueprints we may just build cannons forever.
     val newBlueprints = blueprintsByZone(zone).filterNot(With.groundskeeper.proposalsFulfilled.contains).take(bunkersToAdd)
     newBlueprints.foreach(With.groundskeeper.propose)
-    newBlueprints.size
+    bunkersToAdd
   }
 }

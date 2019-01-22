@@ -10,6 +10,7 @@ import Planning.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.UnitCountOne
 import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchCustom, UnitMatchSpecific}
 import Planning.UnitPreferences.UnitPreferCloseAndNotMining
+import ProxyBwapi.Races.Neutral
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -39,6 +40,8 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   var waitForBuilderToRecallUntil: Option[Int] = None
   
   override def onUpdate() {
+
+    building = building.filter(b => b.alive && ! b.is(Neutral.Geyser))
     
     if (building.exists(b => ! b.unitClass.isTerran)) {
       builderLock.release()

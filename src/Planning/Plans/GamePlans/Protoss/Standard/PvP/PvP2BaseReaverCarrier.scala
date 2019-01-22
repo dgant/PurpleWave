@@ -15,13 +15,11 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.{PvPLateGame2BaseReaverCarrier_SpecificMaps, PvPLateGame2BaseReaverCarrier_SpecificOpponents}
+import Strategery.Strategies.Protoss.PvPBlueStormReaverCarrier
 
 class PvP2BaseReaverCarrier extends GameplanTemplate {
 
-  override val activationCriteria = new Or(
-    new Employing(PvPLateGame2BaseReaverCarrier_SpecificOpponents),
-    new Employing(PvPLateGame2BaseReaverCarrier_SpecificMaps))
+  override val activationCriteria = new Employing(PvPBlueStormReaverCarrier)
 
   override val removeMineralBlocksAt = 80
   override val emergencyPlans: Vector[Plan] = Vector(

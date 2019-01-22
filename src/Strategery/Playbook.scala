@@ -46,6 +46,7 @@ object StrategyGroups {
   val disabled = Vector[Strategy](
     WorkerRush,
     TvEWorkerRushLiftoff,
+    TvETurtleMech,
     TvR1Rax,
     TvRTinfoil,
     TvZProxy8Fact,
@@ -56,12 +57,12 @@ object StrategyGroups {
     PvZProxy2Gate,
     PvP2Gate1012,
     PvP2GateRobo,
-    PvPLateGame2BaseReaverCarrier_SpecificOpponents,
-    PvPLateGame2BaseReaverCarrier_SpecificMaps,
+    PvPBlueStormReaverCarrier,
     PvZLateGameCarrier, // Needs island tech
     MassPhotonCannon,
     CarriersWithNoDefense,
-    FivePoolProxySunkens,
+    ZvZ5PoolSunkenRush,
+    ZvPOverpool,
     PvP1GateReaverExpand,
     PvPLateGameCarrier,
     PvT1GateRobo
@@ -75,7 +76,7 @@ class PurpleWavePlaybook extends EmptyPlaybook {
 
 class TestingPlaybook extends PurpleWavePlaybook {
   //override lazy val forced: Seq[Strategy] = Seq(PvZFFEEconomic, PvZMidgameCorsairReaverZealot, PvZMidgameCorsairReaverGoon, PvZMidgame5GateGoonReaver)
-  override lazy val forced: Seq[Strategy] = Seq(TvZ1RaxFE, TvZRaxCCAcademy, TvZ2RaxTech, TvZSK)
+  override lazy val forced: Seq[Strategy] = Seq(ZvP3HatchAggro)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
 }
 

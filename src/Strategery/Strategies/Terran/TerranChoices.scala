@@ -35,8 +35,6 @@ object TerranChoices {
     TvT1FacPort,
     TvT2FacTanks,
     TvT2Port
-    //TvTStandard
-    //TvTPNukeDrop
   )
   
   /////////

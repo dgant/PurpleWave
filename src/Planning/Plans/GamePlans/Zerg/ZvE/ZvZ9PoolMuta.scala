@@ -19,11 +19,11 @@ import Planning.Predicates.Strategy.{Employing, EnemyIsZerg}
 import Planning.UnitMatchers.UnitMatchOr
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
-import Strategery.Strategies.Zerg.NinePoolMuta
+import Strategery.Strategies.Zerg.ZvZ9PoolMuta
 
-class NinePoolMuta extends GameplanTemplate {
+class ZvZ9PoolMuta extends GameplanTemplate {
   
-  override val activationCriteria: Predicate = new Employing(NinePoolMuta)
+  override val activationCriteria: Predicate = new Employing(ZvZ9PoolMuta)
   
   override def buildOrder: Seq[BuildRequest] = Vector(
     Get(9, Zerg.Drone),

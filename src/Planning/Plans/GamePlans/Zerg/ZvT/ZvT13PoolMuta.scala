@@ -35,7 +35,7 @@ class ZvT13PoolMuta extends GameplanTemplate {
   override def emergencyPlans: Seq[Plan] = Seq(
     new ZvTIdeas.ReactToBarracksCheese
   )
-  
+
   override def attackPlan: Plan = new Attack(Zerg.Mutalisk)
   
   override def buildOrderPlan: Plan = new Parallel (

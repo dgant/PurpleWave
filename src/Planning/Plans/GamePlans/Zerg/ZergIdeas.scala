@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Macro.BuildRequests.{Get, GetAnother}
+import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpRatio, UpgradeContinuously}
@@ -129,18 +129,13 @@ object ZergIdeas {
     new UpgradeContinuously(Zerg.UltraliskSpeed))
 
   class MorphLurkers(count: Int = 100) extends Plan {
-    override def onUpdate(): Unit = {
-      With.scheduler.request(this, GetAnother(With.units.countOurs(Zerg.Hydralisk), Zerg.Lurker))
+    override protected def onUpdate(): Unit = {
+      With.scheduler.request(this, Get(
+        With.units.countOurs(Zerg.Lurker)
+        + With.units.countOurs(Zerg.Hydralisk),
+        Zerg.Lurker))
     }
   }
-  class PumpLurkers(count: Int = 100) extends Parallel(
-    new MorphLurkers(count),
-    new Plan {
-      override def onUpdate(): Unit = {
-        With.scheduler.request(this, Get(count - With.units.countOurs(Zerg.Lurker), Zerg.Hydralisk))
-      }
-    }
-  )
 
   class PumpMutalisks(maximumConcurrently: Int = 100) extends If(
     new Check(() => With.self.gas > Math.min(100, With.self.minerals)),

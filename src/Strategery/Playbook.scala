@@ -79,4 +79,4 @@ class TestingPlaybook extends PurpleWavePlaybook {
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
 }
 
-object Playbook extends TestingPlaybook {}
+object Playbook extends PurpleWavePlaybook {}

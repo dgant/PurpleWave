@@ -7,7 +7,7 @@ import Planning.Plans.Army.{Aggression, Attack, EjectScout, Hunt}
 import Planning.Plans.Basic.Do
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.{MorphLurkers, PumpLurkers, UpgradeHydraRangeThenSpeed}
+import Planning.Plans.GamePlans.Zerg.ZergIdeas.{MorphLurkers, UpgradeHydraRangeThenSpeed}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.CancelAll
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -166,7 +166,7 @@ class ZvT2HatchLurker extends GameplanTemplate {
       Get(5, Zerg.Hydralisk)),
     new If(
       new GasAtLeast(150),
-      new PumpLurkers),
+      new Pump(Zerg.Hydralisk, maximumConcurrently = 2)),
     new Pump(Zerg.Zergling, 18),
     new RequireMiningBases(3),
     new Pump(Zerg.Zergling, 24),

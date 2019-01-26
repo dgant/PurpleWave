@@ -16,9 +16,12 @@ class Simulation(
   
   private def buildSimulacra(team: Team) = if (With.blackboard.mcrs()) Vector.empty else team.units.filter(legalForSimulation).map(new Simulacrum(this, _))
   private def legalForSimulation(unit: UnitInfo): Boolean = (
-    ! unit.invincible             // No stasised units
+    unit.complete
+    && ! unit.invincible          // No stasised units
     && ! unit.is(Protoss.Carrier) // Simulate the Interceptors only -- produces more reliable results
     && ! unit.is(Protoss.Scarab)
+    && ! (unit.unitClass.isWorker && unit.gathering && unit.isOurs)
+    && ! (unit.unitClass.isBuilding && ! unit.canAttack && ! unit.unitClass.isSpellcaster)
   )
   
   val estimation            : Prediction          = new Prediction

@@ -2,11 +2,11 @@ package Planning.Plans.Macro.Build
 
 import Lifecycle.With
 import Micro.Agency.Intention
+import Planning.Plan
 import Planning.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.UnitCountOne
 import Planning.UnitMatchers.{UnitMatchMorphingInto, UnitMatchOr}
-import Planning.UnitPreferences.{UnitPreferBaseWithFewerWorkers, UnitPreferHatcheryWithMoreLarva}
-import Planning.Plan
+import Planning.UnitPreferences.{UnitPreferAll, UnitPreferBaseWithFewerWorkers, UnitPreferBaseWithMoreWorkers, UnitPreferHatcheryWithThreeLarva}
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -52,9 +52,15 @@ class MorphUnit(val classToMorph: UnitClass) extends Plan {
   
   protected def setPreference() {
     if (classToMorph.isWorker) {
-      morpherLock.unitPreference.set(UnitPreferBaseWithFewerWorkers)
+      morpherLock.unitPreference.set(UnitPreferAll(
+        UnitPreferHatcheryWithThreeLarva,
+        UnitPreferBaseWithFewerWorkers
+      ))
     } else if (morpherClass == Zerg.Larva) {
-      morpherLock.unitPreference.set(UnitPreferHatcheryWithMoreLarva)
+      morpherLock.unitPreference.set(UnitPreferAll(
+        UnitPreferHatcheryWithThreeLarva,
+        UnitPreferBaseWithMoreWorkers
+      ))
     } else {
       // AIST1 hack fix: Disabling this so we stop morphing all our Hatcheries into Lairs
       //morpherLock.unitPreference.set(UnitPreferClose(With.geography.home.pixelCenter))

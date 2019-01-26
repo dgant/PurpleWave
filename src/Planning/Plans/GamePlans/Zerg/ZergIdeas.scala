@@ -2,7 +2,9 @@ package Planning.Plans.GamePlans.Zerg
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Planning.Plans.Compound.{If, Or, Trigger}
+import Macro.BuildRequests.Get
+import Planning.Plan
+import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpRatio, UpgradeContinuously}
 import Planning.Plans.Scouting.Scout
 import Planning.Predicates.Compound.{And, Check}
@@ -98,7 +100,7 @@ object ZergIdeas {
       new EnemyHasShown(Zerg.Spire)),
     new PumpRatio(Zerg.Scourge, 2, 12, Seq(
       Enemy(Terran.Wraith, 2.0),
-      Enemy(Terran.Valkyrie, 2.0),
+      Enemy(Terran.Valkyrie, 3.0),
       Enemy(Terran.Battlecruiser, 6.0),
       Enemy(Protoss.Corsair, 2.0),
       Enemy(Protoss.Scout, 3.0),
@@ -112,9 +114,28 @@ object ZergIdeas {
     new UpgradeContinuously(Zerg.HydraliskSpeed))
 
   class UpgradeHydraRangeThenSpeed extends If(
-    new UpgradeComplete(Zerg.HydraliskSpeed),
+    new UpgradeComplete(Zerg.HydraliskRange),
     new UpgradeContinuously(Zerg.HydraliskSpeed),
     new UpgradeContinuously(Zerg.HydraliskRange))
+
+  class UpgradeUltraArmorThenSpeed extends If(
+    new UpgradeComplete(Zerg.UltraliskArmor),
+    new UpgradeContinuously(Zerg.UltraliskSpeed),
+    new UpgradeContinuously(Zerg.UltraliskArmor))
+
+  class UpgradeUltraSpeedThenArmor extends If(
+    new UpgradeComplete(Zerg.UltraliskSpeed),
+    new UpgradeContinuously(Zerg.UltraliskArmor),
+    new UpgradeContinuously(Zerg.UltraliskSpeed))
+
+  class PumpLurkers(count: Int = 100) extends Parallel(
+    new Pump(Zerg.Lurker, count),
+    new Plan {
+      override def onUpdate(): Unit = {
+        With.scheduler.request(this, Get(count - With.units.countOurs(Zerg.Lurker), Zerg.Hydralisk))
+      }
+    }
+  )
 
   class PumpMutalisks(maximumConcurrently: Int = 100) extends If(
     new Check(() => With.self.gas > Math.min(100, With.self.minerals)),

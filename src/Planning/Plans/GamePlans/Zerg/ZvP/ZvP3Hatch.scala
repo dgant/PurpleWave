@@ -11,33 +11,30 @@ import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Zerg.BuildSunkensAtNatural
-import Planning.Plans.Scouting.{CampExpansions, Scout}
+import Planning.Plans.Scouting.Scout
 import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy._
-import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete, UnitMatchWarriors}
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Zerg.ZvP3HatchAggro
+import Strategery.Strategies.Zerg.ZvP3Hatch
 import Strategery.Transistor
 
-class ZvP3HatchAggro extends GameplanTemplate {
+class ZvP3Hatch extends GameplanTemplate {
 
-  override val activationCriteria: Predicate = new Employing(ZvP3HatchAggro)
+  override val activationCriteria: Predicate = new Employing(ZvP3Hatch)
+
   override def scoutPlan: Plan = new Parallel(
+    new ScoutSafelyWithOverlord,
     new Trigger(
       new And(
         new UnitsAtLeast(9, Zerg.Drone, countEggs = true),
         new StartPositionsAtLeast(3),
         new MineralsForUnit(Zerg.Overlord, 2)),
-      new Scout),
-    new ScoutSafelyWithOverlord)
-  
-  override def priorityAttackPlan: Plan = new If(
-    new UnitsAtLeast(24, UnitMatchWarriors),
-    new CampExpansions)
-  
+      new Scout))
+
   override def aggressionPlan: Plan = new If(
     new UnitsAtLeast(40, Zerg.Hydralisk),
     new Aggression(4.0),
@@ -205,10 +202,12 @@ class ZvP3HatchAggro extends GameplanTemplate {
     new If(
       new UpgradeComplete(Zerg.HydraliskSpeed),
       new UpgradeContinuously(Zerg.HydraliskRange)),
-    new Pump(Zerg.Drone, 22),
-    new If(new UnitsAtLeast(18, Zerg.Drone), new BuildGasPumps(2)),
+    new PumpRatio(Zerg.Drone, 14, 30, Seq(Friendly(Zerg.HatcheryLairOrHive, 6.0))),
+    new PumpRatio(Zerg.Extractor, 1, 4, Seq(Friendly(Zerg.Drone, 1.0 / 9.0))),
     new Pump(Zerg.Hydralisk),
-    new PumpRatio(Zerg.Hatchery, 3, 6, Seq(Friendly(Zerg.Drone, 1.0/6.0))))
+    new PumpRatio(Zerg.Hatchery, 3, 6, Seq(Friendly(Zerg.Drone, 1.0/6.0))),
+    new If(new UnitsAtLeast(1, Zerg.HydraliskDen, complete = true)),
+    new Pump(Zerg.Drone))
 
   class Go23HatchMuta extends Parallel(
     new CapGasAtRatioToMinerals(1.0, 100),

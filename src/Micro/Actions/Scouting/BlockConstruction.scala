@@ -12,6 +12,7 @@ object BlockConstruction extends Action {
     blockableBuilders(unit).nonEmpty
       && ! unit.flying
       && With.geography.enemyBases.nonEmpty
+      && (unit.hitPoints > 10 || ! unit.base.exists(_.owner.isEnemy))
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {

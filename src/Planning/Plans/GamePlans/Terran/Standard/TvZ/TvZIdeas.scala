@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic.Pump
-import Planning.Plans.Macro.Build.CancelAll
+import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Terran.BuildBunkersAtMain
 import Planning.Predicates.Compound.And
@@ -21,7 +21,7 @@ object TvZIdeas {
         new And(
           new UnitsAtMost(0, Terran.Bunker),
           new UnitsAtMost(1, Terran.Barracks)),
-        new CancelAll(Terran.SupplyDepot, Terran.Refinery)),
+        new CancelIncomplete(Terran.SupplyDepot, Terran.Refinery)),
       new Pump(Terran.SCV, 5),
       new Build(Get(1, Terran.Barracks)),
       new Pump(Terran.Marine, 4),

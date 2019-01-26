@@ -3,6 +3,8 @@ package Micro.Squads.Goals
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
+import Planning.UnitMatchers.UnitMatchWarriors
+import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
@@ -41,7 +43,9 @@ class GoalAttack extends GoalBasic {
       ByOption.min(With.geography.enemyBases.map(_.heart.tileDistanceFast(focusUs)))
         .getOrElse(With.intelligence.mostBaselikeEnemyTile.tileDistanceFast(focusUs))
 
-    if (With.enemies.exists( ! _.isZerg) && threatDistanceToUs < threatDistanceToEnemy) {
+    if (With.enemies.exists( ! _.isZerg)
+      && threatDistanceToUs < threatDistanceToEnemy
+      && With.units.enemy.count(u => u.is(UnitMatchWarriors) && ! u.is(Terran.Vulture)) > 6) {
       target = With.intelligence.threatOrigin.pixelCenter
       return
     }

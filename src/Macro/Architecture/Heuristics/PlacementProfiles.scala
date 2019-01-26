@@ -8,7 +8,9 @@ object PlacementProfiles {
   
   def default(blueprint: Blueprint): PlacementProfile = {
     if (blueprint.requireTownHallTile.get) {
-      if (With.self.isZerg || With.enemies.forall(_.isTerran))
+      if (With.blackboard.preferCloseExpansion.get)
+        townHallNearby
+      else if (With.self.isZerg || With.enemies.forall(_.isTerran))
         townHallFar
       else
         townHallNearby
@@ -59,9 +61,8 @@ object PlacementProfiles {
   }
   
   val gas = new PlacementProfile("Gas",
-    preferZone                  = 1000.0,
-    preferRhythm                = 0.0,
-    avoidDistanceFromBase       = 1.0
+    preferWorkers               = 1.0,
+    preferDistanceFromEnemy     = 1.0
   )
   
   val townHallNearby = new PlacementProfile("Town Hall Nearby",

@@ -66,7 +66,7 @@ object ZoneUpdater {
       .getOrElse(SpecificPoints.tileMiddle)
   }
 
-  private val wallBuildingThresholdDistanceSquared = Math.pow(32 * 6, 2)
+  private val wallBuildingThresholdDistanceSquared = Math.pow(32 * 12, 2)
   def updateZone(zone: Zone) {
     zone.units = zone.unitBuffer.toVector
     zone.distanceGrid.initialize()

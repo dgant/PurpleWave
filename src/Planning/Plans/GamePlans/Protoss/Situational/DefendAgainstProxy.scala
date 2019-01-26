@@ -29,6 +29,9 @@ class DefendAgainstProxy extends Plan {
     
     val proxies = getProxies.sortBy(_.totalHealth).sortBy(_.remainingCompletionFrames)
     val squad = new Squad(this)
+
+    def unitsNearby(proxy: UnitInfo) = With.units.inTileRadius(proxy.tileIncludingCenter, 8)
+    def enemiesNearby(proxy: UnitInfo) = unitsNearby(proxy).filter(_.isEnemy)
     
     if (proxies.isEmpty) return
     
@@ -37,9 +40,12 @@ class DefendAgainstProxy extends Plan {
     val workersRequired = proxies.map(proxy =>
       (
         proxy,
-        if (With.frame < GameTime(2, 45)()
+        if (enemiesNearby(proxy).exists(u => u.unitClass.isBuilding && u.canAttack))
+          // Don't pull new units in to attack cannons
+          unitsNearby(proxy).count(u => u.isOurs && u.canAttack)
+        else if (With.frame < GameTime(3, 15)()
           && proxy.is(Protoss.Pylon)
-          && proxy.matchups.allies.exists(_.is(Protoss.Gateway)))
+          && enemiesNearby(proxy).exists(_.is(Protoss.Gateway)))
           6
         else if (proxy.isBunker() && (proxy.complete || ! proxy.matchups.allies.exists(a => a.unitClass.isWorker && a.pixelDistanceEdge(proxy) < 256)))
           0
@@ -84,10 +90,10 @@ class DefendAgainstProxy extends Plan {
   
   private def isProxied(enemy: UnitInfo): Boolean = {
     val pixel                     = enemy.pixelCenter
-    val thresholdDistance         = 32.0 * 60.0
-    def baseDistance(base: Base)  = base.heart.pixelCenter.pixelDistance(pixel)
-    lazy val closestEnemyBase     = ByOption.minBy(With.geography.enemyBases)(_.heart.pixelCenter.pixelDistance(pixel))
-    lazy val closestOurBase       = ByOption.minBy(With.geography.ourBases)(_.heart.pixelCenter.pixelDistance(pixel))
+    val thresholdDistance         = 32.0 * 50.0
+    def baseDistance(base: Base)  = base.heart.pixelCenter.groundPixels(pixel)
+    lazy val closestEnemyBase     = ByOption.minBy(With.geography.enemyBases)(_.heart.pixelCenter.groundPixels(pixel))
+    lazy val closestOurBase       = ByOption.minBy(With.geography.ourBases)(_.heart.pixelCenter.groundPixels(pixel))
     lazy val enemyBaseDistance    = closestEnemyBase.map(baseDistance).getOrElse(With.geography.startBases.map(baseDistance).max)
     lazy val ourBaseDistance      = closestOurBase.map(baseDistance).getOrElse(Double.PositiveInfinity)
     lazy val withinOurThreshold   = ourBaseDistance < thresholdDistance

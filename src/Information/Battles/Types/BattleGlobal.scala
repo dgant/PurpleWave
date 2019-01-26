@@ -45,7 +45,10 @@ class BattleGlobal(us: Team, enemy: Team) extends Battle(us, enemy) {
       builder.vanguardUs    = Some(battle.us.vanguard)
       builder.vanguardEnemy = Some(battle.enemy.vanguard)
     }
-    def fitsAttackCriteria(unit: UnitInfo, mustBeMobile: Boolean): Boolean = ! mustBeMobile || ! unit.unitClass.isBuilding
+    def fitsAttackCriteria(unit: UnitInfo, mustBeMobile: Boolean): Boolean = (
+      (! mustBeMobile || ! unit.unitClass.isBuilding)
+      && ! unit.unitClass.isWorker
+      && unit.canAttack)
     battle.us     .units.filter(fitsAttackCriteria(_, weAttack))     .foreach(builder.addUnit)
     battle.enemy  .units.filter(fitsAttackCriteria(_, enemyAttacks)) .foreach(builder.addUnit)
     EstimateAvatar.calculate(builder)

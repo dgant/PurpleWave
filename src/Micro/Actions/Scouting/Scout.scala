@@ -17,7 +17,7 @@ object Scout extends Action {
     BlockConstruction.consider(unit)
     Kindle.consider(unit)
     FindBuildings.consider(unit)
-    Poke.consider(unit)
+    //Poke.consider(unit)
     FindBuildingsWhenBored.consider(unit)
     Potshot.consider(unit)
     Move.consider(unit)

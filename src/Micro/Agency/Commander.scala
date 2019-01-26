@@ -310,7 +310,13 @@ class Commander {
   
   def cancel(unit: FriendlyUnitInfo) {
     if (unready(unit)) return
-    unit.baseUnit.cancelConstruction()
+    if (unit.teching) {
+      unit.baseUnit.cancelResearch()
+    } else if (unit.upgrading) {
+      unit.baseUnit.cancelUpgrade()
+    } else {
+      unit.baseUnit.cancelConstruction()
+    }
     sleep(unit)
   }
   

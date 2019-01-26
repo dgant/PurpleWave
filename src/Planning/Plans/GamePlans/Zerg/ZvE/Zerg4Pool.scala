@@ -4,7 +4,7 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Army.{Aggression, AllIn, Attack}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -14,7 +14,7 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.{FoundEnemyBase, Scout}
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
-import Planning.Predicates.Milestones.{EnemiesAtMost, UnitsAtLeast}
+import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemiesAtMost, UnitsAtLeast}
 import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy, StartPositionsAtLeast}
 import Planning.UnitMatchers.UnitMatchOr
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -59,6 +59,8 @@ class Zerg4Pool extends GameplanTemplate {
   
   override def buildPlans: Seq[Plan] = Vector(
     new CapGasAt(0, 0, 0.0),
+
+    new AllIn(new EnemiesAtLeast(1, Protoss.PhotonCannon)),
   
     new Pump(Zerg.Drone, 3),
     

@@ -34,7 +34,6 @@ class Intelligence {
       scoutTiles.append(With.geography.home)
     }
     With.geography.bases
-      .toVector
       .filter( ! _.zone.island || flyingScout || With.geography.ourBases.forall(_.zone.island))
       .map(base => (base, {
         val heartMain = base.heart.pixelCenter

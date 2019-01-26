@@ -76,24 +76,24 @@ class ProxyHatch extends Parallel {
         new If(
           new Employing(ZvTProxyHatchHydras),
           new Build(
-            Get(2,  Zerg.Hatchery),
-            Get(1,  Zerg.SpawningPool),
-            Get(2,  Zerg.Overlord),
-            Get(1,  Zerg.Extractor),
+            Get(2, Zerg.Hatchery),
+            Get(Zerg.SpawningPool),
+            Get(2, Zerg.Overlord),
+            Get(Zerg.Extractor),
             Get(12, Zerg.Drone))),
         new If(
           new Employing(ZvTProxyHatchZerglings),
           new Build(
-            Get(2,  Zerg.Hatchery),
-            Get(1,  Zerg.SpawningPool),
+            Get(2, Zerg.Hatchery),
+            Get(Zerg.SpawningPool),
             Get(2,  Zerg.Overlord))),
         new If(
           new Employing(ZvTProxyHatchSunkens),
           new Build(
-            Get(2,  Zerg.Overlord),
-            Get(2,  Zerg.Hatchery),
+            Get(2, Zerg.Overlord),
+            Get(2, Zerg.Hatchery),
             Get(12, Zerg.Drone),
-            Get(1,  Zerg.SpawningPool),
+            Get(Zerg.SpawningPool),
             Get(14, Zerg.Drone))))),
   
     new If(
@@ -109,7 +109,7 @@ class ProxyHatch extends Parallel {
       new Employing(ZvTProxyHatchHydras),
       new Parallel(
         new CapGasAt(50, 175, 2.0 / 12.0),
-        new Build(Get(1, Zerg.HydraliskDen)),
+        new Build(Get(Zerg.HydraliskDen)),
         new RequireSufficientSupply,
         new If(
           new UnitsAtLeast(1, Zerg.HydraliskDen, complete = false),
@@ -136,9 +136,9 @@ class ProxyHatch extends Parallel {
               new BuildGasPumps,
               new Pump(Zerg.Zergling),
               new Build(
-                Get(1, Zerg.Lair),
+                Get(Zerg.Lair),
                 Get(Zerg.ZerglingSpeed),
-                Get(1, Zerg.Spire)),
+                Get(Zerg.Spire)),
               new If(
                 new UnitsAtMost(6, Zerg.SunkenColony),
                 new Pump(Zerg.CreepColony, 1)),

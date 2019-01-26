@@ -26,7 +26,8 @@ class TargetAction(val additionalFiltersRequired: TargetFilter*) extends Action 
       TargetFilterFutility,
       TargetFilterScourge,
       TargetFilterReaver,
-      TargetFilterAlmostAnything) ++ additionalFiltersRequired
+      TargetFilterAlmostAnything,
+      TargetFilterCrowded) ++ additionalFiltersRequired
     
     val targetsRequired = new mutable.ListBuffer[UnitInfo]
     for (target <- unit.matchups.targets) {

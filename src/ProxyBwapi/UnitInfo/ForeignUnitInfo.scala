@@ -6,7 +6,9 @@ import Performance.Cache
 import ProxyBwapi.Players.Players
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
+import ProxyBwapi.Upgrades.Upgrade
 import bwapi.Position
 
 class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(originalBaseUnit, id) {
@@ -198,6 +200,9 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
   def orderTargetPixel  : Option[Pixel]       = if (badPositions.contains(_orderTargetPosition)) None else Some(new Pixel(_orderTargetPosition))
   def gatheringMinerals : Boolean             = _gatheringMinerals
   def gatheringGas      : Boolean             = _gatheringGas
+  def techProducing     : Option[Tech]        = None
+  def upgradeProducing  : Option[Upgrade]     = None
+  def unitProducing     : Option[UnitClass]   = None
   
   private var _attacking        : Boolean = _
   private var _constructing     : Boolean = _

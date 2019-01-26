@@ -2,7 +2,6 @@ package Planning.UnitMatchers
 
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.ByOption
 
 abstract class UnitMatchAnyProxy extends UnitMatcher {
   
@@ -13,8 +12,8 @@ abstract class UnitMatchAnyProxy extends UnitMatcher {
     
     val basesEnemy        = With.geography.enemyBases.map(_.heart.pixelCenter)
     val basesFriendly     = With.geography.ourBases.map(_.heart.pixelCenter)
-    val distanceEnemy     = ByOption.min(basesEnemy     .map(unit.pixelDistanceCenter)).getOrElse(unit.pixelDistanceCenter(With.intelligence.mostBaselikeEnemyTile.pixelCenter))
-    val distanceFriendly  = ByOption.min(basesFriendly  .map(unit.pixelDistanceCenter)).getOrElse(unit.pixelDistanceCenter(With.geography.home.pixelCenter))
+    val distanceEnemy     = unit.pixelDistanceTravelling(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
+    val distanceFriendly  = unit.pixelDistanceTravelling(With.geography.home.pixelCenter)
     
     distanceFriendly < distanceEnemy * 1.25
   }

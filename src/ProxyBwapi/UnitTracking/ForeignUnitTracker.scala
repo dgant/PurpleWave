@@ -92,7 +92,7 @@ class ForeignUnitTracker {
     if ( ! unit.possiblyStillThere)                                return
     if (unit.lastSeen > With.grids.friendlyVision.frameUpdated)    return
     if (unit.lastSeen > With.grids.friendlyDetection.frameUpdated) return
-    if (With.framesSince(unit.lastSeen) < 24 * 2)                  return
+    if (With.framesSince(unit.lastSeen) < 24 * 1)                  return
     
     lazy val shouldBeVisible  = With.grids.friendlyVision.isSet(unit.tileIncludingCenter)
     lazy val shouldBeDetected = With.grids.friendlyDetection.isSet(unit.tileIncludingCenter)

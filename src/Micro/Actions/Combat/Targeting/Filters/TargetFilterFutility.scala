@@ -17,6 +17,7 @@ object TargetFilterFutility extends TargetFilter {
       || actor.is(Zerg.Scourge)
       || actor.framesToGetInRange(target) < 8
       || (target.unitClass.isWorker && target.base.exists(_.harvestingArea.contains(target.tileIncludingCenter)))
+      || (actor.is(Zerg.Zergling) && With.self.hasUpgrade(Zerg.ZerglingSpeed) && ! target.player.hasUpgrade(Terran.VultureSpeed))
       || (actor.is(Protoss.Zealot) && target.is(Protoss.Dragoon) && ! target.player.hasUpgrade(Protoss.DragoonRange))
       || (actor.is(Protoss.DarkTemplar) && target.is(Protoss.Dragoon)))
     output

@@ -6,7 +6,7 @@ import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.{PumpWorkers, _}
-import Planning.Plans.Macro.Build.CancelAll
+import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
@@ -60,10 +60,10 @@ object PvTIdeas {
     new Parallel(
       new If(
         new UnitsAtMost(5, UnitMatchWarriors),
-        new CancelAll(Protoss.Nexus)),
+        new CancelIncomplete(Protoss.Nexus)),
       new If(
         new UnitsAtMost(1, Protoss.Gateway),
-        new CancelAll(UnitMatchOr(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Nexus, Protoss.Stargate))),
+        new CancelIncomplete(UnitMatchOr(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Nexus, Protoss.Stargate))),
       new RequireSufficientSupply,
       new Pump(Protoss.DarkTemplar, 3),
       new If(

@@ -23,8 +23,8 @@ abstract class GameplanTemplate extends GameplanMode {
   val meldArchonsAt         : Int               = 40
   val aggression            : Double            = 1.0
   val removeMineralBlocksAt : Int               = 40
-  def superSaturate         : Boolean           = false
   def blueprints            : Seq[Blueprint]    = Seq.empty
+  val superSaturate         : Boolean           = false
   def buildOrder            : Seq[BuildRequest] = Vector.empty
   def emergencyPlans        : Seq[Plan]         = Vector.empty
   def buildPlans            : Seq[Plan]         = Vector.empty

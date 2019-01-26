@@ -45,13 +45,8 @@ object Avoid extends ActionTechnique {
       avoidRealPath(unit)
     }
     avoidGreedyPath(unit)
-    if (unit.zone == unit.agent.destination.zone || unit.agent.canScout) {
-      avoidGreedyPath(unit, distanceValue = 0)
-      avoidGreedyPath(unit, safetyValue = 0)
-    } else {
-      avoidGreedyPath(unit, safetyValue = 0)
-      avoidGreedyPath(unit, distanceValue = 0)
-    }
+    avoidGreedyPath(unit, distanceValue = 0, safetyValue = 2)
+    avoidGreedyPath(unit, distanceValue = 2, safetyValue = 0)
     avoidPotential(unit)
   }
 

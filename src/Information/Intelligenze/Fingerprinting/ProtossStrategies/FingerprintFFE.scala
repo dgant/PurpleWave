@@ -72,7 +72,7 @@ abstract class FingerprintFFE extends FingerprintAnd(
   
   val isFFE: Boolean
   
-  override val sticky = false
+  override def sticky = With.frame > GameTime(4, 45)()
 }
 
 class FingerprintForgeFE extends FingerprintFFE {

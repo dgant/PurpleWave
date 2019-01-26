@@ -4,7 +4,9 @@ import Mathematics.Points.{Pixel, Tile}
 import Performance.Cache
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
+import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 import bwapi._
 
 import scala.collection.JavaConverters._
@@ -164,6 +166,9 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   
   def buildType: UnitClass = buildTypeCache()
   def trainingQueue: Iterable[UnitClass] = trainingQueueCache()
+  def techProducing: Option[Tech] = techProducingCache()
+  def upgradeProducing: Option[Upgrade] = upgradeProducingCache()
+  def unitProducing: Option[UnitClass] = trainingQueue.headOption
   
   private val buildTypeCache = new Cache(() => UnitClasses.get(base.getBuildType))
   private val trainingQueueCache = new Cache(() =>
@@ -171,6 +176,16 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
       base.getTrainingQueue.asScala.map(UnitClasses.get)
     else
       Iterable.empty // Performance optimization
+  )
+  private val techProducingCache = new Cache[Option[Tech]](() =>
+    if (unitClass.techsWhat.nonEmpty && teching)
+      Some(Techs.get(baseUnit.getTech)).filter(x => x != Techs.None && x != Techs.Unknown)
+    else None
+  )
+  private val upgradeProducingCache = new Cache[Option[Upgrade]](() =>
+    if (unitClass.upgradesWhat.nonEmpty && upgrading)
+      Some(Upgrades.get(baseUnit.getUpgrade)).filter(x => x != Upgrades.None && x != Upgrades.Unknown)
+    else None
   )
   
   ////////////////

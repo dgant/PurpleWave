@@ -19,11 +19,11 @@ import Planning.Predicates.Strategy.Employing
 import Planning.UnitCounters.UnitCountEverything
 import Planning.{Plan, Predicate, ProxyPlanner}
 import ProxyBwapi.Races.Zerg
-import Strategery.Strategies.Zerg.ZvZ5PoolSunkenRush
+import Strategery.Strategies.Zerg.ZvZ5PoolSunkens
 
-class Zerg5PoolProxySunkens extends GameplanTemplate {
+class ZvZ5PoolSunkens extends GameplanTemplate {
   
-  override val activationCriteria: Predicate = new Employing(ZvZ5PoolSunkenRush)
+  override val activationCriteria: Predicate = new Employing(ZvZ5PoolSunkens)
   
   override def overlordPlan: Plan = NoPlan()
   override def supplyPlan: Plan = NoPlan()

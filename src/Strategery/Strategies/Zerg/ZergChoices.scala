@@ -5,18 +5,23 @@ import Strategery.Strategies._
 object ZergChoices {
   
   val all: Iterable[Strategy] = Vector(
-    ZvZ5PoolSunkenRush,
+    ZvESparkle,
+    ZvE4Pool,
+
     ZvTProxyHatchZerglings,
     ZvTProxyHatchHydras,
     ZvTProxyHatchSunkens,
-    ZvZ10HatchLing,
-    ZvZ9PoolMuta,
     ZvT1HatchLurker,
-    ZvPOverpool,
-    ZvP3HatchAggro,
+    ZvT2HatchLingBustMuta,
+    ZvT3HatchLing,
+    ZvT2HatchLurker,
+    ZvP3Hatch,
+    ZvP6Hatch,
     ZvT13PoolMuta,
     ZvP2HatchMuta,
-    ZvE4Pool,
-    ZvESparkle
+    ZvZ5PoolSunkens,
+    ZvZ9PoolSpeed,
+    ZvZ9Gas9Pool,
+    ZvZ10HatchLing
   )
 }

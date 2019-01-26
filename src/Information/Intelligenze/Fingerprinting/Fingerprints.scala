@@ -60,6 +60,7 @@ class Fingerprints {
   lazy val fiveRax          = addFingerprint(new Fingerprint5Rax)
   lazy val bbs              = addFingerprint(new FingerprintBBS)
   lazy val twoRax1113       = addFingerprint(new Fingerprint2Rax1113)
+  lazy val oneFac           = addFingerprint(new Fingerprint1Fac)
   lazy val twoFac           = addFingerprint(new Fingerprint2Fac)
   lazy val twoFacVultures   = addFingerprint(new Fingerprint2FacVultures)
   lazy val threeFac         = addFingerprint(new Fingerprint3Fac)

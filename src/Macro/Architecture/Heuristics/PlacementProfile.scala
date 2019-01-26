@@ -1,6 +1,7 @@
 package Macro.Architecture.Heuristics
 
 import Debugging.Visualizations.Colors
+import bwapi.Color
 
 
 class PlacementProfile(
@@ -14,6 +15,7 @@ class PlacementProfile(
   var preferDistanceFromEnemy     : Double = 0.0,
   var preferCoveringWorkers       : Double = 0.0,
   var preferSurfaceArea           : Double = 0.0,
+  var preferWorkers               : Double = 0.0,
   var avoidDistanceFromBase       : Double = 0.0,
   var avoidDistanceFromEntrance   : Double = 0.0,
   var avoidDistanceFromEnemy      : Double = 0.0,
@@ -32,6 +34,7 @@ class PlacementProfile(
       preferDistanceFromEnemy     = other.preferDistanceFromEnemy,
       preferCoveringWorkers       = other.preferCoveringWorkers,
       preferSurfaceArea           = other.preferSurfaceArea,
+      preferWorkers               = other.preferWorkers,
       avoidDistanceFromBase       = other.avoidDistanceFromBase,
       avoidDistanceFromEntrance   = other.avoidDistanceFromEntrance,
       avoidDistanceFromEnemy      = other.avoidDistanceFromEnemy,
@@ -50,6 +53,7 @@ class PlacementProfile(
       new PlacementHeuristicWeight(PlacementHeuristicPowering,                preferPowering,               Colors.NeonGreen),
       new PlacementHeuristicWeight(PlacementHeuristicDistanceFromEnemy,       preferDistanceFromEnemy,      Colors.NeonTeal),
       new PlacementHeuristicWeight(PlacementHeuristicSurfaceArea,             preferSurfaceArea,            Colors.NeonViolet),
+      new PlacementHeuristicWeight(PlacementHeuristicWorkers,                 preferWorkers,                Color.Black),
       new PlacementHeuristicWeight(PlacementHeuristicDistanceFromBase,        -avoidDistanceFromBase,       Colors.DarkViolet),
       new PlacementHeuristicWeight(PlacementHeuristicDistanceFromEntrance,    -avoidDistanceFromEntrance,   Colors.NeonViolet),
       new PlacementHeuristicWeight(PlacementHeuristicDistanceFromEnemy,       -avoidDistanceFromEnemy,      Colors.NeonBlue),

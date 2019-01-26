@@ -5,7 +5,7 @@ import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Techniques.Common.Activators.WeightedMin
 import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, PotshotAsSoonAsPossible}
 import Micro.Actions.Commands.Attack
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Abuse extends ActionTechnique {
@@ -21,7 +21,7 @@ object Abuse extends ActionTechnique {
     && unit.canAttack
     && unit.matchups.targets.nonEmpty
     && unit.matchups.threats.nonEmpty
-    && ! unit.is(Protoss.Corsair)
+    && ! unit.isAny(Protoss.Corsair, Zerg.Lurker)
   )
   
   override val activator = new WeightedMin(this)

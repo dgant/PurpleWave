@@ -15,7 +15,9 @@ import Performance.Cache
 import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatcher}
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
+import ProxyBwapi.Upgrades.Upgrade
 import bwapi._
 
 abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUnit, id) {
@@ -489,7 +491,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   }
   
   def canStim: Boolean = unitClass.canStim && player.hasTech(Terran.Stim) && hitPoints > 10
-  
+
   def moving: Boolean = velocityX != 0 || velocityY != 0
   
   def speedApproaching(other: UnitInfo): Double = speedApproaching(other.pixelCenter)
@@ -526,6 +528,10 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     //Are we close to being able to hit the victim?
     framesToGetInRange(victim) < With.configuration.violenceThresholdFrames
   }
+
+  def techProducing: Option[Tech]
+  def upgradeProducing: Option[Upgrade]
+  def unitProducing: Option[UnitClass]
   
   ////////////////
   // Visibility //

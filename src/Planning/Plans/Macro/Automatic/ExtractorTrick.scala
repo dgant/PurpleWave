@@ -20,7 +20,7 @@ class ExtractorTrick extends Plan {
   
     lazy val shouldCancelExtractor = (
       // Give time for our supply to update
-      extractors.exists(e => With.framesSince(e.frameDiscovered) > 2 * 24)
+      extractors.exists(e => With.framesSince(e.frameDiscovered) > 24)
       && (
         extractors.exists(_.remainingCompletionFrames < 3 * 24)
         || (With.self.supplyTotal == 18 && With.self.supplyUsed >= 18))

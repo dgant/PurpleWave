@@ -36,6 +36,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val area: Int = dimensionMin * dimensionMax
   lazy val sqrtArea: Int = Math.sqrt(area).toInt
   lazy val radialHypotenuse: Double = Math.sqrt(width.toDouble * width.toDouble + height.toDouble * height.toDouble)/2.0
+  lazy val perimeter: Int = 2 * width + 2 * height
   
   def topLeft     : Point = Point(dimensionLeft, dimensionUp)
   def topRight    : Point = Point(dimensionRight, dimensionUp)

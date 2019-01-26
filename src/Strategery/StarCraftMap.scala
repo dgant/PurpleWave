@@ -15,6 +15,7 @@ object Alchemist extends StarCraftMap
 object Benzene extends StarCraftMap
 object BlueStorm extends StarCraftMap
 object ChupungRyeong extends StarCraftMap
+object Destination extends StarCraftMap
 object EmpireOfTheSun extends StarCraftMap
 object Gladiator extends StarCraftMap
 object GreatBarrierReef extends StarCraftMap { override val mineralWalkingOkay = false }

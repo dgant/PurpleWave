@@ -48,6 +48,10 @@ class ZvT3HatchLing extends GameplanTemplate {
         new Scout)),
     new ScoutSafelyWithOverlord)
 
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new ZvTIdeas.ReactToBarracksCheese
+  )
+
   override def buildOrder: Seq[BuildRequest] = Seq(
     Get(9, Zerg.Drone),
     Get(2, Zerg.Overlord),

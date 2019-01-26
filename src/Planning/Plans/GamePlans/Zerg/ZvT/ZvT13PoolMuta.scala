@@ -31,6 +31,10 @@ class ZvT13PoolMuta extends GameplanTemplate {
     new If(
       new Not(new FoundEnemyBase),
       new Attack(Zerg.Zergling, UnitCountOne)))
+
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new ZvTIdeas.ReactToBarracksCheese
+  )
   
   override def attackPlan: Plan = new Attack(Zerg.Mutalisk)
   

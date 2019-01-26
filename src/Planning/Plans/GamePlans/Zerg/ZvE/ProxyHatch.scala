@@ -32,7 +32,7 @@ class ProxyHatch extends Parallel {
   
   private def blueprintCreepColonyNatural: Blueprint = new Blueprint(this,
     building     = Some(Zerg.CreepColony),
-    requireZone  = if (With.enemy.isTerran) ProxyPlanner.proxyEnemyNatural else ProxyPlanner.proxyMiddle,
+    requireZone  = ProxyPlanner.proxyEnemyNatural,
     placement    = Some(PlacementProfiles.proxyCannon))
   
   children.set(Vector(
@@ -45,10 +45,10 @@ class ProxyHatch extends Parallel {
       requireZone = Some(With.geography.ourMain.zone))) },
     
     new Build(
-      Get(1,   Zerg.Hatchery),
-      Get(1,   Zerg.Drone),
-      Get(1,   Zerg.Overlord),
-      Get(9,   Zerg.Drone)),
+      Get(Zerg.Hatchery),
+      Get(Zerg.Drone),
+      Get(Zerg.Overlord),
+      Get(9, Zerg.Drone)),
   
     new If(
       new WeKnowWhereToProxy,

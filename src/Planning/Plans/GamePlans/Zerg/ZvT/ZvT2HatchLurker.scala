@@ -1,12 +1,13 @@
 package Planning.Plans.GamePlans.Zerg.ZvT
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Aggression, Attack, EjectScout, Hunt}
 import Planning.Plans.Basic.Do
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpLurkers, UpgradeHydraRangeThenSpeed}
+import Planning.Plans.GamePlans.Zerg.ZergIdeas.{MorphLurkers, PumpLurkers, UpgradeHydraRangeThenSpeed}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.CancelAll
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -14,9 +15,10 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMinin
 import Planning.Plans.Macro.Zerg.{BuildSunkensAtExpansions, BuildSunkensAtNatural}
 import Planning.Plans.Scouting.Scout
 import Planning.Predicates.Compound.{And, Not}
+import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
-import Planning.UnitMatchers.{UnitMatchTeching, UnitMatchUpgrading, UnitMatchWarriors}
+import Planning.UnitMatchers._
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvT2HatchLurker
@@ -64,6 +66,10 @@ class ZvT2HatchLurker extends GameplanTemplate {
     new EnoughLurkersToAttack,
     new Aggression(6.0),
     new Aggression(1.0))
+
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new ZvTIdeas.ReactToBarracksCheese
+  )
 
   override def buildOrder = Seq(
     Get(9, Zerg.Drone),
@@ -149,18 +155,22 @@ class ZvT2HatchLurker extends GameplanTemplate {
     new BuildOrder(
       Get(Zerg.ZerglingSpeed),
       Get(Zerg.HydraliskDen)),
-    new Pump(Zerg.Drone, 20),
+    new PumpRatio(Zerg.Drone, 20, 40, Seq(Friendly(UnitMatchHatchery, 10.0))),
+    new Build(Get(Zerg.LurkerMorph)),
+    new BuildGasPumps,
+    new If(
+      new TechComplete(Zerg.LurkerMorph, GameTime(0, 15)()),
+      new MorphLurkers),
     new BuildOrder(
-      Get(Zerg.LurkerMorph),
-      Get(2, Zerg.Extractor),
-      Get(5, Zerg.Overlord)),
+      Get(5, Zerg.Overlord),
+      Get(5, Zerg.Hydralisk)),
     new If(
-      new TechComplete(Zerg.LurkerMorph, Zerg.LurkerMorph.researchFrames * 4 / 10),
-      new PumpLurkers(6)),
-    new If(
-      new UnitsAtMost(1, Zerg.Larva),
-      new Pump(Zerg.Hydralisk, 3)),
-    new Pump(Zerg.Zergling)
+      new GasAtLeast(150),
+      new PumpLurkers),
+    new Pump(Zerg.Zergling, 18),
+    new RequireMiningBases(3),
+    new Pump(Zerg.Zergling, 24),
+    new RequireMiningBases(8)
   )
 
   override def buildPlans: Seq[Plan] = Seq(

@@ -18,6 +18,10 @@ class ZvT2HatchLingBustMuta extends GameplanTemplate {
 
   override def attackPlan: Plan = new Attack
 
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new ZvTIdeas.ReactToBarracksCheese
+  )
+
   // Based on Effort vs. Flash's 1-1-1:
   // https://www.youtube.com/watch?v=3sb47YGI7l8&feature=youtu.be&t=2280
   // https://docs.google.com/spreadsheets/d/1m6nU6FewJBC2LGQX_DPuo4PqzxH8hF3bazp8T6QlqRs/edit#gid=1166229923

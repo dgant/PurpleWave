@@ -22,7 +22,7 @@ class Configuration {
   // Strategy //
   //////////////
 
-  var dynamicStickiness   = 3.0
+  var dynamicStickiness   = 4.0
   var targetWinrate       = 0.75
   var strategyRandomness  = 0.0
   var historyHalfLife     = 96.0

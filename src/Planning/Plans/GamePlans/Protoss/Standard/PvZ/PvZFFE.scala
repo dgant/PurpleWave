@@ -92,22 +92,19 @@ class PvZFFE extends GameplanTemplate {
     new If(
       new UnitsAtLeast(20, UnitMatchWorkers),
       new Build(
-        Get(1, Protoss.Assimilator),
-        Get(1, Protoss.CyberneticsCore))),
+        Get(Protoss.Assimilator),
+        Get(Protoss.CyberneticsCore))),
     new PumpWorkers,
     new Pump(Protoss.Dragoon, maximumTotal = 1),
     new Pump(Protoss.Zealot),
     new Build(
-      Get(1, Protoss.Pylon),
-      Get(1, Protoss.Forge)),
+      Get(Protoss.Pylon),
+      Get(Protoss.Forge)),
     new RequireMiningBases(2),
     new Build(
-      Get(2, Protoss.Nexus),
-      Get(1, Protoss.Gateway)),
-    new Build(
+      Get(Protoss.Gateway),
       Get(2, Protoss.Pylon),
-      Get(1, Protoss.Assimilator),
-      Get(1, Protoss.CyberneticsCore)),
-    new RequireMiningBases(2)
+      Get(Protoss.Assimilator),
+      Get(Protoss.CyberneticsCore)),
   )
 }

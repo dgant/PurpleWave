@@ -6,6 +6,7 @@ import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPool
+import Planning.Plans.GamePlans.Terran.Situational.RepairBunker
 import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
@@ -44,6 +45,7 @@ class TvZ1RaxFE extends GameplanTemplate {
   )
 
   override def buildPlans: Seq[Plan] = Seq(
+    new RepairBunker,
     new DefendFightersAgainstEarlyPool,
     new If(
       new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.tenHatch),

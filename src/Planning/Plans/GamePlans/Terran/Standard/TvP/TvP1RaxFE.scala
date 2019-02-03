@@ -5,17 +5,17 @@ import Macro.Architecture.Blueprint
 import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.ConsiderAttacking
-import Planning.Plans.Compound.{FlipIf, If, Or, Parallel}
+import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.Macro.Automatic.Pump
+import Planning.Plans.GamePlans.Terran.Situational.RepairBunker
+import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Expanding.BuildGasPumps
-import Planning.Plans.Macro.Terran.{BuildBunkersAtNatural, BuildMissileTurretsAtNatural}
+import Planning.Plans.Macro.Terran.{BuildBunkersAtNatural, BuildMissileTurretsAtNatural, PopulateBunkers}
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Always
 import Planning.Predicates.Compound.{And, Latch}
 import Planning.Predicates.Milestones._
+import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvP1RaxFE
@@ -64,21 +64,33 @@ class TvP1RaxFE extends GameplanTemplate {
   )
 
   override def buildPlans: Seq[Plan] = Seq(
+    new RepairBunker,
+    new PopulateBunkers,
+
+    new CapGasAt(250),
+
     new TvPIdeas.ReactiveEarlyVulture,
     new Pump(Terran.SiegeTankUnsieged),
     new Build(Get(Terran.MachineShop)),
-    new FlipIf(
-      new Always,
-      //new EnemyDarkTemplarLikely,
-      new Parallel(
-        new Build(Get(2, Terran.Factory)),
-        new BuildGasPumps,
-        new Build(
-          Get(Terran.SiegeMode),
-          Get(2, Terran.MachineShop))),
-      new Parallel(
-        new Build(Get(Terran.EngineeringBay)),
-        new BuildMissileTurretsAtNatural(1))),
-    new Pump(Terran.Marine)
+
+    new If(
+      new EnemyDarkTemplarLikely,
+      new BuildMissileTurretsAtNatural(1)),
+
+    new Trigger(
+      new EnemiesAtLeast(2, Protoss.Dragoon),
+      new Build(
+        Get(Terran.SiegeMode),
+        Get(2, Terran.Factory),
+        Get(2, Terran.Refinery),
+        Get(2, Terran.MachineShop))),
+
+    new BuildMissileTurretsAtNatural(1),
+    new Build(
+      Get(2, Terran.Factory),
+      Get(2, Terran.Refinery),
+      Get(Terran.SiegeMode)),
+
+    new Pump(Terran.Marine, 5)
   )
 }

@@ -1,7 +1,7 @@
 package Strategery.Strategies.Zerg
 
 import Planning.Plan
-import Planning.Plans.GamePlans.Zerg.ZvE.{Zerg4Pool, ZvESparkle}
+import Planning.Plans.GamePlans.Zerg.ZvE.{ZvE4Pool, ZvESparkle}
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
@@ -10,7 +10,7 @@ class ZergStrategy extends Strategy {
 }
 
 object ZvE4Pool extends ZergStrategy {
-  override def gameplan: Option[Plan] = Some(new Zerg4Pool)
+  override def gameplan: Option[Plan] = Some(new ZvE4Pool)
 }
 
 object ZvESparkle extends ZergStrategy {

@@ -21,6 +21,18 @@ class ZvZ9PoolSpeed extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(ZvZ9PoolSpeed)
 
+  override def scoutPlan: Plan = new ScoutSafelyWithOverlord
+  
+  override def attackPlan: Plan = new If(
+    new Or(
+      new Not(new EnemyStrategy(With.fingerprints.fourPool)),
+      new UnitsAtLeast(3, Zerg.Mutalisk, complete = true)),
+    new Attack)
+
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new ZvZIdeas.ReactToFourPool
+  )
+
   override def buildOrder: Seq[BuildRequest] = Vector(
     Get(9, Zerg.Drone),
     Get(Zerg.SpawningPool),
@@ -29,14 +41,6 @@ class ZvZ9PoolSpeed extends GameplanTemplate {
     Get(2, Zerg.Overlord),
     Get(11, Zerg.Drone),
     Get(6, Zerg.Zergling))
-
-  override def scoutPlan: Plan = new ScoutSafelyWithOverlord
-  
-  override def attackPlan: Plan = new If(
-    new Or(
-      new Not(new EnemyStrategy(With.fingerprints.fourPool)),
-      new UnitsAtLeast(3, Zerg.Mutalisk, complete = true)),
-    new Attack)
   
   override def buildPlans: Seq[Plan] = Vector(
 

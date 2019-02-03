@@ -21,7 +21,7 @@ object ZergChoices {
     ZvP2HatchMuta,
     ZvZ5PoolSunkens,
     ZvZ9PoolSpeed,
-    ZvZ9Gas9Pool,
+    ZvZ12Pool,
     ZvZ10HatchLing
   )
 }

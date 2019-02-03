@@ -19,7 +19,6 @@ object TerranChoices {
     TvEProxyBBS,
     TvE1RaxSCVMarine,
     TvE2RaxSCVMarine,
-    TvETurtleMech,
     TvR1Rax,
     TvRTinfoil,
     TerranFFABio)

@@ -1,8 +1,7 @@
 package Strategery.Strategies.Zerg
 
 import Planning.Plan
-import Planning.Plans.GamePlans.Zerg.ZvE.{OneHatchLurker, ProxyHatch}
-import Planning.Plans.GamePlans.Zerg.ZvT.{ZvT13PoolMuta, ZvT2HatchLingBustMuta, ZvT2HatchLurker, ZvT3HatchLing}
+import Planning.Plans.GamePlans.Zerg.ZvT.{ZvT13PoolMuta, ZvT1HatchLurker, ZvT2HatchLingBustMuta, ZvT2HatchLurker, ZvT3HatchLing, ZvTProxyHatch}
 import Strategery.{Heartbreak, StarCraftMap}
 import Strategery.Strategies.Strategy
 import bwapi.Race
@@ -16,7 +15,7 @@ object ZvT13PoolMuta extends ZvTStrategy {
   override def gameplan: Option[Plan] = Some(new ZvT13PoolMuta)
 }
 object ZvT1HatchLurker extends ZvTStrategy {
-  override def gameplan: Option[Plan] = Some(new OneHatchLurker)
+  override def gameplan: Option[Plan] = Some(new ZvT1HatchLurker)
 }
 object ZvT2HatchLingBustMuta extends ZvTStrategy {
   override def gameplan: Option[Plan] = Some(new ZvT2HatchLingBustMuta)
@@ -29,14 +28,14 @@ object ZvT2HatchLurker extends ZvTStrategy {
   override def gameplan: Option[Plan] = Some(new ZvT2HatchLurker)
 }
 object ZvTProxyHatchSunkens extends ZvTStrategy {
-  override def gameplan: Option[Plan] = Some(new ProxyHatch)
+  override def gameplan: Option[Plan] = Some(new ZvTProxyHatch)
   override def startLocationsMax: Int = 3
 }
 object ZvTProxyHatchHydras extends ZvTStrategy {
-  override def gameplan: Option[Plan] = Some(new ProxyHatch)
+  override def gameplan: Option[Plan] = Some(new ZvTProxyHatch)
   override def startLocationsMax: Int = 3
 }
 object ZvTProxyHatchZerglings extends ZvTStrategy {
-  override def gameplan: Option[Plan] = Some(new ProxyHatch)
+  override def gameplan: Option[Plan] = Some(new ZvTProxyHatch)
   override def startLocationsMax: Int = 2
 }

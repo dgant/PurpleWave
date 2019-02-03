@@ -22,11 +22,10 @@ class TvR1Rax extends GameplanTemplateVsRandom {
   override val completionCriteria: Predicate = new UnitsAtLeast(2, UnitMatchWarriors)
   
   override val buildOrder = Vector(
-    Get(1,   Terran.CommandCenter),
-    Get(9,   Terran.SCV),
-    Get(1,   Terran.SupplyDepot),
-    Get(11,  Terran.SCV),
-    Get(1,   Terran.Barracks))
+    Get(9,Terran.SCV),
+    Get(Terran.SupplyDepot),
+    Get(11, Terran.SCV),
+    Get(Terran.Barracks))
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(
@@ -40,7 +39,7 @@ class TvR1Rax extends GameplanTemplateVsRandom {
     new If(
       new Not(new SafeAtHome),
       new Build(
-        Get(1, Terran.Bunker),
+        Get(Terran.Bunker),
         Get(4, Terran.Barracks))),
     new RequireMiningBases(2))
 }

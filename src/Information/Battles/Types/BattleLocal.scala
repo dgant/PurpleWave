@@ -25,13 +25,14 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   lazy val distanceEnemy  : Double  = focus.pixelDistance(With.intelligence.mostBaselikeEnemyTile.pixelCenter) + 2 * rangeEnemy
   lazy val distanceRatio  : Double  = distanceEnemy / (distanceUs + distanceEnemy)
   lazy val turtleBonus    : Double  = if (canTurtle) 0.0 else - PurpleMath.clamp(0.75 * (distanceRatio - 0.5), 0.0, 0.5)
+  lazy val trappedness    : Double  = PurpleMath.weightedMean(us.units.filter(_.canMove).map(u => (trappedPenalty(u), u.subjectiveValue)))
   lazy val attackGains    : Double  = estimationSimulationAttack.costToEnemy
   lazy val attackLosses   : Double  = estimationSimulationAttack.costToUs
   lazy val snipeGains     : Double  = estimationSimulationSnipe.costToEnemy
   lazy val snipeLosses    : Double  = estimationSimulationSnipe.costToUs
   lazy val ratioAttack    : Double  = PurpleMath.nanToInfinity(attackGains  / (attackGains  + attackLosses))
   lazy val ratioSnipe     : Double  = PurpleMath.nanToInfinity(snipeGains   / (snipeGains   + snipeLosses))
-  lazy val totalBonus     : Double  = hysteresis + terranBonus + turtleBonus
+  lazy val totalBonus     : Double  = hysteresis + terranBonus + turtleBonus + trappedness
   lazy val ratioTarget    : Double  = Math.min(.99, PurpleMath.nanToZero((With.configuration.battleValueTarget + totalBonus) / With.blackboard.aggressionRatio()))
   lazy val shouldFight    : Boolean = ratioAttack > ratioTarget || (With.self.isZerg && ratioSnipe > ratioTarget)
   
@@ -44,6 +45,20 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
     val simulation = new Simulation(battle, weAttack, weSnipe)
     simulation.run()
     simulation.estimation
+  }
+
+  private def trappedPenalty(unit: UnitInfo): Double = {
+    if (unit.friendly.isEmpty) return 0.0
+    val agent = unit.friendly.get.agent
+    val trapped = (
+      ! unit.canMove
+      || unit.matchups.doomed
+      || unit.base.exists(With.geography.ourBases.contains)
+      || unit.matchups.threats.exists(_.topSpeed > unit.topSpeed))
+    if ( ! trapped) return 0.0
+    val framesMax = 72.0
+    val output = -0.3 * PurpleMath.clamp((framesMax - unit.matchups.framesOfSafety) / framesMax, 0.0, 1.0)
+    output
   }
   
   private def hysteresisRatio(unit: UnitInfo): Double = {

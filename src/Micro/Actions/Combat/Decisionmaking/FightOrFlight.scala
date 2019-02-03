@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Transportation.Caddy.Shuttling
-import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object FightOrFlight extends Action {
@@ -25,22 +25,23 @@ object FightOrFlight extends Action {
       }
     }
 
-    decide(true,  "YOLO",       () => With.yolo.active())
-    decide(true,  "Bored",      () => unit.battle.isEmpty)
-    decide(true,  "No threats", () => unit.matchups.threats.isEmpty)
-    decide(false, "Pacifist",   () => ! unit.agent.canFight)
-    decide(true,  "CantFlee",   () => ! unit.agent.canFlee)
-    decide(true,  "Hug",        () => ! unit.flying && unit.matchups.targets.exists(t => unit.pixelDistanceEdge(t) < t.pixelRangeMin))
-    decide(false, "Scarabs",    () => unit.is(Protoss.Reaver) && unit.scarabCount == 0)
-    decide(true,  "Cloaked",    () => unit.effectivelyCloaked)
-    decide(true,  "Lurking",    () => unit.is(Zerg.Lurker) && unit.matchups.enemyDetectors.isEmpty)
-    decide(false, "Useless",    () => unit.energyMax == 0 && unit.matchups.threats.nonEmpty && unit.loadedUnits.isEmpty && (
+    decide(true,  "YOLO",         () => With.yolo.active())
+    decide(true,  "Bored",        () => unit.battle.isEmpty)
+    decide(true,  "No threats",   () => unit.matchups.threats.isEmpty)
+    decide(false, "Pacifist",     () => ! unit.agent.canFight)
+    decide(true,  "CantFlee",     () => ! unit.agent.canFlee)
+    decide(true,  "Hug",          () => ! unit.flying && unit.matchups.targets.exists(t => unit.pixelDistanceEdge(t) < t.pixelRangeMin))
+    decide(false, "Scarabs",      () => unit.is(Protoss.Reaver) && unit.scarabCount == 0)
+    decide(true,  "Cloaked",      () => unit.effectivelyCloaked)
+    decide(true,  "Lurking",      () => unit.is(Zerg.Lurker) && unit.matchups.enemyDetectors.isEmpty)
+    decide(false, "Useless",      () => unit.energyMax == 0 && unit.matchups.threats.nonEmpty && unit.loadedUnits.isEmpty && (
       (unit.canAttack && ! unit.matchups.targets.exists(t => ! unit.agent.canFocus || unit.squadenemies.contains(t)))
       || (unit.unitClass.isDetector && ! unit.matchups.enemies.exists(t => t.cloaked && ( ! unit.agent.canFocus || unit.squadenemies.contains(t))))))
-    decide(false, "Drained",    () => ! unit.canAttack && unit.energyMax > 0 && ! unit.unitClass.spells.forall(s => s.energyCost > unit.energy || ! With.self.hasTech(s)))
-    decide(true,  "Scourge",    () => unit.is(Zerg.Scourge) && unit.matchups.targets.exists(target => target.canAttack(unit) && target.matchups.targetsInRange.nonEmpty))
-    decide(false, "Disrupted",  () => unit.underDisruptionWeb && ! unit.flying)
-    decide(false, "Swarmed",    () => unit.underDarkSwarm && ! unit.unitClass.unaffectedByDarkSwarm && unit.matchups.targetsInRange.forall(t => ! t.flying || t.underDarkSwarm))
+    decide(false, "Drained",      () => ! unit.canAttack && unit.energyMax > 0 && ! unit.unitClass.spells.forall(s => s.energyCost > unit.energy || ! With.self.hasTech(s)))
+    decide(true,  "Scourge",      () => unit.is(Zerg.Scourge) && unit.matchups.targets.exists(target => target.canAttack(unit) && target.matchups.targetsInRange.nonEmpty))
+    decide(false, "Disrupted",    () => unit.underDisruptionWeb && ! unit.flying)
+    decide(false, "Swarmed",      () => unit.underDarkSwarm && ! unit.unitClass.unaffectedByDarkSwarm && unit.matchups.targetsInRange.forall(t => ! t.flying || t.underDarkSwarm))
+    decide(false, "WaitForSiege", () => unit.is(Terran.SiegeTankUnsieged) && unit.matchups.threats.exists(_.is(Protoss.Dragoon)) && With.units.ours.exists(_.techProducing.contains(Terran.SiegeMode)) && unit.matchups.allies.exists(a => a.is(Terran.Bunker) && a.complete))
     //decide(true,  "Hodor",      () => unit.matchups.alliesInclSelf.forall(_.base.exists(_.isOurMain)) && unit.matchups.threats.exists(t => ! t.flying && t.base.exists(_.isOurMain)) && unit.matchups.threats.exists(t => ! t.flying && ! t.base.exists(_.isOurMain)))
 
     decide(true, "Workers", () => unit.matchups.allies.exists(u => u.friendly.isDefined && {

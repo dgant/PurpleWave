@@ -36,6 +36,7 @@ object ShowBattleDetails extends View {
       Vector("Snipe",       "%1.2f".format(battle.ratioSnipe)),
       Vector("Target",      "%1.2f".format(battle.ratioTarget)),
       Vector("Hysteresis",  "%1.2f".format(battle.hysteresis)),
+      Vector("Trappedness", "%1.2f".format(battle.trappedness)),
       Vector("Urgency",     "%1.2f".format(battle.turtleBonus))
     ))
   }

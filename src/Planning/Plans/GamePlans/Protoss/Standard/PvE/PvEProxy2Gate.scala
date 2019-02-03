@@ -19,7 +19,7 @@ import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Protoss.{PvPProxy2Gate, PvROpenProxy2Gate, PvTProxy2Gate, PvZProxy2Gate}
 
-class Proxy2Gate extends GameplanTemplate {
+class PvEProxy2Gate extends GameplanTemplate {
   
   override val activationCriteria = new Employing(PvROpenProxy2Gate, PvTProxy2Gate, PvPProxy2Gate, PvZProxy2Gate)
   override val completionCriteria = new Latch(new BasesAtLeast(2))

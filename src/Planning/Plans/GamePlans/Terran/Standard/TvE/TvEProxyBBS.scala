@@ -42,12 +42,12 @@ class TvEProxyBBS extends GameplanTemplate {
   override def supplyPlan: Plan = NoPlan()
   
   override def buildOrder: Seq[BuildRequest] = Vector(
-    Get(1, Terran.CommandCenter),
+    Get(Terran.CommandCenter),
     Get(8, Terran.SCV),
     Get(2, Terran.Barracks),
-    Get(1, Terran.SupplyDepot),
+    Get(Terran.SupplyDepot),
     Get(9, Terran.SCV),
-    Get(1, Terran.Marine))
+    Get(Terran.Marine))
   
   override def buildPlans: Seq[Plan] = Vector(
     new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),

@@ -53,9 +53,8 @@ class ZvZ5PoolSunkens extends GameplanTemplate {
       })
   
   override val buildOrder = Vector(
-    Get(1, Zerg.Hatchery),
     Get(5, Zerg.Drone),
-    Get(1, Zerg.SpawningPool),
+    Get(Zerg.SpawningPool),
     Get(6, Zerg.Drone),
     Get(6, Zerg.Zergling))
   

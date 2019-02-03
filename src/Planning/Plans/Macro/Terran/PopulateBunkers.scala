@@ -38,7 +38,7 @@ class PopulateBunkers extends Plan {
     lock.units.foreach(unit => {
       val intent = new Intention
       intent.toTravel = Some(bunker.pixelCenter)
-      intent.toForm = Some(bunker.pixelCenter)
+      intent.toBoard = Some(bunker)
       unit.agent.intend(this, intent)
     })
   }

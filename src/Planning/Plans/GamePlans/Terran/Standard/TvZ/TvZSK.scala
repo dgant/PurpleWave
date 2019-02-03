@@ -5,6 +5,7 @@ import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.Terran.Situational.RepairBunker
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -65,6 +66,7 @@ class TvZSK extends GameplanTemplate {
     new Aggression(1.0))
   
   override def buildPlans: Seq[Plan] = Vector(
+    new RepairBunker,
     new If(
       new UnitsAtLeast(5, Terran.Marine, complete = true),
       new EjectScout),
@@ -105,7 +107,10 @@ class TvZSK extends GameplanTemplate {
     new Pump(Terran.SiegeTankUnsieged, 3),
     new Pump(Terran.ControlTower),
     new Pump(Terran.ScienceVessel, 20),
-    new PumpRatio(Terran.Medic, 2, 20, Seq(Friendly(Terran.Marine, 1.0/6.0))),
+    new If(
+      new Employing(TvZ2RaxNuke),
+      new PumpRatio(Terran.Medic, 2, 20, Seq(Friendly(Terran.Marine, 1.0/6.0))),
+      new PumpRatio(Terran.Medic, 2, 20, Seq(Friendly(Terran.Marine, 1.0/4.0)))),
     new PumpRatio(Terran.Marine, 0, 120, Seq(Enemy(Zerg.Mutalisk, 5.0))),
     new If(
       new CanAttack,

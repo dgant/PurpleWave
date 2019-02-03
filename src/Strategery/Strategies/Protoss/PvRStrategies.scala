@@ -1,7 +1,7 @@
 package Strategery.Strategies.Protoss
 
 import Planning.Plan
-import Planning.Plans.GamePlans.Protoss.Standard.PvR.PvRTinfoil
+import Planning.Plans.GamePlans.Protoss.Standard.PvR.{PvR2Gate4Gate, PvRTinfoil}
 import Strategery.{MapGroups, StarCraftMap}
 import Strategery.Strategies.Strategy
 import bwapi.Race
@@ -33,7 +33,10 @@ object PvROpenProxy2Gate extends PvR2GateStrategy {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
 }
 
-object PvROpenTinfoil extends PvR2GateStrategy {
+object PvR2Gate4Gate extends PvRStrategy {
+  override def gameplan: Option[Plan] = Some(new PvR2Gate4Gate)
+}
+object PvRTinfoil extends PvR2GateStrategy {
   override def gameplan: Option[Plan] = Some(new PvRTinfoil)
   override def opponentsWhitelisted: Option[Iterable[String]] = Some(Iterable(
     "Kurdiumov",
@@ -41,7 +44,5 @@ object PvROpenTinfoil extends PvR2GateStrategy {
     "UAlbertaBot",
     "OpprimoBot"
   ))
-  override def ourRaces   : Iterable[Race]  = Vector(Race.Protoss)
-  override def enemyRaces : Iterable[Race]  = Vector(Race.Unknown)
 }
 

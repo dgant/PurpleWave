@@ -6,10 +6,11 @@ import Planning.Plan
 import Planning.Plans.Army.{ConsiderAttacking, EjectScout, RecruitFreelancers}
 import Planning.Plans.Compound.{FlipIf, If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.Terran.Situational.RepairBunker
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Terran.{BuildBunkersAtEnemyNatural, BuildBunkersAtMain, BuildBunkersAtNatural, BuildMissileTurretsAtNatural}
+import Planning.Plans.Macro.Terran._
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch}
 import Planning.Predicates.Milestones._
@@ -52,6 +53,9 @@ class TvPSiegeExpandBunker extends GameplanTemplate {
     Get(18, Terran.SCV))
 
   override def buildPlans: Seq[Plan] = Seq(
+
+    new RepairBunker,
+
     new TvPIdeas.CutGasDuringFactory,
     new TvPIdeas.ReactiveEarlyVulture,
 
@@ -64,13 +68,14 @@ class TvPSiegeExpandBunker extends GameplanTemplate {
 
     new If(
       new And(
-        new UnitsAtMost(2, Protoss.Dragoon),
+        new EnemiesAtMost(2, Protoss.Dragoon),
         new EnemyStrategy(With.fingerprints.nexusFirst)),
       new Parallel(
         new BuildBunkersAtEnemyNatural(1),
         new RecruitFreelancers(Terran.SCV, UnitCountExactly(5))),
       new Parallel(
         new EjectScout,
+        new PopulateBunkers,
         new BuildBunkersAtNatural(1))),
 
     new If(
@@ -78,20 +83,23 @@ class TvPSiegeExpandBunker extends GameplanTemplate {
       new Pump(Terran.Marine),
       new Pump(Terran.Marine, 4)),
 
+    new Build(Get(Terran.MachineShop)),
     new FlipIf(
       new UnitsAtLeast(1, Terran.Bunker, complete = true),
       new Parallel(
         new BuildOrder(
-          Get(Terran.MachineShop),
           Get(Terran.SiegeTankUnsieged),
           Get(Terran.EngineeringBay)),
         new Pump(Terran.SiegeTankUnsieged),
         new Build(Get(Terran.SiegeMode))),
       new RequireMiningBases(2)),
 
-    new BuildMissileTurretsAtNatural(1),
-    new Build(
-      Get(2, Terran.Factory),
-      Get(2, Terran.MachineShop))
+    new FlipIf(
+      new EnemiesAtLeast(2, Protoss.Dragoon),
+      new BuildMissileTurretsAtNatural(1),
+      new Build(
+        Get(2, Terran.Factory),
+        Get(2, Terran.Refinery),
+        Get(2, Terran.MachineShop)))
   )
 }

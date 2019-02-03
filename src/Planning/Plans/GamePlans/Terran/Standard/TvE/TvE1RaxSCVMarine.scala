@@ -12,7 +12,6 @@ import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPo
 import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
-import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Terran.BuildBunkersAtEnemy
 import Planning.Plans.Scouting.{FoundEnemyBase, ScoutAt}
 import Planning.Predicates.Compound.{Check, Not}
@@ -35,7 +34,7 @@ class TvE1RaxSCVMarine extends GameplanTemplate {
       override lazy val blueprints = Vector(
         new Blueprint(this,
           building = Some(Terran.Barracks),
-          preferZone = ProxyPlanner.proxyMiddleBase,
+          preferZone = ProxyPlanner.proxyMiddle,
           respectHarvesting = Some(false),
           placement = Some(PlacementProfiles.proxyBuilding)))
     })
@@ -71,8 +70,9 @@ class TvE1RaxSCVMarine extends GameplanTemplate {
     new DefendFightersAgainstEarlyPool,
     new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
     new Pump(Terran.Marine),
-    new BuildBunkersAtEnemy(1),
-    new Build(Get(1, Terran.Bunker)), // Workaround for build limitations
+    new If(
+      new FoundEnemyBase,
+      new BuildBunkersAtEnemy(1)), // Workaround for build limitations
     new If(
       new UnitsAtLeast(1, Terran.Marine, complete = true),
       new RecruitFreelancers(UnitMatchWorkers, new UnitCountExcept(4, UnitMatchWorkers))),

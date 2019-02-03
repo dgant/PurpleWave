@@ -31,6 +31,7 @@ object Idle extends Action {
     Yank,
     DodgeAll,
     Tickle,
+    Repair,
     EmergencyRepair,
     Gather,
     Addon,
@@ -43,6 +44,7 @@ object Idle extends Action {
     Pardon,
     Transport,
     Scout,
+    Bunk,
     Fight,
     Attack,
     Move

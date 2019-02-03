@@ -1,7 +1,6 @@
-package Planning.Plans.GamePlans.Zerg.ZvE
+package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Parallel}
@@ -10,15 +9,20 @@ import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
+import Planning.Predicates.Strategy.Employing
+import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Zerg
+import Strategery.Strategies.Zerg.ZvT1HatchLurker
 
-class OneHatchLurker extends GameplanTemplate {
+class ZvT1HatchLurker extends GameplanTemplate {
+
+  override val activationCriteria: Predicate = new Employing(ZvT1HatchLurker)
   
   override def buildOrder: Seq[BuildRequest] = Vector(
     Get(9, Zerg.Drone),
-    Get(1, Zerg.SpawningPool),
+    Get(Zerg.SpawningPool),
     Get(10, Zerg.Drone),
-    Get(1, Zerg.Extractor),
+    Get(Zerg.Extractor),
     Get(2, Zerg.Overlord),
     Get(11, Zerg.Drone),
     Get(6, Zerg.Zergling))
@@ -26,7 +30,7 @@ class OneHatchLurker extends GameplanTemplate {
   override def scoutPlan: Plan = NoPlan()
   
   override def attackPlan: Plan = new If(
-    new UnitsAtLeast(1, Zerg.Lurker),
+    new UnitsAtLeast(1, Zerg.Lurker, complete = true),
     new Attack,
     super.attackPlan
   )

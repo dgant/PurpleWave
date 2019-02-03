@@ -25,7 +25,7 @@ object Fight extends Action {
     Detect.consider(unit)
     Stim.consider(unit)
     HandleMines.consider(unit)
-    Bunk.consider(unit)
+    EmergencyBunk.consider(unit)
     Root.consider(unit)
     BeACarrier.consider(unit)
     BeAnArbiter.consider(unit)

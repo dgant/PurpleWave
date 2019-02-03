@@ -20,7 +20,7 @@ import Planning.UnitMatchers.UnitMatchOr
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Zerg.ZvE4Pool
 
-class Zerg4Pool extends GameplanTemplate {
+class ZvE4Pool extends GameplanTemplate {
   
   override val activationCriteria = new Employing(ZvE4Pool)
   

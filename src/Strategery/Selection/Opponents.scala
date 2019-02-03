@@ -15,7 +15,7 @@ object Opponents {
   val defaultPvZ  = new StrategySelectionRecommended(StrategySelectionGreedy, PvZ4Gate99, PvZMidgame5GateGoon)
   val fixedPvT    = new StrategySelectionFixed(PvT1015DT, PvT3BaseArbiter)
   val fixedPvZ    = new StrategySelectionFixed(PvZ4Gate99, PvZMidgame5GateGoon)
-  val fixedPvR    = new StrategySelectionFixed(PvROpenTinfoil)
+  val fixedPvR    = new StrategySelectionFixed(PvRTinfoil)
   
   val mcrave        : Opponent = add(Opponent("McRave",       StrategySelectionDynamic))
   val titaniron     : Opponent = add(Opponent("TitanIron",    new StrategySelectionRecommended(StrategySelectionDynamic, PvT1015DT, PvT2BaseCarrier)))

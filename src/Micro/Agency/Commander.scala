@@ -408,7 +408,7 @@ class Commander {
     sleep(unit, 8)
   }
   
-  private def sleep(unit: FriendlyUnitInfo, requiredDelay: Int = 2) {
+  def sleep(unit: FriendlyUnitInfo, requiredDelay: Int = 2) {
     val sleepUntil = Array(
       With.frame + With.configuration.performanceMinimumUnitSleep,
       With.frame + requiredDelay,

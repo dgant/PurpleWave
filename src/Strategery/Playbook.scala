@@ -7,7 +7,7 @@ import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss._
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TvE._
-import Strategery.Strategies.Terran.TvR.{TvR1Rax, TvRTinfoil}
+import Strategery.Strategies.Terran.TvR.TvR1Rax
 import Strategery.Strategies.Terran.TvZ.TvZProxy8Fact
 import Strategery.Strategies.Terran._
 import Strategery.Strategies.Zerg._
@@ -46,9 +46,7 @@ object StrategyGroups {
   val disabled = Vector[Strategy](
     WorkerRush,
     TvEWorkerRushLiftoff,
-    TvETurtleMech,
     TvR1Rax,
-    TvRTinfoil,
     TvZProxy8Fact,
     TvZ2RaxNuke,
     PvTProxyDarkTemplar,
@@ -57,6 +55,9 @@ object StrategyGroups {
     PvZProxy2Gate,
     PvP2Gate1012,
     PvP2GateRobo,
+    ZvTProxyHatchZerglings,
+    ZvTProxyHatchHydras,
+    ZvTProxyHatchSunkens,
     PvPBlueStormReaverCarrier,
     PvZLateGameCarrier, // Needs island tech
     MassPhotonCannon,
@@ -75,8 +76,8 @@ class PurpleWavePlaybook extends EmptyPlaybook {
 
 class TestingPlaybook extends PurpleWavePlaybook {
   //override lazy val forced: Seq[Strategy] = Seq(PvZFFEEconomic, PvZMidgameCorsairReaverZealot, PvZMidgameCorsairReaverGoon, PvZMidgame5GateGoonReaver)
-  override lazy val forced: Seq[Strategy] = Seq(ZvT2HatchLurker)
+  override lazy val forced: Seq[Strategy] = Seq(PvR2Gate4Gate)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
 }
 
-object Playbook extends PurpleWavePlaybook {}
+object Playbook extends TestingPlaybook {}

@@ -163,7 +163,7 @@ object ProtossBuilds {
 
   val TwoGate999 = Vector[BuildRequest] (
     Get(9,   Protoss.Probe),
-    Get(1,   Protoss.Pylon),
+    Get(Protoss.Pylon),
     Get(2,   Protoss.Gateway),
     Get(11,  Protoss.Probe),
     Get(1,   Protoss.Zealot),
@@ -171,15 +171,14 @@ object ProtossBuilds {
     Get(3,   Protoss.Zealot))
   
   val PvT1015GateGoon = Vector[BuildRequest] (
-    Get(1,   Protoss.Nexus),
     Get(8,   Protoss.Probe),
-    Get(1,   Protoss.Pylon),
+    Get(Protoss.Pylon),
     Get(10,  Protoss.Probe),
-    Get(1,   Protoss.Gateway),
+    Get(Protoss.Gateway),
     Get(11,  Protoss.Probe),
-    Get(1,   Protoss.Assimilator),
+    Get(Protoss.Assimilator),
     Get(13,  Protoss.Probe),
-    Get(1,   Protoss.CyberneticsCore),
+    Get(Protoss.CyberneticsCore),
     Get(15,  Protoss.Probe),
     Get(2,   Protoss.Gateway),
     Get(2,   Protoss.Pylon),
@@ -190,10 +189,10 @@ object ProtossBuilds {
 
   val PvT1015GateGoonDT = PvT1015GateGoon ++ Vector[BuildRequest] (
     Get(16,  Protoss.Probe),
-    Get(1,   Protoss.CitadelOfAdun),
+    Get(Protoss.CitadelOfAdun),
     Get(5,   Protoss.Dragoon),
     Get(17,  Protoss.Probe),
-    Get(1,   Protoss.TemplarArchives),
+    Get(Protoss.TemplarArchives),
     Get(18,  Protoss.Probe),
     Get(2,   Protoss.DarkTemplar),
     Get(19,  Protoss.Probe),

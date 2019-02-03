@@ -3,7 +3,7 @@ package Strategery.Strategies.Zerg
 import Information.Intelligenze.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.Plan
-import Planning.Plans.GamePlans.Zerg.ZvZ.{ZvZ5PoolSunkens, ZvZ10HatchLing, ZvZ9PoolSpeed, ZvZ9Gas9Pool}
+import Planning.Plans.GamePlans.Zerg.ZvZ.{ZvZ10HatchLing, ZvZ12Pool, ZvZ5PoolSunkens, ZvZ9PoolSpeed}
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
@@ -27,8 +27,8 @@ object ZvZ9PoolSpeed extends ZvZStrategy {
   override def gameplan: Option[Plan] = Some(new ZvZ9PoolSpeed)
 }
 
-object ZvZ9Gas9Pool extends ZvZStrategy {
-  override def gameplan: Option[Plan] = Some(new ZvZ9Gas9Pool)
+object ZvZ12Pool extends ZvZStrategy {
+  override def gameplan: Option[Plan] = Some(new ZvZ12Pool)
 }
 
 object ZvZ10HatchLing extends ZvZStrategy {

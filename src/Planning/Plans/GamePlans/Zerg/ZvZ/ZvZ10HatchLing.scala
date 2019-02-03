@@ -23,6 +23,10 @@ class ZvZ10HatchLing extends GameplanTemplate {
 
   override val aggression: Double = 1.25
 
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new ZvZIdeas.ReactToFourPool
+  )
+
   // https://liquipedia.net/starcraft/10_Hatch_(vs._Zerg)
   override def buildOrderPlan: Plan = new Parallel(
     new BuildOrder(Get(9, Zerg.Drone)),

@@ -4,6 +4,7 @@ import Lifecycle.With
 import Planning.Predicate
 import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import Strategery.Strategies.Zerg.ZvZ9PoolSpeed
 
 class SafeToMoveOut extends Predicate {
   override def isComplete: Boolean = {
@@ -12,6 +13,7 @@ class SafeToMoveOut extends Predicate {
     if (With.self.isProtoss && With.enemies.forall(_.isTerran))   return pvtSafeToAttack
     if (With.self.isProtoss && With.enemies.forall(_.isProtoss))  return pvpSafeToAttack
     if (With.self.isProtoss && With.enemies.forall(_.isZerg))     return pvzSafeToAttack
+    if (With.self.isZerg && With.enemies.forall(_.isZerg))        return zvzSafeToAttack
     
     With.battles.global.globalSafeToAttack
   }
@@ -143,6 +145,25 @@ class SafeToMoveOut extends Predicate {
     val safeInAir     = airThem     == 0 || airThem     <= airUs     * With.blackboard.aggressionRatio()
     val safeOnGround  = groundThem  == 0 || groundThem  <= groundUs  * With.blackboard.aggressionRatio()
     val output        = safeInAir && safeOnGround
+    output
+  }
+
+  def zvzSafeToAttack: Boolean = {
+    val speedUs = With.self.hasUpgrade(Zerg.ZerglingSpeed)
+    val speedEnemy = With.enemy.hasUpgrade(Zerg.ZerglingSpeed)
+    val strategyUs = With.strategy.selectedCurrently
+    val speedExpectedFirst = (
+      strategyUs.contains(ZvZ9PoolSpeed)
+      || With.fingerprints.twelveHatch.matches
+      || With.fingerprints.twelvePool.matches)
+    val okayOnSpeed = speedUs || (speedExpectedFirst && ! speedEnemy)
+
+    val okayOnZerglings = okayOnSpeed && (
+      countOurs(Zerg.Zergling) >= countEnemy(Zerg.Zergling)
+      || (countOurs(Zerg.Mutalisk) > countEnemy(Zerg.Mutalisk)))
+
+    val okayOnMutalisks = countOurs(Zerg.Mutalisk) + countOurs(Zerg.Scourge) >= countEnemy(Zerg.Mutalisk)
+    val output = okayOnZerglings && okayOnMutalisks
     output
   }
   

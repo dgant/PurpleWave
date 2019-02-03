@@ -4,11 +4,12 @@ import Macro.BuildRequests.Get
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.Terran.Situational.RepairBunker
 import Planning.Plans.GamePlans.Terran.Standard.TvP.TvPIdeas.ReactiveDetection
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
-import Planning.Plans.Macro.Terran.{BuildBunkersAtNatural, BuildMissileTurretsAtBases, BuildMissileTurretsAtNatural}
+import Planning.Plans.Macro.Terran.{BuildBunkersAtNatural, BuildMissileTurretsAtBases, BuildMissileTurretsAtNatural, PopulateBunkers}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyBasesAtMost
 import Planning.Predicates.Strategy.Employing
@@ -31,6 +32,8 @@ class TvP2Armory extends GameplanTemplate {
     new PumpWorkers(oversaturate = false))
 
   override def buildPlans: Seq[Plan] = Vector(
+    new RepairBunker,
+    new PopulateBunkers,
     new If(
       new UnitsAtLeast(3, Terran.Marine),
       new BuildBunkersAtNatural(1)),

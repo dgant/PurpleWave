@@ -16,11 +16,11 @@ import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvROpenTinfoil
+import Strategery.Strategies.Protoss.PvRTinfoil
 
 class PvRTinfoil extends GameplanTemplateVsRandom {
   
-  override val activationCriteria = new Employing(PvROpenTinfoil)
+  override val activationCriteria = new Employing(PvRTinfoil)
   override def scoutPlan   = NoPlan()
 
   override def attackPlan = new If(new UnitsAtLeast(6, Protoss.Gateway, complete = true), new ConsiderAttacking)

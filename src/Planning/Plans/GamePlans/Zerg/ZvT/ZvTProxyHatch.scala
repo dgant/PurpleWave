@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Zerg.ZvE
+package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Lifecycle.With
 import Macro.Architecture.Blueprint
@@ -20,7 +20,7 @@ import Planning.UnitMatchers.{UnitMatchMobileFlying, UnitMatchWorkers}
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.{ZvTProxyHatchHydras, ZvTProxyHatchSunkens, ZvTProxyHatchZerglings}
 
-class ProxyHatch extends Parallel {
+class ZvTProxyHatch extends Parallel {
   
   override def onUpdate() {
     With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue

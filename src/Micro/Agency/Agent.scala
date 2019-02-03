@@ -184,10 +184,10 @@ class Agent(val unit: FriendlyUnitInfo) {
     toFinish      = intent.toFinish
     toUpgrade     = intent.toUpgrade
     toLeash       = intent.toLeash
+    toRepair      = intent.toRepair
     toForm        = intent.toForm
+    toBoard       = intent.toBoard.orElse(toBoard)
     toNuke        = intent.toNuke
-    toRepair      = None
-    toBoard       = None
     canFight      = intent.canAttack
     canFlee       = intent.canFlee
     canMeld       = intent.canMeld

@@ -1,5 +1,6 @@
 package ProxyBwapi.UnitInfo
 
+import Information.Grids.Combat.AbstractGridEnemyRange
 import Lifecycle.With
 import Micro.Agency.Agent
 import Micro.Squads.Squad
@@ -94,4 +95,10 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
 
   // More accurate, but avoiding for performance reasons
   // override def subjectiveValue: Double = super.subjectiveValue + trainee.map(_.subjectiveValue).sum
+
+  def enemyRangeGrid: AbstractGridEnemyRange =
+    if (flying || transport.exists(_.flying))
+      With.grids.enemyRangeAir
+    else
+      With.grids.enemyRangeGround
 }

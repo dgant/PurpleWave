@@ -1,7 +1,7 @@
 package Strategery.Strategies.Zerg
 
 import Planning.Plan
-import Planning.Plans.GamePlans.Zerg.ZvT.{ZvT13PoolMuta, ZvT1HatchLurker, ZvT2HatchLingBustMuta, ZvT2HatchLurker, ZvT3HatchLing, ZvTProxyHatch}
+import Planning.Plans.GamePlans.Zerg.ZvT.{ZvT13PoolMuta, ZvT1HatchLurker, ZvT2HatchLingBustMuta, ZvT2HatchLurker, ZvT3HatchLing, ZvT7Pool, ZvTProxyHatch}
 import Strategery.{Heartbreak, StarCraftMap}
 import Strategery.Strategies.Strategy
 import bwapi.Race
@@ -19,6 +19,9 @@ object ZvT1HatchLurker extends ZvTStrategy {
 }
 object ZvT2HatchLingBustMuta extends ZvTStrategy {
   override def gameplan: Option[Plan] = Some(new ZvT2HatchLingBustMuta)
+}
+object ZvT7Pool extends ZvTStrategy {
+  override def gameplan: Option[Plan] = Some(new ZvT7Pool)
 }
 object ZvT3HatchLing extends ZvTStrategy {
   override def gameplan: Option[Plan] = Some(new ZvT3HatchLing)

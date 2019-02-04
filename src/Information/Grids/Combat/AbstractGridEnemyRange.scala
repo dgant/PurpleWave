@@ -3,8 +3,9 @@ package Information.Grids.Combat
 import Information.Grids.ArrayTypes.AbstractGridVersionedValue
 import Lifecycle.With
 import Mathematics.Shapes.Ring
+import ProxyBwapi.UnitInfo.UnitInfo
 
-class GridEnemyRange extends AbstractGridVersionedValue[Int] {
+abstract class AbstractGridEnemyRange extends AbstractGridVersionedValue[Int] {
 
   override val defaultValue = 0
   override protected var values: Array[Int] = Array.fill(length)(defaultValue)
@@ -15,11 +16,13 @@ class GridEnemyRange extends AbstractGridVersionedValue[Int] {
   // How many frames ahead to project positions
   val framesAhead = 12
 
+  protected def pixelRangeMax(unit: UnitInfo): Double
+
   override def onUpdate(): Unit = {
     for (unit <- With.units.enemy) {
       if (unit.likelyStillThere && (unit.canAttack || unit.unitClass.spells.nonEmpty) && unit.battle.nonEmpty) {
         val tileUnit = unit.projectFrames(framesAhead).tileIncluding
-        val rangeMax = addedRange + unit.effectiveRangePixels.toInt/32
+        val rangeMax = addedRange + pixelRangeMax(unit).toInt/32
         for (d <- 1 to rangeMax) {
           for (point <- Ring.points(d)) {
             val tile = tileUnit.add(point)

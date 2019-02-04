@@ -70,9 +70,8 @@ class Strategist {
     val enemyHasKnownRace = With.enemies.exists(_.raceInitial != Race.Unknown)
     val strategiesUnfiltered = if (enemyHasKnownRace) {
       TerranChoices.all ++ ProtossChoices.all ++ ZergChoices.all
-    }
-    else {
-      TerranChoices.tvr ++ ProtossChoices.pvr ++ ZergChoices.all
+    } else {
+      TerranChoices.tvr ++ ProtossChoices.pvr ++ ZergChoices.zvr
     }
     val strategiesFiltered = filterForcedStrategies(strategiesUnfiltered.filter(isAppropriate))
     strategiesFiltered.foreach(evaluate)

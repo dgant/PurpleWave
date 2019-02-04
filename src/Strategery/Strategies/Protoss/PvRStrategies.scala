@@ -29,7 +29,7 @@ object PvROpenZCoreZ extends PvR1GateCoreStrategy
 object PvROpenZZCore extends PvR1GateCoreStrategy
 object PvROpen2Gate910 extends PvR2GateStrategy
 object PvROpen2Gate1012 extends PvR2GateStrategy
-object PvROpenProxy2Gate extends PvR2GateStrategy {
+object PvRProxy2Gate extends PvR2GateStrategy {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
 }
 

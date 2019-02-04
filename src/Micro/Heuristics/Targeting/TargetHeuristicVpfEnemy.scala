@@ -29,6 +29,7 @@ object TargetHeuristicVpfEnemy extends TargetHeuristic {
 
   override def evaluate(unit: FriendlyUnitInfo, candidate: UnitInfo): Double = {
     lazy val maxTeamVpf = ByOption.max(unit.matchups.enemies.view.filter(_ != candidate).map(calculate)).getOrElse(0.0)
+    val baseVpf = candidate.matchups.vpfTargetHeuristic
 
     var bonusVpf = 0.0
 
@@ -46,8 +47,11 @@ object TargetHeuristicVpfEnemy extends TargetHeuristic {
     if (candidate.is(Protoss.Arbiter) && unit.matchups.allyDetectors.isEmpty) {
       bonusVpf += maxTeamVpf
     }
+    if (With.blackboard.pushKiters.get && candidate.isAny(Terran.Vulture, Protoss.Dragoon)) {
+      bonusVpf += baseVpf
+    }
 
-    candidate.matchups.vpfTargetHeuristic + bonusVpf
+    baseVpf + bonusVpf
   }
 
   def calculate(candidate: UnitInfo): Double = {

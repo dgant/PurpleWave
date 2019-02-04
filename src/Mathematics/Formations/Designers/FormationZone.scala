@@ -80,7 +80,7 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
                 && ! With.architecture.unbuildable.get(tile)
                 && ! With.architecture.untownhallable.get(tile)))) {
               val exitDistance                = distanceGrid.get(tile)
-              val distanceIntoEnemyRangeNow   = 1 + With.grids.enemyRange.get(tile) - With.grids.enemyRange.addedRange
+              val distanceIntoEnemyRangeNow   = 1 + With.grids.enemyRangeGround.get(tile) - With.grids.enemyRangeGround.addedRange
               val distanceIntoEnemyRangeExit  = Math.max(0, enemyRangePixelsMax / 32 - exitDistance)
               val distanceOutOfOurRange       = Math.max(0, exitDistance - idealTiles)
               5 * distanceIntoEnemyRangeNow + 4 * distanceIntoEnemyRangeExit + 3 * distanceOutOfOurRange

@@ -42,10 +42,11 @@ case class StrategyEvaluation(strategy: Strategy) {
   
   private def weighAllFactors: Double = {
     weigh(Vector(
-      new WinrateFactor(interestVsEnemy,    gamesVsEnemy.size,    patienceGames, importanceVsEnemy),
-      new WinrateFactor(interestVsRace,     gamesVsRace.size,     patienceGames, importanceVsRace),
-      new WinrateFactor(interestOnMap,      gamesOnMap.size,      patienceGames, importanceOnMap),
-      new WinrateFactor(interestWithStarts, gamesWithStarts.size, patienceGames, importanceWithStarts)))
+      new WinrateFactor(interestVsEnemy,    gamesVsEnemy.size,    patienceGames, importanceVsEnemy)
+      //new WinrateFactor(interestVsRace,     gamesVsRace.size,     patienceGames, importanceVsRace),
+      //new WinrateFactor(interestOnMap,      gamesOnMap.size,      patienceGames, importanceOnMap),
+      //new WinrateFactor(interestWithStarts, gamesWithStarts.size, patienceGames, importanceWithStarts)
+    ))
   }
   
   private class WinrateFactor(

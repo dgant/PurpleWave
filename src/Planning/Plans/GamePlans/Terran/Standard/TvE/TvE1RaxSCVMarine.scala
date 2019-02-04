@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Attack, RecruitFreelancers}
+import Planning.Plans.Army.{AllIn, Attack, RecruitFreelancers}
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -14,8 +14,9 @@ import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.Terran.BuildBunkersAtEnemy
 import Planning.Plans.Scouting.{FoundEnemyBase, ScoutAt}
-import Planning.Predicates.Compound.{Check, Not}
-import Planning.Predicates.Milestones.UnitsAtLeast
+import Planning.Predicates.Compound.{And, Check, Not}
+import Planning.Predicates.Economy.MineralsAtLeast
+import Planning.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.{Employing, StartPositionsAtLeast}
 import Planning.UnitCounters.UnitCountExcept
 import Planning.UnitMatchers.UnitMatchWorkers
@@ -67,14 +68,22 @@ class TvE1RaxSCVMarine extends GameplanTemplate {
     Get(11, Terran.SCV))
   
   override def buildPlans: Seq[Plan] = Vector(
-    new DefendFightersAgainstEarlyPool,
+    new AllIn(
+      new And(
+        new EnemiesAtLeast(1, Terran.Vulture),
+        new UnitsAtMost(0, Terran.Bunker))),
+    new Do(() => With.blackboard.pushKiters.set(true)),
     new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
+    new DefendFightersAgainstEarlyPool,
     new Pump(Terran.Marine),
     new If(
       new FoundEnemyBase,
-      new BuildBunkersAtEnemy(1)), // Workaround for build limitations
+      new BuildBunkersAtEnemy(1)),
     new If(
       new UnitsAtLeast(1, Terran.Marine, complete = true),
       new RecruitFreelancers(UnitMatchWorkers, new UnitCountExcept(4, UnitMatchWorkers))),
+    new If(
+      new MineralsAtLeast(150),
+      new Pump(Terran.SCV))
   )
 }

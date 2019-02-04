@@ -26,6 +26,7 @@ class Blackboard {
   var yoloEnabled           : Property[Boolean] = add(new Property(true))
   var allowIslandBases      : Property[Boolean] = add(new Property(false))
   var keepingHighTemplar    : Property[Boolean] = add(new Property(true))
+  var pushKiters            : Property[Boolean] = add(new Property(false))
   var stealGas              : Property[Boolean] = add(new Property(false))
   var mcrs                  : Property[Boolean] = add(new Property(With.configuration.enableMCRS))
   var preferCloseExpansion  : Property[Boolean] = add(new Property(false))

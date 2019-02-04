@@ -26,6 +26,10 @@ object TargetFilterFutility extends TargetFilter {
   // Ignore them if they're distractions.
   //
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
+    if (With.blackboard.pushKiters.get) {
+      return true
+    }
+
     lazy val atOurWorkers = target.base.exists(_.owner.isUs) && target.matchups.targetsInRange.exists(_.unitClass.isWorker)
     lazy val alliesAssisting  = target.matchups.threats.exists(ally =>
       ally != actor

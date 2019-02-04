@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvP
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.{Attack, Hunt}
 import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
@@ -44,6 +44,8 @@ object TvPIdeas {
             Get(1, Terran.Academy)))))
 
   class TvPAttack extends Parallel(
+    new Hunt(Terran.Wraith, Protoss.Shuttle),
+    new Hunt(Terran.Wraith, Protoss.Reaver),
     // Continue any existing attacks
     new Trigger(
       new Not(new SafeToMoveOut),
@@ -86,7 +88,7 @@ object TvPIdeas {
       new Or(
         new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway, With.fingerprints.nexusFirst),
         new EnemiesAtLeast(1, Protoss.Zealot))),
-    new PumpRatio(Terran.Vulture, 1, 2, Seq(Enemy(Protoss.Zealot, 0.5))))
+    new PumpRatio(Terran.Vulture, 1, 5, Seq(Enemy(Protoss.Zealot, 1.0))))
 
   class PumpScienceVessels extends PumpRatio(Terran.ScienceVessel, 1, 3, Seq(
     Enemy(Protoss.Arbiter, 1.0),

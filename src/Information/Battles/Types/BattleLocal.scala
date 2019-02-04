@@ -25,7 +25,7 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   lazy val distanceEnemy  : Double  = focus.pixelDistance(With.intelligence.mostBaselikeEnemyTile.pixelCenter) + 2 * rangeEnemy
   lazy val distanceRatio  : Double  = distanceEnemy / (distanceUs + distanceEnemy)
   lazy val turtleBonus    : Double  = if (canTurtle) 0.0 else - PurpleMath.clamp(0.75 * (distanceRatio - 0.5), 0.0, 0.5)
-  lazy val trappedness    : Double  = PurpleMath.weightedMean(us.units.filter(_.canMove).map(u => (trappedPenalty(u), u.subjectiveValue)))
+  lazy val trappedness    : Double  = PurpleMath.weightedMean(us.units.filter(u => u.canMove || u.sieged).map(u => (trappedPenalty(u), u.subjectiveValue)))
   lazy val attackGains    : Double  = estimationSimulationAttack.costToEnemy
   lazy val attackLosses   : Double  = estimationSimulationAttack.costToUs
   lazy val snipeGains     : Double  = estimationSimulationSnipe.costToEnemy
@@ -48,7 +48,9 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   }
 
   private def trappedPenalty(unit: UnitInfo): Double = {
+    if (unit.flying) return 0.0
     if (unit.friendly.isEmpty) return 0.0
+    if (unit.sieged) return 1.0
     val agent = unit.friendly.get.agent
     val trapped = (
       ! unit.canMove

@@ -12,7 +12,7 @@ object ProtossChoices {
     PvROpen2Gate1012,
     PvROpenZZCore,
     PvROpenZCoreZ,
-    PvROpenProxy2Gate,
+    PvRProxy2Gate,
     PvR2Gate4Gate,
     PvRTinfoil,
     ProtossBigFFACarriers,
@@ -127,7 +127,6 @@ object ProtossChoices {
   
   val gimmickOpeners = Vector(
     WorkerRush,
-    MassPhotonCannon,
     PvTProxyDarkTemplar,
     PvEIslandPlasmaCarriers3Base,
     CarriersWithNoDefense,

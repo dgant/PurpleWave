@@ -1,27 +1,39 @@
 package Strategery.Strategies.Zerg
 
-import Strategery.Strategies._
+import Strategery.Strategies.Strategy
 
 object ZergChoices {
-  
-  val all: Iterable[Strategy] = Vector(
+
+  val zvr = Vector(
     ZvESparkle,
     ZvE4Pool,
+    ZvR9Pool
+  )
 
+  val zvt = Vector(
     ZvTProxyHatchZerglings,
     ZvTProxyHatchHydras,
     ZvTProxyHatchSunkens,
-    ZvT1HatchLurker,
+    ZvT7Pool,
     ZvT2HatchLingBustMuta,
     ZvT3HatchLing,
+    ZvT1HatchLurker,
     ZvT2HatchLurker,
+    ZvT13PoolMuta,
+  )
+
+  val zvp = Vector(
     ZvP3Hatch,
     ZvP6Hatch,
-    ZvT13PoolMuta,
     ZvP2HatchMuta,
+  )
+
+  val zvz = Vector(
     ZvZ5PoolSunkens,
     ZvZ9PoolSpeed,
     ZvZ12Pool,
     ZvZ10HatchLing
   )
+  
+  val all: Vector[Strategy] = (zvr ++ zvt ++ zvp ++ zvz).distinct
 }

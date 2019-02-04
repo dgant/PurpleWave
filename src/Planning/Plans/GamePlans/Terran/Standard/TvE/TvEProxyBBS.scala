@@ -5,19 +5,21 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Predicates.Compound.And
-import Planning.UnitCounters.UnitCountExactly
-import Planning.UnitMatchers.UnitMatchWorkers
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.{Attack, RecruitFreelancers}
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Macro.Terran.BuildBunkersAtEnemy
+import Planning.Plans.Scouting.{FoundEnemyBase, ScoutOn}
+import Planning.Predicates.Compound.Not
+import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.UnitsAtLeast
-import Planning.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Predicates.Strategy.Employing
+import Planning.UnitCounters.UnitCountExcept
+import Planning.UnitMatchers.UnitMatchWorkers
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvE.TvEProxyBBS
@@ -28,18 +30,26 @@ class TvEProxyBBS extends GameplanTemplate {
   
   override val aggression: Double = 1.5
   
-  lazy val proxyZone: Option[Zone] = ProxyPlanner.proxyAutomaticAggressive
+  lazy val proxyZone: Option[Zone] = ProxyPlanner.proxyMiddle
   
-  override def scoutPlan: Plan = NoPlan()
+  override def scoutPlan: Plan = new If(
+    new Not(new FoundEnemyBase),
+    new ScoutOn(Terran.Marine))
+
+  override def placementPlan: Plan = new ProposePlacement{
+      override lazy val blueprints = Vector(
+        new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)),
+        new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)))
+    }
   
   override def attackPlan: Plan = new Parallel(
     new Attack,
-    new Trigger(
-      new UnitsAtLeast(1, Terran.Marine, complete = false),
-      new Attack(UnitMatchWorkers, UnitCountExactly(2))))
+    new Attack(Terran.SCV))
   
   override def workerPlan: Plan = NoPlan()
-  override def supplyPlan: Plan = NoPlan()
+  override def supplyPlan: Plan = new If(
+    new MineralsAtLeast(200),
+    super.supplyPlan)
   
   override def buildOrder: Seq[BuildRequest] = Vector(
     Get(Terran.CommandCenter),
@@ -51,27 +61,13 @@ class TvEProxyBBS extends GameplanTemplate {
   
   override def buildPlans: Seq[Plan] = Vector(
     new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
-    new ProposePlacement{
-      override lazy val blueprints = Vector(
-        new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)),
-        new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)))
-    },
     new Pump(Terran.Marine),
     new Build(Get(10, Terran.SCV)),
     new If(
-      new And(
-        new UnitsAtLeast(9, Terran.SCV),
-        new EnemyBasesAtLeast(1)),
-      new Parallel(
-        new ProposePlacement {
-          override lazy val blueprints = Vector(
-            new Blueprint(this, building = Some(Terran.Bunker), preferZone = With.geography.enemyBases.headOption.map(_.zone), respectHarvesting = Some(false)),
-            new Blueprint(this, building = Some(Terran.Bunker), preferZone = With.geography.enemyBases.headOption.map(_.zone), respectHarvesting = Some(false)),
-            new Blueprint(this, building = Some(Terran.Bunker), preferZone = With.geography.enemyBases.headOption.map(_.zone), respectHarvesting = Some(false)),
-            new Blueprint(this, building = Some(Terran.Bunker), preferZone = With.geography.enemyBases.headOption.map(_.zone), respectHarvesting = Some(false))
-          )
-        },
-        new Pump(Terran.Bunker, 3, 1)
-      ))
+      new UnitsAtLeast(9, Terran.SCV),
+      new BuildBunkersAtEnemy(3)),
+    new Trigger(
+      new UnitsAtLeast(2, Terran.Marine),
+      new RecruitFreelancers(UnitMatchWorkers, new UnitCountExcept(8, UnitMatchWorkers)))
   )
 }

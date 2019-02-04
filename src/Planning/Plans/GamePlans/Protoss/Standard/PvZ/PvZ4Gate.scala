@@ -75,10 +75,10 @@ class PvZ4Gate extends GameplanTemplate {
     new If(
       new EnemyHasShownCloakedThreat,
       new Build(
-        Get(1, Protoss.Assimilator),
-        Get(1, Protoss.CyberneticsCore),
-        Get(1, Protoss.RoboticsFacility),
-        Get(1, Protoss.Observatory),
+        Get(Protoss.Assimilator),
+        Get(Protoss.CyberneticsCore),
+        Get(Protoss.RoboticsFacility),
+        Get(Protoss.Observatory),
         Get(2, Protoss.Observer)),
       new If(
         new UnitsAtMost(14, UnitMatchWorkers),

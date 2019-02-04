@@ -242,6 +242,9 @@ class PvTBasic extends GameplanTemplate {
           new And(
             new EmployingCarriers,
             new Or(
+              new EmployingTwoBase,
+              new BasesAtLeast(3)),
+            new Or(
               new ScoutCleared,
               new FrameAtLeast(GameTime(4, 45)()))),
           new Parallel(
@@ -267,6 +270,9 @@ class PvTBasic extends GameplanTemplate {
         new If(
           new Or(
             new EmployingArbiters,
+            new Or(
+              new EmployingTwoBase,
+              new BasesAtLeast(3)),
             new UnitsAtLeast(8, Protoss.Carrier)),
           new Parallel(
             new Build(

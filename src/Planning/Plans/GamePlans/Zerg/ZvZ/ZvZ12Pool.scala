@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvZ
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{Attack, ConsiderAttacking, Hunt}
+import Planning.Plans.Army.{AllIn, Attack, ConsiderAttacking, Hunt}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpJustEnoughScourge, ScoutSafelyWithOverlord}
@@ -47,6 +47,11 @@ class ZvZ12Pool extends GameplanTemplate {
     Get(Zerg.Extractor))
   
   override def buildPlans: Seq[Plan] = Vector(
+
+    new AllIn(
+      new And(
+        new UnitsAtMost(0, Zerg.Spire, complete = true),
+        new EnemiesAtLeast(1, Zerg.Mutalisk))),
 
     new If(
       new UnitsAtLeast(1, Zerg.Spire),

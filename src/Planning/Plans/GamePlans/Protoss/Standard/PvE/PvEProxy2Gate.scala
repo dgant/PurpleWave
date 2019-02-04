@@ -17,11 +17,11 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy}
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import Strategery.Strategies.Protoss.{PvPProxy2Gate, PvROpenProxy2Gate, PvTProxy2Gate, PvZProxy2Gate}
+import Strategery.Strategies.Protoss.{PvPProxy2Gate, PvRProxy2Gate, PvTProxy2Gate, PvZProxy2Gate}
 
 class PvEProxy2Gate extends GameplanTemplate {
-  
-  override val activationCriteria = new Employing(PvROpenProxy2Gate, PvTProxy2Gate, PvPProxy2Gate, PvZProxy2Gate)
+
+  override val activationCriteria = new Employing(PvRProxy2Gate, PvTProxy2Gate, PvPProxy2Gate, PvZProxy2Gate)
   override val completionCriteria = new Latch(new BasesAtLeast(2))
   override def scoutPlan   = new If(new UnitsAtLeast(2, Protoss.Gateway), new Scout)
   override def workerPlan: Plan = NoPlan()
@@ -54,7 +54,9 @@ class PvEProxy2Gate extends GameplanTemplate {
         new Aggression(1.9))),
 
     new RequireSufficientSupply,
-    new BuildOrder(Get(1, Protoss.Gateway), Get(2, Protoss.Zealot)),
+    new BuildOrder(
+      Get(Protoss.Gateway),
+      Get(2, Protoss.Zealot)),
 
     new Pump(Protoss.Observer, 2),
     new If(
@@ -91,7 +93,8 @@ class PvEProxy2Gate extends GameplanTemplate {
   )
   
   override def buildPlans = Vector(
-    new Do(() =>  With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
+    new Do(() => With.blackboard.pushKiters.set(true)),
+    new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
     new Trigger(new UnitsAtLeast(2, Protoss.Gateway),
       initialBefore = new BeforeProxy,
       initialAfter  = new AfterProxy)

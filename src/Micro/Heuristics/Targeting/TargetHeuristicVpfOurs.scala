@@ -6,7 +6,7 @@ object TargetHeuristicVpfOurs extends TargetHeuristic {
   
   override def evaluate(unit: FriendlyUnitInfo, candidate: UnitInfo): Double = {
     val multiplierBase = 240
-    val multiplierMiner = if (candidate.gatheringMinerals) 2.0 else 1.0
+    val multiplierMiner = if (candidate.gatheringMinerals) 1.5 else 1.0
     val output = multiplierBase * multiplierMiner * valuePerAttack(unit, candidate) / unit.cooldownMaxAgainst(candidate)
     output
   }

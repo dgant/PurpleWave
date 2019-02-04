@@ -70,6 +70,11 @@ class TvPDeep4 extends GameplanTemplate {
       Get(4, Terran.Barracks),
       Get(Terran.BioArmor),
       Get(Terran.Stim)),
+    new If(
+      new EnemyHasShown(Protoss.Shuttle),
+      new Build(
+        Get(Terran.Starport),
+        Get(Terran.Wraith))),
     new Pump(Terran.Marine),
     new BuildMissileTurretsAtBases(2),
     new Build(

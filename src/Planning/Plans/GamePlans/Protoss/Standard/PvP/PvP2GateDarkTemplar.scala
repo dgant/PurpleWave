@@ -10,7 +10,7 @@ import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, RequireSufficientSupply}
+import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump, PumpWorkers, RequireSufficientSupply}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
 import Planning.Predicates.Milestones.{EnemiesAtMost, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
@@ -29,7 +29,10 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
   override val attackPlan  = new Trigger(
     new Or(
       new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
-      new EnemyStrategy(With.fingerprints.nexusFirst)),
+      new EnemyStrategy(With.fingerprints.nexusFirst),
+      new And(
+        new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
+        new EnemyStrategy(With.fingerprints.proxyGateway))),
     new Attack)
   override def blueprints = Vector(
     new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.backPylon)),
@@ -43,35 +46,35 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
     // http://wiki.teamliquid.net/starcraft/2_Gateway_Dark_Templar_(vs._Protoss)
     // We get gas/core faster because of mineral locking + later scout
     Get(8,   Protoss.Probe),
-    Get(1,   Protoss.Pylon),            // 8
+    Get(Protoss.Pylon),                 // 8
     Get(10,  Protoss.Probe),
-    Get(1,   Protoss.Gateway),          // 10
+    Get(Protoss.Gateway),               // 10
     Get(12,  Protoss.Probe),
-    Get(2,   Protoss.Pylon),            // 11
+    Get(Protoss.Assimilator),           // 12
     Get(13,  Protoss.Probe),
     Get(1,   Protoss.Zealot),           // 13 = 11 + Z
     Get(14,  Protoss.Probe),
-    Get(1,   Protoss.Assimilator),      // 16 = 14 + Z
+    Get(2,   Protoss.Pylon),            // 16 = 14 + Z
     Get(16,  Protoss.Probe),
-    Get(1,   Protoss.CyberneticsCore),  // 18 = 16 + Z
+    Get(Protoss.CyberneticsCore),       // 18 = 16 + Z
     Get(17,  Protoss.Probe),
     Get(2,   Protoss.Zealot),           // 21 = 17 + ZZ
     Get(18,  Protoss.Probe),
     Get(3,   Protoss.Pylon),            // 22 = 18 + ZZ
     Get(20,  Protoss.Probe),            // 24 = 20 + ZZ
-    Get(1,   Protoss.CitadelOfAdun),
+    Get(Protoss.CitadelOfAdun),
     Get(1,   Protoss.Dragoon),          // 26 = 20 + ZZ + D
     Get(21,  Protoss.Probe),
     Get(2,   Protoss.Dragoon),          // 29 = 21 + ZZ + DD
     Get(2,   Protoss.Gateway),
     Get(3,   Protoss.Pylon),
-    Get(1,   Protoss.TemplarArchives),
+    Get(Protoss.TemplarArchives),
     Get(22,  Protoss.Probe),            // 30 = 22 + ZZZZ + DD
     Get(4,   Protoss.Pylon),            // 32 = 22 + ZZZZ + DD
     Get(23,  Protoss.Probe),
     Get(2,   Protoss.DarkTemplar),
     Get(24,  Protoss.Probe),
-    Get(1,   Protoss.Forge),
+    Get(Protoss.Forge),
     Get(25,  Protoss.Probe),
     Get(5,   Protoss.Pylon))
   
@@ -84,6 +87,9 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
   override val buildPlans = Vector(
     new EjectScout,
     new RequireSufficientSupply,
+    new Trigger(
+      new UnitsAtLeast(1, Protoss.CitadelOfAdun),
+      initialBefore = new CapGasWorkersAt(2)),
     new If(
       new And(
         new EnemiesAtMost(0, Protoss.Observer),

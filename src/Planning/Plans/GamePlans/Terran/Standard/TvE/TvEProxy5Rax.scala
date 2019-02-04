@@ -48,13 +48,14 @@ class TvEProxy5Rax extends GameplanTemplate {
 
   override val buildOrder = Vector(
     Get(5, Terran.SCV),
-    Get(1, Terran.Barracks),
+    Get(Terran.Barracks),
     Get(7, Terran.SCV),
-    Get(1, Terran.SupplyDepot),
-    Get(1, Terran.Marine)
+    Get(Terran.SupplyDepot),
+    Get(Terran.Marine)
   )
 
   override def buildPlans: Seq[Plan] = Vector(
+    new Do(() => With.blackboard.pushKiters.set(true)),
     new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
     new Pump(Terran.Marine),
     new If(

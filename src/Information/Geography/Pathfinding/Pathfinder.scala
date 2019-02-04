@@ -119,10 +119,10 @@ trait Pathfinder {
 
   val threatCostMultiplier = 2
   def threatCostAt(unit: FriendlyUnitInfo, tile: Tile): Float = {
-    threatCostMultiplier * With.grids.enemyRange.get(tile)
+    threatCostMultiplier * unit.enemyRangeGrid.get(tile)
   }
   def threatCostMax(unit: FriendlyUnitInfo, tile: Tile): Float = {
-    val c = With.grids.enemyRange.get(tile)
+    val c = unit.enemyRangeGrid.get(tile)
     threatCostMultiplier * (
       // Gaussian expansion of N+(N-1)+...+1
       if (c % 2 == 0)
@@ -134,7 +134,7 @@ trait Pathfinder {
 
   def goalDistance(end: Tile): (Tile) => Boolean = _ == end
   def goalThreatAware(unit: FriendlyUnitInfo, end: Option[Tile]): (Tile) => Boolean = tile => {
-    With.grids.enemyRange.get(tile) <= 0 && end.forall(theEnd => goalDistance(theEnd)(tile) < goalDistance(theEnd)(unit.tileIncludingCenter))
+    unit.enemyRangeGrid.get(tile) <= 0 && end.forall(theEnd => goalDistance(theEnd)(tile) < goalDistance(theEnd)(unit.tileIncludingCenter))
   }
 
   private val sqrt2f: Float = Math.sqrt(2).toFloat

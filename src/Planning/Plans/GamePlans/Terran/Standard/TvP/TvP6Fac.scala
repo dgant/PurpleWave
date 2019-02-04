@@ -11,7 +11,7 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Terran.{BuildMissileTurretsAtNatural, PopulateBunkers}
 import Planning.Predicates.Compound.Not
-import Planning.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast}
+import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemyHasShown, UnitsAtLeast}
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.{UnitMatchOr, UnitMatchSiegeTank}
@@ -61,6 +61,11 @@ class TvP6Fac extends GameplanTemplate {
       Get(Terran.EngineeringBay),
       Get(Terran.SiegeMode)),
     new BuildMissileTurretsAtNatural(1),
+    new If(
+      new EnemyHasShown(Protoss.Shuttle),
+      new Build(
+        Get(Terran.Starport),
+        Get(Terran.Wraith))),
     new BuildGasPumps,
     new Build(
       Get(Terran.Academy),

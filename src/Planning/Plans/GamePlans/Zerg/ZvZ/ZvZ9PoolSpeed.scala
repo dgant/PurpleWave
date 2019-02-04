@@ -5,6 +5,7 @@ import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPool
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpMutalisks, ScoutSafelyWithOverlord}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -43,7 +44,7 @@ class ZvZ9PoolSpeed extends GameplanTemplate {
     Get(6, Zerg.Zergling))
   
   override def buildPlans: Seq[Plan] = Vector(
-
+    new DefendFightersAgainstEarlyPool,
     new If(
       new UnitsAtLeast(1, Zerg.Spire),
       new CapGasAtRatioToMinerals(1.0, 50),

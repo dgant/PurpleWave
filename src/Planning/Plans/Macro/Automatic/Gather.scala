@@ -8,7 +8,7 @@ import Planning.Plan
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountEverything
 import Planning.UnitMatchers.UnitMatchWorkers
-import ProxyBwapi.Races.Zerg
+import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 import scala.collection.mutable
@@ -96,10 +96,18 @@ class Gather extends Plan {
     baseZones.foreach(zone1 =>
       baseZones.foreach(zone2 => {
         val path = With.paths.zonePath(zone1, zone2)
-        val pathZones: Iterable[Zone] = path.map(_.steps.map(_.to).filter(zone => zone != zone1 && zone != zone2)).getOrElse(Iterable.empty)
-        val pathZonesDanger = pathZones.filter(zone =>
-              zone.units.exists(e => e.isEnemy  && e.unitClass.attacksGround)
-        && !  zone.units.exists(a => a.isOurs   && a.unitClass.attacksGround))
+        val pathZones: Iterable[Zone] = path
+          .map(_.steps.map(_.to).filter(zone => zone != zone1 && zone != zone2))
+          .getOrElse(Iterable.empty)
+        val pathZonesDanger = pathZones.filter(zone => {
+          val friendlyFighters = zone.units.count(a => a.isOurs && a.unitClass.attacksGround)
+          (
+            // Basic danger
+            (zone.units.exists(e => e.isEnemy && e.unitClass.attacksGround) && friendlyFighters == 0)
+            // Vulture danger
+            || (zone.units.count(e => e.isEnemy && e.is(Terran.Vulture)) > friendlyFighters)
+          )
+        })
       if (pathZonesDanger.isEmpty) {
         transfersLegal += ((zone1, zone2))
         transfersLegal += ((zone2, zone1))

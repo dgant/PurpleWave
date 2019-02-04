@@ -14,7 +14,7 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyBasesAtMost
 import Planning.Predicates.Strategy.Employing
 import Planning.{Plan, Predicate}
-import ProxyBwapi.Races.Terran
+import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvP2Armory
 
 class TvP2Armory extends GameplanTemplate {
@@ -54,6 +54,11 @@ class TvP2Armory extends GameplanTemplate {
       Get(Terran.EngineeringBay)),
     new BuildGasPumps,
     new BuildMissileTurretsAtNatural(1),
+    new If(
+      new EnemyHasShown(Protoss.Shuttle),
+      new Build(
+        Get(Terran.Starport),
+        Get(Terran.Wraith))),
     new Build(
       Get(2, Terran.Factory),
       Get(2, Terran.MachineShop),
@@ -67,7 +72,7 @@ class TvP2Armory extends GameplanTemplate {
       Get(Terran.VultureSpeed)),
     new ReactiveDetection,
     new BuildMissileTurretsAtBases(1),
-    new RequireMiningBases(3),
+    new RequireBases(3),
     new PumpWorkers,
     new Build(
       Get(Terran.Starport),

@@ -46,7 +46,9 @@ object Avoid extends ActionTechnique {
     }
     avoidGreedyPath(unit)
     avoidGreedyPath(unit, distanceValue = 0, safetyValue = 2)
+    avoidGreedyPath(unit, distanceValue = 0, safetyValue = 2, crowdValue = 0)
     avoidGreedyPath(unit, distanceValue = 2, safetyValue = 0)
+    avoidGreedyPath(unit, distanceValue = 2, safetyValue = 0, crowdValue = 0)
     avoidPotential(unit)
   }
 
@@ -75,9 +77,12 @@ object Avoid extends ActionTechnique {
   def avoidGreedyPath(
     unit: FriendlyUnitInfo,
     distanceValue: Int = 1,
-    safetyValue: Int = 1): Unit = {
+    safetyValue: Int = 1,
+    crowdValue: Int = 1): Unit = {
 
     if (! unit.readyForMicro) return
+
+    val enemyRangeGrid = unit.enemyRangeGrid
 
     var pathLengthMax = PurpleMath.clamp(unit.matchups.framesOfEntanglement * unit.topSpeed + 3, 6, 10)
     val path = new ArrayBuffer[Tile]
@@ -91,14 +96,14 @@ object Avoid extends ActionTechnique {
       else
         unit.agent.origin.zone.distanceGrid.get(tile)
     def tileScore(tile: Tile): Int = {
-      val enemyRange = With.grids.enemyRange.get(tile)
+      val enemyRange = enemyRangeGrid.get(tile)
       (
         - 10 * distanceValue * tileDistance(tile)
-        - 10 * safetyValue * enemyRange * (if (enemyRange > With.grids.enemyRange.addedRange) 2 else 1)
+        - 10 * safetyValue * enemyRange * (if (enemyRange > enemyRangeGrid.addedRange) 2 else 1)
         - (if (unit.cloaked)
           10 * safetyValue * With.grids.enemyDetection.get(tile) * (if (With.grids.enemyDetection.isDetected(tile)) 2 else 1)
           else 0)
-        - PurpleMath.clamp(With.coordinator.gridPathOccupancy.get(tile) / 3, 0, 9)
+        - crowdValue * PurpleMath.clamp(With.coordinator.gridPathOccupancy.get(tile) / 3, 0, 9)
       )
     }
     val directions = Ring.points(1)
@@ -129,7 +134,7 @@ object Avoid extends ActionTechnique {
       }
     }
 
-    if (path.length >= Math.max(2, With.grids.enemyRange.get(unit.tileIncludingCenter))) {
+    if (path.length >= Math.max(2, enemyRangeGrid.get(unit.tileIncludingCenter))) {
         if (ShowUnitsFriendly.inUse && With.visualization.map) {
           for (i <- 0 until path.length - 1) {
             DrawMap.arrow(

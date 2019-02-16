@@ -29,8 +29,8 @@ class ZvP2HatchMuta extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(ZvP2HatchMuta)
   
   class ProceedWithTech extends Or(
-      new Latch(new UnitsAtLeast(16, Zerg.Drone)),
-      new Latch(new UnitsAtLeast(8, Zerg.Zergling)),
+      new Latch(new UnitsAtLeast(14, Zerg.Drone)),
+      new Latch(new UnitsAtLeast(8, Zerg.Zergling, countEggs = true)),
       new Latch(new UnitsAtLeast(2, Zerg.SunkenColony)),
       new Not(new EnemyStrategy(
         With.fingerprints.twoGate,
@@ -80,7 +80,8 @@ class ZvP2HatchMuta extends GameplanTemplate {
       Get(2, Zerg.Overlord),
       Get(12, Zerg.Drone),
       Get(2, Zerg.Hatchery),
-      Get(1, Zerg.SpawningPool),
+      Get(Zerg.SpawningPool),
+      Get(Zerg.Extractor),
       Get(14, Zerg.Drone)),
     new If(
       new EnemyStrategy(
@@ -88,9 +89,8 @@ class ZvP2HatchMuta extends GameplanTemplate {
         With.fingerprints.nexusFirst),
       new Parallel(
         new BuildOrder(
-          Get(1, Zerg.Extractor),
           Get(17, Zerg.Drone),
-          Get(1, Zerg.Lair)),
+          Get(Zerg.Lair)),
         new If(
           new UnitsAtLeast(16, Zerg.Drone),
           new Build(Get(2, Zerg.Extractor))),
@@ -98,15 +98,15 @@ class ZvP2HatchMuta extends GameplanTemplate {
           Get(21, Zerg.Drone),
           Get(3, Zerg.Overlord),
           Get(3, Zerg.Hatchery),
-          Get(1, Zerg.Spire))),
-      new If(
-        new EnemyStrategy(With.fingerprints.gatewayFe),
-        new BuildOrder(Get(8, Zerg.Zergling)),
-        new Parallel(
-          new Trigger(
-            new UnitsAtLeast(2, UnitMatchOr(Zerg.SunkenColony, Zerg.CreepColony)),
-            initialBefore = new BuildSunkensAtNatural(2, sunkenProfile)),
-          new BuildOrder(Get(10, Zerg.Zergling))))))
+          Get(Zerg.Spire)))),
+    new If(
+      new EnemyStrategy(With.fingerprints.gatewayFe),
+      new BuildOrder(Get(8, Zerg.Zergling)),
+      new Parallel(
+        new Trigger(
+          new UnitsAtLeast(2, UnitMatchOr(Zerg.SunkenColony, Zerg.CreepColony)),
+          initialBefore = new BuildSunkensAtNatural(2, sunkenProfile)),
+        new BuildOrder(Get(10, Zerg.Zergling)))))
     
   lazy val ZealotOrDragoon = UnitMatchOr(Protoss.Zealot, Protoss.Dragoon)
   
@@ -131,10 +131,7 @@ class ZvP2HatchMuta extends GameplanTemplate {
               new BuildSunkensAtNatural(3, sunkenProfile),
               new If(
                 new EnemiesAtLeast(3, ZealotOrDragoon),
-                new BuildSunkensAtNatural(2, sunkenProfile),
-                new If(
-                  new EnemiesAtLeast(1, Terran.Vulture),
-                  new BuildSunkensAtNatural(1, sunkenProfile)))))))))
+                new BuildSunkensAtNatural(2, sunkenProfile))))))))
   
   class ReactiveZerglings extends If(
     new UnitsAtMost(0, Zerg.Spire, complete = true),
@@ -205,8 +202,8 @@ class ZvP2HatchMuta extends GameplanTemplate {
         new MiningBasesAtLeast(4),
         new UnitsAtLeast(32, Zerg.Drone)),
       new Build(
-        Get(1, Zerg.QueensNest),
-        Get(1, Zerg.Hive),
+        Get(Zerg.QueensNest),
+        Get(Zerg.Hive),
         Get(2, Zerg.EvolutionChamber))),
   
     new If(
@@ -224,7 +221,7 @@ class ZvP2HatchMuta extends GameplanTemplate {
               new UnitsAtMost(0, Zerg.Hive))),
           new UpgradeContinuously(Zerg.GroundMeleeDamage)),
         new Build(Get(1, Zerg.EvolutionChamber)))),
-    
+
     new If(
       new Check(() => With.self.gas >= Math.min(100, With.self.minerals)),
       new Parallel(
@@ -258,15 +255,18 @@ class ZvP2HatchMuta extends GameplanTemplate {
     
     new ReactiveZerglings,
     new If(
+      new UnitsAtLeast(1, Zerg.Spire),
+      new Build(Get(5, Zerg.Overlord))), // make sure we have enough when mutas pop
+
+    new If(
       new ProceedWithDrones,
       new Pump(Zerg.Drone, 12),
       new Pump(Zerg.Drone, 9)),
     new If(
       new ProceedWithTech,
       new Build(
-        Get(1, Zerg.Extractor),
-        Get(1, Zerg.Lair),
-        Get(1, Zerg.Spire),
+        Get(Zerg.Lair),
+        Get(Zerg.Spire),
         Get(Zerg.ZerglingSpeed))),
     new If(
       new UnitsAtLeast(1, Zerg.Spire),

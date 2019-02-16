@@ -43,24 +43,26 @@ class GoalAttack extends GoalBasic {
       ByOption.min(With.geography.enemyBases.map(_.heart.tileDistanceFast(focusUs)))
         .getOrElse(With.intelligence.mostBaselikeEnemyTile.tileDistanceFast(focusUs))
 
+    lazy val enemyNonTrollyThreats = With.units.enemy.count(u => u.is(UnitMatchWarriors) && u.possiblyStillThere && ! u.is(Terran.Vulture))
     if (With.enemies.exists( ! _.isZerg)
       && threatDistanceToUs < threatDistanceToEnemy
-      && With.units.enemy.count(u => u.is(UnitMatchWarriors) && ! u.is(Terran.Vulture)) > 6) {
+      && enemyNonTrollyThreats > 6) {
       target = With.intelligence.threatOrigin.pixelCenter
       return
     }
     target =
       ByOption
         .maxBy(With.geography.enemyBases)(base => {
-          val distance            = With.intelligence.threatOrigin.pixelCenter.pixelDistance(base.heart.pixelCenter)
-          val distanceLog         = 1 + Math.log(1 + distance)
-          val defendersLog        = 1 + Math.log(1 + base.defenseValue)
-          val output              = distanceLog / defendersLog
+          val distance      = With.intelligence.threatOrigin.pixelCenter.pixelDistance(base.heart.pixelCenter)
+          val distanceLog   = 1 + Math.log(1 + distance)
+          val defendersLog  = 1 + Math.log(1 + base.defenseValue)
+          val output        = distanceLog / defendersLog
           output
         })
         .map(base => ByOption.minBy(base.units.filter(u => u.isEnemy && u.unitClass.isBuilding))(_.pixelDistanceCenter(base.townHallArea.midPixel))
           .map(_.pixelCenter)
           .getOrElse(base.townHallArea.midPixel))
+        .orElse(if (enemyNonTrollyThreats > 0) Some(With.intelligence.threatOrigin.pixelCenter) else None)
         .getOrElse(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
   }
   

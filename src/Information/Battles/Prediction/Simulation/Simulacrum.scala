@@ -193,6 +193,7 @@ class Simulacrum(
     val pixelAfter        = pixel.project(destination, distanceTraveled)
     pixel                 = pixelAfter
     cooldownMoving        = framesTraveled
+    cooldownShooting      = Math.max(cooldownMoving, cooldownShooting)
     addEvent(() => SimulationEventMove(
       simulation.estimation.frames,
       this,

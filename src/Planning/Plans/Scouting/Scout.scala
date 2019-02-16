@@ -9,7 +9,7 @@ import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchNotHoldingResources, UnitMa
 import Planning.UnitPreferences.UnitPreferClose
 import Planning.{Plan, Property}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Strategery.Strategies.Zerg.ZvE4Pool
+import Strategery.Strategies.Zerg.{ZvE4Pool, ZvT1HatchHydra}
 
 import scala.collection.mutable
 
@@ -36,15 +36,15 @@ class Scout(scoutCount: Int = 1) extends Plan {
     if (With.blackboard.lastScoutDeath > 0)                             return true
     if (bases.exists(_.townHall.isDefined) && scouts.get.units.isEmpty) return true
     // With 4Pool use the scout to help harass/distract
-    if ( ! ZvE4Pool.active && bases.exists(_.units.exists(_.unitClass.isStaticDefense))) return true
-    if ( ! ZvE4Pool.active && With.geography.enemyBases.exists(_.units.exists(u => u.isOurs && ! scouts.get.unitMatcher.get.accept(u)))) return true
+    if ( ! ZvE4Pool.active && ! ZvT1HatchHydra.active && bases.exists(_.units.exists(_.unitClass.isStaticDefense))) return true
+    if ( ! ZvE4Pool.active && ! ZvT1HatchHydra.active && With.geography.enemyBases.exists(_.units.exists(u => u.isOurs && ! scouts.get.unitMatcher.get.accept(u)))) return true
     false
   }
   
   override def onUpdate() {
     if (isComplete) return
     
-    val scoutsDied = acquiredScouts.nonEmpty && acquiredScouts.exists( ! _.alive)
+    val scoutsDied = acquiredScouts.exists( ! _.alive)
     if (scoutsDied) {
       acquiredScouts = List.empty
       With.blackboard.lastScoutDeath = With.frame

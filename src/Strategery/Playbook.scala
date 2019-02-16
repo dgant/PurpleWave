@@ -1,7 +1,7 @@
 package Strategery
 
 import Lifecycle.With
-import Strategery.Selection.{StrategySelectionDynamic, _}
+import Strategery.Selection._
 import Strategery.Strategies.AllRaces.WorkerRush
 import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss._
@@ -71,13 +71,13 @@ object StrategyGroups {
 
 class PurpleWavePlaybook extends EmptyPlaybook {
   override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled
-  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionDynamic
+  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
   //override lazy val forced: Seq[Strategy] = Seq(PvZFFEEconomic, PvZMidgameCorsairReaverZealot, PvZMidgameCorsairReaverGoon, PvZMidgame5GateGoonReaver)
-  override lazy val forced: Seq[Strategy] = Seq(ZvT7Pool)
+  override lazy val forced: Seq[Strategy] = Seq(ZvT1HatchHydra)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
 }
 
-object Playbook extends PurpleWavePlaybook {}
+object Playbook extends TestingPlaybook {}

@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvZ
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Compound.{Parallel, Trigger}
+import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Enemy, Pump, PumpRatio}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Zerg.BuildSunkensInMain
@@ -22,5 +22,8 @@ object ZvZIdeas {
       new Build(Get(Zerg.SpawningPool)),
       new Pump(Zerg.SunkenColony),
       new BuildSunkensInMain(2),
+      new If(
+        new UnitsAtLeast(2, Zerg.SunkenColony, complete = true),
+        new Pump(Zerg.Drone, 9)),
       new PumpRatio(Zerg.Zergling, 0, 12, Seq(Enemy(Zerg.Zergling, 1.0)))))
 }

@@ -1,5 +1,6 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvP
 
+import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Attack, ConsiderAttacking, EjectScout}
 import Planning.Plans.Compound.{If, Parallel, Trigger}
@@ -11,7 +12,7 @@ import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound.Latch
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.{BasesAtLeast, EnemiesAtLeast, UnitsAtLeast}
-import Planning.Predicates.Strategy.Employing
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.UnitMatchSiegeTank
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran}
@@ -69,6 +70,9 @@ class TvPFDStrong extends GameplanTemplate {
     new Build(Get(Terran.SpiderMinePlant)),
     new Pump(Terran.Vulture),
     new Build(Get(Terran.SiegeMode)),
+    new If(
+      new EnemyStrategy(With.fingerprints.twoGate),
+      new Build(Get(2, Terran.Factory))),
     new RequireBases(2)
   )
 }

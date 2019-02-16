@@ -30,7 +30,7 @@ object ProxyPlanner {
   }
   
   def proxyMiddle: Option[Zone] = {
-    val eligibleZones = With.geography.zones.filter(_.tilesBuildable.length > 60)
+    val eligibleZones = With.geography.zones.filter(_.tilesBuildable.length > (4 + 12 + 12) * 1.5)
     proxyPreferredZone(eligibleZones)
   }
   

@@ -82,7 +82,6 @@ class GoalDefendZone extends GoalBasic {
       recruit.agent.intend(squad.client, new Intention {
         canFocus = true
         toTravel = Some(thisTarget.pixelCenter)
-        toReturn = Some(thisTarget.pixelCenter)
       })
     })
   }

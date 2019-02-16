@@ -41,6 +41,26 @@ class Agent(val unit: FriendlyUnitInfo) {
   var combatHysteresisFrames: Int = 0
   var lastIntent: Intention = new Intention
   var shovers: ListBuffer[FriendlyUnitInfo] = new ListBuffer[FriendlyUnitInfo]
+
+  /*
+  val simsAttack = new mutable.Queue[Double]
+  val simsSnipe = new mutable.Queue[Double]
+  private val simQueueMax = 3
+  private def enqueueSim(value: Double, queue: mutable.Queue[Double]): Unit = {
+    queue.enqueue(value)
+    while (queue.length > simQueueMax) {
+      queue.dequeue()
+    }
+  }
+  def enqueueSimAttack(value: Double): Unit = {
+    enqueueSim(value, simsAttack)
+  }
+  def enqueueSimSnipe(value: Double): Unit = {
+    enqueueSim(value, simsSnipe)
+  }
+  def meanSimAttack: Double = PurpleMath.mean(simsAttack)
+  def meanSimSnipe: Double = PurpleMath.mean(simsSnipe)
+  */
   
   ///////////////
   // Decisions //

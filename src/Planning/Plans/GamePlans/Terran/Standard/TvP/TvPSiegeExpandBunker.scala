@@ -94,7 +94,11 @@ class TvPSiegeExpandBunker extends GameplanTemplate {
           Get(Terran.EngineeringBay)),
         new Pump(Terran.SiegeTankUnsieged),
         new Build(Get(Terran.SiegeMode))),
-      new RequireMiningBases(2)),
+      new Parallel(
+        new If(
+          new EnemyStrategy(With.fingerprints.twoGate),
+          new Build(Get(2, Terran.Factory))),
+        new RequireMiningBases(2))),
 
     new FlipIf(
       new EnemiesAtLeast(2, Protoss.Dragoon),

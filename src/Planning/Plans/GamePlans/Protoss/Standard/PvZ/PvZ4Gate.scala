@@ -55,7 +55,7 @@ class PvZ4Gate extends GameplanTemplate {
     new If(
       new EnemyStrategy(With.fingerprints.fourPool),
       new If(
-        new UnitsAtLeast(6, UnitMatchWarriors, complete = true),
+        new UnitsAtLeast(8, UnitMatchWarriors, complete = true),
         super.attackPlan),
       new If(
         new Or(

@@ -3,6 +3,7 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
+import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.Do
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -17,6 +18,8 @@ import Planning.Predicates.Strategy.StartPositionsAtLeast
 import ProxyBwapi.Races.Zerg
 
 class ZvT7Pool extends GameplanTemplate {
+
+  override def attackPlan: Plan = new Attack
 
   override def scoutPlan: Plan = new Parallel(
     new ScoutSafelyWithOverlord,

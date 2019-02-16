@@ -17,6 +17,7 @@ object ZergChoices {
     ZvT7Pool,
     ZvT2HatchLingBustMuta,
     ZvT3HatchLing,
+    ZvT1HatchHydra,
     ZvT1HatchLurker,
     ZvT2HatchLurker,
     ZvT13PoolMuta,

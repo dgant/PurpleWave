@@ -16,9 +16,8 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, EnemyRobo, SafeAtHome}
+import Planning.Predicates.Reactive.{EnemyDarkTemplarLikely, EnemyRobo, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP3GateGoon
@@ -28,7 +27,7 @@ class PvP3GateGoon extends GameplanTemplate {
   override val activationCriteria : Predicate = new Employing(PvP3GateGoon)
   override val completionCriteria : Predicate = new Latch(new Or(new UnitsAtLeast(1, Protoss.RoboticsFacility), new UnitsAtLeast(5, Protoss.Gateway)))
   override def priorityAttackPlan : Plan = new AttackWithDarkTemplar
-  override def attackPlan  : Plan = new If(new Or(new EnemyBasesAtLeast(2), new EnemiesAtMost(0, Protoss.Dragoon), new UnitsAtLeast(15, UnitMatchWarriors)), new PvPIdeas.AttackSafely)
+  override def attackPlan: Plan = new PvPIdeas.AttackSafely
   override def scoutPlan   : Plan = new ScoutOn(Protoss.CyberneticsCore)
   override def workerPlan  : Plan = NoPlan()
   override def placementPlan: Plan = new If(
@@ -42,7 +41,7 @@ class PvP3GateGoon extends GameplanTemplate {
     new Trigger(new UnitsAtLeast(1, Protoss.Reaver), new PvPIdeas.ReactToFFE))
   
   override val buildOrder: Seq[BuildRequest] = ProtossBuilds.ThreeGateGoon
-  
+
   override val buildPlans = Vector(
 
     // Vs. 4-Gates we need the extra Dragoons ASAP

@@ -37,7 +37,19 @@ object BaseFinder {
     val expansions = clusters.flatMap(cluster => bestTownHallTile(cluster, exclusions))
     
     // Merge nearby base positions (like the middle of Heartbreak Ridge)
-    mergeBases(startTiles ++ expansions)
+    val output = mergeBases(startTiles ++ expansions)
+
+    if (output.size <= With.geography.startLocations.size) {
+      With.logger.warn("Only found " + output.size + " bases (frame" + With.frame + ")")
+      With.logger.warn("Total minerals visible: " + With.units.neutral.count(_.unitClass.isMinerals))
+      With.logger.warn("Total gas visible: " + With.units.neutral.count(_.unitClass.isGas))
+      With.logger.warn("Enemy units visible: " + With.units.enemy.size)
+      With.logger.warn("Neutral units visible: ")
+      With.units.neutral.view.map(_.toString).foreach(With.logger.warn)
+      With.logger.warn("Static units known: " + With.game.getStaticNeutralUnits.size())
+    }
+
+    output
   }
   
   private def clusterResourcePatches(resources: Iterable[ForeignUnitInfo]): Iterable[Iterable[ForeignUnitInfo]] = {

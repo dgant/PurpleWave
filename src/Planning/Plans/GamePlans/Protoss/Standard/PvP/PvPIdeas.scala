@@ -16,6 +16,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvP2Gate1012Goon, PvP4GateGoon}
+import Utilities.ByOption
 
 object PvPIdeas {
 
@@ -46,6 +47,9 @@ object PvPIdeas {
         new SafeToMoveOut),
       // Can our army contend with theirs?
       new Or(
+        new And(
+          new UnitsAtLeast(2, Protoss.Reaver, complete = true),
+          new UnitsAtLeast(1, Protoss.Shuttle, complete = true)),
         new UnitsAtLeast(1, UnitMatchAnd(UnitMatchWarriors, UnitMatchNot(Protoss.Dragoon))),
         new UpgradeComplete(Protoss.DragoonRange),
         new Not(new EnemyHasUpgrade(Protoss.DragoonRange))),
@@ -55,7 +59,7 @@ object PvPIdeas {
         new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
         new UnitsAtLeast(4, Protoss.Gateway, complete = true),
         new And(
-          new UnitsAtLeast(1, Protoss.Reaver, complete = true),
+          new UnitsAtLeast(2, Protoss.Reaver, complete = true),
           new UnitsAtLeast(1, Protoss.Shuttle, complete = true)),
         new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)))))
   { override def isComplete: Boolean = super.isComplete } // Easier debugging
@@ -75,12 +79,26 @@ object PvPIdeas {
         Get(Protoss.RoboticsFacility),
         Get(Protoss.RoboticsSupportBay))))
 
+  // Fast proxy DT: 5:15
+  // More normal timing: Closer to 6:00
+  val dtArrivalTime = GameTime(5, 45)()
+
   class ReactToDarkTemplarEmergencies extends Parallel(new ReactToDarkTemplarExisting, new ReactToDarkTemplarPossible)
   class ReactToDarkTemplarPossible extends If(
     new EnemyDarkTemplarLikely,
     new Parallel(
       new If(
-        new UnitsAtMost(0, Protoss.Observatory),
+        new And(
+          new UnitsAtMost(0, Protoss.RoboticsFacility),
+          new FrameAtLeast(() =>
+            dtArrivalTime
+            - ByOption.max(With.units.ours.filter(_.is(Protoss.RoboticsFacility)).map(_.remainingCompletionFrames)).getOrElse(Protoss.RoboticsFacility.buildFrames)
+            - ByOption.max(With.units.ours.filter(_.is(Protoss.Observatory)).map(_.remainingCompletionFrames)).getOrElse(Protoss.Observatory.buildFrames)
+            - ByOption.max(With.units.ours.filter(_.is(Protoss.Observatory)).map(_.remainingCompletionFrames)).getOrElse(Protoss.Observer.buildFrames)),
+          new FrameAtLeast(() =>
+            dtArrivalTime
+            - Protoss.Forge.buildFrames
+            - Protoss.PhotonCannon.buildFrames)),
         new Build(Get(Protoss.Forge))),
       new If(
         new And(
@@ -96,11 +114,12 @@ object PvPIdeas {
     new EnemyDarkTemplarExists,
     new Parallel(
       new If(
-        new UnitsAtMost(0, Protoss.Observer, complete = true),
+        new UnitsAtMost(0, Protoss.Observer),
         new BuildCannonsAtBases(2)),
       new Build(
-        Get(1, Protoss.RoboticsFacility),
-        Get(1, Protoss.Observatory)),
+        Get(Protoss.RoboticsFacility),
+        Get(Protoss.Observatory),
+        Get(Protoss.Observer)),
       new Pump(Protoss.Observer, 3)))
 
   class ReactToTwoGate extends If(
@@ -121,7 +140,7 @@ object PvPIdeas {
         new UnitsAtLeast(1, Protoss.CyberneticsCore),
         new Build(
           Get(2, Protoss.Gateway),
-          Get(1, Protoss.ShieldBattery)))))
+          Get(Protoss.ShieldBattery)))))
 
   class ReactToArbiters extends If(
     new Or(
@@ -129,8 +148,8 @@ object PvPIdeas {
       new EnemiesAtLeast(1, Protoss.ArbiterTribunal)),
     new Parallel(
       new Build(
-        Get(1, Protoss.RoboticsFacility),
-        Get(1, Protoss.Observatory)),
+        Get(Protoss.RoboticsFacility),
+        Get(Protoss.Observatory)),
     new Pump(Protoss.Observer, 2)))
 
   class PerformReactionTo2Gate extends Parallel(
@@ -143,7 +162,11 @@ object PvPIdeas {
     new If(
       new UnitsAtLeast(5, UnitMatchWarriors, complete = true),
       new PumpWorkers),
-    new TrainArmy,
+    new If(
+      new Or(
+        new UnitsAtMost(5, UnitMatchWarriors),
+        new Not(new SafeAtHome)),
+      new TrainArmy),
     new Pump(Protoss.Probe, 12),
     new Build(Get(2, Protoss.Gateway)),
     new Build(Get(Protoss.ShieldBattery)),
@@ -152,7 +175,7 @@ object PvPIdeas {
       Get(Protoss.Assimilator),
       Get(Protoss.CyberneticsCore),
       Get(Protoss.DragoonRange),
-      Get(3, Protoss.Gateway)))
+      Get(2, Protoss.Gateway)))
 
   class ReactTo2Gate extends If(
     new EnemyStrategy(With.fingerprints.twoGate),

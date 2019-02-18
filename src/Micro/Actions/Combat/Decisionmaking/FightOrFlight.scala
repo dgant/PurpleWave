@@ -42,6 +42,16 @@ object FightOrFlight extends Action {
     decide(false, "Disrupted",    () => unit.underDisruptionWeb && ! unit.flying)
     decide(false, "Swarmed",      () => unit.underDarkSwarm && ! unit.unitClass.unaffectedByDarkSwarm && unit.matchups.targetsInRange.forall(t => ! t.flying || t.underDarkSwarm))
     decide(false, "WaitForSiege", () => unit.is(Terran.SiegeTankUnsieged) && unit.matchups.threats.exists(_.is(Protoss.Dragoon)) && With.units.ours.exists(_.techProducing.contains(Terran.SiegeMode)) && unit.matchups.allies.exists(a => a.is(Terran.Bunker) && a.complete))
+    decide(true,  "Commit", () =>
+      unit.visibleToOpponents
+      && unit.unitClass.melee
+      && unit.base.exists(base => base.owner.isEnemy || base.isNaturalOf.exists(_.owner.isEnemy))
+      && unit.matchups.threats.exists(threat =>
+        unit.canAttack(threat)
+        && threat.topSpeed > unit.topSpeed
+        && threat.pixelRangeAgainst(unit) > unit.pixelRangeAgainst(threat)
+        && threat.matchups.threats.forall(ally => ally.topSpeed < threat.topSpeed && ally.pixelRangeAgainst(threat) < threat.pixelRangeAgainst(ally))))
+
     //decide(true,  "Hodor",      () => unit.matchups.alliesInclSelf.forall(_.base.exists(_.isOurMain)) && unit.matchups.threats.exists(t => ! t.flying && t.base.exists(_.isOurMain)) && unit.matchups.threats.exists(t => ! t.flying && ! t.base.exists(_.isOurMain)))
 
     decide(true, "Workers", () => unit.matchups.allies.exists(u => u.friendly.isDefined && {

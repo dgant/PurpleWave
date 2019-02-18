@@ -73,7 +73,7 @@ object ProtossBuilds {
   // The pro-style version gets the third Gateway a bit later, at 26
   // This accepts a slight worker cut, but with mineral locking should
   // be barely behind on Probes in exchange for a much faster third Gateway
-  val ThreeGateGoon = Vector[BuildRequest] (
+  val ThreeGateGoon_NoZealot = Vector[BuildRequest] (
     Get(8,  Protoss.Probe),
     Get(Protoss.Pylon),
     Get(10, Protoss.Probe),
@@ -96,19 +96,51 @@ object ProtossBuilds {
     Get(21, Protoss.Probe)
   )
 
-  val FourGateGoon = Vector[BuildRequest] (
+  val ThreeGateGoon = Vector[BuildRequest] (
     Get(8,   Protoss.Probe),
-    Get(1,   Protoss.Pylon),
+    Get(Protoss.Pylon),
     Get(10,  Protoss.Probe),
-    Get(1,   Protoss.Gateway),
+    Get(Protoss.Gateway),
     Get(12,  Protoss.Probe),
     Get(2,   Protoss.Pylon),
     Get(13,  Protoss.Probe),
-    Get(1,   Protoss.Zealot),
+    Get(Protoss.Zealot),
     Get(14,  Protoss.Probe),
-    Get(1,   Protoss.Assimilator),
+    Get(Protoss.Assimilator),
     Get(15,  Protoss.Probe),
-    Get(1,   Protoss.CyberneticsCore),
+    Get(Protoss.CyberneticsCore),
+    Get(16,  Protoss.Probe),
+    Get(2,   Protoss.Zealot),
+    Get(18,  Protoss.Probe),
+    Get(3,   Protoss.Pylon),
+    Get(19,  Protoss.Probe),
+    Get(1,   Protoss.Dragoon),
+    Get(20,  Protoss.Probe),
+    Get(Protoss.DragoonRange),
+    Get(21,  Protoss.Probe),
+    Get(2,   Protoss.Dragoon),
+    Get(23,  Protoss.Probe),
+    Get(3,   Protoss.Gateway),
+    Get(3,   Protoss.Dragoon),
+    Get(4,   Protoss.Pylon),
+    Get(6,   Protoss.Dragoon),
+    Get(5,   Protoss.Pylon),
+    Get(9,   Protoss.Dragoon)
+  )
+
+  val FourGateGoon = Vector[BuildRequest] (
+    Get(8,   Protoss.Probe),
+    Get(Protoss.Pylon),
+    Get(10,  Protoss.Probe),
+    Get(Protoss.Gateway),
+    Get(12,  Protoss.Probe),
+    Get(2,   Protoss.Pylon),
+    Get(13,  Protoss.Probe),
+    Get(Protoss.Zealot),
+    Get(14,  Protoss.Probe),
+    Get(Protoss.Assimilator),
+    Get(15,  Protoss.Probe),
+    Get(Protoss.CyberneticsCore),
     Get(16,  Protoss.Probe),
     Get(2,   Protoss.Zealot),
     Get(18,  Protoss.Probe),

@@ -35,7 +35,6 @@ class PvP3GateRobo extends GameplanTemplate {
     new PvPIdeas.AttackSafely)
 
   override def emergencyPlans: Seq[Plan] = Vector(
-    new PvPIdeas.ReactToDarkTemplarEmergencies,
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToProxyGateways,
     new PvPIdeas.ReactToFFE,
@@ -68,7 +67,6 @@ class PvP3GateRobo extends GameplanTemplate {
       Get(4,   Protoss.Dragoon),
       Get(22,  Protoss.Probe),
       Get(4,   Protoss.Pylon)))
-
 
   override def buildPlans = Vector(
 

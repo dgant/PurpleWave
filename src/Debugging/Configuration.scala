@@ -16,7 +16,7 @@ class Configuration {
   var enableStreamManners             = true
   var enableHumanManners              = false
   var identifyGhostUnits              = false
-  var targetFrameDurationMilliseconds = 20
+  var targetFrameDurationMilliseconds = 40
   
   //////////////
   // Strategy //

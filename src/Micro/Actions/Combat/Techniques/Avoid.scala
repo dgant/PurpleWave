@@ -37,7 +37,7 @@ object Avoid extends ActionTechnique {
   }
 
   override def perform(unit: FriendlyUnitInfo): Unit = {
-    if (unit.flying) {
+    if (unit.flying || (unit.transport.exists(_.flying) && unit.matchups.framesOfSafety <= 0)) {
       avoidPotential(unit)
       return
     }

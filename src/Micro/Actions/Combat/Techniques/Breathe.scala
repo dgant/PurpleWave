@@ -31,7 +31,11 @@ object Breathe extends ActionTechnique {
     val rangeOurs   = unit.pixelRangeAgainst(unit.matchups.targets.head)
     val rangeTheirs = other.pixelRangeAgainst(unit)
     val rangeDelta  = rangeOurs - rangeTheirs
+
     if (rangeDelta <= 0.0) return Some(0.0)
+
+    // 2/19 speculative try
+    if (other.orderTarget.contains(unit) && rangeDelta >= 0 && other.cooldownLeft < unit.cooldownMaxAirGround) return Some(1.0)
     
     val distanceRatio   = Math.min(1.0, unit.pixelRangeAgainst(other) / unit.pixelDistanceEdge(other))
     val cooldownOurs    = unit.cooldownMaxAgainst(unit.matchups.targets.head)

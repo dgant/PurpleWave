@@ -72,7 +72,11 @@ class ForeignUnitTracker {
   }
   
   private def trackStaticUnits() {
-    With.game.getStaticNeutralUnits.asScala.foreach(add)
+    val staticNeutralUnits = With.game.getStaticNeutralUnits.asScala
+    if (staticNeutralUnits.size < 18) {
+      With.logger.warn("Encountered surprisingly few static neutral units: " + staticNeutralUnits.size)
+    }
+    staticNeutralUnits.foreach(add)
   }
 
   private def add(unit: bwapi.Unit): ForeignUnitInfo = {

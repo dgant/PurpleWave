@@ -9,10 +9,6 @@ case class StrategySelectionSequence(strategySequences: IndexedSeq[Seq[Strategy]
     val gamesAgainst = With.history.gamesVsEnemies
 
     val appropriate = strategySequences.filter(_.forall(With.strategy.isAppropriate))
-    appropriate.sortBy(strategies =>
-      strategies
-        .map(strategy => gamesAgainst.count(_.weEmployed(strategy)))
-        .min)
 
     if ( ! loop && appropriate.headOption.forall(_.forall(strategy => gamesAgainst.exists(_.weEmployed(strategy))))) {
       return StrategySelectionGreedy.chooseBest(
@@ -21,7 +17,12 @@ case class StrategySelectionSequence(strategySequences: IndexedSeq[Seq[Strategy]
         expand)
     }
 
-    val fixed = new StrategySelectionFixed(appropriate.head: _*)
+    val appropriateSorted = appropriate.sortBy(strategies =>
+      strategies
+        .map(strategy => gamesAgainst.count(_.weEmployed(strategy)))
+        .min)
+
+    val fixed = new StrategySelectionFixed(appropriateSorted.head: _*)
 
     fixed.chooseBest(topLevelStrategies, expand)
   }

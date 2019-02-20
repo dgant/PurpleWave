@@ -2,6 +2,7 @@ package ProxyBwapi.UnitInfo
 
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
+import Mathematics.Shapes.Circle
 import Performance.Cache
 import ProxyBwapi.Players.Players
 import ProxyBwapi.Players.PlayerInfo
@@ -9,6 +10,7 @@ import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
 import ProxyBwapi.Upgrades.Upgrade
+import Utilities.ByOption
 import bwapi.Position
 
 class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(originalBaseUnit, id) {
@@ -19,12 +21,25 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
   override val foreign: Option[ForeignUnitInfo] = Some(this)
   
   def flagDead()        { _alive              = false }
-  def flagMissing()     { _possiblyStillThere = false }
   def flagVisible()     { _visible            = true  }
   def flagInvisible()   { _visible            = false }
   def flagBurrowed()    { _burrowed           = true  }
   def flagCloaked()     { _cloaked            = true  }
   def flagUndetected()  { _detected           = false }
+  def flagMissing() {
+    val repositionTo = (0 to 5).view.map(i =>
+      ByOption.minBy(Circle.points(i)
+        .map(tileIncludingCenter.add)
+        .filter(_.valid)
+        .filterNot(With.grids.friendlyVision.isSet))(_.pixelCenter.pixelDistanceSquared(projectFrames(8))))
+      .find(_.nonEmpty).flatten
+
+    if (repositionTo.isDefined) {
+      _pixelCenter = repositionTo.get.pixelCenter
+    } else {
+      _possiblyStillThere = false
+    }
+  }
   
   def update(unit: bwapi.Unit) {
     baseUnit = unit

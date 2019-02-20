@@ -16,7 +16,7 @@ case class StrategyEvaluation(strategy: Strategy) {
   private val multiplayer           = With.enemies.size > 1
   
   val playbookOrder         : Int                       = if (Playbook.strategyOrder.contains(strategy)) Playbook.strategyOrder.indexOf(strategy) else Int.MaxValue
-  val games                 : Iterable[HistoricalGame]  = With.history.games.filter(_.strategies.contains(strategy.toString))
+  val games                 : Iterable[HistoricalGame]  = With.history.games.filter(_.weEmployed(strategy))
   val gamesVsEnemy          : Iterable[HistoricalGame]  = if (multiplayer) Iterable.empty else games.filter(_.enemyName == Playbook.enemyName)
   val gamesVsRace           : Iterable[HistoricalGame]  = if (multiplayer) Iterable.empty else games.filter(_.enemyRace == With.enemy.raceInitial)
   val gamesOnMap            : Iterable[HistoricalGame]  = games.filter(_.mapName        == With.mapFileName)

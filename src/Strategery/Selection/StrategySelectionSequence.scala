@@ -6,19 +6,22 @@ import Strategery.Strategies.Strategy
 case class StrategySelectionSequence(strategySequences: IndexedSeq[Seq[Strategy]], loop: Boolean = false) extends StrategySelectionPolicy {
 
   override def chooseBest(topLevelStrategies: Iterable[Strategy], expand: Boolean): Iterable[Strategy] = {
-    val gamesAgainst = With.history.gamesVsEnemies.size
+    val gamesAgainst = With.history.gamesVsEnemies
 
-    val strategySequencesAllowed = strategySequences.filter(_.forall(With.strategy.isAppropriate))
+    val appropriate = strategySequences.filter(_.forall(With.strategy.isAppropriate))
+    appropriate.sortBy(strategies =>
+      strategies
+        .map(strategy => gamesAgainst.count(_.weEmployed(strategy)))
+        .min)
 
-    if (gamesAgainst >= strategySequencesAllowed.size && ! loop) {
+    if ( ! loop && appropriate.headOption.forall(_.forall(strategy => gamesAgainst.exists(_.weEmployed(strategy))))) {
       return StrategySelectionGreedy.chooseBest(
         topLevelStrategies.filter(strategy =>
-          strategySequencesAllowed.exists(_.exists(_ == strategy))),
+          appropriate.exists(_.exists(_ == strategy))),
         expand)
     }
 
-    val strategies = strategySequencesAllowed(gamesAgainst % strategySequencesAllowed.size)
-    val fixed = new StrategySelectionFixed(strategies: _*)
+    val fixed = new StrategySelectionFixed(appropriate.head: _*)
 
     fixed.chooseBest(topLevelStrategies, expand)
   }

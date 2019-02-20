@@ -19,6 +19,7 @@ class GoalDefendZone extends GoalBasic {
   var zone: Zone = _
   
   override def run() {
+
     lazy val base   = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.intelligence.threatOrigin))
     lazy val choke  = zone.exit
     lazy val walls  = zone.units.filter(u =>

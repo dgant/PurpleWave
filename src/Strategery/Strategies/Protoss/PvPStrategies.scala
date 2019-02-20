@@ -34,7 +34,10 @@ object PvP3GateRobo extends PvPOpeningIntoCarriers {
   override def entranceInverted: Boolean = false
 }
 
-object PvP2GateRobo extends PvPOpeningIntoCarriers
+object PvP2GateRobo extends PvPOpeningIntoCarriers {
+  override def entranceRamped: Boolean = false
+  override def entranceFlat: Boolean = false
+}
 
 object PvP2Gate1012 extends PvPOpeningIntoCarriers
 

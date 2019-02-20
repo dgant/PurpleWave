@@ -7,7 +7,7 @@ import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.{PumpWorkers, _}
 import Planning.Plans.Macro.Build.CancelIncomplete
-import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
 import Planning.Predicates.Milestones._
@@ -53,6 +53,12 @@ object PvTIdeas {
         new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true)),
       new ConsiderAttacking))
 
+  class ReactToFiveRaxAs2GateCore extends If(
+    new And(
+      new EnemyStrategy(With.fingerprints.fiveRax),
+      new FramesUntilUnitAtLeast(Protoss.CyberneticsCore, Protoss.Zealot.buildFrames / 3)),
+    new BuildOrder(Get(2, Protoss.Zealot))
+  )
   class ReactToBBS extends If(
     new And(
       new FrameAtMost(GameTime(10, 0)()),

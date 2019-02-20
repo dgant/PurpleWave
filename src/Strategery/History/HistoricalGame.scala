@@ -1,6 +1,7 @@
 package Strategery.History
 
 import Lifecycle.With
+import Strategery.Strategies.Strategy
 import bwapi.Race
 
 case class HistoricalGame(
@@ -17,7 +18,11 @@ case class HistoricalGame(
   // Convenience methods
   def weight        : Double = With.strategy.gameWeights(this)
   def winsWeighted  : Double = if (won) weight else 0.0
-  
+
+  def weEmployed(strategy: Strategy): Boolean = {
+    strategies.contains(strategy.toString)
+  }
+
   override def toString: String = (
     (if (won) "W" else "L") + ": "
     + ourRace.toString.take(1) + "v" + enemyRace.toString.take(1) + " "

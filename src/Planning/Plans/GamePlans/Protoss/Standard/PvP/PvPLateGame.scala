@@ -96,11 +96,16 @@ class PvPLateGame extends GameplanTemplate {
         new UnitsAtLeast(2, Protoss.HighTemplar),
         new UpgradeContinuously(Protoss.HighTemplarEnergy))))
 
-  class ArbiterTransition extends Build(
-    Get(Protoss.Stargate),
-    Get(Protoss.ArbiterTribunal),
-    Get(2, Protoss.Stargate),
-    Get(Protoss.Stasis))
+  class ArbiterTransition extends Parallel(
+    new Build(
+      Get(Protoss.Stargate),
+      Get(Protoss.ArbiterTribunal)),
+    new If(
+      new And(
+        new UnitsAtLeast(1, Protoss.ArbiterTribunal),
+        new GasPumpsAtLeast(5)),
+      new Build(Get(2, Protoss.Stargate))),
+    new Build(Get(Protoss.Stasis)))
 
   class CarrierTransition extends Parallel(
     new Build(Get(Protoss.Stargate)),

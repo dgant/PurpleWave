@@ -63,7 +63,9 @@ object FightOrFlight extends Action {
         && base.exists(ally.base.contains)
         && ally.visibleToOpponents
         && ally.matchups.framesOfSafety <= Math.max(0, unit.matchups.framesOfSafety)
-        && ally.base.exists(_.units.exists(resource => resource.resourcesLeft > 0 && resource.pixelDistanceCenter(ally) < With.configuration.workerDefenseRadiusPixels))
+        && ally.base.exists(_.units.exists(resource =>
+          resource.resourcesLeft > 0
+          && resource.pixelDistanceCenter(ally) < With.configuration.workerDefenseRadiusPixels))
       )
       output
     }))

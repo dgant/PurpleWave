@@ -75,6 +75,7 @@ class ForeignUnitTracker {
     val staticNeutralUnits = With.game.getStaticNeutralUnits.asScala
     if (staticNeutralUnits.size < 18) {
       With.logger.warn("Encountered surprisingly few static neutral units: " + staticNeutralUnits.size)
+      staticNeutralUnits.foreach(u => With.logger.warn(u.getType.toString))
     }
     staticNeutralUnits.foreach(add)
   }
@@ -121,8 +122,12 @@ class ForeignUnitTracker {
         }
       }
   
-      //Well, if it can't move, it must be dead. Like a building that burned down or was otherwise destroyed.
-      if (unit.unitClass.canMove) unit.flagMissing() else remove(unit)
+      // Well, if it can't move, it must be dead. Like a building that burned down or was otherwise destroyed.
+      if (unit.unitClass.canMove || unit.isSiegeTankSieged()) {
+        unit.flagMissing()
+      } else {
+        remove(unit)
+      }
     }
   }
   

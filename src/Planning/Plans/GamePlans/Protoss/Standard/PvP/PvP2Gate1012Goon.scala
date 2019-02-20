@@ -6,7 +6,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackWithDarkTemplar
-import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
 import Planning.Plans.Scouting.ScoutOn
@@ -24,7 +24,12 @@ class PvP2Gate1012Goon extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(PvP2Gate1012Goon)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(2, Protoss.Nexus))
   override def priorityAttackPlan: Plan = new AttackWithDarkTemplar
-  override def attackPlan: Plan = new Trigger(new UnitsAtLeast(3, UnitMatchWarriors, complete = true), new PvPIdeas.AttackSafely)
+  override def attackPlan: Plan = new If(
+    new Or(
+      new Not(new EnemyStrategy(With.fingerprints.twoGate)),
+      new UnitsAtLeast(1, Protoss.Dragoon, complete = true)),
+    new PvPIdeas.AttackSafely)
+
   override val scoutPlan: Plan = new ScoutOn(Protoss.Pylon)
   
   override def emergencyPlans: Seq[Plan] = Seq(
@@ -33,10 +38,18 @@ class PvP2Gate1012Goon extends GameplanTemplate {
   
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.TwoGate1012
   override def buildPlans = Vector(
+
     new Build(
       Get(Protoss.Assimilator),
-      Get(Protoss.CyberneticsCore),
-      Get(Protoss.DragoonRange)),
+      Get(Protoss.CyberneticsCore)),
+
+    new If(
+      new Or(
+        new EnemyStrategy(With.fingerprints.nexusFirst),
+        new EnemyStrategy(With.fingerprints.proxyGateway)),
+      new BuildOrder(Get(7, Protoss.Zealot))),
+
+    new Build(Get(Protoss.DragoonRange)),
 
     new If(
       new EnemyStrategy(With.fingerprints.forgeFe),
@@ -55,7 +68,9 @@ class PvP2Gate1012Goon extends GameplanTemplate {
 
     new FlipIf(
       new SafeAtHome,
-      new PvPIdeas.TrainArmy,
+      new Trigger(
+        new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
+        new PvPIdeas.TrainArmy),
       new Parallel(
         new Build(Get(3, Protoss.Gateway)),
         new If(
@@ -63,7 +78,9 @@ class PvP2Gate1012Goon extends GameplanTemplate {
             new EnemyStrategy(With.fingerprints.fourGateGoon),
             new Not(new EnemyStrategy(With.fingerprints.robo)),
             new Not(new EnemyStrategy(With.fingerprints.twoGate))),
-          new Build(Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives))))),
+          new Build(
+            Get(Protoss.CitadelOfAdun),
+            Get(Protoss.TemplarArchives))))),
 
     new If(
       new SafeAtHome,

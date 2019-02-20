@@ -21,6 +21,7 @@ object OpponentsAIST {
       Seq(PvP2Gate1012Goon, PvPLateGameArbiter),
       Seq(PvP2GateDTExpand, PvPLateGameArbiter),
       Seq(PvP3GateRobo,     PvPLateGameArbiter),
+      Seq(PvP2GateRobo,     PvPLateGameArbiter),
       Seq(PvP3GateGoon,     PvPLateGameArbiter)
     ), loop = true)
 
@@ -47,10 +48,12 @@ object OpponentsAIST {
   val steamhammer   : Opponent = add(Opponent("Steamhammer",  defaultPvZ))
 
   // Aliases for local testing
+  val jadien            : Opponent = add(Opponent("Jadien",             locutus.policy))
   val madmixp           : Opponent = add(Opponent("MadMixP",            madmix.policy))
   val tscmooz           : Opponent = add(Opponent("tscmooz",            tscmoo.policy))
   val martinrooijackers : Opponent = add(Opponent("Martin Rooijackers", letabot.policy))
   val velicorandom      : Opponent = add(Opponent("Velicorandom",       velocirandom.policy))
+
   
   val all: Vector[Opponent] = allKnown
 }

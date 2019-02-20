@@ -24,7 +24,7 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
     val end       = start.project(zone.exitNow.map(_.pixelTowards(zone)).getOrElse(zone.centroid.pixelCenter), 300)
 
     val allEnemies = (enemies.view ++ units.flatMap(_.battle).distinct.map(_.enemy)).distinct
-    val enemyRangePixelsMin   : Int = ByOption.min(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(32 * 5)
+    val enemyRangePixelsMin   : Int = ByOption.min(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(if (With.enemy.isTerran) 5 * 32 else 32)
     val enemyRangePixelsMax   : Int = ByOption.max(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(32 * 5)
     val meleeUnitDiameter     : Int = Math.max(16, slots.map(s => if (s.idealPixels > 32) 0 else s.unitClass.dimensionMax.toInt).max)
     val meleeChokeWidthUnits  : Int = Math.max(1, 2 * zone.exitNow.map(_.radiusPixels.toInt).getOrElse(0) / meleeUnitDiameter)
@@ -39,7 +39,7 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
       val idealPixels = slot.idealPixels.toInt
       val idealTiles = (idealPixels + 16) / 32
       val flyer = slot.unitClass.isFlyer && ! slot.unitClass.isFlyingBuilding && slot.unitClass != Protoss.Shuttle
-      if (enemyRangePixelsMin < 32 && zone.exitNow.isDefined && idealPixels <= Math.max(32, enemyRangePixelsMin)) {
+      if (enemyRangePixelsMin <= 32 && zone.exitNow.isDefined && idealPixels <= Math.max(32, enemyRangePixelsMin)) {
         // Against enemy melee units, place melee units directly into the exit
         val nextPixel = start
           .project(

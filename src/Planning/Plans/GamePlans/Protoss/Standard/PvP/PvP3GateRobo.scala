@@ -40,33 +40,32 @@ class PvP3GateRobo extends GameplanTemplate {
     new PvPIdeas.ReactToFFE,
     new PvPIdeas.ReactTo2Gate)
 
-  override def buildOrderPlan: Plan = new Parallel(
-    new BuildOrder(
-      Get(8,   Protoss.Probe),
-      Get(Protoss.Pylon),
-      Get(10,  Protoss.Probe),
-      Get(Protoss.Gateway),
-      Get(12,  Protoss.Probe),
-      Get(Protoss.Assimilator),
-      Get(14,  Protoss.Probe),
-      Get(Protoss.CyberneticsCore),
-      Get(1,   Protoss.Zealot),
-      Get(2,   Protoss.Pylon),
-      Get(16,  Protoss.Probe),
-      Get(1,   Protoss.Dragoon),
-      Get(Protoss.DragoonRange),
-      Get(17,  Protoss.Probe),
-      Get(3,   Protoss.Pylon),
-      Get(18,  Protoss.Probe),
-      Get(2,   Protoss.Dragoon),
-      Get(20,  Protoss.Probe),
-      Get(Protoss.RoboticsFacility),
-      Get(21,  Protoss.Probe),
-      Get(3,   Protoss.Dragoon),
-      Get(3,   Protoss.Gateway),
-      Get(4,   Protoss.Dragoon),
-      Get(22,  Protoss.Probe),
-      Get(4,   Protoss.Pylon)))
+  override def buildOrder = Seq(
+    Get(8,   Protoss.Probe),
+    Get(Protoss.Pylon),
+    Get(10,  Protoss.Probe),
+    Get(Protoss.Gateway),
+    Get(12,  Protoss.Probe),
+    Get(Protoss.Assimilator),
+    Get(14,  Protoss.Probe),
+    Get(Protoss.CyberneticsCore),
+    Get(1,   Protoss.Zealot),
+    Get(2,   Protoss.Pylon),
+    Get(16,  Protoss.Probe),
+    Get(1,   Protoss.Dragoon),
+    Get(Protoss.DragoonRange),
+    Get(17,  Protoss.Probe),
+    Get(3,   Protoss.Pylon),
+    Get(18,  Protoss.Probe),
+    Get(2,   Protoss.Dragoon),
+    Get(20,  Protoss.Probe),
+    Get(Protoss.RoboticsFacility),
+    Get(21,  Protoss.Probe),
+    Get(3,   Protoss.Dragoon),
+    Get(3,   Protoss.Gateway),
+    Get(4,   Protoss.Dragoon),
+    Get(22,  Protoss.Probe),
+    Get(4,   Protoss.Pylon))
 
   override def buildPlans = Vector(
 
@@ -74,7 +73,7 @@ class PvP3GateRobo extends GameplanTemplate {
 
     new If(
       new EnemyStrategy(With.fingerprints.robo, With.fingerprints.fourGateGoon, With.fingerprints.nexusFirst),
-      new Build(
+      new BuildOrder(
         Get(Protoss.Shuttle),
         Get(Protoss.RoboticsSupportBay)),
       new BuildOrder(

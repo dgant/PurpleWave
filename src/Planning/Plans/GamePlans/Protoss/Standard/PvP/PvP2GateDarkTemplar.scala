@@ -16,7 +16,7 @@ import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
 import Planning.Predicates.Milestones.{EnemiesAtMost, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
-import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP2GateDTExpand
 
@@ -24,8 +24,12 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
   
   override val activationCriteria = new Employing(PvP2GateDTExpand)
   override val completionCriteria = new Latch(new MiningBasesAtLeast(2))
-  override val workerPlan  = NoPlan()
-  override val scoutPlan   = new ScoutOn(Protoss.CyberneticsCore)
+  override val workerPlan = NoPlan()
+  override val scoutPlan = new If(
+    new StartPositionsAtLeast(3),
+    new ScoutOn(Protoss.Gateway),
+    new ScoutOn(Protoss.CyberneticsCore))
+
   override val attackPlan  = new Trigger(
     new Or(
       new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),

@@ -27,7 +27,7 @@ class PvP3GateGoon extends GameplanTemplate {
   override val activationCriteria : Predicate = new Employing(PvP3GateGoon)
   override val completionCriteria : Predicate = new Latch(new Or(new UnitsAtLeast(1, Protoss.RoboticsFacility), new UnitsAtLeast(5, Protoss.Gateway)))
   override def priorityAttackPlan : Plan = new AttackWithDarkTemplar
-  override def attackPlan: Plan = new PvPIdeas.AttackSafely
+  override def attackPlan: Plan = new Trigger(new UnitsAtLeast(1, Protoss.Dragoon, complete = true), new PvPIdeas.AttackSafely)
   override def scoutPlan   : Plan = new ScoutOn(Protoss.CyberneticsCore)
   override def workerPlan  : Plan = NoPlan()
   override def placementPlan: Plan = new If(

@@ -54,7 +54,6 @@ class Configuration {
   var fogPositionDurationFrames       = GameTime(0, 20)()
   var violenceThresholdFrames         = GameTime(0, 2)()
   var pickupRadiusPixels              = 48 //No idea what actual value is
-  var enablePathRecalculation         = true
   var workerDefenseRadiusPixels       = 32.0 * 4.0
   
   ///////////

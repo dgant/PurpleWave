@@ -55,7 +55,6 @@ object StrategyGroups {
     PvPProxy2Gate,
     PvZProxy2Gate,
     PvP2Gate1012,
-    PvP2GateRobo,
     ZvTProxyHatchZerglings,
     ZvTProxyHatchHydras,
     ZvTProxyHatchSunkens,

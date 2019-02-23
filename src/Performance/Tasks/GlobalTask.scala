@@ -1,5 +1,6 @@
 package Performance.Tasks
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.{Manners, With}
 import Performance.TaskQueue.TaskQueueGrids
 
@@ -48,7 +49,13 @@ class TaskMicro extends AbstractTask {
 }
 class TaskPlanning extends AbstractTask {
   urgency = With.configuration.urgencyPlanning
-  override def maxConsecutiveSkips: Int = 12
+  override def maxConsecutiveSkips: Int =
+    if (With.frame < GameTime(5, 0)())
+      3
+    else if (With.frame < GameTime(10, 0)())
+      6
+    else
+      12
   override protected def onRun() {
     With.intelligence.update()
     With.fingerprints.update()

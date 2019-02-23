@@ -33,10 +33,10 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
       PixelRay(chokeCenter, chokeEnd).tilesIntersected.foreach(occupied.set(_, true))
     }
 
-    val allEnemies = (enemies.view ++ units.flatMap(_.battle).distinct.flatMap(_.enemy.units)).distinct
+    val allEnemies = With.units.enemy.view.filter(_.attacksAgainstGround > 0)
     val enemyRangePixelsMin   : Int = ByOption.min(allEnemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(if (With.enemy.isTerran) 5 * 32 else 32)
     val enemyRangePixelsMax   : Int = ByOption.max(allEnemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(32 * 5)
-    val meleeUnitDiameter     : Int = 4 + Math.max(16, slots.map(s => if (s.idealPixels > 32) 0 else s.unitClass.dimensionMax.toInt).max)
+    val meleeUnitDiameter     : Int = 6 + Math.max(16, slots.map(s => if (s.idealPixels > 32) 0 else s.unitClass.dimensionMax.toInt).max)
     val meleeChokeWidthUnits  : Int = PurpleMath.clamp(2 * zone.exitNow.map(_.radiusPixels.toInt).getOrElse(0) / meleeUnitDiameter, 1, slots.count(_.idealPixels <= 32))
 
     // TODO: Standardize definition of a melee slot

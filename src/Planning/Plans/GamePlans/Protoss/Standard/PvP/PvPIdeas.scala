@@ -5,9 +5,10 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Parallel, _}
+import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
+import Planning.Plans.Macro.Expanding.{RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, MeldArchons}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
@@ -41,7 +42,6 @@ object PvPIdeas {
       new Or(
         new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
         new EnemyStrategy(With.fingerprints.cannonRush),
-        new Employing(PvP4GateGoon),
         new MiningBasesAtLeast(3),
         new EnemyBasesAtLeast(3),
         new SafeToMoveOut),
@@ -124,26 +124,6 @@ object PvPIdeas {
         Get(Protoss.Observer)),
       new Pump(Protoss.Observer, 3)))
 
-  class ReactToTwoGate extends If(
-    new And(
-      new EnemyStrategy(With.fingerprints.twoGate),
-      new UnitsAtMost(0, Protoss.Forge),
-      new Or(
-        new UnitsAtMost(1, Protoss.Gateway, complete = true),
-        new Not(new SafeAtHome))),
-    new Parallel(
-      new If(
-        new UnitsAtMost(7, UnitMatchWarriors),
-        new Parallel(
-          new RequireSufficientSupply,
-          new TrainArmy)),
-      new UpgradeContinuously(Protoss.DragoonRange),
-      new If(
-        new UnitsAtLeast(1, Protoss.CyberneticsCore),
-        new Build(
-          Get(2, Protoss.Gateway),
-          Get(Protoss.ShieldBattery)))))
-
   class ReactToArbiters extends If(
     new Or(
       new EnemiesAtLeast(1, Protoss.Arbiter),
@@ -154,30 +134,82 @@ object PvPIdeas {
         Get(Protoss.Observatory)),
     new Pump(Protoss.Observer, 2)))
 
-  class PerformReactionTo2Gate extends Parallel(
-    new If(
-      new UnitsAtMost(5, UnitMatchWarriors, complete = true),
-      new CapGasAt(200)),
-    new RequireSufficientSupply,
-    new Pump(Protoss.Probe, 9),
-    new Build(Get(Protoss.Gateway)),
-    new If(
-      new UnitsAtLeast(5, UnitMatchWarriors, complete = true),
-      new PumpWorkers),
-    new If(
+  class ReactToGasSteal extends If(
+    new EnemyStrategy(With.fingerprints.gasSteal),
+    new BuildOrder(ProtossBuilds.TwoGate1012: _*))
+
+  class ReactToTwoGate extends If(
+    new And(
+      new EnemyStrategy(With.fingerprints.twoGate),
+      new UnitsAtMost(0, Protoss.Forge),
       new Or(
-        new UnitsAtMost(5, UnitMatchWarriors),
-        new Not(new SafeAtHome)),
-      new TrainArmy),
-    new Pump(Protoss.Probe, 12),
-    new Build(Get(2, Protoss.Gateway)),
-    new Build(Get(Protoss.ShieldBattery)),
-    new Pump(Protoss.Probe, 21),
-    new Build(
+        new UnitsAtMost(1, Protoss.Gateway, complete = true),
+        new Not(new SafeToMoveOut), // Nonsense, but maybe a hack fix (AIST2)
+        new Not(new SafeAtHome))),
+    new Parallel(
+      new If(
+        new UnitsAtMost(7, UnitMatchWarriors),
+        new Parallel(
+          new If(
+            new UnitsAtMost(2, Protoss.Gateway),
+            new Parallel(
+              new CapGasAt(250),
+              new CapGasWorkersAt(2))),
+          new RequireSufficientSupply,
+          new Pump(Protoss.Dragoon),
+          new Pump(Protoss.Zealot))),
+      new UpgradeContinuously(Protoss.DragoonRange),
+      new If(
+        new UnitsAtLeast(1, Protoss.CyberneticsCore),
+        new Parallel(
+          new Build(Get(2, Protoss.Gateway)),
+          new If(
+            new FrameAtMost(GameTime(3, 30)()), // Afterwards it's too late to help
+            new Build(Get(Protoss.ShieldBattery))),
+          new Build(Get(3, Protoss.Gateway))))))
+
+  class PerformReactionTo2Gate extends Parallel(
+
+    new If(
+      new UnitsAtMost(3, Protoss.Gateway),
+      new Parallel(
+        new CapGasWorkersAt(2),
+        new CapGasAt(200))),
+
+    new Pump(Protoss.Probe, 8),
+    new BuildOrder(
+      Get(8, Protoss.Probe),
+      Get(Protoss.Pylon),
+      Get(10, Protoss.Probe),
+      Get(Protoss.Gateway),
+      Get(12, Protoss.Probe),
       Get(Protoss.Assimilator),
+      Get(13, Protoss.Probe),
+      Get(Protoss.Zealot),
+      Get(14, Protoss.Probe),
+      Get(2,  Protoss.Pylon),
+      Get(15, Protoss.Probe),
       Get(Protoss.CyberneticsCore),
-      Get(Protoss.DragoonRange),
-      Get(2, Protoss.Gateway)))
+      Get(16, Protoss.Probe),
+      Get(2,  Protoss.Zealot),
+      Get(2, Protoss.Gateway)),
+    new RequireSufficientSupply,
+    new Pump(Protoss.Probe, 16),
+
+    new FlipIf(
+      new UnitsAtLeast(5, UnitMatchWarriors),
+      new Parallel(
+        new PumpWorkers,
+        new UpgradeContinuously(Protoss.DragoonRange)),
+      new If(
+        new Or(
+          new UnitsAtMost(7, UnitMatchWarriors),
+          new Not(new SafeAtHome)),
+      new TrainArmy)),
+    new If(
+      new FrameAtMost(GameTime(3, 30)()),
+      new Build(Get(Protoss.ShieldBattery))),
+    new Build(Get(3, Protoss.Gateway)))
 
   class ReactTo2Gate extends If(
     new EnemyStrategy(With.fingerprints.twoGate),
@@ -212,9 +244,7 @@ object PvPIdeas {
         new SafeAtHome,
         new UnitsAtLeast(8, UnitMatchWarriors, complete = true)),
       new UnitsAtLeast(16, UnitMatchWarriors, complete = true)),
-    new Parallel(
-      new Build(Get(2, Protoss.Gateway)),
-      new RequireMiningBases(2)))
+    new RequireMiningBases(2))
 
   class TakeBase3 extends If(
     new And(
@@ -222,17 +252,27 @@ object PvPIdeas {
         new Latch(new UnitsAtLeast(1, Protoss.Observer, complete = true)),
         new EnemyRobo),
       new Or(
-        new UnitsAtLeast(40, UnitMatchWarriors),
+        new UnitsAtLeast(20, UnitMatchWarriors),
+        new EnemiesAtLeast(6, Protoss.PhotonCannon),
         new And(
           new SafeAtHome,
           new Or(
             new EnemyCarriers,
             new EnemyBasesAtLeast(3))))),
-    new Parallel(
-      new RequireMiningBases(3),
-      new Build(Get(7, Protoss.Gateway))))
+    new RequireMiningBases(3))
 
-  class MeldArchonsPvP extends MeldArchons(24) {
+  class TakeBase4 extends If(
+    new Or(
+      new UnitsAtLeast(30, UnitMatchWarriors),
+      new EnemiesAtLeast(10, Protoss.PhotonCannon),
+      new And(
+        new SafeAtHome,
+        new Or(
+          new EnemyCarriers,
+          new EnemyBasesAtLeast(4)))),
+    new RequireBases(4))
+
+  class MeldArchonsPvP extends MeldArchons(0) {
     override def minimumArchons: Int = Math.min(6, With.units.countEnemy(Protoss.Zealot) / 6)
   }
 
@@ -299,15 +339,13 @@ object PvPIdeas {
         new UnitsAtLeast(1, Protoss.TemplarArchives, complete = true)),
       // Speedlot-Templar composition
       new Parallel(
-        new PumpRatio(Protoss.Reaver, 0, 4, Seq(Friendly(Protoss.Shuttle, 2.0))),
-        new PumpRatio(Protoss.Shuttle, 0, 2, Seq(Friendly(Protoss.Reaver, 0.5))),
+        new PumpShuttleAndReavers(6, shuttleFirst = false),
         new PumpRatio(Protoss.Dragoon, 3, 24, Seq(Friendly(Protoss.Zealot, 1.5))),
         new PumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-1), Enemy(Protoss.Dragoon, 0.2), Enemy(UnitMatchWarriors, 0.1))),
         new Pump(Protoss.Zealot)),
       // Dragoon-Reaver composition
       new Parallel(
-        new PumpRatio(Protoss.Reaver, 1, 4, Seq(Friendly(Protoss.Shuttle, 3.0))),
-        new PumpRatio(Protoss.Shuttle, 0, 2, Seq(Friendly(Protoss.Reaver, 1.0))),
+        new PumpShuttleAndReavers(6, shuttleFirst = false),
         new PumpDragoonsAndZealots)),
     new If(
       new Or(
@@ -332,6 +370,8 @@ object PvPIdeas {
           new UpgradeComplete(Protoss.GroundDamage, 3),
           new UpgradeContinuously(Protoss.GroundArmor),
           new UpgradeContinuously(Protoss.GroundDamage)))),
-    new Build(Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives)),
+    new Build(
+      Get(Protoss.CitadelOfAdun),
+      Get(Protoss.TemplarArchives)),
     new IfOnMiningBases(3, new Build(Get(2, Protoss.Forge))))
 }

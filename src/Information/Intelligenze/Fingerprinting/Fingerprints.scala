@@ -44,6 +44,9 @@ class Fingerprints {
       twelvePool
       twelveHatch
     }
+    workerRush
+    gasSteal
+
     if (With.frame < GameTime(10, 0)()) {
       all.foreach(_.update())
     }
@@ -55,6 +58,10 @@ class Fingerprints {
     all += fingerprint
     fingerprint
   }
+
+  // Generic
+  lazy val workerRush       = addFingerprint(new FingerprintWorkerRush)
+  lazy val gasSteal         = addFingerprint(new FingerprintGasSteal)
 
   // Terran
   lazy val fiveRax          = addFingerprint(new Fingerprint5Rax)

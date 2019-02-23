@@ -120,6 +120,11 @@ object PlacementProfiles {
     preferZone                  = 100.0,
     avoidDistanceFromEnemy      = 3.0,
     avoidSurfaceArea            = 1.0)
+
+  val proxyTowardsEnemy = new PlacementProfile(
+    "Proxy towards enemy",
+    avoidDistanceFromEnemy = 1.0
+  )
   
   val hugTownHall = new PlacementProfile(
     "Hug town hall",

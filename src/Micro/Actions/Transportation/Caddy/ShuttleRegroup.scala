@@ -3,12 +3,15 @@ package Micro.Actions.Transportation.Caddy
 import Lifecycle.With
 import Mathematics.Shapes.Spiral
 import Micro.Actions.Action
+import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object ShuttleRegroup extends Action {
 
-  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.is(Protoss.Shuttle) && unit.agent.passengers.forall(_.loaded)
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
+    false && // Disabled because saw a case where supportDeepest == supportSafest
+    unit.is(Protoss.Shuttle) && unit.agent.passengers.forall(_.loaded))
 
   // Don't go too crazy ferrying charges around
 
@@ -28,7 +31,7 @@ object ShuttleRegroup extends Action {
     if (antiAir.nonEmpty) {
 
       // Help!
-      val support = unit.teammates.view.filter(u => u.canAttack && ! u.is(Protoss.Reaver)).toVector
+      val support = unit.teammates.view.filter(u => u.canAttack && ! u.isAny(Protoss.Reaver, UnitMatchWorkers)).toVector
       if (support.nonEmpty) {
         val supportDeepest = support.maxBy(_.matchups.framesOfEntanglement)
         val supportSafest = support.maxBy(_.matchups.framesOfEntanglement)

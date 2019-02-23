@@ -13,6 +13,7 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP3GateRobo
@@ -25,10 +26,12 @@ class PvP3GateRobo extends GameplanTemplate {
   override def scoutPlan: Plan = new ScoutOn(Protoss.Gateway)
   override val attackPlan: Plan = new If(
     new Or(
-      new EnemyStrategy(With.fingerprints.nexusFirst),
+      new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.gasSteal),
       new And(
         new EnemyStrategy(With.fingerprints.twoGate),
-        new EnemyHasShown(Protoss.Gateway), // Don't abandon base vs. proxies
+        new Or(
+          new EnemyHasShown(Protoss.Gateway), // Don't abandon base vs. proxies
+          new UnitsAtLeast(7, UnitMatchWarriors)),
         new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
         new Or(
           new UpgradeComplete(Protoss.DragoonRange),
@@ -39,6 +42,7 @@ class PvP3GateRobo extends GameplanTemplate {
     new PvPIdeas.AttackSafely)
 
   override def emergencyPlans: Seq[Plan] = Vector(
+    new PvPIdeas.ReactToGasSteal,
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToProxyGateways,
     new PvPIdeas.ReactToFFE,

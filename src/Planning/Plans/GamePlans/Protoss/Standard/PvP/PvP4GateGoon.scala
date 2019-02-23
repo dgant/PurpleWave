@@ -1,13 +1,13 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Lifecycle.With
-import Macro.BuildRequests.{BuildRequest, Get}
+import Macro.BuildRequests.Get
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.Pump
-import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
@@ -22,18 +22,22 @@ class PvP4GateGoon extends GameplanTemplate {
   
   override val activationCriteria : Predicate = new Employing(PvP4GateGoon)
   override val completionCriteria : Predicate = new Latch(new MiningBasesAtLeast(2))
-  override def attackPlan  : Plan      = new PvPIdeas.AttackSafely
 
-  override def scoutPlan   : Plan = new ScoutOn(Protoss.CyberneticsCore)
-  override val workerPlan  : Plan = NoPlan()
+  override def attackPlan: Plan = new PvPIdeas.AttackSafely
+
+  override def scoutPlan: Plan = new ScoutOn(Protoss.Gateway)
+  override val workerPlan: Plan = NoPlan()
   override def emergencyPlans: Seq[Plan] = Vector(
-    new PvPIdeas.ReactToDarkTemplarEmergencies,
+    new PvPIdeas.ReactToGasSteal,
     new PvPIdeas.ReactToCannonRush,
+    new PvPIdeas.ReactToDarkTemplarEmergencies,
     new PvPIdeas.ReactToProxyGateways,
-    new PvPIdeas.ReactToTwoGate)
+    new PvPIdeas.ReactTo2Gate)
   
-  override val buildOrder: Seq[BuildRequest] = ProtossBuilds.FourGateGoon
-  
+  override def buildOrderPlan = new If(
+    new Not(new EnemyStrategy(With.fingerprints.cannonRush, With.fingerprints.proxyGateway, With.fingerprints.twoGate, With.fingerprints.dtRush)),
+    new BuildOrder(ProtossBuilds.FourGateGoon: _*))
+
   override val buildPlans = Vector(
     new If(
       new Or(
@@ -52,11 +56,18 @@ class PvP4GateGoon extends GameplanTemplate {
         new PvPIdeas.TrainArmy),
       new Pump(Protoss.Dragoon)),
 
+    new Build(
+      Get(Protoss.Gateway),
+      Get(Protoss.Assimilator),
+      Get(Protoss.CyberneticsCore),
+      Get(4, Protoss.Gateway)),
+
     new If(
       new And(
         new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),
         new Not(new EnemyRobo)),
       new Build(Get(Protoss.Forge))),
+
     new RequireMiningBases(2)
   )
 }

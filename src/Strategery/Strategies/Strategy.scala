@@ -25,7 +25,7 @@ abstract class Strategy {
   def ourRaces                : Iterable[Race]                  = Vector(Race.Terran, Race.Protoss, Race.Zerg)
   def enemyRaces              : Iterable[Race]                  = Vector(Race.Terran, Race.Protoss, Race.Zerg, Race.Unknown)
   def startLocationsMin       : Int                             = 2
-  def startLocationsMax       : Int                             = 24
+  def startLocationsMax       : Int                             = 1000
   def ffa                     : Boolean                         = false
   def opponentsWhitelisted    : Option[Iterable[String]]        = None
   def mapsBlacklisted         : Iterable[StarCraftMap]          = Vector.empty

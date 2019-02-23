@@ -31,10 +31,10 @@ object Phalanx extends Action {
     if (formationDistance <= 10
       && unit.unitClass.melee
       && (
-      unit.matchups.targetsInRange.nonEmpty
-      || unit.matchups.threatsInRange.isEmpty
-      || ! unit.visibleToOpponents)) {
-      if (unit.matchups.framesOfSafety < 24 || formationDistance == 0) {
+        unit.matchups.targetsInRange.nonEmpty
+        || unit.matchups.threatsInRange.isEmpty
+        || ! unit.visibleToOpponents)) {
+      if (unit.matchups.framesOfSafety < 24 || formationDistance < 2) {
         With.commander.hold(unit)
       } else {
         if (Random.nextInt(10) == 0) {
@@ -47,7 +47,7 @@ object Phalanx extends Action {
       Engage.delegate(unit)
     } else if (openFire) {
       Engage.delegate(unit)
-    }
+    } else if (unit.matchups.threats.exists(! _.unitClass.melee))
     if (unit.matchups.threats.exists(! _.unitClass.isWorker)) {
       Disengage.delegate(unit)
     }

@@ -52,18 +52,21 @@ class GoalAttack extends GoalBasic {
     }
     target =
       ByOption
-        .maxBy(With.geography.enemyBases)(base => {
-          val distance      = With.intelligence.threatOrigin.pixelCenter.pixelDistance(base.heart.pixelCenter)
-          val distanceLog   = 1 + Math.log(1 + distance)
-          val defendersLog  = 1 + Math.log(1 + base.defenseValue)
-          val output        = distanceLog / defendersLog
-          output
-        })
-        .map(base => ByOption.minBy(base.units.filter(u => u.isEnemy && u.unitClass.isBuilding))(_.pixelDistanceCenter(base.townHallArea.midPixel))
-          .map(_.pixelCenter)
-          .getOrElse(base.townHallArea.midPixel))
-        .orElse(if (enemyNonTrollyThreats > 0) Some(With.intelligence.threatOrigin.pixelCenter) else None)
-        .getOrElse(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
+        .minBy(With.geography.ourBasesAndSettlements.flatMap(_.units.filter(u => u.isEnemy && u.unitClass.isBuilding).map(_.pixelCenter)))(_.groundPixels(With.geography.home.pixelCenter))
+      .orElse(
+        ByOption
+          .maxBy(With.geography.enemyBases)(base => {
+            val distance      = With.intelligence.threatOrigin.pixelCenter.pixelDistance(base.heart.pixelCenter)
+            val distanceLog   = 1 + Math.log(1 + distance)
+            val defendersLog  = 1 + Math.log(1 + base.defenseValue)
+            val output        = distanceLog / defendersLog
+            output
+          })
+          .map(base => ByOption.minBy(base.units.filter(u => u.isEnemy && u.unitClass.isBuilding))(_.pixelDistanceCenter(base.townHallArea.midPixel))
+            .map(_.pixelCenter)
+            .getOrElse(base.townHallArea.midPixel)))
+      .orElse(if (enemyNonTrollyThreats > 0) Some(With.intelligence.threatOrigin.pixelCenter) else None)
+      .getOrElse(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
   }
   
   override protected def offerUseful(candidates: Iterable[FriendlyUnitInfo]) {

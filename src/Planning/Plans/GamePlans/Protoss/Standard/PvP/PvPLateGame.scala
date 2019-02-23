@@ -163,6 +163,8 @@ class PvPLateGame extends GameplanTemplate {
         new UpgradeContinuously(Protoss.DragoonRange)),
 
     new PvPIdeas.TakeBase2,
+    new PvPIdeas.TakeBase3,
+    new PvPIdeas.TakeBase4,
 
     // Psi Storm?
     new If(

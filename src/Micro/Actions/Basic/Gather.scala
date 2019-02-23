@@ -3,7 +3,6 @@ package Micro.Actions.Basic
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.SpecificPoints
-import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Disengage, Engage}
 import Micro.Actions.Combat.Tactics.Potshot
@@ -42,21 +41,22 @@ object Gather extends Action {
         Engage.consider(unit)
       }
 
-      val lethalStabbers = unit.matchups.threatsInRange.filter(t => t.unitClass.melee && t.damageOnNextHitAgainst(unit) >= unit.totalHealth)
+      val lethalStabbers = unit.matchups.threatsInRange.filter(threat =>
+        threat.unitClass.melee
+        && 2 * threat.damageOnNextHitAgainst(unit) >= unit.totalHealth)
       if (lethalStabbers.nonEmpty && unit.base.isDefined) {
-        val walkableResources = unit.base.get.resources
-          .filter(resource =>
-            (!unit.carryingGas && resource.unitClass.isGas && resource.isOurs) ||
-              (!unit.carryingMinerals && resource.unitClass.isMinerals))
-        val bestResource =
-          ByOption.minBy(walkableResources)(resource =>
-            lethalStabbers.map(stabber =>
-              PurpleMath.radiansTo(
-                stabber.pixelCenter.radiansTo(unit.pixelCenter),
-                stabber.pixelCenter.radiansTo(resource.pixelCenter))
-            ).max)
-        if (bestResource.isDefined) {
-          unit.agent.toGather = bestResource
+
+        val goals = (unit.base.get.resources ++ unit.base.flatMap(_.townHall))
+          .filter(goal =>
+            ((unit.carryingGas || unit.carryingMinerals)  && goal.unitClass.isTownHall  && goal.isOurs) ||
+            (!unit.carryingGas                            && goal.unitClass.isGas       && goal.isOurs) ||
+            (!unit.carryingMinerals                       && goal.unitClass.isMinerals))
+
+        val bestGoal = ByOption.maxBy(goals)(resource => lethalStabbers.map(stabber => resource.pixelDistanceCenter(stabber)).max)
+        if (bestGoal.exists(_.unitClass.isTownHall)) {
+          With.commander.returnCargo(unit)
+        } else if (bestGoal.isDefined) {
+          unit.agent.toGather = bestGoal
         }
       }
 
@@ -71,9 +71,7 @@ object Gather extends Action {
 
     // Total hack
     if (unit.agent.toGather.exists(_.zone != unit.zone)
-      && (unit.tileIncludingCenter.y < 64)
-        != (unit.agent.toGather.exists(_.tileIncludingCenter.y < 64))
-      && (unit.tileIncludingCenter.x < 15 || unit.tileIncludingCenter.x > With.mapTileWidth - 15)
+      && unit.base.contains(With.geography.ourMain)
       && Benzene.matches) {
       unit.agent.toTravel = Some(SpecificPoints.middle)
       Move.delegate(unit)

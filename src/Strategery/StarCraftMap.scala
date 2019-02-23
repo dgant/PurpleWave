@@ -16,6 +16,7 @@ object Benzene extends StarCraftMap
 object BlueStorm extends StarCraftMap
 object ChupungRyeong extends StarCraftMap
 object Destination extends StarCraftMap
+object Eddy extends StarCraftMap
 object EmpireOfTheSun extends StarCraftMap
 object Gladiator extends StarCraftMap
 object GreatBarrierReef extends StarCraftMap { override val mineralWalkingOkay = false }
@@ -37,6 +38,7 @@ object StarCraftMaps {
     Benzene,
     BlueStorm,
     ChupungRyeong,
+    Eddy,
     EmpireOfTheSun,
     Gladiator,
     GreatBarrierReef,
@@ -55,7 +57,7 @@ object StarCraftMaps {
 
 object MapGroups {
   val badForBigUnits = Vector(BlueStorm)
-  val badForProxying = Vector(Alchemist, BlueStorm, ChupungRyeong, EmpireOfTheSun, GreatBarrierReef, LaMancha, Roadrunner, TauCross)
+  val badForProxying = Vector(Alchemist, BlueStorm, ChupungRyeong, Eddy, EmpireOfTheSun, GreatBarrierReef, LaMancha, Roadrunner, TauCross)
   val badForWalling = Vector(Alchemist)
   val badForFastThirdBases = Vector(Benzene, Heartbreak)
 }

@@ -29,10 +29,11 @@ class PvPGateGateRobo extends GameplanTemplate {
   override def scoutPlan: Plan = new ScoutOn(Protoss.Pylon)
 
   override def emergencyPlans: Seq[Plan] = Seq(
+    new PvPIdeas.ReactToGasSteal,
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToProxyGateways,
     new PvPIdeas.ReactToFFE,
-    new PvPIdeas.ReactToTwoGate)
+    new PvPIdeas.ReactTo2Gate)
   
   override def buildOrder = Seq(
       // http://wiki.teamliquid.net/starcraft/2_Gate_Reaver_(vs._Protoss)

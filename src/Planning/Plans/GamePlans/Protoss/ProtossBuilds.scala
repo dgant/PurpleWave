@@ -40,17 +40,17 @@ object ProtossBuilds {
   
   val ZCoreZ = Vector[BuildRequest] (
     Get(8,   Protoss.Probe),
-    Get(1,   Protoss.Pylon),
+    Get(Protoss.Pylon),
     Get(10,  Protoss.Probe),
-    Get(1,   Protoss.Gateway),
+    Get(Protoss.Gateway),
     Get(12,  Protoss.Probe),
-    Get(1,   Protoss.Assimilator),
+    Get(Protoss.Assimilator),
     Get(13,  Protoss.Probe),
-    Get(1,   Protoss.Zealot),
+    Get(Protoss.Zealot),
     Get(14,  Protoss.Probe),
     Get(2,   Protoss.Pylon),
     Get(15,  Protoss.Probe),
-    Get(1,   Protoss.CyberneticsCore),
+    Get(Protoss.CyberneticsCore),
     Get(16,  Protoss.Probe),
     Get(2,   Protoss.Zealot))
   

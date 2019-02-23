@@ -302,4 +302,10 @@ class Agent(val unit: FriendlyUnitInfo) {
   def directRide(to: Pixel): Unit = {
     _rideGoal = Some(to)
   }
+
+  ///////////////////////
+  // Explosion hopping //
+  ///////////////////////
+
+  var hoppingExplosion = false
 }

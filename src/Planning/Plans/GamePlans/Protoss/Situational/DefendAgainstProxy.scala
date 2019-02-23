@@ -52,7 +52,7 @@ class DefendAgainstProxy extends Plan {
         else if (proxy.attacksAgainstGround > 0)
           4
         else if (proxy.unitClass.isGas)
-          3 // Dubious, but we need real gas steal reactions to avoid this
+          (if (With.enemy.isProtoss) 0 else 3) // We have PvP gas steal reactions but none yet for other races
         else
           1 // We shouldn't pull for other buildings in general; this is mostly just to keep eyes on them
       )).toMap

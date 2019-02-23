@@ -34,11 +34,33 @@ object OpponentsAIST {
       Seq(PvZFFEEconomic,     PvZMidgameBisu,               PvZLateGameTemplar)
     ))
 
+  val locutusBuilds = StrategySelectionSequence(
+    Vector(
+      Seq(PvP2Gate1012Goon),
+      Seq(PvP2GateDTExpand),
+      Seq(PvP3GateGoon),
+      Seq(PvPProxy2Gate)))
+  val bananaBuilds = StrategySelectionSequence(
+    Vector(
+      Seq(PvP2Gate1012Goon),
+      Seq(PvP2GateDTExpand),
+      Seq(PvP3GateGoon)))
+  val mcRaveBuilds = StrategySelectionSequence(
+    Vector(
+      Seq(PvPProxy2Gate),
+      Seq(PvP2GateDTExpand),
+      Seq(PvP3GateGoon)))
+  val velocirandomBuilds = StrategySelectionSequence(
+    Vector(
+      Seq(PvP2Gate1012Goon),
+      Seq(PvP2GateDTExpand),
+      Seq(PvP3GateGoon)))
+
   // Protoss
-  val locutus       : Opponent = add(Opponent("Locutus",      defaultPvP))
-  val bananabrain   : Opponent = add(Opponent("BananaBrain",  defaultPvP))
-  val mcrave        : Opponent = add(Opponent("McRave",       defaultPvP))
-  val velocirandom  : Opponent = add(Opponent("Velocirandom", defaultPvP))
+  val locutus       : Opponent = add(Opponent("Locutus",      locutusBuilds))
+  val bananabrain   : Opponent = add(Opponent("BananaBrain",  bananaBuilds))
+  val mcrave        : Opponent = add(Opponent("McRave",       mcRaveBuilds))
+  val velocirandom  : Opponent = add(Opponent("Velocirandom", velocirandomBuilds))
   val madmix        : Opponent = add(Opponent("MadMix",       defaultPvP))
   // Terran
   val haopan        : Opponent = add(Opponent("Hao Pan",      defaultPvT))
@@ -49,12 +71,11 @@ object OpponentsAIST {
   val steamhammer   : Opponent = add(Opponent("Steamhammer",  defaultPvZ))
 
   // Aliases for local testing
-  val jadien            : Opponent = add(Opponent("Jadien",             tscmoo.policy))
+  val jadien            : Opponent = add(Opponent("Jadien",             locutus.policy))
   val madmixp           : Opponent = add(Opponent("MadMixP",            madmix.policy))
   val tscmooz           : Opponent = add(Opponent("tscmooz",            tscmoo.policy))
   val martinrooijackers : Opponent = add(Opponent("Martin Rooijackers", letabot.policy))
   val velicorandom      : Opponent = add(Opponent("Velicorandom",       velocirandom.policy))
 
-  
   val all: Vector[Opponent] = allKnown
 }

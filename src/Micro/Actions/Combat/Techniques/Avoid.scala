@@ -44,6 +44,9 @@ object Avoid extends ActionTechnique {
     if (With.configuration.enableThreatAwarePathfinding) {
       avoidRealPath(unit)
     }
+    if (unit.unitClass.isReaver && unit.transport.isDefined) {
+      avoidGreedyPath(unit, 1, 1, 1, 1)
+    }
     avoidGreedyPath(unit)
     avoidGreedyPath(unit, distanceValue = 0, safetyValue = 2)
     avoidGreedyPath(unit, distanceValue = 0, safetyValue = 2, crowdValue = 0)
@@ -75,10 +78,12 @@ object Avoid extends ActionTechnique {
   }
 
   def avoidGreedyPath(
-    unit: FriendlyUnitInfo,
-    distanceValue: Int = 1,
-    safetyValue: Int = 1,
-    crowdValue: Int = 1): Unit = {
+     unit: FriendlyUnitInfo,
+     distanceValue: Int = 1,
+     safetyValue: Int = 1,
+     crowdValue: Int = 1,
+     enemyVulnerabilityValue: Int = 0)
+      : Unit = {
 
     if (! unit.readyForMicro) return
 
@@ -95,6 +100,8 @@ object Avoid extends ActionTechnique {
         0
       else
         unit.agent.origin.zone.distanceGrid.get(tile)
+
+    val idealEnemyVulnerability = With.grids.enemyVulnerabilityGround.rangeMax - unit.pixelRangeGround.toInt / 32 - 1 // The -1 is a safety buffer
     def tileScore(tile: Tile): Int = {
       val enemyRange = enemyRangeGrid.get(tile)
       (
@@ -103,6 +110,7 @@ object Avoid extends ActionTechnique {
         - (if (unit.cloaked)
           10 * safetyValue * With.grids.enemyDetection.get(tile) * (if (With.grids.enemyDetection.isDetected(tile)) 2 else 1)
           else 0)
+        - 10 * enemyVulnerabilityValue * Math.abs(idealEnemyVulnerability - With.grids.enemyVulnerabilityGround.get(tile))
         - crowdValue * PurpleMath.clamp(With.coordinator.gridPathOccupancy.get(tile) / 3, 0, 9)
       )
     }

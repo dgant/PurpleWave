@@ -16,6 +16,7 @@ class TaskGridEnemyDetection              extends GridTask(With.grids.enemyDetec
 class TaskGridEnemyRangeAir               extends GridTask(With.grids.enemyRangeAir)
 class TaskGridEnemyRangeGround            extends GridTask(With.grids.enemyRangeGround)
 class TaskGridEnemyVision                 extends GridTask(With.grids.enemyVision)
+class TaskGridEnemyVulnerabilityGround    extends GridTask(With.grids.enemyVulnerabilityGround)
 class TaskGridFriendlyDetection           extends GridTask(With.grids.friendlyDetection)
 class TaskGridFriendlyVision              extends GridTask(With.grids.friendlyVision)
 class TaskGridHarvestingArea              extends GridTask(With.grids.harvestingArea)

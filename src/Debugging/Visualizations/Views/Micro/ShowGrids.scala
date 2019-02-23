@@ -18,7 +18,7 @@ object ShowGrids extends View {
 
   override def renderMap() {
     val zone = With.units.ours.find(_.selected).map(_.zone).getOrElse(With.viewport.center.tileIncluding.zone)
-    renderGridArray(With.grids.enemyVision, 0, 0)
+    renderGridArray(With.grids.enemyVulnerabilityGround, 0, 0)
     //renderGridArray(zone.distanceGrid, 0, 0)
     //renderGridArray(zone.exitDistanceGrid, 1, 0)
     //zone.exit.foreach(e => renderGridArray(e.distanceGrid, 0, 1))

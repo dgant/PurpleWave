@@ -31,6 +31,7 @@ object PvPGateGateRobo extends PvPOpening {
 object PvP2Gate1012 extends PvPOpening
 
 object PvP2Gate1012Goon extends PvPOpening {
+  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.forgeFe)
   //override def rushDistanceMaximum: Int = 5000
 }
 
@@ -40,7 +41,7 @@ object PvP2GateDTExpand extends PvPOpening {
 
 object PvP3GateGoon extends PvPOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
-  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.twoGate, With.fingerprints.dtRush, With.fingerprints.proxyGateway)
+  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush, With.fingerprints.proxyGateway)
 }
 object PvP4GateGoon extends PvPOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
@@ -49,5 +50,5 @@ object PvP4GateGoon extends PvPOpening {
 }
 object PvPProxy2Gate extends PvPOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
-  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.twoGate)
+  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.twoGate, With.fingerprints.proxyGateway, With.fingerprints.forgeFe)
 }

@@ -6,21 +6,21 @@ import Macro.Architecture.Heuristics.PlacementProfiles
 import Planning.Plans.Macro.Build.ProposePlacement
 import ProxyBwapi.Races.Protoss
 
-class PlaceGatewaysProxied(gatewayCount: Int, proxyZone: () => Option[Zone], allowBlockingBase: Boolean = true) extends ProposePlacement {
-  
+class PlaceBatteriesProxied(batteryCount: Int, proxyZone: () => Option[Zone], allowBlockingBase: Boolean = true) extends ProposePlacement {
+
   private lazy val pylon =
     new Blueprint(this,
       building = Some(Protoss.Pylon),
-      preferZone = proxyZone(),
+      requireZone = proxyZone(),
       respectHarvesting = Some(!allowBlockingBase),
       placement = Some(PlacementProfiles.proxyPylon))
 
-  private lazy val gateways = (0 to gatewayCount).map(unused =>
+  private lazy val batteries = (0 to batteryCount).map(unused =>
     new Blueprint(this,
-      building = Some(Protoss.Gateway),
-      preferZone = proxyZone(),
+      building = Some(Protoss.ShieldBattery),
+      requireZone = proxyZone(),
       respectHarvesting = Some(!allowBlockingBase),
-      placement = Some(PlacementProfiles.proxyBuilding)))
+      placement = Some(PlacementProfiles.proxyTowardsEnemy)))
   
-  override lazy val blueprints: Vector[Blueprint] = Vector(pylon) ++ gateways
+  override lazy val blueprints: Vector[Blueprint] = Vector(pylon) ++ batteries
 }

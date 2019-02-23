@@ -1,5 +1,6 @@
 package Micro.Heuristics.Targeting
 
+import Mathematics.PurpleMath
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetHeuristicDelay extends TargetHeuristic {
@@ -26,7 +27,8 @@ object TargetHeuristicDelay extends TargetHeuristic {
       + distanceTeamEnemy / 5.0
       + distanceGoal / 10.0)
     val framesTotal = distanceTotal / Math.max(1.0, speedUs)
-    val output = 24 + framesTotal
+    val frameBuffer = PurpleMath.clamp(unit.matchups.framesOfSafety, 24, 24 * 4)
+    val output = frameBuffer + framesTotal
     output
   }
 }

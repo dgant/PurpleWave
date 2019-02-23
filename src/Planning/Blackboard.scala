@@ -15,8 +15,9 @@ class Blackboard {
   def reset() {
     resets.foreach(reset => reset())
   }
-  
+
   var aggressionRatio       : Property[Double]  = add(new Property(1.0))
+  var wantToAttack          : Property[Boolean] = add(new Property(false))
   var safetyRatio           : Property[Double]  = add(new Property(1.2))
   var gasWorkerFloor        : Property[Int]     = add(new Property(0))
   var gasWorkerCeiling      : Property[Int]     = add(new Property(200))

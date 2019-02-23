@@ -2,8 +2,8 @@ package Strategery.Strategies.Protoss
 
 import Information.Intelligenze.Fingerprinting.Fingerprint
 import Lifecycle.With
-import Strategery.{BlueStorm, Hitchhiker, MapGroups, StarCraftMap}
 import Strategery.Strategies.Strategy
+import Strategery.{MapGroups, StarCraftMap}
 import bwapi.Race
 
 abstract class PvPStrategy extends Strategy {
@@ -11,37 +11,26 @@ abstract class PvPStrategy extends Strategy {
   override def enemyRaces : Iterable[Race]  = Vector(Race.Protoss)
 }
 
-abstract class PvPOpening extends PvPStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(
-    PvPLateGameCarrier,
-    PvPLateGameArbiter))
-}
+abstract class PvPOpening extends PvPStrategy
 
-abstract class PvPOpeningIntoCarriers extends PvPStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(
-    PvPLateGameCarrier,
-    PvPLateGameArbiter,
-    PvPBlueStormReaverCarrier))
-}
-
-object PvP1GateReaverExpand extends PvPOpeningIntoCarriers {
+object PvP1GateReaverExpand extends PvPOpening {
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.nexusFirst, With.fingerprints.fourGateGoon)
   override def entranceInverted: Boolean = false
   override def entranceFlat: Boolean = false
 }
 
-object PvP3GateRobo extends PvPOpeningIntoCarriers {
+object PvP3GateRobo extends PvPOpening {
   override def entranceInverted: Boolean = false
 }
 
-object PvP2GateRobo extends PvPOpeningIntoCarriers {
+object PvPGateGateRobo extends PvPOpening {
   override def entranceRamped: Boolean = false
   override def entranceFlat: Boolean = false
 }
 
-object PvP2Gate1012 extends PvPOpeningIntoCarriers
+object PvP2Gate1012 extends PvPOpening
 
-object PvP2Gate1012Goon extends PvPOpeningIntoCarriers {
+object PvP2Gate1012Goon extends PvPOpening {
   //override def rushDistanceMaximum: Int = 5000
 }
 
@@ -61,12 +50,4 @@ object PvP4GateGoon extends PvPOpening {
 object PvPProxy2Gate extends PvPOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.twoGate)
-}
-
-object PvPLateGameCarrier extends PvPStrategy
-object PvPLateGameArbiter extends PvPStrategy {
-  override def mapsBlacklisted: Iterable[StarCraftMap] = Iterable(BlueStorm)
-}
-object PvPBlueStormReaverCarrier extends PvPStrategy {
-  override def mapsWhitelisted: Option[Iterable[StarCraftMap]] = Some(Vector(BlueStorm, Hitchhiker))
 }

@@ -2,6 +2,7 @@ package Strategery.Selection
 
 import Lifecycle.With
 import Strategery.Strategies.Strategy
+import Utilities.ByOption
 
 case class StrategySelectionSequence(strategySequences: IndexedSeq[Seq[Strategy]], loop: Boolean = false) extends StrategySelectionPolicy {
 
@@ -17,13 +18,17 @@ case class StrategySelectionSequence(strategySequences: IndexedSeq[Seq[Strategy]
         expand)
     }
 
-    val appropriateSorted = appropriate.sortBy(strategies =>
+    val leastUsed = ByOption.minBy(appropriate)(strategies =>
       strategies
         .map(strategy => gamesAgainst.count(_.weEmployed(strategy)))
         .min)
 
-    val fixed = new StrategySelectionFixed(appropriateSorted.head: _*)
+    if (leastUsed.nonEmpty) {
+      val fixed = new StrategySelectionFixed(leastUsed.get: _*)
+      return fixed.chooseBest(topLevelStrategies, expand)
+    }
 
-    fixed.chooseBest(topLevelStrategies, expand)
+    // Just in case
+    StrategySelectionGreedy.chooseBest(topLevelStrategies, expand)
   }
 }

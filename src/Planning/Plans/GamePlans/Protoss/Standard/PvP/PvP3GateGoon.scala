@@ -9,15 +9,15 @@ import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackWithDarkTemplar
-import Planning.Plans.Macro.Automatic.PumpWorkers
+import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers}
 import Planning.Plans.Macro.Build.ProposePlacement
-import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyDarkTemplarLikely, EnemyRobo, SafeAtHome}
-import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.Predicates.Reactive.{EnemyDarkTemplarLikely, SafeAtHome}
+import Planning.Predicates.Strategy.Employing
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP3GateGoon
@@ -44,42 +44,30 @@ class PvP3GateGoon extends GameplanTemplate {
 
   override val buildPlans = Vector(
 
-    // Vs. 4-Gates we need the extra Dragoons ASAP
-    new If(
-      new And(
-        new MiningBasesAtLeast(2),
-        new Not(new SafeAtHome)),
-      new Build(Get(5, Protoss.Gateway))),
+    new EjectScout,
 
     new If(new UnitsAtLeast(2, Protoss.DarkTemplar, complete = true), new RequireMiningBases(2)),
-    new If(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new RequireMiningBases(2)),
 
-    new If(new SafeAtHome, new PumpWorkers(oversaturate = true), new PumpWorkers),
+    new Pump(Protoss.Probe, 23),
+    new BuildOrder(
+      Get(8, Protoss.Dragoon),
+      Get(2, Protoss.Nexus),
+      Get(11, Protoss.Dragoon)),
 
-     new If(
-       new Or(
-         new EnemyStrategy(With.fingerprints.fourGateGoon),
-         new And(
-           new Not(new EnemyRobo),
-           new Not(new SafeAtHome),
-           new UnitsAtLeast(7, Protoss.Dragoon))),
+    new If(
+      new BasesAtLeast(2),
       new Parallel(
-        new EjectScout,
-        new Build(Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives)))),
+        new If(
+          new Or(
+            new SafeAtHome,
+            new EnemyHasShown(Protoss.Forge),
+            new EnemyDarkTemplarLikely),
+          new Build(
+            Get(Protoss.RoboticsFacility),
+            Get(Protoss.Observatory))),
+        new Build(Get(5, Protoss.Gateway)))),
 
+    new PumpWorkers,
     new PvPIdeas.TrainArmy,
-
-    new If(
-      new SafeAtHome,
-      new RequireMiningBases(2),
-      new Build(Get(Protoss.RoboticsFacility), Get(Protoss.RoboticsSupportBay))),
-
-    new If(
-      new Or(
-        new SafeAtHome,
-        new EnemyHasShown(Protoss.Forge),
-        new EnemyDarkTemplarLikely),
-      new Build(Get(Protoss.RoboticsFacility))),
-    new Build(Get(5, Protoss.Gateway))
   )
 }

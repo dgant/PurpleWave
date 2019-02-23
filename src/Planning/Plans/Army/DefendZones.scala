@@ -49,6 +49,6 @@ class DefendZones extends Plan {
   }
   
   private def baseValue(base: Base): Double = {
-    (5.0 + base.workerCount) * (if (base.owner.isFriendly) 1.0 else 0.0)
+    (5.0 + base.workerCount) * (if (With.geography.ourBasesAndSettlements.contains(base)) 1.0 else 0.0)
   }
 }

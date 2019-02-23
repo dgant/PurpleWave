@@ -1,6 +1,7 @@
 
 package Planning.Plans.Army
 
+import Lifecycle.With
 import Micro.Squads.Goals.GoalAttack
 import Planning.UnitCounters.{UnitCountEverything, UnitCounter}
 import Planning.UnitMatchers._
@@ -13,6 +14,7 @@ class Attack(
   override val goal: GoalAttack = new GoalAttack
 
   override def onUpdate() {
+    With.blackboard.wantToAttack.set(true)
     goal.unitMatcher = matcher
     goal.unitCounter = counter
     super.onUpdate()

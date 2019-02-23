@@ -13,7 +13,7 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump, PumpWorkers, RequireSufficientSupply}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
-import Planning.Predicates.Milestones.{EnemiesAtMost, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
+import Planning.Predicates.Milestones._
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
@@ -34,6 +34,7 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
     new Or(
       new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
       new EnemyStrategy(With.fingerprints.nexusFirst),
+      new UpgradeComplete(Protoss.DragoonRange),
       new And(
         new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
         new EnemyStrategy(With.fingerprints.proxyGateway))),
@@ -85,6 +86,7 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToProxyGateways,
+    new PvPIdeas.ReactTo2Gate,
     new PvPIdeas.ReactToFFE
   )
   

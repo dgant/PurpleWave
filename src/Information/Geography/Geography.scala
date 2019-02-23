@@ -81,6 +81,10 @@ class Geography {
 
   private def getSettlements: Vector[Base] = (Vector.empty
   ++ With.geography.bases.filter(_.units.exists(u => u.isOurs && u.unitClass.isBuilding))
+  ++ Vector(With.geography.ourNatural).filter(x =>
+      With.strategy.isInverted
+      && With.units.ours.exists(u => u.complete && u.unitClass.ranged)
+      && (With.units.enemy.exists(_.unitClass.ranged) || With.battles.global.globalSafeToAttack))
   ++ With.units.ours
     .view
     .filter(u => u.agent.toBuild.exists(_.isTownHall))
@@ -88,7 +92,7 @@ class Geography {
     .flatten
     .filterNot(_.owner.isUs)
     .toVector
-  )
+  ).distinct
   
   var home: Tile = SpecificPoints.tileMiddle
   

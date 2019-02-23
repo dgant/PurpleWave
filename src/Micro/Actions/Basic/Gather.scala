@@ -31,7 +31,6 @@ object Gather extends Action {
       lazy val mainAndNat = Vector(With.geography.ourMain, With.geography.ourNatural).map(_.zone)
       lazy val transferring = !unit.base.exists(_.owner.isUs) && zoneNow != zoneTo && !(mainAndNat.contains(zoneNow) && mainAndNat.contains(zoneTo))
       lazy val threatened = unit.battle.isDefined && unit.matchups.framesOfSafety < combatWindow && unit.matchups.threats.exists(!_.unitClass.isWorker)
-      lazy val damageMax = ByOption.max(unit.matchups.threats.map(_.damageOnNextHitAgainst(unit))).getOrElse(11)
       lazy val threatCloser = unit.matchups.threats.exists(_.pixelDistanceCenter(resource.pixelCenter) < unit.pixelDistanceCenter(resource.pixelCenter))
       lazy val atResource = unit.pixelDistanceCenter(resource) < With.configuration.workerDefenseRadiusPixels
       lazy val beckoned = unit.battle.isDefined && unit.matchups.targets.exists(target =>
@@ -39,7 +38,7 @@ object Gather extends Action {
           && target.pixelDistanceCenter(unit) < With.configuration.workerDefenseRadiusPixels
           && target.base.exists(_.units.exists(resource => resource.resourcesLeft > 0 && target.pixelDistanceCenter(resource) < With.configuration.workerDefenseRadiusPixels)))
 
-      if (atResource && unit.totalHealth > damageMax && beckoned) {
+      if (atResource && unit.totalHealth > 32 && beckoned) {
         Engage.consider(unit)
       }
 

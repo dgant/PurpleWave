@@ -1,9 +1,12 @@
 package Mathematics.Formations.Designers
 
+import Debugging.Visualizations.Colors
+import Debugging.Visualizations.Rendering.DrawMap
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Formations.{FormationAssigned, FormationSlot, FormationUnassigned}
-import Mathematics.Points.{Pixel, Point}
+import Mathematics.Points.{Pixel, PixelRay, Point}
+import Mathematics.PurpleMath
 import Mathematics.Shapes.Spiral
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
@@ -17,17 +20,40 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
   override def form(units: Seq[FriendlyUnitInfo]): FormationAssigned = {
     if (units.isEmpty) return new FormationAssigned(Map.empty)
 
-    val occupied  = With.grids.disposableBoolean1()
-    val slots     = units.map(new FormationSlot(_))
-    val start     = zone.exitNow.map(_.pixelCenter).getOrElse(zone.centroid.pixelCenter)
-    val startTile = start.tileIncluding
-    val end       = start.project(zone.exitNow.map(_.pixelTowards(zone)).getOrElse(zone.centroid.pixelCenter), 300)
+    val occupied        = With.grids.disposableBoolean1()
+    val slots           = units.map(new FormationSlot(_))
+    val chokeSides      = zone.exitNow.get.sidePixels
+    val chokeCenter     = zone.exitNow.map(_.pixelCenter).getOrElse(zone.centroid.pixelCenter)
+    val chokeEnd        = chokeCenter.project(zone.exitNow.map(_.pixelTowards(zone)).getOrElse(zone.centroid.pixelCenter), 300)
+    val chokeCenterTile = chokeCenter.tileIncluding
 
-    val allEnemies = (enemies.view ++ units.flatMap(_.battle).distinct.map(_.enemy)).distinct
-    val enemyRangePixelsMin   : Int = ByOption.min(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(if (With.enemy.isTerran) 5 * 32 else 32)
-    val enemyRangePixelsMax   : Int = ByOption.max(enemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(32 * 5)
-    val meleeUnitDiameter     : Int = Math.max(16, slots.map(s => if (s.idealPixels > 32) 0 else s.unitClass.dimensionMax.toInt).max)
-    val meleeChokeWidthUnits  : Int = Math.max(1, 2 * zone.exitNow.map(_.radiusPixels.toInt).getOrElse(0) / meleeUnitDiameter)
+    // Clear a line for Scarabs
+    DrawMap.line(chokeCenter, chokeEnd, Colors.NeonYellow)
+    if (units.exists(_.is(Protoss.Reaver))) {
+      PixelRay(chokeCenter, chokeEnd).tilesIntersected.foreach(occupied.set(_, true))
+    }
+
+    val allEnemies = (enemies.view ++ units.flatMap(_.battle).distinct.flatMap(_.enemy.units)).distinct
+    val enemyRangePixelsMin   : Int = ByOption.min(allEnemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(if (With.enemy.isTerran) 5 * 32 else 32)
+    val enemyRangePixelsMax   : Int = ByOption.max(allEnemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(32 * 5)
+    val meleeUnitDiameter     : Int = 4 + Math.max(16, slots.map(s => if (s.idealPixels > 32) 0 else s.unitClass.dimensionMax.toInt).max)
+    val meleeChokeWidthUnits  : Int = PurpleMath.clamp(2 * zone.exitNow.map(_.radiusPixels.toInt).getOrElse(0) / meleeUnitDiameter, 1, slots.count(_.idealPixels <= 32))
+
+    // TODO: Standardize definition of a melee slot
+
+    val meleeSlotsEmpty = units.indices.map(i => {
+      val unitsInThisRow = i % meleeChokeWidthUnits
+      val rowsFilled = i / meleeChokeWidthUnits
+      val targetSide = chokeSides(unitsInThisRow % 2)
+      val vectorLateral = if (meleeChokeWidthUnits % 2 == 0) {
+        chokeCenter.project(targetSide, meleeUnitDiameter * (0.5 + unitsInThisRow / 2)) - chokeCenter
+      } else {
+        chokeCenter.project(targetSide, meleeUnitDiameter * ((1 + unitsInThisRow) / 2)) - chokeCenter
+      }
+      val vectorDepth = chokeCenter.project(chokeEnd, 16 + meleeUnitDiameter * rowsFilled) - chokeCenter
+      val output = chokeCenter + vectorLateral + vectorDepth
+      output
+    })
 
     val meleeSlots = new mutable.ArrayBuffer[(UnitClass, Pixel)]
     val arcSlots   = new mutable.ArrayBuffer[(UnitClass, Pixel)]
@@ -35,24 +61,14 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
     val nullPoint   = Point(1000, 1000)
     val nullPoints  = Vector(nullPoint)
     val nullValue   = Int.MaxValue - 1
+
     slots.sortBy(_.idealPixels).foreach(slot => {
       val idealPixels = slot.idealPixels.toInt
       val idealTiles = (idealPixels + 16) / 32
       val flyer = slot.unitClass.isFlyer && ! slot.unitClass.isFlyingBuilding && slot.unitClass != Protoss.Shuttle
       if (enemyRangePixelsMin <= 32 && zone.exitNow.isDefined && idealPixels <= Math.max(32, enemyRangePixelsMin)) {
         // Against enemy melee units, place melee units directly into the exit
-        val nextPixel = start
-          .project(
-            // Point towards the left/right side of the choke
-            zone.exitNow.get.sidePixels(meleeSlots.size % 2),
-            // If odd-sized row: First unit goes in the middle; otherwise offset by half a melee radius
-            (if (meleeChokeWidthUnits % 2 == 0) meleeUnitDiameter / 2 else 0)
-            // Project unit towards the current side
-            +  meleeUnitDiameter * ((meleeSlots.size / 2) % meleeChokeWidthUnits)) +
-          // Fill in rows from front to back
-          start.project(end, meleeUnitDiameter * (2 + (meleeSlots.size / meleeChokeWidthUnits))) -
-          start
-
+        val nextPixel = meleeSlotsEmpty(meleeSlots.size)
         meleeSlots += ((slot.unitClass, nextPixel))
         if ( ! flyer) {
           val w = slot.unitClass.width / 2
@@ -71,7 +87,7 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
           if (p == nullPoint) {
             nullValue
           } else {
-            val tile = startTile.add(p)
+            val tile = chokeCenterTile.add(p)
             if (tile.valid
               && (flyer || (
                 zone.tileGrid.get(tile)
@@ -90,7 +106,7 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
           }})
         if (point != nullPoint) {
           // Assign the unit
-          val tile = startTile.add(point)
+          val tile = chokeCenterTile.add(point)
           if ( ! flyer) {
             occupied.set(tile, true)
           }

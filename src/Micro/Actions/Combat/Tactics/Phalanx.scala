@@ -2,10 +2,13 @@ package Micro.Actions.Combat.Tactics
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
+import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Disengage, Engage}
 import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+
+import scala.util.Random
 
 object Phalanx extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
@@ -24,10 +27,22 @@ object Phalanx extends Action {
 
     unit.agent.toTravel = Some(spot)
     unit.agent.toReturn = Some(spot)
-    if (unit.pixelDistanceCenter(unit.agent.toForm.get) <= (if (unit.matchups.framesOfSafety > 24) 8 else 0)
+    val formationDistance = unit.pixelDistanceCenter(unit.agent.toForm.get)
+    if (formationDistance <= 10
       && unit.unitClass.melee
-      && unit.matchups.threats.forall(_.unitClass.melee) ) {
-      With.commander.hold(unit)
+      && (
+      unit.matchups.targetsInRange.nonEmpty
+      || unit.matchups.threatsInRange.isEmpty
+      || ! unit.visibleToOpponents)) {
+      if (unit.matchups.framesOfSafety < 24 || formationDistance == 0) {
+        With.commander.hold(unit)
+      } else {
+        if (Random.nextInt(10) == 0) {
+          def spread(value: Int) = value + 5 - Random.nextInt(10)
+          unit.agent.toTravel = unit.agent.toTravel.map(p => Pixel(spread(p.x), spread(p.y)))
+        }
+        Move.delegate(unit)
+      }
     } else if (besieged && unit.agent.shouldEngage) {
       Engage.delegate(unit)
     } else if (openFire) {

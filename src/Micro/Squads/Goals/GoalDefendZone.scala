@@ -58,7 +58,14 @@ class GoalDefendZone extends GoalBasic {
   } // For performance
   )
 
-  private def huntableFilter(enemy: UnitInfo): Boolean = ! (enemy.is(Zerg.Drone) && With.fingerprints.fourPool.matches)
+  private def huntableFilter(enemy: UnitInfo): Boolean = (
+    ! (enemy.is(Zerg.Drone) && With.fingerprints.fourPool.matches)
+    && zone.exit.forall(exit =>
+      enemy.flying
+      || With.blackboard.wantToAttack()
+      || enemy.pixelDistanceTravelling(zone.centroid)
+        < (exit.endPixels ++ exit.sidePixels :+ exit.pixelCenter).map(_.groundPixels(zone.centroid)).min))
+
   private val huntableEnemies = new Cache(() => {
     val huntableInZone = squad.enemies.filter(e => e.zone == zone && huntableFilter(e))
     if (huntableInZone.nonEmpty) huntableInZone else squad.enemies.filter(huntableFilter)

@@ -58,12 +58,10 @@ object StrategyGroups {
     ZvTProxyHatchZerglings,
     ZvTProxyHatchHydras,
     ZvTProxyHatchSunkens,
-    PvPBlueStormReaverCarrier,
     PvZLateGameCarrier, // Needs island tech
     CarriersWithNoDefense,
     ZvZ5PoolSunkens,
     PvP1GateReaverExpand,
-    PvPLateGameCarrier,
     PvT1GateRobo
   )
 }

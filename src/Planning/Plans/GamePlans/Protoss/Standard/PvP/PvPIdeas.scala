@@ -105,10 +105,12 @@ object PvPIdeas {
           new UnitsAtMost(0, Protoss.Observer, complete = true),
           new UnitsAtLeast(1, Protoss.Forge)),
         new BuildCannonsAtBases(1)),
-      new Build(
-        Get(Protoss.RoboticsFacility),
-        Get(Protoss.Observatory),
-        Get(Protoss.Observer))))
+      new If(
+        new UnitsAtMost(0, Protoss.Forge),
+        new Build(
+          Get(Protoss.RoboticsFacility),
+          Get(Protoss.Observatory),
+          Get(Protoss.Observer)))))
 
   class ReactToDarkTemplarExisting extends If(
     new EnemyDarkTemplarExists,
@@ -231,7 +233,7 @@ object PvPIdeas {
       new Build(Get(7, Protoss.Gateway))))
 
   class MeldArchonsPvP extends MeldArchons(24) {
-    override def minimumArchons: Int = Math.min(6, With.units.countEnemy(Protoss.Zealot) / 3)
+    override def minimumArchons: Int = Math.min(6, With.units.countEnemy(Protoss.Zealot) / 6)
   }
 
   class GetObserversIfDarkTemplarPossible extends If(
@@ -261,9 +263,9 @@ object PvPIdeas {
   class PumpDragoonsAndZealots extends Parallel(
     new PumpRatio(Protoss.Dragoon, 0, 100, Seq(Enemy(Protoss.Carrier, 5.0))),
     new If(
-      new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.Zealot.buildFrames + GameTime(10, 0)()),
+      new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.Zealot.buildFrames),
       new PumpRatio(Protoss.Zealot, 3, 100, Seq(
-        Enemy(Protoss.Carrier, -2.0),
+        Enemy(Protoss.Carrier, -8.0),
         Friendly(Protoss.Dragoon, 2.0),
         Friendly(Protoss.Reaver, 4.0),
         Friendly(Protoss.Archon, -3.0)))),

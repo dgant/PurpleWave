@@ -24,18 +24,11 @@ object PvT13Nexus extends PvTBasicOpener {
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fiveRax,
     With.fingerprints.bbs)
-  override def startLocationsMin: Int = 4
-
   override def rushDistanceMinimum: Int = super.rushDistanceMinimum
+  override def startLocationsMin: Int = 4
 }
 object PvT21Nexus extends PvTBasicOpener
-object PvT23Nexus extends PvTBasicOpener {
-  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
-    With.fingerprints.fourteenCC,
-    With.fingerprints.fiveRax,
-    With.fingerprints.bbs
-  )
-}
+object PvT23Nexus extends PvTBasicOpener
 object PvT28Nexus extends PvTBasicOpener
 object PvT2GateRangeExpand extends PvTBasicOpener {
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
@@ -78,7 +71,7 @@ object PvTDTExpand extends PvTBasicOpener {
   ))
 }
 
-object PvT2BaseCarrier extends PvTStrategy { override val mapsBlacklisted = Iterable(BlueStorm) }
+object PvT2BaseCarrier extends PvTStrategy
 object PvT3BaseCarrier extends PvTStrategy { override val mapsBlacklisted = MapGroups.badForFastThirdBases }
 object PvT2BaseArbiter extends PvTStrategy { override val mapsBlacklisted = Iterable(BlueStorm) }
 object PvT3BaseArbiter extends PvTStrategy { override val mapsBlacklisted = MapGroups.badForFastThirdBases }

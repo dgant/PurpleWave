@@ -14,10 +14,12 @@ class DefendEntrance(
   override val goal: GoalDefendZone = new GoalDefendZone
   
   override def onUpdate() {
+    val bases = With.geography.ourBasesAndSettlements
+
     goal.unitMatcher = unitMatcher
     goal.unitCounter = unitCounter
     goal.zone = ByOption
-      .minBy(With.geography.ourBasesAndSettlements)(_.heart.groundPixels(With.intelligence.mostBaselikeEnemyTile))
+      .minBy(bases)(_.heart.groundPixels(With.intelligence.mostBaselikeEnemyTile))
       .map(_.zone)
       .getOrElse(With.geography.home.zone)
     super.onUpdate()

@@ -11,7 +11,7 @@ object Opponents {
   }
 
   val defaultPvT  = new StrategySelectionRecommended(StrategySelectionGreedy, PvT1015DT, PvT3BaseCarrier)
-  val defaultPvP  = new StrategySelectionRecommended(StrategySelectionGreedy, PvP2Gate1012, PvPLateGameArbiter)
+  val defaultPvP  = new StrategySelectionRecommended(StrategySelectionGreedy, PvP2Gate1012)
   val defaultPvZ  = new StrategySelectionRecommended(StrategySelectionGreedy, PvZ4Gate99, PvZMidgame5GateGoon)
   val fixedPvT    = new StrategySelectionFixed(PvT1015DT, PvT3BaseArbiter)
   val fixedPvZ    = new StrategySelectionFixed(PvZ4Gate99, PvZMidgame5GateGoon)
@@ -19,7 +19,7 @@ object Opponents {
   
   val mcrave        : Opponent = add(Opponent("McRave",       StrategySelectionDynamic))
   val titaniron     : Opponent = add(Opponent("TitanIron",    new StrategySelectionRecommended(StrategySelectionDynamic, PvT1015DT, PvT2BaseCarrier)))
-  val locutus       : Opponent = add(Opponent("Locutus",      new StrategySelectionRecommended(StrategySelectionDynamic, PvPProxy2Gate, PvPLateGameArbiter)))
+  val locutus       : Opponent = add(Opponent("Locutus",      new StrategySelectionRecommended(StrategySelectionDynamic, PvPProxy2Gate)))
   val tscmoo        : Opponent = add(Opponent("tscmoo",       StrategySelectionGreedy))
   val iron          : Opponent = add(Opponent("Iron",         new StrategySelectionFixed(PvT1015DT, PvT2BaseCarrier)))
   val letabot       : Opponent = add(Opponent("LetaBot",      new StrategySelectionRecommended(StrategySelectionGreedy, PvTReaverCarrierCheese)))
@@ -29,7 +29,7 @@ object Opponents {
   val zzzkbot       : Opponent = add(Opponent("ZZZKBot",      fixedPvZ))
   val ualbertabot   : Opponent = add(Opponent("UAlbertaBot",  fixedPvR))
   val aiur          : Opponent = add(Opponent("Aiur",         defaultPvP))
-  val tyr           : Opponent = add(Opponent("Tyr",          new StrategySelectionRecommended(StrategySelectionGreedy, PvP2GateDTExpand, PvPLateGameArbiter)))
+  val tyr           : Opponent = add(Opponent("Tyr",          new StrategySelectionRecommended(StrategySelectionGreedy, PvP2GateDTExpand)))
   val ecgberht      : Opponent = add(Opponent("Ecgberht",     defaultPvT))
   val overkill      : Opponent = add(Opponent("Overkill",     fixedPvZ))
   val ziabot        : Opponent = add(Opponent("Ziabot",       fixedPvZ))

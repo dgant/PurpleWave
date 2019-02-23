@@ -14,23 +14,24 @@ object OpponentsAIST {
     Vector(
       Seq(PvT1015DT, PvT2BaseArbiter),
       Seq(PvT2GateRangeExpand, PvT2BaseCarrier),
+      Seq(PvT23Nexus, PvT2BaseArbiter)
     ))
 
   val defaultPvP = StrategySelectionSequence(
     Vector(
-      Seq(PvP2Gate1012Goon, PvPLateGameArbiter),
-      Seq(PvP2GateDTExpand, PvPLateGameArbiter),
-      Seq(PvP3GateRobo,     PvPLateGameArbiter),
-      Seq(PvP2GateRobo,     PvPLateGameArbiter),
-      Seq(PvP3GateGoon,     PvPLateGameArbiter)
+      Seq(PvP2Gate1012Goon),
+      Seq(PvP2GateDTExpand),
+      Seq(PvP3GateRobo),
+      Seq(PvPGateGateRobo),
+      Seq(PvP3GateGoon)
     ), loop = true)
 
   val defaultPvZ = StrategySelectionSequence(
     Vector(
       Seq(PvZFFEConservative, PvZMidgameCorsairReaverGoon,  PvZLateGameReaver),
+      Seq(PvZFFEEconomic,     PvZMidgameNeoBisu,            PvZLateGameTemplar),
       Seq(PvZ4Gate99,         PvZMidgame5GateGoonReaver,    PvZLateGameReaver),
-      Seq(PvZFFEConservative, PvZMidgameNeoBisu,            PvZLateGameTemplar),
-      Seq(PvZ4Gate99,         PvZMidgameBisu,               PvZLateGameTemplar)
+      Seq(PvZFFEEconomic,     PvZMidgameBisu,               PvZLateGameTemplar)
     ))
 
   // Protoss
@@ -48,7 +49,7 @@ object OpponentsAIST {
   val steamhammer   : Opponent = add(Opponent("Steamhammer",  defaultPvZ))
 
   // Aliases for local testing
-  val jadien            : Opponent = add(Opponent("Jadien",             locutus.policy))
+  val jadien            : Opponent = add(Opponent("Jadien",             tscmoo.policy))
   val madmixp           : Opponent = add(Opponent("MadMixP",            madmix.policy))
   val tscmooz           : Opponent = add(Opponent("tscmooz",            tscmoo.policy))
   val martinrooijackers : Opponent = add(Opponent("Martin Rooijackers", letabot.policy))

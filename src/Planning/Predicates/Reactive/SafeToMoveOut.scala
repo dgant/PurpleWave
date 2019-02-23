@@ -68,7 +68,7 @@ class SafeToMoveOut extends Predicate {
     
     val scoreDragoon  = 1.0
     val scoreSpeedlot = 1.0
-    val scoreReaver   = 2.0
+    val scoreReaver   = 3.0
     val scoreShuttle  = 2.0
     val scoreArchon   = 2.0
     val scoreCarrier  = 3.0

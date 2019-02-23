@@ -45,7 +45,7 @@ object Reposition extends ActionTechnique {
     val resistancesTerrain = Potential.resistTerrain(unit)
   
     unit.agent.toAttack.foreach(target => {
-      val targetMagnitude = PurpleMath.nanToOne((With.reaction.agencyAverage + unit.framesBeforeAttacking(target)) / unit.framesToBeReadyForAttackOrder)
+      val targetMagnitude = PurpleMath.nanToOne((With.reaction.agencyAverage + unit.framesBeforeAttacking(target)) / unit.framesToBeReadyForAttackOrder.toDouble)
       forceTarget = Potential.unitAttraction(unit, target, targetMagnitude)
     })
     

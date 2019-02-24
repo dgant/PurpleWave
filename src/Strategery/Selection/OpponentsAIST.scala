@@ -56,6 +56,8 @@ object OpponentsAIST {
       Seq(PvP2GateDTExpand),
       Seq(PvP3GateGoon)))
 
+  val anything = StrategySelectionGreedy
+
   // Protoss
   val locutus       : Opponent = add(Opponent("Locutus",      locutusBuilds))
   val bananabrain   : Opponent = add(Opponent("BananaBrain",  bananaBuilds))
@@ -71,7 +73,7 @@ object OpponentsAIST {
   val steamhammer   : Opponent = add(Opponent("Steamhammer",  defaultPvZ))
 
   // Aliases for local testing
-  val jadien            : Opponent = add(Opponent("Jadien",             locutus.policy))
+  val jadien            : Opponent = add(Opponent("Jadien",             StrategySelectionGreedy))
   val madmixp           : Opponent = add(Opponent("MadMixP",            madmix.policy))
   val tscmooz           : Opponent = add(Opponent("tscmooz",            tscmoo.policy))
   val martinrooijackers : Opponent = add(Opponent("Martin Rooijackers", letabot.policy))

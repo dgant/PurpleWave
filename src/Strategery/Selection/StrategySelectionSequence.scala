@@ -11,10 +11,9 @@ case class StrategySelectionSequence(strategySequences: IndexedSeq[Seq[Strategy]
 
     val appropriate = strategySequences.filter(_.forall(With.strategy.isAppropriate))
 
-    if ( ! loop && appropriate.headOption.forall(_.forall(strategy => gamesAgainst.exists(_.weEmployed(strategy))))) {
+    if ( ! loop && appropriate.forall(_.forall(strategy => gamesAgainst.exists(_.weEmployed(strategy))))) {
       return StrategySelectionGreedy.chooseBest(
-        topLevelStrategies.filter(strategy =>
-          appropriate.exists(_.exists(_ == strategy))),
+        topLevelStrategies.filter(strategy => appropriate.exists(_.exists(_ == strategy))),
         expand)
     }
 

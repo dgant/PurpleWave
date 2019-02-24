@@ -93,14 +93,14 @@ class PvPLateGame extends GameplanTemplate {
           Get(5, Protoss.Gateway),
           Get(2, Protoss.Assimilator),
           Get(Protoss.RoboticsFacility),
-          Get(Protoss.RoboticsSupportBay),
+          //Get(Protoss.RoboticsSupportBay),
           Get(Protoss.Observatory)),
         new Build(
           Get(3, Protoss.Gateway),
           Get(2, Protoss.Assimilator),
           Get(Protoss.RoboticsFacility),
           Get(Protoss.Observatory),
-          Get(Protoss.RoboticsSupportBay),
+          //Get(Protoss.RoboticsSupportBay),
           Get(5, Protoss.Gateway)))),
 
     new If(

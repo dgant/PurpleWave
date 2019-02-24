@@ -43,7 +43,7 @@ object Gather extends Action {
 
       val lethalStabbers = unit.matchups.threatsInRange.filter(threat =>
         threat.unitClass.melee
-        && 2 * threat.damageOnNextHitAgainst(unit) >= unit.totalHealth)
+        && (if (threat.presumptiveTarget.contains(unit)) 2 else 1) * threat.damageOnNextHitAgainst(unit) >= unit.totalHealth)
       if (lethalStabbers.nonEmpty && unit.base.isDefined) {
 
         val goals = (unit.base.get.resources ++ unit.base.flatMap(_.townHall))

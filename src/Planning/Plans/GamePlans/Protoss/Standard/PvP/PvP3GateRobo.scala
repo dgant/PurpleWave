@@ -5,7 +5,8 @@ import Macro.BuildRequests.Get
 import Planning.Plans.Army.EjectScout
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.Macro.Automatic.PumpWorkers
+import Planning.Plans.Macro.Automatic.{Pump, PumpShuttleAndReavers, PumpWorkers}
+import Planning.Plans.Macro.Build.CancelAll
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireBases
 import Planning.Plans.Scouting.ScoutOn
@@ -71,24 +72,33 @@ class PvP3GateRobo extends GameplanTemplate {
     Get(21,  Protoss.Probe),
     Get(3,   Protoss.Dragoon),
     Get(3,   Protoss.Gateway),
-    Get(4,   Protoss.Dragoon),
-    Get(22,  Protoss.Probe),
-    Get(4,   Protoss.Pylon))
+    Get(4,   Protoss.Dragoon))
 
   override def buildPlans = Vector(
 
     new EjectScout,
 
     new If(
-      new EnemyStrategy(With.fingerprints.robo, With.fingerprints.fourGateGoon, With.fingerprints.nexusFirst),
-      new BuildOrder(
-        Get(Protoss.Shuttle),
-        Get(Protoss.RoboticsSupportBay)),
-      new BuildOrder(
-        Get(Protoss.Observatory),
-        Get(Protoss.Observer),
-        Get(Protoss.Shuttle),
-        Get(Protoss.RoboticsSupportBay))),
+      new PvPIdeas.CanSkipObservers,
+      new Parallel(
+        new CancelAll(Protoss.Observer),
+        new BuildOrder(
+          Get(Protoss.Shuttle),
+          Get(Protoss.RoboticsSupportBay))),
+      new If(
+        new EnemyHasShown(Protoss.DarkTemplar),
+        new Parallel(
+          new If(
+            new UnitsAtMost(0, Protoss.Observer),
+            new CancelAll(Protoss.Reaver, Protoss.Shuttle)),
+          new BuildOrder(
+            Get(Protoss.Observatory),
+            Get(Protoss.Observer))),
+        new BuildOrder(
+          Get(Protoss.Observatory),
+          Get(Protoss.Shuttle),
+          Get(Protoss.Observer),
+          Get(Protoss.RoboticsSupportBay)))),
 
     new Trigger(
       new Or(
@@ -102,7 +112,12 @@ class PvP3GateRobo extends GameplanTemplate {
           new UnitsAtLeast(2, Protoss.Reaver, complete = true))),
       new RequireBases(2)),
 
-    new PvPIdeas.TrainArmy,
+    new If(
+      new PvPIdeas.CanSkipObservers,
+      new CancelAll(Protoss.Observer, Protoss.Observatory),
+      new Pump(Protoss.Observer, 1)),
+    new PumpShuttleAndReavers(6, shuttleFirst = false),
+    new PvPIdeas.PumpDragoonsAndZealots,
 
     new PumpWorkers(oversaturate = true, 40),
     new RequireBases(2),

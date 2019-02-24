@@ -19,6 +19,8 @@ object PlacementProfiles {
       gas
     else if (blueprint.powers.get)
       pylon
+    else if (blueprint.building.contains(Protoss.RoboticsFacility))
+      robo
     else if (blueprint.building.exists(_.trainsGroundUnits)) {
       if (blueprint.building.contains(Terran.Barracks))
         factoryNoSpace
@@ -49,6 +51,9 @@ object PlacementProfiles {
   )
   
   val pylon = new PlacementProfile("Pylon", basic)
+  val robo = new PlacementProfile("Robo", basic) {
+    avoidDistanceFromIdealRange = 4.0
+  }
   val factory = new PlacementProfile("Factory", basic)
   val factoryNoSpace = new PlacementProfile("Factory", basic) {
     preferSpace = 0.0

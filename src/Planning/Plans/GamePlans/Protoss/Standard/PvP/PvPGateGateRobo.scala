@@ -5,11 +5,12 @@ import Macro.BuildRequests.Get
 import Planning.Plans.Army.EjectScout
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.Macro.Automatic.PumpWorkers
+import Planning.Plans.Macro.Automatic.{Pump, PumpShuttleAndReavers, PumpWorkers}
+import Planning.Plans.Macro.Build.CancelAll
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireBases
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.{And, Latch}
+import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Milestones.{BasesAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
@@ -19,11 +20,7 @@ import Strategery.Strategies.Protoss.PvPGateGateRobo
 class PvPGateGateRobo extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(PvPGateGateRobo)
-  override val completionCriteria: Predicate = new Latch(
-    new And(
-      new UnitsAtLeast(2, Protoss.Nexus),
-      new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
-      new UnitsAtLeast(5, Protoss.Gateway)))
+  override val completionCriteria: Predicate =  new UnitsAtLeast(2, Protoss.Nexus)
   
   override def attackPlan: Plan = new PvP3GateRobo().attackPlan
   override def scoutPlan: Plan = new ScoutOn(Protoss.Pylon)
@@ -79,7 +76,13 @@ class PvPGateGateRobo extends GameplanTemplate {
           new UnitsAtLeast(2, Protoss.Reaver, complete = true))),
       new RequireBases(2)),
 
-    new PvPIdeas.TrainArmy,
+    new If(
+      new PvPIdeas.CanSkipObservers,
+      new CancelAll(Protoss.Observer, Protoss.Observatory),
+      new Pump(Protoss.Observer, 1)),
+    new PumpShuttleAndReavers(6, shuttleFirst = false),
+    new PvPIdeas.PumpDragoonsAndZealots,
+
     new FlipIf(
       new EnemyStrategy(
         With.fingerprints.cannonRush,
@@ -89,18 +92,23 @@ class PvPGateGateRobo extends GameplanTemplate {
         With.fingerprints.nexusFirst,
         With.fingerprints.forgeFe,
         With.fingerprints.robo),
-      new BuildOrder(
-        Get(Protoss.Observatory),
-        Get(Protoss.Observer)),
+      new If(
+        new Not(new PvPIdeas.CanSkipObservers),
+        new BuildOrder(
+          Get(Protoss.Observatory),
+          Get(Protoss.Observer))),
       new BuildOrder(
         Get(Protoss.Shuttle),
-        Get(Protoss.RoboticsSupportBay))),
+        Get(Protoss.RoboticsSupportBay),
+        Get(Protoss.Reaver))),
 
+    new If(
+      new EnemyStrategy(With.fingerprints.fourGateGoon),
+      new Build(Get(3, Protoss.Gateway))),
     new RequireBases(2),
     new Trigger(
       new BasesAtLeast(2),
       new Build(
-        Get(Protoss.Observatory),
         Get(5, Protoss.Gateway),
         Get(2, Protoss.Assimilator))),
     new PumpWorkers(oversaturate = true)

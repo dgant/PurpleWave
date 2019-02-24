@@ -34,7 +34,7 @@ object Phalanx extends Action {
         unit.matchups.targetsInRange.nonEmpty
         || unit.matchups.threatsInRange.isEmpty
         || ! unit.visibleToOpponents)) {
-      if (unit.matchups.framesOfSafety < 24 || formationDistance < 2) {
+      if (unit.matchups.framesOfSafety < 24 || formationDistance < 4) {
         With.commander.hold(unit)
       } else {
         if (Random.nextInt(10) == 0) {

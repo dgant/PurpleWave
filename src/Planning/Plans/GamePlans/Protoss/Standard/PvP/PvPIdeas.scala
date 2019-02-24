@@ -113,7 +113,7 @@ object PvPIdeas {
           Get(Protoss.Observer)))))
 
   class ReactToDarkTemplarExisting extends If(
-    new EnemyDarkTemplarExists,
+    new EnemyHasShown(Protoss.DarkTemplar),
     new Parallel(
       new If(
         new UnitsAtMost(0, Protoss.Observer),
@@ -252,10 +252,11 @@ object PvPIdeas {
         new Latch(new UnitsAtLeast(1, Protoss.Observer, complete = true)),
         new EnemyRobo),
       new Or(
-        new UnitsAtLeast(20, UnitMatchWarriors),
+        new UnitsAtLeast(12, UnitMatchWarriors),
         new EnemiesAtLeast(6, Protoss.PhotonCannon),
         new And(
           new SafeAtHome,
+          new UnitsAtLeast(5, Protoss.Gateway),
           new Or(
             new EnemyCarriers,
             new EnemyBasesAtLeast(3))))),
@@ -263,35 +264,23 @@ object PvPIdeas {
 
   class TakeBase4 extends If(
     new Or(
-      new UnitsAtLeast(30, UnitMatchWarriors),
-      new EnemiesAtLeast(10, Protoss.PhotonCannon),
+      new UnitsAtLeast(20, UnitMatchWarriors),
+      new EnemiesAtLeast(8, Protoss.PhotonCannon),
       new And(
         new SafeAtHome,
+        new UnitsAtLeast(6, Protoss.Gateway),
         new Or(
           new EnemyCarriers,
           new EnemyBasesAtLeast(4)))),
     new RequireBases(4))
 
+  class CanSkipObservers extends And(
+    new Not(new EnemyHasShown(Protoss.DarkTemplar)),
+    new EnemyStrategy(With.fingerprints.robo, With.fingerprints.fourGateGoon, With.fingerprints.nexusFirst))
+
   class MeldArchonsPvP extends MeldArchons(0) {
     override def minimumArchons: Int = Math.min(6, With.units.countEnemy(Protoss.Zealot) / 6)
   }
-
-  class GetObserversIfDarkTemplarPossible extends If(
-    new And(
-      new EnemyBasesAtMost(1),
-      new EnemiesAtMost(0,
-        UnitMatchOr(
-          Protoss.RoboticsFacility,
-          Protoss.RoboticsSupportBay,
-          Protoss.Observatory,
-          Protoss.Observer,
-          Protoss.Shuttle,
-          Protoss.Reaver))),
-    new Build(
-      Get(Protoss.Assimilator),
-      Get(Protoss.CyberneticsCore),
-      Get(Protoss.RoboticsFacility),
-      Get(Protoss.Observatory)))
 
   class PumpSufficientDragoons extends PumpRatio(Protoss.Dragoon, 0, 100, Seq(
     Enemy(Protoss.Carrier, 5.0),
@@ -341,7 +330,7 @@ object PvPIdeas {
       new Parallel(
         new PumpShuttleAndReavers(6, shuttleFirst = false),
         new PumpRatio(Protoss.Dragoon, 3, 24, Seq(Friendly(Protoss.Zealot, 1.5))),
-        new PumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-1), Enemy(Protoss.Dragoon, 0.2), Enemy(UnitMatchWarriors, 0.1))),
+        new PumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-1), Friendly(UnitMatchWarriors, 1.0 / 6.0))),
         new Pump(Protoss.Zealot)),
       // Dragoon-Reaver composition
       new Parallel(

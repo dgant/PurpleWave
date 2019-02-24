@@ -27,6 +27,9 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
     val chokeEnd        = chokeCenter.project(zone.exitNow.map(_.pixelTowards(zone)).getOrElse(zone.centroid.pixelCenter), 300)
     val chokeCenterTile = chokeCenter.tileIncluding
 
+    // Avoid colliding with stuff
+    zone.bases.flatMap(_.townHallArea.tiles).foreach(occupied.set(_, true))
+    zone.bases.foreach(base => if (base.workerCount > 2) base.harvestingArea.tiles.foreach(occupied.set(_, true)))
     // Clear a line for Scarabs
     DrawMap.line(chokeCenter, chokeEnd, Colors.NeonYellow)
     if (units.exists(_.is(Protoss.Reaver))) {

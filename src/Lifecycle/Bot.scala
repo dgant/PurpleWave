@@ -7,8 +7,8 @@ class Bot() extends DefaultBWListener {
 
   override def onStart() {
     try {
-      if (With.frame < 6) With.logger.debug("OnStart: Frame " + With.frame)
       With.onStart()
+      With.logger.debug("OnStart: Frame " + With.frame)
       With.history.onStart()
     }
     catch { case exception: Exception => With.logger.onException(exception) }

@@ -14,10 +14,10 @@ import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.Latch
+import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyDarkTemplarLikely, SafeAtHome}
-import Planning.Predicates.Strategy.Employing
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP3GateGoon
@@ -62,10 +62,12 @@ class PvP3GateGoon extends GameplanTemplate {
       new BasesAtLeast(2),
       new Parallel(
         new If(
-          new Or(
-            new SafeAtHome,
-            new EnemyHasShown(Protoss.Forge),
-            new EnemyDarkTemplarLikely),
+          new And(
+            new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),
+            new Or(
+              new SafeAtHome,
+              new EnemyHasShown(Protoss.Forge),
+              new EnemyDarkTemplarLikely)),
           new Build(
             Get(Protoss.RoboticsFacility),
             Get(Protoss.Observatory))),

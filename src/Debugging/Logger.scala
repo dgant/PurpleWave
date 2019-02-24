@@ -35,7 +35,7 @@ class Logger {
   }
   
   def debug(message: String) {
-    log(message)
+    log(message, chat = false)
   }
   
   def warn(message: String) {
@@ -48,9 +48,11 @@ class Logger {
     log(message)
   }
   
-  private def log(message: String) {
+  private def log(message: String, chat: Boolean = true) {
     logMessages.append(message)
-    Manners.chat(message)
+    if (chat) {
+      Manners.chat(message)
+    }
   }
   
   private def formatException(exception: Exception): String = {

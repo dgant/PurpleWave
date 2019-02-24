@@ -94,9 +94,9 @@ object FightOrFlight extends Action {
       && ally.unitClass.topSpeed <= Protoss.HighTemplar.topSpeed
       && (ally.subjectiveValue > unit.subjectiveValue || ally.unitClass.isBuilding)
       && ( ! ally.unitClass.isBuilding || ally.matchups.threatsInRange.nonEmpty)
-      && ally.agent.ride.exists(_.pixelDistanceEdge(ally) > 96)) || ally.matchups.threatsInRange.nonEmpty
-      && ally.matchups.framesOfSafety <= 12 + Math.max(0, unit.matchups.framesOfSafety)
-    ))
+      && (ally.friendly.forall(_.agent.ride.exists(_.pixelDistanceEdge(ally) > 96)) || ally.matchups.threatsInRange.nonEmpty)
+      && ally.matchups.framesOfSafety <= 12 + Math.max(0, unit.matchups.framesOfSafety)))
+    )
 
     decide(true, getaway, () => unit.agent.ride.exists(ride => {
       val rideDistance = Math.max(0.0, ride.pixelDistanceCenter(unit) - Shuttling.pickupRadius - 32)

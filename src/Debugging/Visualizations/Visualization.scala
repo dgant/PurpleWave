@@ -29,8 +29,7 @@ class Visualization {
     ShowUnitsAll,
     ShowUnitsFriendly,
     ShowUnitsForeign,
-    ShowExplosions,
-    ShowBases
+    ShowExplosions
   )
   
   var enabled   : Boolean = _

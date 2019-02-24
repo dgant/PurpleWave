@@ -2,6 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -14,6 +15,7 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.UnitCounters.UnitCountExactly
 import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
@@ -23,7 +25,11 @@ class PvP2Gate1012Goon extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(PvP2Gate1012Goon)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(2, Protoss.Nexus))
-  override def priorityAttackPlan: Plan = new AttackWithDarkTemplar
+  override def priorityAttackPlan: Plan = new Parallel(
+    new If(
+      new EnemyStrategy(With.fingerprints.proxyGateway),
+      new Attack(Protoss.Zealot, UnitCountExactly(1))),
+    new AttackWithDarkTemplar)
   override def attackPlan: Plan = new If(
     new Or(
       new Not(new EnemyStrategy(With.fingerprints.twoGate)),

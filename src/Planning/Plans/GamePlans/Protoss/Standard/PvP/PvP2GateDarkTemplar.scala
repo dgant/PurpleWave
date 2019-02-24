@@ -4,7 +4,6 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Predicates.Compound.{And, Latch}
 import Planning.Plan
 import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Basic.NoPlan
@@ -13,10 +12,11 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump, PumpWorkers, RequireSufficientSupply}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
-import Planning.Predicates.Milestones._
 import Planning.Plans.Scouting.ScoutOn
+import Planning.Predicates.Compound.{And, Latch}
+import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
-import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP2GateDTExpand
 
@@ -25,24 +25,25 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
   override val activationCriteria = new Employing(PvP2GateDTExpand)
   override val completionCriteria = new Latch(new MiningBasesAtLeast(2))
   override val workerPlan = NoPlan()
-  override val scoutPlan = new If(
-    new StartPositionsAtLeast(3),
-    new ScoutOn(Protoss.Gateway),
-    new ScoutOn(Protoss.CyberneticsCore))
+  override val scoutPlan = new ScoutOn(Protoss.Gateway)
 
   override val attackPlan  = new Trigger(
     new Or(
       new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
       new EnemyStrategy(With.fingerprints.nexusFirst),
-      new UpgradeComplete(Protoss.DragoonRange),
+      new And(
+        new UpgradeStarted(Protoss.DragoonRange),
+        new PvPIdeas.PvPSafeToMoveOut),
       new And(
         new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
         new EnemyStrategy(With.fingerprints.proxyGateway))),
     new Attack)
   override def blueprints = Vector(
-    new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.backPylon)),
-    new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.backPylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
+    new Blueprint(this, building = Some(Protoss.Pylon),         placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 6.0)),
+    new Blueprint(this, building = Some(Protoss.Gateway)),
+    new Blueprint(this, building = Some(Protoss.Pylon),         placement = Some(PlacementProfiles.backPylon)),
+    new Blueprint(this, building = Some(Protoss.ShieldBattery)),
+    new Blueprint(this, building = Some(Protoss.Gateway),       placement = Some(PlacementProfiles.backPylon)),
     new Blueprint(this, building = Some(Protoss.Pylon)),
     new Blueprint(this, building = Some(Protoss.Pylon)),
     new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))

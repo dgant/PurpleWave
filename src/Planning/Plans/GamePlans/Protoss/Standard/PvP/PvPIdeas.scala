@@ -2,11 +2,14 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
+import Macro.Architecture.Blueprint
+import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Parallel, _}
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic._
+import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, MeldArchons}
@@ -167,7 +170,7 @@ object PvPIdeas {
   class PerformReactionTo2Gate extends Parallel(
 
     new If(
-      new UnitsAtMost(3, Protoss.Gateway),
+      new UnitsAtMost(2, Protoss.Gateway),
       new Parallel(
         new CapGasWorkersAt(2),
         new CapGasAt(200))),
@@ -189,13 +192,22 @@ object PvPIdeas {
       Get(16, Protoss.Probe),
       Get(2,  Protoss.Zealot),
       Get(2, Protoss.Gateway),
-      Get(Protoss.Dragoon),
-      Get(3, Protoss.Pylon),
-      Get(17, Protoss.Probe),
-      Get(2, Protoss.Dragoon)),
+      Get(3, Protoss.Pylon)),
     new If(
-      new FrameAtMost(GameTime(3, 40)()),
-      new Build(Get(Protoss.ShieldBattery))),
+      new FrameAtMost(GameTime(3, 35)()),
+      new Parallel(
+        new ProposePlacement {
+          override lazy val blueprints = Seq(
+            new Blueprint(
+              this,
+              building = Some(Protoss.Pylon),
+              requireZone = Some(With.geography.ourMain.zone),
+              placement = Some(PlacementProfiles.defensive),
+              marginPixels = Some(32.0 * 4.0)))},
+        new Build(Get(Protoss.ShieldBattery)))),
+    new BuildOrder(
+      Get(2, Protoss.Dragoon),
+      Get(18, Protoss.Probe)),
     new RequireSufficientSupply,
     new Pump(Protoss.Probe, 16),
 

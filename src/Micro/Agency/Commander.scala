@@ -60,7 +60,7 @@ class Commander {
       sleepAttack(unit)
     }
     else {
-      sleep(unit)
+      unit.baseUnit.holdPosition()
     }
   }
   

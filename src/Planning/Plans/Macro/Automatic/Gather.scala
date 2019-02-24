@@ -161,8 +161,8 @@ class Gather extends Plan {
       )
 
     val workerDistance = worker.pixelDistanceCenter(resource)
-    if (resource.remainingCompletionFrames > PurpleMath.nanToZero(workerDistance / worker.topSpeed)) {
-      return 1e-100
+    if (resource.remainingCompletionFrames > Math.max(0, PurpleMath.nanToZero(workerDistance / worker.topSpeed))) {
+      return Double.MinValue
     }
 
     val safety      = if ( ! worker.zone.bases.exists(_.owner.isUs) || transfersLegal.contains((worker.zone, resource.zone))) 100.0 else 1.0

@@ -33,6 +33,7 @@ class PvP2Gate1012Goon extends GameplanTemplate {
   override def attackPlan: Plan = new If(
     new Or(
       new Not(new EnemyStrategy(With.fingerprints.twoGate)),
+      new EnemiesAtMost(2, UnitMatchWarriors),
       new UnitsAtLeast(1, Protoss.Dragoon, complete = true)),
     new PvPIdeas.AttackSafely)
 

@@ -9,12 +9,12 @@ import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackWithDarkTemplar
-import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers}
+import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump, PumpWorkers}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Compound.Latch
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyDarkTemplarLikely, SafeAtHome}
 import Planning.Predicates.Strategy.Employing
@@ -28,7 +28,7 @@ class PvP3GateGoon extends GameplanTemplate {
   override val completionCriteria : Predicate = new Latch(new Or(new UnitsAtLeast(1, Protoss.RoboticsFacility), new UnitsAtLeast(5, Protoss.Gateway)))
   override def priorityAttackPlan : Plan = new AttackWithDarkTemplar
   override def attackPlan: Plan = new Trigger(new UnitsAtLeast(1, Protoss.Dragoon, complete = true), new PvPIdeas.AttackSafely)
-  override def scoutPlan   : Plan = new ScoutOn(Protoss.CyberneticsCore)
+  override def scoutPlan   : Plan = new ScoutOn(Protoss.Gateway)
   override def workerPlan  : Plan = NoPlan()
   override def placementPlan: Plan = new If(
     new BasesAtLeast(2),
@@ -43,6 +43,9 @@ class PvP3GateGoon extends GameplanTemplate {
   override val buildOrder: Seq[BuildRequest] = ProtossBuilds.ThreeGateGoon
 
   override val buildPlans = Vector(
+    new If(
+      new UnitsAtMost(2, Protoss.Gateway),
+      new CapGasWorkersAt(2)),
 
     new EjectScout,
 

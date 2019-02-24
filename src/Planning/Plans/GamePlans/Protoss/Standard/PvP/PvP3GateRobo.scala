@@ -6,7 +6,7 @@ import Planning.Plans.Army.EjectScout
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{Pump, PumpShuttleAndReavers, PumpWorkers}
-import Planning.Plans.Macro.Build.CancelAll
+import Planning.Plans.Macro.Build.{CancelOrders, CancelIncomplete}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireBases
 import Planning.Plans.Scouting.ScoutOn
@@ -14,7 +14,7 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.UnitMatchers.{UnitMatchTraining, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP3GateRobo
@@ -81,7 +81,8 @@ class PvP3GateRobo extends GameplanTemplate {
     new If(
       new PvPIdeas.CanSkipObservers,
       new Parallel(
-        new CancelAll(Protoss.Observer),
+        new CancelIncomplete(Protoss.Observatory),
+        new CancelOrders(UnitMatchTraining(Protoss.Observer)),
         new BuildOrder(
           Get(Protoss.Shuttle),
           Get(Protoss.RoboticsSupportBay))),
@@ -90,7 +91,7 @@ class PvP3GateRobo extends GameplanTemplate {
         new Parallel(
           new If(
             new UnitsAtMost(0, Protoss.Observer),
-            new CancelAll(Protoss.Reaver, Protoss.Shuttle)),
+            new CancelOrders(UnitMatchTraining(Protoss.Reaver), UnitMatchTraining(Protoss.Shuttle))),
           new BuildOrder(
             Get(Protoss.Observatory),
             Get(Protoss.Observer))),
@@ -109,12 +110,12 @@ class PvP3GateRobo extends GameplanTemplate {
         new And(
           new UnitsAtMost(0, Protoss.TemplarArchives),
           new UnitsAtLeast(1, Protoss.Shuttle, complete = true),
-          new UnitsAtLeast(2, Protoss.Reaver, complete = true))),
+          new UnitsAtLeast(4, Protoss.Reaver, complete = true))),
       new RequireBases(2)),
 
     new If(
       new PvPIdeas.CanSkipObservers,
-      new CancelAll(Protoss.Observer, Protoss.Observatory),
+      new CancelOrders(UnitMatchTraining(Protoss.Observer), Protoss.Observatory),
       new Pump(Protoss.Observer, 1)),
     new PumpShuttleAndReavers(6, shuttleFirst = false),
     new PvPIdeas.PumpDragoonsAndZealots,
@@ -124,7 +125,6 @@ class PvP3GateRobo extends GameplanTemplate {
     new Trigger(
       new BasesAtLeast(2),
       new Build(
-        Get(Protoss.Observatory),
         Get(5, Protoss.Gateway),
         Get(2, Protoss.Assimilator)))
   )

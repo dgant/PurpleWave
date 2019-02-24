@@ -85,18 +85,21 @@ object FightOrFlight extends Action {
       }
     })
 
-    decide(true, "Anchors", () => unit.matchups.allies.exists(ally =>
+    val getaway = "Getaway"
+    decide(true, "Anchors", () => unit.matchups.allies.view.map(_.friendly).filter(_.isDefined).map(_.get).exists(ally => (
       ! ally.unitClass.isWorker
-      && ! ally.friendly.exists(_.loaded)
+      && ally.agent.fightReason != getaway
+      && ! ally.loaded
       && (ally.canAttack || (ally.unitClass.rawCanAttack && ally.unitClass.isBuilding) || ally.is(Zerg.CreepColony))
       && ally.unitClass.topSpeed <= Protoss.HighTemplar.topSpeed
       && (ally.subjectiveValue > unit.subjectiveValue || ally.unitClass.isBuilding)
       && ( ! ally.unitClass.isBuilding || ally.matchups.threatsInRange.nonEmpty)
-      && (ally.friendly.forall(_.agent.ride.exists(_.pixelDistanceEdge(ally) > 96)) || ally.matchups.threatsInRange.nonEmpty)
-      && ally.matchups.framesOfSafety <= 12 + Math.max(0, unit.matchups.framesOfSafety)))
+      && ally.agent.ride.exists(_.pixelDistanceEdge(ally) > 96)) || ally.matchups.threatsInRange.nonEmpty
+      && ally.matchups.framesOfSafety <= 12 + Math.max(0, unit.matchups.framesOfSafety)
+    ))
 
-    decide(true, "Getaway", () => unit.agent.ride.exists(ride => {
-      val rideDistance = Math.max(0.0, ride.pixelDistanceCenter(unit) - Shuttling.pickupRadius)
+    decide(true, getaway, () => unit.agent.ride.exists(ride => {
+      val rideDistance = Math.max(0.0, ride.pixelDistanceCenter(unit) - Shuttling.pickupRadius - 32)
       val rideWait = PurpleMath.nanToInfinity(rideDistance / (ride.topSpeed + unit.topSpeed))
       rideWait <= Math.max(0.0, unit.matchups.framesOfSafety) || (unit.loaded && unit.matchups.framesOfSafety > unit.cooldownMaxAirGround)
     }))

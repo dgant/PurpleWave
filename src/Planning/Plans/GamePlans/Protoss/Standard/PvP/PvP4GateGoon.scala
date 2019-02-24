@@ -6,12 +6,12 @@ import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.Macro.Automatic.Pump
+import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
-import Planning.Predicates.Milestones.{EnemiesAtLeast, MiningBasesAtLeast, UnitsAtLeast}
+import Planning.Predicates.Milestones.{EnemiesAtLeast, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Reactive.EnemyRobo
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
@@ -39,6 +39,10 @@ class PvP4GateGoon extends GameplanTemplate {
     new BuildOrder(ProtossBuilds.FourGateGoon: _*))
 
   override val buildPlans = Vector(
+    new If(
+      new UnitsAtMost(2, Protoss.Gateway),
+      new CapGasWorkersAt(2)),
+
     new If(
       new Or(
         new UnitsAtLeast(15, Protoss.Dragoon),

@@ -8,15 +8,15 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{PumpWorkers, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
-import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, BuildCannonsAtExpansions, BuildCannonsAtNatural}
+import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, BuildCannonsAtNatural}
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, OnMap}
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.Protoss
-import Strategery.{BlueStorm, Hitchhiker}
 import Strategery.Strategies.Protoss.{PvP2Gate1012Goon, PvP2GateDTExpand}
+import Strategery.{BlueStorm, Hitchhiker}
 
 class PvPLateGame extends GameplanTemplate {
 
@@ -37,14 +37,16 @@ class PvPLateGame extends GameplanTemplate {
     new Or(
       new OnMap(BlueStorm, Hitchhiker),
       new And(
-        new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
+        new Or(
+          new EnemiesAtLeast(3, Protoss.Reaver),
+          new UnitsAtLeast(1, Protoss.RoboticsSupportBay)),
         new UnitsAtMost(0, Protoss.TemplarArchives))))
 
   lazy val goZealotTemplarArbiter = new Latch(
     new And(
       new Not(goGoonReaverCarrier),
       new UnitsAtLeast(1, Protoss.TemplarArchives)))
-  
+
   class RoboTech extends Parallel(
     new Build(
       Get(Protoss.RoboticsFacility),
@@ -107,8 +109,14 @@ class PvPLateGame extends GameplanTemplate {
       new UnitsAtLeast(6, Protoss.Zealot),
       new Build(Get(Protoss.CitadelOfAdun))),
     new UpgradeContinuously(Protoss.ZealotSpeed),
-    new Build(Get(6, Protoss.Gateway)),
     new BuildGasPumps,
+    new If(
+      new Not(goGoonReaverCarrier),
+      new Build(
+        Get(Protoss.CitadelOfAdun),
+        Get(Protoss.TemplarArchives))),
+
+    new Build(Get(6, Protoss.Gateway)),
 
     new If(
       new And(
@@ -129,12 +137,10 @@ class PvPLateGame extends GameplanTemplate {
     new Build(Get(Protoss.Stasis)))
 
   class CarrierTransition extends Parallel(
-    new Build(Get(Protoss.Stargate)),
     new Build(
+      Get(Protoss.Stargate),
       Get(Protoss.FleetBeacon),
-      Get(2, Protoss.Stargate),
-      Get(Protoss.CarrierCapacity),
-      Get(3, Protoss.Stargate)))
+      Get(2, Protoss.Stargate)))
 
   override val buildPlans = Vector(
 
@@ -189,21 +195,19 @@ class PvPLateGame extends GameplanTemplate {
       new PvPIdeas.TrainArmy,
       new BuildTech),
 
-    new If(
-      new Not(new PvPIdeas.PvPSafeToMoveOut),
+    new Trigger(
+      new And(
+        new PvPIdeas.PvPSafeToMoveOut,
+        new UnitsAtLeast(6, Protoss.Gateway, complete = true)),
+      new RequireBases(3)),
+
+    new Trigger(
+      goGoonReaverCarrier,
+      new CarrierTransition,
       new Build(Get(8, Protoss.Gateway))),
 
-    new Trigger(new UnitsAtLeast(6, Protoss.Gateway, complete = true)),
-    new RequireBases(3),
-
-    // Crazy Shuttle defense
-    new If(new EnemiesAtLeast(3, Protoss.Shuttle), new Build(Get(Protoss.Stargate), Get(Protoss.Corsair))),
-
-    new Build(Get(8, Protoss.Gateway)),
     new RequireMiningBases(3),
     new Build(Get(12, Protoss.Gateway)),
-    new BuildCannonsAtExpansions(1),
-    new RequireMiningBases(4),
 
     // Arbiter/Carrier transitions
     new If(

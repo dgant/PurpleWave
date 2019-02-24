@@ -16,9 +16,11 @@ class ForeignUnitTracker {
   var enemyUnits      : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
   var neutralUnits    : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
   var enemyGhostUnits : Set[Int]             = new HashSet[Int]
-  
+
+  var initialized = false
+
   def get(id: Int): Option[ForeignUnitInfo] = unitsByIdKnown.get(id)
-  
+
   def update() {
     initialize()
 
@@ -39,18 +41,19 @@ class ForeignUnitTracker {
     }
 
     unitsByIdKnown.values.foreach(updateMissing)
-  
+
     // TODO: Let's stop making these sets by default.
     enemyUnits   = unitsByIdKnown.values.filter(_.player.isEnemy).toSet
     neutralUnits = unitsByIdKnown.values.filter(_.player.isNeutral).toSet
   }
-  
+
   def onUnitDestroy(unit: bwapi.Unit) {
     unitsByIdKnown.get(unit.getID).foreach(remove)
   }
-  
+
   private def initialize() {
-    if (With.frame == 0) {
+    if ( ! initialized) {
+      initialized = true
       flagGhostUnits()
       trackStaticUnits()
     }

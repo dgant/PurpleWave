@@ -136,7 +136,20 @@ object PvPIdeas {
 
   class ReactToGasSteal extends If(
     new EnemyStrategy(With.fingerprints.gasSteal),
-    new BuildOrder(ProtossBuilds.TwoGate1012: _*))
+    new Parallel(
+      new BuildOrder(ProtossBuilds.TwoGate1012: _*),
+      new Build(Get(Protoss.Assimilator)),
+      new If(
+        new UnitsAtMost(0, Protoss.Assimilator),
+        new Parallel(
+          new RequireSufficientSupply,
+          new PumpWorkers,
+          new Pump(Protoss.Zealot),
+          new Build(
+            Get(3, Protoss.Gateway),
+            Get(2, Protoss.Nexus),
+            Get(Protoss.Forge)),
+      ))))
 
   class ReactToTwoGate extends If(
     new And(
@@ -207,7 +220,7 @@ object PvPIdeas {
           new Not(new SafeAtHome)),
       new TrainArmy)),
     new If(
-      new FrameAtMost(GameTime(3, 30)()),
+      new FrameAtMost(GameTime(3, 45)()),
       new Build(Get(Protoss.ShieldBattery))),
     new Build(Get(3, Protoss.Gateway)))
 

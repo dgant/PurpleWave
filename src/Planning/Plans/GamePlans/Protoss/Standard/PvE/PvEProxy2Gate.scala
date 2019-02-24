@@ -7,7 +7,7 @@ import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound.{Or, _}
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.Situational.{PlaceBatteriesProxied, PlaceGatewaysProxied}
+import Planning.Plans.GamePlans.Protoss.Situational.PlaceGatewaysProxied
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases}
@@ -16,7 +16,7 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
-import Planning.Predicates.Strategy.{Employing, EnemyIsProtoss, EnemyIsTerran, EnemyStrategy}
+import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy}
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Protoss.{PvPProxy2Gate, PvRProxy2Gate, PvTProxy2Gate, PvZProxy2Gate}
@@ -46,6 +46,8 @@ class PvEProxy2Gate extends GameplanTemplate {
   
   private class MustTech extends Or(
     new UnitsAtLeast(15, Protoss.Probe),
+    new EnemiesAtLeast(1, Protoss.Forge),
+    new EnemiesAtLeast(1, Protoss.PhotonCannon),
     new EnemyHasShownCloakedThreat,
     new EnemyHasShown(Terran.Vulture),
     new EnemyHasShown(Protoss.Dragoon),

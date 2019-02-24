@@ -6,13 +6,14 @@ import Planning.Plans.Army.EjectScout
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{Pump, PumpShuttleAndReavers, PumpWorkers}
-import Planning.Plans.Macro.Build.CancelAll
+import Planning.Plans.Macro.Build.{CancelIncomplete, CancelOrders}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireBases
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Milestones.{BasesAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.UnitMatchers.UnitMatchTraining
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPGateGateRobo
@@ -78,7 +79,9 @@ class PvPGateGateRobo extends GameplanTemplate {
 
     new If(
       new PvPIdeas.CanSkipObservers,
-      new CancelAll(Protoss.Observer, Protoss.Observatory),
+      new Parallel(
+        new CancelIncomplete(Protoss.Observatory),
+        new CancelOrders(UnitMatchTraining(Protoss.Observer))),
       new Pump(Protoss.Observer, 1)),
     new PumpShuttleAndReavers(6, shuttleFirst = false),
     new PvPIdeas.PumpDragoonsAndZealots,

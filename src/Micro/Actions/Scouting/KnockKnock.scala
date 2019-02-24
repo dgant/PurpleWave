@@ -1,7 +1,7 @@
 package Micro.Actions.Scouting
 
+import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Commands.Attack
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object KnockKnock extends Action {
@@ -13,10 +13,11 @@ object KnockKnock extends Action {
     && unit.matchups.threats.forall(threat =>
       unit.canAttack(threat)
       && threat.unitClass.isWorker
-        && unit.totalHealth > Math.min(11, threat.totalHealth)))
+      && unit.agent.destination.zone.edges.exists(_.contains(threat.pixelCenter))
+      && unit.totalHealth >= Math.min(11, threat.totalHealth)))
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     unit.agent.toAttack = unit.matchups.threats.headOption
-    Attack.delegate(unit)
+    With.commander.attack(unit, unit.agent.toAttack.get)
   }
 }

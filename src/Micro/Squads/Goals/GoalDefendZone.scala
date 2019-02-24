@@ -67,7 +67,7 @@ class GoalDefendZone extends GoalBasic {
         < (exit.endPixels ++ exit.sidePixels :+ exit.pixelCenter).map(_.groundPixels(zone.centroid)).min))
 
   private val huntableEnemies = new Cache(() => {
-    val huntableInZone = squad.enemies.filter(e => e.zone == zone && huntableFilter(e))
+    val huntableInZone = squad.enemies.filter(e => e.zone == zone && huntableFilter(e)) ++ zone.units.filter(u => u.isEnemy && u.unitClass.isGas)
     if (huntableInZone.nonEmpty) huntableInZone else squad.enemies.filter(huntableFilter)
   })
   

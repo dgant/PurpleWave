@@ -9,7 +9,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{MorphLurkers, UpgradeHydraRangeThenSpeed}
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.Build.CancelAll
+import Planning.Plans.Macro.Build.CancelOrders
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Zerg.{BuildSunkensAtExpansions, BuildSunkensAtNatural}
@@ -91,8 +91,8 @@ class ZvT2HatchLurker extends GameplanTemplate {
 
     new CapGasAtRatioToMinerals(1.0, 100),
     new Do(() => With.blackboard.preferCloseExpansion.set(true)),
-    new CancelAll(UnitMatchTeching(Zerg.LurkerMorph)),
-    new CancelAll(UnitMatchUpgrading(Zerg.ZerglingSpeed)),
+    new CancelOrders(UnitMatchTeching(Zerg.LurkerMorph)),
+    new CancelOrders(UnitMatchUpgrading(Zerg.ZerglingSpeed)),
 
     new Pump(Zerg.SunkenColony),
     new BuildSunkensAtNatural(1),

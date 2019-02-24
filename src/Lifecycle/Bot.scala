@@ -7,6 +7,7 @@ class Bot() extends DefaultBWListener {
 
   override def onStart() {
     try {
+      if (With.frame < 6) With.logger.debug("OnStart: Frame " + With.frame)
       With.onStart()
       With.history.onStart()
     }
@@ -15,6 +16,7 @@ class Bot() extends DefaultBWListener {
 
   override def onFrame() {
     try {
+      if (With.frame < 6) With.logger.debug("OnFrame: Frame " + With.frame)
       With.performance.startFrame()
       With.onFrame()
       if ( ! With.configuration.doAbsolutelyNothing) {
@@ -60,6 +62,9 @@ class Bot() extends DefaultBWListener {
   }
   
   override def onSendText(text: String) {
-    KeyboardCommands.onSendText(text)
+    try {
+      KeyboardCommands.onSendText(text)
+    }
+    catch { case exception: Exception => With.logger.onException(exception) }
   }
 }

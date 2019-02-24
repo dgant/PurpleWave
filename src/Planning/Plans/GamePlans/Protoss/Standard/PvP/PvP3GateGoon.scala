@@ -14,7 +14,7 @@ import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyDarkTemplarLikely, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
@@ -69,7 +69,9 @@ class PvP3GateGoon extends GameplanTemplate {
           new And(
             new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),
             new Or(
-              new SafeAtHome,
+              new And(
+                new SafeAtHome,
+                new Check(() => ! With.geography.enemyBases.exists(b => b.isNaturalOf.isDefined && b.townHall.isDefined))),
               new EnemyHasShown(Protoss.Forge),
               new EnemyDarkTemplarLikely)),
           new Build(

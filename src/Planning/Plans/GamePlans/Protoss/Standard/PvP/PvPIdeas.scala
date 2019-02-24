@@ -137,49 +137,32 @@ object PvPIdeas {
   class ReactToGasSteal extends If(
     new EnemyStrategy(With.fingerprints.gasSteal),
     new Parallel(
+      new If(
+        new EnemyHasShown(Protoss.PhotonCannon),
+        new BuildOrder(
+          Get(8, Protoss.Probe),
+          Get(Protoss.Pylon),
+          Get(10, Protoss.Probe),
+          Get(Protoss.Gateway),
+          Get(12, Protoss.Probe),
+          Get(2, Protoss.Pylon),
+          Get(13, Protoss.Probe),
+          Get(Protoss.Zealot),
+          Get(16, Protoss.Probe),
+          Get(2, Protoss.Nexus))),
       new BuildOrder(ProtossBuilds.TwoGate1012: _*),
       new Build(Get(Protoss.Assimilator)),
       new If(
         new UnitsAtMost(0, Protoss.Assimilator),
         new Parallel(
           new RequireSufficientSupply,
-          new PumpWorkers,
+          new PumpWorkers(oversaturate = true),
           new Pump(Protoss.Zealot),
           new Build(
             Get(3, Protoss.Gateway),
             Get(2, Protoss.Nexus),
             Get(Protoss.Forge)),
       ))))
-
-  class ReactToTwoGate extends If(
-    new And(
-      new EnemyStrategy(With.fingerprints.twoGate),
-      new UnitsAtMost(0, Protoss.Forge),
-      new Or(
-        new UnitsAtMost(1, Protoss.Gateway, complete = true),
-        new Not(new SafeToMoveOut), // Nonsense, but maybe a hack fix (AIST2)
-        new Not(new SafeAtHome))),
-    new Parallel(
-      new If(
-        new UnitsAtMost(7, UnitMatchWarriors),
-        new Parallel(
-          new If(
-            new UnitsAtMost(2, Protoss.Gateway),
-            new Parallel(
-              new CapGasAt(250),
-              new CapGasWorkersAt(2))),
-          new RequireSufficientSupply,
-          new Pump(Protoss.Dragoon),
-          new Pump(Protoss.Zealot))),
-      new UpgradeContinuously(Protoss.DragoonRange),
-      new If(
-        new UnitsAtLeast(1, Protoss.CyberneticsCore),
-        new Parallel(
-          new Build(Get(2, Protoss.Gateway)),
-          new If(
-            new FrameAtMost(GameTime(3, 30)()), // Afterwards it's too late to help
-            new Build(Get(Protoss.ShieldBattery))),
-          new Build(Get(3, Protoss.Gateway))))))
 
   class PerformReactionTo2Gate extends Parallel(
 
@@ -205,7 +188,14 @@ object PvPIdeas {
       Get(Protoss.CyberneticsCore),
       Get(16, Protoss.Probe),
       Get(2,  Protoss.Zealot),
-      Get(2, Protoss.Gateway)),
+      Get(2, Protoss.Gateway),
+      Get(Protoss.Dragoon),
+      Get(3, Protoss.Pylon),
+      Get(17, Protoss.Probe),
+      Get(2, Protoss.Dragoon)),
+    new If(
+      new FrameAtMost(GameTime(3, 40)()),
+      new Build(Get(Protoss.ShieldBattery))),
     new RequireSufficientSupply,
     new Pump(Protoss.Probe, 16),
 
@@ -219,9 +209,7 @@ object PvPIdeas {
           new UnitsAtMost(7, UnitMatchWarriors),
           new Not(new SafeAtHome)),
       new TrainArmy)),
-    new If(
-      new FrameAtMost(GameTime(3, 45)()),
-      new Build(Get(Protoss.ShieldBattery))),
+
     new Build(Get(3, Protoss.Gateway)))
 
   class ReactTo2Gate extends If(
@@ -243,7 +231,7 @@ object PvPIdeas {
         new UnitsAtLeast(1, Protoss.Gateway)),
       new And(
         new EnemyStrategy(With.fingerprints.gatewayFe),
-        new UnitsAtLeast(2, Protoss.Gateway)),
+        new UnitsAtLeast(2, UnitMatchOr(Protoss.Gateway, Protoss.CyberneticsCore))),
       new And(
         new Not(new EnemyStrategy(With.fingerprints.cannonRush)),
         new EnemiesAtLeast(1, Protoss.PhotonCannon),
@@ -273,7 +261,7 @@ object PvPIdeas {
           new Or(
             new EnemyCarriers,
             new EnemyBasesAtLeast(3))))),
-    new RequireMiningBases(3))
+    new RequireBases(3))
 
   class TakeBase4 extends If(
     new Or(
@@ -285,7 +273,9 @@ object PvPIdeas {
         new Or(
           new EnemyCarriers,
           new EnemyBasesAtLeast(4)))),
-    new RequireBases(4))
+    new Parallel(
+      new RequireMiningBases(3),
+      new RequireBases(4)))
 
   class CanSkipObservers extends And(
     new Not(new EnemyHasShown(Protoss.DarkTemplar)),
@@ -339,16 +329,19 @@ object PvPIdeas {
       new And(
         new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.Zealot.buildFrames),
         new UnitsAtLeast(1, Protoss.TemplarArchives, complete = true)),
+
       // Speedlot-Templar composition
       new Parallel(
         new PumpShuttleAndReavers(6, shuttleFirst = false),
         new PumpRatio(Protoss.Dragoon, 3, 24, Seq(Friendly(Protoss.Zealot, 1.5))),
-        new PumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-1), Friendly(UnitMatchWarriors, 1.0 / 6.0))),
+        new PumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-1), Friendly(UnitMatchWarriors, 1.0 / 5.0))),
         new Pump(Protoss.Zealot)),
+
       // Dragoon-Reaver composition
       new Parallel(
         new PumpShuttleAndReavers(6, shuttleFirst = false),
         new PumpDragoonsAndZealots)),
+
     new If(
       new Or(
         new EnemyDarkTemplarLikely,

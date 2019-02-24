@@ -13,7 +13,7 @@ import scala.util.Random
 object Phalanx extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     ! unit.flying
-    && unit.agent.toForm.exists(p => unit.framesToTravelTo(p) < GameTime(0, 10)()))
+    && unit.agent.toForm.exists(p => unit.framesToTravelTo(p) < GameTime(0, 8)()))
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val spot      = unit.agent.toForm.get

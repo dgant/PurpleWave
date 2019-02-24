@@ -10,6 +10,7 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, BuildCannonsAtNatural}
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
+import Planning.Predicates.Economy.GasAtMost
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, OnMap}
@@ -71,7 +72,9 @@ class PvPLateGame extends GameplanTemplate {
       Get(Protoss.DragoonRange)),
 
     new Build(Get(3, Protoss.Gateway)),
-    new BuildGasPumps,
+    new If(
+      new GasAtMost(800),
+      new BuildGasPumps),
 
     // Shuttle speed
     new If(new UnitsAtLeast(1, Protoss.Shuttle), new UpgradeContinuously(Protoss.ShuttleSpeed)),
@@ -132,7 +135,8 @@ class PvPLateGame extends GameplanTemplate {
     new If(
       new And(
         new UnitsAtLeast(1, Protoss.ArbiterTribunal),
-        new GasPumpsAtLeast(5)),
+        new GasPumpsAtLeast(5),
+        new MiningBasesAtLeast(4)),
       new Build(Get(2, Protoss.Stargate))),
     new Build(Get(Protoss.Stasis)))
 
@@ -217,10 +221,7 @@ class PvPLateGame extends GameplanTemplate {
       new Or(goZealotTemplarArbiter, new UnitsAtLeast(8, Protoss.Carrier)),
       new ArbiterTransition),
 
-    new Build(Get(14, Protoss.Gateway)),
-    new FlipIf(
-      new PvPIdeas.PvPSafeToMoveOut,
-      new Build(Get(22, Protoss.Gateway)),
-      new RequireMiningBases(5)),
+    new RequireMiningBases(4),
+    new Build(Get(15, Protoss.Gateway)),
   )
 }

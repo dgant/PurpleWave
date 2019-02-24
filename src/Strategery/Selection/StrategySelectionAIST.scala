@@ -14,12 +14,18 @@ object StrategySelectionAIST extends StrategySelectionPolicy {
           OpponentsAIST.all.find(_.matchesVeryLoosely(enemyName))))
 
     if (opponent.isEmpty) {
-      With.logger.warn("Failed to find Opponent matching " + enemyName)
-      return StrategySelectionGreedy.chooseBest(topLevelStrategies, expand)
+      With.logger.warn("Failed to find opponent matching " + enemyName)
+      return (
+        if (With.enemy.isTerran) {
+          OpponentsAIST.defaultPvT
+        } else if (With.enemy.isProtoss) {
+          OpponentsAIST.defaultPvP
+        } else if (With.enemy.isZerg) {
+          OpponentsAIST.defaultPvZ
+        } else StrategySelectionGreedy)
+        .chooseBest(topLevelStrategies, expand)
     }
 
-    opponent
-      .map(_.policy.chooseBest(topLevelStrategies))
-      .getOrElse(StrategySelectionGreedy.chooseBest(topLevelStrategies, expand))
+    opponent.get.policy.chooseBest(topLevelStrategies)
   }
 }

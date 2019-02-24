@@ -3,6 +3,7 @@ package Planning.Plans.Macro.Automatic
 import Information.Geography.Types.{Base, Zone}
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
+import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.LockUnits
@@ -158,10 +159,15 @@ class Gather extends Plan {
       else
         1.0
       )
-    
+
+    val workerDistance = worker.pixelDistanceCenter(resource)
+    if (resource.remainingCompletionFrames > PurpleMath.nanToZero(workerDistance / worker.topSpeed)) {
+      return 1e-100
+    }
+
     val safety      = if ( ! worker.zone.bases.exists(_.owner.isUs) || transfersLegal.contains((worker.zone, resource.zone))) 100.0 else 1.0
     val continuity  = if (resourceByWorker.get(worker).contains(resource)) 2.0 else 1.0
-    val distance    = Math.max(resource.remainingCompletionFrames * worker.topSpeed, worker.pixelDistanceCenter(resource))
+    val distance    = Math.max(resource.remainingCompletionFrames * worker.topSpeed, workerDistance)
     val distanceFactor = 32 * 30 + distance
 
     val currentWorkerCount = workersByResource(resource).count(_ != worker)

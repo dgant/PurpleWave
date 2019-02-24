@@ -6,7 +6,7 @@ import Utilities.ByOption
 
 case class StrategySelectionSequence(strategySequences: IndexedSeq[Seq[Strategy]], loop: Boolean = false) extends StrategySelectionPolicy {
 
-  override def chooseBest(topLevelStrategies: Iterable[Strategy], expand: Boolean): Iterable[Strategy] = {
+  override def chooseBest(topLevelStrategies: Iterable[Strategy], expand: Boolean = true): Iterable[Strategy] = {
     val gamesAgainst = With.history.gamesVsEnemies
 
     val appropriate = strategySequences.filter(_.forall(With.strategy.isAppropriate))

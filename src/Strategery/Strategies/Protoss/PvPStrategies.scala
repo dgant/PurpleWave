@@ -41,7 +41,7 @@ object PvP2GateDTExpand extends PvPOpening {
 
 object PvP3GateGoon extends PvPOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
-  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush, With.fingerprints.proxyGateway)
+  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
 }
 object PvP4GateGoon extends PvPOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits

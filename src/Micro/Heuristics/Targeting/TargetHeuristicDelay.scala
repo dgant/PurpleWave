@@ -27,7 +27,7 @@ object TargetHeuristicDelay extends TargetHeuristic {
       + distanceTeamEnemy / 5.0
       + distanceGoal / 10.0)
     val framesTotal = distanceTotal / Math.max(1.0, speedUs)
-    val frameBuffer = PurpleMath.clamp(unit.matchups.framesOfSafety, 24, 24 * 4)
+    val frameBuffer = PurpleMath.clamp(unit.matchups.framesOfSafety, 0, 24 * 4)
     val output = frameBuffer + framesTotal
     output
   }

@@ -21,10 +21,8 @@ object OpponentsAIST {
     Vector(
       Seq(PvP2Gate1012Goon),
       Seq(PvP2GateDTExpand),
-      Seq(PvP3GateRobo),
-      Seq(PvPGateGateRobo),
-      Seq(PvP3GateGoon)
-    ), loop = true)
+      Seq(PvP3GateGoon),
+      Seq(PvPProxy2Gate)))
 
   val defaultPvZ = StrategySelectionSequence(
     Vector(
@@ -73,7 +71,7 @@ object OpponentsAIST {
   val steamhammer   : Opponent = add(Opponent("Steamhammer",  defaultPvZ))
 
   // Aliases for local testing
-  val jadien            : Opponent = add(Opponent("Jadien",             StrategySelectionGreedy))
+  val jadien            : Opponent = add(Opponent("Jadien",             velocirandomBuilds))
   val madmixp           : Opponent = add(Opponent("MadMixP",            madmix.policy))
   val tscmooz           : Opponent = add(Opponent("tscmooz",            tscmoo.policy))
   val martinrooijackers : Opponent = add(Opponent("Martin Rooijackers", letabot.policy))

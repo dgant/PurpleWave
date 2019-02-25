@@ -55,12 +55,14 @@ class Commander {
     if (unready(unit)) return
     if (unit.moving && ! unit.holdingPosition) {
       unit.baseUnit.holdPosition()
+      sleep(unit)
     }
     if (unit.matchups.targetsInRange.nonEmpty) {
       sleepAttack(unit)
     }
     else {
       unit.baseUnit.holdPosition()
+      sleep(unit)
     }
   }
   

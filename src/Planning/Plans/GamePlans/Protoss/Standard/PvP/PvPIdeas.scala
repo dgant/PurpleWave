@@ -65,7 +65,6 @@ object PvPIdeas {
           new UnitsAtLeast(2, Protoss.Reaver, complete = true),
           new UnitsAtLeast(1, Protoss.Shuttle, complete = true)),
         new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)))))
-  { override def isComplete: Boolean = super.isComplete } // Easier debugging
 
   class AttackSafely extends If(new PvPIdeas.PvPSafeToMoveOut, new Attack)
 
@@ -265,11 +264,11 @@ object PvPIdeas {
         new Latch(new UnitsAtLeast(1, Protoss.Observer, complete = true)),
         new EnemyRobo),
       new Or(
-        new UnitsAtLeast(12, UnitMatchWarriors),
+        new UnitsAtLeast(15, UnitMatchWarriors),
         new EnemiesAtLeast(6, Protoss.PhotonCannon),
         new And(
           new SafeAtHome,
-          new UnitsAtLeast(5, Protoss.Gateway),
+          new UnitsAtLeast(5, Protoss.Gateway, complete = true),
           new Or(
             new EnemyCarriers,
             new EnemyBasesAtLeast(3))))),
@@ -277,11 +276,11 @@ object PvPIdeas {
 
   class TakeBase4 extends If(
     new Or(
-      new UnitsAtLeast(20, UnitMatchWarriors),
+      new UnitsAtLeast(22, UnitMatchWarriors),
       new EnemiesAtLeast(8, Protoss.PhotonCannon),
       new And(
         new SafeAtHome,
-        new UnitsAtLeast(6, Protoss.Gateway),
+        new UnitsAtLeast(6, Protoss.Gateway, complete = true),
         new Or(
           new EnemyCarriers,
           new EnemyBasesAtLeast(4)))),

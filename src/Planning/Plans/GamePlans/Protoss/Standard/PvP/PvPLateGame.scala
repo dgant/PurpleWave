@@ -48,22 +48,6 @@ class PvPLateGame extends GameplanTemplate {
       new Not(goGoonReaverCarrier),
       new UnitsAtLeast(1, Protoss.TemplarArchives)))
 
-  class RoboTech extends Parallel(
-    new Build(
-      Get(Protoss.RoboticsFacility),
-      Get(Protoss.Observatory)),
-    new If(
-      new UnitsAtMost(0, Protoss.TemplarArchives),
-      new Build(Get(Protoss.RoboticsSupportBay))))
-  
-  class TemplarTech extends Parallel(
-    new Build(
-      Get(Protoss.CitadelOfAdun),
-      Get(Protoss.TemplarArchives)),
-    new If(
-      new UnitsAtMost(0, Protoss.Observatory),
-      new BuildCannonsAtNatural(2)))
-
   class BuildTech extends Parallel(
     new Build(
       Get(Protoss.Gateway),

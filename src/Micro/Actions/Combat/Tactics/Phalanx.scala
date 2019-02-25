@@ -28,7 +28,7 @@ object Phalanx extends Action {
     unit.agent.toTravel = Some(spot)
     unit.agent.toReturn = Some(spot)
     val formationDistance = unit.pixelDistanceCenter(unit.agent.toForm.get)
-    if (formationDistance <= 10
+    if (formationDistance <= 12
       && unit.unitClass.melee
       && (
         unit.matchups.targetsInRange.nonEmpty

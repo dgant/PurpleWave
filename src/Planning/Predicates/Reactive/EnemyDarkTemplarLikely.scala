@@ -9,14 +9,18 @@ class EnemyDarkTemplarLikely extends Predicate {
   override def isComplete: Boolean = (
     With.units.existsEnemy(Protoss.DarkTemplar)
     || (
-      With.units.enemy.exists(_.isAny(
+      (
+      With.units.existsEnemy(
         Protoss.HighTemplar,
         Protoss.Archon,
         Protoss.DarkArchon,
-        Protoss.CitadelOfAdun,
         Protoss.TemplarArchives,
         Protoss.ArbiterTribunal,
-        Protoss.Arbiter))
+        Protoss.Arbiter)
+      || (
+        With.units.existsEnemy(Protoss.CitadelOfAdun)
+        && With.units.countEnemy(Protoss.Gateway) < 3
+        && ! With.units.enemy.exists(u => u.is(Protoss.CyberneticsCore) && u.upgrading)))
       && ! With.fingerprints.fourGateGoon.matches
   ))
 }

@@ -23,13 +23,13 @@ class Visualization {
     // Evergreen views
     //ShowPerformanceSummary,
     ShowRushDistances,
-
     ShowClock,
     ShowStrategy,
     ShowUnitsAll,
     ShowUnitsFriendly,
     ShowUnitsForeign,
-    ShowExplosions
+    ShowExplosions,
+    ShowEconomy
   )
   
   var enabled   : Boolean = _

@@ -30,19 +30,24 @@ class PvP3GateGoon extends GameplanTemplate {
   override def attackPlan: Plan = new Trigger(
     new Or(
       new EnemyStrategy(With.fingerprints.gasSteal),
-      new UnitsAtLeast(1, Protoss.Dragoon, complete = true)),
+      new And(
+        new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
+        new Not(new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway))),
+      new UnitsAtLeast(3, Protoss.Dragoon, complete = true)),
     new PvPIdeas.AttackSafely)
-  override def scoutPlan   : Plan = new ScoutOn(Protoss.Gateway)
-  override def workerPlan  : Plan = NoPlan()
+
+  override def scoutPlan: Plan = new ScoutOn(Protoss.Gateway)
+  override def workerPlan: Plan = NoPlan()
   override def placementPlan: Plan = new If(
     new BasesAtLeast(2),
     new ProposePlacement(new Blueprint(this, building = Some(Protoss.Pylon), preferZone = Some(With.geography.ourNatural.zone))))
 
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvPIdeas.ReactToDarkTemplarEmergencies,
+    new PvPIdeas.ReactToGasSteal,
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToProxyGateways,
-    new PvPIdeas.ReactToGasSteal,
+    new PvPIdeas.ReactTo2Gate,
     new PvPIdeas.ReactToFFE)
   
   override val buildOrder: Seq[BuildRequest] = ProtossBuilds.ThreeGateGoon

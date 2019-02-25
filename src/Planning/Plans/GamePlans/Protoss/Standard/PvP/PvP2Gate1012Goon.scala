@@ -1,6 +1,8 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Lifecycle.With
+import Macro.Architecture.Blueprint
+import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
@@ -25,21 +27,35 @@ class PvP2Gate1012Goon extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(PvP2Gate1012Goon)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(2, Protoss.Nexus))
+
+  override def blueprints = Vector(
+    new Blueprint(this, building = Some(Protoss.Pylon),         placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 8.0)),
+    new Blueprint(this, building = Some(Protoss.Gateway),       placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 4.0)),
+    new Blueprint(this, building = Some(Protoss.Gateway),       placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 4.0)),
+    new Blueprint(this, building = Some(Protoss.Pylon),         placement = Some(PlacementProfiles.backPylon)),
+    new Blueprint(this, building = Some(Protoss.ShieldBattery)),
+    new Blueprint(this, building = Some(Protoss.Gateway),       placement = Some(PlacementProfiles.defensive)),
+    new Blueprint(this, building = Some(Protoss.Pylon)),
+    new Blueprint(this, building = Some(Protoss.Pylon)),
+    new Blueprint(this, building = Some(Protoss.Pylon)),
+    new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
+
   override def priorityAttackPlan: Plan = new Parallel(
     new If(
       new EnemyStrategy(With.fingerprints.proxyGateway),
       new Attack(Protoss.Zealot, UnitCountExactly(1))),
     new AttackWithDarkTemplar)
+
   override def attackPlan: Plan = new If(
     new Or(
-      new Not(new EnemyStrategy(With.fingerprints.twoGate)),
-      new EnemiesAtMost(2, UnitMatchWarriors),
-      new UnitsAtLeast(1, Protoss.Dragoon, complete = true)),
+      new Not(new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway)),
+      new UnitsAtLeast(3, Protoss.Dragoon, complete = true)),
     new PvPIdeas.AttackSafely)
 
   override val scoutPlan: Plan = new ScoutOn(Protoss.Pylon)
   
   override def emergencyPlans: Seq[Plan] = Seq(
+    new PvPIdeas.ReactToGasSteal,
     new PvPIdeas.ReactToDarkTemplarEmergencies,
     new PvPIdeas.ReactToCannonRush)
   
@@ -51,9 +67,7 @@ class PvP2Gate1012Goon extends GameplanTemplate {
       Get(Protoss.CyberneticsCore)),
 
     new If(
-      new Or(
-        new EnemyStrategy(With.fingerprints.nexusFirst),
-        new EnemyStrategy(With.fingerprints.proxyGateway)),
+      new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.proxyGateway),
       new BuildOrder(Get(7, Protoss.Zealot))),
 
     new Build(Get(Protoss.DragoonRange)),

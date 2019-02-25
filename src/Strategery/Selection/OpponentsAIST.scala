@@ -34,25 +34,31 @@ object OpponentsAIST {
 
   val locutusBuilds = StrategySelectionSequence(
     Vector(
-      Seq(PvP2Gate1012Goon),
-      Seq(PvP2GateDTExpand),
-      Seq(PvP3GateGoon),
-      Seq(PvPProxy2Gate)))
+      Seq(PvP2Gate1012Goon), // Doing well but was suffering against gas steal and getting confused by fake DT
+      Seq(PvP2GateDTExpand), // Best build
+      Seq(PvP3GateGoon), // Dicey vs. 4-Gate
+      Seq(PvPProxy2Gate) // Low data
+    ), loop = true) // TODO: Remove
   val bananaBuilds = StrategySelectionSequence(
     Vector(
-      Seq(PvP2Gate1012Goon),
-      Seq(PvP2GateDTExpand),
-      Seq(PvP3GateGoon)))
+      Seq(PvP2Gate1012Goon), // Best build
+      Seq(PvP2GateDTExpand), // Pretty good but walks into Robo builds sometimes
+      Seq(PvP3GateGoon), //  No data
+      Seq(PvPProxy2Gate) // Speculative try; no data
+    ), loop = true)  // TODO: Remove
   val mcRaveBuilds = StrategySelectionSequence(
     Vector(
-      Seq(PvPProxy2Gate),
-      Seq(PvP2GateDTExpand),
-      Seq(PvP3GateGoon)))
+      Seq(PvP2Gate1012Goon), // Works okay; forces 2-Gate reaction; sometimes dies to DT counter
+      Seq(PvPProxy2Gate), // No data
+      Seq(PvP2GateDTExpand), // Best build
+      Seq(PvP3GateGoon) // No info
+    ), loop = true)  // TODO: Remove
   val velocirandomBuilds = StrategySelectionSequence(
     Vector(
-      Seq(PvP2Gate1012Goon),
-      Seq(PvP2GateDTExpand),
-      Seq(PvP3GateGoon)))
+      Seq(PvP2Gate1012Goon), // Surprisingly weak
+      Seq(PvP2GateDTExpand), // Best build
+      Seq(PvP3GateGoon) // Pretty good but can flake
+    ), loop = true)  // TODO: Remove
 
   val anything = StrategySelectionGreedy
 

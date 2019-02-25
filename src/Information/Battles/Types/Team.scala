@@ -23,7 +23,7 @@ class Team(val units: Vector[UnitInfo]) {
 
   lazy val meanDamageGround = new Cache(() => PurpleMath.nanToZero(PurpleMath.weightedMean(units.map(u => (u.damageOnHitGround  .toDouble,  u.dpfGround)))))
   lazy val meanDamageAir    = new Cache(() => PurpleMath.nanToZero(PurpleMath.weightedMean(units.map(u => (u.damageOnHitAir     .toDouble,  u.dpfAir)))))
-  def meanDamageAgainst(unit: UnitInfo) = if (unit.flying) meanDamageAir() else meanDamageGround()
+  def meanDamageAgainst(unit: UnitInfo): Double = if (unit.flying) meanDamageAir() else meanDamageGround()
 
 
 }

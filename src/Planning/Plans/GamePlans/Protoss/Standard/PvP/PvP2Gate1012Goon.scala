@@ -38,6 +38,7 @@ class PvP2Gate1012Goon extends GameplanTemplate {
     new Blueprint(this, building = Some(Protoss.Pylon)),
     new Blueprint(this, building = Some(Protoss.Pylon)),
     new Blueprint(this, building = Some(Protoss.Pylon)),
+    new Blueprint(this, building = Some(Protoss.Pylon)),
     new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
 
   override def priorityAttackPlan: Plan = new Parallel(

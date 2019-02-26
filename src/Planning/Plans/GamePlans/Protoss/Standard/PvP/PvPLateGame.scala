@@ -206,6 +206,6 @@ class PvPLateGame extends GameplanTemplate {
       new ArbiterTransition),
 
     new RequireMiningBases(4),
-    new Build(Get(15, Protoss.Gateway)),
+    new Build(Get(20, Protoss.Gateway)),
   )
 }

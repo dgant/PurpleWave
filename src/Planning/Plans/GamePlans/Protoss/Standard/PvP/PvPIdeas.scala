@@ -168,14 +168,39 @@ object PvPIdeas {
 
   class PerformReactionTo2Gate extends Parallel(
 
+    new CapGasAt(0, 300),
     new If(
-      new UnitsAtMost(2, Protoss.Gateway),
-      new Parallel(
-        new CapGasWorkersAt(2),
-        new CapGasAt(200))),
+      new UnitsAtMost(0, Protoss.CyberneticsCore),
+      new CapGasWorkersAt(0),
+      new Trigger(
+        new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
+        new If(
+          new And(
+            new UnitsAtMost(21, Protoss.Probe),
+            new UnitsAtMost(0, Protoss.CitadelOfAdun)),
+          new CapGasWorkersAt(2)))),
 
     new Pump(Protoss.Probe, 8),
-    new BuildOrder(ProtossBuilds.ZCoreZTwoGateGoon: _*),
+    new BuildOrder(
+       Get(8, Protoss.Probe),
+      Get(Protoss.Pylon),
+      Get(10, Protoss.Probe),
+      Get(Protoss.Gateway),
+      Get(12, Protoss.Probe),
+      Get(Protoss.Assimilator),
+      Get(13, Protoss.Probe),
+      Get(Protoss.Zealot),
+      Get(14, Protoss.Probe),
+      Get(2,  Protoss.Pylon),
+      Get(15, Protoss.Probe),
+      Get(Protoss.CyberneticsCore),
+      Get(16, Protoss.Probe),
+      Get(2,  Protoss.Zealot),
+      Get(2, Protoss.Gateway),
+      Get(17, Protoss.Probe),
+      Get(Protoss.Dragoon),
+      Get(18, Protoss.Probe),
+      Get(3, Protoss.Pylon)),
     new If(
       new FrameAtMost(GameTime(3, 35)()),
       new Parallel(
@@ -189,9 +214,9 @@ object PvPIdeas {
               marginPixels = Some(32.0 * 4.0)))},
         new Build(Get(Protoss.ShieldBattery)))),
     new BuildOrder(
-      Get(18, Protoss.Probe),
+      Get(19, Protoss.Probe),
       Get(3, Protoss.Dragoon),
-      Get(19, Protoss.Probe)),
+      Get(20, Protoss.Probe)),
     new RequireSufficientSupply,
     new Pump(Protoss.Probe, 16),
 

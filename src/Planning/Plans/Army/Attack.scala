@@ -14,7 +14,9 @@ class Attack(
   override val goal: GoalAttack = new GoalAttack
 
   override def onUpdate() {
-    With.blackboard.wantToAttack.set(true)
+    if (squad.previousUnits.nonEmpty) {
+      With.blackboard.wantToAttack.set(true)
+    }
     goal.unitMatcher = matcher
     goal.unitCounter = counter
     super.onUpdate()

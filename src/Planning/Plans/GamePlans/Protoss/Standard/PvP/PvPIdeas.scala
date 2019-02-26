@@ -175,23 +175,7 @@ object PvPIdeas {
         new CapGasAt(200))),
 
     new Pump(Protoss.Probe, 8),
-    new BuildOrder(
-      Get(8, Protoss.Probe),
-      Get(Protoss.Pylon),
-      Get(10, Protoss.Probe),
-      Get(Protoss.Gateway),
-      Get(12, Protoss.Probe),
-      Get(Protoss.Assimilator),
-      Get(13, Protoss.Probe),
-      Get(Protoss.Zealot),
-      Get(14, Protoss.Probe),
-      Get(2,  Protoss.Pylon),
-      Get(15, Protoss.Probe),
-      Get(Protoss.CyberneticsCore),
-      Get(16, Protoss.Probe),
-      Get(2,  Protoss.Zealot),
-      Get(2, Protoss.Gateway),
-      Get(3, Protoss.Pylon)),
+    new BuildOrder(ProtossBuilds.ZCoreZTwoGateGoon: _*),
     new If(
       new FrameAtMost(GameTime(3, 35)()),
       new Parallel(
@@ -205,8 +189,9 @@ object PvPIdeas {
               marginPixels = Some(32.0 * 4.0)))},
         new Build(Get(Protoss.ShieldBattery)))),
     new BuildOrder(
-      Get(2, Protoss.Dragoon),
-      Get(18, Protoss.Probe)),
+      Get(18, Protoss.Probe),
+      Get(3, Protoss.Dragoon),
+      Get(19, Protoss.Probe)),
     new RequireSufficientSupply,
     new Pump(Protoss.Probe, 16),
 

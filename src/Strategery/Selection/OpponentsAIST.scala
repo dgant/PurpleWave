@@ -34,30 +34,34 @@ object OpponentsAIST {
 
   val locutusBuilds = StrategySelectionSequence(
     Vector(
-      Seq(PvP2Gate1012Goon), // Doing well but was suffering against gas steal and getting confused by fake DT
-      Seq(PvP2GateDTExpand), // Best build
-      Seq(PvP3GateGoon), // Dicey vs. 4-Gate
-      Seq(PvPProxy2Gate) // Low data
+      Seq(PvP2GateGoon),
+      Seq(PvP2Gate1012Goon), // 11-3
+      Seq(PvP2GateDTExpand), // 9-7 -- was getting hurt vs. 2-Gate (which should be better now)
+      Seq(PvP3GateGoon), // 6-10 -- dicey vs. a lot of things
+      Seq(PvPProxy2Gate) // 5-5
     ), loop = true) // TODO: Remove
   val bananaBuilds = StrategySelectionSequence(
     Vector(
-      Seq(PvP2Gate1012Goon), // Best build
-      Seq(PvP2GateDTExpand), // Pretty good but walks into Robo builds sometimes
-      Seq(PvP3GateGoon), //  No data
-      Seq(PvPProxy2Gate) // Speculative try; no data
+      Seq(PvP2GateGoon),
+      Seq(PvPProxy2Gate), // 9-1 -- lost to 2-Gate but often *beats* 2-Gate
+      Seq(PvP2Gate1012Goon), // 13-2 -- losses were to 2-Gate
+      Seq(PvP2GateDTExpand), // 12-3 -- 2/3 losses were to 2-Gate
+      Seq(PvP3GateGoon), //  10-6 -- rough time vs. 4-Gate
     ), loop = true)  // TODO: Remove
   val mcRaveBuilds = StrategySelectionSequence(
     Vector(
-      Seq(PvP2Gate1012Goon), // Works okay; forces 2-Gate reaction; sometimes dies to DT counter
-      Seq(PvPProxy2Gate), // No data
-      Seq(PvP2GateDTExpand), // Best build
-      Seq(PvP3GateGoon) // No info
+      Seq(PvP2GateGoon),
+      Seq(PvP3GateGoon), // 14-0 -- rock solid
+      Seq(PvPProxy2Gate), // 10-4 -- mostly losing to 2-Gate
+      Seq(PvP2GateDTExpand), // 12-3 -- runs into trouble vs 2GateGoon-Robo-4Gate build
+      Seq(PvP2Gate1012Goon), // 12-3
     ), loop = true)  // TODO: Remove
   val velocirandomBuilds = StrategySelectionSequence(
     Vector(
-      Seq(PvP2Gate1012Goon), // Surprisingly weak
-      Seq(PvP2GateDTExpand), // Best build
-      Seq(PvP3GateGoon) // Pretty good but can flake
+      Seq(PvP2GateGoon),
+      Seq(PvP3GateGoon), // 12-7 -- probably much stronger now after ramp+build fix
+      Seq(PvP2Gate1012Goon), // 5-15 -- maybe better after ramp fix
+      Seq(PvP2GateDTExpand), // 13-6 -- probably much stronger now after ramp+build fix
     ), loop = true)  // TODO: Remove
 
   val anything = StrategySelectionGreedy

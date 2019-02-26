@@ -2,6 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Lifecycle.With
 import Macro.Architecture.Blueprint
+import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.EjectScout
 import Planning.Plans.Basic.NoPlan
@@ -10,7 +11,6 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackWithDarkTemplar
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump, PumpWorkers}
-import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
@@ -26,6 +26,20 @@ class PvP3GateGoon extends GameplanTemplate {
   
   override val activationCriteria : Predicate = new Employing(PvP3GateGoon)
   override val completionCriteria : Predicate = new Latch(new Or(new UnitsAtLeast(1, Protoss.RoboticsFacility), new UnitsAtLeast(5, Protoss.Gateway)))
+
+  override def blueprints = Vector(
+    new Blueprint(this, building = Some(Protoss.Pylon),         placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
+    new Blueprint(this, building = Some(Protoss.Gateway),       placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 12.0)),
+    new Blueprint(this, building = Some(Protoss.Gateway),       placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 12.0)),
+    new Blueprint(this, building = Some(Protoss.Gateway),       placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 12.0)),
+    new Blueprint(this, building = Some(Protoss.Pylon),         placement = Some(PlacementProfiles.backPylon)),
+    new Blueprint(this, building = Some(Protoss.ShieldBattery)),
+    new Blueprint(this, building = Some(Protoss.Pylon)),
+    new Blueprint(this, building = Some(Protoss.Pylon)),
+    new Blueprint(this, building = Some(Protoss.Pylon)),
+    new Blueprint(this, building = Some(Protoss.Pylon)),
+    new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
+
   override def priorityAttackPlan : Plan = new AttackWithDarkTemplar
   override def attackPlan: Plan = new Trigger(
     new Or(
@@ -38,9 +52,6 @@ class PvP3GateGoon extends GameplanTemplate {
 
   override def scoutPlan: Plan = new ScoutOn(Protoss.Gateway)
   override def workerPlan: Plan = NoPlan()
-  override def placementPlan: Plan = new If(
-    new BasesAtLeast(2),
-    new ProposePlacement(new Blueprint(this, building = Some(Protoss.Pylon), preferZone = Some(With.geography.ourNatural.zone))))
 
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvPIdeas.ReactToDarkTemplarEmergencies,

@@ -71,7 +71,7 @@ class BattleClusteringState(seedUnits: Vector[UnitInfo]) {
 
   private lazy val finalClusters: Vector[Vector[UnitInfo]] = {
     val roots = unitLinks.toSeq.filter(p => p._1 == p._2).map(_._1)
-    val clusters = roots.map(root => (root, new ArrayBuffer[UnitInfo])).toMap // Was :+ root before fixing dupes
+    val clusters = roots.map(root => (root, new ArrayBuffer[UnitInfo])).toMap
     // This could be faster if we didn't have to find more
     unitLinks.keys.foreach(unit => {
       val unitRoot = getRoot(unit)

@@ -199,8 +199,7 @@ object PvPIdeas {
       Get(2, Protoss.Gateway),
       Get(17, Protoss.Probe),
       Get(Protoss.Dragoon),
-      Get(18, Protoss.Probe),
-      Get(3, Protoss.Pylon)),
+      Get(18, Protoss.Probe)),
     new If(
       new FrameAtMost(GameTime(3, 35)()),
       new Parallel(
@@ -214,6 +213,7 @@ object PvPIdeas {
               marginPixels = Some(32.0 * 4.0)))},
         new Build(Get(Protoss.ShieldBattery)))),
     new BuildOrder(
+      Get(3, Protoss.Pylon),
       Get(19, Protoss.Probe),
       Get(3, Protoss.Dragoon),
       Get(20, Protoss.Probe)),

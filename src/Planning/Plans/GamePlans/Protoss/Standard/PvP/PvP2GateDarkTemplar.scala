@@ -29,15 +29,17 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
 
   override val attackPlan  = new Trigger(
     new Or(
-      new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
-      new EnemyStrategy(With.fingerprints.nexusFirst),
+      new UnitsAtLeast(1, Protoss.DarkTemplar),
       new And(
         new UpgradeStarted(Protoss.DragoonRange),
         new PvPIdeas.PvPSafeToMoveOut),
       new And(
         new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
         new EnemyStrategy(With.fingerprints.proxyGateway))),
-    new Attack)
+    new Attack,
+    new If(
+      new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.oneGateCore),
+      new PvPIdeas.AttackSafely))
   override def blueprints = Vector(
     new Blueprint(this, building = Some(Protoss.Pylon),         placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 6.0)),
     new Blueprint(this, building = Some(Protoss.Gateway)),
@@ -50,7 +52,6 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
 
   override val buildOrder = Vector(
     // http://wiki.teamliquid.net/starcraft/2_Gateway_Dark_Templar_(vs._Protoss)
-    // We get gas/core faster because of mineral locking + later scout
     Get(8,   Protoss.Probe),
     Get(Protoss.Pylon),                 // 8
     Get(10,  Protoss.Probe),
@@ -58,25 +59,26 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
     Get(12,  Protoss.Probe),
     Get(Protoss.Assimilator),           // 12
     Get(13,  Protoss.Probe),
-    Get(1,   Protoss.Zealot),           // 13 = 11 + Z
+    Get(Protoss.Zealot),                // 13
     Get(14,  Protoss.Probe),
-    Get(2,   Protoss.Pylon),            // 16 = 14 + Z
+    Get(2,   Protoss.Pylon),            // 16
+    Get(15,  Protoss.Probe),
+    Get(Protoss.CyberneticsCore),       // 17
     Get(16,  Protoss.Probe),
-    Get(Protoss.CyberneticsCore),       // 18 = 16 + Z
+    Get(2,   Protoss.Zealot),           // 18 = 16 + Z
     Get(17,  Protoss.Probe),
-    Get(2,   Protoss.Zealot),           // 21 = 17 + ZZ
+    Get(3,   Protoss.Pylon),            // 21 = 17 + ZZ
     Get(18,  Protoss.Probe),
-    Get(3,   Protoss.Pylon),            // 22 = 18 + ZZ
-    Get(20,  Protoss.Probe),            // 24 = 20 + ZZ
-    Get(Protoss.CitadelOfAdun),
-    Get(1,   Protoss.Dragoon),          // 26 = 20 + ZZ + D
+    Get(Protoss.Dragoon),               // 22 = 18 + ZZ
+    Get(Protoss.CitadelOfAdun),         // 24
+    Get(20,  Protoss.Probe),
+    Get(2,   Protoss.Dragoon),          // 26
+    Get(2,   Protoss.Gateway),          // 28
     Get(21,  Protoss.Probe),
-    Get(2,   Protoss.Dragoon),          // 29 = 21 + ZZ + DD
-    Get(2,   Protoss.Gateway),
-    Get(3,   Protoss.Pylon),
     Get(Protoss.TemplarArchives),
-    Get(22,  Protoss.Probe),            // 30 = 22 + ZZZZ + DD
-    Get(4,   Protoss.Pylon),            // 32 = 22 + ZZZZ + DD
+    // Classic build gets 2 Zealots -- can we fit in? do we want to?
+    Get(22,  Protoss.Probe),
+    Get(4,   Protoss.Pylon),
     Get(23,  Protoss.Probe),
     Get(2,   Protoss.DarkTemplar),
     Get(24,  Protoss.Probe),
@@ -104,13 +106,15 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
         new EnemiesAtMost(0, Protoss.Observatory),
         new UnitsAtMost(2, Protoss.DarkTemplar)),
         new Pump(Protoss.DarkTemplar, 3, 1)),
-    new PumpWorkers,
     new If(
       new EnemyDarkTemplarLikely,
       new Parallel(
         new BuildCannonsInMain(1),
-        new BuildCannonsAtNatural(3)),
-      new BuildCannonsAtNatural(2)),
-    new Pump(Protoss.Dragoon),
-    new RequireMiningBases(2))
+        new BuildCannonsAtNatural(3))),
+    new BuildCannonsAtNatural(1),
+    new RequireMiningBases(2),
+    new PumpWorkers,
+    new BuildCannonsAtNatural(2),
+    new Pump(Protoss.Dragoon)
+  )
 }

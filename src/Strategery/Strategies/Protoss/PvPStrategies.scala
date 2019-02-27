@@ -36,7 +36,7 @@ object PvP2Gate1012Goon extends PvPOpening {
 }
 
 object PvP2GateDTExpand extends PvPOpening {
-  //override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.proxyGateway, With.fingerprints.robo)
+  //override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.proxyGateway)
 }
 
 object PvP2GateGoon extends PvPOpening {

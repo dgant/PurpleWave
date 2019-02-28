@@ -77,7 +77,7 @@ object OpponentsAIST {
   val steamhammer   : Opponent = add(Opponent("Steamhammer",  defaultPvZ))
 
   // Aliases for local testing
-  val jadien            : Opponent = add(Opponent("Jadien",             velocirandomBuilds))
+  val jadien            : Opponent = add(Opponent("Jadien",             tscmoo.policy))
   val madmixp           : Opponent = add(Opponent("MadMixP",            madmix.policy))
   val tscmooz           : Opponent = add(Opponent("tscmooz",            tscmoo.policy))
   val martinrooijackers : Opponent = add(Opponent("Martin Rooijackers", letabot.policy))

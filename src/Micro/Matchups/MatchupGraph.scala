@@ -40,6 +40,8 @@ class MatchupGraph {
     entrants.clear
     With.units.playerOwned.foreach(entrant => {
       if (entrant.aliveAndComplete
+      //
+      //if (entrant.alive && (entrant.complete || entrant.remainingCompletionFrames < With.reaction.clusteringMax)
         &&  entrant.battle.isEmpty
         &&  With.framesSince(entrant.frameDiscovered) < 72) {
         val battle = assignToBattle(entrant)

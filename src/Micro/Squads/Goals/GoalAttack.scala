@@ -1,9 +1,10 @@
 package Micro.Squads.Goals
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.UnitMatchers.{UnitMatchProxied, UnitMatchWarriors}
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -51,8 +52,12 @@ class GoalAttack extends GoalBasic {
       return
     }
     target =
-      ByOption
-        .minBy(With.geography.ourBasesAndSettlements.flatMap(_.units.filter(u => u.isEnemy && u.unitClass.isBuilding).map(_.pixelCenter)))(_.groundPixels(With.geography.home.pixelCenter))
+      ByOption.minBy(With.geography.ourBasesAndSettlements.flatMap(_.units.filter(u => u.isEnemy && u.unitClass.isBuilding).map(_.pixelCenter)))(_.groundPixels(With.geography.home.pixelCenter))
+      .orElse(
+        if (With.geography.ourBases.size > 1 && With.frame > GameTime(10, 0)())
+          None
+        else
+          ByOption.minBy(With.units.enemy.view.filter(_.is(UnitMatchProxied)).map(_.pixelCenter))(_.groundPixels(With.geography.home.pixelCenter)))
       .orElse(
         ByOption
           .maxBy(With.geography.enemyBases)(base => {

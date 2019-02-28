@@ -22,8 +22,6 @@ object Gather extends Action {
   override def perform(unit: FriendlyUnitInfo) {
 
     if (unit.battle.nonEmpty) {
-      Potshot.consider(unit)
-
       lazy val resource = unit.agent.toGather.get
       lazy val zoneNow = unit.zone
       lazy val zoneTo = resource.zone
@@ -57,8 +55,14 @@ object Gather extends Action {
           With.commander.returnCargo(unit)
         } else if (bestGoal.isDefined) {
           unit.agent.toGather = bestGoal
+          if (unit.pixelDistanceEdge(bestGoal.get) < 32) {
+            Potshot.consider(unit)
+          }
+          With.commander.gather(unit, bestGoal.get)
         }
       }
+
+      Potshot.consider(unit)
 
       if (transferring
         && threatened

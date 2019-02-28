@@ -1,19 +1,28 @@
 package Planning.UnitMatchers
 
 import Lifecycle.With
+import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitInfo.UnitInfo
 
 abstract class UnitMatchAnyProxy extends UnitMatcher {
-  
+
+  private def baseDistance(unit: UnitInfo, player: PlayerInfo): Double = {
+    val home = With.geography.startBases
+      .find(_.owner == player)
+      .orElse(With.geography.startBases.find(_.owner.isNeutral))
+      .map(_.heart)
+      .getOrElse(if (player.isUs) With.geography.home else With.intelligence.mostBaselikeEnemyTile)
+      .pixelCenter
+    val output = unit.pixelDistanceTravelling(home)
+    output
+  }
   override def accept(unit: UnitInfo): Boolean = {
     if (unit.isFriendly) return false
     if ( ! unit.unitClass.isBuilding) return false
     if (unit.flying) return false
-    
-    val basesEnemy        = With.geography.enemyBases.map(_.heart.pixelCenter)
-    val basesFriendly     = With.geography.ourBases.map(_.heart.pixelCenter)
-    val distanceEnemy     = unit.pixelDistanceTravelling(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
-    val distanceFriendly  = unit.pixelDistanceTravelling(With.geography.home.pixelCenter)
+
+    val distanceEnemy     = baseDistance(unit, unit.player)
+    val distanceFriendly  = baseDistance(unit, With.self)
     
     distanceFriendly < distanceEnemy * 1.25
   }

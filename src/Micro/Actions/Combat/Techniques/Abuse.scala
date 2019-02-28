@@ -53,12 +53,14 @@ object Abuse extends ActionTechnique {
     val safetyFrames = unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate
     lazy val safeToShoot = (
       unit.matchups.framesOfSafety > safetyFrames
-      || unit.matchups.framesOfEntanglementPerThreat.forall(threatPair =>
-        threatPair._2 > safetyFrames
-        || threatPair._1.orderTarget.exists(_ != unit)
-        || threatPair._1.matchups.targets.exists(ally =>
-          threatPair._1.pixelDistanceEdge(ally) <
-          threatPair._1.pixelDistanceEdge(unit) - 32)
+      || unit.matchups.framesOfEntanglementPerThreat.forall(threatEntanglement =>
+        threatEntanglement._2 > safetyFrames
+        // Handles a case where rangeless Goons couldn't get in range to attack a stuck Zealot
+        || ( ! threatEntanglement._1.inRangeToAttack(unit) && ! threatEntanglement._1.moving && ! threatEntanglement._1.presumptiveTarget.contains(unit))
+        || threatEntanglement._1.orderTarget.exists(_ != unit)
+        || threatEntanglement._1.matchups.targets.exists(ally =>
+          threatEntanglement._1.pixelDistanceEdge(ally) <
+          threatEntanglement._1.pixelDistanceEdge(unit) - 32)
       ))
     lazy val lastChanceToShoot = unit.matchups.targetsInRange.isEmpty || unit.matchups.targets.forall(t => t.pixelDistanceEdge(unit) > unit.pixelRangeAgainst(t) - 32.0)
     if (unit.readyForAttackOrder && (safeToShoot || lastChanceToShoot)) {

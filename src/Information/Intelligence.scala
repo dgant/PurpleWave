@@ -95,7 +95,7 @@ class Intelligence {
     var x = 0
     var y = 0
     var n = 0
-    With.units.enemy.foreach(u => if (u.likelyStillThere && u.attacksAgainstGround > 0) {
+    With.units.enemy.foreach(u => if (u.likelyStillThere && u.attacksAgainstGround > 0 && ! u.unitClass.isWorker) {
       x += u.x / 32
       y += u.y / 32
       n += 1
@@ -104,7 +104,9 @@ class Intelligence {
     x += enemyThreatOriginBaseFactor * mostBaselikeEnemyTile.x
     y += enemyThreatOriginBaseFactor * mostBaselikeEnemyTile.y
     n += enemyThreatOriginBaseFactor
-    Tile(x/n, y/n)
+
+    val airCentroid = Tile(x/n, y/n)
+    ByOption.minBy(With.units.enemy.view.map(_.tileIncludingCenter))(_.tileDistanceSquared(airCentroid)).getOrElse(airCentroid)
   })
 
   def enemyMain: Option[Base] = {

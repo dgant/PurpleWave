@@ -7,6 +7,7 @@ import Micro.Actions.Action
 import Micro.Actions.Transportation.Caddy.Shuttling
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.ByOption
 
 object FightOrFlight extends Action {
   
@@ -42,6 +43,13 @@ object FightOrFlight extends Action {
     decide(false, "Disrupted",    () => unit.underDisruptionWeb && ! unit.flying)
     decide(false, "Swarmed",      () => unit.underDarkSwarm && ! unit.unitClass.unaffectedByDarkSwarm && unit.matchups.targetsInRange.forall(t => ! t.flying || t.underDarkSwarm))
     decide(false, "WaitForSiege", () => unit.is(Terran.SiegeTankUnsieged) && unit.matchups.threats.exists(_.is(Protoss.Dragoon)) && With.units.ours.exists(_.techProducing.contains(Terran.SiegeMode)) && unit.matchups.allies.exists(a => a.is(Terran.Bunker) && a.complete))
+    decide(true,  "Energized", () =>
+      unit.matchups.allies.exists(ally =>
+        ally.is(Protoss.ShieldBattery)
+        && ally.complete
+        && ally.energy > 20
+        && ally.pixelDistanceEdge(ally, otherAt = ByOption.minBy(unit.matchups.targets.view.map(unit.pixelToFireAt))(unit.pixelDistanceCenter).getOrElse(unit.pixelCenter)) < 72)
+    )
     decide(true,  "Commit", () =>
       unit.visibleToOpponents
       && unit.unitClass.melee

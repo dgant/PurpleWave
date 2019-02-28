@@ -26,8 +26,8 @@ class Simulacrum(
   var topSpeed            : Double                      = realUnit.topSpeed * speedMultiplier
   var shieldPoints        : Int                         = realUnit.shieldPoints + realUnit.defensiveMatrixPoints
   var hitPoints           : Int                         = realUnit.hitPoints
-  var cooldownShooting    : Int                         = 1 + realUnit.cooldownLeft
-  var cooldownMoving      : Int                         = 0
+  var cooldownShooting    : Int                         = Math.max(realUnit.remainingCompletionFrames, 1 + realUnit.cooldownLeft)
+  var cooldownMoving      : Int                         = Math.max(realUnit.remainingCompletionFrames, 0)
   var pixel               : Pixel                       = realUnit.pixelCenter
   var dead                : Boolean                     = false
   var target              : Option[Simulacrum]          = None

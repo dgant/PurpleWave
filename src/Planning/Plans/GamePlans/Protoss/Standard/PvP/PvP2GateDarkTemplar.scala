@@ -9,14 +9,18 @@ import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump, PumpWorkers, RequireSufficientSupply}
+import Planning.Plans.Macro.Automatic._
+import Planning.Plans.Macro.Build.ProposePlacement
+import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.{And, Latch}
+import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
+import Planning.Predicates.Reactive.{EnemyDarkTemplarLikely, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP2GateDTExpand
 
@@ -32,6 +36,7 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
       new UnitsAtLeast(1, Protoss.DarkTemplar),
       new And(
         new UpgradeStarted(Protoss.DragoonRange),
+        new Not(new EnemyStrategy(With.fingerprints.proxyGateway)),
         new PvPIdeas.PvPSafeToMoveOut),
       new And(
         new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
@@ -40,15 +45,26 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
     new If(
       new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.oneGateCore),
       new PvPIdeas.AttackSafely))
+
+  override def placementPlan: Plan = new Parallel(
+    super.placementPlan,
+    new If(
+      new Not(new EnemyStrategy(With.fingerprints.twoGate)),
+      new ProposePlacement {
+        override lazy val blueprints = Vector(new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
+      }
+    )
+  )
   override def blueprints = Vector(
-    new Blueprint(this, building = Some(Protoss.Pylon),         placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 6.0)),
-    new Blueprint(this, building = Some(Protoss.Gateway)),
-    new Blueprint(this, building = Some(Protoss.Pylon),         placement = Some(PlacementProfiles.backPylon)),
+    new Blueprint(this, building = Some(Protoss.Pylon),           placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
+    new Blueprint(this, building = Some(Protoss.Gateway),         placement = Some(PlacementProfiles.wallGathering)),
+    new Blueprint(this, building = Some(Protoss.Pylon),           placement = Some(PlacementProfiles.wallGathering)),
     new Blueprint(this, building = Some(Protoss.ShieldBattery)),
-    new Blueprint(this, building = Some(Protoss.Gateway),       placement = Some(PlacementProfiles.backPylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
+    new Blueprint(this, building = Some(Protoss.Gateway),         placement = Some(PlacementProfiles.wallGathering)),
+    new Blueprint(this, building = Some(Protoss.CyberneticsCore), placement = Some(PlacementProfiles.wallGathering)),
+    new Blueprint(this, building = Some(Protoss.Pylon),           placement = Some(PlacementProfiles.backPylon)),
+    new Blueprint(this, building = Some(Protoss.Forge),           placement = Some(PlacementProfiles.wallGathering)),
+    new Blueprint(this, building = Some(Protoss.Pylon),           placement = Some(PlacementProfiles.wallGathering)))
 
   override val buildOrder = Vector(
     // http://wiki.teamliquid.net/starcraft/2_Gateway_Dark_Templar_(vs._Protoss)
@@ -106,15 +122,30 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
         new EnemiesAtMost(0, Protoss.Observatory),
         new UnitsAtMost(2, Protoss.DarkTemplar)),
         new Pump(Protoss.DarkTemplar, 3, 1)),
+    new CapGasAt(300),
     new If(
       new EnemyDarkTemplarLikely,
       new Parallel(
         new BuildCannonsInMain(1),
         new BuildCannonsAtNatural(3))),
-    new BuildCannonsAtNatural(1),
+    new BuildCannonsAtNatural(0),
+    new If(new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)), new BuildCannonsAtNatural(1)),
+    new If(
+      new And(
+        new EnemyStrategy(With.fingerprints.twoGate),
+        new Not(new SafeAtHome),
+        new UnitsAtMost(12, UnitMatchWarriors)),
+      new Pump(Protoss.Dragoon)),
     new RequireMiningBases(2),
     new PumpWorkers,
-    new BuildCannonsAtNatural(2),
-    new Pump(Protoss.Dragoon)
+    new If(new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)), new BuildCannonsAtNatural(2)),
+    new Pump(Protoss.Dragoon),
+    // In case we're struggling to get out of our base
+    new If(
+      new MineralsAtLeast(400),
+      new Build(Get(5, Protoss.Gateway))),
+    new Trigger(
+      new UnitsAtLeast(2, Protoss.DarkTemplar),
+      new Build(Get(Protoss.DragoonRange)))
   )
 }

@@ -31,6 +31,11 @@ object TargetHeuristicDetectors extends TargetHeuristic {
       Protoss.Forge,
       Protoss.Observatory
     )
+
+    // Clear the way!
+    detects ||= (
+      unit.zone != unit.agent.destination.zone
+      && unit.agent.destination.zone.exitNow.exists(_.pixelCenter.pixelDistance(candidate.pixelCenter) < 32 * 5))
     
     HeuristicMathMultiplicative.fromBoolean(detects)
   }

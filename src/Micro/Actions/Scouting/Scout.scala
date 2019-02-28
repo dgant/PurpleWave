@@ -12,6 +12,7 @@ object Scout extends Action {
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {
+    Sabotage.consider(unit)
     KnockKnock.consider(unit)
     PreserveScout.consider(unit)
     DisruptBuilder.consider(unit)

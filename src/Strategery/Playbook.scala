@@ -77,7 +77,7 @@ class AISTPlaybook extends PurpleWavePlaybook {
 
 class TestingPlaybook extends PurpleWavePlaybook {
   //override lazy val forced: Seq[Strategy] = Seq(PvZFFEEconomic, PvZMidgameCorsairReaverZealot, PvZMidgameCorsairReaverGoon, PvZMidgame5GateGoonReaver)
-  override lazy val forced: Seq[Strategy] = Seq(PvP2GateDTExpand)
+  override lazy val forced: Seq[Strategy] = Seq(PvP2Gate1012Goon)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
 }
 

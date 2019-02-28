@@ -78,6 +78,7 @@ object ProtossChoices {
     PvP2GateGoon,
     PvP3GateRobo,
     PvP3GateGoon,
+    PvP3GateGoonCounter,
     PvP4GateGoon
   )
   

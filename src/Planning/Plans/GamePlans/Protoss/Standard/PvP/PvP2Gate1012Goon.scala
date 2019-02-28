@@ -9,6 +9,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackWithDarkTemplar
+import Planning.Plans.Macro.Automatic.CapGasWorkersAt
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
@@ -63,13 +64,20 @@ class PvP2Gate1012Goon extends GameplanTemplate {
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.TwoGate1012
   override def buildPlans = Vector(
 
-    new Build(
-      Get(Protoss.Assimilator),
-      Get(Protoss.CyberneticsCore)),
+    new If(
+      new UnitsAtMost(2, Protoss.Gateway),
+      new CapGasWorkersAt(2)),
 
     new If(
       new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.proxyGateway),
-      new BuildOrder(Get(7, Protoss.Zealot))),
+      new BuildOrder(Get(9, Protoss.Zealot)),
+      new If(
+        new EnemyStrategy(With.fingerprints.twoGate),
+        new BuildOrder(Get(7, Protoss.Zealot)))),
+
+    new Build(
+      Get(Protoss.Assimilator),
+      Get(Protoss.CyberneticsCore)),
 
     new Build(Get(Protoss.DragoonRange)),
 

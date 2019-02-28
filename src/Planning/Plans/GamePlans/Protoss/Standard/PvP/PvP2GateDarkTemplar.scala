@@ -127,6 +127,8 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
       new EnemyDarkTemplarLikely,
       new Parallel(
         new BuildCannonsInMain(1),
+        new BuildCannonsAtNatural(2),
+        new BuildCannonsInMain(2),
         new BuildCannonsAtNatural(3))),
     new BuildCannonsAtNatural(0),
     new If(new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)), new BuildCannonsAtNatural(1)),

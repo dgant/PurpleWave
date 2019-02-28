@@ -8,12 +8,12 @@ class Configuration {
   // Tournament Settings //
   /////////////////////////
   
-  var enableSurrenders                = true
+  var enableSurrenders                = false
   var enablePerformanceStops          = true
   var enablePerformanceSurrender      = false
   var enableChat                      = true
   var enableVisualizations            = true
-  var enableStreamManners             = true
+  var enableStreamManners             = false
   var enableHumanManners              = false
   var identifyGhostUnits              = false
   var targetFrameDurationMilliseconds = 30
@@ -99,8 +99,8 @@ class Configuration {
   // Visualization //
   ///////////////////
   
-  var visualizeScreen                     = true
-  var visualizeMap                        = true
+  var visualizeScreen                     = false
+  var visualizeMap                        = false
   var visualizationProbabilityHappyVision = 0.05
   var visualizationProbabilityTextOnly    = 0.01
   var visualizationCullViewport           = true

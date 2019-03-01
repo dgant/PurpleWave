@@ -81,4 +81,8 @@ class TestingPlaybook extends PurpleWavePlaybook {
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
 }
 
+<<<<<<< HEAD
 object Playbook extends AISTPlaybook {}
+=======
+object Playbook extends PurpleWavePlaybook {}
+>>>>>>> origin/master

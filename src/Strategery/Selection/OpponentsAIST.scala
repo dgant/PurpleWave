@@ -33,32 +33,29 @@ object OpponentsAIST {
 
   val locutusBuilds = StrategySelectionSequence(
     Vector(
-      Seq(PvP2Gate1012Goon), // 11-3 -> 13-10 -- it's losing 2-gate mirrors
+      Seq(PvP2Gate1012Goon),
       Seq(PvP3GateGoonCounter),
-      Seq(PvP2GateDTExpand), // 9-7 -> 13-11 -- Weak vs. proxy gate, and drops some games to 4-Gate
-      Seq(PvPProxy2Gate) // 5-5 -> 7-5 -- walks into a lot of 2-gate
+      Seq(PvP2GateDTExpand),
+      Seq(PvPProxy2Gate)
     ))
   val bananaBuilds = StrategySelectionSequence(
     Vector(
-      // 2GateGoon was 9-9
-      //Seq(PvPProxy2Gate), // 9-1 -> 4-6 -- lost to 2-Gate but often *beats* 2-Gate
-      Seq(PvP2Gate1012Goon), // 13-2 -> 17-6 -- losses were to 2-Gate
-      Seq(PvP2GateDTExpand), // 12-3 -> 16-7 -- 2/3 losses were to 2-Gate
-      Seq(PvP3GateGoon), //  10-6 -> 19-5 -- rough time vs. 4-Gate in first round; losses were to 2-gate in second round
+      Seq(PvP2Gate1012Goon),
+      Seq(PvP2GateDTExpand),
+      Seq(PvP3GateGoon),
     ))
   val mcRaveBuilds = StrategySelectionSequence(
     Vector(
-      // 2GateGoon was 3-15
-      Seq(PvP3GateGoon), // 14-0 -> 17-3 -- 1 loss each to 2-gate, 4-gate, robo
-      Seq(PvP2Gate1012Goon), // 12-3 -> 15-4
-      Seq(PvP2GateDTExpand), // 12-3 -> 15-5 -- runs into trouble vs 2GateGoon-Robo-4Gate build
-      Seq(PvPProxy2Gate), // 10-4 -> 13-6 -- mostly losing to 2-Gate
+      Seq(PvP3GateGoon),
+      Seq(PvP2Gate1012Goon),
+      Seq(PvP2GateDTExpand),
+      Seq(PvPProxy2Gate),
     ))
   val velocirandomBuilds = StrategySelectionSequence(
     Vector(
-      Seq(PvP2GateDTExpand), // 13-6 -> 23-1
-      Seq(PvP3GateGoon), // 12-7 -> 23-1
-      Seq(PvP2GateGoon), // 22-2
+      Seq(PvP2GateDTExpand),
+      Seq(PvP3GateGoon),
+      Seq(PvP2GateGoon),
     ))
 
   val anything = StrategySelectionGreedy

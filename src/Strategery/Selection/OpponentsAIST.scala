@@ -5,7 +5,7 @@ import Strategery.Strategies.Protoss._
 object OpponentsAIST {
   private var allKnown: Vector[Opponent] = Vector.empty
   
-  def add(opponent: Opponent): Opponent   = {
+  def add(opponent: Opponent): Opponent = {
     allKnown = allKnown :+ opponent
     opponent
   }

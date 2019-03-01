@@ -51,9 +51,6 @@ object StrategyGroups {
     TvZ2RaxNuke,
     PvTProxyDarkTemplar,
     PvRProxy2Gate,
-    PvTProxy2Gate,
-    //PvPProxy2Gate,
-    PvZProxy2Gate,
     PvP2Gate1012,
     ZvTProxyHatchZerglings,
     ZvTProxyHatchHydras,
@@ -81,8 +78,4 @@ class TestingPlaybook extends PurpleWavePlaybook {
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
 }
 
-<<<<<<< HEAD
-object Playbook extends AISTPlaybook {}
-=======
 object Playbook extends PurpleWavePlaybook {}
->>>>>>> origin/master

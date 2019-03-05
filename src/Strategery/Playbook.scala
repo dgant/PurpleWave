@@ -50,7 +50,6 @@ object StrategyGroups {
     TvZProxy8Fact,
     TvZ2RaxNuke,
     PvTProxyDarkTemplar,
-    PvRProxy2Gate,
     PvP2Gate1012,
     ZvTProxyHatchZerglings,
     ZvTProxyHatchHydras,
@@ -68,12 +67,7 @@ class PurpleWavePlaybook extends EmptyPlaybook {
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy
 }
 
-class AISTPlaybook extends PurpleWavePlaybook {
-  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionAIST
-}
-
 class TestingPlaybook extends PurpleWavePlaybook {
-  //override lazy val forced: Seq[Strategy] = Seq(PvZFFEEconomic, PvZMidgameCorsairReaverZealot, PvZMidgameCorsairReaverGoon, PvZMidgame5GateGoonReaver)
   override lazy val forced: Seq[Strategy] = Seq(PvP2Gate1012Goon)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
 }

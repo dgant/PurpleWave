@@ -1,11 +1,12 @@
 package Strategery
 
-import Lifecycle.With
+import Lifecycle.{Manners, With}
 import Mathematics.PurpleMath
 import Planning.Plan
 import Planning.Plans.GamePlans.StandardGamePlan
 import ProxyBwapi.Players.Players
-import Strategery.History.HistoricalGame
+import Strategery.History.{HistoricalGame, HistoryLoader}
+import Strategery.Selection.StrategySelectionDynamic
 import Strategery.Strategies.Protoss.ProtossChoices
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TerranChoices
@@ -75,6 +76,12 @@ class Strategist {
     }
     val strategiesFiltered = filterForcedStrategies(strategiesUnfiltered.filter(isAppropriate))
     strategiesFiltered.foreach(evaluate)
+    if (HistoryLoader.humanModeEnabled) {
+      Manners.chat("Human mode enabled!")
+      Manners.chat("")
+      With.configuration.strategyRandomness = 0.3
+      return StrategySelectionDynamic.chooseBest(strategiesFiltered).toSet
+    }
     Playbook.strategySelectionPolicy.chooseBest(strategiesFiltered).toSet
   }
 

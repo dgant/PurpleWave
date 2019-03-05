@@ -18,7 +18,8 @@ class FingerprintProxyGateway extends FingerprintAnd(
       override protected def investigate: Boolean = (
         With.frame > GameTime(1, 30)()
         && With.frame < GameTime(4, 0)()
-        && With.geography.enemyBases.exists(base => {
+        && With.geography.enemyBases.exists(_.owner.isProtoss)
+        && With.geography.enemyBases.forall(base => {
           val scoutableTiles = base.zone.tiles.view.filter(With.grids.buildableTerrain.get)
           (base.isStartLocation
             && scoutableTiles.count(tile => tile.valid && With.grids.friendlyVision.rawValues(tile.i) > 0) >= scoutableTiles.size * 0.9

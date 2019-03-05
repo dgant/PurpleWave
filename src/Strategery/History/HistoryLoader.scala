@@ -14,10 +14,10 @@ object HistoryLoader {
   private val filenameTemplate = filenameHistoryPrefix + filenameEnemyToken + ".csv"
   private val loadFilesDirectory = "bwapi-data/read/"
   private val saveFilesDirectory = "bwapi-data/write/"
-  private val seedFilesDirectory = "bwapi-data/AI/"
+  private val seedFilesDirectories = Array("bwapi-data/AI/", "bwapi-data/AI/PretrainP", "bwapi-data/AI/PretrainT", "bwapi-data/AI/PretrainZ")
   
   // The order matters (see below) thus meriting the explicit naming
-  private val directoriesInDecendingOrderOfRecency = Array(loadFilesDirectory, saveFilesDirectory, seedFilesDirectory)
+  private val directoriesInDecendingOrderOfRecency = Array(loadFilesDirectory, saveFilesDirectory) ++ seedFilesDirectories
   
   def load(): Seq[HistoricalGame] = {
     val gamesSerialized = loadAllGames(directoriesInDecendingOrderOfRecency)
@@ -120,5 +120,17 @@ object HistoryLoader {
     if (bufferedWriter != null) {
       bufferedWriter.close()
     }
+  }
+
+  val humanModeFileName = "bwapi-data/AI/human-mode-is.on"
+  def humanModeEnabled: Boolean = {
+    try {
+      return new File(humanModeFileName).exists()
+    }
+    catch { case exception: Exception =>
+      With.logger.warn("Exception looking for human mode file at: " + humanModeFileName)
+      With.logger.onException(exception)
+    }
+    false
   }
 }

@@ -8,7 +8,7 @@ class Configuration {
   // Tournament Settings //
   /////////////////////////
   
-  var enableSurrenders                = false
+  var enableSurrenders                = true
   var enablePerformanceStops          = true
   var enablePerformanceSurrender      = false
   var enableChat                      = true
@@ -16,16 +16,16 @@ class Configuration {
   var enableStreamManners             = false
   var enableHumanManners              = false
   var identifyGhostUnits              = false
-  var targetFrameDurationMilliseconds = 30
+  var targetFrameDurationMilliseconds = 20
   
   //////////////
   // Strategy //
   //////////////
 
   var dynamicStickiness   = 4.0
-  var targetWinrate       = 0.75
-  var strategyRandomness  = 0.0
-  var historyHalfLife     = 96.0
+  var targetWinrate       = 0.8
+  var strategyRandomness  = 0.1
+  var historyHalfLife     = 300.0
   var recentFingerprints  = 2
   
   /////////////

@@ -13,8 +13,7 @@ class Configuration {
   var enablePerformanceSurrender      = false
   var enableChat                      = true
   var enableVisualizations            = true
-  var enableStreamManners             = false
-  var enableHumanManners              = false
+  var enableStreamManners             = true
   var identifyGhostUnits              = false
   var targetFrameDurationMilliseconds = 20
   
@@ -99,8 +98,8 @@ class Configuration {
   // Visualization //
   ///////////////////
   
-  var visualizeScreen                     = false
-  var visualizeMap                        = false
+  var visualizeScreen                     = true
+  var visualizeMap                        = true
   var visualizationProbabilityHappyVision = 0.05
   var visualizationProbabilityTextOnly    = 0.01
   var visualizationCullViewport           = true

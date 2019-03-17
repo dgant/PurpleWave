@@ -1,6 +1,7 @@
 package Lifecycle
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Strategery.History.HistoryLoader
 
 object Manners {
   
@@ -22,7 +23,7 @@ object Manners {
       surrender()
     }
     if (With.frame == GameTime(0, 20)()) {
-      if (With.configuration.enableHumanManners) {
+      if (HistoryLoader.humanModeEnabled) {
         chat("Good luck, " + With.enemy.name + ", and have fun!")
       }
       else {
@@ -44,7 +45,7 @@ object Manners {
   
   def onEnd(isWinner: Boolean) {
     chat(
-      if (With.configuration.enableHumanManners)
+      if (HistoryLoader.humanModeEnabled)
         "Good game, " + With.enemy.name
       else if (isWinner)
         "Good game! I still think you're beautiful."

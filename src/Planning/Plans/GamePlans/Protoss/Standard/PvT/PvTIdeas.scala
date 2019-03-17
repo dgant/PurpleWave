@@ -5,6 +5,7 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound.{If, _}
+import Planning.Plans.GamePlans.Protoss.Situational.BuildHuggingNexus
 import Planning.Plans.Macro.Automatic.{PumpWorkers, _}
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -59,6 +60,29 @@ object PvTIdeas {
       new FramesUntilUnitAtLeast(Protoss.CyberneticsCore, Protoss.Zealot.buildFrames / 3)),
     new BuildOrder(Get(2, Protoss.Zealot))
   )
+  class ReactToWorkerRush extends If(
+    new And(
+      new EnemyStrategy(With.fingerprints.workerRush),
+      new BasesAtMost(2),
+      new FrameAtMost(GameTime(8, 0)())),
+    new Pump(Protoss.Probe, 9),
+    new Parallel(
+      new If(
+        new UnitsAtMost(5, UnitMatchWarriors),
+        new CancelIncomplete(Protoss.Nexus)),
+      new Pump(Protoss.Dragoon, 3),
+      new Pump(Protoss.Zealot, 3),
+      new BuildOrder(
+        Get(8, Protoss.Probe),
+        Get(Protoss.Pylon),
+        Get(10, Protoss.Probe),
+        Get(Protoss.Gateway),
+        Get(12, Protoss.Probe)),
+      new PumpWorkers,
+      new BuildHuggingNexus,
+      new Build(Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore), Get(2, Protoss.Pylon), Get(2, Protoss.Gateway), Get(Protoss.DragoonRange))
+    ))
+
   class ReactToBBS extends If(
     new And(
       new FrameAtMost(GameTime(10, 0)()),
@@ -104,7 +128,10 @@ object PvTIdeas {
   class ReactTo2Fac extends If(
     new And(
       new FrameAtMost(GameTime(10, 0)()),
-      new EnemyStrategy(With.fingerprints.twoFac)),
+      new EnemyStrategy(With.fingerprints.twoFac),
+      new Or(
+        new UnitsAtMost(0, Protoss.Stargate),
+        new UnitsAtLeast(1, Protoss.RoboticsFacility))),
     new Parallel(
       new RequireSufficientSupply,
       new Pump(Protoss.Dragoon, 7),
@@ -183,6 +210,7 @@ object PvTIdeas {
 
   class TrainZealotsOrDragoons extends Parallel(
     new PumpRatio(Protoss.Dragoon, 0, 24, Seq(Friendly(Protoss.Zealot, .75))),
+    new PumpRatio(Protoss.Dragoon, 0, 24, Seq(Enemy(Terran.Vulture, .75))),
     new If(
       new Or(
         new And(
@@ -190,10 +218,10 @@ object PvTIdeas {
           new GasAtMost(200)),
         new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.ZealotSpeed.upgradeFrames.head._2)),
       new PumpRatio(Protoss.Zealot, 0, 24, Seq(
-        Enemy(UnitMatchSiegeTank, 3.0),
-        Enemy(Terran.Goliath,     2.0),
+        Enemy(UnitMatchSiegeTank, 2.5),
+        Enemy(Terran.Goliath,     1.5),
         Enemy(Terran.Marine,      1.0),
-        Enemy(Terran.Vulture,     -0.75)))),
+        Enemy(Terran.Vulture,     -1.0)))),
     new Pump(Protoss.Dragoon),
     new If(new BasesAtLeast(3), new Pump(Protoss.Zealot)))
 
@@ -208,7 +236,7 @@ object PvTIdeas {
     new PumpRatio(Protoss.Arbiter, 0, 2, Seq(Friendly(Protoss.Carrier, 1.0 / 8.0))),
     new PumpRatio(Protoss.HighTemplar, 0, 2, Seq(Friendly(Protoss.Carrier, 1.0 / 8.0))),
     new Pump(Protoss.Carrier),
-    new Pump(Protoss.Arbiter, 12),
+    new Pump(Protoss.Arbiter, 6),
     new If(new GasAtLeast(500), new Pump(Protoss.HighTemplar, maximumConcurrently = 4)),
     new TrainScouts,
     new TrainZealotsOrDragoons)

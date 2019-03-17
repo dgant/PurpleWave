@@ -78,7 +78,6 @@ class Strategist {
     strategiesFiltered.foreach(evaluate)
     if (HistoryLoader.humanModeEnabled) {
       Manners.chat("Human mode enabled!")
-      Manners.chat("")
       With.configuration.strategyRandomness = 0.3
       return StrategySelectionDynamic.chooseBest(strategiesFiltered).toSet
     }

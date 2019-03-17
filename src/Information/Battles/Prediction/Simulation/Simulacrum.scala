@@ -35,7 +35,7 @@ class Simulacrum(
   val fleePixel           : Pixel                       = simulation.focus.project(pixel, 1000).clamp
   
   // Scorekeeping
-  val valuePerDamage    : Double                        = PurpleMath.nanToZero(realUnit.subjectiveValue.toDouble / realUnit.unitClass.maxTotalHealth)
+  val valuePerDamage    : Double                        = PurpleMath.nanToZero(realUnit.subjectiveValue / realUnit.unitClass.maxTotalHealth)
   var damageDealt       : Double                        = 0.0
   var damageReceived    : Double                        = 0.0
   var valueDealt        : Double                        = 0.0

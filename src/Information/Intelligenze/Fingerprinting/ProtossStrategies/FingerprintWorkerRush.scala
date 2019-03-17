@@ -15,8 +15,7 @@ class FingerprintWorkerRush extends Fingerprint {
       (unit: UnitInfo) => {
         val distanceOurBase = unit.pixelDistanceTravelling(With.geography.ourMain.heart.pixelCenter)
         With.geography.startBases.forall(base =>
-          !base.isOurMain
-            | unit.pixelDistanceTravelling(base.heart.pixelCenter) > distanceOurBase
+          base.isOurMain || unit.pixelDistanceTravelling(base.heart.pixelCenter) > distanceOurBase
         )
       }
     )

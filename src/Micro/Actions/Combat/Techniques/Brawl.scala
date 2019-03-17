@@ -19,6 +19,7 @@ object Brawl extends ActionTechnique {
     && unit.is(Zerg.Zergling) || unit.unitClass.melee && unit.matchups.threats.exists(_.is(Zerg.Zergling))
     && unit.matchups.targets.exists(t => ! t.flying && t.unitClass.melee)
     && unit.matchups.threats.exists(t => ! t.flying && t.unitClass.melee && t.pixelDistanceEdge(unit) < 32.0)
+    && (unit.matchups.targetsInRange.exists(_.canAttack(unit)) || ByOption.minBy(unit.matchups.targets)(_.pixelDistanceEdge(unit)).exists(_.canAttack(unit)))
   )
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {

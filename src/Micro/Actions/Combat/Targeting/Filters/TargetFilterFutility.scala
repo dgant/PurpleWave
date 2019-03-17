@@ -12,7 +12,6 @@ object TargetFilterFutility extends TargetFilter {
     lazy val targetBusy = target.gathering || target.constructing || target.repairing || ! target.canMove || BlockConstruction.buildOrders.contains(target.order)
     val output = (
       actor.topSpeed >= target.topSpeed
-      || actor.inRangeToAttack(target)
       || targetBusy
       || actor.is(Zerg.Scourge)
       || actor.framesToGetInRange(target) < 8

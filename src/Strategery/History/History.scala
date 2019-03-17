@@ -17,8 +17,6 @@ class History {
   
   var message = new mutable.ArrayBuffer[String]
   def onStart() {
-    message += " "
-    message += " "
     message += "Good luck on " + currentMapName + ", " + currentEnemyName + "!"
     message += " "
     
@@ -33,11 +31,15 @@ class History {
     val vsWins          = games.count(g => g.enemyName      == currentEnemyName       &&    g.won)
     val vsLosses        = games.count(g => g.enemyName      == currentEnemyName       &&  ! g.won)
     
-    message += "On this map: "                                         + mapWins       + " - " + mapLosses
+    message += "On this map: "                                          + mapWins       + " - " + mapLosses
     message += "With "  + currentStarts         + " start locations: "  + startWins     + " - " + startLosses
-    message += "As "    + With.self.raceInitial + ": "                  + ourRaceWins   + " - " + ourRaceLosses
+    message += "As this race: "                                         + ourRaceWins   + " - " + ourRaceLosses
     message += "Vs. "   + currentEnemyRace      + ": "                  + enemyRaceWins + " - " + enemyRaceLosses
     message += "Vs. "   + currentEnemyName      + ": "                  + vsWins        + " - " + vsLosses
+
+    if (HistoryLoader.humanModeEnabled) {
+      message.clear()
+    }
   }
   
   def onEnd(weWon: Boolean) {

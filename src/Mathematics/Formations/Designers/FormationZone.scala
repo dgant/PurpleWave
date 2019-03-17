@@ -31,7 +31,6 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
     zone.bases.flatMap(_.townHallArea.tiles).foreach(occupied.set(_, true))
     zone.bases.foreach(base => if (base.workerCount > 2) base.harvestingArea.tiles.foreach(occupied.set(_, true)))
     // Clear a line for Scarabs
-    DrawMap.line(chokeCenter, chokeEnd, Colors.NeonYellow)
     if (units.exists(_.is(Protoss.Reaver))) {
       PixelRay(chokeCenter, chokeEnd).tilesIntersected.foreach(occupied.set(_, true))
     }

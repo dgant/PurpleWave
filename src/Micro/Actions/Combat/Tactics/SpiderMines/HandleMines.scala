@@ -26,7 +26,7 @@ object HandleMines extends Action{
 
     lazy val canKillForFree   = ! mine.effectivelyCloaked & unit.pixelRangeAgainst(mine) > 96 && unit.readyForAttackOrder
     lazy val canClear         = unit.agent.shouldEngage || mine.base.exists(_.owner.isUs)
-    lazy val canSnipeAlone    = unit.damageOnNextHitAgainst(mine) >= mine.unitClass.maxTotalHealth
+    lazy val canSnipeAlone    = unit.readyForAttackOrder && unit.damageOnNextHitAgainst(mine) >= mine.unitClass.maxTotalHealth
     lazy val canSnipeTogether = mine.matchups.threatsInRange.map(t => if (t.readyForAttackOrder) t.damageOnNextHitAgainst(mine) else 0).sum > mine.unitClass.maxTotalHealth
     lazy val dragTargets =
       if (unit.unitClass.floats)

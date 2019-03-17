@@ -53,22 +53,36 @@ trait GoalBasic extends SquadGoal {
         && ! u.isAny(Protoss.Zealot, Protoss.DarkTemplar, Protoss.Scout, Protoss.Arbiter, Protoss.Carrier, Zerg.Zergling))
       override val counteredBy: Array[Quality] = Array.empty
     }
+    object FlyingBuilding extends Quality {
+      def matches(u: UnitInfo): Boolean = u.unitClass.isFlyingBuilding
+    }
     object Air extends Quality {
       def matches(u: UnitInfo): Boolean = u.flying
       override val counteredBy: Array[Quality] = Array(AntiAir)
     }
-    object FlyingBuilding extends Quality {
-      def matches(u: UnitInfo): Boolean = u.unitClass.isFlyingBuilding
-    }
     object Ground extends Quality {
       def matches(u: UnitInfo): Boolean = ! u.flying
       override val counteredBy: Array[Quality] = Array(AntiGround)
+    }
+    object AirCombat extends Quality {
+      def matches(u: UnitInfo): Boolean = u.flying
+      override val counteredBy: Array[Quality] = Array(AntiAirCombat)
+    }
+    object GroundCombat extends Quality {
+      def matches(u: UnitInfo): Boolean = ! u.flying
+      override val counteredBy: Array[Quality] = Array(AntiGroundCombat)
     }
     object AntiAir extends Quality {
       def matches(u: UnitInfo): Boolean = u.is(UnitMatchCombatSpellcaster) || u.attacksAgainstAir > 0
     }
     object AntiGround extends Quality {
       def matches(u: UnitInfo): Boolean = u.is(UnitMatchCombatSpellcaster) || (u.attacksAgainstGround > 0 && ! u.unitClass.isWorker)
+    }
+    object AntiAirCombat extends Quality {
+      def matches(u: UnitInfo): Boolean = u.attacksAgainstAir > 0 && ! u.isAny(Terran.Ghost, Protoss.Arbiter)
+    }
+    object AntiGroundCombat extends Quality {
+      def matches(u: UnitInfo): Boolean = u.attacksAgainstGround > 0 && ! u.isAny(Terran.Ghost, Protoss.Arbiter, UnitMatchWorkers)
     }
     object Combat extends Quality {
       def matches(u: UnitInfo): Boolean = (u.canAttack && ! u.unitClass.isWorker)
@@ -93,6 +107,8 @@ trait GoalBasic extends SquadGoal {
       Vulture,
       Air,
       Ground,
+      AirCombat,
+      GroundCombat
     )
     val answers: Array[Quality] = Array(
       Detector,
@@ -100,6 +116,8 @@ trait GoalBasic extends SquadGoal {
       AntiVulture,
       AntiAir,
       AntiGround,
+      AntiAirCombat,
+      AntiGroundCombat,
     )
     val roles: Array[Quality] = Array(
       FlyingBuilding,

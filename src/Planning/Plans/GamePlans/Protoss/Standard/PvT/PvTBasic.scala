@@ -12,7 +12,7 @@ import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTIdeas.TrainMinimumDragoo
 import Planning.Plans.Macro.Automatic.UpgradeContinuously
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
+import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.Plans.Scouting.{Scout, ScoutCleared, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
@@ -64,6 +64,8 @@ class PvTBasic extends GameplanTemplate {
     new If(new Employing(PvT1015DT),            new If(new UpgradeStarted(Protoss.DragoonRange), new Scout)),
     new If(new Employing(PvTDTExpand),          new ScoutOn(Protoss.CyberneticsCore)))
 
+  override def workerPlan: Plan = super.workerPlan
+
   override val priorityAttackPlan = new PvTIdeas.PriorityAttacks
   override val attackPlan = new Parallel(
     new If(
@@ -75,6 +77,7 @@ class PvTBasic extends GameplanTemplate {
 
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvTIdeas.ReactToBBS,
+    new PvTIdeas.ReactToWorkerRush,
     new If(
       new Employing(PvT13Nexus, PvT21Nexus, PvT23Nexus, PvT28Nexus),
       new PvTIdeas.ReactTo2Fac))
@@ -270,10 +273,10 @@ class PvTBasic extends GameplanTemplate {
         new If(
           new Or(
             new EmployingArbiters,
-            new Or(
-              new EmployingTwoBase,
-              new BasesAtLeast(3)),
-            new UnitsAtLeast(8, Protoss.Carrier)),
+            new And(
+              new UnitsAtLeast(8, Protoss.Carrier),
+              new GasPumpsAtLeast(3),
+              new MiningBasesAtLeast(3))),
           new Parallel(
             new Build(
               Get(Protoss.CitadelOfAdun),
@@ -312,6 +315,9 @@ class PvTBasic extends GameplanTemplate {
     new If(new ReadyForThirdBase,   new RequireMiningBases(3)),
     new If(new ReadyForFourthBase,  new RequireMiningBases(4)),
     new BuildCannonsAtExpansions(1),
+    new If(
+      new BasesAtLeast(3),
+      new BuildCannonsAtNatural(1)),
 
     new CriticalUpgrades,
     new FlipIf(

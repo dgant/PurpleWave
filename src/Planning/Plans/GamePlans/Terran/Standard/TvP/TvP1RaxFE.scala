@@ -18,11 +18,16 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Terran.TvP1RaxFE
+import Strategery.Strategies.Terran.{TvP1RaxFE, TvP2FacJoyO, TvPFDStrong, TvPSiegeExpandBunker}
 
 class TvP1RaxFE extends GameplanTemplate {
 
-  override val activationCriteria = new Employing(TvP1RaxFE)
+  override val activationCriteria = new Or(
+    new Employing(TvP1RaxFE),
+    new Latch(
+      new And(
+        new Employing(TvPSiegeExpandBunker, TvPFDStrong, TvP2FacJoyO),
+        new EnemyStrategy(With.fingerprints.gasSteal))))
   override val completionCriteria = new Latch(new And(
     new BasesAtLeast(2),
     new TechStarted(Terran.SiegeMode),

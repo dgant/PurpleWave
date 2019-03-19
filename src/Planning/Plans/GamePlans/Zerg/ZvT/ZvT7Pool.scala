@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.{AllIn, Attack}
 import Planning.Plans.Basic.Do
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -13,9 +13,10 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireBases
 import Planning.Plans.Scouting.{FoundEnemyBase, Scout}
 import Planning.Predicates.Compound.{And, Check, Not}
-import Planning.Predicates.Milestones.{GasForUpgrade, UnitsAtLeast}
+import Planning.Predicates.Milestones.{EnemiesAtLeast, GasForUpgrade, UnitsAtLeast}
 import Planning.Predicates.Strategy.StartPositionsAtLeast
-import ProxyBwapi.Races.Zerg
+import Planning.UnitMatchers.UnitMatchOr
+import ProxyBwapi.Races.{Terran, Zerg}
 
 class ZvT7Pool extends GameplanTemplate {
 
@@ -46,6 +47,7 @@ class ZvT7Pool extends GameplanTemplate {
 
   override def buildPlans: Seq[Plan] = Seq(
     new Do(() => With.blackboard.pushKiters.set(true)),
+    new AllIn(new EnemiesAtLeast(1, UnitMatchOr(Terran.Vulture, Terran.Factory), complete = true)),
     new If(
       new GasForUpgrade(Zerg.ZerglingSpeed),
       new CapGasWorkersAt(0),

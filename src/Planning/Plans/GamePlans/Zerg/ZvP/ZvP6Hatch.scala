@@ -17,7 +17,7 @@ import Planning.Plans.Macro.Zerg.BuildSunkensAtNatural
 import Planning.Plans.Scouting.Scout
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Economy.MineralsAtMost
-import Planning.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost, UpgradeStarted}
+import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete}
 import Planning.{Plan, Predicate}
@@ -126,12 +126,18 @@ class ZvP6Hatch extends GameplanTemplate {
         new Build(Get(Zerg.EvolutionChamber)),
         new UpgradeContinuously(Zerg.GroundRangeDamage),
         new Build(Get(Zerg.Lair)))),
+    new If(
+      new EnemyHasShownCloakedThreat,
+      new Build(
+        Get(Zerg.Lair),
+        Get(Zerg.OverlordSpeed))),
     new PumpRatio(Zerg.Hydralisk, 1, 200, Seq(Enemy(Protoss.Corsair, 2.0), Enemy(Protoss.Scout, 3.0))),
     new PumpRatio(Zerg.Hydralisk, 0, 48, Seq(Enemy(Protoss.Dragoon, 3.0), Enemy(Protoss.Zealot, 2.0), Enemy(Protoss.Archon, 6.0), Friendly(Zerg.Zergling, -0.25))),
     new RequireMiningBases(5),
     new PumpRatio(Zerg.Extractor, 2, 12, Seq(Friendly(Zerg.Drone, 1.0 / 14.0))),
     new Pump(Zerg.Drone, 34),
-    new Pump(Zerg.Hydralisk),
+    new Pump(Zerg.Hydralisk, 24),
+    new Pump(Zerg.Drone, 50),
     new If(
       new UpgradeStarted(Zerg.HydraliskRange),
       new PumpRatio(Zerg.Hatchery, 3, 9, Seq(Friendly(Zerg.Drone, 6.0))))

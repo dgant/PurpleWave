@@ -13,8 +13,8 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Terran.BuildBunkersAtNatural
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.{And, Latch, Not}
-import Planning.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
+import Planning.Predicates.Compound.{Latch, Not}
+import Planning.Predicates.Milestones.MiningBasesAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Terran
@@ -52,15 +52,11 @@ class TvZ1RaxFE extends GameplanTemplate {
       new RequireMiningBases(2)),
     new Pump(Terran.Marine),
     new If(
-      new EnemyStrategy(With.fingerprints.ninePool, With.fingerprints.overpool),
-      new Build(Get(2, Terran.Barracks))),
-    new If(
       new EnemyStrategy(With.fingerprints.fourPool),
-      new Build(Get(4, Terran.Barracks))),
+      new Build(Get(3, Terran.Barracks))),
+    new TvZIdeas.TvZ1RaxExpandVs9Pool,
     new If(
-      new And(
-        new EnemyStrategy(With.fingerprints.ninePool, With.fingerprints.overpool, With.fingerprints.fourPool),
-        new UnitsAtLeast(2, Terran.Barracks, complete = true)),
+      new EnemyStrategy(With.fingerprints.tenHatch),
       new BuildBunkersAtNatural(1)),
     new RequireMiningBases(2),
     new Build(

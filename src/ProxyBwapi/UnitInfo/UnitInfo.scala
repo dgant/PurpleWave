@@ -312,7 +312,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   })
 
   //TODO: Ensnare
-  def cooldownLeft      : Int = Math.max(Math.max(airCooldownLeft, groundCooldownLeft), if (friendly.exists(_.transport.exists(_.flying))) cooldownMaxAirGround else 0)
+  def cooldownLeft      : Int = Math.max(Math.max(airCooldownLeft, groundCooldownLeft), if (friendly.exists(_.transport.exists(_.flying))) cooldownMaxAirGround / 2 else 0)
   def cooldownMaxAir    : Int = (2 + unitClass.airDamageCooldown)     / stimAttackSpeedBonus // +2 is the RNG
   def cooldownMaxGround : Int = (2 + unitClass.groundDamageCooldown)  / stimAttackSpeedBonus // +2 is the RNG
 

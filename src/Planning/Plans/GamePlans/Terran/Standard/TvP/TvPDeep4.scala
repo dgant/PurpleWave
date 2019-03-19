@@ -59,7 +59,7 @@ class TvPDeep4 extends GameplanTemplate {
         new Build(Get(Terran.EngineeringBay)),
         new BuildMissileTurretsAtNatural(1),
         new Build(Get(Terran.Academy)))),
-    new PumpRatio(Terran.Medic, 4, 12, Seq(Friendly(Terran.Marine, 0.25))),
+    new PumpRatio(Terran.Medic, 0, 12, Seq(Friendly(Terran.Marine, 0.25))),
     new If(
       new Or(
         new EnemyHasShown(Protoss.Carrier),

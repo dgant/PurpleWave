@@ -77,8 +77,8 @@ object PvT2BaseArbiter extends PvTStrategy { override val mapsBlacklisted = Iter
 object PvT3BaseArbiter extends PvTStrategy { override val mapsBlacklisted = MapGroups.badForFastThirdBases }
 
 object PvTStove extends PvTStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(
-    Vector(PvT2BaseArbiter))
+  override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(PvT2BaseArbiter))
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.bbs, With.fingerprints.twoRax1113)
 }
 
 object PvTProxy2Gate extends PvTStrategy {

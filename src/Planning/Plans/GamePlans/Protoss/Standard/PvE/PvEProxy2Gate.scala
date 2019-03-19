@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvE
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Army.{Aggression, Attack, Hunt}
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound.{Or, _}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -17,6 +17,7 @@ import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy}
+import Planning.UnitCounters.UnitCountOne
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Protoss.{PvPProxy2Gate, PvRProxy2Gate, PvTProxy2Gate, PvZProxy2Gate}
@@ -30,7 +31,11 @@ class PvEProxy2Gate extends GameplanTemplate {
     new ScoutOn(Protoss.Gateway, quantity = 2))
 
   override def workerPlan: Plan = NoPlan()
-  override def priorityAttackPlan: Plan = new Attack
+  override def priorityAttackPlan: Plan = new Parallel(
+    new If(
+      new EnemyStrategy(With.fingerprints.cannonRush),
+      new Hunt(Protoss.Zealot, Protoss.Probe, UnitCountOne)),
+    new Attack)
   
   private class BeforeProxy extends Parallel(
     new PlaceGatewaysProxied(2, () => ProxyPlanner.proxyMiddle),

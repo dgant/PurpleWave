@@ -175,10 +175,11 @@ class ZvT2HatchLurker extends GameplanTemplate {
 
   override def buildPlans: Seq[Plan] = Seq(
     new If(
+      new EnemyHasShownWraithCloak,
+      new Build(Get(Zerg.OverlordSpeed))),
+    new If(
       new EnemyMech,
       new HydraMuta,
       new LurkerLing)
-
-
   )
 }

@@ -1,5 +1,6 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
+import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Basic.NoPlan
@@ -10,10 +11,11 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Terran.{BuildBunkersAtNatural, BuildMissileTurretsAtBases, BuildMissileTurretsAtNatural}
+import Planning.Plans.Scouting.FindExpansions
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyLurkers, EnemyMutalisks, SafeToMoveOut}
-import Planning.Predicates.Strategy.Employing
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchOr, UnitMatchSiegeTank, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
@@ -38,7 +40,7 @@ class TvZSK extends GameplanTemplate {
     new EnemyHasShown(Zerg.LurkerEgg))
 
   override def scoutPlan: Plan = NoPlan()
-  override def attackPlan: Plan = new If(new CanAttack, new Attack)
+  override def attackPlan: Plan = new Parallel(new If(new CanAttack, new Attack), new FindExpansions(Terran.Wraith))
   override def priorityAttackPlan: Plan = new If(new CanAttack, new Attack(UnitMatchOr(Terran.Ghost, Terran.Vulture)))
   override def workerPlan: Plan = new Parallel(
     new Pump(Terran.NuclearSilo, 1),
@@ -71,6 +73,9 @@ class TvZSK extends GameplanTemplate {
       new UnitsAtLeast(5, Terran.Marine, complete = true),
       new EjectScout),
 
+    new If(
+      new EnemyStrategy(With.fingerprints.tenHatch),
+      new BuildBunkersAtNatural(1)),
     new RequireMiningBases(2),
 
     new If(
@@ -91,7 +96,6 @@ class TvZSK extends GameplanTemplate {
         new Not(new Employing(TvZ2RaxNuke)),
         new UnitsAtLeast(1, Terran.CovertOps))),
     new UpgradeContinuously(Terran.GhostVisionRange),
-
     new Trigger(
       new UnitsAtLeast(1, Terran.ScienceVessel),
       new Parallel(
@@ -104,9 +108,20 @@ class TvZSK extends GameplanTemplate {
         new UpgradeContinuously(Terran.ScienceVesselEnergy))),
 
     new Pump(Terran.Ghost, 2),
+    new If(new UnitsAtLeast(1, Terran.SiegeTankUnsieged), new TechContinuously(Terran.SiegeMode)),
     new Pump(Terran.SiegeTankUnsieged, 3),
     new Pump(Terran.ControlTower),
-    new Pump(Terran.ScienceVessel, 20),
+    new If(
+      new UnitsAtMost(0, Terran.ScienceFacility, complete = true),
+      new Pump(Terran.Wraith, 1)),
+    new Pump(Terran.ScienceVessel, 2),
+    new Pump(Terran.Battlecruiser),
+    new Pump(Terran.ScienceVessel, 12),
+    new If(
+      new Or(
+        new UnitsAtLeast(12, Terran.ScienceVessel),
+        new EnemyHasShown(Zerg.Ultralisk)),
+      new Build(Get(Terran.PhysicsLab))),
     new If(
       new Employing(TvZ2RaxNuke),
       new PumpRatio(Terran.Medic, 2, 20, Seq(Friendly(Terran.Marine, 1.0/6.0))),
@@ -116,7 +131,10 @@ class TvZSK extends GameplanTemplate {
       new CanAttack,
       new Parallel(
         new PumpRatio(Terran.Firebat, 0, 2, Seq(Enemy(Zerg.Zergling, 1.0))),
-        new PumpRatio(Terran.Firebat, 0, 10, Seq(Enemy(Zerg.Zergling, 0.1), Enemy(Zerg.Defiler, 1.0))))),
+        new PumpRatio(Terran.Firebat, 0, 10, Seq(Enemy(Zerg.Zergling, 0.1))))),
+    new If(
+      new EnemyHasShown(Zerg.Defiler),
+      new PumpRatio(Terran.Firebat, 0, 15, Seq(Friendly(Terran.Marine, 0.5)))),
     new Pump(Terran.Marine),
     new Pump(Terran.Vulture, 1),
 

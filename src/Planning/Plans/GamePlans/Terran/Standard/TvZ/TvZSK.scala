@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
-import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Basic.NoPlan
@@ -15,7 +14,7 @@ import Planning.Plans.Scouting.FindExpansions
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyLurkers, EnemyMutalisks, SafeToMoveOut}
-import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.{UnitMatchOr, UnitMatchSiegeTank, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
@@ -73,9 +72,8 @@ class TvZSK extends GameplanTemplate {
       new UnitsAtLeast(5, Terran.Marine, complete = true),
       new EjectScout),
 
-    new If(
-      new EnemyStrategy(With.fingerprints.tenHatch),
-      new BuildBunkersAtNatural(1)),
+    new If(new BasesAtMost(1), new Pump(Terran.Marine, 24, maximumConcurrently = 3)),
+    new BuildBunkersAtNatural(1),
     new RequireMiningBases(2),
 
     new If(
@@ -179,7 +177,7 @@ class TvZSK extends GameplanTemplate {
       new UnitsAtLeast(1, Terran.ScienceFacility),
       new Parallel(
         new IfOnMiningBases(2, new Build(Get(6, Terran.Barracks))),
-        new IfOnMiningBases(3, new Build(Get(2, Terran.EngineeringBay), Get(3, Terran.Starport), Get(9, Terran.Barracks))),
+        new IfOnMiningBases(3, new Build(Get(2, Terran.EngineeringBay), Get(3, Terran.Starport), Get(10, Terran.Barracks))),
         new IfOnMiningBases(4, new Build(Get(14, Terran.Barracks))),
         new RequireMiningBases(4))),
   )

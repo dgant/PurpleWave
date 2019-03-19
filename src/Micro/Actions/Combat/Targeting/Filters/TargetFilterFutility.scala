@@ -41,7 +41,10 @@ object TargetFilterFutility extends TargetFilter {
       target.visible
       || actor.flying
       || ! target.flying
-      || Vector(actor.pixelToFireAt(target).tileIncluding, target.tileIncludingCenter).exists(With.grids.walkableTerrain.get))
+      || Vector(actor.pixelToFireAt(target).tileIncluding, target.tileIncludingCenter)
+        .exists(tile =>
+          With.grids.walkableTerrain.get(tile)
+          && With.grids.altitudeBonus.get(tile) >= With.grids.altitudeBonus.get(target.tileIncludingCenter)))
 
     if (actor.is(Terran.Vulture) && target.unitClass.isBuilding && With.frame < GameTime(0, 4)()) return false
 

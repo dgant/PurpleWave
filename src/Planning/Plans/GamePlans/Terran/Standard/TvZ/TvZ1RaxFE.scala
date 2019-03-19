@@ -59,6 +59,7 @@ class TvZ1RaxFE extends GameplanTemplate {
       new EnemyStrategy(With.fingerprints.tenHatch),
       new BuildBunkersAtNatural(1)),
     new RequireMiningBases(2),
+    new BuildBunkersAtNatural(1),
     new Build(
       Get(Terran.Refinery),
       Get(Terran.EngineeringBay),

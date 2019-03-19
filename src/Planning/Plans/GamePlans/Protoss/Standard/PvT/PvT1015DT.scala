@@ -24,7 +24,9 @@ class PvT1015DT extends GameplanTemplate {
 
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.PvT1015GateGoonDT
 
-  override def emergencyPlans: Seq[Plan] = Seq(new PvTIdeas.ReactToFiveRaxAs2GateCore)
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new PvTIdeas.ReactToFiveRaxAs2GateCore,
+    new PvTIdeas.ReactToWorkerRush)
 
   override val buildPlans = Vector(
     new EjectScout,

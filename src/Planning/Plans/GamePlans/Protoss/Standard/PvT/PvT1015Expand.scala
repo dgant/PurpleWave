@@ -1,5 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
+import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
 import Planning.Plans.Army.Attack
@@ -10,10 +11,9 @@ import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.Scout
-import Planning.Predicates.Compound.Not
 import Planning.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast, UpgradeStarted}
-import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeAtHome}
-import Planning.Predicates.Strategy.Employing
+import Planning.Predicates.Reactive.EnemyBasesAtLeast
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchInNatural}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.PvT1015Expand
@@ -27,7 +27,9 @@ class PvT1015Expand extends GameplanTemplate {
   
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.PvT1015GateGoonExpand
 
-  override def emergencyPlans: Seq[Plan] = Seq(new PvTIdeas.ReactToFiveRaxAs2GateCore)
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new PvTIdeas.ReactToFiveRaxAs2GateCore,
+    new PvTIdeas.ReactToWorkerRush)
   
   override def buildPlans: Seq[Plan] = Vector(
     new Trigger(
@@ -37,10 +39,11 @@ class PvT1015Expand extends GameplanTemplate {
       new RequireMiningBases(3)),
     new Pump(Protoss.Dragoon),
     new If(
-      new Not(new SafeAtHome),
+      new EnemyStrategy(With.fingerprints.twoFac, With.fingerprints.twoFacVultures),
       new Build(
         Get(Protoss.RoboticsFacility),
-        Get(Protoss.Observatory))),
+        Get(Protoss.Observatory),
+        Get(3, Protoss.Gateway))),
     new RequireMiningBases(3)
   )
 }

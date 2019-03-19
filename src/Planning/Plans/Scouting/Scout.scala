@@ -2,6 +2,7 @@ package Planning.Plans.Scouting
 
 import Lifecycle.With
 import Mathematics.Points.SpecificPoints
+import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.{UnitCountBetween, UnitCountExactly}
@@ -20,7 +21,6 @@ class Scout(scoutCount: Int = 1) extends Plan {
   var useScoutingBehaviors = true
   
   val scouts = new Property[LockUnits](new LockUnits {
-    unitCounter.set(UnitCountExactly(scoutCount))
     unitMatcher.set(UnitMatchAnd(UnitMatchWorkers, UnitMatchNotHoldingResources))
     unitPreference.set(UnitPreferClose(SpecificPoints.middle))
     interruptable.set(false)
@@ -43,6 +43,8 @@ class Scout(scoutCount: Int = 1) extends Plan {
   
   override def onUpdate() {
     if (isComplete) return
+
+    scouts.get.unitCounter.set(UnitCountExactly(PurpleMath.clamp(scoutCount, 1, With.geography.startBases.count(_.scouted))))
     
     val scoutsDied = acquiredScouts.exists( ! _.alive)
     if (scoutsDied) {
@@ -79,7 +81,7 @@ class Scout(scoutCount: Int = 1) extends Plan {
     
     while (unassignedScouts.nonEmpty) {
       val destination = With.intelligence.claimBaseToScout().heart.pixelCenter
-      val scout = unassignedScouts.minBy(_.pixelDistanceTravelling(destination))
+      val scout = unassignedScouts.minBy(scout => scout.pixelDistanceTravelling(destination) + 0.5 * scout.pixelDistanceTravelling(scout.agent.destination, destination))
       unassignedScouts -= scout
       
       With.intelligence.highlightScout(scout)

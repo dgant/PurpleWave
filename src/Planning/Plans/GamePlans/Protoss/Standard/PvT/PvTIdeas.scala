@@ -65,11 +65,12 @@ object PvTIdeas {
       new EnemyStrategy(With.fingerprints.workerRush),
       new BasesAtMost(2),
       new FrameAtMost(GameTime(8, 0)())),
-    new Pump(Protoss.Probe, 9),
     new Parallel(
+      new Pump(Protoss.Probe, 9),
       new If(
         new UnitsAtMost(5, UnitMatchWarriors),
         new CancelIncomplete(Protoss.Nexus)),
+      new CapGasWorkersAt(2),
       new Pump(Protoss.Dragoon, 3),
       new Pump(Protoss.Zealot, 3),
       new BuildOrder(

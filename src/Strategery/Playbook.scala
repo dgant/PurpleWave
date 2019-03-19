@@ -68,7 +68,7 @@ class PurpleWavePlaybook extends EmptyPlaybook {
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvT28Nexus, PvT3BaseArbiter)
+  override lazy val forced: Seq[Strategy] = Seq(TvZ2RaxAcademy, TvZ5Rax)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
 }
 

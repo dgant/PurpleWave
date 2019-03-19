@@ -36,24 +36,28 @@ class PvTFastCarrier extends GameplanTemplate {
 
   private val buildOrderProxyGate = Vector(
     Get(8,  Protoss.Probe),
-    Get(1,  Protoss.Pylon),
+    Get(Protoss.Pylon),
     Get(10, Protoss.Probe),
-    Get(1,  Protoss.Gateway),
+    Get(Protoss.Gateway),
     Get(12, Protoss.Probe),
-    Get(1,  Protoss.Assimilator),
+    Get(Protoss.Assimilator),
     Get(13, Protoss.Probe),
     Get(1,  Protoss.Zealot),
     Get(14, Protoss.Probe),
     Get(2,  Protoss.Pylon),
     Get(15, Protoss.Probe),
-    Get(1,  Protoss.CyberneticsCore),
+    Get(Protoss.CyberneticsCore),
     Get(18, Protoss.Probe),
     Get(Protoss.DragoonRange),
-    Get(1,  Protoss.Dragoon),
+    Get(Protoss.Dragoon),
     Get(21, Protoss.Probe),
     Get(2,  Protoss.Nexus))
 
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.PvT28Nexus
+
+  override def emergencyPlans: Seq[Plan] = Vector(
+    new PvTIdeas.ReactToBBS,
+    new PvTIdeas.ReactToWorkerRush)
 
   override def buildPlans: Seq[Plan] = Vector(
     /*
@@ -126,8 +130,8 @@ class PvTFastCarrier extends GameplanTemplate {
     new BuildGasPumps,
     new Build(
       Get(2, Protoss.Gateway),
-      Get(1, Protoss.Stargate),
-      Get(1, Protoss.FleetBeacon),
+      Get(Protoss.Stargate),
+      Get(Protoss.FleetBeacon),
       Get(3, Protoss.Stargate),
       Get(3, Protoss.Gateway)),
     new RequireMiningBases(4),

@@ -3,20 +3,21 @@ package Planning.Plans.GamePlans.Terran.Standard.TvZ
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.Attack
-import Planning.Plans.Compound.{If, Or, Trigger}
+import Planning.Plans.Basic.NoPlan
+import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPool
 import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Macro.Terran.{BuildBunkersAtNatural, BuildMissileTurretsAtNatural}
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.{Latch, Not}
-import Planning.Predicates.Economy.GasAtLeast
-import Planning.Predicates.Milestones.{MiningBasesAtLeast, TechStarted, UnitsAtLeast}
+import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Milestones.{EnemyHasShown, MiningBasesAtLeast, UnitsAtLeast}
+import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
 import Planning.{Plan, Predicate}
-import ProxyBwapi.Races.Terran
+import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran.TvZ2RaxAcademy
 
 class TvZ2RaxAcademy extends GameplanTemplate {
@@ -29,8 +30,10 @@ class TvZ2RaxAcademy extends GameplanTemplate {
     new Not(new EnemyStrategy(With.fingerprints.fourPool)),
     new If(
       new StartPositionsAtLeast(3),
-      new ScoutOn(Terran.Barracks, scoutCount = 2),
-      new ScoutOn(Terran.Barracks)))
+      new ScoutOn(Terran.Barracks, quantity = 2, scoutCount = 2),
+      new ScoutOn(Terran.Barracks, quantity = 2)))
+
+  override def workerPlan: Plan = NoPlan()
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new TvZFourPoolEmergency
@@ -39,32 +42,54 @@ class TvZ2RaxAcademy extends GameplanTemplate {
   override def buildOrder: Seq[BuildRequest] = Seq(
     Get(9, Terran.SCV),
     Get(Terran.SupplyDepot),
+    Get(11, Terran.SCV),
     Get(Terran.Barracks),
     Get(13, Terran.SCV),
-    Get(Terran.Marine),
-    Get(2, Terran.SupplyDepot),
     Get(2, Terran.Barracks),
     Get(14, Terran.SCV),
-    Get(2, Terran.Marine),
+    Get(Terran.Marine),
+    Get(2, Terran.SupplyDepot),
     Get(15, Terran.SCV),
+    Get(2, Terran.Marine),
+    Get(16, Terran.SCV),
     Get(Terran.Refinery),
     Get(3, Terran.Marine),
-    Get(Terran.Academy))
+    Get(Terran.Academy),
+    Get(17, Terran.SCV),
+    Get(5, Terran.Marine),
+    Get(18, Terran.SCV),
+    Get(3, Terran.SupplyDepot),
+    Get(7, Terran.Marine),
+    Get(Terran.Stim),
+    Get(Terran.Comsat),
+    Get(9, Terran.Marine),
+    Get(2, Terran.Medic),
+    Get(19, Terran.SCV),
+    Get(2, Terran.Firebat),
+    Get(20, Terran.SCV),
+    Get(11, Terran.Marine),
+    Get(21, Terran.SCV),
+    Get(13, Terran.Marine))
+
+  class NeedTurret extends Or(
+    new EnemyHasShown(Zerg.HydraliskDen),
+    new EnemyHasShown(Zerg.Hydralisk),
+    new EnemyHasShown(Zerg.LurkerEgg),
+    new EnemyHasShown(Zerg.Lurker))
 
   override def buildPlans: Seq[Plan] = Seq(
     new DefendFightersAgainstEarlyPool,
-    new TechContinuously(Terran.Stim),
-    new PumpRatio(Terran.Medic, 2, 6, Seq(Friendly(Terran.Marine, 0.2))),
-    new PumpRatio(Terran.Firebat, 0, 2, Seq(Friendly(Terran.Marine, 0.1))),
-    new Pump(Terran.Marine),
-    new Trigger(
-      new Or(
-        new TechStarted(Terran.Stim),
-        new GasAtLeast(100)),
-      new CapGasWorkersAt(2)),
-    new If(
-      new TechStarted(Terran.Stim),
-      new RequireMiningBases(2)),
-    new Build(Get(Terran.MarineRange)),
+    new FlipIf(
+      new And(
+        new SafeAtHome,
+        new Not(new NeedTurret)),
+      new Parallel(
+        new If(new NeedTurret, new BuildMissileTurretsAtNatural(1)),
+        new PumpWorkers(oversaturate = true),
+        new PumpRatio(Terran.Medic, 2, 6, Seq(Friendly(Terran.Marine, 0.2))),
+        new PumpRatio(Terran.Firebat, 0, 2, Seq(Friendly(Terran.Marine, 0.1))),
+        new Pump(Terran.Marine),
+        new BuildBunkersAtNatural(1)),
+      new RequireMiningBases(2))
   )
 }

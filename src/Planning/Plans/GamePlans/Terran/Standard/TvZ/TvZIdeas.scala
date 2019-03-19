@@ -37,7 +37,7 @@ object TvZIdeas {
   class TvZ1RaxExpandVs9Pool extends If(
     new EnemyStrategy(With.fingerprints.ninePool, With.fingerprints.overpool),
     new If(
-      new Sticky(new FrameAtLeast(GameTime(2, 50())())),
+      new Sticky(new FrameAtLeast(GameTime(2, 50)())),
       new BuildBunkersAtNatural(1),
       new Parallel(
         new BuildBunkersAtMain(1),

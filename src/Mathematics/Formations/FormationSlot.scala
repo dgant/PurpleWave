@@ -11,6 +11,8 @@ class FormationSlot(unit: FriendlyUnitInfo) {
   private def range(unit: FriendlyUnitInfo): Double = {
     if (unit.isSiegeTankUnsieged() && unit.player.hasTech(Terran.SiegeMode))
       Terran.SiegeTankSieged.effectiveRangePixels
+    else if (unit.is(Terran.Medic))
+      Terran.Marine.effectiveRangePixels - 16
     else
       (unit.loadedUnits.map(_.effectiveRangePixels) ++ Seq(unit.effectiveRangePixels)).max
   }

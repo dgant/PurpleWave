@@ -27,7 +27,8 @@ class TvP1RaxFE extends GameplanTemplate {
     new Latch(
       new And(
         new Employing(TvPSiegeExpandBunker, TvPFDStrong, TvP2FacJoyO),
-        new EnemyStrategy(With.fingerprints.gasSteal))))
+        new EnemyStrategy(With.fingerprints.gasSteal, With.fingerprints.forgeFe, With.fingerprints.nexusFirst))))
+
   override val completionCriteria = new Latch(new And(
     new BasesAtLeast(2),
     new TechStarted(Terran.SiegeMode),
@@ -54,7 +55,7 @@ class TvP1RaxFE extends GameplanTemplate {
       Get(Terran.Barracks),
       Get(15, Terran.SCV),
       Get(2,  Terran.CommandCenter),
-      Get(1,  Terran.Marine),
+      Get(Terran.Marine),
       Get(2,  Terran.SupplyDepot),
       Get(Terran.Refinery)),
     new Pump(Terran.Marine, 4),
@@ -65,8 +66,7 @@ class TvP1RaxFE extends GameplanTemplate {
       new Build(
         Get(18, Terran.SCV),
         Get(Terran.Factory)),
-      new BuildBunkersAtNatural(1))
-  )
+      new BuildBunkersAtNatural(1)))
 
   override def buildPlans: Seq[Plan] = Seq(
     new RepairBunker,

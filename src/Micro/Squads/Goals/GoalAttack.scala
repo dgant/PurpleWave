@@ -44,7 +44,7 @@ class GoalAttack extends GoalBasic {
       ByOption.min(With.geography.enemyBases.map(_.heart.tileDistanceFast(focusUs)))
         .getOrElse(With.intelligence.mostBaselikeEnemyTile.tileDistanceFast(focusUs))
 
-    lazy val enemyNonTrollyThreats = With.units.enemy.count(u => u.is(UnitMatchWarriors) && u.possiblyStillThere && ! u.is(Terran.Vulture))
+    lazy val enemyNonTrollyThreats = With.units.enemy.count(u => u.is(UnitMatchWarriors) && u.possiblyStillThere && ! u.is(Terran.Vulture) && u.detected)
     if (With.enemies.exists( ! _.isZerg)
       && threatDistanceToUs < threatDistanceToEnemy
       && enemyNonTrollyThreats > 6) {

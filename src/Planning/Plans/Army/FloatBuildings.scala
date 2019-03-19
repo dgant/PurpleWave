@@ -5,13 +5,13 @@ import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountEverything
-import Planning.UnitMatchers.UnitMatchOr
+import Planning.UnitMatchers.{UnitMatchOr, UnitMatcher}
 import ProxyBwapi.Races.Terran
 
-class FloatBuildings extends Plan {
+class FloatBuildings(val toFloat: UnitMatcher = UnitMatchOr(Terran.Barracks, Terran.EngineeringBay)) extends Plan {
 
   val floaties: LockUnits = new LockUnits {
-    unitMatcher.set(UnitMatchOr(Terran.Barracks, Terran.EngineeringBay))
+    unitMatcher.set(toFloat)
     unitCounter.set(UnitCountEverything)
   }
 

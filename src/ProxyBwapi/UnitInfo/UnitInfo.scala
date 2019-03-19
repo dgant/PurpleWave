@@ -545,7 +545,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   
   def visibleToOpponents: Boolean =
     if (isFriendly)
-      With.grids.enemyVision.isSet(tileIncludingCenter)
+      With.grids.enemyVision.isSet(tileIncludingCenter) && With.framesSince(lastFrameTakingDamage) > GameTime(0, 2)()
     else
       visible
   

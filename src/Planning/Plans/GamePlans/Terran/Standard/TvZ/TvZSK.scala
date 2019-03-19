@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, Attack, EjectScout}
+import Planning.Plans.Army.{Aggression, Attack, EjectScout, FloatBuildings}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -172,6 +172,12 @@ class TvZSK extends GameplanTemplate {
           Get(Terran.Starport),
           Get(Terran.ScienceFacility),
           Get(2, Terran.Starport)))),
+
+    new If(
+      new And(
+        new UpgradeComplete(Terran.BioArmor, 3),
+        new UpgradeComplete(Terran.BioDamage, 3)),
+      new FloatBuildings(Terran.EngineeringBay)),
 
     new Trigger(
       new UnitsAtLeast(1, Terran.ScienceFacility),

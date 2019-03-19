@@ -15,6 +15,9 @@ object TvE1RaxSCVMarine extends Strategy {
 
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(
     With.fingerprints.forgeFe,
-    With.fingerprints.fourPool
+    With.fingerprints.fourPool,
+    With.fingerprints.twoGate,
+    With.fingerprints.bbs,
+    With.fingerprints.twoRax1113,
   )
 }

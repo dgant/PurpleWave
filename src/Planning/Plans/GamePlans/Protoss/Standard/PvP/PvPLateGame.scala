@@ -120,7 +120,8 @@ class PvPLateGame extends GameplanTemplate {
       new And(
         new UnitsAtLeast(1, Protoss.ArbiterTribunal),
         new GasPumpsAtLeast(5),
-        new MiningBasesAtLeast(4)),
+        new MiningBasesAtLeast(4),
+        new SupplyOutOf200(190)),
       new Build(Get(2, Protoss.Stargate))),
     new Build(Get(Protoss.Stasis)))
 

@@ -33,6 +33,7 @@ class TvT1RaxFE extends GameplanTemplate {
 
   val naturalZone: Zone = With.geography.ourNatural.zone
   override lazy val blueprints: Seq[Blueprint] = Seq(
+    new Blueprint(this, building = Some(Terran.Bunker),       preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(96)),
     new Blueprint(this, building = Some(Terran.Barracks),     preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(0)),
     new Blueprint(this, building = Some(Terran.SupplyDepot),  preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(0)),
     new Blueprint(this, building = Some(Terran.SupplyDepot),  preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(0))

@@ -25,6 +25,10 @@ object TargetFilterFutility extends TargetFilter {
   // Ignore them if they're distractions.
   //
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
+    if ( ! actor.canMove && ! actor.inRangeToAttack(target)) {
+      return false
+    }
+
     if (With.blackboard.pushKiters.get) {
       return true
     }

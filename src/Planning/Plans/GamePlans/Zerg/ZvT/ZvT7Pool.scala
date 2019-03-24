@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
 import Planning.Plans.Army.{AllIn, Attack}
-import Planning.Plans.Basic.Do
+import Planning.Plans.Basic.Write
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
@@ -46,7 +46,7 @@ class ZvT7Pool extends GameplanTemplate {
     Get(Zerg.Extractor))
 
   override def buildPlans: Seq[Plan] = Seq(
-    new Do(() => With.blackboard.pushKiters.set(true)),
+    new Write(With.blackboard.pushKiters, true),
     new AllIn(new EnemiesAtLeast(1, UnitMatchOr(Terran.Vulture, Terran.Factory), complete = true)),
     new If(
       new GasForUpgrade(Zerg.ZerglingSpeed),

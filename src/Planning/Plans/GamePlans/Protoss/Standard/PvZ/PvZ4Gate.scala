@@ -27,9 +27,9 @@ import Strategery.Strategies.Protoss.PvZ4Gate1012
 
 class PvZ4Gate extends GameplanTemplate {
   
-  override val activationCriteria     = new Employing(PvZ4Gate1012)
-  override val completionCriteria     = new Latch(new MiningBasesAtLeast(2))
-  override def buildOrder             = ProtossBuilds.TwoGate1012
+  override val activationCriteria = new Employing(PvZ4Gate1012)
+  override val completionCriteria = new Latch(new MiningBasesAtLeast(2))
+  override def buildOrder      = ProtossBuilds.TwoGate1012
   override def workerPlan      = NoPlan()
   override def scoutPlan       = new ScoutOn(Protoss.Pylon)
   override def scoutExposPlan  = new ScoutExpansionsAt(55)
@@ -38,7 +38,9 @@ class PvZ4Gate extends GameplanTemplate {
       new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.hugTownHall)),
       new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.hugTownHall)),
       new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.hugTownHall)),
-      new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.backPylon)))
+      new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.backPylon)),
+      new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.hugTownHall)),
+      new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.hugTownHall)))
 }
   override def aggressionPlan  = new If(
     new UnitsAtMost(8, UnitMatchWarriors, complete = true),

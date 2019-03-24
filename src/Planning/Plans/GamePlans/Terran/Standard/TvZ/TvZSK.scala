@@ -25,7 +25,9 @@ class TvZSK extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(TvZ5Rax, TvZ2RaxTank, TvZ2RaxNuke, TvZSK)
 
   class CanAttack extends And(
-    new Latch(new UnitsAtLeast(20, UnitMatchWarriors)),
+    new Or(
+      new Employing(TvZ2RaxAcademy),
+      new Latch(new UnitsAtLeast(20, UnitMatchWarriors))),
     new Or(
       new SafeToMoveOut,
       new BasesAtLeast(3),
@@ -104,6 +106,13 @@ class TvZSK extends GameplanTemplate {
         new UpgradeContinuously(Terran.BioDamage),
         new UpgradeContinuously(Terran.BioArmor),
         new UpgradeContinuously(Terran.ScienceVesselEnergy))),
+    new If(
+      new And(
+        new UnitsAtLeast(3, Terran.Battlecruiser),
+        new EnemyHasUpgrade(Zerg.AirArmor)),
+      new Parallel(
+        new Build(Get(Terran.Armory)),
+        new UpgradeContinuously(Terran.AirArmor))),
 
     new Pump(Terran.Ghost, 2),
     new If(new UnitsAtLeast(1, Terran.SiegeTankUnsieged), new TechContinuously(Terran.SiegeMode)),

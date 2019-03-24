@@ -4,7 +4,7 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.{AllIn, Attack}
-import Planning.Plans.Basic.Do
+import Planning.Plans.Basic.{Do, Write}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{ScoutSafelyWithOverlord, UpgradeHydraRangeThenSpeed}
@@ -99,7 +99,7 @@ class ZvT3HatchLing extends GameplanTemplate {
   override def buildPlans: Seq[Plan] = Seq(
 
     new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = GameTime(1, 0)()),
-    new Do(() => With.blackboard.preferCloseExpansion.set(true)),
+    new Write(With.blackboard.preferCloseExpansion, true),
 
     new If(
       new And(

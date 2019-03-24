@@ -155,20 +155,28 @@ object PvTIdeas {
     new PumpRatio(Protoss.Dragoon, 1, 3, Seq(Enemy(Terran.Vulture, 1.0), Enemy(Terran.Wraith, 1.0))),
     new PumpRatio(Protoss.Dragoon, 1, 20, Seq(Enemy(Terran.Vulture, 0.6), Enemy(Terran.Wraith, 0.5))))
 
+  class EnemyHasMines extends Or(
+    new EnemyHasShown(Terran.SpiderMine),
+    new EnemyHasTech(Terran.SpiderMinePlant))
+
   class TrainDarkTemplar extends If(
     new Or(
-      new UnitsAtMost(0, UnitMatchOr(Protoss.Arbiter, Protoss.ArbiterTribunal)),
+      new UnitsAtMost(0, UnitMatchOr(Protoss.Arbiter, Protoss.ArbiterTribunal), complete = true),
       new And(
         new UnitsAtMost(0, Protoss.Arbiter, complete = true),
-        new EnemyStrategy(
-          With.fingerprints.fiveRax,
-          With.fingerprints.bbs,
-          With.fingerprints.twoRax1113,
-          With.fingerprints.twoFac,
-          With.fingerprints.threeFac))),
+        new Or(
+          new Not(new EnemyHasMines),
+          new EnemyStrategy(
+            With.fingerprints.fiveRax,
+            With.fingerprints.bbs,
+            With.fingerprints.twoRax1113,
+            With.fingerprints.twoFac,
+            With.fingerprints.threeFac)))),
     new If(
       new And(
-        new EnemiesAtMost(8, Terran.Vulture),
+        new Or(
+          new EnemiesAtMost(5, Terran.Vulture),
+          new Not(new EnemyHasMines)),
         new EnemyUnitsNone(Terran.ScienceVessel),
         new EnemyUnitsNone(UnitMatchCustom((unit) => unit.is(Terran.MissileTurret) && unit.zone.owner.isNeutral))),
       new Pump(Protoss.DarkTemplar, 4)))

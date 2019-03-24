@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvE
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Aggression, Attack, EjectScout, RecruitFreelancers}
-import Planning.Plans.Basic.{Do, NoPlan}
+import Planning.Plans.Basic.{NoPlan, Write}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPool
@@ -64,7 +64,7 @@ class TvE2RaxSCVMarine extends GameplanTemplate {
     Get(2, Terran.SupplyDepot))
   
   override def buildPlans: Seq[Plan] = Vector(
-    new Do(() => With.blackboard.pushKiters.set(true)),
+    new Write(With.blackboard.pushKiters, true),
     new DefendFightersAgainstEarlyPool,
     new Pump(Terran.Marine),
     new Pump(Terran.SCV),

@@ -33,6 +33,7 @@ object Manners {
   }
   
   private def surrender() {
+    chat("Well played.")
     With.game.leaveGame()
   }
   

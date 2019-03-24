@@ -1,5 +1,6 @@
 package Strategery.Strategies.Protoss
 
+import Information.Intelligenze.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Strategery.Strategies.Strategy
 import Strategery.{MapGroups, StarCraftMap}
@@ -37,7 +38,10 @@ object PvZ4Gate1012 extends PvZ2GateOpening {
 object PvZ4Gate99 extends PvZ2GateOpening {
   override def choices: Iterable[Iterable[Strategy]] = Vector(ProtossChoices.pvzMidgameTransitioningFromOneBase)
 }
-object PvZFFEConservative extends PvZFFEOpening
+object PvZFFEConservative extends PvZFFEOpening {
+  override def responsesWhitelisted: Iterable[Fingerprint] = Vector(With.fingerprints.fourPool)
+  override def allowedVsHuman: Boolean = false
+}
 object PvZFFEEconomic     extends PvZFFEOpening
 object PvZGatewayFE       extends PvZFFEOpening {
   override def minimumGamesVsOpponent: Int = 1

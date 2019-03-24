@@ -4,8 +4,8 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Attack, RecruitFreelancers}
-import Planning.Plans.Basic.{Do, NoPlan}
+import Planning.Plans.Army.{Aggression, Attack, RecruitFreelancers}
+import Planning.Plans.Basic.{Do, NoPlan, Write}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
@@ -41,7 +41,7 @@ class TvEProxy5Rax extends GameplanTemplate {
         new ScoutAt(10, 2),
         new ScoutAt(10))))
 
-  override val aggression: Double = 1.5
+  override def aggressionPlan = new Aggression(1.5)
   override def workerPlan: Plan = NoPlan()
   override def supplyPlan: Plan = NoPlan()
   override def attackPlan: Plan = new Parallel(new Attack, new Attack(Terran.SCV))
@@ -55,7 +55,7 @@ class TvEProxy5Rax extends GameplanTemplate {
   )
 
   override def buildPlans: Seq[Plan] = Vector(
-    new Do(() => With.blackboard.pushKiters.set(true)),
+    new Write(With.blackboard.pushKiters, true),
     new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
     new Pump(Terran.Marine),
     new If(

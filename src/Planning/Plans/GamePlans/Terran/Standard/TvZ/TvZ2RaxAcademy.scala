@@ -9,13 +9,15 @@ import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPo
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackSafely
 import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic._
+import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Terran.{BuildBunkersAtNatural, BuildMissileTurretsAtNatural}
+import Planning.Plans.Macro.Terran.{BuildBunkersAtMain, BuildBunkersAtNatural, BuildMissileTurretsAtNatural}
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
-import Planning.Predicates.Milestones.{EnemyHasShown, MiningBasesAtLeast, UnitsAtLeast}
+import Planning.Predicates.Milestones.{EnemyHasShown, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
+import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran.TvZ2RaxAcademy
@@ -30,14 +32,18 @@ class TvZ2RaxAcademy extends GameplanTemplate {
     new Not(new EnemyStrategy(With.fingerprints.fourPool)),
     new If(
       new StartPositionsAtLeast(3),
-      new ScoutOn(Terran.Barracks, quantity = 2, scoutCount = 2),
-      new ScoutOn(Terran.Barracks, quantity = 2)))
+      new ScoutOn(Terran.Barracks, quantity = 1, scoutCount = 2),
+      new ScoutOn(Terran.Barracks, quantity = 1)))
 
   override def workerPlan: Plan = NoPlan()
 
   override def emergencyPlans: Seq[Plan] = Seq(
-    new TvZFourPoolEmergency
-  )
+    new TvZFourPoolEmergency,
+    new If(
+      new And(
+        new EnemyStrategy(With.fingerprints.ninePool),
+        new UnitsAtLeast(2, Terran.Barracks)),
+      new BuildBunkersAtMain(1)))
 
   override def buildOrder: Seq[BuildRequest] = Seq(
     Get(9, Terran.SCV),
@@ -79,6 +85,11 @@ class TvZ2RaxAcademy extends GameplanTemplate {
 
   override def buildPlans: Seq[Plan] = Seq(
     new DefendFightersAgainstEarlyPool,
+    // Hack to work around bug where we frequently build an extra Barracks
+    new If(
+      new UnitsAtLeast(2, Terran.Barracks, complete = true),
+      new CancelIncomplete(Terran.Barracks)),
+
     new FlipIf(
       new And(
         new SafeAtHome,
@@ -86,10 +97,16 @@ class TvZ2RaxAcademy extends GameplanTemplate {
       new Parallel(
         new If(new NeedTurret, new BuildMissileTurretsAtNatural(1)),
         new PumpWorkers(oversaturate = true),
-        new PumpRatio(Terran.Medic, 2, 6, Seq(Friendly(Terran.Marine, 0.2))),
+        new If(
+          new UnitsAtMost(2, UnitMatchWarriors),
+          new Pump(Terran.Firebat, 2)),
+        new PumpRatio(Terran.Medic, 2, 6, Seq(Friendly(UnitMatchOr(Terran.Marine, Terran.Firebat), 0.2))),
         new PumpRatio(Terran.Firebat, 0, 2, Seq(Friendly(Terran.Marine, 0.1))),
         new Pump(Terran.Marine),
-        new BuildBunkersAtNatural(1)),
+        // Hack to force placement of emergency bunkers in the main, not the natural
+        new Trigger(
+          new UnitsAtLeast(1, Terran.Academy),
+          new BuildBunkersAtNatural(1))),
       new RequireMiningBases(2))
   )
 }

@@ -70,10 +70,13 @@ object FightOrFlight extends Action {
         && base.isDefined
         && base.exists(ally.base.contains)
         && ally.visibleToOpponents
-        && ally.matchups.framesOfSafety <= Math.max(0, unit.matchups.framesOfSafety)
-        && ally.base.exists(_.units.exists(resource =>
-          resource.resourcesLeft > 0
-          && resource.pixelDistanceCenter(ally) < With.configuration.workerDefenseRadiusPixels))
+        && ally.matchups.framesOfSafety <= 24 + Math.max(0, unit.matchups.framesOfSafety)
+        && (
+          ! ally.agent.canFlee
+          || ally.base.exists(_.units.exists(resource =>
+            resource.resourcesLeft > 0
+            && resource.pixelDistanceCenter(ally) < With.configuration.workerDefenseRadiusPixels)))
+        && ally.matchups.threats.exists(u.canAttack)
       )
       output
     }))
@@ -103,8 +106,9 @@ object FightOrFlight extends Action {
       && (ally.subjectiveValue > unit.subjectiveValue || ally.unitClass.isBuilding)
       && ( ! ally.unitClass.isBuilding || ally.matchups.threatsInRange.nonEmpty)
       && (ally.friendly.forall(_.agent.ride.exists(_.pixelDistanceEdge(ally) > 96)) || ally.matchups.threatsInRange.nonEmpty)
-      && ally.matchups.framesOfSafety <= 12 + Math.max(0, unit.matchups.framesOfSafety)))
-    )
+      && ally.matchups.framesOfSafety <= 24 + Math.max(0, unit.matchups.framesOfSafety))
+      && (ally.unitClass.isSpellcaster || ally.matchups.threats.exists(unit.canAttack))
+    ))
 
     decide(true, getaway, () => unit.agent.ride.exists(ride => {
       val rideDistance = Math.max(0.0, ride.pixelDistanceCenter(unit) - Shuttling.pickupRadius - 32)

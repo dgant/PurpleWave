@@ -2,7 +2,7 @@ package Information.Intelligenze.Fingerprinting.ProtossStrategies
 
 import Information.Intelligenze.Fingerprinting.Generic._
 import Lifecycle.With
-import Planning.UnitMatchers.{UnitMatchNot, UnitMatchProxied}
+import Planning.UnitMatchers.{UnitMatchBuilding, UnitMatchNot, UnitMatchProxied}
 import ProxyBwapi.Races.Protoss
 import Utilities.ByOption
 import bwapi.Race
@@ -16,12 +16,13 @@ abstract class FingerprintFFE extends FingerprintAnd(
   
   private class Status {
     lazy val forge                  = With.units.enemy.find(_.is(Protoss.Forge))
-    lazy val cannon                 = With.units.enemy.filter(_.isAll(Protoss.PhotonCannon, UnitMatchNot(UnitMatchProxied))).toVector
+    lazy val cannonsWalled          = With.units.enemy.filter(_.isAll(Protoss.PhotonCannon, UnitMatchNot(UnitMatchProxied))).toVector
+    lazy val buildingsProxied       = With.units.enemy.filter(_.isAll(UnitMatchBuilding, UnitMatchProxied)).toVector
     lazy val gateway                = With.units.enemy.find(_.is(Protoss.Gateway))
     lazy val zealot                 = With.units.enemy.filter(_.is(Protoss.Zealot)).toVector
-    lazy val forgeOrCannon          = cannon ++ forge
+    lazy val forgeOrCannon          = cannonsWalled ++ forge
     lazy val gatewayOrZealot        = gateway ++ zealot
-    lazy val forgeCompletionFrame   = forge.map(_.completionFrame).orElse(ByOption.min(cannon.map(_.frameDiscovered)))
+    lazy val forgeCompletionFrame   = forge.map(_.completionFrame).orElse(ByOption.min(cannonsWalled.map(_.frameDiscovered)))
     lazy val gatewayCompletionFrame = gateway.map(_.completionFrame).orElse(ByOption.min(zealot.map(_.frameDiscovered)))
   }
   
@@ -39,13 +40,18 @@ abstract class FingerprintFFE extends FingerprintAnd(
   
   private def gatewayUnlikely(status: Status): Boolean = status.gatewayOrZealot.isEmpty
   
-  private def conclusivelyForge(status: Status): Boolean = {
-    readyToDecide(status) && (gatewayUnlikely(status) || lossFFE(status) < lossGatewayFE(status))
-  }
+  private def conclusivelyForge(status: Status): Boolean = (
+    status.buildingsProxied.isEmpty
+      && readyToDecide(status)
+      && (gatewayUnlikely(status) || lossFFE(status) < lossGatewayFE(status))
+  )
   
-  private def conclusivelyGateway(status: Status): Boolean = {
-    readyToDecide(status) && ! gatewayUnlikely(status) && lossFFE(status) >= lossGatewayFE(status)
-  }
+  private def conclusivelyGateway(status: Status): Boolean = (
+    status.buildingsProxied.isEmpty
+      && (With.fingerprints.gatewayFirst.matches
+      || (With.units.enemy.exists(u => u.is(Protoss.Gateway) && u.complete) && With.units.enemy.exists(u => u.is(Protoss.Forge) && ! u.complete))
+      || (readyToDecide(status) && ! gatewayUnlikely(status) && lossFFE(status) >= lossGatewayFE(status)))
+  )
   
   private def lossFFE(status: Status): Int = (
     Math.abs(status.forgeCompletionFrame.getOrElse(With.frame + Protoss.Forge.buildFrames) - expectedFFEForge)

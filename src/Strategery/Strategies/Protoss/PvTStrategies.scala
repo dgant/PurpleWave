@@ -24,7 +24,6 @@ object PvT13Nexus extends PvTBasicOpener {
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fiveRax,
     With.fingerprints.bbs)
-  override def rushDistanceMinimum: Int = super.rushDistanceMinimum
   override def startLocationsMin: Int = 4
 }
 object PvT21Nexus extends PvTBasicOpener

@@ -16,7 +16,9 @@ class Bot() extends DefaultBWListener {
 
   override def onFrame() {
     try {
-      if (With.frame < 6) With.logger.debug("OnFrame: Frame " + With.frame)
+      if (With.frame < 6) {
+        With.logger.debug("OnFrame: Frame " + With.frame)
+      }
       With.performance.startFrame()
       With.onFrame()
       if ( ! With.configuration.doAbsolutelyNothing) {
@@ -25,6 +27,13 @@ class Bot() extends DefaultBWListener {
       With.performance.endFrame()
     }
     catch { case exception: Exception => With.logger.onException(exception) }
+
+    // If we don't initialize static units on frame 0 we're in trouble
+    try {
+      if (With.frame == 0 && With.units.neutral.isEmpty) {
+        With.units.update()
+      }
+    } catch { case exception: Exception => With.logger.onException(exception) }
   }
 
   override def onUnitComplete(unit: bwapi.Unit) {

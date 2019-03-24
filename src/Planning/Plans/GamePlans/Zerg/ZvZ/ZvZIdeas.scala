@@ -25,5 +25,9 @@ object ZvZIdeas {
       new If(
         new UnitsAtLeast(2, Zerg.SunkenColony, complete = true),
         new Pump(Zerg.Drone, 9)),
-      new PumpRatio(Zerg.Zergling, 0, 12, Seq(Enemy(Zerg.Zergling, 1.0)))))
+      new PumpRatio(Zerg.Zergling, 0, 12, Seq(Enemy(Zerg.Zergling, 1.0))),
+      new If(
+        new UnitsAtLeast(8, Zerg.Drone, countEggs = true),
+        new BuildSunkensInMain(4))
+    ))
 }

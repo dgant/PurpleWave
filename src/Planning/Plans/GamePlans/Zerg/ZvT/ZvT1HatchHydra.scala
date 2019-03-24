@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.{AllIn, Attack}
-import Planning.Plans.Basic.Do
+import Planning.Plans.Basic.Write
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
@@ -57,7 +57,7 @@ class ZvT1HatchHydra extends GameplanTemplate {
   override def buildOrder = if (With.geography.startLocations.size < 3) poolOn8 else poolOn9
 
   override def buildPlans = Seq(
-    new Do(() => With.blackboard.pushKiters),
+    new Write(With.blackboard.pushKiters, true),
     new FloorGasWorkersAt(1),
     new AllIn(new EnemiesAtLeast(1, Terran.Bunker)),
     new If(

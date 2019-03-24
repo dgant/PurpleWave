@@ -40,6 +40,7 @@ object Terran {
   def PhysicsLab            = UnitClasses.get(UnitType.Terran_Physics_Lab)
   def Comsat                = UnitClasses.get(UnitType.Terran_Comsat_Station)
   def NuclearSilo           = UnitClasses.get(UnitType.Terran_Nuclear_Silo)
+  def SpellScannerSweep     = UnitClasses.get(UnitType.Spell_Scanner_Sweep)
   def WraithEnergy          = Upgrades.get(UpgradeType.Apollo_Reactor)
   def MedicEnergy           = Upgrades.get(UpgradeType.Caduceus_Reactor)
   def GoliathAirRange       = Upgrades.get(UpgradeType.Charon_Boosters)

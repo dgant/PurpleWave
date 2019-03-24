@@ -4,7 +4,7 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Aggression, Attack, EjectScout, Hunt}
-import Planning.Plans.Basic.Do
+import Planning.Plans.Basic.Write
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{MorphLurkers, UpgradeHydraRangeThenSpeed}
@@ -90,7 +90,7 @@ class ZvT2HatchLurker extends GameplanTemplate {
   class HydraMuta extends Parallel(
 
     new CapGasAtRatioToMinerals(1.0, 100),
-    new Do(() => With.blackboard.preferCloseExpansion.set(true)),
+    new Write(With.blackboard.preferCloseExpansion, true),
     new CancelOrders(UnitMatchTeching(Zerg.LurkerMorph)),
     new CancelOrders(UnitMatchUpgrading(Zerg.ZerglingSpeed)),
 

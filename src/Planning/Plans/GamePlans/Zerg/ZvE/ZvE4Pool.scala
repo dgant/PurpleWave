@@ -5,7 +5,7 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, AllIn, Attack}
-import Planning.Plans.Basic.{Do, NoPlan}
+import Planning.Plans.Basic.{NoPlan, Write}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, ExtractorTrick, Pump}
@@ -60,7 +60,7 @@ class ZvE4Pool extends GameplanTemplate {
   override def buildPlans: Seq[Plan] = Vector(
 
     new CapGasAt(0, 0, 0.0),
-    new Do(() => With.blackboard.pushKiters.set(true)),
+    new Write(With.blackboard.pushKiters, true),
     new AllIn(new EnemiesAtLeast(1, Protoss.PhotonCannon)),
   
     new Pump(Zerg.Drone, 3),

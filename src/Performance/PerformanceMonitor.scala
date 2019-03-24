@@ -60,15 +60,15 @@ class PerformanceMonitor {
   }
 
   def continueRunning: Boolean = {
-    millisecondsLeftThisFrame > 1 || ! enablePerformanceStops
+    With.frame == 0 || millisecondsLeftThisFrame > 1 || ! enablePerformanceStops
   }
 
   def violatedThreshold: Boolean = {
-    millisecondsLeftThisFrame <= 0
+    With.frame > 0 && millisecondsLeftThisFrame <= 0
   }
 
   def violatedRules: Boolean = {
-    millisecondsSpentThisFrame >= 55
+    With.frame > 0 && millisecondsSpentThisFrame >= 55
   }
 
   def danger: Boolean = (

@@ -4,7 +4,7 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Aggression, Attack, Hunt}
-import Planning.Plans.Basic.{Do, NoPlan}
+import Planning.Plans.Basic.{Do, NoPlan, Write}
 import Planning.Plans.Compound.{Or, _}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.PlaceGatewaysProxied
@@ -121,7 +121,7 @@ class PvEProxy2Gate extends GameplanTemplate {
   )
   
   override def buildPlans = Vector(
-    new Do(() => With.blackboard.pushKiters.set(true)),
+    new Write(With.blackboard.pushKiters, true),
     new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
     new Trigger(new UnitsAtLeast(2, Protoss.Gateway),
       initialBefore = new BeforeProxy,

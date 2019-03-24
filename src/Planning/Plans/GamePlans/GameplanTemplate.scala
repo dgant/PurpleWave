@@ -21,14 +21,13 @@ import Planning.Predicates.Strategy.WeAreZerg
 abstract class GameplanTemplate extends GameplanMode {
   
   val meldArchonsAt         : Int               = 40
-  val aggression            : Double            = 1.0
   val removeMineralBlocksAt : Int               = 40
   def blueprints            : Seq[Blueprint]    = Seq.empty
   val superSaturate         : Boolean           = false
   def buildOrder            : Seq[BuildRequest] = Vector.empty
   def emergencyPlans        : Seq[Plan]         = Vector.empty
   def buildPlans            : Seq[Plan]         = Vector.empty
-  def aggressionPlan        : Plan              = new Aggression(aggression)
+  def aggressionPlan        : Plan              = NoPlan()
   def placementPlan         : Plan              = new ProposePlacement(blueprints: _*)
   def archonPlan            : Plan              = new MeldArchons(meldArchonsAt)
   def buildOrderPlan        : Plan              = new BuildOrder(buildOrder: _*)

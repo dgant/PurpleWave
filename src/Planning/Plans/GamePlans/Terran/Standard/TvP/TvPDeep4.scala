@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -10,10 +10,11 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Terran.{BuildBunkersAtNatural, BuildMissileTurretsAtBases, BuildMissileTurretsAtNatural}
-import Planning.Predicates.Milestones.{EnemyHasShown, UnitsAtLeast}
+import Planning.Predicates.Compound.And
+import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemyHasShown, UnitsAtLeast}
 import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
 import Planning.Predicates.Strategy.Employing
-import Planning.UnitMatchers.UnitMatchOr
+import Planning.UnitMatchers.{UnitMatchOr, UnitMatchSiegeTank}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvPDeep4
@@ -28,7 +29,9 @@ class TvPDeep4 extends GameplanTemplate {
     new TvPIdeas.TvPAttack,
     new Trigger(
       new UnitsAtLeast(12, UnitMatchOr(Terran.Marine, Terran.Medic), complete = true),
-      new Attack))
+      new Parallel(
+        new Aggression(1.5),
+        new Attack)))
 
   override def workerPlan: Plan = new Parallel(
     new If(
@@ -48,6 +51,15 @@ class TvPDeep4 extends GameplanTemplate {
       Get(Terran.MachineShop)),
     new BuildBunkersAtNatural(1),
     new BuildGasPumps,
+    new If(
+      new And(
+        new UnitsAtLeast(5, UnitMatchSiegeTank),
+        new EnemiesAtLeast(1, UnitMatchOr(Protoss.Arbiter, Protoss.DarkTemplar))),
+      new Build(
+        Get(Terran.Starport),
+        Get(Terran.ScienceFacility),
+        Get(Terran.ControlTower),
+        Get(Terran.ScienceVessel))),
     new Pump(Terran.SiegeTankUnsieged, 2),
     new Build(Get(Terran.SiegeMode)),
     new FlipIf(

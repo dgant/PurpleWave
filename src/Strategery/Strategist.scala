@@ -98,6 +98,7 @@ class Strategist {
     true
   }
 
+  lazy val humanModeEnabled = HistoryLoader.humanModeEnabled
   def isAppropriate(strategy: Strategy): Boolean = {
     lazy val ourRace                  = With.self.raceInitial
     lazy val enemyRacesCurrent        = With.enemies.map(_.raceCurrent).toSet
@@ -114,6 +115,7 @@ class Strategist {
     lazy val disabledOnMap            = strategy.mapsBlacklisted.exists(_.matches) || ! strategy.mapsWhitelisted.forall(_.exists(_.matches))
     lazy val appropriateForOurRace    = strategy.ourRaces.exists(_ == ourRace)
     lazy val appropriateForEnemyRace  = strategy.enemyRaces.exists(race => if (race == Race.Unknown) enemyRaceWasUnknown else (enemyRaceStillUnknown || enemyRacesCurrent.contains(race)))
+    lazy val allowedGivenHumanity     = strategy.allowedVsHuman || ! humanModeEnabled
     lazy val allowedGivenHistory      = allowedGivenOpponentHistory(strategy)
     lazy val allowedForOpponent       = strategy.opponentsWhitelisted.forall(_
       .map(formatName)

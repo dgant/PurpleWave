@@ -47,18 +47,21 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   def repairers: ArrayBuffer[UnitInfo] = ArrayBuffer.empty ++ allies.filter(_.friendly.exists(_.agent.toRepair.contains(me)))
   
   lazy val valuePerDamage                 : Double                = MicroValue.valuePerDamageCurrentHp(me)
-  lazy val vpfDealingMax                  : Double                = splashFactorMax * ByOption.max(targets.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
+  lazy val dpfDealingMax                  : Double                = splashFactorMax * ByOption.max(targets.view.map(me.dpfOnNextHitAgainst)).getOrElse(0.0)
+  lazy val vpfDealingMax                  : Double                = splashFactorMax * ByOption.max(targets.view.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
   lazy val vpfDealingInRange              : Double                = splashFactorInRange * ByOption.max(targetsInRange.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
   lazy val dpfReceiving                   : Double                = threatsInRange.map(_.matchups.dpfDealingDiffused(me)).sum
   lazy val vpfReceiving                   : Double                = valuePerDamage * dpfReceiving
   lazy val vpfNet                         : Double                = vpfDealingInRange - vpfReceiving
   lazy val vpfTargetHeuristic             : Double                = TargetHeuristicVpfEnemy.calculate(me)
+  lazy val framesBeforeAttacking          : Double                = ByOption.max(targets.view.map(me.framesBeforeAttacking)).getOrElse(Forever()).toDouble
   lazy val framesToLive                   : Double                = PurpleMath.nanToInfinity(me.totalHealth / dpfReceiving)
   lazy val doomed                         : Boolean               = framesToLive <= framesOfEntanglement
   lazy val framesOfEntanglementPerThreat  : Map[UnitInfo, Double] = threats.map(threat => (threat, framesOfEntanglementWith(threat))).toMap
   lazy val framesOfEntanglement           : Double                = ByOption.max(framesOfEntanglementPerThreat.values).getOrElse(- Forever())
   lazy val framesOfSafety                 : Double                = - With.latency.latencyFrames - With.reaction.agencyAverage - ByOption.max(framesOfEntanglementPerThreat.values).getOrElse(- Forever().toDouble)
-  
+  lazy val teamFramesOfSafety             : Double                = ByOption.min(alliesInclSelf.view.map(_.matchups.framesOfSafety)).getOrElse(0)
+
   def dpfDealingDiffused(target: UnitInfo): Double = splashFactorInRange * me.dpfOnNextHitAgainst(target) / Math.max(1.0, targetsInRange.size)
   
   def framesOfEntanglementWith(threat: UnitInfo, fixedRange: Option[Double] = None): Double = {

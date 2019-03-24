@@ -56,11 +56,11 @@ class ZvZ10HatchLing extends GameplanTemplate {
     new If(
       new EnemiesAtLeast(1, Zerg.Mutalisk),
       new Attack,
-      new Trigger(
+      new If(
         new Or(
           new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.twelvePool),
           new UpgradeComplete(Zerg.ZerglingSpeed),
-          new UnitsAtLeast(15, Zerg.Zergling)),
+          new UnitsAtLeast(24, Zerg.Zergling)),
         new ConsiderAttacking,
         new Scout { scouts.get.unitMatcher.set(Zerg.Zergling) })))
   
@@ -95,14 +95,13 @@ class ZvZ10HatchLing extends GameplanTemplate {
     new Pump(Zerg.Drone, 9),
     new PumpJustEnoughScourge,
     new PumpMutalisks,
-    new PumpRatio(Zerg.Zergling, 16, 200, Seq(Enemy(Zerg.Zergling, 1.2))),
-
     new If(
       new GasAtLeast(100),
       new Build(
         Get(Zerg.ZerglingSpeed),
         Get(Zerg.Lair),
         Get(Zerg.Spire))),
+    new PumpRatio(Zerg.Zergling, 16, 200, Seq(Enemy(Zerg.Zergling, 1.2))),
     new If(
       new UnitsAtLeast(1, Zerg.SpawningPool, complete = true),
       new Pump(Zerg.Drone, 12)),

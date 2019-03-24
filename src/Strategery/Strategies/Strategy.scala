@@ -32,6 +32,7 @@ abstract class Strategy {
   def mapsWhitelisted         : Option[Iterable[StarCraftMap]]  = None
   def responsesBlacklisted    : Iterable[Fingerprint]           = Vector.empty
   def responsesWhitelisted    : Iterable[Fingerprint]           = Vector.empty
+  def allowedVsHuman          : Boolean                         = false
   def minimumGamesVsOpponent  : Int                             = 0
   
   def active: Boolean = With.strategy.selectedCurrently.contains(this)

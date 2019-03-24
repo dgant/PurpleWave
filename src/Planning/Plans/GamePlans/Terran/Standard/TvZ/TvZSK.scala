@@ -41,7 +41,10 @@ class TvZSK extends GameplanTemplate {
     new EnemyHasShown(Zerg.LurkerEgg))
 
   override def scoutPlan: Plan = NoPlan()
-  override def attackPlan: Plan = new Parallel(new If(new CanAttack, new Attack), new FindExpansions(Terran.Wraith))
+  override def attackPlan: Plan = new Parallel(
+    new If(new CanAttack, new Attack),
+    new FindExpansions(Terran.Wraith),
+    new Attack(Terran.Battlecruiser))
   override def priorityAttackPlan: Plan = new If(new CanAttack, new Attack(UnitMatchOr(Terran.Ghost, Terran.Vulture)))
   override def workerPlan: Plan = new Parallel(
     new Pump(Terran.NuclearSilo, 1),

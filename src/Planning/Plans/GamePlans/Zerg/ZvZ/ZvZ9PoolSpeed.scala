@@ -7,6 +7,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPool
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpMutalisks, ScoutSafelyWithOverlord}
+import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Zerg.BuildSunkensInMain
@@ -31,7 +32,8 @@ class ZvZ9PoolSpeed extends GameplanTemplate {
     new Attack)
 
   override def emergencyPlans: Seq[Plan] = Seq(
-    new ZvZIdeas.ReactToFourPool
+    new ZvZIdeas.ReactToFourPool,
+    new ZergReactionVsWorkerRush
   )
 
   override def buildOrder: Seq[BuildRequest] = Vector(

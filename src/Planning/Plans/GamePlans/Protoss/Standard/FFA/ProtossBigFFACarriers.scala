@@ -1,6 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.FFA
 
 import Macro.BuildRequests.Get
+import Planning.Plans.Army.Aggression
 import Planning.Plans.Basic.NoPlan
 import Planning.Predicates.Compound.{And, Not}
 import Planning.UnitMatchers.UnitMatchWarriors
@@ -22,7 +23,7 @@ class ProtossBigFFACarriers extends GameplanTemplate {
   override val activationCriteria   : Predicate = new Always
   override def placementPlan : Plan = new PlacementForgeFastExpand
   override val scoutPlan     : Plan = NoPlan()
-  override val aggression = 0.6
+  override def aggressionPlan: Plan = new Aggression(0.6)
   
   override val buildOrder = Vector(
     Get(8,   Protoss.Probe),

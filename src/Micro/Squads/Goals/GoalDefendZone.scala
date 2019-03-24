@@ -35,13 +35,13 @@ class GoalDefendZone extends GoalBasic {
       lastAction = "Scour "
       huntEnemies()
     }
-    else if (allowWandering && canDefendChoke) {
-      lastAction = "Protect choke of "
-      defendChoke()
-    }
     else if (walls.nonEmpty) {
       lastAction = "Protect wall of "
       defendHeart(walls.minBy(_.pixelCenter.groundPixels(With.intelligence.mostBaselikeEnemyTile)).pixelCenter)
+    }
+    else if (allowWandering && canDefendChoke) {
+      lastAction = "Protect choke of "
+      defendChoke()
     }
     else {
       lastAction = "Protect heart of "

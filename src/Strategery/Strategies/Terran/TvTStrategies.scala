@@ -10,7 +10,7 @@ abstract class TvTStrategy extends Strategy {
 
 abstract class TvTOpening extends TvTStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
-    TvT5Fac, TvT2Base2Port
+    TvT5Fac, TvT2Base2Port, TvT2BaseBC
   ))
 }
 
@@ -21,12 +21,13 @@ object TvT1FacPort extends TvTOpening
 object TvT2FacTanks extends TvTOpening
 object TvT2Port extends TvTStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
-    TvT2Base2Port
+    TvT2Base2Port, TvT2BaseBC
   ))
 }
 object TvT2Base2Port extends TvTStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
-    TvT5Fac
+    TvT2BaseBC
   ))
 }
 object TvT5Fac extends TvTStrategy
+object TvT2BaseBC extends TvTStrategy

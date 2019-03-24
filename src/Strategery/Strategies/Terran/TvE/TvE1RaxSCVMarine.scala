@@ -13,6 +13,8 @@ object TvE1RaxSCVMarine extends Strategy {
   override def ourRaces: Iterable[Race] = Vector(Race.Terran)
   override def enemyRaces: Iterable[Race] = Vector(Race.Terran, Race.Protoss, Race.Unknown)
 
+  override def allowedVsHuman: Boolean = false
+
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(
     With.fingerprints.forgeFe,
     With.fingerprints.fourPool,

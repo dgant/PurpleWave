@@ -49,7 +49,8 @@ class TvE2RaxSCVMarine extends GameplanTemplate {
   override def workerPlan: Plan = NoPlan()
 
   override def emergencyPlans: Seq[Plan] = Seq(
-    new TvZFourPoolEmergency
+    new TvZFourPoolEmergency,
+    new TerranReactionVsWorkerRush
   )
   
   override val buildOrder = Vector(

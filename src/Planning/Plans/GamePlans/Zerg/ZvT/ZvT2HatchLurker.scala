@@ -8,6 +8,7 @@ import Planning.Plans.Basic.Write
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{MorphLurkers, UpgradeHydraRangeThenSpeed}
+import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.CancelOrders
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -68,7 +69,8 @@ class ZvT2HatchLurker extends GameplanTemplate {
     new Aggression(1.0))
 
   override def emergencyPlans: Seq[Plan] = Seq(
-    new ZvTIdeas.ReactToBarracksCheese
+    new ZvTIdeas.ReactToBarracksCheese,
+    new ZergReactionVsWorkerRush
   )
 
   override def buildOrder = Seq(

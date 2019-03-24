@@ -6,6 +6,7 @@ import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Compound.{If, Parallel, _}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpJustEnoughScourge, PumpJustEnoughZerglings, PumpMutalisks, ScoutSafelyWithOverlord}
+import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas._
 import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -47,6 +48,10 @@ class ZvP3Hatch extends GameplanTemplate {
         new Aggression(1.15))))
   
   override def attackPlan: Plan = new Attack
+
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new ZergReactionVsWorkerRush
+  )
   
   override def buildOrderPlan: Plan = new Parallel(
     new BuildOrder(

@@ -33,7 +33,7 @@ object FightOrFlight extends Action {
     decide(true,  "CantFlee",     () => ! unit.agent.canFlee)
     decide(true,  "Hug",          () => ! unit.flying && unit.matchups.targets.exists(t => unit.pixelDistanceEdge(t) < t.pixelRangeMin))
     decide(false, "Scarabs",      () => unit.is(Protoss.Reaver) && unit.scarabCount == 0)
-    decide(true,  "Cloaked",      () => unit.effectivelyCloaked)
+    decide(true,  "Cloaked",      () => unit.effectivelyCloaked || (unit.is(Terran.Wraith) && unit.energy >= 50 && unit.matchups.enemyDetectors.isEmpty && With.self.hasTech(Terran.WraithCloak)))
     decide(true,  "Lurking",      () => unit.is(Zerg.Lurker) && unit.matchups.enemyDetectors.isEmpty)
     decide(false, "Useless",      () => unit.energyMax == 0 && unit.matchups.threats.nonEmpty && unit.loadedUnits.isEmpty && (
       (unit.canAttack && ! unit.matchups.targets.exists(t => ! unit.agent.canFocus || unit.squadenemies.contains(t)))

@@ -8,7 +8,7 @@ import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitMatchers.UnitMatchOr
 import Planning.Plan
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -38,7 +38,7 @@ class ZvESparkle extends GameplanTemplate {
     }
   }
   
-  override val aggression: Double = 0.8
+  override def aggressionPlan: Plan = new Aggression(0.8)
   
   override def attackPlan: Plan = new Attack(Zerg.Mutalisk)
   

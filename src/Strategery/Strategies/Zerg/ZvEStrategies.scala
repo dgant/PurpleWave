@@ -11,6 +11,9 @@ class ZergStrategy extends Strategy {
 
 object ZvE4Pool extends ZergStrategy {
   override def gameplan: Option[Plan] = Some(new ZvE4Pool)
+
+  // Temporary until we improve scouting
+  override def startLocationsMax: Int = 3
 }
 
 object ZvESparkle extends ZergStrategy {

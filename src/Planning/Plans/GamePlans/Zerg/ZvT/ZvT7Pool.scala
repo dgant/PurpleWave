@@ -8,6 +8,7 @@ import Planning.Plans.Basic.Write
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
+import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAt, Pump}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireBases
@@ -33,6 +34,10 @@ class ZvT7Pool extends GameplanTemplate {
           new UnitsAtLeast(2, Zerg.Overlord, countEggs = true),
           new UnitsAtLeast(8, Zerg.Drone, countEggs = true)),
         new Scout)))
+
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new ZergReactionVsWorkerRush
+  )
 
   override def buildOrder: Seq[BuildRequest] = Seq(
     Get(7, Zerg.Drone),

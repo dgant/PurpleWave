@@ -39,7 +39,8 @@ class ZvR9Pool extends GameplanTemplate {
     new Attack)
 
   override def emergencyPlans: Seq[Plan] = Seq(
-    new ZvZIdeas.ReactToFourPool
+    new ZvZIdeas.ReactToFourPool,
+    new ZergReactionVsWorkerRush
   )
 
   class GoLurkers extends Latch(

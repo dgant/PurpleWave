@@ -15,8 +15,13 @@ class DefendAgainstWorkerRush extends Plan {
   
   override def onUpdate() {
     val attackingWorkers = With.geography.ourBases
-      .flatMap(_.units.filter(u => u.isEnemy && u.unitClass.isWorker))
-      .toSet
+      .flatMap(_.units.filter(u =>
+        u.isEnemy
+        && u.unitClass.isWorker
+        && u.matchups.targets.exists(ally =>
+          (ally.unitClass.isBuilding || ally.friendly.exists(_.agent.toBuild.isDefined))
+          && u.framesToGetInRange(ally) < 24 * 3)))
+      .distinct
   
     lazy val attackingCentroid = PurpleMath.centroid(attackingWorkers.map(_.pixelCenter))
     lazy val ourWorkers = With.units.countOurs(UnitMatchWorkers)

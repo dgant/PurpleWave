@@ -1,11 +1,11 @@
-package Planning.Plans.GamePlans.Terran.Standard.TvE
+package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
 import Micro.Agency.Intention
-import Planning.Plans.Army.{Attack, RecruitFreelancers}
+import Planning.Plans.Army.{Aggression, Attack, RecruitFreelancers}
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -28,7 +28,7 @@ class TvZProxy8Fact extends GameplanTemplate {
 
   override val activationCriteria = new Employing(TvZProxy8Fact)
   
-  override val aggression = 1.5
+  override def aggressionPlan: Plan = new Aggression(1.5)
   
   override def attackPlan: Plan = new Parallel(new Attack, new Attack(Terran.SCV))
   override def scoutPlan: Plan = new ScoutOn(Terran.SCV, quantity = 9)

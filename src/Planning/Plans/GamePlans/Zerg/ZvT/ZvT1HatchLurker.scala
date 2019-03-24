@@ -5,6 +5,7 @@ import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -34,7 +35,11 @@ class ZvT1HatchLurker extends GameplanTemplate {
     new Attack,
     super.attackPlan
   )
-  
+
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new ZergReactionVsWorkerRush
+  )
+
   override def buildPlans: Seq[Plan] = Vector(
     new If(
       new UnitsAtMost(0, Zerg.Lair),

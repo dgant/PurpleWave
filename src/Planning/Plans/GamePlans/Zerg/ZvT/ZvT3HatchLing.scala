@@ -8,6 +8,7 @@ import Planning.Plans.Basic.{Do, Write}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{ScoutSafelyWithOverlord, UpgradeHydraRangeThenSpeed}
+import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -49,7 +50,8 @@ class ZvT3HatchLing extends GameplanTemplate {
     new ScoutSafelyWithOverlord)
 
   override def emergencyPlans: Seq[Plan] = Seq(
-    new ZvTIdeas.ReactToBarracksCheese
+    new ZvTIdeas.ReactToBarracksCheese,
+    new ZergReactionVsWorkerRush
   )
 
   override def buildOrder: Seq[BuildRequest] = Seq(

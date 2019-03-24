@@ -5,6 +5,7 @@ import Macro.BuildRequests.Get
 import Planning.Predicates.Compound.Check
 import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors}
 import Planning.Plan
+import Planning.Plans.Army.Aggression
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -19,7 +20,7 @@ class TerranFFABio extends GameplanTemplate {
   
   override def placementPlan : Plan  = new PlaceBunkersAtNatural(2)
   override val scoutPlan     : Plan  = NoPlan()
-  override val aggression                   = 0.8
+  override def aggressionPlan: Plan = new Aggression(0.8)
   
   private class UpgradeMech extends Parallel(
     new BuildGasPumps,

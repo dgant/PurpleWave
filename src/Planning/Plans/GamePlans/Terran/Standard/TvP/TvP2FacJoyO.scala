@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{Attack, EjectScout}
+import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
@@ -23,7 +23,7 @@ class TvP2FacJoyO extends GameplanTemplate {
   override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
 
   override def scoutPlan: Plan = new ScoutOn(Terran.SupplyDepot, quantity = 2)
-  override val aggression: Double = 1.5
+  override def aggressionPlan: Plan = new Aggression(1.5)
   
   override def attackPlan: Plan = new Parallel(
     new Attack(Terran.Vulture),

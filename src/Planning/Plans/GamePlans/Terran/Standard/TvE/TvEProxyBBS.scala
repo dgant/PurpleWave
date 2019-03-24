@@ -5,7 +5,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{Attack, RecruitFreelancers}
+import Planning.Plans.Army.{Aggression, Attack, RecruitFreelancers}
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -27,8 +27,8 @@ import Strategery.Strategies.Terran.TvE.TvEProxyBBS
 class TvEProxyBBS extends GameplanTemplate {
   
   override val activationCriteria = new Employing(TvEProxyBBS)
-  
-  override val aggression: Double = 1.5
+
+  override def aggressionPlan: Plan = new Aggression(1.5)
   
   lazy val proxyZone: Option[Zone] = ProxyPlanner.proxyMiddle
   

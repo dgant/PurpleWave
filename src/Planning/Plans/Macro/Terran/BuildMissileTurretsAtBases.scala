@@ -5,6 +5,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
 import Macro.BuildRequests.{Get, GetAnother}
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete}
 import Planning.{Plan, Property}
 import ProxyBwapi.Races.Terran
 
@@ -18,12 +19,10 @@ class BuildMissileTurretsAtBases(
   override def onUpdate() {
     val bases = eligibleBases
     if (eligibleBases.nonEmpty) {
-      if (With.units.existsOurs(Terran.EngineeringBay)) {
+      if (With.units.existsOurs(UnitMatchAnd(Terran.EngineeringBay, UnitMatchComplete))) {
         eligibleBases.foreach(turretBase)
       }
-      else {
-        With.scheduler.request(this, Get(Terran.EngineeringBay))
-      }
+      With.scheduler.request(this, Get(Terran.EngineeringBay))
     }
   }
   

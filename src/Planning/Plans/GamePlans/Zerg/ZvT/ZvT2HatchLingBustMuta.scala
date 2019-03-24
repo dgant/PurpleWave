@@ -6,6 +6,7 @@ import Planning.Plans.Army.{AllIn, Attack, EjectScout}
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
+import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases}
 import Planning.Plans.Macro.Zerg.{BuildSunkensAtExpansions, BuildSunkensAtNatural}
@@ -30,7 +31,8 @@ class ZvT2HatchLingBustMuta extends GameplanTemplate {
     new Attack)
 
   override def emergencyPlans: Seq[Plan] = Seq(
-    new ZvTIdeas.ReactToBarracksCheese
+    new ZvTIdeas.ReactToBarracksCheese,
+    new ZergReactionVsWorkerRush
   )
 
   // Based on Effort vs. Flash's 1-1-1:

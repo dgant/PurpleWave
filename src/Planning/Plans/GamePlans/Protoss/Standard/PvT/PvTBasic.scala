@@ -14,7 +14,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.Plans.Scouting.{Scout, ScoutCleared, ScoutOn}
-import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
@@ -110,7 +110,7 @@ class PvTBasic extends GameplanTemplate {
   class EmployingTwoBase    extends Employing(PvT2BaseCarrier, PvT2BaseArbiter)
   class EmployingThreeBase  extends Employing(PvT3BaseCarrier, PvT3BaseArbiter)
   class EmployingCarriers   extends Employing(PvT2BaseCarrier, PvT3BaseCarrier)
-  class EmployingArbiters   extends Employing(PvT2BaseArbiter, PvT3BaseArbiter)
+  class EmployingArbiters   extends Or(new Employing(PvT2BaseArbiter, PvT3BaseArbiter), new Check(() => With.units.countEnemy(Terran.Goliath) > Math.max(10, With.units.countOurs(Protoss.Interceptor) / 3)))
 
   class NeedObservers extends Or(
     new EnemyHasShownCloakedThreat,

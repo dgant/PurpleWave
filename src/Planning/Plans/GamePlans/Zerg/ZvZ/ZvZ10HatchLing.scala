@@ -2,10 +2,11 @@ package Planning.Plans.GamePlans.Zerg.ZvZ
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{AllIn, Attack, ConsiderAttacking, Hunt}
+import Planning.Plans.Army._
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpJustEnoughScourge, PumpMutalisks, ScoutSafelyWithOverlord}
+import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Scouting.Scout
@@ -21,10 +22,11 @@ class ZvZ10HatchLing extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(ZvZ10HatchLing)
 
-  override val aggression: Double = 1.25
+  override def aggressionPlan = new Aggression(1.2)
 
   override def emergencyPlans: Seq[Plan] = Seq(
-    new ZvZIdeas.ReactToFourPool
+    new ZvZIdeas.ReactToFourPool,
+    new ZergReactionVsWorkerRush
   )
 
   // https://liquipedia.net/starcraft/10_Hatch_(vs._Zerg)

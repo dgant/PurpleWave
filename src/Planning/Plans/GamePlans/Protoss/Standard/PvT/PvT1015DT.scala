@@ -17,7 +17,6 @@ class PvT1015DT extends GameplanTemplate {
   
   override val activationCriteria = new Employing(PvT1015DT)
   override val completionCriteria = new MiningBasesAtLeast(2)
-  override val aggression = 1.2
   override val superSaturate = true
   override val attackPlan = new Attack
   override def scoutPlan = new ScoutOn(Protoss.Gateway, quantity = 2)

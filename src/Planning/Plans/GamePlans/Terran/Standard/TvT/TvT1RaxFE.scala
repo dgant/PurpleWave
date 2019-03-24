@@ -10,7 +10,7 @@ import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Terran.BuildBunkersAtNatural
+import Planning.Plans.Macro.Terran.{BuildBunkersAtNatural, PopulateBunkers}
 import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones.UnitsAtLeast
@@ -56,6 +56,7 @@ class TvT1RaxFE extends GameplanTemplate {
     Get(Terran.Factory))
 
   override def buildPlans: Seq[Plan] = Seq(
+    new PopulateBunkers,
     new EjectScout,
      new If(
       new Not(new EnemyStrategy(With.fingerprints.fourteenCC, With.fingerprints.oneRaxFE)),

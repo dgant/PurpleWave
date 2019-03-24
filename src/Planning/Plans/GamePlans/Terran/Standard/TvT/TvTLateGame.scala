@@ -10,13 +10,11 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.Employing
-import Planning.UnitMatchers.UnitMatchSiegeTank
+import Planning.UnitMatchers._
 import ProxyBwapi.Races.Terran
-import Strategery.Strategies.Terran.{TvT2Base2Port, TvT5Fac}
+import Strategery.Strategies.Terran.TvT2Base2Port
 
-class TvT5Fac extends GameplanTemplate {
-
-  override val activationCriteria = new Employing(TvT5Fac)
+class TvTLateGame extends GameplanTemplate {
 
   override def attackPlan: Plan = new Parallel(
     new Attack(Terran.Wraith),
@@ -41,6 +39,14 @@ class TvT5Fac extends GameplanTemplate {
     new If(new UnitsAtLeast(8, UnitMatchSiegeTank, complete = true), new RequireMiningBases(3)),
     new UpgradeContinuously(Terran.MechDamage),
     new If(
+      new UnitsAtLeast(2, Terran.Battlecruiser),
+      new Parallel(
+        new Build(Get(Terran.Yamato)),
+        new UpgradeContinuously(Terran.AirArmor),
+        new If(
+          new UpgradeComplete(Terran.AirArmor, 3),
+          new UpgradeContinuously(Terran.AirDamage)))),
+    new If(
       new Or(
         new UnitsAtLeast(2, Terran.Armory),
         new UpgradeComplete(Terran.MechDamage, 3)),
@@ -58,7 +64,17 @@ class TvT5Fac extends GameplanTemplate {
         Get(3, Terran.MachineShop))),
     new If(new GasPumpsAtLeast(4), new Build(Get(6, Terran.MachineShop))),
     new PumpRatio(Terran.Armory, 0, 1, Seq(Enemy(Terran.Wraith, 1.0))),
-    new Pump(Terran.ScienceVessel, 1),
+    new If(
+      new Or(
+        new UnitsAtMost(0, Terran.PhysicsLab),
+        new EnemyHasShownWraithCloak),
+      new Pump(Terran.ScienceVessel, 1)),
+    new If(
+      new Or(
+        new EnemyHasShown(Terran.Wraith),
+        new EnemiesAtLeast(1, UnitMatchAnd(UnitMatchBuilding, UnitMatchCustom(u => u.flying)))),
+      new UpgradeContinuously(Terran.GoliathAirRange)),
+    new Pump(Terran.Battlecruiser),
     new PumpRatio(Terran.Goliath, 0, 50, Seq(Enemy(Terran.Wraith, 3.0), Enemy(Terran.Dropship, 2.0), Enemy(Terran.Battlecruiser, 6.0))),
     new If(new EnemyHasShownWraithCloak, new Build(Get(Terran.Academy), Get(Terran.Starport), Get(Terran.ScienceFacility), Get(Terran.ControlTower))),
     new If(new UnitsAtMost(0, Terran.Armory, complete = true), new PumpRatio(Terran.Marine, 0, 8, Seq(Enemy(Terran.Wraith, 4.0)))),

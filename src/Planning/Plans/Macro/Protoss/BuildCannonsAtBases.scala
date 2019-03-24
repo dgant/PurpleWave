@@ -24,7 +24,7 @@ class BuildCannonsAtBases(
         With.scheduler.request(this, GetAnother(cannonsRequired, Protoss.PhotonCannon))
       }
       else {
-        With.scheduler.request(this, Get(1, Protoss.Forge))
+        With.scheduler.request(this, Get(Protoss.Forge))
       }
     }
   }

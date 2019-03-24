@@ -1,13 +1,14 @@
 package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Lifecycle.With
-import Macro.BuildRequests.Get
+import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
 import Planning.Plans.Army.{AllIn, Attack}
 import Planning.Plans.Basic.Write
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
+import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Expanding.RequireBases
 import Planning.Plans.Scouting.ScoutOn
@@ -54,7 +55,11 @@ class ZvT1HatchHydra extends GameplanTemplate {
     Get(Zerg.HydraliskDen),
     Get(2, Zerg.Overlord))
 
-  override def buildOrder = if (With.geography.startLocations.size < 3) poolOn8 else poolOn9
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new ZergReactionVsWorkerRush
+  )
+
+  override def buildOrder: Seq[BuildRequest] = if (With.geography.startLocations.size < 3) poolOn8 else poolOn9
 
   override def buildPlans = Seq(
     new Write(With.blackboard.pushKiters, true),

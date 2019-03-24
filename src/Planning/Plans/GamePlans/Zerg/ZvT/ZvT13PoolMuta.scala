@@ -7,10 +7,11 @@ import Macro.BuildRequests.Get
 import Planning.Predicates.Compound.Not
 import Planning.UnitCounters.UnitCountOne
 import Planning.{Plan, Predicate}
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
+import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -24,7 +25,7 @@ class ZvT13PoolMuta extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(ZvT13PoolMuta)
   
-  override val aggression: Double = 0.6
+  override def aggressionPlan: Plan = new Aggression(0.7)
   
   override def scoutPlan: Plan = new Parallel(
     new ScoutSafelyWithOverlord,
@@ -33,7 +34,8 @@ class ZvT13PoolMuta extends GameplanTemplate {
       new Attack(Zerg.Zergling, UnitCountOne)))
 
   override def emergencyPlans: Seq[Plan] = Seq(
-    new ZvTIdeas.ReactToBarracksCheese
+    new ZvTIdeas.ReactToBarracksCheese,
+    new ZergReactionVsWorkerRush
   )
 
   override def attackPlan: Plan = new Attack(Zerg.Mutalisk)

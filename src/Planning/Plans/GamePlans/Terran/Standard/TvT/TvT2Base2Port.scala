@@ -8,6 +8,7 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
+import Planning.Plans.Macro.Terran.PopulateBunkers
 import Planning.Predicates.Compound.Latch
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.Employing
@@ -28,6 +29,7 @@ class TvT2Base2Port extends GameplanTemplate {
     new PumpWorkers(oversaturate = false))
 
   override def buildPlans: Seq[Plan] = Seq(
+    new PopulateBunkers,
     new RequireMiningBases(2),
     new BuildGasPumps,
     new Build(
@@ -35,6 +37,7 @@ class TvT2Base2Port extends GameplanTemplate {
       Get(Terran.MachineShop),
       Get(Terran.ControlTower),
       Get(Terran.WraithCloak)),
+    new PumpRatio(Terran.SiegeTankUnsieged, 0, 3, Seq(Enemy(Terran.Goliath, 1.0))),
     new Pump(Terran.Wraith),
     new Pump(Terran.SiegeTankUnsieged),
     new Build(Get(Terran.Academy)),

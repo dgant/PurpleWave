@@ -7,6 +7,7 @@ import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{ScoutSafelyWithDrone, ScoutSafelyWithOverlord}
+import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas._
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -152,7 +153,9 @@ class ZvP2HatchMuta extends GameplanTemplate {
   
   override def emergencyPlans: Seq[Plan] = Vector(
     new Pump(Zerg.SunkenColony),
-    new ReactiveSunkensVsZealots)
+    new ReactiveSunkensVsZealots,
+    new ZergReactionVsWorkerRush
+  )
   
   override def buildPlans: Seq[Plan] = Vector(
     new EjectScout,

@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.FFA
 import Macro.BuildRequests.Get
 import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -21,7 +21,7 @@ class ProtossHuntersFFAFFEScoutReaver extends GameplanTemplate {
   override val activationCriteria   : Predicate = new Always
   override def placementPlan : Plan = new PlacementForgeFastExpand
   override val scoutPlan     : Plan = NoPlan()
-  override val aggression = 0.6
+  override def aggressionPlan: Plan = new Aggression(0.6)
   
   override val buildOrder = Vector(
     Get(8,   Protoss.Probe),

@@ -6,6 +6,7 @@ import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound.{If, _}
+import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
@@ -36,6 +37,8 @@ class ZvTProxyHatch extends Parallel {
     placement    = Some(PlacementProfiles.proxyCannon))
   
   children.set(Vector(
+    new ZergReactionVsWorkerRush,
+
     new If(
       new UnitsAtLeast(1, Zerg.Lair),
       new CapGasAt(400),

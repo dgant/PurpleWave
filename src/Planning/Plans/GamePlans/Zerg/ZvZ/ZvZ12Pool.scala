@@ -6,6 +6,7 @@ import Planning.Plans.Army.{AllIn, Attack, ConsiderAttacking, Hunt}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpJustEnoughScourge, ScoutSafelyWithOverlord}
+import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases}
@@ -35,7 +36,8 @@ class ZvZ12Pool extends GameplanTemplate {
       new ConsiderAttacking))
 
   override def emergencyPlans: Seq[Plan] = Seq(
-    new ZvZIdeas.ReactToFourPool
+    new ZvZIdeas.ReactToFourPool,
+    new ZergReactionVsWorkerRush
   )
 
   override def buildOrder: Seq[BuildRequest] = Vector(

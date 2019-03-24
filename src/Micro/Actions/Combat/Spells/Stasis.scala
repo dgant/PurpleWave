@@ -32,6 +32,7 @@ object Stasis extends TargetedSpell {
         )
       else 0.0)
       )
+
     
     val output = target.subjectiveValue * teamValue
     output

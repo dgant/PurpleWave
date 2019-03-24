@@ -8,6 +8,7 @@ import Planning.Plans.Basic.Do
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{ScoutSafelyWithOverlord, UpgradeHydraSpeedThenRange}
+import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas.OverlordSpeedVsDarkTemplar
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.CancelIncomplete
@@ -37,6 +38,10 @@ class ZvP6Hatch extends GameplanTemplate {
         new Scout)))
 
   override def attackPlan: Plan = new Attack
+
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new ZergReactionVsWorkerRush
+  )
 
   override def buildOrderPlan = new Parallel(
     new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = GameTime(1, 0)()),

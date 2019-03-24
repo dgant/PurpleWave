@@ -5,16 +5,17 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Predicates.Compound.{And, Check}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Predicates.Milestones.{FrameAtLeast, UnitsAtLeast}
 import Planning.Plans.Scouting.Scout
+import Planning.Predicates.Compound.{And, Check}
+import Planning.Predicates.Milestones.{FrameAtLeast, UnitsAtLeast}
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitCounters.UnitCountEverything
 import Planning.{Plan, Predicate, ProxyPlanner}
@@ -51,7 +52,12 @@ class ZvZ5PoolSunkens extends GameplanTemplate {
           blueprintCreepColony,
           blueprintCreepColony)
       })
-  
+
+
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new ZergReactionVsWorkerRush
+  )
+
   override val buildOrder = Vector(
     Get(5, Zerg.Drone),
     Get(Zerg.SpawningPool),

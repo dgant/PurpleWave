@@ -16,6 +16,7 @@ object ZvT13PoolMuta extends ZvTStrategy {
 }
 object ZvT1HatchHydra extends ZvTStrategy {
   override def gameplan: Option[Plan] = Some(new ZvT1HatchHydra)
+  override def allowedVsHuman: Boolean = false
 }
 object ZvT1HatchLurker extends ZvTStrategy {
   override def gameplan: Option[Plan] = Some(new ZvT1HatchLurker)

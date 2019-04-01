@@ -101,7 +101,7 @@ object PlacementProfiles {
     "Forge wall",
     preferZone                  = 100.0,
     preferNatural               = 10.0,
-    preferPowering              = 0.2,
+    preferPowering              = 0.4,
     avoidDistanceFromBase       = 1.0,
     avoidDistanceFromIdealRange = 4.0)
   

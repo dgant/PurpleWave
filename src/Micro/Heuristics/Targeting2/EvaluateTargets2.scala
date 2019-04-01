@@ -1,12 +1,12 @@
 package Micro.Heuristics.Targeting2
 
 import Mathematics.Heuristics.HeuristicMathMultiplicative
-import Micro.Heuristics.Targeting.TargetHeuristicDetectors
+import Micro.Heuristics.Targeting.{TargetEvaluator, TargetHeuristicDetectors}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
-object EvaluateTargets {
+object EvaluateTargets2 extends TargetEvaluator {
   
   def best(attacker: FriendlyUnitInfo, targets: Iterable[UnitInfo]): Option[UnitInfo] = {
     val output = ByOption.maxBy(targets)(evaluate(attacker, _))

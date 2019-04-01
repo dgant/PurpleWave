@@ -12,8 +12,9 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones.{EnemiesAtLeast, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
-import Planning.Predicates.Reactive.EnemyRobo
+import Planning.Predicates.Reactive.{EnemyBasesAtMost, EnemyRobo}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP4GateGoon
@@ -46,31 +47,38 @@ class PvP4GateGoon extends GameplanTemplate {
     new If(
       new Or(
         new UnitsAtLeast(15, Protoss.Dragoon),
-        new UnitsAtLeast(3, Protoss.DarkTemplar),
         new EnemiesAtLeast(1, Protoss.PhotonCannon)),
       new RequireMiningBases(2)),
 
-    new Pump(Protoss.DarkTemplar),
     new If(
       new EnemyStrategy(With.fingerprints.fourGateGoon),
       new Parallel(
         new Build(
           Get(Protoss.CitadelOfAdun),
           Get(Protoss.TemplarArchives)),
+        new If(
+          new Or(
+            new UnitsAtLeast(30, UnitMatchWarriors),
+            new UnitsAtLeast(2, Protoss.DarkTemplar, complete = true)),
+          new RequireMiningBases(2)),
         new PvPIdeas.TrainArmy),
-      new Pump(Protoss.Dragoon)),
+      new Parallel(
+        new Pump(Protoss.Dragoon),
+        new If(
+          new UnitsAtLeast(15, UnitMatchWarriors),
+          new Parallel(
+            new If(
+              new And(
+                new Not(new EnemyRobo),
+                new EnemyBasesAtMost(1)),
+              new Build(Get(Protoss.Forge))),
+            new RequireMiningBases(2))))),
 
     new Build(
       Get(Protoss.Gateway),
       Get(Protoss.Assimilator),
       Get(Protoss.CyberneticsCore),
       Get(4, Protoss.Gateway)),
-
-    new If(
-      new And(
-        new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),
-        new Not(new EnemyRobo)),
-      new Build(Get(Protoss.Forge))),
 
     new RequireMiningBases(2)
   )

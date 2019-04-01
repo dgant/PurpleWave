@@ -4,7 +4,7 @@ import Mathematics.Heuristics.Heuristic
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
-object EvaluateTargets {
+object EvaluateTargets extends TargetEvaluator {
   
   def best(unit: FriendlyUnitInfo, targets: Iterable[UnitInfo]): Option[UnitInfo] = {
     val output = ByOption.maxBy(targets)(evaluate(unit, _))

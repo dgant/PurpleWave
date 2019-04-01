@@ -104,6 +104,9 @@ object PvZIdeas {
       new UnitsAtMost(8, UnitMatchWarriors)),
     new Parallel(
       new PlacementForgeFastExpand,
+      new If(
+        new EnemiesAtLeast(1, Zerg.Extractor),
+        new Pump(Protoss.PhotonCannon, 5)),
       new PumpRatio(Protoss.PhotonCannon, 1, 8,
         Seq(
           Enemy(Zerg.Zergling, 0.3),

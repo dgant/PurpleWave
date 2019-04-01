@@ -71,17 +71,23 @@ object ZvPIdeas {
       new BuildOrder(Get(12, Zerg.Zergling)),
       new BuildOrder(Get(14, Zerg.Drone))))
 
-  class OverlordSpeedVsDarkTemplar extends If(
+  class OverlordSpeedVsCloakedThreats extends If(
     new Or(
       new EnemyHasShown(Protoss.DarkTemplar),
       new EnemyHasShown(Protoss.HighTemplar),
       new EnemyHasShown(Protoss.Archon),
-      new EnemyHasShown(Protoss.TemplarArchives)),
+      new EnemyHasShown(Protoss.TemplarArchives),
+      new EnemyHasShown(Protoss.Arbiter),
+      new EnemyHasShown(Protoss.ArbiterTribunal)),
     new Build(
       Get(Zerg.Extractor),
       Get(Zerg.SpawningPool),
       Get(Zerg.Lair),
       Get(Zerg.OverlordSpeed)))
+
+  class BurrowVsReaver extends If(
+    new Or(new EnemyHasShown(Protoss.Shuttle), new EnemyHasShown(Protoss.Reaver)),
+    new Build(Get(Zerg.Burrow)))
 
   class NeedAntiAir extends Or(
     new EnemyHasShown(Protoss.Corsair),

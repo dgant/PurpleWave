@@ -1,6 +1,7 @@
 package Debugging
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Micro.Heuristics.Targeting.{EvaluateTargets, TargetEvaluator}
 
 class Configuration {
 
@@ -31,18 +32,20 @@ class Configuration {
   // Battles //
   /////////////
 
+  var targetEvaluator: TargetEvaluator = EvaluateTargets
   var enableMCRS                    = false
   var enableThreatAwarePathfinding  = false
   var avatarBattleDistancePixels    = 32.0 * 6.0
   var battleMarginTileBase          = 12 + 2
   var battleMarginTileMinimum       = 12 + 2
   var battleMarginTileMaximum       = 12 * 2 + 2 // A bit over double Siege Tank range
-  var simulationFrames              = GameTime(0, 7)()
   var battleHysteresisFrames        = GameTime(0, 6)()
-  var battleHysteresisRatio         = 0.12
-  var battleValueTarget             = 0.55
+  var battleHysteresisRatio         = 0.0 // 0.12 -> 0.24 from SSCAIT 2018/ AIST2
+  var baseTarget                    = 0.04 // 0.55 -> 0.1from SSCAIT 2018/ AIST2
+  var simulationFrames              = GameTime(0, 12)()
+  var simulationEstimationPeriod    = 8
+  var simulationScoreHalfLife       = GameTime(0, 3)()
   var simulationBonusTankRange      = 64.0
-  var simulationRetreatDelay        = 8
   var simulationDamageValueRatio    = 0.1
   
   ///////////

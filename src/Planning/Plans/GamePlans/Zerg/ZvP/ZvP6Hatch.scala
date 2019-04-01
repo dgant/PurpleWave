@@ -3,13 +3,13 @@ package Planning.Plans.GamePlans.Zerg.ZvP
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Attack, EjectScout}
+import Planning.Plans.Army.{Attack, EjectScout, Hunt}
 import Planning.Plans.Basic.Do
-import Planning.Plans.Compound.{If, Parallel, Trigger}
+import Planning.Plans.Compound.{FlipIf, If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.{ScoutSafelyWithOverlord, UpgradeHydraSpeedThenRange}
+import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpJustEnoughScourge, ScoutSafelyWithOverlord, UpgradeHydraSpeedThenRange}
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
-import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas.OverlordSpeedVsDarkTemplar
+import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas.{BurrowVsReaver, OverlordSpeedVsCloakedThreats}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -19,8 +19,9 @@ import Planning.Plans.Scouting.Scout
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Economy.MineralsAtMost
 import Planning.Predicates.Milestones._
+import Planning.Predicates.Reactive.EnemyBasesAtMost
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete}
+import Planning.UnitMatchers._
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Zerg.ZvP6Hatch
@@ -37,7 +38,11 @@ class ZvP6Hatch extends GameplanTemplate {
         new Not(new EnemyStrategy(With.fingerprints.twoGate)),
         new Scout)))
 
-  override def attackPlan: Plan = new Attack
+  override def attackPlan: Plan = new Parallel(
+    new Hunt(Zerg.Scourge, Protoss.Shuttle),
+    new Hunt(Zerg.Scourge, Protoss.Corsair),
+    new Attack
+  )
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new ZergReactionVsWorkerRush
@@ -71,6 +76,10 @@ class ZvP6Hatch extends GameplanTemplate {
           Get(Zerg.HydraliskDen),
           Get(4, Zerg.Overlord)))))
 
+  class GetSufficientZerglings extends PumpRatio(Zerg.Zergling, 8, 24, Seq(
+    Enemy(UnitMatchAnd(UnitMatchWarriors, UnitMatchNot(UnitMatchMobileFlying)), 4.0),
+    Friendly(UnitMatchAnd(UnitMatchComplete, Zerg.SunkenColony), -6.0)))
+
   override def buildPlans: Seq[Plan] = Seq(
     new EjectScout,
     new If(
@@ -89,9 +98,7 @@ class ZvP6Hatch extends GameplanTemplate {
         // Gateway FE reaction
         new Parallel(
           new Build(Get(Zerg.SpawningPool)),
-          new If(
-            new UnitsAtMost(0, Zerg.HydraliskDen, complete = true),
-            new PumpRatio(Zerg.Zergling, 8, 24, Seq(Enemy(Protoss.Zealot, 4.0)))),
+          new If(new UnitsAtMost(0, Zerg.HydraliskDen, complete = true), new GetSufficientZerglings),
           new Build(
             Get(13, Zerg.Drone),
             Get(3, Zerg.Hatchery),
@@ -109,9 +116,10 @@ class ZvP6Hatch extends GameplanTemplate {
           new BuildSunkensAtNatural(3),
           new Pump(Zerg.SunkenColony),
           new Pump(Zerg.Drone, 9),
-          new If(
-            new UnitsAtMost(0, Zerg.HydraliskDen, complete = true),
-            new PumpRatio(Zerg.Zergling, 8, 24, Seq(Enemy(Protoss.Zealot, 4.0), Friendly(UnitMatchAnd(UnitMatchComplete, Zerg.SunkenColony), -6.0)))))
+          new FlipIf(
+            new UnitsAtLeast(8, Zerg.Zergling, complete = true),
+            new If(new UnitsAtMost(0, Zerg.HydraliskDen, complete = true), new GetSufficientZerglings),
+            new PumpRatio(Zerg.Drone, 7, 16, Seq(Friendly(Zerg.Zergling, 0.5), Friendly(Zerg.Hydralisk, 1.0)))))
       )),
 
     // Make sure we get the basics
@@ -119,9 +127,20 @@ class ZvP6Hatch extends GameplanTemplate {
     new Build(Get(Zerg.SpawningPool)),
     new Pump(Zerg.Drone, 16),
     new Build(Get(Zerg.Extractor), Get(Zerg.HydraliskDen)),
+    new Pump(Zerg.Hydralisk, 2),
+    new If(
+      new And(
+        new EnemyStrategy(With.fingerprints.gatewayFirst),
+        new EnemyBasesAtMost(1)),
+      new Parallel(
+        new UpgradeHydraSpeedThenRange,
+        new Pump(Zerg.Hydralisk, 12))),
     new Pump(Zerg.Drone, 24),
     new UpgradeHydraSpeedThenRange,
-    new OverlordSpeedVsDarkTemplar,
+    new OverlordSpeedVsCloakedThreats,
+    new BurrowVsReaver,
+    new PumpJustEnoughScourge,
+    new If(new EnemyHasShown(Protoss.Shuttle), new Build(Get(Zerg.Spire))),
     new If(
       new And(
         new UnitsAtLeast(18, Zerg.Hydralisk),
@@ -131,20 +150,14 @@ class ZvP6Hatch extends GameplanTemplate {
         new Build(Get(Zerg.EvolutionChamber)),
         new UpgradeContinuously(Zerg.GroundRangeDamage),
         new Build(Get(Zerg.Lair)))),
-    new If(
-      new EnemyHasShownCloakedThreat,
-      new Build(
-        Get(Zerg.Lair),
-        Get(Zerg.OverlordSpeed))),
     new PumpRatio(Zerg.Hydralisk, 1, 200, Seq(Enemy(Protoss.Corsair, 2.0), Enemy(Protoss.Scout, 3.0))),
-    new PumpRatio(Zerg.Hydralisk, 0, 48, Seq(Enemy(Protoss.Dragoon, 3.0), Enemy(Protoss.Zealot, 2.0), Enemy(Protoss.Archon, 6.0), Friendly(Zerg.Zergling, -0.25))),
+    new PumpRatio(Zerg.Hydralisk, 0, 48, Seq(Enemy(Protoss.Dragoon, 3.0), Enemy(Protoss.Zealot, 2.0), Enemy(Protoss.Archon, 6.0), Enemy(Protoss.Reaver, 5.0), Friendly(Zerg.Zergling, -0.25))),
     new RequireMiningBases(5),
-    new PumpRatio(Zerg.Extractor, 2, 12, Seq(Friendly(Zerg.Drone, 1.0 / 14.0))),
+    new PumpRatio(Zerg.Extractor, 2, 12, Seq(Friendly(Zerg.Drone, 1.0 / 14.0), Friendly(Zerg.Spire, 1.0))),
     new Pump(Zerg.Drone, 34),
     new Pump(Zerg.Hydralisk, 24),
+    new Build(Get(Zerg.Lair)),
     new Pump(Zerg.Drone, 50),
-    new If(
-      new UpgradeStarted(Zerg.HydraliskRange),
-      new PumpRatio(Zerg.Hatchery, 3, 9, Seq(Friendly(Zerg.Drone, 6.0))))
+    new If(new UpgradeStarted(Zerg.HydraliskRange), new PumpRatio(Zerg.Hatchery, 3, 9, Seq(Friendly(Zerg.Drone, 6.0))))
   )
 }

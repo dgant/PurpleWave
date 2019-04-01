@@ -1,7 +1,5 @@
 package Mathematics.Formations.Designers
 
-import Debugging.Visualizations.Colors
-import Debugging.Visualizations.Rendering.DrawMap
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Formations.{FormationAssigned, FormationSlot, FormationUnassigned}
@@ -52,7 +50,7 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
       } else {
         chokeCenter.project(targetSide, meleeUnitDiameter * ((1 + unitsInThisRow) / 2)) - chokeCenter
       }
-      val vectorDepth = chokeCenter.project(chokeEnd, 16 + meleeUnitDiameter * rowsFilled) - chokeCenter
+      val vectorDepth = chokeCenter.project(chokeEnd, 12 + meleeUnitDiameter * rowsFilled) - chokeCenter
       val output = chokeCenter + vectorLateral + vectorDepth
       output
     })

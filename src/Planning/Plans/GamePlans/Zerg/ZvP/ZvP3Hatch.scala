@@ -235,7 +235,7 @@ class ZvP3Hatch extends GameplanTemplate {
     new If(
       new UnitsAtLeast(3, Zerg.Hatchery, complete = true),
       new EjectScout),
-    new OverlordSpeedVsDarkTemplar,
+    new OverlordSpeedVsCloakedThreats,
     new Trigger(
       new UnitsAtLeast(1, Zerg.SpawningPool),
       new Parallel(

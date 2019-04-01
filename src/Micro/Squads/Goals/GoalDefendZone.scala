@@ -60,6 +60,7 @@ class GoalDefendZone extends GoalBasic {
 
   private def huntableFilter(enemy: UnitInfo): Boolean = (
     ! (enemy.is(Zerg.Drone) && With.fingerprints.fourPool.matches)
+    && (enemy.matchups.targets.nonEmpty || enemy.matchups.allies.forall(_.matchups.targets.isEmpty)) // Don't, for example, chase Overlords that have ally Zerglings nearby
     && zone.exit.forall(exit =>
       enemy.flying
       || With.blackboard.wantToAttack()

@@ -12,6 +12,7 @@ abstract class FingerprintFFE extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.proxyGateway),
   new FingerprintNot(With.fingerprints.cannonRush),
   new FingerprintNot(With.fingerprints.twoGate),
+  new FingerprintNot(With.fingerprints.oneGateCore),
   new FingerprintNot(With.fingerprints.nexusFirst)) {
   
   private class Status {
@@ -48,7 +49,8 @@ abstract class FingerprintFFE extends FingerprintAnd(
   
   private def conclusivelyGateway(status: Status): Boolean = (
     status.buildingsProxied.isEmpty
-      && (With.fingerprints.gatewayFirst.matches
+      && (
+      (With.fingerprints.gatewayFirst.matches && With.units.enemy.exists(_.is(Protoss.Forge)))
       || (With.units.enemy.exists(u => u.is(Protoss.Gateway) && u.complete) && With.units.enemy.exists(u => u.is(Protoss.Forge) && ! u.complete))
       || (readyToDecide(status) && ! gatewayUnlikely(status) && lossFFE(status) >= lossGatewayFE(status)))
   )

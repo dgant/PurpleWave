@@ -124,20 +124,21 @@ class Strategist {
         || With.enemies.map(e => formatName(e.name)).exists(nameMatches(_, name))))
 
     val output = (
-          ! disabledOnMap
-      &&  ! disabledInPlaybook
-      &&  (strategy.ffa == isFfa)
+      (strategy.ffa == isFfa)
       &&  (strategy.islandMaps  || ! isIsland)
       &&  (strategy.groundMaps  || ! isGround)
-      &&  strategy.startLocationsMin <= startLocations
-      &&  strategy.startLocationsMax >= startLocations
-      &&  rampOkay
-      &&  rushOkay
+      &&  ! disabledInPlaybook
       &&  appropriateForOurRace
       &&  appropriateForEnemyRace
-      &&  allowedGivenHistory
       &&  allowedForOpponent
-      &&  playedEnemyOftenEnough
+      &&  ! Playbook.respectMap || ! disabledOnMap
+      &&  ! Playbook.respectMap || strategy.startLocationsMin <= startLocations
+      &&  ! Playbook.respectMap || strategy.startLocationsMax >= startLocations
+      &&  ! Playbook.respectMap || rampOkay
+      &&  ! Playbook.respectMap || rushOkay
+      &&  ! Playbook.respectHistory || allowedGivenHistory
+      &&  ! Playbook.respectHistory || playedEnemyOftenEnough
+
     )
     
     output

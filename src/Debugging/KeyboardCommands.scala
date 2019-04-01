@@ -1,8 +1,13 @@
 package Debugging
 
 import Lifecycle.{Manners, With}
+import Strategery.History.HistoryLoader
 
 object KeyboardCommands {
+  def quitVsHuman(): Unit = {
+    if (HistoryLoader.humanModeEnabled) With.game.leaveGame()
+  }
+
   def onSendText(text: String) {
     text match {
       case "q"          => breakpoint()
@@ -21,6 +26,11 @@ object KeyboardCommands {
       case "perform"    => { With.performance.enablePerformanceStops = ! With.performance.enablePerformanceStops; Manners.chat("Performance stops? " + With.performance.enablePerformanceStops) }
       case "map"        => Manners.chat("The current map is " + With.game.mapName + ": " + With.game.mapFileName)
       case "strategize" => With.strategy.selectInitialStrategies
+
+      case "get out"    => quitVsHuman()
+      case "quit"       => quitVsHuman()
+      case "uninstall"  => quitVsHuman()
+      case "surrender"  => quitVsHuman()
       case _            => With.visualization.tryToggle(text)
     }
   }

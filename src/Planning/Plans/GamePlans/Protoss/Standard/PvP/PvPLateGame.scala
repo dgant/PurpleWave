@@ -67,7 +67,16 @@ class PvPLateGame extends GameplanTemplate {
       goZealotTemplarArbiter,
       new BuildCannonsAtNatural(2)),
 
-    // TODO: Deal with Carriers
+    new If(
+      new EnemyStrategy(With.fingerprints.fourGateGoon),
+      new If(
+        new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
+        new Build(
+          Get(Protoss.Gateway),
+          Get(Protoss.CyberneticsCore),
+          Get(Protoss.RoboticsFacility),
+          Get()
+        ))
     new If(
       goZealotTemplarArbiter,
       new Build(
@@ -77,13 +86,18 @@ class PvPLateGame extends GameplanTemplate {
         Get(Protoss.TemplarArchives),
         Get(6, Protoss.Gateway)),
       new If(
-        new EnemyStrategy(With.fingerprints.robo, With.fingerprints.fourGateGoon),
+        new EnemyStrategy(With.fingerprints.fourGateGoon),
         new Build(
+          Get(3, Protoss.Gateway),
+          Get(Protoss.CitadelOfAdun),
+          Get(Protoss.TemplarArchives),
           Get(5, Protoss.Gateway),
           Get(2, Protoss.Assimilator),
+          Get(4, Protoss.Gateway),
           Get(Protoss.RoboticsFacility),
           //Get(Protoss.RoboticsSupportBay),
           Get(Protoss.Observatory)),
+        With.fingerprints.robo,
         new Build(
           Get(3, Protoss.Gateway),
           Get(2, Protoss.Assimilator),

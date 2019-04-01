@@ -40,6 +40,8 @@ class EmptyPlaybook {
   )
   def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy
   def enemyName: String = With.enemy.name
+  def respectMap: Boolean = true
+  def respectHistory: Boolean = true
 }
 
 object StrategyGroups {
@@ -68,8 +70,10 @@ class PurpleWavePlaybook extends EmptyPlaybook {
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(TvT1RaxFE, TvT2BaseBC)
+  override lazy val forced: Seq[Strategy] = Seq(PvP4GateGoon)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
+  override def respectMap: Boolean = false
+  override def respectHistory: Boolean = false
 }
 
-object Playbook extends PurpleWavePlaybook {}
+object Playbook extends TestingPlaybook {}

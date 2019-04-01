@@ -43,6 +43,7 @@ class Fingerprints {
       tenHatch
       twelvePool
       twelveHatch
+      oneHatchGas
     }
     workerRush
     gasSteal
@@ -97,4 +98,5 @@ class Fingerprints {
   lazy val tenHatch     = addFingerprint(new Fingerprint10Hatch9Pool)
   lazy val twelvePool   = addFingerprint(new Fingerprint12Pool)
   lazy val twelveHatch  = addFingerprint(new Fingerprint12Hatch)
+  lazy val oneHatchGas  = addFingerprint(new Fingerprint1HatchGas)
 }

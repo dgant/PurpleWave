@@ -4,7 +4,7 @@ import Debugging.Visualizations.Views.Micro.ShowUnitsFriendly
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints, Tile}
 import Mathematics.PurpleMath
-import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -53,6 +53,7 @@ class Commander {
   
   def hold(unit: FriendlyUnitInfo) {
     if (unready(unit)) return
+    if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
     if (unit.moving && ! unit.holdingPosition) {
       unit.baseUnit.holdPosition()
       sleep(unit)
@@ -68,6 +69,7 @@ class Commander {
   
   def attack(unit: FriendlyUnitInfo, target: UnitInfo) {
     if (unready(unit)) return
+    if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
     if ( ! unit.readyForAttackOrder) { // Necessary or redundant?
       sleep(unit)
       return
@@ -107,7 +109,7 @@ class Commander {
 
   def attackMove(unit: FriendlyUnitInfo, destination: Pixel) {
     if (unready(unit)) return
-    
+    if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
     val alreadyAttackMovingThere = unit.command.exists(c =>
       c.getUnitCommandType.toString == UnitCommandType.Attack_Move.toString &&
       new Pixel(c.getTargetPosition).pixelDistance(destination) < 128)
@@ -121,7 +123,7 @@ class Commander {
   
   def patrol(unit: FriendlyUnitInfo, destination: Pixel) {
     if (unready(unit)) return
-    
+    autoUnburrow(unit)
     unit.baseUnit.patrol(destination.bwapi)
     
     sleepAttack(unit)
@@ -130,7 +132,7 @@ class Commander {
   val flyingOvershoot = 288.0
   def move(unit: FriendlyUnitInfo, to: Pixel) {
     if (unready(unit)) return
-    
+    autoUnburrow(unit)
     // Send flying units past their destination to maximize acceleration
     var destination = to
     if (unit.flying && unit.pixelDistanceSquared(to) < flyingOvershoot * flyingOvershoot) {
@@ -204,12 +206,14 @@ class Commander {
   
   def rightClick(unit: FriendlyUnitInfo, target: UnitInfo) {
     if (unready(unit)) return
+    if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
     unit.baseUnit.rightClick(target.baseUnit)
     sleepAttack(unit)
   }
   
   def useTech(unit: FriendlyUnitInfo, tech: Tech) {
     if (unready(unit)) return
+    autoUnburrow(unit)
     if (tech == Terran.Stim) {
       if (With.framesSince(unit.agent.lastStim) < 24) return
       unit.agent.lastStim = With.frame
@@ -220,6 +224,7 @@ class Commander {
   
   def useTechOnUnit(unit: FriendlyUnitInfo, tech: Tech, target: UnitInfo) {
     if (unready(unit)) return
+    autoUnburrow(unit)
     unit.baseUnit.useTech(tech.baseType, target.baseUnit)
     if (tech == Protoss.ArchonMeld || tech == Protoss.DarkArchonMeld) {
       sleep(unit, 48)
@@ -231,6 +236,7 @@ class Commander {
   
   def useTechOnPixel(unit: FriendlyUnitInfo, tech: Tech, target: Pixel) {
     if (unready(unit)) return
+    autoUnburrow(unit)
     unit.agent.movingTo = Some(target)
     unit.baseUnit.useTech(tech.baseType, target.bwapi)
     if (tech == Terran.SpiderMinePlant) {
@@ -247,7 +253,9 @@ class Commander {
   }
 
   def returnCargo(unit: FriendlyUnitInfo): Unit = {
+    if (unready(unit)) return
     if (unit.carryingResources) {
+      autoUnburrow(unit)
       unit.baseUnit.returnCargo
       sleepReturnCargo(unit)
     }
@@ -255,7 +263,7 @@ class Commander {
   
   def gather(unit: FriendlyUnitInfo, resource: UnitInfo, allowReturningCargo: Boolean = true) {
     if (unready(unit)) return
-    
+    autoUnburrow(unit)
     if (allowReturningCargo && (unit.carryingMinerals || unit.carryingGas)) {
       if ( ! unit.gatheringGas && ! unit.gatheringMinerals) {
         returnCargo(unit)
@@ -284,12 +292,14 @@ class Commander {
   
   def build(unit: FriendlyUnitInfo, unitClass: UnitClass) {
     if (unready(unit)) return
+    autoUnburrow(unit)
     unit.baseUnit.build(unitClass.baseType)
     sleepBuild(unit)
   }
   
   def build(unit: FriendlyUnitInfo, unitClass: UnitClass, tile: Tile) {
     if (unready(unit)) return
+    autoUnburrow(unit)
     if (unit.pixelDistanceSquared(tile.pixelCenter) > Math.pow(32.0 * 5.0, 2)) {
       move(unit, tile.pixelCenter)
       return
@@ -394,6 +404,11 @@ class Commander {
   def pass(unit: FriendlyUnitInfo) {
     if (unready(unit)) return
     sleep(unit)
+  }
+
+  def autoUnburrow(unit: FriendlyUnitInfo): Unit = {
+    if (unready(unit)) return
+    if (unit.burrowed) unburrow(unit)
   }
   
   private def sleepAttack(unit: FriendlyUnitInfo) {

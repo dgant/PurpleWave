@@ -1,6 +1,6 @@
 package Debugging.Visualizations
 
-import Debugging.Visualizations.Views.Battles.{ShowBattleDetails, ShowBattleSummary, ShowClustering}
+import Debugging.Visualizations.Views.Battles.{ShowBattle, ShowClustering}
 import Debugging.Visualizations.Views.Economy.{ShowEconomy, ShowScheduler}
 import Debugging.Visualizations.Views.Fun._
 import Debugging.Visualizations.Views.Geography._
@@ -27,7 +27,7 @@ class Visualization {
     ShowUnitsFriendly,
     ShowUnitsForeign,
     ShowExplosions,
-    ShowFingerprints,
+    ShowBattle,
     ShowPerformanceSummary
   )
   
@@ -106,8 +106,7 @@ class Visualization {
     ShowArchitectureHeuristics,
     ShowArchitecturePlacements,
     ShowBases,
-    ShowBattleDetails,
-    ShowBattleSummary,
+    ShowBattle,
     ShowBlackScreen,
     ShowBulletsAsHearts,
     ShowCarriers,

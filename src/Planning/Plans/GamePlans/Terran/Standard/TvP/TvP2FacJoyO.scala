@@ -9,7 +9,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.BuildGasPumps
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.Latch
+import Planning.Predicates.Compound.{Latch, Not}
 import Planning.Predicates.Milestones.{BasesAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchOr, UnitMatchSiegeTank}
@@ -33,9 +33,10 @@ class TvP2FacJoyO extends GameplanTemplate {
         new EnemyStrategy(With.fingerprints.nexusFirst)),
       new Attack))
 
+  val vulturesVs2Gate = 7
   override def emergencyPlans: Seq[Plan] = Seq(new If(
     new EnemyStrategy(With.fingerprints.twoGate),
-    new PumpRatio(Terran.Vulture, 0, 3, Seq(Enemy(Protoss.Zealot, 1.0)))
+    new Pump(Terran.Vulture, 7)
   ))
 
   override def workerPlan: Plan = new PumpWorkers
@@ -59,7 +60,11 @@ class TvP2FacJoyO extends GameplanTemplate {
   
   override def buildPlans: Seq[Plan] = Vector(
     new EjectScout,
-    new Pump(Terran.MachineShop, 2),
+    new If(
+      new Or(
+        new Not(new EnemyStrategy(With.fingerprints.twoGate)),
+        new UnitsAtLeast(vulturesVs2Gate, Terran.Vulture)),
+      new Pump(Terran.MachineShop, 2)),
     new BuildGasPumps,
     new Trigger(
       new UnitsAtLeast(3, UnitMatchSiegeTank),

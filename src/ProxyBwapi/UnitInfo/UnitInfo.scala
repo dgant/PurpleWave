@@ -437,6 +437,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     && (enemy.unitClass.triggersSpiderMines || ! isSpiderMine())
     && (unitClass.unaffectedByDarkSwarm || ! enemy.underDarkSwarm)
   )
+
+  def canBurrow: Boolean = canDoAnything && (is(Zerg.Lurker) || (player.hasTech(Zerg.Burrow) && isAny(Zerg.Drone, Zerg.Zergling, Zerg.Hydralisk, Zerg.Defiler)))
   
   // Stupid, but helps performance due to costliness of comparing unit classes with BWMirror limitations
   protected class CacheIs(unitClass: UnitClass) extends Cache(() => is(unitClass))

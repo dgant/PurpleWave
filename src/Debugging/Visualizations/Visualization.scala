@@ -9,6 +9,7 @@ import Debugging.Visualizations.Views.Performance.{ShowPerformanceDetails, ShowP
 import Debugging.Visualizations.Views.Planning._
 import Debugging.Visualizations.Views.{ShowClock, View}
 import Lifecycle.With
+import Strategery.History.HistoryLoader
 
 import scala.collection.mutable
 import scala.util.Random
@@ -86,7 +87,7 @@ class Visualization {
   private def requireInitialization() {
     if (initialized) return
     initialized = true
-    enabled = With.configuration.enableVisualizations
+    enabled = With.configuration.enableVisualizations && ! HistoryLoader.humanModeEnabled
     screen  = With.configuration.visualizeScreen
     map     = With.configuration.visualizeMap
     var random = Random.nextDouble()

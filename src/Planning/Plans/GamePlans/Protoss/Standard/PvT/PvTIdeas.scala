@@ -29,7 +29,7 @@ object PvTIdeas {
   class AttackWithScouts extends Attack(Protoss.Scout)
   
   class AttackWithCarrierFleet extends Trigger(
-    new UnitsAtLeast(4, Protoss.Carrier),
+    new UnitsAtLeast(4, Protoss.Carrier, complete = true),
     initialAfter = new Attack(Protoss.Carrier))
   
   class PriorityAttacks extends Parallel(

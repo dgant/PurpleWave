@@ -5,6 +5,7 @@ import Information.Battles.Types.BattleLocal
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
+import Mathematics.Shapes.Spiral
 import Micro.Decisions.MicroValue
 import Micro.Heuristics.Targeting.TargetHeuristicVpfEnemy
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -61,6 +62,8 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val framesOfEntanglement           : Double                = ByOption.max(framesOfEntanglementPerThreat.values).getOrElse(- Forever())
   lazy val framesOfSafety                 : Double                = - With.latency.latencyFrames - With.reaction.agencyAverage - ByOption.max(framesOfEntanglementPerThreat.values).getOrElse(- Forever().toDouble)
   lazy val teamFramesOfSafety             : Double                = ByOption.min(alliesInclSelf.view.map(_.matchups.framesOfSafety)).getOrElse(0)
+  lazy val tilesOfInvisibility            : Double                = if (me.visibleToOpponents) 0 else Spiral.points(8).map(me.tileIncludingCenter.add).find(With.grids.enemyVision.isSet).map(_.tileDistanceFast(me.tileIncludingCenter)).getOrElse(maxTilesOfInvisibility)
+  val maxTilesOfInvisibility = 8
 
   def dpfDealingDiffused(target: UnitInfo): Double = splashFactorInRange * me.dpfOnNextHitAgainst(target) / Math.max(1.0, targetsInRange.size)
   

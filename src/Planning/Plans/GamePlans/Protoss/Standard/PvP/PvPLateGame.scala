@@ -70,13 +70,20 @@ class PvPLateGame extends GameplanTemplate {
     new If(
       new EnemyStrategy(With.fingerprints.fourGateGoon),
       new If(
-        new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
+        new And(
+          new UnitsAtLeast(1, Protoss.RoboticsFacility),
+          new UnitsAtMost(0, Protoss.CitadelOfAdun)),
         new Build(
-          Get(Protoss.Gateway),
-          Get(Protoss.CyberneticsCore),
-          Get(Protoss.RoboticsFacility),
-          Get()
-        ))
+          Get(Protoss.RoboticsSupportBay),
+          Get(2, Protoss.Assimilator),
+          Get(5, Protoss.Gateway),
+          Get(Protoss.Observatory)),
+        new Build(
+          Get(Protoss.CitadelOfAdun),
+          Get(Protoss.TemplarArchives),
+          Get(5, Protoss.Gateway),
+          Get(2, Protoss.Assimilator)))),
+
     new If(
       goZealotTemplarArbiter,
       new Build(
@@ -84,28 +91,23 @@ class PvPLateGame extends GameplanTemplate {
         Get(2, Protoss.Assimilator),
         Get(Protoss.CitadelOfAdun),
         Get(Protoss.TemplarArchives),
-        Get(6, Protoss.Gateway)),
+        Get(Protoss.RoboticsFacility),
+        Get(Protoss.Observatory)),
       new If(
-        new EnemyStrategy(With.fingerprints.fourGateGoon),
+        new EnemyStrategy(With.fingerprints.robo),
         new Build(
-          Get(3, Protoss.Gateway),
-          Get(Protoss.CitadelOfAdun),
-          Get(Protoss.TemplarArchives),
           Get(5, Protoss.Gateway),
           Get(2, Protoss.Assimilator),
-          Get(4, Protoss.Gateway),
           Get(Protoss.RoboticsFacility),
-          //Get(Protoss.RoboticsSupportBay),
           Get(Protoss.Observatory)),
-        With.fingerprints.robo,
         new Build(
-          Get(3, Protoss.Gateway),
           Get(2, Protoss.Assimilator),
           Get(Protoss.RoboticsFacility),
-          Get(Protoss.Observatory),
-          //Get(Protoss.RoboticsSupportBay),
-          Get(5, Protoss.Gateway)))),
+          Get(Protoss.Observatory)))),
 
+    new Build(
+      Get(5, Protoss.Gateway),
+      Get(2, Protoss.Assimilator)),
     new If(
       new UnitsAtLeast(6, Protoss.Zealot),
       new Build(Get(Protoss.CitadelOfAdun))),
@@ -120,9 +122,7 @@ class PvPLateGame extends GameplanTemplate {
     new Build(Get(6, Protoss.Gateway)),
 
     new If(
-      new And(
-        new UnitsAtLeast(12, UnitMatchWarriors),
-        goZealotTemplarArbiter),
+      new And(new UnitsAtLeast(12, UnitMatchWarriors), goZealotTemplarArbiter),
       new PvPIdeas.ForgeUpgrades)
   )
 
@@ -134,8 +134,7 @@ class PvPLateGame extends GameplanTemplate {
       new And(
         new UnitsAtLeast(1, Protoss.ArbiterTribunal),
         new GasPumpsAtLeast(5),
-        new MiningBasesAtLeast(4),
-        new SupplyOutOf200(190)),
+        new MiningBasesAtLeast(4)),
       new Build(Get(2, Protoss.Stargate))),
     new Build(Get(Protoss.Stasis)))
 

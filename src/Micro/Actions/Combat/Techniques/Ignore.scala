@@ -1,7 +1,7 @@
 package Micro.Actions.Combat.Techniques
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
-import Lifecycle.With
+import Mathematics.PurpleMath
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Combat.Techniques.Common.Activators.One
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -15,9 +15,9 @@ object Ignore extends ActionTechnique {
   override val activator = One
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = (
-    (if (With.grids.enemyVision.isSet(unit.tileIncludingCenter)) 1.0 else 2.0)
+    PurpleMath.clamp(unit.matchups.maxTilesOfInvisibility / 3, 1, 4)
     * unit.matchups.framesOfSafety
-    / GameTime(0, 48)()
+    / GameTime(0, 12)()
   )
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {

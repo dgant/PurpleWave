@@ -131,14 +131,13 @@ class Strategist {
       &&  appropriateForOurRace
       &&  appropriateForEnemyRace
       &&  allowedForOpponent
-      &&  ! Playbook.respectMap || ! disabledOnMap
-      &&  ! Playbook.respectMap || strategy.startLocationsMin <= startLocations
-      &&  ! Playbook.respectMap || strategy.startLocationsMax >= startLocations
-      &&  ! Playbook.respectMap || rampOkay
-      &&  ! Playbook.respectMap || rushOkay
-      &&  ! Playbook.respectHistory || allowedGivenHistory
-      &&  ! Playbook.respectHistory || playedEnemyOftenEnough
-
+      &&  ( ! Playbook.respectMap || ! disabledOnMap)
+      &&  ( ! Playbook.respectMap || strategy.startLocationsMin <= startLocations)
+      &&  ( ! Playbook.respectMap || strategy.startLocationsMax >= startLocations)
+      &&  ( ! Playbook.respectMap || rampOkay)
+      &&  ( ! Playbook.respectMap || rushOkay)
+      &&  ( ! Playbook.respectHistory || allowedGivenHistory)
+      &&  ( ! Playbook.respectHistory || playedEnemyOftenEnough)
     )
     
     output

@@ -12,25 +12,29 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
 class GoalDefendZone extends GoalBasic {
-  
+
   private var lastAction = "Defend "
+
   override def toString: String = lastAction + zone
-  
+
   var zone: Zone = _
-  
+
+  override val counterMin: Double = 2.0
+  override val counterMax: Double = 3.0
+
   override def run() {
 
-    lazy val base   = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.intelligence.threatOrigin))
-    lazy val choke  = zone.exit
-    lazy val walls  = zone.units.filter(u =>
+    lazy val base = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.intelligence.threatOrigin))
+    lazy val choke = zone.exit
+    lazy val walls = zone.units.filter(u =>
       u.isOurs
-      && u.unitClass.isStaticDefense
-      && (squad.enemies.isEmpty || squad.enemies.exists(u.canAttack)))
+        && u.unitClass.isStaticDefense
+        && (squad.enemies.isEmpty || squad.enemies.exists(u.canAttack)))
 
-    lazy val allowWandering = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || squad.units.size > 3 || squad.enemies.exists(_.unitClass.ranged)
+    lazy val allowWandering = With.geography.ourBases.size > 2 || !With.enemies.exists(_.isZerg) || squad.units.size > 3 || squad.enemies.exists(_.unitClass.ranged)
     lazy val canHuntEnemies = huntableEnemies().nonEmpty
     lazy val canDefendChoke = choke.isDefined
-    
+
     if (allowWandering && canHuntEnemies) {
       lastAction = "Scour "
       huntEnemies()
@@ -59,19 +63,19 @@ class GoalDefendZone extends GoalBasic {
   )
 
   private def huntableFilter(enemy: UnitInfo): Boolean = (
-    ! (enemy.is(Zerg.Drone) && With.fingerprints.fourPool.matches)
-    && (enemy.matchups.targets.nonEmpty || enemy.matchups.allies.forall(_.matchups.targets.isEmpty)) // Don't, for example, chase Overlords that have ally Zerglings nearby
-    && zone.exit.forall(exit =>
+    !(enemy.is(Zerg.Drone) && With.fingerprints.fourPool.matches)
+      && (enemy.matchups.targets.nonEmpty || enemy.matchups.allies.forall(_.matchups.targets.isEmpty)) // Don't, for example, chase Overlords that have ally Zerglings nearby
+      && zone.exit.forall(exit =>
       enemy.flying
-      || With.blackboard.wantToAttack()
-      || enemy.pixelDistanceTravelling(zone.centroid)
+        || With.blackboard.wantToAttack()
+        || enemy.pixelDistanceTravelling(zone.centroid)
         < (exit.endPixels ++ exit.sidePixels :+ exit.pixelCenter).map(_.groundPixels(zone.centroid)).min))
 
   private val huntableEnemies = new Cache(() => {
     val huntableInZone = squad.enemies.filter(e => e.zone == zone && huntableFilter(e)) ++ zone.units.filter(u => u.isEnemy && u.unitClass.isGas)
     if (huntableInZone.nonEmpty) huntableInZone else squad.enemies.filter(huntableFilter)
   })
-  
+
   def huntEnemies() {
     lazy val home = ByOption.minBy(zone.bases.filter(_.owner.isUs).map(_.heart))(_.groundPixels(zone.centroid))
       .orElse(ByOption.minBy(With.geography.ourBases.map(_.heart))(_.groundPixels(zone.centroid)))
@@ -81,31 +85,32 @@ class GoalDefendZone extends GoalBasic {
     def distance(enemy: UnitInfo): Double = {
       ByOption.min(pointsOfInterest().map(_.pixelDistance(enemy.pixelCenter))).getOrElse(enemy.pixelDistanceCenter(home))
     }
-    lazy val target        = huntableEnemies().minBy(distance)
-    lazy val targetAir     = ByOption.minBy(huntableEnemies().filter   (_.flying))(distance).getOrElse(target)
-    lazy val targetGround  = ByOption.minBy(huntableEnemies().filterNot(_.flying))(distance).getOrElse(target)
+
+    lazy val target = huntableEnemies().minBy(distance)
+    lazy val targetAir = ByOption.minBy(huntableEnemies().filter(_.flying))(distance).getOrElse(target)
+    lazy val targetGround = ByOption.minBy(huntableEnemies().filterNot(_.flying))(distance).getOrElse(target)
     squad.units.foreach(recruit => {
-      val onlyAir     = recruit.canAttack && ! recruit.unitClass.attacksGround
-      val onlyGround  = recruit.canAttack && ! recruit.unitClass.attacksAir
-      val thisTarget  = if (onlyAir) targetAir else if (onlyGround) targetGround else target
+      val onlyAir = recruit.canAttack && !recruit.unitClass.attacksGround
+      val onlyGround = recruit.canAttack && !recruit.unitClass.attacksAir
+      val thisTarget = if (onlyAir) targetAir else if (onlyGround) targetGround else target
       recruit.agent.intend(squad.client, new Intention {
         canFocus = true
         toTravel = Some(thisTarget.pixelCenter)
       })
     })
   }
-  
+
   def defendHeart(center: Pixel) {
-    val protectables  = center.zone.units.filter(u => u.isOurs && u.unitClass.isBuilding && u.hitPoints < 300 && (u.discoveredByEnemy || u.canAttack))
-    val protectRange  = ByOption.max(protectables.map(_.pixelDistanceCenter(center))).getOrElse(32.0 * 8.0)
-    val destination   = ByOption.minBy(protectables)(_.matchups.framesOfSafety).map(_.pixelCenter).getOrElse(center)
+    val protectables = center.zone.units.filter(u => u.isOurs && u.unitClass.isBuilding && u.hitPoints < 300 && (u.discoveredByEnemy || u.canAttack))
+    val protectRange = ByOption.max(protectables.map(_.pixelDistanceCenter(center))).getOrElse(32.0 * 8.0)
+    val destination = ByOption.minBy(protectables)(_.matchups.framesOfSafety).map(_.pixelCenter).getOrElse(center)
     squad.units.foreach(_.agent.intend(squad.client, new Intention {
       toTravel = Some(destination)
       toReturn = if (zone.bases.exists(_.owner.isUs)) Some(destination) else None
       toLeash = Some(Leash(center, protectRange))
     }))
   }
-  
+
   def defendChoke() {
     assignToFormation(new FormationZone(zone, squad.enemies).form(squad.units.toSeq))
   }
@@ -115,9 +120,10 @@ class GoalDefendZone extends GoalBasic {
       defender => {
         val spot = formation.placements.get(defender)
         defender.agent.intend(squad.client, new Intention {
-          toForm    = spot
-          toReturn  = spot
-          toTravel  = spot.orElse(Some(zone.centroid.pixelCenter)) })
+          toForm = spot
+          toReturn = spot
+          toTravel = spot.orElse(Some(zone.centroid.pixelCenter))
+        })
       })
   }
 }

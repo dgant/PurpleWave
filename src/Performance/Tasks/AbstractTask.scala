@@ -74,7 +74,7 @@ abstract class AbstractTask {
   }
   
   final val runMillisecondsMaxRecent = new Cache[Long](() => ByOption.max(runtimeMilliseconds).getOrElse(0))
-  protected final val runMillisecondsSumRecent = new Cache(() => runtimeMilliseconds.sum)
+  protected final val runMillisecondsSumRecent = new Cache(() => runtimeMilliseconds.view.map(Math.min(_, 100)).sum)
   
   final def runMillisecondsMaxAllTime: Long = {
     maxMillisecondsEver

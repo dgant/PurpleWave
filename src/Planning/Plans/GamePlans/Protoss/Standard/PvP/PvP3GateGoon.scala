@@ -12,9 +12,8 @@ import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackWithDarkTemplar
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump, PumpWorkers}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.{And, Check, Latch, Not}
+import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyDarkTemplarLikely, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
@@ -25,7 +24,7 @@ import Strategery.Strategies.Protoss.{PvP3GateGoon, PvP3GateGoonCounter}
 class PvP3GateGoon extends GameplanTemplate {
   
   override val activationCriteria : Predicate = new Employing(PvP3GateGoon, PvP3GateGoonCounter)
-  override val completionCriteria : Predicate = new Latch(new Or(new UnitsAtLeast(1, Protoss.RoboticsFacility), new UnitsAtLeast(5, Protoss.Gateway)))
+  override val completionCriteria : Predicate = new UnitsAtLeast(5, Protoss.Gateway)
 
   override def blueprints = Vector(
     new Blueprint(this, building = Some(Protoss.Pylon),         placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
@@ -70,13 +69,23 @@ class PvP3GateGoon extends GameplanTemplate {
 
     new EjectScout,
 
-    new If(new UnitsAtLeast(2, Protoss.DarkTemplar, complete = true), new RequireMiningBases(2)),
-
     new Pump(Protoss.Probe, 23),
-    new BuildOrder(
-      Get(8, Protoss.Dragoon),
-      Get(2, Protoss.Nexus),
-      Get(11, Protoss.Dragoon)),
+    new BuildOrder(Get(8, Protoss.Dragoon)),
+    new If(
+      new And(
+        new EnemyStrategy(With.fingerprints.fourGateGoon),
+        new BasesAtMost(1)),
+      new BuildOrder(
+        Get(Protoss.CitadelOfAdun),
+        Get(11, Protoss.Dragoon),
+        Get(Protoss.TemplarArchives),
+        Get(14, Protoss.Dragoon),
+        Get(3, Protoss.DarkTemplar),
+        Get(2, Protoss.Nexus)),
+      new BuildOrder(
+        Get(2, Protoss.Nexus),
+        Get(11, Protoss.Dragoon))),
+
 
     new If(
       new BasesAtLeast(2),
@@ -92,10 +101,21 @@ class PvP3GateGoon extends GameplanTemplate {
               new EnemyDarkTemplarLikely)),
           new Build(
             Get(Protoss.RoboticsFacility),
-            Get(Protoss.Observatory))),
-        new Build(Get(5, Protoss.Gateway)))),
+            Get(Protoss.Observatory))))),
 
     new PumpWorkers,
     new PvPIdeas.TrainArmy,
+    new If(
+      new Not(new EnemyStrategy(
+        With.fingerprints.twoGate,
+        With.fingerprints.robo,
+        With.fingerprints.forgeFe,
+        With.fingerprints.gatewayFe,
+        With.fingerprints.nexusFirst)),
+      new Build(
+        Get(Protoss.RoboticsFacility),
+        Get(Protoss.Observatory))),
+
+    new Build(Get(5, Protoss.Gateway)),
   )
 }

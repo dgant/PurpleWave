@@ -32,7 +32,7 @@ object BeACarrier extends Action {
       
       // We can't kite Goliaths, but we should only take shots from them when launching interceptors
       // and if we can afford to take some damage
-      if ((interceptorsActive || unit.totalHealth < unit.unitClass.maxHitPoints) && ! threat.flying) return true
+      if ( ! threat.flying && (interceptorsActive || unit.totalHealth < unit.unitClass.maxHitPoints)) return true
       if (unit.agent.shouldEngage && threat.pixelRangeAgainst(unit) > 32.0 * 6.0) return false
       
       true

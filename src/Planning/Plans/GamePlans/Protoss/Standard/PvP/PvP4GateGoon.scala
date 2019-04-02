@@ -2,19 +2,19 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
+import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump}
+import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump, PumpWorkers}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones.{EnemiesAtLeast, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
-import Planning.Predicates.Reactive.{EnemyBasesAtMost, EnemyRobo}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP4GateGoon
@@ -22,9 +22,18 @@ import Strategery.Strategies.Protoss.PvP4GateGoon
 class PvP4GateGoon extends GameplanTemplate {
   
   override val activationCriteria : Predicate = new Employing(PvP4GateGoon)
-  override val completionCriteria : Predicate = new Latch(new MiningBasesAtLeast(2))
+  override val completionCriteria : Predicate = new Latch(
+    new And(
+      new MiningBasesAtLeast(2),
+      new Or(
+        new UnitsAtMost(0, Protoss.TemplarArchives),
+        new And(
+          new UnitsAtLeast(6, Protoss.Gateway),
+          new UnitsAtLeast(2, Protoss.Assimilator)))))
 
-  override def attackPlan: Plan = new PvPIdeas.AttackSafely
+  override def attackPlan: Plan = new Parallel(
+    new PvPIdeas.AttackSafely,
+    new Attack(Protoss.DarkTemplar))
 
   override def scoutPlan: Plan = new ScoutOn(Protoss.Gateway)
   override val workerPlan: Plan = NoPlan()
@@ -41,38 +50,35 @@ class PvP4GateGoon extends GameplanTemplate {
 
   override val buildPlans = Vector(
     new If(
-      new UnitsAtMost(2, Protoss.Gateway),
+      new UnitsAtMost(3, Protoss.Gateway),
       new CapGasWorkersAt(2)),
 
     new If(
       new Or(
-        new UnitsAtLeast(15, Protoss.Dragoon),
+        new UnitsAtLeast(18, Protoss.Dragoon),
         new EnemiesAtLeast(1, Protoss.PhotonCannon)),
       new RequireMiningBases(2)),
 
-    new If(
+    new Trigger(
       new EnemyStrategy(With.fingerprints.fourGateGoon),
       new Parallel(
+        new BuildOrder(Get(Protoss.CitadelOfAdun)),
+        new PumpWorkers(oversaturate = true),
+        new BuildOrder(
+          Get(6, Protoss.Zealot),
+          Get(Protoss.TemplarArchives),
+          Get(2, Protoss.DarkTemplar),
+          Get(2, Protoss.Nexus),
+          Get(Protoss.Forge),
+          Get(4, Protoss.DarkTemplar)),
+        new BuildCannonsAtNatural(3),
         new Build(
-          Get(Protoss.CitadelOfAdun),
-          Get(Protoss.TemplarArchives)),
-        new If(
-          new Or(
-            new UnitsAtLeast(30, UnitMatchWarriors),
-            new UnitsAtLeast(2, Protoss.DarkTemplar, complete = true)),
-          new RequireMiningBases(2)),
-        new PvPIdeas.TrainArmy),
-      new Parallel(
-        new Pump(Protoss.Dragoon),
-        new If(
-          new UnitsAtLeast(15, UnitMatchWarriors),
-          new Parallel(
-            new If(
-              new And(
-                new Not(new EnemyRobo),
-                new EnemyBasesAtMost(1)),
-              new Build(Get(Protoss.Forge))),
-            new RequireMiningBases(2))))),
+          Get(6, Protoss.Gateway),
+          Get(2, Protoss.Assimilator)),
+        new Trigger(
+          new UnitsAtLeast(2, Protoss.Nexus),
+          new PvPIdeas.TrainArmy)),
+      new Pump(Protoss.Dragoon)),
 
     new Build(
       Get(Protoss.Gateway),
@@ -80,6 +86,7 @@ class PvP4GateGoon extends GameplanTemplate {
       Get(Protoss.CyberneticsCore),
       Get(4, Protoss.Gateway)),
 
-    new RequireMiningBases(2)
+    new RequireMiningBases(2),
+    new Build(Get(Protoss.Forge))
   )
 }

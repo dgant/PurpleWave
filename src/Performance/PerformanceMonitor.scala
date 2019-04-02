@@ -80,7 +80,7 @@ class PerformanceMonitor {
   )
 
   def maxFrameMilliseconds  : Long = frameTimes.max
-  def meanFrameMilliseconds : Long = frameTimes.sum / framesToTrack
+  def meanFrameMilliseconds : Long = frameTimes.view.map(Math.min(_, 100)).sum / framesToTrack
 
   def disqualified: Boolean =
     framesOver85    >= 320 ||

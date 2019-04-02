@@ -71,7 +71,7 @@ object ShowBattle extends View {
 
     val graphWidth = 96
     DrawScreen.graph(
-      Pixel(320 - graphWidth / 2, 290),
+      Pixel(320 - graphWidth / 2, 300),
       "Score",
       Seq(
         GraphCurve(Color.Black,  battle.estimationSimulationAttack.localBattleMetrics.map(unused =>  1.0)),

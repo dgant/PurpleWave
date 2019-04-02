@@ -482,7 +482,9 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
 
   def framesToTravelTo(destination: Pixel)  : Int = framesToTravelPixels(pixelDistanceTravelling(destination))
   def framesToTravelPixels(pixels: Double)  : Int = (if (pixels <= 0.0) 0 else if (canMove) Math.max(0, Math.ceil(pixels / topSpeedPossible).toInt) else Int.MaxValue) + (if (burrowed || sieged) 24 else 0)
-  
+  def framesToTurnTo(radiansTo: Double): Double = unitClass.framesToTurn(PurpleMath.normalizeAroundZero(PurpleMath.radiansTo(angleRadians, radiansTo)))
+  def framesToTurnFrom(enemy: UnitInfo): Double = framesToTurnTo(enemy.pixelCenter.radiansTo(pixelCenter))
+  def framesToAccelerate: Double = PurpleMath.clamp(PurpleMath.nanToZero((topSpeed - speed) / unitClass.accelerationFrames), 0, unitClass.accelerationFrames)
   def framesToGetInRange(enemy: UnitInfo)                 : Int = if (canAttack(enemy)) framesToTravelPixels(pixelDistanceEdge(enemy)           - pixelRangeAgainst(enemy)) else Int.MaxValue
   def framesToGetInRange(enemy: UnitInfo, enemyAt: Pixel) : Int = if (canAttack(enemy)) framesToTravelPixels(pixelDistanceEdge(enemy, enemyAt)  - pixelRangeAgainst(enemy)) else Int.MaxValue
   def framesBeforeAttacking(enemy: UnitInfo)              : Int = framesBeforeAttacking(enemy, enemy.pixelCenter)
@@ -496,7 +498,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def canStim: Boolean = unitClass.canStim && player.hasTech(Terran.Stim) && hitPoints > 10
 
   def moving: Boolean = velocityX != 0 || velocityY != 0
-  
+
+  def speed: Double = velocity.lengthFast
   def speedApproaching(other: UnitInfo): Double = speedApproaching(other.pixelCenter)
   def speedApproaching(pixel: Pixel): Double = {
     val deltaXY = Force(x - pixel.x, y - pixel.y)

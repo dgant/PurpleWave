@@ -16,6 +16,7 @@ object Ignore extends ActionTechnique {
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = (
     PurpleMath.clamp(unit.matchups.maxTilesOfInvisibility / 3, 1, 4)
+    * (if (unit.squad.exists(_.enemies.forall( ! unit.matchups.threats.contains(_)))) 2.0 else 1.0)
     * unit.matchups.framesOfSafety
     / GameTime(0, 12)()
   )

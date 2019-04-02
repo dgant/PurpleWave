@@ -71,17 +71,19 @@ object ShowBattle extends View {
 
     val graphWidth = 96
     DrawScreen.graph(
-      Pixel(320 - graphWidth / 2, 300),
+      Pixel(320 - graphWidth / 2, 360 - graphWidth),
       "Score",
       Seq(
-        GraphCurve(Color.Black,  battle.estimationSimulationAttack.localBattleMetrics.map(unused =>  1.0)),
-        GraphCurve(Color.Black,  battle.estimationSimulationAttack.localBattleMetrics.map(unused => -1.0)),
-        GraphCurve(Colors.DarkGray,  battle.estimationSimulationAttack.localBattleMetrics.map(unused => battle.ratioTarget)),
-        GraphCurve(Color.White, battle.estimationSimulationAttack.localBattleMetrics.map(_.totalScore))),
+        GraphCurve(Color.Black,         battle.estimationSimulationAttack.localBattleMetrics.map(unused =>  1.0)),
+        GraphCurve(Color.Black,         battle.estimationSimulationAttack.localBattleMetrics.map(unused =>  0.0)),
+        GraphCurve(Color.Black,         battle.estimationSimulationAttack.localBattleMetrics.map(unused => -1.0)),
+        GraphCurve(Colors.MediumRed,    battle.estimationSimulationAttack.localBattleMetrics.map(unused => battle.ratioTarget)),
+        GraphCurve(Colors.BrightOrange, battle.estimationSimulationAttack.localBattleMetrics.map(unused => battle.ratioAttack)),
+        GraphCurve(Color.Yellow,        battle.estimationSimulationAttack.localBattleMetrics.map(_.totalScore))),
       fixedYMin = Some(-1.0),
       fixedYMax = Some(1.0),
       width = graphWidth,
-      height = 48)
+      height = graphWidth)
   }
 
   def renderBattleMap(battle: BattleLocal) {

@@ -14,6 +14,7 @@ import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
+import Utilities.ByOption
 import bwapi.Color
 
 import scala.collection.mutable
@@ -226,18 +227,19 @@ class Agent(val unit: FriendlyUnitInfo) {
     if (toReturn.isDefined) {
       toReturn.get
     }
+
     else if (toForm.isDefined) {
       toForm.get
     }
     else if (toLeash.isDefined) {
       toLeash.get.pixelCenter
     }
-    else if (With.geography.ourBases.nonEmpty) {
-      With.geography.ourBases.map(_.heart.pixelCenter).minBy(unit.pixelDistanceTravelling)
-    }
-    else {
-      With.geography.home.pixelCenter
-    }
+    toTravel
+      .flatMap(_.base)
+      .filter(_.owner.isUs)
+      .orElse(ByOption.minBy(With.geography.ourBases)(base => unit.pixelDistanceTravelling(base.heart)))
+      .map(_.heart.pixelCenter)
+      .getOrElse(With.geography.home.pixelCenter)
   }
 
   private def calculateDestination: Pixel = {

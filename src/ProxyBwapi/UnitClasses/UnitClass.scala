@@ -432,6 +432,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
         + (if (isTwoUnitsInOneEgg) 12.5 else if(isZerg) 25.0 else 0.0) // Larva value
       )
       * (if(isWorker) 1.3 else 1.0)
+      * (if (whatBuilds._1 == Terran.Factory) 1.2 else 1.0)
       * (if (this == Protoss.Carrier)     2.0 else 1.0)
       / (if (this == Protoss.Interceptor) 4.0 else 1.0)
       / (if (isTwoUnitsInOneEgg) 2.0 else 1.0)

@@ -36,6 +36,9 @@ object PvPIdeas {
   class PvPSafeToMoveOut extends Or(
     new BasesAtLeast(3),
     new And(
+      new EnemyStrategy(With.fingerprints.cannonRush),
+      new EnemiesAtMost(0, UnitMatchWarriors)),
+    new And(
       // Are we safe against Dark Templar?
       new Or(
         new UnitsAtLeast(2, Protoss.Observer, complete = true),
@@ -70,8 +73,9 @@ object PvPIdeas {
   class ReactToCannonRush extends If(
     new EnemyStrategy(With.fingerprints.cannonRush),
     new Parallel(
+      new Attack,
       new RequireSufficientSupply,
-      new PumpWorkers,
+      new PumpWorkers(oversaturate = true),
       new Pump(Protoss.Reaver, 2),
       new PumpDragoonsAndZealots,
       new Build(

@@ -103,7 +103,7 @@ object FightOrFlight extends Action {
       && ! ally.loaded
       && (ally.canAttack || (ally.unitClass.rawCanAttack && ally.unitClass.isBuilding) || ally.is(Zerg.CreepColony))
       && ally.unitClass.topSpeed <= Protoss.HighTemplar.topSpeed
-      && (ally.subjectiveValue > unit.subjectiveValue || ally.unitClass.isBuilding)
+      && (ally.subjectiveValue * (if (ally.unitClass.isBuilding) 2.0 else 1.0) > unit.subjectiveValue)
       && ( ! ally.unitClass.isBuilding || ally.matchups.threatsInRange.nonEmpty)
       && (ally.friendly.forall(_.agent.ride.exists(_.pixelDistanceEdge(ally) > 96)) || ally.matchups.threatsInRange.nonEmpty)
       && ally.matchups.framesOfSafety <= 24 + Math.max(0, unit.matchups.framesOfSafety))

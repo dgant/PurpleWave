@@ -314,7 +314,7 @@ class PvTBasic extends GameplanTemplate {
     new If(new EmployingTwoBase,    new BuildGasPumps),
     new If(new ReadyForThirdBase,   new RequireMiningBases(3)),
     new If(new ReadyForFourthBase,  new RequireMiningBases(4)),
-    new BuildCannonsAtExpansions(1),
+    new BuildCannonsAtExpansions(2),
     new If(
       new BasesAtLeast(3),
       new BuildCannonsAtNatural(1)),

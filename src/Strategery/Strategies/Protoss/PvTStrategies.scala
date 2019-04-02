@@ -55,9 +55,8 @@ object PvT1015DT extends PvTStrategy {
 object PvT1GateRobo extends PvTBasicOpener
 object PvT2GateObserver extends PvTBasicOpener {
   override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
-    With.fingerprints.fiveRax,
-    With.fingerprints.bbs,
-    With.fingerprints.twoRax1113,
+    With.fingerprints.twoFac,
+    With.fingerprints.twoFacVultures,
     With.fingerprints.threeFac,
     With.fingerprints.threeFacVultures,
   )

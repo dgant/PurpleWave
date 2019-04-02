@@ -63,24 +63,29 @@ object PurpleMath {
   def forcedSignum(int: Int)  : Int = if (int < 0) -1 else 1
   
   val twoPi: Double = Math.PI * 2.0
-  def normalizeAngle(angleRadians: Double): Double = {
-    if      (angleRadians < 0) normalizeAngle(angleRadians + twoPi)
-    else if (angleRadians > twoPi) normalizeAngle(angleRadians - twoPi)
+  def normalize0To2Pi(angleRadians: Double): Double = {
+    if      (angleRadians < 0) normalize0To2Pi(angleRadians + twoPi)
+    else if (angleRadians > twoPi) normalize0To2Pi(angleRadians - twoPi)
+    else    angleRadians
+  }
+  def normalizeAroundZero(angleRadians: Double): Double = {
+    if      (angleRadians < -Math.PI) normalize0To2Pi(angleRadians + twoPi)
+    else if (angleRadians > Math.PI) normalize0To2Pi(angleRadians - twoPi)
     else    angleRadians
   }
   def radiansTo(from: Double, to: Double): Double = {
-    val distance = normalizeAngle(to - from)
+    val distance = normalize0To2Pi(to - from)
     if (distance > Math.PI) distance - twoPI else distance
   }
-  
+
   def geometricMean(values: Iterable[Double]): Double = {
     if (values.isEmpty) return 1.0
     Math.pow(values.product, 1.0 / values.size)
   }
-  
+
   def fromBoolean(value: Boolean): Int = if (value) 1 else 0
   def toBoolean(value: Int): Boolean = value != 0
-  
+
   def broodWarDistance(a: AbstractPoint, b: AbstractPoint): Double = broodWarDistance(a.x, a.y, b.x, b.y)
   def broodWarDistance(x0: Int, y0: Int, x1: Int, y1: Int): Double = {
     val dx = Math.abs(x0 - x1)
@@ -141,7 +146,7 @@ object PurpleMath {
     }
     0
   }
-  
+
   def distanceFromLineSegment(
     point: AbstractPoint,
     segmentStart: AbstractPoint,
@@ -153,22 +158,22 @@ object PurpleMath {
     val y0 = segmentStart.y
     val x1 = segmentEnd.x
     val y1 = segmentEnd.y
-    
+
     val dx0 = x - x0
     val dy0 = y - y0
     val dx1 = x1 - x0
     val dy1 = y1 - y0
-  
+
     val dotProduct = dx0 * dx1 + dy0 * dy1
     val lengthSquared = dx1 * dx1 + dy1 * dy1
     var param = -1.0
     if (lengthSquared != 0) {
       param = dotProduct / lengthSquared
     }
-  
+
     var xx = 0.0
     var yy = 0.0
-  
+
     if (param < 0) {
       xx = x0
       yy = y0
@@ -181,13 +186,13 @@ object PurpleMath {
       xx = x0 + param * dx1
       yy = y0 + param * dy1
     }
-  
+
     var dx = x - xx
     var dy = y - yy
-    
+
     Math.sqrt(dx * dx + dy * dy)
   }
-  
+
   def fastTanh(x: Double): Double = {
     if (x.isPosInfinity) return 1.0
     if (x.isNegInfinity) return -1.0
@@ -195,7 +200,7 @@ object PurpleMath {
   }
 
   def atan2(y: Double, x: Double): Double = {
-   normalizeAngle(Math.atan2(y, x))
+   normalize0To2Pi(Math.atan2(y, x))
   }
 
   def weightedMean(values: Seq[(Double, Double)]): Double = {

@@ -50,6 +50,11 @@ object Gather extends Action {
         With.commander.burrow(unit)
       }
 
+      // Stupid siege tank defense
+      if (unit.matchups.threatsInRange.exists(t => t.is(Terran.SiegeTankSieged) && t.pixelDistanceEdge(resource) < 32 * 13)) {
+        Engage.consider(unit)
+      }
+
       if (atResource && unit.totalHealth > 32 && beckoned) {
         Engage.consider(unit)
       }

@@ -51,7 +51,7 @@ object ShowBattle extends View {
         Vector("Hysteresis",  format(battle.hysteresis)),
         Vector("Trappedness", format(battle.trappedness)),
         Vector("Turtle",      format(battle.turtleBonus)),
-        Vector("Turtle",      format(battle.urgency)),
+        Vector("Turtle",      format(battle.siegeUrgency)),
         Vector("LVLR",        format(metrics.localValueLostRatio)),
         Vector("LHLR",        format(metrics.localHealthLostRatio)),
         Vector("LHVLR",       format(metrics.localHealthValueLostRatio)),

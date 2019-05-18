@@ -76,7 +76,7 @@ class Strategist {
     }
     val strategiesFiltered = filterForcedStrategies(strategiesUnfiltered.filter(isAppropriate))
     strategiesFiltered.foreach(evaluate)
-    if (HistoryLoader.humanModeEnabled) {
+    if (With.configuration.humanMode()) {
       Manners.chat("Human mode enabled!")
       With.configuration.strategyRandomness = 0.3
       return StrategySelectionDynamic.chooseBest(strategiesFiltered).toSet
@@ -98,7 +98,7 @@ class Strategist {
     true
   }
 
-  lazy val humanModeEnabled = HistoryLoader.humanModeEnabled
+  lazy val humanModeEnabled = With.configuration.humanMode()
   def isAppropriate(strategy: Strategy): Boolean = {
     lazy val ourRace                  = With.self.raceInitial
     lazy val enemyRacesCurrent        = With.enemies.map(_.raceCurrent).toSet

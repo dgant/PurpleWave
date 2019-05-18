@@ -37,7 +37,7 @@ class History {
     message += "Vs. "   + currentEnemyRace      + ": "                  + enemyRaceWins + " - " + enemyRaceLosses
     message += "Vs. "   + currentEnemyName      + ": "                  + vsWins        + " - " + vsLosses
 
-    if (HistoryLoader.humanModeEnabled) {
+    if (With.configuration.humanMode()) {
       message.clear()
     }
   }

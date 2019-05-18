@@ -13,7 +13,7 @@ import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Terran.{BuildBunkersAtNatural, BuildMissileTurretsAtNatural, PopulateBunkers}
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.{And, Latch}
+import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
@@ -41,7 +41,7 @@ class TvP1RaxFE extends GameplanTemplate {
        new Blueprint(this, building = Some(Terran.SupplyDepot), preferZone = Some(With.geography.ourNatural.zone)))
    }
 
-  override def scoutPlan: Plan = new ScoutOn(Terran.Factory)
+  override def scoutPlan: Plan = new ScoutOn(Terran.SupplyDepot)
 
   override def attackPlan = new If(
     new EnemyStrategy(With.fingerprints.nexusFirst),
@@ -55,14 +55,16 @@ class TvP1RaxFE extends GameplanTemplate {
       Get(Terran.Barracks),
       Get(15, Terran.SCV),
       Get(2,  Terran.CommandCenter),
-      Get(Terran.Marine),
-      Get(2,  Terran.SupplyDepot),
+      Get(Terran.Marine)),
+    new If(new EnemiesAtLeast(1, Protoss.Zealot), new BuildBunkersAtNatural(1)),
+    new BuildOrder(
+      Get(2, Terran.SupplyDepot),
       Get(Terran.Refinery)),
-    new Pump(Terran.Marine, 4),
+    new If(
+      new Not(new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.forgeFe)),
+      new Pump(Terran.Marine, 4)),
     new FlipIf(
-      new Or(
-        new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway),
-        new EnemyHasShown(Protoss.Zealot)),
+      new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway),
       new Build(
         Get(18, Terran.SCV),
         Get(Terran.Factory)),

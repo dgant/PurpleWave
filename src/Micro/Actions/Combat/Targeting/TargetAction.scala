@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Targeting
 
 import Micro.Actions.Action
 import Micro.Actions.Combat.Targeting.Filters._
-import Micro.Heuristics.Targeting.EvaluateTargets
+import Micro.Heuristics.Targeting2.EvaluateTargets2
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 import scala.collection.mutable
@@ -41,7 +41,7 @@ class TargetAction(val additionalFiltersRequired: TargetFilter*) extends Action 
     
     do {
       val targetsOptional = targetsRequired.filter(target => filtersOptional.forall(_.legal(unit, target)))
-      unit.agent.toAttack = EvaluateTargets.best(unit, targetsOptional)
+      unit.agent.toAttack = EvaluateTargets2.best(unit, targetsOptional)
       filtersOptional = filtersOptional.drop(1)
     }
     while (unit.agent.toAttack.isEmpty && filtersOptional.nonEmpty)

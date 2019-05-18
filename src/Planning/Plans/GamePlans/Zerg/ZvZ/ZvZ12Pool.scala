@@ -84,7 +84,6 @@ class ZvZ12Pool extends GameplanTemplate {
           new EnemyHasShown(Zerg.Mutalisk))),
       new BuildGasPumps),
 
-
     new Pump(Zerg.Zergling, 10),
     new Pump(Zerg.Drone, 6),
     new If(

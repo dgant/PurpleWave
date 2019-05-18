@@ -10,7 +10,7 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.BuildGasPumps
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{Latch, Not}
-import Planning.Predicates.Milestones.{BasesAtLeast, UnitsAtLeast, UnitsAtMost}
+import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchOr, UnitMatchSiegeTank}
 import Planning.{Plan, Predicate}
@@ -66,6 +66,11 @@ class TvP2FacJoyO extends GameplanTemplate {
         new UnitsAtLeast(vulturesVs2Gate, Terran.Vulture)),
       new Pump(Terran.MachineShop, 2)),
     new BuildGasPumps,
+    new If(
+      new Or(
+        new EnemyHasShown(Protoss.Forge),
+        new EnemyHasShown(Protoss.PhotonCannon)),
+      new Build(Get(Terran.SiegeMode))),
     new Trigger(
       new UnitsAtLeast(3, UnitMatchSiegeTank),
       new Parallel(

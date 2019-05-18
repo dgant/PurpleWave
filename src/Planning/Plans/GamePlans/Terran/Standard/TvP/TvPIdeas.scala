@@ -79,6 +79,7 @@ object TvPIdeas {
         Get(Terran.Academy),
         Get(Terran.Starport),
         Get(Terran.ScienceFacility),
+        Get(Terran.SpiderMinePlant),
         Get(Terran.ControlTower)),
       new Pump(Terran.ControlTower)))
 

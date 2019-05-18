@@ -94,6 +94,7 @@ class Fingerprints {
   // Zerg
   lazy val fourPool     = addFingerprint(new Fingerprint4Pool)
   lazy val ninePool     = addFingerprint(new Fingerprint9Pool)
+  lazy val ninePoolGas  = addFingerprint(new Fingerprint9PoolGas)
   lazy val overpool     = addFingerprint(new FingerprintOverpool)
   lazy val tenHatch     = addFingerprint(new Fingerprint10Hatch9Pool)
   lazy val twelvePool   = addFingerprint(new Fingerprint12Pool)

@@ -20,7 +20,7 @@ class RepairBunker extends Plan {
       .filter(u =>
         u.is(Terran.Bunker)
         && ! u.base.exists(_.owner.isEnemy)
-        && u.matchups.framesOfSafety < GameTime(0, 5)()
+        && u.matchups.framesOfSafety < (if (u.hitPoints < u.unitClass.maxHitPoints) 72 else 12)
         && u.remainingCompletionFrames < GameTime(0, 5)())
       .toVector
       .sortBy(_.matchups.framesOfSafety)

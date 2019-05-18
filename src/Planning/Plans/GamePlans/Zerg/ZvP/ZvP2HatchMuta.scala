@@ -19,7 +19,7 @@ import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete, UnitMatchOr, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvP2HatchMuta
@@ -137,6 +137,7 @@ class ZvP2HatchMuta extends GameplanTemplate {
   class ReactiveZerglings extends If(
     new UnitsAtMost(0, Zerg.Spire, complete = true),
     new PumpRatio(Zerg.Zergling, 0, 10, Seq(
+      Friendly(UnitMatchAnd(Zerg.SunkenColony, UnitMatchComplete), -6.0),
       Enemy(Terran.Marine, 1.5),
       Enemy(Terran.Firebat, 3.0),
       Enemy(Terran.Vulture, 2.0),
@@ -261,16 +262,16 @@ class ZvP2HatchMuta extends GameplanTemplate {
       new UnitsAtLeast(1, Zerg.Spire),
       new Build(Get(5, Zerg.Overlord))), // make sure we have enough when mutas pop
 
-    new If(
-      new ProceedWithDrones,
-      new Pump(Zerg.Drone, 12),
-      new Pump(Zerg.Drone, 9)),
+    new Pump(Zerg.Drone, 9),
+    new If(new ProceedWithDrones, new Pump(Zerg.Drone, 12)),
     new If(
       new ProceedWithTech,
       new Build(
         Get(Zerg.Lair),
         Get(Zerg.Spire),
         Get(Zerg.ZerglingSpeed))),
+    new If(new ProceedWithDrones, new Pump(Zerg.Drone, 16)),
+
     new If(
       new UnitsAtLeast(1, Zerg.Spire),
       new Parallel(
@@ -282,7 +283,8 @@ class ZvP2HatchMuta extends GameplanTemplate {
           new BuildGasPumps(3)),
         new If(
           new UnitsAtLeast(34, Zerg.Drone),
-          new BuildGasPumps(5)))),
+          new BuildGasPumps(5))),
+      new If(new ProceedWithDrones, new Pump(Zerg.Drone, 24))),
     new If(
       new And(
         new NeedExpansion(20),

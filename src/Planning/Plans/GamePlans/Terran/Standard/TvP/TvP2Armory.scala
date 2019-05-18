@@ -49,10 +49,11 @@ class TvP2Armory extends GameplanTemplate {
     new Build(
       Get(Terran.Barracks),
       Get(Terran.Refinery),
-      Get(Terran.Factory),
+      Get(Terran.Factory)),
+    new BuildGasPumps,
+    new Build(
       Get(Terran.MachineShop),
       Get(Terran.EngineeringBay)),
-    new BuildGasPumps,
     new BuildMissileTurretsAtNatural(1),
     new If(
       new EnemyHasShown(Protoss.Shuttle),
@@ -66,7 +67,7 @@ class TvP2Armory extends GameplanTemplate {
     new UpgradeContinuously(Terran.MechDamage),
     new If(
       new EnemyBasesAtMost(2),
-      new Build(Get(5, Terran.Factory))), // Normally 4 but we're not very clever with our units
+      new Build(Get(4, Terran.Factory))), // Normally 4 but we're not very clever with our units
     new Build(
       Get(Terran.SpiderMinePlant),
       Get(Terran.VultureSpeed)),

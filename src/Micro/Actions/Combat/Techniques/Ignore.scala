@@ -9,7 +9,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Ignore extends ActionTechnique {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.canMove
+    unit.canMove && (unit.flying || ! unit.zone.edges.exists(_.contains(unit.pixelCenter)))
   )
   
   override val activator = One
@@ -21,7 +21,5 @@ object Ignore extends ActionTechnique {
     / GameTime(0, 12)()
   )
   
-  override protected def perform(unit: FriendlyUnitInfo): Unit = {
-
-  }
+  override protected def perform(unit: FriendlyUnitInfo): Unit = {}
 }

@@ -43,6 +43,13 @@ object PvT1015Expand extends PvTBasicOpener {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
   override def entranceRamped: Boolean = false
 }
+object PvT1015TripleExpand extends PvTBasicOpener {
+  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
+  override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
+    PvT3BaseArbiter,
+    PvT3BaseCarrier
+  ))
+}
 object PvT1015DT extends PvTStrategy {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
   override def choices: Iterable[Iterable[Strategy]] = Vector(

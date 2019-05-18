@@ -20,6 +20,7 @@ class DefendZones extends Plan {
 
     val zoneScores = zones
       .keys
+      .filter(_.units.exists(u => u.unitClass.isBuilding && u.isOurs))
       .map(zone => (zone, zoneValue(zone)))
       .filter(_._2 > 0.0)
       .toMap
@@ -45,7 +46,7 @@ class DefendZones extends Plan {
   }
   
   private def zoneValue(zone: Zone): Double = {
-    zone.bases.map(baseValue).sum + zone.units.view.filter(u => u.unitClass.isBuilding && u.isOurs).map(_.subjectiveValue).sum
+    zone.units.view.map(u => if (u.isEnemy) u.subjectiveValue else 0.0).sum
   }
   
   private def baseValue(base: Base): Double = {

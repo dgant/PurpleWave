@@ -7,10 +7,10 @@ import Lifecycle.With
 import Mathematics.Points.Tile
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Ring
-import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
+import Planning.UnitMatchers.UnitMatchSiegeTank
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 import scala.collection.mutable.ArrayBuffer
@@ -48,10 +48,13 @@ object Avoid extends ActionTechnique {
     if (unit.unitClass.isReaver && unit.transport.isDefined) {
       avoidGreedyPath(unit, 1, 1, 1, 1)
     }
+
+    val retreatOntoMap = unit.matchups.threats.count(_.is(UnitMatchSiegeTank)) > 1
+    if (retreatOntoMap) {
+      avoidGreedyPath(unit, distanceValue = 0, safetyValue = 2)
+    }
     avoidGreedyPath(unit)
     avoidGreedyPath(unit, distanceValue = 0, safetyValue = 2)
-    // TODO: Try this for better Abuse behavior when blocked?
-    // Potshot.consider(unit)
     avoidGreedyPath(unit, distanceValue = 0, safetyValue = 2, crowdValue = 0)
     avoidGreedyPath(unit, distanceValue = 2, safetyValue = 0)
     if (unit.zone != unit.agent.origin.zone) {

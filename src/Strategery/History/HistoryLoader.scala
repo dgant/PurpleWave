@@ -121,16 +121,4 @@ object HistoryLoader {
       bufferedWriter.close()
     }
   }
-
-  val humanModeFileName = "bwapi-data/AI/human-mode-is.on"
-  def humanModeEnabled: Boolean = {
-    try {
-      return new File(humanModeFileName).exists()
-    }
-    catch { case exception: Exception =>
-      With.logger.warn("Exception looking for human mode file at: " + humanModeFileName)
-      With.logger.onException(exception)
-    }
-    false
-  }
 }

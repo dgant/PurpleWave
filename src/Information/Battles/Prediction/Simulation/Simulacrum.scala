@@ -65,7 +65,7 @@ class Simulacrum(
       || realUnit.inRangeToAttack(target)
       || ! realUnit.isOurs)
   lazy val targetQueue: mutable.PriorityQueue[Simulacrum] = (
-    new mutable.PriorityQueue[Simulacrum]()(Ordering.by(x => (x.unitClass.dealsDamage, - x.pixel.pixelDistance(pixel))))
+    new mutable.PriorityQueue[Simulacrum]()(Ordering.by(x => (x.realUnit.participatingInCombat(), - x.pixel.pixelDistance(pixel))))
     ++= realTargets.flatMap(simulation.simulacra.get))
   
   var fightingInitially: Boolean = {

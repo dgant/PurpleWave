@@ -50,6 +50,8 @@ object FightOrFlight extends Action {
         && ally.energy > 20
         && ally.pixelDistanceEdge(ally, otherAt = ByOption.minBy(unit.matchups.targets.view.map(unit.pixelToFireAt))(unit.pixelDistanceCenter).getOrElse(unit.pixelCenter)) < 72)
     )
+
+    /* Disabled because I think it was leading to some units fighting and others not
     decide(true,  "Commit", () =>
       unit.visibleToOpponents
       && unit.unitClass.melee
@@ -59,7 +61,7 @@ object FightOrFlight extends Action {
         && threat.topSpeed > unit.topSpeed
         && threat.pixelRangeAgainst(unit) > unit.pixelRangeAgainst(threat)
         && threat.matchups.threats.forall(ally => ally.topSpeed < threat.topSpeed && ally.pixelRangeAgainst(threat) < threat.pixelRangeAgainst(ally))))
-
+    */
     //decide(true,  "Hodor",      () => unit.matchups.alliesInclSelf.forall(_.base.exists(_.isOurMain)) && unit.matchups.threats.exists(t => ! t.flying && t.base.exists(_.isOurMain)) && unit.matchups.threats.exists(t => ! t.flying && ! t.base.exists(_.isOurMain)))
 
     decide(true, "Workers", () => unit.matchups.allies.exists(u => u.friendly.isDefined && {

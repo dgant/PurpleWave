@@ -1,5 +1,6 @@
 package Micro.Actions.Protoss
 
+import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Commands.{Attack, AttackMove}
 import Micro.Actions.Protoss.Carrier._
@@ -17,9 +18,11 @@ object BeACarrier extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    def interceptorActive(interceptor: UnitInfo): Boolean = {
-      ! unit.complete || (unit.order == Orders.InterceptorAttack)
-    }
+    def interceptorActive(interceptor: UnitInfo): Boolean = (
+      ! unit.complete
+      || (unit.order == Orders.InterceptorAttack)
+      || With.framesSince(unit.lastFrameStartingAttack) < 72
+    )
     def airToAirSupply(units: Seq[UnitInfo]): Double = {
       units.map(u => if (u.flying) u.unitClass.supplyRequired else 0).sum
     }

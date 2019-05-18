@@ -5,7 +5,7 @@ import Strategery.History.HistoryLoader
 
 object KeyboardCommands {
   def quitVsHuman(): Unit = {
-    if (HistoryLoader.humanModeEnabled) With.game.leaveGame()
+    if (With.configuration.humanMode()) With.game.leaveGame()
   }
 
   def onSendText(text: String) {

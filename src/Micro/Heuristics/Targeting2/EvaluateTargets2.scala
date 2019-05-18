@@ -14,13 +14,28 @@ object EvaluateTargets2 extends TargetEvaluator {
   }
 
   def audit(attacker: FriendlyUnitInfo, targets: Iterable[UnitInfo]): Seq[(UnitInfo, Double)] = {
-    val output = targets.map(target => (target, evaluate(attacker, target))).toVector
-    output.sortBy(-_._2)
+    var output = targets.map(target => (target, evaluate(attacker, target))).toVector
+    output = output.sortBy(-_._2)
     output
   }
-  
+
+  def participatingInCombat(target: UnitInfo): Boolean = (
+    target.matchups.targets.nonEmpty
+      || target.isAny(
+        Terran.Dropship,
+        Terran.Medic,
+        Terran.ScienceVessel,
+        Terran.SpiderMine,
+        Protoss.DarkArchon,
+        Protoss.HighTemplar,
+        Protoss.Shuttle,
+        Zerg.Defiler))
+
   def evaluate(attacker: FriendlyUnitInfo, target: UnitInfo): Double = {
-    val targetBaseValue       = getTargetBaseValue(attacker, target)
+    evaluateInner(attacker, target, recur = true)
+  }
+
+  def evaluateInner(attacker: FriendlyUnitInfo, target: UnitInfo, recur: Boolean): Double = {
     val dpfAgainstTarget      = attacker.dpfOnNextHitAgainst(target)
     val teamFramesOfSafety    = attacker.matchups.teamFramesOfSafety
     val framesToReachTarget   = Math.max(
@@ -33,55 +48,25 @@ object EvaluateTargets2 extends TargetEvaluator {
     val framesOutOfWayToShoot = if (attacker.canMove) Math.max(0, attacker.framesToGetInRange(target) - framesOfFreedom) else 0
 
     var output = (
-      targetBaseValue
+      target.baseTargetValue()
       * dpfAgainstTarget
       / Math.max(1.0, target.totalHealth)
       / Math.max(6.0, framesOutOfWayToGoal + framesOutOfWayToShoot)
     )
 
-    // Combat bonus
-    val isCombatEligible = (
-      target.matchups.framesBeforeAttacking <= framesOfFreedom
-      || target.isAny(
-        Terran.Dropship,
-        Terran.Medic,
-        Terran.ScienceVessel,
-        Terran.SpiderMine,
-        Protoss.DarkArchon,
-        Protoss.HighTemplar,
-        Protoss.Shuttle,
-        Zerg.Defiler))
-    if (isCombatEligible) {
-      output *= 10.0 * target.matchups.splashFactorMax
-    }
-
     // Accessibility bonus
-    val accessibleCombatUnit = attacker.inRangeToAttack(target) && isCombatEligible
+    val accessibleCombatUnit = attacker.inRangeToAttack(target) && target.participatingInCombat()
     if (accessibleCombatUnit) {
       output *= 1.5
     }
 
-    // Temporary visibility bonus
-    val temporarilyVisible = (target.cloaked || target.burrowed) && attacker.matchups.allyDetectors.forall(_.is(Terran.SpellScannerSweep))
-    if (temporarilyVisible) {
-      output *= 2.0
-    }
-
     // Repair bonus
-    val repairValue = target.orderTarget.map(targetOrderTarget => if (target.repairing && ! targetOrderTarget.repairing) 1.1 * evaluate(attacker, target) else 0.0).getOrElse(0.0)
+    val repairValue = target.orderTarget.map(targetOrderTarget =>
+      if (target.repairing && ! targetOrderTarget.repairing && recur)
+        1.1 * evaluateInner(attacker, target, recur = false)
+      else
+        0.0).getOrElse(0.0)
     output = Math.max(output, repairValue)
-
-    // Gathering bonus
-    val gathering = target.gathering
-    if (gathering) {
-      output *= 2.0
-    }
-
-    // Construction bonus
-    val constructing = target.constructing
-    if (constructing) {
-      output *= 2.0
-    }
 
     // Detector bonus
     val isDetecting = TargetHeuristicDetectors.evaluate(attacker, target) > HeuristicMathMultiplicative.default
@@ -104,7 +89,38 @@ object EvaluateTargets2 extends TargetEvaluator {
     output
   }
 
-  def getTargetBaseValue(attacker: FriendlyUnitInfo, target: UnitInfo): Double = {
-    target.subjectiveValue
+  def getTargetBaseValue(target: UnitInfo): Double = {
+    var output = target.subjectiveValue
+
+    // Gathering bonus
+    val gathering = target.gathering
+    if (gathering) {
+      output *= 2.0
+    }
+
+    // Construction bonus
+    val constructing = target.constructing
+    if (constructing) {
+      output *= 2.0
+    }
+
+    // Combat bonus
+    if (target.participatingInCombat()) {
+      output *= target.matchups.splashFactorMax
+      if (target.complete) {
+        output *= 2.0
+      } else {
+        val buildFrames = target.unitClass.buildFrames
+        output *= (1.0 + (buildFrames - target.remainingCompletionFrames) / buildFrames)
+      }
+    }
+
+    // Temporary visibility bonus
+    val temporarilyVisible = (target.cloaked || target.burrowed) && target.matchups.enemyDetectors.forall(_.is(Terran.SpellScannerSweep))
+    if (temporarilyVisible) {
+      output *= 2.0
+    }
+
+    output
   }
 }

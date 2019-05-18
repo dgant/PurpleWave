@@ -9,7 +9,7 @@ import Planning.Plans.Compound.{Or, Parallel, _}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTIdeas.TrainMinimumDragoons
-import Planning.Plans.Macro.Automatic.UpgradeContinuously
+import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
@@ -63,8 +63,6 @@ class PvTBasic extends GameplanTemplate {
     new If(new Employing(PvT2GateObserver),     new ScoutOn(Protoss.Pylon)),
     new If(new Employing(PvT1015DT),            new If(new UpgradeStarted(Protoss.DragoonRange), new Scout)),
     new If(new Employing(PvTDTExpand),          new ScoutOn(Protoss.CyberneticsCore)))
-
-  override def workerPlan: Plan = super.workerPlan
 
   override val priorityAttackPlan = new PvTIdeas.PriorityAttacks
   override val attackPlan = new Parallel(
@@ -226,10 +224,10 @@ class PvTBasic extends GameplanTemplate {
             Get(5, Protoss.Gateway))),
         new Build(
             Get(Protoss.CitadelOfAdun),
-            Get(5, Protoss.Gateway),
             Get(Protoss.TemplarArchives),
-            Get(2, Protoss.Forge),
-            Get(Protoss.HighTemplarEnergy))),
+            Get(5, Protoss.Gateway),
+            Get(Protoss.HighTemplarEnergy),
+            Get(2, Protoss.Forge))),
       // No bio? Normal game plan
       new Parallel(
         new If(
@@ -242,6 +240,7 @@ class PvTBasic extends GameplanTemplate {
             Get(Protoss.Observatory),
             Get(3, Protoss.Gateway))),
         new If(
+          // Time for Carrier tech?
           new And(
             new EmployingCarriers,
             new Or(
@@ -251,17 +250,24 @@ class PvTBasic extends GameplanTemplate {
               new ScoutCleared,
               new FrameAtLeast(GameTime(4, 45)()))),
           new Parallel(
-            new Build(
-              Get(Protoss.Stargate),
-              Get(Protoss.FleetBeacon)),
+            new If(
+              new BasesAtLeast(3),
+              new Build(
+                Get(Protoss.Stargate),
+                Get(Protoss.FleetBeacon)),
+              new Build(
+                Get(Protoss.Stargate),
+                Get(Protoss.CitadelOfAdun),
+                Get(Protoss.FleetBeacon),
+                Get(Protoss.ZealotSpeed))),
             new UpgradeContinuously(Protoss.AirDamage),
             new If(
               new UnitsAtLeast(1, Protoss.FleetBeacon),
               new If(
                 new And(
                   new MiningBasesAtLeast(3),
-                  // TODO: Document: why this list?
-                  new Employing(PvT13Nexus, PvT21Nexus, PvT23Nexus, PvT28Nexus, PvT1015Expand)),
+                  // TODO: Document: why this list? I think it was to avoid going too Carrier-heavy after low-econ openers
+                  new Employing(PvT13Nexus, PvT21Nexus, PvT23Nexus, PvT28Nexus, PvT1015Expand, PvT1015TripleExpand)),
                 new Build(
                   Get(3, Protoss.Stargate),
                   Get(3, Protoss.Carrier),
@@ -312,17 +318,24 @@ class PvTBasic extends GameplanTemplate {
     new RequireMiningBases(2),
     new BasicTech,
     new If(new EmployingTwoBase,    new BuildGasPumps),
-    new If(new ReadyForThirdBase,   new RequireMiningBases(3)),
+    new If(new ReadyForThirdBase,   new If(new UnitsAtMost(1, Protoss.Gateway), new Pump(Protoss.Dragoon)), new RequireMiningBases(3)),
     new If(new ReadyForFourthBase,  new RequireMiningBases(4)),
-    new BuildCannonsAtExpansions(2),
     new If(
-      new BasesAtLeast(3),
-      new BuildCannonsAtNatural(1)),
+      new UnitsAtLeast(3, Protoss.Gateway),
+      new BuildCannonsAtExpansions(2),
+      new If(
+        new BasesAtLeast(3),
+        new BuildCannonsAtNatural(1))),
 
     new CriticalUpgrades,
     new FlipIf(
       new SafeAtHome,
       new Parallel(
+        new If(
+          new And(
+            new UnitsAtLeast(4, Protoss.Carrier),
+            new BasesAtLeast(3)),
+          new Build(Get(Protoss.CitadelOfAdun), Get(Protoss.ZealotSpeed))),
         new PvTIdeas.TrainArmy,
         new If(new EnemyHasShown(Terran.Wraith), new ObserverTech)),
       new Parallel(

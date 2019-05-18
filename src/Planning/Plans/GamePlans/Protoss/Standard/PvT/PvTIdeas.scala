@@ -16,7 +16,7 @@ import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchCustom, UnitMatchOr, UnitMatchSiegeTank, UnitMatchWarriors}
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Protoss.{PvT1015DT, PvT1015Expand, PvTStove}
+import Strategery.Strategies.Protoss.{PvT1015DT, PvT1015Expand, PvT1015TripleExpand, PvTStove}
 
 object PvTIdeas {
   
@@ -44,6 +44,7 @@ object PvTIdeas {
     new If(
       new Or(
         new Employing(PvT1015Expand),
+        new Employing(PvT1015TripleExpand),
         new Employing(PvT1015DT),
         new Employing(PvTStove),
         new MiningBasesAtLeast(3),

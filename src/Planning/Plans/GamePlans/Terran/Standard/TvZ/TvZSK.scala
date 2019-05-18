@@ -125,6 +125,11 @@ class TvZSK extends GameplanTemplate {
       new UnitsAtMost(0, Terran.ScienceFacility, complete = true),
       new Pump(Terran.Wraith, 1)),
     new Pump(Terran.ScienceVessel, 2),
+    new If(
+      new TechStarted(Terran.WraithCloak),
+      new PumpRatio(Terran.Wraith, 0, 12, Seq(Enemy(Zerg.Guardian, 1.0), Enemy(Zerg.Mutalisk, 1.0))),
+      new PumpRatio(Terran.Wraith, 0, 12, Seq(Enemy(Zerg.Guardian, 1.0)))),
+    new If(new UnitsAtLeast(5, Terran.Wraith), new Build(Get(Terran.WraithCloak))),
     new Pump(Terran.Battlecruiser),
     new Pump(Terran.ScienceVessel, 12),
     new If(

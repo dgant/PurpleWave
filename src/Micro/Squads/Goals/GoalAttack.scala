@@ -46,6 +46,7 @@ class GoalAttack extends GoalBasic {
 
     lazy val enemyNonTrollyThreats = With.units.enemy.count(u => u.is(UnitMatchWarriors) && u.possiblyStillThere && ! u.is(Terran.Vulture) && u.detected)
     if (With.enemies.exists( ! _.isZerg)
+      && With.enemy.bases.size < 3
       && threatDistanceToUs < threatDistanceToEnemy
       && enemyNonTrollyThreats > 6) {
       target = With.intelligence.threatOrigin.pixelCenter

@@ -23,7 +23,7 @@ object Manners {
       surrender()
     }
     if (With.frame == GameTime(0, 20)()) {
-      if (HistoryLoader.humanModeEnabled) {
+      if (With.configuration.humanMode()) {
         chat("Good luck, " + With.enemy.name + ", and have fun!")
       }
       else {
@@ -46,7 +46,7 @@ object Manners {
   
   def onEnd(isWinner: Boolean) {
     chat(
-      if (HistoryLoader.humanModeEnabled)
+      if (With.configuration.humanMode())
         "Good game, " + With.enemy.name
       else if (isWinner)
         "Good game! I still think you're beautiful."

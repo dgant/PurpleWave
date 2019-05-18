@@ -1,6 +1,9 @@
 package Debugging
 
+import java.io.File
+
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Lifecycle.With
 import Micro.Heuristics.Targeting.{EvaluateTargets, TargetEvaluator}
 
 class Configuration {
@@ -13,7 +16,6 @@ class Configuration {
   var enablePerformanceStops          = true
   var enablePerformanceSurrender      = false
   var enableChat                      = true
-  var enableVisualizations            = true
   var enableStreamManners             = true
   var identifyGhostUnits              = false
   var targetFrameDurationMilliseconds = 20
@@ -40,8 +42,7 @@ class Configuration {
   var battleMarginTileMinimum       = 12 + 2
   var battleMarginTileMaximum       = 12 * 2 + 2 // A bit over double Siege Tank range
   var battleHysteresisFrames        = GameTime(0, 6)()
-  var battleHysteresisRatio         = 0.0 // 0.12 -> 0.24 from SSCAIT 2018/ AIST2
-  var baseTarget                    = 0.04 // 0.55 -> 0.1from SSCAIT 2018/ AIST2
+  var baseTarget                    = 0.04 // 0.55 -> 0.1 from SSCAIT 2018/ AIST2
   var simulationFrames              = GameTime(0, 12)()
   var simulationEstimationPeriod    = 6
   var simulationScoreHalfLife       = GameTime(0, 2)()
@@ -115,4 +116,22 @@ class Configuration {
   var cameraViewportHeight        = 362
   var conservativeViewportWidth   = 640 + cameraViewportWidth
   var conservativeViewportHeight  = 480 + cameraViewportHeight
+
+  class FileFlag(filename: String) {
+    lazy val fullPath = "bwapi-data/AI/" + filename
+    private lazy val enabled: Boolean = {
+      try {
+        new File(fullPath).exists()
+      }
+      catch { case exception: Exception =>
+        With.logger.warn("Exception looking for flag file at: " + fullPath)
+        With.logger.onException(exception)
+      }
+      false
+    }
+    def apply() = enabled
+  }
+
+  val humanMode = new FileFlag("human-mode-is.on")
+  val visualize = new FileFlag("visualizations-are.on")
 }

@@ -69,6 +69,10 @@ class PurpleWavePlaybook extends EmptyPlaybook {
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy
 }
 
+class CIGPlaybook extends PurpleWavePlaybook {
+  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionCIG
+}
+
 class TestingPlaybook extends PurpleWavePlaybook {
   override lazy val forced: Seq[Strategy] = Seq(PvT21Nexus, PvT3BaseCarrier)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
@@ -76,4 +80,4 @@ class TestingPlaybook extends PurpleWavePlaybook {
   override def respectHistory: Boolean = false
 }
 
-object Playbook extends TestingPlaybook {}
+object Playbook extends CIGPlaybook {}

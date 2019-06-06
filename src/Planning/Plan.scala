@@ -37,4 +37,6 @@ class Plan {
   
   final def isPrioritized: Boolean = With.prioritizer.isPrioritized(this)
   final def priority: Int = With.prioritizer.getPriority(this)
+
+  def isEmpty: Boolean = false
 }

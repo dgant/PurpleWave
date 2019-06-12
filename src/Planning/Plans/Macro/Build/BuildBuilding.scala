@@ -2,6 +2,7 @@ package Planning.Plans.Macro.Build
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
+import Macro.Allocation.Placer
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
 import Planning.Plan
@@ -153,7 +154,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
       building.map(_.tileTopLeft)
     }
     else if (currencyLock.satisfied && currencyLock.expectedFrames < With.blackboard.maxFramesToSendAdvanceBuilder) {
-      With.groundskeeper.getSuggestion(buildingClass)
+      With.groundskeeper.getSuggestion(buildingClass).orElse(Placer.place(buildingClass).head.tile)
     }
     else {
       None

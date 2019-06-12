@@ -2,6 +2,7 @@ package Macro.Architecture.PlacementStates
 
 import Debugging.Visualizations.Views.Geography.ShowArchitectureHeuristics
 import Lifecycle.With
+import Macro.Allocation.Placer
 import Macro.Architecture.Heuristics.{EvaluatePlacements, PlacementHeuristicEvaluation}
 import Macro.Architecture.Tiles.Surveyor
 import Macro.Architecture.{Blueprint, Placement}
@@ -84,6 +85,7 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
         candidates        = candidatesUnfiltered.get.size,
         evaluated         = candidatesFiltered.get.size)
 
+      Placer.addPlacement(placement)
       With.architecture.assumePlacement(placement)
       transition(new PlacementStateReady)
     }

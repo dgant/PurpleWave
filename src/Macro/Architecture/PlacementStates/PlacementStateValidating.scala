@@ -1,6 +1,7 @@
 package Macro.Architecture.PlacementStates
 
 import Lifecycle.With
+import Macro.Allocation.Placer
 import Macro.Architecture.{Blueprint, Placement}
 import Mathematics.Points.Tile
 
@@ -8,11 +9,7 @@ import scala.collection.mutable
 
 class PlacementStateValidating(blueprint: Blueprint) extends PlacementState {
   override def step() {
-    val placement = placements.get(blueprint)
-    if (placement.exists(_.satisfies(blueprint))) {
-      With.architecture.assumePlacement(placement.get)
-      transition(new PlacementStateReady)
-    } else if (blueprint.forcePlacement) {
+    if (blueprint.forcePlacement) {
       val placement = Placement(
         blueprint,
         Some(blueprint.requireCandidates.get.head),
@@ -23,6 +20,7 @@ class PlacementStateValidating(blueprint: Blueprint) extends PlacementState {
         frameFinished     = With.frame,
         candidates        = 1,
         evaluated         = 1)
+      Placer.addPlacement(placement)
       With.architecture.assumePlacement(placement)
       transition(new PlacementStateReady)
     } else {

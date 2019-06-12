@@ -36,7 +36,7 @@ class Groundskeeper {
 
   def propose(blueprint: Blueprint): Unit = {
     Placer.placeBlueprints(blueprint)
-      .values.foreach(placement =>
+      .foreach(placement =>
         placement.tile.foreach(tile =>
           suggest(tile, placement.blueprint.building.toSeq: _*)))
   }

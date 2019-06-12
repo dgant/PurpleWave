@@ -2,7 +2,6 @@ package Planning.Plans.Macro.Build
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
-import Macro.Architecture.Blueprint
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
 import Planning.Plan
@@ -15,8 +14,7 @@ import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class BuildBuilding(val buildingClass: UnitClass) extends Plan {
-  
-  val buildingDescriptor  = new Blueprint(this, Some(buildingClass))
+
   val currencyLock        = new LockCurrencyForUnit(buildingClass)
   
   private var desiredTile   : Option[Tile]              = None
@@ -45,7 +43,6 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     
     if (building.exists(b => ! b.unitClass.isTerran)) {
       builderLock.release()
-      With.groundskeeper.flagFulfilled(buildingDescriptor, building.get)
       return
     }
     
@@ -140,6 +137,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
             canAttack   = false
           })
         }
+        desiredTile.foreach(With.groundskeeper.reserve(this, _, buildingClass))
       }
       else if (buildingClass.isTerran) {
         builder.agent.intend(this, new Intention {
@@ -152,14 +150,13 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   
   private def acquireDesiredTile(): Option[Tile] = {
     if (building.isDefined) {
-      With.groundskeeper.flagFulfilled(buildingDescriptor, building.get)
       building.map(_.tileTopLeft)
     }
     else if (currencyLock.satisfied && currencyLock.expectedFrames < With.blackboard.maxFramesToSendAdvanceBuilder) {
-      With.groundskeeper.demand(buildingDescriptor)
+      With.groundskeeper.getSuggestion(buildingClass)
     }
     else {
-      With.groundskeeper.require(buildingDescriptor)
+      None
     }
   }
   

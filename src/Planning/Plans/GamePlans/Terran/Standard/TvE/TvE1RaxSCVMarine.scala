@@ -33,7 +33,7 @@ class TvE1RaxSCVMarine extends GameplanTemplate {
     new Check(() => ! MapGroups.badForProxying.exists(_.matches)),
     new ProposePlacement{
       override lazy val blueprints = Vector(
-        new Blueprint(this,
+        new Blueprint(
           building = Some(Terran.Barracks),
           preferZone = ProxyPlanner.proxyMiddle,
           respectHarvesting = Some(false),

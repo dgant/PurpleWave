@@ -29,15 +29,15 @@ class ProxyDarkTemplarRush extends GameplanTemplate {
   // An example: https://youtu.be/ca40eQ1s7iw
   override def placementPlan: Plan = new ProposePlacement {
     override lazy val blueprints: Seq[Blueprint] = Vector(
-      new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.proxyPylon),    preferZone = ProxyPlanner.proxyMiddle),
-      new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.proxyBuilding), preferZone = ProxyPlanner.proxyMiddle),
-      new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.proxyBuilding), preferZone = ProxyPlanner.proxyMiddle))
+      new Blueprint(building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.proxyPylon),    preferZone = ProxyPlanner.proxyMiddle),
+      new Blueprint(building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.proxyBuilding), preferZone = ProxyPlanner.proxyMiddle),
+      new Blueprint(building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.proxyBuilding), preferZone = ProxyPlanner.proxyMiddle))
   }
 
   def defaultPlacementPlanNewfangled: Plan = new Parallel(
     new ProposePlacement(
-      new Blueprint(this, building = Some(Protoss.Pylon)),
-      new Blueprint(this, building = Some(Protoss.Gateway))),
+      new Blueprint(building = Some(Protoss.Pylon)),
+      new Blueprint(building = Some(Protoss.Gateway))),
     new Trigger(
       new Or(
         new Always, // TEMPORARY

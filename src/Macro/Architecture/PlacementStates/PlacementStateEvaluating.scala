@@ -83,8 +83,8 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
         frameFinished     = With.frame,
         candidates        = candidatesUnfiltered.get.size,
         evaluated         = candidatesFiltered.get.size)
+
       With.architecture.assumePlacement(placement)
-      With.groundskeeper.updatePlacement(blueprint, placement)
       transition(new PlacementStateReady)
     }
   }

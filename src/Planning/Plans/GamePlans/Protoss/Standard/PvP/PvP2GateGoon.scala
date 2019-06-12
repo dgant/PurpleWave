@@ -29,16 +29,16 @@ class PvP2GateGoon extends GameplanTemplate {
   override val completionCriteria : Predicate = new Latch(new UnitsAtLeast(5, Protoss.Gateway))
 
   override def blueprints = Vector(
-    new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 8.0)),
-    new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
-    new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
-    new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.backPylon)))
+    new Blueprint(building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 8.0)),
+    new Blueprint(building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
+    new Blueprint(building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
+    new Blueprint(building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.backPylon)))
 
   override def placementPlan: Plan = new Parallel(
     super.placementPlan,
     new If(
       new BasesAtLeast(2),
-      new ProposePlacement(new Blueprint(this, building = Some(Protoss.Pylon), preferZone = Some(With.geography.ourNatural.zone)))))
+      new ProposePlacement(new Blueprint(building = Some(Protoss.Pylon), preferZone = Some(With.geography.ourNatural.zone)))))
 
   override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
   override def attackPlan: Plan = new If(

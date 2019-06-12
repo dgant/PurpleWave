@@ -24,7 +24,6 @@ class PlacementStateValidating(blueprint: Blueprint) extends PlacementState {
         candidates        = 1,
         evaluated         = 1)
       With.architecture.assumePlacement(placement)
-      With.groundskeeper.updatePlacement(blueprint, placement)
       transition(new PlacementStateReady)
     } else {
       transition(new PlacementStateEvaluating(blueprint))

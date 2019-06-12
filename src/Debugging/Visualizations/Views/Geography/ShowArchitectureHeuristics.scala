@@ -21,20 +21,13 @@ object ShowArchitectureHeuristics extends View {
       placementToRender(blueprint).foreach(placement =>
         renderPlacementHeuristicsMap(blueprint, placement)))
   }
-  
+
   private def blueprintToRender: Option[Blueprint] = {
-    With.groundskeeper.proposalPlacements.keys
-      .toVector
-      .sortBy(_.proposer.priority)
-      .headOption
+    None
   }
-  
+
   private def placementToRender(blueprint: Blueprint): Option[Placement] = {
-    val placement = With.groundskeeper.proposalPlacements(blueprint)
-    if (placement.tile.isEmpty || placement.scoresByTile.isEmpty)
-      None
-    else
-      Some(placement)
+    None
   }
   
   private def renderPlacementHeuristicsScreen(blueprint: Blueprint, placement: Placement) = {

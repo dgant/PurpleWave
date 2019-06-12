@@ -37,8 +37,8 @@ class TvP1RaxFE extends GameplanTemplate {
 
    override def placementPlan: Plan = new ProposePlacement {
      override lazy val blueprints: Seq[Blueprint] = Vector(
-       new Blueprint(this, building = Some(Terran.Barracks), preferZone = Some(With.geography.ourNatural.zone)),
-       new Blueprint(this, building = Some(Terran.SupplyDepot), preferZone = Some(With.geography.ourNatural.zone)))
+       new Blueprint(building = Some(Terran.Barracks), preferZone = Some(With.geography.ourNatural.zone)),
+       new Blueprint(building = Some(Terran.SupplyDepot), preferZone = Some(With.geography.ourNatural.zone)))
    }
 
   override def scoutPlan: Plan = new ScoutOn(Terran.SupplyDepot)

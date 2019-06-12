@@ -13,11 +13,11 @@ class Nexus2GateThenCannons extends ProposePlacement {
     val naturalZone = naturalBase.zone
     val marginPixels = naturalZone.exit.map(_.pixelCenter.pixelDistance(naturalBase.townHallArea.midPixel) - Protoss.Nexus.radialHypotenuse).getOrElse(128.0)
     val output = Vector(
-      new Blueprint(this, building = Some(Protoss.Pylon)),
-      new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(marginPixels - 96.0)),
-      new Blueprint(this, building = Some(Protoss.PhotonCannon), requireZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(marginPixels)),
-      new Blueprint(this, building = Some(Protoss.PhotonCannon), requireZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(marginPixels)),
-      new Blueprint(this, building = Some(Protoss.PhotonCannon), requireZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(marginPixels)))
+      new Blueprint(building = Some(Protoss.Pylon)),
+      new Blueprint(building = Some(Protoss.Pylon), requireZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(marginPixels - 96.0)),
+      new Blueprint(building = Some(Protoss.PhotonCannon), requireZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(marginPixels)),
+      new Blueprint(building = Some(Protoss.PhotonCannon), requireZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(marginPixels)),
+      new Blueprint(building = Some(Protoss.PhotonCannon), requireZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(marginPixels)))
     output
   }
 }

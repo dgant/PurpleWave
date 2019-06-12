@@ -4,13 +4,11 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
 import Mathematics.Points.{Tile, TileRectangle}
-import Planning.Plan
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import Strategery.Plasma
 
 class Blueprint(
-  val proposer            : Plan,
   val building            : Option[UnitClass]         = None,
   var widthTiles          : Option[Int]               = None,
   var heightTiles         : Option[Int]               = None,
@@ -79,8 +77,6 @@ class Blueprint(
     } else {
       Vector(0)
     }
-
-
   
   def fulfilledBy(proposal: Blueprint): Boolean = {
     if (proposal == this) return true
@@ -176,7 +172,7 @@ class Blueprint(
   
   override def toString: String =
     (
-      "#" + proposer.priority + "-" + id.map(_.toString).getOrElse("x") + " " +
+      id.map(_.toString).getOrElse("x") + " " +
       building.map(_.toString + " ").getOrElse("") +
       placement.toString + " " +
       widthTiles + "x" + heightTiles + " " +

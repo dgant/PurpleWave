@@ -6,7 +6,7 @@ import Performance.TaskQueue.TaskQueueGrids
 
 class TaskArchitecture extends AbstractTask {
   urgency = With.configuration.urgencyArchitecture
-  override protected def onRun() { With.placement.run() }
+  override protected def onRun() { /*With.placement.run()*/ }
 }
 class TaskAccounting extends AbstractTask {
   urgency = With.configuration.urgencyEconomy

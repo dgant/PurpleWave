@@ -34,7 +34,7 @@ class ZvZ5PoolSunkens extends GameplanTemplate {
     scouts.get.unitCounter.set(UnitCountEverything)
   }
   
-  private def blueprintCreepColony: Blueprint = new Blueprint(this,
+  private def blueprintCreepColony: Blueprint = new Blueprint(
     building    = Some(Zerg.CreepColony),
     requireZone = ProxyPlanner.proxyEnemyMain,
     placement   = Some(PlacementProfiles.tech))

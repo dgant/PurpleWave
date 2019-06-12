@@ -9,7 +9,7 @@ import Information.Grids.Grids
 import Information.Intelligenze.Fingerprinting.Fingerprints
 import Information._
 import Macro.Allocation._
-import Macro.Architecture.{Architecture, PlacementScheduler}
+import Macro.Architecture.Architecture
 import Macro.Scheduling.{MasterBuildOrderHistory, MasterBuildPlans, Projections, Scheduler}
 import Micro.Agency.{Agency, Commander}
 import Micro.Coordination.Coordinator
@@ -46,7 +46,7 @@ object With {
   var fingerprints      : Fingerprints            = _
   var geography         : Geography               = _
   var grids             : Grids                   = _
-  var groundskeeper     : Groundskeeper           = _
+  var groundskeeper     : Groundskeeper          = _
   var history           : History                 = _
   var intelligence      : Intelligence            = _
   var latency           : Latency                 = _
@@ -54,7 +54,6 @@ object With {
   var matchups          : MatchupGraph            = _
   var paths             : Paths                   = _
   var performance       : PerformanceMonitor      = _
-  var placement         : PlacementScheduler      = _
   var projections       : Projections             = _
   var proxy             : ProxyBWMirror           = _
   var prioritizer       : Prioritizer             = _
@@ -127,7 +126,6 @@ object With {
     matchups          = new MatchupGraph
     paths             = new Paths
     performance       = new PerformanceMonitor
-    placement         = new PlacementScheduler
     prioritizer       = new Prioritizer
     projections       = new Projections
     reaction          = new MicroReaction

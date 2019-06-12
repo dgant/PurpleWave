@@ -32,7 +32,7 @@ class BuildCannonsAtBases(
   private val pylonBlueprintByZone = With.geography.zones
     .map(zone =>(
       zone,
-      new Blueprint(this,
+      new Blueprint(
         building          = Some(Protoss.Pylon),
         requireZone       = Some(zone),
         requireCandidates = Some(zone.tilesSeq),
@@ -43,7 +43,7 @@ class BuildCannonsAtBases(
     .map(zone => (
       zone,
       (1 to cannonsRequired).map(i =>
-        new Blueprint(this,
+        new Blueprint(
           building          = Some(Protoss.PhotonCannon),
           requireZone       = Some(zone),
           requireCandidates = Some(zone.tilesSeq),
@@ -68,8 +68,7 @@ class BuildCannonsAtBases(
       With.scheduler.request(this, GetAnother(1, Protoss.Pylon))
     }
     else if (pylonsInZone.exists(_.aliveAndComplete)) {
-      // Defensive programming measure. If we try re-proposing fulfilled blueprints we may just build cannons forever.
-      val newBlueprints = cannonBlueprintsByZone(zone).filterNot(With.groundskeeper.proposalsFulfilled.contains).take(cannonsToAdd)
+      val newBlueprints = cannonBlueprintsByZone(zone).take(cannonsToAdd)
       newBlueprints.foreach(With.groundskeeper.propose)
       return newBlueprints.size
     }

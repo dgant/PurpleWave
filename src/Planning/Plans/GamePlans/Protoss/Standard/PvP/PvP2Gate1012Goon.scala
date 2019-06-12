@@ -30,17 +30,17 @@ class PvP2Gate1012Goon extends GameplanTemplate {
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(2, Protoss.Nexus))
 
   override def blueprints = Vector(
-    new Blueprint(this, building = Some(Protoss.Pylon),         placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 8.0)),
-    new Blueprint(this, building = Some(Protoss.Gateway),       placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 4.0)),
-    new Blueprint(this, building = Some(Protoss.Gateway),       placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 4.0)),
-    new Blueprint(this, building = Some(Protoss.Pylon),         placement = Some(PlacementProfiles.backPylon)),
-    new Blueprint(this, building = Some(Protoss.ShieldBattery)),
-    new Blueprint(this, building = Some(Protoss.Gateway),       placement = Some(PlacementProfiles.defensive)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
+    new Blueprint(building = Some(Protoss.Pylon),         placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 8.0)),
+    new Blueprint(building = Some(Protoss.Gateway),       placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 4.0)),
+    new Blueprint(building = Some(Protoss.Gateway),       placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 4.0)),
+    new Blueprint(building = Some(Protoss.Pylon),         placement = Some(PlacementProfiles.backPylon)),
+    new Blueprint(building = Some(Protoss.ShieldBattery)),
+    new Blueprint(building = Some(Protoss.Gateway),       placement = Some(PlacementProfiles.defensive)),
+    new Blueprint(building = Some(Protoss.Pylon)),
+    new Blueprint(building = Some(Protoss.Pylon)),
+    new Blueprint(building = Some(Protoss.Pylon)),
+    new Blueprint(building = Some(Protoss.Pylon)),
+    new Blueprint(building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
 
   override def priorityAttackPlan: Plan = new Parallel(
     new If(

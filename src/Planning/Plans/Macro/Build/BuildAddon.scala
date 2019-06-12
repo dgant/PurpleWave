@@ -12,7 +12,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 class BuildAddon(val addonClass: UnitClass) extends Plan {
   
-  val buildingDescriptor  = new Blueprint(this, Some(addonClass))
+  val buildingDescriptor  = new Blueprint(Some(addonClass))
   val currencyLock        = new LockCurrencyForUnit(addonClass)
   
   private var addon: Option[UnitInfo] = None
@@ -34,7 +34,6 @@ class BuildAddon(val addonClass: UnitClass) extends Plan {
   override def onUpdate() {
     
     if (isComplete) {
-      With.groundskeeper.flagFulfilled(buildingDescriptor, addon.get)
       return
     }
       

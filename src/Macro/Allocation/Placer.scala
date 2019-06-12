@@ -2,14 +2,11 @@ package Macro.Allocation
 
 import Macro.Architecture.PlacementStates.{PlacementState, PlacementStateInitial}
 import Macro.Architecture.{Blueprint, Placement}
-import Planning.Plans.Basic.NoPlan
 import ProxyBwapi.UnitClasses.UnitClass
 
 import scala.collection.mutable
 
-object ArchitectureState2 {
-
-  val enabled: Boolean = false
+object Placer {
 
   // Designed to be compatible with the legacy (CIG 2017) API for placement
   val queue: mutable.Queue[Blueprint] = new mutable.Queue[Blueprint]
@@ -19,7 +16,7 @@ object ArchitectureState2 {
   private var placementState: PlacementState = new PlacementStateInitial
 
   def place(unitClasses: UnitClass*): Unit = {
-    placeBlueprints(unitClasses.map(unitClass => new Blueprint(NoPlan(), building = Some(unitClass))): _*)
+    placeBlueprints(unitClasses.map(unitClass => new Blueprint(building = Some(unitClass))): _*)
   }
   def placeBlueprints(blueprints: Blueprint*): Map[Blueprint, Placement] = {
     placements = Map.empty
@@ -31,7 +28,6 @@ object ArchitectureState2 {
         placementState.step()
       }
     }
-    //tmp
-    Map.empty
+    placements
   }
 }

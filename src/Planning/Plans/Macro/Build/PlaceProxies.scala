@@ -177,7 +177,6 @@ abstract class PlaceProxies(buildings: UnitClass*) extends Plan {
     val blueprints = new ArrayBuffer[Blueprint]
     (0 until countPylons).foreach(i => {
       blueprints += new Blueprint(
-        proposer = this,
         building = Some(Protoss.Pylon),
         requirePower = Some(false),
         requireCreep = Some(false),
@@ -195,7 +194,6 @@ abstract class PlaceProxies(buildings: UnitClass*) extends Plan {
     var nonPylonsPlaced = 0
     buildings.filterNot(_ == Protoss.Pylon).foreach(someBuilding => {
       blueprints += new Blueprint(
-        proposer = this,
         building = Some(someBuilding),
         requirePower = Some(false),
         requireCreep = Some(false),

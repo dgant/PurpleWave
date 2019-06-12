@@ -9,14 +9,14 @@ import ProxyBwapi.Races.Protoss
 class PlaceBatteriesProxied(batteryCount: Int, proxyZone: () => Option[Zone], allowBlockingBase: Boolean = true) extends ProposePlacement {
 
   private lazy val pylon =
-    new Blueprint(this,
+    new Blueprint(
       building = Some(Protoss.Pylon),
       requireZone = proxyZone(),
       respectHarvesting = Some(!allowBlockingBase),
       placement = Some(PlacementProfiles.proxyPylon))
 
   private lazy val batteries = (0 to batteryCount).map(unused =>
-    new Blueprint(this,
+    new Blueprint(
       building = Some(Protoss.ShieldBattery),
       requireZone = proxyZone(),
       respectHarvesting = Some(!allowBlockingBase),

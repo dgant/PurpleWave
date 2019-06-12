@@ -7,12 +7,12 @@ import scala.collection.mutable
 
 class Prioritizer {
   
-  val priorities = new mutable.HashMap[Plan, Integer] {
+  private val priorities: mutable.HashMap[Plan, Integer] = new mutable.HashMap[Plan, Integer] {
     override def default(key: Plan): Integer = Integer.MAX_VALUE
   }
   
-  var nextPriority = 0
-  var lastRun = -1
+  var nextPriority: Int = 0
+  var lastRun: Int = -1
   val frameDelays: mutable.Queue[Int] = new mutable.Queue[Int]
   
   def update() {
@@ -25,7 +25,7 @@ class Prioritizer {
     priorities.clear()
   }
   
-  def audit = priorities.toList.sortBy(_._2)
+  def audit: List[(Plan, Integer)] = priorities.toList.sortBy(_._2)
   
   def isPrioritized(plan: Plan): Boolean = {
     priorities.contains(plan)

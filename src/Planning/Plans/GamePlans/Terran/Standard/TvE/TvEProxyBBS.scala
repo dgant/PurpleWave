@@ -38,8 +38,8 @@ class TvEProxyBBS extends GameplanTemplate {
 
   override def placementPlan: Plan = new ProposePlacement{
       override lazy val blueprints = Vector(
-        new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)),
-        new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)))
+        new Blueprint(building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)),
+        new Blueprint(building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)))
     }
   
   override def attackPlan: Plan = new Parallel(

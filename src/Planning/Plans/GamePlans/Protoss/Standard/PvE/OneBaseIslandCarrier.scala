@@ -31,8 +31,8 @@ class OneBaseIslandCarrier extends GameplanTemplate {
   }
   override def placementPlan: Plan = new ProposePlacement {
     override lazy val blueprints = Vector(
-      new Blueprint(this, building = Some(Protoss.Pylon), preferZone = Some(With.geography.ourMain.zone)),
-      new Blueprint(this, building = Some(Protoss.Pylon), preferZone = Some(extraSpaceZone))
+      new Blueprint(building = Some(Protoss.Pylon), preferZone = Some(With.geography.ourMain.zone)),
+      new Blueprint(building = Some(Protoss.Pylon), preferZone = Some(extraSpaceZone))
   )}
 
   override def buildOrderPlan: Plan = new Parallel(

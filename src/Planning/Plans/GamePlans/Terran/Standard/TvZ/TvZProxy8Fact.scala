@@ -37,7 +37,7 @@ class TvZProxy8Fact extends GameplanTemplate {
 
   override def placementPlan: Plan = new ProposePlacement {
     override lazy val blueprints = Vector(
-      new Blueprint(this, building = Some(Terran.Factory),  preferZone = ProxyPlanner.proxyAutomaticAggressive, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)))
+      new Blueprint(building = Some(Terran.Factory),  preferZone = ProxyPlanner.proxyAutomaticAggressive, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)))
   }
   
   override val buildOrder: Seq[BuildRequest] = Vector(

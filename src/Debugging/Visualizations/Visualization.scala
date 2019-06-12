@@ -116,7 +116,6 @@ class Visualization {
     ShowExplosions,
     ShowFingerprints,
     ShowGrids,
-    ShowGroundskeeper,
     ShowHappyUnits,
     ShowHappyVision,
     ShowHistory,

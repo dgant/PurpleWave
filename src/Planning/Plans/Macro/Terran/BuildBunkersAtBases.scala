@@ -27,7 +27,7 @@ class BuildBunkersAtBases(
     .map(zone => (
       zone,
       (1 to bunkersRequired).map(i =>
-        new Blueprint(this,
+        new Blueprint(
           building          = Some(Terran.Bunker),
           requireZone       = Some(zone),
           requireCandidates = Some(zone.tilesSeq),
@@ -45,9 +45,8 @@ class BuildBunkersAtBases(
     if (bunkersToAdd <= 0) {
       return 0
     }
-  
-    // Defensive programming measure. If we try re-proposing fulfilled blueprints we may just build cannons forever.
-    val newBlueprints = blueprintsByZone(zone).filterNot(With.groundskeeper.proposalsFulfilled.contains).take(bunkersToAdd)
+
+    val newBlueprints = blueprintsByZone(zone).take(bunkersToAdd)
     newBlueprints.foreach(With.groundskeeper.propose)
     bunkersToAdd
   }

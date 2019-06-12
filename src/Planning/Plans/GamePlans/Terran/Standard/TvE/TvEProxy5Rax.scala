@@ -26,7 +26,7 @@ class TvEProxy5Rax extends GameplanTemplate {
 
   override def placementPlan: Plan = new ProposePlacement{
     override lazy val blueprints = Vector(
-      new Blueprint(this,
+      new Blueprint(
         building = Some(Terran.Barracks),
         preferZone = ProxyPlanner.proxyMiddle,
         placement = Some(PlacementProfiles.proxyBuilding)))

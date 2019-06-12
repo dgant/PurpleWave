@@ -51,20 +51,20 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
     new If(
       new Not(new EnemyStrategy(With.fingerprints.twoGate)),
       new ProposePlacement {
-        override lazy val blueprints = Vector(new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
+        override lazy val blueprints = Vector(new Blueprint(building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
       }
     )
   )
   override def blueprints = Vector(
-    new Blueprint(this, building = Some(Protoss.Pylon),           placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
-    new Blueprint(this, building = Some(Protoss.Gateway),         placement = Some(PlacementProfiles.wallGathering)),
-    new Blueprint(this, building = Some(Protoss.Pylon),           placement = Some(PlacementProfiles.wallGathering)),
-    new Blueprint(this, building = Some(Protoss.ShieldBattery)),
-    new Blueprint(this, building = Some(Protoss.Gateway),         placement = Some(PlacementProfiles.wallGathering)),
-    new Blueprint(this, building = Some(Protoss.CyberneticsCore), placement = Some(PlacementProfiles.wallGathering)),
-    new Blueprint(this, building = Some(Protoss.Pylon),           placement = Some(PlacementProfiles.backPylon)),
-    new Blueprint(this, building = Some(Protoss.Forge),           placement = Some(PlacementProfiles.wallGathering)),
-    new Blueprint(this, building = Some(Protoss.Pylon),           placement = Some(PlacementProfiles.wallGathering)))
+    new Blueprint(building = Some(Protoss.Pylon),           placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
+    new Blueprint(building = Some(Protoss.Gateway),         placement = Some(PlacementProfiles.wallGathering)),
+    new Blueprint(building = Some(Protoss.Pylon),           placement = Some(PlacementProfiles.wallGathering)),
+    new Blueprint(building = Some(Protoss.ShieldBattery)),
+    new Blueprint(building = Some(Protoss.Gateway),         placement = Some(PlacementProfiles.wallGathering)),
+    new Blueprint(building = Some(Protoss.CyberneticsCore), placement = Some(PlacementProfiles.wallGathering)),
+    new Blueprint(building = Some(Protoss.Pylon),           placement = Some(PlacementProfiles.backPylon)),
+    new Blueprint(building = Some(Protoss.Forge),           placement = Some(PlacementProfiles.wallGathering)),
+    new Blueprint(building = Some(Protoss.Pylon),           placement = Some(PlacementProfiles.wallGathering)))
 
   override val buildOrder = Vector(
     // http://wiki.teamliquid.net/starcraft/2_Gateway_Dark_Templar_(vs._Protoss)

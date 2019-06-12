@@ -41,6 +41,10 @@ class TvPDeep4 extends GameplanTemplate {
       new Pump(Terran.Comsat)),
     new Pump(Terran.SCV, 38))
 
+  class ReactToCarriers extends Or(
+    new EnemyHasShown(Protoss.Carrier),
+    new EnemyHasShown(Protoss.Interceptor))
+
   override def buildPlans: Seq[Plan] = Vector(
     new RepairBunker,
     new RequireMiningBases(2),
@@ -73,10 +77,14 @@ class TvPDeep4 extends GameplanTemplate {
         new Build(Get(Terran.Academy)))),
     new PumpRatio(Terran.Medic, 0, 12, Seq(Friendly(Terran.Marine, 0.25))),
     new If(
-      new Or(
-        new EnemyHasShown(Protoss.Carrier),
-        new EnemyHasShown(Protoss.Interceptor)),
-      new Pump(Terran.SiegeTankUnsieged, 3),
+      new ReactToCarriers,
+      new Parallel(
+        new Build(
+          Get(Terran.Armory),
+          Get(Terran.GoliathAirRange),
+          Get(Terran.MechDamage)),
+        new Pump(Terran.SiegeTankUnsieged, 3),
+        new Pump(Terran.Goliath)),
       new Pump(Terran.SiegeTankUnsieged)),
     new Build(
       Get(4, Terran.Barracks),
@@ -92,7 +100,15 @@ class TvPDeep4 extends GameplanTemplate {
     new Build(
       Get(Terran.MarineRange),
       Get(Terran.BioDamage)),
-    new Build(Get(8, Terran.Barracks)),
-    new Pump(Terran.SiegeTankUnsieged)
+    new If(
+      new ReactToCarriers,
+      new Parallel(
+        new RequireMiningBases(3),
+        new Build(
+          Get(Terran.Starport),
+          Get(Terran.ControlTower),
+          Get(Terran.WraithCloak)),
+        new PumpRatio(Terran.Wraith, 0, 12, Seq(Enemy(Protoss.Carrier, 3.0))))),
+    new Build(Get(8, Terran.Barracks))
   )
 }

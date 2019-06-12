@@ -18,10 +18,10 @@ object Opponents {
   val fixedPvR    = new StrategySelectionFixed(PvRTinfoil)
   
   val mcrave        : Opponent = add(Opponent("McRave",       StrategySelectionDynamic))
-  val titaniron     : Opponent = add(Opponent("TitanIron",    new StrategySelectionRecommended(StrategySelectionDynamic, PvT1015DT, PvT2BaseCarrier)))
   val locutus       : Opponent = add(Opponent("Locutus",      StrategySelectionDynamic))
   val tscmoo        : Opponent = add(Opponent("tscmoo",       StrategySelectionGreedy))
   val iron          : Opponent = add(Opponent("Iron",         new StrategySelectionFixed(PvT2GateRangeExpand, PvT2BaseCarrier)))
+  val titaniron     : Opponent = add(Opponent("TitanIron",    iron.policy))
   val letabot       : Opponent = add(Opponent("LetaBot",      new StrategySelectionRecommended(StrategySelectionGreedy,  PvTReaverCarrierCheese)))
   val steamhammer   : Opponent = add(Opponent("Steamhammer",  StrategySelectionDynamic))
   val microwave     : Opponent = add(Opponent("Microwave",    StrategySelectionDynamic))

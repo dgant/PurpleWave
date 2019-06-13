@@ -47,7 +47,7 @@ class BuildBunkersAtBases(
     }
 
     val newBlueprints = blueprintsByZone(zone).take(bunkersToAdd)
-    newBlueprints.foreach(With.groundskeeper.propose)
+    newBlueprints.foreach(With.groundskeeper.suggest)
     bunkersToAdd
   }
 }

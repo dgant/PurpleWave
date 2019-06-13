@@ -50,7 +50,7 @@ class BuildZergStaticDefenseAtBases(
 
     // Defensive programming measure. If we try re-proposing fulfilled blueprints we may just build cannons forever.
     val newBlueprints = blueprintsByZone(zone).take(creepColoniesToAdd)
-    newBlueprints.foreach(With.groundskeeper.propose)
+    newBlueprints.foreach(With.groundskeeper.suggest)
     newBlueprints.size
   }
 }

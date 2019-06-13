@@ -1,7 +1,7 @@
 package Macro.Allocation
 
 import Lifecycle.With
-import Macro.Architecture.Blueprint
+import Macro.Architecture.{Blueprint, PlacementSuggestion}
 import Mathematics.Points.Tile
 import Planning.Plan
 import Planning.Plans.Basic.NoPlan
@@ -10,45 +10,36 @@ import ProxyBwapi.UnitClasses.UnitClass
 import scala.collection.mutable.ArrayBuffer
 
 class Groundskeeper {
-
-  case class TileSuggestion(tile: Tile, unitClasses: Seq[UnitClass])
   case class TileReservation(var update: Int, plan: Plan, target: Tile, tiles: Seq[Tile], unitClasses: Seq[UnitClass])
 
   var updates: Int = 0
   val reserved: Array[TileReservation] = Array.fill(With.mapTileWidth * With.mapTileHeight)(TileReservation(updates, NoPlan(), Tile(0, 0), Seq.empty, Seq.empty))
 
-  var proposalsBefore     : ArrayBuffer[Blueprint] = ArrayBuffer.empty
-  var proposalsNow        : ArrayBuffer[Blueprint] = ArrayBuffer.empty
-  var suggestionsBefore   : ArrayBuffer[TileSuggestion] = ArrayBuffer.empty
-  var suggestionsNow      : ArrayBuffer[TileSuggestion] = ArrayBuffer.empty
+  var suggestionsBefore   : ArrayBuffer[PlacementSuggestion] = ArrayBuffer.empty
+  var suggestionsNow      : ArrayBuffer[PlacementSuggestion] = ArrayBuffer.empty
   var reservationsBefore  : ArrayBuffer[TileReservation] = ArrayBuffer.empty
   var reservationsNow     : ArrayBuffer[TileReservation] = ArrayBuffer.empty
 
   def update(): Unit = {
     updates += 1
-    proposalsBefore     = proposalsNow
-    proposalsNow        = ArrayBuffer.empty
     suggestionsBefore   = suggestionsNow
     suggestionsNow      = ArrayBuffer.empty
     reservationsBefore  = reservationsNow
     reservationsNow     = ArrayBuffer.empty
   }
 
-  def propose(blueprint: Blueprint): Unit = {
-    Placer.placeBlueprints(blueprint)
-      .foreach(placement =>
-        placement.tile.foreach(tile =>
-          suggest(tile, placement.blueprint.building.toSeq: _*)))
+  def suggestions: Seq[PlacementSuggestion] = suggestionsNow.view ++ suggestionsBefore.view
+
+  def suggest(blueprint: Blueprint): Unit = {
+    suggestionsNow.append(new PlacementSuggestion(blueprint.building.get, blueprint))
   }
 
-  def suggest(tile: Tile, unitClasses: UnitClass*): Unit = {
-    suggestionsNow.append(TileSuggestion(tile, unitClasses))
+  def suggest(tile: Tile, unitClass: UnitClass): Unit = {
+    suggestionsNow.append(new PlacementSuggestion(unitClass, tile))
   }
 
-  def getSuggestion(unitClass: UnitClass): Option[Tile] = {
-    suggestionsNow.find(_.unitClasses.contains(unitClass)).orElse(
-      suggestionsBefore.find(_.unitClasses.contains(unitClass)))
-      .map(_.tile)
+  def getSuggestion(unitClass: UnitClass): PlacementSuggestion = {
+    suggestions.find(_.building == unitClass).getOrElse(new PlacementSuggestion(unitClass, new Blueprint(Some(unitClass))))
   }
 
   def isReserved(tile: Tile, target: Tile, unitClass: UnitClass = null, plan: Plan = null): Boolean = {

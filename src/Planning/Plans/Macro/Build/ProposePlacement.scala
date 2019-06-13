@@ -11,6 +11,6 @@ class ProposePlacement(initialBlueprints: Blueprint*) extends Plan {
   lazy val blueprints: Seq[Blueprint] = initialBlueprints
   
   override def onUpdate() {
-    blueprints.foreach(With.groundskeeper.propose)
+    blueprints.foreach(With.groundskeeper.suggest)
   }
 }

@@ -2,10 +2,9 @@ package Macro.Architecture.PlacementStates
 
 import Debugging.Visualizations.Views.Geography.ShowArchitectureHeuristics
 import Lifecycle.With
-import Macro.Allocation.Placer
 import Macro.Architecture.Heuristics.{EvaluatePlacements, PlacementHeuristicEvaluation}
 import Macro.Architecture.Tiles.Surveyor
-import Macro.Architecture.{Blueprint, Placement}
+import Macro.Architecture.{Placement, PlacementSuggestion}
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Tile
 import Utilities.ByOption
@@ -13,8 +12,8 @@ import Utilities.ByOption
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
-  
+class PlacementStateEvaluating(placementSuggestion: PlacementSuggestion) extends PlacementState {
+  private val blueprint             = placementSuggestion.blueprint
   private var candidatesUnfiltered  : Option[ArrayBuffer[Tile]] = None
   private var candidatesFiltered    : Option[ArrayBuffer[Tile]] = None
   private var nextFilteringIndex    = 0
@@ -85,8 +84,7 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
         candidates        = candidatesUnfiltered.get.size,
         evaluated         = candidatesFiltered.get.size)
 
-      Placer.addPlacement(placement)
-      With.architecture.assumePlacement(placement)
+      With.placement.usePlacement(placementSuggestion, placement)
       transition(new PlacementStateReady)
     }
   }

@@ -64,12 +64,12 @@ class BuildCannonsAtBases(
     }
     
     if (pylonsInZone.isEmpty) {
-      With.groundskeeper.propose(pylonBlueprintByZone(zone))
+      With.groundskeeper.suggest(pylonBlueprintByZone(zone))
       With.scheduler.request(this, GetAnother(1, Protoss.Pylon))
     }
     else if (pylonsInZone.exists(_.aliveAndComplete)) {
       val newBlueprints = cannonBlueprintsByZone(zone).take(cannonsToAdd)
-      newBlueprints.foreach(With.groundskeeper.propose)
+      newBlueprints.foreach(With.groundskeeper.suggest)
       return newBlueprints.size
     }
   

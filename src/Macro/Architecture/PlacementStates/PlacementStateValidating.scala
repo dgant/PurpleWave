@@ -1,14 +1,14 @@
 package Macro.Architecture.PlacementStates
 
 import Lifecycle.With
-import Macro.Allocation.Placer
-import Macro.Architecture.{Blueprint, Placement}
+import Macro.Architecture.{Placement, PlacementSuggestion}
 import Mathematics.Points.Tile
 
 import scala.collection.mutable
 
-class PlacementStateValidating(blueprint: Blueprint) extends PlacementState {
+class PlacementStateValidating(placementSuggestion: PlacementSuggestion) extends PlacementState {
   override def step() {
+    val blueprint = placementSuggestion.blueprint
     if (blueprint.forcePlacement) {
       val placement = Placement(
         blueprint,
@@ -20,11 +20,10 @@ class PlacementStateValidating(blueprint: Blueprint) extends PlacementState {
         frameFinished     = With.frame,
         candidates        = 1,
         evaluated         = 1)
-      Placer.addPlacement(placement)
-      With.architecture.assumePlacement(placement)
+      With.placement.usePlacement(placementSuggestion, placement)
       transition(new PlacementStateReady)
     } else {
-      transition(new PlacementStateEvaluating(blueprint))
+      transition(new PlacementStateEvaluating(placementSuggestion))
     }
   }
 }

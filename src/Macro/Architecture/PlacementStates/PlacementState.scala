@@ -1,13 +1,11 @@
 package Macro.Architecture.PlacementStates
 
-import Macro.Allocation.Placer
-import Macro.Architecture.Blueprint
-
-import scala.collection.mutable
+import Lifecycle.With
+import Macro.Architecture.PlacementSuggestion
 
 abstract class PlacementState {
-  final def queue: mutable.Queue[Blueprint] = Placer.queue
-  final def transition(state: PlacementState): Unit = Placer.setState(state)
+  final def next: Option[PlacementSuggestion] = With.placement.next
+  final def transition(state: PlacementState): Unit = With.placement.setState(state)
   
   def isComplete: Boolean = false
   def step() {}

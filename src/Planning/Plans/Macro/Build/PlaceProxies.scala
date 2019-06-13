@@ -75,7 +75,7 @@ abstract class PlaceProxies(buildings: UnitClass*) extends Plan {
     With.grids.scoutingPathsBases.update()
     With.grids.scoutingPathsStartLocations.update()
     placements = placements.orElse(Some(calculatePlacements))
-    placements.foreach(_.foreach(With.groundskeeper.propose))
+    placements.foreach(_.foreach(With.groundskeeper.suggest))
   }
 
   def calculatePlacements: Seq[Blueprint] = {

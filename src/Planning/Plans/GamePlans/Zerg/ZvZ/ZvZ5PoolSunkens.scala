@@ -35,7 +35,7 @@ class ZvZ5PoolSunkens extends GameplanTemplate {
   }
   
   private def blueprintCreepColony: Blueprint = new Blueprint(
-    building    = Some(Zerg.CreepColony),
+    Zerg.CreepColony,
     requireZone = ProxyPlanner.proxyEnemyMain,
     placement   = Some(PlacementProfiles.tech))
   

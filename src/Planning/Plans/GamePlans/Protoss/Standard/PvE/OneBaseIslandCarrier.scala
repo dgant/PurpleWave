@@ -3,8 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvE
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.{BuildRequest, Get}
+import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
@@ -15,7 +14,6 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Strategy.{EnemyIsProtoss, EnemyIsTerran}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
 class OneBaseIslandCarrier extends GameplanTemplate {
@@ -31,8 +29,8 @@ class OneBaseIslandCarrier extends GameplanTemplate {
   }
   override def placementPlan: Plan = new ProposePlacement {
     override lazy val blueprints = Vector(
-      new Blueprint(building = Some(Protoss.Pylon), preferZone = Some(With.geography.ourMain.zone)),
-      new Blueprint(building = Some(Protoss.Pylon), preferZone = Some(extraSpaceZone))
+      new Blueprint(Protoss.Pylon, preferZone = Some(With.geography.ourMain.zone)),
+      new Blueprint(Protoss.Pylon, preferZone = Some(extraSpaceZone))
   )}
 
   override def buildOrderPlan: Plan = new Parallel(

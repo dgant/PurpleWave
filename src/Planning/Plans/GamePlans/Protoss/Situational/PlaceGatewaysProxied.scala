@@ -10,14 +10,14 @@ class PlaceGatewaysProxied(gatewayCount: Int, proxyZone: () => Option[Zone], all
   
   private lazy val pylon =
     new Blueprint(
-      building = Some(Protoss.Pylon),
+      Protoss.Pylon,
       preferZone = proxyZone(),
       respectHarvesting = Some(!allowBlockingBase),
       placement = Some(PlacementProfiles.proxyPylon))
 
   private lazy val gateways = (0 to gatewayCount).map(unused =>
     new Blueprint(
-      building = Some(Protoss.Gateway),
+      Protoss.Gateway,
       preferZone = proxyZone(),
       respectHarvesting = Some(!allowBlockingBase),
       placement = Some(PlacementProfiles.proxyBuilding)))

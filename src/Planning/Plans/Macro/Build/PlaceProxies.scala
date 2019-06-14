@@ -177,7 +177,7 @@ abstract class PlaceProxies(buildings: UnitClass*) extends Plan {
     val blueprints = new ArrayBuffer[Blueprint]
     (0 until countPylons).foreach(i => {
       blueprints += new Blueprint(
-        building = Some(Protoss.Pylon),
+        Protoss.Pylon,
         requirePower = Some(false),
         requireCreep = Some(false),
         requireTownHallTile = Some(false),
@@ -186,15 +186,14 @@ abstract class PlaceProxies(buildings: UnitClass*) extends Plan {
         requireCandidates = Some(Seq(Tile(
           bestX + walkableMargin + 4 + 6 * i,
           bestY + walkableHeight + 1
-        ))),
-        forcePlacement = true) {
+        )))) {
         override def toString: String = "Proxied pylon"
       }
     })
     var nonPylonsPlaced = 0
     buildings.filterNot(_ == Protoss.Pylon).foreach(someBuilding => {
       blueprints += new Blueprint(
-        building = Some(someBuilding),
+        someBuilding,
         requirePower = Some(false),
         requireCreep = Some(false),
         requireTownHallTile = Some(false),
@@ -203,8 +202,7 @@ abstract class PlaceProxies(buildings: UnitClass*) extends Plan {
         requireCandidates = Some(Seq(Tile(
           bestX + walkableMargin + (if (countPylons > 0) 6 else 4) * (nonPylonsPlaced / 2),
           bestY + walkableHeight + 3 * (nonPylonsPlaced % 2)
-        ))),
-        forcePlacement = true) {
+        )))) {
         override def toString: String = "Proxied " + someBuilding
       }
       nonPylonsPlaced += 1

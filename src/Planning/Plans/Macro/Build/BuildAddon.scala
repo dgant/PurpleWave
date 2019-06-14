@@ -12,7 +12,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 class BuildAddon(val addonClass: UnitClass) extends Plan {
   
-  val buildingDescriptor  = new Blueprint(Some(addonClass))
+  val buildingDescriptor  = new Blueprint(addonClass)
   val currencyLock        = new LockCurrencyForUnit(addonClass)
   
   private var addon: Option[UnitInfo] = None
@@ -21,7 +21,7 @@ class BuildAddon(val addonClass: UnitClass) extends Plan {
     override def accept(unit: UnitInfo): Boolean = unit.addon.forall(addon.contains)
   })
   
-  val builderLock = new LockUnits {
+  val builderLock: LockUnits = new LockUnits {
     description.set("Get a builder")
     unitCounter.set(UnitCountOne)
     unitMatcher.set(builderMatcher)

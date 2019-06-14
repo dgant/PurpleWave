@@ -21,8 +21,8 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   private var orderedTile   : Option[Tile]              = None
   private var building      : Option[FriendlyUnitInfo]  = None
   
-  val builderMatcher = buildingClass.whatBuilds._1
-  val builderLock = new LockUnits {
+  val builderMatcher: UnitClass = buildingClass.whatBuilds._1
+  val builderLock: LockUnits = new LockUnits {
     description.set("Get a builder")
     unitCounter.set(UnitCountOne)
     unitMatcher.set(builderMatcher)
@@ -67,7 +67,10 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
         b.isOurs
         && b.alive
         && b.buildUnit.forall(_.friendly.forall(_.agent.lastClient.contains(this)))) //Don't jack another (Terran) building
-    
+
+    if (building.isEmpty) {
+      With.groundskeeper.suggest(this, buildingClass)
+    }
     desiredTile = acquireDesiredTile()
   
     if (desiredTile.isEmpty) {
@@ -153,7 +156,9 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
       building.map(_.tileTopLeft)
     }
     else if (currencyLock.satisfied && currencyLock.expectedFrames < With.blackboard.maxFramesToSendAdvanceBuilder) {
-      With.groundskeeper.getSuggestion(buildingClass).place().tile
+      val suggestion = With.groundskeeper.getSuggestion(this, buildingClass)
+      suggestion.place()
+      suggestion.tile
     }
     else {
       None

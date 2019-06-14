@@ -28,7 +28,7 @@ class BuildBunkersAtBases(
       zone,
       (1 to bunkersRequired).map(i =>
         new Blueprint(
-          building          = Some(Terran.Bunker),
+          Terran.Bunker,
           requireZone       = Some(zone),
           requireCandidates = Some(zone.tilesSeq),
           placement         = Some(placement)))))

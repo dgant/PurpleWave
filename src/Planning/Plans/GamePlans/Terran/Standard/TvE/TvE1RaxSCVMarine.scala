@@ -34,7 +34,7 @@ class TvE1RaxSCVMarine extends GameplanTemplate {
     new ProposePlacement{
       override lazy val blueprints = Vector(
         new Blueprint(
-          building = Some(Terran.Barracks),
+          Terran.Barracks,
           preferZone = ProxyPlanner.proxyMiddle,
           respectHarvesting = Some(false),
           placement = Some(PlacementProfiles.proxyBuilding)))

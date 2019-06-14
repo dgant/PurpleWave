@@ -10,14 +10,14 @@ class PlaceBatteriesProxied(batteryCount: Int, proxyZone: () => Option[Zone], al
 
   private lazy val pylon =
     new Blueprint(
-      building = Some(Protoss.Pylon),
+      Protoss.Pylon,
       requireZone = proxyZone(),
       respectHarvesting = Some(!allowBlockingBase),
       placement = Some(PlacementProfiles.proxyPylon))
 
   private lazy val batteries = (0 to batteryCount).map(unused =>
     new Blueprint(
-      building = Some(Protoss.ShieldBattery),
+      Protoss.ShieldBattery,
       requireZone = proxyZone(),
       respectHarvesting = Some(!allowBlockingBase),
       placement = Some(PlacementProfiles.proxyTowardsEnemy)))

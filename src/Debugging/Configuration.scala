@@ -67,7 +67,6 @@ class Configuration {
   var maxFramesToSendAdvanceBuilder   = GameTime(0, 40)()
   var maxFramesToTrustBuildRequest    = GameTime(10, 0)()
   var blockerMineralThreshold         = 250 // Setting this goofily high as an AIIDE hack to account for the 249-mineral patches on Fortress
-  var maxPlacementAgeFrames           = GameTime(0, 8)()
   var enableTightBuildingPlacement    = false
   
   /////////////////
@@ -104,8 +103,8 @@ class Configuration {
   
   var visualizeScreen                     = true
   var visualizeMap                        = true
-  var visualizationProbabilityHappyVision = 0.05
-  var visualizationProbabilityTextOnly    = 0.01
+  var visualizationProbabilityHappyVision = 0.0 // 0.05
+  var visualizationProbabilityTextOnly    = 0.0 // 0.01
   var visualizationCullViewport           = true
   
   var camera                      = false
@@ -118,7 +117,7 @@ class Configuration {
   var conservativeViewportHeight  = 480 + cameraViewportHeight
 
   class FileFlag(filename: String) {
-    lazy val fullPath = "bwapi-data/AI/" + filename
+    private lazy val fullPath: String = "bwapi-data/AI/" + filename
     private lazy val enabled: Boolean = {
       try {
         new File(fullPath).exists()
@@ -126,10 +125,10 @@ class Configuration {
       catch { case exception: Exception =>
         With.logger.warn("Exception looking for flag file at: " + fullPath)
         With.logger.onException(exception)
+        false
       }
-      false
     }
-    def apply() = enabled
+    def apply(): Boolean = enabled
   }
 
   val humanMode = new FileFlag("human-mode-is.on")

@@ -1,18 +1,17 @@
 package Macro.Architecture.PlacementStates
 
 import Lifecycle.With
-import Macro.Architecture.{Placement, PlacementSuggestion}
+import Macro.Architecture.{PlacementResult, PlacementRequest}
 import Mathematics.Points.Tile
 
 import scala.collection.mutable
 
-class PlacementStateValidating(placementSuggestion: PlacementSuggestion) extends PlacementState {
+class PlacementStateValidating(request: PlacementRequest) extends PlacementState {
   override def step() {
-    val blueprint = placementSuggestion.blueprint
-    if (blueprint.forcePlacement) {
-      val placement = Placement(
-        blueprint,
-        Some(blueprint.requireCandidates.get.head),
+    if (request.tile.exists(request.blueprint.accepts(_))) {
+      val result = PlacementResult(
+        request.blueprint,
+        request.tile,
         Seq.empty,
         new mutable.HashMap[Tile, Double],
         totalNanoseconds  = 0,
@@ -20,10 +19,10 @@ class PlacementStateValidating(placementSuggestion: PlacementSuggestion) extends
         frameFinished     = With.frame,
         candidates        = 1,
         evaluated         = 1)
-      With.placement.usePlacement(placementSuggestion, placement)
+      With.placement.usePlacement(request, result)
       transition(new PlacementStateReady)
     } else {
-      transition(new PlacementStateEvaluating(placementSuggestion))
+      transition(new PlacementStateEvaluating(request))
     }
   }
 }

@@ -32,7 +32,7 @@ class ZvTProxyHatch extends Parallel {
   private class WeHaveEnoughSunkens extends UnitsAtLeast(3, Zerg.SunkenColony, complete = false)
   
   private def blueprintCreepColonyNatural: Blueprint = new Blueprint(
-    building     = Some(Zerg.CreepColony),
+    Zerg.CreepColony,
     requireZone  = ProxyPlanner.proxyEnemyNatural,
     placement    = Some(PlacementProfiles.proxyCannon))
   
@@ -44,7 +44,7 @@ class ZvTProxyHatch extends Parallel {
       new CapGasAt(400),
       new CapGasAt(100)),
     new ProposePlacement { override lazy val blueprints = Vector(new Blueprint(
-      building = Some(Zerg.Extractor),
+      Zerg.Extractor,
       requireZone = Some(With.geography.ourMain.zone))) },
     
     new Build(
@@ -57,7 +57,7 @@ class ZvTProxyHatch extends Parallel {
       new WeKnowWhereToProxy,
       new Parallel(
         new ProposePlacement { override lazy val blueprints = Vector(
-          new Blueprint(preferZone = ProxyPlanner.proxyEnemyNatural, building = Some(Zerg.Hatchery), placement = Some(PlacementProfiles.proxyBuilding)),
+          new Blueprint(Zerg.Hatchery, preferZone = ProxyPlanner.proxyEnemyNatural, placement = Some(PlacementProfiles.proxyBuilding)),
           blueprintCreepColonyNatural,
           blueprintCreepColonyNatural,
           blueprintCreepColonyNatural,

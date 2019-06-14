@@ -4,7 +4,7 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
-import Macro.Architecture.{Blueprint, Placement}
+import Macro.Architecture.{Blueprint, PlacementResult}
 import Mathematics.Points.Pixel
 import bwapi.Color
 
@@ -26,11 +26,11 @@ object ShowArchitectureHeuristics extends View {
     None
   }
 
-  private def placementToRender(blueprint: Blueprint): Option[Placement] = {
+  private def placementToRender(blueprint: Blueprint): Option[PlacementResult] = {
     None
   }
   
-  private def renderPlacementHeuristicsScreen(blueprint: Blueprint, placement: Placement) = {
+  private def renderPlacementHeuristicsScreen(blueprint: Blueprint, placement: PlacementResult) = {
     With.game.setTextSize(bwapi.Text.Size.Enum.Default)
     DrawScreen.column(
       5,
@@ -46,7 +46,7 @@ object ShowArchitectureHeuristics extends View {
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
   }
   
-  private def renderPlacementHeuristicsMap(blueprint: Blueprint, placement: Placement) = {
+  private def renderPlacementHeuristicsMap(blueprint: Blueprint, placement: PlacementResult) = {
     val heuristicRanges = placement
       .evaluations
       .groupBy(_.heuristic)

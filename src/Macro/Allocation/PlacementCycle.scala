@@ -2,16 +2,16 @@ package Macro.Allocation
 
 import Lifecycle.With
 import Macro.Architecture.PlacementStates.{PlacementState, PlacementStateInitial, PlacementStateReady}
-import Macro.Architecture.{Placement, PlacementSuggestion}
+import Macro.Architecture.{PlacementResult, PlacementRequest}
 
 import scala.collection.mutable
 
 class PlacementCycle {
 
-  private val queue: mutable.ListBuffer[PlacementSuggestion] = new mutable.ListBuffer[PlacementSuggestion]
+  private val queue: mutable.ListBuffer[PlacementRequest] = new mutable.ListBuffer[PlacementRequest]
   private var state: PlacementState = new PlacementStateInitial
 
-  def update(until: Option[PlacementSuggestion] = None): Unit = {
+  def update(until: Option[PlacementRequest] = None): Unit = {
     if (queue.isEmpty || state.isComplete) {
       queue ++= With.groundskeeper.suggestions
       setState(new PlacementStateInitial)
@@ -21,7 +21,7 @@ class PlacementCycle {
     }
   }
 
-  def place(suggestion: PlacementSuggestion): Unit = {
+  def place(suggestion: PlacementRequest): Unit = {
     if ( ! queue.contains(suggestion)) {
       queue += suggestion
     }
@@ -33,12 +33,12 @@ class PlacementCycle {
     }
   }
 
-  // API for placement states
-  def next: Option[PlacementSuggestion] = queue.headOption
+
+  def next: Option[PlacementRequest] = queue.headOption
   def setState(newState: PlacementState): Unit = state = newState
-  def usePlacement(placementSuggestion: PlacementSuggestion, placement: Placement): Unit = {
+  def usePlacement(placementSuggestion: PlacementRequest, placementResult: PlacementResult): Unit = {
     //With.architecture.assumePlacement(placement)
-    placementSuggestion.tile = placement.tile
+    placementSuggestion.tile = placementResult.tile
     queue -= placementSuggestion
   }
 }

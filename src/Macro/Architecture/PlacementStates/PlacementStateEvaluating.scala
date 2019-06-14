@@ -4,7 +4,7 @@ import Debugging.Visualizations.Views.Geography.ShowArchitectureHeuristics
 import Lifecycle.With
 import Macro.Architecture.Heuristics.{EvaluatePlacements, PlacementHeuristicEvaluation}
 import Macro.Architecture.Tiles.Surveyor
-import Macro.Architecture.{Placement, PlacementSuggestion}
+import Macro.Architecture.{PlacementResult, PlacementRequest}
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Tile
 import Utilities.ByOption
@@ -12,7 +12,7 @@ import Utilities.ByOption
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-class PlacementStateEvaluating(placementSuggestion: PlacementSuggestion) extends PlacementState {
+class PlacementStateEvaluating(placementSuggestion: PlacementRequest) extends PlacementState {
   private val blueprint             = placementSuggestion.blueprint
   private var candidatesUnfiltered  : Option[ArrayBuffer[Tile]] = None
   private var candidatesFiltered    : Option[ArrayBuffer[Tile]] = None
@@ -73,7 +73,7 @@ class PlacementStateEvaluating(placementSuggestion: PlacementSuggestion) extends
       // We've evaluated all the tiles! Return our placement conclusions.
       val best = ByOption.minBy(evaluationValues)(_._2).map(_._1)
       updateStepNanoseconds(nanosecondsOnStart)
-      val placement = Placement(
+      val placement = PlacementResult(
         blueprint,
         best,
         evaluationDebugging.values.flatten,

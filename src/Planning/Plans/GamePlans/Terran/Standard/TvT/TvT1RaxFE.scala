@@ -33,10 +33,10 @@ class TvT1RaxFE extends GameplanTemplate {
 
   val naturalZone: Zone = With.geography.ourNatural.zone
   override lazy val blueprints: Seq[Blueprint] = Seq(
-    new Blueprint(building = Some(Terran.Bunker),       preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(96)),
-    new Blueprint(building = Some(Terran.Barracks),     preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(0)),
-    new Blueprint(building = Some(Terran.SupplyDepot),  preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(0)),
-    new Blueprint(building = Some(Terran.SupplyDepot),  preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(0))
+    new Blueprint(Terran.Bunker,       preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(96)),
+    new Blueprint(Terran.Barracks,     preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(0)),
+    new Blueprint(Terran.SupplyDepot,  preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(0)),
+    new Blueprint(Terran.SupplyDepot,  preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(0))
   )
 
   override def buildOrder: Seq[BuildRequest] = Seq(

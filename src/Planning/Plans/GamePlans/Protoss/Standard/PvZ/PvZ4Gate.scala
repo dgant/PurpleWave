@@ -35,12 +35,12 @@ class PvZ4Gate extends GameplanTemplate {
   override def scoutExposPlan  = new ScoutExpansionsAt(55)
   override def placementPlan   = new ProposePlacement {
     override lazy val blueprints = Vector(
-      new Blueprint(building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.hugTownHall)),
-      new Blueprint(building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.hugTownHall)),
-      new Blueprint(building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.hugTownHall)),
-      new Blueprint(building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.backPylon)),
-      new Blueprint(building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.hugTownHall)),
-      new Blueprint(building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.hugTownHall)))
+      new Blueprint(Protoss.Pylon,   placement = Some(PlacementProfiles.hugTownHall)),
+      new Blueprint(Protoss.Gateway, placement = Some(PlacementProfiles.hugTownHall)),
+      new Blueprint(Protoss.Gateway, placement = Some(PlacementProfiles.hugTownHall)),
+      new Blueprint(Protoss.Pylon,   placement = Some(PlacementProfiles.backPylon)),
+      new Blueprint(Protoss.Pylon,   placement = Some(PlacementProfiles.hugTownHall)),
+      new Blueprint(Protoss.Pylon,   placement = Some(PlacementProfiles.hugTownHall)))
 }
   override def aggressionPlan  = new If(
     new UnitsAtMost(8, UnitMatchWarriors, complete = true),

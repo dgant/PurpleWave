@@ -54,7 +54,7 @@ class Architecture {
       ! tile.zone.bases.exists(_.townHallArea.contains(tile))
   }
   
-  def assumePlacement(placement: Placement) {
+  def assumePlacement(placement: PlacementResult) {
     if (placement.tile.isEmpty) return
     
     val tile = placement.tile.get

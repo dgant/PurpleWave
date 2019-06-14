@@ -7,8 +7,6 @@ import ProxyBwapi.Races.Terran
 
 class PlaceBunkersAtNatural(bunkers: Int) extends ProposePlacement {
   override lazy val blueprints: Seq[Blueprint] = (1 to bunkers).map(i =>
-    new Blueprint(
-      building = Some(Terran.Bunker),
-      requireZone = Some(With.geography.ourNatural.zone))
+    new Blueprint(Terran.Bunker, requireZone = Some(With.geography.ourNatural.zone))
   )
 }

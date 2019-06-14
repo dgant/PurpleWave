@@ -30,7 +30,7 @@ class BuildZergStaticDefenseAtBases(
       zone,
       (1 to towersRequired).map(i =>
         new Blueprint(
-          building          = Some(Zerg.CreepColony),
+          Zerg.CreepColony,
           requireZone       = Some(zone),
           requireCandidates = Some(zone.tilesSeq),
           placement         = Some(placement)))))

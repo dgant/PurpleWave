@@ -33,7 +33,7 @@ class BuildCannonsAtBases(
     .map(zone =>(
       zone,
       new Blueprint(
-        building          = Some(Protoss.Pylon),
+        Protoss.Pylon,
         requireZone       = Some(zone),
         requireCandidates = Some(zone.tilesSeq),
         placement         = Some(placementPylon))))
@@ -44,7 +44,7 @@ class BuildCannonsAtBases(
       zone,
       (1 to cannonsRequired).map(i =>
         new Blueprint(
-          building          = Some(Protoss.PhotonCannon),
+          Protoss.PhotonCannon,
           requireZone       = Some(zone),
           requireCandidates = Some(zone.tilesSeq),
           placement         = Some(placementCannon)))))

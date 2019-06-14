@@ -38,7 +38,7 @@ class BuildMissileTurretsAtBases(
     if (turretsToAdd <= 0) return
     
     for (i <- 0 to turretsToAdd) {
-      val blueprint = new Blueprint(building = Some(Terran.MissileTurret), requireZone = Some(base.zone), placement = Some(placement))
+      val blueprint = new Blueprint(Terran.MissileTurret, requireZone = Some(base.zone), placement = Some(placement))
       With.groundskeeper.suggest(blueprint)
     }
     With.scheduler.request(this, GetAnother(turretsToAdd, Terran.MissileTurret))

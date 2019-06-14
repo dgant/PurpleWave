@@ -27,8 +27,9 @@ class Visualization {
     ShowUnitsFriendly,
     ShowUnitsForeign,
     ShowExplosions,
-    //ShowBattle,
-    ShowPerformanceSummary
+    ShowPerformanceSummary,
+    ShowArchitecturePlacements,
+    ShowPlans
   )
   
   var enabled   : Boolean = _

@@ -19,15 +19,15 @@ object PlacementProfiles {
       gas
     else if (blueprint.powers.get)
       pylon
-    else if (blueprint.building.contains(Protoss.RoboticsFacility))
+    else if (blueprint.building == Protoss.RoboticsFacility)
       robo
-    else if (blueprint.building.exists(_.trainsGroundUnits)) {
-      if (blueprint.building.contains(Terran.Barracks))
+    else if (blueprint.building.trainsGroundUnits) {
+      if (blueprint.building == Terran.Barracks)
         factoryNoSpace
       else
         factory
     }
-    else if (blueprint.building.exists(building => building.attacks || building == Zerg.CreepColony || building == Protoss.ShieldBattery))
+    else if (blueprint.building.attacks || blueprint.building == Zerg.CreepColony || blueprint.building == Protoss.ShieldBattery)
       defensive
     else
       tech
@@ -51,7 +51,7 @@ object PlacementProfiles {
   )
   
   val pylon = new PlacementProfile("Pylon", basic)
-  val robo = new PlacementProfile("Robo", basic) {
+  val robo: PlacementProfile = new PlacementProfile("Robo", basic) {
     avoidDistanceFromIdealRange = 4.0
   }
   val factory = new PlacementProfile("Factory", basic)

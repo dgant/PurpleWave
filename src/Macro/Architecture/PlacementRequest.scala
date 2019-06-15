@@ -10,6 +10,8 @@ class PlacementRequest(
    var tile: Option[Tile] = None,
    var plan: Option[Plan] = None) {
 
+  var placementResult: Option[PlacementResult] = None
+
   def unitClass: UnitClass = blueprint.building
 
   def place(): Unit = {

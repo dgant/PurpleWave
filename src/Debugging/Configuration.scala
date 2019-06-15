@@ -79,9 +79,7 @@ class Configuration {
   var performanceMinimumUnitSleep         = 2
   var maximumGamesHistoryPerOpponent      = 500
   
-  var urgentBuildingPlacement             = true
-  var urgentBuildingPlacementCutoffFrames = GameTime(15, 0)()
-  var urgentBuildingPlacementCooldown     = GameTime(0, 1)()
+  var buildingPlacementRefreshPeriod      = GameTime(0, 5)()
   var buildingPlacementMaxTilesToEvaluate = 300
   var buildingPlacementBatchSize          = 300
   var buildingPlacementBatchingStartFrame = GameTime(4, 0)()

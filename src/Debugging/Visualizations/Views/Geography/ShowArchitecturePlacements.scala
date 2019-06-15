@@ -4,8 +4,8 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
-import Macro.Allocation.TileReservation
-import Mathematics.Points.TileRectangle
+import Macro.Architecture.GridExclusion
+import bwapi.Color
 
 object ShowArchitecturePlacements extends View {
 
@@ -24,41 +24,36 @@ object ShowArchitecturePlacements extends View {
   }
 
   def renderGroundskeeperMap(): Unit = {
-    def drawReservation(reservation: TileReservation, isNew: Boolean): Unit = {
-      reservation.tiles.foreach(tile => DrawMap.tileRectangle(TileRectangle(tile, tile.add(1, 1)), if (isNew) Colors.NeonBlue else Colors.MediumBlue))
-      DrawMap.tileRectangle(TileRectangle(reservation.target, reservation.target.add(1, 1)), if (isNew) Colors.NeonGreen else Colors.MediumGreen)
-      DrawMap.label(reservation.plan.toString, reservation.target.pixelCenter)
-    }
-    With.groundskeeper.reservationsNow.foreach(drawReservation(_, isNew = true))
-    With.groundskeeper.reservationsBefore.foreach(drawReservation(_, isNew = false))
+    With.viewport.rectangle().tiles.foreach(tile => {
+      if (tile.valid) {
+        val reservation = With.groundskeeper.reserved(tile.i)
+        if (reservation.update > With.groundskeeper.updates - 1) {
+          DrawMap.box(tile.topLeftPixel, tile.bottomRightPixel, Colors.NeonYellow)
+          DrawMap.label(reservation.plan.toString, tile.pixelCenter)
+        }
+      }
+    })
     With.groundskeeper.suggestions.filter(_.tile.isDefined).foreach(suggestion => {
       val tile = suggestion.tile.get
-      DrawMap.tileRectangle(TileRectangle(tile, tile.add(1, 1)), Colors.NeonYellow)
+      DrawMap.box(tile.topLeftPixel, tile.bottomRightPixel, Colors.NeonOrange)
       DrawMap.label(suggestion.plan.map(_.toString).getOrElse("X"), tile.pixelCenter)
     })
   }
 
   def renderArchitectureMap(): Unit = {
-    With.architecture.exclusions.foreach(exclusion => {
-      DrawMap.tileRectangle(exclusion.areaExcluded, Colors.MediumRed)
-      DrawMap.label(exclusion.description, exclusion.areaExcluded.midPixel)
-    })
+    val tiles = With.viewport.rectangle().tiles.filter(_.valid)
 
-    With.viewport.rectangle().tiles.foreach(tile => {
-      if (With.architecture.unbuildable.get(tile)) {
+    def drawExclusions(exclusions: GridExclusion, color: Color, radius: Int): Unit = {
+      tiles.map(exclusions.get).filter(_.nonEmpty).distinct.foreach(exclusion =>
         DrawMap.box(
-          tile.topLeftPixel.add(4, 4),
-          tile.topLeftPixel.add(28, 28),
-          Colors.MediumTeal,
-          solid = false)
-      }
-      if (With.architecture.unwalkable.get(tile)) {
-        DrawMap.box(
-          tile.topLeftPixel.add(8, 8),
-          tile.topLeftPixel.add(24, 24),
-          Colors.MediumOrange,
-          solid = false)
-      }
-    })
+          exclusion.get.areaExcluded.startPixel.add(radius, radius),
+          exclusion.get.areaExcluded.endPixel.subtract(radius, radius),
+          color))
+    }
+
+    drawExclusions(With.architecture.unbuildable, Colors.MediumRed, 4)
+    drawExclusions(With.architecture.unwalkable, Colors.MediumGreen, 2)
+    drawExclusions(With.architecture.untownhallable, Colors.MediumBlue, 6)
+    drawExclusions(With.architecture.ungassable, Colors.MediumYellow, 8)
   }
 }

@@ -6,7 +6,7 @@ import Mathematics.Points.Tile
 import scala.collection.mutable
 
 case class PlacementResult(
-  blueprint         : Blueprint,
+  request           : PlacementRequest,
   tile              : Option[Tile],
   evaluations       : Iterable[PlacementHeuristicEvaluation],
   scoresByTile      : mutable.HashMap[Tile, Double],

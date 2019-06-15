@@ -68,7 +68,7 @@ class UnitClassProxy(val baseType: UnitType) {
   lazy val requiredUnits            = baseType.requiredUnits.asScala.map(pair => (UnitClasses.get(pair._1), pair._2))
   lazy val requiresCreep            = baseType.requiresCreep
   lazy val requiresPsi              = baseType.requiresPsi
-  lazy val techsWhat           = baseType.researchesWhat.asScala.map(Techs.get)
+  lazy val techsWhat                = baseType.researchesWhat.asScala.map(Techs.get)
   lazy val seekRange                = baseType.seekRange
   lazy val sightRangePixels         = baseType.sightRange
   lazy val spaceProvided            = baseType.spaceProvided

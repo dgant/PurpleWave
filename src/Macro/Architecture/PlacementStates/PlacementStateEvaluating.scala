@@ -12,8 +12,8 @@ import Utilities.ByOption
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-class PlacementStateEvaluating(placementSuggestion: PlacementRequest) extends PlacementState {
-  private val blueprint             = placementSuggestion.blueprint
+class PlacementStateEvaluating(request: PlacementRequest) extends PlacementState {
+  private val blueprint             = request.blueprint
   private var candidatesUnfiltered  : Option[ArrayBuffer[Tile]] = None
   private var candidatesFiltered    : Option[ArrayBuffer[Tile]] = None
   private var nextFilteringIndex    = 0
@@ -74,7 +74,7 @@ class PlacementStateEvaluating(placementSuggestion: PlacementRequest) extends Pl
       val best = ByOption.minBy(evaluationValues)(_._2).map(_._1)
       updateStepNanoseconds(nanosecondsOnStart)
       val placement = PlacementResult(
-        blueprint,
+        request,
         best,
         evaluationDebugging.values.flatten,
         evaluationValues,
@@ -84,7 +84,7 @@ class PlacementStateEvaluating(placementSuggestion: PlacementRequest) extends Pl
         candidates        = candidatesUnfiltered.get.size,
         evaluated         = candidatesFiltered.get.size)
 
-      With.placement.usePlacement(placementSuggestion, placement)
+      With.placement.usePlacement(request, placement)
       transition(new PlacementStateReady)
     }
   }

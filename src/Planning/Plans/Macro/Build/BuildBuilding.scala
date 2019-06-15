@@ -15,7 +15,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class BuildBuilding(val buildingClass: UnitClass) extends Plan {
 
-  val currencyLock        = new LockCurrencyForUnit(buildingClass)
+  val currencyLock = new LockCurrencyForUnit(buildingClass)
   
   private var desiredTile   : Option[Tile]              = None
   private var orderedTile   : Option[Tile]              = None
@@ -183,7 +183,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     travelFrames + 24 >= currencyLock.expectedFrames
   }
   
-  override def visualize() {
+  override def renderMap() {
     if (isComplete) return
     if (orderedTile.isEmpty) return
     DrawMap.box(

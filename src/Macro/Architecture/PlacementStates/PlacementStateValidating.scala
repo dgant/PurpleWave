@@ -8,9 +8,10 @@ import scala.collection.mutable
 
 class PlacementStateValidating(request: PlacementRequest) extends PlacementState {
   override def step() {
-    if (request.tile.exists(request.blueprint.accepts(_))) {
-      val result = PlacementResult(
-        request.blueprint,
+    if (request.tile.exists(request.blueprint.accepts(_, Some(request)))
+      && request.placementResult.forall(result => With.framesSince(result.frameFinished) < With.configuration.buildingPlacementRefreshPeriod)) {
+      val result = request.placementResult.getOrElse(PlacementResult(
+        request,
         request.tile,
         Seq.empty,
         new mutable.HashMap[Tile, Double],
@@ -18,7 +19,7 @@ class PlacementStateValidating(request: PlacementRequest) extends PlacementState
         frameStarted      = With.frame,
         frameFinished     = With.frame,
         candidates        = 1,
-        evaluated         = 1)
+        evaluated         = 1))
       With.placement.usePlacement(request, result)
       transition(new PlacementStateReady)
     } else {

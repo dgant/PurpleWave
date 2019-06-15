@@ -8,7 +8,7 @@ class Plan {
   
   def isComplete: Boolean = false
   def getChildren: Iterable[Plan] = Vector.empty
-  def visualize(): Unit = {}
+  def renderMap(): Unit = {}
   
   protected def onUpdate() {}
   

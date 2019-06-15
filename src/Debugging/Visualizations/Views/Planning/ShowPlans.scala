@@ -8,12 +8,7 @@ import Planning.Plans.Basic.NoPlan
 object ShowPlans extends View {
   
   override def renderMap() {
-    drawPlansRecursively(With.strategy.gameplan)
-  }
-  
-  private def drawPlansRecursively(plan: Plan) {
-    plan.visualize()
-    plan.getChildren.filter(isRelevant).foreach(drawPlansRecursively)
+    With.prioritizer.all.foreach(_._1.renderMap())
   }
 
   var screenEnabled = false

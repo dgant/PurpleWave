@@ -6,26 +6,26 @@ import Mathematics.Points.Tile
 import Planning.Plan
 import Planning.Plans.Basic.NoPlan
 import ProxyBwapi.UnitClasses.UnitClass
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-case class TileReservation(var update: Int, plan: Plan, target: Tile, tiles: Seq[Tile])
+case class TileReservation(plan: Plan, target: Tile, update: Int)
 
 class Groundskeeper {
   var updates: Int = 0
-  val reserved: Array[TileReservation] = Array.fill(With.mapTileWidth * With.mapTileHeight)(TileReservation(updates, NoPlan(), Tile(0, 0), Seq.empty))
+  val reserved: Array[TileReservation] = Array.fill(With.mapTileWidth * With.mapTileHeight)(TileReservation(NoPlan(), Tile(0, 0), updates))
 
-  var suggestionsBefore   : ArrayBuffer[PlacementRequest] = ArrayBuffer.empty
-  var suggestionsNow      : ArrayBuffer[PlacementRequest] = ArrayBuffer.empty
-  var reservationsBefore  : ArrayBuffer[TileReservation] = ArrayBuffer.empty
-  var reservationsNow     : ArrayBuffer[TileReservation] = ArrayBuffer.empty
+  var suggestionsBefore   : mutable.Buffer[PlacementRequest] = ArrayBuffer.empty
+  var suggestionsNow      : mutable.Buffer[PlacementRequest] = ArrayBuffer.empty
+  var blueprintConsumers  : mutable.Map[Blueprint, FriendlyUnitInfo] = mutable.HashMap.empty
 
   def update(): Unit = {
     updates += 1
     suggestionsBefore   = suggestionsNow
     suggestionsNow      = ArrayBuffer.empty
-    reservationsBefore  = reservationsNow
-    reservationsNow     = ArrayBuffer.empty
+    blueprintConsumers.filterNot(_._2.alive).keys.toSeq.foreach(blueprintConsumers.remove)
   }
 
   def suggestions: Seq[PlacementRequest] = (suggestionsNow.view ++ suggestionsBefore.view).distinct
@@ -57,6 +57,11 @@ class Groundskeeper {
     }
   }
 
+  // I am a building plan. I want to indicate that I have used this blueprint to build something
+  def consume(blueprint: Blueprint, unit: FriendlyUnitInfo): Unit = {
+    blueprintConsumers(blueprint) = unit
+  }
+
   private def refresh(request: PlacementRequest): Unit = {
     suggestionsBefore -= request
     if (! suggestionsNow.contains(request)) {
@@ -77,7 +82,7 @@ class Groundskeeper {
   }
 
   def getSuggestion(plan: Plan, unitClass: UnitClass): PlacementRequest = {
-    matchSuggestion(plan, unitClass)
+    val output = matchSuggestion(plan, unitClass)
       .orElse({
         suggest(plan, unitClass)
         matchSuggestion(plan, unitClass)
@@ -88,31 +93,28 @@ class Groundskeeper {
         suggestionsNow += output
         output
       })
+    output.plan = Some(plan)
+    output
   }
 
-  def isReserved(tile: Tile, target: Tile, plan: Option[Plan] = None): Boolean = {
+  def isReserved(tile: Tile, plan: Option[Plan] = None): Boolean = {
     if ( ! tile.valid) return true
-    if ( ! target.valid) return true
     val reservation = reserved(tile.i)
     if (reservation.update < updates - 1) return false
-    if (reservation.target != target) return true
     if ( ! plan.contains(reservation.plan)) return true
     false
   }
 
   def reserve(plan: Plan, target: Tile, unitClass: UnitClass): Boolean = {
-    reserve(plan, target, unitClass.tileArea.add(target).tiles)
+    reserve(plan, unitClass.tileArea.add(target).tiles)
   }
 
-  def reserve(plan: Plan, target: Tile, tiles: Seq[Tile]): Boolean = {
-    val destinations = tiles.view :+ target
-    val canReserve = destinations.forall(tile => ! isReserved(tile, target, plan = Some(plan)))
+  def reserve(plan: Plan, tiles: Seq[Tile]): Boolean = {
+    val canReserve = tiles.forall(tile => ! isReserved(tile, plan = Some(plan)))
     if (canReserve) {
-      val reservation = TileReservation(updates, plan, target, tiles)
-      reservationsNow += reservation
-      destinations.foreach(tile => reserved(tile.i) = reservation)
+      tiles.foreach(tile => reserved(tile.i) = TileReservation(plan, tile, updates))
     } else {
-      //With.logger.warn("Attempting to reserve an unreservable tile: " + target + " and " + tiles + " for " + plan)
+      With.logger.warn("Attempting to reserve unreservable tiles " + tiles + " for " + plan)
     }
     canReserve
   }

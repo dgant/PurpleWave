@@ -93,7 +93,7 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
     trainerLock.unitPreference.set(locationPreference)
   }
   
-  override def visualize() {
+  override def renderMap() {
     if (isComplete) return
     if (trainer.isEmpty) return
     DrawMap.box(

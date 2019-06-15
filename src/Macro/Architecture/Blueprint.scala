@@ -2,9 +2,9 @@ package Macro.Architecture
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
+import Macro.Architecture.ArchitecturalAssessment.ArchitecturalAssessment
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
 import Mathematics.Points.{Tile, TileRectangle}
-import Planning.Plan
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import Strategery.Plasma
@@ -59,29 +59,25 @@ class Blueprint(
     }
     true
   }
-  
-  protected def buildable(tile: Tile): Boolean = {
+  def accepts(tile: Tile, request: Option[PlacementRequest] = None): Boolean = {
+    val reason = assess(tile, request)
+    reason == ArchitecturalAssessment.Accepted
+  }
+
+  def assess(tile: Tile, request: Option[PlacementRequest] = None): ArchitecturalAssessment = {
     if ( ! tile.valid) {
-      return false
+      return ArchitecturalAssessment.Invalid
+    }
+    if ( ! matches(tile)) {
+      return ArchitecturalAssessment.DoesntMatch
     }
     if (requirePower.get) {
       if (heightTiles.get == 3 && ! With.grids.psi3Height.isSet(tile) && ! With.architecture.powered3Height.get(tile)) {
-        return false
+        return ArchitecturalAssessment.Unpowered
       }
       if (heightTiles.get == 2 && ! With.grids.psi2Height.isSet(tile) && ! With.architecture.powered2Height.get(tile)) {
-        return false
+        return ArchitecturalAssessment.Unpowered
       }
-    }
-    
-    true
-  }
-  
-  def accepts(tile: Tile, plan: Option[Plan] = None): Boolean = {
-    if ( ! matches(tile)) {
-      return false
-    }
-    if ( ! buildable(tile)) {
-      return false
     }
 
     val thisZone = tile.zone
@@ -89,29 +85,23 @@ class Blueprint(
       && ! Plasma.matches
       && ( ! With.blackboard.allowIslandBases() || ! thisZone.bases.exists(_.minerals.exists(_.visible)))
       && ! With.architecture.accessibleZones.contains(thisZone)) {
-      return false
+      return ArchitecturalAssessment.InaccessibleIsland
     }
     if (requireGasTile.get) {
-      val legal   = thisZone.bases.exists(_.gas.exists(_.tileTopLeft == tile))
-      val blocked = With.architecture.ungassable.get(tile)
-      return legal && ! blocked
+      if ( ! thisZone.bases.exists(_.gas.exists(_.tileTopLeft == tile))) {
+        return ArchitecturalAssessment.IsntGas
+      }
+      if ( ! With.architecture.gassable(tile, request)) {
+        return ArchitecturalAssessment.BlockedGas
+      }
+      return ArchitecturalAssessment.Accepted
     }
     if (requireTownHallTile.get) {
-      if ( ! thisZone.bases.exists(_.townHallTile == tile)) return false
-      if (With.architecture.untownhallable.get(tile)) return false
+      if ( ! thisZone.bases.exists(_.townHallTile == tile)) return ArchitecturalAssessment.IsntBasePosition
+      if ( ! With.architecture.townhallable(tile, request)) return ArchitecturalAssessment.IsntLegalForTownHall
     }
 
     val buildArea = relativeBuildArea.add(tile)
-  
-    def violatesBuildArea(nextTile: Tile): Boolean = (
-      nextTile.zone.perimeter.contains(nextTile)
-      || ! With.architecture.buildable(nextTile)
-      || (requireCreep.get != With.grids.creep.get(nextTile))
-      || (respectHarvesting.get && With.grids.harvestingArea.get((nextTile)))
-      || (requireResourceGap.get && ! With.grids.buildableTownHall.get(nextTile))
-      || ( ! requireTownHallTile.get && With.grids.units.get(nextTile).exists(u => ! u.flying && u.isEnemy || ! u.canMove))
-      || (With.groundskeeper.isReserved(tile, nextTile, plan))
-    )
 
     var x = buildArea.startInclusive.x
     val xMax = buildArea.endExclusive.x
@@ -119,14 +109,30 @@ class Blueprint(
     while (x < xMax) {
       var y = buildArea.startInclusive.y
       while (y < yMax) {
-        if (violatesBuildArea(Tile(x, y))) {
-          return false
+        val nextTile = Tile(x, y)
+        if (!With.architecture.buildable(nextTile, request)) {
+          return ArchitecturalAssessment.IsntBuildable
+        }
+        if (requireCreep.get != With.grids.creep.get(nextTile)) {
+          return ArchitecturalAssessment.CreepMismatch
+        }
+        if (respectHarvesting.get && With.grids.harvestingArea.get((nextTile))) {
+          return ArchitecturalAssessment.ViolatesHarvesting
+        }
+        if (requireResourceGap.get && ! With.grids.buildableTownHall.get(nextTile)) {
+          return ArchitecturalAssessment.ViolatesResourceGap
+        }
+        if ( ! requireTownHallTile.get && With.grids.units.get(nextTile).exists(u => ! u.flying && u.isEnemy || ! u.canMove)) {
+          return ArchitecturalAssessment.BlockedByUnit
+        }
+        if (With.groundskeeper.isReserved(tile, request.flatMap(_.plan))) {
+          return ArchitecturalAssessment.Reserved
         }
         y += 1
       }
       x += 1
     }
-    true
+    ArchitecturalAssessment.Accepted
   }
   
   override def toString: String =

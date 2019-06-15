@@ -37,8 +37,9 @@ class PlacementCycle {
   def next: Option[PlacementRequest] = queue.headOption
   def setState(newState: PlacementState): Unit = state = newState
   def usePlacement(placementSuggestion: PlacementRequest, placementResult: PlacementResult): Unit = {
-    //With.architecture.assumePlacement(placement)
+    With.architecture.assumePlacement(placementResult)
     placementSuggestion.tile = placementResult.tile
+    placementSuggestion.placementResult = Some(placementResult)
     queue -= placementSuggestion
   }
 }

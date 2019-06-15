@@ -25,7 +25,7 @@ class Prioritizer {
     priorities.clear()
   }
   
-  def audit: List[(Plan, Integer)] = priorities.toList.sortBy(_._2)
+  def all: List[(Plan, Integer)] = priorities.toList.sortBy(_._2)
   
   def isPrioritized(plan: Plan): Boolean = {
     priorities.contains(plan)

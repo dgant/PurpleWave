@@ -9,6 +9,7 @@ import scala.collection.mutable
 class PlacementStateValidating(request: PlacementRequest) extends PlacementState {
   override def step() {
     if (request.tile.exists(request.blueprint.accepts(_, Some(request)))
+      && ! request.blueprint.requireTownHallTile.contains(true) // Town halls are so important we should always recalculate
       && request.placementResult.forall(result => With.framesSince(result.frameFinished) < With.configuration.buildingPlacementRefreshPeriod)) {
       val result = request.placementResult.getOrElse(PlacementResult(
         request,

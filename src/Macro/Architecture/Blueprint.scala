@@ -110,8 +110,11 @@ class Blueprint(
       var y = buildArea.startInclusive.y
       while (y < yMax) {
         val nextTile = Tile(x, y)
-        if (!With.architecture.buildable(nextTile, request)) {
+        if ( ! With.architecture.buildable(nextTile, request)) {
           return ArchitecturalAssessment.IsntBuildable
+        }
+        if (nextTile.zone.perimeter.contains(nextTile)) {
+          return ArchitecturalAssessment.ViolatesPerimeter
         }
         if (requireCreep.get != With.grids.creep.get(nextTile)) {
           return ArchitecturalAssessment.CreepMismatch

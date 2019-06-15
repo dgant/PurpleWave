@@ -60,6 +60,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
         else None
       )
       .orElse(
+        // Is this the cause of Terran construction derp?
         orderedTile.flatMap(tile => With.units.ours.find(unit =>
           unit.is(buildingClass) &&
             unit.tileTopLeft == tile)))
@@ -155,13 +156,12 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     if (building.isDefined) {
       building.map(_.tileTopLeft)
     }
-    else if (currencyLock.satisfied && currencyLock.expectedFrames < With.blackboard.maxFramesToSendAdvanceBuilder) {
-      val suggestion = With.groundskeeper.getSuggestion(this, buildingClass)
-      suggestion.place()
-      suggestion.tile
-    }
     else {
-      None
+      val suggestion = With.groundskeeper.getSuggestion(this, buildingClass)
+      if (suggestion.tile.isEmpty && currencyLock.expectedFrames < With.blackboard.maxFramesToSendAdvanceBuilder) {
+        suggestion.place()
+      }
+      suggestion.tile
     }
   }
   

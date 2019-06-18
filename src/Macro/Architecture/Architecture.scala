@@ -58,30 +58,27 @@ class Architecture {
     ! untownhallable.excludes(tile, request)
   }
   
-  def assumePlacement(placement: PlacementResult) {
-    if (placement.tile.isEmpty) return
-    
+  def assumePlacement(placement: PlacementResult): ArchitectureDiff = {
+
+    val output = new ArchitectureDiffSeries
+
+    if (placement.tile.isEmpty) return output
+
     val tile = placement.tile.get
     val area = TileRectangle(
       tile.add(placement.request.blueprint.relativeBuildStart),
       tile.add(placement.request.blueprint.relativeBuildEnd))
-    val exclusion = Some(Exclusion(placement.request.blueprint.toString, area, Some(placement.request)))
+    val exclusion = Exclusion(placement.request.blueprint.toString, area, Some(placement.request))
 
-    val nTiles = area.tiles.size
-    var iTile = 0
-    while (iTile < nTiles) {
-      val tile = area.tiles(iTile)
-      unbuildable.set(tile, exclusion)
-      unwalkable.set(tile, exclusion)
-      untownhallable.set(tile, exclusion)
-      ungassable.set(tile, exclusion)
-      iTile += 1
-    }
+    area.tiles.filter(_.valid).foreach(new ArchitectureDiffExclude(_, exclusion))
 
     // If we have no Pylons, place in advance of our first completing
     if (placement.request.blueprint.powers.get && ! With.units.existsOurs(Protoss.Pylon)) {
-      addPower(tile, Some(placement))
+      output.stack += new ArchitectureDiffPower(tile)
     }
+
+    output.doo()
+    output
   }
   
   /////////////
@@ -149,7 +146,7 @@ class Architecture {
       })
   }
   
-  private def addPower(tile: Tile, placement: Option[PlacementResult] = None) {
+  private def addPower(tile: Tile) {
     With.grids.psi2Height.psiPoints.map(tile.add).foreach(neighbor => if (neighbor.valid) powered2Height.set(neighbor, true))
     With.grids.psi3Height.psiPoints.map(tile.add).foreach(neighbor => if (neighbor.valid) powered3Height.set(neighbor, true))
   }

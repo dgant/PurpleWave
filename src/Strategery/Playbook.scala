@@ -81,9 +81,9 @@ class TestingPlaybook extends PurpleWavePlaybook {
 }
 
 class ForcedPlaybook extends EmptyPlaybook {
-  override def strategySelectionPolicy: StrategySelectionPolicy = new StrategySelectionFixed(EvELogMapInfo)
+  override def strategySelectionPolicy: StrategySelectionPolicy = new StrategySelectionFixed(PvPProxy2Gate)
   override def respectMap: Boolean = false
   override def respectHistory: Boolean = false
 }
 
-object Playbook extends CIGPlaybook {}
+object Playbook extends ForcedPlaybook {}

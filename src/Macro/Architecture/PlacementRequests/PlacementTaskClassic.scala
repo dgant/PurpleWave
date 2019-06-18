@@ -38,7 +38,7 @@ class PlacementTaskClassic(request: PlacementRequest) extends PlacementTask {
       while (stillFiltering && filterCount < filterCountMax) {
 
         val candidate = candidatesUnfiltered.get(nextFilteringIndex)
-        if (blueprint.accepts(candidate)) {
+        if (blueprint.accepts(candidate, Some(request))) {
           candidatesFiltered.get += candidate
         }
 

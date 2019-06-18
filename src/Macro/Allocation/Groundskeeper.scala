@@ -115,6 +115,9 @@ class Groundskeeper {
     if (canReserve) {
       tiles.foreach(tile => reserved(tile.i) = TileReservation(plan, tile, updates))
     } else {
+      // Where I've seen this, it's been:
+      // 1. A plan calls reserve()
+      // 2. But it calls it on a tile reserved by a plan with a highier priotiy
       With.logger.warn("Attempting to reserve unreservable tiles " + tiles + " for " + plan)
     }
     canReserve

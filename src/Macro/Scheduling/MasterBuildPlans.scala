@@ -18,8 +18,7 @@ class MasterBuildPlans {
   private var queue: Iterable[Buildable] = Vector.empty
   
   def getChildren: Iterable[Plan] = getChildrenCache()
-  private val getChildrenCache = new Cache(() => getChildrenRecalculate)
-  private def getChildrenRecalculate: Iterable[Plan] = {
+  private val getChildrenCache = new Cache(() => {
     val indexByBuild = new mutable.HashMap[Buildable, Int]
     plans.keys.foreach(build => indexByBuild.put(build, 0))
     queue.map(build => {
@@ -27,7 +26,7 @@ class MasterBuildPlans {
       indexByBuild(build) += 1
       output
     })
-  }
+  })
   
   def update(invoker: FollowBuildOrder) {
 

@@ -12,7 +12,7 @@ import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTIdeas.TrainMinimumDragoo
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
+import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.Plans.Scouting.{Scout, ScoutCleared, ScoutOn}
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones._

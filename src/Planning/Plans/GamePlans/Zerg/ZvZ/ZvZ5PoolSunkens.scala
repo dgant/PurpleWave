@@ -11,8 +11,8 @@ import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.Pump
-import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Placement.ProposePlacement
 import Planning.Plans.Scouting.Scout
 import Planning.Predicates.Compound.{And, Check}
 import Planning.Predicates.Milestones.{FrameAtLeast, UnitsAtLeast}

@@ -10,7 +10,7 @@ import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump, PumpWorkers}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
+import Planning.Plans.Placement.BuildCannonsAtNatural
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones.{EnemiesAtLeast, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}

@@ -8,7 +8,7 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
+import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.Predicates.Compound.{And, Latch}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome

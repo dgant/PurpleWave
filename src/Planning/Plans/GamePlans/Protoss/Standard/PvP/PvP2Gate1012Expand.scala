@@ -8,10 +8,9 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.Pump
-import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
+import Planning.Plans.Placement.{BuildCannonsAtNatural, ProposePlacement}
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._

@@ -9,7 +9,7 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, PumpWorkers}
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Terran.BuildBunkersAtMain
+import Planning.Plans.Placement.BuildBunkersAtMain
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy.EnemyStrategy
 import Planning.{Plan, Predicate}

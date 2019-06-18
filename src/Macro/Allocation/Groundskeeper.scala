@@ -1,7 +1,8 @@
 package Macro.Allocation
 
 import Lifecycle.With
-import Macro.Architecture.{Blueprint, PlacementRequest}
+import Macro.Architecture.Blueprint
+import Macro.Architecture.PlacementRequests.PlacementRequest
 import Mathematics.Points.Tile
 import Planning.Plan
 import Planning.Plans.Basic.NoPlan

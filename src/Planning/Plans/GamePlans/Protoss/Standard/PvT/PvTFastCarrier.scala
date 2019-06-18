@@ -10,7 +10,7 @@ import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
+import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.Predicates.Economy.MineralsAtMost

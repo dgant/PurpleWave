@@ -1,7 +1,7 @@
 package Macro.Architecture.PlacementStates
 
 import Lifecycle.With
-import Macro.Architecture.PlacementRequest
+import Macro.Architecture.PlacementRequests.PlacementRequest
 
 abstract class PlacementState {
   final def next: Option[PlacementRequest] = With.placement.next

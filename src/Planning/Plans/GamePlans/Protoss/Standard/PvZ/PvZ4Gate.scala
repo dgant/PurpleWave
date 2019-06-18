@@ -12,9 +12,9 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPool
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Placement.ProposePlacement
 import Planning.Plans.Scouting.{ScoutExpansionsAt, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast

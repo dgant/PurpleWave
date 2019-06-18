@@ -10,6 +10,7 @@ import Strategery.Strategies.Terran.TvE._
 import Strategery.Strategies.Terran.TvR.TvR1Rax
 import Strategery.Strategies.Terran.TvZ.TvZProxy8Fact
 import Strategery.Strategies.Terran._
+import Strategery.Strategies.Utility.EvELogMapInfo
 import Strategery.Strategies.Zerg._
 
 class EmptyPlaybook {
@@ -74,8 +75,13 @@ class CIGPlaybook extends PurpleWavePlaybook {
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvT21Nexus, PvT3BaseCarrier)
-  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
+  override lazy val forced: Seq[Strategy] = Seq(EvELogMapInfo)
+  override def respectMap: Boolean = false
+  override def respectHistory: Boolean = false
+}
+
+class ForcedPlaybook extends EmptyPlaybook {
+  override def strategySelectionPolicy: StrategySelectionPolicy = new StrategySelectionFixed(EvELogMapInfo)
   override def respectMap: Boolean = false
   override def respectHistory: Boolean = false
 }

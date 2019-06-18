@@ -4,6 +4,7 @@ import Information.Geography.Types.Zone
 import Information.Grids.Disposable.GridDisposableBoolean
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
+import Macro.Architecture.PlacementRequests.{PlacementRequest, PlacementResult}
 import Mathematics.Points.{Tile, TileRectangle}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass

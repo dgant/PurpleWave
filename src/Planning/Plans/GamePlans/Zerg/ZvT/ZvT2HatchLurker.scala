@@ -13,7 +13,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.CancelOrders
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
-import Planning.Plans.Macro.Zerg.{BuildSunkensAtExpansions, BuildSunkensAtNatural}
+import Planning.Plans.Placement.{BuildSunkensAtExpansions, BuildSunkensAtNatural}
 import Planning.Plans.Scouting.Scout
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Economy.GasAtLeast

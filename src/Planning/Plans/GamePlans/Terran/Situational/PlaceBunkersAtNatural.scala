@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Situational
 
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Planning.Plans.Macro.Build.ProposePlacement
+import Planning.Plans.Placement.ProposePlacement
 import ProxyBwapi.Races.Terran
 
 class PlaceBunkersAtNatural(bunkers: Int) extends ProposePlacement {

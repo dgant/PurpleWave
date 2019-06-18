@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Situational
 import Information.Geography.Types.Zone
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Planning.Plans.Macro.Build.ProposePlacement
+import Planning.Plans.Placement.ProposePlacement
 import ProxyBwapi.Races.Protoss
 
 class PlaceBatteriesProxied(batteryCount: Int, proxyZone: () => Option[Zone], allowBlockingBase: Boolean = true) extends ProposePlacement {

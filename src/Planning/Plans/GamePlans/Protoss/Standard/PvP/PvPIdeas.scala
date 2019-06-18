@@ -10,7 +10,8 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{RequireBases, RequireMiningBases}
-import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, MeldArchons}
+import Planning.Plans.Macro.Protoss.MeldArchons
+import Planning.Plans.Placement.BuildCannonsAtBases
 import Planning.Predicates.Compound.{And, Latch, Not, Sticky}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._

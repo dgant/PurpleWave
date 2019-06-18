@@ -11,6 +11,7 @@ import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Terran._
+import Planning.Plans.Placement.{BuildBunkersAtEnemyNatural, BuildBunkersAtMain, BuildBunkersAtNatural, BuildMissileTurretsAtNatural}
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch}
 import Planning.Predicates.Milestones._

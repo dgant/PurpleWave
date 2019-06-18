@@ -9,9 +9,9 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Terran.Situational.RepairBunker
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}
-import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Terran.{BuildBunkersAtNatural, BuildMissileTurretsAtNatural, PopulateBunkers}
+import Planning.Plans.Macro.Terran.PopulateBunkers
+import Planning.Plans.Placement.{BuildBunkersAtNatural, BuildMissileTurretsAtNatural, ProposePlacement}
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._

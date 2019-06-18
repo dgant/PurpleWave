@@ -9,10 +9,9 @@ import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAt}
-import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
+import Planning.Plans.Placement.{BuildCannonsAtNatural, ProposePlacement}
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._

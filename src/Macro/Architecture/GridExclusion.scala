@@ -1,6 +1,7 @@
 package Macro.Architecture
 
 import Information.Grids.ArrayTypes.AbstractGridVersionedValue
+import Macro.Architecture.PlacementRequests.PlacementRequest
 import Mathematics.Points.Tile
 
 class GridExclusion extends AbstractGridVersionedValue[Option[Exclusion]] {

@@ -1,4 +1,4 @@
-package Planning.Plans.Macro.Protoss
+package Planning.Plans.Placement
 
 import Information.Geography.Types.Base
 import Lifecycle.With

@@ -10,7 +10,7 @@ import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpMutalisks, ScoutSafelyWithOv
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Zerg.BuildSunkensInMain
+import Planning.Plans.Placement.BuildSunkensInMain
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._

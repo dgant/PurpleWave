@@ -4,7 +4,8 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
-import Macro.Architecture.{Blueprint, PlacementResult}
+import Macro.Architecture.Blueprint
+import Macro.Architecture.PlacementRequests.PlacementResult
 import Mathematics.Points.Pixel
 import bwapi.Color
 

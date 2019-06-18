@@ -9,10 +9,10 @@ import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.Protoss.Situational.{CatchDTRunby, DefendAgainstProxy}
 import Planning.Plans.Macro.Automatic.{Gather, PumpWorkers, RequireSufficientSupply}
-import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{BuildOrder, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.RemoveMineralBlocksAt
 import Planning.Plans.Macro.Protoss.MeldArchons
+import Planning.Plans.Placement.ProposePlacement
 import Planning.Plans.Scouting.{ChillOverlords, ScoutAt, ScoutExpansionsAt}
 import Planning.Predicates.Compound.{Check, Not}
 import Planning.Predicates.Milestones.BasesAtLeast

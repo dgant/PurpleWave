@@ -9,7 +9,7 @@ import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases}
-import Planning.Plans.Macro.Zerg.{BuildSunkensAtExpansions, BuildSunkensAtNatural}
+import Planning.Plans.Placement.{BuildSunkensAtExpansions, BuildSunkensAtNatural}
 import Planning.Plans.Scouting.Scout
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemyWalledIn, UpgradeComplete}

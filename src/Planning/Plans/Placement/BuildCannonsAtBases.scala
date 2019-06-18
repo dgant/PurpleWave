@@ -1,10 +1,10 @@
-package Planning.Plans.Macro.Protoss
+package Planning.Plans.Placement
 
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
-import Macro.BuildRequests.{GetAnother, Get}
+import Macro.BuildRequests.{Get, GetAnother}
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
 

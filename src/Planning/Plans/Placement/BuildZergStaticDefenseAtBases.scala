@@ -1,4 +1,4 @@
-package Planning.Plans.Macro.Zerg
+package Planning.Plans.Placement
 
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With

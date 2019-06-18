@@ -11,7 +11,7 @@ import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergenc
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Terran.{BuildBunkersAtMain, BuildBunkersAtNatural, BuildMissileTurretsAtNatural}
+import Planning.Plans.Placement.{BuildBunkersAtMain, BuildBunkersAtNatural, BuildMissileTurretsAtNatural}
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones.{EnemyHasShown, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}

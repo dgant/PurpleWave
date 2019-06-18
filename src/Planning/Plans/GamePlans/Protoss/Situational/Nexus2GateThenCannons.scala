@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Situational
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Planning.Plans.Macro.Build.ProposePlacement
+import Planning.Plans.Placement.ProposePlacement
 import ProxyBwapi.Races.Protoss
 
 class Nexus2GateThenCannons extends ProposePlacement {

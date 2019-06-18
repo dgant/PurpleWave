@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Situational
 
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Planning.Plans.Macro.Build.ProposePlacement
+import Planning.Plans.Placement.ProposePlacement
 import ProxyBwapi.Races.Protoss
 
 class BuildHuggingNexus extends ProposePlacement {

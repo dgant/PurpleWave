@@ -1,8 +1,8 @@
 package Macro.Allocation
 
 import Lifecycle.With
+import Macro.Architecture.PlacementRequests.{PlacementRequest, PlacementResult}
 import Macro.Architecture.PlacementStates.{PlacementState, PlacementStateInitial, PlacementStateReady}
-import Macro.Architecture.{PlacementResult, PlacementRequest}
 
 import scala.collection.mutable
 

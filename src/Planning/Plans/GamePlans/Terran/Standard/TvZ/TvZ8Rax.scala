@@ -12,7 +12,7 @@ import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergenc
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Terran.{BuildBunkersAtEnemyNatural, BuildBunkersAtNatural}
+import Planning.Plans.Placement.{BuildBunkersAtEnemyNatural, BuildBunkersAtNatural}
 import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound._
 import Planning.Predicates.Milestones._

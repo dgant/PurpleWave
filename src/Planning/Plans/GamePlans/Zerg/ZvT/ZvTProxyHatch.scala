@@ -8,9 +8,9 @@ import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
-import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.BuildGasPumps
+import Planning.Plans.Placement.ProposePlacement
 import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}

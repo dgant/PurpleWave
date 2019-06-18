@@ -1,7 +1,7 @@
 package Macro.Architecture.PlacementStates
 
 import Lifecycle.With
-import Macro.Architecture.{PlacementResult, PlacementRequest}
+import Macro.Architecture.PlacementRequests.{PlacementRequest, PlacementResult}
 import Mathematics.Points.Tile
 
 import scala.collection.mutable

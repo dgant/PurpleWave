@@ -1,4 +1,4 @@
-package Macro.Architecture
+package Macro.Architecture.PlacementRequests
 
 import Macro.Architecture.Heuristics.PlacementHeuristicEvaluation
 import Mathematics.Points.Tile

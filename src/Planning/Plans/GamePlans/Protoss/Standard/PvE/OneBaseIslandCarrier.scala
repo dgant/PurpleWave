@@ -9,10 +9,9 @@ import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
+import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural, ProposePlacement}
 import Planning.Predicates.Milestones._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 

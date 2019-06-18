@@ -12,7 +12,7 @@ import Planning.Plans.GamePlans.Zerg.ZvZ.ZvZIdeas
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases}
-import Planning.Plans.Macro.Zerg.BuildSunkensInMain
+import Planning.Plans.Placement.BuildSunkensInMain
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones.{TechComplete, TechStarted, UnitsAtLeast, UnitsAtMost}

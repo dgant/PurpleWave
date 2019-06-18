@@ -4,6 +4,7 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Macro.Architecture.ArchitecturalAssessment.ArchitecturalAssessment
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
+import Macro.Architecture.PlacementRequests.PlacementRequest
 import Mathematics.Points.{Tile, TileRectangle}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass

@@ -11,8 +11,7 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPool
 import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic.Pump
-import Planning.Plans.Macro.Build.ProposePlacement
-import Planning.Plans.Macro.Terran.BuildBunkersAtEnemy
+import Planning.Plans.Placement.{BuildBunkersAtEnemy, ProposePlacement}
 import Planning.Plans.Scouting.{FoundEnemyBase, ScoutAt}
 import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.Predicates.Economy.MineralsAtLeast

@@ -9,7 +9,8 @@ import Planning.Plans.GamePlans.Terran.Standard.TvP.TvPIdeas.ReactiveDetection
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
-import Planning.Plans.Macro.Terran.{BuildBunkersAtNatural, BuildMissileTurretsAtBases, BuildMissileTurretsAtNatural, PopulateBunkers}
+import Planning.Plans.Macro.Terran.PopulateBunkers
+import Planning.Plans.Placement.{BuildBunkersAtNatural, BuildMissileTurretsAtBases, BuildMissileTurretsAtNatural}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyBasesAtMost
 import Planning.Predicates.Strategy.Employing

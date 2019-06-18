@@ -12,7 +12,7 @@ abstract class Strategy {
   
   def gameplan: Option[Plan] = { None }
   
-  def choices: Iterable[Iterable[Strategy]]     = Iterable.empty
+  def choices: Iterable[Iterable[Strategy]] = Iterable.empty
   
   def islandMaps              : Boolean                         = false
   def groundMaps              : Boolean                         = true

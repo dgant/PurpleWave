@@ -9,7 +9,7 @@ import Planning.Plans.Basic.{Do, NoPlan, Write}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
-import Planning.Plans.Macro.Build.ProposePlacement
+import Planning.Plans.Placement.ProposePlacement
 import Planning.Plans.Scouting.{FoundEnemyBase, ScoutAt}
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Milestones.UnitsAtLeast

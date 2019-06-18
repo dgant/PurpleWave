@@ -10,9 +10,8 @@ import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
-import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Terran.BuildBunkersAtEnemy
+import Planning.Plans.Placement.{BuildBunkersAtEnemy, ProposePlacement}
 import Planning.Plans.Scouting.{FoundEnemyBase, ScoutOn}
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Economy.MineralsAtLeast

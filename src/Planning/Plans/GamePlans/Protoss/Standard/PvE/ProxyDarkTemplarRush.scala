@@ -8,9 +8,9 @@ import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
+import Planning.Plans.Placement.ProposePlacement
 import Planning.Plans.Scouting.{FoundEnemyBase, ScoutOn}
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemiesAtMost, UnitsAtLeast}

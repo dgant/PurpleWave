@@ -12,7 +12,7 @@ import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas._
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
-import Planning.Plans.Macro.Zerg.BuildSunkensAtNatural
+import Planning.Plans.Placement.BuildSunkensAtNatural
 import Planning.Plans.Scouting.{CampExpansions, FindExpansions}
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast

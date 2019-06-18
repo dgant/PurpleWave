@@ -13,7 +13,7 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases, RequireMiningBasesFFA}
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
-import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
+import Planning.Plans.Placement.BuildCannonsAtExpansions
 import ProxyBwapi.Races.Protoss
 
 class ProtossHuntersFFAFFEGatewayCarriers extends GameplanTemplate {

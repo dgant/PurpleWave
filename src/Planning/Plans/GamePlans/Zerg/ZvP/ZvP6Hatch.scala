@@ -14,7 +14,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Zerg.BuildSunkensAtNatural
+import Planning.Plans.Placement.BuildSunkensAtNatural
 import Planning.Plans.Scouting.Scout
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Economy.MineralsAtMost

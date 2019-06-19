@@ -86,4 +86,4 @@ class ForcedPlaybook extends EmptyPlaybook {
   override def respectHistory: Boolean = false
 }
 
-object Playbook extends ForcedPlaybook {}
+object Playbook extends CIGPlaybook {}

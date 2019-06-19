@@ -1,16 +1,17 @@
 package Macro.Architecture.PlacementStates
 
-import Lifecycle.With
 import Macro.Architecture.PlacementRequests.PlacementRequest
 
 class PlacementStateEvaluating(request: PlacementRequest) extends PlacementState {
-  val task = request.task()
+
+  val root = new PlacementNode(request)
 
   override def step(): Unit = {
-    val placement = task.step()
-    placement.foreach(result => {
-      With.placement.usePlacement(request, result)
+    if ( ! root.done) {
+      root.step()
+    }
+    if (root.done) {
       transition(new PlacementStateReady)
-    })
+    }
   }
 }

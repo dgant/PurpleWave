@@ -1,7 +1,7 @@
 package Macro.Allocation
 
 import Lifecycle.With
-import Macro.Architecture.PlacementRequests.{PlacementRequest, PlacementResult}
+import Macro.Architecture.PlacementRequests.PlacementRequest
 import Macro.Architecture.PlacementStates.{PlacementState, PlacementStateInitial, PlacementStateReady}
 
 import scala.collection.mutable
@@ -33,13 +33,9 @@ class PlacementCycle {
     }
   }
 
-
   def next: Option[PlacementRequest] = queue.headOption
   def setState(newState: PlacementState): Unit = state = newState
-  def usePlacement(placementSuggestion: PlacementRequest, placementResult: PlacementResult): Unit = {
-    With.architecture.assumePlacement(placementResult)
-    placementSuggestion.tile = placementResult.tile
-    placementSuggestion.placementResult = Some(placementResult)
-    queue -= placementSuggestion
+  def finishPlacement(request: PlacementRequest): Unit = {
+    queue -= request
   }
 }

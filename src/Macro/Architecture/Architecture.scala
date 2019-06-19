@@ -58,7 +58,7 @@ class Architecture {
     ! untownhallable.excludes(tile, request)
   }
   
-  def assumePlacement(placement: PlacementResult): ArchitectureDiff = {
+  def diffPlacement(placement: PlacementResult): ArchitectureDiff = {
 
     val output = new ArchitectureDiffSeries
 
@@ -77,7 +77,6 @@ class Architecture {
       output.stack += new ArchitectureDiffPower(tile)
     }
 
-    output.doo()
     output
   }
   

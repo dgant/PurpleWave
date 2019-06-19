@@ -159,7 +159,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     else {
       val suggestion = With.groundskeeper.getSuggestion(this, buildingClass)
       if (suggestion.tile.isEmpty && currencyLock.expectedFrames < With.blackboard.maxFramesToSendAdvanceBuilder) {
-        suggestion.place()
+        With.placement.place(suggestion)
       }
       suggestion.tile
     }

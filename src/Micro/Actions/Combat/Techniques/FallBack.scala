@@ -18,11 +18,15 @@ object FallBack extends ActionTechnique {
   )
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
-    if (unit.is(Protoss.Zealot) && unit.matchups.threats.exists(_.is(Zerg.Zergling))) return 1.0
+    //if (unit.is(Protoss.Zealot) && unit.matchups.threats.exists(_.is(Zerg.Zergling))) return 1.0
+    if (unit.is(Protoss.Archon)) return 1.0
     if (unit.is(Protoss.Dragoon)) return 1.0
     if (unit.is(Protoss.Reaver)) return 1.0
+    if (unit.is(Terran.Firebat)) return 1.0
+    if (unit.is(Terran.Goliath)) return 1.0
     if (unit.is(Terran.Vulture)) return 1.0
     if (unit.is(Terran.SiegeTankUnsieged)) return 1.0
+    if (unit.is(Zerg.Hydralisk)) return 1.0
     0.0
   }
   

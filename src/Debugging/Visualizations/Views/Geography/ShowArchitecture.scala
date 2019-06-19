@@ -47,7 +47,7 @@ object ShowArchitecture extends View {
           //DrawMap.circle(tile.pixelCenter, 4, Colors.BrightYellow)
         }
         if (With.architecture.powered3Height.get(tile)) {
-          DrawMap.circle(tile.pixelCenter, 6, Colors.BrightTeal)
+          DrawMap.circle(tile.pixelCenter, 4, Colors.BrightTeal)
         }
 
 
@@ -55,10 +55,7 @@ object ShowArchitecture extends View {
     })
     With.groundskeeper.suggestions.filter(_.tile.isDefined).foreach(suggestion => {
       val tile = suggestion.tile.get
-      DrawMap.box(
-        suggestion.blueprint.relativeBuildArea.startPixel,
-        suggestion.blueprint.relativeBuildArea.endPixel,
-        Colors.MediumBlue)
+      DrawMap.tileRectangle(suggestion.blueprint.relativeBuildArea.add(tile), Colors.MediumBlue)
       DrawMap.label(suggestion.plan.map(_.toString).getOrElse("X"), tile.pixelCenter)
     })
   }

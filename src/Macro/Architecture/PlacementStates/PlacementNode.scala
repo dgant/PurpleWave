@@ -4,6 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.ArchitectureDiff
 import Macro.Architecture.PlacementRequests.{PlacementRequest, PlacementResult, PlacementTask}
 import Mathematics.Points.Tile
+import Utilities.ByOption
 
 import scala.collection.mutable
 
@@ -15,7 +16,7 @@ class PlacementNode(request: PlacementRequest) extends PlacementState {
 
   val task: PlacementTask = request.task()
   val tileQueue = new mutable.PriorityQueue[TileScore]()(Ordering.by( - _.score))
-  var tileQueueUnloaded: Boolean = true
+  var needToLoadTiles: Boolean = true
   var child: Option[PlacementNode] = makeChild
   var tile: Option[Tile] = None
   var diff: Option[ArchitectureDiff] = None
@@ -38,10 +39,23 @@ class PlacementNode(request: PlacementRequest) extends PlacementState {
   }
 
   override def step(): Unit = {
-    if (tileQueueUnloaded) {
-      tileQueueUnloaded = false
-      tileQueue ++= task.tiles.map(tile => TileScore(tile, task.score(tile)))
-      result.candidates = tileQueue.size
+    if (needToLoadTiles) {
+      needToLoadTiles = false
+
+      // An inelegant design here:
+      // If we don't need to do recursive placement (ie. we have no children to place)
+      // then short-circuit the (slow) priority queue by giving it only the winning candidate.
+      val allTiles = task.tiles.filter(task.accept)
+      result.candidates = allTiles.size
+      if (allTiles.isEmpty) {
+        failed = true
+        return
+      }
+      if (child.isEmpty) {
+        tile = ByOption.minBy(allTiles)(task.score)
+      } else {
+        tileQueue ++= allTiles.map(tile => TileScore(tile, task.score(tile)))
+      }
       return
     }
     if (child.exists(_.failed)) {

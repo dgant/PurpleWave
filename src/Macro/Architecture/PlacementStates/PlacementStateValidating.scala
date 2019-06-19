@@ -6,6 +6,7 @@ import Macro.Architecture.PlacementRequests.PlacementRequest
 class PlacementStateValidating(request: PlacementRequest) extends PlacementState {
   override def step() {
     if (request.task().retain()) {
+      // Recursively assume these placements
       var nextRequest: Option[PlacementRequest] = Some(request)
       while (nextRequest.nonEmpty) {
         With.placement.finishPlacement(nextRequest.get)

@@ -24,7 +24,7 @@ class PlacementTaskClassic(request: PlacementRequest) extends PlacementTask {
 
   override def retain(): Boolean = {
     (request.tile.exists(request.blueprint.accepts(_, Some(request)))
-      && ! request.blueprint.requireTownHallTile.contains(true) // Town halls are so important (and inexpensive) that we should always recalculate
+      && request.blueprint.requireTownHallTile.contains(false) // Town halls are so important (and inexpensive) that we should always recalculate
       && request.result.forall(result => With.framesSince(result.frameFinished) < With.configuration.buildingPlacementRefreshPeriod))
   }
 

@@ -67,7 +67,7 @@ class Architecture {
       tile.add(request.blueprint.relativeBuildEnd))
     val exclusion = Exclusion(request.blueprint.toString, area, Some(request))
 
-    area.tiles.filter(_.valid).foreach(new ArchitectureDiffExclude(_, exclusion))
+    output.stack ++= area.tiles.filter(_.valid).map(new ArchitectureDiffExclude(_, exclusion))
 
     // If we have no Pylons, place in advance of our first completing
     if (request.blueprint.powers.get && ! With.units.existsOurs(Protoss.Pylon)) {

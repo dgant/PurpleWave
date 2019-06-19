@@ -24,9 +24,9 @@ class ArchitectureDiffSeries extends ArchitectureDiff {
 
 class ArchitectureDiffExclude(tile: Tile, exclusion: Exclusion) extends ArchitectureDiff {
   val unbuildableBefore: Option[Exclusion] = With.architecture.unbuildable.get(tile)
-  val unwalkableBefore: Option[Exclusion] = With.architecture.unbuildable.get(tile)
-  val untownhallableBefore: Option[Exclusion] = With.architecture.unbuildable.get(tile)
-  val ungassableBefore: Option[Exclusion] = With.architecture.unbuildable.get(tile)
+  val unwalkableBefore: Option[Exclusion] = With.architecture.unwalkable.get(tile)
+  val untownhallableBefore: Option[Exclusion] = With.architecture.untownhallable.get(tile)
+  val ungassableBefore: Option[Exclusion] = With.architecture.ungassable.get(tile)
 
   override def doo(): Unit = {
     With.architecture.unbuildable.set(tile, Some(exclusion))

@@ -12,7 +12,7 @@ class PerformanceMonitor {
   private var millisecondsBefore = 0l
   private var lastFrameDelayUpdate = 0
   
-  var framesOver85    = 0
+  var framesOver55    = 0
   var framesOver1000  = 0
   var framesOver10000 = 0
 
@@ -46,7 +46,7 @@ class PerformanceMonitor {
     uniqueFriendlyDeadIds.clear()
     val millisecondDifference = millisecondsSpentThisFrame
     frameTimes(With.frame % framesToTrack) = millisecondDifference
-    if (millisecondDifference >= 85)    framesOver85    += 1
+    if (millisecondDifference >= 55)    framesOver55    += 1
     if (millisecondDifference >= 1000)  framesOver1000  += 1
     if (millisecondDifference >= 10000) framesOver10000 += 1
   }
@@ -74,7 +74,7 @@ class PerformanceMonitor {
   def danger: Boolean = (
     (With.configuration.enableStreamManners || With.configuration.enablePerformanceSurrender)
     && (
-      framesOver85    > 160 ||
+      framesOver55    > 160 ||
       framesOver1000  > 5   ||
       framesOver10000 > 1)
   )
@@ -83,6 +83,6 @@ class PerformanceMonitor {
   def meanFrameMilliseconds : Long = frameTimes.view.map(Math.min(_, 100)).sum / framesToTrack
 
   def disqualified: Boolean =
-    framesOver85    >= 320 ||
+    framesOver55    >= 320 ||
     framesOver1000  >= 10
 }

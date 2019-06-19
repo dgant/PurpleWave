@@ -2,7 +2,7 @@ package Debugging.Visualizations.Rendering
 
 import Debugging.Visualizations.Colors
 import Lifecycle.With
-import Mathematics.Points.{Pixel, TileRectangle}
+import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import bwapi.Color
 
 object DrawMap {
@@ -37,6 +37,16 @@ object DrawMap {
       end.radiateRadians(angleBack - angleDiff, 7),
       color,
       solid = true)
+  }
+
+  def tile(
+    tile: Tile,
+    margin: Int = 0,
+    color : Color = Colors.DefaultGray): Unit = {
+    box(
+      tile.topLeftPixel.add(margin, margin),
+      tile.bottomRightPixel.subtract(margin, margin),
+      color)
   }
   
   def box(

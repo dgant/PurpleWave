@@ -24,24 +24,47 @@ object ShowArchitecture extends View {
   }
 
   def renderGroundskeeperMap(): Unit = {
-    With.viewport.rectangle().tiles.foreach(tile => {
+    With.viewport.rectangleTight().tiles.foreach(tile => {
       if (tile.valid) {
         val reservation = With.groundskeeper.reserved(tile.i)
-        if (reservation.update > With.groundskeeper.updates - 1) {
-          DrawMap.box(tile.topLeftPixel, tile.bottomRightPixel, Colors.NeonYellow)
+        if (reservation.active) {
+          DrawMap.tile(tile, color = Colors.NeonYellow)
           DrawMap.label(reservation.plan.toString, tile.pixelCenter)
         }
+        if (With.architecture.unbuildable.get(tile).isDefined) {
+          DrawMap.tile(tile, 12, Colors.DarkRed)
+        }
+        if (With.architecture.unwalkable.get(tile).isDefined) {
+          DrawMap.tile(tile, 10, Colors.DarkGreen)
+        }
+        if (With.architecture.untownhallable.get(tile).isDefined) {
+          DrawMap.tile(tile, 7, Colors.DarkTeal)
+        }
+        if (With.architecture.ungassable.get(tile).isDefined) {
+          DrawMap.tile(tile, 4, Colors.DarkIndigo)
+        }
+        if (With.architecture.powered2Height.get(tile)) {
+          //DrawMap.circle(tile.pixelCenter, 4, Colors.BrightYellow)
+        }
+        if (With.architecture.powered3Height.get(tile)) {
+          DrawMap.circle(tile.pixelCenter, 6, Colors.BrightTeal)
+        }
+
+
       }
     })
     With.groundskeeper.suggestions.filter(_.tile.isDefined).foreach(suggestion => {
       val tile = suggestion.tile.get
-      DrawMap.box(tile.topLeftPixel, tile.bottomRightPixel, Colors.NeonOrange)
+      DrawMap.box(
+        suggestion.blueprint.relativeBuildArea.startPixel,
+        suggestion.blueprint.relativeBuildArea.endPixel,
+        Colors.MediumBlue)
       DrawMap.label(suggestion.plan.map(_.toString).getOrElse("X"), tile.pixelCenter)
     })
   }
 
   def renderArchitectureMap(): Unit = {
-    val tiles = With.viewport.rectangle().tiles.filter(_.valid)
+    val tiles = With.viewport.rectangleTight().tiles.filter(_.valid)
 
     def drawExclusions(exclusions: GridExclusion, color: Color, radius: Int): Unit = {
       tiles.map(exclusions.get).filter(_.nonEmpty).distinct.foreach(exclusion =>

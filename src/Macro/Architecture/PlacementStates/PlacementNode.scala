@@ -51,8 +51,9 @@ class PlacementNode(request: PlacementRequest) extends PlacementState {
         failed = true
         return
       }
+
       if (child.isEmpty) {
-        tile = ByOption.minBy(allTiles.map(t => (t, task.score(t))))(_._2).map(_._1)
+        tileQueue ++= ByOption.minBy(allTiles.map(t => TileScore(t, task.score(t))))(_.score)
       } else {
         tileQueue ++= allTiles.map(tile => TileScore(tile, task.score(tile)))
       }

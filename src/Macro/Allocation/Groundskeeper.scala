@@ -8,15 +8,18 @@ import Planning.Plan
 import Planning.Plans.Basic.NoPlan
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.Forever
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-case class TileReservation(plan: Plan, target: Tile, update: Int)
+case class TileReservation(plan: Plan, target: Tile, update: Int) {
+  def active: Boolean = update >= With.groundskeeper.updates - 1
+}
 
 class Groundskeeper {
   var updates: Int = 0
-  val reserved: Array[TileReservation] = Array.fill(With.mapTileWidth * With.mapTileHeight)(TileReservation(NoPlan(), Tile(0, 0), updates))
+  val reserved: Array[TileReservation] = Array.fill(With.mapTileWidth * With.mapTileHeight)(TileReservation(NoPlan(), Tile(0, 0), -Forever()))
 
   var suggestionsBefore   : mutable.Buffer[PlacementRequest] = ArrayBuffer.empty
   var suggestionsNow      : mutable.Buffer[PlacementRequest] = ArrayBuffer.empty
@@ -101,7 +104,7 @@ class Groundskeeper {
   def isReserved(tile: Tile, plan: Option[Plan] = None): Boolean = {
     if ( ! tile.valid) return true
     val reservation = reserved(tile.i)
-    if (reservation.update < updates - 1) return false
+    if ( ! reservation.active) return false
     if ( ! plan.contains(reservation.plan)) return true
     false
   }

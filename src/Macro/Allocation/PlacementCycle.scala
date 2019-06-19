@@ -21,7 +21,7 @@ class PlacementCycle {
     }
   }
 
-  def place(suggestion: PlacementRequest): Unit = {
+  def placeNow(suggestion: PlacementRequest): Unit = {
     if ( ! queue.contains(suggestion)) {
       queue += suggestion
     }

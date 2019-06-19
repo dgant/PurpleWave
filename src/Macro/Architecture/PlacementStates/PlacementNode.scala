@@ -52,7 +52,7 @@ class PlacementNode(request: PlacementRequest) extends PlacementState {
         return
       }
       if (child.isEmpty) {
-        tile = ByOption.minBy(allTiles)(task.score)
+        tile = ByOption.minBy(allTiles.map(t => (t, task.score(t))))(_._2).map(_._1)
       } else {
         tileQueue ++= allTiles.map(tile => TileScore(tile, task.score(tile)))
       }

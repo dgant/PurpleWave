@@ -4,7 +4,7 @@ import Information.Geography.Types.Zone
 import Information.Grids.Disposable.GridDisposableBoolean
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Macro.Architecture.PlacementRequests.{PlacementRequest, PlacementResult}
+import Macro.Architecture.PlacementRequests.PlacementRequest
 import Mathematics.Points.{Tile, TileRectangle}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
@@ -58,22 +58,19 @@ class Architecture {
     ! untownhallable.excludes(tile, request)
   }
   
-  def diffPlacement(placement: PlacementResult): ArchitectureDiff = {
+  def diffPlacement(tile: Tile, request: PlacementRequest): ArchitectureDiff = {
 
     val output = new ArchitectureDiffSeries
 
-    if (placement.tile.isEmpty) return output
-
-    val tile = placement.tile.get
     val area = TileRectangle(
-      tile.add(placement.request.blueprint.relativeBuildStart),
-      tile.add(placement.request.blueprint.relativeBuildEnd))
-    val exclusion = Exclusion(placement.request.blueprint.toString, area, Some(placement.request))
+      tile.add(request.blueprint.relativeBuildStart),
+      tile.add(request.blueprint.relativeBuildEnd))
+    val exclusion = Exclusion(request.blueprint.toString, area, Some(request))
 
     area.tiles.filter(_.valid).foreach(new ArchitectureDiffExclude(_, exclusion))
 
     // If we have no Pylons, place in advance of our first completing
-    if (placement.request.blueprint.powers.get && ! With.units.existsOurs(Protoss.Pylon)) {
+    if (request.blueprint.powers.get && ! With.units.existsOurs(Protoss.Pylon)) {
       output.stack += new ArchitectureDiffPower(tile)
     }
 

@@ -1,5 +1,6 @@
 package Macro.Architecture.PlacementStates
 
+import Lifecycle.With
 import Macro.Architecture.PlacementRequests.PlacementRequest
 
 class PlacementStateEvaluating(request: PlacementRequest) extends PlacementState {
@@ -11,6 +12,7 @@ class PlacementStateEvaluating(request: PlacementRequest) extends PlacementState
       root.step()
     }
     if (root.done) {
+      With.placement.finishPlacement(request)
       transition(new PlacementStateReady)
     }
   }

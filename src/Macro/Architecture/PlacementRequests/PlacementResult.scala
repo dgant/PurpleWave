@@ -1,13 +1,12 @@
 package Macro.Architecture.PlacementRequests
 
-import Macro.Architecture.Heuristics.PlacementHeuristicEvaluation
+import Lifecycle.With
 import Mathematics.Points.Tile
 
 case class PlacementResult(
   request           : PlacementRequest,
-  tile              : Option[Tile],
-  totalNanoseconds  : Long,
-  frameStarted      : Int,
-  frameFinished     : Int,
-  candidates        : Int,
-  evaluated         : Int)
+  var tile          : Option[Tile] = None,
+  var frameStarted  : Int = With.frame,
+  var frameFinished : Int = With.frame,
+  var candidates    : Int = 0,
+  var evaluated     : Int = 0)

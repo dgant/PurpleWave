@@ -7,7 +7,7 @@ import Lifecycle.With
 import Macro.Architecture.GridExclusion
 import bwapi.Color
 
-object ShowArchitecturePlacements extends View {
+object ShowArchitecture extends View {
 
   override def renderScreen(): Unit = {
     renderGroundskeeperScreen()

@@ -2,9 +2,6 @@ package Macro.Architecture.PlacementStates
 
 import Lifecycle.With
 import Macro.Architecture.PlacementRequests.{PlacementRequest, PlacementResult}
-import Mathematics.Points.Tile
-
-import scala.collection.mutable
 
 class PlacementStateValidating(request: PlacementRequest) extends PlacementState {
   override def step() {
@@ -14,8 +11,6 @@ class PlacementStateValidating(request: PlacementRequest) extends PlacementState
       val result = request.result.getOrElse(PlacementResult(
         request,
         request.tile,
-        Seq.empty,
-        new mutable.HashMap[Tile, Double],
         totalNanoseconds  = 0,
         frameStarted      = With.frame,
         frameFinished     = With.frame,

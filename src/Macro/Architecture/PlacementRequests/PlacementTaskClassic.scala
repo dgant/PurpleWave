@@ -1,6 +1,5 @@
 package Macro.Architecture.PlacementRequests
 
-import Debugging.Visualizations.Views.Geography.ShowArchitectureHeuristics
 import Lifecycle.With
 import Macro.Architecture.Heuristics.{EvaluatePlacements, PlacementHeuristicEvaluation}
 import Macro.Architecture.Tiles.Surveyor
@@ -17,7 +16,6 @@ class PlacementTaskClassic(request: PlacementRequest) extends PlacementTask {
   private var candidatesFiltered    : Option[ArrayBuffer[Tile]] = None
   private var nextFilteringIndex    = 0
   private var nextEvaluationIndex   = 0
-  private val evaluationDebugging   = new mutable.HashMap[Tile, Iterable[PlacementHeuristicEvaluation]]
   private val evaluationValues      = new mutable.HashMap[Tile, Double]
   private val evaluationStartFrame  = With.frame
   private var evaluationNanoseconds = 0L
@@ -54,9 +52,6 @@ class PlacementTaskClassic(request: PlacementRequest) extends PlacementTask {
       while (stillEvaluating && evaluationCount < evaluationCountMax) {
 
         val candidate = candidatesFiltered.get(nextEvaluationIndex)
-        if (ShowArchitectureHeuristics.inUse) {
-          evaluationDebugging(candidate) = EvaluatePlacements.evaluate(blueprint, candidate)
-        }
 
         evaluationValues(candidate) = HeuristicMathMultiplicative.resolve(
           blueprint,
@@ -75,8 +70,6 @@ class PlacementTaskClassic(request: PlacementRequest) extends PlacementTask {
       val output = PlacementResult(
         request,
         best,
-        evaluationDebugging.values.flatten,
-        evaluationValues,
         totalNanoseconds  = evaluationNanoseconds,
         frameStarted      = evaluationStartFrame,
         frameFinished     = With.frame,

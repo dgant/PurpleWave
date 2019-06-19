@@ -31,20 +31,20 @@ class Visualization {
     ShowUnitsForeign,
     ShowExplosions,
     ShowPerformanceSummary,
-    ShowArchitecturePlacements,
+    ShowArchitecture,
     ShowPlans
   )
-  
+
   var enabled   : Boolean = _
   var screen    : Boolean = _
   var map       : Boolean = _
   var happy     : Boolean = _
   var textOnly  : Boolean = _
-  
+
   //////////////
-  
+
   val lineHeightSmall = 9
-  
+
   def toggle(view: View) {
     if (views.contains(view)) {
       views -= view
@@ -53,7 +53,7 @@ class Visualization {
       views += view
     }
   }
-  
+
   def tryToggle(viewName: String): Boolean = {
     val matches = knownViews.filter(_.name.toLowerCase.contains(viewName.toLowerCase))
     val matched = matches.size == 1
@@ -62,13 +62,13 @@ class Visualization {
     }
     matched
   }
-  
+
   def render() {
     requireInitialization()
     if ( ! enabled) return
     if (With.tasks.tasks.exists(_.totalRuns == 0)) return
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
-    
+
     if (happy) {
       ShowHappyVision.render()
     }
@@ -88,10 +88,10 @@ class Visualization {
           DrawMap.label(tile.toString, pixel.subtract(0, 15))
         }
       }
-      
+
     }
   }
-  
+
   private var initialized = false
   private def requireInitialization() {
     if (initialized) return
@@ -111,10 +111,9 @@ class Visualization {
       }
     }
   }
-  
+
   lazy val knownViews: Vector[View] = Vector[View](
-    ShowArchitectureHeuristics,
-    ShowArchitecturePlacements,
+    ShowArchitecture,
     ShowBases,
     ShowBattle,
     ShowBlackScreen,

@@ -3,9 +3,15 @@ package Macro.Architecture.PlacementStates
 import Lifecycle.With
 import Macro.Architecture.ArchitectureDiff
 import Macro.Architecture.PlacementRequests.{PlacementRequest, PlacementResult, PlacementTask}
+import Mathematics.Points.Tile
+
+import scala.collection.mutable
 
 class PlacementNode(request: PlacementRequest) extends PlacementState {
 
+  case class TileScore(tile: Tile, score: Double = 0.0)
+
+  val queue = new mutable.PriorityQueue[TileScore]()(Ordering.by( - _.score))
   val child: Option[PlacementNode] = request.child.map(new PlacementNode(_))
   val task: PlacementTask = request.task()
   var result: Option[PlacementResult] = None
@@ -16,7 +22,11 @@ class PlacementNode(request: PlacementRequest) extends PlacementState {
   def done: Boolean = succeeded || failed
 
   override def step(): Unit = {
-    if (result.isEmpty) {
+    if (queue.isEmpty) {
+      if (queue.isEmpty) {
+        failed = true
+      }
+    } else if (result.isEmpty) {
       result = task.step()
       diff = result.filter(_.tile.isDefined).map(With.architecture.diffPlacement)
       diff.foreach(_.doo())

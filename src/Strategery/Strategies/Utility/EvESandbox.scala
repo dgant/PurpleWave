@@ -4,10 +4,12 @@ import java.io.{BufferedWriter, File, FileWriter}
 
 import Lifecycle.With
 import Planning.Plan
+import Planning.Plans.Placement.PvEFFETestBuild
 import Strategery.Strategies.Strategy
 
-object EvELogMapInfo extends Strategy {
-  override def gameplan: Option[Plan] = Some(new Plan {
+object EvESandbox extends Strategy {
+  override def gameplan: Option[Plan] = Some(new PvEFFETestBuild)
+  def notgameplan: Option[Plan] = Some(new Plan {
     override def onUpdate(): Unit = {
       val content = With.geography.startBases.map(base => "Base " + base.townHallTile + " -> " + base.natural.map(_.townHallTile).getOrElse("NONE")).mkString("\n")
       val filename = With.mapFileName + ".info"

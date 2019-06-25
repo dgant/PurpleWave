@@ -2,7 +2,7 @@ package Macro.Architecture.PlacementStates
 
 import Lifecycle.With
 import Macro.Architecture.ArchitectureDiff
-import Macro.Architecture.PlacementRequests.{PlacementRequest, PlacementResult, PlacementTask}
+import Macro.Architecture.PlacementRequests.{PlacementRequest, PlacementResult, PlacementPolicy}
 import Mathematics.Points.Tile
 import Utilities.ByOption
 
@@ -14,7 +14,7 @@ class PlacementNode(request: PlacementRequest) extends PlacementState {
 
   def makeChild: Option[PlacementNode] = request.child.map(new PlacementNode(_))
 
-  val task: PlacementTask = request.task()
+  val task: PlacementPolicy = request.task()
   val tileQueue = new mutable.PriorityQueue[TileScore]()(Ordering.by( - _.score))
   var needToLoadTiles: Boolean = true
   var child: Option[PlacementNode] = makeChild

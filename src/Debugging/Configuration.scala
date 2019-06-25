@@ -81,8 +81,6 @@ class Configuration {
   
   var buildingPlacementRefreshPeriod      = GameTime(0, 30)()
   var buildingPlacementMaxTilesToEvaluate = 300
-  var buildingPlacementBatchSize          = 300
-  var buildingPlacementBatchingStartFrame = GameTime(4, 0)()
   var buildingPlacementMaximumQueue       = 12
   
   var urgencyManners            = 1

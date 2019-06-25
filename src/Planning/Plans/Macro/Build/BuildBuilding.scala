@@ -2,6 +2,8 @@ package Planning.Plans.Macro.Build
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
+import Macro.Architecture.Blueprint
+import Macro.Architecture.PlacementRequests.PlacementRequest
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
 import Planning.Plan
@@ -36,7 +38,9 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   def startedBuilding: Boolean = building.isDefined
   
   var waitForBuilderToRecallUntil: Option[Int] = None
-  
+
+  val defaultSuggestion = new PlacementRequest(new Blueprint(buildingClass))
+
   override def onUpdate() {
 
     building = building.filter(b => b.alive && ! b.is(Neutral.Geyser))

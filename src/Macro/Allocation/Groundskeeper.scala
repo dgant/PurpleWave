@@ -43,6 +43,13 @@ class Groundskeeper {
     }
   }
 
+  // I am a placer plan. I want to suggest a specific request for placing an FFE
+  def suggest(request: PlacementRequest): Unit = {
+    if ( ! suggestionsNow.contains(request)) {
+      suggestionsNow += request
+    }
+  }
+
   // I am a placer plan. I want to suggest a blueprint for placing a Gateway.
   def suggest(blueprint: Blueprint): Unit = {
    val existing = matchSuggestion(blueprint)

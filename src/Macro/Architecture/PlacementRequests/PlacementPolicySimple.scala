@@ -3,10 +3,10 @@ import Macro.Architecture.Tiles.Surveyor
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Tile
 
-class PlacementTaskSimple(request: PlacementRequest) extends PlacementTask {
+class PlacementPolicySimple(request: PlacementRequest) extends PlacementPolicy {
 
   override def retain(): Boolean = {
-    request.child.forall(_.task().retain())
+    request.tile.isDefined && request.child.forall(child => child.tile.isDefined && child.task().retain())
   }
 
   override def tiles: Seq[Tile] = {
@@ -22,9 +22,5 @@ class PlacementTaskSimple(request: PlacementRequest) extends PlacementTask {
       request.blueprint,
       request.blueprint.placement.get.weightedHeuristics,
       tile)
-  }
-
-  override def step(): Option[PlacementResult] = {
-    None
   }
 }

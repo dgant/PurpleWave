@@ -10,10 +10,10 @@ class PlacementRequest(
   var tile: Option[Tile] = None,
   var plan: Option[Plan] = None,
   var child: Option[PlacementRequest] = Option.empty,
-  var task: () => PlacementTask = null) {
+  var task: () => PlacementPolicy = null) {
 
   if (task == null) {
-    task = () => new PlacementTaskClassic(this)
+    task = () => new PlacementPolicyClassic(this)
   }
 
   var result: Option[PlacementResult] = None

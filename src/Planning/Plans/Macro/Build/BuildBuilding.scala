@@ -2,7 +2,6 @@ package Planning.Plans.Macro.Build
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
-import Macro.Architecture.Blueprint
 import Macro.Architecture.PlacementRequests.PlacementRequest
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
@@ -16,41 +15,30 @@ import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class BuildBuilding(val buildingClass: UnitClass) extends Plan {
-
-  val currencyLock = new LockCurrencyForUnit(buildingClass)
-  
-  private var desiredTile   : Option[Tile]              = None
   private var orderedTile   : Option[Tile]              = None
   private var building      : Option[FriendlyUnitInfo]  = None
-  
+
+  val currencyLock = new LockCurrencyForUnit(buildingClass)
+
   val builderMatcher: UnitClass = buildingClass.whatBuilds._1
   val builderLock: LockUnits = new LockUnits {
-    description.set("Get a builder")
     unitCounter.set(UnitCountOne)
     unitMatcher.set(builderMatcher)
     interruptable.set(false)
   }
-    
-  description.set("Build a " + buildingClass)
-  
-  override def isComplete: Boolean = building.exists(_.complete)
-  
-  def startedBuilding: Boolean = building.isDefined
-  
-  var waitForBuilderToRecallUntil: Option[Int] = None
 
-  val defaultSuggestion = new PlacementRequest(new Blueprint(buildingClass))
+  var waitForBuilderToRecallUntil: Option[Int] = None
+  var placement: Option[PlacementRequest] = None
+
+  override def isComplete: Boolean = building.exists(_.complete)
+
+  def desiredTile: Option[Tile] = building.map(_.tileTopLeft).orElse(placement.flatMap(_.tile))
 
   override def onUpdate() {
 
-    building = building.filter(b => b.alive && ! b.is(Neutral.Geyser))
-    
-    if (building.exists(b => ! b.unitClass.isTerran)) {
-      builderLock.release()
-      return
-    }
-    
     building = building
+      .filter(_.alive)
+      .filterNot(_.is(Neutral.Geyser))
       .orElse(
         if (buildingClass.isTerran)
           With.units.ours.find(scaffolding =>
@@ -61,31 +49,36 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
               builder.agent.toFinish.contains(scaffolding)
               || builder.agent.toBuildTile.contains(scaffolding.tileTopLeft)
             )))
-        else None
-      )
+        else None)
       .orElse(
-        // Is this the cause of Terran construction derp?
-        orderedTile.flatMap(tile => With.units.ours.find(unit =>
-          unit.is(buildingClass) &&
-            unit.tileTopLeft == tile)))
-      .filter(b =>
-        b.isOurs
-        && b.alive
-        && b.buildUnit.forall(_.friendly.forall(_.agent.lastClient.contains(this)))) //Don't jack another (Terran) building
+          orderedTile.flatMap(tile => With.units.ours.find(unit =>
+            unit.is(buildingClass) &&
+              unit.tileTopLeft == tile)))
+      .filter(_.alive)
+      .filter(_.isOurs)
+      .filter(_.buildUnit.forall(_.friendly.forall(_.agent.lastClient.contains(this)))) // Don't jack another (Terran) building
+
+    if (isComplete) {
+      placement.foreach(p => With.groundskeeper.consume(p.blueprint, building.get))
+    }
+
+    if (building.exists( ! _.unitClass.isTerran)) {
+      builderLock.release()
+      return
+    }
 
     if (building.isEmpty) {
-      With.groundskeeper.suggest(this, buildingClass)
+      placement = Some(With.groundskeeper.suggest(this, buildingClass))
     }
-    desiredTile = acquireDesiredTile()
-  
+
     if (desiredTile.isEmpty) {
       if (With.frame < With.configuration.maxFramesToTrustBuildRequest) {
-        //Assume we'll find a build location eventually and reserve the currency anyway
+        // Assume we'll find a build location eventually and reserve the currency anyway
         currencyLock.acquire(this)
       }
       return
     }
-  
+
     currencyLock.framesPreordered = (buildingClass.buildUnitsEnabling.map(With.projections.unit) :+ 0).max
     currencyLock.isSpent = building.isDefined
     currencyLock.acquire(this)
@@ -104,14 +97,14 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     } else {
       builderLock.unitMatcher.set(builderMatcher)
     }
-  
+
     // When building placement changes we want a builder closer to the new placement
     if (orderedTile.isDefined && orderedTile != desiredTile) {
       builderLock.release()
     }
     builderLock.unitPreference.set(UnitPreferCloseAndNotMining(desiredTile.get.pixelCenter))
     builderLock.acquire(this)
-    
+
     if (waitForBuilderToRecallUntil.isDefined) {
       if (With.frame < waitForBuilderToRecallUntil.get) {
         return
@@ -121,7 +114,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
         waitForBuilderToRecallUntil = None
       }
     }
-    
+
     if (builderLock.satisfied) {
       val builder = builderLock.units.head
       if (building.isEmpty) {
@@ -156,19 +149,6 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     }
   }
   
-  private def acquireDesiredTile(): Option[Tile] = {
-    if (building.isDefined) {
-      building.map(_.tileTopLeft)
-    }
-    else {
-      val suggestion = With.groundskeeper.getSuggestion(this, buildingClass)
-      if (suggestion.tile.isEmpty && currencyLock.expectedFrames < With.blackboard.maxFramesToSendAdvanceBuilder) {
-        //With.placement.placeNow(suggestion)
-      }
-      suggestion.tile
-    }
-  }
-  
   def needBuilder: Boolean = {
     if (building.isDefined) {
       return buildingClass.isTerran
@@ -200,4 +180,6 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
       drawBackground = true,
       With.self.colorDark)
   }
+
+  description.set("Build a " + buildingClass)
 }

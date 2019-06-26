@@ -5,7 +5,6 @@ import Macro.Buildables.Buildable
 import Performance.Cache
 import Planning.Plan
 import Planning.Plans.Macro.Build._
-import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -17,20 +16,49 @@ class MasterBuildPlans {
   private val plans = new mutable.HashMap[Buildable, ListBuffer[Plan]]
   private var queue: Iterable[Buildable] = Vector.empty
   
-  def getChildren: Iterable[Plan] = getChildrenCache()
-  private val getChildrenCache = new Cache(() => {
+  def children: Iterable[Plan] = childrenCache()
+  private val childrenCache = new Cache(() => {
     val indexByBuild = new mutable.HashMap[Buildable, Int]
-    plans.keys.foreach(build => indexByBuild.put(build, 0))
+    plans.keys.foreach(indexByBuild.put(_, 0))
     queue.map(build => {
       val output = plans(build)(indexByBuild(build))
       indexByBuild(build) += 1
       output
     })
   })
-  
-  def update(invoker: FollowBuildOrder) {
 
-    //Remove complete plans
+  def update(invoker: Plan) {
+
+    //
+    // Before invocation
+    // Add plans to match number of builds we need
+    //
+    queue = With.scheduler.queue.take(maxToFollow)
+    val buildsNeeded =
+      queue
+        .groupBy(buildable => buildable)
+        .map(buildable => (
+          buildable._1,
+          buildable._2.size))
+    buildsNeeded.keys.foreach(build => {
+      if ( ! plans.contains(build)) {
+        plans.put(build, new ListBuffer[Plan])
+      }
+      while (plans(build).size < buildsNeeded(build)) {
+        plans(build).append(buildPlan(build))
+      }
+    })
+    childrenCache.invalidate()
+
+    //
+    // Update macro plans
+    //
+    children.foreach(invoker.delegate)
+
+    //
+    // After invocation:
+    // Remove complete plans
+    //
     plans.values.foreach(plans => {
       var i = 0
       while (i < plans.size) {
@@ -43,27 +71,6 @@ class MasterBuildPlans {
           i += 1
         }
       }})
-
-    //Add plans to match number of builds we need
-    queue = With.scheduler.queue.take(maxToFollow)
-
-    val buildsNeeded =
-      queue
-        .groupBy(buildable => buildable)
-        .map(buildable => (
-          buildable._1,
-          buildable._2.size))
-
-    buildsNeeded.keys.foreach(build => {
-      if ( ! plans.contains(build)) {
-        plans.put(build, new ListBuffer[Plan])
-      }
-      while (plans(build).size < buildsNeeded(build)) {
-        plans(build).append(buildPlan(build))
-      }
-    })
-
-    getChildrenCache.invalidate()
   }
   
   private def buildPlan(buildable: Buildable): Plan = {

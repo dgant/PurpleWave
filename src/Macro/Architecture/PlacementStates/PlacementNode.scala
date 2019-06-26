@@ -2,7 +2,7 @@ package Macro.Architecture.PlacementStates
 
 import Lifecycle.With
 import Macro.Architecture.ArchitectureDiff
-import Macro.Architecture.PlacementRequests.{PlacementRequest, PlacementResult, PlacementPolicy}
+import Macro.Architecture.PlacementRequests.{PlacementRequest, PlacementPolicy}
 import Mathematics.Points.Tile
 import Utilities.ByOption
 
@@ -25,9 +25,6 @@ class PlacementNode(request: PlacementRequest) extends PlacementState {
   var failed: Boolean = false
   def done: Boolean = succeeded || failed
 
-  // Diagnostics
-  val result = PlacementResult(request)
-
   def doDiff(newDiff: ArchitectureDiff): Unit = {
     diff = Some(newDiff)
     newDiff.doo()
@@ -38,6 +35,18 @@ class PlacementNode(request: PlacementRequest) extends PlacementState {
     diff = None
   }
 
+  def fail(): Unit = {
+    failed = true
+    request.tile = None
+    request.lastPlacementFrame = With.frame
+  }
+
+  def succeed(tile: Tile): Unit = {
+    succeeded = true
+    request.tile = Some(tile)
+    request.lastPlacementFrame = With.frame
+  }
+
   override def step(): Unit = {
     if (needToLoadTiles) {
       needToLoadTiles = false
@@ -46,9 +55,8 @@ class PlacementNode(request: PlacementRequest) extends PlacementState {
       // If we don't need to do recursive placement (ie. we have no children to place)
       // then short-circuit the (slow) priority queue by giving it only the winning candidate.
       val allTiles = task.tiles.filter(task.accept)
-      result.candidates = allTiles.size
       if (allTiles.isEmpty) {
-        failed = true
+        fail()
         return
       }
 
@@ -65,12 +73,11 @@ class PlacementNode(request: PlacementRequest) extends PlacementState {
       undoDiff()
     }
     while (tile.isEmpty && tileQueue.nonEmpty) {
-      result.evaluated += 1
       tile = Some(tileQueue.dequeue().tile).filter(task.accept)
       tile.map(With.architecture.diffPlacement(_, request)).foreach(doDiff)
     }
     if (tile.isEmpty) {
-      failed = true
+      fail()
       return
     }
     if (child.exists( ! _.done)) {
@@ -79,13 +86,10 @@ class PlacementNode(request: PlacementRequest) extends PlacementState {
       succeeded = true
     }
 
-    if (failed) {
+    if (succeeded) {
+      succeed(tile.get)
+    } else if (failed) {
       diff.foreach(_.undo())
-    }
-    if (done) {
-      result.frameFinished = With.frame
-      request.tile = tile
-      request.result = Some(result)
     }
   }
 }

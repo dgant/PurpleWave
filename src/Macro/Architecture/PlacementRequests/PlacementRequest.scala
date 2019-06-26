@@ -4,6 +4,7 @@ import Macro.Architecture.Blueprint
 import Mathematics.Points.Tile
 import Planning.Plan
 import ProxyBwapi.UnitClasses.UnitClass
+import Utilities.Forever
 
 class PlacementRequest(
   val blueprint: Blueprint,
@@ -16,7 +17,8 @@ class PlacementRequest(
     task = () => new PlacementPolicyClassic(this)
   }
 
-  var result: Option[PlacementResult] = None
+  var lastPlacementFrame: Int = - Forever()
 
+  def failed: Boolean = tile.isEmpty && lastPlacementFrame >= 0
   def unitClass: UnitClass = blueprint.building
 }

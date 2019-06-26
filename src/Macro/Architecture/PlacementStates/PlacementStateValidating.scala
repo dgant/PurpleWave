@@ -10,7 +10,7 @@ class PlacementStateValidating(request: PlacementRequest) extends PlacementState
       var nextRequest: Option[PlacementRequest] = Some(request)
       while (nextRequest.nonEmpty) {
         With.placement.finishPlacement(nextRequest.get)
-        nextRequest.get.result.flatMap(_.tile).map(With.architecture.diffPlacement(_, request)).foreach(_.doo())
+        nextRequest.get.tile.map(With.architecture.diffPlacement(_, request)).foreach(_.doo())
         nextRequest = nextRequest.get.child
       }
       transition(new PlacementStateReady)

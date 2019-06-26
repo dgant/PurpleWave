@@ -10,7 +10,7 @@ class PlacementPolicyClassic(request: PlacementRequest) extends PlacementPolicy 
   override def retain(): Boolean = {
     (request.tile.exists(request.blueprint.accepts(_, Some(request)))
       && request.blueprint.requireTownHallTile.contains(false) // Town halls are so important (and inexpensive) that we should always recalculate
-      && request.result.forall(result => With.framesSince(result.frameFinished) < With.configuration.buildingPlacementRefreshPeriod))
+      && With.framesSince(request.lastPlacementFrame) < With.configuration.buildingPlacementRefreshPeriod)
   }
 
   override def tiles: Seq[Tile] = {

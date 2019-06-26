@@ -8,6 +8,7 @@ import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Milestones.UpgradeComplete
@@ -57,12 +58,15 @@ class PvEFFETestBuild extends GameplanTemplate {
 
   override def buildPlans: Seq[Plan] = Seq(
     new FFETest,
+    new RequireMiningBases(2),
     new If(
       new Not(new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.Dragoon.buildFrames)),
       new Pump(Protoss.Zealot)),
     new Build(
       Get(Protoss.DragoonRange),
-      Get(5, Protoss.Gateway)),
+      Get(5, Protoss.Gateway),
+      Get(2, Protoss.Assimilator)),
     new Pump(Protoss.Dragoon),
+    new Build(Get(8, Protoss.Gateway))
   )
 }

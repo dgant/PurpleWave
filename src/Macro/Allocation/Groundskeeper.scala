@@ -32,7 +32,9 @@ class Groundskeeper {
     blueprintConsumers.filterNot(_._2.alive).keys.toSeq.foreach(blueprintConsumers.remove)
   }
 
-  def suggestions: Seq[PlacementRequest] = (suggestionsNow.view ++ suggestionsBefore.view).distinct
+  def suggestions: Seq[PlacementRequest] = (suggestionsNow.view ++ suggestionsBefore.view)
+    .distinct
+    .filterNot(request => blueprintConsumers.contains(request.blueprint))
 
   // I am a placer plan. I want to suggest a specific place to put a Gateway.
   def suggest(unitClass: UnitClass, tile: Tile): Unit = {
@@ -60,11 +62,15 @@ class Groundskeeper {
   }
 
   // I am a building plan. I want to indicate that I will need placement for a Gateway.
-  def suggest(plan: Plan, unitClass: UnitClass) {
-    val existing = matchSuggestion(plan, unitClass)
-    existing.foreach(refresh)
-    if (existing.isEmpty) {
-      suggestionsNow += new PlacementRequest(new Blueprint(unitClass), plan = Some(plan))
+  def suggest(plan: Plan, unitClass: UnitClass): PlacementRequest = {
+    val matched = matchSuggestion(plan, unitClass)
+    matched.foreach(refresh)
+    if (matched.isEmpty) {
+      val output = new PlacementRequest(new Blueprint(unitClass), plan = Some(plan))
+      suggestionsNow += output
+      output
+    } else {
+      matched.get
     }
   }
 

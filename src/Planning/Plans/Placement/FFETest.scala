@@ -26,7 +26,15 @@ class FFETest extends Plan {
     new Blueprint(Protoss.Gateway,          requireZone = ourNatural),
     new Blueprint(Protoss.Forge,            requireZone = ourNatural),
     new Blueprint(Protoss.PhotonCannon,     requireZone = ourNatural),
-    new Blueprint(Protoss.PhotonCannon,     requireZone = ourNatural))
+    new Blueprint(Protoss.PhotonCannon,     requireZone = ourNatural),
+    new Blueprint(Protoss.Nexus,            requireZone = ourNatural),
+    new Blueprint(Protoss.Pylon,            requireZone = ourMain),
+    new Blueprint(Protoss.Assimilator,      preferZone  = ourMain),
+    new Blueprint(Protoss.CyberneticsCore,  preferZone  = ourMain),
+    new Blueprint(Protoss.Gateway,          preferZone  = ourMain),
+    new Blueprint(Protoss.Gateway,          preferZone  = ourMain),
+    new Blueprint(Protoss.Gateway,          preferZone  = ourMain),
+    new Blueprint(Protoss.Gateway,          preferZone  = ourMain))
 
   override def onUpdate(): Unit = {
     With.groundskeeper.suggest(requestFFE)

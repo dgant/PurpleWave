@@ -35,6 +35,7 @@ class Groundskeeper {
   def suggestions: Seq[PlacementRequest] = (suggestionsNow.view ++ suggestionsBefore.view)
     .distinct
     .filterNot(request => blueprintConsumers.contains(request.blueprint))
+    .filterNot(_.failed)
 
   // I am a placer plan. I want to suggest a specific place to put a Gateway.
   def suggest(unitClass: UnitClass, tile: Tile): Unit = {

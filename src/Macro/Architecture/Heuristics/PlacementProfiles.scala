@@ -39,7 +39,7 @@ object PlacementProfiles {
     preferNatural               = 0.0,
     preferResources             = 0.0,
     preferRhythm                = 1.0,
-    preferSpace                 = 0.05,
+    preferSpace                 = 0.08,
     preferPowering              = 0.15,
     preferDistanceFromEnemy     = 0.6,
     preferCoveringWorkers       = 0.0,

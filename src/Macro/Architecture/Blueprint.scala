@@ -153,7 +153,7 @@ class Blueprint(
       nextTile.zone.perimeter.contains(nextTile)
       || ! With.architecture.buildable(nextTile)
       || (requireCreep.get != With.grids.creep.get(nextTile))
-      || (respectHarvesting.get && With.grids.harvestingArea.get((nextTile)))
+      || (respectHarvesting.get && thisZone.bases.exists(_.harvestingArea.contains(nextTile)))
       || (requireResourceGap.get && ! With.grids.buildableTownHall.get(nextTile))
       || ( ! requireTownHallTile.get && With.grids.units.get(nextTile).exists(u => ! u.flying && u.isEnemy || ! u.canMove))
     )

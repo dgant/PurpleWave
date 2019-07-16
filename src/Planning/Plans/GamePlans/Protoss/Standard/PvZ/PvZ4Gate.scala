@@ -5,7 +5,7 @@ import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Army.Aggression
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -55,16 +55,9 @@ class PvZ4Gate extends GameplanTemplate {
   
   override def attackPlan: Plan =
     new If(
-      new EnemyStrategy(With.fingerprints.fourPool),
-      new If(
-        new UnitsAtLeast(8, UnitMatchWarriors, complete = true),
-        super.attackPlan),
-      new If(
-        new Or(
-          new EnemiesAtMost(0, UnitMatchWarriors),
-          new UnitsAtLeast(4, UnitMatchWarriors, complete = true)),
-        new Attack,
-        super.attackPlan))
+      new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.overpool),
+      new Trigger(new UnitsAtLeast(2, UnitMatchWarriors, complete = true), super.attackPlan),
+      new Trigger(new UnitsAtLeast(8, UnitMatchWarriors, complete = true), super.attackPlan))
 
   class RespectMutalisks extends Or(
     new EnemyHasShown(Zerg.Lair),
@@ -72,6 +65,7 @@ class PvZ4Gate extends GameplanTemplate {
     new EnemyHasShown(Zerg.Mutalisk))
 
   override def buildPlans = Vector(
+
     new DefendFightersAgainstEarlyPool,
 
     new If(
@@ -93,7 +87,9 @@ class PvZ4Gate extends GameplanTemplate {
             new CapGasAt(150))))),
 
     new If(
-      new RespectMutalisks,
+      new Or(
+        new RespectMutalisks,
+        new UnitsAtLeast(8, Protoss.Zealot)),
       new Build(
         Get(Protoss.Assimilator),
         Get(Protoss.CyberneticsCore),

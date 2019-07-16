@@ -6,12 +6,12 @@ import Planning.Plans.Army.{Attack, ConsiderAttacking, DefendZones, RecruitFreel
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
-import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
 import Planning.Predicates.Milestones.{IfOnMiningBases, OnGasPumps, UnitsAtLeast}
 import ProxyBwapi.Races.Protoss
 
-class ThreeBaseCarriersWithNoDefense extends Parallel {
+class PvE3BaseIslandCarrier extends Parallel {
   
   private class ExpandOverIsland(maxBases: Int) extends RequireMiningBases {
     description.set("Fill island with expansions")
@@ -23,27 +23,27 @@ class ThreeBaseCarriersWithNoDefense extends Parallel {
   }
   
   private class TechToCarriers extends Build(
-    Get(1, Protoss.Gateway),
-    Get(1, Protoss.CyberneticsCore),
-    Get(1, Protoss.Stargate),
-    Get(1, Protoss.FleetBeacon),
+    Get(Protoss.Gateway),
+    Get(Protoss.CyberneticsCore),
+    Get(Protoss.Stargate),
+    Get(Protoss.FleetBeacon),
     NextUpgrade(Protoss.AirDamage),
     NextUpgrade(Protoss.CarrierCapacity),
-    Get(1, Protoss.Forge)
+    Get(Protoss.Forge)
   )
   
   private class TechToArbiters extends Build(
-    Get(1, Protoss.Gateway),
-    Get(1, Protoss.CyberneticsCore),
-    Get(1, Protoss.CitadelOfAdun),
-    Get(1, Protoss.Stargate),
-    Get(1, Protoss.TemplarArchives),
-    Get(1, Protoss.ArbiterTribunal)
+    Get(Protoss.Gateway),
+    Get(Protoss.CyberneticsCore),
+    Get(Protoss.CitadelOfAdun),
+    Get(Protoss.Stargate),
+    Get(Protoss.TemplarArchives),
+    Get(Protoss.ArbiterTribunal)
   )
   
   private class TechToObservers extends Build(
-    Get(1, Protoss.RoboticsFacility),
-    Get(1, Protoss.Observatory)
+    Get(Protoss.RoboticsFacility),
+    Get(Protoss.Observatory)
   )
   
   private class SpamUpgrades extends Parallel(
@@ -70,7 +70,7 @@ class ThreeBaseCarriersWithNoDefense extends Parallel {
         new Pump(Protoss.Arbiter, 2),
         new Pump(Protoss.Carrier)),
       new Parallel(
-        new Pump(Protoss.Scout, 1),
+        new BuildOrder(Get(Protoss.Scout)),
         new Pump(Protoss.Carrier),
         new Pump(Protoss.Observer, 1))),
     new OnGasPumps(1, new Build(Get(3, Protoss.Stargate))),

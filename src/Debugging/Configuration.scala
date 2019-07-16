@@ -118,7 +118,7 @@ class Configuration {
   var conservativeViewportHeight  = 480 + cameraViewportHeight
 
   class FileFlag(filename: String) {
-    lazy val fullPath = "bwapi-data/AI/" + filename
+    private lazy val fullPath: String = With.bwapiData.ai + filename
     private lazy val enabled: Boolean = {
       try {
         new File(fullPath).exists()
@@ -126,10 +126,10 @@ class Configuration {
       catch { case exception: Exception =>
         With.logger.warn("Exception looking for flag file at: " + fullPath)
         With.logger.onException(exception)
+        false
       }
-      false
     }
-    def apply() = enabled
+    def apply(): Boolean = enabled
   }
 
   val humanMode = new FileFlag("human-mode-is.on")

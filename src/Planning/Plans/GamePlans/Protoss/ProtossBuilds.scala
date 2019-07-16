@@ -534,25 +534,25 @@ object ProtossBuilds {
   
   val PvZFFE_Vs4Pool = Vector[BuildRequest] (
     Get(8,   Protoss.Probe),
-    Get(1,   Protoss.Pylon),
-    Get(1,   Protoss.Forge),
+    Get(Protoss.Pylon),
+    Get(Protoss.Forge),
     Get(10,  Protoss.Probe),
     Get(3,   Protoss.PhotonCannon),
     Get(12,  Protoss.Probe),
-    Get(1,   Protoss.Gateway),
+    Get(Protoss.Gateway),
     Get(13,  Protoss.Probe),
     Get(2,   Protoss.Gateway))
   
   val PvZFFE_Conservative = Vector[BuildRequest] (
     Get(8,   Protoss.Probe),
-    Get(1,   Protoss.Pylon),
+    Get(Protoss.Pylon),
     Get(9,   Protoss.Probe),
-    Get(1,   Protoss.Forge),
+    Get(Protoss.Forge),
     Get(2,   Protoss.PhotonCannon))
   
   val PvZFFE_ForgeCannonNexus = Vector[BuildRequest] (
     Get(8,   Protoss.Probe),
-    Get(1,   Protoss.Pylon),
+    Get(Protoss.Pylon),
     Get(10,  Protoss.Probe),
     Get(1,   Protoss.Forge),
     Get(12,  Protoss.Probe),

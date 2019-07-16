@@ -1,9 +1,9 @@
 package Strategery.Strategies.Protoss
 
 import Planning.Plan
-import Planning.Plans.GamePlans.Protoss.Standard.PvR.{PvR2Gate4Gate, PvRTinfoil}
-import Strategery.{MapGroups, StarCraftMap}
+import Planning.Plans.GamePlans.Protoss.Standard.PvR.{PvR2Gate4Gate, PvRForgeDT, PvRTinfoil}
 import Strategery.Strategies.Strategy
+import Strategery.{MapGroups, StarCraftMap}
 import bwapi.Race
 
 abstract class PvRStrategy extends Strategy {
@@ -36,13 +36,20 @@ object PvRProxy2Gate extends PvR2GateStrategy {
 object PvR2Gate4Gate extends PvRStrategy {
   override def gameplan: Option[Plan] = Some(new PvR2Gate4Gate)
 }
-object PvRTinfoil extends PvR2GateStrategy {
-  override def gameplan: Option[Plan] = Some(new PvRTinfoil)
+abstract class PvRTinfoils extends PvRStrategy {
   override def opponentsWhitelisted: Option[Iterable[String]] = Some(Iterable(
     "Kurdiumov",
     "Churchill",
     "UAlbertaBot",
     "OpprimoBot"
   ))
+}
+
+object PvRTinfoil2018 extends PvRTinfoils {
+  override def gameplan: Option[Plan] = Some(new PvRTinfoil)
+}
+
+object PvR1BaseDT extends PvRTinfoils {
+  override def gameplan: Option[Plan] = Some(new PvRForgeDT)
 }
 

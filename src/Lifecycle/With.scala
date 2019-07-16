@@ -38,6 +38,7 @@ object With {
   var buildOrderHistory : MasterBuildOrderHistory = _
   var buildPlans        : MasterBuildPlans        = _
   var bullets           : Bullets                 = _
+  var bwapiData         : BwapiData               = _
   var camera            : Camera                  = _
   var commander         : Commander               = _
   var coordinator       : Coordinator             = _
@@ -81,7 +82,8 @@ object With {
   var mapId           : String  = _
   def mapPixelWidth   : Int     = mapTileWidth * 32
   def mapPixelHeight  : Int     = mapTileHeight * 32
-  
+  def mapWalkWidth    : Int     = mapTileWidth * 4
+  def mapWalkHeight   : Int     = mapTileHeight * 4
   
   def framesSince(previousFrame: Int): Int = Math.max(0, frame - previousFrame)
   
@@ -113,6 +115,7 @@ object With {
     buildOrderHistory = new MasterBuildOrderHistory
     buildPlans        = new MasterBuildPlans
     bullets           = new Bullets
+    bwapiData         = new BwapiData
     camera            = new Camera
     commander         = new Commander
     coordinator       = new Coordinator

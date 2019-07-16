@@ -3,6 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
+import Planning.Plans.Army.EjectScout
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -12,8 +13,9 @@ import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones._
+import Planning.Predicates.Never
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchType, UnitMatchWorkers}
 import Planning.{Plan, Predicate}
@@ -74,14 +76,19 @@ class PvZFFE extends GameplanTemplate {
       new Build(Get(4, Protoss.PhotonCannon))),
     new If(
       new And(
+        new Latch(new Check(() => With.units.countOurs(Protoss.PhotonCannon) + With.self.minerals / 150 >= 2)),
         new EnemyStrategy(With.fingerprints.fourPool),
-        new FrameAtLeast(GameTime(2, 5)()),
-        new FrameAtMost(GameTime(5, 0)()),
+        new FrameAtMost(GameTime(6, 0)()),
         new UnitsAtLeast(1, Protoss.PhotonCannon, complete = false),
-        new UnitsAtMost(2, Protoss.PhotonCannon, complete = true)),
+        new UnitsAtMost(3, Protoss.PhotonCannon, complete = true)),
       new DefendFFEWithProbesAgainst4Pool),
     new If(
+      new EnemyStrategy(With.fingerprints.fourPool),
+      new EjectScout(Protoss.Probe)),
+
+    new If(
       new And(
+        new Never, // Disabled, CIG 2019
         new EnemyStrategy(With.fingerprints.ninePool, With.fingerprints.overpool),
         new FrameAtLeast(GameTime(3, 0)()),
         new FrameAtMost(GameTime(6, 0)()),

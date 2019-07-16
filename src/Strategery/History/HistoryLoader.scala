@@ -1,6 +1,7 @@
 package Strategery.History
 
 import java.io._
+import java.nio.file.Paths
 
 import Lifecycle.With
 
@@ -12,9 +13,10 @@ object HistoryLoader {
   private val filenameHistoryPrefix = "_v" + HistorySerializer.formatVersion + "_history_"
   private val filenameEnemyToken = "{opponent}"
   private val filenameTemplate = filenameHistoryPrefix + filenameEnemyToken + ".csv"
-  private val loadFilesDirectory = "bwapi-data/read/"
-  private val saveFilesDirectory = "bwapi-data/write/"
-  private val seedFilesDirectories = Array("bwapi-data/AI/", "bwapi-data/AI/PretrainP", "bwapi-data/AI/PretrainT", "bwapi-data/AI/PretrainZ")
+  private def loadFilesDirectory = With.bwapiData.read
+  private def saveFilesDirectory = With.bwapiData.write
+  private val seedFilesDirectories = Array("", "PretrainP", "PretrainT", "PretrainZ")
+    .map(relative => With.bwapiData.ai + relative)
   
   // The order matters (see below) thus meriting the explicit naming
   private val directoriesInDecendingOrderOfRecency = Array(loadFilesDirectory, saveFilesDirectory) ++ seedFilesDirectories

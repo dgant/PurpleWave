@@ -40,6 +40,7 @@ class EmptyPlaybook {
   )
   def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy
   def enemyName: String = With.enemy.name
+  def respectOpponent: Boolean = true
   def respectMap: Boolean = true
   def respectHistory: Boolean = true
 }
@@ -60,7 +61,8 @@ object StrategyGroups {
     CarriersWithNoDefense,
     ZvZ5PoolSunkens,
     PvP1GateReaverExpand,
-    PvT1GateRobo
+    PvT1GateRobo,
+    PvE3BaseIslandCarrier
   )
 }
 
@@ -74,10 +76,11 @@ class CIGPlaybook extends PurpleWavePlaybook {
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvT21Nexus, PvT3BaseCarrier)
+  override lazy val forced: Seq[Strategy] = Seq(PvE1BaseIslandCarrier)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
+  override def respectOpponent: Boolean = false
   override def respectMap: Boolean = false
   override def respectHistory: Boolean = false
 }
 
-object Playbook extends CIGPlaybook {}
+object Playbook extends TestingPlaybook {}

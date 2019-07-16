@@ -2,9 +2,10 @@ package Micro.Actions.Protoss
 
 import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Commands.{Attack, AttackMove}
 import Micro.Actions.Protoss.Carrier._
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
 
 object BeACarrier extends Action {
@@ -43,11 +44,11 @@ object BeACarrier extends Action {
 
     lazy val framesToAccelerate = unit.framesToAccelerate
     lazy val interceptors       = unit.interceptors.count(_.complete)
-    lazy val canLeave           = airToAirSupply(unit.matchups.threats) < airToAirSupply(unit.matchups.alliesInclSelf)
+    lazy val canLeave           = airToAirSupply(unit.matchups.threats) < airToAirSupply(unit.matchups.alliesInclSelf) || unit.matchups.threats.exists(_.isAny(Terran.Battlecruiser, Protoss.Carrier))
     lazy val exitingLeash       = unit.matchups.targets.filter(_.matchups.framesToLive > 48).forall(_.pixelDistanceEdge(unit) > 32.0 * 7.0)
     lazy val inRangeNeedlessly  = unit.matchups.threats.exists(threat => shouldNeverHitUs(threat) && unit.matchups.framesOfEntanglementWith(threat) > - Math.max(unit.framesToTurnFrom(threat), unit.framesToAccelerate))
-    lazy val safeFromThreats    = unit.matchups.threats.forall(threat => threat.pixelDistanceCenter(unit) > threat.pixelRangeAir + 8 * 32) // Protect interceptors!
-    lazy val shouldFight        = interceptors > 0 && ! inRangeNeedlessly && (unit.agent.shouldEngage || safeFromThreats  || (interceptors > 1 && ! canLeave))
+    lazy val safeFromThreats    = unit.matchups.threats.forall(threat => threat.pixelDistanceCenter(unit) > threat.pixelRangeAir + 8 * 32 && ! threat.is(Protoss.Carrier)) // Protect interceptors!
+    lazy val shouldFight        = interceptors > 0 && ! inRangeNeedlessly && (unit.agent.shouldEngage || safeFromThreats || (interceptors > 1 && ! canLeave))
     lazy val interceptorsActive = unit.interceptors.count(interceptorActive) >= unit.interceptors.size / 2
 
     if (shouldFight) {
@@ -72,6 +73,10 @@ object BeACarrier extends Action {
         Attack.consider(unit)
       }
       WarmUpInterceptors.consider(unit)
+      if (unit.matchups.targets.exists(_.is(Protoss.Interceptor))) {
+        Target.consider(unit)
+        Attack.consider(unit)
+      }
       AttackMove.consider(unit)
     }
     else {

@@ -20,7 +20,7 @@ class Logger {
       .mkString("-")
     
     val filenameRaw = opponents + "-" + Calendar.getInstance.getTime.toString
-    val filename = "bwapi-data/write/" + filenameRaw.replaceAll("[^A-Za-z0-9 \\-\\.]", "") + ".log.txt"
+    val filename = With.bwapiData.write + filenameRaw.replaceAll("[^A-Za-z0-9 \\-\\.]", "") + ".log.txt"
     val file = new File(filename)
     val printWriter = new PrintWriter(file)
     printWriter.write(logMessages.distinct.mkString("\r\n"))

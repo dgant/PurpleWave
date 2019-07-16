@@ -34,6 +34,7 @@ object PvT2GateRangeExpand extends PvTBasicOpener {
     With.fingerprints.fourteenCC,
     With.fingerprints.oneRaxFE)
 }
+object PvT2GateRangeExpandCarrier extends PvTStrategy
 object PvT25BaseCarrier extends PvTBasicOpener {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
     PvT3BaseCarrier

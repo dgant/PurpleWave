@@ -24,11 +24,13 @@ object Heartbreak extends StarCraftMap
 object Hitchhiker extends StarCraftMap
 object Hunters extends StarCraftMap
 object LaMancha extends StarCraftMap
-object Plasma extends StarCraftMap { override val trustGroundDistance: Boolean = false }
+object Pathfinder extends StarCraftMap
+object Plasma extends StarCraftMap
+object Python extends StarCraftMap
 object Roadrunner extends StarCraftMap
 object Sparkle extends StarCraftMap
 object TauCross extends StarCraftMap
-object ThirdWorld extends StarCraftMap { override val trustGroundDistance: Boolean = false }
+object ThirdWorld extends StarCraftMap
 object Transistor extends StarCraftMap
 
 object StarCraftMaps {
@@ -46,6 +48,7 @@ object StarCraftMaps {
     Hitchhiker,
     Hunters,
     LaMancha,
+    Pathfinder,
     Plasma,
     Roadrunner,
     Sparkle,
@@ -58,7 +61,9 @@ object StarCraftMaps {
 object MapGroups {
   val badForBigUnits = Vector(BlueStorm)
   val badForProxying = Vector(Alchemist, BlueStorm, ChupungRyeong, Eddy, EmpireOfTheSun, GreatBarrierReef, LaMancha, Roadrunner, TauCross)
-  val badForWalling = Vector(Alchemist)
+  val badForWalling = Vector(Alchemist, Pathfinder)
+  val tooShortForFFE = Vector(Python)
   val badForFastThirdBases = Vector(Benzene, Heartbreak)
+  val narrowRamp = Vector(Plasma, ThirdWorld)
 }
 

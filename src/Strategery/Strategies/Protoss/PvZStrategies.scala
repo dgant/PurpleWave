@@ -11,14 +11,8 @@ abstract class PvZStrategy extends Strategy {
   override def enemyRaces: Iterable[Race] = Vector(Race.Zerg)
 }
 
-abstract class PvZMidgame extends PvZStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(
-    ProtossChoices.pvzMidgameTransitioningFromTwoBases
-  )
-}
-
 abstract class PvZFFEOpening extends PvZStrategy {
-  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForWalling
+  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForWalling ++ MapGroups.tooShortForFFE
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     ProtossChoices.pvzMidgameTransitioningFromTwoBases
   )
@@ -26,6 +20,12 @@ abstract class PvZFFEOpening extends PvZStrategy {
 abstract class PvZ2GateOpening extends PvZStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     ProtossChoices.pvzOpenersTransitioningFrom2Gate
+  )
+}
+object PvZ1BaseForgeTech extends PvZStrategy {
+  override def allowedVsHuman: Boolean = false
+  override def choices: Iterable[Iterable[Strategy]] = Vector(
+    Seq(PvZMidgameNeoBisu)
   )
 }
 object PvZProxy2Gate extends PvZ2GateOpening {

@@ -5,7 +5,7 @@ import Mathematics.PurpleMath
 import Planning.Plan
 import Planning.Plans.GamePlans.StandardGamePlan
 import ProxyBwapi.Players.Players
-import Strategery.History.{HistoricalGame, HistoryLoader}
+import Strategery.History.HistoricalGame
 import Strategery.Selection.StrategySelectionDynamic
 import Strategery.Strategies.Protoss.ProtossChoices
 import Strategery.Strategies.Strategy
@@ -130,7 +130,7 @@ class Strategist {
       &&  ! disabledInPlaybook
       &&  appropriateForOurRace
       &&  appropriateForEnemyRace
-      &&  allowedForOpponent
+      &&  ( ! Playbook.respectOpponent || allowedForOpponent)
       &&  ( ! Playbook.respectMap || ! disabledOnMap)
       &&  ( ! Playbook.respectMap || strategy.startLocationsMin <= startLocations)
       &&  ( ! Playbook.respectMap || strategy.startLocationsMax >= startLocations)

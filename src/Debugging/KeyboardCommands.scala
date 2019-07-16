@@ -1,7 +1,7 @@
 package Debugging
 
 import Lifecycle.{Manners, With}
-import Strategery.History.HistoryLoader
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object KeyboardCommands {
   def quitVsHuman(): Unit = {
@@ -39,4 +39,6 @@ object KeyboardCommands {
   def breakpoint() {
     breakpointFodder = -breakpointFodder
   }
+
+  def selected: FriendlyUnitInfo = With.units.ours.find(_.selected).get
 }

@@ -25,7 +25,7 @@ class PvRZCoreZ extends GameplanTemplateVsRandom {
       new EnemyRaceKnown,
       new UnitsAtLeast(1, Protoss.CyberneticsCore)))
 
-  override def attackPlan: Plan = new If (
+  override def attackPlan: Plan = new If(
     new Or(
       new EnemyIsTerran,
       new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.oneGateCore, With.fingerprints.nexusFirst)),

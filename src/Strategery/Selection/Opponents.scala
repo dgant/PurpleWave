@@ -24,10 +24,15 @@ object Opponents {
       StrategySelectionSequence(Seq(
         Seq(
           PvROpenZCoreZ,
-          PvT23Nexus, PvT3BaseArbiter,
+          PvT23Nexus,   PvT2BaseCarrier,
+          PvP3GateGoon, PvP3GateRobo, PvP2GateDTExpand,
+          PvZ4Gate1012, PvZMidgame5GateGoonReaver, PvZLateGameReaver),
+        Seq(PvR2Gate4Gate),
+        Seq(
+          PvRDT,
+          PvTDTExpand, PvT2BaseArbiter,
           PvP2GateDTExpand,
-          PvZ4Gate1012, PvZMidgameNeoBisu, PvZLateGameTemplar),
-        Seq(PvR2Gate4Gate)
+          PvZMidgameNeoBisu, PvZLateGameTemplar),
     )),
     PvRProxy2Gate,
     PvT2GateRangeExpandCarrier,
@@ -39,7 +44,7 @@ object Opponents {
   val titaniron     : Opponent = add(Opponent("TitanIron",    new StrategySelectionRecommended(StrategySelectionGreedy, PvT2GateRangeExpandCarrier)))
   val letabot       : Opponent = add(Opponent("LetaBot",      new StrategySelectionRecommended(StrategySelectionGreedy, PvTReaverCarrierCheese)))
   val steamhammer   : Opponent = add(Opponent("Steamhammer",  StrategySelectionDynamic))
-  val microwave     : Opponent = add(Opponent("Microwave",    new StrategySelectionRecommended(StrategySelectionDynamic, PvZ4Gate1012, PvZMidgame5GateGoon, PvZLateGameTemplar)))
+  val microwave     : Opponent = add(Opponent("Microwave",    new StrategySelectionRecommended(StrategySelectionGreedy, PvZ4Gate1012, PvZMidgame5GateGoon, PvZLateGameTemplar)))
   val megabot       : Opponent = add(Opponent("MegaBot",      defaultPvP))
   val zzzkbot       : Opponent = add(Opponent("ZZZKBot",      new StrategySelectionFixed(PvZ1BaseForgeTech, PvZMidgameNeoBisu, PvZLateGameTemplar)))
   val ualbertabot   : Opponent = add(Opponent("UAlbertaBot",  fixedPvR))
@@ -71,6 +76,7 @@ object Opponents {
   val ziabot2           : Opponent = add(Opponent("Zia bot",            ziabot.policy))
   val johankayser       : Opponent = add(Opponent("Johan Kayser",       srbotone.policy))
   val bryanweber        : Opponent = add(Opponent("Bryan Weber",        cunybot.policy))
+  val jadien            : Opponent = add(Opponent("jadien",             tscmoor.policy))
   
   val all: Vector[Opponent] = allKnown
 }

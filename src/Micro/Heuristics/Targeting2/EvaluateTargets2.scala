@@ -115,6 +115,12 @@ object EvaluateTargets2 extends TargetEvaluator {
       }
     }
 
+    // Immediate combat value bonus
+    val hurtingUsBonus = target.matchups.targetsInRange.nonEmpty || target.unitClass.maxEnergy > 0
+    if (hurtingUsBonus) {
+      output *= 2.0
+    }
+
     // Temporary visibility bonus
     val temporarilyVisible = (target.cloaked || target.burrowed) && target.matchups.enemyDetectors.forall(_.is(Terran.SpellScannerSweep))
     if (temporarilyVisible) {

@@ -18,6 +18,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
+import Strategery.MapGroups
 import Strategery.Strategies.Protoss.{PvP2Gate1012Goon, PvP4GateGoon}
 import Utilities.ByOption
 
@@ -292,7 +293,9 @@ object PvPIdeas {
         new Not(new EnemyStrategy(With.fingerprints.cannonRush)),
         new EnemiesAtLeast(1, Protoss.PhotonCannon),
         new UnitsAtLeast(1, Protoss.Gateway))),
-    new RequireMiningBases(2))
+    new Parallel(
+      new RequireMiningBases(2),
+      new PumpWorkers))
 
   class TakeBase2 extends If(
     new Or(
@@ -389,7 +392,7 @@ object PvPIdeas {
       // Speedlot-Templar composition
       new Parallel(
         new PumpShuttleAndReavers(6, shuttleFirst = false),
-        new PumpRatio(Protoss.Dragoon, 3, 24, Seq(Friendly(Protoss.Zealot, 1.5))),
+        new PumpRatio(Protoss.Dragoon, 3, 24, Seq(Friendly(Protoss.Zealot, if (MapGroups.badForBigUnits.exists(_.matches)) 0.0 else 1.5))),
         new PumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-1), Friendly(UnitMatchWarriors, 1.0 / 5.0))),
         new Pump(Protoss.Zealot)),
 

@@ -12,6 +12,7 @@ abstract class StarCraftMap {
   val trustGroundDistance: Boolean = true
 }
 object Alchemist extends StarCraftMap
+object Arcadia extends StarCraftMap
 object Benzene extends StarCraftMap
 object BlueStorm extends StarCraftMap
 object ChupungRyeong extends StarCraftMap
@@ -60,7 +61,7 @@ object StarCraftMaps {
 
 object MapGroups {
   val badForBigUnits = Vector(BlueStorm)
-  val badForProxying = Vector(Alchemist, BlueStorm, ChupungRyeong, Eddy, EmpireOfTheSun, GreatBarrierReef, LaMancha, Roadrunner, TauCross)
+  val badForProxying = Vector(Alchemist, BlueStorm, ChupungRyeong, Eddy, EmpireOfTheSun, GreatBarrierReef, LaMancha, Roadrunner, TauCross, Arcadia)
   val badForWalling = Vector(Alchemist, Pathfinder)
   val tooShortForFFE = Vector(Python)
   val badForFastThirdBases = Vector(Benzene, Heartbreak)

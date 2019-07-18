@@ -13,11 +13,11 @@ import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Economy.GasAtMost
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._
-import Planning.Predicates.Strategy.{Employing, EnemyStrategy, OnMap}
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.Protoss
+import Strategery.MapGroups
 import Strategery.Strategies.Protoss.{PvP2Gate1012Goon, PvP2GateDTExpand}
-import Strategery.{BlueStorm, Hitchhiker}
 
 class PvPLateGame extends GameplanTemplate {
 
@@ -35,18 +35,18 @@ class PvPLateGame extends GameplanTemplate {
   override def archonPlan: Plan = new PvPIdeas.MeldArchonsPvP
 
   lazy val goGoonReaverCarrier = new Latch(
-    new Or(
-      new OnMap(BlueStorm, Hitchhiker),
-      new And(
-        new Or(
-          new EnemiesAtLeast(3, Protoss.Reaver),
-          new UnitsAtLeast(1, Protoss.RoboticsSupportBay)),
-        new UnitsAtMost(0, Protoss.TemplarArchives))))
+    new And(
+      new Or(
+        new EnemiesAtLeast(3, Protoss.Reaver),
+        new UnitsAtLeast(1, Protoss.RoboticsSupportBay)),
+      new UnitsAtMost(0, Protoss.TemplarArchives)))
 
   lazy val goZealotTemplarArbiter = new Latch(
     new And(
       new Not(goGoonReaverCarrier),
-      new UnitsAtLeast(1, Protoss.CitadelOfAdun)))
+      new Or(
+        new Check(() => MapGroups.badForBigUnits.exists(_.matches)),
+        new UnitsAtLeast(1, Protoss.CitadelOfAdun))))
 
   class BuildTech extends Parallel(
     new Build(

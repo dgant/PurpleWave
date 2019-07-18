@@ -81,6 +81,10 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
       new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.proxyGateway, With.fingerprints.twoGate),
       new BuildOrder(Get(7, Protoss.Zealot))),
 
+    new If(
+      new EnemyStrategy(With.fingerprints.proxyGateway),
+      new Build(Get(2, Protoss.Gateway))),
+
     new Build(
       Get(Protoss.Assimilator),
       Get(Protoss.CyberneticsCore)),

@@ -4,7 +4,7 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.{Aggression, EjectScout}
+import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Compound.{Or, Parallel, _}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -17,7 +17,7 @@ import Planning.Plans.Scouting.{Scout, ScoutCleared, ScoutOn}
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._
-import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.Predicates.Strategy.{Employing, EnemyIsRandom, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
@@ -54,6 +54,7 @@ class PvTBasic extends GameplanTemplate {
   override val meldArchonsAt: Int = 25
 
   override def scoutPlan: Plan = new Parallel(
+    new If(new EnemyIsRandom,                   new ScoutOn(Protoss.Pylon)), // Continue scouting from a PvR opening
     new If(new Employing(PvT13Nexus),           new ScoutOn(Protoss.Nexus, quantity = 2)),
     new If(new Employing(PvT21Nexus),           new ScoutOn(Protoss.Gateway)),
     new If(new Employing(PvT23Nexus),           new ScoutOn(Protoss.Pylon)),
@@ -66,6 +67,12 @@ class PvTBasic extends GameplanTemplate {
 
   override val priorityAttackPlan = new PvTIdeas.PriorityAttacks
   override val attackPlan = new Parallel(
+    // COG 2019 hack -- Don't get locked in our base
+    new If(
+      new And(
+        new Latch(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true)),
+        new BasesAtMost(1)),
+      new Attack),
     new If(
       new Or(
         new Not(new Employing(PvTDTExpand, PvT1GateRobo)),

@@ -12,6 +12,7 @@ object ProtossChoices {
     PvROpen2Gate1012,
     PvROpenZZCore,
     PvROpenZCoreZ,
+    PvRDT,
     PvRProxy2Gate,
     PvR2Gate4Gate,
     PvRTinfoil2018,

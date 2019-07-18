@@ -60,6 +60,7 @@ object StrategyGroups {
     PvZLateGameCarrier, // Needs island tech
     CarriersWithNoDefense,
     ZvZ5PoolSunkens,
+    PvROpenZZCore,
     PvP1GateReaverExpand,
     PvT1GateRobo,
     PvE3BaseIslandCarrier,

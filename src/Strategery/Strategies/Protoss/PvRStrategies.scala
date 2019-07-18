@@ -1,5 +1,7 @@
 package Strategery.Strategies.Protoss
 
+import Information.Intelligenze.Fingerprinting.Fingerprint
+import Lifecycle.With
 import Planning.Plan
 import Planning.Plans.GamePlans.Protoss.Standard.PvR.{PvR2Gate4Gate, PvRForgeDT, PvRTinfoil}
 import Strategery.Strategies.Strategy
@@ -37,6 +39,7 @@ object PvRDT extends PvRStrategy {
 }
 object PvRProxy2Gate extends PvR2GateStrategy {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.fourPool)
 }
 
 object PvR2Gate4Gate extends PvRStrategy {

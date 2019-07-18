@@ -24,8 +24,8 @@ object Opponents {
       StrategySelectionSequence(Seq(
         Seq(
           PvROpenZCoreZ,
-          PvT23Nexus,   PvT2BaseCarrier,
-          PvP3GateGoon, PvP3GateRobo, PvP2GateDTExpand,
+          PvT23Nexus, PvT2BaseCarrier,
+          PvP3GateRobo,
           PvZ4Gate1012, PvZMidgame5GateGoonReaver, PvZLateGameReaver),
         Seq(PvR2Gate4Gate),
         Seq(

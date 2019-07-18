@@ -127,6 +127,33 @@ object EvaluateTargets2 extends TargetEvaluator {
       output *= 2.0
     }
 
+    // Detection bonus
+    val weHaveCloakedThreat = target.matchups.enemies.headOption.exists(_.matchups.alliesInclSelfCloaked.exists(_.matchups.targets.nonEmpty)) && ! target.matchups.enemies.exists(_.is(Protoss.Arbiter))
+    if (weHaveCloakedThreat) {
+      val building = target.constructing || target.repairing
+      val buildTarget = if (building) target.target else None
+      val detects = aidsDetection(target) || buildTarget.exists(aidsDetection)
+      if (detects) {
+        output *= 4.0
+      }
+    }
+
     output
+  }
+
+  def aidsDetection(target: UnitInfo): Boolean = {
+    if (target.unitClass.isDetector) {
+      return true
+    }
+    if (target.isAny(Terran.Comsat, Terran.ControlTower, Protoss.RoboticsFacility)) {
+      return true
+    }
+    if (target.isAny(Terran.Academy, Terran.ScienceFacility, Protoss.Observatory) && ! target.complete) {
+      return true
+    }
+    if (target.isAny(Terran.EngineeringBay, Protoss.Forge)) {
+      return true
+    }
+    false
   }
 }

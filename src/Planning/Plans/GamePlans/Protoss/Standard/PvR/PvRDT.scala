@@ -8,6 +8,7 @@ import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
+import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPool
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvP2GateDarkTemplar
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -43,6 +44,7 @@ class PvRDT extends GameplanTemplate {
     new BuildOrder(new PvP2GateDarkTemplar().buildOrder: _*))
 
   override def buildPlans: Seq[Plan] = Seq(
+    new DefendFightersAgainstEarlyPool,
     new Trigger(
       new UnitsAtLeast(1, Protoss.CitadelOfAdun),
       initialBefore = new CapGasWorkersAt(2)),
@@ -53,6 +55,9 @@ class PvRDT extends GameplanTemplate {
         new Pump(Protoss.DarkTemplar),
         new PumpWorkers,
         new Pump(Protoss.Zealot, 5),
+        new If(
+          new EnemyStrategy(With.fingerprints.fourPool),
+          new Build(Get(2, Protoss.Gateway))),
         new Build(
           Get(Protoss.CitadelOfAdun),
           Get(Protoss.TemplarArchives),

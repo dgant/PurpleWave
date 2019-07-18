@@ -15,7 +15,7 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
 import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
-import Planning.Predicates.Compound.{And, Check, Latch, Not}
+import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyDarkTemplarLikely, SafeAtHome}
@@ -118,11 +118,7 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
     new RequireSufficientSupply,
     new Trigger(
       new UnitsAtLeast(1, Protoss.CitadelOfAdun),
-      initialBefore =
-        // Don't override 2-Gate emergency gas settings
-        new If(
-          new Check(() => ! With.fingerprints.twoGate.matches || ! With.blackboard.gasWorkerCeiling.isSet),
-          new CapGasWorkersAt(2))),
+      initialBefore = new CapGasWorkersAt(2)),
     new If(
       new And(
         new EnemiesAtMost(0, Protoss.Observer),

@@ -79,15 +79,6 @@ class PvP2GateGoon extends GameplanTemplate {
           new CapGasWorkersAt(2)))),
 
     new If(
-      new EnemyStrategy(With.fingerprints.fourGateGoon),
-      new If(
-        new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
-        new RequireMiningBases(2)),
-      new If(
-        new UnitsAtLeast(12, UnitMatchWarriors),
-        new RequireMiningBases(2))),
-
-    new If(
       new Or(
         new EnemyStrategy(With.fingerprints.dtRush),
         new And(
@@ -98,23 +89,34 @@ class PvP2GateGoon extends GameplanTemplate {
         new BuildCannonsInMain(1),
         new BuildCannonsAtNatural(2))),
 
+    new If(
+      new EnemyStrategy(With.fingerprints.earlyForge, With.fingerprints.oneGateCore),
+      new RequireMiningBases(2)),
+    new If(
+      new EnemyStrategy(With.fingerprints.fourGateGoon),
+      new If(
+        new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
+        new RequireMiningBases(2)),
+      new If(
+        new UnitsAtLeast(12, UnitMatchWarriors),
+        new RequireMiningBases(2))),
+
+    new Build(Get(Protoss.DragoonRange)),
+
     new PvPIdeas.TrainArmy,
     new If(
       new EnemyStrategy(With.fingerprints.proxyGateway),
-      new Build(
-        Get(Protoss.DragoonRange),
-        Get(4, Protoss.Gateway)),
+      new Build(Get(4, Protoss.Gateway)),
       new If(
-        new And(
-          new BasesAtMost(1),
-          new EnemyStrategy(With.fingerprints.fourGateGoon)),
+        new Or(
+          new UnitsAtLeast(1, Protoss.CitadelOfAdun),
+          new And(
+            new BasesAtMost(1),
+            new EnemyStrategy(With.fingerprints.fourGateGoon))),
         new Build(
           Get(Protoss.CitadelOfAdun),
-          Get(Protoss.TemplarArchives),
-          Get(Protoss.DragoonRange)),
-        new Build(
-          Get(Protoss.DragoonRange),
-          Get(2, Protoss.Nexus)))),
+          Get(Protoss.TemplarArchives)),
+        new RequireMiningBases(2))),
 
     new If(
       new EnemyStrategy(With.fingerprints.dtRush),

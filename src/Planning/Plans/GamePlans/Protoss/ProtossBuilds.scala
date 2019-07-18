@@ -118,8 +118,7 @@ object ProtossBuilds {
     Get(18, Protoss.Probe),
     Get(3, Protoss.Pylon),
     Get(20, Protoss.Probe),
-    Get(3, Protoss.Dragoon),
-    Get(Protoss.DragoonRange))
+    Get(3, Protoss.Dragoon))
 
   val ThreeGateGoon = Vector[BuildRequest] (
     Get(8,   Protoss.Probe),

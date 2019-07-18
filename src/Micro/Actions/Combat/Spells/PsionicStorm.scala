@@ -2,8 +2,7 @@ package Micro.Actions.Combat.Spells
 
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -14,8 +13,8 @@ object PsionicStorm extends TargetedSpell {
   override protected def tech             : Tech      = Protoss.PsionicStorm
   override protected def aoe              : Boolean   = true
   override protected def castRangeTiles   : Int       = 9
-  override protected def thresholdValue   : Double    = casterClass.subjectiveValue / 3.5
-  override protected def lookaheadFrames  : Int       = 6 + With.latency.latencyFrames
+  override protected def thresholdValue   : Double    = 200
+  override protected def lookaheadFrames  : Int       = With.latency.latencyFrames
 
   override protected def valueTarget(target: UnitInfo): Double = {
     if (With.grids.psionicStorm.isSet(target.tileIncludingCenter)) return 0.0
@@ -29,15 +28,10 @@ object PsionicStorm extends TargetedSpell {
       Zerg.Egg,
       Zerg.LurkerEgg)) return 0.0
 
-    val expectedAccuracy  = PurpleMath.clamp(Terran.Marine.topSpeed / target.topSpeed, 0.2, 1.0)
-    val multiplierValue   = Math.min(target.subjectiveValue, Protoss.Observer.subjectiveValue)
-    val multiplierDamage  = (Math.min(expectedAccuracy * 112.0, target.totalHealth) / target.unitClass.maxTotalHealth)
+    val expectedDamage    = if (target.velocity.lengthSquared > 0) 50 else 75
+    val multiplierValue   = Math.min(expectedDamage, target.totalHealth)
     val multiplierPlayer  = (if (target.isEnemy) 1.0 else -3.0)
-    val output = (
-      multiplierValue
-      * multiplierDamage
-      * multiplierPlayer)
-    
+    val output            = multiplierValue * multiplierPlayer
     output
   }
   

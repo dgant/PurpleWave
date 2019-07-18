@@ -19,19 +19,21 @@ object Opponents {
   
   val mcrave        : Opponent = add(Opponent("McRave",       StrategySelectionDynamic))
   val locutus       : Opponent = add(Opponent("Locutus",      StrategySelectionSequence(Vector(Seq(PvP2GateGoon), Seq(PvP2Gate1012DT), Seq(PvP3GateGoonCounter), Seq(PvP2GateDTExpand), Seq(PvPProxy2Gate)))))
-  val tscmoo        : Opponent = add(Opponent("tscmoo",       StrategySelectionSequence(Seq(
-    Seq(
-      PvRProxy2Gate,
-      PvT2GateRangeExpandCarrier,
-      PvP4GateGoon,
-      PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar),
-    Seq(
-      PvROpenZCoreZ,
-      PvT21Nexus, PvT2BaseCarrier,
-      PvP3GateGoon,
-      PvZ4Gate1012, PvZMidgameNeoBisu, PvZLateGameTemplar),
-    Seq(PvR2Gate4Gate)
-  ))))
+  val tscmoo        : Opponent = add(Opponent("tscmoo",
+    new StrategySelectionTry(
+      StrategySelectionSequence(Seq(
+        Seq(
+          PvROpenZCoreZ,
+          PvT23Nexus, PvT3BaseArbiter,
+          PvP2GateDTExpand,
+          PvZ4Gate1012, PvZMidgameNeoBisu, PvZLateGameTemplar),
+        Seq(PvR2Gate4Gate)
+    )),
+    PvRProxy2Gate,
+    PvT2GateRangeExpandCarrier,
+    PvP2Gate1012DT,
+    PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar
+  )))
   val bananabrain   : Opponent = add(Opponent("BananaBrain",  new StrategySelectionRecommended(StrategySelectionGreedy, PvP2GateDTExpand) { duration = 20 }))
   val iron          : Opponent = add(Opponent("Iron",         new StrategySelectionFixed(PvT2GateRangeExpandCarrier)))
   val titaniron     : Opponent = add(Opponent("TitanIron",    new StrategySelectionRecommended(StrategySelectionGreedy, PvT2GateRangeExpandCarrier)))

@@ -73,15 +73,8 @@ class PvZFFE extends GameplanTemplate {
       new And(
         new EnemyStrategy(With.fingerprints.fourPool),
         new UnitsAtLeast(1, Protoss.Forge)),
-      new Build(Get(4, Protoss.PhotonCannon))),
-    new If(
-      new And(
-        new Latch(new Check(() => With.units.countOurs(Protoss.PhotonCannon) + With.self.minerals / 150 >= 2)),
-        new EnemyStrategy(With.fingerprints.fourPool),
-        new FrameAtMost(GameTime(6, 0)()),
-        new UnitsAtLeast(1, Protoss.PhotonCannon, complete = false),
-        new UnitsAtMost(3, Protoss.PhotonCannon, complete = true)),
-      new DefendFFEWithProbesAgainst4Pool),
+      new Build(Get(6, Protoss.PhotonCannon))),
+    new PvZIdeas.ConditionalDefendFFEWithProbesAgainst4Pool,
     new If(
       new EnemyStrategy(With.fingerprints.fourPool),
       new EjectScout(Protoss.Probe)),

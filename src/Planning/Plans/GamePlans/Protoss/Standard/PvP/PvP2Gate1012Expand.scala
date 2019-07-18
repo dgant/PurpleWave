@@ -12,7 +12,7 @@ import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
-import Planning.Plans.Scouting.ScoutOn
+import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
@@ -45,7 +45,8 @@ class PvP2Gate1012Expand extends GameplanTemplate {
       new BuildCannonsAtNatural(2)),
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToProxyGateways,
-    new PvPIdeas.ReactToFFE)
+    new PvPIdeas.ReactToFFE,
+    new ScoutForCannonRush)
 
   class FollowUpVsTwoGate extends Parallel(
     new RequireMiningBases(2),

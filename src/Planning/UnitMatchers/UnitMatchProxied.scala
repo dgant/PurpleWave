@@ -20,6 +20,8 @@ abstract class UnitMatchAnyProxy extends UnitMatcher {
     if (unit.isFriendly) return false
     if ( ! unit.unitClass.isBuilding) return false
     if (unit.flying) return false
+    if (unit.base.exists(b => b.isStartLocation && ! b.isOurMain)) return false // Hack fix to detecting normal buildings as proxied
+    if (unit.base.exists(b => b.isNaturalOf.exists( ! _.isOurMain))) return false // Hack fix to detecting normal buildings as proxied
 
     val distanceEnemy     = baseDistance(unit, unit.player)
     val distanceFriendly  = baseDistance(unit, With.self)

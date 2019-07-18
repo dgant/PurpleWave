@@ -6,10 +6,10 @@ import Planning.Plans.Army.EjectScout
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{Pump, PumpShuttleAndReavers, PumpWorkers}
-import Planning.Plans.Macro.Build.{CancelOrders, CancelIncomplete}
+import Planning.Plans.Macro.Build.{CancelIncomplete, CancelOrders}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireBases
-import Planning.Plans.Scouting.ScoutOn
+import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
@@ -47,7 +47,8 @@ class PvP3GateRobo extends GameplanTemplate {
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToProxyGateways,
     new PvPIdeas.ReactToFFE,
-    new PvPIdeas.ReactTo2Gate)
+    new PvPIdeas.ReactTo2Gate,
+    new ScoutForCannonRush)
 
   override def buildOrder = Seq(
     Get(8,   Protoss.Probe),

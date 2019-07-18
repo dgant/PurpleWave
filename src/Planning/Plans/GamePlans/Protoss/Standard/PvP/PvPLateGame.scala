@@ -46,7 +46,7 @@ class PvPLateGame extends GameplanTemplate {
   lazy val goZealotTemplarArbiter = new Latch(
     new And(
       new Not(goGoonReaverCarrier),
-      new UnitsAtLeast(1, Protoss.TemplarArchives)))
+      new UnitsAtLeast(1, Protoss.CitadelOfAdun)))
 
   class BuildTech extends Parallel(
     new Build(
@@ -212,12 +212,15 @@ class PvPLateGame extends GameplanTemplate {
     new Build(Get(12, Protoss.Gateway)),
 
     // Arbiter/Carrier transitions
-    new If(
-      new Or(goGoonReaverCarrier, new UnitsAtLeast(8, Protoss.Arbiter)),
-      new CarrierTransition),
-    new If(
-      new Or(goZealotTemplarArbiter, new UnitsAtLeast(8, Protoss.Carrier)),
-      new ArbiterTransition),
+    new Trigger(
+      new SupplyOutOf200(195),
+      new Parallel(
+        new If(
+          new Or(goGoonReaverCarrier, new UnitsAtLeast(8, Protoss.Arbiter)),
+          new CarrierTransition),
+        new If(
+          new Or(goZealotTemplarArbiter, new UnitsAtLeast(8, Protoss.Carrier)),
+          new ArbiterTransition))),
 
     new RequireMiningBases(4),
     new Build(Get(20, Protoss.Gateway)),

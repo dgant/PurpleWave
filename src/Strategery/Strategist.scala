@@ -57,15 +57,15 @@ class Strategist {
     1.0 / (1.0 + (game.order / With.configuration.historyHalfLife))
   )).toMap
 
-  lazy val enemyRecentFingerprints: Vector[String] = {
+  def enemyFingerprints(games: Int = With.configuration.recentFingerprints): Vector[String] = {
     With.history.gamesVsEnemies
-      .toVector
-      .sortBy(-_.timestamp)
-      .take(With.configuration.recentFingerprints)
+      .take(games)
       .flatMap(_.strategies.toVector)
       .filter(_.startsWith("Finger"))
       .distinct
   }
+
+  lazy val enemyRecentFingerprints: Vector[String] = enemyFingerprints(With.configuration.recentFingerprints)
 
   def selectInitialStrategies: Set[Strategy] = {
     val enemyHasKnownRace = With.enemies.exists(_.raceInitial != Race.Unknown)

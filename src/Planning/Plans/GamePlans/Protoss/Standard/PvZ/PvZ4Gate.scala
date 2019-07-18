@@ -104,23 +104,39 @@ class PvZ4Gate extends GameplanTemplate {
           new EnemiesAtLeast(3, Zerg.SunkenColony, complete = true))),
       new RequireMiningBases(2)),
 
+    new PumpRatio(Protoss.Dragoon, 0, 20, Seq(Enemy(Zerg.Mutalisk, 1.0), Enemy(Zerg.Lurker, 1.0))),
     new FlipIf(
       new And(
         new UnitsAtLeast(1, Protoss.Assimilator, complete = true),
         new SafeAtHome),
+
+      // Pre-assimilator
       new FlipIf(
-        new UnitsAtLeast(6, UnitMatchWarriors),
+        new Or(
+          new UnitsAtLeast(6, UnitMatchWarriors),
+          new And(
+            new UnitsAtLeast(3, UnitMatchWarriors),
+            new SafeAtHome)),
+
+        // Army?
         new Parallel(
-          new PumpRatio(Protoss.Dragoon, 0, 20, Seq(Enemy(Zerg.Mutalisk, 1.0), Enemy(Zerg.Lurker, 1.0))),
           new PumpRatio(Protoss.Zealot, 0, 20, Seq(Enemy(Zerg.Zergling, 0.3))),
           new If(new UpgradeStarted(Protoss.DragoonRange), new Pump(Protoss.Dragoon)),
           new Pump(Protoss.Zealot)),
+
+        // Workers?
         new PumpWorkers),
-      new Build(
-        Get(Protoss.Assimilator),
-        Get(Protoss.CyberneticsCore),
-        Get(4, Protoss.Gateway),
-        Get(Protoss.DragoonRange))),
+
+      // Post-assimilator
+      new Parallel(
+        new PumpWorkers,
+        new Build(
+          Get(Protoss.Assimilator),
+          Get(Protoss.CyberneticsCore),
+          Get(4, Protoss.Gateway),
+          Get(Protoss.DragoonRange)),
+        new Pump(Protoss.Dragoon),
+        new Pump(Protoss.Zealot))),
 
     new If(
       new UnitsAtLeast(4, Protoss.Gateway, complete = true),

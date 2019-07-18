@@ -223,7 +223,7 @@ object ProtossBuilds {
     Get(Protoss.Pylon),
     Get(2,   Protoss.Gateway),
     Get(11,  Protoss.Probe),
-    Get(1,   Protoss.Zealot),
+    Get(Protoss.Zealot),
     Get(2,   Protoss.Pylon),
     Get(3,   Protoss.Zealot))
   
@@ -239,8 +239,8 @@ object ProtossBuilds {
     Get(15,  Protoss.Probe),
     Get(2,   Protoss.Gateway),
     Get(2,   Protoss.Pylon),
-    Get(1,   Protoss.Dragoon),
     Get(Protoss.DragoonRange),
+    Get(Protoss.Dragoon),
     Get(3,   Protoss.Dragoon),
     Get(3,   Protoss.Pylon))
 

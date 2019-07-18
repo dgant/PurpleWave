@@ -231,7 +231,7 @@ object PvPIdeas {
 
     new CapGasAt(0, 300),
     new If(
-      new UnitsAtMost(0, Protoss.CyberneticsCore),
+      new UnitsAtMost(1, Protoss.Gateway),
       new CapGasWorkersAt(0),
       new Trigger(
         new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
@@ -261,7 +261,10 @@ object PvPIdeas {
         new Or(
           new UnitsAtMost(7, UnitMatchWarriors),
           new Not(new SafeAtHome)),
-      new TrainArmy)),
+        new Parallel(
+          new BuildOrder(Get(3, Protoss.Zealot)),
+          new TrainArmy
+        ))),
   )
 
   class ReactTo2Gate extends If(

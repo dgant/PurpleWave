@@ -10,6 +10,7 @@ import Planning.UnitPreferences.UnitPreferClose
 import Planning.{Plan, Property}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.ByOption
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -74,6 +75,14 @@ abstract class DefendFFEWithProbes extends Plan {
         steps += 1
         toDefend = toDefend.project(threatSource, 16)
       }
+      val nearestThreat = ByOption.minBy(cannon.matchups.threats)(_.pixelDistanceEdge(cannon))
+      nearestThreat.foreach(someNearestThreat => {
+        val threatDistanceToCannon = cannon.pixelDistanceEdge(threatSource)
+        if (cannon.pixelDistanceEdge(toDefend) > threatDistanceToCannon) {
+          toDefend = cannon.pixelCenter.project(someNearestThreat.pixelCenter, threatDistanceToCannon + 16)
+        }
+      })
+
       workers.foreach(_.agent.intend(this, new Intention {
         canFlee   = false
         //toForm    = Some(toDefend)

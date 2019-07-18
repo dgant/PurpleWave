@@ -12,8 +12,8 @@ import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAt}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
-import Planning.Plans.Scouting.ScoutOn
+import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
+import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyBasesAtMost
@@ -55,7 +55,8 @@ class PvP2GateGoon extends GameplanTemplate {
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvPIdeas.ReactToGasSteal,
     new PvPIdeas.ReactToCannonRush,
-    new PvPIdeas.ReactToFFE)
+    new PvPIdeas.ReactToFFE,
+    new ScoutForCannonRush)
   
   override val buildOrder: Seq[BuildRequest] = ProtossBuilds.ZCoreZTwoGateGoon
 
@@ -93,7 +94,9 @@ class PvP2GateGoon extends GameplanTemplate {
           new BasesAtLeast(2),
           new EnemyBasesAtMost(1),
           new Not(new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.robo, With.fingerprints.nexusFirst, With.fingerprints.fourGateGoon)))),
-      new BuildCannonsAtNatural(2)),
+      new Parallel(
+        new BuildCannonsInMain(1),
+        new BuildCannonsAtNatural(2))),
 
     new PvPIdeas.TrainArmy,
     new If(

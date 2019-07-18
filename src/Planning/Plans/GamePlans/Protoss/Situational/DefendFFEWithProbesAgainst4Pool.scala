@@ -11,7 +11,7 @@ class DefendFFEWithProbesAgainst4Pool extends DefendFFEWithProbes {
     val cannonsComplete     = With.units.countOurs(UnitMatchAnd(Protoss.PhotonCannon, UnitMatchComplete))
     val cannonsIncomplete   = With.units.countOurs(Protoss.PhotonCannon) - cannonsComplete
     val workerCount         = With.units.countOurs(UnitMatchWorkers)
-    val workersToMine       = if (cannonsIncomplete == 2) 0 else if (cannonsIncomplete == 1) 3 else 6
+    val workersToMine       = if (cannonsComplete < 2) 4 else 4 + 2 * cannonsComplete
     val workersDesired      = if (cannonsComplete >= 5) 0 else Math.min(workerCount - workersToMine, zerglings * 4 - cannonsComplete * 3)
     workersDesired
   }

@@ -2,11 +2,11 @@ package Micro.Actions.Protoss
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Commands.{Attack, AttackMove}
 import Micro.Actions.Protoss.Carrier._
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
+import Utilities.ByOption
 
 object BeACarrier extends Action {
   
@@ -73,8 +73,10 @@ object BeACarrier extends Action {
         Attack.consider(unit)
       }
       WarmUpInterceptors.consider(unit)
-      if (unit.matchups.targets.exists(_.is(Protoss.Interceptor))) {
-        Target.consider(unit)
+      if (unit.matchups.targets.exists(_.isAny(Protoss.Carrier, Protoss.Interceptor))) {
+        unit.agent.toAttack = unit.agent.toAttack
+          .orElse(ByOption.minBy(unit.matchups.targetsInRange .filter(u => u.canAttack(unit) && ! u.isInterceptor()))(u => u.totalHealth / (1 + u.subjectiveValue)))
+          .orElse(ByOption.minBy(unit.matchups.targets        .filter(u => u.canAttack(unit) && ! u.isInterceptor()))(_.pixelDistanceEdge(unit)))
         Attack.consider(unit)
       }
       AttackMove.consider(unit)

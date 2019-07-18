@@ -44,15 +44,15 @@ class PvE1BaseIslandCarrier extends GameplanTemplate {
       Get(20, Protoss.Probe),
       Get(3, Protoss.Pylon),
       Get(22, Protoss.Probe),
+      Get(Protoss.Forge),
+      Get(24, Protoss.Probe),
       Get(Protoss.FleetBeacon),
       Get(2, Protoss.Stargate),
-      Get(24, Protoss.Probe),
-      Get(4, Protoss.Pylon),
-      Get(Protoss.Forge)),
+      Get(4, Protoss.Pylon)),
     new SwitchEnemyRace(
-      whenTerran  = new BuildOrder(Get(1, Protoss.PhotonCannon), Get(2, Protoss.Nexus), Get(2, Protoss.PhotonCannon), Get(2, Protoss.Carrier)),
-      whenProtoss = new BuildOrder(Get(3, Protoss.PhotonCannon), Get(4, Protoss.Carrier), Get(2, Protoss.Nexus)),
-      whenZerg    = new BuildOrder(Get(3, Protoss.PhotonCannon), Get(2, Protoss.Corsair), Get(5, Protoss.PhotonCannon)),
+      whenTerran  = new BuildOrder(Get(1, Protoss.PhotonCannon), Get(2, Protoss.Nexus),   Get(2, Protoss.Carrier), Get(2, Protoss.PhotonCannon)),
+      whenProtoss = new BuildOrder(Get(3, Protoss.PhotonCannon), Get(2, Protoss.Carrier), Get(2, Protoss.Nexus)),
+      whenZerg    = new BuildOrder(Get(3, Protoss.PhotonCannon), Get(4, Protoss.Corsair), Get(5, Protoss.PhotonCannon), Get(6, Protoss.Corsair), Get(2, Protoss.Nexus)),
       whenRandom  = new BuildOrder(Get(3, Protoss.PhotonCannon), Get(2, Protoss.Corsair), Get(5, Protoss.PhotonCannon))))
 
 

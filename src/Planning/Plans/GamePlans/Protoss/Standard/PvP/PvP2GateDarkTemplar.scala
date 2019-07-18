@@ -14,8 +14,8 @@ import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
-import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
+import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyDarkTemplarLikely, SafeAtHome}
@@ -30,6 +30,8 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
   override val completionCriteria = new Latch(new MiningBasesAtLeast(2))
   override val workerPlan = NoPlan()
   override val scoutPlan = new ScoutOn(Protoss.Gateway)
+
+  override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
 
   override val attackPlan  = new Trigger(
     new Or(
@@ -107,7 +109,8 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToProxyGateways,
     new PvPIdeas.ReactTo2Gate,
-    new PvPIdeas.ReactToFFE
+    new PvPIdeas.ReactToFFE,
+    new ScoutForCannonRush
   )
   
   override val buildPlans = Vector(
@@ -115,7 +118,11 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
     new RequireSufficientSupply,
     new Trigger(
       new UnitsAtLeast(1, Protoss.CitadelOfAdun),
-      initialBefore = new CapGasWorkersAt(2)),
+      initialBefore =
+        // Don't override 2-Gate emergency gas settings
+        new If(
+          new Check(() => ! With.fingerprints.twoGate.matches || ! With.blackboard.gasWorkerCeiling.isSet),
+          new CapGasWorkersAt(2))),
     new If(
       new And(
         new EnemiesAtMost(0, Protoss.Observer),

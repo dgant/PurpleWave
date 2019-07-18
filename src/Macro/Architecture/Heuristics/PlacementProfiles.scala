@@ -139,6 +139,7 @@ object PlacementProfiles {
   val hugTownHall = new PlacementProfile(
     "Hug town hall",
     preferPowering              = 0.1,
+    preferSpace                 = 1.0,
     avoidDistanceFromBase       = 1.0)
   
   val hugWorkersWithPylon = new PlacementProfile(

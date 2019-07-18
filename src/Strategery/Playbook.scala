@@ -62,7 +62,8 @@ object StrategyGroups {
     ZvZ5PoolSunkens,
     PvP1GateReaverExpand,
     PvT1GateRobo,
-    PvE3BaseIslandCarrier
+    PvE3BaseIslandCarrier,
+    PvZMidgame4Gate2Archon
   )
 }
 
@@ -76,11 +77,11 @@ class CIGPlaybook extends PurpleWavePlaybook {
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvE1BaseIslandCarrier)
+  override lazy val forced: Seq[Strategy] = Seq(PvZ4Gate99, PvZMidgameNeoBisu, PvZLateGameTemplar)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
   override def respectOpponent: Boolean = false
   override def respectMap: Boolean = false
   override def respectHistory: Boolean = false
 }
 
-object Playbook extends TestingPlaybook {}
+object Playbook extends CIGPlaybook {}

@@ -39,7 +39,7 @@ object Opponents {
     PvP2Gate1012DT,
     PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar
   )))
-  val bananabrain   : Opponent = add(Opponent("BananaBrain",  new StrategySelectionRecommended(StrategySelectionGreedy, PvP2GateDTExpand) { duration = 20 }))
+  val bananabrain   : Opponent = add(Opponent("BananaBrain",  new StrategySelectionRecommended(StrategySelectionGreedy, PvP2GateDTExpand) { duration = 10 }))
   val iron          : Opponent = add(Opponent("Iron",         new StrategySelectionFixed(PvT2GateRangeExpandCarrier)))
   val titaniron     : Opponent = add(Opponent("TitanIron",    new StrategySelectionRecommended(StrategySelectionGreedy, PvT2GateRangeExpandCarrier)))
   val letabot       : Opponent = add(Opponent("LetaBot",      new StrategySelectionRecommended(StrategySelectionGreedy, PvTReaverCarrierCheese)))

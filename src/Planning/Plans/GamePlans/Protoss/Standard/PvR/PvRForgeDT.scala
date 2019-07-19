@@ -1,6 +1,8 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvR
 
 import Lifecycle.With
+import Macro.Architecture.Blueprint
+import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
@@ -25,6 +27,13 @@ class PvRForgeDT extends GameplanTemplateVsRandom {
     new Attack(Protoss.DarkTemplar),
     new If(new UnitsAtLeast(6, Protoss.Gateway, complete = true), new ConsiderAttacking)
   )
+
+  override lazy val blueprints = Vector(
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)))
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new If(
@@ -64,8 +73,9 @@ class PvRForgeDT extends GameplanTemplateVsRandom {
     new Pump(Protoss.Zealot),
     new Build(
       Get(Protoss.CitadelOfAdun),
-      Get(Protoss.TemplarArchives),
-      Get(3, Protoss.Gateway)),
+      Get(Protoss.TemplarArchives)),
+    new Build(Get(6, Protoss.PhotonCannon)),
+    new Build(Get(3, Protoss.Gateway)),
     new If(
       new BasesAtLeast(2),
       new Build(Get(8, Protoss.Gateway)))

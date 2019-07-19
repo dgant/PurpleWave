@@ -18,11 +18,11 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.UnitMatchOr
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Protoss.PvZ1BaseForgeTech
+import Strategery.Strategies.Protoss.{PvZ1BaseForgeTech, PvZ1BaseForgeTechForced}
 
 class PvZ1BaseForgeTech extends GameplanTemplate {
 
-  override val activationCriteria: Predicate = new Employing(PvZ1BaseForgeTech)
+  override val activationCriteria: Predicate = new Employing(PvZ1BaseForgeTech, PvZ1BaseForgeTechForced)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(5, Protoss.Gateway))
 
   override def scoutPlan: Plan = new ScoutOn(Protoss.Pylon)

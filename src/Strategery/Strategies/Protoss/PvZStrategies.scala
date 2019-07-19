@@ -29,6 +29,11 @@ object PvZ1BaseForgeTech extends PvZStrategy {
     Seq(PvZMidgameNeoBisu)
   )
 }
+object PvZ1BaseForgeTechForced extends PvZStrategy {
+  override def allowedVsHuman: Boolean = false
+  override def opponentsWhitelisted: Option[Iterable[String]] = Some(Seq("Coxe", "ZZZK"))
+  override def choices: Iterable[Iterable[Strategy]] = PvZ1BaseForgeTech.choices
+}
 object PvZProxy2Gate extends PvZ2GateOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
   override def responsesBlacklisted = Iterable(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.tenHatch)

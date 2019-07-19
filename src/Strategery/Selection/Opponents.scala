@@ -46,7 +46,7 @@ object Opponents {
   val steamhammer   : Opponent = add(Opponent("Steamhammer",  StrategySelectionDynamic))
   val microwave     : Opponent = add(Opponent("Microwave",    new StrategySelectionRecommended(StrategySelectionGreedy, PvZ4Gate1012, PvZMidgame5GateGoon, PvZLateGameTemplar)))
   val megabot       : Opponent = add(Opponent("MegaBot",      defaultPvP))
-  val zzzkbot       : Opponent = add(Opponent("ZZZKBot",      new StrategySelectionFixed(PvZ1BaseForgeTech, PvZMidgameNeoBisu, PvZLateGameTemplar)))
+  val zzzkbot       : Opponent = add(Opponent("ZZZKBot",      new StrategySelectionFixed(PvZ1BaseForgeTechForced, PvZMidgameNeoBisu, PvZLateGameTemplar)))
   val ualbertabot   : Opponent = add(Opponent("UAlbertaBot",  fixedPvR))
   val aiur          : Opponent = add(Opponent("Aiur",         defaultPvP))
   val tyr           : Opponent = add(Opponent("Tyr",          new StrategySelectionFixed(PvP2GateDTExpand)))

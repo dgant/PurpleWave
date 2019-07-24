@@ -58,6 +58,9 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   }
 
   def transformTotalScore(metrics: Seq[LocalBattleMetrics]): Double = {
+    // This can happen when all simulated enemies run away and nobody does any damage
+    if (metrics.lastOption.exists(metric => metric.localHealthLostUs <= 0)) return 1.0
+
     val average = PurpleMath.weightedMean(
       metrics.map(metric => (
         metric.totalScore,

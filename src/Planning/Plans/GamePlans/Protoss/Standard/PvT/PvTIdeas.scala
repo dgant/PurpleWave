@@ -152,7 +152,7 @@ object PvTIdeas {
         Get(3, Protoss.Gateway),
         Get(Protoss.RoboticsFacility),
         Get(Protoss.Observatory))))
-  
+
   class TrainMinimumDragoons extends Parallel(
     new PumpRatio(Protoss.Dragoon, 1, 3, Seq(Enemy(Terran.Vulture, 1.0), Enemy(Terran.Wraith, 1.0))),
     new PumpRatio(Protoss.Dragoon, 1, 20, Seq(Enemy(Terran.Vulture, 0.6), Enemy(Terran.Wraith, 0.5))))
@@ -262,7 +262,7 @@ object PvTIdeas {
     new TrainMinimumDragoons,
     new TrainHighTemplarAgainstBio,
     new PumpRatio(Protoss.Arbiter, 0, 2, Seq(Friendly(Protoss.Carrier, 1.0 / 8.0))),
-    new PumpRatio(Protoss.HighTemplar, 0, 2, Seq(Friendly(Protoss.Carrier, 1.0 / 8.0))),
+    new If(new UnitsAtLeast(8, Protoss.Carrier), new Pump(Protoss.HighTemplar, 2)),
     new TrainCarriers,
     new Pump(Protoss.Arbiter, 6),
     new If(new GasAtLeast(500), new Pump(Protoss.HighTemplar, maximumConcurrently = 4)),

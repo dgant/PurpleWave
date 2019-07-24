@@ -79,15 +79,11 @@ class CIGPlaybook extends PurpleWavePlaybook {
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(
-    PvRDT,
-    PvTDTExpand, PvT2BaseArbiter,
-    PvP2GateDTExpand,
-    PvZMidgameNeoBisu, PvZLateGameTemplar)
+  override lazy val forced: Seq[Strategy] = Seq(PvT28Nexus, PvT3BaseArbiter)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
   override def respectOpponent: Boolean = false
   override def respectMap: Boolean = false
   override def respectHistory: Boolean = false
 }
 
-object Playbook extends CIGPlaybook {}
+object Playbook extends PurpleWavePlaybook {}

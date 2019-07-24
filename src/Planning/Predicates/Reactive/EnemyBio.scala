@@ -21,6 +21,6 @@ class EnemyBio extends Predicate {
       + With.units.countEnemy(Terran.Medic)
     )
     
-    enemyBio > Math.max(8, enemyMech)
+    enemyBio > Math.max(6, enemyMech)
   }
 }

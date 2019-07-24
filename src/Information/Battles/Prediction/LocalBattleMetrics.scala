@@ -55,7 +55,7 @@ class LocalBattleMetrics(simulation: Simulation, previous: Option[LocalBattleMet
   val ratioLocalHealthValueLostEnemy  : Double = PurpleMath.nanToZero(localHealthValueLostEnemy / localHealthValueTotalEnemy)
   val ratioLocalHealthValueLostNet    : Double = ratioLocalHealthValueLostEnemy - ratioLocalHealthValueLostUs
   val weightLife = 1.0
-  val weightHealth = 0.25
+  val weightHealth = 0.1
   val totalScore: Double = PurpleMath.weightedMean(Seq(
     (localValueLostRatio,           weightLife),
     //(localHealthLostRatio,          weightHealth),

@@ -8,11 +8,11 @@ import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Compound.{Or, Parallel, _}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.Macro.Automatic.UpgradeContinuously
+import Planning.Plans.Macro.Automatic.{Enemy, PumpRatio, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
-import Planning.Plans.Scouting.{Scout, ScoutCleared, ScoutForCannonRush, ScoutOn}
+import Planning.Plans.Scouting.{MonitorBases, Scout, ScoutCleared, ScoutOn}
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._
@@ -274,25 +274,31 @@ class PvTBasic extends GameplanTemplate {
         new If(new ReadyForArbiters, new TechToArbiters))))
 
   override val buildPlans = Vector(
+    new MonitorBases(Protoss.Observer),
     new EjectScout,
     new BasicOpening,
     new RequireMiningBases(2),
 
     new If(new ReadyForThirdBase,   new RequireMiningBases(3)),
     new If(new ReadyForFourthBase,  new RequireMiningBases(4)),
-    new If(new Or(new EmployingTwoBase, new BasesAtLeast(3)), new BuildGasPumps),
+    new If(new Or(new EmployingTwoBase, new BasesAtLeast(3), new UnitsAtLeast(4, Protoss.Gateway)), new BuildGasPumps),
     new If(new UnitsAtLeast(3, Protoss.Gateway), new BuildCannonsAtExpansions(2)),
     new If(new BasesAtLeast(3), new BuildCannonsAtNatural(1)),
 
     new HighPriorityUpgrades,
     new If(new EnemyHasShown(Terran.Wraith), new ObserverTech),
     new PvTIdeas.TrainArmy,
-    new If(new EnemyStrategy(With.fingerprints.twoFac), new Build(
-      Get(Protoss.RoboticsFacility),
-      Get(Protoss.Observatory),
-      Get(3, Protoss.Gateway))),
+    new If(
+      new Or(
+        new EnemyStrategy(With.fingerprints.twoFac),
+        new EmployingThreeBase),
+      new Build(
+        Get(Protoss.RoboticsFacility),
+        Get(Protoss.Observatory),
+        Get(3, Protoss.Gateway))),
     new Build(Get(2, Protoss.Gateway)),
-    new If(new MiningBasesAtLeast(3), new Build(Get(3, Protoss.Gateway))),
+    new PumpRatio(Protoss.Gateway, 2, 6, Seq(Enemy(Terran.Factory, 1.5))),
+    new If(new MiningBasesAtLeast(3), new PumpRatio(Protoss.Gateway, 3, 10, Seq(Enemy(Terran.Factory, 1.5)))),
     new AddPrimaryTech,
     new If(new MiningBasesAtLeast(3), new If(new Or(new EnemyBio, new EmployingArbiters), new Build(Get(7,  Protoss.Gateway)), new Build(Get(5,  Protoss.Gateway)))),
     new If(new MiningBasesAtLeast(4), new If(new Or(new EnemyBio, new EmployingArbiters), new Build(Get(14, Protoss.Gateway)), new Build(Get(10, Protoss.Gateway)))),

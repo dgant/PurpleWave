@@ -165,6 +165,7 @@ object PvTIdeas {
     new Or(
       new UnitsAtMost(0, UnitMatchOr(Protoss.Arbiter, Protoss.ArbiterTribunal), complete = true),
       new And(
+        new EnemiesAtMost(0, Terran.Comsat, complete = true),
         new UnitsAtMost(0, Protoss.Arbiter, complete = true),
         new Or(
           new Not(new EnemyHasMines),

@@ -16,7 +16,8 @@ object ReloadScarabs extends Action {
       && With.self.minerals > Protoss.Scarab.mineralPrice
       && unit.scarabCount < maxScarabCount
       && unit.scarabCount < (if(unit.matchups.targetsInRange.isEmpty || unit.cooldownLeft > 0) maxScarabCount else 1)
-      && unit.trainingQueue.isEmpty
+      && unit.trainingQueue.size < 2
+      && unit.trainee.forall(_.remainingCompletionFrames < With.reaction.agencyMax)
   )
   
   override def perform(unit: FriendlyUnitInfo) {

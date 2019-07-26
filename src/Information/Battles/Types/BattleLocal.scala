@@ -5,7 +5,7 @@ import Information.Battles.Prediction.{LocalBattleMetrics, Prediction}
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Planning.UnitMatchers.UnitMatchSiegeTank
-import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
@@ -21,11 +21,11 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   lazy val hysteresis     : Double  =   0.2 * getHysteresis
   lazy val turtleBonus    : Double  =   0.1 * getTurtleBonus
   lazy val hornetBonus    : Double  =   0.3 * getHornetBonus
-  lazy val siegeUrgency   : Double  = - 0.4 * getSiegeUrgency
+  lazy val siegeUrgency   : Double  = - 0.5 * getSiegeUrgency
   lazy val trappedness    : Double  = - 0.2 * getTrappedness
   lazy val ratioAttack    : Double  = transformTotalScore(estimationSimulationAttack.localBattleMetrics)
   lazy val ratioSnipe     : Double  = transformTotalScore(estimationSimulationSnipe.localBattleMetrics)
-  lazy val totalTarget    : Double  = hysteresis + terranBonus + turtleBonus + siegeUrgency + trappedness + With.configuration.baseTarget
+  lazy val totalTarget    : Double  = hysteresis + terranBonus + turtleBonus + hornetBonus + siegeUrgency + trappedness + With.configuration.baseTarget
   lazy val ratioTarget    : Double  = Math.min(.99, PurpleMath.nanToZero(totalTarget))
   lazy val shouldFight    : Boolean = ratioAttack > ratioTarget || ratioSnipe > ratioTarget
 
@@ -41,9 +41,14 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   }
   def getHornetBonus: Double = {
     // Avoid poking at hornet nests
-    val hornet = enemy.units.find(u => ! u.unitClass.canMove && u.matchups.targets.nonEmpty && u.base.exists(_.owner.isEnemy) && (u.matchups.threatsInRange.isEmpty || ! u.visible))
-    if (hornet.isDefined) return 1.0
-    0.0
+    val hornets = enemy.units.count(u =>
+      ! u.unitClass.canMove
+      && ! u.is(Terran.Bunker) // Don't dissuade busting
+      && u.matchups.targets.nonEmpty
+      && (u.base.exists(_.owner.isEnemy) || u.zone.exit.exists(_.otherSideof(u.zone).bases.exists(_.owner.isEnemy)))
+      && (u.matchups.threatsInRange.isEmpty || ! u.visible))
+    val home = us.units.count(_.base.exists(_.owner.isUs))
+    return hornets.toDouble / Math.max(1, hornets + home)
   }
   def getTrappedness: Double = {
     PurpleMath.nanToZero(

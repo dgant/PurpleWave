@@ -49,7 +49,6 @@ object ProtossChoices {
     PvT2GateRangeExpand,
     PvT2GateObserver,
     PvT1015Expand,
-    PvT1015TripleExpand,
     PvT1015DT,
     PvTStove
   )

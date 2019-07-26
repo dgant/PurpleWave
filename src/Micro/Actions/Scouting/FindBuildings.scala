@@ -60,6 +60,7 @@ abstract class AbstractFindBuildings extends Action {
         }
       })
       .filter(With.grids.buildableTerrain.get)
+      .filter(tile => ! unit.matchups.threats.exists(_.inRangeToAttack(unit, tile.pixelCenter)))
   
     if (tilesToScout.isEmpty) return
   

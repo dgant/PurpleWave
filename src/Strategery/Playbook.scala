@@ -48,24 +48,28 @@ class EmptyPlaybook {
 object StrategyGroups {
   val disabled = Vector[Strategy](
     WorkerRush,
+
+    CarriersWithNoDefense,
+
     TvEWorkerRushLiftoff,
     TvR1Rax,
     TvZProxy8Fact,
     TvZ2RaxNuke,
+
+    PvROpenZZCore,
+    PvE3BaseIslandCarrier,
+    PvT1GateRobo,
     PvTProxyDarkTemplar,
     PvP2Gate1012,
+    PvP1GateReaverExpand,
+    PvZLateGameCarrier, // Needs island tech
+    PvZMidgame4Gate2Archon,
+    PvZMidgameNeoNeoBisu,
+
     ZvTProxyHatchZerglings,
     ZvTProxyHatchHydras,
     ZvTProxyHatchSunkens,
-    PvZLateGameCarrier, // Needs island tech
-    CarriersWithNoDefense,
     ZvZ5PoolSunkens,
-    PvROpenZZCore,
-    PvP1GateReaverExpand,
-    PvT1GateRobo,
-    PvE3BaseIslandCarrier,
-    PvZMidgame4Gate2Archon,
-    PvZMidgameNeoNeoBisu
   )
 }
 
@@ -79,7 +83,7 @@ class CIGPlaybook extends PurpleWavePlaybook {
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(ZvP2HatchMuta) // Seq(ZvE9Pool2HatchSpeed)
+  override lazy val forced: Seq[Strategy] = Seq(PvT1015Expand, PvT3BaseCarrier) // Seq(ZvE9Pool2HatchSpeed)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
   override def respectOpponent: Boolean = false
   override def respectMap: Boolean = false

@@ -17,7 +17,7 @@ import Planning.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchCustom, UnitMatchOr, UnitMatchSiegeTank, UnitMatchWarriors}
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Protoss.{PvT1015DT, PvT1015Expand, PvT1015TripleExpand, PvTStove}
+import Strategery.Strategies.Protoss.{PvT1015DT, PvT1015Expand, PvTStove}
 
 object PvTIdeas {
   
@@ -45,7 +45,6 @@ object PvTIdeas {
     new If(
       new Or(
         new Employing(PvT1015Expand),
-        new Employing(PvT1015TripleExpand),
         new Employing(PvT1015DT),
         new Employing(PvTStove),
         new MiningBasesAtLeast(3),
@@ -72,7 +71,14 @@ object PvTIdeas {
       new If(
         new UnitsAtMost(5, UnitMatchWarriors),
         new CancelIncomplete(Protoss.Nexus)),
-      new CapGasWorkersAt(2),
+      new CapGasAt(50),
+      new If(
+        new UnitsAtLeast(10, Protoss.Probe),
+        new CapGasWorkersAt(2),
+        new If(
+          new UnitsAtLeast(7, Protoss.Probe),
+          new CapGasWorkersAt(1),
+          new CapGasWorkersAt(0))),
       new Pump(Protoss.Dragoon, 3),
       new Pump(Protoss.Zealot, 3),
       new BuildOrder(
@@ -190,12 +196,7 @@ object PvTIdeas {
     new If(
       new UnitsAtLeast(18, UnitMatchWarriors),
       new Pump(Protoss.Observer, 3),
-      new If(
-        new UnitsAtLeast(12, UnitMatchWarriors),
-        new Pump(Protoss.Observer, 2),
-        new If(
-          new UnitsAtLeast(3, UnitMatchWarriors),
-          new Pump(Protoss.Observer, 1)))))
+      new Pump(Protoss.Observer, 2)))
 
   class TrainReavers extends Parallel(
     new PumpRatio(Protoss.Reaver, 0, 6, Seq(

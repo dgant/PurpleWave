@@ -37,6 +37,7 @@ object KeyboardCommands {
 
   private var breakpointFodder = 1
   def breakpoint() {
+    val selected = With.units.ours.find(_.selected)
     breakpointFodder = -breakpointFodder
   }
 

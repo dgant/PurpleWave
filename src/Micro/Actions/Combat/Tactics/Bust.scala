@@ -3,10 +3,14 @@ package Micro.Actions.Combat.Tactics
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.Pixel
+import Mathematics.PurpleMath
 import Micro.Actions.Action
+import Micro.Actions.Combat.Decisionmaking.Engage
 import Micro.Actions.Combat.Techniques.Avoid
+import Micro.Actions.Commands.Attack
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.ByOption
 import bwapi.Race
 
 object Bust extends Action {
@@ -38,10 +42,10 @@ object Bust extends Action {
     && With.self.hasUpgrade(Protoss.DragoonRange)
     && unit.matchups.threats.forall(threat => safeFromThreat(unit, threat, unit.pixelCenter))
     && unit.matchups.targets.exists(bunker =>
-        (bunker.visible || With.grids.altitudeBonus.get(unit.tileIncludingCenter) == With.grids.altitudeBonus.get(bunker.tileIncludingCenter))
+        (bunker.visible || bunker.altitudeBonus <= unit.altitudeBonus)
         && bunker.aliveAndComplete
-        && ! bunker.player.hasUpgrade(Terran.MarineRange)
         && bunker.is(Terran.Bunker)
+        && ! bunker.player.hasUpgrade(Terran.MarineRange)
         && unit.matchups.threats.forall(threat =>
           safeFromThreat(
             unit,
@@ -52,12 +56,25 @@ object Bust extends Action {
   override protected def perform(unit: FriendlyUnitInfo) {
     // Goal: Take down the bunker. Don't take any damage from it.
     // If we're getting shot at by the bunker, back off.
-    val bunkers = unit.matchups.threats.filter(_.is(Terran.Bunker))
+    lazy val bunkers = unit.matchups.threats.filter(_.is(Terran.Bunker))
+    lazy val repairers = bunkers.flatMap(_.matchups.repairers).distinct
+    lazy val goons = unit.matchups.allies.filter(u => u.is(Protoss.Dragoon) && u.matchups.targetsInRange.exists(_.is(Terran.Bunker)))
+
+    if (unit.readyForAttackOrder
+      && unit.matchups.targetsInRange.exists(_.is(Terran.Bunker))
+      && goons.length >= 6
+      && repairers.nonEmpty) {
+      unit.agent.toAttack = Some(repairers.minBy(_.pixelDistanceCenter(PurpleMath.centroid(goons.map(_.pixelCenter)))))
+      Attack.delegate(unit)
+    }
+
     if (With.framesSince(unit.lastFrameTakingDamage) < GameTime(0, 1)()) {
       Avoid.delegate(unit)
     }
-    else if (unit.matchups.targetsInRange.nonEmpty) {
+    else if (unit.matchups.targetsInRange.exists(_.canAttack(unit))) {
       With.commander.hold(unit)
     }
+    unit.agent.toAttack = ByOption.minBy(unit.matchups.threats)(_.pixelDistanceEdge(unit))
+    Engage.delegate(unit)
   }
 }

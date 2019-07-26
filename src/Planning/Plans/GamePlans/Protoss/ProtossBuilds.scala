@@ -254,12 +254,6 @@ object ProtossBuilds {
     Get(19,  Protoss.Probe),
     Get(2,   Protoss.Nexus)
   )
-
-  val PvT1015GateGoonExpand = PvT1015GateGoon ++ Vector[BuildRequest] (
-    Get(5,   Protoss.Dragoon),
-    Get(2,   Protoss.Nexus),
-    Get(20,  Protoss.Probe)
-  )
   
   val PvT12Nexus_2Gate = Vector[BuildRequest] (
     Get(8,   Protoss.Probe),

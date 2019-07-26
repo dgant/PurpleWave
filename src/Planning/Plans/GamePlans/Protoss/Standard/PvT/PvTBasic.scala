@@ -8,12 +8,13 @@ import Planning.Plans.Army.{Aggression, Attack, EjectScout, Hunt}
 import Planning.Plans.Compound.{Or, Parallel, _}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Enemy, PumpRatio, UpgradeContinuously}
+import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.Plans.Scouting.{MonitorBases, Scout, ScoutCleared, ScoutOn}
-import Planning.Predicates.Compound.{And, Check, Latch, Not}
+import Planning.Predicates.Compound._
+import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.{Employing, EnemyIsRandom, EnemyStrategy}
@@ -112,8 +113,8 @@ class PvTBasic extends GameplanTemplate {
             new BuildOrder(ProtossBuilds.PvTDTExpand_WithCitadel: _*),
             new BuildOrder(ProtossBuilds.PvTDTExpand_WithoutCitadel: _*)))))))
 
-  class EmployingTwoBase    extends Employing(PvT2BaseCarrier, PvT2BaseArbiter)
-  class EmployingThreeBase  extends Employing(PvT3BaseCarrier, PvT3BaseArbiter)
+  class EmployingThreeBase  extends Or(new Sticky(new MiningBasesAtLeast(3)), new Employing(PvT3BaseCarrier, PvT3BaseArbiter))
+  class EmployingTwoBase    extends Not(new EmployingThreeBase)
   class CarriersCountered   extends Check(() => With.units.countEnemy(Terran.Goliath) > Math.max(10, With.units.countOurs(Protoss.Interceptor) / 3))
   class EmployingCarriers   extends And(new Employing(PvT2BaseCarrier, PvT3BaseCarrier), new Not(new CarriersCountered))
   class EmployingArbiters   extends Or(new  Employing(PvT2BaseArbiter, PvT3BaseArbiter), new CarriersCountered)
@@ -257,11 +258,15 @@ class PvTBasic extends GameplanTemplate {
   class TechToCarriers extends Parallel(
     new If(
       new BasesAtLeast(3),
-      new Build(
-        Get(Protoss.Stargate),
-        Get(Protoss.CitadelOfAdun),
-        Get(Protoss.FleetBeacon),
-        Get(Protoss.ZealotSpeed)),
+      new Parallel(
+        new Build(
+          Get(Protoss.Stargate),
+          Get(Protoss.CitadelOfAdun),
+          Get(Protoss.FleetBeacon),
+          Get(Protoss.ZealotSpeed)),
+        new If(
+          new GasAtLeast(1200),
+          new Build(Get(Protoss.TemplarArchives)))),
       new Build(
         Get(Protoss.Stargate),
         Get(Protoss.FleetBeacon))),
@@ -292,18 +297,25 @@ class PvTBasic extends GameplanTemplate {
 
   override val buildPlans = Vector(
     new If(
-      new And(
-        new GasForUpgrade(Protoss.DragoonRange),
-        new UnitsAtLeast(1, Protoss.Dragoon),
-        new BasesAtMost(1)),
+      new GasCapsUnset,
       new If(
-        new Employing(PvT21Nexus, PvT28Nexus),
-        new CapGasWorkersAt(1),
+        new And(
+          new GasForUpgrade(Protoss.DragoonRange),
+          new UnitsAtLeast(1, Protoss.Dragoon),
+          new BasesAtMost(1)),
         new If(
-          new Employing(PvT1015Expand, PvT2GateRangeExpand),
-          new CapGasWorkersAt(2)))),
+          new Employing(PvT21Nexus, PvT28Nexus),
+          new CapGasWorkersAt(1),
+          new If(
+            new Employing(PvT1015Expand, PvT2GateRangeExpand),
+            new CapGasWorkersAt(2))))),
 
-    new MonitorBases(Protoss.Observer),
+    new If(
+      new Or(
+        new UnitsAtLeast(2, Protoss.Observer, complete = true),
+        new Not(new EnemyHasShownWraithCloak),
+        new Not(new EnemyHasShown(Terran.SpiderMine))),
+      new MonitorBases(Protoss.Observer)),
     new EjectScout,
     new BasicOpening,
     new RequireMiningBases(2),

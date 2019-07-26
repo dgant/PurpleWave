@@ -254,7 +254,7 @@ class ZvP2HatchMuta extends GameplanTemplate {
             new UpgradeContinuously(Zerg.AirDamage))),
         new Pump(Zerg.Mutalisk))),
     
-    new If(buildPlans
+    new If(
       new ShouldDoSpeedlingAllIn,
       new DoSpeedlingAllIn),
     

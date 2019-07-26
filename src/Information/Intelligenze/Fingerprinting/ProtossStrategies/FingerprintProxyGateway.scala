@@ -8,9 +8,9 @@ import ProxyBwapi.Races.Protoss
 
 class FingerprintProxyGateway extends FingerprintAnd(
   new FingerprintOr(
-    new FingerprintArrivesBy(Protoss.Zealot, GameTime(2, 45)),
-    new FingerprintArrivesBy(Protoss.Zealot, GameTime(3, 10), 2),
-    new FingerprintArrivesBy(Protoss.Zealot, GameTime(3, 45), 4),
+    new FingerprintArrivesBy(Protoss.Zealot, GameTime(2, 50)),
+    new FingerprintArrivesBy(Protoss.Zealot, GameTime(3, 15), 2),
+    new FingerprintArrivesBy(Protoss.Zealot, GameTime(3, 50), 4),
     new FingerprintCompleteBy(
       UnitMatchAnd(Protoss.Gateway, UnitMatchProxied),
       GameTime(5,  0)),

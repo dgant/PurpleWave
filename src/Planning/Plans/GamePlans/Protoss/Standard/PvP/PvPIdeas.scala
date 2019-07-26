@@ -46,7 +46,9 @@ object PvPIdeas {
         new Not(new EnemyHasShown(Protoss.DarkTemplar))),
       // Are we obligated to (or want to) move out?
       new Or(
-        new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
+        new And(
+          new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
+          new EnemiesAtMost(0, UnitMatchOr(Protoss.Observer, Protoss.PhotonCannon))),
         new EnemyStrategy(With.fingerprints.cannonRush),
         new MiningBasesAtLeast(3),
         new EnemyBasesAtLeast(3),

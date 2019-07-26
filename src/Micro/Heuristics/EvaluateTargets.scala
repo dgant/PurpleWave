@@ -1,12 +1,10 @@
-package Micro.Heuristics.Targeting2
+package Micro.Heuristics
 
-import Mathematics.Heuristics.HeuristicMathMultiplicative
-import Micro.Heuristics.Targeting.{TargetEvaluator, TargetHeuristicDetectors}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
-object EvaluateTargets2 extends TargetEvaluator {
+object EvaluateTargets extends {
   
   def best(attacker: FriendlyUnitInfo, targets: Iterable[UnitInfo]): Option[UnitInfo] = {
     val output = ByOption.maxBy(targets)(evaluate(attacker, _))
@@ -67,12 +65,6 @@ object EvaluateTargets2 extends TargetEvaluator {
       else
         0.0).getOrElse(0.0)
     output = Math.max(output, repairValue)
-
-    // Detector bonus
-    val isDetecting = TargetHeuristicDetectors.evaluate(attacker, target) > HeuristicMathMultiplicative.default
-    if (isDetecting) {
-      output *= 8.0
-    }
 
     // Free shots
     val freeShot = attacker.enemyRangeGrid.get(attacker.pixelToFireAt(target).tileIncluding) == 0

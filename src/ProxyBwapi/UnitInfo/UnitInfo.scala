@@ -10,7 +10,7 @@ import Lifecycle.With
 import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.PurpleMath
-import Micro.Heuristics.Targeting2.EvaluateTargets2
+import Micro.Heuristics.EvaluateTargets
 import Micro.Matchups.MatchupAnalysis
 import Performance.Cache
 import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatcher}
@@ -151,8 +151,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     remainingTrainFrames
   ).max
 
-  val participatingInCombat = new Cache(() => EvaluateTargets2.participatingInCombat(this))
-  val baseTargetValue = new Cache(() => EvaluateTargets2.getTargetBaseValue(this))
+  val participatingInCombat = new Cache(() => EvaluateTargets.participatingInCombat(this))
+  val baseTargetValue = new Cache(() => EvaluateTargets.getTargetBaseValue(this))
   
   //////////////
   // Geometry //

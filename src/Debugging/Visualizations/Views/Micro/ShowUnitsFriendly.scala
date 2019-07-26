@@ -15,7 +15,7 @@ object ShowUnitsFriendly extends View {
   var showClient      : Boolean = true
   var showAction      : Boolean = true
   var showCommand     : Boolean = true
-  var showOrder       : Boolean = true
+  var showOrder       : Boolean = false
   var showTargets     : Boolean = true
   var showFormation   : Boolean = true
   var showRayPaths    : Boolean = false

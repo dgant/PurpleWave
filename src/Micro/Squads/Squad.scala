@@ -4,8 +4,11 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Squads.Goals.{GoalChill, SquadGoal}
+import Performance.Cache
 import Planning.Plan
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.CountMap
 
 trait SquadWithGoal {
   private var ourGoal: SquadGoal = _
@@ -24,6 +27,8 @@ class Squad(val client: Plan) extends SquadWithGoal {
   def units: Set[FriendlyUnitInfo] = With.squads.units(this)
   
   def update() {
+    age --= age.keys.filterNot(units.contains)
+    units.foreach(age.add(_, 1))
     goal.run()
   }
   
@@ -41,4 +46,10 @@ class Squad(val client: Plan) extends SquadWithGoal {
     else
       PurpleMath.centroid(units.map(_.pixelCenter))
   }
+
+  val age = new CountMap[FriendlyUnitInfo]
+  def leader(unitClass: UnitClass): Option[FriendlyUnitInfo] = leaders().get(unitClass)
+  private val leaders: Cache[Map[UnitClass, FriendlyUnitInfo]] = new Cache(() =>
+    units.toSeq.groupBy(_.unitClass).map(group => (group._1, group._2.maxBy(unit => age.getOrElse(unit, 0))))
+  )
 }

@@ -22,6 +22,7 @@ class Fingerprints {
       siegeExpand
       oneRaxFE
       fourteenCC
+      bio
     }
     if (With.enemies.exists(_.isUnknownOrProtoss)) {
       gatewayFirst
@@ -76,6 +77,7 @@ class Fingerprints {
   lazy val siegeExpand      = addFingerprint(new FingerprintSiegeExpand)
   lazy val oneRaxFE         = addFingerprint(new Fingerprint1RaxFE)
   lazy val fourteenCC       = addFingerprint(new Fingerprint14CC)
+  lazy val bio              = addFingerprint(new FingerprintBio)
 
   // Protoss
   lazy val gatewayFirst = addFingerprint(new FingerprintGatewayFirst)

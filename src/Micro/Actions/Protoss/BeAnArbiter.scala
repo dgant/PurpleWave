@@ -9,7 +9,7 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
-import Micro.Heuristics.Spells.TargetAOE
+import Micro.Heuristics.SpellTargetAOE
 import Planning.UnitMatchers.UnitMatchBuilding
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -50,7 +50,7 @@ object BeAnArbiter extends Action {
     }
 
     if (needUmbrella.nonEmpty && arbiter.battle.isDefined) {
-      val destination = TargetAOE.chooseTargetPixel(
+      val destination = SpellTargetAOE.chooseTargetPixel(
         arbiter,
         umbrellaSearchRadius,
         Protoss.Zealot.subjectiveValue,

@@ -3,6 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{PumpWorkers, UpgradeContinuously}
@@ -14,7 +15,7 @@ import Planning.Predicates.Economy.GasAtMost
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.UnitMatchers.{UnitMatchMobileDetectors, UnitMatchWarriors}
 import ProxyBwapi.Races.Protoss
 import Strategery.MapGroups
 import Strategery.Strategies.Protoss.{PvP2Gate1012Goon, PvP2GateDTExpand}
@@ -31,7 +32,11 @@ class PvPLateGame extends GameplanTemplate {
     new PumpWorkers(false, cap = 75))
   
   override def priorityAttackPlan: Plan = new PvPIdeas.AttackWithDarkTemplar
-  override val attackPlan: Plan = new PvPIdeas.AttackSafely
+  override val attackPlan: Plan = new Parallel(
+    new If(
+      new EnemiesAtMost(0, UnitMatchMobileDetectors),
+      new Attack(Protoss.DarkTemplar)),
+    new PvPIdeas.AttackSafely)
   override def archonPlan: Plan = new PvPIdeas.MeldArchonsPvP
 
   lazy val goGoonReaverCarrier = new Latch(

@@ -7,7 +7,8 @@ object ZergChoices {
   val zvr = Vector(
     ZvESparkle,
     ZvE4Pool,
-    ZvR9Pool
+    ZvR9Pool,
+    ZvE9Pool2HatchSpeed
   )
 
   val zvt = Vector(

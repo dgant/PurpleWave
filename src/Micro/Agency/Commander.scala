@@ -54,6 +54,7 @@ class Commander {
   def hold(unit: FriendlyUnitInfo) {
     if (unready(unit)) return
     if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
+    unit.agent.follow = follower => hold(follower)
     if (unit.moving && ! unit.holdingPosition) {
       unit.baseUnit.holdPosition()
       sleep(unit)
@@ -70,6 +71,8 @@ class Commander {
   def attack(unit: FriendlyUnitInfo, target: UnitInfo) {
     if (unready(unit)) return
     if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
+    unit.agent.follow = follower => attack(follower, target)
+
     if ( ! unit.readyForAttackOrder) { // Necessary or redundant?
       sleep(unit)
       return
@@ -117,7 +120,8 @@ class Commander {
     if ( ! alreadyAttackMovingThere || unit.seeminglyStuck) {
       unit.baseUnit.attack(destination.bwapi)
     }
-    
+
+    unit.agent.follow = follower => attackMove(follower, destination)
     sleepAttack(unit)
   }
   
@@ -125,7 +129,7 @@ class Commander {
     if (unready(unit)) return
     autoUnburrow(unit)
     unit.baseUnit.patrol(destination.bwapi)
-    
+    unit.agent.follow = follower => patrol(follower, destination)
     sleepAttack(unit)
   }
   
@@ -201,6 +205,7 @@ class Commander {
         unit.baseUnit.move(destination.bwapi)
       }
     }
+    unit.agent.follow = follower => move(follower, destination)
     sleep(unit)
   }
   
@@ -374,11 +379,13 @@ class Commander {
     if (unready(unit)) return
     unit.agent.lastCloak = With.frame
     unit.baseUnit.cloak()
+    unit.agent.follow = follower => cloak(follower, tech)
     sleep(unit)
   }
   
   def decloak(unit: FriendlyUnitInfo, tech: Tech) {
     if (unready(unit)) return
+    unit.agent.follow = follower => decloak(follower, tech)
     unit.baseUnit.decloak()
     sleep(unit)
   }
@@ -398,11 +405,6 @@ class Commander {
   def lift(unit: FriendlyUnitInfo) {
     if (unready(unit)) return
     unit.baseUnit.lift()
-    sleep(unit)
-  }
-  
-  def pass(unit: FriendlyUnitInfo) {
-    if (unready(unit)) return
     sleep(unit)
   }
 

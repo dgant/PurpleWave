@@ -18,8 +18,9 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
       estimationSimulationAttack
 
   lazy val terranBonus    : Double  =   0.2 * getTerranBonus
-  lazy val hysteresis     : Double  =   0.1 * getHysteresis
+  lazy val hysteresis     : Double  =   0.2 * getHysteresis
   lazy val turtleBonus    : Double  =   0.1 * getTurtleBonus
+  lazy val hornetBonus    : Double  =   0.3 * getHornetBonus
   lazy val siegeUrgency   : Double  = - 0.4 * getSiegeUrgency
   lazy val trappedness    : Double  = - 0.2 * getTrappedness
   lazy val ratioAttack    : Double  = transformTotalScore(estimationSimulationAttack.localBattleMetrics)
@@ -29,12 +30,19 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   lazy val shouldFight    : Boolean = ratioAttack > ratioTarget || ratioSnipe > ratioTarget
 
   def getTerranBonus: Double = {
-    if (enemy.centroid.zone.owner.isTerran && enemy.units.exists(_.unitClass.isSiegeTank)) 0.2 else 0.0
+    if (enemy.centroid.zone.owner.isTerran && enemy.units.exists(u => u.is(UnitMatchSiegeTank) && u.matchups.targets.nonEmpty)) 0.2 else 0.0
   }
   def getTurtleBonus: Double = {
-    val turrets = us.units.filter(u => ! u.canMove && u.canAttack)
+    // Should we turtle behind our defenses?
+    val turrets = us.units.view.filter(u => ! u.canMove && u.canAttack)
     if (turrets.isEmpty) return 0.0
     if (turrets.forall(t => t.matchups.targetsInRange.isEmpty && t.matchups.threatsInRange.isEmpty)) return 1.0
+    0.0
+  }
+  def getHornetBonus: Double = {
+    // Avoid poking at hornet nests
+    val hornet = enemy.units.find(u => ! u.unitClass.canMove && u.matchups.targets.nonEmpty && u.base.exists(_.owner.isEnemy) && (u.matchups.threatsInRange.isEmpty || ! u.visible))
+    if (hornet.isDefined) return 1.0
     0.0
   }
   def getTrappedness: Double = {

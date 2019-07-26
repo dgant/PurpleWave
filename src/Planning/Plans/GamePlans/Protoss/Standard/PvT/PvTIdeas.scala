@@ -13,7 +13,7 @@ import Planning.Plans.Macro.Protoss.MeldDarkArchons
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio}
+import Planning.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchCustom, UnitMatchOr, UnitMatchSiegeTank, UnitMatchWarriors}
 import ProxyBwapi.Races.{Protoss, Terran}
@@ -50,7 +50,7 @@ object PvTIdeas {
         new Employing(PvTStove),
         new MiningBasesAtLeast(3),
         new EnemyBasesAtLeast(2),
-        new EnemyBio,
+        new EnemyStrategy(With.fingerprints.bio),
         new Not(new EnemyHasShown(Terran.Vulture)),
         new UnitsAtLeast(12, UnitMatchWarriors, complete = true),
         new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true)),
@@ -207,7 +207,7 @@ object PvTIdeas {
       new PumpRatio(Protoss.Reaver, 1, 4, Seq(Friendly(Protoss.Shuttle, 0.5)))))
 
   class TrainHighTemplarAgainstBio extends If(
-    new EnemyBio,
+    new EnemyStrategy(With.fingerprints.bio),
     new PumpRatio(Protoss.HighTemplar, 1, 6, Seq(Enemy(Terran.Marine, 1.0/5.0))))
 
   class TrainScouts extends If(

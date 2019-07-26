@@ -4,7 +4,6 @@ import java.io.File
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Micro.Heuristics.Targeting.{EvaluateTargets, TargetEvaluator}
 
 class Configuration {
 
@@ -34,7 +33,6 @@ class Configuration {
   // Battles //
   /////////////
 
-  var targetEvaluator: TargetEvaluator = EvaluateTargets
   var enableMCRS                    = false
   var enableThreatAwarePathfinding  = false
   var avatarBattleDistancePixels    = 32.0 * 6.0

@@ -110,9 +110,11 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
 
     new If(
       new GoDT,
-      new Build(
+      new BuildOrder(
         Get(Protoss.CitadelOfAdun),
-        Get(Protoss.TemplarArchives))),
+        Get(Protoss.TemplarArchives),
+        Get(Protoss.ZealotSpeed),
+        Get(2, Protoss.DarkTemplar))),
 
     new If(
       new And(

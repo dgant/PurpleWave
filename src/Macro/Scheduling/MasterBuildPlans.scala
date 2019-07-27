@@ -2,7 +2,6 @@ package Macro.Scheduling
 
 import Lifecycle.With
 import Macro.Buildables.Buildable
-import Performance.Cache
 import Planning.Plan
 import Planning.Plans.Macro.Build._
 import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
@@ -14,25 +13,13 @@ class MasterBuildPlans {
   
   private val maxToFollow = 200
   
-  private val plans = new mutable.HashMap[Buildable, ListBuffer[Plan]]
-  private var queue: Iterable[Buildable] = Vector.empty
+  private val childrenByBuildable = new mutable.HashMap[Buildable, ListBuffer[Plan]]
+  private val childrenQueue: mutable.Queue[Plan] = mutable.Queue.empty
   
-  def getChildren: Iterable[Plan] = getChildrenCache()
-  private val getChildrenCache = new Cache(() => getChildrenRecalculate)
-  private def getChildrenRecalculate: Iterable[Plan] = {
-    val indexByBuild = new mutable.HashMap[Buildable, Int]
-    plans.keys.foreach(build => indexByBuild.put(build, 0))
-    queue.map(build => {
-      val output = plans(build)(indexByBuild(build))
-      indexByBuild(build) += 1
-      output
-    })
-  }
-  
-  def update(invoker: FollowBuildOrder) {
+  def getChildren: Seq[Plan] = childrenQueue
 
-    // Remove complete plans
-    plans.values.foreach(plans => {
+  def removeCompletedPlans(): Unit = {
+    childrenByBuildable.values.foreach(plans => {
       var i = 0
       while (i < plans.size) {
         val plan = plans(i)
@@ -44,30 +31,33 @@ class MasterBuildPlans {
           i += 1
         }
       }})
+  }
+  def update(invoker: FollowBuildOrder): Unit = {
 
-    // Add plans to match number of builds we need
-    queue = With.scheduler.queue.take(maxToFollow)
+    childrenQueue.clear()
+    removeCompletedPlans()
 
-    val buildsNeeded =
-      queue
-        .groupBy(buildable => buildable)
-        .map(buildable => (
-          buildable._1,
-          buildable._2.size))
+    // Recalculate the child plans
+    val buildablesUnplanned = With.scheduler.queue.take(maxToFollow)
+    val plansUnclaimed = new mutable.HashMap[Buildable, mutable.Queue[Plan]]()
+    childrenByBuildable.foreach(planPair => plansUnclaimed(planPair._1) = new mutable.Queue[Plan] ++ planPair._2)
 
-    buildsNeeded.keys.foreach(build => {
-      if ( ! plans.contains(build)) {
-        plans.put(build, new ListBuffer[Plan])
-      }
-      while (plans(build).size < buildsNeeded(build)) {
-        plans(build).append(buildPlan(build))
+    buildablesUnplanned.foreach(buildable => {
+      val existingPlans = plansUnclaimed.get(buildable)
+      if (existingPlans.exists(_.nonEmpty)) {
+        childrenQueue += existingPlans.get.dequeue()
+      } else {
+        val newPlan = makeBuildPlan(buildable)
+        if ( ! childrenByBuildable.contains(buildable)) {
+          childrenByBuildable(buildable) = new mutable.ListBuffer[Plan]
+        }
+        childrenByBuildable(buildable) += newPlan
+        childrenQueue += newPlan
       }
     })
-
-    getChildrenCache.invalidate()
   }
   
-  private def buildPlan(buildable: Buildable): Plan = {
+  private def makeBuildPlan(buildable: Buildable): Plan = {
     if (buildable.unitOption.nonEmpty) {
       val unitClass = buildable.unitOption.get
       if (unitClass.isAddon) {

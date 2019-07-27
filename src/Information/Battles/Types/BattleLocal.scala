@@ -5,7 +5,7 @@ import Information.Battles.Prediction.{LocalBattleMetrics, Prediction}
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Planning.UnitMatchers.UnitMatchSiegeTank
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
@@ -43,13 +43,12 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   def getHornetBonus: Double = {
     // Avoid poking at hornet nests
     val hornets = enemy.units.count(u =>
-      ! u.unitClass.canMove
-      && ! u.is(Terran.Bunker) // Don't dissuade busting
+      u.isSiegeTankSieged()
       && u.matchups.targets.nonEmpty
       && (u.base.exists(_.owner.isEnemy) || u.zone.exit.exists(_.otherSideof(u.zone).bases.exists(_.owner.isEnemy)))
       && (u.matchups.threatsInRange.isEmpty || ! u.visible))
     val home = us.units.count(_.base.exists(_.owner.isUs))
-    return hornets.toDouble / Math.max(1, hornets + home)
+    hornets.toDouble / Math.max(1, hornets + home)
   }
   def getTrappedness: Double = {
     PurpleMath.nanToZero(

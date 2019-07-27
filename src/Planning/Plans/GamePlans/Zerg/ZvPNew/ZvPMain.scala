@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvPNew
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.EjectScout
+import Planning.Plans.Army.{Aggression, EjectScout}
 import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
@@ -35,7 +35,7 @@ class ZvPMain extends GameplanTemplate {
   override def buildPlans: Seq[Plan] = Seq(
 
     new EjectScout,
-    new CapGasAt(800),
+    new CapGasAtRatioToMinerals(1.0, 300),
 
     new Pump(Zerg.Drone, 12),
     new Build(Get(Zerg.SpawningPool)),
@@ -52,9 +52,10 @@ class ZvPMain extends GameplanTemplate {
         new EnemiesAtMost(4, Protoss.PhotonCannon),
         new UnitsAtMost(4, Zerg.Hatchery))),
 
-      // Bust!
+      // Hydralisk Bust!
       new Parallel(
         new Pump(Zerg.Drone, 20),
+        new Aggression(1.2),
         new Build(
           Get(Zerg.HydraliskDen),
           Get(Zerg.HydraliskSpeed),
@@ -66,11 +67,12 @@ class ZvPMain extends GameplanTemplate {
         new Pump(Zerg.Drone),
         new Build(Get(5, Zerg.Hatchery))),
 
-      // Don't bust!
+      // Don't Hydralisk bust!
       new Parallel(
-        // If no Corsairs, abuse with Mutalisks
+        // Mutalisk bust!
         new If(
           new AttemptMutaliskBust,
+          new Aggression(1.2),
           new Parallel(
             new PumpRatio(Zerg.Extractor, 1, 3, Seq(Friendly(Zerg.Drone, 1/9.0))),
             new BuildOrder(

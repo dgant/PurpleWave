@@ -17,8 +17,9 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
     else
       estimationSimulationAttack
 
+  lazy val baseHysteresis : Double  = if (With.self.isZerg) 1.5 else 1.0
   lazy val terranBonus    : Double  =   0.2 * getTerranBonus
-  lazy val hysteresis     : Double  =   0.2 * getHysteresis
+  lazy val hysteresis     : Double  =   0.2 * getHysteresis * baseHysteresis
   lazy val turtleBonus    : Double  =   0.1 * getTurtleBonus
   lazy val hornetBonus    : Double  =   0.3 * getHornetBonus
   lazy val siegeUrgency   : Double  = - 0.5 * getSiegeUrgency

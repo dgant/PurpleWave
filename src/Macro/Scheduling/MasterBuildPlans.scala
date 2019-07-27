@@ -31,7 +31,7 @@ class MasterBuildPlans {
   
   def update(invoker: FollowBuildOrder) {
 
-    //Remove complete plans
+    // Remove complete plans
     plans.values.foreach(plans => {
       var i = 0
       while (i < plans.size) {
@@ -45,7 +45,7 @@ class MasterBuildPlans {
         }
       }})
 
-    //Add plans to match number of builds we need
+    // Add plans to match number of builds we need
     queue = With.scheduler.queue.take(maxToFollow)
 
     val buildsNeeded =

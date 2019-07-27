@@ -23,7 +23,6 @@ abstract class GameplanTemplate extends GameplanMode {
   val meldArchonsAt         : Int               = 40
   val removeMineralBlocksAt : Int               = 40
   def blueprints            : Seq[Blueprint]    = Seq.empty
-  val superSaturate         : Boolean           = false
   def buildOrder            : Seq[BuildRequest] = Vector.empty
   def emergencyPlans        : Seq[Plan]         = Vector.empty
   def buildPlans            : Seq[Plan]         = Vector.empty
@@ -32,7 +31,7 @@ abstract class GameplanTemplate extends GameplanMode {
   def archonPlan            : Plan              = new MeldArchons(meldArchonsAt)
   def buildOrderPlan        : Plan              = new BuildOrder(buildOrder: _*)
   def supplyPlan            : Plan              = new RequireSufficientSupply
-  def workerPlan            : Plan              = new If(new Not(new WeAreZerg), new PumpWorkers(superSaturate))
+  def workerPlan            : Plan              = new If(new Not(new WeAreZerg), new PumpWorkers)
   def scoutPlan             : Plan              = new ScoutAt(14)
   def scoutExposPlan        : Plan              = new If(new BasesAtLeast(2), new ScoutExpansionsAt(60))
   def yoloPlan              : Plan              = new If(new Check(() => With.yolo.active()), new Attack)

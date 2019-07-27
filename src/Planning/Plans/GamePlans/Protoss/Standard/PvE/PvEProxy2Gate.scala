@@ -31,7 +31,7 @@ class PvEProxy2Gate extends GameplanTemplate {
     new Not(new FoundEnemyBase),
     new ScoutOn(Protoss.Gateway, quantity = 2))
 
-  override def aggressionPlan: Plan = new Aggression(1.5)
+  override def aggressionPlan: Plan = new Aggression(1.25)
   override def workerPlan: Plan = NoPlan()
 
   override def priorityAttackPlan: Plan = new Parallel(

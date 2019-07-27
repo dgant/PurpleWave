@@ -28,6 +28,10 @@ object ZergChoices {
     ZvP3Hatch,
     ZvP6Hatch,
     ZvP2HatchMuta,
+
+    ZvP12Hatch,
+    ZvPOverpool,
+    ZvP9Pool
   )
 
   val zvz = Vector(

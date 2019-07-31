@@ -124,7 +124,7 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
         new Pump(Protoss.DarkTemplar, 4),
         new Pump(Protoss.Zealot),
         new Trigger(
-          new UnitsAtLeast(1, Protoss.TemplarArchives, complete = true),
+          new UnitsAtLeast(2, Protoss.DarkTemplar),
           new Build(Get(Protoss.DragoonRange))))),
 
     new FlipIf(

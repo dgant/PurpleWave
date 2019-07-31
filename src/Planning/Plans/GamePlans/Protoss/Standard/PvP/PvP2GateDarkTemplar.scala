@@ -103,12 +103,15 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
     Get(Protoss.Forge),
     Get(25,  Protoss.Probe),
     Get(5,   Protoss.Pylon))
-  
+
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvPIdeas.ReactToGasSteal,
     new PvPIdeas.ReactToCannonRush,
-    new PvPIdeas.ReactToProxyGateways,
-    new PvPIdeas.ReactTo2Gate,
+    new If(
+      new UnitsAtMost(0, Protoss.CitadelOfAdun),
+      new Parallel(
+        new PvPIdeas.ReactToProxyGateways,
+        new PvPIdeas.ReactTo2Gate)),
     new PvPIdeas.ReactToFFE,
     new ScoutForCannonRush
   )

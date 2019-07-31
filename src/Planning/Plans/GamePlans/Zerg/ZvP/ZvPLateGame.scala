@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Zerg.ZvPNew
+package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
@@ -7,7 +7,6 @@ import Planning.Plan
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -83,7 +82,7 @@ class ZvPLateGame extends GameplanTemplate {
     new If(
       new GoZerglingDefiler,
       new Parallel(
-        new Pump(Zerg.Defiler, 3),
+        // new Pump(Zerg.Defiler, 3),
         new PumpRatio(Zerg.Extractor, 0, 99, Seq(Friendly(Zerg.Drone, 0.1))),
         new PumpRatio(Zerg.Zergling, 24, 60, Seq(Enemy(UnitMatchWarriors, 7.0))),
         new Build(
@@ -92,8 +91,8 @@ class ZvPLateGame extends GameplanTemplate {
           Get(Zerg.Hive),
           Get(Zerg.GroundArmor),
           Get(Zerg.ZerglingAttackSpeed),
-          Get(Zerg.DefilerMound),
-          Get(Zerg.Consume),
+          // Get(Zerg.DefilerMound),
+          // Get(Zerg.Consume),
           Get(Zerg.GroundMeleeDamage),
           Get(2, Zerg.EvolutionChamber)),
         new UpgradeContinuously(Zerg.GroundArmor),
@@ -140,7 +139,7 @@ class ZvPLateGame extends GameplanTemplate {
     new RequireMiningBases(4),
     new Build(Get(6, Zerg.Hatchery)),
     new RequireMiningBases(5),
-    new Build(Get(9, Zerg.Hatchery)),
+    new Pump(Zerg.Hatchery, 9, maximumConcurrently = 2),
     new BuildGasPumps,
     new If(
       new Or(new GoZerglingDefiler, new GoZerglingMutalisk),

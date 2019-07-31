@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Zerg.ZvPNew
+package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
@@ -7,14 +7,13 @@ import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.DefendAgainstProxy
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
-import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Zerg.BuildSunkensAtNatural
 import Planning.Plans.Scouting.{ScoutAt, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
-import Planning.Predicates.Milestones.{BasesAtLeast, GasForUpgrade, UnitsAtLeast}
+import Planning.Predicates.Milestones.{BasesAtLeast, GasForUpgrade, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
@@ -38,7 +37,6 @@ class ZvPOpening extends GameplanTemplate {
         new ScoutOn(Zerg.SpawningPool))))
 
   override def emergencyPlans: Seq[Plan] = Seq(
-    new ZergReactionVsWorkerRush,
     new DefendAgainstWorkerRush,
     new DefendAgainstProxy
   )
@@ -69,7 +67,10 @@ class ZvPOpening extends GameplanTemplate {
 
   override def buildPlans: Seq[Plan] = Seq(
     new EjectScout,
-    new CapGasAt(150),
+    new If(
+      new UnitsAtMost(0, Zerg.Spire),
+      new CapGasAt(150),
+      new CapGasAtRatioToMinerals(1.0, 300)),
 
     new Pump(Zerg.SunkenColony),
     new If(
@@ -78,13 +79,15 @@ class ZvPOpening extends GameplanTemplate {
         new Build(Get(Zerg.SpawningPool)),
         new BuildSunkensAtNatural(2),
         new BuildOrder(Get(8, Zerg.Zergling)))),
+    new If(
+      new UnitsAtLeast(1, Zerg.Spire),
+      new BuildOrder(Get(8, Zerg.Mutalisk))),
 
     new Trigger(
       new Or(
         new Employing(ZvP12Hatch),
         new UnitsAtLeast(1, Zerg.SpawningPool, complete = true)),
       new Parallel(
-
         new If(
           new Employing(ZvPOverpool),
           new If(
@@ -158,8 +161,25 @@ class ZvPOpening extends GameplanTemplate {
           new PumpRatio(Zerg.Drone, 9, 15, Seq(Flat(9), Friendly(Zerg.SunkenColony, 2))),
           new PumpRatio(Zerg.Zergling, 6, 18, Seq(Enemy(UnitMatchWarriors, 4.5))),
           new Pump(Zerg.Drone, 13),
+          new If(
+            new EnemyStrategy(With.fingerprints.proxyGateway),
+            new Parallel(
+              new Build(
+                Get(Zerg.Extractor),
+                Get(Zerg.ZerglingSpeed)),
+              new Pump(Zerg.Zergling))),
           new RequireMiningBases(3),
-          new Pump(Zerg.Drone)))))),
-      ))
+          new Pump(Zerg.Drone, 18),
+          new Pump(Zerg.Mutalisk),
+          new Pump(Zerg.Drone),
+          // In case we get stuck in our base, add Mutalisks
+          new Build(
+            Get(Zerg.Lair),
+            Get(Zerg.Spire)),
+          new If(
+            new UnitsAtLeast(1, Zerg.Spire),
+            new Build(Get(2, Zerg.Extractor)))
+        ))))))
+    )
   )
 }

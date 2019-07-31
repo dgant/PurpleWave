@@ -22,13 +22,14 @@ object ZergChoices {
     ZvT1HatchLurker,
     ZvT2HatchLurker,
     ZvT13PoolMuta,
+
+    ZvT12Hatch13Pool,
+    ZvT12Hatch11Pool,
+    ZvT9Pool
   )
 
   val zvp = Vector(
-    ZvP3Hatch,
-    ZvP6Hatch,
     ZvP2HatchMuta,
-
     ZvP12Hatch,
     ZvPOverpool,
     ZvP9Pool

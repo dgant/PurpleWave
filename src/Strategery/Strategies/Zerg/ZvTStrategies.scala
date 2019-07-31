@@ -1,9 +1,9 @@
 package Strategery.Strategies.Zerg
 
 import Planning.Plan
-import Planning.Plans.GamePlans.Zerg.ZvT.{ZvT13PoolMuta, ZvT1HatchHydra, ZvT1HatchLurker, ZvT2HatchLingBustMuta, ZvT2HatchLurker, ZvT3HatchLing, ZvT7Pool, ZvTProxyHatch}
-import Strategery.{Heartbreak, StarCraftMap}
+import Planning.Plans.GamePlans.Zerg.ZvT.{ZvT13PoolMuta, ZvT1HatchHydra, ZvT1HatchLurker, ZvT2HatchLingBustMuta, ZvT2HatchLurker, ZvT3HatchLing, ZvTProxyHatch}
 import Strategery.Strategies.Strategy
+import Strategery.{Heartbreak, StarCraftMap}
 import bwapi.Race
 
 abstract class ZvTStrategy extends Strategy {
@@ -24,9 +24,6 @@ object ZvT1HatchLurker extends ZvTStrategy {
 object ZvT2HatchLingBustMuta extends ZvTStrategy {
   override def gameplan: Option[Plan] = Some(new ZvT2HatchLingBustMuta)
 }
-object ZvT7Pool extends ZvTStrategy {
-  override def gameplan: Option[Plan] = Some(new ZvT7Pool)
-}
 object ZvT3HatchLing extends ZvTStrategy {
   override def gameplan: Option[Plan] = Some(new ZvT3HatchLing)
   override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Heartbreak)
@@ -46,3 +43,11 @@ object ZvTProxyHatchZerglings extends ZvTStrategy {
   override def gameplan: Option[Plan] = Some(new ZvTProxyHatch)
   override def startLocationsMax: Int = 2
 }
+
+abstract class ZvTOpening extends ZvTStrategy
+
+object ZvT7Pool extends ZvTOpening
+object ZvT12Hatch13Pool extends ZvTOpening
+object ZvT12Hatch11Pool extends ZvTOpening
+object ZvT9Pool extends ZvTOpening
+

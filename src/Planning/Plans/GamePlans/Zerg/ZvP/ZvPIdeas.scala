@@ -116,6 +116,7 @@ object ZvPIdeas {
   class AttackPlans extends Parallel(
     new Hunt(Zerg.Scourge, Protoss.Shuttle),
     new Hunt(Zerg.Scourge, Protoss.Corsair),
+    new Hunt(Zerg.Scourge, Protoss.Stargate),
     new Hunt(Zerg.Mutalisk, Protoss.HighTemplar),
     new Attack
   )

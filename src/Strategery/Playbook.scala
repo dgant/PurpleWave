@@ -83,7 +83,7 @@ class CIGPlaybook extends PurpleWavePlaybook {
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(ZvP12Hatch, ZvPStandard)
+  override lazy val forced: Seq[Strategy] = Seq(ZvT12Hatch13Pool)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
   override def respectOpponent: Boolean = false
   override def respectMap: Boolean = false

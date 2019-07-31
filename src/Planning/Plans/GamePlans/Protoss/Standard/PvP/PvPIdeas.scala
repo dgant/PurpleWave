@@ -192,11 +192,11 @@ object PvPIdeas {
       Get(2,  Protoss.Zealot),
       Get(2, Protoss.Gateway),
       Get(17, Protoss.Probe),
-      Get(Protoss.Dragoon),
+      Get(3, Protoss.Zealot),
       Get(18, Protoss.Probe),
       Get(3, Protoss.Pylon),
       Get(19, Protoss.Probe),
-      Get(3, Protoss.Dragoon),
+      Get(4, Protoss.Zealot),
       Get(20, Protoss.Probe)),
   )
 
@@ -265,7 +265,7 @@ object PvPIdeas {
           new UnitsAtMost(7, UnitMatchWarriors),
           new Not(new SafeAtHome)),
         new Parallel(
-          new BuildOrder(Get(3, Protoss.Zealot)),
+          new BuildOrder(Get(7, Protoss.Zealot)),
           new TrainArmy
         ))),
   )

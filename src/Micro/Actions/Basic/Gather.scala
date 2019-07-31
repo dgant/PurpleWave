@@ -38,9 +38,10 @@ object Gather extends Action {
           && target.base.exists(_.units.exists(resource => resource.resourcesLeft > 0 && target.pixelDistanceCenter(resource) < With.configuration.workerDefenseRadiusPixels)))
 
       if (unit.canBurrow
-        && unit.matchups.threatsInRange.exists( ! _.isAny(UnitMatchWorkers, Terran.Wraith, Protoss.Arbiter, Protoss.Scout))
+        && unit.matchups.enemies.exists(enemy =>
+        ! enemy.isAny(UnitMatchWorkers, Terran.Wraith, Protoss.Arbiter, Protoss.Scout)
+        && enemy.pixelDistanceEdge(unit) < enemy.pixelRangeAgainst(unit) + 32)
         && ! With.grids.enemyDetection.isDetected(unit.tileIncludingCenter)) {
-        Potshot.delegate(unit)
         With.commander.burrow(unit)
       }
 

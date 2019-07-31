@@ -22,9 +22,9 @@ trait MatchingRatio { def quantity: Double }
 case class Flat(value: Double) extends MatchingRatio {
   def quantity: Double = value
 }
-case class Enemy(enemyMatcher: UnitMatcher, ratio: Double = 1.0) extends MatchingRatio {
+case class Enemy(enemyMatcher: UnitMatcher, ratio: Double) extends MatchingRatio {
   def quantity: Double = With.units.countEnemy(enemyMatcher) * ratio
 }
-case class Friendly(unitMatcher: UnitMatcher, ratio: Double = 1.0) extends MatchingRatio {
+case class Friendly(unitMatcher: UnitMatcher, ratio: Double) extends MatchingRatio {
   def quantity: Double = With.units.countOurs(unitMatcher) * ratio
 }

@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Army.{AllIn, Attack}
 import Planning.Plans.Basic.Write
 import Planning.Plans.Compound.{If, Parallel, Trigger}
@@ -14,12 +14,16 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireBases
 import Planning.Plans.Scouting.{FoundEnemyBase, Scout}
 import Planning.Predicates.Compound.{And, Check, Not}
-import Planning.Predicates.Milestones.{EnemiesAtLeast, GasForUpgrade, UnitsAtLeast}
-import Planning.Predicates.Strategy.StartPositionsAtLeast
+import Planning.Predicates.Milestones.{BasesAtLeast, EnemiesAtLeast, GasForUpgrade, UnitsAtLeast}
+import Planning.Predicates.Strategy.{Employing, StartPositionsAtLeast}
 import Planning.UnitMatchers.UnitMatchOr
 import ProxyBwapi.Races.{Terran, Zerg}
+import Strategery.Strategies.Zerg.ZvT7Pool
 
 class ZvT7Pool extends GameplanTemplate {
+
+  override val activationCriteria: Predicate = new Employing(ZvT7Pool)
+  override val completionCriteria: Predicate = new BasesAtLeast(2)
 
   override def attackPlan: Plan = new Attack
 
@@ -62,6 +66,6 @@ class ZvT7Pool extends GameplanTemplate {
       new Build(Get(Zerg.ZerglingSpeed))),
     new Pump(Zerg.Drone, 6),
     new Pump(Zerg.Zergling),
-    new RequireBases(3)
+    new RequireBases(2)
   )
 }

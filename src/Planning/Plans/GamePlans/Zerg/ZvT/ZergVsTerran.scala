@@ -11,5 +11,10 @@ class ZergVsTerran extends ModalGameplan(
   new ZvT2HatchLurker,
   new ZvT3HatchLing,
   new ZvT13PoolMuta,
-  new ZvTProxyHatch
+  //new ZvTProxyHatch,
+
+  new ZvT7Pool,
+  new ZvTOpening,
+  new ZvTMidgame,
+  new ZvTLateGame
 )

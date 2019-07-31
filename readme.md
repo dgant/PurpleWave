@@ -8,7 +8,7 @@ PurpleWave is a *StarCraft: Brood War* AI written in Scala. It can play all race
 
 PurpleWave has won:
  * 1st Place in the [2018 SSCAIT](https://sscaitournament.com/index.php?action=2018)
- * 1st Place in the [2018 AIST1](https://sites.google.com/view/aistarcrafttournament/aist-s1-2018)
+ * 1st Place in the [2018 AIST1](https://sites.google.com/view/aistarcrafttournament/aist-s1)
  * 2nd Place in the [2017 AIIDE StarCraft AI Competition](http://www.cs.mun.ca/~dchurchill/starcraftaicomp/2017/)
  * 2nd Place in the [2018 IEEE CIG StarCraft AI Competition](https://cilab.sejong.ac.kr/sc_competition2018/)
  * 3rd Place in the [2017 IEEE CIG StarCraft AI Competition](https://cilab.sejong.ac.kr/sc_competition/?p=1090)

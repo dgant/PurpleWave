@@ -154,7 +154,7 @@ class ZvP2HatchMuta extends GameplanTemplate {
   
   override def emergencyPlans: Seq[Plan] = Vector(
     new Pump(Zerg.SunkenColony),
-    new PumpRatio(Zerg.Drone, 9, 18, Seq(Friendly(UnitMatchAnd(Zerg.SunkenColony, UnitMatchComplete)))),
+    new PumpRatio(Zerg.Drone, 0, 18, Seq(Flat(9), Friendly(UnitMatchAnd(Zerg.SunkenColony, UnitMatchComplete), 3))),
     new ReactiveSunkensVsZealots,
     new ZergReactionVsWorkerRush
   )

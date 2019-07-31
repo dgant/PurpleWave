@@ -67,3 +67,20 @@ object PvPProxy2Gate extends PvPOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.twoGate, With.fingerprints.proxyGateway, With.fingerprints.forgeFe)
 }
+
+// TODO -- unfinished
+
+object PvP1ZealotExpand extends PvPOpening {
+  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(With.fingerprints.robo)
+}
+object PvPObsReaverExpand extends PvPOpening {
+  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
+}
+object PvPReaverExpand extends PvPOpening {
+}
+object PvPReaverPush extends PvPOpening {
+  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
+}
+object PvPObsReaverPush extends PvPOpening {
+
+}

@@ -6,7 +6,18 @@
     <option name="optimiseBytecode" value="true" />
     <option name="explainTypeErrors" value="true" />
     <parameters>
-      <parameter value="-optimise" />
+      <parameter value="-opt:unreachable-code" />
+      <parameter value="-opt:simplify-jumps" />
+      <parameter value="-opt:compact-locals" />
+      <parameter value="-opt:copy-propagation" />
+      <parameter value="-opt:redundant-casts" />
+      <parameter value="-opt:box-unbox" />
+      <parameter value="-opt:nullness-tracking" />
+      <parameter value="-opt:closure-invocations" />
+      <parameter value="-opt:inline" />
+      <parameter value="-opt:l:default,inline" />
+      <parameter value="'-opt-inline-from:**'" />
+      <parameter value="-opt-warnings" />
     </parameters>
   </component>
 </project>

@@ -10,11 +10,11 @@ object ShowGrids extends View {
 
   lazy val basePaths: Seq[Seq[Tile]] = With.geography.bases.map(_.townHallTile).flatMap(a =>
       With.geography.bases.map(_.townHallTile).filterNot(_ == a).flatMap(b =>
-        With.paths.aStarBasic(a, b).tiles))
+        With.paths.profileDistance(a, b).find.tiles))
 
   lazy val startPaths: Seq[Seq[Tile]] = With.geography.startLocations.flatMap(a =>
       With.geography.startLocations.filterNot(_ == a).flatMap(b =>
-        With.paths.aStarBasic(a, b).tiles))
+        With.paths.profileDistance(a, b).find.tiles))
 
   override def renderMap() {
     val zone = With.units.ours.find(_.selected).map(_.zone).getOrElse(With.viewport.center.tileIncluding.zone)

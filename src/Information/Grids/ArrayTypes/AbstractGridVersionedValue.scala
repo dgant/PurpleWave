@@ -3,7 +3,7 @@ package Information.Grids.ArrayTypes
 import Mathematics.Points.Tile
 
 abstract class AbstractGridVersionedValue[T] extends AbstractGridArray[T] {
-  private val framestamps = new AbstractGridVersioned {
+  val framestamps: AbstractGridVersioned = new AbstractGridVersioned {
     override protected def updateTimestamps(): Unit = {}
   }
 

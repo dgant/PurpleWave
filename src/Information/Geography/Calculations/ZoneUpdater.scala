@@ -1,5 +1,6 @@
 package Information.Geography.Calculations
 
+import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Types.Zone
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
@@ -89,10 +90,11 @@ object ZoneUpdater {
       && exitBuildings.exists(_.is(Terran.Barracks))
       && canaryTileInside.exists(tileInside =>
           canaryTileOutside.exists(tileOutside =>
-            ! With.paths.aStarBasic(
-              tileInside,
-              tileOutside,
-              100).pathExists)))
+            ! PathfindProfile(
+                tileInside,
+                Some(tileOutside),
+                maximumCost = Some(100))
+              .find.pathExists)))
   }
   
   

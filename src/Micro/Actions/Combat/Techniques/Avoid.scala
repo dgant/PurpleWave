@@ -68,7 +68,12 @@ object Avoid extends ActionTechnique {
 
     if (! unit.readyForMicro) return
 
-    val path = With.paths.aStarThreatAware(unit, if (unit.agent.origin.zone == unit.zone) None else Some(unit.agent.origin.tileIncluding))
+    val path = With.paths.profileThreatAware(
+      start = unit.tileIncludingCenter,
+      end = if (unit.agent.origin.zone == unit.zone) None else Some(unit.agent.origin.tileIncluding),
+      goalDistance = Int(3 + unit.matchups.framesOfEntanglement * unit.topSpeed), // TODO: How far? Reuse for the path length check below?
+      flying = unit.flying).find
+
       if (path.pathExists && path.tiles.exists(_.size > 3)) {
         // Path tiles are in REVERSE
         if (ShowUnitsFriendly.inUse && With.visualization.map) {

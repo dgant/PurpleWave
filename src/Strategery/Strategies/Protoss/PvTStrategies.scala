@@ -5,7 +5,7 @@ import Lifecycle.With
 import Planning.Plan
 import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTReaverCarrierCheese
 import Strategery.Strategies.Strategy
-import Strategery.{BlueStorm, MapGroups, StarCraftMap}
+import Strategery.{BlueStorm, Destination, MapGroups, StarCraftMap}
 import bwapi.Race
 
 abstract class PvTStrategy extends Strategy {
@@ -41,7 +41,7 @@ object PvT25BaseCarrier extends PvTBasicOpener {
   ))
 }
 object PvT1015Expand extends PvTBasicOpener {
-  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
+  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits :+ Destination
   override def entranceRamped: Boolean = false
 
   override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
@@ -50,7 +50,7 @@ object PvT1015Expand extends PvTBasicOpener {
   )
 }
 object PvT1015DT extends PvTStrategy {
-  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
+  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits :+ Destination
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     Vector(
       PvT2BaseArbiter,

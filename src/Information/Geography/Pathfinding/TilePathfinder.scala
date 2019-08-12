@@ -19,13 +19,14 @@ trait TilePathfinder {
   def profileDistance(start: Tile, end: Tile): PathfindProfile = {
     PathfindProfile(start, Some(end))
   }
-  def profileThreatAware(start: Tile, end: Option[Tile], goalDistance: Int, flying: Boolean): PathfindProfile = {
+  def profileThreatAware(start: Tile, end: Option[Tile], maximumLength: Int, flying: Boolean): PathfindProfile = {
     PathfindProfile(
       start,
       end,
       flying = flying,
+      maximumLength = Some(maximumLength),
       costOccupancy = 1f,
-      costThreat = 2f)
+      costThreat = 4f)
   }
 
   private val _stampDefault: Long = Long.MinValue
@@ -36,6 +37,7 @@ trait TilePathfinder {
     val i: Int = tile.i
     var _visitedStamp         : Long  = _stampDefault
     var _enqueuedStamp        : Long  = _stampDefault
+    var _cameFromStamp        : Long  = _stampDefault
     var _cameFrom             : Tile  = _
     var _costFromStart        : Float = _
     var _costToEndFloor       : Float = _
@@ -47,6 +49,7 @@ trait TilePathfinder {
       _enqueuedStamp = _stampCurrent
     }
     @inline def setCameFrom(value: Tile) {
+      _cameFromStamp = _stampCurrent
       _cameFrom = value
     }
     @inline def setCostFromStart(value: Float) {
@@ -60,11 +63,11 @@ trait TilePathfinder {
     }
     @inline def visited         : Boolean           =     _visitedStamp   == _stampCurrent
     @inline def enqueued        : Boolean           =     _enqueuedStamp  == _stampCurrent
+    @inline def cameFrom        : Option[Tile]      = if (_cameFromStamp == _stampCurrent) Some(_cameFrom) else None
+    @inline def cameFromState   : Option[TileState] = cameFrom.map(t => tiles(t.i))
     @inline def costFromStart   : Float             = if (enqueued) _costFromStart    else Float.MaxValue
     @inline def costToEndFloor  : Float             = if (enqueued) _costToEndFloor   else Float.MaxValue
     @inline def pathLength      : Float             = if (enqueued) _pathLength       else Float.MaxValue
-    @inline def cameFrom        : Option[Tile]      = if (enqueued) Some(_cameFrom)   else None
-    @inline def cameFromState   : Option[TileState] = cameFrom.map(t => tiles(t.i))
   }
 
   private def startNextSearch() {
@@ -135,6 +138,8 @@ trait TilePathfinder {
     startNextSearch()
     val horizon = new mutable.PriorityQueue[TileState]()(Ordering.by(t => -t.costToEndFloor))
     val startTileState = tiles(startTile.i)
+    startTileState.setVisited()
+    startTileState.setEnqueued()
     startTileState.setCostFromStart(costFromStart(profile, startTile, threatGrid))
     startTileState.setCostToEndFloor(costToEndFloor(profile, startTile, threatGrid))
     startTileState.setPathLength(1)

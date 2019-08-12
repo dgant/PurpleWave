@@ -105,7 +105,7 @@ object Avoid extends ActionTechnique {
     val path = With.paths.profileThreatAware(
       start = unit.tileIncludingCenter,
       end = end,
-      goalDistance = maximumDistance,
+      maximumLength = maximumDistance,
       flying = unit.flying || unit.transport.nonEmpty).find
 
     if (path.pathExists && path.tiles.exists(_.size > 3)) {

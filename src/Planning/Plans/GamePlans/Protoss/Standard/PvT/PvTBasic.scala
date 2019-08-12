@@ -10,7 +10,7 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.Plans.Scouting.{MonitorBases, Scout, ScoutCleared, ScoutOn}
 import Planning.Predicates.Compound._
@@ -144,9 +144,15 @@ class PvTBasic extends GameplanTemplate {
     new ReadyForThirdBase,
     new SafeToMoveOut,
     new Or(
+      new UnitsAtLeast(3, Protoss.Nexus, complete = true),
       new And(new EnemyStrategy(With.fingerprints.bio), new PreparedForBio),
       new Latch(new UnitsAtLeast(2, Protoss.Arbiter, complete = true)),
       new Latch(new UnitsAtLeast(6, Protoss.Carrier, complete = true))))
+
+  class ReadyForFifthBase extends And(
+    new ReadyForFourthBase,
+    new SafeToMoveOut,
+    new UnitsAtLeast(4, Protoss.Nexus, complete = true))
 
   class BasicOpening extends Parallel(
     new BuildOrder(
@@ -320,8 +326,9 @@ class PvTBasic extends GameplanTemplate {
     new BasicOpening,
     new RequireMiningBases(2),
 
-    new If(new ReadyForThirdBase,   new RequireMiningBases(3)),
-    new If(new ReadyForFourthBase,  new RequireMiningBases(4)),
+    new If(new ReadyForThirdBase,   new RequireBases(3)),
+    new If(new ReadyForFourthBase,  new Parallel(new RequireMiningBases(3), new RequireBases(4))),
+    new If(new ReadyForFifthBase,   new Parallel(new RequireMiningBases(4), new RequireBases(5))),
     new If(new Or(new EmployingTwoBase, new BasesAtLeast(3), new UnitsAtLeast(4, Protoss.Gateway)), new BuildGasPumps),
     new If(new UnitsAtLeast(3, Protoss.Gateway), new BuildCannonsAtExpansions(2)),
     new If(new BasesAtLeast(3), new BuildCannonsAtNatural(1)),

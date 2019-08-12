@@ -10,53 +10,53 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   
   def this(position: Position) = this(position.getX, position.getY)
   
-  def bwapi: Position = new Position(x, y)
+  @inline final def bwapi: Position = new Position(x, y)
   
-  def valid: Boolean = {
+  @inline final def valid: Boolean = {
     x >= 0 &&
     y >= 0 &&
     x < With.mapPixelWidth &&
     y < With.mapPixelHeight
   }
-  def pixelDistanceFromEdge: Int = {
+  @inline final def pixelDistanceFromEdge: Int = {
     var min = x
     if (y < min) min = y
     if (With.mapPixelWidth  - x < min) min = With.mapPixelWidth - x
     if (With.mapPixelHeight - y < min) min = With.mapPixelHeight - y
     min
   }
-  def +(other: Pixel): Pixel = add(other)
-  def -(other: Pixel): Pixel = subtract(other)
-  def add(dx: Int, dy: Int): Pixel = {
+  @inline final def +(other: Pixel): Pixel = add(other)
+  @inline final def -(other: Pixel): Pixel = subtract(other)
+  @inline final def add(dx: Int, dy: Int): Pixel = {
     Pixel(x + dx, y + dy)
   }
-  def add(point: Point): Pixel = {
+  @inline final def add(point: Point): Pixel = {
     add(point.x, point.y)
   }
-  def add(pixel: Pixel): Pixel = {
+  @inline final def add(pixel: Pixel): Pixel = {
     add(pixel.x, pixel.y)
   }
-  def subtract(dx: Int, dy: Int): Pixel = {
+  @inline final def subtract(dx: Int, dy: Int): Pixel = {
     add(-dx, -dy)
   }
-  def subtract(otherPixel: Pixel): Pixel = {
+  @inline final def subtract(otherPixel: Pixel): Pixel = {
     subtract(otherPixel.x, otherPixel.y)
   }
-  def multiply(scale: Int): Pixel = {
+  @inline final def multiply(scale: Int): Pixel = {
     Pixel(scale * x, scale * y)
   }
-  def multiply(scale: Double): Pixel = {
+  @inline final def multiply(scale: Double): Pixel = {
     Pixel((scale * x).toInt, (scale * y).toInt)
   }
-  def divide(scale: Int): Pixel = {
+  @inline final def divide(scale: Int): Pixel = {
     Pixel(x / scale, y / scale)
   }
-  def clamp: Pixel = {
+  @inline final def clamp: Pixel = {
     Pixel(
       PurpleMath.clamp(x, 0, With.mapPixelWidth),
       PurpleMath.clamp(y, 0, With.mapPixelHeight))
   }
-  def project(destination: Pixel, pixels: Double): Pixel = {
+  @inline final def project(destination: Pixel, pixels: Double): Pixel = {
     if (pixels == 0) return this
     val distance = pixelDistance(destination)
     if (distance == 0) return this
@@ -64,54 +64,54 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     delta.multiply(pixels/distance).add(this)
   }
   private val radiansOverDegrees = 2.0 * Math.PI / 256.0
-  def radiateRadians(angleRadians: Double, pixels: Double): Pixel = {
+  @inline final def radiateRadians(angleRadians: Double, pixels: Double): Pixel = {
     add(
       (pixels * Math.cos(angleRadians)).toInt,
       (pixels * Math.sin(angleRadians)).toInt)
   }
-  def radiate256Degrees(angleDegrees: Double, pixels: Double): Pixel = {
+  @inline final def radiate256Degrees(angleDegrees: Double, pixels: Double): Pixel = {
     // According to JohnJ, Brood War understands 256 angles
     // The BWAPI interface reduces this to a double (radians) with the cartesian origin (pointing right)
     // We'll use 256 (to match the engine behavior) and the BWAPI origin
     radiateRadians(radiansOverDegrees * angleDegrees, pixels)
   }
-  def degreesTo(other: Pixel): Double = {
+  @inline final def degreesTo(other: Pixel): Double = {
     radiansTo(other) / radiansOverDegrees
   }
-  def radiansTo(other: Pixel): Double = {
+  @inline final def radiansTo(other: Pixel): Double = {
     PurpleMath.atan2(other.y - y, other.x - x)
   }
-  def midpoint(pixel: Pixel): Pixel = {
+  @inline final def midpoint(pixel: Pixel): Pixel = {
     add(pixel).divide(2)
   }
-  def pixelDistance(pixel: Pixel): Double = PurpleMath.broodWarDistance(x, y, pixel.x, pixel.y)
-  def pixelDistanceSquared(pixel: Pixel): Int = {
+  @inline final def pixelDistance(pixel: Pixel): Double = PurpleMath.broodWarDistance(x, y, pixel.x, pixel.y)
+  @inline final def pixelDistanceSquared(pixel: Pixel): Int = {
     val dx = x - pixel.x
     val dy = y - pixel.y
     dx * dx + dy * dy
   }
-  def tileIncluding: Tile = {
+  @inline final def tileIncluding: Tile = {
     Tile(x/32, y/32)
   }
-  def tileNearest: Tile = {
+  @inline final def tileNearest: Tile = {
     add(16, 16).tileIncluding
   }
-  def toPoint: Point = {
+  @inline final def toPoint: Point = {
     Point(x, y)
   }
-  def zone: Zone = {
+  @inline final def zone: Zone = {
     With.geography.zoneByTile(tileIncluding)
   }
-  def base: Option[Base] = {
+  @inline final def base: Option[Base] = {
     With.geography.baseByTile(tileIncluding)
   }
-  def groundPixels(other: Tile): Double = {
+  @inline final def groundPixels(other: Tile): Double = {
     With.paths.groundPixels(this, other.pixelCenter)
   }
-  def groundPixels(other: Pixel): Double = {
+  @inline final def groundPixels(other: Pixel): Double = {
     With.paths.groundPixels(this, other)
   }
-  def nearestWalkableTerrain: Tile = {
+  @inline final def nearestWalkableTerrain: Tile = {
     val ti = tileIncluding
     if (ti.valid && With.grids.walkableTerrain.values(ti.i)) return ti
     val tx = x / 32

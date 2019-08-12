@@ -10,7 +10,9 @@ object Follow extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     ! unit.matchups.threats.exists(_.unitClass.dealsRadialSplashDamage)
     && unit.isAny(
+      Terran.Battlecruiser,
       Terran.Wraith,
+      Terran.Valkyrie,
       Protoss.Carrier,
       Protoss.Corsair,
       Protoss.Scout,

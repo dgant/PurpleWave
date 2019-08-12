@@ -16,4 +16,6 @@ class GridWalkableTerrain extends AbstractGridBoolean {
         .map(new Tile(i).topLeftWalkPixel.add)
         .count(walkTile => With.game.isWalkable(walkTile.bwapi)) >= walkableGoal))
   }
+
+  @inline final def getUnchecked(i: Int): Boolean = values(i)
 }

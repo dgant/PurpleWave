@@ -93,7 +93,7 @@ object ZoneUpdater {
             ! PathfindProfile(
                 tileInside,
                 Some(tileOutside),
-                maximumCost = Some(100))
+                maximumLength = Some(100))
               .find.pathExists)))
   }
   

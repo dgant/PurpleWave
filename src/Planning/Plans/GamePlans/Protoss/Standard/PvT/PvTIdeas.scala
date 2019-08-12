@@ -114,7 +114,17 @@ object PvTIdeas {
         new PumpWorkers(cap = 12)),
       new If(
         new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
-        new Pump(Protoss.Dragoon),
+        new Parallel(
+          new If(
+            new UnitsAtLeast(21, Protoss.Probe),
+            new FloorGasWorkersAt(3),
+            new If(
+              new UnitsAtLeast(21, Protoss.Probe),
+              new FloorGasWorkersAt(2))),
+          new Pump(Protoss.Dragoon),
+          new If(
+            new Not(new Latch(new GasPumpsAtLeast(2))),
+            new Pump(Protoss.Zealot))),
         new Pump(Protoss.Zealot, 7)),
       new Build(
         Get(Protoss.Pylon),

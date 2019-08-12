@@ -55,7 +55,7 @@ class Commander {
     if (unready(unit)) return
     if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
     unit.agent.follow = follower => hold(follower)
-    if (unit.moving && ! unit.holdingPosition) {
+    if (unit.velocity.lengthSquared > 0 && ! unit.holdingPosition) {
       unit.baseUnit.holdPosition()
       sleep(unit)
     }

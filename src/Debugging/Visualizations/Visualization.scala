@@ -29,7 +29,10 @@ class Visualization {
     ShowExplosions,
     ShowStatus,
     //ShowBattle,
-    ShowPerformanceSummary
+    ShowPerformanceSummary,
+    ShowZones,
+    ShowZonePathDemo
+
   )
 
   var enabled   : Boolean = _

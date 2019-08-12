@@ -7,16 +7,25 @@ abstract class AbstractGridVersionedValue[T] extends AbstractGridArray[T] {
     override protected def updateTimestamps(): Unit = {}
   }
 
-  override def get(i: Int): T = {
+  @inline final override def get(i: Int): T = {
     if (framestamps.isSet(i)) super.get(i) else defaultValue
   }
 
-  override def set(i: Int, value: T): Unit = {
+  @inline final def getUnchecked(i: Int): T = {
+    if (framestamps.isSet(i)) values(i) else defaultValue
+  }
+
+  @inline final override def set(i: Int, value: T): Unit = {
     framestamps.stamp(i)
     super.set(i, value)
   }
-  protected def isSet(i: Int): Boolean = framestamps.isSet(i)
-  protected def isSet(tile: Tile): Boolean = framestamps.isSet(tile)
+  @inline final def setUnchecked(i: Int, value: T): Unit = {
+    framestamps.stamp(i)
+    values(i) = value
+  }
+
+  @inline final protected def isSet(i: Int): Boolean = framestamps.isSet(i)
+  @inline final protected def isSet(tile: Tile): Boolean = framestamps.isSet(tile)
 
   override def update(): Unit = {
     reset()

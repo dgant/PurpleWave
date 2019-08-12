@@ -8,15 +8,17 @@ import scala.util.Random
 object PurpleMath {
   
   val twoPI: Double = 2 * Math.PI
-  
-  def mean(values: Traversable[Double]): Double = {
+  val sqrt2: Double = Math.sqrt(2)
+  val sqrt2f: Float = sqrt2.toFloat
+
+  @inline final def mean(values: Traversable[Double]): Double = {
     if (values.isEmpty)
       0.0
     else
       values.sum / values.size
   }
   
-  def centroid(values: Iterable[Pixel]): Pixel = {
+  @inline final def centroid(values: Iterable[Pixel]): Pixel = {
     if (values.isEmpty)
       SpecificPoints.middle
     else
@@ -25,7 +27,7 @@ object PurpleMath {
         values.view.map(_.y).sum / values.size)
   }
 
-  def centroidTiles(values: Iterable[Tile]): Tile = {
+  @inline final def centroidTiles(values: Iterable[Tile]): Tile = {
     if (values.isEmpty)
       SpecificPoints.tileMiddle
     else
@@ -34,60 +36,60 @@ object PurpleMath {
         values.view.map(_.y).sum / values.size)
   }
 
-  def nanToN(value: Double, n: Double): Double = {
+  @inline final def nanToN(value: Double, n: Double): Double = {
     if (value.isNaN || value.isInfinity) n else value
   }
 
-  def nanToZero(value: Double): Double = nanToN(value, 0)
-  def nanToOne(value: Double): Double = nanToN(value, 1)
-  def nanToInfinity(value: Double): Double = nanToN(value, Double.PositiveInfinity)
+  @inline final def nanToZero(value: Double): Double = nanToN(value, 0)
+  @inline final def nanToOne(value: Double): Double = nanToN(value, 1)
+  @inline final def nanToInfinity(value: Double): Double = nanToN(value, Double.PositiveInfinity)
   
-  def clampRatio(value: Double, ratio: Double): Double = clamp(value, ratio, 1.0 / ratio)
+  @inline final def clampRatio(value: Double, ratio: Double): Double = clamp(value, ratio, 1.0 / ratio)
   
-  def clamp(value: Int, bound0: Int, bound1: Int): Int = {
+  @inline final def clamp(value: Int, bound0: Int, bound1: Int): Int = {
     val min = Math.min(bound0, bound1)
     val max = Math.max(bound0, bound1)
     Math.min(max, Math.max(min, value))
   }
   
-  def clamp(value: Double, value1: Double, value2: Double): Double = {
+  @inline final def clamp(value: Double, value1: Double, value2: Double): Double = {
     val min = Math.min(value1, value2)
     val max = Math.max(value1, value2)
     Math.min(max, Math.max(value, min))
   }
   
-  def clampToOne(value: Double): Double = clamp(value, 0.0, 1.0)
+  @inline final def clampToOne(value: Double): Double = clamp(value, 0.0, 1.0)
   
-  def signum(int: Int)        : Int = if (int == 0) 0 else if (int < 0) -1 else 1
-  def signum(double: Double)  : Int = if (double == 0.0) 0 else if (double < 0) -1 else 1
-  def forcedSignum(int: Int)  : Int = if (int < 0) -1 else 1
+  @inline final def signum(int: Int)        : Int = if (int == 0) 0 else if (int < 0) -1 else 1
+  @inline final def signum(double: Double)  : Int = if (double == 0.0) 0 else if (double < 0) -1 else 1
+  @inline final def forcedSignum(int: Int)  : Int = if (int < 0) -1 else 1
   
   val twoPi: Double = Math.PI * 2.0
-  def normalize0To2Pi(angleRadians: Double): Double = {
+  @inline final def normalize0To2Pi(angleRadians: Double): Double = {
     if      (angleRadians < 0) normalize0To2Pi(angleRadians + twoPi)
     else if (angleRadians > twoPi) normalize0To2Pi(angleRadians - twoPi)
     else    angleRadians
   }
-  def normalizeAroundZero(angleRadians: Double): Double = {
+  @inline final def normalizeAroundZero(angleRadians: Double): Double = {
     if      (angleRadians < -Math.PI) normalize0To2Pi(angleRadians + twoPi)
     else if (angleRadians > Math.PI) normalize0To2Pi(angleRadians - twoPi)
     else    angleRadians
   }
-  def radiansTo(from: Double, to: Double): Double = {
+  @inline final def radiansTo(from: Double, to: Double): Double = {
     val distance = normalize0To2Pi(to - from)
     if (distance > Math.PI) distance - twoPI else distance
   }
 
-  def geometricMean(values: Iterable[Double]): Double = {
+  @inline final def geometricMean(values: Iterable[Double]): Double = {
     if (values.isEmpty) return 1.0
     Math.pow(values.product, 1.0 / values.size)
   }
 
-  def fromBoolean(value: Boolean): Int = if (value) 1 else 0
-  def toBoolean(value: Int): Boolean = value != 0
+  @inline final def fromBoolean(value: Boolean): Int = if (value) 1 else 0
+  @inline final def toBoolean(value: Int): Boolean = value != 0
 
-  def broodWarDistance(a: AbstractPoint, b: AbstractPoint): Double = broodWarDistance(a.x, a.y, b.x, b.y)
-  def broodWarDistance(x0: Int, y0: Int, x1: Int, y1: Int): Double = {
+  @inline final def broodWarDistance(a: AbstractPoint, b: AbstractPoint): Double = broodWarDistance(a.x, a.y, b.x, b.y)
+  @inline final def broodWarDistance(x0: Int, y0: Int, x1: Int, y1: Int): Double = {
     val dx = Math.abs(x0 - x1)
     val dy = Math.abs(y0 - y1)
     val d   = Math.min(dx, dy)
@@ -97,7 +99,7 @@ object PurpleMath {
     }
     D - D / 16 + d * 3 / 8 - D / 64 + d * 3 / 256
   }
-  def broodWarDistanceDouble(x0: Double, y0: Double, x1: Double, y1: Double): Double = {
+  @inline final def broodWarDistanceDouble(x0: Double, y0: Double, x1: Double, y1: Double): Double = {
     val dx = Math.abs(x0 - x1)
     val dy = Math.abs(y0 - y1)
     val d   = Math.min(dx, dy)
@@ -107,7 +109,7 @@ object PurpleMath {
     }
     D - D / 16 + d * 3 / 8 - D / 64 + d * 3 / 256
   }
-  def broodWarDistanceBox(
+  @inline final def broodWarDistanceBox(
     p00: AbstractPoint,
     p01: AbstractPoint,
     p10: AbstractPoint,
@@ -117,7 +119,7 @@ object PurpleMath {
       p01.x, p01.y,
       p10.x, p10.y,
       p11.x, p11.y)
-  def broodWarDistanceBox(
+  @inline final def broodWarDistanceBox(
     x00: Int, y00: Int,
     x01: Int, y01: Int,
     x10: Int, y10: Int,
@@ -147,7 +149,7 @@ object PurpleMath {
     0
   }
 
-  def distanceFromLineSegment(
+  @inline final def distanceFromLineSegment(
     point: AbstractPoint,
     segmentStart: AbstractPoint,
     segmentEnd: AbstractPoint)
@@ -193,21 +195,21 @@ object PurpleMath {
     Math.sqrt(dx * dx + dy * dy)
   }
 
-  def fastSigmoid(x: Double): Double = {
+  @inline final def fastSigmoid(x: Double): Double = {
     0.5 + fastTanh(x) / 2.0
   }
 
-  def fastTanh(x: Double): Double = {
+  @inline final def fastTanh(x: Double): Double = {
     if (x.isPosInfinity) return 1.0
     if (x.isNegInfinity) return -1.0
     x / (1.0 + Math.abs(x))
   }
 
-  def atan2(y: Double, x: Double): Double = {
+  @inline final def atan2(y: Double, x: Double): Double = {
    normalize0To2Pi(Math.atan2(y, x))
   }
 
-  def weightedMean(values: Seq[(Double, Double)]): Double = {
+  @inline final def weightedMean(values: Seq[(Double, Double)]): Double = {
     var numerator = 0.0
     var denominator = 0.0
     for (value <- values) {
@@ -217,16 +219,16 @@ object PurpleMath {
     numerator / denominator
   }
 
-  def softmax[T](values: Seq[T], extract: (T) => Double): Seq[(T, Double)] = {
+  @inline final def softmax[T](values: Seq[T], extract: (T) => Double): Seq[(T, Double)] = {
     val sum = values.map(value => Math.pow(Math.E, extract(value))).sum
     values.map(value => (value, Math.pow(Math.E, extract(value)) / sum))
   }
 
-  def sample[T](seq: Seq[T]): T = {
+  @inline final def sample[T](seq: Seq[T]): T = {
     seq(Random.nextInt(seq.size))
   }
 
-  def sampleWeighted[T](seq: Seq[T], extract: (T) => Double): Option[T] = {
+  @inline final def sampleWeighted[T](seq: Seq[T], extract: (T) => Double): Option[T] = {
     if (seq.isEmpty) return None
     val denominator = seq.map(extract).sum
     val numerator   = Random.nextDouble() * denominator
@@ -244,9 +246,17 @@ object PurpleMath {
     Some(seq.maxBy(extract))
   }
 
-  def softmaxSample[T](seq: Seq[T], extract: (T) => Double): Option[T] = {
+  @inline final def softmaxSample[T](seq: Seq[T], extract: (T) => Double): Option[T] = {
     val softmaxed: Seq[(T, Double)] = softmax(seq, extract)
     sampleWeighted[(T, Double)](softmaxed, v => v._2).map(_._1)
+  }
+
+  // Gaussian expansion of N + (N-1) + (N-2) + ... + 1
+  @inline final def gaussianExpansion(k: Int): Int = {
+    if (k % 2 == 0)
+      (k + 1) * (k / 2)
+    else
+      (k + 2) * (k / 2) + 1
   }
 
 }

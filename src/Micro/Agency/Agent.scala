@@ -1,7 +1,7 @@
 
 package Micro.Agency
 
-import Information.Geography.Pathfinding.Types.ZonePath
+import Information.Geography.Pathfinding.Types.{TilePath, ZonePath}
 import Lifecycle.With
 import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, PixelRay, Tile}
@@ -123,8 +123,8 @@ class Agent(val unit: FriendlyUnitInfo) {
   var lastClient  : Option[Plan]    = None
   var lastAction  : Option[Action]  = None
 
-  var movingTo: Option[Pixel] = None
-  
+  var movingTo        : Option[Pixel]         = None
+  var path            : Option[TilePath]      = None
   var pathsAll        : Traversable[PixelRay] = Seq.empty
   var pathsTruncated  : Traversable[PixelRay] = Seq.empty
   var pathsAcceptable : Traversable[PixelRay] = Seq.empty
@@ -155,6 +155,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     forces.clear()
     resistances.clear()
     movingTo            = None
+    path                = None
     pathsAll            = Seq.empty
     pathsTruncated      = Seq.empty
     pathsAcceptable     = Seq.empty

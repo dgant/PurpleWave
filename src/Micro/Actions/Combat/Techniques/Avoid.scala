@@ -1,8 +1,7 @@
 package Micro.Actions.Combat.Techniques
 
-import Debugging.Visualizations.Rendering.DrawMap
-import Debugging.Visualizations.Views.Micro.ShowUnitsFriendly
-import Debugging.Visualizations.{Colors, ForceColors}
+import Debugging.Visualizations.ForceColors
+import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Combat.Maneuvering.DownhillPathfinder
@@ -12,6 +11,7 @@ import Micro.Decisions.Potential
 import Planning.UnitMatchers.UnitMatchSiegeTank
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.TakeN
 
 object Avoid extends ActionTechnique {
 
@@ -99,24 +99,26 @@ object Avoid extends ActionTechnique {
 
     if (! unit.readyForMicro) return
 
-    val end = if (desireProfile.home > 0) Some(unit.agent.origin.tileIncluding) else None
     val maximumDistance = 3 + Math.max(0, unit.matchups.framesOfEntanglement * unit.topSpeed + unit.effectiveRangePixels).toInt / 32
 
-    val path = With.paths.profileThreatAware(
-      start = unit.tileIncludingCenter,
-      end = end,
-      maximumLength = maximumDistance,
-      flying = unit.flying || unit.transport.nonEmpty).find
+    val profile = new PathfindProfile(unit.tileIncludingCenter)
+    //profile.end           = if (desireProfile.home > 0) Some(unit.agent.origin.tileIncluding) else None
+    profile.maximumLength = Some(maximumDistance)
+    profile.flying        = unit.flying || unit.transport.nonEmpty
+    profile.costOccupancy = 0 //1
+    profile.costThreat    = 0 //4
+    profile.repulsors     =
+      TakeN
+      .by(10, unit.matchups.threats.view)(Ordering.by(t => unit.matchups.framesOfEntanglementPerThreat(t)))
+      .map(t => PathfindRepulsor(
+        t.pixelCenter,
+        t.dpfOnNextHitAgainst(unit),
+        64 + t.pixelRangeAgainst(unit)))
+      .toIndexedSeq
+    val path = profile.find
 
     if (path.pathExists && path.tiles.exists(_.size > 3)) {
-      if (ShowUnitsFriendly.inUse && With.visualization.map) {
-        for (i <- 0 until path.tiles.get.size - 1) {
-          DrawMap.arrow(
-            path.tiles.get(i).pixelCenter,
-            path.tiles.get(i + 1).pixelCenter,
-            Colors.White)
-        }
-      }
+      unit.agent.path = Some(path)
       path.tiles.get.foreach(With.coordinator.gridPathOccupancy.addUnit(unit, _))
       unit.agent.toTravel = Some(path.tiles.get.take(8).last.pixelCenter)
       Move.delegate(unit)

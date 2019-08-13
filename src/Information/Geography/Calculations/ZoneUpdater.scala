@@ -90,9 +90,9 @@ object ZoneUpdater {
       && exitBuildings.exists(_.is(Terran.Barracks))
       && canaryTileInside.exists(tileInside =>
           canaryTileOutside.exists(tileOutside =>
-            ! PathfindProfile(
+            ! new PathfindProfile(
                 tileInside,
-                Some(tileOutside),
+                end = Some(tileOutside),
                 maximumLength = Some(100))
               .find.pathExists)))
   }

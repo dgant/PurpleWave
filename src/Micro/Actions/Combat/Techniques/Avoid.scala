@@ -102,12 +102,14 @@ object Avoid extends ActionTechnique {
     val maximumDistance = 3 + Math.max(0, unit.matchups.framesOfEntanglement * unit.topSpeed + unit.effectiveRangePixels).toInt / 32
 
     val profile = new PathfindProfile(unit.tileIncludingCenter)
-    profile.end           = if (desireProfile.home > 0) Some(unit.agent.origin.tileIncluding) else None
-    profile.maximumLength = Some(maximumDistance)
-    profile.flying        = unit.flying || unit.transport.nonEmpty
-    profile.costOccupancy = 1
-    profile.costThreat    = 3
-    profile.repulsors     =
+    profile.end             = if (desireProfile.home > 0) Some(unit.agent.origin.tileIncluding) else None
+    profile.maximumLength   = Some(maximumDistance)
+    profile.flying          = unit.flying || unit.transport.nonEmpty
+    profile.allowGroundDist = true
+    profile.costOccupancy   = 1f
+    profile.costThreat      = 0f
+    profile.costRepulsion   = 3f
+    profile.repulsors       =
       TakeN
       .by(10, unit.matchups.threats.view)(Ordering.by(t => unit.matchups.framesOfEntanglementPerThreat(t)))
       .map(t => PathfindRepulsor(
@@ -115,6 +117,7 @@ object Avoid extends ActionTechnique {
         t.dpfOnNextHitAgainst(unit),
         64 + t.pixelRangeAgainst(unit)))
       .toIndexedSeq
+    profile.unit = Some(unit)
     val path = profile.find
 
     if (path.pathExists && path.tiles.exists(_.size > 3)) {

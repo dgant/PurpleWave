@@ -125,6 +125,7 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   var movingTo        : Option[Pixel]         = None
   var path            : Option[TilePath]      = None
+  var pathBranches    : Seq[(Pixel, Pixel)]   = Seq.empty
   var pathsAll        : Traversable[PixelRay] = Seq.empty
   var pathsTruncated  : Traversable[PixelRay] = Seq.empty
   var pathsAcceptable : Traversable[PixelRay] = Seq.empty
@@ -156,6 +157,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     resistances.clear()
     movingTo            = None
     path                = None
+    pathBranches        = Seq.empty
     pathsAll            = Seq.empty
     pathsTruncated      = Seq.empty
     pathsAcceptable     = Seq.empty

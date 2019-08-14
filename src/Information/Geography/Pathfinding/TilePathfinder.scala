@@ -1,5 +1,6 @@
 package Information.Geography.Pathfinding
 
+import Debugging.Visualizations.Views.Micro.ShowUnitsFriendly
 import Information.Geography.Pathfinding.Types.TilePath
 import Information.Grids.Combat.AbstractGridEnemyRange
 import Lifecycle.With
@@ -11,10 +12,6 @@ import scala.collection.mutable.ArrayBuffer
 import scala.language.postfixOps
 
 trait TilePathfinder {
-  
-  ////////////////////////////////////////////////////////////
-  // From the old GroundPathFinder -- this can be split out //
-  ////////////////////////////////////////////////////////////
 
   def profileDistance(start: Tile, end: Tile): PathfindProfile = new PathfindProfile(start, Some(end))
 
@@ -50,11 +47,10 @@ trait TilePathfinder {
     }
     @inline def enqueued        : Boolean           = _enqueuedStamp  == _stampCurrent
     @inline def cameFrom        : Option[Tile]      = if (enqueued && _cameFrom.i != i) Some(_cameFrom) else None
-    @inline def cameFromState   : Option[TileState] = cameFrom.map(t => tiles(t.i))
-    @inline def costFromStart   : Float             = if (enqueued) _costFromStart    else Float.MaxValue
-    @inline def costToEndFloor  : Float             = if (enqueued) _costToEndFloor   else Float.MaxValue
-    @inline def pathLength      : Float             = if (enqueued) _pathLength       else Float.MaxValue
-    @inline def repulsion       : Double            = if (enqueued) _repulsion        else Float.MaxValue
+    @inline def costFromStart   : Float             = _costFromStart
+    @inline def costToEndFloor  : Float             = _costToEndFloor
+    @inline def pathLength      : Float             = _pathLength
+    @inline def repulsion       : Double            = _repulsion
   }
 
   private def startNextSearch() {
@@ -74,13 +70,13 @@ trait TilePathfinder {
     while (i < length) {
       val repsulsor = profile.repulsors(i)
       val distance  = repsulsor.source.pixelDistance(tile.pixelCenter)
-      output += repsulsor.magnitude * Math.min(1, PurpleMath.nanToOne(repsulsor.rangePixels / distance))
+      output += repsulsor.magnitude * (1 + repsulsor.rangePixels) / (1 + distance)
       i += 1
     }
     output
   }
 
-  // Best-known cost from the start to this tile
+  // Best cost from the start to this tile
   @inline private final def costFromStart(
     profile: PathfindProfile,
     toTile: Tile,
@@ -89,15 +85,36 @@ trait TilePathfinder {
 
     val i = toTile.i
     val toState = tiles(i)
-    val fromState = tiles(i).cameFromState
+    val fromState = toState.cameFrom.map(t => tiles(t.i))
     if (fromState.isEmpty) return 0
     val fromTile = fromState.get
     val costSoFar     : Float   = fromState.get.costToEndFloor
     val costDistance  : Float   = if (fromTile.tile.x == toTile.x || fromTile.tile.y == toTile.y) 1f else PurpleMath.sqrt2f
     val costThreat    : Float   = if (profile.costThreat == 0) 0 else profile.costThreat * Math.max(0, threatGrid.getUnchecked(i) - threatGrid.getUnchecked(fromTile.i)) // Max?
-    val costOccupancy : Float   = if (profile.costOccupancy == 0) 0 else profile.costOccupancy * With.coordinator.gridPathOccupancy.getUnchecked(i)
-    val costRepulsion : Double  = if (profile.maxRepulsion == 0) 0 else (profile.maxRepulsion + toState.repulsion - fromState.get.repulsion) / profile.maxRepulsion
+    val costOccupancy : Float   = if (profile.costOccupancy == 0)
+      0
+    else
+      profile.costOccupancy * Math.max(-0.1f, PurpleMath.signum(
+          With.coordinator.gridPathOccupancy.getUnchecked(i)
+        - With.coordinator.gridPathOccupancy.getUnchecked(fromTile.i)))
+    val costRepulsion : Double  = if (profile.costRepulsion == 0 || profile.maxRepulsion == 0)
+      0
+    else
+      profile.costRepulsion * Math.max(-0.1, PurpleMath.signum(
+          toState.repulsion
+          - fromState.get.repulsion))
+
     costSoFar + costDistance + costThreat + costOccupancy + costRepulsion.toFloat
+  }
+
+  @inline private final def drawOutput(profile: PathfindProfile, value: TilePath): Unit = {
+    if (ShowUnitsFriendly.mapInUse && ShowUnitsFriendly.showPaths && profile.unit.exists(_.selected)) {
+      profile.unit.foreach(unit =>
+        unit.agent.pathBranches = tiles
+          .view
+          .filter(t => t.enqueued && t.cameFrom.isDefined)
+          .map(t => (t.cameFrom.get.pixelCenter, t.tile.pixelCenter)))
+    }
   }
 
   // The A* admissable heuristic: The lowest possible cost to the end of the path.
@@ -117,11 +134,10 @@ trait TilePathfinder {
     // To escape a tile that's 5 tiles into enemy range means we have to pass through tiles of value 5+4+3+2+1
     // So the floor of the cost we'll pay is the Gaussian expansion of the threat cost at the current tile.
 
-    val costDistanceToEnd   : Float = profile.end.map(tile.tileDistanceFast(_).toFloat).getOrElse(0f)
+    val costDistanceToEnd   : Float = profile.end.map(end => if (profile.flying || ! profile.allowGroundDist) tile.tileDistanceFast(end) else tile.groundPixels(end) / 32).getOrElse(0.0).toFloat
     val costOutOfThreat     : Float = profile.costThreat * threatGrid.getUnchecked(i)
-    val costFloorOccupancy  : Float = profile.costOccupancy * With.coordinator.gridPathOccupancy.getUnchecked(i)
 
-    costFloorOccupancy + Math.max(costDistanceToEnd, costOutOfThreat)
+    Math.max(costDistanceToEnd, costOutOfThreat)
   }
 
   private def failure(tile: Tile) = TilePath(tile, tile, Int.MaxValue, None)
@@ -159,11 +175,13 @@ trait TilePathfinder {
           profile.end.isEmpty
           && profile.maximumLength.isEmpty
           && threatGrid.getUnchecked(bestTile.i) == 0)) {
-        return TilePath(
+        val output = TilePath(
           startTile,
           bestTile,
           costFromStart(profile, bestTileState.tile, threatGrid),
           Some(assemblePath(bestTileState)))
+        drawOutput(profile, output)
+        return output
       }
 
       val neigborTiles = bestTileState.tile.adjacent8

@@ -21,6 +21,7 @@ trait TilePathfinder {
 
   private final class TileState(val tile: Tile) {
     val i: Int = tile.i
+    var _visitedStamp   : Long  = _stampDefault
     var _enqueuedStamp  : Long  = _stampDefault
     var _cameFrom       : Tile  = _
     var _costFromStart  : Float = _
@@ -30,13 +31,20 @@ trait TilePathfinder {
     @inline def setEnqueued() {
       _enqueuedStamp = _stampCurrent
     }
+    @inline def setVisited() {
+      _visitedStamp = _stampCurrent
+    }
     @inline def setCameFrom(value: Tile) {
       _cameFrom = value
     }
+    // Cost of best-known path from the start tile.
+    // In common A* parlance, this is the gScore.
     @inline def setCostFromStart(value: Float) {
       _costFromStart = value
     }
-    @inline def setCostToEndFloor(value: Float) {
+    // Minimum possible cost to the end.
+    // In common A* parlance, this is the fScore.
+    @inline def setTotalCostFloor(value: Float) {
       _costToEndFloor = value
     }
     @inline def setPathLength(value: Float) {
@@ -46,9 +54,10 @@ trait TilePathfinder {
       _repulsion = value
     }
     @inline def enqueued        : Boolean           = _enqueuedStamp  == _stampCurrent
+    @inline def visited         : Boolean           = _visitedStamp  == _stampCurrent
     @inline def cameFrom        : Option[Tile]      = if (enqueued && _cameFrom.i != i) Some(_cameFrom) else None
     @inline def costFromStart   : Float             = _costFromStart
-    @inline def costToEndFloor  : Float             = _costToEndFloor
+    @inline def totalCostFloor  : Float             = _costToEndFloor
     @inline def pathLength      : Float             = _pathLength
     @inline def repulsion       : Double            = _repulsion
   }
@@ -76,33 +85,41 @@ trait TilePathfinder {
     output
   }
 
-  // Best cost from the start to this tile
+  // Best cost from the start tile to this tile.
+  // In common A* parlance, this is the gScore.
   @inline private final def costFromStart(
     profile: PathfindProfile,
     toTile: Tile,
-    threatGrid: AbstractGridEnemyRange)
+    threatGrid: AbstractGridEnemyRange,
+    hypotheticalFrom: Option[Tile] = None)
       : Float = {
 
     val i = toTile.i
     val toState = tiles(i)
-    val fromState = toState.cameFrom.map(t => tiles(t.i))
+    val fromState = hypotheticalFrom.map(t => tiles(t.i)).orElse(toState.cameFrom.map(t => tiles(t.i)))
     if (fromState.isEmpty) return 0
     val fromTile = fromState.get
-    val costSoFar     : Float   = fromState.get.costToEndFloor
+    val costSoFar     : Float   = fromState.get.costFromStart
     val costDistance  : Float   = if (fromTile.tile.x == toTile.x || fromTile.tile.y == toTile.y) 1f else PurpleMath.sqrt2f
     val costThreat    : Float   = if (profile.costThreat == 0) 0 else profile.costThreat * Math.max(0, threatGrid.getUnchecked(i) - threatGrid.getUnchecked(fromTile.i)) // Max?
     val costOccupancy : Float   = if (profile.costOccupancy == 0)
       0
-    else
-      profile.costOccupancy * Math.max(-0.1f, PurpleMath.signum(
-          With.coordinator.gridPathOccupancy.getUnchecked(i)
-        - With.coordinator.gridPathOccupancy.getUnchecked(fromTile.i)))
+    else {
+      // Intuition: We want to keep this value scaled around 0-1 so we can reason about costOccupancy
+      // Signum: Scale-invariant
+      // Sigmoid: Tiebreaks equally signed vectors with different scales
+      val diff = With.coordinator.gridPathOccupancy.getUnchecked(i) - With.coordinator.gridPathOccupancy.getUnchecked(fromTile.i)
+      profile.costOccupancy * 0.5f * (PurpleMath.fastSigmoid(diff) + PurpleMath.signum(diff))
+    }
     val costRepulsion : Double  = if (profile.costRepulsion == 0 || profile.maxRepulsion == 0)
       0
-    else
-      profile.costRepulsion * Math.max(-0.1, PurpleMath.signum(
-          toState.repulsion
-          - fromState.get.repulsion))
+    else {
+      // Intuition: We want to keep this value scaled around 0-1 so we can reason about costOccupancy
+      // Signum: Scale-invariant
+      // Sigmoid: Tiebreaks equally signed vectors with different scales
+      val diff = toState.repulsion - fromState.get.repulsion
+      profile.costRepulsion * 0.5f * (PurpleMath.fastSigmoid(diff) + PurpleMath.signum(diff))
+    }
 
     costSoFar + costDistance + costThreat + costOccupancy + costRepulsion.toFloat
   }
@@ -118,9 +135,10 @@ trait TilePathfinder {
   }
 
   // The A* admissable heuristic: The lowest possible cost to the end of the path.
+  // In common parlance, this is h()
   //
   // Threat-aware pathfinding makes it easy to introduce a non-admissible heuristic,
-  // so be careful when modifying this (or how the threat grid is defined).
+  // so be careful when modifying this.
   @inline private final def costToEndFloor(
     profile: PathfindProfile,
     tile: Tile,
@@ -134,7 +152,8 @@ trait TilePathfinder {
     // To escape a tile that's 5 tiles into enemy range means we have to pass through tiles of value 5+4+3+2+1
     // So the floor of the cost we'll pay is the Gaussian expansion of the threat cost at the current tile.
 
-    val costDistanceToEnd   : Float = profile.end.map(end => if (profile.flying || ! profile.allowGroundDist) tile.tileDistanceFast(end) else tile.groundPixels(end) / 32).getOrElse(0.0).toFloat
+    val costDistanceToEnd   : Float = profile.end.map(end => if (profile.flying || ! profile.allowGroundDist) tile.tileDistanceFast(end) else tile.groundPixels(end) / 32.0).getOrElse(0.0).toFloat
+    val costOutOfRepulsion  : Float = profile.costRepulsion * PurpleMath.fastSigmoid(tiles(i).repulsion.toFloat) // Hacky; used to smartly tiebreak tiles that are otherwise h() = 0. Using this formulation to minimize likelihood of breaking heuristic requirements
     val costOutOfThreat     : Float = profile.costThreat * threatGrid.getUnchecked(i)
 
     Math.max(costDistanceToEnd, costOutOfThreat)
@@ -153,13 +172,14 @@ trait TilePathfinder {
     val threatGrid = if (profile.flying) With.grids.enemyRangeAir else With.grids.enemyRangeGround
     startNextSearch()
     profile.updateRepulsion()
-    val horizon = new mutable.PriorityQueue[TileState]()(Ordering.by(t => -t.costToEndFloor))
+    val horizon = new mutable.PriorityQueue[TileState]()(Ordering.by(t => -t.totalCostFloor))
     val startTileState = tiles(startTile.i)
+    startTileState.setVisited()
     startTileState.setEnqueued()
     startTileState.setCameFrom(startTile)
     startTileState.setRepulsion(totalRepulsion(profile, startTile))
     startTileState.setCostFromStart(costFromStart(profile, startTile, threatGrid))
-    startTileState.setCostToEndFloor(costToEndFloor(profile, startTile, threatGrid))
+    startTileState.setTotalCostFloor(costToEndFloor(profile, startTile, threatGrid))
     startTileState.setPathLength(1)
     horizon += startTileState
 
@@ -167,10 +187,11 @@ trait TilePathfinder {
 
       val bestTileState = horizon.dequeue()
       val bestTile = bestTileState.tile
+      bestTileState.setVisited()
 
       // Are we done?
       if (profile.end.exists(_.i == bestTileState.i)
-        || profile.maximumLength.exists(_ <= bestTileState.pathLength)
+        || profile.maximumLength.exists(_ <= Math.round(bestTileState.pathLength)) // Rounding encourages picking diagonal paths for short maximum lengths
         || (
           profile.end.isEmpty
           && profile.maximumLength.isEmpty
@@ -194,33 +215,35 @@ trait TilePathfinder {
           val neighborOrthogonal = neighborTile.x == bestTile.x || neighborTile.y == bestTile.y
           // Should we bother visiting this neighbor?
           if (
-            // If we've used an admissible heuristic,
-            // and have previously enqueued the neighbor into our horizon,
-            // then it is impossible for us to have approached it via a superior path,
-            // and thus there's no point modifying its cost-to-end floor.
-            ! neighborState.enqueued
+            ! neighborState.visited
 
             // Is the neighbor pathable?
-            // TODO: Recursively inline and make unchecked
             && (profile.flying || With.grids.walkable.getUnchecked(neighborState.i))
 
             // Can we path from here to the neighbor?
             // (Specifically, if it's a diagonal step, verify that it's achievable)
             && (profile.flying
-              || neighborTile.x == bestTileState.tile.x
-              || neighborTile.y == bestTileState.tile.y
+              || neighborOrthogonal
               || With.grids.walkable.getUnchecked(Tile(neighborTile.x, bestTileState.tile.y).i)
               || With.grids.walkable.getUnchecked(Tile(bestTileState.tile.x, neighborTile.y).i))) {
 
-            val neighborState = tiles(neighborTile.i)
-            neighborState.setEnqueued()
-            neighborState.setCameFrom(bestTileState.tile)
-            neighborState.setRepulsion(totalRepulsion(profile, neighborTile))
-            val neighborCostFromStart = costFromStart(profile, neighborTile, threatGrid)
-            neighborState.setCostFromStart(neighborCostFromStart)
-            neighborState.setCostToEndFloor(neighborCostFromStart + costToEndFloor(profile, neighborTile, threatGrid))
-            neighborState.setPathLength(bestTileState.pathLength + (if (neighborOrthogonal) 1 else PurpleMath.sqrt2f))
-            horizon += neighborState
+            val wasEnqueued = neighborState.enqueued
+            if ( ! wasEnqueued) {
+              neighborState.setRepulsion(totalRepulsion(profile, neighborTile))
+            }
+            val neighborCostFromStart = costFromStart(profile, neighborTile, threatGrid, Some(bestTile))
+            if ( ! wasEnqueued || neighborState.costFromStart > neighborCostFromStart) {
+              neighborState.setCameFrom(bestTileState.tile)
+              neighborState.setCostFromStart(neighborCostFromStart)
+              neighborState.setTotalCostFloor(neighborCostFromStart + costToEndFloor(profile, neighborTile, threatGrid))
+              neighborState.setPathLength(bestTileState.pathLength + (if (neighborOrthogonal) 1 else PurpleMath.sqrt2f))
+            }
+            if ( ! wasEnqueued) {
+              neighborState.setRepulsion(totalRepulsion(profile, neighborTile))
+              neighborState.setEnqueued()
+              horizon += neighborState
+            }
+
           }
         }
       }

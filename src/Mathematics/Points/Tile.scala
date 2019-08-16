@@ -167,4 +167,16 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   final def toRectangle: TileRectangle = {
     TileRectangle(this, this.add(1, 1))
   }
+  @inline
+  final def walkable: Boolean = {
+    With.grids.walkable.get(this)
+  }
+  @inline
+  final def walkableUnchecked: Boolean = {
+    With.grids.walkable.getUnchecked(i)
+  }
+  @inline
+  final def buildable: Boolean = {
+    With.grids.buildable.get(this)
+  }
 }

@@ -25,7 +25,7 @@ object Reposition extends ActionTechnique {
   
   override val activator = One
   
-  override val applicabilityBase: Double = 0.8
+  override val applicabilityBase: Double = 0.0 // 0.8
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
     - unit.matchups.vpfNet

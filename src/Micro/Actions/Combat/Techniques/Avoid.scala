@@ -11,7 +11,7 @@ import Micro.Decisions.Potential
 import Planning.UnitMatchers.UnitMatchSiegeTank
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.TakeN
+import Utilities.{ByOption, TakeN}
 
 object Avoid extends ActionTechnique {
 
@@ -45,11 +45,13 @@ object Avoid extends ActionTechnique {
   }
 
   override def perform(unit: FriendlyUnitInfo): Unit = {
+    def timeOriginOfThreat(threat: UnitInfo): Double = threat.framesToTravelTo(unit.agent.origin) - threat.pixelRangeAgainst(unit)
+
     val distanceOriginUs    = unit.pixelDistanceTravelling(unit.agent.origin)
-    val distanceOriginEnemy = unit.matchups.threats.view.map(t => t.pixelDistanceTravelling(unit.agent.origin) + t.pixelRangeAgainst(unit)).min
+    val distanceOriginEnemy = ByOption.min(unit.matchups.threats.view.map(t => t.pixelDistanceTravelling(unit.agent.origin) + t.pixelRangeAgainst(unit))).getOrElse(2.0 * With.mapPixelWidth)
     val enemyCloser         = distanceOriginUs >= distanceOriginEnemy
     val timeOriginUs        = unit.framesToTravelTo(unit.agent.origin)
-    val timeOriginEnemy     = unit.matchups.threats.view.map(t => t.framesToTravelTo(unit.agent.origin) - t.pixelRangeAgainst(unit)).min
+    val timeOriginEnemy     = TakeN.percentile(0.1, unit.matchups.threats)(Ordering.by(timeOriginOfThreat)).map(timeOriginOfThreat).getOrElse(Double.PositiveInfinity)
     val enemySooner         = timeOriginUs >= timeOriginEnemy
     val enemySieging        = unit.matchups.enemies.exists(_.isAny(UnitMatchSiegeTank, Zerg.Lurker))
     val atHome              = unit.zone == unit.agent.origin.zone
@@ -99,7 +101,8 @@ object Avoid extends ActionTechnique {
 
     if (! unit.readyForMicro) return
 
-    val maximumDistance = 3 + Math.max(0, unit.matchups.framesOfEntanglement * unit.topSpeed + unit.effectiveRangePixels).toInt / 32
+    val pathLengthMinimum = 3
+    val maximumDistance = pathLengthMinimum + Math.max(0, unit.matchups.framesOfEntanglement * unit.topSpeed + unit.effectiveRangePixels).toInt / 32
 
     val profile = new PathfindProfile(unit.tileIncludingCenter)
     profile.end             = if (desireProfile.home > 0) Some(unit.agent.origin.tileIncluding) else None
@@ -108,7 +111,7 @@ object Avoid extends ActionTechnique {
     profile.allowGroundDist = true
     profile.costOccupancy   = 1f
     profile.costThreat      = 0f
-    profile.costRepulsion   = 3f
+    profile.costRepulsion   = 2f - PurpleMath.clamp(desireProfile.home, 0, 1)
     profile.repulsors       =
       TakeN
       .by(10, unit.matchups.threats.view)(Ordering.by(t => unit.matchups.framesOfEntanglementPerThreat(t)))
@@ -120,7 +123,7 @@ object Avoid extends ActionTechnique {
     profile.unit = Some(unit)
     val path = profile.find
 
-    if (path.pathExists && path.tiles.exists(_.size > 3)) {
+    if (path.pathExists && path.tiles.exists(_.size >= pathLengthMinimum)) {
       unit.agent.path = Some(path)
       path.tiles.get.foreach(With.coordinator.gridPathOccupancy.addUnit(unit, _))
       unit.agent.toTravel = Some(path.tiles.get.take(8).last.pixelCenter)

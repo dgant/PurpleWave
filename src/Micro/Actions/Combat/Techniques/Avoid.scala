@@ -111,7 +111,7 @@ object Avoid extends ActionTechnique {
     profile.allowGroundDist = true
     profile.costOccupancy   = 1f
     profile.costThreat      = 0f
-    profile.costRepulsion   = 2f - PurpleMath.clamp(desireProfile.home, 0, 1)
+    profile.costRepulsion   = 4f - PurpleMath.clamp(desireProfile.home, 0, 1)
     profile.repulsors       =
       TakeN
       .by(10, unit.matchups.threats.view)(Ordering.by(t => unit.matchups.framesOfEntanglementPerThreat(t)))

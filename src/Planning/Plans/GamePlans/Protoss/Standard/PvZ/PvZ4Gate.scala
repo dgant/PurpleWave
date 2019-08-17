@@ -20,7 +20,7 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
-import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
 import Planning.UnitMatchers.{UnitMatchWarriors, UnitMatchWorkers}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss.PvZ4Gate1012
@@ -31,7 +31,7 @@ class PvZ4Gate extends GameplanTemplate {
   override val completionCriteria = new Latch(new MiningBasesAtLeast(2))
   override def buildOrder      = ProtossBuilds.TwoGate1012
   override def workerPlan      = NoPlan()
-  override def scoutPlan       = new ScoutOn(Protoss.Pylon)
+  override val scoutPlan: Plan = new If(new StartPositionsAtLeast(4), new ScoutOn(Protoss.Pylon), new ScoutOn(Protoss.Gateway))
   override def scoutExposPlan  = new ScoutExpansionsAt(55)
   override def placementPlan   = new ProposePlacement {
     override lazy val blueprints = Vector(

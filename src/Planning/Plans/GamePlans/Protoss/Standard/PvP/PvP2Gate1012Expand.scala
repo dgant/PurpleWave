@@ -16,7 +16,7 @@ import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
-import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP2Gate1012
@@ -33,7 +33,7 @@ class PvP2Gate1012Expand extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(PvP2Gate1012)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(5, Protoss.Gateway))
   override def attackPlan: Plan = new PvPIdeas.AttackSafely
-  override val scoutPlan: Plan = new ScoutOn(Protoss.Pylon)
+  override val scoutPlan: Plan = new If(new StartPositionsAtLeast(4), new ScoutOn(Protoss.Pylon), new ScoutOn(Protoss.Gateway))
   
   override def placementPlan: Plan = new Trigger(
     new UnitsAtLeast(3, Protoss.Pylon),

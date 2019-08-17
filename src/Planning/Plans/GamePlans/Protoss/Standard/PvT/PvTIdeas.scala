@@ -277,7 +277,8 @@ object PvTIdeas {
     new If(new UnitsAtLeast(8, Protoss.Carrier), new Pump(Protoss.HighTemplar, 2)),
     new TrainCarriers,
     new Pump(Protoss.Arbiter, 6),
-    new If(new GasAtLeast(500), new Pump(Protoss.HighTemplar, maximumConcurrently = 4)),
+    new If(new GasAtLeast(500), new Pump(Protoss.HighTemplar, maximumConcurrently = 4, maximumTotal = 6)),
+    new If(new GasAtLeast(1000), new Pump(Protoss.HighTemplar, maximumConcurrently = 4, maximumTotal = 10)),
     new TrainScouts,
     new TrainZealotsOrDragoons)
   

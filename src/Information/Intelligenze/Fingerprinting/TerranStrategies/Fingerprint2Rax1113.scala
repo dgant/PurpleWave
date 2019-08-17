@@ -9,7 +9,7 @@ class Fingerprint2Rax1113 extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.oneRaxFE),
   new FingerprintNot(With.fingerprints.fourteenCC),
   new FingerprintOr(
-    new FingerprintCompleteBy(Terran.Barracks,  GameTime(2, 40), 2), // Normally about 2:45
+    new FingerprintCompleteBy(Terran.Barracks,  GameTime(2, 55), 2), // Normally about 2:45
     new FingerprintCompleteBy(Terran.Marine,    GameTime(2, 55), 3),
     new FingerprintCompleteBy(Terran.Marine,    GameTime(3, 15), 5),
     new FingerprintCompleteBy(Terran.Marine,    GameTime(3, 35), 7),

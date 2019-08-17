@@ -30,7 +30,7 @@ object BeAnArbiter extends Action {
 
   override protected def perform(arbiter: FriendlyUnitInfo) {
     val umbrellaSearchRadius    = 32.0 * 20.0
-    val threatened              = arbiter.matchups.framesOfSafety <= 12.0
+    val threatened              = arbiter.matchups.framesOfSafety <= 12.0 && ! With.yolo.active()
     val arbiters                = arbiter.teammates.filter(_.is(Protoss.Arbiter))
     val needUmbrella            = arbiter.teammates.toSeq.filter(needsUmbrella)
     val needUmbrellaNearby      = needUmbrella.filter(_.pixelDistanceCenter(arbiter) < umbrellaSearchRadius)

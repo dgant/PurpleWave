@@ -7,6 +7,10 @@ import ProxyBwapi.Races.Terran
 
 class FingerprintBio extends Fingerprint {
   override protected def investigate: Boolean = {
+    if (With.units.countEnemy(Terran.Barracks) > 1 && With.units.countEnemy(UnitMatchSiegeTank) < 3) {
+      return true
+    }
+
     val enemyMech = (
         2 * With.units.countEnemy(UnitMatchSiegeTank)
       + 3 * With.units.countEnemy(Terran.Battlecruiser)

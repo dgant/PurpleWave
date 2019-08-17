@@ -113,7 +113,7 @@ class PvTBasic extends GameplanTemplate {
             new BuildOrder(ProtossBuilds.PvTDTExpand_WithCitadel: _*),
             new BuildOrder(ProtossBuilds.PvTDTExpand_WithoutCitadel: _*)))))))
 
-  class EmployingThreeBase  extends Or(new Sticky(new MiningBasesAtLeast(3)), new Employing(PvT3BaseCarrier, PvT3BaseArbiter))
+  class EmployingThreeBase  extends And(new Not(new EnemyStrategy(With.fingerprints.bio)), new Or(new Sticky(new MiningBasesAtLeast(3)), new Employing(PvT3BaseCarrier, PvT3BaseArbiter)))
   class EmployingTwoBase    extends Not(new EmployingThreeBase)
   class CarriersCountered   extends Check(() => With.units.countEnemy(Terran.Goliath) > Math.max(10, With.units.countOurs(Protoss.Interceptor) / 3))
   class EmployingCarriers   extends And(new Employing(PvT2BaseCarrier, PvT3BaseCarrier), new Not(new CarriersCountered))
@@ -317,11 +317,9 @@ class PvTBasic extends GameplanTemplate {
             new CapGasWorkersAt(2))))),
 
     new If(
-      new Or(
-        new UnitsAtLeast(2, Protoss.Observer, complete = true),
-        new Not(new EnemyHasShownWraithCloak),
-        new Not(new EnemyHasShown(Terran.SpiderMine))),
+      new Or(new UnitsAtLeast(2, Protoss.Observer, complete = true), new Not(new EnemyHasShownWraithCloak), new Not(new EnemyHasShown(Terran.SpiderMine))),
       new MonitorBases(Protoss.Observer)),
+
     new EjectScout,
     new BasicOpening,
     new RequireMiningBases(2),
@@ -330,12 +328,16 @@ class PvTBasic extends GameplanTemplate {
     new If(new ReadyForFourthBase,  new Parallel(new RequireMiningBases(3), new RequireBases(4))),
     new If(new ReadyForFifthBase,   new Parallel(new RequireMiningBases(4), new RequireBases(5))),
     new If(new Or(new EmployingTwoBase, new BasesAtLeast(3), new UnitsAtLeast(4, Protoss.Gateway)), new BuildGasPumps),
-    new If(new UnitsAtLeast(3, Protoss.Gateway), new BuildCannonsAtExpansions(2)),
-    new If(new BasesAtLeast(3), new BuildCannonsAtNatural(1)),
+    new If(
+      new EnemyHasShown(Terran.Vulture),
+      new Parallel(
+        new If(new UnitsAtLeast(3, Protoss.Gateway), new BuildCannonsAtExpansions(2)),
+        new If(new BasesAtLeast(3), new BuildCannonsAtNatural(1)))),
 
     new HighPriorityUpgrades,
     new If(new EnemyHasShown(Terran.Wraith), new ObserverTech),
     new PvTIdeas.TrainArmy,
+    new If(new EnemyStrategy(With.fingerprints.twoFac), new Build(Get(3, Protoss.Gateway))), // Maybe 4?
     new If(
       new Or(
         new EnemyStrategy(With.fingerprints.twoFac),
@@ -344,9 +346,12 @@ class PvTBasic extends GameplanTemplate {
         Get(Protoss.RoboticsFacility),
         Get(Protoss.Observatory),
         Get(3, Protoss.Gateway))),
-    new Build(Get(2, Protoss.Gateway)),
-    new PumpRatio(Protoss.Gateway, 2, 6, Seq(Enemy(Terran.Factory, 1.5))),
-    new If(new MiningBasesAtLeast(3), new PumpRatio(Protoss.Gateway, 3, 10, Seq(Enemy(Terran.Factory, 1.5)))),
+    new If(
+      new EnemyStrategy(With.fingerprints.fourteenCC, With.fingerprints.oneRaxFE, With.fingerprints.siegeExpand),
+      new Build(Get(2, Protoss.Gateway)),
+      new Build(Get(4, Protoss.Gateway))),
+    new PumpRatio(Protoss.Gateway, 2, 6,                                    Seq(Flat(-1), Enemy(Terran.Factory, 1.5), Enemy(Terran.Barracks, 1.0))),
+    new If(new MiningBasesAtLeast(3), new PumpRatio(Protoss.Gateway, 3, 10, Seq(Flat(-1), Enemy(Terran.Factory, 1.5), Enemy(Terran.Barracks, 1.0)))),
     new AddPrimaryTech,
     new If(new And(new EmployingArbiters, new GasPumpsAtLeast(3)), new Build(Get(2, Protoss.Stargate), Get(2, Protoss.Forge))),
     new If(new And(new EmployingCarriers, new GasPumpsAtLeast(3)), new Build(Get(2, Protoss.CyberneticsCore), Get(3, Protoss.Stargate))),

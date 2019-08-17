@@ -11,14 +11,14 @@ object ProtossBuilds {
   
   val TwoGate910 = Vector[BuildRequest] (
     Get(8,   Protoss.Probe),
-    Get(1,   Protoss.Pylon),
+    Get(Protoss.Pylon),
     Get(9,   Protoss.Probe),
-    Get(1,   Protoss.Gateway),
+    Get(Protoss.Gateway),
     Get(10,  Protoss.Probe),
     Get(2,   Protoss.Gateway),
     Get(11,  Protoss.Probe),
     Get(2,   Protoss.Zealot),
-    Get(1,   Protoss.Pylon),
+    Get(Protoss.Pylon),
     Get(3,   Protoss.Zealot))
   
   val TwoGate1012 = Vector[BuildRequest] (
@@ -29,11 +29,10 @@ object ProtossBuilds {
     Get(12,  Protoss.Probe),
     Get(2,   Protoss.Gateway),
     Get(13,  Protoss.Probe),
-    Get(1,   Protoss.Zealot),
+    Get(Protoss.Zealot),
     Get(2,   Protoss.Pylon),
     Get(14,  Protoss.Probe),
     Get(3,   Protoss.Zealot),
-    Get(15,  Protoss.Probe),
     Get(3,   Protoss.Pylon),
     Get(17,  Protoss.Probe),
     Get(5,   Protoss.Zealot))

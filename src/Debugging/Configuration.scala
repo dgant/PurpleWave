@@ -4,7 +4,6 @@ import java.io.File
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Micro.Heuristics.Targeting.{EvaluateTargets, TargetEvaluator}
 
 class Configuration {
 
@@ -18,7 +17,7 @@ class Configuration {
   var enableChat                      = true
   var enableStreamManners             = true
   var identifyGhostUnits              = false
-  var targetFrameDurationMilliseconds = 40
+  var targetFrameDurationMilliseconds = 20
   
   //////////////
   // Strategy //
@@ -28,15 +27,14 @@ class Configuration {
   var targetWinrate       = 0.8
   var strategyRandomness  = 0.1
   var historyHalfLife     = 300.0
-  var recentFingerprints  = 2
+  var recentFingerprints  = 3
   
   /////////////
   // Battles //
   /////////////
 
-  var targetEvaluator: TargetEvaluator = EvaluateTargets
   var enableMCRS                    = false
-  var enableThreatAwarePathfinding  = false
+  var enableThreatAwarePathfinding  = true
   var avatarBattleDistancePixels    = 32.0 * 6.0
   var battleMarginTileBase          = 12 + 2
   var battleMarginTileMinimum       = 12 + 2
@@ -113,7 +111,7 @@ class Configuration {
   var conservativeViewportHeight  = 480 + cameraViewportHeight
 
   class FileFlag(filename: String) {
-    private lazy val fullPath: String = "bwapi-data/AI/" + filename
+    private lazy val fullPath: String = With.bwapiData.ai + filename
     private lazy val enabled: Boolean = {
       try {
         new File(fullPath).exists()

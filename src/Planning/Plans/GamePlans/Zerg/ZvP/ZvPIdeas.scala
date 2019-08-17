@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.Aggression
+import Planning.Plans.Army.{Aggression, Attack, Hunt}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -110,4 +110,15 @@ object ZvPIdeas {
       Get(Zerg.Extractor),
       Get(Zerg.SpawningPool),
       Get(Zerg.HydraliskDen)))
+
+  // New stuff
+
+  class AttackPlans extends Parallel(
+    new Hunt(Zerg.Scourge, Protoss.Shuttle),
+    new Hunt(Zerg.Scourge, Protoss.Corsair),
+    new Hunt(Zerg.Scourge, Protoss.Stargate),
+    new Hunt(Zerg.Mutalisk, Protoss.HighTemplar),
+    new Attack
+  )
+
 }

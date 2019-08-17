@@ -6,7 +6,7 @@ import ProxyBwapi.Races.Protoss
 
 class FingerprintCannonRush extends FingerprintCompleteBy(
   UnitMatchAnd(Protoss.PhotonCannon, UnitMatchProxied),
-  GameTime(3,  0)) {
+  GameTime(4,  30)) {
   
   override val sticky = true
 }

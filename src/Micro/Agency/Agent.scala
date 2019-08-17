@@ -1,13 +1,12 @@
 
 package Micro.Agency
 
-import Information.Geography.Pathfinding.Types.ZonePath
+import Information.Geography.Pathfinding.Types.{TilePath, ZonePath}
 import Lifecycle.With
 import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, PixelRay, Tile}
 import Micro.Actions.Combat.Techniques.Common.ActionTechniqueEvaluation
 import Micro.Actions.{Action, Idle}
-import Micro.Heuristics.Targeting.TargetingProfile
 import Performance.Cache
 import Planning.Plan
 import ProxyBwapi.Techs.Tech
@@ -42,26 +41,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   var combatHysteresisFrames: Int = 0
   var lastIntent: Intention = new Intention
   var shovers: ListBuffer[FriendlyUnitInfo] = new ListBuffer[FriendlyUnitInfo]
-
-  /*
-  val simsAttack = new mutable.Queue[Double]
-  val simsSnipe = new mutable.Queue[Double]
-  private val simQueueMax = 3
-  private def enqueueSim(value: Double, queue: mutable.Queue[Double]): Unit = {
-    queue.enqueue(value)
-    while (queue.length > simQueueMax) {
-      queue.dequeue()
-    }
-  }
-  def enqueueSimAttack(value: Double): Unit = {
-    enqueueSim(value, simsAttack)
-  }
-  def enqueueSimSnipe(value: Double): Unit = {
-    enqueueSim(value, simsSnipe)
-  }
-  def meanSimAttack: Double = PurpleMath.mean(simsAttack)
-  def meanSimSnipe: Double = PurpleMath.mean(simsSnipe)
-  */
   
   ///////////////
   // Decisions //
@@ -94,8 +73,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   var canCast       : Boolean                       = false
   var canCancel     : Boolean                       = false
   var canFocus      : Boolean                       = false
-  
-  var targetingProfile: TargetingProfile = TargetingProfiles.default
   
   var lastStim: Int = 0
   var lastCloak: Int = 0
@@ -146,8 +123,9 @@ class Agent(val unit: FriendlyUnitInfo) {
   var lastClient  : Option[Plan]    = None
   var lastAction  : Option[Action]  = None
 
-  var movingTo: Option[Pixel] = None
-  
+  var movingTo        : Option[Pixel]         = None
+  var path            : Option[TilePath]      = None
+  var pathBranches    : Seq[(Pixel, Pixel)]   = Seq.empty
   var pathsAll        : Traversable[PixelRay] = Seq.empty
   var pathsTruncated  : Traversable[PixelRay] = Seq.empty
   var pathsAcceptable : Traversable[PixelRay] = Seq.empty
@@ -178,7 +156,8 @@ class Agent(val unit: FriendlyUnitInfo) {
     forces.clear()
     resistances.clear()
     movingTo            = None
-    targetingProfile    = TargetingProfiles.default
+    path                = None
+    pathBranches        = Seq.empty
     pathsAll            = Seq.empty
     pathsTruncated      = Seq.empty
     pathsAcceptable     = Seq.empty
@@ -263,6 +242,12 @@ class Agent(val unit: FriendlyUnitInfo) {
     _umbrellas += umbrella
   }
   def umbrellas: Seq[FriendlyUnitInfo] = _umbrellas
+
+  /////////////
+  // Leading //
+  /////////////
+
+  var follow: (FriendlyUnitInfo) => Unit = x => {}
 
   /////////////////
   // Ridesharing //

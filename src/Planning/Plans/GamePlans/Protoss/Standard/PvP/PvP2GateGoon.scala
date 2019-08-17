@@ -11,8 +11,8 @@ import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAt}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Placement.{BuildCannonsAtNatural, ProposePlacement}
-import Planning.Plans.Scouting.ScoutOn
+import Planning.Plans.Placement.{BuildCannonsAtNatural, BuildCannonsInMain, ProposePlacement}
+import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyBasesAtMost
@@ -54,7 +54,8 @@ class PvP2GateGoon extends GameplanTemplate {
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvPIdeas.ReactToGasSteal,
     new PvPIdeas.ReactToCannonRush,
-    new PvPIdeas.ReactToFFE)
+    new PvPIdeas.ReactToFFE,
+    new ScoutForCannonRush)
   
   override val buildOrder: Seq[BuildRequest] = ProtossBuilds.ZCoreZTwoGateGoon
 
@@ -77,6 +78,20 @@ class PvP2GateGoon extends GameplanTemplate {
           new CapGasWorkersAt(2)))),
 
     new If(
+      new Or(
+        new EnemyStrategy(With.fingerprints.dtRush),
+        new And(
+          new BasesAtLeast(2),
+          new EnemyBasesAtMost(1),
+          new Not(new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.robo, With.fingerprints.nexusFirst, With.fingerprints.fourGateGoon)))),
+      new Parallel(
+        new BuildCannonsInMain(1),
+        new BuildCannonsAtNatural(2))),
+
+    new If(
+      new EnemyStrategy(With.fingerprints.earlyForge, With.fingerprints.oneGateCore),
+      new RequireMiningBases(2)),
+    new If(
       new EnemyStrategy(With.fingerprints.fourGateGoon),
       new If(
         new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
@@ -85,32 +100,22 @@ class PvP2GateGoon extends GameplanTemplate {
         new UnitsAtLeast(12, UnitMatchWarriors),
         new RequireMiningBases(2))),
 
-    new If(
-      new Or(
-        new EnemyStrategy(With.fingerprints.dtRush),
-        new And(
-          new BasesAtLeast(2),
-          new EnemyBasesAtMost(1),
-          new Not(new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.robo, With.fingerprints.nexusFirst, With.fingerprints.fourGateGoon)))),
-      new BuildCannonsAtNatural(2)),
+    new Build(Get(Protoss.DragoonRange)),
 
     new PvPIdeas.TrainArmy,
     new If(
       new EnemyStrategy(With.fingerprints.proxyGateway),
-      new Build(
-        Get(Protoss.DragoonRange),
-        Get(4, Protoss.Gateway)),
+      new Build(Get(4, Protoss.Gateway)),
       new If(
+        new Or(
+          new UnitsAtLeast(1, Protoss.CitadelOfAdun),
         new And(
           new BasesAtMost(1),
-          new EnemyStrategy(With.fingerprints.fourGateGoon)),
+            new EnemyStrategy(With.fingerprints.fourGateGoon))),
         new Build(
           Get(Protoss.CitadelOfAdun),
-          Get(Protoss.TemplarArchives),
-          Get(Protoss.DragoonRange)),
-        new Build(
-          Get(Protoss.DragoonRange),
-          Get(2, Protoss.Nexus)))),
+          Get(Protoss.TemplarArchives)),
+        new RequireMiningBases(2))),
 
     new If(
       new EnemyStrategy(With.fingerprints.dtRush),

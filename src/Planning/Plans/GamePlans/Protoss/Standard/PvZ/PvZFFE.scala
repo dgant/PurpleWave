@@ -1,21 +1,20 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Basic.NoPlan
+import Planning.Plans.Army.EjectScout
 import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.GamePlans.Protoss.Situational.{DefendFFEWithProbesAgainst4Pool, DefendFFEWithProbesAgainst9Pool, PlacementForgeFastExpand}
-import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers}
+import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
+import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.{UnitMatchType, UnitMatchWorkers}
+import Planning.UnitMatchers.UnitMatchWorkers
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvZFFEConservative, PvZFFEEconomic, PvZGatewayFE}
@@ -68,28 +67,14 @@ class PvZFFE extends GameplanTemplate {
       new Pump(Protoss.Zealot)),
     new PvZIdeas.AddEarlyCannons,
     new If(
-      new And(
-        new EnemyStrategy(With.fingerprints.fourPool),
-        new UnitsAtLeast(1, Protoss.Forge)),
-      new Build(Get(4, Protoss.PhotonCannon))),
+      new EnemyStrategy(With.fingerprints.fourPool),
+      new Pump(Protoss.PhotonCannon, 6)),
+    new PvZIdeas.ConditionalDefendFFEWithProbesAgainst4Pool,
     new If(
-      new And(
-        new EnemyStrategy(With.fingerprints.fourPool),
-        new FrameAtLeast(GameTime(2, 5)()),
-        new FrameAtMost(GameTime(5, 0)()),
-        new UnitsAtLeast(1, Protoss.PhotonCannon, complete = false),
-        new UnitsAtMost(2, Protoss.PhotonCannon, complete = true)),
-      new DefendFFEWithProbesAgainst4Pool),
-    new If(
-      new And(
-        new EnemyStrategy(With.fingerprints.ninePool, With.fingerprints.overpool),
-        new FrameAtLeast(GameTime(3, 0)()),
-        new FrameAtMost(GameTime(6, 0)()),
-        new UnitsAtMost(2, UnitMatchType(Protoss.PhotonCannon), complete = true)),
-      new DefendFFEWithProbesAgainst9Pool)
-  )
+      new EnemyStrategy(With.fingerprints.fourPool),
+      new EjectScout(Protoss.Probe)),
 
-  override def workerPlan: Plan = NoPlan()
+  )
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(
@@ -97,7 +82,9 @@ class PvZFFE extends GameplanTemplate {
       new Build(
         Get(Protoss.Assimilator),
         Get(Protoss.CyberneticsCore))),
-    new PumpWorkers,
+    new If(
+      new EnemyStrategy(With.fingerprints.ninePool, With.fingerprints.tenHatch),
+      new Pump(Protoss.PhotonCannon, 4)),
     new Pump(Protoss.Dragoon, maximumTotal = 1),
     new Pump(Protoss.Zealot),
     new Build(

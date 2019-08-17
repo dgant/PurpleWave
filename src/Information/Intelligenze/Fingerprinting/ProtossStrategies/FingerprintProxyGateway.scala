@@ -7,6 +7,7 @@ import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchProxied}
 import ProxyBwapi.Races.Protoss
 
 class FingerprintProxyGateway extends FingerprintAnd(
+  new FingerprintNot(With.fingerprints.nexusFirst),
   new FingerprintOr(
     new FingerprintArrivesBy(Protoss.Zealot, GameTime(2, 50)),
     new FingerprintArrivesBy(Protoss.Zealot, GameTime(3, 15), 2),

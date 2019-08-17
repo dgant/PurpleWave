@@ -7,7 +7,7 @@ import Micro.Agency.Intention
 import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitMatchers.UnitMatchOr
-import Planning.Plan
+import Planning.{Plan, Predicate}
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
@@ -21,8 +21,11 @@ import Planning.Plans.Scouting.{FoundEnemyBase, Scout}
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.UnitCounters.UnitCountEverything
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
+import Strategery.Sparkle
 
 class ZvESparkle extends GameplanTemplate {
+
+  override val activationCriteria: Predicate = new Check(() => Sparkle.matches)
   
   class KillNeutralBlocker extends Plan() {
     val killers = new LockUnits

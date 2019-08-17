@@ -3,6 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{PumpWorkers, UpgradeContinuously}
@@ -13,11 +14,11 @@ import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Economy.GasAtMost
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._
-import Planning.Predicates.Strategy.{Employing, EnemyStrategy, OnMap}
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.UnitMatchers.{UnitMatchMobileDetectors, UnitMatchWarriors}
 import ProxyBwapi.Races.Protoss
+import Strategery.MapGroups
 import Strategery.Strategies.Protoss.{PvP2Gate1012Goon, PvP2GateDTExpand}
-import Strategery.{BlueStorm, Hitchhiker}
 
 class PvPLateGame extends GameplanTemplate {
 
@@ -31,22 +32,26 @@ class PvPLateGame extends GameplanTemplate {
     new PumpWorkers(false, cap = 75))
   
   override def priorityAttackPlan: Plan = new PvPIdeas.AttackWithDarkTemplar
-  override val attackPlan: Plan = new PvPIdeas.AttackSafely
+  override val attackPlan: Plan = new Parallel(
+    new If(
+      new EnemiesAtMost(0, UnitMatchMobileDetectors),
+      new Attack(Protoss.DarkTemplar)),
+    new PvPIdeas.AttackSafely)
   override def archonPlan: Plan = new PvPIdeas.MeldArchonsPvP
 
   lazy val goGoonReaverCarrier = new Latch(
-    new Or(
-      new OnMap(BlueStorm, Hitchhiker),
       new And(
         new Or(
           new EnemiesAtLeast(3, Protoss.Reaver),
           new UnitsAtLeast(1, Protoss.RoboticsSupportBay)),
-        new UnitsAtMost(0, Protoss.TemplarArchives))))
+      new UnitsAtMost(0, Protoss.TemplarArchives)))
 
   lazy val goZealotTemplarArbiter = new Latch(
     new And(
       new Not(goGoonReaverCarrier),
-      new UnitsAtLeast(1, Protoss.TemplarArchives)))
+      new Or(
+        new Check(() => MapGroups.badForBigUnits.exists(_.matches)),
+        new UnitsAtLeast(1, Protoss.CitadelOfAdun))))
 
   class BuildTech extends Parallel(
     new Build(
@@ -212,12 +217,15 @@ class PvPLateGame extends GameplanTemplate {
     new Build(Get(12, Protoss.Gateway)),
 
     // Arbiter/Carrier transitions
+    new Trigger(
+      new SupplyOutOf200(195),
+      new Parallel(
     new If(
       new Or(goGoonReaverCarrier, new UnitsAtLeast(8, Protoss.Arbiter)),
       new CarrierTransition),
     new If(
       new Or(goZealotTemplarArbiter, new UnitsAtLeast(8, Protoss.Carrier)),
-      new ArbiterTransition),
+          new ArbiterTransition))),
 
     new RequireMiningBases(4),
     new Build(Get(20, Protoss.Gateway)),

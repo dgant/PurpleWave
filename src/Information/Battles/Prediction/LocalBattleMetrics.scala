@@ -6,13 +6,13 @@ import Planning.UnitMatchers.UnitMatchRecruitableForCombat
 
 class LocalBattleMetrics(simulation: Simulation, previous: Option[LocalBattleMetrics]) {
 
-  def nonCombat(simulacrum: Simulacrum): Boolean = simulacrum.realUnit.is(UnitMatchRecruitableForCombat)
-  def ValueLeft(simulacrum: Simulacrum)       : Double = if (simulacrum.dead) 0.0 else simulacrum.value
-  def ValueMax(simulacrum: Simulacrum)        : Double = simulacrum.value
-  def unitHealthLeft(simulacrum: Simulacrum)      : Double = if (nonCombat(simulacrum)) 0.0 else simulacrum.hitPoints 
-  def unitHealthMax(simulacrum: Simulacrum)       : Double = if (nonCombat(simulacrum)) 0.0 else simulacrum.hitPointsInitial
-  def unitHealthValueLeft(simulacrum: Simulacrum) : Double = if (nonCombat(simulacrum)) 0.0 else simulacrum.value * simulacrum.hitPoints + simulacrum.shieldPoints
-  def unitHealthValueMax(simulacrum: Simulacrum)  : Double = if (nonCombat(simulacrum)) 0.0 else simulacrum.value * simulacrum.hitPointsInitial + simulacrum.shieldPointsInitial
+  def nonCombat(simulacrum: Simulacrum)           : Boolean = ! simulacrum.realUnit.is(UnitMatchRecruitableForCombat)
+  def ValueLeft(simulacrum: Simulacrum)           : Double  = if (simulacrum.dead) 0.0 else simulacrum.value
+  def ValueMax(simulacrum: Simulacrum)            : Double  = simulacrum.value
+  def unitHealthLeft(simulacrum: Simulacrum)      : Double  = if (nonCombat(simulacrum)) 0.0 else simulacrum.hitPoints
+  def unitHealthMax(simulacrum: Simulacrum)       : Double  = if (nonCombat(simulacrum)) 0.0 else simulacrum.hitPointsInitial
+  def unitHealthValueLeft(simulacrum: Simulacrum) : Double  = if (nonCombat(simulacrum)) 0.0 else simulacrum.value * simulacrum.hitPoints + simulacrum.shieldPoints
+  def unitHealthValueMax(simulacrum: Simulacrum)  : Double  = if (nonCombat(simulacrum)) 0.0 else simulacrum.value * simulacrum.hitPointsInitial + simulacrum.shieldPointsInitial
 
   val framesIn                        : Int    = simulation.estimation.frames
   val localValueTotalUs               : Double = simulation.unitsOurs.view.map(ValueMax).sum
@@ -31,7 +31,7 @@ class LocalBattleMetrics(simulation: Simulation, previous: Option[LocalBattleMet
   val localHealthLeftEnemy            : Double = simulation.unitsEnemy.view.map(unitHealthLeft).sum
   val localHealthLostUs               : Double = localHealthTotalUs - localHealthLeftUs
   val localHealthLostEnemy            : Double = localHealthTotalEnemy - localHealthLeftEnemy
-  val localHealthLostRatio            : Double = PurpleMath.nanToZero(2 * localHealthLostUs / (localHealthLostUs + localHealthLostEnemy) - 1)
+  val localHealthLostRatio            : Double = PurpleMath.nanToZero(2 * localHealthLostEnemy / (localHealthLostUs + localHealthLostEnemy) - 1)
   val localHealthLostUsHere           : Double = localHealthLostUs - previous.map(_.localHealthLostUs).getOrElse(0.0)
   val localHealthLostEnemyHere        : Double = localHealthLostEnemy - previous.map(_.localHealthLostEnemy).getOrElse(0.0)
   val localHealthDecisiveness         : Double = PurpleMath.nanToZero((localHealthLostUsHere + localHealthLostEnemyHere) / (localHealthTotalUs + localHealthTotalEnemy))
@@ -44,7 +44,7 @@ class LocalBattleMetrics(simulation: Simulation, previous: Option[LocalBattleMet
   val localHealthValueLostUsHere      : Double = localHealthValueLostUs - previous.map(_.localHealthValueLostUs).getOrElse(0.0)
   val localHealthValueLostEnemyHere   : Double = localHealthValueLostEnemy - previous.map(_.localHealthValueLostEnemy).getOrElse(0.0)
   val localHealthValueDecisiveness    : Double = PurpleMath.nanToZero((localHealthValueLostUsHere + localHealthValueLostEnemyHere) / (localHealthValueTotalUs + localHealthValueTotalEnemy))
-  val localHealthValueLostRatio       : Double = PurpleMath.nanToZero(2 * localHealthValueLostUs / (localHealthValueLostUs + localHealthValueLostEnemy) - 1)
+  val localHealthValueLostRatio       : Double = PurpleMath.nanToZero(2 * localHealthValueLostEnemy / (localHealthValueLostUs + localHealthValueLostEnemy) - 1)
   val ratioLocalValueLostUs           : Double = PurpleMath.nanToZero(localValueLostUs / localValueTotalUs)
   val ratioLocalValueLostEnemy        : Double = PurpleMath.nanToZero(localValueLostEnemy / localValueTotalEnemy)
   val ratioLocalValueLostNet          : Double = ratioLocalValueLostEnemy - ratioLocalValueLostUs
@@ -55,10 +55,10 @@ class LocalBattleMetrics(simulation: Simulation, previous: Option[LocalBattleMet
   val ratioLocalHealthValueLostEnemy  : Double = PurpleMath.nanToZero(localHealthValueLostEnemy / localHealthValueTotalEnemy)
   val ratioLocalHealthValueLostNet    : Double = ratioLocalHealthValueLostEnemy - ratioLocalHealthValueLostUs
   val weightLife = 1.0
-  val weightHealth = 0.25
+  val weightHealth = 0.1
   val totalScore: Double = PurpleMath.weightedMean(Seq(
     (localValueLostRatio,           weightLife),
-    (localHealthLostRatio,          weightHealth),
+    //(localHealthLostRatio,          weightHealth),
     (localHealthValueLostRatio,     weightHealth),
     (ratioLocalValueLostNet,        weightLife),
     (ratioLocalHealthLostNet,       weightHealth),

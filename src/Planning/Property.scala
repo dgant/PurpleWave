@@ -4,6 +4,9 @@ class Property[T](default: T) {
   
   private var _parent: Option[Property[T]] = None
   private var _value: T = default
+  private var _set: Boolean = false
+
+  def isSet: Boolean = _set
   
   def get: T = {
     if (_parent.contains(this)) {
@@ -24,10 +27,12 @@ class Property[T](default: T) {
   
   def reset() {
     set(default)
+    _set = false
   }
   
   def set(value: T) {
     _value = value
+    _set = true
   }
   
   override def toString: String = "Property: " + get.toString

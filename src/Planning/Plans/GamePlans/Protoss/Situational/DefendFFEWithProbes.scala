@@ -1,12 +1,18 @@
 package Planning.Plans.GamePlans.Protoss.Situational
 
 import Lifecycle.With
+import Mathematics.Points.Pixel
 import Micro.Agency.{Intention, Leash}
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountBetween
 import Planning.UnitMatchers.UnitMatchWorkers
+import Planning.UnitPreferences.UnitPreferClose
 import Planning.{Plan, Property}
 import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.ByOption
+
+import scala.collection.mutable.ArrayBuffer
 
 abstract class DefendFFEWithProbes extends Plan {
   
@@ -22,22 +28,58 @@ abstract class DefendFFEWithProbes extends Plan {
     
     lazy val zerglings    = With.units.enemy.find(_.is(Zerg.Zergling))
     lazy val threatSource = zerglings.map(_.pixelCenter).getOrElse(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
-    lazy val toDefend     = cannons.minBy(_.pixelDistanceCenter(threatSource)).pixelCenter.project(threatSource, 64.0)
-    
+
     if (cannons.isEmpty) return
+    cannons.toVector.sortBy(_.totalHealth)
     
     val probesRequired = probeCount
     if (defenders.get.units.size > probesRequired) {
       defenders.get.release()
     }
-    
+    defenders.get.unitPreference.set(UnitPreferClose(cannons.map(_.pixelCenter).minBy(_.pixelDistance(threatSource))))
     defenders.get.unitCounter.set(new UnitCountBetween(0, probesRequired))
     defenders.get.acquire(this)
-    defenders.get.units.foreach(_.agent.intend(this, new Intention {
-      canFlee   = false
-      toForm    = Some(toDefend)
-      toTravel  = Some(toDefend)
-      toLeash   = Some(Leash(toDefend, 32.0 * 5.0))
-    }))
+    val closestDistance = cannons.map(_.pixelDistanceEdge(threatSource)).min
+    val threatenedCannons = cannons.filter(_.pixelDistanceEdge(threatSource) <= closestDistance + 96)
+    val workers = new ArrayBuffer[FriendlyUnitInfo]
+    val workersByCannon = threatenedCannons.map(c => (c, new ArrayBuffer[FriendlyUnitInfo])).toMap
+    workers ++= defenders.get.units
+    while (workers.nonEmpty) {
+      threatenedCannons.foreach(cannon => {
+        if (workers.nonEmpty) {
+          val worker = workers.minBy(_.pixelDistanceEdge(cannon))
+          workers -= worker
+          workersByCannon(cannon) += worker
+        }
+      })
+    }
+
+    def occupied(pixel: Pixel): Boolean = (
+      pixel.tileIncluding.adjacent9.exists(With.groundskeeper.isReserved(_))
+    )
+    workersByCannon.foreach(pair => {
+      val cannon = pair._1
+      val workers = pair._2
+      var toDefend = cannon.pixelCenter.project(threatSource, 48.0)
+      var steps = 0
+      while (steps < 8 && occupied(toDefend)) {
+        steps += 1
+        toDefend = toDefend.project(threatSource, 16)
+      }
+      val nearestThreat = ByOption.minBy(cannon.matchups.threats)(_.pixelDistanceEdge(cannon))
+      nearestThreat.foreach(someNearestThreat => {
+        val threatDistanceToCannon = cannon.pixelDistanceEdge(threatSource)
+        if (cannon.pixelDistanceEdge(toDefend) > threatDistanceToCannon) {
+          toDefend = cannon.pixelCenter.project(someNearestThreat.pixelCenter, threatDistanceToCannon + 16)
+        }
+      })
+
+      workers.foreach(_.agent.intend(this, new Intention {
+        canFlee   = false
+        //toForm    = Some(toDefend)
+        toTravel  = Some(toDefend)
+        toLeash   = Some(Leash(toDefend, 32.0 * 4.0))
+      }))
+    })
   }
 }

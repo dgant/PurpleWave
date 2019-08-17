@@ -120,7 +120,7 @@ class Blueprint(
         if (requireCreep.get != With.grids.creep.get(nextTile)) {
           return ArchitecturalAssessment.CreepMismatch
         }
-        if (respectHarvesting.get && With.grids.harvestingArea.get((nextTile))) {
+        if (respectHarvesting.get && thisZone.bases.exists(_.harvestingArea.contains(nextTile))) {
           return ArchitecturalAssessment.ViolatesHarvesting
         }
         if (requireResourceGap.get && ! With.grids.buildableTownHall.get(nextTile)) {

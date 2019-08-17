@@ -57,7 +57,11 @@ class History {
     HistoryLoader.save(games.toVector :+ thisGame)
   }
 
-  def gamesVsEnemies: Iterable[HistoricalGame] = {
-    games.filter(game => With.enemies.exists(_.name == game.enemyName))
+  lazy val gamesVsEnemies: Vector[HistoricalGame] = {
+    games
+      .view
+      .filter(game => With.enemies.exists(_.name == game.enemyName))
+      .toVector
+      .sortBy(-_.timestamp)
   }
 }

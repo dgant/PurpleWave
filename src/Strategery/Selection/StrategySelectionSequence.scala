@@ -4,7 +4,7 @@ import Lifecycle.With
 import Strategery.Strategies.Strategy
 import Utilities.ByOption
 
-case class StrategySelectionSequence(strategySequences: IndexedSeq[Seq[Strategy]], loop: Boolean = false) extends StrategySelectionPolicy {
+case class StrategySelectionSequence(strategySequences: Seq[Seq[Strategy]], loop: Boolean = false) extends StrategySelectionPolicy {
 
   override def chooseBest(topLevelStrategies: Iterable[Strategy], expand: Boolean = true): Iterable[Strategy] = {
     val gamesAgainst = With.history.gamesVsEnemies

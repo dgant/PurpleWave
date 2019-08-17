@@ -180,14 +180,18 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
   ////////////
   // Orders //
   ////////////
-  
+
+  private def convertPosition(position: bwapi.Position): Option[Pixel] = {
+    if (badPositions.contains(position)) None else Some(new Pixel(position))
+  }
+
   private def updateOrders() {
-    //Performance enhancement -- spare the expensive target calls for irrelevant units
-    _target               = if (unitClass.targetsMatter)         baseUnit.getTarget               else null
-    _targetPosition       = if (unitClass.targetPositionsMatter) baseUnit.getTargetPosition       else null
-    _order                = if (unitClass.ordersMatter)          baseUnit.getOrder.toString       else Orders.Nothing
-    _orderTarget          = if (unitClass.targetsMatter)         baseUnit.getOrderTarget          else null
-    _orderTargetPosition  = if (unitClass.targetPositionsMatter) baseUnit.getOrderTargetPosition  else null
+    // Performance optmization -- spare the expensive target calls for irrelevant units
+    _target               = if (unitClass.targetsMatter)         With.units.get(baseUnit.getTarget)               else None
+    _targetPixel          = if (unitClass.targetPositionsMatter) convertPosition(baseUnit.getTargetPosition)      else None
+    _order                = if (unitClass.ordersMatter)          baseUnit.getOrder.toString                       else Orders.Nothing
+    _orderTarget          = if (unitClass.targetsMatter)         With.units.get(baseUnit.getOrderTarget)          else None
+    _orderTargetPixel     = if (unitClass.targetPositionsMatter) convertPosition(baseUnit.getOrderTargetPosition) else None
     _gatheringMinerals    = unitClass.ordersMatter && baseUnit.isGatheringMinerals
     _gatheringGas         = unitClass.ordersMatter && baseUnit.isGatheringGas
     _attacking            = unitClass.ordersMatter && baseUnit.isAttacking
@@ -204,20 +208,20 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
     _upgrading            = unitClass.ordersMatter && baseUnit.isUpgrading
   }
   
-  private var _target               : bwapi.Unit  = _
-  private var _targetPosition       : Position    = Position.None
-  private var _order                : String      = "Stop"
-  private var _orderTarget          : bwapi.Unit  = _
-  private var _orderTargetPosition  : Position    = Position.None
-  private var _gatheringMinerals    : Boolean     = _
-  private var _gatheringGas         : Boolean     = _
+  private var _target               : Option[UnitInfo]  = None
+  private var _targetPixel          : Option[Pixel]     = None
+  private var _order                : String            = "Stop"
+  private var _orderTarget          : Option[UnitInfo]  = None
+  private var _orderTargetPixel     : Option[Pixel]     = None
+  private var _gatheringMinerals    : Boolean           = _
+  private var _gatheringGas         : Boolean           = _
   
   private val badPositions = Vector(Position.Invalid, Position.None, Position.Unknown, null)
-  def target            : Option[UnitInfo]    = if (_target == null) None else With.units.get(_target)
-  def targetPixel       : Option[Pixel]       = if (badPositions.contains(_targetPosition)) None else Some(new Pixel(_targetPosition))
+  def target            : Option[UnitInfo]    = _target
+  def targetPixel       : Option[Pixel]       = _targetPixel
   def order             : String              = _order
-  def orderTarget       : Option[UnitInfo]    = if (_target == null) None else With.units.get(_orderTarget)
-  def orderTargetPixel  : Option[Pixel]       = if (badPositions.contains(_orderTargetPosition)) None else Some(new Pixel(_orderTargetPosition))
+  def orderTarget       : Option[UnitInfo]    = _orderTarget
+  def orderTargetPixel  : Option[Pixel]       = _orderTargetPixel
   def gatheringMinerals : Boolean             = _gatheringMinerals
   def gatheringGas      : Boolean             = _gatheringGas
   def techProducing     : Option[Tech]        = None

@@ -11,6 +11,7 @@ object TargetFilterFocus extends TargetFilter {
     || actor.inRangeToAttack(target)
     || (target.canAttack(actor) && target.inRangeToAttack(actor))
     || (target.visible && target.topSpeed < actor.topSpeed * 0.75 && actor.matchups.threats.isEmpty)
+    || target.interceptors.exists(legal(actor, _))
   )
   
 }

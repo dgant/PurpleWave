@@ -11,7 +11,7 @@ import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump, PumpWorkers}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Placement.BuildCannonsAtNatural
-import Planning.Plans.Scouting.ScoutOn
+import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones.{EnemiesAtLeast, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
@@ -42,7 +42,8 @@ class PvP4GateGoon extends GameplanTemplate {
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToDarkTemplarEmergencies,
     new PvPIdeas.ReactToProxyGateways,
-    new PvPIdeas.ReactTo2Gate)
+    new PvPIdeas.ReactTo2Gate,
+    new ScoutForCannonRush)
   
   override def buildOrderPlan = new If(
     new Not(new EnemyStrategy(With.fingerprints.cannonRush, With.fingerprints.proxyGateway, With.fingerprints.twoGate, With.fingerprints.dtRush)),

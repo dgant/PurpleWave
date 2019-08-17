@@ -9,7 +9,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object DodgeAll extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.canMove && ! With.yolo.active()
+    unit.canMove
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {

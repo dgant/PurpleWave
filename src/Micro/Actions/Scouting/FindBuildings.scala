@@ -20,7 +20,7 @@ object FindBuildingsWhenBored extends AbstractFindBuildings {
 abstract class AbstractFindBuildings extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    With.geography.enemyBases.nonEmpty
+    With.geography.enemyBases.nonEmpty || unit.agent.lastIntent.toScoutBases.nonEmpty
   }
   
   protected val boredomFrames: Int
@@ -34,8 +34,9 @@ abstract class AbstractFindBuildings extends Action {
           - b.townHallTile.groundPixels(With.geography.home))
         .take(count)
     }
-    
-    val basesToScout =
+
+    val suggestedBases = unit.agent.lastIntent.toScoutBases
+    val basesToScout = if (suggestedBases.nonEmpty) suggestedBases else
       With.geography.enemyBases.filter(b => ! b.zone.island && With.intelligence.unitsShown(b.owner, Zerg.SpawningPool) == 0) ++ (
         if (With.geography.enemyBases.size == 1)
           With.geography.enemyBases.head.natural.map(Vector(_)).getOrElse(nearestNeutralBases(1))
@@ -59,6 +60,7 @@ abstract class AbstractFindBuildings extends Action {
         }
       })
       .filter(With.grids.buildableTerrain.get)
+      .filter(tile => ! unit.matchups.threats.exists(_.inRangeToAttack(unit, tile.pixelCenter)))
   
     if (tilesToScout.isEmpty) return
   

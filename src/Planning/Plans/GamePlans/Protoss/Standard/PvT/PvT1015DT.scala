@@ -6,6 +6,7 @@ import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Compound.Trigger
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
+import Planning.Plans.Macro.Automatic.PumpWorkers
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
@@ -17,9 +18,10 @@ class PvT1015DT extends GameplanTemplate {
   
   override val activationCriteria = new Employing(PvT1015DT)
   override val completionCriteria = new MiningBasesAtLeast(2)
-  override val superSaturate = true
   override val attackPlan = new Attack
   override def scoutPlan = new ScoutOn(Protoss.Gateway, quantity = 2)
+
+  override def workerPlan: Plan = new PumpWorkers(oversaturate = true)
 
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.PvT1015GateGoonDT
 

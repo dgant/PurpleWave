@@ -10,7 +10,7 @@ import Lifecycle.With
 import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.PurpleMath
-import Micro.Heuristics.Targeting2.EvaluateTargets2
+import Micro.Heuristics.EvaluateTargets
 import Micro.Matchups.MatchupAnalysis
 import Performance.Cache
 import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatcher}
@@ -151,8 +151,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     remainingTrainFrames
   ).max
 
-  val participatingInCombat = new Cache(() => EvaluateTargets2.participatingInCombat(this))
-  val baseTargetValue = new Cache(() => EvaluateTargets2.getTargetBaseValue(this))
+  val participatingInCombat = new Cache(() => EvaluateTargets.participatingInCombat(this))
+  val baseTargetValue = new Cache(() => EvaluateTargets.getTargetBaseValue(this))
   
   //////////////
   // Geometry //
@@ -277,6 +277,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
         (isScout()    && player.hasUpgrade(Protoss.ScoutVisionRange))     ||
         (isOverlord() && player.hasUpgrade(Zerg.OverlordVisionRange)))
       64 else 0))
+
+  def altitudeBonus: Double = tileIncludingCenter.altitudeBonus
 
   ////////////
   // Combat //
@@ -483,14 +485,15 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def inRangeToAttack(enemy: UnitInfo)                    : Boolean = pixelDistanceEdge(enemy)          <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy)          > pixelRangeMin)
   def inRangeToAttack(enemy: UnitInfo, enemyAt: Pixel)    : Boolean = pixelDistanceEdge(enemy, enemyAt) <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy, enemyAt) > pixelRangeMin)
   def inRangeToAttack(enemy: UnitInfo, framesAhead: Int)  : Boolean = inRangeToAttack(enemy, enemy.projectFrames(framesAhead))
-
+  def pixelsToGetInRange(enemy: UnitInfo)                 : Double = if (canAttack(enemy)) (pixelDistanceEdge(enemy) - pixelRangeAgainst(enemy)) else Int.MaxValue
+  def pixelsToGetInRange(enemy: UnitInfo, enemyAt: Pixel) : Double = if (canAttack(enemy)) (pixelDistanceEdge(enemy, enemyAt) - pixelRangeAgainst(enemy)) else Int.MaxValue
   def framesToTravelTo(destination: Pixel)  : Int = framesToTravelPixels(pixelDistanceTravelling(destination))
   def framesToTravelPixels(pixels: Double)  : Int = (if (pixels <= 0.0) 0 else if (canMove) Math.max(0, Math.ceil(pixels / topSpeedPossible).toInt) else Int.MaxValue) + (if (burrowed || sieged) 24 else 0)
   def framesToTurnTo(radiansTo: Double): Double = unitClass.framesToTurn(PurpleMath.normalizeAroundZero(PurpleMath.radiansTo(angleRadians, radiansTo)))
   def framesToTurnFrom(enemy: UnitInfo): Double = framesToTurnTo(enemy.pixelCenter.radiansTo(pixelCenter))
   def framesToAccelerate: Double = PurpleMath.clamp(PurpleMath.nanToZero((topSpeed - speed) / unitClass.accelerationFrames), 0, unitClass.accelerationFrames)
-  def framesToGetInRange(enemy: UnitInfo)                 : Int = if (canAttack(enemy)) framesToTravelPixels(pixelDistanceEdge(enemy)           - pixelRangeAgainst(enemy)) else Int.MaxValue
-  def framesToGetInRange(enemy: UnitInfo, enemyAt: Pixel) : Int = if (canAttack(enemy)) framesToTravelPixels(pixelDistanceEdge(enemy, enemyAt)  - pixelRangeAgainst(enemy)) else Int.MaxValue
+  def framesToGetInRange(enemy: UnitInfo)                 : Int = if (canAttack(enemy)) framesToTravelPixels(pixelsToGetInRange(enemy)) else Int.MaxValue
+  def framesToGetInRange(enemy: UnitInfo, enemyAt: Pixel) : Int = if (canAttack(enemy)) framesToTravelPixels(pixelsToGetInRange(enemy, enemyAt)) else Int.MaxValue
   def framesBeforeAttacking(enemy: UnitInfo)              : Int = framesBeforeAttacking(enemy, enemy.pixelCenter)
   def framesBeforeAttacking(enemy: UnitInfo, at: Pixel)   : Int = {
     if (canAttack(enemy)) {

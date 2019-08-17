@@ -55,7 +55,7 @@ class ZvP2HatchMuta extends GameplanTemplate {
   
   override def priorityAttackPlan: Plan = new If(
     new UnitsAtLeast(12, UnitMatchWarriors),
-    new CampExpansions)
+    new CampExpansions(Zerg.Zergling))
   
   override def attackPlan: Plan = new If(
     new Or(
@@ -154,6 +154,7 @@ class ZvP2HatchMuta extends GameplanTemplate {
   
   override def emergencyPlans: Seq[Plan] = Vector(
     new Pump(Zerg.SunkenColony),
+    new PumpRatio(Zerg.Drone, 0, 18, Seq(Flat(9), Friendly(UnitMatchAnd(Zerg.SunkenColony, UnitMatchComplete), 3))),
     new ReactiveSunkensVsZealots,
     new ZergReactionVsWorkerRush
   )
@@ -260,7 +261,9 @@ class ZvP2HatchMuta extends GameplanTemplate {
     new ReactiveZerglings,
     new If(
       new UnitsAtLeast(1, Zerg.Spire),
-      new Build(Get(5, Zerg.Overlord))), // make sure we have enough when mutas pop
+      new BuildOrder(
+        Get(5, Zerg.Overlord),
+        Get(8, Zerg.Mutalisk))), // make sure we have enough when mutas pop
 
     new Pump(Zerg.Drone, 9),
     new If(new ProceedWithDrones, new Pump(Zerg.Drone, 12)),

@@ -1,7 +1,6 @@
 package Lifecycle
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
-import Strategery.History.HistoryLoader
 
 object Manners {
   
@@ -18,7 +17,7 @@ object Manners {
     if (With.configuration.enableSurrenders
       && With.performance.enablePerformanceStops
       && With.performance.enablePerformanceSurrenders
-      && With.performance.framesOver55 > 1000) {
+      && With.performance.framesOverShort > 1000) {
       With.logger.error("Quitting due to performance failure")
       surrender()
     }

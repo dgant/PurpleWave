@@ -23,6 +23,7 @@ class GoalDefendZone extends GoalBasic {
   override val counterMax: Double = 3.0
 
   override def run() {
+    if (squad.units.isEmpty) return
 
     lazy val base = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.intelligence.threatOrigin))
     lazy val choke = zone.exit
@@ -63,7 +64,10 @@ class GoalDefendZone extends GoalBasic {
   )
 
   private def huntableFilter(enemy: UnitInfo): Boolean = (
-    !(enemy.is(Zerg.Drone) && With.fingerprints.fourPool.matches)
+    ! (enemy.is(Zerg.Drone) && With.fingerprints.fourPool.matches)
+      && (
+        squad.units.exists(_.canAttack(enemy))
+        || (enemy.cloaked && squad.units.exists(_.unitClass.isDetector)))
       && (enemy.matchups.targets.nonEmpty || enemy.matchups.allies.forall(_.matchups.targets.isEmpty)) // Don't, for example, chase Overlords that have ally Zerglings nearby
       && zone.exit.forall(exit =>
       enemy.flying

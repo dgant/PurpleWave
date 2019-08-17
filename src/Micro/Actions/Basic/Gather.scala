@@ -7,7 +7,8 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Disengage, Engage}
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Commands.Move
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import Planning.UnitMatchers.UnitMatchWorkers
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Strategery.Benzene
 import Utilities.ByOption
@@ -37,16 +38,10 @@ object Gather extends Action {
           && target.base.exists(_.units.exists(resource => resource.resourcesLeft > 0 && target.pixelDistanceCenter(resource) < With.configuration.workerDefenseRadiusPixels)))
 
       if (unit.canBurrow
-        && unit.matchups.threatsInRange.exists(_.isAny(
-          Terran.Vulture,
-          Terran.Firebat,
-          Protoss.Archon,
-          Protoss.Reaver,
-          Protoss.DarkTemplar,
-          Zerg.Lurker,
-          Zerg.Mutalisk))
+        && unit.matchups.enemies.exists(enemy =>
+        ! enemy.isAny(UnitMatchWorkers, Terran.Wraith, Protoss.Arbiter, Protoss.Scout)
+        && enemy.pixelDistanceEdge(unit) < enemy.pixelRangeAgainst(unit) + 32)
         && ! With.grids.enemyDetection.isDetected(unit.tileIncludingCenter)) {
-        Potshot.delegate(unit)
         With.commander.burrow(unit)
       }
 

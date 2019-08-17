@@ -5,7 +5,7 @@ import Mathematics.PurpleMath
 import Planning.Plan
 import Planning.Plans.GamePlans.StandardGamePlan
 import ProxyBwapi.Players.Players
-import Strategery.History.{HistoricalGame, HistoryLoader}
+import Strategery.History.HistoricalGame
 import Strategery.Selection.StrategySelectionDynamic
 import Strategery.Strategies.Protoss.ProtossChoices
 import Strategery.Strategies.Strategy
@@ -57,15 +57,15 @@ class Strategist {
     1.0 / (1.0 + (game.order / With.configuration.historyHalfLife))
   )).toMap
 
-  lazy val enemyRecentFingerprints: Vector[String] = {
+  def enemyFingerprints(games: Int = With.configuration.recentFingerprints): Vector[String] = {
     With.history.gamesVsEnemies
-      .toVector
-      .sortBy(-_.timestamp)
-      .take(With.configuration.recentFingerprints)
+      .take(games)
       .flatMap(_.strategies.toVector)
       .filter(_.startsWith("Finger"))
       .distinct
   }
+
+  lazy val enemyRecentFingerprints: Vector[String] = enemyFingerprints(With.configuration.recentFingerprints)
 
   def selectInitialStrategies: Set[Strategy] = {
     val enemyHasKnownRace = With.enemies.exists(_.raceInitial != Race.Unknown)
@@ -130,7 +130,7 @@ class Strategist {
       &&  ! disabledInPlaybook
       &&  appropriateForOurRace
       &&  appropriateForEnemyRace
-      &&  allowedForOpponent
+      &&  ( ! Playbook.respectOpponent || allowedForOpponent)
       &&  ( ! Playbook.respectMap || ! disabledOnMap)
       &&  ( ! Playbook.respectMap || strategy.startLocationsMin <= startLocations)
       &&  ( ! Playbook.respectMap || strategy.startLocationsMax >= startLocations)

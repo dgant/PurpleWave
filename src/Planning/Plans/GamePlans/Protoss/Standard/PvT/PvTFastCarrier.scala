@@ -16,8 +16,8 @@ import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.Predicates.Economy.MineralsAtMost
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Never
-import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio}
-import Planning.Predicates.Strategy.Employing
+import Planning.Predicates.Reactive.EnemyBasesAtLeast
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.MapGroups
 import Strategery.Strategies.Protoss._
@@ -102,7 +102,7 @@ class PvTFastCarrier extends GameplanTemplate {
                 new Not(new UpgradeComplete(Protoss.AirArmor, 3)),
                 new Or(
                   new UpgradeComplete(Protoss.AirDamage, 3),
-                  new EnemyBio)),
+                  new EnemyStrategy(With.fingerprints.bio))),
               new UpgradeContinuously(Protoss.AirArmor),
               new UpgradeContinuously(Protoss.AirDamage)))),
         new If(

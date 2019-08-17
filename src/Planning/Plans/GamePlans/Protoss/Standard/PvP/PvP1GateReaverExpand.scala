@@ -8,7 +8,7 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.PumpWorkers
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Scouting.ScoutOn
+import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeAtHome}
@@ -30,7 +30,8 @@ class PvP1GateReaverExpand extends GameplanTemplate {
     new PvPIdeas.ReactToDarkTemplarEmergencies,
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToProxyGateways,
-    new PvPIdeas.ReactToFFE)
+    new PvPIdeas.ReactToFFE,
+    new ScoutForCannonRush)
 
   override def buildOrderPlan: Plan = new Parallel(
     new BuildOrder(

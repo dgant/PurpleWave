@@ -9,7 +9,7 @@ import Planning.Plans.Macro.Automatic.{Pump, PumpShuttleAndReavers, PumpWorkers}
 import Planning.Plans.Macro.Build.{CancelIncomplete, CancelOrders}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireBases
-import Planning.Plans.Scouting.ScoutOn
+import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Milestones.{BasesAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
@@ -31,7 +31,8 @@ class PvPGateGateRobo extends GameplanTemplate {
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToProxyGateways,
     new PvPIdeas.ReactToFFE,
-    new PvPIdeas.ReactTo2Gate)
+    new PvPIdeas.ReactTo2Gate,
+    new ScoutForCannonRush)
   
   override def buildOrder = Seq(
       // http://wiki.teamliquid.net/starcraft/2_Gate_Reaver_(vs._Protoss)

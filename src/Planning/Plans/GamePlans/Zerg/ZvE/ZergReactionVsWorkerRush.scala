@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.{Attack, DefendAgainstWorkerRush}
 import Planning.Plans.Compound.{If, Or}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}
@@ -23,6 +23,7 @@ class ZergReactionVsWorkerRush extends GameplanTemplate {
   override def attackPlan: Plan = new Attack
 
   override def buildPlans: Seq[Plan] = Seq(
+    new DefendAgainstWorkerRush,
     new If(
       new And(
         new UnitsAtLeast(2, Zerg.Zergling, countEggs = true),

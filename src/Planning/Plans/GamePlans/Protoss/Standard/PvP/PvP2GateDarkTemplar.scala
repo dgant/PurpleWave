@@ -13,7 +13,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Placement.{BuildCannonsAtNatural, BuildCannonsInMain, ProposePlacement}
-import Planning.Plans.Scouting.ScoutOn
+import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
@@ -29,6 +29,8 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
   override val completionCriteria = new Latch(new MiningBasesAtLeast(2))
   override val workerPlan = NoPlan()
   override val scoutPlan = new ScoutOn(Protoss.Gateway)
+
+  override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
 
   override val attackPlan  = new Trigger(
     new Or(
@@ -104,9 +106,13 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvPIdeas.ReactToGasSteal,
     new PvPIdeas.ReactToCannonRush,
+    new If(
+      new UnitsAtMost(0, Protoss.CitadelOfAdun),
+      new Parallel(
     new PvPIdeas.ReactToProxyGateways,
-    new PvPIdeas.ReactTo2Gate,
-    new PvPIdeas.ReactToFFE
+        new PvPIdeas.ReactTo2Gate)),
+    new PvPIdeas.ReactToFFE,
+    new ScoutForCannonRush
   )
   
   override val buildPlans = Vector(

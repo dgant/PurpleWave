@@ -21,7 +21,9 @@ object Scout extends Action {
     FindBuildings.consider(unit)
     //Poke.consider(unit)
     FindBuildingsWhenBored.consider(unit)
-    Potshot.consider(unit)
+    if (unit.matchups.threatsInRange.isEmpty) {
+      Potshot.consider(unit)
+    }
     Move.consider(unit)
   }
 }

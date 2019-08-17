@@ -1,7 +1,7 @@
 package Strategery.Strategies.Zerg
 
 import Planning.Plan
-import Planning.Plans.GamePlans.Zerg.ZvE.{ZvE4Pool, ZvESparkle}
+import Planning.Plans.GamePlans.Zerg.ZvE.{ZvE4Pool, ZvE9Pool2HatchSpeed, ZvESparkle}
 import Strategery.{Benzene, StarCraftMap}
 import Strategery.Strategies.Strategy
 import bwapi.Race
@@ -17,6 +17,10 @@ object ZvE4Pool extends ZergStrategy {
 
   // Temporary until we improve scouting
   override def startLocationsMax: Int = 3
+}
+
+object ZvE9Pool2HatchSpeed extends ZergStrategy {
+  override def gameplan: Option[Plan] = Some(new ZvE9Pool2HatchSpeed)
 }
 
 object ZvESparkle extends ZergStrategy {

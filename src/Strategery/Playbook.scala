@@ -10,7 +10,6 @@ import Strategery.Strategies.Terran.TvE._
 import Strategery.Strategies.Terran.TvR.TvR1Rax
 import Strategery.Strategies.Terran.TvZ.TvZProxy8Fact
 import Strategery.Strategies.Terran._
-import Strategery.Strategies.Utility.EvESandbox
 import Strategery.Strategies.Zerg._
 
 class EmptyPlaybook {
@@ -41,6 +40,7 @@ class EmptyPlaybook {
   )
   def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy
   def enemyName: String = With.enemy.name
+  def respectOpponent: Boolean = true
   def respectMap: Boolean = true
   def respectHistory: Boolean = true
 }
@@ -48,20 +48,28 @@ class EmptyPlaybook {
 object StrategyGroups {
   val disabled = Vector[Strategy](
     WorkerRush,
+
+    CarriersWithNoDefense,
+
     TvEWorkerRushLiftoff,
     TvR1Rax,
     TvZProxy8Fact,
     TvZ2RaxNuke,
+
+    PvROpenZZCore,
+    PvE3BaseIslandCarrier,
+    PvT1GateRobo,
     PvTProxyDarkTemplar,
     PvP2Gate1012,
+    PvP1GateReaverExpand,
+    PvZLateGameCarrier, // Needs island tech
+    PvZMidgame4Gate2Archon,
+    PvZMidgameNeoNeoBisu,
+
     ZvTProxyHatchZerglings,
     ZvTProxyHatchHydras,
     ZvTProxyHatchSunkens,
-    PvZLateGameCarrier, // Needs island tech
-    CarriersWithNoDefense,
     ZvZ5PoolSunkens,
-    PvP1GateReaverExpand,
-    PvT1GateRobo
   )
 }
 
@@ -75,15 +83,11 @@ class CIGPlaybook extends PurpleWavePlaybook {
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(EvESandbox)
+  override lazy val forced: Seq[Strategy] = Seq(PvP3GateGoon)
+  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
+  override def respectOpponent: Boolean = false
   override def respectMap: Boolean = false
   override def respectHistory: Boolean = false
 }
 
-class ForcedPlaybook extends EmptyPlaybook {
-  override def strategySelectionPolicy: StrategySelectionPolicy = new StrategySelectionFixed(EvESandbox)
-  override def respectMap: Boolean = false
-  override def respectHistory: Boolean = false
-}
-
-object Playbook extends ForcedPlaybook {}
+object Playbook extends PurpleWavePlaybook {}

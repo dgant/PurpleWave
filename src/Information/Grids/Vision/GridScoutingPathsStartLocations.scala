@@ -9,7 +9,7 @@ class GridScoutingPathsStartLocations extends GridGroundDistance {
   override def origins: Vector[Tile] =
     With.geography.startLocations.flatMap(a =>
       With.geography.startLocations.filterNot(_ == a).flatMap(
-        With.paths.aStarBasic(a, _).tiles))
+        With.paths.profileDistance(a, _).find.tiles))
       .flatten
       .distinct
 }

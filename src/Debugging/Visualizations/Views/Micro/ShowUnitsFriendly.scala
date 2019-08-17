@@ -3,6 +3,7 @@ package Debugging.Visualizations.Views.Micro
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Debugging.Visualizations.{Colors, ForceColors}
+import Information.Geography.Pathfinding.Types.TilePath
 import Lifecycle.With
 import Mathematics.Points.PixelRay
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -15,17 +16,17 @@ object ShowUnitsFriendly extends View {
   var showClient      : Boolean = true
   var showAction      : Boolean = true
   var showCommand     : Boolean = true
-  var showOrder       : Boolean = true
+  var showOrder       : Boolean = false
   var showTargets     : Boolean = true
   var showFormation   : Boolean = true
-  var showRayPaths    : Boolean = false
+  var showPaths       : Boolean = true
   var showForces      : Boolean = true
   var showDesire      : Boolean = true
   var showDistance    : Boolean = false
   var showFightReason : Boolean = true
-  
+
   override def renderMap() { With.units.ours.foreach(renderUnitState) }
-  
+
   def renderUnitState(unit: FriendlyUnitInfo) {
     val agent = unit.agent
     if (selectedOnly && ! unit.selected) return
@@ -33,7 +34,7 @@ object ShowUnitsFriendly extends View {
     if ( ! With.viewport.contains(unit.pixelCenter)) return
     if ( ! unit.unitClass.orderable) return
     if (unit.transport.isDefined) return
-    
+
     var labelY = -28
     if (showFightReason) {
       DrawMap.label(
@@ -71,7 +72,7 @@ object ShowUnitsFriendly extends View {
         drawBackground = false)
       labelY += 7
     }
-    
+
     if (showTargets) {
       val targetUnit = unit.target.orElse(unit.orderTarget)
       if (targetUnit.nonEmpty) {
@@ -102,16 +103,26 @@ object ShowUnitsFriendly extends View {
         Colors.BrightViolet)
       }
     }
-    
-    if (showRayPaths) {
-      def drawPath(ray: PixelRay, color: Color) {
+
+    if (showPaths) {
+      def drawRayPath(ray: PixelRay, color: Color) {
         ray.tilesIntersected.foreach(tile => DrawMap.box(
           tile.topLeftPixel.add(1, 1),
           tile.bottomRightPixel.subtract(1, 1),
           if (With.grids.walkable.get(tile)) color else Colors.BrightRed))
       }
-      agent.pathsAll.foreach(drawPath(_, Colors.BrightBlue))
-      agent.pathsAcceptable.foreach(drawPath(_, Colors.BrightYellow))
+      def drawTilePath(path: TilePath): Unit = {
+        for (i <- 0 until path.tiles.get.size - 1) {
+          DrawMap.arrow(
+            path.tiles.get(i).pixelCenter,
+            path.tiles.get(i + 1).pixelCenter,
+            Colors.White)
+        }
+      }
+      agent.pathBranches.foreach(pair => DrawMap.arrow(pair._1, pair._2, Colors.NeonBlue))
+      agent.path.foreach(drawTilePath)
+      agent.pathsAll.foreach(drawRayPath(_, Colors.BrightBlue))
+      agent.pathsAcceptable.foreach(drawRayPath(_, Colors.BrightYellow))
     }
     
     if (showForces) {

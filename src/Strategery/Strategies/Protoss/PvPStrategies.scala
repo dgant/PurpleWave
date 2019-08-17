@@ -34,13 +34,20 @@ object PvP2Gate1012Goon extends PvPOpening {
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.forgeFe)
   //override def rushDistanceMaximum: Int = 5000
 }
+object PvP2Gate1012GoonCounter extends PvPOpening {
+  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(With.fingerprints.forgeFe, With.fingerprints.robo)
+}
+object PvP2Gate1012DT extends PvPOpening {
+  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.forgeFe, With.fingerprints.robo)
+}
 
 object PvP2GateDTExpand extends PvPOpening {
   //override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.proxyGateway)
 }
-
 object PvP2GateGoon extends PvPOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
+  override def responsesBlacklisted: Iterable[Fingerprint] = PvP3GateGoon.responsesBlacklisted
+  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(With.fingerprints.proxyGateway, With.fingerprints.twoGate)
 }
 object PvP3GateGoon extends PvPOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
@@ -59,4 +66,21 @@ object PvP4GateGoon extends PvPOpening {
 object PvPProxy2Gate extends PvPOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.twoGate, With.fingerprints.proxyGateway, With.fingerprints.forgeFe)
+}
+
+// TODO -- unfinished
+
+object PvP1ZealotExpand extends PvPOpening {
+  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(With.fingerprints.robo)
+}
+object PvPObsReaverExpand extends PvPOpening {
+  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
+}
+object PvPReaverExpand extends PvPOpening {
+}
+object PvPReaverPush extends PvPOpening {
+  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
+}
+object PvPObsReaverPush extends PvPOpening {
+
 }

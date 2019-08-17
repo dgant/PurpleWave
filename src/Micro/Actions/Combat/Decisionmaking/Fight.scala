@@ -18,6 +18,7 @@ object Fight extends Action {
   )
   
   override def perform(unit: FriendlyUnitInfo) {
+    Follow.consider(unit)
     GooseChase.consider(unit)
     Support.consider(unit)
     StrategicNuke.consider(unit)

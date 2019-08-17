@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.Get
+import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -11,11 +11,11 @@ import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Placement.{BuildCannonsAtNatural, ProposePlacement}
-import Planning.Plans.Scouting.ScoutOn
+import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
-import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP2Gate1012
@@ -32,7 +32,7 @@ class PvP2Gate1012Expand extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(PvP2Gate1012)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(5, Protoss.Gateway))
   override def attackPlan: Plan = new PvPIdeas.AttackSafely
-  override val scoutPlan: Plan = new ScoutOn(Protoss.Pylon)
+  override val scoutPlan: Plan = new If(new StartPositionsAtLeast(4), new ScoutOn(Protoss.Pylon), new ScoutOn(Protoss.Gateway))
   
   override def placementPlan: Plan = new Trigger(
     new UnitsAtLeast(3, Protoss.Pylon),
@@ -44,7 +44,8 @@ class PvP2Gate1012Expand extends GameplanTemplate {
       new BuildCannonsAtNatural(2)),
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToProxyGateways,
-    new PvPIdeas.ReactToFFE)
+    new PvPIdeas.ReactToFFE,
+    new ScoutForCannonRush)
 
   class FollowUpVsTwoGate extends Parallel(
     new RequireMiningBases(2),
@@ -83,7 +84,7 @@ class PvP2Gate1012Expand extends GameplanTemplate {
       Get(Protoss.DragoonRange),
       Get(3, Protoss.Gateway)))
   
-  override val buildOrder = ProtossBuilds.TwoGate1012
+  override val buildOrder: Vector[BuildRequest] = ProtossBuilds.TwoGate1012
   override def buildPlans = Vector(
 
     new If(

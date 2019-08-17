@@ -8,6 +8,7 @@ import Planning.Plans.Basic.{Do, NoPlan, Write}
 import Planning.Plans.Compound.{Or, _}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.PlaceGatewaysProxied
+import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases}
@@ -30,7 +31,9 @@ class PvEProxy2Gate extends GameplanTemplate {
     new Not(new FoundEnemyBase),
     new ScoutOn(Protoss.Gateway, quantity = 2))
 
+  override def aggressionPlan: Plan = new Aggression(1.2)
   override def workerPlan: Plan = NoPlan()
+
   override def priorityAttackPlan: Plan = new Parallel(
     new If(
       new EnemyStrategy(With.fingerprints.cannonRush),
@@ -118,6 +121,10 @@ class PvEProxy2Gate extends GameplanTemplate {
       new Build(Get(4, Protoss.Gateway))),
 
     new Pump(Protoss.Zealot),
+  )
+
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new PvPIdeas.ReactToCannonRush
   )
   
   override def buildPlans = Vector(

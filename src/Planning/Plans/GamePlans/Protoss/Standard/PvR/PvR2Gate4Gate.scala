@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.ConsiderAttacking
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -13,7 +13,8 @@ import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Milestones.{UnitsAtLeast, UpgradeComplete}
-import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.Predicates.Reactive.EnemyBasesAtLeast
+import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvR2Gate4Gate
@@ -29,10 +30,12 @@ class PvR2Gate4Gate extends GameplanTemplate {
     new Blueprint(Protoss.Pylon,    placement = Some(PlacementProfiles.hugTownHall)))
 
   override def attackPlan: Plan = new Trigger(
+    new Or(
     new UpgradeComplete(Protoss.DragoonRange),
-    new ConsiderAttacking
-  )
-  override def scoutPlan: Plan = new ScoutOn(Protoss.CyberneticsCore)
+      new EnemyBasesAtLeast(2),
+      new EnemyIsTerran),
+    new Attack)
+  override def scoutPlan: Plan = new ScoutOn(Protoss.Gateway, 2)
 
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.TwoGate910
 

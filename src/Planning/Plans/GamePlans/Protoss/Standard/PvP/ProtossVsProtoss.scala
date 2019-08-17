@@ -5,7 +5,7 @@ import Planning.Plans.GamePlans.ModalGameplan
 class ProtossVsProtoss extends ModalGameplan(
   new PvPVsForge,
   new PvP2Gate1012Expand,
-  new PvP2Gate1012Goon,
+  new PvP2Gate1012GoonOrDT,
   new PvP1GateReaverExpand,
   new PvPGateGateRobo,
   new PvP2GateGoon,

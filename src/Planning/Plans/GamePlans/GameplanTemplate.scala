@@ -5,7 +5,7 @@ import Macro.Architecture.Blueprint
 import Macro.BuildRequests.BuildRequest
 import Planning.Plan
 import Planning.Plans.Army.{RecruitFreelancers, _}
-import Planning.Plans.Basic.NoPlan
+import Planning.Plans.Basic.{NoPlan, WriteStatus}
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.Protoss.Situational.{CatchDTRunby, DefendAgainstProxy}
 import Planning.Plans.Macro.Automatic.{Gather, PumpWorkers, RequireSufficientSupply}
@@ -22,17 +22,18 @@ abstract class GameplanTemplate extends GameplanMode {
   
   val meldArchonsAt         : Int               = 40
   val removeMineralBlocksAt : Int               = 40
+  def status                : String            = this.toString
   def blueprints            : Seq[Blueprint]    = Seq.empty
-  val superSaturate         : Boolean           = false
   def buildOrder            : Seq[BuildRequest] = Vector.empty
   def emergencyPlans        : Seq[Plan]         = Vector.empty
   def buildPlans            : Seq[Plan]         = Vector.empty
   def aggressionPlan        : Plan              = NoPlan()
+  def statusPlan            : Plan              = new WriteStatus(() => status)
   def placementPlan         : Plan              = new ProposePlacement(blueprints: _*)
   def archonPlan            : Plan              = new MeldArchons(meldArchonsAt)
   def buildOrderPlan        : Plan              = new BuildOrder(buildOrder: _*)
   def supplyPlan            : Plan              = new RequireSufficientSupply
-  def workerPlan            : Plan              = new If(new Not(new WeAreZerg), new PumpWorkers(superSaturate))
+  def workerPlan            : Plan              = new If(new Not(new WeAreZerg), new PumpWorkers)
   def scoutPlan             : Plan              = new ScoutAt(14)
   def scoutExposPlan        : Plan              = new If(new BasesAtLeast(2), new ScoutExpansionsAt(60))
   def yoloPlan              : Plan              = new If(new Check(() => With.yolo.active()), new Attack)
@@ -79,6 +80,7 @@ abstract class GameplanTemplate extends GameplanMode {
           ++ buildPlans
           ++ Vector(
             archonPlan,
+            statusPlan,
             new ClearBurrowedBlockers,
             new FollowBuildOrder,
             new RemoveMineralBlocksAt(removeMineralBlocksAt))

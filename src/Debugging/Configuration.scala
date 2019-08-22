@@ -35,6 +35,7 @@ class Configuration {
 
   var enableMCRS                    = false
   var enableThreatAwarePathfinding  = true
+  var retreatTowardsHomeOptional    = enableThreatAwarePathfinding // Works much better with threat-aware on
   var avatarBattleDistancePixels    = 32.0 * 6.0
   var battleMarginTileBase          = 12 + 2
   var battleMarginTileMinimum       = 12 + 2

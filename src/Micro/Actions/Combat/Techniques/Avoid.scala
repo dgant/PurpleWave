@@ -56,9 +56,16 @@ object Avoid extends ActionTechnique {
     val enemySieging        = unit.matchups.enemies.exists(_.isAny(UnitMatchSiegeTank, Zerg.Lurker))
     val atHome              = unit.zone == unit.agent.origin.zone
     val scouting            = unit.agent.canScout
-    val desireToGoHome      = if (enemySieging) -1 else if (scouting || atHome) 0 else (
-      (if (enemyCloser) 1 else 0) + (if (enemySooner) 1 else 0)
-    )
+    val desireToGoHome      =
+      if ( ! With.configuration.retreatTowardsHomeOptional)
+        1
+      else if (enemySieging)
+        -1
+      else if (scouting || atHome)
+        0
+      else
+        ((if (enemyCloser) 1 else 0) + (if (enemySooner) 1 else 0))
+
     val desireForFreedom    = if (unit.flying && ! unit.matchups.threats.exists(_.unitClass.dealsRadialSplashDamage)) 0 else 1
     val desireForSafety     = PurpleMath.clamp(0, 3, (3 * (1 - unit.matchups.framesOfSafety / 72)).toInt)
     val desireProfile       = DesireProfile(desireToGoHome, desireForSafety, desireForFreedom)

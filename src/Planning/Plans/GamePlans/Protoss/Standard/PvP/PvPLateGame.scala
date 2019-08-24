@@ -175,6 +175,9 @@ class PvPLateGame extends GameplanTemplate {
           new Not(new UpgradeComplete(Protoss.ZealotSpeed)))),
         new UpgradeContinuously(Protoss.DragoonRange)),
 
+    // Mineral-only base? Need legs
+    new If(new MineralOnlyBase, new Build(Get(Protoss.CitadelOfAdun), Get(Protoss.ZealotSpeed))),
+
     new PvPIdeas.TakeBase2,
     new PvPIdeas.TakeBase3,
     new PvPIdeas.TakeBase4,

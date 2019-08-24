@@ -9,6 +9,7 @@ import Planning.Plans.GamePlans.Protoss.Situational.BuildHuggingNexus
 import Planning.Plans.Macro.Automatic.{PumpWorkers, _}
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
+import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.MeldDarkArchons
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
@@ -97,51 +98,27 @@ object PvTIdeas {
       new FrameAtMost(GameTime(10, 0)()),
       new EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113)),
     new Parallel(
-      new If(
-        new UnitsAtMost(5, UnitMatchWarriors),
-        new CancelIncomplete(Protoss.Nexus)),
-      new If(
-        new UnitsAtMost(1, Protoss.Gateway),
-        new CancelIncomplete(UnitMatchOr(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Nexus, Protoss.Stargate))),
+      new If(new UnitsAtMost(5, UnitMatchWarriors), new CancelIncomplete(Protoss.Nexus)),
+      new If(new UnitsAtMost(1, Protoss.Gateway), new CancelIncomplete(UnitMatchOr(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Nexus, Protoss.Stargate))),
       new RequireSufficientSupply,
-      new Pump(Protoss.DarkTemplar, 3),
-      new If(
-        new UnitsAtLeast(3, Protoss.Dragoon),
-        new Build(Get(Protoss.DragoonRange))),
-      new If(
-        new UnitsAtLeast(2, Protoss.Gateway),
-        new PumpWorkers,
-        new PumpWorkers(cap = 12)),
-      new If(
-        new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
-        new Parallel(
-          new If(
-            new UnitsAtLeast(21, Protoss.Probe),
-            new FloorGasWorkersAt(3),
-            new If(
-              new UnitsAtLeast(21, Protoss.Probe),
-              new FloorGasWorkersAt(2))),
-          new Pump(Protoss.Dragoon),
-          new If(
-            new Not(new Latch(new GasPumpsAtLeast(2))),
-            new Pump(Protoss.Zealot))),
-        new Pump(Protoss.Zealot, 7)),
+      new If(new UnitsAtLeast(2, Protoss.Reaver), new RequireMiningBases(2)),
+      new Pump(Protoss.Reaver, 2),
+      new If(new UnitsAtLeast(3, Protoss.Dragoon), new Build(Get(Protoss.DragoonRange))),
+      new If(new UnitsAtLeast(2, Protoss.Gateway), new PumpWorkers, new PumpWorkers(cap = 12)),
+      new Pump(Protoss.Dragoon),
+      new Pump(Protoss.Zealot, 7),
       new Build(
         Get(Protoss.Pylon),
         Get(2, Protoss.Gateway),
         Get(18, Protoss.Probe),
-        Get(Protoss.ShieldBattery),
-        Get(3, Protoss.Gateway)),
-      new If(
-        new UnitsAtLeast(1, Protoss.Dragoon),
-        new UpgradeContinuously(Protoss.DragoonRange)),
+        Get(Protoss.ShieldBattery)),
       new Pump(Protoss.Probe),
       new Build(
         Get(Protoss.Assimilator),
         Get(Protoss.CyberneticsCore),
-        Get(Protoss.CitadelOfAdun),
-        Get(Protoss.TemplarArchives),
-        Get(3, Protoss.Gateway),
+        Get(Protoss.DragoonRange),
+        Get(Protoss.RoboticsFacility),
+        Get(Protoss.RoboticsSupportBay),
         Get(2, Protoss.Nexus))))
 
   class ReactTo2Fac extends If(

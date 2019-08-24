@@ -3,7 +3,7 @@ package Planning.Plans.Macro.Automatic
 import Lifecycle.With
 import Planning.Predicate
 
-class GasCapsUnset extends Predicate {
+class GasCapsUntouched extends Predicate {
   override def isComplete: Boolean = (
     ! With.blackboard.gasWorkerCeiling.isSet
     && ! With.blackboard.gasWorkerFloor.isSet

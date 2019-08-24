@@ -22,11 +22,11 @@ import Planning.UnitCounters.UnitCountExactly
 import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.{PvP2Gate1012DT, PvP2Gate1012Goon, PvP2Gate1012GoonCounter}
+import Strategery.Strategies.Protoss.{PvP2Gate1012DT, PvP2Gate1012Goon}
 
 class PvP2Gate1012GoonOrDT extends GameplanTemplate {
 
-  override val activationCriteria: Predicate = new Employing(PvP2Gate1012Goon, PvP2Gate1012GoonCounter, PvP2Gate1012DT)
+  override val activationCriteria: Predicate = new Employing(PvP2Gate1012Goon, PvP2Gate1012DT)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(2, Protoss.Nexus))
 
   override def blueprints = Vector(

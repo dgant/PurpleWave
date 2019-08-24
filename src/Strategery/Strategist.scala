@@ -20,7 +20,7 @@ class Strategist {
   lazy val selectedInitially: Set[Strategy] = selectInitialStrategies
   
   lazy val map: Option[StarCraftMap] = StarCraftMaps.all.find(_.matches)
-   
+
   private var enemyRaceAtLastCheck: Race = With.enemy.raceInitial
   private var selectedLast: Option[Set[Strategy]] = None
   def selectedCurrently: Set[Strategy] = {

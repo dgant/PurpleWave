@@ -37,7 +37,11 @@ class PvP2GateGoon extends GameplanTemplate {
   override def placementPlan: Plan = new Parallel(
     super.placementPlan,
     new If(
-      new BasesAtLeast(2),
+      new Or(
+        new BasesAtLeast(2),
+        new And(
+          new UnitsAtLeast(3, Protoss.Pylon),
+          new Not(new EnemyStrategy(With.fingerprints.proxyGateway)))),
       new ProposePlacement(new Blueprint(this, building = Some(Protoss.Pylon), preferZone = Some(With.geography.ourNatural.zone)))))
 
   override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
@@ -89,9 +93,12 @@ class PvP2GateGoon extends GameplanTemplate {
         new BuildCannonsInMain(1),
         new BuildCannonsAtNatural(2))),
 
-    new If(
-      new EnemyStrategy(With.fingerprints.earlyForge, With.fingerprints.oneGateCore),
-      new RequireMiningBases(2)),
+    new If(new EnemyStrategy(With.fingerprints.earlyForge), new RequireMiningBases(2)),
+
+    new Build(Get(Protoss.DragoonRange)),
+
+    new If(new EnemyStrategy(With.fingerprints.oneGateCore), new RequireMiningBases(2)),
+
     new If(
       new EnemyStrategy(With.fingerprints.fourGateGoon),
       new If(
@@ -101,9 +108,8 @@ class PvP2GateGoon extends GameplanTemplate {
         new UnitsAtLeast(12, UnitMatchWarriors),
         new RequireMiningBases(2))),
 
-    new Build(Get(Protoss.DragoonRange)),
-
     new PvPIdeas.TrainArmy,
+
     new If(
       new EnemyStrategy(With.fingerprints.proxyGateway),
       new Build(Get(4, Protoss.Gateway)),

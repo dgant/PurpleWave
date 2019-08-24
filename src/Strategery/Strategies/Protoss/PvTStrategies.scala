@@ -26,15 +26,39 @@ object PvT13Nexus extends PvTBasicOpener {
     With.fingerprints.bbs)
   override def startLocationsMin: Int = 4
 }
-object PvT21Nexus extends PvTBasicOpener
+object PvT21Nexus extends PvTBasicOpener {
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.fiveRax,
+    With.fingerprints.bbs,
+    With.fingerprints.twoFac,
+    With.fingerprints.twoFacVultures,
+    With.fingerprints.threeFac,
+    With.fingerprints.threeFacVultures)
+}
 object PvT23Nexus extends PvTBasicOpener
-object PvT28Nexus extends PvTBasicOpener
+object PvT28Nexus extends PvTBasicOpener {
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.fiveRax,
+    With.fingerprints.bbs)
+}
 object PvT2GateRangeExpand extends PvTBasicOpener {
+  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.twoRax1113,
+    With.fingerprints.twoFac,
+    With.fingerprints.twoFacVultures,
+    With.fingerprints.threeFac,
+    With.fingerprints.threeFacVultures)
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fourteenCC,
-    With.fingerprints.oneRaxFE)
+    With.fingerprints.oneRaxFE,
+    With.fingerprints.fiveRax,
+    With.fingerprints.bbs)
 }
-object PvT2GateRangeExpandCarrier extends PvTStrategy
+object PvT2GateRangeExpandCarrier extends PvTStrategy {
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.fiveRax,
+    With.fingerprints.bbs)
+}
 object PvT25BaseCarrier extends PvTBasicOpener {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
     PvT3BaseCarrier
@@ -43,7 +67,6 @@ object PvT25BaseCarrier extends PvTBasicOpener {
 object PvT1015Expand extends PvTBasicOpener {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits :+ Destination
   override def entranceRamped: Boolean = false
-
   override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fourteenCC,
     With.fingerprints.oneRaxFE

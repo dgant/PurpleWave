@@ -7,7 +7,7 @@ import Planning.Predicates.Milestones.{BasesAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.EnemyStrategy
 import ProxyBwapi.Races.Protoss
 
-class PvPVsForge extends PvP3GateRobo {
+class PvPVsForge extends PvPRobo {
 
   // Locutus has two very silly openers that are very confusing to a bot
   // * Forge fast expansion

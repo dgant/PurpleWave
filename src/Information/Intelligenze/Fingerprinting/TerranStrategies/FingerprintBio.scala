@@ -1,14 +1,39 @@
 package Information.Intelligenze.Fingerprinting.TerranStrategies
 
 import Information.Intelligenze.Fingerprinting.Fingerprint
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Planning.UnitMatchers.UnitMatchSiegeTank
 import ProxyBwapi.Races.Terran
 
 class FingerprintBio extends Fingerprint {
   override protected def investigate: Boolean = {
-    if (With.units.countEnemy(Terran.Barracks) > 1 && With.units.countEnemy(UnitMatchSiegeTank) < 3) {
+    if (With.units.countEnemy(Terran.Barracks) > 2) {
       return true
+    }
+    if (With.units.countEnemy(Terran.Barracks) > 1 && ! With.fingerprints.bbs.matches) {
+      return true
+    }
+
+    if (With.intelligence.unitsShown.allEnemies(Terran.Vulture) < 4) {
+      if (With.enemies.exists(_.hasUpgrade(Terran.MarineRange))) {
+        return true
+      }
+      if (With.enemies.exists(_.hasTech(Terran.Stim))) {
+        return true
+      }
+      if (With.intelligence.unitsShown.allEnemies(Terran.Medic) > 0) {
+        return true
+      }
+      if (With.intelligence.unitsShown.allEnemies(Terran.Firebat) > 0) {
+        return true
+      }
+      if (With.intelligence.unitsShown.allEnemies(Terran.Marine) > 8) {
+        return true
+      }
+      if (With.units.existsEnemy(u => u.is(Terran.Academy) && u.upgrading)) {
+        return true
+      }
     }
 
     val enemyMech = (
@@ -31,5 +56,5 @@ class FingerprintBio extends Fingerprint {
     enemyBio > Math.max(8, enemyMech)
   }
 
-  override protected def sticky: Boolean = true
+  override protected def sticky: Boolean = With.frame > GameTime(10, 0)()
 }

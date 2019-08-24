@@ -18,7 +18,7 @@ object ProtossBuilds {
     Get(2,   Protoss.Gateway),
     Get(11,  Protoss.Probe),
     Get(2,   Protoss.Zealot),
-    Get(Protoss.Pylon),
+    Get(2,   Protoss.Pylon),
     Get(3,   Protoss.Zealot))
   
   val TwoGate1012 = Vector[BuildRequest] (

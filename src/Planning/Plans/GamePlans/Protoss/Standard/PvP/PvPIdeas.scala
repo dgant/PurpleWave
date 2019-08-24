@@ -278,7 +278,10 @@ object PvPIdeas {
     new EnemyStrategy(With.fingerprints.proxyGateway),
     new Parallel(
       new PerformReactionTo2Gate,
-      new Hunt(Protoss.Dragoon, UnitMatchAnd(Protoss.Zealot, (unit: UnitInfo) => unit.orderTargetPixel.exists(_.base.exists(_.owner.isUs)))),
+      new Hunt(Protoss.Dragoon, UnitMatchAnd(Protoss.Zealot, (unit: UnitInfo) =>
+        unit.base.exists(_.isOurMain)
+        || unit.base.exists(_.isNaturalOf.exists(_.isOurMain))
+        || unit.orderTargetPixel.exists(_.base.exists(_.owner.isUs)))),
       new Build(
         Get(Protoss.CitadelOfAdun),
         Get(Protoss.TemplarArchives))))

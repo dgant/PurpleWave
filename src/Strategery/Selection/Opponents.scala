@@ -25,7 +25,7 @@ object Opponents {
         Seq(
           PvROpenZCoreZ,
           PvT23Nexus, PvT2BaseCarrier,
-          PvP3GateRobo,
+          PvPRobo,
           PvZ4Gate1012, PvZMidgame5GateGoonReaver, PvZLateGameReaver),
         Seq(PvR2Gate4Gate),
         Seq(

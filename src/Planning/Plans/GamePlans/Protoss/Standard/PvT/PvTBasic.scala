@@ -200,6 +200,7 @@ class PvTBasic extends GameplanTemplate {
               new UpgradeContinuously(Protoss.AirDamage),
               new If(new UpgradeComplete(Protoss.AirDamage, 3), new UpgradeContinuously(Protoss.AirArmor))))),
         new UpgradeContinuously(Protoss.CarrierCapacity))),
+    new If(new MineralOnlyBase, new Build(Get(Protoss.CitadelOfAdun), Get(Protoss.ZealotSpeed))),
     new If(new UpgradeComplete(Protoss.ArbiterEnergy), new Build(Get(Protoss.Stasis))),
     new If(new UnitsAtLeast(1, Protoss.Shuttle), new UpgradeContinuously(Protoss.ShuttleSpeed)))
 
@@ -303,7 +304,7 @@ class PvTBasic extends GameplanTemplate {
 
   override val buildPlans = Vector(
     new If(
-      new GasCapsUnset,
+      new GasCapsUntouched,
       new If(
         new And(
           new GasForUpgrade(Protoss.DragoonRange),

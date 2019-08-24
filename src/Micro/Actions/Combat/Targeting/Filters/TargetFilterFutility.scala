@@ -29,7 +29,8 @@ object TargetFilterFutility extends TargetFilter {
       return false
     }
 
-    if (With.blackboard.pushKiters.get) {
+    // Respect PushKiters (intended for eg. Proxy Zealot rushes coming up against Dragoons)
+    if (With.blackboard.pushKiters.get && target.canAttack(actor) && target.pixelRangeAgainst(actor) > 32) {
       return true
     }
 

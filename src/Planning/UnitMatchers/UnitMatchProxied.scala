@@ -26,7 +26,7 @@ abstract class UnitMatchAnyProxy extends UnitMatcher {
     val distanceEnemy     = baseDistance(unit, unit.player)
     val distanceFriendly  = baseDistance(unit, With.self)
     
-    distanceFriendly < distanceEnemy * 1.25
+    distanceFriendly < distanceEnemy * 1.4
   }
   
   val distanceRatio: Double

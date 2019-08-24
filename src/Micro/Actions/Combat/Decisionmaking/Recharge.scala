@@ -13,7 +13,7 @@ object Recharge extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.canMove
     && unit.shieldPoints < unit.unitClass.maxShields / 3
-    && unit.totalHealth < unit.unitClass.maxTotalHealth / 3.0
+    && (unit.totalHealth < unit.unitClass.maxTotalHealth / 3.0 || ! unit.agent.shouldEngage)
   )
   
   protected def validBattery(unit: UnitInfo): Boolean = (

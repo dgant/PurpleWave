@@ -36,6 +36,8 @@ class Fingerprints {
       forgeFe
       gatewayFe
       dtRush
+      dragoonRange
+      mannerPylon
     }
     if (With.enemies.exists(_.isUnknownOrZerg)) {
       fourPool
@@ -93,6 +95,8 @@ class Fingerprints {
   lazy val forgeFe      = addFingerprint(new FingerprintForgeFE)
   lazy val gatewayFe    = addFingerprint(new FingerprintGatewayFE)
   lazy val dtRush       = addFingerprint(new FingerprintDTRush)
+  lazy val dragoonRange = addFingerprint(new FingerprintDragoonRange)
+  lazy val mannerPylon  = addFingerprint(new FingerprintMannerPylon)
   
   // Zerg
   lazy val fourPool     = addFingerprint(new Fingerprint4Pool)

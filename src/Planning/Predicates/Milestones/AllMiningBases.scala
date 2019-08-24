@@ -10,6 +10,6 @@ object AllMiningBases {
       .filter(base =>
         base.townHall.isDefined &&
         base.minerals.size >= 5 &&
-        base.mineralsLeft > With.configuration.maxMineralsBeforeMinedOut)
+        base.mineralsLeft > With.configuration.minimumMineralsBeforeMinedOut)
   }
 }

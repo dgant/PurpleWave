@@ -17,26 +17,6 @@ class EmptyPlaybook {
   lazy val forced   : Seq[Strategy] = none
   lazy val disabled : Seq[Strategy] = none
   val strategyOrder: Seq[Strategy] = Vector(
-    PvT13Nexus,
-    PvTDTExpand,
-    PvT21Nexus,
-    PvT23Nexus,
-    PvT28Nexus,
-    PvT2GateRangeExpand,
-
-    PvT2BaseCarrier,
-    PvT2BaseArbiter,
-
-    PvP2Gate1012Goon,
-    PvP2GateDTExpand,
-    PvP3GateGoon,
-    PvP3GateRobo,
-
-    PvZ4Gate99,
-    PvZFFEEconomic,
-    PvZGatewayFE,
-    PvZMidgame5GateGoon,
-    PvZMidgameNeoBisu,
   )
   def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy
   def enemyName: String = With.enemy.name
@@ -61,7 +41,6 @@ object StrategyGroups {
     PvT1GateRobo,
     PvTProxyDarkTemplar,
     PvP2Gate1012,
-    PvP1GateReaverExpand,
     PvZLateGameCarrier, // Needs island tech
     PvZMidgame4Gate2Archon,
     PvZMidgameNeoNeoBisu,
@@ -83,11 +62,11 @@ class CIGPlaybook extends PurpleWavePlaybook {
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvP3GateGoon)
+  override lazy val forced: Seq[Strategy] = Seq(PvPRobo)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
   override def respectOpponent: Boolean = false
   override def respectMap: Boolean = false
   override def respectHistory: Boolean = false
 }
 
-object Playbook extends PurpleWavePlaybook {}
+object Playbook extends TestingPlaybook {}

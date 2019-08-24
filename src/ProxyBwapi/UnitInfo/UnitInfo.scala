@@ -267,6 +267,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
 
   def isTransport: Boolean = unitClass.isTransport && ( ! isOverlord() || player.hasUpgrade(Zerg.OverlordDrops))
 
+  def detectionRangePixels: Int = if (unitClass.isDetector) (if (unitClass.isBuilding) 32 * 7 else sightRangePixels) else 0
   def sightRangePixels: Int = sightRangePixelsCache()
   private val sightRangePixelsCache = new Cache(() =>
     if (blind) 32 else

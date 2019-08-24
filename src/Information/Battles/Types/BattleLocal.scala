@@ -17,21 +17,25 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
     else
       estimationSimulationAttack
 
-  lazy val baseHysteresis : Double  = if (With.self.isZerg) 1.5 else 1.0
-  lazy val terranBonus    : Double  =   0.2 * getTerranBonus
-  lazy val hysteresis     : Double  =   0.2 * getHysteresis * baseHysteresis
-  lazy val turtleBonus    : Double  =   0.1 * getTurtleBonus
-  lazy val hornetBonus    : Double  =   0.3 * getHornetBonus
-  lazy val siegeUrgency   : Double  = - 0.5 * getSiegeUrgency
-  lazy val trappedness    : Double  = - 0.2 * getTrappedness
-  lazy val ratioAttack    : Double  = transformTotalScore(estimationSimulationAttack.localBattleMetrics)
-  lazy val ratioSnipe     : Double  = transformTotalScore(estimationSimulationSnipe.localBattleMetrics)
-  lazy val totalTarget    : Double  = hysteresis + terranBonus + turtleBonus + hornetBonus + siegeUrgency + trappedness + With.configuration.baseTarget
-  lazy val ratioTarget    : Double  = Math.min(.99, PurpleMath.nanToZero(totalTarget))
-  lazy val shouldFight    : Boolean = ratioAttack > ratioTarget || ratioSnipe > ratioTarget
+  lazy val baseHysteresis   : Double  = if (With.self.isZerg) 1.5 else 1.0
+  lazy val terranHomeBonus  : Double  =   0.2 * getTerranHomeBonus
+  lazy val hysteresis       : Double  =   0.2 * getHysteresis * baseHysteresis
+  lazy val turtleBonus      : Double  =   0.1 * getTurtleBonus
+  lazy val hornetBonus      : Double  =   0.3 * getHornetBonus
+  lazy val terranMaxBonus   : Double  = - 0.2 * getTerranMaxBonus
+  lazy val siegeUrgency     : Double  = - 0.5 * getSiegeUrgency
+  lazy val trappedness      : Double  = - 0.2 * getTrappedness
+  lazy val ratioAttack      : Double  = transformTotalScore(estimationSimulationAttack.localBattleMetrics)
+  lazy val ratioSnipe       : Double  = transformTotalScore(estimationSimulationSnipe.localBattleMetrics)
+  lazy val totalTarget      : Double  = hysteresis + terranHomeBonus + terranMaxBonus + turtleBonus + hornetBonus + siegeUrgency + trappedness + With.configuration.baseTarget
+  lazy val ratioTarget      : Double  = Math.min(.99, PurpleMath.nanToZero(totalTarget))
+  lazy val shouldFight      : Boolean = ratioAttack > ratioTarget || ratioSnipe > ratioTarget
 
-  def getTerranBonus: Double = {
+  def getTerranHomeBonus: Double = {
     if (enemy.centroid.zone.owner.isTerran && enemy.units.exists(u => u.is(UnitMatchSiegeTank) && u.matchups.targets.nonEmpty)) 0.2 else 0.0
+  }
+  def getTerranMaxBonus: Double = {
+    if (With.enemies.forall(_.isTerran)) PurpleMath.clamp(0.0, 1.0, (With.self.supplyUsed - 300) / 100.0) else 0
   }
   def getTurtleBonus: Double = {
     // Should we turtle behind our defenses?

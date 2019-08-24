@@ -22,7 +22,7 @@ import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.MapGroups
 import Strategery.Strategies.Protoss._
 
-class PvTFastCarrier extends GameplanTemplate {
+class PvT25BaseCarrier extends GameplanTemplate {
 
   class CanProxy extends Check(() => ! With.strategy.map.exists(MapGroups.badForProxying.contains))
   class CanGoCarriers extends Check(() => 4 * Math.max(4, With.units.countOurs(Protoss.Carrier)) > With.units.countEnemy(Terran.Goliath))
@@ -34,25 +34,6 @@ class PvTFastCarrier extends GameplanTemplate {
   override def scoutPlan: Plan        = new If(new CanProxy, new ScoutOn(Protoss.Gateway), new ScoutOn(Protoss.Pylon))
   override val removeMineralBlocksAt  = 24
 
-  private val buildOrderProxyGate = Vector(
-    Get(8,  Protoss.Probe),
-    Get(Protoss.Pylon),
-    Get(10, Protoss.Probe),
-    Get(Protoss.Gateway),
-    Get(12, Protoss.Probe),
-    Get(Protoss.Assimilator),
-    Get(13, Protoss.Probe),
-    Get(1,  Protoss.Zealot),
-    Get(14, Protoss.Probe),
-    Get(2,  Protoss.Pylon),
-    Get(15, Protoss.Probe),
-    Get(Protoss.CyberneticsCore),
-    Get(18, Protoss.Probe),
-    Get(Protoss.DragoonRange),
-    Get(Protoss.Dragoon),
-    Get(21, Protoss.Probe),
-    Get(2,  Protoss.Nexus))
-
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.PvT28Nexus
 
   override def emergencyPlans: Seq[Plan] = Vector(
@@ -60,14 +41,6 @@ class PvTFastCarrier extends GameplanTemplate {
     new PvTIdeas.ReactToWorkerRush)
 
   override def buildPlans: Seq[Plan] = Vector(
-    /*
-    new Trigger(
-      new UnitsAtLeast(1, Protoss.Gateway),
-      initialBefore = new If(
-        new CanProxy,
-        new PlaceGatewaysProxied(1, () => ProxyPlanner.proxyAutomaticSneaky),
-        new PlaceGatewaysProxied(1, () => Some(With.geography.ourNatural.zone), allowBlockingBase = false))),
-        */
     new EjectScout,
     new RequireMiningBases(2),
     new If(new EnemyBasesAtLeast(2), new RequireMiningBases(3)),

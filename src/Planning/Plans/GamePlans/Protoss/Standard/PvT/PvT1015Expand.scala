@@ -7,7 +7,7 @@ import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Compound.{If, Or, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, GasCapsUnset, Pump}
+import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, GasCapsUntouched, Pump}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.Scout
 import Planning.Predicates.Compound.{And, Not}
@@ -27,6 +27,7 @@ class PvT1015Expand extends GameplanTemplate {
     new UnitsAtLeast(3, Protoss.Nexus),
     new And(new UnitsAtLeast(2, Protoss.Nexus), new Not(new ShouldDoubleExpand)))
 
+  override val removeMineralBlocksAt: Int = 20
   override def scoutPlan = new If(new UpgradeStarted(Protoss.DragoonRange), new Scout)
   override val attackPlan = new Attack
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.PvT1015GateGoon
@@ -49,14 +50,12 @@ class PvT1015Expand extends GameplanTemplate {
 
     new Trigger(
       new And(
-        new GasCapsUnset,
+        new GasCapsUntouched,
         new UnitsAtLeast(1, Protoss.Dragoon),
         new GasForUpgrade(Protoss.DragoonRange)),
       new CapGasWorkersAt(2)),
 
-    new If(
-      new ShouldDoubleExpand,
-      new RequireMiningBases(3)),
+    new If(new ShouldDoubleExpand, new RequireMiningBases(3)),
 
     new If(
       new Or(

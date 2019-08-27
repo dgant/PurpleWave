@@ -5,7 +5,7 @@ import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.BuildOrders.BuildOrder
-import Planning.Plans.Macro.Protoss.BuildCannonsAtBases
+import Planning.Plans.Macro.Protoss.BuildTowersAtBases
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyIsZerg}
 import Planning.{Plan, Predicate}
@@ -46,7 +46,7 @@ class PvE2BaseIslandCarrier extends GameplanTemplate {
   override def buildPlans: Seq[Plan] = Vector(
     new If(
       new EnemyIsZerg,
-      new BuildCannonsAtBases(3)),
+      new BuildTowersAtBases(3)),
     new PvEIslandCarrierLateGame
   )
 }

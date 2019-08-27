@@ -34,8 +34,9 @@ class Agency {
         .filter(validAgent)
         .map(_.agent)
         .toVector
-        .sortBy(_.lastFrame)
-        .sortBy(_.unit.matchups.framesOfSafety)
+        .sortBy(_.unit.frameDiscovered) // Start with a stable order
+        .sortBy(_.unit.matchups.framesOfSafety) // Units in trouble get first dibs on things
+        .sortBy(_.unit.unitClass.isTransport) // Make transports go after their passengers so they know what passengers want
     }
     
     var doContinue = true

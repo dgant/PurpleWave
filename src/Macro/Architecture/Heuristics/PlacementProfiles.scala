@@ -52,9 +52,11 @@ object PlacementProfiles {
   
   val pylon = new PlacementProfile("Pylon", basic)
   val robo = new PlacementProfile("Robo", basic) {
-    avoidDistanceFromIdealRange = 4.0
+    avoidDistanceFromIdealRange = 6.0
   }
-  val factory = new PlacementProfile("Factory", basic)
+  val factory = new PlacementProfile("Factory", basic) {
+    avoidSurfaceArea = 0.01
+  }
   val factoryNoSpace = new PlacementProfile("Factory", basic) {
     preferSpace = 0.0
   }

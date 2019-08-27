@@ -8,7 +8,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
-import Planning.Plans.Macro.Protoss.BuildCannonsAtBases
+import Planning.Plans.Macro.Protoss.BuildTowersAtBases
 import Planning.Predicates.Milestones.{EnemyHasShown, OnGasPumps, UnitsAtLeast, UpgradeComplete}
 import Planning.Predicates.Reactive.EnemyMutalisks
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -78,7 +78,7 @@ class PvEIslandCarrierLateGame extends Parallel(
     new EnemyMutalisks,
     new Parallel(
       new Pump(Protoss.Corsair, 8),
-      new BuildCannonsAtBases(2),
+      new BuildTowersAtBases(2),
       new Build(Get(2, Protoss.Stargate)))),
   new PumpRatio(Protoss.Corsair, 0, 24, Seq(Enemy(Zerg.Mutalisk, 1.0), Enemy(Terran.Wraith, 0.5))),
 
@@ -107,7 +107,7 @@ class PvEIslandCarrierLateGame extends Parallel(
         Get(2, Protoss.Carrier)),
       new IslandCarrierUpgrades,
       new Build(Get(Protoss.Forge)),
-      new BuildCannonsAtBases(1),
+      new BuildTowersAtBases(1),
 
       // Expansions
       new If(new UnitsAtLeast(4, Protoss.Carrier), new RequireMiningBases(2)),

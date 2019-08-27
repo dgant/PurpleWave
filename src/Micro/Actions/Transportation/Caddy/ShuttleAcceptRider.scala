@@ -32,7 +32,9 @@ object ShuttleAcceptRider extends Action {
       .view
       .filter(passenger =>
         passenger.unitClass.isReaver
-        && (passenger.scarabCount > 0 || passenger.training || passenger.matchups.framesOfSafety < 0))
+        // It shouldn't waste time NOT picking up Reavers that still need to train Scarabs
+        //&& (passenger.scarabCount > 0 || passenger.training || passenger.matchups.framesOfSafety < 0)
+      )
       .flatMap(_.friendly)
       .filter(passenger =>
           shuttle.canTransport(passenger)

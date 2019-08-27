@@ -6,7 +6,7 @@ import Micro.Actions.Combat.Maneuvering.{GooseChase, Sneak, Support}
 import Micro.Actions.Combat.Spells.{SpiderMine, Stim}
 import Micro.Actions.Combat.Tactics.SpiderMines.HandleMines
 import Micro.Actions.Combat.Tactics._
-import Micro.Actions.Protoss.{BeACarrier, BeAnArbiter}
+import Micro.Actions.Protoss.{BeACarrier, BeAnArbiter, Paradrop}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Fight extends Action {
@@ -25,6 +25,7 @@ object Fight extends Action {
     Cast.consider(unit)
     Detect.consider(unit)
     Stim.consider(unit)
+    Paradrop.consider(unit)
     HandleMines.consider(unit)
     EmergencyBunk.consider(unit)
     Root.consider(unit)

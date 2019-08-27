@@ -352,9 +352,9 @@ class Commander {
   }
   
   
-  def unload(unit: FriendlyUnitInfo, passenger: UnitInfo) {
+  def unload(transport: FriendlyUnitInfo, passenger: UnitInfo) {
     //No sleeping required
-    unit.baseUnit.unload(passenger.baseUnit)
+    transport.baseUnit.unload(passenger.baseUnit)
   }
   
   def addon(unit: FriendlyUnitInfo, unitClass: UnitClass) {

@@ -9,7 +9,7 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{PumpWorkers, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
-import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, BuildCannonsAtNatural}
+import Planning.Plans.Macro.Protoss.{BuildTowersAtBases, BuildCannonsAtNatural}
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Economy.GasAtMost
 import Planning.Predicates.Milestones._
@@ -164,7 +164,7 @@ class PvPLateGame extends GameplanTemplate {
 
     new If(
       new EnemyDarkTemplarLikely,
-      new BuildCannonsAtBases(1)),
+      new BuildTowersAtBases(1)),
 
     // Dragoon Range?
     new If(

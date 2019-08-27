@@ -10,7 +10,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{RequireBases, RequireMiningBases}
-import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, MeldArchons}
+import Planning.Plans.Macro.Protoss.{BuildTowersAtBases, MeldArchons}
 import Planning.Predicates.Compound.{And, Latch, Not, Sticky}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._
@@ -112,7 +112,7 @@ object PvPIdeas {
         new And(
           new UnitsAtMost(0, Protoss.Observer, complete = true),
           new UnitsAtLeast(1, Protoss.Forge)),
-        new BuildCannonsAtBases(1)),
+        new BuildTowersAtBases(1)),
       new If(
         new UnitsAtMost(0, Protoss.Forge),
         new Build(
@@ -125,7 +125,7 @@ object PvPIdeas {
     new Parallel(
       new If(
         new UnitsAtMost(0, Protoss.Observer),
-        new BuildCannonsAtBases(2)),
+        new BuildTowersAtBases(2)),
       new Build(
         Get(Protoss.RoboticsFacility),
         Get(Protoss.Observatory),
@@ -374,7 +374,7 @@ object PvPIdeas {
       new EnemiesAtMost(0, Protoss.PhotonCannon),
       new Pump(Protoss.DarkTemplar, 3),
       new Pump(Protoss.DarkTemplar, 2)),
-    new IfOnMiningBases(3, new Pump(Protoss.DarkTemplar, 1)))
+    new Pump(Protoss.DarkTemplar, 1))
 
   class TrainArmy extends Parallel(
     new Pump(Protoss.Carrier),

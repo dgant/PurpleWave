@@ -49,10 +49,10 @@ object Avoid extends ActionTechnique {
 
     val distanceOriginUs    = unit.pixelDistanceTravelling(unit.agent.origin)
     val distanceOriginEnemy = ByOption.min(unit.matchups.threats.view.map(t => t.pixelDistanceTravelling(unit.agent.origin) + t.pixelRangeAgainst(unit))).getOrElse(2.0 * With.mapPixelWidth)
-    val enemyCloser         = distanceOriginUs >= distanceOriginEnemy
+    val enemyCloser         = distanceOriginUs + 128 >= distanceOriginEnemy
     val timeOriginUs        = unit.framesToTravelTo(unit.agent.origin)
     val timeOriginEnemy     = TakeN.percentile(0.1, unit.matchups.threats)(Ordering.by(timeOriginOfThreat)).map(timeOriginOfThreat).getOrElse(Double.PositiveInfinity)
-    val enemySooner         = timeOriginUs >= timeOriginEnemy
+    val enemySooner         = timeOriginUs + 96 >= timeOriginEnemy
     val enemySieging        = unit.matchups.enemies.exists(_.isAny(UnitMatchSiegeTank, Zerg.Lurker))
     val atHome              = unit.zone == unit.agent.origin.zone
     val scouting            = unit.agent.canScout
@@ -87,15 +87,14 @@ object Avoid extends ActionTechnique {
     avoidPotential(unit, desireProfile)
   }
 
-  val defaultProfiles = Seq(
+  val defaultGreedyProfiles = Seq(
     DesireProfile(home = 1, safety = 2, freedom = 1),
     DesireProfile(home = 0, safety = 2, freedom = 1),
     DesireProfile(home = 0, safety = 2, freedom = 0),
     DesireProfile(home = 2, safety = 0, freedom = 1),
     DesireProfile(home = 2, safety = 0, freedom = 0))
-
   def avoidGreedyPaths(unit: FriendlyUnitInfo, desire: DesireProfile): Unit = {
-    defaultProfiles.sortBy(_.distance(desire)).foreach(someDesire =>
+    defaultGreedyProfiles.sortBy(_.distance(desire)).foreach(someDesire =>
       DownhillPathfinder.decend(
         unit,
         homeValue     = someDesire.home,
@@ -116,9 +115,9 @@ object Avoid extends ActionTechnique {
     profile.maximumLength   = Some(maximumDistance)
     profile.flying          = unit.flying || unit.transport.nonEmpty
     profile.allowGroundDist = true
-    profile.costOccupancy   = 1f
-    profile.costThreat      = 0f
-    profile.costRepulsion   = 4f - PurpleMath.clamp(desireProfile.home, 0, 1)
+    profile.costOccupancy   = 0.5f
+    profile.costThreat      = 3f - PurpleMath.clamp(desireProfile.home, -1, 1) / 2f
+    profile.costRepulsion   = 1f - PurpleMath.clamp(desireProfile.home, -1, 1) / 2f
     profile.repulsors       =
       TakeN
       .by(10, unit.matchups.threats.view)(Ordering.by(t => unit.matchups.framesOfEntanglementPerThreat(t)))

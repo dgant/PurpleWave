@@ -42,7 +42,14 @@ abstract class AbstractTask {
     alreadyViolatedThreshold  = With.performance.violatedThreshold
     alreadyViolatedRules      = With.performance.violatedRules
     onRun()
-    val millisecondsAfter   = System.nanoTime() / nanosToMillis
+    var millisecondsAfter   = System.nanoTime() / nanosToMillis
+
+    // Debugging (ie. setting breakpoints) terribly breaks performance monitoring;
+    // so we detect debug pauses and ignore them
+    if (With.frame > 0 && With.configuration.debugPauses() && millisecondsAfter >= With.configuration.debugPauseThreshold) {
+      millisecondsAfter = runMillisecondsMean
+    }
+
     recordRunDuration(millisecondsAfter - millisecondsBefore)
     lastRunFrame = With.frame
     totalRunCount += 1

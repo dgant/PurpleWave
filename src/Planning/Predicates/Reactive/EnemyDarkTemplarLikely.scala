@@ -7,20 +7,12 @@ import ProxyBwapi.Races.Protoss
 class EnemyDarkTemplarLikely extends Predicate {
   
   override def isComplete: Boolean = (
-    With.units.existsEnemy(Protoss.DarkTemplar)
-    || (
-      (
-      With.units.existsEnemy(
+    With.fingerprints.dtRush.matches
+    || With.units.existsEnemy(
         Protoss.HighTemplar,
         Protoss.Archon,
         Protoss.DarkArchon,
         Protoss.TemplarArchives,
         Protoss.ArbiterTribunal,
-        Protoss.Arbiter)
-      || (
-        With.units.existsEnemy(Protoss.CitadelOfAdun)
-        && With.units.countEnemy(Protoss.Gateway) < 3
-        && ! With.units.enemy.exists(u => u.is(Protoss.CyberneticsCore) && u.upgrading)))
-      && ! With.fingerprints.fourGateGoon.matches
-  ))
+        Protoss.Arbiter))
 }

@@ -64,9 +64,7 @@ class Simulacrum(
       ! simulation.fleeing
       || realUnit.inRangeToAttack(target)
       || ! realUnit.isOurs)
-  lazy val targetQueue: mutable.PriorityQueue[Simulacrum] = (
-    new mutable.PriorityQueue[Simulacrum]()(Ordering.by(x => (x.realUnit.participatingInCombat(), - x.pixel.pixelDistance(pixel))))
-    ++= realTargets.flatMap(simulation.simulacra.get))
+  lazy val targetQueue: ArrayBuffer[Simulacrum] = new mutable.ArrayBuffer[Simulacrum] ++ realTargets.flatMap(simulation.simulacra.get)
   
   var fightingInitially: Boolean = {
     if ( ! realUnit.canAttack) {
@@ -117,6 +115,13 @@ class Simulacrum(
     if (cooldownShooting > 0)           simulation.updated = true
     if (cooldownMoving > 0 && fighting) simulation.updated = true
   }
+
+  // It'd be nice if this lined up with real targeting logic
+  @inline final def targetValue(target: Simulacrum): Double = {
+    val distance = Math.max(0.0, target.pixel.pixelDistance(pixel) - realUnit.pixelRangeAgainst(target.realUnit))
+    val targetValue = target.realUnit.baseTargetValue()
+    targetValue - 1000000 * distance
+  }
   
   def tryToAcquireTarget() {
     if ( ! fighting)                                return
@@ -127,7 +132,9 @@ class Simulacrum(
     target.foreach(targetQueue.+=)
     target = None
     while (target.isEmpty && targetQueue.nonEmpty) {
-      val candidate = targetQueue.dequeue()
+      val candidateIndex = targetQueue.indices.maxBy(i => targetValue(targetQueue(i)))
+      val candidate = targetQueue(candidateIndex)
+      targetQueue.remove(candidateIndex)
       if (isValidTarget(candidate)) {
         target = Some(candidate)
       }

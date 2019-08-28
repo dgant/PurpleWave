@@ -8,7 +8,7 @@ import ProxyBwapi.Races.Protoss
 class PumpShuttleAndReavers(reavers: Int = 50, shuttleFirst: Boolean = true) extends Parallel(
   (if (shuttleFirst)
     new If(
-      new UnitsAtMost(0, Protoss.RoboticsFacility),
+      new UnitsAtMost(0, Protoss.RoboticsSupportBay, complete = true),
       new Pump(Protoss.Shuttle, 1))
   else NoPlan()
   ),

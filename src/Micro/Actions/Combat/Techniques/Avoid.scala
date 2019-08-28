@@ -113,7 +113,7 @@ object Avoid extends ActionTechnique {
     val profile = new PathfindProfile(unit.tileIncludingCenter)
     profile.end             = if (desireProfile.home > 0) Some(unit.agent.origin.tileIncluding) else None
     profile.maximumLength   = Some(maximumDistance)
-    profile.flying          = unit.flying || unit.transport.nonEmpty
+    profile.flying          = unit.flying || unit.transport.exists(_.flying)
     profile.allowGroundDist = true
     profile.costOccupancy   = 0.5f
     profile.costThreat      = 3f - PurpleMath.clamp(desireProfile.home, -1, 1) / 2f

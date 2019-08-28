@@ -9,7 +9,7 @@ class Cache[T](recalculator: () => T, refreshPeriod: Int = 1) {
   private var invalidStartingOnThisFrame: Int = 0
   
   @inline
-  def apply(): T = {
+  final def apply(): T = {
     if (invalidStartingOnThisFrame <= With.frame) {
       invalidStartingOnThisFrame = With.frame + refreshPeriod
       lastValue = recalculator()

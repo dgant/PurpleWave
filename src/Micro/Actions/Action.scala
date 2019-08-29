@@ -1,5 +1,6 @@
 package Micro.Actions
 
+import Lifecycle.With
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 abstract class Action {
@@ -15,6 +16,9 @@ abstract class Action {
     if (( ! requiresReadiness || unit.readyForMicro) && allowed(unit)) {
       val previousCredit = unit.agent.lastAction
       if (giveCredit) unit.agent.lastAction = Some(this)
+      if (With.configuration.debugging()) {
+        unit.agent.actionsPerformed += this
+      }
       perform(unit)
       if (unit.readyForMicro) {
         unit.agent.lastAction = previousCredit

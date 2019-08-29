@@ -44,7 +44,11 @@ class PerformanceMonitor {
     uniqueFriendlyUnitObjects = 0
     uniqueFriendlyUnitIds.clear()
     uniqueFriendlyDeadIds.clear()
-    val millisecondDifference = millisecondsSpentThisFrame
+    var millisecondDifference = millisecondsSpentThisFrame
+    if (With.configuration.debugging() && millisecondDifference > With.configuration.debugPauseThreshold) {
+      millisecondDifference = meanFrameMilliseconds
+    }
+
     frameTimes(With.frame % framesToTrack) = millisecondDifference
     if (millisecondDifference >= 55)    framesOverShort += 1
     if (millisecondDifference >= 1000)  framesOver1000  += 1

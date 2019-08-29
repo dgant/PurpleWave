@@ -123,7 +123,7 @@ object Root extends Action {
     }
   }
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = true
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.isAny(UnitMatchSiegeTank,  Zerg.Lurker)
   
   override def perform(unit: FriendlyUnitInfo) {
     val rootAction = new RootAction(unit)

@@ -11,11 +11,10 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Protoss.BuildShieldBatteriesAtNatural
 import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely}
+import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeAtHome}
 import Planning.Predicates.Strategy._
 import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
@@ -95,15 +94,10 @@ class PvPRobo extends GameplanTemplate {
   override def attackPlan: Plan = new If(
     new Or(
       new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.gasSteal, With.fingerprints.cannonRush, With.fingerprints.earlyForge),
-      new And(
-        new EnemyStrategy(With.fingerprints.oneGateCore),
-        new GateGateRobo),
+      new And(new GateGateRobo, new EnemyStrategy(With.fingerprints.oneGateCore), new Not(new EnemyStrategy(With.fingerprints.fourGateGoon))),
       new EnemyBasesAtLeast(2),
-      new And(
-        new EnemyStrategy(With.fingerprints.dtRush),
-        new UnitsAtLeast(2, Protoss.Observer, complete = true)),
-       new And(
-        new EnemyStrategy(With.fingerprints.twoGate),
+      new And(new EnemyStrategy(With.fingerprints.dtRush), new UnitsAtLeast(2, Protoss.Observer, complete = true)),
+      new And(new EnemyStrategy(With.fingerprints.twoGate),
         new Or(
           new EnemyHasShown(Protoss.Gateway), // Don't abandon base vs. proxies
           new UnitsAtLeast(7, UnitMatchWarriors)),
@@ -138,14 +132,7 @@ class PvPRobo extends GameplanTemplate {
             Get(Protoss.Observatory),
             Get(2, Protoss.Observer))))))
 
-  override def workerPlan: Plan =
-    new If(
-      new BasesAtMost(1),
-      new PumpWorkers(oversaturate = true),
-      new If(
-        new UnitsAtLeast(4, Protoss.Gateway),
-        new PumpWorkers,
-        new PumpWorkers(maximumConcurrently = 1))) // Make sure we get those Gates up ASAP
+  override def workerPlan: Plan = new PumpWorkers(maximumConcurrently = 1)
 
   override def buildOrderPlan: Plan = new Parallel(
     new BuildOrder(
@@ -193,8 +180,13 @@ class PvPRobo extends GameplanTemplate {
         new If(new ShuttleFirst, new BuildOrder(Get(Protoss.Shuttle))),
         new Trigger(
           new UnitsAtLeast(2, Protoss.Reaver),
-          new PumpShuttleAndReavers,
+          new If(
+            new EnemyStrategy(With.fingerprints.fourGateGoon),
+            new Pump(Protoss.Reaver),
+            new PumpShuttleAndReavers),
           new Pump(Protoss.Reaver, 2)))),
+    // Make sure we don't accidentally start an extra Zealot due to tight gas
+    new BuildOrder(Get(Protoss.Dragoon)),
     new Pump(Protoss.Dragoon),
     new If(
       new UnitsAtLeast(3, Protoss.Gateway),
@@ -204,8 +196,8 @@ class PvPRobo extends GameplanTemplate {
     new If(
       new EnemyStrategy(With.fingerprints.fourGateGoon),
       new Parallel(
-        new BuildShieldBatteriesAtNatural(2),
-        new Build(Get(3, Protoss.Gateway)))),
+        //new BuildShieldBatteriesAtNatural(2),
+        )),
     new RequireMiningBases(2))
 
   class EnemyLowUnitCount extends Or(
@@ -228,10 +220,11 @@ class PvPRobo extends GameplanTemplate {
       // TODO: React properly vs. cannon rush
 
     // Expand
-    new Trigger(
+    new If(
       new Or(
         new And(new UnitsAtLeast(1, Protoss.Reaver), new EnemyLowUnitCount),
-        new UnitsAtLeast(4, Protoss.Reaver, complete = true)),
+        new And(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new SafeAtHome),
+        new UnitsAtLeast(3, Protoss.Reaver, complete = true)),
       new Expand),
 
     new If(
@@ -265,8 +258,12 @@ class PvPRobo extends GameplanTemplate {
       new Not(new EnemyLowUnitCount),
       new Build(Get(3, Protoss.Gateway))),
 
+    new If(new BasesAtMost(1), new PumpWorkers(oversaturate = true)),
+
     new Expand,
 
+    new Build(Get(4, Protoss.Gateway)),
+    new PumpWorkers,
     new Build(
       Get(5, Protoss.Gateway),
       Get(2, Protoss.Assimilator),

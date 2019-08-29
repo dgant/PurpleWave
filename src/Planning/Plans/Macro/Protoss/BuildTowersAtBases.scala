@@ -21,11 +21,11 @@ class BuildTowersAtBases(
     val zones = bases.map(_.zone).toSet.toArray
 
     if (zones.nonEmpty) {
-      if (towerClass == Protoss.PhotonCannon && With.units.existsOurs(Protoss.Forge)) {
+      if (towerClass != Protoss.PhotonCannon || With.units.existsOurs(Protoss.Forge)) {
         val towersRequired = zones.map(towerZone).sum
         With.scheduler.request(this, GetAnother(towersRequired, towerClass))
       }
-      else {
+      else if (towerClass == Protoss.PhotonCannon) {
         With.scheduler.request(this, Get(Protoss.Forge))
       }
     }

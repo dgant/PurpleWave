@@ -8,6 +8,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 final class PathfindProfile(
   var start: Tile,
   var end: Option[Tile] = None,
+  var minimumLength: Option[Float] = None,
   var maximumLength: Option[Float] = None,
   var flying: Boolean = false,
   var allowGroundDist: Boolean = false,

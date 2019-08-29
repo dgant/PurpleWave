@@ -132,6 +132,8 @@ class Agent(val unit: FriendlyUnitInfo) {
   var pathAccepted    : Traversable[PixelRay] = Seq.empty
   
   val techniques: ArrayBuffer[ActionTechniqueEvaluation] = new ArrayBuffer[ActionTechniqueEvaluation]
+
+  val actionsPerformed: ArrayBuffer[Action] = new ArrayBuffer[Action]()
   
   var fightReason: String = ""
   
@@ -166,6 +168,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     cachedWaypoint.clear()
     techniques.clear()
     fightReason = ""
+    actionsPerformed.clear()
     _umbrellas.clear()
   }
 

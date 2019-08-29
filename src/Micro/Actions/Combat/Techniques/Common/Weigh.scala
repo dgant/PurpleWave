@@ -21,7 +21,7 @@ object Weigh {
       : Option[ActionTechnique] = {
 
     val allowed = techniques.view.filter(_.allowed(unit))
-    if (ShowTechniques.inUse && unit.selected || With.viewport.contains(unit.tileIncludingCenter)) {
+    if (ShowTechniques.inUse && (unit.selected || With.viewport.contains(unit.tileIncludingCenter))) {
       unit.agent.techniques ++=
         allowed.map(technique => new ActionTechniqueEvaluation(unit, technique))
     }

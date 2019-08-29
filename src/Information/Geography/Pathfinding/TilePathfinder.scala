@@ -190,10 +190,13 @@ trait TilePathfinder {
       bestTileState.setVisited()
 
       // Are we done?
-      if (profile.end.exists(_.i == bestTileState.i)
+      val minimumLengthMet = profile.minimumLength.forall(_ <= bestTileState.pathLength)
+      if (
+        (profile.end.exists(_.i == bestTileState.i) && minimumLengthMet)
         || profile.maximumLength.exists(_ <= Math.round(bestTileState.pathLength)) // Rounding encourages picking diagonal paths for short maximum lengths
         || (
           profile.end.isEmpty
+          && minimumLengthMet
           && profile.maximumLength.isEmpty
           && threatGrid.getUnchecked(bestTile.i) == 0)) {
         val output = TilePath(

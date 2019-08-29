@@ -18,6 +18,7 @@ object Breathe extends ActionTechnique {
     && unit.matchups.threats.nonEmpty
     && ! unit.unitClass.melee
     && ! unit.is(Protoss.Corsair) // Try to find a better generalizer; maybe cooldown vs. turn rate
+    && ! unit.transport.exists(_.flying) // Transport cooldown means this just makes the unit flee
   )
   
   override val activator = new WeightedMean(this)

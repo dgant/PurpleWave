@@ -44,6 +44,16 @@ object Avoid extends ActionTechnique {
     ).sum
   }
 
+  def pathfindingRepulsion(unit: FriendlyUnitInfo, maxThreats: Int = 10): IndexedSeq[PathfindRepulsor] = {
+    TakeN
+      .by(maxThreats, unit.matchups.threats.view)(Ordering.by(t => unit.matchups.framesOfEntanglementPerThreat(t)))
+      .map(t => PathfindRepulsor(
+        t.pixelCenter,
+        t.dpfOnNextHitAgainst(unit),
+        64 + t.pixelRangeAgainst(unit)))
+      .toIndexedSeq
+  }
+
   override def perform(unit: FriendlyUnitInfo): Unit = {
     def timeOriginOfThreat(threat: UnitInfo): Double = threat.framesToTravelTo(unit.agent.origin) - threat.pixelRangeAgainst(unit)
 
@@ -116,16 +126,9 @@ object Avoid extends ActionTechnique {
     profile.flying          = unit.flying || unit.transport.exists(_.flying)
     profile.allowGroundDist = true
     profile.costOccupancy   = 0.5f
-    profile.costThreat      = 3f - PurpleMath.clamp(desireProfile.home, -1, 1) / 2f
-    profile.costRepulsion   = 1f - PurpleMath.clamp(desireProfile.home, -1, 1) / 2f
-    profile.repulsors       =
-      TakeN
-      .by(10, unit.matchups.threats.view)(Ordering.by(t => unit.matchups.framesOfEntanglementPerThreat(t)))
-      .map(t => PathfindRepulsor(
-        t.pixelCenter,
-        t.dpfOnNextHitAgainst(unit),
-        64 + t.pixelRangeAgainst(unit)))
-      .toIndexedSeq
+    profile.costThreat      = 4f // - PurpleMath.clamp(desireProfile.home, -1, 1) / 2f
+    profile.costRepulsion   = 2f // - PurpleMath.clamp(desireProfile.home, -1, 1) / 2f
+    profile.repulsors       = pathfindingRepulsion(unit)
     profile.unit = Some(unit)
     val path = profile.find
 

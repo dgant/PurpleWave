@@ -125,7 +125,7 @@ trait TilePathfinder {
   }
 
   @inline private final def drawOutput(profile: PathfindProfile, value: TilePath): Unit = {
-    if (ShowUnitsFriendly.mapInUse && ShowUnitsFriendly.showPaths && profile.unit.exists(_.selected)) {
+    if (ShowUnitsFriendly.mapInUse && ShowUnitsFriendly.showPaths && profile.unit.exists(u => u.selected || u.transport.exists(_.selected))) {
       profile.unit.foreach(unit =>
         unit.agent.pathBranches = tiles
           .view

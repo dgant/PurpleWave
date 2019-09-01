@@ -128,7 +128,7 @@ object Avoid extends ActionTechnique {
     profile.allowGroundDist = true
     profile.costOccupancy   = 0.5f
     profile.costThreat      = 4f // - PurpleMath.clamp(desireProfile.home, -1, 1) / 2f
-    profile.costRepulsion   = 2f // - PurpleMath.clamp(desireProfile.home, -1, 1) / 2f
+    profile.costRepulsion   = 1.5f // - PurpleMath.clamp(desireProfile.home, -1, 1) / 2f
     profile.repulsors       = pathfindingRepulsion(unit)
     profile.unit = Some(unit)
     val path = profile.find

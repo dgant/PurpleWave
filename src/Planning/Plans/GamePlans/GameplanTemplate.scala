@@ -43,6 +43,7 @@ abstract class GameplanTemplate extends GameplanMode {
   def attackPlan            : Plan              = new ConsiderAttacking
   def dropPlan              : Plan              = NoPlan() //new DropAttack
   def overlordPlan          : Plan              = new ChillOverlords
+  def defendEntrance        : Plan              = new DefendEntrance()
 
   def tacticsPlans: Vector[Plan] = Vector(
     aggressionPlan,
@@ -59,7 +60,7 @@ abstract class GameplanTemplate extends GameplanMode {
     new EscortSettlers,
     scoutExposPlan,
     attackPlan,
-    new DefendEntrance,
+    defendEntrance,
     new Gather,
     overlordPlan,
     new RecruitFreelancers,

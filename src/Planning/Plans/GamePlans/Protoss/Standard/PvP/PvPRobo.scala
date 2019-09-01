@@ -4,7 +4,8 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{ConsiderAttacking, EjectScout}
+import Planning.Plans.Army.{ConsiderAttacking, DefendNatural, EjectScout}
+import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
@@ -16,7 +17,7 @@ import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeAtHome}
 import Planning.Predicates.Strategy._
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPRobo
@@ -55,7 +56,11 @@ class PvPRobo extends GameplanTemplate {
   class GateGateRobo extends Or(
     new Latch(
       new And(
-        new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway),
+        new EnemyStrategy(
+          With.fingerprints.nexusFirst,
+          With.fingerprints.gatewayFe,
+          With.fingerprints.twoGate,
+          With.fingerprints.proxyGateway),
         new UnitsAtMost(0, Protoss.RoboticsFacility))),
     new Check(() => With.strategy.isFlat || With.strategy.isInverted))
 
@@ -96,26 +101,30 @@ class PvPRobo extends GameplanTemplate {
   // TODO: Replace with (or merge into) PvPSafeToMoveOut?
   // TODO: Handle 4-Gate Zealot
   override def attackPlan: Plan = new If(
-    new Or(
-      new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.gasSteal, With.fingerprints.cannonRush, With.fingerprints.earlyForge),
-      new And(new GateGateRobo, new EnemyStrategy(With.fingerprints.oneGateCore), new Not(new EnemyStrategy(With.fingerprints.fourGateGoon))),
-      new EnemyBasesAtLeast(2),
-      new And(new EnemyStrategy(With.fingerprints.dtRush), new UnitsAtLeast(2, Protoss.Observer, complete = true)),
-      new And(new EnemyStrategy(With.fingerprints.twoGate),
-        new Or(
-          new EnemyHasShown(Protoss.Gateway), // Don't abandon base vs. proxies
-          new UnitsAtLeast(7, UnitMatchWarriors)),
-        new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
-        new Or(
-          new UpgradeComplete(Protoss.DragoonRange),
-          new Not(new EnemyHasUpgrade(Protoss.DragoonRange)))),
-      new And(
-        new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),
-        new Latch(
-          new And(
-            new UnitsAtLeast(1, Protoss.Shuttle, complete = true),
-            new UnitsAtLeast(2, Protoss.Reaver, complete = true))))),
-    new ConsiderAttacking)
+    new And(
+      new Or(
+        new Not(new EnemyHasShown(Protoss.DarkTemplar)),
+        new UnitsAtLeast(2, Protoss.Observer, complete = true)),
+      new Or(
+        new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.gasSteal, With.fingerprints.cannonRush, With.fingerprints.earlyForge),
+        new And(new GateGateRobo, new EnemyStrategy(With.fingerprints.oneGateCore), new Not(new EnemyStrategy(With.fingerprints.fourGateGoon))),
+        new EnemyBasesAtLeast(2),
+        new And(new EnemyStrategy(With.fingerprints.dtRush), new UnitsAtLeast(2, Protoss.Observer, complete = true)),
+        new And(new EnemyStrategy(With.fingerprints.twoGate),
+          new Or(
+            new EnemyHasShown(Protoss.Gateway), // Don't abandon base vs. proxies
+            new UnitsAtLeast(7, UnitMatchWarriors)),
+          new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
+          new Or(
+            new UpgradeComplete(Protoss.DragoonRange),
+            new Not(new EnemyHasUpgrade(Protoss.DragoonRange)))),
+        new And(
+          new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),
+          new Latch(
+            new And(
+              new UnitsAtLeast(1, Protoss.Shuttle, complete = true),
+              new UnitsAtLeast(2, Protoss.Reaver, complete = true)))))),
+      new ConsiderAttacking)
 
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvPIdeas.ReactToGasSteal,
@@ -136,7 +145,8 @@ class PvPRobo extends GameplanTemplate {
             Get(Protoss.Observatory),
             Get(2, Protoss.Observer))))))
 
-  override def workerPlan: Plan = new PumpWorkers
+  override def scoutExposPlan: Plan = NoPlan()
+  override def defendEntrance: Plan = new If(new ReadyToExpand, new DefendNatural, super.defendEntrance)
 
   override def buildOrderPlan: Plan = new Parallel(
     new BuildOrder(
@@ -213,30 +223,26 @@ class PvPRobo extends GameplanTemplate {
       With.fingerprints.dtRush,
       With.fingerprints.earlyForge))
 
+  class ReadyToExpand extends Or(
+    new And(new UnitsAtLeast(1, Protoss.Reaver), new EnemyLowUnitCount),
+    new And(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new SafeAtHome),
+    new And(
+      new Latch(new UnitsAtLeast(3, UnitMatchOr(Protoss.Shuttle, Protoss.Reaver), complete = true)),
+      new UnitsAtLeast(2, UnitMatchOr(Protoss.Shuttle, Protoss.Reaver), complete = true)))
 
   override def buildPlans: Seq[Plan] = Seq(
 
     new EjectScout,
 
-    new If(
-      new GasCapsUntouched,
-      new CapGasAt(300)),
+    new If(new GasCapsUntouched, new CapGasAt(350)),
 
     // TODO: Be useful for PvPVsForge:
       // TODO: React properly vs. cannon rush
 
-    // Expand
-    new If(
-      new Or(
-        new And(new UnitsAtLeast(1, Protoss.Reaver), new EnemyLowUnitCount),
-        new And(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new SafeAtHome),
-        new UnitsAtLeast(3, Protoss.Reaver, complete = true)),
-      new Expand),
+    new If(new ReadyToExpand, new Expand),
 
     new If(
-      new And(
-        new Latch(new UnitsAtLeast(1, Protoss.Dragoon)),
-        new GateGateRobo),
+      new And(new Latch(new UnitsAtLeast(1, Protoss.Dragoon)), new GateGateRobo),
       new Build(Get(2, Protoss.Gateway))),
 
     // This flip is important to ensure that Gate Gate Robo gets its tech in timely fashion
@@ -256,14 +262,8 @@ class PvPRobo extends GameplanTemplate {
             new Build(Get(Protoss.RoboticsSupportBay)))),
         new If(new UnitsAtLeast(1, Protoss.Observatory), new Build(Get(Protoss.RoboticsSupportBay))))),
 
-    new If(
-      new EnemyStrategy(With.fingerprints.dtRush),
-      new Build(Get(Protoss.ObserverSpeed))),
-
-    new If(
-      new Not(new EnemyLowUnitCount),
-      new Build(Get(3, Protoss.Gateway))),
-
+    new If(new EnemyStrategy(With.fingerprints.dtRush), new Build(Get(Protoss.ObserverSpeed))),
+    new If(new Not(new EnemyLowUnitCount), new Build(Get(3, Protoss.Gateway))),
     new If(new BasesAtMost(1), new PumpWorkers(oversaturate = true)),
 
     new Expand,

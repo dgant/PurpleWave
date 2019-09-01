@@ -12,7 +12,6 @@ import Micro.Actions.Commands.Attack
 import Planning.UnitMatchers.UnitMatchRecruitableForCombat
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.ByOption
 
 object Paradrop extends Action {
 
@@ -56,8 +55,7 @@ object Paradrop extends Action {
 
     val profile = new PathfindProfile(unit.tileIncludingCenter)
     profile.end                 = Some(destination)
-    profile.minimumLength       = Some(Math.min(unit.effectiveRangePixels.toInt / 32 - 1, ByOption.min(unit.matchups.threats.view.map(_.pixelRangeAgainst(unit).toInt / 32)).getOrElse(1)))
-    profile.maximumLength       = Some(unit.effectiveRangePixels.toInt / 32)
+    profile.maximumLength       = Some(20)
     profile.canCrossUnwalkable  = false
     profile.allowGroundDist     = false
     profile.costOccupancy       = 0.01f

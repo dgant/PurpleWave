@@ -21,7 +21,7 @@ object Abuse extends ActionTechnique {
     && unit.canAttack
     && unit.matchups.targets.nonEmpty
     && unit.matchups.threats.nonEmpty
-    && ! unit.isAny(Protoss.Corsair, Zerg.Lurker)
+    && ! unit.isAny(Protoss.Reaver, Protoss.Corsair, Zerg.Lurker)
   )
   
   override val activator = new WeightedMin(this)

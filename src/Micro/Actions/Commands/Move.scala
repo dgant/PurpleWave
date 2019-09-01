@@ -20,8 +20,14 @@ object Move extends Action {
       && unit.canAttack) {
       With.commander.attackMove(unit, pixelToMove)
     }
-    else if (unit.agent.ride.isDefined
-      && (unit.matchups.threatsInRange.nonEmpty || unit.framesToTravelTo(pixelToMove) > unit.unitClass.groundDamageCooldown * 4)) {
+    else if (
+      // If we have a ride
+      unit.agent.ride.isDefined
+      // and that ride can get us there faster
+      && unit.framesToTravelTo(pixelToMove) >
+        4 * unit.unitClass.groundDamageCooldown
+        + unit.agent.ride.get.framesToTravelTo(unit.pixelCenter)
+        + unit.agent.ride.get.framesToTravelPixels(unit.pixelDistanceCenter(pixelToMove))) {
       With.commander.rightClick(unit, unit.agent.ride.get)
     }
     else {

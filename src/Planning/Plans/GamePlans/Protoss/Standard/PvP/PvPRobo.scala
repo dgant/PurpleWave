@@ -53,6 +53,10 @@ class PvPRobo extends GameplanTemplate {
       new Not(new GateGateRobo)))
 
   class GateGateRobo extends Or(
+    new Latch(
+      new And(
+        new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway),
+        new UnitsAtMost(0, Protoss.RoboticsFacility))),
     new Check(() => With.strategy.isFlat || With.strategy.isInverted))
 
   class ShuttleFirst extends And(
@@ -132,7 +136,7 @@ class PvPRobo extends GameplanTemplate {
             Get(Protoss.Observatory),
             Get(2, Protoss.Observer))))))
 
-  override def workerPlan: Plan = new PumpWorkers(maximumConcurrently = 1)
+  override def workerPlan: Plan = new PumpWorkers
 
   override def buildOrderPlan: Plan = new Parallel(
     new BuildOrder(
@@ -181,7 +185,9 @@ class PvPRobo extends GameplanTemplate {
         new Trigger(
           new UnitsAtLeast(2, Protoss.Reaver),
           new If(
-            new EnemyStrategy(With.fingerprints.fourGateGoon),
+            new And(
+              new EnemyStrategy(With.fingerprints.fourGateGoon),
+              new UnitsAtMost(3, Protoss.Reaver)),
             new Pump(Protoss.Reaver),
             new PumpShuttleAndReavers),
           new Pump(Protoss.Reaver, 2)))),
@@ -262,8 +268,6 @@ class PvPRobo extends GameplanTemplate {
 
     new Expand,
 
-    new Build(Get(4, Protoss.Gateway)),
-    new PumpWorkers,
     new Build(
       Get(5, Protoss.Gateway),
       Get(2, Protoss.Assimilator),

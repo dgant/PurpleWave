@@ -10,9 +10,10 @@ object TargetFilterFutility extends TargetFilter {
   
   private def catchableBy(actor: UnitInfo, target: UnitInfo): Boolean = {
     lazy val targetBusy = target.gathering || target.constructing || target.repairing || ! target.canMove || BlockConstruction.buildOrders.contains(target.order)
-
+    lazy val ourSpeed = Math.max(actor.topSpeed, actor.friendly.flatMap(_.transport.map(_.topSpeed)).getOrElse(0.0))
+    lazy val weAreFlying = actor.flying || actor.friendly.exists(_.agent.ride.exists(_.flying)) && ! target.flying
     val output = (
-      actor.topSpeed >= Math.max(target.topSpeed, actor.friendly.flatMap(_.transport.map(_.topSpeed)).getOrElse(0.0))
+      ourSpeed * (if (weAreFlying) 2 else 1) >= target.topSpeed
       || targetBusy
       || actor.is(Zerg.Scourge)
       || actor.framesToGetInRange(target) < 8

@@ -4,7 +4,7 @@ import Debugging.Visualizations.ForceColors
 import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Lifecycle.With
 import Mathematics.PurpleMath
-import Micro.Actions.Combat.Maneuvering.DownhillPathfinder
+import Micro.Actions.Combat.Maneuvering.{DownhillPathfinder, FollowPath}
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
@@ -122,8 +122,9 @@ object Avoid extends ActionTechnique {
 
     val profile = new PathfindProfile(unit.tileIncludingCenter)
     profile.end             = if (desireProfile.home > 0) Some(unit.agent.origin.tileIncluding) else None
+    profile.minimumLength   = Some(pathLengthMinimum)
     profile.maximumLength   = Some(maximumDistance)
-    profile.flying          = unit.flying || unit.transport.exists(_.flying)
+    profile.canCrossUnwalkable          = unit.flying || unit.transport.exists(_.flying)
     profile.allowGroundDist = true
     profile.costOccupancy   = 0.5f
     profile.costThreat      = 4f // - PurpleMath.clamp(desireProfile.home, -1, 1) / 2f
@@ -132,12 +133,7 @@ object Avoid extends ActionTechnique {
     profile.unit = Some(unit)
     val path = profile.find
 
-    if (path.pathExists && path.tiles.exists(_.size >= pathLengthMinimum)) {
-      unit.agent.path = Some(path)
-      path.tiles.get.foreach(With.coordinator.gridPathOccupancy.addUnit(unit, _))
-      unit.agent.toTravel = Some(path.tiles.get.take(8).last.pixelCenter)
-      Move.delegate(unit)
-    }
+    new FollowPath(path).delegate(unit)
   }
 
   def avoidPotential(unit: FriendlyUnitInfo, desireProfile: DesireProfile): Unit = {

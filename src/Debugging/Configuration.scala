@@ -134,5 +134,5 @@ class Configuration {
   val humanMode = new FileFlag("human-mode-is.on")
   val visualize = new FileFlag("visualizations-are.on")
   val debugging = new FileFlag("debugging-is.on")
-  def debugPauseThreshold = if (debugging()) 24 * 60 * 60 else 250
+  def debugPauseThreshold: Int = if (debugging()) 250 else 24 * 60 * 60
 }

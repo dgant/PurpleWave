@@ -16,7 +16,8 @@ object Chase extends ActionTechnique {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.canMove
     && unit.canAttack
-    && ! unit.is(Terran.SCV) // SCVs are just really bad at this
+    && unit.transport.isEmpty
+    && ! unit.is(Terran.SCV) // SCVs are just really bad at this due to halt distance
   )
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {

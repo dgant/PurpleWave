@@ -8,9 +8,11 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 final class PathfindProfile(
   var start: Tile,
   var end: Option[Tile] = None,
+  var endDistanceMaximum: Float = 0,
   var minimumLength: Option[Float] = None,
   var maximumLength: Option[Float] = None,
-  var flying: Boolean = false,
+  var canCrossUnwalkable: Boolean = false,
+  var canEndUnwalkable: Option[Boolean] = None,
   var allowGroundDist: Boolean = false,
   var costOccupancy: Float = 0f,
   var costThreat: Float = 0f,
@@ -20,7 +22,6 @@ final class PathfindProfile(
   var unit: Option[FriendlyUnitInfo] = None) {
 
   def find: TilePath = With.paths.aStar(this)
-
 
   // Lil' hack -- track max repulsion statefully
   var maxRepulsion: Double = 0

@@ -152,7 +152,7 @@ trait TilePathfinder {
     // To escape a tile that's 5 tiles into enemy range means we have to pass through tiles of value 5+4+3+2+1
     // So the floor of the cost we'll pay is the Gaussian expansion of the threat cost at the current tile.
 
-    val costDistanceToEnd   : Float = profile.end.map(end => if (profile.flying || ! profile.allowGroundDist) tile.tileDistanceFast(end) else tile.groundPixels(end) / 32.0).getOrElse(0.0).toFloat
+    val costDistanceToEnd   : Float = profile.end.map(end => if (profile.canCrossUnwalkable || ! profile.allowGroundDist) tile.tileDistanceFast(end) else tile.groundPixels(end) / 32.0).getOrElse(0.0).toFloat
     val costOutOfRepulsion  : Float = profile.costRepulsion * PurpleMath.fastSigmoid(tiles(i).repulsion.toFloat) // Hacky; used to smartly tiebreak tiles that are otherwise h() = 0. Using this formulation to minimize likelihood of breaking heuristic requirements
     val costOutOfThreat     : Float = profile.costThreat * threatGrid.getUnchecked(i)
 
@@ -169,7 +169,7 @@ trait TilePathfinder {
 
     if ( ! startTile.valid) return failure(startTile)
 
-    val threatGrid = if (profile.flying) With.grids.enemyRangeAir else With.grids.enemyRangeGround
+    val threatGrid = if (profile.canCrossUnwalkable) With.grids.enemyRangeAir else With.grids.enemyRangeGround
     startNextSearch()
     profile.updateRepulsion()
     val horizon = new mutable.PriorityQueue[TileState]()(Ordering.by(t => -t.totalCostFloor))
@@ -190,9 +190,15 @@ trait TilePathfinder {
       bestTileState.setVisited()
 
       // Are we done?
+      val atEnd = profile.end.exists(end =>
+        end.i == bestTileState.i
+        || (
+          profile.endDistanceMaximum > 0
+          && end.tileDistanceFast(bestTile) <= profile.endDistanceMaximum
+          && (profile.canCrossUnwalkable || end.tileDistanceFast(bestTile) <= profile.endDistanceMaximum)))
       val minimumLengthMet = profile.minimumLength.forall(_ <= bestTileState.pathLength)
       if (
-        (profile.end.exists(_.i == bestTileState.i) && minimumLengthMet)
+        (atEnd && minimumLengthMet && (profile.canEndUnwalkable.getOrElse(profile.canCrossUnwalkable) || bestTile.walkableUnchecked))
         || profile.maximumLength.exists(_ <= Math.round(bestTileState.pathLength)) // Rounding encourages picking diagonal paths for short maximum lengths
         || (
           profile.end.isEmpty
@@ -221,11 +227,11 @@ trait TilePathfinder {
             ! neighborState.visited
 
             // Is the neighbor pathable?
-            && (profile.flying || With.grids.walkable.getUnchecked(neighborState.i))
+            && (profile.canCrossUnwalkable || With.grids.walkable.getUnchecked(neighborState.i))
 
             // Can we path from here to the neighbor?
             // (Specifically, if it's a diagonal step, verify that it's achievable)
-            && (profile.flying
+            && (profile.canCrossUnwalkable
               || neighborOrthogonal
               || With.grids.walkable.getUnchecked(Tile(neighborTile.x, bestTileState.tile.y).i)
               || With.grids.walkable.getUnchecked(Tile(bestTileState.tile.x, neighborTile.y).i))) {

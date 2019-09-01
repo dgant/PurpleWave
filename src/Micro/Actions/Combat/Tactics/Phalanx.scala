@@ -1,10 +1,12 @@
 package Micro.Actions.Combat.Tactics
 
+import Information.Geography.Pathfinding.PathfindProfile
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Disengage, Engage}
+import Micro.Actions.Combat.Maneuvering.FollowPath
 import Micro.Actions.Commands.Move
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.Protoss
@@ -19,13 +21,19 @@ object Phalanx extends Action {
     && unit.agent.toForm.exists(p => unit.framesToTravelTo(p) < GameTime(0, 8)()))
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
+
+    val acceptableDistanceFromFormation = 12
+
     val spot      = unit.agent.toForm.get
     val hoplites  = unit.matchups.allies.flatMap(_.friendly).filter(_.agent.toForm.isDefined)
-    val openFire  = ! unit.unitClass.melee && unit.matchups.targets.exists(t => t.pixelDistanceEdge(unit, unit.agent.toForm.get) <= unit.pixelRangeAgainst(t))
+    val openFire  = ! unit.unitClass.melee && unit.matchups.targets.exists(t =>  t.pixelDistanceEdge(unit, unit.agent.toForm.get) <= unit.pixelRangeAgainst(t))
     val besieged = hoplites.exists(hoplite =>
-      hoplite.matchups.threats.exists(threat =>
-        threat.inRangeToAttack(hoplite, hoplite.agent.toForm.get)
-        && hoplite.pixelRangeAgainst(threat) < threat.pixelRangeAgainst(hoplite)
+      hoplite.agent.toForm.isDefined
+      && hoplite.matchups.threats.exists(threat =>
+        (
+          threat.inRangeToAttack(hoplite, hoplite.agent.toForm.get)
+          || (threat.inRangeToAttack(hoplite) && hoplite.pixelDistanceCenter(hoplite.agent.toForm.get) <= acceptableDistanceFromFormation))
+        && hoplite.pixelRangeAgainst(threat) <= threat.pixelRangeAgainst(hoplite)
         && With.grids.enemyVision.isSet(hoplite.agent.toForm.get.tileIncluding)))
 
     lazy val soloZealotShouldFlee = (
@@ -36,7 +44,7 @@ object Phalanx extends Action {
     unit.agent.toTravel = Some(spot)
     unit.agent.toReturn = Some(spot)
     val formationDistance = unit.pixelDistanceCenter(unit.agent.toForm.get)
-    if (formationDistance <= 12
+    if (formationDistance <= acceptableDistanceFromFormation
       && unit.unitClass.melee
       && (
         unit.matchups.targetsInRange.nonEmpty
@@ -60,6 +68,16 @@ object Phalanx extends Action {
       Engage.delegate(unit)
     } else if (unit.matchups.threats.exists(! _.unitClass.melee))
     if (unit.matchups.threats.exists(! _.unitClass.isWorker)) {
+      // If we can safely get to our spot, let's do so
+      val profile = new PathfindProfile(unit.tileIncludingCenter)
+      profile.end             = unit.agent.toForm.map(_.tileIncluding)
+      profile.maximumLength   = Some(2 + formationDistance.toInt * 2 / 32)
+      profile.canCrossUnwalkable          = unit.transport.exists(_.flying)
+      profile.allowGroundDist = false
+      profile.costThreat      = 3f
+      profile.unit = Some(unit)
+      val path = profile.find
+      new FollowPath(path).delegate(unit)
       Disengage.delegate(unit)
     }
     Move.delegate(unit)

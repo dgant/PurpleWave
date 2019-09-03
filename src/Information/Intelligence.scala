@@ -5,6 +5,7 @@ import Information.Intelligenze.UnitsShown
 import Lifecycle.With
 import Mathematics.Points.Tile
 import Performance.Cache
+import Planning.UnitMatchers.{UnitMatchBuilding, UnitMatchWorkers}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
@@ -116,12 +117,19 @@ class Intelligence {
   def enemyNatural: Option[Base] = {
     enemyMain.flatMap(_.natural)
   }
+
+  private var _enemyHasScoutedUs = false
+  private var _enemyHasScoutedUsWithWorker = false
+  def enemyHasScoutedUs: Boolean = _enemyHasScoutedUs
+  def enemyHasScoutedUsWithWorker: Boolean = _enemyHasScoutedUsWithWorker
   
   def update() {
     unitsShown.update()
     updateEnemyMain()
     flyingScout = false
     scoutTiles.clear()
+    _enemyHasScoutedUsWithWorker = _enemyHasScoutedUsWithWorker || With.geography.ourBases.exists(_.units.exists(u => u.isEnemy && u.is(UnitMatchWorkers)))
+    _enemyHasScoutedUs = _enemyHasScoutedUs || _enemyHasScoutedUsWithWorker || With.units.ours.view.filter(_.is(UnitMatchBuilding)).exists(u => u.tileArea.tiles.exists(With.grids.enemyVision.isSet))
   }
   
   private def updateEnemyMain() {

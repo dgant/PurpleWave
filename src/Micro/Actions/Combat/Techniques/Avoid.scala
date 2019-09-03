@@ -4,7 +4,7 @@ import Debugging.Visualizations.ForceColors
 import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Lifecycle.With
 import Mathematics.PurpleMath
-import Micro.Actions.Combat.Maneuvering.{DownhillPathfinder, FollowPath}
+import Micro.Actions.Combat.Maneuvering.{DownhillPathfinder, Traverse}
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
@@ -63,7 +63,7 @@ object Avoid extends ActionTechnique {
     val timeOriginUs        = unit.framesToTravelTo(unit.agent.origin)
     val timeOriginEnemy     = TakeN.percentile(0.1, unit.matchups.threats)(Ordering.by(timeOriginOfThreat)).map(timeOriginOfThreat).getOrElse(Double.PositiveInfinity)
     val enemySooner         = timeOriginUs + 96 >= timeOriginEnemy
-    val enemySieging        = unit.matchups.enemies.exists(_.isAny(UnitMatchSiegeTank, Zerg.Lurker))
+    val enemySieging        = unit.matchups.enemies.exists(_.isAny(UnitMatchSiegeTank, Zerg.Lurker)) && ! unit.base.exists(_.owner.isEnemy)
     val atHome              = unit.zone == unit.agent.origin.zone
     val scouting            = unit.agent.canScout
     val desireToGoHome      =
@@ -73,6 +73,8 @@ object Avoid extends ActionTechnique {
         -1
       else if (scouting || atHome)
         0
+      else if (unit.base.exists(_.owner.isEnemy))
+        2
       else
         ((if (enemyCloser) 1 else 0) + (if (enemySooner) 1 else 0))
 
@@ -133,7 +135,7 @@ object Avoid extends ActionTechnique {
     profile.unit = Some(unit)
     val path = profile.find
 
-    new FollowPath(path).delegate(unit)
+    new Traverse(path).delegate(unit)
   }
 
   def avoidPotential(unit: FriendlyUnitInfo, desireProfile: DesireProfile): Unit = {

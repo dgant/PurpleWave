@@ -13,9 +13,9 @@ import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackWithDarkTemp
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump, PumpWorkers}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
-import Planning.Predicates.Compound.{And, Check, Not}
+import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyDarkTemplarLikely, SafeAtHome}
+import Planning.Predicates.Reactive.{EnemyBasesAtMost, EnemyDarkTemplarLikely, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
@@ -93,11 +93,9 @@ class PvP3GateGoon extends GameplanTemplate {
       new Parallel(
         new If(
           new And(
-            new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),
+            new Not(new EnemyStrategy(With.fingerprints.fourGateGoon, With.fingerprints.robo)),
             new Or(
-              new And(
-                new SafeAtHome,
-                new Check(() => ! With.geography.enemyBases.exists(b => b.isNaturalOf.isDefined && b.townHall.isDefined))),
+              new And(new SafeAtHome, new EnemyBasesAtMost(1)),
               new EnemyHasShown(Protoss.Forge),
               new EnemyDarkTemplarLikely)),
           new Build(

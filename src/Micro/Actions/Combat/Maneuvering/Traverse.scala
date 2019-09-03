@@ -6,7 +6,7 @@ import Micro.Actions.Action
 import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class FollowPath(path: TilePath) extends Action {
+class Traverse(path: TilePath) extends Action {
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove && path.pathExists
 

@@ -6,7 +6,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Disengage, Engage}
-import Micro.Actions.Combat.Maneuvering.FollowPath
+import Micro.Actions.Combat.Maneuvering.Traverse
 import Micro.Actions.Commands.Move
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.Protoss
@@ -25,9 +25,9 @@ object Phalanx extends Action {
     val acceptableDistanceFromFormation = 12
 
     val spot      = unit.agent.toForm.get
-    val hoplites  = unit.matchups.allies.flatMap(_.friendly).filter(_.agent.toForm.isDefined)
+    val hoplites  = unit.matchups.alliesInclSelf.flatMap(_.friendly).filter(_.agent.toForm.isDefined)
     val openFire  = ! unit.unitClass.melee && unit.matchups.targets.exists(t =>  t.pixelDistanceEdge(unit, unit.agent.toForm.get) <= unit.pixelRangeAgainst(t))
-    val besieged = hoplites.exists(hoplite =>
+    val besieged  = hoplites.exists(hoplite =>
       hoplite.agent.toForm.isDefined
       && hoplite.matchups.threats.exists(threat =>
         (
@@ -77,7 +77,7 @@ object Phalanx extends Action {
       profile.costThreat      = 3f
       profile.unit = Some(unit)
       val path = profile.find
-      new FollowPath(path).delegate(unit)
+      new Traverse(path).delegate(unit)
       Disengage.delegate(unit)
     }
     Move.delegate(unit)

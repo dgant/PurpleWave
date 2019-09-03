@@ -1,9 +1,12 @@
 package Micro.Actions.Scouting
 
+import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Physics.Gravity
 import Micro.Actions.Action
+import Micro.Actions.Combat.Maneuvering.Traverse
+import Micro.Actions.Combat.Techniques.Avoid
 import Micro.Actions.Commands.Move
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -60,6 +63,7 @@ abstract class AbstractFindBuildings extends Action {
         }
       })
       .filter(With.grids.buildableTerrain.get)
+      .filter(tile => unit.enemyRangeGrid.getUnchecked(tile.i) <= 0 || ( unit.cloaked && ! With.grids.enemyDetection.isDetected(tile.i)))
       .filter(tile => ! unit.matchups.threats.exists(_.inRangeToAttack(unit, tile.pixelCenter)))
   
     if (tilesToScout.isEmpty) return
@@ -69,11 +73,21 @@ abstract class AbstractFindBuildings extends Action {
       With.grids.friendlyVision.framesSince(tile)))
     
     val force = pulls.map(_.apply(unit.pixelCenter)).reduce(_ + _)
-      
-    //TODO: Use actual potential flow so we can avoid obstacles and threats
+
     val target = unit.pixelCenter.add(force.normalize(64.0).toPoint)
     val tileToScout = tilesToScout.minBy(_.pixelCenter.pixelDistance(target))
+
+    val profile = new PathfindProfile(tileToScout)
+    profile.canCrossUnwalkable  = false
+    profile.allowGroundDist     = false
+    profile.costOccupancy       = 0.01f
+    profile.costThreat          = 3
+    profile.costRepulsion       = 0.25f
+    profile.repulsors           = Avoid.pathfindingRepulsion(unit)
+    profile.unit                = Some(unit)
+    val path = profile.find
     unit.agent.toTravel = Some(tileToScout.pixelCenter)
+    new Traverse(path).delegate(unit)
     Move.delegate(unit)
   }
 }

@@ -3,17 +3,17 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.Protoss.Situational.{DefendFFEWithProbesAgainst4Pool, PlacementForgeFastExpand}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.MeldArchons
-import Planning.Predicates.Compound.{And, Check, Latch}
+import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones.{EnemyHasShownCloakedThreat, _}
 import Planning.Predicates.Reactive.{EnemyMutalisks, SafeAtHome, SafeToMoveOut}
-import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.Predicates.Strategy.{Employing, EnemyRecentStrategy, EnemyStrategy}
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss._
@@ -23,7 +23,12 @@ object PvZIdeas {
   class ConditionalDefendFFEWithProbesAgainst4Pool extends If(
     new And(
       new Latch(new Check(() => With.units.countOurs(Protoss.PhotonCannon) + With.self.minerals / 150 >= 2)),
-      new EnemyStrategy(With.fingerprints.fourPool),
+      new Or(
+        new EnemyStrategy(With.fingerprints.fourPool),
+        new And(
+          new Not(new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.twelvePool, With.fingerprints.tenHatch, With.fingerprints.ninePool, With.fingerprints.overpool)),
+          new EnemyRecentStrategy(With.fingerprints.fourPool),
+          new Check(() => With.intelligence.enemyHasScoutedUsWithWorker))),
       new FrameAtMost(GameTime(6, 0)()),
       new UnitsAtLeast(1, Protoss.PhotonCannon, complete = false),
       new UnitsAtMost(3, Protoss.PhotonCannon, complete = true)),
@@ -217,4 +222,6 @@ object PvZIdeas {
       new Pump(Protoss.HighTemplar)),
     new Pump(Protoss.Zealot)
   )
+
+  class Eject4PoolScout extends If(new FrameAtMost(GameTime(2, 30)()), new EjectScout(Protoss.Probe))
 }

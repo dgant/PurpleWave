@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{ConsiderAttacking, DefendNatural, EjectScout}
+import Planning.Plans.Army.{Aggression, ConsiderAttacking, DefendNatural, EjectScout}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -87,15 +87,6 @@ class PvPRobo extends GameplanTemplate {
     new Blueprint(this, building = Some(Protoss.Pylon), placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 7.0)),
     new Blueprint(this, building = Some(Protoss.ShieldBattery)),
     new Blueprint(this, building = Some(Protoss.ShieldBattery)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    /* TODO: Do this only if safe
-    new Blueprint(this, building = Some(Protoss.Pylon),
-      placement = Some(PlacementProfiles.defensive),
-      preferZone = Some(With.geography.ourNatural.zone),
-      marginPixels = Some(32.0 * 3.0))
-    */
   )
 
   // TODO: Replace with (or merge into) PvPSafeToMoveOut?
@@ -146,7 +137,14 @@ class PvPRobo extends GameplanTemplate {
             Get(2, Protoss.Observer))))))
 
   override def scoutExposPlan: Plan = NoPlan()
-  override def defendEntrance: Plan = new If(new ReadyToExpand, new DefendNatural, super.defendEntrance)
+  override def defendEntrance: Plan = new Trigger(new ReadyToExpand, new DefendNatural, super.defendEntrance)
+
+  override def aggressionPlan: Plan = new Trigger(
+    new And(
+      new ReadyToExpand,
+      new EnemyStrategy(With.fingerprints.fourGateGoon)),
+    new Aggression(1.5)
+  )
 
   override def buildOrderPlan: Plan = new Parallel(
     new BuildOrder(
@@ -208,13 +206,7 @@ class PvPRobo extends GameplanTemplate {
       new UnitsAtLeast(3, Protoss.Gateway),
       new Pump(Protoss.Zealot, maximumConcurrently = 1)))
 
-  class Expand extends Parallel(
-    new If(
-      new EnemyStrategy(With.fingerprints.fourGateGoon),
-      new Parallel(
-        //new BuildShieldBatteriesAtNatural(2),
-        )),
-    new RequireMiningBases(2))
+  class Expand extends RequireMiningBases(2)
 
   class EnemyLowUnitCount extends Or(
     new EnemyBasesAtLeast(2),
@@ -264,7 +256,7 @@ class PvPRobo extends GameplanTemplate {
 
     new If(new EnemyStrategy(With.fingerprints.dtRush), new Build(Get(Protoss.ObserverSpeed))),
     new If(new Not(new EnemyLowUnitCount), new Build(Get(3, Protoss.Gateway))),
-    new If(new BasesAtMost(1), new PumpWorkers(oversaturate = true)),
+    new PumpWorkers(oversaturate = true),
 
     new Expand,
 

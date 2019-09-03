@@ -69,4 +69,13 @@ class TestingPlaybook extends PurpleWavePlaybook {
   override def respectHistory: Boolean = false
 }
 
-object Playbook extends PurpleWavePlaybook {}
+class HumanPlaybook extends PurpleWavePlaybook {
+  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionSequence(Seq(
+    Seq(PvPRobo),
+    Seq(PvP2GateDTExpand),
+    Seq(PvP3GateGoon),
+    Seq(PvP2Gate1012)
+  ))
+}
+
+object Playbook extends TestingPlaybook {}

@@ -341,9 +341,6 @@ object PvPIdeas {
       new RequireMiningBases(3),
       new RequireBases(4)))
 
-  class CanSkipObservers extends And(
-    new Not(new EnemyHasShown(Protoss.DarkTemplar)),
-    new EnemyStrategy(With.fingerprints.robo, With.fingerprints.fourGateGoon, With.fingerprints.nexusFirst))
 
   class MeldArchonsPvP extends MeldArchons(0) {
     override def minimumArchons: Int = Math.min(6, With.units.countEnemy(Protoss.Zealot) / 6)
@@ -374,7 +371,9 @@ object PvPIdeas {
       new EnemiesAtMost(0, Protoss.PhotonCannon),
       new Pump(Protoss.DarkTemplar, 3),
       new Pump(Protoss.DarkTemplar, 2)),
-    new Pump(Protoss.DarkTemplar, 1))
+    new If(
+      new GasPumpsAtLeast(3),
+      new Pump(Protoss.DarkTemplar, 1)))
 
   class TrainArmy extends Parallel(
     new Pump(Protoss.Carrier),

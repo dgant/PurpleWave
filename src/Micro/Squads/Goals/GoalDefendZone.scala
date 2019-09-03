@@ -30,6 +30,7 @@ class GoalDefendZone extends GoalBasic {
     lazy val walls = zone.units.filter(u =>
       u.isOurs
         && u.unitClass.isStaticDefense
+        && choke.forall(_.pixelCenter.pixelDistance(u.pixelCenter) > 96 + u.effectiveRangePixels)
         && (squad.enemies.isEmpty || squad.enemies.exists(u.canAttack)))
 
     lazy val allowWandering = With.geography.ourBases.size > 2 || !With.enemies.exists(_.isZerg) || squad.units.size > 3 || squad.enemies.exists(_.unitClass.ranged)

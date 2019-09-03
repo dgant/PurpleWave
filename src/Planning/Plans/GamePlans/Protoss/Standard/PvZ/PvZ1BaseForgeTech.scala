@@ -7,6 +7,7 @@ import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.{Attack, Hunt}
 import Planning.Plans.Compound.{FlipIf, If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.Eject4PoolScout
 import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpRatio}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -71,6 +72,7 @@ class PvZ1BaseForgeTech extends GameplanTemplate {
   )
 
   override def buildPlans: Seq[Plan] = Seq(
+    new Eject4PoolScout,
     new BuildOrder(
       Get(12, Protoss.Probe),
       Get(2, Protoss.PhotonCannon)),

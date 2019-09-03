@@ -83,9 +83,6 @@ object ShowUnitsFriendly extends View {
         DrawMap.line(unit.pixelCenter, targetPosition.get, unit.player.colorDark)
       }
       if (agent.movingTo.isDefined) {
-        if (selectedOnly) {
-          DrawMap.arrow(unit.pixelCenter, agent.nextWaypoint(agent.movingTo.get), Colors.BrightGray)
-        }
         DrawMap.arrow(unit.pixelCenter, agent.movingTo.get, Colors.MidnightGray)
       }
       if (agent.toAttack.isDefined) {

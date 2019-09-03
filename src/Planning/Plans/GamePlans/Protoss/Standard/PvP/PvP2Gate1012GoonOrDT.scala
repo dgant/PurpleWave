@@ -16,7 +16,7 @@ import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.SafeAtHome
+import Planning.Predicates.Reactive.{EnemyBasesAtMost, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
 import Planning.UnitCounters.UnitCountExactly
 import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
@@ -52,7 +52,17 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
     new Or(
       new Not(new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway)),
       new UnitsAtLeast(3, Protoss.Dragoon, complete = true)),
-    new PvPIdeas.AttackSafely)
+    new If(
+      new And(
+        new UnitsAtLeast(2, Protoss.DarkTemplar, complete = true),
+        new EnemiesAtMost(0, Protoss.Observer)),
+      new Attack,
+      new If(
+        new Not(
+          new And(
+            new MiningBasesAtLeast(2),
+            new EnemyStrategy(With.fingerprints.fourGateGoon))),
+        new PvPIdeas.AttackSafely)))
 
   override val scoutPlan: Plan = new If(new StartPositionsAtLeast(4), new ScoutOn(Protoss.Pylon), new ScoutOn(Protoss.Gateway))
   
@@ -65,7 +75,21 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
     new Or(
       new Employing(PvP2Gate1012DT),
       new EnemyStrategy(With.fingerprints.fourGateGoon, With.fingerprints.proxyGateway)),
-    new Not(new EnemyStrategy(With.fingerprints.robo)))
+    new Or(
+      new UnitsAtLeast(1, Protoss.CitadelOfAdun),
+      new Not(new EnemyStrategy(With.fingerprints.robo))))
+
+
+  class NeedForgeToExpand extends Or(
+    new EnemyStrategy(With.fingerprints.dtRush, With.fingerprints.forgeFe), // Forge FE can hide a DT rush
+    new And(
+      new Not(new EnemyStrategy(With.fingerprints.robo)),
+      new EnemyBasesAtMost(1)))
+
+  class Expand extends Parallel(
+    new If(new NeedForgeToExpand, new Build(Get(Protoss.Forge))),
+    new RequireMiningBases(2))
+
   
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.TwoGate1012
   override def buildPlans = Vector(
@@ -77,36 +101,26 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
         new Not(new GoDT)),
       new CapGasWorkersAt(2)),
 
-    new If(
-      new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.proxyGateway, With.fingerprints.twoGate),
-      new BuildOrder(Get(7, Protoss.Zealot))),
-
-    new If(
-      new EnemyStrategy(With.fingerprints.proxyGateway),
-      new Build(Get(2, Protoss.Gateway))),
+    new If(new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.proxyGateway, With.fingerprints.twoGate), new BuildOrder(Get(7, Protoss.Zealot))),
 
     new Build(
       Get(Protoss.Assimilator),
       Get(Protoss.CyberneticsCore)),
 
     new If(
-      new Not(new GoDT),
-      new Build(Get(Protoss.DragoonRange))),
-
-    new If(
       new EnemyStrategy(With.fingerprints.forgeFe),
-      new Build(
+      new BuildOrder(
         Get(Protoss.RoboticsFacility),
+        Get(Protoss.Shuttle),
         Get(Protoss.RoboticsSupportBay))),
+
+    new If(new Not(new GoDT), new Build(Get(Protoss.DragoonRange))),
 
     new If(
       new Or(
         new UnitsAtLeast(2, UnitMatchOr(Protoss.DarkTemplar, Protoss.Reaver), complete = true),
-        new And(
-          new UnitsAtLeast(12, UnitMatchWarriors),
-          new UnitsAtLeast(1, Protoss.Forge),
-          new SafeAtHome)),
-      new RequireMiningBases(2)),
+        new And(new SafeAtHome, new UnitsAtLeast(12, UnitMatchWarriors))),
+      new Expand),
 
     new If(
       new GoDT,
@@ -132,14 +146,11 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
       new PvPIdeas.TrainArmy,
       new Build(Get(3, Protoss.Gateway))),
 
-    new If(
+    new FlipIf(
       new SafeAtHome,
-      new RequireMiningBases(2)),
+      new Expand,
+      new Build(Get(4, Protoss.Gateway))),
 
-    new Build(
-      Get(Protoss.Forge),
-      Get(4, Protoss.Gateway),
-      Get(2, Protoss.Nexus)),
-    new BuildCannonsAtNatural(2),
+    new If(new NeedForgeToExpand, new BuildCannonsAtNatural(2)),
   )
 }

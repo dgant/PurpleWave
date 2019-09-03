@@ -1,12 +1,14 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.EjectScout
-import Planning.Plans.Compound.{If, Trigger}
+import Planning.Plans.Compound.{If, Or, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
+import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.Eject4PoolScout
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -69,7 +71,11 @@ class PvZFFE extends GameplanTemplate {
     new If(
       new EnemyStrategy(With.fingerprints.fourPool),
       new Pump(Protoss.PhotonCannon, 6)),
-    new PvZIdeas.ConditionalDefendFFEWithProbesAgainst4Pool,
+    new Trigger(
+      new Or(
+        new UnitsAtLeast(2, Protoss.PhotonCannon),
+        new FrameAtLeast(GameTime(2, 20)())),
+      new PvZIdeas.ConditionalDefendFFEWithProbesAgainst4Pool),
     new If(
       new EnemyStrategy(With.fingerprints.fourPool),
       new EjectScout(Protoss.Probe)),
@@ -77,6 +83,7 @@ class PvZFFE extends GameplanTemplate {
   )
   
   override def buildPlans: Seq[Plan] = Vector(
+    new Eject4PoolScout,
     new If(
       new UnitsAtLeast(20, UnitMatchWorkers),
       new Build(

@@ -32,7 +32,11 @@ class PvP4GateGoon extends GameplanTemplate {
           new UnitsAtLeast(2, Protoss.Assimilator)))))
 
   override def attackPlan: Plan = new Parallel(
-    new PvPIdeas.AttackSafely,
+    new If(
+      new Or(
+        new UnitsAtMost(0, Protoss.CitadelOfAdun),
+        new Latch(new UnitsAtLeast(1, Protoss.DarkTemplar))),
+      new PvPIdeas.AttackSafely),
     new Attack(Protoss.DarkTemplar))
 
   override def scoutPlan: Plan = new ScoutOn(Protoss.Gateway)
@@ -64,7 +68,9 @@ class PvP4GateGoon extends GameplanTemplate {
       new EnemyStrategy(With.fingerprints.fourGateGoon),
       new Parallel(
         new BuildOrder(Get(Protoss.CitadelOfAdun)),
-        new PumpWorkers(oversaturate = true),
+        new If(
+          new Latch(new UnitsAtLeast(2, Protoss.DarkTemplar)),
+          new PumpWorkers(oversaturate = true)),
         new BuildOrder(
           Get(6, Protoss.Zealot),
           Get(Protoss.TemplarArchives),

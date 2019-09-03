@@ -11,5 +11,7 @@ class ProtossVsProtoss extends ModalGameplan(
   new PvP2GateGoon,
   new PvP3GateGoon,
   new PvP4GateGoon,
-  new PvPLateGame
+  new PvPMidGame,
+  // new PvPLateGame
+  new PvPLateGame2
 )

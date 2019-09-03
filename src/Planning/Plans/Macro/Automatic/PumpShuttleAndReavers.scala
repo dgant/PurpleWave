@@ -10,8 +10,7 @@ class PumpShuttleAndReavers(reavers: Int = 50, shuttleFirst: Boolean = true) ext
     new If(
       new UnitsAtMost(0, Protoss.RoboticsSupportBay, complete = true),
       new Pump(Protoss.Shuttle, 1))
-  else NoPlan()
-  ),
+  else NoPlan()),
 
   new PumpRatio(Protoss.Shuttle, 0, reavers / 2, Seq(Friendly(Protoss.Reaver, 0.5))),
   new Pump(Protoss.Reaver, reavers),

@@ -2,6 +2,8 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvR
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
+import Macro.Architecture.Blueprint
+import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Basic.NoPlan
@@ -22,6 +24,21 @@ class PvRTinfoil extends GameplanTemplateVsRandom {
   
   override val activationCriteria = new Employing(PvRTinfoil2018)
   override def scoutPlan   = NoPlan()
+
+  override lazy val blueprints = Vector(
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.Pylon)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.Pylon)),
+    new Blueprint(this, placement = Some(PlacementProfiles.backPylon),    building = Some(Protoss.Pylon)),
+    new Blueprint(this, placement = Some(PlacementProfiles.tech),         building = Some(Protoss.Forge)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
+    new Blueprint(this, placement = Some(PlacementProfiles.backPylon),    building = Some(Protoss.Gateway)),
+    new Blueprint(this, placement = Some(PlacementProfiles.backPylon),    building = Some(Protoss.RoboticsFacility)),
+    new Blueprint(this, placement = Some(PlacementProfiles.backPylon),    building = Some(Protoss.RoboticsSupportBay)))
 
   override def attackPlan = new If(new UnitsAtLeast(6, Protoss.Gateway, complete = true), new ConsiderAttacking)
 
@@ -50,7 +67,7 @@ class PvRTinfoil extends GameplanTemplateVsRandom {
         new UnitsAtMost(2, Protoss.PhotonCannon, complete = true)),
       new DefendFFEWithProbesAgainst4Pool),
     new Pump(Protoss.Observer, 1),
-    new PumpShuttleAndReavers(4),
+    new PumpShuttleAndReavers(6),
     new UpgradeContinuously(Protoss.ShuttleSpeed),
     new If(
       new And(
@@ -68,9 +85,9 @@ class PvRTinfoil extends GameplanTemplateVsRandom {
       Get(1, Protoss.CyberneticsCore),
       Get(4, Protoss.PhotonCannon),
       Get(1, Protoss.RoboticsFacility),
-      Get(5, Protoss.PhotonCannon),
-      Get(1, Protoss.RoboticsSupportBay),
       Get(6, Protoss.PhotonCannon),
+      Get(1, Protoss.RoboticsSupportBay),
+      Get(8, Protoss.PhotonCannon),
       Get(Protoss.DragoonRange),
       Get(1, Protoss.Observatory)),
     new If(

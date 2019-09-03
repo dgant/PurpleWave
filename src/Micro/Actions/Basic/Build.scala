@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Points.Tile
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
-import Micro.Actions.Combat.Maneuvering.Path
+import Micro.Actions.Combat.Maneuvering.{Traverse}
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Commands.{Attack, Move}
 import Planning.UnitMatchers.UnitMatchWorkers
@@ -92,7 +92,14 @@ object Build extends Action {
     }
 
     unit.agent.toTravel = Some(movePixel)
-    Path.delegate(unit)
+
+    // Pathfind for cross-zone travel, eg to avoid getting stuck on mineral blocks
+    if (movePixel.zone != unit.zone) {
+      val profile = With.paths.profileDistance(unit.tileIncludingCenter, movePixel.tileIncluding)
+      val path = profile.find
+      new Traverse(path).delegate(unit)
+    }
+
     Move.delegate(unit)
   }
 }

@@ -64,13 +64,18 @@ class PvP2GateGoon extends GameplanTemplate {
   
   override val buildOrder: Seq[BuildRequest] = ProtossBuilds.ZCoreZTwoGateGoon
 
+  class GoDT extends Or(
+    new UnitsAtLeast(1, Protoss.CitadelOfAdun),
+    new And(
+      new BasesAtMost(1),
+      new EnemyStrategy(With.fingerprints.fourGateGoon),
+      new Not(new EnemyStrategy(With.fingerprints.robo))))
+
   override val buildPlans = Vector(
 
-    new If(
-      new Not(new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway)),
-      new EjectScout),
+    new If(new Not(new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway)), new EjectScout),
 
-    new CapGasAt(0, 300),
+    new If(new GoDT, new CapGasAt(0, 350), new CapGasAt(0, 250)),
     new If(
       new UnitsAtMost(0, Protoss.CyberneticsCore),
       new CapGasWorkersAt(0),
@@ -79,8 +84,8 @@ class PvP2GateGoon extends GameplanTemplate {
         new If(
           new And(
             new UnitsAtMost(21, Protoss.Probe),
-            new UnitsAtMost(0, Protoss.CitadelOfAdun)),
-          new CapGasWorkersAt(2)))),
+            new Not(new GoDT))),
+          new CapGasWorkersAt(2))),
 
     new If(
       new Or(
@@ -98,15 +103,8 @@ class PvP2GateGoon extends GameplanTemplate {
     new Build(Get(Protoss.DragoonRange)),
 
     new If(new EnemyStrategy(With.fingerprints.oneGateCore), new RequireMiningBases(2)),
-
-    new If(
-      new EnemyStrategy(With.fingerprints.fourGateGoon),
-      new If(
-        new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
-        new RequireMiningBases(2)),
-      new If(
-        new UnitsAtLeast(12, UnitMatchWarriors),
-        new RequireMiningBases(2))),
+    new If(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true), new RequireMiningBases(2)),
+    new If(new UnitsAtLeast(12, UnitMatchWarriors), new RequireMiningBases(2)),
 
     new PvPIdeas.TrainArmy,
 
@@ -114,11 +112,7 @@ class PvP2GateGoon extends GameplanTemplate {
       new EnemyStrategy(With.fingerprints.proxyGateway),
       new Build(Get(4, Protoss.Gateway)),
       new If(
-        new Or(
-          new UnitsAtLeast(1, Protoss.CitadelOfAdun),
-          new And(
-            new BasesAtMost(1),
-            new EnemyStrategy(With.fingerprints.fourGateGoon))),
+        new GoDT,
         new Build(
           Get(Protoss.CitadelOfAdun),
           Get(Protoss.TemplarArchives)),
@@ -135,6 +129,8 @@ class PvP2GateGoon extends GameplanTemplate {
       Get(5, Protoss.Gateway),
       Get(2, Protoss.Assimilator)),
 
-    new BuildCannonsAtNatural(2)
+    new If(
+      new Not(new EnemyStrategy(With.fingerprints.robo)),
+      new BuildCannonsAtNatural(2))
   )
 }

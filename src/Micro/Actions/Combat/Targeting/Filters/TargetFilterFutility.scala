@@ -40,7 +40,7 @@ object TargetFilterFutility extends TargetFilter {
     lazy val alliesAssisting  = target.matchups.threats.exists(ally =>
       ally != actor
       && catchableBy(ally, target)
-      && (ally.topSpeed > target.topSpeed || ally.pixelRangeAgainst(target) > actor.pixelRangeAgainst(target))
+      && (ally.topSpeed >= target.topSpeed || ally.pixelRangeAgainst(target) >= actor.pixelRangeAgainst(target))
       && ally.framesBeforeAttacking(target) <= actor.framesBeforeAttacking(target))
     
     lazy val targetCatchable  = catchableBy(actor, target) || alliesAssisting

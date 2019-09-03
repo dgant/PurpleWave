@@ -5,7 +5,7 @@ import Lifecycle.{Manners, With}
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.FollowPath
+import Micro.Actions.Combat.Maneuvering.Traverse
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Combat.Techniques.Avoid
 import Micro.Actions.Commands.Attack
@@ -55,18 +55,19 @@ object Paradrop extends Action {
 
     val profile = new PathfindProfile(unit.tileIncludingCenter)
     profile.end                 = Some(destination)
-    profile.maximumLength       = Some(20)
+    profile.endDistanceMaximum  = (unit.effectiveRangePixels + (if (unit.unitClass != Protoss.HighTemplar) unit.topSpeed * unit.cooldownLeft else 0)).toFloat / 32f
+    profile.maximumLength       = Some(30)
     profile.canCrossUnwalkable  = false
     profile.allowGroundDist     = false
-    profile.costOccupancy       = 0.01f
+    profile.costOccupancy       = 0.5f
     profile.costThreat          = 3
-    profile.costRepulsion       = if (target.isDefined) 0.5f else 1.5f
+    profile.costRepulsion       = if (target.isDefined) 1f else 1.5f
     profile.repulsors           = Avoid.pathfindingRepulsion(unit)
     profile.unit                = Some(unit)
     val path = profile.find
     if (path.pathExists) {
       unit.agent.toTravel = Some(path.end.pixelCenter)
-      new FollowPath(path).delegate(unit)
+      new Traverse(path).delegate(unit)
     } else if (With.configuration.debugging()) {
       Manners.chat(f"Failed to path $unit to $destination")
       Manners.chat(f"Targeting $target")

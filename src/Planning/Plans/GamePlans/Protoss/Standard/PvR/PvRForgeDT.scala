@@ -29,11 +29,18 @@ class PvRForgeDT extends GameplanTemplateVsRandom {
   )
 
   override lazy val blueprints = Vector(
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)))
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.Pylon)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.Pylon)),
+    new Blueprint(this, placement = Some(PlacementProfiles.backPylon),    building = Some(Protoss.Pylon)),
+    new Blueprint(this, placement = Some(PlacementProfiles.tech),         building = Some(Protoss.Forge)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
+    new Blueprint(this, placement = Some(PlacementProfiles.backPylon),    building = Some(Protoss.Gateway)))
+
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new If(

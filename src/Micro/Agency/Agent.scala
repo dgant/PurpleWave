@@ -88,22 +88,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   }
   private val cachedZonePath = new mutable.HashMap[Pixel, Option[ZonePath]]
   
-  def nextWaypoint(to: Pixel): Pixel = {
-    if (unit.flying) return to
-    if ( ! With.strategy.map.forall(_.trustGroundDistance)) return to
-    if ( ! cachedWaypoint.contains(to)) {
-      val path = zonePath(to)
-      cachedWaypoint(to) = path
-        .map(_.steps
-          .map(_.edge.pixelCenter)
-          .find(step => unit.pixelDistanceCenter(step) > 128)
-          .getOrElse(to))
-        .getOrElse(to)
-    }
-    cachedWaypoint(to)
-  }
-  private val cachedWaypoint = new mutable.HashMap[Pixel, Pixel]
-  
   /////////////////
   // Suggestions //
   /////////////////
@@ -165,7 +149,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     pathsAcceptable     = Seq.empty
     pathAccepted        = Seq.empty
     cachedZonePath.clear()
-    cachedWaypoint.clear()
     techniques.clear()
     fightReason = ""
     actionsPerformed.clear()

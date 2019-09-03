@@ -40,6 +40,7 @@ object StrategyGroups {
     PvE3BaseIslandCarrier,
     PvT1GateRobo,
     PvTProxyDarkTemplar,
+    PvT25BaseCarrier, // Experimenting with this so we can delete it
     PvP2Gate1012,
     PvZLateGameCarrier, // Needs island tech
     PvZMidgame4Gate2Archon,
@@ -78,4 +79,4 @@ class HumanPlaybook extends PurpleWavePlaybook {
   ))
 }
 
-object Playbook extends TestingPlaybook {}
+object Playbook extends PurpleWavePlaybook {}

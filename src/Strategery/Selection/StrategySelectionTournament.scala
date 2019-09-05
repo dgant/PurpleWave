@@ -4,7 +4,7 @@ import Lifecycle.With
 import Strategery.{Plasma, Playbook}
 import Strategery.Strategies.Strategy
 
-object StrategySelectionCIG extends StrategySelectionPolicy {
+object StrategySelectionTournament extends StrategySelectionPolicy {
   
   def chooseBest(topLevelStrategies: Iterable[Strategy], expand: Boolean = true): Iterable[Strategy] = {
     if (Plasma.matches) {

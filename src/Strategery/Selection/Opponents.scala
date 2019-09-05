@@ -10,44 +10,55 @@ object Opponents {
     opponent
   }
 
-  val defaultPvT  = new StrategySelectionRecommended(StrategySelectionGreedy, PvT1015DT, PvT3BaseCarrier)
+  val defaultPvT  = new StrategySelectionRecommended(StrategySelectionGreedy, PvT32Nexus, PvT3BaseCarrier)
   val defaultPvP  = new StrategySelectionRecommended(StrategySelectionGreedy, PvP2Gate1012DT)
   val defaultPvZ  = new StrategySelectionRecommended(StrategySelectionGreedy, PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar)
   val fixedPvT    = new StrategySelectionFixed(PvT1015DT, PvT3BaseArbiter)
   val fixedPvZ    = new StrategySelectionFixed(PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar)
   val fixedPvR    = new StrategySelectionFixed(PvR1BaseDT)
-  
-  val mcrave        : Opponent = add(Opponent("McRave",       StrategySelectionDynamic))
-  val locutus       : Opponent = add(Opponent("Locutus",      StrategySelectionSequence(Vector(Seq(PvP2GateGoon), Seq(PvP2Gate1012DT), Seq(PvP3GateGoonCounter), Seq(PvP2GateDTExpand), Seq(PvPProxy2Gate)))))
-  val tscmoo        : Opponent = add(Opponent("tscmoo",
-    new StrategySelectionTry(
-      StrategySelectionSequence(Seq(
-        Seq(
-          PvROpenZCoreZ,
-          PvT23Nexus, PvT2BaseCarrier,
-          PvPRobo,
-          PvZ4Gate1012, PvZMidgame5GateGoonReaver, PvZLateGameReaver),
-        Seq(PvR2Gate4Gate),
-        Seq(
-          PvRDT,
-          PvTDTExpand, PvT2BaseArbiter,
-          PvP2GateDTExpand,
-          PvZMidgameNeoBisu, PvZLateGameTemplar),
-    )),
-    PvRProxy2Gate,
-    PvT2GateRangeExpandCarrier,
-    PvP2Gate1012DT,
-    PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar
-  )))
-  val bananabrain   : Opponent = add(Opponent("BananaBrain",  new StrategySelectionRecommended(StrategySelectionGreedy, PvP2GateDTExpand) { duration = 10 }))
-  val iron          : Opponent = add(Opponent("Iron",         new StrategySelectionFixed(PvT2GateRangeExpandCarrier)))
-  val titaniron     : Opponent = add(Opponent("TitanIron",    new StrategySelectionRecommended(StrategySelectionGreedy, PvT2GateRangeExpandCarrier)))
+
+  // New AIIDE opponents
+
+  val aitp          : Opponent = add(Opponent("AITP",         defaultPvT))
+  val apollo        : Opponent = add(Opponent("Apollo",       defaultPvZ))
+  val bananabrain   : Opponent = add(Opponent("BananaBrain",  StrategySelectionRandom)) // TODO
+  val bunkerBoxer   : Opponent = add(Opponent("BunkerBoxeR",  defaultPvT))
+  val cdbot         : Opponent = add(Opponent("CDBot",        defaultPvZ))
+  // dandan/daqin below
+  val dragon        : Opponent = add(Opponent("Dragon",       StrategySelectionGreedy))
+  val firefrog      : Opponent = add(Opponent("Firefrog",     defaultPvZ))
+  val kimbot        : Opponent = add(Opponent("KimBot",       new StrategySelectionRecommended(StrategySelectionGreedy, PvTReaverCarrierCheese) { duration = 1 })) // IceLab or Leta fork?
   val letabot       : Opponent = add(Opponent("LetaBot",      new StrategySelectionRecommended(StrategySelectionGreedy, PvTReaverCarrierCheese)))
+  val locutus       : Opponent = add(Opponent("Locutus",      StrategySelectionSequence(Vector(
+    Seq(PvP2GateGoon),
+    Seq(PvPRobo),
+    Seq(PvP2Gate1012DT),
+    Seq(PvP3GateGoonCounter),
+    Seq(PvP3GateGoon),
+    Seq(PvP2GateDTExpand),
+    Seq(PvPProxy2Gate)))))
+  val dandanbot     : Opponent = add(Opponent("DanDanBot",    locutus.policy))
+  val daqin         : Opponent = add(Opponent("DaQin",        locutus.policy))
+  val mcrave        : Opponent = add(Opponent("McRave",       StrategySelectionGreedy))
+  val metabot       : Opponent = add(Opponent("MegaBot",      defaultPvP))
+  val microwave     : Opponent = add(Opponent("Microwave",    new StrategySelectionRecommended(StrategySelectionGreedy, PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar)))
+  val murph         : Opponent = add(Opponent("Murph",        defaultPvP))
+  val ophelia       : Opponent = add(Opponent("Ophelia",      defaultPvZ))
   val steamhammer   : Opponent = add(Opponent("Steamhammer",  StrategySelectionDynamic))
-  val microwave     : Opponent = add(Opponent("Microwave",    new StrategySelectionRecommended(StrategySelectionGreedy, PvZ4Gate1012, PvZMidgame5GateGoon, PvZLateGameTemplar)))
-  val megabot       : Opponent = add(Opponent("MegaBot",      defaultPvP))
-  val zzzkbot       : Opponent = add(Opponent("ZZZKBot",      new StrategySelectionFixed(PvZ1BaseForgeTechForced, PvZMidgameNeoBisu, PvZLateGameTemplar)))
+  val stormbreaker  : Opponent = add(Opponent("Stormbreaker", defaultPvT))
+  val xiaoyi        : Opponent = add(Opponent("XiaoYi",       new StrategySelectionRecommended(StrategySelectionGreedy, PvT13Nexus, PvT2BaseCarrier) { duration = 3 }))
+
+  // Returning AIIDE opponents
+  val cse           : Opponent = add(Opponent("CSE",          StrategySelectionRandom)) // TODO
+  val iron          : Opponent = add(Opponent("Iron",         new StrategySelectionFixed(PvT2GateRangeExpandCarrier) { checkValidity = false }))
+  val saida         : Opponent = add(Opponent("SAIDA",        new StrategySelectionFixed(PvT13Nexus, PvT2BaseCarrier) { checkValidity = false }))
   val ualbertabot   : Opponent = add(Opponent("UAlbertaBot",  fixedPvR))
+  val zzzkbot       : Opponent = add(Opponent("ZZZKBot",      new StrategySelectionFixed(PvZ1BaseForgeTechForced, PvZMidgameNeoBisu, PvZLateGameTemplar) { checkValidity = false }))
+
+  // Other tournaments
+
+  val titaniron     : Opponent = add(Opponent("TitanIron",    new StrategySelectionRecommended(StrategySelectionGreedy, PvT2GateRangeExpandCarrier)))
+  val megabot       : Opponent = add(Opponent("MegaBot",      defaultPvP))
   val aiur          : Opponent = add(Opponent("Aiur",         defaultPvP))
   val tyr           : Opponent = add(Opponent("Tyr",          new StrategySelectionFixed(PvP2GateDTExpand)))
   val ecgberht      : Opponent = add(Opponent("Ecgberht",     defaultPvT))
@@ -62,10 +73,9 @@ object Opponents {
   val korean        : Opponent = add(Opponent("Korean",       defaultPvZ))
   val cunybot       : Opponent = add(Opponent("CUNYBot",      new StrategySelectionRecommended(StrategySelectionGreedy, PvZFFEEconomic, PvZMidgame5GateGoonReaver, PvZLateGameReaver)))
   val isamind       : Opponent = add(Opponent("ISAMind",      locutus.policy))
-  val stormbreaker  : Opponent = add(Opponent("Stormbreaker", defaultPvZ))
 
   // Aliases
-  val tscmoor           : Opponent = add(Opponent("tscmoor",            tscmoo.policy))
+
   val ironbot           : Opponent = add(Opponent("Iron bot",           iron.policy))
   val martinrooijackers : Opponent = add(Opponent("Martin Rooijackers", letabot.policy))
   val megabot2017       : Opponent = add(Opponent("MegaBot2017",        megabot.policy))
@@ -76,7 +86,7 @@ object Opponents {
   val ziabot2           : Opponent = add(Opponent("Zia bot",            ziabot.policy))
   val johankayser       : Opponent = add(Opponent("Johan Kayser",       srbotone.policy))
   val bryanweber        : Opponent = add(Opponent("Bryan Weber",        cunybot.policy))
-  val jadien            : Opponent = add(Opponent("jadien",             tscmoor.policy))
+  val jadien            : Opponent = add(Opponent("jadien"))
   
   val all: Vector[Opponent] = allKnown
 }

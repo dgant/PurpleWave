@@ -16,7 +16,7 @@ import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
 import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.EnemyBasesAtMost
+import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBasesAtMost}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
@@ -46,13 +46,18 @@ class PvP2GateGoon extends GameplanTemplate {
 
   override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
   override def attackPlan: Plan = new If(
-    new Or(
-      new EnemyStrategy(With.fingerprints.gasSteal, With.fingerprints.nexusFirst, With.fingerprints.oneGateCore, With.fingerprints.robo, With.fingerprints.dtRush),
-      new And(
-        new Not(new EnemyStrategy(With.fingerprints.proxyGateway)),
-        new UnitsAtLeast(3, Protoss.Dragoon, complete = true)),
-      new UnitsAtLeast(7, Protoss.Dragoon, complete = true)),
-    new PvPIdeas.AttackSafely)
+    new And(
+      new Or(
+        new BasesAtMost(1),
+        new EnemyBasesAtLeast(2),
+        new Not(new EnemyStrategy(With.fingerprints.dragoonRange))),
+      new Or(
+        new EnemyStrategy(With.fingerprints.gasSteal, With.fingerprints.nexusFirst, With.fingerprints.oneGateCore, With.fingerprints.robo, With.fingerprints.dtRush),
+        new And(
+          new Not(new EnemyStrategy(With.fingerprints.proxyGateway)),
+          new UnitsAtLeast(3, Protoss.Dragoon, complete = true)),
+        new UnitsAtLeast(7, Protoss.Dragoon, complete = true))),
+      new PvPIdeas.AttackSafely)
 
   override def scoutPlan: Plan = new ScoutOn(Protoss.Zealot)
 

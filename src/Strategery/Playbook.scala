@@ -58,12 +58,12 @@ class PurpleWavePlaybook extends EmptyPlaybook {
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy
 }
 
-class CIGPlaybook extends PurpleWavePlaybook {
-  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionCIG
+class AIIDEPlaybook extends PurpleWavePlaybook {
+  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionTournament
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvPRobo)
+  override lazy val forced: Seq[Strategy] = Seq(PvP1ZealotExpand)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
   override def respectOpponent: Boolean = false
   override def respectMap: Boolean = false
@@ -79,4 +79,4 @@ class HumanPlaybook extends PurpleWavePlaybook {
   ))
 }
 
-object Playbook extends PurpleWavePlaybook {}
+object Playbook extends AIIDEPlaybook {}

@@ -42,6 +42,7 @@ object ProtossChoices {
     PvT21Nexus,
     PvT23Nexus,
     PvT28Nexus,
+    PvT32Nexus,
     PvT25BaseCarrier,
     PvT2GateRangeExpandCarrier,
     PvTDTExpand,
@@ -70,6 +71,7 @@ object ProtossChoices {
   /////////
   
   val pvpOpenersWithoutTransitions = Vector(
+    PvP1ZealotExpand,
     PvP2GateDTExpand,
     PvPProxy2Gate
   )

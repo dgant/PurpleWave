@@ -317,13 +317,13 @@ object ProtossBuilds {
 
   val PvT21Nexus = Vector[BuildRequest] (
     Get(8,   Protoss.Probe),
-    Get(1,   Protoss.Pylon),
+    Get(Protoss.Pylon),
     Get(10,  Protoss.Probe),
-    Get(1,   Protoss.Gateway),
+    Get(Protoss.Gateway),
     Get(12,  Protoss.Probe),
-    Get(1,   Protoss.Assimilator),
+    Get(Protoss.Assimilator),
     Get(13,  Protoss.Probe),
-    Get(1,   Protoss.CyberneticsCore),
+    Get(Protoss.CyberneticsCore),
     Get(15,  Protoss.Probe),
     Get(2,   Protoss.Pylon),
     Get(16,  Protoss.Probe),
@@ -360,13 +360,13 @@ object ProtossBuilds {
 
   val PvT28Nexus = Vector[BuildRequest] (
     Get(8,  Protoss.Probe),
-    Get(1,  Protoss.Pylon),
+    Get(Protoss.Pylon),
     Get(10, Protoss.Probe),
-    Get(1,  Protoss.Gateway),
+    Get(Protoss.Gateway),
     Get(12, Protoss.Probe),
-    Get(1,  Protoss.Assimilator),
+    Get(Protoss.Assimilator),
     Get(13, Protoss.Probe),
-    Get(1,  Protoss.CyberneticsCore),
+    Get(Protoss.CyberneticsCore),
     Get(15, Protoss.Probe),
     Get(2,  Protoss.Pylon),
     Get(16, Protoss.Probe),
@@ -380,6 +380,34 @@ object ProtossBuilds {
     Get(21, Protoss.Probe),
     Get(3,  Protoss.Dragoon),
     Get(22, Protoss.Probe),
+    Get(2,  Protoss.Nexus))
+
+  val PvT32Nexus = Vector[BuildRequest] (
+    Get(8,  Protoss.Probe),
+    Get(Protoss.Pylon),
+    Get(10, Protoss.Probe),
+    Get(Protoss.Gateway),
+    Get(12, Protoss.Probe),
+    Get(2,  Protoss.Pylon),
+    Get(13, Protoss.Probe),
+    Get(Protoss.Zealot),
+    Get(14, Protoss.Probe),
+    Get(Protoss.Assimilator),
+    Get(15, Protoss.Probe),
+    Get(2,  Protoss.Zealot),
+    Get(16, Protoss.Probe),
+    Get(Protoss.CyberneticsCore),
+    Get(18, Protoss.Probe),
+    Get(3,  Protoss.Pylon), // 22/25
+    Get(19, Protoss.Probe),
+    Get(Protoss.Dragoon),
+    Get(20, Protoss.Probe),
+    Get(Protoss.DragoonRange),
+    Get(22, Protoss.Probe),
+    Get(2,  Protoss.Dragoon),
+    Get(4,  Protoss.Pylon), // 30/33
+    Get(23, Protoss.Probe),
+    Get(3,  Protoss.Dragoon),
     Get(2,  Protoss.Nexus))
 
   val PvT2GateRangeExpand = Vector[BuildRequest] (

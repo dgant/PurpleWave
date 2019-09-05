@@ -23,19 +23,35 @@ abstract class PvTBasicOpener extends PvTStrategy {
 object PvT13Nexus extends PvTBasicOpener {
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fiveRax,
-    With.fingerprints.bbs)
+    With.fingerprints.bbs,
+    With.fingerprints.bunkerRush)
   override def startLocationsMin: Int = 4
 }
 object PvT21Nexus extends PvTBasicOpener {
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fiveRax,
     With.fingerprints.bbs,
+    With.fingerprints.bunkerRush,
     With.fingerprints.twoFac,
     With.fingerprints.twoFacVultures,
     With.fingerprints.threeFac,
     With.fingerprints.threeFacVultures)
 }
-object PvT23Nexus extends PvTBasicOpener
+object PvT23Nexus extends PvTBasicOpener {
+  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.fiveRax,
+    With.fingerprints.bbs,
+    With.fingerprints.bunkerRush,
+    With.fingerprints.fourteenCC
+  )
+}
+object PvT32Nexus extends PvTBasicOpener {
+  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.fiveRax,
+    With.fingerprints.bbs,
+    With.fingerprints.bunkerRush
+  )
+}
 object PvT28Nexus extends PvTBasicOpener {
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fiveRax,
@@ -98,10 +114,14 @@ object PvTDTExpand extends PvTBasicOpener {
   ))
 }
 
-object PvT2BaseCarrier extends PvTStrategy
-object PvT3BaseCarrier extends PvTStrategy { override val mapsBlacklisted = MapGroups.badForFastThirdBases }
+object PvT2BaseCarrier extends PvTStrategy {
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.bio
+  )
+}
+object PvT3BaseCarrier extends PvTStrategy
 object PvT2BaseArbiter extends PvTStrategy { override val mapsBlacklisted = Iterable(BlueStorm) }
-object PvT3BaseArbiter extends PvTStrategy { override val mapsBlacklisted = MapGroups.badForFastThirdBases }
+object PvT3BaseArbiter extends PvTStrategy
 
 object PvTStove extends PvTStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(PvT2BaseArbiter))
@@ -115,5 +135,5 @@ object PvTProxy2Gate extends PvTStrategy {
 
 object PvTReaverCarrierCheese extends PvTStrategy {
   override def gameplan: Option[Plan] = Some(new PvTReaverCarrierCheese)
-  override def opponentsWhitelisted: Option[Iterable[String]] = Some(Vector("Rooijackers", "Leta"))
+  override def opponentsWhitelisted: Option[Iterable[String]] = Some(Vector("Rooijackers", "Leta", "KimBot", "Taeja Kim"))
 }

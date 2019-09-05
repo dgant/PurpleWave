@@ -65,7 +65,6 @@ object MapGroups {
   val badForProxying = Vector(Alchemist, BlueStorm, ChupungRyeong, Eddy, EmpireOfTheSun, GreatBarrierReef, LaMancha, Roadrunner, TauCross, Arcadia, Luna)
   val badForWalling = Vector(Alchemist, Pathfinder)
   val tooShortForFFE = Vector(Python)
-  val badForFastThirdBases = Vector(Benzene, Heartbreak)
   val narrowRamp = Vector(Plasma, ThirdWorld)
 }
 

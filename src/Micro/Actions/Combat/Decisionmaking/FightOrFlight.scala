@@ -49,7 +49,7 @@ object FightOrFlight extends Action {
         ally.is(Protoss.ShieldBattery)
         && ally.complete
         && ally.energy > 20
-        && ally.pixelDistanceEdge(ally, otherAt = ByOption.minBy(unit.matchups.targets.view.map(unit.pixelToFireAt))(unit.pixelDistanceCenter).getOrElse(unit.pixelCenter)) < 72)
+        && ally.pixelDistanceEdge(unit, otherAt = ByOption.minBy(unit.matchups.targets.view.map(unit.pixelToFireAt))(unit.pixelDistanceCenter).getOrElse(unit.pixelCenter)) < 72)
     )
 
     /* Disabled because I think it was leading to some units fighting and others not

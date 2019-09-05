@@ -25,7 +25,7 @@ import Strategery.Strategies.Protoss.PvPRobo
 class PvPRobo extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(PvPRobo)
-  override val completionCriteria: Predicate = new Latch(new And(new BasesAtLeast(2), new UnitsAtLeast(5, Protoss.Gateway)))
+  override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
 
   class ScoutOnGateway extends StartPositionsAtLeast(3)
 
@@ -215,12 +215,14 @@ class PvPRobo extends GameplanTemplate {
       With.fingerprints.dtRush,
       With.fingerprints.earlyForge))
 
-  class ReadyToExpand extends Or(
-    new And(new UnitsAtLeast(1, Protoss.Reaver), new EnemyLowUnitCount),
-    new And(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new SafeAtHome),
-    new And(
-      new Latch(new UnitsAtLeast(3, UnitMatchOr(Protoss.Shuttle, Protoss.Reaver), complete = true)),
-      new UnitsAtLeast(2, UnitMatchOr(Protoss.Shuttle, Protoss.Reaver), complete = true)))
+  class ReadyToExpand extends And(
+    new UnitsAtLeast(2, Protoss.Gateway),
+    new Or(
+      new And(new UnitsAtLeast(1, Protoss.Reaver), new EnemyLowUnitCount),
+      new And(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new SafeAtHome),
+      new And(
+        new Latch(new UnitsAtLeast(3, UnitMatchOr(Protoss.Shuttle, Protoss.Reaver), complete = true)),
+        new UnitsAtLeast(2, UnitMatchOr(Protoss.Shuttle, Protoss.Reaver), complete = true))))
 
   override def buildPlans: Seq[Plan] = Seq(
 
@@ -246,6 +248,7 @@ class PvPRobo extends GameplanTemplate {
       new Parallel(
         new If(new GateGateRobo, new Build(Get(2, Protoss.Gateway))),
         new Build(Get(Protoss.RoboticsFacility)),
+        new Build(Get(2, Protoss.Gateway)),
         new If(
           new GetObservers,
           new Build(Get(Protoss.Observatory)),
@@ -260,10 +263,6 @@ class PvPRobo extends GameplanTemplate {
 
     new Expand,
 
-    new Build(
-      Get(5, Protoss.Gateway),
-      Get(2, Protoss.Assimilator),
-      Get(Protoss.ShuttleSpeed),
-      Get(6, Protoss.Gateway))
+    new Build(Get(5, Protoss.Gateway), Get(2, Protoss.Assimilator))
   )
 }

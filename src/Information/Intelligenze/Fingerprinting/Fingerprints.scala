@@ -12,6 +12,7 @@ class Fingerprints {
   
   def update() {
     if (With.enemies.exists(_.isUnknownOrTerran)) {
+      bunkerRush
       fiveRax
       bbs
       twoRax1113
@@ -68,6 +69,7 @@ class Fingerprints {
   lazy val gasSteal         = addFingerprint(new FingerprintGasSteal)
 
   // Terran
+  lazy val bunkerRush       = addFingerprint(new FingerprintBunkerRush)
   lazy val fiveRax          = addFingerprint(new Fingerprint5Rax)
   lazy val bbs              = addFingerprint(new FingerprintBBS)
   lazy val twoRax1113       = addFingerprint(new Fingerprint2Rax1113)

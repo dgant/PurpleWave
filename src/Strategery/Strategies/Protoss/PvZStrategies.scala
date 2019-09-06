@@ -50,7 +50,7 @@ object PvZFFEConservative extends PvZFFEOpening {
 }
 object PvZFFEEconomic     extends PvZFFEOpening
 object PvZGatewayFE       extends PvZFFEOpening {
-  override def minimumGamesVsOpponent: Int = 1
+  override def minimumGamesVsOpponent: Int = 2
   override def responsesWhitelisted = Seq(With.fingerprints.twelveHatch, With.fingerprints.tenHatch)
   override def responsesBlacklisted = Seq(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.overpool, With.fingerprints.twelvePool)
 }

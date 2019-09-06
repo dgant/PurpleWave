@@ -65,6 +65,7 @@ object PvTIdeas {
   class ReactToWorkerRush extends If(
     new And(
       new EnemyStrategy(With.fingerprints.workerRush),
+      new EnemiesAtMost(0, UnitMatchWarriors),
       new BasesAtMost(2),
       new FrameAtMost(GameTime(8, 0)())),
     new Parallel(

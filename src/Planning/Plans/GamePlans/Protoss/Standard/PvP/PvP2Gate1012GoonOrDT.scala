@@ -27,7 +27,7 @@ import Strategery.Strategies.Protoss.{PvP2Gate1012DT, PvP2Gate1012Goon}
 class PvP2Gate1012GoonOrDT extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(PvP2Gate1012Goon, PvP2Gate1012DT)
-  override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(2, Protoss.Nexus))
+  override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
 
   override def blueprints = Vector(
     new Blueprint(this, building = Some(Protoss.Pylon),         placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 8.0)),

@@ -12,8 +12,8 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
-import Planning.Predicates.Compound.{And, Check, Latch, Not}
+import Planning.Plans.Scouting.ScoutForCannonRush
+import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeAtHome}
 import Planning.Predicates.Strategy._
@@ -26,43 +26,6 @@ class PvPRobo extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(PvPRobo)
   override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
-
-  class ScoutOnGateway extends StartPositionsAtLeast(3)
-
-  class ZealotBeforeCore extends And(
-    new Not(new EnemyStrategy(
-      With.fingerprints.forgeFe,
-      With.fingerprints.oneGateCore)),
-    new Or(
-      new StartPositionsAtMost(2),
-      new EnemyRecentStrategy(
-        With.fingerprints.workerRush,
-        With.fingerprints.mannerPylon,
-        With.fingerprints.cannonRush,
-        With.fingerprints.proxyGateway,
-        With.fingerprints.twoGate,
-        With.fingerprints.nexusFirst)))
-
-  class ZealotAfterCore extends Or(
-    new EnemyStrategy(
-      With.fingerprints.workerRush,
-      With.fingerprints.mannerPylon,
-      With.fingerprints.proxyGateway,
-      With.fingerprints.twoGate),
-    new And(
-      new Not(new EnemyStrategy(With.fingerprints.oneGateCore)),
-      new Not(new GateGateRobo)))
-
-  class GateGateRobo extends Or(
-    new Latch(
-      new And(
-        new EnemyStrategy(
-          With.fingerprints.nexusFirst,
-          With.fingerprints.gatewayFe,
-          With.fingerprints.twoGate,
-          With.fingerprints.proxyGateway),
-        new UnitsAtMost(0, Protoss.RoboticsFacility))),
-    new Check(() => With.strategy.isFlat || With.strategy.isInverted))
 
   class ShuttleFirst extends And(
     new Not(new EnemyStrategy(With.fingerprints.dtRush)),
@@ -80,7 +43,7 @@ class PvPRobo extends GameplanTemplate {
         new Not(new EnemyStrategy(With.fingerprints.dragoonRange)),
         new EnemyRecentStrategy(With.fingerprints.dtRush))))
 
-  override def scoutPlan: Plan = new If(new ScoutOnGateway, new ScoutOn(Protoss.Gateway), new ScoutOn(Protoss.CyberneticsCore))
+  override def scoutPlan: Plan = new PvP1GateCoreIdeas.ScoutPlan()
 
   override def blueprints = Vector(
     new Blueprint(this, building = Some(Protoss.Pylon)),
@@ -98,7 +61,7 @@ class PvPRobo extends GameplanTemplate {
         new UnitsAtLeast(2, Protoss.Observer, complete = true)),
       new Or(
         new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.gasSteal, With.fingerprints.cannonRush, With.fingerprints.earlyForge),
-        new And(new GateGateRobo, new EnemyStrategy(With.fingerprints.oneGateCore), new Not(new EnemyStrategy(With.fingerprints.fourGateGoon))),
+        new And(new PvP1GateCoreIdeas.GateGate, new EnemyStrategy(With.fingerprints.oneGateCore), new Not(new EnemyStrategy(With.fingerprints.fourGateGoon))),
         new EnemyBasesAtLeast(2),
         new And(new EnemyStrategy(With.fingerprints.dtRush), new UnitsAtLeast(2, Protoss.Observer, complete = true)),
         new And(new EnemyStrategy(With.fingerprints.twoGate),
@@ -146,36 +109,7 @@ class PvPRobo extends GameplanTemplate {
     new Aggression(1.5)
   )
 
-  override def buildOrderPlan: Plan = new Parallel(
-    new BuildOrder(
-      Get(8, Protoss.Probe),
-      Get(Protoss.Pylon),
-      Get(10, Protoss.Probe),
-      Get(Protoss.Gateway),
-      Get(12, Protoss.Probe),
-      Get(Protoss.Assimilator),
-      Get(13, Protoss.Probe)),
-    new If(
-      new ZealotBeforeCore,
-      new Parallel(
-        new BuildOrder(
-          Get(Protoss.Zealot),
-          Get(14, Protoss.Probe),
-          Get(2, Protoss.Pylon),
-          Get(15, Protoss.Probe),
-          Get(Protoss.CyberneticsCore),
-          Get(16, Protoss.Probe)),
-        new If(
-          new ZealotAfterCore,
-          new BuildOrder(Get(2, Protoss.Zealot)))),
-      new BuildOrder(
-        Get(14, Protoss.Probe),
-        Get(Protoss.CyberneticsCore))),
-    new If(
-      new ZealotAfterCore,
-      new BuildOrder(
-        Get(2, Protoss.Zealot),
-        Get(2, Protoss.Pylon))))
+  override def buildOrderPlan: Plan = new PvP1GateCoreIdeas.BuildOrderPlan
 
   private class TrainArmy extends Parallel(
     new UpgradeContinuously(Protoss.DragoonRange),
@@ -236,7 +170,7 @@ class PvPRobo extends GameplanTemplate {
     new If(new ReadyToExpand, new Expand),
 
     new If(
-      new And(new Latch(new UnitsAtLeast(1, Protoss.Dragoon)), new GateGateRobo),
+      new And(new Latch(new UnitsAtLeast(1, Protoss.Dragoon)), new PvP1GateCoreIdeas.GateGate),
       new Build(Get(2, Protoss.Gateway))),
 
     // This flip is important to ensure that Gate Gate Robo gets its tech in timely fashion
@@ -246,7 +180,7 @@ class PvPRobo extends GameplanTemplate {
         new Not(new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway))),
       new TrainArmy,
       new Parallel(
-        new If(new GateGateRobo, new Build(Get(2, Protoss.Gateway))),
+        new If(new PvP1GateCoreIdeas.GateGate, new Build(Get(2, Protoss.Gateway))),
         new Build(Get(Protoss.RoboticsFacility)),
         new Build(Get(2, Protoss.Gateway)),
         new If(

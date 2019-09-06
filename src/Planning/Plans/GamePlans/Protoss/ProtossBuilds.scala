@@ -295,11 +295,13 @@ object ProtossBuilds {
     Get(Protoss.Zealot),
     Get(19, Protoss.Probe),
     Get(2,  Protoss.Pylon),
+    Get(21, Protoss.Probe), // Modification; normally Probes #20+21 come after the Dragoons
     Get(2,  Protoss.Dragoon),
-    Get(21, Protoss.Probe),
     Get(Protoss.DragoonRange),
+    Get(23, Protoss.Probe),
     Get(3, Protoss.Pylon),
-    Get(4, Protoss.Dragoon))
+    Get(4, Protoss.Dragoon),
+    Get(25, Protoss.Probe))
 
   
   val PvT13Nexus_GateCore = Vector[BuildRequest] (

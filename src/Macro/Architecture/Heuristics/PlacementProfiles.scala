@@ -130,13 +130,14 @@ object PlacementProfiles {
 
   val proxyTowardsEnemy = new PlacementProfile(
     "Proxy towards enemy",
-    avoidDistanceFromEnemy = 1.0
-  )
+    avoidDistanceFromEnemy = 1.0)
+
   val wallGathering = new PlacementProfile(
     "Wall gathering area",
-    avoidDistanceFromBase   = 1.0,
-    avoidDistanceFromEnemy  = 1.0
-  )
+    preferZone                  = 100.0,
+    preferPowering              = 0.4,
+    avoidDistanceFromBase       = 1.0,
+    avoidDistanceFromIdealRange = 4.0)
 
   val hugTownHall = new PlacementProfile(
     "Hug town hall",

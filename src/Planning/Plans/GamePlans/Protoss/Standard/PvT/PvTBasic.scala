@@ -354,9 +354,14 @@ class PvTBasic extends GameplanTemplate {
       new EnemyStrategy(With.fingerprints.fourteenCC, With.fingerprints.oneRaxFE, With.fingerprints.siegeExpand),
       new Build(Get(2, Protoss.Gateway)),
       new Build(Get(4, Protoss.Gateway))),
-    new PumpRatio(Protoss.Gateway, 2, 6,                                    Seq(Flat(-1), Enemy(Terran.Factory, 1.5), Enemy(Terran.Barracks, 1.0))),
-    new If(new MiningBasesAtLeast(3), new PumpRatio(Protoss.Gateway, 3, 10, Seq(Flat(-1), Enemy(Terran.Factory, 1.5), Enemy(Terran.Barracks, 1.0)))),
-    new AddPrimaryTech,
+    new FlipIf(
+      new UnitsAtLeast(1, Protoss.Stargate),
+      new Parallel(
+        new If(new EnemyStrategy(With.fingerprints.twoFac),   new Build(Get(4, Protoss.Gateway))),
+        new If(new EnemyStrategy(With.fingerprints.threeFac), new Build(Get(5, Protoss.Gateway))),
+        new PumpRatio(Protoss.Gateway, 2, 6,                                    Seq(Flat(-1), Enemy(Terran.Factory, 1.5), Enemy(Terran.Barracks, 1.0))),
+        new If(new MiningBasesAtLeast(3), new PumpRatio(Protoss.Gateway, 3, 10, Seq(Flat(-1), Enemy(Terran.Factory, 1.5), Enemy(Terran.Barracks, 1.0))))),
+      new AddPrimaryTech),
     new If(new And(new EmployingArbiters, new GasPumpsAtLeast(3)), new Build(Get(2, Protoss.Stargate), Get(2, Protoss.Forge))),
     new If(new And(new EmployingCarriers, new GasPumpsAtLeast(3)), new Build(Get(2, Protoss.CyberneticsCore), Get(3, Protoss.Stargate))),
     new If(new MiningBasesAtLeast(3), new If(new Or(new EnemyStrategy(With.fingerprints.bio), new EmployingArbiters), new Build(Get(7,  Protoss.Gateway)), new Build(Get(5,  Protoss.Gateway)))),

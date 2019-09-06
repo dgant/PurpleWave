@@ -14,5 +14,5 @@ class PumpShuttleAndReavers(reavers: Int = 50, shuttleFirst: Boolean = true) ext
 
   new PumpRatio(Protoss.Shuttle, 0, reavers / 2, Seq(Friendly(Protoss.Reaver, 0.5))),
   new Pump(Protoss.Reaver, reavers),
-  new PumpRatio(Protoss.Shuttle, 0, (reavers + 1) / 2, Seq(Flat(0.5), Friendly(Protoss.Reaver, 0.5))),
+  new PumpRatio(Protoss.Shuttle, 0, (reavers + 1) / 2, Seq(Flat(0.5), Friendly(Protoss.Reaver, 0.5)), round = Rounding.Down),
 )

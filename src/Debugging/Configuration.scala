@@ -62,7 +62,7 @@ class Configuration {
   // Macro //
   ///////////
   
-  var minimumMineralsBeforeMinedOut       = 175 * 8
+  var minimumMineralsBeforeMinedOut   = 150 * 8
   var maxFramesToSendAdvanceBuilder   = GameTime(0, 40)()
   var maxFramesToTrustBuildRequest    = GameTime(10, 0)()
   var blockerMineralThreshold         = 250 // Setting this goofily high as an AIIDE hack to account for the 249-mineral patches on Fortress

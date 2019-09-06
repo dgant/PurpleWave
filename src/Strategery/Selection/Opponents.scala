@@ -33,14 +33,18 @@ object Opponents {
     Seq(PvP2GateGoon),
     Seq(PvPRobo),
     Seq(PvP2Gate1012DT),
-    Seq(PvP3GateGoonCounter),
     Seq(PvP3GateGoon),
     Seq(PvP2GateDTExpand),
     Seq(PvPProxy2Gate)))))
   val dandanbot     : Opponent = add(Opponent("DanDanBot",    locutus.policy))
   val daqin         : Opponent = add(Opponent("DaQin",        locutus.policy))
   val mcrave        : Opponent = add(Opponent("McRave",       StrategySelectionGreedy))
-  val metabot       : Opponent = add(Opponent("MegaBot",      defaultPvP))
+  val metabot       : Opponent = add(Opponent("MegaBot",      new StrategySelectionFixed(PvPRobo)))
+  val skynet        : Opponent = add(Opponent("Skynet",       metabot.policy))
+  val aiur          : Opponent = add(Opponent("Aiur",         metabot.policy))
+  val richoux       : Opponent = add(Opponent("Florian Richoux",metabot.policy))
+  val vajda         : Opponent = add(Opponent("Tomas Vajda",  metabot.policy))
+  val ximp          : Opponent = add(Opponent("XIMP",         metabot.policy))
   val microwave     : Opponent = add(Opponent("Microwave",    new StrategySelectionRecommended(StrategySelectionGreedy, PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar)))
   val murph         : Opponent = add(Opponent("Murph",        defaultPvP))
   val ophelia       : Opponent = add(Opponent("Ophelia",      defaultPvZ))
@@ -59,7 +63,7 @@ object Opponents {
 
   val titaniron     : Opponent = add(Opponent("TitanIron",    new StrategySelectionRecommended(StrategySelectionGreedy, PvT2GateRangeExpandCarrier)))
   val megabot       : Opponent = add(Opponent("MegaBot",      defaultPvP))
-  val aiur          : Opponent = add(Opponent("Aiur",         defaultPvP))
+  //val aiur          : Opponent = add(Opponent("Aiur",         defaultPvP)) -- Disabled temporarily while testing MetaBot for AIIDE
   val tyr           : Opponent = add(Opponent("Tyr",          new StrategySelectionFixed(PvP2GateDTExpand)))
   val ecgberht      : Opponent = add(Opponent("Ecgberht",     defaultPvT))
   val overkill      : Opponent = add(Opponent("Overkill",     fixedPvZ))

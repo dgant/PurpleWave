@@ -127,9 +127,10 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
       .orElse(test(Tile(tx + dx, ty + dy)))
       .orElse(flip(Tile(tx + dx, ty - dy), Tile(tx - dx, ty + dy)))
       .orElse(test(Tile(tx - dx, ty - dy)))
-      .orElse(Spiral.points(16).map(ti.add).filter(_.valid).find(t => With.grids.walkableTerrain.values(t.i)))
+      .orElse(Spiral.points(16).view.map(ti.add).find(tile =>
+        tile.valid && With.grids.walkableTerrain.getUnchecked(tile.i)
+      ))
       .getOrElse(tileIncluding)
-
     output
   }
 }

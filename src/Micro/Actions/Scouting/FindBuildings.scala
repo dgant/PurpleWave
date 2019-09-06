@@ -77,7 +77,8 @@ abstract class AbstractFindBuildings extends Action {
     val target = unit.pixelCenter.add(force.normalize(64.0).toPoint)
     val tileToScout = tilesToScout.minBy(_.pixelCenter.pixelDistance(target))
 
-    val profile = new PathfindProfile(tileToScout)
+    val profile = new PathfindProfile(unit.tileIncludingCenter)
+    profile.end                 = Some(tileToScout)
     profile.canCrossUnwalkable  = false
     profile.allowGroundDist     = false
     profile.costOccupancy       = 0.01f

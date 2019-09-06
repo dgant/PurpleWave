@@ -41,7 +41,6 @@ object StrategyGroups {
     PvT1GateRobo,
     PvTProxyDarkTemplar,
     PvT25BaseCarrier, // Experimenting with this so we can delete it
-    PvP2Gate1012,
     PvZLateGameCarrier, // Needs island tech
     PvZMidgame4Gate2Archon,
     PvZMidgameNeoNeoBisu,
@@ -50,6 +49,8 @@ object StrategyGroups {
     ZvTProxyHatchHydras,
     ZvTProxyHatchSunkens,
     ZvZ5PoolSunkens,
+
+    DarkArchonsWithNoDefense // Temporary for AIIDE testing
   )
 }
 
@@ -63,7 +64,7 @@ class AIIDEPlaybook extends PurpleWavePlaybook {
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvP1ZealotExpand)
+  override lazy val forced: Seq[Strategy] = Seq(PvT13Nexus, PvT2BaseCarrier)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
   override def respectOpponent: Boolean = false
   override def respectMap: Boolean = false
@@ -75,7 +76,7 @@ class HumanPlaybook extends PurpleWavePlaybook {
     Seq(PvPRobo),
     Seq(PvP2GateDTExpand),
     Seq(PvP3GateGoon),
-    Seq(PvP2Gate1012)
+    Seq(PvP2Gate1012Goon)
   ))
 }
 

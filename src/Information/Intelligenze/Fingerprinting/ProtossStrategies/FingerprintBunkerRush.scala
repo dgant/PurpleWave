@@ -6,7 +6,7 @@ import ProxyBwapi.Races.Terran
 
 class FingerprintBunkerRush extends FingerprintCompleteBy(
   UnitMatchAnd(Terran.Bunker, UnitMatchProxied),
-  GameTime(4,  30)) {
+  GameTime(5,  0)) {
   
   override val sticky = true
 }

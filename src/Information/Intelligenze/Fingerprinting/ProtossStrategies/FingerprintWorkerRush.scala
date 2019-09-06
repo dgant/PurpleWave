@@ -3,7 +3,7 @@ package Information.Intelligenze.Fingerprinting.ProtossStrategies
 import Information.Intelligenze.Fingerprinting.Fingerprint
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchWorkers}
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchWarriors, UnitMatchWorkers}
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class FingerprintWorkerRush extends Fingerprint {
@@ -20,7 +20,9 @@ class FingerprintWorkerRush extends Fingerprint {
       }
     )
 
-  override protected def investigate: Boolean =
-    (With.frame < GameTime(4, 0)() && With.units.countEnemy(UnitMatchAttackingWorker) > 2) ||
-    (With.frame < GameTime(6, 0)() && With.units.countEnemy(UnitMatchAttackingWorker) > 4)
+  override protected def investigate: Boolean = (
+    ! With.units.existsEnemy(UnitMatchWarriors)
+    && (
+      (With.frame < GameTime(4, 0)() && With.units.countEnemy(UnitMatchAttackingWorker) > 2) ||
+      (With.frame < GameTime(6, 0)() && With.units.countEnemy(UnitMatchAttackingWorker) > 4)))
 }

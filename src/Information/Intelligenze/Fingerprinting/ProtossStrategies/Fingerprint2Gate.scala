@@ -4,9 +4,9 @@ import Information.Intelligenze.Fingerprinting.Generic.{FingerprintArrivesBy, Fi
 import ProxyBwapi.Races.Protoss
 
 class Fingerprint2Gate extends FingerprintOr(
-  new FingerprintArrivesBy(Protoss.Zealot,    GameTime(3, 40), 2),
-  new FingerprintArrivesBy(Protoss.Zealot,    GameTime(4, 15), 3),
-  new FingerprintArrivesBy(Protoss.Zealot,    GameTime(5,  0), 4),
+  new FingerprintArrivesBy(Protoss.Zealot,    GameTime(3, 30), 2),
+  new FingerprintArrivesBy(Protoss.Zealot,    GameTime(3, 55), 3),
+  new FingerprintArrivesBy(Protoss.Zealot,    GameTime(4, 20), 4),
   new FingerprintCompleteBy(Protoss.Gateway,  GameTime(2, 55), 2)) {
   
   override val sticky = true

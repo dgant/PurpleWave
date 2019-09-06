@@ -19,11 +19,11 @@ import Planning.Predicates.Reactive.{EnemyBasesAtMost, EnemyDarkTemplarLikely, S
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.{PvP3GateGoon, PvP3GateGoonCounter}
+import Strategery.Strategies.Protoss.{PvP3GateGoon}
 
 class PvP3GateGoon extends GameplanTemplate {
   
-  override val activationCriteria : Predicate = new Employing(PvP3GateGoon, PvP3GateGoonCounter)
+  override val activationCriteria : Predicate = new Employing(PvP3GateGoon)
   override val completionCriteria : Predicate = new UnitsAtLeast(5, Protoss.Gateway)
 
   override def blueprints = Vector(

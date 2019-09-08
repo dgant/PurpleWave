@@ -141,27 +141,25 @@ object PvTIdeas {
     new EnemyHasTech(Terran.SpiderMinePlant))
 
   class TrainDarkTemplar extends If(
-    new Or(
-      new UnitsAtMost(0, UnitMatchOr(Protoss.Arbiter, Protoss.ArbiterTribunal), complete = true),
-      new And(
-        new EnemiesAtMost(0, Terran.Comsat, complete = true),
-        new UnitsAtMost(0, Protoss.Arbiter, complete = true),
-        new Or(
-          new Not(new EnemyHasMines),
-          new EnemyStrategy(
-            With.fingerprints.fiveRax,
-            With.fingerprints.bbs,
-            With.fingerprints.twoRax1113,
-            With.fingerprints.twoFac,
-            With.fingerprints.threeFac)))),
-    new If(
-      new And(
-        new Or(
-          new EnemiesAtMost(5, Terran.Vulture),
-          new Not(new EnemyHasMines)),
-        new EnemyUnitsNone(Terran.ScienceVessel),
-        new EnemyUnitsNone(UnitMatchCustom((unit) => unit.is(Terran.MissileTurret) && unit.zone.owner.isNeutral))),
-      new Pump(Protoss.DarkTemplar, 4)))
+    new And(
+      // Can't spare gas on top of Carriers
+      new UnitsAtMost(0, Protoss.FleetBeacon),
+      new Or(
+        // Drain Comsat energy in advance of Arbiters
+        new Not(new Latch(new UnitsAtLeast(1, UnitMatchOr(Protoss.Arbiter, Protoss.ArbiterTribunal), complete = true))),
+        //
+        new And(
+          new EnemiesAtMost(2, Terran.Comsat, complete = true),
+          new Or(
+            new Not(new EnemyHasMines),
+            new And(
+              new FrameAtMost(GameTime(9, 0)()),
+              new EnemyStrategy(
+                With.fingerprints.fiveRax,
+                With.fingerprints.bbs,
+                With.fingerprints.twoRax1113,
+                With.fingerprints.twoFac,
+                With.fingerprints.threeFac)))))))
 
   private class TrainObservers extends If(
     new UnitsAtLeast(24, UnitMatchWarriors),
@@ -211,7 +209,7 @@ object PvTIdeas {
     new Pump(Protoss.Dragoon),
     new If(new BasesAtLeast(3), new Pump(Protoss.Zealot)))
 
-  class DarkArchonsUseful extends And(new EnemyHasShown(Terran.ScienceVessel), new UnitsAtLeast(1, Protoss.Arbiter))
+  class DarkArchonsUseful extends And(new EnemyHasShown(Terran.ScienceVessel), new UnitsAtLeast(3, Protoss.Arbiter))
 
   class TrainDarkArchons extends If(
     new DarkArchonsUseful,
@@ -244,13 +242,5 @@ object PvTIdeas {
     new If(new GasAtLeast(1000), new Pump(Protoss.HighTemplar, maximumConcurrently = 4, maximumTotal = 10)),
     new TrainScouts,
     new TrainZealotsOrDragoons)
-  
-  class GetObserversForCloakedWraiths extends If(
-    new EnemyHasShownWraithCloak,
-    new Parallel(
-      new Build(
-        Get(1, Protoss.RoboticsFacility),
-        Get(1, Protoss.Observatory)),
-      new PvTIdeas.TrainObservers))
 }
 

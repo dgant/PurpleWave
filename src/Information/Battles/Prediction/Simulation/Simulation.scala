@@ -80,17 +80,19 @@ class Simulation(
   }
   
   def cleanup() {
-    estimation.costToUs           = unitsOurs   .map(_.valueReceived).sum
-    estimation.costToEnemy        = unitsEnemy  .map(_.valueReceived).sum
-    estimation.damageToUs         = unitsOurs   .map(_.damageReceived).sum
-    estimation.damageToEnemy      = unitsEnemy  .map(_.damageReceived).sum
+    estimation.simulation         = Some(this)
+    estimation.costToUs           = unitsOurs   .view.map(_.valueReceived).sum
+    estimation.costToEnemy        = unitsEnemy  .view.map(_.valueReceived).sum
+    estimation.damageToUs         = unitsOurs   .view.map(_.damageReceived).sum
+    estimation.damageToEnemy      = unitsEnemy  .view.map(_.damageReceived).sum
     estimation.deathsUs           = unitsOurs   .count(_.dead)
     estimation.deathsEnemy        = unitsEnemy  .count(_.dead)
     estimation.totalUnitsUs       = unitsOurs   .size
     estimation.totalUnitsEnemy    = unitsEnemy  .size
-    estimation.reportCards        ++= everyone  .map(simulacrum => (simulacrum.realUnit, simulacrum.reportCard))
-    estimation.simulation         = Some(this)
-    estimation.events             = everyone.flatMap(_.events).sortBy(_.frame)
+    if (With.configuration.debugging()) {
+      estimation.debugReport ++= everyone.map(simulacrum => (simulacrum.realUnit, simulacrum.reportCard))
+      estimation.events             = everyone.flatMap(_.events).sortBy(_.frame)
+    }
     recordMetrics()
   }
   

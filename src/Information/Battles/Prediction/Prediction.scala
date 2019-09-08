@@ -17,7 +17,7 @@ class Prediction {
 
   // Used only for local battles
   var simulation: Option[Simulation] = None
-  var reportCards = new mutable.HashMap[UnitInfo, ReportCard]
+  var debugReport = new mutable.HashMap[UnitInfo, ReportCard]
   var events: Iterable[SimulationEvent] = Iterable.empty
   val localBattleMetrics: mutable.ArrayBuffer[LocalBattleMetrics] = new mutable.ArrayBuffer[LocalBattleMetrics]
 

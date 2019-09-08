@@ -17,7 +17,7 @@ class Configuration {
   var enableChat                      = false
   var enableStreamManners             = false
   var identifyGhostUnits              = false
-  var targetFrameDurationMilliseconds = 40
+  var targetFrameDurationMilliseconds = 30
   
   //////////////
   // Strategy //

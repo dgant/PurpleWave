@@ -4,6 +4,8 @@ import Debugging.Visualizations.Views.Battles.ShowBattle
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
+import Micro.Heuristics.EvaluateTargets
+import Planning.UnitMatchers.UnitMatchRecruitableForCombat
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
@@ -51,6 +53,7 @@ class Simulacrum(
   val fleePixel           : Pixel               = simulation.focus.project(pixel, 10000).clamp
   
   // Scorekeeping
+  val nonCombat         : Boolean               = ! realUnit.is(UnitMatchRecruitableForCombat)
   val valuePerDamage    : Double                = PurpleMath.nanToZero(realUnit.subjectiveValue / unitClass.maxTotalHealth)
   var damageDealt       : Double                = 0.0
   var damageReceived    : Double                = 0.0
@@ -58,6 +61,7 @@ class Simulacrum(
   var valueReceived     : Double                = 0.0
   var kills             : Int                   = 0
   var events: ArrayBuffer[SimulationEvent] = new ArrayBuffer[SimulationEvent]
+
 
   val realTargets: Seq[UnitInfo] = realUnit.matchups.targets
     .filter(target =>
@@ -116,11 +120,13 @@ class Simulacrum(
     if (cooldownMoving > 0 && fighting) simulation.updated = true
   }
 
-  // It'd be nice if this lined up with real targeting logic
   @inline final def targetValue(target: Simulacrum): Double = {
-    val distance = Math.max(0.0, target.pixel.pixelDistance(pixel) - realUnit.pixelRangeAgainst(target.realUnit))
-    val targetValue = target.realUnit.baseTargetValue()
-    targetValue - 1000000 * distance
+    val framesToFire = Math.max(0.0, target.pixel.pixelDistance(pixel) - realUnit.pixelRangeAgainst(target.realUnit)) / Math.max(0.001, topSpeed)
+    EvaluateTargets.baseAttackerToTargetValue(
+      baseTargetValue = target.realUnit.baseTargetValue(),
+      totalHealth = target.hitPoints + target.shieldPoints,
+      framesOutOfTheWay = framesToFire
+    )
   }
   
   def tryToAcquireTarget() {

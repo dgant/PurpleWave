@@ -17,15 +17,16 @@ object BeACarrier extends Action {
     unit.is(Protoss.Carrier)        &&
     unit.matchups.enemies.nonEmpty
   }
-  
+
+  protected final def interceptorActive(interceptor: UnitInfo): Boolean = (
+    ! interceptor.complete
+    || interceptor.totalHealth < interceptor.unitClass.maxTotalHealth
+    || interceptor.order == Orders.InterceptorAttack
+    || interceptor.cooldownLeft > 0
+    || With.framesSince(interceptor.lastFrameStartingAttack) < 72
+  )
   override protected def perform(unit: FriendlyUnitInfo) {
-    def interceptorActive(interceptor: UnitInfo): Boolean = (
-      ! unit.complete
-      || unit.totalHealth < unit.unitClass.maxTotalHealth
-      || (unit.order == Orders.InterceptorAttack)
-      || unit.cooldownLeft > 0
-      || With.framesSince(unit.lastFrameStartingAttack) < 72
-    )
+
     def airToAirSupply(units: Seq[UnitInfo]): Double = {
       units.map(u => if (u.flying) u.unitClass.supplyRequired else 0).sum
     }

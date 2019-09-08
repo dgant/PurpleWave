@@ -83,7 +83,7 @@ abstract class AbstractFindBuildings extends Action {
     profile.allowGroundDist     = false
     profile.costOccupancy       = 0.01f
     profile.costThreat          = 5
-    profile.costRepulsion       = 0.25f
+    profile.costRepulsion       = 0.4f
     profile.repulsors           = Avoid.pathfindingRepulsion(unit)
     profile.unit                = Some(unit)
     val path = profile.find

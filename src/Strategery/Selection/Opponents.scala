@@ -10,7 +10,7 @@ object Opponents {
     opponent
   }
 
-  val defaultPvT  = new StrategySelectionRecommended(StrategySelectionGreedy, PvT32Nexus, PvT3BaseCarrier)
+  val defaultPvT  = new StrategySelectionRecommended(StrategySelectionGreedy, PvT28Nexus, PvT2BaseCarrier)
   val defaultPvP  = new StrategySelectionRecommended(StrategySelectionGreedy, PvP2Gate1012DT)
   val defaultPvZ  = new StrategySelectionRecommended(StrategySelectionGreedy, PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar)
   val fixedPvT    = new StrategySelectionFixed(PvT1015DT, PvT3BaseArbiter)
@@ -22,7 +22,7 @@ object Opponents {
   val aitp          : Opponent = add(Opponent("AITP",         defaultPvT))
   val apollo        : Opponent = add(Opponent("Apollo",       defaultPvZ))
   val bananabrain   : Opponent = add(Opponent("BananaBrain",  StrategySelectionRandom)) // TODO
-  val bunkerBoxer   : Opponent = add(Opponent("BunkerBoxeR",  defaultPvT))
+  val bunkerBoxer   : Opponent = add(Opponent("BunkerBoxeR",  new StrategySelectionRecommended(StrategySelectionGreedy, PvT32Nexus, PvT3BaseArbiter)))
   val cdbot         : Opponent = add(Opponent("CDBot",        defaultPvZ))
   // dandan/daqin below
   val dragon        : Opponent = add(Opponent("Dragon",       StrategySelectionGreedy))
@@ -56,8 +56,7 @@ object Opponents {
   // Returning AIIDE opponents
   val cse           : Opponent = add(Opponent("CSE",          StrategySelectionRandom)) // TODO
   val iron          : Opponent = add(Opponent("Iron",         new StrategySelectionFixed(PvT2GateRangeExpandCarrier)))
-  //val saida         : Opponent = add(Opponent("SAIDA",        new StrategySelectionFixed(PvT28Nexus, PvT2BaseCarrier)))
-  val saida         : Opponent = add(Opponent("SAIDA",        new StrategySelectionFixed(PvT28Nexus, PvT3BaseArbiter)))
+  val saida         : Opponent = add(Opponent("SAIDA",        new StrategySelectionFixed(PvT28Nexus, PvT2BaseCarrier)))
   val ualbertabot   : Opponent = add(Opponent("UAlbertaBot",  fixedPvR))
   val zzzkbot       : Opponent = add(Opponent("ZZZKBot",      new StrategySelectionFixed(PvZ1BaseForgeTechForced, PvZMidgameNeoBisu, PvZLateGameTemplar)))
 
@@ -92,7 +91,7 @@ object Opponents {
   val ziabot2           : Opponent = add(Opponent("Zia bot",            ziabot.policy))
   val johankayser       : Opponent = add(Opponent("Johan Kayser",       srbotone.policy))
   val bryanweber        : Opponent = add(Opponent("Bryan Weber",        cunybot.policy))
-  val jadien            : Opponent = add(Opponent("jadien",             saida.policy))
+  val jadien            : Opponent = add(Opponent("jadien",             StrategySelectionRandom))
   
   val all: Vector[Opponent] = allKnown
 }

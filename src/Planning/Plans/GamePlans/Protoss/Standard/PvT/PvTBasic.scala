@@ -170,7 +170,7 @@ class PvTBasic extends GameplanTemplate {
       Get(Protoss.DragoonRange)))
 
   class GetObserverTech extends Parallel(
-    new Build(Get(Protoss.RoboticsFacility), Get(Protoss.Observatory)),
+    new BuildOrder(Get(Protoss.RoboticsFacility), Get(Protoss.Observatory), Get(Protoss.Observer)),
     new If(
       new And(
         new EnemiesAtLeast(3, Terran.SpiderMine),
@@ -187,7 +187,7 @@ class PvTBasic extends GameplanTemplate {
           new EmployingCarriers,
           new Or(
             new EnemiesAtLeast(8, Terran.Goliath),
-            new GasPumpsAtLeast(4)))),
+            new GasPumpsAtLeast(5)))),
       new Build(Get(Protoss.TemplarArchives), Get(Protoss.PsionicStorm))),
     new If(new UnitsAtLeast(4, Protoss.Zealot),           new UpgradeContinuously(Protoss.ZealotSpeed)),
     new If(new UnitsAtLeast(1, Protoss.ArbiterTribunal),  new Build(Get(Protoss.ArbiterEnergy))),
@@ -343,7 +343,9 @@ class PvTBasic extends GameplanTemplate {
             new CapGasWorkersAt(2))))),
 
     new If(
-      new Or(new UnitsAtLeast(2, Protoss.Observer, complete = true), new Not(new EnemyHasShownWraithCloak), new Not(new EnemyHasShown(Terran.SpiderMine))),
+      new And(
+        new EnemiesAtMost(7, Terran.Factory),
+        new Or(new UnitsAtLeast(2, Protoss.Observer, complete = true), new Not(new EnemyHasShownWraithCloak), new Not(new EnemyHasShown(Terran.SpiderMine)))),
       new MonitorBases(Protoss.Observer)),
 
     new EjectScout,

@@ -45,7 +45,8 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
     true
   }
   def repairers: ArrayBuffer[UnitInfo] = ArrayBuffer.empty ++ allies.filter(_.friendly.exists(_.agent.toRepair.contains(me)))
-  
+
+  lazy val firstTeammate                  : UnitInfo              = alliesInclSelf.minBy(_.id)
   lazy val valuePerDamage                 : Double                = MicroValue.valuePerDamageCurrentHp(me)
   lazy val dpfDealingMax                  : Double                = splashFactorMax * ByOption.max(targets.view.map(me.dpfOnNextHitAgainst)).getOrElse(0.0)
   lazy val vpfDealingMax                  : Double                = splashFactorMax * ByOption.max(targets.view.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
@@ -60,7 +61,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val framesOfEntanglementPerThreat  : Map[UnitInfo, Double] = threats.map(threat => (threat, framesOfEntanglementWith(threat))).toMap
   lazy val framesOfEntanglement           : Double                = ByOption.max(framesOfEntanglementPerThreat.values).getOrElse(- Forever())
   lazy val framesOfSafety                 : Double                = - With.latency.latencyFrames - With.reaction.agencyAverage - ByOption.max(framesOfEntanglementPerThreat.values).getOrElse(- Forever().toDouble)
-  lazy val teamFramesOfSafety             : Double                = ByOption.min(alliesInclSelf.view.map(_.matchups.framesOfSafety)).getOrElse(0)
+  lazy val teamFramesOfSafety             : Double                = if (me == firstTeammate) ByOption.min(alliesInclSelf.view.map(_.matchups.framesOfSafety)).getOrElse(0) else firstTeammate.matchups.teamFramesOfSafety
   lazy val tilesOfInvisibility            : Double                = if (me.visibleToOpponents) 0 else Spiral.points(8).map(me.tileIncludingCenter.add).find(With.grids.enemyVision.isSet).map(_.tileDistanceFast(me.tileIncludingCenter)).getOrElse(maxTilesOfInvisibility)
   val maxTilesOfInvisibility = 8
 

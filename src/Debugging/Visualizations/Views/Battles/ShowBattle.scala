@@ -62,11 +62,11 @@ object ShowBattle extends View {
         Vector("Duration",    metrics.framesIn / 24 + "s"),
         Vector("Metrics",     battle.estimationSimulationAttack.localBattleMetrics.size.toString),
         Vector("Survivors"),
-        Vector(With.self.name,  describeTeam(estimation.reportCards.filter(_._1.isFriendly) .filterNot(_._2.dead).keys)),
-        Vector(With.enemy.name, describeTeam(estimation.reportCards.filter(_._1.isEnemy)    .filterNot(_._2.dead).keys)),
+        Vector(With.self.name,  describeTeam(estimation.debugReport.filter(_._1.isFriendly) .filterNot(_._2.dead).keys)),
+        Vector(With.enemy.name, describeTeam(estimation.debugReport.filter(_._1.isEnemy)    .filterNot(_._2.dead).keys)),
         Vector("Dead"),
-        Vector(With.self.name,  describeTeam(estimation.reportCards.filter(_._1.isFriendly) .filter(_._2.dead).keys)),
-        Vector(With.enemy.name, describeTeam(estimation.reportCards.filter(_._1.isEnemy)    .filter(_._2.dead).keys))
+        Vector(With.self.name,  describeTeam(estimation.debugReport.filter(_._1.isFriendly) .filter(_._2.dead).keys)),
+        Vector(With.enemy.name, describeTeam(estimation.debugReport.filter(_._1.isEnemy)    .filter(_._2.dead).keys))
       ))
     })
 

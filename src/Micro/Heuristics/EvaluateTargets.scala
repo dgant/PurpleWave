@@ -33,6 +33,16 @@ object EvaluateTargets extends {
     evaluateInner(attacker, target, recur = true)
   }
 
+  // Used by combat simulation as well, to keep targeting behavior somewhat consistent
+  // Thus the implementation needs to be FAST.
+  @inline final def baseAttackerToTargetValue(
+    baseTargetValue: Double,
+    totalHealth: Double,
+    framesOutOfTheWay: Double,
+    dpf: Double = 1.0): Double = {
+    baseTargetValue * dpf / Math.max(1.0, totalHealth) / Math.max(6.0, framesOutOfTheWay)
+  }
+
   def evaluateInner(attacker: FriendlyUnitInfo, target: UnitInfo, recur: Boolean): Double = {
     val framesToGoal          = attacker.framesToTravelTo(attacker.agent.destination)
     val framesToGoalAtTarget  = attacker.framesToTravelPixels(attacker.pixelDistanceTravelling(attacker.agent.destination, attacker.pixelToFireAt(target)))
@@ -40,12 +50,11 @@ object EvaluateTargets extends {
     val framesOutOfWayToGoal  = if (attacker.canMove) Math.max(0, framesToGoalAtTarget - framesToGoal) else 0
     val framesOutOfWayToShoot = if (attacker.canMove) Math.max(0, attacker.framesToGetInRange(target) - framesOfFreedom) else 0
 
-    var output = (
-      target.baseTargetValue()
-      * attacker.dpfOnNextHitAgainst(target)
-      / Math.max(1.0, target.totalHealth)
-      / Math.max(6.0, framesOutOfWayToGoal + framesOutOfWayToShoot)
-    )
+    var output = baseAttackerToTargetValue(
+      baseTargetValue = target.baseTargetValue(),
+      totalHealth = target.totalHealth,
+      framesOutOfTheWay = framesOutOfWayToGoal + framesOutOfWayToShoot,
+      dpf = attacker.dpfOnNextHitAgainst(target))
 
     // Accessibility bonus
     val accessibleCombatUnit = attacker.inRangeToAttack(target) && target.participatingInCombat() && ! target.isInterceptor()

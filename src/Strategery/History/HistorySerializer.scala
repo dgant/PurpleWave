@@ -46,8 +46,8 @@ object HistorySerializer {
     val ourRace         = columns(4)
     val enemyRace       = columns(5)
     val won             = columns(6).toBoolean
-    val strategies      = columns.drop(7).toSet
-    val allRaces = Array(Race.Terran, Race.Protoss, Race.Zerg, Race.Random, Race.None, Race.Unknown)
+    val strategies      = columns.drop(7).distinct
+    val allRaces        = Array(Race.Terran, Race.Protoss, Race.Zerg, Race.Random, Race.None, Race.Unknown)
     HistoricalGame(
       timestamp       = id,
       startLocations  = startLocations,

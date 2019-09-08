@@ -10,7 +10,7 @@ import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.Build.ProposePlacement
+import Planning.Plans.Macro.Build.{CancelOrders, ProposePlacement}
 import Planning.Plans.Macro.BuildOrders.BuildOrder
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
@@ -90,8 +90,6 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
       new CapGasAt(300),
       new CapGasAt(200)),
 
-    new BuildOrder(Get(2, Protoss.Dragoon)),
-
     // Delay build until scout cleared
     new If(
       new Or(
@@ -99,6 +97,7 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
         new FrameAtLeast(GameTime(4, 10)())),
 
       new Parallel(
+        new CancelOrders(Protoss.CyberneticsCore),
         new BuildOrder(
           Get(Protoss.CitadelOfAdun),
           Get(Protoss.TemplarArchives),
@@ -131,7 +130,11 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
         new RequireMiningBases(2),
         new If(
           new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),
-          new BuildCannonsAtNatural(2)))),
+          new BuildCannonsAtNatural(2))),
+
+    new BuildOrder(
+      Get(1, Protoss.Dragoon),
+      Get(Protoss.AirDamage))),
 
     new Pump(Protoss.Dragoon)
   )

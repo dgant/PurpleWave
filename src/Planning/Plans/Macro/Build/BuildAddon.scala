@@ -2,16 +2,21 @@ package Planning.Plans.Macro.Build
 
 import Lifecycle.With
 import Macro.Architecture.Blueprint
+import Macro.Buildables.{Buildable, BuildableUnit}
 import Micro.Agency.Intention
-import Planning.Plan
-import Planning.ResourceLocks.{LockCurrencyForUnit, LockUnits}
+import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.UnitCountOne
 import Planning.UnitMatchers.{UnitMatchAnd, UnitMatcher}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class BuildAddon(val addonClass: UnitClass) extends Plan {
-  
+class BuildAddon(val addonClass: UnitClass) extends ProductionPlan {
+
+  override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
+  override def producerUnitLocks: Seq[LockUnits] = Seq(builderLock)
+  override def producerInProgress: Boolean = addon.isDefined
+  override def buildable: Buildable = BuildableUnit(addonClass)
+
   val buildingDescriptor  = new Blueprint(this, Some(addonClass))
   val currencyLock        = new LockCurrencyForUnit(addonClass)
   

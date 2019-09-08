@@ -74,19 +74,19 @@ object PlacementProfiles {
   
   val townHallNearby = new PlacementProfile("Town Hall Nearby",
     preferZone                  = 1000.0,
-    preferNatural               = 1.0,
+    preferNatural               = 10.0,
     preferResources             = 0.5,
     preferRhythm                = 0.0,
-    preferDistanceFromEnemy     = 0.5,
-    avoidDistanceFromBase       = 1.5
+    preferDistanceFromEnemy     = 2.0,
+    avoidDistanceFromBase       = 1.0
   )
   
   val townHallFar = new PlacementProfile("Town Hall Far",
     preferZone                  = 1000.0,
-    preferNatural               = 1.0,
+    preferNatural               = 10.0,
     preferResources             = 0.5,
     preferRhythm                = 0.0,
-    preferDistanceFromEnemy     = 2.0,
+    preferDistanceFromEnemy     = 4.0,
     avoidDistanceFromBase       = 0.5
   )
   

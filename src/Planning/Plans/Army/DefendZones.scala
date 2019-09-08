@@ -31,7 +31,9 @@ class DefendZones extends Plan {
       .view
       .filter(e => e.likelyStillAlive && e.likelyStillThere && (e.unitClass.dealsDamage || e.unitClass.isDetector || e.unitClass.isTransport))
       .map(enemy => (enemy, zoneScores.minBy(z => enemy.pixelDistanceTravelling(z._1.centroid))._1))
-      .filter(pair => pair._1.framesToTravelTo(pair._2.centroid.pixelCenter) < GameTime(0, 20)())
+      .filter(pair =>
+        pair._1.framesToTravelTo(pair._2.centroid.pixelCenter) < GameTime(0, 12)()
+        && pair._1.pixelDistanceTravelling(pair._2.centroid.pixelCenter) < 32 * 64)
       .toMap
     
     zoneScores

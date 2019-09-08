@@ -3,10 +3,10 @@ package Planning.Plans.Macro.Build
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import Macro.Architecture.Blueprint
+import Macro.Buildables.{Buildable, BuildableUnit}
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
-import Planning.Plan
-import Planning.ResourceLocks.{LockCurrencyForUnit, LockUnits}
+import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.UnitCountOne
 import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchCustom, UnitMatchSpecific}
 import Planning.UnitPreferences.UnitPreferCloseAndNotMining
@@ -14,8 +14,13 @@ import ProxyBwapi.Races.Neutral
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class BuildBuilding(val buildingClass: UnitClass) extends Plan {
-  
+class BuildBuilding(val buildingClass: UnitClass) extends ProductionPlan {
+
+  override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
+  override def producerUnitLocks: Seq[LockUnits] = Seq(builderLock)
+  override def producerInProgress: Boolean = building.isDefined
+  override def buildable: Buildable = BuildableUnit(buildingClass)
+
   val buildingDescriptor  = new Blueprint(this, Some(buildingClass))
   val currencyLock        = new LockCurrencyForUnit(buildingClass)
   

@@ -202,7 +202,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     toTravel
       .flatMap(_.base)
       .filter(_.owner.isUs)
-      .orElse(ByOption.minBy(With.geography.ourBases)(base => unit.pixelDistanceTravelling(base.heart)))
+      .orElse(ByOption.minBy(With.geography.ourBases)(base => unit.pixelDistanceTravelling(base.heart) * (if (base.scoutedByEnemy || base.isNaturalOf.exists(_.scoutedByEnemy)) 1 else 1000)))
       .map(_.heart.pixelCenter)
       .getOrElse(With.geography.home.pixelCenter)
   }
@@ -233,7 +233,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   // Leading //
   /////////////
 
-  var follow: (FriendlyUnitInfo) => Unit = x => {}
+  var leadFollower: (FriendlyUnitInfo) => Unit = x => {}
 
   /////////////////
   // Ridesharing //

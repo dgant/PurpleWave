@@ -17,7 +17,7 @@ object Scratch extends ActionTechnique {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.canMove
     && unit.agent.canFight
-    && unit.matchups.threats.forall(t => t.pixelRangeAgainst(unit) < unit.pixelRangeMax && t.topSpeed <= unit.topSpeed)
+    && unit.matchups.threats.forall(t => ! t.canMove || (t.pixelRangeAgainst(unit) < unit.pixelRangeMax && t.topSpeed <= unit.topSpeed))
     && unit.matchups.framesOfSafety >= safetyMarginFrames
     && (unit.flying || unit.zone.exit.map(_.pixelCenter).forall(exit =>
       ByOption

@@ -12,7 +12,7 @@ case class HistoricalGame(
   ourRace         : Race,
   enemyRace       : Race,
   won             : Boolean,
-  strategies      : Set[String],
+  strategies      : Seq[String],
   var order       : Int = 0) {
   
   // Convenience methods

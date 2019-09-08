@@ -24,7 +24,7 @@ class PvT2GateExpandCarrier extends GameplanTemplate {
 
   override def scoutPlan: Plan = new ScoutOn(Protoss.CyberneticsCore)
   override def attackPlan: Plan = new Parallel(
-    new PvTIdeas.AttackWithCarrierFleet,
+    new PvTIdeas.PriorityAttacks,
     new If(
       new Or(
         new Not(new EnemyHasShown(Terran.SpiderMine)),

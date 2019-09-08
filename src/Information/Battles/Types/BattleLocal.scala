@@ -25,6 +25,7 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   lazy val terranMaxBonus   : Double  = - 0.2 * getTerranMaxBonus
   lazy val siegeUrgency     : Double  = - 0.5 * getSiegeUrgency
   lazy val trappedness      : Double  = - 0.2 * getTrappedness
+  lazy val meleeCommitment  : Double  = 0.2 * getMeleeCommitment
   lazy val ratioAttack      : Double  = transformTotalScore(estimationSimulationAttack.localBattleMetrics)
   lazy val ratioSnipe       : Double  = transformTotalScore(estimationSimulationSnipe.localBattleMetrics)
   lazy val totalTarget      : Double  = hysteresis + terranHomeBonus + terranMaxBonus + turtleBonus + hornetBonus + siegeUrgency + trappedness + With.configuration.baseTarget
@@ -72,6 +73,9 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
     val distanceEnemy  : Double  = eligibleUnits.map(_.pixelDistanceTravelling(With.intelligence.mostBaselikeEnemyTile)).max
     val distanceRatio  : Double  = distanceEnemy / (distanceUs + distanceEnemy)
     distanceRatio
+  }
+  def getMeleeCommitment: Double = {
+    0.0 // TODO
   }
 
   def transformTotalScore(metrics: Seq[LocalBattleMetrics]): Double = {

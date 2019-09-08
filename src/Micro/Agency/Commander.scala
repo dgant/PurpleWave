@@ -54,7 +54,7 @@ class Commander {
   def hold(unit: FriendlyUnitInfo) {
     if (unready(unit)) return
     if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
-    unit.agent.follow = follower => hold(follower)
+    unit.agent.leadFollower = follower => hold(follower)
     if (unit.velocity.lengthSquared > 0 && ! unit.holdingPosition) {
       unit.baseUnit.holdPosition()
       sleep(unit)
@@ -71,7 +71,7 @@ class Commander {
   def attack(unit: FriendlyUnitInfo, target: UnitInfo) {
     if (unready(unit)) return
     if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
-    unit.agent.follow = follower => attack(follower, target)
+    unit.agent.leadFollower = follower => attack(follower, target)
 
     if ( ! unit.readyForAttackOrder) { // Necessary or redundant?
       sleep(unit)
@@ -121,7 +121,7 @@ class Commander {
       unit.baseUnit.attack(destination.bwapi)
     }
 
-    unit.agent.follow = follower => attackMove(follower, destination)
+    unit.agent.leadFollower = follower => attackMove(follower, destination)
     sleepAttack(unit)
   }
   
@@ -129,7 +129,7 @@ class Commander {
     if (unready(unit)) return
     autoUnburrow(unit)
     unit.baseUnit.patrol(destination.bwapi)
-    unit.agent.follow = follower => patrol(follower, destination)
+    unit.agent.leadFollower = follower => patrol(follower, destination)
     sleepAttack(unit)
   }
   
@@ -205,7 +205,7 @@ class Commander {
         unit.baseUnit.move(destination.bwapi)
       }
     }
-    unit.agent.follow = follower => move(follower, destination)
+    unit.agent.leadFollower = follower => move(follower, destination)
     sleep(unit)
   }
   
@@ -379,13 +379,13 @@ class Commander {
     if (unready(unit)) return
     unit.agent.lastCloak = With.frame
     unit.baseUnit.cloak()
-    unit.agent.follow = follower => cloak(follower, tech)
+    unit.agent.leadFollower = follower => cloak(follower, tech)
     sleep(unit)
   }
   
   def decloak(unit: FriendlyUnitInfo, tech: Tech) {
     if (unready(unit)) return
-    unit.agent.follow = follower => decloak(follower, tech)
+    unit.agent.leadFollower = follower => decloak(follower, tech)
     unit.baseUnit.decloak()
     sleep(unit)
   }

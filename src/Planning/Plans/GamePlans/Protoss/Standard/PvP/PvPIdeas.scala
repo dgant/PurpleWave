@@ -311,7 +311,7 @@ object PvPIdeas {
       new UnitsAtLeast(16, UnitMatchWarriors, complete = true)),
     new RequireMiningBases(2))
 
-  class TakeBase3 extends If(
+  class TakeBase3WithGateways extends If(
     new And(
       new Or(
         new Latch(new UnitsAtLeast(1, Protoss.Observer, complete = true)),
@@ -325,9 +325,11 @@ object PvPIdeas {
           new Or(
             new EnemyCarriers,
             new EnemyBasesAtLeast(3))))),
-    new RequireBases(3))
+    new Parallel(
+      new Build(Get(5, Protoss.Gateway)),
+      new RequireBases(3)))
 
-  class TakeBase4 extends If(
+  class TakeBase4WithGateways extends If(
     new Or(
       new UnitsAtLeast(22, UnitMatchWarriors),
       new EnemiesAtLeast(8, Protoss.PhotonCannon),
@@ -338,7 +340,9 @@ object PvPIdeas {
           new EnemyCarriers,
           new EnemyBasesAtLeast(4)))),
     new Parallel(
+      new Build(Get(6, Protoss.Gateway)),
       new RequireMiningBases(3),
+      new Build(Get(8, Protoss.Gateway)),
       new RequireBases(4)))
 
 

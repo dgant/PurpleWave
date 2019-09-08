@@ -145,8 +145,8 @@ class PvPLateGame extends GameplanTemplate {
       new BasesAtLeast(3),
       new Parallel(
         new PvPIdeas.TakeBase2,
-        new PvPIdeas.TakeBase3,
-        new PvPIdeas.TakeBase4)),
+        new PvPIdeas.TakeBase3WithGateways,
+        new PvPIdeas.TakeBase4WithGateways)),
 
     new PvPIdeas.TrainArmy,
 

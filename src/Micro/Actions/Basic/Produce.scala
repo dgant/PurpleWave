@@ -22,14 +22,16 @@ object Produce extends Action {
       if (With.framesSince(unit.agent.lastIntent.frameCreated) < Math.max(128, unit.agent.toTrain.get.buildFrames / 2)) {
         With.commander.build(unit, unit.agent.toTrain.get)
       }
-      unit.agent.lastIntent.toTrain = None //Avoid building repeatedly
     }
     else if (unit.agent.toTech.isDefined) {
       With.commander.tech(unit, unit.agent.toTech.get)
     }
     else if (unit.agent.toUpgrade.isDefined) {
       With.commander.upgrade(unit, unit.agent.toUpgrade.get)
-      unit.agent.lastIntent.toUpgrade = None //Avoid building repeatedly
     }
+
+      unit.agent.lastIntent.toTrain = None // Avoid training repeatedly
+    unit.agent.lastIntent.toTech = None // Avoid teching repeatedly (mostly impacts failure to renew the desire to tech)
+    unit.agent.lastIntent.toUpgrade = None //Avoid upgrading repeatedly
   }
 }

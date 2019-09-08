@@ -31,8 +31,7 @@ object Attack extends Action {
       Move.delegate(unit)
     }
     
-    if (target.is(Protoss.Interceptor)
-    || (target.is(Protoss.Carrier) && ! unit.inRangeToAttack(target))) {
+    if (target.is(Protoss.Interceptor)) {
       unit.agent.toTravel = Some(target.pixelCenter)
       AttackMove.delegate(unit)
     }

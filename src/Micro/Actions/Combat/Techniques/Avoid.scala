@@ -55,11 +55,11 @@ object Avoid extends ActionTechnique {
   }
 
   override def perform(unit: FriendlyUnitInfo): Unit = {
-    def timeOriginOfThreat(threat: UnitInfo): Double = threat.framesToTravelTo(unit.agent.origin) - threat.pixelRangeAgainst(unit)
+    def timeOriginOfThreat(threat: UnitInfo): Double = threat.framesToTravelTo(unit.agent.origin) - threat.pixelRangeAgainst(unit) * threat.topSpeed
 
     val distanceOriginUs    = unit.pixelDistanceTravelling(unit.agent.origin)
-    val distanceOriginEnemy = ByOption.min(unit.matchups.threats.view.map(t => t.pixelDistanceTravelling(unit.agent.origin) + t.pixelRangeAgainst(unit))).getOrElse(2.0 * With.mapPixelWidth)
-    val enemyCloser         = distanceOriginUs + 128 >= distanceOriginEnemy
+    val distanceOriginEnemy = ByOption.min(unit.matchups.threats.view.map(t => t.pixelDistanceTravelling(unit.agent.origin) - t.pixelRangeAgainst(unit))).getOrElse(2.0 * With.mapPixelWidth)
+    val enemyCloser         = distanceOriginUs + 160 >= distanceOriginEnemy
     val timeOriginUs        = unit.framesToTravelTo(unit.agent.origin)
     val timeOriginEnemy     = TakeN.percentile(0.1, unit.matchups.threats)(Ordering.by(timeOriginOfThreat)).map(timeOriginOfThreat).getOrElse(Double.PositiveInfinity)
     val enemySooner         = timeOriginUs + 96 >= timeOriginEnemy
@@ -119,7 +119,7 @@ object Avoid extends ActionTechnique {
 
     if (! unit.readyForMicro) return
 
-    val pathLengthMinimum = 3
+    val pathLengthMinimum = 6
     val maximumDistance = pathLengthMinimum + Math.max(0, unit.matchups.framesOfEntanglement * unit.topSpeed + unit.effectiveRangePixels).toInt / 32
 
     val profile = new PathfindProfile(unit.tileIncludingCenter)

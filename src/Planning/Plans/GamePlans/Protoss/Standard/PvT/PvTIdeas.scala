@@ -4,7 +4,7 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
-import Planning.Plans.Compound.{If, _}
+import Planning.Plans.Compound.{If, Trigger, _}
 import Planning.Plans.GamePlans.Protoss.Situational.BuildHuggingNexus
 import Planning.Plans.Macro.Automatic.{PumpWorkers, _}
 import Planning.Plans.Macro.Build.CancelIncomplete
@@ -18,36 +18,22 @@ import Planning.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchCustom, UnitMatchOr, UnitMatchSiegeTank, UnitMatchWarriors}
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Protoss.{PvT1015DT, PvT1015Expand, PvTStove}
+import Strategery.Strategies.Protoss.{PvT1015DT, PvT1015Expand, PvT32Nexus, PvTStove}
 
 object PvTIdeas {
-  
-  class AttackWithDarkTemplar extends If(
-    new Or(
-      new EnemyUnitsNone(Protoss.Observer),
-      new EnemyBasesAtLeast(3)),
-    new Attack(Protoss.DarkTemplar))
-  
-  class AttackWithScouts extends Attack(Protoss.Scout)
-  
-  class AttackWithCarrierFleet extends Trigger(
-    new UnitsAtLeast(4, Protoss.Carrier, complete = true),
-    initialAfter = new Attack(Protoss.Carrier))
-  
+
   class PriorityAttacks extends Parallel(
-    new AttackWithDarkTemplar,
-    new AttackWithScouts,
-    new AttackWithCarrierFleet)
+    new If(new Or(new EnemyUnitsNone(Protoss.Observer), new EnemyBasesAtLeast(3)), new Attack(Protoss.DarkTemplar)),
+    new Attack(Protoss.Scout),
+    new Trigger(new UnitsAtLeast(4, Protoss.Carrier, complete = true), initialAfter = new Attack(Protoss.Carrier)))
   
   class AttackSafely extends If(
     new Or(
-      new Not(new EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113)),
-      new Latch(new UnitsAtLeast(12, UnitMatchWarriors))),
+      new Latch(new UnitsAtLeast(8, UnitMatchWarriors)),
+      new Not(new EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113))),
     new If(
       new Or(
-        new Employing(PvT1015Expand),
-        new Employing(PvT1015DT),
-        new Employing(PvTStove),
+        new Employing(PvT32Nexus, PvT1015Expand, PvT1015DT, PvTStove),
         new MiningBasesAtLeast(3),
         new EnemyBasesAtLeast(2),
         new EnemyStrategy(With.fingerprints.bio),
@@ -60,8 +46,8 @@ object PvTIdeas {
     new And(
       new EnemyStrategy(With.fingerprints.fiveRax),
       new FramesUntilUnitAtLeast(Protoss.CyberneticsCore, Protoss.Zealot.buildFrames / 3)),
-    new BuildOrder(Get(2, Protoss.Zealot))
-  )
+    new BuildOrder(Get(2, Protoss.Zealot)))
+
   class ReactToWorkerRush extends If(
     new And(
       new EnemyStrategy(With.fingerprints.workerRush),
@@ -91,8 +77,7 @@ object PvTIdeas {
         Get(12, Protoss.Probe)),
       new PumpWorkers,
       new BuildHuggingNexus,
-      new Build(Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore), Get(2, Protoss.Pylon), Get(2, Protoss.Gateway), Get(Protoss.DragoonRange))
-    ))
+      new Build(Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore), Get(2, Protoss.Pylon), Get(2, Protoss.Gateway), Get(Protoss.DragoonRange))))
 
   class ReactToBBS extends If(
     new And(
@@ -210,8 +195,8 @@ object PvTIdeas {
     new Pump(Protoss.Scout, 5))
 
   class TrainZealotsOrDragoons extends Parallel(
-    new PumpRatio(Protoss.Dragoon, 0, 24, Seq(Friendly(Protoss.Zealot, .75))),
-    new PumpRatio(Protoss.Dragoon, 0, 24, Seq(Enemy(Terran.Vulture, .75))),
+    new PumpRatio(Protoss.Dragoon, 0, 24, Seq(Flat(6.0), Enemy(Terran.Vulture, .75))),
+    new PumpRatio(Protoss.Dragoon, 0, 24, Seq(Friendly(Protoss.Zealot, 1.0))),
     new If(
       new Or(
         new And(

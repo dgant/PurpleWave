@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -79,7 +79,6 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
       new UnitsAtLeast(1, Protoss.CitadelOfAdun),
       new Not(new EnemyStrategy(With.fingerprints.robo))))
 
-
   class NeedForgeToExpand extends Or(
     new EnemyStrategy(With.fingerprints.dtRush, With.fingerprints.forgeFe), // Forge FE can hide a DT rush
     new And(
@@ -90,7 +89,7 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
     new If(new NeedForgeToExpand, new Build(Get(Protoss.Forge))),
     new RequireMiningBases(2))
 
-  
+
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.TwoGate1012
   override def buildPlans = Vector(
 
@@ -106,6 +105,12 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
     new Build(
       Get(Protoss.Assimilator),
       Get(Protoss.CyberneticsCore)),
+
+    new If(
+      new And(
+        new GoDT,
+        new UnitsAtLeast(1, Protoss.CyberneticsCore)),
+      new EjectScout(Protoss.Probe)),
 
     new If(
       new EnemyStrategy(With.fingerprints.forgeFe),

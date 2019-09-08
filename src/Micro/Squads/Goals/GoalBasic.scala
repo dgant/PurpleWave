@@ -43,6 +43,7 @@ trait GoalBasic extends SquadGoal {
         || u.damageOnHitGround >= Terran.SpiderMine.maxHitPoints
         || u.pixelRangeGround > 32.0 * 3.0)
       override val counteredBy: Array[Quality] = Array.empty
+      override def counterScaling(input: Double): Double = 5.0 * input
     }
     object Vulture extends Quality {
       override def matches(u: UnitInfo): Boolean = u.is(Terran.Vulture)
@@ -61,7 +62,7 @@ trait GoalBasic extends SquadGoal {
       override val counteredBy: Array[Quality] = Array(AntiAir)
     }
     object Ground extends Quality {
-      def matches(u: UnitInfo): Boolean = ! u.flying
+      def matches(u: UnitInfo): Boolean = ! u.flying && ! u.isAny(Terran.SpiderMine)
       override val counteredBy: Array[Quality] = Array(AntiGround)
     }
     object AirCombat extends Quality {
@@ -69,7 +70,7 @@ trait GoalBasic extends SquadGoal {
       override val counteredBy: Array[Quality] = Array(AntiAirCombat)
     }
     object GroundCombat extends Quality {
-      def matches(u: UnitInfo): Boolean = ! u.flying
+      def matches(u: UnitInfo): Boolean = ! u.flying && ! u.isAny(Terran.SpiderMine)
       override val counteredBy: Array[Quality] = Array(AntiGroundCombat)
     }
     object AntiAir extends Quality {

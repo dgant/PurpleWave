@@ -7,57 +7,53 @@ import Planning.Plans.Macro.Build._
 import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 
 class MasterBuildPlans {
   
   private val maxToFollow = 200
-  
-  private val childrenByBuildable = new mutable.HashMap[Buildable, ListBuffer[Plan]]
-  private val childrenQueue: mutable.Queue[Plan] = mutable.Queue.empty
-  
-  def getChildren: Seq[Plan] = childrenQueue
 
-  def removeCompletedPlans(): Unit = {
-    childrenByBuildable.values.foreach(plans => {
-      var i = 0
-      while (i < plans.size) {
-        val plan = plans(i)
-        if (plan.isComplete) {
-          With.recruiter.release(plan)
-          plans.remove(i)
-        }
-        else {
-          i += 1
-        }
-      }})
-  }
+  private var childrenPlans: mutable.ArrayBuffer[ProductionPlan] = mutable.ArrayBuffer.empty
+  
+  def getChildren: Seq[Plan] = childrenPlans
+
+  var lastUpdateFrame: Int = -1
   def update(invoker: FollowBuildOrder): Unit = {
+    if (With.frame == lastUpdateFrame) return
+    lastUpdateFrame = With.frame
 
-    childrenQueue.clear()
-    removeCompletedPlans()
+    // 1. Release completed plans
+    // 2. Map current buildables to available plans; produce new plans as needed
+    // 3. Replace the queue
 
-    // Recalculate the child plans
-    val buildablesUnplanned = With.scheduler.queue.take(maxToFollow)
-    val plansUnclaimed = new mutable.HashMap[Buildable, mutable.Queue[Plan]]()
-    childrenByBuildable.foreach(planPair => plansUnclaimed(planPair._1) = new mutable.Queue[Plan] ++ planPair._2)
-
-    buildablesUnplanned.foreach(buildable => {
-      val existingPlans = plansUnclaimed.get(buildable)
-      if (existingPlans.exists(_.nonEmpty)) {
-        childrenQueue += existingPlans.get.dequeue()
-      } else {
-        val newPlan = makeBuildPlan(buildable)
-        if ( ! childrenByBuildable.contains(buildable)) {
-          childrenByBuildable(buildable) = new mutable.ListBuffer[Plan]
-        }
-        childrenByBuildable(buildable) += newPlan
-        childrenQueue += newPlan
+    val newPlans = new mutable.ArrayBuffer[ProductionPlan](childrenPlans.size)
+    val livingPlans = new mutable.ListBuffer[ProductionPlan]
+    var i = 0
+    childrenPlans.foreach(plan => {
+      if (plan.isComplete) {
+        With.recruiter.release(plan)
+      }
+      else {
+        livingPlans += plan
       }
     })
+
+    With.scheduler.queue.take(maxToFollow).foreach(buildable => {
+      var plan: Option[ProductionPlan] = None
+      i = 0
+      while (i < livingPlans.length) {
+        if (livingPlans(i).buildable == buildable) {
+          plan = Some(livingPlans.remove(i))
+          i = livingPlans.length
+        }
+        i += 1
+      }
+      plan = plan.orElse(Some(makeBuildPlan(buildable)))
+      newPlans += plan.get
+    })
+    childrenPlans = newPlans
   }
   
-  private def makeBuildPlan(buildable: Buildable): Plan = {
+  private def makeBuildPlan(buildable: Buildable): ProductionPlan = {
     if (buildable.unitOption.nonEmpty) {
       val unitClass = buildable.unitOption.get
       if (unitClass.isAddon) {

@@ -1,9 +1,9 @@
 package Planning.Plans.Macro.Build
 
 import Lifecycle.With
+import Macro.Buildables.{Buildable, BuildableUnit}
 import Micro.Agency.Intention
-import Planning.Plan
-import Planning.ResourceLocks.{LockCurrencyForUnit, LockUnits}
+import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.UnitCountOne
 import Planning.UnitMatchers.{UnitMatchMorphingInto, UnitMatchOr}
 import Planning.UnitPreferences.{UnitPreferAll, UnitPreferBaseWithFewerWorkers, UnitPreferBaseWithMoreWorkers, UnitPreferHatcheryWithThreeLarva}
@@ -11,8 +11,13 @@ import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class MorphUnit(val classToMorph: UnitClass) extends Plan {
-  
+class MorphUnit(val classToMorph: UnitClass) extends ProductionPlan {
+
+  override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
+  override def producerUnitLocks: Seq[LockUnits] = Seq(morpherLock)
+  override def producerInProgress: Boolean = morpher.exists(_.morphing)
+  override def buildable: Buildable = BuildableUnit(classToMorph)
+
   description.set("Morph a " + classToMorph)
   
   val currencyLock    = new LockCurrencyForUnit(classToMorph)

@@ -11,7 +11,7 @@ import Planning.Plans.GamePlans.Protoss.Situational.PlaceGatewaysProxied
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases}
+import Planning.Plans.Macro.Expanding.RequireBases
 import Planning.Plans.Scouting.{FoundEnemyBase, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
@@ -19,6 +19,7 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy}
 import Planning.UnitCounters.UnitCountOne
+import Planning.UnitMatchers.UnitMatchOr
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Protoss.{PvPProxy2Gate, PvRProxy2Gate, PvTProxy2Gate, PvZProxy2Gate}
@@ -110,8 +111,9 @@ class PvEProxy2Gate extends GameplanTemplate {
         new If(
           new MustTech,
           new Parallel(
-            new BuildGasPumps(1),
-            new Build(Get(1, Protoss.CyberneticsCore)),
+            new Build(
+              Get(Protoss.Assimilator),
+              Get(Protoss.CyberneticsCore)),
             new Pump(Protoss.Dragoon))))),
 
     new If(
@@ -120,7 +122,9 @@ class PvEProxy2Gate extends GameplanTemplate {
         new MineralsAtLeast(250)),
       new Build(Get(4, Protoss.Gateway))),
 
-    new Pump(Protoss.Zealot),
+    new If(
+      new EnemiesAtMost(1, UnitMatchOr(Protoss.Dragoon, Terran.Vulture)),
+      new Pump(Protoss.Zealot)),
   )
 
   override def emergencyPlans: Seq[Plan] = Seq(

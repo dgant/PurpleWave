@@ -10,6 +10,12 @@ import Utilities.ByOption
 object BaseUpdater {
   
   def updateBase(base: Base) {
+    if (With.grids.friendlyVision.isSet(base.townHallTile)) {
+      base.lastScoutedFrame = With.frame
+    }
+    if (With.grids.enemyVision.isSet(base.townHallTile)) {
+      base.lastScoutedByEnemyFrame = With.frame
+    }
     updateAssets(base)
     updateOwner(base)
   }
@@ -21,7 +27,7 @@ object BaseUpdater {
     base.owner = base.townHall.map(_.player).getOrElse(if (base.scouted) With.neutral else base.owner)
     
     // Assume ownership of implicit starting location
-    if (base.owner.isNeutral && base.lastScoutedFrame <= 0 && With.intelligence.firstEnemyMain.contains(base)) {
+    if (base.owner.isNeutral && ! base.scouted && With.intelligence.firstEnemyMain.contains(base)) {
       base.owner = With.enemy
     }
     

@@ -22,14 +22,17 @@ object Follow extends Action {
     val maybeLeader = unit.squad.flatMap(_.leader(unit.unitClass)).filterNot(_ == unit)
     unit.agent.toTravel = maybeLeader.map(_.pixelCenter).orElse(unit.agent.toTravel)
     maybeLeader
-      .withFilter(leader => unit.pixelDistanceCenter(leader) < Seq(128, ByOption.min(unit.matchups.threats.view.map(_.pixelsToGetInRange(unit).toInt)).getOrElse(0)).max)
+      .withFilter(leader =>
+        unit.pixelDistanceCenter(leader) < Seq(128, ByOption.min(unit.matchups.threats.view.map(_.pixelsToGetInRange(unit).toInt)).getOrElse(0)).max
+        && ( ! unit.isCarrier() || leader.matchups.threatsInRange.forall(unit.matchups.threatsInRange.contains))
+      )
       .foreach(leader => {
         if (unit.matchups.targetsInRange.isEmpty
           && unit.matchups.framesOfSafety > 24
           && unit.pixelDistanceCenter(leader) > 64) {
           Move.delegate(unit)
         }
-        leader.agent.follow(unit)
+        leader.agent.leadFollower(unit)
       })
   }
 }

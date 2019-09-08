@@ -3,10 +3,10 @@ package Planning.Plans.Macro.Build
 import Debugging.Visualizations.Rendering.DrawMap
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
+import Macro.Buildables.{Buildable, BuildableUnit}
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
-import Planning.Plan
-import Planning.ResourceLocks.{LockCurrencyForUnit, LockUnits}
+import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.UnitCountOne
 import Planning.UnitMatchers._
 import Planning.UnitPreferences.{UnitPreferIdle, UnitPreference}
@@ -14,8 +14,13 @@ import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class TrainUnit(val traineeClass: UnitClass) extends Plan {
-  
+class TrainUnit(val traineeClass: UnitClass) extends ProductionPlan {
+
+  override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
+  override def producerUnitLocks: Seq[LockUnits] = Seq(trainerLock)
+  override def producerInProgress: Boolean = trainee.isDefined
+  override def buildable: Buildable = BuildableUnit(traineeClass)
+
   description.set("Train a " + traineeClass)
   
   val currencyLock    = new LockCurrencyForUnit(traineeClass)

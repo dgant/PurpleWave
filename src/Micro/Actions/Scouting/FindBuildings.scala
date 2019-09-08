@@ -79,10 +79,10 @@ abstract class AbstractFindBuildings extends Action {
 
     val profile = new PathfindProfile(unit.tileIncludingCenter)
     profile.end                 = Some(tileToScout)
-    profile.canCrossUnwalkable  = false
+    profile.canCrossUnwalkable  = unit.flying
     profile.allowGroundDist     = false
     profile.costOccupancy       = 0.01f
-    profile.costThreat          = 3
+    profile.costThreat          = 5
     profile.costRepulsion       = 0.25f
     profile.repulsors           = Avoid.pathfindingRepulsion(unit)
     profile.unit                = Some(unit)

@@ -22,7 +22,7 @@ class GridEnemyDetection extends AbstractGridVersionedValue[Int] {
 
   override def onUpdate(): Unit = {
     for (unit <- With.units.enemy) {
-      if (unit.aliveAndComplete
+      if ((unit.aliveAndComplete || unit.remainingCompletionFrames < 48)
         && unit.likelyStillThere
         && unit.unitClass.isDetector
         && ! unit.stasised

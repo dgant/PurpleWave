@@ -1,6 +1,5 @@
 package Micro.Actions.Combat.Techniques
 
-import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Techniques.Common.Activators.WeightedMean
 import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, AttackAsSoonAsPossible}
 import ProxyBwapi.Races.Protoss
@@ -47,10 +46,7 @@ object Breathe extends ActionTechnique {
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    Potshot.delegate(unit)
     AttackAsSoonAsPossible.delegate(unit)
-    if ( ! unit.readyForAttackOrder) {
-      Avoid.delegate(unit)
-    }
+    Avoid.delegate(unit)
   }
 }

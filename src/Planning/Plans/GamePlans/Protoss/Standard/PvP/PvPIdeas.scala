@@ -175,6 +175,7 @@ object PvPIdeas {
   val lastChanceFor2GateShieldBatteryDefense = GameTime(2, 50)() - Protoss.ShieldBattery.buildFrames - GameTime(0, 5)()
 
   class AntiTwoGateInBaseFrom1GateCore extends Parallel(
+    new If(new UnitsAtMost(0, Protoss.CyberneticsCore), new CancelIncomplete(Protoss.Nexus)),
     new BuildOrder(
       Get(8, Protoss.Probe),
       Get(Protoss.Pylon),
@@ -201,6 +202,7 @@ object PvPIdeas {
   )
 
   class AntiTwoGateProxyFrom1GateCore extends Parallel(
+    new If(new UnitsAtMost(0, Protoss.CyberneticsCore), new CancelIncomplete(Protoss.Nexus)),
     new If(
       new FrameAtMost(lastChanceFor2GateShieldBatteryDefense),
       new CancelIncomplete(Protoss.CyberneticsCore)),
@@ -282,6 +284,7 @@ object PvPIdeas {
         unit.base.exists(_.isOurMain)
         || unit.base.exists(_.isNaturalOf.exists(_.isOurMain))
         || unit.orderTargetPixel.exists(_.base.exists(_.owner.isUs)))),
+      new If(new UpgradeStarted(Protoss.DragoonRange), new Attack),
       new Build(
         Get(Protoss.CitadelOfAdun),
         Get(Protoss.TemplarArchives))))
@@ -357,17 +360,23 @@ object PvPIdeas {
     Friendly(Protoss.Zealot, 0.5),
     Friendly(Protoss.Archon, 3.0)))
 
+  class ZealotsAllowed extends Or(
+    new EnemiesAtMost(0, Protoss.Carrier),
+    new EnemiesAtLeast(7, UnitMatchAnd(UnitMatchWarriors, UnitMatchNot(Protoss.Zealot))))
+
   class PumpDragoonsAndZealots extends Parallel(
     new PumpRatio(Protoss.Dragoon, 0, 100, Seq(Enemy(Protoss.Carrier, 5.0))),
     new If(
-      new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.Zealot.buildFrames),
+      new And(
+        new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.Zealot.buildFrames),
+        new ZealotsAllowed),
       new PumpRatio(Protoss.Zealot, 3, 100, Seq(
         Enemy(Protoss.Carrier, -8.0),
         Friendly(Protoss.Dragoon, 2.0),
         Friendly(Protoss.Reaver, 4.0),
         Friendly(Protoss.Archon, -3.0)))),
     new Pump(Protoss.Dragoon),
-    new Pump(Protoss.Zealot))
+    new If(new ZealotsAllowed, new Pump(Protoss.Zealot)))
 
   class TrainDarkTemplar extends If(
     new EnemiesAtMost(0, Protoss.Observer),
@@ -400,7 +409,7 @@ object PvPIdeas {
         new PumpShuttleAndReavers(6, shuttleFirst = false),
         new PumpRatio(Protoss.Dragoon, 3, 24, Seq(Friendly(Protoss.Zealot, if (MapGroups.badForBigUnits.exists(_.matches)) 0.0 else 1.5))),
         new PumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-1), Friendly(UnitMatchWarriors, 1.0 / 5.0))),
-        new Pump(Protoss.Zealot)),
+        new If(new ZealotsAllowed, new Pump(Protoss.Zealot))),
 
       // Dragoon-Reaver composition
       new Parallel(

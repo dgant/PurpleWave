@@ -1,5 +1,6 @@
 package Micro.Actions.Combat.Techniques.Common
 
+import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Commands.Attack
@@ -13,11 +14,12 @@ object AttackAsSoonAsPossible extends Action {
   )
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    if (unit.readyForAttackOrder
-      || unit.matchups.targetsInRange.isEmpty
-      || unit.matchups.targets.forall(t => unit.pixelDistanceEdge(t) > unit.pixelRangeAgainst(t) - 32.0)) {
-      Target.delegate(unit)
+    Target.delegate(unit)
+    val target = unit.agent.toAttack
+    if (target.isDefined && unit.framesToGetInRange(target.get) + With.reaction.agencyAverage + unit.unitClass.framesToTurn180 >= unit.cooldownLeft) {
       Attack.delegate(unit)
+    } else {
+      unit.agent.toAttack = None
     }
   }
 }

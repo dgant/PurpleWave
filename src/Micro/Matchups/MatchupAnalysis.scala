@@ -46,7 +46,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   }
   def repairers: ArrayBuffer[UnitInfo] = ArrayBuffer.empty ++ allies.filter(_.friendly.exists(_.agent.toRepair.contains(me)))
 
-  lazy val firstTeammate                  : UnitInfo              = alliesInclSelf.minBy(_.id)
+  lazy val firstTeammate                  : UnitInfo              = if (alliesInclSelf.isEmpty) me else alliesInclSelf.minBy(_.id)
   lazy val valuePerDamage                 : Double                = MicroValue.valuePerDamageCurrentHp(me)
   lazy val dpfDealingMax                  : Double                = splashFactorMax * ByOption.max(targets.view.map(me.dpfOnNextHitAgainst)).getOrElse(0.0)
   lazy val vpfDealingMax                  : Double                = splashFactorMax * ByOption.max(targets.view.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)

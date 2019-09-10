@@ -128,7 +128,7 @@ object Avoid extends ActionTechnique {
     profile.maximumLength       = Some(maximumDistance)
     profile.canCrossUnwalkable  = unit.flying || unit.transport.exists(_.flying)
     profile.allowGroundDist     = true
-    profile.costOccupancy       = 0.5f
+    profile.costOccupancy       = 0.75f
     profile.costThreat          = 4f
     profile.costRepulsion       = 1.5f
     profile.repulsors           = pathfindingRepulsion(unit)

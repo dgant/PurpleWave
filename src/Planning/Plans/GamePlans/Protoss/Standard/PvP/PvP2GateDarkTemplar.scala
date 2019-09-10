@@ -77,7 +77,7 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
     new PvPIdeas.ReactToFFE,
     new ScoutForCannonRush)
 
-  override def buildOrderPlan = new PvP1GateCoreIdeas.BuildOrderPlan
+  override def buildOrderPlan = new PvP1GateCoreIdeas.BuildOrderPlan(allowZealotBeforeCore = false)
   
   override val buildPlans = Vector(
     new Trigger(

@@ -15,10 +15,10 @@ abstract class PvPOpening extends PvPStrategy
 object PvPRobo extends PvPOpening
 object PvP2GateDTExpand extends PvPOpening
 object PvP2Gate1012Goon extends PvPOpening {
-  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.forgeFe)
+  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.forgeFe, With.fingerprints.gatewayFe)
 }
 object PvP2Gate1012DT extends PvPOpening {
-  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.forgeFe, With.fingerprints.robo)
+  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.robo)
 }
 object PvP2GateGoon extends PvPOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits

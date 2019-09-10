@@ -14,7 +14,7 @@ import Planning.Predicates.Compound.{And, Not, Sticky}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBasesAtMost, SafeAtHome, SafeToMoveOut}
 import Planning.Predicates.Strategy.{EnemyRecentStrategy, EnemyStrategy}
-import Planning.UnitMatchers.UnitMatchMobileDetectors
+import Planning.UnitMatchers.{UnitMatchMobileDetectors, UnitMatchWarriors}
 import ProxyBwapi.Races.Protoss
 
 class PvPLateGame extends GameplanTemplate {
@@ -131,6 +131,24 @@ class PvPLateGame extends GameplanTemplate {
       new Not(new EnemyHasShown(Protoss.DarkTemplar)),
       new UnitsAtLeast(2, Protoss.Observer, complete = true)))
 
+  class AddScalingTech extends Parallel(
+    new If(
+      new And(
+        new MiningBasesAtLeast(2),
+        new UnitsAtLeast(18, Protoss.Dragoon)),
+      new Build(Get(Protoss.CitadelOfAdun), Get(Protoss.ZealotSpeed))),
+    new If(
+      new And(
+        new GasPumpsAtLeast(3),
+        new UnitsAtLeast(24, UnitMatchWarriors)),
+      new Parallel(
+        new Build(Get(Protoss.Forge)),
+        new UpgradeContinuously(Protoss.GroundDamage),
+        new Build(
+          Get(Protoss.CitadelOfAdun),
+          Get(Protoss.TemplarArchives))))
+  )
+
   override def buildPlans: Seq[Plan] = Seq(
     new Build(Get(Protoss.Pylon), Get(Protoss.Gateway), Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore), Get(Protoss.DragoonRange), Get(2, Protoss.Gateway)),
 
@@ -148,6 +166,7 @@ class PvPLateGame extends GameplanTemplate {
         new PvPIdeas.TakeBase3WithGateways,
         new PvPIdeas.TakeBase4WithGateways)),
 
+    new AddScalingTech,
     new PvPIdeas.TrainArmy,
 
     // Three-base transition

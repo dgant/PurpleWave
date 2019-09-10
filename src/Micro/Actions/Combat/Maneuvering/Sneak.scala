@@ -24,7 +24,7 @@ object Sneak extends Action {
 
     if ( ! unit.readyForMicro) return
 
-    if ( ! unit.effectivelyCloaked || With.grids.enemyDetection.get(unit.tileIncludingCenter) - With.grids.enemyDetection.addedRange + 1 > 0) {
+    if ( ! unit.effectivelyCloaked || unit.tileArea.expand(2, 2).tiles.exists(With.grids.enemyDetection.isDetected)) {
       Avoid.delegate(unit)
     }
   }

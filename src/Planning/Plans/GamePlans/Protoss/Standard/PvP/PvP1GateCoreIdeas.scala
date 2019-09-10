@@ -74,7 +74,7 @@ object PvP1GateCoreIdeas {
             Get(Protoss.Observatory),
             Get(2, Protoss.Observer))))))
 
-  class BuildOrderPlan extends Parallel(
+  class BuildOrderPlan(allowZealotBeforeCore: Boolean = true) extends Parallel(
     new BuildOrder(
       Get(8, Protoss.Probe),
       Get(Protoss.Pylon),
@@ -84,7 +84,9 @@ object PvP1GateCoreIdeas {
       Get(Protoss.Assimilator),
       Get(13, Protoss.Probe)),
     new If(
-      new ZealotBeforeCore,
+      new And(
+        new ZealotBeforeCore,
+        new Check(() => allowZealotBeforeCore)),
       new Parallel(
         new BuildOrder(
           Get(Protoss.Zealot),

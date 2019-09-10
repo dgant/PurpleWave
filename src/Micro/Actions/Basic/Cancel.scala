@@ -12,7 +12,7 @@ object Cancel extends Action {
     if (unit.agent.canCancel) return true
 
     lazy val unpowered        = unit.unitClass.requiresPsi && ! unit.powered
-    lazy val framesCutoff     = 24 + With.reaction.agencyAverage
+    lazy val framesCutoff     = 48 + With.reaction.agencyAverage
     lazy val framesToLive     = unit.matchups.framesToLive
     lazy val framesToFinish   = Seq(unit.remainingTechFrames, unit.remainingUpgradeFrames, unit.remainingTrainFrames).max
     lazy val doomed           = unit.battle.isDefined && unit.matchups.threatsInRange.nonEmpty && framesToLive < framesCutoff

@@ -4,11 +4,11 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers}
+import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump, PumpWorkers}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Compound.{And, Latch, Not}
-import Planning.Predicates.Milestones.{BasesAtLeast, EnemiesAtLeast, UnitsAtLeast, UnitsAtMost}
+import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeAtHome}
 import Planning.Predicates.Strategy.EnemyStrategy
 import Planning.{Plan, Predicate}
@@ -23,7 +23,7 @@ class PvPVsForge extends GameplanTemplate {
   // * Fake FFE into 3 proxy gates
   // This also needs to be robust against eg. Ximp turtling into Carriers
 
-  override val activationCriteria: Predicate = new And(new EnemyStrategy(With.fingerprints.forgeFe, With.fingerprints.cannonRush), new UnitsAtMost(0, Protoss.CitadelOfAdun))
+  override val activationCriteria: Predicate = new And(new EnemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.cannonRush), new UnitsAtMost(0, Protoss.CitadelOfAdun))
   override val completionCriteria: Predicate = new Latch(new And(new BasesAtLeast(2), new UnitsAtLeast(1, Protoss.Reaver)))
 
   override def buildOrderPlan: Plan = new Parallel(
@@ -33,17 +33,23 @@ class PvPVsForge extends GameplanTemplate {
       Get(10, Protoss.Probe)),
     new If(
       new And(
-        new EnemyStrategy(With.fingerprints.cannonRush),
+        new MiningBasesAtMost(1),
+        new EnemyStrategy(With.fingerprints.forgeFe, With.fingerprints.cannonRush),
         new Or(
           new EnemiesAtLeast(2, Protoss.PhotonCannon),
           new EnemyBasesAtLeast(2))),
-      new RequireMiningBases(2)),
+      new Parallel(
+        new CapGasWorkersAt(0),
+        new BuildOrder(Get(13, Protoss.Probe)),
+        new RequireMiningBases(2))),
     new BuildOrder(
       Get(Protoss.Gateway),
       Get(11, Protoss.Probe),
       Get(Protoss.Assimilator),
       Get(13, Protoss.Probe),
-      Get(Protoss.CyberneticsCore),
+      Get(Protoss.CyberneticsCore)),
+    new If(new And(new EnemiesAtLeast(1, Protoss.Zealot), new UnitsAtMost(0, Protoss.CyberneticsCore, complete = true)), new BuildOrder(Get(Protoss.Zealot))),
+    new BuildOrder(
       Get(15, Protoss.Probe),
       Get(2, Protoss.Pylon),
       Get(17, Protoss.Probe),

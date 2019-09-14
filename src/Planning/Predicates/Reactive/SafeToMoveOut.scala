@@ -2,7 +2,7 @@ package Planning.Predicates.Reactive
 
 import Lifecycle.With
 import Planning.Predicate
-import Planning.UnitMatchers.UnitMatcher
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete, UnitMatcher}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvZ9PoolSpeed
 
@@ -19,7 +19,7 @@ class SafeToMoveOut extends Predicate {
   }
   
   private def countOurs(unitMatcher: UnitMatcher): Int = {
-    With.units.countOurs(unitMatcher)
+    With.units.countOurs(UnitMatchAnd(unitMatcher, UnitMatchComplete))
   }
   
   private def countEnemy(unitMatcher: UnitMatcher): Int = {
@@ -68,8 +68,8 @@ class SafeToMoveOut extends Predicate {
     
     val scoreDragoon  = 1.0
     val scoreSpeedlot = 1.0
-    val scoreReaver   = 2.5
-    val scoreShuttle  = 1.5
+    val scoreReaver   = 2.0
+    val scoreShuttle  = 1.25
     val scoreArchon   = 2.0
     val scoreCarrier  = 3.0
     

@@ -64,7 +64,7 @@ class AIIDEPlaybook extends PurpleWavePlaybook {
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvT13Nexus, PvT2BaseCarrier)
+  override lazy val forced: Seq[Strategy] = Seq(PvP2Gate1012DT)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
   override def respectOpponent: Boolean = false
   override def respectMap: Boolean = false

@@ -23,7 +23,7 @@ case class StrategySelectionSequence(strategySequences: Seq[Seq[Strategy]], loop
         .min)
 
     if (leastUsed.nonEmpty) {
-      val fixed = new StrategySelectionFixed(leastUsed.get: _*)
+      val fixed = new StrategySelectionFixedAppropriate(leastUsed.get: _*)
       return fixed.chooseBest(topLevelStrategies, expand)
     }
 

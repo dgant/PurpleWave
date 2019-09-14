@@ -16,7 +16,8 @@ object ShowFingerprints extends View {
       5 * With.visualization.lineHeightSmall,
       "Matched:\n\n"
       + With.fingerprints.all.filter(_.matches).map(format).mkString("\n")
-      + "\n\n\nUnmatched:\n\n"
-      + With.fingerprints.all.filterNot(_.matches).map(format).mkString("\n"))
+      //+ "\n\n\nUnmatched:\n\n"
+      //+ With.fingerprints.all.filterNot(_.matches).map(format).mkString("\n")
+    )
   }
 }

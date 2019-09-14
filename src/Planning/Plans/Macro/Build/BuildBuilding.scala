@@ -183,7 +183,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends ProductionPlan {
       return false
     }
     val travelFrames = (if (builderLock.units.isEmpty) 1.4 else 1.25) * proposedBuilder.get.framesToTravelTo(desiredTile.get.pixelCenter)
-    travelFrames + 24 >= currencyLock.expectedFrames
+    travelFrames + 48 >= currencyLock.expectedFrames
   }
   
   override def visualize() {

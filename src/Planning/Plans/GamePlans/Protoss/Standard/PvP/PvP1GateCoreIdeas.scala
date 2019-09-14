@@ -84,9 +84,9 @@ object PvP1GateCoreIdeas {
       Get(Protoss.Assimilator),
       Get(13, Protoss.Probe)),
     new If(
-      new And(
-        new ZealotBeforeCore,
-        new Check(() => allowZealotBeforeCore)),
+      new And(new ZealotBeforeCore, new Check(() => allowZealotBeforeCore)),
+
+      // ZCore*
       new Parallel(
         new BuildOrder(
           Get(Protoss.Zealot),
@@ -95,15 +95,30 @@ object PvP1GateCoreIdeas {
           Get(15, Protoss.Probe),
           Get(Protoss.CyberneticsCore),
           Get(16, Protoss.Probe)),
+
         new If(
           new ZealotAfterCore,
+          // ZCoreZ
           new BuildOrder(Get(2, Protoss.Zealot)))),
-      new BuildOrder(
-        Get(14, Protoss.Probe),
-        Get(Protoss.CyberneticsCore))),
-    new If(
-      new ZealotAfterCore,
-      new BuildOrder(
-        Get(2, Protoss.Zealot),
-        Get(2, Protoss.Pylon))))
+
+      // Core*
+      new Parallel(
+        new BuildOrder(
+          Get(14, Protoss.Probe),
+          Get(Protoss.CyberneticsCore)),
+
+        new If(
+          new ZealotAfterCore,
+          // CoreZ
+          new BuildOrder(
+            Get(Protoss.Zealot),
+            Get(2, Protoss.Pylon),
+            Get(16, Protoss.Probe)),
+
+          // NZCore
+          new BuildOrder(
+            Get(15, Protoss.Probe),
+            Get(2, Protoss.Pylon),
+            Get(17, Protoss.Probe)))
+      )))
 }

@@ -7,7 +7,7 @@ import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.UpgradeContinuously
-import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildCannonsAtNaturalAndExpansions
 import Planning.Predicates.Compound.{And, Not, Sticky}
@@ -57,34 +57,39 @@ class PvPLateGame extends GameplanTemplate {
     new Parallel(
       new Build(
         Get(Protoss.CitadelOfAdun),
-        Get(Protoss.TemplarArchives)),
-      new FlipIf(
-        new EnemyPassiveOpening,
-        new Build(
-          Get(3, Protoss.Gateway),
-          Get(2, Protoss.Assimilator),
-          Get(Protoss.PsionicStorm),
-          Get(Protoss.ZealotSpeed)),
-        new Build(Get(5, Protoss.Gateway))),
+        Get(2, Protoss.Gateway),
+        Get(Protoss.TemplarArchives),
+        Get(5, Protoss.Gateway),
+        Get(2, Protoss.Assimilator)),
       new BuildGasPumps,
       new Build(
+        Get(Protoss.ZealotSpeed),
         Get(Protoss.Forge),
         Get(Protoss.GroundDamage),
+        Get(Protoss.PsionicStorm),
         Get(7, Protoss.Gateway),
         Get(Protoss.HighTemplarEnergy),
         Get(2, Protoss.GroundDamage),
         Get(10, Protoss.Gateway))),
 
     new Parallel(
-      new Build(
-        Get(3, Protoss.Gateway),
-        Get(Protoss.RoboticsFacility),
-        Get(Protoss.Observatory),
-        Get(5, Protoss.Gateway)),
+      new Build(Get(3, Protoss.Gateway)),
+      new FlipIf(
+        new And(
+          new SafeAtHome,
+          new Or(
+            new UnitsAtLeast(1, Protoss.RoboticsFacility),
+            new EnemyBasesAtLeast(2))),
+        new Build(
+          Get(5, Protoss.Gateway),
+          Get(2, Protoss.Assimilator)),
+        new Build(
+          Get(Protoss.RoboticsFacility),
+          Get(Protoss.Observatory),
+          Get(Protoss.RoboticsSupportBay),
+          Get(Protoss.ShuttleSpeed))),
       new BuildGasPumps,
       new Build(
-        Get(Protoss.RoboticsSupportBay),
-        Get(Protoss.ShuttleSpeed),
         Get(Protoss.CitadelOfAdun),
         Get(Protoss.ZealotSpeed),
         Get(7, Protoss.Gateway),
@@ -135,8 +140,10 @@ class PvPLateGame extends GameplanTemplate {
     new If(
       new And(
         new MiningBasesAtLeast(2),
-        new UnitsAtLeast(18, Protoss.Dragoon)),
+        new UnitsAtLeast(24, Protoss.Dragoon),
+        new UnitsAtLeast(5, Protoss.Gateway, complete = true)),
       new Build(Get(Protoss.CitadelOfAdun), Get(Protoss.ZealotSpeed))),
+    new If(new UnitsAtLeast(1, Protoss.HighTemplar), new Build(Get(Protoss.PsionicStorm))),
     new If(
       new And(
         new GasPumpsAtLeast(3),
@@ -146,10 +153,19 @@ class PvPLateGame extends GameplanTemplate {
         new UpgradeContinuously(Protoss.GroundDamage),
         new Build(
           Get(Protoss.CitadelOfAdun),
-          Get(Protoss.TemplarArchives))))
-  )
+          Get(Protoss.TemplarArchives),
+          Get(Protoss.ZealotSpeed),
+          Get(Protoss.PsionicStorm)))))
+
+  class FinishDarkTemplarRush extends If(
+    new And(
+      new UnitsAtLeast(1, Protoss.TemplarArchives),
+      new UnitsAtMost(0, Protoss.Observer),
+      new UnitsAtMost(0, Protoss.Observatory)),
+    new BuildOrder(Get(2, Protoss.DarkTemplar)))
 
   override def buildPlans: Seq[Plan] = Seq(
+    new FinishDarkTemplarRush,
     new Build(Get(Protoss.Pylon), Get(Protoss.Gateway), Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore), Get(Protoss.DragoonRange), Get(2, Protoss.Gateway)),
 
     //  Detection

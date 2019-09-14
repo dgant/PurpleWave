@@ -25,7 +25,7 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   lazy val terranMaxBonus   : Double  = - 0.2 * getTerranMaxBonus
   lazy val siegeUrgency     : Double  = - 0.5 * getSiegeUrgency
   lazy val trappedness      : Double  = - 0.2 * getTrappedness
-  lazy val meleeCommitment  : Double  = 0.2 * getMeleeCommitment
+  lazy val meleeCommitment  : Double  = 0.2 * getSkirmishModifier
   lazy val ratioAttack      : Double  = transformTotalScore(estimationSimulationAttack.localBattleMetrics)
   lazy val ratioSnipe       : Double  = transformTotalScore(estimationSimulationSnipe.localBattleMetrics)
   lazy val totalTarget      : Double  = hysteresis + terranHomeBonus + terranMaxBonus + turtleBonus + hornetBonus + siegeUrgency + trappedness + With.configuration.baseTarget
@@ -74,8 +74,17 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
     val distanceRatio  : Double  = distanceEnemy / (distanceUs + distanceEnemy)
     distanceRatio
   }
-  def getMeleeCommitment: Double = {
-    0.0 // TODO
+  private def meanRange(team: Team): Double = PurpleMath.weightedMean(team.units.view.map(u => (u.effectiveRangePixels, u.subjectiveValue)))
+  private def outranges(unit: UnitInfo, threat: UnitInfo): Boolean = threat.pixelRangeAgainst(unit) > unit.effectiveRangePixels
+  def getSkirmishModifier: Double = {
+    val meanRangeUs     = meanRange(us)
+    val meanRangeEnemy  = meanRange(enemy)
+    val outrangeableUs  = us.units.count(unit => unit.matchups.threats.exists(outranges(unit, _)))
+    val outrangedUs     = us.units.count(unit => unit.matchups.threatsInRange.exists(outranges(unit, _)))
+    val ratioRange      = PurpleMath.nanToZero(meanRangeEnemy - meanRangeUs / (meanRangeEnemy + meanRangeUs))
+    val ratioOutranged  = PurpleMath.nanToZero(2 * outrangedUs / outrangeableUs - 1)
+    //val impact          = PurpleMath.nanToZero(outrangeableUs / team
+    0.0
   }
 
   def transformTotalScore(metrics: Seq[LocalBattleMetrics]): Double = {

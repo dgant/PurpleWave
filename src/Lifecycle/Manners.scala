@@ -1,7 +1,6 @@
 package Lifecycle
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
-import Strategery.History.HistoryLoader
 
 object Manners {
   
@@ -35,6 +34,12 @@ object Manners {
   private def surrender() {
     chat("Well played.")
     With.game.leaveGame()
+  }
+
+  def debugChat(text: String): Unit = {
+    if (With.configuration.debugging()) {
+      chat(text)
+    }
   }
   
   def chat(text: String) {

@@ -1,15 +1,13 @@
 package Micro.Actions.Protoss
 
 import Information.Geography.Pathfinding.PathfindProfile
-import Lifecycle.{Manners, With}
-import Mathematics.Points.Pixel
+import Lifecycle.Manners
 import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Traverse
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Combat.Techniques.Avoid
 import Micro.Actions.Commands.Attack
-import Planning.UnitMatchers.UnitMatchRecruitableForCombat
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
@@ -39,23 +37,27 @@ object Paradrop extends Action {
     }
     val target = unit.agent.toAttack
 
-    // If we're attacking, drop in firing position
-    // Otherwise, flee
-    def getCentroid(units: Iterable[UnitInfo]): Option[Pixel] = {
-      val eligibleUnits = units.view.filter(u => unit.is(UnitMatchRecruitableForCombat) && ! u.isAny(Protoss.Shuttle, Protoss.Reaver, Protoss.HighTemplar))
-      if (eligibleUnits.size < 3) None else Some(PurpleMath.centroid(eligibleUnits.map(_.pixelCenter)))
-    }
+    def eligibleTeammate = (unit: UnitInfo) => ! unit.isAny(Protoss.Shuttle, Protoss.Reaver, Protoss.HighTemplar)
+    lazy val squadmates = unit.squad.map(_.units.toSeq.filter(eligibleTeammate)).getOrElse(Seq.empty)
+    lazy val squadmatesEngaged = squadmates.filter(_.matchups.enemies.nonEmpty)
+    lazy val allies = unit.matchups.allies.filter(eligibleTeammate)
+    lazy val alliesEngaged = allies.filter(_.matchups.enemies.nonEmpty)
+
     val destinationAir =
       unit.agent.toAttack.map(_.pixelCenter)
-        .orElse(unit.squad.flatMap(squad => getCentroid(squad.units.view)))
-        .orElse(getCentroid(unit.matchups.allies))
+        .orElse(if (squadmates.size > 3) Some(PurpleMath.centroid(squadmates.map(_.pixelCenter))) else None)
+        .orElse(if (allies.size > 3) Some(PurpleMath.centroid(allies.map(_.pixelCenter))) else None)
         .getOrElse(if (unit.agent.shouldEngage) unit.agent.destination else unit.agent.origin)
     val destination = destinationAir.nearestWalkableTerrain
     unit.agent.toTravel = Some(destination.pixelCenter)
 
     val profile = new PathfindProfile(unit.tileIncludingCenter)
+    def targetDistance: Float = (unit.effectiveRangePixels + (if (unit.unitClass != Protoss.HighTemplar) unit.topSpeed * unit.cooldownLeft else 0)).toFloat / 32f
     profile.end                 = Some(destination)
-    profile.endDistanceMaximum  = (unit.effectiveRangePixels + (if (unit.unitClass != Protoss.HighTemplar) unit.topSpeed * unit.cooldownLeft else 0)).toFloat / 32f
+    profile.endDistanceMaximum  =
+      if (target.isDefined && unit.pixelDistanceCenter(target.get.pixelCenter) > targetDistance)
+        targetDistance
+      else 0
     profile.maximumLength       = Some(30)
     profile.canCrossUnwalkable  = false
     profile.allowGroundDist     = false
@@ -66,11 +68,12 @@ object Paradrop extends Action {
     profile.unit                = Some(unit)
     val path = profile.find
     if (path.pathExists) {
+
       unit.agent.toTravel = Some(path.end.pixelCenter)
       new Traverse(path).delegate(unit)
-    } else if (With.configuration.debugging()) {
-      Manners.chat(f"Failed to path $unit to $destination")
-      Manners.chat(f"Targeting $target")
+    } else {
+      Manners.debugChat(f"Failed to path $unit to $destination")
+      Manners.debugChat(f"Targeting $target")
     }
   }
 }

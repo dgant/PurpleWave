@@ -101,6 +101,7 @@ class Simulation(
     if (zoneUs == zoneEnemy) return 1.0
     val edge      = zoneUs.edges.find(_.zones.contains(zoneEnemy))
     val edgeWidth = Math.max(32.0, edge.map(_.radiusPixels * 2.0).getOrElse(32.0 * 10.0))
-    PurpleMath.nanToOne(2.5 * edgeWidth / ourWidth)
+    val output    = PurpleMath.clamp(PurpleMath.nanToOne(2.5 * edgeWidth / ourWidth), 0.25, 1.0)
+    output
   }
 }

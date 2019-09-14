@@ -3,7 +3,7 @@ package Strategery.Selection
 import Lifecycle.With
 import Strategery.Strategies.Strategy
 
-class StrategySelectionRecommended(fallback: StrategySelectionPolicy, strategies: Strategy*) extends StrategySelectionFixed(strategies: _*) {
+class StrategySelectionRecommended(fallback: StrategySelectionPolicy, strategies: Strategy*) extends StrategySelectionFixedAppropriate(strategies: _*) {
 
   var duration = 5
 

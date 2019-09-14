@@ -73,7 +73,7 @@ object FightOrFlight extends Action {
         && base.isDefined
         && base.exists(ally.base.contains)
         && ally.visibleToOpponents
-        && ally.matchups.framesOfSafety <= 24 + Math.max(0, unit.matchups.framesOfSafety)
+        && ally.matchups.framesOfSafety <= 6 + Math.max(0, unit.matchups.framesOfSafety)
         && (
           ! ally.agent.canFlee
           || ally.base.exists(_.units.exists(resource =>

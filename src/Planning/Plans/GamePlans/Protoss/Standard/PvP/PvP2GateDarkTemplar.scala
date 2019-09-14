@@ -5,7 +5,6 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.{Plan, Predicate}
 import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -20,6 +19,7 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyDarkTemplarLikely, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP2GateDTExpand
 
@@ -58,13 +58,9 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
   override def blueprints = Vector(
     new Blueprint(this, building = Some(Protoss.Pylon),           placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
     new Blueprint(this, building = Some(Protoss.Gateway),         placement = Some(PlacementProfiles.wallGathering)),
-    new Blueprint(this, building = Some(Protoss.Pylon),           placement = Some(PlacementProfiles.wallGathering)),
-    new Blueprint(this, building = Some(Protoss.ShieldBattery)),
-    new Blueprint(this, building = Some(Protoss.Gateway),         placement = Some(PlacementProfiles.wallGathering)),
-    new Blueprint(this, building = Some(Protoss.CyberneticsCore), placement = Some(PlacementProfiles.wallGathering)),
     new Blueprint(this, building = Some(Protoss.Pylon),           placement = Some(PlacementProfiles.backPylon)),
-    new Blueprint(this, building = Some(Protoss.Forge),           placement = Some(PlacementProfiles.wallGathering)),
-    new Blueprint(this, building = Some(Protoss.Pylon),           placement = Some(PlacementProfiles.wallGathering)))
+    new Blueprint(this, building = Some(Protoss.ShieldBattery)),
+    new Blueprint(this, building = Some(Protoss.Gateway),         placement = Some(PlacementProfiles.wallGathering)))
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvPIdeas.ReactToGasSteal,
@@ -92,14 +88,18 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
 
     // Delay build until scout cleared
     new If(
+
       new Or(
+        new UnitsAtLeast(1, Protoss.CitadelOfAdun),
         new ScoutCleared,
         new FrameAtLeast(GameTime(4, 10)())),
 
       new Parallel(
         new CancelOrders(Protoss.CyberneticsCore),
         new BuildOrder(
+          Get(Protoss.Dragoon),
           Get(Protoss.CitadelOfAdun),
+          Get(2, Protoss.Dragoon),
           Get(Protoss.TemplarArchives),
           Get(2, Protoss.Gateway),
           Get(2, Protoss.DarkTemplar),
@@ -132,10 +132,14 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
           new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),
           new BuildCannonsAtNatural(2))),
 
+    // Do while ejecting scout
     new BuildOrder(
-      Get(1, Protoss.Dragoon),
-      Get(Protoss.AirDamage))),
+      Get(Protoss.Dragoon),
+      Get(Protoss.AirDamage),
+      Get(2, Protoss.Gateway),
+      Get(2, Protoss.Dragoon))),
 
+    new PumpWorkers(oversaturate = true),
     new Pump(Protoss.Dragoon)
   )
 }

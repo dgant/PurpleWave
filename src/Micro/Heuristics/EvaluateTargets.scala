@@ -136,7 +136,7 @@ object EvaluateTargets extends {
       val buildTarget = if (building) target.target else None
       val detects = aidsDetection(target) || buildTarget.exists(aidsDetection)
       if (detects) {
-        output *= 4.0
+        output *= 10.0
       }
     }
 

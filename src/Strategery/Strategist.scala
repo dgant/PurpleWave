@@ -81,7 +81,9 @@ class Strategist {
       With.configuration.strategyRandomness = 0.3
       return StrategySelectionDynamic.chooseBest(strategiesFiltered).toSet
     }
-    Playbook.strategySelectionPolicy.chooseBest(strategiesFiltered).toSet
+    Playbook.strategySelectionPolicy.chooseBestUnfiltered(strategiesUnfiltered).getOrElse(
+      Playbook.strategySelectionPolicy.chooseBest(strategiesFiltered))
+      .toSet
   }
 
   private def filterForcedStrategies(strategies: Iterable[Strategy]): Iterable[Strategy] = {

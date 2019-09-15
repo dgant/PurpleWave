@@ -38,13 +38,14 @@ class TargetAction(val additionalFiltersRequired: TargetFilter*) extends Action 
       unit.matchups.targets.map(target =>
         (target, (filtersOptional ++ filtersRequired).map(filter =>
           (filter.legal(unit, target), filter))))
-    
-    do {
-      val targetsOptional = targetsRequired.filter(target => filtersOptional.forall(_.legal(unit, target)))
-      unit.agent.toAttack = EvaluateTargets.best(unit, targetsOptional)
-      filtersOptional = filtersOptional.drop(1)
+
+    for (filtersOptionalToDrop <- 0 to filtersOptional.length) {
+      if (unit.agent.toAttack.isEmpty) {
+        val filtersOptionalActive = filtersOptional.drop(filtersOptionalToDrop)
+        val targetsOptional = targetsRequired.filter(target => filtersOptionalActive.forall(_.legal(unit, target)))
+        unit.agent.toAttack = EvaluateTargets.best(unit, targetsOptional)
+      }
     }
-    while (unit.agent.toAttack.isEmpty && filtersOptional.nonEmpty)
     
     Unit
   }

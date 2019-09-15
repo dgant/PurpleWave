@@ -576,9 +576,9 @@ object ProtossBuilds {
   val PvZFFE_ForgeCannonNexus = Vector[BuildRequest] (
     Get(8,   Protoss.Probe),
     Get(Protoss.Pylon),
-    Get(10,  Protoss.Probe),
+    Get(11,  Protoss.Probe),
     Get(1,   Protoss.Forge),
-    Get(12,  Protoss.Probe),
+    Get(13,  Protoss.Probe),
     Get(2,   Protoss.PhotonCannon),
     Get(14,  Protoss.Probe),
     Get(2,   Protoss.Nexus))

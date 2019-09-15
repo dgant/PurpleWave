@@ -20,9 +20,7 @@ object BeACarrier extends Action {
 
   protected final def interceptorActive(interceptor: UnitInfo): Boolean = (
     ! interceptor.complete
-    || interceptor.totalHealth < interceptor.unitClass.maxTotalHealth
     || interceptor.order == Orders.InterceptorAttack
-    || interceptor.cooldownLeft > 0
     || With.framesSince(interceptor.lastFrameStartingAttack) < 72
   )
   override protected def perform(unit: FriendlyUnitInfo) {

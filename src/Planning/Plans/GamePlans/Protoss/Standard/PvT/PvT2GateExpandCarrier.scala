@@ -30,8 +30,7 @@ class PvT2GateExpandCarrier extends GameplanTemplate {
         new Not(new EnemyHasShown(Terran.SpiderMine)),
         new Not(new EnemyStrategy(With.fingerprints.twoFac)),
         new Latch(new UnitsAtLeast(4, Protoss.Carrier, complete = true))),
-      super.attackPlan)
-  )
+      new PvTIdeas.PvTAttack))
 
   //override def buildOrder: Seq[BuildRequest] = ProtossBuilds.PvT2GateRangeExpand
   override def buildOrder: Seq[BuildRequest] = ProtossBuilds.PvT1015GateGoon

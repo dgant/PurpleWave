@@ -45,16 +45,16 @@ object Opponents {
   val daqin         : Opponent = add(Opponent("DaQin",        locutus.policy))
   val mcrave        : Opponent = add(Opponent("McRave",       new StrategySelectionRecommended(StrategySelectionGreedy, PvPRobo) { duration = 1 }))
   val metabot       : Opponent = add(Opponent("MegaBot",      new StrategySelectionFixedUnfiltered(PvPRobo)))
-  val skynet        : Opponent = add(Opponent("Skynet",       metabot.policy))
-  val andrewsmith   : Opponent = add(Opponent("Andrew Smith", metabot.policy))
-  val aiur          : Opponent = add(Opponent("Aiur",         metabot.policy))
+  val skynet        : Opponent = add(Opponent("Skynet",       metabot.policy)) // For testing purposes
+  val andrewsmith   : Opponent = add(Opponent("Andrew Smith", metabot.policy)) // For testing purposes
+  val aiur          : Opponent = add(Opponent("Aiur",         metabot.policy)) // For testing purposes
   val richoux       : Opponent = add(Opponent("Florian Richoux",metabot.policy))
   val vajda         : Opponent = add(Opponent("Tomas Vajda",  metabot.policy))
   val ximp          : Opponent = add(Opponent("XIMP",         metabot.policy))
   val microwave     : Opponent = add(Opponent("Microwave",    new StrategySelectionRecommended(StrategySelectionGreedy, PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar)))
   val murph         : Opponent = add(Opponent("Murph",        defaultPvP))
   val ophelia       : Opponent = add(Opponent("Ophelia",      defaultPvZ))
-  val steamhammer   : Opponent = add(Opponent("Steamhammer",  StrategySelectionDynamic))
+  val steamhammer   : Opponent = add(Opponent("Steamhammer",  new StrategySelectionRecommended(StrategySelectionDynamic, PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar)))
   val stormbreaker  : Opponent = add(Opponent("Stormbreaker", defaultPvT))
   val xiaoyi        : Opponent = add(Opponent("XiaoYi",       new StrategySelectionRecommended(StrategySelectionGreedy, PvT13Nexus, PvT2BaseCarrier) { duration = 3 }))
 
@@ -96,7 +96,7 @@ object Opponents {
   val ziabot2           : Opponent = add(Opponent("Zia bot",            ziabot.policy))
   val johankayser       : Opponent = add(Opponent("Johan Kayser",       srbotone.policy))
   val bryanweber        : Opponent = add(Opponent("Bryan Weber",        cunybot.policy))
-  val jadien            : Opponent = add(Opponent("jadien",             StrategySelectionRandom))
+  val jadien            : Opponent = add(Opponent("jadien",             iron.policy))
   
   val all: Vector[Opponent] = allKnown
 }

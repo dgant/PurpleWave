@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Attack, ConsiderAttacking}
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Trigger, _}
 import Planning.Plans.GamePlans.Protoss.Situational.BuildHuggingNexus
 import Planning.Plans.Macro.Automatic.{PumpWorkers, _}
@@ -14,9 +14,9 @@ import Planning.Plans.Macro.Protoss.MeldDarkArchons
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.EnemyBasesAtLeast
+import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeToMoveOut}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.{UnitMatchCustom, UnitMatchOr, UnitMatchSiegeTank, UnitMatchWarriors}
+import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.{PvT1015DT, PvT1015Expand, PvT32Nexus, PvTStove}
 
@@ -26,7 +26,12 @@ object PvTIdeas {
     new If(new Or(new EnemyUnitsNone(Protoss.Observer), new EnemyBasesAtLeast(3)), new Attack(Protoss.DarkTemplar)),
     new Attack(Protoss.Scout),
     new Trigger(new UnitsAtLeast(4, Protoss.Carrier, complete = true), initialAfter = new Attack(Protoss.Carrier)))
-  
+
+  class PvTAttack extends Trigger(
+    new UnitsAtLeast(4, Protoss.Carrier, complete = true),
+    new Attack,
+    new Attack(UnitMatchAnd(UnitMatchRecruitableForCombat, UnitMatchNot(UnitMatchWorkers), UnitMatchNot(Protoss.Carrier))))
+
   class AttackSafely extends If(
     new Or(
       new Latch(new UnitsAtLeast(8, UnitMatchWarriors)),
@@ -40,7 +45,9 @@ object PvTIdeas {
         new Not(new EnemyHasShown(Terran.Vulture)),
         new UnitsAtLeast(12, UnitMatchWarriors, complete = true),
         new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true)),
-      new ConsiderAttacking))
+      new If(
+        new SafeToMoveOut,
+        new PvTAttack)))
 
   class ReactToFiveRaxAs2GateCore extends If(
     new And(

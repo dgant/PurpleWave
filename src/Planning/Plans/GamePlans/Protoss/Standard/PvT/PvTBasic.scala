@@ -4,10 +4,11 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.{Aggression, Attack, EjectScout, Hunt}
+import Planning.Plans.Army.{Aggression, EjectScout, Hunt}
 import Planning.Plans.Compound.{Or, Parallel, _}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
+import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTIdeas.PvTAttack
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
@@ -74,7 +75,7 @@ class PvTBasic extends GameplanTemplate {
       new And(
         new Latch(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true)),
         new BasesAtMost(1)),
-      new Attack),
+      new PvTAttack),
     new If(
       new Or(
         new Not(new Employing(PvTDTExpand, PvT1GateRobo)),

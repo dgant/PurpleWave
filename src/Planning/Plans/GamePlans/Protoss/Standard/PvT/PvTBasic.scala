@@ -192,7 +192,9 @@ class PvTBasic extends GameplanTemplate {
     new If(new UnitsAtLeast(4, Protoss.Zealot),           new UpgradeContinuously(Protoss.ZealotSpeed)),
     new If(new UnitsAtLeast(1, Protoss.ArbiterTribunal),  new Build(Get(Protoss.ArbiterEnergy))),
     new If(
-      new UnitsAtLeast(2, Protoss.Carrier),
+      new And(
+        new EmployingCarriers,
+        new UnitsAtLeast(1, Protoss.Stargate)),
       new Parallel(
         new If(
           new UnitsAtLeast(2, Protoss.CyberneticsCore),

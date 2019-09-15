@@ -13,7 +13,9 @@ abstract class PvPStrategy extends Strategy {
 
 abstract class PvPOpening extends PvPStrategy
 object PvPRobo extends PvPOpening
-object PvP2GateDTExpand extends PvPOpening
+object PvP2GateDTExpand extends PvPOpening {
+  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.twoGate, With.fingerprints.proxyGateway)
+}
 object PvP2Gate1012Goon extends PvPOpening {
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.forgeFe, With.fingerprints.gatewayFe)
 }
@@ -28,7 +30,6 @@ object PvP2GateGoon extends PvPOpening {
 object PvP3GateGoon extends PvPOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
-  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(With.fingerprints.gatewayFe, With.fingerprints.forgeFe, With.fingerprints.robo, With.fingerprints.fourGateGoon)
   override def minimumGamesVsOpponent: Int = 2
 }
 object PvP4GateGoon extends PvPOpening {

@@ -27,7 +27,7 @@ class Configuration {
   var targetWinrate       = 0.8
   var strategyRandomness  = 0.1
   var historyHalfLife     = 300.0
-  var recentFingerprints  = 3
+  var recentFingerprints  = 2
   
   /////////////
   // Battles //

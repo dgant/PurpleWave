@@ -40,7 +40,7 @@ object EvaluateTargets extends {
     totalHealth: Double,
     framesOutOfTheWay: Double,
     dpf: Double = 1.0): Double = {
-    baseTargetValue * dpf / Math.max(1.0, totalHealth) / Math.max(6.0, framesOutOfTheWay)
+    baseTargetValue * dpf / (Math.max(1.0, totalHealth) * Math.max(6.0, framesOutOfTheWay))
   }
 
   def evaluateInner(attacker: FriendlyUnitInfo, target: UnitInfo, recur: Boolean): Double = {
@@ -136,7 +136,7 @@ object EvaluateTargets extends {
       val buildTarget = if (building) target.target else None
       val detects = aidsDetection(target) || buildTarget.exists(aidsDetection)
       if (detects) {
-        output *= 10.0
+        output *= 40.0
       }
     }
 

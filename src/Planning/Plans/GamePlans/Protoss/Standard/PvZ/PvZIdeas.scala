@@ -112,7 +112,7 @@ object PvZIdeas {
         new PumpRatio(Protoss.Dragoon, 0, 10,  Seq(Enemy(Zerg.Mutalisk, 1.25), Friendly(Protoss.Corsair, -1.0))),
         new Pump(Protoss.Stargate, 1),
         new Build(Get(Protoss.DragoonRange)))))
-  
+
   class AddEarlyCannons extends If(
     new And(
       new UnitsAtLeast(1, Protoss.Forge),
@@ -121,26 +121,24 @@ object PvZIdeas {
     new Parallel(
       new PlacementForgeFastExpand,
       new If(
-        new EnemiesAtLeast(1, Zerg.Extractor),
-        new Pump(Protoss.PhotonCannon, 5)),
-      new If(
         new EnemyStrategy(With.fingerprints.fourPool),
         new Parallel(
           new Pump(Protoss.PhotonCannon, 3),
           new PumpWorkers,
           new Pump(Protoss.PhotonCannon, 7))),
+
       new If(
-        new EnemyStrategy(With.fingerprints.ninePool),
-        new Pump(Protoss.PhotonCannon, 3)),
-      new If(
-        new EnemyHasUpgrade(Zerg.ZerglingSpeed),
-        new Pump(Protoss.PhotonCannon, 5)),
-      new PumpRatio(Protoss.PhotonCannon, 1, 8,
-        Seq(
-          Enemy(Zerg.Zergling, 0.3),
-          Enemy(Zerg.Hydralisk, 0.75),
-          Friendly(Protoss.Zealot, -1.0)))))
-  
+        new And(new UnitsAtLeast(1, Protoss.Gateway), new UnitsAtLeast(2, Protoss.Nexus)),
+        new Parallel(
+          new If(new EnemiesAtLeast(1, Zerg.Extractor),         new Pump(Protoss.PhotonCannon, 5)),
+          new If(new EnemyStrategy(With.fingerprints.ninePool), new Pump(Protoss.PhotonCannon, 3)),
+          new If(new EnemyHasUpgrade(Zerg.ZerglingSpeed),       new Pump(Protoss.PhotonCannon, 5)),
+          new PumpRatio(Protoss.PhotonCannon, 1, 8,
+            Seq(
+              Enemy(Zerg.Zergling, 0.3),
+              Enemy(Zerg.Hydralisk, 0.75),
+              Friendly(Protoss.Zealot, -1.0)))))))
+
   class AddGateways extends Parallel(
     new IfOnMiningBases(1, new Build(Get(4, Protoss.Gateway))),
     new IfOnMiningBases(2, new Build(Get(9, Protoss.Gateway))),

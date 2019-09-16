@@ -5,7 +5,7 @@ import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.Aggression
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -55,9 +55,12 @@ class PvZ4Gate extends GameplanTemplate {
   
   override def attackPlan: Plan =
     new If(
-      new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.overpool),
-      new Trigger(new UnitsAtLeast(2, UnitMatchWarriors, complete = true), super.attackPlan),
-      new Trigger(new UnitsAtLeast(8, UnitMatchWarriors, complete = true), super.attackPlan))
+      new UnitsAtLeast(6, Protoss.Dragoon, complete = true),
+      new Attack,
+      new If(
+        new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.overpool),
+        new Trigger(new UnitsAtLeast(2, UnitMatchWarriors, complete = true), super.attackPlan),
+        new Trigger(new UnitsAtLeast(4, UnitMatchWarriors, complete = true), super.attackPlan)))
 
   class RespectMutalisks extends Or(
     new EnemyHasShown(Zerg.Lair),

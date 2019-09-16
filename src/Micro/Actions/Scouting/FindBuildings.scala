@@ -8,7 +8,6 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Traverse
 import Micro.Actions.Combat.Techniques.Avoid
 import Micro.Actions.Commands.Move
-import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import bwapi.Race
 
@@ -40,11 +39,12 @@ abstract class AbstractFindBuildings extends Action {
 
     val suggestedBases = unit.agent.lastIntent.toScoutBases
     val basesToScout = if (suggestedBases.nonEmpty) suggestedBases else
-      With.geography.enemyBases.filter(b => ! b.zone.island && With.intelligence.unitsShown(b.owner, Zerg.SpawningPool) == 0) ++ (
+      With.geography.enemyBases.filter(b => ! b.zone.island) ++ (
         if (With.geography.enemyBases.size == 1)
           With.geography.enemyBases.head.natural.map(Vector(_)).getOrElse(nearestNeutralBases(1))
-        else if (With.geography.enemyBases.size <= With.geography.ourBases.size)
-          nearestNeutralBases(if (With.enemy.isZerg) 5 else 2)
+        // Scout for third bases -- Disabled so we can get a better sense of enemy tech/army size
+        //else if (With.geography.enemyBases.size <= With.geography.ourBases.size)
+        // nearestNeutralBases(if (With.enemy.isZerg) 5 else 2)
         else
           Vector.empty)
   

@@ -35,15 +35,13 @@ object PvP1GateCoreIdeas {
 
   class ZealotBeforeCore extends And(
     new PossibleZealotPressure,
-    new Or(
-      new StartPositionsAtMost(2),
-      new EnemyRecentStrategy(
-        With.fingerprints.workerRush,
-        With.fingerprints.mannerPylon,
-        With.fingerprints.cannonRush,
-        With.fingerprints.proxyGateway,
-        With.fingerprints.twoGate,
-        With.fingerprints.nexusFirst)))
+    new EnemyRecentStrategy(
+      With.fingerprints.workerRush,
+      With.fingerprints.mannerPylon,
+      With.fingerprints.cannonRush,
+      With.fingerprints.proxyGateway,
+      With.fingerprints.twoGate,
+      With.fingerprints.nexusFirst))
 
   class ZealotAfterCore extends Or(
     new EnemyStrategy(

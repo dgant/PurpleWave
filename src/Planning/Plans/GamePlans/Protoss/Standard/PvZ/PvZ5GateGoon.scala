@@ -43,6 +43,7 @@ class PvZ5GateGoon extends GameplanTemplate {
     new EnemiesAtMost(0, Zerg.Hydralisk))
 
   override def buildPlans: Seq[Plan] = Vector(
+    new CapGasAt(400),
     new PvZIdeas.TakeSafeNatural,
     new PvZIdeas.AddEarlyCannons,
     new UpgradeContinuously(Protoss.DragoonRange),

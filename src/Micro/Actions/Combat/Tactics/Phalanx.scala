@@ -54,6 +54,10 @@ object Phalanx extends Action {
       if (unit.matchups.targetsInRange.nonEmpty) {
         Potshot.consider(unit)
       } else if (unit.matchups.framesOfSafety < 24 || (formationDistance < 4 && ! unit.moving)) {
+        // Addressing the case where BW's in-range calculation differs from ours -- this avoids holding position where a unit refuses to fight back
+        if (unit.matchups.framesOfSafety < 2) {
+          Engage.delegate(unit)
+        }
         With.commander.hold(unit)
       } else {
         if (Random.nextInt(10) == 0) {

@@ -1,5 +1,6 @@
 package Strategery.Selection
 
+import Strategery.Benzene
 import Strategery.Strategies.Protoss._
 
 object Opponents {
@@ -68,7 +69,10 @@ object Opponents {
   val iron          : Opponent = add(Opponent("Iron",         new StrategySelectionFixed(PvT2GateRangeExpandCarrier)))
   val saida         : Opponent = add(Opponent("SAIDA",        new StrategySelectionFixed(PvT28Nexus, PvT2BaseCarrier)))
   val ualbertabot   : Opponent = add(Opponent("UAlbertaBot",  fixedPvR))
-  val zzzkbot       : Opponent = add(Opponent("ZZZKBot",      new StrategySelectionFixed(PvZ1BaseForgeTechForced, PvZMidgameNeoBisu, PvZLateGameTemplar)))
+  val zzzkbot       : Opponent = add(Opponent("ZZZKBot",      (if (Benzene.matches)
+    new StrategySelectionFixed(PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar) else
+    new StrategySelectionFixed(PvZ1BaseForgeTechForced, PvZMidgameNeoBisu, PvZLateGameTemplar)
+  )))
 
   // Other tournaments
 
@@ -101,7 +105,7 @@ object Opponents {
   val ziabot2           : Opponent = add(Opponent("Zia bot",            ziabot.policy))
   val johankayser       : Opponent = add(Opponent("Johan Kayser",       srbotone.policy))
   val bryanweber        : Opponent = add(Opponent("Bryan Weber",        cunybot.policy))
-  val jadien            : Opponent = add(Opponent("jadien",             zzzkbot.policy))
+  val jadien            : Opponent = add(Opponent("jadien",             defaultPvZ))
   
   val all: Vector[Opponent] = allKnown
 }

@@ -131,15 +131,15 @@ class SafeToMoveOut extends Predicate {
         1.0 * archons
       + 6.0 * carriers
       + 1.0 * scouts
-      + 1.0 * dragoons
+      + 1.5 * dragoons
       + 1.0 * (zealots + zealotBonusUs)
       + 1.5 * storms
     )
     val groundThem = (
-        1.2 * Math.pow(zerglings, (if (zerglingSpeed) 0.88 else 0.8)) * (if (zerglingAspd) 1.5 else 1.0)
-      + 3 * hydralisks
-      + 8 * ultralisks
-      + 6 * defilers
+        0.6 * Math.pow(zerglings, (if (zerglingSpeed) 0.88 else 0.8)) * (if (zerglingAspd) 1.5 else 1.0)
+      + 1.5 * hydralisks
+      + 8.0 * ultralisks
+      + 6.0 * defilers
     )
   
     val safeInAir     = airThem     == 0 || airThem     <= airUs     * With.blackboard.aggressionRatio()

@@ -1,6 +1,6 @@
 package Strategery.Selection
 
-import Strategery.Benzene
+import Strategery.{Benzene, Heartbreak}
 import Strategery.Strategies.Protoss._
 
 object Opponents {
@@ -65,7 +65,7 @@ object Opponents {
   val xiaoyi        : Opponent = add(Opponent("XiaoYi",       new StrategySelectionRecommended(StrategySelectionGreedy, PvT13Nexus, PvT2BaseCarrier) { duration = 3 }))
 
   // Returning AIIDE opponents
-  val cse           : Opponent = add(Opponent("CSE",          new StrategySelectionFixed(PvP2GateDTExpand)))
+  val cse           : Opponent = add(Opponent("CSE",          (if (Heartbreak.matches) new StrategySelectionFixed(PvP2Gate1012DT) else new StrategySelectionFixed(PvP2GateDTExpand))))
   val iron          : Opponent = add(Opponent("Iron",         new StrategySelectionFixed(PvT2GateRangeExpandCarrier)))
   val saida         : Opponent = add(Opponent("SAIDA",        new StrategySelectionFixed(PvT28Nexus, PvT2BaseCarrier)))
   val ualbertabot   : Opponent = add(Opponent("UAlbertaBot",  fixedPvR))

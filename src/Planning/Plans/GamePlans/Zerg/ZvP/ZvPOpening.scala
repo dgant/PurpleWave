@@ -103,6 +103,7 @@ class ZvPOpening extends GameplanTemplate {
 
         new RequireMiningBases(2),
 
+        // If -- vs. Nexus-first
         new If(
           new EnemyStrategy(With.fingerprints.nexusFirst),
           new If(
@@ -120,7 +121,8 @@ class ZvPOpening extends GameplanTemplate {
               new Pump(Zerg.Drone, 13),
               new RequireMiningBases(3),
               new Pump(Zerg.Drone))),
-        // Else
+
+        // Else -- vs. Forge FE
         new If(
           new EnemyStrategy(With.fingerprints.forgeFe),
           new Parallel(
@@ -129,7 +131,7 @@ class ZvPOpening extends GameplanTemplate {
             new Pump(Zerg.Drone),
             new Build(Get(Zerg.SpawningPool))),
 
-        // Else
+        // Else -- vs. Gateway FE
         new If(
           new EnemyStrategy(With.fingerprints.gatewayFe),
           new Parallel(
@@ -139,7 +141,7 @@ class ZvPOpening extends GameplanTemplate {
             new RequireMiningBases(3),
             new Pump(Zerg.Drone)),
 
-        // Else
+        // Else -- vs. 1 Gate Core
         new If(
           new EnemyStrategy(With.fingerprints.oneGateCore),
           new Parallel(
@@ -155,7 +157,7 @@ class ZvPOpening extends GameplanTemplate {
               Get(Zerg.ZerglingSpeed)),
             new RequireMiningBases(3)),
 
-        // Else
+        // Else -- vs. 2-Gate / Unknown
         new Parallel(
           new BuildOrder(Get(Zerg.SpawningPool)),
           new PumpRatio(Zerg.Drone, 9, 15, Seq(Flat(9), Friendly(Zerg.SunkenColony, 2))),
@@ -168,17 +170,16 @@ class ZvPOpening extends GameplanTemplate {
                 Get(Zerg.Extractor),
                 Get(Zerg.ZerglingSpeed)),
               new Pump(Zerg.Zergling))),
-          new RequireMiningBases(3),
           new Pump(Zerg.Drone, 18),
           new Pump(Zerg.Mutalisk),
-          new Pump(Zerg.Drone),
-          // In case we get stuck in our base, add Mutalisks
           new Build(
+            Get(Zerg.Extractor),
             Get(Zerg.Lair),
             Get(Zerg.Spire)),
           new If(
             new UnitsAtLeast(1, Zerg.Spire),
-            new Build(Get(2, Zerg.Extractor)))
+            new Build(Get(2, Zerg.Extractor))),
+          new RequireMiningBases(3),
         ))))))
     )
   )

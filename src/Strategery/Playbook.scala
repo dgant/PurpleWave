@@ -64,7 +64,7 @@ class AIIDEPlaybook extends PurpleWavePlaybook {
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvP2Gate1012DT)
+  override lazy val forced: Seq[Strategy] = Seq(ZvP12Hatch, ZvPReactiveBust)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
   override def respectOpponent: Boolean = false
   override def respectMap: Boolean = false
@@ -80,4 +80,4 @@ class HumanPlaybook extends PurpleWavePlaybook {
   ))
 }
 
-object Playbook extends AIIDEPlaybook {}
+object Playbook extends TestingPlaybook {}

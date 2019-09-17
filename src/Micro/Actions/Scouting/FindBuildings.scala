@@ -40,7 +40,7 @@ abstract class AbstractFindBuildings extends Action {
     val suggestedBases = unit.agent.lastIntent.toScoutBases
     val basesToScout = if (suggestedBases.nonEmpty) suggestedBases else
       With.geography.enemyBases.filter(b => ! b.zone.island) ++ (
-        if (With.geography.enemyBases.size == 1)
+        if (With.geography.enemyBases.size == 1 && unit.matchups.threats.forall(_.unitClass.isWorker))
           With.geography.enemyBases.head.natural.map(Vector(_)).getOrElse(nearestNeutralBases(1))
         // Scout for third bases -- Disabled so we can get a better sense of enemy tech/army size
         //else if (With.geography.enemyBases.size <= With.geography.ourBases.size)

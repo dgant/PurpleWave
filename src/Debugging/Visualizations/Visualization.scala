@@ -28,11 +28,7 @@ class Visualization {
     ShowUnitsForeign,
     ShowExplosions,
     ShowStatus,
-    //ShowBattle,
     ShowPerformanceSummary,
-    ShowZones,
-    ShowZonePathDemo
-
   )
 
   var enabled   : Boolean = _

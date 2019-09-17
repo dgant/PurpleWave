@@ -11,8 +11,8 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Scouting.CampExpansions
-import Planning.Predicates.Compound.Check
-import Planning.Predicates.Milestones.UnitsAtLeast
+import Planning.Predicates.Compound.{Check, Not}
+import Planning.Predicates.Milestones.{EnemyHasShown, UnitsAtLeast}
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
 
@@ -56,13 +56,20 @@ class ZvPLateGame extends GameplanTemplate {
     new CapGasAt(800),
     new CampExpansions(Zerg.Zergling),
 
+    // Basic tech
     new Pump(Zerg.Drone, 18),
     new Build(
       Get(Zerg.SpawningPool),
-      Get(Zerg.Lair),
-      Get(Zerg.OverlordSpeed),
-      Get(Zerg.Burrow)),
+      Get(Zerg.Lair)),
+    new If(
+      new EnemyHasShown(Protoss.Corsair),
+      new Parallel(
+        new Build(Get(Zerg.Spire)),
+        new ZvPIdeas.PumpScourgeAgainstAir)), // Critical for defense
     new RequireMiningBases(2),
+    new Build(Get(Zerg.OverlordSpeed)),
+    new If(new Not(new EnemyHasShown(Protoss.Observer)), new Build(Get(Zerg.Burrow))),
+
     new If(new UnitsAtLeast(18, Zerg.Hydralisk),  new Pump(Zerg.Drone, 30)),
     new If(new UnitsAtLeast(30, Zerg.Hydralisk),  new Pump(Zerg.Drone, 50)),
     new If(new UnitsAtLeast(24, Zerg.Zergling),   new Pump(Zerg.Drone, 30)),
@@ -77,8 +84,8 @@ class ZvPLateGame extends GameplanTemplate {
         Get(Zerg.UltraliskSpeed),
         Get(4, Zerg.Ultralisk),
         Get(Zerg.UltraliskArmor))),
-    new Pump(Zerg.Ultralisk),
-    new PumpRatio(Zerg.Scourge, 0, 8, Seq(Enemy(Protoss.Corsair, 2.0))),
+
+    // Tech: Zergling + Defiler
     new If(
       new GoZerglingDefiler,
       new Parallel(
@@ -98,6 +105,8 @@ class ZvPLateGame extends GameplanTemplate {
         new UpgradeContinuously(Zerg.GroundArmor),
         new UpgradeContinuously(Zerg.GroundMeleeDamage)
       )),
+
+    // Tech: Zergling + Mutalisk
     new If(
       new GoZerglingMutalisk,
       new Parallel(
@@ -113,11 +122,14 @@ class ZvPLateGame extends GameplanTemplate {
           Get(Zerg.ZerglingAttackSpeed),
           Get(Zerg.GroundMeleeDamage)),
         new UpgradeContinuously(Zerg.GroundMeleeDamage))),
+
+    // Tech: Hydralisk + Lurker
     new If(
       new GoHydraliskLurker,
       new Parallel(
         new Pump(Zerg.Lurker),
         new Build(
+          Get(Zerg.HydraliskDen),
           Get(Zerg.HydraliskSpeed),
           Get(Zerg.HydraliskRange),
           Get(Zerg.LurkerMorph)),
@@ -125,22 +137,29 @@ class ZvPLateGame extends GameplanTemplate {
         new Build(Get(2, Zerg.EvolutionChamber)),
         new UpgradeContinuously(Zerg.GroundArmor),
         new UpgradeContinuously(Zerg.GroundRangeDamage))),
+
+    // Tech: Pure Hydralisk
     new If(
       new GoHydraliskOnly,
       new Parallel(
         new Build(
+          Get(Zerg.HydraliskDen),
           Get(Zerg.HydraliskSpeed),
           Get(Zerg.HydraliskRange)),
         new PumpRatio(Zerg.Hydralisk, 18, 60, Seq(Enemy(UnitMatchWarriors, 2.5))),
         new Build(Get(2, Zerg.EvolutionChamber)),
         new UpgradeContinuously(Zerg.GroundArmor),
         new UpgradeContinuously(Zerg.GroundRangeDamage))),
+
+    // Economy
     new Pump(Zerg.Drone, 65),
     new RequireMiningBases(4),
     new Build(Get(6, Zerg.Hatchery)),
     new RequireMiningBases(5),
     new Pump(Zerg.Hatchery, 9, maximumConcurrently = 2),
     new BuildGasPumps,
+
+    // Army
     new If(
       new Or(new GoZerglingDefiler, new GoZerglingMutalisk),
       new Parallel(

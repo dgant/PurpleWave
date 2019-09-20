@@ -4,14 +4,16 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Performance.Cache
 import Planning.Plan
-import Planning.Plans.Basic.NoPlan
+import Planning.Plans.Basic.{NoPlan, WriteStatus}
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.Zerg.ZergIdeas.UpgradeHydraSpeedThenRange
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Scouting.CampExpansions
 import Planning.Predicates.Compound.{Check, Not}
+import Planning.Predicates.Economy.GasAtMost
 import Planning.Predicates.Milestones.{EnemyHasShown, UnitsAtLeast}
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -67,8 +69,8 @@ class ZvPLateGame extends GameplanTemplate {
         new Build(Get(Zerg.Spire)),
         new ZvPIdeas.PumpScourgeAgainstAir)), // Critical for defense
     new RequireMiningBases(2),
-    new Build(Get(Zerg.OverlordSpeed)),
-    new If(new Not(new EnemyHasShown(Protoss.Observer)), new Build(Get(Zerg.Burrow))),
+    new If(new UnitsAtLeast(40, Zerg.Drone), new Build(Get(Zerg.OverlordSpeed))),
+    new If(new UnitsAtLeast(40, Zerg.Drone), new If(new Not(new EnemyHasShown(Protoss.Observer)), new Build(Get(Zerg.Burrow)))),
 
     new If(new UnitsAtLeast(18, Zerg.Hydralisk),  new Pump(Zerg.Drone, 30)),
     new If(new UnitsAtLeast(30, Zerg.Hydralisk),  new Pump(Zerg.Drone, 50)),
@@ -89,6 +91,7 @@ class ZvPLateGame extends GameplanTemplate {
     new If(
       new GoZerglingDefiler,
       new Parallel(
+        new WriteStatus("Ling-Defiler"),
         // new Pump(Zerg.Defiler, 3),
         new PumpRatio(Zerg.Extractor, 0, 99, Seq(Friendly(Zerg.Drone, 0.1))),
         new PumpRatio(Zerg.Zergling, 24, 60, Seq(Enemy(UnitMatchWarriors, 7.0))),
@@ -110,6 +113,7 @@ class ZvPLateGame extends GameplanTemplate {
     new If(
       new GoZerglingMutalisk,
       new Parallel(
+        new WriteStatus("Ling-Muta"),
         new Pump(Zerg.Mutalisk),
         new PumpRatio(Zerg.Extractor, 0, 99, Seq(Friendly(Zerg.Drone, 0.1))),
         new PumpRatio(Zerg.Zergling, 18, 30, Seq(Enemy(UnitMatchWarriors, 6.0))),
@@ -127,14 +131,16 @@ class ZvPLateGame extends GameplanTemplate {
     new If(
       new GoHydraliskLurker,
       new Parallel(
+        new WriteStatus("Hydra-Lurker"),
+        new CapGasAt(400),
         new Pump(Zerg.Lurker),
-        new Build(
-          Get(Zerg.HydraliskDen),
-          Get(Zerg.HydraliskSpeed),
-          Get(Zerg.HydraliskRange),
-          Get(Zerg.LurkerMorph)),
+        new Build(Get(Zerg.HydraliskDen)),
+        new UpgradeHydraSpeedThenRange,
+        new Build(Get(Zerg.LurkerMorph)),
         new PumpRatio(Zerg.Hydralisk, 18, 60, Seq(Enemy(UnitMatchWarriors, 2.0))),
-        new Build(Get(2, Zerg.EvolutionChamber)),
+        new If(
+          new UnitsAtLeast(50, Zerg.Drone),
+          new Build(Get(2, Zerg.EvolutionChamber))),
         new UpgradeContinuously(Zerg.GroundArmor),
         new UpgradeContinuously(Zerg.GroundRangeDamage))),
 
@@ -142,10 +148,10 @@ class ZvPLateGame extends GameplanTemplate {
     new If(
       new GoHydraliskOnly,
       new Parallel(
-        new Build(
-          Get(Zerg.HydraliskDen),
-          Get(Zerg.HydraliskSpeed),
-          Get(Zerg.HydraliskRange)),
+        new WriteStatus("Hydralisk Only"),
+        new CapGasAt(250),
+        new Build(Get(Zerg.HydraliskDen)),
+        new UpgradeHydraSpeedThenRange,
         new PumpRatio(Zerg.Hydralisk, 18, 60, Seq(Enemy(UnitMatchWarriors, 2.5))),
         new Build(Get(2, Zerg.EvolutionChamber)),
         new UpgradeContinuously(Zerg.GroundArmor),
@@ -153,9 +159,12 @@ class ZvPLateGame extends GameplanTemplate {
 
     // Economy
     new Pump(Zerg.Drone, 65),
+    new BuildGasPumps(2),
     new RequireMiningBases(4),
+    new BuildGasPumps(3),
     new Build(Get(6, Zerg.Hatchery)),
     new RequireMiningBases(5),
+    new If(new GasAtMost(400), new BuildGasPumps),
     new Pump(Zerg.Hatchery, 9, maximumConcurrently = 2),
     new BuildGasPumps,
 

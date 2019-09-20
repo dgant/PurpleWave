@@ -19,7 +19,7 @@ class UnitsAtLeast(
         With.units.countOurs(UnitMatchAnd(UnitMatchComplete, matcher))
       }
       else if (countEggs) {
-        With.units.ours.count(u => u.is(matcher) || (u.isAny(Zerg.Egg, Zerg.LurkerEgg) && u.buildType == matcher))
+        With.units.ours.count(u => u.is(matcher) || (u.isAny(Zerg.Egg, Zerg.LurkerEgg, Zerg.Cocoon) && u.buildType == matcher))
       }
       else {
         With.units.countOurs(matcher)

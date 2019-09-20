@@ -65,9 +65,23 @@ abstract class PlayerProxy(base:Player) {
   private val mineralsCache           = new Cache(() => base.minerals)
   private val gatheredGasCache        = new Cache(() => base.gatheredGas)
   private val gatheredMineralsCache   = new Cache(() => base.gatheredMinerals)
-  private val supplyUsedCache         = new Cache(() => if (!isUs) 0 else               With.units.ours.toSeq.filter(u =>               u.unitClass.race == raceInitial).map(_.unitClass.supplyRequired).sum)
-  private val supplyTotalCache        = new Cache(() => if (!isUs) 0 else Math.min(400, With.units.ours.toSeq.filter(u => u.complete && u.unitClass.race == raceInitial).map(_.unitClass.supplyProvided).sum))
   private val unitsCache              = new Cache(() => base.getUnits.asScala)
   private val upgradeLevelCaches      = new mutable.HashMap[Upgrade, Cache[Int]]
   private val techsResearchedCaches   = new mutable.HashMap[Tech, Cache[Boolean]]
+
+  private val supplyUsedCache = new Cache(() => if (!isUs) 0 else
+    With.units.ours
+      .view
+      .withFilter(u => u.unitClass.race == raceInitial)
+      .map(u => if (u.morphing) u.buildType.supplyRequired else u.unitClass.supplyRequired)
+      .sum)
+
+  private val supplyTotalCache = new Cache(() => if (!isUs) 0 else
+    Math.min(
+      400,
+      With.units.ours
+        .view
+        .withFilter(u => u.complete && u.unitClass.race == raceInitial)
+        .map(_.unitClass.supplyProvided)
+        .sum))
 }

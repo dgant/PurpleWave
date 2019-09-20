@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.{Aggression, AllIn}
+import Planning.Plans.Army.{Aggression, AllIn, Attack}
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
@@ -15,7 +15,7 @@ import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyBasesAtLeast
-import Planning.Predicates.Strategy.EnemyStrategy
+import Planning.Predicates.Strategy.{EnemyIsZerg, EnemyStrategy}
 import ProxyBwapi.Races.Zerg
 
 class ZvE9Pool2HatchSpeed extends GameplanTemplate {
@@ -34,6 +34,11 @@ class ZvE9Pool2HatchSpeed extends GameplanTemplate {
   override def aggressionPlan: Plan = new If(
     new UpgradeComplete(Zerg.ZerglingSpeed),
     new Aggression(1.5))
+
+  override def attackPlan: Plan = new If(
+    new EnemyIsZerg,
+    super.attackPlan,
+    new Attack)
 
   override val buildOrder = Seq(
     Get(9, Zerg.Drone),

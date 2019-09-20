@@ -22,24 +22,29 @@ import Strategery.Strategies.Zerg.{ZvPHydraBust, ZvPMutaliskBust, ZvPReactiveBus
 
 class ZvPMain extends GameplanTemplate {
 
-  override val activationCriteria: Predicate = new Employing(ZvPReactiveBust, ZvPHydraBust)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(5, Zerg.Hatchery))
 
   override def scoutPlan: Plan = new ScoutSafelyWithOverlord
   override def attackPlan: Plan = new ZvPIdeas.AttackPlans
 
-  class AttemptZerglingBust extends Or(
-    new Employing(ZvPZerglingBust),
-    new And(
-      new Employing(ZvPReactiveBust),
-      new EnemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.oneGateCore)))
+  class AttemptZerglingBust extends And(
+    new UnitsAtMost(0, Zerg.Lair),
+    new UnitsAtMost(0, Zerg.Spire),
+    new Or(
+      new Employing(ZvPZerglingBust),
+      new And(
+        new Employing(ZvPReactiveBust),
+        new EnemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.oneGateCore))))
 
-  class AttemptHydraliskBust extends Or(
-    new Employing(ZvPHydraBust),
-    new And(
-      new Employing(ZvPReactiveBust),
-      new EnemyStrategy(With.fingerprints.forgeFe),
-      new EnemiesAtMost(1, Protoss.PhotonCannon, complete = true)))
+  class AttemptHydraliskBust extends And(
+    new UnitsAtMost(0, Zerg.Lair),
+    new UnitsAtMost(0, Zerg.Spire),
+    new Or(
+      new Employing(ZvPHydraBust),
+      new And(
+        new Employing(ZvPReactiveBust),
+        new EnemyStrategy(With.fingerprints.forgeFe),
+        new EnemiesAtMost(1, Protoss.PhotonCannon, complete = true))))
 
   class AttemptMutaliskBust extends Or(
     new Employing(ZvPMutaliskBust),
@@ -51,6 +56,7 @@ class ZvPMain extends GameplanTemplate {
 
   class DoZerglingBust extends Parallel(
     new WriteStatus("Zergling Bust"),
+
     new BuildOrder(
       Get(Zerg.Extractor),
       Get(Zerg.ZerglingSpeed)),
@@ -59,7 +65,10 @@ class ZvPMain extends GameplanTemplate {
       new EnemiesAtLeast(1, UnitMatchOr(Protoss.Stargate, Protoss.Corsair, Protoss.Scout)),
       new Parallel(
         new Build(Get(Zerg.Lair), Get(Zerg.Spire)),
-        new ZvPIdeas.PumpScourgeAgainstAir)),
+        new ZvPIdeas.PumpScourgeAgainstAir),
+      new If(
+        new GasForUpgrade(Zerg.ZerglingSpeed),
+        new CapGasAt(0))),
     new If(
       new EnemyHasShown(Protoss.DarkTemplar),
       new UpgradeContinuously(Zerg.OverlordSpeed)),
@@ -97,8 +106,8 @@ class ZvPMain extends GameplanTemplate {
         Get(29, Zerg.Drone),
         Get(6, Zerg.Overlord)),
       new BuildOrder(
-        Get(18, Zerg.Drone),
-        Get(6, Zerg.Overlord))),
+        Get(23, Zerg.Drone),
+        Get(5, Zerg.Overlord))),
 
     new Pump(Zerg.Mutalisk),
     new Pump(Zerg.Zergling, 12),
@@ -109,9 +118,9 @@ class ZvPMain extends GameplanTemplate {
     new PumpWorkers,
     new Pump(Zerg.Zergling)))
 
-
-
   class DoFiveHatch extends Parallel(
+    new WriteStatus("5-Hatch"),
+
     // Get just enough army to defend while we go five Hatch
     new If(
       new And(
@@ -132,14 +141,11 @@ class ZvPMain extends GameplanTemplate {
     new PumpRatio(Zerg.Zergling, 12, 24, Seq(Enemy(UnitMatchWarriors, 4.0), Friendly(Zerg.Hydralisk, -4.0), Friendly(Zerg.Mutalisk, -7.0))),
 
     new PumpWorkers,
-    new Trigger(
-      new UnitsAtLeast(1, Zerg.Spire),
-      new Build(
-        Get(Zerg.HydraliskDen),
-        Get(Zerg.HydraliskSpeed),
-        Get(Zerg.HydraliskRange),
-        Get(5, Zerg.Hatchery),
-        Get(Zerg.OverlordSpeed)))
+    new Build(
+      Get(Zerg.HydraliskDen),
+      Get(Zerg.HydraliskSpeed),
+      Get(Zerg.HydraliskRange),
+      Get(5, Zerg.Hatchery))
   )
 
   override def buildPlans: Seq[Plan] = Seq(

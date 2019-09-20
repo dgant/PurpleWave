@@ -1,7 +1,7 @@
 package Debugging.Visualizations
 
 import Debugging.Visualizations.Views.Battles.{ShowBattle, ShowClustering}
-import Debugging.Visualizations.Views.Economy.{ShowEconomy, ShowScheduler}
+import Debugging.Visualizations.Views.Economy.{ShowEconomy, ShowProduction, ShowScheduler}
 import Debugging.Visualizations.Views.Fun._
 import Debugging.Visualizations.Views.Geography._
 import Debugging.Visualizations.Views.Micro._
@@ -29,6 +29,7 @@ class Visualization {
     ShowExplosions,
     ShowStatus,
     ShowPerformanceSummary,
+    ShowProduction
   )
 
   var enabled   : Boolean = _
@@ -127,6 +128,7 @@ class Visualization {
     ShowUnitsFriendly,
     ShowPerformanceDetails,
     ShowPerformanceSummary,
+    ShowProduction,
     ShowPlans,
     ShowReactionTime,
     ShowResources,

@@ -72,7 +72,8 @@ abstract class GameplanTemplate extends GameplanMode {
     if ( ! initialized) {
       initialized = true
       children.set(
-        Vector(placementPlan)
+        Vector(statusPlan)
+          ++ Vector(placementPlan)
           ++ Vector(new RequireEssentials)
           ++ emergencyPlans
           ++ Vector(buildOrderPlan)
@@ -81,7 +82,6 @@ abstract class GameplanTemplate extends GameplanMode {
           ++ buildPlans
           ++ Vector(
             archonPlan,
-            statusPlan,
             new ClearBurrowedBlockers,
             new FollowBuildOrder,
             new RemoveMineralBlocksAt(removeMineralBlocksAt))

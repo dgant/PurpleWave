@@ -22,6 +22,7 @@ object Spread extends ActionTechnique {
     && unit.flying
     && unit.matchups.allies.exists(isValidAlly)
     && unit.matchups.enemies.exists(isValidEnemy)
+    && ! unit.unitClass.suicides
   )
   
   override val activator: Activator = new WeightedMax(this)

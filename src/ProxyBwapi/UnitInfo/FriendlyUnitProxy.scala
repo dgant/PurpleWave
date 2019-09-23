@@ -107,7 +107,7 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   private val isGatheringMineralsCache  = new Cache(() => base.isGatheringMinerals)
   private val isGatheringGasCache       = new Cache(() => base.isGatheringGas)
   
-  private val badPositions = Vector(Position.Invalid, Position.None, Position.Unknown)
+  private val badPositions = Vector(null, Position.Invalid, Position.None, Position.Unknown)
   
   def target            : Option[UnitInfo]  = targetCache()
   def targetPixel       : Option[Pixel]     = targetPixelCache()

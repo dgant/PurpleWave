@@ -52,6 +52,7 @@ object Paradrop extends Action {
     unit.agent.toTravel = Some(destination.pixelCenter)
 
     val profile = new PathfindProfile(unit.tileIncludingCenter)
+    // TODO: For endDistanceMaximum we want to use GROUND distance, or at least verify that the tiles are easily connected (so we stop dropping Reavers on Andromeda islands
     def targetDistance: Float = (unit.effectiveRangePixels + (if (unit.unitClass != Protoss.HighTemplar) unit.topSpeed * unit.cooldownLeft else 0)).toFloat / 32f
     profile.end                 = Some(destination)
     profile.endDistanceMaximum  =

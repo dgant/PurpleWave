@@ -7,6 +7,7 @@ import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, PotshotAsSoonAsP
 import Micro.Actions.Commands.Attack
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.ByOption
 
 object Abuse extends ActionTechnique {
   
@@ -25,6 +26,28 @@ object Abuse extends ActionTechnique {
   )
   
   override val activator = new WeightedMin(this)
+
+  override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
+    lazy val defenders        = unit.matchups.threats.view.filter(t => t.matchups.threats.isEmpty || t.pixelRangeAgainst(unit) >= unit.effectiveRangePixels)
+    lazy val targets          = unit.matchups.targets.view.filter(t => ! t.canAttack(unit) || unit.pixelRangeAgainst(t) > t.pixelRangeAgainst(unit))
+    lazy val defenderNearest  = ByOption.minBy(defenders)(_.pixelDistanceEdge(unit))
+    lazy val targetNearest    = ByOption.minBy(targets)(_.pixelDistanceEdge(unit))
+
+    if (targetNearest.isEmpty) return 0.0
+    if (defenderNearest.isEmpty) return 1.0
+    if (ByOption.maxBy(unit.matchups.framesOfEntanglementPerThreat)(_._2).map(_._1).forall(threat =>
+      unit.canAttack(threat)
+      && unit.inRangeToAttack(threat)
+      && threat.pixelRangeAgainst(unit) + 32 * 2 < unit.pixelRangeAgainst(threat))) return 1.0
+
+    val target = targetNearest.get
+    val defender = defenderNearest.get
+
+    val pixelsOutsideRangeUs      = unit.pixelDistanceEdge(defender)  - defender.pixelRangeAgainst(unit)
+    val pixelsOutsideRangeTarget  = unit.pixelDistanceEdge(target)    - unit.pixelRangeAgainst(target)
+    val output = if (pixelsOutsideRangeUs > 32 + pixelsOutsideRangeTarget) 1.0 else 0.0
+    output
+  }
   
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
     if (other.isFriendly) return None

@@ -1,28 +1,38 @@
 package Micro.Actions.Combat.Techniques
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Mathematics.PurpleMath
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
-import Micro.Actions.Combat.Techniques.Common.Activators.One
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.ByOption
 
 object Ignore extends ActionTechnique {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.canMove
-    && (unit.flying || ! unit.zone.edges.exists(_.contains(unit.pixelCenter)))
-    && (unit.flying || With.coordinator.gridPathOccupancy.get(unit.tileIncludingCenter) <= 0)
-  )
-  
-  override val activator = One
-  
-  override def applicabilitySelf(unit: FriendlyUnitInfo): Double = (
-    PurpleMath.clamp(unit.matchups.maxTilesOfInvisibility / 3, 1, 4)
-    * (if (unit.squad.exists(_.enemies.forall( ! unit.matchups.threats.contains(_)))) 2.0 else 1.0)
-    * unit.matchups.framesOfSafety
-    / GameTime(0, 12)()
-  )
-  
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
+    lazy val adjacentTiles    = unit.tileIncludingCenter.toRectangle.expand(1, 1).tiles.filter(_.valid)
+    lazy val ground           = ! unit.flying
+    lazy val blockingChoke    = ground && adjacentTiles.exists(tile => tile.zone.edges.exists(_.contains(tile.pixelCenter)))
+    lazy val blockingPath     = ground && adjacentTiles.exists(With.coordinator.gridPathOccupancy.get(_) > 0)
+    lazy val blockingNeighbor = ground && adjacentTiles.exists(With.grids.units.get(_).exists(neighbor => neighbor.friendly.exists(ally => ! ally.flying && ally.canBeIgnorantOfCombat)))
+    lazy val canIgnore        = unit.canBeIgnorantOfCombat
+    val output                = unit.canMove && canIgnore && ! blockingChoke && ! blockingNeighbor
+    output
+  }
+
+  def threatBuffer(unit: FriendlyUnitInfo, threat: UnitInfo): Double = {
+    val safetyBuffer  = 32 * 3
+    val distance      = threat.pixelDistanceEdge(unit)
+    val range         = threat.pixelRangeAgainst(unit)
+    val gapClosed     = 24 * Math.max(0, threat.topSpeed - unit.topSpeed)
+    val output        = distance - range - gapClosed - safetyBuffer
+    output
+  }
+
+  def ignoranceBuffer(unit: FriendlyUnitInfo): Double = {
+    val threatBuffers   = unit.matchups.threats.view.map(threatBuffer(unit, _))
+    val threatBufferMin = ByOption.min(threatBuffers).getOrElse(0.0)
+    val output          = threatBufferMin - unit.effectiveRangePixels / 3
+    output
+  }
+
   override protected def perform(unit: FriendlyUnitInfo): Unit = {}
 }

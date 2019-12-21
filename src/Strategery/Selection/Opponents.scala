@@ -22,7 +22,7 @@ object Opponents {
   val bananabrain   : Opponent = add(Opponent("BananaBrain",  defaultPvP))
   val styxz         : Opponent = add(Opponent("StyxZ",        new StrategySelectionFixed(PvZ4Gate1012, PvZMidgame5GateGoon, PvZLateGameTemplar)))
   val haopan        : Opponent = add(Opponent("Hao Pan",      defaultPvT))
-  val killerbot     : Opponent = add(Opponent("Killerbot",    new StrategySelectionFixed(PvZFFEEconomic, PvZMidgameCorsairReaverGoon, PvZLateGameReaver)))
+  val killerbot     : Opponent = add(Opponent("Killerbot",    new StrategySelectionFixed(PvZFFEEconomic, PvZMidgame5GateGoonReaver, PvZLateGameReaver)))
   val mariandevecka : Opponent = add(Opponent("Marian Devecka", killerbot.policy))
   val cherrypi      : Opponent = add(Opponent("CherryPiSSCAIT2017",
     if (MapGroups.badForProxying.exists(_.matches))
@@ -111,7 +111,7 @@ object Opponents {
   val ziabot2           : Opponent = add(Opponent("Zia bot",            ziabot.policy))
   val johankayser       : Opponent = add(Opponent("Johan Kayser",       srbotone.policy))
   val bryanweber        : Opponent = add(Opponent("Bryan Weber",        cunybot.policy))
-  val jadien            : Opponent = add(Opponent("jadien",             defaultPvZ))
+  val jadien            : Opponent = add(Opponent("jadien",             StrategySelectionRandom))
   
   val all: Vector[Opponent] = allKnown
 }

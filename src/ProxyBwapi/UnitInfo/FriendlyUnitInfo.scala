@@ -2,6 +2,7 @@ package ProxyBwapi.UnitInfo
 
 import Information.Grids.Combat.AbstractGridEnemyRange
 import Lifecycle.With
+import Micro.Actions.Combat.Techniques.Ignore
 import Micro.Agency.Agent
 import Micro.Squads.Squad
 import Performance.Cache
@@ -101,4 +102,8 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
       With.grids.enemyRangeAir
     else
       With.grids.enemyRangeGround
+
+  // Cached values for Ignore
+  def canBeIgnorantOfCombat = combatIgnoranceBuffer() > 0
+  val combatIgnoranceBuffer = new Cache(() => Ignore.ignoranceBuffer(this))
 }

@@ -54,12 +54,9 @@ class PvZFFE extends GameplanTemplate {
             new BuildOrder(ProtossBuilds.PvZFFE_NexusGatewayForge: _*),
             new BuildOrder(ProtossBuilds.PvZFFE_NexusForgeCannons: _*)),
           new If(
-            new EnemyStrategy(With.fingerprints.twelvePool),
-            new BuildOrder(ProtossBuilds.PvZFFE_NexusForgeCannons: _*),
-            new If(
-              new EnemyStrategy(With.fingerprints.overpool),
-              new BuildOrder(ProtossBuilds.PvZFFE_ForgeNexusCannon: _*),
-              new BuildOrder(ProtossBuilds.PvZFFE_ForgeCannonNexus: _*)))))))
+            new EnemyStrategy(With.fingerprints.overpool, With.fingerprints.twelvePool),
+            new BuildOrder(ProtossBuilds.PvZFFE_ForgeNexusCannon: _*),
+            new BuildOrder(ProtossBuilds.PvZFFE_ForgeCannonNexus: _*))))))
   
   override def emergencyPlans: Seq[Plan] = Seq(
     new If(

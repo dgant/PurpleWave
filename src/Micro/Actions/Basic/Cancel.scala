@@ -20,7 +20,7 @@ object Cancel extends Action {
     lazy val canCancel        = unit.isAny(UnitMatchBuilding, Zerg.LurkerEgg, Zerg.Egg, Zerg.Cocoon) // Performance hack to avoid accessing .training, etc.
     lazy val producing        = unit.training || unit.upgrading || unit.teching
     lazy val beingBorn        = unit.remainingCompletionFrames > 0
-    lazy val isDecoy          = unit.unitClass.attacks && unit.matchups.allies.exists(_.isBeingViolent) // Is this correct?
+    lazy val isDecoy          = (unit.unitClass.attacks || unit.is(Zerg.CreepColony)) && unit.matchups.allies.exists(_.isBeingViolent) // Is this correct?
     lazy val shouldCancel     = (unpowered || beingBorn || (producing && willNeverFinish)) && ! isDecoy
     
     val output = (

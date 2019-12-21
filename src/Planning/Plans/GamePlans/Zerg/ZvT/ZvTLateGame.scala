@@ -46,6 +46,8 @@ class ZvTLateGame extends GameplanTemplate  {
       Get(Zerg.ZerglingAttackSpeed)),
     new RequireMiningBases(3),
 
+    // TODO: Add a Sunken at each base vs Vultures
+
     new If(new UnitsAtLeast(1, Zerg.HydraliskDen), new Build(Get(Zerg.LurkerMorph))),
     new If(
       new EnemiesAtLeast(1, UnitMatchSiegeTank),

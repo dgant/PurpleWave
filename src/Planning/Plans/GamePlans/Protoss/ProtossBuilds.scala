@@ -577,24 +577,24 @@ object ProtossBuilds {
     Get(8,   Protoss.Probe),
     Get(Protoss.Pylon),
     Get(11,  Protoss.Probe),
-    Get(1,   Protoss.Forge),
-    Get(13,  Protoss.Probe),
-    Get(2,   Protoss.PhotonCannon),
+    Get(Protoss.Forge),
     Get(14,  Protoss.Probe),
+    Get(2,   Protoss.PhotonCannon),
     Get(2,   Protoss.Nexus))
 
   val PvZFFE_ForgeNexusCannon = Vector[BuildRequest] (
     Get(8,   Protoss.Probe),
-    Get(1,   Protoss.Pylon),
-    Get(10,  Protoss.Probe),
-    Get(1,   Protoss.Forge),
-    Get(14,  Protoss.Probe),
+    Get(Protoss.Pylon),
+    Get(11,  Protoss.Probe),
+    Get(Protoss.Forge),
+    Get(13,  Protoss.Probe),
     Get(2,   Protoss.Nexus),
     Get(2,   Protoss.PhotonCannon))
 
   val PvZFFE_NexusGatewayForge = Vector[BuildRequest] (
+    // This differs from https://liquipedia.net/starcraft/Forge_FE_(vs._Zerg) but should be safer
     Get(8,   Protoss.Probe),
-    Get(1,   Protoss.Pylon),
+    Get(Protoss.Pylon),
     Get(12,  Protoss.Probe),
     Get(2,   Protoss.Nexus),
     Get(14,  Protoss.Probe),
@@ -605,15 +605,6 @@ object ProtossBuilds {
     Get(1,   Protoss.Zealot),
     Get(2,   Protoss.PhotonCannon),
     Get(17,  Protoss.Probe))
-
-  val PvZFFE_NexusForgeCannons = Vector[BuildRequest] (
-    Get(8,   Protoss.Probe),
-    Get(1,   Protoss.Pylon),
-    Get(14,  Protoss.Probe),
-    Get(2,   Protoss.Nexus),
-    Get(1,   Protoss.Forge),
-    Get(16,  Protoss.Probe),
-    Get(2,   Protoss.PhotonCannon))
 
   val PvZFFE_GatewayForgeCannonsConservative = Vector[BuildRequest] (
     Get(8,   Protoss.Probe),

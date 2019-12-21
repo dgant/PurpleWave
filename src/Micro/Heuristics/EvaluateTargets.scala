@@ -1,5 +1,6 @@
 package Micro.Heuristics
 
+import Lifecycle.With
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -143,6 +144,11 @@ object EvaluateTargets extends {
     // Interceptor penalty
     if (target.isInterceptor()) {
       output *= 0.25
+    }
+
+    // Expansion bonus
+    if (target.unitClass.isTownHall && target.base.forall(base => ! With.intelligence.enemyMain.contains(base) && ! With.intelligence.enemyNatural.contains(base))) {
+      output *= 3.0
     }
 
     output

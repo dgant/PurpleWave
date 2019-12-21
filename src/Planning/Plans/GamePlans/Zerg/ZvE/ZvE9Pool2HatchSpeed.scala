@@ -12,10 +12,11 @@ import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Scouting.{FoundEnemyBase, ScoutOn}
 import Planning.Predicates.Compound.{And, Not}
-import Planning.Predicates.Economy.GasAtLeast
+import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Predicates.Strategy.{EnemyIsZerg, EnemyStrategy}
+import Planning.UnitMatchers.UnitMatchHatchery
 import ProxyBwapi.Races.Zerg
 
 class ZvE9Pool2HatchSpeed extends GameplanTemplate {
@@ -60,8 +61,8 @@ class ZvE9Pool2HatchSpeed extends GameplanTemplate {
           Get(Zerg.Extractor),
           Get(Zerg.Lair),
           Get(Zerg.Spire))),
-      new Parallel(
 
+      new Parallel(
         // We have no economic advantage over anyone except a 4-pooler, so for us Zergling speed is our one timing to attack
         new If(
           new Or(
@@ -76,11 +77,15 @@ class ZvE9Pool2HatchSpeed extends GameplanTemplate {
           new AllIn),
 
         new Build(Get(2, Zerg.Hatchery)),
-        new If(new GasAtLeast(100), new Build(Get(Zerg.ZerglingSpeed))),
-        new Pump(Zerg.Zergling),
         new If(
-          new GasForUpgrade(Zerg.ZerglingSpeed),
-          new CapGasWorkersAt(0),
-          new Build(Get(Zerg.Extractor)))))
+          new Or(
+            new UnitsAtLeast(2, UnitMatchHatchery),
+            new MineralsAtLeast(350)),
+          new If(
+            new GasForUpgrade(Zerg.ZerglingSpeed),
+            new CapGasWorkersAt(0),
+            new Build(Get(Zerg.Extractor)))),
+        new If(new GasAtLeast(100), new Build(Get(Zerg.ZerglingSpeed))),
+        new Pump(Zerg.Zergling)))
   )
 }

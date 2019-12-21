@@ -63,6 +63,16 @@ class AIIDEPlaybook extends PurpleWavePlaybook {
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionTournament
 }
 
+class SSCAITTournamentPlaybook extends PurpleWavePlaybook {
+  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionTournament
+  override lazy val disabled: Seq[Strategy] = new PurpleWavePlaybook().disabled ++ Vector[Strategy](
+    PvTStove,
+    PvT1015Expand,
+    PvT2GateObserver,
+    PvP1ZealotExpand
+  )
+}
+
 class TestingPlaybook extends PurpleWavePlaybook {
   override lazy val forced: Seq[Strategy] = Seq(ZvP9Pool, ZvPOverpool, ZvP12Hatch)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
@@ -80,4 +90,4 @@ class HumanPlaybook extends PurpleWavePlaybook {
   ))
 }
 
-object Playbook extends TestingPlaybook {}
+object Playbook extends SSCAITTournamentPlaybook {}

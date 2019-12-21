@@ -1,6 +1,6 @@
 package Strategery.Selection
 
-import Strategery.{Benzene, Heartbreak}
+import Strategery.{Benzene, Heartbreak, MapGroups}
 import Strategery.Strategies.Protoss._
 
 object Opponents {
@@ -11,44 +11,49 @@ object Opponents {
     opponent
   }
 
-  val defaultPvT  = new StrategySelectionRecommended(StrategySelectionGreedy, PvT28Nexus, PvT2BaseCarrier)
-  val defaultPvP  = new StrategySelectionRecommended(StrategySelectionGreedy, PvP2Gate1012DT)
-  val defaultPvZ  = new StrategySelectionRecommended(StrategySelectionSequence(
-    Seq(
-      Seq(PvZ4Gate1012, PvZMidgame5GateGoon, PvZLateGameTemplar),
-      Seq(PvZFFEEconomic, PvZMidgameNeoBisu, PvZLateGameTemplar),
-      Seq(PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar))),
-    PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar)
+  val defaultPvT  = StrategySelectionGreedy
+  val defaultPvP  = StrategySelectionGreedy
+  val defaultPvZ  = StrategySelectionGreedy
   val fixedPvT    = new StrategySelectionFixed(PvT1015DT, PvT3BaseArbiter)
   val fixedPvZ    = new StrategySelectionFixed(PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar)
   val fixedPvR    = new StrategySelectionFixed(PvR1BaseDT)
 
-  // New AIIDE opponents
-
-  val aitp          : Opponent = add(Opponent("AITP",         defaultPvT))
-  val apollo        : Opponent = add(Opponent("Apollo",       defaultPvZ))
-  val bananabrain   : Opponent = add(Opponent("BananaBrain",  StrategySelectionSequence(Vector(
-    Seq(PvP2Gate1012DT),
-    Seq(PvPRobo),
-    Seq(PvP2GateDTExpand),
-    Seq(PvP2Gate1012Goon),
-    Seq(PvP3GateGoon),
-    Seq(PvP1ZealotExpand)
-  ))))
-  val bunkerBoxer   : Opponent = add(Opponent("BunkerBoxeR",  new StrategySelectionRecommended(StrategySelectionGreedy, PvT32Nexus, PvT3BaseArbiter)))
-  val cdbot         : Opponent = add(Opponent("CDBot",        defaultPvZ))
-  // dandan/daqin below
-  val dragon        : Opponent = add(Opponent("Dragon",       StrategySelectionGreedy))
-  val firefrog      : Opponent = add(Opponent("Firefrog",     defaultPvZ))
-  val kimbot        : Opponent = add(Opponent("KimBot",       new StrategySelectionRecommended(StrategySelectionGreedy, PvTReaverCarrierCheese) { duration = 1 })) // IceLab or Leta fork?
-  val letabot       : Opponent = add(Opponent("LetaBot",      new StrategySelectionRecommended(StrategySelectionGreedy, PvTReaverCarrierCheese)))
+  // Recently updated opponents
+  val bananabrain   : Opponent = add(Opponent("BananaBrain",  defaultPvP))
+  val styxz         : Opponent = add(Opponent("StyxZ",        new StrategySelectionFixed(PvZ4Gate1012, PvZMidgame5GateGoon, PvZLateGameTemplar)))
+  val haopan        : Opponent = add(Opponent("Hao Pan",      defaultPvT))
+  val killerbot     : Opponent = add(Opponent("Killerbot",    new StrategySelectionFixed(PvZFFEEconomic, PvZMidgameCorsairReaverGoon, PvZLateGameReaver)))
+  val mariandevecka : Opponent = add(Opponent("Marian Devecka", killerbot.policy))
+  val cherrypi      : Opponent = add(Opponent("CherryPiSSCAIT2017",
+    if (MapGroups.badForProxying.exists(_.matches))
+      new StrategySelectionFixed(PvZ4Gate99, PvZMidgame5GateGoonReaver, PvZLateGameReaver)
+    else
+      new StrategySelectionFixed(PvZProxy2Gate, PvZ4Gate99, PvZMidgame5GateGoonReaver, PvZLateGameReaver)))
+  val dragon        : Opponent = add(Opponent("Dragon",
+    if (MapGroups.badForProxying.exists(_.matches))
+      new StrategySelectionFixed(PvT1015DT, PvT3BaseArbiter)
+    else
+      new StrategySelectionFixed(PvTProxy2Gate, PvT1015DT, PvT2BaseArbiter)))
   val locutus       : Opponent = add(Opponent("Locutus",      StrategySelectionSequence(Vector(
     Seq(PvP2Gate1012DT),
     Seq(PvPRobo),
     Seq(PvP2GateDTExpand),
     Seq(PvPProxy2Gate)))))
-  val dandanbot     : Opponent = add(Opponent("DanDanBot",    locutus.policy))
+  val znzzbot       : Opponent = add(Opponent("ZNZZBot",      locutus.policy))
+  val betastar      : Opponent = add(Opponent("BetaStar",     locutus.policy))
   val daqin         : Opponent = add(Opponent("DaQin",        locutus.policy))
+
+
+  // AIIDE opponents
+  val aitp          : Opponent = add(Opponent("AITP",         defaultPvT))
+  val apollo        : Opponent = add(Opponent("Apollo",       defaultPvZ))
+  val bunkerBoxer   : Opponent = add(Opponent("BunkerBoxeR",  new StrategySelectionRecommended(StrategySelectionGreedy, PvT32Nexus, PvT3BaseArbiter)))
+  val cdbot         : Opponent = add(Opponent("CDBot",        defaultPvZ))
+  // dandan/daqin below
+  val firefrog      : Opponent = add(Opponent("Firefrog",     defaultPvZ))
+  val kimbot        : Opponent = add(Opponent("KimBot",       new StrategySelectionRecommended(StrategySelectionGreedy, PvTReaverCarrierCheese) { duration = 1 })) // IceLab or Leta fork?
+  val letabot       : Opponent = add(Opponent("LetaBot",      new StrategySelectionRecommended(StrategySelectionGreedy, PvTReaverCarrierCheese)))
+  val dandanbot     : Opponent = add(Opponent("DanDanBot",    locutus.policy))
   val mcrave        : Opponent = add(Opponent("McRave",       new StrategySelectionRecommended(StrategySelectionGreedy, PvPRobo) { duration = 1 }))
   val metabot       : Opponent = add(Opponent("MegaBot",      new StrategySelectionFixed(PvPRobo)))
   val skynet        : Opponent = add(Opponent("Skynet",       metabot.policy)) // For testing purposes
@@ -68,6 +73,7 @@ object Opponents {
   val cse           : Opponent = add(Opponent("CSE",          (if (Heartbreak.matches) new StrategySelectionFixed(PvP2Gate1012DT) else new StrategySelectionFixed(PvP2GateDTExpand))))
   val iron          : Opponent = add(Opponent("Iron",         new StrategySelectionFixed(PvT2GateRangeExpandCarrier)))
   val saida         : Opponent = add(Opponent("SAIDA",        new StrategySelectionFixed(PvT28Nexus, PvT2BaseCarrier)))
+  val adias         : Opponent = add(Opponent("adias",        saida.policy))
   val ualbertabot   : Opponent = add(Opponent("UAlbertaBot",  fixedPvR))
   val zzzkbot       : Opponent = add(Opponent("ZZZKBot",      (if (Benzene.matches)
     new StrategySelectionFixed(PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar) else

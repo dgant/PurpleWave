@@ -72,6 +72,8 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
     new PvPIdeas.ReactToCannonRush)
 
   class GoDT extends And(
+    new EnemiesAtMost(0, Protoss.PhotonCannon),
+    new EnemiesAtMost(0, Protoss.Forge),
     new Or(
       new Employing(PvP2Gate1012DT),
       new EnemyStrategy(With.fingerprints.fourGateGoon, With.fingerprints.proxyGateway)),

@@ -1,21 +1,37 @@
 package Planning.UnitMatchers
 
+import Information.Geography.Types.Base
 import Lifecycle.With
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitInfo.UnitInfo
 
 abstract class UnitMatchAnyProxy extends UnitMatcher {
 
+  private def mainBases(player: PlayerInfo): Seq[Base] = {
+    if (player.isUs) return Seq(With.geography.ourMain)
+    var bases = With.geography.startBases.filter(_.owner == player)
+    if (bases.isEmpty) {
+      bases = With.geography.startBases.filter(base => base.owner.isNeutral && base.lastScoutedFrame > 0)
+    }
+    if (bases.isEmpty) {
+      bases = With.geography.startBases.filter(base => base.owner.isNeutral)
+    }
+    if (bases.isEmpty) {
+      bases = With.geography.bases.filter( ! _.owner.isUs)
+    }
+    if (bases.isEmpty) {
+      bases = With.geography.bases
+    }
+    bases
+  }
+
+
   private def baseDistance(unit: UnitInfo, player: PlayerInfo): Double = {
-    val home = With.geography.startBases
-      .find(_.owner == player)
-      .orElse(With.geography.startBases.find(_.owner.isNeutral))
-      .map(_.heart)
-      .getOrElse(if (player.isUs) With.geography.home else With.intelligence.mostBaselikeEnemyTile)
-      .pixelCenter
-    val output = unit.pixelDistanceTravelling(home)
+    val bases = mainBases(unit.player)
+    val output = bases.map(base => unit.pixelDistanceTravelling(base.townHallTile)).min
     output
   }
+
   override def accept(unit: UnitInfo): Boolean = {
     if (unit.isFriendly) return false
     if ( ! unit.unitClass.isBuilding) return false

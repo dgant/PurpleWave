@@ -142,6 +142,7 @@ class Visualization {
     ShowTechniques,
     ShowTextOnly,
     ShowTextOnlyUnits,
+    ShowUnitPaths,
     ShowZoneBorderTiles,
     ShowZoneLabels,
     ShowZonePathDemo,

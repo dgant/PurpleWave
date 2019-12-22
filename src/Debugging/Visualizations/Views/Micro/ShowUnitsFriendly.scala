@@ -101,7 +101,7 @@ object ShowUnitsFriendly extends View {
       }
     }
 
-    if (showPaths) {
+    if (showPaths && unit.selected) {
       def drawRayPath(ray: PixelRay, color: Color) {
         ray.tilesIntersected.foreach(tile => DrawMap.box(
           tile.topLeftPixel.add(1, 1),

@@ -1,6 +1,6 @@
 package Information.Geography.Pathfinding
 
-import Debugging.Visualizations.Views.Micro.ShowUnitsFriendly
+import Debugging.Visualizations.Views.Micro.ShowUnitPaths
 import Information.Geography.Pathfinding.Types.TilePath
 import Information.Grids.Combat.AbstractGridEnemyRange
 import Lifecycle.With
@@ -125,7 +125,7 @@ trait TilePathfinder {
   }
 
   @inline private final def drawOutput(profile: PathfindProfile, value: TilePath): Unit = {
-    if (ShowUnitsFriendly.mapInUse && ShowUnitsFriendly.showPaths && profile.unit.exists(u => u.selected || u.transport.exists(_.selected))) {
+    if (ShowUnitPaths.mapInUse && profile.unit.exists(u => u.selected || u.transport.exists(_.selected))) {
       profile.unit.foreach(unit =>
         unit.agent.pathBranches = tiles
           .view

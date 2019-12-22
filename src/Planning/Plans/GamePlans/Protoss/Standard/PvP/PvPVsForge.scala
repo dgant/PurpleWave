@@ -27,6 +27,7 @@ class PvPVsForge extends GameplanTemplate {
   override val completionCriteria: Predicate = new Latch(new And(new BasesAtLeast(2), new UnitsAtLeast(1, Protoss.Reaver)))
 
   override def buildOrderPlan: Plan = new Parallel(
+    new PvPIdeas.CancelAirWeapons,
     new BuildOrder(
       Get(8, Protoss.Probe),
       Get(Protoss.Pylon),
@@ -64,13 +65,12 @@ class PvPVsForge extends GameplanTemplate {
   override def buildPlans: Seq[Plan] = Seq(
     new BuildOrder(
       Get(Protoss.RoboticsFacility),
-      Get(Protoss.Shuttle),
-      Get(Protoss.DragoonRange)),
+      Get(2, Protoss.Gateway),
+      Get(Protoss.DragoonRange),
+      Get(Protoss.Shuttle)),
     new Pump(Protoss.Reaver),
     new If(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new RequireMiningBases(2)),
-    new If(
-      new EnemiesAtLeast(3, Protoss.PhotonCannon),
-      new RequireMiningBases(2)),
+    new If(new EnemiesAtLeast(3, Protoss.PhotonCannon), new RequireMiningBases(2)),
     new Pump(Protoss.Dragoon, 3),
     new BuildOrder(
       Get(Protoss.RoboticsSupportBay),

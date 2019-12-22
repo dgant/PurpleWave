@@ -105,7 +105,10 @@ class PvEProxy2Gate extends GameplanTemplate {
 
     new FlipIf(
       new MustTech,
-      new Pump(Protoss.Zealot, 10),
+      new If(
+        new EnemyIsTerran,
+        new BuildOrder(Get(5, Protoss.Zealot)),
+        new Pump(Protoss.Zealot, 7)),
       new Parallel(
         new PumpWorkers,
         new If(

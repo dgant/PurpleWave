@@ -28,7 +28,7 @@ object ShowProduction extends View {
           unit.remainingTechFrames,
           Colors.MidnightGreen,
           Colors.BrightGreen))
-      else if (unit.upgrading) {
+      else if (unit.upgrading && unit.upgradeProducing.isDefined) {
         val up = unit.upgradeProducing.get
         val levelNext = 1 + With.self.getUpgradeLevel(up)
         Some(Producible(

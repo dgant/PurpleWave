@@ -139,9 +139,7 @@ class Commander {
     autoUnburrow(unit)
     // Send some flying units past their destination to maximize acceleration
     var destination = to
-    if (unit.flying
-      && unit.pixelDistanceSquared(to) < flyingOvershoot * flyingOvershoot
-      && ! unit.isShuttle()) {
+    if (unit.flying && unit.pixelDistanceSquared(to) < flyingOvershoot * flyingOvershoot) {
       destination = unit.pixelCenter.project(to, flyingOvershoot)
       if (destination == unit.pixelCenter) {
         val signX = PurpleMath.forcedSignum(SpecificPoints.middle.x - destination.x)

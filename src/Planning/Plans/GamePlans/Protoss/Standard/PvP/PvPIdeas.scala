@@ -7,7 +7,7 @@ import Planning.Plans.Army.{Attack, Hunt}
 import Planning.Plans.Compound.{If, Parallel, _}
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.Build.CancelIncomplete
+import Planning.Plans.Macro.Build.{CancelIncomplete, CancelOrders}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildTowersAtBases, MeldArchons}
@@ -443,4 +443,8 @@ object PvPIdeas {
       Get(Protoss.CitadelOfAdun),
       Get(Protoss.TemplarArchives)),
     new IfOnMiningBases(3, new Build(Get(2, Protoss.Forge))))
+
+  class CancelAirWeapons extends If(
+    new And(new UpgradeStarted(Protoss.AirDamage), new Not(new UpgradeComplete(Protoss.AirDamage))),
+    new CancelOrders(Protoss.CyberneticsCore))
 }

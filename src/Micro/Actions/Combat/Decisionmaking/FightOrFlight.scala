@@ -111,7 +111,8 @@ object FightOrFlight extends Action {
       && ( ! ally.unitClass.isBuilding || ally.matchups.threatsInRange.nonEmpty)
       && (ally.friendly.forall(_.agent.ride.exists(_.pixelDistanceEdge(ally) > 96)) || ally.matchups.framesOfSafety <= PurpleMath.clamp(unit.matchups.framesOfSafety, 0, 3))
       && ally.matchups.framesOfSafety <= 24 + Math.max(0, unit.matchups.framesOfSafety))
-      && (ally.unitClass.isSpellcaster || ally.matchups.threats.exists(unit.canAttack))
+      && (ally.unitClass.isSpellcaster ||
+        (ally.matchups.threats.exists(unit.canAttack) && (ally.agent.shouldEngage || ally.matchups.targetsInRange.nonEmpty)))
     ))
 
     decide(true, getaway, () => unit.agent.ride.exists(ride => {

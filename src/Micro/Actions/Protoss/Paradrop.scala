@@ -29,7 +29,7 @@ object Paradrop extends Action {
 
     // If we can drop out and attack now, do so
     if (unit.agent.toAttack.exists(unit.inRangeToAttack)) {
-      val shouldDrop = unit.matchups.framesOfSafety > unit.cooldownLeft || (unit.agent.shouldEngage && unit.matchups.threatsInRange.forall(u => u.pixelRangeAgainst(unit) + 16 >= u.effectiveRangePixels))
+      val shouldDrop = unit.matchups.framesOfSafety > unit.cooldownLeft || (unit.agent.shouldEngage && unit.matchups.threatsInRange.forall(u => u.pixelRangeAgainst(unit) + 16 >= unit.effectiveRangePixels))
       if (shouldDrop) {
         Attack.delegate(unit)
         return
@@ -68,7 +68,6 @@ object Paradrop extends Action {
     profile.unit                = Some(unit)
     val path = profile.find
     if (path.pathExists) {
-
       unit.agent.toTravel = Some(path.end.pixelCenter)
       new Traverse(path).delegate(unit)
     } else {

@@ -1,5 +1,6 @@
 package Micro.Actions.Combat.Techniques
 
+import Mathematics.PurpleMath
 import Micro.Actions.Combat.Techniques.Common.Activators.WeightedMean
 import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, AttackAsSoonAsPossible}
 import ProxyBwapi.Races.Protoss
@@ -42,11 +43,13 @@ object Breathe extends ActionTechnique {
     val cooldownTheirs  = other.cooldownMaxAgainst(unit)
     val cooldownRatio   = cooldownOurs / cooldownTheirs
     
-    Some(cooldownRatio)
+    Some(PurpleMath.clampToOne(cooldownRatio))
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     AttackAsSoonAsPossible.delegate(unit)
-    Avoid.delegate(unit)
+    if ( ! unit.readyForAttackOrder) {
+      Avoid.delegate(unit)
+    }
   }
 }

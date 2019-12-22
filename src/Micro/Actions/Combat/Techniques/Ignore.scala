@@ -10,11 +10,10 @@ object Ignore extends ActionTechnique {
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     lazy val adjacentTiles    = unit.tileIncludingCenter.toRectangle.expand(1, 1).tiles.filter(_.valid)
     lazy val ground           = ! unit.flying
-    lazy val blockingChoke    = ground && adjacentTiles.exists(tile => tile.zone.edges.exists(_.contains(tile.pixelCenter)))
     lazy val blockingPath     = ground && adjacentTiles.exists(With.coordinator.gridPathOccupancy.get(_) > 0)
-    lazy val blockingNeighbor = ground && adjacentTiles.exists(With.grids.units.get(_).exists(neighbor => neighbor.friendly.exists(ally => ! ally.flying && ally.canBeIgnorantOfCombat)))
+    lazy val blockingNeighbor = ground && adjacentTiles.exists(With.grids.units.get(_).exists(neighbor => neighbor != unit && neighbor.friendly.exists(ally => ! ally.flying && ! ally.canBeIgnorantOfCombat)))
     lazy val canIgnore        = unit.canBeIgnorantOfCombat
-    val output                = unit.canMove && canIgnore && ! blockingChoke && ! blockingNeighbor
+    val output                = unit.canMove && canIgnore && ! blockingPath && ! blockingNeighbor
     output
   }
 

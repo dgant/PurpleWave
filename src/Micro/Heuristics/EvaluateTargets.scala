@@ -123,6 +123,17 @@ object EvaluateTargets extends {
       output *= 2.0
     }
 
+    // Visibility bonus
+    if (target.visibleToOpponents) {
+      output *= 1.25
+    }
+    if (target.likelyStillThere) {
+      output *= 1.25
+    }
+    if (target.possiblyStillThere) {
+      output *= 1.25
+    }
+
     // Temporary visibility bonus
     val temporarilyVisible = (target.cloaked || target.burrowed) && target.matchups.enemyDetectors.forall(_.is(Terran.SpellScannerSweep))
     if (temporarilyVisible) {

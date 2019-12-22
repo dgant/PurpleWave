@@ -139,14 +139,22 @@ object DrawMap {
   }
   
   def drawSkull(pixel: Pixel, colorDark: Color = Colors.MidnightRed, colorBright: Color = Colors.NeonRed, f: Int = 1): Unit = {
-    DrawMap.box(pixel.add(-3 * f, 0), pixel.add(4 * f, 8 * f), colorDark, solid = false)
     DrawMap.circle(pixel, 5 * f, colorBright,  solid = true)
     DrawMap.circle(pixel, 5 * f, colorDark,    solid = false)
-    DrawMap.box(pixel.add(-2 * f,  1 * f), pixel.add(2  * f, 7 * f), colorBright, solid = true)
-    DrawMap.box(pixel.add(-2 * f, -2 * f), pixel.add(0  * f, 0 * f), Color.Black, solid = true)
-    DrawMap.box(pixel.add( 1 * f, -2 * f), pixel.add(3  * f, 0 * f), Color.Black, solid = true)
-    DrawMap.line(pixel.add(-1 * f, 3 * f), pixel.add(-2 * f, 9 * f), colorDark)
-    DrawMap.line(pixel.add( 1 * f, 3 * f), pixel.add(2  * f, 9 * f), colorDark)
+    DrawMap.box(pixel.add(-3 * f, 0 * f), pixel.add(1 + 3 * f, 6 * f), colorBright, solid = true)
+    DrawMap.box(pixel.add(-3 * f, 0 * f), pixel.add(1 + 3 * f, 6 * f), colorDark,   solid = false)
+    DrawMap.box(pixel.add(-3 * f, 0 * f), pixel.add(1 + 3 * f, 3 * f), colorBright, solid = true)
+
+    if (f == 1) {
+      DrawMap.box(pixel.add(-2 * f, -2 * f), pixel.add(0 * f, 0 * f), Color.Black, solid = true)
+      DrawMap.box(pixel.add( 1 * f, -2 * f), pixel.add(3 * f, 0 * f), Color.Black, solid = true)
+    } else {
+      DrawMap.circle(pixel.add(-2 * f, -1 * f), f, Color.Black, solid = true)
+      DrawMap.circle(pixel.add( 2 * f, -1 * f), f, Color.Black, solid = true)
+    }
+    DrawMap.triangle(pixel.add(0, 1 * f), pixel.add(- f, 2 * f), pixel.add(f, 2 * f), Color.Black, solid = true)
+    DrawMap.line(pixel.add(-1 * f, 3 * f), pixel.add(-1 * f, 6 * f - 1), colorDark)
+    DrawMap.line(pixel.add( 1 * f, 3 * f), pixel.add( 1 * f, 6 * f - 1), colorDark)
   }
   
   def irrelevant(points: Iterable[Pixel]): Boolean = {

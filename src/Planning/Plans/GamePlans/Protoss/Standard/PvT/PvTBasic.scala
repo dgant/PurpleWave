@@ -118,7 +118,7 @@ class PvTBasic extends GameplanTemplate {
 
   class EmployingThreeBase  extends And(new Not(new EnemyStrategy(With.fingerprints.bio)), new Or(new Sticky(new MiningBasesAtLeast(3)), new Employing(PvT3BaseCarrier, PvT3BaseArbiter)))
   class EmployingTwoBase    extends Not(new EmployingThreeBase)
-  class CarriersCountered   extends Check(() => With.units.countEnemy(Terran.Goliath) > Math.max(10, With.units.countOurs(Protoss.Interceptor) / 3))
+  class CarriersCountered   extends Check(() => With.units.countEnemy(Terran.Goliath) > Math.max(10, With.units.countOurs(Protoss.Interceptor) / 1.8))
   class EmployingCarriers   extends And(new Employing(PvT2BaseCarrier, PvT3BaseCarrier), new Not(new CarriersCountered))
   class EmployingArbiters   extends Or( new Employing(PvT2BaseArbiter, PvT3BaseArbiter),         new CarriersCountered)
   class WantObservers       extends Or(new EnemyStrategy(With.fingerprints.twoFac), new EmployingThreeBase, new EnemyHasShownWraithCloak)

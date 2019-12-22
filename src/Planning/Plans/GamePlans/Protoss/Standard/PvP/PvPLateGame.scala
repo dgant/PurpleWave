@@ -74,6 +74,7 @@ class PvPLateGame extends GameplanTemplate {
 
     new Parallel(
       new Build(Get(3, Protoss.Gateway)),
+      new If(new UnitsAtLeast(1, Protoss.RoboticsFacility), new BuildGasPumps),
       new FlipIf(
         new And(
           new SafeAtHome,

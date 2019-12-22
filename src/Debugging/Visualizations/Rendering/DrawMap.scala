@@ -138,7 +138,7 @@ object DrawMap {
     line(points.head, points.last, color)
   }
   
-  def drawSkull(pixel: Pixel, colorDark: Color = Colors.MidnightRed, colorBright: Color = Colors.NeonRed, f: Int = 1): Unit = {
+  def drawSkull(pixel: Pixel, colorDark: Color = Colors.DarkGray, colorBright: Color = Colors.BrightGray, f: Int = 1): Unit = {
     DrawMap.circle(pixel, 5 * f, colorBright,  solid = true)
     DrawMap.circle(pixel, 5 * f, colorDark,    solid = false)
     DrawMap.box(pixel.add(-3 * f, 0 * f), pixel.add(1 + 3 * f, 6 * f), colorBright, solid = true)

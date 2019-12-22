@@ -14,7 +14,7 @@ object ShowKills extends View {
       .zipWithIndex
 
     if (kills.nonEmpty) {
-      val text = Vector("High score (Kills)") ++ kills.map(p => "#" + p._2 + 1 + " " + p._1.unitClass.toString + ": " + p._1.kills)
+      val text = Vector("High score (Kills)") ++ kills.map(p => "#" + (p._2 + 1) + " " + p._1.unitClass.toString + ": " + p._1.kills)
       DrawScreen.column(5, 5 * With.visualization.lineHeightSmall, text)
     }
   }

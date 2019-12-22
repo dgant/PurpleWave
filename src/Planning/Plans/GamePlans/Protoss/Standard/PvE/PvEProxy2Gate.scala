@@ -19,7 +19,7 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy}
 import Planning.UnitCounters.UnitCountOne
-import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWorkers}
+import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Protoss.{PvPProxy2Gate, PvRProxy2Gate, PvTProxy2Gate, PvZProxy2Gate}
@@ -85,7 +85,7 @@ class PvEProxy2Gate extends GameplanTemplate {
       Get(4, Protoss.Zealot),
       Get(12, Protoss.Probe)),
 
-    new If(new And(new EnemiesAtLeast(4, Protoss.PhotonCannon), new EnemyUnitsNone(UnitMatchWorkers)), new RequireMiningBases(2)),
+    new If(new And(new EnemiesAtLeast(4, Protoss.PhotonCannon), new EnemyUnitsNone(UnitMatchWarriors)), new RequireMiningBases(2)),
 
     new Pump(Protoss.Observer, 2),
     new If(

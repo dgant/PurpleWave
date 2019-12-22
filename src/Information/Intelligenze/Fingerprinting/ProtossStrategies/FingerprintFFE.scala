@@ -16,8 +16,8 @@ abstract class FingerprintFFE extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.nexusFirst)) {
   
   private class Status {
-    lazy val forge                  = With.units.enemy.find(_.is(Protoss.Forge))
-    lazy val cannonsWalled          = With.units.enemy.filter(_.isAll(Protoss.PhotonCannon, UnitMatchNot(UnitMatchProxied))).toVector
+    lazy val forge                  = With.units.enemy.find(u => u.is(Protoss.Forge) && ! u.zone.bases.exists(_.isStartLocation))
+    lazy val cannonsWalled          = With.units.enemy.filter(u => u.isAll(Protoss.PhotonCannon, UnitMatchNot(UnitMatchProxied)) && ! u.zone.bases.exists(_.isStartLocation)).toVector
     lazy val buildingsProxied       = With.units.enemy.filter(_.isAll(UnitMatchBuilding, UnitMatchProxied)).toVector
     lazy val gateway                = With.units.enemy.find(_.is(Protoss.Gateway))
     lazy val zealot                 = With.units.enemy.filter(_.is(Protoss.Zealot)).toVector

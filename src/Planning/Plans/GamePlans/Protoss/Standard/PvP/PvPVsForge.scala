@@ -23,7 +23,9 @@ class PvPVsForge extends GameplanTemplate {
   // * Fake FFE into 3 proxy gates
   // This also needs to be robust against eg. Ximp turtling into Carriers
 
-  override val activationCriteria: Predicate = new And(new EnemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.cannonRush), new UnitsAtMost(0, Protoss.CitadelOfAdun))
+  override val activationCriteria: Predicate = new And(
+    new EnemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.cannonRush),
+    new UnitsAtMost(0, Protoss.CitadelOfAdun))
   override val completionCriteria: Predicate = new Latch(new And(new BasesAtLeast(2), new UnitsAtLeast(1, Protoss.Reaver)))
 
   override def buildOrderPlan: Plan = new Parallel(

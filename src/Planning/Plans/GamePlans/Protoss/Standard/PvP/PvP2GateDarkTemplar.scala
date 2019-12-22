@@ -10,7 +10,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.{CancelOrders, ProposePlacement}
-import Planning.Plans.Macro.BuildOrders.BuildOrder
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
 import Planning.Plans.Scouting.{ScoutCleared, ScoutForCannonRush}
@@ -100,8 +100,14 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
           Get(Protoss.Dragoon),
           Get(Protoss.CitadelOfAdun),
           Get(2, Protoss.Dragoon),
-          Get(Protoss.TemplarArchives),
-          Get(2, Protoss.Gateway),
+          Get(Protoss.TemplarArchives)),
+        new If(
+          new And(
+            new EnemiesAtLeast(2, Protoss.PhotonCannon),
+            new Not(new EnemyStrategy(With.fingerprints.cannonRush))),
+          new RequireMiningBases(2),
+          new Build(Get(2, Protoss.Gateway))),
+        new BuildOrder(
           Get(2, Protoss.DarkTemplar),
           Get(Protoss.Forge)),
         new If(

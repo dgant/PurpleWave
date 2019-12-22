@@ -11,7 +11,7 @@ abstract class UnitMatchAnyProxy extends UnitMatcher {
     if (player.isUs) return Seq(With.geography.ourMain)
     var bases = With.geography.startBases.filter(_.owner == player)
     if (bases.isEmpty) {
-      bases = With.geography.startBases.filter(base => base.owner.isNeutral && base.lastScoutedFrame > 0)
+      bases = With.geography.startBases.filter(base => base.owner.isNeutral && base.lastScoutedFrame == 0)
     }
     if (bases.isEmpty) {
       bases = With.geography.startBases.filter(base => base.owner.isNeutral)

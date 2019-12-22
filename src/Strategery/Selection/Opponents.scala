@@ -43,11 +43,10 @@ object Opponents {
     Seq(PvP2Gate1012DT),
     Seq(PvPRobo),
     Seq(PvP2GateDTExpand),
-    Seq(PvPProxy2Gate)))))
+    Seq(PvP3GateGoon)))))
   val znzzbot       : Opponent = add(Opponent("ZNZZBot",      locutus.policy))
   val betastar      : Opponent = add(Opponent("BetaStar",     locutus.policy))
   val daqin         : Opponent = add(Opponent("DaQin",        locutus.policy))
-
 
   // AIIDE opponents
   val aitp          : Opponent = add(Opponent("AITP",         defaultPvT))
@@ -116,7 +115,8 @@ object Opponents {
   val ziabot2           : Opponent = add(Opponent("Zia bot",            ziabot.policy))
   val johankayser       : Opponent = add(Opponent("Johan Kayser",       srbotone.policy))
   val bryanweber        : Opponent = add(Opponent("Bryan Weber",        cunybot.policy))
-  val jadien            : Opponent = add(Opponent("jadien",             dragon.policy))
+  //val jadien            : Opponent = add(Opponent("jadien",             locutus.policy))
+  val jadien            : Opponent = add(Opponent("jadien",             StrategySelectionFixed(PvP2Gate1012DT)))
   
   val all: Vector[Opponent] = allKnown
 }

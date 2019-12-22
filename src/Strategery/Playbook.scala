@@ -67,9 +67,7 @@ class SSCAITTournamentPlaybook extends PurpleWavePlaybook {
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionTournament
   override lazy val disabled: Seq[Strategy] = new PurpleWavePlaybook().disabled ++ Vector[Strategy](
     PvTStove,
-    PvT1015Expand,
     PvT2GateObserver,
-    PvP1ZealotExpand
   )
 }
 

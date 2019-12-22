@@ -196,15 +196,12 @@ trait TilePathfinder {
           profile.endDistanceMaximum > 0
           && end.tileDistanceFast(bestTile) <= profile.endDistanceMaximum
           && (profile.canCrossUnwalkable || end.tileDistanceFast(bestTile) <= profile.endDistanceMaximum)))
-      val minimumLengthMet = profile.minimumLength.forall(_ <= bestTileState.pathLength)
       if (
-        (atEnd && minimumLengthMet && (profile.canEndUnwalkable.getOrElse(profile.canCrossUnwalkable) || bestTile.walkableUnchecked))
-        || profile.maximumLength.exists(_ <= Math.round(bestTileState.pathLength)) // Rounding encourages picking diagonal paths for short maximum lengths
+        profile.lengthMaximum.exists(_ <= Math.round(bestTileState.pathLength)) // Rounding encourages picking diagonal paths for short maximum lengths
         || (
-          profile.end.isEmpty
-          && minimumLengthMet
-          && profile.maximumLength.isEmpty
-          && threatGrid.getUnchecked(bestTile.i) == 0)) {
+          (atEnd || (profile.end.isEmpty && (profile.canEndUnwalkable.getOrElse(profile.canCrossUnwalkable) || bestTile.walkableUnchecked)))
+          && profile.lengthMinimum.forall(_ <= bestTileState.pathLength)
+          && profile.threatMaximum.forall(_ >= threatGrid.getUnchecked(bestTile.i)))) {
         val output = TilePath(
           startTile,
           bestTile,

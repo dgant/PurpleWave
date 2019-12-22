@@ -29,7 +29,7 @@ class Visualization {
     ShowExplosions,
     ShowStatus,
     ShowPerformanceSummary,
-    ShowFingerprints
+    ShowProduction
   )
 
   var enabled   : Boolean = _

@@ -1,7 +1,8 @@
 package Micro.Actions.Protoss
 
 import Information.Geography.Pathfinding.PathfindProfile
-import Lifecycle.Manners
+import Information.Geography.Pathfinding.Types.NoPath
+import Lifecycle.{Manners, With}
 import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Traverse
@@ -51,22 +52,29 @@ object Paradrop extends Action {
     val destination = destinationAir.nearestWalkableTerrain
     unit.agent.toTravel = Some(destination.pixelCenter)
 
-    val profile = new PathfindProfile(unit.tileIncludingCenter)
-    def targetDistance: Float = (unit.effectiveRangePixels + (if (unit.unitClass != Protoss.HighTemplar) unit.topSpeed * unit.cooldownLeft else 0)).toFloat / 32f
-    profile.end                 = Some(destination)
-    profile.endDistanceMaximum  =
-      if (target.isDefined && unit.pixelDistanceCenter(target.get.pixelCenter) > targetDistance)
-        targetDistance
-      else 0
-    profile.maximumLength       = Some(30)
-    profile.canCrossUnwalkable  = false
-    profile.allowGroundDist     = false
-    profile.costOccupancy       = 0.5f
-    profile.costThreat          = 3
-    profile.costRepulsion       = if (target.isDefined) 1f else 1.5f
-    profile.repulsors           = Avoid.pathfindingRepulsion(unit)
-    profile.unit                = Some(unit)
-    val path = profile.find
+    val targetDistance: Float = (unit.effectiveRangePixels + (if (unit.unitClass != Protoss.HighTemplar) unit.topSpeed * unit.cooldownLeft else 0)).toFloat / 32f
+    val endDistanceMaximum = if (target.isDefined && unit.pixelDistanceCenter(target.get.pixelCenter) > targetDistance) targetDistance else 0
+    val repulsors = Avoid.pathfindingRepulsion(unit)
+
+    var path = NoPath.value
+    Seq(Some(0), Some(With.grids.enemyRangeGround.addedRange - 1), None).foreach(maximumThreat =>
+      Seq(false, true).foreach(crossEdges => {
+        if ( ! path.pathExists) {
+          val profile = new PathfindProfile(unit.tileIncludingCenter)
+          profile.end                 = Some(destination)
+          profile.endDistanceMaximum  = endDistanceMaximum // Air distance! Encourages trying to shoot over cliffs
+          profile.lengthMaximum       = Some(30)
+          profile.threatMaximum       = maximumThreat
+          profile.canCrossUnwalkable  = crossEdges
+          profile.allowGroundDist     = false
+          profile.costOccupancy       = 0.5f
+          profile.costThreat          = 3
+          profile.costRepulsion       = if (target.isDefined) 1f else 1.5f
+          profile.repulsors           = repulsors
+          profile.unit                = Some(unit)
+          path = profile.find
+        }
+      }))
     if (path.pathExists) {
       unit.agent.toTravel = Some(path.end.pixelCenter)
       new Traverse(path).delegate(unit)

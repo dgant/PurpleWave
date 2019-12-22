@@ -74,11 +74,11 @@ object Phalanx extends Action {
     if (unit.matchups.threats.exists(! _.unitClass.isWorker)) {
       // If we can safely get to our spot, let's do so
       val profile = new PathfindProfile(unit.tileIncludingCenter)
-      profile.end             = unit.agent.toForm.map(_.tileIncluding)
-      profile.maximumLength   = Some(2 + formationDistance.toInt * 2 / 32)
-      profile.canCrossUnwalkable          = unit.transport.exists(_.flying)
-      profile.allowGroundDist = false
-      profile.costThreat      = 3f
+      profile.end                 = unit.agent.toForm.map(_.tileIncluding)
+      profile.lengthMaximum       = Some(2 + formationDistance.toInt * 2 / 32)
+      profile.canCrossUnwalkable  = unit.transport.exists(_.flying)
+      profile.allowGroundDist     = false
+      profile.costThreat          = 3f
       profile.unit = Some(unit)
       val path = profile.find
       new Traverse(path).delegate(unit)

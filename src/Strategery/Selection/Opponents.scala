@@ -22,7 +22,7 @@ object Opponents {
   val bananabrain   : Opponent = add(Opponent("BananaBrain",  defaultPvP))
   val styxz         : Opponent = add(Opponent("StyxZ",        StrategySelectionFixed(PvZ4Gate1012, PvZMidgame5GateGoon, PvZLateGameTemplar)))
   val haopan        : Opponent = add(Opponent("Hao Pan",      defaultPvT))
-  val killerbot     : Opponent = add(Opponent("Killerbot",    StrategySelectionFixed(PvZFFEEconomic, PvZMidgame5GateGoonReaver, PvZLateGameReaver)))
+  val killerbot     : Opponent = add(Opponent("Killerbot",    StrategySelectionFixed(PvZFFEEconomic, PvZMidgameCorsairReaverZealot, PvZLateGameReaver)))
   val mariandevecka : Opponent = add(Opponent("Marian Devecka", killerbot.policy))
   val cherrypi      : Opponent = add(Opponent("CherryPiSSCAIT2017",
     if (MapGroups.badForProxying.exists(_.matches))

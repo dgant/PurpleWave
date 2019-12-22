@@ -153,8 +153,8 @@ object DrawMap {
       DrawMap.circle(pixel.add( 2 * f, -1 * f), f, Color.Black, solid = true)
     }
     DrawMap.triangle(pixel.add(0, 1 * f), pixel.add(- f, 2 * f), pixel.add(f, 2 * f), Color.Black, solid = true)
-    DrawMap.line(pixel.add(-1 * f, 3 * f), pixel.add(-1 * f, 6 * f - 1), colorDark)
-    DrawMap.line(pixel.add( 1 * f, 3 * f), pixel.add( 1 * f, 6 * f - 1), colorDark)
+    DrawMap.line(pixel.add(-1 * f, 4 * f), pixel.add(-1 * f, 6 * f - 1), colorDark)
+    DrawMap.line(pixel.add( 1 * f, 4 * f), pixel.add( 1 * f, 6 * f - 1), colorDark)
   }
   
   def irrelevant(points: Iterable[Pixel]): Boolean = {

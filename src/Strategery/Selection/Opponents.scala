@@ -20,7 +20,11 @@ object Opponents {
 
   // Recently updated opponents
   val bananabrain   : Opponent = add(Opponent("BananaBrain",  defaultPvP))
-  val styxz         : Opponent = add(Opponent("StyxZ",        StrategySelectionFixed(PvZ4Gate1012, PvZMidgame5GateGoon, PvZLateGameTemplar)))
+  val styxz         : Opponent = add(Opponent("StyxZ",
+    (if (Benzene.matches)
+    new StrategySelectionRecommended(StrategySelectionGreedy, PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar) { duration = 2 } else
+    new StrategySelectionRecommended(StrategySelectionGreedy, PvZ1BaseForgeTechForced, PvZMidgameNeoBisu, PvZLateGameTemplar) { duration = 3 }
+  )))
   val haopan        : Opponent = add(Opponent("Hao Pan",      defaultPvT))
   val killerbot     : Opponent = add(Opponent("Killerbot",    StrategySelectionFixed(PvZFFEEconomic, PvZMidgame5GateGoonReaver, PvZLateGameReaver)))
   val mariandevecka : Opponent = add(Opponent("Marian Devecka", killerbot.policy))

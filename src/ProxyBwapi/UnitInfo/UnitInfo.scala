@@ -141,7 +141,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     unitClass.subjectiveValue
       + scarabCount * Protoss.Scarab.subjectiveValue
       + interceptorCount * Protoss.Interceptor.subjectiveValue
-      + friendly.map(_.loadedUnits.map(_.subjectiveValue).sum).sum
+      + (if (unitClass.isTransport) friendly.map(_.loadedUnits.map(_.subjectiveValue).sum).sum else 0)
   , cd4)
 
   def remainingOccupationFrames: Int = Vector(

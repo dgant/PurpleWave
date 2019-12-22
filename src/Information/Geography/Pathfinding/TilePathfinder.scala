@@ -195,7 +195,7 @@ trait TilePathfinder {
         || (
           profile.endDistanceMaximum > 0
           && end.tileDistanceFast(bestTile) <= profile.endDistanceMaximum
-          && (profile.canCrossUnwalkable || end.tileDistanceFast(bestTile) <= profile.endDistanceMaximum)))
+          && (profile.canCrossUnwalkable || end.groundPixels(bestTile) <= 32 * profile.endDistanceMaximum)))
       if (
         profile.lengthMaximum.exists(_ <= Math.round(bestTileState.pathLength)) // Rounding encourages picking diagonal paths for short maximum lengths
         || (

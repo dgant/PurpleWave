@@ -78,6 +78,7 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   private def outranges(unit: UnitInfo, threat: UnitInfo): Boolean = threat.pixelRangeAgainst(unit) > unit.effectiveRangePixels
   def getSkirmishModifier: Double = {
     val meanRangeUs     = meanRange(us)
+
     val meanRangeEnemy  = meanRange(enemy)
     val outrangeableUs  = us.units.count(unit => unit.matchups.threats.exists(outranges(unit, _)))
     val outrangedUs     = us.units.count(unit => unit.matchups.threatsInRange.exists(outranges(unit, _)))
@@ -103,7 +104,6 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
       1.0)
     output
   }
-
   
   private def estimateSimulation(battle: BattleLocal, weAttack: Boolean, weSnipe: Boolean): Prediction = {
     val simulation = new Simulation(battle, weAttack, weSnipe)

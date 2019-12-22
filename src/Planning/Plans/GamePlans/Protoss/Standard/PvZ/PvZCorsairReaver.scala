@@ -80,7 +80,6 @@ class PvZCorsairReaver extends GameplanTemplate {
         Get(Protoss.CitadelOfAdun),
         Get(Protoss.ZealotSpeed))),
     new Build(
-      Get(Protoss.GroundArmor),
       Get(6, Protoss.Gateway)),
   )
 }

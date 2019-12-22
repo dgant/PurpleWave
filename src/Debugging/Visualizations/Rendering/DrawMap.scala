@@ -138,6 +138,17 @@ object DrawMap {
     line(points.head, points.last, color)
   }
   
+  def drawSkull(pixel: Pixel, colorDark: Color = Colors.MidnightRed, colorBright: Color = Colors.NeonRed, f: Int = 1): Unit = {
+    DrawMap.box(pixel.add(-3 * f, 0), pixel.add(4 * f, 8 * f), colorDark, solid = false)
+    DrawMap.circle(pixel, 5 * f, colorBright,  solid = true)
+    DrawMap.circle(pixel, 5 * f, colorDark,    solid = false)
+    DrawMap.box(pixel.add(-2 * f,  1 * f), pixel.add(2  * f, 7 * f), colorBright, solid = true)
+    DrawMap.box(pixel.add(-2 * f, -2 * f), pixel.add(0  * f, 0 * f), Color.Black, solid = true)
+    DrawMap.box(pixel.add( 1 * f, -2 * f), pixel.add(3  * f, 0 * f), Color.Black, solid = true)
+    DrawMap.line(pixel.add(-1 * f, 3 * f), pixel.add(-2 * f, 9 * f), colorDark)
+    DrawMap.line(pixel.add( 1 * f, 3 * f), pixel.add(2  * f, 9 * f), colorDark)
+  }
+  
   def irrelevant(points: Iterable[Pixel]): Boolean = {
     With.configuration.visualizationCullViewport && points.forall(irrelevant)
   }

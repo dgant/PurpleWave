@@ -130,9 +130,18 @@ object PvZIdeas {
       new If(
         new And(new UnitsAtLeast(1, Protoss.Gateway), new UnitsAtLeast(2, Protoss.Nexus)),
         new Parallel(
-          new If(new EnemiesAtLeast(1, Zerg.Extractor),         new Pump(Protoss.PhotonCannon, 5)),
-          new If(new EnemyStrategy(With.fingerprints.ninePool), new Pump(Protoss.PhotonCannon, 3)),
-          new If(new EnemyHasUpgrade(Zerg.ZerglingSpeed),       new Pump(Protoss.PhotonCannon, 5)),
+          new If(
+            new EnemyStrategy(With.fingerprints.ninePoolGas),
+            new Pump(Protoss.PhotonCannon, 5)),
+          new If(
+            new And(new EnemyStrategy(With.fingerprints.tenHatch), new EnemiesAtLeast(1, Zerg.Extractor)),
+            new Pump(Protoss.PhotonCannon, 4)),
+          new If(
+            new EnemyStrategy(With.fingerprints.ninePool),
+            new Pump(Protoss.PhotonCannon, 3)),
+          new If(
+            new EnemyHasUpgrade(Zerg.ZerglingSpeed),
+            new Pump(Protoss.PhotonCannon, 5)),
           new PumpRatio(Protoss.PhotonCannon, 1, 8,
             Seq(
               Enemy(Zerg.Zergling, 0.3),

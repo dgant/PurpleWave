@@ -29,7 +29,7 @@ object Paradrop extends Action {
     }
 
     // If we can drop out and attack now, do so
-    if (unit.agent.toAttack.exists(unit.inRangeToAttack)) {
+    if (unit.agent.toAttack.exists(target => unit.pixelDistanceEdge(target) <= unit.pixelRangeAgainst(target) + unit.cooldownLeft * unit.topSpeed)) {
       val shouldDrop = unit.matchups.framesOfSafety > unit.cooldownLeft || (unit.agent.shouldEngage && unit.matchups.threatsInRange.forall(u => u.pixelRangeAgainst(unit) + 16 >= unit.effectiveRangePixels))
       if (shouldDrop) {
         Attack.delegate(unit)
@@ -62,7 +62,7 @@ object Paradrop extends Action {
         if ( ! path.pathExists) {
           val profile = new PathfindProfile(unit.tileIncludingCenter)
           profile.end                 = Some(destination)
-          profile.endDistanceMaximum  = endDistanceMaximum // Air distance! Encourages trying to shoot over cliffs
+          profile.endDistanceMaximum  = endDistanceMaximum // Uses the distance implied by allowGroundDist
           profile.lengthMaximum       = Some(30)
           profile.threatMaximum       = maximumThreat
           profile.canCrossUnwalkable  = crossEdges

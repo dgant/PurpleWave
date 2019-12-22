@@ -29,7 +29,7 @@ class Visualization {
     ShowExplosions,
     ShowStatus,
     ShowPerformanceSummary,
-    ShowProduction
+    ShowKills
   )
 
   var enabled   : Boolean = _
@@ -122,6 +122,7 @@ class Visualization {
     ShowHappyVision,
     ShowHistory,
     ShowIntelligence,
+    ShowKills,
     ShowMobility,
     ShowUnitsAll,
     ShowUnitsForeign,

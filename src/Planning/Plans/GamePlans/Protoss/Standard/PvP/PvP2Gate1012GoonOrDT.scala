@@ -93,7 +93,6 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
     new If(new NeedForgeToExpand, new Build(Get(Protoss.Forge))),
     new RequireMiningBases(2))
 
-
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.TwoGate1012
   override def buildPlans = Vector(
 

@@ -40,13 +40,18 @@ object Opponents {
     //  StrategySelectionFixed(PvTProxy2Gate, PvT1015Expand, PvT3BaseArbiter)
     ))
   val locutus       : Opponent = add(Opponent("Locutus",      StrategySelectionSequence(Vector(
+    Seq(PvPRobo),
+    Seq(PvP3GateGoon),
+    Seq(PvP1ZealotExpand),
+    Seq(PvP2GateDTExpand)))))
+  val locutusClonePolicy = StrategySelectionSequence(Vector(
     Seq(PvP2Gate1012DT),
     Seq(PvPRobo),
     Seq(PvP2GateDTExpand),
-    Seq(PvP3GateGoon)))))
-  val znzzbot       : Opponent = add(Opponent("ZNZZBot",      locutus.policy))
-  val betastar      : Opponent = add(Opponent("BetaStar",     locutus.policy))
-  val daqin         : Opponent = add(Opponent("DaQin",        locutus.policy))
+    Seq(PvPProxy2Gate)))
+  val znzzbot       : Opponent = add(Opponent("ZNZZBot",      locutusClonePolicy))
+  val betastar      : Opponent = add(Opponent("BetaStar",     locutusClonePolicy))
+  val daqin         : Opponent = add(Opponent("DaQin",        locutusClonePolicy))
 
   // AIIDE opponents
   val aitp          : Opponent = add(Opponent("AITP",         defaultPvT))
@@ -115,8 +120,7 @@ object Opponents {
   val ziabot2           : Opponent = add(Opponent("Zia bot",            ziabot.policy))
   val johankayser       : Opponent = add(Opponent("Johan Kayser",       srbotone.policy))
   val bryanweber        : Opponent = add(Opponent("Bryan Weber",        cunybot.policy))
-  //val jadien            : Opponent = add(Opponent("jadien",             locutus.policy))
-  val jadien            : Opponent = add(Opponent("jadien",             StrategySelectionFixed(PvP2Gate1012DT)))
+  val jadien            : Opponent = add(Opponent("jadien",             locutus.policy))
   
   val all: Vector[Opponent] = allKnown
 }

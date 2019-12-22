@@ -55,7 +55,7 @@ object TargetFilterFutility extends TargetFilter {
 
     if (actor.is(Terran.Vulture) && target.unitClass.isBuilding && With.frame < GameTime(0, 4)()) return false
 
-    val output = targetReachable && (targetCatchable || atOurWorkers)
+    val output = targetReachable && (atOurWorkers || targetCatchable)
     
     output
   }

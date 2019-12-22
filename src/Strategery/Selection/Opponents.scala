@@ -30,10 +30,11 @@ object Opponents {
     else
       StrategySelectionFixed(PvZProxy2Gate, PvZ4Gate99, PvZMidgame5GateGoonReaver, PvZLateGameReaver)))
   val dragon        : Opponent = add(Opponent("Dragon",
-    if (MapGroups.badForProxying.exists(_.matches))
-      StrategySelectionFixed(PvT1015DT, PvT3BaseArbiter)
-    else
-      StrategySelectionFixed(PvTProxy2Gate, PvT1015DT, PvT2BaseArbiter)))
+    //if (MapGroups.badForProxying.exists(_.matches))
+      StrategySelectionFixed(PvT13Nexus, PvT3BaseArbiter)
+    //else
+    //  StrategySelectionFixed(PvTProxy2Gate, PvT1015Expand, PvT3BaseArbiter)
+    ))
   val locutus       : Opponent = add(Opponent("Locutus",      StrategySelectionSequence(Vector(
     Seq(PvP2Gate1012DT),
     Seq(PvPRobo),
@@ -111,7 +112,7 @@ object Opponents {
   val ziabot2           : Opponent = add(Opponent("Zia bot",            ziabot.policy))
   val johankayser       : Opponent = add(Opponent("Johan Kayser",       srbotone.policy))
   val bryanweber        : Opponent = add(Opponent("Bryan Weber",        cunybot.policy))
-  val jadien            : Opponent = add(Opponent("jadien",             killerbot.policy))
+  val jadien            : Opponent = add(Opponent("jadien",             dragon.policy))
   
   val all: Vector[Opponent] = allKnown
 }

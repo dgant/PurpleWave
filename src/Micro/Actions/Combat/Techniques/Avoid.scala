@@ -117,7 +117,7 @@ object Avoid extends ActionTechnique {
 
   def avoidRealPath(unit: FriendlyUnitInfo, desireProfile: DesireProfile): Unit = {
 
-    if (! unit.readyForMicro) return
+    if (! unit.ready) return
 
     val pathLengthMinimum = 6
     val maximumDistance = pathLengthMinimum + Math.max(0, unit.matchups.framesOfEntanglement * unit.topSpeed + unit.effectiveRangePixels).toInt / 32
@@ -141,7 +141,7 @@ object Avoid extends ActionTechnique {
 
   def avoidPotential(unit: FriendlyUnitInfo, desireProfile: DesireProfile): Unit = {
 
-    if (! unit.readyForMicro) return
+    if (! unit.ready) return
 
     unit.agent.toTravel = Some(unit.agent.origin)
 

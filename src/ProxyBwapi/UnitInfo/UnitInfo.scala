@@ -142,7 +142,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
       + scarabCount * Protoss.Scarab.subjectiveValue
       + interceptorCount * Protoss.Interceptor.subjectiveValue
       + friendly.map(_.loadedUnits.map(_.subjectiveValue).sum).sum
-  )
+  , cd4)
 
   def remainingOccupationFrames: Int = Vector(
     remainingCompletionFrames,
@@ -152,7 +152,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   ).max
 
   val participatingInCombat = new Cache(() => EvaluateTargets.participatingInCombat(this))
-  val baseTargetValue = new Cache(() => EvaluateTargets.getTargetBaseValue(this))
+  val baseTargetValue = new Cache(() => EvaluateTargets.getTargetBaseValue(this), cd2)
   
   //////////////
   // Geometry //
@@ -457,6 +457,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   lazy val isGhost              : CacheIs = new CacheIs(Terran.Ghost)
   lazy val isVulture            : CacheIs = new CacheIs(Terran.Vulture)
   lazy val isGoliath            : CacheIs = new CacheIs(Terran.Goliath)
+  lazy val isWraith             : CacheIs = new CacheIs(Terran.Wraith)
   lazy val isSiegeTankSieged    : CacheIs = new CacheIs(Terran.SiegeTankSieged)
   lazy val isSiegeTankUnsieged  : CacheIs = new CacheIs(Terran.SiegeTankUnsieged)
   lazy val isZealot             : CacheIs = new CacheIs(Protoss.Zealot)
@@ -469,8 +470,11 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   lazy val isReaver             : CacheIs = new CacheIs(Protoss.Reaver)
   lazy val isOverlord           : CacheIs = new CacheIs(Zerg.Overlord)
   lazy val isHydralisk          : CacheIs = new CacheIs(Zerg.Hydralisk)
+  lazy val isMutalisk           : CacheIs = new CacheIs(Zerg.Mutalisk)
   lazy val isLurker             : CacheIs = new CacheIs(Zerg.Lurker)
   lazy val isUltralisk          : CacheIs = new CacheIs(Zerg.Ultralisk)
+  lazy val isGuardian           : CacheIs = new CacheIs(Zerg.Guardian)
+
   
   // Frame X:     Unit's cooldown is 0.   Unit starts attacking.
   // Frame X-1:   Unit's cooldown is 1.   Unit receives attack order.

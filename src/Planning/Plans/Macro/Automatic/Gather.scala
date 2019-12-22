@@ -185,7 +185,8 @@ class Gather extends Plan {
           case 0 => 1.0
           case 1 => 1.0
           case 2 => 1.0
-          case 3 => 0.0001
+          case 3 => if (resource.base.exists(_.townHallTile.x > resource.x + 3)) 0.8 else 0.0001 // Gas-to-left requires 4 to mine
+          case 4 => 0.0001
           case _ => 0.0
         }
       }

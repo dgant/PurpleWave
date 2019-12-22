@@ -118,7 +118,7 @@ object EvaluateTargets extends {
     }
 
     // Anti-air bonus
-    val antiAirBonus = target.matchups.targets.exists(_.isAny(Protoss.Carrier, Protoss.Scout, Zerg.Mutalisk, Zerg.Guardian)) && target.attacksAgainstAir > 0
+    val antiAirBonus = target.attacksAgainstAir > 0 && target.matchups.targets.exists(t => t.flying && t.attacksAgainstGround > 0)
     if (antiAirBonus) {
       output *= 2.0
     }

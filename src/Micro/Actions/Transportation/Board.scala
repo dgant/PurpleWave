@@ -19,7 +19,7 @@ object Board extends Action {
     
     unit.agent.toTravel = Some(transport.pixelCenter)
     if (transport.pixelDistanceEdge(unit) < With.configuration.pickupRadiusPixels) {
-      With.commander.hijack(unit)
+      unit.hijack()
       With.commander.rightClick(unit, transport)
     }
   }

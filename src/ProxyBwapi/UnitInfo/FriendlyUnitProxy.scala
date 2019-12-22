@@ -3,7 +3,7 @@ import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
 import Performance.Cache
 import ProxyBwapi.Players.{PlayerInfo, Players}
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
@@ -226,16 +226,16 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   private val cachedAngleRadians    = new Cache(() => base.getAngle)
   private val cacheVelocityX        = new Cache(() => base.getVelocityX)
   private val cacheVelocityY        = new Cache(() => base.getVelocityY)
-  private val cachedFlying          = new Cache(() => (unitClass.canFly || lifted)  && base.isFlying)
+  private val cachedFlying          = new Cache(() => (unitClass.canFly || lifted)  && base.isFlying, cd4)
   private val cachedLifted          = new Cache(() => unitClass.isFlyingBuilding    && base.isLifted, cd4)
   private val cachedLoaded          = new Cache(() => unitClass.canBeTransported    && base.isLoaded)
-  private val cachedIrradiated      = new Cache(() => unitClass.canBeIrradiated     && base.isIrradiated)
+  private val cachedIrradiated      = new Cache(() => unitClass.canBeIrradiated     && Players.all.exists(_.hasTech(Terran.Irradiate)) && base.isIrradiated)
   private val cachedIsSieged        = new Cache(() => unitClass.canSiege            && base.isSieged)
   private val cachedIsStimmed       = new Cache(() => unitClass.canStim             && base.isStimmed)
-  private val cachedIsLockedDown    = new Cache(() => unitClass.canBeLockedDown     && base.isLockedDown, cd4)
-  private val cachedStasised        = new Cache(() => unitClass.canBeStasised       && base.isStasised, cd4)
-  private val cachedIsEnsnared      = new Cache(() => unitClass.canBeEnsnared       && base.isEnsnared, cd4)
-  private val cachedIsMaelstrommed  = new Cache(() => unitClass.canBeMaelstrommed   && base.isMaelstrommed, cd4)
+  private val cachedIsLockedDown    = new Cache(() => unitClass.canBeLockedDown     && Players.all.exists(_.hasTech(Terran.Lockdown))   && base.isLockedDown,   cd4)
+  private val cachedStasised        = new Cache(() => unitClass.canBeStasised       && Players.all.exists(_.hasTech(Protoss.Stasis))    && base.isStasised,     cd4)
+  private val cachedIsEnsnared      = new Cache(() => unitClass.canBeEnsnared       && Players.all.exists(_.hasTech(Zerg.Ensnare))      && base.isEnsnared,     cd4)
+  private val cachedIsMaelstrommed  = new Cache(() => unitClass.canBeMaelstrommed   && Players.all.exists(_.hasTech(Protoss.Maelstrom)) && base.isMaelstrommed, cd4)
   
   //////////////
   // Statuses //

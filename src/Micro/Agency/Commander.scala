@@ -9,7 +9,6 @@ import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
-import Utilities.CountMap
 import bwapi.UnitCommandType
 
 // Commander is responsible for issuing unit commands
@@ -20,39 +19,23 @@ import bwapi.UnitCommandType
 // of Brood War's glitchy unit behavior.
 //
 class Commander {
-  
-  private val nextOrderFrame = new CountMap[FriendlyUnitInfo]
-  
   def run() {
-    nextOrderFrame.keys.filterNot(_.alive).foreach(nextOrderFrame.remove)
-    nextOrderFrame.keys.foreach(unit => nextOrderFrame(unit) = Math.max(nextOrderFrame(unit), AttackDelay.nextSafeOrderFrame(unit)))
-  }
-  
-  def ready(unit: FriendlyUnitInfo): Boolean = {
-    nextOrderFrame(unit) <= With.frame
-  }
-  
-  private def unready(unit: FriendlyUnitInfo): Boolean = {
-    ! ready(unit)
-  }
-  
-  def hijack(unit: FriendlyUnitInfo) {
-    nextOrderFrame.remove(unit)
+    With.units.ours.foreach(unit => unit.sleepUntil(Math.max(unit.nextOrderFrame.getOrElse(0), AttackDelay.nextSafeOrderFrame(unit))))
   }
   
   def doNothing(unit: FriendlyUnitInfo) {
-    if (unready(unit)) return
+    if (unit.unready) return
     sleep(unit)
   }
   
   def stop(unit: FriendlyUnitInfo) {
-    if (unready(unit)) return
+    if (unit.unready) return
     unit.baseUnit.stop()
     sleep(unit)
   }
   
   def hold(unit: FriendlyUnitInfo) {
-    if (unready(unit)) return
+    if (unit.unready) return
     if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
     unit.agent.leadFollower = follower => hold(follower)
     if (unit.velocity.lengthSquared > 0 && ! unit.holdingPosition) {
@@ -69,7 +52,7 @@ class Commander {
   }
   
   def attack(unit: FriendlyUnitInfo, target: UnitInfo) {
-    if (unready(unit)) return
+    if (unit.unready) return
     if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
     unit.agent.leadFollower = follower => attack(follower, target)
 
@@ -111,7 +94,7 @@ class Commander {
   }
 
   def attackMove(unit: FriendlyUnitInfo, destination: Pixel) {
-    if (unready(unit)) return
+    if (unit.unready) return
     if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
     val alreadyAttackMovingThere = unit.command.exists(c =>
       c.getUnitCommandType.toString == UnitCommandType.Attack_Move.toString &&
@@ -126,7 +109,7 @@ class Commander {
   }
   
   def patrol(unit: FriendlyUnitInfo, destination: Pixel) {
-    if (unready(unit)) return
+    if (unit.unready) return
     autoUnburrow(unit)
     unit.baseUnit.patrol(destination.bwapi)
     unit.agent.leadFollower = follower => patrol(follower, destination)
@@ -135,7 +118,7 @@ class Commander {
   
   val flyingOvershoot = 288.0
   def move(unit: FriendlyUnitInfo, to: Pixel) {
-    if (unready(unit)) return
+    if (unit.unready) return
     autoUnburrow(unit)
     // Send some flying units past their destination to maximize acceleration
     var destination = to
@@ -210,14 +193,14 @@ class Commander {
   }
   
   def rightClick(unit: FriendlyUnitInfo, target: UnitInfo) {
-    if (unready(unit)) return
+    if (unit.unready) return
     if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
     unit.baseUnit.rightClick(target.baseUnit)
     sleepAttack(unit)
   }
   
   def useTech(unit: FriendlyUnitInfo, tech: Tech) {
-    if (unready(unit)) return
+    if (unit.unready) return
     autoUnburrow(unit)
     if (tech == Terran.Stim) {
       if (With.framesSince(unit.agent.lastStim) < 24) return
@@ -228,7 +211,7 @@ class Commander {
   }
   
   def useTechOnUnit(unit: FriendlyUnitInfo, tech: Tech, target: UnitInfo) {
-    if (unready(unit)) return
+    if (unit.unready) return
     autoUnburrow(unit)
     unit.baseUnit.useTech(tech.baseType, target.baseUnit)
     if (tech == Protoss.ArchonMeld || tech == Protoss.DarkArchonMeld) {
@@ -240,7 +223,7 @@ class Commander {
   }
   
   def useTechOnPixel(unit: FriendlyUnitInfo, tech: Tech, target: Pixel) {
-    if (unready(unit)) return
+    if (unit.unready) return
     autoUnburrow(unit)
     unit.agent.movingTo = Some(target)
     unit.baseUnit.useTech(tech.baseType, target.bwapi)
@@ -252,13 +235,13 @@ class Commander {
   }
   
   def repair(unit: FriendlyUnitInfo, target: UnitInfo) {
-    if (unready(unit)) return
+    if (unit.unready) return
     unit.baseUnit.repair(target.baseUnit)
     sleep(unit, 24)
   }
 
   def returnCargo(unit: FriendlyUnitInfo): Unit = {
-    if (unready(unit)) return
+    if (unit.unready) return
     if (unit.carryingResources) {
       autoUnburrow(unit)
       unit.baseUnit.returnCargo
@@ -267,7 +250,7 @@ class Commander {
   }
   
   def gather(unit: FriendlyUnitInfo, resource: UnitInfo, allowReturningCargo: Boolean = true) {
-    if (unready(unit)) return
+    if (unit.unready) return
     autoUnburrow(unit)
     if (allowReturningCargo && (unit.carryingMinerals || unit.carryingGas)) {
       if ( ! unit.gatheringGas && ! unit.gatheringMinerals) {
@@ -296,14 +279,14 @@ class Commander {
   }
   
   def build(unit: FriendlyUnitInfo, unitClass: UnitClass) {
-    if (unready(unit)) return
+    if (unit.unready) return
     autoUnburrow(unit)
     unit.baseUnit.build(unitClass.baseType)
     sleepBuild(unit)
   }
   
   def build(unit: FriendlyUnitInfo, unitClass: UnitClass, tile: Tile) {
-    if (unready(unit)) return
+    if (unit.unready) return
     autoUnburrow(unit)
     if (unit.pixelDistanceSquared(tile.pixelCenter) > Math.pow(32.0 * 5.0, 2)) {
       move(unit, tile.pixelCenter)
@@ -314,19 +297,19 @@ class Commander {
   }
   
   def tech(unit: FriendlyUnitInfo, tech: Tech) {
-    if (unready(unit)) return
+    if (unit.unready) return
     unit.baseUnit.research(tech.baseType)
     sleep(unit)
   }
   
   def upgrade(unit: FriendlyUnitInfo, upgrade: Upgrade) {
-    if (unready(unit)) return
+    if (unit.unready) return
     unit.baseUnit.upgrade(upgrade.baseType)
     sleep(unit)
   }
   
   def cancel(unit: FriendlyUnitInfo) {
-    if (unready(unit)) return
+    if (unit.unready) return
     if (unit.teching) {
       unit.baseUnit.cancelResearch()
     } else if (unit.upgrading) {
@@ -338,14 +321,14 @@ class Commander {
   }
   
   def rally(unit: FriendlyUnitInfo, pixel: Pixel) {
-    if (unready(unit)) return
+    if (unit.unready) return
     unit.baseUnit.setRallyPoint(pixel.bwapi)
     unit.lastSetRally = With.frame
     sleep(unit)
   }
   
   def rally(unit: FriendlyUnitInfo, targetUnit: UnitInfo) {
-    if (unready(unit)) return
+    if (unit.unready) return
     unit.baseUnit.setRallyPoint(unit.baseUnit)
     unit.lastSetRally = With.frame
     sleep(unit)
@@ -358,25 +341,25 @@ class Commander {
   }
   
   def addon(unit: FriendlyUnitInfo, unitClass: UnitClass) {
-    if (unready(unit)) return
+    if (unit.unready) return
     unit.baseUnit.buildAddon(unitClass.baseType)
     sleep(unit)
   }
   
   def buildScarab(unit: FriendlyUnitInfo) {
-    if (unready(unit)) return
+    if (unit.unready) return
     unit.baseUnit.build(Protoss.Scarab.baseType)
     sleep(unit)
   }
   
   def buildInterceptor(unit: FriendlyUnitInfo) {
-    if (unready(unit)) return
+    if (unit.unready) return
     unit.baseUnit.build(Protoss.Interceptor.baseType)
     sleep(unit)
   }
   
   def cloak(unit: FriendlyUnitInfo, tech: Tech) {
-    if (unready(unit)) return
+    if (unit.unready) return
     unit.agent.lastCloak = With.frame
     unit.baseUnit.cloak()
     unit.agent.leadFollower = follower => cloak(follower, tech)
@@ -384,32 +367,32 @@ class Commander {
   }
   
   def decloak(unit: FriendlyUnitInfo, tech: Tech) {
-    if (unready(unit)) return
+    if (unit.unready) return
     unit.agent.leadFollower = follower => decloak(follower, tech)
     unit.baseUnit.decloak()
     sleep(unit)
   }
   
   def burrow(unit: FriendlyUnitInfo) {
-    if (unready(unit)) return
+    if (unit.unready) return
     unit.baseUnit.burrow()
     sleep(unit)
   }
   
   def unburrow(unit: FriendlyUnitInfo) {
-    if (unready(unit)) return
+    if (unit.unready) return
     unit.baseUnit.unburrow()
     sleep(unit)
   }
   
   def lift(unit: FriendlyUnitInfo) {
-    if (unready(unit)) return
+    if (unit.unready) return
     unit.baseUnit.lift()
     sleep(unit)
   }
 
   def autoUnburrow(unit: FriendlyUnitInfo): Unit = {
-    if (unready(unit)) return
+    if (unit.unready) return
     if (unit.burrowed) unburrow(unit)
   }
   
@@ -432,7 +415,7 @@ class Commander {
       With.frame + With.configuration.performanceMinimumUnitSleep,
       With.frame + requiredDelay,
       With.frame + With.latency.turnSize,
-      nextOrderFrame(unit)).max
-    nextOrderFrame.put(unit, sleepUntil)
+      unit.nextOrderFrame.getOrElse(0)).max
+    unit.sleepUntil(sleepUntil)
   }
 }

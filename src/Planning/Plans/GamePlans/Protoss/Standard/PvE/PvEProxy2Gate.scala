@@ -11,7 +11,7 @@ import Planning.Plans.GamePlans.Protoss.Situational.PlaceGatewaysProxied
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Expanding.RequireBases
+import Planning.Plans.Macro.Expanding.{RequireBases, RequireMiningBases}
 import Planning.Plans.Scouting.{FoundEnemyBase, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
@@ -128,6 +128,10 @@ class PvEProxy2Gate extends GameplanTemplate {
     new If(
       new EnemiesAtMost(1, UnitMatchOr(Protoss.Dragoon, Terran.Vulture)),
       new Pump(Protoss.Zealot)),
+
+    new If(
+      new UnitsAtLeast(4, Protoss.Gateway, complete = true),
+      new RequireMiningBases(2))
   )
 
   override def emergencyPlans: Seq[Plan] = Seq(

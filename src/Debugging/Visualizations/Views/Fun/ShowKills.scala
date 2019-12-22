@@ -28,9 +28,9 @@ object ShowKills extends View {
       val x3 = kills >= t2
       val skulls = kills / (if (x3) t2 else if (x2) t1 else 1)
       val scale = if (x3) 3 else if (x2) 2 else 1
-      val w = 10 * scale + 1
-      val dx = skulls * w / 2
-      (0 until kills).foreach(kill => DrawMap.drawSkull(unit.pixelCenter.add(kill * w - dx, -8 * (scale + 1)), f = scale))
+      val w = 10 * scale + 2
+      val dx = (skulls - 1) * w / 2
+      (0 until skulls).foreach(kill => DrawMap.drawSkull(unit.pixelCenter.add(kill * w - dx, -8 * (scale + 1)), f = scale))
     })
   }
 }

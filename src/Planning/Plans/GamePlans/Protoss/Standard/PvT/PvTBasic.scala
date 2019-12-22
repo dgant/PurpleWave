@@ -116,13 +116,16 @@ class PvTBasic extends GameplanTemplate {
             new BuildOrder(ProtossBuilds.PvTDTExpand_WithCitadel: _*),
             new BuildOrder(ProtossBuilds.PvTDTExpand_WithoutCitadel: _*)))))))
 
-  class EmployingThreeBase  extends And(new Not(new EnemyStrategy(With.fingerprints.bio)), new Or(new Sticky(new MiningBasesAtLeast(3)), new Employing(PvT3BaseCarrier, PvT3BaseArbiter)))
+  class EmployingThreeBase  extends Or(new Sticky(new MiningBasesAtLeast(3)), new Employing(PvT3BaseCarrier, PvT3BaseArbiter))
   class EmployingTwoBase    extends Not(new EmployingThreeBase)
   class CarriersCountered   extends Check(() => With.units.countEnemy(Terran.Goliath) > Math.max(10, With.units.countOurs(Protoss.Interceptor) / 1.8))
   class EmployingCarriers   extends And(new Employing(PvT2BaseCarrier, PvT3BaseCarrier), new Not(new CarriersCountered))
   class EmployingArbiters   extends Or( new Employing(PvT2BaseArbiter, PvT3BaseArbiter),         new CarriersCountered)
-  class WantObservers       extends Or(new EnemyStrategy(With.fingerprints.twoFac), new EmployingThreeBase, new EnemyHasShownWraithCloak)
-  class PreparedForBio      extends Latch(new Or(new UnitsAtLeast(1, Protoss.Reaver), new TechComplete(Protoss.PsionicStorm)))
+  class PreparedForBio      extends Latch(new Or(new UnitsAtLeast(1, Protoss.Reaver), new TechStarted(Protoss.PsionicStorm)))
+  class WantObservers       extends Or(
+    new EnemyStrategy(With.fingerprints.twoFac),
+    new And(new Not(new EnemyStrategy(With.fingerprints.bio)), new EmployingThreeBase),
+    new EnemyHasShownWraithCloak)
 
   class ReadyForThirdBase extends And(
     // Don't expand if unprepared for bio
@@ -223,8 +226,8 @@ class PvTBasic extends GameplanTemplate {
     new If(new UnitsAtLeast(1, Protoss.Shuttle), new UpgradeContinuously(Protoss.ShuttleSpeed)))
 
   class LowPriorityUpgrades extends Parallel(
-    new If(new And(new EmployingArbiters, new GasPumpsAtLeast(3)), new Build(Get(2, Protoss.Stargate), Get(2, Protoss.Forge))),
-    new If(new And(new EmployingCarriers, new GasPumpsAtLeast(3)), new Build(Get(2, Protoss.CyberneticsCore))),
+    new If(new And(new EmployingArbiters, new GasPumpsAtLeast(3), new UnitsAtLeast(1, Protoss.ArbiterTribunal)),  new Build(Get(2, Protoss.Stargate), Get(2, Protoss.Forge))),
+    new If(new And(new EmployingCarriers, new GasPumpsAtLeast(3), new UnitsAtLeast(1, Protoss.FleetBeacon)),      new Build(Get(2, Protoss.CyberneticsCore))),
     new If(new EmployingCarriers, new UpgradeContinuously(Protoss.Shields, 1)),
 
     // Get upgrades with Arbiter builds, vs. Bio, or when maxed on air upgrades
@@ -260,20 +263,32 @@ class PvTBasic extends GameplanTemplate {
     new EmployingArbiters,
     new And(new UnitsAtLeast(12, Protoss.Carrier), new GasPumpsAtLeast(5), new MiningBasesAtLeast(4)))
 
-  class TechVsBio extends If(
+  class TechVsBioIsReaver extends And(
+    new UnitsAtMost(0, Protoss.TemplarArchives),
     new Or(
       new EmployingCarriers,
-      new UnitsAtLeast(1, Protoss.RoboticsFacility)),
-    new Build(Get(Protoss.RoboticsFacility), Get(Protoss.RoboticsSupportBay)),
-    new Parallel(
+      new UnitsAtLeast(1, Protoss.RoboticsFacility)))
+
+  class TechVsBio extends Parallel(
+    new If(
+      new TechVsBioIsReaver,
+      new Build(Get(Protoss.RoboticsFacility), Get(Protoss.RoboticsSupportBay)),
+      new Parallel(
+        new Build(
+          Get(Protoss.CitadelOfAdun),
+          Get(Protoss.TemplarArchives),
+          Get(Protoss.PsionicStorm)))),
+    new If(
+      new MiningBasesAtLeast(3),
       new Build(
         Get(Protoss.CitadelOfAdun),
-        Get(Protoss.TemplarArchives),
-        Get(Protoss.PsionicStorm),
         Get(2, Protoss.Forge),
         Get(Protoss.GroundArmor),
-        Get(Protoss.GroundArmor),
-        Get(Protoss.ZealotSpeed))))
+        Get(Protoss.GroundDamage),
+        Get(Protoss.ZealotSpeed))),
+    new If(
+      new GasPumpsAtLeast(3),
+      new Build(Get(Protoss.TemplarArchives))))
 
   class TechToCarriers extends Parallel(
     new If(
@@ -307,7 +322,14 @@ class PvTBasic extends GameplanTemplate {
   class AddPrimaryTech extends Parallel(
     new If(
       new EnemyStrategy(With.fingerprints.bio),
-      new TechVsBio,
+      new TechVsBio),
+    new If(
+      new Or(
+        new Not(new EnemyStrategy(With.fingerprints.bio)),
+        new And(
+          new PreparedForBio,
+          new MiningBasesAtLeast(4),
+          new GasPumpsAtLeast(3))),
       new Parallel(
         new If(new ReadyForCarriers, new TechToCarriers),
         new If(new ReadyForArbiters, new TechToArbiters))))

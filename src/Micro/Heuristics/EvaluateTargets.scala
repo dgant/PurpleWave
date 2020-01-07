@@ -117,6 +117,11 @@ object EvaluateTargets extends {
       output *= 2.0
     }
 
+    // Immobility bonus
+    if ( ! target.canMove) {
+      output *= 1.5
+    }
+
     // Anti-air bonus
     val antiAirBonus = target.attacksAgainstAir > 0 && target.matchups.targets.exists(t => t.flying && t.attacksAgainstGround > 0)
     if (antiAirBonus) {

@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Techniques
 import Mathematics.PurpleMath
 import Micro.Actions.Combat.Techniques.Common.Activators.WeightedMean
 import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, AttackAsSoonAsPossible}
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Breathe extends ActionTechnique {
@@ -17,7 +17,7 @@ object Breathe extends ActionTechnique {
     && unit.matchups.targets.nonEmpty
     && unit.matchups.threats.nonEmpty
     && ! unit.unitClass.melee
-    && ! unit.is(Protoss.Corsair) // Try to find a better generalizer; maybe cooldown vs. turn rate
+    && ! unit.isAny(Terran.Battlecruiser, Protoss.Corsair) // Try to find a better generalizer; maybe cooldown vs. turn rate
     && ! unit.transport.exists(_.flying) // Transport cooldown means this just makes the unit flee
   )
   

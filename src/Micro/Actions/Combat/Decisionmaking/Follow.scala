@@ -23,7 +23,7 @@ object Follow extends Action {
     unit.agent.toTravel = maybeLeader.map(_.pixelCenter).orElse(unit.agent.toTravel)
     maybeLeader
       .withFilter(leader =>
-        unit.pixelDistanceCenter(leader) < Seq(128, ByOption.min(unit.matchups.threats.view.map(_.pixelsToGetInRange(unit).toInt)).getOrElse(0)).max
+        unit.pixelDistanceCenter(leader) < Seq(256, ByOption.min(unit.matchups.threats.view.map(_.pixelsToGetInRange(unit).toInt)).getOrElse(0)).max
         && ( ! unit.isCarrier() || leader.matchups.threatsInRange.forall(unit.matchups.threatsInRange.contains))
       )
       .foreach(leader => {

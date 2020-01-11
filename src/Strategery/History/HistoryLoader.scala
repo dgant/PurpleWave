@@ -1,7 +1,6 @@
 package Strategery.History
 
 import java.io._
-import java.nio.file.Paths
 
 import Lifecycle.With
 
@@ -33,7 +32,6 @@ object HistoryLoader {
     val gamesByTimestamp = new mutable.HashMap[Long, HistoricalGame]
     games.foreach(game => gamesByTimestamp(game.timestamp) = gamesByTimestamp.getOrElse(game.timestamp, game))
     val output = gamesByTimestamp.values.toSeq.sortBy(_.timestamp).reverse
-    output.zipWithIndex.foreach(pair => pair._1.order = pair._2)
     output
   }
   

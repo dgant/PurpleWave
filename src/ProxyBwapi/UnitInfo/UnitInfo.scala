@@ -148,7 +148,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     remainingCompletionFrames,
     remainingTechFrames,
     remainingUpgradeFrames,
-    remainingTrainFrames
+    remainingTrainFrames,
+    addon.map(_.remainingCompletionFrames).getOrElse(0)
   ).max
 
   val participatingInCombat = new Cache(() => EvaluateTargets.participatingInCombat(this))

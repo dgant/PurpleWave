@@ -22,14 +22,16 @@ class Visualization {
   var views = mutable.ArrayBuffer(
     // Evergreen views
     ShowClock,
-    ShowStrategy,
+    /*
     ShowUnitsAll,
     ShowUnitsFriendly,
     ShowUnitsForeign,
     ShowExplosions,
     ShowStatus,
     ShowPerformanceSummary,
-    ShowFingerprints
+    ShowFingerprints,
+    */
+    ShowKills
   )
 
   var enabled   : Boolean = _

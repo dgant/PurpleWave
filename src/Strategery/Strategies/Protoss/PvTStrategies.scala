@@ -71,11 +71,13 @@ object PvT2GateRangeExpand extends PvTBasicOpener {
     With.fingerprints.bbs)
 }
 object PvT2GateRangeExpandCarrier extends PvTStrategy {
+  override def allowedVsHuman: Boolean = false
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fiveRax,
     With.fingerprints.bbs)
 }
 object PvT25BaseCarrier extends PvTBasicOpener {
+  override def allowedVsHuman: Boolean = false
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
     PvT3BaseCarrier
   ))
@@ -99,6 +101,7 @@ object PvT1015DT extends PvTStrategy {
 }
 object PvT1GateRobo extends PvTBasicOpener
 object PvT2GateObserver extends PvTBasicOpener {
+  override def allowedVsHuman: Boolean = false
   override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.twoFac,
     With.fingerprints.twoFacVultures,
@@ -124,6 +127,7 @@ object PvT2BaseArbiter extends PvTStrategy { override val mapsBlacklisted = Iter
 object PvT3BaseArbiter extends PvTStrategy
 
 object PvTStove extends PvTStrategy {
+  override def allowedVsHuman: Boolean = false
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(PvT2BaseArbiter))
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.bbs, With.fingerprints.twoRax1113)
 }
@@ -134,6 +138,7 @@ object PvTProxy2Gate extends PvTStrategy {
 }
 
 object PvTReaverCarrierCheese extends PvTStrategy {
+  override def allowedVsHuman: Boolean = false
   override def gameplan: Option[Plan] = Some(new PvTReaverCarrierCheese)
   override def opponentsWhitelisted: Option[Iterable[String]] = Some(Vector("Rooijackers", "Leta", "KimBot", "Taeja Kim"))
 }

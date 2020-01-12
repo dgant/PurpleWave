@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{Attack, EjectScout}
+import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -42,6 +42,8 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
     new Blueprint(this, building = Some(Protoss.Pylon)),
     new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
 
+  override def aggressionPlan: Plan = new If(new UpgradeComplete(Protoss.ZealotSpeed), new Aggression(1.5), super.aggressionPlan)
+
   override def priorityAttackPlan: Plan = new Parallel(
     new If(
       new EnemyStrategy(With.fingerprints.proxyGateway),
@@ -72,6 +74,8 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
     new PvPIdeas.ReactToCannonRush)
 
   class GoDT extends And(
+    new EnemiesAtMost(0, Protoss.PhotonCannon),
+    new EnemiesAtMost(0, Protoss.Forge),
     new Or(
       new Employing(PvP2Gate1012DT),
       new EnemyStrategy(With.fingerprints.fourGateGoon, With.fingerprints.proxyGateway)),
@@ -88,7 +92,6 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
   class Expand extends Parallel(
     new If(new NeedForgeToExpand, new Build(Get(Protoss.Forge))),
     new RequireMiningBases(2))
-
 
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.TwoGate1012
   override def buildPlans = Vector(

@@ -2,6 +2,7 @@ package ProxyBwapi.UnitInfo
 
 import Information.Grids.Combat.AbstractGridEnemyRange
 import Lifecycle.With
+import Micro.Actions.Combat.Techniques.Ignore
 import Micro.Agency.Agent
 import Micro.Squads.Squad
 import Performance.Cache
@@ -18,7 +19,6 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
   def squad: Option[Squad] = With.squads.squadByUnit.get(this)
   def squadmates: Set[FriendlyUnitInfo] = squad.map(_.units).getOrElse(Set.empty)
   def squadenemies: Seq[UnitInfo] = squad.map(_.enemies).getOrElse(Seq.empty)
-  def readyForMicro: Boolean = With.commander.ready(this)
   def teammates: Set[UnitInfo] = teammatesCache()
   def enemies: Seq[UnitInfo] = enemiesCache()
   lazy val agent: Agent = new Agent(this)
@@ -53,6 +53,15 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
   //////////////
 
   def completeOrNearlyComplete: Boolean = complete || remainingCompletionFrames < With.reaction.planningMax
+
+  // Commander readiness
+  var nextOrderFrame: Option[Int] = None
+  @inline def ready: Boolean = nextOrderFrame.forall(_ <= With.frame)
+  @inline def unready: Boolean = ! ready
+  @inline def sleepUntil(frame: Int): Unit = nextOrderFrame = Some(frame)
+  def hijack(): Unit = nextOrderFrame = None
+
+
 
   private var _trainerPlan: Option[Plan] = None
   def trainerPlan: Option[Plan] = _trainerPlan
@@ -101,4 +110,8 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
       With.grids.enemyRangeAir
     else
       With.grids.enemyRangeGround
+
+  // Cached values for Ignore
+  def canBeIgnorantOfCombat = combatIgnoranceBuffer() > 0
+  val combatIgnoranceBuffer = new Cache(() => Ignore.ignoranceBuffer(this))
 }

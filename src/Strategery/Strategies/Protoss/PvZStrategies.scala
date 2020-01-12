@@ -31,7 +31,7 @@ object PvZ1BaseForgeTech extends PvZStrategy {
 }
 object PvZ1BaseForgeTechForced extends PvZStrategy {
   override def allowedVsHuman: Boolean = false
-  override def opponentsWhitelisted: Option[Iterable[String]] = Some(Seq("Coxe", "ZZZK", "Jadien"))
+  override def opponentsWhitelisted: Option[Iterable[String]] = Some(Seq("Coxe", "ZZZK", "StyX", "Jadien", "ChimeraBot"))
   override def choices: Iterable[Iterable[Strategy]] = PvZ1BaseForgeTech.choices
 }
 object PvZProxy2Gate extends PvZ2GateOpening {

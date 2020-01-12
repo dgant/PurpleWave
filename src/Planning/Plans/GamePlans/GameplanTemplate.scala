@@ -16,6 +16,7 @@ import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Plans.Scouting.{ChillOverlords, ScoutAt, ScoutExpansionsAt}
 import Planning.Predicates.Compound.{Check, Not}
 import Planning.Predicates.Milestones.BasesAtLeast
+import Planning.Predicates.Reactive.SafeToMoveOut
 import Planning.Predicates.Strategy.WeAreZerg
 
 abstract class GameplanTemplate extends GameplanMode {
@@ -35,7 +36,7 @@ abstract class GameplanTemplate extends GameplanMode {
   def supplyPlan            : Plan              = new RequireSufficientSupply
   def workerPlan            : Plan              = new If(new Not(new WeAreZerg), new PumpWorkers)
   def scoutPlan             : Plan              = new ScoutAt(14)
-  def scoutExposPlan        : Plan              = new If(new BasesAtLeast(2), new ScoutExpansionsAt(60))
+  def scoutExposPlan        : Plan              = new If(new BasesAtLeast(2), new If(new SafeToMoveOut, new ScoutExpansionsAt(60), new ScoutExpansionsAt(80)))
   def yoloPlan              : Plan              = new If(new Check(() => With.yolo.active()), new Attack)
   def priorityDefensePlan   : Plan              = NoPlan()
   def priorityAttackPlan    : Plan              = NoPlan()

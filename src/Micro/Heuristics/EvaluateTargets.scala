@@ -118,10 +118,26 @@ object EvaluateTargets extends {
       output *= 2.0
     }
 
+    // Immobility bonus
+    if ( ! target.canMove) {
+      output *= 1.5
+    }
+
     // Anti-air bonus
-    val antiAirBonus = target.matchups.targets.exists(_.isAny(Protoss.Carrier, Protoss.Scout, Zerg.Mutalisk, Zerg.Guardian)) && target.attacksAgainstAir > 0
+    val antiAirBonus = target.attacksAgainstAir > 0 && target.matchups.targets.exists(t => t.flying && t.attacksAgainstGround > 0)
     if (antiAirBonus) {
       output *= 2.0
+    }
+
+    // Visibility bonus
+    if (target.visibleToOpponents) {
+      output *= 1.25
+    }
+    if (target.likelyStillThere) {
+      output *= 1.25
+    }
+    if (target.possiblyStillThere) {
+      output *= 1.25
     }
 
     // Temporary visibility bonus

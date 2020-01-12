@@ -22,7 +22,7 @@ object DownhillPathfinder {
     targetValue   : Int = 0)
       : Unit = {
 
-    if (! unit.readyForMicro) return
+    if (! unit.ready) return
 
     val enemyRangeGrid = unit.enemyRangeGrid
 

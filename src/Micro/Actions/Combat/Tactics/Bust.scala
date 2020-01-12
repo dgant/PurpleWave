@@ -71,7 +71,7 @@ object Bust extends Action {
     if (With.framesSince(unit.lastFrameTakingDamage) < GameTime(0, 1)()) {
       Avoid.delegate(unit)
     }
-    else if (unit.matchups.targetsInRange.exists(_.canAttack(unit))) {
+    else if (unit.matchups.targetsInRange.exists(_.canAttack(unit)) && unit.velocity.lengthSquared > 0) {
       With.commander.hold(unit)
     }
     unit.agent.toAttack = ByOption.minBy(unit.matchups.threats)(_.pixelDistanceEdge(unit))

@@ -111,6 +111,7 @@ class SafeToMoveOut extends Predicate {
     val archons       = countOurs(Protoss.Archon)
     val storms        = if (psionicStorm) With.units.ours.map(u => if (u.is(Protoss.HighTemplar)) u.energy / 75 else 0).sum else 0
     val reavers       = countOurs(Protoss.Reaver)
+    val shuttles      = countOurs(Protoss.Shuttle)
     val corsairs      = countOurs(Protoss.Corsair)
     val scouts        = countOurs(Protoss.Scout)
     val carriers      = countOurs(Protoss.Carrier)
@@ -135,12 +136,14 @@ class SafeToMoveOut extends Predicate {
       + 1.5 * dragoons
       + 1.0 * (zealots + zealotBonusUs)
       + 1.5 * storms
+      + 4.5 * reavers
+      + 2.0 * Math.min(reavers / 2.0, shuttles)
     )
     val groundThem = (
-        0.6 * Math.pow(zerglings, (if (zerglingSpeed) 0.88 else 0.8)) * (if (zerglingAspd) 1.5 else 1.0)
-      + 1.5 * hydralisks
-      + 8.0 * ultralisks
-      + 6.0 * defilers
+        0.6  * Math.pow(zerglings, (if (zerglingSpeed) 0.88 else 0.8)) * (if (zerglingAspd) 1.5 else 1.0)
+      + 1.25 * hydralisks
+      + 8.0  * ultralisks
+      + 6.0  * defilers
     )
   
     val safeInAir     = airThem     == 0 || airThem     <= airUs     * With.blackboard.aggressionRatio()

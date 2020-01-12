@@ -8,6 +8,8 @@ class PerformanceMonitor {
   
   private val framesToTrack = 24 * 3
   private val frameTimes = Array.fill(framesToTrack)(1l)
+
+  val frameLimitShort: Int = 85
   
   private var millisecondsBefore = 0l
   private var lastFrameDelayUpdate = 0
@@ -50,9 +52,9 @@ class PerformanceMonitor {
     }
 
     frameTimes(With.frame % framesToTrack) = millisecondDifference
-    if (millisecondDifference >= 55)    framesOverShort += 1
-    if (millisecondDifference >= 1000)  framesOver1000  += 1
-    if (millisecondDifference >= 10000) framesOver10000 += 1
+    if (millisecondDifference >= frameLimitShort) framesOverShort += 1
+    if (millisecondDifference >= 1000)            framesOver1000  += 1
+    if (millisecondDifference >= 10000)           framesOver10000 += 1
   }
 
   def millisecondsLeftThisFrame: Long = {
@@ -72,13 +74,13 @@ class PerformanceMonitor {
   }
 
   def violatedRules: Boolean = {
-    With.frame > 0 && millisecondsSpentThisFrame >= 55
+    With.frame > 0 && millisecondsSpentThisFrame >= frameLimitShort
   }
 
   def danger: Boolean = (
     (With.configuration.enableStreamManners || With.configuration.enablePerformanceSurrender)
     && (
-      framesOverShort    > 160 ||
+      framesOverShort > 160 ||
       framesOver1000  > 5   ||
       framesOver10000 > 1)
   )
@@ -87,6 +89,6 @@ class PerformanceMonitor {
   def meanFrameMilliseconds : Long = frameTimes.view.map(Math.min(_, 100)).sum / framesToTrack
 
   def disqualified: Boolean =
-    framesOverShort    >= 320 ||
+    framesOverShort >= 320 ||
     framesOver1000  >= 10
 }

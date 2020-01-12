@@ -52,7 +52,7 @@ class PvZFFE extends GameplanTemplate {
           new Trigger(
             new UnitsAtMost(0, Protoss.Forge),
             new BuildOrder(ProtossBuilds.PvZFFE_NexusGatewayForge: _*),
-            new BuildOrder(ProtossBuilds.PvZFFE_NexusForgeCannons: _*)),
+            new BuildOrder(ProtossBuilds.PvZFFE_ForgeNexusCannon: _*)),
           new If(
             new EnemyStrategy(With.fingerprints.overpool, With.fingerprints.twelvePool),
             new BuildOrder(ProtossBuilds.PvZFFE_ForgeNexusCannon: _*),

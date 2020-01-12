@@ -8,10 +8,11 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Predicates.Compound.Latch
+import Planning.Predicates.Compound.{And, Latch}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyMutalisks
 import Planning.Predicates.Strategy.Employing
+import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss.{PvZLateGameCarrier, PvZMidgameCorsairReaverGoon, PvZMidgameCorsairReaverZealot}
 
@@ -32,7 +33,16 @@ class PvZCorsairReaver extends GameplanTemplate {
     new PumpRatio(Protoss.Corsair, 1, 12, Seq(Enemy(Zerg.Mutalisk, 1.0))),
     new PumpRatio(Protoss.Dragoon, 1, 8, Seq(Enemy(Zerg.Mutalisk, 1.0), Friendly(Protoss.Corsair, -1.0))),
     new PumpRatio(Protoss.Stargate, 0, 2, Seq(Enemy(Zerg.Mutalisk, 1/5.0))),
-    new If(new UnitsAtLeast(16, Protoss.Dragoon), new RequireMiningBases(3)),
+    new Trigger(
+      new Or(
+        new UnitsAtLeast(16, Protoss.Dragoon),
+        new And(
+          new UnitsAtLeast(30, UnitMatchWarriors),
+          new UnitsAtLeast(2, Protoss.Reaver, complete = true),
+          new UnitsAtLeast(1, Protoss.Shuttle, complete = true))),
+      new Parallel(
+        new Attack,
+        new RequireMiningBases(3))),
     new If(
       new Employing(PvZLateGameCarrier),
       new PumpShuttleAndReavers(shuttleFirst = false),
@@ -69,6 +79,7 @@ class PvZCorsairReaver extends GameplanTemplate {
       new Build(
         Get(Protoss.CitadelOfAdun),
         Get(Protoss.ZealotSpeed))),
-    new Build(Get(6, Protoss.Gateway)),
+    new Build(
+      Get(6, Protoss.Gateway)),
   )
 }

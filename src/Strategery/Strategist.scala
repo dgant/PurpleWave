@@ -52,10 +52,15 @@ class Strategist {
     .map(_.gameplan.get)
     .getOrElse(new StandardGamePlan)
   
-  lazy val gameWeights: Map[HistoricalGame, Double] = With.history.games.map(game => (
-    game,
-    1.0 / (1.0 + (game.order / With.configuration.historyHalfLife))
-  )).toMap
+  lazy val gameWeights: Map[HistoricalGame, Double] = With.history.games
+    .filter(_.enemyMatches)
+    .zipWithIndex
+    .toVector
+    .map{case(game: HistoricalGame, i: Int) => (
+      game,
+      1.0 / (1.0 + (i / With.configuration.historyHalfLife))
+    )}
+    .toMap
 
   def enemyFingerprints(games: Int = With.configuration.recentFingerprints): Vector[String] = {
     With.history.gamesVsEnemies

@@ -73,7 +73,7 @@ object SpiderMine extends Action {
     val target = vulture.agent.toAttack.get
 
     Potshot.delegate(vulture)
-    if ( ! vulture.readyForMicro) return
+    if ( ! vulture.ready) return
 
     val saboteurs = vulture.matchups.alliesInclSelf.filter(u => u.is(Terran.Vulture) && u.friendly.exists(_.spiderMines > 0))
     val saboteursInitial  = new mutable.PriorityQueue[UnitInfo]()(Ordering.by(v => victims.map(_.pixelDistanceEdge(v)).min)) ++ saboteurs

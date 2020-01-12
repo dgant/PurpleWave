@@ -75,7 +75,7 @@ object Batter extends ActionTechnique {
       Avoid.consider(unit)
     }
   
-    if (unit.readyForMicro) {
+    if (unit.ready) {
       targetOutsiders.delegate(unit)
       targetRepairers.delegate(unit)
       targetWall.delegate(unit)
@@ -87,7 +87,7 @@ object Batter extends ActionTechnique {
       Attack.delegate(unit)
     }
   
-    if (unit.readyForMicro && altitudeHere < altitudeThere) {
+    if (unit.ready && altitudeHere < altitudeThere) {
       val walkableTiles = wallUnits
         .flatMap(building =>
           building.tileArea.expand(1, 1).tiles

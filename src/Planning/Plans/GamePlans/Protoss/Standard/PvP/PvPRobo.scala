@@ -32,7 +32,8 @@ class PvPRobo extends GameplanTemplate {
     new Or(
       new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.twoGate),
       new EnemyBasesAtLeast(2),
-      new EnemyStrategy(With.fingerprints.robo)))
+      new EnemyStrategy(With.fingerprints.robo),
+      new EnemyRecentStrategy(With.fingerprints.fourGateGoon)))
 
   class GetObservers extends Or(
     new EnemyDarkTemplarLikely,
@@ -153,7 +154,7 @@ class PvPRobo extends GameplanTemplate {
     new UnitsAtLeast(2, Protoss.Gateway),
     new Or(
       new And(new UnitsAtLeast(1, Protoss.Reaver), new EnemyLowUnitCount),
-      new And(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new SafeAtHome),
+      new And(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new And(new SafeAtHome, new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)))),
       new And(
         new Latch(new UnitsAtLeast(3, UnitMatchOr(Protoss.Shuttle, Protoss.Reaver), complete = true)),
         new UnitsAtLeast(2, UnitMatchOr(Protoss.Shuttle, Protoss.Reaver), complete = true))))
@@ -163,9 +164,6 @@ class PvPRobo extends GameplanTemplate {
     new EjectScout,
 
     new If(new GasCapsUntouched, new CapGasAt(350)),
-
-    // TODO: Be useful for PvPVsForge:
-      // TODO: React properly vs. cannon rush
 
     new If(new ReadyToExpand, new Expand),
 

@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvP
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.{Attack, Hunt}
+import Planning.Plans.Army.{Attack, ConsiderAttacking, Hunt}
 import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
@@ -11,9 +11,10 @@ import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeToMoveOut
-import Planning.Predicates.Strategy.EnemyStrategy
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.UnitMatchSiegeTank
 import ProxyBwapi.Races.{Protoss, Terran}
+import Strategery.Strategies.Terran.TvP2FacJoyO
 
 object TvPIdeas {
   
@@ -46,13 +47,18 @@ object TvPIdeas {
   class TvPAttack extends Parallel(
     new Hunt(Terran.Wraith, Protoss.Shuttle),
     new Hunt(Terran.Wraith, Protoss.Reaver),
-    // Continue any existing attacks
-    new Trigger(
-      new Not(new SafeToMoveOut),
-      initialBefore = new Attack),
+    // Keep pressuring if appropriate
+    new If(
+      new Employing(TvP2FacJoyO),
+      new ConsiderAttacking,
+      // Otherwise, wait for our later timing
+      new Trigger(
+        new Not(new SafeToMoveOut),
+        initialBefore = new Attack)),
     new Trigger(
       new Or(
         new MiningBasesAtLeast(3),
+        new UpgradeComplete(Terran.MechDamage, 2),
         new EnemyHasShown(Protoss.Carrier),
         new EnemyHasShown(Protoss.Interceptor),
         new EnemyHasShown(Protoss.FleetBeacon)),

@@ -40,6 +40,14 @@ class TvZSK extends GameplanTemplate {
     new EnemyHasShown(Zerg.Lurker),
     new EnemyHasShown(Zerg.LurkerEgg))
 
+  class GoTank extends And(
+    new Employing(TvZ2RaxTank),
+    new Or(
+      new EnemyHasTech(Zerg.LurkerMorph),
+      new EnemyHasShown(Zerg.Lurker),
+      new EnemyHasShown(Zerg.LurkerEgg),
+      new EnemiesAtLeast(4, UnitMatchOr(Zerg.SunkenColony, Zerg.CreepColony))))
+
   override def scoutPlan: Plan = NoPlan()
   override def attackPlan: Plan = new Parallel(
     new If(new CanAttack, new Attack),
@@ -92,7 +100,7 @@ class TvZSK extends GameplanTemplate {
       new UnitsAtLeast(1, Terran.Factory),
       new UpgradeContinuously(Terran.MarineRange)),
     new If(new Employing(TvZ2RaxNuke), new Pump(Terran.CovertOps, 1)),
-    new If(new Employing(TvZ2RaxTank), new Pump(Terran.MachineShop, 1)),
+    new If(new GoTank, new Pump(Terran.MachineShop, 1)),
     new Pump(Terran.NuclearMissile, 1),
     new If(
       new Or(
@@ -175,10 +183,10 @@ class TvZSK extends GameplanTemplate {
 
     new FlipIf(
       new EnemyLurkers,
-      new If(new Employing(TvZ5Rax), new Build(Get(5, Terran.Barracks))),
+      new If(new Not(new GoTank), new Build(Get(5, Terran.Barracks))),
       new Parallel(
         new Build(Get(Terran.Factory)),
-        new If(new Employing(TvZ2RaxTank), new Build(Get(3, Terran.Barracks))),
+        new If(new GoTank, new Build(Get(3, Terran.Barracks))),
         new BuildGasPumps,
         new If(
           new Or(

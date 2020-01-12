@@ -1,6 +1,7 @@
 
 package Micro.Agency
 
+import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Pathfinding.Types.{TilePath, ZonePath}
 import Lifecycle.With
 import Mathematics.Physics.Force
@@ -114,6 +115,42 @@ class Agent(val unit: FriendlyUnitInfo) {
   var pathsTruncated  : Traversable[PixelRay] = Seq.empty
   var pathsAcceptable : Traversable[PixelRay] = Seq.empty
   var pathAccepted    : Traversable[PixelRay] = Seq.empty
+
+  def focusPath: TilePath = {
+    refreshFocusPath()
+    focusPathCache()
+  }
+  def focusPathSteps: Seq[Tile] = {
+    focusPathStepsCache()
+  }
+  private def refreshFocusPath(): Unit = {
+    val destinationTile = destination.tileIncluding
+    if ( ! focusPathGoal.contains(destinationTile)) {
+      focusPathCache.invalidate()
+    }
+    focusPathGoal = Some(destinationTile)
+  }
+  private var focusPathGoal: Option[Tile] = None
+  private val focusPathCache = new Cache[TilePath](() => {
+    val profile = new PathfindProfile(unit.tileIncludingCenter)
+    profile.end                 = focusPathGoal
+    profile.canCrossUnwalkable  = unit.flying || unit.transport.exists(_.flying)
+    profile.allowGroundDist     = true
+    profile.costEnemyVision     = 1f
+    profile.costThreat          = 2f
+    profile.unit = Some(unit)
+    profile.find
+  })
+  val focusPathStepSize: Int = 6
+  val focusPathStepSizeSqrt2: Double = focusPathStepSize * Math.sqrt(2)
+  private val focusPathStepsCache = new Cache[Seq[Tile]](() => {
+    val path = focusPathCache()
+    if (path.tiles.isEmpty) {
+      Seq.empty
+    } else {
+      path.tiles.get.view.zipWithIndex.filter(_._2 % focusPathStepSize == 0).map(_._1)
+    }
+  })
   
   val techniques: ArrayBuffer[ActionTechniqueEvaluation] = new ArrayBuffer[ActionTechniqueEvaluation]
 
@@ -148,6 +185,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     pathsTruncated      = Seq.empty
     pathsAcceptable     = Seq.empty
     pathAccepted        = Seq.empty
+    focusPathGoal       = None
     cachedZonePath.clear()
     techniques.clear()
     fightReason = ""
@@ -256,7 +294,9 @@ class Agent(val unit: FriendlyUnitInfo) {
     _passengers -= passenger
   }
   def updateRidesharing(): Unit = {
-    _passengers --= passengers.filter(u => ! u.alive || ! u.isOurs)
+    if (_passengers.nonEmpty) {
+      _passengers --= passengers.filter(u => !u.alive || !u.isOurs)
+    }
     if (unit.transport.isDefined) {
       unit.transport.foreach(_.agent.claimPassenger(unit))
     } else {

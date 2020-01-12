@@ -23,7 +23,7 @@ object Tickle extends Action {
     // * Fight when injured if everyone nearby is targeting someone else
     // * Don't get pulled out of the base
     
-    if ( ! unit.readyForMicro) return
+    if ( ! unit.ready) return
     
     var attack                = true
   

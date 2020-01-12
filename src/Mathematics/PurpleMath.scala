@@ -266,4 +266,7 @@ object PurpleMath {
       (k + 2) * (k / 2) + 1
   }
 
+  @inline final def square(k: Int): Int = k * k
+  @inline final def square(k: Float): Float = k * k
+  @inline final def square(k: Double): Double = k * k
 }

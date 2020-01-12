@@ -55,7 +55,7 @@ object Spread extends ActionTechnique {
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     AttackAsSoonAsPossible.delegate(unit)
-    if ( ! unit.readyForMicro) return
+    if ( ! unit.ready) return
   
     Target.delegate(unit)
     

@@ -1,8 +1,9 @@
 package Micro.Actions.Combat.Techniques
 
+import Mathematics.PurpleMath
 import Micro.Actions.Combat.Techniques.Common.Activators.WeightedMean
 import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, AttackAsSoonAsPossible}
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Breathe extends ActionTechnique {
@@ -16,7 +17,7 @@ object Breathe extends ActionTechnique {
     && unit.matchups.targets.nonEmpty
     && unit.matchups.threats.nonEmpty
     && ! unit.unitClass.melee
-    && ! unit.is(Protoss.Corsair) // Try to find a better generalizer; maybe cooldown vs. turn rate
+    && ! unit.isAny(Terran.Battlecruiser, Protoss.Corsair) // Try to find a better generalizer; maybe cooldown vs. turn rate
     && ! unit.transport.exists(_.flying) // Transport cooldown means this just makes the unit flee
   )
   
@@ -42,11 +43,13 @@ object Breathe extends ActionTechnique {
     val cooldownTheirs  = other.cooldownMaxAgainst(unit)
     val cooldownRatio   = cooldownOurs / cooldownTheirs
     
-    Some(cooldownRatio)
+    Some(PurpleMath.clampToOne(cooldownRatio))
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     AttackAsSoonAsPossible.delegate(unit)
-    Avoid.delegate(unit)
+    if ( ! unit.readyForAttackOrder) {
+      Avoid.delegate(unit)
+    }
   }
 }

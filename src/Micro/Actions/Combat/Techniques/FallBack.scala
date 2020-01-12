@@ -15,6 +15,7 @@ object FallBack extends ActionTechnique {
     && unit.canAttack
     && unit.agent.canFight
     && unit.matchups.targets.nonEmpty
+    && ! unit.isAny(Terran.Battlecruiser) // Try to find a better generalizer; maybe cooldown vs. turn rate
   )
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {

@@ -18,7 +18,7 @@ object Cast extends Action {
     if (unit.agent.canCast) {
       spells.foreach(_.consider(unit))
     }
-    if (unit.readyForMicro
+    if (unit.ready
       && unit.matchups.threats.nonEmpty
       && unit.isAny(
         Terran.ScienceVessel,

@@ -59,25 +59,16 @@ class PurpleWavePlaybook extends EmptyPlaybook {
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy
 }
 
-class AIIDEPlaybook extends PurpleWavePlaybook {
+class TournamentPlaybook extends PurpleWavePlaybook {
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionTournament
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(ZvP9Pool, ZvPOverpool, ZvP12Hatch)
+  override lazy val forced: Seq[Strategy] = Seq(TvP2FacJoyO, TvPDeep4)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
   override def respectOpponent: Boolean = false
   override def respectMap: Boolean = false
   override def respectHistory: Boolean = false
 }
 
-class HumanPlaybook extends PurpleWavePlaybook {
-  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionSequence(Seq(
-    Seq(PvPRobo),
-    Seq(PvP2GateDTExpand),
-    Seq(PvP3GateGoon),
-    Seq(PvP2Gate1012Goon)
-  ))
-}
-
-object Playbook extends TestingPlaybook {}
+object Playbook extends PurpleWavePlaybook {}

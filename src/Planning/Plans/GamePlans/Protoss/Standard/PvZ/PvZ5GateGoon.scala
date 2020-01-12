@@ -100,11 +100,11 @@ class PvZ5GateGoon extends GameplanTemplate {
 
     // Transition
     new Trigger(
-      new Or(
-        new UnitsAtLeast(2, Protoss.Reaver),
-        new And(
+      new And(
+        new UnitsAtLeast(5, Protoss.Gateway, complete = true),
+        new Or(
           new Employing(PvZMidgame5GateGoon),
-          new UnitsAtLeast(5, Protoss.Gateway, complete = true))),
+          new Latch(new UnitsAtLeast(1, Protoss.Reaver)))),
       new Parallel(
         new RequireMiningBases(3),
         new Build(

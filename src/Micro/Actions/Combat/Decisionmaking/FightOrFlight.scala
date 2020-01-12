@@ -43,7 +43,7 @@ object FightOrFlight extends Action {
     decide(false, "Disrupted",    () => unit.underDisruptionWeb && ! unit.flying)
     decide(false, "Swarmed",      () => unit.underDarkSwarm && ! unit.unitClass.unaffectedByDarkSwarm && unit.matchups.targetsInRange.forall(t => ! t.flying || t.underDarkSwarm))
     decide(true,  "CanAbuse",     () => unit.matchups.threats.forall(t => unit.canAttack(t) && unit.topSpeed > t.topSpeed && unit.pixelRangeAgainst(t) > t.pixelRangeAgainst(unit) + 32))
-    decide(false, "WaitForSiege", () => unit.is(Terran.SiegeTankUnsieged) && unit.matchups.threats.exists(_.is(Protoss.Dragoon)) && With.units.ours.exists(_.techProducing.contains(Terran.SiegeMode)) && unit.matchups.allies.exists(a => a.is(Terran.Bunker) && a.complete))
+    decide(false, "WaitForSiege", () => unit.is(Terran.SiegeTankUnsieged) && unit.matchups.threats.exists(_.is(Protoss.Dragoon)) && With.units.ours.exists(_.techProducing.contains(Terran.SiegeMode)) && unit.matchups.allies.exists(a => a.is(Terran.Bunker) && a.complete && ! With.blackboard.wantToAttack()))
     decide(true,  "Energized", () =>
       unit.matchups.allies.exists(ally =>
         ally.is(Protoss.ShieldBattery)
@@ -111,7 +111,8 @@ object FightOrFlight extends Action {
       && ( ! ally.unitClass.isBuilding || ally.matchups.threatsInRange.nonEmpty)
       && (ally.friendly.forall(_.agent.ride.exists(_.pixelDistanceEdge(ally) > 96)) || ally.matchups.framesOfSafety <= PurpleMath.clamp(unit.matchups.framesOfSafety, 0, 3))
       && ally.matchups.framesOfSafety <= 24 + Math.max(0, unit.matchups.framesOfSafety))
-      && (ally.unitClass.isSpellcaster || ally.matchups.threats.exists(unit.canAttack))
+      && (ally.unitClass.isSpellcaster ||
+        (ally.matchups.threats.exists(unit.canAttack) && (ally.agent.shouldEngage || ally.matchups.targetsInRange.nonEmpty)))
     ))
 
     decide(true, getaway, () => unit.agent.ride.exists(ride => {

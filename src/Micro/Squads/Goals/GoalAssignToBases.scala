@@ -20,7 +20,11 @@ abstract class GoalAssignToBases extends GoalBasic {
   protected var destinationByScout: mutable.ArrayBuffer[(FriendlyUnitInfo, Pixel)] = new mutable.ArrayBuffer[(FriendlyUnitInfo, Pixel)]
   protected var destinationFrame: Int = 0
   override protected def destination: Pixel = {
-    destinationByScout.headOption.map(_._2).getOrElse(baseToPixel(With.intelligence.peekNextBaseToScout(baseFilter)))
+    destinationByScout
+      .headOption
+      .map(_._2)
+      .filter(_.base.exists(baseFilter))
+      .getOrElse(baseToPixel(With.intelligence.peekNextBaseToScout(baseFilter)))
   }
   protected def baseToPixel(base: Base): Pixel = base.heart.pixelCenter
   

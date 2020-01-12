@@ -72,7 +72,7 @@ object Build extends Action {
       }
     }
     
-    if ( ! unit.readyForMicro) return
+    if ( ! unit.ready) return
     
     blockersOurs
       .flatMap(_.friendly)
@@ -96,6 +96,7 @@ object Build extends Action {
     // Pathfind for cross-zone travel, eg to avoid getting stuck on mineral blocks
     if (movePixel.zone != unit.zone) {
       val profile = With.paths.profileDistance(unit.tileIncludingCenter, movePixel.tileIncluding)
+      profile.allowGroundDist = true
       val path = profile.find
       new Traverse(path).delegate(unit)
     }

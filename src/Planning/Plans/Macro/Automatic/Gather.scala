@@ -227,16 +227,15 @@ class Gather extends Plan {
           val baseFrom = resourceBefore.flatMap(_.base)
           val baseTo = resource.base
           val workerToResource = baseFrom.flatMap(baseA => baseTo.map(baseB => baseCosts(baseA, baseB))).getOrElse(worker.pixelDistanceEdge(resource))
-          val framesToResource = worker.framesToTravelPixels(workerToResource)
-          const double framesToResource =
-              (workerToResource + (stick ? 0.0 : FLAGS_gatherer_sticky_distance)) /
-              std::max(.01, worker->topSpeed);
-          const double framesGathering =
-              std::max(24.0, FLAGS_gatherer_lookahead - framesToResource);
-          const double preference = resource->type->isGas ? gasWorkerDesire : 1.0;
-          const double stickiness = stick ? FLAGS_gatherer_sticky_multiplier : 1.0;
-
-          0.0
+          val kHysteresisPixels = 12
+          val kLookaheadFrames = 24 * 60
+          val workerToResourceHysteresis = if (stick) 0 else 12
+          val framesToResource = worker.framesToTravelPixels(workerToResource + workerToResourceHysteresis)
+          val framesSpentGathering = Math.max(24, kLookaheadFrames - framesToResource)
+          val gasPreference = if (resource.unitClass.isGas) gasWorkerDesire else 1.0
+          val stickiness = if (stick) 2.0 else 1.0
+          val output = -throughput * speed * framesSpentGathering * gasPreference * stickiness
+          output
         }
         /*
 

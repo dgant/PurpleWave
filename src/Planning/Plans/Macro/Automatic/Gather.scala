@@ -153,62 +153,57 @@ class Gather extends Plan {
             ))
           .toMap
       } else Map.empty
-    val workersToUpdate = workers.toVector.sortBy(worker =>
-      // TODO: Make sure this has the correct sign!
-      if (needMoreGasWorkers) {
-        newGasDistance(worker)
-          .getOrElse(minGasDistance.getOrElse(worker, None)
-          .getOrElse(Double.PositiveInfinity))
-      } else {
-        worker.id.toDouble // TODO: This used to be "Frames since update" using the cooldown mechanism, ie. update least-recently-updated worker
-      })
-
-    // Update workers in priority order
-    // TODO: Cap worker updates per run, for performance
-    // TODO: Respect cooldown, if needed
-    workersToUpdate
+    val workersToUpdate = workers
       .view
       .filter(worker => {
         // Don't interrupt workers who are about to reach minerals.
-        val resourceBefore = resourceByWorker.get(worker);
-        val resourceBeforeEdgePixels = resourceBefore.map(_.pixelDistanceEdge(worker))
-        resourceBefore.forall(_.unitClass.isGas) || resourceBeforeEdgePixels.forall(_ > 32)
-      })
-      .foreach(worker => {
-        //TODO: Update frames since update
         val resourceBefore = resourceByWorker.get(worker)
-        unassignWorker(worker)
-        if (resourceBefore.exists(_.unitClass.isGas)) {
-          gasWorkersNow -= 1
-        }
+        val resourceBeforeEdgePixels = resourceBefore.map(_.pixelDistanceEdge(worker))
+        resourceBefore.forall(r => r.unitClass.isGas || workersByResource(r).size > 5 || resourceBeforeEdgePixels.forall(_ > 64)) // The > 5 check is for disentangling massively popular resources
+      })
+      .groupBy(_.base)
+      .toVector
+      .sortBy(b => b._1.map(_.workerCount).getOrElse(0))
+      .flatMap(b => b._2.toVector.sortBy(w =>
+        w.id.toDouble / 1000000.0 // This used to be "Frames since update" using the cooldown mechanism, ie. update least-recently-updated worker
+        + (if (needMoreGasWorkers) newGasDistance(w).getOrElse(minGasDistance.getOrElse(w, None).getOrElse(kLightYear)) else 0.0)
+        + (if (resourceByWorker.contains(w)) 1000000 else 0)))
 
-        val gasWorkerDesire = if (gasWorkersNow < gasWorkersMax) 1.0 else 0.1
+    // Update workers in priority order
+    workersToUpdate.foreach(worker => {
+      val resourceBefore = resourceByWorker.get(worker)
+      unassignWorker(worker)
+      if (resourceBefore.exists(_.unitClass.isGas)) {
+        gasWorkersNow -= 1
+      }
 
-        // Assign the worker to tbhe best resource
-        val resourceBest = ByOption.maxBy(workersByResource.keysIterator)(ResourceScore(worker, _, gasWorkerDesire, resourceBefore).output)
-        resourceBest.foreach(bestResource => {
-          assignWorker(worker, bestResource)
-          if (resourceBefore.exists(_.unitClass.isGas)) gasWorkersNow -= 1
-          if (bestResource.unitClass.isGas) gasWorkersNow += 1
-        })
+      val gasWorkerDesire = if (gasWorkersNow < gasWorkersMax) 1.0 else 0.1
+
+      // Assign the worker to tbhe best resource
+      val resourceBestScore = ByOption.maxBy(workersByResource.keysIterator.map(ResourceScore(worker, _, gasWorkerDesire, resourceBefore)))(_.output)
+      resourceBestScore.foreach(bestResourceScore => {
+        val bestResource = bestResourceScore.resource
+        assignWorker(worker, bestResource)
+        if (resourceBefore.exists(_.unitClass.isGas)) gasWorkersNow -= 1
+        if (bestResource.unitClass.isGas) gasWorkersNow += 1
       })
 
-    workersToUpdate.foreach(worker => worker.agent.intend(this, new Intention {
-      toGather = resourceByWorker.get(worker)
-    }))
+      worker.agent.intend(this, new Intention {
+        toGather = resourceByWorker.get(worker)
+      })
+    })
   }
-
-  // Based on https://tl.net/forum/bw-strategy/551478-efficient-gas-mining
-  lazy val fourthGasMiningRate = (296.0 - (if (With.self.isTerran) 240.0 else if (With.self.isProtoss) 274.0 else 264.0)) / 296.0
 
   // Evaluate the marginal efficacy of assigning this worker to a resource.
   case class ResourceScore(worker: FriendlyUnitInfo, val resource: UnitInfo, val gasWorkerDesire: Double, var resourceBefore: Option[UnitInfo] = None) {
     resourceBefore = resourceBefore.orElse(resourceByWorker.get(worker))
-    val resourceBeforeEdgePixels = resourceBefore.map(_.pixelDistanceEdge(worker))
 
     // How many workers are already mining this patch?
-    // TODO: Originally had the unimplemented comment "Count only close-or-closer workers so new miners don't scare us off."
-    val workersBefore = workersByResource.get(resource).map(_.size).getOrElse(0)
+    // Don't count workers that are further away -- the closest workers get priority on the patch
+    val workersBefore = workersByResource
+      .get(resource)
+      .map(_.size)
+      .getOrElse(0)
 
     // The depot-to-resource distance is used in two ways:
     // -Resources close to the hall should get priority on their first two workers
@@ -217,14 +212,17 @@ class Gather extends Plan {
 
     // Geyser mining speed varies based on direction relative to town hall
     val belowTownHall = resource.base.map(_.townHallTile).exists(t => t.y < resource.tileTopLeft.y - 3 || t.x < resource.tileTopLeft.x - 4)
+
+    // Based on https://tl.net/forum/bw-strategy/551478-efficient-gas-mining
     val needFourOnGas = resource.unitClass.isGas && belowTownHall
-    val distanceRatio = PurpleMath.clamp(hallToResourcePixels / 3.0, 1.0, 2.0)
+
+    val distanceRatio = PurpleMath.clamp(hallToResourcePixels / (32.0 * 3.0), 1.0, 2.0)
 
     // How effective will the next worker be on this resource?
     var throughput = 0.001
     if (resource.unitClass.isGas) {
-      if (workersBefore == 4 && needFourOnGas) {
-        throughput = fourthGasMiningRate
+      if (workersBefore == 3 && needFourOnGas) {
+        throughput = 0.5
       } else if (workersBefore < 3) {
         throughput = 1.0
       }
@@ -239,27 +237,21 @@ class Gather extends Plan {
         throughput = 1.0 + 0.5 * (2.0 - distanceRatio)
       } else if (workersBefore == 1) {
         // Second workers prefer distant resources (since they'll spend more time mining)
-        // Range on 0.5 - 0.8
-        throughput = 0.5 + 0.3 * (distanceRatio - 1.0)
+        // Range on 0.8 - 0.95
+        throughput = 0.8 + 0.15 * (distanceRatio - 1.0)
       } else if (workersBefore < 3) {
         // Third workers also prefer distant resources
-        // Range on 0.2 - 0.5
-        throughput = 0.2 + 0.3 * (distanceRatio - 1.0)
+        // Range on 0.5 - 0.7
+        throughput = 0.5 + 0.2 * (distanceRatio - 1.0)
       }
     }
-
-    // When deciding whether to travel to another base to mine, there's a
-    // tradeoff between mining efficiency and the time-discounted value of
-    // resources.
-    // There's no obvious way to measure the tradeoff, so it's left as a
-    // hyperparameter.
-    val stick = resourceBefore.contains(resource) &&
-        ! worker.carryingResources &&
-        resourceBeforeEdgePixels.forall(_ < 8)
+    // Don't encourage redistributing a worker who's currently approaching their minerals
+    val resourceBeforeEdgePixels = resourceBefore.map(_.pixelDistanceEdge(worker))
+    val stick = resourceBefore.contains(resource) && ! worker.carryingResources && resourceBeforeEdgePixels.forall(_ < 64)
     val baseFrom = worker.base.orElse(resourceBefore.flatMap(_.base))
     val baseTo = resource.base
     val workerToResourceCost = baseFrom.flatMap(baseA => baseTo.map(baseB => baseCosts(baseA, baseB)())).getOrElse(worker.pixelDistanceTravelling(resource.pixelCenter))
-    val workerToResourceHysteresis = if (stick) 0 else 12
+    val workerToResourceHysteresis = if (stick) 0 else 32
     val framesToResource = worker.framesToTravelPixels(workerToResourceCost + workerToResourceHysteresis)
     val framesSpentGathering = Math.max(24, kLookaheadFrames - framesToResource)
     val gasPreference = if (resource.unitClass.isGas) gasWorkerDesire else 1.0
@@ -267,5 +259,5 @@ class Gather extends Plan {
     val output = throughput * framesSpentGathering * gasPreference * stickiness
   }
 
-  def audit = resourceByWorker.keysIterator.map(worker => workersByResource.keys.map(ResourceScore(worker, _, 1.0)))
+  //def audit = resourceByWorker.keys.map(worker => workersByResource.keys.map(ResourceScore(worker, _, 1.0))).toMap
 }

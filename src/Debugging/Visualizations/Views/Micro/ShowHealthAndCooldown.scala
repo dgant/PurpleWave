@@ -1,103 +1,22 @@
 package Debugging.Visualizations.Views.Micro
 
+import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
-import Debugging.Visualizations.{Colors, Hues}
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
 
-object ShowUnitsAll extends View {
-  
-  var showHitPoints       = true
-  var showResources       = false
-  var showViolence        = false
-  var showBattleIgnorance = true
-  var showMortality       = false
-  var showSafety          = false
+object ShowHealthAndCooldown extends View {
   
   override def renderMap() { With.units.all.foreach(renderUnit) }
   
   def renderUnit(unit: UnitInfo) {
     if ( ! With.viewport.contains(unit.pixelCenter)) return
     if ( ! unit.likelyStillAlive) return
-    
-    val color = unit.color
-    
-    if (showHitPoints) {
-      showHitPointsAndCooldown(unit)
-    }
-    if (showViolence) {
-      if (unit.isBeingViolent) {
-        DrawMap.circle(Pixel(unit.pixelCenter.x, unit.top - 7), 5, unit.player.colorMedium, solid = true)
-        DrawMap.text(Pixel(unit.pixelCenter.x - 2, unit.top - 12), "!!")
-      }
-      if (unit.target.exists(_.isEnemyOf(unit))) {
-        DrawMap.arrow(unit.pixelCenter, unit.target.get.pixelCenter, unit.player.colorBright)
-        DrawMap.labelBox(
-          Vector(
-            unit.damageOnNextHitAgainst(unit.target.get).toString,
-            "%1.1f".format(unit.vpfOnNextHitAgainst(unit.target.get))),
-          unit.pixelCenter.project(unit.target.map(_.pixelCenter).getOrElse(unit.pixelCenter), 24),
-          true,
-          unit.player.colorBright)
-      }
-      if (unit.is(Protoss.Scarab)) {
-        unit.target.foreach(scarabTarget => Range(1, 6).foreach(r => DrawMap.circle(scarabTarget.pixelCenter, 4 * r)))
-      }
-    }
-  
-    if (showResources) {
-      if (unit.initialResources > 0) {
-        DrawMap.label(unit.resourcesLeft + "/" + unit.initialResources, unit.pixelCenter.add(0, With.visualization.lineHeightSmall), drawBackground = true, color)
-      }
-      if (unit.isMineralBlocker) {
-        DrawMap.label("(Blocker)", unit.pixelCenter.add(0, 2 * With.visualization.lineHeightSmall), drawBackground = true, color)
-      }
-    }
-    
-    if (showBattleIgnorance) {
-      if (unit.battle.isEmpty) {
-        DrawMap.circle(unit.pixelCenter, 5, Color.Black, solid = true)
-      }
-    }
-    
-    if (showMortality) {
-      val ttlThreshold  = 8.0
-      val ttlCurrent    = unit.matchups.framesToLive.toDouble / 24.0
-      if (ttlCurrent <= ttlThreshold) {
-        val ratio       = ttlCurrent / ttlThreshold
-        val ratio255    = Math.max(0, (255 * (1.0 - ratio)).toInt)
-        val radius      = Math.max(10.0, unit.unitClass.dimensionMin / 2.0)
-        DrawMap.circle(unit.pixelCenter, radius.toInt,   Colors.hsv(Hues.Red, 255, ratio255),  solid = true)
-        With.game.setTextSize(bwapi.Text.Size.Enum.Large)
-        DrawMap.text(unit.pixelCenter.subtract(4, 10), ttlCurrent.toInt.toString)
-        With.game.setTextSize(bwapi.Text.Size.Enum.Small)
-      }
-    }
-    if (showSafety) {
-      if (unit.matchups.framesOfSafety < 24 * 4) {
-        val color =
-          if (unit.matchups.framesOfSafety <= 0)
-            Colors.NeonRed
-          else if (unit.matchups.framesOfSafety <= 24)
-            Colors.NeonOrange
-          else
-            Colors.NeonGreen
-        
-        val radius = Math.max(10.0, unit.unitClass.dimensionMin / 2.0)
-        DrawMap.circle(unit.pixelCenter, radius.toInt, color,  solid = true)
-        DrawMap.label(unit.matchups.framesOfEntanglement.toInt.toString, unit.pixelCenter)
-      }
-    }
-  }
-  
-  private def showHitPointsAndCooldown(unit: UnitInfo) {
-  
-    if (unit.invincible) return
     if ( ! unit.possiblyStillThere) return
+    if (unit.invincible) return
     
     val width = Math.min(48, Math.max(18, (unit.unitClass.maxTotalHealth + unit.defensiveMatrixPoints) / 5))
     val marginTopHp = 3
@@ -112,7 +31,8 @@ object ShowUnitsAll extends View {
     val widthShNow = width * unit.shieldPoints / denominator
     val widthDmNow = width * unit.defensiveMatrixPoints / denominator
     val widthEnergyNow = if (unit.energyMax == 0) 0 else Math.min(width, width * unit.energy / unit.energyMax)
-    //Min, because I haven't yet accounted for energy max upgrades
+
+    // Min, because I haven't yet accounted for energy max upgrades
     val widthCooldownButton = 3
     val widthCooldown = width - 2 * widthCooldownButton - 2
     val widthCooldownNow = widthCooldown * Math.max(unit.cooldownLeft, unit.spellCooldownLeft) / Math.max(1, unit.cooldownMaxAirGround) //TODO: Max spell cooldown?

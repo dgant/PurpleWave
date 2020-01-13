@@ -146,7 +146,7 @@ class Commander {
       val from      = unit.pixelCenter
       val fromZone  = from.zone
       val toZone    = to.zone
-      if (fromZone != toZone || unit.agent.toBuild.isEmpty) {
+      if (fromZone != toZone) {
         val walkableMineral = toZone.bases
           .flatMap(_.minerals)
           .find(mineral =>

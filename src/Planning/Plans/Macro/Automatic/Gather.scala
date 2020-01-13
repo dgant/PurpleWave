@@ -7,7 +7,6 @@ import Micro.Agency.Intention
 import Performance.Cache
 import Planning.Plan
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.UnitCountEverything
 import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -16,17 +15,63 @@ import scala.collection.mutable
 
 class Gather extends Plan {
 
+  val kDistanceMining: Int = 32 * 12
+  val kInvalidResourceScore = 1e100d
+  val kHysteresisPixels = 12
+  val kLookaheadFrames: Int = 24 * 60
+  val kLightYear: Double = 1e10
+  val kGasCompletionFrames = 48
+
   // Adapted from https://github.com/TorchCraft/TorchCraftAI/blob/master/src/modules/gatherer/gathererassignments.cpp
   // See LICENSE: https://github.com/TorchCraft/TorchCraftAI/blob/master/LICENSE
 
-  val workerLock: LockUnits = new LockUnits {
-    unitMatcher.set(UnitMatchWorkers)
-    unitCounter.set(UnitCountEverything)
-  }
   var workers: collection.Set[FriendlyUnitInfo] = Set.empty
 
+  val workerLock: LockUnits = new LockUnits { unitMatcher.set(UnitMatchWorkers) }
   val resourceByWorker = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
   val workersByResource = new mutable.HashMap[UnitInfo, mutable.Set[FriendlyUnitInfo]]
+
+  def isValidResource (unit: UnitInfo): Boolean = isValidMineral(unit) || isValidGas(unit)
+  def isValidMineral  (unit: UnitInfo): Boolean = unit.alive && unit.mineralsLeft > 0
+  def isValidGas      (unit: UnitInfo): Boolean = unit.alive && unit.isOurs && unit.gasLeft > 0 && unit.remainingCompletionFrames < 24 * 2
+
+  private lazy val baseCosts: Map[(Base, Base), Cache[Double]] = With.geography.bases
+    .flatMap(baseA => With.geography.bases.map(baseB => (baseA, baseB)))
+    .map(basePair => (basePair, new Cache[Double](() =>
+      if (basePair._1 == basePair._2) 0.0
+      else if (basePair._1.hashCode() > basePair._2.hashCode()) baseCosts((basePair._2, basePair._1)).apply()
+      else basePair._1.heart.groundPixels(basePair._2.heart) // TODO: Account for unsafe travel
+    ))).toMap
+  private val miningBases         = new Cache(() => With.geography.ourBases.filter(_.townHall.exists(t => t.hasEverBeenCompleteHatch || t.remainingCompletionFrames < 24 * 10)))
+  private val ourMinerals         = new Cache(() => miningBases().view.flatMap(_.minerals))
+  private val ourGas              = new Cache(() => miningBases().view.flatMap(_.gas).filter(u => u.isOurs && u.remainingCompletionFrames < kGasCompletionFrames).toVector)
+  private val allMinerals         = new Cache(() => With.units.neutral.view.filter(_.mineralsLeft > 0).toVector)
+  private val allGas              = new Cache(() => With.units.ours.view.filter(u => u.unitClass.isGas && u.remainingCompletionFrames < kGasCompletionFrames).toVector)
+  private val longMineMinerals    = new Cache(() => ourMinerals().length < workers.size / 4)
+  private val longMineGas         = new Cache(() => ourGas().isEmpty)
+  private val legalMinerals       = new Cache(() => if (longMineMinerals()) allMinerals() else ourMinerals())
+  private val legalGas            = new Cache(() => if (longMineGas()) allGas() else ourGas())
+  private val newMinerals         = new Cache(() => legalMinerals().filter(isNewResource))
+  private val newGas              = new Cache(() => legalGas().filter(isNewResource))
+  private val resourcesToExclude   = new Cache(() => workersByResource
+    .keysIterator
+    .filterNot(resource =>
+          (isValidMineral(resource) && (longMineMinerals()  || ! isLongDistanceResource(resource)))
+      ||  (isValidGas(resource)     && (longMineGas()       || ! isLongDistanceResource(resource))))
+    .toVector)
+  private val resourceHallPixels  = new Cache(() => workersByResource
+    .keysIterator
+    .map(resource => (resource, ByOption.min(miningBases().map(_.townHall.get.pixelDistanceEdge(resource))).getOrElse(kLightYear)))
+    .toMap)
+
+  def isLongDistanceResource(unit: UnitInfo): Boolean = {
+    ! miningBases().exists(unit.base.contains)
+  }
+
+  def isNewResource(unit: UnitInfo): Boolean = {
+    ! workersByResource.contains(unit)
+  }
+
   def assignWorker(worker: FriendlyUnitInfo, resource: UnitInfo): Unit = {
     unassignWorker(worker)
     resourceByWorker(worker) = resource
@@ -58,39 +103,6 @@ class Gather extends Plan {
     workersByResource.get(resource).map(_.size).getOrElse(0)
   }
 
-  def isValidResource(unit: UnitInfo): Boolean = {
-    if ( ! unit.alive) return false
-    if ( ! unit.unitClass.isResource) return false
-    unit.unitClass.isMinerals || (unit.isOurs && unit.remainingCompletionFrames < 24 * 2)
-  }
-
-  val kDistanceMining: Int = 32 * 12
-  val lightYear: Double = 1e10
-
-  lazy val baseCosts: Map[(Base, Base), Cache[Double]] = With.geography.bases
-    .flatMap(baseA => With.geography.bases.map(baseB => (baseA, baseB)))
-    .map(basePair => (basePair, new Cache[Double](() =>
-      if (basePair._1 == basePair._2) 0.0
-      else if (basePair._1.hashCode() > basePair._2.hashCode()) baseCosts((basePair._2, basePair._1)).apply()
-      else basePair._1.heart.groundPixels(basePair._2.heart) // TODO: Account for unsafe travel
-    )))
-    .toMap
-
-  lazy val depotToResourceDistances = new Cache(() => workersByResource
-    .keysIterator
-    .map(resource => (
-      resource,
-      ByOption
-        .min(
-          With.geography
-            .ourBases
-            .filter(_.townHall.isDefined)
-            .map(base =>
-              if (resource.base.contains(base)) base.townHall.get.pixelDistanceEdge(resource)
-              else base.townHallTile.groundPixels(resource.tileTopLeft)))
-        .getOrElse(lightYear)))
-    .toMap)
-
   override def onUpdate() {
     workerLock.acquire(this)
     workers = workerLock.units
@@ -98,19 +110,12 @@ class Gather extends Plan {
     resourceByWorker.keys.withFilter( ! workers.contains(_)).foreach(unassignWorker)
     // TODO: Unassign any workers who are no longer in the squad -- TCAI does this with the controller
 
-    // Add/remove resources
-    val resourcesToRemove = workersByResource.keys.filterNot(isValidResource)
-    resourcesToRemove.foreach(excludeResource)
-
-    val newResources: Seq[UnitInfo] =
-      (With.units.neutral.view ++ With.units.ours.view)
-        .withFilter(resource => isValidResource(resource) && ! workersByResource.contains(resource))
-        .toVector
-    newResources.foreach(includeResource)
+    newMinerals().foreach(includeResource)
+    newGas().foreach(includeResource)
+    resourcesToExclude().foreach(excludeResource)
 
     // Count gas workers
     var gasWorkersNow = resourceByWorker.count(_._2.unitClass.isGas)
-    // Map resources to bases and measure distance
 
     val totalMineralPatches = With.geography.ourBases.view.map(_.minerals.size).sum
     val totalGasPumps = With.geography.ourBases.view.map(_.gas.count(_.isOurs)).sum
@@ -131,7 +136,7 @@ class Gather extends Plan {
     // Otherwise:
     // Sort workers by frames since update, descending.
     def newGasDistance(worker: FriendlyUnitInfo): Option[Double] = {
-      ByOption.min(newResources.filter(_.unitClass.isGas).map(_.pixelDistanceEdge(worker)))
+      ByOption.min(newGas().map(_.pixelDistanceEdge(worker)))
     }
     // Determine if we need to prioritize updating gas workers.
     val minGasDistance: Map[FriendlyUnitInfo, Option[Double]] =
@@ -194,8 +199,6 @@ class Gather extends Plan {
 
   // Evaluate the marginal efficacy of assigning this worker to a resource.
   def scoreResource(worker: FriendlyUnitInfo, resource: UnitInfo, gasWorkerDesire: Double): Double = {
-    val kInvalid = 1e100d
-
     val resourceBefore = resourceByWorker.get(worker);
     val resourceBeforeEdgePixels = resourceBefore.map(_.pixelDistanceEdge(worker))
 
@@ -227,18 +230,8 @@ class Gather extends Plan {
     }
 
     // How fast is mining from this resource?
-    val depotToResourceDistance = depotToResourceDistances()(resource)
+    val depotToResourceDistance = resourceHallPixels()(resource)
     val speed = 3.0 + 12.0 / Math.max(12.0, depotToResourceDistance)
-
-    /*
-    TODO: Reenable
-    if (depotToResourceDistance > kDistanceMining) {
-      if ( ! canDistanceMine) {
-        return kInvalid
-      }
-    }
-
-     */
 
     // When deciding whether to travel to another base to mine, there's a
     // tradeoff between mining efficiency and the time-discounted value of
@@ -251,8 +244,6 @@ class Gather extends Plan {
     val baseFrom = worker.base.orElse(resourceBefore.flatMap(_.base))
     val baseTo = resource.base
     val workerToResourceCost = baseFrom.flatMap(baseA => baseTo.map(baseB => baseCosts(baseA, baseB)())).getOrElse(worker.pixelDistanceTravelling(resource.pixelCenter))
-    val kHysteresisPixels = 12
-    val kLookaheadFrames = 24 * 60
     val workerToResourceHysteresis = if (stick) 0 else 12
     val framesToResource = worker.framesToTravelPixels(workerToResourceCost + workerToResourceHysteresis)
     val framesSpentGathering = Math.max(24, kLookaheadFrames - framesToResource)

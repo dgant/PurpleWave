@@ -177,7 +177,7 @@ class Gather extends Plan {
         gasWorkersNow -= 1
       }
 
-      val gasWorkerDesire = if (gasWorkersNow < gasWorkersMax) 1.0 else 0.1
+      val gasWorkerDesire = gasWorkersNow < gasWorkersMax
 
       // Assign the worker to tbhe best resource
       val resourceBestScore = ByOption.maxBy(workersByResource.keysIterator.map(ResourceScore(worker, _, gasWorkerDesire, resourceBefore)))(_.output)
@@ -195,14 +195,14 @@ class Gather extends Plan {
   }
 
   // Evaluate the marginal efficacy of assigning this worker to a resource.
-  case class ResourceScore(worker: FriendlyUnitInfo, val resource: UnitInfo, val gasWorkerDesire: Double, var resourceBefore: Option[UnitInfo] = None) {
+  case class ResourceScore(worker: FriendlyUnitInfo, val resource: UnitInfo, val gasWorkerDesire: Boolean, var resourceBefore: Option[UnitInfo] = None) {
     resourceBefore = resourceBefore.orElse(resourceByWorker.get(worker))
 
     // How many workers are already mining this patch?
     // Don't count workers that are further away -- the closest workers get priority on the patch
     val workersBefore = workersByResource
       .get(resource)
-      .map(_.size)
+      .map(_.count(_ != worker))
       .getOrElse(0)
 
     // The depot-to-resource distance is used in two ways:
@@ -222,7 +222,7 @@ class Gather extends Plan {
     var throughput = 0.001
     if (resource.unitClass.isGas) {
       if (workersBefore == 3 && needFourOnGas) {
-        throughput = 0.5
+        throughput = 0.75
       } else if (workersBefore < 3) {
         throughput = 1.0
       }
@@ -254,10 +254,8 @@ class Gather extends Plan {
     val workerToResourceHysteresis = if (stick) 0 else 32
     val framesToResource = worker.framesToTravelPixels(workerToResourceCost + workerToResourceHysteresis)
     val framesSpentGathering = Math.max(24, kLookaheadFrames - framesToResource)
-    val gasPreference = if (resource.unitClass.isGas) gasWorkerDesire else 1.0
+    val gasPreference = if (resource.unitClass.isGas) (if (gasWorkerDesire) 2.0 else 0.75) else 1.0 // When we don't want gas, we still want it more than the third mineral worker
     val stickiness = if (stick) 2.0 else 1.0
     val output = throughput * framesSpentGathering * gasPreference * stickiness
   }
-
-  //def audit = resourceByWorker.keys.map(worker => workersByResource.keys.map(ResourceScore(worker, _, 1.0))).toMap
 }

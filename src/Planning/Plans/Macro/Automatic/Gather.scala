@@ -53,7 +53,7 @@ class Gather extends Plan {
   private val legalGas            = new Cache(() => if (longMineGas()) allGas() else ourGas())
   private val newMinerals         = new Cache(() => legalMinerals().filter(isNewResource))
   private val newGas              = new Cache(() => legalGas().filter(isNewResource))
-  private val resourcesToExclude   = new Cache(() => workersByResource
+  private val resourcesToExclude  = new Cache(() => workersByResource
     .keysIterator
     .filterNot(resource =>
           (isValidMineral(resource) && (longMineMinerals()  || ! isLongDistanceResource(resource)))
@@ -93,6 +93,7 @@ class Gather extends Plan {
 
   def excludeResource(resource: UnitInfo): Unit = {
     workersByResource.get(resource).foreach(_.foreach(resourceByWorker.remove))
+    workersByResource.remove(resource)
   }
 
   def getResource(worker: FriendlyUnitInfo): Option[UnitInfo] = {
@@ -184,7 +185,7 @@ class Gather extends Plan {
         val gasWorkerDesire = if (gasWorkersNow < gasWorkersMax) 1.0 else 0.1
 
         // Assign the worker to tbhe best resource
-        val resourceBest = ByOption.maxBy(workersByResource.keysIterator)(scoreResource(worker, _, gasWorkerDesire))
+        val resourceBest = ByOption.maxBy(workersByResource.keysIterator)(ResourceScore(worker, _, gasWorkerDesire, resourceBefore).output)
         resourceBest.foreach(bestResource => {
           assignWorker(worker, bestResource)
           if (resourceBefore.exists(_.unitClass.isGas)) gasWorkersNow -= 1
@@ -197,21 +198,33 @@ class Gather extends Plan {
     }))
   }
 
+  // Based on https://tl.net/forum/bw-strategy/551478-efficient-gas-mining
+  lazy val fourthGasMiningRate = (296.0 - (if (With.self.isTerran) 240.0 else if (With.self.isProtoss) 274.0 else 264.0)) / 296.0
+
   // Evaluate the marginal efficacy of assigning this worker to a resource.
-  def scoreResource(worker: FriendlyUnitInfo, resource: UnitInfo, gasWorkerDesire: Double): Double = {
-    val resourceBefore = resourceByWorker.get(worker);
+  case class ResourceScore(worker: FriendlyUnitInfo, val resource: UnitInfo, val gasWorkerDesire: Double, var resourceBefore: Option[UnitInfo] = None) {
+    resourceBefore = resourceBefore.orElse(resourceByWorker.get(worker))
     val resourceBeforeEdgePixels = resourceBefore.map(_.pixelDistanceEdge(worker))
 
     // How many workers are already mining this patch?
     // TODO: Originally had the unimplemented comment "Count only close-or-closer workers so new miners don't scare us off."
     val workersBefore = workersByResource.get(resource).map(_.size).getOrElse(0)
 
+    // The depot-to-resource distance is used in two ways:
+    // -Resources close to the hall should get priority on their first two workers
+    // -Resources far from the hall benefit more from the third worker
+    val hallToResourcePixels = resourceHallPixels()(resource)
+
+    // Geyser mining speed varies based on direction relative to town hall
+    val belowTownHall = resource.base.map(_.townHallTile).exists(t => t.y < resource.tileTopLeft.y - 3 || t.x < resource.tileTopLeft.x - 4)
+    val needFourOnGas = resource.unitClass.isGas && belowTownHall
+    val distanceRatio = PurpleMath.clamp(hallToResourcePixels / 3.0, 1.0, 2.0)
+
     // How effective will the next worker be on this resource?
     var throughput = 0.001
     if (resource.unitClass.isGas) {
-      // Depends on distance, but generally a geyser only supports three workers
-      if (workersBefore == 3) {
-        throughput = 0.01
+      if (workersBefore == 4 && needFourOnGas) {
+        throughput = fourthGasMiningRate
       } else if (workersBefore < 3) {
         throughput = 1.0
       }
@@ -221,17 +234,19 @@ class Gather extends Plan {
       }
     } else {
       if (workersBefore == 0) {
-        throughput = 1.0
+        // First workers prefer closer resources
+        // Range on 1.0 - 1.5
+        throughput = 1.0 + 0.5 * (2.0 - distanceRatio)
       } else if (workersBefore == 1) {
-        throughput = 0.8
-      } else if (workersBefore == 2) {
-        throughput = 0.2
+        // Second workers prefer distant resources (since they'll spend more time mining)
+        // Range on 0.5 - 0.8
+        throughput = 0.5 + 0.3 * (distanceRatio - 1.0)
+      } else if (workersBefore < 3) {
+        // Third workers also prefer distant resources
+        // Range on 0.2 - 0.5
+        throughput = 0.2 + 0.3 * (distanceRatio - 1.0)
       }
     }
-
-    // How fast is mining from this resource?
-    val depotToResourceDistance = resourceHallPixels()(resource)
-    val speed = 3.0 + 12.0 / Math.max(12.0, depotToResourceDistance)
 
     // When deciding whether to travel to another base to mine, there's a
     // tradeoff between mining efficiency and the time-discounted value of
@@ -249,7 +264,8 @@ class Gather extends Plan {
     val framesSpentGathering = Math.max(24, kLookaheadFrames - framesToResource)
     val gasPreference = if (resource.unitClass.isGas) gasWorkerDesire else 1.0
     val stickiness = if (stick) 2.0 else 1.0
-    val output = throughput * speed * framesSpentGathering * gasPreference * stickiness
-    output
+    val output = throughput * framesSpentGathering * gasPreference * stickiness
   }
+
+  def audit = resourceByWorker.keysIterator.map(worker => workersByResource.keys.map(ResourceScore(worker, _, 1.0)))
 }

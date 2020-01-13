@@ -22,6 +22,7 @@ class Visualization {
   var views = mutable.ArrayBuffer(
     // Evergreen views
     ShowClock,
+    ShowStrategyName,
     ShowHealthAndCooldown,
     ShowUnitsFriendly,
     ShowUnitsEnemy,
@@ -140,7 +141,7 @@ class Visualization {
     ShowSquads,
     ShowStatus,
     ShowStrategyInterest,
-    ShowStrategy,
+    ShowStrategyName,
     ShowStrategyEvaluations,
     ShowTechniques,
     ShowTextOnly,

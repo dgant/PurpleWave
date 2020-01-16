@@ -3,7 +3,7 @@ package Micro.Squads.Goals
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
 class GoalCatchDTRunby extends GoalBasic {
@@ -27,12 +27,6 @@ class GoalCatchDTRunby extends GoalBasic {
 
   override def acceptsHelp: Boolean = needed && squad.units.isEmpty
 
-  override protected def offerCritical(candidates: Iterable[FriendlyUnitInfo]): Unit = {}
-  override protected def offerImportant(candidates: Iterable[FriendlyUnitInfo]): Unit = {
-    if (acceptsHelp) {
-      ByOption.minBy(candidates.filter(unitMatcher.accept))(_.pixelDistanceEdge(destination)).foreach(addCandidate)
-    }
-  }
-  override protected def offerUseful(candidates: Iterable[FriendlyUnitInfo]): Unit =  {}
-  override protected def offerUseless(candidates: Iterable[FriendlyUnitInfo]): Unit = {}
+  // TODO
+  ???
 }

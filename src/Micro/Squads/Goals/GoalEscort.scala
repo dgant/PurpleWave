@@ -19,7 +19,4 @@ class GoalEscort extends GoalBasic {
           .map(_.pixelCenter)
           .getOrElse(thePrincipal.projectFrames(24 * 5)))
         .getOrElse(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
-  
-  override protected def offerUseful(candidates: Iterable[FriendlyUnitInfo]) {}
-  override protected def offerUseless(candidates: Iterable[FriendlyUnitInfo]) {}
 }

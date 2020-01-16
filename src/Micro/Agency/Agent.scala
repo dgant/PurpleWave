@@ -271,6 +271,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   // Leading //
   /////////////
 
+  val leader = new Cache(() => unit.squad.flatMap(_.leader(unit.unitClass)))
   var leadFollower: (FriendlyUnitInfo) => Unit = x => {}
 
   /////////////////

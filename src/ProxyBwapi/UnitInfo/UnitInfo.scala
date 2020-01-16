@@ -44,12 +44,12 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     (if (shieldPoints > 0) "(" + shieldPoints + "/" + unitClass.maxShields + ") " else "") +
     tileIncludingCenter.toString + " " + pixelCenter.toString
   }
-  
-  def is(unitMatcher: UnitMatcher): Boolean = unitMatcher.accept(this)
-  def isPrerequisite(unitMatcher: UnitMatcher): Boolean = unitMatcher.acceptAsPrerequisite(this)
-  def isNone(unitMatchers: UnitMatcher*): Boolean = ! unitMatchers.exists(_.accept(this))
-  def isAny(unitMatchers: UnitMatcher*): Boolean = unitMatchers.exists(_.accept(this))
-  def isAll(unitMatchers: UnitMatcher*): Boolean = unitMatchers.forall(_.accept(this))
+
+  @inline def is(unitMatcher: UnitMatcher): Boolean = unitMatcher.accept(this)
+  @inline def isPrerequisite(unitMatcher: UnitMatcher): Boolean = unitMatcher.acceptAsPrerequisite(this)
+  @inline def isNone(unitMatchers: UnitMatcher*): Boolean = ! unitMatchers.exists(_.accept(this))
+  @inline def isAny(unitMatchers: UnitMatcher*): Boolean = unitMatchers.exists(_.accept(this))
+  @inline def isAll(unitMatchers: UnitMatcher*): Boolean = unitMatchers.forall(_.accept(this))
   
   //////////////////
   // Statefulness //

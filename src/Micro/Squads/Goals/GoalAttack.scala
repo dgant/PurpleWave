@@ -3,6 +3,7 @@ package Micro.Squads.Goals
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.Pixel
+import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Planning.UnitMatchers.{UnitMatchProxied, UnitMatchWarriors}
 import ProxyBwapi.Races.Terran
@@ -36,7 +37,7 @@ class GoalAttack extends GoalBasic {
   
   protected def chooseTarget(): Unit = {
     val focusEnemy = With.intelligence.threatOrigin
-    val focusUs = squad.centroid.tileIncluding
+    val focusUs = PurpleMath.centroid(squad.units.view.map(_.pixelCenter)).tileIncluding
     val threatDistanceToUs =
       ByOption.min(With.geography.ourBases.map(_.heart.tileDistanceFast(focusEnemy)))
         .getOrElse(With.geography.home.tileDistanceFast(focusEnemy))
@@ -74,9 +75,4 @@ class GoalAttack extends GoalBasic {
       .orElse(if (enemyNonTrollyThreats > 0) Some(With.intelligence.threatOrigin.pixelCenter) else None)
       .getOrElse(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
   }
-  
-  override protected def offerUseful(candidates: Iterable[FriendlyUnitInfo]) {
-    candidates.foreach(c => if (unitMatcher.accept(c)) addCandidate(c))
-  }
-  override protected def offerUseless(candidates: Iterable[FriendlyUnitInfo]) {}
 }

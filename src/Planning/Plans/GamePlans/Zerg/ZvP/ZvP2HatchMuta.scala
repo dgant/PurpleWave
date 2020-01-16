@@ -13,13 +13,13 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Zerg.BuildSunkensAtNatural
-import Planning.Plans.Scouting.{CampExpansions, FindExpansions}
+import Planning.Plans.Scouting.FindExpansions
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete, UnitMatchOr, UnitMatchWarriors}
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete, UnitMatchOr}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvP2HatchMuta
@@ -52,11 +52,7 @@ class ZvP2HatchMuta extends GameplanTemplate {
       preferDistanceFromEnemy = 0.25)
   else
     PlacementProfiles.defensive
-  
-  override def priorityAttackPlan: Plan = new If(
-    new UnitsAtLeast(12, UnitMatchWarriors),
-    new CampExpansions(Zerg.Zergling))
-  
+
   override def attackPlan: Plan = new If(
     new Or(
       new UnitsAtLeast(1, Zerg.Mutalisk, complete = true),

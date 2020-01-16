@@ -19,9 +19,6 @@ class GoalDefendZone extends GoalBasic {
 
   var zone: Zone = _
 
-  override val counterMin: Double = 2.0
-  override val counterMax: Double = 3.0
-
   override def run() {
     if (squad.units.isEmpty) return
 
@@ -36,12 +33,13 @@ class GoalDefendZone extends GoalBasic {
     lazy val allowWandering = With.geography.ourBases.size > 2 || !With.enemies.exists(_.isZerg) || squad.units.size > 3 || squad.enemies.exists(_.unitClass.ranged)
     lazy val canHuntEnemies = huntableEnemies().nonEmpty
     lazy val canDefendChoke = choke.isDefined
+    lazy val wallExistsNotNearChoke = walls.exists(wall => choke.forall(chokepoint => wall.pixelDistanceCenter(chokepoint.pixelCenter) > 8 * 32))
 
     if (allowWandering && canHuntEnemies) {
       lastAction = "Scour "
       huntEnemies()
     }
-    else if (walls.nonEmpty) {
+    else if (wallExistsNotNearChoke) {
       lastAction = "Protect wall of "
       defendHeart(walls.minBy(_.pixelCenter.groundPixels(With.intelligence.mostBaselikeEnemyTile)).pixelCenter)
     }

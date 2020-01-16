@@ -11,7 +11,6 @@ import Planning.Plans.GamePlans.Zerg.ZergIdeas.UpgradeHydraSpeedThenRange
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Scouting.CampExpansions
 import Planning.Predicates.Compound.{Check, Not}
 import Planning.Predicates.Economy.GasAtMost
 import Planning.Predicates.Milestones.{EnemyHasShown, UnitsAtLeast}
@@ -56,7 +55,6 @@ class ZvPLateGame extends GameplanTemplate {
 
   override def buildPlans: Seq[Plan] = Seq(
     new CapGasAt(800),
-    new CampExpansions(Zerg.Zergling),
 
     // Basic tech
     new Pump(Zerg.Drone, 18),

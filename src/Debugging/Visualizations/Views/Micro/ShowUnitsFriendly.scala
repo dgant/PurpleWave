@@ -24,6 +24,7 @@ object ShowUnitsFriendly extends View {
   var showDesire      : Boolean = true
   var showDistance    : Boolean = false
   var showFightReason : Boolean = true
+  var showLeaders     : Boolean = true
 
   override def renderMap() { With.units.ours.foreach(renderUnitState) }
 
@@ -159,6 +160,14 @@ object ShowUnitsFriendly extends View {
         agent.unit.pixelCenter.add(0, 21),
         drawBackground = true,
         Color.Black)
+    }
+
+    if (showLeaders) {
+      if (agent.leader().contains(unit)) {
+        val start = unit.pixelCenter.add(0, unit.bottom + 8)
+        DrawMap.box(start.subtract(4, 4), start.add(4, 4), color = unit.player.colorDeep)
+        DrawMap.drawStar(start, 4, Colors.NeonYellow)
+      }
     }
   }
   

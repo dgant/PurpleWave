@@ -19,7 +19,7 @@ object Follow extends Action {
       Zerg.Mutalisk))
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    val maybeLeader = unit.squad.flatMap(_.leader(unit.unitClass)).filterNot(_ == unit)
+    val maybeLeader = unit.agent.leader()
     unit.agent.toTravel = maybeLeader.map(_.pixelCenter).orElse(unit.agent.toTravel)
     maybeLeader
       .withFilter(leader =>

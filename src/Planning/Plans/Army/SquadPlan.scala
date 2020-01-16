@@ -1,5 +1,6 @@
 package Planning.Plans.Army
 
+import Lifecycle.With
 import Micro.Squads.Goals.SquadGoal
 import Micro.Squads.Squad
 import Planning.Plan
@@ -11,6 +12,6 @@ abstract class SquadPlan[T <: SquadGoal] extends Plan {
   
   override def onUpdate() {
     squad.setGoal(goal)
-    squad.commission()
+    With.squads.commission(squad)
   }
 }

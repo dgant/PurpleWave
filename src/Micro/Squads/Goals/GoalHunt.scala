@@ -37,9 +37,4 @@ class GoalHunt(val enemyMatcher: UnitMatcher) extends GoalBasic {
       .minBy(squad.enemies.view.filter(_.possiblyStillThere).map(_.pixelCenter))(_.pixelDistance(centroid))
       .getOrElse(With.intelligence.mostIntriguingBases().head.heart.pixelCenter)
   }
-  
-  override protected def offerUseful(candidates: Iterable[FriendlyUnitInfo]) {
-    candidates.foreach(c => if (unitMatcher.accept(c)) addCandidate(c))
-  }
-  override protected def offerUseless(candidates: Iterable[FriendlyUnitInfo]) {}
 }

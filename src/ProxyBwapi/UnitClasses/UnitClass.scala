@@ -557,6 +557,4 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
       || (unit.unitClass == Zerg.Hive         && this == Zerg.Hatchery)
       || (unit.unitClass == Zerg.Lair         && this == Zerg.Hatchery)))
   )
-
-  override def toUnitClass: UnitClass = this
 }

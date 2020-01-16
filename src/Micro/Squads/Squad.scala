@@ -1,8 +1,6 @@
 package Micro.Squads
 
 import Lifecycle.With
-import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
 import Micro.Squads.Goals.{GoalChill, SquadGoal}
 import Performance.Cache
 import Planning.Plan
@@ -32,22 +30,11 @@ class Squad(val client: Plan) extends SquadWithGoal {
     goal.run()
   }
   
-  def commission(): Unit = {
-    With.squads.commission(this)
-  }
-  
   def recruit(unit: FriendlyUnitInfo) {
-    With.squads.addUnit(this, unit)
-  }
-  
-  def centroid: Pixel = {
-    if (units.isEmpty)
-      With.geography.home.pixelCenter
-    else
-      PurpleMath.centroid(units.map(_.pixelCenter))
+    // TODO: Need to implement
   }
 
-  val age = new CountMap[FriendlyUnitInfo]
+  val age: CountMap[FriendlyUnitInfo] = new CountMap[FriendlyUnitInfo]
   def leader(unitClass: UnitClass): Option[FriendlyUnitInfo] = leaders().get(unitClass)
   private val leaders: Cache[Map[UnitClass, FriendlyUnitInfo]] = new Cache(() =>
     units.toSeq.groupBy(_.unitClass).map(group => (group._1, group._2.maxBy(unit => age.getOrElse(unit, 0))))

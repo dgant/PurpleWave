@@ -4,6 +4,7 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
+import Mathematics.PurpleMath
 import Micro.Squads.Squad
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -23,8 +24,9 @@ object ShowSquads extends View {
         color,
         drawBorder = unit.isEnemy,
         unit.player.colorMedium))
-  
-    With.game.drawCircleMap(squad.centroid.bwapi, squad.units.map(_.pixelDistanceCenter(squad.centroid)).max.toInt, color)
+
+    val centroid = PurpleMath.centroid(squad.units.view.map(_.pixelCenter))
+    With.game.drawCircleMap(centroid.bwapi, squad.units.map(_.pixelDistanceCenter(centroid)).max.toInt, color)
   }
   
   override def renderScreen() {

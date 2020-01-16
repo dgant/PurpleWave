@@ -12,6 +12,7 @@ class TaskQueueGlobal extends AbstractTaskQueue {
     new TaskAccounting,
     new TaskArchitecture,
     new TaskPlanning,
+    new TaskSquads,
     new TaskMicro,
     new TaskManners,
     new TaskCamera,

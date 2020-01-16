@@ -17,6 +17,6 @@ class RecruitFreelancers(
   
   override def onUpdate() {
     freelancers.acquire(this)
-    freelancers.units.foreach(With.squads.addFreelancer)
+    freelancers.units.foreach(With.squads.advertise)
   }
 }

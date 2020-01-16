@@ -69,6 +69,13 @@ class TaskPlanning extends AbstractTask {
     With.blackboard.reset()
     With.strategy.gameplan.update()
     With.groundskeeper.update()
+  }
+}
+class TaskSquads extends AbstractTask {
+  urgency = With.configuration.urgencySquads
+  override def maxConsecutiveSkips: Int =
+    24 * 5
+  override protected def onRun(): Unit = {
     With.squads.update()
   }
 }

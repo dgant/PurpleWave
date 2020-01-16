@@ -5,29 +5,33 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable
 
-class Squads {
+class Squads extends SquadBatching {
   
-  val all: mutable.Set[Squad] = new mutable.HashSet[Squad]
+  //val all: mutable.Set[Squad] = new mutable.HashSet[Squad]
+  def all: Seq[Squad] = activeBatch.squads.view
+
+  // TODO: Unused; Delete
   val unitsBySquad: mutable.Map[Squad, mutable.HashSet[FriendlyUnitInfo]] = new mutable.HashMap[Squad, mutable.HashSet[FriendlyUnitInfo]]
+
+  // TODO: Replace usage by Unit.Squad; then Delete
   val squadByUnit: mutable.Map[FriendlyUnitInfo, Squad] = new mutable.HashMap[FriendlyUnitInfo, Squad]
+
+  // TODO: Unused; Delete
   val freelancers: mutable.Set[FriendlyUnitInfo] = new mutable.HashSet[FriendlyUnitInfo]
-  
-  def allByPriority: Seq[Squad] = all.toSeq.sortBy(_.client.priority)
+
+  def allByPriority: Seq[Squad] = all.sortBy(_.client.priority)
+
+  // TODO: Needs new canonical source of truth
   def units(squad: Squad): Set[FriendlyUnitInfo] = unitsBySquad.get(squad).map(_.toSet).getOrElse(Set.empty)
-  def squad(unit: FriendlyUnitInfo): Option[Squad] = squadByUnit.get(unit)
   
   def reset() {
     all.foreach(squad => squad.previousUnits = squad.units)
-    all.clear()
     squadByUnit.clear()
     unitsBySquad.clear()
     freelancers.clear()
   }
-  
-  def addFreelancer(unit: FriendlyUnitInfo) {
-    freelancers += unit
-  }
-  
+
+  // TODO: Delete; to be implemented within the batching
   def assignFreelancers() {
     With.squads.allByPriority.foreach(_.goal.prepareForCandidates())
     RecruitmentLevel.values.foreach(recruitmentLevel =>
@@ -37,18 +41,15 @@ class Squads {
         squad.goal.offer(nextFreelancers, recruitmentLevel)
       }))
   }
-  
-  def commission(squad: Squad) {
-    all += squad
-    unitsBySquad.put(squad, new mutable.HashSet[FriendlyUnitInfo])
-  }
-  
+
+  // TODO: Delete; Only used internally
   def removeUnit(unit: FriendlyUnitInfo) {
     freelancers += unit
     squadByUnit.get(unit).foreach(unitsBySquad(_).remove(unit))
     squadByUnit.remove(unit)
   }
-  
+
+  // TODO: Replace usage by Squad; then delete
   def addUnit(squad: Squad, unit: FriendlyUnitInfo) {
     removeUnit(unit)
     squadByUnit(unit) = squad

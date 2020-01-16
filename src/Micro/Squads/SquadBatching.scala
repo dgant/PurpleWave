@@ -26,7 +26,7 @@ trait SquadBatching {
     batches.last.squads += squad
   }
 
-  def run(): Unit = {
+  protected def updateBatching(): Unit = {
     // Get the newest batch (Clearing all other batches that have accumulated in the interim)
     while (batches.size > 1 && batches.head.processingStarted == batches.head.processingFinished) {
       val nextBatch = batches.dequeue()

@@ -13,7 +13,7 @@ import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutForCannonRush
-import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Compound.{And, Latch, Not, ConcludeWhen}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeAtHome}
 import Planning.Predicates.Strategy._
@@ -27,13 +27,16 @@ class PvPRobo extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(PvPRobo)
   override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
 
-  class ShuttleFirst extends And(
-    new Not(new EnemyStrategy(With.fingerprints.dtRush)),
-    new Or(
-      new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.twoGate),
-      new EnemyBasesAtLeast(2),
-      new EnemyStrategy(With.fingerprints.robo),
-      new EnemyRecentStrategy(With.fingerprints.fourGateGoon)))
+  class ShuttleFirst extends ConcludeWhen(
+    new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
+    new And(
+      new UnitsAtMost(0, Protoss.RoboticsSupportBay),
+      new Not(new EnemyStrategy(With.fingerprints.dtRush)),
+      new Or(
+        new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.twoGate),
+        new EnemyBasesAtLeast(2),
+        new EnemyStrategy(With.fingerprints.robo),
+        new EnemyRecentStrategy(With.fingerprints.fourGateGoon))))
 
   class GetObservers extends Or(
     new EnemyDarkTemplarLikely,

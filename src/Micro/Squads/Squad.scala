@@ -1,6 +1,5 @@
 package Micro.Squads
 
-import Lifecycle.With
 import Micro.Squads.Goals.{GoalChill, SquadGoal}
 import Performance.Cache
 import Planning.Plan
@@ -8,30 +7,44 @@ import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.CountMap
 
+import scala.collection.mutable
+
 trait SquadWithGoal {
-  private var ourGoal: SquadGoal = _
-  def goal: SquadGoal = ourGoal
-  def setGoal(goal: SquadGoal) {
-    ourGoal = goal
-    goal.squad = this.asInstanceOf[Squad]
+  private var _ourGoal: SquadGoal = _
+  final def goal: SquadGoal = _ourGoal
+  final def setGoal(goal: SquadGoal) {
+    _ourGoal = goal
+    goal.setSquad(this.asInstanceOf[Squad])
   }
   setGoal(new GoalChill)
 }
 
-class Squad(val client: Plan) extends SquadWithGoal {
+trait SquadWithUnits {
+  def units: Set[FriendlyUnitInfo] = _unitsCache()
+  def previousUnits: Set[FriendlyUnitInfo] = _previousunitsCache()
+  private var _units: mutable.Set[FriendlyUnitInfo] = mutable.Set.empty
+  private var _previousUnits: mutable.Set[FriendlyUnitInfo] = mutable.Set.empty
+  private val _unitsCache = new Cache(() => _units.toSet)
+  private val _previousunitsCache = new Cache(() => _previousUnits.toSet)
+
+  final def clearUnits(): Unit = {
+    _previousUnits = _units
+    _units = mutable.Set.empty
+  }
+
+  final def recruit(unit: FriendlyUnitInfo): Unit = {
+    _units += unit
+  }
+}
+
+class Squad(val client: Plan) extends SquadWithGoal with SquadWithUnits {
   
   var enemies: Seq[UnitInfo] = Seq.empty
-  var previousUnits: Set[FriendlyUnitInfo] = Set.empty
-  def units: Set[FriendlyUnitInfo] = With.squads.units(this)
   
-  def update() {
+  def run() {
     age --= age.keys.filterNot(units.contains)
     units.foreach(age.add(_, 1))
     goal.run()
-  }
-  
-  def recruit(unit: FriendlyUnitInfo) {
-    // TODO: Need to implement
   }
 
   val age: CountMap[FriendlyUnitInfo] = new CountMap[FriendlyUnitInfo]

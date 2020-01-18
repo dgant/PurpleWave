@@ -6,7 +6,7 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
-class GoalCatchDTRunby extends GoalBasic {
+class GoalCatchDTRunby extends SquadGoalBasic {
   
   override def toString: String = "Detect DT runbys"
   
@@ -24,8 +24,6 @@ class GoalCatchDTRunby extends GoalBasic {
         .getOrElse(heart.pixelDistance(With.intelligence.mostBaselikeEnemyTile.pixelCenter)))
       .getOrElse(With.geography.home.pixelCenter)
   }
-
-  override def acceptsHelp: Boolean = needed && squad.units.isEmpty
 
   // TODO
   ???

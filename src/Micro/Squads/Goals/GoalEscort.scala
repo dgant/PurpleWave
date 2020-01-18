@@ -5,13 +5,13 @@ import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
-class GoalEscort extends GoalBasic {
+class GoalEscort extends SquadGoalBasic {
   
   override def toString: String = "Escort to " + destination.zone
   
   var principal: Option[FriendlyUnitInfo] = None
   
-  override protected def destination: Pixel =
+  override def destination: Pixel =
     principal
       .map(thePrincipal =>
         ByOption

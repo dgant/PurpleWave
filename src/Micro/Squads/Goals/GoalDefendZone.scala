@@ -11,7 +11,7 @@ import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
-class GoalDefendZone extends GoalBasic {
+class GoalDefendZone extends SquadGoalBasic {
 
   private var lastAction = "Defend "
 

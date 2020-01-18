@@ -6,7 +6,7 @@ import Micro.Agency.Intention
 import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class GoalEjectScout extends GoalBasic {
+class GoalEjectScout extends SquadGoalBasic {
   
   override def toString: String = "Eject scouts"
   

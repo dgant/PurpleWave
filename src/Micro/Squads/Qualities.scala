@@ -23,7 +23,7 @@ object Qualities {
       || u.damageOnHitGround >= Terran.SpiderMine.maxHitPoints
       || u.pixelRangeGround > 32.0 * 3.0)
     override val counteredBy: Array[Quality] = Array.empty
-    override def counterScaling(input: Double): Double = 5.0 * input
+    @inline override def counterScaling: Double = 5.0
   }
   object Vulture extends Quality {
     override def accept(u: UnitInfo): Boolean = u.is(Terran.Vulture)
@@ -33,9 +33,6 @@ object Qualities {
     override def accept(u: UnitInfo): Boolean = (AntiGround.accept(u)
       && ! u.isAny(Protoss.Zealot, Protoss.DarkTemplar, Protoss.Scout, Protoss.Arbiter, Protoss.Carrier, Zerg.Zergling))
     override val counteredBy: Array[Quality] = Array.empty
-  }
-  object FlyingBuilding extends Quality {
-    def accept(u: UnitInfo): Boolean = u.unitClass.isFlyingBuilding
   }
   object Air extends Quality {
     def accept(u: UnitInfo): Boolean = u.flying
@@ -71,27 +68,25 @@ object Qualities {
   }
   object Detector extends Quality {
     def accept(u: UnitInfo): Boolean = u.unitClass.isDetector
-    override def counterScaling(input: Double): Double = 5.0 * input
+    @inline override def counterScaling: Double = 5.0
   }
-  object SiegeTank extends Quality {
-    def accept(u: UnitInfo): Boolean = u.unitClass.isSiegeTank
+  object StaticDefense extends Quality {
+    def accept(u: UnitInfo): Boolean = u.unitClass.attacksGround && u.unitClass.isBuilding
   }
-  object Transport extends Quality {
-    def accept(u: UnitInfo): Boolean = u.isAny(Terran.Dropship, Protoss.Shuttle, Zerg.Overlord)
+  object AntiStaticDefense extends Quality {
+    def accept(u: UnitInfo): Boolean = u.pixelRangeGround > 32.0 * 7.0 || u.isSiegeTankUnsieged()
   }
-  object Transportable extends Quality {
-    def accept(u: UnitInfo): Boolean = u.isAny(Protoss.HighTemplar, Protoss.Reaver, Zerg.Defiler)
-  }
-  val threats: Array[Quality] = Array(
+  val enemy: Array[Quality] = Array(
     Cloaked,
     SpiderMine,
     Vulture,
     Air,
     Ground,
     AirCombat,
-    GroundCombat
+    GroundCombat,
+    StaticDefense
   )
-  val answers: Array[Quality] = Array(
+  val friendly: Array[Quality] = Array(
     Detector,
     AntiSpiderMine,
     AntiVulture,
@@ -99,11 +94,6 @@ object Qualities {
     AntiGround,
     AntiAirCombat,
     AntiGroundCombat,
-  )
-  val roles: Array[Quality] = Array(
-    FlyingBuilding,
-    SiegeTank,
-    Transport,
-    Transportable
+    AntiStaticDefense
   )
 }

@@ -39,8 +39,7 @@ object Paradrop extends Action {
     val target = unit.agent.toAttack
 
     def eligibleTeammate = (unit: UnitInfo) => ! unit.isAny(Protoss.Shuttle, Protoss.Reaver, Protoss.HighTemplar)
-    lazy val squadmates = unit.squad.map(_.units.toSeq.filter(eligibleTeammate)).getOrElse(Seq.empty)
-    lazy val squadmatesEngaged = squadmates.filter(_.matchups.enemies.nonEmpty)
+    lazy val squadmates = unit.squadmates.view.filter(eligibleTeammate)
     lazy val allies = unit.matchups.allies.filter(eligibleTeammate)
     lazy val alliesEngaged = allies.filter(_.matchups.enemies.nonEmpty)
 

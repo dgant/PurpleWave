@@ -10,7 +10,7 @@ import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
-class GoalAttack extends GoalBasic {
+class GoalAttack extends SquadGoalBasic {
   
   override def toString: String = "Attack " + target.zone.name
   

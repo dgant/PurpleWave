@@ -6,7 +6,7 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
-class GoalRazeProxies(var pixel: Pixel) extends GoalBasic {
+class GoalRazeProxies(var pixel: Pixel) extends SquadGoalBasic {
 
   override def toString: String = "Raze proxies in " + pixel.zone.name
 

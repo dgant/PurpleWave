@@ -5,10 +5,9 @@ import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Planning.UnitMatchers.UnitMatcher
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
-class GoalHunt(val enemyMatcher: UnitMatcher) extends GoalBasic {
+class GoalHunt(val enemyMatcher: UnitMatcher) extends SquadGoalBasic {
   
   override def toString: String = (
     "Hunt "

@@ -10,14 +10,14 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable
 
-abstract class GoalAssignToBases extends GoalBasic {
+abstract class GoalAssignToBases extends SquadGoalBasic {
 
   def takeNextBase(scout: FriendlyUnitInfo): Base
 
   protected def baseFilter: Base => Boolean = base => base.owner.isNeutral
   protected var destinationByScout: mutable.ArrayBuffer[(FriendlyUnitInfo, Pixel)] = new mutable.ArrayBuffer[(FriendlyUnitInfo, Pixel)]
   protected var destinationFrame: Int = 0
-  override protected def destination: Pixel = {
+  override def destination: Pixel = {
     destinationByScout
       .headOption
       .map(_._2)

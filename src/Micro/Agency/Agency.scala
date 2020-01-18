@@ -30,6 +30,7 @@ class Agency {
       lastQueueCompletion = With.frame
 
       With.coordinator.runPerAgentCycle()
+      With.squads.updateGoals()
       agentQueue ++= With.units.ours.view
         .filter(validAgent)
         .map(_.agent)

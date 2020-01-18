@@ -22,8 +22,8 @@ class SquadBatch {
 
   def step(): Unit = {
     if ( ! started) {
-      eligibleSquads ++= squads.map(new SquadAssignment(_))
-      freelancersUnassigned ++= freelancers
+      eligibleSquads ++= squads.distinct.map(new SquadAssignment(_))
+      freelancersUnassigned ++= freelancers.distinct
       started = true
 
       // TODO: Sort the freelancers by max(Proximity*SquadValue*max(QualityNeed))

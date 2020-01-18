@@ -16,13 +16,14 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
   
   override val friendly: Option[FriendlyUnitInfo] = Some(this)
   
-  def squad: Option[Squad] = With.squads.squadByUnit.get(this)
+  def squad: Option[Squad] = squadCache()
   def squadmates: Set[FriendlyUnitInfo] = squad.map(_.units).getOrElse(Set.empty)
   def squadenemies: Seq[UnitInfo] = squad.map(_.enemies).getOrElse(Seq.empty)
   def teammates: Set[UnitInfo] = teammatesCache()
   def enemies: Seq[UnitInfo] = enemiesCache()
   lazy val agent: Agent = new Agent(this)
 
+  private val squadCache = new Cache(() => With.squads.all.find(_.units.contains(this)))
   private val teammatesCache = new Cache(() => (squadmates ++ matchups.allies))
   private val enemiesCache = new Cache(() => (squadenemies ++ matchups.enemies).distinct)
   

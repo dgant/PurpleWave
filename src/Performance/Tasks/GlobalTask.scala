@@ -64,7 +64,7 @@ class TaskPlanning extends AbstractTask {
     With.recruiter.update()
     With.prioritizer.update()
     With.scheduler.reset()
-    With.squads.reset()
+    With.squads.startNewBatch()
     With.buildOrderHistory.update()
     With.blackboard.reset()
     With.strategy.gameplan.update()
@@ -76,7 +76,7 @@ class TaskSquads extends AbstractTask {
   override def maxConsecutiveSkips: Int =
     24 * 5
   override protected def onRun(): Unit = {
-    With.squads.update()
+    With.squads.updateGoals()
   }
 }
 class TaskVisualizations extends AbstractTask {

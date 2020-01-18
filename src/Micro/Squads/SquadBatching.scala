@@ -6,7 +6,6 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import scala.collection.mutable
 
 trait SquadBatching {
-
   val batches = new mutable.Queue[SquadBatch]
   var activeBatch = new SquadBatch
 
@@ -26,7 +25,7 @@ trait SquadBatching {
     batches.last.squads += squad
   }
 
-  protected def updateBatching(): Unit = {
+  protected def stepBatching(): Unit = {
     // Get the newest batch (Clearing all other batches that have accumulated in the interim)
     while (batches.size > 1 && batches.head.processingStarted == batches.head.processingFinished) {
       val nextBatch = batches.dequeue()

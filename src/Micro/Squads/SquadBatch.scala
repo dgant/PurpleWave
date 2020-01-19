@@ -2,17 +2,19 @@ package Micro.Squads
 
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.ByOption
 
 import scala.collection.mutable
 
 class SquadBatch {
 
-  // TODO: Wrap these; don't try to access them externally
   val squads = new mutable.ArrayBuffer[Squad]
   val freelancers = new mutable.ArrayBuffer[FriendlyUnitInfo]
 
   def processingStarted: Boolean = started
   def processingFinished: Boolean = finished
+
+  def assignments: Seq[SquadAssignment] = if (processingFinished) eligibleSquads else Seq.empty
 
   private var started: Boolean = false
   private var finished: Boolean = false
@@ -26,12 +28,16 @@ class SquadBatch {
       freelancersUnassigned ++= freelancers.distinct
       started = true
 
-      // TODO: Sort the freelancers by max(Proximity*SquadValue*max(QualityNeed))
-      freelancersUnassigned.sortBy(f => f.id)
+      freelancersUnassigned.sortBy(f => - ByOption.max(
+        eligibleSquads.view
+          .filter(_.squad.goal.candidateWelcome(this, f))
+          .map(s => s.squad.goal.candidateValue(this, f)))
+        .getOrElse(0.0))
     }
 
     if (freelancersUnassigned.isEmpty) {
-      val incompleteSquad = eligibleSquads.reverseIterator.find(squad => false) // TODO: Disqualify incomplete squads and release their units before finishing
+      // TODO: Disqualify incomplete squads and release their units before finishing
+      val incompleteSquad = eligibleSquads.reverseIterator.find(squad => false)
       if (incompleteSquad.isDefined) {
         freelancersUnassigned ++= incompleteSquad.get.units
         eligibleSquads -= incompleteSquad.get
@@ -54,6 +60,11 @@ class SquadBatch {
   }
 
   def squadValue(freelancer: FriendlyUnitInfo, squad: SquadAssignment): Double = {
-    1.0 // TODO: Calculate max(Proximity*SquadValue*max(QualityNeed))
+    squad.squad.goal.inherentValue * squad.squad.goal.candidateValue(this, freelancer)
+  }
+
+  def apply(): Unit = {
+    With.squads.all.foreach(squad => squad.clearUnits())
+    assignments.foreach(assignment => assignment.squad.addUnits(assignment.units))
   }
 }

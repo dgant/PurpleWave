@@ -72,10 +72,10 @@ class DefendAgainstProxy extends Plan {
     }
     lastProxyCount = proxies.size
     defenders.get.acquire(this)
+    defenders.get.units.foreach(With.squads.freelance)
   
     squad.enemies = proxies
     With.squads.commission(squad)
-    defenders.get.units.foreach(squad.recruit)
     squad.setGoal(new GoalRazeProxies(squadDestination))
   }
   

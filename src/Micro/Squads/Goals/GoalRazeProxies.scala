@@ -2,6 +2,7 @@ package Micro.Squads.Goals
 
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
+import Planning.UnitMatchers.{UnitMatchOr, UnitMatchRecruitableForCombat, UnitMatchWorkers}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
@@ -24,4 +25,6 @@ class GoalRazeProxies(var pixel: Pixel) extends SquadGoalBasic {
       canFlee = false
     }))
   }
+
+  unitMatcher = UnitMatchOr(UnitMatchRecruitableForCombat, UnitMatchWorkers)
 }

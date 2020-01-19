@@ -19,7 +19,7 @@ class FloatBuildings(val toFloat: UnitMatcher = UnitMatchOr(Terran.Barracks, Ter
     floaties.acquire(this)
     floaties.units.foreach(floatie => {
       if (floatie.flying) {
-        With.squads.advertise(floatie)
+        With.squads.freelance(floatie)
       }
       else {
         floatie.agent.intend(this, new Intention {

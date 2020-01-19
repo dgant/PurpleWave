@@ -2,6 +2,9 @@ package Micro.Squads.Goals
 
 import Lifecycle.With
 import Mathematics.Points.Pixel
+import Performance.Cache
+import Planning.UnitCounters.UnitCountUpToLambda
+import Planning.UnitMatchers.UnitMatchMobileDetectors
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
@@ -12,9 +15,8 @@ class GoalCatchDTRunby extends SquadGoalBasic {
   
   var scout: Option[UnitInfo] = None
 
-  var needed: Boolean = true
+  val needed = new Cache(() => With.geography.ourBasesAndSettlements.exists(_.units.forall(u => ! u.isFriendly || ! u.unitClass.isDetector || ! u.complete)))
   override def run(): Unit = {
-    needed = With.geography.ourBasesAndSettlements.exists(_.units.forall(u => ! u.isFriendly || ! u.unitClass.isDetector || ! u.complete))
     super.run()
   }
   override def destination: Pixel = {
@@ -25,6 +27,6 @@ class GoalCatchDTRunby extends SquadGoalBasic {
       .getOrElse(With.geography.home.pixelCenter)
   }
 
-  // TODO
-  ???
+  unitMatcher = UnitMatchMobileDetectors
+  unitCounter = new UnitCountUpToLambda(() => if (needed()) 1 else 0)
 }

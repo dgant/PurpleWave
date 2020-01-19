@@ -211,6 +211,15 @@ object PurpleMath {
     if (x.isNegInfinity) return -1.0
     x / (1.0 + Math.abs(x))
   }
+  @inline final def fastInverseSqrt(x: Double): Double = {
+    // Via https://stackoverflow.com/questions/15260373/does-scala-have-floattointbits-and-intbitstofloat-methods
+    val xhalf = 0.5f * x
+    var i = java.lang.Double.doubleToRawLongBits(x)
+    i = 0x5f3759df - (i >> 1)
+    var output = java.lang.Double.longBitsToDouble(i)
+    output *= (1.5f - xhalf * x * x)
+    output
+  }
 
   @inline final def atan2(y: Double, x: Double): Double = {
    normalize0To2Pi(Math.atan2(y, x))

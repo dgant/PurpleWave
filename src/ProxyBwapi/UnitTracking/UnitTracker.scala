@@ -3,7 +3,7 @@ package ProxyBwapi.UnitTracking
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.Shapes.Circle
-import Performance.{Cache, UnitCounter}
+import Performance.{Cache, TotalUnitCounter}
 import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 
@@ -25,19 +25,19 @@ class UnitTracker {
   def all = allCache()
   private val allCache = new Cache(() => playerOwned ++ neutral)
   
-  private val counterOurs = new UnitCounter(() => ours)
+  private val counterOurs = new TotalUnitCounter(() => ours)
   def existsOurs(matcher: UnitMatcher*): Boolean = countOurs(matcher: _*) > 0
   def countOurs(matcher: UnitMatcher*): Int = counterOurs(matcher: _*)
   def countOursP(predicate: (UnitInfo) => Boolean): Int = counterOurs.p(predicate)
   def ours: Set[FriendlyUnitInfo] = friendlyUnitTracker.ourUnits
   
-  private val counterEnemy = new UnitCounter(() => enemy)
+  private val counterEnemy = new TotalUnitCounter(() => enemy)
   def existsEnemy(matcher: UnitMatcher*): Boolean = countEnemy(matcher: _*) > 0
   def countEnemy(matcher: UnitMatcher*): Int = counterEnemy(matcher: _*)
   def countEnemyP(predicate: (UnitInfo) => Boolean): Int = counterEnemy.p(predicate)
   def enemy: Set[ForeignUnitInfo] = foreignUnitTracker.enemyUnits
 
-  private val counterEver = new UnitCounter(() => ever)
+  private val counterEver = new TotalUnitCounter(() => ever)
   def existsEver(matcher: UnitMatcher*): Boolean = countEver(matcher: _*) > 0
   def countEver(matcher: UnitMatcher*): Int = counterEver(matcher: _*)
   def countEverP(predicate: (UnitInfo) => Boolean): Int = counterEver.p(predicate)

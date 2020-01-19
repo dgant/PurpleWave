@@ -77,6 +77,7 @@ class TaskSquads extends AbstractTask {
     24 * 5
   override protected def onRun(): Unit = {
     With.squads.updateGoals()
+    With.squads.stepBatching()
   }
 }
 class TaskVisualizations extends AbstractTask {

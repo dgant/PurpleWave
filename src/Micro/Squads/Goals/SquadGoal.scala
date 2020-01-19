@@ -2,6 +2,7 @@ package Micro.Squads.Goals
 
 import Lifecycle.With
 import Mathematics.Points.Pixel
+import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Micro.Squads.{QualityCounter, Squad, SquadBatch}
 import Planning.UnitCounters.{UnitCountEverything, UnitCounter}
@@ -17,6 +18,14 @@ trait SquadGoalWithSquad {
     _squad = squad
   }
   private var _squad: Squad = _
+}
+
+object ProximityValue {
+  def apply(candidate: FriendlyUnitInfo, destinations: Seq[Pixel]): Double = {
+    // We want to reward being close but not let the multiplicative factor blow up as the unit gets very close.
+    // After some experimentation with graphing it, I like 1 / sqrt(tiles/8 + 1)
+    ByOption.max(destinations.map(d => 1.0 / PurpleMath.fastInverseSqrt(candidate.pixelDistanceTravelling(d) / 8 / 32 + 1))).getOrElse(1.0)
+  }
 }
 
 trait SquadRecruiter extends SquadGoalWithSquad {
@@ -45,7 +54,7 @@ trait SquadRecruiterSimple extends SquadRecruiter {
   def candidateDistance(candidate: FriendlyUnitInfo): Double = ByOption.max(destinations.map(candidate.pixelDistanceTravelling)).getOrElse(10 * With.mapPixelWidth)
   def candidateValue(batch: SquadBatch, candidate: FriendlyUnitInfo): Double = {
     invalidateBatch(batch)
-    qualityCounter.utility(candidate)
+    ProximityValue(candidate, destinations) * qualityCounter.utility(candidate)
   }
   protected def invalidateBatch(batch: SquadBatch): Unit = {
     if (batch != currentBatch) {

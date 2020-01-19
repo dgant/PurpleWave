@@ -32,8 +32,8 @@ trait SquadWithUnits {
     _units = mutable.Set.empty
   }
 
-  final def recruit(unit: FriendlyUnitInfo): Unit = {
-    _units += unit
+  final def addUnits(unit: Seq[FriendlyUnitInfo]): Unit = {
+    _units ++= unit
   }
 }
 

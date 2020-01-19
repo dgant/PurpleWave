@@ -4,7 +4,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable.ArrayBuffer
 
-class SquadAssignment(squad: Squad) {
+class SquadAssignment(val squad: Squad) {
   private val assignedUnits = new ArrayBuffer[FriendlyUnitInfo]
 
   def units: Seq[FriendlyUnitInfo] = assignedUnits

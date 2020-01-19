@@ -7,7 +7,7 @@ import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Planning.UnitMatchers.{UnitMatchProxied, UnitMatchWarriors}
 import ProxyBwapi.Races.Terran
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
 class GoalAttack extends SquadGoalBasic {

@@ -93,7 +93,7 @@ class Configuration {
   var urgencyArchitecture       = 1
   var urgencyGrids              = 2
   var urgencyPlanning           = 5
-  var urgencySquads             = 50
+  var urgencySquads             = 20
   var urgencyBattles            = 20
   var urgencyUnitTracking       = 20
   var urgencyMicro              = 100

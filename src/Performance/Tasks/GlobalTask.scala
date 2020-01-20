@@ -73,8 +73,6 @@ class TaskPlanning extends AbstractTask {
 }
 class TaskSquads extends AbstractTask {
   urgency = With.configuration.urgencySquads
-  override def maxConsecutiveSkips: Int =
-    24 * 5
   override protected def onRun(): Unit = {
     With.squads.updateGoals()
     With.squads.stepBatching()

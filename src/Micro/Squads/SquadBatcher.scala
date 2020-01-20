@@ -34,7 +34,7 @@ trait SquadBatcher {
 
     // Get the newest batch (Clearing all other batches that have accumulated in the interim)
     while (batches.size > 1 && batches.head.processingStarted == batches.head.processingFinished) {
-      val nextBatch = batches.dequeue()
+      batches.dequeue()
       lastBatchStart = With.frame
     }
 
@@ -52,6 +52,7 @@ trait SquadBatcher {
         lastBatchCompletion = With.frame
         val batchDuration = With.framesSince(lastBatchStart)
         recruitRuntimes += batchDuration
+        while (recruitRuntimes.sum > With.reaction.runtimeQueueDuration) { recruitRuntimes.dequeue() }
         With.logger.debug("Squad batch finished processing " + With.framesSince(activeBatch.frameCreated) + " frames after it was created. Total runtime: " + batchDuration)
       }
     }

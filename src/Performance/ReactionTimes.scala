@@ -37,5 +37,5 @@ class ReactionTimes {
   private val estimationAverageCache    = new Cache(() => filterTimes(With.battles.estimationRuntimes).sum  / Math.max(1, filterTimes(With.battles.estimationRuntimes).size))
   private val clusteringAverageCache    = new Cache(() => filterTimes(With.battles.clustering.runtimes).sum / Math.max(1, filterTimes(With.battles.clustering.runtimes).size))
   private val planningAverageCache      = new Cache(() => filterTimes(With.prioritizer.frameDelays).sum     / Math.max(1, filterTimes(With.prioritizer.frameDelays).size))
-  private val squadRecruitAverageCache  = new Cache(() => filterTimes(With.prioritizer.frameDelays).sum     / Math.max(1, filterTimes(With.prioritizer.frameDelays).size))
+  private val squadRecruitAverageCache  = new Cache(() => filterTimes(With.squads.recruitRuntimes).sum      / Math.max(1, With.squads.recruitRuntimes.size))
 }

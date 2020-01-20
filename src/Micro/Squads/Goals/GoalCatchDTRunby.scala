@@ -4,13 +4,15 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Performance.Cache
 import Planning.UnitCounters.UnitCountUpToLambda
-import Planning.UnitMatchers.UnitMatchMobileDetectors
+import Planning.UnitMatchers.{UnitMatchMobileDetectors, UnitMatcher}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.ByOption
+import Utilities.{ByOption, CountMap}
 
 class GoalCatchDTRunby extends SquadGoalBasic {
-  
+
+  override def inherentValue: Double = GoalValue.defendBase
+
   override def toString: String = "Detect DT runbys"
   
   var scout: Option[UnitInfo] = None
@@ -25,6 +27,12 @@ class GoalCatchDTRunby extends SquadGoalBasic {
       ByOption.min(dts.map(_.pixelDistanceCenter(heart)))
         .getOrElse(heart.pixelDistance(With.intelligence.mostBaselikeEnemyTile.pixelCenter)))
       .getOrElse(With.geography.home.pixelCenter)
+  }
+
+  override def qualityNeeds: CountMap[UnitMatcher] = {
+    val output = new CountMap[UnitMatcher]
+    output(UnitMatchMobileDetectors) = 1
+    output
   }
 
   unitMatcher = UnitMatchMobileDetectors

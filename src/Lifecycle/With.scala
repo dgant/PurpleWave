@@ -23,7 +23,7 @@ import ProxyBwapi.ProxyBWMirror
 import ProxyBwapi.UnitTracking.UnitTracker
 import Strategery.History.History
 import Strategery.{StarCraftMapMatcher, Strategist}
-import _root_.Performance.{Latency, MicroReaction, PerformanceMonitor}
+import _root_.Performance.{Latency, ReactionTimes, PerformanceMonitor}
 import bwta.BWTA
 
 import scala.collection.JavaConverters._
@@ -59,7 +59,7 @@ object With {
   var projections       : Projections             = _
   var proxy             : ProxyBWMirror           = _
   var prioritizer       : Prioritizer             = _
-  var reaction          : MicroReaction           = _
+  var reaction          : ReactionTimes           = _
   var recruiter         : Recruiter               = _
   var scheduler         : Scheduler               = _
   var strategy          : Strategist              = _
@@ -133,7 +133,7 @@ object With {
     placement         = new PlacementScheduler
     prioritizer       = new Prioritizer
     projections       = new Projections
-    reaction          = new MicroReaction
+    reaction          = new ReactionTimes
     recruiter         = new Recruiter
     scheduler         = new Scheduler
     strategy          = new Strategist

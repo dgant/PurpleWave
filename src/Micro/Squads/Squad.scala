@@ -9,7 +9,26 @@ import Utilities.CountMap
 
 import scala.collection.mutable
 
-trait SquadWithGoal {
+class Squad(val client: Plan) {
+  
+  var enemies: Seq[UnitInfo] = Seq.empty
+  
+  def run() {
+    age --= age.keys.filterNot(units.contains)
+    units.foreach(age.add(_, 1))
+    goal.run()
+  }
+
+  val age: CountMap[FriendlyUnitInfo] = new CountMap[FriendlyUnitInfo]
+  def leader(unitClass: UnitClass): Option[FriendlyUnitInfo] = leaders().get(unitClass)
+  private val leaders: Cache[Map[UnitClass, FriendlyUnitInfo]] = new Cache(() =>
+    units.toSeq.groupBy(_.unitClass).map(group => (group._1, group._2.maxBy(unit => age.getOrElse(unit, 0))))
+  )
+
+  //////////////////
+  // Goal aspects //
+  //////////////////
+
   private var _ourGoal: SquadGoal = _
   final def goal: SquadGoal = _ourGoal
   final def setGoal(goal: SquadGoal) {
@@ -17,9 +36,11 @@ trait SquadWithGoal {
     goal.setSquad(this.asInstanceOf[Squad])
   }
   setGoal(new GoalChill)
-}
 
-trait SquadWithUnits {
+  //////////////////
+  // Unit aspects //
+  //////////////////
+
   def units: Set[FriendlyUnitInfo] = _unitsCache()
   def previousUnits: Set[FriendlyUnitInfo] = _previousunitsCache()
   private var _units: mutable.Set[FriendlyUnitInfo] = mutable.Set.empty
@@ -35,21 +56,4 @@ trait SquadWithUnits {
   final def addUnits(unit: Seq[FriendlyUnitInfo]): Unit = {
     _units ++= unit
   }
-}
-
-class Squad(val client: Plan) extends SquadWithGoal with SquadWithUnits {
-  
-  var enemies: Seq[UnitInfo] = Seq.empty
-  
-  def run() {
-    age --= age.keys.filterNot(units.contains)
-    units.foreach(age.add(_, 1))
-    goal.run()
-  }
-
-  val age: CountMap[FriendlyUnitInfo] = new CountMap[FriendlyUnitInfo]
-  def leader(unitClass: UnitClass): Option[FriendlyUnitInfo] = leaders().get(unitClass)
-  private val leaders: Cache[Map[UnitClass, FriendlyUnitInfo]] = new Cache(() =>
-    units.toSeq.groupBy(_.unitClass).map(group => (group._1, group._2.maxBy(unit => age.getOrElse(unit, 0))))
-  )
 }

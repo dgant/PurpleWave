@@ -31,7 +31,7 @@ object ShowSquads extends View {
   
   override def renderScreen() {
     val table =
-      Vector(Vector("Client", "",  "Goal",  "", "", "", "Recruits", "",  "Enemies")) ++
+      Vector(Vector("Squad", "",  "Goal",  "", "", "", "Recruits", "",  "Enemies")) ++
       With.squads.allByPriority.map(squad =>
         Vector(
           squad.client.toString,

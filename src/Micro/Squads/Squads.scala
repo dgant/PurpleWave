@@ -1,6 +1,6 @@
 package Micro.Squads
 
-class Squads extends SquadBatching {
+class Squads extends SquadBatcher {
 
   def all: Seq[Squad] = activeBatch.squads.view
   def allByPriority: Seq[Squad] = all.sortBy(_.client.priority)

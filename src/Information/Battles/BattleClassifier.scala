@@ -51,7 +51,7 @@ class BattleClassifier {
   
   def trackPerformance() {
     estimationRuntimes.enqueue(With.framesSince(lastEstimationCompletion))
-    while (estimationRuntimes.sum > 24 * 2) estimationRuntimes.dequeue()
+    while (estimationRuntimes.sum > With.reaction.runtimeQueueDuration) { estimationRuntimes.dequeue() }
     lastEstimationCompletion = With.frame
   }
   

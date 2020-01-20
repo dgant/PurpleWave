@@ -11,6 +11,8 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
 class GoalAttack extends SquadGoalBasic {
+
+  override def inherentValue: Double = GoalValue.attack
   
   override def toString: String = "Attack " + target.zone.name
   

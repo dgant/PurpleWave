@@ -13,6 +13,8 @@ import Utilities.ByOption
 
 class GoalDefendZone extends SquadGoalBasic {
 
+  override def inherentValue: Double = GoalValue.defendBase
+
   private var lastAction = "Defend "
 
   override def toString: String = lastAction + zone

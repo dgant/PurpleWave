@@ -21,4 +21,6 @@ class Attack(
     goal.unitCounter = counter
     super.onUpdate()
   }
+
+  description.set(super.toString + (if (matcher != UnitMatchAnd(UnitMatchRecruitableForCombat, UnitMatchNot(UnitMatchWorkers))) "(" + matcher + ")" else ""))
 }

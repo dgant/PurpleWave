@@ -9,6 +9,8 @@ import Utilities.ByOption
 
 class GoalRazeProxies(var pixel: Pixel) extends SquadGoalBasic {
 
+  override def inherentValue: Double = GoalValue.defendBase
+
   override def toString: String = "Raze proxies in " + pixel.zone.name
 
   override def run() {

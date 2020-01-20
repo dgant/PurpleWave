@@ -24,9 +24,7 @@ class Agency {
     
     if (agentQueue.isEmpty) {
       runtimes.enqueue(With.framesSince(lastQueueCompletion))
-      while (runtimes.sum > 24 * 10) {
-        runtimes.dequeue()
-      }
+      while (runtimes.sum > With.reaction.runtimeQueueDuration) { runtimes.dequeue() }
       lastQueueCompletion = With.frame
 
       With.coordinator.runPerAgentCycle()

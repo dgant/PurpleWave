@@ -2,13 +2,12 @@ package Micro.Squads.Goals
 
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Micro.Squads.{QualityCounter, Squad, SquadBatch}
 import Planning.UnitCounters.{UnitCountEverything, UnitCounter}
 import Planning.UnitMatchers.{UnitMatchRecruitableForCombat, UnitMatcher}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.ByOption
+import Utilities.{ByOption, CountMap}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -24,7 +23,7 @@ object ProximityValue {
   def apply(candidate: FriendlyUnitInfo, destinations: Seq[Pixel]): Double = {
     // We want to reward being close but not let the multiplicative factor blow up as the unit gets very close.
     // After some experimentation with graphing it, I like 1 / sqrt(tiles/8 + 1)
-    ByOption.max(destinations.map(d => 1.0 / PurpleMath.fastInverseSqrt(candidate.pixelDistanceTravelling(d) / 8 / 32 + 1))).getOrElse(1.0)
+    ByOption.max(destinations.map(d => 1.0 / Math.sqrt(candidate.pixelDistanceTravelling(d) / 8 / 32 + 1))).getOrElse(1.0)
   }
 }
 
@@ -33,7 +32,6 @@ trait SquadRecruiter extends SquadGoalWithSquad {
   def addCandidate(candidate: FriendlyUnitInfo): Unit
   def candidates: Seq[FriendlyUnitInfo]
   def candidateWelcome(batch: SquadBatch, candidate: FriendlyUnitInfo): Boolean
-  def candidateDistance(candidate: FriendlyUnitInfo): Double
   def candidateValue(batch: SquadBatch, candidate: FriendlyUnitInfo): Double
 }
 
@@ -49,17 +47,19 @@ trait SquadRecruiterSimple extends SquadRecruiter {
   def candidates: Seq[FriendlyUnitInfo] = _candidates
   def candidateWelcome(batch: SquadBatch, candidate: FriendlyUnitInfo): Boolean = {
     invalidateBatch(batch)
-    unitMatcher.accept(candidate) && unitCounter.accept(candidates)
+    unitMatcher.accept(candidate) && unitCounter.continue(batch.assignments.find(_.squad == squad).map(_.units).getOrElse(Seq.empty))
   }
   def candidateDistance(candidate: FriendlyUnitInfo): Double = ByOption.max(destinations.map(candidate.pixelDistanceTravelling)).getOrElse(10 * With.mapPixelWidth)
   def candidateValue(batch: SquadBatch, candidate: FriendlyUnitInfo): Double = {
     invalidateBatch(batch)
     ProximityValue(candidate, destinations) * qualityCounter.utility(candidate)
   }
+  def qualityNeeds: CountMap[UnitMatcher] = new CountMap[UnitMatcher]
   protected def invalidateBatch(batch: SquadBatch): Unit = {
     if (batch != currentBatch) {
       currentBatch = batch
       qualityCounter = new QualityCounter
+      qualityCounter.setNeeds(qualityNeeds)
       _candidates.clear()
       squad.enemies.foreach(qualityCounter.countUnit)
     }

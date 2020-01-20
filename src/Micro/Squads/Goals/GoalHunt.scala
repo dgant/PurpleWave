@@ -8,6 +8,8 @@ import Planning.UnitMatchers.UnitMatcher
 import Utilities.ByOption
 
 class GoalHunt(val enemyMatcher: UnitMatcher) extends SquadGoalBasic {
+
+  override def inherentValue: Double = GoalValue.harass
   
   override def toString: String = (
     "Hunt "

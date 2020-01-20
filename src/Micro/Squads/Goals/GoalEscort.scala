@@ -6,6 +6,8 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
 class GoalEscort extends SquadGoalBasic {
+
+  override def inherentValue: Double = GoalValue.escort
   
   override def toString: String = "Escort to " + destination.zone
   

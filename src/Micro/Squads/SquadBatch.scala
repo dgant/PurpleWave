@@ -8,13 +8,14 @@ import scala.collection.mutable
 
 class SquadBatch {
 
+  val frameCreated: Int = With.frame
   val squads = new mutable.ArrayBuffer[Squad]
   val freelancers = new mutable.ArrayBuffer[FriendlyUnitInfo]
 
   def processingStarted: Boolean = started
   def processingFinished: Boolean = finished
 
-  def assignments: Seq[SquadAssignment] = if (processingFinished) eligibleSquads else Seq.empty
+  def assignments: Seq[SquadAssignment] = eligibleSquads
 
   private var started: Boolean = false
   private var finished: Boolean = false
@@ -48,19 +49,24 @@ class SquadBatch {
       return
     }
 
-    if (eligibleSquads.isEmpty) {
-      With.logger.warn("Ran out of eligible squads with " + freelancersUnassigned.length + " unassigned freelancers")
-      finished = true
+    val freelancer = freelancersUnassigned.dequeue()
+    var squadsEligibleForUnit = eligibleSquads.filter(_.squad.goal.candidateWelcome(this, freelancer))
+
+    if (squadsEligibleForUnit.isEmpty) {
+      With.logger.warn("No eligible squads accept " + freelancer + ". Eligible squads remaining: " + eligibleSquads)
       return
     }
 
     // Assign the front freelancer
-    val freelancer = freelancersUnassigned.dequeue()
-    eligibleSquads.maxBy(squadValue(freelancer, _)).addUnit(freelancer)
+    val squadScores = squadsEligibleForUnit.map(s => (s, (squadValue(freelancer, s))))
+    squadScores.maxBy(_._2)._1.addUnit(freelancer)
   }
 
   def squadValue(freelancer: FriendlyUnitInfo, squad: SquadAssignment): Double = {
-    squad.squad.goal.inherentValue * squad.squad.goal.candidateValue(this, freelancer)
+    val inherentValue = squad.squad.goal.inherentValue
+    val candidateValue = squad.squad.goal.candidateValue(this, freelancer)
+    val output = inherentValue * candidateValue
+    output
   }
 
   def apply(): Unit = {

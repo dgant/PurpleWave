@@ -7,6 +7,8 @@ import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class GoalEjectScout extends SquadGoalBasic {
+
+  override def inherentValue: Double = GoalValue.defendBase
   
   override def toString: String = "Eject scouts"
   

@@ -31,7 +31,7 @@ class BattleClustering {
   def run() {
     if (clusterInProgress.isComplete) {
       runtimes.enqueue(With.framesSince(lastClusterCompletion))
-      while (runtimes.length > 10) runtimes.dequeue()
+      while (runtimes.sum > With.reaction.runtimeQueueDuration) { runtimes.dequeue() }
       lastClusterCompletion = With.frame
       clusterComplete.clusters // Acquire the clusters before we wipe away the data required to produce them
       clusterComplete       = clusterInProgress

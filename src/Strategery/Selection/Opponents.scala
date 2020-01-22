@@ -18,14 +18,22 @@ object Opponents {
   val fixedPvZ    = StrategySelectionFixed(PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar)
   val fixedPvR    = StrategySelectionFixed(PvR1BaseDT)
 
-  // Recently updated opponents
-  val bananabrain   : Opponent = add(Opponent("BananaBrain",  defaultPvP))
+  // TorchUp opponents
+
   val styxz         : Opponent = add(Opponent("StyxZ",
     (if (Benzene.matches)
     new StrategySelectionRecommended(StrategySelectionGreedy, PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar) { duration = 2 } else
     new StrategySelectionRecommended(StrategySelectionGreedy, PvZ1BaseForgeTechForced, PvZMidgameNeoBisu, PvZLateGameTemplar) { duration = 3 }
   )))
   val haopan        : Opponent = add(Opponent("Hao Pan",      defaultPvT))
+    val locutus       : Opponent = add(Opponent("Locutus",      StrategySelectionSequence(Vector(
+    Seq(PvPRobo),
+    Seq(PvP3GateGoon),
+    Seq(PvP1ZealotExpand),
+    Seq(PvP2GateDTExpand)))))
+
+  // SSCAIT opponents
+  val bananabrain   : Opponent = add(Opponent("BananaBrain",  defaultPvP))
   val killerbot     : Opponent = add(Opponent("Killerbot",    StrategySelectionFixed(PvZFFEEconomic, PvZMidgame5GateGoonReaver, PvZLateGameReaver)))
   val mariandevecka : Opponent = add(Opponent("Marian Devecka", killerbot.policy))
   val cherrypi      : Opponent = add(Opponent("CherryPiSSCAIT2017",
@@ -39,11 +47,6 @@ object Opponents {
     //else
     //  StrategySelectionFixed(PvTProxy2Gate, PvT1015Expand, PvT3BaseArbiter)
     ))
-  val locutus       : Opponent = add(Opponent("Locutus",      StrategySelectionSequence(Vector(
-    Seq(PvPRobo),
-    Seq(PvP3GateGoon),
-    Seq(PvP1ZealotExpand),
-    Seq(PvP2GateDTExpand)))))
   val locutusClonePolicy = StrategySelectionSequence(Vector(
     Seq(PvP2Gate1012DT),
     Seq(PvPRobo),

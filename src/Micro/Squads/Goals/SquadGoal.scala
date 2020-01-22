@@ -22,8 +22,8 @@ trait SquadGoalWithSquad {
 object ProximityValue {
   def apply(candidate: FriendlyUnitInfo, destinations: Seq[Pixel]): Double = {
     // We want to reward being close but not let the multiplicative factor blow up as the unit gets very close.
-    // After some experimentation with graphing it, I like 1 / sqrt(tiles/8 + 1)
-    ByOption.max(destinations.map(d => 1.0 / Math.sqrt(candidate.pixelDistanceTravelling(d) / 8 / 32 + 1))).getOrElse(1.0)
+    // After some experimentation with graphing it, I like 1 / sqrt(1 + tiles/8)
+    ByOption.max(destinations.map(d => 1.0 / Math.sqrt(1.0 + candidate.pixelDistanceTravelling(d) / 8 / 32))).getOrElse(1.0)
   }
 }
 

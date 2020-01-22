@@ -59,7 +59,8 @@ class SquadBatch {
 
     // Assign the front freelancer
     val squadScores = squadsEligibleForUnit.map(s => (s, (squadValue(freelancer, s))))
-    squadScores.maxBy(_._2)._1.addUnit(freelancer)
+    val bestSquad = squadScores.maxBy(_._2)._1
+    bestSquad.addUnit(freelancer)
   }
 
   def squadValue(freelancer: FriendlyUnitInfo, squad: SquadAssignment): Double = {

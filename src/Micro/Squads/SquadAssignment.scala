@@ -11,5 +11,8 @@ class SquadAssignment(val squad: Squad) {
 
   def addUnit(unit: FriendlyUnitInfo): Unit = {
     assignedUnits += unit
+    squad.goal.addCandidate(unit)
   }
+
+  override def toString: String = "SquadAssignment: " + squad.client.toString + " (" + units.size + " units)"
 }

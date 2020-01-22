@@ -5,14 +5,19 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
+import Micro.Squads.SquadBatch
 import Planning.UnitMatchers.{UnitMatchProxied, UnitMatchWarriors}
 import ProxyBwapi.Races.Terran
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
 class GoalAttack extends SquadGoalBasic {
 
   override def inherentValue: Double = GoalValue.attack
+
+  override def candidateValue(batch: SquadBatch, candidate: FriendlyUnitInfo): Double = {
+    PurpleMath.clamp(super.candidateValue(batch, candidate), 0.5, 5.0)
+  }
   
   override def toString: String = "Attack " + target.zone.name
   

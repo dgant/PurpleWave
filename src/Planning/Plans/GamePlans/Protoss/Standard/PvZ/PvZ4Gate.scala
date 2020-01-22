@@ -101,10 +101,14 @@ class PvZ4Gate extends GameplanTemplate {
     new Trigger(
       new Or(
         new MineralsAtLeast(800),
-        new UnitsAtLeast(24, UnitMatchWarriors),
+        new UnitsAtLeast(18, UnitMatchWarriors),
         new And(
-          new UnitsAtLeast(6, Protoss.Dragoon),
-          new EnemiesAtLeast(3, Zerg.SunkenColony, complete = true))),
+          new Or(
+            new UnitsAtLeast(12, Protoss.Dragoon),
+            new And(
+              new Not(new RespectMutalisks),
+            new UnitsAtLeast(6, Protoss.Dragoon))),
+          new EnemiesAtLeast(4, Zerg.SunkenColony, complete = true))),
       new RequireMiningBases(2)),
 
     new PumpRatio(Protoss.Dragoon, 0, 20, Seq(Enemy(Zerg.Mutalisk, 1.0), Enemy(Zerg.Lurker, 1.0))),

@@ -16,7 +16,8 @@ object Follow extends Action {
       Protoss.Carrier,
       Protoss.Corsair,
       Protoss.Scout,
-      Zerg.Mutalisk))
+      Zerg.Mutalisk)
+    && ! unit.agent.leader().contains(unit))
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val maybeLeader = unit.agent.leader()

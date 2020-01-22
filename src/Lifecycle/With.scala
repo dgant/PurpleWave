@@ -20,10 +20,11 @@ import Planning.{Blackboard, Yolo}
 import ProxyBwapi.Bullets.Bullets
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.ProxyBWMirror
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import ProxyBwapi.UnitTracking.UnitTracker
 import Strategery.History.History
 import Strategery.{StarCraftMapMatcher, Strategist}
-import _root_.Performance.{Latency, ReactionTimes, PerformanceMonitor}
+import _root_.Performance.{Latency, PerformanceMonitor, ReactionTimes}
 import bwta.BWTA
 
 import scala.collection.JavaConverters._
@@ -160,4 +161,7 @@ object With {
     BWTA.computeDistanceTransform()
     BWTA.buildChokeNodes()
   }
+
+  // For debugging convenience
+  def selected: FriendlyUnitInfo = With.units.ours.find(_.selected).get
 }

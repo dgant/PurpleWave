@@ -1,8 +1,8 @@
 package Micro.Squads.Goals
 
 object GoalValue {
-  val defendBase      : Double = 5
-  val escort          : Double = 4
+  val escort          : Double = 30
+  val defendBase      : Double = 15
   val scout           : Double = 3
   val harass          : Double = 2
   val attack          : Double = 1

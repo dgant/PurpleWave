@@ -21,26 +21,20 @@ class SquadBatch {
   private var finished: Boolean = false
 
   private var eligibleSquads = new mutable.ListBuffer[SquadAssignment]
-  private var freelancersUnassigned = new mutable.Queue[FriendlyUnitInfo]
+  private var freelancersUnassigned = new mutable.PriorityQueue[(FriendlyUnitInfo, Double)]()(Ordering.by(_._2))
 
   def step(): Unit = {
     if ( ! started) {
       eligibleSquads ++= squads.distinct.map(new SquadAssignment(_))
-      freelancersUnassigned ++= freelancers.distinct
+      freelancersUnassigned ++= freelancers.distinct.map(freeLancer => (freeLancer, bestValueOfFreelancer(freeLancer)))
       started = true
-
-      freelancersUnassigned.sortBy(f => - ByOption.max(
-        eligibleSquads.view
-          .filter(_.squad.goal.candidateWelcome(this, f))
-          .map(s => s.squad.goal.candidateValue(this, f)))
-        .getOrElse(0.0))
     }
 
     if (freelancersUnassigned.isEmpty) {
       // TODO: Disqualify incomplete squads and release their units before finishing
       val incompleteSquad = eligibleSquads.reverseIterator.find(squad => false)
       if (incompleteSquad.isDefined) {
-        freelancersUnassigned ++= incompleteSquad.get.units
+        freelancersUnassigned ++= incompleteSquad.get.units.map(u => (u, bestValueOfFreelancer(u)))
         eligibleSquads -= incompleteSquad.get
         return
       }
@@ -49,7 +43,7 @@ class SquadBatch {
       return
     }
 
-    val freelancer = freelancersUnassigned.dequeue()
+    val freelancer = freelancersUnassigned.dequeue()._1
     var squadsEligibleForUnit = eligibleSquads.filter(_.squad.goal.candidateWelcome(this, freelancer))
 
     if (squadsEligibleForUnit.isEmpty) {
@@ -61,6 +55,14 @@ class SquadBatch {
     val squadScores = squadsEligibleForUnit.map(s => (s, (squadValue(freelancer, s))))
     val bestSquad = squadScores.maxBy(_._2)._1
     bestSquad.addUnit(freelancer)
+  }
+
+  def bestValueOfFreelancer(freelancer: FriendlyUnitInfo): Double = {
+    ByOption.max(
+      eligibleSquads.view
+        .filter(_.squad.goal.candidateWelcome(this, freelancer))
+        .map(s => s.squad.goal.candidateValue(this, freelancer)))
+      .getOrElse(0.0)
   }
 
   def squadValue(freelancer: FriendlyUnitInfo, squad: SquadAssignment): Double = {

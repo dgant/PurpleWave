@@ -68,8 +68,7 @@ class PvZ1BaseForgeTech extends GameplanTemplate {
     Get(15, Protoss.Probe),
     Get(2, Protoss.Pylon),
     Get(16, Protoss.Probe),
-    Get(Protoss.Gateway)
-  )
+    Get(Protoss.Gateway))
 
   override def buildPlans: Seq[Plan] = Seq(
     new Eject4PoolScout,
@@ -89,6 +88,8 @@ class PvZ1BaseForgeTech extends GameplanTemplate {
         new EnemiesAtMost(0, UnitMatchOr(Zerg.Hydralisk, Zerg.SporeColony))),
         new Build(Get(Protoss.Scout))),
     new Build(
+      Get(Protoss.Forge),
+      Get(Protoss.GroundDamage),
       Get(Protoss.CitadelOfAdun),
       Get(Protoss.TemplarArchives)),
     new FlipIf(

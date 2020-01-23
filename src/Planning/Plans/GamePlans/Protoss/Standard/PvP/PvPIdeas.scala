@@ -53,6 +53,16 @@ object PvPIdeas {
         new MiningBasesAtLeast(3),
         new EnemyBasesAtLeast(3),
         new SafeToMoveOut),
+      // Is an attack less likely to succeed than we are to get backstabbed or counter-pushed?
+      // Inspired by Locutus turtling on one base and then either dropping us or four-gating behind the cannons.
+      new Or(
+        new Latch(
+          new Or(
+            new UnitsAtLeast(1, Protoss.Reaver, complete = true),
+            new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
+            new UnitsAtLeast(5, Protoss.Gateway, complete = true),
+            new BasesAtMost(1))),
+        new EnemyBasesAtLeast(2)),
       // Can our army contend with theirs?
       new Or(
         new And(

@@ -2,6 +2,7 @@ package Macro.Architecture.Tiles
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Mathematics.Points.Tile
+import ProxyBwapi.Races.Neutral
 
 object TileSourceGas extends TileSource {
   
@@ -13,6 +14,6 @@ object TileSourceGas extends TileSource {
     With.geography.bases
       .view
       .filter(_.townHall.exists(_.player.isUs))
-      .flatMap(_.gas.map(_.tileTopLeft))
+      .flatMap(_.gas.filter(_.unitClass == Neutral.Geyser).map(_.tileTopLeft))
   }
 }

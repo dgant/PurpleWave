@@ -134,7 +134,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   // Economics //
   ///////////////
   
-  lazy val isMineralBlocker: Boolean = unitClass.isMinerals && mineralsLeft < With.configuration.blockerMineralThreshold
+  lazy val isBlocker: Boolean = gasLeft + mineralsLeft < With.configuration.blockerMineralThreshold
   
   def subjectiveValue: Double = subjectiveValueCache()
   private val subjectiveValueCache = new Cache(() =>

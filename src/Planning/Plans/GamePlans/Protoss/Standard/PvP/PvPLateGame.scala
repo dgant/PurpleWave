@@ -6,7 +6,7 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.Macro.Automatic.UpgradeContinuously
+import Planning.Plans.Macro.Automatic.{PylonBlock, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildCannonsAtNaturalAndExpansions
@@ -14,7 +14,7 @@ import Planning.Predicates.Compound.{And, Not, Sticky}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBasesAtMost, SafeAtHome, SafeToMoveOut}
 import Planning.Predicates.Strategy.{EnemyRecentStrategy, EnemyStrategy}
-import Planning.UnitMatchers.{UnitMatchMobileDetectors, UnitMatchWarriors}
+import Planning.UnitMatchers.{UnitMatchMobileDetectors, UnitMatchWarriors, UnitMatchWorkers}
 import ProxyBwapi.Races.Protoss
 
 class PvPLateGame extends GameplanTemplate {
@@ -174,6 +174,7 @@ class PvPLateGame extends GameplanTemplate {
     new GetReactiveObservers,
 
     // Expansions
+    new If(new And(new MiningBasesAtLeast(2), new UnitsAtLeast(36, UnitMatchWorkers)), new PylonBlock),
     new RequireMiningBases(2),
     new If(new And(new ReadyForThirdIfSafe, new SafeForThird), new RequireBases(3)),
     new Trigger(

@@ -26,7 +26,7 @@ object BaseFinder {
     val allResources  = With.units.neutral.filter(unit => unit.unitClass.isGas || unit.unitClass.isMinerals)
     
     // Get every resource that isn't a mineral block and isn't tied to a start location
-    val baseResources = allResources.filterNot(_.isMineralBlocker)
+    val baseResources = allResources.filterNot(_.isBlocker)
     val expoResources = baseResources.filterNot(r => startPixels.exists(_.pixelDistance(r.pixelCenter) <= baseRadiusPixels))
     
     // Cluster the expansion resources

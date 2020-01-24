@@ -4,8 +4,9 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.Attack
+import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{If, Trigger, _}
-import Planning.Plans.GamePlans.Protoss.Situational.BuildHuggingNexus
+import Planning.Plans.GamePlans.Protoss.Situational.{BuildHuggingNexus, DefendFightersAgainstRush}
 import Planning.Plans.Macro.Automatic.{PumpWorkers, _}
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -32,28 +33,43 @@ object PvTIdeas {
     new Attack,
     new Attack(UnitMatchAnd(UnitMatchRecruitableForCombat, UnitMatchNot(UnitMatchWorkers), UnitMatchNot(Protoss.Carrier))))
 
+  class EnemyBarracksCheese extends And(
+    new EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113),
+    new Not(new EnemyHasShown(Terran.Vulture)),
+    new Not(new EnemyHasShown(Terran.SiegeTankUnsieged)),
+    new Not(new EnemyHasShown(Terran.SiegeTankSieged)))
+
+  class NeedToPressureBarracksCheese extends And(new EnemyBarracksCheese, new Check(() => With.strategy.isFlat || With.strategy.isInverted))
+
   class AttackSafely extends If(
-    new Or(
-      new Latch(new UnitsAtLeast(8, UnitMatchWarriors)),
-      new Not(new EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113))),
+    new NeedToPressureBarracksCheese,
+    new Attack,
     new If(
       new Or(
-        new Employing(PvT32Nexus, PvT1015Expand, PvT1015DT, PvTStove),
-        new MiningBasesAtLeast(3),
-        new EnemyBasesAtLeast(2),
-        new EnemyStrategy(With.fingerprints.bio),
-        new Not(new EnemyHasShown(Terran.Vulture)),
-        new UnitsAtLeast(12, UnitMatchWarriors, complete = true),
-        new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true)),
+        new Latch(new UnitsAtLeast(8, UnitMatchWarriors)),
+        new Not(new EnemyBarracksCheese)),
       new If(
-        new SafeToMoveOut,
-        new PvTAttack)))
+        new Or(
+          new Employing(PvT32Nexus, PvT1015Expand, PvT1015DT, PvTStove),
+          new MiningBasesAtLeast(3),
+          new EnemyBasesAtLeast(2),
+          new EnemyStrategy(With.fingerprints.bio),
+          new Not(new EnemyHasShown(Terran.Vulture)),
+          new UnitsAtLeast(12, UnitMatchWarriors, complete = true),
+          new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true)),
+        new If(
+          new SafeToMoveOut,
+          new PvTAttack))))
 
-  class ReactToFiveRaxAs2GateCore extends If(
-    new And(
-      new EnemyStrategy(With.fingerprints.fiveRax),
-      new FramesUntilUnitAtLeast(Protoss.CyberneticsCore, Protoss.Zealot.buildFrames / 3)),
-    new BuildOrder(Get(2, Protoss.Zealot)))
+  class ReactToFiveRaxAs2GateCore extends Parallel(
+    new If(
+      new And(
+        new EnemyStrategy(With.fingerprints.fiveRax),
+        new FramesUntilUnitAtLeast(Protoss.CyberneticsCore, Protoss.Zealot.buildFrames / 3)),
+      new BuildOrder(Get(2, Protoss.Zealot))),
+    new If(
+      new EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113),
+      new DefendFightersAgainstRush))
 
   class ReactToWorkerRush extends If(
     new And(
@@ -62,6 +78,7 @@ object PvTIdeas {
       new BasesAtMost(2),
       new FrameAtMost(GameTime(8, 0)())),
     new Parallel(
+      new WriteStatus("ReactToWorkerRush"),
       new Pump(Protoss.Probe, 9),
       new If(
         new UnitsAtMost(5, UnitMatchWarriors),
@@ -91,13 +108,15 @@ object PvTIdeas {
       new FrameAtMost(GameTime(10, 0)()),
       new EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113)),
     new Parallel(
+      new WriteStatus("ReactToBBS"),
+      new DefendFightersAgainstRush,
       new If(new UnitsAtMost(5, UnitMatchWarriors), new CancelIncomplete(Protoss.Nexus)),
       new If(new UnitsAtMost(1, Protoss.Gateway), new CancelIncomplete(UnitMatchOr(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Nexus, Protoss.Stargate))),
       new RequireSufficientSupply,
       new If(new UnitsAtLeast(2, Protoss.Reaver), new RequireMiningBases(2)),
       new Pump(Protoss.Reaver, 2),
-      new If(new UnitsAtLeast(3, Protoss.Dragoon), new Build(Get(Protoss.DragoonRange))),
       new If(new UnitsAtLeast(2, Protoss.Gateway), new PumpWorkers, new PumpWorkers(cap = 12)),
+      new Build(Get(Protoss.DragoonRange)),
       new Pump(Protoss.Dragoon),
       new Pump(Protoss.Zealot, 7),
       new Build(
@@ -122,6 +141,7 @@ object PvTIdeas {
         new UnitsAtMost(0, Protoss.Stargate),
         new UnitsAtLeast(1, Protoss.RoboticsFacility))),
     new Parallel(
+      new WriteStatus("ReactTo2Fac"),
       new RequireSufficientSupply,
       new Pump(Protoss.Dragoon, 7),
       new Build(

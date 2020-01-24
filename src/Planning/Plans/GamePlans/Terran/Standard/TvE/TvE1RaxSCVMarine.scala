@@ -8,7 +8,7 @@ import Planning.Plans.Army.{Aggression, AllIn, Attack, RecruitFreelancers}
 import Planning.Plans.Basic.{Do, NoPlan, Write}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPool
+import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
 import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
@@ -75,7 +75,7 @@ class TvE1RaxSCVMarine extends GameplanTemplate {
         new UnitsAtMost(0, Terran.Bunker))),
     new Write(With.blackboard.pushKiters, true),
     new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
-    new DefendFightersAgainstEarlyPool,
+    new DefendFightersAgainstRush,
     new Pump(Terran.Marine),
     new If(
       new FoundEnemyBase,

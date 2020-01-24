@@ -106,7 +106,9 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     else {
       framesFailingToAttack = 0
     }
-    if ( ! complete || completionFrame > 24 * 60 * 180) {
+    if (complete) {
+      completionFrame = Math.min(completionFrame, With.frame)
+    } else if (completionFrame > 24 * 60 * 180) {
       completionFrame = With.frame + remainingCompletionFrames
     }
     lastHitPoints             = hitPoints

@@ -204,10 +204,9 @@ object PvPIdeas {
       Get(2, Protoss.Gateway),
       Get(3, Protoss.Pylon), // A little early in case we have more Probes than expected
       Get(17, Protoss.Probe),
-      Get(3, Protoss.Zealot),
-      Get(18, Protoss.Probe),
+      Get(Protoss.Dragoon),
       Get(19, Protoss.Probe),
-      Get(4, Protoss.Zealot),
+      Get(2, Protoss.Dragoon),
       Get(20, Protoss.Probe)),
   )
 
@@ -276,11 +275,7 @@ object PvPIdeas {
         new Or(
           new UnitsAtMost(7, UnitMatchWarriors),
           new Not(new SafeAtHome)),
-        new Parallel(
-          new BuildOrder(Get(7, Protoss.Zealot)),
-          new TrainArmy
-        ))),
-  )
+        new TrainArmy)))
 
   class ReactTo2Gate extends If(
     new EnemyStrategy(With.fingerprints.twoGate),

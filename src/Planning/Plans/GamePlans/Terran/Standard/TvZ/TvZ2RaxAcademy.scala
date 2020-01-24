@@ -5,7 +5,7 @@ import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPool
+import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackSafely
 import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic._
@@ -84,7 +84,7 @@ class TvZ2RaxAcademy extends GameplanTemplate {
     new EnemyHasShown(Zerg.Lurker))
 
   override def buildPlans: Seq[Plan] = Seq(
-    new DefendFightersAgainstEarlyPool,
+    new DefendFightersAgainstRush,
     // Hack to work around bug where we frequently build an extra Barracks
     new If(
       new UnitsAtLeast(2, Terran.Barracks, complete = true),

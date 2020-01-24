@@ -2,6 +2,7 @@ package Micro.Actions.Combat.Techniques
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Micro.Actions.Combat.Tactics.Potshot
+import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Combat.Techniques.Common.Activators.WeightedMin
 import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, PotshotAsSoonAsPossible}
 import Micro.Actions.Commands.Attack
@@ -89,6 +90,12 @@ object Abuse extends ActionTechnique {
     if (unit.readyForAttackOrder && (safeToShoot || lastChanceToShoot)) {
       Potshot.delegate(unit)
       PotshotAsSoonAsPossible.delegate(unit)
+      if (unit.agent.shouldEngage) {
+        // It's possible for a unit to want to Abuse but wind up with no legal targets.
+        // If the unit doesn't want to fight, good; it will head wherever it needs to go.
+        // It might be correct to always just pick a target here; to be conservative, we'll try only doing it when we want to fight.
+        Target.delegate(unit)
+      }
       Attack.delegate(unit)
       if (unit.agent.toAttack.isEmpty) return
     }

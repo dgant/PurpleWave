@@ -8,7 +8,7 @@ import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPool
+import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Scouting.ScoutOn
@@ -40,7 +40,7 @@ class PvR2Gate4Gate extends GameplanTemplate {
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.TwoGate910
 
   override def buildPlans = Vector(
-    new DefendFightersAgainstEarlyPool,
+    new DefendFightersAgainstRush,
     new CapGasAt(400),
 
     new BuildOrder(Get(5, Protoss.Zealot)),

@@ -18,7 +18,7 @@ import Planning.Predicates.Compound._
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.{Employing, EnemyIsRandom, EnemyStrategy}
-import Planning.UnitMatchers.UnitMatchOr
+import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWorkers}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
 
@@ -86,9 +86,7 @@ class PvTBasic extends GameplanTemplate {
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvTIdeas.ReactToBBS,
     new PvTIdeas.ReactToWorkerRush,
-    new If(
-      new Employing(PvT13Nexus, PvT21Nexus, PvT23Nexus, PvT28Nexus),
-      new PvTIdeas.ReactTo2Fac))
+    new If(new Employing(PvT13Nexus, PvT21Nexus, PvT23Nexus, PvT28Nexus), new PvTIdeas.ReactTo2Fac))
 
   override def buildOrderPlan: Plan = new Parallel(
     new If(new Employing(PvT13Nexus),           new BuildOrder(ProtossBuilds.PvT13Nexus_GateCoreGateZ: _*)),
@@ -386,6 +384,7 @@ class PvTBasic extends GameplanTemplate {
     new If(new ReadyForFourthBase,  new Parallel(new RequireMiningBases(3), new RequireBases(4))),
     new If(new ReadyForFifthBase,   new Parallel(new RequireMiningBases(4), new RequireBases(5))),
     new If(new Or(new EmployingTwoBase, new BasesAtLeast(3), new UnitsAtLeast(5, Protoss.Gateway)), new BuildGasPumps),
+    new If(new And(new MiningBasesAtLeast(3), new UnitsAtLeast(48, UnitMatchWorkers)), new PylonBlock),
 
     // Protect expansions
     new If(

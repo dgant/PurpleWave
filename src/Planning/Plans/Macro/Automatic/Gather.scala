@@ -12,6 +12,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
 import scala.collection.mutable
+import scala.util.Random
 
 class Gather extends Plan {
 
@@ -30,6 +31,7 @@ class Gather extends Plan {
   val workerLock: LockUnits = new LockUnits { unitMatcher.set(UnitMatchWorkers) }
   val resourceByWorker = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
   val workersByResource = new mutable.HashMap[UnitInfo, mutable.Set[FriendlyUnitInfo]]
+  val workerCooldownUntil = new mutable.HashMap[FriendlyUnitInfo, Int]
 
   def isValidResource (unit: UnitInfo): Boolean = isValidMineral(unit) || isValidGas(unit)
   def isValidMineral  (unit: UnitInfo): Boolean = unit.alive && unit.mineralsLeft > 0
@@ -109,6 +111,7 @@ class Gather extends Plan {
     workers = workerLock.units
     if (workers.isEmpty) return
     resourceByWorker.keys.withFilter( ! workers.contains(_)).foreach(unassignWorker)
+    workerCooldownUntil.keys.withFilter( ! workers.contains(_)).foreach(workerCooldownUntil.remove)
     // TODO: Unassign any workers who are no longer in the squad -- TCAI does this with the controller
 
     newMinerals().foreach(includeResource)
@@ -136,8 +139,8 @@ class Gather extends Plan {
     //
     // Otherwise:
     // Sort workers by frames since update, descending.
-    def newGasDistance(worker: FriendlyUnitInfo): Option[Double] = {
-      ByOption.min(newGas().map(_.pixelDistanceEdge(worker)))
+    def newResourceDistance(worker: FriendlyUnitInfo): Option[Double] = {
+      ByOption.min((newMinerals() ++ newGas()).map(_.pixelDistanceEdge(worker)))
     }
     // Determine if we need to prioritize updating gas workers.
     val minGasDistance: Map[FriendlyUnitInfo, Option[Double]] =
@@ -153,6 +156,15 @@ class Gather extends Plan {
             ))
           .toMap
       } else Map.empty
+    val respectCooldown = gasWorkersNow >= gasWorkersMax
+
+    def workerOrder(worker: FriendlyUnitInfo): Double = {
+      lazy val cd = workerCooldownUntil.getOrElse(worker, 0).toDouble
+      if (respectCooldown) {
+        cd
+      } else {
+        newResourceDistance(worker).orElse(minGasDistance(worker)).getOrElse(cd)
+      }}
     val workersToUpdate = workers
       .view
       .filter(worker => {
@@ -161,37 +173,43 @@ class Gather extends Plan {
         val resourceBeforeEdgePixels = resourceBefore.map(_.pixelDistanceEdge(worker))
         resourceBefore.forall(r => r.unitClass.isGas || workersByResource(r).size > 5 || resourceBeforeEdgePixels.forall(_ > 64)) // The > 5 check is for disentangling massively popular resources
       })
-      .groupBy(_.base)
       .toVector
-      .sortBy(b => b._1.map(_.workerCount).getOrElse(0))
-      .flatMap(b => b._2.toVector.sortBy(w =>
-        w.id.toDouble / 1000000.0 // This used to be "Frames since update" using the cooldown mechanism, ie. update least-recently-updated worker
-        + (if (needMoreGasWorkers) newGasDistance(w).getOrElse(minGasDistance.getOrElse(w, None).getOrElse(kLightYear)) else 0.0)
-        + (if (resourceByWorker.contains(w)) 1000000 else 0)))
+      .sortBy(workerOrder)
 
     // Update workers in priority order
-    workersToUpdate.foreach(worker => {
-      val resourceBefore = resourceByWorker.get(worker)
-      unassignWorker(worker)
-      if (resourceBefore.exists(_.unitClass.isGas)) {
-        gasWorkersNow -= 1
-      }
+    workersToUpdate
+      .filter(worker => ! respectCooldown || workerCooldownUntil.get(worker).forall(_ <= With.frame))
+      .foreach(worker => {
+        val resourceBefore = resourceByWorker.get(worker)
+        unassignWorker(worker)
+        if (resourceBefore.exists(_.unitClass.isGas)) {
+          gasWorkersNow -= 1
+        }
 
-      val gasWorkerDesire = gasWorkersNow < gasWorkersMax
+        val gasWorkerDesire = gasWorkersNow < gasWorkersMax
 
-      // Assign the worker to tbhe best resource
-      val resourceBestScore = ByOption.maxBy(workersByResource.keysIterator.map(ResourceScore(worker, _, gasWorkerDesire, resourceBefore)))(_.output)
-      resourceBestScore.foreach(bestResourceScore => {
-        val bestResource = bestResourceScore.resource
-        assignWorker(worker, bestResource)
-        if (resourceBefore.exists(_.unitClass.isGas)) gasWorkersNow -= 1
-        if (bestResource.unitClass.isGas) gasWorkersNow += 1
+        // For easy debugging
+        if (worker.selected) {
+          val scores = workersByResource.keysIterator.map(ResourceScore(worker, _, gasWorkerDesire, resourceBefore)).toVector.sortBy(_.output)
+          if (With.frame < 0) { // Cheat the optimizer
+            System.out.println(scores.toString)
+          }
+        }
+
+        // Assign the worker to tbhe best resource
+        val resourceBestScore = ByOption.maxBy(workersByResource.keysIterator.map(ResourceScore(worker, _, gasWorkerDesire, resourceBefore)))(_.output)
+        resourceBestScore.foreach(bestResourceScore => {
+          val bestResource = bestResourceScore.resource
+          assignWorker(worker, bestResource)
+          if (resourceBefore.exists(_.unitClass.isGas)) gasWorkersNow -= 1
+          if (bestResource.unitClass.isGas) gasWorkersNow += 1
+        })
+
+        worker.agent.intend(this, new Intention {
+          toGather = resourceByWorker.get(worker)
+        })
+        workerCooldownUntil(worker) = With.frame + 48 + Random.nextInt(48)
       })
-
-      worker.agent.intend(this, new Intention {
-        toGather = resourceByWorker.get(worker)
-      })
-    })
   }
 
   // Evaluate the marginal efficacy of assigning this worker to a resource.

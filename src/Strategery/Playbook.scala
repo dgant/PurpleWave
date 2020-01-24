@@ -42,8 +42,11 @@ object StrategyGroups {
     PvTProxyDarkTemplar,
     PvT25BaseCarrier, // Experimenting with this so we can delete it
     PvZLateGameCarrier, // Needs island tech
+    PvZGatewayFE, // Execution needs work; in particular, Zealots need to protect cannons
     PvZMidgame4Gate2Archon,
     PvZMidgameNeoNeoBisu,
+    PvZMidgameCorsairReaverGoon, // Too fragile
+    PvZMidgameCorsairReaverZealot, // Too fragile; especially bad at dealing with Mutalisks
 
     ZvTProxyHatchZerglings,
     ZvTProxyHatchHydras,
@@ -64,7 +67,7 @@ class TournamentPlaybook extends PurpleWavePlaybook {
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvZ1BaseForgeTech, PvZMidgameNeoBisu, PvZLateGameTemplar)
+  override lazy val forced: Seq[Strategy] = Seq(PvP1ZealotExpand)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
   override def respectOpponent: Boolean = false
   override def respectMap: Boolean = false

@@ -30,6 +30,7 @@ class Visualization {
     ShowStatus,
 
     ShowPerformanceSummary,
+    ShowSaturation
   )
 
   var enabled   : Boolean = _
@@ -135,6 +136,7 @@ class Visualization {
     ShowReactionTime,
     ShowResources,
     ShowRushDistances,
+    ShowSaturation,
     ShowScheduler,
     ShowSquads,
     ShowStatus,

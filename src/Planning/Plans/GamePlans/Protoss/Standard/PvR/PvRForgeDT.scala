@@ -9,7 +9,7 @@ import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplateVsRandom
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPool
+import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, PumpWorkers}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -67,7 +67,7 @@ class PvRForgeDT extends GameplanTemplateVsRandom {
 
   override def buildPlans = Vector(
     new CapGasAt(300),
-    new DefendFightersAgainstEarlyPool,
+    new DefendFightersAgainstRush,
     new Pump(Protoss.DarkTemplar, 4),
     new Trigger(
       new UnitsAtLeast(2, Protoss.DarkTemplar, complete = true),

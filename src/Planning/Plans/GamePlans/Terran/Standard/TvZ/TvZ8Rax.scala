@@ -6,7 +6,7 @@ import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.{Attack, RecruitFreelancers}
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPool
+import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
 import Planning.Plans.GamePlans.Terran.Situational.RepairBunker
 import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic.Pump
@@ -69,7 +69,7 @@ class TvZ8Rax extends GameplanTemplate {
 
   override def buildPlans: Seq[Plan] = Seq(
     new RepairBunker,
-    new DefendFightersAgainstEarlyPool,
+    new DefendFightersAgainstRush,
 
     new If(
       new CanBunkerRush,

@@ -144,6 +144,13 @@ object PlacementProfiles {
     preferPowering              = 0.1,
     preferSpace                 = 2.0,
     avoidDistanceFromBase       = 1.0)
+
+  val hugTownHallTowardsEntrance = new PlacementProfile(
+    "Hug town hall towards entrance",
+    preferPowering              = 0.1,
+    preferSpace                 = 2.0,
+    avoidDistanceFromBase       = 1.0,
+    avoidDistanceFromEntrance   = 0.2)
   
   val hugWorkersWithPylon = new PlacementProfile(
     "Hug workers with pylon",

@@ -30,10 +30,10 @@ class PvZ1BaseForgeTech extends GameplanTemplate {
   override def scoutPlan: Plan = new ScoutOn(Protoss.Pylon)
 
   override def blueprints: Seq[Blueprint] = Vector(
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHallTowardsEntrance)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHallTowardsEntrance)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHallTowardsEntrance)),
+    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHallTowardsEntrance)),
     new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)),
     new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)),
     new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)),

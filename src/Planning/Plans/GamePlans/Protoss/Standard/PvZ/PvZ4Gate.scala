@@ -10,7 +10,7 @@ import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPool
+import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders._
@@ -69,7 +69,7 @@ class PvZ4Gate extends GameplanTemplate {
 
   override def buildPlans = Vector(
 
-    new DefendFightersAgainstEarlyPool,
+    new DefendFightersAgainstRush,
 
     new If(
       new EnemyHasShownCloakedThreat,
@@ -137,11 +137,22 @@ class PvZ4Gate extends GameplanTemplate {
       // Post-assimilator
       new Parallel(
         new PumpWorkers,
+        new Build(Get(Protoss.Assimilator)),
+        new If(
+          new And(
+            new Or(
+              new EnemiesAtLeast(10, Zerg.Zergling),
+              new UnitsAtLeast(1, Protoss.Forge),
+              new EnemyStrategy(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.ninePoolGas)),
+            new Not(new RespectMutalisks),
+            new Not(new EnemyHasShown(Zerg.Hydralisk)),
+            new EnemiesAtMost(0, Zerg.HydraliskDen)),
+          new Build(Get(Protoss.Forge), Get(Protoss.GroundDamage))),
         new Build(
-          Get(Protoss.Assimilator),
           Get(Protoss.CyberneticsCore),
           Get(4, Protoss.Gateway),
           Get(Protoss.DragoonRange)),
+
         new Pump(Protoss.Dragoon),
         new Pump(Protoss.Zealot))),
 

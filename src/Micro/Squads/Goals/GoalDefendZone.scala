@@ -37,7 +37,7 @@ class GoalDefendZone extends SquadGoalBasic {
         && ( ! u.is(Protoss.ShieldBattery) || choke.forall(_.pixelCenter.pixelDistance(u.pixelCenter) > 96 + u.effectiveRangePixels))
         && (squad.enemies.isEmpty || squad.enemies.exists(u.canAttack)))
 
-    lazy val allowWandering = With.geography.ourBases.size > 2 || !With.enemies.exists(_.isZerg) || squad.units.size > 3 || squad.enemies.exists(_.unitClass.ranged)
+    lazy val allowWandering = With.geography.ourBases.size > 2 || !With.enemies.exists(_.isZerg) || squad.units.size > 3 || squad.enemies.exists(_.unitClass.ranged) || With.blackboard.wantToAttack()
     lazy val canHuntEnemies = huntableEnemies().nonEmpty
     lazy val canDefendChoke = choke.isDefined
     lazy val wallExistsButNoneNearChoke = walls.nonEmpty && walls.forall(wall =>
@@ -78,10 +78,10 @@ class GoalDefendZone extends SquadGoalBasic {
         || (enemy.cloaked && squad.units.exists(_.unitClass.isDetector)))
       && (enemy.matchups.targets.nonEmpty || enemy.matchups.allies.forall(_.matchups.targets.isEmpty)) // Don't, for example, chase Overlords that have ally Zerglings nearby
       && zone.exit.forall(exit =>
-      enemy.flying
-        || With.blackboard.wantToAttack()
-        || enemy.pixelDistanceTravelling(zone.centroid)
-        < (exit.endPixels ++ exit.sidePixels :+ exit.pixelCenter).map(_.groundPixels(zone.centroid)).min))
+        enemy.flying
+          || With.blackboard.wantToAttack()
+          || enemy.pixelDistanceTravelling(zone.centroid)
+          < (exit.endPixels ++ exit.sidePixels :+ exit.pixelCenter).map(_.groundPixels(zone.centroid)).min))
 
   private val huntableEnemies = new Cache(() => {
     val huntableInZone = squad.enemies.filter(e => e.zone == zone && huntableFilter(e)) ++ zone.units.filter(u => u.isEnemy && u.unitClass.isGas)

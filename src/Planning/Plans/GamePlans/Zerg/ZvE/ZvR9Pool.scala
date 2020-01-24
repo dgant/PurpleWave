@@ -6,7 +6,7 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPool
+import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpMutalisks, ScoutSafelyWithOverlord}
 import Planning.Plans.GamePlans.Zerg.ZvZ.ZvZIdeas
 import Planning.Plans.Macro.Automatic._
@@ -59,7 +59,7 @@ class ZvR9Pool extends GameplanTemplate {
 
   override def buildPlans: Seq[Plan] = Vector(
 
-    new DefendFightersAgainstEarlyPool,
+    new DefendFightersAgainstRush,
 
     new If(
       new Or(

@@ -8,7 +8,7 @@ import Planning.Plans.Compound.{If, Or}
 import Planning.Plans.GamePlans.GameplanTemplateVsRandom
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstEarlyPool
+import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Predicates.Compound.And
 import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyRaceKnown, EnemyStrategy}
@@ -34,7 +34,7 @@ class PvRZCoreZ extends GameplanTemplateVsRandom {
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.ZCoreZ
 
   override def buildPlans: Vector[Plan] = Vector(
-    new DefendFightersAgainstEarlyPool,
+    new DefendFightersAgainstRush,
     new Pump(Protoss.Dragoon)
   )
 }

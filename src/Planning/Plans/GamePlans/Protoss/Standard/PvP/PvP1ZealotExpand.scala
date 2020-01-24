@@ -1,14 +1,14 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Lifecycle.With
-import Macro.BuildRequests.{BuildRequest, Get}
+import Macro.BuildRequests.Get
 import Planning.Plans.Army.Attack
-import Planning.Plans.Compound.If
+import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutForCannonRush
-import Planning.Predicates.Compound.{And, Latch}
+import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
@@ -29,18 +29,22 @@ class PvP1ZealotExpand extends GameplanTemplate {
     new PvPIdeas.ReactTo2Gate,
     new ScoutForCannonRush)
 
-  override val buildOrder: Vector[BuildRequest] = Vector(
-    Get(8,  Protoss.Probe),
-    Get(Protoss.Pylon),
-    Get(10, Protoss.Probe),
-    Get(Protoss.Gateway),
-    Get(13, Protoss.Probe),
-    Get(Protoss.Zealot),
-    Get(14, Protoss.Probe),
-    Get(2,  Protoss.Pylon),
-    Get(16, Protoss.Probe),
-    Get(2,  Protoss.Nexus),
-    Get(17, Protoss.Probe))
+  override val buildOrderPlan = new Parallel(
+    new BuildOrder(
+      Get(8,  Protoss.Probe),
+      Get(Protoss.Pylon),
+      Get(10, Protoss.Probe),
+      Get(Protoss.Gateway),
+      Get(13, Protoss.Probe),
+      Get(Protoss.Zealot),
+      Get(14, Protoss.Probe),
+      Get(2,  Protoss.Pylon),
+      Get(16, Protoss.Probe)),
+    new If(
+      new Not(new EnemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.cannonRush)),
+      new BuildOrder(
+        Get(2,  Protoss.Nexus),
+        Get(17, Protoss.Probe))))
 
   override def buildPlans = Vector(
     new If(

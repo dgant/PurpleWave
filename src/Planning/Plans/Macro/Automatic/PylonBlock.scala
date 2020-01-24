@@ -67,7 +67,7 @@ class PylonBlock extends Plan {
           canFlee = true
           canFocus = true
         }
-        if (blocker.pixelDistanceCenter(tileToBlock.pixelCenter) < 256) {
+        if (blocker.pixelDistanceCenter(tileToBlock.pixelCenter) < 256 && With.self.supplyUsed + 24 <= With.self.supplyTotal) {
           currencyLock.acquire(this)
           intent = new Intention {
             toBuild = Some(Protoss.Pylon)

@@ -13,7 +13,7 @@ object Opponents {
 
   val defaultPvT  = StrategySelectionGreedy
   val defaultPvP  = StrategySelectionGreedy
-  val defaultPvZ  = StrategySelectionGreedy
+  val defaultPvZ  = new StrategySelectionRecommended(StrategySelectionGreedy, PvZFFEEconomic, PvZMidgame5GateGoon, PvZLateGameTemplar)
   val fixedPvT    = StrategySelectionFixed(PvT1015DT, PvT3BaseArbiter)
   val fixedPvZ    = StrategySelectionFixed(PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar)
   val fixedPvR    = StrategySelectionFixed(PvR1BaseDT)

@@ -33,6 +33,11 @@ class PvPLateGame extends GameplanTemplate {
   val goingTemplar = new Sticky(new UnitsAtLeast(1, Protoss.CitadelOfAdun))
 
   val buildCannons = new And(
+    // It's a good bet to do so; DT are the scariest threat
+    new Or(
+      new SafeAtHome,
+      new EnemyHasShownCloakedThreat),
+
     // Templar are reasonably likely
     new Or(
       new EnemyRecentStrategy(With.fingerprints.dtRush),
@@ -129,7 +134,7 @@ class PvPLateGame extends GameplanTemplate {
         new UnitsAtLeast(7, Protoss.Gateway)),
       new And(
         new Not(goingTemplar),
-        new UnitsAtLeast(5, Protoss.Gateway))))
+        new UnitsAtLeast(5, Protoss.Gateway, complete = true))))
 
   class SafeForThird extends And(
     new SafeToMoveOut,

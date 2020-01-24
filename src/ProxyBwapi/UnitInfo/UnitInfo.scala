@@ -174,8 +174,13 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def corners: Vector[Pixel] = Vector(topLeft, topRight, bottomLeft, bottomRight)
   
   def tileIncludingCenter:  Tile          = pixelCenter.tileIncluding
-  def tileArea:             TileRectangle = unitClass.tileArea.add(tileTopLeft)
+  def tiles:                Seq[Tile]     = cacheTiles()
+  def tileArea:             TileRectangle = cacheTileArea()
   def addonArea:            TileRectangle = TileRectangle(Tile(0, 0), Tile(2, 2)).add(tileTopLeft).add(4,1)
+
+  private def tileCacheDuration: Int = { if (unitClass.isBuilding) (if (unitClass.canFly) 24 * 5 else 24 * 60) else cd2 }
+  private lazy val cacheTileArea = new Cache(() => unitClass.tileArea.add(tileTopLeft), refreshPeriod = tileCacheDuration)
+  private lazy val cacheTiles = new Cache(() => cacheTileArea().tiles.toVector, refreshPeriod = tileCacheDuration)
   
   def zone: Zone = cacheZone()
   // Hack to get buildings categorized in zone they were intended to be constructed in
@@ -461,6 +466,13 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   lazy val isWraith             : CacheIs = new CacheIs(Terran.Wraith)
   lazy val isSiegeTankSieged    : CacheIs = new CacheIs(Terran.SiegeTankSieged)
   lazy val isSiegeTankUnsieged  : CacheIs = new CacheIs(Terran.SiegeTankUnsieged)
+  lazy val isComsat             : CacheIs = new CacheIs(Terran.Comsat)
+  lazy val isControlTower       : CacheIs = new CacheIs(Terran.ControlTower)
+  lazy val isEngineeringBay     : CacheIs = new CacheIs(Terran.EngineeringBay)
+  lazy val isAcademy            : CacheIs = new CacheIs(Terran.Academy)
+  lazy val isScienceFacility    : CacheIs = new CacheIs(Terran.ScienceFacility)
+  lazy val isScannerSweep       : CacheIs = new CacheIs(Terran.SpellScannerSweep)
+
   lazy val isZealot             : CacheIs = new CacheIs(Protoss.Zealot)
   lazy val isDragoon            : CacheIs = new CacheIs(Protoss.Dragoon)
   lazy val isObserver           : CacheIs = new CacheIs(Protoss.Observer)
@@ -469,6 +481,10 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   lazy val isCarrier            : CacheIs = new CacheIs(Protoss.Carrier)
   lazy val isInterceptor        : CacheIs = new CacheIs(Protoss.Interceptor)
   lazy val isReaver             : CacheIs = new CacheIs(Protoss.Reaver)
+  lazy val isArbiter            : CacheIs = new CacheIs(Protoss.Arbiter)
+  lazy val isForge              : CacheIs = new CacheIs(Protoss.Forge)
+  lazy val isRoboticsFacility   : CacheIs = new CacheIs(Protoss.RoboticsFacility)
+  lazy val isObservatory        : CacheIs = new CacheIs(Protoss.Observatory)
   lazy val isOverlord           : CacheIs = new CacheIs(Zerg.Overlord)
   lazy val isHydralisk          : CacheIs = new CacheIs(Zerg.Hydralisk)
   lazy val isMutalisk           : CacheIs = new CacheIs(Zerg.Mutalisk)

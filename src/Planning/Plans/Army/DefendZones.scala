@@ -1,6 +1,6 @@
 package Planning.Plans.Army
 
-import Information.Geography.Types.{Base, Zone}
+import Information.Geography.Types.Zone
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Planning.UnitMatchers.{UnitMatchRecruitableForCombat, UnitMatcher}
@@ -18,18 +18,13 @@ class DefendZones extends Plan {
 
     zones.values.foreach(_.goal.unitMatcher = defenderMatcher.get)
 
-    val zoneScores = zones
-      .keys
-      .filter(_.units.exists(u => u.unitClass.isBuilding && u.isOurs))
-      .map(zone => (zone, zoneValue(zone)))
-      .filter(_._2 > 0.0)
-      .toMap
+    val zoneScores = zones.keys.filter(_.units.exists(u => u.unitClass.isBuilding && u.isOurs)).map(z => (z, zoneValue(z))).toMap
     
     if (zoneScores.isEmpty) return
     
     val zoneByEnemy = With.units.enemy
       .view
-      .filter(e => e.likelyStillAlive && e.likelyStillThere && (e.unitClass.dealsDamage || e.unitClass.isDetector || e.unitClass.isTransport))
+      .filter(e => e.likelyStillAlive && e.likelyStillThere && (e.unitClass.dealsDamage || e.unitClass.isDetector || e.isTransport))
       .map(enemy => (enemy, zoneScores.minBy(z => enemy.pixelDistanceTravelling(z._1.centroid))._1))
       .filter(pair =>
         pair._1.framesToTravelTo(pair._2.centroid.pixelCenter) < GameTime(0, 12)()
@@ -48,10 +43,6 @@ class DefendZones extends Plan {
   }
   
   private def zoneValue(zone: Zone): Double = {
-    zone.units.view.map(u => if (u.isEnemy) u.subjectiveValue else 0.0).sum
-  }
-  
-  private def baseValue(base: Base): Double = {
-    (5.0 + base.workerCount) * (if (With.geography.ourBasesAndSettlements.contains(base)) 1.0 else 0.0)
+    1.0 + zone.units.view.map(u => if (u.unitClass.isWorker || u.unitClass.isBuilding) u.subjectiveValue else 0.0).sum
   }
 }

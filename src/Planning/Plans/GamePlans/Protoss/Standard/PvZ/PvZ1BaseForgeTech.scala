@@ -5,25 +5,26 @@ import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.{Attack, Hunt}
-import Planning.Plans.Compound.{FlipIf, If, Parallel, Trigger}
+import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.Eject4PoolScout
-import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpRatio}
+import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.{Eject4PoolScout, MeldArchonsUntilStorm}
+import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpRatio, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
-import Planning.Plans.Scouting.{Scout, ScoutOn}
-import Planning.Predicates.Compound.Latch
+import Planning.Plans.Scouting.{MonitorBases, ScoutOn}
+import Planning.Predicates.Compound.{Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.UnitMatchOr
+import Planning.UnitCounters.UnitCountEverything
+import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Protoss.{PvZ1BaseForgeTech, PvZ1BaseForgeTechForced}
+import Strategery.Strategies.Protoss.PvZ1BaseForgeTech
 
 class PvZ1BaseForgeTech extends GameplanTemplate {
 
-  override val activationCriteria: Predicate = new Employing(PvZ1BaseForgeTech, PvZ1BaseForgeTechForced)
+  override val activationCriteria: Predicate = new Employing(PvZ1BaseForgeTech)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(5, Protoss.Gateway))
 
   override def scoutPlan: Plan = new ScoutOn(Protoss.Pylon)
@@ -41,8 +42,7 @@ class PvZ1BaseForgeTech extends GameplanTemplate {
   override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
   override def attackPlan: Plan = new Parallel(
     new Hunt(Zerg.Overlord, Protoss.Corsair),
-    new Scout(100) { scouts().unitMatcher.set(Protoss.Corsair) },
-    new Attack(Protoss.Corsair),
+    new MonitorBases(Protoss.Corsair, initialUnitCounter = UnitCountEverything),
     super.attackPlan)
 
   override def emergencyPlans: Seq[Plan] = Seq(
@@ -70,43 +70,58 @@ class PvZ1BaseForgeTech extends GameplanTemplate {
     Get(16, Protoss.Probe),
     Get(Protoss.Gateway))
 
+  override def archonPlan: Plan = new MeldArchonsUntilStorm
+
   override def buildPlans: Seq[Plan] = Seq(
     new Eject4PoolScout,
     new BuildOrder(
       Get(12, Protoss.Probe),
       Get(2, Protoss.PhotonCannon)),
-    new Pump(Protoss.DarkTemplar, 2),
-    new Pump(Protoss.Zealot, 12),
+
+    // Key army
+    // We can spend all our gas here but need minerals to expand
+    new FlipIf(
+      new EnemyHasShown(Zerg.Mutalisk),
+      new Parallel(
+        new Pump(Protoss.DarkTemplar, 2),
+        new If(
+          new Or(new UpgradeComplete(Protoss.GroundDamage), new UnitsAtLeast(1, Protoss.DarkTemplar)),
+          new Pump(Protoss.Zealot, 6),
+          new Pump(Protoss.Zealot, 12))),
+      new Parallel(
+        new PumpRatio(Protoss.Corsair, 4, 12, Seq(Enemy(Zerg.Mutalisk, 1.5))),
+        new If(new Or(new EnemyHasShown(Zerg.Mutalisk), new UpgradeStarted(Protoss.ZealotSpeed)), new Pump(Protoss.HighTemplar)),
+        new If(new Not(new EnemyHasShown(Zerg.Hydralisk)), new Build(Get(Protoss.Scout))))),
+
     new Build(
       Get(Protoss.Assimilator),
       Get(Protoss.CyberneticsCore),
       Get(Protoss.Stargate),
       Get(4, Protoss.PhotonCannon)),
-    new PumpRatio(Protoss.Corsair, 6, 18, Seq(Enemy(Zerg.Mutalisk, 1.5))),
-    new Parallel(
-      new If(
-        new EnemiesAtMost(0, UnitMatchOr(Zerg.Hydralisk, Zerg.SporeColony))),
-        new Build(Get(Protoss.Scout))),
+
     new Build(
-      Get(Protoss.Forge),
       Get(Protoss.GroundDamage),
       Get(Protoss.CitadelOfAdun),
+      Get(Protoss.ZealotSpeed),
       Get(Protoss.TemplarArchives)),
-    new FlipIf(
-      new UnitsAtLeast(1, Protoss.DarkTemplar),
-      new Build(
-        Get(3, Protoss.Gateway),
-        Get(Protoss.GroundDamage),
-        Get(Protoss.ZealotSpeed)),
+    new If(new EnemyHasShown(Zerg.Mutalisk), new UpgradeContinuously(Protoss.AirDamage)),
+
+    new If(
+      new Or(
+        new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
+        new UnitsAtLeast(12, UnitMatchWarriors)),
       new Parallel(
-        new Trigger(
-          new UnitsAtLeast(1, Protoss.TemplarArchives),
-          new BuildCannonsAtNatural(2)),
+        new BuildCannonsAtNatural(2),
         new RequireMiningBases(2))),
-    new Build(
-      Get(5, Protoss.Gateway),
-      Get(2, Protoss.Assimilator),
-      Get(Protoss.PsionicStorm)),
+
+    new If(
+      new MiningBasesAtLeast(2),
+      new Build(
+        Get(5, Protoss.Gateway),
+        Get(2, Protoss.Assimilator)),
+      new Build(
+        Get(3, Protoss.Gateway))),
+
     new Pump(Protoss.HighTemplar),
     new Pump(Protoss.Zealot)
   )

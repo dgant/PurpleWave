@@ -11,8 +11,7 @@ class GridBuildableTownHall extends AbstractGridBoolean {
     reset()
     With.units.neutral.foreach(unit =>
       if (unit.unitClass.isResource) {
-        unit.tileArea.expand(3, 3).tiles.foreach(tile =>
-          set(tile, false))
+        unit.tileArea.expand(3, 3).tiles.foreach(set(_, false))
       })
   }
 }

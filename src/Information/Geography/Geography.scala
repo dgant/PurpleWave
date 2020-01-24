@@ -83,7 +83,8 @@ class Geography {
   ++ With.geography.bases.filter(_.units.exists(u => u.isOurs && u.unitClass.isBuilding))
   ++ Vector(With.geography.ourNatural).filter(x =>
       With.strategy.isInverted
-      && With.units.ours.exists(u => u.complete && u.unitClass.ranged)
+      && ! With.geography.ourMain.units.exists(_.unitClass.isStaticDefense)
+      && With.units.ours.exists(u => u.complete && u.unitClass.ranged && (u.unitClass.canMove || u.unitClass.isSiegeTank))
       && (With.units.enemy.exists(_.unitClass.ranged) || With.battles.global.globalSafeToAttack))
   ++ With.units.ours
     .view

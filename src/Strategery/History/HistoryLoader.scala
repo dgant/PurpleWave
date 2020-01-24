@@ -102,23 +102,7 @@ object HistoryLoader {
     output
   }
   
-  private def saveGames(filename: String, contents: Iterable[String]) {
-    
-    var bufferedWriter: BufferedWriter = null
-    
-    try {
-      val file            = new File(filename)
-      val fileWriter      = new FileWriter(file)
-          bufferedWriter  = new BufferedWriter(fileWriter)
-      
-      contents.map(_ + "\n").foreach(bufferedWriter.write)
-    }
-    catch { case exception: Exception =>
-      With.logger.warn("Failed to save game history to " + filename)
-      With.logger.onException(exception)
-    }
-    if (bufferedWriter != null) {
-      bufferedWriter.close()
-    }
+  private def saveGames(filename: String, lines: Iterable[String]) {
+    WriteFile(filename, lines, "save game history")
   }
 }

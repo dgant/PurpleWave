@@ -24,15 +24,8 @@ abstract class PvZ2GateOpening extends PvZStrategy {
 }
 object PvZ1BaseForgeTech extends PvZStrategy {
   override def allowedVsHuman: Boolean = false
-  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(With.fingerprints.fourPool)
-  override def choices: Iterable[Iterable[Strategy]] = Vector(
-    Seq(PvZMidgameNeoBisu)
-  )
-}
-object PvZ1BaseForgeTechForced extends PvZStrategy {
-  override def allowedVsHuman: Boolean = false
-  override def opponentsWhitelisted: Option[Iterable[String]] = Some(Seq("Coxe", "ZZZK", "StyX", "Jadien", "ChimeraBot"))
-  override def choices: Iterable[Iterable[Strategy]] = PvZ1BaseForgeTech.choices
+  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.ninePoolGas)
+  override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgameNeoBisu))
 }
 object PvZProxy2Gate extends PvZ2GateOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying

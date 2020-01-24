@@ -4,6 +4,7 @@ package Micro.Actions.Combat.Decisionmaking
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
+import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Transportation.Caddy.Shuttling
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -13,6 +14,13 @@ object FightOrFlight extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.canMove
+  }
+
+  def potentiallyUseful(unit: FriendlyUnitInfo): Boolean = {
+    if (Target.legalTargetsRequired(unit).nonEmpty) return true
+    if (unit.unitClass.spells.exists(spell => With.self.hasTech(spell) && unit.energy >= spell.energyCost)) return true
+    if (unit.unitClass.isDetector && ! unit.matchups.enemies.exists(t => t.cloaked && ( ! unit.agent.canFocus || unit.squadenemies.contains(t)))) return true
+    false
   }
   
   override def perform(unit: FriendlyUnitInfo) {
@@ -35,9 +43,7 @@ object FightOrFlight extends Action {
     decide(false, "Scarabs",      () => unit.is(Protoss.Reaver) && unit.scarabCount == 0)
     decide(true,  "Cloaked",      () => unit.effectivelyCloaked || (unit.is(Terran.Wraith) && unit.energy >= 50 && unit.matchups.enemyDetectors.isEmpty && With.self.hasTech(Terran.WraithCloak)))
     decide(true,  "Lurking",      () => unit.is(Zerg.Lurker) && unit.matchups.enemyDetectors.isEmpty)
-    decide(false, "Useless",      () => unit.energyMax == 0 && unit.matchups.threats.nonEmpty && unit.loadedUnits.isEmpty && (
-      (unit.canAttack && ! unit.matchups.targets.exists(t => ! unit.agent.canFocus || unit.squadenemies.contains(t)))
-      || (unit.unitClass.isDetector && ! unit.matchups.enemies.exists(t => t.cloaked && ( ! unit.agent.canFocus || unit.squadenemies.contains(t))))))
+    decide(false, "Useless",      () => unit.matchups.threats.nonEmpty && unit.loadedUnits.isEmpty && ! potentiallyUseful(unit))
     decide(false, "Drained",      () => ! unit.canAttack && unit.energyMax > 0 && unit.unitClass.spells.forall(s => s.energyCost > unit.energy || ! With.self.hasTech(s)))
     decide(true,  "Scourge",      () => unit.is(Zerg.Scourge) && unit.matchups.targets.exists(target => target.canAttack(unit) && target.matchups.targetsInRange.nonEmpty))
     decide(false, "Disrupted",    () => unit.underDisruptionWeb && ! unit.flying)

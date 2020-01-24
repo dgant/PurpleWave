@@ -30,7 +30,6 @@ class Visualization {
     ShowStatus,
 
     ShowPerformanceSummary,
-    ShowSquads
   )
 
   var enabled   : Boolean = _

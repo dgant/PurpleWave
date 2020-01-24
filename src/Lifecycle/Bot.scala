@@ -1,6 +1,7 @@
 package Lifecycle
 
 import Debugging._
+import Strategery.History.OpponentLogger
 import bwapi.DefaultBWListener
 
 class Bot() extends DefaultBWListener {
@@ -64,6 +65,7 @@ class Bot() extends DefaultBWListener {
   override def onEnd(isWinner: Boolean) {
     try {
       With.history.onEnd(isWinner)
+      OpponentLogger.onEnd()
       Manners.onEnd(isWinner)
       With.onEnd()
     }

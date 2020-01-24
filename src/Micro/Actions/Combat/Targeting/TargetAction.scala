@@ -5,8 +5,6 @@ import Micro.Actions.Combat.Targeting.Filters._
 import Micro.Heuristics.EvaluateTargets
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-import scala.collection.mutable
-
 class TargetAction(val additionalFiltersRequired: TargetFilter*) extends Action {
   
   val additionalFiltersOptional: Vector[TargetFilter] = Vector.empty
@@ -17,37 +15,47 @@ class TargetAction(val additionalFiltersRequired: TargetFilter*) extends Action 
     && unit.canAttack
     && unit.matchups.targets.nonEmpty
   )
-  
-  override protected def perform(unit: FriendlyUnitInfo) {
+
+  val filtersAlwaysRequired = Vector(
+    TargetFilterFocus,
+    TargetFilterStayCloaked,
+    TargetFilterFutility,
+    TargetFilterScourge,
+    TargetFilterReaver,
+    TargetFilterAlmostAnything,
+    TargetFilterCrowded)
+
+  def filtersRequired = filtersAlwaysRequired ++ additionalFiltersRequired
+
+  def legalTargetsRequired(unit: FriendlyUnitInfo): Iterable[UnitInfo] = {
+    unit.matchups.targets.view.filter(target => filtersRequired.forall(_.legal(unit, target)))
+  }
+
+  def legalTargets(unit: FriendlyUnitInfo): Seq[UnitInfo] = {
     var filtersOptional = additionalFiltersOptional ++ Vector(TargetFilterCombatants, TargetFilterIgnoreScouts)
-    val filtersRequired = Vector(
-      TargetFilterFocus,
-      TargetFilterStayCloaked,
-      TargetFilterFutility,
-      TargetFilterScourge,
-      TargetFilterReaver,
-      TargetFilterAlmostAnything,
-      TargetFilterCrowded) ++ additionalFiltersRequired
-    
-    val targetsRequired = new mutable.ListBuffer[UnitInfo]
-    for (target <- unit.matchups.targets) {
-      if (filtersRequired.forall(_.legal(unit, target))) targetsRequired += target
-    }
-    
+
     def audit =
       unit.matchups.targets.map(target =>
         (target, (filtersOptional ++ filtersRequired).map(filter =>
           (filter.legal(unit, target), filter))))
 
+    val targetsRequired = legalTargetsRequired(unit).toVector
     for (filtersOptionalToDrop <- 0 to filtersOptional.length) {
       if (unit.agent.toAttack.isEmpty) {
         val filtersOptionalActive = filtersOptional.drop(filtersOptionalToDrop)
-        val targetsOptional = targetsRequired.filter(target => filtersOptionalActive.forall(_.legal(unit, target)))
-        unit.agent.toAttack = EvaluateTargets.best(unit, targetsOptional)
+        val legalTargets = targetsRequired.filter(target => filtersOptionalActive.forall(_.legal(unit, target)))
+        if (legalTargets.nonEmpty) {
+          return legalTargets
+        }
       }
     }
-    
-    Unit
+
+    Seq.empty
+  }
+  
+  override protected def perform(unit: FriendlyUnitInfo) {
+    val bestTarget = EvaluateTargets.best(unit, legalTargets(unit))
+    unit.agent.toAttack = bestTarget
   }
 }
 

@@ -12,7 +12,7 @@ class GridUnwalkableUnits extends AbstractGridVersioned {
         if ((unit.unitClass.isBuilding || unit.isAny(Zerg.Egg, Zerg.LurkerEgg))
           && ! unit.flying
           && ! unit.is(Terran.SiegeTankSieged)) {
-          unit.tileArea.tiles.foreach(stamp)
+          unit.tiles.foreach(stamp)
         })
   }
 }

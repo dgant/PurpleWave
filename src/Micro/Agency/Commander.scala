@@ -401,7 +401,7 @@ class Commander {
   }
   
   private def sleepBuild(unit: FriendlyUnitInfo) {
-    //Based on https://github.com/tscmoo/tsc-bwai/blame/master/src/unit_controls.h#L1497
+    // Based on https://github.com/tscmoo/tsc-bwai/blame/master/src/unit_controls.h#L1497
     sleep(unit, 1 + 2 * With.latency.latencyFrames)
   }
   

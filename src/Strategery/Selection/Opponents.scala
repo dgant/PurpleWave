@@ -17,7 +17,7 @@ object Opponents {
   val fixedPvT    = StrategySelectionFixed(PvT1015DT, PvT3BaseArbiter)
   val fixedPvZ    = StrategySelectionFixed(PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar)
   val fixedPvR    = StrategySelectionFixed(PvR1BaseDT)
-  val safePvZ     = new StrategySelectionRecommended(StrategySelectionGreedy, PvZ1BaseForgeTechForced, PvZMidgameNeoBisu, PvZLateGameTemplar)
+  val safePvZ     = new StrategySelectionRecommended(StrategySelectionGreedy, PvZ1BaseForgeTech, PvZMidgameNeoBisu, PvZLateGameTemplar)
 
   // TorchUp opponents
 
@@ -26,7 +26,7 @@ object Opponents {
   val crona         : Opponent = add(Opponent("Crona",        defaultPvZ))
   val cunybot       : Opponent = add(Opponent("CUNYBot",      safePvZ))
   val ecgberht      : Opponent = add(Opponent("Ecgberht",     defaultPvT))
-  val haopan        : Opponent = add(Opponent("Hao Pan",      defaultPvT))
+  val haopan        : Opponent = add(Opponent("Hao Pan",      new StrategySelectionRecommended(StrategySelectionGreedy, PvT32Nexus, PvT2BaseCarrier)))
   val letabot       : Opponent = add(Opponent("LetaBot",      new StrategySelectionRecommended(StrategySelectionGreedy, PvTReaverCarrierCheese)))
   val locutus       : Opponent = add(Opponent("Locutus",      StrategySelectionSequence(Vector(
     Seq(PvP2GateDTExpand),

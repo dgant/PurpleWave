@@ -4,15 +4,19 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.UnitCountOne
+import Planning.UnitCounters.{UnitCountOne, UnitCounter}
 import Planning.UnitMatchers.UnitMatcher
 import Planning.UnitPreferences.UnitPreferClose
 import Planning.{Plan, Property}
 
-class MonitorBases(initialUnitMatcher: UnitMatcher, bases: () => Seq[Base] = () => With.geography.enemyBases) extends Plan {
+class MonitorBases(
+    initialUnitMatcher: UnitMatcher,
+    bases: () => Seq[Base] = () => With.geography.enemyBases,
+    initialUnitCounter: UnitCounter = UnitCountOne) extends Plan {
+
   val scouts = new Property[LockUnits](new LockUnits {
     unitMatcher.set(initialUnitMatcher)
-    unitCounter.set(UnitCountOne)
+    unitCounter.set(initialUnitCounter)
     interruptable.set(false)
   })
 

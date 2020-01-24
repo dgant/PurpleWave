@@ -141,13 +141,13 @@ object EvaluateTargets extends {
     }
 
     // Temporary visibility bonus
-    val temporarilyVisible = (target.cloaked || target.burrowed) && target.matchups.enemyDetectors.forall(_.is(Terran.SpellScannerSweep))
+    val temporarilyVisible = (target.cloaked || target.burrowed) && target.matchups.enemyDetectors.forall(_.isScannerSweep())
     if (temporarilyVisible) {
       output *= 2.0
     }
 
     // Detection bonus
-    val weHaveCloakedThreat = target.matchups.enemies.headOption.exists(_.matchups.alliesInclSelfCloaked.exists(_.matchups.targets.nonEmpty)) && ! target.matchups.enemies.exists(_.is(Protoss.Arbiter))
+    val weHaveCloakedThreat = target.matchups.enemies.headOption.exists(_.matchups.alliesInclSelfCloaked.exists(_.matchups.targets.nonEmpty)) && ! target.matchups.enemies.exists(_.isArbiter())
     if (weHaveCloakedThreat) {
       val building = target.constructing || target.repairing
       val buildTarget = if (building) target.target else None
@@ -174,13 +174,10 @@ object EvaluateTargets extends {
     if (target.unitClass.isDetector) {
       return true
     }
-    if (target.isAny(Terran.Comsat, Terran.ControlTower, Protoss.RoboticsFacility)) {
+    if (target.isComsat() || target.isControlTower() || target.isRoboticsFacility() || target.isEngineeringBay() || target.isForge()) {
       return true
     }
-    if (target.isAny(Terran.Academy, Terran.ScienceFacility, Protoss.Observatory) && ! target.complete) {
-      return true
-    }
-    if (target.isAny(Terran.EngineeringBay, Protoss.Forge)) {
+    if ((target.isAcademy() || target.isScienceFacility() || target.isObservatory()) && ! target.complete) {
       return true
     }
     false

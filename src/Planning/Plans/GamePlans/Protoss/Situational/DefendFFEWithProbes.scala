@@ -1,5 +1,8 @@
 package Planning.Plans.GamePlans.Protoss.Situational
 
+import Debugging.Visualizations.Colors
+import Debugging.Visualizations.Rendering.DrawMap
+import Debugging.Visualizations.Views.Micro.ShowUnitsFriendly
 import Lifecycle.With
 import Mathematics.Points.{Pixel, TileRectangle}
 import Micro.Agency.{Intention, Leash}
@@ -89,6 +92,9 @@ abstract class DefendFFEWithProbes extends Plan {
         toTravel  = Some(toDefend)
         toLeash   = Some(Leash(toDefend, 32.0 * 4.0))
       }))
+      if (ShowUnitsFriendly.mapInUse) {
+        workers.foreach(w => DrawMap.circle(w.agent.toTravel.get, 16, Colors.NeonYellow))
+      }
     })
   }
 }

@@ -30,7 +30,8 @@ class Visualization {
     ShowStatus,
 
     ShowPerformanceSummary,
-    ShowSaturation
+    ShowSaturation,
+    ShowFingerprints
   )
 
   var enabled   : Boolean = _

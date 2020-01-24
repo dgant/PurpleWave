@@ -26,6 +26,7 @@ class FingerprintProxyGateway extends FingerprintAnd(
           tilesSeen >= scoutableTiles.size * 0.9
         }))
     })) {
-  
-  override val sticky = true
+
+  // Stick only once we have some affirmative proof, so we don't permanently overreact against Nexus-first (which has an empty main)
+  override def sticky = With.units.countEnemy(Protoss.Zealot) > 0 || With.units.countEnemy(Protoss.Gateway) > 0
 }

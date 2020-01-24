@@ -107,8 +107,12 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
       framesFailingToAttack = 0
     }
     if (complete) {
+      // We don't know exactly when it finished; now is our best guess.
+      // The most important consumer of this estimate is fingerprinting.
+      // For fingerprinting, "finished now" is a pretty decent metric.
       completionFrame = Math.min(completionFrame, With.frame)
-    } else if (completionFrame > 24 * 60 * 180) {
+    }
+    if ( ! complete || completionFrame > 24 * 60 * 180) {
       completionFrame = With.frame + remainingCompletionFrames
     }
     lastHitPoints             = hitPoints

@@ -2,27 +2,11 @@ package Micro.Actions.Combat.Targeting.Filters
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Micro.Actions.Scouting.BlockConstruction
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterFutility extends TargetFilter {
-  
-  private def catchableBy(actor: UnitInfo, target: UnitInfo): Boolean = {
-    lazy val targetBusy = target.gathering || target.constructing || target.repairing || ! target.canMove || BlockConstruction.buildOrders.contains(target.order)
-    lazy val ourSpeed = Math.max(actor.topSpeed, actor.friendly.flatMap(_.transport.map(_.topSpeed)).getOrElse(0.0))
-    lazy val weAreFlying = actor.flying || actor.friendly.exists(_.agent.ride.exists(_.flying)) && ! target.flying
-    val output = (
-      ourSpeed * (if (weAreFlying) 2 else 1) >= target.topSpeed
-      || targetBusy
-      || actor.is(Zerg.Scourge)
-      || actor.framesToGetInRange(target) < 8
-      || (target.unitClass.isWorker && target.base.exists(_.harvestingArea.contains(target.tileIncludingCenter)))
-      || (actor.is(Zerg.Zergling) && With.self.hasUpgrade(Zerg.ZerglingSpeed) && ! target.player.hasUpgrade(Terran.VultureSpeed))
-      || (actor.is(Protoss.Zealot) && target.is(Protoss.Dragoon) && ! target.player.hasUpgrade(Protoss.DragoonRange))
-      || (actor.is(Protoss.DarkTemplar) && target.is(Protoss.Dragoon)))
-    output
-  }
+
   // Target units according to our goals.
   // Ignore them if they're distractions.
   //
@@ -37,13 +21,12 @@ object TargetFilterFutility extends TargetFilter {
     }
 
     lazy val atOurWorkers = target.base.exists(_.owner.isUs) && target.matchups.targetsInRange.exists(_.unitClass.isWorker)
-    lazy val alliesAssisting  = target.matchups.threats.exists(ally =>
+    lazy val alliesAssisting = target.matchups.catchers.exists(ally =>
       ally != actor
-      && catchableBy(ally, target)
       && (ally.topSpeed >= target.topSpeed || ally.pixelRangeAgainst(target) >= actor.pixelRangeAgainst(target))
       && ally.framesBeforeAttacking(target) <= actor.framesBeforeAttacking(target))
     
-    lazy val targetCatchable  = catchableBy(actor, target) || alliesAssisting
+    lazy val targetCatchable  = target.matchups.catchers.contains(actor) || alliesAssisting
     lazy val targetReachable  = (
       target.visible
       || actor.flying

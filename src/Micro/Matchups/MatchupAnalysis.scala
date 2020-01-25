@@ -6,6 +6,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Spiral
+import Micro.Actions.Scouting.BlockConstruction
 import Micro.Decisions.MicroValue
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -39,6 +40,23 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val threatsInRange         : Vector[UnitInfo]    = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me, at) - me.pixelsTravelledMax(frame) - threat.pixelsTravelledMax(frame))
   lazy val targetsInRange         : Vector[UnitInfo]    = targets.filter(target => target.visible && me.pixelRangeAgainst(target) >= target.pixelDistanceEdge(me, at) - me.pixelsTravelledMax(frame) - target.pixelsTravelledMax(frame) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
   lazy val nearestArbiter         : Option[UnitInfo]    = ByOption.minBy(allies.view.filter(_.is(Protoss.Arbiter)))(_.pixelDistanceSquared(me))
+
+  def isCatcher(actor: UnitInfo): Boolean = {
+    lazy val ourSpeed = Math.max(actor.topSpeed, actor.friendly.flatMap(_.transport.map(_.topSpeed)).getOrElse(0.0))
+    lazy val weAreFlying = actor.flying || actor.friendly.exists(_.agent.ride.exists(_.flying)) && ! me.flying
+    val output = (
+      ourSpeed * (if (weAreFlying) 2 else 1) >= me.topSpeed
+        || busyForCatching
+        || actor.is(Zerg.Scourge)
+        || actor.framesToGetInRange(me) < 8
+        || (me.unitClass.isWorker && me.base.exists(_.harvestingArea.contains(me.tileIncludingCenter)))
+        || (actor.is(Zerg.Zergling) && With.self.hasUpgrade(Zerg.ZerglingSpeed) && ! me.player.hasUpgrade(Terran.VultureSpeed))
+        || (actor.is(Protoss.Zealot) && me.isDragoon() && ! me.player.hasUpgrade(Protoss.DragoonRange))
+        || (actor.is(Protoss.DarkTemplar) && me.isDragoon()))
+    output
+  }
+  lazy val busyForCatching  : Boolean        = me.gathering || me.constructing || me.repairing || ! me.canMove || BlockConstruction.buildOrders.contains(me.order)
+  lazy val catchers         : Set[UnitInfo]  = threats.filter(isCatcher).toSet
   
   private def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = {
     if ( ! shooter.canAttack(victim)) return false
@@ -171,6 +189,5 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
       val output = numerator / baselineVpf
       output
     }
-
   }
 }

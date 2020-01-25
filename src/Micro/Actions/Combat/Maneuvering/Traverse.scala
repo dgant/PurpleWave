@@ -15,7 +15,7 @@ class Traverse(path: TilePath) extends Action {
     unit.agent.path = Some(path)
     path.tiles.get.foreach(With.coordinator.gridPathOccupancy.addUnit(unit, _))
     val lookaheadDefault = (2 * unit.unitClass.haltPixels + unit.topSpeed * With.reaction.agencyAverage / 32).toInt
-    val lookaheadFinal = PurpleMath.clamp(lookaheadDefault, 6, 10)
+    val lookaheadFinal = PurpleMath.clamp(lookaheadDefault, 8, 12)
     unit.agent.toTravel = Some(path.tiles.get.take(lookaheadFinal).last.pixelCenter)
     Move.delegate(unit)
   }

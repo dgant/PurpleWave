@@ -163,9 +163,12 @@ class PvZ2Gate1012 extends GameplanTemplate {
           new Build(
             Get(Protoss.CyberneticsCore),
             Get(Protoss.DragoonRange)),
-          new Build(
-            Get(Protoss.Forge),
-            Get(Protoss.GroundDamage))),
+          new Parallel(
+            // They will be stuck making Zerglings with no third Hatchery, so we can punish with mass slowlots
+            new If(new EnemyStrategy(With.fingerprints.tenHatch, With.fingerprints.twelvePool), new Build(Get(3, Protoss.Gateway))),
+            new Build(
+              Get(Protoss.Forge),
+              Get(Protoss.GroundDamage)))),
         new Build(Get(4, Protoss.Gateway)))),
 
     new Pump(Protoss.Zealot),

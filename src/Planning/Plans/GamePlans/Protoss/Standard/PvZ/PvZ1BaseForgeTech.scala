@@ -99,11 +99,12 @@ class PvZ1BaseForgeTech extends GameplanTemplate {
       Get(Protoss.Stargate),
       Get(4, Protoss.PhotonCannon)),
 
-    new Build(
-      Get(Protoss.GroundDamage),
+    new BuildOrder(
       Get(Protoss.CitadelOfAdun),
-      Get(Protoss.ZealotSpeed),
-      Get(Protoss.TemplarArchives)),
+      Get(Protoss.TemplarArchives),
+      Get(Protoss.DarkTemplar),
+      Get(Protoss.GroundDamage),
+      Get(Protoss.ZealotSpeed)),
     new If(new EnemyHasShown(Zerg.Mutalisk), new UpgradeContinuously(Protoss.AirDamage)),
 
     new If(
@@ -123,6 +124,8 @@ class PvZ1BaseForgeTech extends GameplanTemplate {
         Get(3, Protoss.Gateway))),
 
     new Pump(Protoss.HighTemplar),
-    new Pump(Protoss.Zealot)
+    new Pump(Protoss.Zealot),
+
+    new Build(Get(5, Protoss.Gateway))
   )
 }

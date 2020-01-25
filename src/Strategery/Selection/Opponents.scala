@@ -21,6 +21,7 @@ object Opponents {
   val zergRotation = Vector(
     Seq(PvZ4Gate1012,       PvZMidgame5GateGoon,  PvZLateGameTemplar),
     Seq(PvZFFEEconomic,     PvZMidgameBisu,       PvZLateGameTemplar),
+    Seq(PvZ4Gate99,         PvZMidgame5GateGoon,  PvZLateGameReaver),
     Seq(PvZ1BaseForgeTech,  PvZMidgameNeoBisu,    PvZLateGameTemplar))
 
   // TorchUp opponents
@@ -38,7 +39,7 @@ object Opponents {
     Seq(PvPProxy2Gate)),
     loop = true)))
   val microwave     : Opponent = add(Opponent("Microwave",    StrategySelectionSequence(zergRotation)))
-  val styxz         : Opponent = add(Opponent("StyxZ",        StrategySelectionSequence(zergRotation, loop = true)))
+  val styxz         : Opponent = add(Opponent("StyxZ",        StrategySelectionSequence(zergRotation)))
   val tcpzerg       : Opponent = add(Opponent("TCPZerg",      safePvZ))
 
   // SSCAIT opponents

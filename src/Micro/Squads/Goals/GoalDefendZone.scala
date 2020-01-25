@@ -39,11 +39,15 @@ class GoalDefendZone extends SquadGoalBasic {
 
     lazy val allowWandering = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || squad.enemies.exists(_.unitClass.ranged) || With.blackboard.wantToAttack()
     lazy val canHuntEnemies = huntableEnemies().nonEmpty
-    lazy val canDefendChoke = choke.isDefined
+    lazy val canDefendChoke = squad.units.size > 3 && choke.isDefined
     lazy val wallExistsButNoneNearChoke = walls.nonEmpty && walls.forall(wall =>
       choke.forall(chokepoint =>
         (chokepoint.sidePixels :+ chokepoint.pixelCenter).forall(wall.pixelDistanceCenter(_) > 8 * 32)))
-    lazy val entranceBreached = huntableEnemies().exists(e => e.zone == zone && ! zone.edges.exists(edge => e.pixelDistanceCenter(edge.pixelCenter) < 64 + edge.radiusPixels))
+    lazy val entranceBreached = huntableEnemies().exists(e =>
+      e.attacksAgainstGround > 0
+      && ! e.unitClass.isWorker
+      && e.zone == zone
+      && ! zone.edges.exists(edge => e.pixelDistanceCenter(edge.pixelCenter) < 64 + edge.radiusPixels))
 
     if ((allowWandering || entranceBreached) && canHuntEnemies) {
       lastAction = "Scour "
@@ -53,7 +57,7 @@ class GoalDefendZone extends SquadGoalBasic {
       lastAction = "Protect wall of "
       defendHeart(walls.minBy(_.pixelCenter.groundPixels(With.intelligence.mostBaselikeEnemyTile)).pixelCenter)
     }
-    else if (allowWandering && canDefendChoke) {
+    else if (! entranceBreached && canDefendChoke) {
       lastAction = "Protect choke of "
       defendChoke()
     }

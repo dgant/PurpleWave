@@ -12,9 +12,10 @@ object Opponents {
   }
 
   val pvzCore = Seq(PvZFFEEconomic, PvZMidgame5GateGoonReaver, PvZLateGameReaver)
+  val pvz2Gate = Seq(PvZ2Gate1012,   PvZ4GateGoon,     PvZMidgame5GateGoonReaver,  PvZLateGameReaver)
   val zergRotation = Vector(
     pvzCore,
-    Seq(PvZ2Gate1012,   PvZ4GateGoon,     PvZMidgame5GateGoonReaver,  PvZLateGameReaver),
+    pvz2Gate,
     Seq(PvZFFEEconomic,                   PvZMidgameBisu,             PvZLateGameTemplar),
     Seq(PvZ2Gate910,    PvZ4GatePlusOne,  PvZMidgame5GateGoon,        PvZLateGameTemplar))
   val defaultPvT  = StrategySelectionGreedy
@@ -38,7 +39,7 @@ object Opponents {
     Seq(PvP1ZealotExpand),
     Seq(PvPProxy2Gate)),
     loop = true)))
-  val microwave     : Opponent = add(Opponent("Microwave",    StrategySelectionSequence(zergRotation)))
+  val microwave     : Opponent = add(Opponent("Microwave",    new StrategySelectionRecommended(StrategySelectionSequence(zergRotation), pvz2Gate: _*)))
   val styxz         : Opponent = add(Opponent("StyxZ",        defaultPvZ))
   val tcpzerg       : Opponent = add(Opponent("TCPZerg",      safePvZ))
 

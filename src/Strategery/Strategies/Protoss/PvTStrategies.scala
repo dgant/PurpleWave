@@ -83,7 +83,7 @@ object PvT25BaseCarrier extends PvTBasicOpener {
   ))
 }
 object PvT1015Expand extends PvTBasicOpener {
-  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits :+ Destination
+  override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Destination)
   override def entranceRamped: Boolean = false
   override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fourteenCC,
@@ -91,7 +91,7 @@ object PvT1015Expand extends PvTBasicOpener {
   )
 }
 object PvT1015DT extends PvTStrategy {
-  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits :+ Destination
+  override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Destination)
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     Vector(
       PvT2BaseArbiter,

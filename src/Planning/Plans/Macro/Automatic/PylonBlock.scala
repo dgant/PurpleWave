@@ -51,10 +51,11 @@ class PylonBlock extends Plan {
     val basesDistant = basesByProxmity.drop((basesByProxmity.size + 1) / 2).reverse
 
     val basesEligible = basesDistant.filter(base =>
-      baseIsEligible(base)
-        && base.isNaturalOf.forall(main =>
-          baseIsEligible(main)
-          && basesDistant.contains(main)))
+      With.grids.scoutingPathsStartLocations.get(base.townHallTile.add(1, 1)) > 15
+      && baseIsEligible(base)
+      && base.isNaturalOf.forall(main =>
+        baseIsEligible(main)
+        && basesDistant.contains(main)))
 
     val basesUnblocked = basesEligible.filterNot(base => base.zone.units.exists(u => u.isFriendly && u.unitClass.isBuilding && u.tileArea.intersects(base.townHallArea)))
     basesUnblocked.headOption.foreach(baseToBlock => {
@@ -67,7 +68,7 @@ class PylonBlock extends Plan {
           canFlee = true
           canFocus = true
         }
-        if (blocker.pixelDistanceCenter(tileToBlock.pixelCenter) < 256 && With.self.supplyUsed + 24 <= With.self.supplyTotal) {
+        if (blocker.pixelDistanceCenter(tileToBlock.pixelCenter) < 256 && With.self.supplyUsed + 24 >= With.self.supplyTotal) {
           currencyLock.acquire(this)
           intent = new Intention {
             toBuild = Some(Protoss.Pylon)

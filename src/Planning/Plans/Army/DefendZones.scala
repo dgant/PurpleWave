@@ -43,6 +43,7 @@ class DefendZones extends Plan {
   }
   
   private def zoneValue(zone: Zone): Double = {
-    1.0 + zone.units.view.map(u => if (u.unitClass.isWorker || u.unitClass.isBuilding) u.subjectiveValue else 0.0).sum
+    // Omit Pylons/Supply Depots, which may just be there to block expansions
+    1.0 + zone.units.view.map(u => if ((u.unitClass.isWorker || u.unitClass.isBuilding) && u.unitClass.supplyProvided != 16) u.subjectiveValue else 0.0).sum
   }
 }

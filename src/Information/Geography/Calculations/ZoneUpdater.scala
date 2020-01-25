@@ -12,15 +12,9 @@ import Utilities.ByOption
 object ZoneUpdater {
   
   def update() {
-    if (With.frame == 0) {
-      // Grid tasks update for the first time after Geography because many need to understand zones
-      // But for us to initialize zones properly, we need the unit grid ready.
-      With.grids.units.initialize()
-      With.grids.units.update()
-      // Precalculate these
-      With.geography.zones.foreach(_.distanceGrid)
-      With.geography.zones.foreach(_.edges.foreach(_.distanceGrid))
-    }
+    // Precalculate these
+    With.geography.zones.foreach(_.distanceGrid)
+    With.geography.zones.foreach(_.edges.foreach(_.distanceGrid))
 
     With.geography.zones.foreach(_.unitBuffer.clear())
     for (unit <- With.units.all) {

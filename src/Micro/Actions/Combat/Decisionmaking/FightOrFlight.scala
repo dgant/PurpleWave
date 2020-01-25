@@ -112,14 +112,13 @@ object FightOrFlight extends Action {
       && ally.agent.fightReason != getaway
       && ! ally.loaded
       && (ally.canAttack || (ally.unitClass.rawCanAttack && ally.unitClass.isBuilding) || ally.is(Zerg.CreepColony))
-      && ally.unitClass.topSpeed <= Protoss.HighTemplar.topSpeed
+      && (ally.unitClass.topSpeed <= Protoss.HighTemplar.topSpeed)
       && (ally.subjectiveValue * (if (ally.unitClass.isBuilding) 2.0 else 1.0) > unit.subjectiveValue)
-      && ( ! ally.unitClass.isBuilding || ally.matchups.threatsInRange.nonEmpty)
+      && (ally.matchups.framesOfSafety < 24 + Math.max(0, unit.matchups.framesOfSafety) || ( ! ally.unitClass.isBuilding && ally.matchups.targetsInRange.nonEmpty))
       && (ally.friendly.forall(_.agent.ride.exists(_.pixelDistanceEdge(ally) > 96)) || ally.matchups.framesOfSafety <= PurpleMath.clamp(unit.matchups.framesOfSafety, 0, 3))
-      && ally.matchups.framesOfSafety <= 24 + Math.max(0, unit.matchups.framesOfSafety))
       && (ally.unitClass.isSpellcaster ||
         (ally.matchups.threats.exists(t => ! t.unitClass.isWorker && t.topSpeed > ally.topSpeed && unit.canAttack(t)) && (ally.agent.shouldEngage || ally.matchups.targetsInRange.nonEmpty)))
-    ))
+    )))
 
     decide(true, getaway, () => unit.agent.ride.exists(ride => {
       val rideDistance = Math.max(0.0, ride.pixelDistanceCenter(unit) - Shuttling.pickupRadius - 32)

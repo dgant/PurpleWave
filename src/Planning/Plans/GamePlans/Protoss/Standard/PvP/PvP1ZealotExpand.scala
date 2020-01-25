@@ -3,10 +3,12 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.Attack
-import Planning.Plans.Compound.{If, Parallel}
+import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.ReactToDarkTemplarEmergencies
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
 import Planning.Plans.Scouting.ScoutForCannonRush
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
@@ -50,11 +52,13 @@ class PvP1ZealotExpand extends GameplanTemplate {
     new If(
       new EnemiesAtLeast(2, Protoss.Zealot),
       new BuildOrder(Get(2, Protoss.Zealot))),
+    new If(new Or(new EnemiesAtLeast(1, Protoss.CitadelOfAdun), new EnemiesAtLeast(1, Protoss.TemplarArchives)), new BuildCannonsAtNatural(1)),
     new Build(
       Get(Protoss.Assimilator),
       Get(Protoss.CyberneticsCore),
       Get(3, Protoss.Gateway),
       Get(Protoss.DragoonRange)),
+    new ReactToDarkTemplarEmergencies,
     new PvPIdeas.TrainArmy,
     new RequireMiningBases(2)
   )

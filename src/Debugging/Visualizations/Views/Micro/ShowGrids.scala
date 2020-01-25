@@ -9,8 +9,9 @@ import Mathematics.Points.TileRectangle
 object ShowGrids extends View {
 
   override def renderMap() {
-    renderGridArray(With.coordinator.gridPathOccupancy, 0, 0)
-    renderGridArray(With.grids.enemyRangeGround, 0, 1)
+    renderGridArray(With.geography.home.zone.distanceGrid, 0, 1)
+    renderGridArray(With.grids.walkableTerrain, 0, 0)
+    renderGridArray(With.grids.unwalkableUnits, 1, 0)
   }
   
   private def renderGridArray[T](map: AbstractGrid[T], offsetX: Int = 0, offsetY: Int = 0) {

@@ -18,7 +18,6 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
-import Strategery.MapGroups
 import Strategery.Strategies.Protoss.{PvP2Gate1012Goon, PvP4GateGoon}
 import Utilities.ByOption
 
@@ -215,31 +214,35 @@ object PvPIdeas {
     new If(
       new FrameAtMost(lastChanceFor2GateShieldBatteryDefense),
       new CancelIncomplete(Protoss.CyberneticsCore)),
-    new BuildOrder(
-      Get(8, Protoss.Probe),
-      Get(Protoss.Pylon),
-      Get(10, Protoss.Probe),
-      Get(Protoss.Gateway),
-      Get(12, Protoss.Probe),
-      Get(Protoss.Assimilator),
-      Get(13, Protoss.Probe),
-      Get(Protoss.Zealot),
-      Get(14, Protoss.Probe),
-      Get(2,  Protoss.Pylon),
-      Get(15, Protoss.Probe),
-      Get(Protoss.ShieldBattery),
-      Get(2,  Protoss.Zealot),
-      Get(16, Protoss.Probe),   // 20/26
-      Get(2,  Protoss.Gateway),
-      Get(17, Protoss.Probe),  // 21/26
-      Get(3,  Protoss.Zealot), // 23/26
-      Get(3,  Protoss.Pylon),  // 23/26+8
-      Get(19, Protoss.Probe),  // 25/26+8
-      Get(5,  Protoss.Zealot), // 28/34
-      Get(20, Protoss.Probe),  // 29/34
-      Get(Protoss.CyberneticsCore),
-      Get(21, Protoss.Probe)),
-  )
+    new Parallel(
+      new If(
+        new UnitsAtMost(0, Protoss.CyberneticsCore),
+        new CapGasWorkersAt(0),
+        new If(
+          new UnitsAtMost(19, Protoss.Probe),
+          new CapGasWorkersAt(1))),
+      new BuildOrder(
+        Get(8, Protoss.Probe),
+        Get(Protoss.Pylon),
+        Get(10, Protoss.Probe),
+        Get(Protoss.Gateway),
+        Get(13, Protoss.Probe),
+        Get(Protoss.Zealot),
+        Get(14, Protoss.Probe),
+        Get(2,  Protoss.Pylon),
+        Get(15, Protoss.Probe),
+        Get(Protoss.ShieldBattery),
+        Get(2,  Protoss.Zealot),
+        Get(2,  Protoss.Gateway),
+        Get(17, Protoss.Probe),  // 21/26
+        Get(3,  Protoss.Zealot), // 23/26
+        Get(3,  Protoss.Pylon),  // 23/26+8
+        Get(19, Protoss.Probe),  // 25/26+8
+        Get(5,  Protoss.Zealot), // 28/34
+        Get(Protoss.Assimilator),
+        Get(20, Protoss.Probe),  // 29/34
+        Get(Protoss.CyberneticsCore),
+        Get(21, Protoss.Probe))))
 
   class PerformReactionTo2Gate extends Parallel(
 
@@ -389,7 +392,7 @@ object PvPIdeas {
       new EnemiesAtMost(0, Protoss.PhotonCannon),
       new Pump(Protoss.DarkTemplar, 3),
       new Pump(Protoss.DarkTemplar, 2)),
-    new Pump(Protoss.DarkTemplar, 1))
+    new If(new GasPumpsAtLeast(2), new Pump(Protoss.DarkTemplar, 1)))
 
   class TrainArmy extends Parallel(
     new Pump(Protoss.Carrier),
@@ -412,7 +415,7 @@ object PvPIdeas {
       // Speedlot-Templar composition
       new Parallel(
         new PumpShuttleAndReavers(6, shuttleFirst = false),
-        new PumpRatio(Protoss.Dragoon, 3, 24, Seq(Friendly(Protoss.Zealot, if (MapGroups.badForBigUnits.exists(_.matches)) 0.0 else 1.5))),
+        new PumpRatio(Protoss.Dragoon, 3, 24, Seq(Friendly(Protoss.Zealot, 1.5))),
         new PumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-1), Friendly(UnitMatchWarriors, 1.0 / 5.0))),
         new If(new ZealotsAllowed, new Pump(Protoss.Zealot))),
 

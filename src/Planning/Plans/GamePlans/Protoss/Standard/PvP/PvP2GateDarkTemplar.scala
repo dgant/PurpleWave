@@ -50,7 +50,9 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
   override def placementPlan: Plan = new Parallel(
     super.placementPlan,
     new If(
-      new Not(new EnemyStrategy(With.fingerprints.twoGate)),
+      new And(
+        new UnitsAtLeast(1, Protoss.CitadelOfAdun),
+        new Not(new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway))),
       new ProposePlacement {
         override lazy val blueprints = Vector(new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
       }))

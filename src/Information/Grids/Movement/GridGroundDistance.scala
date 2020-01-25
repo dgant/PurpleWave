@@ -9,10 +9,13 @@ class GridGroundDistance(initialOrigins: Tile*) extends AbstractGridInt {
 
   def origins: Seq[Tile] = initialOrigins
 
+  @inline def walkable(tile: Tile): Boolean = { tile.valid && (With.grids.walkable.get(tile) || (With.frame < 9 && With.units.ours.exists(_.tileArea.contains(tile)))) }
+  @inline def walkable(iTile: Int): Boolean = { (With.grids.walkable.get(iTile) || (With.frame < 9 && With.units.ours.exists(_.tileArea.tiles.exists(_ == iTile)))) }
+
   override def onInitialization(): Unit = {
-    var seeds = origins.filter(With.grids.walkable.get)
+    var seeds = origins.filter(walkable)
     if (seeds.isEmpty) {
-      seeds = seeds.flatMap(seed => Spiral.points(20).map(seed.add).find(With.grids.walkable.get))
+      seeds = seeds.flatMap(seed => Spiral.points(20).map(seed.add).find(walkable))
     }
 
     var distance = 0
@@ -40,7 +43,7 @@ class GridGroundDistance(initialOrigins: Tile*) extends AbstractGridInt {
       }
     }
     def explore(iTile: Int): Unit = {
-      if (get(iTile) == defaultValue && valid(iTile) && With.grids.walkable.get(iTile)) {
+      if (get(iTile) == defaultValue && valid(iTile) && walkable(iTile)) {
         set(iTile, distance)
         expand(iTile)
       }

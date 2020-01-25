@@ -10,11 +10,12 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeAtHome}
-import Planning.Predicates.Strategy.EnemyStrategy
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
+import Strategery.Strategies.Protoss.PvP1ZealotExpand
 
-class PvPVsForge extends GameplanTemplate {
+class PvPVsForgeOld extends GameplanTemplate {
 
   // Bots have done a variety of nonsense behind FFE:
   // * Real FFE into macro
@@ -24,6 +25,7 @@ class PvPVsForge extends GameplanTemplate {
   // This also needs to be robust against eg. Ximp turtling into Carriers
 
   override val activationCriteria: Predicate = new And(
+    new Not(new Employing(PvP1ZealotExpand)),
     new EnemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.cannonRush),
     new UnitsAtMost(0, Protoss.CitadelOfAdun))
   override val completionCriteria: Predicate = new Latch(new And(new BasesAtLeast(2), new UnitsAtLeast(1, Protoss.Reaver)))

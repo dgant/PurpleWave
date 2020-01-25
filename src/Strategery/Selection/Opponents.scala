@@ -18,6 +18,10 @@ object Opponents {
   val fixedPvZ    = StrategySelectionFixed(PvZ4Gate99, PvZMidgame5GateGoon, PvZLateGameTemplar)
   val fixedPvR    = StrategySelectionFixed(PvR1BaseDT)
   val safePvZ     = new StrategySelectionRecommended(StrategySelectionGreedy, PvZ1BaseForgeTech, PvZMidgameNeoBisu, PvZLateGameTemplar)
+  val zergRotation = Vector(
+    Seq(PvZ4Gate1012,       PvZMidgame5GateGoon,  PvZLateGameTemplar),
+    Seq(PvZFFEEconomic,     PvZMidgameBisu,       PvZLateGameTemplar),
+    Seq(PvZ1BaseForgeTech,  PvZMidgameNeoBisu,    PvZLateGameTemplar))
 
   // TorchUp opponents
 
@@ -33,9 +37,9 @@ object Opponents {
     Seq(PvP1ZealotExpand),
     Seq(PvPProxy2Gate)),
     loop = true)))
-  val microwave     : Opponent = add(Opponent("Microwave",    defaultPvZ))
-  val styxz         : Opponent = add(Opponent("StyxZ",        safePvZ))
-  val tcgpzerg      : Opponent = add(Opponent("TCPZerg",      safePvZ))
+  val microwave     : Opponent = add(Opponent("Microwave",    StrategySelectionSequence(zergRotation)))
+  val styxz         : Opponent = add(Opponent("StyxZ",        StrategySelectionSequence(zergRotation, loop = true)))
+  val tcpzerg       : Opponent = add(Opponent("TCPZerg",      safePvZ))
 
   // SSCAIT opponents
   val bananabrain   : Opponent = add(Opponent("BananaBrain",  defaultPvP))

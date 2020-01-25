@@ -6,7 +6,7 @@ import Information.Grids.Disposable.GridDisposableBoolean
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.{Tile, TileRectangle}
-import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.Races.{Neutral, Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 
 import scala.collection.mutable
@@ -135,7 +135,7 @@ class Architecture {
 
     // Flag places where we can't build gas
     With.geography.bases.foreach(_.gas.foreach(gas =>
-      if (gas.alive && ! gas.player.isNeutral && gas.alive) {
+      if (gas.alive && ! gas.is(Neutral.Geyser)) {
         ungassable.set(gas.tileTopLeft, true)
       }
     ))

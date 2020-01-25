@@ -75,7 +75,7 @@ object PlacementProfiles {
   val townHallNearby = new PlacementProfile("Town Hall Nearby",
     preferZone                  = 1.0,
     preferNatural               = 10.0,
-    preferResources             = 0.5,
+    preferResources             = 0.75,
     preferRhythm                = 0.0,
     preferDistanceFromEnemy     = 2.0,
     avoidDistanceFromBase       = 1.0

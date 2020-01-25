@@ -62,6 +62,30 @@ class Commander {
     }
   
     // TODO: Fix attack cancelling for Photon Cannons
+    // Via Ankmairdor, the iscript:
+    // PhotonCannonGndAttkInit:
+    //   playfram           2
+    //   wait               2
+    //   playfram           1
+    //   wait               2
+    //   playfram           3
+    //   wait               2
+    // PhotonCannonGndAttkRpt:
+    //   wait               1
+    //   attack
+    //   gotorepeatattk
+    //   ignorerest
+    //
+    // on first frame of attack, the animation runs twice
+    // so there is 6 frame delay for first attack and 0 frame delay for continued attacks, also no non-interruptible section so additional commands can interupt an attack
+    // though the biggest optimization would be issuing an attack command rather than waiting for them to autotarget
+    // though I suppose with latency, this can backfire a small percentage(about 1/15 or 2/15) of the time and result in fewer attacks
+    //
+    // on average issuing an attack command that arrives on the first frame that a target is available will save 7 frames
+    // if you wait until a target is in range to issue attack, you save an average of 3 frames (LF3)
+    // if you waited to issue attack and the tower autotargets before your order arrives, you lose at least 22 frames(cooldown)
+    // as far as I can tell, no penalty for bad early guesses on attacking
+
     if (unit.is(Protoss.PhotonCannon)) return
     
     if (target.visible) {

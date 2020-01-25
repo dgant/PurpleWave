@@ -1,7 +1,9 @@
 package Micro.Actions.Commands
 
+import Information.Geography.Pathfinding.PathfindProfile
 import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Actions.Combat.Maneuvering.Traverse
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Move extends Action {
@@ -13,6 +15,25 @@ object Move extends Action {
   
   override def perform(unit: FriendlyUnitInfo) {
     val pixelToMove = unit.agent.toTravel.get
+
+    // Do a pathfinding move
+    if ( ! With.performance.danger) {
+      val tileToMove = pixelToMove.tileIncluding
+      if ( ! unit.flying
+        && unit.agent.path.isEmpty
+        && unit.pixelDistanceTravelling(tileToMove) > 128 + unit.pixelDistanceCenter(pixelToMove)) {
+         val profile = new PathfindProfile(unit.tileIncludingCenter)
+            profile.end                 = Some(tileToMove)
+            profile.lengthMaximum       = Some(8)
+            profile.threatMaximum       = Some(0)
+            profile.canCrossUnwalkable  = false
+            profile.allowGroundDist     = true
+            profile.unit = Some(unit)
+        val path = profile.find
+        val traverse = new Traverse(path)
+        traverse.consider(unit)
+      }
+    }
     
     if (unit.agent.shouldEngage
       && With.reaction.agencyAverage > 12

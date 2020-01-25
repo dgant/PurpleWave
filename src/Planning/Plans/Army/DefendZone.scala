@@ -11,7 +11,7 @@ class DefendZone(zone: Zone) extends SquadPlan[GoalDefendZone] {
   
   override def onUpdate() {
   
-    if (enemies.size < 3 && enemies.forall(e => e.unitClass.isWorker || ! e.canAttack)) {
+    if (enemies.size < 3 && enemies.forall(e => (e.unitClass.isWorker || ! e.canAttack) && (e.isOverlord() || ! e.unitClass.isTransport))) {
       return
     }
   

@@ -113,13 +113,13 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   }
   @inline final def nearestWalkableTerrain: Tile = {
     val ti = tileIncluding
-    if (ti.valid && With.grids.walkableTerrain.values(ti.i)) return ti
+    if (ti.valid && With.grids.walkable.getUnchecked(ti.i)) return ti
     val tx = x / 32
     val ty = y / 32
     val dx = if (x % 32 < 16) -1 else 1
     val dy = if (y % 32 < 16) -1 else 1
     val xFirst = Math.abs(16 - (x % 32)) > Math.abs(16 - (y % 32))
-    def test(tile: Tile): Option[Tile] = if (tile.valid && With.grids.walkableTerrain.values(tile.i)) Some(tile) else None
+    def test(tile: Tile): Option[Tile] = if (tile.valid && With.grids.walkable.getUnchecked(tile.i)) Some(tile) else None
     def flip(t0: Tile, t1: Tile): Option[Tile] = if (xFirst) test(t0).orElse(test(t1)) else test(t1).orElse(test(t0))
 
     val output =
@@ -127,9 +127,7 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
       .orElse(test(Tile(tx + dx, ty + dy)))
       .orElse(flip(Tile(tx + dx, ty - dy), Tile(tx - dx, ty + dy)))
       .orElse(test(Tile(tx - dx, ty - dy)))
-      .orElse(Spiral.points(16).view.map(ti.add).find(tile =>
-        tile.valid && With.grids.walkableTerrain.getUnchecked(tile.i)
-      ))
+      .orElse(Spiral.points(16).view.map(ti.add).find(tile => tile.valid && With.grids.walkable.getUnchecked(tile.i)))
       .getOrElse(tileIncluding)
     output
   }

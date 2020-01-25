@@ -6,9 +6,10 @@ import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.ReactToDarkTemplarEmergencies
+import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAtRatio, PumpWorkers}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
+import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
+import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
 import Planning.Plans.Scouting.ScoutForCannonRush
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
@@ -20,12 +21,11 @@ import Strategery.Strategies.Protoss.PvP1ZealotExpand
 class PvP1ZealotExpand extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(PvP1ZealotExpand)
-  override val completionCriteria: Predicate = new Latch(new And(new BasesAtLeast(2), new UnitsAtLeast(3, Protoss.Gateway)))
+  override val completionCriteria: Predicate = new Latch(new And(new BasesAtLeast(2), new UnitsAtLeast(5, Protoss.Gateway)))
 
   override def attackPlan: Plan = new If(new EnemyStrategy(With.fingerprints.nexusFirst), new Attack)
 
   override def emergencyPlans: Seq[Plan] = Vector(
-    new PvPIdeas.ReactToDarkTemplarEmergencies,
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToProxyGateways,
     new PvPIdeas.ReactTo2Gate,
@@ -48,18 +48,32 @@ class PvP1ZealotExpand extends GameplanTemplate {
         Get(2,  Protoss.Nexus),
         Get(17, Protoss.Probe))))
 
+  override def workerPlan: Plan = new If(
+    new UnitsAtLeast(5, Protoss.Gateway),
+    new PumpWorkers,
+    new PumpWorkers(maximumTotal = 25))
+
   override def buildPlans = Vector(
+    new CapGasAt(250),
+    new CapGasWorkersAtRatio(.14),
     new If(
       new EnemiesAtLeast(2, Protoss.Zealot),
       new BuildOrder(Get(2, Protoss.Zealot))),
-    new If(new Or(new EnemiesAtLeast(1, Protoss.CitadelOfAdun), new EnemiesAtLeast(1, Protoss.TemplarArchives)), new BuildCannonsAtNatural(1)),
+    new If(new EnemiesAtLeast(1, Protoss.CitadelOfAdun), new BuildCannonsAtNatural(1)),
+    new If(new Or(new EnemiesAtLeast(1, Protoss.TemplarArchives), new EnemyHasShown(Protoss.DarkTemplar)), new Parallel(
+      new BuildCannonsAtNatural(1),
+      new BuildCannonsInMain(1),
+      new BuildCannonsAtNatural(2))),
     new Build(
       Get(Protoss.Assimilator),
-      Get(Protoss.CyberneticsCore),
+      Get(Protoss.CyberneticsCore)),
+    new ReactToDarkTemplarEmergencies,
+    new Build(
       Get(3, Protoss.Gateway),
       Get(Protoss.DragoonRange)),
-    new ReactToDarkTemplarEmergencies,
     new PvPIdeas.TrainArmy,
-    new RequireMiningBases(2)
+    new RequireMiningBases(2),
+    new Build(Get(5, Protoss.Gateway)),
+    new BuildGasPumps
   )
 }

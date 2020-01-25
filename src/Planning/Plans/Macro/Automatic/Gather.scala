@@ -118,19 +118,13 @@ class Gather extends Plan {
     newGas().foreach(includeResource)
     resourcesToExclude().foreach(excludeResource)
 
-    // Count gas workers
-    var gasWorkersNow = resourceByWorker.count(_._2.unitClass.isGas)
-
     val totalMineralPatches = With.geography.ourBases.view.map(_.minerals.size).sum
-    val totalGasPumps = With.geography.ourBases.view.map(_.gas.count(_.isOurs)).sum
-    val canDistanceMine = totalMineralPatches < 7
-    val gasWorkersMax = Math.min(
-      3 * totalGasPumps,
-      PurpleMath.clamp(
-        Math.round(With.blackboard.gasTargetRatio() * workers.size).toInt,
-        With.blackboard.gasWorkerFloor(),
-        With.blackboard.gasWorkerCeiling()))
-    val needMoreGasWorkers = gasWorkersNow < gasWorkersMax
+    val totalGasPumps       = With.geography.ourBases.view.map(_.gas.count(_.isOurs)).sum
+    val canDistanceMine     = totalMineralPatches < 7
+    var gasWorkersNow       = resourceByWorker.count(_._2.unitClass.isGas)
+    val gasWorkerTarget     = PurpleMath.clamp(Math.round(With.blackboard.gasWorkerRatio() * workers.size).toInt, With.blackboard.gasWorkerFloor(), With.blackboard.gasWorkerCeiling())
+    val gasWorkersMax       = PurpleMath.clamp(gasWorkerTarget,workers.size - 2 * totalMineralPatches, 3 * totalGasPumps)
+    val needMoreGasWorkers  = gasWorkersNow < gasWorkersMax
 
     // Update workers in priority order.
     //

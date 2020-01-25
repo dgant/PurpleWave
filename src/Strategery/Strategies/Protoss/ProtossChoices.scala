@@ -69,7 +69,14 @@ object ProtossChoices {
   /////////
   // PvP //
   /////////
-  
+
+  val pvpSpecialtyOpeners = Vector(
+    PvE1BaseIslandCarrier,
+    PvE15BaseIslandCarrier,
+    PvE2BaseIslandCarrier,
+    PvE3BaseIslandCarrier
+  )
+
   val pvpOpenersWithoutTransitions = Vector(
     PvP1ZealotExpand,
     PvP2GateDTExpand,
@@ -104,19 +111,13 @@ object ProtossChoices {
   )
   
   val pvzOpenersTransitioningFrom1GateCore = Vector(
-    PvZ4Gate99,
-    PvZ4Gate1012
+    PvZ2Gate910,
+    PvZ2Gate1012
   )
 
   val pvzOpenersTransitioningFrom2Gate = Vector(
-    PvZ4Gate99,
-    PvZ4Gate1012
-  )
-  
-  val pvzMidgameTransitioningFromOneBase = Vector(
-    PvZMidgame4Gate2Archon,
-    PvZMidgame5GateGoon,
-    PvZMidgame5GateGoonReaver
+    PvZ2Gate910,
+    PvZ2Gate1012
   )
   
   val pvzMidgameTransitioningFromTwoBases = Vector(

@@ -3,6 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvE
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.{Get, GetAnother}
+import Planning.Plans.Army.KillPsiDisruptor
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.ProposePlacement
@@ -11,8 +12,9 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMinin
 import Planning.Plans.Macro.Protoss.BuildTowersAtBases
 import Planning.Predicates.Milestones.{EnemyHasShown, OnGasPumps, UnitsAtLeast, UpgradeComplete}
 import Planning.Predicates.Reactive.EnemyMutalisks
+import Planning.Predicates.Strategy.OnMap
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import Strategery.Plasma
+import Strategery.{Plasma, Sparkle}
 import Utilities.ByOption
 
 class PlaceIslandPylons extends ProposePlacement {
@@ -72,6 +74,8 @@ class PvEIslandCarrierLateGame extends Parallel(
     Get(Protoss.CyberneticsCore),
     Get(Protoss.Stargate)),
   new BuildGasPumps,
+
+  new If(new OnMap(Sparkle), new Parallel(new Build(Get(2, Protoss.Zealot)), new KillPsiDisruptor)),
 
   // Corsairs
   new If(

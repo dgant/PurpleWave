@@ -164,7 +164,7 @@ object ShowUnitsFriendly extends View {
 
     if (showLeaders) {
       if (agent.leader().contains(unit)) {
-        val start = unit.pixelCenter.add(0, unit.bottom + 8)
+        val start = unit.pixelCenter.add(0, unit.unitClass.dimensionDown + 8)
         DrawMap.box(start.subtract(4, 4), start.add(4, 4), color = unit.player.colorDeep)
         DrawMap.drawStar(start, 4, Colors.NeonYellow)
       }

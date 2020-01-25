@@ -35,6 +35,7 @@ object PvPIdeas {
 
   class PvPSafeToMoveOut extends Or(
     new BasesAtLeast(3),
+    new EnemyBasesAtLeast(3),
     new And(
       new EnemyStrategy(With.fingerprints.cannonRush),
       new EnemiesAtMost(0, UnitMatchWarriors)),
@@ -49,8 +50,6 @@ object PvPIdeas {
           new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
           new EnemiesAtMost(0, UnitMatchOr(Protoss.Observer, Protoss.PhotonCannon))),
         new EnemyStrategy(With.fingerprints.cannonRush),
-        new MiningBasesAtLeast(3),
-        new EnemyBasesAtLeast(3),
         new SafeToMoveOut),
       // Is an attack less likely to succeed than we are to get backstabbed or counter-pushed?
       // Inspired by Locutus turtling on one base and then either dropping us or four-gating behind the cannons.

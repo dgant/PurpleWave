@@ -13,7 +13,7 @@ import Planning.Plans.Macro.Build.{CancelOrders, ProposePlacement}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
-import Planning.Plans.Scouting.{ScoutCleared, ScoutForCannonRush}
+import Planning.Plans.Scouting.{FoundEnemyBase, ScoutCleared, ScoutForCannonRush}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyDarkTemplarLikely, SafeAtHome}
@@ -32,20 +32,22 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
 
   override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
 
-  override val attackPlan  = new Trigger(
+  override val attackPlan = new If(
     new Or(
-      new UnitsAtLeast(1, Protoss.DarkTemplar),
+      // It's our timing
+      new Latch(new UnitsAtLeast(1, Protoss.DarkTemplar)),
       new And(
-        new UpgradeStarted(Protoss.DragoonRange),
-        new Not(new EnemyStrategy(With.fingerprints.proxyGateway)),
-        new PvPIdeas.PvPSafeToMoveOut),
-      new And(
-        new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
-        new EnemyStrategy(With.fingerprints.proxyGateway))),
+        new FoundEnemyBase,
+        // Attack greedy openings
+        new Or(
+          new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.oneGateCore),
+          new Not(new EnemyHasShown(Protoss.Zealot))),
+        // Pressure proxy opening
+        new Or(
+          new Not(new EnemyStrategy(With.fingerprints.proxyGateway)),
+          new UnitsAtLeast(1, Protoss.Dragoon, complete = true)))),
     new Attack,
-    new If(
-      new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.oneGateCore),
-      new PvPIdeas.AttackSafely))
+    new PvPIdeas.AttackSafely)
 
   override def placementPlan: Plan = new Parallel(
     super.placementPlan,

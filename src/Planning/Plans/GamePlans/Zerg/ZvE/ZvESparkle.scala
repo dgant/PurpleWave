@@ -6,7 +6,7 @@ import Macro.BuildRequests.Get
 import Micro.Agency.Intention
 import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitMatchers.UnitMatchOr
+import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.NoPlan
@@ -29,7 +29,7 @@ class ZvESparkle extends GameplanTemplate {
   
   class KillNeutralBlocker extends Plan() {
     val killers = new LockUnits
-    killers.unitMatcher.set(Zerg.Zergling)
+    killers.unitMatcher.set(UnitMatchWarriors)
     killers.unitCounter.set(UnitCountEverything)
     override def onUpdate() {
       val targets = With.geography.ourZones.flatMap(_.units.filter(_.is(Neutral.PsiDisruptor)))

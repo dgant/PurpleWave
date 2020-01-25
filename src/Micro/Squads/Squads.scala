@@ -8,4 +8,8 @@ class Squads extends SquadBatcher {
   def updateGoals() {
     allByPriority.foreach(_.run())
   }
+
+  def clearConscripts(): Unit = {
+    all.foreach(_.clearConscripts())
+  }
 }

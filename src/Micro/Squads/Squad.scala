@@ -43,17 +43,35 @@ class Squad(val client: Plan) {
 
   def units: Set[FriendlyUnitInfo] = _unitsCache()
   def previousUnits: Set[FriendlyUnitInfo] = _previousunitsCache()
-  private var _units: mutable.Set[FriendlyUnitInfo] = mutable.Set.empty
-  private var _previousUnits: mutable.Set[FriendlyUnitInfo] = mutable.Set.empty
-  private val _unitsCache = new Cache(() => _units.toSet)
-  private val _previousunitsCache = new Cache(() => _previousUnits.toSet)
+  private var _units: Set[FriendlyUnitInfo] = Set.empty
+  private var _conscripts: mutable.Set[FriendlyUnitInfo] = mutable.Set.empty
+  private var _freelancers: mutable.Set[FriendlyUnitInfo] = mutable.Set.empty
+  private var _previousFreelancers: mutable.Set[FriendlyUnitInfo] = mutable.Set.empty
+  private val _unitsCache = new Cache(() => _freelancers.toSet)
+  private val _previousunitsCache = new Cache(() => _previousFreelancers.toSet)
 
-  final def clearUnits(): Unit = {
-    _previousUnits = _units
-    _units = mutable.Set.empty
+  final def clearFreelancers(): Unit = {
+    _previousFreelancers = _freelancers
+    _freelancers = mutable.Set.empty
+    updateUnits()
   }
 
-  final def addUnits(unit: Seq[FriendlyUnitInfo]): Unit = {
-    _units ++= unit
+  final def clearConscripts(): Unit = {
+    _conscripts.clear()
+    updateUnits()
+  }
+
+  final def addFreelancers(units: Iterable[FriendlyUnitInfo]): Unit = {
+    _freelancers ++= units
+    updateUnits()
+  }
+
+  final def addConscripts(units: Iterable[FriendlyUnitInfo]): Unit = {
+    _conscripts ++= units
+    updateUnits()
+  }
+
+  final private def updateUnits(): Unit = {
+    _units = _conscripts.toSet.union(_freelancers)
   }
 }

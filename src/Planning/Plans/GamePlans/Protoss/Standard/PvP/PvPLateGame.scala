@@ -30,7 +30,7 @@ class PvPLateGame extends GameplanTemplate {
 
   override def archonPlan: Plan = new PvPIdeas.MeldArchonsPvP
 
-  val goingTemplar = new Sticky(new UnitsAtLeast(1, Protoss.CitadelOfAdun))
+  val goingTemplar = new Not(new Sticky(new UnitsAtLeast(1, Protoss.RoboticsSupportBay)))
 
   val buildCannons = new And(
     // It's a good bet to do so; DT are the scariest threat
@@ -64,7 +64,7 @@ class PvPLateGame extends GameplanTemplate {
         Get(Protoss.CitadelOfAdun),
         Get(2, Protoss.Gateway),
         Get(Protoss.TemplarArchives),
-        Get(5, Protoss.Gateway),
+        Get(6, Protoss.Gateway),
         Get(2, Protoss.Assimilator)),
       new BuildGasPumps,
       new Build(
@@ -96,6 +96,7 @@ class PvPLateGame extends GameplanTemplate {
           Get(Protoss.ShuttleSpeed))),
       new BuildGasPumps,
       new Build(
+        Get(6, Protoss.Gateway),
         Get(Protoss.CitadelOfAdun),
         Get(Protoss.ZealotSpeed),
         Get(7, Protoss.Gateway),
@@ -134,7 +135,9 @@ class PvPLateGame extends GameplanTemplate {
         new UnitsAtLeast(7, Protoss.Gateway)),
       new And(
         new Not(goingTemplar),
-        new UnitsAtLeast(5, Protoss.Gateway, complete = true))))
+        new UnitsAtLeast(5, Protoss.Gateway, complete = true),
+        new UnitsAtLeast(1, Protoss.Shuttle, complete = true),
+        new UnitsAtLeast(1, Protoss.Reaver, complete = true))))
 
   class SafeForThird extends And(
     new SafeToMoveOut,

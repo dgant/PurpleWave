@@ -67,11 +67,11 @@ class TournamentPlaybook extends PurpleWavePlaybook {
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvZFFEEconomic, PvZMidgameNeoBisu, PvZLateGameTemplar)
+  override lazy val forced: Seq[Strategy] = Seq(PvZ2Gate910, PvZ4GatePlusOne, PvZMidgame5GateGoon, PvZLateGameReaver)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
   override def respectOpponent: Boolean = false
   override def respectMap: Boolean = false
   override def respectHistory: Boolean = false
 }
 
-object Playbook extends TournamentPlaybook {}
+object Playbook extends TestingPlaybook {}

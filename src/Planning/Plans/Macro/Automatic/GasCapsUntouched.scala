@@ -9,6 +9,6 @@ class GasCapsUntouched extends Predicate {
     && ! With.blackboard.gasWorkerFloor.isSet
     && ! With.blackboard.gasLimitFloor.isSet
     && ! With.blackboard.gasLimitCeiling.isSet
-    && ! With.blackboard.gasTargetRatio.isSet
+    && ! With.blackboard.gasWorkerRatio.isSet
   )
 }

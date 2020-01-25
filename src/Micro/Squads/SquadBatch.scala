@@ -73,7 +73,7 @@ class SquadBatch {
   }
 
   def apply(): Unit = {
-    With.squads.all.foreach(squad => squad.clearUnits())
-    assignments.foreach(assignment => assignment.squad.addUnits(assignment.units))
+    With.squads.all.foreach(squad => squad.clearFreelancers())
+    assignments.foreach(assignment => assignment.squad.addFreelancers(assignment.units))
   }
 }

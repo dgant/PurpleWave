@@ -64,6 +64,7 @@ class TaskPlanning extends AbstractTask {
     With.recruiter.update()
     With.prioritizer.update()
     With.scheduler.reset()
+    With.squads.clearConscripts()
     With.squads.startNewBatch()
     With.buildOrderHistory.update()
     With.blackboard.reset()

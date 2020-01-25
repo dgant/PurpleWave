@@ -27,15 +27,21 @@ object PvZ1BaseForgeTech extends PvZStrategy {
   override def responsesWhitelisted: Iterable[Fingerprint] = Seq(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.ninePoolGas)
   override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgameNeoBisu))
 }
+object PvZ4GatePlusOne extends PvZStrategy {
+  override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgame5GateGoon, PvZMidgame5GateGoonReaver, PvZMidgameBisu, PvZMidgameNeoBisu, PvZMidgameNeoNeoBisu, PvZMidgame4Gate2Archon))
+}
+object PvZ4GateGoon extends PvZStrategy {
+  override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgame5GateGoon, PvZMidgame5GateGoonReaver))
+}
 object PvZProxy2Gate extends PvZ2GateOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
   override def responsesBlacklisted = Iterable(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.tenHatch)
 }
-object PvZ4Gate1012 extends PvZ2GateOpening {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(ProtossChoices.pvzMidgameTransitioningFromOneBase)
+object PvZ2Gate1012 extends PvZ2GateOpening {
+  override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(PvZ4GatePlusOne, PvZ4GateGoon))
 }
-object PvZ4Gate99 extends PvZ2GateOpening {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(ProtossChoices.pvzMidgameTransitioningFromOneBase)
+object PvZ2Gate910 extends PvZ2GateOpening {
+  override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(PvZ4GatePlusOne, PvZ4GateGoon))
 }
 object PvZFFEConservative extends PvZFFEOpening {
   override def responsesWhitelisted: Iterable[Fingerprint] = Vector(With.fingerprints.fourPool)

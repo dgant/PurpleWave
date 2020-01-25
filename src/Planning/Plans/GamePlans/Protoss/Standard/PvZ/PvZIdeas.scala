@@ -38,7 +38,7 @@ object PvZIdeas {
     new Or(
       new SafeToMoveOut,
       new BasesAtLeast(3),
-      new Employing(PvZProxy2Gate, PvZ4Gate99, PvZ4Gate1012)),
+      new Employing(PvZProxy2Gate, PvZ2Gate910, PvZ2Gate1012)),
     new Attack)
 
   class TemplarUpToEight extends MeldArchons(49) { override def maximumTemplar = 8 }

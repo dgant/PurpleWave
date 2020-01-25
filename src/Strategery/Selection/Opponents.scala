@@ -21,8 +21,7 @@ object Opponents {
   val zergRotation = Vector(
     Seq(PvZ4Gate1012,       PvZMidgame5GateGoon,  PvZLateGameTemplar),
     Seq(PvZFFEEconomic,     PvZMidgameBisu,       PvZLateGameTemplar),
-    Seq(PvZ4Gate99,         PvZMidgame5GateGoon,  PvZLateGameReaver),
-    Seq(PvZ1BaseForgeTech,  PvZMidgameNeoBisu,    PvZLateGameTemplar))
+    Seq(PvZ4Gate99,         PvZMidgame5GateGoon,  PvZLateGameReaver))
 
   // TorchUp opponents
 

@@ -93,7 +93,7 @@ abstract class DefendFFEWithProbes extends Plan {
         toLeash   = Some(Leash(toDefend, 32.0 * 4.0))
       }))
       if (ShowUnitsFriendly.mapInUse) {
-        workers.foreach(w => DrawMap.circle(w.agent.toTravel.get, 16, Colors.NeonYellow))
+        workers.foreach(w => DrawMap.circle(toDefend, 16, Colors.NeonYellow))
       }
     })
   }

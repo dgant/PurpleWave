@@ -144,7 +144,7 @@ object PvZIdeas {
             new Pump(Protoss.PhotonCannon, 5)),
           new PumpRatio(Protoss.PhotonCannon, 1, 8,
             Seq(
-              Enemy(Zerg.Zergling, 0.3),
+              Enemy(Zerg.Zergling, 0.416), // Highest ratio that doesn't produce a third cannon vs. 6
               Enemy(Zerg.Hydralisk, 0.75),
               Friendly(Protoss.Zealot, -1.0)))))))
 

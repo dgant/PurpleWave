@@ -31,7 +31,8 @@ class Visualization {
 
     ShowPerformanceSummary,
     ShowSaturation,
-    ShowFingerprints
+    ShowFingerprints,
+    ShowBases
   )
 
   var enabled   : Boolean = _

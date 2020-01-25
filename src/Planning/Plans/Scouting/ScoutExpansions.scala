@@ -5,7 +5,7 @@ import Planning.Plans.Army.SquadPlan
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran}
 
-class FindExpansions(matcher: UnitMatcher = UnitMatchAnd(
+class ScoutExpansions(matcher: UnitMatcher = UnitMatchAnd(
   UnitMatchRecruitableForCombat,
   UnitMatchNot(UnitMatchWorkers),
   UnitMatchNot(Terran.Medic),

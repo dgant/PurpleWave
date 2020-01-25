@@ -17,8 +17,8 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   // If you try to compare a Tile to a non-Tile you can get incorrect results.
   // Invalid tiles can also produce incorrect results.
   // For example, on a 256 x 256 map: (0, 1) == (-256, 0)
-  final override def equals(other: scala.Any): Boolean = hashCode == other.hashCode
-  final override def hashCode: Int = i
+  @inline final override def equals(other: scala.Any): Boolean = hashCode == other.hashCode
+  @inline final override def hashCode: Int = i
   
   @inline
   final def valid: Boolean = {
@@ -81,6 +81,7 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   final def tileDistanceSlow(tile: Tile): Double = {
     Math.sqrt(tileDistanceSquared(tile))
   }
+  @inline
   private val sqrt2m1 = Math.sqrt(2) - 1
   @inline
   final def tileDistanceFast(tile: Tile): Double = {
@@ -90,6 +91,7 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     val dy = Math.abs(y - tile.y)
     0.941256 * Math.max(dx, dy) + Math.min(dx, dy) * sqrt2m1
   }
+  @inline
   def tileDistanceSquared(tile: Tile): Int = {
     val dx = x - tile.x
     val dy = y - tile.y

@@ -43,15 +43,15 @@ abstract class AbstractFindBuildings extends Action {
         if (With.geography.enemyBases.size == 1 && unit.matchups.threats.forall(_.unitClass.isWorker))
           With.geography.enemyBases.head.natural.map(Vector(_)).getOrElse(nearestNeutralBases(1))
         // Scout for third bases -- Disabled so we can get a better sense of enemy tech/army size
-        //else if (With.geography.enemyBases.size <= With.geography.ourBases.size)
-        // nearestNeutralBases(if (With.enemy.isZerg) 5 else 2)
+        // else if (With.geography.enemyBases.size <= With.geography.ourBases.size)
+        //   nearestNeutralBases(if (With.enemy.isZerg) 5 else 2)
         else
           Vector.empty)
   
     val tilesToScout = basesToScout
       .flatMap(base => {
         val tiles = base.zone.tiles.filter(tile =>
-          ! base.harvestingArea.contains(tile) //Don't walk into worker line
+          ! base.harvestingArea.contains(tile) // Don't walk into worker line
           && With.grids.walkable.get(tile)
           && With.grids.friendlyVision.framesSince(tile) > boredomFrames)
       

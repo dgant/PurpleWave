@@ -10,7 +10,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Terran.{BuildBunkersAtNatural, BuildMissileTurretsAtBases, BuildMissileTurretsAtNatural}
-import Planning.Plans.Scouting.FindExpansions
+import Planning.Plans.Scouting.ScoutExpansions
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyLurkers, EnemyMutalisks, SafeToMoveOut}
@@ -51,7 +51,7 @@ class TvZSK extends GameplanTemplate {
   override def scoutPlan: Plan = NoPlan()
   override def attackPlan: Plan = new Parallel(
     new If(new CanAttack, new Attack),
-    new FindExpansions(Terran.Wraith),
+    new ScoutExpansions(Terran.Wraith),
     new Attack(Terran.Battlecruiser))
   override def priorityAttackPlan: Plan = new If(new CanAttack, new Attack(UnitMatchOr(Terran.Ghost, Terran.Vulture)))
   override def workerPlan: Plan = new Parallel(

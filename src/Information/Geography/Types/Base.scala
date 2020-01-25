@@ -1,12 +1,14 @@
 package Information.Geography.Types
 
 import Lifecycle.With
-import Mathematics.Points.{Tile, TileRectangle}
+import Mathematics.Points.{PixelRay, Tile, TileRectangle}
 import Mathematics.PurpleMath
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.EnrichPixel._
+
+import scala.collection.mutable
 
 class Base(val townHallTile: Tile)
 {
@@ -65,6 +67,21 @@ class Base(val townHallTile: Tile)
       output
     }
   }
+  lazy val resourcePathTiles: Set[Tile] = {
+    val output = new mutable.ArrayBuffer[Tile]
+    val townHallTiles = townHallArea.tiles
+    def hallDistanceSquared(resourceTile: Tile): Double = townHallTiles.map(resourceTile.tileDistanceSquared).min
+    resources.sortBy(_.pixelDistanceCenter(heart.pixelCenter)).foreach(resource => {
+      val resourceTiles   = resource.tileArea.tiles
+      val bestDistance    = resourceTiles.map(hallDistanceSquared).min
+      val from            = resourceTiles.filter(hallDistanceSquared(_) <= bestDistance).minBy(_.tileDistanceSquared(heart))
+      val to              = townHallArea.tiles.minBy(_.tileDistanceSquared(from))
+      val route           = PixelRay(from.pixelCenter, to.pixelCenter)
+      output ++= route.tilesIntersected
+    })
+    output.toSet
+  }
+  lazy val resourcePathTilesI: Set[Int] = resourcePathTiles.map(_.i)
   
   var mineralsLeft              = 0
   var gasLeft                   = 0

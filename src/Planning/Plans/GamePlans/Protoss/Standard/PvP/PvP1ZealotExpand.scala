@@ -83,7 +83,9 @@ class PvP1ZealotExpand extends GameplanTemplate {
       Get(Protoss.DragoonRange)),
     new PvPIdeas.TrainArmy,
     new RequireMiningBases(2),
-    new Build(Get(5, Protoss.Gateway)),
+    new Build(
+      Get(Protoss.Forge),
+      Get(5, Protoss.Gateway)),
     new BuildGasPumps
   )
 }

@@ -4,7 +4,6 @@ package Micro.Actions.Combat.Decisionmaking
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
-import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Transportation.Caddy.Shuttling
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -17,7 +16,7 @@ object FightOrFlight extends Action {
   }
 
   def potentiallyUseful(unit: FriendlyUnitInfo): Boolean = {
-    if (Target.legalTargetsRequired(unit).nonEmpty) return true
+    if (unit.matchups.targets.nonEmpty) return true
     if (unit.unitClass.spells.exists(spell => With.self.hasTech(spell) && unit.energy >= spell.energyCost)) return true
     if (unit.unitClass.isDetector && ! unit.matchups.enemies.exists(t => t.cloaked && ( ! unit.agent.canFocus || unit.squadenemies.contains(t)))) return true
     false

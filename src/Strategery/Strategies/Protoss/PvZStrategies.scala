@@ -33,15 +33,25 @@ object PvZ4GatePlusOne extends PvZStrategy {
 object PvZ4GateGoon extends PvZStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgame5GateGoon, PvZMidgame5GateGoonReaver))
 }
+object PvZCorsair extends PvZStrategy {
+  override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgameBisu, PvZMidgameNeoBisu, PvZMidgameNeoNeoBisu, PvZMidgame4Gate2Archon))
+}
+object PvZDT extends PvZStrategy {
+  override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgameBisu, PvZMidgameNeoBisu, PvZMidgameNeoNeoBisu, PvZMidgame4Gate2Archon))
+}
 object PvZProxy2Gate extends PvZ2GateOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
   override def responsesBlacklisted = Iterable(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.tenHatch)
 }
+object PvZ10Gate extends PvZ2GateOpening {
+  override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(PvZ4GatePlusOne, PvZ4GateGoon, PvZDT, PvZCorsair))
+}
 object PvZ2Gate1012 extends PvZ2GateOpening {
-  override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(PvZ4GatePlusOne, PvZ4GateGoon))
+  override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(PvZ4GatePlusOne, PvZ4GateGoon, PvZDT))
 }
 object PvZ2Gate910 extends PvZ2GateOpening {
-  override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(PvZ4GatePlusOne, PvZ4GateGoon))
+  override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(PvZ4GatePlusOne, PvZ4GateGoon, PvZDT))
+  override def responsesWhitelisted: Iterable[Fingerprint] = Vector(With.fingerprints.fourPool, With.fingerprints.twelveHatch)
 }
 object PvZFFEConservative extends PvZFFEOpening {
   override def responsesWhitelisted: Iterable[Fingerprint] = Vector(With.fingerprints.fourPool)

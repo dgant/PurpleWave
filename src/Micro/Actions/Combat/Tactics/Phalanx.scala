@@ -5,8 +5,9 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
-import Micro.Actions.Combat.Decisionmaking.{Disengage, Engage}
+import Micro.Actions.Combat.Decisionmaking.Engage
 import Micro.Actions.Combat.Maneuvering.Traverse
+import Micro.Actions.Combat.Techniques.FallBack
 import Micro.Actions.Commands.Move
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.Protoss
@@ -81,9 +82,9 @@ object Phalanx extends Action {
       profile.costThreat          = 3f
       profile.unit = Some(unit)
       val path = profile.find
-      new Traverse(path).delegate(unit)
-      Disengage.delegate(unit)
+      new Traverse(path, move = false).delegate(unit)
     }
+    FallBack.delegate(unit)
     Move.delegate(unit)
   }
 }

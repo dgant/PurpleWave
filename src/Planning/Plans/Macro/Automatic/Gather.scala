@@ -122,9 +122,14 @@ class Gather extends Plan {
     val totalGasPumps       = With.geography.ourBases.view.map(_.gas.count(_.isOurs)).sum
     val canDistanceMine     = totalMineralPatches < 7
     var gasWorkersNow       = resourceByWorker.count(_._2.unitClass.isGas)
-    val gasWorkerTarget     = PurpleMath.clamp(Math.round(With.blackboard.gasWorkerRatio() * workers.size).toInt, With.blackboard.gasWorkerFloor(), With.blackboard.gasWorkerCeiling())
-    val gasWorkersMax       = PurpleMath.clamp(gasWorkerTarget,workers.size - 2 * totalMineralPatches, 3 * totalGasPumps)
-    val needMoreGasWorkers  = gasWorkersNow < gasWorkersMax
+    var gasWorkerTarget     = PurpleMath.clamp(Math.round(With.blackboard.gasWorkerRatio() * workers.size).toInt, With.blackboard.gasWorkerFloor(), With.blackboard.gasWorkerCeiling())
+    gasWorkerTarget         = PurpleMath.clamp(gasWorkerTarget, workers.size - 2 * totalMineralPatches, 3 * totalGasPumps)
+    if (With.self.gas < With.blackboard.gasLimitFloor()) {
+      gasWorkerTarget = 3 * totalGasPumps
+    } else {
+      gasWorkerTarget = PurpleMath.clamp(gasWorkerTarget, 0, (With.blackboard.gasLimitCeiling() - With.self.gas + 7) / 8)
+    }
+    val needMoreGasWorkers  = gasWorkersNow < gasWorkerTarget
 
     // Update workers in priority order.
     //
@@ -150,7 +155,7 @@ class Gather extends Plan {
             ))
           .toMap
       } else Map.empty
-    val respectCooldown = gasWorkersNow >= gasWorkersMax
+    val respectCooldown = gasWorkersNow >= gasWorkerTarget
 
     def workerOrder(worker: FriendlyUnitInfo): Double = {
       lazy val cd = workerCooldownUntil.getOrElse(worker, 0).toDouble
@@ -180,18 +185,18 @@ class Gather extends Plan {
           gasWorkersNow -= 1
         }
 
-        val gasWorkerDesire = gasWorkersNow < gasWorkersMax
+        val gasWorkerDesired = gasWorkersNow < gasWorkerTarget
 
         // For easy debugging
         if (worker.selected) {
-          val scores = workersByResource.keysIterator.map(ResourceScore(worker, _, gasWorkerDesire, resourceBefore)).toVector.sortBy(_.output)
+          val scores = workersByResource.keysIterator.map(ResourceScore(worker, _, gasWorkerDesired, resourceBefore)).toVector.sortBy(_.output)
           if (With.frame < 0) { // Cheat the optimizer
             System.out.println(scores.toString)
           }
         }
 
         // Assign the worker to tbhe best resource
-        val resourceBestScore = ByOption.maxBy(workersByResource.keysIterator.map(ResourceScore(worker, _, gasWorkerDesire, resourceBefore)))(_.output)
+        val resourceBestScore = ByOption.maxBy(workersByResource.keysIterator.map(ResourceScore(worker, _, gasWorkerDesired, resourceBefore)))(_.output)
         resourceBestScore.foreach(bestResourceScore => {
           val bestResource = bestResourceScore.resource
           assignWorker(worker, bestResource)

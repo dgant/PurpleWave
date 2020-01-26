@@ -41,18 +41,19 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val targetsInRange         : Vector[UnitInfo]    = targets.filter(target => target.visible && me.pixelRangeAgainst(target) >= target.pixelDistanceEdge(me, at) - me.pixelsTravelledMax(frame) - target.pixelsTravelledMax(frame) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
   lazy val nearestArbiter         : Option[UnitInfo]    = ByOption.minBy(allies.view.filter(_.is(Protoss.Arbiter)))(_.pixelDistanceSquared(me))
 
-  def isCatcher(actor: UnitInfo): Boolean = {
-    lazy val ourSpeed = Math.max(actor.topSpeed, actor.friendly.flatMap(_.transport.map(_.topSpeed)).getOrElse(0.0))
-    lazy val weAreFlying = actor.flying || actor.friendly.exists(_.agent.ride.exists(_.flying)) && ! me.flying
+  def isCatcher(catcher: UnitInfo): Boolean = {
+    lazy val catcherSpeed = Math.max(catcher.topSpeed, catcher.friendly.flatMap(_.transport.map(_.topSpeed)).getOrElse(0.0))
+    lazy val catcherFlying = catcher.flying || catcher.friendly.exists(_.agent.ride.exists(_.flying)) && ! me.flying
     val output = (
-      ourSpeed * (if (weAreFlying) 2 else 1) >= me.topSpeed
+      catcherSpeed * (if (catcherFlying) 2 else 1) >= me.topSpeed
+        || (catcher.pixelRangeAgainst(me) > me.effectiveRangePixels && catcher.friendly.exists(_.squadenemies.contains(me)))
         || busyForCatching
-        || actor.is(Zerg.Scourge)
-        || actor.framesToGetInRange(me) < 8
+        || catcher.is(Zerg.Scourge)
+        || catcher.framesToGetInRange(me) < 8
         || (me.unitClass.isWorker && me.base.exists(_.harvestingArea.contains(me.tileIncludingCenter)))
-        || (actor.is(Zerg.Zergling) && With.self.hasUpgrade(Zerg.ZerglingSpeed) && ! me.player.hasUpgrade(Terran.VultureSpeed))
-        || (actor.is(Protoss.Zealot) && me.isDragoon() && ! me.player.hasUpgrade(Protoss.DragoonRange))
-        || (actor.is(Protoss.DarkTemplar) && me.isDragoon()))
+        || (catcher.is(Zerg.Zergling) && With.self.hasUpgrade(Zerg.ZerglingSpeed) && ! me.player.hasUpgrade(Terran.VultureSpeed))
+        || (catcher.is(Protoss.Zealot) && me.isDragoon() && ! me.player.hasUpgrade(Protoss.DragoonRange))
+        || (catcher.is(Protoss.DarkTemplar) && me.isDragoon()))
     output
   }
   lazy val busyForCatching  : Boolean        = me.gathering || me.constructing || me.repairing || ! me.canMove || BlockConstruction.buildOrders.contains(me.order)

@@ -211,6 +211,8 @@ object ProtossBuilds {
     Get(8,   Protoss.Probe),
     Get(1,   Protoss.Pylon),
     Get(9,   Protoss.Probe),
+    Get(1,   Protoss.Gateway),
+    Get(10,   Protoss.Probe),
     Get(2,   Protoss.Gateway),
     Get(11,  Protoss.Probe),
     Get(1,   Protoss.Zealot),

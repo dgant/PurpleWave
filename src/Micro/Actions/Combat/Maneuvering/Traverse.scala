@@ -7,7 +7,7 @@ import Micro.Actions.Action
 import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class Traverse(path: TilePath) extends Action {
+class Traverse(path: TilePath, move: Boolean = false) extends Action {
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove && path.pathExists
 
@@ -17,6 +17,9 @@ class Traverse(path: TilePath) extends Action {
     val lookaheadDefault = (2 * unit.unitClass.haltPixels + unit.topSpeed * With.reaction.agencyAverage / 32).toInt
     val lookaheadFinal = PurpleMath.clamp(lookaheadDefault, 8, 12)
     unit.agent.toTravel = Some(path.tiles.get.take(lookaheadFinal).last.pixelCenter)
-    Move.delegate(unit)
+
+    if (move) {
+      Move.delegate(unit)
+    }
   }
 }

@@ -163,8 +163,8 @@ object DrawMap {
     val b = Math.max(2, a / 2)
     val c = Math.max(1, b / 2)
     DrawMap.triangle(pixel.add(-a, -c), pixel.add(a, -c), pixel.add(0, c), color)
-    DrawMap.triangle(pixel.add(0, -a),  pixel.add(0, c),  pixel.add(-b, b), color)
-    DrawMap.triangle(pixel.add(0, -a),  pixel.add(0, c),  pixel.add( b, b), color)
+    DrawMap.triangle(pixel.add(0, -a),  pixel.add(0, c),  pixel.add(-b, b + 1), color)
+    DrawMap.triangle(pixel.add(0, -a),  pixel.add(0, c),  pixel.add( b, b + 1), color)
   }
   
   def irrelevant(points: Iterable[Pixel]): Boolean = {

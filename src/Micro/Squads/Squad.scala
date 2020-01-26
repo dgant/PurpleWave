@@ -41,17 +41,12 @@ class Squad(val client: Plan) {
   // Unit aspects //
   //////////////////
 
-  def units: Set[FriendlyUnitInfo] = _unitsCache()
-  def previousUnits: Set[FriendlyUnitInfo] = _previousunitsCache()
+  def units: Set[FriendlyUnitInfo] = _units
   private var _units: Set[FriendlyUnitInfo] = Set.empty
   private var _conscripts: mutable.Set[FriendlyUnitInfo] = mutable.Set.empty
   private var _freelancers: mutable.Set[FriendlyUnitInfo] = mutable.Set.empty
-  private var _previousFreelancers: mutable.Set[FriendlyUnitInfo] = mutable.Set.empty
-  private val _unitsCache = new Cache(() => _freelancers.toSet)
-  private val _previousunitsCache = new Cache(() => _previousFreelancers.toSet)
 
   final def clearFreelancers(): Unit = {
-    _previousFreelancers = _freelancers
     _freelancers = mutable.Set.empty
     updateUnits()
   }
@@ -72,6 +67,6 @@ class Squad(val client: Plan) {
   }
 
   final private def updateUnits(): Unit = {
-    _units = _conscripts.toSet.union(_freelancers)
+    _units = _conscripts.toSet ++ _freelancers
   }
 }

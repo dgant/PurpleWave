@@ -22,7 +22,7 @@ import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.UnitMatchers.{UnitMatchAntiAir, UnitMatchWarriors}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss.{PvZ4GateGoon, PvZ4GatePlusOne, PvZCorsair, PvZDT}
 
@@ -41,7 +41,11 @@ class PvZ1Base extends GameplanTemplate {
       new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.hugTownHall)),
       new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.hugTownHall))) }
 
-  override def attackPlan: Plan =
+  override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
+  override def attackPlan: Plan = new Parallel(
+    new If(
+      new And(new EnemiesAtMost(0, Zerg.Mutalisk), new EnemiesAtMost(0, Zerg.Scourge)),
+      new Attack(Protoss.Corsair)),
     new If(
       new Or(
         new UpgradeComplete(Protoss.GroundDamage),
@@ -50,7 +54,7 @@ class PvZ1Base extends GameplanTemplate {
       new If(
         new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.overpool),
         new Trigger(new UnitsAtLeast(2, UnitMatchWarriors, complete = true), new ConsiderAttacking),
-        new Trigger(new UnitsAtLeast(4, UnitMatchWarriors, complete = true), new ConsiderAttacking)))
+        new Trigger(new UnitsAtLeast(4, UnitMatchWarriors, complete = true), new ConsiderAttacking))))
 
   class EnemyHydralisks extends Or(
     new EnemyHasShown(Zerg.Hydralisk),
@@ -69,7 +73,9 @@ class PvZ1Base extends GameplanTemplate {
     new Employing(PvZ4GateGoon),
     new And(
       new Employing(PvZCorsair),
-      new EnemyHydralisks),
+      new Or(
+        new EnemyHydralisks,
+        new Latch(new UnitsAtLeast(2, Protoss.Corsair)))),
     new And(
       new GettingAntiAirASAP,
       new Not(new GettingArchons)))
@@ -94,7 +100,7 @@ class PvZ1Base extends GameplanTemplate {
 
     new If(new GettingAntiAirASAP,      new WriteStatus("Anti-AirASAP")),
     new If(new GettingGoons,            new WriteStatus("4-Gate Goons")),
-    new If(new GettingZealots,  new WriteStatus("+1 Speedlot")),
+    new If(new GettingZealots,          new WriteStatus("+1 Speedlot")),
     new If(new GettingCorsair,          new WriteStatus("Corsair")),
     new If(new GettingDT,               new WriteStatus("DT Expand")),
 
@@ -135,10 +141,11 @@ class PvZ1Base extends GameplanTemplate {
       new Or(
         new MineralsAtLeast(700),
         new UnitsAtLeast(2, Protoss.DarkTemplar, complete = true),
+        new UnitsAtLeast(2, Protoss.Archon, complete = true),
         new And(
           new Or(
             new Not(new GettingAntiAirASAP),
-            new UnitsAtLeast(8, Protoss.Dragoon, complete = true)),
+            new UnitsAtLeast(8, UnitMatchAntiAir, complete = true)),
           new Or(
             new And(new UnitsAtLeast(6, UnitMatchWarriors), new EnemiesAtLeast(4, Zerg.SunkenColony, complete = true)),
             new And(new UnitsAtLeast(8, UnitMatchWarriors), new EnemiesAtLeast(3, Zerg.SunkenColony, complete = true)),
@@ -154,19 +161,20 @@ class PvZ1Base extends GameplanTemplate {
     new Pump(Protoss.DarkTemplar, 1),
     new If(new GettingCorsair, new Pump(Protoss.Corsair, 1)),
     new Pump(Protoss.HighTemplar),
+    new Pump(Protoss.Dragoon, 1), // For ejecting Overlords and such
     new Pump(Protoss.Zealot, 7), // Save minerals for remaining tech + gateways
     new PumpWorkers,
     new If(new GettingCorsair, new Pump(Protoss.Corsair, 6)),
 
     new Build(Get(2, Protoss.Pylon), Get(Protoss.Assimilator)),
     new If(new GettingCorsair,  new Build(Get(Protoss.CyberneticsCore), Get(Protoss.Stargate))),
-    new If(new GettingArchons,  new Build(Get(Protoss.CyberneticsCore), Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives))),
+    new If(new GettingArchons,  new Build(Get(Protoss.CyberneticsCore), Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives), Get(5, Protoss.Gateway))),
     new If(new GettingDT,       new Build(Get(Protoss.CyberneticsCore), Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives))),
     new If(new GettingZealots,  new Build(Get(Protoss.Forge),           Get(Protoss.GroundDamage),  Get(2, Protoss.Gateway), Get(Protoss.CitadelOfAdun), Get(Protoss.ZealotSpeed), Get(Protoss.TemplarArchives), Get(5, Protoss.Gateway))),
     new If(new GettingGoons,    new Build(Get(Protoss.CyberneticsCore), Get(4, Protoss.Gateway))),
 
     new Pump(Protoss.Zealot),
-
+    new Build(Get(4, Protoss.Gateway)),
     new If(new UnitsAtLeast(4, Protoss.Gateway, complete = true), new RequireMiningBases(2))
   )
 }

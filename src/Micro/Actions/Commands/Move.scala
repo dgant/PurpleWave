@@ -5,6 +5,7 @@ import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Traverse
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Strategery.MapGroups
 
 object Move extends Action {
   
@@ -17,14 +18,14 @@ object Move extends Action {
     val pixelToMove = unit.agent.toTravel.get
 
     // Do a pathfinding move
-    if ( ! With.performance.danger) {
-      val tileToMove = pixelToMove.tileIncluding
+    if ( ! With.performance.danger && MapGroups.needCustomPathing.exists(_.matches)) {
+      lazy val tileToMove = pixelToMove.nearestWalkableTerrain
       if ( ! unit.flying
         && unit.agent.path.isEmpty
         && unit.pixelDistanceTravelling(tileToMove) > 128 + unit.pixelDistanceCenter(pixelToMove)) {
          val profile = new PathfindProfile(unit.tileIncludingCenter)
             profile.end                 = Some(tileToMove)
-            profile.lengthMaximum       = Some(8)
+            profile.lengthMaximum       = Some(24)
             profile.threatMaximum       = Some(0)
             profile.canCrossUnwalkable  = false
             profile.allowGroundDist     = true

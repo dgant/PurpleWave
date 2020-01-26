@@ -3,6 +3,8 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvE
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.{Get, GetAnother}
+import Micro.Agency.Intention
+import Planning.Plan
 import Planning.Plans.Army.KillPsiDisruptor
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic._
@@ -10,10 +12,14 @@ import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildTowersAtBases
+import Planning.Predicates.Compound.Not
 import Planning.Predicates.Milestones.{EnemyHasShown, OnGasPumps, UnitsAtLeast, UpgradeComplete}
 import Planning.Predicates.Reactive.EnemyMutalisks
 import Planning.Predicates.Strategy.OnMap
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import Planning.ResourceLocks.LockUnits
+import Planning.UnitCounters.UnitCountOne
+import Planning.UnitMatchers.UnitMatchWorkers
+import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import Strategery.{Plasma, Sparkle}
 import Utilities.ByOption
 
@@ -66,6 +72,25 @@ class ExpandOverIsland(maxBases: Int) extends RequireBases {
       Math.min(maxBases, With.geography.bases.count(_.zone.canWalkTo(With.geography.ourMain.zone))))
 }
 
+class HackySparkleExpansion extends Plan {
+  val lock = new LockUnits { unitMatcher.set(UnitMatchWorkers); unitCounter.set(UnitCountOne) }
+  lazy val base = ByOption.minBy(With.geography.neutralBases)(b => {
+    val x: Double = b.townHallTile.groundPixels(With.geography.home)
+    val y: Double = ByOption.min(With.units.neutral.filter(_.is(Neutral.PsiDisruptor)).map(_.pixelDistanceCenter(b.townHallTile.pixelCenter))).getOrElse(0.001)
+    x / y
+  })
+
+  override def onUpdate(): Unit = {
+    if (base.exists(_.townHall.isEmpty)) {
+      lock.acquire(this)
+      lock.units.foreach(_.agent.intend(this, new Intention {
+        toBuild = Some(Protoss.Nexus)
+        toBuildTile = Some(base.get.townHallTile)
+      }))
+    }
+  }
+}
+
 class PvEIslandCarrierLateGame extends Parallel(
   // Prerequisites
   new Build(
@@ -75,7 +100,7 @@ class PvEIslandCarrierLateGame extends Parallel(
     Get(Protoss.Stargate)),
   new BuildGasPumps,
 
-  new If(new OnMap(Sparkle), new Parallel(new Build(Get(2, Protoss.Zealot)), new KillPsiDisruptor)),
+  new If(new OnMap(Sparkle), new Parallel(new Build(Get(3, Protoss.Zealot)), new KillPsiDisruptor)),
 
   // Corsairs
   new If(
@@ -114,9 +139,15 @@ class PvEIslandCarrierLateGame extends Parallel(
       new BuildTowersAtBases(1),
 
       // Expansions
-      new If(new UnitsAtLeast(4, Protoss.Carrier), new RequireMiningBases(2)),
-      new If(new UnitsAtLeast(8, Protoss.Carrier), new RequireMiningBases(3)),
-      new If(new UnitsAtLeast(4, Protoss.Carrier), new PumpWorkers),
+      new If(
+        new OnMap(Sparkle),
+        new If(
+          new UnitsAtLeast(2, Protoss.Carrier),
+          new HackySparkleExpansion),
+        new Parallel(
+          new If(new UnitsAtLeast(4, Protoss.Carrier), new RequireMiningBases(2)),
+          new If(new UnitsAtLeast(8, Protoss.Carrier), new RequireMiningBases(3)),
+          new If(new UnitsAtLeast(4, Protoss.Carrier), new PumpWorkers))),
 
       new Pump(Protoss.Carrier),
 
@@ -126,7 +157,7 @@ class PvEIslandCarrierLateGame extends Parallel(
       new OnGasPumps(2, new Build(Get(5, Protoss.Stargate))),
       new OnGasPumps(3, new Build(Get(8, Protoss.Stargate))),
       new OnGasPumps(4, new Build(Get(12, Protoss.Stargate))),
-      new ExpandOverIsland(12),
+      new If(new Not(new OnMap(Sparkle)), new ExpandOverIsland(12)),
       new If(
         new UnitsAtLeast(2, Protoss.Stargate, complete = true),
         new Build(

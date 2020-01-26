@@ -18,5 +18,4 @@ object TargetFilterFocus extends TargetFilter {
       + 32 * actor.agent.focusPathStepSize)
     || target.interceptors.exists(legal(actor, _))
   )
-  
 }

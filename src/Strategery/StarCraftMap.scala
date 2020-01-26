@@ -20,6 +20,7 @@ object Destination extends StarCraftMap
 object Eddy extends StarCraftMap
 object EmpireOfTheSun extends StarCraftMap
 object Gladiator extends StarCraftMap
+object GoldRush extends StarCraftMap
 object GreatBarrierReef extends StarCraftMap { override val mineralWalkingOkay = false }
 object Heartbreak extends StarCraftMap
 object Hitchhiker extends StarCraftMap
@@ -44,6 +45,7 @@ object StarCraftMaps {
     ChupungRyeong,
     Eddy,
     EmpireOfTheSun,
+    GoldRush,
     Gladiator,
     GreatBarrierReef,
     Heartbreak,
@@ -66,5 +68,6 @@ object MapGroups {
   val badForWalling = Vector(Alchemist, Pathfinder)
   val tooShortForFFE = Vector(Python)
   val narrowRamp = Vector(Plasma, ThirdWorld)
+  val needCustomPathing = Vector(Benzene, BlueStorm, GoldRush)
 }
 

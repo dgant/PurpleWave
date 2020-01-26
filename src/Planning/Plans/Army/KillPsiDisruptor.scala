@@ -5,12 +5,12 @@ import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountEverything
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchAntiGround, UnitMatchWarriors}
 import ProxyBwapi.Races.Neutral
 
 class KillPsiDisruptor extends Plan() {
   val killers = new LockUnits
-  killers.unitMatcher.set(UnitMatchWarriors)
+  killers.unitMatcher.set(UnitMatchAnd(UnitMatchWarriors, UnitMatchAntiGround))
   killers.unitCounter.set(UnitCountEverything)
   override def onUpdate() {
     val targets = With.geography.ourZones.flatMap(_.units.filter(_.is(Neutral.PsiDisruptor)))

@@ -13,7 +13,7 @@ object TileSourceTownHall extends TileSource {
     With.geography.bases
       .view
       .filter(b => b.mineralsLeft > 3000 || b.gasLeft > 1000)
-      .filterNot(base => base.owner.isEnemy || base.zone.island)
+      .filterNot(base => base.owner.isEnemy || base.zone.island || (With.strategy.isIslandMap && With.geography.home.groundPixels(base.townHallTile) > With.mapPixelWidth * 4))
       .map(_.townHallTile)
   }
 }

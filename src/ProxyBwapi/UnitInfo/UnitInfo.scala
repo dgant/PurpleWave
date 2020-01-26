@@ -37,13 +37,15 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def friendly  : Option[FriendlyUnitInfo]  = None
   def foreign   : Option[ForeignUnitInfo]   = None
   
-  override def toString: String = {
-    unitClass.toString + " #" +
+  override def toString: String = (
+    unitClass.toString
+    + (if (selected) " (*)" else "")
+    + " #" +
     id + " " +
     hitPoints + "/" + unitClass.maxHitPoints + " " +
     (if (shieldPoints > 0) "(" + shieldPoints + "/" + unitClass.maxShields + ") " else "") +
     tileIncludingCenter.toString + " " + pixelCenter.toString
-  }
+    )
 
   @inline def is(unitMatcher: UnitMatcher): Boolean = unitMatcher.accept(this)
   @inline def isPrerequisite(unitMatcher: UnitMatcher): Boolean = unitMatcher.acceptAsPrerequisite(this)

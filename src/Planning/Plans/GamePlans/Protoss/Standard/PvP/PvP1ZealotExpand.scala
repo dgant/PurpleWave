@@ -1,12 +1,14 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Lifecycle.With
+import Macro.Architecture.Blueprint
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.ReactToDarkTemplarEmergencies
 import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAtRatio, PumpWorkers}
+import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
@@ -22,6 +24,14 @@ class PvP1ZealotExpand extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(PvP1ZealotExpand)
   override val completionCriteria: Predicate = new Latch(new And(new BasesAtLeast(2), new UnitsAtLeast(5, Protoss.Gateway)))
+
+  override def placementPlan: Plan = new Parallel(
+    super.placementPlan,
+    new If(
+      new BasesAtLeast(2),
+      new ProposePlacement {
+        override lazy val blueprints = Vector(new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
+      }))
 
   override def attackPlan: Plan = new If(new EnemyStrategy(With.fingerprints.nexusFirst), new Attack)
 

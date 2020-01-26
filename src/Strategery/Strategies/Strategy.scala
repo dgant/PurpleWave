@@ -19,8 +19,8 @@ abstract class Strategy {
   def entranceRamped          : Boolean                         = true
   def entranceFlat            : Boolean                         = true
   def entranceInverted        : Boolean                         = true
-  def rushDistanceMinimum     : Int                             = Int.MinValue
-  def rushDistanceMaximum     : Int                             = Int.MaxValue
+  def rushDistanceMinimum     : Double                          = Double.NegativeInfinity
+  def rushDistanceMaximum     : Double                          = Double.PositiveInfinity
   def multipleEntrances       : Boolean                         = true
   def ourRaces                : Iterable[Race]                  = Vector(Race.Terran, Race.Protoss, Race.Zerg)
   def enemyRaces              : Iterable[Race]                  = Vector(Race.Terran, Race.Protoss, Race.Zerg, Race.Unknown)

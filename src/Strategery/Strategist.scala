@@ -107,24 +107,24 @@ class Strategist {
 
   lazy val humanModeEnabled = With.configuration.humanMode()
   def isAppropriate(strategy: Strategy): Boolean = {
-    lazy val ourRace                  = With.self.raceInitial
-    lazy val enemyRacesCurrent        = With.enemies.map(_.raceCurrent).toSet
-    lazy val enemyRaceWasUnknown      = With.enemies.exists(_.raceInitial == Race.Unknown)
-    lazy val enemyRaceStillUnknown    = With.enemies.exists(_.raceCurrent == Race.Unknown)
-    lazy val gamesVsEnemy             = With.history.gamesVsEnemies.size
-    lazy val playedEnemyOftenEnough   = gamesVsEnemy >= strategy.minimumGamesVsOpponent
-    lazy val isIsland                 = isIslandMap
-    lazy val isGround                 = ! isIsland
-    lazy val rampOkay                 = (strategy.entranceInverted || ! isInverted) && (strategy.entranceFlat || ! isFlat) && (strategy.entranceRamped || ! isRamped)
-    lazy val rushOkay                 = rushDistanceMean > strategy.rushDistanceMinimum && rushDistanceMean < strategy.rushDistanceMaximum
-    lazy val startLocations           = With.geography.startLocations.size
-    lazy val disabledInPlaybook       = Playbook.disabled.contains(strategy)
-    lazy val disabledOnMap            = strategy.mapsBlacklisted.exists(_.matches) || ! strategy.mapsWhitelisted.forall(_.exists(_.matches))
-    lazy val appropriateForOurRace    = strategy.ourRaces.exists(_ == ourRace)
-    lazy val appropriateForEnemyRace  = strategy.enemyRaces.exists(race => if (race == Race.Unknown) enemyRaceWasUnknown else (enemyRaceStillUnknown || enemyRacesCurrent.contains(race)))
-    lazy val allowedGivenHumanity     = strategy.allowedVsHuman || ! humanModeEnabled
-    lazy val allowedGivenHistory      = allowedGivenOpponentHistory(strategy)
-    lazy val allowedForOpponent       = strategy.opponentsWhitelisted.forall(_
+    val ourRace                  = With.self.raceInitial
+    val enemyRacesCurrent        = With.enemies.map(_.raceCurrent).toSet
+    val enemyRaceWasUnknown      = With.enemies.exists(_.raceInitial == Race.Unknown)
+    val enemyRaceStillUnknown    = With.enemies.exists(_.raceCurrent == Race.Unknown)
+    val gamesVsEnemy             = With.history.gamesVsEnemies.size
+    val playedEnemyOftenEnough   = gamesVsEnemy >= strategy.minimumGamesVsOpponent
+    val isIsland                 = isIslandMap
+    val isGround                 = ! isIsland
+    val rampOkay                 = (strategy.entranceInverted || ! isInverted) && (strategy.entranceFlat || ! isFlat) && (strategy.entranceRamped || ! isRamped)
+    val rushOkay                 = rushDistanceMean > strategy.rushDistanceMinimum && rushDistanceMean < strategy.rushDistanceMaximum
+    val startLocations           = With.geography.startLocations.size
+    val disabledInPlaybook       = Playbook.disabled.contains(strategy)
+    val disabledOnMap            = strategy.mapsBlacklisted.exists(_.matches) || ! strategy.mapsWhitelisted.forall(_.exists(_.matches))
+    val appropriateForOurRace    = strategy.ourRaces.exists(_ == ourRace)
+    val appropriateForEnemyRace  = strategy.enemyRaces.exists(race => if (race == Race.Unknown) enemyRaceWasUnknown else (enemyRaceStillUnknown || enemyRacesCurrent.contains(race)))
+    val allowedGivenHumanity     = strategy.allowedVsHuman || ! humanModeEnabled
+    val allowedGivenHistory      = allowedGivenOpponentHistory(strategy)
+    val allowedForOpponent       = strategy.opponentsWhitelisted.forall(_
       .map(formatName)
       .exists(name =>
         nameMatches(name, Playbook.enemyName)

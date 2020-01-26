@@ -7,7 +7,7 @@ import Micro.Actions.Action
 import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class Traverse(path: TilePath, move: Boolean = false) extends Action {
+class Traverse(path: TilePath, move: Boolean = true) extends Action {
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove && path.pathExists
 

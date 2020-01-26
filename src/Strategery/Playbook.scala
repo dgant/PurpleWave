@@ -37,7 +37,11 @@ object StrategyGroups {
     TvZ2RaxNuke,
 
     PvROpenZZCore,
-    PvE3BaseIslandCarrier,
+
+    PvE15BaseIslandCarrier, // Disabled for Sparkle in TorchUp
+    PvE2BaseIslandCarrier, // Disabled for Sparkle in TorchUp
+    PvE3BaseIslandCarrier, // Disabled for Sparkle in TorchUp
+
     PvT1GateRobo,
     PvTProxyDarkTemplar,
     PvT25BaseCarrier, // Experimenting with this so we can delete it
@@ -63,15 +67,15 @@ class PurpleWavePlaybook extends EmptyPlaybook {
 }
 
 class TournamentPlaybook extends PurpleWavePlaybook {
-  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionTournament
+  override def strategySelectionPolicy: StrategySelectionPolicy = if (Sparkle.matches) StrategySelectionGreedy else StrategySelectionTournament
 }
 
 class TestingPlaybook extends PurpleWavePlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvZ10Gate, PvZDT, PvZMidgameBisu, PvZLateGameTemplar)
+  override lazy val forced: Seq[Strategy] = Seq(PvZ10Gate, PvZCorsair, PvZMidgameBisu, PvZLateGameTemplar)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
   override def respectOpponent: Boolean = false
   override def respectMap: Boolean = false
   override def respectHistory: Boolean = false
 }
 
-object Playbook extends TestingPlaybook {}
+object Playbook extends TournamentPlaybook {}

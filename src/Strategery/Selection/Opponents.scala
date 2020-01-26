@@ -11,16 +11,21 @@ object Opponents {
     opponent
   }
 
-  val pvzCore = Seq(PvZFFEEconomic, PvZMidgame5GateGoonReaver, PvZLateGameReaver)
-  val pvz2Gate = Seq(PvZ2Gate1012,   PvZ4GateGoon,     PvZMidgame5GateGoonReaver,  PvZLateGameReaver)
+  val pvzFFE1   = Seq(PvZFFEEconomic, PvZMidgame5GateGoonReaver,  PvZLateGameReaver)
+  val pvzFFE2   = Seq(PvZFFEEconomic,                             PvZMidgameNeoBisu,          PvZLateGameTemplar)
+  val pvz2Gate  = Seq(PvZ2Gate1012,   PvZ4GateGoon,               PvZMidgame5GateGoonReaver,  PvZLateGameReaver)
+  val pvz1Gate  = Seq(PvZ10Gate,      PvZDT,                      PvZMidgameBisu,             PvZLateGameTemplar)
+
   val zergRotation = Vector(
-    pvzCore,
+    pvzFFE1,
     pvz2Gate,
-    Seq(PvZFFEEconomic,                   PvZMidgameBisu,             PvZLateGameTemplar),
-    Seq(PvZ2Gate910,    PvZ4GatePlusOne,  PvZMidgame5GateGoon,        PvZLateGameTemplar))
+    pvz1Gate,
+    pvzFFE2,
+    Seq(PvZ2Gate910,    PvZSpeedlot,  PvZMidgameBisu,        PvZLateGameTemplar))
+
   val defaultPvT  = StrategySelectionGreedy
   val defaultPvP  = StrategySelectionGreedy
-  val defaultPvZ  = new StrategySelectionRecommended(StrategySelectionSequence(zergRotation), pvzCore: _*)
+  val defaultPvZ  = new StrategySelectionRecommended(StrategySelectionSequence(zergRotation), pvzFFE1: _*)
   val fixedPvT    = StrategySelectionFixed(PvT1015DT, PvT3BaseArbiter)
   val fixedPvZ    = StrategySelectionFixed(PvZ2Gate910, PvZ4GateGoon, PvZMidgame5GateGoon, PvZLateGameTemplar)
   val fixedPvR    = StrategySelectionFixed(PvR1BaseDT)
@@ -29,7 +34,7 @@ object Opponents {
   // TorchUp opponents
   val bunkerBoxer   : Opponent = add(Opponent("BunkerBoxeR",  new StrategySelectionRecommended(StrategySelectionGreedy, PvT32Nexus, PvT3BaseArbiter)))
   val zzzkbot       : Opponent = add(Opponent("ZZZKBot",      safePvZ))
-  val crona         : Opponent = add(Opponent("Crona",        defaultPvZ))
+  val crona         : Opponent = add(Opponent("Crona",        StrategySelectionSequence(zergRotation)))
   val cunybot       : Opponent = add(Opponent("CUNYBot",      safePvZ))
   val ecgberht      : Opponent = add(Opponent("Ecgberht",     defaultPvT))
   val haopan        : Opponent = add(Opponent("Hao Pan",      new StrategySelectionRecommended(StrategySelectionGreedy, PvT32Nexus, PvT2BaseCarrier)))
@@ -39,7 +44,7 @@ object Opponents {
     Seq(PvP1ZealotExpand),
     Seq(PvPProxy2Gate)),
     loop = true)))
-  val microwave     : Opponent = add(Opponent("Microwave",    new StrategySelectionRecommended(StrategySelectionSequence(zergRotation), pvz2Gate: _*)))
+  val microwave     : Opponent = add(Opponent("Microwave",    StrategySelectionSequence(zergRotation)))
   val styxz         : Opponent = add(Opponent("StyxZ",        defaultPvZ))
   val tcpzerg       : Opponent = add(Opponent("TCPZerg",      safePvZ))
 
@@ -49,9 +54,9 @@ object Opponents {
   val mariandevecka : Opponent = add(Opponent("Marian Devecka", killerbot.policy))
   val cherrypi      : Opponent = add(Opponent("CherryPiSSCAIT2017",
     if (MapGroups.badForProxying.exists(_.matches))
-      StrategySelectionFixed(PvZ2Gate910, PvZ4GatePlusOne, PvZMidgame5GateGoonReaver, PvZLateGameReaver)
+      StrategySelectionFixed(PvZ2Gate910, PvZSpeedlot, PvZMidgame5GateGoonReaver, PvZLateGameReaver)
     else
-      StrategySelectionFixed(PvZProxy2Gate, PvZ2Gate910, PvZ4GatePlusOne, PvZMidgame5GateGoonReaver, PvZLateGameReaver)))
+      StrategySelectionFixed(PvZProxy2Gate, PvZ2Gate910, PvZSpeedlot, PvZMidgame5GateGoonReaver, PvZLateGameReaver)))
   val dragon        : Opponent = add(Opponent("Dragon",
     //if (MapGroups.badForProxying.exists(_.matches))
       StrategySelectionFixed(PvT13Nexus, PvT3BaseArbiter)

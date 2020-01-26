@@ -9,7 +9,7 @@ import Mathematics.Points.TileRectangle
 object ShowGrids extends View {
 
   override def renderMap() {
-    renderGridArray(With.geography.home.zone.distanceGrid, 0, 1)
+    renderGridArray(With.units.all.find(_.selected).map(_.tileIncludingCenter).getOrElse(With.geography.home).zone.distanceGrid, 0, 1)
     renderGridArray(With.grids.walkableTerrain, 0, 0)
     renderGridArray(With.grids.unwalkableUnits, 1, 0)
   }

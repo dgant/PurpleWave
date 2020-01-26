@@ -19,7 +19,7 @@ class ChillOverlords extends Plan {
   val overlords = new LockUnits
   overlords.unitMatcher.set(Zerg.Overlord)
   overlords.unitCounter.set(UnitCountEverything)
-  
+
   val cloakedThreat = new Latch(new EnemiesAtLeast(1, UnitMatchOr(
     Terran.Wraith,
     Terran.Ghost,
@@ -27,7 +27,7 @@ class ChillOverlords extends Plan {
     Protoss.Arbiter,
     Zerg.Lurker
   )))
-  
+
   override def onUpdate() {
     if ( ! With.self.isZerg) {
       return

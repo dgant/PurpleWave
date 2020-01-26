@@ -5,7 +5,7 @@ import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.{Attack, ConsiderAttacking}
+import Planning.Plans.Army.{Attack, ConsiderAttacking, Hunt}
 import Planning.Plans.Basic.{NoPlan, WriteStatus}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -16,7 +16,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Scouting.ScoutOn
+import Planning.Plans.Scouting.{Chill, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
@@ -24,7 +24,7 @@ import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
 import Planning.UnitMatchers.{UnitMatchAntiAir, UnitMatchWarriors}
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Protoss.{PvZ4GateGoon, PvZ4GatePlusOne, PvZCorsair, PvZDT}
+import Strategery.Strategies.Protoss.{PvZ4GateGoon, PvZCorsair, PvZDT, PvZSpeedlot}
 
 class PvZ1Base extends GameplanTemplate {
 
@@ -43,6 +43,8 @@ class PvZ1Base extends GameplanTemplate {
 
   override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
   override def attackPlan: Plan = new Parallel(
+    new Chill(Protoss.HighTemplar),
+    new Hunt(Protoss.Corsair, Zerg.Overlord),
     new If(
       new And(new EnemiesAtMost(0, Zerg.Mutalisk), new EnemiesAtMost(0, Zerg.Scourge)),
       new Attack(Protoss.Corsair)),
@@ -81,7 +83,7 @@ class PvZ1Base extends GameplanTemplate {
       new Not(new GettingArchons)))
 
   class GettingZealots extends And(
-    new Employing(PvZ4GatePlusOne),
+    new Employing(PvZSpeedlot),
     new Not(new GettingGoons))
 
   class GettingCorsair extends And(
@@ -144,6 +146,9 @@ class PvZ1Base extends GameplanTemplate {
         new UnitsAtLeast(2, Protoss.Archon, complete = true),
         new And(
           new Or(
+            new Not(new Or(new GettingArchons, new GettingDT)),
+            new UnitsAtLeast(1, Protoss.TemplarArchives)),
+          new Or(
             new Not(new GettingAntiAirASAP),
             new UnitsAtLeast(8, UnitMatchAntiAir, complete = true)),
           new Or(
@@ -170,7 +175,7 @@ class PvZ1Base extends GameplanTemplate {
     new If(new GettingCorsair,  new Build(Get(Protoss.CyberneticsCore), Get(Protoss.Stargate))),
     new If(new GettingArchons,  new Build(Get(Protoss.CyberneticsCore), Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives), Get(5, Protoss.Gateway))),
     new If(new GettingDT,       new Build(Get(Protoss.CyberneticsCore), Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives))),
-    new If(new GettingZealots,  new Build(Get(Protoss.Forge),           Get(Protoss.GroundDamage),  Get(2, Protoss.Gateway), Get(Protoss.CitadelOfAdun), Get(Protoss.ZealotSpeed), Get(Protoss.TemplarArchives), Get(5, Protoss.Gateway))),
+    new If(new GettingZealots,  new Build(Get(Protoss.CyberneticsCore), Get(Protoss.Forge),         Get(Protoss.GroundDamage),    Get(2, Protoss.Gateway), Get(Protoss.CitadelOfAdun), Get(Protoss.ZealotSpeed), Get(Protoss.TemplarArchives), Get(5, Protoss.Gateway))),
     new If(new GettingGoons,    new Build(Get(Protoss.CyberneticsCore), Get(4, Protoss.Gateway))),
 
     new Pump(Protoss.Zealot),

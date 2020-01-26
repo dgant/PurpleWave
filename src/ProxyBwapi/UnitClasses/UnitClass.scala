@@ -431,7 +431,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
           mineralValue
         + MicroValue.gasToMineralsRatio * gasValue.toInt
         + 6.25 * supplyRequired // 100 minerals buys 16 supply; 100 / 16 = 6.25
-        + (if (isTwoUnitsInOneEgg) 24 else if(isZerg) 50.0 else 0.0) // Larva value
+        + (if (isTwoUnitsInOneEgg) 12.5 else if(isZerg) 25.0 else 0.0) // Larva value
       )
       * (if(isWorker) 1.3 else 1.0)
       * (if (whatBuilds._1 == Terran.Factory) 1.2 else 1.0)

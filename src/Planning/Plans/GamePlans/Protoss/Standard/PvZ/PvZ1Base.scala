@@ -152,10 +152,11 @@ class PvZ1Base extends GameplanTemplate {
             new Not(new GettingAntiAirASAP),
             new UnitsAtLeast(8, UnitMatchAntiAir, complete = true)),
           new Or(
-            new And(new UnitsAtLeast(6, UnitMatchWarriors), new EnemiesAtLeast(4, Zerg.SunkenColony, complete = true)),
-            new And(new UnitsAtLeast(8, UnitMatchWarriors), new EnemiesAtLeast(3, Zerg.SunkenColony, complete = true)),
-            new And(new UnitsAtLeast(8, UnitMatchWarriors), new SafeAtHome),
-            new UnitsAtLeast(15, UnitMatchWarriors, complete = true)))),
+            new And(new UnitsAtLeast(6,   UnitMatchWarriors), new EnemiesAtLeast(4, Zerg.SunkenColony, complete = true)),
+            new And(new UnitsAtLeast(8,   UnitMatchWarriors), new EnemiesAtLeast(3, Zerg.SunkenColony, complete = true)),
+            new And(new UnitsAtLeast(12,  UnitMatchWarriors), new EnemiesAtLeast(2, Zerg.SunkenColony, complete = true)),
+            new And(new UnitsAtLeast(14,  UnitMatchWarriors), new SafeAtHome),
+            new UnitsAtLeast(20, UnitMatchWarriors, complete = true)))),
       new RequireMiningBases(2)),
 
     // Train army/workers

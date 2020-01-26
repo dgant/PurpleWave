@@ -19,7 +19,7 @@ import Planning.Predicates.Strategy.OnMap
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountOne
 import Planning.UnitMatchers.UnitMatchWorkers
-import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.{Plasma, Sparkle}
 import Utilities.ByOption
 
@@ -74,13 +74,10 @@ class ExpandOverIsland(maxBases: Int) extends RequireBases {
 
 class HackySparkleExpansion extends Plan {
   val lock = new LockUnits { unitMatcher.set(UnitMatchWorkers); unitCounter.set(UnitCountOne) }
-  lazy val base = ByOption.minBy(With.geography.neutralBases)(b => {
-    val x: Double = b.townHallTile.groundPixels(With.geography.home)
-    val y: Double = ByOption.min(With.units.neutral.filter(_.is(Neutral.PsiDisruptor)).map(_.pixelDistanceCenter(b.townHallTile.pixelCenter))).getOrElse(0.001)
-    x / y
-  })
+  def base = ByOption.minBy(With.geography.neutralBases.filter(b => ! b.townHallArea.tiles.map(_.bwapi).exists(With.game.hasCreep)))(_.townHallTile.tileDistanceSquared(With.geography.home))
 
   override def onUpdate(): Unit = {
+    if (With.units.countOurs(Protoss.Nexus) > 1) return
     if (base.exists(_.townHall.isEmpty)) {
       lock.acquire(this)
       lock.units.foreach(_.agent.intend(this, new Intention {
@@ -100,7 +97,7 @@ class PvEIslandCarrierLateGame extends Parallel(
     Get(Protoss.Stargate)),
   new BuildGasPumps,
 
-  new If(new OnMap(Sparkle), new Parallel(new Build(Get(3, Protoss.Zealot)), new KillPsiDisruptor)),
+  new If(new OnMap(Sparkle), new Parallel(new Build(Get(6, Protoss.Zealot)), new KillPsiDisruptor)),
 
   // Corsairs
   new If(

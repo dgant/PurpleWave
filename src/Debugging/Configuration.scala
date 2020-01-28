@@ -11,13 +11,13 @@ class Configuration {
   // Tournament Settings //
   /////////////////////////
   
-  var enableSurrenders                = false
+  var enableSurrenders                = true
   var enablePerformanceStops          = true
   var enablePerformanceSurrender      = false
-  var enableChat                      = false
-  var enableStreamManners             = false
+  var enableChat                      = true
+  var enableStreamManners             = true
   var identifyGhostUnits              = false
-  var targetFrameDurationMilliseconds = 40
+  var targetFrameDurationMilliseconds = 35
   
   //////////////
   // Strategy //

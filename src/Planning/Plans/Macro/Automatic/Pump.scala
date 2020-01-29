@@ -23,7 +23,7 @@ class Pump(
   
     val doubleEggMultiplier       = if (unitClass.isTwoUnitsInOneEgg) 2 else 1
     val unitsNow                  = currentCount
-    val unitsToAddCeiling         = Math.max(0, Math.min(maximumTotal, maxDesirable) - unitsNow)
+    val unitsToAddCeiling         = Math.max(0, Math.min(maximumTotal, maxDesirable) - unitsNow) // TODO: Clamp Nukes to #Silos
     val buildersSpawning          = if (unitClass.whatBuilds._1 == Zerg.Larva) With.units.countOurs(UnitMatchAnd(UnitMatchHatchery, UnitMatchComplete)) else 0
     val buildersExisting          = builders.toVector
     val buildersReserved          = buildersExisting.map(_.unitClass).distinct.map(With.scheduler.macroPumps.consumed).sum
@@ -69,9 +69,9 @@ class Pump(
   protected def currentCount: Int = {
     // Should this just be unit.alive?
     // Maybe this is compensating for a Scheduler
-    With.units.ours
-      .toVector
-      .map(unit =>
+    var sum = 0
+    With.units.ours.foreach(unit =>
+      sum += (
         if (unit.alive && matcher.accept(unit)) {
           1
         }
@@ -81,7 +81,8 @@ class Pump(
         else {
           0
         })
-      .sum
+    )
+    sum
   }
   
   protected val matcher =
@@ -103,15 +104,19 @@ class Pump(
       }
       else unitClass)
   
-  protected def builders: Set[FriendlyUnitInfo] = With.units.ours.filter(builder =>
-    builder.alive
-      && builder.is(unitClass.whatBuilds._1)
-      && builder.remainingCompletionFrames < unitClass.buildFrames
-      && ( unitClass != Terran.NuclearMissile                           || ! builder.hasNuke)
-      && ( ! unitClass.isAddon                                          || builder.addon.isEmpty)
-      && ( ! unitClass.isAddon                                          || unitClass.buildUnitsEnabling.forall(t => With.units.ours.exists(u => u.completeOrNearlyComplete && u.is(t)))) // Hack -- don't reserve buildings before we have the tech to build the addon.
-      && ( ! unitClass.buildUnitsEnabling.contains(Terran.MachineShop)  || builder.addon.isDefined)
-      && ( ! unitClass.buildUnitsEnabling.contains(Terran.ControlTower) || builder.addon.isDefined))
+  protected def builders: Seq[FriendlyUnitInfo] = With.units.ours
+    .view
+    .filter(builder =>
+      builder.alive
+        && builder.is(unitClass.whatBuilds._1)
+        && builder.remainingCompletionFrames < unitClass.buildFrames
+        && ( unitClass != Terran.NuclearMissile                           || ! builder.hasNuke)
+        && ( ! unitClass.requiresPsi                                      || builder.powered)
+        && ( ! unitClass.isAddon                                          || builder.addon.isEmpty)
+        && ( ! unitClass.isAddon                                          || unitClass.buildUnitsEnabling.forall(t => With.units.ours.exists(u => u.completeOrNearlyComplete && u.is(t)))) // Hack -- don't reserve buildings before we have the tech to build the addon.
+        && ( ! unitClass.buildUnitsEnabling.contains(Terran.MachineShop)  || builder.addon.isDefined)
+        && ( ! unitClass.buildUnitsEnabling.contains(Terran.ControlTower) || builder.addon.isDefined))
+    .toSeq
   
   protected def buildCapacity: Int = {
     Vector(
@@ -121,7 +126,5 @@ class Pump(
     ).min
   }
   
-  protected def maxDesirable: Int = {
-    Int.MaxValue
-  }
+  protected def maxDesirable: Int = Int.MaxValue
 }

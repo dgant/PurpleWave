@@ -2,10 +2,9 @@ package Micro.Actions.Transportation
 
 import Mathematics.PurpleMath
 import Micro.Actions.Action
-import Micro.Actions.Combat.Decisionmaking.Leave
+import Micro.Actions.Combat.Techniques.Avoid
 import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.EnrichPixel.EnrichedPixelCollection
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -19,7 +18,7 @@ object Pickup extends Action {
     val passengersPotential = potentialPassengers(unit)
     if (passengersPotential.isEmpty && unit.loadedUnits.isEmpty && ! unit.unitClass.isDetector) {
       unit.agent.toTravel = Some(unit.agent.origin)
-      Leave.consider(unit)
+      Avoid.consider(unit)
       return
     }
     val passengersAccepted  = new ArrayBuffer[FriendlyUnitInfo]

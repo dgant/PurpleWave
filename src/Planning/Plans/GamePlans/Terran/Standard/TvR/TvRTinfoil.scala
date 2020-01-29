@@ -3,62 +3,68 @@ package Planning.Plans.GamePlans.Terran.Standard.TvR
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Plans.Basic.NoPlan
-import Planning.UnitMatchers.UnitMatchSiegeTank
-import Planning.{Plan, Predicate}
-import Planning.Plans.Compound.If
-import Planning.Plans.GamePlans.GameplanModeTemplateVsRandom
-import Planning.Plans.Macro.Automatic.Pump
+import Planning.Plans.Army.Attack
+import Planning.Plans.Compound.{If, Trigger}
+import Planning.Plans.GamePlans.GameplanTemplateVsRandom
+import Planning.Plans.GamePlans.Terran.Situational.RepairBunker
+import Planning.Plans.Macro.Automatic.{Friendly, Pump, PumpRatio}
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Predicates.Milestones.UnitsAtLeast
+import Planning.Plans.Macro.Expanding.BuildGasPumps
+import Planning.Plans.Macro.Terran.PopulateBunkers
+import Planning.Predicates.Milestones.{UnitsAtLeast, UpgradeComplete}
 import Planning.Predicates.Strategy.Employing
+import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvR.TvRTinfoil
 
-class TvRTinfoil extends GameplanModeTemplateVsRandom {
+class TvRTinfoil extends GameplanTemplateVsRandom {
   
   override val activationCriteria: Predicate = new Employing(TvRTinfoil)
-  override val completionCriteria: Predicate = new UnitsAtLeast(8, UnitMatchSiegeTank, complete = true)
   
   override lazy val blueprints = Vector(
-    new Blueprint(this, building = Some(Terran.Bunker),       placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(this, building = Some(Terran.Bunker),       placement = Some(PlacementProfiles.hugTownHall), marginPixels = Some(32)),
     new Blueprint(this, building = Some(Terran.Barracks),     placement = Some(PlacementProfiles.hugTownHall)),
     new Blueprint(this, building = Some(Terran.SupplyDepot),  placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(this, building = Some(Terran.Barracks),     placement = Some(PlacementProfiles.hugTownHall)),
     new Blueprint(this, building = Some(Terran.SupplyDepot),  placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(this, building = Some(Terran.Factory),      placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(this, building = Some(Terran.SupplyDepot),  placement = Some(PlacementProfiles.hugTownHall)))
+    new Blueprint(this, building = Some(Terran.Factory),      placement = Some(PlacementProfiles.hugTownHall)))
   
-  override def defaultAttackPlan: Plan = NoPlan()
+  override def attackPlan: Plan = new If(
+    new UpgradeComplete(Terran.MarineRange),
+    new Attack)
   
   override val buildOrder = Vector(
-    Get(1,   Terran.CommandCenter),
-    Get(9,   Terran.SCV),
-    Get(1,   Terran.Barracks),
-    Get(1,   Terran.SupplyDepot),
-    Get(11,  Terran.SCV),
-    Get(1,   Terran.Marine),
-    Get(1,   Terran.Bunker))
+    Get(9,  Terran.SCV),
+    Get(Terran.SupplyDepot),
+    Get(10, Terran.SCV),
+    Get(Terran.Barracks),
+    Get(13, Terran.SCV),
+    Get(Terran.Marine),
+    Get(Terran.Bunker),
+    Get(14, Terran.SCV))
   
   override def buildPlans: Seq[Plan] = Vector(
-    new If(new UnitsAtLeast(1, UnitMatchSiegeTank), new Build(Get(Terran.SiegeMode))),
+    new RepairBunker,
+    new Trigger(
+      new UnitsAtLeast(10, UnitMatchWarriors),
+      initialBefore = new PopulateBunkers),
+    new PumpRatio(Terran.Medic, 0, 4, Seq(Friendly(Terran.Marine, 0.2))),
     new Pump(Terran.SiegeTankUnsieged),
-    new If(
-      new UnitsAtLeast(6, Terran.Marine),
-      new Pump(Terran.Medic, 3, 1)),
-    new Pump(Terran.Marine),
+    new Pump(Terran.Marine, maximumConcurrently = 1),
+    new BuildGasPumps,
     new Build(
-      Get(2, Terran.Barracks),
-      Get(1, Terran.Refinery),
-      Get(1, Terran.Factory),
-      Get(1, Terran.MachineShop),
-      Get(2, Terran.Bunker),
-      Get(1, Terran.Academy),
-      Get(1, Terran.Comsat),
-      Get(1, Terran.EngineeringBay),
-      Get(2, Terran.MissileTurret),
-      Get(2, Terran.Factory),
+      Get(Terran.Factory),
+      Get(Terran.MachineShop),
+      Get(Terran.SiegeMode),
+      Get(Terran.EngineeringBay),
+      Get(Terran.Academy),
+      Get(Terran.BioDamage),
+      Get(Terran.MissileTurret),
       Get(Terran.Stim),
-      Get(2, Terran.MachineShop))
+      Get(Terran.Comsat),
+      Get(Terran.BioArmor),
+      Get(Terran.MarineRange),
+      Get(4, Terran.Barracks)),
+    new Pump(Terran.Marine)
   )
 }

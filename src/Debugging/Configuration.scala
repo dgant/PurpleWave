@@ -1,47 +1,51 @@
 package Debugging
 
+import java.io.File
+
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Lifecycle.With
 
 class Configuration {
-  
+
   /////////////////////////
   // Tournament Settings //
   /////////////////////////
   
-  var enableSurrenders                = false
+  var enableSurrenders                = true
   var enablePerformanceStops          = true
   var enablePerformanceSurrender      = false
-  var enableChat                      = false
-  var enableHistoryChat               = true
-  var enableVisualizations            = true
+  var enableChat                      = true
   var enableStreamManners             = true
-  var enableHumanManners              = false
   var identifyGhostUnits              = false
-  var targetFrameDurationMilliseconds = 20
+  var targetFrameDurationMilliseconds = 35
   
   //////////////
   // Strategy //
   //////////////
-  
-  var targetWinrate       = 0.75
-  var strategyRandomness  = 0.0
-  var historyHalfLife     = 96.0
+
+  var dynamicStickiness   = 4.0
+  var targetWinrate       = 0.8
+  var strategyRandomness  = 0.1
+  var historyHalfLife     = 3.0
+  var recentFingerprints  = 2
   
   /////////////
   // Battles //
   /////////////
 
-  var enableMCRS                    = true
+  var enableMCRS                    = false
+  var enableThreatAwarePathfinding  = true
+  var retreatTowardsHomeOptional    = enableThreatAwarePathfinding // Works much better with threat-aware on
   var avatarBattleDistancePixels    = 32.0 * 6.0
   var battleMarginTileBase          = 12 + 2
   var battleMarginTileMinimum       = 12 + 2
   var battleMarginTileMaximum       = 12 * 2 + 2 // A bit over double Siege Tank range
-  var simulationFrames              = GameTime(0, 7)()
   var battleHysteresisFrames        = GameTime(0, 6)()
-  var battleHysteresisRatio         = 0.125
-  var battleValueTarget             = 0.55
+  var baseTarget                    = 0.04 // 0.55 -> 0.1 from SSCAIT 2018/ AIST2
+  var simulationFrames              = GameTime(0, 12)()
+  var simulationEstimationPeriod    = 6
+  var simulationScoreHalfLife       = GameTime(0, 2)()
   var simulationBonusTankRange      = 64.0
-  var simulationRetreatDelay        = 8
   var simulationDamageValueRatio    = 0.1
   
   ///////////
@@ -49,30 +53,29 @@ class Configuration {
   ///////////
   
   var concaveMarginPixels             = 20.0
-  var assumedBuilderTravelSpeed       = 0.65
   var fogPositionDurationFrames       = GameTime(0, 20)()
   var violenceThresholdFrames         = GameTime(0, 2)()
   var pickupRadiusPixels              = 48 //No idea what actual value is
-  var enablePathRecalculation         = true
   var workerDefenseRadiusPixels       = 32.0 * 4.0
   
   ///////////
   // Macro //
   ///////////
   
-  var maxMineralsBeforeMinedOut       = 300 * 8
+  var minimumMineralsBeforeMinedOut   = 150 * 8
   var maxFramesToSendAdvanceBuilder   = GameTime(0, 40)()
   var maxFramesToTrustBuildRequest    = GameTime(10, 0)()
   var blockerMineralThreshold         = 250 // Setting this goofily high as an AIIDE hack to account for the 249-mineral patches on Fortress
-  var maxPlacementAgeFrames           = GameTime(0, 3)()
+  var maxPlacementAgeFrames           = GameTime(0, 8)()
   var enableTightBuildingPlacement    = false
   
   /////////////////
   // Performance //
   /////////////////
-  
+
+  var doAbsolutelyNothing                 = false
   var foreignUnitUpdatePeriod             = 4
-  var garbageCollectionThresholdMs        = 5
+  val friendlyUnitUpdatePeriod            = 4
   var performanceMinimumUnitSleep         = 2
   var maximumGamesHistoryPerOpponent      = 500
   
@@ -83,7 +86,6 @@ class Configuration {
   var buildingPlacementBatchSize          = 300
   var buildingPlacementBatchingStartFrame = GameTime(4, 0)()
   var buildingPlacementMaximumQueue       = 12
-  var buildingPlacementTestsPathing       = false
   
   var urgencyManners            = 1
   var urgencyEconomy            = 1
@@ -91,6 +93,7 @@ class Configuration {
   var urgencyArchitecture       = 1
   var urgencyGrids              = 2
   var urgencyPlanning           = 5
+  var urgencySquads             = 20
   var urgencyBattles            = 20
   var urgencyUnitTracking       = 20
   var urgencyMicro              = 100
@@ -113,4 +116,24 @@ class Configuration {
   var cameraViewportHeight        = 362
   var conservativeViewportWidth   = 640 + cameraViewportWidth
   var conservativeViewportHeight  = 480 + cameraViewportHeight
+
+  class FileFlag(filename: String) {
+    private lazy val fullPath: String = With.bwapiData.ai + filename
+    private lazy val enabled: Boolean = {
+      try {
+        new File(fullPath).exists()
+      }
+      catch { case exception: Exception =>
+        With.logger.warn("Exception looking for flag file at: " + fullPath)
+        With.logger.onException(exception)
+        false
+      }
+    }
+    def apply(): Boolean = enabled
+  }
+
+  val humanMode = new FileFlag("human-mode-is.on")
+  val visualize = new FileFlag("visualizations-are.on")
+  val debugging = new FileFlag("debugging-is.on")
+  def debugPauseThreshold: Int = if (debugging()) 250 else 24 * 60 * 60
 }

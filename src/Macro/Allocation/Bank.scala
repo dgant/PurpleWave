@@ -24,7 +24,7 @@ class Bank {
   }
   
   private def recountResources() {
-    val framesAhead = 2 * With.reaction.planningAverage
+    val framesAhead = 4 * With.reaction.planningAverage
     mineralsLeft  = With.self.minerals  + (framesAhead * With.economy.incomePerFrameMinerals).toInt
     gasLeft       = With.self.gas       + (framesAhead * With.economy.incomePerFrameGas).toInt
     supplyLeft    = With.self.supplyTotal - With.self.supplyUsed
@@ -79,10 +79,10 @@ class Bank {
   
   private def expectedFrames(request: LockCurrency): Int = {
     if (request.satisfied) return 0
-    Vector(
+    Math.max(
       request.framesPreordered,
-      framesToEarnMinerals(-mineralsLeft),
-      framesToEarnGas(-gasLeft)
-    ).max
+      Math.max(
+        framesToEarnMinerals(-mineralsLeft),
+        framesToEarnGas(-gasLeft)))
   }
 }

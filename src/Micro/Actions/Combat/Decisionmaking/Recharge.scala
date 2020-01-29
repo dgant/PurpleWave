@@ -12,8 +12,9 @@ object Recharge extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.canMove
-    && unit.shieldPoints < unit.unitClass.maxShields / 2
-    && unit.totalHealth < unit.unitClass.maxTotalHealth / 2.0
+    && (unit.agent.toForm.isEmpty || ! unit.readyForAttackOrder || unit.matchups.targetsInRange.isEmpty) // Particularly to ensure that ramp-holders don't get stuck trying to get to a battery
+    && unit.shieldPoints < unit.unitClass.maxShields / 3
+    && (unit.totalHealth < unit.unitClass.maxTotalHealth / 3.0 || ! unit.agent.shouldEngage)
   )
   
   protected def validBattery(unit: UnitInfo): Boolean = (
@@ -25,7 +26,7 @@ object Recharge extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     var batteries = unit.matchups.allies.filter(validBattery)
-    if (batteries.isEmpty) batteries = unit.zone.units.filter(validBattery).toVector
+    if (batteries.isEmpty) batteries = unit.zone.units.filter(validBattery)
     val battery = ByOption.minBy(batteries)(_.pixelDistanceEdge(unit))
     if (battery.isEmpty) return
     

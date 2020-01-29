@@ -1,18 +1,20 @@
+
 package Micro.Agency
 
-import Information.Geography.Pathfinding.ZonePath
+import Information.Geography.Pathfinding.PathfindProfile
+import Information.Geography.Pathfinding.Types.{TilePath, ZonePath}
 import Lifecycle.With
 import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, PixelRay, Tile}
 import Micro.Actions.Combat.Techniques.Common.ActionTechniqueEvaluation
 import Micro.Actions.{Action, Idle}
-import Micro.Heuristics.Targeting.TargetingProfile
 import Performance.Cache
 import Planning.Plan
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
+import Utilities.ByOption
 import bwapi.Color
 
 import scala.collection.mutable
@@ -73,8 +75,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   var canCancel     : Boolean                       = false
   var canFocus      : Boolean                       = false
   
-  var targetingProfile: TargetingProfile = TargetingProfiles.default
-  
   var lastStim: Int = 0
   var lastCloak: Int = 0
   var shouldEngage: Boolean = false
@@ -88,20 +88,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     cachedZonePath(to)
   }
   private val cachedZonePath = new mutable.HashMap[Pixel, Option[ZonePath]]
-  
-  def nextWaypoint(to: Pixel): Pixel = {
-    if (unit.flying) return to
-    if ( ! With.strategy.map.forall(_.trustGroundDistance)) return to
-    if ( ! cachedWaypoint.contains(to)) {
-      val path = zonePath(to)
-      cachedWaypoint(to) = path.get.steps
-        .map(_.edge.pixelCenter)
-        .find(step => unit.pixelDistanceCenter(step) > 128)
-        .getOrElse(to)
-    }
-    cachedWaypoint(to)
-  }
-  private val cachedWaypoint = new mutable.HashMap[Pixel, Pixel]
   
   /////////////////
   // Suggestions //
@@ -121,16 +107,54 @@ class Agent(val unit: FriendlyUnitInfo) {
   var lastFrame   : Int             = 0
   var lastClient  : Option[Plan]    = None
   var lastAction  : Option[Action]  = None
-  
-  var netEngagementValue: Double = _
-  var movingTo: Option[Pixel] = None
-  
+
+  var movingTo        : Option[Pixel]         = None
+  var path            : Option[TilePath]      = None
+  var pathBranches    : Seq[(Pixel, Pixel)]   = Seq.empty
   var pathsAll        : Traversable[PixelRay] = Seq.empty
   var pathsTruncated  : Traversable[PixelRay] = Seq.empty
   var pathsAcceptable : Traversable[PixelRay] = Seq.empty
   var pathAccepted    : Traversable[PixelRay] = Seq.empty
+
+  def focusPath: TilePath = {
+    refreshFocusPath()
+    focusPathCache()
+  }
+  def focusPathSteps: Seq[Tile] = {
+    focusPathStepsCache()
+  }
+  private def refreshFocusPath(): Unit = {
+    val destinationTile = destination.tileIncluding
+    if ( ! focusPathGoal.contains(destinationTile)) {
+      focusPathCache.invalidate()
+    }
+    focusPathGoal = Some(destinationTile)
+  }
+  private var focusPathGoal: Option[Tile] = None
+  private val focusPathCache = new Cache[TilePath](() => {
+    val profile = new PathfindProfile(unit.tileIncludingCenter)
+    profile.end                 = focusPathGoal
+    profile.canCrossUnwalkable  = unit.flying || unit.transport.exists(_.flying)
+    profile.allowGroundDist     = true
+    profile.costEnemyVision     = 1f
+    profile.costThreat          = 2f
+    profile.unit = Some(unit)
+    profile.find
+  })
+  val focusPathStepSize: Int = 6
+  val focusPathStepSizeSqrt2: Double = focusPathStepSize * Math.sqrt(2)
+  private val focusPathStepsCache = new Cache[Seq[Tile]](() => {
+    val path = focusPathCache()
+    if (path.tiles.isEmpty) {
+      Seq.empty
+    } else {
+      path.tiles.get.view.zipWithIndex.filter(_._2 % focusPathStepSize == 0).map(_._1)
+    }
+  })
   
   val techniques: ArrayBuffer[ActionTechniqueEvaluation] = new ArrayBuffer[ActionTechniqueEvaluation]
+
+  val actionsPerformed: ArrayBuffer[Action] = new ArrayBuffer[Action]()
   
   var fightReason: String = ""
   
@@ -146,26 +170,29 @@ class Agent(val unit: FriendlyUnitInfo) {
     followIntent()
     combatHysteresisFrames = Math.max(0, combatHysteresisFrames - With.framesSince(lastFrame))
     lastFrame = With.frame
+    updateRidesharing()
     Idle.consider(unit)
     cleanUp()
   }
-  
+
   private def resetState() {
     forces.clear()
     resistances.clear()
-    netEngagementValue  = 1.0
     movingTo            = None
-    targetingProfile    = TargetingProfiles.default
+    path                = None
+    pathBranches        = Seq.empty
     pathsAll            = Seq.empty
     pathsTruncated      = Seq.empty
     pathsAcceptable     = Seq.empty
     pathAccepted        = Seq.empty
+    focusPathGoal       = None
     cachedZonePath.clear()
-    cachedWaypoint.clear()
     techniques.clear()
     fightReason = ""
+    actionsPerformed.clear()
+    _umbrellas.clear()
   }
-  
+
   private def followIntent() {
     val intent    = lastIntent
     toReturn      = intent.toReturn
@@ -181,11 +208,12 @@ class Agent(val unit: FriendlyUnitInfo) {
     toFinish      = intent.toFinish
     toUpgrade     = intent.toUpgrade
     toLeash       = intent.toLeash
+    toRepair      = intent.toRepair
     toForm        = intent.toForm
+    toBoard       = intent.toBoard.orElse(toBoard)
     toNuke        = intent.toNuke
-    toRepair      = None
-    toBoard       = None
     canFight      = intent.canAttack
+    canFlee       = intent.canFlee
     canMeld       = intent.canMeld
     canScout      = intent.canScout
     canLiftoff    = intent.canLiftoff
@@ -193,29 +221,30 @@ class Agent(val unit: FriendlyUnitInfo) {
     canCancel     = intent.canCancel
     canFocus      = intent.canFocus
   }
-  
+
   private def cleanUp() {
     shovers.clear()
   }
-  
+
   private def calculateOrigin: Pixel = {
     if (toReturn.isDefined) {
       toReturn.get
     }
+
     else if (toForm.isDefined) {
       toForm.get
     }
     else if (toLeash.isDefined) {
       toLeash.get.pixelCenter
     }
-    else if (With.geography.ourBases.nonEmpty) {
-      With.geography.ourBases.map(_.heart.pixelCenter).minBy(unit.pixelDistanceTravelling)
-    }
-    else {
-      With.geography.home.pixelCenter
-    }
+    toTravel
+      .flatMap(_.base)
+      .filter(_.owner.isUs)
+      .orElse(ByOption.minBy(With.geography.ourBases)(base => unit.pixelDistanceTravelling(base.heart) * (if (base.scoutedByEnemy || base.isNaturalOf.exists(_.scoutedByEnemy)) 1 else 1000)))
+      .map(_.heart.pixelCenter)
+      .getOrElse(With.geography.home.pixelCenter)
   }
-  
+
   private def calculateDestination: Pixel = {
     if (toTravel.isDefined) {
       toTravel.get
@@ -227,17 +256,70 @@ class Agent(val unit: FriendlyUnitInfo) {
       origin
     }
   }
-  
-  private def isAnchor(ally: UnitInfo): Boolean = {
-    if ( ! ally.unitClass.dealsDamage) return false
-    
-    // Don't retreat to a Missile Turret against Zerglings, for example
-    if (ally.matchups.enemies.nonEmpty && ally.matchups.targets.isEmpty) return false
-    
-    if ( ! ally.unitClass.canMove && ally.canAttack) {
-      return true
-    }
-    
-    false
+
+  //////////////////////
+  // Arbiter coverage //
+  //////////////////////
+
+  private var _umbrellas = new ArrayBuffer[FriendlyUnitInfo]
+  def addUmbrella(umbrella: FriendlyUnitInfo): Unit = {
+    _umbrellas += umbrella
   }
+  def umbrellas: Seq[FriendlyUnitInfo] = _umbrellas
+
+  /////////////
+  // Leading //
+  /////////////
+
+  val leader = new Cache(() => unit.squad.flatMap(_.leader(unit.unitClass)))
+  var leadFollower: (FriendlyUnitInfo) => Unit = x => {}
+
+  /////////////////
+  // Ridesharing //
+  /////////////////
+
+  private var rideAge: Int = 0
+  private var _ride: Option[FriendlyUnitInfo] = None
+  private val _passengers: ArrayBuffer[FriendlyUnitInfo] = new ArrayBuffer[FriendlyUnitInfo]
+  def ride: Option[FriendlyUnitInfo] = _ride
+  def passengers: Seq[FriendlyUnitInfo] = (_passengers ++ unit.loadedUnits).distinct
+  def claimPassenger(passenger: FriendlyUnitInfo): Unit = {
+    passenger.agent._ride = Some(unit)
+    passenger.agent.rideAge = 0
+    if ( ! _passengers.contains(passenger)) {
+      _passengers += passenger
+    }
+  }
+  def releasePassenger(passenger: FriendlyUnitInfo): Unit = {
+    passenger.agent._ride = passenger.agent._ride.filterNot(_ == unit)
+    _passengers -= passenger
+  }
+  def updateRidesharing(): Unit = {
+    if (_passengers.nonEmpty) {
+      _passengers --= passengers.filter(u => !u.alive || !u.isOurs)
+    }
+    if (unit.transport.isDefined) {
+      unit.transport.foreach(_.agent.claimPassenger(unit))
+    } else {
+      rideAge += 1
+      if (rideAge > 2 || _ride.exists(!_.alive)) {
+        _ride.foreach(_.agent.releasePassenger(unit))
+      }
+    }
+  }
+  private var _rideGoal: Option[Pixel] = None
+  def consumePassengerRideGoal: Option[Pixel] = {
+    val output = _rideGoal
+    _rideGoal = None
+    output
+  }
+  def directRide(to: Pixel): Unit = {
+    _rideGoal = Some(to)
+  }
+
+  ///////////////////////
+  // Explosion hopping //
+  ///////////////////////
+
+  var hoppingExplosion = false
 }

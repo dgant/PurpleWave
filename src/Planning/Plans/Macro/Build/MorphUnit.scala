@@ -1,18 +1,23 @@
 package Planning.Plans.Macro.Build
 
-import Macro.Scheduling.Project
+import Lifecycle.With
+import Macro.Buildables.{Buildable, BuildableUnit}
 import Micro.Agency.Intention
-import Planning.ResourceLocks.{LockCurrencyForUnit, LockUnits}
+import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.UnitCountOne
 import Planning.UnitMatchers.{UnitMatchMorphingInto, UnitMatchOr}
-import Planning.UnitPreferences.{UnitPreferBaseWithFewerWorkers, UnitPreferHatcheryWithMoreLarva}
-import Planning.Plan
+import Planning.UnitPreferences.{UnitPreferAll, UnitPreferBaseWithFewerWorkers, UnitPreferBaseWithMoreWorkers, UnitPreferHatcheryWithThreeLarva}
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class MorphUnit(val classToMorph: UnitClass) extends Plan {
-  
+class MorphUnit(val classToMorph: UnitClass) extends ProductionPlan {
+
+  override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
+  override def producerUnitLocks: Seq[LockUnits] = Seq(morpherLock)
+  override def producerInProgress: Boolean = morpher.exists(_.morphing)
+  override def buildable: Buildable = BuildableUnit(classToMorph)
+
   description.set("Morph a " + classToMorph)
   
   val currencyLock    = new LockCurrencyForUnit(classToMorph)
@@ -32,8 +37,8 @@ class MorphUnit(val classToMorph: UnitClass) extends Plan {
   
     // Duplicated across TrainUnit
     currencyLock.framesPreordered = (
-      classToMorph.buildUnitsEnabling.map(Project.framesToUnits(_, 1))
-      :+ Project.framesToUnits(morpherClass, 1)).max
+      classToMorph.buildUnitsEnabling.map(With.projections.unit)
+      :+ With.projections.unit(morpherClass)).max
     
     currencyLock.isSpent = morpher.exists(m => m.alive && m.isAny(Zerg.Egg, Zerg.LurkerEgg, Zerg.Cocoon, classToMorph))
     currencyLock.acquire(this)
@@ -52,9 +57,15 @@ class MorphUnit(val classToMorph: UnitClass) extends Plan {
   
   protected def setPreference() {
     if (classToMorph.isWorker) {
-      morpherLock.unitPreference.set(UnitPreferBaseWithFewerWorkers)
+      morpherLock.unitPreference.set(UnitPreferAll(
+        UnitPreferHatcheryWithThreeLarva,
+        UnitPreferBaseWithFewerWorkers
+      ))
     } else if (morpherClass == Zerg.Larva) {
-      morpherLock.unitPreference.set(UnitPreferHatcheryWithMoreLarva)
+      morpherLock.unitPreference.set(UnitPreferAll(
+        UnitPreferHatcheryWithThreeLarva,
+        UnitPreferBaseWithMoreWorkers
+      ))
     } else {
       // AIST1 hack fix: Disabling this so we stop morphing all our Hatcheries into Lairs
       //morpherLock.unitPreference.set(UnitPreferClose(With.geography.home.pixelCenter))

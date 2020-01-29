@@ -1,10 +1,8 @@
 package Planning.Predicates.Milestones
 
 import Lifecycle.With
-import Planning.Predicate
+import Planning.Predicates.Compound.{Check, Latch}
 
-class EnemyWalledIn extends Predicate {
-  
-  override def isComplete: Boolean = With.geography.enemyZones.exists(_.walledIn)
-  
-}
+class EnemyWalledIn extends Latch(new Check(() =>
+  With.geography.zones.exists(z => z.walledIn && ! z.owner.isUs)
+))

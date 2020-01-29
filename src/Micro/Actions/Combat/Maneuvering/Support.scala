@@ -13,16 +13,23 @@ object Support extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = isSupport(unit)
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
+
     // If useless, just go home as normal
-    if (unit.unitClass.spells.forall(tech => ! With.self.hasTech(tech) || unit.energy < tech.energyCost)) {
+    if ( ! unit.unitClass.isTransport
+      && unit.unitClass.spells.forall(tech => ! With.self.hasTech(tech) || unit.energy < tech.energyCost)) {
       return
     }
 
     // Who can we support?
     var supportables = unit.matchups.allies.filterNot(isSupport)
-    if (supportables.isEmpty) supportables = unit.squad.map(_.units.toVector.filterNot(isSupport)).getOrElse(Vector.empty)
+    if (supportables.isEmpty) supportables = unit.squad.map(_.units.view.filterNot(isSupport).toVector).getOrElse(Vector.empty)
     if (supportables.isEmpty) return
-    val destination = unit.battle.map(_.us.vanguard).getOrElse(PurpleMath.centroid(supportables.map(_.pixelCenter)))
+    val destination = unit.battle
+      .map(_.us.vanguard)
+      .getOrElse({
+        val centroid = PurpleMath.centroid(supportables.map(_.pixelCenter))
+        supportables.minBy(_.pixelDistanceTravelling(unit.agent.destination)).pixelCenter
+      })
 
     // Retreat to help
     if (!unit.visibleToOpponents) {

@@ -9,7 +9,7 @@ object TileSourceOurBases extends TileSource {
     true
   }
   
-  override def tiles(blueprint: Blueprint): Iterable[Tile] = {
-    With.geography.ourBases.flatMap(_.zone.tilesBuildable)
+  override def tiles(blueprint: Blueprint): Seq[Tile] = {
+    With.geography.ourBases.view.flatMap(_.zone.tilesBuildable)
   }
 }

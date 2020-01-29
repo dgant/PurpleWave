@@ -1,14 +1,9 @@
 package Micro.Actions.Combat.Maneuvering
 
-import Debugging.Visualizations.ForceColors
+import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Actions.Combat.Targeting.Target
-import Micro.Actions.Commands.{Gravitate, Move}
-import Micro.Decisions.Potential
-import Planning.UnitMatchers.UnitMatchMobileDetectors
-import Planning.Yolo
-import ProxyBwapi.Races.Protoss
+import Micro.Actions.Combat.Techniques.Avoid
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Sneak extends Action {
@@ -17,30 +12,20 @@ object Sneak extends Action {
     unit.cloaked
     && unit.canMove
     && unit.agent.canFlee
-    && ! Yolo.active
-    && ! unit.matchups.allies.exists(_.is(Protoss.Arbiter))
-    && ! unit.matchups.enemies.exists(_.is(UnitMatchMobileDetectors))
+    && ! With.yolo.active()
+    && ! unit.agent.shouldEngage
+    && unit.matchups.nearestArbiter.isEmpty
+    && unit.matchups.enemyDetectors.isEmpty
     && unit.matchups.enemies.exists(e => e.complete && ! e.unitClass.isWorker && (if (unit.flying) e.unitClass.attacksGround else e.unitClass.attacksAir))
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {
     Potshot.delegate(unit)
 
-    if ( ! unit.readyForMicro) return
+    if ( ! unit.ready) return
 
-    val needsToFlee = (
-      ! unit.effectivelyCloaked
-        || unit.matchups.enemyDetectors.exists(e => e.pixelDistanceEdge(unit) < 32.0 * (if(e.unitClass.canMove) 15.0 else 12.0))
-    )
-
-    if (needsToFlee) {
-      Target.delegate(unit)
-      val forceThreat     = Potential.avoidThreatsWhileCloaked(unit)
-      val forceSneaking   = Potential.detectionRepulsion(unit)
-      unit.agent.forces.put(ForceColors.threat,     forceThreat)
-      unit.agent.forces.put(ForceColors.bypassing,  forceSneaking)
-      Gravitate.delegate(unit)
-      Move.delegate(unit)
+    if ( ! unit.effectivelyCloaked || unit.tileArea.expand(2, 2).tiles.exists(With.grids.enemyDetection.isDetected)) {
+      Avoid.delegate(unit)
     }
   }
 }

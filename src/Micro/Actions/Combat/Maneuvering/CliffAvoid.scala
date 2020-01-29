@@ -19,9 +19,10 @@ object CliffAvoid extends Action {
     val dpfFromWalkers    = walkers.map(_.dpfOnNextHitAgainst(unit)).sum
     val dpfFromThreats    = threats.map(_.dpfOnNextHitAgainst(unit)).sum
     val cliffingMagnitude = PurpleMath.nanToZero(dpfFromWalkers / dpfFromThreats)
-    
-    val forceCliffing   = Potential.cliffAttraction(unit).normalize(cliffingMagnitude)
-    unit.agent.forces.put(ForceColors.bypassing,  forceCliffing)
+
+    val forceThreats = Potential.avoidThreats(unit)
+    val forceCliffing = Potential.cliffAttraction(unit).normalize(0.5 * cliffingMagnitude)
+    unit.agent.forces.put(ForceColors.sneaking, forceCliffing)
     
     Avoid.delegate(unit)
   }

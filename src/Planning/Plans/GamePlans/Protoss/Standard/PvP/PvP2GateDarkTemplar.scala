@@ -1,102 +1,155 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Predicates.Compound.{And, Latch}
-import Planning.Plan
 import Planning.Plans.Army.{Attack, EjectScout}
-import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, RequireSufficientSupply}
+import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.Macro.Automatic._
+import Planning.Plans.Macro.Build.{CancelOrders, ProposePlacement}
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
-import Planning.Predicates.Milestones.{EnemiesAtMost, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
-import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
+import Planning.Plans.Scouting.{FoundEnemyBase, ScoutCleared, ScoutForCannonRush}
+import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Milestones._
+import Planning.Predicates.Reactive.{EnemyDarkTemplarLikely, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvPOpen2GateDTExpand
+import Strategery.Strategies.Protoss.PvP2GateDTExpand
 
-class PvP2GateDarkTemplar extends GameplanModeTemplate {
+class PvP2GateDarkTemplar extends GameplanTemplate {
   
-  override val activationCriteria = new Employing(PvPOpen2GateDTExpand)
-  override val completionCriteria = new Latch(new MiningBasesAtLeast(2))
-  override val defaultWorkerPlan  = NoPlan()
-  override val defaultScoutPlan   = new ScoutOn(Protoss.CyberneticsCore)
-  override val defaultAttackPlan  = new Trigger(
+  override val activationCriteria = new Employing(PvP2GateDTExpand)
+  override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
+
+  override val scoutPlan = new PvP1GateCoreIdeas.ScoutPlan
+
+  override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
+
+  override val attackPlan = new If(
     new Or(
-      new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
-      new EnemyStrategy(With.fingerprints.nexusFirst)),
-    new Attack)
-  override def blueprints = Vector(
-    new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.backPylon)),
-    new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.backPylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
+      // It's our timing
+      new Latch(new UnitsAtLeast(1, Protoss.DarkTemplar)),
+      new And(
+        new FoundEnemyBase,
+        // Attack greedy openings
+        new Or(
+          new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.oneGateCore),
+          new Not(new EnemyHasShown(Protoss.Zealot))),
+        // Pressure proxy opening
+        new Or(
+          new Not(new EnemyStrategy(With.fingerprints.proxyGateway)),
+          new UnitsAtLeast(1, Protoss.Dragoon, complete = true)))),
+    new Attack,
+    new PvPIdeas.AttackSafely)
 
-  override val buildOrder = Vector(
-    // http://wiki.teamliquid.net/starcraft/2_Gateway_Dark_Templar_(vs._Protoss)
-    // We get gas/core faster because of mineral locking + later scout
-    Get(8,   Protoss.Probe),
-    Get(1,   Protoss.Pylon),            // 8
-    Get(10,  Protoss.Probe),
-    Get(1,   Protoss.Gateway),          // 10
-    Get(12,  Protoss.Probe),
-    Get(2,   Protoss.Pylon),            // 11
-    Get(13,  Protoss.Probe),
-    Get(1,   Protoss.Zealot),           // 13 = 11 + Z
-    Get(14,  Protoss.Probe),
-    Get(1,   Protoss.Assimilator),      // 16 = 14 + Z
-    Get(16,  Protoss.Probe),
-    Get(1,   Protoss.CyberneticsCore),  // 18 = 16 + Z
-    Get(17,  Protoss.Probe),
-    Get(2,   Protoss.Zealot),           // 21 = 17 + ZZ
-    Get(18,  Protoss.Probe),
-    Get(3,   Protoss.Pylon),            // 22 = 18 + ZZ
-    Get(20,  Protoss.Probe),            // 24 = 20 + ZZ
-    Get(1,   Protoss.CitadelOfAdun),
-    Get(1,   Protoss.Dragoon),          // 26 = 20 + ZZ + D
-    Get(21,  Protoss.Probe),
-    Get(2,   Protoss.Dragoon),          // 29 = 21 + ZZ + DD
-    Get(2,   Protoss.Gateway),
-    Get(3,   Protoss.Pylon),
-    Get(1,   Protoss.TemplarArchives),
-    Get(22,  Protoss.Probe),            // 30 = 22 + ZZZZ + DD
-    Get(4,   Protoss.Pylon),            // 32 = 22 + ZZZZ + DD
-    Get(23,  Protoss.Probe),
-    Get(2,   Protoss.DarkTemplar),
-    Get(24,  Protoss.Probe),
-    Get(1,   Protoss.Forge),
-    Get(25,  Protoss.Probe),
-    Get(5,   Protoss.Pylon))
-  
-  override def emergencyPlans: Seq[Plan] = Seq(
-    new PvPIdeas.ReactToCannonRush,
-    new PvPIdeas.ReactToProxyGateways,
-    new PvPIdeas.ReactToFFE
-  )
-  
-  override val buildPlans = Vector(
-    new EjectScout,
-    new RequireSufficientSupply,
+  override def placementPlan: Plan = new Parallel(
+    super.placementPlan,
     new If(
       new And(
-        new EnemiesAtMost(0, Protoss.Observer),
-        new EnemiesAtMost(0, Protoss.Observatory),
-        new UnitsAtMost(2, Protoss.DarkTemplar)),
-        new Pump(Protoss.DarkTemplar, 3, 1)),
-    new PumpWorkers,
+        new UnitsAtLeast(1, Protoss.CitadelOfAdun),
+        new Not(new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway))),
+      new ProposePlacement {
+        override lazy val blueprints = Vector(new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
+      }))
+
+  override def blueprints = Vector(
+    new Blueprint(this, building = Some(Protoss.Pylon),           placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
+    new Blueprint(this, building = Some(Protoss.Gateway),         placement = Some(PlacementProfiles.wallGathering)),
+    new Blueprint(this, building = Some(Protoss.Pylon),           placement = Some(PlacementProfiles.backPylon)),
+    new Blueprint(this, building = Some(Protoss.ShieldBattery)),
+    new Blueprint(this, building = Some(Protoss.Gateway),         placement = Some(PlacementProfiles.wallGathering)))
+
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new PvPIdeas.ReactToGasSteal,
+    new PvPIdeas.ReactToCannonRush,
     new If(
-      new EnemyDarkTemplarLikely,
+      new UnitsAtMost(0, Protoss.CitadelOfAdun),
       new Parallel(
-        new BuildCannonsInMain(1),
-        new BuildCannonsAtNatural(3)),
-      new BuildCannonsAtNatural(2)),
-    new Pump(Protoss.Dragoon),
-    new RequireMiningBases(2))
+        new PvPIdeas.ReactToProxyGateways,
+        new PvPIdeas.ReactTo2Gate)),
+    new PvPIdeas.ReactToFFE,
+    new ScoutForCannonRush)
+
+  override def buildOrderPlan = new PvP1GateCoreIdeas.BuildOrderPlan
+  
+  override val buildPlans = Vector(
+    new Trigger(
+      new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
+      new EjectScout,
+      new EjectScout(Protoss.Probe)),
+
+    new Trigger(
+      new UnitsAtLeast(1, Protoss.CitadelOfAdun),
+      new CapGasAt(300),
+      new CapGasAt(200)),
+
+    // Delay build until scout cleared
+    new If(
+
+      new Or(
+        new UnitsAtLeast(1, Protoss.CitadelOfAdun),
+        new ScoutCleared,
+        new FrameAtLeast(GameTime(4, 10)())),
+
+      new Parallel(
+        new CancelOrders(Protoss.CyberneticsCore),
+        new BuildOrder(
+          Get(Protoss.Dragoon),
+          Get(Protoss.CitadelOfAdun),
+          Get(2, Protoss.Dragoon),
+          Get(Protoss.TemplarArchives)),
+        new If(
+          new And(
+            new EnemiesAtLeast(2, Protoss.PhotonCannon),
+            new Not(new EnemyStrategy(With.fingerprints.cannonRush))),
+          new RequireMiningBases(2),
+          new Build(Get(2, Protoss.Gateway))),
+        new BuildOrder(
+          Get(2, Protoss.DarkTemplar),
+          Get(Protoss.Forge)),
+        new If(
+          new And(
+            new EnemiesAtMost(0, Protoss.Observer),
+            new EnemiesAtMost(0, Protoss.Observatory),
+            new UnitsAtMost(2, Protoss.DarkTemplar)),
+            new Pump(Protoss.DarkTemplar, 3, 1)),
+        new If(
+          new EnemyDarkTemplarLikely,
+          new Parallel(
+            new BuildCannonsInMain(1),
+            new BuildCannonsAtNatural(2),
+            new BuildCannonsInMain(2),
+            new BuildCannonsAtNatural(3))),
+        new BuildCannonsAtNatural(0),
+        new If(
+          new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),
+          new BuildCannonsAtNatural(1)),
+        new If(
+          new And(
+            new EnemyStrategy(With.fingerprints.twoGate),
+            new Not(new SafeAtHome),
+            new UnitsAtMost(12, UnitMatchWarriors)),
+          new Pump(Protoss.Dragoon)),
+        new RequireMiningBases(2),
+        new If(
+          new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),
+          new BuildCannonsAtNatural(2))),
+
+    // Do while ejecting scout
+    new BuildOrder(
+      Get(Protoss.Dragoon),
+      Get(Protoss.AirDamage),
+      Get(2, Protoss.Gateway),
+      Get(2, Protoss.Dragoon))),
+
+    new PumpWorkers(oversaturate = true),
+    new Pump(Protoss.Dragoon)
+  )
 }

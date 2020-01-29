@@ -1,45 +1,99 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
-import Macro.BuildRequests.{BuildRequest, Get}
+import Lifecycle.With
+import Macro.BuildRequests.Get
+import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.Macro.Automatic.Pump
-import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump, PumpWorkers}
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.Latch
-import Planning.Predicates.Milestones.{EnemiesAtLeast, MiningBasesAtLeast, UnitsAtLeast}
-import Planning.Predicates.Strategy.Employing
+import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
+import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
+import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Milestones.{EnemiesAtLeast, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvPOpen4GateGoon
+import Strategery.Strategies.Protoss.PvP4GateGoon
 
-class PvP4GateGoon extends GameplanModeTemplate {
+class PvP4GateGoon extends GameplanTemplate {
   
-  override val activationCriteria : Predicate = new Employing(PvPOpen4GateGoon)
-  override val completionCriteria : Predicate = new Latch(new MiningBasesAtLeast(2))
-  override def defaultAttackPlan  : Plan      = new PvPIdeas.AttackSafely
+  override val activationCriteria : Predicate = new Employing(PvP4GateGoon)
+  override val completionCriteria : Predicate = new Latch(
+    new And(
+      new MiningBasesAtLeast(2),
+      new Or(
+        new UnitsAtMost(0, Protoss.TemplarArchives),
+        new And(
+          new UnitsAtLeast(6, Protoss.Gateway),
+          new UnitsAtLeast(2, Protoss.Assimilator)))))
 
-  override def defaultScoutPlan   : Plan = new ScoutOn(Protoss.CyberneticsCore)
-  override val defaultWorkerPlan  : Plan = NoPlan()
-  override def emergencyPlans: Seq[Plan] = Vector(
-    new PvPIdeas.ReactToDarkTemplarEmergencies,
-    new PvPIdeas.ReactToCannonRush,
-    new PvPIdeas.ReactToProxyGateways,
-    new PvPIdeas.ReactToTwoGate)
-  
-  override val buildOrder: Seq[BuildRequest] = ProtossBuilds.Opening_4GateDragoon
-  
-  override val buildPlans = Vector(
+  override def attackPlan: Plan = new Parallel(
     new If(
       new Or(
-        new UnitsAtLeast(15, Protoss.Dragoon),
+        new UnitsAtMost(0, Protoss.CitadelOfAdun),
+        new Latch(new UnitsAtLeast(1, Protoss.DarkTemplar))),
+      new PvPIdeas.AttackSafely),
+    new Attack(Protoss.DarkTemplar))
+
+  override def scoutPlan: Plan = new ScoutOn(Protoss.Gateway)
+  override val workerPlan: Plan = NoPlan()
+  override def emergencyPlans: Seq[Plan] = Vector(
+    new PvPIdeas.ReactToGasSteal,
+    new PvPIdeas.ReactToCannonRush,
+    new PvPIdeas.ReactToDarkTemplarEmergencies,
+    new PvPIdeas.ReactToProxyGateways,
+    new PvPIdeas.ReactTo2Gate,
+    new ScoutForCannonRush)
+  
+  override def buildOrderPlan = new If(
+    new Not(new EnemyStrategy(With.fingerprints.cannonRush, With.fingerprints.proxyGateway, With.fingerprints.twoGate, With.fingerprints.dtRush)),
+    new BuildOrder(ProtossBuilds.FourGateGoon: _*))
+
+  override val buildPlans = Vector(
+    new If(
+      new UnitsAtMost(3, Protoss.Gateway),
+      new CapGasWorkersAt(2)),
+
+    new If(
+      new Or(
+        new UnitsAtLeast(18, Protoss.Dragoon),
         new EnemiesAtLeast(1, Protoss.PhotonCannon)),
       new RequireMiningBases(2)),
-    new Pump(Protoss.Dragoon),
-    new Build(Get(Protoss.Forge)),
-    new RequireMiningBases(2)
+
+    new Trigger(
+      new EnemyStrategy(With.fingerprints.fourGateGoon),
+      new Parallel(
+        new BuildOrder(Get(Protoss.CitadelOfAdun)),
+        new If(
+          new Latch(new UnitsAtLeast(2, Protoss.DarkTemplar)),
+          new PumpWorkers(oversaturate = true)),
+        new BuildOrder(
+          Get(6, Protoss.Zealot),
+          Get(Protoss.TemplarArchives),
+          Get(2, Protoss.DarkTemplar),
+          Get(2, Protoss.Nexus),
+          Get(Protoss.Forge),
+          Get(4, Protoss.DarkTemplar)),
+        new BuildCannonsAtNatural(3),
+        new Build(
+          Get(6, Protoss.Gateway),
+          Get(2, Protoss.Assimilator)),
+        new Trigger(
+          new UnitsAtLeast(2, Protoss.Nexus),
+          new PvPIdeas.TrainArmy)),
+      new Pump(Protoss.Dragoon)),
+
+    new Build(
+      Get(Protoss.Gateway),
+      Get(Protoss.Assimilator),
+      Get(Protoss.CyberneticsCore),
+      Get(4, Protoss.Gateway)),
+
+    new RequireMiningBases(2),
+    new Build(Get(Protoss.Forge))
   )
 }

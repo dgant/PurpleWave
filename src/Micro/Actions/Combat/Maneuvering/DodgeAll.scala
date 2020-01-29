@@ -4,13 +4,12 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Coordination.Explosions.Explosion
-import Planning.Yolo
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object DodgeAll extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.canMove && ! Yolo.active
+    unit.canMove
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {

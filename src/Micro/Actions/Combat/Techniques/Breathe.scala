@@ -1,10 +1,9 @@
 package Micro.Actions.Combat.Techniques
 
-import Micro.Actions.Combat.Decisionmaking.Leave
-import Micro.Actions.Combat.Tactics.Potshot
+import Mathematics.PurpleMath
 import Micro.Actions.Combat.Techniques.Common.Activators.WeightedMean
 import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, AttackAsSoonAsPossible}
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Breathe extends ActionTechnique {
@@ -18,7 +17,8 @@ object Breathe extends ActionTechnique {
     && unit.matchups.targets.nonEmpty
     && unit.matchups.threats.nonEmpty
     && ! unit.unitClass.melee
-    && ! unit.is(Protoss.Corsair) // Try to find a better generalizer; maybe cooldown vs. turn rate
+    && ! unit.isAny(Terran.Battlecruiser, Protoss.Corsair) // Try to find a better generalizer; maybe cooldown vs. turn rate
+    && ! unit.transport.exists(_.flying) // Transport cooldown means this just makes the unit flee
   )
   
   override val activator = new WeightedMean(this)
@@ -32,21 +32,24 @@ object Breathe extends ActionTechnique {
     val rangeOurs   = unit.pixelRangeAgainst(unit.matchups.targets.head)
     val rangeTheirs = other.pixelRangeAgainst(unit)
     val rangeDelta  = rangeOurs - rangeTheirs
+
     if (rangeDelta <= 0.0) return Some(0.0)
+
+    // 2/19 speculative try
+    if (other.orderTarget.contains(unit) && rangeDelta >= 0 && other.cooldownLeft < unit.cooldownMaxAirGround) return Some(1.0)
     
     val distanceRatio   = Math.min(1.0, unit.pixelRangeAgainst(other) / unit.pixelDistanceEdge(other))
     val cooldownOurs    = unit.cooldownMaxAgainst(unit.matchups.targets.head)
     val cooldownTheirs  = other.cooldownMaxAgainst(unit)
     val cooldownRatio   = cooldownOurs / cooldownTheirs
     
-    Some(cooldownRatio)
+    Some(PurpleMath.clampToOne(cooldownRatio))
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    Potshot.delegate(unit)
     AttackAsSoonAsPossible.delegate(unit)
     if ( ! unit.readyForAttackOrder) {
-      Leave.delegate(unit)
+      Avoid.delegate(unit)
     }
   }
 }

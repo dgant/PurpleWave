@@ -2,7 +2,7 @@ package Micro.Actions.Commands
 
 import Lifecycle.With
 import Micro.Actions.Action
-import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Attack extends Action {
@@ -13,14 +13,26 @@ object Attack extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
+    val target = unit.agent.toAttack.get
+
+    val dropship = unit.transport.find(_.isAny(Terran.Dropship, Protoss.Shuttle, Zerg.Overlord))
+    val delay = unit.cooldownMaxAirGround
+    if (dropship.isDefined
+      && Math.min(unit.pixelDistanceEdge(target), unit.pixelDistanceEdge(target.projectFrames(delay)))
+      <= unit.pixelRangeAgainst(target)
+        + With.reaction.agencyAverage
+        + delay * unit.topSpeed) {
+      With.commander.unload(dropship.get, unit)
+      return
+    }
+
     if (unit.is(Zerg.Lurker) && ! unit.burrowed) {
       unit.agent.toTravel = Some(unit.agent.toAttack.get.pixelCenter)
       Move.delegate(unit)
     }
     
-    if (unit.agent.toAttack.get.is(Protoss.Interceptor)
-    || (unit.agent.toAttack.get.is(Protoss.Carrier) && ! unit.inRangeToAttack(unit.agent.toAttack.get))) {
-      unit.agent.toTravel = unit.agent.toAttack.map(_.pixelCenter)
+    if (target.is(Protoss.Interceptor)) {
+      unit.agent.toTravel = Some(target.pixelCenter)
       AttackMove.delegate(unit)
     }
     

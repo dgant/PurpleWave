@@ -4,13 +4,12 @@ import Lifecycle.With
 import Strategery.Selection._
 import Strategery.Strategies.AllRaces.WorkerRush
 import Strategery.Strategies.Protoss.PvE._
-import Strategery.Strategies.Protoss.PvR.{PvROpen2Gate1012, PvROpen2Gate910}
-import Strategery.Strategies.Protoss.{PvPOpen3GateGoon, _}
+import Strategery.Strategies.Protoss._
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TvE._
-import Strategery.Strategies.Terran.TvR.{TvR1Rax, TvRTinfoil}
-import Strategery.Strategies.Terran.TvT.TvTStandard
-import Strategery.Strategies.Terran.TvZ._
+import Strategery.Strategies.Terran.TvR.TvR1Rax
+import Strategery.Strategies.Terran.TvZ.TvZProxy8Fact
+import Strategery.Strategies.Terran._
 import Strategery.Strategies.Zerg._
 
 class EmptyPlaybook {
@@ -18,66 +17,65 @@ class EmptyPlaybook {
   lazy val forced   : Seq[Strategy] = none
   lazy val disabled : Seq[Strategy] = none
   val strategyOrder: Seq[Strategy] = Vector(
-    PvEIslandPlasmaCarriers1Base,
-    PvPLateGame2BaseReaverCarrier_SpecificMaps,
-    PvTEarly1015GateGoonDT,
-    PvT2GateObserver,
-    PvT13Nexus,
-    PvT21Nexus,
-    PvT3BaseArbiter,
-    PvT2BaseCarrier,
-    PvPOpen2Gate1012,
-    PvPOpen2GateDTExpand,
-    PvPOpen3GateGoon,
-    PvZ4Gate99,
-    PvZEarlyFFEEconomic,
-    PvZMidgame5GateGoon,
-    PvROpen2Gate910,
-    PvROpen2Gate1012
   )
   def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy
   def enemyName: String = With.enemy.name
+  def respectOpponent: Boolean = true
+  def respectMap: Boolean = true
+  def respectHistory: Boolean = true
 }
 
 object StrategyGroups {
   val disabled = Vector[Strategy](
     WorkerRush,
-    WorkerRushLiftoff,
-    PvZEarlyFFEConservative,
-    PvZMidgameNeoBisu,
-    TvR1Rax,
-    TvRTinfoil,
-    TvEProxy5Rax,
-    TvEProxy8Fact,
-    TvEMassGoliath,
-    TvE2PortWraith,
-    TvTStandard,
-    TvZEarlyCCFirst,
-    TvZEarly1RaxGas,
-    TvZEarly1RaxFEEconomic,
-    TvZEarly1RaxFEConservative,
-    TvZEarly2Rax,
-    MassPhotonCannon,
+
     CarriersWithNoDefense,
-    ProxyDarkTemplar,
-    FivePoolProxySunkens,
-    PvPOpen2GateRobo,
-    PvPOpen2Gate1012
+
+    TvEWorkerRushLiftoff,
+    TvR1Rax,
+    TvZProxy8Fact,
+    TvZ2RaxNuke,
+
+    PvROpenZZCore,
+
+    PvE15BaseIslandCarrier, // Disabled for Sparkle in TorchUp
+    PvE2BaseIslandCarrier, // Disabled for Sparkle in TorchUp
+    PvE3BaseIslandCarrier, // Disabled for Sparkle in TorchUp
+
+    PvT1GateRobo,
+    PvTProxyDarkTemplar,
+    PvT25BaseCarrier, // Experimenting with this so we can delete it
+    PvZLateGameCarrier, // Needs island tech
+    PvZGatewayFE, // Execution needs work; in particular, Zealots need to protect cannons
+    PvZMidgame4Gate2Archon,
+    PvZMidgameNeoNeoBisu,
+    PvZMidgameCorsairReaverGoon, // Too fragile
+    PvZMidgameCorsairReaverZealot, // Too fragile; especially bad at dealing with Mutalisks
+
+    ZvTProxyHatchZerglings,
+    ZvTProxyHatchHydras,
+    ZvTProxyHatchSunkens,
+    ZvZ5PoolSunkens,
+
+    DarkArchonsWithNoDefense // Temporary for AIIDE testing
   )
 }
 
-class TestingPlaybook extends EmptyPlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvPOpen2Gate1012Goon, PvPLateGameArbiter)
-  override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled
-  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionDynamic
-}
-
 class PurpleWavePlaybook extends EmptyPlaybook {
-  override lazy val disabled  : Seq[Strategy] = StrategyGroups.disabled
+  override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled
+  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy
 }
 
-class SSCAITPlaybook extends PurpleWavePlaybook {
-  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionSSCAIT
+class TournamentPlaybook extends PurpleWavePlaybook {
+  override def strategySelectionPolicy: StrategySelectionPolicy = if (Sparkle.matches) StrategySelectionGreedy else StrategySelectionTournament
 }
 
-object Playbook extends TestingPlaybook {}
+class TestingPlaybook extends PurpleWavePlaybook {
+  override lazy val forced: Seq[Strategy] = Seq(PvZ10Gate, PvZCorsair, PvZMidgameBisu, PvZLateGameTemplar)
+  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
+  override def respectOpponent: Boolean = false
+  override def respectMap: Boolean = false
+  override def respectHistory: Boolean = false
+}
+
+object Playbook extends PurpleWavePlaybook {}

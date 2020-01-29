@@ -23,4 +23,8 @@ class UnitsShown {
       unitCounts(unit.player)(unit.unitClass) += unit.id
     })
   }
+
+  def allEnemies(unitClass: UnitClass): Int = {
+    With.enemies.map(apply(_, unitClass)).sum
+  }
 }

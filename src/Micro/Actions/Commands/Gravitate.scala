@@ -19,7 +19,7 @@ object Gravitate extends Action {
   private val cardinal8directions = (0.0 until 2.0 by 0.25).map(_ * Math.PI).toVector
   
   def useShortAreaPathfinding(unit: FriendlyUnitInfo): Boolean = {
-    ! unit.flying && unit.agent.destination.zone == unit.zone
+    ! unit.flying && ! unit.transport.exists(_.flying) && unit.agent.destination.zone == unit.zone
   }
 
   

@@ -12,12 +12,13 @@ object HistoryLoader {
   private val filenameHistoryPrefix = "_v" + HistorySerializer.formatVersion + "_history_"
   private val filenameEnemyToken = "{opponent}"
   private val filenameTemplate = filenameHistoryPrefix + filenameEnemyToken + ".csv"
-  private val loadFilesDirectory = "bwapi-data/read/"
-  private val saveFilesDirectory = "bwapi-data/write/"
-  private val seedFilesDirectory = "bwapi-data/AI/"
+  private def loadFilesDirectory = With.bwapiData.read
+  private def saveFilesDirectory = With.bwapiData.write
+  private val seedFilesDirectories = Array("", "PretrainP", "PretrainT", "PretrainZ")
+    .map(relative => With.bwapiData.ai + relative)
   
   // The order matters (see below) thus meriting the explicit naming
-  private val directoriesInDecendingOrderOfRecency = Array(loadFilesDirectory, saveFilesDirectory, seedFilesDirectory)
+  private val directoriesInDecendingOrderOfRecency = Array(loadFilesDirectory, saveFilesDirectory) ++ seedFilesDirectories
   
   def load(): Seq[HistoricalGame] = {
     val gamesSerialized = loadAllGames(directoriesInDecendingOrderOfRecency)
@@ -31,7 +32,6 @@ object HistoryLoader {
     val gamesByTimestamp = new mutable.HashMap[Long, HistoricalGame]
     games.foreach(game => gamesByTimestamp(game.timestamp) = gamesByTimestamp.getOrElse(game.timestamp, game))
     val output = gamesByTimestamp.values.toSeq.sortBy(_.timestamp).reverse
-    output.zipWithIndex.foreach(pair => pair._1.order = pair._2)
     output
   }
   
@@ -102,23 +102,7 @@ object HistoryLoader {
     output
   }
   
-  private def saveGames(filename: String, contents: Iterable[String]) {
-    
-    var bufferedWriter: BufferedWriter = null
-    
-    try {
-      val file            = new File(filename)
-      val fileWriter      = new FileWriter(file)
-          bufferedWriter  = new BufferedWriter(fileWriter)
-      
-      contents.map(_ + "\n").foreach(bufferedWriter.write)
-    }
-    catch { case exception: Exception =>
-      With.logger.warn("Failed to save game history to " + filename)
-      With.logger.onException(exception)
-    }
-    if (bufferedWriter != null) {
-      bufferedWriter.close()
-    }
+  private def saveGames(filename: String, lines: Iterable[String]) {
+    WriteFile(filename, lines, "save game history")
   }
 }

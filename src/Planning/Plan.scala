@@ -37,4 +37,12 @@ class Plan {
   
   final def isPrioritized: Boolean = With.prioritizer.isPrioritized(this)
   final def priority: Int = With.prioritizer.getPriority(this)
+
+  def isEmpty: Boolean = false
+
+  val id: Long = PlanId()
+  object PlanId {
+    var id: Long = 0
+    def apply(): Long = { id += 1;  id - 1 }
+  }
 }

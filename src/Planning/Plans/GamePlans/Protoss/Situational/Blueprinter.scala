@@ -22,14 +22,14 @@ object Blueprinter {
       new Blueprint(plan,
         building      = Some(Protoss.Pylon),
         requireZone   = Some(naturalZone),
-        placement     = Some(PlacementProfiles.wallPylon),
+        placement     = Some(PlacementProfiles.defensive),
         marginPixels  = Some(Math.max(0, marginPixels - 72.0))))
     
     val cannons = (0 to cannonCount).map(i =>
       new Blueprint(plan,
         building      = Some(Protoss.PhotonCannon),
         requireZone   = Some(naturalZone),
-        placement     = Some(PlacementProfiles.wallCannon),
+        placement     = Some(PlacementProfiles.defensive),
         marginPixels  = Some(marginPixels)))
     
     val output = pylons ++ cannons

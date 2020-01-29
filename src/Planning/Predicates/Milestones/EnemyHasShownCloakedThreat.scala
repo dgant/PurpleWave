@@ -9,7 +9,6 @@ class EnemyHasShownCloakedThreat extends Or(
   new EnemyHasShown(Protoss.Arbiter),
   new EnemyHasShown(Protoss.ArbiterTribunal),
   new EnemyHasShown(Protoss.DarkTemplar),
-  new EnemyHasShown(Protoss.CitadelOfAdun),
   new EnemyHasShown(Protoss.TemplarArchives),
   new EnemyHasShown(Zerg.LurkerEgg),
   new EnemyHasShown(Zerg.Lurker))

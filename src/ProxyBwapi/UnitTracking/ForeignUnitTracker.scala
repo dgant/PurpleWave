@@ -16,9 +16,11 @@ class ForeignUnitTracker {
   var enemyUnits      : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
   var neutralUnits    : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
   var enemyGhostUnits : Set[Int]             = new HashSet[Int]
-  
+
+  var initialized = false
+
   def get(id: Int): Option[ForeignUnitInfo] = unitsByIdKnown.get(id)
-  
+
   def update() {
     initialize()
 
@@ -39,18 +41,19 @@ class ForeignUnitTracker {
     }
 
     unitsByIdKnown.values.foreach(updateMissing)
-  
+
     // TODO: Let's stop making these sets by default.
     enemyUnits   = unitsByIdKnown.values.filter(_.player.isEnemy).toSet
     neutralUnits = unitsByIdKnown.values.filter(_.player.isNeutral).toSet
   }
-  
+
   def onUnitDestroy(unit: bwapi.Unit) {
     unitsByIdKnown.get(unit.getID).foreach(remove)
   }
-  
+
   private def initialize() {
-    if (With.frame == 0) {
+    if ( ! initialized) {
+      initialized = true
       flagGhostUnits()
       trackStaticUnits()
     }
@@ -72,7 +75,12 @@ class ForeignUnitTracker {
   }
   
   private def trackStaticUnits() {
-    With.game.getStaticNeutralUnits.asScala.foreach(add)
+    val staticNeutralUnits = With.game.getStaticNeutralUnits.asScala
+    if (staticNeutralUnits.size < 18) {
+      With.logger.warn("Encountered surprisingly few static neutral units: " + staticNeutralUnits.size)
+      staticNeutralUnits.foreach(u => With.logger.warn(u.getType.toString))
+    }
+    staticNeutralUnits.foreach(add)
   }
 
   private def add(unit: bwapi.Unit): ForeignUnitInfo = {
@@ -92,7 +100,7 @@ class ForeignUnitTracker {
     if ( ! unit.possiblyStillThere)                                return
     if (unit.lastSeen > With.grids.friendlyVision.frameUpdated)    return
     if (unit.lastSeen > With.grids.friendlyDetection.frameUpdated) return
-    if (With.framesSince(unit.lastSeen) < 24 * 2)                  return
+    if (With.framesSince(unit.lastSeen) < 24 * 1)                  return
     
     lazy val shouldBeVisible  = With.grids.friendlyVision.isSet(unit.tileIncludingCenter)
     lazy val shouldBeDetected = With.grids.friendlyDetection.isSet(unit.tileIncludingCenter)
@@ -117,8 +125,12 @@ class ForeignUnitTracker {
         }
       }
   
-      //Well, if it can't move, it must be dead. Like a building that burned down or was otherwise destroyed.
-      if (unit.unitClass.canMove) unit.flagMissing() else remove(unit)
+      // Well, if it can't move, it must be dead. Like a building that burned down or was otherwise destroyed.
+      if (unit.unitClass.canMove || unit.isSiegeTankSieged()) {
+        unit.flagMissing()
+      } else {
+        remove(unit)
+      }
     }
   }
   

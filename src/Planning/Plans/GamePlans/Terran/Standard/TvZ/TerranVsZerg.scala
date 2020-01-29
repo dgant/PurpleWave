@@ -1,13 +1,12 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Planning.Plans.GamePlans.ModalGameplan
+import Planning.Plans.GamePlans.Terran.Standard.TvE.TerranReactionVsWorkerRush
 
 class TerranVsZerg extends ModalGameplan(
-  new TvZCCFirst,
-  new TvZ1RaxFEEconomic,
-  new TvZ1RaxFEConservative,
-  new TvZ2RaxExpand,
-  new TvZ1RaxGas,
-  new TerranVsZergBio,
-  new TerranVsZergMech
+  new TerranReactionVsWorkerRush,
+  new TvZ8Rax,
+  new TvZ1RaxFE,
+  new TvZ2RaxAcademy,
+  new TvZSK
 )

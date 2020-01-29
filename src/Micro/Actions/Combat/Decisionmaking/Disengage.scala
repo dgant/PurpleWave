@@ -1,9 +1,9 @@
 package Micro.Actions.Combat.Decisionmaking
 
+import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Techniques.Common.Weigh
 import Micro.Actions.Combat.Techniques._
-import Planning.Yolo
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Disengage extends Action {
@@ -11,7 +11,7 @@ object Disengage extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.agent.canFlee
     && unit.matchups.threats.nonEmpty
-    && ! Yolo.active
+    && ! With.yolo.active()
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {
@@ -23,7 +23,6 @@ object Disengage extends Action {
       FallBack,
       Ignore,
       Scratch,
-      Purr,
-      Retreat)
+      Purr)
   }
 }

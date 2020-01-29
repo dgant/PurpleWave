@@ -13,6 +13,7 @@ abstract class HeuristicMath {
     heuristics  : Iterable[THeuristicWeight],
     candidates  : Iterable[TCandidate])
       : TCandidate = {
+
     candidates.minBy(candidate => resolve(context, heuristics, candidate))
   }
   

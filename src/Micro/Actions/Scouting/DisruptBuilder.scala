@@ -3,7 +3,7 @@ package Micro.Actions.Scouting
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Commands.Attack
-import Micro.Heuristics.Targeting.EvaluateTargets
+import Micro.Heuristics.EvaluateTargets
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import bwapi.Race
 

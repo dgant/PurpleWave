@@ -1,27 +1,32 @@
 package ProxyBwapi.UnitInfo
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
 import Performance.Cache
 import ProxyBwapi.Players.{PlayerInfo, Players}
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
+import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 import bwapi._
 
 import scala.collection.JavaConverters._
 
 abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(base, id) {
+
+  override protected val cd1: Int = With.configuration.friendlyUnitUpdatePeriod
+  override protected val cd2: Int = cd1 * 2
+  override protected val cd4: Int = cd1 * 4
   
   override def equals(obj: Any): Boolean = obj.isInstanceOf[FriendlyUnitProxy] && obj.asInstanceOf[FriendlyUnitProxy].id == id
   override def hashCode(): Int = id.hashCode
   
-  private val cacheClass     = new Cache[UnitClass]  (() =>  UnitClasses.get(base.getType), GameTime(0, 1)())
-  private val cachePlayer    = new Cache[PlayerInfo] (() =>  Players.get(base.getPlayer))
+  private val cacheClass     = new Cache[UnitClass]  (() =>  UnitClasses.get(base.getType))
+  private val cachePlayer    = new Cache[PlayerInfo] (() =>  Players.get(base.getPlayer), 24)
   private val cachePixel     = new Cache[Pixel]      (() =>  new Pixel(base.getPosition))
   private val cacheTile      = new Cache[Tile]       (() =>  new Tile(base.getTilePosition))
   private val cacheCompleted = new Cache[Boolean]    (() =>  base.isCompleted)
   private val cacheExists    = new Cache[Boolean]    (() =>  { val e = base.exists; With.performance.trackUnit(id, e); e })
-  private val cacheSelected  = new Cache[Boolean]    (() =>  base.isSelected)
+  private val cacheSelected  = new Cache[Boolean]    (() =>  base.isSelected, cd1)
   
   ///////////////////
   // Tracking info //
@@ -52,13 +57,13 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   def energy                : Int       = getEnergyCache()
   def plagued               : Boolean   = isPlaguedCache()
 
-  private val getHitPointsCache             = new Cache(() => base.getHitPoints)
-  private val isInvincibleCache             = new Cache(() => base.isInvincible)
+  private val getHitPointsCache             = new Cache(() => base.getHitPoints, cd1)
+  private val isInvincibleCache             = new Cache(() => base.isInvincible, cd4)
   private val isPlaguedCache                = new Cache(() => base.isPlagued)
   private val getDefenseMatrixPointsCache   = new Cache(() => if (unitClass.isBuilding) 0 else base.getDefenseMatrixPoints)
   private val getInitialResourcesCache      = new Cache(() => if (unitClass.isResource) base.getInitialResources else 0)
   private val getResourcesCache             = new Cache(() => if (unitClass.isResource) base.getResources else 0)
-  private val getShieldsCache               = new Cache(() => if (unitClass.isProtoss) base.getShields else 0)
+  private val getShieldsCache               = new Cache(() => if (unitClass.isProtoss) base.getShields else 0, cd1)
   private val getEnergyCache                = new Cache(() => if (unitClass.maxEnergy > 0) base.getEnergy else 0)
   
   ////////////
@@ -102,7 +107,7 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   private val isGatheringMineralsCache  = new Cache(() => base.isGatheringMinerals)
   private val isGatheringGasCache       = new Cache(() => base.isGatheringGas)
   
-  private val badPositions = Vector(Position.Invalid, Position.None, Position.Unknown)
+  private val badPositions = Vector(null, Position.Invalid, Position.None, Position.Unknown)
   
   def target            : Option[UnitInfo]  = targetCache()
   def targetPixel       : Option[Pixel]     = targetPixelCache()
@@ -141,13 +146,13 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   def upgrading       : Boolean = isUpgradingCache()
   
   private val isAttackingCache        = new Cache(() => base.isAttacking)
-  private val isConstructingCache     = new Cache(() => base.isConstructing)
+  private val isConstructingCache     = new Cache(() => unitClass.isWorker && base.isConstructing)
   private val isFollowingCache        = new Cache(() => base.isFollowing)
   private val isHoldingPositionCache  = new Cache(() => base.isHoldingPosition)
   private val isIdleCache             = new Cache(() => base.isIdle)
   private val isInterruptibleCache    = new Cache(() => base.isInterruptible)
   private val isMorphingCache         = new Cache(() => base.isMorphing)
-  private val isRepairingCache        = new Cache(() => base.isRepairing)
+  private val isRepairingCache        = new Cache(() => unitClass.isWorker && unitClass.isTerran && base.isRepairing)
   private val isResearchingCache      = new Cache(() => base.isResearching)
   private val isPatrollingCache       = new Cache(() => base.isPatrolling)
   private val isTrainingCache         = new Cache(() => base.isTraining)
@@ -161,6 +166,9 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   
   def buildType: UnitClass = buildTypeCache()
   def trainingQueue: Iterable[UnitClass] = trainingQueueCache()
+  def techProducing: Option[Tech] = techProducingCache()
+  def upgradeProducing: Option[Upgrade] = upgradeProducingCache()
+  def unitProducing: Option[UnitClass] = trainingQueue.headOption
   
   private val buildTypeCache = new Cache(() => UnitClasses.get(base.getBuildType))
   private val trainingQueueCache = new Cache(() =>
@@ -168,6 +176,16 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
       base.getTrainingQueue.asScala.map(UnitClasses.get)
     else
       Iterable.empty // Performance optimization
+  )
+  private val techProducingCache = new Cache[Option[Tech]](() =>
+    if (unitClass.techsWhat.nonEmpty && teching)
+      Some(Techs.get(baseUnit.getTech)).filter(x => x != Techs.None && x != Techs.Unknown)
+    else None
+  )
+  private val upgradeProducingCache = new Cache[Option[Upgrade]](() =>
+    if (unitClass.upgradesWhat.nonEmpty && upgrading)
+      Some(Upgrades.get(baseUnit.getUpgrade)).filter(x => x != Upgrades.None && x != Upgrades.Unknown)
+    else None
   )
   
   ////////////////
@@ -182,7 +200,7 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   private val isBurrowedCache = new Cache(() => base.isBurrowed)
   private val cachedCloaked   = new Cache(() => base.isCloaked)
   private val isDetectedCache = new Cache(() => base.isDetected)
-  private val isVisibleCache  = new Cache(() => base.isVisible)
+  private val isVisibleCache  = new Cache(() => true || base.isVisible) // Performance hack -- when wouldn't it be visible?
   
   //////////////
   // Movement //
@@ -208,16 +226,16 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   private val cachedAngleRadians    = new Cache(() => base.getAngle)
   private val cacheVelocityX        = new Cache(() => base.getVelocityX)
   private val cacheVelocityY        = new Cache(() => base.getVelocityY)
-  private val cachedFlying          = new Cache(() => (unitClass.canFly || lifted)  && base.isFlying)
-  private val cachedLifted          = new Cache(() => unitClass.isFlyingBuilding    && base.isLifted)
+  private val cachedFlying          = new Cache(() => (unitClass.canFly || lifted)  && base.isFlying, cd4)
+  private val cachedLifted          = new Cache(() => unitClass.isFlyingBuilding    && base.isLifted, cd4)
   private val cachedLoaded          = new Cache(() => unitClass.canBeTransported    && base.isLoaded)
-  private val cachedIrradiated      = new Cache(() => unitClass.canBeIrradiated     && base.isIrradiated)
+  private val cachedIrradiated      = new Cache(() => unitClass.canBeIrradiated     && Players.all.exists(_.hasTech(Terran.Irradiate)) && base.isIrradiated)
   private val cachedIsSieged        = new Cache(() => unitClass.canSiege            && base.isSieged)
-  private val cachedIsStimmed       = new Cache(() => unitClass.canBeStasised       && base.isStimmed)
-  private val cachedIsLockedDown    = new Cache(() => unitClass.canBeLockedDown     && base.isLockedDown)
-  private val cachedStasised        = new Cache(() => unitClass.canBeStasised       && base.getStasisTimer > 0) //isStasised is BIZARRELY expensive in BWMirror -- trying this alternative
-  private val cachedIsEnsnared      = new Cache(() => unitClass.canBeEnsnared       && base.isEnsnared)
-  private val cachedIsMaelstrommed  = new Cache(() => unitClass.canBeMaelstrommed   && base.isMaelstrommed)
+  private val cachedIsStimmed       = new Cache(() => unitClass.canStim             && base.isStimmed)
+  private val cachedIsLockedDown    = new Cache(() => unitClass.canBeLockedDown     && Players.all.exists(_.hasTech(Terran.Lockdown))   && base.isLockedDown,   cd4)
+  private val cachedStasised        = new Cache(() => unitClass.canBeStasised       && Players.all.exists(_.hasTech(Protoss.Stasis))    && base.isStasised,     cd4)
+  private val cachedIsEnsnared      = new Cache(() => unitClass.canBeEnsnared       && Players.all.exists(_.hasTech(Zerg.Ensnare))      && base.isEnsnared,     cd4)
+  private val cachedIsMaelstrommed  = new Cache(() => unitClass.canBeMaelstrommed   && Players.all.exists(_.hasTech(Protoss.Maelstrom)) && base.isMaelstrommed, cd4)
   
   //////////////
   // Statuses //
@@ -251,24 +269,28 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   private val beingGatheredCache = new Cache(() => base.isBeingGathered)
   private val beingHealedCache = new Cache(() => base.isBeingHealed)
   private val blindCache = new Cache(() => base.isBlind)
-  private val poweredCache = new Cache(() => base.isPowered)
+  private val poweredCache = new Cache(() => base.isPowered, cd4)
   private val targetableCache = new Cache(() => base.isTargetable)
   private val underAttackCache = new Cache(() => base.isUnderAttack)
-  private val underDarkSwarmCache = new Cache(() => base.isUnderDarkSwarm)
-  private val underDisruptionWebCache = new Cache(() => base.isUnderDisruptionWeb)
+  private val underDarkSwarmCache = new Cache(() => base.isUnderDarkSwarm, cd4)
+  private val underDisruptionWebCache = new Cache(() => base.isUnderDisruptionWeb, cd4)
   private val underStormCache = new Cache(() => base.isUnderStorm)
   
   private val carryingMineralsCache = new Cache(() => unitClass.isWorker && base.isCarryingMinerals)
-  private val carryingGasCache      = new Cache(() => unitClass.isWorker && base.isCarryingGas)
+  private val carryingGasCache      = new Cache(() => unitClass.isWorker && ! carryingMinerals && base.isCarryingGas)
   
   def spiderMines: Int = cachedSpiderMines()
-  private val cachedSpiderMines = new Cache(() => base.getSpiderMineCount)
+  private val cachedSpiderMines = new Cache(() => base.getSpiderMineCount, cd2)
   
   def addon: Option[UnitInfo] = cachedAddon()
-  private val cachedAddon = new Cache(() => With.units.get(base.getAddon))
+  private val cachedAddon = new Cache(() =>
+    if (unitClass.isTerran
+    && unitClass.isBuilding
+    && (unitClass.isTownHall || unitClass.isFactory || unitClass.isStarport || unitClass.isScienceFacility))
+    With.units.get(base.getAddon) else None)
   
   def hasNuke: Boolean = cachedHasNuke()
-  private val cachedHasNuke = new Cache(() => base.hasNuke)
+  private val cachedHasNuke = new Cache(() => base.hasNuke, cd4)
   
   def spaceRemaining: Int = spaceRemainingCache()
   private val spaceRemainingCache = new Cache(() => base.getSpaceRemaining)

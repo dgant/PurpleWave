@@ -5,7 +5,11 @@ import scala.collection.immutable
 case class TileRectangle(
   startInclusive : Tile,
   endExclusive   : Tile) {
-  
+
+  def this(tile: Tile) {
+    this(tile, tile.add(1, 1))
+  }
+
   if (endExclusive.x < startInclusive.x || endExclusive.y < startInclusive.y) {
     throw new Exception("Created an invalid (non-normalized) rectangle")
   }
@@ -54,11 +58,10 @@ case class TileRectangle(
   
   lazy val cornerPixels: Array[Pixel] = Array(startPixel, topRightPixel, endPixel, bottomleftPixel)
   
-  lazy val tiles: immutable.IndexedSeq[Tile] = {
+  lazy val tiles: immutable.IndexedSeq[Tile] =
     (0 until endExclusive.x - startInclusive.x).flatMap(x =>
       (0 until endExclusive.y - startInclusive.y).map(y =>
         Tile(startInclusive.x + x, startInclusive.y + y)))
-  }
   
   lazy val tilesSurrounding: Iterable[Tile] = {
     expand(1, 1).tiles.filterNot(contains)

@@ -1,17 +1,25 @@
 
 package Micro.Actions.Combat.Decisionmaking
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
+import Mathematics.PurpleMath
 import Micro.Actions.Action
-import Planning.Yolo
-import ProxyBwapi.Races.{Protoss, Zerg}
+import Micro.Actions.Transportation.Caddy.Shuttling
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.ByOption
 
 object FightOrFlight extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.canMove
+  }
+
+  def potentiallyUseful(unit: FriendlyUnitInfo): Boolean = {
+    if (unit.matchups.targets.nonEmpty) return true
+    if (unit.unitClass.spells.exists(spell => With.self.hasTech(spell) && unit.energy >= spell.energyCost)) return true
+    if (unit.unitClass.isDetector && ! unit.matchups.enemies.exists(t => t.cloaked && ( ! unit.agent.canFocus || unit.squadenemies.contains(t)))) return true
+    false
   }
   
   override def perform(unit: FriendlyUnitInfo) {
@@ -25,22 +33,44 @@ object FightOrFlight extends Action {
       }
     }
 
-    decide(true,  "YOLO",       () => Yolo.active)
-    decide(true,  "Bored",      () => unit.battle.isEmpty)
-    decide(true,  "No threats", () => unit.matchups.threats.isEmpty)
-    decide(true,  "CantFlee",   () => ! unit.agent.canFlee)
-    decide(false, "Scarabs",    () => unit.is(Protoss.Reaver) && unit.scarabCount == 0)
-    decide(true,  "Cloaked",    () => unit.effectivelyCloaked)
-    decide(true,  "Lurking",    () => unit.is(Zerg.Lurker) && unit.matchups.enemyDetectors.isEmpty)
-    decide(true,  "Focused",    () => unit.agent.canFocus && (! unit.visibleToOpponents || unit.matchups.framesOfSafety > GameTime(0, 2)()) && With.framesSince(unit.lastFrameTakingDamage) > GameTime(0, 10)())
-    decide(false, "Pacifist",   () => ! unit.agent.canFight)
-    decide(false, "Useless",    () => unit.canAttack && unit.energyMax == 0 && unit.matchups.targets.isEmpty && unit.matchups.threats.nonEmpty)
-    decide(false, "Drained",    () => ! unit.canAttack && unit.energyMax > 0 && ! unit.unitClass.spells.forall(s => s.energyCost > unit.energy || ! With.self.hasTech(s)))
-    decide(true,  "Scourge",    () => unit.is(Zerg.Scourge) && unit.matchups.targets.exists(target => target.canAttack(unit) && target.matchups.targetsInRange.nonEmpty))
-    decide(false, "Disrupted",  () => unit.underDisruptionWeb && ! unit.flying)
-    decide(true,  "Hodor",      () => unit.matchups.alliesInclSelf.forall(_.base.exists(_.isOurMain)) && unit.matchups.threats.exists(_.base.exists(_.isOurMain)) && unit.matchups.threats.exists(!_.base.exists(_.isOurMain)))
-    decide(false, "Swarmed",    () => unit.underDarkSwarm && ! unit.unitClass.unaffectedByDarkSwarm && unit.matchups.targetsInRange.forall(t => ! t.flying || t.underDarkSwarm))
-    decide(true,  "Workers",    () => unit.matchups.allies.exists(u => u.friendly.isDefined && {
+    decide(true,  "YOLO",         () => With.yolo.active())
+    decide(true,  "Bored",        () => unit.battle.isEmpty)
+    decide(true,  "No threats",   () => unit.matchups.threats.isEmpty)
+    decide(false, "Pacifist",     () => ! unit.agent.canFight)
+    decide(true,  "CantFlee",     () => ! unit.agent.canFlee)
+    decide(true,  "Hug",          () => ! unit.flying && unit.matchups.targets.exists(t => unit.pixelDistanceEdge(t) < t.pixelRangeMin))
+    decide(false, "Scarabs",      () => unit.is(Protoss.Reaver) && unit.scarabCount == 0)
+    decide(true,  "Cloaked",      () => unit.effectivelyCloaked || (unit.is(Terran.Wraith) && unit.energy >= 50 && unit.matchups.enemyDetectors.isEmpty && With.self.hasTech(Terran.WraithCloak)))
+    decide(true,  "Lurking",      () => unit.is(Zerg.Lurker) && unit.matchups.enemyDetectors.isEmpty)
+    decide(false, "Useless",      () => unit.matchups.threats.nonEmpty && unit.loadedUnits.isEmpty && ! potentiallyUseful(unit))
+    decide(false, "Drained",      () => ! unit.canAttack && unit.energyMax > 0 && unit.unitClass.spells.forall(s => s.energyCost > unit.energy || ! With.self.hasTech(s)))
+    decide(true,  "Scourge",      () => unit.is(Zerg.Scourge) && unit.matchups.targets.exists(target => target.canAttack(unit) && target.matchups.targetsInRange.nonEmpty))
+    decide(false, "Disrupted",    () => unit.underDisruptionWeb && ! unit.flying)
+    decide(false, "Swarmed",      () => unit.underDarkSwarm && ! unit.unitClass.unaffectedByDarkSwarm && unit.matchups.targetsInRange.forall(t => ! t.flying || t.underDarkSwarm))
+    decide(true,  "CanAbuse",     () => unit.matchups.threats.forall(t => unit.canAttack(t) && unit.topSpeed > t.topSpeed && unit.pixelRangeAgainst(t) > t.pixelRangeAgainst(unit) + 32))
+    decide(false, "WaitForSiege", () => unit.is(Terran.SiegeTankUnsieged) && unit.matchups.threats.exists(_.is(Protoss.Dragoon)) && With.units.ours.exists(_.techProducing.contains(Terran.SiegeMode)) && unit.matchups.allies.exists(a => a.is(Terran.Bunker) && a.complete && ! With.blackboard.wantToAttack()))
+    decide(true,  "Energized", () =>
+      unit.matchups.allies.exists(ally =>
+        ally.is(Protoss.ShieldBattery)
+        && ally.complete
+        && ally.energy > 20
+        && ally.pixelDistanceEdge(unit, otherAt = ByOption.minBy(unit.matchups.targets.view.map(unit.pixelToFireAt))(unit.pixelDistanceCenter).getOrElse(unit.pixelCenter)) < 72)
+    )
+
+    /* Disabled because I think it was leading to some units fighting and others not
+    decide(true,  "Commit", () =>
+      unit.visibleToOpponents
+      && unit.unitClass.melee
+      && unit.base.exists(base => base.owner.isEnemy || base.isNaturalOf.exists(_.owner.isEnemy))
+      && unit.matchups.threats.exists(threat =>
+        unit.canAttack(threat)
+        && threat.topSpeed > unit.topSpeed
+        && threat.pixelRangeAgainst(unit) > unit.pixelRangeAgainst(threat)
+        && threat.matchups.threats.forall(ally => ally.topSpeed < threat.topSpeed && ally.pixelRangeAgainst(threat) < threat.pixelRangeAgainst(ally))))
+    */
+    //decide(true,  "Hodor",      () => unit.matchups.alliesInclSelf.forall(_.base.exists(_.isOurMain)) && unit.matchups.threats.exists(t => ! t.flying && t.base.exists(_.isOurMain)) && unit.matchups.threats.exists(t => ! t.flying && ! t.base.exists(_.isOurMain)))
+
+    decide(true, "Workers", () => unit.matchups.allies.exists(u => u.friendly.isDefined && {
       val ally = u.friendly.get
       val base = u.base.filter(_.owner.isUs)
       val output = (
@@ -48,29 +78,53 @@ object FightOrFlight extends Action {
         && base.isDefined
         && base.exists(ally.base.contains)
         && ally.visibleToOpponents
-        && ally.matchups.framesOfSafety <= Math.max(0, unit.matchups.framesOfSafety)
-        && ally.base.exists(_.units.exists(resource => resource.resourcesLeft > 0 && resource.pixelDistanceCenter(ally) < With.configuration.workerDefenseRadiusPixels))
+        && ally.matchups.framesOfSafety <= 6 + Math.max(0, unit.matchups.framesOfSafety)
+        && (
+          ! ally.agent.canFlee
+          || ally.base.exists(_.units.exists(resource =>
+            resource.resourcesLeft > 0
+            && resource.pixelDistanceCenter(ally) < With.configuration.workerDefenseRadiusPixels)))
+        && ally.matchups.threats.exists(u.canAttack)
       )
       output
     }))
-    /*
-    decide(false, "Stand", () =>
-      unit.agent.toForm.exists(form =>
-        unit.matchups.targets.forall(target =>
-          target.unitClass.isWorker
-          || target.matchups.targets.view.filter(_.friendly.exists(_.agent.toForm.isDefined)).forall(victim =>
-            target.inRangeToAttack(victim, victim.friendly.flatMap(_.agent.toForm).getOrElse(victim.pixelCenter))
-        ))))
-        */
 
-    decide(true, "Anchors", () => unit.matchups.allies.exists(ally =>
+    decide(false, "Hazard", () => {
+      With.blackboard.mcrs() && {
+        val occupancy = With.coordinator.gridPathOccupancy.get(unit.tileIncludingCenter)
+        val output: Boolean = (
+          ! unit.flying
+            && occupancy > 0
+            && occupancy + unit.unitClass.sqrtArea > 24
+            && unit.matchups.allies.exists(ally =>
+              ! ally.flying
+              && ! ally.friendly.exists(_.agent.shouldEngage)
+              && ally.pixelDistanceEdge(unit) < 32))
+        output
+      }
+    })
+
+
+    val getaway = "Getaway"
+    decide(true, "Anchors", () => unit.matchups.allies.view.map(_.friendly).filter(_.isDefined).map(_.get).exists(ally => (
       ! ally.unitClass.isWorker
+      && ally.agent.fightReason != getaway
+      && ! ally.loaded
       && (ally.canAttack || (ally.unitClass.rawCanAttack && ally.unitClass.isBuilding) || ally.is(Zerg.CreepColony))
-      && ally.unitClass.topSpeed <= Protoss.HighTemplar.topSpeed
-      && (ally.subjectiveValue > unit.subjectiveValue || ally.unitClass.isBuilding)
-      && (ally.matchups.targetsInRange.nonEmpty || ( ! ally.canAttack && ally.matchups.enemies.exists(_.pixelDistanceEdge(ally) < ally.effectiveRangePixels)))
-      && ally.matchups.framesOfSafety <= unit.matchups.framesOfSafety))
-  
+      && (ally.unitClass.topSpeed <= Protoss.HighTemplar.topSpeed)
+      && (ally.subjectiveValue * (if (ally.unitClass.isBuilding) 2.0 else 1.0) > unit.subjectiveValue)
+      && (ally.matchups.framesOfSafety < 24 + Math.max(0, unit.matchups.framesOfSafety) || ( ! ally.unitClass.isBuilding && ally.matchups.targetsInRange.nonEmpty))
+      && (ally.friendly.forall(_.agent.ride.exists(_.pixelDistanceEdge(ally) > 96)) || ally.matchups.framesOfSafety <= PurpleMath.clamp(unit.matchups.framesOfSafety, 0, 3))
+      && (ally.unitClass.isSpellcaster ||
+        (ally.matchups.threats.exists(t => ! t.unitClass.isWorker && t.topSpeed > ally.topSpeed && unit.canAttack(t)) && (ally.agent.shouldEngage || ally.matchups.targetsInRange.nonEmpty)))
+    )))
+
+    decide(true, getaway, () => unit.agent.ride.exists(ride => {
+      val rideDistance = Math.max(0.0, ride.pixelDistanceCenter(unit) - Shuttling.pickupRadius - 32)
+      val rideWait = PurpleMath.nanToInfinity(rideDistance / (ride.topSpeed + unit.topSpeed))
+      rideWait <= Math.max(0.0, unit.matchups.framesOfSafety) || (unit.loaded && unit.matchups.framesOfSafety > unit.cooldownMaxAirGround)
+    }))
+
     if (decision.isDefined) {
       unit.agent.shouldEngage = decision.get
       unit.agent.combatHysteresisFrames = 0
@@ -88,11 +142,10 @@ object FightOrFlight extends Action {
     if (unit.agent.shouldEngage != shouldEngage) {
       unit.agent.combatHysteresisFrames = With.configuration.battleHysteresisFrames
     }
-    unit.agent.fightReason = ""
-    unit.agent.netEngagementValue = 0.0 // TODO
+    unit.agent.fightReason = "Sim"
     unit.agent.shouldEngage = shouldEngage
 
-    if (With.configuration.enableMCRS) {
+    if (With.blackboard.mcrs()) {
       unit.agent.shouldEngage = unit.mcrs.shouldFight
     }
   }

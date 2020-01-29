@@ -5,11 +5,10 @@ import Lifecycle.With
 import Mathematics.Points.Tile
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
-import Micro.Actions.Combat.Maneuvering.Path
+import Micro.Actions.Combat.Maneuvering.{Traverse}
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Commands.{Attack, Move}
 import Planning.UnitMatchers.UnitMatchWorkers
-import Planning.Yolo
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
@@ -44,7 +43,7 @@ object Build extends Action {
           && blocker.likelyStillThere)
     }
     
-    val ignoreBlockers        = distance > 32.0 * 8.0 || Yolo.active
+    val ignoreBlockers        = distance > 32.0 * 8.0 || With.yolo.active()
     lazy val blockersIn       = if (ignoreBlockers) Seq.empty else buildArea.tiles.flatMap(blockersForTile).toSeq
     lazy val blockersNear     = if (ignoreBlockers) Seq.empty else buildArea.expand(2, 2).tiles.flatMap(blockersForTile).toSeq
     lazy val blockersOurs     = blockersNear.filter(_.isOurs)
@@ -62,7 +61,7 @@ object Build extends Action {
       lazy val noThreats  = unit.matchups.threats.isEmpty
       lazy val allWorkers = unit.matchups.threats.size == 1 && unit.matchups.threats.head.unitClass.isWorker
       lazy val healthy    = unit.totalHealth > 10 || unit.totalHealth >= unit.matchups.threats.head.totalHealth
-      if (noThreats || (allWorkers && healthy)) {
+      if (noThreats || (allWorkers && healthy) && unit.cooldownLeft < With.reaction.agencyMax) {
         Target.delegate(unit)
         unit.agent.toAttack = unit.agent.toAttack.orElse(Some(blockersToKill.minBy(_.pixelDistanceEdge(unit))))
         Attack.delegate(unit)
@@ -73,7 +72,7 @@ object Build extends Action {
       }
     }
     
-    if ( ! unit.readyForMicro) return
+    if ( ! unit.ready) return
     
     blockersOurs
       .flatMap(_.friendly)
@@ -93,7 +92,15 @@ object Build extends Action {
     }
 
     unit.agent.toTravel = Some(movePixel)
-    Path.delegate(unit)
+
+    // Pathfind for cross-zone travel, eg to avoid getting stuck on mineral blocks
+    if (movePixel.zone != unit.zone) {
+      val profile = With.paths.profileDistance(unit.tileIncludingCenter, movePixel.tileIncluding)
+      profile.allowGroundDist = true
+      val path = profile.find
+      new Traverse(path).delegate(unit)
+    }
+
     Move.delegate(unit)
   }
 }

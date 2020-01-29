@@ -7,7 +7,6 @@ import Mathematics.Points.SpecificPoints
 import Mathematics.PurpleMath
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
-import Utilities.EnrichPixel._
 
 import scala.collection.mutable
 
@@ -34,8 +33,8 @@ class BattleClassifier {
       ++ Vector(() => updateBattle(global))
       ++ Vector(() => nextBattlesLocal.foreach(updateBattle))
       ++ Vector(() => nextBattleGlobal.foreach(updateBattle))
-      ++ nextBattlesLocal.map(battle => () => battle.estimationSimulationAttack)
-      ++ nextBattlesLocal.map(battle => () => battle.estimationSimulationSnipe)
+      ++ (if (With.blackboard.mcrs()) Vector.empty else nextBattlesLocal.map(battle => () => battle.estimationSimulationAttack))
+      ++ (if (With.blackboard.mcrs()) Vector.empty else nextBattlesLocal.map(battle => () => battle.estimationSimulationSnipe))
       ++ nextBattlesLocal.map(battle => () => battle.shouldFight)
       ++ Vector(() => trackPerformance())
       ++ nextBattleGlobal.map(battle => () => battle.globalSafeToAttack)
@@ -52,12 +51,12 @@ class BattleClassifier {
   
   def trackPerformance() {
     estimationRuntimes.enqueue(With.framesSince(lastEstimationCompletion))
-    while (estimationRuntimes.sum > 24 * 30) estimationRuntimes.dequeue()
+    while (estimationRuntimes.sum > With.reaction.runtimeQueueDuration) { estimationRuntimes.dequeue() }
     lastEstimationCompletion = With.frame
   }
   
   def runClustering() {
-    clustering.enqueue(With.units.all.filter(BattleClassificationFilters.isEligibleLocal))
+    clustering.enqueue(With.units.playerOwned.view.filter(BattleClassificationFilters.isEligibleLocal).toVector)
     clustering.run()
   }
   
@@ -67,8 +66,8 @@ class BattleClassifier {
     nextBattlesLocal = clustering.clusters
       .map(cluster =>
         new BattleLocal(
-          new Team(cluster.filter(_.isOurs).toVector),
-          new Team(cluster.filter(_.isEnemy).toVector)))
+          new Team(cluster.filter(_.isOurs)),
+          new Team(cluster.filter(_.isEnemy))))
       .filter(_.teams.forall(_.units.exists(u =>
         u.canAttack
         || u.unitClass.isSpellcaster
@@ -81,8 +80,8 @@ class BattleClassifier {
   private def replaceBattleGlobal() {
     nextBattleGlobal.foreach(global = _)
     global = new BattleGlobal(
-      new Team(asVectorUs     (With.units.ours  .filter(BattleClassificationFilters.isEligibleGlobal))),
-      new Team(asVectorEnemy  (With.units.enemy .filter(BattleClassificationFilters.isEligibleGlobal))))
+      new Team(asVectorUs     (With.units.ours  .view.filter(BattleClassificationFilters.isEligibleGlobal))),
+      new Team(asVectorEnemy  (With.units.enemy .view.filter(BattleClassificationFilters.isEligibleGlobal))))
   }
   
   private def updateBattle(battle: Battle) {

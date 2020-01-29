@@ -50,14 +50,14 @@ class Recruiter {
     //  Batch 2+: Units assigned to weaker-priority locks
     //
     val assignedToLowerPriority = unitsByLock.keys
-      .toSeq
+      .view
       .filter(otherRequest =>
         (otherRequest.interruptable.get || lock.canPoach.get)
         && lock.owner.priority < otherRequest.owner.priority)
       .flatMap(getUnits)
 
     lock.offerUnits(
-      Iterable.empty
+      Seq.empty
         ++ unitsByLock.getOrElse(lock, Iterable.empty)
         ++ unassignedUnits
         ++ assignedToLowerPriority,
@@ -105,8 +105,8 @@ class Recruiter {
     unitsByLock.find(_._2.contains(unit)).foreach(pair => unitsByLock(pair._1).remove(unit))
   }
   
-  def getUnits(lock: LockUnits): Set[FriendlyUnitInfo] = {
-    unitsByLock.get(lock).map(_.toSet).getOrElse(Set.empty)
+  def getUnits(lock: LockUnits): collection.Set[FriendlyUnitInfo] = {
+    unitsByLock.getOrElse(lock, Set.empty)
   }
   
   def audit = {

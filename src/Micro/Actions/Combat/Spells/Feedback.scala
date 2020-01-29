@@ -11,7 +11,7 @@ object Feedback extends TargetedSpell {
   override protected def tech           : Tech      = Protoss.Feedback
   override protected def aoe            : Boolean   = false
   override protected def castRangeTiles : Int       = 10
-  override protected def thresholdValue : Double    = Protoss.DarkArchon.subjectiveValue / 3.0
+  override protected def thresholdValue : Double    = Protoss.DarkArchon.subjectiveValue / 4.0
   
   override protected def valueTarget(target: UnitInfo): Double = {
     if (target.unitClass.isBuilding)  return -1.0

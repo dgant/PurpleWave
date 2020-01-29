@@ -2,13 +2,19 @@ package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Predicates.Compound.Check
 import Planning.Plan
-import Planning.Plans.Compound.{If, Parallel}
-import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers, UpgradeContinuously}
+import Planning.Plans.Army.{Attack, ConsiderAttacking, Hunt}
+import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
+import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Predicates.Milestones.EnemyHasShownCloakedThreat
+import Planning.Predicates.Compound.{And, Check, Not}
+import Planning.Predicates.Economy.GasAtLeast
+import Planning.Predicates.Milestones._
+import Planning.Predicates.Reactive.SafeToMoveOut
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.UnitMatchers.UnitMatchSiegeTank
 import ProxyBwapi.Races.{Protoss, Terran}
+import Strategery.Strategies.Terran.TvP2FacJoyO
 
 object TvPIdeas {
   
@@ -37,4 +43,68 @@ object TvPIdeas {
             Get(1, Terran.EngineeringBay),
             Get(3, Terran.MissileTurret),
             Get(1, Terran.Academy)))))
+
+  class TvPAttack extends Parallel(
+    new Hunt(Terran.Wraith, Protoss.Shuttle),
+    new Hunt(Terran.Wraith, Protoss.Reaver),
+    // Keep pressuring if appropriate
+    new If(
+      new Employing(TvP2FacJoyO),
+      new ConsiderAttacking,
+      // Otherwise, wait for our later timing
+      new Trigger(
+        new Not(new SafeToMoveOut),
+        initialBefore = new Attack)),
+    new Trigger(
+      new Or(
+        new MiningBasesAtLeast(3),
+        new UpgradeComplete(Terran.MechDamage, 2),
+        new EnemyHasShown(Protoss.Carrier),
+        new EnemyHasShown(Protoss.Interceptor),
+        new EnemyHasShown(Protoss.FleetBeacon)),
+      new Attack))
+
+  class CutGasDuringFactory extends If(
+    new And(
+      new UnitsAtMost(0, Terran.Factory, complete = true),
+      new Or(
+        new GasAtLeast(100),
+        new UnitsAtLeast(1, Terran.Factory))),
+    new CapGasWorkersAt(1))
+
+  class ReactiveDetection extends If(
+    new And(
+      new Or(
+        new MiningBasesAtLeast(3),
+        new EnemyHasShown(Protoss.DarkTemplar, 1),
+        new EnemyHasShown(Protoss.Arbiter),
+        new EnemyHasShown(Protoss.ArbiterTribunal)),
+      new UnitsAtLeast(2, Terran.Factory)),
+    new Parallel(
+      new Build(
+        Get(Terran.Academy),
+        Get(Terran.Starport),
+        Get(Terran.ScienceFacility),
+        Get(Terran.SpiderMinePlant),
+        Get(Terran.ControlTower)),
+      new Pump(Terran.ControlTower)))
+
+  class ReactiveEarlyVulture extends If(
+    new And(
+      new UnitsAtMost(0, Terran.MachineShop),
+      new Or(
+        new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway, With.fingerprints.nexusFirst),
+        new EnemiesAtLeast(1, Protoss.Zealot))),
+    new PumpRatio(Terran.Vulture, 1, 5, Seq(Enemy(Protoss.Zealot, 1.0))))
+
+  class PumpScienceVessels extends PumpRatio(Terran.ScienceVessel, 1, 3, Seq(
+    Enemy(Protoss.Arbiter, 1.0),
+    Enemy(Protoss.DarkTemplar, 1.0)))
+
+  class PumpGoliaths extends PumpRatio(Terran.Goliath, 0, 30, Seq(
+      Enemy(Protoss.Carrier,  6.0),
+      Enemy(Protoss.Arbiter,  2.0),
+      Enemy(Protoss.Scout,    2.0),
+      Enemy(Protoss.Shuttle,  1.0),
+      Friendly(UnitMatchSiegeTank, 0.2)))
 }

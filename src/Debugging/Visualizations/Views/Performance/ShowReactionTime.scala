@@ -10,11 +10,11 @@ object ShowReactionTime extends View {
     DrawScreen.table(
       5, 5 * With.visualization.lineHeightSmall,
       Vector(
-        Vector("", "Agency", "Clustering", "Estimation", "Planning"),
-        Vector("Samples:",    With.agents.runtimes.size.toString,   With.battles.clustering.runtimes.size.toString, With.battles.estimationRuntimes.size.toString,  With.prioritizer.frameDelays.size.toString),
-        Vector("Last:",       With.reaction.agencyLast.toString,    With.reaction.clusteringLast.toString,          With.reaction.estimationLast.toString,          With.reaction.planningLast.toString),
-        Vector("Max:",        With.reaction.agencyMax.toString,     With.reaction.clusteringMax.toString,           With.reaction.estimationMax.toString,           With.reaction.planningMax.toString),
-        Vector("Avg:",        With.reaction.agencyAverage.toString, With.reaction.clusteringAverage.toString,       With.reaction.estimationAverage.toString,       With.reaction.planningAverage.toString),
+        Vector("", "Agency", "Clustering", "Estimation", "Planning", "Squad Recruit"),
+        Vector("Samples:",    With.agents.runtimes.size.toString,   With.battles.clustering.runtimes.size.toString, With.battles.estimationRuntimes.size.toString,  With.prioritizer.frameDelays.size.toString, With.squads.recruitRuntimes.size.toString),
+        Vector("Last:",       With.reaction.agencyLast.toString,    With.reaction.clusteringLast.toString,          With.reaction.estimationLast.toString,          With.reaction.planningLast.toString,        With.reaction.squadRecruitLast.toString),
+        Vector("Max:",        With.reaction.agencyMax.toString,     With.reaction.clusteringMax.toString,           With.reaction.estimationMax.toString,           With.reaction.planningMax.toString,         With.reaction.squadRecruitMax.toString),
+        Vector("Avg:",        With.reaction.agencyAverage.toString, With.reaction.clusteringAverage.toString,       With.reaction.estimationAverage.toString,       With.reaction.planningAverage.toString,     With.reaction.squadRecruitAverage.toString),
         Vector("Avg Total:",  With.reaction.framesTotal.toString)))
   }
 }

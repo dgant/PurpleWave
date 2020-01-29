@@ -30,7 +30,7 @@ class BuildBunkersAtBases(
         new Blueprint(this,
           building          = Some(Terran.Bunker),
           requireZone       = Some(zone),
-          requireCandidates = Some(zone.tiles),
+          requireCandidates = Some(zone.tilesSeq),
           placement         = Some(placement)))))
     .toMap
   
@@ -39,7 +39,7 @@ class BuildBunkersAtBases(
   }
   
   private def placeBuildingsInZone(zone: Zone): Int = {
-    lazy val towersInZone = With.units.countOursP(u => u.is(Terran.Bunker) && u.zone == zone)
+    lazy val towersInZone = With.units.countOursP(u => u.is(Terran.Bunker) && u.zone == zone && u.complete)
     lazy val bunkersToAdd = bunkersRequired - towersInZone
     
     if (bunkersToAdd <= 0) {
@@ -49,6 +49,6 @@ class BuildBunkersAtBases(
     // Defensive programming measure. If we try re-proposing fulfilled blueprints we may just build cannons forever.
     val newBlueprints = blueprintsByZone(zone).filterNot(With.groundskeeper.proposalsFulfilled.contains).take(bunkersToAdd)
     newBlueprints.foreach(With.groundskeeper.propose)
-    newBlueprints.size
+    bunkersToAdd
   }
 }

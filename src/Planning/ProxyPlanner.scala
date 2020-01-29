@@ -2,6 +2,7 @@ package Planning
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
+import Mathematics.Points.SpecificPoints
 
 object ProxyPlanner {
 
@@ -30,12 +31,12 @@ object ProxyPlanner {
   }
   
   def proxyMiddle: Option[Zone] = {
-    val eligibleZones = With.geography.zones.filter(_.tilesBuildable.length > 60)
+    val eligibleZones = With.geography.zones.filter(_.tilesBuildable.length > (4 + 12 + 12) * 1.5)
     proxyPreferredZone(eligibleZones)
   }
   
   def proxyMiddleBase: Option[Zone] = {
-    val eligibleZones = With.geography.bases.map(_.zone).toSet.toSeq
+    val eligibleZones = With.geography.bases.map(_.zone).distinct
     proxyPreferredZone(eligibleZones)
   }
   
@@ -43,14 +44,6 @@ object ProxyPlanner {
     if (eligibleZones.isEmpty) {
       return Some(With.geography.ourNatural.zone)
     }
-    Some(
-      eligibleZones.minBy(zone =>
-        5 * With.geography.bases
-          .filter(base => base.isStartLocation && ! base.owner.isFriendly)
-          .map(_.heart.groundPixels(zone.centroid))
-          .sum +
-        3 * With.geography.ourBases
-          .map(_.heart.groundPixels(zone.centroid))
-          .sum))
+    Some(eligibleZones.minBy(zone => zone.centroid.tileDistanceSquared(SpecificPoints.tileMiddle)))
   }
 }

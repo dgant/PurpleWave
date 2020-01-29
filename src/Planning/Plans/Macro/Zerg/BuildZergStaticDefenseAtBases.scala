@@ -12,7 +12,7 @@ import ProxyBwapi.UnitClasses.UnitClass
 class BuildZergStaticDefenseAtBases(
   towerClass: UnitClass,
   towersRequired: Int,
-  placement: PlacementProfile = PlacementProfiles.wallCannon)
+  placement: PlacementProfile = PlacementProfiles.defensive)
   extends Plan {
   
   override def onUpdate() {
@@ -32,7 +32,7 @@ class BuildZergStaticDefenseAtBases(
         new Blueprint(this,
           building          = Some(Zerg.CreepColony),
           requireZone       = Some(zone),
-          requireCandidates = Some(zone.tiles),
+          requireCandidates = Some(zone.tilesSeq),
           placement         = Some(placement)))))
     .toMap
   

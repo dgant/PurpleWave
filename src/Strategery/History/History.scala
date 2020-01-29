@@ -17,8 +17,6 @@ class History {
   
   var message = new mutable.ArrayBuffer[String]
   def onStart() {
-    message += " "
-    message += " "
     message += "Good luck on " + currentMapName + ", " + currentEnemyName + "!"
     message += " "
     
@@ -33,11 +31,15 @@ class History {
     val vsWins          = games.count(g => g.enemyName      == currentEnemyName       &&    g.won)
     val vsLosses        = games.count(g => g.enemyName      == currentEnemyName       &&  ! g.won)
     
-    message += "On this map: "                                         + mapWins       + " - " + mapLosses
+    message += "On this map: "                                          + mapWins       + " - " + mapLosses
     message += "With "  + currentStarts         + " start locations: "  + startWins     + " - " + startLosses
-    message += "As "    + With.self.raceInitial + ": "                  + ourRaceWins   + " - " + ourRaceLosses
+    message += "As this race: "                                         + ourRaceWins   + " - " + ourRaceLosses
     message += "Vs. "   + currentEnemyRace      + ": "                  + enemyRaceWins + " - " + enemyRaceLosses
     message += "Vs. "   + currentEnemyName      + ": "                  + vsWins        + " - " + vsLosses
+
+    if (With.configuration.humanMode()) {
+      message.clear()
+    }
   }
   
   def onEnd(weWon: Boolean) {
@@ -49,13 +51,17 @@ class History {
       ourRace         = With.self.raceInitial,
       enemyRace       = currentEnemyRace,
       won             = weWon,
-      strategies =
-        With.strategy.selectedCurrently.map(_.toString)
-        ++ With.fingerprints.all.filter(_.matches).map(_.toString))
+      strategies = (
+        With.strategy.selectedCurrently.map(_.toString).toVector
+        ++ With.fingerprints.all.filter(_.matches).map(_.toString).sorted).distinct)
     HistoryLoader.save(games.toVector :+ thisGame)
   }
 
-  def gamesVsEnemies: Iterable[HistoricalGame] = {
-    games.filter(game => With.enemies.exists(_.name == game.enemyName))
+  lazy val gamesVsEnemies: Vector[HistoricalGame] = {
+    games
+      .view
+      .filter(game => With.enemies.exists(_.name == game.enemyName))
+      .toVector
+      .sortBy(-_.timestamp)
   }
 }

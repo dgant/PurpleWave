@@ -7,12 +7,11 @@ import Lifecycle.With
 import Mathematics.Points.TileRectangle
 
 object ShowGrids extends View {
-  
+
   override def renderMap() {
-    val distanceGrid = With.units.ours.find(_.selected).map(_.agent.origin.zone).getOrElse(With.geography.home.zone).distanceGrid
-    renderGridArray(distanceGrid, 0, 0)
-    renderGridArray(With.grids.enemyRange, 0, 1)
-    renderGridArray(With.grids.occupancy, 1, 1)
+    renderGridArray(With.units.all.find(_.selected).map(_.tileIncludingCenter).getOrElse(With.geography.home).zone.distanceGrid, 0, 1)
+    renderGridArray(With.grids.walkableTerrain, 0, 0)
+    renderGridArray(With.grids.unwalkableUnits, 1, 0)
   }
   
   private def renderGridArray[T](map: AbstractGrid[T], offsetX: Int = 0, offsetY: Int = 0) {

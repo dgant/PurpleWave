@@ -17,6 +17,6 @@ object PlacementHeuristicPowering extends PlacementHeuristic {
         tile.valid
         && With.grids.buildable.get(tile)
         && ! With.grids.psi2Height.isSet(tile)
-        && ! With.architecture.powered2Height.contains(tile))
+        && ! With.architecture.powered2Height.get(tile))
   }
 }

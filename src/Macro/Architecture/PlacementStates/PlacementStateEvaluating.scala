@@ -4,9 +4,10 @@ import Debugging.Visualizations.Views.Geography.ShowArchitectureHeuristics
 import Lifecycle.With
 import Macro.Architecture.Heuristics.{EvaluatePlacements, PlacementHeuristicEvaluation}
 import Macro.Architecture.Tiles.Surveyor
-import Macro.Architecture.{Architect, Blueprint, Placement}
+import Macro.Architecture.{Blueprint, Placement}
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Tile
+import Utilities.ByOption
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -26,9 +27,9 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
     val nanosecondsOnStart = System.nanoTime()
     if (stillSurveying) {
       val sources = Surveyor.candidates(blueprint)
-      candidatesUnfiltered      = Some(new ArrayBuffer[Tile])
-      candidatesFiltered        = Some(new ArrayBuffer[Tile])
-      candidatesUnfiltered.get  ++= sources.flatMap(_.tiles(blueprint))
+      candidatesUnfiltered = Some(new ArrayBuffer[Tile])
+      candidatesFiltered   = Some(new ArrayBuffer[Tile])
+      sources.foreach(source => candidatesUnfiltered.get ++= source.tiles(blueprint))
       updateStepNanoseconds(nanosecondsOnStart)
     }
     else if (stillFiltering) {
@@ -38,7 +39,7 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
       while (stillFiltering && filterCount < filterCountMax) {
         
         val candidate = candidatesUnfiltered.get(nextFilteringIndex)
-        if (Architect.canBuild(blueprint, candidate, recheckPathing = true)) {
+        if (blueprint.accepts(candidate)) {
           candidatesFiltered.get += candidate
         }
         
@@ -70,14 +71,13 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
     }
     else {
       // We've evaluated all the tiles! Return our placement conclusions.
-      val evaluationValuesMap = evaluationValues.toMap
-      val best                = EvaluatePlacements.findBest(blueprint, evaluationValuesMap)
+      val best = ByOption.minBy(evaluationValues)(_._2).map(_._1)
       updateStepNanoseconds(nanosecondsOnStart)
       val placement = Placement(
         blueprint,
         best,
         evaluationDebugging.values.flatten,
-        evaluationValuesMap,
+        evaluationValues,
         totalNanoseconds  = evaluationNanoseconds,
         frameStarted      = evaluationStartFrame,
         frameFinished     = With.frame,

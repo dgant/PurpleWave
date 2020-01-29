@@ -6,13 +6,18 @@ object HeuristicMathMultiplicative extends HeuristicMath {
   val heuristicMinimum  = 1.0
   val default           = heuristicMinimum
   
-  def fromBoolean(value:Boolean):Double = if (value) 2.0 else 1.0
+  def fromBoolean(value: Boolean): Double = if (value) 2.0 else 1.0
   
   def resolve[TContext, TCandidate, THeuristic, THeuristicWeight <: HeuristicWeight[TContext, TCandidate]](
     context       : TContext,
     heuristics    : Iterable[THeuristicWeight],
     candidate     : TCandidate)
       : Double = {
-    - heuristics.map(_.weighMultiplicatively(context, candidate)).product
+
+    var output = -1.0
+    for (h <- heuristics) {
+      output *= h.apply(context, candidate)
+    }
+    output
   }
 }

@@ -9,10 +9,11 @@ object TileSourceTownHall extends TileSource {
     blueprint.requireTownHallTile.get
   }
   
-  override def tiles(blueprint: Blueprint): Iterable[Tile] = {
+  override def tiles(blueprint: Blueprint): Seq[Tile] = {
     With.geography.bases
+      .view
       .filter(b => b.mineralsLeft > 3000 || b.gasLeft > 1000)
-      .filterNot(base => base.owner.isEnemy || base.zone.island)
-      .map(_.townHallArea.startInclusive)
+      .filterNot(base => base.owner.isEnemy || base.zone.island || (With.strategy.isIslandMap && With.geography.home.groundPixels(base.townHallTile) > With.mapPixelWidth * 4))
+      .map(_.townHallTile)
   }
 }

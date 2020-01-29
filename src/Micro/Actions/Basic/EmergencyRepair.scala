@@ -9,9 +9,8 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 object EmergencyRepair extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    true
-    && unit.is(Terran.SCV)
-    && With.self.minerals + With.economy.ourIncomePerFrameMinerals * GameTime(0, 10)() > 50
+    unit.is(Terran.SCV)
+    && With.self.minerals + With.economy.ourIncomePerFrameMinerals * GameTime(0, 10)() > 25
   )
   
   override def perform(unit: FriendlyUnitInfo) {
@@ -25,8 +24,8 @@ object EmergencyRepair extends Action {
     With.commander.repair(unit, patient)
   }
   
-  def eligiblePatients(repairer: FriendlyUnitInfo): Iterable[UnitInfo] = {
-    repairer.teammates.filter(patient =>
+  def eligiblePatients(repairer: FriendlyUnitInfo): Seq[UnitInfo] =
+    repairer.teammates.view.filter(patient =>
       patient != repairer
       && patient.complete
       && patient.unitClass.isMechanical
@@ -35,8 +34,7 @@ object EmergencyRepair extends Action {
       && ! patient.is(Terran.SCV)
       && ! patient.moving
       && ! patient.plagued
-    )
-  }
+    ).toSeq
   
   def isCloseEnough(repairer: FriendlyUnitInfo, patient: UnitInfo): Boolean = {
     if (repairer.pixelDistanceEdge(patient) > 32.0 * 30.0) return false

@@ -5,7 +5,7 @@ import Planning.Plan
 import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -17,12 +17,12 @@ import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss.PvZMidgame4Gate2Archon
 
-class PvZ4Gate2Archon extends GameplanModeTemplate {
+class PvZ4Gate2Archon extends GameplanTemplate {
   
   override val activationCriteria = new Employing(PvZMidgame4Gate2Archon)
   override val completionCriteria = new Latch(new Or(new MiningBasesAtLeast(3), new TechComplete(Protoss.PsionicStorm)))
-  override def defaultAttackPlan: Plan = new Trigger(new UnitsAtLeast(2, Protoss.Archon), new Attack, new PvZIdeas.ConditionalAttack)
-  override def defaultArchonPlan: Plan = new If(
+  override def attackPlan: Plan = new Trigger(new UnitsAtLeast(2, Protoss.Archon), new Attack, new PvZIdeas.ConditionalAttack)
+  override def archonPlan: Plan = new If(
     new TechStarted(Protoss.PsionicStorm),
     new MeldArchons(49) {
       override def maximumTemplar = 8
@@ -30,7 +30,7 @@ class PvZ4Gate2Archon extends GameplanModeTemplate {
     new MeldArchons)
 
 
-  override def defaultWorkerPlan: Plan = NoPlan()
+  override def workerPlan: Plan = NoPlan()
   override def emergencyPlans: Seq[Plan] = Seq(new PvZIdeas.ReactToLurkers, new PvZIdeas.ReactToMutalisks)
   
   override def buildPlans: Seq[Plan] = Vector(
@@ -56,18 +56,21 @@ class PvZ4Gate2Archon extends GameplanModeTemplate {
         new Pump(Protoss.Dragoon, 8),
         new UpgradeContinuously(Protoss.DragoonRange))),
     new Pump(Protoss.Dragoon, 1),
-    new PumpMatchingRatio(Protoss.Dragoon, 0, 12, Seq(Enemy(Zerg.Mutalisk, 1.0), Friendly(Protoss.Corsair, -1.0), Friendly(Protoss.Archon, -2.0))),
+    new If(
+      new UpgradeStarted(Protoss.DragoonRange),
+      new Pump(Protoss.Dragoon, 8)),
+    new PumpRatio(Protoss.Dragoon, 0, 12, Seq(Enemy(Zerg.Mutalisk, 1.0), Friendly(Protoss.Corsair, -1.0), Friendly(Protoss.Archon, -2.0))),
     new Pump(Protoss.Zealot),
     new Build(
-      Get(1, Protoss.Gateway),
-      Get(1, Protoss.Assimilator),
-      Get(1, Protoss.CyberneticsCore),
+      Get(Protoss.Gateway),
+      Get(Protoss.Assimilator),
+      Get(Protoss.CyberneticsCore),
       Get(2, Protoss.Assimilator),
-      Get(1, Protoss.CitadelOfAdun)),
+      Get(Protoss.CitadelOfAdun)),
     new PumpWorkers,
     new UpgradeContinuously(Protoss.GroundDamage),
     new Build(
-      Get(1, Protoss.TemplarArchives),
+      Get(Protoss.TemplarArchives),
       Get(4, Protoss.Gateway),
       Get(Protoss.ZealotSpeed),
       Get(6, Protoss.Gateway),

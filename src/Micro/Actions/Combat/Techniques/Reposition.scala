@@ -19,11 +19,13 @@ object Reposition extends ActionTechnique {
     unit.canMove
     && unit.canAttack
     && unit.unitClass.ranged
+    && unit.matchups.targetsInRange.nonEmpty
+    && unit.cooldownLeft > 0
   )
   
   override val activator = One
   
-  override val applicabilityBase: Double = 0.8
+  override val applicabilityBase: Double = 0.0 // 0.8
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
     - unit.matchups.vpfNet
@@ -31,7 +33,7 @@ object Reposition extends ActionTechnique {
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     AttackAsSoonAsPossible.delegate(unit)
-    if ( ! unit.readyForMicro) return
+    if ( ! unit.ready) return
     
     Target.delegate(unit)
     
@@ -43,7 +45,7 @@ object Reposition extends ActionTechnique {
     val resistancesTerrain = Potential.resistTerrain(unit)
   
     unit.agent.toAttack.foreach(target => {
-      val targetMagnitude = PurpleMath.nanToOne((With.reaction.agencyAverage + unit.framesBeforeAttacking(target)) / unit.framesToBeReadyForAttackOrder)
+      val targetMagnitude = PurpleMath.nanToOne((With.reaction.agencyAverage + unit.framesBeforeAttacking(target)) / unit.framesToBeReadyForAttackOrder.toDouble)
       forceTarget = Potential.unitAttraction(unit, target, targetMagnitude)
     })
     

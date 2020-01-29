@@ -17,10 +17,11 @@ object WarmUpInterceptors extends Action {
     def isLegal(target: UnitInfo): Boolean = (
       unit.canAttack(target)
       && target.totalHealth > Protoss.Zealot.maxTotalHealth - 10
+      && ! target.is(Protoss.Carrier)
     )
     unit.agent.toAttack =
-      ByOption.maxBy(unit.zone.units.toVector.filter(u => isLegal(u) && unit.inRangeToAttack(u)))(_.totalHealth)
-      .orElse(ByOption.minBy(unit.zone.units.toVector.filter(u => isLegal(u)))(_.pixelDistanceCenter(unit)))
+      ByOption.maxBy(unit.zone.units.filter(u => isLegal(u) && unit.inRangeToAttack(u)))(_.totalHealth)
+      .orElse(ByOption.minBy(unit.zone.units.filter(u => isLegal(u)))(_.pixelDistanceCenter(unit)))
     Attack.delegate(unit)
   }
 }

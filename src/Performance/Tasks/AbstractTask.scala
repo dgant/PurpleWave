@@ -1,6 +1,8 @@
 package Performance.Tasks
 
 import Lifecycle.With
+import Performance.Cache
+import Utilities.ByOption
 
 import scala.collection.mutable
 
@@ -41,7 +43,15 @@ abstract class AbstractTask {
     alreadyViolatedRules      = With.performance.violatedRules
     onRun()
     val millisecondsAfter   = System.nanoTime() / nanosToMillis
-    recordRunDuration(millisecondsAfter - millisecondsBefore)
+    var millisecondsDelta   = millisecondsAfter - millisecondsBefore
+
+    // Debugging (ie. setting breakpoints) terribly breaks performance monitoring;
+    // so we detect debug pauses and ignore them
+    if (With.configuration.debugging() && millisecondsDelta >= With.configuration.debugPauseThreshold) {
+      millisecondsDelta = runMillisecondsMean
+    }
+
+    recordRunDuration(millisecondsDelta)
     lastRunFrame = With.frame
     totalRunCount += 1
   }
@@ -71,17 +81,12 @@ abstract class AbstractTask {
     totalMillisecondsEver
   }
   
-  final def runMillisecondsMaxRecent: Long = {
-    if (runtimeMilliseconds.isEmpty) return 0
-    runtimeMilliseconds.max
-  }
+  final val runMillisecondsMaxRecent = new Cache[Long](() => ByOption.max(runtimeMilliseconds).getOrElse(0))
+  protected final val runMillisecondsSumRecent = new Cache(() => runtimeMilliseconds.view.map(Math.min(_, 100)).sum)
   
   final def runMillisecondsMaxAllTime: Long = {
     maxMillisecondsEver
   }
   
-  final def runMillisecondsMean: Long = {
-    if (runtimeMilliseconds.isEmpty) return 0
-    runtimeMilliseconds.sum / runtimeMilliseconds.size
-  }
+  final def runMillisecondsMean: Long = runMillisecondsSumRecent() / Math.max(1, runtimeMilliseconds.size)
 }

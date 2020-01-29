@@ -1,16 +1,16 @@
 package Strategery
 
-import Lifecycle.With
+import Lifecycle.{Manners, With}
 import Mathematics.PurpleMath
 import Planning.Plan
 import Planning.Plans.GamePlans.StandardGamePlan
 import ProxyBwapi.Players.Players
 import Strategery.History.HistoricalGame
+import Strategery.Selection.StrategySelectionDynamic
 import Strategery.Strategies.Protoss.ProtossChoices
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TerranChoices
 import Strategery.Strategies.Zerg.ZergChoices
-import Utilities.ByOption
 import bwapi.Race
 
 import scala.collection.mutable
@@ -20,7 +20,7 @@ class Strategist {
   lazy val selectedInitially: Set[Strategy] = selectInitialStrategies
   
   lazy val map: Option[StarCraftMap] = StarCraftMaps.all.find(_.matches)
-   
+
   private var enemyRaceAtLastCheck: Race = With.enemy.raceInitial
   private var selectedLast: Option[Set[Strategy]] = None
   def selectedCurrently: Set[Strategy] = {
@@ -52,76 +52,99 @@ class Strategist {
     .map(_.gameplan.get)
     .getOrElse(new StandardGamePlan)
   
-  lazy val gameWeights: Map[HistoricalGame, Double] = With.history.games.map(game => (
-    game,
-    1.0 / (1.0 + (game.order / With.configuration.historyHalfLife))
-  )).toMap
+  lazy val gameWeights: Map[HistoricalGame, Double] = With.history.games
+    .filter(_.enemyMatches)
+    .zipWithIndex
+    .toVector
+    .map{case(game: HistoricalGame, i: Int) => (
+      game,
+      1.0 / (1.0 + (i / With.configuration.historyHalfLife))
+    )}
+    .toMap
 
-  lazy val enemyLastFingerprints: Vector[String] = {
-    ByOption.maxBy(With.history.gamesVsEnemies)(_.timestamp)
-      .map(_.strategies.toVector)
-      .getOrElse(Vector.empty)
+  def enemyFingerprints(games: Int = With.configuration.recentFingerprints): Vector[String] = {
+    With.history.gamesVsEnemies
+      .take(games)
+      .flatMap(_.strategies.toVector)
       .filter(_.startsWith("Finger"))
+      .distinct
   }
-  
+
+  lazy val enemyRecentFingerprints: Vector[String] = enemyFingerprints(With.configuration.recentFingerprints)
+
   def selectInitialStrategies: Set[Strategy] = {
     val enemyHasKnownRace = With.enemies.exists(_.raceInitial != Race.Unknown)
     val strategiesUnfiltered = if (enemyHasKnownRace) {
       TerranChoices.all ++ ProtossChoices.all ++ ZergChoices.all
-    }
-    else {
-      TerranChoices.tvr ++ ProtossChoices.pvr ++ ZergChoices.all
+    } else {
+      TerranChoices.tvr ++ ProtossChoices.pvr ++ ZergChoices.zvr
     }
     val strategiesFiltered = filterForcedStrategies(strategiesUnfiltered.filter(isAppropriate))
     strategiesFiltered.foreach(evaluate)
-    Playbook.strategySelectionPolicy.chooseBest(strategiesFiltered).toSet
+    if (With.configuration.humanMode()) {
+      Manners.chat("Human mode enabled!")
+      With.configuration.strategyRandomness = 0.3
+      return StrategySelectionDynamic.chooseBest(strategiesFiltered).toSet
+    }
+    Playbook.strategySelectionPolicy.chooseBestUnfiltered(strategiesUnfiltered).getOrElse(
+      Playbook.strategySelectionPolicy.chooseBest(strategiesFiltered))
+      .toSet
   }
-  
+
   private def filterForcedStrategies(strategies: Iterable[Strategy]): Iterable[Strategy] = {
     if (strategies.exists(Playbook.forced.contains))
       strategies.filter(Playbook.forced.contains)
     else
       strategies
   }
-  
+
+  def allowedGivenOpponentHistory(strategy: Strategy): Boolean = {
+    if (strategy.responsesBlacklisted.map(_.toString).exists(enemyRecentFingerprints.contains)) return false
+    if (strategy.responsesWhitelisted.nonEmpty
+      && ! strategy.responsesWhitelisted.map(_.toString).exists(enemyRecentFingerprints.contains)) return false
+    true
+  }
+
+  lazy val humanModeEnabled = With.configuration.humanMode()
   def isAppropriate(strategy: Strategy): Boolean = {
-    lazy val ourRace                  = With.self.raceInitial
-    lazy val enemyRacesCurrent        = With.enemies.map(_.raceCurrent).toSet
-    lazy val enemyRaceWasUnknown      = With.enemies.exists(_.raceInitial == Race.Unknown)
-    lazy val enemyRaceStillUnknown    = With.enemies.exists(_.raceCurrent == Race.Unknown)
-    lazy val gamesVsEnemy             = With.history.gamesVsEnemies.size
-    lazy val playedEnemyOftenEnough   = gamesVsEnemy >= strategy.minimumGamesVsOpponent
-    lazy val isIsland                 = isIslandMap
-    lazy val isGround                 = ! isIsland
-    lazy val rampOkay                 = (strategy.entranceInverted || ! isInverted) && (strategy.entranceFlat || ! isFlat) && (strategy.entranceRamped || ! isRamped)
-    lazy val rushOkay                 = rushDistanceMean > strategy.rushDistanceMinimum && rushDistanceMean < strategy.rushDistanceMaximum
-    lazy val startLocations           = With.geography.startLocations.size
-    lazy val disabledInPlaybook       = Playbook.disabled.contains(strategy)
-    lazy val disabledOnMap            = strategy.mapsBlacklisted.exists(_.matches) || ! strategy.mapsWhitelisted.forall(_.exists(_.matches))
-    lazy val appropriateForOurRace    = strategy.ourRaces.exists(_ == ourRace)
-    lazy val appropriateForEnemyRace  = strategy.enemyRaces.exists(race => if (race == Race.Unknown) enemyRaceWasUnknown else (enemyRaceStillUnknown || enemyRacesCurrent.contains(race)))
-    lazy val allowedGivenHistory      = ! strategy.responsesBlacklisted.map(_.toString).exists(enemyLastFingerprints.contains)
-    lazy val allowedForOpponent       = strategy.opponentsWhitelisted.forall(_
+    val ourRace                  = With.self.raceInitial
+    val enemyRacesCurrent        = With.enemies.map(_.raceCurrent).toSet
+    val enemyRaceWasUnknown      = With.enemies.exists(_.raceInitial == Race.Unknown)
+    val enemyRaceStillUnknown    = With.enemies.exists(_.raceCurrent == Race.Unknown)
+    val gamesVsEnemy             = With.history.gamesVsEnemies.size
+    val playedEnemyOftenEnough   = gamesVsEnemy >= strategy.minimumGamesVsOpponent
+    val isIsland                 = isIslandMap
+    val isGround                 = ! isIsland
+    val rampOkay                 = (strategy.entranceInverted || ! isInverted) && (strategy.entranceFlat || ! isFlat) && (strategy.entranceRamped || ! isRamped)
+    val rushOkay                 = rushDistanceMean > strategy.rushDistanceMinimum && rushDistanceMean < strategy.rushDistanceMaximum
+    val startLocations           = With.geography.startLocations.size
+    val disabledInPlaybook       = Playbook.disabled.contains(strategy)
+    val disabledOnMap            = strategy.mapsBlacklisted.exists(_.matches) || ! strategy.mapsWhitelisted.forall(_.exists(_.matches))
+    val appropriateForOurRace    = strategy.ourRaces.exists(_ == ourRace)
+    val appropriateForEnemyRace  = strategy.enemyRaces.exists(race => if (race == Race.Unknown) enemyRaceWasUnknown else (enemyRaceStillUnknown || enemyRacesCurrent.contains(race)))
+    val allowedGivenHumanity     = strategy.allowedVsHuman || ! humanModeEnabled
+    val allowedGivenHistory      = allowedGivenOpponentHistory(strategy)
+    val allowedForOpponent       = strategy.opponentsWhitelisted.forall(_
       .map(formatName)
       .exists(name =>
         nameMatches(name, Playbook.enemyName)
         || With.enemies.map(e => formatName(e.name)).exists(nameMatches(_, name))))
 
     val output = (
-          ! disabledOnMap
-      &&  ! disabledInPlaybook
-      &&  (strategy.ffa == isFfa)
+      (strategy.ffa == isFfa)
       &&  (strategy.islandMaps  || ! isIsland)
       &&  (strategy.groundMaps  || ! isGround)
-      &&  strategy.startLocationsMin <= startLocations
-      &&  strategy.startLocationsMax >= startLocations
-      &&  rampOkay
-      &&  rushOkay
+      &&  ! disabledInPlaybook
       &&  appropriateForOurRace
       &&  appropriateForEnemyRace
-      &&  allowedGivenHistory
-      &&  allowedForOpponent
-      &&  playedEnemyOftenEnough
+      &&  ( ! Playbook.respectOpponent || allowedForOpponent)
+      &&  ( ! Playbook.respectMap || ! disabledOnMap)
+      &&  ( ! Playbook.respectMap || strategy.startLocationsMin <= startLocations)
+      &&  ( ! Playbook.respectMap || strategy.startLocationsMax >= startLocations)
+      &&  ( ! Playbook.respectMap || rampOkay)
+      &&  ( ! Playbook.respectMap || rushOkay)
+      &&  ( ! Playbook.respectHistory || allowedGivenHistory)
+      &&  ( ! Playbook.respectHistory || playedEnemyOftenEnough)
     )
     
     output

@@ -1,6 +1,6 @@
 package Information.Battles.Prediction.Simulation
 
-import Information.Battles.Prediction.Prediction
+import Information.Battles.Prediction.{LocalBattleMetrics, Prediction}
 import Information.Battles.Types.{BattleLocal, Team}
 import Information.Geography.Types.Zone
 import Lifecycle.With
@@ -14,14 +14,16 @@ class Simulation(
   val weAttack  : Boolean,
   val weSnipe   : Boolean) {
   
-  private def buildSimulacra(team: Team) = team.units.filter(legalForSimulation).map(new Simulacrum(this, _))
+  private def buildSimulacra(team: Team) = if (With.blackboard.mcrs()) Vector.empty else team.units.filter(legalForSimulation).map(new Simulacrum(this, _))
   private def legalForSimulation(unit: UnitInfo): Boolean = (
-    ! unit.invincible             // No stasised units
+    unit.complete
+    && ! unit.invincible          // No stasised units
     && ! unit.is(Protoss.Carrier) // Simulate the Interceptors only -- produces more reliable results
     && ! unit.is(Protoss.Scarab)
-    && ( ! unit.is(Protoss.DarkTemplar) || ! unit.isFriendly) // Dark Templar ignore simulation, and when one is cloaked it can throw off the whole simulation
+    && ! (unit.unitClass.isWorker && unit.gathering && unit.isOurs)
+    && ! (unit.unitClass.isBuilding && ! unit.canAttack && ! unit.unitClass.isSpellcaster)
   )
-  
+
   val estimation            : Prediction          = new Prediction
   val focus                 : Pixel               = battle.focus
   val unitsOurs             : Vector[Simulacrum]  = buildSimulacra(battle.us)
@@ -32,21 +34,23 @@ class Simulation(
   lazy val ourWidth         : Double              = battle.us.units.filterNot(_.flying).map(unit => if (unit.flying) 0.0 else unit.unitClass.dimensionMin + unit.unitClass.dimensionMax).sum
   lazy val chokeMobility    : Map[Zone, Double]   = battle.us.units.map(_.zone).distinct.map(zone => (zone, getChokeMobility(zone))).toMap
   
-  val simulacra: Map[UnitInfo, Simulacrum] =
+  val simulacra: Map[UnitInfo, Simulacrum] = if (With.blackboard.mcrs()) Map.empty else
     (unitsOurs.filter(_.canMove) ++ unitsEnemy)
       .map(simulacrum => (simulacrum.realUnit, simulacrum))
       .toMap
-  
+
   def complete: Boolean = (
     estimation.frames > With.configuration.simulationFrames
     || ! updated
     || unitsOurs.forall(_.dead)
     || unitsEnemy.forall(_.dead)
-    || everyone.forall(e => e.dead || ! e.fighting)
+    || everyone.forall(u => u.dead || ! u.fighting)
   )
   
   def run() {
-    while ( ! complete) step()
+    if (!With.blackboard.mcrs()) {
+      while (!complete) step()
+    }
     cleanup()
   }
   
@@ -56,6 +60,9 @@ class Simulation(
     snipe()
     everyone.foreach(_.step())
     everyone.foreach(_.updateDeath())
+    if (estimation.frames - estimation.localBattleMetrics.lastOption.map(_.framesIn).getOrElse(0) >= With.configuration.simulationEstimationPeriod) {
+      recordMetrics()
+    }
   }
   
   def snipe() {
@@ -67,19 +74,26 @@ class Simulation(
       unitsOurs.foreach(_.cooldownMoving = 24)
     }
   }
+
+  def recordMetrics() {
+    estimation.localBattleMetrics += new LocalBattleMetrics(this, estimation.localBattleMetrics.lastOption)
+  }
   
   def cleanup() {
-    estimation.costToUs         = unitsOurs   .map(_.valueReceived).sum
-    estimation.costToEnemy      = unitsEnemy  .map(_.valueReceived).sum
-    estimation.damageToUs       = unitsOurs   .map(_.damageReceived).sum
-    estimation.damageToEnemy    = unitsEnemy  .map(_.damageReceived).sum
-    estimation.deathsUs         = unitsOurs   .count(_.dead)
-    estimation.deathsEnemy      = unitsEnemy  .count(_.dead)
-    estimation.totalUnitsUs     = unitsOurs   .size
-    estimation.totalUnitsEnemy  = unitsEnemy  .size
-    estimation.reportCards      ++= everyone  .map(simulacrum => (simulacrum.realUnit, simulacrum.reportCard))
-    estimation.simulation       = Some(this)
-    estimation.events           = everyone.flatMap(_.events).sortBy(_.frame)
+    estimation.simulation         = Some(this)
+    estimation.costToUs           = unitsOurs   .view.map(_.valueReceived).sum
+    estimation.costToEnemy        = unitsEnemy  .view.map(_.valueReceived).sum
+    estimation.damageToUs         = unitsOurs   .view.map(_.damageReceived).sum
+    estimation.damageToEnemy      = unitsEnemy  .view.map(_.damageReceived).sum
+    estimation.deathsUs           = unitsOurs   .count(_.dead)
+    estimation.deathsEnemy        = unitsEnemy  .count(_.dead)
+    estimation.totalUnitsUs       = unitsOurs   .size
+    estimation.totalUnitsEnemy    = unitsEnemy  .size
+    if (With.configuration.debugging()) {
+      estimation.debugReport ++= everyone.map(simulacrum => (simulacrum.realUnit, simulacrum.reportCard))
+      estimation.events             = everyone.flatMap(_.events).sortBy(_.frame)
+    }
+    recordMetrics()
   }
   
   private def getChokeMobility(zoneUs: Zone): Double = {
@@ -87,6 +101,7 @@ class Simulation(
     if (zoneUs == zoneEnemy) return 1.0
     val edge      = zoneUs.edges.find(_.zones.contains(zoneEnemy))
     val edgeWidth = Math.max(32.0, edge.map(_.radiusPixels * 2.0).getOrElse(32.0 * 10.0))
-    PurpleMath.nanToOne(2.5 * edgeWidth / ourWidth)
+    val output    = PurpleMath.clamp(PurpleMath.nanToOne(2.5 * edgeWidth / ourWidth), 0.25, 1.0)
+    output
   }
 }

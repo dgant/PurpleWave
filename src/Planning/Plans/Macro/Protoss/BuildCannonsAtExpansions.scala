@@ -4,7 +4,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Macro.Architecture.Heuristics.PlacementProfiles
 
-class BuildCannonsAtExpansions(initialCount: Int) extends BuildCannonsAtBases(
+class BuildCannonsAtExpansions(initialCount: Int) extends BuildTowersAtBases(
   initialCount,
   PlacementProfiles.hugTownHall,
   PlacementProfiles.hugTownHall) {

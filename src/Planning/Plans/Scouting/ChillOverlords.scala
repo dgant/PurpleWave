@@ -7,9 +7,9 @@ import Micro.Agency.Intention
 import Planning.Predicates.Compound.Latch
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitMatchers.UnitMatchOr
-import Planning.Composition.UnitCountEverything
 import Planning.Plan
 import Planning.Predicates.Milestones.EnemiesAtLeast
+import Planning.UnitCounters.UnitCountEverything
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
@@ -19,7 +19,7 @@ class ChillOverlords extends Plan {
   val overlords = new LockUnits
   overlords.unitMatcher.set(Zerg.Overlord)
   overlords.unitCounter.set(UnitCountEverything)
-  
+
   val cloakedThreat = new Latch(new EnemiesAtLeast(1, UnitMatchOr(
     Terran.Wraith,
     Terran.Ghost,
@@ -27,8 +27,11 @@ class ChillOverlords extends Plan {
     Protoss.Arbiter,
     Zerg.Lurker
   )))
-  
+
   override def onUpdate() {
+    if ( ! With.self.isZerg) {
+      return
+    }
     if (With.self.hasUpgrade(Zerg.OverlordSpeed)) {
       return
     }

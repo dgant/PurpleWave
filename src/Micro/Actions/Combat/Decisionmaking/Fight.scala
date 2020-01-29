@@ -6,7 +6,7 @@ import Micro.Actions.Combat.Maneuvering.{GooseChase, Sneak, Support}
 import Micro.Actions.Combat.Spells.{SpiderMine, Stim}
 import Micro.Actions.Combat.Tactics.SpiderMines.HandleMines
 import Micro.Actions.Combat.Tactics._
-import Micro.Actions.Protoss.{BeACarrier, BeAnArbiter}
+import Micro.Actions.Protoss.{BeACarrier, BeAReaver, BeAnArbiter, Paradrop}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Fight extends Action {
@@ -18,16 +18,20 @@ object Fight extends Action {
   )
   
   override def perform(unit: FriendlyUnitInfo) {
+    Follow.consider(unit)
     GooseChase.consider(unit)
     Support.consider(unit)
     StrategicNuke.consider(unit)
     Cast.consider(unit)
+    Detect.consider(unit)
     Stim.consider(unit)
+    Paradrop.consider(unit)
     HandleMines.consider(unit)
-    Bunk.consider(unit)
+    EmergencyBunk.consider(unit)
     Root.consider(unit)
     BeACarrier.consider(unit)
     BeAnArbiter.consider(unit)
+    BeAReaver.consider(unit)
     Recharge.consider(unit)
     Reload.consider(unit)
     SpiderMine.consider(unit)

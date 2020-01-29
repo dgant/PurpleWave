@@ -12,7 +12,7 @@ import bwapi.Color
 object ShowDesire extends View {
   
   override def renderMap() {
-    if (With.configuration.enableMCRS) {
+    if (With.blackboard.mcrs()) {
       With.units.playerOwned.foreach(renderMCRS)
     } else {
       With.units.ours.foreach(renderUnitState)
@@ -42,7 +42,6 @@ object ShowDesire extends View {
     var x = unit.pixelCenter.x
     var y = unit.pixelCenter.y + 28
     var width = 18
-    drawDesire(agent.netEngagementValue, x - width / 2, y, width)
     
     width = 27
     x = unit.pixelCenter.x

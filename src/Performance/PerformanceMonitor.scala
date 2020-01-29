@@ -8,17 +8,19 @@ class PerformanceMonitor {
   
   private val framesToTrack = 24 * 3
   private val frameTimes = Array.fill(framesToTrack)(1l)
+
+  val frameLimitShort: Int = 85
   
   private var millisecondsBefore = 0l
   private var lastFrameDelayUpdate = 0
   
-  var framesOver55    = 0
+  var framesOverShort = 0
   var framesOver1000  = 0
   var framesOver10000 = 0
-  
+
   var enablePerformanceStops: Boolean = With.configuration.enablePerformanceStops // For disabling performance stops while debugging
   var enablePerformanceSurrenders: Boolean = With.configuration.enablePerformanceSurrender
-  
+
   var lastUniqueUnitIdCount: Int = 0
   var lastUniqueDeadIdCount: Int = 0
   var lastUniqueFriendlyUnitObjects: Int = 0
@@ -32,11 +34,11 @@ class PerformanceMonitor {
       uniqueFriendlyDeadIds += id
     }
   }
-  
+
   def startFrame() {
     millisecondsBefore = System.currentTimeMillis()
   }
-  
+
   def endFrame() {
     lastUniqueUnitIdCount = uniqueFriendlyUnitIds.size
     lastUniqueDeadIdCount = uniqueFriendlyDeadIds.size
@@ -44,45 +46,49 @@ class PerformanceMonitor {
     uniqueFriendlyUnitObjects = 0
     uniqueFriendlyUnitIds.clear()
     uniqueFriendlyDeadIds.clear()
-    val millisecondDifference = millisecondsSpentThisFrame
+    var millisecondDifference = millisecondsSpentThisFrame
+    if (With.configuration.debugging() && millisecondDifference > With.configuration.debugPauseThreshold) {
+      millisecondDifference = meanFrameMilliseconds
+    }
+
     frameTimes(With.frame % framesToTrack) = millisecondDifference
-    if (millisecondDifference >= 55)    framesOver55    += 1
-    if (millisecondDifference >= 1000)  framesOver1000  += 1
-    if (millisecondDifference >= 10000) framesOver10000 += 1
+    if (millisecondDifference >= frameLimitShort) framesOverShort += 1
+    if (millisecondDifference >= 1000)            framesOver1000  += 1
+    if (millisecondDifference >= 10000)           framesOver10000 += 1
   }
-  
+
   def millisecondsLeftThisFrame: Long = {
     Math.max(0, With.configuration.targetFrameDurationMilliseconds - millisecondsSpentThisFrame)
   }
-  
+
   def millisecondsSpentThisFrame: Long = {
     Math.max(0, System.currentTimeMillis - millisecondsBefore)
   }
-  
+
   def continueRunning: Boolean = {
-    millisecondsLeftThisFrame > 1 || ! enablePerformanceStops
+    With.frame == 0 || millisecondsLeftThisFrame > 1 || ! enablePerformanceStops
   }
-  
+
   def violatedThreshold: Boolean = {
-    millisecondsLeftThisFrame <= 0
+    With.frame > 0 && millisecondsLeftThisFrame <= 0
   }
-  
+
   def violatedRules: Boolean = {
-    millisecondsSpentThisFrame >= 55
+    With.frame > 0 && millisecondsSpentThisFrame >= frameLimitShort
   }
-  
+
   def danger: Boolean = (
     (With.configuration.enableStreamManners || With.configuration.enablePerformanceSurrender)
     && (
-      framesOver55    > 160 ||
+      framesOverShort > 160 ||
       framesOver1000  > 5   ||
       framesOver10000 > 1)
   )
-  
+
   def maxFrameMilliseconds  : Long = frameTimes.max
-  def meanFrameMilliseconds : Long = frameTimes.sum / framesToTrack
-  
+  def meanFrameMilliseconds : Long = frameTimes.view.map(Math.min(_, 100)).sum / framesToTrack
+
   def disqualified: Boolean =
-    framesOver55    >= 320 ||
+    framesOverShort >= 320 ||
     framesOver1000  >= 10
 }

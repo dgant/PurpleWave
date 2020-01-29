@@ -1,171 +1,278 @@
 package Planning.Plans.Macro.Automatic
 
-import Information.Geography.Types.{Base, Zone}
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Geography.Types.Base
 import Lifecycle.With
+import Mathematics.PurpleMath
 import Micro.Agency.Intention
-import Planning.Composition.UnitCountEverything
+import Performance.Cache
 import Planning.Plan
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitMatchers.UnitMatchWorkers
-import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.ByOption
 
 import scala.collection.mutable
+import scala.util.Random
 
 class Gather extends Plan {
-  
-  val workerLock = new LockUnits {
-    unitMatcher.set(UnitMatchWorkers)
-    unitCounter.set(UnitCountEverything)
-  }
-  
-  var resource  : Set[UnitInfo] = Set.empty
-  var minerals  : Set[UnitInfo] = Set.empty
-  var gasses    : Set[FriendlyUnitInfo] = Set.empty
-  var resources : Set[UnitInfo] = Set.empty
-  var workers   : Set[FriendlyUnitInfo] = Set.empty
-  var gasWorkersNow = 0
-  var gasWorkersMax = 0
-  var workersByResource = new mutable.HashMap[UnitInfo, mutable.HashSet[FriendlyUnitInfo]]
-  var resourceByWorker = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
-  
-  private val transfersLegal = new mutable.HashSet[(Zone, Zone)]
-  
-  override def onUpdate() {
-    workerLock.acquire(this)
-    workers = workerLock.units
-    setGoals()
-    countUnits()
-    workers.foreach(updateWorker)
-  }
-  
-  private def setGoals() {
-    val belowFloor    = With.self.gas < Math.min(With.blackboard.gasLimitFloor(), With.blackboard.gasLimitCeiling())
-    val aboveCeiling  = With.self.gas > Math.max(With.blackboard.gasLimitFloor(), With.blackboard.gasLimitCeiling())
 
-    gasWorkersMax =
-      Vector(
-        workers.size - 3,
-        With.blackboard.gasWorkerCeiling(),
-        if (belowFloor)
-          workers.size
-        else if (aboveCeiling)
-          0
-        else
-          (workers.size * With.blackboard.gasTargetRatio()).toInt)
-        .min
+  val kDistanceMining: Int = 32 * 12
+  val kInvalidResourceScore = 1e100d
+  val kHysteresisPixels = 12
+  val kLookaheadFrames: Int = 24 * 60
+  val kLightYear: Double = 1e10
+  val kGasCompletionFrames = 48
+
+  // Adapted from https://github.com/TorchCraft/TorchCraftAI/blob/master/src/modules/gatherer/gathererassignments.cpp
+  // See LICENSE: https://github.com/TorchCraft/TorchCraftAI/blob/master/LICENSE
+
+  var workers: collection.Set[FriendlyUnitInfo] = Set.empty
+
+  val workerLock: LockUnits = new LockUnits { unitMatcher.set(UnitMatchWorkers) }
+  val resourceByWorker = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
+  val workersByResource = new mutable.HashMap[UnitInfo, mutable.Set[FriendlyUnitInfo]]
+  val workerCooldownUntil = new mutable.HashMap[FriendlyUnitInfo, Int]
+
+  def isValidResource (unit: UnitInfo): Boolean = isValidMineral(unit) || isValidGas(unit)
+  def isValidMineral  (unit: UnitInfo): Boolean = unit.alive && unit.mineralsLeft > 0
+  def isValidGas      (unit: UnitInfo): Boolean = unit.alive && unit.isOurs && unit.gasLeft > 0 && unit.remainingCompletionFrames < 24 * 2
+
+  private lazy val baseCosts: Map[(Base, Base), Cache[Double]] = With.geography.bases
+    .flatMap(baseA => With.geography.bases.map(baseB => (baseA, baseB)))
+    .map(basePair => (basePair, new Cache[Double](() =>
+      if (basePair._1 == basePair._2) 0.0
+      else if (basePair._1.hashCode() > basePair._2.hashCode()) baseCosts((basePair._2, basePair._1)).apply()
+      else basePair._1.heart.groundPixels(basePair._2.heart) // TODO: Account for unsafe travel
+    ))).toMap
+  private val miningBases         = new Cache(() => With.geography.ourBases.filter(_.townHall.exists(t => t.hasEverBeenCompleteHatch || t.remainingCompletionFrames < 24 * 10)))
+  private val ourMinerals         = new Cache(() => miningBases().view.flatMap(_.minerals))
+  private val ourGas              = new Cache(() => miningBases().view.flatMap(_.gas).filter(u => u.isOurs && u.remainingCompletionFrames < kGasCompletionFrames).toVector)
+  private val allMinerals         = new Cache(() => With.units.neutral.view.filter(_.mineralsLeft > 0).toVector)
+  private val allGas              = new Cache(() => With.units.ours.view.filter(u => u.unitClass.isGas && u.remainingCompletionFrames < kGasCompletionFrames).toVector)
+  private val longMineMinerals    = new Cache(() => ourMinerals().length < workers.size / 4)
+  private val longMineGas         = new Cache(() => ourGas().isEmpty)
+  private val legalMinerals       = new Cache(() => if (longMineMinerals()) allMinerals() else ourMinerals())
+  private val legalGas            = new Cache(() => if (longMineGas()) allGas() else ourGas())
+  private val newMinerals         = new Cache(() => legalMinerals().filter(isNewResource))
+  private val newGas              = new Cache(() => legalGas().filter(isNewResource))
+  private val resourcesToExclude  = new Cache(() => workersByResource
+    .keysIterator
+    .filterNot(resource =>
+          (isValidMineral(resource) && (longMineMinerals()  || ! isLongDistanceResource(resource)))
+      ||  (isValidGas(resource)     && (longMineGas()       || ! isLongDistanceResource(resource))))
+    .toVector)
+  private val resourceHallPixels  = new Cache(() => workersByResource
+    .keysIterator
+    .map(resource => (resource, ByOption.min(miningBases().map(_.townHall.get.pixelDistanceEdge(resource))).getOrElse(kLightYear)))
+    .toMap)
+
+  def isLongDistanceResource(unit: UnitInfo): Boolean = {
+    ! miningBases().exists(unit.base.contains)
   }
-  
-    private def countUnits() {
-      val activeBases = With.geography.ourBases.filter(_.townHall.exists(hall =>
-        hall.is(Zerg.LairOrHive)
-        || hall.remainingCompletionFrames < GameTime(0, 10)()
-        || hall.hasEverBeenCompleteHatch))
-      calculateTransferPaths(activeBases)
-      minerals  = activeBases.flatMap(_.minerals).toSet
-      gasses    = activeBases.flatMap(_.gas.flatMap(_.friendly).filter(u => u.complete)).toSet
-      if (minerals.isEmpty) {
-        minerals = With.geography.bases.flatMap(_.minerals).toSet
-      }
-      if (gasses.isEmpty) {
-        gasses = With.units.ours.filter(_.unitClass.isGas)
-      }
-      resources = gasses ++ minerals
-      if (resources.isEmpty) {
-        return
-      }
-    
-      workersByResource.clear()
-      resourceByWorker.clear()
-      resources.foreach(resource => workersByResource(resource) = new mutable.HashSet[FriendlyUnitInfo])
-      workers.foreach(unit => unit.agent.lastIntent.toGather.foreach(resource => assign(unit, resource)))
-      gasWorkersNow = resourceByWorker.count(_._2.unitClass.isGas)
-    }
-  
-    private def calculateTransferPaths(bases: Iterable[Base]) {
-      transfersLegal.clear()
-      val baseZones = bases.map(_.zone).toSet
-      baseZones.foreach(zone1 =>
-        baseZones.foreach(zone2 => {
-          val path = With.paths.zonePath(zone1, zone2)
-          val pathZones: Iterable[Zone] = path.map(_.steps.map(_.to).filter(zone => zone != zone1 && zone != zone2)).getOrElse(Iterable.empty)
-          val pathZonesDanger = pathZones.filter(zone =>
-                zone.units.exists(e => e.isEnemy  && e.unitClass.attacksGround)
-          && !  zone.units.exists(a => a.isOurs   && a.unitClass.attacksGround))
-        if (pathZonesDanger.isEmpty) {
-          transfersLegal += ((zone1, zone2))
-          transfersLegal += ((zone2, zone1))
-        }
-      }))
+
+  def isNewResource(unit: UnitInfo): Boolean = {
+    ! workersByResource.contains(unit)
   }
-  
-  private def isActiveGas(resource: UnitInfo): Boolean = resource.unitClass.isGas
-  
-  private def assign(worker: FriendlyUnitInfo, resource: UnitInfo) {
-    unassign(worker)
-    if ( ! resources.contains(resource)) return
-    if (isActiveGas(resource)) {
-      gasWorkersNow += 1
-    }
+
+  def assignWorker(worker: FriendlyUnitInfo, resource: UnitInfo): Unit = {
+    unassignWorker(worker)
     resourceByWorker(worker) = resource
     workersByResource(resource) += worker
   }
-  
-  private def unassign(worker: FriendlyUnitInfo) {
-    val resource = resourceByWorker.get(worker)
-    if (resource.exists(isActiveGas)) {
-      gasWorkersNow -= 1
-    }
-    resource.foreach(workersByResource(_) -= worker)
+
+  def unassignWorker(worker: FriendlyUnitInfo): Unit = {
+    resourceByWorker.get(worker).map(workersByResource.get).foreach(_.foreach(_.remove(worker)))
     resourceByWorker.remove(worker)
   }
-  
-  private def updateWorker(worker: FriendlyUnitInfo) {
-    val bestResource = resources.maxBy(utility(worker, _))
-    assign(worker, bestResource)
-    worker.agent.intend(this, new Intention {
-      toGather = resourceByWorker.get(worker)
-    })
-  }
-  
-  private def utility(worker: FriendlyUnitInfo, resource: UnitInfo): Double = {
-    val depleted = resource.gasLeft + resource.mineralsLeft == 0
-    val need =
-      (if (depleted) 0.2 else 1.0) * (
-      if (gasWorkersNow == gasWorkersMax)
-        1.0
-      else if (resource.unitClass.isGas == (gasWorkersNow < gasWorkersMax) && ! depleted)
-        100.0
-      else
-        1.0
-      )
-    
-    val safety      = if ( ! worker.zone.bases.exists(_.owner.isUs) || transfersLegal.contains((worker.zone, resource.zone))) 100.0 else 1.0
-    val continuity  = if (resourceByWorker.get(worker).contains(resource)) 2.0 else 1.0
-    val distance    = Math.max(resource.remainingCompletionFrames * worker.topSpeed, worker.pixelDistanceEdge(resource))
-    val distanceFactor = 32 * 30 + distance
 
-    val currentWorkerCount = workersByResource(resource).count(_ != worker)
-    val saturation  =
-      if (resource.unitClass.isMinerals) {
-        currentWorkerCount match {
-          case 0 => 1.0
-          case 1 => 0.8
-          case 2 => 0.1
-          case _ => 0.0
+  def includeResource(resource: UnitInfo): Unit = {
+    workersByResource(resource) = workersByResource.getOrElse(resource, mutable.Set.empty)
+  }
+
+  def containsResource(resource: UnitInfo): Boolean = {
+    workersByResource.contains(resource)
+  }
+
+  def excludeResource(resource: UnitInfo): Unit = {
+    workersByResource.get(resource).foreach(_.foreach(resourceByWorker.remove))
+    workersByResource.remove(resource)
+  }
+
+  def getResource(worker: FriendlyUnitInfo): Option[UnitInfo] = {
+    resourceByWorker.get(worker)
+  }
+
+  def countWorkers(resource: UnitInfo): Int = {
+    workersByResource.get(resource).map(_.size).getOrElse(0)
+  }
+
+  override def onUpdate() {
+    workerLock.acquire(this)
+    workers = workerLock.units
+    if (workers.isEmpty) return
+    resourceByWorker.keys.withFilter( ! workers.contains(_)).foreach(unassignWorker)
+    workerCooldownUntil.keys.withFilter( ! workers.contains(_)).foreach(workerCooldownUntil.remove)
+    // TODO: Unassign any workers who are no longer in the squad -- TCAI does this with the controller
+
+    newMinerals().foreach(includeResource)
+    newGas().foreach(includeResource)
+    resourcesToExclude().foreach(excludeResource)
+
+    val totalMineralPatches = With.geography.ourBases.view.map(_.minerals.size).sum
+    val totalGasPumps       = With.geography.ourBases.view.map(_.gas.count(_.isOurs)).sum
+    val canDistanceMine     = totalMineralPatches < 7
+    var gasWorkersNow       = resourceByWorker.count(_._2.unitClass.isGas)
+    var gasWorkerTarget     = PurpleMath.clamp(Math.round(With.blackboard.gasWorkerRatio() * workers.size).toInt, With.blackboard.gasWorkerFloor(), With.blackboard.gasWorkerCeiling())
+    gasWorkerTarget         = PurpleMath.clamp(gasWorkerTarget, workers.size - 2 * totalMineralPatches, 3 * totalGasPumps)
+    if (With.self.gas < With.blackboard.gasLimitFloor()) {
+      gasWorkerTarget = 3 * totalGasPumps
+    } else {
+      gasWorkerTarget = PurpleMath.clamp(gasWorkerTarget, 0, (With.blackboard.gasLimitCeiling() - With.self.gas + 7) / 8)
+    }
+    val needMoreGasWorkers  = gasWorkersNow < gasWorkerTarget
+
+    // Update workers in priority order.
+    //
+    // When a new resource is available:
+    // Prioritize workers closest to the new resource.
+    //
+    // Otherwise:
+    // Sort workers by frames since update, descending.
+    def newResourceDistance(worker: FriendlyUnitInfo): Option[Double] = {
+      ByOption.min((newMinerals() ++ newGas()).map(_.pixelDistanceEdge(worker)))
+    }
+    // Determine if we need to prioritize updating gas workers.
+    val minGasDistance: Map[FriendlyUnitInfo, Option[Double]] =
+      if (needMoreGasWorkers) {
+        workers
+          .map(worker => (
+            worker,
+            ByOption
+              .min(
+                workersByResource
+                  .filter(pair => pair._1.unitClass.isGas && pair._2.size < 3)
+                  .map(resource => worker.pixelDistanceTravelling(resource._1.pixelCenter))) // TODO: Used edge distance?
+            ))
+          .toMap
+      } else Map.empty
+    val respectCooldown = gasWorkersNow >= gasWorkerTarget
+
+    def workerOrder(worker: FriendlyUnitInfo): Double = {
+      lazy val cd = workerCooldownUntil.getOrElse(worker, 0).toDouble
+      if (respectCooldown) {
+        cd
+      } else {
+        newResourceDistance(worker).orElse(minGasDistance(worker)).getOrElse(cd)
+      }}
+    val workersToUpdate = workers
+      .view
+      .filter(worker => {
+        // Don't interrupt workers who are about to reach minerals.
+        val resourceBefore = resourceByWorker.get(worker)
+        val resourceBeforeEdgePixels = resourceBefore.map(_.pixelDistanceEdge(worker))
+        resourceBefore.forall(r => r.unitClass.isGas || workersByResource(r).size > 5 || resourceBeforeEdgePixels.forall(_ > 64)) // The > 5 check is for disentangling massively popular resources
+      })
+      .toVector
+      .sortBy(workerOrder)
+
+    // Update workers in priority order
+    workersToUpdate
+      .filter(worker => ! respectCooldown || workerCooldownUntil.get(worker).forall(_ <= With.frame))
+      .foreach(worker => {
+        val resourceBefore = resourceByWorker.get(worker)
+        unassignWorker(worker)
+        if (resourceBefore.exists(_.unitClass.isGas)) {
+          gasWorkersNow -= 1
         }
-      }
-      else {
-        currentWorkerCount match {
-          case 0 => 1.0
-          case 1 => 1.0
-          case 2 => 1.0
-          case 3 => 0.0001
-          case _ => 0.0
+
+        val gasWorkerDesired = gasWorkersNow < gasWorkerTarget
+
+        // For easy debugging
+        if (worker.selected) {
+          val scores = workersByResource.keysIterator.map(ResourceScore(worker, _, gasWorkerDesired, resourceBefore)).toVector.sortBy(_.output)
+          if (With.frame < 0) { // Cheat the optimizer
+            System.out.println(scores.toString)
+          }
         }
+
+        // Assign the worker to tbhe best resource
+        val resourceBestScore = ByOption.maxBy(workersByResource.keysIterator.map(ResourceScore(worker, _, gasWorkerDesired, resourceBefore)))(_.output)
+        resourceBestScore.foreach(bestResourceScore => {
+          val bestResource = bestResourceScore.resource
+          assignWorker(worker, bestResource)
+          if (resourceBefore.exists(_.unitClass.isGas)) gasWorkersNow -= 1
+          if (bestResource.unitClass.isGas) gasWorkersNow += 1
+        })
+
+        worker.agent.intend(this, new Intention {
+          toGather = resourceByWorker.get(worker)
+        })
+        workerCooldownUntil(worker) = With.frame + 48 + Random.nextInt(48)
+      })
+  }
+
+  // Evaluate the marginal efficacy of assigning this worker to a resource.
+  case class ResourceScore(worker: FriendlyUnitInfo, val resource: UnitInfo, val gasWorkerDesire: Boolean, var resourceBefore: Option[UnitInfo] = None) {
+    resourceBefore = resourceBefore.orElse(resourceByWorker.get(worker))
+
+    // How many workers are already mining this patch?
+    // Don't count workers that are further away -- the closest workers get priority on the patch
+    val workersBefore = workersByResource
+      .get(resource)
+      .map(_.count(_ != worker))
+      .getOrElse(0)
+
+    // The depot-to-resource distance is used in two ways:
+    // -Resources close to the hall should get priority on their first two workers
+    // -Resources far from the hall benefit more from the third worker
+    val hallToResourcePixels = resourceHallPixels()(resource)
+
+    // Geyser mining speed varies based on direction relative to town hall
+    val belowTownHall = resource.base.map(_.townHallTile).exists(t => t.y < resource.tileTopLeft.y - 3 || t.x < resource.tileTopLeft.x - 4)
+
+    // Based on https://tl.net/forum/bw-strategy/551478-efficient-gas-mining
+    val needFourOnGas = resource.unitClass.isGas && belowTownHall
+
+    val distanceRatio = PurpleMath.clamp(hallToResourcePixels / (32.0 * 3.0), 1.0, 2.0)
+
+    // How effective will the next worker be on this resource?
+    var throughput = 0.001
+    if (resource.unitClass.isGas) {
+      if (workersBefore == 3 && needFourOnGas) {
+        throughput = 0.75
+      } else if (workersBefore < 3) {
+        throughput = 1.0
       }
-    val output = need * continuity * saturation / (128.0 + distance)
-    output
+      // Account for geyser depletion
+      if (resource.resourcesLeft < 8) {
+        throughput *= 0.25
+      }
+    } else {
+      if (workersBefore == 0) {
+        // First workers prefer closer resources
+        // Range on 1.0 - 1.5
+        throughput = 1.0 + 0.5 * (2.0 - distanceRatio)
+      } else if (workersBefore == 1) {
+        // Second workers prefer distant resources (since they'll spend more time mining)
+        // Range on 0.8 - 0.95
+        throughput = 0.8 + 0.15 * (distanceRatio - 1.0)
+      } else if (workersBefore < 3) {
+        // Third workers also prefer distant resources
+        // Range on 0.5 - 0.7
+        throughput = 0.5 + 0.2 * (distanceRatio - 1.0)
+      }
+    }
+    // Don't encourage redistributing a worker who's currently approaching their minerals
+    val resourceBeforeEdgePixels = resourceBefore.map(_.pixelDistanceEdge(worker))
+    val stick = resourceBefore.contains(resource) && ! worker.carryingResources && resourceBeforeEdgePixels.forall(_ < 64)
+    val baseFrom = worker.base.orElse(resourceBefore.flatMap(_.base))
+    val baseTo = resource.base
+    val workerToResourceCost = baseFrom.flatMap(baseA => baseTo.map(baseB => baseCosts(baseA, baseB)())).getOrElse(worker.pixelDistanceTravelling(resource.pixelCenter))
+    val workerToResourceHysteresis = if (stick) 0 else 32
+    val framesToResource = worker.framesToTravelPixels(workerToResourceCost + workerToResourceHysteresis)
+    val framesSpentGathering = Math.max(24, kLookaheadFrames - framesToResource)
+    val gasPreference = if (resource.unitClass.isGas) (if (gasWorkerDesire) 2.0 else 0.75) else 1.0 // When we don't want gas, we still want it more than the third mineral worker
+    val stickiness = if (stick) 2.0 else 1.0
+    val output = throughput * framesSpentGathering * gasPreference * stickiness
   }
 }

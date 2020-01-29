@@ -33,7 +33,10 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   
   lazy val dimensionMin: Int = Math.min(width, height)
   lazy val dimensionMax: Int = Math.max(width, height)
+  lazy val area: Int = dimensionMin * dimensionMax
+  lazy val sqrtArea: Int = Math.sqrt(area).toInt
   lazy val radialHypotenuse: Double = Math.sqrt(width.toDouble * width.toDouble + height.toDouble * height.toDouble)/2.0
+  lazy val perimeter: Int = 2 * width + 2 * height
   
   def topLeft     : Point = Point(dimensionLeft, dimensionUp)
   def topRight    : Point = Point(dimensionRight, dimensionUp)
@@ -63,9 +66,10 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   // Combat //
   ////////////
   
-  lazy val ranged  : Boolean = rawCanAttack && pixelRangeMax > 32 * 2
-  lazy val melee   : Boolean = rawCanAttack && ! ranged
-  
+  lazy val ranged     : Boolean = rawCanAttack && pixelRangeMax > 32 * 2
+  lazy val melee      : Boolean = rawCanAttack && ! ranged
+  lazy val castsSpells: Boolean = spells.nonEmpty
+
   lazy val suicides: Boolean = Array(
     Terran.SpiderMine,
     Protoss.Scarab,
@@ -105,7 +109,9 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
       Zerg.Devourer, // Well, SORT of
       Zerg.InfestedTerran)
     .contains(this)
-  
+
+  lazy val isReaver: Boolean = this == Protoss.Reaver
+
   lazy val maxTotalHealth: Int = maxHitPoints + maxShields
   
   // Via http://www.starcraftai.com/wiki/Regeneration
@@ -159,23 +165,34 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val effectiveRangePixels: Double =
     if (isDetector)                         32.0 * 11.0
     else if (this == Terran.Battlecruiser)  32.0 * 10.0
-    else if (this == Protoss.HighTemplar)   32.0 * 9.0
     else if (this == Protoss.Arbiter)       32.0 * 9.0
     else if (this == Protoss.DarkArchon)    32.0 * 10.0
+    else if (this == Protoss.HighTemplar)   32.0 * 9.0
+    else if (this == Zerg.Defiler)          32.0 * 9.0
+    else if (this == Zerg.Queen)            32.0 * 9.0
     else pixelRangeMax
-  
+
   lazy val tileArea               : TileRectangle = TileRectangle(Tile(0, 0), tileSize)
-  lazy val targetsMatter          : Boolean = this != Protoss.Interceptor
-  lazy val targetPositionsMatter  : Boolean = this != Protoss.Interceptor
+  lazy val ordersMatter           : Boolean = ! this.isResource
+  lazy val targetsMatter          : Boolean = this != Protoss.Interceptor && ! this.isResource
+  lazy val targetPositionsMatter  : Boolean = this != Protoss.Interceptor && ! this.isResource && (this.isFlyingBuilding || ! this.isBuilding)
   lazy val orderable              : Boolean = ! isSpell && ! Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
   lazy val isResource             : Boolean = isMinerals || isGas
   lazy val isMinerals             : Boolean = isMineralField
   lazy val isGas                  : Boolean = Vector(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this)
   lazy val isTownHall             : Boolean = Vector(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this)
-  lazy val isSiegeTank            : Boolean = this == Terran.SiegeTankSieged || this == Terran.SiegeTankUnsieged
   lazy val isStaticDefense        : Boolean = (isBuilding && attacks || this == Terran.Bunker || this == Protoss.ShieldBattery) && this != Terran.SiegeTankSieged
   lazy val isTransport            : Boolean = spaceProvided > 0 && isFlyer && this != Protoss.Carrier
   lazy val shootsScarabs          : Boolean = this == Protoss.Reaver // Performance shortcut
+
+  // Performance shortcut -- comparing types
+  lazy val isArbiter          : Boolean = this == Protoss.Arbiter
+  lazy val isCarrier          : Boolean = this == Protoss.Carrier
+  lazy val isSiegeTank        : Boolean = this == Terran.SiegeTankSieged || this == Terran.SiegeTankUnsieged
+  lazy val isFactory          : Boolean = this == Terran.Factory
+  lazy val isStarport         : Boolean = this == Terran.Starport
+  lazy val isScienceFacility  : Boolean = this == Terran.ScienceFacility
+  lazy val isZergling         : Boolean = this == Zerg.Zergling
   
   lazy val unaffectedByDarkSwarm: Boolean = Vector(
     Terran.SiegeTankSieged,
@@ -204,7 +221,6 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val trainsUnits        : Boolean = UnitClasses.all.exists(unit => unit.whatBuilds._1 == this)
   lazy val trainsAirUnits     : Boolean = UnitClasses.all.exists(unit => unit.whatBuilds._1 == this && unit.isFlyer)
   lazy val trainsGroundUnits  : Boolean = UnitClasses.all.exists(unit => unit.whatBuilds._1 == this && ! unit.isFlyer && ! unit.isBuilding)
-  
   
   lazy val isProtoss : Boolean = race == Race.Protoss
   lazy val isTerran  : Boolean = race == Race.Terran
@@ -418,6 +434,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
         + (if (isTwoUnitsInOneEgg) 12.5 else if(isZerg) 25.0 else 0.0) // Larva value
       )
       * (if(isWorker) 1.3 else 1.0)
+      * (if (whatBuilds._1 == Terran.Factory) 1.2 else 1.0)
       * (if (this == Protoss.Carrier)     2.0 else 1.0)
       / (if (this == Protoss.Interceptor) 4.0 else 1.0)
       / (if (isTwoUnitsInOneEgg) 2.0 else 1.0)
@@ -505,11 +522,12 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val canStim              : Boolean = this == Terran.Marine || this == Terran.Firebat
   lazy val canSiege             : Boolean = this == Terran.SiegeTankUnsieged || this == Terran.SiegeTankSieged
   lazy val canBeIrradiated      : Boolean = Players.all.exists(_.isUnknownOrTerran)  && ! isBuilding
-  lazy val canBeIrradiateBurned : Boolean = Players.all.exists(_.isUnknownOrTerran)  && ! isBuilding && isOrganic
+  lazy val canBeIrradiateBurned : Boolean = Players.all.exists(_.isUnknownOrTerran)  && ! isBuilding && isOrganic && this != Zerg.LurkerEgg && this != Zerg.Egg
   lazy val canBeLockedDown      : Boolean = Players.all.exists(_.isUnknownOrTerran)  && ! isBuilding && isMechanical
   lazy val canBeMaelstrommed    : Boolean = Players.all.exists(_.isUnknownOrProtoss) && ! isBuilding && isOrganic
   lazy val canBeEnsnared        : Boolean = Players.all.exists(_.isUnknownOrZerg)    && ! isBuilding
   lazy val canBeStasised        : Boolean = Players.all.exists(_.isUnknownOrProtoss) && ! isBuilding
+  lazy val canLoadUnits         : Boolean = Vector(Terran.Bunker, Terran.Dropship, Protoss.Shuttle, Zerg.Overlord).contains(this)
   lazy val canBeTransported     : Boolean = ! isBuilding && spaceRequired <= 8 // BWAPI gives 255 for unloadable units
   lazy val spells: Array[Tech] =
     if (this == Terran.Battlecruiser)   Array(Terran.Yamato)                                                          else
@@ -533,9 +551,10 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   
   override def acceptAsPrerequisite(unit: UnitInfo): Boolean = (
     accept(unit)
-    || (unit.unitClass == Zerg.GreaterSpire && this == Zerg.Spire)
-    || (unit.unitClass == Zerg.Hive         && this == Zerg.Lair)
-    || (unit.unitClass == Zerg.Hive         && this == Zerg.Hatchery)
-    || (unit.unitClass == Zerg.Lair         && this == Zerg.Hatchery)
+    || (unit.unitClass.isZerg && unit.unitClass.isBuilding && (
+         (unit.unitClass == Zerg.GreaterSpire && this == Zerg.Spire)
+      || (unit.unitClass == Zerg.Hive         && this == Zerg.Lair)
+      || (unit.unitClass == Zerg.Hive         && this == Zerg.Hatchery)
+      || (unit.unitClass == Zerg.Lair         && this == Zerg.Hatchery)))
   )
 }

@@ -6,11 +6,16 @@ import Lifecycle.With
 import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.Protoss
 import Utilities.ByOption
-import Utilities.EnrichPixel._
 
 object BaseUpdater {
   
   def updateBase(base: Base) {
+    if (With.grids.friendlyVision.isSet(base.townHallTile)) {
+      base.lastScoutedFrame = With.frame
+    }
+    if (With.grids.enemyVision.isSet(base.townHallTile)) {
+      base.lastScoutedByEnemyFrame = With.frame
+    }
     updateAssets(base)
     updateOwner(base)
   }
@@ -22,7 +27,7 @@ object BaseUpdater {
     base.owner = base.townHall.map(_.player).getOrElse(if (base.scouted) With.neutral else base.owner)
     
     // Assume ownership of implicit starting location
-    if (base.owner.isNeutral && base.lastScoutedFrame <= 0 && With.intelligence.firstEnemyMain.contains(base)) {
+    if (base.owner.isNeutral && ! base.scouted && With.intelligence.firstEnemyMain.contains(base)) {
       base.owner = With.enemy
     }
     
@@ -42,14 +47,12 @@ object BaseUpdater {
   
   private def updateAssets(base: Base) {
     base.units          = base.zone.units.filter(_.base.contains(base))
-    base.townHall       = ByOption.minBy(base.units.filter(u => u.unitClass.isTownHall && ! u.flying))(_.tileTopLeft.tileDistanceManhattan(base.townHallTile))
-    base.minerals       = base.units.filter(u => u.mineralsLeft > 0 && ! u.isMineralBlocker)
+    base.townHall       = ByOption.minBy(base.units.view.filter(u => u.unitClass.isTownHall && ! u.flying))(_.tileTopLeft.tileDistanceManhattan(base.townHallTile))
+    base.minerals       = base.units.filter(u => u.mineralsLeft > 0 && ! u.isBlocker)
     base.gas            = base.units.filter(_.unitClass.isGas)
-    base.workers        = base.units.filter(u => u.player == base.owner && u.is(UnitMatchWorkers))
-    base.defenders      = base.units.filter(u => u.player == base.owner && u.unitClass.rawCanAttack)
-    base.mineralsLeft   = base.minerals.toSeq.map(_.mineralsLeft).sum
-    base.gasLeft        = base.gas.toSeq.map(_.gasLeft).sum
-    base.harvestingArea = (Vector(base.townHallArea) ++ (base.minerals.filter(_.mineralsLeft > With.configuration.blockerMineralThreshold) ++ base.gas).map(_.tileArea)).boundary
-    base.heart          = base.harvestingArea.midpoint
+    base.workerCount    = base.units.count(u => u.player == base.owner && u.is(UnitMatchWorkers))
+    base.defenseValue   = base.units.iterator.map(u => if (u.player == base.owner && ! u.unitClass.isWorker && (u.canAttack || u.unitClass.spells.nonEmpty)) u.subjectiveValue else 0).sum
+    base.mineralsLeft   = base.minerals.iterator.map(_.mineralsLeft).sum
+    base.gasLeft        = base.gas.iterator.map(_.gasLeft).sum
   }
 }

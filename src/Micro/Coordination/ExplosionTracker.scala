@@ -42,7 +42,6 @@ class ExplosionTracker {
   
   def run() {
     byBattle.clear()
-    if (With.performance.enablePerformanceStops && With.performance.danger) return
     With.bullets.all.foreach(explosionFromBullet)
     With.units.all.foreach(explosionFromUnit)
     With.game.getNukeDots.asScala.map(new Pixel(_)).foreach(explosionFromNuke)
@@ -55,8 +54,7 @@ class ExplosionTracker {
     lazy val sourceUnit   = bullet.sourceUnit
     if (someTerran && sourceUnit.exists(_.is(Terran.ScienceVessel)))
       addToBattle(sourceUnit.get, new ExplosionEMP(bullet))
-    else if (someZerg
-      && sourceUnit.exists(u => u.is(Zerg.Lurker) && u.isEnemy && u.effectivelyCloaked)) {
+    else if (someZerg && sourceUnit.exists(u => u.is(Zerg.Lurker) && u.isEnemy && u.effectivelyCloaked)) {
       addToBattle(sourceUnit.get, new ExplosionLurkerNow(bullet))
     }
     else if (someProtoss && sourceUnit.exists(_.is(Protoss.HighTemplar))) {
@@ -70,10 +68,8 @@ class ExplosionTracker {
       addToBattle(unit, new ExplosionIrradiateSplash(unit))
     }
     else if (unit.is(Terran.SpiderMine)
-      && ! unit.burrowed
-      && unit.isFriendly
-      && unit.orderTarget.nonEmpty) {
-      // Only auto-dodge our own triggered mines
+      && ( ! unit.burrowed || unit.matchups.enemies.exists(e => e.unitClass.triggersSpiderMines && e.pixelDistanceEdge(unit) < 64))
+      && unit.isFriendly) {
       addToBattle(unit, new ExplosionSpiderMineBlast(unit))
     }
     else if (unit.is(Zerg.InfestedTerran)) {

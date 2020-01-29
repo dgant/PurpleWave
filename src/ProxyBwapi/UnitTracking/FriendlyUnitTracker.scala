@@ -37,7 +37,9 @@ class FriendlyUnitTracker {
   }
   
   def onUnitDestroy(unit: bwapi.Unit) {
-    remove(unit.getID)
+    val id = unit.getID
+    get(id).foreach(friendly => if (friendly.agent.canScout) With.blackboard.lastScoutDeath = With.frame)
+    remove(id)
   }
   
   private def add(unit: bwapi.Unit, id: Int) {

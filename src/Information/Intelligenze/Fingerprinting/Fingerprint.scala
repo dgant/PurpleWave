@@ -1,17 +1,29 @@
 package Information.Intelligenze.Fingerprinting
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Lifecycle.With
+
 abstract class Fingerprint {
   
-  protected val sticky: Boolean = false
+  protected def sticky: Boolean = false
+  protected def lockAfter: Int = GameTime(120, 0)()
   protected def investigate: Boolean
   protected val children: Seq[Fingerprint] = Seq.empty
-  
-  private var matched: Boolean = false
+
+  protected var firstMatchFrame: Int = -1
+  protected var matched: Boolean = false
   final def matches: Boolean = matched
   final def update() {
     children.foreach(_.update())
-    if (sticky && matched) return
-    matched = investigate
+    if (sticky && matched) {
+      return
+    }
+    if (With.frame < lockAfter) {
+      matched = investigate
+    }
+    if (matched && firstMatchFrame < 0) {
+      firstMatchFrame = With.frame
+    }
   }
   
   override def toString: String = {

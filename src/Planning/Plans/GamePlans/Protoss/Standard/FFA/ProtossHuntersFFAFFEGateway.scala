@@ -1,10 +1,11 @@
 package Planning.Plans.GamePlans.Protoss.Standard.FFA
 
 import Macro.BuildRequests.Get
+import Planning.Plans.Army.Aggression
 import Planning.Plans.Basic.NoPlan
 import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
 import Planning.Predicates.Always
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
@@ -14,12 +15,12 @@ import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
 import Planning.Predicates.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Protoss
 
-class ProtossHuntersFFAFFEGateway extends GameplanModeTemplate {
+class ProtossHuntersFFAFFEGateway extends GameplanTemplate {
   
   override val activationCriteria   : Predicate = new Always
-  override def defaultPlacementPlan : Plan = new PlacementForgeFastExpand
-  override val defaultScoutPlan     : Plan = NoPlan()
-  override val aggression = 0.8
+  override def placementPlan : Plan = new PlacementForgeFastExpand
+  override val scoutPlan     : Plan = NoPlan()
+  override def aggressionPlan: Plan = new Aggression(0.8)
   
   override val buildOrder = Vector(
     Get(8,   Protoss.Probe),

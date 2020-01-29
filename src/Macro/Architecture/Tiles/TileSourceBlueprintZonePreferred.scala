@@ -9,7 +9,7 @@ object TileSourceBlueprintZonePreferred extends TileSource {
     blueprint.preferZone.isDefined
   }
   
-  override def tiles(blueprint: Blueprint): Iterable[Tile] = {
+  override def tiles(blueprint: Blueprint): Seq[Tile] = {
     blueprint.preferZone.get.tilesBuildable
   }
 }

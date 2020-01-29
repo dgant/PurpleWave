@@ -12,7 +12,7 @@ class GridCreep extends AbstractGridBoolean {
   // So we need to actually query for this.
   
   // Performance optimization: Don't bother checking for creep if none is possible.
-  private lazy val creepPossible: Boolean = Players.all.exists(_.isZerg) || With.units.neutral.exists(_.unitClass.producesCreep)
+  private lazy val creepPossible: Boolean = Players.all.exists(p => p.isZerg && ! p.isNeutral) || With.units.neutral.exists(_.unitClass.producesCreep)
   
   override def update(): Unit = {
     if ( ! creepPossible) return

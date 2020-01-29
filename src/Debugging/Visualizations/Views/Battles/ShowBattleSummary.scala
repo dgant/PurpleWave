@@ -7,7 +7,6 @@ import Information.Battles.Prediction.Prediction
 import Information.Battles.Types.BattleLocal
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Planning.Yolo
 import Utilities.ByOption
 import bwapi.Text
 
@@ -28,7 +27,7 @@ object ShowBattleSummary extends View {
     With.game.drawTextScreen(army1.bwapi, "+" + With.battles.global.estimationAbstractOffense.costToEnemy.toInt + " x " + "%1.2f".format(With.blackboard.aggressionRatio.get))
     With.game.drawTextScreen(army2.bwapi, "-" + With.battles.global.estimationAbstractOffense.costToUs.toInt)
     localBattle.foreach(battle => drawEstimationReport(battle.estimationSimulationAttack))
-    if (Yolo.active && With.frame / 24 % 2 == 0) {
+    if (With.yolo.active() && With.frame / 24 % 2 == 0) {
       With.game.drawTextScreen(yolo.bwapi, "YOLO")
     }
   }
@@ -69,7 +68,7 @@ object ShowBattleSummary extends View {
     DrawMap.line    (battle.focus,          battle.enemy.vanguard,  enemyColorDark)
     With.game.drawCircleMap(battle.focus.bwapi, (battle.us.units ++ battle.enemy.units).map(_.pixelDistanceCenter(battle.focus)).max.toInt, neutralColor)
     DrawMap.labelBox(
-      Vector(estimation.netValue.toInt.toString),
+      Vector(estimation.localBattleMetrics.lastOption.map(_.totalScore * 100).getOrElse(0.0).toInt.toString),
       battle.focus.add(24, 0),
       drawBackground = true,
       backgroundColor = winnerStrengthColor)

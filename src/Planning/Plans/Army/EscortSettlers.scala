@@ -2,8 +2,7 @@ package Planning.Plans.Army
 
 import Lifecycle.With
 import Micro.Squads.Goals.GoalEscort
-import Planning.Composition.UnitCountEverything
-import Planning.UnitCounters.UnitCounter
+import Planning.UnitCounters.{UnitCountEverything, UnitCounter}
 import Planning.UnitMatchers._
 import Utilities.ByOption
 
@@ -27,7 +26,7 @@ class EscortSettlers(
     val buildTile     = settler.get.agent.toBuildTile.get
     val enemies       = With.paths.zonePathUnits(settler.get.zone, buildTile.zone).filter(u => u.isEnemy)
     goal.principal    = settler
-    squad.enemies     = enemies
+    squad.enemies     = (enemies ++ settler.get.matchups.threats).distinct
     super.onUpdate()
   }
 }

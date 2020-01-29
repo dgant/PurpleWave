@@ -1,46 +1,41 @@
 package Micro.Actions.Combat.Spells
 
 import Lifecycle.With
-import Micro.Actions.Action
-import Micro.Heuristics.Spells.TargetSingle
-import ProxyBwapi.Races.Terran
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Mathematics.Points.TileRectangle
+import ProxyBwapi.Races.{Terran, Zerg}
+import ProxyBwapi.Techs.Tech
+import ProxyBwapi.UnitClasses.UnitClass
+import ProxyBwapi.UnitInfo.UnitInfo
 
-object Irradiate extends Action {
-  
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.is(Terran.ScienceVessel)               &&
-    unit.energy >= Terran.Irradiate.energyCost  &&
-    With.self.hasTech(Terran.Irradiate)         &&
-    unit.matchups.enemies.nonEmpty
+object Irradiate extends TargetedSpell {
+
+  override protected def casterClass    : UnitClass = Terran.ScienceVessel
+  override protected def tech           : Tech      = Terran.Irradiate
+  override protected def aoe            : Boolean   = false
+  override protected def castRangeTiles : Int       = 9
+  override protected def thresholdValue : Double    = Zerg.Mutalisk.subjectiveValue
+
+  protected def valueUnit(target: UnitInfo): Double = {
+    if ( ! target.unitClass.canBeIrradiateBurned)
+      0.0
+    else if (target.irradiated)
+      0.0
+    else if (target.is(Zerg.LurkerEgg))
+      0.0
+    else if (target.isEnemy)
+      target.subjectiveValue
+    else if (target.isFriendly)
+      - target.subjectiveValue
+    else
+      0.0
   }
-  
-  override protected def perform(unit: FriendlyUnitInfo) {
-    
-    def valueTarget(target: UnitInfo): Double = {
-      val baseValue =
-        if ( ! target.isEnemy)
-          -1.0
-        else if ( ! target.unitClass.isOrganic)
-          -1.0
-        else if (target.matchups.framesToLive < 24 * 20)
-          -1.0
-        else if (target.unitClass.gasPrice >= 0)
-          1.0
-        else
-          -1.0
-      
-      baseValue * unit.subjectiveValue
-    }
-    
-    val target = TargetSingle.chooseTarget(
-      unit,
-      32.0 * 14.0,
-      1.0,
-      valueTarget)
-    
-    target.foreach(With.commander.useTechOnUnit(unit, Terran.Irradiate, _))
+
+  override protected def valueTarget(target: UnitInfo): Double = {
+    val targetValue = valueUnit(target) * target.hitPoints / target.unitClass.maxHitPoints
+    val neighborValue = With.units.inRectangle(TileRectangle(
+      target.tileIncludingCenter.subtract(1, 1),
+      target.tileIncludingCenter.add(1, 1))).view.map(valueUnit).sum
+
+    targetValue + neighborValue / 2.0
   }
-  
-  
 }

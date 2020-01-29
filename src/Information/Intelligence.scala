@@ -5,6 +5,7 @@ import Information.Intelligenze.UnitsShown
 import Lifecycle.With
 import Mathematics.Points.Tile
 import Performance.Cache
+import Planning.UnitMatchers.{UnitMatchBuilding, UnitMatchWorkers}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
@@ -16,6 +17,7 @@ class Intelligence {
   var firstEnemyMain: Option[Base] = None
 
   def mostBaselikeEnemyTile: Tile = mostBaselikeEnemyTileCache()
+  def threatOrigin: Tile = enemyThreatOriginCache()
   
   private val scoutTiles = new mutable.ListBuffer[Tile]
   private var lastScoutFrame = 0
@@ -33,7 +35,6 @@ class Intelligence {
       scoutTiles.append(With.geography.home)
     }
     With.geography.bases
-      .toVector
       .filter( ! _.zone.island || flyingScout || With.geography.ourBases.forall(_.zone.island))
       .map(base => (base, {
         val heartMain = base.heart.pixelCenter
@@ -57,16 +58,17 @@ class Intelligence {
        nextBasesToScoutCache.invalidate()
      }
   }
-  def peekNextBaseToScout: Base = {
+  def peekNextBaseToScout(filter: Base => Boolean = b => true): Base = {
     populateNextBasesToScout()
-    nextBasesToScoutCache().head
+    nextBasesToScoutCache().find(filter).getOrElse(nextBasesToScoutCache().head)
   }
-  def claimBaseToScout: Base = {
+  def claimBaseToScout(filter: Base => Boolean = b => true): Base = {
     populateNextBasesToScout()
-    val output = nextBasesToScoutCache().remove(0)
+    val output = peekNextBaseToScout(filter)
+    nextBasesToScoutCache() -= output
     output
   }
-  def claimBaseToScout(unit: FriendlyUnitInfo): Base = {
+  def claimBaseToScoutForUnit(unit: FriendlyUnitInfo, filter: Base => Boolean = b => true): Base = {
     populateNextBasesToScout()
     val base = nextBasesToScoutCache().maxBy(base => {
       var distance = 32.0 * 10 + unit.pixelDistanceCenter(base.heart.pixelCenter)
@@ -81,13 +83,33 @@ class Intelligence {
 
   private val mostBaselikeEnemyTileCache = new Cache(() =>
     With.units.enemy
-      .toVector
+      .view
       .filter(unit => unit.possiblyStillThere && ! unit.flying && unit.unitClass.isBuilding)
+      .toVector
       .sortBy(unit => ! unit.unitClass.isTownHall)
       .map(_.tileIncludingCenter)
       .headOption
       .getOrElse(baseIntrigue().maxBy(_._2)._1.townHallArea.midpoint))
-  
+
+  private val enemyThreatOriginBaseFactor = 3
+  private val enemyThreatOriginCache = new Cache(() => {
+    var x = 0
+    var y = 0
+    var n = 0
+    With.units.enemy.foreach(u => if (u.likelyStillThere && u.attacksAgainstGround > 0 && ! u.unitClass.isWorker) {
+      x += u.x / 32
+      y += u.y / 32
+      n += 1
+    })
+
+    x += enemyThreatOriginBaseFactor * mostBaselikeEnemyTile.x
+    y += enemyThreatOriginBaseFactor * mostBaselikeEnemyTile.y
+    n += enemyThreatOriginBaseFactor
+
+    val airCentroid = Tile(x/n, y/n)
+    ByOption.minBy(With.units.enemy.view.map(_.tileIncludingCenter))(_.tileDistanceSquared(airCentroid)).getOrElse(airCentroid)
+  })
+
   def enemyMain: Option[Base] = {
     firstEnemyMain.filter(base => ! base.scouted || base.owner.isEnemy)
   }
@@ -95,12 +117,19 @@ class Intelligence {
   def enemyNatural: Option[Base] = {
     enemyMain.flatMap(_.natural)
   }
+
+  private var _enemyHasScoutedUs = false
+  private var _enemyHasScoutedUsWithWorker = false
+  def enemyHasScoutedUs: Boolean = _enemyHasScoutedUs
+  def enemyHasScoutedUsWithWorker: Boolean = _enemyHasScoutedUsWithWorker
   
   def update() {
     unitsShown.update()
     updateEnemyMain()
     flyingScout = false
     scoutTiles.clear()
+    _enemyHasScoutedUsWithWorker = _enemyHasScoutedUsWithWorker || With.geography.ourBases.exists(_.units.exists(u => u.isEnemy && u.is(UnitMatchWorkers)))
+    _enemyHasScoutedUs = _enemyHasScoutedUs || _enemyHasScoutedUsWithWorker || With.units.ours.view.filter(_.is(UnitMatchBuilding)).exists(u => u.tileArea.tiles.exists(With.grids.enemyVision.isSet))
   }
   
   private def updateEnemyMain() {

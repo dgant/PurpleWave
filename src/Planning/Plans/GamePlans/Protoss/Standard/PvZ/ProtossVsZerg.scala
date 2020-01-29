@@ -4,14 +4,22 @@ import Planning.Plans.GamePlans.ModalGameplan
 
 class ProtossVsZerg extends ModalGameplan(
   // Openings
-  new PvZ4Gate99,
-  new PvZ4Gate,
+  new PvZ1BaseForgeTech,
+  new PvZ10Gate,
+  new PvZ2Gate910,
+  new PvZ2Gate1012,
   new PvZFFE,
+
   // Midgames
   new PvZ4Gate2Archon,
   new PvZBisu,
   new PvZNeoBisu,
+  new PvZNeoNeoBisu,
   new PvZ5GateGoon,
+  new PvZCorsairReaver,
+
   // Late game
-  new PvZLateGame
+  new PvZLateGameReaver,
+  new PvZLateGameTemplar,
+  new PvZLateGameCarrier,
 )

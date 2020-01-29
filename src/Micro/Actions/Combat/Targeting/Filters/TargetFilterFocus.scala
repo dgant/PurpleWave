@@ -6,9 +6,16 @@ object TargetFilterFocus extends TargetFilter {
   
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = (
     ! actor.agent.canFocus
-    || target.zone == actor.agent.destination.zone
+    || actor.agent.destination.zone == target.zone
+    || actor.base.exists(b => b.owner.isEnemy && actor.matchups.threats.forall(_.unitClass.isWorker))
+    || actor.inRangeToAttack(target)
     || (target.canAttack(actor) && target.inRangeToAttack(actor))
-    || (target.visible && target.topSpeed < actor.topSpeed * 0.75 && actor.matchups.threats.isEmpty)
+    || actor.agent.focusPathSteps.exists(tile =>
+      target.pixelDistanceCenter(tile.pixelCenter)
+      < Math.max(
+          actor.pixelRangeAgainst(target),
+          if (target.canAttack(actor)) target.pixelRangeAgainst(actor) else 0)
+      + 32 * actor.agent.focusPathStepSize)
+    || target.interceptors.exists(legal(actor, _))
   )
-  
 }

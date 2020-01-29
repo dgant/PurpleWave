@@ -18,10 +18,10 @@ case object EnrichPixel {
     def boundary: TileRectangle =
       TileRectangle(
         Tile(
-          rectangles.map(_.startInclusive.x).min,
-          rectangles.map(_.startInclusive.y).min),
+          rectangles.view.map(_.startInclusive.x).min,
+          rectangles.view.map(_.startInclusive.y).min),
         Tile(
-          rectangles.map(_.endExclusive.x).max,
-          rectangles.map(_.endExclusive.y).max))
+          rectangles.view.map(_.endExclusive.x).max,
+          rectangles.view.map(_.endExclusive.y).max))
   }
 }

@@ -1,6 +1,7 @@
 package Information.Battles.Prediction.Simulation
 
 import Debugging.Visualizations.Rendering.DrawMap
+import Mathematics.Points.Pixel
 
 case class SimulationEventAttack(
   frame   : Int,
@@ -33,4 +34,7 @@ case class SimulationEventAttack(
     DrawMap.line(pixel.add(-5, -5), pixel.add(5, 5),  color)
     DrawMap.line(pixel.add(5, -5),  pixel.add(-5, 5), color)
   }
+
+  override val from: Pixel = shooter.pixel
+  override val to: Pixel = shooter.pixel
 }

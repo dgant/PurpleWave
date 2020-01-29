@@ -17,12 +17,12 @@ object Manners {
     if (With.configuration.enableSurrenders
       && With.performance.enablePerformanceStops
       && With.performance.enablePerformanceSurrenders
-      && With.performance.framesOver55 > 1000) {
+      && With.performance.framesOverShort > 1000) {
       With.logger.error("Quitting due to performance failure")
       surrender()
     }
     if (With.frame == GameTime(0, 20)()) {
-      if (With.configuration.enableHumanManners) {
+      if (With.configuration.humanMode()) {
         chat("Good luck, " + With.enemy.name + ", and have fun!")
       }
       else {
@@ -32,7 +32,14 @@ object Manners {
   }
   
   private def surrender() {
+    chat("Well played.")
     With.game.leaveGame()
+  }
+
+  def debugChat(text: String): Unit = {
+    if (With.configuration.debugging()) {
+      chat(text)
+    }
   }
   
   def chat(text: String) {
@@ -44,7 +51,7 @@ object Manners {
   
   def onEnd(isWinner: Boolean) {
     chat(
-      if (With.configuration.enableHumanManners)
+      if (With.configuration.humanMode())
         "Good game, " + With.enemy.name
       else if (isWinner)
         "Good game! I still think you're beautiful."

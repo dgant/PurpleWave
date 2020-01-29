@@ -1,6 +1,7 @@
 package Micro.Actions.Combat.Maneuvering
 
 import Debugging.Visualizations.ForceColors
+import Lifecycle.With
 import Mathematics.Physics.ForceMath
 import Micro.Actions.Action
 import Micro.Actions.Commands.{Gravitate, Move}
@@ -15,6 +16,10 @@ class Dodge(explosions: Iterable[Explosion]) extends Action {
   )
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
+
+    if (unit.canBurrow && explosions.forall(_.canBurrowAway(unit))) {
+      With.commander.burrow(unit)
+    }
 
     val forces = explosions.map(explosion =>
       explosion

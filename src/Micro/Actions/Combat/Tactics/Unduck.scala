@@ -10,6 +10,7 @@ object Unduck extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.burrowed
+    && ! Duck.allowed(unit)
     && Vector(Zerg.Zergling, Zerg.Hydralisk, Zerg.Defiler).contains(unit.unitClass)
     && (unit.agent.shouldEngage || ! unit.effectivelyCloaked || unit.matchups.enemies.forall(e =>
       ! e.unitClass.attacksGround

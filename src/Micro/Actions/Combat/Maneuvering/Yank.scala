@@ -1,6 +1,7 @@
 package Micro.Actions.Combat.Maneuvering
 
 import Micro.Actions.Action
+import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Yank extends Action {
@@ -17,6 +18,6 @@ object Yank extends Action {
   override protected def perform(unit: FriendlyUnitInfo) {
     unit.agent.canFlee = true
     unit.agent.toTravel = Some(unit.agent.toLeash.get.pixelCenter)
-    unit.agent.shouldEngage = false
+    Move.delegate(unit)
   }
 }

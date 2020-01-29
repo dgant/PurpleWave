@@ -1,11 +1,13 @@
 package Micro.Actions.Scouting
 
+import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Physics.Gravity
 import Micro.Actions.Action
+import Micro.Actions.Combat.Maneuvering.Traverse
+import Micro.Actions.Combat.Techniques.Avoid
 import Micro.Actions.Commands.Move
-import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import bwapi.Race
 
@@ -20,33 +22,36 @@ object FindBuildingsWhenBored extends AbstractFindBuildings {
 abstract class AbstractFindBuildings extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    With.geography.enemyBases.nonEmpty
+    With.geography.enemyBases.nonEmpty || unit.agent.lastIntent.toScoutBases.nonEmpty
   }
   
   protected val boredomFrames: Int
   
   override protected def perform(unit: FriendlyUnitInfo) {
     def nearestNeutralBases(count: Int): Iterable[Base] = {
-      With.geography.neutralBases.toVector
+      With.geography.neutralBases
+        .filterNot(_.zone.island)
         .sortBy(b =>
           b.townHallTile.groundPixels(With.intelligence.mostBaselikeEnemyTile)
           - b.townHallTile.groundPixels(With.geography.home))
         .take(count)
     }
-    
-    val basesToScout =
-      With.geography.enemyBases.filter(b => With.intelligence.unitsShown(b.owner, Zerg.SpawningPool) == 0) ++ (
-        if (With.geography.enemyBases.size == 1)
+
+    val suggestedBases = unit.agent.lastIntent.toScoutBases
+    val basesToScout = if (suggestedBases.nonEmpty) suggestedBases else
+      With.geography.enemyBases.filter(b => ! b.zone.island) ++ (
+        if (With.geography.enemyBases.size == 1 && unit.matchups.threats.forall(_.unitClass.isWorker))
           With.geography.enemyBases.head.natural.map(Vector(_)).getOrElse(nearestNeutralBases(1))
-        else if (With.geography.enemyBases.size <= With.geography.ourBases.size)
-          nearestNeutralBases(if (With.enemy.isZerg) 5 else 2)
+        // Scout for third bases -- Disabled so we can get a better sense of enemy tech/army size
+        // else if (With.geography.enemyBases.size <= With.geography.ourBases.size)
+        //   nearestNeutralBases(if (With.enemy.isZerg) 5 else 2)
         else
           Vector.empty)
   
     val tilesToScout = basesToScout
       .flatMap(base => {
         val tiles = base.zone.tiles.filter(tile =>
-          ! base.harvestingArea.contains(tile) //Don't walk into worker line
+          ! base.harvestingArea.contains(tile) // Don't walk into worker line
           && With.grids.walkable.get(tile)
           && With.grids.friendlyVision.framesSince(tile) > boredomFrames)
       
@@ -58,6 +63,8 @@ abstract class AbstractFindBuildings extends Action {
         }
       })
       .filter(With.grids.buildableTerrain.get)
+      .filter(tile => unit.enemyRangeGrid.getUnchecked(tile.i) <= 0 || ( unit.cloaked && ! With.grids.enemyDetection.isDetected(tile.i)))
+      .filter(tile => ! unit.matchups.threats.exists(_.inRangeToAttack(unit, tile.pixelCenter)))
   
     if (tilesToScout.isEmpty) return
   
@@ -66,11 +73,22 @@ abstract class AbstractFindBuildings extends Action {
       With.grids.friendlyVision.framesSince(tile)))
     
     val force = pulls.map(_.apply(unit.pixelCenter)).reduce(_ + _)
-      
-    //TODO: Use actual potential flow so we can avoid obstacles and threats
+
     val target = unit.pixelCenter.add(force.normalize(64.0).toPoint)
     val tileToScout = tilesToScout.minBy(_.pixelCenter.pixelDistance(target))
+
+    val profile = new PathfindProfile(unit.tileIncludingCenter)
+    profile.end                 = Some(tileToScout)
+    profile.canCrossUnwalkable  = unit.flying
+    profile.allowGroundDist     = false
+    profile.costOccupancy       = 0.01f
+    profile.costThreat          = 5
+    profile.costRepulsion       = 0.4f
+    profile.repulsors           = Avoid.pathfindingRepulsion(unit)
+    profile.unit                = Some(unit)
+    val path = profile.find
     unit.agent.toTravel = Some(tileToScout.pixelCenter)
+    new Traverse(path).delegate(unit)
     Move.delegate(unit)
   }
 }

@@ -8,7 +8,7 @@ import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
-import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, MeldDarkArchons}
+import Planning.Plans.Macro.Protoss.{BuildTowersAtBases, MeldDarkArchons}
 import Planning.Predicates.Milestones.{IfOnMiningBases, UnitsAtLeast, UnitsAtMost}
 import ProxyBwapi.Races.Protoss
 
@@ -17,7 +17,7 @@ class DarkArchonRushWithNoDefense extends Parallel {
   children.set(Vector(
     new MeldDarkArchons,
     new RequireEssentials,
-    new Build(ProtossBuilds.Opening13Nexus_NoZealot_OneGateCore: _*),
+    new Build(ProtossBuilds.PvT13Nexus_GateCore: _*),
     new RequireMiningBases(2),
     new RequireSufficientSupply,
     new PumpWorkers,
@@ -47,7 +47,7 @@ class DarkArchonRushWithNoDefense extends Parallel {
     new Build(Get(10, Protoss.Gateway)),
     new BuildGasPumps,
     new RequireMiningBases(4),
-    new BuildCannonsAtBases(1),
+    new BuildTowersAtBases(1),
     new UpgradeContinuously(Protoss.GroundDamage),
     new UpgradeContinuously(Protoss.GroundArmor),
     new IfOnMiningBases(5, new Build(Get(14, Protoss.Gateway))),

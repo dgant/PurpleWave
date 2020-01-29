@@ -5,9 +5,9 @@ import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
-import Planning.Composition.UnitCountEverything
 import Planning.UnitMatchers.UnitMatchWorkers
 import Planning.Plan
+import Planning.UnitCounters.UnitCountEverything
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable
@@ -98,7 +98,7 @@ class AttackWithWorkers extends Plan {
   }
   
   def tickle() {
-    val base = With.geography.enemyBases.toList.sortBy(_.workers.size).lastOption
+    val base = With.geography.enemyBases.toList.sortBy(_.workerCount).lastOption
     val target = base.map(_.heart.pixelCenter).getOrElse(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
     fighters.units.foreach(tickle(_, target))
   }

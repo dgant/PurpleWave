@@ -23,6 +23,10 @@ class ClearBurrowedBlockers extends Plan {
   decoy.get.unitCounter.set(UnitCountOne)
   
   override def onUpdate(): Unit = {
+
+    if (With.frame < GameTime(6, 0)()) {
+      return
+    }
     
     if ( ! With.enemies.exists(_.isZerg) && ! With.enemies.exists(_.isTerran)) {
       return
@@ -32,7 +36,7 @@ class ClearBurrowedBlockers extends Plan {
     }
     
     val target = With.units.ours
-      .find(u => u.agent.toBuild.exists(_.isTownHall))
+      .find(u => u.agent.toBuild.exists(_.isTownHall) && ! u.unitClass.isBuilding)
       .flatMap(_.agent.toBuildTile.map(_.pixelCenter))
     
     if (target.isEmpty) return

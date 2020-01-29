@@ -21,7 +21,7 @@ class EjectScout(
 
     if (scouts.isEmpty) return
 
-    squad.enemies = scout
+    squad.enemies = scout.toSeq
     goal.scout = scout
     goal.unitMatcher = matcher
     goal.unitCounter = counter

@@ -22,15 +22,16 @@ class Blueprint(
   var requireResourceGap  : Option[Boolean]           = None,
   var placement           : Option[PlacementProfile]  = None,
   var marginPixels        : Option[Double]            = None,
-  val requireCandidates   : Option[Iterable[Tile]]    = None,
+  val requireCandidates   : Option[Seq[Tile]]         = None,
   var preferZone          : Option[Zone]              = None,
   val requireZone         : Option[Zone]              = None,
-  var respectHarvesting   : Option[Boolean]           = None) {
+  var respectHarvesting   : Option[Boolean]           = None,
+  var forcePlacement      : Boolean                   = false) {
   
   var id: Option[Int] = None
   val frameCreated: Int = With.frame
   
-  widthTiles                  = widthTiles                  .orElse(building.map(b => b.tileWidth + (if (b.canBuildAddon) 2 else 0))).orElse(Some(1))
+  widthTiles                  = widthTiles                  .orElse(building.map(b => b.tileWidth + (if (b.canBuildAddon && ! b.isTownHall) 2 else 0))).orElse(Some(1))
   heightTiles                 = heightTiles                 .orElse(building.map(_.tileHeight)).orElse(Some(1))
   powers                      = powers                      .orElse(Some(building.contains(Protoss.Pylon)))
   requirePower                = requirePower                .orElse(Some(building.exists(_.requiresPsi)))
@@ -43,9 +44,42 @@ class Blueprint(
   respectHarvesting           = respectHarvesting           .orElse(Some( ! requireTownHallTile.get))
   marginPixels = marginPixels
     .orElse(building.filter(_.attacks).map(_.effectiveRangePixels.toDouble))
-    .orElse(building.filter(_ == Protoss.ShieldBattery).map(b => 32.0 * 2.0))
+    .orElse(building.filter(_ == Protoss.ShieldBattery).map(b => 0.0))
     .orElse(building.filter(_ == Zerg.CreepColony).map(b => 32.0 * 7.0))
-    .orElse(Some(32.0 * 9.0))
+    .orElse(Some(32.0 * 11.0))
+
+  val rhythmsX: Vector[Int] =
+    if (With.self.isTerran) {
+      if (widthTiles.get > 3)
+        Vector(0)
+      else if (widthTiles.get == 3)
+        Vector(0, 3)
+      else
+        Vector(0, 2, 4)
+    } else if (With.self.isProtoss) {
+      if (widthTiles.get == 2)
+        Vector(0)
+      else
+        Vector(2)
+    } else {
+      Vector(0)
+    }
+  val rhythmsY: Vector[Int] =
+    if (With.self.isTerran) {
+      if (heightTiles.get == 3)
+        Vector(0, 3)
+      else
+        Vector(0, 2, 4)
+    } else if (With.self.isProtoss) {
+      if (widthTiles.get == 2)
+        Vector(0, 2, 4)
+      else
+        Vector(0, 3)
+    } else {
+      Vector(0)
+    }
+
+
   
   def fulfilledBy(proposal: Blueprint): Boolean = {
     if (proposal == this) return true
@@ -76,10 +110,10 @@ class Blueprint(
       return false
     }
     if (requirePower.get) {
-      if (heightTiles.get == 3 && ! With.grids.psi3Height.isSet(tile) && ! With.architecture.powered3Height.contains(tile)) {
+      if (heightTiles.get == 3 && ! With.grids.psi3Height.isSet(tile) && ! With.architecture.powered3Height.get(tile)) {
         return false
       }
-      if (heightTiles.get == 2 && ! With.grids.psi2Height.isSet(tile) && ! With.architecture.powered2Height.contains(tile)) {
+      if (heightTiles.get == 2 && ! With.grids.psi2Height.isSet(tile) && ! With.architecture.powered2Height.get(tile)) {
         return false
       }
     }
@@ -94,9 +128,7 @@ class Blueprint(
     if ( ! buildable(tile)) {
       return false
     }
-    
-    // TODO: Migrate the rest out into matches/buildable
-    
+
     val thisZone = tile.zone
     if (thisZone.island
       && ! Plasma.matches
@@ -106,12 +138,12 @@ class Blueprint(
     }
     if (requireGasTile.get) {
       val legal   = thisZone.bases.exists(_.gas.exists(_.tileTopLeft == tile))
-      val blocked = With.architecture.ungassable.contains(tile)
+      val blocked = With.architecture.ungassable.get(tile)
       return legal && ! blocked
     }
     if (requireTownHallTile.get) {
       if ( ! thisZone.bases.exists(_.townHallTile == tile)) return false
-      if (With.architecture.untownhallable.contains(tile)) return false
+      if (With.architecture.untownhallable.get(tile)) return false
     }
 
     val buildArea = relativeBuildArea.add(tile)
@@ -120,14 +152,26 @@ class Blueprint(
       nextTile.zone.perimeter.contains(nextTile)
       || ! With.architecture.buildable(nextTile)
       || (requireCreep.get != With.grids.creep.get(nextTile))
-      || (respectHarvesting.get && With.architecture.isHarvestingArea(nextTile))
+      || (respectHarvesting.get && thisZone.bases.exists(_.resourcePathTilesI.contains(nextTile.i)))
+      || (respectHarvesting.get && thisZone.bases.exists(_.townHallArea.contains(nextTile)))
       || (requireResourceGap.get && ! With.grids.buildableTownHall.get(nextTile))
       || ( ! requireTownHallTile.get && With.grids.units.get(nextTile).exists(u => ! u.flying && u.isEnemy || ! u.canMove))
     )
-    
-    val violator = buildArea.tiles.find(violatesBuildArea)
-    
-    violator.isEmpty
+
+    var x = buildArea.startInclusive.x
+    val xMax = buildArea.endExclusive.x
+    val yMax = buildArea.endExclusive.y
+    while (x < xMax) {
+      var y = buildArea.startInclusive.y
+      while (y < yMax) {
+        if (violatesBuildArea(Tile(x, y))) {
+          return false
+        }
+        y += 1
+      }
+      x += 1
+    }
+    true
   }
   
   override def toString: String =

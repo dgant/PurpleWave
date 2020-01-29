@@ -3,8 +3,7 @@ package Strategery.Strategies.Terran
 import Strategery.Strategies.Terran.FFA.TerranFFABio
 import Strategery.Strategies.Terran.TvE._
 import Strategery.Strategies.Terran.TvR.{TvR1Rax, TvRTinfoil}
-import Strategery.Strategies.Terran.TvT.TvTStandard
-import Strategery.Strategies.Terran.TvZ._
+import Strategery.Strategies.Terran.TvZ.TvZProxy8Fact
 import Strategery.Strategies._
 
 object TerranChoices {
@@ -14,17 +13,13 @@ object TerranChoices {
   /////////
   
   val tvr = Vector(
-    WorkerRushLiftoff,
+    TvEWorkerRushLiftoff,
     TvEProxy5Rax,
-    TvEProxy8Fact,
     TvEProxyBBS,
-    TvESCVMarineAllIn,
-    TvEMassBio,
-    TvETurtleMech,
+    TvE1RaxSCVMarine,
+    TvE2RaxSCVMarine,
     TvR1Rax,
     TvRTinfoil,
-    TvEMassGoliath,
-    TvE2PortWraith,
     TerranFFABio)
   
   /////////
@@ -32,8 +27,12 @@ object TerranChoices {
   /////////
   
   val tvtOpeners = Vector(
-    TvTStandard
-    //TvTPNukeDrop
+    TvT14CC,
+    TvT1RaxFE,
+    TvT1FacFE,
+    TvT1FacPort,
+    TvT2FacTanks,
+    TvT2Port
   )
   
   /////////
@@ -41,9 +40,10 @@ object TerranChoices {
   /////////
   
   val tvpOpeners = Vector(
-    //TvPEarly14CC,
-    //TvPEarlyFDStrong
-    //TvTPNukeDrop
+    TvP1RaxFE,
+    TvPSiegeExpandBunker,
+    TvPFDStrong,
+    TvP2FacJoyO,
   )
   
   /////////
@@ -51,11 +51,10 @@ object TerranChoices {
   /////////
   
   val tvzOpeners = Vector(
-    TvZEarlyCCFirst,
-    TvZEarly1RaxGas,
-    TvZEarly1RaxFEEconomic,
-    TvZEarly1RaxFEConservative,
-    TvZEarly2Rax
+    TvZ1RaxFE,
+    TvZ2RaxAcademy,
+    TvZ8Rax,
+    TvZProxy8Fact,
   )
   
   val normalOpeners: Vector[Strategy] = (tvr ++ tvtOpeners ++ tvpOpeners ++ tvzOpeners).distinct

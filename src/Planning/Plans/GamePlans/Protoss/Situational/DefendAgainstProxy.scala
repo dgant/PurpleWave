@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Situational
 import Information.Geography.Types.Base
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Micro.Squads.Goals.GoalSmash
+import Micro.Squads.Goals.GoalRazeProxies
 import Micro.Squads.Squad
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountBetween
@@ -29,6 +29,9 @@ class DefendAgainstProxy extends Plan {
     
     val proxies = getProxies.sortBy(_.totalHealth).sortBy(_.remainingCompletionFrames)
     val squad = new Squad(this)
+
+    def unitsNearby(proxy: UnitInfo) = With.units.inTileRadius(proxy.tileIncludingCenter, 8)
+    def enemiesNearby(proxy: UnitInfo) = unitsNearby(proxy).filter(_.isEnemy)
     
     if (proxies.isEmpty) return
     
@@ -37,13 +40,19 @@ class DefendAgainstProxy extends Plan {
     val workersRequired = proxies.map(proxy =>
       (
         proxy,
-        if (proxy.attacksAgainstGround > 0)
-          if (proxy.complete)
-            6
-          else
-            4
+        if (enemiesNearby(proxy).exists(u => u.unitClass.isBuilding && u.canAttack))
+          // Don't pull new units in to attack cannons
+          unitsNearby(proxy).count(u => u.isOurs && u.canAttack)
+        else if (With.frame < GameTime(3, 15)()
+          && proxy.is(Protoss.Pylon)
+          && enemiesNearby(proxy).exists(_.is(Protoss.Gateway)))
+          6
+        else if (proxy.isBunker() && (proxy.complete || ! proxy.matchups.allies.exists(a => a.unitClass.isWorker && a.pixelDistanceEdge(proxy) < 256)))
+          0
+        else if (proxy.attacksAgainstGround > 0)
+          4
         else if (proxy.unitClass.isGas)
-          3 // Dubious, but we need real gas steal reactions to avoid this
+          (if (With.enemy.isProtoss) 0 else 3) // We have PvP gas steal reactions but none yet for other races
         else
           1 // We shouldn't pull for other buildings in general; this is mostly just to keep eyes on them
       )).toMap
@@ -51,6 +60,11 @@ class DefendAgainstProxy extends Plan {
     val maxWorkers            = With.units.countOurs(UnitMatchWorkers) - 5
     val finalWorkers          = Math.min(totalWorkersRequired, maxWorkers)
     val squadDestination      = proxies.head.pixelCenter
+
+    if (totalWorkersRequired <= 0) {
+      defenders.get.release()
+      return
+    }
     defenders.get.unitCounter.set(new UnitCountBetween(0, finalWorkers))
     defenders.get.unitPreference.set(UnitPreferClose(squadDestination))
     if (lastProxyCount > proxies.size) {
@@ -58,11 +72,11 @@ class DefendAgainstProxy extends Plan {
     }
     lastProxyCount = proxies.size
     defenders.get.acquire(this)
+    defenders.get.units.foreach(With.squads.freelance)
   
     squad.enemies = proxies
-    squad.commission()
-    defenders.get.units.foreach(squad.recruit)
-    squad.setGoal(new GoalSmash(squadDestination))
+    With.squads.commission(squad)
+    squad.setGoal(new GoalRazeProxies(squadDestination))
   }
   
   private def getProxies: Seq[UnitInfo] = {
@@ -77,9 +91,9 @@ class DefendAgainstProxy extends Plan {
   private def isProxied(enemy: UnitInfo): Boolean = {
     val pixel                     = enemy.pixelCenter
     val thresholdDistance         = 32.0 * 50.0
-    def baseDistance(base: Base)  = base.heart.pixelCenter.pixelDistance(pixel)
-    lazy val closestEnemyBase     = ByOption.minBy(With.geography.enemyBases)(_.heart.pixelCenter.pixelDistance(pixel))
-    lazy val closestOurBase       = ByOption.minBy(With.geography.ourBases)(_.heart.pixelCenter.pixelDistance(pixel))
+    def baseDistance(base: Base)  = base.heart.pixelCenter.groundPixels(pixel)
+    lazy val closestEnemyBase     = ByOption.minBy(With.geography.enemyBases)(_.heart.pixelCenter.groundPixels(pixel))
+    lazy val closestOurBase       = ByOption.minBy(With.geography.ourBases)(_.heart.pixelCenter.groundPixels(pixel))
     lazy val enemyBaseDistance    = closestEnemyBase.map(baseDistance).getOrElse(With.geography.startBases.map(baseDistance).max)
     lazy val ourBaseDistance      = closestOurBase.map(baseDistance).getOrElse(Double.PositiveInfinity)
     lazy val withinOurThreshold   = ourBaseDistance < thresholdDistance

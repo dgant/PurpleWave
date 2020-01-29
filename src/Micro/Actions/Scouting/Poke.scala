@@ -15,7 +15,7 @@ object Poke extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     With.intelligence.enemyMain.isDefined
     && unit.canAttack
-    && unit.totalHealth > 15
+    && unit.totalHealth > 39
     && unit.matchups.targets.exists(_.unitClass.isWorker)
     && unit.matchups.threats.forall(_.unitClass.isWorker)
     && ( // Save our strength for blocking Hatcheries

@@ -3,7 +3,8 @@ package Planning.Plans.Macro.Automatic
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
-import ProxyBwapi.Races.Zerg
+import Planning.Predicates.Milestones.TechStarted
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClasses
 
 class RequireSufficientSupply extends Plan {
@@ -15,6 +16,17 @@ class RequireSufficientSupply extends Plan {
   override def onUpdate() {
     With.scheduler.request(this, Get(totalRequiredRecalculate, supplyProvider))
   }
+
+  lazy val productionTypes = Seq(
+    Terran.CommandCenter,
+    Terran.Barracks,
+    Terran.Factory,
+    Terran.Starport,
+    Protoss.Nexus,
+    Protoss.Gateway,
+    Protoss.RoboticsFacility,
+    Protoss.Stargate
+  )
   
   def totalRequiredRecalculate: Int = {
   
@@ -41,17 +53,27 @@ class RequireSufficientSupply extends Plan {
   
     val depotCompletionFrames     = supplyProvider.buildFrames + (if (supplyProvider.isBuilding) 24 * 4 else 0) //Add a few seconds to account for builder transit time (and finishing time)
     val supplyPerProvider         = supplyProvider.supplyProvided
-    val currentSupplyOfTownHalls  = With.units.ours.filter(unit => unit.remainingCompletionFrames < depotCompletionFrames && ! unit.is(supplyProvider)).toSeq.map(_.unitClass.supplyProvided).sum
+    val currentSupplyOfTownHalls  = With.units.ours.view.filter(unit => unit.remainingCompletionFrames < depotCompletionFrames && ! unit.is(supplyProvider)).map(_.unitClass.supplyProvided).sum
     val currentSupplyUsed         = With.self.supplyUsed
     val unitSpendingRatio         = if (With.geography.ourBases.size < 3) 0.5 else 0.75 //This is the metric that needs the most improvement
-    val costPerUnitSupply         = 50.0 / 2.0 //Assume 50 minerals buys 1 supply (then divide by two because 1 supply = 2 BWAPI supply)
+    val costPerUnitSupply         = 50.0 / 2.0 // Assume 50 minerals buys 1 supply (then divide by two because 1 supply = 2 BWAPI supply)
     val incomePerFrame            = With.economy.ourIncomePerFrameMinerals + With.economy.ourIncomePerFrameGas
     val supplyUsedPerFrame        = incomePerFrame * unitSpendingRatio / costPerUnitSupply
     val supplyBanked              = unitSpendingRatio * With.self.minerals / costPerUnitSupply
     lazy val larva                = With.units.countOurs(Zerg.Larva)
     lazy val hatcheries           = With.units.countOurs(Zerg.HatcheryLairOrHive)
     lazy val larvaPerFrame        = hatcheries / 342.0
-    val supplyAddableBeforeDepotCompletion  = if (With.self.isZerg) larva + larvaPerFrame * depotCompletionFrames else 400
+    val supplyAddableBeforeDepotCompletion: Double =
+      if (With.self.isZerg)
+        larva + larvaPerFrame * depotCompletionFrames * (if (With.units.existsOurs(Zerg.Spire)) 2 else 1) +
+        (if (new TechStarted(Zerg.LurkerMorph).isComplete) Math.min(6, With.units.countOurs(Zerg.Hydralisk)) else 0)
+      else
+        productionTypes
+          .map(productionType =>
+            productionType.unitsTrained
+              .map(traineeType =>
+                traineeType.supplyRequired * supplyProvider.buildFrames / traineeType.buildFrames)
+              .max).sum
     val supplySpentBeforeDepotCompletion    = supplyBanked + supplyUsedPerFrame * depotCompletionFrames
     val supplyUsedWhenDepotWouldFinish      = Math.min(400, currentSupplyUsed + Math.min(supplySpentBeforeDepotCompletion, supplyAddableBeforeDepotCompletion))
     val totalProvidersRequired              = Math.ceil((supplyUsedWhenDepotWouldFinish - currentSupplyOfTownHalls) / supplyPerProvider).toInt

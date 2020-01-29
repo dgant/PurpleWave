@@ -1,20 +1,19 @@
 package Mathematics.Formations
 
-import Mathematics.Points.Pixel
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClasses.UnitClass
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class FormationSlot(unit: UnitInfo) {
-  val unitClass           : UnitClass = unit.unitClass
-  val idealDistancePixels : Double      = range(unit)
+class FormationSlot(unit: FriendlyUnitInfo) {
+  val unitClass: UnitClass = unit.unitClass
+  val idealPixels : Double = range(unit)
   
-  var pixelAfter: Pixel = _
-  
-  private def range(unit: UnitInfo): Double = {
-    if (unit.is(Terran.SiegeTankUnsieged))
+  private def range(unit: FriendlyUnitInfo): Double = {
+    if (unit.isSiegeTankUnsieged() && unit.player.hasTech(Terran.SiegeMode))
       Terran.SiegeTankSieged.effectiveRangePixels
+    else if (unit.is(Terran.Medic))
+      Terran.Marine.effectiveRangePixels - 16
     else
-      unit.effectiveRangePixels
+      (unit.loadedUnits.map(_.effectiveRangePixels) ++ Seq(unit.effectiveRangePixels)).max
   }
 }

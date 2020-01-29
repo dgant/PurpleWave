@@ -24,7 +24,7 @@ object Smuggle extends Action {
       val forceSmuggling  = Potential.smuggleRepulsion(unit)
       val forceHeading    = ForceMath.fromPixels(unit.pixelCenter, unit.agent.toTravel.getOrElse(unit.pixelCenter))
       unit.agent.forces.put(ForceColors.threat,     forceThreat)
-      unit.agent.forces.put(ForceColors.bypassing,  forceSmuggling)
+      unit.agent.forces.put(ForceColors.sneaking,  forceSmuggling)
       unit.agent.forces.put(ForceColors.traveling,  forceHeading)
       Gravitate.delegate(unit)
       Move.delegate(unit)

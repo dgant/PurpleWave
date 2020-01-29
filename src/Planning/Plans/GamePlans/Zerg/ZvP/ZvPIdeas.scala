@@ -2,9 +2,9 @@ package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.Aggression
+import Planning.Plans.Army.{Aggression, Attack, Hunt}
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}
+import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Compound.Latch
@@ -12,7 +12,7 @@ import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.EnemyStrategy
-import ProxyBwapi.Races.Zerg
+import ProxyBwapi.Races.{Protoss, Zerg}
 
 object ZvPIdeas {
   
@@ -70,4 +70,61 @@ object ZvPIdeas {
       new OverpoolSpendLarvaOnZerglings,
       new BuildOrder(Get(12, Zerg.Zergling)),
       new BuildOrder(Get(14, Zerg.Drone))))
+
+  class OverlordSpeedVsCloakedThreats extends If(
+    new Or(
+      new EnemyHasShown(Protoss.DarkTemplar),
+      new EnemyHasShown(Protoss.HighTemplar),
+      new EnemyHasShown(Protoss.Archon),
+      new EnemyHasShown(Protoss.TemplarArchives),
+      new EnemyHasShown(Protoss.Arbiter),
+      new EnemyHasShown(Protoss.ArbiterTribunal)),
+    new Build(
+      Get(Zerg.Extractor),
+      Get(Zerg.SpawningPool),
+      Get(Zerg.Lair),
+      Get(Zerg.OverlordSpeed)))
+
+  class BurrowVsReaver extends If(
+    new Or(new EnemyHasShown(Protoss.Shuttle), new EnemyHasShown(Protoss.Reaver)),
+    new Build(Get(Zerg.Burrow)))
+
+  class NeedAntiAir extends Or(
+    new EnemyHasShown(Protoss.Corsair),
+    new EnemyHasShown(Protoss.Scout),
+    new EnemyHasShown(Protoss.Carrier),
+    new EnemyHasShown(Protoss.Interceptor),
+    new EnemyHasShown(Protoss.Stargate))
+
+  class TechToSpireVsAir extends If(
+    new NeedAntiAir,
+    new Build(
+      Get(Zerg.Extractor),
+      Get(Zerg.SpawningPool),
+      Get(Zerg.Lair),
+      Get(Zerg.Spire)))
+
+  class TechToHydrasVsAir extends If(
+    new NeedAntiAir,
+    new Build(
+      Get(Zerg.Extractor),
+      Get(Zerg.SpawningPool),
+      Get(Zerg.HydraliskDen)))
+
+  // New stuff
+
+  class PumpScourgeAgainstAir extends Parallel(
+    new PumpRatio(Zerg.Scourge, 0, 8, Seq(Flat(2), Enemy(Protoss.Corsair, 2), Enemy(Protoss.Scout, 3))),
+    new PumpRatio(Zerg.Scourge, 0, 24, Seq(Enemy(Protoss.Carrier, 6))))
+
+  class AttackPlans extends Parallel(
+    new Hunt(Zerg.Scourge, Protoss.Shuttle),
+    new Hunt(Zerg.Scourge, Protoss.Corsair),
+    new Hunt(Zerg.Scourge, Protoss.Stargate),
+    new Hunt(Zerg.Mutalisk, Protoss.HighTemplar),
+    new Hunt(Zerg.Mutalisk, Protoss.Shuttle),
+    new Hunt(Zerg.Mutalisk, Protoss.Reaver),
+    new Attack
+  )
+
 }

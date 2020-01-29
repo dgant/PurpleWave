@@ -5,22 +5,22 @@ import Macro.BuildRequests.Get
 import Planning.Predicates.Compound.Check
 import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors}
 import Planning.Plan
+import Planning.Plans.Army.Aggression
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
+import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.Terran.Situational.PlaceBunkersAtNatural
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBasesFFA}
 import Planning.Predicates.Milestones.{EnemyHasShownCloakedThreat, UnitsAtLeast}
 import ProxyBwapi.Races.Terran
 
-class TerranFFABio extends GameplanModeTemplate {
+class TerranFFABio extends GameplanTemplate {
   
-  override def defaultPlacementPlan : Plan  = new BunkersAtNatural(2)
-  override val defaultScoutPlan     : Plan  = NoPlan()
-  override val aggression                   = 0.8
-  override val scoutExpansionsAt            = 150
+  override def placementPlan : Plan  = new PlaceBunkersAtNatural(2)
+  override val scoutPlan     : Plan  = NoPlan()
+  override def aggressionPlan: Plan = new Aggression(0.8)
   
   private class UpgradeMech extends Parallel(
     new BuildGasPumps,
@@ -33,9 +33,9 @@ class TerranFFABio extends GameplanModeTemplate {
       Get(1, Terran.Starport),
       Get(1, Terran.ScienceFacility)))
   
-  override def defaultAttackPlan: Plan = new If(
+  override def attackPlan: Plan = new If(
     new UnitsAtLeast(20, UnitMatchWarriors),
-    super.defaultAttackPlan)
+    super.attackPlan)
   
   override lazy val buildOrder = Vector(
       Get(1,   Terran.CommandCenter),

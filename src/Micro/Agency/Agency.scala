@@ -24,19 +24,25 @@ class Agency {
     
     if (agentQueue.isEmpty) {
       runtimes.enqueue(With.framesSince(lastQueueCompletion))
-      while (runtimes.sum > 24 * 10) {
-        runtimes.dequeue()
-      }
+      while (runtimes.sum > With.reaction.runtimeQueueDuration) { runtimes.dequeue() }
       lastQueueCompletion = With.frame
 
-      agentQueue ++= With.units.ours.view.filter(validAgent).map(_.agent).toVector.sortBy(_.lastFrame)
+      With.coordinator.runPerAgentCycle()
+      With.squads.updateGoals()
+      agentQueue ++= With.units.ours.view
+        .filter(validAgent)
+        .map(_.agent)
+        .toVector
+        .sortBy(_.unit.frameDiscovered) // Start with a stable order
+        .sortBy(_.unit.matchups.framesOfSafety) // Units in trouble get first dibs on things
+        .sortBy(_.unit.unitClass.isTransport) // Make transports go after their passengers so they know what passengers want
     }
     
     var doContinue = true
     while (doContinue && agentQueue.nonEmpty) {
       doContinue = doContinue && With.performance.continueRunning
       val agent = agentQueue.dequeue()
-      if (agent.unit.unitClass.orderable && agent.unit.alive && agent.unit.readyForMicro) {
+      if (agent.unit.unitClass.orderable && agent.unit.alive && agent.unit.ready) {
         agent.execute()
       }
     }

@@ -4,18 +4,18 @@ import Lifecycle.With
 import Planning.Plan
 
 class CapGasAt(
-  floor: Int,
-  ceiling: Int = Int.MinValue,
+  a: Int,
+  b: Int = Int.MinValue,
   ratio: Double = Double.NaN) extends Plan {
-  
+
   override def onUpdate() {
-    val finalCeiling = if (ceiling == Int.MinValue) floor else ceiling
-    
-    With.blackboard.gasLimitFloor.set(floor)
+    val finalCeiling = if (b == Int.MinValue) a else b
+
+    With.blackboard.gasLimitFloor.set(a)
     With.blackboard.gasLimitCeiling.set(finalCeiling)
-    
+
     if ( ! ratio.isNaN) {
-      With.blackboard.gasTargetRatio.set(ratio)
+      With.blackboard.gasWorkerRatio.set(ratio)
     }
   }
 }

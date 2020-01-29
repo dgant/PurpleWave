@@ -10,21 +10,22 @@ import Information.Intelligenze.Fingerprinting.Fingerprints
 import Information._
 import Macro.Allocation._
 import Macro.Architecture.{Architecture, PlacementScheduler}
-import Macro.Scheduling.{MasterBuildOrderHistory, MasterBuildPlans, Scheduler}
+import Macro.Scheduling.{MasterBuildOrderHistory, MasterBuildPlans, Projections, Scheduler}
 import Micro.Agency.{Agency, Commander}
 import Micro.Coordination.Coordinator
 import Micro.Matchups.MatchupGraph
 import Micro.Squads.Squads
 import Performance.TaskQueue.{AbstractTaskQueue, TaskQueueGlobal}
-import Planning.Blackboard
+import Planning.{Blackboard, Yolo}
 import ProxyBwapi.Bullets.Bullets
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.ProxyBWMirror
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import ProxyBwapi.UnitTracking.UnitTracker
 import Strategery.History.History
-import Strategery.Strategist
-import _root_.Performance.{Latency, MicroReaction, PerformanceMonitor}
 import bwapi.Flag
+import Strategery.{StarCraftMapMatcher, Strategist}
+import _root_.Performance.{Latency, PerformanceMonitor, ReactionTimes}
 import bwta.BWTA
 
 import scala.collection.JavaConverters._
@@ -39,11 +40,11 @@ object With {
   var buildOrderHistory : MasterBuildOrderHistory = _
   var buildPlans        : MasterBuildPlans        = _
   var bullets           : Bullets                 = _
+  var bwapiData         : BwapiData               = _
   var camera            : Camera                  = _
   var commander         : Commander               = _
   var coordinator       : Coordinator             = _
   var configuration     : Configuration           = _
-  
   var economy           : Economy                 = _
   var fingerprints      : Fingerprints            = _
   var geography         : Geography               = _
@@ -57,9 +58,10 @@ object With {
   var paths             : Paths                   = _
   var performance       : PerformanceMonitor      = _
   var placement         : PlacementScheduler      = _
+  var projections       : Projections             = _
   var proxy             : ProxyBWMirror           = _
   var prioritizer       : Prioritizer             = _
-  var reaction          : MicroReaction           = _
+  var reaction          : ReactionTimes           = _
   var recruiter         : Recruiter               = _
   var scheduler         : Scheduler               = _
   var strategy          : Strategist              = _
@@ -68,6 +70,7 @@ object With {
   var units             : UnitTracker             = _
   var viewport          : Viewport                = _
   var visualization     : Visualization           = _
+  var yolo              : Yolo                    = _
   
   var self    : PlayerInfo         = _
   var neutral : PlayerInfo         = _
@@ -78,9 +81,11 @@ object With {
   var mapTileWidth    : Int     = 0
   var mapTileHeight   : Int     = 0
   var mapFileName     : String  = _
+  var mapId           : String  = _
   def mapPixelWidth   : Int     = mapTileWidth * 32
   def mapPixelHeight  : Int     = mapTileHeight * 32
-  
+  def mapWalkWidth    : Int     = mapTileWidth * 4
+  def mapWalkHeight   : Int     = mapTileHeight * 4
   
   def framesSince(previousFrame: Int): Int = Math.max(0, frame - previousFrame)
   
@@ -100,6 +105,7 @@ object With {
     mapTileWidth      = game.mapWidth
     mapTileHeight     = game.mapHeight
     mapFileName       = game.mapFileName
+    mapId             = StarCraftMapMatcher.clean(mapFileName)
     configuration     = new Configuration
     logger            = new Logger
     initializeBWTA()
@@ -111,6 +117,7 @@ object With {
     buildOrderHistory = new MasterBuildOrderHistory
     buildPlans        = new MasterBuildPlans
     bullets           = new Bullets
+    bwapiData         = new BwapiData
     camera            = new Camera
     commander         = new Commander
     coordinator       = new Coordinator
@@ -127,7 +134,8 @@ object With {
     performance       = new PerformanceMonitor
     placement         = new PlacementScheduler
     prioritizer       = new Prioritizer
-    reaction          = new MicroReaction
+    projections       = new Projections
+    reaction          = new ReactionTimes
     recruiter         = new Recruiter
     scheduler         = new Scheduler
     strategy          = new Strategist
@@ -136,6 +144,7 @@ object With {
     units             = new UnitTracker
     viewport          = new Viewport
     visualization     = new Visualization
+    yolo              = new Yolo
     
     game.setLocalSpeed(0)
   }
@@ -149,4 +158,7 @@ object With {
     BWTA.readMap(With.game)
     BWTA.analyze()
   }
+
+  // For debugging convenience
+  def selected: FriendlyUnitInfo = With.units.ours.find(_.selected).get
 }

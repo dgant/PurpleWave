@@ -1,6 +1,5 @@
 package Mathematics
 
-import Lifecycle.With
 import Mathematics.Points.Pixel
 
 import scala.collection.mutable
@@ -27,8 +26,8 @@ object Clustering {
         groupsByLeader(thing) ++= neighborsByUnit(thing).filter(neighbor =>
           ! limitRegion ||
           (
-            With.grids.altitudeBonus.get(extractPixel(thing).tileIncluding) ==
-            With.grids.altitudeBonus.get(extractPixel(neighbor).tileIncluding) &&
+            extractPixel(thing).tileIncluding.altitudeBonus ==
+            extractPixel(neighbor).tileIncluding.altitudeBonus &&
             extractPixel(thing).zone ==
             extractPixel(neighbor).zone
           ))

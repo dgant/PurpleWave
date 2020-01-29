@@ -1,7 +1,9 @@
 package ProxyBwapi.UnitInfo
 import Mathematics.Points.{Pixel, Tile}
 import ProxyBwapi.Players.PlayerInfo
+import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
+import ProxyBwapi.Upgrades.Upgrade
 
 class HistoricalUnitInfo(unit: UnitInfo) extends UnitInfo(unit.baseUnit, unit.id) {
   override val player: PlayerInfo = unit.player
@@ -86,4 +88,8 @@ class HistoricalUnitInfo(unit: UnitInfo) extends UnitInfo(unit.baseUnit, unit.id
   override val underStorm: Boolean = unit.underStorm
   override val addon: Option[UnitInfo] = None
   override val hasNuke: Boolean = unit.hasNuke
+
+  override val techProducing: Option[Tech] = unit.techProducing
+  override val upgradeProducing: Option[Upgrade]  = unit.upgradeProducing
+  override val unitProducing: Option[UnitClass] = unit.unitProducing
 }

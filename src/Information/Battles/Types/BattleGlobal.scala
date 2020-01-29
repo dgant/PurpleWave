@@ -17,7 +17,6 @@ class BattleGlobal(us: Team, enemy: Team) extends Battle(us, enemy) {
   def sumValue(units: Iterable[UnitInfo]): Double = units.toVector.map(_.subjectiveValue).sum
   lazy val valueEnemyArmy   : Double = sumValue(With.units.enemy.filter(u => u.unitClass.dealsDamage))
   lazy val valueUsArmy      : Double = sumValue(With.units.ours.filter(u => u.unitClass.dealsDamage))
-  lazy val valueRatioTarget : Double = With.configuration.battleValueTarget // Math.min(With.configuration.battleValueTarget, PurpleMath.nanToOne(valueEnemyArmy / (valueEnemyArmy + valueUsArmy)))
   
   private def globalSafe(estimation: Prediction, discountFactor: Double): Boolean = {
     val tradesEffectively = discountFactor * estimation.costToEnemy - estimation.costToUs >= 0
@@ -46,7 +45,10 @@ class BattleGlobal(us: Team, enemy: Team) extends Battle(us, enemy) {
       builder.vanguardUs    = Some(battle.us.vanguard)
       builder.vanguardEnemy = Some(battle.enemy.vanguard)
     }
-    def fitsAttackCriteria(unit: UnitInfo, mustBeMobile: Boolean): Boolean = ! mustBeMobile || ! unit.unitClass.isBuilding
+    def fitsAttackCriteria(unit: UnitInfo, mustBeMobile: Boolean): Boolean = (
+      (! mustBeMobile || ! unit.unitClass.isBuilding)
+      && ! unit.unitClass.isWorker
+      && unit.canAttack)
     battle.us     .units.filter(fitsAttackCriteria(_, weAttack))     .foreach(builder.addUnit)
     battle.enemy  .units.filter(fitsAttackCriteria(_, enemyAttacks)) .foreach(builder.addUnit)
     EstimateAvatar.calculate(builder)

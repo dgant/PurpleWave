@@ -1,28 +1,23 @@
 package Micro.Actions.Combat.Techniques
 
-import Debugging.Visualizations.{Colors, ForceColors}
-import Debugging.Visualizations.Rendering.DrawMap
-import Debugging.Visualizations.Views.Micro.ShowUnitsFriendly
+import Debugging.Visualizations.ForceColors
+import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Lifecycle.With
-import Mathematics.Points.Tile
 import Mathematics.PurpleMath
-import Mathematics.Shapes.Ring
+import Micro.Actions.Combat.Maneuvering.{DownhillPathfinder, Traverse}
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
+import Planning.UnitMatchers.UnitMatchSiegeTank
+import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-
-import scala.collection.mutable.ArrayBuffer
+import Utilities.{ByOption, TakeN}
 
 object Avoid extends ActionTechnique {
+
+  // Run away!
   
-  // If our path home is blocked by enemies,
-  // try to find an alternate escape route.
-  
-  override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.canMove
-    && unit.matchups.threats.nonEmpty
-  )
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove && (unit.matchups.threats.nonEmpty || (unit.effectivelyCloaked && unit.matchups.enemyDetectors.nonEmpty))
   
   override val applicabilityBase: Double = 0.5
   
@@ -37,86 +32,131 @@ object Avoid extends ActionTechnique {
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
     if (other.isFriendly) return None
     if ( ! other.canAttack(unit)) return None
-    
-    lazy val path = unit.agent.zonePath(unit.agent.origin)
-    if ( ! unit.flying && path.isEmpty) return None
-
     Some(1.0)
   }
 
+  case class DesireProfile(home: Int, safety: Int, freedom: Int, target: Int = 0) {
+    def distance(other: DesireProfile): Double = Seq(
+      Math.pow(home - other.home, 2),
+      Math.pow(safety - other.safety, 2),
+      Math.pow(freedom - other.freedom, 2),
+      Math.pow(target - other.target, 2),
+    ).sum
+  }
+
+  def pathfindingRepulsion(unit: FriendlyUnitInfo, maxThreats: Int = 10): IndexedSeq[PathfindRepulsor] = {
+    TakeN
+      .by(maxThreats, unit.matchups.threats.view)(Ordering.by(t => unit.matchups.framesOfEntanglementPerThreat(t)))
+      .map(t => PathfindRepulsor(
+        t.pixelCenter,
+        t.dpfOnNextHitAgainst(unit),
+        64 + t.pixelRangeAgainst(unit)))
+      .toIndexedSeq
+  }
+
   override def perform(unit: FriendlyUnitInfo): Unit = {
-    if (unit.flying) {
-      oldPerform(unit)
+    def timeOriginOfThreat(threat: UnitInfo): Double = threat.framesToTravelTo(unit.agent.origin) - threat.pixelRangeAgainst(unit) * threat.topSpeed
+
+    val distanceOriginUs    = unit.pixelDistanceTravelling(unit.agent.origin)
+    val distanceOriginEnemy = ByOption.min(unit.matchups.threats.view.map(t => t.pixelDistanceTravelling(unit.agent.origin) - t.pixelRangeAgainst(unit))).getOrElse(2.0 * With.mapPixelWidth)
+    val enemyCloser         = distanceOriginUs + 160 >= distanceOriginEnemy
+    val timeOriginUs        = unit.framesToTravelTo(unit.agent.origin)
+    val timeOriginEnemy     = TakeN.percentile(0.1, unit.matchups.threats)(Ordering.by(timeOriginOfThreat)).map(timeOriginOfThreat).getOrElse(Double.PositiveInfinity)
+    val enemySooner         = timeOriginUs + 96 >= timeOriginEnemy
+    val enemySieging        = unit.matchups.enemies.exists(_.isAny(UnitMatchSiegeTank, Zerg.Lurker)) && ! unit.base.exists(_.owner.isEnemy)
+    val atHome              = unit.zone == unit.agent.origin.zone
+    val scouting            = unit.agent.canScout
+    val desireToGoHome      =
+      if ( ! With.configuration.retreatTowardsHomeOptional)
+        1
+      else if (enemySieging)
+        -1
+      else if (scouting || atHome)
+        0
+      else if (unit.base.exists(_.owner.isEnemy))
+        2
+      else
+        ((if (enemyCloser) 1 else 0) + (if (enemySooner) 1 else 0))
+
+    val desireForFreedom    = if (unit.flying && ! unit.matchups.threats.exists(_.unitClass.dealsRadialSplashDamage)) 0 else 1
+    val desireForSafety     = PurpleMath.clamp(0, 3, (3 * (1 - unit.matchups.framesOfSafety / 72)).toInt)
+    val desireProfile       = DesireProfile(desireToGoHome, desireForSafety, desireForFreedom)
+
+    if (unit.flying || (unit.transport.exists(_.flying) && unit.matchups.framesOfSafety <= 0)) {
+      avoidPotential(unit, desireProfile)
       return
     }
-
-    var pathLengthMax = 6
-    val path = new ArrayBuffer[Tile]
-    path += unit.tileIncludingCenter
-    var bestScore = Int.MinValue
-    def tileDistance(tile: Tile): Int = if(tile.zone == unit.agent.origin.zone) 0 else unit.agent.origin.zone.distanceGrid.get(tile)
-    def tileScore(tile: Tile): Int = {
-      val enemyRange = With.grids.enemyRange.get(tile)
-      (
-        - 10 * tileDistance(tile)
-        - 10 * enemyRange * (if (enemyRange > With.grids.enemyRange.addedRange) 2 else 1)
-        - PurpleMath.clamp(With.grids.occupancy(tile), 0, 9)
-      )
+    if (With.configuration.enableThreatAwarePathfinding) {
+      avoidRealPath(unit, desireProfile)
     }
-    while (path.length < pathLengthMax) {
-      val origin = unit.agent.origin.zone
-      val here = path.last
-      var bestScore = tileScore(here)
-      var bestTile = here
-      for (p <- Ring.points(1)) {
-        val there = here.add(p)
-        if (there.valid && With.grids.walkable.get(there) && ! path.contains(there)) {
-          val score = tileScore(there)
-          if (score > bestScore) {
-            bestScore = score
-            bestTile = there
-          }
-        }
-      }
-      if (bestTile == here) {
-        // Makeshift "break"
-        pathLengthMax = -1
-      } else {
-        path += bestTile
-      }
+    if (unit.unitClass.isReaver && unit.transport.isDefined) {
+      DownhillPathfinder.decend(unit, 1, 1, 1, 1)
     }
-
-    unit.agent.toTravel = {
-      if (path.length < Math.max(2, With.grids.enemyRange.get(unit.tileIncludingCenter))) {
-        // We're stuck. Just go home.
-        Some(unit.agent.origin)
-      } else {
-        if (ShowUnitsFriendly.inUse) {
-          for (i <- 0 until path.length - 1) {
-            DrawMap.arrow(path(i).pixelCenter, path(i + 1).pixelCenter, Colors.DarkTeal)
-          }
-        }
-        Some(path.last.pixelCenter)
-      }
+    if (unit.zone != unit.agent.origin.zone) {
+      unit.agent.toTravel = Some(unit.agent.origin)
+      Move.delegate(unit)
     }
-    Move.delegate(unit)
+    avoidPotential(unit, desireProfile)
   }
-  
-  def oldPerform(unit: FriendlyUnitInfo): Unit = {
+
+  val defaultGreedyProfiles = Seq(
+    DesireProfile(home = 1, safety = 2, freedom = 1),
+    DesireProfile(home = 0, safety = 2, freedom = 1),
+    DesireProfile(home = 0, safety = 2, freedom = 0),
+    DesireProfile(home = 2, safety = 0, freedom = 1),
+    DesireProfile(home = 2, safety = 0, freedom = 0))
+  def avoidGreedyPaths(unit: FriendlyUnitInfo, desire: DesireProfile): Unit = {
+    defaultGreedyProfiles.sortBy(_.distance(desire)).foreach(someDesire =>
+      DownhillPathfinder.decend(
+        unit,
+        homeValue     = someDesire.home,
+        safetyValue   = someDesire.safety,
+        freedomValue  = someDesire.freedom,
+        targetValue   = someDesire.target))
+  }
+
+  def avoidRealPath(unit: FriendlyUnitInfo, desireProfile: DesireProfile): Unit = {
+
+    if (! unit.ready) return
+
+    val pathLengthMinimum = 6
+    val maximumDistance = pathLengthMinimum + Math.max(0, unit.matchups.framesOfEntanglement * unit.topSpeed + unit.effectiveRangePixels).toInt / 32
+
+    val profile = new PathfindProfile(unit.tileIncludingCenter)
+    profile.end                 = if (desireProfile.home > 0) Some(unit.agent.origin.tileIncluding) else None
+    profile.lengthMinimum       = Some(pathLengthMinimum)
+    profile.lengthMaximum       = Some(maximumDistance)
+    profile.threatMaximum       = Some(0)
+    profile.canCrossUnwalkable  = unit.flying || unit.transport.exists(_.flying)
+    profile.allowGroundDist     = true
+    profile.costOccupancy       = if (profile.canCrossUnwalkable) 0f else 3f
+    profile.costThreat          = 6f
+    profile.costRepulsion       = 2.5f
+    profile.repulsors           = pathfindingRepulsion(unit)
+    profile.unit = Some(unit)
+    val path = profile.find
+
+    new Traverse(path).delegate(unit)
+  }
+
+  def avoidPotential(unit: FriendlyUnitInfo, desireProfile: DesireProfile): Unit = {
+
+    if (! unit.ready) return
+
     unit.agent.toTravel = Some(unit.agent.origin)
 
     val bonusAvoidThreats = PurpleMath.clamp(With.reaction.agencyAverage + unit.matchups.framesOfEntanglement, 12.0, 24.0) / 12.0
     val bonusPreferExit   = if (unit.agent.origin.zone != unit.zone) 1.0 else if (unit.matchups.threats.exists(_.topSpeed < unit.topSpeed)) 0.0 else 0.5
     val bonusRegrouping   = 9.0 / Math.max(24.0, unit.matchups.framesOfEntanglement)
-    val bonusMobility     = 1.0
-    
-    val forceThreat       = Potential.avoidThreats(unit)      * bonusAvoidThreats
-    val forceSpacing      = Potential.avoidCollision(unit)
-    val forceExiting      = Potential.preferTravelling(unit)  * bonusPreferExit
-    val forceSpreading    = Potential.preferSpreading(unit)
-    val forceRegrouping   = Potential.preferRegrouping(unit)  * bonusRegrouping
-    val forceMobility     = Potential.preferMobility(unit)    * bonusMobility
-    val resistancesTerran = Potential.resistTerrain(unit)
+
+    val forceThreat         = Potential.avoidThreats(unit)      * desireProfile.safety
+    val forceSpacing        = Potential.avoidCollision(unit)    * desireProfile.freedom
+    val forceExiting        = Potential.preferTravelling(unit)  * desireProfile.home * bonusPreferExit
+    val forceSpreading      = Potential.preferSpreading(unit)   * desireProfile.safety * desireProfile.freedom
+    val forceRegrouping     = Potential.preferRegrouping(unit)  * bonusRegrouping
+    val forceMobility       = Potential.preferMobility(unit)
+    val forceSneaking       = Potential.detectionRepulsion(unit)
+    val resistancesTerrain  = Potential.resistTerrain(unit)
     
     unit.agent.forces.put(ForceColors.threat,         forceThreat)
     unit.agent.forces.put(ForceColors.traveling,      forceExiting)
@@ -124,7 +164,8 @@ object Avoid extends ActionTechnique {
     unit.agent.forces.put(ForceColors.regrouping,     forceRegrouping)
     unit.agent.forces.put(ForceColors.spacing,        forceSpacing)
     unit.agent.forces.put(ForceColors.mobility,       forceMobility)
-    unit.agent.resistances.put(ForceColors.mobility,  resistancesTerran)
+    unit.agent.forces.put(ForceColors.sneaking,       forceSneaking)
+    unit.agent.resistances.put(ForceColors.mobility,  resistancesTerrain)
     Gravitate.delegate(unit)
 
     Move.delegate(unit)

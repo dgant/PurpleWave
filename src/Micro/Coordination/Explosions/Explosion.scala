@@ -13,4 +13,5 @@ trait Explosion {
   def framesRemaining: Double
   def pixelsOfEntanglement(unit: UnitInfo): Double
   def directionTo(unit: UnitInfo): Force
+  def canBurrowAway(unit: UnitInfo) = false
 }

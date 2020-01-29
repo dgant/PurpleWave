@@ -1,7 +1,7 @@
 package Debugging.Visualizations
 
-import Debugging.Visualizations.Views.Battles.{ShowBattleDetails, ShowBattleSummary, ShowClustering}
-import Debugging.Visualizations.Views.Economy.{ShowEconomy, ShowScheduler}
+import Debugging.Visualizations.Views.Battles.{ShowBattle, ShowClustering}
+import Debugging.Visualizations.Views.Economy.{ShowEconomy, ShowProduction, ShowScheduler}
 import Debugging.Visualizations.Views.Fun._
 import Debugging.Visualizations.Views.Geography._
 import Debugging.Visualizations.Views.Micro._
@@ -22,13 +22,15 @@ class Visualization {
   
   var views = mutable.ArrayBuffer(
     // Evergreen views
-    ShowPerformanceSummary,
     ShowClock,
-    ShowStrategy,
-    ShowUnitsAll,
+    ShowStrategyName,
+    ShowHealthAndCooldown,
     ShowUnitsFriendly,
-    ShowUnitsForeign,
+    ShowUnitsEnemy,
     ShowExplosions,
+    ShowStatus,
+
+    ShowPerformanceSummary,
     ShowFingerprints
   )
   
@@ -87,7 +89,7 @@ class Visualization {
   private def requireInitialization() {
     if (initialized) return
     initialized = true
-    enabled = With.configuration.enableVisualizations
+    enabled = With.configuration.visualize()
     screen  = With.configuration.visualizeScreen
     map     = With.configuration.visualizeMap
     var random = Random.nextDouble()
@@ -105,11 +107,9 @@ class Visualization {
   
   lazy val knownViews: Vector[View] = Vector[View](
     ShowArchitectureHeuristics,
-    ShowArchitecturePaths,
     ShowArchitecturePlacements,
     ShowBases,
-    ShowBattleDetails,
-    ShowBattleSummary,
+    ShowBattle,
     ShowBlackScreen,
     ShowBulletsAsHearts,
     ShowCarriers,
@@ -123,25 +123,31 @@ class Visualization {
     ShowHappyUnits,
     ShowHappyVision,
     ShowHistory,
+    ShowIgnorance,
     ShowIntelligence,
+    ShowKills,
     ShowMobility,
-    ShowUnitsAll,
-    ShowUnitsForeign,
+    ShowHealthAndCooldown,
+    ShowUnitsEnemy,
     ShowUnitsFriendly,
     ShowPerformanceDetails,
     ShowPerformanceSummary,
+    ShowProduction,
     ShowPlans,
     ShowReactionTime,
     ShowResources,
     ShowRushDistances,
+    ShowSaturation,
     ShowScheduler,
     ShowSquads,
-    ShowStrategiesInterest,
-    ShowStrategy,
+    ShowStatus,
+    ShowStrategyInterest,
+    ShowStrategyName,
     ShowStrategyEvaluations,
     ShowTechniques,
     ShowTextOnly,
     ShowTextOnlyUnits,
+    ShowUnitPaths,
     ShowZoneBorderTiles,
     ShowZoneLabels,
     ShowZonePathDemo,

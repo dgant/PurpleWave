@@ -8,7 +8,7 @@ object TileSourceBlueprintZoneRequired extends TileSource {
     blueprint.requireZone.isDefined
   }
   
-  override def tiles(blueprint: Blueprint): Iterable[Tile] = {
+  override def tiles(blueprint: Blueprint): Seq[Tile] = {
     blueprint.requireZone.get.tilesBuildable
   }
 }

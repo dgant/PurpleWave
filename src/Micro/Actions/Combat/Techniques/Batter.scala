@@ -8,7 +8,6 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Combat.Targeting.Filters.TargetFilterWhitelist
 import Micro.Actions.Combat.Targeting.TargetAction
-import Micro.Actions.Combat.Decisionmaking.Leave
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Attack, Move}
 import ProxyBwapi.Races.Terran
@@ -73,10 +72,10 @@ object Batter extends ActionTechnique {
     lazy val shouldRetreat    = ! unit.agent.shouldEngage || (unit.unitClass.melee && dying)
     
     if (shouldRetreat) {
-      Leave.consider(unit)
+      Avoid.consider(unit)
     }
   
-    if (unit.readyForMicro) {
+    if (unit.ready) {
       targetOutsiders.delegate(unit)
       targetRepairers.delegate(unit)
       targetWall.delegate(unit)
@@ -88,7 +87,7 @@ object Batter extends ActionTechnique {
       Attack.delegate(unit)
     }
   
-    if (unit.readyForMicro && altitudeHere < altitudeThere) {
+    if (unit.ready && altitudeHere < altitudeThere) {
       val walkableTiles = wallUnits
         .flatMap(building =>
           building.tileArea.expand(1, 1).tiles

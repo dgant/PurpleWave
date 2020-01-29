@@ -3,20 +3,24 @@ package Planning.Plans.Macro.Build
 import Debugging.Visualizations.Rendering.DrawMap
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Macro.Scheduling.Project
+import Macro.Buildables.{Buildable, BuildableUnit}
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
-import Planning.ResourceLocks.{LockCurrencyForUnit, LockUnits}
+import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.UnitCountOne
 import Planning.UnitMatchers._
 import Planning.UnitPreferences.{UnitPreferIdle, UnitPreference}
-import Planning.Plan
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class TrainUnit(val traineeClass: UnitClass) extends Plan {
-  
+class TrainUnit(val traineeClass: UnitClass) extends ProductionPlan {
+
+  override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
+  override def producerUnitLocks: Seq[LockUnits] = Seq(trainerLock)
+  override def producerInProgress: Boolean = trainee.isDefined
+  override def buildable: Buildable = BuildableUnit(traineeClass)
+
   description.set("Train a " + traineeClass)
   
   val currencyLock    = new LockCurrencyForUnit(traineeClass)
@@ -57,8 +61,8 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
   
     // Duplicated across MorphUnit
     currencyLock.framesPreordered = (
-      traineeClass.buildUnitsEnabling.map(Project.framesToUnits(_, 1))
-      :+ Project.framesToUnits(trainerClass, 1)
+      traineeClass.buildUnitsEnabling.map(With.projections.unit)
+      :+ With.projections.unit(trainerClass)
       :+ trainer.map(_.remainingOccupationFrames).getOrElse(0)).max
     currencyLock.isSpent = trainee.isDefined || trainer.exists(_.trainingQueue.headOption.contains(traineeClass))
     currencyLock.acquire(this)
@@ -85,7 +89,7 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
         val framesToLive    = measureSafety(() => unit.matchups.framesToLive)
         val framesOfSafety  = measureSafety(() => unit.matchups.framesOfSafety)
         val distance        = Math.max(1.0, unit.pixelDistanceCenter(With.intelligence.mostBaselikeEnemyTile.pixelCenter))
-        val workers         = Math.max(1.0, if (traineeClass.isWorker) unit.base.map(_.workers.size).sum else 1.0)
+        val workers         = Math.max(1.0, if (traineeClass.isWorker) unit.base.map(_.workerCount).sum else 1.0)
         val addons          = if (addonsRequired.isEmpty && traineeClass != Terran.SCV) 1.0 + 10.0 * unit.addon.size else 1.0
         addons * distance * workers / framesToLive / framesOfSafety
       }

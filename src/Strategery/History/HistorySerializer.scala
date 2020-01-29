@@ -13,11 +13,10 @@ object HistorySerializer {
   //                                                                                                  //
   //////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  val formatVersion: Int = 2
+  val formatVersion: Int = 4
   
-  
-  
-  // Let's roll our own half-baked CSV because the CIG deadline is in two weeks and json4s is being stubborn and we are wise, experienced developers.
+  // "Let's roll our own half-baked CSV because the CIG deadline is in two weeks and json4s is being stubborn and we are wise, experienced developers."
+  // The half-backed CSV has lasted 2.5 years now.
   val separator = ",,,"
   
   def readGames(serializedHistory: Iterable[String]): Vector[HistoricalGame] = {
@@ -45,8 +44,8 @@ object HistorySerializer {
     val ourRace         = columns(4)
     val enemyRace       = columns(5)
     val won             = columns(6).toBoolean
-    val strategies      = columns.drop(7).toSet
-    val allRaces = Array(Race.Terran, Race.Protoss, Race.Zerg, Race.Random, Race.None, Race.Unknown)
+    val strategies      = columns.drop(7).distinct
+    val allRaces        = Array(Race.Terran, Race.Protoss, Race.Zerg, Race.Random, Race.None, Race.Unknown)
     HistoricalGame(
       timestamp       = id,
       startLocations  = startLocations,

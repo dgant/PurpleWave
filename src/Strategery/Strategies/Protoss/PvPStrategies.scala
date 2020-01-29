@@ -2,68 +2,41 @@ package Strategery.Strategies.Protoss
 
 import Information.Intelligenze.Fingerprinting.Fingerprint
 import Lifecycle.With
-import Strategery.{BlueStorm, Hitchhiker, MapGroups, StarCraftMap}
 import Strategery.Strategies.Strategy
+import Strategery.{MapGroups, StarCraftMap}
 import bwapi.Race
 
-class PvPStrategy extends Strategy {
+abstract class PvPStrategy extends Strategy {
   override def ourRaces   : Iterable[Race]  = Vector(Race.Protoss)
   override def enemyRaces : Iterable[Race]  = Vector(Race.Protoss)
 }
 
-class PvPOpening extends PvPStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(
-    PvPLateGameCarrier,
-    PvPLateGameArbiter))
+abstract class PvPOpening extends PvPStrategy
+object PvPRobo extends PvPOpening
+object PvP2GateDTExpand extends PvPOpening
+object PvP2Gate1012Goon extends PvPOpening {
+  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.forgeFe, With.fingerprints.gatewayFe)
 }
-
-class PvPOpeningIntoCarriers extends PvPStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(
-    PvPLateGameCarrier,
-    PvPLateGameArbiter,
-    PvPLateGame2BaseReaverCarrier_SpecificOpponents,
-    PvPLateGame2BaseReaverCarrier_SpecificMaps))
+object PvP2Gate1012DT extends PvPOpening {
+  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.robo)
 }
-
-object PvPOpen1GateReaverExpand extends PvPOpeningIntoCarriers {
-  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.nexusFirst)
-  override def entranceInverted: Boolean = false
+object PvP2GateGoon extends PvPOpening {
+  override def responsesBlacklisted: Iterable[Fingerprint] = PvP3GateGoon.responsesBlacklisted
+  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(With.fingerprints.proxyGateway, With.fingerprints.twoGate)
 }
-
-object PvPOpen2GateRobo extends PvPOpeningIntoCarriers
-
-object PvPOpen2Gate1012 extends PvPOpeningIntoCarriers {
-}
-
-object PvPOpen2Gate1012Goon extends PvPOpeningIntoCarriers {
-  override def rushDistanceMaximum: Int = 5000
-}
-
-object PvPOpen2GateDTExpand extends PvPOpening {
-  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.twoGate)
-}
-
-object PvPOpen3GateGoon extends PvPOpening {
-  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
+object PvP3GateGoon extends PvPOpening {
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
+  override def minimumGamesVsOpponent: Int = 2
 }
-object PvPOpen4GateGoon extends PvPOpening {
-  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForBigUnits
+object PvP4GateGoon extends PvPOpening {
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
   override def entranceRamped: Boolean = false
 }
-object PvPOpenProxy2Gate extends PvPOpening {
+object PvPProxy2Gate extends PvPOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
-  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.twoGate)
+  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.twoGate, With.fingerprints.proxyGateway, With.fingerprints.forgeFe, With.fingerprints.earlyForge)
 }
-
-object PvPLateGameCarrier extends PvPStrategy
-object PvPLateGameArbiter extends PvPStrategy {
-  override def mapsBlacklisted: Iterable[StarCraftMap] = Iterable(BlueStorm)
-}
-object PvPLateGame2BaseReaverCarrier_SpecificOpponents extends PvPStrategy {
-  override def opponentsWhitelisted: Option[Iterable[String]] = Some(Vector("McRave"))
-}
-object PvPLateGame2BaseReaverCarrier_SpecificMaps extends PvPStrategy {
-  override def mapsWhitelisted: Option[Iterable[StarCraftMap]] = Some(Vector(BlueStorm, Hitchhiker))
+object PvP1ZealotExpand extends PvPOpening {
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.proxyGateway, With.fingerprints.twoGate)
+  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(With.fingerprints.oneGateCore, With.fingerprints.earlyForge, With.fingerprints.forgeFe)
 }

@@ -1,7 +1,7 @@
 package Debugging.Visualizations
 
 import Lifecycle.With
-import Mathematics.Points.{Pixel, Tile}
+import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Performance.Cache
 
 class Viewport {
@@ -28,6 +28,8 @@ class Viewport {
   def contains(tile: Tile): Boolean = {
     contains(tile.pixelCenter)
   }
+
+  val rectangle: Cache[TileRectangle] = new Cache(() => TileRectangle(start.tileIncluding, end.tileIncluding))
   
   private val startCache  = new Cache[Pixel](() => startRecalculate)
   private val endcache    = new Cache[Pixel](() => endRecalculate)

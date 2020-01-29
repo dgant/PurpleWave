@@ -12,14 +12,18 @@ object Scout extends Action {
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {
+    Sabotage.consider(unit)
+    KnockKnock.consider(unit)
     PreserveScout.consider(unit)
     DisruptBuilder.consider(unit)
     BlockConstruction.consider(unit)
     Kindle.consider(unit)
     FindBuildings.consider(unit)
-    Poke.consider(unit)
+    //Poke.consider(unit)
     FindBuildingsWhenBored.consider(unit)
-    Potshot.consider(unit)
+    if (unit.matchups.threatsInRange.isEmpty) {
+      Potshot.consider(unit)
+    }
     Move.consider(unit)
   }
 }

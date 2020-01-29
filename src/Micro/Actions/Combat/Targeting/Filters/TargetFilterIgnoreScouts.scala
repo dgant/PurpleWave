@@ -31,11 +31,10 @@ object TargetFilterIgnoreScouts extends TargetFilter {
     lazy val combatThreats      = actor.matchups.enemies.exists(e => e.unitClass.attacksGround && ! e.unitClass.isWorker)
     lazy val targetViolent      = target.isBeingViolent
     
-    if ( ! targetIsWorker)                  return true
-    if ( ! targetInOurBase)                 return true
-    if (beingWorkerRushed)                  return true
-    if (beingProxied)                       return true
-    if (facingRealThreats && targetViolent) return true
+    if ( ! targetIsWorker)                    return true
+    if (beingWorkerRushed)                    return true
+    if (beingProxied)                         return true
+    if (facingRealThreats && targetViolent)   return true
     if (isEarlyGame && ! targetInEnemyBase && ! inRange) return false
     
     canCatch

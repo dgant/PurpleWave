@@ -16,36 +16,17 @@ case class StrategyEvaluation(strategy: Strategy) {
   private val multiplayer           = With.enemies.size > 1
   
   val playbookOrder         : Int                       = if (Playbook.strategyOrder.contains(strategy)) Playbook.strategyOrder.indexOf(strategy) else Int.MaxValue
-  val games                 : Iterable[HistoricalGame]  = With.history.games.filter(_.strategies.contains(strategy.toString))
+  val games                 : Iterable[HistoricalGame]  = With.history.games.filter(_.weEmployed(strategy))
   val gamesVsEnemy          : Iterable[HistoricalGame]  = if (multiplayer) Iterable.empty else games.filter(_.enemyName == Playbook.enemyName)
-  val gamesVsRace           : Iterable[HistoricalGame]  = if (multiplayer) Iterable.empty else games.filter(_.enemyRace == With.enemy.raceInitial)
-  val gamesOnMap            : Iterable[HistoricalGame]  = games.filter(_.mapName        == With.mapFileName)
-  val gamesWithStarts       : Iterable[HistoricalGame]  = games.filter(_.startLocations == With.game.getStartLocations.size)
-  val numberGamesVsEnemy    : Double                    = gamesVsEnemy.size
-  val numberGamesVsRace     : Double                    = gamesVsRace.size
-  val numberGamesOnMap      : Double                    = gamesOnMap.size
-  val numberGamesWithStarts : Double                    = gamesWithStarts.size
-  val patienceGames         : Double                    = getConfidenceSamples(strategy)
-  val winrateTotal          : Double                    = winrate(games)
-  val winrateVsEnemy        : Double                    = winrate(gamesVsEnemy)
-  val winrateVsRace         : Double                    = winrate(gamesVsRace)
-  val winrateOnMap          : Double                    = winrate(gamesOnMap)
-  val winrateWithStarts     : Double                    = winrate(gamesWithStarts)
-  val interestRaw           : Double                    = interest(games,            patienceGames)
-  val interestVsEnemy       : Double                    = interest(gamesVsEnemy,     patienceGames)
-  val interestVsRace        : Double                    = interest(gamesVsRace,      patienceGames)
-  val interestOnMap         : Double                    = interest(gamesOnMap,       patienceGames)
-  val interestWithStarts    : Double                    = interest(gamesWithStarts,  patienceGames)
-  val interestDeterministic : Double                    = weighAllFactors
-  val interestStochastic    : Double                    = Random.nextDouble()
-  val interestTotal         : Double                    = With.configuration.strategyRandomness * interestStochastic + (1.0 - With.configuration.strategyRandomness) * interestDeterministic
+  val patienceGames         : Double  = getConfidenceSamples(strategy)
+  val winrateVsEnemy        : Double  = winrate(gamesVsEnemy)
+  val interestVsEnemy       : Double  = interest(gamesVsEnemy, patienceGames)
+  val interestDeterministic : Double  = weighAllFactors
+  val interestStochastic    : Double  = Random.nextDouble()
+  val interestTotal         : Double  = With.configuration.strategyRandomness * interestStochastic + (1.0 - With.configuration.strategyRandomness) * interestDeterministic
   
   private def weighAllFactors: Double = {
-    weigh(Vector(
-      new WinrateFactor(interestVsEnemy,    gamesVsEnemy.size,    patienceGames, importanceVsEnemy),
-      new WinrateFactor(interestVsRace,     gamesVsRace.size,     patienceGames, importanceVsRace),
-      new WinrateFactor(interestOnMap,      gamesOnMap.size,      patienceGames, importanceOnMap),
-      new WinrateFactor(interestWithStarts, gamesWithStarts.size, patienceGames, importanceWithStarts)))
+    weigh(Vector(new WinrateFactor(interestVsEnemy, gamesVsEnemy.size, patienceGames, importanceVsEnemy)))
   }
   
   private class WinrateFactor(

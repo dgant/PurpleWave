@@ -38,17 +38,22 @@ object ShowArchitecturePlacements extends View {
       DrawMap.tileRectangle(exclusion.areaExcluded, Colors.MediumRed)
       DrawMap.label(exclusion.description, exclusion.areaExcluded.midPixel)
     })
-  
-    With.architecture.unwalkable.foreach(tile => DrawMap.box(
-      tile.topLeftPixel.add(8, 8),
-      tile.topLeftPixel.add(24, 24),
-      Colors.MediumOrange,
-      solid = false))
-  
-    With.architecture.unbuildable.foreach(tile => DrawMap.box(
-      tile.topLeftPixel.add(4, 4),
-      tile.topLeftPixel.add(28, 28),
-      Colors.MediumTeal,
-      solid = false))
+
+    With.viewport.rectangle().tiles.foreach(tile => {
+      if (With.architecture.unbuildable.get(tile)) {
+        DrawMap.box(
+          tile.topLeftPixel.add(4, 4),
+          tile.topLeftPixel.add(28, 28),
+          Colors.MediumTeal,
+          solid = false)
+      }
+      if (With.architecture.unwalkable.get(tile)) {
+        DrawMap.box(
+          tile.topLeftPixel.add(8, 8),
+          tile.topLeftPixel.add(24, 24),
+          Colors.MediumOrange,
+          solid = false)
+      }
+    })
   }
 }

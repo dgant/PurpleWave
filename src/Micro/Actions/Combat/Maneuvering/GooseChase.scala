@@ -7,8 +7,10 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
 object GooseChase extends Action {
-  
-  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.agent.canScout || (
+
+  override def allowed(unit: FriendlyUnitInfo): Boolean = false
+
+  def allowedOld(unit: FriendlyUnitInfo): Boolean = unit.agent.canScout || (
     false
     && (unit.isAny(Terran.Vulture, Zerg.Zergling) || unit.agent.canScout)
     && With.strategy.map.forall(_.trustGroundDistance)

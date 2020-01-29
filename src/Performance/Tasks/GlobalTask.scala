@@ -1,5 +1,6 @@
 package Performance.Tasks
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.{Manners, With}
 import Performance.TaskQueue.TaskQueueGrids
 
@@ -42,26 +43,40 @@ class TaskMicro extends AbstractTask {
   override protected def onRun() {
     With.matchups.run()
     With.commander.run()
-    With.coordinator.run()
+    With.coordinator.runPerTask()
     With.agents.run()
   }
 }
 class TaskPlanning extends AbstractTask {
   urgency = With.configuration.urgencyPlanning
-  override def maxConsecutiveSkips: Int = 12
+  override def maxConsecutiveSkips: Int =
+    if (With.frame < GameTime(5, 0)())
+      3
+    else if (With.frame < GameTime(10, 0)())
+      6
+    else
+      12
   override protected def onRun() {
     With.intelligence.update()
     With.fingerprints.update()
+    With.yolo.update()
     With.bank.update()
     With.recruiter.update()
     With.prioritizer.update()
     With.scheduler.reset()
-    With.squads.reset()
+    With.squads.clearConscripts()
+    With.squads.startNewBatch()
     With.buildOrderHistory.update()
     With.blackboard.reset()
     With.strategy.gameplan.update()
     With.groundskeeper.update()
-    With.squads.update()
+  }
+}
+class TaskSquads extends AbstractTask {
+  urgency = With.configuration.urgencySquads
+  override protected def onRun(): Unit = {
+    With.squads.updateGoals()
+    With.squads.stepBatching()
   }
 }
 class TaskVisualizations extends AbstractTask {

@@ -2,16 +2,25 @@ package Micro.Squads.Goals
 
 import Lifecycle.With
 import Mathematics.Points.Pixel
+import Performance.Cache
+import Planning.UnitCounters.UnitCountUpToLambda
+import Planning.UnitMatchers.{UnitMatchMobileDetectors, UnitMatcher}
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.ByOption
+import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.{ByOption, CountMap}
 
-class GoalCatchDTRunby extends GoalBasic {
-  
+class GoalCatchDTRunby extends SquadGoalBasic {
+
+  override def inherentValue: Double = GoalValue.defendBase
+
   override def toString: String = "Detect DT runbys"
   
   var scout: Option[UnitInfo] = None
-  
+
+  val needed = new Cache(() => With.geography.ourBasesAndSettlements.exists(_.units.forall(u => ! u.isFriendly || ! u.unitClass.isDetector || ! u.complete)))
+  override def run(): Unit = {
+    super.run()
+  }
   override def destination: Pixel = {
     val dts = With.units.enemy.filter(_.is(Protoss.DarkTemplar))
     ByOption.minBy(With.geography.ourBases.map(_.heart.pixelCenter))(heart =>
@@ -20,14 +29,12 @@ class GoalCatchDTRunby extends GoalBasic {
       .getOrElse(With.geography.home.pixelCenter)
   }
 
-  override def acceptsHelp: Boolean = squad.units.isEmpty
-
-  override protected def offerCritical(candidates: Iterable[FriendlyUnitInfo]): Unit = {}
-  override protected def offerImportant(candidates: Iterable[FriendlyUnitInfo]): Unit = {
-    if (acceptsHelp) {
-      ByOption.minBy(candidates.filter(unitMatcher.accept))(_.pixelDistanceEdge(destination)).foreach(addCandidate)
-    }
+  override def qualityNeeds: CountMap[UnitMatcher] = {
+    val output = new CountMap[UnitMatcher]
+    output(UnitMatchMobileDetectors) = 1
+    output
   }
-  override protected def offerUseful(candidates: Iterable[FriendlyUnitInfo]): Unit =  {}
-  override protected def offerUseless(candidates: Iterable[FriendlyUnitInfo]): Unit = {}
+
+  unitMatcher = UnitMatchMobileDetectors
+  unitCounter = new UnitCountUpToLambda(() => if (needed()) 1 else 0)
 }

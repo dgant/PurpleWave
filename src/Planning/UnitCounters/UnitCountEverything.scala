@@ -1,6 +1,4 @@
-package Planning.Composition
-
-import Planning.UnitCounters.UnitCountBetween
+package Planning.UnitCounters
 
 object UnitCountEverything extends UnitCountBetween {
   minimum.set(0)

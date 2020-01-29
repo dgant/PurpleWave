@@ -1,19 +1,23 @@
 package Planning.Plans.Macro.Build
 
 import Lifecycle.With
-import Macro.Scheduling.Project
+import Macro.Buildables.{Buildable, BuildableTech}
 import Micro.Agency.Intention
-import Planning.ResourceLocks.{LockCurrencyForTech, LockUnits}
+import Planning.ResourceLocks.{LockCurrency, LockCurrencyForTech, LockUnits}
 import Planning.UnitCounters.UnitCountOne
 import Planning.UnitPreferences.UnitPreferIdle
-import Planning.Plan
 import ProxyBwapi.Techs.Tech
 import Utilities.ByOption
 
-class ResearchTech(tech: Tech) extends Plan {
+class ResearchTech(tech: Tech) extends ProductionPlan {
+
+  override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
+  override def producerUnitLocks: Seq[LockUnits] = Seq(techers)
+  override def producerInProgress: Boolean = techers.units.exists(_.techProducing.contains(tech))
+  override def buildable: Buildable = BuildableTech(tech)
 
   val techerClass = tech.whatResearches
-  val currency = new LockCurrencyForTech(tech)
+  val currencyLock = new LockCurrencyForTech(tech)
   val techers = new LockUnits {
     unitCounter.set(UnitCountOne)
     unitMatcher.set(techerClass)
@@ -30,12 +34,12 @@ class ResearchTech(tech: Tech) extends Plan {
     // Don't even stick a projected expenditure in the queue if we're this far out.
     if ( ! With.units.existsOurs(techerClass)) return
     
-    currency.framesPreordered = Math.max(
+    currencyLock.framesPreordered = Math.max(
       ByOption.max(techers.units.map(_.remainingOccupationFrames)).getOrElse(0),
-      Project.framesToUnits(techerClass))
-    currency.acquire(this)
-    currency.isSpent = With.units.ours.exists(techer => techer.teching && techer.techingType == tech)
-    if ( ! currency.satisfied) return
+      With.projections.unit(techerClass))
+    currencyLock.acquire(this)
+    currencyLock.isSpent = With.units.ours.exists(techer => techer.teching && techer.techingType == tech)
+    if ( ! currencyLock.satisfied) return
   
     techers.acquire(this)
     techers.units.foreach(_.agent.intend(this, new Intention { toTech = Some(tech) }))

@@ -5,6 +5,36 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object AttackDelay {
+
+  /*
+  Dragoon frames, via Ankmairdor:
+
+  DragoonGndAttkInit:
+    playfram           0x110    # frame set 16
+    wait               1
+    playfram           0x121    # frame set 17
+    wait               1
+    playfram           0x132    # frame set 18
+    wait               1
+    playfram           0x143    # frame set 19
+    wait               1
+    playfram           0x154    # frame set 20
+    wait               1
+    playfram           0x165    # frame set 21
+    wait               1
+  DragoonGndAttkRpt:
+    playfram           0x176    # frame set 22
+    wait               1
+    playfram           0x187    # frame set 23
+    wait               1
+    attackwith         1
+    playfram           0x176    # frame set 22
+    wait               1
+    playfram           0x165    # frame set 21
+    gotorepeatattk
+    ignorerest
+   */
+
   
   /*
   UPDATE 8/7/0217

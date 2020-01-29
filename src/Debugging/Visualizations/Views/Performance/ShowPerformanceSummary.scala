@@ -12,14 +12,10 @@ object ShowPerformanceSummary extends View {
     DrawScreen.header(80, With.latency.turnSize                   + " frames/turn")
     DrawScreen.header(155, With.performance.meanFrameMilliseconds + "ms avg")
     DrawScreen.header(230, With.performance.maxFrameMilliseconds  + "ms max")
-    With.game.drawTextScreen(5,   2 * With.visualization.lineHeightSmall, "+55ms: "     + With.performance.framesOver55     + "/320")
+    val short = "+" + With.performance.frameLimitShort.toString + "ms: "
+    With.game.drawTextScreen(5,   2 * With.visualization.lineHeightSmall, short         + With.performance.framesOverShort  + "/320")
     With.game.drawTextScreen(80,  2 * With.visualization.lineHeightSmall, "+1000ms: "   + With.performance.framesOver1000   + "/10")
     With.game.drawTextScreen(155, 2 * With.visualization.lineHeightSmall, "+10000ms: "  + With.performance.framesOver10000  + "/1")
-    With.game.drawTextScreen(230, 2 * With.visualization.lineHeightSmall, "Units: " +
-      Vector(
-        With.performance.lastUniqueFriendlyUnitObjects,
-        With.performance.lastUniqueUnitIdCount,
-        With.performance.lastUniqueDeadIdCount).mkString(", "))
     if (With.performance.disqualified) {
       With.game.setTextSize(Text.Size.Large)
       DrawScreen.header(295, ":/")

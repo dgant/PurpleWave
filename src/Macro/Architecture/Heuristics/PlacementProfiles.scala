@@ -8,7 +8,9 @@ object PlacementProfiles {
   
   def default(blueprint: Blueprint): PlacementProfile = {
     if (blueprint.requireTownHallTile.get) {
-      if (With.self.isZerg || With.enemies.forall(_.isTerran))
+      if (With.blackboard.preferCloseExpansion.get)
+        townHallNearby
+      else if (With.self.isZerg || With.enemies.forall(_.isTerran))
         townHallFar
       else
         townHallNearby
@@ -17,6 +19,8 @@ object PlacementProfiles {
       gas
     else if (blueprint.powers.get)
       pylon
+    else if (blueprint.building.contains(Protoss.RoboticsFacility))
+      robo
     else if (blueprint.building.exists(_.trainsGroundUnits)) {
       if (blueprint.building.contains(Terran.Barracks))
         factoryNoSpace
@@ -24,7 +28,7 @@ object PlacementProfiles {
         factory
     }
     else if (blueprint.building.exists(building => building.attacks || building == Zerg.CreepColony || building == Protoss.ShieldBattery))
-      wallCannon
+      defensive
     else
       tech
   }
@@ -34,11 +38,11 @@ object PlacementProfiles {
     preferZone                  = 1.0,
     preferNatural               = 0.0,
     preferResources             = 0.0,
-    preferSpace                 = 0.05,
-    preferPowering              = 0.1,
+    preferRhythm                = 1.0,
+    preferSpace                 = 0.2,
+    preferPowering              = 0.15,
     preferDistanceFromEnemy     = 0.6,
-    preferCoveringWorkers       = 0.0,
-    preferSurfaceArea           = 0.5,
+    preferSurfaceArea           = 0.25,
     avoidDistanceFromBase       = 0.3,
     avoidDistanceFromEnemy      = 0.0,
     avoidDistanceFromIdealRange = 0.05,
@@ -46,7 +50,12 @@ object PlacementProfiles {
   )
   
   val pylon = new PlacementProfile("Pylon", basic)
-  val factory = new PlacementProfile("Factory", basic)
+  val robo = new PlacementProfile("Robo", basic) {
+    avoidDistanceFromIdealRange = 6.0
+  }
+  val factory = new PlacementProfile("Factory", basic) {
+    avoidSurfaceArea = 0.01
+  }
   val factoryNoSpace = new PlacementProfile("Factory", basic) {
     preferSpace = 0.0
   }
@@ -58,23 +67,25 @@ object PlacementProfiles {
   }
   
   val gas = new PlacementProfile("Gas",
-    preferZone                  = 1000.0,
-    avoidDistanceFromBase       = 1.0
+    preferWorkers               = 1.0,
+    preferDistanceFromEnemy     = 1.0
   )
   
   val townHallNearby = new PlacementProfile("Town Hall Nearby",
-    preferZone                  = 1000.0,
-    preferNatural               = 1.0,
-    preferResources             = 0.5,
-    preferDistanceFromEnemy     = 0.5,
-    avoidDistanceFromBase       = 1.5
+    preferZone                  = 1.0,
+    preferNatural               = 10.0,
+    preferResources             = 0.75,
+    preferRhythm                = 0.0,
+    preferDistanceFromEnemy     = 2.0,
+    avoidDistanceFromBase       = 1.0
   )
   
   val townHallFar = new PlacementProfile("Town Hall Far",
-    preferZone                  = 1000.0,
-    preferNatural               = 1.0,
+    preferZone                  = 1.0,
+    preferNatural               = 10.0,
     preferResources             = 0.5,
-    preferDistanceFromEnemy     = 1.5,
+    preferRhythm                = 0.0,
+    preferDistanceFromEnemy     = 4.0,
     avoidDistanceFromBase       = 0.5
   )
   
@@ -87,23 +98,13 @@ object PlacementProfiles {
     avoidDistanceFromIdealRange = 0.0
   }
   
-  val wallPylon = new PlacementProfile(
-    "Pylon for a wall",
+  val defensive = new PlacementProfile(
+    "Forge wall",
     preferZone                  = 100.0,
     preferNatural               = 10.0,
-    preferPowering              = 1.0,
-    preferCoveringWorkers       = 0.5,
-    avoidDistanceFromEntrance   = 0.5,
-    avoidSurfaceArea            = 0.05,
-    avoidDistanceFromIdealRange = 0.5)
-  
-  val wallCannon = new PlacementProfile(
-    "Cannons for a wall",
-    preferZone                  = 100.0,
-    preferNatural               = 10.0,
-    avoidDistanceFromEntrance   = 1.0,
-    avoidDistanceFromEnemy      = 0.5,
-    avoidDistanceFromIdealRange = 1.75)
+    preferPowering              = 0.4,
+    avoidDistanceFromBase       = 1.0,
+    avoidDistanceFromIdealRange = 4.0)
   
   val proxyBuilding = new PlacementProfile(
     "Proxy",
@@ -125,25 +126,43 @@ object PlacementProfiles {
     preferZone                  = 100.0,
     avoidDistanceFromEnemy      = 3.0,
     avoidSurfaceArea            = 1.0)
-  
+
+  val proxyTowardsEnemy = new PlacementProfile(
+    "Proxy towards enemy",
+    avoidDistanceFromEnemy = 1.0)
+
+  val wallGathering = new PlacementProfile(
+    "Wall gathering area",
+    preferZone                  = 100.0,
+    preferPowering              = 0.4,
+    avoidDistanceFromBase       = 1.0,
+    avoidDistanceFromIdealRange = 4.0)
+
   val hugTownHall = new PlacementProfile(
     "Hug town hall",
     preferPowering              = 0.1,
+    preferSpace                 = 2.0,
     avoidDistanceFromBase       = 1.0)
+
+  val hugTownHallTowardsEntrance = new PlacementProfile(
+    "Hug town hall towards entrance",
+    preferPowering              = 0.1,
+    preferSpace                 = 2.0,
+    avoidDistanceFromBase       = 1.0,
+    avoidDistanceFromEntrance   = 0.2)
   
   val hugWorkersWithPylon = new PlacementProfile(
     "Hug workers with pylon",
     preferPowering              = 0.1,
-    preferCoveringWorkers       = 1.0,
     avoidDistanceFromEnemy      = 0.00001)
   
   val hugWorkersWithCannon = new PlacementProfile(
     "Hug workers with cannon",
-    preferCoveringWorkers       = 1.0,
+    avoidDistanceFromBase       = 1.0,
     avoidDistanceFromEnemy      = 0.00001)
   
   val cannonAgainstAir = new PlacementProfile(
     "Cannon against air/drops",
-    preferCoveringWorkers       = 1.0,
+    avoidDistanceFromBase       = 1.0,
     preferDistanceFromEnemy     = 0.5)
 }

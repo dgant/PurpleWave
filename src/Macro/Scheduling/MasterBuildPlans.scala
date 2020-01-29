@@ -6,18 +6,17 @@ import Performance.Cache
 import Planning.Plan
 import Planning.Plans.Macro.Build._
 import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
-import ProxyBwapi.UnitClasses.UnitClass
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 class MasterBuildPlans {
-  
+
   private val maxToFollow = 200
-  
+
   private val plans = new mutable.HashMap[Buildable, ListBuffer[Plan]]
   private var queue: Iterable[Buildable] = Vector.empty
-  
+
   def getChildren: Iterable[Plan] = getChildrenCache()
   private val getChildrenCache = new Cache(() => getChildrenRecalculate)
   private def getChildrenRecalculate: Iterable[Plan] = {
@@ -29,10 +28,10 @@ class MasterBuildPlans {
       output
     })
   }
-  
+
   def update(invoker: FollowBuildOrder) {
 
-    //Remove complete plans
+    // Remove complete plans
     plans.values.foreach(plans => {
       var i = 0
       while (i < plans.size) {
@@ -46,7 +45,7 @@ class MasterBuildPlans {
         }
       }})
 
-    //Add plans to match number of builds we need
+    // Add plans to match number of builds we need
     queue = With.scheduler.queue.take(maxToFollow)
 
     val buildsNeeded =
@@ -63,13 +62,11 @@ class MasterBuildPlans {
       while (plans(build).size < buildsNeeded(build)) {
         plans(build).append(buildPlan(build))
       }
-
-      //Consider removing excess plans
     })
 
     getChildrenCache.invalidate()
   }
-  
+
   private def buildPlan(buildable: Buildable): Plan = {
     if (buildable.unitOption.nonEmpty) {
       val unitClass = buildable.unitOption.get
@@ -90,7 +87,7 @@ class MasterBuildPlans {
     if (buildable.upgradeOption.nonEmpty) {
       return new ResearchUpgrade(buildable.upgradeOption.get, buildable.upgradeLevel)
     }
-    
+
     throw new Exception("Tried to build a Buildable that doesn't specify any unit, tech, or research")
   }
 }

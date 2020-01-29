@@ -4,26 +4,29 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Mathematics.Points.Pixel
 
 case class SimulationEventMove(
-  frame   : Int,
-  sim     : Simulacrum,
-  from    : Pixel,
-  to      : Pixel,
-  frames  : Int)
+  frame     : Int,
+  sim       : Simulacrum,
+  pixelFrom : Pixel,
+  pixelTo   : Pixel,
+  frames    : Int)
     extends SimulationEvent {
-  
+
   override def toString: String = Vector(
     frame + ":",
     describe(sim),
     "moves from",
-    from,
+    pixelFrom,
     "to",
-    to,
+    pixelTo,
     "in",
     frames,
     "frames"
     ).map(_.toString).mkString(" ")
-  
+
   override def draw() {
-    DrawMap.arrow(from, to, sim.realUnit.player.colorMedium)
+    DrawMap.arrow(pixelFrom, pixelTo, sim.realUnit.player.colorMedium)
   }
+
+  override def from: Pixel = pixelFrom
+  override def to: Pixel = pixelFrom
 }

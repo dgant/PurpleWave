@@ -22,6 +22,7 @@ object Spread extends ActionTechnique {
     && unit.flying
     && unit.matchups.allies.exists(isValidAlly)
     && unit.matchups.enemies.exists(isValidEnemy)
+    && ! unit.unitClass.suicides
   )
   
   override val activator: Activator = new WeightedMax(this)
@@ -54,7 +55,7 @@ object Spread extends ActionTechnique {
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     AttackAsSoonAsPossible.delegate(unit)
-    if ( ! unit.readyForMicro) return
+    if ( ! unit.ready) return
   
     Target.delegate(unit)
     

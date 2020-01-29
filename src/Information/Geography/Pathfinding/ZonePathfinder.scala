@@ -1,40 +1,50 @@
 package Information.Geography.Pathfinding
 
+import Information.Geography.Pathfinding.Types.{ZonePath, ZonePathNode}
 import Information.Geography.Types.Zone
+import Lifecycle.With
+import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
-object ZonePathfinder {
-  
+import scala.collection.mutable
+
+trait ZonePathfinder {
+
+  var pathfindId: Long = Long.MinValue
+  private val paths = new mutable.HashMap[(Zone, Zone), Option[ZonePath]]
+  def zonePath(from: Zone, to: Zone): Option[ZonePath] = {
+    if (! paths.contains((from, to))) {
+      pathfindId += 1
+      paths((from, to)) = zonePathfind(from, to)
+    }
+    paths((from, to))
+  }
+
+  def zonePathUnits(from: Zone, to: Zone): Vector[UnitInfo] = {
+    val zones = zonePath(from, to).map(_.zones).getOrElse(Vector(from, to).distinct)
+    val output = zones.map(_.units.toVector).fold(Vector.empty)(_ ++ _)
+    output
+  }
+
   // Note that this has the weakness of assuming the path is always from the center of the zone
   // The shortest path from other points of the zone may be different.
-  def find(
-    fromOriginal  : Zone,
-    from          : Zone,
-    to            : Zone,
-    pathHere      : Vector[ZonePathNode]  = Vector.empty,
-    explored      : Set[Zone]             = Set.empty)
+  protected def zonePathfind(
+    from: Zone,
+    to: Zone,
+    pathHere: Vector[ZonePathNode] = Vector.empty)
       : Option[ZonePath] = {
-    
-    if (from == to) {
-      return Some(ZonePath(
-        from  = fromOriginal,
-        to    = to,
-        steps = pathHere))
+
+    from.lastPathfindId = pathfindId
+    val start = from.centroid
+    val end = to.centroid
+    if (!With.paths.groundPathExists(start, end)) return None
+
+    if (from == to) return Some(Types.ZonePath(from, to, pathHere))
+    val bestEdge = ByOption.minBy(from.edges.filter(_.otherSideof(from).lastPathfindId != pathfindId))(_.distanceGrid.get(end))
+    if (bestEdge.isEmpty) {
+      return None
     }
-    val edges = from.edges
-      .filterNot(edge => explored.contains(edge.otherSideof(from)))
-      .sortBy(_.pixelCenter.pixelDistance(from.centroid.pixelCenter))
-    
-    val paths = edges.flatMap(edge => {
-      val nextZone = edge.otherSideof(from)
-      find(
-        fromOriginal,
-        nextZone,
-        to,
-        pathHere :+ ZonePathNode(from, nextZone, edge),
-        explored + from)
-    })
-    
-    ByOption.minBy(paths)(_.lengthPixels)
+
+    zonePathfind(bestEdge.get.otherSideof(from), to, pathHere :+ ZonePathNode(from, to, bestEdge.get))
   }
 }

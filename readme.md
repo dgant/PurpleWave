@@ -7,10 +7,12 @@ https://github.com/dgant/PurpleWave
 PurpleWave is a *StarCraft: Brood War* AI written in Scala. It can play all races and a large variety of strategies.
 
 PurpleWave has won:
- * 1st Place in the [2018 AIST1](https://sites.google.com/view/aistarcrafttournament/aist-s1-2018)
+ * 1st Place in the [2019 IEEE CoG StarCraft AI Competition](https://www.facebook.com/groups/bwapi/permalink/10162282016865261/)
+ * 1st Place in the [2018 SSCAIT](https://sscaitournament.com/index.php?action=2018) 
+ * 1st Place in the [2018 AIST1](https://sites.google.com/view/aistarcrafttournament/aist-s1)
  * 2nd Place in the [2017 AIIDE StarCraft AI Competition](http://www.cs.mun.ca/~dchurchill/starcraftaicomp/2017/)
+ * 2nd Place in the [2018 IEEE CIG StarCraft AI Competition](https://cilab.sejong.ac.kr/sc_competition2018/)
  * 3rd Place in the [2017 IEEE CIG StarCraft AI Competition](https://cilab.sejong.ac.kr/sc_competition/?p=1090)
- * And has ranked as high as #2 on the [SSCAIT Ladder](https://sscaitournament.com/index.php?action=scores). 
 
 PurpleWave vs. Iron, AIIDE 2017:
 
@@ -22,7 +24,7 @@ Thanks to:
 * @jaj22/JohnJ for lots of advice navigating Brood War mechanics
 * @IMP42 @AdakiteSystems and @tscmoo for helping me get BWAPI up and running when I was getting started
 * @kovarex @heinermann @bgweber @certicky @krasi0 @davechurchill and the Cognition & Intelligence Lab at Sejong University for making Brood War competitions possible in the first place
-* @vjurenka for BWMirror and Luke Perkins for BWTA
+* @vjurenka for BWMirror, Luke Perkins for BWTA, @CMcCrave for MCRS/Horizon, and @JasperGeurtz for JBWAPI
 
 ## How to build PurpleWave
 [See build instructions in install.md](install/install.md)
@@ -56,4 +58,4 @@ You should find PurpleWave.exe in a directory with several DLLs which it needs t
 Say hi! Post an issue here on Github or email dsgant at gmail
 
 ## License
-PurpleWave is published under the MIT License. Make PurpleWave your own!
+PurpleWave is published under the MIT License. I encourage you to use PurpleWave as a starting point for your own creation!

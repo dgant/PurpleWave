@@ -9,6 +9,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Planning.Yolo
 import Utilities.ByOption
+import bwapi.Text
 
 object ShowBattleSummary extends View {
   
@@ -75,12 +76,12 @@ object ShowBattleSummary extends View {
   }
   
   private def drawEstimationReport(estimation: Prediction) {
-    With.game.setTextSize(bwapi.TextSize.Large)
+    With.game.setTextSize(Text.Size.Large)
     With.game.drawTextScreen(tableHeader0.bwapi, With.self.name)
     With.game.drawTextScreen(tableHeader1.bwapi, With.enemy.name)
     With.game.drawTextScreen(tableStart0.bwapi, "+" + estimation.costToEnemy.toInt)
     With.game.drawTextScreen(tableStart1.bwapi, "-" + estimation.costToUs.toInt)
-    With.game.setTextSize(bwapi.TextSize.Small)
+    With.game.setTextSize(Text.Size.Small)
   }
 }
 

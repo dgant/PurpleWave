@@ -3,6 +3,7 @@ package Debugging.Visualizations.Views.Performance
 import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
+import bwapi.Text
 
 object ShowPerformanceSummary extends View {
   
@@ -20,9 +21,9 @@ object ShowPerformanceSummary extends View {
         With.performance.lastUniqueUnitIdCount,
         With.performance.lastUniqueDeadIdCount).mkString(", "))
     if (With.performance.disqualified) {
-      With.game.setTextSize(bwapi.TextSize.Large)
+      With.game.setTextSize(Text.Size.Large)
       DrawScreen.header(295, ":/")
-      With.game.setTextSize(bwapi.TextSize.Small)
+      With.game.setTextSize(Text.Size.Small)
     }
   }
 }

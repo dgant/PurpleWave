@@ -1,8 +1,8 @@
 package Lifecycle
 
-import bwapi.{BWListener, Player}
+import bwapi.{BWEventListener, Player}
 
-object Listener extends BWListener {
+object Listener extends BWEventListener {
 
   var bot: Option[Bot] = None
 

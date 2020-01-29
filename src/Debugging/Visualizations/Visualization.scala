@@ -9,6 +9,7 @@ import Debugging.Visualizations.Views.Performance.{ShowPerformanceDetails, ShowP
 import Debugging.Visualizations.Views.Planning._
 import Debugging.Visualizations.Views.{ShowClock, View}
 import Lifecycle.With
+import bwapi.Text
 
 import scala.collection.mutable
 import scala.util.Random
@@ -63,7 +64,7 @@ class Visualization {
     requireInitialization()
     if ( ! enabled) return
     if (With.tasks.tasks.exists(_.totalRuns == 0)) return
-    With.game.setTextSize(bwapi.TextSize.Small)
+    With.game.setTextSize(Text.Size.Small)
     
     if (happy) {
       ShowHappyVision.render()

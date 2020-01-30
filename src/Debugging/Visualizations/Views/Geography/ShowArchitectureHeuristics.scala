@@ -9,26 +9,26 @@ import Mathematics.Points.Pixel
 import bwapi.{Color, Text}
 
 object ShowArchitectureHeuristics extends View {
-  
+
   override def renderScreen() {
     blueprintToRender.foreach(blueprint =>
       placementToRender(blueprint).foreach(placement =>
       renderPlacementHeuristicsScreen(blueprint, placement)))
   }
-  
+
   override def renderMap() {
     blueprintToRender.foreach(blueprint =>
       placementToRender(blueprint).foreach(placement =>
         renderPlacementHeuristicsMap(blueprint, placement)))
   }
-  
+
   private def blueprintToRender: Option[Blueprint] = {
     With.groundskeeper.proposalPlacements.keys
       .toVector
       .sortBy(_.proposer.priority)
       .headOption
   }
-  
+
   private def placementToRender(blueprint: Blueprint): Option[Placement] = {
     val placement = With.groundskeeper.proposalPlacements(blueprint)
     if (placement.tile.isEmpty || placement.scoresByTile.isEmpty)
@@ -36,8 +36,8 @@ object ShowArchitectureHeuristics extends View {
     else
       Some(placement)
   }
-  
-  private def renderPlacementHeuristicsScreen(blueprint: Blueprint, placement: Placement): Unit = {
+
+  private def renderPlacementHeuristicsScreen(blueprint: Blueprint, placement: Placement) = {
     With.game.setTextSize(Text.Size.Default)
     DrawScreen.column(
       5,
@@ -52,8 +52,8 @@ object ShowArchitectureHeuristics extends View {
         .flatten)
     With.game.setTextSize(Text.Size.Small)
   }
-  
-  private def renderPlacementHeuristicsMap(blueprint: Blueprint, placement: Placement): Unit = {
+
+  private def renderPlacementHeuristicsMap(blueprint: Blueprint, placement: Placement) = {
     val heuristicRanges = placement
       .evaluations
       .groupBy(_.heuristic)
@@ -66,7 +66,7 @@ object ShowArchitectureHeuristics extends View {
             max = pair._2.map(_.evaluation).max)
         )
       )
-    
+
     placement.evaluations
       .filter(evaluation => With.viewport.contains(evaluation.candidate))
       .foreach(evaluation => {
@@ -79,7 +79,7 @@ object ShowArchitectureHeuristics extends View {
           range.min,
           range.max)
       })
-    
+
     val scoreMin = placement.scoresByTile.values.min
     val scoreMax = placement.scoresByTile.values.max
     placement.scoresByTile
@@ -93,7 +93,7 @@ object ShowArchitectureHeuristics extends View {
           scoreMin,
           scoreMax))
   }
-  
+
   private def drawBlueprint(
     building  : Blueprint,
     color     : Color,
@@ -108,7 +108,7 @@ object ShowArchitectureHeuristics extends View {
       (16 * (value - min) / max).toInt,
       color)
   }
-  
+
   private case class HeuristicRange(
     color : Color,
     min   : Double,

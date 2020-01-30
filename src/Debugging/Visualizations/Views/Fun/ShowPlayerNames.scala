@@ -5,7 +5,7 @@ import ProxyBwapi.Players.PlayerInfo
 import bwapi.Text
 
 object ShowPlayerNames extends {
-  
+
   def renderScreen(visionLabel: String) {
     With.game.setTextSize(Text.Size.Large)
     With.game.drawBoxScreen   (5,      5,      5 + 20, 5 + 20,        With.self.colorMedium,  true)
@@ -16,7 +16,7 @@ object ShowPlayerNames extends {
     With.game.drawTextScreen  (5,      5 + 50,                        With.self.name + " is displaying this game in " + visionLabel + "!")
     With.game.setTextSize(Text.Size.Small)
   }
-  
+
   private def renderRace(player: PlayerInfo): String = {
     " (" + player.raceCurrent.toString.take(1) + ")"
   }

@@ -2,15 +2,15 @@ package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
 
-class PumpWorkers(oversaturate: Boolean = false, cap: Int = 85, maximumConcurrently: Int = 2, maximumTotal: Int = 200) extends Pump(With.self.workerClass, maximumConcurrently = maximumConcurrently, maximumTotal = maximumTotal) {
+class PumpWorkers(oversaturate: Boolean = false, cap: Int = 85, maximumConcurrently: Int = 3, maximumTotal: Int = 200) extends Pump(With.self.workerClass, maximumConcurrently = maximumConcurrently, maximumTotal = maximumTotal) {
   
   protected def builderCount: Int = {
     if (With.self.isTerran)
       4
     else if (With.self.isProtoss)
-      2
+      1
     else
-      3
+      2
   }
   override def maxDesirable: Int = Math.min(
     cap,

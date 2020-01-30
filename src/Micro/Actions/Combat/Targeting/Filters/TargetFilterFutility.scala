@@ -26,7 +26,7 @@ object TargetFilterFutility extends TargetFilter {
       && (ally.topSpeed >= target.topSpeed || ally.pixelRangeAgainst(target) >= actor.pixelRangeAgainst(target))
       && ally.framesBeforeAttacking(target) <= actor.framesBeforeAttacking(target))
     
-    lazy val targetCatchable  = target.battle.isEmpty || target.matchups.catchers.contains(actor) || alliesAssisting
+    lazy val targetCatchable  = target.matchups.catchers.contains(actor) || alliesAssisting
     lazy val targetReachable  = (
       target.visible
       || actor.flying

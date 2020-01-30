@@ -19,6 +19,8 @@ object Listener extends BWEventListener {
     catch { case exception: Exception =>
       lastException = Some(exception)
       lastStackTrace = Some(exception.getStackTrace.toString)
+      doesThisCodeEvenGetExecuted = 456
+      val setABreakpointHere = 12345
     }
   }
 

@@ -78,4 +78,4 @@ class TestingPlaybook extends PurpleWavePlaybook {
   override def respectHistory: Boolean = false
 }
 
-object Playbook extends PurpleWavePlaybook {}
+object Playbook extends TournamentPlaybook {}

@@ -1,10 +1,8 @@
 # PurpleWave
-### An extensible AI player for *StarCraft: Brood War*
-
-https://github.com/dgant/PurpleWave
+### A tournament-winning AI player of *StarCraft: Brood War*
 
 ## About
-PurpleWave is a *StarCraft: Brood War* AI written in Scala. It can play all races and a large variety of strategies.
+[PurpleWave](https://github.com/dgant/PurpleWave) is a *StarCraft: Brood War* AI written in Scala. It can play all three races and a large variety of professional-style strategies.
 
 PurpleWave has won:
  * 1st Place in the [2019 IEEE CoG StarCraft AI Competition](https://cilab.gist.ac.kr/sc_competition2019/?cat=17)
@@ -14,6 +12,8 @@ PurpleWave has won:
  * 2nd Place in the [2017 AIIDE StarCraft AI Competition](https://www.cs.mun.ca/~dchurchill/starcraftaicomp/2017/)
  * 2nd Place in the [2018 IEEE CIG StarCraft AI Competition](https://cilab.gist.ac.kr/sc_competition2018/?cat=17)
  * 3rd Place in the [2017 IEEE CIG StarCraft AI Competition](https://cilab.gist.ac.kr/sc_competition2017/?cat=17)
+ 
+PurpleWave has also ranked #1 on the [BASIL](https://basil.bytekeeper.org/ranking.html), SSCAIT, and SAIL ladders.
 
 PurpleWave vs. Iron, AIIDE 2017:
 
@@ -24,8 +24,8 @@ Thanks to:
 * Nathan Roth (Antiga/Iruian) for strategy advice and consulting -- so much of the polish in PurpleWave's strategies comes from his wisdom and replay analysis
 * @jaj22/JohnJ for lots of advice navigating Brood War mechanics
 * @IMP42 @AdakiteSystems and @tscmoo for helping me get BWAPI up and running when I was getting started
-* @kovarex @heinermann @bgweber @certicky @krasi0 @davechurchill and the Cognition & Intelligence Lab at Sejong University for making Brood War competitions possible in the first place
-* @JasperGeurtz and @Bytekeeper for JBWAPI, @vjurenka for BWMirror, Luke Perkins for BWTA, and @CMcCrave for MCRS/Horizon 
+* @davechurchill @certicky @krasi0 @Bytekeeper @bgweber Nathan Roth and the Cognition & Intelligence Lab at Sejong University for hosting Brood War competitions
+* @kovarex and @heinermann for [BWAPI](https://github.com/bwapi/bwapi), @JasperGeurtz @Bytekeeper and @N00byEdge for [JBWAPI](https://github.com/JavaBWAPI/JBWAPI), @vjurenka for [BWMirror](https://github.com/vjurenka/BWMirror), @tscmoo for [OpenBW](https://github.com/OpenBW/openbw/), Luke Perkins for BWTA, and @CMcCrave for [MCRS/Horizon](https://github.com/Cmccrave/Horizon) 
 
 ## How to build PurpleWave
 [See build instructions in install.md](install/install.md)

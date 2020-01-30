@@ -8,9 +8,9 @@ class PumpWorkers(oversaturate: Boolean = false, cap: Int = 85, maximumConcurren
     if (With.self.isTerran)
       4
     else if (With.self.isProtoss)
-      1
-    else
       2
+    else
+      3
   }
   override def maxDesirable: Int = Math.min(
     cap,

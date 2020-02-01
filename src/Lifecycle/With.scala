@@ -155,8 +155,13 @@ object With {
   
   private def initializeBWTA() {
     With.logger.debug("Loading BWTA for " + With.game.mapName + " at " + With.game.mapFileName())
-    BWTA.readMap(With.game)
-    BWTA.analyze()
+    try {
+      BWTA.readMap(With.game)
+      BWTA.analyze()
+    } catch { case exception: Exception =>
+      With.logger.onException(exception)
+
+    }
   }
 
   // For debugging convenience

@@ -160,7 +160,10 @@ object With {
       BWTA.analyze()
     } catch { case exception: Exception =>
       With.logger.onException(exception)
-
+      // With the error logged, try again
+      BWTA.readMap(With.game)
+      BWTA.setFailOnError(false)
+      BWTA.analyze()
     }
   }
 

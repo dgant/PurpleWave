@@ -46,7 +46,6 @@ class Geography {
     (if (ourMain.owner.isUs) ourMain.natural else None)
       .getOrElse(bases.find(_.isNaturalOf.exists(_.owner.isUs))
       .getOrElse(bases.minBy(_.townHallTile.groundPixels(ourMain.townHallTile)))))
-
   
   def zoneByTile(tile: Tile): Zone = if (tile.valid) zoneByTileCacheValid(tile.i) else zoneByTileCacheInvalid(tile)
   def baseByTile(tile: Tile): Option[Base] = if (tile.valid) baseByTileCacheValid(tile.i) else getBaseForTile(tile)

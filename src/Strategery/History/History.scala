@@ -1,7 +1,7 @@
 package Strategery.History
 
 import Lifecycle.With
-import Strategery.Playbook
+import Strategery.FinalPlaybook
 import bwapi.Race
 
 import scala.collection.mutable
@@ -12,7 +12,7 @@ class History {
   
   lazy val currentMapName   : String  = With.game.mapFileName
   lazy val currentStarts    : Int     = With.game.getStartLocations.size
-  lazy val currentEnemyName : String  = Playbook.enemyName
+  lazy val currentEnemyName : String  = FinalPlaybook.enemyName
   lazy val currentEnemyRace : Race    = With.enemy.raceInitial
   
   var message = new mutable.ArrayBuffer[String]
@@ -37,7 +37,7 @@ class History {
     message += "Vs. "   + currentEnemyRace      + ": "                  + enemyRaceWins + " - " + enemyRaceLosses
     message += "Vs. "   + currentEnemyName      + ": "                  + vsWins        + " - " + vsLosses
 
-    if (With.configuration.humanMode()) {
+    if (With.configuration.humanMode) {
       message.clear()
     }
   }

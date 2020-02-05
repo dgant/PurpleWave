@@ -12,12 +12,17 @@ class Logger {
   private val logMessages = new ListBuffer[String]
   private var errorOcurred = false
   
-  def flush() {
-    if ( ! errorOcurred) { return }
-    
-    val opponents = With.enemies
-      .map(_.name)
-      .mkString("-")
+  def flush(): Unit = {
+    var shouldFlush = true
+    var opponents: String = ""
+    try {
+      if (!errorOcurred && !With.configuration.debugging) {
+        shouldFlush = false
+      }
+      opponents = With.enemies.map(_.name).mkString("-")
+    } catch { case exception: Exception => {} }
+
+    if ( ! shouldFlush) return
     
     val filenameRaw = opponents + "-" + Calendar.getInstance.getTime.toString
     val filename = With.bwapiData.write + filenameRaw.replaceAll("[^A-Za-z0-9 \\-\\.]", "") + ".log.txt"
@@ -50,7 +55,7 @@ class Logger {
   
   private def log(message: String, chat: Boolean = true) {
     logMessages.append(message)
-    if (chat) {
+    if (chat && With.configuration.debugging) {
       Manners.chat(message)
     }
   }

@@ -1,7 +1,7 @@
 package Lifecycle
 
 import Debugging.Visualizations.{Viewport, Visualization}
-import Debugging.{Camera, Configuration, Logger}
+import Debugging.{Camera, Logger}
 import Information.Battles.BattleClassifier
 import Information.Geography.Geography
 import Information.Geography.Pathfinding.Paths
@@ -19,18 +19,27 @@ import Performance.TaskQueue.{AbstractTaskQueue, TaskQueueGlobal}
 import Planning.{Blackboard, Yolo}
 import ProxyBwapi.Bullets.Bullets
 import ProxyBwapi.Players.{PlayerInfo, Players}
-import ProxyBwapi.ProxyBWMirror
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.ProxyBWAPI
 import ProxyBwapi.UnitTracking.UnitTracker
 import Strategery.History.History
-import bwapi.Flag
 import Strategery.{StarCraftMapMatcher, Strategist}
 import _root_.Performance.{Latency, PerformanceMonitor, ReactionTimes}
+import bwapi.Flag
 import bwta.BWTA
 
 import scala.collection.JavaConverters._
 
 object With {
+
+  var self            : PlayerInfo          = _
+  var neutral         : PlayerInfo          = _
+  var enemies         : Vector[PlayerInfo]  = _
+  var frame           : Int                 = 0
+  var mapTileWidth    : Int                 = 0
+  var mapTileHeight   : Int                 = 0
+  var mapFileName     : String              = _
+  var mapId           : String              = _
+
   var game              : bwapi.Game              = _
   var agents            : Agency                  = _
   var architecture      : Architecture            = _
@@ -59,7 +68,7 @@ object With {
   var performance       : PerformanceMonitor      = _
   var placement         : PlacementScheduler      = _
   var projections       : Projections             = _
-  var proxy             : ProxyBWMirror           = _
+  var proxy             : ProxyBWAPI              = _
   var prioritizer       : Prioritizer             = _
   var reaction          : ReactionTimes           = _
   var recruiter         : Recruiter               = _
@@ -71,34 +80,29 @@ object With {
   var viewport          : Viewport                = _
   var visualization     : Visualization           = _
   var yolo              : Yolo                    = _
-  
-  var self    : PlayerInfo         = _
-  var neutral : PlayerInfo         = _
-  var enemies : Vector[PlayerInfo] = _
-  def enemy   : PlayerInfo        = enemies.head
-  
-  var frame           : Int     = 0
-  var mapTileWidth    : Int     = 0
-  var mapTileHeight   : Int     = 0
-  var mapFileName     : String  = _
-  var mapId           : String  = _
-  def mapPixelWidth   : Int     = mapTileWidth * 32
-  def mapPixelHeight  : Int     = mapTileHeight * 32
-  def mapWalkWidth    : Int     = mapTileWidth * 4
-  def mapWalkHeight   : Int     = mapTileHeight * 4
-  
+
+  def enemy: PlayerInfo     = enemies.head
+  def mapPixelWidth   : Int = mapTileWidth * 32
+  def mapPixelHeight  : Int = mapTileHeight * 32
+  def mapWalkWidth    : Int = mapTileWidth * 4
+  def mapWalkHeight   : Int = mapTileHeight * 4
   def framesSince(previousFrame: Int): Int = Math.max(0, frame - previousFrame)
-  
+
   def onFrame() {
     frame = With.game.getFrameCount
   }
-  
+
   def onStart() {
-    game.setLatCom(false)
     game.enableFlag(Flag.UserInput)
+    game.setLatCom(false)
     game.setLocalSpeed(0)
-    
-    proxy             = new ProxyBWMirror
+
+    ////////////////
+    // Basic data //
+    ////////////////
+
+    frame             = 0
+    proxy             = new ProxyBWAPI
     self              = Players.get(game.self)
     neutral           = Players.get(game.neutral)
     enemies           = game.enemies.asScala.map(Players.get).toVector
@@ -106,9 +110,22 @@ object With {
     mapTileHeight     = game.mapHeight
     mapFileName       = game.mapFileName
     mapId             = StarCraftMapMatcher.clean(mapFileName)
+
+    ///////////////////
+    // Configuration //
+    ///////////////////
+
+    bwapiData         = new BwapiData
     configuration     = new Configuration
     logger            = new Logger
-    initializeBWTA()
+    ConfigurationLoader.load()
+
+    ////////////////////
+    // Normal systems //
+    ////////////////////
+
+    analyzeTerrain()
+
     agents            = new Agency
     architecture      = new Architecture
     bank              = new Bank
@@ -117,7 +134,6 @@ object With {
     buildOrderHistory = new MasterBuildOrderHistory
     buildPlans        = new MasterBuildPlans
     bullets           = new Bullets
-    bwapiData         = new BwapiData
     camera            = new Camera
     commander         = new Commander
     coordinator       = new Coordinator
@@ -145,15 +161,13 @@ object With {
     viewport          = new Viewport
     visualization     = new Visualization
     yolo              = new Yolo
-    
-    game.setLocalSpeed(0)
   }
   
   def onEnd() {
     With.logger.flush()
   }
   
-  private def initializeBWTA() {
+  private def analyzeTerrain() {
     With.logger.debug("Loading BWTA for " + With.game.mapName + " at " + With.game.mapFileName())
     try {
       BWTA.readMap(With.game)
@@ -166,7 +180,4 @@ object With {
       BWTA.analyze()
     }
   }
-
-  // For debugging convenience
-  def selected: FriendlyUnitInfo = With.units.ours.find(_.selected).get
 }

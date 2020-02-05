@@ -16,7 +16,7 @@ abstract class Action {
     if (( ! requiresReadiness || unit.ready) && allowed(unit)) {
       val previousCredit = unit.agent.lastAction
       if (giveCredit) unit.agent.lastAction = Some(this)
-      if (With.configuration.debugging()) {
+      if (With.configuration.debugging) {
         unit.agent.actionsPerformed += this
       }
       perform(unit)

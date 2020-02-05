@@ -89,7 +89,7 @@ class Simulation(
     estimation.deathsEnemy        = unitsEnemy  .count(_.dead)
     estimation.totalUnitsUs       = unitsOurs   .size
     estimation.totalUnitsEnemy    = unitsEnemy  .size
-    if (With.configuration.debugging()) {
+    if (With.configuration.debugging) {
       estimation.debugReport ++= everyone.map(simulacrum => (simulacrum.realUnit, simulacrum.reportCard))
       estimation.events             = everyone.flatMap(_.events).sortBy(_.frame)
     }

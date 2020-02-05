@@ -2,7 +2,6 @@ package Micro.Actions.Combat.Maneuvering
 
 import Information.Geography.Pathfinding.Types.TilePath
 import Lifecycle.With
-import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -14,9 +13,11 @@ class Traverse(path: TilePath, move: Boolean = true) extends Action {
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     unit.agent.path = Some(path)
     path.tiles.get.foreach(With.coordinator.gridPathOccupancy.addUnit(unit, _))
-    val lookaheadDefault = (2 * unit.unitClass.haltPixels + unit.topSpeed * With.reaction.agencyAverage / 32).toInt
-    val lookaheadFinal = PurpleMath.clamp(lookaheadDefault, 8, 12)
-    unit.agent.toTravel = Some(path.tiles.get.take(lookaheadFinal).last.pixelCenter)
+
+    // 5 was the recommendation from McRave.
+    // It avoids putting units in situations where they're trying to move just to the other side of a building,
+    // which can cause them to get stuck.
+    unit.agent.toTravel = Some(path.tiles.get.take(5).last.pixelCenter)
 
     if (move) {
       Move.delegate(unit)

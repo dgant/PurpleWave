@@ -1,23 +1,27 @@
-package Debugging
-
-import java.io.File
+package Lifecycle
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
-import Lifecycle.With
+import Strategery.Playbook
 
 class Configuration {
 
   /////////////////////////
-  // Tournament Settings //
+  // Tournament settings //
   /////////////////////////
-  
-  var enableSurrenders                = true
-  var enablePerformanceStops          = true
-  var enablePerformanceSurrender      = false
-  var enableChat                      = true
-  var enableStreamManners             = true
-  var identifyGhostUnits              = false
-  var targetFrameDurationMilliseconds = 35
+
+  var enableSurrenders                = false
+  var enableChat                      = false
+  var targetFrameDurationMilliseconds = 30
+
+  ///////////////////
+  // Mode settings //
+  ///////////////////
+
+  var humanMode                       = false
+  var visualizeFun                    = false
+  var visualizeDebug                  = false
+  var debugging                       = false
+  var debugPauseThreshold: Int        = 24 * 60 * 60
   
   //////////////
   // Strategy //
@@ -28,6 +32,8 @@ class Configuration {
   var strategyRandomness  = 0.1
   var historyHalfLife     = 3.0
   var recentFingerprints  = 2
+  var forcedStrategy: Option[String] = None
+  var forcedPlaybook: Option[Playbook] = None
   
   /////////////
   // Battles //
@@ -73,9 +79,10 @@ class Configuration {
   // Performance //
   /////////////////
 
-  var doAbsolutelyNothing                 = false
-  var foreignUnitUpdatePeriod             = 4
-  val friendlyUnitUpdatePeriod            = 4
+
+  var enablePerformancePauses             = true
+  var foreignUnitUpdatePeriod             = 1
+  val friendlyUnitUpdatePeriod            = 1
   var performanceMinimumUnitSleep         = 2
   var maximumGamesHistoryPerOpponent      = 500
   
@@ -116,24 +123,4 @@ class Configuration {
   var cameraViewportHeight        = 362
   var conservativeViewportWidth   = 640 + cameraViewportWidth
   var conservativeViewportHeight  = 480 + cameraViewportHeight
-
-  class FileFlag(filename: String) {
-    private lazy val fullPath: String = With.bwapiData.ai + filename
-    private lazy val enabled: Boolean = {
-      try {
-        new File(fullPath).exists()
-      }
-      catch { case exception: Exception =>
-        With.logger.warn("Exception looking for flag file at: " + fullPath)
-        With.logger.onException(exception)
-        false
-      }
-    }
-    def apply(): Boolean = enabled
-  }
-
-  val humanMode = new FileFlag("human-mode-is.on")
-  val visualize = new FileFlag("visualizations-are.on")
-  val debugging = new FileFlag("debugging-is.on")
-  def debugPauseThreshold: Int = if (debugging()) 250 else 24 * 60 * 60
 }

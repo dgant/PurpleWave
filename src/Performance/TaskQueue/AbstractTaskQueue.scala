@@ -36,7 +36,7 @@ abstract class AbstractTaskQueue {
     
       if (task.framesSinceRunning > task.maxConsecutiveSkips
           || With.performance.millisecondsLeftThisFrame > expectedMilliseconds
-          || ! With.performance.enablePerformanceStops) {
+          || ! With.performance.enablePerformancePauses) {
         task.run()
       } else {
         task.skip()

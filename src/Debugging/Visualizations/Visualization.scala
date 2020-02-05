@@ -89,7 +89,7 @@ class Visualization {
   private def requireInitialization() {
     if (initialized) return
     initialized = true
-    enabled = With.configuration.visualize()
+    enabled = With.configuration.visualizeDebug
     screen  = With.configuration.visualizeScreen
     map     = With.configuration.visualizeMap
     var random = Random.nextDouble()

@@ -38,7 +38,7 @@ object FallBack extends ActionTechnique {
     if ( ! other.canAttack(unit)) return None
     if ( ! unit.canAttack(other)) return Some(0.0)
 
-    if (unit.topSpeed >= other.topSpeed) return Some(0.0)
+    if ((unit.unitClass.attackAnimationFrames > 2 || unit.unitClass.needsToTurnToShoot) && unit.topSpeed >= other.topSpeed) return Some(0.0)
     if (unit.pixelRangeAgainst(other) < other.pixelRangeAgainst(unit)) return Some(0.0)
     Some(1.0)
   }

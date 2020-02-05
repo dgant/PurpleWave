@@ -5,7 +5,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object KeyboardCommands {
   def quitVsHuman(): Unit = {
-    if (With.configuration.humanMode()) With.game.leaveGame()
+    if (With.configuration.humanMode) With.game.leaveGame()
   }
 
   def onSendText(text: String) {
@@ -22,8 +22,7 @@ object KeyboardCommands {
       case "2"          => With.game.setLocalSpeed(60)    ; With.configuration.camera = false
       case "3"          => With.game.setLocalSpeed(30)    ; With.configuration.camera = false
       case "4"          => With.game.setLocalSpeed(0)     ; With.configuration.camera = false
-      case "d"          => With.configuration.doAbsolutelyNothing = With.configuration.doAbsolutelyNothing
-      case "perform"    => { With.performance.enablePerformanceStops = ! With.performance.enablePerformanceStops; Manners.chat("Performance stops? " + With.performance.enablePerformanceStops) }
+      case "perform"    => { With.configuration.enablePerformancePauses = ! With.performance.enablePerformancePauses; Manners.chat("Performance stops? " + With.configuration.enablePerformancePauses) }
       case "map"        => Manners.chat("The current map is " + With.game.mapName + ": " + With.game.mapFileName)
       case "strategize" => With.strategy.selectInitialStrategies
 

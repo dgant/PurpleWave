@@ -12,7 +12,7 @@ import Strategery.Strategies.Terran.TvZ.TvZProxy8Fact
 import Strategery.Strategies.Terran._
 import Strategery.Strategies.Zerg._
 
-class EmptyPlaybook {
+class Playbook {
   val none: Seq[Strategy] = Seq.empty
   lazy val forced   : Seq[Strategy] = none
   lazy val disabled : Seq[Strategy] = none
@@ -61,16 +61,20 @@ object StrategyGroups {
   )
 }
 
-class PurpleWavePlaybook extends EmptyPlaybook {
+class NormalPlaybook extends Playbook {
   override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy
 }
 
-class TournamentPlaybook extends PurpleWavePlaybook {
-  override def strategySelectionPolicy: StrategySelectionPolicy = if (Sparkle.matches) StrategySelectionGreedy else StrategySelectionTournament
+object TournamentPlaybook extends NormalPlaybook {
+  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionTournament
 }
 
-class TestingPlaybook extends PurpleWavePlaybook {
+object HumanPlaybook extends NormalPlaybook {
+  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionDynamic
+}
+
+class TestingPlaybook extends NormalPlaybook {
   override lazy val forced: Seq[Strategy] = Seq(PvZ10Gate, PvZCorsair, PvZMidgameBisu, PvZLateGameTemplar)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
   override def respectOpponent: Boolean = false
@@ -78,4 +82,4 @@ class TestingPlaybook extends PurpleWavePlaybook {
   override def respectHistory: Boolean = false
 }
 
-object Playbook extends PurpleWavePlaybook {}
+object FinalPlaybook extends NormalPlaybook {}

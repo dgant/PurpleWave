@@ -9,32 +9,32 @@ import Planning.UnitMatchers._
 import ProxyBwapi.UnitClasses.UnitClass
 
 class Attack(
-  matcher: UnitMatcher = UnitMatchNone,
-  counter: UnitCounter = UnitCountEverything)
+    matcherArgument: UnitMatcher = UnitMatchNone,
+    counter: UnitCounter = UnitCountEverything)
   extends SquadPlan[GoalAttack] {
 
   override val goal: GoalAttack = new GoalAttack
 
-  val forcedAttackers: LockUnits = new LockUnits{
+  val conscript = matcherArgument != UnitMatchNone
+  val matcher = if (matcherArgument == UnitMatchNone) UnitMatchAnd(UnitMatchRecruitableForCombat, UnitMatchNot(UnitMatchWorkers)) else matcherArgument
+
+  private val attackers: LockUnits = new LockUnits{
     unitMatcher.set(matcher)
     unitCounter.set(counter)
   }
 
   override def onUpdate() {
-    var actualMatcher: UnitMatcher = matcher
-    if (actualMatcher == UnitMatchNone) {
-      actualMatcher = UnitMatchAnd(UnitMatchRecruitableForCombat, UnitMatchNot(UnitMatchWorkers))
-    } else {
-      forcedAttackers.acquire(this)
-      squad.addConscripts(forcedAttackers.units)
+    if (conscript) {
+      attackers.acquire(this)
+      squad.addConscripts(attackers.units)
     }
-    goal.unitMatcher = actualMatcher
-    goal.unitCounter = counter
-    if (With.units.ours.exists(actualMatcher.accept)) {
+    goal.unitMatcher = attackers.unitMatcher.get
+    goal.unitCounter = attackers.unitCounter.get
+    if (With.units.ours.exists(matcher.accept)) {
       With.blackboard.wantToAttack.set(true)
     }
     super.onUpdate()
   }
 
-  description.set(super.toString + (if (matcher.isInstanceOf[UnitClass]) "(" + matcher + ")" else ""))
+  description.set(super.toString + (if (matcherArgument.isInstanceOf[UnitClass]) "(" + matcherArgument + ")" else ""))
 }

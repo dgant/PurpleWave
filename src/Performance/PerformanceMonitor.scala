@@ -18,8 +18,7 @@ class PerformanceMonitor {
   var framesOver1000  = 0
   var framesOver10000 = 0
 
-  var enablePerformanceStops: Boolean = With.configuration.enablePerformanceStops // For disabling performance stops while debugging
-  var enablePerformanceSurrenders: Boolean = With.configuration.enablePerformanceSurrender
+  def enablePerformancePauses: Boolean = With.configuration.enablePerformancePauses // For disabling performance stops while debugging
 
   var lastUniqueUnitIdCount: Int = 0
   var lastUniqueDeadIdCount: Int = 0
@@ -47,7 +46,7 @@ class PerformanceMonitor {
     uniqueFriendlyUnitIds.clear()
     uniqueFriendlyDeadIds.clear()
     var millisecondDifference = millisecondsSpentThisFrame
-    if (With.configuration.debugging() && millisecondDifference > With.configuration.debugPauseThreshold) {
+    if (With.configuration.debugging && millisecondDifference > With.configuration.debugPauseThreshold) {
       millisecondDifference = meanFrameMilliseconds
     }
 
@@ -66,7 +65,7 @@ class PerformanceMonitor {
   }
 
   def continueRunning: Boolean = {
-    With.frame == 0 || millisecondsLeftThisFrame > 1 || ! enablePerformanceStops
+    With.frame == 0 || millisecondsLeftThisFrame > 1 || ! enablePerformancePauses
   }
 
   def violatedThreshold: Boolean = {
@@ -78,7 +77,7 @@ class PerformanceMonitor {
   }
 
   def danger: Boolean = (
-    (With.configuration.enableStreamManners || With.configuration.enablePerformanceSurrender)
+    With.configuration.enablePerformancePauses
     && (
       framesOverShort > 160 ||
       framesOver1000  > 5   ||

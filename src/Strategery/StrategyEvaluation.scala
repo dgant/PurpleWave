@@ -15,9 +15,9 @@ case class StrategyEvaluation(strategy: Strategy) {
   private val importanceWithStarts  = 3.0
   private val multiplayer           = With.enemies.size > 1
   
-  val playbookOrder         : Int                       = if (Playbook.strategyOrder.contains(strategy)) Playbook.strategyOrder.indexOf(strategy) else Int.MaxValue
+  val playbookOrder         : Int                       = if (FinalPlaybook.strategyOrder.contains(strategy)) FinalPlaybook.strategyOrder.indexOf(strategy) else Int.MaxValue
   val games                 : Iterable[HistoricalGame]  = With.history.games.filter(_.weEmployed(strategy))
-  val gamesVsEnemy          : Iterable[HistoricalGame]  = if (multiplayer) Iterable.empty else games.filter(_.enemyName == Playbook.enemyName)
+  val gamesVsEnemy          : Iterable[HistoricalGame]  = if (multiplayer) Iterable.empty else games.filter(_.enemyName == FinalPlaybook.enemyName)
   val patienceGames         : Double  = getConfidenceSamples(strategy)
   val winrateVsEnemy        : Double  = winrate(gamesVsEnemy)
   val interestVsEnemy       : Double  = interest(gamesVsEnemy, patienceGames)

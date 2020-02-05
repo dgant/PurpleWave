@@ -5,7 +5,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{Aggression, Attack, RecruitFreelancers}
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -41,10 +41,15 @@ class TvEProxyBBS extends GameplanTemplate {
         new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)),
         new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)))
     }
+
+  object AttackWithWorkersCondition extends UnitsAtLeast(2, Terran.Marine)
+  object CountWorkerAttackers extends UnitCountExcept(8, UnitMatchWorkers)
   
   override def attackPlan: Plan = new Parallel(
     new Attack,
-    new Attack(Terran.SCV))
+    new Trigger(
+      AttackWithWorkersCondition,
+      new Attack(Terran.SCV, CountWorkerAttackers)))
   
   override def workerPlan: Plan = NoPlan()
   override def supplyPlan: Plan = new If(
@@ -66,8 +71,8 @@ class TvEProxyBBS extends GameplanTemplate {
     new If(
       new UnitsAtLeast(9, Terran.SCV),
       new BuildBunkersAtEnemy(3)),
-    new Trigger(
-      new UnitsAtLeast(2, Terran.Marine),
-      new RecruitFreelancers(UnitMatchWorkers, new UnitCountExcept(8, UnitMatchWorkers)))
+
+    // Reenable once we stop the conscription workaround for attack squads
+    // new Trigger(AttackWithWorkersCondition, new RecruitFreelancers(UnitMatchWorkers, CountWorkerAttackers))
   )
 }

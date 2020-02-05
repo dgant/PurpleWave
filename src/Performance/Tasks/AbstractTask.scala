@@ -47,7 +47,7 @@ abstract class AbstractTask {
 
     // Debugging (ie. setting breakpoints) terribly breaks performance monitoring;
     // so we detect debug pauses and ignore them
-    if (With.configuration.debugging() && millisecondsDelta >= With.configuration.debugPauseThreshold) {
+    if (With.configuration.debugging && millisecondsDelta >= With.configuration.debugPauseThreshold) {
       millisecondsDelta = runMillisecondsMean
     }
 

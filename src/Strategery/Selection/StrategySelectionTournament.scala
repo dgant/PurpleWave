@@ -1,7 +1,7 @@
 package Strategery.Selection
 
 import Lifecycle.With
-import Strategery.{Plasma, Playbook}
+import Strategery.{Plasma, FinalPlaybook}
 import Strategery.Strategies.Strategy
 
 object StrategySelectionTournament extends StrategySelectionPolicy {
@@ -11,7 +11,7 @@ object StrategySelectionTournament extends StrategySelectionPolicy {
       return StrategySelectionGreedy.chooseBest(topLevelStrategies, expand)
     }
     
-    val enemyName = Playbook.enemyName
+    val enemyName = FinalPlaybook.enemyName
     val opponent =
       Opponents.all.find(_.matches(enemyName)).orElse(
         Opponents.all.find(_.matchesLoosely(enemyName)).orElse(

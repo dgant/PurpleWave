@@ -26,7 +26,7 @@ class ForeignUnitTracker {
 
     val unitsByIdVisible = Players.all.filterNot(_.isFriendly).flatMap(_.rawUnits)
       .map(unit => (unit.getID, unit))
-      .filter(isValidForeignUnit)
+      .filter(_._2.exists())
 
     unitsByIdKnown.foreach(pair => pair._2.flagInvisible())
     for (pair <- unitsByIdVisible) {
@@ -54,23 +54,7 @@ class ForeignUnitTracker {
   private def initialize() {
     if ( ! initialized) {
       initialized = true
-      flagGhostUnits()
       trackStaticUnits()
-    }
-  }
-  
-  private def flagGhostUnits() {
-    if ( ! With.configuration.identifyGhostUnits) {
-      return
-    }
-    //At the start of the game BWAPI sometimes gives us enemy units that don't make any sense.\
-    // TODO: Track ghost minerals too
-    Players.all
-    val ghostUnits = With.game.getAllUnits.asScala.filter(unit => Players.get(unit.getPlayer).isEnemy)
-    enemyGhostUnits = ghostUnits.map(_.getID).toSet
-    if (ghostUnits.nonEmpty) {
-      With.logger.warn("Found ghost units at start of game:")
-      ghostUnits.map(u => u.getType + ", " + u.getPlayer.getName + " " + u.getPosition).foreach(With.logger.warn)
     }
   }
   
@@ -138,28 +122,5 @@ class ForeignUnitTracker {
     unit.flagDead()
     unitsByIdKnown.remove(unit.id)
     With.units.historicalUnitTracker.add(unit)
-  }
-  
-  private def isValidForeignUnit(unitPair: (Int, bwapi.Unit)): Boolean = {
-    val id = unitPair._1
-    val unit = unitPair._2
-    
-    if ( ! unit.exists) {
-      return false
-    }
-    
-    if (With.configuration.identifyGhostUnits) {
-      if (enemyGhostUnits.contains(id)) {
-        if (With.frame > 5 && unit.isVisible) {
-          // Looks like it's a legit unit! It just happened to share an ID with a ghost unit
-          enemyGhostUnits = enemyGhostUnits - id
-        }
-        else {
-          return false
-        }
-      }
-    }
-    
-    true
   }
 }

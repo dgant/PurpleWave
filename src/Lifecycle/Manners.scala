@@ -14,15 +14,8 @@ object Manners {
       && With.units.enemy.exists(_.unitClass.isResourceDepot)) {
       surrender()
     }
-    if (With.configuration.enableSurrenders
-      && With.performance.enablePerformanceStops
-      && With.performance.enablePerformanceSurrenders
-      && With.performance.framesOverShort > 1000) {
-      With.logger.error("Quitting due to performance failure")
-      surrender()
-    }
     if (With.frame == GameTime(0, 20)()) {
-      if (With.configuration.humanMode()) {
+      if (With.configuration.humanMode) {
         chat("Good luck, " + With.enemy.name + ", and have fun!")
       }
       else {
@@ -37,7 +30,7 @@ object Manners {
   }
 
   def debugChat(text: String): Unit = {
-    if (With.configuration.debugging()) {
+    if (With.configuration.debugging) {
       chat(text)
     }
   }
@@ -51,7 +44,7 @@ object Manners {
   
   def onEnd(isWinner: Boolean) {
     chat(
-      if (With.configuration.humanMode())
+      if (With.configuration.humanMode)
         "Good game, " + With.enemy.name
       else if (isWinner)
         "Good game! I still think you're beautiful."

@@ -22,9 +22,7 @@ class Bot() extends DefaultBWListener {
       }
       With.performance.startFrame()
       With.onFrame()
-      if ( ! With.configuration.doAbsolutelyNothing) {
-        With.tasks.run()
-      }
+      With.tasks.run()
       With.performance.endFrame()
     }
     catch { case exception: Exception => With.logger.onException(exception) }

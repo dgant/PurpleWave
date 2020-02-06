@@ -18,7 +18,7 @@ object StrategySelectionTournament extends StrategySelectionPolicy {
           Opponents.all.find(_.matchesVeryLoosely(enemyName))))
     
     if (opponent.isEmpty) {
-      With.logger.warn("Failed to find Opponent matching " + enemyName)
+      With.logger.warn("Didn't find opponent plan for " + enemyName)
       return StrategySelectionGreedy.chooseBest(topLevelStrategies, expand)
     }
     

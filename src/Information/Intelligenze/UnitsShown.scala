@@ -27,4 +27,6 @@ class UnitsShown {
   def allEnemies(unitClass: UnitClass): Int = {
     With.enemies.map(apply(_, unitClass)).sum
   }
+
+  def all(player: PlayerInfo): Map[UnitClass, mutable.HashSet[Int]] = unitCounts(player)
 }

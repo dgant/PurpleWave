@@ -1,7 +1,6 @@
 package Lifecycle
 
 import Debugging._
-import Strategery.History.OpponentLogger
 import bwapi.DefaultBWListener
 
 class Bot() extends DefaultBWListener {
@@ -9,7 +8,6 @@ class Bot() extends DefaultBWListener {
   override def onStart() {
     try {
       With.onStart()
-      With.logger.debug("OnStart: Frame " + With.frame)
       With.history.onStart()
     }
     catch { case exception: Exception => With.logger.onException(exception) }
@@ -17,9 +15,6 @@ class Bot() extends DefaultBWListener {
 
   override def onFrame() {
     try {
-      if (With.frame < 6) {
-        With.logger.debug("OnFrame: Frame " + With.frame)
-      }
       With.performance.startFrame()
       With.onFrame()
       With.tasks.run()
@@ -64,7 +59,6 @@ class Bot() extends DefaultBWListener {
   override def onEnd(isWinner: Boolean) {
     try {
       With.history.onEnd(isWinner)
-      OpponentLogger.onEnd()
       With.tasks.onEnd()
       With.storyteller.onEnd()
       Manners.onEnd(isWinner)

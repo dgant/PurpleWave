@@ -3,6 +3,7 @@ package Debugging
 import java.io.{File, PrintWriter}
 import java.util.Calendar
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.{Manners, With}
 
 import scala.collection.mutable.ListBuffer
@@ -54,8 +55,9 @@ class Logger {
   }
   
   private def log(message: String, chat: Boolean = true) {
-    logMessages.append(message)
-    System.err.println(message)
+    var logMessage = With.frame + " | " + new GameTime(With.frame).toString + " | " + message
+    logMessages.append(logMessage)
+    System.err.println(logMessage)
     if (chat && With.configuration.debugging) Manners.chat(message)
   }
   

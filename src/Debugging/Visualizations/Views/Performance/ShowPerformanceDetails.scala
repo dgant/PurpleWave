@@ -22,6 +22,6 @@ object ShowPerformanceDetails extends View {
         task.totalViolatedThreshold.toString,
         task.totalViolatedRules.toString
       ))
-    DrawScreen.table(5, With.visualization.lineHeightSmall * 6, Vector(title) ++ Vector(headers) ++ body)
+    DrawScreen.table(5, With.visualization.lineHeightSmall * 6, With.tasks.statusTable)
   }
 }

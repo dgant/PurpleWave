@@ -1,7 +1,7 @@
 package Lifecycle
 
 import Debugging.Visualizations.{Viewport, Visualization}
-import Debugging.{Camera, Logger}
+import Debugging.{Camera, Logger, Storyteller}
 import Information.Battles.BattleClassifier
 import Information.Geography.Geography
 import Information.Geography.Pathfinding.Paths
@@ -74,6 +74,7 @@ object With {
   var recruiter         : Recruiter               = _
   var scheduler         : Scheduler               = _
   var strategy          : Strategist              = _
+  var storyteller       : Storyteller             = _
   var squads            : Squads                  = _
   var tasks             : AbstractTaskQueue       = _
   var units             : UnitTracker             = _
@@ -155,6 +156,7 @@ object With {
     recruiter         = new Recruiter
     scheduler         = new Scheduler
     strategy          = new Strategist
+    storyteller       = new Storyteller
     squads            = new Squads
     tasks             = new TaskQueueGlobal
     units             = new UnitTracker

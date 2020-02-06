@@ -165,8 +165,8 @@ object ShowUnitsFriendly extends View {
     if (showLeaders) {
       if (agent.leader().contains(unit)) {
         val start = unit.pixelCenter.add(0, unit.unitClass.dimensionDown + 8)
-        DrawMap.circle(start, 5, color = unit.player.colorDeep, solid = true)
-        DrawMap.drawStar(start.subtract(1, 1), 4, Colors.NeonYellow) // Not sure why the subtract(1, 1) is necessary to align but oh well
+        DrawMap.circle(start, 5, color = unit.player.colorMidnight, solid = true)
+        DrawMap.drawStar(start, 4, Colors.NeonYellow)
       }
     }
   }

@@ -44,4 +44,30 @@ abstract class AbstractTaskQueue {
       i += 1
     }
   }
+
+  def statusTable: Vector[Vector[String]] = {
+        val title = Vector("Cutoff: ", With.configuration.targetFrameDurationMilliseconds + "ms")
+    val headers = Vector("Task", "Last run", " Run %", "Seconds", "Avg ms", "Max (Recent)", "Max (All time)", "Extended", "Disqualifying")
+    val body = With.tasks.tasks
+      .sortBy(_.getClass.getSimpleName)
+      .map(task => Vector(
+        task.getClass.getSimpleName.replace("Task", ""),
+        "X" * Math.min(10, Math.max(0, task.framesSinceRunning - 1)),
+        " " + (100 * (1.0 + task.totalRuns) / (1.0 + task.totalSkips + task.totalRuns)).toInt.toString + "%%",
+        (task.runMillisecondsTotal / 1000).toString,
+        task.runMillisecondsMean.toString,
+        task.runMillisecondsMaxRecent().toString,
+        task.runMillisecondsMaxAllTime.toString,
+        task.totalViolatedThreshold.toString,
+        task.totalViolatedRules.toString
+      ))
+    Vector(title) ++ Vector(headers) ++ body
+  }
+
+  def status: String = statusTable.map(_.mkString("\t")).mkString("\n")
+
+  def onEnd(): Unit = {
+    With.logger.debug(status)
+    tasks.foreach(_.onEnd())
+  }
 }

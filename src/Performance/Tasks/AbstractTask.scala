@@ -27,6 +27,7 @@ abstract class AbstractTask {
   private var alreadyViolatedRules      = false
   
   protected def onRun()
+  def onEnd() {}
   
   final def framesSinceRunning      : Int     = Math.max(1, With.framesSince(lastRunFrame))
   final def totalRuns               : Int     = totalRunCount

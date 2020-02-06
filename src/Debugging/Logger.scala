@@ -55,9 +55,8 @@ class Logger {
   
   private def log(message: String, chat: Boolean = true) {
     logMessages.append(message)
-    if (chat && With.configuration.debugging) {
-      Manners.chat(message)
-    }
+    System.err.println(message)
+    if (chat && With.configuration.debugging) Manners.chat(message)
   }
   
   private def formatException(exception: Exception): String = {

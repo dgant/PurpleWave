@@ -23,6 +23,7 @@ class Bot() extends DefaultBWListener {
       With.performance.startFrame()
       With.onFrame()
       With.tasks.run()
+      With.storyteller.onFrame()
       With.performance.endFrame()
     }
     catch { case exception: Exception => With.logger.onException(exception) }
@@ -64,6 +65,8 @@ class Bot() extends DefaultBWListener {
     try {
       With.history.onEnd(isWinner)
       OpponentLogger.onEnd()
+      With.tasks.onEnd()
+      With.storyteller.onEnd()
       Manners.onEnd(isWinner)
       With.onEnd()
     }

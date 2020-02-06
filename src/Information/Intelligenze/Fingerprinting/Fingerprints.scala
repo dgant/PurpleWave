@@ -64,6 +64,8 @@ class Fingerprints {
     fingerprint
   }
 
+  def status: String = all.filter(_.matches).map(_.toString.replaceAll("Fingerprint", "")).mkString("\n")
+
   // Generic
   lazy val workerRush       = addFingerprint(new FingerprintWorkerRush)
   lazy val gasSteal         = addFingerprint(new FingerprintGasSteal)

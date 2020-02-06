@@ -58,6 +58,7 @@ class Bot() extends DefaultBWListener {
   
   override def onEnd(isWinner: Boolean) {
     try {
+      With.logger.debug("Game ended in " + (if (isWinner) "victory" else "defeat"))
       With.history.onEnd(isWinner)
       With.tasks.onEnd()
       With.storyteller.onEnd()

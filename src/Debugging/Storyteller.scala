@@ -18,12 +18,13 @@ class Storyteller {
     }
   }
 
-  val stories = Seq[Story](
+  val stories: Seq[Story] = Seq[Story](
     Story("Strategy", () => With.strategy.selectedCurrently.map(_.toString).mkString(" ")),
     Story("Status", () => With.blackboard.status.get.mkString(", ")),
     Story("Enemy race", () => With.enemy.raceCurrent.toString),
     Story("Fingerprints", () => With.fingerprints.status),
-    Story("Enemy units", () => With.intelligence.unitsShown.all(With.enemy).filter(_._2.size > 0).map(_._1.toString).mkString(", "))
+    Story("Our bases", () => With.geography.ourBases.size.toString),
+    Story("Enemy bases", () => With.geography.enemyBases.size.toString)
   )
 
   def onFrame(): Unit = {
@@ -38,6 +39,7 @@ class Storyteller {
     if (unitsDiff.nonEmpty) {
       With.logger.debug("New enemy units: " + unitsDiff.map(_.toString).mkString(","))
     }
+    unitsBefore = unitsAfter
   }
 
   private def logPerformance() {

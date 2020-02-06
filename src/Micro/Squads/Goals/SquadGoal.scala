@@ -5,7 +5,7 @@ import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Micro.Squads.{QualityCounter, Squad, SquadBatch}
 import Planning.UnitCounters.{UnitCountEverything, UnitCounter}
-import Planning.UnitMatchers.{UnitMatchRecruitableForCombat, UnitMatcher}
+import Planning.UnitMatchers.{UnitMatchAnything, UnitMatcher}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.{ByOption, CountMap}
 
@@ -68,7 +68,7 @@ trait SquadRecruiterSimple extends SquadRecruiter {
   protected var currentBatch: SquadBatch = _
   protected var qualityCounter: QualityCounter = _
   protected val _candidates = new ArrayBuffer[FriendlyUnitInfo]
-  var unitMatcher: UnitMatcher = UnitMatchRecruitableForCombat
+  var unitMatcher: UnitMatcher = UnitMatchAnything
   var unitCounter: UnitCounter = UnitCountEverything
 }
 

@@ -51,7 +51,7 @@ abstract class AbstractTaskQueue {
     val body = With.tasks.tasks
       .sortBy(_.getClass.getSimpleName)
       .map(task => Vector(
-        task.getClass.getSimpleName.replace("Task", ""),
+        task.getClass.getSimpleName.replace("Task", "").padTo(20, ' '),
         "X" * Math.min(10, Math.max(0, task.framesSinceRunning - 1)),
         " " + (100 * (1.0 + task.totalRuns) / (1.0 + task.totalSkips + task.totalRuns)).toInt.toString + "%%",
         (task.runMillisecondsTotal / 1000).toString,

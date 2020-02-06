@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, Attack, RecruitFreelancers}
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.{Do, NoPlan, Write}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -12,7 +12,6 @@ import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Scouting.{FoundEnemyBase, ScoutAt}
 import Planning.Predicates.Compound.Not
-import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy.{Employing, StartPositionsAtLeast}
 import Planning.UnitCounters.UnitCountExcept
 import Planning.UnitMatchers.UnitMatchWorkers
@@ -44,7 +43,7 @@ class TvEProxy5Rax extends GameplanTemplate {
   override def aggressionPlan = new Aggression(1.5)
   override def workerPlan: Plan = NoPlan()
   override def supplyPlan: Plan = NoPlan()
-  override def attackPlan: Plan = new Parallel(new Attack, new Attack(Terran.SCV))
+  override def attackPlan: Plan = new Parallel(new Attack, new Attack(UnitMatchWorkers, new UnitCountExcept(3, UnitMatchWorkers)))
 
   override val buildOrder = Vector(
     Get(5, Terran.SCV),
@@ -58,8 +57,10 @@ class TvEProxy5Rax extends GameplanTemplate {
     new Write(With.blackboard.pushKiters, true),
     new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
     new Pump(Terran.Marine),
+    /*
     new If(
       new UnitsAtLeast(1, Terran.Marine),
       new RecruitFreelancers(UnitMatchWorkers, new UnitCountExcept(3, UnitMatchWorkers))),
+    */
   )
 }

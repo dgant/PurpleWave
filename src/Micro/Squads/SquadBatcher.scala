@@ -53,10 +53,7 @@ trait SquadBatcher {
         val batchDuration = With.framesSince(lastBatchStart)
         recruitRuntimes += batchDuration
         while (recruitRuntimes.sum > With.reaction.runtimeQueueDuration) { recruitRuntimes.dequeue() }
-        With.logger.debug("Squad batch finished processing " + With.framesSince(activeBatch.frameCreated) + " frames after it was created. Total runtime: " + batchDuration)
       }
     }
-
-    With.logger.debug("SquadBatcher processed " + batchSteps + "steps. Total batches: " + batches.size)
   }
 }

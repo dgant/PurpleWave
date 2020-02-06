@@ -49,7 +49,7 @@ class TvEProxyBBS extends GameplanTemplate {
     new Attack,
     new Trigger(
       AttackWithWorkersCondition,
-      new Attack(Terran.SCV, CountWorkerAttackers)))
+      new Attack(UnitMatchWorkers, CountWorkerAttackers)))
   
   override def workerPlan: Plan = NoPlan()
   override def supplyPlan: Plan = new If(

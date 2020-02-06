@@ -118,6 +118,7 @@ class Visualization {
     ShowEconomy,
     ShowExplosions,
     ShowFingerprints,
+    ShowGradients,
     ShowGrids,
     ShowGroundskeeper,
     ShowHappyUnits,

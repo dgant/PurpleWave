@@ -1,7 +1,7 @@
 package Lifecycle
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
-import Strategery.Playbook
+import Strategery.{DefaultPlaybook, Playbook}
 
 class Configuration {
 
@@ -22,7 +22,7 @@ class Configuration {
   var visualizeDebug                  = false
   var debugging                       = false
   var debugPauseThreshold: Int        = 24 * 60 * 60
-  
+
   //////////////
   // Strategy //
   //////////////
@@ -34,6 +34,7 @@ class Configuration {
   var recentFingerprints  = 2
   var forcedStrategy: Option[String] = None
   var forcedPlaybook: Option[Playbook] = None
+  def playbook: Playbook = forcedPlaybook.getOrElse(DefaultPlaybook)
   
   /////////////
   // Battles //

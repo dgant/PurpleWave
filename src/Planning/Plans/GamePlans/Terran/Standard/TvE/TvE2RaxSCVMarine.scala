@@ -38,7 +38,7 @@ class TvE2RaxSCVMarine extends GameplanTemplate {
     new ReadyToAttack,
     new Parallel(
       new Attack,
-      new Attack(Terran.SCV)))
+      new Attack(UnitMatchWorkers, new UnitCountExcept(5, UnitMatchWorkers))))
 
   override def supplyPlan: Plan = new If(
     new Or(

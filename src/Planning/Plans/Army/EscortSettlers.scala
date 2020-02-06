@@ -27,6 +27,9 @@ class EscortSettlers(
     val enemies       = With.paths.zonePathUnits(settler.get.zone, buildTile.zone).filter(u => u.isEnemy)
     goal.principal    = settler
     squad.enemies     = (enemies ++ settler.get.matchups.threats).distinct
-    super.onUpdate()
+
+    if (squad.enemies.nonEmpty) {
+      super.onUpdate()
+    }
   }
 }

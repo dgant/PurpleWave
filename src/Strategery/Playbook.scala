@@ -82,4 +82,4 @@ class TestingPlaybook extends NormalPlaybook {
   override def respectHistory: Boolean = false
 }
 
-object FinalPlaybook extends NormalPlaybook {}
+object DefaultPlaybook extends NormalPlaybook {}

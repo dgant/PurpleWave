@@ -5,6 +5,7 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Planning.UnitMatchers.{UnitMatchRecruitableForCombat, UnitMatcher}
 import Planning.{Plan, Property}
+import ProxyBwapi.UnitInfo.UnitInfo
 
 class DefendZones extends Plan {
   
@@ -13,12 +14,19 @@ class DefendZones extends Plan {
   val defenderMatcher = new Property[UnitMatcher](UnitMatchRecruitableForCombat)
   
   override def getChildren: Iterable[Plan] = zones.values
+
+  def indicatesDefendableZone(unit: UnitInfo): Boolean = {
+    if ( ! unit.isOurs) return false
+    if ( ! unit.unitClass.isBuilding) return false
+    if (unit.flying && ! unit.unitClass.isTownHall) return false
+    true
+  }
   
   protected override def onUpdate() {
 
     zones.values.foreach(_.goal.unitMatcher = defenderMatcher.get)
 
-    val zoneScores = zones.keys.filter(_.units.exists(u => u.unitClass.isBuilding && u.isOurs)).map(z => (z, zoneValue(z))).toMap
+    val zoneScores = zones.keys.filter(_.units.exists(indicatesDefendableZone)).map(z => (z, zoneValue(z))).toMap
     
     if (zoneScores.isEmpty) return
     

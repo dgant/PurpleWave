@@ -16,11 +16,13 @@ import bwapi.Race
 import scala.collection.mutable
 
 class Strategist {
-    
+
   lazy val selectedInitially: Set[Strategy] = selectInitialStrategies
   
   lazy val map: Option[StarCraftMap] = StarCraftMaps.all.find(_.matches)
 
+  private def playbook: Playbook = With.configuration.playbook
+  
   private var enemyRaceAtLastCheck: Race = With.enemy.raceInitial
   private var selectedLast: Option[Set[Strategy]] = None
   def selectedCurrently: Set[Strategy] = {
@@ -86,14 +88,14 @@ class Strategist {
       With.configuration.strategyRandomness = 0.3
       return StrategySelectionDynamic.chooseBest(strategiesFiltered).toSet
     }
-    FinalPlaybook.strategySelectionPolicy.chooseBestUnfiltered(strategiesUnfiltered).getOrElse(
-      FinalPlaybook.strategySelectionPolicy.chooseBest(strategiesFiltered))
+    playbook.strategySelectionPolicy.chooseBestUnfiltered(strategiesUnfiltered).getOrElse(
+      playbook.strategySelectionPolicy.chooseBest(strategiesFiltered))
       .toSet
   }
 
   private def filterForcedStrategies(strategies: Iterable[Strategy]): Iterable[Strategy] = {
-    if (strategies.exists(FinalPlaybook.forced.contains))
-      strategies.filter(FinalPlaybook.forced.contains)
+    if (strategies.exists(playbook.forced.contains))
+      strategies.filter(playbook.forced.contains)
     else
       strategies
   }
@@ -118,7 +120,7 @@ class Strategist {
     val rampOkay                 = (strategy.entranceInverted || ! isInverted) && (strategy.entranceFlat || ! isFlat) && (strategy.entranceRamped || ! isRamped)
     val rushOkay                 = rushDistanceMean > strategy.rushDistanceMinimum && rushDistanceMean < strategy.rushDistanceMaximum
     val startLocations           = With.geography.startLocations.size
-    val disabledInPlaybook       = FinalPlaybook.disabled.contains(strategy)
+    val disabledInPlaybook       = playbook.disabled.contains(strategy)
     val disabledOnMap            = strategy.mapsBlacklisted.exists(_.matches) || ! strategy.mapsWhitelisted.forall(_.exists(_.matches))
     val appropriateForOurRace    = strategy.ourRaces.exists(_ == ourRace)
     val appropriateForEnemyRace  = strategy.enemyRaces.exists(race => if (race == Race.Unknown) enemyRaceWasUnknown else (enemyRaceStillUnknown || enemyRacesCurrent.contains(race)))
@@ -127,7 +129,7 @@ class Strategist {
     val allowedForOpponent       = strategy.opponentsWhitelisted.forall(_
       .map(formatName)
       .exists(name =>
-        nameMatches(name, FinalPlaybook.enemyName)
+        nameMatches(name, playbook.enemyName)
         || With.enemies.map(e => formatName(e.name)).exists(nameMatches(_, name))))
 
     val output = (
@@ -137,14 +139,14 @@ class Strategist {
       &&  ! disabledInPlaybook
       &&  appropriateForOurRace
       &&  appropriateForEnemyRace
-      &&  ( ! FinalPlaybook.respectOpponent || allowedForOpponent)
-      &&  ( ! FinalPlaybook.respectMap || ! disabledOnMap)
-      &&  ( ! FinalPlaybook.respectMap || strategy.startLocationsMin <= startLocations)
-      &&  ( ! FinalPlaybook.respectMap || strategy.startLocationsMax >= startLocations)
-      &&  ( ! FinalPlaybook.respectMap || rampOkay)
-      &&  ( ! FinalPlaybook.respectMap || rushOkay)
-      &&  ( ! FinalPlaybook.respectHistory || allowedGivenHistory)
-      &&  ( ! FinalPlaybook.respectHistory || playedEnemyOftenEnough)
+      &&  ( ! playbook.respectOpponent || allowedForOpponent)
+      &&  ( ! playbook.respectMap || ! disabledOnMap)
+      &&  ( ! playbook.respectMap || strategy.startLocationsMin <= startLocations)
+      &&  ( ! playbook.respectMap || strategy.startLocationsMax >= startLocations)
+      &&  ( ! playbook.respectMap || rampOkay)
+      &&  ( ! playbook.respectMap || rushOkay)
+      &&  ( ! playbook.respectHistory || allowedGivenHistory)
+      &&  ( ! playbook.respectHistory || playedEnemyOftenEnough)
     )
     
     output

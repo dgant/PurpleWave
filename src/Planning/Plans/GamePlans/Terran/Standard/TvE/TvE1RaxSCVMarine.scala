@@ -52,7 +52,7 @@ class TvE1RaxSCVMarine extends GameplanTemplate {
   override def aggressionPlan = new Aggression(1.5)
   override def workerPlan: Plan = NoPlan()
   override def supplyPlan: Plan = NoPlan()
-  override def attackPlan: Plan = new Parallel(new Attack, new Attack(Terran.SCV))
+  override def attackPlan: Plan = new Parallel(new Attack, new Attack(UnitMatchWorkers, new UnitCountExcept(3, UnitMatchWorkers)))
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new TvZFourPoolEmergency,

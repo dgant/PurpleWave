@@ -37,7 +37,7 @@ class Storyteller {
     val unitsAfter = With.enemies.flatMap(With.intelligence.unitsShown.all(_).view).filter(_._2.nonEmpty).map(_._1).toSet
     val unitsDiff = unitsAfter -- unitsBefore
     if (unitsDiff.nonEmpty) {
-      With.logger.debug("New enemy units: " + unitsDiff.map(_.toString).mkString(","))
+      With.logger.debug("New enemy units: " + unitsDiff.map(_.toString).mkString(", "))
     }
     unitsBefore = unitsAfter
   }

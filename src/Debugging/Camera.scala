@@ -1,11 +1,11 @@
 package Debugging
 
-import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints, Tile, TileRectangle}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
+import bwapi.MouseButton
 
 class Camera {
   
@@ -18,29 +18,40 @@ class Camera {
   private val tweenFrames       = 24
   private var impatienceFrames  = 24 * 10
   
-  
-  var interestByBattle  : Map[Battle,   Double] = Map.empty
-  var interestByUnit    : Map[UnitInfo, Double] = Map.empty
+  var obscurityByUnit   : Map[UnitInfo, Double] = Map.empty
   var visibleArea       : TileRectangle         = TileRectangle(Tile(0, 0), Tile(0, 0))
   var visibleUnits      : Set[UnitInfo]         = Set.empty
-  
+  var enabled           : Boolean               = true
+
   private def totalInterest(unit: UnitInfo): Double = {
-    val interestBattle  = if (unit.battle.isDefined) interestByBattle.getOrElse(unit.battle.get, 0.0) else 0.0
-    val interestUnit    = interestByUnit(unit)
-    interestBattle * interestUnit * unit.subjectiveValue
+    val interestBattle    = if (unit.battle.exists(_.enemy.units.exists(u => u.canAttack && ! u.unitClass.isWorker))) 10.0 else 1.0
+    val obscurityUnit     = obscurityByUnit(unit)
+    val interestActivity  = if (unit.training || unit.upgrading || unit.teching || unit.moving || unit.attacking) 3.0 else 1.0
+    interestBattle * obscurityUnit * interestActivity
   }
-  
+
   def onFrame() {
-    if ( ! With.configuration.camera) { return }
+    if ( ! With.configuration.debugging) { return }
+
+    // Enable autocamera until we interact with the screen
+    val mousePosition = new Pixel(With.game.getMousePosition)
+    if (mousePosition.x > 20 && mousePosition.y < 620 && mousePosition.y > 20 && mousePosition.y < 460) {
+      enabled = enabled && ! With.game.getMouseState(MouseButton.M_LEFT)
+      enabled = enabled && ! With.game.getMouseState(MouseButton.M_MIDDLE)
+      enabled = enabled && ! With.game.getMouseState(MouseButton.M_RIGHT)
+    }
+
+    if ( ! enabled) { return }
+
     val interestGain  = 1.0 / impatienceFrames
     val interestDecay = 2 * interestGain
-  
-    interestByBattle  = With.battles.local.map(b => (b, 0.0 + b.enemy.units.map(_.subjectiveValue).sum * b.us.units.map(_.subjectiveValue).sum)).toMap
-    interestByUnit = With.units.ours
+
+    obscurityByUnit = With.units.ours
       .map(unit => {
-        val interestOld = interestByUnit.getOrElse(unit, 1.0)
-        val interestNew = Math.min(1.0, interestOld + interestGain - (if (visibleUnits.contains(unit)) interestDecay else 0.0))
-        (unit, interestNew)
+        var interest = obscurityByUnit.getOrElse(unit, 1.0)
+        if (visibleUnits.contains(unit)) interest -= 5 else interest += 1
+        interest = Math.max(1.0, interest)
+        (unit, interest)
       }).toMap
     
     val eligibleUnits       = With.units.ours.filterNot(_.isAny(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine))
@@ -60,8 +71,8 @@ class Camera {
     
     tween()
   
-    visibleArea   = TileRectangle(With.viewport.start.tileIncluding, With.viewport.end.tileIncluding)
-    visibleUnits  = With.units.inRectangle(visibleArea).toSet
+    visibleArea   = TileRectangle(With.viewport.start.tileIncluding, With.viewport.start.pixel.add(Pixel(640, 400)).tileIncluding)
+    visibleUnits  = With.units.inRectangle(visibleArea).filter(_.visible).toSet
   }
   
   def focusOn(unit: UnitInfo) {

@@ -40,17 +40,15 @@ class TargetAction(val additionalFiltersRequired: TargetFilter*) extends Action 
           (filter.legal(unit, target), filter))))
 
     val targetsRequired = legalTargetsRequired(unit).toVector
+    var output: Seq[UnitInfo] = Seq.empty
     for (filtersOptionalToDrop <- 0 to filtersOptional.length) {
-      if (unit.agent.toAttack.isEmpty) {
+      if (output.isEmpty && unit.agent.toAttack.isEmpty) {
         val filtersOptionalActive = filtersOptional.drop(filtersOptionalToDrop)
-        val legalTargets = targetsRequired.filter(target => filtersOptionalActive.forall(_.legal(unit, target)))
-        if (legalTargets.nonEmpty) {
-          return legalTargets
-        }
+        output = targetsRequired.filter(target => filtersOptionalActive.forall(_.legal(unit, target)))
       }
     }
 
-    Seq.empty
+    output
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {

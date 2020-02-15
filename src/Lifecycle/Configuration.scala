@@ -115,8 +115,7 @@ class Configuration {
   var visualizationProbabilityHappyVision = 0.05
   var visualizationProbabilityTextOnly    = 0.01
   var visualizationCullViewport           = true
-  
-  var camera                      = false
+
   var cameraDynamicSpeed          = false
   var cameraDynamicSpeedSlowest   = 30
   var cameraDynamicSpeedFastest   = 0

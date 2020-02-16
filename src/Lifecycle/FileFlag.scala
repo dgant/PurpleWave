@@ -19,7 +19,7 @@ class FileFlag(filename: String) {
   lazy val contents: String = {
     try {
       if (enabled) {
-        Source.fromFile(filename).getLines.mkString("\n")
+        Source.fromFile(fullPath).getLines.mkString("\n")
       } else ""
     } catch { case exception: Exception =>
       With.logger.warn("Exception reading file flag at: " + fullPath)

@@ -1,8 +1,7 @@
 package Lifecycle
 
 import Mathematics.PurpleMath
-import Strategery.Selection.{StrategySelectionPolicy, StrategySelectionRandom}
-import Strategery.Strategies.Strategy
+import Strategery.Strategies.{AllChoices, Strategy}
 import Strategery.{HumanPlaybook, TestingPlaybook, TournamentPlaybook}
 
 object ConfigurationLoader {
@@ -92,7 +91,7 @@ object ConfigurationLoader {
   private def setFixedBuild(strategyNamesText: String): Unit = {
     val strategyNamesLines = strategyNamesText.split("[\r\n]+").filter(_.nonEmpty).toVector
     val strategyNames = PurpleMath.sample(strategyNamesLines).split("").toVector
-    val strategyNamesAndInstances = strategyNamesLines.map(name => (name, With.strategy.strategiesUnfiltered.find(_.toString.toLowerCase == name.toLowerCase)))
+    val strategyNamesAndInstances = strategyNamesLines.map(name => (name, AllChoices.allVsRandom.find(_.toString.toLowerCase == name.toLowerCase)))
     val strategyNamesUnmatched = strategyNamesAndInstances.filter(_._2.isEmpty).map(_._1)
     val strategyInstances = strategyNamesAndInstances.filter(_._2.nonEmpty).map(_._2.get)
     if (strategyNamesUnmatched.nonEmpty) {
@@ -101,7 +100,6 @@ object ConfigurationLoader {
     if (strategyInstances.nonEmpty) {
       config.forcedPlaybook = Some(new TestingPlaybook {
           override lazy val forced: Seq[Strategy] = strategyInstances
-          override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
       })
     }
   }

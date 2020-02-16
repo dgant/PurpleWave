@@ -7,10 +7,7 @@ import Planning.Plans.GamePlans.StandardGamePlan
 import ProxyBwapi.Players.Players
 import Strategery.History.HistoricalGame
 import Strategery.Selection.StrategySelectionDynamic
-import Strategery.Strategies.Protoss.ProtossChoices
-import Strategery.Strategies.Strategy
-import Strategery.Strategies.Terran.TerranChoices
-import Strategery.Strategies.Zerg.ZergChoices
+import Strategery.Strategies.{AllChoices, Strategy}
 import bwapi.Race
 
 import scala.collection.mutable
@@ -76,11 +73,7 @@ class Strategist {
 
   lazy val enemyRecentFingerprints: Vector[String] = enemyFingerprints(With.configuration.recentFingerprints)
 
-  def strategiesUnfiltered = if (With.enemies.exists(_.raceInitial != Race.Unknown)) {
-    TerranChoices.all ++ ProtossChoices.all ++ ZergChoices.all
-  } else {
-    TerranChoices.tvr ++ ProtossChoices.pvr ++ ZergChoices.zvr
-  }
+  def strategiesUnfiltered = if (With.enemies.exists(_.raceInitial == Race.Unknown)) AllChoices.treeVsRandom else AllChoices.treeVsKnownRace
 
   def selectInitialStrategies: Set[Strategy] = {
     val strategiesFiltered = filterForcedStrategies(strategiesUnfiltered.filter(isAppropriate))

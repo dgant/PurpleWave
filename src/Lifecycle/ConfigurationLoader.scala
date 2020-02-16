@@ -1,17 +1,21 @@
 package Lifecycle
 
-import Strategery.{HumanPlaybook, TournamentPlaybook}
+import Mathematics.PurpleMath
+import Strategery.Selection.{StrategySelectionPolicy, StrategySelectionRandom}
+import Strategery.Strategies.Strategy
+import Strategery.{HumanPlaybook, TestingPlaybook, TournamentPlaybook}
 
 object ConfigurationLoader {
 
   def load(): Unit = {
-    val human         = new FileFlag("humanopponent.enabled").apply()
-    val ladder        = new FileFlag("ladder.enabled").apply()
+    val human         = new FileFlag("humanopponent.enabled")()
+    val ladder        = new FileFlag("ladder.enabled")()
     val livestream    = ladder // Until we come up with something better
-    val tournament    = new FileFlag("tournament.enabled").apply()
-    val roundrobin    = new FileFlag("roundrobin.enabled").apply()
-    val elimination   = new FileFlag("elimination.enabled").apply()
-    val debugging     = new FileFlag("debugging.enabled").apply()
+    val tournament    = new FileFlag("tournament.enabled")()
+    val roundrobin    = new FileFlag("roundrobin.enabled")()
+    val elimination   = new FileFlag("elimination.enabled")()
+    val debugging     = new FileFlag("debugging.enabled")()
+    val fixedbuilds   = new FileFlag("fixedbuilds.txt").contents
 
     if (tournament && ladder) {
       With.logger.warn("Both tournament and ladder modes are enabled")
@@ -23,13 +27,14 @@ object ConfigurationLoader {
       With.logger.warn("Both round robin and elimination modes are enabled.")
     }
 
-    if (livestream)     { setLivestreamMode() }
-    if (human)          { setHumanMode() }
-    if (ladder)         { setLadderMode() }
-    if (tournament)     { setTournamentMode() }
-    if (roundrobin)     { setRoundRobinMode() }
-    if (elimination)    { setEliminationMode() }
-    if (debugging)      { setDebugMode() }
+    if (livestream)           { setLivestreamMode() }
+    if (human)                { setHumanMode() }
+    if (ladder)               { setLadderMode() }
+    if (tournament)           { setTournamentMode() }
+    if (roundrobin)           { setRoundRobinMode() }
+    if (elimination)          { setEliminationMode() }
+    if (debugging)            { setDebugMode() }
+    if (fixedbuilds.nonEmpty) { setFixedBuild(fixedbuilds) }
 
     Seq(
       ("Human", human.toString),
@@ -82,6 +87,23 @@ object ConfigurationLoader {
     config.targetFrameDurationMilliseconds  = 20
     config.debugging                        = true
     config.debugPauseThreshold              = 24 * 5
+  }
+
+  private def setFixedBuild(strategyNamesText: String): Unit = {
+    val strategyNamesLines = strategyNamesText.split("[\r\n]+").filter(_.nonEmpty).toVector
+    val strategyNames = PurpleMath.sample(strategyNamesLines).split("").toVector
+    val strategyNamesAndInstances = strategyNamesLines.map(name => (name, With.strategy.strategiesUnfiltered.find(_.toString.toLowerCase == name.toLowerCase)))
+    val strategyNamesUnmatched = strategyNamesAndInstances.filter(_._2.isEmpty).map(_._1)
+    val strategyInstances = strategyNamesAndInstances.filter(_._2.nonEmpty).map(_._2.get)
+    if (strategyNamesUnmatched.nonEmpty) {
+      With.logger.warn("Tried to use fixed build but failed to match builds: (" + strategyNamesUnmatched.mkString(", ") + ") from (" + strategyNamesLines.mkString(", ") + ")")
+    }
+    if (strategyInstances.nonEmpty) {
+      config.forcedPlaybook = Some(new TestingPlaybook {
+          override lazy val forced: Seq[Strategy] = strategyInstances
+          override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
+      })
+    }
   }
 
   private def config: Configuration = With.configuration

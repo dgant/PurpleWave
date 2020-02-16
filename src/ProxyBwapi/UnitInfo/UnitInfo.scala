@@ -27,8 +27,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   protected val cd1: Int = Math.min(
     With.configuration.foreignUnitUpdatePeriod,
     With.configuration.friendlyUnitUpdatePeriod)
-  protected val cd2: Int = 2 * cd1
-  protected val cd4: Int = 4 * cd1
+  protected val cd2: Int = 1 * cd1
+  protected val cd4: Int = 1 * cd1
 
   //////////////
   // Identity //

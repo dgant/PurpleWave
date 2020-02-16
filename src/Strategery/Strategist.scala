@@ -18,13 +18,14 @@ import scala.collection.mutable
 class Strategist {
 
   lazy val selectedInitially: Set[Strategy] = selectInitialStrategies
-  
+
   lazy val map: Option[StarCraftMap] = StarCraftMaps.all.find(_.matches)
 
   private def playbook: Playbook = With.configuration.playbook
-  
+
   private var enemyRaceAtLastCheck: Race = With.enemy.raceInitial
   private var selectedLast: Option[Set[Strategy]] = None
+
   def selectedCurrently: Set[Strategy] = {
     val enemyRaceNow = With.enemy.raceCurrent
     if (selectedLast.isEmpty) {
@@ -36,7 +37,7 @@ class Strategist {
     enemyRaceAtLastCheck = enemyRaceNow
     selectedLast.get
   }
-  
+
   // Plasma is so weird we need to handle it separately.
   lazy val isPlasma: Boolean = Plasma.matches
   lazy val isIslandMap: Boolean = heyIsThisAnIslandMap
@@ -48,20 +49,21 @@ class Strategist {
   lazy val isFlat: Boolean = heightMain == heightNatural
   lazy val isInverted: Boolean = heightMain < heightNatural
   lazy val rushDistanceMean: Double = PurpleMath.mean(With.geography.rushDistances)
-  
+
   lazy val gameplan: Plan = selectedInitially
     .find(_.gameplan.isDefined)
     .map(_.gameplan.get)
     .getOrElse(new StandardGamePlan)
-  
+
   lazy val gameWeights: Map[HistoricalGame, Double] = With.history.games
     .filter(_.enemyMatches)
     .zipWithIndex
     .toVector
-    .map{case(game: HistoricalGame, i: Int) => (
+    .map { case (game: HistoricalGame, i: Int) => (
       game,
       1.0 / (1.0 + (i / With.configuration.historyHalfLife))
-    )}
+    )
+    }
     .toMap
 
   def enemyFingerprints(games: Int = With.configuration.recentFingerprints): Vector[String] = {
@@ -74,13 +76,13 @@ class Strategist {
 
   lazy val enemyRecentFingerprints: Vector[String] = enemyFingerprints(With.configuration.recentFingerprints)
 
+  def strategiesUnfiltered = if (With.enemies.exists(_.raceInitial != Race.Unknown)) {
+    TerranChoices.all ++ ProtossChoices.all ++ ZergChoices.all
+  } else {
+    TerranChoices.tvr ++ ProtossChoices.pvr ++ ZergChoices.zvr
+  }
+
   def selectInitialStrategies: Set[Strategy] = {
-    val enemyHasKnownRace = With.enemies.exists(_.raceInitial != Race.Unknown)
-    val strategiesUnfiltered = if (enemyHasKnownRace) {
-      TerranChoices.all ++ ProtossChoices.all ++ ZergChoices.all
-    } else {
-      TerranChoices.tvr ++ ProtossChoices.pvr ++ ZergChoices.zvr
-    }
     val strategiesFiltered = filterForcedStrategies(strategiesUnfiltered.filter(isAppropriate))
     strategiesFiltered.foreach(evaluate)
     if (With.configuration.humanMode) {

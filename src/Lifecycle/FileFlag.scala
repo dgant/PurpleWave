@@ -16,7 +16,7 @@ class FileFlag(filename: String) {
       false
     }
   }
-  private lazy val contents: String = {
+  lazy val contents: String = {
     try {
       if (enabled) {
         Source.fromFile(filename).getLines.mkString("\n")

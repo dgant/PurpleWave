@@ -69,9 +69,13 @@ class Base(val townHallTile: Tile)
   }
   lazy val resourcePathTiles: Set[Tile] = {
     val output = new mutable.ArrayBuffer[Tile]
+
+    // Draw a shortest-path line from each resource to the town hall.
+    // Where multiple equally-short lines are available, take the one closest to the heart.
+    // Ban all tiles in that line.
     val townHallTiles = townHallArea.tiles
     def hallDistanceSquared(resourceTile: Tile): Double = townHallTiles.map(resourceTile.tileDistanceSquared).min
-    resources.sortBy(_.pixelDistanceCenter(heart.pixelCenter)).foreach(resource => {
+    resources.foreach(resource => {
       val resourceTiles   = resource.tileArea.tiles
       val bestDistance    = resourceTiles.map(hallDistanceSquared).min
       val from            = resourceTiles.filter(hallDistanceSquared(_) <= bestDistance).minBy(_.tileDistanceSquared(heart))
@@ -79,6 +83,23 @@ class Base(val townHallTile: Tile)
       val route           = PixelRay(from.pixelCenter, to.pixelCenter)
       output ++= route.tilesIntersected
     })
+
+    // Avoid blocking the path where workers are likely to pop out of gas
+    // by blocking tiles adjacent to the Nexus that could be along the critical path
+    val townHallAdjacentTiles = townHallArea.expand(1, 1).tiles
+    gas.foreach(_.tileArea.tilesSurrounding.foreach(gasTile => {
+      output += townHallAdjacentTiles.minBy(_.tileDistanceSquared(gasTile))
+    }))
+
+    // Avoid trapping workers into the mining area by banning tiles which are adjacent to the resource but closer to the town hall
+    minerals.foreach(mineral => {
+      val resourceDistance = mineral.tileArea.tiles.map(hallDistanceSquared).min
+      val adjacentTiles = mineral.tileArea.tilesSurrounding
+      val adjacentTilesCloser = adjacentTiles.filter(hallDistanceSquared(_) < resourceDistance)
+      output ++= adjacentTilesCloser
+    })
+    output --= townHallTiles
+
     output.toSet
   }
   lazy val resourcePathTilesI: Set[Int] = resourcePathTiles.map(_.i)

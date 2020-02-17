@@ -17,7 +17,7 @@ class Logger {
     var shouldFlush = true
     var opponents: String = ""
     try {
-      if (!errorOcurred && !With.configuration.debugging) {
+      if ( ! errorOcurred && ! With.configuration.debugging) {
         shouldFlush = false
       }
       opponents = With.enemies.map(_.name).mkString("-")

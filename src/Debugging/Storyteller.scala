@@ -19,12 +19,13 @@ class Storyteller {
   }
 
   val stories: Seq[Story] = Seq[Story](
-    Story("Strategy", () => With.strategy.selectedCurrently.map(_.toString).mkString(" ")),
-    Story("Status", () => With.blackboard.status.get.mkString(", ")),
-    Story("Enemy race", () => With.enemy.raceCurrent.toString),
-    Story("Fingerprints", () => With.fingerprints.status),
-    Story("Our bases", () => With.geography.ourBases.size.toString),
-    Story("Enemy bases", () => With.geography.enemyBases.size.toString)
+    Story("Forced playbook",  () => With.configuration.forcedPlaybook.map(_.toString).getOrElse("None")),
+    Story("Strategy",         () => With.strategy.selectedCurrently.map(_.toString).mkString(" ")),
+    Story("Status",           () => With.blackboard.status.get.mkString(", ")),
+    Story("Enemy race",       () => With.enemy.raceCurrent.toString),
+    Story("Fingerprints",     () => With.fingerprints.status.mkString(" ")),
+    Story("Our bases",        () => With.geography.ourBases.size.toString),
+    Story("Enemy bases",      () => With.geography.enemyBases.size.toString)
   )
 
   def onFrame(): Unit = {
@@ -47,6 +48,7 @@ class Storyteller {
       Seq(With.performance.frameLimitShort, With.performance.framesOverShort),
       Seq(1000, With.performance.framesOver1000),
       Seq(10000, With.performance.framesOver10000)).map(line => line.head.toString + "ms: " + line.last.toString).mkString("\n"))
+    With.logger.debug("Our performance was " + (if (With.performance.disqualified) "BAD" else if (With.performance.danger) "DANGEROUS" else "good"))
   }
 
   private def logStrategyEvaluation(): Unit = {

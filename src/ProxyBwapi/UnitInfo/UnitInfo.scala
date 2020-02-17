@@ -615,20 +615,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def effectivelyCloaked: Boolean =
     (burrowed || cloaked) &&
     ( ! ensnared && ! plagued) && (
-      if (isFriendly)
-        ! With.grids.enemyDetection.isDetected(tileIncludingCenter)
-        && (
-          // We can't see Scanner Sweeps due to BWAPI 4.1.2 limitations
-          // Let's try to infer scans
-          (
-            Math.min(With.framesSince(friendly.map(_.agent.lastCloak).getOrElse(0)), With.framesSince(lastFrameTakingDamage)) > 162 + 2
-            && ! matchups.enemies.exists(e => e.visible && e.orderTarget.contains(this))
-          )
-          || ! With.enemies.exists(_.isTerran))
-          // Scanner sweep.
-          // lasts 162 frames.
-          // Cloakedness updates on per-unit timer lasting 30 frames.
-          // There's also a global cloak timer every 300 frames.
+      if (isFriendly) ! With.grids.enemyDetection.isDetected(tileIncludingCenter)
       else ! detected
     )
   

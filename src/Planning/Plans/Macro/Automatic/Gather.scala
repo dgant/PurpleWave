@@ -35,7 +35,7 @@ class Gather extends Plan {
 
   def isValidResource (unit: UnitInfo): Boolean = isValidMineral(unit) || isValidGas(unit)
   def isValidMineral  (unit: UnitInfo): Boolean = unit.alive && unit.mineralsLeft > 0
-  def isValidGas      (unit: UnitInfo): Boolean = unit.alive && unit.isOurs && unit.gasLeft > 0 && unit.remainingCompletionFrames < 24 * 2
+  def isValidGas      (unit: UnitInfo): Boolean = unit.alive && unit.isOurs && unit.remainingCompletionFrames < 24 * 2
 
   private lazy val baseCosts: Map[(Base, Base), Cache[Double]] = With.geography.bases
     .flatMap(baseA => With.geography.bases.map(baseB => (baseA, baseB)))

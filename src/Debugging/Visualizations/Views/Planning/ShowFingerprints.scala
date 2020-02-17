@@ -10,7 +10,7 @@ object ShowFingerprints extends View {
       5,
       5 * With.visualization.lineHeightSmall,
       "Matched:\n\n"
-      + With.fingerprints.status
+      + With.fingerprints.status.mkString("\n")
     )
   }
 }

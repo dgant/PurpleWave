@@ -67,7 +67,8 @@ class NormalPlaybook extends Playbook {
 }
 
 object TournamentPlaybook extends NormalPlaybook {
-  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionTournament
+  //override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionTournament
+  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
 }
 
 object HumanPlaybook extends NormalPlaybook {

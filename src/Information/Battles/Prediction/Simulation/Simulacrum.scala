@@ -149,10 +149,12 @@ class Simulacrum(
       fighting = false
     }
     else if (target != lastTarget) {
-      // TODO: Stop using real unit positions!
-      val distanceByAir     : Double = realUnit.pixelDistanceEdge(target.get.realUnit)
-      val distanceTraveling : Double = realUnit.pixelDistanceTravelling(target.get.realUnit.pixelCenter)
-      pathBendiness = PurpleMath.clamp(PurpleMath.nanToInfinity(distanceByAir / distanceTraveling), 1.0, 3.0)
+      val targetPixel = target.get.pixel
+      if (flying || pixel.zone == targetPixel.zone) {
+        pathBendiness = 1.0
+      } else {
+        pathBendiness = PurpleMath.clamp(PurpleMath.nanToInfinity(pixel.pixelDistance(targetPixel) / pixel.groundPixels(targetPixel)), 1.0, 3.0)
+      }
     }
   }
   
@@ -249,14 +251,15 @@ class Simulacrum(
     && target.hitPoints > 0
     && (pixelRangeMin <= 0 || pixel.pixelDistance(target.pixel) >= pixelRangeMin)
   )
+
+  def airDistance(target: Simulacrum): Double = PurpleMath.broodWarDistanceBox(
+    realUnit.pixelStartAt(pixel),
+    realUnit.pixelEndAt(pixel),
+    target.realUnit.pixelStartAt(target.pixel),
+    target.realUnit.pixelEndAt(target.pixel))
   
   def pixelsOutOfRange(target: Simulacrum): Double = {
-    val actualDistance = PurpleMath.broodWarDistanceBox(
-      realUnit.pixelStartAt(pixel),
-      realUnit.pixelEndAt(pixel),
-      target.realUnit.pixelStartAt(target.pixel),
-      target.realUnit.pixelEndAt(target.pixel))
-    val output = actualDistance - realUnit.pixelRangeAgainst(target.realUnit) - bonusRange
+    val output = airDistance(target) - realUnit.pixelRangeAgainst(target.realUnit) - bonusRange
     output
   }
   

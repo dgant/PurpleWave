@@ -5,7 +5,7 @@ import Lifecycle.With
 import Planning.Plan
 import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTReaverCarrierCheese
 import Strategery.Strategies.Strategy
-import Strategery.{BlueStorm, Destination, MapGroups, StarCraftMap}
+import Strategery.{Destination, MapGroups, StarCraftMap}
 import bwapi.Race
 
 abstract class PvTStrategy extends Strategy {
@@ -49,7 +49,8 @@ object PvT32Nexus extends PvTBasicOpener {
   override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fiveRax,
     With.fingerprints.bbs,
-    With.fingerprints.bunkerRush
+    With.fingerprints.bunkerRush,
+    With.fingerprints.fourteenCC
   )
 }
 object PvT28Nexus extends PvTBasicOpener {
@@ -115,15 +116,19 @@ object PvTDTExpand extends PvTBasicOpener {
     PvT3BaseArbiter,
     PvT3BaseCarrier
   ))
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.twoRaxAcad,
+    With.fingerprints.twoFacVultures,
+    With.fingerprints.threeFacVultures
+  )
 }
-
 object PvT2BaseCarrier extends PvTStrategy {
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.bio
   )
 }
 object PvT3BaseCarrier extends PvTStrategy
-object PvT2BaseArbiter extends PvTStrategy { override val mapsBlacklisted = Iterable(BlueStorm) }
+object PvT2BaseArbiter extends PvTStrategy
 object PvT3BaseArbiter extends PvTStrategy
 
 object PvTStove extends PvTStrategy {

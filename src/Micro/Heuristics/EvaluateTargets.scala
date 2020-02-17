@@ -120,7 +120,7 @@ object EvaluateTargets extends {
 
     // Immobility bonus
     if ( ! target.canMove) {
-      output *= 1.5
+      output *= 1.25
     }
 
     // Anti-air bonus

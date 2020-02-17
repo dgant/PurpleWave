@@ -295,6 +295,20 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
 
   def altitudeBonus: Double = tileIncludingCenter.altitudeBonus
 
+  val arrivalFrame = new Cache(() => {
+    val home        = With.geography.home.pixelCenter
+    val classSpeed  = unitClass.topSpeed
+    val travelTime  = Math.min(24 * 60 * 60,
+      if (canMove)
+        framesToTravelTo(home)
+      else if (classSpeed > 0)
+        (pixelDistanceTravelling(home) / classSpeed).toInt
+      else
+        Int.MaxValue)
+    val completionTime  = PurpleMath.clamp(completionFrame, With.frame, With.frame + unitClass.buildFrames)
+    val arrivalTime     = completionTime + travelTime
+    arrivalTime
+  })
   ////////////
   // Combat //
   ////////////

@@ -11,7 +11,7 @@ abstract class AbstractTask {
   private var lastRunFrame          : Int   = -1
   private var totalRunCount         : Int   = 0
   private var totalSkipCount        : Int   = 0
-  private var totalMillisecondsEver : Long = 0
+  private var totalMillisecondsEver : Long  = 0
   private var maxMillisecondsEver   : Long  = 0
   private var violatedThreshold     : Int   = 0
   private var violatedRules         : Int   = 0
@@ -75,6 +75,7 @@ abstract class AbstractTask {
     }
     if ( ! alreadyViolatedRules && With.performance.violatedRules) {
       violatedRules += 1
+      With.logger.warn(toString + " exceeded frame time: " + millisecondsDuration +" ms")
     }
   }
   

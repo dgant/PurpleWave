@@ -7,24 +7,24 @@ import Strategery.{HumanPlaybook, TestingPlaybook, TournamentPlaybook}
 object ConfigurationLoader {
 
   def load(): Unit = {
-    val human         = new FileFlag("humanopponent.enabled")()
-    val ladder        = new FileFlag("ladder.enabled")()
+    val human         = new BooleanFlag("humanopponent")()
+    val ladder        = new BooleanFlag("ladder")()
     val livestream    = ladder // Until we come up with something better
-    val tournament    = new FileFlag("tournament.enabled")()
-    val roundrobin    = new FileFlag("roundrobin.enabled")()
-    val elimination   = new FileFlag("elimination.enabled")()
-    val debugging     = new FileFlag("debugging.enabled")()
+    val tournament    = new BooleanFlag("tournament")()
+    val roundrobin    = new BooleanFlag("roundrobin")()
+    val elimination   = new BooleanFlag("elimination")()
+    val pretraining   = new BooleanFlag("pretraining")()
+    val debugging     = new BooleanFlag("debugging")()
+    val debugginglive = new BooleanFlag("debugginglive")()
     val fixedbuilds   = new FileFlag("fixedbuilds.txt").contents
 
-    if (tournament && ladder) {
-      With.logger.warn("Both tournament and ladder modes are enabled")
-    }
-    if (tournament && livestream) {
-      With.logger.warn("Both tournament and livestream modes are enabled")
-    }
-    if (roundrobin && elimination) {
-      With.logger.warn("Both round robin and elimination modes are enabled.")
-    }
+    if (tournament  && ladder)        With.logger.warn("Both tournament and ladder modes are enabled")
+    if (tournament  && livestream)    With.logger.warn("Both tournament and livestream modes are enabled")
+    if (tournament  && pretraining)   With.logger.warn("Both tournament and pretraining modes are enabled")
+    if (pretraining && ladder)        With.logger.warn("Both pretraining and laddermodes are enabled")
+    if (pretraining && livestream)    With.logger.warn("Both pretraining and livestream modes are enabled")
+    if (roundrobin  && elimination)   With.logger.warn("Both round robin and elimination modes are enabled")
+    if (debugginglive && ! debugging) With.logger.warn("debugginglive enabled without debugging enabled")
 
     if (livestream)           { setLivestreamMode() }
     if (human)                { setHumanMode() }
@@ -33,6 +33,7 @@ object ConfigurationLoader {
     if (roundrobin)           { setRoundRobinMode() }
     if (elimination)          { setEliminationMode() }
     if (debugging)            { setDebugMode() }
+    if (debugginglive)        { setDebugLiveMode() }
     if (fixedbuilds.nonEmpty) { setFixedBuild(fixedbuilds) }
 
     Seq(
@@ -80,11 +81,15 @@ object ConfigurationLoader {
   }
 
   private def setDebugMode(): Unit = {
-    config.visualizeDebug                   = true
     config.enableChat                       = true
     config.enableSurrenders                 = true
-    config.targetFrameDurationMilliseconds  = 20
     config.debugging                        = true
+  }
+
+  private def setDebugLiveMode(): Unit = {
+    setDebugMode()
+    config.visualizeDebug                   = true
+    config.targetFrameDurationMilliseconds  = 20
     config.debugPauseThreshold              = 24 * 5
   }
 

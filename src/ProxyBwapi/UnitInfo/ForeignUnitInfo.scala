@@ -56,8 +56,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
   
   private var updateCount = 0
   private def updateTimeInsensitiveInformation() {
-    if (updateCount == 0
-      || (updateCount + id) % With.configuration.foreignUnitUpdatePeriod == 0) {
+    if (updateCount == 0 || (updateCount + id) % With.configuration.foreignUnitUpdatePeriod == 0) {
       updateTracking()
       updateVisibility()
       updateHealth()

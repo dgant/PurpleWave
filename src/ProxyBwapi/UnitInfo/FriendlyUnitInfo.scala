@@ -62,8 +62,6 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
   @inline def sleepUntil(frame: Int): Unit = nextOrderFrame = Some(frame)
   def hijack(): Unit = nextOrderFrame = None
 
-
-
   private var _trainerPlan: Option[Plan] = None
   def trainerPlan: Option[Plan] = _trainerPlan
   def setTrainerPlan(myTrainer: Plan): Unit = {

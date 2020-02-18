@@ -24,12 +24,6 @@ import bwapi._
 
 abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUnit, id) {
 
-  protected val cd1: Int = Math.min(
-    With.configuration.foreignUnitUpdatePeriod,
-    With.configuration.friendlyUnitUpdatePeriod)
-  protected val cd2: Int = 1 * cd1
-  protected val cd4: Int = 1 * cd1
-
   //////////////
   // Identity //
   //////////////
@@ -149,8 +143,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     unitClass.subjectiveValue
       + scarabCount * Protoss.Scarab.subjectiveValue
       + interceptorCount * Protoss.Interceptor.subjectiveValue
-      + (if (unitClass.isTransport) friendly.map(_.loadedUnits.map(_.subjectiveValue).sum).sum else 0)
-  , cd4)
+      + (if (unitClass.isTransport) friendly.map(_.loadedUnits.map(_.subjectiveValue).sum).sum else 0))
 
   def remainingOccupationFrames: Int = Vector(
     remainingCompletionFrames,
@@ -161,7 +154,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   ).max
 
   val participatingInCombat = new Cache(() => EvaluateTargets.participatingInCombat(this))
-  val baseTargetValue = new Cache(() => EvaluateTargets.getTargetBaseValue(this), cd2)
+  val baseTargetValue = new Cache(() => EvaluateTargets.getTargetBaseValue(this))
   
   //////////////
   // Geometry //
@@ -186,7 +179,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def tileArea:             TileRectangle = cacheTileArea()
   def addonArea:            TileRectangle = TileRectangle(Tile(0, 0), Tile(2, 2)).add(tileTopLeft).add(4,1)
 
-  private def tileCacheDuration: Int = { if (unitClass.isBuilding) (if (unitClass.canFly) 24 * 5 else 24 * 60) else cd2 }
+  private def tileCacheDuration: Int = { if (unitClass.isBuilding) (if (unitClass.canFly) 24 * 5 else 24 * 60) else 1 }
   private lazy val cacheTileArea = new Cache(() => unitClass.tileArea.add(tileTopLeft), refreshPeriod = tileCacheDuration)
   private lazy val cacheTiles = new Cache(() => cacheTileArea().tiles.toVector, refreshPeriod = tileCacheDuration)
   
@@ -253,8 +246,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     && unitClass.topSpeed > 0
     && canDoAnything
     && ! burrowed
-    && ! sieged,
-    cd1)
+    && ! sieged)
 
   def topSpeed: Double = if (canMove) topSpeedPossibleCache() else 0
   def topSpeedPossible: Double = topSpeedPossibleCache()
@@ -271,8 +263,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
       (isOverlord()   && player.hasUpgrade(Zerg.ZerglingSpeed))     ||
       (isHydralisk()  && player.hasUpgrade(Zerg.HydraliskSpeed))    ||
       (isUltralisk()  && player.hasUpgrade(Zerg.UltraliskSpeed)))
-      1.5 else 1.0)),
-  cd4)
+      1.5 else 1.0)))
 
   def projectFrames(framesToLookAhead: Double): Pixel = pixelCenter.add((velocityX * framesToLookAhead).toInt, (velocityY * framesToLookAhead).toInt)
 

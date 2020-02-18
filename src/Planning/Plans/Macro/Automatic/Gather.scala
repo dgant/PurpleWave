@@ -61,10 +61,6 @@ class Gather extends Plan {
           (isValidMineral(resource) && (longMineMinerals()  || ! isLongDistanceResource(resource)))
       ||  (isValidGas(resource)     && (longMineGas()       || ! isLongDistanceResource(resource))))
     .toVector)
-  private val resourceHallPixels  = new Cache(() => workersByResource
-    .keysIterator
-    .map(resource => (resource, ByOption.min(miningBases().map(_.townHall.get.pixelDistanceEdge(resource))).getOrElse(kLightYear)))
-    .toMap)
 
   def isLongDistanceResource(unit: UnitInfo): Boolean = {
     ! miningBases().exists(unit.base.contains)
@@ -225,7 +221,7 @@ class Gather extends Plan {
     // The depot-to-resource distance is used in two ways:
     // -Resources close to the hall should get priority on their first two workers
     // -Resources far from the hall benefit more from the third worker
-    val hallToResourcePixels = resourceHallPixels()(resource)
+    val hallToResourcePixels = ByOption.min(miningBases().map(_.townHall.get.pixelDistanceEdge(resource))).getOrElse(kLightYear)
 
     // Geyser mining speed varies based on direction relative to town hall
     val belowTownHall = resource.base.map(_.townHallTile).exists(t => t.y < resource.tileTopLeft.y - 3 || t.x < resource.tileTopLeft.x - 4)

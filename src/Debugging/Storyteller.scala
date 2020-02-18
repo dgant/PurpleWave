@@ -3,6 +3,7 @@ package Debugging
 import Debugging.Visualizations.Views.Planning.ShowStrategyEvaluations
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrades
@@ -22,6 +23,19 @@ class Storyteller {
     }
   }
 
+  lazy val defaultTechs = Seq(
+    Terran.ScannerSweep,
+    Terran.NuclearStrike,
+    Terran.DefensiveMatrix,
+    Terran.Healing,
+    Protoss.ArchonMeld,
+    Protoss.Feedback,
+    Protoss.DarkArchonMeld,
+    Zerg.Parasite,
+    Zerg.InfestCommandCenter,
+    Zerg.DarkSwarm)
+  lazy val interestingTechs = Techs.all.filter(! defaultTechs.contains(_))
+
   val stories: Seq[Story] = Seq[Story](
     Story("Opponents",      () => With.enemies.filter(_.isEnemy).map(_.name).mkString(", ")),
     Story("Playbook",       () => With.configuration.playbook.toString),
@@ -31,8 +45,8 @@ class Storyteller {
     Story("Fingerprints",   () => With.fingerprints.status.mkString(" ")),
     Story("Our bases",      () => With.geography.ourBases.size.toString),
     Story("Enemy bases",    () => With.geography.enemyBases.size.toString),
-    Story("Our techs",      () => Techs.all.view.filter(With.self.hasTech).mkString(", ")),
-    Story("Enemy techs",    () => Techs.all.view.filter(t => With.enemies.exists(_.hasTech(t))).mkString(", ")),
+    Story("Our techs",      () => interestingTechs.view.filter(With.self.hasTech).mkString(", ")),
+    Story("Enemy techs",    () => interestingTechs.view.filter(t => With.enemies.exists(_.hasTech(t))).mkString(", ")),
     Story("Our upgrades",   () => Upgrades.all.view.map(u => (u, With.self.getUpgradeLevel(u))).filter(_._2 > 0).map(u => u._1 + " = " + u._2).mkString(", ")),
     Story("Enemy upgrades", () => Upgrades.all.view.map(u => (u, ByOption.max(With.enemies.map(_.getUpgradeLevel(u))).getOrElse(0))).filter(_._2 > 0).map(u => u._1 + " = " + u._2).mkString(", "))
   )

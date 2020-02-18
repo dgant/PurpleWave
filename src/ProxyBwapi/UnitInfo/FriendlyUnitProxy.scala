@@ -78,10 +78,10 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   private val interceptorCountCache   = new Cache(() => if (is(Protoss.Carrier)) base.getInterceptorCount else 0)
   private val scarabCountCache        = new Cache(() => if (is(Protoss.Reaver)) base.getScarabCount else 0)
   
-  def attackStarting            : Boolean = isStartingAttackCache()
-  def attackAnimationHappening  : Boolean = isAttackFrameCache()
-  def airCooldownLeft           : Int     = airCooldownLeftCache()
-  def groundCooldownLeft        : Int     = groundCooldownLeftCache()
+  def attackStarting            : Boolean = base.isStartingAttack
+  def attackAnimationHappening  : Boolean = base.isAttackFrame
+  def airCooldownLeft           : Int     = base.getAirWeaponCooldown
+  def groundCooldownLeft        : Int     = base.getGroundWeaponCooldown
   def spellCooldownLeft         : Int     = spellCooldownLeftCache()
   
   private val isStartingAttackCache   = new Cache(() => unitClass.rawCanAttack && base.isStartingAttack)

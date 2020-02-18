@@ -35,7 +35,7 @@ class Camera {
 
     // Enable autocamera until we interact with the screen
     val mousePosition = new Pixel(With.game.getMousePosition)
-    if (mousePosition.x > 20 && mousePosition.y < 620 && mousePosition.y > 20 && mousePosition.y < 460) {
+    if (mousePosition.x > 10 && mousePosition.x < 630 && mousePosition.y > 10 && mousePosition.y < 470) {
       enabled = enabled && ! With.game.getMouseState(MouseButton.M_LEFT)
       enabled = enabled && ! With.game.getMouseState(MouseButton.M_MIDDLE)
       enabled = enabled && ! With.game.getMouseState(MouseButton.M_RIGHT)

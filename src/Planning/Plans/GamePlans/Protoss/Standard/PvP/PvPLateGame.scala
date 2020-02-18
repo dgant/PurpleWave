@@ -9,7 +9,7 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{PylonBlock, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
-import Planning.Plans.Macro.Protoss.BuildCannonsAtNaturalAndExpansions
+import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.Predicates.Compound.{And, Not, Sticky}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBasesAtMost, SafeAtHome, SafeToMoveOut}
@@ -58,7 +58,6 @@ class PvPLateGame extends GameplanTemplate {
 
   class AddEarlyTech extends If(
     goingTemplar,
-
     new Parallel(
       new Build(
         Get(Protoss.CitadelOfAdun),
@@ -104,18 +103,16 @@ class PvPLateGame extends GameplanTemplate {
 
   class AddLateTech extends Parallel(
     new Build(Get(Protoss.Forge)),
-    new If(new GasPumpsAtLeast(3), new Build(Get(2, Protoss.Forge))),
+    new If(new GasPumpsAtLeast(4), new Build(Get(2, Protoss.Forge))),
     new UpgradeContinuously(Protoss.GroundDamage),
     new If(new Or(new UpgradeStarted(Protoss.GroundDamage, 3), new UnitsAtLeast(2, Protoss.Forge)), new UpgradeContinuously(Protoss.GroundArmor)),
-    new Build(Get(Protoss.RoboticsFacility), Get(Protoss.Observatory))
-  )
+    new Build(Get(Protoss.RoboticsFacility), Get(Protoss.Observatory)))
 
   class AddLateGateways extends Parallel(
     new If(new MiningBasesAtLeast(2), new Build(Get(9, Protoss.Gateway))),
     new If(new MiningBasesAtLeast(3), new Build(Get(13, Protoss.Gateway))),
     new If(new MiningBasesAtLeast(4), new Build(Get(16, Protoss.Gateway))),
-    new If(new MiningBasesAtLeast(5), new Build(Get(20, Protoss.Gateway)))
-  )
+    new If(new MiningBasesAtLeast(5), new Build(Get(20, Protoss.Gateway))))
 
   class GetReactiveObservers extends If(
     new And(
@@ -141,6 +138,7 @@ class PvPLateGame extends GameplanTemplate {
 
   class SafeForThird extends And(
     new SafeToMoveOut,
+    new EnemyBasesAtLeast(3),
     new Or(
       new Not(new EnemyHasShown(Protoss.DarkTemplar)),
       new UnitsAtLeast(2, Protoss.Observer, complete = true)))
@@ -178,7 +176,8 @@ class PvPLateGame extends GameplanTemplate {
     new Build(Get(Protoss.Pylon), Get(Protoss.Gateway), Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore), Get(Protoss.DragoonRange), Get(2, Protoss.Gateway)),
 
     //  Detection
-    new If(buildCannons, new BuildCannonsAtNaturalAndExpansions(2)),
+    new If(buildCannons, new BuildCannonsAtNatural(2)),
+    new If(buildCannons, new BuildCannonsAtExpansions(1)),
     new GetReactiveObservers,
 
     // Expansions
@@ -190,7 +189,8 @@ class PvPLateGame extends GameplanTemplate {
       new Parallel(
         new PvPIdeas.TakeBase2,
         new PvPIdeas.TakeBase3WithGateways,
-        new PvPIdeas.TakeBase4WithGateways)),
+        //new PvPIdeas.TakeBase4WithGateways
+        )),
 
     new AddScalingTech,
     new PvPIdeas.TrainArmy,

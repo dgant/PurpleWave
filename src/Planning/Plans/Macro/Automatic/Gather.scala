@@ -35,7 +35,7 @@ class Gather extends Plan {
 
   def isValidResource (unit: UnitInfo): Boolean = isValidMineral(unit) || isValidGas(unit)
   def isValidMineral  (unit: UnitInfo): Boolean = unit.alive && unit.mineralsLeft > 0
-  def isValidGas      (unit: UnitInfo): Boolean = unit.alive && unit.isOurs && unit.remainingCompletionFrames < 24 * 2
+  def isValidGas      (unit: UnitInfo): Boolean = unit.alive && unit.isOurs && unit.unitClass.isGas && unit.remainingCompletionFrames < 24 * 2
 
   private lazy val baseCosts: Map[(Base, Base), Cache[Double]] = With.geography.bases
     .flatMap(baseA => With.geography.bases.map(baseB => (baseA, baseB)))
@@ -61,6 +61,10 @@ class Gather extends Plan {
           (isValidMineral(resource) && (longMineMinerals()  || ! isLongDistanceResource(resource)))
       ||  (isValidGas(resource)     && (longMineGas()       || ! isLongDistanceResource(resource))))
     .toVector)
+  private val resourceHallPixels  = new Cache(() => workersByResource
+    .keysIterator
+    .map(resource => (resource, ByOption.min(miningBases().map(_.townHall.get.pixelDistanceEdge(resource))).getOrElse(kLightYear)))
+    .toMap)
 
   def isLongDistanceResource(unit: UnitInfo): Boolean = {
     ! miningBases().exists(unit.base.contains)
@@ -192,7 +196,8 @@ class Gather extends Plan {
         }
 
         // Assign the worker to tbhe best resource
-        val resourceBestScore = ByOption.maxBy(workersByResource.keysIterator.map(ResourceScore(worker, _, gasWorkerDesired, resourceBefore)))(_.output)
+        val resourceScores = workersByResource.keysIterator.map(ResourceScore(worker, _, gasWorkerDesired, resourceBefore)).toVector // TODO TEMPORARY
+        val resourceBestScore = ByOption.maxBy(resourceScores)(_.output)
         resourceBestScore.foreach(bestResourceScore => {
           val bestResource = bestResourceScore.resource
           assignWorker(worker, bestResource)
@@ -203,7 +208,7 @@ class Gather extends Plan {
         worker.agent.intend(this, new Intention {
           toGather = resourceByWorker.get(worker)
         })
-        workerCooldownUntil(worker) = With.frame + 48 + Random.nextInt(48)
+        workerCooldownUntil(worker) = With.frame + 72 + Random.nextInt(72)
       })
   }
 
@@ -221,7 +226,7 @@ class Gather extends Plan {
     // The depot-to-resource distance is used in two ways:
     // -Resources close to the hall should get priority on their first two workers
     // -Resources far from the hall benefit more from the third worker
-    val hallToResourcePixels = ByOption.min(miningBases().map(_.townHall.get.pixelDistanceEdge(resource))).getOrElse(kLightYear)
+    val hallToResourcePixels = resourceHallPixels()(resource)
 
     // Geyser mining speed varies based on direction relative to town hall
     val belowTownHall = resource.base.map(_.townHallTile).exists(t => t.y < resource.tileTopLeft.y - 3 || t.x < resource.tileTopLeft.x - 4)

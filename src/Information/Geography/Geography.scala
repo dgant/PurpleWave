@@ -79,7 +79,11 @@ class Geography {
 
 
   private def getSettlements: Vector[Base] = (Vector.empty
-  ++ With.geography.bases.filter(_.units.exists(u => u.isOurs && u.unitClass.isBuilding))
+  ++ With.geography.bases.filter(_.units.exists(u =>
+      u.isOurs
+      && u.unitClass.isBuilding
+      && (u.unitClass.isTownHall || ! u.base.exists(_.townHallArea.intersects(u.tileArea)) // Ignore proxy base blockers
+    )))
   ++ Vector(With.geography.ourNatural).filter(x =>
       With.strategy.isInverted
       && ! With.geography.ourMain.units.exists(_.unitClass.isStaticDefense)

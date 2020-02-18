@@ -300,6 +300,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     val arrivalTime     = completionTime + travelTime
     arrivalTime
   })
+
   ////////////
   // Combat //
   ////////////

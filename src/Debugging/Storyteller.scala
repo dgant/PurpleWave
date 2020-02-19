@@ -39,6 +39,7 @@ class Storyteller {
   val stories: Seq[Story] = Seq[Story](
     Story("Opponents",      () => With.enemies.filter(_.isEnemy).map(_.name).mkString(", ")),
     Story("Playbook",       () => With.configuration.playbook.toString),
+    Story("Policy",         () => With.configuration.playbook.strategySelectionPolicy.toString),
     Story("Strategy",       () => With.strategy.selectedCurrently.map(_.toString).mkString(" ")),
     Story("Status",         () => With.blackboard.status.get.mkString(", ")),
     Story("Enemy race",     () => With.enemy.raceCurrent.toString),

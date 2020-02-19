@@ -14,16 +14,13 @@ class Logger {
   private var errorOcurred = false
   
   def flush(): Unit = {
-    var shouldFlush = true
+    var shouldFlush = errorOcurred || With.configuration.debugging
+    if ( ! shouldFlush) return
+
     var opponents: String = ""
     try {
-      if ( ! errorOcurred && ! With.configuration.debugging) {
-        shouldFlush = false
-      }
       opponents = With.enemies.map(_.name).mkString("-")
-    } catch { case exception: Exception => {} }
-
-    if ( ! shouldFlush) return
+    } catch { case exception: Exception => }
     
     val filenameRaw = opponents + "-" + Calendar.getInstance.getTime.toString
     val filename = With.bwapiData.write + filenameRaw.replaceAll("[^A-Za-z0-9 \\-\\.]", "") + ".log.txt"

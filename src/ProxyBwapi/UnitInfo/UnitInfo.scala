@@ -73,7 +73,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   var lastGatheringUpdate       : Int = Int.MinValue
   var discoveredByEnemy         : Boolean = false
   def lastTotalHealthPoints: Int = lastHitPoints + lastShieldPoints + lastDefensiveMatrixPoints
-  
+
+  private var lastUnitClass: UnitClass = unitClass
   def updateCommon() {
     val thisFrame = With.frame
     if (totalHealth < lastTotalHealthPoints) {
@@ -103,14 +104,21 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
       framesFailingToAttack = 0
     }
     if (complete) {
+      // If the unit class changes (eg. Geyser -> Extractor) update the completion frame
+      if (unitClass != lastUnitClass) {
+        completionFrame = With.frame
+      }
+
       // We don't know exactly when it finished; now is our best guess.
       // The most important consumer of this estimate is fingerprinting.
       // For fingerprinting, "finished now" is a pretty decent metric.
       completionFrame = Math.min(completionFrame, With.frame)
     }
+    // The latter case is for units that have *never* had an assigned completion time (eg. == Forever())
     if ( ! complete || completionFrame > 24 * 60 * 180) {
       completionFrame = With.frame + remainingCompletionFrames
     }
+    lastUnitClass             = unitClass
     lastHitPoints             = hitPoints
     lastShieldPoints          = shieldPoints
     lastDefensiveMatrixPoints = defensiveMatrixPoints

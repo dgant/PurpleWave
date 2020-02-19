@@ -10,6 +10,7 @@ class FingerprintMannerPylon extends Fingerprint {
     With.frame < GameTime(5, 0)()
     && With.geography.ourMain.units.exists(u =>
       u.is(Protoss.Pylon)
+      && u.player.isEnemy
       && With.geography.ourMain.harvestingArea.contains(u.tileIncludingCenter))
   )
 

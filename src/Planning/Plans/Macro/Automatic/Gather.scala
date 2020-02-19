@@ -208,7 +208,7 @@ class Gather extends Plan {
         worker.agent.intend(this, new Intention {
           toGather = resourceByWorker.get(worker)
         })
-        workerCooldownUntil(worker) = With.frame + 72 + Random.nextInt(72)
+        workerCooldownUntil(worker) = With.frame + 48 + Random.nextInt(48)
       })
   }
 

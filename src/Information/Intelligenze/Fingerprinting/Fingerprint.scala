@@ -10,7 +10,6 @@ abstract class Fingerprint {
   protected def investigate: Boolean
   protected val children: Seq[Fingerprint] = Seq.empty
 
-  protected var firstMatchFrame: Int = -1
   protected var matched: Boolean = false
   final def matches: Boolean = matched
   final def update() {
@@ -20,9 +19,6 @@ abstract class Fingerprint {
     }
     if (With.frame < lockAfter) {
       matched = investigate
-    }
-    if (matched && firstMatchFrame < 0) {
-      firstMatchFrame = With.frame
     }
   }
   

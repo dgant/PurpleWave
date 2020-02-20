@@ -74,7 +74,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   var discoveredByEnemy         : Boolean = false
   def lastTotalHealthPoints: Int = lastHitPoints + lastShieldPoints + lastDefensiveMatrixPoints
 
-  private var lastUnitClass: UnitClass = unitClass
+  private var lastUnitClass: UnitClass = _
   def updateCommon() {
     val thisFrame = With.frame
     if (totalHealth < lastTotalHealthPoints) {

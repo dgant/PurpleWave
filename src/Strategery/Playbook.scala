@@ -81,7 +81,7 @@ object HumanPlaybook extends NormalPlaybook {
 }
 
 class TestingPlaybook extends NormalPlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvZ10Gate, PvZCorsair, PvZMidgameBisu, PvZLateGameTemplar)
+  override lazy val forced: Seq[Strategy] = Seq(PvP2Gate1012Goon)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
   override def respectOpponent: Boolean = false
   override def respectMap: Boolean = false

@@ -15,6 +15,7 @@ import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
 import Planning.Plans.Scouting.ScoutForCannonRush
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
+import Planning.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
@@ -59,7 +60,10 @@ class PvP1ZealotExpand extends GameplanTemplate {
         Get(17, Protoss.Probe))))
 
   override def workerPlan: Plan = new If(
-    new UnitsAtLeast(5, Protoss.Gateway),
+    new Or(
+      new UnitsAtLeast(5, Protoss.Gateway),
+      new EnemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.nexusFirst),
+      new EnemyBasesAtLeast(2)),
     new PumpWorkers,
     new PumpWorkers(maximumTotal = 25))
 
@@ -78,6 +82,15 @@ class PvP1ZealotExpand extends GameplanTemplate {
       Get(Protoss.Assimilator),
       Get(Protoss.CyberneticsCore)),
     new ReactToDarkTemplarEmergencies,
+    new Build(Get(2, Protoss.Gateway)),
+    // If we don't know what they're doing, stick a Forge in there
+    new If(
+      new And(
+        new BasesAtLeast(2),
+        new Not(new EnemyBasesAtLeast(2)),
+        new EnemiesAtMost(2, Protoss.Gateway),
+        new Not(new EnemyStrategy(With.fingerprints.dragoonRange, With.fingerprints.twoGate, With.fingerprints.fourGateGoon, With.fingerprints.robo, With.fingerprints.forgeFe, With.fingerprints.gatewayFe))),
+      new Build(Get(Protoss.Forge))),
     new Build(
       Get(3, Protoss.Gateway),
       Get(Protoss.DragoonRange)),

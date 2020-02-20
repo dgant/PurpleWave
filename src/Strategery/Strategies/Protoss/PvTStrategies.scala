@@ -93,15 +93,6 @@ object PvT1015DT extends PvTStrategy {
   override def entranceRamped: Boolean = false
 }
 object PvT1GateRobo extends PvTBasicOpener
-object PvT2GateObserver extends PvTBasicOpener {
-  override def allowedVsHuman: Boolean = false
-  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
-    With.fingerprints.twoFac,
-    With.fingerprints.twoFacVultures,
-    With.fingerprints.threeFac,
-    With.fingerprints.threeFacVultures,
-  )
-}
 object PvTDTExpand extends PvTBasicOpener {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
     PvT2BaseCarrier,

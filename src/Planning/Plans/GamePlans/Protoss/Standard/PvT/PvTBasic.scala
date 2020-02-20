@@ -26,7 +26,6 @@ class PvTBasic extends GameplanTemplate {
   override val activationCriteria = new Employing(
     PvT13Nexus,
     PvT21Nexus,
-    PvT23Nexus,
     PvT28Nexus,
     PvT32Nexus,
     PvT2GateRangeExpand,
@@ -58,12 +57,10 @@ class PvTBasic extends GameplanTemplate {
     new If(new EnemyIsRandom,                   new ScoutOn(Protoss.Pylon)), // Continue scouting from a PvR opening
     new If(new Employing(PvT13Nexus),           new ScoutOn(Protoss.Nexus, quantity = 2)),
     new If(new Employing(PvT21Nexus),           new ScoutOn(Protoss.Gateway)),
-    new If(new Employing(PvT23Nexus),           new ScoutOn(Protoss.Pylon)),
     new If(new Employing(PvT28Nexus),           new ScoutOn(Protoss.Gateway)),
     new If(new Employing(PvT32Nexus),           new ScoutOn(Protoss.Pylon)),
     new If(new Employing(PvT2GateRangeExpand),  new ScoutOn(Protoss.Pylon)),
     new If(new Employing(PvT1GateRobo),         new ScoutOn(Protoss.CyberneticsCore)),
-    new If(new Employing(PvT2GateObserver),     new ScoutOn(Protoss.Pylon)),
     new If(new Employing(PvT1015DT),            new If(new UpgradeStarted(Protoss.DragoonRange), new Scout)),
     new If(new Employing(PvTDTExpand),          new ScoutOn(Protoss.CyberneticsCore)))
 
@@ -86,16 +83,14 @@ class PvTBasic extends GameplanTemplate {
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvTIdeas.ReactToBBS,
     new PvTIdeas.ReactToWorkerRush,
-    new If(new Employing(PvT13Nexus, PvT21Nexus, PvT23Nexus, PvT28Nexus), new PvTIdeas.ReactTo2Fac))
+    new If(new Employing(PvT13Nexus, PvT21Nexus, PvT28Nexus), new PvTIdeas.ReactTo2Fac))
 
   override def buildOrderPlan: Plan = new Parallel(
     new If(new Employing(PvT13Nexus),           new BuildOrder(ProtossBuilds.PvT13Nexus_GateCoreGateZ: _*)),
     new If(new Employing(PvT21Nexus),           new BuildOrder(ProtossBuilds.PvT21Nexus: _*)),
-    new If(new Employing(PvT23Nexus),           new BuildOrder(ProtossBuilds.PvT23Nexus: _*)),
     new If(new Employing(PvT28Nexus),           new BuildOrder(ProtossBuilds.PvT28Nexus: _*)),
     new If(new Employing(PvT32Nexus),           new BuildOrder(ProtossBuilds.PvT32Nexus: _*)),
     new If(new Employing(PvT2GateRangeExpand),  new BuildOrder(ProtossBuilds.PvT2GateRangeExpand: _*)),
-    new If(new Employing(PvT2GateObserver),     new BuildOrder(ProtossBuilds.PvT2GateObs: _*)),
     new If(new Employing(PvT1015DT),            new BuildOrder(ProtossBuilds.PvT1015GateGoonDT: _*)),
     new If(new Employing(PvT1GateRobo),         new BuildOrder(ProtossBuilds.PvT1GateReaver: _*)),
     // DT expand, but don't build a Citadel in the enemy's face

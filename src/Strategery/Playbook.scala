@@ -57,10 +57,6 @@ object StrategyGroups {
     ZvZ5PoolSunkens,
 
     PvTStove, // TODO: For ladder/fun play only
-    PvT2GateObserver, // Experimenting with this so we can delete it
-    PvT25BaseCarrier, // Experimenting with this so we can delete it
-    PvT2GateRangeExpandCarrier, // Experimenting with this so we can delete it
-    PvTReaverCarrierCheese,
 
     DarkArchonsWithNoDefense // Temporary for AIIDE testing
   )

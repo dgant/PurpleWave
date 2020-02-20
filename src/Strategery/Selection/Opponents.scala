@@ -31,6 +31,9 @@ object Opponents {
   val fixedPvR    = StrategySelectionFixed(PvR1BaseDT)
   val safePvZ     = new StrategySelectionRecommended(StrategySelectionGreedy, PvZ1BaseForgeTech, PvZMidgameNeoBisu, PvZLateGameTemplar)
 
+  // AIST3 opponents
+  val letabot           : Opponent = add(Opponent("Iron bot",           StrategySelectionFixed(PvT13Nexus, PvT3BaseCarrier)))
+
   // TorchUp opponents
   val bunkerBoxer   : Opponent = add(Opponent("BunkerBoxeR",  new StrategySelectionRecommended(StrategySelectionGreedy, PvT32Nexus, PvT3BaseArbiter)))
   val zzzkbot       : Opponent = add(Opponent("ZZZKBot",      safePvZ))
@@ -38,7 +41,6 @@ object Opponents {
   val cunybot       : Opponent = add(Opponent("CUNYBot",      safePvZ))
   val ecgberht      : Opponent = add(Opponent("Ecgberht",     defaultPvT))
   val haopan        : Opponent = add(Opponent("Hao Pan",      new StrategySelectionRecommended(StrategySelectionGreedy, PvT32Nexus, PvT2BaseCarrier)))
-  val letabot       : Opponent = add(Opponent("LetaBot",      new StrategySelectionRecommended(StrategySelectionGreedy, PvTReaverCarrierCheese)))
   val locutus       : Opponent = add(Opponent("Locutus",      StrategySelectionSequence(Vector(
     Seq(PvP2GateDTExpand),
     Seq(PvP1ZealotExpand),
@@ -78,7 +80,7 @@ object Opponents {
   val cdbot         : Opponent = add(Opponent("CDBot",        defaultPvZ))
   // dandan/daqin below
   val firefrog      : Opponent = add(Opponent("Firefrog",     defaultPvZ))
-  val kimbot        : Opponent = add(Opponent("KimBot",       new StrategySelectionRecommended(StrategySelectionGreedy, PvTReaverCarrierCheese) { duration = 1 })) // IceLab or Leta fork?
+  val iron          : Opponent = add(Opponent("Iron bot",           StrategySelectionFixed(PvT1015DT, PvT2BaseCarrier)))
   val dandanbot     : Opponent = add(Opponent("DanDanBot",    locutus.policy))
   val mcrave        : Opponent = add(Opponent("McRave",       new StrategySelectionRecommended(StrategySelectionGreedy, PvPRobo) { duration = 1 }))
   val metabot       : Opponent = add(Opponent("MegaBot",      StrategySelectionFixed(PvPRobo)))
@@ -96,14 +98,12 @@ object Opponents {
 
   // Returning AIIDE opponents
   val cse           : Opponent = add(Opponent("CSE",          (if (Heartbreak.matches) StrategySelectionFixed(PvP2Gate1012DT) else StrategySelectionFixed(PvP2GateDTExpand))))
-  val iron          : Opponent = add(Opponent("Iron",         StrategySelectionFixed(PvT2GateRangeExpandCarrier)))
   val saida         : Opponent = add(Opponent("SAIDA",        StrategySelectionFixed(PvT28Nexus, PvT2BaseCarrier)))
   val adias         : Opponent = add(Opponent("adias",        saida.policy))
   val ualbertabot   : Opponent = add(Opponent("UAlbertaBot",  fixedPvR))
 
   // Other tournaments
 
-  val titaniron     : Opponent = add(Opponent("TitanIron",    new StrategySelectionRecommended(StrategySelectionGreedy, PvT2GateRangeExpandCarrier)))
   val megabot       : Opponent = add(Opponent("MegaBot",      defaultPvP))
   //val aiur          : Opponent = add(Opponent("Aiur",         defaultPvP)) -- Disabled temporarily while testing MetaBot for AIIDE
   val tyr           : Opponent = add(Opponent("Tyr",          StrategySelectionFixed(PvP2GateDTExpand)))

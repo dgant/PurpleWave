@@ -2,8 +2,6 @@ package Strategery.Strategies.Protoss
 
 import Information.Intelligenze.Fingerprinting.Fingerprint
 import Lifecycle.With
-import Planning.Plan
-import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTReaverCarrierCheese
 import Strategery.Strategies.Strategy
 import Strategery.{Destination, MapGroups, StarCraftMap}
 import bwapi.Race
@@ -24,39 +22,33 @@ object PvT13Nexus extends PvTBasicOpener {
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fiveRax,
     With.fingerprints.bbs,
-    With.fingerprints.bunkerRush)
-  override def startLocationsMin: Int = 3
+    With.fingerprints.bunkerRush,
+    With.fingerprints.twoRax1113)
 }
 object PvT21Nexus extends PvTBasicOpener {
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fiveRax,
     With.fingerprints.bbs,
     With.fingerprints.bunkerRush,
+    With.fingerprints.twoRax1113,
     With.fingerprints.twoFac,
     With.fingerprints.twoFacVultures,
     With.fingerprints.threeFac,
     With.fingerprints.threeFacVultures)
 }
-object PvT23Nexus extends PvTBasicOpener {
-  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
+object PvT28Nexus extends PvTBasicOpener {
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fiveRax,
-    With.fingerprints.bbs,
-    With.fingerprints.bunkerRush,
-    With.fingerprints.fourteenCC
-  )
+    With.fingerprints.bbs)
 }
 object PvT32Nexus extends PvTBasicOpener {
   override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fiveRax,
     With.fingerprints.bbs,
     With.fingerprints.bunkerRush,
-    With.fingerprints.fourteenCC
+    With.fingerprints.fourteenCC,
+    With.fingerprints.oneRaxFE
   )
-}
-object PvT28Nexus extends PvTBasicOpener {
-  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
-    With.fingerprints.fiveRax,
-    With.fingerprints.bbs)
 }
 object PvT2GateRangeExpand extends PvTBasicOpener {
   override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
@@ -112,6 +104,7 @@ object PvT2GateObserver extends PvTBasicOpener {
 }
 object PvTDTExpand extends PvTBasicOpener {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
+    PvT2BaseCarrier,
     PvT2BaseArbiter,
     PvT3BaseArbiter,
     PvT3BaseCarrier
@@ -140,10 +133,4 @@ object PvTStove extends PvTStrategy {
 object PvTProxy2Gate extends PvTStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(ProtossChoices.pvtOpenersTransitioningFrom2Gate)
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
-}
-
-object PvTReaverCarrierCheese extends PvTStrategy {
-  override def allowedVsHuman: Boolean = false
-  override def gameplan: Option[Plan] = Some(new PvTReaverCarrierCheese)
-  override def opponentsWhitelisted: Option[Iterable[String]] = Some(Vector("Rooijackers", "Leta", "KimBot", "Taeja Kim"))
 }

@@ -9,10 +9,10 @@ object TargetFilterCrowded extends TargetFilter {
 
     if (range > 32) return true
     val framesToGetInRange = actor.framesToGetInRange(target)
-    val occupiedPerimeter = target.matchups.threatsViolent
+    val occupiedPerimeter = target.matchups.threats
       .view
       .map(threat =>
-        if (threat.pixelRangeAgainst(target) <= range && threat.framesToGetInRange(target) < framesToGetInRange)
+        if (threat.isBeingViolent && threat.pixelRangeAgainst(target) <= range && threat.framesToGetInRange(target) < framesToGetInRange)
           threat.unitClass.dimensionMax
         else
           0)

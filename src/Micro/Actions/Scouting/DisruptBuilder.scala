@@ -8,20 +8,24 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import bwapi.Race
 
 object DisruptBuilder extends Action {
-  
+
+  def scaryThreats(unit: FriendlyUnitInfo): Iterable[UnitInfo] = {
+    unit.matchups.threats.view.filter(t => t.pixelsToGetInRange(unit) < 64 && ! t.constructing)
+  }
+
+  def disruptableBuilders(unit: FriendlyUnitInfo): Iterable[UnitInfo] = {
+    unit.matchups.enemies.filter(e => e.unitClass.isWorker && e.constructing)
+  }
+
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
+    lazy val scaries = scaryThreats(unit)
     lazy val targets = disruptableBuilders(unit)
     (unit.canAttack
      && With.intelligence.enemyMain.isDefined
      && With.enemies.exists(_.raceInitial == Race.Terran)
      && targets.nonEmpty
-     && (unit.matchups.threatsViolent.isEmpty || targets.exists(canKillInTime(unit, _))))
-  }
-  
-  protected def canKillInTime(unit: FriendlyUnitInfo, target: UnitInfo): Boolean = {
-    val framesToKill = unit.cooldownLeft + (target.hitPoints / unit.dpfOnNextHitAgainst(target))
-    val framesToLive = unit.hitPoints / unit.matchups.threatsViolent.map(t => t.dpfOnNextHitAgainst(unit)).sum
-    framesToKill <= framesToLive
+     && scaries.size < 2
+     && (scaries.isEmpty || (unit.totalHealth > 5 && targets.exists(_.totalHealth < unit.totalHealth))))
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
@@ -29,9 +33,5 @@ object DisruptBuilder extends Action {
     val target = EvaluateTargets.best(unit, builders)
     unit.agent.toAttack = target
     Attack.delegate(unit)
-  }
-  
-  def disruptableBuilders(unit: FriendlyUnitInfo): Iterable[UnitInfo] = {
-    unit.matchups.enemies.filter(e => e.unitClass.isWorker && e.constructing)
   }
 }

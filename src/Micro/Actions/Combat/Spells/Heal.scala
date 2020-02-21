@@ -17,7 +17,7 @@ object Heal extends Action {
   override protected def perform(unit: FriendlyUnitInfo) {
     val targets = validTargets(unit)
     val target  = ByOption.minBy(targets)(patient =>
-      if (unit.matchups.battle.isDefined && unit.matchups.threatsViolent.nonEmpty)
+      if (unit.matchups.battle.isDefined && unit.matchups.threats.nonEmpty)
         patient.pixelDistanceEdge(unit)
       else
         patient.pixelDistanceCenter(unit.agent.destination))

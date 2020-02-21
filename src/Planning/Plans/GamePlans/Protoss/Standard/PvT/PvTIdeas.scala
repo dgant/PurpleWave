@@ -11,7 +11,6 @@ import Planning.Plans.Macro.Automatic.{PumpWorkers, _}
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Protoss.MeldDarkArchons
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
 import Planning.Predicates.Milestones._
@@ -132,33 +131,6 @@ object PvTIdeas {
         Get(Protoss.RoboticsFacility),
         Get(Protoss.RoboticsSupportBay),
         Get(2, Protoss.Nexus))))
-
-  class ReactTo2Fac extends If(
-    new And(
-      new FrameAtMost(GameTime(10, 0)()),
-      new EnemyStrategy(With.fingerprints.twoFac),
-      new Or(
-        new UnitsAtMost(0, Protoss.Stargate),
-        new UnitsAtLeast(1, Protoss.RoboticsFacility))),
-    new Parallel(
-      new WriteStatus("ReactTo2Fac"),
-      new RequireSufficientSupply,
-      new Pump(Protoss.Dragoon, 7),
-      new Build(
-        Get(9, Protoss.Probe),
-        Get(Protoss.Gateway),
-        Get(Protoss.Assimilator),
-        Get(Protoss.CyberneticsCore),
-        Get(18, Protoss.Probe),
-        Get(Protoss.DragoonRange),
-        Get(2, Protoss.Gateway),
-        Get(2, Protoss.Nexus)),
-      new PumpWorkers,
-      new Build(
-        Get(3, Protoss.Gateway),
-        Get(Protoss.RoboticsFacility),
-        Get(Protoss.Observatory))))
-
   class TrainMinimumDragoons extends Parallel(
     new PumpRatio(Protoss.Dragoon, 1, 5, Seq(Enemy(Terran.Vulture, 1.0), Enemy(Terran.Wraith, 1.0))),
     new PumpRatio(Protoss.Dragoon, 1, 20, Seq(Enemy(Terran.Vulture, 0.75), Enemy(Terran.Wraith, 0.5))))
@@ -236,24 +208,11 @@ object PvTIdeas {
     new Pump(Protoss.Dragoon),
     new If(new BasesAtLeast(3), new Pump(Protoss.Zealot)))
 
-  class DarkArchonsUseful extends And(new EnemyHasShown(Terran.ScienceVessel), new UnitsAtLeast(3, Protoss.Arbiter))
-
-  class TrainDarkArchons extends If(
-    new DarkArchonsUseful,
-    new If(
-      new UnitsExactly(0, Protoss.DarkArchon),
-      new Parallel(
-        new If(new UnitsAtLeast(2, Protoss.DarkTemplar), new MeldDarkArchons),
-        new If(new UnitsAtLeast(12, UnitMatchWarriors), new Pump(Protoss.DarkTemplar, 2)))))
-
   class TrainCarriers extends If(
     new Check(() => With.units.countEnemy(Terran.Goliath) < 8 + 3 * With.units.countOurs(Protoss.Carrier)),
     new Pump(Protoss.Carrier))
 
   class TrainArmy extends Parallel(
-    new TrainDarkArchons,
-    new If(new And(new DarkArchonsUseful, new UnitsAtLeast(2, Protoss.DarkTemplar), new UnitsAtMost(1, Protoss.DarkArchon)), new MeldDarkArchons),
-    new If(new And(new DarkArchonsUseful, new UnitsAtLeast(12, UnitMatchWarriors), new UnitsAtMost(0, Protoss.DarkTemplar)), new Pump(Protoss.DarkTemplar, 2)),
     new TrainDarkTemplar,
     new PumpRatio(Protoss.Shuttle, 0, 1, Seq(Friendly(Protoss.Reaver, 1.0))),
     new PumpRatio(Protoss.Shuttle, 0, 2, Seq(Friendly(Protoss.Reaver, 0.5))),

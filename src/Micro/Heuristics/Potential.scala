@@ -1,4 +1,4 @@
-package Micro.Decisions
+package Micro.Heuristics
 
 import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}

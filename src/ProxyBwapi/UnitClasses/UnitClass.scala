@@ -2,7 +2,7 @@ package ProxyBwapi.UnitClasses
 
 import Mathematics.Points.{Point, Tile, TileRectangle}
 import Mathematics.PurpleMath
-import Micro.Decisions.MicroValue
+import Micro.Heuristics.MicroValue
 import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
@@ -439,6 +439,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
       / (if (this == Protoss.Interceptor) 4.0 else 1.0)
       / (if (isTwoUnitsInOneEgg) 2.0 else 1.0)
     )
+  lazy val logSubjectiveValue = Math.log(subjectiveValue)
   
   //////////////////////
   // Micro frame data //

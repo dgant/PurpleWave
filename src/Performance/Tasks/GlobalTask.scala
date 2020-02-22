@@ -83,6 +83,7 @@ class TaskVisualizations extends AbstractTask {
   override def maxConsecutiveSkips: Int = 0
   override protected def onRun() {
     With.visualization.render()
+    With.animations.render()
   }
 }
 class TaskUnitTracking extends AbstractTask {

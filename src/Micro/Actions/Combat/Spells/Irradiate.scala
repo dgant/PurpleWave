@@ -5,7 +5,7 @@ import Mathematics.Points.TileRectangle
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Irradiate extends TargetedSpell {
 
@@ -30,9 +30,9 @@ object Irradiate extends TargetedSpell {
       0.0
   }
 
-  override protected def valueTarget(target: UnitInfo): Double = {
+  override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
     val targetValue = valueUnit(target) * target.hitPoints / target.unitClass.maxHitPoints
-    val neighborValue = With.units.inRectangle(TileRectangle(
+    val neighborValue = With.units.inTileRectangle(TileRectangle(
       target.tileIncludingCenter.subtract(1, 1),
       target.tileIncludingCenter.add(1, 1))).view.map(valueUnit).sum
 

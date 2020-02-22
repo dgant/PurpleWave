@@ -4,7 +4,7 @@ import Debugging.Visualizations.ForceColors
 import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Techniques.Avoid
-import Micro.Decisions.Potential
+import Micro.Heuristics.Potential
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object CliffAvoid extends Action {

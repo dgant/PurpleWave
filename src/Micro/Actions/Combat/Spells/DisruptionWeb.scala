@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Spells
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object DisruptionWeb extends TargetedSpell {
   
@@ -13,7 +13,7 @@ object DisruptionWeb extends TargetedSpell {
   override protected def castRangeTiles : Int       = 9
   override protected def thresholdValue : Double    = casterClass.subjectiveValue / 2.0
   
-  override protected def valueTarget(target: UnitInfo): Double = {
+  override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
     if (target.underDisruptionWeb)  return 0.0
     if (target.flying)              return 0.0
     if ( ! target.canAttack)        return 0.0

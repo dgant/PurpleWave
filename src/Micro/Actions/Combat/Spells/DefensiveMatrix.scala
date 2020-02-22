@@ -19,7 +19,7 @@ object DefensiveMatrix extends TargetedSpell {
     ! With.self.hasTech(Terran.EMP)
   }
   
-  override protected def valueTarget(target: UnitInfo): Double = {
+  override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
     if (target.unitClass.isBuilding)      return 0.0
     if (target.isEnemy)                   return 0.0
     if (target.defensiveMatrixPoints > 0) return 0.0

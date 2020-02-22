@@ -8,7 +8,7 @@ import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Combat.Techniques.Common.Activators.One
 import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, AttackAsSoonAsPossible}
 import Micro.Actions.Commands.{Gravitate, Move}
-import Micro.Decisions.Potential
+import Micro.Heuristics.Potential
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Reposition extends ActionTechnique {

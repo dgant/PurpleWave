@@ -13,10 +13,10 @@ import bwta.Region
 import scala.collection.mutable
 
 class Zone(
-  val name        : String,
-  val bwtaRegion  : Region,
-  val boundary    : TileRectangle,
-  val tiles       : mutable.Set[Tile]) {
+            val name        : String,
+            val bwtaRegion  : Region,
+            val boundary    : TileRectangle,
+            val tiles       : mutable.Set[Tile]) {
 
   val tilesSeq: Seq[Tile] = tiles.toSeq
   val tileGrid = new GridFixedLambdaBoolean(i => tiles.contains(new Tile(i)))

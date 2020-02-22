@@ -7,7 +7,7 @@ import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Spiral
 import Micro.Actions.Scouting.BlockConstruction
-import Micro.Decisions.MicroValue
+import Micro.Heuristics.MicroValue
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, Forever}

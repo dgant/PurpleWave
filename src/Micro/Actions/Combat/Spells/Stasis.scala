@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Spells
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Stasis extends TargetedSpell {
   
@@ -13,7 +13,7 @@ object Stasis extends TargetedSpell {
   override protected def castRangeTiles : Int       = 9
   override protected def thresholdValue : Double    = casterClass.subjectiveValue
   
-  override protected def valueTarget(target: UnitInfo): Double = {
+  override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
     if (target.unitClass.isBuilding) return 0.0
     if (target.underStorm) return 0.0
     if (target.invincible) return 0.0

@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Spells
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Feedback extends TargetedSpell {
   
@@ -13,7 +13,7 @@ object Feedback extends TargetedSpell {
   override protected def castRangeTiles : Int       = 10
   override protected def thresholdValue : Double    = Protoss.DarkArchon.subjectiveValue / 4.0
   
-  override protected def valueTarget(target: UnitInfo): Double = {
+  override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
     if (target.unitClass.isBuilding)  return -1.0
     if ( ! target.isEnemy)            return -1.0
     

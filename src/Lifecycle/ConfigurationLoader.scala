@@ -95,8 +95,8 @@ object ConfigurationLoader {
 
   private def setFixedBuild(strategyNamesText: String): Unit = {
     val strategyNamesLines = strategyNamesText.split("[\r\n]+").filter(_.nonEmpty).toVector
-    val strategyNames = PurpleMath.sample(strategyNamesLines).split("").toVector
-    val strategyNamesAndInstances = strategyNamesLines.map(name => (name, AllChoices.allVsRandom.find(_.toString.toLowerCase == name.toLowerCase)))
+    val strategyNames = PurpleMath.sample(strategyNamesLines).split(" ").toVector
+    val strategyNamesAndInstances = strategyNames.map(name => (name, AllChoices.allVsRandom.find(_.toString.toLowerCase == name.toLowerCase)))
     val strategyNamesUnmatched = strategyNamesAndInstances.filter(_._2.isEmpty).map(_._1)
     val strategyInstances = strategyNamesAndInstances.filter(_._2.nonEmpty).map(_._2.get)
     if (strategyNamesUnmatched.nonEmpty) {

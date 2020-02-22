@@ -17,19 +17,21 @@ abstract class TargetedSpell extends Action {
   protected def castRangeTiles  : Int
   protected def thresholdValue  : Double
   protected def lookaheadFrames : Int = With.latency.latencyFrames
+  protected def pixelWidth      : Int = 48
+  protected def pixelHeight     : Int = 48
   
-  protected def valueTarget(target: UnitInfo): Double
+  protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.is(casterClass)            &&
     With.self.hasTech(tech)         &&
     hasEnoughEnergy(unit)           &&
-    additionalConditions(unit)      &&
-    unit.matchups.enemies.nonEmpty
+    unit.matchups.enemies.nonEmpty  &&
+    additionalConditions(unit)
   }
   
   protected def hasEnoughEnergy(unit: FriendlyUnitInfo): Boolean = {
-    unit.energy > tech.energyCost
+    unit.energy >= tech.energyCost
   }
   
   protected def additionalConditions(unit: FriendlyUnitInfo): Boolean = true
@@ -41,7 +43,7 @@ abstract class TargetedSpell extends Action {
     val totalRange      = safeDistance + 32.0 * castRangeTiles
     
     if (aoe) {
-      val targetPixel = SpellTargetAOE.chooseTargetPixel(unit, totalRange, thresholdValue, valueTarget, lookaheadFrames)
+      val targetPixel = SpellTargetAOE.chooseTargetPixel(unit, totalRange, thresholdValue, valueTarget, pixelWidth = pixelWidth, pixelHeight = pixelHeight)
       targetPixel.foreach(With.commander.useTechOnPixel(unit, tech, _))
       targetPixel.foreach(onCast(unit, _))
     }

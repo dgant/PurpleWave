@@ -66,7 +66,7 @@ class UnitTracker {
       .filter(_.pixelCenter.pixelDistanceSquared(pixel) <= pixelsSquared)
   }
   
-  def inRectangle(rectangle: TileRectangle): Vector[UnitInfo] = {
+  def inTileRectangle(rectangle: TileRectangle): Vector[UnitInfo] = {
     inTiles(rectangle.tiles)
   }
   

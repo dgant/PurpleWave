@@ -72,7 +72,7 @@ class Camera {
     tween()
   
     visibleArea   = TileRectangle(With.viewport.start.tileIncluding, With.viewport.start.pixel.add(Pixel(640, 400)).tileIncluding)
-    visibleUnits  = With.units.inRectangle(visibleArea).filter(_.visible).toSet
+    visibleUnits  = With.units.inTileRectangle(visibleArea).filter(_.visible).toSet
   }
   
   def focusOn(unit: UnitInfo) {

@@ -366,7 +366,7 @@ class PvTBasic extends GameplanTemplate {
 
     // Gas pump timing
     new PumpRatio(Protoss.Assimilator, 1, 2, Seq(Friendly(Protoss.Gateway, 0.2), Friendly(Protoss.RoboticsSupportBay, 0.4), Friendly(Protoss.TemplarArchives, 0.2), Friendly(Protoss.Stargate, 2.0))),
-    new If(new EmployingTwoBase), new BuildGasPumps,
+    new If(new EmployingTwoBase, new BuildGasPumps),
     new If(new UnitsAtLeast(45, UnitMatchWorkers), new BuildGasPumps),
 
     ////////////////////////////

@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Spells
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object MindControl extends TargetedSpell {
   
@@ -13,7 +13,7 @@ object MindControl extends TargetedSpell {
   override protected def castRangeTiles : Int       = 8
   override protected def thresholdValue : Double    = 0.5 * Protoss.DarkArchon.subjectiveValue
   
-  override protected def valueTarget(target: UnitInfo): Double = {
+  override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
     if (target.unitClass.isBuilding)  return -1.0
     if (target.isFriendly)            return -1.0
     if (target.stasised)              return -1.0

@@ -14,7 +14,7 @@ object Lockdown extends TargetedSpell {
   override protected def castRangeTiles : Int       = 8
   override protected def thresholdValue : Double    = Terran.Ghost.subjectiveValue
   
-  override protected def valueTarget(target: UnitInfo): Double = {
+  override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
     if ( ! target.isEnemy)                return 0.0
     if ( ! target.unitClass.isMechanical) return 0.0
     if (target.unitClass.isBuilding)      return 0.0

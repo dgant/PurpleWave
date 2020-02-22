@@ -20,7 +20,7 @@ object TacticalNuke extends TargetedSpell {
     && With.units.existsOurs(UnitMatchAnd(Terran.NuclearMissile, UnitMatchComplete))
   )
 
-  override protected def valueTarget(target: UnitInfo): Double = {
+  override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
     if (target.invincible)                              return 0.0
     if (target.is(Zerg.Larva))                          return 0.0
     if (target.is(Zerg.Egg))                            return 0.0

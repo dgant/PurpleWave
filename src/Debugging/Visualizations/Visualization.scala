@@ -81,7 +81,6 @@ class Visualization {
       if (screen) {
         views.foreach(_.renderScreen())
       }
-      
     }
   }
   

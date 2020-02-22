@@ -4,12 +4,10 @@ import Debugging.Visualizations.ForceColors
 import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.PurpleMath
-import Mathematics.Shapes.Circle
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Commands.{Gravitate, Move}
-import Micro.Decisions.Potential
-import Micro.Heuristics.SpellTargetAOE
+import Micro.Heuristics.{Potential, SpellTargetAOE}
 import Planning.UnitMatchers.UnitMatchBuilding
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -55,9 +53,10 @@ object BeAnArbiter extends Action {
         umbrellaSearchRadius,
         Protoss.Zealot.subjectiveValue,
         evaluateForCloaking,
-        12,
-        (tile) => Circle.points(2).map(tile.add).filter(_.valid),
-        Some(toUmbrella))
+        pixelWidth = 288,
+        pixelHeight = 288,
+        projectionFrames = 12.0,
+        candidates = Some(toUmbrella))
       destination.foreach(someDestination => {
         amCovering = true
         needUmbrella.foreach(ally => if (ally.pixelDistanceCenter(someDestination) < 32 * 7) {

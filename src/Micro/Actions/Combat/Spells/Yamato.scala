@@ -1,6 +1,6 @@
 package Micro.Actions.Combat.Spells
 
-import Micro.Decisions.MicroValue
+import Micro.Heuristics.MicroValue
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
@@ -14,7 +14,7 @@ object Yamato extends TargetedSpell {
   override protected def castRangeTiles : Int       = 10
   override protected def thresholdValue : Double    = Protoss.Shuttle.subjectiveValue
   
-  override protected def valueTarget(target: UnitInfo): Double = {
+  override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
     if ( ! target.isEnemy) return 0.0
   
     val yamatoDamage    = 260.0

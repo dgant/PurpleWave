@@ -6,7 +6,7 @@ import Mathematics.Physics.ForceMath
 import Micro.Actions.Action
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Coordination.Explosions.Explosion
-import Micro.Decisions.Potential
+import Micro.Heuristics.Potential
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class Dodge(explosions: Iterable[Explosion]) extends Action {

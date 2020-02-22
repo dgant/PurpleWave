@@ -7,7 +7,7 @@ import Mathematics.PurpleMath
 import Micro.Actions.Combat.Maneuvering.{DownhillPathfinder, Traverse}
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Gravitate, Move}
-import Micro.Decisions.Potential
+import Micro.Heuristics.Potential
 import Planning.UnitMatchers.UnitMatchSiegeTank
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}

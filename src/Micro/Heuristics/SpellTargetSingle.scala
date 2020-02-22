@@ -1,14 +1,14 @@
 package Micro.Heuristics
 
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object SpellTargetSingle {
   
   def chooseTarget(
-    caster              : UnitInfo,
+    caster              : FriendlyUnitInfo,
     searchRadiusPixels  : Double,
     minimumValue        : Double,
-    evaluate            : (UnitInfo) => Double): Option[UnitInfo] = {
+    evaluate            : (UnitInfo, FriendlyUnitInfo) => Double): Option[UnitInfo] = {
     
     val targets = caster.matchups.others.filter(t => t.pixelDistanceCenter(caster) <= searchRadiusPixels && t.visible && ! t.effectivelyCloaked)
     
@@ -16,7 +16,7 @@ object SpellTargetSingle {
       return None
     }
     
-    val valueByTarget = targets.map(t => (t, evaluate(t))).toMap
+    val valueByTarget = targets.map(t => (t, evaluate(t, caster))).toMap
     
     val best = valueByTarget.maxBy(_._2)
     

@@ -1,6 +1,6 @@
 package Lifecycle
 
-import Debugging.Visualizations.{Viewport, Visualization}
+import Debugging.Visualizations.{Animations, Viewport, Visualization}
 import Debugging.{Camera, Logger, Storyteller}
 import Information.Battles.BattleClassifier
 import Information.Geography.Geography
@@ -42,6 +42,7 @@ object With {
 
   var game              : bwapi.Game              = _
   var agents            : Agency                  = _
+  var animations        : Animations              = _
   var architecture      : Architecture            = _
   var bank              : Bank                    = _
   var blackboard        : Blackboard              = _
@@ -128,6 +129,7 @@ object With {
     analyzeTerrain()
 
     agents            = new Agency
+    animations        = new Animations
     architecture      = new Architecture
     bank              = new Bank
     battles           = new BattleClassifier

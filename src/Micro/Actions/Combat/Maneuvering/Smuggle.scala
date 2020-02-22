@@ -5,7 +5,7 @@ import Mathematics.Physics.ForceMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Techniques.Avoid
 import Micro.Actions.Commands.{Gravitate, Move}
-import Micro.Decisions.Potential
+import Micro.Heuristics.Potential
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Smuggle extends Action {

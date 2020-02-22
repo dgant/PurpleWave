@@ -7,7 +7,7 @@ import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Combat.Techniques.Common.Activators.{Activator, WeightedMax}
 import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, AttackAsSoonAsPossible}
 import Micro.Actions.Commands.{Gravitate, Move}
-import Micro.Decisions.Potential
+import Micro.Heuristics.Potential
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 

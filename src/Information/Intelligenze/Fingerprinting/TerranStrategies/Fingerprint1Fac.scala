@@ -11,4 +11,5 @@ class Fingerprint1Fac extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.siegeExpand),
   new FingerprintNot(With.fingerprints.oneRaxFE),
   new FingerprintNot(With.fingerprints.fourteenCC),
-  new FingerprintNot(With.fingerprints.twoFac))
+  new FingerprintNot(With.fingerprints.twoFac),
+  new FingerprintNot(With.fingerprints.threeFac))

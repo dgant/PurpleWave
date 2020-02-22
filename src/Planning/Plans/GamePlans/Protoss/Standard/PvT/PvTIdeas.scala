@@ -48,17 +48,30 @@ object PvTIdeas {
         new Latch(new UnitsAtLeast(8, UnitMatchWarriors)),
         new Not(new EnemyBarracksCheese)),
       new If(
-        new Or(
-          new Employing(PvT32Nexus, PvT1015Expand, PvT1015DT, PvTStove),
-          new MiningBasesAtLeast(3),
-          new EnemyBasesAtLeast(2),
-          new EnemyStrategy(With.fingerprints.bio),
-          new Not(new EnemyHasShown(Terran.Vulture)),
-          new UnitsAtLeast(12, UnitMatchWarriors, complete = true),
-          new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true)),
-        new If(
-          new SafeToMoveOut,
-          new PvTAttack))))
+        new And(
+          // It's safe -- or necessary for our build -- to attack in general
+          new Or(
+            new SafeToMoveOut,
+            new And(
+              new FrameAtMost(GameTime(4, 0)()),
+              new Employing(PvT32Nexus, PvT1015Expand, PvT1015DT, PvTStove))),
+          // We won't die to Vulture rush
+          new Or(
+            new MiningBasesAtLeast(3),
+            new EnemyBasesAtLeast(2),
+            new EnemyStrategy(With.fingerprints.bio),
+            new Not(new EnemyHasShown(Terran.Vulture)),
+            new Or(
+              // Don't get sieged in
+              new EnemyHasTech(Terran.SiegeMode),
+              // Vs 3-fac: Turtle hard
+              new Latch(new UnitsAtLeast(24, UnitMatchWarriors)),
+              // Vs 2-fac: Turtle medium
+              new And(
+                new Latch(new UnitsAtLeast(12, UnitMatchWarriors)),
+                new Not(new EnemyStrategy(With.fingerprints.threeFac))),
+              new Not(new EnemyStrategy(With.fingerprints.twoFac, With.fingerprints.threeFac))))),
+          new PvTAttack)))
 
   class ReactToFiveRaxAs2GateCore extends Parallel(
     new If(
@@ -121,8 +134,8 @@ object PvTIdeas {
       new Build(
         Get(Protoss.Pylon),
         Get(2, Protoss.Gateway),
-        Get(18, Protoss.Probe),
-        Get(Protoss.ShieldBattery)),
+        Get(18, Protoss.Probe)),
+      new If(new BasesAtMost(1), new Build(Get(Protoss.ShieldBattery))),
       new Pump(Protoss.Probe),
       new Build(
         Get(Protoss.Assimilator),
@@ -135,30 +148,20 @@ object PvTIdeas {
     new PumpRatio(Protoss.Dragoon, 1, 5, Seq(Enemy(Terran.Vulture, 1.0), Enemy(Terran.Wraith, 1.0))),
     new PumpRatio(Protoss.Dragoon, 1, 20, Seq(Enemy(Terran.Vulture, 0.75), Enemy(Terran.Wraith, 0.5))))
 
-  class EnemyHasMines extends Or(
-    new EnemyHasShown(Terran.SpiderMine),
-    new EnemyHasTech(Terran.SpiderMinePlant))
+  class EnemyHasMines extends Or(new EnemyHasShown(Terran.SpiderMine), new EnemyHasTech(Terran.SpiderMinePlant))
 
   class TrainDarkTemplar extends If(
     new And(
       // Can't spare gas on top of Carriers
       new UnitsAtMost(0, Protoss.FleetBeacon),
-      new Or(
-        // Drain Comsat energy in advance of Arbiters
-        new Not(new Latch(new UnitsAtLeast(1, UnitMatchOr(Protoss.Arbiter, Protoss.ArbiterTribunal), complete = true))),
-        //
-        new And(
-          new EnemiesAtMost(2, Terran.Comsat, complete = true),
-          new Or(
-            new Not(new EnemyHasMines),
-            new And(
-              new FrameAtMost(GameTime(9, 0)()),
-              new EnemyStrategy(
-                With.fingerprints.fiveRax,
-                With.fingerprints.bbs,
-                With.fingerprints.twoRax1113,
-                With.fingerprints.twoFac,
-                With.fingerprints.threeFac)))))))
+      // Use DTs to drain ComSet energy prior to Arbiters,
+      // but there's no point in having both at the same time
+      new UnitsAtMost(0, Protoss.ArbiterTribunal, complete = true),
+      new UnitsAtMost(0, Protoss.Arbiter),
+      new EnemiesAtMost(0, Terran.ScienceVessel),
+      new Not(new EnemyHasShown(Terran.SpellScannerSweep)),
+      new EnemiesAtMost(0, Terran.Comsat, complete = true)),
+    new Pump(Protoss.DarkTemplar, 2))
 
   private class TrainObservers extends If(
     new UnitsAtLeast(24, UnitMatchWarriors),
@@ -169,6 +172,7 @@ object PvTIdeas {
       new Pump(Protoss.Observer, 2)))
 
   class TrainReavers extends Parallel(
+    new If(new EnemyStrategy(With.fingerprints.bio), new Pump(Protoss.Reaver, 2)),
     new PumpRatio(Protoss.Reaver, 0, 6, Seq(
       Enemy(Terran.Marine, 1.0/6.0),
       Enemy(Terran.Goliath, 1.0/6.0),

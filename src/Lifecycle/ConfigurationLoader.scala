@@ -9,7 +9,7 @@ object ConfigurationLoader {
   def load(): Unit = {
     val human         = new BooleanFlag("humanopponent")()
     val ladder        = new BooleanFlag("ladder")()
-    val livestream    = ladder // Until we come up with something better
+    val livestream    = new BooleanFlag("livestream")() // Until we come up with something better
     val tournament    = new BooleanFlag("tournament")()
     val roundrobin    = new BooleanFlag("roundrobin")()
     val elimination   = new BooleanFlag("elimination")()

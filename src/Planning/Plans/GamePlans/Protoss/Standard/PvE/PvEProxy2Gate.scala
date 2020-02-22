@@ -14,7 +14,6 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{RequireBases, RequireMiningBases}
 import Planning.Plans.Scouting.{FoundEnemyBase, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
-import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy}
@@ -70,6 +69,8 @@ class PvEProxy2Gate extends GameplanTemplate {
     new EnemyWalledIn)
 
   private class AfterProxy extends Parallel(
+
+    // Aggression
     new If(
       new FrameAtLeast(GameTime(3, 30)())),
       new If(
@@ -80,65 +81,50 @@ class PvEProxy2Gate extends GameplanTemplate {
           new Aggression(1.9))),
 
     new RequireSufficientSupply,
-    new BuildOrder(
-      Get(10, Protoss.Probe),
-      Get(Protoss.Gateway),
-      Get(Protoss.Zealot),
-      Get(11, Protoss.Probe),
-      Get(2, Protoss.Zealot),
-      Get(2, Protoss.Pylon),
-      Get(4, Protoss.Zealot),
-      Get(12, Protoss.Probe)),
+
+    new BuildOrder(Get(10, Protoss.Probe), Get(Protoss.Pylon), Get(2, Protoss.Gateway)),
 
     new If(new And(new EnemiesAtLeast(4, Protoss.PhotonCannon), new EnemyUnitsNone(UnitMatchWarriors)), new RequireMiningBases(2)),
 
-    new Pump(Protoss.Observer, 2),
+    new If(
+      new And(
+        new Not(new EnemyStrategy(With.fingerprints.wallIn)),
+        new EnemiesAtMost(0, Terran.Bunker, complete = true)),
+      new BuildOrder(
+        Get(11, Protoss.Probe),
+        Get(2, Protoss.Zealot),
+        Get(2, Protoss.Pylon),
+        Get(4, Protoss.Zealot),
+        Get(12, Protoss.Probe))),
+
     new If(
       new EnemyHasShownCloakedThreat,
       new Parallel(
+        new Pump(Protoss.Observer, 2),
         new Pump(Protoss.RoboticsFacility, 1),
         new Pump(Protoss.Observatory, 1))),
 
-    new UpgradeContinuously(Protoss.DragoonRange),
-    new If(
-      new Not(new UpgradeStarted(Protoss.DragoonRange)),
-      new CapGasAt(200)),
+    new CapGasAt(200),
+
+    new PumpWorkers,
 
     new If(
-      new And(
-        new UnitsAtLeast(8, Protoss.Dragoon),
-        new SafeAtHome),
-      new RequireBases(2)),
-
-    new FlipIf(
       new MustTech,
-      new If(
-        new EnemyIsTerran,
-        new BuildOrder(Get(5, Protoss.Zealot)),
-        new Pump(Protoss.Zealot, 7)),
-      new Parallel(
-        new PumpWorkers,
-        new If(
-          new MustTech,
-          new Parallel(
-            new Build(
-              Get(Protoss.Assimilator),
-              Get(Protoss.CyberneticsCore)),
-            new Pump(Protoss.Dragoon))))),
+      new Build(
+        Get(Protoss.Assimilator),
+        Get(Protoss.CyberneticsCore),
+        Get(Protoss.DragoonRange))),
 
-    new If(
-      new Or(
-        new UnitsAtLeast(15, Protoss.Probe),
-        new MineralsAtLeast(250)),
+    new If(new And(new UnitsAtLeast(8, Protoss.Dragoon), new SafeAtHome), new RequireBases(2)),
+
+
+    new Pump(Protoss.Dragoon),
+    new FlipIf(
+      new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
+      new If(new EnemiesAtMost(1, UnitMatchOr(Protoss.Dragoon, Terran.Vulture)), new Pump(Protoss.Zealot)),
       new Build(Get(4, Protoss.Gateway))),
 
-    new If(
-      new EnemiesAtMost(1, UnitMatchOr(Protoss.Dragoon, Terran.Vulture)),
-      new Pump(Protoss.Zealot)),
-
-    new If(
-      new UnitsAtLeast(4, Protoss.Gateway, complete = true),
-      new RequireMiningBases(2))
+    new If(new UnitsAtLeast(4, Protoss.Gateway, complete = true), new RequireMiningBases(2))
   )
 
   override def emergencyPlans: Seq[Plan] = Seq(

@@ -49,6 +49,9 @@ object PvT32Nexus extends PvTBasicOpener {
     With.fingerprints.fourteenCC,
     With.fingerprints.oneRaxFE
   )
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.wallIn
+  )
 }
 object PvT2GateRangeExpand extends PvTBasicOpener {
   override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
@@ -82,6 +85,9 @@ object PvT1015Expand extends PvTBasicOpener {
     With.fingerprints.fourteenCC,
     With.fingerprints.oneRaxFE
   )
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.wallIn
+  )
 }
 object PvT1015DT extends PvTStrategy {
   override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Destination)
@@ -106,14 +112,12 @@ object PvTDTExpand extends PvTBasicOpener {
     With.fingerprints.threeFacVultures
   )
 }
-object PvT2BaseCarrier extends PvTStrategy {
-  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
-    With.fingerprints.bio
-  )
-}
-object PvT3BaseCarrier extends PvTStrategy
+object PvT2BaseCarrier extends PvTStrategy { override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.bio) }
+object PvT3BaseCarrier extends PvTStrategy { override def choices = Vector(Vector(PvT3rdFast, PvT3rdSafe)) }
 object PvT2BaseArbiter extends PvTStrategy
-object PvT3BaseArbiter extends PvTStrategy
+object PvT3BaseArbiter extends PvTStrategy { override def choices = Vector(Vector(PvT3rdFast, PvT3rdSafe)) }
+object PvT3rdFast extends PvTStrategy
+object PvT3rdSafe extends PvTStrategy
 
 object PvTStove extends PvTStrategy {
   override def allowedVsHuman: Boolean = false
@@ -122,6 +126,14 @@ object PvTStove extends PvTStrategy {
 }
 
 object PvTProxy2Gate extends PvTStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(ProtossChoices.pvtOpenersTransitioningFrom2Gate)
+  override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
+    PvT2BaseCarrier,
+    PvT2BaseArbiter,
+    PvT3BaseArbiter,
+    PvT3BaseCarrier
+  ))
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.wallIn
+  )
 }

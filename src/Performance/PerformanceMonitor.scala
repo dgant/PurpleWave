@@ -9,7 +9,7 @@ class PerformanceMonitor {
   private val framesToTrack = 24 * 3
   private val frameTimes = Array.fill(framesToTrack)(1l)
 
-  val frameLimitShort: Int = 85
+  val frameLimitShort: Int = 55
   
   private var millisecondsBefore = 0l
   private var lastFrameDelayUpdate = 0

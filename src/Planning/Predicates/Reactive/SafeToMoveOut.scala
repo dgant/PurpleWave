@@ -16,7 +16,9 @@ class SafeToMoveOut extends Predicate {
     if (With.self.isProtoss && With.enemies.forall(_.isZerg))     return pvzSafeToAttack
     if (With.self.isZerg && With.enemies.forall(_.isZerg))        return zvzSafeToAttack
     
-    With.battles.global.globalSafeToAttack
+    val output = With.battles.global.globalSafeToAttack
+    With.blackboard.safeToMoveOut.set(output)
+    output
   }
   
   private def countOurs(unitMatcher: UnitMatcher): Int = {

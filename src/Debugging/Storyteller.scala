@@ -3,17 +3,19 @@ package Debugging
 import Debugging.Visualizations.Views.Planning.ShowStrategyEvaluations
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
+import Planning.UnitMatchers.UnitMatchHatchery
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrades
 import Utilities.ByOption
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 class Storyteller {
 
-  case class Story(label: String, currentValue: () => String, var valueLast: String = "") {
+  case class Story(label: String, currentValue:   () => String, var valueLast: String = "") {
     def update(): Unit = {
       val valueNew = currentValue()
       if (valueLast != valueNew) {
@@ -37,31 +39,41 @@ class Storyteller {
   lazy val interestingTechs = Techs.all.filter(! defaultTechs.contains(_))
 
   val stories: Seq[Story] = Seq[Story](
-    Story("Opponents",      () => With.enemies.filter(_.isEnemy).map(_.name).mkString(", ")),
-    Story("Playbook",       () => With.configuration.playbook.toString),
-    Story("Policy",         () => With.configuration.playbook.strategySelectionPolicy.toString),
-    Story("Strategy",       () => With.strategy.selectedCurrently.map(_.toString).mkString(" ")),
-    Story("Status",         () => With.blackboard.status.get.mkString(", ")),
-    Story("Enemy race",     () => With.enemy.raceCurrent.toString),
-    Story("Fingerprints",   () => With.fingerprints.status.mkString(" ")),
-    Story("Our bases",      () => With.geography.ourBases.size.toString),
-    Story("Enemy bases",    () => With.geography.enemyBases.size.toString),
-    Story("Our techs",      () => interestingTechs.view.filter(With.self.hasTech).mkString(", ")),
-    Story("Enemy techs",    () => interestingTechs.view.filter(t => With.enemies.exists(_.hasTech(t))).mkString(", ")),
-    Story("Our upgrades",   () => Upgrades.all.view.map(u => (u, With.self.getUpgradeLevel(u))).filter(_._2 > 0).map(u => u._1 + " = " + u._2).mkString(", ")),
-    Story("Enemy upgrades", () => Upgrades.all.view.map(u => (u, ByOption.max(With.enemies.map(_.getUpgradeLevel(u))).getOrElse(0))).filter(_._2 > 0).map(u => u._1 + " = " + u._2).mkString(", "))
+    Story("Opponents",        () => With.enemies.filter(_.isEnemy).map(_.name).mkString(", ")),
+    Story("Playbook",         () => With.configuration.playbook.toString),
+    Story("Policy",           () => With.configuration.playbook.strategySelectionPolicy.toString),
+    Story("Strategy",         () => With.strategy.selectedCurrently.map(_.toString).mkString(" ")),
+    Story("Status",           () => With.blackboard.status.get.mkString(", ")),
+    Story("Attack",           () => With.blackboard.wantToAttack.get.toString),
+    Story("Enemy race",       () => With.enemy.raceCurrent.toString),
+    Story("Fingerprints",     () => With.fingerprints.status.mkString(" ")),
+    Story("Our bases",        () => With.geography.ourBases.size.toString),
+    Story("Enemy bases",      () => With.geography.enemyBases.size.toString),
+    Story("Our techs",        () => interestingTechs.view.filter(With.self.hasTech).mkString(", ")),
+    Story("Enemy techs",      () => interestingTechs.view.filter(t => With.enemies.exists(_.hasTech(t))).mkString(", ")),
+    Story("Our upgrades",     () => Upgrades.all.view.map(u => (u, With.self.getUpgradeLevel(u))).filter(_._2 > 0).map(u => u._1 + " = " + u._2).mkString(", ")),
+    Story("Enemy upgrades",   () => Upgrades.all.view.map(u => (u, ByOption.max(With.enemies.map(_.getUpgradeLevel(u))).getOrElse(0))).filter(_._2 > 0).map(u => u._1 + " = " + u._2).mkString(", ")),
+    Story("Our Factories",    () => With.units.countOurs(Terran.Factory).toString),
+    Story("Our Barracks",     () => With.units.countOurs(Terran.Barracks).toString),
+    Story("Our Gateways",     () => With.units.countOurs(Protoss.Gateway).toString),
+    Story("Our Hatcheries",   () => With.units.countOurs(UnitMatchHatchery).toString),
+    Story("Enemy Factories",  () => With.units.countEnemy(Terran.Factory).toString),
+    Story("Enemy Barracks",   () => With.units.countEnemy(Terran.Barracks).toString),
+    Story("Enemy Gateways",   () => With.units.countEnemy(Protoss.Gateway).toString),
+    Story("Enemy Hatcheries", () => With.units.countEnemy(UnitMatchHatchery).toString),
   )
 
   def onFrame(): Unit = {
     stories.foreach(_.update())
     logIntelligence()
+    logOurUnits()
   }
 
-  var unitsBefore: Set[UnitClass] = Set.empty
+  var enemyUnitsBefore: Set[UnitClass] = Set.empty
   private def logIntelligence(): Unit = {
-    val unitsAfter = With.enemies.flatMap(With.intelligence.unitsShown.all(_).view).filter(_._2.nonEmpty).map(_._1).toSet
-    val unitsDiff = unitsAfter -- unitsBefore
-    unitsDiff.foreach(newType => {
+    val enemyUnitsAfter = With.enemies.flatMap(With.intelligence.unitsShown.all(_).view).filter(_._2.nonEmpty).map(_._1).toSet
+    val enemyUnitsDiff = enemyUnitsAfter -- enemyUnitsBefore
+    enemyUnitsDiff.foreach(newType => {
       With.logger.debug("Discovered novel enemy unit: " + newType)
       With.units.enemy.withFilter(_.is(newType)).foreach(unit => {
         if (newType.isBuilding) {
@@ -78,7 +90,14 @@ class Storyteller {
         }
       })
     })
-    unitsBefore = unitsAfter
+    enemyUnitsBefore = enemyUnitsAfter
+  }
+
+  private var ourUnitsBefore: mutable.Set[UnitClass] = mutable.HashSet.empty
+  private def logOurUnits(): Unit = {
+    val ourUnitsAfter = With.units.ours.map(_.unitClass)
+    val ourUnitsNew = ourUnitsAfter -- enemyUnitsBefore
+    ourUnitsNew.foreach(unit => "New unit")
   }
 
   private def logPerformance() {

@@ -128,6 +128,10 @@ object EvaluateTargets extends {
     if (antiAirBonus) {
       output *= 2.0
     }
+    if (target.isAny(Terran.Armory, Protoss.CyberneticsCore, Zerg.Spire, Zerg.HydraliskDen)
+      && With.units.existsOurs(Terran.Battlecruiser, Terran.Wraith, Terran.ScienceVessel, Protoss.Carrier, Protoss.Scout, Zerg.Mutalisk, Zerg.Guardian)) {
+      output *= 10.0
+    }
 
     // Visibility bonus
     if (target.visibleToOpponents) {

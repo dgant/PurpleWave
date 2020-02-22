@@ -88,6 +88,7 @@ class Fingerprints {
   lazy val bio                = addFingerprint(new FingerprintBio)
   lazy val oneArmoryUpgrades  = addFingerprint(new Fingerprint1ArmoryUpgrades)
   lazy val twoArmoryUpgrades  = addFingerprint(new Fingerprint2ArmoryUpgrades)
+  lazy val wallIn             = addFingerprint(new FingerprintWallIn)
 
   // Protoss
   lazy val gatewayFirst = addFingerprint(new FingerprintGatewayFirst)

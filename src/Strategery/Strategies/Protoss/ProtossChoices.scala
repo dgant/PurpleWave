@@ -33,11 +33,11 @@ object ProtossChoices {
   // PvT //
   /////////
   
-  val pvtOpenersWithoutTransitions = Vector(
+  val pvtOpenersTransitioningFromNothing = Vector(
     PvTProxy2Gate,
     PvT13Nexus,
   )
-  
+
   val pvtOpenersTransitioningFrom1GateCore = Vector(
     PvT21Nexus,
     PvT28Nexus,
@@ -55,10 +55,8 @@ object ProtossChoices {
     PvT1015Expand,
     PvT1015DT
   )
-  
-  val pvtOpenersWithTransitions: Vector[Strategy] = (pvtOpenersTransitioningFrom1GateCore ++ pvtOpenersTransitioningFrom2Gate).distinct
-  
-  val pvtOpenersAll: Vector[Strategy] = (pvtOpenersWithoutTransitions ++ pvtOpenersTransitioningFrom1GateCore ++ pvtOpenersTransitioningFrom2Gate).distinct
+
+  val pvtOpenersAll: Vector[Strategy] = (pvtOpenersTransitioningFromNothing ++ pvtOpenersTransitioningFrom1GateCore ++ pvtOpenersTransitioningFrom2Gate).distinct
   
   /////////
   // PvP //

@@ -3,14 +3,12 @@ package ProxyBwapi.UnitTracking
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-import scala.collection.immutable.HashSet
 import scala.collection.mutable
 
 class FriendlyUnitTracker {
     
   private val unitInfosById = new mutable.HashMap[Int, FriendlyUnitInfo].empty
-  private var friendlyUnits: Set[FriendlyUnitInfo] = new HashSet[FriendlyUnitInfo]
-  var ourUnits: Set[FriendlyUnitInfo] = new HashSet[FriendlyUnitInfo]
+  var ourUnits: Iterable[FriendlyUnitInfo] = Iterable.empty
   
   def get(id: Int): Option[FriendlyUnitInfo] = unitInfosById.get(id)
   
@@ -22,22 +20,33 @@ class FriendlyUnitTracker {
     // Note that this only gets our own units and totally ignores allied units!
     
     val newBwapiUnitsById = With.self.rawUnits.map(unit => (unit.getID, unit)).toMap
-  
+
+    var newUnitsDiscovered: Int = 0
     newBwapiUnitsById.foreach(idToUnit =>
-      if ( ! unitInfosById.contains(idToUnit._1))
-        add(idToUnit._2, idToUnit._1))
-  
-    unitInfosById.foreach(idToUnitInfo =>
-      if ( ! newBwapiUnitsById.contains(idToUnitInfo._1))
-        remove(idToUnitInfo._1))
+      if ( ! unitInfosById.contains(idToUnit._1)) {
+        add(idToUnit._2, idToUnit._1)
+        newUnitsDiscovered += 1
+      })
+
+    // Performance optimization:
+    // Count whether any units are missing.
+    // If not, skip this membership test.
+    // The membership test is mostly a fallback anyway since we should remove these units in onUnitDestroy.
+    if (unitInfosById.size + newUnitsDiscovered > newBwapiUnitsById.size) {
+      unitInfosById.foreach(idToUnitInfo =>
+        if (!newBwapiUnitsById.contains(idToUnitInfo._1))
+          remove(idToUnitInfo._1))
+    }
     
     unitInfosById.foreach(pair => pair._2.update(newBwapiUnitsById(pair._1)))
-    friendlyUnits = unitInfosById.values.toSet
-    ourUnits = friendlyUnits.filter(_.player == With.self)
+
+    // TODO: This can probably just stay a view or otherwise not converted to a set for performance's sake
+    ourUnits = unitInfosById.values.view.filter(_.isOurs)
   }
   
   def onUnitDestroy(unit: bwapi.Unit) {
     val id = unit.getID
+    // TODO: Get this out of here. "With.blackboard.lastScout.exists( ! _.alive)"
     get(id).foreach(friendly => if (friendly.agent.canScout) With.blackboard.lastScoutDeath = With.frame)
     remove(id)
   }

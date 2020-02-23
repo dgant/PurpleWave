@@ -29,7 +29,7 @@ class UnitTracker {
   def existsOurs(matcher: UnitMatcher*): Boolean = countOurs(matcher: _*) > 0
   def countOurs(matcher: UnitMatcher*): Int = counterOurs(matcher: _*)
   def countOursP(predicate: (UnitInfo) => Boolean): Int = counterOurs.p(predicate)
-  def ours: Set[FriendlyUnitInfo] = friendlyUnitTracker.ourUnits
+  def ours: Iterable[FriendlyUnitInfo] = friendlyUnitTracker.ourUnits
   
   private val counterEnemy = new TotalUnitCounter(() => enemy)
   def existsEnemy(matcher: UnitMatcher*): Boolean = countEnemy(matcher: _*) > 0

@@ -2,8 +2,6 @@ package Performance
 
 import Lifecycle.With
 
-import scala.collection.mutable
-
 class PerformanceMonitor {
   
   private val framesToTrack = 24 * 3
@@ -20,31 +18,11 @@ class PerformanceMonitor {
 
   def enablePerformancePauses: Boolean = With.configuration.enablePerformancePauses // For disabling performance stops while debugging
 
-  var lastUniqueUnitIdCount: Int = 0
-  var lastUniqueDeadIdCount: Int = 0
-  var lastUniqueFriendlyUnitObjects: Int = 0
-  private var uniqueFriendlyUnitObjects: Int = 0
-  private val uniqueFriendlyUnitIds = new mutable.HashSet[Int]
-  private val uniqueFriendlyDeadIds = new mutable.HashSet[Int]
-  def trackUnit(id: Int, alive: Boolean) {
-    uniqueFriendlyUnitObjects += 1
-    uniqueFriendlyUnitIds += id
-    if ( ! alive) {
-      uniqueFriendlyDeadIds += id
-    }
-  }
-
   def startFrame() {
     millisecondsBefore = System.currentTimeMillis()
   }
 
   def endFrame() {
-    lastUniqueUnitIdCount = uniqueFriendlyUnitIds.size
-    lastUniqueDeadIdCount = uniqueFriendlyDeadIds.size
-    lastUniqueFriendlyUnitObjects = uniqueFriendlyUnitObjects
-    uniqueFriendlyUnitObjects = 0
-    uniqueFriendlyUnitIds.clear()
-    uniqueFriendlyDeadIds.clear()
     var millisecondDifference = millisecondsSpentThisFrame
     if (With.configuration.debugging && millisecondDifference > With.configuration.debugPauseThreshold) {
       millisecondDifference = meanFrameMilliseconds

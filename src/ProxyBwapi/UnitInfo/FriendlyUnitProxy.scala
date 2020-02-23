@@ -19,7 +19,7 @@ abstract class FriendlyUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends UnitInf
   private val cachePlayer    = new Cache[PlayerInfo] (() =>  Players.get(bwapiUnit.getPlayer))
   private val cachePixel     = new Cache[Pixel]      (() =>  new Pixel(bwapiUnit.getPosition))
   private val cacheTile      = new Cache[Tile]       (() =>  new Tile(bwapiUnit.getTilePosition))
-  private val cacheExists    = new Cache[Boolean]    (() =>  { val e = bwapiUnit.exists; With.performance.trackUnit(id, e); e })
+  private val cacheExists    = new Cache[Boolean]    (() =>  bwapiUnit.exists)
 
   ///////////////////
   // Tracking info //
@@ -39,7 +39,7 @@ abstract class FriendlyUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends UnitInf
   // Health //
   ////////////
 
-  def alive                 : Boolean   = { val e = bwapiUnit.exists; With.performance.trackUnit(id, e); e }
+  def alive                 : Boolean   = bwapiUnit.exists
   def complete              : Boolean   = bwapiUnit.isCompleted
   def defensiveMatrixPoints : Int       = bwapiUnit.getDefenseMatrixPoints
   def hitPoints             : Int       = bwapiUnit.getHitPoints

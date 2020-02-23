@@ -19,6 +19,7 @@ object ShowSaturation extends View {
         unit.velocityY == 0 &&
         unit.target.exists(_.unitClass.isResource))
       .flatMap(_.target)
+      .toSet
 
     With.geography.ourBases
       .view

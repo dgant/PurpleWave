@@ -95,7 +95,7 @@ class Storyteller {
 
   private var ourUnitsBefore: mutable.Set[UnitClass] = mutable.HashSet.empty
   private def logOurUnits(): Unit = {
-    val ourUnitsAfter = With.units.ours.map(_.unitClass)
+    val ourUnitsAfter = With.units.ours.map(_.unitClass).toSet
     val ourUnitsNew = ourUnitsAfter -- enemyUnitsBefore
     ourUnitsNew.foreach(unit => "New unit")
   }

@@ -8,8 +8,5 @@ object UnitClasses {
   def None: UnitClass = get(UnitType.None)
   def Unknown: UnitClass = get(UnitType.Unknown)
   
-  def get(unitType: UnitType): UnitClass = {
-    With.proxy.unitClassByType.getOrElse(unitType,
-      With.proxy.unitClassByName(unitType.toString))
-  }
+  def get(unitType: UnitType): UnitClass = With.proxy.unitClassByType.getOrElse(unitType, With.proxy.unitClassByName(unitType.toString))
 }

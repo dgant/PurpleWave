@@ -38,7 +38,7 @@ class PvTBasic extends GameplanTemplate {
     PvT3BaseCarrier,
     PvT3BaseArbiter)
 
-  override val meldArchonsAt: Int = -1
+  override val meldArchonsAt: Int = 25
 
   override def scoutPlan: Plan = new Parallel(
     new If(new EnemyIsRandom,                   new ScoutOn(Protoss.Pylon)), // Continue scouting from a PvR opening

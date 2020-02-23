@@ -97,7 +97,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     else {
       framesFailingToMove = 0
     }
-    if (tryingToAttackHere && cooldownLeft == 0) {
+    if (cooldownLeft == 0 && tryingToAttackHere) {
       framesFailingToAttack += 1
     }
     else {

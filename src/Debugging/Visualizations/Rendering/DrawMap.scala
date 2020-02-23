@@ -157,14 +157,14 @@ object DrawMap {
     DrawMap.line(pixel.add( 1 * f, 4 * f), pixel.add( 1 * f, 6 * f - 1), colorDark)
   }
 
-  def drawStar(pixel: Pixel, radius: Int, color: Color): Unit = {
+  def drawStar(pixel: Pixel, radius: Int, color: Color, solid: Boolean = true): Unit = {
     // Totally fudging the math on this -- might be better if I spent 2 minutes thinking or Googling
     val a = Math.max(4, radius)
     val b = Math.max(2, a / 2)
     val c = Math.max(1, b / 2)
-    DrawMap.triangle(pixel.add(-a, -c), pixel.add(a, -c), pixel.add(0, c), color)
-    DrawMap.triangle(pixel.add(0, -a),  pixel.add(0, c),  pixel.add(-b, b + 1), color)
-    DrawMap.triangle(pixel.add(0, -a),  pixel.add(0, c),  pixel.add( b, b + 1), color)
+    DrawMap.triangle(pixel.add(-a, -c), pixel.add(a, -c), pixel.add(0, c), color, solid)
+    DrawMap.triangle(pixel.add(0, -a),  pixel.add(0, c),  pixel.add(-b, b + 1), color, solid)
+    DrawMap.triangle(pixel.add(0, -a),  pixel.add(0, c),  pixel.add( b, b + 1), color, solid)
   }
   
   def irrelevant(points: Iterable[Pixel]): Boolean = {

@@ -3,7 +3,7 @@ package Debugging.Visualizations
 import Lifecycle.With
 
 class Animation {
-  def durationFrames: Int = 240
+  def durationFrames: Int = 96
   def drawScreen(): Unit = {}
   def drawMap(): Unit = {}
 

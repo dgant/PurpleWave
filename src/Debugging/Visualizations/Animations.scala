@@ -12,17 +12,17 @@ class Animations {
     animations += animation
   }
 
-  def addMap(animate: () => Unit, durationFrames: Int = 240): Unit = {
+  def addMap(animate: () => Unit, duration: Int = 96): Unit = {
     add(new Animation {
       override def drawMap(): Unit = animate()
-      override def durationFrames: Int = durationFrames
+      override def durationFrames: Int = duration
     })
   }
 
-  def addScreen(animate: () => Unit, durationFrames: Int = 240): Unit = {
+  def addScreen(animate: () => Unit, duration: Int = 96): Unit = {
     add(new Animation {
       override def drawScreen(): Unit = animate()
-      override def durationFrames: Int = durationFrames
+      override def durationFrames: Int = duration
     })
   }
 

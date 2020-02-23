@@ -17,8 +17,8 @@ abstract class TargetedSpell extends Action {
   protected def castRangeTiles  : Int
   protected def thresholdValue  : Double
   protected def lookaheadFrames : Int = With.latency.latencyFrames
-  protected def pixelWidth      : Int = 48
-  protected def pixelHeight     : Int = 48
+  protected def pixelWidth      : Int = 96
+  protected def pixelHeight     : Int = 96
   
   protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double
   

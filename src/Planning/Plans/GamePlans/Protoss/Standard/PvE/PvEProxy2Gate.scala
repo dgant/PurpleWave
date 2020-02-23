@@ -122,7 +122,10 @@ class PvEProxy2Gate extends GameplanTemplate {
     new FlipIf(
       new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
       new If(new EnemiesAtMost(1, UnitMatchOr(Protoss.Dragoon, Terran.Vulture)), new Pump(Protoss.Zealot)),
-      new Build(Get(4, Protoss.Gateway))),
+      // Build Gateways but make sure we don't place new ones at the proxy
+      new If(
+        new UnitsAtLeast(2, Protoss.Pylon, complete = true),
+        new Build(Get(4, Protoss.Gateway)))),
 
     new If(new UnitsAtLeast(4, Protoss.Gateway, complete = true), new RequireMiningBases(2))
   )

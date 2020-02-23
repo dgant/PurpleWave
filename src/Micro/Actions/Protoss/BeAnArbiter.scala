@@ -26,6 +26,17 @@ object BeAnArbiter extends Action {
       Protoss.Observer,
       UnitMatchBuilding)
 
+  def evaluateForCloaking(target: UnitInfo, friendlyUnitInfo: FriendlyUnitInfo): Double = {
+    if ( ! target.isFriendly) return 0.0
+    if ( ! needsUmbrella(target)) return 0.0
+    if (target.battle.isEmpty && friendlyUnitInfo.squad.exists(ourSquad => ! target.friendly.map(_.squad).exists(_.contains(ourSquad)))) return 0.0
+    val value           = target.subjectiveValue
+    val dangerFactor    = 2.0 + PurpleMath.fastTanh(Math.max(-48, target.matchups.framesOfEntanglement))
+    val isolationFactor = if (target.friendly.exists(_.agent.umbrellas.nonEmpty) && target.matchups.nearestArbiter.exists(_ != friendlyUnitInfo)) 0.0 else 1.0
+    val output          = value * dangerFactor * isolationFactor
+    output
+  }
+
   override protected def perform(arbiter: FriendlyUnitInfo) {
     val umbrellaSearchRadius    = 32.0 * 20.0
     val threatened              = arbiter.matchups.framesOfSafety <= 12.0 && ! With.yolo.active()
@@ -35,17 +46,6 @@ object BeAnArbiter extends Action {
     val needUmbrellaBadly       = needUmbrellaNearby.filter(_.friendly.forall(_.agent.umbrellas.isEmpty))
     val toUmbrella              = if (arbiter.matchups.enemies.exists(_.is(Terran.ScienceVessel))) needUmbrellaBadly else needUmbrellaNearby
     var amCovering              = false
-
-    def evaluateForCloaking(target: UnitInfo): Double = {
-      if ( ! target.isFriendly) return 0.0
-      if ( ! needsUmbrella(target)) return 0.0
-      if (target.battle.isEmpty && arbiter.squad.exists(ourSquad => ! target.friendly.map(_.squad).exists(_.contains(ourSquad)))) return 0.0
-      val value           = target.subjectiveValue
-      val dangerFactor    = 2.0 + PurpleMath.fastTanh(Math.max(-48, target.matchups.framesOfEntanglement))
-      val isolationFactor = if (target.friendly.exists(_.agent.umbrellas.nonEmpty) && target.matchups.nearestArbiter.exists(_ != arbiter)) 0.0 else 1.0
-      val output          = value * dangerFactor * isolationFactor
-      output
-    }
 
     if (needUmbrella.nonEmpty && arbiter.battle.isDefined) {
       val destination = SpellTargetAOE.chooseTargetPixel(

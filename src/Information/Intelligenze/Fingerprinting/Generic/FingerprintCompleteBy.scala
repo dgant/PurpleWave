@@ -1,5 +1,6 @@
 package Information.Intelligenze.Fingerprinting.Generic
 
+import Lifecycle.With
 import Planning.UnitMatchers.UnitMatcher
 
 class FingerprintCompleteBy(
@@ -8,5 +9,5 @@ class FingerprintCompleteBy(
   quantity    : Int = 1)
     extends AbstractFingerprintQuantityBy(unitMatcher, gameTime) {
   
-  override def investigate: Boolean = observed >= quantity
+  override def investigate: Boolean = With.frame < gameTime() && observed >= quantity
 }

@@ -446,7 +446,9 @@ class PvTBasic extends GameplanTemplate {
     new RequireMiningBases(4),
     new PumpReactiveGateways(12, 16),
     new RequireMiningBases(5),
-    new Build(Get(22, Protoss.Gateway))
+    new Build(Get(25, Protoss.Gateway)),
+    new RequireMiningBases(6),
+    new Build(Get(30, Protoss.Gateway))
   )
 }
 

@@ -424,6 +424,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val mineralValue     : Int = if (this == Zerg.Larva) 0 else mineralPrice  + buildUnitsSpent.map(_.mineralValue).sum
   lazy val gasValue         : Int = if (this == Zerg.Larva) 0 else gasPrice      + buildUnitsSpent.map(_.gasValue).sum
   lazy val subjectiveValue  : Double =
+    if (isSpell) 0 else 
     if (this == Zerg.LurkerEgg) Zerg.Lurker.subjectiveValue else
     if (this == Zerg.Cocoon) Zerg.Guardian.subjectiveValue else
     (

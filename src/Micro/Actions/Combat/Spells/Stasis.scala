@@ -1,5 +1,6 @@
 package Micro.Actions.Combat.Spells
 
+import Lifecycle.With
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
@@ -14,8 +15,10 @@ object Stasis extends TargetedSpell {
   override protected def thresholdValue : Double    = casterClass.subjectiveValue
   
   override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
+    if (With.grids.psionicStorm.isSet(target.tileIncludingCenter)) return 0.0
     if (target.unitClass.isBuilding) return 0.0
     if (target.underStorm) return 0.0
+    if (target.stasised)   return 0.0
     if (target.invincible) return 0.0
 
     val teamValue = (

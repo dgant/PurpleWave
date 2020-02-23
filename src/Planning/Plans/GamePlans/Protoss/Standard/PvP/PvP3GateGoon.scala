@@ -10,7 +10,8 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackWithDarkTemplar
 import Planning.Plans.Macro.Automatic.CapGasWorkersAt
-import Planning.Plans.Macro.BuildOrders.BuildOrder
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
+import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Milestones._
@@ -33,9 +34,7 @@ class PvP3GateGoon extends GameplanTemplate {
     new Blueprint(this, building = Some(Protoss.Pylon),         placement = Some(PlacementProfiles.backPylon)),
     new Blueprint(this, building = Some(Protoss.Pylon)),
     new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
+    new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone))) // If we need emergency cannons in the natural, this is the Pylon we need done
 
   override def priorityAttackPlan : Plan = new AttackWithDarkTemplar
   override def attackPlan: Plan = new Trigger(
@@ -66,10 +65,20 @@ class PvP3GateGoon extends GameplanTemplate {
       new CapGasWorkersAt(2)),
 
     new EjectScout,
-    new BuildOrder(
-      Get(8, Protoss.Dragoon),
-      Get(2, Protoss.Nexus),
-      Get(11, Protoss.Dragoon)),
+    new BuildOrder(Get(8, Protoss.Dragoon)),
+    // Kind of cowardly, but if we can't be sure they're not going DT, get a Forge before expanding so we can get cannons in time if necessary
+    new If(
+      new Not(new EnemyStrategy(
+        With.fingerprints.nexusFirst,
+        With.fingerprints.twoGate,
+        With.fingerprints.forgeFe,
+        With.fingerprints.gatewayFe,
+        With.fingerprints.dragoonRange,
+        With.fingerprints.fourGateGoon,
+        With.fingerprints.robo)),
+      new Build(Get(Protoss.Forge))),
+    new RequireMiningBases(2),
+    new BuildOrder(Get(11, Protoss.Dragoon)),
 
     new PvPIdeas.TrainArmy,
   )

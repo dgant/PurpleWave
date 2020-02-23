@@ -13,8 +13,12 @@ class FingerprintArrivesBy(
   override val sticky = true
   
   override def investigate: Boolean = {
+    val targetFrame = gameTime.frames
+
+    // Important performance short-circuit
+    if (With.frame > targetFrame) return false
+
     val units           = With.units.ever.view.filter(u => u.isEnemy && unitMatcher.accept(u))
-    val targetFrame     = gameTime.frames
     val arrivingOnTime  = units.count(_.arrivalFrame() < targetFrame)
     val output          = arrivingOnTime >= quantity
     output

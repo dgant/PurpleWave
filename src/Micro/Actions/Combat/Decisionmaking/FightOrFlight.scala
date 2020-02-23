@@ -33,7 +33,7 @@ object FightOrFlight extends Action {
       }
     }
 
-    decide(true,  "YOLO",         () => With.yolo.active())
+    decide(true,  "YOLO",         () => With.yolo.active() && unit.canAttack)
     decide(true,  "Bored",        () => unit.battle.isEmpty)
     decide(true,  "No threats",   () => unit.matchups.threats.isEmpty)
     decide(false, "Pacifist",     () => ! unit.agent.canFight)

@@ -33,7 +33,7 @@ class Animations {
         animations.foreach(_.drawMap())
       }
       if (With.visualization.screen) {
-        animations.foreach(_.drawMap())
+        animations.foreach(_.drawScreen())
       }
     }
 

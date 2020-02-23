@@ -37,10 +37,8 @@ abstract class TargetedSpell extends Action {
   protected def additionalConditions(unit: FriendlyUnitInfo): Boolean = true
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    val framesToLive    = unit.matchups.framesToLive
-    val framesOfSafety  = unit.matchups.framesOfSafety
-    val safeDistance    = PurpleMath.clamp(framesToLive * unit.topSpeed, 0.0, 32.0 * 12.0)
-    val totalRange      = safeDistance + 32.0 * castRangeTiles
+    val safeDistance  = PurpleMath.clamp(unit.matchups.framesOfSafety * unit.topSpeed, 0.0, 32 * 18)
+    val totalRange    = safeDistance + 32.0 * castRangeTiles
     
     if (aoe) {
       val targetPixel = SpellTargetAOE.chooseTargetPixel(unit, totalRange, thresholdValue, valueTarget, pixelWidth = pixelWidth, pixelHeight = pixelHeight)

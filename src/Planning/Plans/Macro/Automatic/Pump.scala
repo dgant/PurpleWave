@@ -26,7 +26,7 @@ class Pump(
     val unitsToAddCeiling         = Math.max(0, Math.min(maximumTotal, maxDesirable) - unitsNow) // TODO: Clamp Nukes to #Silos
     val buildersSpawning          = if (unitClass.whatBuilds._1 == Zerg.Larva) With.units.countOurs(UnitMatchAnd(UnitMatchHatchery, UnitMatchComplete)) else 0
     val buildersExisting          = builders.toVector
-    val buildersReserved          = buildersExisting.map(_.unitClass).distinct.map(With.scheduler.macroPumps.consumed).sum
+    val buildersReserved          = buildersExisting.view.map(_.unitClass).distinct.map(With.scheduler.macroPumps.consumed).sum
     val buildersReadiness         = getBuilderReadiness(buildersExisting)
     val buildersTotal             = buildersExisting.size + buildersSpawning
     val buildersAllocatable       = Math.max(0, Math.min(buildersTotal * maximumConcurrentlyRatio, buildersTotal - buildersReserved))
@@ -52,7 +52,7 @@ class Pump(
     With.scheduler.request(this, Get(unitsToRequest, unitClass))
   }
   
-  private def getBuilderReadiness(builders: Vector[FriendlyUnitInfo]): Double = {
+  private def getBuilderReadiness(builders: Iterable[FriendlyUnitInfo]): Double = {
     val output = ByOption
       .mean(builders.map(b => 1.0 - Math.min(1.0, Math.max(b.remainingTrainFrames, b.remainingCompletionFrames).toDouble / unitClass.buildFrames)))
       .getOrElse(0.5)
@@ -104,7 +104,7 @@ class Pump(
       }
       else unitClass)
   
-  protected def builders: Seq[FriendlyUnitInfo] = With.units.ours
+  protected def builders: Iterable[FriendlyUnitInfo] = With.units.ours
     .view
     .filter(builder =>
       builder.alive
@@ -116,7 +116,6 @@ class Pump(
         && ( ! unitClass.isAddon                                          || unitClass.buildUnitsEnabling.forall(t => With.units.ours.exists(u => u.completeOrNearlyComplete && u.is(t)))) // Hack -- don't reserve buildings before we have the tech to build the addon.
         && ( ! unitClass.buildUnitsEnabling.contains(Terran.MachineShop)  || builder.addon.isDefined)
         && ( ! unitClass.buildUnitsEnabling.contains(Terran.ControlTower) || builder.addon.isDefined))
-    .toSeq
   
   protected def buildCapacity: Int = {
     Vector(

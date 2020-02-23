@@ -121,16 +121,16 @@ class PvTBasic extends GameplanTemplate {
           new Parallel(new UpgradeContinuously(Protoss.AirArmor), new If(new UpgradeComplete(Protoss.AirArmor, 3), new UpgradeContinuously(Protoss.AirDamage))),
           new Parallel(new UpgradeContinuously(Protoss.AirDamage), new If(new UpgradeComplete(Protoss.AirDamage, 3), new UpgradeContinuously(Protoss.AirArmor)))))))
 
-  class GatewayUpgrades extends Parallel(
-    // Get upgrades with Arbiter builds, vs. Bio, or when maxed on air upgrades
+  // Get upgrades with Arbiter builds, vs. Bio, or when maxed on air upgrades
     // Double-spin, or prioritize armor vs. bio
-    new If(
-      new Or(
-        new EnemyStrategy(With.fingerprints.bio),
-        new EmployingArbiters,
-        new And(
-          new UpgradeComplete(Protoss.AirDamage, 2, Protoss.AirDamage.upgradeFrames(2)),
-          new UpgradeComplete(Protoss.AirArmor, 2, Protoss.AirArmor.upgradeFrames(2)))),
+  class GatewayUpgrades extends If(
+    new Or(
+      new EnemyStrategy(With.fingerprints.bio),
+      new EmployingArbiters,
+      new And(
+        new UpgradeComplete(Protoss.AirDamage, 2, Protoss.AirDamage.upgradeFrames(2)),
+        new UpgradeComplete(Protoss.AirArmor, 2, Protoss.AirArmor.upgradeFrames(2)))),
+    new Parallel(
       new If(
         new UnitsAtLeast(2, Protoss.Forge),
         new FlipIf(
@@ -144,7 +144,10 @@ class PvTBasic extends GameplanTemplate {
             new If(new UpgradeComplete(Protoss.GroundArmor, 3), new UpgradeContinuously(Protoss.GroundDamage))),
           new Parallel(
             new UpgradeContinuously(Protoss.GroundDamage),
-            new If(new UpgradeComplete(Protoss.GroundDamage, 3), new UpgradeContinuously(Protoss.GroundArmor)))))))
+            new If(new UpgradeComplete(Protoss.GroundDamage, 3), new UpgradeContinuously(Protoss.GroundArmor))))),
+      new If(
+        new UnitsAtLeast(3, Protoss.Forge),
+        new UpgradeContinuously(Protoss.Shields))))
 
   class HighPriorityTech extends Parallel(
     new If(new EnemyHasShownWraithCloak, new GoObs),
@@ -178,6 +181,7 @@ class PvTBasic extends GameplanTemplate {
 
   class LowPriorityTech extends Parallel(
     new If(new And(new EnemyStrategy(With.fingerprints.bio), new GasPumpsAtLeast(3)), new Build(Get(2, Protoss.Forge))),
+    new If(new And(new EnemyStrategy(With.fingerprints.bio), new GasPumpsAtLeast(4)), new Build(Get(3, Protoss.Forge))),
     new If(new And(new EmployingArbiters, new GasPumpsAtLeast(4), new UnitsAtLeast(1, Protoss.ArbiterTribunal)),  new Build(Get(2, Protoss.Stargate), Get(2, Protoss.Forge))),
     new If(new And(new EmployingCarriers, new GasPumpsAtLeast(4), new UnitsAtLeast(1, Protoss.FleetBeacon)),      new Build(Get(2, Protoss.CyberneticsCore), Get(Protoss.Forge))),
     new If(new EmployingCarriers, new UpgradeContinuously(Protoss.Shields, 1)),

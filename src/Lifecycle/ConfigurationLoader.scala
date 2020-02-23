@@ -48,12 +48,12 @@ object ConfigurationLoader {
   }
 
   private def setTournamentMode(): Unit = {
-    config.targetFrameDurationMilliseconds  = 40
-    config.forcedPlaybook                   = Some(TournamentPlaybook)
+    config.forcedPlaybook = Some(TournamentPlaybook)
+    config.targetFrameDurationMilliseconds = 40
   }
 
   private def setLadderMode(): Unit = {
-    config.targetFrameDurationMilliseconds  = 40
+    config.targetFrameDurationMilliseconds = 40
   }
 
   private def setEliminationMode(): Unit = {

@@ -7,14 +7,14 @@ import ProxyBwapi.Races.Zerg
 class EnemyLurkers extends Predicate {
   
   override def isComplete: Boolean = {
-    With.units.enemy.exists(_.is(Zerg.Lurker)) ||
-    With.units.enemy.exists(_.is(Zerg.LurkerEgg)) ||
+    With.units.existsEnemy(Zerg.Lurker) ||
+    With.units.existsEnemy(Zerg.LurkerEgg) ||
     (
       (
-        With.units.enemy.exists(_.is(Zerg.Hydralisk)) ||
-        With.units.enemy.exists(_.is(Zerg.HydraliskDen))
+        With.units.existsEnemy(Zerg.Hydralisk) ||
+        With.units.existsEnemy(Zerg.HydraliskDen)
       )
-      && With.units.enemy.exists(_.is(Zerg.Lair))
+      && With.units.existsEnemy(Zerg.Lair)
     )
   }
 }

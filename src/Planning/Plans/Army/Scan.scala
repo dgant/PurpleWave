@@ -25,7 +25,7 @@ class Scan extends Plan {
     }
     
     // TODO: Actually check whether we can attack the darned thing.
-    val cloakedTargets = With.units.enemy.filter(ninja =>
+    val cloakedTargets = With.units.enemy.view.filter(ninja =>
       ninja.effectivelyCloaked
       && ninja.matchups.targets.nonEmpty
       && ninja.matchups.enemies.exists(defender =>
@@ -38,7 +38,7 @@ class Scan extends Plan {
       return
     }
     
-    val contentiousTanks = With.units.enemy.filter(u =>
+    val contentiousTanks = With.units.enemy.view.filter(u =>
       ! u.visible &&
       u.likelyStillThere &&
       u.unitClass.isSiegeTank &&

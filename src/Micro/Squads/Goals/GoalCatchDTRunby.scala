@@ -22,7 +22,7 @@ class GoalCatchDTRunby extends SquadGoalBasic {
     super.run()
   }
   override def destination: Pixel = {
-    val dts = With.units.enemy.filter(_.is(Protoss.DarkTemplar))
+    val dts = With.units.enemy.view.filter(_.is(Protoss.DarkTemplar))
     ByOption.minBy(With.geography.ourBases.map(_.heart.pixelCenter))(heart =>
       ByOption.min(dts.map(_.pixelDistanceCenter(heart)))
         .getOrElse(heart.pixelDistance(With.intelligence.mostBaselikeEnemyTile.pixelCenter)))

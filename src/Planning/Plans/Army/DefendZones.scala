@@ -30,8 +30,7 @@ class DefendZones extends Plan {
     
     if (zoneScores.isEmpty) return
     
-    val zoneByEnemy = With.units.enemy
-      .view
+    val zoneByEnemy = With.units.enemy.view
       .filter(e => e.likelyStillAlive && e.likelyStillThere && (e.unitClass.dealsDamage || e.unitClass.isDetector || e.isTransport))
       .map(enemy => (enemy, zoneScores.minBy(z => enemy.pixelDistanceTravelling(z._1.centroid))._1))
       .filter(pair =>

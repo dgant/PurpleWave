@@ -24,11 +24,11 @@ class DefendFightersAgainstRush extends Plan {
     }
 
     def inOurBase(unit: UnitInfo): Boolean = unit.zone.bases.exists(_.owner.isUs)
-    
-    val cannons           = With.units.ours .filter(u => u.aliveAndComplete && u.isAny(Terran.Bunker, Protoss.PhotonCannon))
-    val fighters          = With.units.ours .filter(u => u.unitClass.canMove && u.canAttack && ! u.unitClass.isWorker && inOurBase(u) && u.remainingCompletionFrames < GameTime(0, 5)())
-    lazy val aggressors   = With.units.enemy.filter(u => u.aliveAndComplete && u.is(UnitMatchWarriors) && inOurBase(u))
-    lazy val workers      = With.units.ours.filter(u => u.aliveAndComplete && u.unitClass.isWorker)
+
+    val fighters          = With.units.ours .view.filter(u => u.unitClass.canMove && u.canAttack && ! u.unitClass.isWorker && inOurBase(u) && u.remainingCompletionFrames < GameTime(0, 5)())
+    lazy val cannons      = With.units.ours .view.filter(u => u.aliveAndComplete && u.isAny(Terran.Bunker, Protoss.PhotonCannon))
+    lazy val aggressors   = With.units.enemy.view.filter(u => u.aliveAndComplete && u.is(UnitMatchWarriors) && inOurBase(u))
+    lazy val workers      = With.units.ours.view.filter(u => u.aliveAndComplete && u.unitClass.isWorker)
     lazy val threatening  = aggressors.filter(_.inPixelRadius(32 * 4).exists(n => n.isOurs && n.totalHealth < 200))
     
     if (fighters.isEmpty) {

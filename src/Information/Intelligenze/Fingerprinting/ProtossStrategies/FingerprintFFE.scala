@@ -2,7 +2,7 @@ package Information.Intelligenze.Fingerprinting.ProtossStrategies
 
 import Information.Intelligenze.Fingerprinting.Generic._
 import Lifecycle.With
-import Planning.UnitMatchers.{UnitMatchBuilding, UnitMatchNot, UnitMatchProxied}
+import Planning.UnitMatchers._
 import ProxyBwapi.Races.Protoss
 import Utilities.ByOption
 import bwapi.Race
@@ -17,10 +17,10 @@ abstract class FingerprintFFE extends FingerprintAnd(
   
   private class Status {
     lazy val forge                  = With.units.enemy.find(u => u.is(Protoss.Forge) && ! u.zone.bases.exists(_.isStartLocation))
-    lazy val cannonsWalled          = With.units.enemy.filter(u => u.isAll(Protoss.PhotonCannon, UnitMatchNot(UnitMatchProxied)) && ! u.zone.bases.exists(_.isStartLocation)).toVector
-    lazy val buildingsProxied       = With.units.enemy.filter(_.isAll(UnitMatchBuilding, UnitMatchProxied)).toVector
     lazy val gateway                = With.units.enemy.find(_.is(Protoss.Gateway))
-    lazy val zealot                 = With.units.enemy.filter(_.is(Protoss.Zealot)).toVector
+    lazy val cannonsWalled          = With.units.enemy.view.filter(u => u.isAll(Protoss.PhotonCannon, UnitMatchNot(UnitMatchProxied)) && ! u.zone.bases.exists(_.isStartLocation)).toVector
+    lazy val buildingsProxied       = With.units.enemy.view.filter(_.isAll(UnitMatchBuilding, UnitMatchProxied)).toVector
+    lazy val zealot                 = With.units.enemy.view.filter(_.is(Protoss.Zealot)).toVector
     lazy val forgeOrCannon          = cannonsWalled ++ forge
     lazy val gatewayOrZealot        = gateway ++ zealot
     lazy val forgeCompletionFrame   = forge.map(_.completionFrame).orElse(ByOption.min(cannonsWalled.map(_.frameDiscovered)))
@@ -50,8 +50,8 @@ abstract class FingerprintFFE extends FingerprintAnd(
   private def conclusivelyGateway(status: Status): Boolean = (
     status.buildingsProxied.isEmpty
       && (
-      (With.fingerprints.gatewayFirst.matches && With.units.enemy.exists(_.is(Protoss.Forge)))
-      || (With.units.enemy.exists(u => u.is(Protoss.Gateway) && u.complete) && With.units.enemy.exists(u => u.is(Protoss.Forge) && ! u.complete))
+      (With.fingerprints.gatewayFirst.matches && With.units.existsEnemy(Protoss.Forge))
+      || (With.units.existsEnemy(UnitMatchAnd(Protoss.Gateway, UnitMatchComplete)) && With.units.existsEnemy(UnitMatchAnd(Protoss.Gateway, UnitMatchNot(UnitMatchComplete))))
       || (readyToDecide(status) && ! gatewayUnlikely(status) && lossFFE(status) >= lossGatewayFE(status)))
   )
   

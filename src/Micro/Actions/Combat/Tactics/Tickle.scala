@@ -200,8 +200,8 @@ object Tickle extends Action {
   private def destroyBuildings(unit: FriendlyUnitInfo) {
     // Vs. 4-pool they will often be left with just an egg or two.
     // We need to surround it and do as much damage to it as possible
-    val egg = With.units.enemy.filter(_.is(Zerg.Egg)).toVector.sortBy(_.totalHealth).headOption
-    lazy val nonEgg = With.units.enemy.filter(_.unitClass.isBuilding).toVector.sortBy(_.totalHealth).headOption
+    val egg = With.units.enemy.view.filter(_.is(Zerg.Egg)).toVector.sortBy(_.totalHealth).headOption
+    lazy val nonEgg = With.units.enemy.view.filter(_.unitClass.isBuilding).toVector.sortBy(_.totalHealth).headOption
     unit.agent.toAttack = egg.orElse(nonEgg)
     Attack.consider(unit)
   }

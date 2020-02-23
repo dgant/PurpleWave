@@ -88,7 +88,7 @@ class Geography {
       With.strategy.isInverted
       && ! With.geography.ourMain.units.exists(_.unitClass.isStaticDefense)
       && With.units.ours.exists(u => u.complete && u.unitClass.ranged && (u.unitClass.canMove || u.unitClass.isSiegeTank))
-      && (With.units.enemy.exists(_.unitClass.ranged) || With.battles.global.globalSafeToAttack))
+      && (With.units.existsEnemy(_.unitClass.ranged) || With.battles.global.globalSafeToAttack))
   ++ With.units.ours
     .view
     .filter(u => u.agent.toBuild.exists(_.isTownHall))

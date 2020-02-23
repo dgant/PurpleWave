@@ -6,16 +6,14 @@ import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, Orders}
 
 import scala.collection.JavaConverters._
-import scala.collection.immutable.HashSet
 import scala.collection.mutable
 
 class ForeignUnitTracker {
   
   private val unitsByIdKnown = new mutable.HashMap[Int, ForeignUnitInfo].empty
   
-  var enemyUnits      : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
-  var neutralUnits    : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
-  var enemyGhostUnits : Set[Int]             = new HashSet[Int]
+  var enemyUnits: Iterable[ForeignUnitInfo] = Iterable.empty
+  var neutralUnits: Iterable[ForeignUnitInfo] = Iterable.empty
 
   var initialized = false
 
@@ -42,9 +40,8 @@ class ForeignUnitTracker {
 
     unitsByIdKnown.values.foreach(updateMissing)
 
-    // TODO: Let's stop making these sets by default.
-    enemyUnits   = unitsByIdKnown.values.filter(_.player.isEnemy).toSet
-    neutralUnits = unitsByIdKnown.values.filter(_.player.isNeutral).toSet
+    enemyUnits   = unitsByIdKnown.values.filter(_.player.isEnemy)
+    neutralUnits = unitsByIdKnown.values.filter(_.player.isNeutral)
   }
 
   def onUnitDestroy(unit: bwapi.Unit) {

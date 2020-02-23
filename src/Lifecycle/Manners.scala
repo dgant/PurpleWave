@@ -1,6 +1,7 @@
 package Lifecycle
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Planning.UnitMatchers.UnitMatchWorkers
 
 object Manners {
   
@@ -10,8 +11,8 @@ object Manners {
     if (With.configuration.enableSurrenders
       && With.self.supplyUsed == 0
       && With.self.minerals < 50
-      && With.units.enemy.exists(_.unitClass.isWorker)
-      && With.units.enemy.exists(_.unitClass.isResourceDepot)) {
+      && With.units.existsEnemy(UnitMatchWorkers)
+      && With.units.existsEnemy(_.unitClass.isResourceDepot)) {
       surrender()
     }
     if (With.frame == GameTime(0, 20)()) {

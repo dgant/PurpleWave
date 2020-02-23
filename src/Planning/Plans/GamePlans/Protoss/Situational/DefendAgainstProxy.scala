@@ -27,7 +27,7 @@ class DefendAgainstProxy extends Plan {
       return
     }
     
-    val proxies = getProxies.sortBy(_.totalHealth).sortBy(_.remainingCompletionFrames)
+    val proxies = getProxies.toVector.sortBy(_.totalHealth).sortBy(_.remainingCompletionFrames)
     val squad = new Squad(this)
 
     def unitsNearby(proxy: UnitInfo) = With.units.inTileRadius(proxy.tileIncludingCenter, 8)
@@ -79,8 +79,8 @@ class DefendAgainstProxy extends Plan {
     squad.setGoal(new GoalRazeProxies(squadDestination))
   }
   
-  private def getProxies: Seq[UnitInfo] = {
-    With.units.enemy.toSeq.filter(e =>
+  private def getProxies: Iterable[UnitInfo] = {
+    With.units.enemy.view.filter(e =>
       e.likelyStillAlive
       && e.possiblyStillThere
       && scaryTypes.contains(e.unitClass)

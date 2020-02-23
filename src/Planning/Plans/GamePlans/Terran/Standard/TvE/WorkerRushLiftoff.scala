@@ -110,7 +110,7 @@ class WorkerRushLiftoff extends Parallel {
     val scoreStarting   = 1.0 + zone.bases.count(_.isStartLocation)
     val scoreNatural    = 1.0 + zone.bases.count(_.isNaturalOf.isDefined)
     val scoreVisible    = 1.0 + zone.units.count(_.isEnemy)
-    val scoreDistance   = 1.0 + ByOption.min(With.units.enemy.filter(_.canMove).map(_.framesToTravelTo(zone.centroid.pixelCenter))).getOrElse(0)
+    val scoreDistance   = 1.0 + ByOption.min(With.units.enemy.view.filter(_.canMove).map(_.framesToTravelTo(zone.centroid.pixelCenter))).getOrElse(0)
 
     val scoreTotal      = scoreCrossing * scoreBase * scoreStarting * scoreNatural * scoreVisible / scoreDistance
     scoreTotal

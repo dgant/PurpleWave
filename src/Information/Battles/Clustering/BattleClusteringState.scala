@@ -34,10 +34,11 @@ class BattleClusteringState(seedUnits: Vector[UnitInfo]) {
       val nextTile = tileCenter.add(points(iPoint))
       iPoint += 1
       if (nextTile.valid) {
+        val nextTileI = nextTile.i
         val explorationGrid = if (isFriendly) With.battles.clustering.exploredFriendly else With.battles.clustering.exploredEnemy
-        if ( ! explorationGrid.get(nextTile.i)) {
-          explorationGrid.set(nextTile.i, true)
-          val neighbors = With.grids.units.get(nextTile)
+        if ( ! explorationGrid.getUnchecked(nextTileI)) {
+          explorationGrid.setUnchecked(nextTileI, true)
+          val neighbors = With.grids.units.getUnchecked(nextTileI)
           val nNeighbors = neighbors.size
           var iNeighbor = 0
           while (iNeighbor < nNeighbors) {
@@ -81,13 +82,9 @@ class BattleClusteringState(seedUnits: Vector[UnitInfo]) {
     output
   }
   
-  def clusters: Vector[Vector[UnitInfo]] = {
-    if (isComplete)
-      finalClusters
-    else
-      Vector.empty
-  }
-  
+  def clusters: Vector[Vector[UnitInfo]] = if (isComplete) finalClusters else Vector.empty
+
+  @inline
   @tailrec
   private def getRoot(unit: UnitInfo): UnitInfo = {
     //val linkedUnit = unit.clusterParent.getOrElse(unit)

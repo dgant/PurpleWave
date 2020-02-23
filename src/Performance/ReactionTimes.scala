@@ -5,7 +5,7 @@ import Utilities.ByOption
 
 class ReactionTimes {
 
-  val runtimeQueueDuration: Int = 24 * 10
+  val runtimeQueueDuration: Int = 24 * 8
   
   def agencyLast          : Int = With.framesSince(With.agents.lastQueueCompletion)
   def clusteringLast      : Int = With.framesSince(With.battles.clustering.lastClusterCompletion)

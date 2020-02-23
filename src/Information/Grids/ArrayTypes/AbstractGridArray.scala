@@ -5,7 +5,7 @@ import Mathematics.Points.Tile
 
 abstract class AbstractGridArray[T] extends AbstractGrid[T] {
 
-  def rawValues: Array[T] = values
+  @inline def rawValues: Array[T] = values
   protected var values: Array[T]
   private var initialized = false
   
@@ -26,8 +26,10 @@ abstract class AbstractGridArray[T] extends AbstractGrid[T] {
   def onInitialization()        {}
   val indices: Range            = 0 until length
   val tiles                     = indices.map(i => new Tile(i))
-  def get(i: Int): T            = if (valid(i)) values(i) else defaultValue
-  def set(i: Int, value: T)     { if (valid(i)) values(i) = value }
-  def set(tile: Tile, value: T) { set(tile.i, value) }
+  @inline def get(i: Int)                     : T     = if (valid(i)) values(i) else defaultValue
+  @inline def set(i: Int, value: T)           : Unit  = if (valid(i)) values(i) = value
+  @inline def set(tile: Tile, value: T)       : Unit  = set(tile.i, value)
+  @inline def getUnchecked(i: Int)            : T     = values(i)
+  @inline def setUnchecked(i: Int, value: T)  : Unit  = values(i) = value
 }
 

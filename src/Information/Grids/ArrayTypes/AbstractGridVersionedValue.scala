@@ -8,10 +8,10 @@ abstract class AbstractGridVersionedValue[T] extends AbstractGridArray[T] {
   }
 
   @inline final override def get(i: Int): T = {
-    if (framestamps.isSet(i)) super.get(i) else defaultValue
+    if (framestamps.isSet(i) && i < length) values(i) else defaultValue
   }
 
-  @inline final def getUnchecked(i: Int): T = {
+  @inline final override def getUnchecked(i: Int): T = {
     if (framestamps.isSet(i)) values(i) else defaultValue
   }
 
@@ -19,7 +19,7 @@ abstract class AbstractGridVersionedValue[T] extends AbstractGridArray[T] {
     framestamps.stamp(i)
     super.set(i, value)
   }
-  @inline final def setUnchecked(i: Int, value: T): Unit = {
+  @inline final override def setUnchecked(i: Int, value: T): Unit = {
     framestamps.stamp(i)
     values(i) = value
   }

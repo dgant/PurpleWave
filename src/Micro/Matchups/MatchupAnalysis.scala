@@ -101,6 +101,13 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   }
 
   def framesOfEntanglementWith(threat: UnitInfo): Double = {
+    /*
+    This math stinks. I'm looking at a High Templar that's 407 pixels (12.7 tiles) away from a Marine,
+    with 8 avg agency frames, 3 latency frames,
+    and the entanglement is -6.8 while the safety is -4.2 frames
+    That is, we're saying the templar has 4 frames to turn and run before the marine will dash 7.7 tiles and shoot it.
+    Something's really busted here.
+     */
     lazy val approachSpeedMe      = me.speedApproaching(threat.pixelCenter)
     lazy val approachSpeedThreat  = if (threat.is(Protoss.Interceptor)) 0.0 else threat.speedApproaching(me.pixelCenter)
     lazy val approachSpeedTotal   = approachSpeedMe + approachSpeedThreat

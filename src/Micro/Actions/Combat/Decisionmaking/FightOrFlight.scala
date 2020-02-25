@@ -104,7 +104,6 @@ object FightOrFlight extends Action {
       }
     })
 
-
     val getaway = "Getaway"
     decide(true, "Anchors", () => unit.matchups.allies.view.map(_.friendly).filter(_.isDefined).map(_.get).exists(ally => (
       ! ally.unitClass.isWorker

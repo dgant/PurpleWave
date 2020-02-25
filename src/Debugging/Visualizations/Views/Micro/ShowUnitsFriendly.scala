@@ -173,7 +173,7 @@ object ShowUnitsFriendly extends View {
 
     if (showCharge) {
       if (unit.unitClass.spells.exists(spell => spell.energyCost > 0 && With.self.hasTech(spell) && unit.energy >= spell.energyCost)) {
-        val r = unit.unitClass.radialHypotenuse * 1.5 * With.frame % 7 / 7.0
+        val r = unit.unitClass.radialHypotenuse * (0.5 + (With.frame % 7) / 7.0)
         DrawMap.circle(unit.pixelCenter, r.toInt, Colors.NeonYellow)
       }
     }

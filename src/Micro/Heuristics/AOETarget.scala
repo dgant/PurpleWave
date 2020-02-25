@@ -46,7 +46,7 @@ class AOETarget(
     val positionProjected = unit.projectFrames(projectionFrames)
     xMin = Math.min(xMin, positionProjected.x)
     yMin = Math.min(yMin, positionProjected.y)
-    yMax = Math.max(xMax, positionProjected.x)
+    xMax = Math.max(xMax, positionProjected.x)
     yMax = Math.max(yMax, positionProjected.y)
   })
   lazy val finalTarget = Pixel((xMin + xMax) / 2, (yMin + yMax) / 2)

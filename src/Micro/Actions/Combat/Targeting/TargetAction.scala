@@ -23,7 +23,8 @@ class TargetAction(val additionalFiltersRequired: TargetFilter*) extends Action 
     TargetFilterScourge,
     TargetFilterReaver,
     TargetFilterAlmostAnything,
-    TargetFilterCrowded)
+    TargetFilterCrowded,
+    TargetFilterTankFodder)
 
   def filtersRequired = filtersAlwaysRequired ++ additionalFiltersRequired
 

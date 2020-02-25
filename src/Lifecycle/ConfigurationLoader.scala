@@ -88,7 +88,7 @@ object ConfigurationLoader {
 
   private def setDebugLiveMode(): Unit = {
     setDebugMode()
-    config.visualizeDebug                   = true
+    //config.visualizeDebug                   = true
     config.targetFrameDurationMilliseconds  = 20
     config.debugPauseThreshold              = 24 * 5
   }

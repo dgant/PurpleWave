@@ -15,6 +15,7 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtMost, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
@@ -103,6 +104,8 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
         new Not(new GoDT)),
       new CapGasWorkersAt(2)),
 
+    new If(new UnitsAtLeast(1, Protoss.Dragoon, complete = true), new EjectScout),
+
     new If(new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.proxyGateway, With.fingerprints.twoGate), new BuildOrder(Get(7, Protoss.Zealot))),
 
     new Build(
@@ -132,11 +135,15 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
 
     new If(
       new GoDT,
-      new BuildOrder(
-        Get(Protoss.CitadelOfAdun),
-        Get(Protoss.TemplarArchives),
-        Get(Protoss.ZealotSpeed),
-        Get(2, Protoss.DarkTemplar))),
+      new Parallel(
+        new BuildOrder(
+          Get(Protoss.Dragoon),
+          Get(Protoss.CitadelOfAdun),
+          Get(Protoss.TemplarArchives)),
+        new FlipIf(
+          new GasAtLeast(260), // If we get Leg Enhancements with less gas than this, our Dark Templar will be delayed
+          new Build(Get(2, Protoss.DarkTemplar)),
+          new Build(Get(Protoss.ZealotSpeed))))),
 
     new If(
       new And(

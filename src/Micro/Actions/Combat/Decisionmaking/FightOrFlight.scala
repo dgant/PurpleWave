@@ -121,7 +121,11 @@ object FightOrFlight extends Action {
     decide(true, getaway, () => unit.agent.ride.exists(ride => {
       val rideDistance = Math.max(0.0, ride.pixelDistanceCenter(unit) - Shuttling.pickupRadius - 32)
       val rideWait = PurpleMath.nanToInfinity(rideDistance / (ride.topSpeed + unit.topSpeed))
-      rideWait <= Math.max(0.0, unit.matchups.framesOfSafety) || (unit.loaded && unit.matchups.framesOfSafety > unit.cooldownMaxAirGround)
+      (unit.isAny(Protoss.Reaver, Protoss.HighTemplar
+      )
+        && unit.matchups.threats.exists(_.isSiegeTankSieged())
+        && (rideWait <= Math.max(0.0, unit.matchups.framesOfSafety)
+          || (unit.loaded && unit.matchups.framesOfSafety > unit.cooldownMaxAirGround)))
     }))
 
     if (decision.isDefined) {

@@ -54,31 +54,35 @@ class PvP4GateGoon extends GameplanTemplate {
     new BuildOrder(ProtossBuilds.FourGateGoon: _*))
 
   override val buildPlans = Vector(
-    new If(
-      new UnitsAtMost(3, Protoss.Gateway),
-      new CapGasWorkersAt(2)),
+    new If(new UnitsAtMost(3, Protoss.Gateway), new CapGasWorkersAt(2)),
 
     new If(
       new Or(
         new UnitsAtLeast(18, Protoss.Dragoon),
-        new EnemiesAtLeast(1, Protoss.PhotonCannon)),
+        new EnemiesAtLeast(3, Protoss.PhotonCannon, complete = true)),
       new RequireMiningBases(2)),
 
     new Trigger(
       new EnemyStrategy(With.fingerprints.fourGateGoon),
       new Parallel(
-        new BuildOrder(Get(Protoss.CitadelOfAdun)),
+        new BuildOrder(Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives)),
+        // At the point where we are training the archives, we need to save a bit of gas to make DTs,
+        // so we make Zealots instead
         new If(
-          new Latch(new UnitsAtLeast(2, Protoss.DarkTemplar)),
-          new PumpWorkers(oversaturate = true)),
-        new BuildOrder(
-          Get(6, Protoss.Zealot),
-          Get(Protoss.TemplarArchives),
-          Get(2, Protoss.DarkTemplar),
-          Get(2, Protoss.Nexus),
-          Get(Protoss.Forge),
-          Get(4, Protoss.DarkTemplar)),
-        new BuildCannonsAtNatural(3),
+          new UnitsAtLeast(1, Protoss.TemplarArchives),
+          new BuildOrder(
+            Get(2, Protoss.Zealot),
+            Get(2, Protoss.DarkTemplar),
+            Get(Protoss.Forge))),
+        new Trigger(
+          new UnitsAtLeast(2, Protoss.DarkTemplar, complete = true),
+          new Build(
+            Get(2, Protoss.Nexus),
+            Get(Protoss.Forge),
+            Get(5, Protoss.Gateway))),
+        new Trigger(new UnitsAtLeast(2, Protoss.DarkTemplar), new PumpWorkers(oversaturate = true)),
+        new Pump(Protoss.Dragoon),
+        new BuildCannonsAtNatural(2),
         new Build(
           Get(6, Protoss.Gateway),
           Get(2, Protoss.Assimilator)),
@@ -94,6 +98,9 @@ class PvP4GateGoon extends GameplanTemplate {
       Get(4, Protoss.Gateway)),
 
     new RequireMiningBases(2),
-    new Build(Get(Protoss.Forge))
+    new Build(
+      Get(Protoss.Forge),
+      Get(6, Protoss.Gateway),
+      Get(2, Protoss.Assimilator))
   )
 }

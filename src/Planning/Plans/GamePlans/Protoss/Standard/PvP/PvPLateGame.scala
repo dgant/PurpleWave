@@ -21,7 +21,8 @@ class PvPLateGame extends GameplanTemplate {
 
   override val emergencyPlans: Vector[Plan] = Vector(
     new PvPIdeas.ReactToDarkTemplarEmergencies,
-    new PvPIdeas.ReactToCannonRush)
+    new PvPIdeas.ReactToCannonRush,
+    new PvPIdeas.ReactToRoboAsDT)
 
   override def priorityAttackPlan: Plan = new PvPIdeas.AttackWithDarkTemplar
   override val attackPlan: Plan = new Parallel(

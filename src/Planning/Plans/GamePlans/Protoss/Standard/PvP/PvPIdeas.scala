@@ -18,7 +18,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
-import Strategery.Strategies.Protoss.{PvP2Gate1012Goon, PvP4GateGoon}
+import Strategery.Strategies.Protoss.{PvP2Gate1012Goon, PvP2GateDTExpand, PvP4GateGoon}
 import Utilities.ByOption
 
 object PvPIdeas {
@@ -94,6 +94,18 @@ object PvPIdeas {
         Get(Protoss.CyberneticsCore),
         Get(Protoss.RoboticsFacility),
         Get(Protoss.RoboticsSupportBay))))
+
+  // If we opened DT into Robo, we can survive but it's an emergency that requires a worker cut
+  class ReactToRoboAsDT extends If(
+    new And(
+      new Not(new Latch(new UnitsAtLeast(5, Protoss.Gateway))),
+      new Employing(PvP2GateDTExpand),
+      new EnemyStrategy(With.fingerprints.robo),
+      new UnitsAtLeast(25, Protoss.Probe)),
+    new Pump(Protoss.Dragoon),
+    new Build(
+      Get(5, Protoss.Gateway),
+      Get(2, Protoss.Assimilator)))
 
   // Fast proxy DT: 5:15
   // More normal timing: Closer to 6:00
@@ -230,9 +242,9 @@ object PvPIdeas {
         Get(14, Protoss.Probe),
         Get(2,  Protoss.Pylon),
         Get(15, Protoss.Probe),
-        Get(Protoss.ShieldBattery),
-        Get(2,  Protoss.Zealot),
         Get(2,  Protoss.Gateway),
+        Get(2,  Protoss.Zealot),
+        Get(Protoss.ShieldBattery),
         Get(17, Protoss.Probe),  // 21/26
         Get(3,  Protoss.Zealot), // 23/26
         Get(3,  Protoss.Pylon),  // 23/26+8

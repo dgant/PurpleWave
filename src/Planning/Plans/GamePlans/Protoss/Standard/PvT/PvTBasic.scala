@@ -172,7 +172,7 @@ class PvTBasic extends GameplanTemplate {
     new If(
       new Or(
         new UnitsAtLeast(1, Protoss.HighTemplar),
-        new GasAtLeast(1200),
+        new GasAtLeast(800),
         new And(
           new EmployingCarriers,
           new UnitsAtMost(0, Protoss.RoboticsSupportBay),
@@ -341,9 +341,10 @@ class PvTBasic extends GameplanTemplate {
     new If(
       new And(new SafeAtHome, new UnitsAtLeast(5, Protoss.Gateway)),
       new Parallel(
-        new If(new And(new EmployingTemplar,  new UnitsAtLeast(1, Protoss.CitadelOfAdun)),  new GoStorm),
-        new If(new And(new EmployingArbiters, new UnitsAtLeast(1, Protoss.CitadelOfAdun)),  new GoArbiter),
-        new If(new And(new EmployingCarriers, new UnitsAtLeast(1, Protoss.Stargate)),       new GoCarrier))),
+        new If(new And(new EmployingReavers,  new UnitsAtLeast(1, Protoss.RoboticsFacility)), new GoReaver),
+        new If(new And(new EmployingTemplar,  new UnitsAtLeast(1, Protoss.CitadelOfAdun)),    new GoStorm),
+        new If(new And(new EmployingArbiters, new UnitsAtLeast(1, Protoss.CitadelOfAdun)),    new GoArbiter),
+        new If(new And(new EmployingCarriers, new UnitsAtLeast(1, Protoss.Stargate)),         new GoCarrier))),
 
     new HighPriorityTech,
     new PvTIdeas.TrainArmy,

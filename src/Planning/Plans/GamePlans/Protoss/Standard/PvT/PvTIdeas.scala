@@ -193,7 +193,7 @@ object PvTIdeas {
 
   class TrainZealotsOrDragoons extends Parallel(
     new PumpRatio(Protoss.Dragoon, 0, 24, Seq(Flat(6.0), Enemy(Terran.Vulture, .75))),
-    new PumpRatio(Protoss.Dragoon, 0, 24, Seq(Friendly(Protoss.Zealot, 1.0))),
+    new PumpRatio(Protoss.Dragoon, 0, 24, Seq(Friendly(Protoss.Zealot, 0.4), Friendly(Protoss.Reaver, -2))),
     new If(
       new Or(
         new And(

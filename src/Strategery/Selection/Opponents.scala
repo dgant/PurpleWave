@@ -39,7 +39,7 @@ object Opponents {
     Seq(PvP1ZealotExpand),
     Seq(PvP2Gate1012DT)))))
   val dragon        : Opponent = add(Opponent("Dragon",       StrategySelectionSequence(Vector(
-    Seq(PvTProxy2Gate,  PvT3BaseCarrier, PvT3rdFast),
+    Seq(PvTProxy2Gate,  PvT2BaseReaver, PvT3BaseCarrier, PvT3rdFast),
     Seq(PvTDTExpand,    PvT2BaseArbiter),
     Seq(PvT13Nexus,     PvT2BaseReaver, PvT3BaseCarrier, PvT3rdFast)))))
   val letabot       : Opponent = add(Opponent("LetaBot",      StrategySelectionSequence(Vector(

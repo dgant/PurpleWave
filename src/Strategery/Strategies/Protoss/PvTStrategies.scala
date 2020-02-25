@@ -15,8 +15,8 @@ abstract class PvTBasicOpener extends PvTStrategy {
     PvT2BaseReaver,
     PvT2BaseCarrier,
     PvT2BaseArbiter,
-    PvT3BaseCarrier,
-    PvT3BaseArbiter
+    PvT3rdFast,
+    PvT3rdObs,
   ))
 }
 object PvT13Nexus extends PvTBasicOpener {

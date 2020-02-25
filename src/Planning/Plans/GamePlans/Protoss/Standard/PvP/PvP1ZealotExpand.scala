@@ -7,7 +7,7 @@ import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.ReactToDarkTemplarEmergencies
-import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAtRatio, PumpWorkers}
+import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAt, CapGasWorkersAtRatio, PumpWorkers}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -29,7 +29,10 @@ class PvP1ZealotExpand extends GameplanTemplate {
   override def placementPlan: Plan = new Parallel(
     super.placementPlan,
     new If(
-      new BasesAtLeast(2),
+      new And(
+        new BasesAtLeast(2),
+        new UnitsAtLeast(4, Protoss.Pylon),
+        new Not(new EnemyStrategy(With.fingerprints.proxyGateway))),
       new ProposePlacement {
         override lazy val blueprints = Vector(new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
       }))
@@ -68,8 +71,21 @@ class PvP1ZealotExpand extends GameplanTemplate {
     new PumpWorkers(maximumTotal = 25))
 
   override def buildPlans = Vector(
+    // We really need very little gas early on;
+    // rather, we depserately need minerals to get our Gateways and Forge up.
     new CapGasAt(250),
     new CapGasWorkersAtRatio(.14),
+    new If(
+      new And(
+        new UnitsAtMost(1, Protoss.Gateway),
+        new GasForUpgrade(Protoss.DragoonRange)),
+      new CapGasWorkersAt(1),
+      new If(
+        new UnitsAtMost(4, Protoss.Gateway),
+        new CapGasWorkersAt(2))),
+
+    // Ordered to maximize chances of getting detection in time but only if absolutely necessary.
+    // It's also quite possible to die to a 4Gate + DT if the ordering isn't careful.
     new If(
       new EnemiesAtLeast(2, Protoss.Zealot),
       new BuildOrder(Get(2, Protoss.Zealot))),
@@ -83,22 +99,31 @@ class PvP1ZealotExpand extends GameplanTemplate {
       Get(Protoss.CyberneticsCore)),
     new ReactToDarkTemplarEmergencies,
     new Build(Get(2, Protoss.Gateway)),
+
     // If we don't know what they're doing, stick a Forge in there
     new If(
       new And(
         new BasesAtLeast(2),
         new Not(new EnemyBasesAtLeast(2)),
         new EnemiesAtMost(2, Protoss.Gateway),
-        new Not(new EnemyStrategy(With.fingerprints.dragoonRange, With.fingerprints.twoGate, With.fingerprints.fourGateGoon, With.fingerprints.robo, With.fingerprints.forgeFe, With.fingerprints.gatewayFe))),
+        new Not(new EnemyStrategy(
+          With.fingerprints.dragoonRange,
+          With.fingerprints.twoGate,
+          With.fingerprints.fourGateGoon,
+          With.fingerprints.robo,
+          With.fingerprints.forgeFe,
+          With.fingerprints.gatewayFe))),
       new Build(Get(Protoss.Forge))),
+
+    // Finish the build order
     new Build(
       Get(3, Protoss.Gateway),
       Get(Protoss.DragoonRange)),
     new PvPIdeas.TrainArmy,
     new RequireMiningBases(2),
     new Build(
-      Get(Protoss.Forge),
-      Get(5, Protoss.Gateway)),
+      Get(5, Protoss.Gateway),
+      Get(Protoss.Forge)),
     new BuildGasPumps
   )
 }

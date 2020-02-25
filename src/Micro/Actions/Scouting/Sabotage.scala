@@ -17,9 +17,13 @@ object Sabotage extends Action {
     && ! With.strategy.selectedCurrently.contains(ZvE4Pool))
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    if (unit.matchups.threats.forall(t => t.framesToGetInRange(unit) > 12 || (t.unitClass.isWorker && t.totalHealth <= unit.totalHealth))) {
-      unit.agent.toAttack = ByOption.minBy(unit.matchups.targets.view.filter(u =>
-        u.unitClass.isBuilding || (u.unitClass.isWorker && u.visible)))(_.unitClass.maxTotalHealth)
+    val buildingTarget = ByOption.minBy(unit.matchups.targets.view.filter(u => u.unitClass.isBuilding || (u.unitClass.isWorker && u.visible)))(_.unitClass.maxTotalHealth)
+    if (unit.matchups.threats.forall(threat =>
+      threat.framesToGetInRange(unit) > 12
+      || (threat.unitClass.isWorker
+        && (threat.totalHealth <= unit.totalHealth
+          || buildingTarget.exists(b => Math.max(15 + threat.pixelRangeAgainst(unit), b.pixelDistanceEdge(unit)) < threat.pixelDistanceEdge(unit)))))) {
+      unit.agent.toAttack = buildingTarget
       Attack.delegate(unit)
     }
 

@@ -31,9 +31,11 @@ object ShuttleAcceptRider extends Action {
     val pickupCandidates = With.units.ours
       .view
       .filter(passenger =>
-        passenger.unitClass.isReaver
-        // It shouldn't waste time NOT picking up Reavers that still need to train Scarabs
-        //&& (passenger.scarabCount > 0 || passenger.training || passenger.matchups.framesOfSafety < 0)
+        passenger.unitClass.isReaver && (
+          // If the candidate has different goals than our passenger, and aren't in immediate danger, we can't help them
+          shuttle.agent.passengers.isEmpty
+          || shuttle.battle.exists(passenger.battle.contains)
+          || shuttle.agent.passengers.headOption.map(_.squad).getOrElse(shuttle.squad).forall(passenger.squad.contains))
       )
       .flatMap(_.friendly)
       .filter(passenger =>

@@ -44,7 +44,7 @@ class SquadBatch {
     }
 
     val freelancer = freelancersUnassigned.dequeue()._1
-    var squadsEligibleForUnit = eligibleSquads.filter(_.squad.goal.candidateWelcome(this, freelancer))
+    val squadsEligibleForUnit = eligibleSquads.filter(_.squad.goal.candidateWelcome(this, freelancer))
 
     if (squadsEligibleForUnit.isEmpty) {
       //This is happening a lot and producing log spam

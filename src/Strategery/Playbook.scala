@@ -42,7 +42,6 @@ object StrategyGroups {
     PvE2BaseIslandCarrier, // Disabled for Sparkle in TorchUp
     PvE3BaseIslandCarrier, // Disabled for Sparkle in TorchUp
 
-    PvT1GateRobo,
     PvTProxyDarkTemplar,
     PvZLateGameCarrier, // Needs island tech
     PvZGatewayFE, // Execution needs work; in particular, Zealots need to protect cannons

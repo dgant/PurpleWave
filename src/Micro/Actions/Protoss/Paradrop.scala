@@ -54,7 +54,7 @@ object Paradrop extends Action {
     val targetDistance: Float = (unit.effectiveRangePixels + (if (unit.unitClass != Protoss.HighTemplar) unit.topSpeed * unit.cooldownLeft else 0)).toFloat / 32f
     val endDistanceMaximum = if (target.isDefined && unit.pixelDistanceCenter(target.get.pixelCenter) > targetDistance) targetDistance else 0
     val repulsors = Avoid.pathfindingRepulsion(unit)
-    val shouldCrossTerrain = unit.matchups.framesOfSafety < 24 || unit.matchups.threats.isEmpty || target.isEmpty || ! unit.tileIncludingCenter.walkable
+    val shouldCrossTerrain = unit.matchups.framesOfSafety < 24 || unit.matchups.threats.isEmpty || target.forall(_.zone != unit.zone) || ! unit.tileIncludingCenter.walkable
     var path = NoPath.value
     Seq(Some(0), Some(With.grids.enemyRangeGround.addedRange - 1), None).foreach(maximumThreat =>
       (if (shouldCrossTerrain) Seq(true) else Seq(false, true)).foreach(crossEdges => {
@@ -67,8 +67,8 @@ object Paradrop extends Action {
           profile.canCrossUnwalkable  = crossEdges
           profile.allowGroundDist     = false
           profile.costOccupancy       = 0.5f
-          profile.costThreat          = 3
-          profile.costRepulsion       = if (target.isDefined) 1f else 1.5f
+          profile.costThreat          = 5f
+          profile.costRepulsion       = 2.5f
           profile.repulsors           = repulsors
           profile.unit                = Some(unit)
           path = profile.find

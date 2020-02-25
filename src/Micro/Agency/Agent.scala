@@ -308,13 +308,17 @@ class Agent(val unit: FriendlyUnitInfo) {
     }
   }
   private var _rideGoal: Option[Pixel] = None
-  def consumePassengerRideGoal: Option[Pixel] = {
+  def peekPassengerRideGoal: Option[Pixel] = _rideGoal
+  def consumePassengerRideGoal(): Option[Pixel] = {
     val output = _rideGoal
     _rideGoal = None
     output
   }
   def directRide(to: Pixel): Unit = {
     _rideGoal = Some(to)
+  }
+  def prioritizedPassengers: Seq[FriendlyUnitInfo] = {
+    unit.loadedUnits.sortBy(p => p.unitClass.subjectiveValue - p.frameDiscovered / 10000.0)
   }
 
   ///////////////////////

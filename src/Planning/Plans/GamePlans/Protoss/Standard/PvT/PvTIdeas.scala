@@ -172,14 +172,10 @@ object PvTIdeas {
       new Pump(Protoss.Observer, 2)))
 
   class TrainReavers extends Parallel(
-    new If(new EnemyStrategy(With.fingerprints.bio), new Pump(Protoss.Reaver, 2)),
-    new PumpRatio(Protoss.Reaver, 0, 6, Seq(
+    new PumpRatio(Protoss.Reaver, 2, 6, Seq(
       Enemy(Terran.Marine, 1.0/6.0),
       Enemy(Terran.Goliath, 1.0/6.0),
-      Enemy(Terran.Vulture, 1.0/8.0))),
-    new If(
-      new EnemiesAtMost(0, UnitMatchOr(Terran.Wraith, Terran.Goliath)),
-      new PumpRatio(Protoss.Reaver, 1, 4, Seq(Friendly(Protoss.Shuttle, 0.5)))))
+      Enemy(Terran.Vulture, 1.0/8.0))))
 
   class TrainHighTemplarAgainstBio extends If(
     new EnemyStrategy(With.fingerprints.bio),

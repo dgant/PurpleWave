@@ -17,11 +17,10 @@ object ShuttleCarry extends Action {
   }
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
-    shuttle.agent.passengers
-      .sortBy(_ != mainPassenger(shuttle))
-      .flatMap(_.agent.consumePassengerRideGoal)
-      .foreach(goal => {
-        shuttle.agent.toTravel = Some(goal)
+    shuttle.agent.prioritizedPassengers
+      .find(_.agent.peekPassengerRideGoal.nonEmpty)
+      .foreach(passenger => {
+        shuttle.agent.toTravel = passenger.agent.consumePassengerRideGoal()
         Move.delegate(shuttle)
       })
   }

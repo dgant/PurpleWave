@@ -5,7 +5,8 @@ import Information.Intelligenze.BaseFilterExpansions
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Planning.UnitCounters.UnitCountUpToLambda
-import Planning.UnitMatchers.{UnitMatchMobile, UnitMatcher}
+import Planning.UnitMatchers.{UnitMatchMobile, UnitMatchNot, UnitMatcher}
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.CountMap
 
@@ -27,4 +28,5 @@ class GoalFindExpansions extends GoalAssignToBases {
   }
 
   unitCounter = new UnitCountUpToLambda(() => scoutsWanted)
+  unitMatcher = UnitMatchNot(unit => unit.topSpeed < Protoss.Zealot.topSpeed || unit.isAny(Terran.Battlecruiser, Terran.Valkyrie, Terran.Dropship, Protoss.Carrier, Protoss.Shuttle))
 }

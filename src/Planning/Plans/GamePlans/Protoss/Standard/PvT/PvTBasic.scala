@@ -34,7 +34,8 @@ class PvTBasic extends GameplanTemplate {
     PvT32Nexus,
     PvT2GateRangeExpand,
     PvTDTExpand,
-    PvT1GateRobo,
+    PvT1GateReaver,
+    PvT2BaseReaver,
     PvT2BaseCarrier,
     PvT2BaseArbiter,
     PvT3BaseCarrier,
@@ -60,7 +61,7 @@ class PvTBasic extends GameplanTemplate {
     new If(new Employing(PvT28Nexus),           new ScoutOn(Protoss.Gateway)),
     new If(new Employing(PvT32Nexus),           new ScoutOn(Protoss.Pylon)),
     new If(new Employing(PvT2GateRangeExpand),  new ScoutOn(Protoss.Pylon)),
-    new If(new Employing(PvT1GateRobo),         new ScoutOn(Protoss.CyberneticsCore)),
+    new If(new Employing(PvT1GateReaver),       new ScoutOn(Protoss.CyberneticsCore)),
     new If(new Employing(PvT1015DT),            new If(new UpgradeStarted(Protoss.DragoonRange), new Scout)),
     new If(new Employing(PvTDTExpand),          new ScoutOn(Protoss.CyberneticsCore)))
 
@@ -74,7 +75,7 @@ class PvTBasic extends GameplanTemplate {
       new PvTAttack),
     new If(
       new Or(
-        new Not(new Employing(PvTDTExpand, PvT1GateRobo)),
+        new Not(new Employing(PvTDTExpand, PvT1GateReaver)),
         new Latch(new UnitsAtLeast(1, UnitMatchOr(Protoss.DarkTemplar, Protoss.Reaver), complete = true)),
         new UpgradeStarted(Protoss.DragoonRange)),
       new PvTIdeas.AttackSafely))
@@ -91,7 +92,7 @@ class PvTBasic extends GameplanTemplate {
     new If(new Employing(PvT32Nexus),           new BuildOrder(ProtossBuilds.PvT32Nexus: _*)),
     new If(new Employing(PvT2GateRangeExpand),  new BuildOrder(ProtossBuilds.PvT2GateRangeExpand: _*)),
     new If(new Employing(PvT1015DT),            new BuildOrder(ProtossBuilds.PvT1015GateGoonDT: _*)),
-    new If(new Employing(PvT1GateRobo),         new BuildOrder(ProtossBuilds.PvT1GateReaver: _*)),
+    new If(new Employing(PvT1GateReaver),       new BuildOrder(ProtossBuilds.PvT1GateReaver: _*)),
     // If going DT, avoid showing the tech
     new If(new Employing(PvTDTExpand), new Parallel(
       new BuildOrder(ProtossBuilds.PvTDTExpand_BeforeCitadel: _*),
@@ -116,8 +117,9 @@ class PvTBasic extends GameplanTemplate {
     + 2.0 * With.units.countEnemy(Terran.Medic) > Math.max(10, With.units.countOurs(Protoss.Interceptor)))
   class EmployingCarriers   extends Employing(PvT2BaseCarrier, PvT3BaseCarrier)
   class EmployingArbiters   extends Employing(PvT2BaseArbiter, PvT3BaseArbiter)
+  class EmployingReavers    extends Or(new Employing(PvT2BaseReaver), new UnitsAtLeast(1, Protoss.RoboticsSupportBay))
   class EmployingTemplar    extends Or(
-    new EmployingArbiters,
+    new And(new EmployingArbiters, new Not(new EmployingReavers)),
     new UnitsAtLeast(1, Protoss.TemplarArchives),
     new And(new UnitsAtLeast(1, Protoss.CitadelOfAdun), new UnitsAtMost(0, Protoss.RoboticsFacility)))
   class EnemyTwoPlusRax     extends EnemyStrategy(With.fingerprints.bbs, With.fingerprints.twoRax1113)
@@ -186,7 +188,9 @@ class PvTBasic extends GameplanTemplate {
     new If(new UnitsAtLeast(4, Protoss.Zealot),           new UpgradeContinuously(Protoss.ZealotSpeed)),
 
     new UpgradeCarriers,
-    new If(new And(new UnitsAtLeast(1, Protoss.Shuttle), new GasPumpsAtLeast(2)), new UpgradeContinuously(Protoss.ShuttleSpeed)),
+    new If(
+      new And(new UnitsAtLeast(1, Protoss.Shuttle), new UnitsAtLeast(1, Protoss.Reaver), new GasPumpsAtLeast(2)),
+      new UpgradeContinuously(Protoss.ShuttleSpeed)),
     new If(
       new Or(new MineralOnlyBase, new And(new MiningBasesAtLeast(4), new EmployingCarriers), new And(new MiningBasesAtLeast(5))),
       new Build(Get(Protoss.CitadelOfAdun), Get(Protoss.ZealotSpeed))),
@@ -360,7 +364,10 @@ class PvTBasic extends GameplanTemplate {
       new If(
         new EmployingTemplar,
         new Parallel(new GoDT, new Build(Get(2, Protoss.Gateway))),
-        new Parallel(new GoObs, new Build(Get(2, Protoss.Gateway))))),
+        new If(
+          new EmployingReavers,
+          new Parallel(new GoReaver, new Build(Get(2, Protoss.Gateway))),
+          new Parallel(new GoObs, new Build(Get(2, Protoss.Gateway)))))),
 
     // One-base bio without tech
     //  2 Gate -> Reaver
@@ -402,9 +409,12 @@ class PvTBasic extends GameplanTemplate {
         new EmployingTemplar,
         new Parallel(new GoDT, new Build(Get(3, Protoss.Gateway)), new GoObs, new Build(Get(5, Protoss.Gateway))),
         new If(
-          new UnitsAtLeast(1, Protoss.RoboticsFacility),
-          new Parallel(new GoObs, new Build(Get(5, Protoss.Gateway))),
-          new Parallel(new Build(Get(2, Protoss.Gateway)), new GoObs, new Build(Get(5, Protoss.Gateway)))))),
+          new EmployingReavers,
+            new Parallel(new GoReaver, new Build(Get(3, Protoss.Gateway))),
+            new If(
+              new UnitsAtLeast(1, Protoss.RoboticsFacility),
+              new Parallel(new GoObs, new Build(Get(5, Protoss.Gateway))),
+              new Parallel(new Build(Get(2, Protoss.Gateway)), new GoObs, new Build(Get(5, Protoss.Gateway))))))),
 
     // TODO: Against 3Fac: Maybe go up to 6 Gateways? See if it's necessary first
 
@@ -421,19 +431,17 @@ class PvTBasic extends GameplanTemplate {
         new EmployingTemplar,
         new GoDT, // DT stream will keep us alive until Vessels
         new If(
-          new UnitsAtLeast(1, Protoss.RoboticsFacility),
+          new Or(new EmployingReavers, new EmployingCarriers, new UnitsAtLeast(1, Protoss.RoboticsFacility)),
           new Parallel(new GoReaver, new Build(Get(5, Protoss.Gateway))),
-          new If(
-            new EmployingCarriers,
-            new Parallel(new GoReaver, new Build(Get(5, Protoss.Gateway))),
-            new Parallel(new GoStorm, new Build(Get(5, Protoss.Gateway))))))),
+          new Parallel(new GoStorm, new Build(Get(5, Protoss.Gateway)))))),
 
     // Two-base tech: Go get your tech
     // Three-base tech: If fast-thirding, take it now; otherwise get Observer + Gateways and react
+    new If(new EmployingReavers, new GoReaver),
     new If(
       new EmployingThreeBase,
       new If(
-        new Employing(PvT3rdSafe),
+        new Employing(PvT3rdObs),
         new Parallel(
           new If(new EnemyBasesAtMost(1), new Build(Get(2, Protoss.Gateway))),
           new GoObs,

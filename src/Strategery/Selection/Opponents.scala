@@ -41,8 +41,11 @@ object Opponents {
   val dragon        : Opponent = add(Opponent("Dragon",       StrategySelectionSequence(Vector(
     Seq(PvTProxy2Gate,  PvT3BaseCarrier, PvT3rdFast),
     Seq(PvTDTExpand,    PvT2BaseArbiter),
-    Seq(PvT13Nexus,     PvT3BaseArbiter, PvT3rdSafe)))))
-  val letabot       : Opponent = add(Opponent("LetaBot",      new StrategySelectionRecommended(StrategySelectionGreedy, PvTDTExpand, PvT3BaseCarrier, PvT3rdFast)))
+    Seq(PvT13Nexus,     PvT2BaseReaver, PvT3BaseCarrier, PvT3rdFast)))))
+  val letabot       : Opponent = add(Opponent("LetaBot",      StrategySelectionSequence(Vector(
+    Seq(PvTDTExpand, PvT3BaseArbiter, PvT3rdFast),
+    Seq(PvT21Nexus, PvT2BaseReaver, PvT3BaseCarrier, PvT3rdFast),
+    Seq(PvT13Nexus, PvT3BaseCarrier, PvT3rdObs)))))
   val locutus       : Opponent = add(Opponent("Locutus",      StrategySelectionSequence(Vector(
     Seq(PvP2GateDTExpand),
     Seq(PvP4GateGoon),

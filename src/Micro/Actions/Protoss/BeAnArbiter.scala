@@ -48,7 +48,7 @@ object BeAnArbiter extends Action {
     var amCovering              = false
 
     if (needUmbrella.nonEmpty && arbiter.battle.isDefined) {
-      val destination = SpellTargetAOE.chooseTargetPixel(
+      val destination = new SpellTargetAOE().chooseTargetPixel(
         arbiter,
         umbrellaSearchRadius,
         Protoss.Zealot.subjectiveValue,

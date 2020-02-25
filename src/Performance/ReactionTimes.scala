@@ -12,6 +12,7 @@ class ReactionTimes {
   def estimationLast      : Int = With.framesSince(With.battles.lastEstimationCompletion)
   def planningLast        : Int = With.framesSince(With.prioritizer.lastRun)
   def squadRecruitLast    : Int = With.framesSince(With.squads.lastBatchCompletion)
+  def gridUnitsLast       : Int = With.grids.units.lastUpdateDuration
   def agencyMin           : Int = agencyMinCache()
   def agencyMax           : Int = agencyMaxCache()
   def agencyAverage       : Int = agencyAverageCache()
@@ -23,6 +24,8 @@ class ReactionTimes {
   def planningAverage     : Int = planningAverageCache()
   def squadRecruitMax     : Int = squadRecruitMaxCache()
   def squadRecruitAverage : Int = squadRecruitAverageCache()
+  def gridUnitsMax        : Int = gridUnitsMaxCache()
+  def gridUnitsAverage    : Int = gridUnitsAverageCache()
   def framesTotal         : Int = agencyAverage + estimationAverage + clusteringAverage
 
   def filterTimes(times: Seq[Int]): Seq[Int] = if (With.configuration.debugging) times.view.filter(_ < With.configuration.debugPauseThreshold) else times
@@ -33,9 +36,11 @@ class ReactionTimes {
   private val estimationMaxCache        = new Cache(() => ByOption.max(With.battles.estimationRuntimes).getOrElse(0))
   private val planningMaxCache          = new Cache(() => ByOption.max(With.prioritizer.frameDelays).getOrElse(0))
   private val squadRecruitMaxCache      = new Cache(() => ByOption.max(With.squads.recruitRuntimes).getOrElse(0))
+  private val gridUnitsMaxCache         = new Cache(() => ByOption.max(With.grids.units.updateIntervals).getOrElse(0))
   private val agencyAverageCache        = new Cache(() => filterTimes(With.agents.runtimes).sum             / Math.max(1, filterTimes(With.agents.runtimes).size))
   private val estimationAverageCache    = new Cache(() => filterTimes(With.battles.estimationRuntimes).sum  / Math.max(1, filterTimes(With.battles.estimationRuntimes).size))
   private val clusteringAverageCache    = new Cache(() => filterTimes(With.battles.clustering.runtimes).sum / Math.max(1, filterTimes(With.battles.clustering.runtimes).size))
   private val planningAverageCache      = new Cache(() => filterTimes(With.prioritizer.frameDelays).sum     / Math.max(1, filterTimes(With.prioritizer.frameDelays).size))
   private val squadRecruitAverageCache  = new Cache(() => filterTimes(With.squads.recruitRuntimes).sum      / Math.max(1, With.squads.recruitRuntimes.size))
+  private val gridUnitsAverageCache     = new Cache(() => filterTimes(With.grids.units.updateIntervals).sum / Math.max(1, With.grids.units.updateIntervals.size))
 }

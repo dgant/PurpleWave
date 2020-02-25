@@ -25,6 +25,7 @@ object ShowUnitsFriendly extends View {
   var showDistance    : Boolean = false
   var showFightReason : Boolean = true
   var showLeaders     : Boolean = true
+  var showCharge      : Boolean = true
   
   override def renderMap() { With.units.ours.foreach(renderUnitState) }
   
@@ -167,6 +168,13 @@ object ShowUnitsFriendly extends View {
         val start = unit.pixelCenter.add(0, unit.unitClass.dimensionDown + 8)
         DrawMap.circle(start, 5, color = unit.player.colorMidnight, solid = true)
         DrawMap.drawStar(start, 4, Colors.NeonYellow)
+      }
+    }
+
+    if (showCharge) {
+      if (unit.unitClass.spells.exists(spell => spell.energyCost > 0 && With.self.hasTech(spell) && unit.energy >= spell.energyCost)) {
+        val r = unit.unitClass.radialHypotenuse * 1.5 * With.frame % 7 / 7.0
+        DrawMap.circle(unit.pixelCenter, r.toInt, Colors.NeonYellow)
       }
     }
   }

@@ -32,7 +32,7 @@ class TargetAction(val additionalFiltersRequired: TargetFilter*) extends Action 
   }
 
   def legalTargets(unit: FriendlyUnitInfo): Seq[UnitInfo] = {
-    var filtersOptional = additionalFiltersOptional ++ Vector(TargetFilterCombatants, TargetFilterIgnoreScouts)
+    val filtersOptional = additionalFiltersOptional ++ Vector(TargetFilterCombatants, TargetFilterIgnoreScouts)
 
     def audit =
       unit.matchups.targets.map(target =>

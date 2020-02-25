@@ -46,7 +46,7 @@ object Gather extends Action {
       }
 
       // Stupid siege tank defense
-      if (unit.matchups.threatsInRange.exists(t => t.is(Terran.SiegeTankSieged) && t.pixelDistanceEdge(resource) < 32 * 13)) {
+      if (unit.matchups.threatsInRange.exists(t => t.is(Terran.SiegeTankSieged) && t.pixelDistanceEdge(resource) < 32 * 13 && t.base.exists(_.owner.isUs))) {
         Engage.consider(unit)
       }
 

@@ -20,6 +20,11 @@ class TaskBattles extends AbstractTask {
 class TaskCamera extends AbstractTask {
   override protected def onRun() { With.camera.onFrame() }
 }
+class TaskFingerprinting extends AbstractTask {
+  override protected def onRun(): Unit = {
+    With.fingerprints.update()
+  }
+}
 class TaskGeography extends AbstractTask {
   urgency = With.configuration.urgencyGeography
   override protected def onRun() { With.geography.update() }
@@ -58,7 +63,6 @@ class TaskPlanning extends AbstractTask {
       12
   override protected def onRun() {
     With.intelligence.update()
-    With.fingerprints.update()
     With.yolo.update()
     With.bank.update()
     With.recruiter.update()

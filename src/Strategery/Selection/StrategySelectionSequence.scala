@@ -28,6 +28,7 @@ case class StrategySelectionSequence(strategySequences: Seq[Seq[Strategy]], loop
     }
 
     // Just in case
+    With.logger.warn("Couldn't follow any strategies in sequence")
     StrategySelectionGreedy.chooseBest(topLevelStrategies, expand)
   }
 }

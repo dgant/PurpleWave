@@ -86,7 +86,7 @@ object Avoid extends ActionTechnique {
       avoidPotential(unit, desireProfile)
       return
     }
-    if (With.configuration.enableThreatAwarePathfinding) {
+    if (With.configuration.enableThreatAwarePathfinding && ! With.performance.danger) {
       avoidRealPath(unit, desireProfile)
     }
     if (unit.unitClass.isReaver && unit.transport.isDefined) {
@@ -119,8 +119,8 @@ object Avoid extends ActionTechnique {
 
     if (! unit.ready) return
 
-    val pathLengthMinimum = 6
-    val maximumDistance = pathLengthMinimum + Math.max(0, unit.matchups.framesOfEntanglement * unit.topSpeed + unit.effectiveRangePixels).toInt / 32
+    val pathLengthMinimum = 7
+    val maximumDistance = PurpleMath.clamp((unit.matchups.framesOfEntanglement * unit.topSpeed + unit.effectiveRangePixels).toInt / 32, pathLengthMinimum, 15)
 
     val profile = new PathfindProfile(unit.tileIncludingCenter)
     profile.end                 = if (desireProfile.home > 0) Some(unit.agent.origin.tileIncluding) else None

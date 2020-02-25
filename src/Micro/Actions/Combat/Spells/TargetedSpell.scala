@@ -2,7 +2,6 @@ package Micro.Actions.Combat.Spells
 
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Heuristics.{SpellTargetAOE, SpellTargetSingle}
 import ProxyBwapi.Techs.Tech
@@ -37,11 +36,11 @@ abstract class TargetedSpell extends Action {
   protected def additionalConditions(unit: FriendlyUnitInfo): Boolean = true
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    val safeDistance  = PurpleMath.clamp(unit.matchups.framesOfSafety * unit.topSpeed, 0.0, 32 * 18)
+    val safeDistance  = Math.max(0, -unit.matchups.pixelsOfEntanglement)
     val totalRange    = safeDistance + 32.0 * castRangeTiles
     
     if (aoe) {
-      val targetPixel = SpellTargetAOE.chooseTargetPixel(unit, totalRange, thresholdValue, valueTarget, pixelWidth = pixelWidth, pixelHeight = pixelHeight)
+      val targetPixel = new SpellTargetAOE().chooseTargetPixel(unit, totalRange, thresholdValue, valueTarget, pixelWidth = pixelWidth, pixelHeight = pixelHeight)
       targetPixel.foreach(With.commander.useTechOnPixel(unit, tech, _))
       targetPixel.foreach(onCast(unit, _))
     }

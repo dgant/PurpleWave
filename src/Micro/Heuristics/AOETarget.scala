@@ -5,7 +5,6 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import Mathematics.Points.{Pixel, PixelRectangle}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.ByOption
 
 class AOETarget(
     target: UnitInfo,
@@ -23,19 +22,33 @@ class AOETarget(
   private val evalPixelStart = Pixel(xs.min, ys.min)
   private val evalPixelEnd = Pixel(xs.max, ys.max)
   val rectangle = PixelRectangle(evalPixelStart, evalPixelEnd)
-  val units: Set[UnitInfo] = rectangle
+  // Get units in the *expanded* rectangle to handle the potential out-of-dateness of the unit grid
+  val units: Iterable[UnitInfo] = rectangle.expand(64, 64)
     .pixelsEach32
     .view
     .map(_.tileIncluding)
     .filter(_.valid)
-    .flatMap(With.grids.units.get(_).filter(u => u.likelyStillThere && rectangle.contains(u.pixelCenter)))
-    .toSet
+    .flatMap(With.grids.units.get(_).filter(u =>
+      u.likelyStillThere
+      && rectangle.contains(u.pixelCenter))) // Require the unit to actually be there; don't trust the grid))
   val netValue: Double = units.view.map(evaluate(_, caster)).sum
-  lazy val positionsProjected = units.map(_.projectFrames(projectionFrames))
-  lazy val xMin: Int = ByOption.min(positionsProjected.map(_.x)).getOrElse(p.x)
-  lazy val yMin: Int = ByOption.min(positionsProjected.map(_.y)).getOrElse(p.y)
-  lazy val xMax: Int = ByOption.max(positionsProjected.map(_.x)).getOrElse(p.x)
-  lazy val yMax: Int = ByOption.max(positionsProjected.map(_.y)).getOrElse(p.y)
+  var xMin = Int.MaxValue
+  var yMin = Int.MaxValue
+  var xMax = Int.MinValue
+  var yMax = Int.MinValue
+  if (units.isEmpty) {
+    xMin = evalPixelStart.x
+    yMin = evalPixelStart.y
+    xMax = evalPixelEnd.x
+    yMax = evalPixelEnd.y
+  }
+  units.foreach(unit => {
+    val positionProjected = unit.projectFrames(projectionFrames)
+    xMin = Math.min(xMin, positionProjected.x)
+    yMin = Math.min(yMin, positionProjected.y)
+    yMax = Math.max(xMax, positionProjected.x)
+    yMax = Math.max(yMax, positionProjected.y)
+  })
   lazy val finalTarget = Pixel((xMin + xMax) / 2, (yMin + yMax) / 2)
 
   def drawMap(): Unit = {

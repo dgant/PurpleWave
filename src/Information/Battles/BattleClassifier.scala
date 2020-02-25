@@ -43,7 +43,7 @@ class BattleClassifier {
       ++ Vector(() => runClustering())
     )
     for (step <- steps) {
-      if ( With.performance.continueRunning) {
+      if (With.performance.continueRunning) {
         step()
       }
     }

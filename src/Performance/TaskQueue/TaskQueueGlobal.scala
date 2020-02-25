@@ -6,6 +6,7 @@ class TaskQueueGlobal extends AbstractTaskQueue {
   override val tasks: Vector[AbstractTask] = Vector (
     new TaskLatency,
     new TaskUnitTracking,
+    new TaskFingerprinting,
     new TaskGeography,
     new TaskGrids,
     new TaskBattles,

@@ -41,10 +41,13 @@ object PvZDT extends PvZStrategy {
 }
 object PvZProxy2Gate extends PvZ2GateOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
+  override def responsesWhitelisted = Iterable(With.fingerprints.twelveHatch, With.fingerprints.twelvePool, With.fingerprints.overpool)
   override def responsesBlacklisted = Iterable(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.tenHatch)
 }
 object PvZ10Gate extends PvZ2GateOpening {
   override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(PvZSpeedlot, PvZ4GateGoon, PvZDT, PvZCorsair))
+  override def responsesBlacklisted = Iterable(With.fingerprints.fourPool)
+  override def minimumGamesVsOpponent: Int = 1
 }
 object PvZ2Gate1012 extends PvZ2GateOpening {
   override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(PvZSpeedlot, PvZ4GateGoon, PvZDT))

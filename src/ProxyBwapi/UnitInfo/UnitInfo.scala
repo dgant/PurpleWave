@@ -536,6 +536,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def framesToTravelPixels(pixels: Double)  : Int = (if (pixels <= 0.0) 0 else if (canMove) Math.max(0, Math.ceil(pixels / topSpeedPossible).toInt) else Forever()) + (if (burrowed || sieged) 24 else 0)
   def framesToTurnTo(radiansTo: Double): Double = unitClass.framesToTurn(PurpleMath.normalizeAroundZero(PurpleMath.radiansTo(angleRadians, radiansTo)))
   def framesToTurnFrom(enemy: UnitInfo): Double = framesToTurnTo(enemy.pixelCenter.radiansTo(pixelCenter))
+  def framesToStopRightNow: Double = if (unitClass.isFlyer || unitClass.floats) PurpleMath.clamp(PurpleMath.nanToZero(framesToAccelerate * speed / topSpeed), 0.0, framesToAccelerate) else 0.0
   def framesToAccelerate: Double = PurpleMath.clamp(PurpleMath.nanToZero((topSpeed - speed) / unitClass.accelerationFrames), 0, unitClass.accelerationFrames)
   def framesToGetInRange(enemy: UnitInfo)                 : Int = if (canAttack(enemy)) framesToTravelPixels(pixelsToGetInRange(enemy)) else Forever()
   def framesToGetInRange(enemy: UnitInfo, enemyAt: Pixel) : Int = if (canAttack(enemy)) framesToTravelPixels(pixelsToGetInRange(enemy, enemyAt)) else Forever()
@@ -606,14 +607,14 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     else
       visible
   
-  def likelyStillThere: Boolean =
-    possiblyStillThere &&
+  @inline def likelyStillThere: Boolean = cacheLikelyStillThere()
+  private val cacheLikelyStillThere = new Cache(() => possiblyStillThere &&
     ( ! canMove
       || With.framesSince(lastSeen) < With.configuration.fogPositionDurationFrames
       || is(UnitMatchSiegeTank)
-      || (player.isTerran && base.exists(_.owner == player)))
+      || (player.isTerran && base.exists(_.owner == player))))
   
-  def likelyStillAlive: Boolean = (
+  @inline def likelyStillAlive: Boolean = (
     likelyStillThere
     || unitClass.isBuilding
     || unitClass.isWorker

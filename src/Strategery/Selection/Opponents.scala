@@ -1,5 +1,6 @@
 package Strategery.Selection
 
+import Lifecycle.With
 import Strategery.Strategies.Protoss._
 import Strategery.{Heartbreak, MapGroups}
 
@@ -32,7 +33,24 @@ object Opponents {
   val safePvZ     = new StrategySelectionRecommended(StrategySelectionGreedy, PvZ1BaseForgeTech, PvZMidgameNeoBisu, PvZLateGameTemplar)
 
   // AIST3 opponents
-  val letabot           : Opponent = add(Opponent("Iron bot",           StrategySelectionFixed(PvT13Nexus, PvT3BaseCarrier)))
+  val bananabrain   : Opponent = add(Opponent("BananaBrain",  StrategySelectionSequence(Vector(
+    Seq(PvP2GateDTExpand),
+    Seq(PvP4GateGoon),
+    Seq(PvP1ZealotExpand),
+    Seq(PvP2Gate1012DT)))))
+  val dragon        : Opponent = add(Opponent("Dragon",       StrategySelectionSequence(Vector(
+    Seq(PvTProxy2Gate,  PvT3BaseCarrier, PvT3rdFast),
+    Seq(PvTDTExpand,    PvT2BaseArbiter),
+    Seq(PvT13Nexus,     PvT3BaseArbiter, PvT3rdSafe)))))
+  val letabot       : Opponent = add(Opponent("LetaBot",      new StrategySelectionRecommended(StrategySelectionGreedy, PvTDTExpand, PvT3BaseCarrier, PvT3rdFast)))
+  val locutus       : Opponent = add(Opponent("Locutus",      StrategySelectionSequence(Vector(
+    Seq(PvP2GateDTExpand),
+    Seq(PvP4GateGoon),
+    Seq(PvP1ZealotExpand),
+    Seq(PvP2Gate1012DT)))))
+  val mcrave        : Opponent = add(Opponent("McRave",       if (With.enemy.isZerg) StrategySelectionGreedy else new StrategySelectionRecommended(StrategySelectionGreedy, PvPRobo) { duration = 1 }))
+  val microwave     : Opponent = add(Opponent("Microwave",    StrategySelectionDynamic))
+  val willyt        : Opponent = add(Opponent("WillyT",       StrategySelectionDynamic))
 
   // TorchUp opponents
   val bunkerBoxer   : Opponent = add(Opponent("BunkerBoxeR",  new StrategySelectionRecommended(StrategySelectionGreedy, PvT32Nexus, PvT3BaseArbiter)))
@@ -41,17 +59,10 @@ object Opponents {
   val cunybot       : Opponent = add(Opponent("CUNYBot",      safePvZ))
   val ecgberht      : Opponent = add(Opponent("Ecgberht",     defaultPvT))
   val haopan        : Opponent = add(Opponent("Hao Pan",      new StrategySelectionRecommended(StrategySelectionGreedy, PvT32Nexus, PvT2BaseCarrier)))
-  val locutus       : Opponent = add(Opponent("Locutus",      StrategySelectionSequence(Vector(
-    Seq(PvP2GateDTExpand),
-    Seq(PvP1ZealotExpand),
-    Seq(PvPProxy2Gate)),
-    loop = true)))
-  val microwave     : Opponent = add(Opponent("Microwave",    StrategySelectionSequence(zergRotation)))
   val styxz         : Opponent = add(Opponent("StyxZ",        defaultPvZ))
   val tcpzerg       : Opponent = add(Opponent("TCPZerg",      safePvZ))
 
   // SSCAIT opponents
-  val bananabrain   : Opponent = add(Opponent("BananaBrain",  defaultPvP))
   val killerbot     : Opponent = add(Opponent("Killerbot",    StrategySelectionFixed(PvZFFEEconomic, PvZMidgame5GateGoonReaver, PvZLateGameReaver)))
   val mariandevecka : Opponent = add(Opponent("Marian Devecka", killerbot.policy))
   val cherrypi      : Opponent = add(Opponent("CherryPiSSCAIT2017",
@@ -59,12 +70,6 @@ object Opponents {
       StrategySelectionFixed(PvZ2Gate910, PvZSpeedlot, PvZMidgame5GateGoonReaver, PvZLateGameReaver)
     else
       StrategySelectionFixed(PvZProxy2Gate, PvZ2Gate910, PvZSpeedlot, PvZMidgame5GateGoonReaver, PvZLateGameReaver)))
-  val dragon        : Opponent = add(Opponent("Dragon",
-    //if (MapGroups.badForProxying.exists(_.matches))
-      StrategySelectionFixed(PvT13Nexus, PvT3BaseArbiter)
-    //else
-    //  StrategySelectionFixed(PvTProxy2Gate, PvT1015Expand, PvT3BaseArbiter)
-    ))
   val locutusClonePolicy = StrategySelectionSequence(Vector(
     Seq(PvP2Gate1012DT),
     Seq(PvPRobo),
@@ -82,7 +87,6 @@ object Opponents {
   val firefrog      : Opponent = add(Opponent("Firefrog",     defaultPvZ))
   val iron          : Opponent = add(Opponent("Iron bot",           StrategySelectionFixed(PvT1015DT, PvT2BaseCarrier)))
   val dandanbot     : Opponent = add(Opponent("DanDanBot",    locutus.policy))
-  val mcrave        : Opponent = add(Opponent("McRave",       new StrategySelectionRecommended(StrategySelectionGreedy, PvPRobo) { duration = 1 }))
   val metabot       : Opponent = add(Opponent("MegaBot",      StrategySelectionFixed(PvPRobo)))
   val skynet        : Opponent = add(Opponent("Skynet",       metabot.policy)) // For testing purposes
   val andrewsmith   : Opponent = add(Opponent("Andrew Smith", metabot.policy)) // For testing purposes

@@ -46,7 +46,8 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
     lazy val catcherFlying = catcher.flying || catcher.friendly.exists(_.agent.ride.exists(_.flying)) && ! me.flying
     val output = (
       catcherSpeed * (if (catcherFlying) 2 else 1) >= me.topSpeed
-        || (catcher.pixelRangeAgainst(me) > me.effectiveRangePixels && catcher.friendly.exists(_.squadenemies.contains(me)))
+        // The Math.max prevents Zealots from thinking they can catch SCVs
+        || (catcher.pixelRangeAgainst(me) > Math.max(32 * 2, me.effectiveRangePixels) && catcher.friendly.exists(_.squadenemies.contains(me)))
         || busyForCatching
         || catcher.is(Zerg.Scourge)
         || catcher.framesToGetInRange(me) < 8
@@ -56,8 +57,8 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
         || (catcher.is(Protoss.DarkTemplar) && me.isDragoon()))
     output
   }
-  lazy val busyForCatching  : Boolean        = me.gathering || me.constructing || me.repairing || ! me.canMove || BlockConstruction.buildOrders.contains(me.order)
-  lazy val catchers         : Set[UnitInfo]  = threats.filter(isCatcher).toSet
+  lazy val busyForCatching  : Boolean           = me.gathering || me.constructing || me.repairing || ! me.canMove || BlockConstruction.buildOrders.contains(me.order)
+  lazy val catchers         : Vector[UnitInfo]  = threats.filter(isCatcher)
   
   private def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = {
     if ( ! shooter.canAttack(victim)) return false
@@ -65,7 +66,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   }
   def repairers: ArrayBuffer[UnitInfo] = ArrayBuffer.empty ++ allies.filter(_.friendly.exists(_.agent.toRepair.contains(me)))
 
-  lazy val firstTeammate                  : UnitInfo              = if (alliesInclSelf.isEmpty) me else alliesInclSelf.minBy(_.id)
+  lazy val firstTeammate                  : UnitInfo              = ByOption.minBy(alliesInclSelf)(_.id).getOrElse(me)
   lazy val valuePerDamage                 : Double                = MicroValue.valuePerDamageCurrentHp(me)
   lazy val dpfDealingMax                  : Double                = splashFactorMax * ByOption.max(targets.view.map(me.dpfOnNextHitAgainst)).getOrElse(0.0)
   lazy val vpfDealingMax                  : Double                = splashFactorMax * ByOption.max(targets.view.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
@@ -77,16 +78,29 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val framesBeforeAttacking          : Double                = ByOption.max(targets.view.map(me.framesBeforeAttacking)).getOrElse(Forever()).toDouble
   lazy val framesToLive                   : Double                = PurpleMath.nanToInfinity(me.totalHealth / dpfReceiving)
   lazy val doomed                         : Boolean               = framesToLive <= framesOfEntanglement
+  lazy val pixelsOfEntanglementPerThreat  : Map[UnitInfo, Double] = threats.map(threat => (threat, pixelsOfEntanglementWith(threat))).toMap
   lazy val framesOfEntanglementPerThreat  : Map[UnitInfo, Double] = threats.map(threat => (threat, framesOfEntanglementWith(threat))).toMap
   lazy val framesOfEntanglement           : Double                = ByOption.max(framesOfEntanglementPerThreat.values).getOrElse(- Forever())
+  lazy val pixelsOfEntanglement           : Double                = ByOption.max(pixelsOfEntanglementPerThreat.values).getOrElse(- With.mapPixelWidth)
   lazy val framesOfSafety                 : Double                = - With.latency.latencyFrames - With.reaction.agencyAverage - ByOption.max(framesOfEntanglementPerThreat.values).getOrElse(- Forever().toDouble)
   lazy val teamFramesOfSafety             : Double                = if (me == firstTeammate) ByOption.min(alliesInclSelf.view.map(_.matchups.framesOfSafety)).getOrElse(0) else firstTeammate.matchups.teamFramesOfSafety
   lazy val tilesOfInvisibility            : Double                = if (me.visibleToOpponents) 0 else Spiral.points(8).map(me.tileIncludingCenter.add).find(With.grids.enemyVision.isSet).map(_.tileDistanceFast(me.tileIncludingCenter)).getOrElse(maxTilesOfInvisibility)
   val maxTilesOfInvisibility = 8
 
   def dpfDealingDiffused(target: UnitInfo): Double = splashFactorInRange * me.dpfOnNextHitAgainst(target) / Math.max(1.0, targetsInRange.size)
-  
-  def framesOfEntanglementWith(threat: UnitInfo, fixedRange: Option[Double] = None): Double = {
+
+  def pixelsOfEntanglementWith(threat: UnitInfo, fixedRange: Option[Double] = None): Double = {
+    val speedTowardsThreat    = me.speedApproaching(threat)
+    val framesToStopMe        = if(speedTowardsThreat <= 0) 0.0 else me.framesToStopRightNow
+    val framesToFlee          = framesToStopMe + me.unitClass.framesToTurn180 + With.latency.framesRemaining + With.reaction.agencyAverage
+    val distanceClosedByMe    = speedTowardsThreat * framesToFlee
+    val distanceClosedByEnemy = if (threat.is(Protoss.Interceptor)) 0.0 else (threat.topSpeed * framesToFlee)
+    val distanceEntangled     = threat.pixelRangeAgainst(me) - threat.pixelDistanceEdge(me)
+    val output                = distanceEntangled + distanceClosedByEnemy
+    output
+  }
+
+  def framesOfEntanglementWith(threat: UnitInfo): Double = {
     lazy val approachSpeedMe      = me.speedApproaching(threat.pixelCenter)
     lazy val approachSpeedThreat  = if (threat.is(Protoss.Interceptor)) 0.0 else threat.speedApproaching(me.pixelCenter)
     lazy val approachSpeedTotal   = approachSpeedMe + approachSpeedThreat
@@ -96,7 +110,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
     lazy val reactionFrames       = With.reaction.agencyMax + 2 * With.latency.framesRemaining
     lazy val threatRangeBonus     = if (threat.isFriendly) 0.0 else Math.max(0.0, approachSpeedTotal * reactionFrames)
     
-    val effectiveRange = fixedRange.getOrElse(threat.pixelRangeAgainst(me) + threatRangeBonus)
+    val effectiveRange = threat.pixelRangeAgainst(me) + threatRangeBonus
     val gapPixels = me.pixelDistanceEdge(threat) - effectiveRange
     
     val gapSpeed          = if (gapPixels >= 0 && threat.canMove) threat.topSpeed else me.topSpeed

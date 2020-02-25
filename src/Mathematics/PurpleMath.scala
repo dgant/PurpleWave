@@ -100,8 +100,8 @@ object PurpleMath {
     D - D / 16 + d * 3 / 8 - D / 64 + d * 3 / 256
   }
   @inline final def broodWarDistanceDouble(x0: Double, y0: Double, x1: Double, y1: Double): Double = {
-    val dx = Math.abs(x0 - x1)
-    val dy = Math.abs(y0 - y1)
+    val dx  = Math.abs(x0 - x1)
+    val dy  = Math.abs(y0 - y1)
     val d   = Math.min(dx, dy)
     val D   = Math.max(dx, dy)
     if (d < D / 4) {

@@ -103,6 +103,7 @@ object ConfigurationLoader {
       With.logger.warn("Tried to use fixed build but failed to match builds: (" + strategyNamesUnmatched.mkString(", ") + ") from (" + strategyNamesLines.mkString(", ") + ")")
     }
     if (strategyInstances.nonEmpty) {
+      With.logger.debug("Using fixed build: " + strategyNamesText)
       config.forcedPlaybook = Some(new TestingPlaybook {
           override lazy val forced: Seq[Strategy] = strategyInstances
       })

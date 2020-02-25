@@ -1,12 +1,11 @@
 package Micro.Heuristics
 
-import Lifecycle.With
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
 
-object SpellTargetAOE {
+class SpellTargetAOE {
 
   def chooseTargetPixel(
    caster              : FriendlyUnitInfo,
@@ -31,7 +30,8 @@ object SpellTargetAOE {
       new AOETarget(target, caster, -1, -1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, projectionFrames = projectionFrames, evaluate = evaluate)))
     val bestBox = ByOption.maxBy(boxes)(_.netValue)
     val output = bestBox.map(_.finalTarget)
-    bestBox.filter(_.netValue > minimumValue).foreach(box => With.animations.addMap(box.drawMap))
+    //We were invoking this way too frequently and I think breaking the BWAPI client socket
+    //bestBox.filter(_.netValue > minimumValue).foreach(box => With.animations.addMap(box.drawMap))
     output
   }
 }

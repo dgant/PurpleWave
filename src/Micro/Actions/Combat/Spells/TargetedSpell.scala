@@ -37,7 +37,7 @@ abstract class TargetedSpell extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     val safeDistance  = Math.max(0, -unit.matchups.pixelsOfEntanglement)
-    val totalRange    = safeDistance + 32.0 * castRangeTiles
+    val totalRange    = safeDistance + 32.0 * castRangeTiles + 64 // +64 is just some encouragement
     
     if (aoe) {
       val targetPixel = new SpellTargetAOE().chooseTargetPixel(unit, totalRange, thresholdValue, valueTarget, pixelWidth = pixelWidth, pixelHeight = pixelHeight)

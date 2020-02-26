@@ -108,7 +108,7 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
         new If(
           new And(
             new EnemiesAtLeast(2, Protoss.PhotonCannon),
-            new Not(new EnemyStrategy(With.fingerprints.cannonRush))),
+            new Not(new EnemyStrategy(With.fingerprints.cannonRush, With.fingerprints.dtRush))),
           new RequireMiningBases(2),
           new Build(Get(2, Protoss.Gateway))),
         new BuildOrder(
@@ -138,6 +138,7 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
             new UnitsAtMost(12, UnitMatchWarriors)),
           new Pump(Protoss.Dragoon)),
         new RequireMiningBases(2),
+        new If(new EnemyStrategy(With.fingerprints.dtRush), new BuildCannonsAtNatural(3)), // Get a LOT so they dont get bursted down
         new If(
           new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),
           new BuildCannonsAtNatural(2))),

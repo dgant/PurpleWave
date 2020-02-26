@@ -93,7 +93,7 @@ class ForeignUnitTracker {
       remove(unit)
     }
     else if (shouldBeVisible) {
-      if ( ! shouldBeDetected) {
+      if (!shouldBeDetected) {
         if (wasBurrowing) {
           unit.flagBurrowed()
           unit.flagUndetected()
@@ -105,12 +105,16 @@ class ForeignUnitTracker {
           return
         }
       }
-  
+
       // Well, if it can't move, it must be dead. Like a building that burned down or was otherwise destroyed.
-      if (unit.unitClass.canMove || unit.isSiegeTankSieged()) {
-        unit.flagMissing()
+      // HACK: Vision grids can be out of date, causing us to think a unit is dead when we actually just can't see it
+      // The temporary fix is querying all the tiles to ensure it's not just in the fog
+      if ( ! unit.unitClass.canMove && ! unit.isSiegeTankSieged()) {
+        if (unit.tileArea.tiles.exists(_.bwapiVisible)) {
+          remove(unit)
+        }
       } else {
-        remove(unit)
+        unit.flagMissing()
       }
     }
   }

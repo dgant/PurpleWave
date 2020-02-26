@@ -1,6 +1,7 @@
 
 package Micro.Actions.Combat.Decisionmaking
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
@@ -38,6 +39,7 @@ object FightOrFlight extends Action {
     decide(true,  "No threats",   () => unit.matchups.threats.isEmpty)
     decide(false, "Pacifist",     () => ! unit.agent.canFight)
     decide(true,  "CantFlee",     () => ! unit.agent.canFlee)
+    decide(true,  "Berzerk",      () => With.frame < GameTime(6, 0)() && unit.isAny(Protoss.Zealot, Zerg.Zergling) && unit.base.exists(b => b.owner.isEnemy || b.isNaturalOf.exists(_.owner.isEnemy)) && unit.matchups.threats.exists(t => t.is(Terran.Vulture) && t.matchups.catchers.isEmpty))
     decide(true,  "Hug",          () => ! unit.flying && unit.matchups.targets.exists(t => unit.pixelDistanceEdge(t) < t.pixelRangeMin))
     decide(false, "Scarabs",      () => unit.is(Protoss.Reaver) && unit.scarabCount == 0)
     decide(true,  "Cloaked",      () => unit.effectivelyCloaked || (unit.is(Terran.Wraith) && unit.energy >= 50 && unit.matchups.enemyDetectors.isEmpty && With.self.hasTech(Terran.WraithCloak)))

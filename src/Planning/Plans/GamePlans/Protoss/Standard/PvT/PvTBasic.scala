@@ -169,19 +169,7 @@ class PvTBasic extends GameplanTemplate {
 
     new UpgradeContinuously(Protoss.CarrierCapacity),
 
-    new If(
-      new Or(
-        new UnitsAtLeast(1, Protoss.HighTemplar),
-        new GasAtLeast(800),
-        new And(
-          new EmployingCarriers,
-          new UnitsAtMost(0, Protoss.RoboticsSupportBay),
-          new GasPumpsAtLeast(3),
-          new Or(
-            new CarriersCountered,
-            new EnemiesAtLeast(8, Terran.Goliath),
-            new GasPumpsAtLeast(5)))),
-      new GoStorm),
+    new If(new Or(new UnitsAtLeast(1, Protoss.HighTemplar), new GasAtLeast(800)), new GoStorm),
 
     new If(new UnitsAtLeast(1, Protoss.ArbiterTribunal),  new Build(Get(Protoss.ArbiterEnergy))),
     new If(new UpgradeComplete(Protoss.ArbiterEnergy),    new Build(Get(Protoss.Stasis))),

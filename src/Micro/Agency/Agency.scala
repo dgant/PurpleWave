@@ -37,13 +37,18 @@ class Agency {
         .sortBy(_.unit.matchups.framesOfSafety.toInt) // Units in trouble get first dibs on things
         .sortBy(_.unit.unitClass.isTransport) // Make transports go after their passengers so they know what passengers want
     }
-    
-    var doContinue = true
-    while (doContinue && agentQueue.nonEmpty) {
-      doContinue = doContinue && With.performance.continueRunning
+
+    while (agentQueue.nonEmpty && With.performance.continueRunning) {
       val agent = agentQueue.dequeue()
       if (agent.unit.unitClass.orderable && agent.unit.alive && agent.unit.ready) {
+        val timeBefore = With.performance.millisecondsSpentThisFrame
         agent.execute()
+        if (With.performance.violatedLimit) {
+          val timeAfter = With.performance.millisecondsSpentThisFrame
+          val timeDelta = timeAfter - timeBefore
+          With.logger.warn("Microing " + agent.unit.unitClass + " violated threshold by taking " + timeDelta + "ms considering")
+          With.logger.warn(agent.actionsPerformed.map(_.toString).mkString(", "))
+        }
       }
     }
   

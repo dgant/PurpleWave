@@ -18,7 +18,7 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy}
 import Planning.UnitCounters.UnitCountOne
-import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
+import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Protoss.{PvPProxy2Gate, PvRProxy2Gate, PvTProxy2Gate, PvZProxy2Gate}
@@ -119,13 +119,17 @@ class PvEProxy2Gate extends GameplanTemplate {
 
 
     new Pump(Protoss.Dragoon),
-    new FlipIf(
-      new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
-      new If(new EnemiesAtMost(1, UnitMatchOr(Protoss.Dragoon, Terran.Vulture)), new Pump(Protoss.Zealot)),
-      // Build Gateways but make sure we don't place new ones at the proxy
-      new If(
-        new UnitsAtLeast(2, Protoss.Pylon, complete = true),
-        new Build(Get(4, Protoss.Gateway)))),
+    new If(
+      new UnitsAtLeast(1, Protoss.CyberneticsCore),
+      // HACK: Build Gateways but wait until Core to request them to make sure we don't place new ones at the proxy
+      new BuildOrder(
+        Get(2, Protoss.Dragoon),
+        Get(4, Protoss.Gateway))),
+    new If(
+      new And(
+        new EnemiesAtMost(1, Protoss.Dragoon),
+        new EnemiesAtMost(0, Terran.Vulture)),
+      new Pump(Protoss.Zealot)),
 
     new If(new UnitsAtLeast(4, Protoss.Gateway, complete = true), new RequireMiningBases(2))
   )

@@ -3,6 +3,7 @@ package Debugging
 import Debugging.Visualizations.Views.Planning.ShowStrategyEvaluations
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
+import Planning.Predicates.Reactive.{SafeAtHome, SafeToMoveOut}
 import Planning.UnitMatchers.UnitMatchHatchery
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Techs
@@ -44,7 +45,9 @@ class Storyteller {
     Story("Policy",             () => With.configuration.playbook.strategySelectionPolicy.toString),
     Story("Strategy",           () => With.strategy.selectedCurrently.map(_.toString).mkString(" ")),
     Story("Status",             () => With.blackboard.status.get.mkString(", ")),
-    Story("Attack",             () => With.blackboard.wantToAttack.get.toString),
+    Story("Safe at home",       () => new SafeAtHome().isComplete.toString),
+    Story("Safe to move out",   () => new SafeToMoveOut().isComplete.toString),
+    Story("Should attack",      () => With.blackboard.wantToAttack.get.toString),
     Story("Enemy race",         () => With.enemy.raceCurrent.toString),
     Story("Fingerprints",       () => With.fingerprints.status.mkString(" ")),
     Story("Our bases",          () => With.geography.ourBases.size.toString),

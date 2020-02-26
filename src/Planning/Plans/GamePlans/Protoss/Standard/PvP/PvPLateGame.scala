@@ -6,7 +6,7 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.Macro.Automatic.{PylonBlock, UpgradeContinuously}
+import Planning.Plans.Macro.Automatic.{CapGasAt, PylonBlock, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
@@ -86,9 +86,10 @@ class PvPLateGame extends GameplanTemplate {
           new Or(
             new UnitsAtLeast(1, Protoss.RoboticsFacility),
             new EnemyBasesAtLeast(2))),
-        new Build(
-          Get(5, Protoss.Gateway),
-          Get(2, Protoss.Assimilator)),
+        new Parallel(
+          new Build(
+            Get(5, Protoss.Gateway),
+            Get(2, Protoss.Assimilator))),
         new Build(
           Get(Protoss.RoboticsFacility),
           Get(Protoss.Observatory),
@@ -173,6 +174,7 @@ class PvPLateGame extends GameplanTemplate {
     new BuildOrder(Get(2, Protoss.DarkTemplar)))
 
   override def buildPlans: Seq[Plan] = Seq(
+    new CapGasAt(500),
     new FinishDarkTemplarRush,
     new Build(Get(Protoss.Pylon), Get(Protoss.Gateway), Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore), Get(Protoss.DragoonRange), Get(2, Protoss.Gateway)),
 

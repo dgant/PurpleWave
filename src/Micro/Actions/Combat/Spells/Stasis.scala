@@ -1,7 +1,7 @@
 package Micro.Actions.Combat.Spells
 
 import Lifecycle.With
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -16,10 +16,16 @@ object Stasis extends TargetedSpell {
   
   override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
     if (With.grids.psionicStorm.isSet(target.tileIncludingCenter)) return 0.0
+    if (target.unitClass.isSpell)       return 0.0
     if (target.unitClass.isBuilding) return 0.0
     if (target.underStorm) return 0.0
     if (target.stasised)   return 0.0
     if (target.invincible) return 0.0
+    if (target.isAny(
+      Protoss.Interceptor,
+      Zerg.Larva,
+      Zerg.Egg,
+      Zerg.LurkerEgg)) return 0.0
 
     val teamValue = (
       Math.min(1.0, target.matchups.targets.size / 3.0)

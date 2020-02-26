@@ -97,10 +97,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends ProductionPlan {
     if (building.exists(_.buildUnit.isDefined)) {
       builderLock.unitMatcher.set(new UnitMatchSpecific(Set(building.get.buildUnit.get)))
     } else if ( ! builderLock.satisfied && desiredZone.exists(_.bases.exists(_.workerCount > 5))) {
-      builderLock.unitMatcher.set(UnitMatchAnd(
-        UnitMatchCustom(_.zone == desiredZone.get),
-        builderMatcher
-      ))
+      builderLock.unitMatcher.set(UnitMatchAnd(UnitMatchCustom(_.zone == desiredZone.get), builderMatcher))
     } else {
       builderLock.unitMatcher.set(builderMatcher)
     }

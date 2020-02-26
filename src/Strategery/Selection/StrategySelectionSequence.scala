@@ -12,7 +12,7 @@ case class StrategySelectionSequence(strategySequences: Seq[Seq[Strategy]], loop
     val appropriateness = strategySequences.map(seq => seq.map(strategy => (strategy, With.strategy.isAppropriate(strategy))))
     val appropriate = strategySequences.filter(_.forall(With.strategy.isAppropriate))
     With.logger.debug("StrategySelectionSequence appropriateness:")
-    With.logger.debug(appropriate.toString)
+    With.logger.debug(appropriateness.toString)
 
     if (appropriate.isEmpty) {
       With.logger.warn("No complete strategies in StrategySelectionSequence were appropriate.")
@@ -20,9 +20,7 @@ case class StrategySelectionSequence(strategySequences: Seq[Seq[Strategy]], loop
 
     if ( ! loop && appropriate.forall(_.forall(strategy => gamesAgainst.exists(_.weEmployed(strategy))))) {
       With.logger.debug("StrategySelectionSequence has tried everything once and isn't looping. We will choose from among them greedily.")
-      return StrategySelectionGreedy.chooseBest(
-        topLevelStrategies.filter(strategy => appropriate.exists(_.exists(_ == strategy))),
-        expand)
+      return StrategySelectionGreedy.chooseBest(appropriate)
     }
 
     val leastUsed = ByOption.minBy(appropriate)(strategies =>

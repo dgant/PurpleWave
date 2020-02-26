@@ -83,6 +83,7 @@ object PvT1GateReaver extends PvTBasicOpener {
   }
   override def responsesBlacklisted: Iterable[Fingerprint] = {
     // TODO: Add 1 Fac Port
+    // TODO: Add 2 Fac tank?
     Seq(With.fingerprints.siegeExpand)
   }
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(PvT2BaseReaver, PvT3rdObs))

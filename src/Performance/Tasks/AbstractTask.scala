@@ -23,8 +23,8 @@ abstract class AbstractTask {
   def maxConsecutiveSkips : Int = 48
   def due                 : Boolean = framesSinceRunning > maxConsecutiveSkips
   
-  private var alreadyViolatedThreshold  = false
-  private var alreadyViolatedRules      = false
+  private var alreadyViolatedTarget  = false
+  private var alreadyViolatedLimit      = false
   
   protected def onRun()
   def onEnd() {}
@@ -40,8 +40,8 @@ abstract class AbstractTask {
   final def run() {
     
     val millisecondsBefore  = System.nanoTime() / nanosToMillis
-    alreadyViolatedThreshold  = With.performance.violatedThreshold
-    alreadyViolatedRules      = With.performance.violatedRules
+    alreadyViolatedTarget  = With.performance.violatedTarget
+    alreadyViolatedLimit      = With.performance.violatedLimit
     onRun()
     val millisecondsAfter   = System.nanoTime() / nanosToMillis
     var millisecondsDelta   = millisecondsAfter - millisecondsBefore
@@ -70,12 +70,14 @@ abstract class AbstractTask {
     while (runtimeMilliseconds.size > runtimesToTrack) {
       runtimeMilliseconds.dequeue()
     }
-    if ( ! alreadyViolatedThreshold && With.performance.violatedThreshold) {
+    if ( ! alreadyViolatedTarget && With.performance.violatedTarget) {
       violatedThreshold += 1
     }
-    if ( ! alreadyViolatedRules && With.performance.violatedRules) {
+    if ( ! alreadyViolatedLimit && With.performance.violatedLimit) {
       violatedRules += 1
-      With.logger.warn(toString + " exceeded frame time: " + millisecondsDuration +" ms")
+      if (maxConsecutiveSkips > 1) {
+        With.logger.warn(toString + " went too long: " + millisecondsDuration + "ms for " + With.performance.millisecondsSpentThisFrame + "ms this frame")
+      }
     }
   }
   
@@ -91,4 +93,6 @@ abstract class AbstractTask {
   }
   
   final def runMillisecondsMean: Long = runMillisecondsSumRecent() / Math.max(1, runtimeMilliseconds.size)
+
+  override def toString: String = getClass.getSimpleName
 }

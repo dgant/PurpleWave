@@ -13,11 +13,12 @@ object PsionicStorm extends TargetedSpell {
   override protected def tech             : Tech      = Protoss.PsionicStorm
   override protected def aoe              : Boolean   = true
   override protected def castRangeTiles   : Int       = 9
-  override protected def thresholdValue   : Double    = 4.5 * Terran.Marine.subjectiveValue
-  override protected def lookaheadFrames  : Int       = 0
+  override protected def thresholdValue   : Double    = 16 * Terran.Marine.subjectiveValue
+  override protected def lookaheadFrames  : Int       = 8
 
   override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
     if (With.grids.psionicStorm.isSet(target.tileIncludingCenter)) return 0.0
+    if (target.unitClass.isSpell)       return 0.0
     if (target.unitClass.isBuilding)    return 0.0
     if (target.underStorm)              return 0.0
     if (target.stasised)                return 0.0
@@ -37,10 +38,10 @@ object PsionicStorm extends TargetedSpell {
       return 0.0
     }
 
-    val multiplayerPlayer   = if (target.isEnemy) 1.0 else if (target.isFriendly) -2.0 else 0.0
-    val multiplierUnit      = Math.min(Terran.Goliath.subjectiveValue, target.unitClass.subjectiveValue)
-    val multiplierDanger    = if (caster.matchups.threatsInRange.nonEmpty) 1.25 else 1.0
-    val output = multiplayerPlayer * multiplierUnit * multiplierDanger
+    val multiplayerPlayer = if (target.isEnemy) 1.0 else if (target.isFriendly) -2.0 else 0.0
+    val multiplierUnit    = 3 * Terran.Marine.subjectiveValue + target.unitClass.subjectiveValue
+    val multiplierDanger  = if (caster.matchups.threatsInRange.nonEmpty) 1.25 else 1.0
+    val output            = multiplayerPlayer * multiplierUnit * multiplierDanger
     output
   }
   

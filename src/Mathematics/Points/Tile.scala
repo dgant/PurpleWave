@@ -181,4 +181,8 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   final def buildable: Boolean = {
     With.grids.buildable.get(this)
   }
+  @inline
+  final def bwapiVisible: Boolean = {
+    With.game.isVisible(x, y)
+  }
 }

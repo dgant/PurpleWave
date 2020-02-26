@@ -18,8 +18,12 @@ class PerformanceMonitor {
 
   def enablePerformancePauses: Boolean = With.configuration.enablePerformancePauses // For disabling performance stops while debugging
 
+  // The tradeoff here is between using System.currentTimeMillis and System.nanoTime
+  // https://www.geeksforgeeks.org/java-system-nanotime-vs-system-currenttimemillis/
+  def systemMillis: Long = System.nanoTime / 1000000
+
   def startFrame() {
-    millisecondsBefore = System.currentTimeMillis()
+    millisecondsBefore = systemMillis
   }
 
   def endFrame() {
@@ -34,23 +38,23 @@ class PerformanceMonitor {
     if (millisecondDifference >= 10000)           framesOver10000 += 1
   }
 
-  def millisecondsLeftThisFrame: Long = {
+  def millisecondsLeftBeforeTarget: Long = {
     Math.max(0, With.configuration.targetFrameDurationMilliseconds - millisecondsSpentThisFrame)
   }
 
   def millisecondsSpentThisFrame: Long = {
-    Math.max(0, System.currentTimeMillis - millisecondsBefore)
+    Math.max(0, systemMillis - millisecondsBefore)
   }
 
   def continueRunning: Boolean = {
-    With.frame == 0 || millisecondsLeftThisFrame > 1 || ! enablePerformancePauses
+    With.frame == 0 || millisecondsLeftBeforeTarget > 1 || ! enablePerformancePauses
   }
 
-  def violatedThreshold: Boolean = {
-    With.frame > 0 && millisecondsLeftThisFrame <= 0
+  def violatedTarget: Boolean = {
+    With.frame > 0 && millisecondsLeftBeforeTarget <= 0
   }
 
-  def violatedRules: Boolean = {
+  def violatedLimit: Boolean = {
     With.frame > 0 && millisecondsSpentThisFrame >= frameLimitShort
   }
 

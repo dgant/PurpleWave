@@ -28,7 +28,7 @@ class SpellTargetAOE {
       new AOETarget(target, caster, -1,  1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, projectionFrames = projectionFrames, evaluate = evaluate),
       new AOETarget(target, caster,  1, -1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, projectionFrames = projectionFrames, evaluate = evaluate),
       new AOETarget(target, caster, -1, -1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, projectionFrames = projectionFrames, evaluate = evaluate)))
-    val bestBox = ByOption.maxBy(boxes)(_.netValue)
+    val bestBox = ByOption.maxBy(boxes)(_.netValue).filter(_.netValue >= minimumValue)
     val output = bestBox.map(_.finalTarget)
     //We were invoking this way too frequently and I think breaking the BWAPI client socket
     //bestBox.filter(_.netValue > minimumValue).foreach(box => With.animations.addMap(box.drawMap))

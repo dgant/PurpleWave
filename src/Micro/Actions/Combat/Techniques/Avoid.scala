@@ -46,7 +46,7 @@ object Avoid extends ActionTechnique {
 
   def pathfindingRepulsion(unit: FriendlyUnitInfo, maxThreats: Int = 10): IndexedSeq[PathfindRepulsor] = {
     TakeN
-      .by(maxThreats, unit.matchups.threats.view)(Ordering.by(t => unit.matchups.framesOfEntanglementPerThreat(t)))
+      .by(maxThreats, unit.matchups.threats.view.filter(_.likelyStillThere))(Ordering.by(t => unit.matchups.framesOfEntanglementPerThreat(t)))
       .map(t => PathfindRepulsor(
         t.pixelCenter,
         t.dpfOnNextHitAgainst(unit),

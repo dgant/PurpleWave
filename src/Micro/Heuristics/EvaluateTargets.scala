@@ -1,6 +1,7 @@
 package Micro.Heuristics
 
 import Lifecycle.With
+import Mathematics.PurpleMath
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -108,12 +109,12 @@ object EvaluateTargets extends {
         output *= 2.0
       } else {
         val buildFrames = target.unitClass.buildFrames
-        output *= (1.0 + (buildFrames - target.remainingCompletionFrames) / buildFrames)
+        output *= (1.0 + PurpleMath.clamp((buildFrames - target.remainingCompletionFrames) / buildFrames, 0, 1.0))
       }
     }
 
     // Immediate combat value bonus
-    val hurtingUsBonus = target.matchups.targetsInRange.nonEmpty || target.unitClass.maxEnergy > 0
+    val hurtingUsBonus = target.matchups.targetsInRange.nonEmpty || (target.energy > 40 && ! target.isAny(Terran.Wraith, Protoss.Corsair))
     if (hurtingUsBonus) {
       output *= 2.0
     }
@@ -159,6 +160,12 @@ object EvaluateTargets extends {
       if (detects) {
         output *= 40.0
       }
+    }
+
+    // Cloaked bonus
+    // Prefer taking out cloaked units before any detection is eliminated
+    if (target.cloaked && target.matchups.threats.nonEmpty && target.matchups.enemyDetectors.forall(_.matchups.threats.nonEmpty) && target.matchups.nearestArbiter.isEmpty) {
+      output *= 2.0
     }
 
     // Interceptor penalty

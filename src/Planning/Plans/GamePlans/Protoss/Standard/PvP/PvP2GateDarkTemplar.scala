@@ -99,7 +99,10 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
         new FrameAtLeast(GameTime(4, 10)())),
 
       new Parallel(
-        new CancelOrders(Protoss.CyberneticsCore),
+        // Don't accidentally cancel range that we actually want/need
+        new If(
+          new Not(new EnemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate)),
+          new CancelOrders(Protoss.CyberneticsCore)),c
         new BuildOrder(
           Get(Protoss.Dragoon),
           Get(Protoss.CitadelOfAdun),

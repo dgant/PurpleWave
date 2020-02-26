@@ -218,11 +218,10 @@ object PvPIdeas {
       Get(Protoss.Zealot),
       Get(14, Protoss.Probe),
       Get(2,  Protoss.Pylon),
-      Get(15, Protoss.Probe),
-      Get(Protoss.CyberneticsCore),
       Get(16, Protoss.Probe),
-      Get(2,  Protoss.Zealot),
       Get(2, Protoss.Gateway),
+      Get(2,  Protoss.Zealot),
+      Get(Protoss.CyberneticsCore),
       Get(3, Protoss.Pylon), // A little early in case we have more Probes than expected
       Get(17, Protoss.Probe),
       Get(Protoss.Dragoon),

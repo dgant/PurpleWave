@@ -29,6 +29,4 @@ abstract class Action {
   final def delegate(unit: FriendlyUnitInfo) {
     consider(unit, giveCredit = false)
   }
-
-  override def toString: String = getClass.getSimpleName
 }

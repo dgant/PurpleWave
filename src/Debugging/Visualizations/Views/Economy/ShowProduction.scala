@@ -43,6 +43,7 @@ object ShowProduction extends View {
     .flatten
     .toVector ++ With.bank.requests
       .withFilter( ! _.isSpent)
+      .withFilter(_.owner.isInstanceOf[ProductionPlan])
       .map(request => {
         val productionPlan = request.owner.asInstanceOf[ProductionPlan]
         val duration = if (productionPlan != null) productionPlan.buildable.frames else 24 * 45

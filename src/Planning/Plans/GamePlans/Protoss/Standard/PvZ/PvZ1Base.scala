@@ -100,11 +100,11 @@ class PvZ1Base extends GameplanTemplate {
 
     new DefendFightersAgainstRush,
 
-    new If(new GettingAntiAirASAP,      new WriteStatus("Anti-AirASAP")),
-    new If(new GettingGoons,            new WriteStatus("4-Gate Goons")),
-    new If(new GettingZealots,          new WriteStatus("+1 Speedlot")),
-    new If(new GettingCorsair,          new WriteStatus("Corsair")),
-    new If(new GettingDT,               new WriteStatus("DT Expand")),
+    new If(new GettingAntiAirASAP,  new WriteStatus("Anti-AirASAP")),
+    new If(new GettingGoons,        new WriteStatus("4-Gate Goons")),
+    new If(new GettingZealots,      new WriteStatus("+1 Speedlot")),
+    new If(new GettingCorsair,      new WriteStatus("Corsair")),
+    new If(new GettingDT,           new WriteStatus("DT Expand")),
 
     // Emergency detection
     // or limit gas
@@ -116,19 +116,27 @@ class PvZ1Base extends GameplanTemplate {
         Get(Protoss.RoboticsFacility),
         Get(Protoss.Observatory),
         Get(2, Protoss.Observer)),
-      new If(
-        // Definitely don't cap gas for these
-        new And(
-          new Not(new GettingArchons),
-          new Not(new GettingDT),
-          new Not(new GettingCorsair)),
+      new Parallel(
         new If(
-          new GettingGoons,
-          new CapGasWorkersAtRatio(.14),
+          new GettingDT,
           new If(
-            new GasForUpgrade(Protoss.ZealotSpeed),
-            new CapGasAt(0),
-            new CapGasAt(250))))),
+            new UnitsExactly(0, Protoss.CyberneticsCore),
+            new CapGasWorkersAt(1),
+            new If(
+              new UnitsExactly(0, Protoss.CitadelOfAdun),
+              new CapGasWorkersAt(2)))),
+        new If(
+          new And(
+            new Not(new GettingArchons),
+            new Not(new GettingDT),
+            new Not(new GettingCorsair)),
+          new If(
+            new GettingGoons,
+            new CapGasWorkersAtRatio(.14),
+            new If(
+              new GasForUpgrade(Protoss.ZealotSpeed),
+              new CapGasAt(0),
+              new CapGasAt(250)))))),
 
     // Emergency Dragoons
     new If(

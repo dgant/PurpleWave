@@ -72,7 +72,7 @@ class Pump(
     var sum = 0
     With.units.ours.foreach(unit =>
       sum += (
-        if (unit.alive && matcher.accept(unit)) {
+        if (unit.complete && unit.alive && matcher.accept(unit)) {
           1
         }
         else if (unit.is(Zerg.Egg) && unit.buildType == unitClass) {

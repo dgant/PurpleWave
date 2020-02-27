@@ -23,16 +23,22 @@ import Strategery.Strategies.Protoss.PvP1ZealotExpand
 
 class PvP1ZealotExpand extends GameplanTemplate {
 
+  private val defaultCannons: Int = 3
   override val activationCriteria: Predicate = new Employing(PvP1ZealotExpand)
-  override val completionCriteria: Predicate = new Latch(new And(new BasesAtLeast(2), new UnitsAtLeast(5, Protoss.Gateway)))
+  override val completionCriteria: Predicate = new Latch(new And(
+    new BasesAtLeast(2),
+    new UnitsAtLeast(5, Protoss.Gateway),
+    new Or(
+      new Not(new ShouldAddCannons),
+      new UnitsAtLeast(defaultCannons, Protoss.PhotonCannon))))
 
   override def placementPlan: Plan = new Parallel(
     super.placementPlan,
     new If(
       new And(
         new BasesAtLeast(2),
-        new UnitsAtLeast(4, Protoss.Pylon),
-        new Not(new EnemyStrategy(With.fingerprints.proxyGateway))),
+        new UnitsAtLeast(2, Protoss.Pylon),
+        new Not(new EnemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate))),
       new ProposePlacement {
         override lazy val blueprints = Vector(new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
       }))
@@ -70,6 +76,18 @@ class PvP1ZealotExpand extends GameplanTemplate {
     new PumpWorkers,
     new PumpWorkers(maximumTotal = 25))
 
+  class ShouldAddCannons extends And(
+    new BasesAtLeast(2),
+    new Not(new EnemyBasesAtLeast(2)),
+    new EnemiesAtMost(2, Protoss.Gateway),
+    new Not(new EnemyStrategy(
+      With.fingerprints.dragoonRange,
+      With.fingerprints.twoGate,
+      With.fingerprints.fourGateGoon,
+      With.fingerprints.robo,
+      With.fingerprints.forgeFe,
+      With.fingerprints.gatewayFe)))
+
   override def buildPlans = Vector(
     // We really need very little gas early on;
     // rather, we depserately need minerals to get our Gateways and Forge up.
@@ -89,11 +107,17 @@ class PvP1ZealotExpand extends GameplanTemplate {
     new If(
       new EnemiesAtLeast(2, Protoss.Zealot),
       new BuildOrder(Get(2, Protoss.Zealot))),
-    new If(new EnemiesAtLeast(1, Protoss.CitadelOfAdun), new BuildCannonsAtNatural(1)),
-    new If(new Or(new EnemiesAtLeast(1, Protoss.TemplarArchives), new EnemyHasShown(Protoss.DarkTemplar)), new Parallel(
-      new BuildCannonsAtNatural(1),
-      new BuildCannonsInMain(1),
-      new BuildCannonsAtNatural(2))),
+    new If(
+      new EnemiesAtLeast(1, Protoss.CitadelOfAdun),
+      new BuildCannonsAtNatural(1)),
+    new If(
+      new Or(
+        new EnemiesAtLeast(1, Protoss.TemplarArchives),
+        new EnemyHasShown(Protoss.DarkTemplar)),
+      new Parallel(
+        new BuildCannonsAtNatural(1),
+        new BuildCannonsInMain(1),
+        new BuildCannonsAtNatural(2))),
     new Build(
       Get(Protoss.Assimilator),
       Get(Protoss.CyberneticsCore)),
@@ -101,24 +125,13 @@ class PvP1ZealotExpand extends GameplanTemplate {
     new Build(Get(2, Protoss.Gateway)),
 
     // If we don't know what they're doing, stick a Forge in there
-    new If(
-      new And(
-        new BasesAtLeast(2),
-        new Not(new EnemyBasesAtLeast(2)),
-        new EnemiesAtMost(2, Protoss.Gateway),
-        new Not(new EnemyStrategy(
-          With.fingerprints.dragoonRange,
-          With.fingerprints.twoGate,
-          With.fingerprints.fourGateGoon,
-          With.fingerprints.robo,
-          With.fingerprints.forgeFe,
-          With.fingerprints.gatewayFe))),
-      new Build(Get(Protoss.Forge))),
+    new If(new ShouldAddCannons, new Build(Get(Protoss.Forge))),
 
     // Finish the build order
     new Build(
       Get(3, Protoss.Gateway),
       Get(Protoss.DragoonRange)),
+    new If(new ShouldAddCannons, new BuildCannonsAtNatural(defaultCannons)),
     new PvPIdeas.TrainArmy,
     new RequireMiningBases(2),
     new Build(

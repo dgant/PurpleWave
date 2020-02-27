@@ -9,9 +9,9 @@ import Mathematics.Points.TileRectangle
 object ShowGrids extends View {
 
   override def renderMap() {
-    renderGridArray(With.units.all.find(_.selected).map(_.tileIncludingCenter).getOrElse(With.geography.home).zone.distanceGrid, 0, 1)
-    renderGridArray(With.grids.walkableTerrain, 0, 0)
-    renderGridArray(With.grids.unwalkableUnits, 1, 0)
+    //renderGridArray(With.units.all.find(_.selected).map(_.tileIncludingCenter).getOrElse(With.geography.home).zone.distanceGrid, 0, 1)
+    renderGridArray(With.grids.enemyRangeGround, 0, 0)
+    renderGridArray(With.grids.units, 1, 0)
   }
   
   private def renderGridArray[T](map: AbstractGrid[T], offsetX: Int = 0, offsetY: Int = 0) {
@@ -19,7 +19,7 @@ object ShowGrids extends View {
     viewportTiles.tiles
       .filterNot(tile => map.get(tile) == map.defaultValue)
       .foreach(tile => DrawMap.text(
-        tile.topLeftPixel.add(offsetX*12, offsetY*13),
+        tile.topLeftPixel.add(offsetX*10, offsetY*13),
         map.repr(map.get(tile))))
   }
   

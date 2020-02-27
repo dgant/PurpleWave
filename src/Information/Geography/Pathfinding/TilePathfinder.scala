@@ -169,7 +169,17 @@ trait TilePathfinder {
 
     if ( ! startTile.valid) return failure(startTile)
 
-    val threatGrid = if (profile.canCrossUnwalkable) With.grids.enemyRangeAir else With.grids.enemyRangeGround
+    val isFlying = profile.unit.exists(u => u.flying || u.transport.exists(_.flying)) || profile.canCrossUnwalkable
+    val isGround = profile.unit.exists(u => ! u.flying)
+    val threatGrid: AbstractGridEnemyRange  =
+      if (isFlying && isGround)
+        With.grids.enemyRangeAirGround
+      else if (isFlying)
+        With.grids.enemyRangeAir
+      else if (isGround)
+        With.grids.enemyRangeGround
+      else
+        With.grids.enemyRangeAirGround
     startNextSearch()
     profile.updateRepulsion()
     val horizon = new mutable.PriorityQueue[TileState]()(Ordering.by(t => -t.totalCostFloor))

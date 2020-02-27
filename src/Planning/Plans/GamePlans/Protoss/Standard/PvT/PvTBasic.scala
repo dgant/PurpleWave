@@ -191,7 +191,8 @@ class PvTBasic extends GameplanTemplate {
     new If(new And(new EmployingCarriers, new GasPumpsAtLeast(4), new UnitsAtLeast(1, Protoss.FleetBeacon)),      new Build(Get(2, Protoss.CyberneticsCore), Get(Protoss.Forge))),
     new If(new EmployingCarriers, new UpgradeContinuously(Protoss.Shields, 1)),
     new GatewayUpgrades,
-    new If(new And(new EnemiesAtLeast(3, Terran.SpiderMine), new GasPumpsAtLeast(3)), new UpgradeContinuously(Protoss.ObserverSpeed)))
+    new If(new And(new EnemiesAtLeast(3, Terran.SpiderMine), new GasPumpsAtLeast(3)), new UpgradeContinuously(Protoss.ObserverSpeed)),
+    new If(new UnitsAtLeast(2, Protoss.Reaver), new UpgradeContinuously(Protoss.ScarabDamage)))
 
   class ConsiderTakingFastSecondBase extends If(
     new And(
@@ -326,10 +327,10 @@ class PvTBasic extends GameplanTemplate {
     new ConsiderTakingFastFourthBase,
 
     new BuildOrder(Get(Protoss.Gateway), Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore), Get(Protoss.Dragoon), Get(Protoss.DragoonRange)),
+    new If(new And(new EmployingReavers,  new UnitsAtLeast(1, Protoss.RoboticsFacility)), new GoReaver),
     new If(
       new And(new SafeAtHome, new UnitsAtLeast(5, Protoss.Gateway)),
       new Parallel(
-        new If(new And(new EmployingReavers,  new UnitsAtLeast(1, Protoss.RoboticsFacility)), new GoReaver),
         new If(new And(new EmployingTemplar,  new UnitsAtLeast(1, Protoss.CitadelOfAdun)),    new GoStorm),
         new If(new And(new EmployingArbiters, new UnitsAtLeast(1, Protoss.CitadelOfAdun)),    new GoArbiter),
         new If(new And(new EmployingCarriers, new UnitsAtLeast(1, Protoss.Stargate)),         new GoCarrier))),

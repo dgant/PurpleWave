@@ -1,13 +1,11 @@
 package Information.Grids.Combat
 
-import Information.Grids.AbstractGrid
-import Lifecycle.With
+import ProxyBwapi.UnitInfo.UnitInfo
 
-class GridEnemyRangeAirGround extends AbstractGrid[Int] {
-
-  override def get(i: Int): Int = Math.max(
-    With.grids.enemyRangeGround.get(i),
-    With.grids.enemyRangeAir.get(i))
-
-  override def defaultValue: Int = 0
+class GridEnemyRangeAirGround extends AbstractGridEnemyRange {
+  override protected def pixelRangeMax(unit: UnitInfo): Double =
+    if (unit.canAttack)
+      Math.max(unit.pixelRangeGround, unit.pixelRangeAir)
+    else
+      0.0
 }

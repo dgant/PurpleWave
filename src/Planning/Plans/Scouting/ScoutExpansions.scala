@@ -8,8 +8,11 @@ import ProxyBwapi.Races.{Protoss, Terran}
 class ScoutExpansions(matcher: UnitMatcher = UnitMatchAnd(
   UnitMatchRecruitableForCombat,
   UnitMatchNot(UnitMatchWorkers),
+  UnitMatchNot(Terran.Battlecruiser),
   UnitMatchNot(Terran.Medic),
-  UnitMatchNot(Protoss.Shuttle))) extends SquadPlan[GoalFindExpansions] {
+  UnitMatchNot(Terran.Dropship),
+  UnitMatchNot(Protoss.Shuttle),
+  UnitMatchNot(Protoss.Carrier))) extends SquadPlan[GoalFindExpansions] {
 
   override val goal: GoalFindExpansions = new GoalFindExpansions
 

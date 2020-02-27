@@ -15,7 +15,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
-import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
+import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural, MeldArchons}
 import Planning.Plans.Scouting.{MonitorBases, Scout, ScoutCleared, ScoutOn}
 import Planning.Predicates.Compound._
 import Planning.Predicates.Economy.GasAtLeast
@@ -41,7 +41,10 @@ class PvTBasic extends GameplanTemplate {
     PvT3BaseCarrier,
     PvT3BaseArbiter)
 
-  override val meldArchonsAt: Int = 25
+  override def archonPlan: Plan =
+    new If(new EnemyStrategy(With.fingerprints.bio),
+    new MeldArchons(40) { override def maximumTemplar: Int = 8 },
+    new MeldArchons(25))
 
   override def placementPlan: Plan = new If(
     new And(
@@ -109,14 +112,15 @@ class PvTBasic extends GameplanTemplate {
             new BuildOrder(ProtossBuilds.PvTDTExpand_WithCitadel: _*),
             new BuildOrder(ProtossBuilds.PvTDTExpand_WithoutCitadel: _*)))))))
 
-  class EmployingThreeBase  extends Employing(PvT3BaseCarrier, PvT3BaseArbiter)
+  class EmployingThreeBase  extends Employing(PvT3BaseCarrier, PvT3BaseArbiter, PvT3BaseGateway)
   class EmployingTwoBase    extends Not(new EmployingThreeBase)
   class CarriersCountered   extends Check(() =>
       1.8 * With.units.countEnemy(Terran.Goliath)
     + 1.0 * With.units.countEnemy(Terran.Marine)
     + 2.0 * With.units.countEnemy(Terran.Medic) > Math.max(10, With.units.countOurs(Protoss.Interceptor)))
-  class EmployingCarriers   extends Employing(PvT2BaseCarrier, PvT3BaseCarrier)
-  class EmployingArbiters   extends Employing(PvT2BaseArbiter, PvT3BaseArbiter)
+  class EmployingGateway    extends Or(new Employing(PvT2BaseGateway, PvT3BaseGateway), new And(new EnemyStrategy(With.fingerprints.bio), new UnitsAtMost(0, Protoss.FleetBeacon), new UnitsAtMost(0, Protoss.ArbiterTribunal)))
+  class EmployingCarriers   extends And(new Employing(PvT2BaseCarrier, PvT3BaseCarrier), new Not(new EmployingGateway))
+  class EmployingArbiters   extends And(new Employing(PvT2BaseArbiter, PvT3BaseArbiter), new Not(new EmployingGateway))
   class EmployingReavers    extends Or(new Employing(PvT2BaseReaver), new UnitsAtLeast(1, Protoss.RoboticsSupportBay))
   class EmployingTemplar    extends Or(
     new And(new EmployingArbiters, new Not(new EmployingReavers)),
@@ -137,15 +141,18 @@ class PvTBasic extends GameplanTemplate {
           new Parallel(new UpgradeContinuously(Protoss.AirDamage), new If(new UpgradeComplete(Protoss.AirDamage, 3), new UpgradeContinuously(Protoss.AirArmor)))))))
 
   // Get upgrades with Arbiter builds, vs. Bio, or when maxed on air upgrades
-    // Double-spin, or prioritize armor vs. bio
+  // Double-spin, or prioritize armor vs. bio
   class GatewayUpgrades extends If(
     new Or(
-      new EnemyStrategy(With.fingerprints.bio),
       new EmployingArbiters,
+      new EmployingGateway,
       new And(
         new UpgradeComplete(Protoss.AirDamage, 2, Protoss.AirDamage.upgradeFrames(2)),
         new UpgradeComplete(Protoss.AirArmor, 2, Protoss.AirArmor.upgradeFrames(2)))),
     new Parallel(
+      new If(
+        new And(new UpgradeStarted(Protoss.GroundDamage), new UpgradeStarted(Protoss.GroundArmor)),
+        new Build(Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives))),
       new If(
         new UnitsAtLeast(2, Protoss.Forge),
         new FlipIf(
@@ -154,15 +161,15 @@ class PvTBasic extends GameplanTemplate {
           new UpgradeContinuously(Protoss.GroundArmor)),
         new If(
           new EnemyStrategy(With.fingerprints.bio),
-          new Parallel(
-            new UpgradeContinuously(Protoss.GroundArmor),
-            new If(new UpgradeComplete(Protoss.GroundArmor, 3), new UpgradeContinuously(Protoss.GroundDamage))),
-          new Parallel(
+          new If(
+            new UpgradeComplete(Protoss.GroundArmor, 3),
             new UpgradeContinuously(Protoss.GroundDamage),
-            new If(new UpgradeComplete(Protoss.GroundDamage, 3), new UpgradeContinuously(Protoss.GroundArmor))))),
-      new If(
-        new UnitsAtLeast(3, Protoss.Forge),
-        new UpgradeContinuously(Protoss.Shields))))
+            new UpgradeContinuously(Protoss.GroundArmor)),
+          new If(
+            new UpgradeComplete(Protoss.GroundDamage, 3),
+            new UpgradeContinuously(Protoss.GroundArmor),
+            new UpgradeContinuously(Protoss.GroundDamage)))),
+      new If(new UnitsAtLeast(3, Protoss.Forge), new UpgradeContinuously(Protoss.Shields))))
 
   class HighPriorityTech extends Parallel(
     new If(new EnemyHasShownWraithCloak, new GoObs),
@@ -182,15 +189,16 @@ class PvTBasic extends GameplanTemplate {
     new If(
       new Or(new MineralOnlyBase, new And(new MiningBasesAtLeast(4), new EmployingCarriers), new And(new MiningBasesAtLeast(5))),
       new Build(Get(Protoss.CitadelOfAdun), Get(Protoss.ZealotSpeed))),
-    new If(new EnemyStrategy(With.fingerprints.bio), new GatewayUpgrades))
+    new GatewayUpgrades)
 
   class LowPriorityTech extends Parallel(
-    new If(new And(new EnemyStrategy(With.fingerprints.bio), new GasPumpsAtLeast(3)), new Build(Get(2, Protoss.Forge))),
-    new If(new And(new EnemyStrategy(With.fingerprints.bio), new GasPumpsAtLeast(4)), new Build(Get(3, Protoss.Forge))),
+    new If(new And(new EmployingGateway, new GasPumpsAtLeast(3)), new Build(Get(2, Protoss.Forge))),
+    new If(new And(new EmployingGateway, new GasPumpsAtLeast(4)), new Build(Get(3, Protoss.Forge))),
     new If(new And(new EmployingArbiters, new GasPumpsAtLeast(4), new UnitsAtLeast(1, Protoss.ArbiterTribunal)),  new Build(Get(2, Protoss.Stargate), Get(2, Protoss.Forge))),
     new If(new And(new EmployingCarriers, new GasPumpsAtLeast(4), new UnitsAtLeast(1, Protoss.FleetBeacon)),      new Build(Get(2, Protoss.CyberneticsCore), Get(Protoss.Forge))),
     new If(new EmployingCarriers, new UpgradeContinuously(Protoss.Shields, 1)),
     new GatewayUpgrades,
+    new If(new EmployingGateway, new Build(Get(Protoss.HighTemplarEnergy))),
     new If(new And(new EnemiesAtLeast(3, Terran.SpiderMine), new GasPumpsAtLeast(3)), new UpgradeContinuously(Protoss.ObserverSpeed)),
     new If(new UnitsAtLeast(2, Protoss.Reaver), new UpgradeContinuously(Protoss.ScarabDamage)))
 
@@ -267,6 +275,7 @@ class PvTBasic extends GameplanTemplate {
   class GoStorm   extends Parallel(new WriteStatus("GoStorm"),    new BuildOrder(Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives), Get(Protoss.PsionicStorm), Get(2, Protoss.HighTemplar)))
   class GoCarrier extends Parallel(new WriteStatus("GoCarrier"),  new BuildOrder(Get(Protoss.Stargate), Get(2, Protoss.Gateway), Get(2, Protoss.Stargate), Get(Protoss.FleetBeacon), Get(2, Protoss.Carrier), Get(4, Protoss.Gateway), Get(Protoss.CarrierCapacity), Get(Protoss.AirDamage)))
   class GoArbiter extends Parallel(new WriteStatus("GoArbiter"),  new BuildOrder(Get(Protoss.CitadelOfAdun), Get(2, Protoss.Gateway), Get(Protoss.Stargate), Get(Protoss.TemplarArchives), Get(Protoss.ArbiterTribunal), Get(Protoss.ArbiterEnergy), Get(Protoss.Arbiter), Get(6, Protoss.Gateway)))
+  class GoGateway extends Parallel(new WriteStatus("GoGateway"),  new BuildOrder(Get(3, Protoss.Gateway), Get(Protoss.CitadelOfAdun), Get(2, Protoss.Forge), Get(5, Protoss.Gateway), Get(Protoss.GroundDamage), Get(Protoss.GroundArmor), Get(Protoss.ZealotSpeed), Get(Protoss.TemplarArchives), Get(7, Protoss.Gateway)))
 
   class PumpReactiveGateways(min: Int, max: Int) extends PumpRatio(Protoss.Gateway, min, max, Seq(Enemy(Terran.Barracks, 1.0), Enemy(Terran.Factory, 1.5), Friendly(Protoss.Stargate, -2.0), Friendly(Protoss.RoboticsSupportBay, -1.0)))
 
@@ -440,12 +449,14 @@ class PvTBasic extends GameplanTemplate {
         // Hide our tech
         new Or(new ScoutCleared, new FrameAtLeast(GameTime(4, 45)())),
         new Parallel(
+          new If(new EmployingGateway,  new GoGateway),
           new If(new EmployingCarriers, new GoCarrier),
           new If(new EmployingArbiters, new GoArbiter)))),
 
     // Get enough Gateways (and other production facilities) to survive
     new PumpReactiveGateways(3, 7),
     new RequireMiningBases(3),
+    new If(new EmployingGateway,  new GoGateway),
     new If(new EmployingCarriers, new GoCarrier),
     new If(new EmployingArbiters, new GoArbiter),
     new PumpReactiveGateways(9, 12),

@@ -39,13 +39,13 @@ object Opponents {
     Seq(PvP1ZealotExpand),
     Seq(PvP2Gate1012DT)))))
   val dragon        : Opponent = add(Opponent("Dragon",       StrategySelectionSequence(Vector(
-    Seq(PvTProxy2Gate,  PvT2BaseReaver, PvT3BaseCarrier, PvT3rdFast),
+    Seq(PvTProxy2Gate,  PvT2BaseReaver, PvT3BaseGateway),
     Seq(PvTDTExpand,    PvT2BaseArbiter),
-    Seq(PvT13Nexus,     PvT2BaseReaver, PvT3BaseCarrier, PvT3rdFast)))))
+    Seq(PvT13Nexus,     PvT2BaseReaver, PvT3BaseCarrier)))))
   val letabot       : Opponent = add(Opponent("LetaBot",      StrategySelectionSequence(Vector(
-    Seq(PvTDTExpand, PvT3BaseArbiter, PvT3rdFast),
-    Seq(PvT21Nexus, PvT2BaseReaver, PvT3BaseCarrier, PvT3rdFast),
-    Seq(PvT13Nexus, PvT3BaseCarrier, PvT3rdObs)))))
+    Seq(PvTDTExpand,  PvT3rdFast,       PvT3BaseArbiter),
+    Seq(PvT21Nexus,   PvT2BaseReaver,   PvT3BaseCarrier),
+    Seq(PvT13Nexus,   PvT3rdObs,        PvT3BaseCarrier)))))
   val locutus       : Opponent = add(Opponent("Locutus",      StrategySelectionSequence(Vector(
     Seq(PvP2GateDTExpand),
     Seq(PvP4GateGoon),

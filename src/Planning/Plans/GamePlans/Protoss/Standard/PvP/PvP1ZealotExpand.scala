@@ -7,7 +7,7 @@ import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.ReactToDarkTemplarEmergencies
-import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAt, CapGasWorkersAtRatio, PumpWorkers}
+import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -90,17 +90,20 @@ class PvP1ZealotExpand extends GameplanTemplate {
 
   override def buildPlans = Vector(
     // We really need very little gas early on;
-    // rather, we depserately need minerals to get our Gateways and Forge up.
-    new CapGasAt(250),
-    new CapGasWorkersAtRatio(.14),
+    // rather, we desperately need minerals to get our Gateways and Forge up.
     new If(
-      new And(
-        new UnitsAtMost(1, Protoss.Gateway),
-        new GasForUpgrade(Protoss.DragoonRange)),
-      new CapGasWorkersAt(1),
-      new If(
-        new UnitsAtMost(4, Protoss.Gateway),
-        new CapGasWorkersAt(2))),
+      new GasCapsUntouched,
+      new Parallel(
+        new CapGasAt(200),
+        new CapGasWorkersAtRatio(.14),
+        new If(
+          new And(
+            new UnitsAtMost(1, Protoss.Gateway),
+            new GasForUpgrade(Protoss.DragoonRange)),
+          new CapGasWorkersAt(1),
+          new If(
+            new UnitsAtMost(4, Protoss.Gateway),
+            new CapGasWorkersAt(2))))),
 
     // Ordered to maximize chances of getting detection in time but only if absolutely necessary.
     // It's also quite possible to die to a 4Gate + DT if the ordering isn't careful.

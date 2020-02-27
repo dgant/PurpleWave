@@ -46,8 +46,7 @@ class Agency {
         if (With.performance.violatedLimit) {
           val timeAfter = With.performance.millisecondsSpentThisFrame
           val timeDelta = timeAfter - timeBefore
-          With.logger.warn("Microing " + agent.unit.unitClass + " violated threshold by taking " + timeDelta + "ms considering")
-          With.logger.warn(agent.actionsPerformed.map(_.toString).mkString(", "))
+          With.logger.warn("Microing " + agent.unit.unitClass + " violated threshold by taking " + timeDelta + "ms considering" + agent.actionsPerformed.map(_.toString).mkString(", "))
         }
       }
     }

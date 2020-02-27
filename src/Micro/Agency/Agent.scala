@@ -191,6 +191,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     fightReason = ""
     actionsPerformed.clear()
     _umbrellas.clear()
+    _rideGoal = None
   }
 
   private def followIntent() {
@@ -308,17 +309,12 @@ class Agent(val unit: FriendlyUnitInfo) {
     }
   }
   private var _rideGoal: Option[Pixel] = None
-  def peekPassengerRideGoal: Option[Pixel] = _rideGoal
-  def consumePassengerRideGoal(): Option[Pixel] = {
-    val output = _rideGoal
-    _rideGoal = None
-    output
-  }
+  def rideGoal: Option[Pixel] = _rideGoal
   def directRide(to: Pixel): Unit = {
     _rideGoal = Some(to)
   }
   def prioritizedPassengers: Seq[FriendlyUnitInfo] = {
-    unit.loadedUnits.sortBy(p => p.unitClass.subjectiveValue - p.frameDiscovered / 10000.0)
+    passengers.sortBy(p => p.unitClass.subjectiveValue - p.frameDiscovered / 10000.0)
   }
 
   ///////////////////////

@@ -7,7 +7,7 @@ import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump, PumpWorkers}
+import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
@@ -54,7 +54,13 @@ class PvP4GateGoon extends GameplanTemplate {
     new BuildOrder(ProtossBuilds.FourGateGoon: _*))
 
   override val buildPlans = Vector(
-    new If(new UnitsAtMost(3, Protoss.Gateway), new CapGasWorkersAt(2)),
+    new If(
+      new GasCapsUntouched,
+      new If(
+        new UnitsAtMost(3, Protoss.Gateway),
+        new Parallel(
+          new CapGasWorkersAt(2),
+          new CapGasAt(250)))),
 
     new If(
       new Or(

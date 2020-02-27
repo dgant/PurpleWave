@@ -18,9 +18,9 @@ object ShuttleCarry extends Action {
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
     shuttle.agent.prioritizedPassengers
-      .find(_.agent.peekPassengerRideGoal.nonEmpty)
+      .find(_.agent.rideGoal.nonEmpty)
       .foreach(passenger => {
-        shuttle.agent.toTravel = passenger.agent.consumePassengerRideGoal()
+        shuttle.agent.toTravel = passenger.agent.rideGoal
         Move.delegate(shuttle)
       })
   }

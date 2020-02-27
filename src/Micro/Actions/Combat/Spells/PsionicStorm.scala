@@ -29,19 +29,24 @@ object PsionicStorm extends TargetedSpell {
       Zerg.Egg,
       Zerg.LurkerEgg)) return 0.0
 
+    val templar = caster.matchups.allyTemplarCount
+
     // Don't wander into tank range
     if (target.isEnemy
+      && templar < 3
       && target.is(Terran.SiegeTankSieged)
       && caster.pixelDistanceCenter(target) > 32 * castRangeTiles
       && (caster.visibleToOpponents || target.tileIncludingCenter.altitudeBonus >= caster.tileIncludingCenter.altitudeBonus)
       && target.matchups.targetsInRange.isEmpty) {
+
       return 0.0
     }
 
     val multiplayerPlayer = if (target.isEnemy) 1.0 else if (target.isFriendly) -2.0 else 0.0
     val multiplierUnit    = 3 * Terran.Marine.subjectiveValue + target.unitClass.subjectiveValue
     val multiplierDanger  = if (caster.matchups.threatsInRange.nonEmpty) 1.25 else 1.0
-    val output            = multiplayerPlayer * multiplierUnit * multiplierDanger
+    val multiplierMany    = if (templar > 5) 2.0 else if (templar > 2) 1.4 else 1.0
+    val output            = multiplierMany * multiplayerPlayer * multiplierUnit * multiplierDanger
     output
   }
   

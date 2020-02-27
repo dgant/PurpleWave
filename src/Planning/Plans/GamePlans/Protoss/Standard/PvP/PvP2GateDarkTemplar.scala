@@ -85,14 +85,21 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
       new EjectScout,
       new EjectScout(Protoss.Probe)),
 
-    new Trigger(
-      new UnitsAtLeast(1, Protoss.CitadelOfAdun),
-      new CapGasAt(300),
-      new CapGasAt(200)),
+    new If(
+      new GasCapsUntouched,
+      new Trigger(
+        new UnitsAtLeast(1, Protoss.CitadelOfAdun),
+        new CapGasAt(300),
+        new CapGasAt(200))),
+
+    new If(
+      new And(
+        new UpgradeStarted(Protoss.AirDamage),
+        new EnemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate)),
+      new CancelOrders(Protoss.CyberneticsCore)),
 
     // Delay build until scout cleared
     new If(
-
       new Or(
         new UnitsAtLeast(1, Protoss.CitadelOfAdun),
         new ScoutCleared,
@@ -134,24 +141,31 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
         new If(
           new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),
           new BuildCannonsAtNatural(1)),
+        new If(new UnitsAtLeast(12, Protoss.Dragoon), new RequireMiningBases(2)),
         new If(
           new And(
             new EnemyStrategy(With.fingerprints.twoGate),
             new Not(new SafeAtHome),
             new UnitsAtMost(12, UnitMatchWarriors)),
           new Pump(Protoss.Dragoon)),
-        new RequireMiningBases(2),
+        new If(
+          new EnemyStrategy(With.fingerprints.proxyGateway),
+          new Build(Get(4, Protoss.Gateway)),
+          new RequireMiningBases(2)),
         new If(new EnemyStrategy(With.fingerprints.dtRush), new BuildCannonsAtNatural(3)), // Get a LOT so they dont get bursted down
         new If(
           new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),
           new BuildCannonsAtNatural(2))),
 
     // Do while ejecting scout
-    new BuildOrder(
-      Get(Protoss.Dragoon),
-      Get(Protoss.AirDamage),
-      Get(2, Protoss.Gateway),
-      Get(2, Protoss.Dragoon))),
+    new Parallel(
+      new BuildOrder(Get(Protoss.Dragoon)),
+      new If(
+        new Not(new EnemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate)),
+        new Build(Get(Protoss.AirDamage))),
+      new BuildOrder(
+        Get(2, Protoss.Gateway),
+        Get(2, Protoss.Dragoon)))),
 
     new PumpWorkers(oversaturate = true),
     new Pump(Protoss.Dragoon)

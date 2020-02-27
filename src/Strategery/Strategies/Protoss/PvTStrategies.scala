@@ -15,6 +15,7 @@ abstract class PvTBasicOpener extends PvTStrategy {
     PvT2BaseReaver,
     PvT2BaseCarrier,
     PvT2BaseArbiter,
+    PvT2BaseGateway,
     PvT3rdFast,
     PvT3rdObs,
   ))
@@ -74,6 +75,7 @@ object PvT1015DT extends PvTStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     Vector(
       PvT2BaseArbiter,
+      PvT2BaseGateway,
       PvT3rdFast))
 }
 object PvT1GateReaver extends PvTBasicOpener {
@@ -92,6 +94,7 @@ object PvTDTExpand extends PvTBasicOpener {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
     PvT2BaseCarrier,
     PvT2BaseArbiter,
+    PvT2BaseGateway,
     PvT3rdFast
   ))
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
@@ -107,18 +110,20 @@ object PvT2BaseReaver extends PvTStrategy {
     With.fingerprints.twoRaxAcad,
     With.fingerprints.bio,
     With.fingerprints.twoArmoryUpgrades)
-  override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(PvT2BaseCarrier, PvT3BaseArbiter, PvT3BaseCarrier))
+  override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(PvT2BaseCarrier, PvT3BaseArbiter, PvT3BaseCarrier, PvT3BaseGateway))
 }
 object PvT3rdFast extends PvTStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(PvT3BaseArbiter, PvT3BaseCarrier))
+  override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(PvT3BaseArbiter, PvT3BaseCarrier, PvT3BaseGateway))
 }
 object PvT3rdObs extends PvTStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(PvT3BaseArbiter, PvT3BaseCarrier))
+  override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(PvT3BaseArbiter, PvT3BaseCarrier, PvT3BaseGateway))
 }
 object PvT2BaseCarrier extends PvTStrategy
 object PvT2BaseArbiter extends PvTStrategy
+object PvT2BaseGateway extends PvTStrategy { override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.oneArmoryUpgrades, With.fingerprints.twoArmoryUpgrades) }
 object PvT3BaseCarrier extends PvTStrategy
 object PvT3BaseArbiter extends PvTStrategy
+object PvT3BaseGateway extends PvTStrategy { override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.oneArmoryUpgrades, With.fingerprints.twoArmoryUpgrades) }
 object PvTStove extends PvTStrategy {
   override def allowedVsHuman: Boolean = false
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(PvT2BaseArbiter))

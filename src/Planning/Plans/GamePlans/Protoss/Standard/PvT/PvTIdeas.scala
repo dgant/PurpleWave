@@ -158,9 +158,7 @@ object PvTIdeas {
       // but there's no point in having both at the same time
       new UnitsAtMost(0, Protoss.ArbiterTribunal, complete = true),
       new UnitsAtMost(0, Protoss.Arbiter),
-      new EnemiesAtMost(0, Terran.ScienceVessel),
-      new Not(new EnemyHasShown(Terran.SpellScannerSweep)),
-      new EnemiesAtMost(0, Terran.Comsat, complete = true)),
+      new EnemiesAtMost(0, Terran.ScienceVessel)),
     new Pump(Protoss.DarkTemplar, 2))
 
   private class TrainObservers extends If(
@@ -192,6 +190,7 @@ object PvTIdeas {
     new Pump(Protoss.Scout, 5))
 
   class TrainZealotsOrDragoons extends Parallel(
+    new PumpRatio(Protoss.Dragoon, 0, 100, Seq(Enemy(Terran.Wraith, 1.0), Enemy(Terran.Battlecruiser, 5.0))),
     new PumpRatio(Protoss.Dragoon, 0, 24, Seq(Flat(6.0), Enemy(Terran.Vulture, .75))),
     new PumpRatio(Protoss.Dragoon, 0, 24, Seq(Friendly(Protoss.Zealot, 0.4), Friendly(Protoss.Reaver, -2))),
     new If(
@@ -205,8 +204,13 @@ object PvTIdeas {
         Enemy(Terran.Goliath,     1.5),
         Enemy(Terran.Marine,      1.0),
         Enemy(Terran.Vulture,     -1.0)))),
-    new Pump(Protoss.Dragoon),
-    new If(new BasesAtLeast(3), new Pump(Protoss.Zealot)))
+
+    new PumpRatio(Protoss.Dragoon, 0, 24, Seq(Enemy(Terran.Vulture, 1.25))),
+    new PumpRatio(Protoss.Zealot, 0, 100, Seq(Enemy(UnitMatchSiegeTank, 2.0))),
+    new If(
+      new Or(new BasesAtLeast(3), new UpgradeStarted(Protoss.ZealotSpeed), new EnemyStrategy(With.fingerprints.bio)),
+      new Pump(Protoss.Zealot)),
+    new Pump(Protoss.Dragoon))
 
   class TrainCarriers extends If(
     new Check(() => With.units.countEnemy(Terran.Goliath) < 8 + 3 * With.units.countOurs(Protoss.Carrier)),
@@ -224,7 +228,7 @@ object PvTIdeas {
     new TrainCarriers,
     new PumpRatio(Protoss.Arbiter, 2, 8, Seq(Enemy(UnitMatchSiegeTank, 0.5))),
     new If(new GasAtLeast(500), new Pump(Protoss.HighTemplar, maximumConcurrently = 4, maximumTotal = 6)),
-    new If(new GasAtLeast(1000), new Pump(Protoss.HighTemplar, maximumConcurrently = 4, maximumTotal = 10)),
+    new If(new GasAtLeast(1000), new Pump(Protoss.HighTemplar)),
     new TrainScouts,
     new TrainZealotsOrDragoons)
 }

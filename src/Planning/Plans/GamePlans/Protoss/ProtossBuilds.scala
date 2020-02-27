@@ -437,6 +437,7 @@ object ProtossBuilds {
     Get(4,  Protoss.Dragoon))
 
   // Reference: Movie vs. Sharp: https://youtu.be/1pxD_HLpImg?t=4883
+  // See also https://www.youtube.com/watch?v=-vQmonHDbQU
   val PvT1GateReaver = Vector[BuildRequest] (
     Get(8,  Protoss.Probe),
     Get(Protoss.Pylon),
@@ -460,16 +461,15 @@ object ProtossBuilds {
     Get(Protoss.Shuttle),
     Get(4,  Protoss.Pylon),
     Get(Protoss.RoboticsSupportBay),
-    Get(3,  Protoss.Dragoon),
     Get(21, Protoss.Probe),
-    Get(Protoss.ShuttleSpeed),
-    Get(22, Protoss.Probe),
-    Get(5,  Protoss.Pylon),
+    Get(3,  Protoss.Dragoon),
     Get(Protoss.Reaver),
-    Get(2, Protoss.Zealot),
-    Get(25, Protoss.Probe),
-    Get(2, Protoss.Nexus)
-  )
+    Get(22, Protoss.Probe),
+    Get(4,  Protoss.Dragoon),
+    Get(2, Protoss.Nexus),
+    Get(5,  Protoss.Pylon),
+    Get(23, Protoss.Probe),
+    Get(Protoss.DragoonRange))
   
   val PvT2GateObs = Vector[BuildRequest] (
     Get(8,   Protoss.Probe),

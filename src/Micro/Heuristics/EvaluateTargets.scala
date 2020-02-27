@@ -13,9 +13,9 @@ object EvaluateTargets extends {
     output
   }
 
-  def audit(attacker: FriendlyUnitInfo, targets: Iterable[UnitInfo]): Seq[(UnitInfo, Double)] = {
-    var output = targets.map(target => (target, evaluate(attacker, target))).toVector
-    output = output.sortBy(-_._2)
+  def audit(attacker: FriendlyUnitInfo, targets: Iterable[UnitInfo]): Seq[(UnitInfo, Double, Double)] = {
+    var output = targets.map(target => (target, target.baseTargetValue(), evaluate(attacker, target))).toVector
+    output = output.sortBy(-_._3)
     output
   }
 
@@ -104,7 +104,7 @@ object EvaluateTargets extends {
 
     // Combat bonus
     if (target.participatingInCombat()) {
-      output *= target.matchups.splashFactorMax
+      output *= Math.max(1.0, target.matchups.splashFactorMax)
       if (target.complete) {
         output *= 2.0
       } else {
@@ -116,7 +116,7 @@ object EvaluateTargets extends {
     // Immediate combat value bonus
     val hurtingUsBonus = target.matchups.targetsInRange.nonEmpty || (target.energy > 40 && ! target.isAny(Terran.Wraith, Protoss.Corsair))
     if (hurtingUsBonus) {
-      output *= 2.0
+      output *= 1.25
     }
 
     // Immobility bonus

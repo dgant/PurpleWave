@@ -52,7 +52,10 @@ object Opponents {
     Seq(PvP1ZealotExpand),
     Seq(PvP2Gate1012DT)))))
   val mcrave        : Opponent = add(Opponent("McRave",       if (With.enemy.isZerg) StrategySelectionGreedy else new StrategySelectionRecommended(StrategySelectionGreedy, PvPRobo) { duration = 1 }))
-  val microwave     : Opponent = add(Opponent("Microwave",    StrategySelectionDynamic))
+  val microwave     : Opponent = add(Opponent("Microwave",    StrategySelectionSequence(Vector(
+    Seq(PvZ2Gate910, PvZ4GateGoon, PvZMidgame5GateGoon, PvZLateGameReaver),
+    Seq(PvZFFEEconomic, PvZMidgame5GateGoonReaver, PvZLateGameReaver),
+    Seq(PvZ2Gate1012, PvZDT, PvZMidgameBisu, PvZLateGameTemplar)))))
   val willyt        : Opponent = add(Opponent("WillyT",       StrategySelectionDynamic))
 
   // TorchUp opponents

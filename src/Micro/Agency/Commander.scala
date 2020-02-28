@@ -140,18 +140,18 @@ class Commander {
     sleepAttack(unit)
   }
   
-  val flyingOvershoot = 288.0
   def move(unit: FriendlyUnitInfo, to: Pixel) {
     if (unit.unready) return
     autoUnburrow(unit)
     // Send some flying units past their destination to maximize acceleration
     var destination = to
-    if (unit.flying && unit.pixelDistanceSquared(to) < flyingOvershoot * flyingOvershoot) {
-      destination = unit.pixelCenter.project(to, flyingOvershoot)
+    var overshoot = if (unit.flying) 288.0 else 32
+    if ((unit.flying || unit.is(Protoss.HighTemplar)) && unit.pixelDistanceSquared(to) < overshoot * overshoot) {
+      destination = unit.pixelCenter.project(to, overshoot)
       if (destination == unit.pixelCenter) {
         val signX = PurpleMath.forcedSignum(SpecificPoints.middle.x - destination.x)
         val signY = PurpleMath.forcedSignum(SpecificPoints.middle.y - destination.y)
-        destination = destination.add((signX * flyingOvershoot).toInt, (signY * flyingOvershoot).toInt)
+        destination = destination.add((signX * overshoot).toInt, (signY * overshoot).toInt)
       }
     }
     

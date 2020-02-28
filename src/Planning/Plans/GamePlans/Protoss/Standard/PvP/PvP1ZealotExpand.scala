@@ -1,12 +1,13 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.Architecture.Blueprint
+import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.ReactToDarkTemplarEmergencies
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -42,6 +43,10 @@ class PvP1ZealotExpand extends GameplanTemplate {
       new ProposePlacement {
         override lazy val blueprints = Vector(new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
       }))
+
+  override def blueprints = Vector(
+    new Blueprint(this, building = Some(Protoss.Pylon), placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
+    new Blueprint(this, building = Some(Protoss.Pylon), placement = Some(PlacementProfiles.backPylon)))
 
   override def attackPlan: Plan = new If(new EnemyStrategy(With.fingerprints.nexusFirst), new Attack)
 
@@ -105,30 +110,30 @@ class PvP1ZealotExpand extends GameplanTemplate {
             new UnitsAtMost(4, Protoss.Gateway),
             new CapGasWorkersAt(2))))),
 
-    // Ordered to maximize chances of getting detection in time but only if absolutely necessary.
-    // It's also quite possible to die to a 4Gate + DT if the ordering isn't careful.
     new If(
       new EnemiesAtLeast(2, Protoss.Zealot),
       new BuildOrder(Get(2, Protoss.Zealot))),
-    new If(
-      new EnemiesAtLeast(1, Protoss.CitadelOfAdun),
-      new BuildCannonsAtNatural(1)),
-    new If(
-      new Or(
-        new EnemiesAtLeast(1, Protoss.TemplarArchives),
-        new EnemyHasShown(Protoss.DarkTemplar)),
-      new Parallel(
-        new BuildCannonsAtNatural(1),
-        new BuildCannonsInMain(1),
-        new BuildCannonsAtNatural(2))),
     new Build(
       Get(Protoss.Assimilator),
       Get(Protoss.CyberneticsCore)),
-    new ReactToDarkTemplarEmergencies,
-    new Build(Get(2, Protoss.Gateway)),
 
-    // If we don't know what they're doing, stick a Forge in there
-    new If(new ShouldAddCannons, new Build(Get(Protoss.Forge))),
+    // A fast-ish (Core-first, non-proxy) DT arrives at the natural at 5:10 or so
+    // Forge + Cannon takes 56 seconds
+    // So we want to request the Forge at about 4:00 to ensure we mine the required money and build it in time
+    new If(
+      new FrameAtLeast(GameTime(4, 0)())),
+      new Parallel(
+        // If we don't know what they're doing, stick a Forge in there
+        new If(new ShouldAddCannons, new Build(Get(Protoss.Forge))),
+        new If(new EnemiesAtLeast(1, Protoss.CitadelOfAdun), new BuildCannonsAtNatural(1)),
+        new If(
+          new Or(
+            new EnemiesAtLeast(1, Protoss.TemplarArchives),
+            new EnemyHasShown(Protoss.DarkTemplar)),
+          new Parallel(
+            new BuildCannonsAtNatural(1),
+            new BuildCannonsInMain(1),
+            new BuildCannonsAtNatural(2)))),
 
     // Finish the build order
     new Build(

@@ -6,15 +6,15 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.Macro.Automatic.{CapGasAt, PylonBlock, UpgradeContinuously}
+import Planning.Plans.Macro.Automatic.{CapGasAt, PumpWorkers, PylonBlock, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
-import Planning.Predicates.Compound.{And, Not, Sticky}
+import Planning.Predicates.Compound.{And, Latch, Not, Sticky}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBasesAtMost, SafeAtHome, SafeToMoveOut}
 import Planning.Predicates.Strategy.{EnemyRecentStrategy, EnemyStrategy}
-import Planning.UnitMatchers.{UnitMatchMobileDetectors, UnitMatchWarriors, UnitMatchWorkers}
+import Planning.UnitMatchers.{UnitMatchMobileDetectors, UnitMatchOr, UnitMatchWarriors, UnitMatchWorkers}
 import ProxyBwapi.Races.Protoss
 
 class PvPLateGame extends GameplanTemplate {
@@ -30,6 +30,8 @@ class PvPLateGame extends GameplanTemplate {
     new PvPIdeas.AttackSafely)
 
   override def archonPlan: Plan = new PvPIdeas.MeldArchonsPvP
+
+  override def workerPlan: Plan = new PumpWorkers(maximumTotal = 25)
 
   val goingTemplar = new Not(new Sticky(new UnitsAtLeast(1, Protoss.RoboticsSupportBay)))
 
@@ -173,12 +175,18 @@ class PvPLateGame extends GameplanTemplate {
       new UnitsAtMost(0, Protoss.Observatory)),
     new BuildOrder(Get(2, Protoss.DarkTemplar)))
 
+  class NeedToCutWorkersForGateways extends And(
+    new Latch(new And(new MiningBasesAtLeast(2), new EnemyBasesAtMost(1))),
+    new UnitsAtMost(4, UnitMatchOr(Protoss.Gateway, Protoss.RoboticsFacility)),
+    new Not(new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.dtRush)))
+
   override def buildPlans: Seq[Plan] = Seq(
     new CapGasAt(500),
     new FinishDarkTemplarRush,
+    new If(new Not(new NeedToCutWorkersForGateways), new PumpWorkers),
     new Build(Get(Protoss.Pylon), Get(Protoss.Gateway), Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore), Get(Protoss.DragoonRange), Get(2, Protoss.Gateway)),
 
-    //  Detection
+    // Detection
     new If(buildCannons, new BuildCannonsAtNatural(2)),
     new If(buildCannons, new BuildCannonsAtExpansions(1)),
     new GetReactiveObservers,

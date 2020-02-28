@@ -1,4 +1,4 @@
-package Debugging.Visualizations.Views.Micro
+package Debugging.Visualizations.Views.Economy
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap

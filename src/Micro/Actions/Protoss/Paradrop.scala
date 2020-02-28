@@ -29,7 +29,7 @@ object Paradrop extends Action {
       .filter(t =>
         t.valid
         && With.grids.walkable.get(t)
-        && With.grids.enemyRangeGround.get(t) == 0
+        && With.grids.enemyRangeAirGround.get(t) == 0
         && t.groundPixels(goalTile) < 1.5 * reaver.effectiveRangePixels
         && ! reaver.matchups.threats.exists(t => t.isSiegeTankSieged() && t.inRangeToAttack(reaver, t.pixelCenter)))
       .map(tile => (

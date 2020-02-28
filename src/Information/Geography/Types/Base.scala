@@ -3,6 +3,7 @@ package Information.Geography.Types
 import Lifecycle.With
 import Mathematics.Points.{PixelRay, Tile, TileRectangle}
 import Mathematics.PurpleMath
+import Performance.Cache
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -25,6 +26,7 @@ class Base(val townHallTile: Tile)
   var       name            : String            = "Nowhere"
   var       defenseValue    : Double            = _
   var       workerCount     : Int               = _
+  val       saturation      : Cache[Double]     = new Cache(() => workerCount.toDouble / (1 + 3 * gas.size + 2 * minerals.size))
 
   private var calculatedHarvestingArea: Option[TileRectangle] = None
   private var calculatedHeart: Option[Tile] = None

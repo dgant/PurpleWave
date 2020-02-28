@@ -1,7 +1,7 @@
 package Debugging.Visualizations
 
 import Debugging.Visualizations.Views.Battles.{ShowBattle, ShowClustering}
-import Debugging.Visualizations.Views.Economy.{ShowEconomy, ShowProduction, ShowScheduler}
+import Debugging.Visualizations.Views.Economy._
 import Debugging.Visualizations.Views.Fun._
 import Debugging.Visualizations.Views.Geography._
 import Debugging.Visualizations.Views.Micro._
@@ -25,13 +25,15 @@ class Visualization {
     ShowClock,
     ShowStrategyName,
     ShowHealthAndCooldown,
+    ShowUtilization,
     ShowUnitsFriendly,
     ShowUnitsEnemy,
     ShowExplosions,
     ShowStatus,
-
     ShowPerformanceSummary,
-    ShowFingerprints
+
+    // Temporary views
+    ShowProduction
   )
   
   var enabled   : Boolean = _

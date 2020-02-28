@@ -58,8 +58,8 @@ object ShowProduction extends View {
           ,
           duration,
           Math.min(request.expectedFrames, duration),
-          colorBack = Color.Black,
-          colorFront = Color.Black,
+          colorBack = Colors.ShadowGray,
+          colorFront = Colors.ShadowGray,
           started = false
         )})
 
@@ -68,8 +68,15 @@ object ShowProduction extends View {
       val p = producibles(i)
       val y0 = 45 + 14 * i
       val y1 = y0 + 12
-      With.game.drawBoxScreen(5, y0, 5 + p.framesTotal / 8, y1, p.colorBack, p.started)
-      With.game.drawBoxScreen(5, y0, 5 + (p.framesTotal - p.framesLeft) / 8, y1, p.colorFront, true)
+      val drawDenominator = () => With.game.drawBoxScreen(5, y0, 5 + p.framesTotal / 8,                   y1, p.colorBack,  p.started)
+      val drawNumerator = () => With.game.drawBoxScreen(5, y0, 5 + (p.framesTotal - p.framesLeft) / 8,  y1, p.colorFront, true)
+      if (p.started) {
+        drawDenominator()
+        drawNumerator()
+      } else {
+        drawNumerator()
+        drawDenominator()
+      }
       With.game.drawTextScreen(7, y0, p.name)
     })
   }

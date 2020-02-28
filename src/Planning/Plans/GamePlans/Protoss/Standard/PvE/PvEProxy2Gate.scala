@@ -110,10 +110,16 @@ class PvEProxy2Gate extends GameplanTemplate {
 
     new If(
       new MustTech,
-      new Build(
-        Get(Protoss.Assimilator),
-        Get(Protoss.CyberneticsCore),
-        Get(Protoss.DragoonRange))),
+      new Parallel(
+        new Build(
+          Get(Protoss.Assimilator),
+          Get(Protoss.CyberneticsCore)),
+        new If(
+          new EnemyHasShown(Terran.Vulture),
+          new BuildOrder(Get(2, Protoss.Dragoon))),
+        new BuildOrder(
+          Get(Protoss.DragoonRange),
+          Get(2, Protoss.Dragoon)))),
 
     new If(new And(new UnitsAtLeast(8, Protoss.Dragoon), new SafeAtHome), new RequireBases(2)),
 

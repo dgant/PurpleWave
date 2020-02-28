@@ -66,6 +66,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   var lastFrameTryingToMove     : Int = _
   var lastFrameTryingToAttack   : Int = _
   var lastFrameStartingAttack   : Int = _
+  var lastFrameOccupied         : Int = _
   var framesFailingToMove       : Int = 0
   var framesFailingToAttack     : Int = 0
   var hasEverBeenCompleteHatch  : Boolean = false // Stupid AIST hack fix for detecting whether a base is mineable
@@ -117,6 +118,9 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     // The latter case is for units that have *never* had an assigned completion time (eg. == Forever())
     if ( ! complete || completionFrame > 24 * 60 * 180) {
       completionFrame = With.frame + remainingCompletionFrames
+    }
+    if (remainingOccupationFrames > 0) {
+      lastFrameOccupied = With.frame
     }
     lastUnitClass             = unitClass
     lastHitPoints             = hitPoints

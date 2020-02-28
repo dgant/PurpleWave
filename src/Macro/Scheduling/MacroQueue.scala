@@ -19,7 +19,11 @@ class MacroQueue {
     requestsByPlan.clear()
   }
   
-  def request(requester: Plan, requests: Iterable[BuildRequest]) {
+  def request(requester: Plan, theRequest: BuildRequest) {
+    request(requester, Iterable(theRequest))
+  }
+
+  def request(requester: Plan, requests: Iterable[BuildRequest]): Unit = {
     requestsByPlan.put(requester, requests ++ requestsByPlan.getOrElse(requester, Iterable.empty))
   }
   

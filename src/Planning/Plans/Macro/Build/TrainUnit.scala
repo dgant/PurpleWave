@@ -70,6 +70,10 @@ class TrainUnit(val traineeClass: UnitClass) extends ProductionPlan {
       updateTrainerPreference()
       trainerLock.acquire(this)
       trainer = trainerLock.units.headOption
+      if (trainer.exists(_.buildUnit.exists(_.unitClass != traineeClass))) {
+        trainerLock.release()
+        trainer = None
+      }
       if (trainee.isEmpty) {
         trainer.foreach(_.agent.intend(this, new Intention { toTrain = Some(traineeClass) }))
       }

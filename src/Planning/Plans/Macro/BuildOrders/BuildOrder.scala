@@ -31,6 +31,6 @@ class BuildOrder(initialRequests: BuildRequest*) extends Plan {
       }
     })
     
-    With.scheduler.request(this, modifiedRequests)
+    modifiedRequests.foreach(With.scheduler.request(this, _))
   }
 }

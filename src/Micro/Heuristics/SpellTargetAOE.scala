@@ -1,5 +1,6 @@
 package Micro.Heuristics
 
+import Lifecycle.With
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -19,7 +20,9 @@ class SpellTargetAOE {
     : Option[Pixel] = {
     val finalCandidates = candidates.getOrElse(caster.matchups.allUnits
       .view
-      .filter(target => (target.visible || target.burrowed))
+      .filter(target =>
+            ((target.likelyStillThere && With.framesSince(target.lastSeen) < 72)
+        ||  (target.burrowed && target.possiblyStillThere)))
       .filter(_.pixelDistanceCenter(caster) <= searchRadiusPixels))
       .filter( ! _.invincible)
     val targets = finalCandidates.filter(evaluate(_, caster) > 0)

@@ -15,6 +15,6 @@ class Build(initialRequests: BuildRequest*) extends Plan {
       requests.get.take(3).map(_.toString).mkString(", ") +
       (if (requests.get.size > 3) "..." else ""))
     
-    With.scheduler.request(this, requests.get)
+    requests.get.foreach(With.scheduler.request(this, _))
   }
 }

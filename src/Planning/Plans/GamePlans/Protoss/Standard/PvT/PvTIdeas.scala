@@ -187,7 +187,7 @@ object PvTIdeas {
 
   class TrainGatewayUnits extends Parallel(
     new PumpRatio(Protoss.Dragoon, 0, 100, Seq(Enemy(Terran.Wraith, 1.0), Enemy(Terran.Battlecruiser, 5.0))),
-    new PumpRatio(Protoss.Dragoon, 0, 24, Seq(Flat(6.0), Enemy(Terran.Vulture, .75))),
+    new PumpRatio(Protoss.Dragoon, 0, 24, Seq(Flat(3.0), Enemy(Terran.Vulture, .75))),
     new If(
       new Or(new UpgradeStarted(Protoss.ZealotSpeed), new And(new MineralsAtLeast(600), new GasAtMost(200))),
       new PumpRatio(Protoss.Zealot, 0, 50, Seq(
@@ -196,6 +196,7 @@ object PvTIdeas {
         Enemy(Terran.Marine,      1.0),
         Enemy(Terran.Vulture,     -1.0)))),
     new PumpRatio(Protoss.Dragoon, 0, 24, Seq(Enemy(Terran.Vulture, 1.25))),
+    new If(new Not(new EnemyStrategy(With.fingerprints.bio)), new Pump(Protoss.Dragoon, 12)),
     new If(
       new UnitsAtLeast(1, Protoss.TemplarArchives),
       new Parallel(

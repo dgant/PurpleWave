@@ -24,7 +24,7 @@ class MacroQueue {
   }
 
   def request(requester: Plan, requests: Iterable[BuildRequest]): Unit = {
-    requestsByPlan.put(requester, requests ++ requestsByPlan.getOrElse(requester, Iterable.empty))
+    requestsByPlan.put(requester, requestsByPlan.getOrElse(requester, Iterable.empty) ++ requests)
   }
   
   def audit: Vector[(Plan, Iterable[BuildRequest])] = {

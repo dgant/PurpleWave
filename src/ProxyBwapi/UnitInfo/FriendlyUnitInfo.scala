@@ -53,8 +53,6 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
   // Statuses //
   //////////////
 
-  def completeOrNearlyComplete: Boolean = complete || remainingCompletionFrames < With.reaction.planningMax + With.reaction.agencyMax
-
   // Commander readiness
   var nextOrderFrame: Option[Int] = None
   @inline def ready: Boolean = nextOrderFrame.forall(_ <= With.frame)

@@ -18,7 +18,7 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMinin
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural, MeldArchons}
 import Planning.Plans.Scouting.{MonitorBases, Scout, ScoutCleared, ScoutOn}
 import Planning.Predicates.Compound._
-import Planning.Predicates.Economy.GasAtLeast
+import Planning.Predicates.Economy.{GasAtLeast, GasAtMost}
 import Planning.Predicates.Milestones.{EnemyHasShownWraithCloak, _}
 import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.{Employing, EnemyIsRandom, EnemyRecentStrategy, EnemyStrategy}
@@ -43,7 +43,7 @@ class PvTBasic extends GameplanTemplate {
 
   override def archonPlan: Plan =
     new If(new EnemyStrategy(With.fingerprints.bio),
-    new MeldArchons(40) { override def maximumTemplar: Int = 8 },
+    new MeldArchons(49) { override def maximumTemplar: Int = 8 },
     new MeldArchons(25))
 
   override def placementPlan: Plan = new If(
@@ -291,28 +291,33 @@ class PvTBasic extends GameplanTemplate {
     new If(
       // Allow emergency reactions to control gas
       new GasCapsUntouched,
-      new If(
-        // On one base, we usually just need the gas for 1-2 gate Goon production
-        new BasesAtMost(1),
+      new Parallel(
         new If(
-          new And(new GasForUpgrade(Protoss.DragoonRange), new UnitsAtLeast(1, Protoss.Dragoon)),
+          // On one base, we usually just need the gas for 1-2 gate Goon production
+          new BasesAtMost(1),
           new If(
-            new Employing(PvT21Nexus, PvT28Nexus, PvT32Nexus),
-            new CapGasWorkersAt(1),
+            new And(new GasForUpgrade(Protoss.DragoonRange), new UnitsAtLeast(1, Protoss.Dragoon)),
             new If(
-              new Employing(PvT1015Expand, PvT2GateRangeExpand),
-              new CapGasWorkersAt(2)))),
-        new If(
-          // On two base, we only want gas if we're fast teching
-          new BasesAtMost(2),
+              new Employing(PvT21Nexus, PvT28Nexus, PvT32Nexus),
+              new CapGasWorkersAt(1),
+              new If(
+                new Employing(PvT1015Expand, PvT2GateRangeExpand),
+                new CapGasWorkersAt(2),
+                new Parallel(
+                  new If(
+                    new And(new Employing(PvTDTExpand), new UnitsAtMost(0, Protoss.DarkTemplar), new GasAtMost(300)),
+                    new FloorGasWorkersAt(3))))))),
           new If(
-            new And(
-              new EnemyTwoPlusFac,
-              new UnitsAtMost(4, Protoss.Gateway)),
-            new CapGasAt(250)),
-          new If(
-            new UnitsAtMost(45, UnitMatchWorkers),
-            new CapGasAt(500))))),
+            // On two base, we only want gas if we're fast teching
+            new BasesAtMost(2),
+            new If(
+              new And(
+                new EnemyTwoPlusFac,
+                new UnitsAtMost(4, Protoss.Gateway)),
+              new CapGasAt(250)),
+            new If(
+              new UnitsAtMost(45, UnitMatchWorkers),
+              new CapGasAt(500))))),
 
     // Scout with Observer
     new If(

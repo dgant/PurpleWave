@@ -143,6 +143,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   ///////////////
   // Economics //
   ///////////////
+
+  def completeOrNearlyComplete: Boolean = complete || remainingCompletionFrames < With.reaction.planningMax + With.reaction.agencyMax
   
   lazy val isBlocker: Boolean = gasLeft + mineralsLeft < With.configuration.blockerMineralThreshold
   

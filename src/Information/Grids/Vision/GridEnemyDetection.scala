@@ -29,7 +29,7 @@ class GridEnemyDetection extends AbstractGridVersionedValue[Int] {
         && ! unit.blind) {
         val tileUnit = unit.projectFrames(framesAhead).tileIncluding
         val rangeMax = addedRange + unit.detectionRangePixels / 32
-        for (d <- 1 to rangeMax) {
+        for (d <- 0 to rangeMax) {
           for (point <- Ring.points(d)) {
             val tile = tileUnit.add(point)
             if (tile.valid) {

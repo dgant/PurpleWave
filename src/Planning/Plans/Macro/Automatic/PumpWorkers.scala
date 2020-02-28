@@ -2,7 +2,7 @@ package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
 
-class PumpWorkers(oversaturate: Boolean = false, cap: Int = 85, maximumConcurrently: Int = 2, maximumTotal: Int = 200) extends Pump(With.self.workerClass, maximumConcurrently = maximumConcurrently, maximumTotal = maximumTotal) {
+class PumpWorkers(oversaturate: Boolean = false, cap: Int = 85, maximumConcurrently: Int = 32, maximumTotal: Int = 200) extends Pump(With.self.workerClass, maximumConcurrently = maximumConcurrently, maximumTotal = maximumTotal) {
   
   protected def builderCount: Int = {
     if (With.self.isTerran)

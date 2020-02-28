@@ -70,7 +70,7 @@ class TrainUnit(val traineeClass: UnitClass) extends ProductionPlan {
       updateTrainerPreference()
       trainerLock.acquire(this)
       trainer = trainerLock.units.headOption
-      if (trainer.exists(_.buildUnit.exists(_.unitClass != traineeClass))) {
+      if (trainer.exists(_.buildUnit.exists(u => u.unitClass != traineeClass && ! u.completeOrNearlyComplete))) {
         trainerLock.release()
         trainer = None
       }

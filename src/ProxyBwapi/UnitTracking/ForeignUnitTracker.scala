@@ -106,6 +106,9 @@ class ForeignUnitTracker {
         }
       }
 
+      if (unit.unitClass.isSpell && (With.framesSince(unit.frameDiscovered) > 240 || With.grids.friendlyVision.isSet(unit.tileIncludingCenter))) {
+        remove(unit)
+      }
       // Well, if it can't move, it must be dead. Like a building that burned down or was otherwise destroyed.
       // HACK: Vision grids can be out of date, causing us to think a unit is dead when we actually just can't see it
       // The temporary fix is querying all the tiles to ensure it's not just in the fog

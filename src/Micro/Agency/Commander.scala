@@ -152,6 +152,9 @@ class Commander {
         val signX = PurpleMath.forcedSignum(SpecificPoints.middle.x - destination.x)
         val signY = PurpleMath.forcedSignum(SpecificPoints.middle.y - destination.y)
         destination = destination.add((signX * overshoot).toInt, (signY * overshoot).toInt)
+        if ( ! unit.flying) {
+          destination = destination.nearestWalkableTerrain.pixelCenter
+        }
       }
     }
     

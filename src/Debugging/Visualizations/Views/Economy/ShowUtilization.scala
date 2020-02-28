@@ -14,7 +14,7 @@ object ShowUtilization extends View {
       .foreach(unit => {
         val frames = With.framesSince(unit.lastFrameOccupied)
         if (frames > 0) {
-          val ratio = 0.9 * Math.min(1.0, Math.log(frames) / max)
+          val ratio = Math.min(1.0, Math.log(frames) / max)
           DrawMap.box(
             unit.pixelCenter.subtract((ratio * unit.unitClass.dimensionLeft).toInt, (ratio * unit.unitClass.dimensionUp).toInt),
             unit.pixelCenter.add((ratio * unit.unitClass.dimensionRight).toInt, (ratio * unit.unitClass.dimensionDown).toInt),

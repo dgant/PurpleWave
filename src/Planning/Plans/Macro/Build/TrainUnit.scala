@@ -35,25 +35,18 @@ class TrainUnit(val traineeClass: UnitClass) extends ProductionPlan {
     else
       matchTrainer
     
-  val trainerLock = new LockUnits {
-    unitMatcher.set(trainerMatcher)
+  lazy val trainerLock = new LockUnits {
+    unitMatcher.set(u => trainerMatcher.accept(u) && (trainer.contains(u) || u.friendly.exists(_.trainee.forall(_.completeOrNearlyComplete))))
     unitCounter.set(UnitCountOne)
+    unitPreference.set(preference)
   }
   
-  private var trainer: Option[FriendlyUnitInfo] = None
-  private var trainee: Option[FriendlyUnitInfo] = None
-  
+  private def trainer: Option[FriendlyUnitInfo] = trainerLock.units.headOption
+  private def trainee: Option[FriendlyUnitInfo] = trainer.flatMap(_.trainee.filter(_.is(traineeClass)))
   override def isComplete: Boolean = trainee.exists(_.completeOrNearlyComplete)
-
-  protected def assignTrainerAndTrainee(): Unit = {
-    trainer = trainerLock.units.headOption
-    trainee = trainer.flatMap(_.trainee.filter(_.is(traineeClass)))
-  }
   
   override def onUpdate() {
     if (isComplete) return
-  
-    assignTrainerAndTrainee()
   
     // Duplicated across MorphUnit
     currencyLock.framesPreordered = (
@@ -63,14 +56,11 @@ class TrainUnit(val traineeClass: UnitClass) extends ProductionPlan {
     currencyLock.isSpent = trainee.isDefined
     currencyLock.acquire(this)
     if (currencyLock.satisfied) {
-      updateTrainerPreference()
       trainerLock.acquire(this)
-      assignTrainerAndTrainee()
-      // If this trainer is occupied right now, release it,
-      // because maybe we can get a free trainer next time
-      if (trainer.exists(_.buildUnit.exists(u => u.unitClass != traineeClass && ! u.completeOrNearlyComplete))) {
+      if (trainee.isEmpty && trainer.forall(_.buildUnit.exists( ! _.completeOrNearlyComplete))) {
+        // If this trainer is occupied right now, release it,
+        // because maybe we can get a free trainer next time
         trainerLock.release()
-        trainer = None
       }
       if (trainee.isEmpty) {
         trainer.foreach(_.agent.intend(this, new Intention { toTrain = Some(traineeClass) }))
@@ -78,31 +68,27 @@ class TrainUnit(val traineeClass: UnitClass) extends ProductionPlan {
     }
   }
 
-  val safetyFramesMax = GameTime(0, 10)()
-  lazy val mapSize = With.mapTileWidth + With.mapTileHeight
-  private def updateTrainerPreference() {
-    val locationPreference = new UnitPreference {
-      override def preference(trainer: FriendlyUnitInfo): Double = {
-        // Factors, ranging on [0, 1]
-        val addon     = if (trainer.addon.isDefined) 0.0 else 1.0
-        val readiness = trainer.remainingOccupationFrames.toDouble / Math.max(trainer.trainee.map(_.unitClass.buildFrames).getOrElse(0), traineeClass.buildFrames)
-        val workers   = if (traineeClass.isWorker) PurpleMath.clamp(trainer.base.map(_.saturation()).getOrElse(0.0), 0.0, 1.0) else 0.0
-        val health    = trainer.totalHealth / trainer.unitClass.maxTotalHealth.toDouble
-        val safety    = PurpleMath.clamp(trainer.matchups.framesOfSafety, 0, safetyFramesMax) / safetyFramesMax.toDouble
-        val distance  = 1.0 - PurpleMath.clamp(trainer.tileIncludingCenter.groundPixels(With.intelligence.mostBaselikeEnemyTile) / mapSize, 0.0, 1.0)
-        val score = (
-            10000000000.0 * addon
-          + 100000000.0   * workers
-          + 1000000.0     * readiness
-          + 10000.0       * health
-          + 100.0         * safety
-          + 1.0           * distance
-        )
-        score
-      }
+  private val safetyFramesMax = GameTime(0, 10)()
+  private lazy val mapSize = With.mapTileWidth + With.mapTileHeight
+  private lazy val preference = new UnitPreference {
+    override def preference(trainer: FriendlyUnitInfo): Double = {
+      // Factors, ranging on [0, 1]
+      val addon     = if (trainer.addon.isDefined) 0.0 else 1.0
+      val readiness = trainer.remainingOccupationFrames.toDouble / Math.max(trainer.trainee.map(_.unitClass.buildFrames).getOrElse(0), traineeClass.buildFrames)
+      val workers   = if (traineeClass.isWorker) PurpleMath.clamp(trainer.base.map(_.saturation()).getOrElse(0.0), 0.0, 1.0) else 0.0
+      val health    = trainer.totalHealth / trainer.unitClass.maxTotalHealth.toDouble
+      val safety    = PurpleMath.clamp(trainer.matchups.framesOfSafety, 0, safetyFramesMax) / safetyFramesMax.toDouble
+      val distance  = 1.0 - PurpleMath.clamp(trainer.tileIncludingCenter.groundPixels(With.intelligence.mostBaselikeEnemyTile) / mapSize, 0.0, 1.0)
+      val score = (
+          10000000000.0 * addon
+        + 100000000.0   * workers
+        + 1000000.0     * readiness
+        + 10000.0       * health
+        + 100.0         * safety
+        + 1.0           * distance
+      )
+      score
     }
-    
-    trainerLock.unitPreference.set(locationPreference)
   }
   
   override def visualize() {

@@ -6,7 +6,6 @@ import Micro.Actions.Combat.Techniques.Ignore
 import Micro.Agency.Agent
 import Micro.Squads.Squad
 import Performance.Cache
-import Planning.Plan
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 

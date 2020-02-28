@@ -6,6 +6,7 @@ import Performance.Cache
 import Planning.Plan
 import Planning.Plans.Macro.Build._
 import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
+import Utilities.ByOption
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -46,7 +47,7 @@ class MasterBuildPlans {
       }})
 
     // Add plans to match number of builds we need
-    queue = With.scheduler.queue.take(maxToFollow)
+    queue = With.scheduler.macroQueue.queue.take(maxToFollow)
 
     val buildsNeeded =
       queue
@@ -55,12 +56,21 @@ class MasterBuildPlans {
           buildable._1,
           buildable._2.size))
 
+    // Add needed builds
     buildsNeeded.keys.foreach(build => {
       if ( ! plans.contains(build)) {
         plans.put(build, new ListBuffer[Plan])
       }
       while (plans(build).size < buildsNeeded(build)) {
         plans(build).append(buildPlan(build))
+      }
+    })
+
+    // Remove unneeded builds
+    plans.keys.foreach(build => {
+      while (plans(build).size > buildsNeeded.getOrElse(build, 0)) {
+        val removablePlan = ByOption.maxBy(plans(build).filterNot(With.bank.hasSpentRequest))(_.priority)
+        removablePlan.foreach(plans(build).-=)
       }
     })
 

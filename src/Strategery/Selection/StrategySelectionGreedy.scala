@@ -5,6 +5,7 @@ import Strategery.Strategies.Strategy
 
 object StrategySelectionGreedy extends StrategySelectionBasic {
   override protected def chooseBasedOnInterest: Iterable[Strategy] = {
+    if (With.strategy.interest.values.isEmpty) return Iterable.empty
     val mostInterest = With.strategy.interest.values.max
     val bestPermutation = With.strategy.interest.find(_._2 >= mostInterest).get
     bestPermutation._1
@@ -17,7 +18,13 @@ abstract class StrategySelectionBasic extends StrategySelectionPolicy {
     val strategyEvaluations     = strategies.map(strategy => (strategy, With.strategy.evaluate(strategy))).toMap
     val permutationEvaluations  = permutations.map(p => (p, p.map(strategyEvaluations))).toMap
     With.strategy.interest      = permutationEvaluations.map(p => (p._1, PurpleMath.geometricMean(p._2.map(_.interestTotal))))
-    chooseBasedOnInterest
+
+    var output = chooseBasedOnInterest
+    if (output.isEmpty) {
+      With.logger.warn("Attempted to choose strategies based on interest but no strategies were available.")
+      output = chooseBest(With.strategy.strategiesFiltered)
+    }
+    output
   }
 
   def chooseBest(topLevelStrategies: Iterable[Strategy], expand: Boolean = true): Iterable[Strategy] = {

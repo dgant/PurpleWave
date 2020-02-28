@@ -1,6 +1,5 @@
 package Strategery.Selection
 
-import Lifecycle.With
 import Strategery.Strategies.Protoss._
 import Strategery.{Heartbreak, MapGroups}
 
@@ -40,7 +39,7 @@ object Opponents {
     Seq(PvP2Gate1012DT)))))
   val dragon        : Opponent = add(Opponent("Dragon",       StrategySelectionSequence(Vector(
     Seq(PvTProxy2Gate,  PvT2BaseReaver, PvT3BaseGateway),
-    Seq(PvTDTExpand,    PvT2BaseArbiter),
+    Seq(PvT32Nexus,     PvT2BaseGateway),
     Seq(PvT13Nexus,     PvT2BaseReaver, PvT3BaseCarrier)))))
   val letabot       : Opponent = add(Opponent("LetaBot",      StrategySelectionSequence(Vector(
     Seq(PvTDTExpand,  PvT3rdFast,       PvT3BaseArbiter),
@@ -51,7 +50,7 @@ object Opponents {
     Seq(PvP4GateGoon),
     Seq(PvP1ZealotExpand),
     Seq(PvP2Gate1012DT)))))
-  val mcrave        : Opponent = add(Opponent("McRave",       if (With.enemy.isZerg) StrategySelectionGreedy else new StrategySelectionRecommended(StrategySelectionGreedy, PvPRobo) { duration = 1 }))
+  val mcrave        : Opponent = add(Opponent("McRave",       StrategySelectionGreedy))
   val microwave     : Opponent = add(Opponent("Microwave",    StrategySelectionSequence(Vector(
     Seq(PvZ2Gate910, PvZ4GateGoon, PvZMidgame5GateGoon, PvZLateGameReaver),
     Seq(PvZFFEEconomic, PvZMidgame5GateGoonReaver, PvZLateGameReaver),
@@ -129,7 +128,7 @@ object Opponents {
   val isamind       : Opponent = add(Opponent("ISAMind",      locutus.policy))
 
   // Aliases
-
+  val mcravez           : Opponent = add(Opponent("McRaveZ",            mcrave.policy))
   val ironbot           : Opponent = add(Opponent("Iron bot",           iron.policy))
   val martinrooijackers : Opponent = add(Opponent("Martin Rooijackers", letabot.policy))
   val megabot2017       : Opponent = add(Opponent("MegaBot2017",        megabot.policy))

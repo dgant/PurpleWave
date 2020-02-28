@@ -39,9 +39,7 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
       new And(
         new FoundEnemyBase,
         // Attack greedy openings
-        new Or(
-          new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.oneGateCore),
-          new Not(new EnemyHasShown(Protoss.Zealot))),
+        new EnemyStrategy(With.fingerprints.nexusFirst),
         // Pressure proxy opening
         new Or(
           new Not(new EnemyStrategy(With.fingerprints.proxyGateway)),

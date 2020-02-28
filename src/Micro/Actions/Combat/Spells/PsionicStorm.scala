@@ -43,7 +43,7 @@ object PsionicStorm extends TargetedSpell {
     }
 
     val multiplayerPlayer = if (target.isEnemy) 1.0 else if (target.isFriendly) -2.0 else 0.0
-    val multiplierUnit    = 3 * Terran.Marine.subjectiveValue + target.unitClass.subjectiveValue
+    val multiplierUnit    = 3 * Terran.Marine.subjectiveValue + Math.min(target.unitClass.subjectiveValue, Terran.SiegeTankUnsieged.subjectiveValue)
     val multiplierDanger  = if (caster.matchups.threatsInRange.nonEmpty) 1.25 else 1.0
     val multiplierMany    = if (templar > 5) 2.0 else if (templar > 2) 1.4 else 1.0
     val output            = multiplierMany * multiplayerPlayer * multiplierUnit * multiplierDanger

@@ -74,17 +74,18 @@ class Strategist {
   lazy val enemyRecentFingerprints: Vector[String] = enemyFingerprints(With.configuration.recentFingerprints)
 
   def strategiesUnfiltered = if (With.enemies.exists(_.raceInitial == Race.Unknown)) AllChoices.treeVsRandom else AllChoices.treeVsKnownRace
+  def strategiesFiltered = filterForcedStrategies(strategiesUnfiltered.filter(isAppropriate))
 
   def selectInitialStrategies: Set[Strategy] = {
-    val strategiesFiltered = filterForcedStrategies(strategiesUnfiltered.filter(isAppropriate))
-    strategiesFiltered.foreach(evaluate)
+    val strategies = strategiesFiltered
+    strategies.foreach(evaluate)
     if (With.configuration.humanMode) {
       Manners.chat("Human mode enabled!")
       With.configuration.strategyRandomness = 0.3
-      return StrategySelectionDynamic.chooseBest(strategiesFiltered).toSet
+      return StrategySelectionDynamic.chooseBest(strategies).toSet
     }
     playbook.strategySelectionPolicy.chooseBestUnfiltered(strategiesUnfiltered).getOrElse(
-      playbook.strategySelectionPolicy.chooseBest(strategiesFiltered))
+      playbook.strategySelectionPolicy.chooseBest(strategies))
       .toSet
   }
 

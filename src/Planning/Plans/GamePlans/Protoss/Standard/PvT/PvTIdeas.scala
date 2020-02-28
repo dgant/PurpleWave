@@ -12,7 +12,7 @@ import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
-import Planning.Predicates.Economy.{GasAtMost, MineralsAtLeast}
+import Planning.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeToMoveOut}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
@@ -189,20 +189,23 @@ object PvTIdeas {
     new PumpRatio(Protoss.Dragoon, 0, 100, Seq(Enemy(Terran.Wraith, 1.0), Enemy(Terran.Battlecruiser, 5.0))),
     new PumpRatio(Protoss.Dragoon, 0, 24, Seq(Flat(3.0), Enemy(Terran.Vulture, .75))),
     new If(
-      new Or(new UpgradeStarted(Protoss.ZealotSpeed), new And(new MineralsAtLeast(600), new GasAtMost(200))),
-      new PumpRatio(Protoss.Zealot, 0, 50, Seq(
-        Enemy(UnitMatchSiegeTank, 2.5),
-        Enemy(Terran.Goliath,     1.5),
-        Enemy(Terran.Marine,      1.0),
-        Enemy(Terran.Vulture,     -1.0)))),
-    new PumpRatio(Protoss.Dragoon, 0, 24, Seq(Enemy(Terran.Vulture, 1.25))),
-    new If(new Not(new EnemyStrategy(With.fingerprints.bio)), new Pump(Protoss.Dragoon, 12)),
-    new If(
-      new UnitsAtLeast(1, Protoss.TemplarArchives),
+      new EnemyStrategy(With.fingerprints.bio),
       new Parallel(
         new Pump(Protoss.HighTemplar),
         new Pump(Protoss.Zealot)),
-      new Pump(Protoss.Dragoon)))
+      new Parallel(
+        new If(
+          new Or(new UpgradeStarted(Protoss.ZealotSpeed), new And(new MineralsAtLeast(600), new GasAtMost(200))),
+          new PumpRatio(Protoss.Zealot, 0, 50, Seq(
+            Enemy(UnitMatchSiegeTank, 2.5),
+            Enemy(Terran.Goliath,     1.5),
+            Enemy(Terran.Marine,      1.0),
+            Enemy(Terran.Vulture,     -1.0)))),
+        new If(
+          new And(new GasAtLeast(800)),
+          new Pump(Protoss.HighTemplar, 8, maximumConcurrently = 2)),
+        new PumpRatio(Protoss.HighTemplar, 0, 4, Seq(Friendly(UnitMatchWarriors, 0.1))),
+        new Pump(Protoss.Dragoon))))
 
   class TrainCarriers extends If(
     new Check(() => With.units.countEnemy(Terran.Goliath) < 8 + 3 * With.units.countOurs(Protoss.Carrier)),

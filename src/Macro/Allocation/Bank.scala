@@ -2,6 +2,7 @@ package Macro.Allocation
 
 import Planning.ResourceLocks.LockCurrency
 import Lifecycle.With
+import Planning.Plan
 
 import scala.collection.mutable
 
@@ -21,6 +22,10 @@ class Bank {
   def request(request: LockCurrency) {
     requests += request
     recountResources()
+  }
+
+  def hasSpentRequest(plan: Plan): Boolean = {
+    requests.exists(request => request.owner == plan && request.isSpent)
   }
   
   private def recountResources() {

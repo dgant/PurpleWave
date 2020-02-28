@@ -154,6 +154,7 @@ class PvTBasic extends GameplanTemplate {
       new If(
         new And(new UpgradeStarted(Protoss.GroundDamage), new UpgradeStarted(Protoss.GroundArmor)),
         new Build(Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives))),
+      new If(new TechComplete(Protoss.PsionicStorm), new UpgradeContinuously(Protoss.HighTemplarEnergy)),
       new If(
         new UnitsAtLeast(2, Protoss.Forge),
         new FlipIf(
@@ -199,7 +200,6 @@ class PvTBasic extends GameplanTemplate {
     new If(new And(new EmployingCarriers, new GasPumpsAtLeast(4), new UnitsAtLeast(1, Protoss.FleetBeacon)),      new Build(Get(2, Protoss.CyberneticsCore), Get(Protoss.Forge))),
     new If(new EmployingCarriers, new UpgradeContinuously(Protoss.Shields, 1)),
     new GatewayUpgrades,
-    new If(new EmployingGateway, new Build(Get(Protoss.HighTemplarEnergy))),
     new If(new And(new EnemiesAtLeast(3, Terran.SpiderMine), new GasPumpsAtLeast(3)), new UpgradeContinuously(Protoss.ObserverSpeed)),
     new If(new UnitsAtLeast(2, Protoss.Reaver), new UpgradeContinuously(Protoss.ScarabDamage)))
 

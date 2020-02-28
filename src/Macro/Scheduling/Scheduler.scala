@@ -26,18 +26,14 @@ class Scheduler {
     })
   }
 
-  def buildersConsumed(unit: UnitClass): Int = {
+  def buildersAllocated(unit: UnitClass): Int = {
     val ratio = if (unit.isTwoUnitsInOneEgg) 2 else 1
-    ByOption.min((unit.buildUnitsBorrowed ++ unit.buildUnitsSpent).map(builder => {
-      val unitsNow        = With.units.countOurs(UnitMatchAnd(unit, UnitMatchComplete))
-      val unitsRequested  = builder.unitsTrained.toVector.map(u => Math.max(0, this.unitsRequested(u) - With.units.countOurs(UnitMatchAnd(u, UnitMatchComplete)))).sum
-      val unitsToBuild    = Math.max(0, unitsRequested - unitsNow)
-      val buildersUsed    = unitsToBuild / ratio
-      buildersUsed
+    ByOption.max((unit.buildUnitsBorrowed ++ unit.buildUnitsSpent).map(builder => {
+      val traineesNow       = builder.unitsTrained.toVector.map(u => With.units.countOurs(UnitMatchAnd(u, UnitMatchComplete))).sum
+      val traineesRequested = builder.unitsTrained.toVector.map(u => Math.max(0, this.unitsRequested(u) - With.units.countOurs(UnitMatchAnd(u, UnitMatchComplete)))).sum
+      val traineesToBuild   = Math.max(0, traineesRequested - traineesNow)
+      val buildersAllocated = traineesToBuild / ratio
+      buildersAllocated
     })).getOrElse(0)
-  }
-  
-  def queue: Iterable[Buildable] = {
-    macroQueue.queue
   }
 }

@@ -31,15 +31,13 @@ class MacroQueue {
     requestsByPlan.toVector.sortBy(_._1.priority)
   }
   
-  def queue: Iterable[Buildable] = queueCache()
-  val queueCache = new Cache(() => {
+  def queue: Vector[Buildable] = queueCache()
+  val queueCache = new Cache[Vector[Buildable]](() => {
     val requestQueue = requestsByPlan.keys.toVector.sortBy(_.priority).flatten(requestsByPlan)
     val unitsWanted = new CountMap[UnitClass]
     val unitsActual = new CountMap[UnitClass]
       With.units.ours.foreach(unit => {
-        if (unit.completeOrNearlyComplete) {
-          unitsActual.add(unit.unitClass, 1)
-        }
+        unitsActual.add(unit.unitClass, 1)
         if (unit.is(Terran.SiegeTankSieged)) {
           unitsActual.add(Terran.SiegeTankUnsieged, 1)
         }
@@ -54,7 +52,7 @@ class MacroQueue {
           unitsActual.add(Zerg.Hatchery, 1)
         }
       })
-    requestQueue.flatten(buildable => getUnfulfilledBuildables(buildable, unitsWanted, unitsActual))
+    requestQueue.flatten(getUnfulfilledBuildables(_, unitsWanted, unitsActual))
   })
   
   private def getUnfulfilledBuildables(

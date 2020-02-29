@@ -9,8 +9,8 @@ import bwapi.Color
 
 object ShowProduction extends View {
 
-  case class Producible(name: String, framesTotal: Int, framesLeft: Int, colorBack: Color, colorFront: Color, started: Boolean = true)
-  
+  case class Producible(name: String, framesTotal: Int, framesLeft: Int, colorDenominator: Color, colorNumerator: Color, started: Boolean = true, paid: Boolean = true)
+
   override def renderScreen() {
     val producibles: Seq[Producible] = With.units.ours.view.map(unit => {
       val unitClass = if (unit.isAny(Zerg.Egg, Zerg.LurkerEgg, Zerg.Cocoon)) unit.buildType else unit.unitClass
@@ -58,9 +58,10 @@ object ShowProduction extends View {
           ,
           duration,
           Math.min(request.expectedFrames, duration),
-          colorBack = Colors.ShadowGray,
-          colorFront = Colors.ShadowGray,
-          started = false
+          colorDenominator = Colors.ShadowGray,
+          colorNumerator = Colors.ShadowGray,
+          started = false,
+          paid = productionPlan.producerCurrencyLocks.forall(_.isSatisfied)
         )})
 
     producibles.sortBy(p => p.framesLeft - p.framesTotal).sortBy( ! _.started)
@@ -68,8 +69,9 @@ object ShowProduction extends View {
       val p = producibles(i)
       val y0 = 45 + 14 * i
       val y1 = y0 + 12
-      val drawDenominator = () => With.game.drawBoxScreen(5, y0, 5 + p.framesTotal / 8,                   y1, p.colorBack,  p.started)
-      val drawNumerator = () => With.game.drawBoxScreen(5, y0, 5 + (p.framesTotal - p.framesLeft) / 8,  y1, p.colorFront, true)
+      val colorDenominator = if (p.paid && ! p.started) Colors.BrightGray else p.colorDenominator
+      val drawDenominator = () => With.game.drawBoxScreen(5, y0, 5 + p.framesTotal / 8,                 y1, colorDenominator, p.started)
+      val drawNumerator = () => With.game.drawBoxScreen(5, y0, 5 + (p.framesTotal - p.framesLeft) / 8,  y1, p.colorNumerator, true)
       if (p.started) {
         drawDenominator()
         drawNumerator()

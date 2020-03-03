@@ -21,16 +21,16 @@ object ShowStrategyEvaluations extends View {
     val evaluations = With.strategy.evaluations.values
       .toVector
       .sortBy(_.playbookOrder)
-      .sortBy( - _.interestTotal)
+      .sortBy( - _.probabilityWin)
 
     Vector(
-      Vector("Strategy")    ++ evaluations.map(_.strategy.toString),
-      Vector("Order")       ++ evaluations.map(e => if (e.playbookOrder > 100) "" else e.playbookOrder.toString),
-      Vector("Samps")       ++ evaluations.map(_.patienceGames.toString),
-      Vector("#Games")      ++ evaluations.map(e => formatGames(e.games.map(_.weight).sum)),
-      Vector("#Weighted")   ++ evaluations.map(e => formatGames(e.gamesVsEnemy.map(_.weight).sum)),
-      Vector("WinPct")      ++ evaluations.map(e => formatPercentage(e.winrateVsEnemy)),
-      Vector("WeightedPct") ++ evaluations.map(e => formatPercentage(e.interestTotal)))
+      Vector("Strategy") ++ evaluations.map(_.strategy.toString),
+      Vector("Order")    ++ evaluations.map(e => if (e.playbookOrder > 100) "" else e.playbookOrder.toString),
+      Vector("#Games")   ++ evaluations.map(e => formatGames(e.gamesUs.size)),
+      Vector("#Wtd")     ++ evaluations.map(e => formatGames(e.gamesUs.map(_.weight).sum)),
+      Vector("#WtdWins") ++ evaluations.map(e => formatGames(e.gamesUs.map(_.winsWeighted).sum)),
+      Vector("WinPct")   ++ evaluations.map(e => formatPercentage(e.winrateVsEnemy)),
+      Vector("WinEst")   ++ evaluations.map(e => formatPercentage(e.probabilityWin)))
   }
   
   private def formatGames(games: Double): String = {
@@ -40,8 +40,6 @@ object ShowStrategyEvaluations extends View {
   private def formatPercentage(value: Double): String = {
     (value * 100.0).toInt + """%%"""
   }
-  
-
   
   private def drawColumn(x: Int, name: String, rows: Iterable[String]) {
     val y = 5 * With.visualization.lineHeightSmall

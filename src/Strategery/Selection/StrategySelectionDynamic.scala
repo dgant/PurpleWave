@@ -4,15 +4,16 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Strategery.Strategies.Strategy
 
-object StrategySelectionDynamic extends StrategySelectionBasic {
+object StrategySelectionDynamic extends StrategySelectionPolicy {
 
-  override protected def chooseBasedOnInterest: Iterable[Strategy] = {
-    val strategies: Seq[(Iterable[Strategy], Double)] = With.strategy.interest.toVector
-    PurpleMath
-      .softmaxSample[(Iterable[Strategy], Double)](
-        strategies,
-        v => With.configuration.dynamicStickiness * v._2)
-      .map(_._1)
-      .getOrElse(Iterable.empty)
+  def chooseBranch: Seq[Strategy] = {
+    val weights = With.strategy.strategyBranchesLegal
+      .map(branch =>
+        (
+          branch,
+          Math.exp(With.configuration.dynamicStickiness * With.strategy.winProbabilityByBranch(branch)
+        )))
+      .toMap
+    PurpleMath.sampleWeighted(weights.keys.toSeq, w => weights(w)).get
   }
 }

@@ -4,14 +4,13 @@ import Debugging.Visualizations.Views.View
 import Lifecycle.With
 
 object ShowStrategyInterest extends View {
+
+  def evaluations: Vector[(String, String)] = With.strategy.winProbabilityByBranch
+    .toVector
+    .sortBy( - _._2)
+    .map(pair => (formatPercentage(pair._2), pair._1.toSeq.map(_.toString).sorted.mkString(" + ")))
   
   override def renderScreen() {
-    
-    val evaluations = With.strategy.interest
-      .toVector
-      .sortBy( - _._2)
-      .take(380 / With.visualization.lineHeightSmall)
-    
     val x0 = 5
     val x1 = 45
     val y0 = 5 * With.visualization.lineHeightSmall
@@ -20,12 +19,13 @@ object ShowStrategyInterest extends View {
     With.game.drawTextScreen(x1, y0, "Strategy")
     
     evaluations
+      .take(380 / With.visualization.lineHeightSmall)
       .indices
       .foreach(i => {
         val y = y0 + (1 + i) * With.visualization.lineHeightSmall
         val e = evaluations(i)
-        With.game.drawTextScreen(x0, y, formatPercentage(e._2))
-        With.game.drawTextScreen(x1, y, e._1.toSeq.map(_.toString).sorted.mkString(" + "))
+        With.game.drawTextScreen(x0, y, e._1)
+        With.game.drawTextScreen(x1, y, e._2)
       })
   }
   

@@ -5,66 +5,33 @@ import Mathematics.PurpleMath
 import Strategery.History.HistoricalGame
 import Strategery.Strategies.Strategy
 
-import scala.util.Random
+class StrategyEvaluation(val strategy: Strategy) {
 
-case class StrategyEvaluation(strategy: Strategy) {
-  
-  private val importanceVsEnemy     = 100.0
-  private val importanceVsRace      = 1.0
-  private val importanceOnMap       = 3.0
-  private val importanceWithStarts  = 3.0
-  private val multiplayer           = With.enemies.size > 1
-  
-  private def playbook: Playbook = With.configuration.playbook
-  
-  val playbookOrder         : Int                       = if (playbook.strategyOrder.contains(strategy)) playbook.strategyOrder.indexOf(strategy) else Int.MaxValue
-  val games                 : Iterable[HistoricalGame]  = With.history.games.filter(_.weEmployed(strategy))
-  val gamesVsEnemy          : Iterable[HistoricalGame]  = if (multiplayer) Iterable.empty else games.filter(_.enemyName == playbook.enemyName)
-  val patienceGames         : Double  = getConfidenceSamples(strategy)
-  val winrateVsEnemy        : Double  = winrate(gamesVsEnemy)
-  val interestVsEnemy       : Double  = interest(gamesVsEnemy, patienceGames)
-  val interestDeterministic : Double  = weighAllFactors
-  val interestStochastic    : Double  = Random.nextDouble()
-  val interestTotal         : Double  = With.configuration.strategyRandomness * interestStochastic + (1.0 - With.configuration.strategyRandomness) * interestDeterministic
-  
-  private def weighAllFactors: Double = {
-    weigh(Vector(new WinrateFactor(interestVsEnemy, gamesVsEnemy.size, patienceGames, importanceVsEnemy)))
-  }
-  
-  private class WinrateFactor(
-    val interest        : Double,
-    val games           : Double,
-    val confidenceGames : Double,
-    val importance      : Double)
-  
-  private def weigh(factors: Iterable[WinrateFactor]): Double = {
-    val effectiveGamesByFactor = factors.map(factor => (factor, factor.importance * Math.max(factor.games, factor.confidenceGames))).toMap
-    val output = factors.map(factor => factor.interest * effectiveGamesByFactor(factor)).sum / effectiveGamesByFactor.values.sum
-    output
-  }
-  
-  // How many (decayed) games before we have confidence in this strategy?
-  private def getConfidenceSamples(strategy: Strategy): Double = {
-    if (strategy.choices.isEmpty) {
-      2.0
-    }
-    else {
-      Math.min(8.0, strategy.choices.map(_.map(getConfidenceSamples).sum).sum)
-    }
-  }
-  
-  private def winrate(games: Iterable[HistoricalGame]): Double = {
-    PurpleMath.nanToZero(games.map(_.winsWeighted).sum / games.map(_.weight).sum)
-  }
-  
-  private def interest(games: Iterable[HistoricalGame], confidenceSamples: Double): Double = {
-    val gamesReal   = games.map(_.weight).sum
-    val gamesFake   = Math.max(0.0, confidenceSamples - gamesReal)
-    val winsReal    = games.map(_.winsWeighted).sum
-    val winsFake    = With.configuration.targetWinrate * gamesFake
-    val numerator   = winsReal + winsFake
-    val denominator = gamesReal + gamesFake
-    val output      = numerator / denominator
-    output
-  }
+  val playbookOrder       : Int                       = if (With.configuration.playbook.strategyOrder.contains(strategy)) With.configuration.playbook.strategyOrder.indexOf(strategy) else Int.MaxValue
+  def gamesAll            : Iterable[HistoricalGame]  = With.strategy.gamesVsOpponent
+  val gamesAllWon         : Iterable[HistoricalGame]  = gamesAll.filter(_.won)
+  val gamesAllLost        : Iterable[HistoricalGame]  = gamesAll.filterNot(_.won)
+  val gamesUs             : Iterable[HistoricalGame]  = gamesAll.filter(_.weEmployed(strategy))
+  val gamesUsWon          : Iterable[HistoricalGame]  = gamesUs.filter(_.won)
+  val target              : Double  = With.configuration.targetWinrate
+  val winrateVsEnemy      : Double  = PurpleMath.nanToZero(gamesUs.map(_.winsWeighted).sum / gamesUs.map(_.weight).sum)
+  val probabilityPerWin   : Double  = getProbabilityPerWin
+  val probabilityPerLoss  : Double  = getProbabilityPerLoss
+  val probabilityWin      : Double  = getProbabilityWin
+  val probabilityLoss     : Double  = 1 - probabilityWin
+
+  // Hyperparameter controlling how many games worth of the optimistic target winrate to assume
+  // Increase to revisit lost strategies sooner
+  // Decrease to abandon them more aggressively
+  val priorGames = 1.5
+
+  // Probability this strategy appears given a win
+  def getProbabilityPerWin: Double = (target * priorGames + gamesAllWon.filter(_.weEmployed(strategy)).map(_.weight).sum) / (priorGames + gamesAllWon.map(_.weight).sum)
+
+  // Probability this strategy appears given a loss
+  def getProbabilityPerLoss: Double = ((1.0 - target) * priorGames + gamesAllLost.filter(_.weEmployed(strategy)).map(_.weight).sum) / (priorGames + gamesAllLost.map(_.weight).sum)
+
+  // Probability we win given this strategy
+  def getProbabilityWin: Double = (priorGames * target + gamesUsWon.map(_.weight).sum) / (priorGames + gamesUs.map(_.weight).sum)
 }
+

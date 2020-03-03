@@ -54,7 +54,7 @@ object HistorySerializer {
       ourRace         = allRaces.find(_.toString == ourRace).getOrElse(Race.Unknown),
       enemyRace       = allRaces.find(_.toString == enemyRace).getOrElse(Race.Unknown),
       won             = won,
-      strategies      = strategies)
+      tags      = strategies)
   }
   
   def writeGames(games: Iterable[HistoricalGame]): Iterable[String] = {
@@ -69,7 +69,7 @@ object HistorySerializer {
       game.enemyName      .toString,
       game.ourRace        .toString,
       game.enemyRace      .toString,
-      game.won            .toString) ++ game.strategies
+      game.won            .toString) ++ game.tags
     columns.mkString(separator)
   }
   

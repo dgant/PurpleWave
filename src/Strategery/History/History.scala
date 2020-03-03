@@ -50,7 +50,7 @@ class History {
       ourRace         = With.self.raceInitial,
       enemyRace       = currentEnemyRace,
       won             = weWon,
-      strategies = (
+      tags = (
         With.strategy.selectedCurrently.map(_.toString).toVector
         ++ With.fingerprints.all.filter(_.matches).map(_.toString).sorted).distinct)
     HistoryLoader.save(games.toVector :+ thisGame)

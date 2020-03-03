@@ -1,8 +1,8 @@
 package Lifecycle
 
 import Mathematics.PurpleMath
-import Strategery.Strategies.{AllChoices, Strategy}
-import Strategery.{HumanPlaybook, TestingPlaybook, TournamentPlaybook}
+import Strategery.Selection.{StrategySelectionGreedy, StrategySelectionPolicy}
+import Strategery.{HumanPlaybook, PretrainingPlaybook, TestingPlaybook, TournamentPlaybook}
 
 object ConfigurationLoader {
 
@@ -32,6 +32,7 @@ object ConfigurationLoader {
     if (tournament)           { setTournamentMode() }
     if (roundrobin)           { setRoundRobinMode() }
     if (elimination)          { setEliminationMode() }
+    if (pretraining)          { setPretraining() }
     if (debugging)            { setDebugMode() }
     if (debugginglive)        { setDebugLiveMode() }
     if (fixedbuilds.nonEmpty) { setFixedBuild(fixedbuilds) }
@@ -53,15 +54,17 @@ object ConfigurationLoader {
   }
 
   private def setLadderMode(): Unit = {
-    config.targetFrameDurationMilliseconds = 40
+    config.historyHalfLife                  = 20
+    config.targetFrameDurationMilliseconds  = 40
   }
 
   private def setEliminationMode(): Unit = {
-    config.recentFingerprints = 2
+    config.recentFingerprints               = 2
   }
 
   private def setRoundRobinMode(): Unit = {
-    config.recentFingerprints = 4
+    config.historyHalfLife                  = 20
+    config.recentFingerprints               = 4
   }
 
   private def setLivestreamMode(): Unit = {
@@ -73,11 +76,15 @@ object ConfigurationLoader {
 
   private def setHumanMode(): Unit = {
     config.humanMode                        = true
-    config.strategyRandomness               = 0.4
     config.enableChat                       = true
     config.enableSurrenders                 = true
     config.targetFrameDurationMilliseconds  = 20
     config.forcedPlaybook                   = Some(HumanPlaybook)
+  }
+
+  private def setPretraining(): Unit = {
+    config.historyHalfLife                  = 20
+    config.forcedPlaybook                   = Some(PretrainingPlaybook)
   }
 
   private def setDebugMode(): Unit = {
@@ -96,7 +103,7 @@ object ConfigurationLoader {
   private def setFixedBuild(strategyNamesText: String): Unit = {
     val strategyNamesLines = strategyNamesText.replaceAll(",", " ").replaceAll("  ", " ").split("[\r\n]+").filter(_.nonEmpty).toVector
     val strategyNames = PurpleMath.sample(strategyNamesLines).split(" ").toVector
-    val strategyNamesAndInstances = strategyNames.map(name => (name, AllChoices.allVsRandom.find(_.toString.toLowerCase == name.toLowerCase)))
+    val strategyNamesAndInstances = strategyNames.map(name => (name, With.strategy.legalities.keys.find(_.toString == name)))
     val strategyNamesUnmatched = strategyNamesAndInstances.filter(_._2.isEmpty).map(_._1)
     val strategyInstances = strategyNamesAndInstances.filter(_._2.nonEmpty).map(_._2.get)
     if (strategyNamesUnmatched.nonEmpty) {
@@ -105,7 +112,7 @@ object ConfigurationLoader {
     if (strategyInstances.nonEmpty) {
       With.logger.debug("Using fixed build: " + strategyNamesText)
       config.forcedPlaybook = Some(new TestingPlaybook {
-          override lazy val forced: Seq[Strategy] = strategyInstances
+          override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy(Some(Seq(strategyInstances)))
       })
     }
   }

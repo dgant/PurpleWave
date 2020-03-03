@@ -3,7 +3,7 @@ package Strategery.Strategies
 import Information.Intelligenze.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.Plan
-import Strategery.StarCraftMap
+import Strategery.{StarCraftMap, StrategyEvaluation, StrategyLegality}
 import bwapi.Race
 
 abstract class Strategy {
@@ -36,4 +36,7 @@ abstract class Strategy {
   def minimumGamesVsOpponent  : Int                             = 0
   
   def active: Boolean = With.strategy.selectedCurrently.contains(this)
+
+  def legality: StrategyLegality      = With.strategy.legalities(this)
+  def evaluation: StrategyEvaluation  = With.strategy.evaluations(this)
 }

@@ -14,11 +14,10 @@ import Strategery.Strategies.Zerg._
 
 class Playbook {
   val none: Seq[Strategy] = Seq.empty
-  lazy val forced   : Seq[Strategy] = none
   lazy val disabled : Seq[Strategy] = none
   val strategyOrder: Seq[Strategy] = Vector(
   )
-  def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy
+  def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy()
   def enemyName: String = With.enemy.name
   def respectOpponent: Boolean = true
   def respectMap: Boolean = true
@@ -26,7 +25,7 @@ class Playbook {
 }
 
 object StrategyGroups {
-  val disabled = Vector[Strategy](
+  val disabled: Vector[Strategy] = Vector[Strategy](
     WorkerRush,
 
     CarriersWithNoDefense,
@@ -63,7 +62,7 @@ object StrategyGroups {
 
 class NormalPlaybook extends Playbook {
   override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled
-  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy
+  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy()
 }
 
 object TournamentPlaybook extends NormalPlaybook {
@@ -74,8 +73,11 @@ object HumanPlaybook extends NormalPlaybook {
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionDynamic
 }
 
+object PretrainingPlaybook extends NormalPlaybook {
+  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionDynamic
+}
+
 class TestingPlaybook extends NormalPlaybook {
-  override lazy val forced: Seq[Strategy] = Seq(PvP2Gate1012Goon)
   override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
   override def respectOpponent: Boolean = false
   override def respectMap: Boolean = false

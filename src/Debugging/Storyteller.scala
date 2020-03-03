@@ -1,6 +1,6 @@
 package Debugging
 
-import Debugging.Visualizations.Views.Planning.ShowStrategyEvaluations
+import Debugging.Visualizations.Views.Planning.{ShowStrategyEvaluations, ShowStrategyInterest}
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Planning.Predicates.Reactive.{SafeAtHome, SafeToMoveOut}
@@ -64,6 +64,7 @@ class Storyteller {
     Story("Enemy Barracks",     () => With.units.countEnemy(Terran.Barracks).toString),
     Story("Enemy Gateways",     () => With.units.countEnemy(Protoss.Gateway).toString),
     Story("Enemy Hatcheries",   () => With.units.countEnemy(UnitMatchHatchery).toString),
+    Story("Rush distances",     () => With.geography.rushDistances.mkString(", ")),
     Story("Performance danger", () => With.performance.danger.toString)
   )
 
@@ -126,8 +127,14 @@ class Storyteller {
     columns.map(_.mkString("\t")).foreach(With.logger.debug)
   }
 
+  private def logStrategyInterest(): Unit = {
+    With.logger.debug("Strategy interest")
+    ShowStrategyInterest.evaluations.map(p => p._1 + " " + p._2).foreach(With.logger.debug)
+  }
+
   def onEnd(): Unit = {
     logPerformance()
     logStrategyEvaluation()
+    logStrategyInterest()
   }
 }

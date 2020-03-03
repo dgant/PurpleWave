@@ -1,145 +1,33 @@
 package Strategery.Selection
 
-import Strategery.Strategies.Protoss._
-import Strategery.{Heartbreak, MapGroups}
-
 object Opponents {
   private var allKnown: Vector[Opponent] = Vector.empty
-  
-  def add(opponent: Opponent): Opponent   = {
-    allKnown = allKnown :+ opponent
-    opponent
-  }
+  private def add(name: String, policy: StrategySelectionPolicy = StrategySelectionGreedy()): Opponent = { val output = Opponent(name, policy); allKnown = allKnown :+ output; output }
 
-  val pvzFFE1   = Seq(PvZFFEEconomic, PvZMidgame5GateGoonReaver,  PvZLateGameReaver)
-  val pvzFFE2   = Seq(PvZFFEEconomic,                             PvZMidgameNeoBisu,          PvZLateGameTemplar)
-  val pvz2Gate  = Seq(PvZ2Gate1012,   PvZ4GateGoon,               PvZMidgame5GateGoonReaver,  PvZLateGameReaver)
-  val pvz1Gate  = Seq(PvZ10Gate,      PvZDT,                      PvZMidgameBisu,             PvZLateGameTemplar)
-
-  val zergRotation = Vector(
-    pvzFFE1,
-    pvz2Gate,
-    pvz1Gate,
-    pvzFFE2,
-    Seq(PvZ2Gate910,    PvZSpeedlot,  PvZMidgameBisu,        PvZLateGameTemplar))
-
-  val defaultPvT  = StrategySelectionGreedy
-  val defaultPvP  = StrategySelectionGreedy
-  val defaultPvZ  = new StrategySelectionRecommended(StrategySelectionSequence(zergRotation), pvzFFE1: _*)
-  val fixedPvT    = StrategySelectionFixed(PvT1015DT, PvT3BaseArbiter)
-  val fixedPvZ    = StrategySelectionFixed(PvZ2Gate910, PvZ4GateGoon, PvZMidgame5GateGoon, PvZLateGameTemplar)
-  val fixedPvR    = StrategySelectionFixed(PvR1BaseDT)
-  val safePvZ     = new StrategySelectionRecommended(StrategySelectionGreedy, PvZ1BaseForgeTech, PvZMidgameNeoBisu, PvZLateGameTemplar)
-
-  // AIST3 opponents
-  val bananabrain   : Opponent = add(Opponent("BananaBrain",  StrategySelectionSequence(Vector(
-    Seq(PvP2GateDTExpand),
-    Seq(PvP4GateGoon),
-    Seq(PvP1ZealotExpand),
-    Seq(PvP2Gate1012DT)))))
-  val dragon        : Opponent = add(Opponent("Dragon",       StrategySelectionSequence(Vector(
-    Seq(PvTProxy2Gate,  PvT2BaseReaver, PvT3BaseGateway),
-    Seq(PvT32Nexus,     PvT2BaseGateway),
-    Seq(PvT13Nexus,     PvT2BaseReaver, PvT3BaseCarrier)))))
-  val letabot       : Opponent = add(Opponent("LetaBot",      StrategySelectionSequence(Vector(
-    Seq(PvTDTExpand,  PvT3rdFast,       PvT3BaseArbiter),
-    Seq(PvT21Nexus,   PvT2BaseReaver,   PvT3BaseCarrier),
-    Seq(PvT13Nexus,   PvT3rdObs,        PvT3BaseCarrier)))))
-  val locutus       : Opponent = add(Opponent("Locutus",      StrategySelectionSequence(Vector(
-    Seq(PvP2GateDTExpand),
-    Seq(PvP4GateGoon),
-    Seq(PvP1ZealotExpand),
-    Seq(PvP2Gate1012DT)))))
-  val mcrave        : Opponent = add(Opponent("McRave",       StrategySelectionGreedy))
-  val microwave     : Opponent = add(Opponent("Microwave",    StrategySelectionSequence(Vector(
-    Seq(PvZ2Gate910, PvZ4GateGoon, PvZMidgame5GateGoon, PvZLateGameReaver),
-    Seq(PvZFFEEconomic, PvZMidgame5GateGoonReaver, PvZLateGameReaver),
-    Seq(PvZ2Gate1012, PvZDT, PvZMidgameBisu, PvZLateGameTemplar)))))
-  val willyt        : Opponent = add(Opponent("WillyT",       StrategySelectionDynamic))
-
-  // TorchUp opponents
-  val bunkerBoxer   : Opponent = add(Opponent("BunkerBoxeR",  new StrategySelectionRecommended(StrategySelectionGreedy, PvT32Nexus, PvT3BaseArbiter)))
-  val zzzkbot       : Opponent = add(Opponent("ZZZKBot",      safePvZ))
-  val crona         : Opponent = add(Opponent("Crona",        StrategySelectionSequence(zergRotation)))
-  val cunybot       : Opponent = add(Opponent("CUNYBot",      safePvZ))
-  val ecgberht      : Opponent = add(Opponent("Ecgberht",     defaultPvT))
-  val haopan        : Opponent = add(Opponent("Hao Pan",      new StrategySelectionRecommended(StrategySelectionGreedy, PvT32Nexus, PvT2BaseCarrier)))
-  val styxz         : Opponent = add(Opponent("StyxZ",        defaultPvZ))
-  val tcpzerg       : Opponent = add(Opponent("TCPZerg",      safePvZ))
-
-  // SSCAIT opponents
-  val killerbot     : Opponent = add(Opponent("Killerbot",    StrategySelectionFixed(PvZFFEEconomic, PvZMidgame5GateGoonReaver, PvZLateGameReaver)))
-  val mariandevecka : Opponent = add(Opponent("Marian Devecka", killerbot.policy))
-  val cherrypi      : Opponent = add(Opponent("CherryPiSSCAIT2017",
-    if (MapGroups.badForProxying.exists(_.matches))
-      StrategySelectionFixed(PvZ2Gate910, PvZSpeedlot, PvZMidgame5GateGoonReaver, PvZLateGameReaver)
-    else
-      StrategySelectionFixed(PvZProxy2Gate, PvZ2Gate910, PvZSpeedlot, PvZMidgame5GateGoonReaver, PvZLateGameReaver)))
-  val locutusClonePolicy = StrategySelectionSequence(Vector(
-    Seq(PvP2Gate1012DT),
-    Seq(PvPRobo),
-    Seq(PvP2GateDTExpand),
-    Seq(PvPProxy2Gate)))
-  val znzzbot       : Opponent = add(Opponent("ZNZZBot",      locutusClonePolicy))
-  val betastar      : Opponent = add(Opponent("BetaStar",     locutusClonePolicy))
-  val daqin         : Opponent = add(Opponent("DaQin",        locutusClonePolicy))
-
-  // AIIDE opponents
-  val aitp          : Opponent = add(Opponent("AITP",         defaultPvT))
-  val apollo        : Opponent = add(Opponent("Apollo",       defaultPvZ))
-  val cdbot         : Opponent = add(Opponent("CDBot",        defaultPvZ))
-  // dandan/daqin below
-  val firefrog      : Opponent = add(Opponent("Firefrog",     defaultPvZ))
-  val iron          : Opponent = add(Opponent("Iron bot",           StrategySelectionFixed(PvT1015DT, PvT2BaseCarrier)))
-  val dandanbot     : Opponent = add(Opponent("DanDanBot",    locutus.policy))
-  val metabot       : Opponent = add(Opponent("MegaBot",      StrategySelectionFixed(PvPRobo)))
-  val skynet        : Opponent = add(Opponent("Skynet",       metabot.policy)) // For testing purposes
-  val andrewsmith   : Opponent = add(Opponent("Andrew Smith", metabot.policy)) // For testing purposes
-  val aiur          : Opponent = add(Opponent("Aiur",         metabot.policy)) // For testing purposes
-  val richoux       : Opponent = add(Opponent("Florian Richoux",metabot.policy))
-  val vajda         : Opponent = add(Opponent("Tomas Vajda",  metabot.policy))
-  val ximp          : Opponent = add(Opponent("XIMP",         metabot.policy))
-  val murph         : Opponent = add(Opponent("Murph",        defaultPvP))
-  val ophelia       : Opponent = add(Opponent("Ophelia",      defaultPvZ))
-  val steamhammer   : Opponent = add(Opponent("Steamhammer",  defaultPvZ))
-  val stormbreaker  : Opponent = add(Opponent("Stormbreaker", defaultPvT))
-  val xiaoyi        : Opponent = add(Opponent("XiaoYi",       new StrategySelectionRecommended(StrategySelectionGreedy, PvT13Nexus, PvT2BaseCarrier) { duration = 3 }))
-
-  // Returning AIIDE opponents
-  val cse           : Opponent = add(Opponent("CSE",          (if (Heartbreak.matches) StrategySelectionFixed(PvP2Gate1012DT) else StrategySelectionFixed(PvP2GateDTExpand))))
-  val saida         : Opponent = add(Opponent("SAIDA",        StrategySelectionFixed(PvT28Nexus, PvT2BaseCarrier)))
-  val adias         : Opponent = add(Opponent("adias",        saida.policy))
-  val ualbertabot   : Opponent = add(Opponent("UAlbertaBot",  fixedPvR))
-
-  // Other tournaments
-
-  val megabot       : Opponent = add(Opponent("MegaBot",      defaultPvP))
-  //val aiur          : Opponent = add(Opponent("Aiur",         defaultPvP)) -- Disabled temporarily while testing MetaBot for AIIDE
-  val tyr           : Opponent = add(Opponent("Tyr",          StrategySelectionFixed(PvP2GateDTExpand)))
-  val overkill      : Opponent = add(Opponent("Overkill",     fixedPvZ))
-  val ziabot        : Opponent = add(Opponent("Ziabot",       fixedPvZ))
-  val opprimobot    : Opponent = add(Opponent("OpprimoBot",   new StrategySelectionRecommended(fixedPvR)))
-  val bonjwa        : Opponent = add(Opponent("Bonjwa",       fixedPvT))
-  val terranuab     : Opponent = add(Opponent("TerranUAB",    fixedPvT))
-  val srbotone      : Opponent = add(Opponent("SRbotOne",     fixedPvT))
-  val sling         : Opponent = add(Opponent("Sling",        fixedPvZ))
-  val salsa         : Opponent = add(Opponent("Salsa",        fixedPvZ))
-  val korean        : Opponent = add(Opponent("Korean",       defaultPvZ))
-  val isamind       : Opponent = add(Opponent("ISAMind",      locutus.policy))
+  // Aliased
+  val iron        : Opponent = add("Iron")
+  val letabot     : Opponent = add("LetaBot")
+  val megabot     : Opponent = add("MegaBot")
+  val zzzkbot     : Opponent = add("ZZZKBot")
+  val ualbertabot : Opponent = add("UAlbertaBot")
+  val aiur        : Opponent = add("AIUR")
+  val overkill    : Opponent = add("Overkill")
+  val zia         : Opponent = add("Zia")
+  val srbotone    : Opponent = add("SRBotOne")
+  val cunybot     : Opponent = add("CUNYBot")
 
   // Aliases
-  val mcravez           : Opponent = add(Opponent("McRaveZ",            mcrave.policy))
-  val ironbot           : Opponent = add(Opponent("Iron bot",           iron.policy))
-  val martinrooijackers : Opponent = add(Opponent("Martin Rooijackers", letabot.policy))
-  val megabot2017       : Opponent = add(Opponent("MegaBot2017",        megabot.policy))
-  val chriscoxe         : Opponent = add(Opponent("Chris Coxe",         zzzkbot.policy))
-  val davechurchill     : Opponent = add(Opponent("Dave Churchill",     ualbertabot.policy))
-  val florianrichoux    : Opponent = add(Opponent("Florian Richoux",    aiur.policy))
-  val sijiaxu           : Opponent = add(Opponent("Sijia Xu",           overkill.policy))
-  val ziabot2           : Opponent = add(Opponent("Zia bot",            ziabot.policy))
-  val johankayser       : Opponent = add(Opponent("Johan Kayser",       srbotone.policy))
-  val bryanweber        : Opponent = add(Opponent("Bryan Weber",        cunybot.policy))
-  val jadien            : Opponent = add(Opponent("jadien",             locutus.policy))
+  val ironbot           : Opponent = add("Iron bot",           iron.policy)
+  val martinrooijackers : Opponent = add("Martin Rooijackers", letabot.policy)
+  val megabot2017       : Opponent = add("MegaBot2017",        megabot.policy)
+  val chriscoxe         : Opponent = add("Chris Coxe",         zzzkbot.policy)
+  val davechurchill     : Opponent = add("Dave Churchill",     ualbertabot.policy)
+  val florianrichoux    : Opponent = add("Florian Richoux",    aiur.policy)
+  val sijiaxu           : Opponent = add("Sijia Xu",           overkill.policy)
+  val ziabot            : Opponent = add("Zia bot",            zia.policy)
+  val johankayser       : Opponent = add("Johan Kayser",       srbotone.policy)
+  val bryanweber        : Opponent = add("Bryan Weber",        cunybot.policy)
+  val jadien            : Opponent = add("jadien",             iron.policy)
   
   val all: Vector[Opponent] = allKnown
 }

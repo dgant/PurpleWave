@@ -14,7 +14,7 @@ object ShowUnitCounts extends View {
 
     if (unitCounts.nonEmpty) {
       val text = Vector(Vector("Our units", "")) ++ unitCounts.map(row => Vector(row._2.size.toString, row._1.toString))
-      DrawScreen.table(5, 5 * With.visualization.lineHeightSmall, text)
+      DrawScreen.table(480, 5 * With.visualization.lineHeightSmall, text)
     }
   }
 }

@@ -24,7 +24,6 @@ object KeyboardCommands {
       case "4"          => With.game.setLocalSpeed(0)     ; With.camera.enabled = false
       case "perform"    => { With.configuration.enablePerformancePauses = ! With.performance.enablePerformancePauses; Manners.chat("Performance stops? " + With.configuration.enablePerformancePauses) }
       case "map"        => Manners.chat("The current map is " + With.game.mapName + ": " + With.game.mapFileName)
-      case "strategize" => With.strategy.selectInitialStrategies
 
       case "get out"    => quitVsHuman()
       case "quit"       => quitVsHuman()

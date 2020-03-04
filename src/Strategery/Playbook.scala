@@ -15,8 +15,6 @@ import Strategery.Strategies.Zerg._
 class Playbook {
   val none: Seq[Strategy] = Seq.empty
   lazy val disabled : Seq[Strategy] = none
-  val strategyOrder: Seq[Strategy] = Vector(
-  )
   def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy()
   def enemyName: String = With.enemy.name
   def respectOpponent: Boolean = true

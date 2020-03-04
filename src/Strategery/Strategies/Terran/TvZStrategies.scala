@@ -10,7 +10,7 @@ abstract class TvZStrategy extends Strategy {
   override def enemyRaces: Iterable[Race] = Vector(Race.Zerg)
 }
 
-abstract class TvZMidgame extends Strategy {
+abstract class TvZMidgame extends TvZStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     Vector(TvZSK))
 }

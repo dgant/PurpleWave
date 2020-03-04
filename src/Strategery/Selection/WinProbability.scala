@@ -1,6 +1,6 @@
 package Strategery.Selection
 
-import Lifecycle.With
+import Mathematics.PurpleMath
 import Strategery.Strategies.Strategy
 
 object WinProbability {
@@ -18,8 +18,6 @@ object WinProbability {
   // When we have an untested strategy, we can be optimistic in the face of uncertainty: P(A|win) == goal_wr and P(B|win) == 1 - goal_wr
   //
   def apply(strategies: Iterable[Strategy]): Double = {
-    val winning = With.strategy.winProbability * strategies.map(_.evaluation.probabilityPerWin).product
-    val losing  = (1 - With.strategy.winProbability) * strategies.map(_.evaluation.probabilityPerWin).product
-    winning / (winning + losing)
+    PurpleMath.geometricMean(strategies.map(_.evaluation.probabilityWin))
   }
 }

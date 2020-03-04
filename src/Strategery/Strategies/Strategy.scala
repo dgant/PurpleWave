@@ -8,7 +8,7 @@ import bwapi.Race
 
 abstract class Strategy {
   
-  override def toString: String = getClass.getSimpleName.replace("$", "")
+  override val toString: String = getClass.getSimpleName.replace("$", "")
   
   def gameplan: Option[Plan] = { None }
   

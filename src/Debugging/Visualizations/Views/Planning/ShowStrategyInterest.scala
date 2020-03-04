@@ -5,7 +5,7 @@ import Lifecycle.With
 
 object ShowStrategyInterest extends View {
 
-  def evaluations: Vector[(String, String)] = With.strategy.winProbabilityByBranch
+  def evaluations: Vector[(String, String)] = With.strategy.winProbabilityByBranchLegal
     .toVector
     .sortBy( - _._2)
     .map(pair => (formatPercentage(pair._2), pair._1.toSeq.map(_.toString).sorted.mkString(" + ")))

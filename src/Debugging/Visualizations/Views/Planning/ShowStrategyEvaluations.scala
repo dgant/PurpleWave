@@ -18,17 +18,13 @@ object ShowStrategyEvaluations extends View {
   }
 
   def columns: Vector[Vector[String]] = {
-    val evaluations = With.strategy.evaluations.values
-      .toVector
-      .sortBy(_.playbookOrder)
-      .sortBy( - _.probabilityWin)
+    val evaluations = With.strategy.evaluations.values.toVector.sortBy( - _.probabilityWin)
 
     Vector(
       Vector("Strategy") ++ evaluations.map(_.strategy.toString),
-      Vector("Order")    ++ evaluations.map(e => if (e.playbookOrder > 100) "" else e.playbookOrder.toString),
       Vector("#Games")   ++ evaluations.map(e => formatGames(e.gamesUs.size)),
       Vector("#Wtd")     ++ evaluations.map(e => formatGames(e.gamesUs.map(_.weight).sum)),
-      Vector("#WtdWins") ++ evaluations.map(e => formatGames(e.gamesUs.map(_.winsWeighted).sum)),
+      Vector("#WtdWins") ++ evaluations.map(e => formatGames(e.gamesUs.filter(_.won).map(_.weight).sum)),
       Vector("WinPct")   ++ evaluations.map(e => formatPercentage(e.winrateVsEnemy)),
       Vector("WinEst")   ++ evaluations.map(e => formatPercentage(e.probabilityWin)))
   }

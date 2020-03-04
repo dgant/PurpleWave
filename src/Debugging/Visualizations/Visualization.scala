@@ -33,8 +33,9 @@ class Visualization {
     ShowPerformanceSummary,
 
     // Temporary views
-    ShowProduction,
-    ShowUnitCounts
+    //ShowProduction,
+    //ShowUnitCounts
+    ShowStrategyInterest
   )
   
   var enabled   : Boolean = _

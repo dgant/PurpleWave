@@ -1,7 +1,8 @@
 package Lifecycle
 
 import Mathematics.PurpleMath
-import Strategery.Selection.{StrategySelectionGreedy, StrategySelectionPolicy}
+import Strategery.Selection.{ExpandStrategy, StrategySelectionGreedy, StrategySelectionPolicy}
+import Strategery.Strategies.AllChoices
 import Strategery.{HumanPlaybook, PretrainingPlaybook, TestingPlaybook, TournamentPlaybook}
 
 object ConfigurationLoader {
@@ -101,18 +102,23 @@ object ConfigurationLoader {
   }
 
   private def setFixedBuild(strategyNamesText: String): Unit = {
+    // The implementation of this is a little tricky because we have to call this before the Strategist has been instantiated
+
+    // Get all the strategy names
     val strategyNamesLines = strategyNamesText.replaceAll(",", " ").replaceAll("  ", " ").split("[\r\n]+").filter(_.nonEmpty).toVector
-    val strategyNames = PurpleMath.sample(strategyNamesLines).split(" ").toVector
-    val strategyNamesAndInstances = strategyNames.map(name => (name, With.strategy.legalities.keys.find(_.toString == name)))
-    val strategyNamesUnmatched = strategyNamesAndInstances.filter(_._2.isEmpty).map(_._1)
-    val strategyInstances = strategyNamesAndInstances.filter(_._2.nonEmpty).map(_._2.get)
+    val strategyNames = PurpleMath.sample(strategyNamesLines).split(" ")
+
+    // Get all the mapped strategy objects
+    val strategyByName          = AllChoices.tree.flatMap(ExpandStrategy.apply).distinct.map(s => (s.toString, s)).toMap
+    val strategyNamesUnmatched  = strategyNames.filterNot(strategyByName.contains)
+    val strategies              = strategyNames.flatMap(strategyByName.get)
     if (strategyNamesUnmatched.nonEmpty) {
       With.logger.warn("Tried to use fixed build but failed to match builds: (" + strategyNamesUnmatched.mkString(", ") + ") from (" + strategyNamesLines.mkString(", ") + ")")
     }
-    if (strategyInstances.nonEmpty) {
+    if (strategies.nonEmpty) {
       With.logger.debug("Using fixed build: " + strategyNamesText)
       config.forcedPlaybook = Some(new TestingPlaybook {
-          override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy(Some(Seq(strategyInstances)))
+          override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy(Some(strategies))
       })
     }
   }

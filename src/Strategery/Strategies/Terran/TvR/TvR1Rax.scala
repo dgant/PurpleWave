@@ -1,13 +1,13 @@
 package Strategery.Strategies.Terran.TvR
 
 import Strategery.Strategies.Strategy
-import Strategery.Strategies.Terran.TerranChoices
+import Strategery.Strategies.Terran.{TerranChoices, TvT14CC}
 import bwapi.Race
 
 object TvR1Rax extends Strategy {
   
   override lazy val choices = Vector(
-    TerranChoices.tvtOpeners,
+    TerranChoices.tvtOpeners.filterNot(_ == TvT14CC),
     TerranChoices.tvpOpeners,
     TerranChoices.tvzOpeners)
   

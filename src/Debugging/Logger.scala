@@ -14,7 +14,7 @@ class Logger {
   private var errorOcurred = false
   
   def flush(): Unit = {
-    var shouldFlush = errorOcurred || With.configuration.debugging
+    val shouldFlush = errorOcurred || With.configuration.debugging
     if ( ! shouldFlush) return
 
     var opponents: String = ""
@@ -31,28 +31,25 @@ class Logger {
   }
   
   def onException(exception: Exception) {
-    errorOcurred = true
-    log("An exception was thrown on frame " + With.frame)
-    logMessages.append(formatException(exception))
+    error("An exception was thrown on frame " + With.frame)
     debug(formatException(exception))
   }
   
   def debug(message: String) {
-    log(message, chat = false)
+    log("DEBUG | " + message, chat = false)
   }
   
   def warn(message: String) {
-    errorOcurred = true
-    log(message)
+    log("WARN  | " + message)
   }
   
   def error(message: String) {
     errorOcurred = true
-    log(message)
+    log("ERROR | " + message)
   }
   
   private def log(message: String, chat: Boolean = true) {
-    var logMessage = With.frame + " | " + new GameTime(With.frame).toString + " | " + message
+    val logMessage = With.frame.toString + " | " + new GameTime(With.frame).toString + " | " + message
     logMessages.append(logMessage)
     System.err.println(logMessage)
     if (chat && With.configuration.debugging) Manners.chat(message)

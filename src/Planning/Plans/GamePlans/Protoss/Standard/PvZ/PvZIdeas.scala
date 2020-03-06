@@ -26,7 +26,7 @@ object PvZIdeas {
       new Or(
         new EnemyStrategy(With.fingerprints.fourPool),
         new And(
-          new Not(new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.twelvePool, With.fingerprints.tenHatch, With.fingerprints.ninePool, With.fingerprints.overpool)),
+          new Not(new EnemyRecentStrategy(With.fingerprints.twelveHatch, With.fingerprints.twelvePool, With.fingerprints.tenHatch, With.fingerprints.ninePool, With.fingerprints.overpool)),
           new EnemyRecentStrategy(With.fingerprints.fourPool),
           new Check(() => With.intelligence.enemyHasScoutedUsWithWorker))),
       new FrameAtMost(GameTime(6, 0)()),

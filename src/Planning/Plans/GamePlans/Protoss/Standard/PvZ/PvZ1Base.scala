@@ -26,13 +26,13 @@ import Planning.UnitMatchers.{UnitMatchAntiAir, UnitMatchWarriors}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss.{PvZ4GateGoon, PvZCorsair, PvZDT, PvZSpeedlot}
 
-class PvZ1Base extends GameplanTemplate {
+abstract class PvZ1Base extends GameplanTemplate {
 
-  override val completionCriteria = new Latch(new MiningBasesAtLeast(2))
-  override def buildOrder      = ProtossBuilds.TwoGate1012
-  override def workerPlan      = NoPlan()
-  override val scoutPlan: Plan = new If(new StartPositionsAtLeast(4), new ScoutOn(Protoss.Pylon), new ScoutOn(Protoss.Gateway))
-  override def placementPlan   = new ProposePlacement {
+  override val completionCriteria   = new Latch(new MiningBasesAtLeast(2))
+  override def buildOrder           = ProtossBuilds.TwoGate1012
+  override def workerPlan           = NoPlan()
+  override val scoutPlan: Plan      = new If(new StartPositionsAtLeast(4), new ScoutOn(Protoss.Pylon), new ScoutOn(Protoss.Gateway))
+  override def placementPlan: Plan  = new ProposePlacement {
     override lazy val blueprints = Vector(
       new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.hugTownHall)),
       new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.hugTownHall)),
@@ -132,7 +132,7 @@ class PvZ1Base extends GameplanTemplate {
             new Not(new GettingCorsair)),
           new If(
             new GettingGoons,
-            new CapGasWorkersAtRatio(.14),
+            new CapGasWorkersAtRatio(.12),
             new If(
               new GasForUpgrade(Protoss.ZealotSpeed),
               new CapGasAt(0),
@@ -166,6 +166,11 @@ class PvZ1Base extends GameplanTemplate {
             new And(new UnitsAtLeast(14,  UnitMatchWarriors), new SafeAtHome),
             new UnitsAtLeast(20, UnitMatchWarriors, complete = true)))),
       new RequireMiningBases(2)),
+
+    // Make sure we hit the 4-Gate timing
+    new If(
+      new And(new GettingGoons, new UnitsAtLeast(1, Protoss.CyberneticsCore), new SafeAtHome),
+      new Build(Get(Protoss.DragoonRange), Get(4, Protoss.Gateway))),
 
     // Train army/workers
     new Pump(Protoss.Probe, 16),

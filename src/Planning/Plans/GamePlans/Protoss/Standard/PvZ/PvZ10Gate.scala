@@ -6,7 +6,7 @@ import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvZ10Gate
 
-class PvZ10Gate extends PvZ2Gate1012 {
+class PvZ10Gate extends PvZ1Base {
   override val activationCriteria = new Employing(PvZ10Gate)
   override val scoutPlan = new ScoutOn(Protoss.Gateway)
   override def buildOrder = Vector(

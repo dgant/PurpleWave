@@ -41,15 +41,11 @@ class Storyteller {
 
   val stories: Seq[Story] = Seq[Story](
     Story("Opponents",          () => With.enemies.filter(_.isEnemy).map(_.name).mkString(", ")),
+    Story("Rush distances",     () => With.geography.rushDistances.mkString(", ")),
     Story("Playbook",           () => With.configuration.playbook.toString),
     Story("Policy",             () => With.configuration.playbook.strategySelectionPolicy.toString),
-    Story("Strategy",           () => With.strategy.selectedCurrently.map(_.toString).mkString(" ")),
-    Story("Status",             () => With.blackboard.status.get.mkString(", ")),
-    Story("Safe at home",       () => new SafeAtHome().isComplete.toString),
-    Story("Safe to move out",   () => new SafeToMoveOut().isComplete.toString),
-    Story("Should attack",      () => With.blackboard.wantToAttack.get.toString),
     Story("Enemy race",         () => With.enemy.raceCurrent.toString),
-    Story("Fingerprints",       () => With.fingerprints.status.mkString(" ")),
+    Story("Strategy",           () => With.strategy.selectedCurrently.map(_.toString).mkString(" ")),
     Story("Our bases",          () => With.geography.ourBases.size.toString),
     Story("Enemy bases",        () => With.geography.enemyBases.size.toString),
     Story("Our techs",          () => interestingTechs.view.filter(With.self.hasTech).mkString(", ")),
@@ -64,14 +60,23 @@ class Storyteller {
     Story("Enemy Barracks",     () => With.units.countEnemy(Terran.Barracks).toString),
     Story("Enemy Gateways",     () => With.units.countEnemy(Protoss.Gateway).toString),
     Story("Enemy Hatcheries",   () => With.units.countEnemy(UnitMatchHatchery).toString),
-    Story("Rush distances",     () => With.geography.rushDistances.mkString(", ")),
+    Story("Safe at home",       () => new SafeAtHome().isComplete.toString),
+    Story("Safe to move out",   () => new SafeToMoveOut().isComplete.toString),
+    Story("Should attack",      () => With.blackboard.wantToAttack.get.toString),
+    Story("Fingerprints",       () => With.fingerprints.status.mkString(" ")),
+    Story("Status",             () => With.blackboard.status.get.mkString(", ")),
     Story("Performance danger", () => With.performance.danger.toString)
   )
-
+  var firstLog: Boolean = true
   def onFrame(): Unit = {
     stories.foreach(_.update())
     logIntelligence()
     logOurUnits()
+    if (firstLog) {
+      firstLog = false
+      logStrategyEvaluation()
+      logStrategyInterest()
+    }
   }
 
   var enemyUnitsBefore: Set[UnitClass] = Set.empty
@@ -134,7 +139,5 @@ class Storyteller {
 
   def onEnd(): Unit = {
     logPerformance()
-    logStrategyEvaluation()
-    logStrategyInterest()
   }
 }

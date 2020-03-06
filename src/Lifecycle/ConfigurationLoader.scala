@@ -2,7 +2,7 @@ package Lifecycle
 
 import Mathematics.PurpleMath
 import Strategery.Selection.{ExpandStrategy, StrategySelectionGreedy, StrategySelectionPolicy}
-import Strategery.Strategies.AllChoices
+import Strategery.Strategies.{AllChoices, Strategy}
 import Strategery.{HumanPlaybook, PretrainingPlaybook, TestingPlaybook, TournamentPlaybook}
 
 object ConfigurationLoader {
@@ -55,8 +55,9 @@ object ConfigurationLoader {
   }
 
   private def setLadderMode(): Unit = {
-    config.historyHalfLife                  = 20
+    config.historyHalfLife                  = 40
     config.targetFrameDurationMilliseconds  = 40
+    config.recentFingerprints               = 4
   }
 
   private def setEliminationMode(): Unit = {
@@ -64,7 +65,7 @@ object ConfigurationLoader {
   }
 
   private def setRoundRobinMode(): Unit = {
-    config.historyHalfLife                  = 20
+    config.historyHalfLife                  = 40
     config.recentFingerprints               = 4
   }
 
@@ -99,6 +100,11 @@ object ConfigurationLoader {
     config.visualizeDebug                   = true
     config.targetFrameDurationMilliseconds  = 20
     config.debugPauseThreshold              = 24 * 5
+    config.forcedPlaybook                   = Some(new TestingPlaybook)
+  }
+
+  def matchNames(names: Seq[String], branches: Seq[Seq[Strategy]]): Seq[Seq[Strategy]] = {
+    branches.filter(branch => names.forall(name => branch.exists(_.toString == name)))
   }
 
   private def setFixedBuild(strategyNamesText: String): Unit = {
@@ -109,16 +115,14 @@ object ConfigurationLoader {
     val strategyNames = PurpleMath.sample(strategyNamesLines).split(" ")
 
     // Get all the mapped strategy objects
-    val strategyByName          = AllChoices.tree.flatMap(ExpandStrategy.apply).distinct.map(s => (s.toString, s)).toMap
-    val strategyNamesUnmatched  = strategyNames.filterNot(strategyByName.contains)
-    val strategies              = strategyNames.flatMap(strategyByName.get)
-    if (strategyNamesUnmatched.nonEmpty) {
-      With.logger.warn("Tried to use fixed build but failed to match builds: (" + strategyNamesUnmatched.mkString(", ") + ") from (" + strategyNamesLines.mkString(", ") + ")")
+    var matchingBranches = matchNames(strategyNames, AllChoices.tree.flatMap(ExpandStrategy.apply).distinct)
+    if (matchingBranches.isEmpty) {
+      With.logger.warn("Tried to use fixed build but failed to match " + strategyNamesText)
     }
-    if (strategies.nonEmpty) {
+    if (matchingBranches.nonEmpty) {
       With.logger.debug("Using fixed build: " + strategyNamesText)
       config.forcedPlaybook = Some(new TestingPlaybook {
-          override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy(Some(strategies))
+        override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy(Some(matchingBranches))
       })
     }
   }

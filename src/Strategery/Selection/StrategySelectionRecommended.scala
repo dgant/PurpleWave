@@ -7,8 +7,6 @@ class StrategySelectionRecommended(fallback: StrategySelectionPolicy, recommende
 
   var duration = 5
 
-  override def toString: String = "StrategySelectionRecommended: (" + recommendedBranch.mkString(" + ") + ")"
-
   override def chooseBranch: Seq[Strategy] = {
     var legalMatchedBranches = With.strategy.strategyBranchesLegal.filter(branch => recommendedBranch.forall(branch.contains))
 

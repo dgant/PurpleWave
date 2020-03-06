@@ -11,12 +11,9 @@ class StrategyEvaluation(val strategy: Strategy) {
   // Increase to revisit lost strategies sooner
   // Decrease to abandon them more aggressively
   val priorGames            : Double = 1.5
-  val gamesAll              : Iterable[HistoricalGame]  = With.strategy.gamesVsOpponent
-  val gamesAllWon           : Iterable[HistoricalGame]  = gamesAll.filter(_.won)
-  val gamesAllLost          : Iterable[HistoricalGame]  = gamesAll.filterNot(_.won)
-  val gamesUs               : Iterable[HistoricalGame]  = gamesAll.filter(_.weEmployed(strategy))
-  val gamesUsWon            : Iterable[HistoricalGame]  = gamesUs.filter(_.won)
-  val gamesUsLost           : Iterable[HistoricalGame]  = gamesUs.filterNot(_.won)
+  val gamesUs               : Vector[HistoricalGame]  = With.strategy.gamesVsOpponent.filter(_.weEmployed(strategy)).toVector
+  val gamesUsWon            : Vector[HistoricalGame]  = gamesUs.filter(_.won)
+  val gamesUsLost           : Vector[HistoricalGame]  = gamesUs.filterNot(_.won)
   val gamesUsWeightSum      : Double  = gamesUs     .map(_.weight).sum
   val gamesUsWonWeightSum   : Double  = gamesUsWon  .map(_.weight).sum
   val targetWins            : Double  = With.configuration.targetWinrate

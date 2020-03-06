@@ -15,14 +15,14 @@ class Yolo {
   private var lastUpdate: Int = 0
   private var maxoutFramesCharged: Int = 0
   private var maxoutYolo: Boolean = false
-  private val maxoutYoloFrameThreshold = GameTime(0, 40)()
+  private val maxoutYoloFrameThreshold = GameTime(2, 0)()
 
   private def maxouted = With.self.supplyUsed / 2 >= 192 && With.units.ours.forall(u => ! u.unitClass.isCarrier || u.interceptorCount > 7)
 
   def update(): Unit = {
     var frames = With.framesSince(lastUpdate)
     lastUpdate = With.frame
-    if (maxouted) {
+    if (maxouted && With.frame > GameTime(20, 0)()) {
       maxoutFramesCharged += frames
     } else {
       maxoutFramesCharged -= 2 * frames

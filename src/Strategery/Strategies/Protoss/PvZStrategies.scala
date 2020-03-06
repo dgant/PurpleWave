@@ -28,7 +28,7 @@ object PvZ1BaseForgeTech extends PvZStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgameNeoBisu))
 }
 object PvZSpeedlot extends PvZStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgame5GateGoon, PvZMidgame5GateGoonReaver, PvZMidgameBisu, PvZMidgameNeoBisu, PvZMidgameNeoNeoBisu, PvZMidgame4Gate2Archon))
+  override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgameBisu, PvZMidgameNeoBisu, PvZMidgameNeoNeoBisu, PvZMidgame4Gate2Archon))
 }
 object PvZ4GateGoon extends PvZStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgame5GateGoon, PvZMidgame5GateGoonReaver))

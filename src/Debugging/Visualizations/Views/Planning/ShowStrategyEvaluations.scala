@@ -18,7 +18,7 @@ object ShowStrategyEvaluations extends View {
   }
 
   def columns: Vector[Vector[String]] = {
-    val evaluations = With.strategy.evaluations.values.toVector.sortBy( - _.probabilityWin)
+    val evaluations = With.strategy.evaluations.values.filter(e => e.strategy.legality.isLegal || e.gamesUs.nonEmpty).toVector.sortBy( - _.probabilityWin)
 
     Vector(
       Vector("Strategy") ++ evaluations.map(_.strategy.toString),

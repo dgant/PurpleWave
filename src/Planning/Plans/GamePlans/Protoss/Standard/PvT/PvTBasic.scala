@@ -27,19 +27,6 @@ import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
 
 class PvTBasic extends GameplanTemplate {
-  override val activationCriteria = new Employing(
-    PvT13Nexus,
-    PvT21Nexus,
-    PvT28Nexus,
-    PvT32Nexus,
-    PvT2GateRangeExpand,
-    PvTDTExpand,
-    PvT1GateReaver,
-    PvT2BaseReaver,
-    PvT2BaseCarrier,
-    PvT2BaseArbiter,
-    PvT3BaseCarrier,
-    PvT3BaseArbiter)
 
   override def archonPlan: Plan =
     new If(new EnemyStrategy(With.fingerprints.bio),
@@ -123,10 +110,7 @@ class PvTBasic extends GameplanTemplate {
   class EmployingCarriers   extends And(new Employing(PvT2BaseCarrier, PvT3BaseCarrier), new Not(new EmployingGateway))
   class EmployingArbiters   extends And(new Employing(PvT2BaseArbiter, PvT3BaseArbiter), new Not(new EmployingGateway))
   class EmployingReavers    extends Or(new Employing(PvT2BaseReaver), new UnitsAtLeast(1, Protoss.RoboticsSupportBay))
-  class EmployingTemplar    extends Or(
-    new And(new EmployingArbiters, new Not(new EmployingReavers)),
-    new UnitsAtLeast(1, Protoss.TemplarArchives),
-    new And(new UnitsAtLeast(1, Protoss.CitadelOfAdun), new UnitsAtMost(0, Protoss.RoboticsFacility)))
+  class EmployingDTRush     extends Or(new UnitsAtLeast(1, Protoss.TemplarArchives), new Employing(PvTStove, PvTDTExpand, PvT2BaseArbiter))
   class EnemyTwoPlusRax     extends EnemyStrategy(With.fingerprints.bbs, With.fingerprints.twoRax1113)
   class EnemyTwoPlusFac     extends EnemyStrategy(With.fingerprints.twoFac, With.fingerprints.threeFac, With.fingerprints.twoFacVultures, With.fingerprints.threeFacVultures)
 
@@ -332,7 +316,7 @@ class PvTBasic extends GameplanTemplate {
       new MonitorBases(Protoss.Observer)),
 
     // Pylon block
-    new If(new And(new MiningBasesAtLeast(3), new UnitsAtLeast(48, UnitMatchWorkers)), new PylonBlock),
+    new If(new And(new BasesAtLeast(3), new MiningBasesAtLeast(2), new UnitsAtLeast(45, UnitMatchWorkers)), new PylonBlock),
 
     /////////////////////////
     // Actual build order //
@@ -346,9 +330,9 @@ class PvTBasic extends GameplanTemplate {
     new If(
       new And(new SafeAtHome, new UnitsAtLeast(5, Protoss.Gateway)),
       new Parallel(
-        new If(new And(new EmployingTemplar,  new UnitsAtLeast(1, Protoss.CitadelOfAdun)),    new GoStorm),
-        new If(new And(new EmployingArbiters, new UnitsAtLeast(1, Protoss.CitadelOfAdun)),    new GoArbiter),
-        new If(new And(new EmployingCarriers, new UnitsAtLeast(1, Protoss.Stargate)),         new GoCarrier))),
+        new If(new And(new EmployingCarriers, new UnitsAtLeast(1, Protoss.Stargate)),       new GoCarrier),
+        new If(new And(new EmployingGateway,  new UnitsAtLeast(1, Protoss.CitadelOfAdun)),  new GoStorm),
+        new If(new And(new EmployingArbiters, new UnitsAtLeast(1, Protoss.CitadelOfAdun)),  new GoArbiter))),
 
     new HighPriorityTech,
     new PvTIdeas.TrainArmy,
@@ -367,7 +351,7 @@ class PvTBasic extends GameplanTemplate {
     new If(
       new EnemyTwoPlusFac,
       new If(
-        new EmployingTemplar,
+        new EmployingDTRush,
         new Parallel(new GoDT, new Build(Get(2, Protoss.Gateway))),
         new If(
           new EmployingReavers,
@@ -383,7 +367,7 @@ class PvTBasic extends GameplanTemplate {
     new If(
       new EnemyTwoPlusRax,
       new If(
-        new EmployingTemplar,
+        new EmployingDTRush,
         new GoDT, // DT stream will keep us alive until Vessels
         new If(
           new UnitsAtLeast(1, Protoss.RoboticsFacility),
@@ -411,15 +395,15 @@ class PvTBasic extends GameplanTemplate {
     new If(
       new EnemyTwoPlusFac,
       new If(
-        new EmployingTemplar,
+        new EmployingDTRush,
         new Parallel(new GoDT, new Build(Get(3, Protoss.Gateway)), new GoObs, new Build(Get(5, Protoss.Gateway))),
         new If(
           new EmployingReavers,
-            new Parallel(new GoReaver, new Build(Get(3, Protoss.Gateway))),
-            new If(
-              new UnitsAtLeast(1, Protoss.RoboticsFacility),
-              new Parallel(new GoObs, new Build(Get(5, Protoss.Gateway))),
-              new Parallel(new Build(Get(2, Protoss.Gateway)), new GoObs, new Build(Get(5, Protoss.Gateway))))))),
+            new Parallel(new GoReaver, new Build(Get(3, Protoss.Gateway), Get(2, Protoss.Assimilator))),
+            new Parallel(
+              new If(new UnitsAtMost(0, Protoss.RoboticsFacility), new Build(Get(2, Protoss.Gateway))),
+              new GoObs,
+              new Build(Get(4, Protoss.Gateway), Get(2, Protoss.Assimilator), Get(5, Protoss.Gateway)))))),
 
     // TODO: Against 3Fac: Maybe go up to 6 Gateways? See if it's necessary first
 
@@ -433,7 +417,7 @@ class PvTBasic extends GameplanTemplate {
     new If(
       new EnemyStrategy(With.fingerprints.bio),
       new If(
-        new EmployingTemplar,
+        new EmployingDTRush,
         new GoDT, // DT stream will keep us alive until Vessels
         new If(
           new Or(new EmployingReavers, new EmployingCarriers, new UnitsAtLeast(1, Protoss.RoboticsFacility)),

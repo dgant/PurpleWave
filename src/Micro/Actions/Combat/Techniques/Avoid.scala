@@ -5,11 +5,12 @@ import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Combat.Maneuvering.{DownhillPathfinder, Traverse}
+import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Heuristics.Potential
-import Planning.UnitMatchers.UnitMatchSiegeTank
-import ProxyBwapi.Races.Zerg
+import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWorkers}
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, TakeN}
 
@@ -82,6 +83,14 @@ object Avoid extends ActionTechnique {
     val desireForSafety     = PurpleMath.clamp(0, 3, (3 * (1 - unit.matchups.framesOfSafety / 72)).toInt)
     val desireProfile       = DesireProfile(desireToGoHome, desireForSafety, desireForFreedom)
 
+    // Don't spray out against Zerglings
+    if (unit.is(Protoss.Zealot) && unit.base == unit.agent.origin.base && unit.agent.origin.base.exists(_.isOurMain) && unit.matchups.threats.forall(_.isAny(Zerg.Zergling, UnitMatchWorkers))) {
+      unit.agent.toTravel = unit.agent.origin.base.map(_.heart.pixelCenter)
+      Potshot.delegate(unit)
+      Move.delegate(unit)
+      return
+    }
+
     if (unit.flying || (unit.transport.exists(_.flying) && unit.matchups.framesOfSafety <= 0)) {
       avoidPotential(unit, desireProfile)
       return
@@ -116,7 +125,6 @@ object Avoid extends ActionTechnique {
   }
 
   def avoidRealPath(unit: FriendlyUnitInfo, desireProfile: DesireProfile): Unit = {
-
     if (! unit.ready) return
 
     val pathLengthMinimum = 7

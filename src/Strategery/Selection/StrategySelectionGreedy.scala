@@ -3,7 +3,6 @@ import Lifecycle.With
 import Strategery.Strategies.Strategy
 
 case class StrategySelectionGreedy(requiredBranches: Option[Seq[Seq[Strategy]]] = None) extends StrategySelectionPolicy {
-  override def toString: String = "StrategySelectionRecommended: (" + branches.map(_.mkString(" + ")).mkString(", ") + ")"
 
   lazy val branches: Seq[Seq[Strategy]] = requiredBranches.getOrElse(With.strategy.strategyBranchesUnfiltered)
 

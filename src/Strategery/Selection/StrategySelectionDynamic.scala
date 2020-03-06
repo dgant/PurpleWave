@@ -7,13 +7,11 @@ import Strategery.Strategies.Strategy
 object StrategySelectionDynamic extends StrategySelectionPolicy {
 
   def chooseBranch: Seq[Strategy] = {
-    val weights = With.strategy.strategyBranchesLegal
-      .map(branch =>
-        (
-          branch,
-          Math.exp(With.configuration.dynamicStickiness * With.strategy.winProbabilityByBranch(branch)
-        )))
-      .toMap
+    val weights = StrategyShare.byBranch
+      .map(branch => (
+        branch._1,
+        Math.exp(With.configuration.dynamicStickiness * With.strategy.winProbabilityByBranch(branch._1)) / branch._2
+      ))
     PurpleMath.sampleWeighted(weights.keys.toSeq, w => weights(w)).get
   }
 }

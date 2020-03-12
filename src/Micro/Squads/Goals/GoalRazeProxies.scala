@@ -1,32 +1,30 @@
 package Micro.Squads.Goals
 
 import Mathematics.Points.Pixel
+import Mathematics.PurpleMath
 import Micro.Agency.Intention
-import Planning.UnitMatchers.{UnitMatchOr, UnitMatchRecruitableForCombat, UnitMatchWorkers}
-import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
-class GoalRazeProxies(var pixel: Pixel) extends SquadGoalBasic {
+class GoalRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends SquadGoalBasic {
 
+  private val proxyPixels   = assignments.values.toSeq.map(_.pixelCenter).distinct
+  private val centroidPixel = PurpleMath.centroid(proxyPixels)
+  private val centroidUnit  = ByOption.minBy(proxyPixels)(_.pixelDistance(centroidPixel)).getOrElse(super.destination)
+
+  override def destination: Pixel = centroidUnit
   override def inherentValue: Double = GoalValue.defendBase
 
-  override def toString: String = "Raze proxies in " + pixel.zone.name
+  override def toString: String = "Raze proxies"
 
   override def run() {
-    var keyTarget: Option[UnitInfo] = None
-    if (squad.enemies.forall(_.isAny(Protoss.Probe, Protoss.Pylon, Protoss.Gateway))) {
-      keyTarget = ByOption.minBy(squad.enemies.view.filter(_.is(Protoss.Pylon)).toVector)(u => u.totalHealth * (if (u.complete) 1 else 100))
-    }
-    val bunker = squad.enemies.find(e => e.isBunker() && ! e.complete)
-    keyTarget = keyTarget.orElse(bunker.flatMap(_.matchups.allies.find(a => a.unitClass.isWorker && a.orderTarget == bunker)))
-
-    squad.units.foreach(_.agent.intend(squad.client, new Intention {
-      toTravel = Some(pixel)
-      toAttack = keyTarget
-      canFlee = false
-    }))
+    squad.units.foreach(unit => {
+      val assignee = assignments.get(unit)
+      unit.agent.intend(squad.client, new Intention {
+        toTravel  = Some(assignee.map(_.pixelCenter).getOrElse(destination))
+        toAttack  = assignee
+        canFlee   = assignments.keys.forall( ! _.unitClass.isWorker)
+      })
+    })
   }
-
-  unitMatcher = UnitMatchOr(UnitMatchRecruitableForCombat, UnitMatchWorkers)
 }

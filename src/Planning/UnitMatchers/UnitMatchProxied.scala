@@ -25,7 +25,6 @@ abstract class UnitMatchAnyProxy extends UnitMatcher {
     bases
   }
 
-
   private def baseDistance(unit: UnitInfo, player: PlayerInfo): Double = {
     val bases = mainBases(player)
     val output = bases.map(base => unit.pixelDistanceTravelling(base.townHallTile)).min

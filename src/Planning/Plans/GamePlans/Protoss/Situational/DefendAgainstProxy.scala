@@ -1,105 +1,99 @@
 package Planning.Plans.GamePlans.Protoss.Situational
 
-import Information.Geography.Types.Base
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Squads.Goals.GoalRazeProxies
 import Micro.Squads.Squad
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.UnitCountBetween
-import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors, UnitMatchWorkers}
-import Planning.UnitPreferences.UnitPreferClose
+import Planning.UnitCounters.UnitCountExactly
+import Planning.UnitMatchers._
 import Planning.{Plan, Property}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.ByOption
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.{ByOption, Forever}
+
+import scala.collection.mutable
 
 class DefendAgainstProxy extends Plan {
-  
+
   val defenders = new Property[LockUnits](new LockUnits)
-  defenders.get.unitMatcher.set(UnitMatchOr(UnitMatchWorkers, UnitMatchWarriors))
-  
-  var lastProxyCount = 0
+  val squad = new Squad(this)
   
   override def onUpdate() {
-  
-    if (With.frame > GameTime(5, 0)()) {
-      return
-    }
-    
-    val proxies = getProxies.toVector.sortBy(_.totalHealth).sortBy(_.remainingCompletionFrames)
-    val squad = new Squad(this)
+    if (With.frame > GameTime(7, 0)()) return
 
-    def unitsNearby(proxy: UnitInfo) = With.units.inTileRadius(proxy.tileIncludingCenter, 8)
-    def enemiesNearby(proxy: UnitInfo) = unitsNearby(proxy).filter(_.isEnemy)
-    
+    // Get sorted list of proxies
+    val proxies = getProxies.toVector
+      .sortBy(_.remainingCompletionFrames)
+      .sortBy(_.totalHealth)
+      .sortBy( ! _.unitClass.trainsGroundUnits)
+      .sortBy(-_.dpfGround)
+
     if (proxies.isEmpty) return
-    
-    //TODO: Choose based on HP and remaining build time
-    //However, our remaining build time for enemy units depends on HP, and doesn't yet correctly identify damage taken.
-    val workersRequired = proxies.map(proxy =>
-      (
-        proxy,
-        if (enemiesNearby(proxy).exists(u => u.unitClass.isBuilding && u.canAttack))
-          // Don't pull new units in to attack cannons
-          unitsNearby(proxy).count(u => u.isOurs && u.canAttack)
-        else if (With.frame < GameTime(3, 15)()
-          && proxy.is(Protoss.Pylon)
-          && enemiesNearby(proxy).exists(_.is(Protoss.Gateway)))
-          6
-        else if (proxy.isBunker() && (proxy.complete || ! proxy.matchups.allies.exists(a => a.unitClass.isWorker && a.pixelDistanceEdge(proxy) < 256)))
-          0
-        else if (proxy.attacksAgainstGround > 0)
-          4
-        else if (proxy.unitClass.isGas)
-          (if (With.enemy.isProtoss) 0 else 3) // We have PvP gas steal reactions but none yet for other races
-        else
-          1 // We shouldn't pull for other buildings in general; this is mostly just to keep eyes on them
-      )).toMap
-    val totalWorkersRequired  = workersRequired.values.sum
-    val maxWorkers            = With.units.countOurs(UnitMatchWorkers) - 5
-    val finalWorkers          = Math.min(totalWorkersRequired, maxWorkers)
-    val squadDestination      = proxies.head.pixelCenter
 
-    if (totalWorkersRequired <= 0) {
-      defenders.get.release()
-      return
-    }
-    defenders.get.unitCounter.set(new UnitCountBetween(0, finalWorkers))
-    defenders.get.unitPreference.set(UnitPreferClose(squadDestination))
-    if (lastProxyCount > proxies.size) {
-      defenders.get.release()
-    }
-    lastProxyCount = proxies.size
+    // Set up collections of available and assigned defenders
+    var additionalWorkersAllowed  = With.units.countOurs(UnitMatchWorkers) - 6
+    val defendersAssigned         = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
+    val defendersAvailable        = new mutable.HashSet[FriendlyUnitInfo]
+    defenders.get.release()
+    defenders.get.unitMatcher.set(UnitMatchOr(UnitMatchWorkers, UnitMatchWarriors))
+    With.recruiter.inquire(defenders.get, isDryRun = true).foreach(defendersAvailable ++= _)
+
+    // For each proxy, in priority order, decide who if anyone to assign to it
+    proxies.foreach(proxy => {
+      val isAnnoying          = proxy.unitClass.isGas || proxy.base.exists(_.resourcePathTiles.exists(proxy.tileArea.contains))
+      val isEmergency         = proxy.isAny(Terran.Barracks, Terran.Bunker, Protoss.PhotonCannon, Protoss.Gateway)
+      val isCloseEnoughToPull = Seq(With.geography.ourMain, With.geography.ourNatural).exists(_.townHallArea.midpoint.groundPixels(proxy.tileIncludingCenter) < 32 * 21)
+      val mustPull            = proxy.dpfGround > 0 && With.geography.ourBases.exists(_.resourcePathTiles.exists(_.pixelCenter.pixelDistance(proxy.pixelCenter) < proxy.effectiveRangePixels + 32))
+      val framesBeforeDamage  = ByOption
+        .min(With.units.enemy.filter(u =>
+          u.dpfGround > 0
+          && u.unitClass.isBuilding
+          && u.pixelDistanceCenter(proxy) < u.effectiveRangePixels + 96).map(_.remainingCompletionFrames))
+        .getOrElse(Forever())
+      val defendersRequired   = if (isEmergency) 6 else if (isAnnoying) 2 else 1
+      val defendersViable     = defendersAvailable
+        .toVector
+        .filter(defender =>
+          ! defender.unitClass.isWorker
+          || mustPull
+          || (
+            isEmergency
+            && isCloseEnoughToPull
+            && (
+              defender.pixelDistanceEdge(proxy) < 64
+              || defender.framesToGetInRange(proxy) < framesBeforeDamage)))
+        .sortBy(_.pixelDistanceTravelling(proxy.pixelCenter))
+      val defendersRequested = defendersViable.take(defendersRequired)
+      defendersRequested.foreach(defender => {
+        var canAdd = ! defender.unitClass.isWorker
+        if (defender.unitClass.isWorker && additionalWorkersAllowed > 0) {
+          additionalWorkersAllowed -= 1
+          canAdd = true
+        }
+        if (canAdd) {
+          defendersAssigned -= defender
+          defendersAssigned(defender) = proxy
+        }
+      })
+    })
+
+    defenders.get.unitCounter.set(UnitCountExactly(defendersAssigned.size))
+    defenders.get.unitMatcher.set(UnitMatchCustom(_.friendly.exists(defendersAssigned.contains)))
     defenders.get.acquire(this)
-    defenders.get.units.foreach(With.squads.freelance)
   
-    squad.enemies = proxies
+    squad.enemies = defendersAssigned.values.toSeq.distinct
+    squad.setGoal(new GoalRazeProxies(defendersAssigned.toMap))
     With.squads.commission(squad)
-    squad.setGoal(new GoalRazeProxies(squadDestination))
   }
   
   private def getProxies: Iterable[UnitInfo] = {
     With.units.enemy.view.filter(e =>
-      e.likelyStillAlive
+      ! e.flying
+      && e.likelyStillAlive
       && e.possiblyStillThere
-      && scaryTypes.contains(e.unitClass)
-      && isProxied(e)
-      && ! e.flying)
-  }
-  
-  private def isProxied(enemy: UnitInfo): Boolean = {
-    val pixel                     = enemy.pixelCenter
-    val thresholdDistance         = 32.0 * 50.0
-    def baseDistance(base: Base)  = base.heart.pixelCenter.groundPixels(pixel)
-    lazy val closestEnemyBase     = ByOption.minBy(With.geography.enemyBases)(_.heart.pixelCenter.groundPixels(pixel))
-    lazy val closestOurBase       = ByOption.minBy(With.geography.ourBases)(_.heart.pixelCenter.groundPixels(pixel))
-    lazy val enemyBaseDistance    = closestEnemyBase.map(baseDistance).getOrElse(With.geography.startBases.map(baseDistance).max)
-    lazy val ourBaseDistance      = closestOurBase.map(baseDistance).getOrElse(Double.PositiveInfinity)
-    lazy val withinOurThreshold   = ourBaseDistance < thresholdDistance
-    lazy val closerToUs           = ourBaseDistance < enemyBaseDistance
-    val output = closerToUs && withinOurThreshold
-    output
+      && e.isAny(scaryTypes: _*)
+      && e.is(UnitMatchProxied))
   }
   
   lazy val scaryTypes = Vector(
@@ -110,6 +104,7 @@ class DefendAgainstProxy extends Plan {
     Protoss.Assimilator,
     Protoss.Pylon,
     Protoss.PhotonCannon,
+    Protoss.Gateway,
     Zerg.CreepColony,
     Zerg.Extractor,
     Zerg.SunkenColony,

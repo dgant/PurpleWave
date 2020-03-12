@@ -371,10 +371,10 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
   
   def remainingCompletionFrames: Int = {
     if (complete) return 0
-    val startingHp    = 1 + unitClass.maxHitPoints / 10
-    val progress      = Math.max(0.0, (hitPoints - startingHp).toDouble / (unitClass.maxTotalHealth - startingHp))
-    val progressLeft  = 1.0 - progress
-    val output        = progressLeft * unitClass.buildFrames - With.framesSince(lastSeen)
+    val startingTotalHealth = 1 + unitClass.maxTotalHealth / 10
+    val progress            = Math.max(0.0, (totalHealth - startingTotalHealth).toDouble / (unitClass.maxTotalHealth - startingTotalHealth))
+    val progressLeft        = 1.0 - progress
+    val output              = progressLeft * unitClass.buildFrames - With.framesSince(lastSeen)
     output.toInt
   }
 

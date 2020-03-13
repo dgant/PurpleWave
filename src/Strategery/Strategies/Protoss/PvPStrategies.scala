@@ -11,7 +11,12 @@ abstract class PvPStrategy extends Strategy {
   override def enemyRaces : Iterable[Race]  = Vector(Race.Protoss)
 }
 
-abstract class PvPOpening extends PvPStrategy
+object PvP3rdBaseFast extends PvPStrategy
+object PvP3rdBaseSlow extends PvPStrategy
+
+abstract class PvPOpening extends PvPStrategy {
+  override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(PvP3rdBaseSlow, PvP3rdBaseFast))
+}
 object PvPRobo extends PvPOpening
 object PvP2GateDTExpand extends PvPOpening
 object PvP2Gate1012Goon extends PvPOpening {

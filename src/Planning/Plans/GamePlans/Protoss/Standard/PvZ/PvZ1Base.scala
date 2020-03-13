@@ -24,7 +24,7 @@ import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
 import Planning.UnitMatchers.{UnitMatchAntiAir, UnitMatchWarriors}
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Protoss.{PvZ4GateGoon, PvZCorsair, PvZDT, PvZSpeedlot}
+import Strategery.Strategies.Protoss._
 
 abstract class PvZ1Base extends GameplanTemplate {
 
@@ -54,9 +54,13 @@ abstract class PvZ1Base extends GameplanTemplate {
         new UnitsAtLeast(6, Protoss.Dragoon, complete = true)),
       new Attack,
       new If(
-        new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.overpool),
-        new Trigger(new UnitsAtLeast(2, UnitMatchWarriors, complete = true), new ConsiderAttacking),
-        new Trigger(new UnitsAtLeast(4, UnitMatchWarriors, complete = true), new ConsiderAttacking))))
+        new Or(
+          new EnemyStrategy(With.fingerprints.twelveHatch),
+          new And(
+            new Employing(PvZ2Gate910),
+            new EnemyStrategy(With.fingerprints.tenHatch, With.fingerprints.overpool))),
+        new ConsiderAttacking,
+        new Trigger(new UnitsAtLeast(7, UnitMatchWarriors, complete = true), new ConsiderAttacking))))
 
   class EnemyHydralisks extends Or(
     new EnemyHasShown(Zerg.Hydralisk),

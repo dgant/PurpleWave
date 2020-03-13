@@ -37,7 +37,7 @@ class DefendAgainstProxy extends Plan {
     val defendersAvailable        = new mutable.HashSet[FriendlyUnitInfo]
     defenders.get.release()
     defenders.get.unitMatcher.set(UnitMatchOr(UnitMatchWorkers, UnitMatchWarriors))
-    With.recruiter.inquire(defenders.get, isDryRun = true).foreach(defendersAvailable ++= _)
+    defenders.get.inquire(this).foreach(defendersAvailable ++= _)
 
     // For each proxy, in priority order, decide who if anyone to assign to it
     proxies.foreach(proxy => {
@@ -81,6 +81,9 @@ class DefendAgainstProxy extends Plan {
     defenders.get.unitCounter.set(UnitCountExactly(defendersAssigned.size))
     defenders.get.unitMatcher.set(UnitMatchCustom(_.friendly.exists(defendersAssigned.contains)))
     defenders.get.acquire(this)
+    if (defenders.get.units.nonEmpty) {
+      With.blackboard.status.set(With.blackboard.status.get :+ "DefendingProxy")
+    }
   
     squad.enemies = defendersAssigned.values.toSeq.distinct
     squad.setGoal(new GoalRazeProxies(defendersAssigned.toMap))

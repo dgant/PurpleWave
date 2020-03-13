@@ -122,11 +122,13 @@ object PvTIdeas {
     new Parallel(
       new WriteStatus("ReactToBBS"),
       new DefendFightersAgainstRush,
+      new CapGasAt(250),
+      new If(new UnitsAtMost(1, Protoss.Gateway, complete = true), new CapGasWorkersAt(1)),
       new If(new UnitsAtMost(5, UnitMatchWarriors), new CancelIncomplete(Protoss.Nexus)),
       new If(new UnitsAtMost(1, Protoss.Gateway), new CancelIncomplete(UnitMatchOr(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Nexus, Protoss.Stargate))),
       new RequireSufficientSupply,
-      new If(new UnitsAtLeast(2, Protoss.Reaver), new RequireMiningBases(2)),
-      new Pump(Protoss.Reaver, 2),
+      new If(new UnitsAtLeast(1, Protoss.Reaver, complete = true), new RequireMiningBases(2)),
+      new Pump(Protoss.Reaver),
       new If(new UnitsAtLeast(2, Protoss.Gateway), new PumpWorkers, new PumpWorkers(cap = 12)),
       new Build(Get(Protoss.DragoonRange)),
       new Pump(Protoss.Dragoon),
@@ -138,12 +140,14 @@ object PvTIdeas {
       new If(new BasesAtMost(1), new Build(Get(Protoss.ShieldBattery))),
       new Pump(Protoss.Probe),
       new Build(
+        Get(2, Protoss.Gateway),
         Get(Protoss.Assimilator),
         Get(Protoss.CyberneticsCore),
         Get(Protoss.DragoonRange),
         Get(Protoss.RoboticsFacility),
         Get(Protoss.RoboticsSupportBay),
         Get(2, Protoss.Nexus))))
+
   class TrainMinimumDragoons extends Parallel(
     new PumpRatio(Protoss.Dragoon, 1, 5, Seq(Enemy(Terran.Vulture, 1.0), Enemy(Terran.Wraith, 1.0))),
     new PumpRatio(Protoss.Dragoon, 1, 20, Seq(Enemy(Terran.Vulture, 0.75), Enemy(Terran.Wraith, 0.5))))

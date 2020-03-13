@@ -8,7 +8,7 @@ class PumpWorkers(oversaturate: Boolean = false, cap: Int = 85, maximumConcurren
     if (With.self.isTerran)
       4
     else if (With.self.isProtoss)
-      2
+      3
     else
       3
   }

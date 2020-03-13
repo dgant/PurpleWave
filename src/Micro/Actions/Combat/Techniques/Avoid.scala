@@ -83,10 +83,12 @@ object Avoid extends ActionTechnique {
     val desireForSafety     = PurpleMath.clamp(0, 3, (3 * (1 - unit.matchups.framesOfSafety / 72)).toInt)
     val desireProfile       = DesireProfile(desireToGoHome, desireForSafety, desireForFreedom)
 
-    // Don't spray out against Zerglings
-    if (unit.is(Protoss.Zealot) && unit.base == unit.agent.origin.base && unit.agent.origin.base.exists(_.isOurMain) && unit.matchups.threats.forall(_.isAny(Zerg.Zergling, UnitMatchWorkers))) {
+    // Don't spray out against melee units
+    if (unit.is(Protoss.Zealot) && unit.base == unit.agent.origin.base && unit.agent.origin.base.exists(_.isOurMain) && unit.matchups.threats.forall(_.isAny(Protoss.Zealot, Zerg.Zergling, UnitMatchWorkers))) {
       unit.agent.toTravel = unit.agent.origin.base.map(_.heart.pixelCenter)
-      Potshot.delegate(unit)
+      if ( ! unit.matchups.threats.exists(_.is(Protoss.Zealot))) {
+        Potshot.delegate(unit)
+      }
       Move.delegate(unit)
       return
     }

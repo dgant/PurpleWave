@@ -443,7 +443,7 @@ object PvPIdeas {
       new Parallel(
         new PumpShuttleAndReavers(6, shuttleFirst = false),
         new PumpRatio(Protoss.Dragoon, 3, 24, Seq(Friendly(Protoss.Zealot, 1.5))),
-        new PumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-1), Friendly(UnitMatchWarriors, 1.0 / 5.0))),
+        new PumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-1), Friendly(UnitMatchWarriors, 1.0 / 4.0))),
         new If(new ZealotsAllowed, new Pump(Protoss.Zealot))),
 
       // Dragoon-Reaver composition

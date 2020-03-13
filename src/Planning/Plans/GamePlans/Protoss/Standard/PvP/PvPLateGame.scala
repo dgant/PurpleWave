@@ -13,9 +13,10 @@ import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNat
 import Planning.Predicates.Compound.{And, Latch, Not, Sticky}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBasesAtMost, SafeAtHome, SafeToMoveOut}
-import Planning.Predicates.Strategy.{EnemyRecentStrategy, EnemyStrategy}
+import Planning.Predicates.Strategy.{Employing, EnemyRecentStrategy, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchMobileDetectors, UnitMatchOr, UnitMatchWarriors, UnitMatchWorkers}
 import ProxyBwapi.Races.Protoss
+import Strategery.Strategies.Protoss.PvP3rdBaseFast
 
 class PvPLateGame extends GameplanTemplate {
 
@@ -142,7 +143,14 @@ class PvPLateGame extends GameplanTemplate {
 
   class SafeForThird extends And(
     new SafeToMoveOut,
-    new EnemyBasesAtLeast(3),
+    new Or(
+      new EnemyBasesAtLeast(3),
+      new Employing(PvP3rdBaseFast),
+      new And(
+        new Not(new EnemyHasShown(Protoss.Shuttle)),
+        new Or(
+          new EnemyHasShown(Protoss.HighTemplar),
+          new EnemyHasShown(Protoss.Reaver)))),
     new Or(
       new Not(new EnemyHasShown(Protoss.DarkTemplar)),
       new UnitsAtLeast(2, Protoss.Observer, complete = true)))

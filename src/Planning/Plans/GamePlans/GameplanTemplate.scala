@@ -34,7 +34,7 @@ abstract class GameplanTemplate extends GameplanMode {
   def buildOrderPlan        : Plan              = new BuildOrder(buildOrder: _*)
   def supplyPlan            : Plan              = new RequireSufficientSupply
   def workerPlan            : Plan              = new If(new Not(new WeAreZerg), new PumpWorkers)
-  def scoutPlan             : Plan              = new ScoutAt(14)
+  def scoutPlan             : Plan              = new ScoutDefault
   def scoutExposPlan        : Plan              = new If(new And(new BasesAtLeast(2), new IsTimeToScoutExpansions), new ScoutExpansions)
   def yoloPlan              : Plan              = new If(new Check(() => With.yolo.active()), new Attack)
   def priorityDefensePlan   : Plan              = NoPlan()

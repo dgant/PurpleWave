@@ -39,7 +39,7 @@ class PvP4GateGoon extends GameplanTemplate {
       new PvPIdeas.AttackSafely),
     new Attack(Protoss.DarkTemplar))
 
-  override def scoutPlan: Plan = new ScoutOn(Protoss.Gateway)
+  override def scoutWorkerPlan: Plan = new ScoutOn(Protoss.Gateway)
   override val workerPlan: Plan = NoPlan()
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvPIdeas.ReactToGasSteal,

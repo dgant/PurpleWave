@@ -15,7 +15,7 @@ class CatchDTRunby(
   override val goal: GoalCatchDTRunby = new GoalCatchDTRunby
 
   override def onUpdate() {
-    if (With.enemies.map(With.intelligence.unitsShown(_, Protoss.DarkTemplar)).sum == 0) {
+    if (With.enemies.map(With.unitsShown(_, Protoss.DarkTemplar)).sum == 0) {
       return
     }
 

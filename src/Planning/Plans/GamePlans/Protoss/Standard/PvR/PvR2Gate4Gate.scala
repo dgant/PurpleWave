@@ -35,7 +35,7 @@ class PvR2Gate4Gate extends GameplanTemplate {
       new EnemyBasesAtLeast(2),
       new EnemyIsTerran),
     new Attack)
-  override def scoutPlan: Plan = new ScoutOn(Protoss.Gateway, quantity = 2)
+  override def scoutWorkerPlan: Plan = new ScoutOn(Protoss.Gateway, quantity = 2)
 
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.TwoGate910
 

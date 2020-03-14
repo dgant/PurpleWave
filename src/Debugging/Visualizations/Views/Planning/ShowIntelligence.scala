@@ -9,7 +9,7 @@ import bwapi.Color
 object ShowIntelligence extends View {
 
   override def renderMap(): Unit = {
-    val bases = With.intelligence.mostIntriguingBases()
+    val bases = With.scouting.mostIntriguingBases()
     bases.indices.foreach(i => {
       val base = bases(i)
       val pixel = base.townHallTile.pixelCenter

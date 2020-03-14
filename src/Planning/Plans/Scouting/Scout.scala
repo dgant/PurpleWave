@@ -24,7 +24,6 @@ class Scout(scoutCount: Int = 1) extends Plan {
     unitMatcher.set(UnitMatchAnd(UnitMatchWorkers, UnitMatchNotHoldingResources))
     unitPreference.set(UnitPreferClose(SpecificPoints.middle))
     interruptable.set(false)
-    //canPoach.set(true)
   })
   
   var acquiredScouts: Iterable[FriendlyUnitInfo] = Iterable.empty
@@ -60,7 +59,7 @@ class Scout(scoutCount: Int = 1) extends Plan {
     
     val getNextScoutBase = () => {
       if (enemyStartBases.isEmpty) {
-        With.intelligence.claimBaseToScout()
+        With.scouting.claimBaseToScout()
       }
       else {
         enemyStartBases.head
@@ -72,7 +71,7 @@ class Scout(scoutCount: Int = 1) extends Plan {
     }
     
     scouts.get.unitCounter.set(new UnitCountBetween(1, scoutsDesired))
-    scouts.get.unitPreference.set(UnitPreferClose(With.intelligence.mostIntriguingBases().head.heart.pixelCenter))
+    scouts.get.unitPreference.set(UnitPreferClose(With.scouting.mostIntriguingBases().head.heart.pixelCenter))
     scouts.get.acquire(this)
     acquiredScouts = scouts.get.units
     
@@ -80,11 +79,11 @@ class Scout(scoutCount: Int = 1) extends Plan {
     unassignedScouts ++= acquiredScouts
     
     while (unassignedScouts.nonEmpty) {
-      val destination = With.intelligence.claimBaseToScout().heart.pixelCenter
+      val destination = With.scouting.claimBaseToScout().heart.pixelCenter
       val scout = unassignedScouts.minBy(scout => scout.pixelDistanceTravelling(destination) + 0.5 * scout.pixelDistanceTravelling(scout.agent.destination, destination))
       unassignedScouts -= scout
       
-      With.intelligence.highlightScout(scout)
+      With.scouting.highlightScout(scout)
       
       val intention = new Intention
       intention.toTravel = Some(destination)

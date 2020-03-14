@@ -7,6 +7,7 @@ import Information.Geography.Geography
 import Information.Geography.Pathfinding.Paths
 import Information.Grids.Grids
 import Information.Intelligenze.Fingerprinting.Fingerprints
+import Information.Intelligenze.UnitsShown
 import Information._
 import Macro.Allocation._
 import Macro.Architecture.{Architecture, PlacementScheduler}
@@ -61,7 +62,6 @@ object With {
   var grids             : Grids                   = _
   var groundskeeper     : Groundskeeper           = _
   var history           : History                 = _
-  var intelligence      : Intelligence            = _
   var latency           : Latency                 = _
   var logger            : Logger                  = _
   var matchups          : MatchupGraph            = _
@@ -74,11 +74,13 @@ object With {
   var reaction          : ReactionTimes           = _
   var recruiter         : Recruiter               = _
   var scheduler         : Scheduler               = _
+  var scouting          : Scouting                = _
   var strategy          : Strategist              = _
   var storyteller       : Storyteller             = _
   var squads            : Squads                  = _
   var tasks             : AbstractTaskQueue       = _
   var units             : UnitTracker             = _
+  var unitsShown        : UnitsShown              = _
   var viewport          : Viewport                = _
   var visualization     : Visualization           = _
   var yolo              : Yolo                    = _
@@ -146,7 +148,6 @@ object With {
     geography         = new Geography
     grids             = new Grids
     history           = new History
-    intelligence      = new Intelligence
     latency           = new Latency
     matchups          = new MatchupGraph
     paths             = new Paths
@@ -157,11 +158,13 @@ object With {
     reaction          = new ReactionTimes
     recruiter         = new Recruiter
     scheduler         = new Scheduler
+    scouting          = new Scouting
     strategy          = new Strategist
     storyteller       = new Storyteller
     squads            = new Squads
     tasks             = new TaskQueueGlobal
     units             = new UnitTracker
+    unitsShown        = new UnitsShown
     viewport          = new Viewport
     visualization     = new Visualization
     yolo              = new Yolo

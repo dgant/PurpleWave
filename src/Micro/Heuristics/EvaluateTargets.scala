@@ -174,7 +174,7 @@ object EvaluateTargets extends {
     }
 
     // Expansion bonus
-    if (target.unitClass.isTownHall && target.base.forall(base => ! With.intelligence.enemyMain.contains(base) && ! With.intelligence.enemyNatural.contains(base))) {
+    if (target.unitClass.isTownHall && target.base.forall(base => ! With.scouting.enemyMain.contains(base) && ! With.scouting.enemyNatural.contains(base))) {
       output *= 3.0
     }
 

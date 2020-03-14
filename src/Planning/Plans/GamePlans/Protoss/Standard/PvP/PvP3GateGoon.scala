@@ -46,7 +46,7 @@ class PvP3GateGoon extends GameplanTemplate {
       new UnitsAtLeast(3, Protoss.Dragoon, complete = true)),
     new PvPIdeas.AttackSafely)
 
-  override def scoutPlan: Plan = new ScoutOn(Protoss.Gateway)
+  override def scoutWorkerPlan: Plan = new ScoutOn(Protoss.Gateway)
 
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvPIdeas.ReactToDarkTemplarEmergencies,

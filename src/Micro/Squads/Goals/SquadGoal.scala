@@ -76,7 +76,7 @@ trait SquadGoal extends SquadRecruiter {
   def squad: Squad
   def setSquad(squad: Squad): Unit
   def run(): Unit
-  def destination: Pixel = With.intelligence.mostBaselikeEnemyTile.pixelCenter
+  def destination: Pixel = With.scouting.mostBaselikeEnemyTile.pixelCenter
   override def toString: String = getClass.getSimpleName.replaceAllLiterally("$", "")
 }
 

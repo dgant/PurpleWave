@@ -27,7 +27,7 @@ class ZvT13PoolMuta extends GameplanTemplate {
   
   override def aggressionPlan: Plan = new Aggression(0.7)
   
-  override def scoutPlan: Plan = new Parallel(
+  override def scoutWorkerPlan: Plan = new Parallel(
     new ScoutSafelyWithOverlord,
     new If(
       new Not(new FoundEnemyBase),

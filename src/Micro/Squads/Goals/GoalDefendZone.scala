@@ -25,7 +25,7 @@ class GoalDefendZone extends SquadGoalBasic {
   private var _currentDestination: Pixel = Pixel(0, 0)
 
   override def run() {
-    lazy val base = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.intelligence.threatOrigin))
+    lazy val base = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.scouting.threatOrigin))
     _currentDestination = zone.centroid.pixelCenter.nearestWalkableTerrain.pixelCenter
 
     if (squad.units.isEmpty) return
@@ -55,7 +55,7 @@ class GoalDefendZone extends SquadGoalBasic {
     }
     else if (wallExistsButNoneNearChoke) {
       lastAction = "Protect wall of "
-      defendHeart(walls.minBy(_.pixelCenter.groundPixels(With.intelligence.mostBaselikeEnemyTile)).pixelCenter)
+      defendHeart(walls.minBy(_.pixelCenter.groundPixels(With.scouting.mostBaselikeEnemyTile)).pixelCenter)
     }
     else if (! entranceBreached && canDefendChoke) {
       lastAction = "Protect choke of "

@@ -28,7 +28,7 @@ object PvZIdeas {
         new And(
           new Not(new EnemyRecentStrategy(With.fingerprints.twelveHatch, With.fingerprints.twelvePool, With.fingerprints.tenHatch, With.fingerprints.ninePool, With.fingerprints.overpool)),
           new EnemyRecentStrategy(With.fingerprints.fourPool),
-          new Check(() => With.intelligence.enemyHasScoutedUsWithWorker))),
+          new Check(() => With.scouting.enemyHasScoutedUsWithWorker))),
       new FrameAtMost(GameTime(6, 0)()),
       new UnitsAtLeast(1, Protoss.PhotonCannon, complete = false),
       new UnitsAtMost(3, Protoss.PhotonCannon, complete = true)),

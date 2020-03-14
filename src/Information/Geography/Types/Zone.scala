@@ -46,7 +46,7 @@ class Zone(
   def calculateExit: Option[Edge] = {
     ByOption.minBy(edges)(edge =>
       ByOption.min(With.geography.enemyBases.map(enemyBase => edge.distanceGrid.get(enemyBase.heart)))
-        .getOrElse(edge.distanceGrid.get(With.intelligence.threatOrigin)))
+        .getOrElse(edge.distanceGrid.get(With.scouting.threatOrigin)))
   }
   
   def contains(tile: Tile)    : Boolean = boundary.contains(tile) && tiles.contains(tile)

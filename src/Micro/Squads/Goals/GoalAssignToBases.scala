@@ -22,14 +22,14 @@ abstract class GoalAssignToBases extends SquadGoalBasic {
       .headOption
       .map(_._2)
       .filter(_.base.exists(baseFilter))
-      .getOrElse(baseToPixel(With.intelligence.peekNextBaseToScout(baseFilter)))
+      .getOrElse(baseToPixel(With.scouting.peekNextBaseToScout(baseFilter)))
   }
   protected def baseToPixel(base: Base): Pixel = base.heart.pixelCenter
 
   
   override def run() {
     squad.units.foreach(unit => {
-      With.intelligence.highlightScout(unit)
+      With.scouting.highlightScout(unit)
       val scoutPixel = destinationByScout.find(_._1 == unit).map(_._2).getOrElse(destination)
       unit.agent.intend(squad.client, new Intention {
         toTravel = Some(scoutPixel)
@@ -39,7 +39,7 @@ abstract class GoalAssignToBases extends SquadGoalBasic {
   }
 
   private def scoutPreference(unit: FriendlyUnitInfo): Double = {
-    val scoutDestination = baseToPixel(With.intelligence.peekNextBaseToScout(BaseFilterExpansions.apply))
+    val scoutDestination = baseToPixel(With.scouting.peekNextBaseToScout(BaseFilterExpansions.apply))
     val typeMultiplier = if (unit.isAny(
       Terran.Battlecruiser,
       Terran.Dropship,
@@ -57,7 +57,7 @@ abstract class GoalAssignToBases extends SquadGoalBasic {
         * typeMultiplier
         * (if (unit.flying) 1.0 else 1.5)
         * (if (unit.cloaked) 1.0 else 1.5)
-        * (if (unit.is(Protoss.Zealot) && With.enemies.map(With.intelligence.unitsShown(_, Terran.Vulture)).sum > 0) 3.0 else 1.0)
+        * (if (unit.is(Protoss.Zealot) && With.enemies.map(With.unitsShown(_, Terran.Vulture)).sum > 0) 3.0 else 1.0)
       )
     else
       Double.MaxValue

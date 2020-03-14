@@ -61,7 +61,7 @@ class ZvP2HatchMuta extends GameplanTemplate {
       new EnemyBasesAtLeast(2)),
     new Attack)
   
-  override def scoutPlan: Plan = new Parallel(
+  override def scoutWorkerPlan: Plan = new Parallel(
     new ScoutSafelyWithOverlord,
     new Trigger(
       new UnitsAtLeast(2, Zerg.Overlord),

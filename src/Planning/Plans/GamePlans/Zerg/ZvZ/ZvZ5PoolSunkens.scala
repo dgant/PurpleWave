@@ -25,11 +25,10 @@ import Strategery.Strategies.Zerg.ZvZ5PoolSunkens
 class ZvZ5PoolSunkens extends GameplanTemplate {
   
   override val activationCriteria: Predicate = new Employing(ZvZ5PoolSunkens)
-  
-  override def overlordPlan: Plan = NoPlan()
+
   override def supplyPlan: Plan = NoPlan()
   override def attackPlan: Plan = new Attack
-  override def scoutPlan: Plan = new Scout {
+  override def scoutWorkerPlan: Plan = new Scout {
     scouts.get.unitMatcher.set(Zerg.Overlord)
     scouts.get.unitCounter.set(UnitCountEverything)
   }

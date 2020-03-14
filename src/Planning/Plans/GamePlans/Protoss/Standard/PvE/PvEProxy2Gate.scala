@@ -27,7 +27,7 @@ class PvEProxy2Gate extends GameplanTemplate {
 
   override val activationCriteria = new Employing(PvRProxy2Gate, PvTProxy2Gate, PvPProxy2Gate, PvZProxy2Gate)
   override val completionCriteria = new Latch(new BasesAtLeast(2))
-  override def scoutPlan = new If(
+  override def scoutWorkerPlan = new If(
     new Not(new FoundEnemyBase),
     new ScoutOn(Protoss.Gateway, quantity = 2))
 

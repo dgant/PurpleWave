@@ -31,7 +31,7 @@ abstract class PvZ1Base extends GameplanTemplate {
   override val completionCriteria   = new Latch(new MiningBasesAtLeast(2))
   override def buildOrder           = ProtossBuilds.TwoGate1012
   override def workerPlan           = NoPlan()
-  override val scoutPlan: Plan      = new If(new StartPositionsAtLeast(4), new ScoutOn(Protoss.Pylon), new ScoutOn(Protoss.Gateway))
+  override val scoutWorkerPlan: Plan      = new If(new StartPositionsAtLeast(4), new ScoutOn(Protoss.Pylon), new ScoutOn(Protoss.Gateway))
   override def placementPlan: Plan  = new ProposePlacement {
     override lazy val blueprints = Vector(
       new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.hugTownHall)),

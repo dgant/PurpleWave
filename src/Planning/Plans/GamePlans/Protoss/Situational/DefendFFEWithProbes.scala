@@ -30,7 +30,7 @@ abstract class DefendFFEWithProbes extends Plan {
     if (cannons.isEmpty) cannons = With.units.ours.filter(_.is(Protoss.Forge))
     
     lazy val zerglings    = With.units.enemy.find(_.is(Zerg.Zergling))
-    lazy val threatSource = zerglings.map(_.pixelCenter).getOrElse(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
+    lazy val threatSource = zerglings.map(_.pixelCenter).getOrElse(With.scouting.mostBaselikeEnemyTile.pixelCenter)
 
     if (cannons.isEmpty) return
     cannons.toVector.sortBy(_.totalHealth)

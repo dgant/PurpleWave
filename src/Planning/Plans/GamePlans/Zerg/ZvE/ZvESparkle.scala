@@ -71,7 +71,7 @@ class ZvESparkle extends GameplanTemplate {
     new BuildOrder(Get(7, Zerg.Mutalisk))
   )
   
-  override def scoutPlan = new If(
+  override def scoutWorkerPlan = new If(
     new Not(new FoundEnemyBase),
     new Scout(15) { scouts.get.unitMatcher.set(Zerg.Overlord) })
   

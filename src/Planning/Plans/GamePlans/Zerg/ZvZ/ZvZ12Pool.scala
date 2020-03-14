@@ -23,7 +23,7 @@ class ZvZ12Pool extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(ZvZ12Pool)
 
-  override def scoutPlan: Plan = new ScoutSafelyWithOverlord
+  override def scoutWorkerPlan: Plan = new ScoutSafelyWithOverlord
   
   override def attackPlan: Plan = new Parallel(
     new Hunt(Zerg.Scourge, Zerg.Mutalisk),

@@ -23,7 +23,7 @@ class ZvTOpening extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(ZvT12Hatch13Pool, ZvT12Hatch11Pool, ZvT9Pool)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(1, Zerg.Lair))
 
-  override def scoutPlan: Plan = new Parallel(
+  override def scoutWorkerPlan: Plan = new Parallel(
     new ScoutSafelyWithOverlord,
     new If(
       new Employing(ZvT9Pool),

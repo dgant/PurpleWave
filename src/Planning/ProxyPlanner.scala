@@ -19,11 +19,11 @@ object ProxyPlanner {
   }
   
   def proxyEnemyMain: Option[Zone] = {
-    With.intelligence.enemyMain.map(_.zone)
+    With.scouting.enemyMain.map(_.zone)
   }
   
   def proxyEnemyNatural: Option[Zone] = {
-    With.intelligence.enemyNatural.map(_.zone)
+    With.scouting.enemyNatural.map(_.zone)
   }
   
   def proxyOutsideEnemyNatural: Option[Zone] = {

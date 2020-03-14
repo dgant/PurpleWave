@@ -138,7 +138,7 @@ class WorkerRushLiftoff extends Parallel {
   private def evaluateGroundTile(tile: Tile): Double = {
     val zone = tile.zone
     val scoreZoneSize   = 1.0 + zone.tiles.size
-    val scoreDistance   = 1.0 + ByOption.min(With.units.enemy.filter(_.canMove).map(_.framesToTravelTo(zone.centroid.pixelCenter).toDouble)).getOrElse(With.intelligence.mostBaselikeEnemyTile.tileDistanceFast(tile))
+    val scoreDistance   = 1.0 + ByOption.min(With.units.enemy.filter(_.canMove).map(_.framesToTravelTo(zone.centroid.pixelCenter).toDouble)).getOrElse(With.scouting.mostBaselikeEnemyTile.tileDistanceFast(tile))
     val scoreObscurity  = 1.0 + tile.zone.edges.map(_.pixelCenter.pixelDistance(tile.pixelCenter)).sum
     val scoreCrossing   = 1.0 + zoneCrossings.getOrElse(zone, 2)
     val scoreBase       = 1.0 + zone.bases.size

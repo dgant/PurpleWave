@@ -28,7 +28,7 @@ class TvZ2RaxAcademy extends GameplanTemplate {
   override val completionCriteria: Predicate = new Latch(new MiningBasesAtLeast(2))
 
   override def attackPlan: Plan = new Trigger(new UnitsAtLeast(1, Terran.Firebat, complete = true), new AttackSafely)
-  override def scoutPlan: Plan = new If(
+  override def scoutWorkerPlan: Plan = new If(
     new Not(new EnemyStrategy(With.fingerprints.fourPool)),
     new If(
       new StartPositionsAtLeast(3),

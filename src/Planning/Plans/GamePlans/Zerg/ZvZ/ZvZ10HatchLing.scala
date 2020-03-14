@@ -50,7 +50,7 @@ class ZvZ10HatchLing extends GameplanTemplate {
       Get(12, Zerg.Drone),
       Get(6, Zerg.Zergling))))
   
-  override def scoutPlan: Plan = new ScoutSafelyWithOverlord
+  override def scoutWorkerPlan: Plan = new ScoutSafelyWithOverlord
   
   override def attackPlan: Plan = new Parallel(
     new Attack(Zerg.Mutalisk),

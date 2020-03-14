@@ -19,7 +19,7 @@ class DefendEntrance(
     goal.unitMatcher = unitMatcher
     goal.unitCounter = unitCounter
     goal.zone = ByOption
-      .minBy(bases)(_.heart.groundPixels(With.intelligence.mostBaselikeEnemyTile))
+      .minBy(bases)(_.heart.groundPixels(With.scouting.mostBaselikeEnemyTile))
       .map(_.zone)
       .getOrElse(With.geography.home.zone)
     super.onUpdate()

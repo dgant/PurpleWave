@@ -22,7 +22,7 @@ class ZvT1HatchHydra extends GameplanTemplate {
 
   override val activationCriteria = new Employing(ZvT1HatchHydra)
 
-  override def scoutPlan: Plan = new Parallel(
+  override def scoutWorkerPlan: Plan = new Parallel(
     new ScoutSafelyWithOverlord,
     new If(
       new StartPositionsAtLeast(3),

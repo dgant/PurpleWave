@@ -27,7 +27,7 @@ class ZvT7Pool extends GameplanTemplate {
 
   override def attackPlan: Plan = new Attack
 
-  override def scoutPlan: Plan = new Parallel(
+  override def scoutWorkerPlan: Plan = new Parallel(
     new ScoutSafelyWithOverlord,
     new If(
       new And(

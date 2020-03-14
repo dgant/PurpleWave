@@ -41,6 +41,6 @@ object Rally extends Action {
       }
     }
 
-    With.commander.rally(unit, With.intelligence.mostBaselikeEnemyTile.pixelCenter)
+    With.commander.rally(unit, With.scouting.mostBaselikeEnemyTile.pixelCenter)
   }
 }

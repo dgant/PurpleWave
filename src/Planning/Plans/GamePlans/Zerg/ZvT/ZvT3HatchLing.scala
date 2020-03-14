@@ -35,7 +35,7 @@ class ZvT3HatchLing extends GameplanTemplate {
       new UpgradeComplete(Zerg.ZerglingSpeed)),
     new Attack(Zerg.Zergling))
 
-  override def scoutPlan: Plan = new Parallel(
+  override def scoutWorkerPlan: Plan = new Parallel(
     new If(
       new And(
         new Not(new EnemyWalledIn),

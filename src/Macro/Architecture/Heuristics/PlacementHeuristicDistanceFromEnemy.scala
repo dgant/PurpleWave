@@ -13,7 +13,7 @@ object PlacementHeuristicDistanceFromEnemy extends PlacementHeuristic {
       With.geography.startBases.filterNot(_.owner.isUs)
     }
     if (seedTiles.isEmpty) {
-      seedTiles = Vector(With.intelligence.mostBaselikeEnemyTile)
+      seedTiles = Vector(With.scouting.mostBaselikeEnemyTile)
     }
 
     val distanceMin = seedTiles

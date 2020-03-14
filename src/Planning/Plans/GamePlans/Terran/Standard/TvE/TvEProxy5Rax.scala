@@ -31,7 +31,7 @@ class TvEProxy5Rax extends GameplanTemplate {
         placement = Some(PlacementProfiles.proxyBuilding)))
   }
 
-  override def scoutPlan: Plan = new If(
+  override def scoutWorkerPlan: Plan = new If(
     new StartPositionsAtLeast(3),
     new If(
       new Not(new FoundEnemyBase),

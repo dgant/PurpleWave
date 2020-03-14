@@ -11,11 +11,11 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, ExtractorTrick, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Scouting.{FoundEnemyBase, Scout}
+import Planning.Plans.Scouting.Scout
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
-import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemiesAtMost, UnitsAtLeast}
-import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy, StartPositionsAtLeast}
+import Planning.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast}
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.UnitMatchOr
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Zerg.ZvE4Pool
@@ -33,32 +33,21 @@ class ZvE4Pool extends GameplanTemplate {
     new Aggression(99),
     new Aggression(1.5))
   
-  override def scoutPlan: Plan = new Parallel(
-    new If(
-      new And(
-        new Or(
-          new StartPositionsAtLeast(3),
-          new Not(new EnemyIsTerran)),
-        new Or(
-          new Not(new FoundEnemyBase),
-          new EnemiesAtMost(0, UnitMatchOr(Protoss.PhotonCannon, Protoss.CyberneticsCore, Protoss.Assimilator, Protoss.Dragoon, Protoss.Corsair)))),
-      new Scout(2) { scouts.get.unitMatcher.set(Zerg.Overlord) }),
-    new If(
-      new And(
-        new Latch(
-          new And(
-            new MineralsAtLeast(126),
-            new UnitsAtLeast(1, Zerg.SpawningPool))),
-        new Not(new EnemyStrategy(With.fingerprints.twoGate)),
-        new UnitsAtLeast(4, UnitMatchOr(Zerg.Drone, Zerg.Extractor))),
-      new Scout))
+  override def scoutWorkerPlan: Plan = new If(
+    new And(
+      new Latch(
+        new And(
+          new MineralsAtLeast(126),
+          new UnitsAtLeast(1, Zerg.SpawningPool))),
+      new Not(new EnemyStrategy(With.fingerprints.twoGate)),
+      new UnitsAtLeast(4, UnitMatchOr(Zerg.Drone, Zerg.Extractor))),
+    new Scout)
   
   override def supplyPlan: Plan = NoPlan()
   
   override def attackPlan: Plan = new Attack
   
   override def buildPlans: Seq[Plan] = Vector(
-
     new CapGasAt(0, 0),
     new Write(With.blackboard.pushKiters, true),
     new AllIn(new EnemiesAtLeast(1, Protoss.PhotonCannon)),

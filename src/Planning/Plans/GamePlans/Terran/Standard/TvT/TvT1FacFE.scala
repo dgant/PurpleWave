@@ -19,7 +19,7 @@ class TvT1FacFE extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(TvT1FacFE)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(2, Terran.Factory))
 
-  override def scoutPlan = new ScoutAt(13)
+  override def scoutWorkerPlan = new ScoutAt(13)
   override def attackPlan = new If(new EnemyStrategy(With.fingerprints.fourteenCC), new Attack)
 
   override def buildOrder: Seq[BuildRequest] = Seq(

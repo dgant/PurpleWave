@@ -81,7 +81,7 @@ class Storyteller {
 
   var enemyUnitsBefore: Set[UnitClass] = Set.empty
   private def logIntelligence(): Unit = {
-    val enemyUnitsAfter = With.enemies.flatMap(With.intelligence.unitsShown.all(_).view).filter(_._2.nonEmpty).map(_._1).toSet
+    val enemyUnitsAfter = With.enemies.flatMap(With.unitsShown.all(_).view).filter(_._2.nonEmpty).map(_._1).toSet
     val enemyUnitsDiff = enemyUnitsAfter -- enemyUnitsBefore
     enemyUnitsDiff.foreach(newType => {
       With.logger.debug("Discovered novel enemy unit: " + newType)

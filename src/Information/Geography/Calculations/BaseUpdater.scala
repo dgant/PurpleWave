@@ -27,7 +27,7 @@ object BaseUpdater {
     base.owner = base.townHall.map(_.player).getOrElse(if (base.scouted) With.neutral else base.owner)
     
     // Assume ownership of implicit starting location
-    if (base.owner.isNeutral && ! base.scouted && With.intelligence.firstEnemyMain.contains(base)) {
+    if (With.scouting.enemyMain.contains(base)) {
       base.owner = With.enemy
     }
     

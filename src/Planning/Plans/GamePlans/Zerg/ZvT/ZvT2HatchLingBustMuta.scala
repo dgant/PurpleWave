@@ -22,7 +22,7 @@ class ZvT2HatchLingBustMuta extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(ZvT2HatchLingBustMuta)
 
-  override def scoutPlan: Plan = new Parallel(
+  override def scoutWorkerPlan: Plan = new Parallel(
     new ScoutSafelyWithOverlord,
     new Scout { scouts.get.unitMatcher.set(Zerg.Zergling) })
 

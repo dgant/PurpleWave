@@ -22,7 +22,7 @@ class ProtossBigFFACarriers extends GameplanTemplate {
   
   override val activationCriteria   : Predicate = new Always
   override def placementPlan : Plan = new PlacementForgeFastExpand
-  override val scoutPlan     : Plan = NoPlan()
+  override val scoutWorkerPlan     : Plan = NoPlan()
   override def aggressionPlan: Plan = new Aggression(0.6)
   
   override val buildOrder = Vector(

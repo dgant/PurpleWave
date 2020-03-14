@@ -21,7 +21,7 @@ import ProxyBwapi.Races.Zerg
 
 class ZvE9Pool2HatchSpeed extends GameplanTemplate {
 
-  override def scoutPlan: Plan = new Parallel(
+  override def scoutWorkerPlan: Plan = new Parallel(
     new ScoutSafelyWithOverlord,
     new If(
       new Not(new FoundEnemyBase),

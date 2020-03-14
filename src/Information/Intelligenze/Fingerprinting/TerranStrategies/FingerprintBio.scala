@@ -15,20 +15,20 @@ class FingerprintBio extends Fingerprint {
       return true
     }
 
-    if (With.intelligence.unitsShown.allEnemies(Terran.Vulture) < 4) {
+    if (With.unitsShown.allEnemies(Terran.Vulture) < 4) {
       if (With.enemies.exists(_.hasUpgrade(Terran.MarineRange))) {
         return true
       }
       if (With.enemies.exists(_.hasTech(Terran.Stim))) {
         return true
       }
-      if (With.intelligence.unitsShown.allEnemies(Terran.Medic) > 0) {
+      if (With.unitsShown.allEnemies(Terran.Medic) > 0) {
         return true
       }
-      if (With.intelligence.unitsShown.allEnemies(Terran.Firebat) > 0) {
+      if (With.unitsShown.allEnemies(Terran.Firebat) > 0) {
         return true
       }
-      if (With.intelligence.unitsShown.allEnemies(Terran.Marine) > 8) {
+      if (With.unitsShown.allEnemies(Terran.Marine) > 8) {
         return true
       }
       if (With.units.existsEnemy(u => u.is(Terran.Academy) && u.upgrading)) {

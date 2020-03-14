@@ -39,7 +39,7 @@ class ZvT2HatchLurker extends GameplanTemplate {
           new EnemyWalledIn,
           new EnemyStrategy(With.fingerprints.oneFac, With.fingerprints.twoFac)))))
 
-  override def scoutPlan: Plan = new Trigger(
+  override def scoutWorkerPlan: Plan = new Trigger(
     new Or(
       new MineralsForUnit(Zerg.Hatchery, 2),
       new And(

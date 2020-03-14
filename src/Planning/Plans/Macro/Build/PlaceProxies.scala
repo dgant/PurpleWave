@@ -59,7 +59,7 @@ abstract class PlaceProxies(buildings: UnitClass*) extends Plan {
   }
 
   val techProxyScore: Tile => Double = tile => {
-    val target = With.intelligence.threatOrigin
+    val target = With.scouting.threatOrigin
     (
       (if (With.grids.enemyVision.isSet(tile)) 1 else 10)
       * With.grids.altitudeBonus.get(tile)

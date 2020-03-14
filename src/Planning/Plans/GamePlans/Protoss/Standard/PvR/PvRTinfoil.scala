@@ -23,7 +23,7 @@ import Strategery.Strategies.Protoss.PvRTinfoil2018
 class PvRTinfoil extends GameplanTemplateVsRandom {
   
   override val activationCriteria = new Employing(PvRTinfoil2018)
-  override def scoutPlan   = NoPlan()
+  override def scoutWorkerPlan   = NoPlan()
 
   override lazy val blueprints = Vector(
     new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.Pylon)),

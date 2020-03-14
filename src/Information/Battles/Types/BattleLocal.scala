@@ -70,7 +70,7 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
     val eligibleUnits = enemy.units.view.filter(_.isAny(UnitMatchSiegeTank, Protoss.Reaver, Zerg.Lurker))
     if (eligibleUnits.isEmpty) return 0.0
     val distanceUs     : Double  = eligibleUnits.map(_.pixelDistanceTravelling(With.geography.home)).min
-    val distanceEnemy  : Double  = eligibleUnits.map(_.pixelDistanceTravelling(With.intelligence.mostBaselikeEnemyTile)).max
+    val distanceEnemy  : Double  = eligibleUnits.map(_.pixelDistanceTravelling(With.scouting.mostBaselikeEnemyTile)).max
     val distanceRatio  : Double  = distanceEnemy / (distanceUs + distanceEnemy)
     distanceRatio
   }

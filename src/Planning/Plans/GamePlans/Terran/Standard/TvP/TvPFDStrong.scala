@@ -23,7 +23,7 @@ class TvPFDStrong extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(TvPFDStrong)
   override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
 
-  override def scoutPlan: Plan = new ScoutAt(13)
+  override def scoutWorkerPlan: Plan = new ScoutAt(13)
   override def attackPlan: Plan = new Parallel(
     new Attack(Terran.Vulture),
     new Trigger(

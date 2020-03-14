@@ -12,10 +12,10 @@ class FingerprintSiegeExpand extends FingerprintAnd(
     override protected def investigate: Boolean = {
       With.enemies.exists(e => {
         val siege =
-          (With.intelligence.unitsShown(e, Terran.SiegeTankUnsieged)
-          + With.intelligence.unitsShown(e, Terran.SiegeTankSieged)) > 0
+          (With.unitsShown(e, Terran.SiegeTankUnsieged)
+          + With.unitsShown(e, Terran.SiegeTankSieged)) > 0
         val expand = (
-          With.intelligence.unitsShown(e, Terran.CommandCenter) > 1
+          With.unitsShown(e, Terran.CommandCenter) > 1
           || With.units.enemy.exists(u => u.player == e && u.isCommandCenter() && ! With.geography.startLocations.contains(u.tileTopLeft))
           || e.bases.size > 1)
         siege && expand

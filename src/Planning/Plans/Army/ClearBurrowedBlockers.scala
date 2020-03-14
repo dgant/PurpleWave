@@ -31,7 +31,7 @@ class ClearBurrowedBlockers extends Plan {
     if ( ! With.enemies.exists(_.isZerg) && ! With.enemies.exists(_.isTerran)) {
       return
     }
-    if ( ! With.enemies.exists(_.isZerg) && With.enemies.forall(With.intelligence.unitsShown(_, Terran.SpiderMine) == 0)) {
+    if ( ! With.enemies.exists(_.isZerg) && With.enemies.forall(With.unitsShown(_, Terran.SpiderMine) == 0)) {
       return
     }
     

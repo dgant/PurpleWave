@@ -21,12 +21,12 @@ class GoalAttack extends SquadGoalBasic {
   
   override def toString: String = "Attack " + target.zone.name
   
-  var target: Pixel = With.intelligence.mostBaselikeEnemyTile.pixelCenter
+  var target: Pixel = With.scouting.mostBaselikeEnemyTile.pixelCenter
   
   override def run() {
     chooseTarget()
     squad.units.foreach(attacker => {
-      With.intelligence.highlightScout(attacker)
+      With.scouting.highlightScout(attacker)
       attacker.agent.intend(squad.client, new Intention {
         toTravel = Some(target)
       })
@@ -43,21 +43,21 @@ class GoalAttack extends SquadGoalBasic {
   }
   
   protected def chooseTarget(): Unit = {
-    val focusEnemy = With.intelligence.threatOrigin
+    val focusEnemy = With.scouting.threatOrigin
     val focusUs = PurpleMath.centroid(squad.units.view.map(_.pixelCenter)).tileIncluding
     val threatDistanceToUs =
       ByOption.min(With.geography.ourBases.map(_.heart.tileDistanceFast(focusEnemy)))
         .getOrElse(With.geography.home.tileDistanceFast(focusEnemy))
     val threatDistanceToEnemy =
       ByOption.min(With.geography.enemyBases.map(_.heart.tileDistanceFast(focusUs)))
-        .getOrElse(With.intelligence.mostBaselikeEnemyTile.tileDistanceFast(focusUs))
+        .getOrElse(With.scouting.mostBaselikeEnemyTile.tileDistanceFast(focusUs))
 
     lazy val enemyNonTrollyThreats = With.units.enemy.count(u => u.is(UnitMatchWarriors) && u.possiblyStillThere && ! u.is(Terran.Vulture) && u.detected)
     if (With.enemies.exists( ! _.isZerg)
       && With.enemy.bases.size < 3
       && threatDistanceToUs < threatDistanceToEnemy
       && enemyNonTrollyThreats > 6) {
-      target = With.intelligence.threatOrigin.pixelCenter
+      target = With.scouting.threatOrigin.pixelCenter
       return
     }
     target =
@@ -70,7 +70,7 @@ class GoalAttack extends SquadGoalBasic {
       .orElse(
         ByOption
           .maxBy(With.geography.enemyBases)(base => {
-            val distance      = With.intelligence.threatOrigin.pixelCenter.pixelDistance(base.heart.pixelCenter)
+            val distance      = With.scouting.threatOrigin.pixelCenter.pixelDistance(base.heart.pixelCenter)
             val distanceLog   = 1 + Math.log(1 + distance)
             val defendersLog  = 1 + Math.log(1 + base.defenseValue)
             val output        = distanceLog / defendersLog
@@ -79,7 +79,7 @@ class GoalAttack extends SquadGoalBasic {
           .map(base => ByOption.minBy(base.units.filter(u => u.isEnemy && u.unitClass.isBuilding))(_.pixelDistanceCenter(base.townHallArea.midPixel))
             .map(_.pixelCenter)
             .getOrElse(base.townHallArea.midPixel)))
-      .orElse(if (enemyNonTrollyThreats > 0) Some(With.intelligence.threatOrigin.pixelCenter) else None)
-      .getOrElse(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
+      .orElse(if (enemyNonTrollyThreats > 0) Some(With.scouting.threatOrigin.pixelCenter) else None)
+      .getOrElse(With.scouting.mostBaselikeEnemyTile.pixelCenter)
   }
 }

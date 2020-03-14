@@ -62,7 +62,8 @@ class TaskPlanning extends AbstractTask {
     else
       12
   override protected def onRun() {
-    With.intelligence.update()
+    With.unitsShown.update()
+    With.scouting.update()
     With.yolo.update()
     With.bank.update()
     With.recruiter.update()

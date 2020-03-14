@@ -9,7 +9,7 @@ object TargetFilterRush extends TargetFilter {
   override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = (
     With.frame > timeThreshold
       || ! target.unitClass.isBuilding
-      || ! target.base.exists(b => With.intelligence.enemyMain.contains(b) || With.intelligence.enemyNatural.contains(b))
+      || ! target.base.exists(b => With.scouting.enemyMain.contains(b) || With.scouting.enemyNatural.contains(b))
       || target.zone.walledIn
       || target.totalHealth < 300
       || target.isAny(

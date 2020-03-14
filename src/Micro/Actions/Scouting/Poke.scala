@@ -13,7 +13,7 @@ import Utilities.ByOption
 object Poke extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    With.intelligence.enemyMain.isDefined
+    With.scouting.enemyMain.isDefined
     && unit.canAttack
     && unit.totalHealth > 39
     && unit.matchups.targets.exists(_.unitClass.isWorker)

@@ -28,7 +28,7 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
   override val activationCriteria = new Employing(PvP2GateDTExpand)
   override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
 
-  override val scoutPlan = new PvP1GateCoreIdeas.ScoutPlan
+  override val scoutWorkerPlan = new PvP1GateCoreIdeas.ScoutPlan
 
   override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
 

@@ -9,10 +9,10 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
 import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic.Pump
-import Planning.Plans.Scouting.{FoundEnemyBase, ScoutAt}
+import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound.{Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
-import Planning.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
+import Planning.Predicates.Milestones.{FoundEnemyBase, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitCounters.UnitCountExcept
 import Planning.UnitMatchers.UnitMatchWorkers
@@ -24,7 +24,7 @@ class TvE2RaxSCVMarine extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(TvE2RaxSCVMarine)
 
-  override def scoutWorkerPlan: Plan = new If(
+  override def initialScoutPlan: Plan = new If(
     new Not(new FoundEnemyBase),
     new ScoutAt(10))
 

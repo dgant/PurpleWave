@@ -16,7 +16,7 @@ class PvE2BaseIslandCarrier extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(PvE2BaseIslandCarrier)
 
-  override def scoutWorkerPlan: Plan = NoPlan()
+  override def initialScoutPlan: Plan = NoPlan()
   override def scoutExposPlan: Plan = NoPlan()
 
   override def attackPlan: Plan = new Trigger(

@@ -31,7 +31,7 @@ class TvZProxy8Fact extends GameplanTemplate {
   override def aggressionPlan: Plan = new Aggression(1.5)
   
   override def attackPlan: Plan = new Parallel(new Attack, new Attack(Terran.SCV))
-  override def scoutWorkerPlan: Plan = new ScoutOn(Terran.SCV, quantity = 9)
+  override def initialScoutPlan: Plan = new ScoutOn(Terran.SCV, quantity = 9)
   override def workerPlan: Plan = NoPlan()
   override def supplyPlan: Plan = NoPlan()
 

@@ -21,7 +21,7 @@ class PvTStove extends GameplanTemplate {
   override val completionCriteria   = new Latch(new Or(new MiningBasesAtLeast(3), new UnitsAtLeast(1, Protoss.ArbiterTribunal)))
   override def priorityAttackPlan   = new PvTIdeas.PriorityAttacks
   override def priorityDefensePlan  = new If(new EnemyHasShown(Terran.Vulture), new DefendEntrance(Protoss.Dragoon, UnitCountOne))
-  override def scoutWorkerPlan = new ScoutOn(Protoss.Pylon)
+  override def initialScoutPlan = new ScoutOn(Protoss.Pylon)
 
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvTIdeas.ReactToBBS,

@@ -7,12 +7,12 @@ import Planning.Plans.Army.{AllIn, Attack}
 import Planning.Plans.Basic.{Do, Write}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.{ScoutSafelyWithOverlord, UpgradeHydraRangeThenSpeed}
+import Planning.Plans.GamePlans.Zerg.ZergIdeas.UpgradeHydraRangeThenSpeed
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Scouting.Scout
+import Planning.Plans.Scouting.ScoutWithWorkers
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
@@ -35,19 +35,17 @@ class ZvT3HatchLing extends GameplanTemplate {
       new UpgradeComplete(Zerg.ZerglingSpeed)),
     new Attack(Zerg.Zergling))
 
-  override def scoutWorkerPlan: Plan = new Parallel(
-    new If(
-      new And(
-        new Not(new EnemyWalledIn),
-        new Not(new EnemyStrategy(With.fingerprints.twoFacVultures))),
-      new Trigger(
-        new Or(
-          new And(
-            new StartPositionsAtLeast(4),
-            new MineralsForUnit(Zerg.Overlord, 2)),
-          new MineralsForUnit(Zerg.Hatchery, 2)),
-        new Scout)),
-    new ScoutSafelyWithOverlord)
+  override def initialScoutPlan: Plan = new If(
+    new And(
+      new Not(new EnemyWalledIn),
+      new Not(new EnemyStrategy(With.fingerprints.twoFacVultures))),
+    new Trigger(
+      new Or(
+        new And(
+          new StartPositionsAtLeast(4),
+          new MineralsForUnit(Zerg.Overlord, 2)),
+        new MineralsForUnit(Zerg.Hatchery, 2)),
+      new ScoutWithWorkers))
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new ZvTIdeas.ReactToBarracksCheese,

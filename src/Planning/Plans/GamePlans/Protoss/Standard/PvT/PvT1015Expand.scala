@@ -9,7 +9,7 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, GasCapsUntouched, Pump}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Scouting.Scout
+import Planning.Plans.Scouting.ScoutWithWorkers
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
@@ -28,7 +28,7 @@ class PvT1015Expand extends GameplanTemplate {
     new And(new UnitsAtLeast(2, Protoss.Nexus), new Not(new ShouldDoubleExpand)))
 
   override val removeMineralBlocksAt: Int = 20
-  override def scoutWorkerPlan = new If(new UpgradeStarted(Protoss.DragoonRange), new Scout)
+  override def initialScoutPlan = new If(new UpgradeStarted(Protoss.DragoonRange), new ScoutWithWorkers)
   override val attackPlan = new Attack
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.PvT1015GateGoon
 

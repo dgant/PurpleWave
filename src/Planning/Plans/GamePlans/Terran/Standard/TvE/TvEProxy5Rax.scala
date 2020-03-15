@@ -10,8 +10,9 @@ import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
-import Planning.Plans.Scouting.{FoundEnemyBase, ScoutAt}
+import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound.Not
+import Planning.Predicates.Milestones.FoundEnemyBase
 import Planning.Predicates.Strategy.{Employing, StartPositionsAtLeast}
 import Planning.UnitCounters.UnitCountExcept
 import Planning.UnitMatchers.UnitMatchWorkers
@@ -31,7 +32,7 @@ class TvEProxy5Rax extends GameplanTemplate {
         placement = Some(PlacementProfiles.proxyBuilding)))
   }
 
-  override def scoutWorkerPlan: Plan = new If(
+  override def initialScoutPlan: Plan = new If(
     new StartPositionsAtLeast(3),
     new If(
       new Not(new FoundEnemyBase),

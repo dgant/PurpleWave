@@ -20,7 +20,7 @@ class TvT1FacPort extends GameplanTemplate {
   override val activationCriteria = new Employing(TvT1FacPort)
   override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
 
-  override def scoutWorkerPlan = new ScoutAt(13)
+  override def initialScoutPlan = new ScoutAt(13)
   override def attackPlan = new Parallel(
     new If(new EnemyStrategy(With.fingerprints.fourteenCC), new Attack),
     new Trigger(

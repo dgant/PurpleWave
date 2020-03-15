@@ -35,8 +35,8 @@ abstract class GameplanTemplate extends GameplanMode {
   def supplyPlan            : Plan              = new RequireSufficientSupply
   def workerPlan            : Plan              = new If(new Not(new WeAreZerg), new PumpWorkers)
   def scoutOverlordPlan     : Plan              = new ConsiderScoutingWithOverlords
-  def scoutWorkerPlan       : Plan              = new ScoutDefault
-  def scoutExposPlan        : Plan              = new If(new And(new BasesAtLeast(2), new IsTimeToScoutExpansions), new ScoutExpansions)
+  def initialScoutPlan      : Plan              = new ConsiderScoutingWithWorker
+  def scoutExposPlan        : Plan              = new If(new And(new BasesAtLeast(2), new ShouldScoutExpansions), new ScoutExpansions)
   def yoloPlan              : Plan              = new If(new Check(() => With.yolo.active()), new Attack)
   def priorityDefensePlan   : Plan              = NoPlan()
   def priorityAttackPlan    : Plan              = NoPlan()
@@ -52,7 +52,7 @@ abstract class GameplanTemplate extends GameplanMode {
     priorityAttackPlan,
     nukePlan,
     dropPlan,
-    scoutWorkerPlan,
+    initialScoutPlan,
     new DefendAgainstProxy,
     new DefendZones,
     new DefendAgainstWorkerRush,

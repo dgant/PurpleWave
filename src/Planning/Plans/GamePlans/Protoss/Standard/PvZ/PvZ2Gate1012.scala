@@ -12,6 +12,6 @@ class PvZ2Gate1012 extends PvZ1Base {
 
   override val activationCriteria = new Employing(PvZ2Gate1012)
   override def buildOrder         = ProtossBuilds.TwoGate1012
-  override val scoutWorkerPlan: Plan    = new If(new StartPositionsAtLeast(4), new ScoutOn(Protoss.Pylon), new ScoutOn(Protoss.Gateway))
+  override val initialScoutPlan: Plan    = new If(new StartPositionsAtLeast(4), new ScoutOn(Protoss.Pylon), new ScoutOn(Protoss.Gateway))
 }
 

@@ -5,7 +5,7 @@ import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.{Attack, ConsiderAttacking, Hunt}
+import Planning.Plans.Army.{Attack, Chill, ConsiderAttacking, Hunt}
 import Planning.Plans.Basic.{NoPlan, WriteStatus}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -16,7 +16,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Scouting.{Chill, ScoutOn}
+import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
@@ -31,7 +31,7 @@ abstract class PvZ1Base extends GameplanTemplate {
   override val completionCriteria   = new Latch(new MiningBasesAtLeast(2))
   override def buildOrder           = ProtossBuilds.TwoGate1012
   override def workerPlan           = NoPlan()
-  override val scoutWorkerPlan: Plan      = new If(new StartPositionsAtLeast(4), new ScoutOn(Protoss.Pylon), new ScoutOn(Protoss.Gateway))
+  override val initialScoutPlan: Plan      = new If(new StartPositionsAtLeast(4), new ScoutOn(Protoss.Pylon), new ScoutOn(Protoss.Gateway))
   override def placementPlan: Plan  = new ProposePlacement {
     override lazy val blueprints = Vector(
       new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.hugTownHall)),

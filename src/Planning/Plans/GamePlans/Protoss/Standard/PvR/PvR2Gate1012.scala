@@ -17,7 +17,7 @@ class PvR2Gate1012 extends GameplanTemplateVsRandom {
   override val activationCriteria: Predicate = new Employing(PvROpen2Gate1012)
   override val completionCriteria: Predicate = new UnitsAtLeast(2, Protoss.Zealot)
   override val buildOrder         = ProtossBuilds.TwoGate1012
-  override def scoutWorkerPlan   = new ScoutOn(Protoss.Pylon)
+  override def initialScoutPlan   = new ScoutOn(Protoss.Pylon)
   override def attackPlan  = new Plan
   
   override def buildPlans = Vector(

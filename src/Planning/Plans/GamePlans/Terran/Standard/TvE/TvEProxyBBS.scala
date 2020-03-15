@@ -13,10 +13,10 @@ import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Terran.BuildBunkersAtEnemy
-import Planning.Plans.Scouting.{FoundEnemyBase, ScoutOn}
+import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Economy.MineralsAtLeast
-import Planning.Predicates.Milestones.UnitsAtLeast
+import Planning.Predicates.Milestones.{FoundEnemyBase, UnitsAtLeast}
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitCounters.UnitCountExcept
 import Planning.UnitMatchers.UnitMatchWorkers
@@ -32,7 +32,7 @@ class TvEProxyBBS extends GameplanTemplate {
   
   lazy val proxyZone: Option[Zone] = ProxyPlanner.proxyMiddle
   
-  override def scoutWorkerPlan: Plan = new If(
+  override def initialScoutPlan: Plan = new If(
     new Not(new FoundEnemyBase),
     new ScoutOn(Terran.Marine))
 

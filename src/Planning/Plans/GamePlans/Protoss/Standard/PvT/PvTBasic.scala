@@ -16,7 +16,7 @@ import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural, MeldArchons}
-import Planning.Plans.Scouting.{MonitorBases, Scout, ScoutCleared, ScoutOn}
+import Planning.Plans.Scouting.{MonitorBases, ScoutWithWorkers, ScoutCleared, ScoutOn}
 import Planning.Predicates.Compound._
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost}
 import Planning.Predicates.Milestones.{EnemyHasShownWraithCloak, _}
@@ -44,7 +44,7 @@ class PvTBasic extends GameplanTemplate {
       new Blueprint(this, building = Some(Protoss.Pylon),           requireZone = Some(With.geography.ourMain.zone)),
       new Blueprint(this, building = Some(Protoss.CyberneticsCore), requireZone = Some(With.geography.ourMain.zone))))
 
-  override def scoutWorkerPlan: Plan = new Parallel(
+  override def initialScoutPlan: Plan = new Parallel(
     new If(new EnemyIsRandom,                   new ScoutOn(Protoss.Pylon)), // Continue scouting from a PvR opening
     new If(new Employing(PvT13Nexus),           new ScoutOn(Protoss.Nexus, quantity = 2)),
     new If(new Employing(PvT21Nexus),           new ScoutOn(Protoss.Gateway)),
@@ -52,7 +52,7 @@ class PvTBasic extends GameplanTemplate {
     new If(new Employing(PvT32Nexus),           new ScoutOn(Protoss.Pylon)),
     new If(new Employing(PvT2GateRangeExpand),  new ScoutOn(Protoss.Pylon)),
     new If(new Employing(PvT1GateReaver),       new ScoutOn(Protoss.CyberneticsCore)),
-    new If(new Employing(PvT1015DT),            new If(new UpgradeStarted(Protoss.DragoonRange), new Scout)),
+    new If(new Employing(PvT1015DT),            new If(new UpgradeStarted(Protoss.DragoonRange), new ScoutWithWorkers)),
     new If(new Employing(PvTDTExpand),          new ScoutOn(Protoss.CyberneticsCore)))
 
   override val priorityAttackPlan = new PvTIdeas.PriorityAttacks

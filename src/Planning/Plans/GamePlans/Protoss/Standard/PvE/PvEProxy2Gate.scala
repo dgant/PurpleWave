@@ -12,7 +12,7 @@ import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{RequireBases, RequireMiningBases}
-import Planning.Plans.Scouting.{FoundEnemyBase, ScoutOn}
+import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
@@ -27,7 +27,7 @@ class PvEProxy2Gate extends GameplanTemplate {
 
   override val activationCriteria = new Employing(PvRProxy2Gate, PvTProxy2Gate, PvPProxy2Gate, PvZProxy2Gate)
   override val completionCriteria = new Latch(new BasesAtLeast(2))
-  override def scoutWorkerPlan = new If(
+  override def initialScoutPlan = new If(
     new Not(new FoundEnemyBase),
     new ScoutOn(Protoss.Gateway, quantity = 2))
 

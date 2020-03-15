@@ -13,10 +13,10 @@ import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergenc
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.Terran.BuildBunkersAtEnemy
-import Planning.Plans.Scouting.{FoundEnemyBase, ScoutAt}
+import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
-import Planning.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast, UnitsAtMost}
+import Planning.Predicates.Milestones.{EnemiesAtLeast, FoundEnemyBase, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.{Employing, StartPositionsAtLeast}
 import Planning.UnitCounters.UnitCountExcept
 import Planning.UnitMatchers.UnitMatchWorkers
@@ -40,7 +40,7 @@ class TvE1RaxSCVMarine extends GameplanTemplate {
           placement = Some(PlacementProfiles.proxyBuilding)))
     })
 
-  override def scoutWorkerPlan: Plan = new If(
+  override def initialScoutPlan: Plan = new If(
     new StartPositionsAtLeast(3),
     new If(
       new Not(new FoundEnemyBase),

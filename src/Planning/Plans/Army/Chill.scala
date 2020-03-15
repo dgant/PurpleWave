@@ -1,4 +1,4 @@
-package Planning.Plans.Scouting
+package Planning.Plans.Army
 
 import Lifecycle.With
 import Mathematics.PurpleMath

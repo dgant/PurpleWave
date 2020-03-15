@@ -7,14 +7,13 @@ import Planning.Plans.Army.{AllIn, Attack}
 import Planning.Plans.Basic.Write
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAt, Pump}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireBases
-import Planning.Plans.Scouting.{FoundEnemyBase, Scout}
+import Planning.Plans.Scouting.ScoutWithWorkers
 import Planning.Predicates.Compound.{And, Check, Not}
-import Planning.Predicates.Milestones.{BasesAtLeast, EnemiesAtLeast, GasForUpgrade, UnitsAtLeast}
+import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, StartPositionsAtLeast}
 import Planning.UnitMatchers.UnitMatchOr
 import ProxyBwapi.Races.{Terran, Zerg}
@@ -27,17 +26,15 @@ class ZvT7Pool extends GameplanTemplate {
 
   override def attackPlan: Plan = new Attack
 
-  override def scoutWorkerPlan: Plan = new Parallel(
-    new ScoutSafelyWithOverlord,
-    new If(
+  override def initialScoutPlan: Plan = new If(
+    new And(
+      new StartPositionsAtLeast(3),
+      new Not(new FoundEnemyBase)),
+    new Trigger(
       new And(
-        new StartPositionsAtLeast(3),
-        new Not(new FoundEnemyBase)),
-      new Trigger(
-        new And(
-          new UnitsAtLeast(2, Zerg.Overlord, countEggs = true),
-          new UnitsAtLeast(8, Zerg.Drone, countEggs = true)),
-        new Scout)))
+        new UnitsAtLeast(2, Zerg.Overlord, countEggs = true),
+        new UnitsAtLeast(8, Zerg.Drone, countEggs = true)),
+      new ScoutWithWorkers))
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new ZergReactionVsWorkerRush

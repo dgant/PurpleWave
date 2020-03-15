@@ -4,10 +4,6 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Micro.Agency.Intention
-import Planning.Predicates.Compound.{And, Check, Not}
-import Planning.ResourceLocks.LockUnits
-import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
-import Planning.{Plan, Predicate}
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
@@ -15,11 +11,14 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireBases
+import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
-import Planning.Plans.Scouting.{FoundEnemyBase, Scout}
 import Planning.Predicates.Reactive.SafeAtHome
+import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountEverything
+import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
+import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import Strategery.Sparkle
 
@@ -71,10 +70,7 @@ class ZvESparkle extends GameplanTemplate {
     new BuildOrder(Get(7, Zerg.Mutalisk))
   )
   
-  override def scoutWorkerPlan = new If(
-    new Not(new FoundEnemyBase),
-    new Scout(15) { scouts.get.unitMatcher.set(Zerg.Overlord) })
-  
+  override def initialScoutPlan = NoPlan()
   override def supplyPlan: Plan = NoPlan()
   override def buildPlans: Seq[Plan] = Vector(
     new If(

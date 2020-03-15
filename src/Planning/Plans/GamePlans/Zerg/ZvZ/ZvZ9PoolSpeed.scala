@@ -3,10 +3,11 @@ package Planning.Plans.GamePlans.Zerg.ZvZ
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.Attack
+import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpMutalisks, ScoutSafelyWithOverlord}
+import Planning.Plans.GamePlans.Zerg.ZergIdeas.PumpMutalisks
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -23,7 +24,7 @@ class ZvZ9PoolSpeed extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(ZvZ9PoolSpeed)
 
-  override def scoutWorkerPlan: Plan = new ScoutSafelyWithOverlord
+  override def initialScoutPlan: Plan = NoPlan()
   
   override def attackPlan: Plan = new If(
     new Or(

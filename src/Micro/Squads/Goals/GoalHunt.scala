@@ -36,6 +36,6 @@ class GoalHunt(val enemyMatcher: UnitMatcher) extends SquadGoalBasic {
     val flying = squad.units.forall(_.flying)
     ByOption
       .minBy(squad.enemies.view.filter(_.possiblyStillThere).map(_.pixelCenter))(_.pixelDistance(centroid))
-      .getOrElse(With.scouting.mostIntriguingBases().head.heart.pixelCenter)
+      .getOrElse(With.scouting.baseIntrigue.maxBy(_._2)._1.heart.pixelCenter)
   }
 }

@@ -47,7 +47,9 @@ class FriendlyUnitTracker {
   def onUnitDestroy(unit: bwapi.Unit) {
     val id = unit.getID
     // TODO: Get this out of here. "With.blackboard.lastScout.exists( ! _.alive)"
-    get(id).foreach(friendly => if (friendly.agent.canScout) With.blackboard.lastScoutDeath = With.frame)
+    val friendly = get(id)
+    friendly.foreach(friendlyUnit => if (friendlyUnit.agent.canScout && friendlyUnit.unitClass.isWorker) With.blackboard.lastScoutDeath = With.frame)
+    friendly.filter(_.agent.lastIntent.toScoutBases.nonEmpty).foreach(u => With.blackboard.lastScoutDeath = With.frame)
     remove(id)
   }
   

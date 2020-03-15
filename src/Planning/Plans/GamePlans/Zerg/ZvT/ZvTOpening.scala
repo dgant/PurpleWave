@@ -5,7 +5,6 @@ import Macro.BuildRequests.Get
 import Planning.Plans.Army.EjectScout
 import Planning.Plans.Compound.{FlipIf, If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
 import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpRatio, PumpWorkers}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -23,13 +22,10 @@ class ZvTOpening extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(ZvT12Hatch13Pool, ZvT12Hatch11Pool, ZvT9Pool)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(1, Zerg.Lair))
 
-  override def scoutWorkerPlan: Plan = new Parallel(
-    new ScoutSafelyWithOverlord,
-    new If(
-      new Employing(ZvT9Pool),
-      new ScoutOn(Zerg.SpawningPool),
-      new ScoutOn(Zerg.Overlord, quantity = 2))
-  )
+  override def initialScoutPlan: Plan = new If(
+    new Employing(ZvT9Pool),
+    new ScoutOn(Zerg.SpawningPool),
+    new ScoutOn(Zerg.Overlord, quantity = 2))
 
   override def buildOrderPlan: Plan = new If(
     new Employing(ZvT9Pool),

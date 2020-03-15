@@ -5,11 +5,11 @@ import Macro.BuildRequests.Get
 import Planning.Plans.Army._
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpJustEnoughScourge, PumpMutalisks, ScoutSafelyWithOverlord}
+import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpJustEnoughScourge, PumpMutalisks}
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Scouting.Scout
+import Planning.Plans.Scouting.ScoutWithZergling
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
@@ -50,7 +50,7 @@ class ZvZ10HatchLing extends GameplanTemplate {
       Get(12, Zerg.Drone),
       Get(6, Zerg.Zergling))))
   
-  override def scoutWorkerPlan: Plan = new ScoutSafelyWithOverlord
+  override def initialScoutPlan: Plan = new ScoutWithZergling
   
   override def attackPlan: Plan = new Parallel(
     new Attack(Zerg.Mutalisk),
@@ -63,8 +63,7 @@ class ZvZ10HatchLing extends GameplanTemplate {
           new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.twelvePool),
           new UpgradeComplete(Zerg.ZerglingSpeed),
           new UnitsAtLeast(24, Zerg.Zergling)),
-        new ConsiderAttacking,
-        new Scout { scouts.get.unitMatcher.set(Zerg.Zergling) })))
+        new ConsiderAttacking)))
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(

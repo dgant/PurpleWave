@@ -5,12 +5,11 @@ import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.{AllIn, Attack, EjectScout}
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases}
 import Planning.Plans.Macro.Zerg.{BuildSunkensAtExpansions, BuildSunkensAtNatural}
-import Planning.Plans.Scouting.Scout
+import Planning.Plans.Scouting.ScoutWithZergling
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemyWalledIn, UpgradeComplete}
 import Planning.Predicates.Strategy.Employing
@@ -22,9 +21,7 @@ class ZvT2HatchLingBustMuta extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(ZvT2HatchLingBustMuta)
 
-  override def scoutWorkerPlan: Plan = new Parallel(
-    new ScoutSafelyWithOverlord,
-    new Scout { scouts.get.unitMatcher.set(Zerg.Zergling) })
+  override def initialScoutPlan: Plan = new ScoutWithZergling
 
   override def attackPlan: Plan = new Trigger(
     new UpgradeComplete(Zerg.ZerglingSpeed, 1, GameTime(0, 10)()),

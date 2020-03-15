@@ -6,7 +6,7 @@ import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Compound.{If, Or, Trigger}
 import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpRatio, UpgradeContinuously}
-import Planning.Plans.Scouting.Scout
+import Planning.Plans.Scouting.ScoutWithWorkers
 import Planning.Predicates.Compound.{And, Check}
 import Planning.Predicates.Milestones.{EnemiesAtMost, EnemyHasShown, FrameAtMost, UpgradeComplete}
 import Planning.UnitMatchers._
@@ -31,11 +31,7 @@ object ZergIdeas {
       Zerg.Mutalisk,
       Zerg.Scourge)))
   
-  class ScoutSafelyWithOverlord extends If(
-    new SafeForOverlords,
-    new Scout(3) { scouts.get.unitMatcher.set(Zerg.Overlord) })
-  
-  class ScoutSafelyWithDrone extends If(new EnemiesAtMost(0, UnitMatchAntiGround), new Scout)
+  class ScoutSafelyWithDrone extends If(new EnemiesAtMost(0, UnitMatchAntiGround), new ScoutWithWorkers)
   
   class PumpJustEnoughZerglings(minimum: Int = 2, maximum: Int = 12) extends PumpRatio(
     Zerg.Zergling, minimum, maximum,

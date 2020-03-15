@@ -14,7 +14,7 @@ import Planning.Plans.Macro.Build.CancelOrders
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Zerg.{BuildSunkensAtExpansions, BuildSunkensAtNatural}
-import Planning.Plans.Scouting.Scout
+import Planning.Plans.Scouting.ScoutWithWorkers
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
@@ -39,7 +39,7 @@ class ZvT2HatchLurker extends GameplanTemplate {
           new EnemyWalledIn,
           new EnemyStrategy(With.fingerprints.oneFac, With.fingerprints.twoFac)))))
 
-  override def scoutWorkerPlan: Plan = new Trigger(
+  override def initialScoutPlan: Plan = new Trigger(
     new Or(
       new MineralsForUnit(Zerg.Hatchery, 2),
       new And(
@@ -47,7 +47,7 @@ class ZvT2HatchLurker extends GameplanTemplate {
         new MineralsForUnit(Zerg.Overlord, 2))),
     new If(
       new Not(new EnemyMech),
-      new Scout))
+      new ScoutWithWorkers))
 
   override def attackPlan: Plan = new Parallel(
     new Attack(Zerg.Mutalisk),

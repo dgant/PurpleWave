@@ -47,7 +47,7 @@ class PvPRobo extends GameplanTemplate {
         new Not(new EnemyStrategy(With.fingerprints.dragoonRange)),
         new EnemyRecentStrategy(With.fingerprints.dtRush))))
 
-  override def scoutWorkerPlan: Plan = new PvP1GateCoreIdeas.ScoutPlan()
+  override def initialScoutPlan: Plan = new PvP1GateCoreIdeas.ScoutPlan()
 
   override def blueprints = Vector(
     new Blueprint(this, building = Some(Protoss.Pylon)),

@@ -4,13 +4,12 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, AllIn, Attack}
+import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
 import Planning.Plans.GamePlans.Zerg.ZvZ.ZvZIdeas
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump}
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Scouting.{FoundEnemyBase, ScoutOn}
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
 import Planning.Predicates.Milestones._
@@ -21,11 +20,7 @@ import ProxyBwapi.Races.Zerg
 
 class ZvE9Pool2HatchSpeed extends GameplanTemplate {
 
-  override def scoutWorkerPlan: Plan = new Parallel(
-    new ScoutSafelyWithOverlord,
-    new If(
-      new Not(new FoundEnemyBase),
-      new ScoutOn(Zerg.Overlord, quantity = 2)))
+  override def initialScoutPlan: Plan = NoPlan()
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new ZvZIdeas.ReactToFourPool,

@@ -49,7 +49,7 @@ class TvZ8Rax extends GameplanTemplate {
             new RecruitFreelancers(UnitMatchWorkers, UnitCountExactly(2))),
           new Attack(Terran.SCV)))))
 
-  override def scoutWorkerPlan: Plan = new If(
+  override def initialScoutPlan: Plan = new If(
     new Not(new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.fourPool)),
     new If(
       new StartPositionsAtLeast(3),

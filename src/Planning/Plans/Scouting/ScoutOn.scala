@@ -7,6 +7,6 @@ import Planning.UnitMatchers.UnitMatcher
 
 class ScoutOn(unitMatcher: UnitMatcher, scoutCount: Int = 1, quantity: Int = 1) extends If(
   new Check(() => With.units.ours.count(u => u.is(unitMatcher) && With.framesSince(u.frameDiscovered) > 24) >= quantity),
-  new Scout(scoutCount)) {
+  new ScoutWithWorkers(scoutCount)) {
   description.set("Scout on " + unitMatcher)
 }

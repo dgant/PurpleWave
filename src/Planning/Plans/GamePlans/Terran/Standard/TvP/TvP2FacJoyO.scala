@@ -22,7 +22,7 @@ class TvP2FacJoyO extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(TvP2FacJoyO)
   override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
 
-  override def scoutWorkerPlan: Plan = new ScoutOn(Terran.SupplyDepot, quantity = 2)
+  override def initialScoutPlan: Plan = new ScoutOn(Terran.SupplyDepot, quantity = 2)
   override def aggressionPlan: Plan = new Aggression(1.5)
   
   override def attackPlan: Plan = new Parallel(

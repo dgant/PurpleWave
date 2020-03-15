@@ -12,10 +12,10 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.{PlaceGroundProxies, ProposePlacement}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Scouting.{FoundEnemyBase, ScoutOn}
+import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Always
 import Planning.Predicates.Compound.Not
-import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemiesAtMost, UnitsAtLeast}
+import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemiesAtMost, FoundEnemyBase, UnitsAtLeast}
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.UnitMatchMobileDetectors
 import ProxyBwapi.Races.{Protoss, Terran}
@@ -66,7 +66,7 @@ class ProxyDarkTemplarRush extends GameplanTemplate {
     Get(15, Protoss.Probe),
     Get(4, Protoss.Gateway))
 
-  override def scoutWorkerPlan: Plan = new If(new Not(new FoundEnemyBase), new ScoutOn(Protoss.Pylon))
+  override def initialScoutPlan: Plan = new If(new Not(new FoundEnemyBase), new ScoutOn(Protoss.Pylon))
   override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
   override def attackPlan: Plan = new Trigger(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true), super.attackPlan)
   override def workerPlan: Plan = NoPlan()

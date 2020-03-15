@@ -15,8 +15,9 @@ class Scouting {
     baseScoutMap(base) += 1
   }
 
-  def baseIntrigue: Map[Base, Double] = cacheBaseIntrigueInitial().map(p => (p._1, p._2 / Math.pow(100.0, baseScouts(p._1))))
-  private val cacheBaseIntrigueInitial = new Cache(() => With.geography.bases.filter(b => ! b.owner.isUs).map(base => (base, getBaseIntrigueInitial(base))).toMap)
+  def baseIntrigue: Map[Base, Double] = baseIntrigueRaw.map(p => (p._1, p._2 / Math.pow(100.0, baseScouts(p._1))))
+  def baseIntrigueRaw: Map[Base, Double] = cacheBaseIntrigueInitial()
+  private val cacheBaseIntrigueInitial = new Cache(() => scoutableBases.map(base => (base, getBaseIntrigueInitial(base))).toMap)
   private def getBaseIntrigueInitial(base: Base): Double = {
     val enemyHearts         = With.geography.enemyBases.map(_.heart)
     val heartMain           = base.heart.pixelCenter
@@ -26,6 +27,13 @@ class Scouting {
     val informationAge      = 1.0 + With.framesSince(base.lastScoutedFrame)
     val startPositionBonus  = if (base.isStartLocation && base.lastScoutedFrame <= 0) 100.0 else 1.0
     val output              = startPositionBonus * informationAge / distanceFromEnemy
+    output
+  }
+  private def scoutableBases: Seq[Base] = {
+    var output = With.geography.bases.filter(b => ! b.owner.isUs)
+    if (output.isEmpty) {
+      output = With.geography.bases
+    }
     output
   }
 
@@ -58,9 +66,10 @@ class Scouting {
     ByOption.minBy(With.units.enemy.view.map(_.tileIncludingCenter))(_.tileDistanceSquared(airCentroid)).getOrElse(airCentroid)
   })
 
-  def enemyMain: Option[Base] = firstEnemyMain.filter(base => ! base.scouted || base.owner.isEnemy)
+  def firstEnemyMain: Option[Base] = _firstEnemyMain
+  def enemyMain: Option[Base] = _firstEnemyMain.filter(base => ! base.scouted || base.owner.isEnemy)
   def enemyNatural: Option[Base] = enemyMain.flatMap(_.natural)
-  private var firstEnemyMain: Option[Base] = None
+  private var _firstEnemyMain: Option[Base] = None
 
   def enemyHasScoutedUs: Boolean = _enemyHasScoutedUs
   def enemyHasScoutedUsWithWorker: Boolean = _enemyHasScoutedUsWithWorker
@@ -69,13 +78,13 @@ class Scouting {
   
   def update() {
     baseScoutMap.clear()
-    if (firstEnemyMain.isEmpty) {
-      firstEnemyMain = With.geography.startBases.find(_.owner.isEnemy)
+    if (_firstEnemyMain.isEmpty) {
+      _firstEnemyMain = With.geography.startBases.find(_.owner.isEnemy)
     }
-    if (firstEnemyMain.isEmpty) {
+    if (_firstEnemyMain.isEmpty) {
       val possibleMains = With.geography.startBases.filterNot(_.owner.isUs).filter(base => base.owner.isEnemy || ! base.scouted)
       if (possibleMains.size == 1) {
-        firstEnemyMain = possibleMains.headOption
+        _firstEnemyMain = possibleMains.headOption
       }
     }
     _enemyHasScoutedUsWithWorker = _enemyHasScoutedUsWithWorker || With.geography.ourBases.exists(_.units.exists(u => u.isEnemy && u.is(UnitMatchWorkers)))

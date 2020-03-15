@@ -1,15 +1,15 @@
-package Planning.Plans.Scouting
+package Planning.Plans.Army
 
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Circle
 import Micro.Agency.Intention
-import Planning.Predicates.Compound.Latch
-import Planning.ResourceLocks.LockUnits
-import Planning.UnitMatchers.UnitMatchOr
 import Planning.Plan
+import Planning.Predicates.Compound.Latch
 import Planning.Predicates.Milestones.EnemiesAtLeast
+import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountEverything
+import Planning.UnitMatchers.UnitMatchOr
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption

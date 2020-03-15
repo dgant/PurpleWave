@@ -5,9 +5,8 @@ import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
 import Planning.Plans.Army.{AllIn, Attack}
 import Planning.Plans.Basic.Write
-import Planning.Plans.Compound.{If, Parallel, Trigger}
+import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Expanding.RequireBases
@@ -22,14 +21,12 @@ class ZvT1HatchHydra extends GameplanTemplate {
 
   override val activationCriteria = new Employing(ZvT1HatchHydra)
 
-  override def scoutWorkerPlan: Plan = new Parallel(
-    new ScoutSafelyWithOverlord,
+  override def initialScoutPlan: Plan = new If(
+    new StartPositionsAtLeast(3),
     new If(
-      new StartPositionsAtLeast(3),
-      new If(
-        new StartPositionsAtLeast(4),
-        new ScoutOn(Zerg.Extractor),
-        new ScoutOn(Zerg.HydraliskDen))))
+      new StartPositionsAtLeast(4),
+      new ScoutOn(Zerg.Extractor),
+      new ScoutOn(Zerg.HydraliskDen)))
 
   override def attackPlan: Plan = new Attack
   override def supplyPlan: Plan = new Trigger(

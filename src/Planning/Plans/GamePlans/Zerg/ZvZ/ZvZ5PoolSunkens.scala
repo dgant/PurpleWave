@@ -13,11 +13,10 @@ import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Scouting.Scout
+import Planning.Plans.Scouting.ScoutWithWorkers
 import Planning.Predicates.Compound.{And, Check}
 import Planning.Predicates.Milestones.{FrameAtLeast, UnitsAtLeast}
 import Planning.Predicates.Strategy.Employing
-import Planning.UnitCounters.UnitCountEverything
 import Planning.{Plan, Predicate, ProxyPlanner}
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.ZvZ5PoolSunkens
@@ -28,10 +27,7 @@ class ZvZ5PoolSunkens extends GameplanTemplate {
 
   override def supplyPlan: Plan = NoPlan()
   override def attackPlan: Plan = new Attack
-  override def scoutWorkerPlan: Plan = new Scout {
-    scouts.get.unitMatcher.set(Zerg.Overlord)
-    scouts.get.unitCounter.set(UnitCountEverything)
-  }
+  override def initialScoutPlan: Plan = NoPlan()
   
   private def blueprintCreepColony: Blueprint = new Blueprint(this,
     building    = Some(Zerg.CreepColony),
@@ -76,8 +72,8 @@ class ZvZ5PoolSunkens extends GameplanTemplate {
         new If(
           new FrameAtLeast(GameTime(1, 10)()),
           new Parallel(
-            new Scout(1),
-            new Scout(1)))),
+            new ScoutWithWorkers(1),
+            new ScoutWithWorkers(1)))),
     new Pump(Zerg.Zergling)
   )
 }

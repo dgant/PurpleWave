@@ -13,7 +13,7 @@ import Planning.Plans.Macro.Build.{CancelOrders, ProposePlacement}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
-import Planning.Plans.Scouting.{FoundEnemyBase, ScoutCleared, ScoutForCannonRush}
+import Planning.Plans.Scouting.{ScoutCleared, ScoutForCannonRush}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyDarkTemplarLikely, SafeAtHome}
@@ -28,7 +28,7 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
   override val activationCriteria = new Employing(PvP2GateDTExpand)
   override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
 
-  override val scoutWorkerPlan = new PvP1GateCoreIdeas.ScoutPlan
+  override val initialScoutPlan = new PvP1GateCoreIdeas.ScoutPlan
 
   override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
 

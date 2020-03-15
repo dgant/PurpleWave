@@ -7,7 +7,6 @@ import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.DefendAgainstProxy
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -28,14 +27,12 @@ class ZvPOpening extends GameplanTemplate {
 
   override def attackPlan: Plan = new Attack
 
-  override def scoutWorkerPlan: Plan = new Parallel(
-    new ScoutSafelyWithOverlord,
+  override def initialScoutPlan: Plan = new If(
+    new Not(new EnemyStrategy(With.fingerprints.forgeFe)),
     new If(
-      new Not(new EnemyStrategy(With.fingerprints.forgeFe)),
-      new If(
-        new Employing(ZvP12Hatch),
-        new ScoutAt(8),
-        new ScoutOn(Zerg.SpawningPool))))
+      new Employing(ZvP12Hatch),
+      new ScoutAt(8),
+      new ScoutOn(Zerg.SpawningPool)))
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new DefendAgainstWorkerRush,

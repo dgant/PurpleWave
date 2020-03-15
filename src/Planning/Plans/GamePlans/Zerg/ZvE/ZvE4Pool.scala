@@ -11,7 +11,7 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, ExtractorTrick, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Scouting.Scout
+import Planning.Plans.Scouting.ScoutWithWorkers
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast}
@@ -33,7 +33,7 @@ class ZvE4Pool extends GameplanTemplate {
     new Aggression(99),
     new Aggression(1.5))
   
-  override def scoutWorkerPlan: Plan = new If(
+  override def initialScoutPlan: Plan = new If(
     new And(
       new Latch(
         new And(
@@ -41,7 +41,7 @@ class ZvE4Pool extends GameplanTemplate {
           new UnitsAtLeast(1, Zerg.SpawningPool))),
       new Not(new EnemyStrategy(With.fingerprints.twoGate)),
       new UnitsAtLeast(4, UnitMatchOr(Zerg.Drone, Zerg.Extractor))),
-    new Scout)
+    new ScoutWithWorkers)
   
   override def supplyPlan: Plan = NoPlan()
   

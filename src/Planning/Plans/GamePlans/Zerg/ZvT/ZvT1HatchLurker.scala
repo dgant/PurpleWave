@@ -28,7 +28,7 @@ class ZvT1HatchLurker extends GameplanTemplate {
     Get(11, Zerg.Drone),
     Get(6, Zerg.Zergling))
   
-  override def scoutWorkerPlan: Plan = NoPlan()
+  override def initialScoutPlan: Plan = NoPlan()
   
   override def attackPlan: Plan = new If(
     new UnitsAtLeast(1, Zerg.Lurker, complete = true),

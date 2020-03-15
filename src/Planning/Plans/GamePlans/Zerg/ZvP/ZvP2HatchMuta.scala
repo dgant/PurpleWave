@@ -6,7 +6,6 @@ import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.{ScoutSafelyWithDrone, ScoutSafelyWithOverlord}
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.GamePlans.Zerg.ZvP.ZvPIdeas._
 import Planning.Plans.Macro.Automatic._
@@ -60,12 +59,6 @@ class ZvP2HatchMuta extends GameplanTemplate {
       new ShouldDoSpeedlingAllIn,
       new EnemyBasesAtLeast(2)),
     new Attack)
-  
-  override def scoutWorkerPlan: Plan = new Parallel(
-    new ScoutSafelyWithOverlord,
-    new Trigger(
-      new UnitsAtLeast(2, Zerg.Overlord),
-      new ScoutSafelyWithDrone))
   
   override def scoutExposPlan: Plan = new If(
     new UnitsAtLeast(8, Zerg.Mutalisk),

@@ -4,7 +4,7 @@ import Planning.Plans.Compound.{If, SwitchOurRace}
 import Planning.Predicates.Strategy.StartPositionsAtLeast
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
-class ScoutDefault extends SwitchOurRace(
+class ConsiderScoutingWithWorker extends SwitchOurRace(
   whenTerran = new If(
     new StartPositionsAtLeast(3),
     new ScoutOn(Terran.SupplyDepot),

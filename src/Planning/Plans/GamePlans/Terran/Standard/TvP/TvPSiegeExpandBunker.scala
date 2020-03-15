@@ -28,7 +28,7 @@ class TvPSiegeExpandBunker extends GameplanTemplate {
     new UnitsAtLeast(1, Terran.EngineeringBay)
   ))
 
-  override def scoutWorkerPlan: Plan = new ScoutOn(Terran.Factory)
+  override def initialScoutPlan: Plan = new ScoutOn(Terran.Factory)
 
   override def attackPlan = new Parallel(
     new Attack(Terran.Vulture),

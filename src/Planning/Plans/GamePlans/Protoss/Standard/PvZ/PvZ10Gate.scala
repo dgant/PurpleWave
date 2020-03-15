@@ -8,7 +8,7 @@ import Strategery.Strategies.Protoss.PvZ10Gate
 
 class PvZ10Gate extends PvZ1Base {
   override val activationCriteria = new Employing(PvZ10Gate)
-  override val scoutWorkerPlan = new ScoutOn(Protoss.Gateway)
+  override val initialScoutPlan = new ScoutOn(Protoss.Gateway)
   override def buildOrder = Vector(
     Get(8, Protoss.Probe),
     Get(Protoss.Pylon),

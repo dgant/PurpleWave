@@ -3,10 +3,9 @@ package Planning.Plans.GamePlans.Zerg.ZvP
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Aggression, EjectScout}
-import Planning.Plans.Basic.WriteStatus
+import Planning.Plans.Basic.{NoPlan, WriteStatus}
 import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -24,8 +23,8 @@ class ZvPMain extends GameplanTemplate {
 
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(5, Zerg.Hatchery))
 
-  override def scoutWorkerPlan: Plan = new ScoutSafelyWithOverlord
   override def attackPlan: Plan = new ZvPIdeas.AttackPlans
+  override def initialScoutPlan: Plan = NoPlan()
 
   class AttemptZerglingBust extends And(
     new UnitsAtMost(0, Zerg.Lair),

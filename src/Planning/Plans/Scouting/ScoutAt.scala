@@ -5,7 +5,7 @@ import Planning.Predicates.Milestones.SupplyOutOf200
 
 class ScoutAt(minimumSupply: Int, scoutCount: Int = 1) extends If(
   new SupplyOutOf200(minimumSupply),
-  new Scout(scoutCount)) {
+  new ScoutWithWorkers(scoutCount)) {
   
   description.set("Scout at " + minimumSupply + " supply")
 }

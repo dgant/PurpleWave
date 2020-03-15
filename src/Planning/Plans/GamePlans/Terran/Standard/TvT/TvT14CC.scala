@@ -26,7 +26,7 @@ class TvT14CC extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(TvT14CC)
   override val completionCriteria: Predicate = new Latch(new And(new UnitsAtLeast(1, Terran.Bunker, complete = true), new UnitsAtLeast(2, Terran.Refinery)))
 
-  override def scoutWorkerPlan = new ScoutOn(Terran.CommandCenter, quantity = 2)
+  override def initialScoutPlan = new ScoutOn(Terran.CommandCenter, quantity = 2)
   override def attackPlan = NoPlan()
 
   val naturalZone: Zone = With.geography.ourNatural.zone

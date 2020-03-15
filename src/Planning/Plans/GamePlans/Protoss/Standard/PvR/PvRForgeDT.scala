@@ -21,7 +21,7 @@ import Strategery.Strategies.Protoss.PvR1BaseDT
 class PvRForgeDT extends GameplanTemplateVsRandom {
 
   override val activationCriteria = new Employing(PvR1BaseDT)
-  override def scoutWorkerPlan = NoPlan()
+  override def initialScoutPlan = NoPlan()
 
   override def attackPlan = new Parallel(
     new Attack(Protoss.DarkTemplar),

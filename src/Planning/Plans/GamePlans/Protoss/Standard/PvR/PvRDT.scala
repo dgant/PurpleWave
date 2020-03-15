@@ -29,7 +29,7 @@ class PvRDT extends GameplanTemplate {
     new UnitsAtLeast(2, Protoss.PhotonCannon))
 
   override val workerPlan = NoPlan()
-  override def scoutWorkerPlan: Plan = new ScoutOn(Protoss.Pylon)
+  override def initialScoutPlan: Plan = new ScoutOn(Protoss.Pylon)
 
   override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
 

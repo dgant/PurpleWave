@@ -4,7 +4,7 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Planning.Predicate
 
-class IsTimeToScoutExpansions extends Predicate {
+class ShouldScoutExpansions extends Predicate {
   def time: GameTime = {
     if (With.self.isProtoss)
       if (With.enemy.isTerran)        GameTime(9, 0)

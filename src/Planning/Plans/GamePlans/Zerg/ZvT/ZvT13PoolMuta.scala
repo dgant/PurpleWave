@@ -8,15 +8,15 @@ import Planning.Predicates.Compound.Not
 import Planning.UnitCounters.UnitCountOne
 import Planning.{Plan, Predicate}
 import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.ScoutSafelyWithOverlord
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Predicates.Milestones.UnitsAtLeast
-import Planning.Plans.Scouting.FoundEnemyBase
+import Planning.Plans.Scouting.ScoutWithZergling
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.ZvT13PoolMuta
@@ -27,11 +27,7 @@ class ZvT13PoolMuta extends GameplanTemplate {
   
   override def aggressionPlan: Plan = new Aggression(0.7)
   
-  override def scoutWorkerPlan: Plan = new Parallel(
-    new ScoutSafelyWithOverlord,
-    new If(
-      new Not(new FoundEnemyBase),
-      new Attack(Zerg.Zergling, UnitCountOne)))
+  override def initialScoutPlan: Plan = new ScoutWithZergling
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new ZvTIdeas.ReactToBarracksCheese,

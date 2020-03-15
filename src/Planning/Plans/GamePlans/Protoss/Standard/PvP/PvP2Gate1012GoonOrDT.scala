@@ -67,7 +67,7 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
             new EnemyStrategy(With.fingerprints.fourGateGoon))),
         new PvPIdeas.AttackSafely)))
 
-  override val scoutWorkerPlan: Plan = new If(new StartPositionsAtLeast(4), new ScoutOn(Protoss.Pylon), new ScoutOn(Protoss.Gateway))
+  override val initialScoutPlan: Plan = new If(new StartPositionsAtLeast(4), new ScoutOn(Protoss.Pylon), new ScoutOn(Protoss.Gateway))
   
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvPIdeas.ReactToGasSteal,

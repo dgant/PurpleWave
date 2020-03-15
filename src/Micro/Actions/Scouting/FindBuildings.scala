@@ -28,6 +28,10 @@ abstract class AbstractFindBuildings extends Action {
   protected val boredomFrames: Int
   
   override protected def perform(unit: FriendlyUnitInfo) {
+    if (unit.matchups.threats.isEmpty && unit.agent.lastIntent.toScoutBases.forall( ! _.scouted)) {
+      Move.consider(unit)
+    }
+
     def nearestNeutralBases(count: Int): Iterable[Base] = {
       With.geography.neutralBases
         .filterNot(_.zone.island)
@@ -47,7 +51,9 @@ abstract class AbstractFindBuildings extends Action {
         //   nearestNeutralBases(if (With.enemy.isZerg) 5 else 2)
         else
           Vector.empty)
-  
+
+    // TODO: This relies on GridFriendlyVersion.framesSince()
+    // which is now a LIE as the grid is not updated every frame
     val tilesToScout = basesToScout
       .flatMap(base => {
         val tiles = base.zone.tiles.filter(tile =>

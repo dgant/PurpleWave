@@ -10,6 +10,8 @@ object TargetFilterRush extends TargetFilter {
     With.frame > timeThreshold
       || ! target.unitClass.isBuilding
       || ! target.base.exists(b => With.scouting.enemyMain.contains(b) || With.scouting.enemyNatural.contains(b))
+      || target.base.forall(_.resourcePathTiles.forall(With.grids.friendlyVision.ever))
+      || target.tileArea.contains(actor.agent.destination)
       || target.zone.walledIn
       || target.totalHealth < 300
       || target.isAny(

@@ -14,7 +14,7 @@ class ExtractorTrick extends Plan {
     val shouldBuildExtractor = (
       With.self.supplyTotal == 18
       && Vector(17, 18).contains(With.self.supplyUsed)
-      && With.self.minerals >= 76
+      && With.self.minerals >= 84
       && With.units.existsOurs(Zerg.Larva)
       && extractors.isEmpty)
   

@@ -23,13 +23,31 @@ class ScoutWithOverlord extends AbstractScoutPlan {
       val scouts  = getScouts(Zerg.Overlord, 1)
       scouts.foreach(scoutBasesTowardsTownHall(_, bases))
     } else {
-      // Vs Terran:  Scout least-claimed main nearest scout
-      // Vs Protoss: Scout least-claimed main's natural nearest scout
-      // Vs Zerg:    Scout least-claimed main nearest scout
-      // Vs Random:  Scout least-claimed main nearest scout
-      val bases   = With.geography.startBases.filterNot(_.scouted).sortBy(_.townHallTile.groundPixels(With.geography.home))
-      val scouts  = getScouts(Zerg.Overlord, bases.size)
-      scouts.zipWithIndex.foreach(workerAndIndex => scoutBasesTowardsTownHall(workerAndIndex._1, Seq(bases(workerAndIndex._2))))
+      // Vs Terran:  Scout main with nearest scout
+      // Vs Protoss: Scout main's natural with nearest scout
+      // Vs Zerg:    Scout main with nearest scout
+      // Vs Random:  Scout main with nearest scout
+
+      // Sort by ENTRANCE distance to encourage seeing critical buildings and flying over armies leaving the base
+      val candidateBases = With.geography.startBases.filterNot(_.owner.isUs).filterNot(_.scouted)
+      val scouts = getScouts(Zerg.Overlord, candidateBases.size).toVector.sortBy(_.frameDiscovered)
+      val startBases = candidateBases.sortBy(main => {
+          val base = main.natural.filter(! _.scouted && With.enemy.isProtoss).getOrElse(main)
+          base.zone.exit
+            .map(_.pixelCenter)
+            .getOrElse(base.townHallArea.midPixel)
+            .pixelDistance(
+              scouts
+                .headOption
+                .map(_.pixelCenter)
+                .getOrElse(With.geography.home.pixelCenter))
+      })
+      val scoutBases = startBases
+        .map(b => b.natural.filter(
+          With.enemy.isProtoss
+          && ! b.scouted
+          && _.heart.tileDistanceSquared(With.geography.home) <=git b.heart.tileDistanceSquared(With.geography.home)).getOrElse(b))
+      scouts.zipWithIndex.foreach(workerAndIndex => scoutBasesTowardsTownHall(workerAndIndex._1, Seq(scoutBases(workerAndIndex._2))))
     }
   }
 }

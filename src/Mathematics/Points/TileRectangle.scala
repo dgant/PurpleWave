@@ -39,6 +39,10 @@ case class TileRectangle(
   def contains(tile: Tile): Boolean = {
     contains(tile.x, tile.y)
   }
+
+  def contains(pixel: Pixel): Boolean = {
+    contains(pixel.x / 32, pixel.y / 32)
+  }
   
   def intersects(otherRectangle: TileRectangle): Boolean = {
     containsRectangle(otherRectangle) || otherRectangle.containsRectangle(this)

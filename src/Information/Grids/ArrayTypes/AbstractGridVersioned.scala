@@ -20,6 +20,7 @@ abstract class AbstractGridVersioned extends AbstractGridInt {
   @inline final def stamp(tile: Tile) { stamp(tile.i) }
   @inline final def stampUnchecked(tile: Tile) { stampUnchecked(tile.i) }
   @inline final def framesSince(tile: Tile): Int = version - get(tile)
+  @inline final def ever(tile: Tile): Boolean = get(tile) > 0
 
   override def update() {
     updateVersion()

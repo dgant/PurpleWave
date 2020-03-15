@@ -54,7 +54,7 @@ class GridGroundDistance(initialOrigins: Tile*) extends AbstractGridInt {
     while(openSize > 0) {
       val next = open
       val nextSize = openSize
-      open = if (open == tilesA) tilesB else tilesA
+      open = if (open.equals(tilesA)) tilesB else tilesA
       openSize = 0
       for (nextTile <- 0 until nextSize) explore(next(nextTile))
       distance += 1

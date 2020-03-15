@@ -48,6 +48,7 @@ abstract class GameplanTemplate extends GameplanMode {
   def tacticsPlans: Vector[Plan] = Vector(
     aggressionPlan,
     yoloPlan,
+    scoutOverlordPlan,
     priorityDefensePlan,
     priorityAttackPlan,
     nukePlan,

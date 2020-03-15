@@ -100,7 +100,6 @@ object Paradrop extends Action {
         profile.lengthMaximum       = Some(30)
         profile.threatMaximum       = maximumThreat
         profile.canCrossUnwalkable  = true
-        profile.allowGroundDist     = false
         profile.costOccupancy       = 0.25f
         profile.costThreat          = 5f
         profile.costRepulsion       = if (target.isDefined) 0.5f else 2f

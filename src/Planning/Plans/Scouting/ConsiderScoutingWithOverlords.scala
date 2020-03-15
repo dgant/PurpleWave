@@ -1,32 +1,33 @@
 package Planning.Plans.Scouting
 
-import Planning.Plans.Compound.{SwitchEnemyRace, Trigger}
-import Planning.Predicates.Compound.And
-import Planning.Predicates.Milestones.EnemiesAtMost
+import Planning.Plans.Compound.{Or, SwitchEnemyRace, Trigger}
+import Planning.Predicates.Milestones.EnemiesAtLeast
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
 class ConsiderScoutingWithOverlords extends SwitchEnemyRace(
   whenTerran = new Trigger(
-    new And(
-      new EnemiesAtMost(0, Terran.Marine),
-      new EnemiesAtMost(0, Terran.Goliath),
-      new EnemiesAtMost(0, Terran.Wraith),
-      new EnemiesAtMost(0, Terran.Barracks, complete = true)),
-    new ScoutWithOverlord),
+    new Or(
+      new EnemiesAtLeast(1, Terran.Marine),
+      new EnemiesAtLeast(1, Terran.Goliath),
+      new EnemiesAtLeast(1, Terran.Wraith),
+      new EnemiesAtLeast(1, Terran.Barracks, complete = true)),
+    initialBefore = new ScoutWithOverlord),
   whenProtoss = new Trigger(
-    new And(
-      new EnemiesAtMost(0, Protoss.Dragoon),
-      new EnemiesAtMost(0, Protoss.Corsair),
-      new EnemiesAtMost(0, Protoss.Stargate, complete = true),
-      new EnemiesAtMost(0, Protoss.CyberneticsCore, complete = true)),
-    new ScoutWithOverlord),
+    new Or(
+      new EnemiesAtLeast(1, Protoss.Dragoon),
+      new EnemiesAtLeast(1, Protoss.Corsair),
+      new EnemiesAtLeast(1, Protoss.Stargate, complete = true),
+      new EnemiesAtLeast(1, Protoss.CyberneticsCore, complete = true)),
+    initialBefore = new ScoutWithOverlord),
   whenZerg = new Trigger(
-    new And(
-      new EnemiesAtMost(0, Zerg.Mutalisk),
-      new EnemiesAtMost(0, Zerg.Scourge),
-      new EnemiesAtMost(0, Zerg.Hydralisk),
-      new EnemiesAtMost(0, Zerg.Lair),
-      new EnemiesAtMost(0, Zerg.Spire)),
-    new ScoutWithOverlord),
+    new Or(
+      new EnemiesAtLeast(1, Zerg.Mutalisk),
+      new EnemiesAtLeast(1, Zerg.Scourge),
+      new EnemiesAtLeast(1, Zerg.Hydralisk),
+      new EnemiesAtLeast(1, Zerg.Lair),
+      new EnemiesAtLeast(1, Zerg.Spire)),
+    initialBefore = new ScoutWithOverlord),
   whenRandom = new ScoutWithOverlord
-)
+) {
+  description.set("Consider Ovie scouting")
+}

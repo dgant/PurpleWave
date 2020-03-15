@@ -35,8 +35,8 @@ trait GroundDistance {
   }
 
   def groundPixels(origin: Pixel, destination: Pixel): Double = {
-    // Some maps have broken ground distance (due to continued reliance on BWTA,
-    // which in particular seems to suffer on maps with narrow ramps, eg. Plasma, Third World
+    // Some maps used to have broken ground distance (due to BWTA,
+    // which in particular suffered on maps with narrow ramps, eg. Plasma, Third World
     if (With.strategy.map.exists( ! _.trustGroundDistance)) {
       return origin.pixelDistance(destination)
     }
@@ -52,13 +52,14 @@ trait GroundDistance {
     // before which we're getting pixel-resolution distance and after which we're getting tile-resolution distance
     Math.max(
       origin.pixelDistance(destination),
-      32 * groundTiles(origin.tileIncluding, destination.tileIncluding))
+      32.0 * groundTiles(origin.tileIncluding, destination.tileIncluding))
   }
 
   protected def groundTiles(origin: Tile, destination: Tile): Long = {
     ByOption
       .min(destination.zone.edges.map(edge =>
-        edge.distanceGrid.get(destination) + edge.distanceGrid.get(origin).toLong))
+        edge.distanceGrid.get(destination)
+        + edge.distanceGrid.get(origin).toLong))
       .getOrElse(impossiblyLargeDistance)
   }
 }

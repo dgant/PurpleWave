@@ -423,6 +423,8 @@ object PvPIdeas {
 
   class TrainArmy extends Parallel(
     new Pump(Protoss.Carrier),
+    new PumpRatio(Protoss.Observer, 0, 1, Seq(Enemy(Protoss.DarkTemplar, 1.0))),
+    new PumpRatio(Protoss.Dragoon, 0, 80, Seq(Enemy(Protoss.Carrier, 6.0))),
     new If(
       new And(
         new Not(new EnemyCarriersOnly),

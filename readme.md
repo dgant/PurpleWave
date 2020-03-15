@@ -5,13 +5,15 @@
 [PurpleWave](https://github.com/dgant/PurpleWave) is a *StarCraft: Brood War* AI written in Scala. It can play all three races and a large variety of professional-style strategies.
 
 PurpleWave has won:
- * 1st Place in the [2019 IEEE CoG StarCraft AI Competition](https://cilab.gist.ac.kr/sc_competition2019/?cat=17)
- * 1st Place in the [2018 SSCAIT](https://sscaitournament.com/index.php?action=2018) 
- * 1st Place in the [2018 AIST1](https://sites.google.com/view/aistarcrafttournament/aist-s1)
- * 2nd place in the [2019 AIIDE StarCraft AI Competition](https://www.cs.mun.ca/~dchurchill/starcraftaicomp/2019/)
- * 2nd Place in the [2017 AIIDE StarCraft AI Competition](https://www.cs.mun.ca/~dchurchill/starcraftaicomp/2017/)
- * 2nd Place in the [2018 IEEE CIG StarCraft AI Competition](https://cilab.gist.ac.kr/sc_competition2018/?cat=17)
- * 3rd Place in the [2017 IEEE CIG StarCraft AI Competition](https://cilab.gist.ac.kr/sc_competition2017/?cat=17)
+ * :trophy: 1st Place in the [2019-20 SSCAIT](https://sscaitournament.com/index.php?action=2019)
+ * :trophy: 1st Place in the [2019 IEEE CoG StarCraft AI Competition](https://cilab.gist.ac.kr/sc_competition2019/?cat=17)
+ * :trophy: 1st Place in the [2018-19 SSCAIT](https://sscaitournament.com/index.php?action=2018)
+ * :trophy: 1st Place in the [2018 AIST1](https://sites.google.com/view/aistarcrafttournament/aist-s1)
+ * :2nd_place_medal: 2nd place in the [2020 AIST3](https://sites.google.com/view/aistarcrafttournament/aist-s3)
+ * :2nd_place_medal: 2nd place in the [2019 AIIDE StarCraft AI Competition](https://www.cs.mun.ca/~dchurchill/starcraftaicomp/2019/)
+ * :2nd_place_medal: 2nd Place in the [2017 AIIDE StarCraft AI Competition](https://www.cs.mun.ca/~dchurchill/starcraftaicomp/2017/)
+ * :2nd_place_medal: 2nd Place in the [2018 IEEE CIG StarCraft AI Competition](https://cilab.gist.ac.kr/sc_competition2018/?cat=17)
+ * :3rd_place_medal: 3rd Place in the [2017 IEEE CIG StarCraft AI Competition](https://cilab.gist.ac.kr/sc_competition2017/?cat=17)
  
 PurpleWave has also ranked #1 on the [BASIL](https://basil.bytekeeper.org/ranking.html), SSCAIT, and SAIL ladders.
 

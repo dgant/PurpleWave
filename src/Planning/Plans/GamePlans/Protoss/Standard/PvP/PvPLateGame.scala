@@ -146,6 +146,7 @@ class PvPLateGame extends GameplanTemplate {
     new Or(
       new EnemyBasesAtLeast(3),
       new Employing(PvP3rdBaseFast),
+      new EnemiesAtLeast(5, Protoss.PhotonCannon),
       new And(
         new Not(new EnemyHasShown(Protoss.Shuttle)),
         new Or(

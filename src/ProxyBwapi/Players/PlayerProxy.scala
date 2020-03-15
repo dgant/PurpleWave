@@ -73,7 +73,7 @@ abstract class PlayerProxy(base:Player) {
     With.units.ours
       .view
       .withFilter(u => u.unitClass.race == raceInitial)
-      .map(u => if (u.morphing) u.buildType.supplyRequired else u.unitClass.supplyRequired)
+      .map(u => if (u.morphing) u.buildType.supplyRequired * (if (u.buildType.isTwoUnitsInOneEgg) 2 else 1) else u.unitClass.supplyRequired)
       .sum)
 
   private val supplyTotalCache = new Cache(() => if (!isUs) 0 else

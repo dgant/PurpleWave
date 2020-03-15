@@ -124,7 +124,7 @@ object PvTIdeas {
       new DefendFightersAgainstRush,
       new CapGasAt(250),
       new If(new UnitsAtMost(1, Protoss.Gateway, complete = true), new CapGasWorkersAt(1)),
-      new If(new UnitsAtMost(5, UnitMatchWarriors), new CancelIncomplete(Protoss.Nexus)),
+      new If(new UnitsAtMost(5, UnitMatchWarriors), new CancelIncomplete(Protoss.Nexus, Protoss.CitadelOfAdun, Protoss.TemplarArchives)),
       new If(new UnitsAtMost(1, Protoss.Gateway), new CancelIncomplete(UnitMatchOr(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Nexus, Protoss.Stargate))),
       new RequireSufficientSupply,
       new If(new UnitsAtLeast(1, Protoss.Reaver, complete = true), new RequireMiningBases(2)),

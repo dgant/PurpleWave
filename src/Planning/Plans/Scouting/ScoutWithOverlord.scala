@@ -46,7 +46,7 @@ class ScoutWithOverlord extends AbstractScoutPlan {
         .map(b => b.natural.filter(
           With.enemy.isProtoss
           && ! b.scouted
-          && _.heart.tileDistanceSquared(With.geography.home) <=git b.heart.tileDistanceSquared(With.geography.home)).getOrElse(b))
+          && _.heart.tileDistanceSquared(With.geography.home) <= b.heart.tileDistanceSquared(With.geography.home)).getOrElse(b))
       scouts.zipWithIndex.foreach(workerAndIndex => scoutBasesTowardsTownHall(workerAndIndex._1, Seq(scoutBases(workerAndIndex._2))))
     }
   }

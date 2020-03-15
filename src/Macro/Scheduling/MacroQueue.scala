@@ -37,7 +37,11 @@ class MacroQueue {
     val unitsWanted = new CountMap[UnitClass]
     val unitsActual = new CountMap[UnitClass]
       With.units.ours.foreach(unit => {
-        unitsActual.add(unit.unitClass, 1)
+        // Count the unit if it no longer needs attention
+        // Namely, Terran buildings need ongoing support
+        if (unit.complete || ! (unit.unitClass.isBuilding && unit.unitClass.isTerran)) {
+          unitsActual.add(unit.unitClass, 1)
+        }
         if (unit.is(Terran.SiegeTankSieged)) {
           unitsActual.add(Terran.SiegeTankUnsieged, 1)
         }
@@ -52,6 +56,16 @@ class MacroQueue {
           unitsActual.add(Zerg.Hatchery, 1)
         }
       })
+    // Don't leave Terran buildings incomplete;
+    // Make sure we have a plan for finishing all our existing buildings
+    if (With.self.isTerran) {
+      With.units.ours
+        .filter(u => u.unitClass.isBuilding && ! u.complete)
+        .map(_.unitClass)
+        .toVector
+        .distinct
+        .foreach(u => unitsWanted(u) = Math.max(unitsWanted(u), With.units.countOurs(u)))
+    }
     requestQueue.flatten(getUnfulfilledBuildables(_, unitsWanted, unitsActual))
   })
   

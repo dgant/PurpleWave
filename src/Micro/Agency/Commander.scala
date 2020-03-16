@@ -205,10 +205,12 @@ class Commander {
     //
     // Also, give different units different paths to avoid "conga line" behavior
     //
-    destination = destination.add((unit.id + With.frame / 36) % 5 - 2, 0)
+    if (unit.pixelDistanceCenter(destination) > 160) {
+      destination = destination.add((unit.id + With.frame / 36) % 5 - 2, 0)
+    }
     
     if (unit.pixelDistanceCenter(destination) > 3) {
-      if (unit.is(Terran.Medic)) {
+      if (unit.is(Terran.Medic) && unit.agent.shouldEngage) {
         unit.baseUnit.attack(destination.bwapi)
       }
       else {

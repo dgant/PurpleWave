@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Techniques
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Information.Geography.Types.Zone
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Combat.Targeting.Filters.TargetFilterWhitelist

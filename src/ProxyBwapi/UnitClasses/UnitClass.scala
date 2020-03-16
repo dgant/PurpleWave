@@ -110,6 +110,14 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
       Zerg.InfestedTerran)
     .contains(this)
 
+  // Subjective measure of splashiness
+  lazy val splashFactor: Double = if (dealsRadialSplashDamage || this == Zerg.Lurker)
+      2.5
+    else if(this == Zerg.Mutalisk)
+      1.25
+    else
+      1.0
+
   lazy val isReaver: Boolean = this == Protoss.Reaver
 
   lazy val maxTotalHealth: Int = maxHitPoints + maxShields

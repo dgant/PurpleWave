@@ -1,6 +1,6 @@
 package Micro.Actions.Combat.Techniques
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Combat.Techniques.Common.Activators.WeightedMin

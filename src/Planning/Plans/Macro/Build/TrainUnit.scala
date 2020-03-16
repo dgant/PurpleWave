@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Build
 
 import Debugging.Visualizations.Rendering.DrawMap
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.Buildables.{Buildable, BuildableUnit}
 import Mathematics.PurpleMath

@@ -93,13 +93,8 @@ class Base(val townHallTile: Tile)
       output += townHallAdjacentTiles.minBy(_.tileDistanceSquared(gasTile))
     }))
 
-    // Avoid trapping workers into the mining area by banning tiles which are adjacent to the resource but closer to the town hall
-    minerals.foreach(mineral => {
-      val resourceDistance = mineral.tileArea.tiles.map(hallDistanceSquared).min
-      val adjacentTiles = mineral.tileArea.tilesSurrounding
-      val adjacentTilesCloser = adjacentTiles.filter(hallDistanceSquared(_) < resourceDistance)
-      output ++= adjacentTilesCloser
-    })
+    // Avoid trapping workers into the mining area by banning tiles which are adjacent to the resource
+    output ++= minerals.flatMap(_.tileArea.tilesSurrounding)
     output --= townHallTiles
 
     output.toSet

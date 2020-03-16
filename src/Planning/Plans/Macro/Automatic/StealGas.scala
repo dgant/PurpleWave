@@ -1,6 +1,6 @@
 package Planning.Plans.Macro.Automatic
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Planning.Plan
 import Planning.ResourceLocks.LockCurrencyForUnit

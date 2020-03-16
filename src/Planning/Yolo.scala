@@ -1,6 +1,6 @@
 package Planning
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Performance.Cache
 import Planning.UnitMatchers.UnitMatchWorkers

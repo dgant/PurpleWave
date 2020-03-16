@@ -6,9 +6,8 @@ import Information.Battles.BattleClassifier
 import Information.Geography.Geography
 import Information.Geography.Pathfinding.Paths
 import Information.Grids.Grids
-import Information.Intelligenze.Fingerprinting.Fingerprints
-import Information.Intelligenze.UnitsShown
-import Information._
+import Information.Fingerprinting.Fingerprints
+import Information.{UnitsShown, _}
 import Macro.Allocation._
 import Macro.Architecture.{Architecture, PlacementScheduler}
 import Macro.Scheduling.{MasterBuildOrderHistory, MasterBuildPlans, Projections, Scheduler}

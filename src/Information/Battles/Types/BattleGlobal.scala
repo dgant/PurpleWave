@@ -49,8 +49,8 @@ class BattleGlobal(us: Team, enemy: Team) extends Battle(us, enemy) {
       (! mustBeMobile || ! unit.unitClass.isBuilding)
       && ! unit.unitClass.isWorker
       && unit.canAttack)
-    battle.us     .units.filter(fitsAttackCriteria(_, weAttack))     .foreach(builder.addUnit)
-    battle.enemy  .units.filter(fitsAttackCriteria(_, enemyAttacks)) .foreach(builder.addUnit)
+    battle.us     .units.view.filter(fitsAttackCriteria(_, weAttack))     .foreach(builder.addUnit)
+    battle.enemy  .units.view.filter(fitsAttackCriteria(_, enemyAttacks)) .foreach(builder.addUnit)
     EstimateAvatar.calculate(builder)
   }
 }

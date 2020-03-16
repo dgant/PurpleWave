@@ -1,6 +1,6 @@
 package Micro.Actions.Basic
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Actions.Action
 import ProxyBwapi.Races.Terran

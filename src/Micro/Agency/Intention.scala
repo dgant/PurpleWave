@@ -1,6 +1,5 @@
 package Micro.Agency
 
-import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
 import ProxyBwapi.Techs.Tech
@@ -27,12 +26,11 @@ class Intention {
   var toLeash       : Option[Leash]             = None
   var toRepair      : Option[UnitInfo]          = None
   var toBoard       : Option[FriendlyUnitInfo]  = None
-  var toScoutBases  : Seq[Base]                 = Seq.empty
+  var toScoutTiles  : Seq[Tile]                 = Seq.empty
   var canAttack     : Boolean                   = true
   var canFlee       : Boolean                   = true
   var canMeld       : Boolean                   = false
   var canTickle     : Boolean                   = false
-  var canScout      : Boolean                   = false
   var canLiftoff    : Boolean                   = false
   var canCancel     : Boolean                   = false
   var canFocus      : Boolean                   = false

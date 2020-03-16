@@ -1,6 +1,6 @@
 package Planning.Predicates.Strategy
 
-import Information.Intelligenze.Fingerprinting.Fingerprint
+import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.Plans.Compound.Or
 import Planning.Predicate

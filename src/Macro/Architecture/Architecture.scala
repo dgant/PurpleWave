@@ -3,7 +3,7 @@ package Macro.Architecture
 import Debugging.Visualizations.Views.Geography.ShowArchitecturePlacements
 import Information.Geography.Types.Zone
 import Information.Grids.Disposable.GridDisposableBoolean
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.{Tile, TileRectangle}
 import ProxyBwapi.Races.{Neutral, Protoss, Zerg}

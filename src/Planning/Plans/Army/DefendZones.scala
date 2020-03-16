@@ -1,7 +1,7 @@
 package Planning.Plans.Army
 
 import Information.Geography.Types.Zone
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Planning.UnitMatchers.{UnitMatchRecruitableForCombat, UnitMatcher}
 import Planning.{Plan, Property}

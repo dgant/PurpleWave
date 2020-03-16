@@ -16,13 +16,16 @@ abstract class AbstractScoutPlan extends Plan {
   protected def replaceDeadScouts: Boolean = true
   protected final def enemyFound: Boolean = With.scouting.enemyMain.isDefined
 
-  protected val scoutLock = new LockUnits {
+  protected val scoutLock: LockUnits = new LockUnits {
     unitMatcher.set(UnitMatchMobile)
     unitCounter.set(UnitCountOne)
     unitPreference.set(UnitPreferIdle)
   }
 
   protected final def getScouts(matcher: UnitMatcher, count: Int): Iterable[FriendlyUnitInfo] = {
+    if (scoutLock.units.size > count) {
+      scoutLock.release()
+    }
     scoutLock.unitMatcher.set(matcher)
     scoutLock.unitCounter.set(new UnitCountBetween(0, count))
     scoutLock.unitPreference.set(UnitPreferIdle)
@@ -40,10 +43,13 @@ abstract class AbstractScoutPlan extends Plan {
   }
 
   private final def scoutTo(unit: FriendlyUnitInfo, bases: Seq[Base], destination: Pixel): Unit = {
+    val tiles = bases.view.flatMap(base => base.zone.tiles.filter(tile =>
+      ! base.harvestingArea.contains(tile) // Don't walk into worker line
+      && With.grids.buildableTerrain.get(tile))).toVector.distinct
     unit.agent.intend(this, new Intention {
-      canScout      = true
-      toScoutBases  = bases
+      toScoutTiles  = tiles
       toTravel      = Some(destination)
+      canFocus      = true
     })
     bases.foreach(With.scouting.registerScout)
   }

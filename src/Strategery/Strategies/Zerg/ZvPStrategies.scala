@@ -1,6 +1,6 @@
 package Strategery.Strategies.Zerg
 
-import Information.Intelligenze.Fingerprinting.Fingerprint
+import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.Plan
 import Planning.Plans.GamePlans.Zerg.ZvP.{ZvP2HatchMuta}

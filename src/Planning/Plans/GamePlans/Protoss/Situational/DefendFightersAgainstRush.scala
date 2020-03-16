@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Situational
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Agency.Intention

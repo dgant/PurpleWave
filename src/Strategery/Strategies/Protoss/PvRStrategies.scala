@@ -1,6 +1,6 @@
 package Strategery.Strategies.Protoss
 
-import Information.Intelligenze.Fingerprinting.Fingerprint
+import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.Plan
 import Planning.Plans.GamePlans.Protoss.Standard.PvR.{PvR2Gate4Gate, PvRForgeDT, PvRTinfoil}

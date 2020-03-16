@@ -27,8 +27,7 @@ class MonitorBases(
     scouts.get.acquire(this)
     scouts.get.units.foreach(scout => scout.agent.intend(this, new Intention {
       toTravel = Some(With.geography.home.pixelCenter)
-      canScout = true
-      toScoutBases = basesToScout
+      toScoutTiles = basesToScout.flatMap(_.zone.tiles)
     }))
   }
 }

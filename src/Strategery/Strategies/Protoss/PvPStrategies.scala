@@ -1,6 +1,6 @@
 package Strategery.Strategies.Protoss
 
-import Information.Intelligenze.Fingerprinting.Fingerprint
+import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Strategery.Strategies.Strategy
 import Strategery.{MapGroups, StarCraftMap}
@@ -43,6 +43,6 @@ object PvPProxy2Gate extends PvPOpening {
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.twoGate, With.fingerprints.proxyGateway, With.fingerprints.forgeFe, With.fingerprints.earlyForge)
 }
 object PvP1ZealotExpand extends PvPOpening {
-  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.proxyGateway)
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.proxyGateway, With.fingerprints.cannonRush)
   override def minimumGamesVsOpponent: Int = 1
 }

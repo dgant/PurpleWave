@@ -1,6 +1,6 @@
 package Strategery.Strategies.Zerg
 
-import Information.Intelligenze.Fingerprinting.Fingerprint
+import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.Plan
 import Planning.Plans.GamePlans.Zerg.ZvZ.{ZvZ10HatchLing, ZvZ12Pool, ZvZ5PoolSunkens, ZvZ9PoolSpeed}

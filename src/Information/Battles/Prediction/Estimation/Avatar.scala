@@ -42,7 +42,7 @@ class Avatar {
     
     this()
   
-    val splashFactor = unit.matchups.splashFactorMax // Funky that this uses matchups
+    val splashFactor = unit.unitClass.splashFactor
     
     val geometric     = nearestEnemy.isDefined
     val contributes   = unit.unitClass.dealsDamage

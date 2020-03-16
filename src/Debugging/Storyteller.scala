@@ -1,7 +1,7 @@
 package Debugging
 
 import Debugging.Visualizations.Views.Planning.{ShowStrategyEvaluations, ShowStrategyInterest}
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Planning.Predicates.Reactive.{SafeAtHome, SafeToMoveOut}
 import Planning.UnitMatchers.UnitMatchHatchery

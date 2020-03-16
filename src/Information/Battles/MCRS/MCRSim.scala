@@ -1,6 +1,6 @@
 package Information.Battles.MCRS
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Mathematics.PurpleMath
 import ProxyBwapi.UnitInfo.UnitInfo
 

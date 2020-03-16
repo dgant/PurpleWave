@@ -1,6 +1,6 @@
 package Micro.Actions.Combat.Tactics
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Micro.Actions.Action

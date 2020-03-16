@@ -3,7 +3,7 @@ package Debugging
 import java.io.{File, PrintWriter}
 import java.util.Calendar
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.{Manners, With}
 
 import scala.collection.mutable.ListBuffer

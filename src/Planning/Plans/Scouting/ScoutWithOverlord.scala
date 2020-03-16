@@ -5,9 +5,8 @@ import ProxyBwapi.Races.Zerg
 
 class ScoutWithOverlord extends AbstractScoutPlan {
   override def onUpdate(): Unit = {
+    if (isComplete) return
     if ( ! With.self.isZerg) return
-    if (With.blackboard.lastScoutDeath > 0) return
-
     if (With.scouting.firstEnemyMain.isDefined) {
       // Vs Terran:  Scout least-claimed known main + its natural
       // Vs Protoss: Scout least-claimed known main + its natural

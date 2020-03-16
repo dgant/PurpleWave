@@ -1,6 +1,6 @@
 package Strategery.Strategies.Terran
 
-import Information.Intelligenze.Fingerprinting.Fingerprint
+import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Strategery.Strategies.Strategy
 import bwapi.Race

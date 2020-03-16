@@ -216,7 +216,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     canFight      = intent.canAttack
     canFlee       = intent.canFlee
     canMeld       = intent.canMeld
-    canScout      = intent.canScout
     canLiftoff    = intent.canLiftoff
     canCast       = false
     canCancel     = intent.canCancel

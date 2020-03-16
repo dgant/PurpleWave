@@ -17,9 +17,14 @@ class ScoutExpansions(matcher: UnitMatcher = UnitMatchAnd(
   UnitMatchNot(Protoss.Carrier))) extends AbstractScoutPlan {
 
   override protected def onUpdate(): Unit = {
-    val scoutableBases  = With.geography.neutralBases.sortBy(base => With.scouting.baseIntrigue.getOrElse(base, 0.0))
-    val scoutsWanted    = PurpleMath.clamp(With.self.supplyUsed / 80, 1, scoutableBases.size)
-    val scouts          = getScouts(matcher, 1)
-    scouts.zipWithIndex.foreach(s => scoutBasesTowardsTownHall(s._1, Seq(scoutableBases(s._2))))
+    var scoutableBases = With.geography.neutralBases
+      .filterNot(With.scouting.enemyMain.contains)
+      .filterNot(With.scouting.enemyNatural.contains)
+      .sortBy(base => - With.scouting.baseIntrigue.getOrElse(base, 0.0))
+      .sortBy(_.zone.island)
+
+    val scoutsWanted = PurpleMath.clamp(Math.max(1, With.self.supplyUsed / 80), 0, scoutableBases.size)
+    val scouts          = getScouts(matcher, scoutsWanted).toVector.sortBy(_.flying)
+    scouts.zipWithIndex.foreach(s => scoutBasesTowardsTownHall(s._1, Seq(scoutableBases(s._2 % scoutableBases.size))))
   }
 }

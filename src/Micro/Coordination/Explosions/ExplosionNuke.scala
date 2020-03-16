@@ -1,6 +1,6 @@
 package Micro.Coordination.Explosions
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
 

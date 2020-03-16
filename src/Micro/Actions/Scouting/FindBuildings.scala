@@ -9,7 +9,6 @@ import Micro.Actions.Combat.Maneuvering.Traverse
 import Micro.Actions.Combat.Techniques.Avoid
 import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import bwapi.Race
 
 object FindBuildings extends AbstractFindBuildings {
   override protected val boredomFrames = 24 * 30
@@ -22,13 +21,13 @@ object FindBuildingsWhenBored extends AbstractFindBuildings {
 abstract class AbstractFindBuildings extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    With.geography.enemyBases.nonEmpty || unit.agent.lastIntent.toScoutBases.nonEmpty
+    With.geography.enemyBases.nonEmpty || unit.agent.lastIntent.toScoutTiles.nonEmpty
   }
   
   protected val boredomFrames: Int
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    if (unit.matchups.threats.isEmpty && unit.agent.lastIntent.toScoutBases.forall( ! _.scouted)) {
+    if (unit.matchups.threats.isEmpty && ! unit.agent.lastIntent.toScoutTiles.exists(With.grids.friendlyVision.ever)) {
       Move.consider(unit)
     }
 
@@ -41,36 +40,17 @@ abstract class AbstractFindBuildings extends Action {
         .take(count)
     }
 
-    val suggestedBases = unit.agent.lastIntent.toScoutBases
-    val basesToScout = if (suggestedBases.nonEmpty) suggestedBases else
-      With.geography.enemyBases.filter(b => ! b.zone.island) ++ (
-        if (With.geography.enemyBases.size == 1 && unit.matchups.threats.forall(_.unitClass.isWorker))
-          With.geography.enemyBases.head.natural.map(Vector(_)).getOrElse(nearestNeutralBases(1))
-        // Scout for third bases -- Disabled so we can get a better sense of enemy tech/army size
-        // else if (With.geography.enemyBases.size <= With.geography.ourBases.size)
-        //   nearestNeutralBases(if (With.enemy.isZerg) 5 else 2)
-        else
-          Vector.empty)
-
-    // TODO: This relies on GridFriendlyVersion.framesSince()
-    // which is now a LIE as the grid is not updated every frame
-    val tilesToScout = basesToScout
-      .flatMap(base => {
-        val tiles = base.zone.tiles.filter(tile =>
-          ! base.harvestingArea.contains(tile) // Don't walk into worker line
-          && With.grids.walkable.get(tile)
-          && With.grids.friendlyVision.framesSince(tile) > boredomFrames)
-      
-        if (base.owner.raceInitial == Race.Zerg) {
-          tiles.filter(tile => With.grids.creep.get(tile) || tile.tileDistanceFast(base.townHallArea.midpoint) < 9.0)
-        }
-        else {
-          tiles
-        }
-      })
-      .filter(With.grids.buildableTerrain.get)
-      .filter(tile => unit.enemyRangeGrid.getUnchecked(tile.i) <= 0 || ( unit.cloaked && ! With.grids.enemyDetection.isDetected(tile.i)))
-      .filter(tile => ! unit.matchups.threats.exists(_.inRangeToAttack(unit, tile.pixelCenter)))
+    val tilesToScout = unit.agent.lastIntent.toScoutTiles
+      .filter(tile =>
+        With.grids.friendlyVision.framesSince(tile) > boredomFrames
+        && With.grids.buildableTerrain.get(tile)
+        && (unit.enemyRangeGrid.get(tile) <= 0 || ( unit.cloaked && ! With.grids.enemyDetection.isDetected(tile.i)))
+        && ! unit.matchups.threats.exists(_.inRangeToAttack(unit, tile.pixelCenter))
+        && tile.base.forall(base =>
+          ! base.owner.isEnemy
+          || ! base.owner.isZerg
+          || With.grids.creep.get(tile)
+          || tile.tileDistanceFast(base.townHallArea.midpoint) < 9.0))
   
     if (tilesToScout.isEmpty) return
   

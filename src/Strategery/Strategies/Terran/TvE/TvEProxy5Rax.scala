@@ -1,6 +1,6 @@
 package Strategery.Strategies.Terran.TvE
 
-import Information.Intelligenze.Fingerprinting.Fingerprint
+import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.Plan
 import Planning.Plans.GamePlans.Terran.Standard.TvE.TvEProxy5Rax

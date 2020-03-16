@@ -1,6 +1,6 @@
 package Micro.Actions.Combat.Tactics.SpiderMines
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action

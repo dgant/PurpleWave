@@ -1,6 +1,6 @@
 package Planning.Predicates.Strategy
 
-import Information.Intelligenze.Fingerprinting.Fingerprint
+import Information.Fingerprinting.Fingerprint
 import Planning.Predicate
 
 class EnemyStrategy(fingerprints: Fingerprint*) extends Predicate {

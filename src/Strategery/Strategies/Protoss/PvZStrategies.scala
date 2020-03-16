@@ -1,6 +1,6 @@
 package Strategery.Strategies.Protoss
 
-import Information.Intelligenze.Fingerprinting.Fingerprint
+import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Strategery.Strategies.Strategy
 import Strategery.{MapGroups, StarCraftMap}

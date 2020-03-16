@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Zerg.ZvT
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.{AllIn, Attack}

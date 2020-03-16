@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Zerg.ZvT
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Aggression, Attack, EjectScout, Hunt}

@@ -1,6 +1,6 @@
 package Micro.Actions.Combat.Targeting.Filters
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 

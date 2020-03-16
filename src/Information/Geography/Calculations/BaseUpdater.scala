@@ -1,7 +1,7 @@
 package Information.Geography.Calculations
 
 import Information.Geography.Types.Base
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.Protoss

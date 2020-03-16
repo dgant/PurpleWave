@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Compound.{If, Parallel}

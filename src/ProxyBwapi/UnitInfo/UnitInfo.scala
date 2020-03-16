@@ -5,7 +5,7 @@ import Information.Battles.MCRS.MCRSUnit
 import Information.Battles.Types.BattleLocal
 import Information.Geography.Types.{Base, Zone}
 import Information.Grids.AbstractGrid
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, Tile, TileRectangle}

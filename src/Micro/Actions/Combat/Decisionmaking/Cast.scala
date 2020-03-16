@@ -1,6 +1,6 @@
 package Micro.Actions.Combat.Decisionmaking
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Micro.Actions.Action
 import Micro.Actions.Combat.Spells._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}

@@ -1,6 +1,6 @@
 package Lifecycle
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Planning.UnitMatchers.UnitMatchWorkers
 
 object Manners {

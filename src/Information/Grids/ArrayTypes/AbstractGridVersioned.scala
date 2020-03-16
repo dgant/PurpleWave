@@ -8,7 +8,7 @@ abstract class AbstractGridVersioned extends AbstractGridInt {
   var version: Int = 0
   override val defaultValue: Int = -1
   reset()
-  def updateVersion() { version += 1 }
+  def updateVersion() { version = Math.max(1 + version, With.frame) }
 
   @inline final def isSet(i: Int): Boolean = get(i) >= version
   @inline final def isSet(tile: Tile): Boolean = isSet(tile.i)

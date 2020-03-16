@@ -131,17 +131,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val splashFactorMax: Double = splashFactorForUnits(targets)
   lazy val splashFactorInRange: Double = splashFactorForUnits(targetsInRange)
   
-  protected def splashFactorForUnits(targetsConsidered: Iterable[UnitInfo]): Double = {
-    val min = targetsConsidered.size
-    val max =
-      if(me.unitClass.dealsRadialSplashDamage || me.is(Zerg.Lurker))
-        2.5
-      else if(me.is(Zerg.Mutalisk))
-        1.25
-      else
-        1.0
-    Math.min(min, max)
-  }
+  protected def splashFactorForUnits(targetsConsidered: Iterable[UnitInfo]): Double = PurpleMath.clamp(me.unitClass.splashFactor, 1.0, targetsConsidered.size)
 
   object TargetHeuristicVpfEnemy {
 

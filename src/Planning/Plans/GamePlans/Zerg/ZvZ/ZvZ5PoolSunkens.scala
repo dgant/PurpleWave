@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Zerg.ZvZ
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles

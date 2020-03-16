@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Attack, Hunt}
@@ -202,11 +202,40 @@ object PvPIdeas {
             Get(Protoss.Forge)),
       ))))
 
-  val lastChanceFor2GateShieldBatteryDefense = GameTime(2, 50)() - Protoss.ShieldBattery.buildFrames - GameTime(0, 5)()
+  val lastChanceFor2GateShieldBatteryDefense: Int = GameTime(2, 50)() - Protoss.ShieldBattery.buildFrames - GameTime(0, 5)()
+
+  class AntiTwoGateProxyFrom1GateCore extends Parallel(
+    new WriteStatus("ReactTo2GateProxyFrom1GateCore"),
+    new If(
+      new FrameAtMost(lastChanceFor2GateShieldBatteryDefense),
+      new CancelIncomplete(Protoss.CyberneticsCore)),
+    new BuildOrder(
+      Get(8, Protoss.Probe),
+      Get(Protoss.Pylon),
+      Get(10, Protoss.Probe),
+      Get(Protoss.Gateway),
+      Get(13, Protoss.Probe),
+      Get(Protoss.Zealot),
+      Get(14, Protoss.Probe),
+      Get(2,  Protoss.Pylon),
+      Get(15, Protoss.Probe),
+      Get(2,  Protoss.Gateway),
+      Get(16, Protoss.Probe),
+      Get(2,  Protoss.Zealot),
+      Get(Protoss.ShieldBattery),
+      Get(18, Protoss.Probe),  // 22/26
+      Get(3,  Protoss.Zealot), // 24/26
+      Get(3,  Protoss.Pylon),  // 24/26+8
+      Get(20, Protoss.Probe),  // 26/26+8
+      Get(5,  Protoss.Zealot), // 28/34
+      Get(Protoss.Assimilator),
+      Get(20, Protoss.Probe),  // 29/34
+      Get(Protoss.CyberneticsCore),
+      Get(21, Protoss.Probe),
+      Get(7, Protoss.Zealot)))
 
   class AntiTwoGateInBaseFrom1GateCore extends Parallel(
     new WriteStatus("ReactTo2GateInBaseFrom1GateCore"),
-    new If(new UnitsAtMost(0, Protoss.CyberneticsCore), new CancelIncomplete(Protoss.Nexus)),
     new BuildOrder(
       Get(8, Protoss.Probe),
       Get(Protoss.Pylon),
@@ -221,68 +250,28 @@ object PvPIdeas {
       Get(16, Protoss.Probe),
       Get(2, Protoss.Gateway),
       Get(2,  Protoss.Zealot),
-      Get(Protoss.CyberneticsCore),
-      Get(3, Protoss.Pylon), // A little early in case we have more Probes than expected
       Get(17, Protoss.Probe),
-      Get(Protoss.Dragoon),
+      Get(Protoss.CyberneticsCore),
+      Get(4, Protoss.Zealot),
+      Get(18, Protoss.Probe),
+      Get(3, Protoss.Pylon),
       Get(19, Protoss.Probe),
       Get(2, Protoss.Dragoon),
-      Get(20, Protoss.Probe)),
-  )
-
-  class AntiTwoGateProxyFrom1GateCore extends Parallel(
-    new WriteStatus("ReactTo2GateProxyFrom1GateCore"),
-    new If(new UnitsAtMost(0, Protoss.CyberneticsCore), new CancelIncomplete(Protoss.Nexus)),
-    new If(
-      new FrameAtMost(lastChanceFor2GateShieldBatteryDefense),
-      new CancelIncomplete(Protoss.CyberneticsCore)),
-    new Parallel(
-      new If(
-        new UnitsAtMost(0, Protoss.CyberneticsCore),
-        new CapGasWorkersAt(0),
-        new If(
-          new UnitsAtMost(19, Protoss.Probe),
-          new CapGasWorkersAt(1))),
-      new BuildOrder(
-        Get(8, Protoss.Probe),
-        Get(Protoss.Pylon),
-        Get(10, Protoss.Probe),
-        Get(Protoss.Gateway),
-        Get(13, Protoss.Probe),
-        Get(Protoss.Zealot),
-        Get(14, Protoss.Probe),
-        Get(2,  Protoss.Pylon),
-        Get(15, Protoss.Probe),
-        Get(2,  Protoss.Gateway),
-        Get(16, Protoss.Probe),
-        Get(2,  Protoss.Zealot),
-        Get(Protoss.ShieldBattery),
-        Get(18, Protoss.Probe),  // 22/26
-        Get(3,  Protoss.Zealot), // 24/26
-        Get(3,  Protoss.Pylon),  // 24/26+8
-        Get(20, Protoss.Probe),  // 26/26+8
-        Get(5,  Protoss.Zealot), // 28/34
-        Get(Protoss.Assimilator),
-        Get(20, Protoss.Probe),  // 29/34
-        Get(Protoss.CyberneticsCore),
-        Get(21, Protoss.Probe),
-        Get(7, Protoss.Zealot))))
+      Get(21, Protoss.Probe),
+      Get(4, Protoss.Dragoon),
+      Get(Protoss.DragoonRange)))
 
   class PerformReactionTo2Gate extends Parallel(
     new WriteStatus("ReactTo2Gate"),
     new CapGasAt(0, 300),
     new If(
-      new UnitsAtMost(1, Protoss.Gateway),
+      new UnitsAtMost(0, Protoss.CyberneticsCore),
       new CapGasWorkersAt(0),
-      new Trigger(
-        new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
-        new If(
-          new And(
-            new UnitsAtMost(21, Protoss.Probe),
-            new UnitsAtMost(0, Protoss.CitadelOfAdun)),
-          new CapGasWorkersAt(2)))),
-
+      new If(
+        new UnitsAtMost(19, Protoss.Probe),
+        new CapGasWorkersAt(1))),
     new Pump(Protoss.Probe, 8),
+    new If(new UnitsAtMost(0, Protoss.CyberneticsCore), new CancelIncomplete(Protoss.Nexus)),
     new If(
       new Sticky(
         new And(
@@ -292,17 +281,18 @@ object PvPIdeas {
       new AntiTwoGateInBaseFrom1GateCore),
     new RequireSufficientSupply,
     new Pump(Protoss.Probe, 16),
-
     new FlipIf(
       new UnitsAtLeast(5, UnitMatchWarriors),
+      new TrainArmy,
       new Parallel(
         new PumpWorkers,
-        new UpgradeContinuously(Protoss.DragoonRange)),
-      new If(
-        new Or(new UnitsAtMost(7, UnitMatchWarriors), new Not(new SafeAtHome)),
-        new TrainArmy)))
+        new UpgradeContinuously(Protoss.DragoonRange))))
 
-  class ReactTo2Gate extends If(new EnemyStrategy(With.fingerprints.twoGate), new PerformReactionTo2Gate)
+  class ReactTo2Gate extends If(
+    new EnemyStrategy(With.fingerprints.twoGate),
+    new Parallel(
+      new WriteStatus("ReactTo2Gate"),
+      new PerformReactionTo2Gate))
 
   class ReactToProxyGateways extends If(
     new EnemyStrategy(With.fingerprints.proxyGateway),

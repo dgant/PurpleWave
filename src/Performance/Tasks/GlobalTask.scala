@@ -1,6 +1,6 @@
 package Performance.Tasks
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.{Manners, With}
 import Performance.TaskQueue.TaskQueueGrids
 

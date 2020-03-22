@@ -85,19 +85,34 @@ object PvPIdeas {
   class AttackSafely extends If(new PvPIdeas.PvPSafeToMoveOut, new Attack)
 
   class ReactToCannonRush extends If(
-    new EnemyStrategy(With.fingerprints.cannonRush),
+    new And(
+      new EnemyStrategy(With.fingerprints.cannonRush),
+      new FrameAtMost(GameTime(10, 0)())),
     new Parallel(
       new WriteStatus("ReactToCannonRush"),
-      new Attack,
+      new Attack(Protoss.Reaver),
+      new BuildOrder(ProtossBuilds.ZZCore: _*),
       new RequireSufficientSupply,
-      new PumpWorkers(oversaturate = true),
-      new Pump(Protoss.Reaver, 2),
-      new PumpDragoonsAndZealots,
-      new Build(
-        Get(Protoss.Gateway),
-        Get(Protoss.CyberneticsCore),
+      new PumpWorkers,
+      new Trigger(
+        new UnitsAtLeast(2, Protoss.Reaver, complete = true),
+        new If(new SafeToMoveOut, new RequireMiningBases(2)),
+        new CancelIncomplete(Protoss.Nexus, Protoss.CitadelOfAdun, Protoss.TemplarArchives)),
+      new If(new BasesAtMost(1), new CancelIncomplete(Protoss.CitadelOfAdun, Protoss.TemplarArchives)),
+      new BuildOrder(
         Get(Protoss.RoboticsFacility),
-        Get(Protoss.RoboticsSupportBay))))
+        Get(Protoss.Shuttle),
+        Get(Protoss.RoboticsSupportBay),
+        Get(2, Protoss.Reaver),
+        Get(Protoss.Observatory),
+        Get(Protoss.Observer),
+        Get(Protoss.DragoonRange)),
+      new Pump(Protoss.Observer, 1),
+      new Pump(Protoss.Reaver, 1),
+      new Pump(Protoss.Observer, 2),
+      new Pump(Protoss.Reaver, 2),
+      new PumpWorkers(oversaturate = true),
+      new PumpDragoonsAndZealots))
 
   // If we opened DT into Robo, we can survive but it's an emergency that requires a worker cut
   class ReactToRoboAsDT extends If(
@@ -115,7 +130,7 @@ object PvPIdeas {
 
   // Fast proxy DT: 5:15
   // More normal timing: Closer to 6:00
-  val dtArrivalTime = GameTime(5, 45)()
+  val dtArrivalTime: Int = GameTime(5, 45)()
 
   class ReactToDarkTemplarEmergencies extends Parallel(new ReactToDarkTemplarExisting, new ReactToDarkTemplarLikely)
   class ReactToDarkTemplarLikely extends If(
@@ -289,7 +304,9 @@ object PvPIdeas {
         new UpgradeContinuously(Protoss.DragoonRange))))
 
   class ReactTo2Gate extends If(
-    new EnemyStrategy(With.fingerprints.twoGate),
+    new And(
+      new EnemyStrategy(With.fingerprints.twoGate),
+      new FrameAtMost(GameTime(6, 0)())),
     new Parallel(
       new WriteStatus("ReactTo2Gate"),
       new PerformReactionTo2Gate))
@@ -356,22 +373,6 @@ object PvPIdeas {
     new Parallel(
       new Build(Get(5, Protoss.Gateway)),
       new RequireBases(3)))
-
-  class TakeBase4WithGateways extends If(
-    new Or(
-      new UnitsAtLeast(22, UnitMatchWarriors),
-      new EnemiesAtLeast(8, Protoss.PhotonCannon),
-      new And(
-        new SafeAtHome,
-        new UnitsAtLeast(6, Protoss.Gateway, complete = true),
-        new Or(
-          new EnemyCarriers,
-          new EnemyBasesAtLeast(4)))),
-    new Parallel(
-      new Build(Get(6, Protoss.Gateway)),
-      new RequireMiningBases(3),
-      new Build(Get(8, Protoss.Gateway)),
-      new RequireBases(4)))
 
 
   class MeldArchonsPvP extends MeldArchons(0) {

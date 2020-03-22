@@ -208,14 +208,18 @@ class PvPLateGame extends GameplanTemplate {
       new BasesAtLeast(3),
       new Parallel(
         new PvPIdeas.TakeBase2,
-        new PvPIdeas.TakeBase3WithGateways,
-        //new PvPIdeas.TakeBase4WithGateways
-        )),
+        new PvPIdeas.TakeBase3WithGateways)),
 
     new AddScalingTech,
     new PvPIdeas.TrainArmy,
 
     // Three-base transition
+    new If(
+      new NeedToCutWorkersForGateways,
+      new Build(
+        Get(4, Protoss.Gateway),
+        Get(2, Protoss.Assimilator),
+        Get(5, Protoss.Gateway))),
     new AddEarlyTech,
     new RequireBases(3),
 

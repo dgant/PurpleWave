@@ -1,6 +1,5 @@
 package Strategery.Strategies.Protoss
 
-import Strategery.Strategies.AllRaces.WorkerRush
 import Strategery.Strategies.Protoss.FFA._
 import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies._
@@ -129,7 +128,6 @@ object ProtossChoices {
   /////////
   
   val gimmickOpeners = Vector(
-    WorkerRush,
     PvTProxyDarkTemplar,
     PvE3BaseIslandCarrier,
     CarriersWithNoDefense,

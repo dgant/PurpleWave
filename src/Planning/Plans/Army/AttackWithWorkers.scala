@@ -2,12 +2,12 @@ package Planning.Plans.Army
 
 import Information.Geography.Types.Base
 import Lifecycle.With
-import Mathematics.Points.{Pixel, SpecificPoints}
+import Mathematics.Points.{Pixel, Tile}
 import Micro.Agency.Intention
-import Planning.ResourceLocks.LockUnits
-import Planning.UnitMatchers.UnitMatchWorkers
 import Planning.Plan
+import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountEverything
+import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable
@@ -38,7 +38,8 @@ class AttackWithWorkers extends Plan {
       tickle()
     }
   }
-  
+
+  lazy val waitingPoint: Tile = With.geography.allTiles.minBy(tile => With.geography.startBases.filterNot(_.owner.isUs).map(_.heart.groundPixels(tile)).sum)
   def findStartLocation() {
     // 2-Player: We know where they are. Go SMOrc.
     // 3-player: Scout one base with one probe while keeping the others in the middle.
@@ -64,9 +65,8 @@ class AttackWithWorkers extends Plan {
         unscoutedBases    -= nextBase
         tickle(scout, nextBase)
       }
-      
-      val middleZone = With.geography.zones.minBy(_.centroid.tileDistanceFast(SpecificPoints.tileMiddle))
-      unassignedScouts.foreach(tickle(_, middleZone.centroid.pixelCenter))
+
+      unassignedScouts.foreach(tickle(_, waitingPoint.pixelCenter))
     }
   }
   
@@ -76,7 +76,6 @@ class AttackWithWorkers extends Plan {
       With.geography.bases
         .filter( ! _.owner.isUs)
         .filter(_.isStartLocation || haveSeenABase) //Only search non-start locations until we've killed the first
-        .toVector
         .sortBy(_.heart.tileDistanceFast(With.geography.home))
         .sortBy( ! _.isStartLocation)
         .sortBy(_.lastScoutedFrame)

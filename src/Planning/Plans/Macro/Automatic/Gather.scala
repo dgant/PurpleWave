@@ -213,7 +213,7 @@ class Gather extends Plan {
   }
 
   // Evaluate the marginal efficacy of assigning this worker to a resource.
-  case class ResourceScore(worker: FriendlyUnitInfo, val resource: UnitInfo, val gasWorkerDesire: Boolean, var resourceBefore: Option[UnitInfo] = None) {
+  case class ResourceScore(worker: FriendlyUnitInfo, resource: UnitInfo, gasWorkerDesire: Boolean, var resourceBefore: Option[UnitInfo] = None) {
     resourceBefore = resourceBefore.orElse(resourceByWorker.get(worker))
 
     // How many workers are already mining this patch?

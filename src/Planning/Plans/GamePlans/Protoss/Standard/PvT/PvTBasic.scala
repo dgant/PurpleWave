@@ -395,7 +395,7 @@ class PvTBasic extends GameplanTemplate {
     new If(
       new EnemyTwoPlusFac,
       new If(
-        new EmployingDTRush,
+        new And(new EmployingDTRush, new UnitsAtLeast(1, Protoss.CitadelOfAdun)),
         new Parallel(new GoDT, new Build(Get(3, Protoss.Gateway)), new GoObs, new Build(Get(5, Protoss.Gateway))),
         new If(
           new EmployingReavers,
@@ -444,7 +444,17 @@ class PvTBasic extends GameplanTemplate {
           new If(new EmployingArbiters, new GoArbiter)))),
 
     // Get enough Gateways (and other production facilities) to survive
-    new PumpReactiveGateways(3, 7),
+    new If(
+      new Employing(PvT2BaseCarrier),
+      new Build(Get(4, Protoss.Gateway)),
+      new If(
+        new Employing(PvT2BaseReaver),
+        new PumpReactiveGateways(3, 6),
+        new If(
+          new Employing(PvT2BaseArbiter, PvT2BaseGateway),
+          new PumpReactiveGateways(6, 7),
+          new PumpReactiveGateways(3, 7)))),
+
     new RequireMiningBases(3),
     new If(new EmployingGateway,  new GoGateway),
     new If(new EmployingCarriers, new GoCarrier),

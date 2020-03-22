@@ -22,8 +22,8 @@ class Strategist {
     if (selectedLast.isEmpty) {
       selectedLast = Some(selectedInitially)
     }
-    else if (enemyRaceAtLastCheck != enemyRaceNow || With.frame < 5) { // Hack fix
-      selectedLast = Some(selectedInitially.filter(_.legality.isLegal))
+    else if (enemyRaceAtLastCheck != enemyRaceNow) { // Hack fix
+      selectedLast = Some(selectedInitially.filter(_.enemyRaces.exists(_ == enemyRaceNow)))
     }
     enemyRaceAtLastCheck = enemyRaceNow
     selectedLast.get
@@ -46,8 +46,14 @@ class Strategist {
     .toMap
 
   lazy val enemyRecentFingerprints: Vector[String] = enemyFingerprints(With.configuration.recentFingerprints)
-  def enemyFingerprints(games: Int = With.configuration.recentFingerprints): Vector[String] = {
-    With.history.gamesVsEnemies.take(games).flatMap(_.tags.toVector).filter(_.startsWith("Finger")).distinct
+  private lazy val recentGamesCheckingForMultipleRaces = With.history.gamesVsEnemies.take(10)
+  private lazy val enemyHasBeenTerran   : Int = Math.min(1, recentGamesCheckingForMultipleRaces.count(_.enemyRace == Race.Terran))
+  private lazy val enemyHasBeenProtoss  : Int = Math.min(1, recentGamesCheckingForMultipleRaces.count(_.enemyRace == Race.Protoss))
+  private lazy val enemyHasBeenZerg     : Int = Math.min(1, recentGamesCheckingForMultipleRaces.count(_.enemyRace == Race.Zerg))
+  private lazy val enemyMultipleRaces   : Boolean = (enemyHasBeenTerran + enemyHasBeenProtoss + enemyHasBeenZerg > 1)
+  def enemyFingerprints(games: Int): Vector[String] = {
+    val finalGames = (if (enemyMultipleRaces) 3 else 1) * games
+    With.history.gamesVsEnemies.take(finalGames).flatMap(_.tags.toVector).filter(_.startsWith("Finger")).distinct
   }
 
   lazy val strategiesTopLevel : Seq[Strategy] = AllChoices.tree

@@ -1,5 +1,7 @@
 package Strategery.Selection
 
+import scala.util.Random
+
 import Mathematics.PurpleMath
 import Strategery.Strategies.Strategy
 
@@ -17,7 +19,11 @@ object WinProbability {
   // Naive Bayes assumes independence of A/B in each class, which for us is not very true but makes better use of limited game information
   // When we have an untested strategy, we can be optimistic in the face of uncertainty: P(A|win) == goal_wr and P(B|win) == 1 - goal_wr
   //
+  // Apply a small random factor to shuffle strategies with nearly-equal values
+  val randomFactor = 1e-6
   def apply(strategies: Iterable[Strategy]): Double = {
-    PurpleMath.geometricMean(strategies.map(_.evaluation.probabilityWin))
+    val probability = PurpleMath.geometricMean(strategies.map(_.evaluation.probabilityWin))
+    val output = Random.nextDouble() * randomFactor + probability * (1.0 - randomFactor)
+    output
   }
 }

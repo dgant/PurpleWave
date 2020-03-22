@@ -205,10 +205,8 @@ object PvTIdeas {
             Enemy(Terran.Goliath,     1.5),
             Enemy(Terran.Marine,      1.0),
             Enemy(Terran.Vulture,     -1.0)))),
-        new If(
-          new And(new GasAtLeast(800)),
-          new Pump(Protoss.HighTemplar, 8, maximumConcurrently = 2)),
-        new PumpRatio(Protoss.HighTemplar, 0, 4, Seq(Friendly(UnitMatchWarriors, 0.1))),
+        new If(new GasAtLeast(800), new Pump(Protoss.HighTemplar, 8, maximumConcurrently = 2)),
+        new PumpRatio(Protoss.HighTemplar, 0, 4, Seq(Flat(-2.0), Friendly(UnitMatchWarriors, 0.1))),
         new Pump(Protoss.Dragoon))))
 
   class TrainCarriers extends If(

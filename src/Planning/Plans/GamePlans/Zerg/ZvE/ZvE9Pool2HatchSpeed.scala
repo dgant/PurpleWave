@@ -72,6 +72,7 @@ class ZvE9Pool2HatchSpeed extends GameplanTemplate {
           new AllIn),
 
         new Build(Get(2, Zerg.Hatchery)),
+        new If(new UnitsAtLeast(2, Zerg.Hatchery), new Build(Get(Zerg.Extractor))),
         new If(
           new Or(
             new UnitsAtLeast(2, UnitMatchHatchery),

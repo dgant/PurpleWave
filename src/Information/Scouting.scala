@@ -1,10 +1,12 @@
 package Information
 
+import Information.Fingerprinting.Generic.GameTime
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Points.Tile
 import Performance.Cache
 import Planning.UnitMatchers.{UnitMatchBuilding, UnitMatchWorkers}
+import ProxyBwapi.Races.Zerg
 import Utilities.{ByOption, CountMap}
 
 class Scouting {
@@ -83,8 +85,35 @@ class Scouting {
     }
     if (_firstEnemyMain.isEmpty) {
       val possibleMains = With.geography.startBases.filterNot(_.owner.isUs).filter(base => base.owner.isEnemy || ! base.scouted)
+      // Infer possible mains from process of elimination
       if (possibleMains.size == 1) {
         _firstEnemyMain = possibleMains.headOption
+        With.logger.debug("Inferred enemy main from process of elimination.")
+      }
+      // Infer main by creep
+      else if (With.frame < GameTime(5, 0)() && With.enemies.exists(_.isZerg)) {
+        val newlyCreepedBases = With.geography.startBases
+          .filter(b => b.owner.isNeutral && b.zone.tiles.exists(t =>
+            With.grids.creep.getUnchecked(t.i)
+            && ! With.grids.creepInitial.getUnchecked(t.i)))
+
+        if (newlyCreepedBases.size == 1) {
+          _firstEnemyMain = newlyCreepedBases.headOption
+          With.logger.debug("Inferred enemy main from presence of creep: " + _firstEnemyMain.get.toString)
+        }
+      }
+      // Infer main by Overlord
+      else if (With.frame < GameTime(2, 30)()) {
+        val overlords = With.units.enemy.filter(_.is(Zerg.Overlord))
+        val overlordMains = overlords.map(overlord => (overlord, With.geography.startBases.filter(base =>
+          base.owner.isNeutral
+          && overlord.framesToTravelTo(base.townHallArea.midPixel) < With.frame + GameTime(0, 5)()
+        )))
+        val overlordProofs = overlordMains.find(_._2.size == 1)
+        overlordProofs.foreach(overlordProof => {
+          _firstEnemyMain = overlordProof._2.headOption
+          With.logger.debug("Inferred enemy main from Overlord position: " + overlordProof._1 + " -> " + _firstEnemyMain.get.toString)
+        })
       }
     }
     _enemyHasScoutedUsWithWorker = _enemyHasScoutedUsWithWorker || With.geography.ourBases.exists(_.units.exists(u => u.isEnemy && u.is(UnitMatchWorkers)))

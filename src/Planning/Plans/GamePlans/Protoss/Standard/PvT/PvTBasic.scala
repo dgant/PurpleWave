@@ -439,6 +439,8 @@ class PvTBasic extends GameplanTemplate {
         // Hide our tech
         new Or(new ScoutCleared, new FrameAtLeast(GameTime(4, 45)())),
         new Parallel(
+          // Without this step 2-Base Reaver into Carrier gets Stargate before even finishing Robo
+          new If(new And(new EmployingReavers, new EmployingCarriers), new Build(Get(2, Protoss.Gateway))),
           new If(new EmployingGateway,  new GoGateway),
           new If(new EmployingCarriers, new GoCarrier),
           new If(new EmployingArbiters, new GoArbiter)))),

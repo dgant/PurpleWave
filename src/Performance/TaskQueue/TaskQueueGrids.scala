@@ -8,6 +8,7 @@ class TaskQueueGrids extends AbstractTaskQueue {
     new TaskGridBuildable                   { urgency = 10   },
     new TaskGridBuildableTerrain            { urgency = 10   },
     new TaskGridBuildableTownHall           { urgency = 1    },
+    new TaskGridCreepInitial                { urgency = 1    },
     new TaskGridCreep                       { urgency = 1    },
     new TaskGridEnemyDetection              { urgency = 100  },
     new TaskGridEnemyRangeAir               { urgency = 100  },

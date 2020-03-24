@@ -16,6 +16,7 @@ import Planning.Predicates.Compound.Not
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.UnitMatchers.UnitMatchHatchery
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.ZvZ9PoolSpeed
@@ -70,10 +71,23 @@ class ZvZ9PoolSpeed extends GameplanTemplate {
         Get(Zerg.Lair),
         Get(Zerg.Spire))),
 
-    new Pump(Zerg.Drone, 8),
+    // Against 2-Hatch builds, add Sunkens to survive Zergling pressure
     new If(
-      new UnitsAtLeast(1, Zerg.Spire),
-      new BuildOrder(Get(3, Zerg.Mutalisk))),
+      new Or(
+        new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.twelvePool),
+        new EnemiesAtLeast(2, UnitMatchHatchery, complete = true)),
+      new Parallel(
+        // Finish the initial Zergling pressure.
+        // The tenth Zergling arrives as their Zerglings pop
+        // Anything past twelve is unlikely to contribute to pressure
+        new BuildOrder(Get(12, Zerg.Zergling)),
+        // We only need to end on 8 drones to sustain Mutalisk production,
+        // but in order to have the extra money for Sunkens we start by overbuilding Drones such that we end on 9
+        new If(new UnitsAtLeast(1, Zerg.Lair), new BuildOrder(Get(Zerg.Drone, 14))),
+        new If(new UnitsAtLeast(1, Zerg.Spire), new BuildSunkensInMain(2)))),
+
+    new Pump(Zerg.Drone, 8),
+    new If(new UnitsAtLeast(1, Zerg.Spire), new BuildOrder(Get(3, Zerg.Mutalisk))),
     new PumpMutalisks,
     new Pump(Zerg.Zergling),
   )

@@ -131,7 +131,7 @@ object EvaluateTargets extends {
     }
     if (target.isAny(Terran.Armory, Protoss.CyberneticsCore, Zerg.Spire, Zerg.HydraliskDen)
       && With.units.existsOurs(Terran.Battlecruiser, Terran.Wraith, Terran.ScienceVessel, Protoss.Carrier, Protoss.Scout, Zerg.Mutalisk, Zerg.Guardian)) {
-      output *= 10.0
+      output *= 2.5
     }
 
     // Visibility bonus

@@ -11,6 +11,7 @@ class TaskGridAltitudeBonus               extends GridTask(With.grids.altitudeBo
 class TaskGridBuildable                   extends GridTask(With.grids.buildable)
 class TaskGridBuildableTerrain            extends GridTask(With.grids.buildableTerrain)
 class TaskGridBuildableTownHall           extends GridTask(With.grids.buildableTownHall)
+class TaskGridCreepInitial                extends GridTask(With.grids.creepInitial)
 class TaskGridCreep                       extends GridTask(With.grids.creep)
 class TaskGridEnemyDetection              extends GridTask(With.grids.enemyDetection)
 class TaskGridEnemyRangeAir               extends GridTask(With.grids.enemyRangeAir)

@@ -31,6 +31,8 @@ class Visualization {
     ShowExplosions,
     ShowStatus,
     ShowPerformanceSummary,
+
+    ShowGas
   )
   
   var enabled   : Boolean = _
@@ -116,6 +118,7 @@ class Visualization {
     ShowEconomy,
     ShowExplosions,
     ShowFingerprints,
+    ShowGas,
     ShowGradients,
     ShowGrids,
     ShowGroundskeeper,

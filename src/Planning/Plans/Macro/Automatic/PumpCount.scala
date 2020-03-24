@@ -36,8 +36,8 @@ object PumpCount {
         if (unit.complete && unit.alive && matcher.accept(unit)) {
           1
         }
-        else if (unit.is(Zerg.Egg) && unit.buildType == unitClass) {
-          if (unitClass.isTwoUnitsInOneEgg) 2 else 1
+        else if (unit.isAny(Zerg.Egg, Zerg.LurkerEgg, Zerg.Cocoon) && unit.buildType == unitClass) {
+          unit.buildType.copiesProduced
         }
         else {
           0

@@ -17,7 +17,7 @@ class ScoutWithOverlord extends AbstractScoutPlan {
       val bases   = if (With.enemy.isTerran || With.enemy.isProtoss) {
         Seq(main) ++ main.natural
       } else if (With.enemy.isZerg) {
-        With.geography.enemyBases
+        (Seq(main) ++ With.geography.enemyBases).distinct
       } else Seq(main)
       val scouts  = getScouts(Zerg.Overlord, 1)
       scouts.foreach(scoutBasesTowardsTownHall(_, bases))

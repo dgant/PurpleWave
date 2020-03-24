@@ -129,8 +129,12 @@ class Gather extends Plan {
     val gasWorkersHardMaximum = Math.min(4 * totalGasPumps, Math.max(With.blackboard.gasWorkerFloor(), With.blackboard.gasWorkerCeiling()))
     val gasGoalMinimum        = Math.min(With.blackboard.gasLimitFloor(), With.blackboard.gasLimitCeiling())
     val gasGoalMaximum        = Math.max(With.blackboard.gasLimitFloor(), With.blackboard.gasLimitCeiling())
-    val gasWorkerRatioTarget  = Math.round(With.blackboard.gasWorkerRatio() * workers.size).toInt
-    val gasWorkerTarget       = PurpleMath.clamp(gasWorkerRatioTarget, gasWorkersHardMinimum, gasWorkersHardMaximum)
+    val gasNow                = With.self.gas
+    val gasWorkersTripMinimum = (7 + gasGoalMinimum - With.self.gas) / 8
+    val gasWorkersTripMaximum = (7 + gasGoalMaximum - With.self.gas) / 8
+    val gasWorkersRatioTarget = Math.round(With.blackboard.gasWorkerRatio() * workers.size).toInt
+    val gasWorkersBaseTarget  = PurpleMath.clamp(gasWorkersRatioTarget, gasWorkersTripMinimum, gasWorkersTripMaximum)
+    val gasWorkerTarget       = PurpleMath.clamp(gasWorkersBaseTarget, gasWorkersHardMinimum, gasWorkersHardMaximum)
     var gasWorkersNow         = resourceByWorker.count(_._2.unitClass.isGas)
     def needMoreGasWorkers    = gasWorkersNow < gasWorkerTarget
     def needFewerGasWorkers   = gasWorkersNow > gasWorkerTarget

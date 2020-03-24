@@ -61,6 +61,9 @@ class MacroQueue {
         unitsCounted.add(Zerg.Lair, 1)
         unitsCounted.add(Zerg.Hatchery, 1)
       }
+      if (unit.isAny(Zerg.Egg, Zerg.LurkerEgg, Zerg.Cocoon)) {
+        unitsCounted.add(unit.buildType, unit.buildType.copiesProduced)
+      }
     })
     // Don't leave Terran buildings incomplete;
     // Make sure we have a plan for finishing all our existing buildings
@@ -106,7 +109,7 @@ class MacroQueue {
     }
     else {
       val unit = request.buildable.unitOption.get
-      var unitCountActual = unitsCounted(unit)
+      val unitCountActual = unitsCounted(unit)
       unitsWanted.put(unit, request.add + Math.max(unitsWanted(unit), unitCountActual))
       unitsWanted.put(unit, Math.max(unitsWanted(unit), request.require))
       var difference = unitsWanted(unit) - unitCountActual

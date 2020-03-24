@@ -20,6 +20,7 @@ abstract class AbstractScoutPlan extends Plan {
     unitMatcher.set(UnitMatchMobile)
     unitCounter.set(UnitCountOne)
     unitPreference.set(UnitPreferIdle)
+    interruptable.set(false)
   }
 
   protected final def getScouts(matcher: UnitMatcher, count: Int): Iterable[FriendlyUnitInfo] = {

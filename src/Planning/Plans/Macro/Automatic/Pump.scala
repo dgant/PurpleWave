@@ -21,7 +21,6 @@ class Pump(
   override def onUpdate() {
     if ( ! canBuild) return
   
-    val doubleEggMultiplier = if (unitClass.isTwoUnitsInOneEgg) 2 else 1
     val unitsNow            = PumpCount.currentCount(unitClass)
     val unitsToAddCeiling   = Math.max(0, Math.min(maximumTotal, maxDesirable) - unitsNow) // TODO: Clamp Nukes to #Silos
     val buildersSpawning    = if (unitClass.whatBuilds._1 == Zerg.Larva) With.units.countOurs(UnitMatchAnd(UnitMatchHatchery, UnitMatchComplete)) else 0
@@ -40,8 +39,8 @@ class Pump(
     val budgetedByGas       = if (gasPrice      <= 0) 400 else (gas      + (1.0 - buildersReadiness) * With.economy.ourIncomePerFrameGas      * unitClass.buildFrames) / gasPrice
     val budgeted            = Math.max(1, Math.ceil(Math.min(budgetedByMinerals, budgetedByGas))) // 3/4/2020 change: To encourage saving budget for eg. Dragoon instead of burning on Zealot, using ceil instead of round
     
-    val buildersToConsume   = Math.max(0, Vector(maximumConcurrently, builderOutputCap, budgeted, unitsToAddCeiling / doubleEggMultiplier).min.toInt)
-    val unitsToAdd          = buildersToConsume * doubleEggMultiplier
+    val buildersToConsume   = Math.max(0, Vector(maximumConcurrently, builderOutputCap, budgeted, unitsToAddCeiling / unitClass.copiesProduced).min.toInt)
+    val unitsToAdd          = buildersToConsume * unitClass.copiesProduced
     val unitsToRequest      = unitsNow + unitsToAdd
   
     // This check is necessitated by our tendency to request Scourge even when unitsToAdd is 0
@@ -79,7 +78,7 @@ class Pump(
   
   protected def buildCapacity: Int = {
     Vector(
-      builders.size * (if (unitClass.isTwoUnitsInOneEgg) 2 else 1),
+      builders.size * unitClass.copiesProduced,
       if (unitClass.isAddon) builders.count(_.addon.isEmpty) else Int.MaxValue,
       if (unitClass.supplyRequired == 0) 400 else (400 - With.self.supplyUsed) / unitClass.supplyRequired
     ).min

@@ -2,7 +2,6 @@ package Macro.Scheduling
 
 import Lifecycle.With
 import Macro.BuildRequests._
-import Macro.Buildables.Buildable
 import Planning.Plan
 import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete}
 import ProxyBwapi.UnitClasses.UnitClass
@@ -27,12 +26,11 @@ class Scheduler {
   }
 
   def buildersAllocated(unit: UnitClass): Int = {
-    val ratio = if (unit.isTwoUnitsInOneEgg) 2 else 1
     ByOption.max((unit.buildUnitsBorrowed ++ unit.buildUnitsSpent).map(builder => {
       val traineesNow       = builder.unitsTrained.toVector.map(u => With.units.countOurs(UnitMatchAnd(u, UnitMatchComplete))).sum
       val traineesRequested = builder.unitsTrained.toVector.map(u => Math.max(0, this.unitsRequested(u) - With.units.countOurs(UnitMatchAnd(u, UnitMatchComplete)))).sum
       val traineesToBuild   = Math.max(0, traineesRequested - traineesNow)
-      val buildersAllocated = traineesToBuild / ratio
+      val buildersAllocated = traineesToBuild / unit.copiesProduced
       buildersAllocated
     })).getOrElse(0)
   }

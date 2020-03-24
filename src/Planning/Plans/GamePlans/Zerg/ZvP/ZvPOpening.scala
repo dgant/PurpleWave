@@ -36,8 +36,7 @@ class ZvPOpening extends GameplanTemplate {
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new DefendAgainstWorkerRush,
-    new DefendAgainstProxy
-  )
+    new DefendAgainstProxy)
 
   override def buildOrderPlan = new Parallel(
     new If(
@@ -55,14 +54,14 @@ class ZvPOpening extends GameplanTemplate {
           Get(11, Zerg.Drone))),
     new If(
       new Employing(ZvP9Pool),
+      new Parallel(
         new BuildOrder(
           Get(9, Zerg.Drone),
           Get(Zerg.SpawningPool),
           Get(10, Zerg.Drone),
           Get(2, Zerg.Overlord),
           Get(11, Zerg.Drone)),
-      new Trigger(new UnitsAtLeast(2, Zerg.Overlord), initialBefore = new ExtractorTrick))
-  )
+        new Trigger(new UnitsAtLeast(2, Zerg.Overlord), initialBefore = new ExtractorTrick))))
 
   class PumpEnoughZerglings extends PumpRatio(Zerg.Zergling, 6, 18, Seq(Enemy(UnitMatchGroundWarriors, 4.5), Friendly(Zerg.Mutalisk, -6.0), Friendly(Zerg.SunkenColony, -4.0)))
 

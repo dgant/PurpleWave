@@ -14,15 +14,15 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMinin
 import Planning.Plans.Macro.Zerg.BuildSunkensAtNatural
 import Planning.Plans.Scouting.ScoutExpansions
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
-import Planning.Predicates.Economy.MineralsAtLeast
+import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.EnemyBasesAtLeast
+import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete, UnitMatchOr}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvP2HatchMuta
-import Strategery.{StarCraftMap, Transistor}
+import Strategery.Transistor
 
 class ZvP2HatchMuta extends GameplanTemplate {
   
@@ -39,10 +39,30 @@ class ZvP2HatchMuta extends GameplanTemplate {
   class ProceedWithDrones extends Or(
     new ProceedWithTech,
     new Latch(new UnitsAtLeast(1, Zerg.Zergling)))
-  
-  class MapIs(map: StarCraftMap) extends Plan {
-    override def isComplete: Boolean = map.matches
-  }
+
+  class ShouldDoSpeedlingAllIn extends EnemyStrategy(
+    With.fingerprints.cannonRush,
+    With.fingerprints.proxyGateway)
+
+  class DoSpeedlingAllIn extends Parallel(
+    new Aggression(1.2),
+    new BuildOrder(Get(10, Zerg.Zergling)),
+    new If(
+      new Or(
+        new GasAtLeast(100),
+        new UpgradeComplete(Zerg.ZerglingSpeed, 1, Zerg.ZerglingSpeed.upgradeFrames(1))),
+      new CapGasAt(0)),
+    new FlipIf(
+      new SafeAtHome,
+      new Pump(Zerg.Zergling),
+      new Pump(Zerg.Drone, 9)),
+    new Build(
+      Get(1, Zerg.Extractor),
+      Get(Zerg.ZerglingSpeed)),
+    new RequireMiningBases(3),
+    new If(
+      new MineralsAtLeast(400),
+      new RequireMiningBases(4)))
   
   private def sunkenProfile = if (Transistor.matches)
     new PlacementProfile(
@@ -63,7 +83,7 @@ class ZvP2HatchMuta extends GameplanTemplate {
   override def scoutExposPlan: Plan = new If(
     new UnitsAtLeast(8, Zerg.Mutalisk),
     new ScoutExpansions)
-  
+
   override def buildOrderPlan: Plan = new Parallel(
     new BuildOrder(
       Get(9, Zerg.Drone),
@@ -74,29 +94,31 @@ class ZvP2HatchMuta extends GameplanTemplate {
       Get(Zerg.Extractor),
       Get(14, Zerg.Drone)),
     new If(
-      new EnemyStrategy(
-        With.fingerprints.forgeFe,
-        With.fingerprints.nexusFirst),
+      new EnemyStrategy(With.fingerprints.forgeFe, With.fingerprints.nexusFirst),
       new Parallel(
         new BuildOrder(
           Get(17, Zerg.Drone),
-          Get(Zerg.Lair)),
-        new If(
-          new UnitsAtLeast(16, Zerg.Drone),
-          new Build(Get(2, Zerg.Extractor))),
-        new BuildOrder(
+          Get(Zerg.Lair),
           Get(21, Zerg.Drone),
           Get(3, Zerg.Overlord),
           Get(3, Zerg.Hatchery),
-          Get(Zerg.Spire)))),
+          Get(22, Zerg.Drone),
+          Get(Zerg.Spire),
+          Get(24, Zerg.Drone)))), // 26 if we never made any Zerglings accidentally along the way
     new If(
       new EnemyStrategy(With.fingerprints.gatewayFe),
-      new BuildOrder(Get(8, Zerg.Zergling)),
       new Parallel(
-        new Trigger(
-          new UnitsAtLeast(2, UnitMatchOr(Zerg.SunkenColony, Zerg.CreepColony)),
-          initialBefore = new BuildSunkensAtNatural(2, sunkenProfile)),
-        new BuildOrder(Get(10, Zerg.Zergling)))))
+        new BuildOrder(
+          Get(8, Zerg.Zergling),
+          Get(Zerg.Lair),
+          Get(17, Zerg.Drone)),
+        new BuildSunkensAtNatural(2),
+        new BuildOrder(
+          Get(19, Zerg.Drone),
+          Get(3, Zerg.Overlord),
+          Get(Zerg.Spire),
+          Get(3, Zerg.Hatchery),
+          Get(22, Zerg.Drone)))))
     
   lazy val ZealotOrDragoon = UnitMatchOr(Protoss.Zealot, Protoss.Dragoon)
   
@@ -121,7 +143,10 @@ class ZvP2HatchMuta extends GameplanTemplate {
               new BuildSunkensAtNatural(3, sunkenProfile),
               new If(
                 new EnemiesAtLeast(3, ZealotOrDragoon),
-                new BuildSunkensAtNatural(2, sunkenProfile))))))))
+                new BuildSunkensAtNatural(2, sunkenProfile),
+                new If(
+                  new EnemyStrategy(With.fingerprints.twoGate),
+                  new BuildSunkensAtNatural(2, sunkenProfile)))))))))
   
   class ReactiveZerglings extends If(
     new UnitsAtMost(0, Zerg.Spire, complete = true),

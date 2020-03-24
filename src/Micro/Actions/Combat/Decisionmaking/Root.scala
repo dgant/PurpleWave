@@ -5,7 +5,7 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Targeting.Target
 import Planning.UnitMatchers.UnitMatchSiegeTank
 import ProxyBwapi.Races.{Terran, Zerg}
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders}
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
 
 object Root extends Action {
   
@@ -26,35 +26,38 @@ object Root extends Action {
     private val pushSpacing = 32.0 * 3.0
     private def framesToRoot = 18 + With.reaction.agencyAverage
     
-    private lazy val weAreALurker         = Zerg.Lurker.accept(unit)
-    private lazy val weAreATank           = UnitMatchSiegeTank.accept(unit)
-    private lazy val weAreRooted          = (weAreALurker && unit.burrowed) || unit.is(Terran.SiegeTankSieged)
-    private lazy val maxRange             = if (unit.is(Terran.SiegeTankUnsieged)) Terran.SiegeTankSieged.pixelRangeGround else unit.pixelRangeGround
-    private lazy val ourDistanceToGoal    = distanceToGoal(unit)
-    private lazy val rootersInPush        = unit.squadmates.filter(s => unit != s && Zerg.Lurker.accept(s) || UnitMatchSiegeTank.accept(s))
-    private lazy val rootersInPushCloser  = rootersInPush.count(distanceToGoal(_) < ourDistanceToGoal + pushSpacing)
-    
-    private lazy val threatsButNoTargets  = unit.matchups.threats.nonEmpty && unit.matchups.targets.isEmpty
-    private lazy val insideNarrowChoke    = unit.zone.edges.exists(e => e.radiusPixels < 32.0 * 4.0 && unit.pixelDistanceCenter(e.pixelCenter) < e.radiusPixels)
-    private lazy val beingPickedUp        = unit.agent.toBoard.isDefined
-    private lazy val outOfCombat          = unit.matchups.battle.isEmpty
-    private lazy val inTheWay             = unit.agent.shovers.nonEmpty
-    private lazy val retreating           = ! unit.agent.shouldEngage
-    private lazy val protectingBase       = unit.matchups.allies.exists(a => a.unitClass.isBuilding && a.matchups.framesOfSafety < unit.matchups.framesOfSafety)
-    private lazy val insideTurretRange    = unit.matchups.threatsInRange.exists(_.unitClass.isBuilding)
-    private lazy val nearFormationPoint   = unit.agent.toForm.exists(unit.pixelDistanceCenter(_) < 32.0 * 6.0)
-    private lazy val turretsInRange       = unit.matchups.targetsInRange.exists(_.unitClass.isStaticDefense)
-    private lazy val buildingInRange      = unit.matchups.targetsInRange.exists(_.unitClass.isBuilding)
-    private lazy val combatTargets        = unit.matchups.enemies.filter(e => (unit.canAttack(e) && e.unitClass.dealsDamage) || (e.is(Zerg.Lurker) && ! e.inRangeToAttack(unit)))
-    private lazy val targetsInRange       = combatTargets.filter(t => unit.pixelDistanceEdge(t) < maxRange)
-    private lazy val targetsNearingRange  = combatTargets.filter(t => { val p = t.projectFrames(framesToRoot); unit.pixelDistanceEdge(t.pixelStartAt(p), t.pixelEndAt(p)) < maxRange - 32})
-    private lazy val girdForCombat        = targetsInRange.nonEmpty || targetsNearingRange.size > 3
-    private lazy val artilleryOutOfRange  = unit.matchups.targets.filter(t => t.canAttack(unit) && t.pixelRangeAgainst(unit) >unit.pixelRangeAgainst(t) && t.inRangeToAttack(unit))
-    private lazy val duckForCover         = false && (weAreALurker && unit.matchups.enemyDetectors.isEmpty && unit.matchups.framesOfSafety < framesToRoot && (artilleryOutOfRange.isEmpty || ! With.enemy.isTerran)) // Root for safety, but not in range of Tanks if they can scan us
-    private lazy val letsKillThemAlready  = weAreALurker && unit.agent.toAttack.exists(_.pixelDistanceEdge(unit) < 64.0)
-    private lazy val leadingPush          = ! unit.agent.destination.zone.owner.isUs && (rootersInPush.size + 1) / 3 > rootersInPushCloser
-    private lazy val destinationFarAway   = unit.pixelDistanceCenter(unit.agent.destination) > 32.0 * 4.0 && ! nearFormationPoint
-    private lazy val hugged               = weAreATank && unit.matchups.threats.exists(t => ! t.flying && t.pixelDistanceEdge(unit) <= 96) && unit.matchups.targets.nonEmpty && unit.matchups.targets.forall(_.pixelDistanceEdge(unit) <= 96)
+    private lazy val weAreALurker           = Zerg.Lurker.accept(unit)
+    private lazy val weAreATank             = UnitMatchSiegeTank.accept(unit)
+    private lazy val weAreRooted            = (weAreALurker && unit.burrowed) || unit.is(Terran.SiegeTankSieged)
+    private lazy val maxRange               = if (unit.is(Terran.SiegeTankUnsieged)) Terran.SiegeTankSieged.pixelRangeGround else unit.pixelRangeGround
+    private lazy val ourDistanceToGoal      = distanceToGoal(unit)
+    private lazy val rootersInPush          = unit.squadmates.filter(s => unit != s && Zerg.Lurker.accept(s) || UnitMatchSiegeTank.accept(s))
+    private lazy val rootersInPushCloser    = rootersInPush.count(distanceToGoal(_) < ourDistanceToGoal + pushSpacing)
+
+    def notHiddenUphill(target: UnitInfo): Boolean = target.visible || target.altitudeBonus <=  unit.altitudeBonus
+    private lazy val visibleTargets         = unit.matchups.targets.filter(notHiddenUphill)
+    private lazy val visibleTargetsInRange  = unit.matchups.targetsInRange.filter(notHiddenUphill)
+    private lazy val threatsButNoTargets    = unit.matchups.threats.nonEmpty && visibleTargets.isEmpty
+    private lazy val insideNarrowChoke      = unit.zone.edges.exists(e => e.radiusPixels < 32.0 * 4.0 && unit.pixelDistanceCenter(e.pixelCenter) < e.radiusPixels)
+    private lazy val beingPickedUp          = unit.agent.toBoard.isDefined
+    private lazy val outOfCombat            = unit.matchups.battle.isEmpty
+    private lazy val inTheWay               = unit.agent.shovers.nonEmpty
+    private lazy val retreating             = ! unit.agent.shouldEngage
+    private lazy val protectingBase         = unit.matchups.allies.exists(a => a.unitClass.isBuilding && a.matchups.framesOfSafety < unit.matchups.framesOfSafety)
+    private lazy val insideTurretRange      = unit.matchups.threatsInRange.exists(_.unitClass.isBuilding)
+    private lazy val nearFormationPoint     = unit.agent.toForm.exists(unit.pixelDistanceCenter(_) < 32.0 * 6.0)
+    private lazy val turretsInRange         = visibleTargetsInRange.exists(_.unitClass.isStaticDefense)
+    private lazy val buildingInRange        = visibleTargetsInRange.exists(_.unitClass.isBuilding)
+    private lazy val combatTargets          = unit.matchups.enemies.filter(e => (unit.canAttack(e) && e.unitClass.dealsDamage) || (e.is(Zerg.Lurker) && ! e.inRangeToAttack(unit)))
+    private lazy val targetsInRange         = combatTargets.filter(t => unit.pixelDistanceEdge(t) < maxRange)
+    private lazy val targetsNearingRange    = combatTargets.filter(t => { val p = t.projectFrames(framesToRoot); unit.pixelDistanceEdge(t.pixelStartAt(p), t.pixelEndAt(p)) < maxRange - 32})
+    private lazy val girdForCombat          = targetsInRange.nonEmpty || targetsNearingRange.size > 3
+    private lazy val artilleryOutOfRange    = unit.matchups.targets.filter(t => t.canAttack(unit) && t.pixelRangeAgainst(unit) >unit.pixelRangeAgainst(t) && t.inRangeToAttack(unit))
+    private lazy val duckForCover           = false && (weAreALurker && unit.matchups.enemyDetectors.isEmpty && unit.matchups.framesOfSafety < framesToRoot && (artilleryOutOfRange.isEmpty || ! With.enemy.isTerran)) // Root for safety, but not in range of Tanks if they can scan us
+    private lazy val letsKillThemAlready    = weAreALurker && unit.agent.toAttack.exists(_.pixelDistanceEdge(unit) < 64.0)
+    private lazy val leadingPush            = ! unit.agent.destination.zone.owner.isUs && (rootersInPush.size + 1) / 3 > rootersInPushCloser
+    private lazy val destinationFarAway     = unit.pixelDistanceCenter(unit.agent.destination) > 32.0 * 4.0 && ! nearFormationPoint
+    private lazy val hugged                 = weAreATank && unit.matchups.threats.exists(t => ! t.flying && t.pixelDistanceEdge(unit) <= 96) && unit.matchups.targets.nonEmpty && unit.matchups.targets.forall(_.pixelDistanceEdge(unit) <= 96)
     
     lazy val mustBeUnrooted = (
           (threatsButNoTargets              )

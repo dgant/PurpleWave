@@ -34,13 +34,13 @@ class ZvPLateGame extends GameplanTemplate {
       + corsair * With.units.countEnemy(Protoss.Corsair))
   }
 
-  val compositionZerglingMutalisk = CompositionWeight(8,  2.0,  2.0, -6.0,  6.0, -9.0)
+  val compositionZerglingMutalisk = CompositionWeight(8,  2.0,  2.0, -6.0,  6.0, -6.0)
   val compositionZerglingDefiler  = CompositionWeight(8,  0.0,  4.0, -3.0,  3.0, -3.0)
   val compositionHydraliskLurker  = CompositionWeight(12, 3.0,  0.0,  6.0, -6.0,  3.0)
   val compositionHydraliskOnly    = CompositionWeight(0,  1.5,  1.5,  3.0, -3.0,  3.0)
   val composition = new Cache(() => Seq(
     compositionZerglingMutalisk,
-    compositionZerglingDefiler,
+    //compositionZerglingDefiler,
     compositionHydraliskLurker,
     compositionHydraliskOnly
   ).maxBy(_.weigh))
@@ -151,7 +151,9 @@ class ZvPLateGame extends GameplanTemplate {
         new Build(Get(Zerg.HydraliskDen)),
         new UpgradeHydraSpeedThenRange,
         new PumpRatio(Zerg.Hydralisk, 18, 60, Seq(Enemy(UnitMatchWarriors, 2.5))),
-        new Build(Get(2, Zerg.EvolutionChamber)),
+        new Build(
+          Get(6, Zerg.Hatchery),
+          Get(2, Zerg.EvolutionChamber)),
         new UpgradeContinuously(Zerg.GroundArmor),
         new UpgradeContinuously(Zerg.GroundRangeDamage))),
 

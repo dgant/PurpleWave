@@ -96,7 +96,6 @@ class Scouting {
           .filter(b => b.owner.isNeutral && b.zone.tiles.exists(t =>
             With.grids.creep.getUnchecked(t.i)
             && ! With.grids.creepInitial.getUnchecked(t.i)))
-
         if (newlyCreepedBases.size == 1) {
           _firstEnemyMain = newlyCreepedBases.headOption
           With.logger.debug("Inferred enemy main from presence of creep: " + _firstEnemyMain.get.toString)

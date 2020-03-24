@@ -10,7 +10,7 @@ import Micro.Actions.Combat.Maneuvering.Traverse
 import Micro.Actions.Combat.Techniques.FallBack
 import Micro.Actions.Commands.Move
 import Planning.UnitMatchers.UnitMatchWarriors
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.util.Random
@@ -84,7 +84,9 @@ object Phalanx extends Action {
       val path = profile.find
       new Traverse(path, move = false).delegate(unit)
     }
-    FallBack.delegate(unit)
+    if ( ! unit.isAny(Protoss.Corsair, Zerg.Zergling)) {
+      FallBack.delegate(unit)
+    }
     Move.delegate(unit)
   }
 }

@@ -62,8 +62,10 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val catchers         : Vector[UnitInfo]  = threats.filter(isCatcher)
   
   private def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = {
-    if ( ! shooter.canAttack(victim)) return false
-    true
+    if (shooter.canAttack(victim)) return true
+    if (shooter.unitClass.canAttack(shooter)
+      && shooter.framesToBeReadyForAttackOrder < victim.framesToTravelPixels(shooter.pixelRangeAgainst(victim) - shooter.pixelDistanceEdge(victim))) return true
+    false
   }
   def repairers: ArrayBuffer[UnitInfo] = ArrayBuffer.empty ++ allies.filter(_.friendly.exists(_.agent.toRepair.contains(me)))
 

@@ -2,8 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.{Plan, Predicate}
-import Planning.Plans.Army.{Attack, ConsiderAttacking, EjectScout}
+import Planning.Plans.Army.{Attack, Chill, ConsiderAttacking, EjectScout}
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{FlipIf, If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -13,7 +12,9 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Zerg.BuildSunkensAtNatural
 import Planning.Predicates.Compound.{And, Latch, Not, Sticky}
 import Planning.Predicates.Milestones._
+import Planning.Predicates.Reactive.SafeToMoveOut
 import Planning.Predicates.Strategy.EnemyStrategy
+import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 
 class ZvTMidgame extends GameplanTemplate {
@@ -21,6 +22,13 @@ class ZvTMidgame extends GameplanTemplate {
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(1, Zerg.Hive))
 
   class GoMutalisk extends Sticky(new Not(new EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.oneRaxFE)))
+
+  // Avoid suiciding Hydralisks destined to become Lurkers
+  override def priorityDefensePlan: Plan = new If(
+    new And(
+      new Not(new SafeToMoveOut),
+      new TechStarted(Zerg.LurkerMorph)),
+    new Chill(Zerg.Hydralisk))
 
   override def attackPlan: Plan = new Parallel(
     new Attack(Zerg.Mutalisk),
@@ -31,12 +39,13 @@ class ZvTMidgame extends GameplanTemplate {
         new And(
           new UpgradeComplete(Zerg.ZerglingSpeed),
           new Not(new EnemyHasUpgrade(Terran.VultureSpeed)))),
-      new ConsiderAttacking)
-  )
+      new ConsiderAttacking))
 
   override def buildPlans: Seq[Plan] = Seq(
     new EjectScout,
     new Build(Get(12, Zerg.Drone)),
+    new If(new And(new UnitsAtLeast(1, Zerg.Lair), new Not(new GoMutalisk)), new Build(Get(Zerg.HydraliskDen))),
+    new If(new And(new UnitsAtLeast(1, Zerg.Lair), new UnitsAtLeast(1, Zerg.HydraliskDen)), new Build(Get(Zerg.LurkerMorph))),
     new RequireMiningBases(2),
     new Build(
       Get(Zerg.SpawningPool),
@@ -44,7 +53,6 @@ class ZvTMidgame extends GameplanTemplate {
       Get(Zerg.ZerglingSpeed),
       Get(Zerg.Lair)),
     new If(new EnemyStrategy(With.fingerprints.oneRaxGas), new BuildSunkensAtNatural(1)),
-    new If(new UnitsAtLeast(1, Zerg.HydraliskDen), new Build(Get(Zerg.LurkerMorph))),
     new If(new Or(new EnemyStrategy(With.fingerprints.oneRaxGas), new EnemiesAtLeast(1, Terran.Vulture)), new Build(Get(Zerg.Burrow))),
     new If(new EnemyHasShownWraithCloak, new UpgradeContinuously(Zerg.OverlordSpeed)),
 

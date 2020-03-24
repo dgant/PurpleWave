@@ -12,7 +12,7 @@ import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Zerg.BuildSunkensInMain
-import Planning.Predicates.Compound.Not
+import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
@@ -49,9 +49,10 @@ class ZvZ9PoolSpeed extends GameplanTemplate {
   
   override def buildPlans: Seq[Plan] = Vector(
     new DefendFightersAgainstRush,
+
+    new CapGasAtRatioToMinerals(1.0, 50),
     new If(
-      new UnitsAtLeast(1, Zerg.Spire),
-      new CapGasAtRatioToMinerals(1.0, 50),
+      new Not(new UnitsAtLeast(1, Zerg.Spire)),
       new If(
         new UnitsAtLeast(1, Zerg.Lair),
         new CapGasAt(150),
@@ -68,25 +69,29 @@ class ZvZ9PoolSpeed extends GameplanTemplate {
       new GasAtLeast(100),
       new Build(
         Get(Zerg.ZerglingSpeed),
-        Get(Zerg.Lair),
-        Get(Zerg.Spire))),
+        Get(Zerg.Lair))),
 
     // Against 2-Hatch builds, add Sunkens to survive Zergling pressure
     new If(
-      new Or(
-        new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.twelvePool),
-        new EnemiesAtLeast(2, UnitMatchHatchery, complete = true)),
-      new Parallel(
-        // Finish the initial Zergling pressure.
-        // The tenth Zergling arrives as their Zerglings pop
-        // Anything past twelve is unlikely to contribute to pressure
-        new BuildOrder(Get(12, Zerg.Zergling)),
-        // We only need to end on 8 drones to sustain Mutalisk production,
-        // but in order to have the extra money for Sunkens we start by overbuilding Drones such that we end on 9
-        new If(new UnitsAtLeast(1, Zerg.Lair), new BuildOrder(Get(Zerg.Drone, 14))),
-        new If(new UnitsAtLeast(1, Zerg.Spire), new BuildSunkensInMain(2)))),
+      new And(
+        new UnitsAtLeast(1, Zerg.Lair),
+        new Or(
+          new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.twelvePool),
+          new EnemiesAtLeast(2, UnitMatchHatchery, complete = true))),
+        new Parallel(
+          // Finish our initial Zergling pressure.
+          // The tenth Zergling arrives as 12 Hatch's first Zerglings pop
+          // Anything past twelve is unlikely to contribute to pressure
+          new BuildOrder(Get(12, Zerg.Zergling)),
+          // We only need to end on 8 drones to sustain Mutalisk production,
+          // in order to have the extra money for Sunkens we'd like to start by overbuilding Drones such that we end on 9
+          // Overbuilding Drones vs. Pool-first builds (into 2 Hatch) is suicide though; we win this automatically with Mutalisks anyhow
+          new If(new Not(new EnemyStrategy(With.fingerprints.ninePool, With.fingerprints.overpool)), new BuildOrder(Get(Zerg.Drone, 14))),
+          new Pump(Zerg.Drone, 7),
+          new BuildSunkensInMain(2))),
 
     new Pump(Zerg.Drone, 8),
+    new Build(Get(Zerg.Spire)),
     new If(new UnitsAtLeast(1, Zerg.Spire), new BuildOrder(Get(3, Zerg.Mutalisk))),
     new PumpMutalisks,
     new Pump(Zerg.Zergling),

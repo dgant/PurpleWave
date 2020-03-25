@@ -3,6 +3,6 @@ package Planning.UnitMatchers
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object UnitMatchAttacks extends UnitMatcher {
-  override def accept(unit: UnitInfo): Boolean =
+  override def apply(unit: UnitInfo): Boolean =
     unit.canAttack
 }

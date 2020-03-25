@@ -31,7 +31,7 @@ abstract class UnitMatchAnyProxy extends UnitMatcher {
     output
   }
 
-  override def accept(unit: UnitInfo): Boolean = {
+  override def apply(unit: UnitInfo): Boolean = {
     if (unit.isFriendly) return false
     if ( ! unit.unitClass.isBuilding) return false
     if (unit.flying) return false

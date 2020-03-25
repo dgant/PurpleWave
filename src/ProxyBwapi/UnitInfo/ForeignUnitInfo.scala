@@ -368,14 +368,23 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
   private var _underDisruptionWeb     : Boolean = _
   private var _underStorm             : Boolean = _
   private var _addon                  : Option[UnitInfo] = None
-  
+
+  protected def remainingFrames(snapshotHitPoints: Int, snapshotShields: Int, dataFrame: Int): Int = {
+    val totalHealthInitial  = 1 + unitClass.maxTotalHealth / 10
+    val totalHealthSnapshot = snapshotHitPoints + snapshotShields
+    val progress            = Math.max(0.0, (totalHealthSnapshot - totalHealthInitial).toDouble / (unitClass.maxTotalHealth - totalHealthInitial))
+    val progressLeft        = 1.0 - progress
+    val output              = progressLeft * unitClass.buildFrames - With.framesSince(dataFrame)
+    output.toInt
+  }
   def remainingCompletionFrames: Int = {
     if (complete) return 0
-    val startingTotalHealth = 1 + unitClass.maxTotalHealth / 10
-    val progress            = Math.max(0.0, (totalHealth - startingTotalHealth).toDouble / (unitClass.maxTotalHealth - startingTotalHealth))
-    val progressLeft        = 1.0 - progress
-    val output              = progressLeft * unitClass.buildFrames - With.framesSince(lastSeen)
-    output.toInt
+    // Use both the initial projection and the up-to-date projection
+    // We can't always trust the most up-to-date projection in case the unit has taken damage
+    val remainingNow      = remainingFrames(hitPoints, shieldPoints, lastSeen)
+    val remainingInitial  = remainingFrames(initialHitPoints, initialShields, frameDiscovered)
+    val output            = Math.min(remainingNow, remainingInitial)
+    output
   }
 
   def remainingTrainFrames    : Int     = _remainingTrainFrames

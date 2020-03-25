@@ -3,6 +3,7 @@ package Mathematics.Points
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Mathematics.PurpleMath
+import Mathematics.Shapes.Spiral
 import bwapi.TilePosition
 
 case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
@@ -184,5 +185,10 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline
   final def bwapiVisible: Boolean = {
     With.game.isVisible(x, y)
+  }
+  @inline final def nearestWalkableTerrain: Tile = {
+    if (valid && With.grids.walkable.getUnchecked(i)) return this
+    val output = Spiral.points(16).view.map(add).find(tile => tile.valid && With.grids.walkable.getUnchecked(tile.i)).getOrElse(this)
+    output
   }
 }

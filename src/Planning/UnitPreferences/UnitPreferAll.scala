@@ -3,11 +3,11 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 case class UnitPreferAll(preferences: UnitPreference*) extends UnitPreference {
   
-  override def preference(unit: FriendlyUnitInfo): Double = {
+  override def apply(unit: FriendlyUnitInfo): Double = {
     val weighted = preferences
       .zipWithIndex
       .map(pair =>
-        pair._1.preference(unit)
+        pair._1.apply(unit)
         * Math.pow(10, -pair._2))
     val output = weighted.sum
     output

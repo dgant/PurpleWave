@@ -4,6 +4,7 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Buildables.{Buildable, BuildableUnit}
+import Macro.Scheduling.MacroCounter
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
@@ -38,7 +39,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends ProductionPlan {
     
   description.set("Build a " + buildingClass)
   
-  override def isComplete: Boolean = building.exists(_.complete)
+  override def isComplete: Boolean = building.exists(b => MacroCounter.countComplete(b)(buildingClass) > 0)
   
   def startedBuilding: Boolean = building.isDefined
   

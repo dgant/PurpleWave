@@ -30,7 +30,7 @@ class Attack(
     }
     goal.unitMatcher = attackers.unitMatcher.get
     goal.unitCounter = attackers.unitCounter.get
-    if (With.units.ours.exists(matcher.accept)) {
+    if (With.units.ours.exists(matcher.apply)) {
       With.blackboard.wantToAttack.set(true)
     }
     super.onUpdate()

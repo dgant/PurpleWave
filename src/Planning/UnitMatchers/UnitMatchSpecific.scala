@@ -6,7 +6,7 @@ class UnitMatchSpecific(defaultUnits: Set[UnitInfo] = Set.empty) extends UnitMat
   
   var specificUnits: Set[UnitInfo] = defaultUnits
   
-  override def accept(unit: UnitInfo): Boolean = {
+  override def apply(unit: UnitInfo): Boolean = {
     specificUnits.contains(unit)
   }
 }

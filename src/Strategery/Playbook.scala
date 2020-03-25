@@ -27,7 +27,7 @@ object StrategyGroups {
     CarriersWithNoDefense,
 
     TvEWorkerRushLiftoff,
-    TvR1Rax,
+    TvR1Rax, // Why is this disabled? Is it broken?
     TvZProxy8Fact,
     TvZ2RaxNuke,
 

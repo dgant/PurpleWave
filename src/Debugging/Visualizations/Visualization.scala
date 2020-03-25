@@ -32,7 +32,7 @@ class Visualization {
     ShowStatus,
     ShowPerformanceSummary,
 
-    ShowGas
+    ShowTileInfo
   )
   
   var enabled   : Boolean = _

@@ -2,5 +2,5 @@ package Planning.UnitPreferences
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object UnitPreferAnything extends UnitPreference {
-  override def preference(unit: FriendlyUnitInfo): Double = 0
+  override def apply(unit: FriendlyUnitInfo): Double = 0
 }

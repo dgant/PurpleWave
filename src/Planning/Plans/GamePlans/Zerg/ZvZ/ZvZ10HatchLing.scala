@@ -3,13 +3,13 @@ package Planning.Plans.GamePlans.Zerg.ZvZ
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army._
+import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpJustEnoughScourge, PumpMutalisks}
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Scouting.ScoutWithZergling
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
@@ -50,7 +50,7 @@ class ZvZ10HatchLing extends GameplanTemplate {
       Get(12, Zerg.Drone),
       Get(6, Zerg.Zergling))))
   
-  override def initialScoutPlan: Plan = new ScoutWithZergling
+  override def initialScoutPlan: Plan = NoPlan()
   
   override def attackPlan: Plan = new Parallel(
     new Attack(Zerg.Mutalisk),

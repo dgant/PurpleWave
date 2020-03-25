@@ -101,7 +101,6 @@ object PvPIdeas {
       new If(new BasesAtMost(1), new CancelIncomplete(Protoss.CitadelOfAdun, Protoss.TemplarArchives)),
       new BuildOrder(
         Get(Protoss.RoboticsFacility),
-        Get(Protoss.Shuttle),
         Get(Protoss.RoboticsSupportBay),
         Get(2, Protoss.Reaver),
         Get(Protoss.Observatory),

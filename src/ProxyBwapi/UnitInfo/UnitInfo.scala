@@ -41,11 +41,15 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     tileIncludingCenter.toString + " " + pixelCenter.toString
     )
 
-  @inline def is(unitMatcher: UnitMatcher): Boolean = unitMatcher.accept(this)
-  @inline def isPrerequisite(unitMatcher: UnitMatcher): Boolean = unitMatcher.acceptAsPrerequisite(this)
-  @inline def isNone(unitMatchers: UnitMatcher*): Boolean = ! unitMatchers.exists(_.accept(this))
-  @inline def isAny(unitMatchers: UnitMatcher*): Boolean = unitMatchers.exists(_.accept(this))
-  @inline def isAll(unitMatchers: UnitMatcher*): Boolean = unitMatchers.forall(_.accept(this))
+  @inline def is(unitMatcher: UnitMatcher): Boolean = unitMatcher.apply(this)
+  @inline def isPrerequisite(unitMatcher: UnitMatcher): Boolean = (
+    unitMatcher(this)
+      || unitMatcher == Zerg.Hatchery && isAny(Zerg.Lair, Zerg.Hive)
+      || unitMatcher == Zerg.Lair && is(Zerg.Hatchery)
+      || unitMatcher == Zerg.Spire && is(Zerg.GreaterSpire))
+  @inline def isNone(unitMatchers: UnitMatcher*): Boolean = ! unitMatchers.exists(_.apply(this))
+  @inline def isAny(unitMatchers: UnitMatcher*): Boolean = unitMatchers.exists(_.apply(this))
+  @inline def isAll(unitMatchers: UnitMatcher*): Boolean = unitMatchers.forall(_.apply(this))
   
   //////////////////
   // Statefulness //
@@ -57,6 +61,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   var clusteringEnabled: Boolean = false
 
   val frameDiscovered           : Int = With.frame
+  val initialHitPoints          : Int = baseUnit.getHitPoints
+  val initialShields            : Int = baseUnit.getShields
   var completionFrame           : Int = Forever() // Can't use unitClass during construction
   var lastHitPoints             : Int = _
   var lastShieldPoints          : Int = _
@@ -148,7 +154,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   // Economics //
   ///////////////
 
-  def completeOrNearlyComplete: Boolean = complete || remainingCompletionFrames < With.reaction.planningMax + With.reaction.agencyMax
+  def completeOrNearlyComplete: Boolean = complete || remainingCompletionFrames < With.latency.framesRemaining
   
   lazy val isBlocker: Boolean = gasLeft + mineralsLeft < With.configuration.blockerMineralThreshold
   
@@ -167,7 +173,24 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     addon.map(_.remainingCompletionFrames).getOrElse(0)
   ).max
 
-  val participatingInCombat = new Cache(() => EvaluateTargets.participatingInCombat(this))
+  val participatingInCombat = new Cache(() => matchups.targets.nonEmpty || isAny(
+    // Spellcasters (which don't have targets)
+    // Static defense (which doesn't have targets if incomplete)
+    Terran.Dropship,
+    Terran.Medic,
+    Terran.ScienceVessel,
+    Terran.SpiderMine,
+    Terran.MissileTurret,
+    Terran.Bunker,
+    Protoss.DarkArchon,
+    Protoss.HighTemplar,
+    Protoss.Shuttle,
+    Protoss.ShieldBattery,
+    Zerg.CreepColony,
+    Zerg.Defiler,
+    Zerg.SporeColony,
+    Zerg.SunkenColony
+  ))
   val baseTargetValue = new Cache(() => EvaluateTargets.getTargetBaseValue(this))
   
   //////////////

@@ -6,18 +6,18 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 object Qualities {
   object Cloaked extends Quality {
-    def accept(u: UnitInfo): Boolean = u.burrowed || u.isAny(
+    def apply(u: UnitInfo): Boolean = u.burrowed || u.isAny(
       Terran.Ghost, Terran.Wraith, Terran.SpiderMine,
       Protoss.Arbiter, Protoss.DarkTemplar, Protoss.Observer,
       Zerg.Lurker, Zerg.LurkerEgg) || (u.is(Terran.Vulture) && u.player.hasTech(Terran.SpiderMinePlant))
     override val counteredBy: Array[Quality] = Array(Detector)
   }
   object SpiderMine extends Quality {
-    override def accept(u: UnitInfo): Boolean = u.is(Terran.SpiderMine)
+    override def apply(u: UnitInfo): Boolean = u.is(Terran.SpiderMine)
     override val counteredBy: Array[Quality] = Array(AntiVulture)
   }
   object AntiSpiderMine extends Quality {
-    override def accept(u: UnitInfo): Boolean = u.attacksAgainstGround > 0 && (
+    override def apply(u: UnitInfo): Boolean = u.attacksAgainstGround > 0 && (
       u.flying
       || u.unitClass.floats
       || u.damageOnHitGround >= Terran.SpiderMine.maxHitPoints
@@ -26,55 +26,55 @@ object Qualities {
     @inline override def counterScaling: Double = 5.0
   }
   object Vulture extends Quality {
-    override def accept(u: UnitInfo): Boolean = u.is(Terran.Vulture)
+    override def apply(u: UnitInfo): Boolean = u.is(Terran.Vulture)
     override val counteredBy: Array[Quality] = Array(AntiVulture)
   }
   object AntiVulture extends Quality {
-    override def accept(u: UnitInfo): Boolean = (AntiGround.accept(u)
+    override def apply(u: UnitInfo): Boolean = (AntiGround.apply(u)
       && ! u.isAny(Protoss.Zealot, Protoss.DarkTemplar, Protoss.Scout, Protoss.Arbiter, Protoss.Carrier, Zerg.Zergling))
     override val counteredBy: Array[Quality] = Array.empty
   }
   object Air extends Quality {
-    def accept(u: UnitInfo): Boolean = u.flying
+    def apply(u: UnitInfo): Boolean = u.flying
     override val counteredBy: Array[Quality] = Array(AntiAir)
   }
   object Ground extends Quality {
-    def accept(u: UnitInfo): Boolean = ! u.flying && ! u.isAny(Terran.SpiderMine)
+    def apply(u: UnitInfo): Boolean = ! u.flying && ! u.isAny(Terran.SpiderMine)
     override val counteredBy: Array[Quality] = Array(AntiGround)
   }
   object AirCombat extends Quality {
-    def accept(u: UnitInfo): Boolean = u.flying
+    def apply(u: UnitInfo): Boolean = u.flying
     override val counteredBy: Array[Quality] = Array(AntiAirCombat)
   }
   object GroundCombat extends Quality {
-    def accept(u: UnitInfo): Boolean = ! u.flying && ! u.isAny(Terran.SpiderMine)
+    def apply(u: UnitInfo): Boolean = ! u.flying && ! u.isAny(Terran.SpiderMine)
     override val counteredBy: Array[Quality] = Array(AntiGroundCombat)
   }
   object AntiAir extends Quality {
-    def accept(u: UnitInfo): Boolean = u.is(UnitMatchCombatSpellcaster) || u.attacksAgainstAir > 0
+    def apply(u: UnitInfo): Boolean = u.is(UnitMatchCombatSpellcaster) || u.attacksAgainstAir > 0
   }
   object AntiGround extends Quality {
-    def accept(u: UnitInfo): Boolean = u.is(UnitMatchCombatSpellcaster) || (u.attacksAgainstGround > 0 && ! u.unitClass.isWorker)
+    def apply(u: UnitInfo): Boolean = u.is(UnitMatchCombatSpellcaster) || (u.attacksAgainstGround > 0 && ! u.unitClass.isWorker)
   }
   object AntiAirCombat extends Quality {
-    def accept(u: UnitInfo): Boolean = u.attacksAgainstAir > 0 && ! u.isAny(Terran.Ghost, Protoss.Arbiter)
+    def apply(u: UnitInfo): Boolean = u.attacksAgainstAir > 0 && ! u.isAny(Terran.Ghost, Protoss.Arbiter)
   }
   object AntiGroundCombat extends Quality {
-    def accept(u: UnitInfo): Boolean = u.attacksAgainstGround > 0 && ! u.isAny(Terran.Ghost, Protoss.Arbiter, UnitMatchWorkers)
+    def apply(u: UnitInfo): Boolean = u.attacksAgainstGround > 0 && ! u.isAny(Terran.Ghost, Protoss.Arbiter, UnitMatchWorkers)
   }
   object Combat extends Quality {
-    def accept(u: UnitInfo): Boolean = (u.canAttack && ! u.unitClass.isWorker)
+    def apply(u: UnitInfo): Boolean = (u.canAttack && ! u.unitClass.isWorker)
     override val counteredBy: Array[Quality] = Array(Combat)
   }
   object Detector extends Quality {
-    def accept(u: UnitInfo): Boolean = u.unitClass.isDetector
+    def apply(u: UnitInfo): Boolean = u.unitClass.isDetector
     @inline override def counterScaling: Double = 5.0
   }
   object StaticDefense extends Quality {
-    def accept(u: UnitInfo): Boolean = u.unitClass.attacksGround && u.unitClass.isBuilding
+    def apply(u: UnitInfo): Boolean = u.unitClass.attacksGround && u.unitClass.isBuilding
   }
   object AntiStaticDefense extends Quality {
-    def accept(u: UnitInfo): Boolean = u.pixelRangeGround > 32.0 * 7.0 || u.isSiegeTankUnsieged()
+    def apply(u: UnitInfo): Boolean = u.pixelRangeGround > 32.0 * 7.0 || u.isSiegeTankUnsieged()
   }
   val enemy: Array[Quality] = Array(
     Cloaked,

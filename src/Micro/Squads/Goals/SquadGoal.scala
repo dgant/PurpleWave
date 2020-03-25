@@ -47,7 +47,7 @@ trait SquadRecruiterSimple extends SquadRecruiter {
   def candidates: Seq[FriendlyUnitInfo] = _candidates
   def candidateWelcome(batch: SquadBatch, candidate: FriendlyUnitInfo): Boolean = {
     invalidateBatch(batch)
-    unitMatcher.accept(candidate) && unitCounter.continue(batch.assignments.find(_.squad == squad).map(_.units).getOrElse(Seq.empty))
+    unitMatcher.apply(candidate) && unitCounter.continue(batch.assignments.find(_.squad == squad).map(_.units).getOrElse(Seq.empty))
   }
   def candidateDistance(candidate: FriendlyUnitInfo): Double = ByOption.max(destinations.map(candidate.pixelDistanceTravelling)).getOrElse(10 * With.mapPixelWidth)
   def candidateValue(batch: SquadBatch, candidate: FriendlyUnitInfo): Double = {

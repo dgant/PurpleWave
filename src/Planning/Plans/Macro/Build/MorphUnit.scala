@@ -2,11 +2,12 @@ package Planning.Plans.Macro.Build
 
 import Lifecycle.With
 import Macro.Buildables.{Buildable, BuildableUnit}
+import Macro.Scheduling.MacroCounter
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.UnitCountOne
-import Planning.UnitMatchers.{UnitMatchMorphingInto, UnitMatchOr}
-import Planning.UnitPreferences.{UnitPreferAll, UnitPreferBaseWithFewerWorkers, UnitPreferBaseWithMoreWorkers, UnitPreferHatcheryWithThreeLarva}
+import Planning.UnitMatchers.{UnitMatchMorphingInto, UnitMatchOr, UnitMatchSpecific}
+import Planning.UnitPreferences._
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -20,16 +21,16 @@ class MorphUnit(val classToMorph: UnitClass) extends ProductionPlan {
 
   description.set("Morph a " + classToMorph)
   
-  val currencyLock    = new LockCurrencyForUnit(classToMorph)
-  val morpherClass    = classToMorph.whatBuilds._1
-  val morpherLock     = new LockUnits {
+  val currencyLock  = new LockCurrencyForUnit(classToMorph)
+  val morpherClass  = classToMorph.whatBuilds._1
+  val morpherLock   = new LockUnits {
     unitMatcher.set(UnitMatchOr(morpherClass, UnitMatchMorphingInto(classToMorph)))
     unitCounter.set(UnitCountOne)
   }
   
   private var morpher: Option[FriendlyUnitInfo] = None
   
-  override def isComplete: Boolean = morpher.filter(_.unitClass == classToMorph).exists(_.aliveAndComplete)
+  override def isComplete: Boolean = morpher.exists(t => MacroCounter.countComplete(t)(classToMorph) > 0)
   
   override def onUpdate() {
     
@@ -40,11 +41,12 @@ class MorphUnit(val classToMorph: UnitClass) extends ProductionPlan {
       classToMorph.buildUnitsEnabling.map(With.projections.unit)
       :+ With.projections.unit(morpherClass)).max
     
-    currencyLock.isSpent = morpher.exists(m => m.alive && m.isAny(Zerg.Egg, Zerg.LurkerEgg, Zerg.Cocoon, classToMorph))
+    currencyLock.isSpent = morpher.exists(t => MacroCounter.countCompleteOrIncomplete(t)(classToMorph) > 0)
     currencyLock.acquire(this)
     
     if (currencyLock.satisfied && ! currencyLock.isSpent) {
       setPreference()
+      morpherLock.unitMatcher.set(morpher.map(m => new UnitMatchSpecific(Set(m))).getOrElse(morpherClass))
       morpherLock.acquire(this)
       morpher = morpherLock.units.headOption
       morpher.foreach(_.agent.intend(this, new Intention {
@@ -67,8 +69,7 @@ class MorphUnit(val classToMorph: UnitClass) extends ProductionPlan {
         UnitPreferBaseWithMoreWorkers
       ))
     } else {
-      // AIST1 hack fix: Disabling this so we stop morphing all our Hatcheries into Lairs
-      //morpherLock.unitPreference.set(UnitPreferClose(With.geography.home.pixelCenter))
+      morpherLock.unitPreference.set(u => (if (u.visibleToOpponents) 0 else 1) - u.matchups.framesOfSafety)
     }
   }
 }

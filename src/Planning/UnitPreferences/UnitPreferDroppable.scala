@@ -26,7 +26,7 @@ object UnitPreferDroppable extends UnitPreference {
   )
   
   
-  override def preference(unit: FriendlyUnitInfo): Double = {
+  override def apply(unit: FriendlyUnitInfo): Double = {
     val index = preferenceOrder.indexOf(unit.unitClass)
     if (index < 0)
       Double.MaxValue

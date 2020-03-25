@@ -23,7 +23,7 @@ class BuildAddon(val addonClass: UnitClass) extends ProductionPlan {
   private var addon: Option[UnitInfo] = None
   
   val builderMatcher = UnitMatchAnd(addonClass.whatBuilds._1, new UnitMatcher {
-    override def accept(unit: UnitInfo): Boolean = unit.addon.forall(addon.contains)
+    override def apply(unit: UnitInfo): Boolean = unit.addon.forall(addon.contains)
   })
   
   val builderLock = new LockUnits {

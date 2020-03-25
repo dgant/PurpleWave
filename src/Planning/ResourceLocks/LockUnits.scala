@@ -14,7 +14,6 @@ class LockUnits extends {
   
   var canPoach          = new Property[Boolean](false)
   var interruptable     = new Property[Boolean](true)
-  var acceptSubstitutes = new Property[Boolean](false)
   val unitMatcher       = new Property[UnitMatcher](UnitMatchAnything)
   val unitPreference    = new Property[UnitPreference](UnitPreferAnything)
   val unitCounter       = new Property[UnitCounter](UnitCountEverything)
@@ -43,12 +42,7 @@ class LockUnits extends {
   
   def units: collection.Set[FriendlyUnitInfo] = With.recruiter.getUnits(this)
 
-  protected def weAccept(unit: FriendlyUnitInfo): Boolean = {
-    if(acceptSubstitutes.get)
-      unitMatcher.get.acceptAsPrerequisite(unit)
-    else
-      unitMatcher.get.accept(unit)
-  }
+  protected def weAccept(unit: FriendlyUnitInfo): Boolean = unitMatcher.get.apply(unit)
 
   def offerUnits(candidates: Iterable[FriendlyUnitInfo], dryRun: Boolean): Option[Iterable[FriendlyUnitInfo]] = {
     unitCounter.get.reset()
@@ -78,7 +72,7 @@ class LockUnits extends {
   }
 
   protected def findSingleFinalist(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
-    ByOption.minBy(candidates.filter(weAccept))(unitPreference.get.preference)
+    ByOption.minBy(candidates.filter(weAccept))(unitPreference.get.apply)
   }
 
   protected def findMultipleFinalists(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
@@ -93,7 +87,7 @@ class LockUnits extends {
       } else {
         val output = new mutable.PriorityQueue[FriendlyUnitInfo]()(Ordering.by(candidate =>
           // Negative because priority queue is highest-first
-          - unitPreference.get.preference(candidate)
+          - unitPreference.get.apply(candidate)
           * (if (units.contains(candidate)) 1.0 else 1.5)
         ))
         (output, () => output.dequeue())

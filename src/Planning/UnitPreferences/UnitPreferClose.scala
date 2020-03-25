@@ -6,7 +6,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 case class UnitPreferClose(pixel: Pixel = SpecificPoints.middle) extends UnitPreference {
   
-  override def preference(unit: FriendlyUnitInfo): Double = (
+  override def apply(unit: FriendlyUnitInfo): Double = (
     (if (With.performance.danger)
       unit.pixelDistanceCenter(pixel)
     else

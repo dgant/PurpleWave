@@ -18,7 +18,7 @@ class FingerprintArrivesBy(
     // Important performance short-circuit
     if (With.frame > targetFrame) return false
 
-    val units           = With.units.ever.view.filter(u => u.isEnemy && unitMatcher.accept(u))
+    val units           = With.units.ever.view.filter(u => u.isEnemy && unitMatcher.apply(u))
     val arrivingOnTime  = units.count(_.arrivalFrame() < targetFrame)
     val output          = arrivingOnTime >= quantity
     output

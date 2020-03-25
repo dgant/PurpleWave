@@ -2,7 +2,7 @@ package Planning.UnitMatchers
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object UnitMatchIdle extends UnitMatcher{
-  override def accept(unit: UnitInfo): Boolean = {
+  override def apply(unit: UnitInfo): Boolean = {
     Seq(
       unit.remainingCompletionFrames,
       unit.friendly.map(_.remainingTrainFrames).getOrElse(0),

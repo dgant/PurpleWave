@@ -5,7 +5,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 object UnitMatchTransport extends UnitMatcher {
   
-  override def accept(unit: UnitInfo): Boolean =
+  override def apply(unit: UnitInfo): Boolean =
     unit.aliveAndComplete             &&
     unit.flying                       &&
     unit.unitClass.spaceProvided > 0  &&

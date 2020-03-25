@@ -4,7 +4,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 object UnitMatchWarriors extends UnitMatcher {
   
-  override def accept(unit: UnitInfo): Boolean = (
+  override def apply(unit: UnitInfo): Boolean = (
     unit.aliveAndComplete
     && unit.unitClass.dealsDamage
     && unit.unitClass.orderable

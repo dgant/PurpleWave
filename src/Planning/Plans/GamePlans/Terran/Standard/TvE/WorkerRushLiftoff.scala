@@ -25,7 +25,7 @@ class WorkerRushLiftoff extends Parallel {
   
   val dyingLock = new LockUnits
   dyingLock.unitMatcher.set(new UnitMatcher {
-    override def accept(unit: UnitInfo) = unit.totalHealth < 21
+    override def apply(unit: UnitInfo) = unit.totalHealth < 21
   })
   dyingLock.unitCounter.set(UnitCountEverything)
   

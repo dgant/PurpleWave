@@ -5,7 +5,6 @@ import Macro.BuildRequests.BuildRequest
 import Macro.Buildables.Buildable
 import Performance.Cache
 import Planning.Plan
-import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
@@ -35,46 +34,26 @@ class MacroQueue {
   
   def queue: Vector[Buildable] = queueCache()
   val queueCache = new Cache[Vector[Buildable]](() => {
-    val requestQueue = requestsByPlan.keys.toVector.sortBy(_.priority).flatten(requestsByPlan)
-    val unitsWanted = new CountMap[UnitClass]
-    val unitsCounted = new CountMap[UnitClass]
+    val requestQueue    = requestsByPlan.keys.toVector.sortBy(_.priority).flatten(requestsByPlan)
+    val unitsWanted     = new CountMap[UnitClass]
+    val unitsCounted    = new CountMap[UnitClass]
+    val unitsExisting   = new CountMap[UnitClass]
     val upgradesCounted = new CountMap[Upgrade]
-    val techsCounted = new mutable.HashSet[Tech]
+    val techsCounted    = new mutable.HashSet[Tech]
+
+    // Count units
+    With.units.ours.foreach(unit => {
+      // Use the standard macro counter to ensure production plans complete as we intend
+      MacroCounter.countComplete(unit).foreach(p => unitsCounted(p._1) += p._2)
+      // Require completion of things, especially Terran buildings
+      MacroCounter.countCompleteOrIncomplete(unit).foreach(p => unitsExisting(p._1) += p._2)
+    })
+    unitsExisting.foreach(pair => unitsWanted(pair._1) = Math.max(unitsWanted(pair._1), pair._2))
+
+    // Count upgrades and tech
     Upgrades.all.map(u => (u, With.self.getUpgradeLevel(u))).foreach(u => upgradesCounted(u._1) = u._2)
     techsCounted ++= Techs.all.filter(With.self.hasTech)
-    With.units.ours.foreach(unit => {
-      // Count the unit if it no longer needs attention
-      // Namely, Terran buildings need ongoing support
-      if (unit.complete || ! (unit.unitClass.isBuilding && unit.unitClass.isTerran)) {
-        unitsCounted.add(unit.unitClass, 1)
-      }
-      if (unit.is(Terran.SiegeTankSieged)) {
-        unitsCounted.add(Terran.SiegeTankUnsieged, 1)
-      }
-      if (unit.is(Zerg.GreaterSpire)) {
-        unitsCounted.add(Zerg.Spire, 1)
-      }
-      if (unit.is(Zerg.Lair)) {
-        unitsCounted.add(Zerg.Hatchery, 1)
-      }
-      if (unit.is(Zerg.Hive)) {
-        unitsCounted.add(Zerg.Lair, 1)
-        unitsCounted.add(Zerg.Hatchery, 1)
-      }
-      if (unit.isAny(Zerg.Egg, Zerg.LurkerEgg, Zerg.Cocoon)) {
-        unitsCounted.add(unit.buildType, unit.buildType.copiesProduced)
-      }
-    })
-    // Don't leave Terran buildings incomplete;
-    // Make sure we have a plan for finishing all our existing buildings
-    if (With.self.isTerran) {
-      With.units.ours
-        .filter(u => u.unitClass.isBuilding && ! u.complete)
-        .map(_.unitClass)
-        .toVector
-        .distinct
-        .foreach(u => unitsWanted(u) = Math.max(unitsWanted(u), With.units.countOurs(u)))
-    }
+
     requestQueue.flatten(getUnfulfilledBuildables(_, unitsWanted, unitsCounted, upgradesCounted, techsCounted))
   })
   

@@ -68,7 +68,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   var canFlee       : Boolean                       = true
   var canCower      : Boolean                       = false
   var canMeld       : Boolean                       = false
-  var canScout      : Boolean                       = false
   var canPillage    : Boolean                       = false
   var canLiftoff    : Boolean                       = false
   var canCast       : Boolean                       = false
@@ -80,6 +79,8 @@ class Agent(val unit: FriendlyUnitInfo) {
   var shouldEngage: Boolean = false
   val forces: mutable.Map[Color, Force] = new mutable.HashMap[Color, Force]
   val resistances: mutable.Map[Color, Vector[Force]] = new mutable.HashMap[Color, Vector[Force]]
+
+  def canScout: Boolean = lastIntent.toScoutTiles.nonEmpty
   
   def zonePath(to: Pixel): Option[ZonePath] = {
     if ( ! cachedZonePath.contains(to)) {

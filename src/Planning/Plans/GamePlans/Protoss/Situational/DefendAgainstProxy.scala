@@ -5,7 +5,7 @@ import Lifecycle.With
 import Micro.Squads.Goals.GoalRazeProxies
 import Micro.Squads.Squad
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.UnitCountExactly
+import Planning.UnitCounters.{UnitCountEverything, UnitCountExactly}
 import Planning.UnitMatchers._
 import Planning.{Plan, Property}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -24,10 +24,10 @@ class DefendAgainstProxy extends Plan {
 
     // Get sorted list of proxies
     val proxies = getProxies.toVector
-      .sortBy(_.remainingCompletionFrames)
       .sortBy(_.totalHealth)
+      .sortBy(_.remainingCompletionFrames)
       .sortBy( ! _.unitClass.trainsGroundUnits)
-      .sortBy(-_.dpfGround)
+      .sortBy( - _.dpfGround)
 
     if (proxies.isEmpty) return
 
@@ -36,6 +36,7 @@ class DefendAgainstProxy extends Plan {
     val defendersAssigned         = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
     val defendersAvailable        = new mutable.HashSet[FriendlyUnitInfo]
     defenders.get.release()
+    defenders.get.unitCounter.set(UnitCountEverything)
     defenders.get.unitMatcher.set(UnitMatchOr(UnitMatchWorkers, UnitMatchWarriors))
     defenders.get.inquire(this).foreach(defendersAvailable ++= _)
 
@@ -81,12 +82,13 @@ class DefendAgainstProxy extends Plan {
     defenders.get.unitCounter.set(UnitCountExactly(defendersAssigned.size))
     defenders.get.unitMatcher.set(UnitMatchCustom(_.friendly.exists(defendersAssigned.contains)))
     defenders.get.acquire(this)
-    if (defenders.get.units.nonEmpty) {
-      With.blackboard.status.set(With.blackboard.status.get :+ "DefendingProxy")
+    if (defenders.get.units.isEmpty) {
+      return
     }
-  
+    With.blackboard.status.set(With.blackboard.status.get :+ "DefendingProxy")
     squad.enemies = defendersAssigned.values.toSeq.distinct
     squad.setGoal(new GoalRazeProxies(defendersAssigned.toMap))
+    squad.addConscripts(defenders.get.units)
     With.squads.commission(squad)
   }
   

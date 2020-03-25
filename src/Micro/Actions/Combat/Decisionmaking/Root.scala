@@ -26,12 +26,12 @@ object Root extends Action {
     private val pushSpacing = 32.0 * 3.0
     private def framesToRoot = 18 + With.reaction.agencyAverage
     
-    private lazy val weAreALurker           = Zerg.Lurker.accept(unit)
-    private lazy val weAreATank             = UnitMatchSiegeTank.accept(unit)
+    private lazy val weAreALurker           = Zerg.Lurker.apply(unit)
+    private lazy val weAreATank             = UnitMatchSiegeTank.apply(unit)
     private lazy val weAreRooted            = (weAreALurker && unit.burrowed) || unit.is(Terran.SiegeTankSieged)
     private lazy val maxRange               = if (unit.is(Terran.SiegeTankUnsieged)) Terran.SiegeTankSieged.pixelRangeGround else unit.pixelRangeGround
     private lazy val ourDistanceToGoal      = distanceToGoal(unit)
-    private lazy val rootersInPush          = unit.squadmates.filter(s => unit != s && Zerg.Lurker.accept(s) || UnitMatchSiegeTank.accept(s))
+    private lazy val rootersInPush          = unit.squadmates.filter(s => unit != s && Zerg.Lurker.apply(s) || UnitMatchSiegeTank.apply(s))
     private lazy val rootersInPushCloser    = rootersInPush.count(distanceToGoal(_) < ourDistanceToGoal + pushSpacing)
 
     def notHiddenUphill(target: UnitInfo): Boolean = target.visible || target.altitudeBonus <=  unit.altitudeBonus

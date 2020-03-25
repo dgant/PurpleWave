@@ -52,7 +52,7 @@ class QualityCounter {
   }
 
   def utilityQualities(unit: FriendlyUnitInfo): Seq[(Quality, Quality, Double)] = {
-    val friendlyQualities = Qualities.friendly.view.filter(_.accept(unit))
+    val friendlyQualities = Qualities.friendly.view.filter(_.apply(unit))
     val qualities = friendlyQualities.flatMap(friendlyQuality =>
       qualitiesEnemy.view.flatMap(enemyQuality =>
         enemyQuality._1.counteredBy.view
@@ -68,7 +68,7 @@ class QualityCounter {
   }
 
   def utilityNeed(unit: FriendlyUnitInfo): Seq[(UnitMatcher, Double)] = {
-    val needs = unitsNeeded.keys.view.filter(_.accept(unit)).map(need => {
+    val needs = unitsNeeded.keys.view.filter(_.apply(unit)).map(need => {
       val valueNeeded = unitsNeeded(need)
       val valuePossessed = unitsPossessed(need)
       (need, scaleNeed(PurpleMath.nanToInfinity(valueNeeded.toDouble / valuePossessed)))

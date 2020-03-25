@@ -79,7 +79,7 @@ object ShowHealthAndCooldown extends View {
       DrawMap.box(Pixel(xStart, yStartEnergy), Pixel(xStart + widthEnergyNow, yEndEnergy), Colors.BrightTeal, solid = true)
     }
     
-    if (widthCooldownNow > 0) {
+    if (unit.complete && widthCooldownNow > 0) {
       DrawMap.box(Pixel(xStart - 1, yStartCooldown - 1), Pixel(xStart + width + 2, yEndCooldown + 1), Color.Black, solid = true)
       if (unit.cooldownLeft > 0) {
         DrawMap.box(Pixel(xStartCooldown, yStartCooldown), Pixel(xStartCooldown + widthCooldownNow, yEndCooldown), unit.color, solid = true)

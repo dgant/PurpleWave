@@ -4,5 +4,5 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object UnitPreferIdle extends UnitPreference {
   
-  override def preference(unit: FriendlyUnitInfo): Double = unit.remainingOccupationFrames
+  override def apply(unit: FriendlyUnitInfo): Double = unit.remainingOccupationFrames
 }

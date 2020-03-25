@@ -105,9 +105,11 @@ object EvaluateTargets extends {
     // Combat bonus
     if (target.participatingInCombat()) {
       output *= Math.max(1.0, target.matchups.splashFactorMax)
+      output *= 2.0
       if (target.complete) {
         output *= 2.0
       } else {
+        // Prefer nearly-complete buildings
         val buildFrames = target.unitClass.buildFrames
         output *= (1.0 + PurpleMath.clamp((buildFrames - target.remainingCompletionFrames) / buildFrames, 0, 1.0))
       }

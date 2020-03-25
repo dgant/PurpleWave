@@ -12,7 +12,7 @@ object PumpCount {
   def currentCount(unitClass: UnitClass): Int = {
     val matcher = UnitMatchOr(
       new UnitMatcher {
-        override def accept(unit: UnitInfo): Boolean = unit.is(Zerg.Egg) && unit.friendly.exists(_.buildType == unitClass)
+        override def apply(unit: UnitInfo): Boolean = unit.is(Zerg.Egg) && unit.friendly.exists(_.buildType == unitClass)
       },
       if (unitClass == Terran.SiegeTankSieged || unitClass == Terran.SiegeTankUnsieged) {
         UnitMatchSiegeTank
@@ -33,7 +33,7 @@ object PumpCount {
     var sum = 0
     With.units.ours.foreach(unit =>
       sum += (
-        if (unit.complete && unit.alive && matcher.accept(unit)) {
+        if (unit.complete && unit.alive && matcher.apply(unit)) {
           1
         }
         else if (unit.isAny(Zerg.Egg, Zerg.LurkerEgg, Zerg.Cocoon) && unit.buildType == unitClass) {

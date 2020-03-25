@@ -3,8 +3,8 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 case class UnitMatchAnd(matchers: UnitMatcher*) extends UnitMatcher {
   
-  override def accept(unit: UnitInfo): Boolean = {
-    matchers.forall(_.accept(unit))
+  override def apply(unit: UnitInfo): Boolean = {
+    matchers.forall(_.apply(unit))
   }
   
 }

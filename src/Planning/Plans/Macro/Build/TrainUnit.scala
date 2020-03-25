@@ -4,6 +4,7 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.Buildables.{Buildable, BuildableUnit}
+import Macro.Scheduling.MacroCounter
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
@@ -36,14 +37,14 @@ class TrainUnit(val traineeClass: UnitClass) extends ProductionPlan {
       matchTrainer
     
   lazy val trainerLock = new LockUnits {
-    unitMatcher.set(u => trainerMatcher.accept(u) && (trainer.contains(u) || u.friendly.exists(_.trainee.forall(_.completeOrNearlyComplete))))
+    unitMatcher.set(u => trainerMatcher.apply(u) && (trainer.contains(u) || u.friendly.exists(_.trainee.forall(_.completeOrNearlyComplete))))
     unitCounter.set(UnitCountOne)
     unitPreference.set(preference)
   }
   
   private def trainer: Option[FriendlyUnitInfo] = trainerLock.units.headOption
   private def trainee: Option[FriendlyUnitInfo] = trainer.flatMap(_.trainee.filter(_.is(traineeClass)))
-  override def isComplete: Boolean = trainee.exists(_.completeOrNearlyComplete)
+  override def isComplete: Boolean = trainee.exists(t => MacroCounter.countComplete(t)(traineeClass) > 0)
   
   override def onUpdate() {
     if (isComplete) return
@@ -71,7 +72,7 @@ class TrainUnit(val traineeClass: UnitClass) extends ProductionPlan {
   private val safetyFramesMax = GameTime(0, 10)()
   private lazy val mapSize = With.mapTileWidth + With.mapTileHeight
   private lazy val preference = new UnitPreference {
-    override def preference(trainer: FriendlyUnitInfo): Double = {
+    override def apply(trainer: FriendlyUnitInfo): Double = {
       // Factors, ranging on [0, 1]
       val addon     = if (trainer.addon.isDefined) 0.0 else 1.0
       val readiness = trainer.remainingOccupationFrames.toDouble / Math.max(trainer.trainee.map(_.unitClass.buildFrames).getOrElse(0), traineeClass.buildFrames)

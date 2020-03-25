@@ -559,14 +559,5 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   /////////////////
   
   // UnitMatcher
-  @inline def accept(unit: UnitInfo): Boolean = unit.unitClass == this
-  
-  override def acceptAsPrerequisite(unit: UnitInfo): Boolean = (
-    accept(unit)
-    || (unit.unitClass.isZerg && unit.unitClass.isBuilding && (
-         (unit.unitClass == Zerg.GreaterSpire && this == Zerg.Spire)
-      || (unit.unitClass == Zerg.Hive         && this == Zerg.Lair)
-      || (unit.unitClass == Zerg.Hive         && this == Zerg.Hatchery)
-      || (unit.unitClass == Zerg.Lair         && this == Zerg.Hatchery)))
-  )
+  @inline def apply(unit: UnitInfo): Boolean = unit.unitClass == this
 }

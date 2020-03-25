@@ -47,7 +47,7 @@ class ScoutForCannonRush extends Plan {
     if ( ! shouldScout) return
 
     scouts.get.unitPreference.set(UnitPreferClose(
-      scouts.get.units.headOption.map(_.pixelCenter).getOrElse(With.geography.home.pixelCenter)))
+    scouts.get.units.headOption.map(_.pixelCenter).getOrElse(With.geography.home.pixelCenter)))
     scouts.get.acquire(this)
     scouts.get.units.foreach(scout => scout.agent.intend(this, new Intention {
       toTravel = Some(With.geography.home.pixelCenter)

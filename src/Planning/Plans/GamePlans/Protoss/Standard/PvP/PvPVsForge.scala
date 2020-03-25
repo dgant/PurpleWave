@@ -12,7 +12,7 @@ import Planning.Predicates.Reactive.EnemyNaturalConfirmed
 import Planning.Predicates.Strategy.EnemyStrategy
 import ProxyBwapi.Races.Protoss
 
-class PvPVsForgeNew extends PvP3GateGoon {
+class PvPVsForge extends PvP3GateGoon {
 
   // Bots have done a variety of nonsense behind FFE:
   // * Real FFE into macro
@@ -24,6 +24,7 @@ class PvPVsForgeNew extends PvP3GateGoon {
   override val activationCriteria: Predicate = new And(
     new EnemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.cannonRush),
     new UnitsAtMost(0, Protoss.CitadelOfAdun))
+
   override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
 
   override def buildOrderPlan = new Parallel(

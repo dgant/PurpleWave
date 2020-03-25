@@ -6,9 +6,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 object TargetFilterAlmostAnything extends TargetFilter {
   
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
-    // Don't attack larvae. Just don't do it.
-    //
-    if (target.is(Zerg.Larva)) return false
+    if (target.isAny(Zerg.Larva, Zerg.Egg)) return false
   
     actor.agent.toLeash.forall(leash => (
       actor.inRangeToAttack(target)

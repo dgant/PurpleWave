@@ -1,8 +1,10 @@
 package Micro.Squads.Goals
 
+import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
+import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
@@ -20,9 +22,10 @@ class GoalRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends Squa
   override def run() {
     squad.units.foreach(unit => {
       val assignee = assignments.get(unit)
+      val attackTarget = if (With.units.existsEnemy(UnitMatchWarriors)) None else assignee
       unit.agent.intend(squad.client, new Intention {
         toTravel  = Some(assignee.map(_.pixelCenter).getOrElse(destination))
-        toAttack  = assignee
+        toAttack  = attackTarget
         canFlee   = assignments.keys.forall( ! _.unitClass.isWorker)
       })
     })

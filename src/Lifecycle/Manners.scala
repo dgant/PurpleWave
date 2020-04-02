@@ -15,7 +15,7 @@ object Manners {
       && With.units.existsEnemy(_.unitClass.isResourceDepot)) {
       surrender()
     }
-    if (With.frame == GameTime(0, 20)()) {
+    if (With.frame == GameTime(0, 5)()) {
       if (With.configuration.humanMode) {
         chat("Good luck, " + With.enemy.name + ", and have fun!")
       }

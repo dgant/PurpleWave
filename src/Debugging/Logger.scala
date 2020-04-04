@@ -54,8 +54,12 @@ class Logger {
   private def log(message: String, chat: Boolean = true) {
     val logMessage = With.frame.toString + " | " + new GameTime(With.frame).toString + " | " + message
     logMessages.append(logMessage)
-    System.err.println(logMessage)
-    if (chat && With.configuration.debugging) Manners.chat(message)
+    if (With.configuration.logstd) {
+      System.err.println(logMessage)
+    }
+    if (chat && With.configuration.debugging) {
+      Manners.chat(message)
+    }
   }
   
   private def formatException(exception: Exception): String = {

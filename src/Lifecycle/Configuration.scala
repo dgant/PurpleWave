@@ -21,6 +21,7 @@ class Configuration {
   var visualizeFun                    = false
   var visualizeDebug                  = false
   var debugging                       = false
+  var logstd                          = false
   var debugPauseThreshold: Int        = 24 * 60 * 60
 
   //////////////

@@ -1,3 +1,6 @@
 [submodule "3rdparty/jbwapi"]
 	path = 3rdparty/jbwapi
 	url = https://github.com/JavaBWAPI/JBWAPI
+[submodule "3rdparty/mjson"]
+	path = 3rdparty/mjson
+	url = https://github.com/bolerio/mjson

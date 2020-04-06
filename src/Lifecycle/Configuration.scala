@@ -22,6 +22,7 @@ class Configuration {
   var visualizeDebug                  = false
   var debugging                       = false
   var debugPauseThreshold: Int        = 24 * 60 * 60
+  var logstd                          = false
 
   //////////////
   // Strategy //

@@ -1,7 +1,6 @@
 package Debugging
 
 import java.io.{File, PrintWriter}
-import java.util.{Calendar, Date}
 
 import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.{Manners, With}
@@ -12,8 +11,6 @@ class Logger {
   
   private val logMessages = new ListBuffer[String]
   private var errorOcurred = false
-
-  private val creationDate: Date = Calendar.getInstance.getTime
   
   def flush(): Unit = {
     val shouldFlush = errorOcurred || With.configuration.debugging
@@ -25,8 +22,7 @@ class Logger {
       opponents = With.enemies.map(_.name).mkString("-")
     } catch { case exception: Exception => }
     
-    val filenameRaw = opponents + "-" + creationDate.toString
-    val filename = With.bwapiData.write + filenameRaw.replaceAll("[^A-Za-z0-9 \\-\\.]", "").replace(" ", "-") + ".log.txt"
+    val filename = With.bwapiData.write + ".log.txt"
     val file = new File(filename)
     val printWriter = new PrintWriter(file)
     printWriter.write(logMessages.mkString("\r\n"))

@@ -169,10 +169,6 @@ object With {
     yolo              = new Yolo
   }
   
-  def onEnd() {
-    With.logger.flush()
-  }
-  
   private def analyzeTerrain() {
     With.logger.debug("Loading BWTA for " + With.game.mapName + " at " + With.game.mapFileName())
     try {

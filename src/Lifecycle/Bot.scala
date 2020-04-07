@@ -63,7 +63,7 @@ class Bot() extends DefaultBWListener {
       With.tasks.onEnd()
       With.storyteller.onEnd()
       Manners.onEnd(isWinner)
-      With.onEnd()
+      With.logger.flush()
     }
     catch { case exception: Exception => With.logger.onException(exception) }
   }

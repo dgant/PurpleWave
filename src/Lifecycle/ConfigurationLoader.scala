@@ -12,7 +12,7 @@ object ConfigurationLoader {
 
   def getOrDefault(json: Json, property: String, default: Boolean): Boolean = {
     val value = json.at(property)
-    if (value == null || value.toString() != "true") {
+    if (value == null || ! value.isString || value.asString() != "true") {
       return default
     }
     true
@@ -63,7 +63,7 @@ object ConfigurationLoader {
       if (pretraining)          { setPretraining() }
       if (debugging)            { setDebugMode() }
       if (debugginglive)        { setDebugLiveMode() }
-      if (logstd)               { With.configuration.logstd }
+      if (logstd)               { With.configuration.logstd = true }
       if (fixedbuilds.nonEmpty) { setFixedBuild(fixedbuilds) }
 
       Seq(

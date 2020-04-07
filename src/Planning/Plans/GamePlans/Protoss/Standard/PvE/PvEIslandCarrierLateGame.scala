@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvE
 
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Macro.BuildRequests.{Get, GetAnother}
+import Macro.BuildRequests.Get
 import Micro.Agency.Intention
 import Planning.Plan
 import Planning.Plans.Army.KillPsiDisruptor
@@ -157,7 +157,5 @@ class PvEIslandCarrierLateGame extends Parallel(
       new If(new Not(new OnMap(Sparkle)), new ExpandOverIsland(12)),
       new If(
         new UnitsAtLeast(2, Protoss.Stargate, complete = true),
-        new Build(
-          GetAnother(8, Protoss.PhotonCannon),
-          GetAnother(2, Protoss.Pylon))))),
+        new Pump(Protoss.PhotonCannon, maximumConcurrently = 3)))),
 )

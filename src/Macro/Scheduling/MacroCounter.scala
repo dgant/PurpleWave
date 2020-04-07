@@ -1,5 +1,6 @@
 package Macro.Scheduling
 
+import Lifecycle.With
 import Planning.UnitMatchers.UnitMatchSiegeTank
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
@@ -54,4 +55,7 @@ object MacroCounter {
 
     output
   }
+
+  def countFriendlyComplete: CountMap[UnitClass] = With.units.ours.map(countComplete).reduce(_ + _)
+  def countFriendlyCompleteOrIncomplete: CountMap[UnitClass] = With.units.ours.map(countCompleteOrIncomplete).reduce(_ + _)
 }

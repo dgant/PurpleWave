@@ -19,8 +19,7 @@ object Get {
     val shouldAdd = false
     val buildable = toBuildable(buildableType, quantity)
     val output = new BuildRequest(buildable) {
-      override val add      : Int = if (shouldAdd) quantity else 0
-      override val require  : Int = if (shouldAdd) 0        else quantity
+      override val total  : Int = if (shouldAdd) 0 else quantity
     }
     output
   }

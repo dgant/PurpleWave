@@ -14,4 +14,10 @@ class CountMap[T] extends mutable.HashMap[T, Int] {
     keys.foreach(key => output.put(key, this(key)))
     output
   }
+
+  def +(other: CountMap[T]): CountMap[T] = {
+    val output = new CountMap[T]
+    Seq(this, other).foreach(_.foreach(pair => output(pair._1) += pair._2))
+    output
+  }
 }

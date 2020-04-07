@@ -108,7 +108,7 @@ class Recruiter {
     unitsByLock.getOrElse(lock, Set.empty)
   }
   
-  def audit = {
+  def audit: Vector[(Plan, mutable.Set[FriendlyUnitInfo])] = {
     unitsByLock.toVector.sortBy(_._1.owner.priority).map(p => (p._1.owner, p._2))
   }
 }

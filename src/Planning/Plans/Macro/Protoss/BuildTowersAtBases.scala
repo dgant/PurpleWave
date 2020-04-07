@@ -4,9 +4,10 @@ import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
-import Macro.BuildRequests.{Get, GetAnother}
+import Macro.BuildRequests.Get
 import Planning.Plan
-import ProxyBwapi.Races.Protoss
+import Planning.Plans.Macro.Automatic.Pump
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitClasses.UnitClass
 
 class BuildTowersAtBases(
@@ -21,13 +22,12 @@ class BuildTowersAtBases(
     val zones = bases.map(_.zone).toSet.toArray
 
     if (zones.nonEmpty) {
-      if (towerClass != Protoss.PhotonCannon || With.units.existsOurs(Protoss.Forge)) {
-        val towersRequired = zones.map(towerZone).sum
-        With.scheduler.request(this, GetAnother(towersRequired, towerClass))
-      }
-      else if (towerClass == Protoss.PhotonCannon) {
+      if (towerClass == Protoss.PhotonCannon) {
         With.scheduler.request(this, Get(Protoss.Forge))
+      } else if (towerClass == Terran.MissileTurret) {
+        With.scheduler.request(this, Get(Terran.EngineeringBay))
       }
+      zones.foreach(towerZone)
     }
   }
 
@@ -56,26 +56,24 @@ class BuildTowersAtBases(
     With.geography.ourBasesAndSettlements
   }
 
-  private def towerZone(zone: Zone): Int = {
+  private def towerZone(zone: Zone): Unit= {
     lazy val pylonsInZone = zone.units.filter(_.is(Protoss.Pylon))
     lazy val towersInZone = zone.units.filter(_.is(towerClass))
     lazy val towersToAdd = towersRequired - towersInZone.size
     
-    if (towersToAdd <= 0) {
-      return 0
-    }
+    if (towersToAdd <= 0) return
+
+    val needPylons = towerClass.requiresPsi
     
-    if (pylonsInZone.isEmpty) {
+    if (needPylons && pylonsInZone.isEmpty) {
       With.groundskeeper.propose(pylonBlueprintByZone(zone))
-      With.scheduler.request(this, GetAnother(1, Protoss.Pylon))
+      new Pump(Protoss.Pylon, maximumConcurrently = 1)
     }
-    else if (pylonsInZone.exists(_.aliveAndComplete)) {
+    if ( ! needPylons || pylonsInZone.exists(_.aliveAndComplete)) {
       // Defensive programming measure. If we try re-proposing fulfilled blueprints we may just build towers forever.
       val newBlueprints = towerBlueprintsByZone(zone).filterNot(With.groundskeeper.proposalsFulfilled.contains).take(towersToAdd)
       newBlueprints.foreach(With.groundskeeper.propose)
-      return newBlueprints.size
+      new Pump(towerClass, maximumConcurrently = towersToAdd)
     }
-  
-    0
   }
 }

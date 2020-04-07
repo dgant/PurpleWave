@@ -154,7 +154,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   // Economics //
   ///////////////
 
-  def completeOrNearlyComplete: Boolean = complete || remainingCompletionFrames < With.latency.framesRemaining
+  // When a Larva is about to morph, but hasn't turned into an egg, remainingCompletionFrames is ZERO
+  def completeOrNearlyComplete: Boolean = complete || (remainingCompletionFrames > 0 && remainingCompletionFrames < With.latency.framesRemaining)
   
   lazy val isBlocker: Boolean = gasLeft + mineralsLeft < With.configuration.blockerMineralThreshold
   

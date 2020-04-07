@@ -2,6 +2,7 @@ package Planning.Plans.Macro.BuildOrders
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
+import Macro.Scheduling.MacroCounter
 import Planning.{Plan, Property}
 
 class BuildOrder(initialRequests: BuildRequest*) extends Plan {
@@ -13,18 +14,15 @@ class BuildOrder(initialRequests: BuildRequest*) extends Plan {
   val requests = new Property[Seq[BuildRequest]](initialRequests)
   
   override def onUpdate() {
-    val countByClassNow = With.units.ours.groupBy(_.unitClass).map(pair => (pair._1, pair._2.size))
-  
     val modifiedRequests = requests.get.flatMap(request => {
       val unit = request.buildable.unitOption.filter( ! _.isBuilding)
-      if (unit.isDefined && request.require > 0) {
-        val quantityNow = countByClassNow.getOrElse(unit.get, 0)
-        val quantityNew = request.require + quantityNow - With.buildOrderHistory.doneAllTime(unit.get)
-        if (quantityNew <= 0) {
+      if (unit.isDefined && request.total > 0) {
+        val quantityLost = Math.max(0, With.buildOrderHistory.doneAllTime(unit.get) - MacroCounter.countFriendlyCompleteOrIncomplete(unit.get))
+        val quantityToRequest = request.total - quantityLost
+        if (quantityToRequest > 0) {
+          Some(Get(quantityToRequest, unit.get))
+        } else {
           None
-        }
-        else {
-          Some(Get(quantityNew, unit.get))
         }
       } else {
         Some(request)

@@ -70,9 +70,6 @@ class MacroQueue {
       if (With.self.getUpgradeLevel(upgrade) < request.buildable.upgradeLevel) {
         upgradesCounted(upgrade) = request.buildable.upgradeLevel
         Vector(request.buildable)
-      } else if (request.add > 0 && upgradesCounted(upgrade) < upgrade.levels.last) {
-        upgradesCounted(upgrade) += 1
-        Vector(request.buildable)
       } else {
         None
       }
@@ -89,8 +86,7 @@ class MacroQueue {
     else {
       val unit = request.buildable.unitOption.get
       val unitCountActual = unitsCounted(unit)
-      unitsWanted.put(unit, request.add + Math.max(unitsWanted(unit), unitCountActual))
-      unitsWanted.put(unit, Math.max(unitsWanted(unit), request.require))
+      unitsWanted.put(unit, Math.max(unitsWanted(unit), request.total))
       var difference = unitsWanted(unit) - unitCountActual
       if (unit.isTwoUnitsInOneEgg) {
         difference = (1 + difference) / 2

@@ -32,20 +32,6 @@ class MasterBuildPlans {
 
   def update(invoker: FollowBuildOrder) {
 
-    // Remove complete plans
-    plans.values.foreach(plans => {
-      var i = 0
-      while (i < plans.size) {
-        val plan = plans(i)
-        if (plan.isComplete) {
-          With.recruiter.release(plan)
-          plans.remove(i)
-        }
-        else {
-          i += 1
-        }
-      }})
-
     // Add plans to match number of builds we need
     queue = With.scheduler.macroQueue.queue.take(maxToFollow)
 
@@ -65,6 +51,20 @@ class MasterBuildPlans {
         plans(build).append(buildPlan(build))
       }
     })
+
+    // Remove complete plans
+    plans.values.foreach(plans => {
+      var i = 0
+      while (i < plans.size) {
+        val plan = plans(i)
+        if (plan.isComplete) {
+          With.recruiter.release(plan)
+          plans.remove(i)
+        }
+        else {
+          i += 1
+        }
+      }})
 
     // Remove unneeded builds
     plans.keys.foreach(build => {

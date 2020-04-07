@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvE
 
 import Lifecycle.With
-import Macro.BuildRequests.{Get, GetAnother, NextUpgrade}
+import Macro.BuildRequests.{Get, NextUpgrade}
 import Planning.Plans.Army.{Attack, ConsiderAttacking, DefendZones, RecruitFreelancers}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -77,9 +77,7 @@ class PvE3BaseIslandCarrier extends Parallel {
     new OnGasPumps(2, new Build(Get(5, Protoss.Stargate))),
     new OnGasPumps(3, new Build(Get(8, Protoss.Stargate))),
     new OnGasPumps(4, new Build(Get(12, Protoss.Stargate))),
-    new Build(
-      GetAnother(6, Protoss.PhotonCannon),
-      GetAnother(2, Protoss.Pylon)),
+    new Pump(Protoss.PhotonCannon, maximumConcurrently = 3),
     new ExpandOverIsland(12),
     new Attack(Protoss.Scout), // TODO: Scout expansions, don't attack
     new DefendZones,

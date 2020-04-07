@@ -1,14 +1,13 @@
 package Planning.Plans.GamePlans.AllRaces
 
 import Lifecycle.With
-import Macro.BuildRequests.GetAnother
 import Mathematics.PurpleMath
 import Planning.Plans.Army.AttackWithWorkers
 import Planning.Plans.Basic.Do
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.StandardGamePlan
-import Planning.Plans.Macro.Automatic.{Gather, Pump}
-import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
+import Planning.Plans.Macro.Automatic.{Gather, Pump, RequireSufficientSupply}
+import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
 import Planning.Plans.Scouting.{ConsiderScoutingWithOverlords, ScoutWithWorkers}
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemiesAtMost, FoundEnemyBase}
@@ -34,9 +33,7 @@ class WorkerRush extends Trigger {
     // We get confused because our builder is also our gatherer,
     // so we send it "in advance" but then we have no income
     new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = 0),
-    new If(
-      new Check(() => With.self.supplyUsed == With.self.supplyTotal),
-      new Build(GetAnother(1, With.self.supplyClass))),
+    new If(new Check(() => With.self.supplyUsed == With.self.supplyTotal), new RequireSufficientSupply),
     new Pump(With.self.workerClass),
     new FollowBuildOrder,
     new ConsiderScoutingWithOverlords,

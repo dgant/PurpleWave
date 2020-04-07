@@ -17,6 +17,6 @@ class MasterBuildOrderHistory {
   def doneAllTime(unitClass: UnitClass): Int = countByClassAllTime(unitClass).size
   
   def update() {
-    With.units.ours.foreach(unit => countByClassAllTime(unit.unitClass).add(unit.id))
+    With.units.ours.foreach(unit => MacroCounter.countComplete(unit).foreach(p => countByClassAllTime(p._1).add(unit.id)))
   }
 }

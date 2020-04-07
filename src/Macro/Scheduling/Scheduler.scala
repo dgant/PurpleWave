@@ -20,8 +20,7 @@ class Scheduler {
   def request(requester: Plan, theRequest: BuildRequest) {
     macroQueue.request(requester, theRequest)
     theRequest.buildable.unitOption.foreach(unit => {
-      unitsRequested(unit) = Math.max(unitsRequested(unit), theRequest.require)
-      unitsRequested(unit) = Math.max(unitsRequested(unit), With.units.countOurs(unit)) + theRequest.add
+      unitsRequested(unit) = Math.max(unitsRequested(unit), theRequest.total)
     })
   }
 

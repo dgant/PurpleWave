@@ -1,7 +1,8 @@
 package Macro.BuildRequests
 
+import Lifecycle.With
 import Macro.Buildables.BuildableUpgrade
 
 case class NextUpgrade(upgrade: ProxyBwapi.Upgrades.Upgrade) extends BuildRequest(BuildableUpgrade(upgrade)) {
-  override def add: Int = 1
+  override def total: Int = With.self.getUpgradeLevel(upgrade) + 1
 }

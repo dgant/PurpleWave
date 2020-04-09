@@ -220,7 +220,7 @@ object PvTIdeas {
     new TrainReavers,
     new TrainObservers,
     new TrainMinimumDragoons,
-    new If(new EnemyStrategy(With.fingerprints.bio), new PumpRatio(Protoss.HighTemplar, 1, 5, Seq(Enemy(Terran.Marine, 1.0/5.0)))),
+    new If(new And(new EnemyStrategy(With.fingerprints.bio), new UnitsAtLeast(5, Protoss.Gateway)), new PumpRatio(Protoss.HighTemplar, 1, 5, Seq(Enemy(Terran.Marine, 1.0/5.0)))),
     new If(new UnitsAtLeast(8, Protoss.Carrier), new Pump(Protoss.HighTemplar, 2)),
     new TrainCarriers,
     new PumpRatio(Protoss.Arbiter, 2, 8, Seq(Enemy(UnitMatchSiegeTank, 0.5))),

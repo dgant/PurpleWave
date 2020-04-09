@@ -37,13 +37,13 @@ class TrainUnit(val traineeClass: UnitClass) extends ProductionPlan {
       matchTrainer
     
   lazy val trainerLock = new LockUnits {
-    unitMatcher.set(u => trainerMatcher.apply(u) && (trainer.contains(u) || u.friendly.exists(_.trainee.forall(_.completeOrNearlyComplete))))
+    unitMatcher.set(u => trainerMatcher.apply(u) && (trainer.contains(u) || u.friendly.exists(_.trainee.forall(t => t.is(traineeClass) || t.completeOrNearlyComplete))))
     unitCounter.set(UnitCountOne)
     unitPreference.set(preference)
   }
   
-  private def trainer: Option[FriendlyUnitInfo] = trainerLock.units.headOption
-  private def trainee: Option[FriendlyUnitInfo] = trainer.flatMap(_.trainee.filter(_.is(traineeClass)))
+  def trainer: Option[FriendlyUnitInfo] = trainerLock.units.headOption
+  def trainee: Option[FriendlyUnitInfo] = trainer.flatMap(_.trainee.filter(_.is(traineeClass)))
   override def isComplete: Boolean = trainee.exists(t => MacroCounter.countComplete(t)(traineeClass) > 0)
   
   override def onUpdate() {

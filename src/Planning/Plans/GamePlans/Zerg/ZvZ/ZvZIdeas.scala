@@ -1,19 +1,25 @@
 package Planning.Plans.GamePlans.Zerg.ZvZ
 
+import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Enemy, Pump, PumpRatio}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Zerg.BuildSunkensInMain
-import Planning.Predicates.Milestones.UnitsAtLeast
+import Planning.Predicates.Compound.And
+import Planning.Predicates.Milestones.{FrameAtMost, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.EnemyStrategy
 import ProxyBwapi.Races.Zerg
 
 object ZvZIdeas {
 
-  class ReactToFourPool extends Trigger(
-    new EnemyStrategy(With.fingerprints.fourPool),
+  class ReactToFourPool extends If(
+    new And(
+      new EnemyStrategy(With.fingerprints.fourPool),
+      new UnitsAtMost(3, Zerg.SunkenColony, complete = true),
+      new UnitsAtMost(1, Zerg.Hatchery, complete = true),
+      new FrameAtMost(GameTime(4, 0)())),
     new Parallel(
       new Trigger(
         new UnitsAtLeast(2, Zerg.SunkenColony),

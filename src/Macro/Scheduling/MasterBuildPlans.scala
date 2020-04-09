@@ -2,7 +2,6 @@ package Macro.Scheduling
 
 import Lifecycle.With
 import Macro.Buildables.Buildable
-import Performance.Cache
 import Planning.Plan
 import Planning.Plans.Macro.Build._
 import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
@@ -14,26 +13,15 @@ import scala.collection.mutable.ListBuffer
 class MasterBuildPlans {
 
   private val maxToFollow = 200
-
   private val plans = new mutable.HashMap[Buildable, ListBuffer[Plan]]
-  private var queue: Iterable[Buildable] = Vector.empty
 
-  def getChildren: Iterable[Plan] = getChildrenCache()
-  private val getChildrenCache = new Cache(() => getChildrenRecalculate)
-  private def getChildrenRecalculate: Iterable[Plan] = {
-    val indexByBuild = new mutable.HashMap[Buildable, Int]
-    plans.keys.foreach(build => indexByBuild.put(build, 0))
-    queue.map(build => {
-      val output = plans(build)(indexByBuild(build))
-      indexByBuild(build) += 1
-      output
-    })
-  }
+  def getChildren: Iterable[Plan] = buildChildren
+  private var buildChildren: Iterable[Plan] = Iterable.empty
 
   def update(invoker: FollowBuildOrder) {
 
     // Add plans to match number of builds we need
-    queue = With.scheduler.macroQueue.queue.take(maxToFollow)
+    val queue = With.scheduler.macroQueue.queue.take(maxToFollow)
 
     val buildsNeeded =
       queue
@@ -75,7 +63,19 @@ class MasterBuildPlans {
       }
     })
 
-    getChildrenCache.invalidate()
+    // Recalculate children
+    val indexByBuild = new mutable.HashMap[Buildable, Int]
+    plans.keys.foreach(build => indexByBuild.put(build, 0))
+    val childrenMappedFromQueue = queue.map(build => {
+      val output = plans.get(build).flatMap(_.lift(indexByBuild(build)))
+      indexByBuild(build) += 1
+      output
+    }).filter(_.nonEmpty).map(_.get)
+    val childrenUnmappedFromQueue = plans.flatMap(_._2).filterNot(childrenMappedFromQueue.contains)
+    buildChildren = (
+      childrenUnmappedFromQueue.filter(With.bank.hasSpentRequest).toVector.sortBy(_.frameCreated)
+      ++ childrenMappedFromQueue
+      ++ childrenUnmappedFromQueue.filterNot(With.bank.hasSpentRequest).toVector.sortBy(_.frameCreated))
   }
 
   private def buildPlan(buildable: Buildable): Plan = {

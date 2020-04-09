@@ -5,6 +5,7 @@ import Lifecycle.With
 class Plan {
   
   val description = new Property[String](realName)
+  val frameCreated = With.frame
   
   def isComplete: Boolean = false
   def getChildren: Iterable[Plan] = Vector.empty

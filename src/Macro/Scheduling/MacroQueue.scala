@@ -3,7 +3,6 @@ package Macro.Scheduling
 import Lifecycle.With
 import Macro.BuildRequests.BuildRequest
 import Macro.Buildables.Buildable
-import Performance.Cache
 import Planning.Plan
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitClasses.UnitClass
@@ -32,8 +31,7 @@ class MacroQueue {
     requestsByPlan.toVector.sortBy(_._1.priority)
   }
   
-  def queue: Vector[Buildable] = queueCache()
-  val queueCache = new Cache[Vector[Buildable]](() => {
+  def queue: Vector[Buildable] = {
     val requestQueue    = requestsByPlan.keys.toVector.sortBy(_.priority).flatten(requestsByPlan)
     val unitsWanted     = new CountMap[UnitClass]
     val unitsCounted    = new CountMap[UnitClass]
@@ -45,7 +43,7 @@ class MacroQueue {
     With.units.ours.foreach(unit => {
       // Use the standard macro counter to ensure production plans complete as we intend
       MacroCounter.countComplete(unit).foreach(p => unitsCounted(p._1) += p._2)
-      // Require completion of things, especially Terran buildings
+      // Require completion of Terran buildings
       MacroCounter.countCompleteOrIncomplete(unit).foreach(p => unitsExisting(p._1) += p._2)
     })
     unitsExisting.foreach(pair => unitsWanted(pair._1) = Math.max(unitsWanted(pair._1), pair._2))
@@ -55,7 +53,7 @@ class MacroQueue {
     techsCounted ++= Techs.all.filter(With.self.hasTech)
 
     requestQueue.flatten(getUnfulfilledBuildables(_, unitsWanted, unitsCounted, upgradesCounted, techsCounted))
-  })
+  }
   
   private def getUnfulfilledBuildables(
     request         : BuildRequest,

@@ -155,7 +155,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   ///////////////
 
   // When a Larva is about to morph, but hasn't turned into an egg, remainingCompletionFrames is ZERO
-  def completeOrNearlyComplete: Boolean = complete || (remainingCompletionFrames > 0 && remainingCompletionFrames < With.latency.framesRemaining)
+  def completeOrNearlyComplete: Boolean = complete || (remainingCompletionFrames < With.latency.framesRemaining && ( ! isAny(Zerg.Larva, Zerg.Hydralisk, Zerg.Mutalisk)))
   
   lazy val isBlocker: Boolean = gasLeft + mineralsLeft < With.configuration.blockerMineralThreshold
   

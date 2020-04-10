@@ -461,7 +461,10 @@ class PvTBasic extends GameplanTemplate {
     new If(new EmployingGateway,  new GoGateway),
     new If(new EmployingCarriers, new GoCarrier),
     new If(new EmployingArbiters, new GoArbiter),
-    new PumpReactiveGateways(9, 12),
+    new If(
+      new EmployingCarriers,
+      new PumpReactiveGateways(5, 8),
+      new PumpReactiveGateways(9, 12)),
     new LowPriorityTech,
 
     // Protect expansions

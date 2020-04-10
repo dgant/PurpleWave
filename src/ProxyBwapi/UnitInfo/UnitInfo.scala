@@ -3,9 +3,9 @@ package ProxyBwapi.UnitInfo
 import Debugging.Visualizations.Colors
 import Information.Battles.MCRS.MCRSUnit
 import Information.Battles.Types.BattleLocal
+import Information.Fingerprinting.Generic.GameTime
 import Information.Geography.Types.{Base, Zone}
 import Information.Grids.AbstractGrid
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
@@ -13,6 +13,7 @@ import Mathematics.PurpleMath
 import Micro.Heuristics.EvaluateTargets
 import Micro.Matchups.MatchupAnalysis
 import Performance.Cache
+import Planning.Plan
 import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatcher}
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -174,25 +175,13 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     addon.map(_.remainingCompletionFrames).getOrElse(0)
   ).max
 
-  val participatingInCombat = new Cache(() => matchups.targets.nonEmpty || isAny(
-    // Spellcasters (which don't have targets)
-    // Static defense (which doesn't have targets if incomplete)
-    Terran.Dropship,
-    Terran.Medic,
-    Terran.ScienceVessel,
-    Terran.SpiderMine,
-    Terran.MissileTurret,
-    Terran.Bunker,
-    Protoss.DarkArchon,
-    Protoss.HighTemplar,
-    Protoss.Shuttle,
-    Protoss.ShieldBattery,
-    Zerg.CreepColony,
-    Zerg.Defiler,
-    Zerg.SporeColony,
-    Zerg.SunkenColony
-  ))
-  val baseTargetValue = new Cache(() => EvaluateTargets.getTargetBaseValue(this))
+  private var producer: Option[Plan] = None
+  def setProducer(plan: Plan) {
+    producer = Some(plan)
+  }
+  def getProducer: Option[Plan] = {
+    producer.filter(_.isPrioritized)
+  }
   
   //////////////
   // Geometry //
@@ -342,6 +331,26 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   ////////////
   // Combat //
   ////////////
+
+  val participatingInCombat = new Cache(() => matchups.targets.nonEmpty || isAny(
+    // Spellcasters (which don't have targets)
+    // Static defense (which doesn't have targets if incomplete)
+    Terran.Dropship,
+    Terran.Medic,
+    Terran.ScienceVessel,
+    Terran.SpiderMine,
+    Terran.MissileTurret,
+    Terran.Bunker,
+    Protoss.DarkArchon,
+    Protoss.HighTemplar,
+    Protoss.Shuttle,
+    Protoss.ShieldBattery,
+    Zerg.CreepColony,
+    Zerg.Defiler,
+    Zerg.SporeColony,
+    Zerg.SunkenColony
+  ))
+  val baseTargetValue = new Cache(() => EvaluateTargets.getTargetBaseValue(this))
 
   def battle: Option[BattleLocal] = With.battles.byUnit.get(this).orElse(With.matchups.entrants.find(_._2.contains(this)).map(_._1))
   def matchups: MatchupAnalysis = With.matchups.get(this)

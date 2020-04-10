@@ -41,59 +41,48 @@ class BuildBuilding(val buildingClass: UnitClass) extends ProductionPlan {
   
   override def isComplete: Boolean = building.exists(b => MacroCounter.countComplete(b)(buildingClass) > 0)
   
-  def startedBuilding: Boolean = building.isDefined
-  
   var waitForBuilderToRecallUntil: Option[Int] = None
   
   override def onUpdate() {
 
-    building = building.filter(b => b.alive && ! b.is(Neutral.Geyser))
-    
-    if (building.exists(b => ! b.unitClass.isTerran)) {
-      builderLock.release()
-      With.groundskeeper.flagFulfilled(buildingDescriptor, building.get)
-      return
-    }
-    
+    lazy val possibleBuildings = With.units.ours.filter(u =>
+      u.is(buildingClass)
+      && ! u.complete
+
+      && MacroCounter.countComplete(u)(buildingClass) == 0)
     building = building
-      .orElse(
-        if (buildingClass.isTerran)
-          With.units.ours.find(scaffolding =>
-            ! scaffolding.complete
-            && scaffolding.is(buildingClass)
-            && ! scaffolding.buildUnit.exists(_.friendly.forall(builder =>
-              // This probably doesn't handle addon construction correctly
-              builder.agent.toFinish.contains(scaffolding)
-              || builder.agent.toBuildTile.contains(scaffolding.tileTopLeft)
-            )))
-        else None
-      )
-      .orElse(
-        orderedTile.flatMap(tile => With.units.ours.find(unit =>
-          unit.is(buildingClass) &&
-            unit.tileTopLeft == tile)))
-      .filter(b =>
-        b.isOurs
-        && b.alive
-        && b.buildUnit.forall(_.friendly.forall(_.agent.lastClient.contains(this)))) //Don't jack another (Terran) building
-    
-    desiredTile = acquireDesiredTile()
-  
-    if (desiredTile.isEmpty) {
-      if (With.frame < With.configuration.maxFramesToTrustBuildRequest) {
-        //Assume we'll find a build location eventually and reserve the currency anyway
-        currencyLock.acquire(this)
-      }
-      return
+      // Remove dead buildings
+      .filter(b => b.alive && ! b.is(Neutral.Geyser))
+      // Take any matching incomplete building; preferably being produced by existing builder, and preferably on the targeted square
+      .orElse(possibleBuildings.find(pb => pb.buildUnit.flatMap(_.friendly).exists(_.friendly.exists(builderLock.units.contains))))
+      .orElse(possibleBuildings.find(pb => orderedTile.contains(pb.tileTopLeft)))
+      .orElse(possibleBuildings.find(pb => desiredTile.contains(pb.tileTopLeft)))
+      .orElse(possibleBuildings.headOption)
+    building.foreach(_.friendly.foreach(_.setProducer(this)))
+
+    desiredTile = building.map(_.tileTopLeft).orElse(
+      if (currencyLock.satisfied && currencyLock.expectedFrames < With.blackboard.maxFramesToSendAdvanceBuilder)
+        With.groundskeeper.demand(buildingDescriptor)
+      else
+        With.groundskeeper.require(buildingDescriptor))
+
+    // Reserve money if we have a place to build, or if it's early game and we expect to get one eventually
+    if (desiredTile.isDefined || With.frame >= With.configuration.maxFramesToTrustBuildRequest) {
+      currencyLock.framesPreordered = (buildingClass.buildUnitsEnabling.map(With.projections.unit) :+ 0).max
+      currencyLock.isSpent = building.isDefined
+      currencyLock.acquire(this)
     }
-  
-    currencyLock.framesPreordered = (buildingClass.buildUnitsEnabling.map(With.projections.unit) :+ 0).max
-    currencyLock.isSpent = building.isDefined
-    currencyLock.acquire(this)
+
+    if (building.isDefined) {
+      With.groundskeeper.flagFulfilled(buildingDescriptor, building.get)
+    }
+
     if ( ! needBuilder) {
+      builderLock.release()
       return
     }
 
+    // Find an appropriate builder (or make sure we use the current builder)
     val desiredZone = desiredTile.map(_.zone)
     if (building.exists(_.buildUnit.isDefined)) {
       builderLock.unitMatcher.set(new UnitMatchSpecific(Set(building.get.buildUnit.get)))
@@ -152,20 +141,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends ProductionPlan {
       }
     }
   }
-  
-  private def acquireDesiredTile(): Option[Tile] = {
-    if (building.isDefined) {
-      With.groundskeeper.flagFulfilled(buildingDescriptor, building.get)
-      building.map(_.tileTopLeft)
-    }
-    else if (currencyLock.satisfied && currencyLock.expectedFrames < With.blackboard.maxFramesToSendAdvanceBuilder) {
-      With.groundskeeper.demand(buildingDescriptor)
-    }
-    else {
-      With.groundskeeper.require(buildingDescriptor)
-    }
-  }
-  
+
   def needBuilder: Boolean = {
     if (building.isDefined) {
       return buildingClass.isTerran

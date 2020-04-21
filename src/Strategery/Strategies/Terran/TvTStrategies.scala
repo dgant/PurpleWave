@@ -1,6 +1,9 @@
 package Strategery.Strategies.Terran
 
+import Planning.Plan
+import Planning.Plans.GamePlans.Terran.Standard.TvT.TvTProxy5Rax
 import Strategery.Strategies.Strategy
+import Strategery.{MapGroups, StarCraftMap}
 import bwapi.Race
 
 abstract class TvTStrategy extends Strategy {
@@ -13,6 +16,12 @@ abstract class TvTOpening extends TvTStrategy {
     TvT5Fac, TvT2Base2Port, TvT2BaseBC
   ))
 }
+
+object TvTProxy5Rax extends TvTStrategy {
+  override def gameplan: Option[Plan] = Some(new TvTProxy5Rax)
+  override def mapsBlacklisted: Vector[StarCraftMap] = MapGroups.badForProxying
+}
+
 
 object TvT14CC extends TvTOpening
 object TvT1RaxFE extends TvTOpening

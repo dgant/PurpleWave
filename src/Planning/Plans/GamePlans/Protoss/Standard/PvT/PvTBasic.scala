@@ -229,7 +229,13 @@ class PvTBasic extends GameplanTemplate {
             new EnemyHasShown(Terran.Comsat),
             new EnemyHasShown(Terran.SpellScannerSweep),
             new EnemiesAtLeast(1, Terran.MissileTurret)),
-          new UnitsAtLeast(3, Protoss.Gateway)))),
+          new UnitsAtLeast(3, Protoss.Gateway)),
+        // Bunker is a good hint of safety but not absolute proof; consider it but don't get fooled too often
+        new And(
+          new EnemyStrategy(With.fingerprints.oneFac),
+          new EnemiesAtLeast(1, Terran.Bunker),
+          new Not(new EnemyStrategy(With.fingerprints.bunkerRush)),
+          new Not(new EnemyRecentStrategy(With.fingerprints.twoFac, With.fingerprints.threeFac, With.fingerprints.twoFacVultures, With.fingerprints.threeFacVultures))))),
     new Parallel(new WriteStatus("Instant3rd"), new RequireMiningBases(3)))
 
   class ConsiderTakingFastFourthBase extends If(
@@ -458,13 +464,22 @@ class PvTBasic extends GameplanTemplate {
           new PumpReactiveGateways(3, 7)))),
 
     new RequireMiningBases(3),
-    new If(new EmployingGateway,  new GoGateway),
-    new If(new EmployingCarriers, new GoCarrier),
-    new If(new EmployingArbiters, new GoArbiter),
-    new If(
-      new EmployingCarriers,
-      new PumpReactiveGateways(5, 8),
-      new PumpReactiveGateways(9, 12)),
+
+    // Get our 3-base tech, but not before 3 bases
+    new FlipIf(
+      new BasesAtLeast(3),
+      // Reactive Gateways
+      new Parallel(
+        new If(
+          new EmployingCarriers,
+          new PumpReactiveGateways(5, 8),
+          new PumpReactiveGateways(9, 12))),
+      // 3-Base tech
+      new Parallel(
+        new If(new EmployingGateway,  new GoGateway),
+        new If(new EmployingCarriers, new GoCarrier),
+        new If(new EmployingArbiters, new GoArbiter))),
+
     new LowPriorityTech,
 
     // Protect expansions

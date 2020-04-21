@@ -51,6 +51,7 @@ class BuildAddon(val addonClass: UnitClass) extends ProductionPlan {
     if (currencyLock.satisfied && builderLock.satisfied) {
       val builder = builderLock.units.head
       addon = builder.addon
+      addon.foreach(_.setProducer(this))
       if (addon.isEmpty) {
         builder.agent.intend(this, new Intention {
           toAddon = if (currencyLock.satisfied) Some(addonClass) else None

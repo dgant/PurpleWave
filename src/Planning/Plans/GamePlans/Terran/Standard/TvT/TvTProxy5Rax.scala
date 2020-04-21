@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Terran.Standard.TvE
+package Planning.Plans.GamePlans.Terran.Standard.TvT
 
 import Lifecycle.With
 import Macro.Architecture.Blueprint
@@ -18,11 +18,11 @@ import Planning.UnitCounters.UnitCountExcept
 import Planning.UnitMatchers.UnitMatchWorkers
 import Planning.{Plan, Predicate, ProxyPlanner}
 import ProxyBwapi.Races.Terran
-import Strategery.Strategies.Terran.TvE.TvEProxy5Rax
+import Strategery.Strategies.Terran.TvTProxy5Rax
 
-class TvEProxy5Rax extends GameplanTemplate {
+class TvTProxy5Rax extends GameplanTemplate {
 
-  override val activationCriteria: Predicate = new Employing(TvEProxy5Rax)
+  override val activationCriteria: Predicate = new Employing(TvTProxy5Rax)
 
   override def placementPlan: Plan = new ProposePlacement{
     override lazy val blueprints = Vector(
@@ -58,10 +58,5 @@ class TvEProxy5Rax extends GameplanTemplate {
     new Write(With.blackboard.pushKiters, true),
     new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
     new Pump(Terran.Marine),
-    /*
-    new If(
-      new UnitsAtLeast(1, Terran.Marine),
-      new RecruitFreelancers(UnitMatchWorkers, new UnitCountExcept(3, UnitMatchWorkers))),
-    */
   )
 }

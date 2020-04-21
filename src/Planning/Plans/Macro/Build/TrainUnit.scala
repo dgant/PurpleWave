@@ -48,6 +48,8 @@ class TrainUnit(val traineeClass: UnitClass) extends ProductionPlan {
   
   override def onUpdate() {
     if (isComplete) return
+
+    trainee.foreach(_.setProducer(this))
   
     // Duplicated across MorphUnit
     currencyLock.framesPreordered = (
@@ -73,7 +75,14 @@ class TrainUnit(val traineeClass: UnitClass) extends ProductionPlan {
   private lazy val mapSize = With.mapTileWidth + With.mapTileHeight
   private lazy val preference = new UnitPreference {
     override def apply(trainer: FriendlyUnitInfo): Double = {
-      // Factors, ranging on [0, 1]
+      // Lower score -> More preferred
+
+      // These factors should produce unambiguous ordering based on factor importance;
+      // either they should range on [0, 1] or have discrete { -1, 0, 1 } values
+
+      // Strongly prefer a trainer already making the class,
+      // to avoid accidentally picking up and training another unit.
+      val already   = trainer.trainee.map(t => if (t.is(traineeClass)) -1.0 else 1.0).getOrElse(0.0)
       val addon     = if (trainer.addon.isDefined) 0.0 else 1.0
       val readiness = trainer.remainingOccupationFrames.toDouble / Math.max(trainer.trainee.map(_.unitClass.buildFrames).getOrElse(0), traineeClass.buildFrames)
       val workers   = if (traineeClass.isWorker) PurpleMath.clamp(trainer.base.map(_.saturation()).getOrElse(0.0), 0.0, 1.0) else 0.0
@@ -81,12 +90,13 @@ class TrainUnit(val traineeClass: UnitClass) extends ProductionPlan {
       val safety    = PurpleMath.clamp(trainer.matchups.framesOfSafety, 0, safetyFramesMax) / safetyFramesMax.toDouble
       val distance  = 1.0 - PurpleMath.clamp(trainer.tileIncludingCenter.groundPixels(With.scouting.mostBaselikeEnemyTile) / mapSize, 0.0, 1.0)
       val score = (
-          10000000000.0 * addon
-        + 100000000.0   * workers
-        + 1000000.0     * readiness
-        + 10000.0       * health
-        + 100.0         * safety
-        + 1.0           * distance
+          1000000000000.0 * already
+        + 10000000000.0   * addon
+        + 100000000.0     * workers
+        + 1000000.0       * readiness
+        + 10000.0         * health
+        + 100.0           * safety
+        + 1.0             * distance
       )
       score
     }

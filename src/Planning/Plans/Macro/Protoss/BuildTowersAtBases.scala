@@ -57,8 +57,8 @@ class BuildTowersAtBases(
   }
 
   private def towerZone(zone: Zone): Unit= {
-    lazy val pylonsInZone = zone.units.filter(_.is(Protoss.Pylon))
-    lazy val towersInZone = zone.units.filter(_.is(towerClass))
+    lazy val pylonsInZone = zone.units.filter(u => u.isOurs && u.is(Protoss.Pylon))
+    lazy val towersInZone = zone.units.filter(u => u.isOurs && u.is(towerClass))
     lazy val towersToAdd = towersRequired - towersInZone.size
     
     if (towersToAdd <= 0) return
@@ -73,7 +73,7 @@ class BuildTowersAtBases(
       // Defensive programming measure. If we try re-proposing fulfilled blueprints we may just build towers forever.
       val newBlueprints = towerBlueprintsByZone(zone).filterNot(With.groundskeeper.proposalsFulfilled.contains).take(towersToAdd)
       newBlueprints.foreach(With.groundskeeper.propose)
-      new Pump(towerClass, maximumConcurrently = towersToAdd)
+      new Pump(towerClass, maximumConcurrently = towersToAdd).update()
     }
   }
 }

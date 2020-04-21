@@ -14,9 +14,7 @@ object TerranChoices {
   
   val tvr = Vector(
     TvEWorkerRushLiftoff,
-    TvEProxy5Rax,
     TvEProxyBBS,
-    TvE1RaxSCVMarine,
     TvE2RaxSCVMarine,
     TvR1Rax,
     TvRTinfoil,
@@ -27,6 +25,7 @@ object TerranChoices {
   /////////
   
   val tvtOpeners = Vector(
+    TvTProxy5Rax,
     TvT14CC,
     TvT1RaxFE,
     TvT1FacFE,

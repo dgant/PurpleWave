@@ -19,8 +19,8 @@ object ShowProduction extends View {
           unitClass.toString,
           unitClass.buildFrames,
           if (unit.complete) unit.remainingTrainFrames else unit.remainingCompletionFrames,
-          Colors.DarkBlue,
-          Colors.NeonBlue))
+          if (unit.friendly.forall(_.getProducer.isEmpty)) Colors.DarkRed else Colors.DarkBlue,
+          if (unit.friendly.forall(_.getProducer.isEmpty)) Colors.NeonRed else Colors.NeonBlue))
       else if (unit.teching)
         unit.techProducing.map(t => Producible(
           t.toString,
@@ -35,8 +35,8 @@ object ShowProduction extends View {
           up.toString + (if (up.levels.length > 1) " " + levelNext.toString else ""),
           up.upgradeFrames(levelNext),
           unit.remainingUpgradeFrames,
-          Colors.MidnightRed,
-          Colors.MediumRed))
+          Colors.MidnightViolet,
+          Colors.MediumViolet))
       }
       else None
     })

@@ -99,7 +99,7 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
         Math.max(1e-5, metric.totalDecisiveness * Math.pow(0.5, metric.framesIn / With.configuration.simulationScoreHalfLife)))))
     val aggression = With.blackboard.aggressionRatio()
     val output = PurpleMath.clamp(
-      average + (1.0 - average) * (aggression - 1.0),
+      aggression * (1.0 + average) - 1.0,
       -1.0,
       1.0)
     output

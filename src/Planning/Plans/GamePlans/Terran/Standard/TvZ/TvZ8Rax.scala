@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvZ
 import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{Attack, RecruitFreelancers}
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
@@ -18,7 +18,6 @@ import Planning.Predicates.Compound._
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
 import Planning.UnitCounters.{UnitCountExactly, UnitCountExcept}
-import Planning.UnitMatchers.UnitMatchWorkers
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran.TvZ8Rax
@@ -42,12 +41,10 @@ class TvZ8Rax extends GameplanTemplate {
       new Attack,
       new If(
         new CanBunkerRush,
-        new Parallel(
-          new If(
-            new UnitsAtMost(0, Terran.Bunker, complete = true),
-            new RecruitFreelancers(UnitMatchWorkers, new UnitCountExcept(8, UnitMatchWorkers)),
-            new RecruitFreelancers(UnitMatchWorkers, UnitCountExactly(2))),
-          new Attack(Terran.SCV)))))
+        new If(
+          new UnitsAtMost(0, Terran.Bunker, complete = true),
+          new Attack(Terran.SCV, new UnitCountExcept(8, Terran.SCV)),
+          new Attack(Terran.SCV, UnitCountExactly(2))))))
 
   override def initialScoutPlan: Plan = new If(
     new Not(new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.fourPool)),

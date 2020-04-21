@@ -66,6 +66,6 @@ object MacroCounter {
     output
   }
 
-  def countFriendlyComplete: CountMap[UnitClass] = With.units.ours.map(countComplete).reduce(_ + _)
-  def countFriendlyCompleteOrIncomplete: CountMap[UnitClass] = With.units.ours.map(countCompleteOrIncomplete).reduce(_ + _)
+  def countFriendlyComplete: CountMap[UnitClass] = With.units.ours.map(countComplete).reduceOption(_ + _).getOrElse(new CountMap)
+  def countFriendlyCompleteOrIncomplete: CountMap[UnitClass] = With.units.ours.map(countCompleteOrIncomplete).reduceOption(_ + _).getOrElse(new CountMap)
 }

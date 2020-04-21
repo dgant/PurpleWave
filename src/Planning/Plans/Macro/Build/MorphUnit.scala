@@ -33,8 +33,6 @@ class MorphUnit(val classToMorph: UnitClass) extends ProductionPlan {
   override def isComplete: Boolean = morpher.exists(t => MacroCounter.countComplete(t)(classToMorph) > 0)
   
   override def onUpdate() {
-    
-    if (isComplete) return
   
     // Duplicated across TrainUnit
     currencyLock.framesPreordered = (
@@ -49,6 +47,7 @@ class MorphUnit(val classToMorph: UnitClass) extends ProductionPlan {
       morpherLock.unitMatcher.set(morpher.map(m => new UnitMatchSpecific(Set(m))).getOrElse(morpherClass))
       morpherLock.acquire(this)
       morpher = morpherLock.units.headOption
+      morpher.foreach(_.setProducer(this))
       morpher.foreach(_.agent.intend(this, new Intention {
         toTrain = Some(classToMorph)
         canFlee = classToMorph == Zerg.Lurker

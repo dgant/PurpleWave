@@ -35,7 +35,7 @@ class MacroQueue {
     val requestQueue    = requestsByPlan.keys.toVector.sortBy(_.priority).flatten(requestsByPlan)
     val unitsWanted     = new CountMap[UnitClass]
     val unitsCounted    = new CountMap[UnitClass]
-    val unitsExisting   = new CountMap[UnitClass]
+    //val unitsExisting   = new CountMap[UnitClass]
     val upgradesCounted = new CountMap[Upgrade]
     val techsCounted    = new mutable.HashSet[Tech]
 
@@ -44,9 +44,9 @@ class MacroQueue {
       // Use the standard macro counter to ensure production plans complete as we intend
       MacroCounter.countComplete(unit).foreach(p => unitsCounted(p._1) += p._2)
       // Require completion of Terran buildings
-      MacroCounter.countCompleteOrIncomplete(unit).foreach(p => unitsExisting(p._1) += p._2)
+      //MacroCounter.countCompleteOrIncomplete(unit).foreach(p => unitsExisting(p._1) += p._2)
     })
-    unitsExisting.foreach(pair => unitsWanted(pair._1) = Math.max(unitsWanted(pair._1), pair._2))
+    //unitsExisting.foreach(pair => unitsWanted(pair._1) = Math.max(unitsWanted(pair._1), pair._2))
 
     // Count upgrades and tech
     Upgrades.all.map(u => (u, With.self.getUpgradeLevel(u))).foreach(u => upgradesCounted(u._1) = u._2)

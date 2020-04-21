@@ -48,8 +48,9 @@ class BuildBuilding(val buildingClass: UnitClass) extends ProductionPlan {
     lazy val possibleBuildings = With.units.ours.filter(u =>
       u.is(buildingClass)
       && ! u.complete
+      && MacroCounter.countComplete(u)(buildingClass) == 0
+      && u.getProducer.forall(p => p == this || ! With.prioritizer.isPrioritized(p)))
 
-      && MacroCounter.countComplete(u)(buildingClass) == 0)
     building = building
       // Remove dead buildings
       .filter(b => b.alive && ! b.is(Neutral.Geyser))

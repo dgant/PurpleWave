@@ -2,7 +2,7 @@ package Strategery
 
 import Lifecycle.With
 import Strategery.Selection._
-import Strategery.Strategies.AllRaces.WorkerRushes
+import Strategery.Strategies.AllRaces.{Sandbox, WorkerRushes}
 import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss._
 import Strategery.Strategies.Strategy
@@ -24,6 +24,8 @@ class Playbook {
 
 object StrategyGroups {
   val disabled: Vector[Strategy] = WorkerRushes.all ++ Vector[Strategy](
+    Sandbox,
+
     CarriersWithNoDefense,
 
     TvEWorkerRushLiftoff,

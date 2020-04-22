@@ -83,8 +83,7 @@ class MasterBuildPlans {
       val unitClass = buildable.unitOption.get
       if (unitClass.isAddon) {
         return new BuildAddon(unitClass)
-      }
-      else if (unitClass.isBuilding && ! unitClass.whatBuilds._1.isBuilding) {
+      } else if (unitClass.isBuilding && ! unitClass.whatBuilds._1.isBuilding) {
         return new BuildBuilding(unitClass)
       } else if (unitClass.buildUnitsSpent.exists(_.isZerg)) {
         return new MorphUnit(unitClass)

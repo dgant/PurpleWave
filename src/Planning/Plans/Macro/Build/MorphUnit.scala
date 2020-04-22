@@ -11,6 +11,7 @@ import Planning.UnitPreferences._
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.ByOption
 
 class MorphUnit(val classToMorph: UnitClass) extends ProductionPlan {
 
@@ -33,27 +34,38 @@ class MorphUnit(val classToMorph: UnitClass) extends ProductionPlan {
   override def isComplete: Boolean = morpher.exists(t => MacroCounter.countComplete(t)(classToMorph) > 0)
   
   override def onUpdate() {
+
+    // Claim an in-progress but unmanaged morphing unit, to avoid duplicating production
+    // Shared somewhat with BuildBuilding
+    lazy val alreadyMorphing = With.units.ours.filter(u =>
+      MacroCounter.countCompleteOrIncomplete(u)(classToMorph) > 0
+      && MacroCounter.countComplete(u)(classToMorph) == 0
+      && u.getProducer.forall(p => p == this || ! With.prioritizer.isPrioritized(p)))
+    morpher = morpher
+      .filter(m => m.alive && (m.is(morpherClass) || MacroCounter.countCompleteOrIncomplete(m)(classToMorph) > 0))
+      .orElse(ByOption.minBy(alreadyMorphing)(_.frameDiscovered))
   
-    // Duplicated across TrainUnit
+    // Shared somewhat with TrainUnit
     currencyLock.framesPreordered = (
       classToMorph.buildUnitsEnabling.map(With.projections.unit)
       :+ With.projections.unit(morpherClass)).max
     
-    currencyLock.isSpent = morpher.exists(t => MacroCounter.countCompleteOrIncomplete(t)(classToMorph) > 0)
+    currencyLock.isSpent = morpher.exists(m => MacroCounter.countCompleteOrIncomplete(m)(classToMorph) > 0)
     currencyLock.acquire(this)
-    
     if (currencyLock.satisfied && ! currencyLock.isSpent) {
       setPreference()
       morpherLock.unitMatcher.set(morpher.map(m => new UnitMatchSpecific(Set(m))).getOrElse(morpherClass))
       morpherLock.acquire(this)
       morpher = morpherLock.units.headOption
-      morpher.foreach(_.setProducer(this))
       morpher.foreach(_.agent.intend(this, new Intention {
         toTrain = Some(classToMorph)
+        // TODO: Include behavior for morphing Guardians/Devourers
         canFlee = classToMorph == Zerg.Lurker
         canAttack = classToMorph != Zerg.Lurker
       }))
     }
+    // TODO: Send Hydras/Mutas somewhere smart soon before they morph based on currency projection
+    morpher.foreach(_.setProducer(this))
   }
   
   protected def setPreference() {

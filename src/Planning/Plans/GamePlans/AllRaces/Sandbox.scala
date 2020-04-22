@@ -3,23 +3,30 @@ package Planning.Plans.GamePlans.AllRaces
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers}
-import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Expanding.RequireMiningBases
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.Zerg
 
 class Sandbox extends GameplanTemplate {
 
-  override def buildOrder: Seq[BuildRequest] = ProtossBuilds.PvT13Nexus_GateCore
-
-  override def workerPlan: Plan = new PumpWorkers(maximumConcurrently = 2)
+  override def buildOrder: Seq[BuildRequest] = Seq(
+    Get(9, Zerg.Drone),
+    Get(2, Zerg.Overlord),
+    Get(12, Zerg.Drone),
+    Get(2, Zerg.Hatchery),
+    Get(Zerg.Extractor),
+    Get(Zerg.SpawningPool),
+    Get(14, Zerg.Drone),
+    Get(6, Zerg.Zergling),
+    Get(Zerg.Lair),
+    Get(8, Zerg.Zergling),
+    Get(Zerg.ZerglingSpeed),
+    Get(12, Zerg.Zergling),
+    Get(Zerg.Spire),
+    Get(13, Zerg.Zergling),
+    Get(2, Zerg.Extractor),
+    Get(14, Zerg.Zergling),
+    Get(6, Zerg.Mutalisk)
+  )
 
   override def buildPlans: Seq[Plan] = Seq(
-    //new Build(Get(Protoss.DragoonRange)),
-    //new Pump(Protoss.Dragoon),
-    new Pump(Protoss.Zealot),
-    new RequireMiningBases(5),
-    new Build(Get(2, Protoss.Gateway))
   )
 }

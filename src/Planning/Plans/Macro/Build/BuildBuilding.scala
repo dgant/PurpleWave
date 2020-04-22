@@ -14,6 +14,7 @@ import Planning.UnitPreferences.UnitPreferCloseAndNotMining
 import ProxyBwapi.Races.Neutral
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.ByOption
 
 class BuildBuilding(val buildingClass: UnitClass) extends ProductionPlan {
 
@@ -58,7 +59,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends ProductionPlan {
       .orElse(possibleBuildings.find(pb => pb.buildUnit.flatMap(_.friendly).exists(_.friendly.exists(builderLock.units.contains))))
       .orElse(possibleBuildings.find(pb => orderedTile.contains(pb.tileTopLeft)))
       .orElse(possibleBuildings.find(pb => desiredTile.contains(pb.tileTopLeft)))
-      .orElse(possibleBuildings.headOption)
+      .orElse(ByOption.minBy(possibleBuildings)(_.frameDiscovered))
     building.foreach(_.friendly.foreach(_.setProducer(this)))
 
     desiredTile = building.map(_.tileTopLeft).orElse(

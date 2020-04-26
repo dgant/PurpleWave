@@ -22,7 +22,7 @@ class Logger {
       opponents = With.enemies.map(_.name).mkString("-")
     } catch { case exception: Exception => }
     
-    val filename = With.bwapiData.write + ".log.txt"
+    val filename = With.bwapiData.write + opponents + ".log.txt"
     val file = new File(filename)
     val printWriter = new PrintWriter(file)
     printWriter.write(logMessages.mkString("\r\n"))

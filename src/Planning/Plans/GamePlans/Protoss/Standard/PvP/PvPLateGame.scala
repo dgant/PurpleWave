@@ -226,6 +226,11 @@ class PvPLateGame extends GameplanTemplate {
     new FlipIf(
       new SafeAtHome,
       new AddLateGateways,
-      new AddLateTech)
+      new AddLateTech),
+
+    new RequireMiningBases(3),
+    new If(new MiningBasesAtLeast(3), new Build((Get(12, Protoss.Gateway)))),
+    new RequireMiningBases(4),
+    new If(new MiningBasesAtLeast(4), new Build((Get(16, Protoss.Gateway)))),
   )
 }

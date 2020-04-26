@@ -28,8 +28,8 @@ import Strategery.Strategies.Protoss._
 
 class PvTBasic extends GameplanTemplate {
 
-  override def archonPlan: Plan =
-    new If(new EnemyStrategy(With.fingerprints.bio),
+  override def archonPlan: Plan = new If(
+    new EnemyStrategy(With.fingerprints.bio),
     new MeldArchons(49) { override def maximumTemplar: Int = 8 },
     new MeldArchons(25))
 

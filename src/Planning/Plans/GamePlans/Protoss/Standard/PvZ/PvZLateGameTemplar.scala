@@ -7,7 +7,7 @@ import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
+import Planning.Plans.Placement.BuildCannonsAtExpansions
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss

@@ -11,7 +11,7 @@ import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.{Eject4PoolScout, 
 import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpRatio, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
+import Planning.Plans.Placement.BuildCannonsAtNatural
 import Planning.Plans.Scouting.{MonitorBases, ScoutOn}
 import Planning.Predicates.Compound.{Latch, Not}
 import Planning.Predicates.Milestones._
@@ -30,14 +30,14 @@ class PvZ1BaseForgeTech extends GameplanTemplate {
   override def initialScoutPlan: Plan = new ScoutOn(Protoss.Pylon)
 
   override def blueprints: Seq[Blueprint] = Vector(
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHallTowardsEntrance)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHallTowardsEntrance)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHallTowardsEntrance)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHallTowardsEntrance)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall)))
+    new Blueprint(Protoss.Pylon,        placement = Some(PlacementProfiles.hugTownHallTowardsEntrance)),
+    new Blueprint(Protoss.PhotonCannon, placement = Some(PlacementProfiles.hugTownHallTowardsEntrance)),
+    new Blueprint(Protoss.PhotonCannon, placement = Some(PlacementProfiles.hugTownHallTowardsEntrance)),
+    new Blueprint(Protoss.PhotonCannon, placement = Some(PlacementProfiles.hugTownHallTowardsEntrance)),
+    new Blueprint(Protoss.PhotonCannon, placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.Pylon,        placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.Forge,        placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.Gateway,      placement = Some(PlacementProfiles.hugTownHall)))
 
   override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
   override def attackPlan: Plan = new Parallel(

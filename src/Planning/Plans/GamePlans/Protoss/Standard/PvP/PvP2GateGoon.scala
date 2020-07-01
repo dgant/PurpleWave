@@ -9,10 +9,9 @@ import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAt}
-import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
+import Planning.Plans.Placement.{BuildCannonsAtNatural, BuildCannonsInMain, ProposePlacement}
 import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
@@ -29,10 +28,10 @@ class PvP2GateGoon extends GameplanTemplate {
   override val completionCriteria : Predicate = new Latch(new UnitsAtLeast(5, Protoss.Gateway))
 
   override def blueprints = Vector(
-    new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 8.0)),
-    new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
-    new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
-    new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.backPylon)))
+    new Blueprint(Protoss.Pylon,   placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 8.0)),
+    new Blueprint(Protoss.Gateway, placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
+    new Blueprint(Protoss.Gateway, placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
+    new Blueprint(Protoss.Pylon,   placement = Some(PlacementProfiles.backPylon)))
 
   override def placementPlan: Plan = new Parallel(
     super.placementPlan,
@@ -42,7 +41,7 @@ class PvP2GateGoon extends GameplanTemplate {
         new And(
           new UnitsAtLeast(3, Protoss.Pylon),
           new Not(new EnemyStrategy(With.fingerprints.proxyGateway)))),
-      new ProposePlacement(new Blueprint(this, building = Some(Protoss.Pylon), preferZone = Some(With.geography.ourNatural.zone)))))
+      new ProposePlacement(new Blueprint(Protoss.Pylon, preferZone = Some(With.geography.ourNatural.zone)))))
 
   override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
   override def attackPlan: Plan = new If(

@@ -11,7 +11,7 @@ class PlacementHeuristicEvaluation(
   evaluation  : Double,
   val color   : bwapi.Color)
 
-    extends HeuristicEvaluation (
+  extends HeuristicEvaluation (
     heuristic,
     state,
     candidate,

@@ -50,10 +50,10 @@ class PvPRobo extends GameplanTemplate {
   override def initialScoutPlan: Plan = new PvP1GateCoreIdeas.ScoutPlan()
 
   override def blueprints = Vector(
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon), placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 7.0)),
-    new Blueprint(this, building = Some(Protoss.ShieldBattery)),
-    new Blueprint(this, building = Some(Protoss.ShieldBattery)),
+    new Blueprint(Protoss.Pylon),
+    new Blueprint(Protoss.Pylon, placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 7.0)),
+    new Blueprint(Protoss.ShieldBattery),
+    new Blueprint(Protoss.ShieldBattery),
   )
 
   // TODO: Replace with (or merge into) PvPSafeToMoveOut?

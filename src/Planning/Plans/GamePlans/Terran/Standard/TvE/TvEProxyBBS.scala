@@ -10,8 +10,7 @@ import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers}
-import Planning.Plans.Macro.Build.ProposePlacement
-import Planning.Plans.Macro.Terran.BuildBunkersAtEnemy
+import Planning.Plans.Placement.{BuildBunkersAtEnemy, ProposePlacement}
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Economy.MineralsAtLeast
@@ -35,11 +34,11 @@ class TvEProxyBBS extends GameplanTemplate {
     new Not(new FoundEnemyBase),
     new ScoutOn(Terran.Marine))
 
-  override def placementPlan: Plan = new ProposePlacement{
-      override lazy val blueprints = Vector(
-        new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)),
-        new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)))
-    }
+  override def placementPlan: Plan = new ProposePlacement {
+    override lazy val blueprints = Vector(
+      new Blueprint(Terran.Barracks, preferZone = proxyZone, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)),
+      new Blueprint(Terran.Barracks, preferZone = proxyZone, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)))
+  }
   
   override def attackPlan: Plan = new Parallel(
     new Attack,

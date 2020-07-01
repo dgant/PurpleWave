@@ -9,7 +9,7 @@ import Information.Grids.Grids
 import Information.Fingerprinting.Fingerprints
 import Information.{UnitsShown, _}
 import Macro.Allocation._
-import Macro.Architecture.{Architecture, PlacementScheduler}
+import Macro.Architecture.Architecture
 import Macro.Scheduling.{MasterBuildOrderHistory, MasterBuildPlans, Projections, Scheduler}
 import Micro.Agency.{Agency, Commander}
 import Micro.Coordination.Coordinator
@@ -66,7 +66,7 @@ object With {
   var matchups          : MatchupGraph            = _
   var paths             : Paths                   = _
   var performance       : PerformanceMonitor      = _
-  var placement         : PlacementScheduler      = _
+  var placement         : PlacementCycle          = _
   var projections       : Projections             = _
   var proxy             : ProxyBWAPI              = _
   var prioritizer       : Prioritizer             = _
@@ -151,7 +151,7 @@ object With {
     matchups          = new MatchupGraph
     paths             = new Paths
     performance       = new PerformanceMonitor
-    placement         = new PlacementScheduler
+    placement         = new PlacementCycle
     prioritizer       = new Prioritizer
     projections       = new Projections
     reaction          = new ReactionTimes

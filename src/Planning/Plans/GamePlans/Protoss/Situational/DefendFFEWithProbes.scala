@@ -4,7 +4,7 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.Micro.ShowUnitsFriendly
 import Lifecycle.With
-import Mathematics.Points.{Pixel, TileRectangle}
+import Mathematics.Points.Pixel
 import Micro.Agency.{Intention, Leash}
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountBetween
@@ -58,16 +58,7 @@ abstract class DefendFFEWithProbes extends Plan {
     }
 
     def occupied(pixel: Pixel): Boolean = (
-      With.groundskeeper
-        .proposalPlacements
-        .view
-        .flatMap(_._2.tile)
-        .exists(t => TileRectangle(
-          t,
-          t
-            .add(1, 1))
-            .expand(1, 1)
-            .contains(pixel.tileIncluding))
+      pixel.tileIncluding.adjacent9.exists(With.groundskeeper.isReserved(_))
     )
     workersByCannon.foreach(pair => {
       val cannon = pair._1

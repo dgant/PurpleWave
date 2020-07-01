@@ -2,7 +2,6 @@ package Macro.Scheduling
 
 import Lifecycle.With
 import Macro.Buildables.Buildable
-import Planning.Plan
 import Planning.Plans.Macro.Build._
 import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
 import Utilities.ByOption
@@ -13,10 +12,10 @@ import scala.collection.mutable.ListBuffer
 class MasterBuildPlans {
 
   private val maxToFollow = 200
-  private val plans = new mutable.HashMap[Buildable, ListBuffer[Plan]]
+  private val plans = new mutable.HashMap[Buildable, ListBuffer[ProductionPlan]]
 
-  def getChildren: Iterable[Plan] = buildChildren
-  private var buildChildren: Iterable[Plan] = Iterable.empty
+  def getChildren: Iterable[ProductionPlan] = buildChildren
+  private var buildChildren: Iterable[ProductionPlan] = Iterable.empty
 
   def update(invoker: FollowBuildOrder) {
 
@@ -33,7 +32,7 @@ class MasterBuildPlans {
     // Add needed builds
     buildsNeeded.keys.foreach(build => {
       if ( ! plans.contains(build)) {
-        plans.put(build, new ListBuffer[Plan])
+        plans.put(build, new ListBuffer[ProductionPlan])
       }
       while (plans(build).size < buildsNeeded(build)) {
         plans(build).append(buildPlan(build))
@@ -46,6 +45,7 @@ class MasterBuildPlans {
       while (i < plans.size) {
         val plan = plans(i)
         if (plan.isComplete) {
+          plan.onCompletion()
           With.recruiter.release(plan)
           plans.remove(i)
         }
@@ -78,7 +78,7 @@ class MasterBuildPlans {
       ++ childrenUnmappedFromQueue.filterNot(With.bank.hasSpentRequest).toVector.sortBy(_.frameCreated))
   }
 
-  private def buildPlan(buildable: Buildable): Plan = {
+  private def buildPlan(buildable: Buildable): ProductionPlan = {
     if (buildable.unitOption.nonEmpty) {
       val unitClass = buildable.unitOption.get
       if (unitClass.isAddon) {

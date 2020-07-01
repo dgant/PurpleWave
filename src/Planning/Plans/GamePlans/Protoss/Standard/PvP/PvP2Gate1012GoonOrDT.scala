@@ -12,7 +12,7 @@ import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackWithDarkTemp
 import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAt, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
+import Planning.Plans.Placement.BuildCannonsAtNatural
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.GasAtLeast
@@ -31,17 +31,17 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
   override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
 
   override def blueprints = Vector(
-    new Blueprint(this, building = Some(Protoss.Pylon),         placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 8.0)),
-    new Blueprint(this, building = Some(Protoss.Gateway),       placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 4.0)),
-    new Blueprint(this, building = Some(Protoss.Gateway),       placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 4.0)),
-    new Blueprint(this, building = Some(Protoss.Pylon),         placement = Some(PlacementProfiles.backPylon)),
-    new Blueprint(this, building = Some(Protoss.ShieldBattery)),
-    new Blueprint(this, building = Some(Protoss.Gateway),       placement = Some(PlacementProfiles.defensive)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
+    new Blueprint(Protoss.Pylon,         placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 8.0)),
+    new Blueprint(Protoss.Gateway,       placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 4.0)),
+    new Blueprint(Protoss.Gateway,       placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 4.0)),
+    new Blueprint(Protoss.Pylon,         placement = Some(PlacementProfiles.backPylon)),
+    new Blueprint(Protoss.ShieldBattery),
+    new Blueprint(Protoss.Gateway,       placement = Some(PlacementProfiles.defensive)),
+    new Blueprint(Protoss.Pylon),
+    new Blueprint(Protoss.Pylon),
+    new Blueprint(Protoss.Pylon),
+    new Blueprint(Protoss.Pylon),
+    new Blueprint(Protoss.Pylon, requireZone = Some(With.geography.ourNatural.zone)))
 
   override def aggressionPlan: Plan = new If(new UpgradeComplete(Protoss.ZealotSpeed), new Aggression(1.5), super.aggressionPlan)
 

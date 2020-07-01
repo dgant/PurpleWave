@@ -26,19 +26,19 @@ class PvRTinfoil extends GameplanTemplateVsRandom {
   override def initialScoutPlan   = NoPlan()
 
   override lazy val blueprints = Vector(
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.Pylon)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.Pylon)),
-    new Blueprint(this, placement = Some(PlacementProfiles.backPylon),    building = Some(Protoss.Pylon)),
-    new Blueprint(this, placement = Some(PlacementProfiles.tech),         building = Some(Protoss.Forge)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
-    new Blueprint(this, placement = Some(PlacementProfiles.backPylon),    building = Some(Protoss.Gateway)),
-    new Blueprint(this, placement = Some(PlacementProfiles.backPylon),    building = Some(Protoss.RoboticsFacility)),
-    new Blueprint(this, placement = Some(PlacementProfiles.backPylon),    building = Some(Protoss.RoboticsSupportBay)))
+    new Blueprint(Protoss.Pylon,              placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.Pylon,              placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.Pylon,              placement = Some(PlacementProfiles.backPylon)),
+    new Blueprint(Protoss.Pylon,              placement = Some(PlacementProfiles.tech)),
+    new Blueprint(Protoss.PhotonCannon,       placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.PhotonCannon,       placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.PhotonCannon,       placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.PhotonCannon,       placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.PhotonCannon,       placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.PhotonCannon,       placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.Gateway,            placement = Some(PlacementProfiles.backPylon)),
+    new Blueprint(Protoss.RoboticsFacility,   placement = Some(PlacementProfiles.backPylon)),
+    new Blueprint(Protoss.RoboticsSupportBay, placement = Some(PlacementProfiles.backPylon)))
 
   override def attackPlan = new If(new UnitsAtLeast(6, Protoss.Gateway, complete = true), new ConsiderAttacking)
 

@@ -23,11 +23,11 @@ class TvRTinfoil extends GameplanTemplateVsRandom {
   override val activationCriteria: Predicate = new Employing(TvRTinfoil)
   
   override lazy val blueprints = Vector(
-    new Blueprint(this, building = Some(Terran.Bunker),       placement = Some(PlacementProfiles.hugTownHall), marginPixels = Some(32)),
-    new Blueprint(this, building = Some(Terran.Barracks),     placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(this, building = Some(Terran.SupplyDepot),  placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(this, building = Some(Terran.SupplyDepot),  placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(this, building = Some(Terran.Factory),      placement = Some(PlacementProfiles.hugTownHall)))
+    new Blueprint(Terran.Bunker,       placement = Some(PlacementProfiles.hugTownHall), marginPixels = Some(32)),
+    new Blueprint(Terran.Barracks,     placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Terran.SupplyDepot,  placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Terran.SupplyDepot,  placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Terran.Factory,      placement = Some(PlacementProfiles.hugTownHall)))
   
   override def attackPlan: Plan = new If(
     new UpgradeComplete(Terran.MarineRange),

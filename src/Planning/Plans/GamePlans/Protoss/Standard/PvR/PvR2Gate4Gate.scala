@@ -24,10 +24,10 @@ class PvR2Gate4Gate extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(PvR2Gate4Gate)
 
   override lazy val blueprints = Vector(
-    new Blueprint(this, building = Some(Protoss.Pylon), placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(this, building = Some(Protoss.Pylon), placement = Some(PlacementProfiles.hugTownHall)))
+    new Blueprint(Protoss.Pylon,    placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.Gateway,  placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.Gateway,  placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.Pylon,    placement = Some(PlacementProfiles.hugTownHall)))
 
   override def attackPlan: Plan = new Trigger(
     new Or(

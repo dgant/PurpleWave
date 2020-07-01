@@ -29,18 +29,17 @@ class PvRForgeDT extends GameplanTemplateVsRandom {
   )
 
   override lazy val blueprints = Vector(
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.Pylon)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.Pylon)),
-    new Blueprint(this, placement = Some(PlacementProfiles.backPylon),    building = Some(Protoss.Pylon)),
-    new Blueprint(this, placement = Some(PlacementProfiles.tech),         building = Some(Protoss.Forge)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
-    new Blueprint(this, placement = Some(PlacementProfiles.hugTownHall),  building = Some(Protoss.PhotonCannon)),
-    new Blueprint(this, placement = Some(PlacementProfiles.backPylon),    building = Some(Protoss.Gateway)))
-
+    new Blueprint(Protoss.Pylon,        placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.Pylon,        placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.Pylon,        placement = Some(PlacementProfiles.backPylon)),
+    new Blueprint(Protoss.Forge,        placement = Some(PlacementProfiles.tech)),
+    new Blueprint(Protoss.PhotonCannon, placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.PhotonCannon, placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.PhotonCannon, placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.PhotonCannon, placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.PhotonCannon, placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.PhotonCannon, placement = Some(PlacementProfiles.hugTownHall)),
+    new Blueprint(Protoss.Gateway,      placement = Some(PlacementProfiles.backPylon)))
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new If(

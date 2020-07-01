@@ -11,6 +11,6 @@ object TileSourceAnywhere extends TileSource {
   }
   
   override def tiles(blueprint: Blueprint): Seq[Tile] = {
-    With.geography.allTiles.indices.filter(With.grids.buildable.get).map(new Tile(_))
+    With.geography.allTiles
   }
 }

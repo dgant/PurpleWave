@@ -102,7 +102,7 @@ class TrainUnit(val traineeClass: UnitClass) extends ProductionPlan {
     }
   }
   
-  override def visualize() {
+  override def renderMap() {
     if (isComplete) return
     if (trainer.isEmpty) return
     DrawMap.box(

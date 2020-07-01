@@ -8,7 +8,8 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Terran.{BuildMissileTurretsAtBases, PopulateBunkers}
+import Planning.Plans.Macro.Terran.PopulateBunkers
+import Planning.Plans.Placement.BuildMissileTurretsAtBases
 import Planning.Predicates.Compound.Latch
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.Employing

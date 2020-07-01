@@ -10,7 +10,7 @@ import Planning.Predicates.Always
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases, RequireMiningBasesFFA}
-import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
+import Planning.Plans.Placement.BuildCannonsAtExpansions
 import Planning.Predicates.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Protoss
 

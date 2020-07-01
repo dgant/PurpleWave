@@ -9,10 +9,9 @@ import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
+import Planning.Plans.Placement.{BuildCannonsAtNatural, BuildCannonsInMain, ProposePlacement}
 import Planning.Plans.Scouting.ScoutForCannonRush
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
@@ -41,12 +40,12 @@ class PvP1ZealotExpand extends GameplanTemplate {
         new UnitsAtLeast(2, Protoss.Pylon),
         new Not(new EnemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate))),
       new ProposePlacement {
-        override lazy val blueprints = Vector(new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
+        override lazy val blueprints = Vector(new Blueprint(Protoss.Pylon, requireZone = Some(With.geography.ourNatural.zone)))
       }))
 
   override def blueprints = Vector(
-    new Blueprint(this, building = Some(Protoss.Pylon), placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
-    new Blueprint(this, building = Some(Protoss.Pylon), placement = Some(PlacementProfiles.backPylon)))
+    new Blueprint(Protoss.Pylon, placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
+    new Blueprint(Protoss.Pylon, placement = Some(PlacementProfiles.backPylon)))
 
   override def attackPlan: Plan = new If(new EnemyStrategy(With.fingerprints.nexusFirst), new Attack)
 
@@ -121,7 +120,7 @@ class PvP1ZealotExpand extends GameplanTemplate {
     // Forge + Cannon takes 56 seconds
     // So we want to request the Forge at about 4:00 to ensure we mine the required money and build it in time
     new If(
-      new FrameAtLeast(GameTime(4, 0)())),
+      new FrameAtLeast(GameTime(4, 0)()),
       new Parallel(
         // If we don't know what they're doing, stick a Forge in there
         new If(new ShouldAddCannons, new Build(Get(Protoss.Forge))),
@@ -133,7 +132,7 @@ class PvP1ZealotExpand extends GameplanTemplate {
           new Parallel(
             new BuildCannonsAtNatural(1),
             new BuildCannonsInMain(1),
-            new BuildCannonsAtNatural(2)))),
+            new BuildCannonsAtNatural(2))))),
 
     // Finish the build order
     new Build(

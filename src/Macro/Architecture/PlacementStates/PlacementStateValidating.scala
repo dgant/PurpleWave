@@ -1,33 +1,21 @@
 package Macro.Architecture.PlacementStates
 
 import Lifecycle.With
-import Macro.Architecture.{Blueprint, Placement}
-import Mathematics.Points.Tile
+import Macro.Architecture.PlacementRequests.PlacementRequest
 
-import scala.collection.mutable
-
-class PlacementStateValidating(blueprint: Blueprint) extends PlacementState {
+class PlacementStateValidating(request: PlacementRequest) extends PlacementState {
   override def step() {
-    val placement = placements.get(blueprint)
-    if (placement.exists(_.satisfies(blueprint))) {
-      With.architecture.assumePlacement(placement.get)
-      transition(new PlacementStateReady)
-    } else if (blueprint.forcePlacement) {
-      val placement = Placement(
-        blueprint,
-        Some(blueprint.requireCandidates.get.head),
-        Seq.empty,
-        new mutable.HashMap[Tile, Double],
-        totalNanoseconds  = 0,
-        frameStarted      = With.frame,
-        frameFinished     = With.frame,
-        candidates        = 1,
-        evaluated         = 1)
-      With.architecture.assumePlacement(placement)
-      With.groundskeeper.updatePlacement(blueprint, placement)
+    if (request.task().retain()) {
+      // Recursively assume these placements
+      var nextRequest: Option[PlacementRequest] = Some(request)
+      while (nextRequest.nonEmpty) {
+        With.placement.finishPlacement(nextRequest.get)
+        nextRequest.get.tile.map(With.architecture.diffPlacement(_, request)).foreach(_.doo())
+        nextRequest = nextRequest.get.child
+      }
       transition(new PlacementStateReady)
     } else {
-      transition(new PlacementStateEvaluating(blueprint))
+      transition(new PlacementStateEvaluating(request))
     }
   }
 }

@@ -9,10 +9,10 @@ import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.Build.{CancelOrders, ProposePlacement}
+import Planning.Plans.Macro.Build.CancelOrders
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Protoss.{BuildCannonsAtNatural, BuildCannonsInMain}
+import Planning.Plans.Placement.{BuildCannonsAtNatural, BuildCannonsInMain, ProposePlacement}
 import Planning.Plans.Scouting.{ScoutCleared, ScoutForCannonRush}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
@@ -54,15 +54,55 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
         new UnitsAtLeast(1, Protoss.CitadelOfAdun),
         new Not(new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway))),
       new ProposePlacement {
-        override lazy val blueprints = Vector(new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
+        override lazy val blueprints = Vector(new Blueprint(Protoss.Pylon, requireZone = Some(With.geography.ourNatural.zone)))
       }))
 
   override def blueprints = Vector(
-    new Blueprint(this, building = Some(Protoss.Pylon),           placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
-    new Blueprint(this, building = Some(Protoss.Gateway),         placement = Some(PlacementProfiles.wallGathering)),
-    new Blueprint(this, building = Some(Protoss.Pylon),           placement = Some(PlacementProfiles.backPylon)),
-    new Blueprint(this, building = Some(Protoss.ShieldBattery)),
-    new Blueprint(this, building = Some(Protoss.Gateway),         placement = Some(PlacementProfiles.wallGathering)))
+    new Blueprint(Protoss.Pylon,           placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
+    new Blueprint(Protoss.Gateway,         placement = Some(PlacementProfiles.wallGathering)),
+    new Blueprint(Protoss.Pylon,           placement = Some(PlacementProfiles.wallGathering)),
+    new Blueprint(Protoss.ShieldBattery),
+    new Blueprint(Protoss.Gateway,         placement = Some(PlacementProfiles.wallGathering)),
+    new Blueprint(Protoss.CyberneticsCore, placement = Some(PlacementProfiles.wallGathering)),
+    new Blueprint(Protoss.Pylon,           placement = Some(PlacementProfiles.backPylon)),
+    new Blueprint(Protoss.Forge,           placement = Some(PlacementProfiles.wallGathering)),
+    new Blueprint(Protoss.Pylon,           placement = Some(PlacementProfiles.wallGathering)))
+
+  override val buildOrder = Vector(
+    // http://wiki.teamliquid.net/starcraft/2_Gateway_Dark_Templar_(vs._Protoss)
+    Get(8,   Protoss.Probe),
+    Get(Protoss.Pylon),                 // 8
+    Get(10,  Protoss.Probe),
+    Get(Protoss.Gateway),               // 10
+    Get(12,  Protoss.Probe),
+    Get(Protoss.Assimilator),           // 12
+    Get(13,  Protoss.Probe),
+    Get(Protoss.Zealot),                // 13
+    Get(14,  Protoss.Probe),
+    Get(2,   Protoss.Pylon),            // 16
+    Get(15,  Protoss.Probe),
+    Get(Protoss.CyberneticsCore),       // 17
+    Get(16,  Protoss.Probe),
+    Get(2,   Protoss.Zealot),           // 18 = 16 + Z
+    Get(17,  Protoss.Probe),
+    Get(3,   Protoss.Pylon),            // 21 = 17 + ZZ
+    Get(18,  Protoss.Probe),
+    Get(Protoss.Dragoon),               // 22 = 18 + ZZ
+    Get(Protoss.CitadelOfAdun),         // 24
+    Get(20,  Protoss.Probe),
+    Get(2,   Protoss.Dragoon),          // 26
+    Get(2,   Protoss.Gateway),          // 28
+    Get(21,  Protoss.Probe),
+    Get(Protoss.TemplarArchives),
+    // Classic build gets 2 Zealots -- can we fit in? do we want to?
+    Get(22,  Protoss.Probe),
+    Get(4,   Protoss.Pylon),
+    Get(23,  Protoss.Probe),
+    Get(2,   Protoss.DarkTemplar),
+    Get(24,  Protoss.Probe),
+    Get(Protoss.Forge),
+    Get(25,  Protoss.Probe),
+    Get(5,   Protoss.Pylon))
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvPIdeas.ReactToGasSteal,

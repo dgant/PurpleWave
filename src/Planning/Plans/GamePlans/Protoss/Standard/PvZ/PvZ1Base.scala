@@ -13,9 +13,9 @@ import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
 import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.MeldArchonsUntilStorm
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Placement.ProposePlacement
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
@@ -28,18 +28,18 @@ import Strategery.Strategies.Protoss._
 
 abstract class PvZ1Base extends GameplanTemplate {
 
-  override val completionCriteria   = new Latch(new MiningBasesAtLeast(2))
-  override def buildOrder           = ProtossBuilds.TwoGate1012
-  override def workerPlan           = NoPlan()
-  override val initialScoutPlan: Plan      = new If(new StartPositionsAtLeast(4), new ScoutOn(Protoss.Pylon), new ScoutOn(Protoss.Gateway))
-  override def placementPlan: Plan  = new ProposePlacement {
+  override val completionCriteria     = new Latch(new MiningBasesAtLeast(2))
+  override def buildOrder             = ProtossBuilds.TwoGate1012
+  override def workerPlan             = NoPlan()
+  override val initialScoutPlan: Plan = new If(new StartPositionsAtLeast(4), new ScoutOn(Protoss.Pylon), new ScoutOn(Protoss.Gateway))
+  override def placementPlan: Plan = new ProposePlacement {
     override lazy val blueprints = Vector(
-      new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.hugTownHall)),
-      new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.hugTownHall)),
-      new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.hugTownHall)),
-      new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.backPylon)),
-      new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.hugTownHall)),
-      new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.hugTownHall))) }
+      new Blueprint(Protoss.Pylon,   placement = Some(PlacementProfiles.hugTownHall)),
+      new Blueprint(Protoss.Gateway, placement = Some(PlacementProfiles.hugTownHall)),
+      new Blueprint(Protoss.Gateway, placement = Some(PlacementProfiles.hugTownHall)),
+      new Blueprint(Protoss.Pylon,   placement = Some(PlacementProfiles.backPylon)),
+      new Blueprint(Protoss.Pylon,   placement = Some(PlacementProfiles.hugTownHall)),
+      new Blueprint(Protoss.Pylon,   placement = Some(PlacementProfiles.hugTownHall))) }
 
   override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
   override def attackPlan: Plan = new Parallel(

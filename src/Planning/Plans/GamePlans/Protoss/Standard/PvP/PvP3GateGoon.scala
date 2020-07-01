@@ -26,15 +26,15 @@ class PvP3GateGoon extends GameplanTemplate {
   override val completionCriteria : Predicate = new MiningBasesAtLeast(2)
 
   override def blueprints = Vector(
-    new Blueprint(this, building = Some(Protoss.Pylon),         placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
-    new Blueprint(this, building = Some(Protoss.ShieldBattery)),
-    new Blueprint(this, building = Some(Protoss.Gateway),       placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 12.0)),
-    new Blueprint(this, building = Some(Protoss.Gateway),       placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 12.0)),
-    new Blueprint(this, building = Some(Protoss.Gateway),       placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 12.0)),
-    new Blueprint(this, building = Some(Protoss.Pylon),         placement = Some(PlacementProfiles.backPylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone))) // If we need emergency cannons in the natural, this is the Pylon we need done
+    new Blueprint(Protoss.Pylon,         placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
+    new Blueprint(Protoss.ShieldBattery),
+    new Blueprint(Protoss.Gateway,       placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 12.0)),
+    new Blueprint(Protoss.Gateway,       placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 12.0)),
+    new Blueprint(Protoss.Gateway,       placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 12.0)),
+    new Blueprint(Protoss.Pylon,         placement = Some(PlacementProfiles.backPylon)),
+    new Blueprint(Protoss.Pylon),
+    new Blueprint(Protoss.Pylon),
+    new Blueprint(Protoss.Pylon, requireZone = Some(With.geography.ourNatural.zone))) // If we need emergency cannons in the natural, this is the Pylon we need done
 
   override def priorityAttackPlan : Plan = new AttackWithDarkTemplar
   override def attackPlan: Plan = new Trigger(

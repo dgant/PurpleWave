@@ -6,9 +6,9 @@ import Macro.BuildRequests.Get
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Enemy, Pump, PumpRatio}
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Zerg.BuildSunkensInMain
 import Planning.Predicates.Compound.And
 import Planning.Predicates.Milestones.{FrameAtMost, UnitsAtLeast, UnitsAtMost}
+import Planning.Plans.Placement.BuildSunkensInMain
 import Planning.Predicates.Strategy.EnemyStrategy
 import ProxyBwapi.Races.Zerg
 

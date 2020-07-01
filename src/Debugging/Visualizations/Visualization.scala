@@ -1,5 +1,6 @@
 package Debugging.Visualizations
 
+import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.Battles.{ShowBattle, ShowClustering}
 import Debugging.Visualizations.Views.Economy._
 import Debugging.Visualizations.Views.Fun._
@@ -10,6 +11,8 @@ import Debugging.Visualizations.Views.Planning._
 import Debugging.Visualizations.Views.{ShowClock, View}
 import Lifecycle.With
 import bwapi.Text
+import Mathematics.Points.Pixel
+import bwapi.MouseButton
 
 import scala.collection.mutable
 import scala.util.Random
@@ -33,8 +36,9 @@ class Visualization {
     ShowPerformanceSummary,
 
     // Temporary views
-    ShowUnitCounts,
-    ShowProduction
+    ShowPerformanceSummary,
+    ShowArchitecture,
+    ShowPlans
   )
   
   var enabled   : Boolean = _
@@ -83,6 +87,12 @@ class Visualization {
       }
       if (screen) {
         views.foreach(_.renderScreen())
+        if (With.game.getMouseState(MouseButton.M_LEFT)) {
+          val mouse = new Pixel(With.game.getMousePosition)
+          val pixel = With.viewport.start + mouse
+          val tile = pixel.tileIncluding
+          DrawMap.label(tile.toString, pixel.subtract(0, 15))
+        }
       }
     }
   }
@@ -108,8 +118,7 @@ class Visualization {
   }
   
   lazy val knownViews: Vector[View] = Vector[View](
-    ShowArchitectureHeuristics,
-    ShowArchitecturePlacements,
+    ShowArchitecture,
     ShowBases,
     ShowBattle,
     ShowBlackScreen,
@@ -123,7 +132,6 @@ class Visualization {
     ShowGas,
     ShowGradients,
     ShowGrids,
-    ShowGroundskeeper,
     ShowHappyUnits,
     ShowHappyVision,
     ShowHistory,

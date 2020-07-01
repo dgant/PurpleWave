@@ -8,18 +8,16 @@ import Planning.Plans.Basic.NoPlan
 object ShowPlans extends View {
   
   override def renderMap() {
-    drawPlansRecursively(With.strategy.gameplan)
+    With.prioritizer.all.foreach(_._1.renderMap())
   }
-  
-  private def drawPlansRecursively(plan: Plan) {
-    plan.visualize()
-    plan.getChildren.filter(isRelevant).foreach(drawPlansRecursively)
-  }
-  
+
+  var screenEnabled = false
   override def renderScreen() {
-    describePlanTree(With.strategy.gameplan, 0, 0)
-      .zipWithIndex
-      .foreach(pair => With.game.drawTextScreen(0, (5 + pair._2) * With.visualization.lineHeightSmall, pair._1))
+    if (screenEnabled) {
+      describePlanTree(With.strategy.gameplan, 0, 0)
+        .zipWithIndex
+        .foreach(pair => With.game.drawTextScreen(0, (5 + pair._2) * With.visualization.lineHeightSmall, pair._1))
+    }
   }
   
   private def describePlanTree(plan: Plan, childOrder: Integer, depth: Integer): Seq[String] = {

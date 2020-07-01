@@ -13,7 +13,7 @@ import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvP2GateDarkTemplar
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
+import Planning.Plans.Placement.BuildCannonsAtNatural
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy._

@@ -4,14 +4,14 @@ package Utilities
 object ByOption {
   
   def min[A](sequence: TraversableOnce[A])(implicit cmp: scala.Ordering[A]): Option[A] = {
-    if (sequence.isEmpty) None else Some(sequence.min)
+    if (sequence.isEmpty) None else Some(sequence.min(cmp))
   }
   
   def max[A](sequence: TraversableOnce[A])(implicit cmp: scala.Ordering[A]): Option[A] = {
-    if (sequence.isEmpty) None else Some(sequence.max)
+    if (sequence.isEmpty) None else Some(sequence.max(cmp))
   }
   
-  def mean(sequence: TraversableOnce[Double])(implicit cmp: scala.Ordering[Double]): Option[Double] = {
+  def mean(sequence: TraversableOnce[Double]): Option[Double] = {
     if (sequence.isEmpty)
       None
     else {
@@ -26,7 +26,7 @@ object ByOption {
   }
   
   // Root mean square
-  def rms(sequence: TraversableOnce[Double])(implicit cmp: scala.Ordering[Double]): Option[Double] = {
+  def rms(sequence: TraversableOnce[Double]): Option[Double] = {
     if (sequence.isEmpty)
       None
     else {

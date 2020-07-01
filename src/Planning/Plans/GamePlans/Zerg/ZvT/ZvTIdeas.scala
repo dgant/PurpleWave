@@ -6,7 +6,7 @@ import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Enemy, Pump, PumpRatio}
 import Planning.Plans.Macro.BuildOrders.BuildOrder
 import Planning.Plans.Macro.Expanding.RequireBases
-import Planning.Plans.Macro.Zerg.BuildSunkensAtNatural
+import Planning.Plans.Placement.BuildSunkensAtNatural
 import Planning.Predicates.Compound.And
 import Planning.Predicates.Milestones.{GasForUpgrade, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.EnemyStrategy

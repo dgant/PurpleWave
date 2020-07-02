@@ -165,25 +165,7 @@ class Gather extends Plan {
       } else Map.empty
     val respectCooldown = gasWorkersNow >= gasWorkerTarget
 
-    def workerOrder(worker: FriendlyUnitInfo): Double = {
-      lazy val cd = workerCooldownUntil.getOrElse(worker, 0).toDouble
-      if (respectCooldown) {
-        cd
-      } else {
-        newResourceDistance(worker).orElse(minGasDistance(worker)).getOrElse(cd)
-      }}
-    val workersToUpdate = workers
-      .view
-      .filter(worker => {
-        // Don't interrupt workers who are about to reach minerals.
-        val resourceBefore = resourceByWorker.get(worker)
-        val resourceBeforeEdgePixels = resourceBefore.map(_.pixelDistanceEdge(worker))
-        resourceBefore.forall(r => r.unitClass.isGas || workersByResource(r).size > 5 || resourceBeforeEdgePixels.forall(_ > 64)) // The > 5 check is for disentangling massively popular resources
-      })
-      .toVector
-      .sortBy(workerOrder)
-
-      // Evaluate the marginal efficacy of assigning this worker to a resource.
+    // Evaluate the marginal efficacy of assigning this worker to a resource.
     case class ResourceScore(worker: FriendlyUnitInfo, resource: UnitInfo, var resourceBefore: Option[UnitInfo] = None) {
       resourceBefore = resourceBefore.orElse(resourceByWorker.get(worker))
 
@@ -249,9 +231,29 @@ class Gather extends Plan {
     }
 
     // Update workers in priority order
-    workersToUpdate
+    class OrderedWorker(val worker: FriendlyUnitInfo) {
+      lazy val cd: Double = workerCooldownUntil.getOrElse(worker, 0).toDouble
+      val order: Double = if (respectCooldown) {
+        cd
+      } else {
+        newResourceDistance(worker).orElse(minGasDistance(worker)).getOrElse(cd)
+      }
+    }
+    val workersToUpdate = workers
+      .view
       .filter(worker => ! respectCooldown || workerCooldownUntil.get(worker).forall(_ <= With.frame))
-      .foreach(worker => {
+      .filter(worker => {
+        // Don't interrupt workers who are about to reach minerals.
+        val resourceBefore = resourceByWorker.get(worker)
+        val resourceBeforeEdgePixels = resourceBefore.map(_.pixelDistanceEdge(worker))
+        resourceBefore.forall(r => r.unitClass.isGas || workersByResource(r).size > 5 || resourceBeforeEdgePixels.forall(_ > 64)) // The > 5 check is for disentangling massively popular resources
+      })
+      .map(new OrderedWorker(_))
+      .toVector
+      .sortBy(_.order)
+    workersToUpdate
+      .foreach(orderedWorker => {
+        val worker = orderedWorker.worker
         val resourceBefore = resourceByWorker.get(worker)
         unassignWorker(worker)
         if (resourceBefore.exists(_.unitClass.isGas)) {

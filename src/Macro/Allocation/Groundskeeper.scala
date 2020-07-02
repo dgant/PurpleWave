@@ -29,7 +29,7 @@ class Groundskeeper {
     updates += 1
     suggestionsBefore   = suggestionsNow
     suggestionsNow      = ArrayBuffer.empty
-    blueprintConsumers.filterNot(_._2.alive).keys.toSeq.foreach(blueprintConsumers.remove)
+    blueprintConsumers.view.filterNot(_._2.alive).toSeq.foreach(p => blueprintConsumers.remove(p._1))
   }
 
   def suggestions: Seq[PlacementRequest] = (suggestionsNow.view ++ suggestionsBefore.view)

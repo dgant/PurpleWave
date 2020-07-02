@@ -66,6 +66,15 @@ object MacroCounter {
     output
   }
 
-  def countFriendlyComplete: CountMap[UnitClass] = With.units.ours.map(countComplete).reduceOption(_ + _).getOrElse(new CountMap)
-  def countFriendlyCompleteOrIncomplete: CountMap[UnitClass] = With.units.ours.map(countCompleteOrIncomplete).reduceOption(_ + _).getOrElse(new CountMap)
+  def countFriendlyComplete: CountMap[UnitClass] = {
+    val output = new CountMap[UnitClass]
+    With.units.ours.map(countComplete).foreach(_.foreach(countPair => output(countPair._1) += countPair._2))
+    output
+  }
+
+  def countFriendlyCompleteOrIncomplete: CountMap[UnitClass] = {
+    val output = new CountMap[UnitClass]
+    With.units.ours.map(countCompleteOrIncomplete).foreach(_.foreach(countPair => output(countPair._1) += countPair._2))
+    output
+  }
 }

@@ -2,7 +2,7 @@ package Utilities
 
 import scala.collection.mutable
 
-class CountMap[T] extends mutable.HashMap[T, Int] {
+class CountMap[T] extends mutable.ListMap[T, Int] {
   override def default(key: T): Int = { put(key, 0); 0 }
   def add         (key: T, value:Int)   = put(key, this(key) + value)
   def addOne      (key: T)              = add(key, 1)

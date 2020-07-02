@@ -68,7 +68,7 @@ class UnitClassProxy(val baseType: UnitType) {
   lazy val requiredUnits            = baseType.requiredUnits.asScala.map(pair => (UnitClasses.get(pair._1), pair._2))
   lazy val requiresCreep            = baseType.requiresCreep
   lazy val requiresPsi              = baseType.requiresPsi
-  lazy val techsWhat           = baseType.researchesWhat.asScala.map(Techs.get)
+  lazy val techsWhat                = baseType.researchesWhat.asScala.map(Techs.get)
   lazy val seekRange                = baseType.seekRange
   lazy val sightRangePixels         = baseType.sightRange
   lazy val spaceProvided            = baseType.spaceProvided
@@ -92,7 +92,7 @@ class UnitClassProxy(val baseType: UnitType) {
   lazy val airDamageBonusRaw        = baseType.airWeapon.damageBonus
   lazy val airDamageCooldownRaw     = baseType.airWeapon.damageCooldown
   lazy val airDamageFactorRaw       = baseType.airWeapon.damageFactor
-  //lazy val airDamageRaw         = baseType.airWeapon.damageType //This doesn't work and crashes BWMirror!
+  lazy val airDamageTypeRaw         = baseType.airWeapon.damageType
   lazy val airExplosionTypeRaw      = baseType.airWeapon.explosionType
   lazy val airRangeRaw              = baseType.airWeapon.maxRange
   lazy val airSplashRadius50        = baseType.airWeapon.innerSplashRadius
@@ -101,7 +101,7 @@ class UnitClassProxy(val baseType: UnitType) {
   lazy val groundDamageBonusRaw     = baseType.groundWeapon.damageBonus
   lazy val groundDamageCooldownRaw  = baseType.groundWeapon.damageCooldown
   lazy val groundDamageFactorRaw    = baseType.groundWeapon.damageFactor
-  //lazy val groundDamageRaw      = baseType.groundWeapon.damageType //This doesn't work and crashes BWMirror!
+  lazy val groundDamageTypeRaw      = baseType.groundWeapon.damageType
   lazy val groundExplosionTypeRaw   = baseType.groundWeapon.explosionType
   lazy val groundSplashRadius50     = baseType.groundWeapon.innerSplashRadius
   lazy val groundSplashRadius25     = baseType.groundWeapon.outerSplashRadius
@@ -309,4 +309,18 @@ class UnitClassProxy(val baseType: UnitType) {
     else
       None
   }
+
+  override val toString: String = asString
+    .replace("Terran_", "")
+    .replace("Zerg_", "")
+    .replace("Protoss_", "")
+    .replace("Neutral_", "")
+    .replace("Resource_", "")
+    .replace("Critter_", "")
+    .replace("Special_", "")
+    .replace("Vulture_Spider", "Spider")
+    .replaceAll("_", " ")
+
+  // For performance
+  override val hashCode: Int = toString.hashCode
 }

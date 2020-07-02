@@ -136,6 +136,7 @@ class Visualization {
     ShowHappyVision,
     ShowHistory,
     ShowIgnorance,
+    ShowKills,
     ShowMobility,
     ShowHealthAndCooldown,
     ShowUnitsEnemy,

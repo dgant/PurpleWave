@@ -139,33 +139,7 @@ class Gather extends Plan {
     def needMoreGasWorkers    = gasWorkersNow < gasWorkerTarget
     def needFewerGasWorkers   = gasWorkersNow > gasWorkerTarget
 
-    // Update workers in priority order.
-    //
-    // When a new resource is available:
-    // Prioritize workers closest to the new resource.
-    //
-    // Otherwise:
-    // Sort workers by frames since update, descending.
-    def newResourceDistance(worker: FriendlyUnitInfo): Option[Double] = {
-      ByOption.min((newMinerals() ++ newGas()).map(_.pixelDistanceEdge(worker)))
-    }
-    // Determine if we need to prioritize updating gas workers.
-    val minGasDistance: Map[FriendlyUnitInfo, Option[Double]] =
-      if (needMoreGasWorkers) {
-        workers
-          .map(worker => (
-            worker,
-            ByOption
-              .min(
-                workersByResource
-                  .filter(pair => pair._1.unitClass.isGas && pair._2.size < 3)
-                  .map(resource => worker.pixelDistanceTravelling(resource._1.pixelCenter))) // TODO: Used edge distance?
-            ))
-          .toMap
-      } else Map.empty
-    val respectCooldown = gasWorkersNow >= gasWorkerTarget
-
-    // Evaluate the marginal efficacy of assigning this worker to a resource.
+    // Evaluates the marginal efficacy of assigning this worker to a resource.
     case class ResourceScore(worker: FriendlyUnitInfo, resource: UnitInfo, var resourceBefore: Option[UnitInfo] = None) {
       resourceBefore = resourceBefore.orElse(resourceByWorker.get(worker))
 
@@ -230,6 +204,32 @@ class Gather extends Plan {
       val output                      = throughput * framesSpentGathering * gasPreference * stickiness
     }
 
+    // Update workers in priority order.
+    //
+    // When a new resource is available:
+    // Prioritize workers closest to the new resource.
+    //
+    // Otherwise:
+    // Sort workers by frames since update, descending.
+    def newResourceDistance(worker: FriendlyUnitInfo): Option[Double] = {
+      ByOption.min((newMinerals() ++ newGas()).map(_.pixelDistanceEdge(worker)))
+    }
+    // Determine if we need to prioritize updating gas workers.
+    val minGasDistance: Map[FriendlyUnitInfo, Option[Double]] =
+      if (needMoreGasWorkers) {
+        workers
+          .map(worker => (
+            worker,
+            ByOption
+              .min(
+                workersByResource
+                  .filter(pair => pair._1.unitClass.isGas && pair._2.size < 3)
+                  .map(resource => worker.pixelDistanceTravelling(resource._1.pixelCenter))) // TODO: Used edge distance?
+            ))
+          .toMap
+      } else Map.empty
+    val respectCooldown = gasWorkersNow >= gasWorkerTarget
+
     // Update workers in priority order
     class OrderedWorker(val worker: FriendlyUnitInfo) {
       lazy val cd: Double = workerCooldownUntil.getOrElse(worker, 0).toDouble
@@ -251,6 +251,7 @@ class Gather extends Plan {
       .map(new OrderedWorker(_))
       .toVector
       .sortBy(_.order)
+
     workersToUpdate
       .foreach(orderedWorker => {
         val worker = orderedWorker.worker

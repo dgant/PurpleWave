@@ -210,6 +210,7 @@ object PvPIdeas {
           Get(16, Protoss.Probe),
           Get(2, Protoss.Nexus))),
       new BuildOrder(ProtossBuilds.TwoGate1012: _*),
+      new PvPIdeas.ReactToDarkTemplarEmergencies,
       new Build(Get(Protoss.Assimilator)),
       new If(
         new UnitsAtMost(0, Protoss.Assimilator),

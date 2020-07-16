@@ -26,7 +26,7 @@ import Strategery.Strategies.Protoss.PvP2GateDTExpand
 class PvP2GateDarkTemplar extends GameplanTemplate {
   
   override val activationCriteria = new Employing(PvP2GateDTExpand)
-  override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
+  override val completionCriteria: Predicate = new Latch(new And(new UnitsAtLeast(1, Protoss.TemplarArchives), new BasesAtLeast(2)))
 
   override val initialScoutPlan = new PvP1GateCoreIdeas.ScoutPlan
 
@@ -166,6 +166,10 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
         Get(2, Protoss.Dragoon)))),
 
     new PumpWorkers(oversaturate = true),
-    new Pump(Protoss.Dragoon)
+    new Pump(Protoss.Dragoon),
+
+    // Include this in case the Archives is heavily delayed for whatever reason
+    new RequireMiningBases(2),
+    new Build(Get(8, Protoss.Gateway))
   )
 }

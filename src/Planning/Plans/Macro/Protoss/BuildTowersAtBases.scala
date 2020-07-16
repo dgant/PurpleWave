@@ -60,8 +60,6 @@ class BuildTowersAtBases(
     lazy val pylonsInZone = zone.units.filter(u => u.isOurs && u.is(Protoss.Pylon))
     lazy val towersInZone = zone.units.filter(u => u.isOurs && u.is(towerClass))
     lazy val towersToAdd = towersRequired - towersInZone.size
-    
-    if (towersToAdd <= 0) return
 
     val needPylons = towerClass.requiresPsi
     
@@ -69,6 +67,7 @@ class BuildTowersAtBases(
       With.groundskeeper.suggest(pylonBlueprintByZone(zone))
       new Pump(Protoss.Pylon, maximumConcurrently = 1)
     }
+
     if ( ! needPylons || pylonsInZone.exists(_.aliveAndComplete)) {
       val newBlueprints = towerBlueprintsByZone(zone).take(towersToAdd)
       newBlueprints.foreach(With.groundskeeper.suggest)

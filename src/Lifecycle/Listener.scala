@@ -4,7 +4,7 @@ import bwapi.{BWEventListener, Player}
 
 object Listener extends BWEventListener {
 
-  var bot: Option[Bot] = None
+  var bot: Option[BWEventListener] = None
 
   var lastException: Option[Exception] = None
   var lastStackTrace: Option[String] = None
@@ -13,7 +13,7 @@ object Listener extends BWEventListener {
   override def onStart(): Unit = {
     try {
       With.game = JBWAPIClient.getGame
-      bot = Some(new Bot())
+      bot = Some(new BotScratch())
       bot.get.onStart()
     }
     catch { case exception: Exception =>

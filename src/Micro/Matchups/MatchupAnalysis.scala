@@ -63,7 +63,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   
   private def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = {
     if (shooter.canAttack(victim)) return true
-    if (shooter.unitClass.canAttack(shooter)
+    if (shooter.unitClass.canAttack(victim)
       && shooter.framesToBeReadyForAttackOrder < victim.framesToTravelPixels(shooter.pixelRangeAgainst(victim) - shooter.pixelDistanceEdge(victim))) return true
     false
   }

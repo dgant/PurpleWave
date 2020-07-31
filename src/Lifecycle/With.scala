@@ -176,6 +176,7 @@ object With {
       BWTA.analyze()
     } catch { case exception: Exception =>
       With.logger.onException(exception)
+      With.logger.debug("Retrying terrain analysis with assertions disabled.")
       // With the error logged, try again
       BWTA.readMap(With.game)
       BWTA.setFailOnError(false)

@@ -69,11 +69,11 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   var lastShieldPoints          : Int = _
   var lastDefensiveMatrixPoints : Int = _
   var lastCooldown              : Int = _
-  var lastFrameTakingDamage     : Int = _
-  var lastFrameTryingToMove     : Int = _
-  var lastFrameTryingToAttack   : Int = _
-  var lastFrameStartingAttack   : Int = _
-  var lastFrameOccupied         : Int = _
+  var lastFrameTakingDamage     : Int = - Forever()
+  var lastFrameTryingToMove     : Int = - Forever()
+  var lastFrameTryingToAttack   : Int = - Forever()
+  var lastFrameStartingAttack   : Int = - Forever()
+  var lastFrameOccupied         : Int = - Forever()
   var framesFailingToMove       : Int = 0
   var framesFailingToAttack     : Int = 0
   var hasEverBeenCompleteHatch  : Boolean = false // Stupid AIST hack fix for detecting whether a base is mineable
@@ -641,10 +641,10 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   ////////////////
   
   def visibleToOpponents: Boolean =
-    if (isFriendly)
-      With.grids.enemyVision.isSet(tileIncludingCenter) || With.framesSince(lastFrameTakingDamage) < GameTime(0, 2)() || With.framesSince(lastFrameStartingAttack) < GameTime(0, 2)()
-    else
+    if (isEnemy)
       visible
+    else
+      With.grids.enemyVision.isSet(tileIncludingCenter) || With.framesSince(lastFrameTakingDamage) < GameTime(0, 2)() || With.framesSince(lastFrameStartingAttack) < GameTime(0, 2)()
   
   @inline def likelyStillThere: Boolean = cacheLikelyStillThere()
   private val cacheLikelyStillThere = new Cache(() => possiblyStillThere &&

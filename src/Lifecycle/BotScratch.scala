@@ -1,6 +1,6 @@
 package Lifecycle
 
-import bwapi.{DefaultBWListener, Game, Text}
+import bwapi.{Color, DefaultBWListener, Game, Text}
 
 class BotScratch extends DefaultBWListener {
 
@@ -11,8 +11,8 @@ class BotScratch extends DefaultBWListener {
     game.setScreenPosition(32 * 64, 32 * 64)
     game.setLocalSpeed(50)
     game.setTextSize(Text.Size.Large)
+    game.drawLineScreen(0, 0, 640, 480, Color.Brown)
     game.drawTextScreen(300, 180, game.getFrameCount.toString)
-    duration += 0.01
     Thread.sleep(duration.toInt)
   }
 

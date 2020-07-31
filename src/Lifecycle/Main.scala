@@ -1,8 +1,13 @@
 package Lifecycle
 
+import bwapi.BWClientConfiguration
+
 object Main {
 
   def main(args: Array[String]) {
-    JBWAPIClient.startGame(true)
+    val configuration = new BWClientConfiguration
+    configuration.async = true
+    configuration.autoContinue = true
+    JBWAPIClient.startGame(configuration)
   }
 }

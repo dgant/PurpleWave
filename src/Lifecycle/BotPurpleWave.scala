@@ -3,7 +3,7 @@ package Lifecycle
 import Debugging._
 import bwapi.DefaultBWListener
 
-class Bot() extends DefaultBWListener {
+class BotPurpleWave extends DefaultBWListener {
 
   override def onStart() {
     try {

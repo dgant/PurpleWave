@@ -8,7 +8,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Evacuate extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.isTransport && unit.matchups.framesToLive < unit.loadedUnits.size * 24
+    unit.isTransport && unit.loadedUnits.nonEmpty && unit.matchups.framesToLive < unit.loadedUnits.size * 24
   )
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {

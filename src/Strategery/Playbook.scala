@@ -40,12 +40,16 @@ object StrategyGroups {
     PvE3BaseIslandCarrier, // Disabled for Sparkle in TorchUp
 
     PvTProxyDarkTemplar,
-    PvZLateGameCarrier, // Needs island tech
+
+    PvZDT,       // Requires better micro on one base
+    PvZCorsair,  // Requires better micro on one base
+    PvZSpeedlot, // Requires better micro on one base
     PvZGatewayFE, // Execution needs work; in particular, Zealots need to protect cannons
     PvZMidgame4Gate2Archon,
     PvZMidgameNeoNeoBisu,
     PvZMidgameCorsairReaverGoon, // Too fragile
     PvZMidgameCorsairReaverZealot, // Too fragile; especially bad at dealing with Mutalisks
+    PvZLateGameCarrier, // Needs island tech
 
     ZvTProxyHatchZerglings,
     ZvTProxyHatchHydras,

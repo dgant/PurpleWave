@@ -13,6 +13,9 @@ object Opponents {
   val metabot     : Opponent = add("MetaBot",   StrategySelectionFixed(PvPRobo))
   val betastar    : Opponent = add("BetaStar")
   val xiaoyi      : Opponent = add("XIAOYI",    StrategySelectionFixed(PvT13Nexus, PvT2BaseCarrier))
+  val aiur        : Opponent = add("AIUR",      StrategySelectionFixed(PvPRobo)) // Metabot stand-in
+  val skynet      : Opponent = add("Skynet",    StrategySelectionFixed(PvPRobo)) // Metabot stand-in
+  val ximp        : Opponent = add("XIMP",      StrategySelectionFixed(PvPRobo)) // Metabot stand-in
 
   // Aliased
   val iron        : Opponent = add("Iron")
@@ -20,13 +23,14 @@ object Opponents {
   val megabot     : Opponent = add("MegaBot")
   //val zzzkbot     : Opponent = add("ZZZKBot")
   val ualbertabot : Opponent = add("UAlbertaBot")
-  val aiur        : Opponent = add("AIUR")
+  //val aiur        : Opponent = add("AIUR")
   val overkill    : Opponent = add("Overkill")
   val zia         : Opponent = add("Zia")
   val srbotone    : Opponent = add("SRBotOne")
   val cunybot     : Opponent = add("CUNYBot")
 
   // Aliases
+  val andrewsmith       : Opponent = add("Andrew Smith",       skynet.policy)
   val ironbot           : Opponent = add("Iron bot",           iron.policy)
   val martinrooijackers : Opponent = add("Martin Rooijackers", letabot.policy)
   val megabot2017       : Opponent = add("MegaBot2017",        megabot.policy)
@@ -37,6 +41,7 @@ object Opponents {
   val ziabot            : Opponent = add("Zia bot",            zia.policy)
   val johankayser       : Opponent = add("Johan Kayser",       srbotone.policy)
   val bryanweber        : Opponent = add("Bryan Weber",        cunybot.policy)
+  val tomasvajda        : Opponent = add("Tomas Vajda",        ximp.policy)
   val jadien            : Opponent = add("jadien",             iron.policy)
   
   val all: Vector[Opponent] = allKnown

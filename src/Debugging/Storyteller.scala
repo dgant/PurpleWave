@@ -2,7 +2,7 @@ package Debugging
 
 import Debugging.Visualizations.Views.Planning.{ShowStrategyEvaluations, ShowStrategyInterest}
 import Information.Fingerprinting.Generic.GameTime
-import Lifecycle.With
+import Lifecycle.{JBWAPIClient, With}
 import Planning.Predicates.Reactive.{SafeAtHome, SafeToMoveOut}
 import Planning.UnitMatchers.UnitMatchHatchery
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -74,6 +74,7 @@ class Storyteller {
     logOurUnits()
     if (firstLog) {
       firstLog = false
+      logEnvironment()
       logStrategyEvaluation()
       logStrategyInterest()
     }
@@ -116,6 +117,16 @@ class Storyteller {
       Seq(1000, With.performance.framesOver1000),
       Seq(10000, With.performance.framesOver10000)).map(line => line.head.toString + "ms: " + line.last.toString).mkString("\n"))
     With.logger.debug("Our performance was " + (if (With.performance.disqualified) "BAD" else if (With.performance.danger) "DANGEROUS" else "good"))
+    With.logger.debug(JBWAPIClient.getPerformanceMetrics.toString)
+  }
+
+  private def logEnvironment(): Unit = {
+    With.logger.debug("OS:             " + System.getProperty("os.name") + " " + System.getProperty("os.version") + " " + System.getProperty("os.arch"))
+    With.logger.debug("JRE:            " + System.getProperty("java.vendor") + " - " + System.getProperty("java.version"))
+    With.logger.debug("CPUs available: " + Runtime.getRuntime.availableProcessors())
+    With.logger.debug("Free memory:    " + Runtime.getRuntime.freeMemory()  / 1000000 + " MB")
+    With.logger.debug("Total memory:   " + Runtime.getRuntime.totalMemory() / 1000000 + " MB")
+    With.logger.debug("Max memory:     " + Runtime.getRuntime.maxMemory()   / 1000000 + " MB")
   }
 
   private def logStrategyEvaluation(): Unit = {

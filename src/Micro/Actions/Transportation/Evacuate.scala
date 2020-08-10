@@ -12,7 +12,7 @@ object Evacuate extends Action {
   )
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    With.commander.unload(unit, unit.loadedUnits.head)
+    unit.loadedUnits.headOption.foreach(With.commander.unload(unit, _))
     Avoid.delegate(unit)
   }
 }

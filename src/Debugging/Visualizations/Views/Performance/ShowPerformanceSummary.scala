@@ -2,7 +2,7 @@ package Debugging.Visualizations.Views.Performance
 
 import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.View
-import Lifecycle.With
+import Lifecycle.{JBWAPIClient, With}
 import bwapi.Text
 
 object ShowPerformanceSummary extends View {
@@ -12,6 +12,7 @@ object ShowPerformanceSummary extends View {
     DrawScreen.header(80, With.latency.turnSize                   + " frames/turn")
     DrawScreen.header(155, With.performance.meanFrameMilliseconds + "ms avg")
     DrawScreen.header(230, With.performance.maxFrameMilliseconds  + "ms max")
+    DrawScreen.header(305, JBWAPIClient.framesBehind() + " frames back")
     val short = "+" + With.performance.frameLimitShort.toString + "ms: "
     With.game.drawTextScreen(5,   2 * With.visualization.lineHeightSmall, short         + With.performance.framesOverShort  + "/320")
     With.game.drawTextScreen(80,  2 * With.visualization.lineHeightSmall, "+1000ms: "   + With.performance.framesOver1000   + "/10")

@@ -1,6 +1,6 @@
 package Performance
 
-import Lifecycle.With
+import Lifecycle.{JBWAPIClient, With}
 
 class PerformanceMonitor {
   
@@ -47,7 +47,7 @@ class PerformanceMonitor {
   }
 
   def continueRunning: Boolean = {
-    With.frame == 0 || millisecondsLeftBeforeTarget > 1 || ! enablePerformancePauses
+    With.frame == 0 || ! enablePerformancePauses || (millisecondsLeftBeforeTarget > 1 && JBWAPIClient.framesBehind() < 1)
   }
 
   def violatedTarget: Boolean = {

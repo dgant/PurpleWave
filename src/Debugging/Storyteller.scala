@@ -10,6 +10,9 @@ import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrades
 import Utilities.ByOption
+import java.lang.management.ManagementFactory
+
+import com.sun.management.OperatingSystemMXBean
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -121,12 +124,13 @@ class Storyteller {
   }
 
   private def logEnvironment(): Unit = {
-    With.logger.debug("OS:             " + System.getProperty("os.name") + " " + System.getProperty("os.version") + " " + System.getProperty("os.arch"))
-    With.logger.debug("JRE:            " + System.getProperty("java.vendor") + " - " + System.getProperty("java.version"))
-    With.logger.debug("CPUs available: " + Runtime.getRuntime.availableProcessors())
-    With.logger.debug("Free memory:    " + Runtime.getRuntime.freeMemory()  / 1000000 + " MB")
-    With.logger.debug("Total memory:   " + Runtime.getRuntime.totalMemory() / 1000000 + " MB")
-    With.logger.debug("Max memory:     " + Runtime.getRuntime.maxMemory()   / 1000000 + " MB")
+    With.logger.debug("OS:               " + System.getProperty("os.name") + " " + System.getProperty("os.version") + " " + System.getProperty("os.arch"))
+    With.logger.debug("JRE:              " + System.getProperty("java.vendor") + " - " + System.getProperty("java.version"))
+    With.logger.debug("CPUs available:   " + Runtime.getRuntime.availableProcessors())
+    With.logger.debug("System memory:    " + ManagementFactory.getOperatingSystemMXBean.asInstanceOf[OperatingSystemMXBean].getTotalPhysicalMemorySize)
+    With.logger.debug("JVM Free memory:  " + Runtime.getRuntime.freeMemory()  / 1000000 + " MB")
+    With.logger.debug("JVM Total memory: " + Runtime.getRuntime.totalMemory() / 1000000 + " MB")
+    With.logger.debug("JVM Max memory:   " + Runtime.getRuntime.maxMemory()   / 1000000 + " MB")
   }
 
   private def logStrategyEvaluation(): Unit = {

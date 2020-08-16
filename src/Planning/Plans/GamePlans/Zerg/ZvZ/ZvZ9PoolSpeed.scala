@@ -29,7 +29,12 @@ class ZvZ9PoolSpeed extends GameplanTemplate {
   
   override def attackPlan: Plan = new If(
     new Or(
-      new Not(new EnemyStrategy(With.fingerprints.fourPool)),
+      new And(
+        new Not(new EnemyStrategy(With.fingerprints.fourPool)),
+        new Not(new EnemyStrategy(With.fingerprints.ninePoolGas))),
+      new And(
+        new UpgradeComplete(Zerg.ZerglingSpeed),
+        new Not(new EnemyHasUpgrade(Zerg.ZerglingSpeed))),
       new UnitsAtLeast(3, Zerg.Mutalisk, complete = true)),
     new Attack)
 

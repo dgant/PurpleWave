@@ -13,16 +13,12 @@ class Logger {
   private var errorOcurred = false
   
   def flush(): Unit = {
-    val shouldFlush = errorOcurred || With.configuration.debugging
-
-    if ( ! shouldFlush) return
-
     var opponents: String = ""
     try {
       opponents = With.enemies.map(_.name).mkString("-")
     } catch { case exception: Exception => }
     
-    val filename = With.bwapiData.write + opponents + ".log.txt"
+    val filename = With.bwapiData.write + opponents + (if (errorOcurred) ".error" else ".normal") + ".log.txt"
     val file = new File(filename)
     val printWriter = new PrintWriter(file)
     printWriter.write(logMessages.mkString("\r\n"))

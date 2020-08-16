@@ -127,10 +127,10 @@ class Storyteller {
     With.logger.debug("OS:               " + System.getProperty("os.name") + " " + System.getProperty("os.version") + " " + System.getProperty("os.arch"))
     With.logger.debug("JRE:              " + System.getProperty("java.vendor") + " - " + System.getProperty("java.version"))
     With.logger.debug("CPUs available:   " + Runtime.getRuntime.availableProcessors())
-    With.logger.debug("System memory:    " + ManagementFactory.getOperatingSystemMXBean.asInstanceOf[OperatingSystemMXBean].getTotalPhysicalMemorySize)
-    With.logger.debug("JVM Free memory:  " + Runtime.getRuntime.freeMemory()  / 1000000 + " MB")
-    With.logger.debug("JVM Total memory: " + Runtime.getRuntime.totalMemory() / 1000000 + " MB")
+    With.logger.debug("System memory:    " + ManagementFactory.getOperatingSystemMXBean.asInstanceOf[OperatingSystemMXBean].getTotalPhysicalMemorySize / 1000000 + " MB")
     With.logger.debug("JVM Max memory:   " + Runtime.getRuntime.maxMemory()   / 1000000 + " MB")
+    With.logger.debug("JVM Total memory: " + Runtime.getRuntime.totalMemory() / 1000000 + " MB")
+    With.logger.debug("JVM Free memory:  " + Runtime.getRuntime.freeMemory()  / 1000000 + " MB")
   }
 
   private def logStrategyEvaluation(): Unit = {

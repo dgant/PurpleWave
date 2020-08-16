@@ -10,8 +10,8 @@ import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, PumpWorkers, RequireSufficientSupply}
-import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Placement.ProposePlacement
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.And
 import Planning.Predicates.Economy.{GasAtLeast, SupplyBlocked}
@@ -37,7 +37,7 @@ class TvZProxy8Fact extends GameplanTemplate {
 
   override def placementPlan: Plan = new ProposePlacement {
     override lazy val blueprints = Vector(
-      new Blueprint(this, building = Some(Terran.Factory),  preferZone = ProxyPlanner.proxyAutomaticAggressive, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)))
+      new Blueprint(Terran.Factory,  preferZone = ProxyPlanner.proxyAutomaticAggressive, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)))
   }
   
   override val buildOrder: Seq[BuildRequest] = Vector(

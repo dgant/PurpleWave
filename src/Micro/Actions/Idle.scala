@@ -11,14 +11,12 @@ import Micro.Actions.Transportation.Transport
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Idle extends Action {
-  
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    true
-  }
-  
-  override def perform(unit: FriendlyUnitInfo) {
-    actions.foreach(_.consider(unit))
-  }
+
+  @inline
+  final override def allowed(unit: FriendlyUnitInfo): Boolean = true
+
+  @inline
+  final override def perform(unit: FriendlyUnitInfo): Unit = actions.foreach(_.consider(unit))
   
   private val actions = Vector(
     HackyRazeGasSteal,

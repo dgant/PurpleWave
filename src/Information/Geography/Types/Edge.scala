@@ -18,7 +18,7 @@ class Edge(choke: Chokepoint) {
   lazy val radiusPixels : Double = choke.getWidth / 2
   lazy val tiles        : Vector[Tile] = PixelRay(sidePixels.head, sidePixels.last).tilesIntersected.toVector
   lazy val sidePixels   : Seq[Pixel] = Vector(new Pixel(choke.getSides.getLeft), new Pixel(choke.getSides.getRight))
-  lazy val endPixels: Vector[Pixel] = Vector(-1, 1)
+  lazy val endPixels    : Vector[Pixel] = Vector(-1, 1)
     .map(m => pixelCenter
       .radiateRadians(
         PurpleMath.atan2(

@@ -13,8 +13,7 @@ class BuildGasPumps(quantity: Int = Int.MaxValue, pumpType: UnitClass = With.sel
     (
       gas.tileTopLeft,
       new Blueprint(
-        this,
-        building = Some(pumpType),
+        pumpType,
         requireZone = Some(gas.zone),
         requireCandidates = Some(Seq(gas.tileTopLeft))
       )
@@ -28,7 +27,7 @@ class BuildGasPumps(quantity: Int = Int.MaxValue, pumpType: UnitClass = With.sel
     val eligibleBlueprints  = eligibleGasToTake.map(_.tileTopLeft).flatMap(blueprints.get)
     val finalBlueprints     = eligibleBlueprints.take(quantity)
     val gasToRequest        = Math.min(quantity, eligibleGas.size)
-    finalBlueprints.foreach(With.groundskeeper.propose)
+    finalBlueprints.foreach(With.groundskeeper.suggest)
     With.scheduler.request(this, Get(gasToRequest, pumpType))
   }
 }

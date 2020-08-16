@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Situational
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Planning.Plans.Macro.Build.ProposePlacement
+import Planning.Plans.Placement.ProposePlacement
 import ProxyBwapi.Races.Protoss
 
 class Nexus2GateThenCannons extends ProposePlacement {
@@ -13,11 +13,11 @@ class Nexus2GateThenCannons extends ProposePlacement {
     val naturalZone = naturalBase.zone
     val marginPixels = naturalZone.exit.map(_.pixelCenter.pixelDistance(naturalBase.townHallArea.midPixel) - Protoss.Nexus.radialHypotenuse).getOrElse(128.0)
     val output = Vector(
-      new Blueprint(this, building = Some(Protoss.Pylon)),
-      new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(marginPixels - 96.0)),
-      new Blueprint(this, building = Some(Protoss.PhotonCannon), requireZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(marginPixels)),
-      new Blueprint(this, building = Some(Protoss.PhotonCannon), requireZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(marginPixels)),
-      new Blueprint(this, building = Some(Protoss.PhotonCannon), requireZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(marginPixels)))
+      new Blueprint(Protoss.Pylon),
+      new Blueprint(Protoss.Pylon,        requireZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(marginPixels - 96.0)),
+      new Blueprint(Protoss.PhotonCannon, requireZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(marginPixels)),
+      new Blueprint(Protoss.PhotonCannon, requireZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(marginPixels)),
+      new Blueprint(Protoss.PhotonCannon, requireZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(marginPixels)))
     output
   }
 }

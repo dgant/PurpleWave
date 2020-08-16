@@ -2,9 +2,9 @@ package Planning.Plans.Macro.Build
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
-import Macro.Architecture.Blueprint
 import Macro.Buildables.{Buildable, BuildableUnit}
 import Macro.Scheduling.MacroCounter
+import Macro.Architecture.PlacementRequests.PlacementRequest
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
@@ -23,27 +23,29 @@ class BuildBuilding(val buildingClass: UnitClass) extends ProductionPlan {
   override def producerInProgress: Boolean = building.isDefined
   override def buildable: Buildable = BuildableUnit(buildingClass)
 
-  val buildingDescriptor  = new Blueprint(this, Some(buildingClass))
-  val currencyLock        = new LockCurrencyForUnit(buildingClass)
+  private var orderedTile : Option[Tile]              = None
+  private var building    : Option[FriendlyUnitInfo]  = None
   
-  private var desiredTile   : Option[Tile]              = None
-  private var orderedTile   : Option[Tile]              = None
-  private var building      : Option[FriendlyUnitInfo]  = None
-  
-  val builderMatcher = buildingClass.whatBuilds._1
-  val builderLock = new LockUnits {
-    description.set("Get a builder")
+  val currencyLock = new LockCurrencyForUnit(buildingClass)
+
+  val builderMatcher: UnitClass = buildingClass.whatBuilds._1
+  val builderLock: LockUnits = new LockUnits {
     unitCounter.set(UnitCountOne)
     unitMatcher.set(builderMatcher)
     interruptable.set(false)
   }
     
-  description.set("Build a " + buildingClass)
-  
-  override def isComplete: Boolean = building.exists(b => MacroCounter.countComplete(b)(buildingClass) > 0)
-  
   var waitForBuilderToRecallUntil: Option[Int] = None
-  
+  var placement: Option[PlacementRequest] = None
+
+  def desiredTile: Option[Tile] = building.map(_.tileTopLeft).orElse(placement.flatMap(_.tile))
+
+  override def isComplete: Boolean = building.exists(b => MacroCounter.countComplete(b)(buildingClass) > 0)
+
+  override def onCompletion(): Unit = {
+    placement.foreach(p => With.groundskeeper.consume(p.blueprint, building.get))
+  }
+
   override def onUpdate() {
 
     lazy val possibleBuildings = With.units.ours.filter(u =>
@@ -62,21 +64,15 @@ class BuildBuilding(val buildingClass: UnitClass) extends ProductionPlan {
       .orElse(ByOption.minBy(possibleBuildings)(_.frameDiscovered))
     building.foreach(_.friendly.foreach(_.setProducer(this)))
 
-    desiredTile = building.map(_.tileTopLeft).orElse(
-      if (currencyLock.satisfied && currencyLock.expectedFrames < With.blackboard.maxFramesToSendAdvanceBuilder)
-        With.groundskeeper.demand(buildingDescriptor)
-      else
-        With.groundskeeper.require(buildingDescriptor))
+    if (building.isEmpty) {
+      placement = Some(With.groundskeeper.suggest(this, buildingClass))
+    }
 
     // Reserve money if we have a place to build, or if it's early game and we expect to get one eventually
     if (desiredTile.isDefined || With.frame >= With.configuration.maxFramesToTrustBuildRequest) {
       currencyLock.framesPreordered = (buildingClass.buildUnitsEnabling.map(With.projections.unit) :+ 0).max
       currencyLock.isSpent = building.isDefined
       currencyLock.acquire(this)
-    }
-
-    if (building.isDefined) {
-      With.groundskeeper.flagFulfilled(buildingDescriptor, building.get)
     }
 
     if ( ! needBuilder) {
@@ -134,6 +130,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends ProductionPlan {
             canAttack   = false
           })
         }
+        desiredTile.foreach(With.groundskeeper.reserve(this, _, buildingClass))
       }
       else if (buildingClass.isTerran) {
         builder.agent.intend(this, new Intention {
@@ -162,7 +159,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends ProductionPlan {
     travelFrames + 48 >= currencyLock.expectedFrames
   }
   
-  override def visualize() {
+  override def renderMap() {
     if (isComplete) return
     if (orderedTile.isEmpty) return
     DrawMap.box(
@@ -175,4 +172,6 @@ class BuildBuilding(val buildingClass: UnitClass) extends ProductionPlan {
       drawBackground = true,
       With.self.colorDark)
   }
+
+  description.set("Build a " + buildingClass)
 }

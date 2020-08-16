@@ -11,7 +11,7 @@ import Planning.Plans.GamePlans.Zerg.ZergIdeas.PumpMutalisks
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Zerg.BuildSunkensInMain
+import Planning.Plans.Placement.BuildSunkensInMain
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
@@ -54,7 +54,6 @@ class ZvZ9PoolSpeed extends GameplanTemplate {
   
   override def buildPlans: Seq[Plan] = Vector(
     new DefendFightersAgainstRush,
-
     new CapGasAtRatioToMinerals(1.0, 50),
     new If(
       new Not(new UnitsAtLeast(1, Zerg.Spire)),
@@ -63,7 +62,7 @@ class ZvZ9PoolSpeed extends GameplanTemplate {
         new CapGasAt(150),
         new If(
           new GasForUpgrade(Zerg.ZerglingSpeed),
-          new CapGasWorkersAt(2)))),
+            new CapGasWorkersAt(2)))),
 
     new Pump(Zerg.SunkenColony),
     new If(

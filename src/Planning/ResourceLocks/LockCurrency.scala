@@ -16,7 +16,7 @@ class LockCurrency {
   
   def satisfied: Boolean = isSatisfied || isSpent
   
-  def acquire(plan:Plan) {
+  def acquire(plan: Plan) {
     owner = plan
     With.bank.request(this)
   }

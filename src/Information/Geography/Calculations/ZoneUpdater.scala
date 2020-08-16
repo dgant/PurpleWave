@@ -34,12 +34,6 @@ object ZoneUpdater {
             .foreach(_.isNaturalOf = Some(startLocationBase)))
     }
   
-    val plannedBases = With.groundskeeper.proposalPlacements
-      .flatMap(placement => placement._2.tile)
-      .flatMap(tile => if (tile.zone.bases.isEmpty) None else Some(tile.zone.bases.minBy(_.heart.tileDistanceFast(tile))))
-      .filter(_.owner.isNeutral)
-      .toSet
-  
     With.geography.zones.foreach(zone => { zone.owner = With.neutral; zone.contested = false })
     val playerBorders = Players.all
       .filterNot(_.isNeutral)

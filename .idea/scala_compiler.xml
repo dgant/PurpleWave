@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ScalaCompilerConfiguration">
     <option name="compileOrder" value="JavaThenScala" />
+    <option name="postfixOps" value="true" />
     <option name="featureWarnings" value="true" />
     <option name="optimiseBytecode" value="true" />
     <option name="explainTypeErrors" value="true" />

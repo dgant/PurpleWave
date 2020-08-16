@@ -17,7 +17,7 @@ class BuildAddon(val addonClass: UnitClass) extends ProductionPlan {
   override def producerInProgress: Boolean = addon.isDefined
   override def buildable: Buildable = BuildableUnit(addonClass)
 
-  val buildingDescriptor  = new Blueprint(this, Some(addonClass))
+  val buildingDescriptor  = new Blueprint(addonClass)
   val currencyLock        = new LockCurrencyForUnit(addonClass)
   
   private var addon: Option[UnitInfo] = None
@@ -26,7 +26,7 @@ class BuildAddon(val addonClass: UnitClass) extends ProductionPlan {
     override def apply(unit: UnitInfo): Boolean = unit.addon.forall(addon.contains)
   })
   
-  val builderLock = new LockUnits {
+  val builderLock: LockUnits = new LockUnits {
     description.set("Get a builder")
     unitCounter.set(UnitCountOne)
     unitMatcher.set(builderMatcher)
@@ -39,7 +39,6 @@ class BuildAddon(val addonClass: UnitClass) extends ProductionPlan {
   override def onUpdate() {
     
     if (isComplete) {
-      With.groundskeeper.flagFulfilled(buildingDescriptor, addon.get)
       return
     }
       

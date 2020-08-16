@@ -6,6 +6,10 @@ case class TileRectangle(
   startInclusive : Tile,
   endExclusive   : Tile) {
 
+  def this() {
+    this(new Tile(0), new Tile(0))
+  }
+
   def this(tile: Tile) {
     this(tile, tile.add(1, 1))
   }

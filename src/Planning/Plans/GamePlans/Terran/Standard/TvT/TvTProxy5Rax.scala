@@ -9,7 +9,7 @@ import Planning.Plans.Basic.{Do, NoPlan, Write}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
-import Planning.Plans.Macro.Build.ProposePlacement
+import Planning.Plans.Placement.ProposePlacement
 import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Milestones.FoundEnemyBase
@@ -26,8 +26,8 @@ class TvTProxy5Rax extends GameplanTemplate {
 
   override def placementPlan: Plan = new ProposePlacement{
     override lazy val blueprints = Vector(
-      new Blueprint(this,
-        building = Some(Terran.Barracks),
+      new Blueprint(
+        Terran.Barracks,
         preferZone = ProxyPlanner.proxyMiddle,
         placement = Some(PlacementProfiles.proxyBuilding)))
   }

@@ -11,7 +11,7 @@ import bwapi.{Player, Race, Unit}
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
-abstract class PlayerProxy(base:Player) {
+abstract class PlayerProxy(base: Player) {
   
   lazy val id             : Int       = base.getID
   lazy val name           : String    = base.getName
@@ -84,4 +84,6 @@ abstract class PlayerProxy(base:Player) {
         .withFilter(u => u.complete && u.unitClass.race == raceInitial)
         .map(_.unitClass.supplyProvided)
         .sum))
+
+  override val hashCode: Int = id
 }

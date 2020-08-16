@@ -8,10 +8,10 @@ import Planning.Plan
 import Planning.Plans.Army.KillPsiDisruptor
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildTowersAtBases
+import Planning.Plans.Placement.ProposePlacement
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Milestones.{EnemyHasShown, OnGasPumps, UnitsAtLeast, UpgradeComplete}
 import Planning.Predicates.Reactive.EnemyMutalisks
@@ -25,9 +25,9 @@ import Utilities.ByOption
 
 class PlaceIslandPylons extends ProposePlacement {
   override lazy val blueprints = Vector(
-    new Blueprint(this, building = Some(Protoss.Pylon), preferZone = Some(With.geography.ourMain.zone)),
-    new Blueprint(this, building = Some(Protoss.Pylon), preferZone = Some(With.geography.ourNatural.zone)),
-    new Blueprint(this, building = Some(Protoss.Pylon), preferZone =
+    new Blueprint(Protoss.Pylon, preferZone = Some(With.geography.ourMain.zone)),
+    new Blueprint(Protoss.Pylon, preferZone = Some(With.geography.ourNatural.zone)),
+    new Blueprint(Protoss.Pylon, preferZone =
       ByOption.minBy(
         With.geography.bases
           .filter(b => b != With.geography.ourMain && b != With.geography.ourNatural)

@@ -9,4 +9,5 @@ abstract class ProductionPlan extends Plan {
   def producerUnitLocks: Seq[LockUnits]
   def producerInProgress: Boolean
   def buildable: Buildable
+  def onCompletion(): Unit = {}
 }

@@ -8,9 +8,9 @@ import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
-import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.BuildGasPumps
+import Planning.Plans.Placement.ProposePlacement
 import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
@@ -31,8 +31,8 @@ class ZvTProxyHatch extends Parallel {
   private class WeKnowWhereToProxy extends Check(() => ProxyPlanner.proxyEnemyNatural.isDefined)
   private class WeHaveEnoughSunkens extends UnitsAtLeast(3, Zerg.SunkenColony, complete = false)
   
-  private def blueprintCreepColonyNatural: Blueprint = new Blueprint(this,
-    building     = Some(Zerg.CreepColony),
+  private def blueprintCreepColonyNatural: Blueprint = new Blueprint(
+    Zerg.CreepColony,
     requireZone  = ProxyPlanner.proxyEnemyNatural,
     placement    = Some(PlacementProfiles.proxyCannon))
   
@@ -43,8 +43,8 @@ class ZvTProxyHatch extends Parallel {
       new UnitsAtLeast(1, Zerg.Lair),
       new CapGasAt(400),
       new CapGasAt(100)),
-    new ProposePlacement { override lazy val blueprints = Vector(new Blueprint(this,
-      building = Some(Zerg.Extractor),
+    new ProposePlacement { override lazy val blueprints = Vector(new Blueprint(
+      Zerg.Extractor,
       requireZone = Some(With.geography.ourMain.zone))) },
     
     new Build(
@@ -57,7 +57,7 @@ class ZvTProxyHatch extends Parallel {
       new WeKnowWhereToProxy,
       new Parallel(
         new ProposePlacement { override lazy val blueprints = Vector(
-          new Blueprint(this, preferZone = ProxyPlanner.proxyEnemyNatural, building = Some(Zerg.Hatchery), placement = Some(PlacementProfiles.proxyBuilding)),
+          new Blueprint(Zerg.Hatchery, preferZone = ProxyPlanner.proxyEnemyNatural, placement = Some(PlacementProfiles.proxyBuilding)),
           blueprintCreepColonyNatural,
           blueprintCreepColonyNatural,
           blueprintCreepColonyNatural,

@@ -12,11 +12,13 @@ object PlacementHeuristicPowering extends PlacementHeuristic {
     if ( ! blueprint.powers.get) return HeuristicMathMultiplicative.default
     
     With.grids.psi2Height.psiPoints
-      .map(candidate.add)
-      .count(tile =>
-        tile.valid
-        && With.grids.buildable.get(tile)
-        && ! With.grids.psi2Height.isSet(tile)
-        && ! With.architecture.powered2Height.get(tile))
+      .count(point => {
+        val tile = candidate.add(point)
+        val i = tile.i
+        (tile.valid
+          && With.grids.buildable.getUnchecked(i)
+          && ! With.grids.psi2Height.isSetUnchecked(i)
+          && ! With.architecture.powered2Height.getUnchecked(i))
+      })
   }
 }

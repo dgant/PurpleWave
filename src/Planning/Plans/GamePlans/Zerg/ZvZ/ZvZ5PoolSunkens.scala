@@ -11,8 +11,8 @@ import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.Pump
-import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Placement.ProposePlacement
 import Planning.Plans.Scouting.ScoutWithWorkers
 import Planning.Predicates.Compound.{And, Check}
 import Planning.Predicates.Milestones.{FrameAtLeast, UnitsAtLeast}
@@ -29,8 +29,8 @@ class ZvZ5PoolSunkens extends GameplanTemplate {
   override def attackPlan: Plan = new Attack
   override def initialScoutPlan: Plan = NoPlan()
   
-  private def blueprintCreepColony: Blueprint = new Blueprint(this,
-    building    = Some(Zerg.CreepColony),
+  private def blueprintCreepColony: Blueprint = new Blueprint(
+    Zerg.CreepColony,
     requireZone = ProxyPlanner.proxyEnemyMain,
     placement   = Some(PlacementProfiles.tech))
   

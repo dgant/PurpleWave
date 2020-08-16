@@ -73,7 +73,6 @@ class Configuration {
   var maxFramesToSendAdvanceBuilder   = GameTime(0, 40)()
   var maxFramesToTrustBuildRequest    = GameTime(10, 0)()
   var blockerMineralThreshold         = 250 // Setting this goofily high as an AIIDE hack to account for the 249-mineral patches on Fortress
-  var maxPlacementAgeFrames           = GameTime(0, 8)()
   var enableTightBuildingPlacement    = false
   
   /////////////////
@@ -86,12 +85,8 @@ class Configuration {
   var performanceMinimumUnitSleep         = 2
   var maximumGamesHistoryPerOpponent      = 500
   
-  var urgentBuildingPlacement             = true
-  var urgentBuildingPlacementCutoffFrames = GameTime(15, 0)()
-  var urgentBuildingPlacementCooldown     = GameTime(0, 1)()
+  var buildingPlacementRefreshPeriod      = GameTime(0, 30)()
   var buildingPlacementMaxTilesToEvaluate = 300
-  var buildingPlacementBatchSize          = 300
-  var buildingPlacementBatchingStartFrame = GameTime(4, 0)()
   var buildingPlacementMaximumQueue       = 12
   
   var urgencyManners            = 1
@@ -111,8 +106,8 @@ class Configuration {
   
   var visualizeScreen                     = true
   var visualizeMap                        = true
-  var visualizationProbabilityHappyVision = 0.05
-  var visualizationProbabilityTextOnly    = 0.01
+  var visualizationProbabilityHappyVision = 0.0 // 0.05
+  var visualizationProbabilityTextOnly    = 0.0 // 0.01
   var visualizationCullViewport           = true
 
   var cameraDynamicSpeed          = false

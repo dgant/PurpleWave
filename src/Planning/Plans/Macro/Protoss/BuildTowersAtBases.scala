@@ -34,8 +34,8 @@ class BuildTowersAtBases(
   private val pylonBlueprintByZone = With.geography.zones
     .map(zone =>(
       zone,
-      new Blueprint(this,
-        building          = Some(Protoss.Pylon),
+      new Blueprint(
+        Protoss.Pylon,
         requireZone       = Some(zone),
         requireCandidates = Some(zone.tilesSeq),
         placement         = Some(placementPylon))))
@@ -45,8 +45,8 @@ class BuildTowersAtBases(
     .map(zone => (
       zone,
       (1 to towersRequired).map(i =>
-        new Blueprint(this,
-          building          = Some(towerClass),
+        new Blueprint(
+          towerClass,
           requireZone       = Some(zone),
           requireCandidates = Some(zone.tilesSeq),
           placement         = Some(placementTower)))))
@@ -56,7 +56,7 @@ class BuildTowersAtBases(
     With.geography.ourBasesAndSettlements
   }
 
-  private def towerZone(zone: Zone): Unit= {
+  private def towerZone(zone: Zone): Unit = {
     lazy val pylonsInZone = zone.units.filter(u => u.isOurs && u.is(Protoss.Pylon))
     lazy val towersInZone = zone.units.filter(u => u.isOurs && u.is(towerClass))
     lazy val towersToAdd = towersRequired - towersInZone.size
@@ -64,14 +64,13 @@ class BuildTowersAtBases(
     val needPylons = towerClass.requiresPsi
     
     if (needPylons && pylonsInZone.isEmpty) {
-      With.groundskeeper.propose(pylonBlueprintByZone(zone))
+      With.groundskeeper.suggest(pylonBlueprintByZone(zone))
       new Pump(Protoss.Pylon, maximumConcurrently = 1)
     }
 
     if ( ! needPylons || pylonsInZone.exists(_.aliveAndComplete)) {
-      // Defensive programming measure. If we try re-proposing fulfilled blueprints we may just build towers forever.
-      val newBlueprints = towerBlueprintsByZone(zone).filterNot(With.groundskeeper.proposalsFulfilled.contains).take(towersToAdd)
-      newBlueprints.foreach(With.groundskeeper.propose)
+      val newBlueprints = towerBlueprintsByZone(zone).take(towersToAdd)
+      newBlueprints.foreach(With.groundskeeper.suggest)
       new Pump(towerClass, maximumConcurrently = towersToAdd).update()
     }
   }

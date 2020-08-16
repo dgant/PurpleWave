@@ -12,7 +12,7 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.BuildGasPumps
-import Planning.Plans.Macro.Terran.BuildBunkersAtNatural
+import Planning.Plans.Placement.BuildBunkersAtNatural
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones.UnitsAtLeast
@@ -31,9 +31,9 @@ class TvT14CC extends GameplanTemplate {
 
   val naturalZone: Zone = With.geography.ourNatural.zone
   override lazy val blueprints: Seq[Blueprint] = Seq(
-    new Blueprint(this, building = Some(Terran.Barracks),     preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(0)),
-    new Blueprint(this, building = Some(Terran.SupplyDepot),  preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(0)),
-    new Blueprint(this, building = Some(Terran.SupplyDepot),  preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(0))
+    new Blueprint(Terran.Barracks,     preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(0)),
+    new Blueprint(Terran.SupplyDepot,  preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(0)),
+    new Blueprint(Terran.SupplyDepot,  preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(0))
   )
 
   override def buildOrder: Seq[BuildRequest] = Seq(

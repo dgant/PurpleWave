@@ -16,6 +16,7 @@ import Micro.Coordination.Coordinator
 import Micro.Matchups.MatchupGraph
 import Micro.Squads.Squads
 import Performance.TaskQueue.{AbstractTaskQueue, TaskQueueGlobal}
+import Placement.Preplacement
 import Planning.{Blackboard, Yolo}
 import ProxyBwapi.Bullets.Bullets
 import ProxyBwapi.Players.{PlayerInfo, Players}
@@ -67,6 +68,7 @@ object With {
   var paths             : Paths                   = _
   var performance       : PerformanceMonitor      = _
   var placement         : PlacementCycle          = _
+  var preplacement      : Preplacement            = _
   var projections       : Projections             = _
   var proxy             : ProxyBWAPI              = _
   var prioritizer       : Prioritizer             = _
@@ -152,6 +154,7 @@ object With {
     paths             = new Paths
     performance       = new PerformanceMonitor
     placement         = new PlacementCycle
+    preplacement      = new Preplacement
     prioritizer       = new Prioritizer
     projections       = new Projections
     reaction          = new ReactionTimes

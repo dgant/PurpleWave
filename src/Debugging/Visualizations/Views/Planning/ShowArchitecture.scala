@@ -1,4 +1,4 @@
-package Debugging.Visualizations.Views.Geography
+package Debugging.Visualizations.Views.Planning
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}

@@ -24,10 +24,17 @@ class Logger {
     printWriter.write(logMessages.mkString("\r\n"))
     printWriter.close()
   }
-  
-  def onException(exception: Exception) {
+
+  /**
+    * Looks the same as the next method, except I set a debugging breakpoint in that one but not thihs one
+    */
+  def quietlyOnException(exception: Exception): Unit = {
     error("An exception was thrown on frame " + With.frame)
     error(formatException(exception))
+  }
+  
+  def onException(exception: Exception) {
+    quietlyOnException(exception)
   }
   
   def debug(message: String) {

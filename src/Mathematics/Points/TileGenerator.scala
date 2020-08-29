@@ -24,14 +24,14 @@ class TileGenerator(suggestedOrigin: Tile, val boundA: Tile, val boundB: Tile, v
     val output = nextOutput
     var foundNext: Boolean = false
     do {
-      if (sideBreadth > 0) {
-        sideBreadth = -sideBreadth
-      } else {
+      if (sideBreadth < 0) {
         dBreadth += 1
       }
+      sideBreadth = -sideBreadth
       if (dBreadth > maxBreadth) {
         dBreadth = 0
         dDepth += 1
+        sideBreadth = 1
       }
 
       _hasNext = dDepth <= maxDepth

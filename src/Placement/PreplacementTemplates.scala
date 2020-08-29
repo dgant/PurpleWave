@@ -1,6 +1,15 @@
 package Placement
 
-object Preplacements {
+object PreplacementTemplates {
+
+  val walkway = new PreplacementTemplate().add("-")
+
+  val townhall = new PreplacementTemplate().add(
+    "Txxx " +
+    "xxxx " +
+    "xxxx "
+  )
+
   val gateways21 = new PreplacementTemplate().add(
   "------------ " +
   "-GxxxPxGxxx- " +

@@ -67,8 +67,9 @@ class TaskPlanning extends AbstractTask {
     With.yolo.update()
     With.bank.update()
     With.recruiter.update()
-
     With.prioritizer.update()
+    With.preplacement.update()
+
     With.scheduler.reset()
     With.squads.clearConscripts()
     With.squads.startNewBatch()

@@ -3,10 +3,10 @@ package Lifecycle
 import Debugging.Visualizations.{Animations, Viewport, Visualization}
 import Debugging.{Camera, Logger, Storyteller}
 import Information.Battles.BattleClassifier
+import Information.Fingerprinting.Fingerprints
 import Information.Geography.Geography
 import Information.Geography.Pathfinding.Paths
 import Information.Grids.Grids
-import Information.Fingerprinting.Fingerprints
 import Information.{UnitsShown, _}
 import Macro.Allocation._
 import Macro.Architecture.Architecture
@@ -178,7 +178,7 @@ object With {
       BWTA.readMap(With.game)
       BWTA.analyze()
     } catch { case exception: Exception =>
-      With.logger.onException(exception)
+      With.logger.quietlyOnException(exception)
       With.logger.debug("Retrying terrain analysis with assertions disabled.")
       // With the error logged, try again
       BWTA.readMap(With.game)

@@ -36,9 +36,9 @@ class Visualization {
     ShowPerformanceSummary,
 
     // Temporary views
-    ShowPerformanceSummary,
-    ShowArchitecture,
-    ShowPlans
+    ShowPreplacement,
+    //ShowArchitecture,
+    //ShowPlans
   )
   
   var enabled   : Boolean = _
@@ -145,6 +145,7 @@ class Visualization {
     ShowPerformanceSummary,
     ShowProduction,
     ShowPlans,
+    ShowPreplacement,
     ShowReactionTime,
     ShowResources,
     ShowRushDistances,

@@ -54,7 +54,12 @@ class PlacementNode(request: PlacementRequest) extends PlacementState {
       // An inelegant design here:
       // If we don't need to do recursive placement (ie. we have no children to place)
       // then short-circuit the (slow) priority queue by giving it only the winning candidate.
-      val allTiles = task.tiles.filter(task.accept)
+      var allTiles: Seq[Tile] = Seq.empty
+      task.tiles.find(tiles => {
+        allTiles = tiles.filter(task.accept)
+        allTiles.nonEmpty
+      })
+
       if (allTiles.isEmpty) {
         fail()
         return

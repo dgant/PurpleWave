@@ -1,7 +1,6 @@
 package Macro.Architecture.PlacementRequests
 
 import Lifecycle.With
-import Macro.Architecture.Tiles.Surveyor
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Tile
 
@@ -13,9 +12,7 @@ class PlacementPolicyClassic(request: PlacementRequest) extends PlacementPolicy 
       && With.framesSince(request.lastPlacementFrame) < With.configuration.buildingPlacementRefreshPeriod)
   }
 
-  override def tiles: Seq[Tile] = {
-    Surveyor.candidates(request.blueprint).view.flatMap(_.tiles(request.blueprint))
-  }
+  override def tiles: Seq[Seq[Tile]] = tilesForRequest(request)
 
   override def accept(tile: Tile): Boolean = {
     request.blueprint.accepts(tile, Some(request))

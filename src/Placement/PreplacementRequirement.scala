@@ -3,9 +3,9 @@ package Placement
 import ProxyBwapi.UnitClasses.UnitClass
 import Utilities.ByOption
 
-class PreplacementType(val buildings: UnitClass*) {
-  var width: Int = ByOption.max(buildings.map(_.width)).getOrElse(1)
-  var height: Int = ByOption.max(buildings.map(_.height)).getOrElse(1)
+class PreplacementRequirement(val buildings: UnitClass*) {
+  var width: Int = ByOption.max(buildings.map(_.tileWidth)).getOrElse(1)
+  var height: Int = ByOption.max(buildings.map(_.tileHeight)).getOrElse(1)
 
   def this(theWidth: Int, theHeight: Int) {
     this()
@@ -21,4 +21,13 @@ class PreplacementType(val buildings: UnitClass*) {
   val requireBuildable: Boolean = true
   val walkableAfter: Boolean = false
   val buildableAfter: Boolean = false
+
+  override def toString: String = (
+      if (buildableAfter) "Unused"
+      else if (walkableAfter) "Walkway"
+      else if (buildings.nonEmpty) buildings.mkString(", ")
+      else "Building"
+    ) + " " + dimensionString
+
+  private def dimensionString: String = width + "x" + height
 }

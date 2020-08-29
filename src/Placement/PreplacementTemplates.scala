@@ -7,29 +7,77 @@ object PreplacementTemplates {
   val townhall = new PreplacementTemplate().add(
     "Txxx " +
     "xxxx " +
-    "xxxx "
-  )
+    "xxxx " )
 
-  val gateways21 = new PreplacementTemplate().add(
-  "------------ " +
-  "-GxxxPxGxxx- " +
-  "-xxxxxxxxxx- " +
-  "-xxxx--xxxx- " +
-  "------------ " )
+  val initialLayouts = Seq(
+    new PreplacementTemplate().add(
+      "---------- " +
+      "-GxxxGxxx- " +
+      "-xxxxxxxx- " +
+      "-xxxxxxxx- " +
+      "xPxYxxRxx- " +
+      "xxxxxxxxx- " +
+      "xxxxxxx--- "),
+    new PreplacementTemplate().add(
+      "---------- " +
+      "-GxxxGxxx- " +
+      "-xxxxxxxx- " +
+      "-xxxxxxxx- " +
+      "xPxYxxRxx--- " +
+      "xxxxxxRxxxxx " ))
 
-  val gateways12 = new PreplacementTemplate().add(
-  "-------- " +
-  "-GxxxPx- " +
-  "-xxxxxx- " +
-  "-xxxxPx- " +
-  "-Gxxxxx- " +
-  "-xxxxPx- " +
-  "-xxxxxx- " +
-  "-------- " )
+  val gateways = Seq(
+    new PreplacementTemplate().add(
+      "xxx-------- " +
+      "PxGxxxGxxx- " +
+      "xxxxxxxxxx- " +
+      "Pxxxxxxxxx- " +
+      "xxGxxxGxxx- " +
+      "Pxxxxxxxxx- " +
+      "xxxxxxxxxx- " +
+      "xxx-------- " ),
+    new PreplacementTemplate().add(
+      "xxx---- " +
+      "PxGxxx- " +
+      "xxxxxx- " +
+      "Pxxxxx- " +
+      "xxGxxx- " +
+      "Pxxxxx- " +
+      "xxxxxx- " +
+      "xxx---- " ),
+    new PreplacementTemplate().add(
+      "---------- " +
+      "-GxxxGxxx- " +
+      "-xxxxxxxx- " +
+      "-xxxxxxxx- " +
+      "--xPxPxx-- " ),
+    new PreplacementTemplate().add(
+      "xx--------- " +
+      "PxGxxxGxxx- " +
+      "xxxxxxxxxx- " +
+      "Pxxxxxxxxx- " +
+      "xx--------- " ),
+    new PreplacementTemplate().add(
+      "-------- " +
+      "-GxxxPx- " +
+      "-xxxxxx- " +
+      "-xxxxPx- " +
+      "-Gxxxxxx " +
+      "-xxxxPxx " +
+      "-xxxxxxx " +
+      "------xx " ))
 
-  val tech21 = new PreplacementTemplate().add(
-    "3xxPx3xx " +
-    "xxxxxxxx " )
+  val tech = Seq(
+    new PreplacementTemplate().add(
+      "3xxPx3xx " +
+      "xxxxxxxx " ),
+    new PreplacementTemplate().add(
+      "3xx " +
+      "xxx " +
+      "3xx " +
+      "xxx " +
+      "Pxx " +
+      "xxx " ))
 
   val batterycannon = new PreplacementTemplate().add(
     "--------- " +

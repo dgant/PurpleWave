@@ -97,7 +97,7 @@ class Base(val townHallTile: Tile)
     output ++= minerals.flatMap(_.tileArea.tilesSurrounding)
     output --= townHallTiles
 
-    output.toSet
+    output.filter(_.valid).toSet
   }
   lazy val resourcePathTilesI: Set[Int] = resourcePathTiles.map(_.i)
   

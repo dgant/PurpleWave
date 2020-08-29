@@ -37,11 +37,11 @@ class Preplacement {
     val directionBack = new Direction(exit.get, back.get)
 
     fits ++= preplacement.fit(exit.get, directionBack, PreplacementTemplates.batterycannon)
-    fits ++= preplacement.fit(exit.get, directionBack, PreplacementTemplates.gateways21)
-    fits ++= preplacement.fit(back.get, directionExit, PreplacementTemplates.tech21, 2)
-    fits ++= preplacement.fit(exit.get, directionBack, PreplacementTemplates.gateways21, 2)
-    fits ++= preplacement.fit(back.get, directionExit, PreplacementTemplates.tech21)
-    fits ++= preplacement.fit(exit.get, directionBack, PreplacementTemplates.gateways21, 5)
-    fits ++= preplacement.fit(exit.get, directionBack, PreplacementTemplates.gateways12, 10)
+    fits ++= preplacement.fitAny(exit.get, directionBack, PreplacementTemplates.initialLayouts)
+    fits ++= preplacement.fitAny(exit.get, directionBack, PreplacementTemplates.gateways, 1)
+    fits ++= preplacement.fitAny(back.get, directionExit, PreplacementTemplates.tech, 1)
+    fits ++= preplacement.fitAny(exit.get, directionBack, PreplacementTemplates.gateways, 1)
+    fits ++= preplacement.fitAny(back.get, directionExit, PreplacementTemplates.tech)
+    fits ++= preplacement.fitAny(exit.get, directionBack, PreplacementTemplates.gateways)
   }
 }

@@ -1,5 +1,6 @@
 package Placement
 
+import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Points.{Direction, Point, Tile, TileGenerator}
 import ProxyBwapi.UnitClasses.UnitClass
@@ -12,23 +13,28 @@ class Preplacer {
   private lazy val points = Array.fill[Option[PreplacementSlot]](With.mapTileWidth * With.mapTileHeight)(None)
   private val byDimensions = new mutable.HashMap[(Int, Int), ArrayBuffer[Tile]]
   private val byBuilding = new mutable.HashMap[UnitClass, ArrayBuffer[Tile]]
+  private val byZone = new mutable.HashMap[Zone, ArrayBuffer[PreplacementRequirement]]()
 
   def get(width: Int, height: Int): Seq[Tile] = byDimensions.getOrElse((width, height), Seq.empty)
   def get(building: UnitClass): Seq[Tile] = byBuilding.getOrElse(building, Seq.empty)
 
-  def fit(from: Tile, direction: Direction, template: PreplacementTemplate, maxFits: Int = 1): Seq[Fit] = {
+  def fitAny(from: Tile, direction: Direction, templates: Seq[PreplacementTemplate], maxFits: Int = 1): Seq[Fit] = {
     val output = new ArrayBuffer[Fit]
     val zone = from.zone
     val generator = new TileGenerator(from, zone.boundary.startInclusive, zone.boundary.endExclusive, direction)
     while(output.size < maxFits && generator.hasNext) {
       val tile = generator.next()
-      if (fits(tile, template)) {
-        val newFit = Fit(tile, template)
+      val template = templates.find(fits(tile, _))
+      template.foreach(t => {
+        val newFit = Fit(tile, t)
         output += newFit
-        place(newFit)
-      }
+        place(newFit)})
     }
     output
+  }
+
+  def fit(from: Tile, direction: Direction, template: PreplacementTemplate, maxFits: Int = 1): Seq[Fit] = {
+    fitAny(from, direction, Seq(template), maxFits)
   }
 
   def fits(origin: Tile, template: PreplacementTemplate): Boolean = {
@@ -110,5 +116,7 @@ class Preplacer {
       byDimensions.put(d, byDimensions.getOrElse(d, new ArrayBuffer[Tile]))
       byDimensions(d) += tile
     }
+    byZone.put(tile.zone, byZone.getOrElse(tile.zone, new ArrayBuffer[PreplacementRequirement]()))
+    byZone(tile.zone) += requirement
   }
 }

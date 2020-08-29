@@ -1,6 +1,6 @@
 package Placement
 
-import Mathematics.Points.{Point, Tile, TileRectangle}
+import Mathematics.Points._
 import Performance.{Cache, CacheForever}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.ByOption

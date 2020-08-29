@@ -6,7 +6,11 @@ object Surveyor {
   
   val tileSources = Seq(
     Seq(
-      TileSourcePreplacement),
+      TileSourcePreplacementSpecific),
+    Seq(
+      TileSourcePreplacementGeneral),
+    Seq(
+      TileSourcePreplacementWeak),
     Seq(
       TileSourceBlueprint,
       TileSourceBlueprintZoneRequired,

@@ -65,6 +65,7 @@ case class TileRectangle(
   def bottomleftPixel : Pixel = Pixel(startPixel.x, endPixel.y)
   
   lazy val cornerPixels: Array[Pixel] = Array(startPixel, topRightPixel, endPixel, bottomleftPixel)
+  lazy val cornerTilesInclusive: Array[Tile] = Array(startInclusive, Tile(endExclusive.x - 1, startInclusive.y), endExclusive.subtract(1, 1), Tile(startInclusive.x, endExclusive.y - 1))
   
   lazy val tiles: immutable.IndexedSeq[Tile] =
     (0 until endExclusive.x - startInclusive.x).flatMap(x =>

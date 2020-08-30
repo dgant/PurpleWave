@@ -2,7 +2,7 @@ package Placement
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
-import Mathematics.Points.{Direction, Point, Tile, TileGenerator}
+import Mathematics.Points._
 import ProxyBwapi.UnitClasses.UnitClass
 
 import scala.collection.mutable
@@ -18,27 +18,34 @@ class Preplacer {
   def get(width: Int, height: Int): Seq[Tile] = byDimensions.getOrElse((width, height), Seq.empty)
   def get(building: UnitClass): Seq[Tile] = byBuilding.getOrElse(building, Seq.empty)
 
-  def fitAny(from: Tile, direction: Direction, templates: Seq[PreplacementTemplate], maxFits: Int = 1): Seq[Fit] = {
+  def fitAny(from: Tile, bounds: TileRectangle, direction: Direction, templates: Seq[PreplacementTemplate], maxFits: Int = 1): Seq[Fit] = {
     val output = new ArrayBuffer[Fit]
-    val zone = from.zone
-    val generator = new TileGenerator(from, zone.boundary.startInclusive, zone.boundary.endExclusive, direction)
-    while(output.size < maxFits && generator.hasNext) {
-      val tile = generator.next()
-      val template = templates.find(fits(tile, _))
-      template.foreach(t => {
-        val newFit = Fit(tile, t)
-        output += newFit
-        place(newFit)})
+
+    var templateIndex = 0
+    while (templateIndex < templates.length) {
+      val template = templates(templateIndex)
+      val generator = new TileGenerator(from, bounds.startInclusive, bounds.endExclusive, direction)
+      while (generator.hasNext) {
+        val tile = generator.next()
+        if (fits(tile, template)) {
+          val newFit = Fit(tile, template)
+          place(newFit)
+          output += newFit
+          if (output.length >= maxFits) {
+            return output
+          }
+        }
+      }
+      templateIndex += 1
     }
     output
   }
 
-  def fit(from: Tile, direction: Direction, template: PreplacementTemplate, maxFits: Int = 1): Seq[Fit] = {
-    fitAny(from, direction, Seq(template), maxFits)
+  def fit(from: Tile, bounds: TileRectangle, direction: Direction, template: PreplacementTemplate, maxFits: Int = 1): Seq[Fit] = {
+    fitAny(from, bounds, direction, Seq(template), maxFits)
   }
 
   def fits(origin: Tile, template: PreplacementTemplate): Boolean = {
-    // TODO: Allow rechecking an existing fit
     val violation = template.points.find(templatePoint => {
       val slot = templatePoint.requirement
       val slotOrigin = origin.add(templatePoint.point)

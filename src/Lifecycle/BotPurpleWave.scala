@@ -17,6 +17,7 @@ class BotPurpleWave extends DefaultBWListener {
     try {
       With.performance.startFrame()
       With.onFrame()
+      With.lambdas.update()
       With.tasks.run()
       With.storyteller.onFrame()
       With.performance.endFrame()

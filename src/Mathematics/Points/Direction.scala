@@ -9,4 +9,10 @@ class Direction(x: Int, y: Int) extends AbstractPoint(
   def this(start: AbstractPoint, end: AbstractPoint) {
     this(end.x - start.x, end.y - start.y)
   }
+  def isVertical: Boolean = x == 0
+  def isHorizontal: Boolean = y == 0
+  def isUp: Boolean = y < 0
+  def isDown: Boolean = y > 0
+  def isLeft: Boolean = x < 0
+  def isRight: Boolean = x > 0
 }

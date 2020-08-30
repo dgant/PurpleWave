@@ -5,7 +5,12 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * For debugging.
   * Queue of lambdas to invoke on the next onFrame().
-  * The purpose of this is to allow manual execution of code which hits breakpoints. Example:
+  *
+  * This queue serves two purposes:
+  * + Allow manually executionof code which hits breakpoints.
+  * + Allow keyboard commands to execute changes which must happen during an onFrame() event.
+  *
+  * Example:
   *
   * // Somewhere in codebase:
   * someFunction() {
@@ -20,11 +25,11 @@ class LambdaQueue {
   private val queue: ArrayBuffer[() => Unit] = new ArrayBuffer()
 
   def add(event: () => Unit): Unit = {
-
+    queue += event
   }
 
   def update(): Unit = {
-    queue.foreach(_)
+    queue.foreach(_())
     queue.clear()
   }
 }

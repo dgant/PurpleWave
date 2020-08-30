@@ -5,7 +5,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object KeyboardCommands {
   def quitVsHuman(): Unit = {
-    if (With.configuration.humanMode) With.game.leaveGame()
+    if (With.configuration.humanMode) With.lambdas.add(() => With.game.leaveGame())
   }
 
   def onSendText(text: String) {

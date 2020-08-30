@@ -28,20 +28,27 @@ class Preplacement {
   }
 
   private def preplaceZone(zone: Zone): Unit = {
-    val exit = zone.exit.map(_.pixelCenter.tileIncluding).orElse(ByOption.minBy(zone.tiles)(_.tileDistanceFast(SpecificPoints.tileMiddle)))
-    val back = exit.flatMap(o => ByOption.maxBy(zone.tiles)(_.tileDistanceFast(o)))
+    val anyExit = zone.exit.map(_.pixelCenter.tileIncluding).orElse(ByOption.minBy(zone.tiles)(_.tileDistanceFast(SpecificPoints.tileMiddle)))
+    val anyBack = anyExit.flatMap(o => ByOption.maxBy(zone.tiles)(_.tileDistanceFast(o)))
 
-    if (exit.isEmpty || back.isEmpty) return
+    if (anyExit.isEmpty || anyBack.isEmpty) return
 
-    val directionExit = new Direction(back.get, exit.get)
-    val directionBack = new Direction(exit.get, back.get)
+    val bounds = zone.boundary
+    val exit = anyExit.get
+    val back = anyBack.get
+    val exitEdge = bounds.cornerTilesInclusive.sortBy(_.tileDistanceManhattan(exit)).take(2).minBy(t => Math.min(t.x, t.y))
+    val backEdge = bounds.cornerTilesInclusive.sortBy(_.tileDistanceManhattan(back)).take(2).minBy(t => Math.min(t.x, t.y))
+    val exitSide = bounds.cornerTilesInclusive.maxBy(_.tileDistanceManhattan(exitEdge))
+    val backSide = bounds.cornerTilesInclusive.maxBy(_.tileDistanceManhattan(backEdge))
+    val directionExit = new Direction(anyBack.get, anyExit.get)
+    val directionBack = new Direction(anyExit.get, anyBack.get)
 
-    fits ++= preplacement.fit(exit.get, directionBack, PreplacementTemplates.batterycannon)
-    fits ++= preplacement.fitAny(exit.get, directionBack, PreplacementTemplates.initialLayouts)
-    fits ++= preplacement.fitAny(exit.get, directionBack, PreplacementTemplates.gateways, 1)
-    fits ++= preplacement.fitAny(back.get, directionExit, PreplacementTemplates.tech, 1)
-    fits ++= preplacement.fitAny(exit.get, directionBack, PreplacementTemplates.gateways, 1)
-    fits ++= preplacement.fitAny(back.get, directionExit, PreplacementTemplates.tech)
-    fits ++= preplacement.fitAny(exit.get, directionBack, PreplacementTemplates.gateways)
+    fits ++= preplacement.fit     (exit,      bounds, directionBack, PreplacementTemplates.batterycannon)
+    fits ++= preplacement.fitAny  (exitEdge,  bounds, directionBack, PreplacementTemplates.initialLayouts)
+    fits ++= preplacement.fitAny  (exitEdge,  bounds, directionBack, PreplacementTemplates.gateways, 1)
+    fits ++= preplacement.fitAny  (backEdge,  bounds, directionExit, PreplacementTemplates.tech, 1)
+    fits ++= preplacement.fitAny  (exitEdge,  bounds, directionBack, PreplacementTemplates.gateways, 1)
+    fits ++= preplacement.fitAny  (backEdge,  bounds, directionExit, PreplacementTemplates.tech)
+    fits ++= preplacement.fitAny  (exitEdge,  bounds, directionBack, PreplacementTemplates.gateways)
   }
 }

@@ -17,6 +17,10 @@ case class TileReservation(plan: Plan, target: Tile, update: Int) {
   def active: Boolean = update >= With.groundskeeper.updates - 1
 }
 
+case class RequestReservation(plan: Plan, update: Int) {
+  def active: Boolean = update >= With.groundskeeper.updates - 1
+}
+
 class Groundskeeper {
   var updates: Int = 0
   val reserved: Array[TileReservation] = Array.fill(With.mapTileWidth * With.mapTileHeight)(TileReservation(NoPlan(), Tile(0, 0), -Forever()))
@@ -24,12 +28,22 @@ class Groundskeeper {
   var suggestionsBefore   : mutable.Buffer[PlacementRequest] = ArrayBuffer.empty
   var suggestionsNow      : mutable.Buffer[PlacementRequest] = ArrayBuffer.empty
   var blueprintConsumers  : mutable.Map[Blueprint, FriendlyUnitInfo] = mutable.HashMap.empty
+  var requestHolders      : mutable.Map[PlacementRequest, RequestReservation] = mutable.HashMap.empty
 
   def update(): Unit = {
     updates += 1
     suggestionsBefore   = suggestionsNow
     suggestionsNow      = ArrayBuffer.empty
     blueprintConsumers.view.filterNot(_._2.alive).toSeq.foreach(p => blueprintConsumers.remove(p._1))
+    requestHolders.view.filterNot(_._2.active).toSeq.foreach(r => requestHolders.remove(r._1))
+  }
+
+  def getRequestHolder(request: PlacementRequest): Option[Plan] = {
+    requestHolders.get(request).map(_.plan)
+  }
+
+  def setRequestHolder(request: PlacementRequest, holder: Plan): Unit = {
+    requestHolders(request) = RequestReservation(holder, updates)
   }
 
   def suggestions: Seq[PlacementRequest] = (suggestionsNow.view ++ suggestionsBefore.view)
@@ -63,16 +77,19 @@ class Groundskeeper {
   }
 
   // I am a building plan. I want to indicate that I will need placement for a Gateway.
-  def suggest(plan: Plan, unitClass: UnitClass): PlacementRequest = {
-    val matched = matchSuggestion(plan, unitClass)
+  def request(requestingPlan: Plan, unitClass: UnitClass): PlacementRequest = {
+    val matched = matchSuggestion(requestingPlan, unitClass)
     matched.foreach(refresh)
-    if (matched.isEmpty) {
-      val output = new PlacementRequest(new Blueprint(unitClass), plan = Some(plan))
-      suggestionsNow += output
-      output
-    } else {
-      matched.get
-    }
+    val output =
+      if (matched.isEmpty) {
+        val newRequest = new PlacementRequest(new Blueprint(unitClass))
+        suggestionsNow += newRequest
+        newRequest
+      } else {
+        matched.get
+      }
+    setRequestHolder(output, requestingPlan)
+    output
   }
 
   // I am a building plan. I want to indicate that I have used this blueprint to build something
@@ -97,22 +114,6 @@ class Groundskeeper {
 
   private def matchSuggestion(plan: Plan, unitClass: UnitClass): Option[PlacementRequest] = {
     suggestions.find(s => s.unitClass == unitClass && s.plan.forall(_ == plan))
-  }
-
-  def getSuggestion(plan: Plan, unitClass: UnitClass): PlacementRequest = {
-    val output = matchSuggestion(plan, unitClass)
-      .orElse({
-        suggest(plan, unitClass)
-        matchSuggestion(plan, unitClass)
-      })
-      .getOrElse({
-        With.logger.warn("Failed to find suggestion we JUST issued")
-        val output = new PlacementRequest(new Blueprint(unitClass), plan = Some(plan))
-        suggestionsNow += output
-        output
-      })
-    output.plan = Some(plan)
-    output
   }
 
   def isReserved(tile: Tile, plan: Option[Plan] = None): Boolean = {

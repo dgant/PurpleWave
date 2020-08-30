@@ -77,7 +77,7 @@ class Blueprint(
       }
       if (heightTiles.get == 2 && ! With.grids.psi2Height.isSet(tile) && ! With.architecture.powered2Height.get(tile)) {
         return ArchitecturalAssessment.Unpowered
-    }
+      }
     }
 
     val thisZone = tile.zone

@@ -1,7 +1,7 @@
 package Lifecycle
 
 import Debugging.Visualizations.{Animations, Viewport, Visualization}
-import Debugging.{Camera, Logger, Storyteller}
+import Debugging.{Camera, LambdaQueue, Logger, Storyteller}
 import Information.Battles.BattleClassifier
 import Information.Fingerprinting.Fingerprints
 import Information.Geography.Geography
@@ -62,6 +62,7 @@ object With {
   var grids             : Grids                   = _
   var groundskeeper     : Groundskeeper           = _
   var history           : History                 = _
+  var lambdas           : LambdaQueue             = _
   var latency           : Latency                 = _
   var logger            : Logger                  = _
   var matchups          : MatchupGraph            = _
@@ -149,6 +150,7 @@ object With {
     geography         = new Geography
     grids             = new Grids
     history           = new History
+    lambdas           = new LambdaQueue
     latency           = new Latency
     matchups          = new MatchupGraph
     paths             = new Paths

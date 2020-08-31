@@ -115,7 +115,7 @@ class PvPRobo extends GameplanTemplate {
 
   override def buildOrderPlan: Plan = new PvP1GateCoreIdeas.BuildOrderPlan
 
-  private class TrainArmy extends Parallel(
+  private class TrainArmyHighPri extends Parallel(
     new UpgradeContinuously(Protoss.DragoonRange),
     new Trigger(
       new UnitsAtLeast(1, Protoss.RoboticsFacility),
@@ -136,7 +136,9 @@ class PvPRobo extends GameplanTemplate {
               new UnitsAtMost(3, Protoss.Reaver)),
             new Pump(Protoss.Reaver),
             new PumpShuttleAndReavers),
-          new Pump(Protoss.Reaver, 2)))),
+          new Pump(Protoss.Reaver, 2)))))
+
+  private class TrainArmyLowPri extends Parallel(
     // Make sure we don't accidentally start an extra Zealot due to tight gas
     new BuildOrder(Get(Protoss.Dragoon)),
     new Pump(Protoss.Dragoon),
@@ -168,18 +170,23 @@ class PvPRobo extends GameplanTemplate {
 
     new If(new GasCapsUntouched, new CapGasAt(350)),
 
-    new If(new ReadyToExpand, new Expand),
+    new Trigger(
+      new UnitsAtLeast(1, Protoss.Dragoon),
+      new If(
+        new PvP1GateCoreIdeas.GateGate),
+        new Build(Get(2, Protoss.Gateway))),
 
-    new If(
-      new And(new Latch(new UnitsAtLeast(1, Protoss.Dragoon)), new PvP1GateCoreIdeas.GateGate),
-      new Build(Get(2, Protoss.Gateway))),
+    // Keep pumping robo units even if expanding
+    new TrainArmyHighPri,
+
+    new If(new ReadyToExpand, new Expand),
 
     // This flip is important to ensure that Gate Gate Robo gets its tech in timely fashion
     new FlipIf(
       new And(
         new UnitsAtLeast(2, Protoss.Dragoon),
         new Not(new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway))),
-      new TrainArmy,
+      new TrainArmyLowPri,
       new Parallel(
         new If(new PvP1GateCoreIdeas.GateGate, new Build(Get(2, Protoss.Gateway))),
         new Build(Get(Protoss.RoboticsFacility)),

@@ -12,60 +12,83 @@ object PreplacementTemplates {
   val initialLayouts = Seq(
     new PreplacementTemplate().add(
       "---------- " +
-      "-GxxxGxxx- " +
+      "-4xxx4xxx- " +
       "-xxxxxxxx- " +
       "-xxxxxxxx- " +
-      "xPxYxxRxx- " +
+      "-HxxPxRxx- " +
       "xxxxxxxxx- " +
-      "xxxxxxx--- "),
+      "xxxxx----- "),
     new PreplacementTemplate().add(
       "---------- " +
-      "-GxxxGxxx- " +
+      "-4xxx4xxx- " +
       "-xxxxxxxx- " +
       "-xxxxxxxx- " +
-      "xPxYxxRxx--- " +
-      "xxxxxxRxxxxx " ))
+      "-RxxPxHxx- " +
+      "-xxxxxxxxx " +
+      "-----xxxxx ")
+  )
 
   val gateways = Seq(
     new PreplacementTemplate().add(
       "xxx-------- " +
-      "PxGxxxGxxx- " +
+      "Px4xxx4xxx- " +
       "xxxxxxxxxx- " +
       "Pxxxxxxxxx- " +
-      "xxGxxxGxxx- " +
+      "xx4xxx4xxx- " +
       "Pxxxxxxxxx- " +
       "xxxxxxxxxx- " +
       "xxx-------- " ),
     new PreplacementTemplate().add(
       "xxx---- " +
-      "PxGxxx- " +
+      "Px4xxx- " +
       "xxxxxx- " +
       "Pxxxxx- " +
-      "xxGxxx- " +
+      "xx4xxx- " +
       "Pxxxxx- " +
       "xxxxxx- " +
       "xxx---- " ),
     new PreplacementTemplate().add(
       "---------- " +
-      "-GxxxGxxx- " +
+      "-4xxx4xxx- " +
       "-xxxxxxxx- " +
       "-xxxxxxxx- " +
       "--xPxPxx-- " ),
     new PreplacementTemplate().add(
       "xx--------- " +
-      "PxGxxxGxxx- " +
+      "Px4xxx4xxx- " +
       "xxxxxxxxxx- " +
       "Pxxxxxxxxx- " +
       "xx--------- " ),
     new PreplacementTemplate().add(
       "-------- " +
-      "-GxxxPx- " +
+      "-4xxxPx- " +
       "-xxxxxx- " +
       "-xxxxPx- " +
-      "-Gxxxxxx " +
+      "-4xxxxxx " +
       "-xxxxPxx " +
       "-xxxxxxx " +
-      "------xx " ))
+      "------xx " ),
+    new PreplacementTemplate().add(
+      "xxx---- " +
+      "Px4xxx- " +
+      "xxxxxx- " +
+      "xxxxxx- " +
+      "xxx---- " ),
+    new PreplacementTemplate().add(
+      "PxPx- " +
+      "xxxx- " +
+      "4xxx- " +
+      "xxxx- " +
+      "xxxx- " +
+      "----- " ),
+    new PreplacementTemplate().add(
+      "-PxPx " +
+      "-xxxx " +
+      "-4xxx " +
+      "-xxxx " +
+      "-xxxx " +
+      "----- " )
+  )
 
   val tech = Seq(
     new PreplacementTemplate().add(

@@ -12,8 +12,7 @@ object TileSourcePreplacementWeak extends TileSource {
     val dimensions = (blueprint.building.tileWidth, blueprint.building.tileHeight)
 
     val reduced = dimensions match {
-      case (4, 2)   => Seq((4, 3))
-      case (3, 2)   => Seq((4, 3))
+      // Defiler Nest is 4x2 but we don't want to stick it in a 4x3 due to likelihood of creating a trap.
       case (3, 2)   => Seq((4, 3), (4, 2))
       case (2, 2)   => Seq((4, 3), (4, 2), (3, 2))
       case default  => Seq.empty

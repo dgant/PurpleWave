@@ -50,8 +50,10 @@ class PreplacementTemplate {
         val pt: PreplacementRequirement = char.toLower match {
           case '-' => ReservedWalkable
           case 't' => new PreplacementRequirement(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery)
+          case 'h' => new PreplacementRequirement(Terran.Armory, Terran.Academy, Protoss.Forge, Protoss.CyberneticsCore, Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.RoboticsSupportBay, Protoss.Observatory, Protoss.ArbiterTribunal, Protoss.FleetBeacon, Zerg.EvolutionChamber, Zerg.SpawningPool, Zerg.HydraliskDen, Zerg.QueensNest, Zerg.UltraliskCavern) // 3x2 tech
           case 'p' => new PreplacementRequirement(Protoss.Pylon)
-          case 'g' => new PreplacementRequirement(Protoss.Gateway)
+          case 'g' => new PreplacementRequirement(Terran.Barracks, Protoss.Gateway, Protoss.Stargate) // 4x3 production
+          case 'r' => new PreplacementRequirement(Protoss.RoboticsFacility) // 3x2 production
           case 'f' => new PreplacementRequirement(Protoss.Forge)
           case 'y' => new PreplacementRequirement(Protoss.CyberneticsCore)
           case 'c' => new PreplacementRequirement(Protoss.PhotonCannon)

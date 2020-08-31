@@ -45,10 +45,10 @@ class Preplacement {
 
     fits ++= preplacement.fit     (exit,      bounds, directionBack, PreplacementTemplates.batterycannon)
     fits ++= preplacement.fitAny  (exitEdge,  bounds, directionBack, PreplacementTemplates.initialLayouts)
-    fits ++= preplacement.fitAny  (exitEdge,  bounds, directionBack, PreplacementTemplates.gateways, 1)
-    fits ++= preplacement.fitAny  (backEdge,  bounds, directionExit, PreplacementTemplates.tech, 1)
-    fits ++= preplacement.fitAny  (exitEdge,  bounds, directionBack, PreplacementTemplates.gateways, 1)
-    fits ++= preplacement.fitAny  (backEdge,  bounds, directionExit, PreplacementTemplates.tech)
     fits ++= preplacement.fitAny  (exitEdge,  bounds, directionBack, PreplacementTemplates.gateways)
+    fits ++= preplacement.fitAny  (backEdge,  bounds, directionExit, PreplacementTemplates.tech)
+    fits ++= preplacement.fitAny  (exitEdge,  bounds, directionBack, PreplacementTemplates.gateways, 2)
+    fits ++= preplacement.fitAny  (backEdge,  bounds, directionExit, PreplacementTemplates.tech)
+    fits ++= preplacement.fitAny  (exitEdge,  bounds, directionBack, PreplacementTemplates.gateways, 5)
   }
 }

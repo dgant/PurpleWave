@@ -41,6 +41,9 @@ abstract class AbstractTaskQueue {
       } else {
         task.skip()
       }
+      if (With.configuration.logTaskDuration) {
+        With.logger.debug("Task duration: " + task + ": " + task.runtimeMilliseconds.last)
+      }
       i += 1
     }
   }

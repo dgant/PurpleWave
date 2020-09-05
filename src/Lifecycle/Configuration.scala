@@ -79,11 +79,11 @@ class Configuration {
   // Performance //
   /////////////////
 
-
   var enablePerformancePauses             = true
   var foreignUnitUpdatePeriod             = 1
   var performanceMinimumUnitSleep         = 2
   var maximumGamesHistoryPerOpponent      = 500
+  var logTaskDuration                     = false
   
   var buildingPlacementRefreshPeriod      = GameTime(0, 30)()
   var buildingPlacementMaxTilesToEvaluate = 300

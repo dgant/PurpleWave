@@ -16,7 +16,6 @@ object Surveyor {
       TileSourceBlueprintZoneRequired,
       TileSourceBlueprintZonePreferred),
     Seq(
-      TileSourcePlasma,
       TileSourceTownHall,
       TileSourceGas,
       TileSourceOurBases,

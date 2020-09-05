@@ -6,9 +6,12 @@ import Mathematics.Points.Tile
 
 object TileSourceAnywhere extends TileSource {
   
-  override def appropriateFor(blueprint: Blueprint): Boolean = {
-    true
-  }
+  override def appropriateFor(blueprint: Blueprint): Boolean = (
+    ! blueprint.requireTownHallTile.get
+    && ! blueprint.requireGasTile.get
+    && ! blueprint.requireCreep.get
+    && ! blueprint.requirePower.get
+  )
   
   override def tiles(blueprint: Blueprint): Seq[Tile] = {
     With.geography.allTiles

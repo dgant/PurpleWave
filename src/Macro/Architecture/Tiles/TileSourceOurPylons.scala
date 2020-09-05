@@ -10,7 +10,7 @@ import scala.collection.mutable
 object TileSourceOurPylons extends TileSource {
   
   override def appropriateFor(blueprint: Blueprint): Boolean = {
-    blueprint.requirePower.get
+    blueprint.requirePower.contains(true)
   }
   
   override def tiles(blueprint: Blueprint): Seq[Tile] = {

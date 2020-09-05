@@ -25,6 +25,7 @@ object KeyboardCommands {
       case "perform"    => { With.configuration.enablePerformancePauses = ! With.performance.enablePerformancePauses; Manners.chat("Performance stops? " + With.configuration.enablePerformancePauses) }
       case "map"        => With.logger.debug("The current map is " + With.game.mapName + ": " + With.game.mapFileName)
       case "pm"         => With.logger.debug(JBWAPIClient.getPerformanceMetrics.toString)
+      case "task"       => With.configuration.logTaskDuration = ! With.configuration.logTaskDuration
 
       case "get out"    => quitVsHuman()
       case "quit"       => quitVsHuman()

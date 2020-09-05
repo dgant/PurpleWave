@@ -24,7 +24,7 @@ abstract class AbstractTask {
   def due                 : Boolean = framesSinceRunning > maxConsecutiveSkips
   
   private var alreadyViolatedTarget  = false
-  private var alreadyViolatedLimit      = false
+  private var alreadyViolatedLimit   = false
   
   protected def onRun()
   def onEnd() {}

@@ -94,5 +94,5 @@ abstract class AbstractTask {
   
   final def runMillisecondsMean: Long = runMillisecondsSumRecent() / Math.max(1, runtimeMilliseconds.size)
 
-  override def toString: String = getClass.getSimpleName
+  override val toString: String = if (getClass.getSimpleName.contains("anon")) getClass.getSuperclass.getSimpleName else getClass.getSimpleName
 }

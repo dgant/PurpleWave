@@ -6,7 +6,6 @@ import Mathematics.Points.Tile
 class GridMobilityAir extends AbstractGridArray[Int] {
   
   override def onInitialization() {
-    
     var i = 0
     while (i < length) {
       values(i) = 1 + new Tile(i).tileDistanceFromEdge

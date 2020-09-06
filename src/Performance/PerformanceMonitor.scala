@@ -27,6 +27,7 @@ class PerformanceMonitor {
   }
 
   def endFrame() {
+    var violated = violatedTarget
     var millisecondDifference = millisecondsSpentThisFrame
     if (With.configuration.debugging && millisecondDifference > With.configuration.debugPauseThreshold) {
       millisecondDifference = meanFrameMilliseconds
@@ -36,6 +37,10 @@ class PerformanceMonitor {
     if (millisecondDifference >= frameLimitShort) framesOverShort += 1
     if (millisecondDifference >= 1000)            framesOver1000  += 1
     if (millisecondDifference >= 10000)           framesOver10000 += 1
+
+    if (violated) {
+      With.logger.debug("Violated frame @ " + millisecondsSpentThisFrame + "ms. Task durations: \n" + With.tasks.describeThisFrame)
+    }
   }
 
   def millisecondsLeftBeforeTarget: Long = {

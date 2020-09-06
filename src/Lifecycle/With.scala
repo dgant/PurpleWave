@@ -87,7 +87,7 @@ object With {
   var visualization     : Visualization           = _
   var yolo              : Yolo                    = _
 
-  def enemy: PlayerInfo     = enemies.head
+  def enemy: PlayerInfo = enemies.head
   def mapPixelWidth   : Int = mapTileWidth * 32
   def mapPixelHeight  : Int = mapTileHeight * 32
   def mapWalkWidth    : Int = mapTileWidth * 4

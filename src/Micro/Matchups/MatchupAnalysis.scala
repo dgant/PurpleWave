@@ -26,9 +26,9 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   // Default is necessary for killing empty bases because no Battle is happening
   private lazy val defaultUnits   : Vector[UnitInfo]    = if (me.canAttack) me.zone.units.filter(u => u.isEnemy && BattleClassificationFilters.isEligibleLocal(u)) else Vector.empty
   lazy val battle                 : Option[BattleLocal] = me.battle.orElse(With.matchups.entrants.find(_._2.contains(me)).map(_._1))
-  lazy val allUnits               : Vector[UnitInfo]    = battle.map(b => b.teams.flatMap(_.units)    ++ With.matchups.entrants.getOrElse(b, Set.empty)).getOrElse(defaultUnits).distinct
-  lazy val enemies                : Vector[UnitInfo]    = battle.map(b => b.teamOf(me).opponent.units ++ With.matchups.entrants.getOrElse(b, Set.empty).filter(   _.isEnemyOf(me))).getOrElse(defaultUnits).distinct
-  lazy val alliesInclSelf         : Vector[UnitInfo]    = battle.map(b => b.teamOf(me).units          ++ With.matchups.entrants.getOrElse(b, Set.empty).filter( ! _.isEnemyOf(me))).getOrElse(Vector.empty).distinct
+  lazy val allUnits               : Vector[UnitInfo]    = battle.map(b => b.teams.flatMap(_.units)    ++ With.matchups.entrants.getOrElse(b, Seq.empty)                                ).getOrElse(defaultUnits).distinct
+  lazy val enemies                : Vector[UnitInfo]    = battle.map(b => b.teamOf(me).opponent.units ++ With.matchups.entrants.getOrElse(b, Seq.empty).view.filter(   _.isEnemyOf(me))).getOrElse(defaultUnits).distinct
+  lazy val alliesInclSelf         : Vector[UnitInfo]    = battle.map(b => b.teamOf(me).units          ++ With.matchups.entrants.getOrElse(b, Seq.empty).view.filter( ! _.isEnemyOf(me))).getOrElse(Vector.empty).distinct
   lazy val alliesInclSelfCloaked  : Vector[UnitInfo]    = alliesInclSelf.filter(_.cloakedOrBurrowed)
   lazy val allies                 : Vector[UnitInfo]    = alliesInclSelf.filterNot(_.id == me.id)
   lazy val others                 : Vector[UnitInfo]    = enemies ++ allies

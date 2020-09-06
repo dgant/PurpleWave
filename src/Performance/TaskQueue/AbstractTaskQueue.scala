@@ -19,16 +19,13 @@ abstract class AbstractTaskQueue {
       return
     }
   
-    tasks
+    val tasksSorted = tasks
       .sortBy(task => - task.urgency * task.framesSinceRunning)
       .sortBy( ! _.due)
-      
-  
-    // Ordinarily we'd do foreach() but that swallows exceptions and I don't understand why
-    //
+
     var i = 0
-    while (i < tasks.length) {
-      val task = tasks(i)
+    while (i < tasksSorted.length) {
+      val task = tasksSorted(i)
       val expectedMilliseconds =
         Math.max(
           if (task.totalRuns < 10) 5 else 0, // Arbitrary assumption before we have much data
@@ -73,4 +70,11 @@ abstract class AbstractTaskQueue {
     With.logger.debug(status)
     tasks.foreach(_.onEnd())
   }
+
+  def describeThisFrame: String = (
+      tasks
+        .filter(_.framesSinceRunning <= 1)
+        .map(task => task.toString + ": " + task.runtimeMilliseconds.lastOption.map(_.toString).getOrElse("?") + "ms")
+        .mkString("\n")
+  )
 }

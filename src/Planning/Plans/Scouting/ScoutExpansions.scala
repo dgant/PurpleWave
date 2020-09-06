@@ -23,7 +23,7 @@ class ScoutExpansions(matcher: UnitMatcher = UnitMatchAnd(
       .sortBy(base => - With.scouting.baseIntrigue.getOrElse(base, 0.0))
       .sortBy(_.zone.island)
 
-    val scoutsWanted = PurpleMath.clamp(Math.max(1, With.self.supplyUsed / 80), 0, scoutableBases.size)
+    val scoutsWanted    = PurpleMath.clamp(Math.max(1, With.self.supplyUsed / 80), 0, scoutableBases.size)
     val scouts          = getScouts(matcher, scoutsWanted).toVector.sortBy(_.flying)
     scouts.zipWithIndex.foreach(s => scoutBasesTowardsTownHall(s._1, Seq(scoutableBases(s._2 % scoutableBases.size))))
   }

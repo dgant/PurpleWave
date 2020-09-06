@@ -76,7 +76,7 @@ abstract class AbstractTask {
     if ( ! alreadyViolatedLimit && With.performance.violatedLimit) {
       violatedRules += 1
       if (maxConsecutiveSkips > 1) {
-        With.logger.warn(toString + " went too long: " + millisecondsDuration + "ms for " + With.performance.millisecondsSpentThisFrame + "ms this frame")
+        With.logger.warn(toString + " went too long: " + millisecondsDuration + "ms for " + With.performance.millisecondsSpentThisFrame + "ms this frame. " + (if (due) "It was due to run" else ""))
       }
     }
   }

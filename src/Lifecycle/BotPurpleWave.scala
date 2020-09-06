@@ -17,7 +17,9 @@ class BotPurpleWave extends DefaultBWListener {
     try {
       With.performance.startFrame()
       With.onFrame()
-      With.lambdas.update()
+      With.latency.onFrame()
+      With.units.onFrame()
+      With.lambdas.onFrame()
       With.tasks.run()
       With.storyteller.onFrame()
       With.performance.endFrame()
@@ -27,7 +29,7 @@ class BotPurpleWave extends DefaultBWListener {
     // If we don't initialize static units on frame 0 we're in trouble
     try {
       if (With.frame == 0 && With.units.neutral.isEmpty) {
-        With.units.update()
+        With.units.onFrame()
       }
     } catch { case exception: Exception => With.logger.onException(exception) }
   }
@@ -62,6 +64,7 @@ class BotPurpleWave extends DefaultBWListener {
       With.logger.debug("Game ended in " + (if (isWinner) "victory" else "defeat"))
       With.history.onEnd(isWinner)
       With.tasks.onEnd()
+      With.grids.tasks.onEnd()
       With.storyteller.onEnd()
       Manners.onEnd(isWinner)
       With.logger.flush()

@@ -8,12 +8,9 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 object PumpCount {
 
-
   def currentCount(unitClass: UnitClass): Int = {
     val matcher = UnitMatchOr(
-      new UnitMatcher {
-        override def apply(unit: UnitInfo): Boolean = unit.is(Zerg.Egg) && unit.friendly.exists(_.buildType == unitClass)
-      },
+      (unit: UnitInfo) => unit.is(Zerg.Egg) && unit.friendly.exists(_.buildType == unitClass),
       if (unitClass == Terran.SiegeTankSieged || unitClass == Terran.SiegeTankUnsieged) {
         UnitMatchSiegeTank
       }

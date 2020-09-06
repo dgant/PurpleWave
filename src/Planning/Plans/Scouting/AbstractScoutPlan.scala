@@ -44,9 +44,10 @@ abstract class AbstractScoutPlan extends Plan {
   }
 
   private final def scoutTo(unit: FriendlyUnitInfo, bases: Seq[Base], destination: Pixel): Unit = {
-    val tiles = bases.view.flatMap(base => base.zone.tiles.filter(tile =>
-      ! base.harvestingArea.contains(tile) // Don't walk into worker line
-      && With.grids.buildableTerrain.get(tile))).toVector.distinct
+    val tiles = bases.map(_.zone).distinct.flatMap(zone => zone.tiles.view.filter(tile =>
+      With.grids.buildableTerrain.get(tile)
+      && ! zone.bases.exists(_.harvestingArea.contains(tile)))) // Don't walk into worker line
+
     unit.agent.intend(this, new Intention {
       toScoutTiles  = tiles
       toTravel      = Some(destination)

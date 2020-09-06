@@ -84,7 +84,7 @@ class UnitTracker {
     output.toVector
   }
   
-  def update() {
+  def onFrame() {
     friendlyUnitTracker.update()
     foreignUnitTracker.update()
     all.foreach(historicalUnitTracker.remove)

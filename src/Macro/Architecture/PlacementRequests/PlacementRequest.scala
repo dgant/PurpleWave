@@ -22,4 +22,7 @@ class PlacementRequest(
   def failed: Boolean = tile.isEmpty && lastPlacementFrame >= 0
   def unitClass: UnitClass = blueprint.building
   def plan: Option[Plan] = With.groundskeeper.getRequestHolder(this)
+
+  // Attempted performance improvement
+  final override val hashCode: Int = super.hashCode()
 }

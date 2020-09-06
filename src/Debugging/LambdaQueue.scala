@@ -28,7 +28,7 @@ class LambdaQueue {
     queue += event
   }
 
-  def update(): Unit = {
+  def onFrame(): Unit = {
     queue.foreach(_())
     queue.clear()
   }

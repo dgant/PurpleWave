@@ -46,10 +46,11 @@ class Groundskeeper {
     requestHolders(request) = RequestReservation(holder, updates)
   }
 
-  def suggestions: Seq[PlacementRequest] = (suggestionsNow.view ++ suggestionsBefore.view)
-    .distinct
-    .filterNot(request => blueprintConsumers.contains(request.blueprint))
+  private def suggestionsWithDuplicates: Seq[PlacementRequest] = (suggestionsNow.view ++ suggestionsBefore.view)
     .filterNot(_.failed)
+    .filterNot(request => blueprintConsumers.contains(request.blueprint))
+
+  def suggestions = suggestionsWithDuplicates.distinct
 
   // I am a placer plan. I want to suggest a specific place to put a Gateway.
   def suggest(unitClass: UnitClass, tile: Tile): Unit = {
@@ -105,15 +106,15 @@ class Groundskeeper {
   }
 
   private def matchSuggestion(blueprint: Blueprint): Option[PlacementRequest] = {
-    suggestions.find(_.blueprint == blueprint)
+    suggestionsWithDuplicates.find(_.blueprint == blueprint)
   }
 
   private def matchSuggestion(unitClass: UnitClass, tile: Tile): Option[PlacementRequest] = {
-    suggestions.find(s => s.unitClass == unitClass && s.tile.contains(tile))
+    suggestionsWithDuplicates.find(s => s.unitClass == unitClass && s.tile.contains(tile))
   }
 
   private def matchSuggestion(plan: Plan, unitClass: UnitClass): Option[PlacementRequest] = {
-    suggestions.find(s => s.unitClass == unitClass && s.plan.forall(_ == plan))
+    suggestionsWithDuplicates.find(s => s.unitClass == unitClass && s.plan.forall(_ == plan))
   }
 
   def isReserved(tile: Tile, plan: Option[Plan] = None): Boolean = {

@@ -2,7 +2,6 @@ package Performance.Tasks
 
 import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.{Manners, With}
-import Performance.TaskQueue.TaskQueueGrids
 
 class TaskArchitecture extends AbstractTask {
   urgency = With.configuration.urgencyArchitecture
@@ -31,12 +30,7 @@ class TaskGeography extends AbstractTask {
 }
 class TaskGrids extends AbstractTask {
   urgency = With.configuration.urgencyGrids
-  private val taskQueue = new TaskQueueGrids
-  override protected def onRun() { taskQueue.run() }
-}
-class TaskLatency extends AbstractTask {
-  override def maxConsecutiveSkips: Int = 0
-  override protected def onRun() { With.latency.onFrame() }
+  override protected def onRun() { With.grids.tasks.run() }
 }
 class TaskManners extends AbstractTask {
   urgency = With.configuration.urgencyManners
@@ -91,12 +85,5 @@ class TaskVisualizations extends AbstractTask {
   override protected def onRun() {
     With.visualization.render()
     With.animations.render()
-  }
-}
-class TaskUnitTracking extends AbstractTask {
-  urgency = With.configuration.urgencyUnitTracking
-  override def maxConsecutiveSkips: Int = 0
-  override protected def onRun() {
-    With.units.update()
   }
 }

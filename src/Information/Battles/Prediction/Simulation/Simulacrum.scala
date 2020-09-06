@@ -64,11 +64,17 @@ class Simulacrum(
 
 
   val realTargets: Seq[UnitInfo] = realUnit.matchups.targets
+    .view
     .filter(target =>
       ! simulation.fleeing
       || realUnit.inRangeToAttack(target)
       || ! realUnit.isOurs)
-  lazy val targetQueue: ArrayBuffer[Simulacrum] = new mutable.ArrayBuffer[Simulacrum] ++ realTargets.flatMap(simulation.simulacra.get)
+
+  lazy val targetQueue: ArrayBuffer[Simulacrum] = {
+    val output = new mutable.ArrayBuffer[Simulacrum]
+    output.append(realTargets.view.flatMap(simulation.simulacra.get): _*)
+    output
+  }
   
   var fightingInitially: Boolean = {
     if ( ! realUnit.canAttack) {
@@ -99,7 +105,7 @@ class Simulacrum(
   // Simulation steps /////////////////////////////////////////////////////////////////////////////////////////////////
   //////////////////////
 
-  def updateDeath() {
+  @inline final def updateDeath() {
     dead = dead || hitPoints <= 0
     if (dead) {
       hitPoints = 0
@@ -107,7 +113,7 @@ class Simulacrum(
     }
   }
   
-  def step() {
+  @inline final def step() {
     if (dead) return
     if (simulation.fleeing && isFriendly) fighting = false
     cooldownMoving    -= 1
@@ -129,7 +135,7 @@ class Simulacrum(
     )
   }
   
-  def tryToAcquireTarget() {
+  @inline final def tryToAcquireTarget() {
     if ( ! fighting)                                return
     if (cooldownMoving > 0 || cooldownShooting > 0) return
     if (validTargetExistsInRange)                   return
@@ -158,21 +164,21 @@ class Simulacrum(
     }
   }
   
-  def tryToChaseTarget() {
+  @inline final def tryToChaseTarget() {
     if ( ! fighting)              return
     if (validTargetExistsInRange) return
     if ( ! validTargetExists)     return
     moveTowards(target.get.pixel)
   }
   
-  def tryToStrikeTarget() {
+  @inline final def tryToStrikeTarget() {
     if ( ! fighting)                  return
     if (cooldownShooting > 0)         return
     if ( ! validTargetExistsInRange)  return
     dealDamage(target.get)
   }
   
-  def tryToRunAway() {
+  @inline final def tryToRunAway() {
     if (fighting) return
     // Assume units at home are trapped
     // Prevents us from thinking workers can easily escape
@@ -181,7 +187,7 @@ class Simulacrum(
     moveTowards(fleePixel)
   }
   
-  private def dealDamage(victim: Simulacrum) {
+  @inline private final def dealDamage(victim: Simulacrum) {
     val splashFactor      = if (multiplierSplash == 1.0) 1.0 else Math.max(1.0, Math.min(targetQueue.count( ! _.dead) / 4.0, multiplierSplash))
     val victimWasAlive    = victim.hitPoints > 0
     val damage            = realUnit.damageOnNextHitAgainst(victim.realUnit, Some(victim.shieldPoints), from = Some(pixel), to = Some(victim.pixel))
@@ -217,7 +223,7 @@ class Simulacrum(
     victim.addEvent(buildEvent)
   }
   
-  private def moveTowards(destination: Pixel) {
+  @inline private final def moveTowards(destination: Pixel) {
     if ( ! canMove)         return
     if (cooldownMoving > 0) return
     val effectiveSpeed    = topSpeed / pathBendiness
@@ -240,33 +246,37 @@ class Simulacrum(
     ))
   }
   
-  private def addEvent(event: () => SimulationEvent) {
+  @inline private final def addEvent(event: () => SimulationEvent) {
     if (ShowBattle.inUse) {
       events += event()
     }
   }
   
-  def isValidTarget(target: Simulacrum): Boolean = (
+  @inline final def isValidTarget(target: Simulacrum): Boolean = (
     ! target.dead
     && target.hitPoints > 0
     && (pixelRangeMin <= 0 || pixel.pixelDistance(target.pixel) >= pixelRangeMin)
   )
 
-  def airDistance(target: Simulacrum): Double = PurpleMath.broodWarDistanceBox(
-    realUnit.pixelStartAt(pixel),
-    realUnit.pixelEndAt(pixel),
-    target.realUnit.pixelStartAt(target.pixel),
-    target.realUnit.pixelEndAt(target.pixel))
+  @inline final def airDistance(target: Simulacrum): Double = PurpleMath.broodWarDistanceBox(
+    pixel.x - unitClass.dimensionLeft,
+    pixel.y - unitClass.dimensionUp,
+    pixel.x + unitClass.dimensionRight,
+    pixel.y + unitClass.dimensionDown,
+    target.pixel.x - target.unitClass.dimensionLeft,
+    target.pixel.y - target.unitClass.dimensionUp,
+    target.pixel.x + target.unitClass.dimensionRight,
+    target.pixel.y + target.unitClass.dimensionDown)
   
-  def pixelsOutOfRange(target: Simulacrum): Double = {
+  @inline final def pixelsOutOfRange(target: Simulacrum): Double = {
     val output = airDistance(target) - realUnit.pixelRangeAgainst(target.realUnit) - bonusRange
     output
   }
   
-  def validTargetExists       : Boolean = target.exists(isValidTarget)
-  def validTargetExistsInRange: Boolean = validTargetExists && pixelsOutOfRange(target.get) <= 0
+  @inline final def validTargetExists       : Boolean = target.exists(isValidTarget)
+  @inline final def validTargetExistsInRange: Boolean = validTargetExists && pixelsOutOfRange(target.get) <= 0
   
-  def reportCard: ReportCard = ReportCard(
+  @inline final def reportCard: ReportCard = ReportCard(
     simulacrum      = this,
     estimation      = simulation.estimation,
     valueDealt      = valueDealt,

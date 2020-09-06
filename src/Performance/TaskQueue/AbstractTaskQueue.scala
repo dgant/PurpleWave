@@ -43,6 +43,16 @@ abstract class AbstractTaskQueue {
       }
       i += 1
     }
+
+    if (With.performance.violatedLimit) {
+      With.logger.debug("Task queue overtime @ "
+        + With.performance.millisecondsSpentThisFrame
+        + "ms. Task durations: \n"
+        + tasksSorted
+          .filter(_.framesSinceRunning <= 1)
+          .map(task => task.toString + ": " + task.runtimeMilliseconds.lastOption.map(_.toString).getOrElse("?") + "ms")
+          .mkString("\n"))
+    }
   }
 
   def statusTable: Vector[Vector[String]] = {

@@ -79,7 +79,7 @@ class Configuration {
   // Performance //
   /////////////////
 
-  var enablePerformancePauses             = false //true
+  var enablePerformancePauses             = true
   var foreignUnitUpdatePeriod             = 1
   var performanceMinimumUnitSleep         = 2
   var maximumGamesHistoryPerOpponent      = 500

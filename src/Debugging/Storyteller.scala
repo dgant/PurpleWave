@@ -1,5 +1,7 @@
 package Debugging
 
+import java.lang.management.ManagementFactory
+
 import Debugging.Visualizations.Views.Planning.{ShowStrategyEvaluations, ShowStrategyInterest}
 import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.{JBWAPIClient, With}
@@ -10,12 +12,11 @@ import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrades
 import Utilities.ByOption
-import java.lang.management.ManagementFactory
-
 import com.sun.management.OperatingSystemMXBean
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
+import scala.io.Source
 
 class Storyteller {
 
@@ -131,6 +132,20 @@ class Storyteller {
     With.logger.debug("JVM Max memory:   " + Runtime.getRuntime.maxMemory()   / 1000000 + " MB")
     With.logger.debug("JVM Total memory: " + Runtime.getRuntime.totalMemory() / 1000000 + " MB")
     With.logger.debug("JVM Free memory:  " + Runtime.getRuntime.freeMemory()  / 1000000 + " MB")
+
+    try {
+      val timestamp = Source.fromFile(With.bwapiData.ai + "timestamp.txt").getLines.mkString
+      With.logger.debug("This copy of PurpleWave was packaged for distribution on " + timestamp)
+    } catch { case exception: Exception =>
+      With.logger.debug("No deployment timestamp available")
+    }
+
+    try {
+      val revision = Source.fromFile(With.bwapiData.ai + "revision.txt").getLines.mkString
+      With.logger.debug("This copy of PurpleWave came from Git revision " + revision)
+    } catch { case exception: Exception =>
+        With.logger.debug("No deployment Git revision available")
+    }
   }
 
   private def logStrategyEvaluation(): Unit = {

@@ -56,7 +56,7 @@ class Strategist {
     With.history.gamesVsEnemies.take(finalGames).flatMap(_.tags.toVector).filter(_.startsWith("Finger")).distinct
   }
 
-  lazy val strategiesTopLevel : Seq[Strategy] = AllChoices.tree
+  lazy val strategiesTopLevel : Seq[Strategy] = if (With.enemy.raceCurrent == Race.Unknown) AllChoices.treeVsRandom else AllChoices.treeVsKnownRace
   lazy val strategiesAll      : Seq[Strategy] = strategyBranchesUnfiltered.flatten.distinct
 
   lazy val strategyBranchesUnfiltered : Seq[Seq[Strategy]] = strategiesTopLevel.flatMap(ExpandStrategy.apply).distinct

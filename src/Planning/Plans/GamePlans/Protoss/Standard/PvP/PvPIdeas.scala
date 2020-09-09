@@ -274,11 +274,14 @@ object PvPIdeas {
       Get(2,  Protoss.Zealot),
       Get(17, Protoss.Probe),
       Get(Protoss.CyberneticsCore),
-      Get(4, Protoss.Zealot),
       Get(18, Protoss.Probe),
       Get(3, Protoss.Pylon),
-      Get(19, Protoss.Probe),
-      Get(2, Protoss.Dragoon),
+      Get(19, Protoss.Probe)),
+    new If(
+      new UnitsAtMost(0, Protoss.CyberneticsCore, complete = true),
+      new Pump(Protoss.Zealot),
+      new BuildOrder(Get(2, Protoss.Dragoon))),
+    new BuildOrder(
       Get(21, Protoss.Probe),
       Get(4, Protoss.Dragoon),
       Get(Protoss.DragoonRange)))

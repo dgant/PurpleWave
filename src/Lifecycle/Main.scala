@@ -4,10 +4,11 @@ import bwapi.BWClientConfiguration
 
 object Main {
 
+  val configuration = new BWClientConfiguration
+  configuration.async = false
+  configuration.autoContinue = true
+
   def main(args: Array[String]) {
-    val configuration = new BWClientConfiguration
-    //configuration.async = true
-    configuration.autoContinue = true
     JBWAPIClient.startGame(configuration)
   }
 }

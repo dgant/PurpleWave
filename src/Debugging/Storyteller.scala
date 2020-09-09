@@ -4,7 +4,7 @@ import java.lang.management.ManagementFactory
 
 import Debugging.Visualizations.Views.Planning.{ShowStrategyEvaluations, ShowStrategyInterest}
 import Information.Fingerprinting.Generic.GameTime
-import Lifecycle.{JBWAPIClient, With}
+import Lifecycle.{JBWAPIClient, Main, With}
 import Planning.Predicates.Reactive.{SafeAtHome, SafeToMoveOut}
 import Planning.UnitMatchers.UnitMatchHatchery
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -146,6 +146,12 @@ class Storyteller {
     } catch { case exception: Exception =>
         With.logger.debug("No deployment Git revision available")
     }
+    With.logger.debug("JBWAPI autocontinue: " + Main.configuration.autoContinue)
+    With.logger.debug("JBWAPI debugConnection: " + Main.configuration.debugConnection)
+    With.logger.debug("JBWAPI async: " + Main.configuration.async)
+    With.logger.debug("JBWAPI async frame buffer size: " + Main.configuration.asyncFrameBufferSize)
+    With.logger.debug("JBWAPI unlimited frame zero: " + Main.configuration.unlimitedFrameZero)
+    With.logger.debug("JBWAPI max frame duration: " + Main.configuration.maxFrameDurationMs + "ms")
   }
 
   private def logStrategyEvaluation(): Unit = {
@@ -171,3 +177,4 @@ class Storyteller {
     logPerformance()
   }
 }
+

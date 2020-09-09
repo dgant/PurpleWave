@@ -8,7 +8,7 @@ object TileSourceBlueprint extends TileSource {
     blueprint.requireCandidates.isDefined
   }
   
-  override def tiles(blueprint: Blueprint): Seq[Tile] = {
+  override def tiles(blueprint: Blueprint): Iterable[Tile] = {
     blueprint.requireCandidates.get
   }
 }

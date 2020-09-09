@@ -71,7 +71,6 @@ class Configuration {
   
   var minimumMineralsBeforeMinedOut   = 150 * 8
   var maxFramesToSendAdvanceBuilder   = GameTime(0, 40)()
-  var maxFramesToTrustBuildRequest    = GameTime(10, 0)()
   var blockerMineralThreshold         = 250 // Setting this goofily high as an AIIDE hack to account for the 249-mineral patches on Fortress
   var enableTightBuildingPlacement    = false
   
@@ -85,7 +84,7 @@ class Configuration {
   var maximumGamesHistoryPerOpponent      = 500
   var logTaskDuration                     = false
   
-  var buildingPlacementRefreshPeriod      = GameTime(0, 30)()
+  var buildingPlacementRefreshPeriod      = GameTime(0, 3)()
   var buildingPlacementMaxTilesToEvaluate = 300
   var buildingPlacementMaximumQueue       = 12
   

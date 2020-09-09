@@ -7,7 +7,7 @@ object TileSourceOurBases extends TileSource {
   
   override def appropriateFor(blueprint: Blueprint): Boolean = TileSourceAnywhere.appropriateFor(blueprint)
   
-  override def tiles(blueprint: Blueprint): Seq[Tile] = {
+  override def tiles(blueprint: Blueprint): Iterable[Tile] = {
     With.geography.ourBases.view.flatMap(_.zone.tilesBuildable)
   }
 }

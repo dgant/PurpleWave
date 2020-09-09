@@ -20,7 +20,9 @@ object ShowArchitecture extends View {
 
   def renderGroundskeeperScreen(): Unit = {
     DrawScreen.column(5, 40,
-      With.groundskeeper.suggestions.filter(_.tile.isEmpty).map(s =>s.blueprint.toString + s.plan.map(_.toString).getOrElse("")))
+      With.groundskeeper.suggestions
+        .filter(_.tile.isEmpty)
+        .map(s =>s.blueprint.toString + s.plan.map(_.toString).getOrElse("")))
   }
 
   def renderGroundskeeperMap(): Unit = {
@@ -43,14 +45,12 @@ object ShowArchitecture extends View {
         if (With.architecture.ungassable.get(tile).isDefined) {
           DrawMap.tile(tile, 4, Colors.DarkIndigo)
         }
-        if (With.architecture.powered2Height.get(tile)) {
+        if (With.architecture.powered2Height.get(tile) <= With.frame) {
           //DrawMap.circle(tile.pixelCenter, 4, Colors.BrightYellow)
         }
-        if (With.architecture.powered3Height.get(tile)) {
+        if (With.architecture.powered3Height.get(tile) <= With.frame) {
           DrawMap.circle(tile.pixelCenter, 4, Colors.BrightTeal)
         }
-
-
       }
     })
     With.groundskeeper.suggestions.filter(_.tile.isDefined).foreach(suggestion => {

@@ -22,6 +22,9 @@ class Preplacement {
     if (initialized) return
     initialized = true
 
+    With.units.neutral
+      .filter(u => u.unitClass.isBuilding && ! u.base.exists(_.townHallArea.intersects(u.tileArea)))
+      .foreach(_.tileArea.tiles.foreach(t => preplacement.place(Fit(t, PreplacementTemplates.walkway))))
     With.geography.bases.foreach(b => preplacement.place(Fit(b.townHallTile, PreplacementTemplates.townhall)))
     With.geography.bases.foreach(b => b.resourcePathTiles.foreach(t => preplacement.place(Fit(t, PreplacementTemplates.walkway))))
     With.geography.zones.foreach(preplaceZone)

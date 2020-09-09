@@ -7,5 +7,5 @@ trait TileSource {
   
   def appropriateFor(blueprint: Blueprint): Boolean
   
-  def tiles(blueprint: Blueprint): Seq[Tile]
+  def tiles(blueprint: Blueprint): Iterable[Tile]
 }

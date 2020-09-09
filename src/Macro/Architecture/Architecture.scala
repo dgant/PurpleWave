@@ -1,31 +1,31 @@
 package Macro.Architecture
 
-import Information.Geography.Types.Zone
-import Information.Grids.Disposable.GridDisposableBoolean
 import Information.Fingerprinting.Generic.GameTime
+import Information.Geography.Types.Zone
+import Information.Grids.Disposable.GridDisposableInt
 import Lifecycle.With
 import Macro.Architecture.PlacementRequests.PlacementRequest
 import Mathematics.Points.{Tile, TileRectangle}
-import ProxyBwapi.Races.{Neutral, Protoss, Zerg}
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
+import Utilities.Forever
 
 class Architecture {
-  val unbuildable     : GridExclusion = new GridExclusion
-  val unwalkable      : GridExclusion = new GridExclusion
-  val ungassable      : GridExclusion = new GridExclusion
-  val untownhallable  : GridExclusion = new GridExclusion
-  val creep           : GridExclusion = new GridExclusion
-  val powered2Height    : GridDisposableBoolean                     = new GridDisposableBoolean
-  val powered3Height    : GridDisposableBoolean                     = new GridDisposableBoolean
-  var accessibleZones   : Vector[Zone]                              = Vector.empty
+  val unbuildable       : GridExclusion = new GridExclusion
+  val unwalkable        : GridExclusion = new GridExclusion
+  val ungassable        : GridExclusion = new GridExclusion
+  val untownhallable    : GridExclusion = new GridExclusion
+  val creep             : GridExclusion = new GridExclusion
+  val powered2Height    : GridDisposableInt = new GridDisposableInt { override def defaultValue: Int = Forever() }
+  val powered3Height    : GridDisposableInt = new GridDisposableInt { override def defaultValue: Int = Forever() }
+  var accessibleZones   : Vector[Zone] = Vector.empty
     
   def usuallyNeedsMargin(unitClass: UnitClass): Boolean = {
     if (With.configuration.enableTightBuildingPlacement) {
       unitClass.isBuilding &&
       unitClass.trainsGroundUnits &&
-      ! unitClass.isTownHall //Nexus margins bork FFEs. Down the road Hatcheries may need margins.
-    }
-    else true
+      ! unitClass.isTownHall // Nexus margins bork FFEs. Down the road Hatcheries may need margins.
+    } else true
   }
   
   def reboot() {
@@ -134,17 +134,12 @@ class Architecture {
   ///////////
   
   private def recalculatePower() {
-    With.units.ours.foreach(unit =>
-      if (unit.is(Protoss.Pylon)
-        && (With.framesSince(unit.completionFrame) < GameTime(0, 3)()
-          || unit.zone.units.forall(other => ! other.is(Protoss.Pylon) || other.completionFrame >= unit.completionFrame))) {
-        addPower(unit.tileTopLeft)
-      })
+    With.units.ours.filter(_.is(Protoss.Pylon)).foreach(unit => addPower(unit.tileTopLeft, unit.completionFrame + GameTime(0, 3)()))
   }
   
-  private def addPower(tile: Tile) {
-    With.grids.psi2Height.psiPoints.map(tile.add).foreach(neighbor => if (neighbor.valid) powered2Height.set(neighbor, true))
-    With.grids.psi3Height.psiPoints.map(tile.add).foreach(neighbor => if (neighbor.valid) powered3Height.set(neighbor, true))
+  private def addPower(tile: Tile, frame: Int) {
+    With.grids.psi2Height.psiPoints.map(tile.add).foreach(neighbor => if (neighbor.valid) powered2Height.set(neighbor, frame))
+    With.grids.psi3Height.psiPoints.map(tile.add).foreach(neighbor => if (neighbor.valid) powered3Height.set(neighbor, frame))
   }
 
   private def recalculateBuilderAccess() {

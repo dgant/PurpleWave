@@ -4,6 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Tile
+import Utilities.Forever
 
 object PlacementHeuristicPowering extends PlacementHeuristic {
   
@@ -18,7 +19,7 @@ object PlacementHeuristicPowering extends PlacementHeuristic {
         (tile.valid
           && With.grids.buildable.getUnchecked(i)
           && ! With.grids.psi2Height.isSetUnchecked(i)
-          && ! With.architecture.powered2Height.getUnchecked(i))
+          && With.architecture.powered2Height.getUnchecked(i) >= Forever())
       })
   }
 }

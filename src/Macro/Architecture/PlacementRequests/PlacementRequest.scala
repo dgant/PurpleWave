@@ -10,6 +10,7 @@ import Utilities.Forever
 class PlacementRequest(
   val blueprint: Blueprint,
   var tile: Option[Tile] = None,
+  var requiredFrame: Int = With.frame, // Frame this placement needs to be valid by; concerns future availability of Pylon power
   var child: Option[PlacementRequest] = Option.empty,
   var task: () => PlacementPolicy = null) {
 
@@ -19,10 +20,11 @@ class PlacementRequest(
 
   var lastPlacementFrame: Int = - Forever()
 
-  def failed: Boolean = tile.isEmpty && lastPlacementFrame >= 0
   def unitClass: UnitClass = blueprint.building
   def plan: Option[Plan] = With.groundskeeper.getRequestHolder(this)
 
   // Attempted performance improvement
   final override val hashCode: Int = super.hashCode()
+
+  override def toString: String = "PlacementRequest: " + tile + " for " + blueprint + " in " + (requiredFrame - With.frame) + " frames"
 }

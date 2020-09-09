@@ -42,12 +42,11 @@ class Groundskeeper {
     requestHolders.get(request).map(_.plan)
   }
 
-  def setRequestHolder(request: PlacementRequest, holder: Plan): Unit = {
+  private def setRequestHolder(request: PlacementRequest, holder: Plan): Unit = {
     requestHolders(request) = RequestReservation(holder, updates)
   }
 
   private def suggestionsWithDuplicates: Seq[PlacementRequest] = (suggestionsNow.view ++ suggestionsBefore.view)
-    .filterNot(_.failed)
     .filterNot(request => blueprintConsumers.contains(request.blueprint))
 
   def suggestions = suggestionsWithDuplicates.distinct

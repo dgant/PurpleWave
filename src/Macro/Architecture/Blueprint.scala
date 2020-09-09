@@ -25,8 +25,7 @@ class Blueprint(
   val requireCandidates   : Option[Seq[Tile]]         = None,
   var preferZone          : Option[Zone]              = None,
   val requireZone         : Option[Zone]              = None,
-  var respectHarvesting   : Option[Boolean]           = None,
-  var forcePlacement      : Boolean                   = false) {
+  var respectHarvesting   : Option[Boolean]           = None) {
   
   var id: Option[Int] = None
   val frameCreated: Int = With.frame
@@ -72,10 +71,10 @@ class Blueprint(
       return ArchitecturalAssessment.DoesntMatch
     }
     if (requirePower.get) {
-      if (heightTiles.get == 3 && ! With.grids.psi3Height.isSet(tile) && ! With.architecture.powered3Height.get(tile)) {
+      if (heightTiles.get == 3 && ! With.grids.psi3Height.isSet(tile) && With.architecture.powered3Height.get(tile) > request.map(_.requiredFrame).getOrElse(With.frame)) {
         return ArchitecturalAssessment.Unpowered
       }
-      if (heightTiles.get == 2 && ! With.grids.psi2Height.isSet(tile) && ! With.architecture.powered2Height.get(tile)) {
+      if (heightTiles.get == 2 && ! With.grids.psi2Height.isSet(tile) && With.architecture.powered2Height.get(tile)> request.map(_.requiredFrame).getOrElse(With.frame)) {
         return ArchitecturalAssessment.Unpowered
       }
     }

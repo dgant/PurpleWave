@@ -8,7 +8,7 @@ object TileSourceOurNonBaseZones extends TileSource {
   
   override def appropriateFor(blueprint: Blueprint): Boolean = TileSourceAnywhere.appropriateFor(blueprint)
   
-  override def tiles(blueprint: Blueprint): Seq[Tile] = {
+  override def tiles(blueprint: Blueprint): Iterable[Tile] = {
     With.geography.ourZones.view.filterNot(_.bases.exists(_.owner.isUs)).flatMap(_.tilesBuildable.view)
   }
 }

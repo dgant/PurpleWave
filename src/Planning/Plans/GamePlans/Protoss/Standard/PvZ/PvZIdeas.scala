@@ -22,7 +22,7 @@ object PvZIdeas {
 
   class ConditionalDefendFFEWithProbesAgainst4Pool extends If(
     new And(
-      new Latch(new Check(() => With.units.countOurs(Protoss.PhotonCannon) + With.self.minerals / 150 >= 2)),
+      new Latch(new Check(() => With.units.countOurs(Protoss.PhotonCannon) + (With.self.minerals + 24) / 150 >= 2)),
       new Or(
         new EnemyStrategy(With.fingerprints.fourPool),
         new And(

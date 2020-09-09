@@ -7,7 +7,7 @@ object TileSourcePreplacementSpecific extends TileSource {
 
   override def appropriateFor(blueprint: Blueprint): Boolean = true
 
-  override def tiles(blueprint: Blueprint): Seq[Tile] = {
+  override def tiles(blueprint: Blueprint): Iterable[Tile] = {
     With.preplacement.preplacement.get(blueprint.building).view.filter(filter)
   }
 

@@ -46,12 +46,12 @@ class ArchitectureDiffExclude(tile: Tile, exclusion: Exclusion) extends Architec
 class ArchitectureDiffPower(tile: Tile) extends ArchitectureDiff {
   val psi2Tiles: Array[Tile] = With.grids.psi2Height.psiPoints.map(tile.add).filter(_.valid)
   val psi3Tiles: Array[Tile] = With.grids.psi3Height.psiPoints.map(tile.add).filter(_.valid)
-  val power2Before: Array[Boolean] = psi2Tiles.map(With.architecture.powered2Height.get)
-  val power3Before: Array[Boolean] = psi3Tiles.map(With.architecture.powered3Height.get)
+  val power2Before: Array[Int] = psi2Tiles.map(With.architecture.powered2Height.get)
+  val power3Before: Array[Int] = psi3Tiles.map(With.architecture.powered3Height.get)
 
   override def doo(): Unit = {
-    psi2Tiles.foreach(With.architecture.powered2Height.set(_, true))
-    psi3Tiles.foreach(With.architecture.powered3Height.set(_, true))
+    psi2Tiles.foreach(With.architecture.powered2Height.set(_, With.frame))
+    psi3Tiles.foreach(With.architecture.powered3Height.set(_, With.frame))
   }
 
   override def undo(): Unit = {

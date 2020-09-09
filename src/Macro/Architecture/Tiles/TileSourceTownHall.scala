@@ -9,7 +9,7 @@ object TileSourceTownHall extends TileSource {
     blueprint.requireTownHallTile.get
   }
   
-  override def tiles(blueprint: Blueprint): Seq[Tile] = {
+  override def tiles(blueprint: Blueprint): Iterable[Tile] = {
     With.geography.bases
       .view
       .filter(b => b.mineralsLeft > 3000 || b.gasLeft > 1000)

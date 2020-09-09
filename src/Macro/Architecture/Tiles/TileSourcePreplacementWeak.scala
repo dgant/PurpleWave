@@ -8,7 +8,7 @@ object TileSourcePreplacementWeak extends TileSource {
 
   override def appropriateFor(blueprint: Blueprint): Boolean = true
 
-  override def tiles(blueprint: Blueprint): Seq[Tile] = {
+  override def tiles(blueprint: Blueprint): Iterable[Tile] = {
     val dimensions = (blueprint.building.tileWidth, blueprint.building.tileHeight)
 
     val reduced = dimensions match {

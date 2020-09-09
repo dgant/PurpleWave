@@ -36,8 +36,8 @@ class Visualization {
     ShowPerformanceSummary,
 
     // Temporary views
-    ShowPreplacement,
-    //ShowArchitecture,
+    //ShowPreplacement,
+    ShowArchitecture,
     //ShowPlans
   )
   

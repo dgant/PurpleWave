@@ -13,7 +13,7 @@ object TileSourceAnywhere extends TileSource {
     && ! blueprint.requirePower.get
   )
   
-  override def tiles(blueprint: Blueprint): Seq[Tile] = {
+  override def tiles(blueprint: Blueprint): Iterable[Tile] = {
     With.geography.allTiles
   }
 }

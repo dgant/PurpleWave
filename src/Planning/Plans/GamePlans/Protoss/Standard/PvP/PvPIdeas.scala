@@ -245,11 +245,11 @@ object PvPIdeas {
       Get(16, Protoss.Probe),
       Get(2,  Protoss.Zealot),
       Get(Protoss.ShieldBattery),
-      Get(18, Protoss.Probe),  // 22/26
-      Get(3,  Protoss.Zealot), // 24/26
-      Get(3,  Protoss.Pylon),  // 24/26+8
-      Get(20, Protoss.Probe),  // 26/26+8
-      Get(5,  Protoss.Zealot), // 28/34
+      Get(3,  Protoss.Pylon),  // 20/25+8
+      Get(18, Protoss.Probe),  // 21/25
+      Get(3,  Protoss.Zealot), // 23/25
+      Get(20, Protoss.Probe),  // 25/25
+      Get(5,  Protoss.Zealot), // 29/34
       Get(Protoss.Assimilator),
       Get(20, Protoss.Probe),  // 29/34
       Get(Protoss.CyberneticsCore),

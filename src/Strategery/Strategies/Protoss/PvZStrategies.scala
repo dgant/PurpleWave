@@ -24,7 +24,9 @@ abstract class PvZ2GateOpening extends PvZStrategy {
 }
 object PvZ1BaseForgeTech extends PvZStrategy {
   override def allowedVsHuman: Boolean = false
-  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(With.fingerprints.fourPool)
+  //Disabled for AIIDE round robin
+  //override def responsesWhitelisted: Iterable[Fingerprint] = Seq(With.fingerprints.fourPool)
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.twelvePool, With.fingerprints.overpool)
   override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgameNeoBisu))
 }
 object PvZSpeedlot extends PvZStrategy {

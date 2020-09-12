@@ -16,7 +16,6 @@ import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.UnitMatchWorkers
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvZFFEConservative, PvZFFEEconomic, PvZGatewayFE}
@@ -54,7 +53,7 @@ class PvZFFE extends GameplanTemplate {
             new BuildOrder(ProtossBuilds.PvZFFE_NexusGatewayForge: _*),
             new BuildOrder(ProtossBuilds.PvZFFE_ForgeNexusCannon: _*)),
           new If(
-            new EnemyStrategy(With.fingerprints.overpool, With.fingerprints.twelvePool),
+            new EnemyStrategy(With.fingerprints.overpool, With.fingerprints.twelvePool, With.fingerprints.tenHatch),
             new BuildOrder(ProtossBuilds.PvZFFE_ForgeNexusCannon: _*),
             new BuildOrder(ProtossBuilds.PvZFFE_ForgeCannonNexus: _*))))))
   
@@ -75,24 +74,26 @@ class PvZFFE extends GameplanTemplate {
       new PvZIdeas.ConditionalDefendFFEWithProbesAgainst4Pool),
     new If(
       new EnemyStrategy(With.fingerprints.fourPool),
-      new EjectScout(Protoss.Probe)),
-
-  )
+      new EjectScout(Protoss.Probe)))
   
   override def buildPlans: Seq[Plan] = Vector(
     new Eject4PoolScout,
-    new If(
-      new UnitsAtLeast(20, UnitMatchWorkers),
-      new Build(
-        Get(Protoss.Assimilator),
-        Get(Protoss.CyberneticsCore))),
+    new Build(
+      Get(Protoss.Pylon),
+      Get(Protoss.Forge),
+      Get(2, Protoss.PhotonCannon),
+      Get(2, Protoss.Nexus),
+      Get(2, Protoss.Pylon),
+      Get(Protoss.Gateway),
+      Get(2, Protoss.PhotonCannon)),
     new If(
       new EnemyStrategy(With.fingerprints.ninePool, With.fingerprints.tenHatch),
       new Pump(Protoss.PhotonCannon, 4)),
     new Pump(Protoss.Dragoon, maximumTotal = 1),
     new Pump(Protoss.Zealot),
     new Build(
-      Get(Protoss.Pylon),
+      Get(Protoss.Assimilator),
+      Get(Protoss.CyberneticsCore),
       Get(Protoss.Forge)),
     new RequireMiningBases(2),
     new Build(

@@ -8,6 +8,6 @@ import Strategery.Strategies.Protoss.PvZ2Gate910
 
 class PvZ2Gate910 extends PvZ2Gate1012 {
   override val activationCriteria = new Employing(PvZ2Gate910)
-  override val initialScoutPlan          = new ScoutOn(Protoss.Gateway, quantity = 2)
-  override def buildOrder         = ProtossBuilds.TwoGate8910
+  override val initialScoutPlan   = new ScoutOn(Protoss.Gateway, quantity = 2)
+  override def buildOrder         = ProtossBuilds.TwoGate910
 }

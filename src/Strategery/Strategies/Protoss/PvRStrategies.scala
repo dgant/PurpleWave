@@ -36,6 +36,7 @@ object PvRDT extends PvRStrategy {
     Seq(PvTDTExpand),
     Seq(PvP2GateDTExpand),
     Seq(PvZMidgameBisu, PvZMidgameNeoBisu, PvZMidgameNeoNeoBisu))
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.fourPool)
 }
 object PvRProxy2Gate extends PvR2GateStrategy {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying

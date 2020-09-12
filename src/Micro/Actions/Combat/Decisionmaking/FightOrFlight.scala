@@ -58,7 +58,7 @@ object FightOrFlight extends Action {
         && ally.energy > 20
         && ally.pixelDistanceEdge(unit, otherAt = ByOption.minBy(unit.matchups.targets.view.map(unit.pixelToFireAt))(unit.pixelDistanceCenter).getOrElse(unit.pixelCenter)) < 72)
     )
-    
+
     decide(true, "Workers", () => unit.matchups.allies.exists(u => u.friendly.isDefined && {
       val ally = u.friendly.get
       val base = u.base.filter(_.owner.isUs)

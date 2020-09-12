@@ -23,26 +23,29 @@ object Gather extends Action {
   
   override def perform(unit: FriendlyUnitInfo) {
 
+    // Gatherer combat micro
     if (unit.battle.nonEmpty) {
-      lazy val resource = unit.agent.toGather.get
-      lazy val zoneNow = unit.zone
-      lazy val zoneTo = resource.zone
-      lazy val mainAndNat = Vector(With.geography.ourMain, With.geography.ourNatural).map(_.zone)
-      lazy val transferring = !unit.base.exists(_.owner.isUs) && zoneNow != zoneTo && !(mainAndNat.contains(zoneNow) && mainAndNat.contains(zoneTo))
-      lazy val threatened = unit.battle.isDefined && unit.matchups.framesOfSafety < combatWindow && unit.matchups.threats.exists(!_.unitClass.isWorker)
-      lazy val threatCloser = unit.matchups.threats.exists(_.pixelDistanceCenter(resource.pixelCenter) < unit.pixelDistanceCenter(resource.pixelCenter))
-      lazy val atResource = unit.pixelDistanceCenter(resource) < With.configuration.workerDefenseRadiusPixels
-      lazy val beckoned = unit.battle.isDefined && unit.matchups.targets.exists(target =>
-        !target.unitClass.isWorker
-          && target.pixelDistanceCenter(unit) < With.configuration.workerDefenseRadiusPixels
-          && target.base.exists(_.units.exists(resource => resource.resourcesLeft > 0 && target.pixelDistanceCenter(resource) < With.configuration.workerDefenseRadiusPixels)))
+      var mineralLock = true
+      var resource    = unit.agent.toGather.get
 
+      // Burrow from threats
       if (unit.canBurrow
         && unit.matchups.enemies.exists(enemy =>
-        ! enemy.isAny(UnitMatchWorkers, Terran.Wraith, Protoss.Arbiter, Protoss.Scout)
-        && enemy.pixelDistanceEdge(unit) < enemy.pixelRangeAgainst(unit) + 32)
-        && ! With.grids.enemyDetection.isDetected(unit.tileIncludingCenter)) {
+          ! enemy.isAny(UnitMatchWorkers, Terran.Wraith, Protoss.Arbiter, Protoss.Scout)
+          && enemy.pixelDistanceEdge(unit) < enemy.pixelRangeAgainst(unit) + 32)
+          && ! With.grids.enemyDetection.isDetected(unit.tileIncludingCenter)) {
         With.commander.burrow(unit)
+      }
+
+      // Move between adjacent bases if threatened
+      lazy val resourcePath = resource.base.flatMap(_.resourcePaths.getOrElse(resource, Seq.empty))
+      lazy val oppositeBase = unit.base.flatMap(base => base.natural.orElse(base.isNaturalOf)).filter(_.townHall.exists(u => u.complete && u.isOurs))
+      if (oppositeBase.nonEmpty && unit.matchups.threats.exists(threat => resourcePath.exists(tile => threat.pixelsToGetInRange(unit, tile.pixelCenter) < 32))) {
+        val resourceAfter = ByOption.minBy(oppositeBase.get.minerals.filter(_.alive))(_.pixelDistanceEdge(resource)).getOrElse(resource)
+        if (resourceAfter != resource) {
+          mineralLock = false
+          resource = resourceAfter
+        }
       }
 
       // Stupid siege tank defense
@@ -50,15 +53,21 @@ object Gather extends Action {
         Engage.consider(unit)
       }
 
-      if (atResource && unit.totalHealth > 32 && beckoned) {
+      // Help with fights when appropriate
+      lazy val beckonedToFight  = unit.matchups.targets.exists(target =>
+        ! target.unitClass.isWorker
+        && (target.canAttack || target.unitClass.rawCanAttack)
+        && target.pixelDistanceCenter(unit)     < With.configuration.workerDefenseRadiusPixels
+        && target.pixelDistanceCenter(resource) < With.configuration.workerDefenseRadiusPixels)
+      if (unit.totalHealth > 32 && beckonedToFight) {
         Engage.consider(unit)
       }
 
       val lethalStabbers = unit.matchups.threatsInRange.filter(threat =>
         threat.unitClass.melee
         && (if (threat.presumptiveTarget.contains(unit)) 2 else 1) * threat.damageOnNextHitAgainst(unit) >= unit.totalHealth)
-      if (lethalStabbers.nonEmpty && unit.base.isDefined) {
 
+      if (lethalStabbers.nonEmpty && unit.base.isDefined) {
         val goals = (unit.base.get.resources ++ unit.base.flatMap(_.townHall))
           .filter(goal =>
             ((unit.carryingGas || unit.carryingMinerals)  && goal.unitClass.isTownHall  && goal.isOurs) ||
@@ -73,12 +82,25 @@ object Gather extends Action {
           if (unit.pixelDistanceEdge(bestGoal.get) < 32) {
             Potshot.consider(unit)
           }
-          With.commander.gather(unit, bestGoal.get)
+
+          // Gather, if necessary
+          if (mineralLock || ! unit.gathering || ! unit.orderTarget.exists(_.unitClass == resource.unitClass)) {
+            With.commander.gather(unit, bestGoal.get)
+          } else {
+            With.commander.sleep(unit)
+          }
         }
       }
 
       Potshot.consider(unit)
 
+      // Run away if threatened during transfer
+      lazy val zoneNow          = unit.zone
+      lazy val zoneTo           = resource.zone
+      lazy val mainAndNatural   = Vector(With.geography.ourMain, With.geography.ourNatural).map(_.zone)
+      lazy val transferring     = ! unit.base.exists(_.owner.isUs) && zoneNow != zoneTo && ! (mainAndNatural.contains(zoneNow) && mainAndNatural.contains(zoneTo))
+      lazy val threatened       = unit.battle.isDefined && unit.matchups.framesOfSafety < combatWindow && unit.matchups.threats.exists(!_.unitClass.isWorker)
+      lazy val threatCloser     = unit.matchups.threats.exists(_.pixelDistanceCenter(resource.pixelCenter) < unit.pixelDistanceCenter(resource.pixelCenter))
       if (transferring
         && threatened
         && threatCloser

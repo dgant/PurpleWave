@@ -23,7 +23,7 @@ class Strategist {
       selectedLast = Some(selectedInitially)
     }
     else if (enemyRaceAtLastCheck != enemyRaceNow) { // Hack fix
-      selectedLast = Some(selectedInitially.filter(_.enemyRaces.exists(_ == enemyRaceNow)))
+      selectedLast = Some(selectedInitially.filter(_.enemyRaces.exists(r => r == Race.Unknown || r == enemyRaceNow)))
     }
     enemyRaceAtLastCheck = enemyRaceNow
     selectedLast.get

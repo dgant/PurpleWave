@@ -69,22 +69,26 @@ class Base(val townHallTile: Tile)
       output
     }
   }
+  private def resourcePathTiles(resource: UnitInfo): Seq[Tile] = {
+    // Draw a shortest-path line from each resource to the town hall.
+    // Where multiple equally-short lines are available, take the one closest to the heart.
+    // Count all tiles in that line.
+    val townHallTiles = townHallArea.tiles
+    def hallDistanceSquared(resourceTile: Tile): Double = townHallTiles.map(resourceTile.tileDistanceSquared).min
+    val resourceTiles   = resource.tileArea.tiles
+    val bestDistance    = resourceTiles.map(hallDistanceSquared).min
+    val from            = resourceTiles.filter(hallDistanceSquared(_) <= bestDistance).minBy(_.tileDistanceSquared(heart))
+    val to              = townHallArea.tiles.minBy(_.tileDistanceSquared(from))
+    val route           = PixelRay(from.pixelCenter, to.pixelCenter)
+    route.tilesIntersected
+  }
+  lazy val resourcePaths: Map[UnitInfo, Seq[Tile]] = {
+    resources.map(resource => (resource, resourcePathTiles(resource))).toMap
+  }
   lazy val resourcePathTiles: Set[Tile] = {
     val output = new mutable.ArrayBuffer[Tile]
 
-    // Draw a shortest-path line from each resource to the town hall.
-    // Where multiple equally-short lines are available, take the one closest to the heart.
-    // Ban all tiles in that line.
-    val townHallTiles = townHallArea.tiles
-    def hallDistanceSquared(resourceTile: Tile): Double = townHallTiles.map(resourceTile.tileDistanceSquared).min
-    resources.foreach(resource => {
-      val resourceTiles   = resource.tileArea.tiles
-      val bestDistance    = resourceTiles.map(hallDistanceSquared).min
-      val from            = resourceTiles.filter(hallDistanceSquared(_) <= bestDistance).minBy(_.tileDistanceSquared(heart))
-      val to              = townHallArea.tiles.minBy(_.tileDistanceSquared(from))
-      val route           = PixelRay(from.pixelCenter, to.pixelCenter)
-      output ++= route.tilesIntersected
-    })
+    output ++= resourcePaths.values.flatten
 
     // Avoid blocking the path where workers are likely to pop out of gas
     // by blocking tiles adjacent to the Nexus that could be along the critical path
@@ -95,11 +99,10 @@ class Base(val townHallTile: Tile)
 
     // Avoid trapping workers into the mining area by banning tiles which are adjacent to the resource
     output ++= minerals.flatMap(_.tileArea.tilesSurrounding)
-    output --= townHallTiles
+    output --= townHallArea.tiles
 
     output.filter(_.valid).toSet
   }
-  lazy val resourcePathTilesI: Set[Int] = resourcePathTiles.map(_.i)
   
   var mineralsLeft              = 0
   var gasLeft                   = 0

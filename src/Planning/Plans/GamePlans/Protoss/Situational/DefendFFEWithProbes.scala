@@ -39,11 +39,11 @@ abstract class DefendFFEWithProbes extends Plan {
     if (defenders.get.units.size > probesRequired) {
       defenders.get.release()
     }
-    defenders.get.unitPreference.set(UnitPreferClose(cannons.map(_.pixelCenter).minBy(_.pixelDistance(threatSource))))
+    defenders.get.unitPreference.set(UnitPreferClose(cannons.map(_.pixelCenter).minBy(_.groundPixels(threatSource))))
     defenders.get.unitCounter.set(new UnitCountBetween(0, probesRequired))
     defenders.get.acquire(this)
-    val closestDistance = cannons.map(_.pixelDistanceEdge(threatSource)).min
-    val threatenedCannons = cannons.filter(_.pixelDistanceEdge(threatSource) <= closestDistance + 96)
+    val closestDistance = cannons.map(_.pixelDistanceTravelling(threatSource)).min
+    val threatenedCannons = cannons.filter(_.pixelDistanceTravelling(threatSource) <= closestDistance + 96)
     val workers = new ArrayBuffer[FriendlyUnitInfo]
     val workersByCannon = threatenedCannons.map(c => (c, new ArrayBuffer[FriendlyUnitInfo])).toMap
     workers ++= defenders.get.units

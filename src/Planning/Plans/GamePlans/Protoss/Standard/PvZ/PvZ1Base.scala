@@ -171,11 +171,6 @@ abstract class PvZ1Base extends GameplanTemplate {
             new UnitsAtLeast(20, UnitMatchWarriors, complete = true)))),
       new RequireMiningBases(2)),
 
-    // Make sure we hit the 4-Gate timing
-    new If(
-      new And(new GettingGoons, new UnitsAtLeast(1, Protoss.CyberneticsCore), new SafeAtHome),
-      new Build(Get(Protoss.DragoonRange), Get(4, Protoss.Gateway))),
-
     // Train army/workers
     new Pump(Protoss.Probe, 16),
     new If(new GettingArchons, new Pump(Protoss.HighTemplar)),

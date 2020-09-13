@@ -68,9 +68,9 @@ object Avoid extends ActionTechnique {
     val atHome              = unit.zone == unit.agent.origin.zone
     val scouting            = unit.agent.canScout
     val desireToGoHome      =
-      if ( ! With.configuration.retreatTowardsHomeOptional)
-        1
-      else if (enemySieging)
+      if (unit.is(Protoss.DarkTemplar))
+        -1
+      else if (enemySieging && ! enemyCloser && ! enemySooner)
         -1
       else if (scouting || atHome)
         0
@@ -84,8 +84,13 @@ object Avoid extends ActionTechnique {
     val desireProfile       = DesireProfile(desireToGoHome, desireForSafety, desireForFreedom)
 
     // Don't spray out against melee units
-    if (unit.is(Protoss.Zealot) && unit.base == unit.agent.origin.base && unit.agent.origin.base.exists(_.isOurMain) && unit.matchups.threats.forall(_.isAny(Protoss.Zealot, Zerg.Zergling, UnitMatchWorkers))) {
+    if (unit.is(Protoss.Zealot)
+      && unit.base == unit.agent.origin.base
+      && unit.agent.origin.base.exists(_.isOurMain)
+      && unit.matchups.threats.forall(_.isAny(Protoss.Zealot, Zerg.Zergling, UnitMatchWorkers))) {
       unit.agent.toTravel = unit.agent.origin.base.map(_.heart.pixelCenter)
+
+      // Poke back at enemies -- likely Zerglings -- while retreating
       if ( ! unit.matchups.threats.exists(_.is(Protoss.Zealot))) {
         Potshot.delegate(unit)
       }
@@ -93,37 +98,53 @@ object Avoid extends ActionTechnique {
       return
     }
 
+    // If traveling by air, potential provides the smoothest paths
     if (unit.flying || (unit.transport.exists(_.flying) && unit.matchups.framesOfSafety <= 0)) {
       avoidPotential(unit, desireProfile)
       return
     }
-    if (With.configuration.enableThreatAwarePathfinding && ! With.performance.danger) {
+
+    // Try a perfect-match downhill path first, both for performance and because it's smoother
+    avoidDownhillPath(unit, desireProfile)
+
+    // Apply threat-aware pathfinding to try finding a better solution
+    if ( ! With.performance.danger) {
       avoidRealPath(unit, desireProfile)
     }
+
+    // I guess at some point we deemed this necessary
     if (unit.unitClass.isReaver && unit.transport.isDefined) {
       DownhillPathfinder.decend(unit, 1, 1, 1, 1)
     }
-    if (unit.zone != unit.agent.origin.zone) {
+
+    // If home is safe, run directly there, possibly through enemy fire
+    val originBase = unit.agent.origin.base
+    if (originBase.isDefined && unit.base != originBase && ! unit.matchups.threats.exists(_.base == originBase)) {
       unit.agent.toTravel = Some(unit.agent.origin)
       Move.delegate(unit)
     }
+
+    // Last resort: try SOME way of pathfinding around
+    avoidDownhillPath(unit, desireProfile)
+
+    // Last resort: Potential fields, which by now are probably totally out-of-tune for ground units
     avoidPotential(unit, desireProfile)
   }
 
-  val defaultGreedyProfiles = Seq(
-    DesireProfile(home = 1, safety = 2, freedom = 1),
-    DesireProfile(home = 0, safety = 2, freedom = 1),
-    DesireProfile(home = 0, safety = 2, freedom = 0),
-    DesireProfile(home = 2, safety = 0, freedom = 1),
-    DesireProfile(home = 2, safety = 0, freedom = 0))
-  def avoidGreedyPaths(unit: FriendlyUnitInfo, desire: DesireProfile): Unit = {
-    defaultGreedyProfiles.sortBy(_.distance(desire)).foreach(someDesire =>
-      DownhillPathfinder.decend(
-        unit,
-        homeValue     = someDesire.home,
-        safetyValue   = someDesire.safety,
-        freedomValue  = someDesire.freedom,
-        targetValue   = someDesire.target))
+  def avoidDownhillPath(unit: FriendlyUnitInfo, desire: DesireProfile): Unit = {
+    Seq(
+      DesireProfile(home = 1, safety = 2, freedom = 1),
+      DesireProfile(home = 0, safety = 2, freedom = 1),
+      DesireProfile(home = 0, safety = 2, freedom = 0),
+      DesireProfile(home = 2, safety = 0, freedom = 1),
+      DesireProfile(home = 2, safety = 0, freedom = 0))
+      .sortBy(_.distance(desire)).foreach(someDesire =>
+        DownhillPathfinder.decend(
+          unit,
+          homeValue     = someDesire.home,
+          safetyValue   = someDesire.safety,
+          freedomValue  = someDesire.freedom,
+          targetValue   = someDesire.target))
   }
 
   def avoidRealPath(unit: FriendlyUnitInfo, desireProfile: DesireProfile): Unit = {

@@ -74,18 +74,19 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val dpfDealingMax                  : Double                = splashFactorMax * ByOption.max(targets.view.map(me.dpfOnNextHitAgainst)).getOrElse(0.0)
   lazy val vpfDealingMax                  : Double                = splashFactorMax * ByOption.max(targets.view.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
   lazy val vpfDealingInRange              : Double                = splashFactorInRange * ByOption.max(targetsInRange.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
-  lazy val dpfReceiving                   : Double                = threatsInRange.map(_.matchups.dpfDealingDiffused(me)).sum
+  lazy val dpfReceiving                   : Double                = threatsInRange.view.map(_.matchups.dpfDealingDiffused(me)).sum
   lazy val vpfReceiving                   : Double                = valuePerDamage * dpfReceiving
   lazy val vpfNet                         : Double                = vpfDealingInRange - vpfReceiving
   lazy val vpfTargetHeuristic             : Double                = TargetHeuristicVpfEnemy.calculate(me)
   lazy val framesBeforeAttacking          : Double                = ByOption.max(targets.view.map(me.framesBeforeAttacking)).getOrElse(Forever()).toDouble
   lazy val framesToLive                   : Double                = PurpleMath.nanToInfinity(me.totalHealth / dpfReceiving)
   lazy val doomed                         : Boolean               = framesToLive <= framesOfEntanglement
-  lazy val pixelsOfEntanglementPerThreat  : Map[UnitInfo, Double] = threats.map(threat => (threat, pixelsOfEntanglementWith(threat))).toMap
-  lazy val framesOfEntanglementPerThreat  : Map[UnitInfo, Double] = threats.map(threat => (threat, framesOfEntanglementWith(threat))).toMap
+  lazy val pixelsOfEntanglementPerThreat  : Map[UnitInfo, Double] = threats.view.map(threat => (threat, pixelsOfEntanglementWith(threat))).toMap
+  lazy val framesOfEntanglementPerThreat  : Map[UnitInfo, Double] = threats.view.map(threat => (threat, framesOfEntanglementWith(threat))).toMap
   lazy val framesOfEntanglement           : Double                = ByOption.max(framesOfEntanglementPerThreat.values).getOrElse(- Forever())
   lazy val pixelsOfEntanglement           : Double                = ByOption.max(pixelsOfEntanglementPerThreat.values).getOrElse(- With.mapPixelWidth)
   lazy val framesOfSafety                 : Double                = - With.latency.latencyFrames - With.reaction.agencyAverage - ByOption.max(framesOfEntanglementPerThreat.values).getOrElse(- Forever().toDouble)
+  lazy val pixelsOutOfNonWorkerRange      : Double                = ByOption.min(threats.view.filterNot(_.unitClass.isWorker).map(t => t.pixelDistanceEdge(me) - t.pixelRangeAgainst(me))).getOrElse(With.mapPixelWidth)
   lazy val teamFramesOfSafety             : Double                = if (me == firstTeammate) ByOption.min(alliesInclSelf.view.map(_.matchups.framesOfSafety)).getOrElse(0) else firstTeammate.matchups.teamFramesOfSafety
   lazy val tilesOfInvisibility            : Double                = if (me.visibleToOpponents) 0 else Spiral.points(8).map(me.tileIncludingCenter.add).find(With.grids.enemyVision.isSet).map(_.tileDistanceFast(me.tileIncludingCenter)).getOrElse(maxTilesOfInvisibility)
   val maxTilesOfInvisibility = 8

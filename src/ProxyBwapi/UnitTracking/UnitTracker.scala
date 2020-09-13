@@ -43,6 +43,8 @@ class UnitTracker {
   @inline def ever: Iterable[UnitInfo] = all ++ historicalUnitTracker.all
   
   @inline def neutral: Iterable[ForeignUnitInfo] = foreignUnitTracker.neutralUnits
+
+  val selected = new Cache(() => With.units.all.filter(_.selected))
   
   def inTileRadius(tile: Tile, tiles: Int): Vector[UnitInfo] = {
     inTiles(

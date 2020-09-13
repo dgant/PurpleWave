@@ -61,19 +61,12 @@ object FightOrFlight extends Action {
 
     decide(true, "Workers", () => unit.matchups.allies.exists(u => u.friendly.isDefined && {
       val ally = u.friendly.get
-      val base = u.base.filter(_.owner.isUs)
       val output = (
         ally.unitClass.isWorker
-        && base.isDefined
-        && base.exists(ally.base.contains)
         && ally.visibleToOpponents
-        && ally.matchups.framesOfSafety <= 2 + Math.max(0, unit.matchups.framesOfSafety)
-        && (
-          ! ally.agent.canFlee
-          || ally.base.exists(_.units.exists(resource =>
-            resource.resourcesLeft > 0
-            && resource.pixelDistanceCenter(ally) < With.configuration.workerDefenseRadiusPixels)))
-        && ally.matchups.threats.exists(u.canAttack)
+        && ally.agent.toGather.exists(_.pixelDistanceEdge(ally) < With.configuration.workerDefenseRadiusPixels)
+        && ally.matchups.pixelsOutOfNonWorkerRange <= 16 + unit.matchups.pixelsOutOfNonWorkerRange
+        && ally.matchups.threats.exists(threat => u.canAttack && threat.framesToGetInRange(ally) <= 8 + unit.framesToGetInRange(threat))
       )
       output
     }))

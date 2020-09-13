@@ -1,6 +1,5 @@
 package Debugging.Visualizations.Views.Battles
 
-import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Debugging.Visualizations.Views.Micro.ShowSquads
 import Debugging.Visualizations.Views.View
@@ -28,7 +27,7 @@ object ShowClustering extends View {
   
   override def renderMap() {
     val battles = With.battles.local
-    battles.foreach(b => Seq((b.us, With.self.colorBright), (b.enemy, With.enemy.colorBright)).foreach(p =>
+    battles.foreach(b => Seq((b.us, With.self.colorNeon), (b.enemy, With.enemy.colorNeon)).foreach(p =>
         DrawMap.polygonPixels(
           PurpleMath.convexHullPixels(
             p._1.units.map(_.corners.maxBy(_.pixelDistanceSquared(b.focus)))),

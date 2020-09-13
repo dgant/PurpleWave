@@ -6,7 +6,7 @@ import Debugging.Visualizations.{Colors, ForceColors}
 import Information.Geography.Pathfinding.Types.TilePath
 import Lifecycle.With
 import Mathematics.Points.PixelRay
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 import bwapi.Color
 
@@ -103,12 +103,12 @@ object ShowUnitsFriendly extends View {
       }
     }
     
-    if (showPaths && (unit.selected || unit.transport.exists(_.selected))) {
+    if (showPaths && (unit.selected || unit.transport.exists(_.selected) || With.units.selected().isEmpty)) {
       def drawRayPath(ray: PixelRay, color: Color) {
         ray.tilesIntersected.foreach(tile => DrawMap.box(
           tile.topLeftPixel.add(1, 1),
           tile.bottomRightPixel.subtract(1, 1),
-          if (With.grids.walkable.get(tile)) color else Colors.BrightRed))
+          if (With.grids.walkable.get(tile)) color else Colors.DarkRed))
       }
       def drawTilePath(path: TilePath): Unit = {
         for (i <- 0 until path.tiles.get.size - 1) {
@@ -177,9 +177,5 @@ object ShowUnitsFriendly extends View {
         DrawMap.circle(unit.pixelCenter, r.toInt, Colors.NeonYellow)
       }
     }
-  }
-  
-  def drawAttackCommand(attacker: UnitInfo, victim: UnitInfo) {
-    DrawMap.circle(attacker.pixelCenter, attacker.unitClass.radialHypotenuse.toInt, Colors.BrightViolet)
   }
 }

@@ -1,9 +1,9 @@
 package Mathematics.Formations.Designers
 
-import Information.Geography.Types.Zone
+import Information.Geography.Types.{Edge, Zone}
 import Lifecycle.With
 import Mathematics.Formations.{FormationAssigned, FormationSlot, FormationUnassigned}
-import Mathematics.Points.{Pixel, PixelRay, Point}
+import Mathematics.Points._
 import Mathematics.Shapes.Spiral
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
@@ -35,8 +35,10 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
     val allEnemies = With.units.enemy.view.filter(_.attacksAgainstGround > 0)
     val enemyRangePixelsMin   : Int = ByOption.min(allEnemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(if (With.enemy.isTerran) 5 * 32 else 32)
     val enemyRangePixelsMax   : Int = ByOption.max(allEnemies.view.map(_.effectiveRangePixels.toInt)).getOrElse(32 * 5)
-    val meleeUnitDiameter     : Int = 6 + Math.max(16, slots.map(s => if (s.idealPixels > 32) 0 else s.unitClass.dimensionMax.toInt).max)
-    val meleeChokeWidthUnits  : Int = Math.max(1, Math.min(2 * zone.exitNow.map(_.radiusPixels.toInt).getOrElse(0) / meleeUnitDiameter, slots.count(_.idealPixels <= 32)))
+    val exit                  : Option[Edge] = zone.exitNow
+    val exitDirection         : Direction = exit.map(e => e.sidePixels.head.subtract(e.sidePixels.last).direction).getOrElse(Directions.Right)
+    val meleeUnitSize         : Int = 3 + Math.max(16, slots.map(s => if (s.idealPixels > 32) 0 else if (exitDirection.isHorizontal) s.unitClass.width else s.unitClass.height).max)
+    val meleeChokeWidthUnits  : Int = Math.max(1, Math.min(2 * exit.map(_.radiusPixels.toInt).getOrElse(0) / meleeUnitSize, slots.count(_.idealPixels <= 32)))
 
     // TODO: Standardize definition of a melee slot
 
@@ -45,11 +47,11 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
       val rowsFilled = i / meleeChokeWidthUnits
       val targetSide = chokeSides(unitsInThisRow % 2)
       val vectorLateral = if (meleeChokeWidthUnits % 2 == 0) {
-        chokeCenter.project(targetSide, meleeUnitDiameter * (0.5 + unitsInThisRow / 2)) - chokeCenter
+        chokeCenter.project(targetSide, meleeUnitSize * (0.5 + unitsInThisRow / 2)) - chokeCenter
       } else {
-        chokeCenter.project(targetSide, meleeUnitDiameter * ((1 + unitsInThisRow) / 2)) - chokeCenter
+        chokeCenter.project(targetSide, meleeUnitSize * ((1 + unitsInThisRow) / 2)) - chokeCenter
       }
-      val vectorDepth = chokeCenter.project(chokeEnd, 12 + meleeUnitDiameter * rowsFilled) - chokeCenter
+      val vectorDepth = chokeCenter.project(chokeEnd, 12 + meleeUnitSize * rowsFilled) - chokeCenter
       val output = chokeCenter + vectorLateral + vectorDepth
       output
     })

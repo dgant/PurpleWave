@@ -101,9 +101,6 @@ class Commander {
       
       if (shouldOrder) {
         unit.baseUnit.attack(target.baseUnit)
-        if (ShowUnitsFriendly.inUse && With.visualization.map) {
-          ShowUnitsFriendly.drawAttackCommand(unit, target)
-        }
       }
       sleepAttack(unit)
     } else {

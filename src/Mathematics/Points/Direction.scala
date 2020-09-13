@@ -2,7 +2,7 @@ package Mathematics.Points
 
 import Mathematics.PurpleMath
 
-class Direction(x: Int, y: Int) extends AbstractPoint(
+case class Direction(override val x: Int, override val y: Int) extends AbstractPoint (
   if (x*x < y*y) 0 else PurpleMath.signum(x),
   if (x*x >= y*y) 0 else PurpleMath.signum(y)) {
 

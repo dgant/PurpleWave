@@ -10,11 +10,11 @@ abstract class AbstractPoint(val x: Int, val y: Int) {
   @inline final def pixel : Pixel = Pixel(x, y)
   @inline final def tile  : Tile  = Tile(x, y)
 
-  def direction: Point =
+  def direction: Direction  =
     if (Math.abs(x) > Math.abs(y))
-      Point(PurpleMath.signum(x), 0)
+      Direction(PurpleMath.signum(x), 0)
     else
-      Point(0, PurpleMath.signum(y))
+      Direction(0, PurpleMath.signum(y))
 
   @inline final def maxDimensionLength: Int = Math.max(Math.abs(x), Math.abs(y))
 

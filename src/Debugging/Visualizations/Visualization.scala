@@ -34,11 +34,6 @@ class Visualization {
     ShowExplosions,
     ShowStatus,
     ShowPerformanceSummary,
-
-    // Temporary views
-    //ShowPreplacement,
-    ShowArchitecture,
-    //ShowPlans
   )
   
   var enabled   : Boolean = _

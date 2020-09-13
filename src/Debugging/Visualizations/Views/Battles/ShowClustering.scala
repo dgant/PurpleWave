@@ -6,6 +6,7 @@ import Debugging.Visualizations.Views.Micro.ShowSquads
 import Debugging.Visualizations.Views.View
 import Information.Battles.Types.BattleLocal
 import Lifecycle.With
+import Mathematics.PurpleMath
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
 
@@ -27,9 +28,12 @@ object ShowClustering extends View {
   
   override def renderMap() {
     val battles = With.battles.local
-    for (i <- battles.indices) {
-      renderMapBattle(battles(i), colors(i % colors.size))
-    }
+    battles.foreach(b => Seq((b.us, With.self.colorBright), (b.enemy, With.enemy.colorBright)).foreach(p =>
+        DrawMap.polygonPixels(
+          PurpleMath.convexHullPixels(
+            p._1.units.map(_.corners.maxBy(_.pixelDistanceSquared(b.focus)))),
+            p._2)
+    ))
   }
   
   private def renderMapBattle(battle: BattleLocal, color: Color) {
@@ -37,16 +41,5 @@ object ShowClustering extends View {
       team.units.foreach(unit =>
         DrawMap.line(unit.pixelCenter, team.centroid, color)))
   }
-  
-  private lazy val colors = Vector(
-    Colors.NeonRed,
-    Colors.BrightYellow,
-    Colors.NeonOrange,
-    Colors.BrightGreen,
-    Colors.BrightTeal,
-    Colors.NeonBlue,
-    Colors.NeonIndigo,
-    Colors.NeonViolet
-  )
 }
 

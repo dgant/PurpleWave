@@ -63,7 +63,7 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     val delta = destination.subtract(this)
     delta.multiply(pixels/distance).add(this)
   }
-  private val radiansOverDegrees = 2.0 * Math.PI / 256.0
+
   @inline final def radiateRadians(angleRadians: Double, pixels: Double): Pixel = {
     add(
       (pixels * Math.cos(angleRadians)).toInt,
@@ -85,9 +85,9 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     add(pixel).divide(2)
   }
   @inline final def pixelDistance(pixel: Pixel): Double = PurpleMath.broodWarDistance(x, y, pixel.x, pixel.y)
-  @inline final def pixelDistanceSquared(pixel: Pixel): Int = {
-    val dx = x - pixel.x
-    val dy = y - pixel.y
+  @inline final def pixelDistanceSquared(other: Pixel): Int = {
+    val dx = x - other.x
+    val dy = y - other.y
     dx * dx + dy * dy
   }
   @inline final def tileIncluding: Tile = {

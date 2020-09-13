@@ -118,5 +118,4 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
         .mapValues(_.map(_._2)))
       .assign(units)
   }
-
 }

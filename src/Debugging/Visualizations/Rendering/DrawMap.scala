@@ -144,6 +144,7 @@ object DrawMap {
   }
   
   def polygonPixels(points: Iterable[Pixel], color: Color = Colors.DefaultGray) {
+    if (points.size < 2) return
     points.reduce((p1, p2) => { line(p1, p2, color); p2 })
     line(points.head, points.last, color)
   }

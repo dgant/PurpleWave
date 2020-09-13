@@ -39,7 +39,7 @@ class PlacementNode(request: PlacementRequest) extends PlacementState {
     failed = true
     request.tile = None
     request.lastPlacementFrame = With.frame
-    With.logger.warnCircuitBreaker("Failed to place " + request)
+    //With.logger.warnCircuitBreaker("Failed to place " + request)
   }
 
   def succeed(tile: Tile): Unit = {

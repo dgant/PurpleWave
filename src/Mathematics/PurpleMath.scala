@@ -1,8 +1,10 @@
 package Mathematics
 
 import Lifecycle.With
-import Mathematics.Points.{AbstractPoint, Pixel, SpecificPoints, Tile}
+import Mathematics.Points._
 
+import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
 object PurpleMath {
@@ -189,8 +191,8 @@ object PurpleMath {
       yy = y0 + param * dy1
     }
 
-    var dx = x - xx
-    var dy = y - yy
+    val dx = x - xx
+    val dy = y - yy
 
     Math.sqrt(dx * dx + dy * dy)
   }
@@ -269,4 +271,48 @@ object PurpleMath {
   @inline final def square(k: Int): Int = k * k
   @inline final def square(k: Float): Float = k * k
   @inline final def square(k: Double): Double = k * k
+
+  /**
+    * @return 0 if colinear, 1 if clockwise, -1 if counterclockwise
+    */
+  @inline def clockDirection(a: AbstractPoint, b: AbstractPoint, c: AbstractPoint): Int = {
+    // See https://stackoverflow.com/questions/1165647/how-to-determine-if-a-list-of-polygon-points-are-in-clockwise-order/1180256#1180256
+    // and https://www.geeksforgeeks.org/orientation-3-ordered-points/
+    signum((b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y))
+  }
+
+  def convexHull(points: Seq[Point]): Seq[Point] = {
+    // See https://en.wikipedia.org/wiki/Graham_scan
+    if (points.isEmpty) return Seq.empty
+    if (points.size == 2) return Seq(points.head, points.last)
+
+    // Find an extremum, guaranteed to be on the hull
+    val yMax = points.view.map(_.y).max
+    val origin = points.view.filter(_.y == yMax).maxBy(_.x)
+
+    // Get points sorted by polar angle with the origin, discarding closer points
+    var sortedPoints = new ArrayBuffer[(Point, Double)]
+    sortedPoints ++= points.view.map(p => (p, origin.radiansTo(p)))
+    sortedPoints = sortedPoints.sortBy(_._2).sortBy(_._1 != origin)
+    var i: Int = 1
+    while(i < sortedPoints.length) {
+      val a = sortedPoints(i - 1)
+      val b = sortedPoints(i)
+      if (a._2 == b._2) {
+        sortedPoints.remove(if (origin.distanceSquared(a._1) < origin.distanceSquared(b._1)) i - 1 else i)
+      } else {
+        i += 1
+      }
+    }
+
+    val stack = new mutable.Stack[Point]
+    sortedPoints.foreach(point => {
+      while (stack.size > 1 && clockDirection(point._1, stack.head, stack(1)) < 0)
+        stack.pop()
+      stack.push(point._1)
+    })
+    stack
+  }
+
+  def convexHullPixels(pixels: Seq[Pixel]): Seq[Pixel] = convexHull(pixels.map(_.toPoint)).map(p => Pixel(p.x, p.y))
 }

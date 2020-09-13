@@ -20,4 +20,14 @@ class CountMap[T] extends mutable.ListMap[T, Int] {
     Seq(this, other).foreach(_.foreach(pair => output(pair._1) += pair._2))
     output
   }
+
+  def mode: Option[T] = {
+    var output: Option[T] = None
+    var maximumCount: Int = Int.MinValue
+    foreach(p => if (p._2 >= maximumCount) {
+      output = Some(p._1)
+      maximumCount = p._2
+    })
+    output
+  }
 }

@@ -2,7 +2,7 @@ package Micro.Actions.Basic
 
 import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Mathematics.Points.SpecificPoints
+import Mathematics.Points.{SpecificPoints, Tile}
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Disengage, Engage}
 import Micro.Actions.Combat.Tactics.Potshot
@@ -38,7 +38,7 @@ object Gather extends Action {
       }
 
       // Move between adjacent bases if threatened
-      lazy val resourcePath = resource.base.flatMap(_.resourcePaths.getOrElse(resource, Seq.empty))
+      lazy val resourcePath: Iterable[Tile] = resource.base.map(_.resourcePaths.getOrElse(resource, Seq.empty)).getOrElse(Iterable.empty)
       lazy val oppositeBase = unit.base.flatMap(base => base.natural.orElse(base.isNaturalOf)).filter(_.townHall.exists(u => u.complete && u.isOurs))
       if (oppositeBase.nonEmpty && unit.matchups.threats.exists(threat => resourcePath.exists(tile => threat.pixelsToGetInRange(unit, tile.pixelCenter) < 32))) {
         val resourceAfter = ByOption.minBy(oppositeBase.get.minerals.filter(_.alive))(_.pixelDistanceEdge(resource)).getOrElse(resource)

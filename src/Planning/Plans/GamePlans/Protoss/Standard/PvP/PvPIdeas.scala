@@ -79,6 +79,12 @@ object PvPIdeas {
         new UnitsAtLeast(1, UnitMatchAnd(UnitMatchWarriors, UnitMatchNot(Protoss.Dragoon))),
         new UpgradeComplete(Protoss.DragoonRange),
         new Not(new EnemyHasUpgrade(Protoss.DragoonRange))),
+      // If we expanded, wait until we can capitalize or if they've already expanded too
+      new Or(
+        new BasesAtMost(1),
+        new EnemyBasesAtLeast(2),
+        new Latch(new And(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new UnitsAtLeast(1, Protoss.Shuttle, complete = true))),
+        new Latch(new UnitsAtLeast(15, UnitMatchWarriors))),
       // Don't mess with 4-Gates
       new Or(
         new Employing(PvP2Gate1012Goon, PvP4GateGoon),

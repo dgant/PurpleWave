@@ -81,7 +81,7 @@ object PvT1015DT extends PvTStrategy {
 object PvT1GateReaver extends PvTBasicOpener {
   override def responsesWhitelisted: Iterable[Fingerprint] = {
     // TODO: Add FD once we have a fingerprint
-    Seq(With.fingerprints.fourteenCC, With.fingerprints.oneRaxFE, With.fingerprints.twoFac, With.fingerprints.threeFac, With.fingerprints.bio, With.fingerprints.twoRaxAcad)
+    Seq(With.fingerprints.fourteenCC, With.fingerprints.oneRaxFE, With.fingerprints.twoFacVultures, With.fingerprints.threeFacVultures, With.fingerprints.bio, With.fingerprints.twoRaxAcad)
   }
   override def responsesBlacklisted: Iterable[Fingerprint] = {
     // TODO: Add 1 Fac Port

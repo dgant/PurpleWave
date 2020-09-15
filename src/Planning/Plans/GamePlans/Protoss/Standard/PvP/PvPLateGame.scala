@@ -217,9 +217,8 @@ class PvPLateGame extends GameplanTemplate {
     new If(
       new NeedToCutWorkersForGateways,
       new Build(
-        Get(4, Protoss.Gateway),
-        Get(2, Protoss.Assimilator),
-        Get(5, Protoss.Gateway))),
+        Get(5, Protoss.Gateway),
+        Get(2, Protoss.Assimilator))),
     new AddEarlyTech,
     new RequireBases(3),
 

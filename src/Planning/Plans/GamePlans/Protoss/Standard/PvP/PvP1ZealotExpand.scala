@@ -49,6 +49,12 @@ class PvP1ZealotExpand extends GameplanTemplate {
 
   override def attackPlan: Plan = new If(new EnemyStrategy(With.fingerprints.nexusFirst), new Attack)
 
+  override def supplyPlan: Plan = new If(
+    new Or(
+      new UnitsAtMost(1, Protoss.Nexus),
+      new UnitsAtLeast(2, Protoss.Nexus, complete = true)),
+    super.supplyPlan)
+
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToProxyGateways,
@@ -106,7 +112,11 @@ class PvP1ZealotExpand extends GameplanTemplate {
             new GasForUpgrade(Protoss.DragoonRange)),
           new CapGasWorkersAt(1),
           new If(
-            new UnitsAtMost(4, Protoss.Gateway),
+            new Or(
+              new UnitsAtMost(4, Protoss.Gateway, complete = true),
+              new And(
+                new ShouldAddCannons,
+                new UnitsAtMost(0, Protoss.Forge))),
             new CapGasWorkersAt(2))))),
 
     new If(

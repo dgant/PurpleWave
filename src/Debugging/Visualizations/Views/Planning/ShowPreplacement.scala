@@ -1,30 +1,44 @@
 package Debugging.Visualizations.Views.Planning
 
+import Debugging.Visualizations.Colors
+import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
+import Mathematics.Points.{Direction, Pixel, SpecificPoints, TileGenerator}
 
 object ShowPreplacement extends View {
 
   override def renderMap(): Unit = {
     With.preplacement.fits.foreach(_.drawMap())
+  }
 
-    val zone = With.geography.ourMain.zone
-    val exit = zone.exit.map(_.pixelCenter.tileIncluding)
-    if(exit.isEmpty) return
+  def showGenerator() {
+    With.geography.zones.foreach(zone => {
+      if (zone.boundary.contains(new Pixel(With.game.getMousePosition).add(With.viewport.start).tileIncluding)) {
+        val bounds        = zone.boundary
+        val exitDirection = zone.exit.map(_.direction).getOrElse(zone.centroid.subtract(SpecificPoints.tileMiddle).direction)
+        val exitTile      = zone.exit.map(_.pixelCenter.tileIncluding).getOrElse(zone.centroid)
+        val tilesFront    = bounds.cornerTilesInclusive.sortBy(t => Math.min(Math.abs(t.x - exitTile.x), Math.abs(t.y - exitTile.y))).take(2)
+        val tilesBack     = bounds.cornerTilesInclusive.filterNot(tilesFront.contains)
+        val cornerFront   = tilesFront.maxBy(_.tileDistanceSquared(SpecificPoints.tileMiddle))
+        val cornerBack    = tilesBack.maxBy(_.tileDistanceSquared(cornerFront))
 
-    /*
-    val back = zone.tiles.maxBy(_.tileDistanceFast(exit.get))
-    val generator = new TileGenerator(exit.get, zone.boundary.startInclusive, zone.boundary.endExclusive, new Direction(exit.get, back))
-    var previous = exit.get
-    var next = previous
-    var i = 0
-    while (generator.hasNext) {
-      next = generator.next()
-      DrawMap.arrow(previous.pixelCenter, next.pixelCenter, Colors.NeonOrange)
-      DrawMap.label(i.toString, next.pixelCenter.add(0, 7))
-      i += 1
-      previous = next
-    }
-    */
+        val directionToBack   = new Direction(cornerFront, cornerBack)
+        val directionToFront  = new Direction(cornerBack, cornerFront)
+
+        DrawMap.box(bounds.startPixel, bounds.endPixel, Colors.NeonYellow)
+        val generator = new TileGenerator(exitTile, zone.boundary.startInclusive, zone.boundary.endExclusive, directionToBack)
+        var previous = exitTile
+        var next = previous
+        var i = 0
+        while (generator.hasNext) {
+          next = generator.next()
+          DrawMap.arrow(previous.pixelCenter, next.pixelCenter, Colors.NeonOrange)
+          DrawMap.label(i.toString, next.pixelCenter.add(0, 7))
+          i += 1
+          previous = next
+        }
+      }
+    })
   }
 }

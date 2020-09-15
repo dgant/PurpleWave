@@ -18,11 +18,11 @@ class Viewport {
       .bwapi)
   }
   
-  def contains(pixel: Pixel): Boolean = {
-    pixel.x >= start.x  &&
-    pixel.y >= start.y  &&
-    pixel.x <= end.x    &&
-    pixel.y <= end.y
+  def contains(pixel: Pixel, buffer: Int = 0): Boolean = {
+    pixel.x + buffer >= start.x  &&
+    pixel.y + buffer >= start.y  &&
+    pixel.x - buffer <= end.x    &&
+    pixel.y - buffer <= end.y
   }
   
   def contains(tile: Tile): Boolean = {

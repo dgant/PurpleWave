@@ -1,7 +1,5 @@
 package Mathematics.Points
 
-import Mathematics.PurpleMath
-
 abstract class AbstractPoint(val x: Int, val y: Int) {
   
   @inline final def length        : Double = Math.sqrt(lengthSquared)
@@ -10,11 +8,7 @@ abstract class AbstractPoint(val x: Int, val y: Int) {
   @inline final def pixel : Pixel = Pixel(x, y)
   @inline final def tile  : Tile  = Tile(x, y)
 
-  def direction: Direction  =
-    if (Math.abs(x) > Math.abs(y))
-      Direction(PurpleMath.signum(x), 0)
-    else
-      Direction(0, PurpleMath.signum(y))
+  def direction: Direction = new Direction(this)
 
   @inline final def maxDimensionLength: Int = Math.max(Math.abs(x), Math.abs(y))
 

@@ -183,6 +183,6 @@ object DrawMap {
   }
   def irrelevant(pixel: Pixel): Boolean = {
     val buffer = 32 * 4
-    ! pixel.valid || ! With.viewport.contains(pixel)
+    ! pixel.valid || ! With.viewport.contains(pixel, buffer)
   }
 }

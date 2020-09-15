@@ -19,7 +19,7 @@ class PreplacementTemplate {
   val end     : Cache[Tile] = new CacheForever(() => Tile(bottom(), right()))
   val area    : Cache[TileRectangle] = new CacheForever[TileRectangle](() => TileRectangle(start(), end()))
   def width   : Int         = right() - left()
-  val height  : Int         = bottom() - top()
+  def height  : Int         = bottom() - top()
 
   def add(point: Point, requirement: PreplacementRequirement): PreplacementTemplate = {
     points += PreplacementSlot(point, requirement)
@@ -36,17 +36,17 @@ class PreplacementTemplate {
   def add(string: String): PreplacementTemplate = {
     var x: Int = 0
     var y: Int = 0
-    var onNewline: Boolean = true
+    var onWhitespace: Boolean = true
     def point(): Point = Point(x, y)
     string.foreach(char => {
       if (char.isWhitespace) {
-        if ( ! onNewline) {
-          onNewline = true
+        if ( ! onWhitespace) {
+          onWhitespace = true
           x = 0
           y += 1
         }
       } else {
-        onNewline = false
+        onWhitespace = false
         val pt: PreplacementRequirement = char.toLower match {
           case '-' => ReservedWalkable
           case 't' => new PreplacementRequirement(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery)

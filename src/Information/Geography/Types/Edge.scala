@@ -2,7 +2,7 @@ package Information.Geography.Types
 
 import Information.Grids.Movement.GridGroundDistance
 import Lifecycle.With
-import Mathematics.Points.{Pixel, PixelRay, Tile}
+import Mathematics.Points.{Direction, Pixel, PixelRay, Tile}
 import Mathematics.PurpleMath
 import bwta.Chokepoint
 
@@ -18,6 +18,7 @@ class Edge(choke: Chokepoint) {
   lazy val radiusPixels : Double = choke.getWidth / 2
   lazy val tiles        : Vector[Tile] = PixelRay(sidePixels.head, sidePixels.last).tilesIntersected.toVector
   lazy val sidePixels   : Seq[Pixel] = Vector(new Pixel(choke.getSides.getLeft), new Pixel(choke.getSides.getRight))
+  lazy val direction    : Direction = new Direction(sidePixels.head, sidePixels.last)
   lazy val endPixels    : Vector[Pixel] = Vector(-1, 1)
     .map(m => pixelCenter
       .radiateRadians(

@@ -1,8 +1,11 @@
 package Micro.Actions.Combat.Techniques
 
 import Debugging.Visualizations.ForceColors
+import Debugging.Visualizations.Rendering.DrawMap
 import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Lifecycle.With
+import Mathematics.Physics.ForceMath
+import Mathematics.Points.PixelRay
 import Mathematics.PurpleMath
 import Micro.Actions.Combat.Maneuvering.{DownhillPathfinder, Traverse}
 import Micro.Actions.Combat.Tactics.Potshot
@@ -13,6 +16,7 @@ import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWorkers}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, TakeN}
+import bwapi.Color
 
 object Avoid extends ActionTechnique {
 
@@ -104,7 +108,10 @@ object Avoid extends ActionTechnique {
       return
     }
 
-    // Try a perfect-match downhill path first, both for performance and because it's smoother
+    // Try the smoothest, fastest solution: Direct potential
+    avoidDirect(unit, desireProfile)
+
+    // Try a perfect-match downhill, both for performance and because it's smoother
     avoidDownhillPath(unit, desireProfile)
 
     // Apply threat-aware pathfinding to try finding a better solution
@@ -131,14 +138,43 @@ object Avoid extends ActionTechnique {
     avoidPotential(unit, desireProfile)
   }
 
-  def avoidDownhillPath(unit: FriendlyUnitInfo, desire: DesireProfile): Unit = {
+  def avoidDirect(unit: FriendlyUnitInfo, desireProfile: DesireProfile): Unit = {
+    if ( ! unit.ready) return
+
+    if (desireProfile.safety <= 0) return
+
+    val forceThreat   = Potential.avoidThreats(unit)   * desireProfile.safety
+    val forceSpacing  = Potential.avoidCollision(unit) * desireProfile.freedom
+    val force         = ForceMath.sumAll(forceThreat, forceSpacing)
+
+    val rotationSteps = 4
+    (1 to 1 + 2 * rotationSteps).foreach(r => {
+      if (unit.ready) {
+        val rotationRadians = ((r % 2) * 2 - 1) * (r / 2) * Math.PI / 2 / rotationSteps
+        val ray = PixelRay(unit.pixelCenter, unit.pixelCenter.radiateRadians(force.radians + rotationRadians, 64))
+        val destination = ray.to
+        if (destination.valid) {
+          if (unit.flying || ray.tilesIntersected.forall(_.walkable)) {
+            val origin = unit.agent.origin
+            if (unit.zone == origin.zone || desireProfile.home * unit.pixelDistanceTravelling(destination, origin) <= desireProfile.home * unit.pixelDistanceTravelling(origin)) {
+              unit.agent.toTravel = Some(destination)
+              Move.delegate(unit)
+              DrawMap.arrow(unit.pixelCenter, destination, Color.White) // TMP
+            }
+          }
+        }
+      }
+    })
+  }
+
+  def avoidDownhillPath(unit: FriendlyUnitInfo, desireProfile: DesireProfile): Unit = {
     Seq(
       DesireProfile(home = 1, safety = 2, freedom = 1),
       DesireProfile(home = 0, safety = 2, freedom = 1),
       DesireProfile(home = 0, safety = 2, freedom = 0),
       DesireProfile(home = 2, safety = 0, freedom = 1),
       DesireProfile(home = 2, safety = 0, freedom = 0))
-      .sortBy(_.distance(desire)).foreach(someDesire =>
+      .sortBy(_.distance(desireProfile)).foreach(someDesire =>
         DownhillPathfinder.decend(
           unit,
           homeValue     = someDesire.home,
@@ -172,7 +208,7 @@ object Avoid extends ActionTechnique {
 
   def avoidPotential(unit: FriendlyUnitInfo, desireProfile: DesireProfile): Unit = {
 
-    if (! unit.ready) return
+    if ( ! unit.ready) return
 
     unit.agent.toTravel = Some(unit.agent.origin)
 

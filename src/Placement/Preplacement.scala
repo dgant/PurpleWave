@@ -3,7 +3,6 @@ package Placement
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Points.{Direction, SpecificPoints}
-import Utilities.ByOption
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -31,27 +30,23 @@ class Preplacement {
   }
 
   private def preplaceZone(zone: Zone): Unit = {
-    val anyExit = zone.exit.map(_.pixelCenter.tileIncluding).orElse(ByOption.minBy(zone.tiles)(_.tileDistanceFast(SpecificPoints.tileMiddle)))
-    val anyBack = anyExit.flatMap(o => ByOption.maxBy(zone.tiles)(_.tileDistanceFast(o)))
+    val bounds        = zone.boundary
+    val exitDirection = zone.exit.map(_.direction).getOrElse(zone.centroid.subtract(SpecificPoints.tileMiddle).direction)
+    val exitTile      = zone.exit.map(_.pixelCenter.tileIncluding).getOrElse(zone.centroid)
+    val tilesFront    = bounds.cornerTilesInclusive.sortBy(t => Math.min(Math.abs(t.x - exitTile.x), Math.abs(t.y - exitTile.y))).take(2)
+    val tilesBack     = bounds.cornerTilesInclusive.filterNot(tilesFront.contains)
+    val cornerFront   = tilesFront.maxBy(_.tileDistanceSquared(SpecificPoints.tileMiddle))
+    val cornerBack    = tilesBack.maxBy(_.tileDistanceSquared(cornerFront))
 
-    if (anyExit.isEmpty || anyBack.isEmpty) return
+    val directionToBack   = new Direction(cornerFront, cornerBack)
+    val directionToFront  = new Direction(cornerBack, cornerFront)
 
-    val bounds = zone.boundary
-    val exit = anyExit.get
-    val back = anyBack.get
-    val exitEdge = bounds.cornerTilesInclusive.sortBy(_.tileDistanceManhattan(exit)).take(2).minBy(t => Math.min(t.x, t.y))
-    val backEdge = bounds.cornerTilesInclusive.sortBy(_.tileDistanceManhattan(back)).take(2).minBy(t => Math.min(t.x, t.y))
-    val exitSide = bounds.cornerTilesInclusive.maxBy(_.tileDistanceManhattan(exitEdge))
-    val backSide = bounds.cornerTilesInclusive.maxBy(_.tileDistanceManhattan(backEdge))
-    val directionExit = new Direction(anyBack.get, anyExit.get)
-    val directionBack = new Direction(anyExit.get, anyBack.get)
-
-    fits ++= preplacement.fit     (exit,      bounds, directionBack, PreplacementTemplates.batterycannon)
-    fits ++= preplacement.fitAny  (exitEdge,  bounds, directionBack, PreplacementTemplates.initialLayouts)
-    fits ++= preplacement.fitAny  (exitEdge,  bounds, directionBack, PreplacementTemplates.gateways)
-    fits ++= preplacement.fitAny  (backEdge,  bounds, directionExit, PreplacementTemplates.tech)
-    fits ++= preplacement.fitAny  (exitEdge,  bounds, directionBack, PreplacementTemplates.gateways, 2)
-    fits ++= preplacement.fitAny  (backEdge,  bounds, directionExit, PreplacementTemplates.tech)
-    fits ++= preplacement.fitAny  (exitEdge,  bounds, directionBack, PreplacementTemplates.gateways, 5)
+    fits ++= preplacement.fit     (exitTile,    bounds, directionToBack,  PreplacementTemplates.batterycannon)
+    fits ++= preplacement.fitAny  (cornerFront, bounds, directionToBack,  PreplacementTemplates.initialLayouts)
+    fits ++= preplacement.fitAny  (cornerFront, bounds, directionToBack,  PreplacementTemplates.gateways)
+    fits ++= preplacement.fitAny  (cornerBack,  bounds, directionToFront, PreplacementTemplates.tech)
+    fits ++= preplacement.fitAny  (cornerFront, bounds, directionToBack,  PreplacementTemplates.gateways, 2)
+    fits ++= preplacement.fitAny  (cornerBack,  bounds, directionToFront, PreplacementTemplates.tech)
+    fits ++= preplacement.fitAny  (cornerFront, bounds, directionToBack,  PreplacementTemplates.gateways, 5)
   }
 }

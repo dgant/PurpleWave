@@ -13,7 +13,7 @@ object Opponents {
   // AIIDE 2020
   val bananabrain : Opponent = add("BananaBrain")
   val dandanbot   : Opponent = add("DanDanBot",   defaultPvP)
-  val dragon      : Opponent = add("Dragon",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvT13Nexus, PvT3rdFast, PvT3BaseArbiter))
+  val dragon      : Opponent = add("Dragon",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvT13Nexus, PvT3rdFast, PvT3BaseGateway))
   val ecgberht    : Opponent = add("Ecgberht",    new StrategySelectionRecommended(StrategySelectionGreedy(), PvT32Nexus, PvT2BaseReaver, PvT3BaseGateway))
   val eggbot      : Opponent = add("EggBot",      defaultPvP)
   val mcrave      : Opponent = add("McRave",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ2Gate1012, PvZ4GateGoon, PvZMidgame5GateGoonReaver, PvZLateGameReaver))

@@ -11,8 +11,13 @@ object Engage extends Action {
     unit.agent.canFight &&
     unit.matchups.targets.nonEmpty
   }
+
+  override def perform(unit: FriendlyUnitInfo): Unit = {
+
+    weigh(unit)
+  }
   
-  override def perform(unit: FriendlyUnitInfo) {
+  private def weigh(unit: FriendlyUnitInfo) {
     Weigh.consider(unit,
       Abuse,
       Aim,

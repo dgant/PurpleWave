@@ -38,6 +38,7 @@ class Fingerprints {
       gatewayFe
       dtRush
       dragoonRange
+      coreBeforeZ
       mannerPylon
     }
     if (With.enemies.exists(_.isUnknownOrZerg)) {
@@ -67,8 +68,8 @@ class Fingerprints {
   def status: Seq[String] = all.filter(_.matches).map(_.toString.replaceAll("Fingerprint", ""))
 
   // Generic
-  lazy val workerRush       = addFingerprint(new FingerprintWorkerRush)
-  lazy val gasSteal         = addFingerprint(new FingerprintGasSteal)
+  lazy val workerRush         = addFingerprint(new FingerprintWorkerRush)
+  lazy val gasSteal           = addFingerprint(new FingerprintGasSteal)
 
   // Terran
   lazy val bunkerRush         = addFingerprint(new FingerprintBunkerRush)
@@ -104,6 +105,7 @@ class Fingerprints {
   lazy val gatewayFe    = addFingerprint(new FingerprintGatewayFE)
   lazy val dtRush       = addFingerprint(new FingerprintDTRush)
   lazy val dragoonRange = addFingerprint(new FingerprintDragoonRange)
+  lazy val coreBeforeZ  = addFingerprint(new FingerprintCoreBeforeZealot)
   lazy val mannerPylon  = addFingerprint(new FingerprintMannerPylon)
   
   // Zerg

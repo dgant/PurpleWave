@@ -1,6 +1,7 @@
 package Debugging
 
 import java.lang.management.ManagementFactory
+import java.util.Calendar
 
 import Debugging.Visualizations.Views.Planning.{ShowStrategyEvaluations, ShowStrategyInterest}
 import Information.Fingerprinting.Generic.GameTime
@@ -73,15 +74,15 @@ class Storyteller {
   )
   var firstLog: Boolean = true
   def onFrame(): Unit = {
-    stories.foreach(_.update())
-    logIntelligence()
-    logOurUnits()
     if (firstLog) {
       firstLog = false
       logEnvironment()
       logStrategyEvaluation()
       logStrategyInterest()
     }
+    stories.foreach(_.update())
+    logIntelligence()
+    logOurUnits()
   }
 
   var enemyUnitsBefore: Set[UnitClass] = Set.empty
@@ -116,15 +117,21 @@ class Storyteller {
   }
 
   private def logPerformance() {
-    With.logger.debug(Seq(
+    val gameFastestSeconds = With.frame / 24
+    val gameWallClockSeconds = (System.nanoTime() - With.startNanoTime) / 1000000000
+    With.logger.debug("Game duration (fastest):    " + gameFastestSeconds / 60 + "m " + gameFastestSeconds % 60 + "s")
+    With.logger.debug("Game duration (wall clock): " + gameWallClockSeconds / 60 + "m " + gameWallClockSeconds % 60 + "s")
+    With.logger.debug("\n" + Seq(
       Seq(With.performance.frameLimitShort, With.performance.framesOverShort),
       Seq(1000, With.performance.framesOver1000),
-      Seq(10000, With.performance.framesOver10000)).map(line => line.head.toString + "ms: " + line.last.toString).mkString("\n"))
+      Seq(10000, With.performance.framesOver10000)).map(line => "Bot frames over " + line.head.toString + "ms: " + line.last.toString).mkString("\n"))
+
     With.logger.debug("Our performance was " + (if (With.performance.disqualified) "BAD" else if (With.performance.danger) "DANGEROUS" else "good"))
     With.logger.debug(JBWAPIClient.getPerformanceMetrics.toString)
   }
 
   private def logEnvironment(): Unit = {
+    With.logger.debug("Game start time:  " + Calendar.getInstance().getTime.toString)
     With.logger.debug("OS:               " + System.getProperty("os.name") + " " + System.getProperty("os.version") + " " + System.getProperty("os.arch"))
     With.logger.debug("JRE:              " + System.getProperty("java.vendor") + " - " + System.getProperty("java.version"))
     With.logger.debug("CPUs available:   " + Runtime.getRuntime.availableProcessors())

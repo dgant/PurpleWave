@@ -9,7 +9,7 @@ import Planning.Plans.Compound.{If, Or, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackWithDarkTemplar
-import Planning.Plans.Macro.Automatic.CapGasWorkersAt
+import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, GasCapsUntouched}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
@@ -61,8 +61,10 @@ class PvP3GateGoon extends GameplanTemplate {
 
   override val buildPlans = Vector(
     new If(
-      new UnitsAtMost(2, Protoss.Gateway),
-      new CapGasWorkersAt(2)),
+      new GasCapsUntouched,
+      new If(
+        new UnitsAtMost(2, Protoss.Gateway),
+        new CapGasWorkersAt(2))),
 
     new EjectScout,
     new BuildOrder(Get(8, Protoss.Dragoon)),

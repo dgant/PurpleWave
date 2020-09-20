@@ -11,7 +11,7 @@ class Configuration {
 
   var enableSurrenders                = false
   var enableChat                      = false
-  var targetFrameDurationMilliseconds = 40
+  var targetFrameDurationMilliseconds = 15
 
   ///////////////////
   // Mode settings //

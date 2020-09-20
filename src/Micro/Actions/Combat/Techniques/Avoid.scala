@@ -1,7 +1,6 @@
 package Micro.Actions.Combat.Techniques
 
 import Debugging.Visualizations.ForceColors
-import Debugging.Visualizations.Rendering.DrawMap
 import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Lifecycle.With
 import Mathematics.Physics.ForceMath
@@ -16,7 +15,6 @@ import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWorkers}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, TakeN}
-import bwapi.Color
 
 object Avoid extends ActionTechnique {
 
@@ -135,7 +133,11 @@ object Avoid extends ActionTechnique {
     avoidDownhillPath(unit, desireProfile)
 
     // Last resort: Potential fields, which by now are probably totally out-of-tune for ground units
-    avoidPotential(unit, desireProfile)
+    if (desireToGoHome >= 0) {
+      unit.agent.toTravel = Some(unit.agent.origin)
+    } else {
+      avoidPotential(unit, desireProfile)
+    }
   }
 
   def avoidDirect(unit: FriendlyUnitInfo, desireProfile: DesireProfile): Unit = {
@@ -143,23 +145,50 @@ object Avoid extends ActionTechnique {
 
     if (desireProfile.safety <= 0) return
 
-    val forceThreat   = Potential.avoidThreats(unit)   * desireProfile.safety
-    val forceSpacing  = Potential.avoidCollision(unit) * desireProfile.freedom
-    val force         = ForceMath.sumAll(forceThreat, forceSpacing)
+    val origin = unit.agent.origin
+    if (desireProfile.home > 0 && origin.zone != unit.zone && unit.matchups.threats.exists(threat => {
+      val rangeThreat     = threat.pixelRangeAgainst(unit)
+      val distanceThreat  = threat.pixelDistanceTravelling(origin)
+      val distanceUs      = unit.pixelDistanceTravelling(origin)
+      // Do they cut us off (by speed or pure range) before we get home?
+      (distanceThreat - rangeThreat) / (Math.min(threat.topSpeed, unit.topSpeed)) < distanceUs / unit.topSpeed
+    })) {
+      return
+    }
 
+    val pathLength    = 64 + unit.matchups.pixelsOfEntanglement
+    val stepSize      = Math.min(pathLength, Math.max(64, unit.topSpeed * With.reaction.agencyMax))
+    val forceThreat   = (Potential.avoidThreats(unit)                     * desireProfile.safety).clipMin(1.0)
+    val forceTravel   = (Potential.preferTravel(unit, unit.agent.origin)  * desireProfile.home)
+    val forceSpacing  = (Potential.avoidCollision(unit) * desireProfile.freedom).clipMax(0.5)
+    val forceSafety   = ForceMath.sumAll(forceThreat, forceTravel)
+    val force         = ForceMath.sumAll(forceSafety.normalize, forceSpacing)
+
+    // If our safety force is tiny, it means the unit is torn between running away and going home
+    // In this case, we need to fall back to pathfinding.
+    if (forceSafety.lengthSquared < 1) {
+      return
+    }
+
+    // Find a walkable path
     val rotationSteps = 4
     (1 to 1 + 2 * rotationSteps).foreach(r => {
       if (unit.ready) {
-        val rotationRadians = ((r % 2) * 2 - 1) * (r / 2) * Math.PI / 2 / rotationSteps
-        val ray = PixelRay(unit.pixelCenter, unit.pixelCenter.radiateRadians(force.radians + rotationRadians, 64))
+        val rotationRadians = ((r % 2) * 2 - 1) * (r / 2) * Math.PI / 3 / rotationSteps
+        val ray = PixelRay(unit.pixelCenter, unit.pixelCenter.radiateRadians(force.radians + rotationRadians, pathLength))
         val destination = ray.to
+        // Verify validity of the path
         if (destination.valid) {
           if (unit.flying || ray.tilesIntersected.forall(_.walkable)) {
-            val origin = unit.agent.origin
+            // Verify that it takes us home, if necessary
             if (unit.zone == origin.zone || desireProfile.home * unit.pixelDistanceTravelling(destination, origin) <= desireProfile.home * unit.pixelDistanceTravelling(origin)) {
-              unit.agent.toTravel = Some(destination)
-              Move.delegate(unit)
-              DrawMap.arrow(unit.pixelCenter, destination, Color.White) // TMP
+              // Verify that it gets us away from threats
+              // Compare distance to a tiny incremental step so it rejects walking through enemies
+              if (unit.matchups.threats.forall(threat => threat.pixelDistanceSquared(unit.pixelCenter) < threat.pixelDistanceSquared(unit.pixelCenter.project(destination, 16)))) {
+                ray.tilesIntersected.foreach(With.coordinator.gridPathOccupancy.addUnit(unit, _))
+                unit.agent.toTravel = Some(unit.pixelCenter.project(destination, stepSize)) // Use smaller step size to use direct line travel instead of BW's 8-directional long distance moves
+                Move.delegate(unit)
+              }
             }
           }
         }

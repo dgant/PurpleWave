@@ -47,8 +47,6 @@ class PvPRobo extends GameplanTemplate {
         new Not(new EnemyStrategy(With.fingerprints.dragoonRange)),
         new EnemyRecentStrategy(With.fingerprints.dtRush))))
 
-  override def initialScoutPlan: Plan = new PvP1GateCoreIdeas.ScoutPlan()
-
   override def blueprints = Vector(
     new Blueprint(Protoss.Pylon),
     new Blueprint(Protoss.Pylon, placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 7.0)),
@@ -60,6 +58,12 @@ class PvPRobo extends GameplanTemplate {
   // TODO: Handle 4-Gate Zealot
   override def attackPlan: Plan = new If(
     new And(
+      // No point attacking with Zealots if they have any defense whatsoever
+      new Or(
+        new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
+        new UnitsAtLeast(1, Protoss.Reaver, complete = true),
+        new EnemiesAtMost(0, Protoss.PhotonCannon, complete = true),
+        new EnemiesAtMost(1, UnitMatchWarriors)),
       new Or(
         new Not(new EnemyHasShown(Protoss.DarkTemplar)),
         new UnitsAtLeast(2, Protoss.Observer, complete = true)),

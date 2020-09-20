@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Compound.{If, Parallel}
-import Planning.Plans.Macro.Automatic.Pump
+import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicate
@@ -38,6 +38,8 @@ class PvPVsForge extends PvP3GateGoon {
         Get(Protoss.RoboticsFacility),
         Get(2, Protoss.Reaver)),
       new Parallel(
+        new If(new UnitsAtMost(0, Protoss.CyberneticsCore), new CapGasWorkersAt(0)),
+
         // Vs. Gateway FE we need some Zealot production so they don't just walk into our mineral line
         new If(new EnemyStrategy(With.fingerprints.gatewayFe),  new Parallel(new Build(Get(Protoss.Gateway)), new If(new UnitsAtMost(0, Protoss.CyberneticsCore)), new Pump(Protoss.Zealot))),
         // If they've bought a Nexus, we can too

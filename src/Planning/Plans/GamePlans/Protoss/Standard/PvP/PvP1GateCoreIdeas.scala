@@ -6,7 +6,7 @@ import Planning.Plan
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.BuildOrder
-import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
+import Planning.Plans.Scouting.ScoutForCannonRush
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
@@ -15,8 +15,6 @@ import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPRobo
 
 object PvP1GateCoreIdeas {
-
-  class ScoutPlan extends If(new StartPositionsAtLeast(3), new ScoutOn(Protoss.Gateway), new ScoutOn(Protoss.CyberneticsCore))
 
   class GateGate extends And(
     new Employing(PvPRobo),
@@ -41,14 +39,16 @@ object PvP1GateCoreIdeas {
       With.fingerprints.cannonRush,
       With.fingerprints.proxyGateway,
       With.fingerprints.twoGate,
-      With.fingerprints.nexusFirst))
+      With.fingerprints.nexusFirst,
+      With.fingerprints.gasSteal))
 
   class ZealotAfterCore extends Or(
     new EnemyStrategy(
       With.fingerprints.workerRush,
       With.fingerprints.mannerPylon,
       With.fingerprints.proxyGateway,
-      With.fingerprints.twoGate),
+      With.fingerprints.twoGate,
+      With.fingerprints.gasSteal),
     new And(
       new PossibleZealotPressure,
       new Not(new GateGate))) // We want that second Gateway up quickly instead

@@ -2,7 +2,7 @@ package Micro.Actions.Basic
 
 import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Mathematics.Points.{SpecificPoints, Tile}
+import Mathematics.Points.SpecificPoints
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Disengage, Engage}
 import Micro.Actions.Combat.Tactics.Potshot
@@ -23,11 +23,21 @@ object Gather extends Action {
   
   override def perform(unit: FriendlyUnitInfo) {
 
+    var resource = unit.agent.toGather.get
+
+    // Move between adjacent bases if threatened
+    val baseOriginal = resource.base
+    lazy val baseOpposite = unit.base.flatMap(b => b.isNaturalOf.orElse(b.natural))
+    if (baseOpposite.nonEmpty && baseOriginal.exists(_.units.exists(threat =>
+      ! threat.unitClass.isWorker
+      && threat.isEnemy
+      && threat.canAttack(unit)
+      && threat.pixelsToGetInRange(unit, resource.pixelCenter) < 128))) {
+      resource = ByOption.minBy(baseOpposite.get.minerals.filter(_.alive))(_.pixelDistanceEdge(unit)).getOrElse(resource)
+    }
+
     // Gatherer combat micro
     if (unit.battle.nonEmpty) {
-      var mineralLock = true
-      var resource    = unit.agent.toGather.get
-
       // Burrow from threats
       if (unit.canBurrow
         && unit.matchups.enemies.exists(enemy =>
@@ -35,17 +45,6 @@ object Gather extends Action {
           && enemy.pixelDistanceEdge(unit) < enemy.pixelRangeAgainst(unit) + 32)
           && ! With.grids.enemyDetection.isDetected(unit.tileIncludingCenter)) {
         With.commander.burrow(unit)
-      }
-
-      // Move between adjacent bases if threatened
-      lazy val resourcePath: Iterable[Tile] = resource.base.map(_.resourcePaths.getOrElse(resource, Seq.empty)).getOrElse(Iterable.empty)
-      lazy val oppositeBase = unit.base.flatMap(base => base.natural.orElse(base.isNaturalOf)).filter(_.townHall.exists(u => u.complete && u.isOurs))
-      if (oppositeBase.nonEmpty && unit.matchups.threats.exists(threat => resourcePath.exists(tile => threat.pixelsToGetInRange(unit, tile.pixelCenter) < 32))) {
-        val resourceAfter = ByOption.minBy(oppositeBase.get.minerals.filter(_.alive))(_.pixelDistanceEdge(resource)).getOrElse(resource)
-        if (resourceAfter != resource) {
-          mineralLock = false
-          resource = resourceAfter
-        }
       }
 
       // Stupid siege tank defense
@@ -78,16 +77,10 @@ object Gather extends Action {
         if (bestGoal.exists(_.unitClass.isTownHall)) {
           With.commander.returnCargo(unit)
         } else if (bestGoal.isDefined) {
-          unit.agent.toGather = bestGoal
           if (unit.pixelDistanceEdge(bestGoal.get) < 32) {
             Potshot.consider(unit)
-          }
-
-          // Gather, if necessary
-          if (mineralLock || ! unit.gathering || ! unit.orderTarget.exists(_.unitClass == resource.unitClass)) {
-            With.commander.gather(unit, bestGoal.get)
           } else {
-            With.commander.sleep(unit)
+            With.commander.gather(unit, bestGoal.get)
           }
         }
       }
@@ -110,14 +103,14 @@ object Gather extends Action {
       }
     }
 
-    // Total hack
-    if (unit.agent.toGather.exists(_.zone != unit.zone)
-      && unit.base.contains(With.geography.ourMain)
+    // Benzene travel hack
+    if (resource.zone != unit.zone
+      && unit.zone == With.geography.ourMain.zone
       && Benzene.matches) {
       unit.agent.toTravel = Some(SpecificPoints.middle)
       Move.delegate(unit)
     }
     
-    With.commander.gather(unit, unit.agent.toGather.get)
+    With.commander.gather(unit, resource)
   }
 }

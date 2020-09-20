@@ -4,6 +4,7 @@ import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Mathematics.PurpleMath
+import Mathematics.Shapes.Circle
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -211,6 +212,20 @@ object Potential {
   ////////////////
   // Collisions //
   ////////////////
+
+  def preferTravel(unit: FriendlyUnitInfo, goal: Pixel): Force = {
+    if (unit.flying) {
+      new Force(goal.subtract(unit.pixelCenter)).normalize
+    } else {
+      val center = unit.tileIncludingCenter
+      val circle = Circle.points(5).map(center.add).filter(_.walkable)
+      if (circle.isEmpty) {
+        new Force(goal.subtract(unit.pixelCenter)).normalize
+      }
+      val path = circle.minBy(_.groundPixels(center))
+      new Force(path.subtract(center)).normalize
+    }
+  }
   
   def collisionResistances(unit: FriendlyUnitInfo): Vector[Force] = {
     if (unit.flying) return Vector.empty
@@ -225,7 +240,7 @@ object Potential {
     if (other.flying) return new Force
     if (other.unitClass.isBuilding) return new Force
   
-    val maximumDistance   = 64
+    val maximumDistance   = Math.max(unit.unitClass.dimensionMax, other.unitClass.dimensionMax)
     val blockerDistance   = other.pixelDistanceEdge(unit)
     val magnitudeDistance = 1.0 - PurpleMath.clampToOne(blockerDistance / (1.0 + maximumDistance))
     val magnitudeSize     = unit.unitClass.dimensionMax * other.unitClass.dimensionMax / 32.0 / 32.0

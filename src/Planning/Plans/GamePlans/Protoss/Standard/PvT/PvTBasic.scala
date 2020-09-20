@@ -110,7 +110,7 @@ class PvTBasic extends GameplanTemplate {
   class EmployingCarriers   extends And(new Employing(PvT2BaseCarrier, PvT3BaseCarrier), new Not(new EmployingGateway))
   class EmployingArbiters   extends Or(
     new And(new Not(new EmployingGateway),  new Employing(PvT2BaseArbiter, PvT3BaseArbiter)),
-    new And(new EmployingGateway,           new UpgradeStarted(Protoss.GroundDamage, 3), new UpgradeStarted(Protoss.GroundArmor, 3)))
+    new And(new EmployingGateway,           new BasesAtLeast(4), new GasPumpsAtLeast(3), new UpgradeStarted(Protoss.GroundDamage), new UpgradeStarted(Protoss.GroundArmor)))
   class EmployingReavers    extends Or(new Employing(PvT2BaseReaver), new UnitsAtLeast(1, Protoss.RoboticsSupportBay))
   class EmployingDTRush     extends Or(new UnitsAtLeast(1, Protoss.TemplarArchives), new Employing(PvTStove, PvTDTExpand, PvT2BaseArbiter))
   class EnemyTwoPlusRax     extends EnemyStrategy(With.fingerprints.bbs, With.fingerprints.twoRax1113)

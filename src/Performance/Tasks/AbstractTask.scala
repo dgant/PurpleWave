@@ -41,7 +41,7 @@ abstract class AbstractTask {
     
     val millisecondsBefore  = System.nanoTime() / nanosToMillis
     alreadyViolatedTarget  = With.performance.violatedTarget
-    alreadyViolatedLimit      = With.performance.violatedLimit
+    alreadyViolatedLimit   = With.performance.violatedLimit
     onRun()
     val millisecondsAfter   = System.nanoTime() / nanosToMillis
     var millisecondsDelta   = millisecondsAfter - millisecondsBefore
@@ -76,7 +76,14 @@ abstract class AbstractTask {
     if ( ! alreadyViolatedLimit && With.performance.violatedLimit) {
       violatedRules += 1
       if (maxConsecutiveSkips > 1) {
-        With.logger.warn(toString + " went too long: " + millisecondsDuration + "ms for " + With.performance.millisecondsSpentThisFrame + "ms this frame. " + (if (due) "It was due to run" else ""))
+        With.logger.warn(
+          toString
+          + " crossed the "
+          + With.performance.frameLimitShort
+          + "ms threshold, taking "
+          + millisecondsDuration
+          + "ms for " + With.performance.millisecondsSpentThisFrame + "ms total this frame. "
+          + (if (due) "The task was overdue to run this frame." else ""))
       }
     }
   }

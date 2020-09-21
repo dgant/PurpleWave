@@ -45,9 +45,11 @@ abstract class AbstractTaskQueue {
     }
 
     if (With.performance.violatedLimit) {
-      With.logger.debug("Task queue overtime @ "
+      With.logger.debug("Task queue took @ "
         + With.performance.millisecondsSpentThisFrame
-        + "ms. Task durations: \n"
+        + "ms, crossing the "
+        + With.performance.frameLimitShort
+        + "ms threshold. Task durations: \n"
         + tasksSorted
           .filter(_.framesSinceRunning <= 1)
           .map(task => task.toString + ": " + task.runtimeMilliseconds.lastOption.map(_.toString).getOrElse("?") + "ms")

@@ -156,7 +156,7 @@ class Storyteller {
     With.logger.debug("JBWAPI autocontinue: " + Main.configuration.autoContinue)
     With.logger.debug("JBWAPI debugConnection: " + Main.configuration.debugConnection)
     With.logger.debug("JBWAPI async: " + Main.configuration.async)
-    With.logger.debug("JBWAPI async frame buffer size: " + Main.configuration.asyncFrameBufferSize)
+    With.logger.debug("JBWAPI async frame buffer size: " + Main.configuration.asyncFrameBufferCapacity)
     With.logger.debug("JBWAPI unlimited frame zero: " + Main.configuration.unlimitedFrameZero)
     With.logger.debug("JBWAPI max frame duration: " + Main.configuration.maxFrameDurationMs + "ms")
   }

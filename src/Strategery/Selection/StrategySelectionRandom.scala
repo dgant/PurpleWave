@@ -14,4 +14,7 @@ object StrategySelectionRandom extends StrategySelectionPolicy {
       ))
     PurpleMath.sampleWeighted(weights.keys.toSeq, w => weights(w)).get
   }
+
+
+  override def toString = "StrategySelectionRandom"
 }

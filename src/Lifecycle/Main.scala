@@ -6,7 +6,7 @@ object Main {
 
   val configuration = new BWClientConfiguration
   configuration.async = true
-  configuration.autoContinue = true
+  configuration.autoContinue = false
   configuration.maxFrameDurationMs = 10
   configuration.asyncUnsafe = true
 

@@ -40,7 +40,7 @@ object With {
   var mapTileHeight   : Int                 = 0
   var mapFileName     : String              = _
   var mapId           : String              = _
-  var startNanoTime       : Long                = 0
+  var startNanoTime   : Long                = 0
 
   var game              : bwapi.Game              = _
   var agents            : Agency                  = _
@@ -101,6 +101,7 @@ object With {
 
   def onStart() {
     startNanoTime = System.nanoTime()
+    game = JBWAPIClient.getGame
     game.enableFlag(Flag.UserInput)
     game.setLatCom(false)
     game.setLocalSpeed(0)

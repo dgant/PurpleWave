@@ -12,8 +12,7 @@ object Listener extends BWEventListener {
 
   override def onStart(): Unit = {
     try {
-      With.game = JBWAPIClient.getGame
-      bot = Some(new BotPurpleWave())
+      bot = Some(new BotPurpleWave)
       bot.get.onStart()
     }
     catch { case exception: Exception =>

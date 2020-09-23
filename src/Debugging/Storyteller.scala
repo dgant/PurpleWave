@@ -126,7 +126,7 @@ class Storyteller {
       Seq(1000, With.performance.framesOver1000),
       Seq(10000, With.performance.framesOver10000)).map(line => "Bot frames over " + line.head.toString + "ms: " + line.last.toString).mkString("\n"))
 
-    With.logger.debug("Our performance was " + (if (With.performance.disqualified) "BAD" else if (With.performance.danger) "DANGEROUS" else "good"))
+    With.logger.debug("Our performance (if running synchronously) would be " + (if (With.performance.disqualified) "BAD" else if (With.performance.danger) "DANGEROUS" else "good"))
     With.logger.debug(JBWAPIClient.getPerformanceMetrics.toString)
   }
 
@@ -156,6 +156,7 @@ class Storyteller {
     With.logger.debug("JBWAPI autocontinue: " + Main.configuration.autoContinue)
     With.logger.debug("JBWAPI debugConnection: " + Main.configuration.debugConnection)
     With.logger.debug("JBWAPI async: " + Main.configuration.async)
+    With.logger.debug("JBWAPI async unsafe: " + Main.configuration.asyncUnsafe)
     With.logger.debug("JBWAPI async frame buffer size: " + Main.configuration.asyncFrameBufferCapacity)
     With.logger.debug("JBWAPI unlimited frame zero: " + Main.configuration.unlimitedFrameZero)
     With.logger.debug("JBWAPI max frame duration: " + Main.configuration.maxFrameDurationMs + "ms")

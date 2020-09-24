@@ -11,7 +11,7 @@ class Configuration {
 
   var enableSurrenders                = false
   var enableChat                      = false
-  var targetFrameDurationMilliseconds = 15
+  var targetFrameDurationMilliseconds = 30
 
   ///////////////////
   // Mode settings //
@@ -88,6 +88,7 @@ class Configuration {
   
   var urgencyManners            = 1
   var urgencyEconomy            = 1
+  var urgencyGather             = 1
   var urgencyGeography          = 1
   var urgencyArchitecture       = 1
   var urgencyGrids              = 2

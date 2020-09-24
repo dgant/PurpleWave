@@ -24,6 +24,12 @@ class TaskFingerprinting extends AbstractTask {
     With.fingerprints.update()
   }
 }
+class TaskGathering extends AbstractTask {
+  urgency = With.configuration.urgencyGather
+  override protected def onRun(): Unit = {
+    With.gathering.run()
+  }
+}
 class TaskGeography extends AbstractTask {
   urgency = With.configuration.urgencyGeography
   override protected def onRun() { With.geography.update() }

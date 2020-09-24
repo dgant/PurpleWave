@@ -5,10 +5,10 @@ import bwapi.BWClientConfiguration
 object Main {
 
   val configuration = new BWClientConfiguration
-  configuration.async = true
-  configuration.autoContinue = false
-  configuration.maxFrameDurationMs = 10
-  configuration.asyncUnsafe = true
+  configuration.async = false
+  configuration.asyncUnsafe = false
+  configuration.autoContinue = true
+  configuration.maxFrameDurationMs = 30
 
   def main(args: Array[String]) {
     JBWAPIClient.startGame(configuration)

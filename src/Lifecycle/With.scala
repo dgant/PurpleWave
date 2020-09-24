@@ -10,6 +10,7 @@ import Information.Grids.Grids
 import Information.{UnitsShown, _}
 import Macro.Allocation._
 import Macro.Architecture.Architecture
+import Macro.Gathering
 import Macro.Scheduling.{MasterBuildOrderHistory, MasterBuildPlans, Projections, Scheduler}
 import Micro.Agency.{Agency, Commander}
 import Micro.Coordination.Coordinator
@@ -59,6 +60,7 @@ object With {
   var configuration     : Configuration           = _
   var economy           : Economy                 = _
   var fingerprints      : Fingerprints            = _
+  var gathering         : Gathering               = _
   var geography         : Geography               = _
   var grids             : Grids                   = _
   var groundskeeper     : Groundskeeper           = _
@@ -150,6 +152,7 @@ object With {
     economy           = new Economy
     fingerprints      = new Fingerprints
     groundskeeper     = new Groundskeeper
+    gathering         = new Gathering
     geography         = new Geography
     grids             = new Grids
     history           = new History

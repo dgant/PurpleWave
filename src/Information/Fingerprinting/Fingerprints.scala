@@ -9,53 +9,63 @@ import Lifecycle.With
 import scala.collection.mutable
 
 class Fingerprints {
+
+  private def relevantFingerprints =
+    Seq(
+      workerRush,
+      gasSteal) ++
+    (if (With.enemies.exists(_.isUnknownOrTerran)) Seq(
+      bunkerRush,
+      fiveRax,
+      bbs,
+      twoRax1113,
+      twoFac,
+      twoFacVultures,
+      threeFac,
+      threeFacVultures,
+      siegeExpand,
+      oneRaxFE,
+      fourteenCC,
+      bio,
+    ) else Seq.empty) ++
+    (if (With.enemies.exists(_.isUnknownOrProtoss)) Seq(
+      gatewayFirst,
+      earlyForge,
+      proxyGateway,
+      cannonRush,
+      twoGate,
+      oneGateCore,
+      fourGateGoon,
+      nexusFirst,
+      forgeFe,
+      gatewayFe,
+      dtRush,
+      dragoonRange,
+      coreBeforeZ,
+      mannerPylon,
+    ) else Seq.empty) ++
+    (if (With.enemies.exists(_.isUnknownOrZerg)) Seq(
+      fourPool,
+      ninePool,
+      overpool,
+      tenHatch,
+      twelvePool,
+      twelveHatch,
+      oneHatchGas
+    ) else Seq.empty)
   
   def update() {
-    if (With.enemies.exists(_.isUnknownOrTerran)) {
-      bunkerRush
-      fiveRax
-      bbs
-      twoRax1113
-      twoFac
-      twoFacVultures
-      threeFac
-      threeFacVultures
-      siegeExpand
-      oneRaxFE
-      fourteenCC
-      bio
+    if (With.frame > GameTime(10, 0)()) {
+      return
     }
-    if (With.enemies.exists(_.isUnknownOrProtoss)) {
-      gatewayFirst
-      earlyForge
-      proxyGateway
-      cannonRush
-      twoGate
-      oneGateCore
-      fourGateGoon
-      nexusFirst
-      forgeFe
-      gatewayFe
-      dtRush
-      dragoonRange
-      coreBeforeZ
-      mannerPylon
-    }
-    if (With.enemies.exists(_.isUnknownOrZerg)) {
-      fourPool
-      ninePool
-      overpool
-      tenHatch
-      twelvePool
-      twelveHatch
-      oneHatchGas
-    }
-    workerRush
-    gasSteal
 
-    if (With.frame < GameTime(10, 0)()) {
-      all.foreach(_.update())
-    }
+    val fingerprints = relevantFingerprints.toVector.sortBy(_.lastUpdateFrame)
+
+    fingerprints.foreach(fingerprint => {
+      if (With.performance.continueRunning) {
+        fingerprint.update()
+      }
+    })
   }
 
   val all: mutable.ArrayBuffer[Fingerprint] = new mutable.ArrayBuffer[Fingerprint]

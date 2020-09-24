@@ -1,7 +1,6 @@
 package Information.Battles.Prediction.Estimation
 
 import Lifecycle.With
-import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -33,26 +32,18 @@ class Avatar {
   var totalFlyers                     = 0.0
   var totalUnits                      = 0.0
   
-  def this(
-    unit          : UnitInfo,
-    nearestEnemy  : Option[Pixel] = None,
-    attacking     : Boolean       = false,
-    retreating    : Boolean       = false,
-    chasing       : Boolean       = false) {
+  def this(unit: UnitInfo, attacking: Boolean = false) {
     
     this()
   
     val splashFactor = unit.unitClass.splashFactor
-    
-    val geometric     = nearestEnemy.isDefined
+
     val contributes   = unit.unitClass.dealsDamage
     val range         = unit.pixelRangeMax + 32.0 * (if (attacking || ! unit.canMove) 1.0 else 3.0)
-    val pixelsAway    = if (geometric) unit.pixelDistanceCenter(nearestEnemy.get) else With.configuration.avatarBattleDistancePixels
-    val framesAway    = if (pixelsAway <= range) 0.0 else if (chasing) Double.PositiveInfinity else PurpleMath.nanToInfinity(Math.max(0.0, pixelsAway - range) / unit.topSpeed * 0.5)
+    val pixelsAway    = With.configuration.avatarBattleDistancePixels
+    val framesAway    = if (pixelsAway <= range) 0.0 else PurpleMath.nanToInfinity(Math.max(0.0, pixelsAway - range) / unit.topSpeed * 0.5)
     val framesTotal   = With.configuration.simulationFrames
-    var efficacy      = if (retreating) 0.0 else splashFactor * Math.max(0.0, (framesTotal - framesAway) / framesTotal)
-    val altitudeBonus = if (unit.flying || ! geometric) 1.0 else unit.tileIncludingCenter.altitudeBonus
-    var fortitude     = altitudeBonus * (if (geometric && unit.effectivelyCloaked) 5.0 else 1.0)
+    var efficacy      = splashFactor * Math.max(0.0, (framesTotal - framesAway) / framesTotal)
 
     // Very rough approximation -- of course Dark Swarm matters when it's the *target* under the swarm
     if (unit.underDisruptionWeb || (unit.underDarkSwarm && unit.unitClass.unaffectedByDarkSwarm)) {
@@ -84,7 +75,7 @@ class Avatar {
     attacksGround                   = if (unit.unitClass.attacksGround) 1.0 else 0.0
     attacksAir                      = if (unit.unitClass.attacksAir)    1.0 else 0.0
     subjectiveValue                 = unit.subjectiveValue
-    totalHealth                     = fortitude * unit.totalHealth
+    totalHealth                     = unit.totalHealth
     totalFlyers                     = if (unit.flying) 1.0 else 0.0
     totalUnits                      = 1.0
   }

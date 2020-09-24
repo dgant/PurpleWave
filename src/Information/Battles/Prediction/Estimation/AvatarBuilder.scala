@@ -12,8 +12,6 @@ class AvatarBuilder {
   var vanguardEnemy : Option[Pixel] = None
   var weAttack      : Boolean       = false
   var enemyAttacks  : Boolean       = false
-  var weRetreat     : Boolean       = false
-  var enemyRetreats : Boolean       = false
   val unitsOurs   = new mutable.HashMap[UnitInfo, Avatar]
   val unitsEnemy  = new mutable.HashMap[UnitInfo, Avatar]
   var avatarUs    = new Avatar
@@ -21,8 +19,8 @@ class AvatarBuilder {
   
   def addUnit(unit: UnitInfo) {
     if ( ! eligible(unit)) return
-    if (unit.isFriendly)  addUnit(unit, avatarUs,     unitsOurs,  vanguardEnemy,  weAttack,     weRetreat,      enemyRetreats)
-    else                  addUnit(unit, avatarEnemy,  unitsEnemy, vanguardUs,     enemyAttacks, enemyRetreats,  weRetreat)
+    if (unit.isFriendly)  addUnit(unit, avatarUs,     unitsOurs,  weAttack)
+    else                  addUnit(unit, avatarEnemy,  unitsEnemy, enemyAttacks)
   }
   
   def removeUnit(unit: UnitInfo) {
@@ -34,14 +32,11 @@ class AvatarBuilder {
     unit              : UnitInfo,
     bigAvatar         : Avatar,
     avatars           : mutable.HashMap[UnitInfo, Avatar],
-    opposingVanguard  : Option[Pixel],
-    attacking         : Boolean,
-    retreating        : Boolean,
-    chasing           : Boolean) {
+    attacking         : Boolean) {
     
     if (avatars.contains(unit)) return
     
-    val newAvatar = new Avatar(unit, opposingVanguard, attacking, retreating, chasing)
+    val newAvatar = new Avatar(unit, attacking)
     avatars.put(unit, newAvatar)
     bigAvatar.add(newAvatar)
   }
@@ -51,9 +46,7 @@ class AvatarBuilder {
     bigAvatar : Avatar,
     avatars   : mutable.HashMap[UnitInfo, Avatar]) {
   
-    avatars
-      .get(unit)
-      .foreach(avatar => {
+    avatars.get(unit).foreach(avatar => {
         bigAvatar.remove(avatar)
         avatars.remove(unit)
       })
@@ -61,14 +54,14 @@ class AvatarBuilder {
   
   private def eligible(unit: UnitInfo): Boolean = {
     if ( ! unit.unitClass.dealsDamage)                              return false
-    if (unit.unitClass.isWorker   && ! unit.isBeingViolent)           return false
+    if (unit.unitClass.isWorker   && ! unit.isBeingViolent)         return false
     if (unit.unitClass.isBuilding && ! unit.unitClass.dealsDamage)  return false
-    if (unit.is(Terran.SpiderMine))                                   return false
-    if (unit.is(Protoss.Scarab))                                      return false
-    if (unit.is(Protoss.Interceptor))                                 return false
-    if (unit.is(Zerg.Larva))                                          return false
-    if (unit.is(Zerg.Egg))                                            return false
-    if (unit.is(Zerg.LurkerEgg))                                      return false
+    if (unit.is(Terran.SpiderMine))                                 return false
+    if (unit.is(Protoss.Scarab))                                    return false
+    if (unit.is(Protoss.Interceptor))                               return false
+    if (unit.is(Zerg.Larva))                                        return false
+    if (unit.is(Zerg.Egg))                                          return false
+    if (unit.is(Zerg.LurkerEgg))                                    return false
     unit.aliveAndComplete
   }
 }

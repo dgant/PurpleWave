@@ -10,7 +10,6 @@ class GridMobilityGround extends AbstractGrid[Int] {
   override def get(i: Int): Int = {
     Seq(
       With.grids.mobilityTerrain.get(i),
-      With.grids.mobilityBuildings.get(i),
       With.grids.mobilityAir.get(i)
     ).min
   }

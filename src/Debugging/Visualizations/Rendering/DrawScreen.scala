@@ -1,7 +1,7 @@
 package Debugging.Visualizations.Rendering
 
 import Debugging.Visualizations.Colors
-import Information.Battles.Prediction.Prediction
+import Information.Battles.Prediction.PredictionLocal
 import Information.Battles.Types.BattleLocal
 import Lifecycle.With
 import Mathematics.Points.Pixel
@@ -84,8 +84,8 @@ object DrawScreen {
     })
   }
 
-  private def drawBattleMap(battle: BattleLocal, estimation: Prediction) {
-    val weWin               = battle.shouldFight
+  private def drawBattleMap(battle: BattleLocal, estimation: PredictionLocal) {
+    val weWin               = battle.judgement.exists(_.shouldFight)
     val ourColorDark        = With.self.colorMidnight
     val enemyColorDark      = With.enemy.colorMidnight
     val ourColorNeon        = With.self.colorNeon

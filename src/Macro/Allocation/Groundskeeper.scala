@@ -46,10 +46,9 @@ class Groundskeeper {
     requestHolders(request) = RequestReservation(holder, updates)
   }
 
-  private def suggestionsWithDuplicates: Seq[PlacementRequest] = (suggestionsNow.view ++ suggestionsBefore.view)
-    .filterNot(request => blueprintConsumers.contains(request.blueprint))
+  private def suggestionsUnfiltered = (suggestionsNow.view ++ suggestionsBefore.view)
 
-  def suggestions = suggestionsWithDuplicates.distinct
+  def suggestions = suggestionsUnfiltered.filterNot(request => blueprintConsumers.contains(request.blueprint)).toSet
 
   // I am a placer plan. I want to suggest a specific place to put a Gateway.
   def suggest(unitClass: UnitClass, tile: Tile): Unit = {
@@ -105,15 +104,17 @@ class Groundskeeper {
   }
 
   private def matchSuggestion(blueprint: Blueprint): Option[PlacementRequest] = {
-    suggestionsWithDuplicates.find(_.blueprint == blueprint)
+    if (blueprintConsumers.contains(blueprint)) None else suggestionsUnfiltered.find(_.blueprint == blueprint)
   }
 
   private def matchSuggestion(unitClass: UnitClass, tile: Tile): Option[PlacementRequest] = {
-    suggestionsWithDuplicates.find(s => s.unitClass == unitClass && s.tile.contains(tile))
+    // Put the blueprint consumer check at the end because it's the slowest
+    suggestionsUnfiltered.find(s => s.tile.contains(tile) && s.unitClass == unitClass && ! blueprintConsumers.contains(s.blueprint))
   }
 
   private def matchSuggestion(plan: Plan, unitClass: UnitClass): Option[PlacementRequest] = {
-    suggestionsWithDuplicates.find(s => s.unitClass == unitClass && s.plan.forall(_ == plan))
+    // Put the blueprint consumer check at the end because it's the slowest
+    suggestionsUnfiltered.find(s => s.plan.forall(_ == plan) && s.unitClass == unitClass && ! blueprintConsumers.contains(s.blueprint))
   }
 
   def isReserved(tile: Tile, plan: Option[Plan] = None): Boolean = {

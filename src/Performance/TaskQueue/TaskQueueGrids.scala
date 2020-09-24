@@ -19,7 +19,6 @@ class TaskQueueGrids extends AbstractTaskQueue {
     new TaskGridFriendlyDetection           { urgency = 10   },
     new TaskGridFriendlyVision              { urgency = 10   },
     new TaskGridMobilityBorder              { urgency = 1    },
-    new TaskGridMobilityBuildings           { urgency = 1    },
     new TaskGridMobilityTerrain             { urgency = 1    },
     new TaskGridPsionicStorm                { urgency = 100  },
     new TaskGridPsi2x2and3x2                { urgency = 10   },

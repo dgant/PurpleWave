@@ -1,6 +1,6 @@
 package Information.Battles.Prediction.Simulation
 
-import Information.Battles.Prediction.{LocalBattleMetrics, Prediction}
+import Information.Battles.Prediction.{LocalBattleMetrics, PredictionLocal}
 import Information.Battles.Types.{BattleLocal, Team}
 import Information.Geography.Types.Zone
 import Lifecycle.With
@@ -24,7 +24,7 @@ class Simulation(
     && ! (unit.unitClass.isBuilding && ! unit.canAttack && ! unit.unitClass.isSpellcaster)
   )
 
-  val estimation            : Prediction          = new Prediction
+  val estimation            : PredictionLocal          = new PredictionLocal
   val focus                 : Pixel               = battle.focus
   val unitsOurs             : Vector[Simulacrum]  = buildSimulacra(battle.us)
   val unitsEnemy            : Vector[Simulacrum]  = buildSimulacra(battle.enemy)
@@ -91,7 +91,7 @@ class Simulation(
     estimation.totalUnitsEnemy    = unitsEnemy  .size
     if (With.configuration.debugging) {
       estimation.debugReport ++= everyone.map(simulacrum => (simulacrum.realUnit, simulacrum.reportCard))
-      estimation.events             = everyone.flatMap(_.events).sortBy(_.frame)
+      estimation.events = everyone.flatMap(_.events).sortBy(_.frame)
     }
     recordMetrics()
   }

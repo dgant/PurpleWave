@@ -48,6 +48,7 @@ class TrainUnit(val traineeClass: UnitClass) extends ProductionPlan {
   
   override def onUpdate() {
     if (isComplete) return
+    if (400 - With.self.supplyUsed < traineeClass.supplyRequired) return
 
     trainee.foreach(_.setProducer(this))
   

@@ -2,7 +2,7 @@ package Lifecycle
 
 import Debugging.Visualizations.{Animations, Viewport, Visualization}
 import Debugging.{Camera, LambdaQueue, Logger, Storyteller}
-import Information.Battles.BattleClassifier
+import Information.Battles.Battles
 import Information.Fingerprinting.Fingerprints
 import Information.Geography.Geography
 import Information.Geography.Pathfinding.Paths
@@ -49,7 +49,7 @@ object With {
   var architecture      : Architecture            = _
   var bank              : Bank                    = _
   var blackboard        : Blackboard              = _
-  var battles           : BattleClassifier        = _
+  var battles           : Battles        = _
   var buildOrderHistory : MasterBuildOrderHistory = _
   var buildPlans        : MasterBuildPlans        = _
   var bullets           : Bullets                 = _
@@ -141,7 +141,7 @@ object With {
     animations        = new Animations
     architecture      = new Architecture
     bank              = new Bank
-    battles           = new BattleClassifier
+    battles           = new Battles
     blackboard        = new Blackboard
     buildOrderHistory = new MasterBuildOrderHistory
     buildPlans        = new MasterBuildPlans

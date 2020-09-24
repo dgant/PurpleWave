@@ -120,7 +120,7 @@ object FightOrFlight extends Action {
   private def applyEstimation(unit: FriendlyUnitInfo) {
     if (unit.battle.isEmpty) return
     val battle = unit.battle.get
-    val shouldEngage = battle.shouldFight
+    val shouldEngage = battle.judgement.get.shouldFight
   
     if (unit.agent.shouldEngage != shouldEngage) {
       unit.agent.combatHysteresisFrames = With.configuration.battleHysteresisFrames

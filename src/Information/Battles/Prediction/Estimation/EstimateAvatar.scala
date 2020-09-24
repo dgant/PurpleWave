@@ -1,30 +1,20 @@
 package Information.Battles.Prediction.Estimation
 
-import Information.Battles.Prediction.Prediction
+import Information.Battles.Prediction.PredictionGlobal
 import Lifecycle.With
 
 object EstimateAvatar {
   
-  def calculate(avatarBuilder: AvatarBuilder): Prediction = {
+  def calculate(avatarBuilder: AvatarBuilder): PredictionGlobal = {
     
-    val output = new Prediction
-    
-    output.avatarUs         = avatarBuilder.avatarUs
-    output.avatarEnemy      = avatarBuilder.avatarEnemy
+    val output = new PredictionGlobal(avatarBuilder.avatarUs, avatarBuilder.avatarEnemy)
     output.totalUnitsUs     = output.avatarUs.totalUnits
     output.totalUnitsEnemy  = output.avatarEnemy.totalUnits
     
     if (avatarBuilder.avatarUs.totalUnits <= 0 || avatarBuilder.avatarEnemy.totalUnits <= 0) return output
-    
-    val maxFrames =
-      if(avatarBuilder.weRetreat || avatarBuilder.enemyRetreats)
-        // Yeah, we need to do better than this.
-        24 * 3
-      else
-        With.configuration.simulationFrames
         
     val frameStep = 24
-    while (output.frames < maxFrames && output.weSurvive && output.enemySurvives) {
+    while (output.frames < With.configuration.simulationFrames && output.weSurvive && output.enemySurvives) {
       output.frames         += frameStep
       output.damageToUs     += dealDamage (avatarBuilder.avatarEnemy, avatarBuilder.avatarUs,     frameStep, output.deathsEnemy, output.damageToUs)
       output.damageToEnemy  += dealDamage (avatarBuilder.avatarUs,    avatarBuilder.avatarEnemy,  frameStep, output.deathsUs,    output.damageToEnemy)

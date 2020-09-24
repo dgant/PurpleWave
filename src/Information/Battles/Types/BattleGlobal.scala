@@ -1,24 +1,19 @@
 package Information.Battles.Types
 
 import Information.Battles.Prediction.Estimation.{AvatarBuilder, EstimateAvatar}
-import Information.Battles.Prediction.Prediction
+import Information.Battles.Prediction.PredictionGlobal
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class BattleGlobal(us: Team, enemy: Team) extends Battle(us, enemy) {
-  
-  lazy val estimationAbstract           : Prediction  = estimateAvatar(this, geometric = false, weAttack = true,  enemyAttacks = true,  weRetreat = false)
-  lazy val estimationAbstractOffense    : Prediction  = estimateAvatar(this, geometric = false, weAttack = true,  enemyAttacks = false, weRetreat = false)
-  lazy val estimationAbstractDefense    : Prediction  = estimateAvatar(this, geometric = false, weAttack = false, enemyAttacks = true,  weRetreat = false)
+
+  private lazy val estimationAbstractOffense: PredictionGlobal = estimateAvatar(this, weAttack = true)
+  private lazy val estimationAbstractDefense: PredictionGlobal = estimateAvatar(this, weAttack = false)
   
   lazy val globalSafeToAttack: Boolean = globalSafe(estimationAbstractOffense, With.blackboard.aggressionRatio())
   lazy val globalSafeToDefend: Boolean = globalSafe(estimationAbstractDefense, With.blackboard.safetyRatio()) || globalSafeToAttack
   
-  def sumValue(units: Iterable[UnitInfo]): Double = units.toVector.map(_.subjectiveValue).sum
-  lazy val valueEnemyArmy   : Double = sumValue(With.units.enemy.filter(u => u.unitClass.dealsDamage))
-  lazy val valueUsArmy      : Double = sumValue(With.units.ours.filter(u => u.unitClass.dealsDamage))
-  
-  private def globalSafe(estimation: Prediction, discountFactor: Double): Boolean = {
+  private def globalSafe(estimation: PredictionGlobal, discountFactor: Double): Boolean = {
     val tradesEffectively = discountFactor * estimation.costToEnemy - estimation.costToUs >= 0
     val killsEffectively =
       estimation.enemyDies &&
@@ -28,29 +23,19 @@ class BattleGlobal(us: Team, enemy: Team) extends Battle(us, enemy) {
     (estimation.totalUnitsUs > 0 || estimation.totalUnitsEnemy == 0) &&
     (tradesEffectively || killsEffectively)
   }
+
+  private def fitsAttackCriteria(unit: UnitInfo, mustBeMobile: Boolean): Boolean = (
+    (! mustBeMobile || ! unit.unitClass.isBuilding)
+    && ! unit.unitClass.isWorker
+    && unit.canAttack)
   
-  private def estimateAvatar(
-    battle        : Battle,
-    geometric     : Boolean,
-    weAttack      : Boolean,
-    enemyAttacks  : Boolean,
-    weRetreat     : Boolean)
-      : Prediction = {
-    
+  private def estimateAvatar(battle: Battle, weAttack: Boolean): PredictionGlobal = {
     val builder           = new AvatarBuilder
     builder.weAttack      = weAttack
-    builder.enemyAttacks  = enemyAttacks
-    builder.weRetreat     = weRetreat
-    if (geometric) {
-      builder.vanguardUs    = Some(battle.us.vanguard)
-      builder.vanguardEnemy = Some(battle.enemy.vanguard)
-    }
-    def fitsAttackCriteria(unit: UnitInfo, mustBeMobile: Boolean): Boolean = (
-      (! mustBeMobile || ! unit.unitClass.isBuilding)
-      && ! unit.unitClass.isWorker
-      && unit.canAttack)
-    battle.us     .units.view.filter(fitsAttackCriteria(_, weAttack))     .foreach(builder.addUnit)
-    battle.enemy  .units.view.filter(fitsAttackCriteria(_, enemyAttacks)) .foreach(builder.addUnit)
+    builder.enemyAttacks  = ! weAttack
+
+    battle.us     .units.view.filter(fitsAttackCriteria(_, builder.weAttack))     .foreach(builder.addUnit)
+    battle.enemy  .units.view.filter(fitsAttackCriteria(_, builder.enemyAttacks)) .foreach(builder.addUnit)
     EstimateAvatar.calculate(builder)
   }
 }

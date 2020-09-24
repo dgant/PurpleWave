@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views.Battles
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
-import Information.Battles.Prediction.Prediction
+import Information.Battles.Prediction.PredictionLocal
 import Information.Battles.Types.BattleLocal
 import Lifecycle.With
 import Mathematics.Points.Pixel
@@ -16,24 +16,18 @@ object ShowBattleSummary extends View {
   private val tableHeader1  = tableHeader0.add(125, 0)
   private val tableStart0   = tableHeader0.add(0, 25)
   private val tableStart1   = tableHeader1.add(0, 25)
-  private val army0         = Pixel(438, 18)
-  private val army1         = Pixel(521, 18)
-  private val army2         = Pixel(589, 18)
   private val yolo          = Pixel(310, 230)
   private val tacticsRanks  = Pixel(235, 18)
   
   override def renderScreen() {
-    With.game.drawTextScreen(army0.bwapi, "Offense:")
-    With.game.drawTextScreen(army1.bwapi, "+" + With.battles.global.estimationAbstractOffense.costToEnemy.toInt + " x " + "%1.2f".format(With.blackboard.aggressionRatio.get))
-    With.game.drawTextScreen(army2.bwapi, "-" + With.battles.global.estimationAbstractOffense.costToUs.toInt)
-    localBattle.foreach(battle => drawEstimationReport(battle.estimationSimulationAttack))
+    localBattle.foreach(battle => drawEstimationReport(battle.estimationSimulationAttack.get))
     if (With.yolo.active() && With.frame / 24 % 2 == 0) {
       With.game.drawTextScreen(yolo.bwapi, "YOLO")
     }
   }
   
   override def renderMap() {
-    localBattle.foreach(battle => drawBattleMap(battle, battle.estimationSimulationAttack))
+    localBattle.foreach(battle => drawBattleMap(battle, battle.estimationSimulationAttack.get))
   }
   
   def localBattle: Option[BattleLocal] = {
@@ -45,8 +39,8 @@ object ShowBattleSummary extends View {
       Some(localBattles.minBy(battle => battle.focus.pixelDistanceSquared(With.viewport.center)))
   }
   
-  private def drawBattleMap(battle: BattleLocal, estimation: Prediction) {
-    val weWin               = battle.shouldFight
+  private def drawBattleMap(battle: BattleLocal, estimation: PredictionLocal) {
+    val weWin               = battle.judgement.get.shouldFight
     val ourColorDark        = With.self.colorDark
     val enemyColorDark      = With.enemy.colorDark
     val ourColorNeon        = With.self.colorNeon
@@ -74,7 +68,7 @@ object ShowBattleSummary extends View {
       backgroundColor = winnerStrengthColor)
   }
   
-  private def drawEstimationReport(estimation: Prediction) {
+  private def drawEstimationReport(estimation: PredictionLocal) {
     With.game.setTextSize(Text.Size.Large)
     With.game.drawTextScreen(tableHeader0.bwapi, With.self.name)
     With.game.drawTextScreen(tableHeader1.bwapi, With.enemy.name)

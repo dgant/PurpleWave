@@ -6,14 +6,14 @@ import Mathematics.PurpleMath
 
 class LocalBattleMetrics(simulation: Simulation, previous: Option[LocalBattleMetrics]) {
 
-  @inline final def ValueLeft(simulacrum: Simulacrum)           : Double  = if (simulacrum.dead) 0.0 else simulacrum.value
   @inline final def ValueMax(simulacrum: Simulacrum)            : Double  = simulacrum.value
+  @inline final def ValueLeft(simulacrum: Simulacrum)           : Double  = if (simulacrum.dead) 0.0 else simulacrum.value
   @inline final def unitHealthLeft(simulacrum: Simulacrum)      : Double  = if (simulacrum.nonCombat) 0.0 else simulacrum.hitPoints
   @inline final def unitHealthMax(simulacrum: Simulacrum)       : Double  = if (simulacrum.nonCombat) 0.0 else simulacrum.hitPointsInitial
   @inline final def unitHealthValueLeft(simulacrum: Simulacrum) : Double  = if (simulacrum.nonCombat) 0.0 else simulacrum.value * simulacrum.hitPoints + simulacrum.shieldPoints
   @inline final def unitHealthValueMax(simulacrum: Simulacrum)  : Double  = if (simulacrum.nonCombat) 0.0 else simulacrum.value * simulacrum.hitPointsInitial + simulacrum.shieldPointsInitial
 
-  val framesIn                             : Int    = simulation.estimation.frames
+  val framesIn                             : Int    = simulation.prediction.frames
   lazy val localValueTotalUs               : Double = simulation.unitsOurs.view.map(ValueMax).sum
   lazy val localValueTotalEnemy            : Double = simulation.unitsEnemy.view.map(ValueMax).sum
   lazy val localValueLeftUs                : Double = simulation.unitsOurs.view.map(ValueLeft).sum

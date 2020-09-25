@@ -33,7 +33,7 @@ class Simulacrum(
   val value       : Double      = realUnit.subjectiveValue
 
   val speedMultiplier   : Double  = if (isEnemy || flying) 1.0 else PurpleMath.clamp(simulation.chokeMobility.getOrElse(realUnit.zone, 1.0), 0.75, 1.0)
-  val bonusRange        : Double  = if (isFriendly || ! unitClass.isSiegeTank || ! simulation.weAttack) 0.0 else With.configuration.simulationBonusTankRange
+  val bonusRange        : Double  = if (isFriendly || ! unitClass.isSiegeTank || ! simulation.prediction.weAttack) 0.0 else With.configuration.simulationBonusTankRange
   val multiplierSplash  : Double  = realUnit.matchups.splashFactorMax
 
   val canMove             : Boolean             = realUnit.canMove
@@ -212,7 +212,7 @@ class Simulacrum(
     }
 
     val buildEvent = () => SimulationEventAttack(
-      simulation.estimation.frames,
+      simulation.prediction.frames,
       this,
       victim,
       damageToHitPoints + damageToShields,
@@ -238,7 +238,7 @@ class Simulacrum(
     cooldownMoving        = framesTraveled
     cooldownShooting      = Math.max(cooldownMoving, cooldownShooting)
     addEvent(() => SimulationEventMove(
-      simulation.estimation.frames,
+      simulation.prediction.frames,
       this,
       pixelBefore,
       pixelAfter,
@@ -278,7 +278,7 @@ class Simulacrum(
   
   @inline final def reportCard: ReportCard = ReportCard(
     simulacrum      = this,
-    estimation      = simulation.estimation,
+    estimation      = simulation.prediction, //TODO: Redundant
     valueDealt      = valueDealt,
     valueReceived   = valueReceived,
     damageDealt     = damageDealt,

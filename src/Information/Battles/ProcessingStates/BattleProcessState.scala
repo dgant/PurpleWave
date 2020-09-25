@@ -9,5 +9,7 @@ trait BattleProcessState {
 
   def step(): Unit
 
-  def isFinalStep: Boolean = true
+  def isFinalStep: Boolean = false
+
+  val frameStarted: Int = With.frame
 }

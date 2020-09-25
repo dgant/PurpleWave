@@ -35,8 +35,8 @@ class Visualization {
     ShowStatus,
     ShowPerformanceSummary,
 
-    ShowClustering,
-    ShowUnitPaths
+    ShowUnitPaths,
+    ShowBattle
   )
   
   var enabled   : Boolean = _

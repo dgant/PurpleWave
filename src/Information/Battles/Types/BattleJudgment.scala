@@ -18,8 +18,8 @@ class BattleJudgment(battle: BattleLocal) {
   lazy val siegeUrgency     : Double  = - 0.5 * getSiegeUrgency
   lazy val trappedness      : Double  = - 0.2 * getTrappedness
   lazy val meleeCommitment  : Double  =   0.2 * getSkirmishModifier
-  lazy val ratioAttack      : Double  = transformTotalScore(battle.estimationSimulationAttack.get.localBattleMetrics)
-  lazy val ratioSnipe       : Double  = transformTotalScore(battle.estimationSimulationSnipe.get.localBattleMetrics)
+  lazy val ratioAttack      : Double  = transformTotalScore(battle.predictionAttack.localBattleMetrics)
+  lazy val ratioSnipe       : Double  = transformTotalScore(battle.predictionSnipe.localBattleMetrics)
   lazy val totalTarget      : Double  = hysteresis + terranHomeBonus + terranMaxBonus + turtleBonus + hornetBonus + siegeUrgency + trappedness + With.configuration.baseTarget
   lazy val ratioTarget      : Double  = Math.min(.99, PurpleMath.nanToZero(totalTarget))
   lazy val shouldFight      : Boolean = ratioAttack > ratioTarget || ratioSnipe > ratioTarget

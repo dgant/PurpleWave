@@ -57,5 +57,10 @@ class BattleClustering {
         || u.unitClass.isSpellcaster
         || u.unitClass.isDetector
         || u.unitClass.isTransport)))
+
+
+    // TODO: These can probably be done separately, and the global battle probably doesn't even need a focus
+    With.battles.nextBattlesLocal.foreach(_.updateFoci())
+    With.battles.nextBattleGlobal.foreach(_.updateFoci())
   }
 }

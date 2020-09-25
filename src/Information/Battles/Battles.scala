@@ -28,10 +28,8 @@ class Battles {
   }
 
   def run() {
-    nextBattlesLocal.foreach(_.updateFoci())
-    nextBattleGlobal.foreach(_.updateFoci()) // TODO: Do we even use this?
-    nextBattlesLocal.foreach(_.updateFoci()) // TODO: We PROBABLY want to do this every time. Do these values matter?
-    nextBattleGlobal.foreach(_.updateFoci()) // TODO: We PROBABLY want to do this every time. Do these values matter?
+    local.foreach(_.updateFoci())
+    global.updateFoci() // TODO: Do we even use this?
 
     var proceed = true
     while (proceed && With.performance.continueRunning) {

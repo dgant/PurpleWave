@@ -4,7 +4,6 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawScreen.GraphCurve
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Debugging.Visualizations.Views.View
-import Information.Battles.Prediction.PredictionLocal
 import Information.Battles.Prediction.Simulation.Simulacrum
 import Information.Battles.Types.BattleLocal
 import Lifecycle.With
@@ -16,7 +15,7 @@ import bwapi.Color
 object ShowBattle extends View {
   
   override def renderScreen() {
-    localBattle.foreach(battle => battle.estimationSimulationAttack.foreach(renderBattleScreen(battle, _)))
+    localBattle.foreach(renderBattleScreen)
 
     if (With.yolo.active() && With.frame / 24 % 2 == 0) {
       DrawScreen.column(610, 230, "YOLO")
@@ -39,11 +38,12 @@ object ShowBattle extends View {
     units.groupBy(_.unitClass).toVector.sortBy( - _._2.size).map(p => p._2.size + " " + p._1).mkString(", ")
   }
 
-  def renderBattleScreen(battle: BattleLocal, estimation: PredictionLocal) {
+  def renderBattleScreen(battle: BattleLocal) {
+    val prediction = battle.predictionAttack
     val barHeight = With.visualization.lineHeightSmall
     val x = 5
 
-    estimation.localBattleMetrics.lastOption.foreach(metrics => {
+    prediction.localBattleMetrics.lastOption.foreach(metrics => {
       DrawScreen.table(x, 4 * barHeight, Vector(
         Vector("Attack",      format(battle.judgement.get.ratioAttack)),
         Vector("Snipe",       format(battle.judgement.get.ratioSnipe)),
@@ -60,13 +60,13 @@ object ShowBattle extends View {
         Vector("RLHLN",       format(metrics.ratioLocalHealthLostNet)),
         Vector("RLHVLN",      format(metrics.ratioLocalHealthValueLostNet)),
         Vector("Duration",    metrics.framesIn / 24 + "s"),
-        Vector("Metrics",     estimation.localBattleMetrics.size.toString),
+        Vector("Metrics",     prediction.localBattleMetrics.size.toString),
         Vector("Survivors"),
-        Vector(With.self.name,  describeTeam(estimation.debugReport.filter(_._1.isFriendly) .filterNot(_._2.dead).keys)),
-        Vector(With.enemy.name, describeTeam(estimation.debugReport.filter(_._1.isEnemy)    .filterNot(_._2.dead).keys)),
+        Vector(With.self.name,  describeTeam(prediction.debugReport.filter(_._1.isFriendly) .filterNot(_._2.dead).keys)),
+        Vector(With.enemy.name, describeTeam(prediction.debugReport.filter(_._1.isEnemy)    .filterNot(_._2.dead).keys)),
         Vector("Dead"),
-        Vector(With.self.name,  describeTeam(estimation.debugReport.filter(_._1.isFriendly) .filter(_._2.dead).keys)),
-        Vector(With.enemy.name, describeTeam(estimation.debugReport.filter(_._1.isEnemy)    .filter(_._2.dead).keys))
+        Vector(With.self.name,  describeTeam(prediction.debugReport.filter(_._1.isFriendly) .filter(_._2.dead).keys)),
+        Vector(With.enemy.name, describeTeam(prediction.debugReport.filter(_._1.isEnemy)    .filter(_._2.dead).keys))
       ))
     })
 
@@ -75,12 +75,12 @@ object ShowBattle extends View {
       Pixel(320 - graphWidth / 2, 360 - graphWidth),
       "Score",
       Seq(
-        GraphCurve(Color.Black,         estimation.localBattleMetrics.map(unused =>  1.0)),
-        GraphCurve(Color.Black,         estimation.localBattleMetrics.map(unused =>  0.0)),
-        GraphCurve(Color.Black,         estimation.localBattleMetrics.map(unused => -1.0)),
-        GraphCurve(Colors.MediumRed,    estimation.localBattleMetrics.map(unused => battle.judgement.get.ratioTarget)),
-        GraphCurve(Colors.BrightOrange, estimation.localBattleMetrics.map(unused => battle.judgement.get.ratioAttack)),
-        GraphCurve(Color.Yellow,        estimation.localBattleMetrics.map(_.totalScore))),
+        GraphCurve(Color.Black,         prediction.localBattleMetrics.map(unused =>  1.0)),
+        GraphCurve(Color.Black,         prediction.localBattleMetrics.map(unused =>  0.0)),
+        GraphCurve(Color.Black,         prediction.localBattleMetrics.map(unused => -1.0)),
+        GraphCurve(Colors.MediumRed,    prediction.localBattleMetrics.map(unused => battle.judgement.get.ratioTarget)),
+        GraphCurve(Colors.BrightOrange, prediction.localBattleMetrics.map(unused => battle.judgement.get.ratioAttack)),
+        GraphCurve(Color.Yellow,        prediction.localBattleMetrics.map(_.totalScore))),
       fixedYMin = Some(-1.0),
       fixedYMax = Some(1.0),
       width = graphWidth,
@@ -88,7 +88,7 @@ object ShowBattle extends View {
   }
 
   def renderBattleMap(battle: BattleLocal) {
-    val simulation = battle.estimationSimulationAttack.get.simulation.get
+    val simulation = battle.predictionAttack.simulation
     simulation.simulacra.values.foreach(renderSimulacrumMap(_, battle.judgement.get.shouldFight))
   }
   

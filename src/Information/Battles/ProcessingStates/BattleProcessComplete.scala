@@ -5,5 +5,5 @@ class BattleProcessComplete extends BattleProcessState {
     transitionTo(new BattleProcessInitial)
   }
 
-  override val isFinalStep: Boolean = false
+  override val isFinalStep: Boolean = true
 }

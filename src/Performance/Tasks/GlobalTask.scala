@@ -13,7 +13,7 @@ class TaskAccounting extends AbstractTask {
 }
 class TaskBattles extends AbstractTask {
   urgency = With.configuration.urgencyBattles
-  override def maxConsecutiveSkips: Int = 6
+  override def maxConsecutiveSkips: Int = 3
   override protected def onRun() { With.battles.run() }
 }
 class TaskCamera extends AbstractTask {

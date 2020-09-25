@@ -20,14 +20,14 @@ object ShowBattleSummary extends View {
   private val tacticsRanks  = Pixel(235, 18)
   
   override def renderScreen() {
-    localBattle.foreach(battle => drawEstimationReport(battle.estimationSimulationAttack.get))
+    localBattle.foreach(battle => drawEstimationReport(battle.predictionAttack))
     if (With.yolo.active() && With.frame / 24 % 2 == 0) {
       With.game.drawTextScreen(yolo.bwapi, "YOLO")
     }
   }
   
   override def renderMap() {
-    localBattle.foreach(battle => drawBattleMap(battle, battle.estimationSimulationAttack.get))
+    localBattle.foreach(battle => drawBattleMap(battle, battle.predictionAttack))
   }
   
   def localBattle: Option[BattleLocal] = {

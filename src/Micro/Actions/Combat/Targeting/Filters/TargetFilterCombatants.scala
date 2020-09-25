@@ -9,7 +9,7 @@ object TargetFilterCombatants extends TargetFilter {
   //
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
     
-    if (actor.battle.forall(_.estimationSimulationAttack.map(_.deathsUs).sum == 0)) return true
+    if (actor.battle.forall(_.predictionAttack.deathsUs == 0)) return true
     
     lazy val teamEngaged = (actor.teammates + actor).exists(_.matchups.framesOfSafety <= 0.0)
     

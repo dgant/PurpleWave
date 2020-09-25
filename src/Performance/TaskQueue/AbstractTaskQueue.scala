@@ -11,7 +11,6 @@ abstract class AbstractTaskQueue {
   {
     // There's some path-dependency in task initialization.
     // Run each task in order until we've run everything once.
-    //
     if (tasks.exists(_.hasNeverRun)) {
       while (With.performance.continueRunning && tasks.exists(_.hasNeverRun)) {
         tasks.find(_.hasNeverRun).get.run()
@@ -26,14 +25,14 @@ abstract class AbstractTaskQueue {
     var i = 0
     while (i < tasksSorted.length) {
       val task = tasksSorted(i)
-      val expectedMilliseconds =
-        Math.max(
-          if (task.totalRuns < 10) 5 else 0, // Arbitrary assumption before we have much data
-          if (With.performance.danger) task.runMillisecondsMaxAllTime else 2 * task.runMillisecondsMaxRecent())
+      val expectedMilliseconds = Math.max(
+        if (task.totalRuns < 10) 5 else 1, // Arbitrary assumption before we have much data
+        if (With.performance.danger) task.runMillisecondsMaxAllTime else task.runMillisecondsMaxRecent())
     
-      if (task.framesSinceRunning > task.maxConsecutiveSkips
-          || With.performance.millisecondsLeftBeforeTarget > expectedMilliseconds
-          || ! With.performance.enablePerformancePauses) {
+      if (With.performance.continueRunning && (
+        i == 0
+        || With.performance.millisecondsUntilTarget >= expectedMilliseconds
+        || ! With.performance.enablePerformancePauses)) {
         task.run()
       } else {
         task.skip()
@@ -48,7 +47,7 @@ abstract class AbstractTaskQueue {
       With.logger.debug("Task queue took @ "
         + With.performance.millisecondsSpentThisFrame
         + "ms, crossing the "
-        + With.performance.frameLimitShort
+        + With.configuration.frameMillisecondLimit
         + "ms threshold. Task durations: \n"
         + tasksSorted
           .filter(_.framesSinceRunning <= 1)
@@ -58,7 +57,7 @@ abstract class AbstractTaskQueue {
   }
 
   def statusTable: Vector[Vector[String]] = {
-        val title = Vector("Cutoff: ", With.configuration.targetFrameDurationMilliseconds + "ms")
+        val title = Vector("Cutoff: ", With.configuration.frameMillisecondLimit + "ms")
     val headers = Vector("Task", "Last run", " Run %", "Seconds", "Avg ms", "Max (Recent)", "Max (All time)", "Extended", "Disqualifying")
     val body = With.tasks.tasks
       .sortBy(_.getClass.getSimpleName)

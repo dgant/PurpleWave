@@ -50,7 +50,7 @@ class Agency {
             "Microing "
             + agent.unit.unitClass
             + " crossed the "
-            + With.performance.frameLimitShort
+            + With.configuration.frameMillisecondLimit
             + "ms threshold by taking "
             + timeDelta
             + "ms considering "

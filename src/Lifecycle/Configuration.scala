@@ -6,12 +6,13 @@ import Strategery.{DefaultPlaybook, Playbook}
 class Configuration {
 
   /////////////////////////
-  // Tournament settings //
+  // Tournament settings //s
   /////////////////////////
 
-  var enableSurrenders                = false
-  var enableChat                      = false
-  var targetFrameDurationMilliseconds = 30
+  var enableSurrenders        = false
+  var enableChat              = false
+  var frameMillisecondTarget  = 20
+  var frameMillisecondLimit   = 55
 
   ///////////////////
   // Mode settings //

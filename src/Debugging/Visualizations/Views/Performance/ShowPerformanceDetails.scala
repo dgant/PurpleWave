@@ -7,7 +7,6 @@ import Lifecycle.With
 object ShowPerformanceDetails extends View {
   
   override def renderScreen() {
-    val title = Vector("Cutoff: ", With.configuration.targetFrameDurationMilliseconds + "ms")
     val headers = Vector("Task", "Last run", " Run %", "Seconds", "Avg ms", "Max (Recent)", "Max (All time)", "Extended", "Disqualifying")
     val body = With.tasks.tasks
       .sortBy(_.getClass.getSimpleName)

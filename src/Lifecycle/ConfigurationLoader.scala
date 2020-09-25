@@ -10,12 +10,21 @@ import mjson.Json
 
 object ConfigurationLoader {
 
-  def getOrDefault(json: Json, property: String, default: Boolean): Boolean = {
+  def getOrDefault[T](json: Json, property: String, default: T): T = {
     val value = json.at(property)
-    if (value == null || ! value.isString || value.asString() != "true") {
+    if (value == null) {
       return default
     }
-    true
+    val attemptedOutput: T = default match {
+      case _: Boolean =>  if (value.isBoolean)  value.asBoolean().asInstanceOf[T] else default
+      case _: Int =>      if (value.isNumber)   value.asInteger().asInstanceOf[T] else default
+      case _: Double =>   if (value.isNumber)   value.asDouble().asInstanceOf[T] else default
+      case _ =>           if (value.isString)   value.asString().asInstanceOf[T] else default
+    }
+    if (attemptedOutput == null) {
+      return default
+    }
+    attemptedOutput
   }
 
   def load(): Unit = {
@@ -33,7 +42,6 @@ object ConfigurationLoader {
     try {
       val configText    = scala.io.Source.fromFile(configFile).mkString
       val config        = Json.read(configText)
-
       val human         = getOrDefault(config, "human",         false)
       val ladder        = getOrDefault(config, "ladder",        false)
       val livestream    = getOrDefault(config, "livestream",    false)
@@ -44,7 +52,12 @@ object ConfigurationLoader {
       val debugging     = getOrDefault(config, "debugging",     false)
       val debugginglive = getOrDefault(config, "debugginglive", false)
       val logstd        = getOrDefault(config, "logstd",        false)
+      val frameMsTarget = getOrDefault(config, "framemstarget", With.configuration.frameMillisecondTarget)
+      val frameMsLimit  = getOrDefault(config, "framemslimit",  With.configuration.frameMillisecondLimit)
       val fixedbuilds   = new FileFlag("fixedbuilds.txt").contents
+
+      With.configuration.frameMillisecondTarget = frameMsTarget
+      With.configuration.frameMillisecondLimit = frameMsLimit
 
       if (tournament    && ladder)      With.logger.warn("Both tournament and ladder modes are enabled")
       if (tournament    && livestream)  With.logger.warn("Both tournament and livestream modes are enabled")
@@ -80,12 +93,10 @@ object ConfigurationLoader {
 
   private def setTournamentMode(): Unit = {
     config.forcedPlaybook = Some(TournamentPlaybook)
-    config.targetFrameDurationMilliseconds = 40
   }
 
   private def setLadderMode(): Unit = {
     config.historyHalfLife                  = 40
-    config.targetFrameDurationMilliseconds  = 40
     config.recentFingerprints               = 4
   }
 
@@ -102,19 +113,16 @@ object ConfigurationLoader {
     config.visualizeFun                     = true
     config.enableChat                       = true
     config.enableSurrenders                 = true
-    config.targetFrameDurationMilliseconds  = 20
   }
 
   private def setHumanMode(): Unit = {
     config.humanMode                        = true
     config.enableChat                       = true
     config.enableSurrenders                 = true
-    config.targetFrameDurationMilliseconds  = 20
     config.forcedPlaybook                   = Some(HumanPlaybook)
   }
 
   private def setPretraining(): Unit = {
-    config.historyHalfLife                  = 20
     config.forcedPlaybook                   = Some(PretrainingPlaybook)
   }
 
@@ -127,7 +135,6 @@ object ConfigurationLoader {
   private def setDebugLiveMode(): Unit = {
     setDebugMode()
     config.visualizeDebug                   = true
-    config.targetFrameDurationMilliseconds  = 20
     config.debugPauseThreshold              = 24 * 5
     config.forcedPlaybook                   = Some(new TestingPlaybook)
   }

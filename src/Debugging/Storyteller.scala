@@ -122,7 +122,7 @@ class Storyteller {
     With.logger.debug("Game duration (fastest):    " + gameFastestSeconds / 60 + "m " + gameFastestSeconds % 60 + "s")
     With.logger.debug("Game duration (wall clock): " + gameWallClockSeconds / 60 + "m " + gameWallClockSeconds % 60 + "s")
     With.logger.debug("\n" + Seq(
-      Seq(With.performance.frameLimitShort, With.performance.framesOverShort),
+      Seq(With.configuration.frameMillisecondLimit, With.performance.framesOverShort),
       Seq(1000, With.performance.framesOver1000),
       Seq(10000, With.performance.framesOver10000)).map(line => "Bot frames over " + line.head.toString + "ms: " + line.last.toString).mkString("\n"))
 

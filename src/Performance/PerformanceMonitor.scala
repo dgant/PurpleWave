@@ -7,11 +7,9 @@ class PerformanceMonitor {
   private val framesToTrack = 24 * 3
   private val frameTimes = Array.fill(framesToTrack)(1l)
 
-  val frameLimitShort: Int = 30
-  
-  private var millisecondsBefore = 0l
+  private var millisecondsOnFrameStart = 0l
   private var lastFrameDelayUpdate = 0
-  
+
   var framesOverShort = 0
   var framesOver1000  = 0
   var framesOver10000 = 0
@@ -23,7 +21,7 @@ class PerformanceMonitor {
   def systemMillis: Long = System.nanoTime / 1000000
 
   def startFrame() {
-    millisecondsBefore = systemMillis
+    millisecondsOnFrameStart = systemMillis
   }
 
   def endFrame() {
@@ -34,29 +32,29 @@ class PerformanceMonitor {
     }
 
     frameTimes(With.frame % framesToTrack) = millisecondDifference
-    if (millisecondDifference >= frameLimitShort) framesOverShort += 1
-    if (millisecondDifference >= 1000)            framesOver1000  += 1
-    if (millisecondDifference >= 10000)           framesOver10000 += 1
+    if (millisecondDifference >= With.configuration.frameMillisecondLimit)  framesOverShort += 1
+    if (millisecondDifference >= 1000)                                      framesOver1000  += 1
+    if (millisecondDifference >= 10000)                                     framesOver10000 += 1
   }
 
-  def millisecondsLeftBeforeTarget: Long = {
-    Math.max(0, With.configuration.targetFrameDurationMilliseconds - millisecondsSpentThisFrame)
+  def millisecondsUntilTarget: Long = {
+    With.configuration.frameMillisecondTarget - millisecondsSpentThisFrame
   }
 
   def millisecondsSpentThisFrame: Long = {
-    Math.max(0, systemMillis - millisecondsBefore)
+    Math.max(0, systemMillis - millisecondsOnFrameStart)
   }
 
   def continueRunning: Boolean = {
-    With.frame == 0 || ! enablePerformancePauses || (millisecondsLeftBeforeTarget > 1 && JBWAPIClient.framesBehind() < 1)
+    With.frame == 0 || ! enablePerformancePauses || (millisecondsUntilTarget > 1 && JBWAPIClient.framesBehind() < 1)
   }
 
   def violatedTarget: Boolean = {
-    With.frame > 0 && millisecondsLeftBeforeTarget <= 0
+    With.frame > 0 && millisecondsSpentThisFrame >= With.configuration.frameMillisecondTarget
   }
 
   def violatedLimit: Boolean = {
-    With.frame > 0 && millisecondsSpentThisFrame >= frameLimitShort
+    With.frame > 0 && millisecondsSpentThisFrame >= With.configuration.frameMillisecondLimit
   }
 
   def danger: Boolean = (
@@ -70,7 +68,5 @@ class PerformanceMonitor {
   def maxFrameMilliseconds  : Long = frameTimes.max
   def meanFrameMilliseconds : Long = frameTimes.view.map(Math.min(_, 100)).sum / framesToTrack
 
-  def disqualified: Boolean =
-    framesOverShort >= 320 ||
-    framesOver1000  >= 10
+  def disqualified: Boolean = framesOverShort >= 320 || framesOver1000  >= 10
 }

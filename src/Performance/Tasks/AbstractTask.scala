@@ -79,7 +79,7 @@ abstract class AbstractTask {
         With.logger.warn(
           toString
           + " crossed the "
-          + With.performance.frameLimitShort
+          + With.configuration.frameMillisecondLimit
           + "ms threshold, taking "
           + millisecondsDuration
           + "ms for " + With.performance.millisecondsSpentThisFrame + "ms total this frame. "

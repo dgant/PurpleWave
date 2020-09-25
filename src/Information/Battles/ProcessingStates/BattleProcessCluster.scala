@@ -11,7 +11,6 @@ class BattleProcessCluster extends BattleProcessState {
     if (needToReset) {
       needToReset = false
       With.battles.clustering.reset()
-      return
     }
 
     if ( ! With.battles.clustering.isComplete) {

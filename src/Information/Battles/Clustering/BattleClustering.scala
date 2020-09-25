@@ -1,6 +1,7 @@
 package Information.Battles.Clustering
 
 import Information.Battles.BattleClassificationFilters
+import Information.Battles.Types.{BattleLocal, Team}
 import Information.Grids.Disposable.GridDisposableBoolean
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -46,5 +47,15 @@ class BattleClustering {
     // Evaluate the lazy clusters before we wipe away the data required to produce them
     clusterComplete.clusters
     clusterComplete = clusterInProgress
+    With.battles.nextBattlesLocal = clusters
+      .map(cluster =>
+        new BattleLocal(
+          new Team(cluster.filter(_.isOurs)),
+          new Team(cluster.filter(_.isEnemy))))
+      .filter(_.teams.forall(_.units.exists(u =>
+        u.canAttack
+        || u.unitClass.isSpellcaster
+        || u.unitClass.isDetector
+        || u.unitClass.isTransport)))
   }
 }

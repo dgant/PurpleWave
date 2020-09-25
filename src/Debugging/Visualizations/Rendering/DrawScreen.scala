@@ -58,6 +58,10 @@ object DrawScreen {
     val pointStart        = innerBorderStart  .add      (margin, margin)
     val pointEnd          = innerBorderEnd    .subtract (margin, margin)
 
+    if (curves.flatten(_.points).isEmpty) {
+      return
+    }
+
     val dataMin = curves.flatten(_.points).min
     val dataMax = curves.flatten(_.points).max
     val yMin    = Math.min(dataMin, fixedYMin.getOrElse(dataMin))

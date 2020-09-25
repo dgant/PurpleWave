@@ -88,6 +88,8 @@ class TaskSquads extends AbstractTask {
 }
 class TaskVisualizations extends AbstractTask {
   override def maxConsecutiveSkips: Int = 0
+  override def cosmetic: Boolean = true
+  override def skippable: Boolean = false
   override protected def onRun() {
     With.visualization.render()
     With.animations.render()

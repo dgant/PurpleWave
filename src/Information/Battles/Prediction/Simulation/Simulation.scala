@@ -49,12 +49,11 @@ class Simulation(val prediction: PredictionLocal) {
     snipe()
     everyone.foreach(_.step())
     everyone.foreach(_.updateDeath())
-    if (prediction.frames - prediction.localBattleMetrics.lastOption.map(_.framesIn).getOrElse(0) >= With.configuration.simulationEstimationPeriod) {
-      recordMetrics()
-    }
-    // TODO: This should be a separate batch step
+
     if (complete) {
       cleanup()
+    } else if (prediction.frames - prediction.localBattleMetrics.lastOption.map(_.framesIn).getOrElse(0) >= With.configuration.simulationEstimationPeriod) {
+      recordMetrics()
     }
   }
   

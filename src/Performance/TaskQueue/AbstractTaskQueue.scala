@@ -20,7 +20,8 @@ abstract class AbstractTaskQueue {
   
     val tasksSorted = tasks
       .sortBy(task => - task.urgency * task.framesSinceRunning)
-      .sortBy( ! _.due)
+      .sortBy( ! _.due) // Ensure we run any due tasks
+      .sortBy(_.cosmetic) // Don't let a cosmetic task overtake a due task
 
     var i = 0
     while (i < tasksSorted.length) {
@@ -28,8 +29,10 @@ abstract class AbstractTaskQueue {
       val expectedMilliseconds = Math.max(
         if (task.totalRuns < 10) 5 else 1, // Arbitrary assumption before we have much data
         if (With.performance.danger) task.runMillisecondsMaxAllTime else task.runMillisecondsMaxRecent())
-    
-      if (With.performance.continueRunning && (
+
+      if ( ! task.skippable) {
+        task.run()
+      } else if (With.performance.continueRunning && (
         i == 0
         || With.performance.millisecondsUntilTarget >= expectedMilliseconds
         || ! With.performance.enablePerformancePauses)) {

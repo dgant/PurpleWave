@@ -21,6 +21,8 @@ abstract class AbstractTask {
   
   var urgency             : Int = 1
   def maxConsecutiveSkips : Int = 48
+  def skippable           : Boolean = true
+  def cosmetic            : Boolean = false
   def due                 : Boolean = framesSinceRunning > maxConsecutiveSkips
   
   private var alreadyViolatedTarget  = false

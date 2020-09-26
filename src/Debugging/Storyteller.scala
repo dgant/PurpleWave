@@ -126,7 +126,10 @@ class Storyteller {
       Seq(1000, With.performance.framesOver1000),
       Seq(10000, With.performance.framesOver10000)).map(line => "Bot frames over " + line.head.toString + "ms: " + line.last.toString).mkString("\n"))
 
-    With.logger.debug("Our performance (if running synchronously) would be " + (if (With.performance.disqualified) "BAD" else if (With.performance.danger) "DANGEROUS" else "good"))
+    With.logger.debug(
+      "The bot believes its performance"
+      + (if (Main.configuration.async) ", if running synchronously, would be " else " was ")
+      + (if (With.performance.disqualified) "BAD" else if (With.performance.danger) "DANGEROUS" else "good"))
     With.logger.debug(JBWAPIClient.getPerformanceMetrics.toString)
   }
 

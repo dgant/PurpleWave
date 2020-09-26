@@ -28,7 +28,7 @@ object Gather extends Action {
     // Move between adjacent bases if threatened
     val baseOriginal = resource.base
     lazy val baseOpposite = unit.base.flatMap(b => b.isNaturalOf.orElse(b.natural))
-    if (baseOpposite.nonEmpty && baseOriginal.exists(_.units.exists(threat =>
+    if (baseOpposite.exists(_.owner.isUs) && baseOriginal.exists(_.units.exists(threat =>
       ! threat.unitClass.isWorker
       && threat.isEnemy
       && threat.canAttack(unit)

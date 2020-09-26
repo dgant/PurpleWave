@@ -16,6 +16,6 @@ class BattleProcessSwap extends BattleProcessState {
       new Team(With.units.ours  .view.filter(BattleClassificationFilters.isEligibleGlobal).toVector),
       new Team(With.units.enemy .view.filter(BattleClassificationFilters.isEligibleGlobal).toVector))
 
-    transitionTo(new BattleProcessComplete)
+    transitionTo(new BattleProcessMatchupAnalysis)
   }
 }

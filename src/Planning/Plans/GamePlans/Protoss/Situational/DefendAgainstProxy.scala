@@ -65,6 +65,7 @@ class DefendAgainstProxy extends Plan {
               defender.pixelDistanceEdge(proxy) < 64
               || defender.framesToGetInRange(proxy) < framesBeforeDamage)))
         .sortBy(_.pixelDistanceTravelling(proxy.pixelCenter))
+        .sortBy(-_.dpfOnNextHitAgainst(proxy))
       val defendersRequested = defendersViable.take(defendersRequired)
       defendersRequested.foreach(defender => {
         var canAdd = ! defender.unitClass.isWorker
@@ -73,7 +74,7 @@ class DefendAgainstProxy extends Plan {
           canAdd = true
         }
         if (canAdd) {
-          defendersAssigned -= defender
+          defendersAvailable -= defender
           defendersAssigned(defender) = proxy
         }
       })

@@ -28,10 +28,10 @@ class LockUnits extends {
     With.recruiter.add(this)
   }
   
-  def inquire(plan: Plan): Option[Seq[FriendlyUnitInfo]] = {
+  def inquire(plan: Plan): Option[Vector[FriendlyUnitInfo]] = {
     val ownerBefore = owner // This is supposed to be free of side-effects so retain the owner
     owner = plan
-    val output = With.recruiter.inquire(this, isDryRun = true).map(_.toSeq) // toVector ensures we don't return a view with invalid owner
+    val output = With.recruiter.inquire(this, isDryRun = true).map(_.toVector) // toVector ensures we don't return a view with invalid owner
     owner = ownerBefore
     output
   }

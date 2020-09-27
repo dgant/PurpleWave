@@ -23,7 +23,8 @@ class PvPLateGame extends GameplanTemplate {
   override val emergencyPlans: Vector[Plan] = Vector(
     new PvPIdeas.ReactToDarkTemplarEmergencies,
     new PvPIdeas.ReactToCannonRush,
-    new PvPIdeas.ReactToRoboAsDT)
+    new PvPIdeas.ReactToRoboAsDT,
+    new PvPIdeas.ReactToArbiters)
 
   override def priorityAttackPlan: Plan = new PvPIdeas.AttackWithDarkTemplar
   override val attackPlan: Plan = new Parallel(
@@ -121,7 +122,10 @@ class PvPLateGame extends GameplanTemplate {
 
   class GetReactiveObservers extends If(
     new And(
-      new EnemyHasShown(Protoss.DarkTemplar),
+      new Or(
+        new EnemyHasShown(Protoss.DarkTemplar),
+        new EnemyHasShown(Protoss.Arbiter),
+        new EnemiesAtLeast(1, Protoss.ArbiterTribunal)),
       new Or(new Not(goingTemplar), new ReadyForThirdIfSafe)),
     new Build(Get(Protoss.RoboticsFacility), Get(Protoss.Observatory), Get(Protoss.ObserverSpeed)))
 

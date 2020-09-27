@@ -13,7 +13,7 @@ object Opponents {
   // AIIDE 2020
   val bananabrain : Opponent = add("BananaBrain", new StrategySelectionRecommended(StrategySelectionGreedy(), PvPRobo, PvP3rdBaseSlow) { duration = 3 })
   val dandanbot   : Opponent = add("DanDanBot",   defaultPvP)
-  val dragon      : Opponent = add("Dragon",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvT13Nexus, PvT3rdFast, PvT3BaseCarrier, PvEStormNo))
+  val dragon      : Opponent = add("Dragon",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvT13Nexus, PvT3rdFast, PvT3BaseArbiter, PvEStormNo))
   val ecgberht    : Opponent = add("Ecgberht",    new StrategySelectionRecommended(StrategySelectionGreedy(), PvT32Nexus, PvT2BaseReaver, PvT3BaseGateway))
   val eggbot      : Opponent = add("EggBot",      defaultPvP)
   val mcrave      : Opponent = add("McRave",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ2Gate1012, PvZ4GateGoon, PvZMidgame5GateGoonReaver, PvZLateGameReaver))
@@ -24,7 +24,7 @@ object Opponents {
   val taij        : Opponent = add("Taij",        defaultPvT)
   val willyt      : Opponent = add("WillyT",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvT28Nexus, PvT2BaseReaver, PvT3BaseArbiter))
   val zzzkbot     : Opponent = add("ZZZKBot",     new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ1BaseForgeTech, PvZMidgameNeoBisu, PvZLateGameTemplar))
-  val daqin       : Opponent = add("DaQin",       StrategySelectionFixed(PvP2GateDTExpand, PvP3rdBaseSlow))
+  val daqin       : Opponent = add("DaQin",       new StrategySelectionRecommended(StrategySelectionGreedy(), PvPRobo, PvP3rdBaseSlow))
   val ualbertabot : Opponent = add("UAlbertaBot", StrategySelectionFixed(PvR1BaseDT))
 
   // COG 2020

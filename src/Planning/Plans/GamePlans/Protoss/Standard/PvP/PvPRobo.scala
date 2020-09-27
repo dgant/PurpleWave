@@ -149,7 +149,7 @@ class PvPRobo extends GameplanTemplate {
     new Pump(Protoss.Dragoon),
     new If(
       new UnitsAtLeast(3, Protoss.Gateway),
-      new Pump(Protoss.Zealot, maximumConcurrently = 1)))
+      new Pump(Protoss.Zealot)))
 
   class Expand extends RequireMiningBases(2)
 

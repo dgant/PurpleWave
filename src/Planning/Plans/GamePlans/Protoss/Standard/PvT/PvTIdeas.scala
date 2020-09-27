@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.{Attack, Hunt}
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{If, Trigger, _}
 import Planning.Plans.GamePlans.Protoss.Situational.{BuildHuggingNexus, DefendFightersAgainstRush}
@@ -11,6 +11,7 @@ import Planning.Plans.Macro.Automatic.{PumpWorkers, _}
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Macro.Protoss.MeldDarkArchons
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
 import Planning.Predicates.Milestones._
@@ -23,6 +24,8 @@ import Strategery.Strategies.Protoss._
 object PvTIdeas {
 
   class PriorityAttacks extends Parallel(
+    new Hunt(Protoss.DarkArchon, Terran.Ghost),
+    new Hunt(Protoss.DarkArchon, Terran.ScienceVessel),
     new If(new Or(new EnemyUnitsNone(Protoss.Observer), new EnemyBasesAtLeast(3)), new Attack(Protoss.DarkTemplar)),
     new Attack(Protoss.Scout),
     new Trigger(new UnitsAtLeast(4, Protoss.Carrier, complete = true), initialAfter = new Attack(Protoss.Carrier)))
@@ -195,7 +198,7 @@ object PvTIdeas {
     new If(
       new EnemyStrategy(With.fingerprints.bio),
       new Parallel(
-        new Pump(Protoss.HighTemplar, maximumTotal = 6),
+        new Pump(Protoss.HighTemplar),
         new Pump(Protoss.Zealot)),
       new Parallel(
         new If(
@@ -222,6 +225,13 @@ object PvTIdeas {
     new TrainMinimumDragoons,
     new If(new And(new Employing(PvEStormYes), new EnemyStrategy(With.fingerprints.bio), new UnitsAtLeast(5, Protoss.Gateway)), new PumpRatio(Protoss.HighTemplar, 1, 5, Seq(Enemy(Terran.Marine, 1.0/5.0)))),
     new If(new And(new Employing(PvEStormYes), new UnitsAtLeast(8, Protoss.Carrier)), new Pump(Protoss.HighTemplar, 2)),
+    new If(
+      new EnemyHasTech(Terran.Lockdown),
+      new Parallel(
+        new If(
+          new UnitsAtMost(2, Protoss.DarkArchon),
+          new MeldDarkArchons,
+          new Pump(Protoss.DarkTemplar, maximumTotal = 4, maximumConcurrently = 2)))),
     new TrainCarriers,
     new PumpRatio(Protoss.Arbiter, 2, 8, Seq(Enemy(UnitMatchSiegeTank, 0.5))),
     new TrainScouts,

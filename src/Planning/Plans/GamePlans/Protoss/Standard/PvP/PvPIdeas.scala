@@ -201,7 +201,8 @@ object PvPIdeas {
       new Build(
         Get(Protoss.RoboticsFacility),
         Get(Protoss.Observatory)),
-    new Pump(Protoss.Observer, 2)))
+      new UpgradeContinuously(Protoss.ObserverSpeed),
+      new Pump(Protoss.Observer, 3)))
 
   class AggressWithZealotsAgainstRangelessDragoons extends If(
     new And(

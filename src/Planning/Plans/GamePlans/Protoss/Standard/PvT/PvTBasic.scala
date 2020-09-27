@@ -72,8 +72,6 @@ class PvTBasic extends GameplanTemplate {
 
   override def emergencyPlans: Seq[Plan] = Vector(new PvTIdeas.ReactToBBS, new PvTIdeas.ReactToWorkerRush)
 
-  override def workerPlan: Plan = super.workerPlan
-
   override def buildOrderPlan: Plan = new Parallel(
     new ConsiderTakingFastSecondBase,
     new If(new Employing(PvT13Nexus),           new BuildOrder(ProtossBuilds.PvT13Nexus_GateCoreGateZ: _*)),

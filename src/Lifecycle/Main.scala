@@ -5,8 +5,8 @@ import bwapi.BWClientConfiguration
 object Main {
 
   val configuration = new BWClientConfiguration
-  configuration.async = false
-  configuration.asyncUnsafe = false
+  configuration.async = true
+  configuration.asyncUnsafe = true
   configuration.autoContinue = true
   configuration.maxFrameDurationMs = 30
 

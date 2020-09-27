@@ -195,7 +195,7 @@ object PvTIdeas {
     new If(
       new EnemyStrategy(With.fingerprints.bio),
       new Parallel(
-        new Pump(Protoss.HighTemplar),
+        new Pump(Protoss.HighTemplar, maximumTotal = 6),
         new Pump(Protoss.Zealot)),
       new Parallel(
         new If(
@@ -205,7 +205,7 @@ object PvTIdeas {
             Enemy(Terran.Goliath,     1.5),
             Enemy(Terran.Marine,      1.0),
             Enemy(Terran.Vulture,     -1.0)))),
-        new If(new GasAtLeast(800), new Pump(Protoss.HighTemplar, 8, maximumConcurrently = 2)),
+        new If(new GasAtLeast(800), new Pump(Protoss.HighTemplar, 6, maximumConcurrently = 2)),
         new PumpRatio(Protoss.HighTemplar, 0, 4, Seq(Flat(-2.0), Friendly(UnitMatchWarriors, 0.1))),
         new Pump(Protoss.Dragoon))))
 

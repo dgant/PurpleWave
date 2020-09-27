@@ -39,7 +39,6 @@ object PsionicStorm extends TargetedSpell {
       && caster.pixelDistanceCenter(target) > 32 * castRangeTiles
       && (caster.visibleToOpponents || target.tileIncludingCenter.altitudeBonus >= caster.tileIncludingCenter.altitudeBonus)
       && target.matchups.targetsInRange.isEmpty) {
-
       return 0.0
     }
 

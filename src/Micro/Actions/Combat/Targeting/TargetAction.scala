@@ -18,12 +18,13 @@ class TargetAction(val additionalFiltersRequired: TargetFilter*) extends Action 
 
   val filtersAlwaysRequired = Vector(
     TargetFilterPossible,
+    TargetFilterLarvaAndEgg,
+    TargetFilterLeash,
     TargetFilterFocus,
     TargetFilterStayCloaked,
     TargetFilterFutility,
     TargetFilterScourge,
     TargetFilterReaver,
-    TargetFilterAlmostAnything,
     TargetFilterCrowded,
     TargetFilterTankFodder,
     TargetFilterRush)

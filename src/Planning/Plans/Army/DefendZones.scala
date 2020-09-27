@@ -51,6 +51,14 @@ class DefendZones extends Plan {
   
   private def zoneValue(zone: Zone): Double = {
     // Omit Pylons/Supply Depots, which may just be there to block expansions
-    1.0 + zone.units.view.map(u => if ((u.unitClass.isWorker || u.unitClass.isBuilding) && u.unitClass.supplyProvided != 16) u.subjectiveValue else 0.0).sum
+    //
+    // Exception: If we want to be around the map anyway, it's a good way to prevent the expansion from being taken
+    // There's some risk of splitting the army, so avoid doing that in PvP where that's suicidal
+    lazy val canDefendBlocks = With.blackboard.wantToAttack() && ! With.enemies.exists(_.isProtoss)
+    1.0 + zone.units.view.map(u =>
+      if ((u.unitClass.isWorker || u.unitClass.isBuilding) && (u.unitClass.supplyProvided != 16 || canDefendBlocks))
+        u.subjectiveValue
+      else
+        0.0).sum
   }
 }

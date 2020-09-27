@@ -64,7 +64,7 @@ class PvP4GateGoon extends GameplanTemplate {
 
     new If(
       new Or(
-        new UnitsAtLeast(18, Protoss.Dragoon),
+        new UnitsAtLeast(26, Protoss.Dragoon),
         new EnemiesAtLeast(3, Protoss.PhotonCannon, complete = true)),
       new RequireMiningBases(2)),
 

@@ -79,9 +79,8 @@ abstract class DefendFFEWithProbes extends Plan {
 
       workers.foreach(_.agent.intend(this, new Intention {
         canFlee   = false
-        //toForm    = Some(toDefend)
         toTravel  = Some(toDefend)
-        toLeash   = Some(Leash(toDefend, 32.0 * 4.0))
+        toLeash   = Some(Leash(toDefend, 32.0 * 5.0))
       }))
       if (ShowUnitsFriendly.mapInUse) {
         workers.foreach(w => DrawMap.circle(toDefend, 16, Colors.NeonYellow))

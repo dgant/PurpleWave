@@ -14,17 +14,22 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Placement.{BuildCannonsAtNatural, BuildCannonsInMain, ProposePlacement}
 import Planning.Plans.Scouting.ScoutForCannonRush
 import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvP1ZealotExpand
+import Strategery.Strategies.Protoss.{PvP1ZealotExpand, PvP2GateDTExpand, PvPRobo}
 
 class PvP1ZealotExpand extends GameplanTemplate {
 
   private val defaultCannons: Int = 3
-  override val activationCriteria: Predicate = new Employing(PvP1ZealotExpand)
+  override val activationCriteria: Predicate = new Or(
+    new Employing(PvP1ZealotExpand),
+    new And(
+      new EnemyStrategy(With.fingerprints.gasSteal),
+      new Employing(PvPRobo, PvP2GateDTExpand)))
   override val completionCriteria: Predicate = new Latch(new And(
     new BasesAtLeast(2),
     new UnitsAtLeast(5, Protoss.Gateway),
@@ -80,6 +85,7 @@ class PvP1ZealotExpand extends GameplanTemplate {
 
   override def workerPlan: Plan = new If(
     new Or(
+      new EnemyStrategy(With.fingerprints.gasSteal),
       new UnitsAtLeast(5, Protoss.Gateway),
       new EnemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.nexusFirst),
       new EnemyBasesAtLeast(2)),
@@ -145,9 +151,8 @@ class PvP1ZealotExpand extends GameplanTemplate {
             new BuildCannonsAtNatural(2))))),
 
     // Finish the build order
-    new Build(
-      Get(3, Protoss.Gateway),
-      Get(Protoss.DragoonRange)),
+    new Build(Get(3, Protoss.Gateway)),
+    new If(new GasAtLeast(40), new UpgradeContinuously(Protoss.DragoonRange)), // Check is in case of gas steal
     new If(new ShouldAddCannons, new BuildCannonsAtNatural(defaultCannons)),
     new PvPIdeas.TrainArmy,
     new RequireMiningBases(2),

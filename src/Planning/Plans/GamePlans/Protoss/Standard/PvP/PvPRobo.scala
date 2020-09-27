@@ -113,6 +113,7 @@ class PvPRobo extends GameplanTemplate {
   override def aggressionPlan: Plan = new Trigger(
     new And(
       new ReadyToExpand,
+      new BasesAtMost(1),
       new EnemyStrategy(With.fingerprints.fourGateGoon)),
     new Aggression(1.5)
   )

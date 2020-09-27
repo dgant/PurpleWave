@@ -29,9 +29,12 @@ import Strategery.Strategies.Protoss._
 class PvTBasic extends GameplanTemplate {
 
   override def archonPlan: Plan = new If(
-    new EnemyStrategy(With.fingerprints.bio),
-    new MeldArchons(49) { override def maximumTemplar: Int = 8 },
-    new MeldArchons(25))
+    new Employing(PvEStormNo),
+    new MeldArchons,
+    new If(
+      new EnemyStrategy(With.fingerprints.bio),
+      new MeldArchons(49) { override def maximumTemplar: Int = 8 },
+      new MeldArchons(25)))
 
   override def placementPlan: Plan = new If(
     new And(
@@ -162,7 +165,11 @@ class PvTBasic extends GameplanTemplate {
 
     new UpgradeContinuously(Protoss.CarrierCapacity),
 
-    new If(new Or(new UnitsAtLeast(1, Protoss.HighTemplar), new GasAtLeast(800)), new GoStorm),
+    new If(
+      new And(
+        new Employing(PvEStormYes),
+        new Or(new UnitsAtLeast(1, Protoss.HighTemplar), new GasAtLeast(800))),
+      new GoStorm),
 
     new If(new UnitsAtLeast(1, Protoss.ArbiterTribunal),  new Build(Get(Protoss.ArbiterEnergy))),
     new If(new UpgradeComplete(Protoss.ArbiterEnergy),    new Build(Get(Protoss.Stasis))),
@@ -336,9 +343,9 @@ class PvTBasic extends GameplanTemplate {
     new If(
       new And(new SafeAtHome, new UnitsAtLeast(5, Protoss.Gateway)),
       new Parallel(
-        new If(new And(new EmployingCarriers, new UnitsAtLeast(1, Protoss.Stargate)),       new GoCarrier),
-        new If(new And(new EmployingGateway,  new UnitsAtLeast(1, Protoss.CitadelOfAdun)),  new GoStorm),
-        new If(new And(new EmployingArbiters, new UnitsAtLeast(1, Protoss.CitadelOfAdun)),  new GoArbiter))),
+        new If(new And(new EmployingCarriers, new UnitsAtLeast(1, Protoss.Stargate)),                                   new GoCarrier),
+        new If(new And(new EmployingGateway,  new UnitsAtLeast(1, Protoss.CitadelOfAdun), new Employing(PvEStormYes)),  new GoStorm),
+        new If(new And(new EmployingArbiters, new UnitsAtLeast(1, Protoss.CitadelOfAdun)),                              new GoArbiter))),
 
     new HighPriorityTech,
     new PvTIdeas.TrainArmy,
@@ -426,7 +433,7 @@ class PvTBasic extends GameplanTemplate {
         new EmployingDTRush,
         new GoDT, // DT stream will keep us alive until Vessels
         new If(
-          new Or(new EmployingReavers, new EmployingCarriers, new UnitsAtLeast(1, Protoss.RoboticsFacility)),
+          new Or(new EmployingReavers, new EmployingCarriers, new UnitsAtLeast(1, Protoss.RoboticsFacility), new Employing(PvEStormNo)),
           new Parallel(new GoReaver, new Build(Get(5, Protoss.Gateway))),
           new Parallel(new GoStorm, new Build(Get(5, Protoss.Gateway)))))),
 
@@ -478,7 +485,8 @@ class PvTBasic extends GameplanTemplate {
       new Parallel(
         new If(new EmployingGateway,  new GoGateway),
         new If(new EmployingCarriers, new GoCarrier),
-        new If(new EmployingArbiters, new GoArbiter))),
+        new If(new EmployingArbiters, new GoArbiter),
+        new If(new And(new EmployingArbiters, new Employing(PvEStormNo)), new GoObs))),
 
     new LowPriorityTech,
 

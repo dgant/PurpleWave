@@ -13,7 +13,7 @@ object PsionicStorm extends TargetedSpell {
   override protected def tech             : Tech      = Protoss.PsionicStorm
   override protected def aoe              : Boolean   = true
   override protected def castRangeTiles   : Int       = 9
-  override protected def thresholdValue   : Double    = 16 * Terran.Marine.subjectiveValue
+  override protected def thresholdValue   : Double    = 14 * Terran.Marine.subjectiveValue
   override protected def lookaheadFrames  : Int       = 8
 
   override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {

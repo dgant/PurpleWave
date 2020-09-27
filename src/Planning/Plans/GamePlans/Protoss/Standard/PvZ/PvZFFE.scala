@@ -27,7 +27,10 @@ class PvZFFE extends GameplanTemplate {
   
   override def initialScoutPlan: Plan = new If(
     new Not(new EnemyStrategy(With.fingerprints.fourPool)),
-    new ScoutOn(Protoss.Pylon))
+    new If(
+      new Employing(PvZFFEConservative),
+      new ScoutOn(Protoss.PhotonCannon, quantity = 2),
+      new ScoutOn(Protoss.Pylon)))
   
   override def placementPlan: Plan = new PlacementForgeFastExpand
   

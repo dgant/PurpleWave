@@ -49,7 +49,7 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
       new And(
         new Not(new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway)),
         new Not(new EnemyHasUpgrade(Protoss.DragoonRange)))),
-    new Aggression(1.5),
+    new Aggression(1.25),
     super.aggressionPlan)
 
   override def priorityAttackPlan: Plan = new Parallel(

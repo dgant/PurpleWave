@@ -18,7 +18,7 @@ import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeToMoveOut}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Protoss.{PvT1015DT, PvT1015Expand, PvT32Nexus, PvTStove}
+import Strategery.Strategies.Protoss._
 
 object PvTIdeas {
 
@@ -206,7 +206,7 @@ object PvTIdeas {
             Enemy(Terran.Marine,      1.0),
             Enemy(Terran.Vulture,     -1.0)))),
         new If(new GasAtLeast(800), new Pump(Protoss.HighTemplar, 6, maximumConcurrently = 2)),
-        new PumpRatio(Protoss.HighTemplar, 0, 4, Seq(Flat(-2.0), Friendly(UnitMatchWarriors, 0.1))),
+        new If(new Employing(PvEStormYes), new PumpRatio(Protoss.HighTemplar, 0, 4, Seq(Flat(-2.0), Friendly(UnitMatchWarriors, 0.1)))),
         new Pump(Protoss.Dragoon))))
 
   class TrainCarriers extends If(
@@ -220,8 +220,8 @@ object PvTIdeas {
     new TrainReavers,
     new TrainObservers,
     new TrainMinimumDragoons,
-    new If(new And(new EnemyStrategy(With.fingerprints.bio), new UnitsAtLeast(5, Protoss.Gateway)), new PumpRatio(Protoss.HighTemplar, 1, 5, Seq(Enemy(Terran.Marine, 1.0/5.0)))),
-    new If(new UnitsAtLeast(8, Protoss.Carrier), new Pump(Protoss.HighTemplar, 2)),
+    new If(new And(new Employing(PvEStormYes), new EnemyStrategy(With.fingerprints.bio), new UnitsAtLeast(5, Protoss.Gateway)), new PumpRatio(Protoss.HighTemplar, 1, 5, Seq(Enemy(Terran.Marine, 1.0/5.0)))),
+    new If(new And(new Employing(PvEStormYes), new UnitsAtLeast(8, Protoss.Carrier)), new Pump(Protoss.HighTemplar, 2)),
     new TrainCarriers,
     new PumpRatio(Protoss.Arbiter, 2, 8, Seq(Enemy(UnitMatchSiegeTank, 0.5))),
     new TrainScouts,

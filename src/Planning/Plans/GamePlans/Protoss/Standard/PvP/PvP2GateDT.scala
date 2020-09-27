@@ -152,7 +152,9 @@ class PvP2GateDT extends GameplanTemplate {
         new If(
           new EnemyStrategy(With.fingerprints.proxyGateway),
           new Build(Get(4, Protoss.Gateway)),
-          new RequireMiningBases(2)),
+          new Parallel(
+            new BuildCannonsAtNatural(0),
+            new RequireMiningBases(2))),
         new If(new EnemyStrategy(With.fingerprints.dtRush), new BuildCannonsAtNatural(3)), // Get a LOT so they dont get bursted down
         new If(
           new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),

@@ -20,6 +20,11 @@ abstract class PvTBasicOpener extends PvTStrategy {
     PvT3rdObs,
   ))
 }
+
+abstract class PvTEndgame extends PvTStrategy {
+  override def choices: Iterable[Iterable[Strategy]] = Vector(PvEStormOptions())
+}
+
 object PvT13Nexus extends PvTBasicOpener {
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fiveRax,
@@ -103,6 +108,25 @@ object PvTDTExpand extends PvTBasicOpener {
     With.fingerprints.threeFacVultures
   )
 }
+object PvTStove extends PvTStrategy {
+  override def allowedVsHuman: Boolean = false
+  override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(PvT2BaseArbiter))
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.bbs, With.fingerprints.twoRax1113)
+}
+object PvTProxy2Gate extends PvTStrategy {
+  override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
+    PvT2BaseCarrier,
+    PvT2BaseArbiter,
+    PvT2BaseReaver,
+    PvT3rdFast,
+    PvT3rdObs
+  ))
+  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.wallIn
+  )
+}
+
 object PvT2BaseReaver extends PvTStrategy {
   override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.twoFac,
@@ -118,28 +142,10 @@ object PvT3rdFast extends PvTStrategy {
 object PvT3rdObs extends PvTStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(PvT3BaseArbiter, PvT3BaseCarrier, PvT3BaseGateway))
 }
-object PvT2BaseCarrier extends PvTStrategy
-object PvT2BaseArbiter extends PvTStrategy
-object PvT2BaseGateway extends PvTStrategy { override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.oneArmoryUpgrades, With.fingerprints.twoArmoryUpgrades) }
-object PvT3BaseCarrier extends PvTStrategy
-object PvT3BaseArbiter extends PvTStrategy
-object PvT3BaseGateway extends PvTStrategy { override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.oneArmoryUpgrades, With.fingerprints.twoArmoryUpgrades) }
-object PvTStove extends PvTStrategy {
-  override def allowedVsHuman: Boolean = false
-  override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(PvT2BaseArbiter))
-  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.bbs, With.fingerprints.twoRax1113)
-}
+object PvT2BaseCarrier extends PvTEndgame
+object PvT2BaseArbiter extends PvTEndgame
+object PvT2BaseGateway extends PvTEndgame { override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.oneArmoryUpgrades, With.fingerprints.twoArmoryUpgrades) }
+object PvT3BaseCarrier extends PvTEndgame
+object PvT3BaseArbiter extends PvTEndgame
+object PvT3BaseGateway extends PvTEndgame { override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.oneArmoryUpgrades, With.fingerprints.twoArmoryUpgrades) }
 
-object PvTProxy2Gate extends PvTStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
-    PvT2BaseCarrier,
-    PvT2BaseArbiter,
-    PvT2BaseReaver,
-    PvT3rdFast,
-    PvT3rdObs
-  ))
-  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
-  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
-    With.fingerprints.wallIn
-  )
-}

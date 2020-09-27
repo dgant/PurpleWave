@@ -209,7 +209,7 @@ object PvPIdeas {
       new Latch(new UnitsAtLeast(5, Protoss.Zealot, complete = true)),
       new EnemyHasShown(Protoss.Dragoon),
       new Not(new EnemyHasUpgrade(Protoss.DragoonRange))),
-    new Aggression(1.5))
+    new Aggression(1.25))
 
   class ReactToGasSteal extends If(
     new EnemyStrategy(With.fingerprints.gasSteal),

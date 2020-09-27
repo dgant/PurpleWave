@@ -7,10 +7,11 @@ import Mathematics.Physics.ForceMath
 import Mathematics.Points.PixelRay
 import Mathematics.PurpleMath
 import Micro.Actions.Combat.Maneuvering.{DownhillPathfinder, Traverse}
+import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Heuristics.Potential
-import Planning.UnitMatchers.UnitMatchSiegeTank
+import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWorkers}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, TakeN}
@@ -84,11 +85,11 @@ object Avoid extends ActionTechnique {
     val desireForSafety   = PurpleMath.clamp(0, 3, (3 * (1 - unit.matchups.framesOfSafety / 72)).toInt)
     val desireProfile     = DesireProfile(desireToGoHome, desireForSafety, desireForFreedom)
 
-    // Don't spray out against melee units
-    /*
+    // Don't spray Zealots out against melee units, especially Zerglings
     if (unit.is(Protoss.Zealot)
       && unit.base == unit.agent.origin.base
       && unit.agent.origin.base.exists(_.isOurMain)
+      && unit.matchups.threats.exists( ! _.unitClass.isWorker)
       && unit.matchups.threats.forall(_.isAny(Protoss.Zealot, Zerg.Zergling, UnitMatchWorkers))) {
       unit.agent.toTravel = unit.agent.origin.base.map(_.heart.pixelCenter)
 
@@ -99,7 +100,6 @@ object Avoid extends ActionTechnique {
       Move.delegate(unit)
       return
     }
-    */
 
     // If traveling by air, potential provides the smoothest paths
     if (unit.flying || (unit.transport.exists(_.flying) && unit.matchups.framesOfSafety <= 0)) {

@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Attack, Hunt}
+import Planning.Plans.Army.{Aggression, Attack, Hunt}
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{If, Parallel, _}
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -203,6 +203,14 @@ object PvPIdeas {
         Get(Protoss.Observatory)),
     new Pump(Protoss.Observer, 2)))
 
+  class AggressWithZealotsAgainstRangelessDragoons extends If(
+    new And(
+      new Latch(new UnitsAtLeast(2, Protoss.Gateway, complete = true)),
+      new Latch(new UnitsAtLeast(5, Protoss.Zealot, complete = true)),
+      new EnemyHasShown(Protoss.Dragoon),
+      new Not(new EnemyHasUpgrade(Protoss.DragoonRange))),
+    new Aggression(1.5))
+
   class ReactToGasSteal extends If(
     new EnemyStrategy(With.fingerprints.gasSteal),
     new Parallel(
@@ -221,6 +229,7 @@ object PvPIdeas {
           Get(16, Protoss.Probe),
           Get(2, Protoss.Nexus))),
       new BuildOrder(ProtossBuilds.TwoGate1012: _*),
+      new AggressWithZealotsAgainstRangelessDragoons,
       new PvPIdeas.ReactToDarkTemplarEmergencies,
       new Build(Get(Protoss.Assimilator)),
       new If(

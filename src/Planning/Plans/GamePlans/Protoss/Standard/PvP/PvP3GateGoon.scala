@@ -10,11 +10,13 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackWithDarkTemplar
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, GasCapsUntouched}
+import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Milestones._
+import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
@@ -68,17 +70,23 @@ class PvP3GateGoon extends GameplanTemplate {
 
     new EjectScout,
     new BuildOrder(Get(8, Protoss.Dragoon)),
+
     // Kind of cowardly, but if we can't be sure they're not going DT, get a Forge before expanding so we can get cannons in time if necessary
     new If(
-      new Not(new EnemyStrategy(
-        With.fingerprints.nexusFirst,
-        With.fingerprints.twoGate,
-        With.fingerprints.forgeFe,
-        With.fingerprints.gatewayFe,
-        With.fingerprints.dragoonRange,
-        With.fingerprints.fourGateGoon,
-        With.fingerprints.robo)),
+      new And(
+        new Not(new EnemyDarkTemplarLikely),
+        new Not(new EnemyHasShownCloakedThreat),
+        new EnemyStrategy(
+          With.fingerprints.nexusFirst,
+          With.fingerprints.twoGate,
+          With.fingerprints.forgeFe,
+          With.fingerprints.gatewayFe,
+          With.fingerprints.dragoonRange,
+          With.fingerprints.fourGateGoon,
+          With.fingerprints.robo)),
+      new CancelIncomplete(Protoss.Forge),
       new Build(Get(Protoss.Forge))),
+
     new RequireMiningBases(2),
     new BuildOrder(Get(11, Protoss.Dragoon)),
 

@@ -1,10 +1,10 @@
 package Micro.Squads.Goals
 
 import Lifecycle.With
-import Mathematics.Points.Pixel
+import Mathematics.Points.{Pixel, Tile}
 import Micro.Agency.Intention
-import Planning.UnitMatchers.UnitMatchWorkers
-import ProxyBwapi.UnitInfo.UnitInfo
+import Planning.Plans.Scouting.ScoutTracking
+import Utilities.ByOption
 
 class GoalEjectScout extends SquadGoalBasic {
 
@@ -12,16 +12,21 @@ class GoalEjectScout extends SquadGoalBasic {
   
   override def toString: String = "Eject scouts"
   
-  var scout: Option[UnitInfo] = None
-  
-  override def destination: Pixel = scout.map(_.pixelCenter).getOrElse(With.geography.home.pixelCenter)
+  override def destination: Pixel = targetScout
+    .map(_.pixelCenter)
+    .getOrElse(
+      ByOption.minBy(tilesToConsider)(With.grids.friendlyVision.get).getOrElse(With.geography.home).pixelCenter)
+
+  private def tilesToConsider: Seq[Tile] = ScoutTracking.basesToConsider.view.flatMap(_.zone.tiles)
+
+  private def targetScout = ByOption.maxBy(squad.enemies.filter(_.likelyStillThere))(_.lastSeen)
   
   override def run() {
     squad.units.foreach(ejector => {
-      val target = if (ejector.matchups.targets.forall(_.is(UnitMatchWorkers))) scout else None
       ejector.agent.intend(squad.client, new Intention {
+        toScoutTiles = if (targetScout.exists(_.possiblyStillThere)) Seq.empty else tilesToConsider
         toTravel = Some(destination)
-        toAttack = target
+        toAttack = if (ejector.matchups.targets.forall(targetScout.contains)) targetScout else None
       })
     })
   }

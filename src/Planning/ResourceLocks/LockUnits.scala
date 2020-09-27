@@ -28,10 +28,10 @@ class LockUnits extends {
     With.recruiter.add(this)
   }
   
-  def inquire(plan: Plan): Option[Iterable[FriendlyUnitInfo]] = {
+  def inquire(plan: Plan): Option[Seq[FriendlyUnitInfo]] = {
     val ownerBefore = owner // This is supposed to be free of side-effects so retain the owner
     owner = plan
-    val output = With.recruiter.inquire(this, isDryRun = true)
+    val output = With.recruiter.inquire(this, isDryRun = true).map(_.toSeq) // toVector ensures we don't return a view with invalid owner
     owner = ownerBefore
     output
   }
@@ -44,15 +44,15 @@ class LockUnits extends {
 
   protected def weAccept(unit: FriendlyUnitInfo): Boolean = unitMatcher.get.apply(unit)
 
-  def offerUnits(candidates: Iterable[FriendlyUnitInfo], dryRun: Boolean): Option[Iterable[FriendlyUnitInfo]] = {
+  def offerUnits(candidates: Iterable[FriendlyUnitInfo], dryRun: Boolean): Option[Seq[FriendlyUnitInfo]] = {
     unitCounter.get.reset()
     val finalists = findFinalists(candidates)
     val finalistsSatisfy = unitCounter.get.accept(finalists)
     if ( ! dryRun) isSatisfied = finalistsSatisfy
-    if (finalistsSatisfy) Some(finalists) else None
+    if (finalistsSatisfy) Some(finalists.toSeq) else None
   }
 
-  def findFinalists(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
+  private def findFinalists(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
     // Here's a bunch of special-case performance improvements.
     // offerMultipleUnits()
     if (unitCounter.get == UnitCountEverything) {

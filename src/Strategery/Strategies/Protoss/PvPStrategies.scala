@@ -30,6 +30,7 @@ object PvP2GateGoon extends PvPOpening {
   override def responsesWhitelisted: Iterable[Fingerprint] = Seq(With.fingerprints.proxyGateway, With.fingerprints.twoGate)
 }
 object PvP3GateGoon extends PvPOpening {
+  override def responsesWhitelisted: Iterable[Fingerprint] = Iterable(With.fingerprints.robo, With.fingerprints.nexusFirst, With.fingerprints.twoGate)
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
   override def minimumGamesVsOpponent: Int = 2
 }

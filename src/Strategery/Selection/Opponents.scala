@@ -11,7 +11,7 @@ object Opponents {
   val defaultPvZ = new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ2Gate910, PvZ4GateGoon, PvZMidgame5GateGoonReaver, PvZLateGameTemplar)
 
   // AIIDE 2020
-  val bananabrain : Opponent = add("BananaBrain")
+  val bananabrain : Opponent = add("BananaBrain", new StrategySelectionRecommended(StrategySelectionGreedy(), PvP2Gate1012DT, PvP3rdBaseSlow))
   val dandanbot   : Opponent = add("DanDanBot",   defaultPvP)
   val dragon      : Opponent = add("Dragon",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvT13Nexus, PvT3rdFast, PvT3BaseGateway))
   val ecgberht    : Opponent = add("Ecgberht",    new StrategySelectionRecommended(StrategySelectionGreedy(), PvT32Nexus, PvT2BaseReaver, PvT3BaseGateway))
@@ -19,8 +19,8 @@ object Opponents {
   val mcrave      : Opponent = add("McRave",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ2Gate1012, PvZ4GateGoon, PvZMidgame5GateGoonReaver, PvZLateGameReaver))
   val microwave   : Opponent = add("Microwave",   new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ2Gate1012, PvZ4GateGoon, PvZMidgame5GateGoonReaver, PvZLateGameReaver))
   val randofoo    : Opponent = add("Randofoo",    defaultPvP)
-  val stardust    : Opponent = add("Stardust")
-  val steamhammer : Opponent = add("Steamhammer", new StrategySelectionRecommended(StrategySelectionDynamic, PvZ2Gate1012, PvZ4GateGoon, PvZMidgame5GateGoonReaver, PvZLateGameReaver))
+  val stardust    : Opponent = add("Stardust",    new StrategySelectionRecommended(StrategySelectionGreedy(), PvP2GateDTExpand, PvP3rdBaseSlow))
+  val steamhammer : Opponent = add("Steamhammer", new StrategySelectionRecommended(StrategySelectionDynamic,  PvZ2Gate1012, PvZ4GateGoon, PvZMidgame5GateGoonReaver, PvZLateGameReaver))
   val taij        : Opponent = add("Taij",        defaultPvT)
   val willyt      : Opponent = add("WillyT",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvT28Nexus, PvT2BaseReaver, PvT3BaseArbiter))
   val zzzkbot     : Opponent = add("ZZZKBot",     new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ1BaseForgeTech, PvZMidgameNeoBisu, PvZLateGameTemplar))

@@ -3,9 +3,9 @@ package Planning.Plans.Army
 import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Squads.Goals.GoalEjectScout
+import Planning.Plans.Scouting.{ScoutCleared, ScoutTracking}
 import Planning.UnitCounters.{UnitCountOne, UnitCounter}
 import Planning.UnitMatchers._
-import ProxyBwapi.Races.Zerg
 import Utilities.ByOption
 
 class EjectScout(
@@ -15,16 +15,17 @@ class EjectScout(
 
   override val goal: GoalEjectScout = new GoalEjectScout
 
+  private val scoutCleared = new ScoutCleared
   override def onUpdate() {
     if (With.frame > GameTime(8, 0)()) return
-    val eligibleZones = With.geography.ourZones.toSet ++ Seq(With.geography.ourNatural.zone) ++ With.geography.ourMain.zone.edges.flatMap(_.zones)
-    val scouts = eligibleZones.flatMap(_.units.filter(u => u.possiblyStillThere && u.isEnemy && u.isAny(UnitMatchWorkers, Zerg.Overlord)))
+    if (scoutCleared.isComplete) return
+
+    val scouts = ScoutTracking.enemyScouts.toSeq
     val scout = ByOption.minBy(scouts)(_.id)
 
     if (scouts.isEmpty) return
 
-    squad.enemies = scout.toSeq
-    goal.scout = scout
+    squad.enemies = ScoutTracking.enemyScouts.toSeq
     goal.unitMatcher = matcher
     goal.unitCounter = counter
     super.onUpdate()

@@ -38,7 +38,7 @@ class DefendAgainstProxy extends Plan {
     defenders.get.release()
     defenders.get.unitCounter.set(UnitCountEverything)
     defenders.get.unitMatcher.set(UnitMatchOr(UnitMatchWorkers, UnitMatchWarriors))
-    defenders.get.inquire(this).foreach(defendersAvailable ++= _)
+    defenders.get.inquire(this).toVector.foreach(defendersAvailable ++= _)
 
     // For each proxy, in priority order, decide who if anyone to assign to it
     proxies.foreach(proxy => {

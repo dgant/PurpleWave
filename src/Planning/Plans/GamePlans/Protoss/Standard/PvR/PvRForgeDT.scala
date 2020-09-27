@@ -10,6 +10,7 @@ import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplateVsRandom
 import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
+import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.ConditionalDefendFFEWithProbesAgainst4Pool
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, PumpWorkers}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -57,15 +58,22 @@ class PvRForgeDT extends GameplanTemplateVsRandom {
     Get(11, Protoss.Probe),
     Get(2, Protoss.PhotonCannon),
     Get(13, Protoss.Probe),
-    Get(Protoss.Gateway),
+    Get(3, Protoss.PhotonCannon),
+    Get(14, Protoss.Probe),
+    Get(2, Protoss.Pylon),
     Get(15, Protoss.Probe),
-    Get(Protoss.Assimilator),
+    Get(Protoss.Gateway),
     Get(16, Protoss.Probe),
+    Get(Protoss.Assimilator),
+    Get(17, Protoss.Probe),
     Get(Protoss.CyberneticsCore),
+    Get(18, Protoss.Probe),
+    Get(Protoss.Zealot),
     Get(4, Protoss.PhotonCannon))
 
   override def buildPlans = Vector(
     new CapGasAt(300),
+    new ConditionalDefendFFEWithProbesAgainst4Pool,
     new DefendFightersAgainstRush,
     new Pump(Protoss.DarkTemplar, 4),
     new Trigger(

@@ -98,8 +98,9 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
       new EnemyBasesAtMost(1)))
 
   class Expand extends Parallel(
-    new If(new NeedForgeToExpand, new Build(Get(Protoss.Forge))),
-    new RequireMiningBases(2))
+    new If(new NeedForgeToExpand, new BuildCannonsAtNatural(0)), // Build the Forge and a Pylon
+    new RequireMiningBases(2),
+    new If(new NeedForgeToExpand, new BuildCannonsAtNatural(1)))
 
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.TwoGate1012
   override def buildPlans = Vector(

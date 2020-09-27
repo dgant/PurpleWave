@@ -77,9 +77,10 @@ class GoalDefendZone extends SquadGoalBasic {
   )
 
   private def huntableFilter(enemy: UnitInfo): Boolean = (
-    ! (enemy.is(Zerg.Drone) && With.fingerprints.fourPool.matches)
+    ! (enemy.is(Zerg.Drone) && With.fingerprints.fourPool.matches) // Don't get baited by 4-pool scouts
       && (squad.units.exists(_.canAttack(enemy)) || (enemy.cloaked && squad.units.exists(_.unitClass.isDetector)))
       && (enemy.matchups.targets.nonEmpty || enemy.matchups.allies.forall(_.matchups.targets.isEmpty)) // Don't, for example, chase Overlords that have ally Zerglings nearby
+      // If we don't really want to fight, wait until they push into the base
       && zone.exit.forall(exit =>
         enemy.flying
           || With.blackboard.wantToAttack()

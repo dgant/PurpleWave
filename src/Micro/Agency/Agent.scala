@@ -93,9 +93,14 @@ class Agent(val unit: FriendlyUnitInfo) {
   /////////////////
   // Suggestions //
   /////////////////
-  
-  def origin: Pixel = originCache()
-  private val originCache = new Cache(() => calculateOrigin)
+
+  def origin: Pixel = toReturn.orElse(toForm).orElse(toLeash.map(_.pixelCenter)).getOrElse(originCache())
+  private val originCache = new Cache(() => toTravel
+    .flatMap(_.base)
+    .filter(_.owner.isUs)
+    .orElse(ByOption.minBy(With.geography.ourBases)(base => unit.pixelDistanceTravelling(base.heart) * (if (base.scoutedByEnemy || base.isNaturalOf.exists(_.scoutedByEnemy)) 1 else 1000)))
+    .map(_.heart.pixelCenter)
+    .getOrElse(With.geography.home.pixelCenter))
   
   // This is kind of a mess.
   def destination: Pixel = destinationCache()
@@ -225,25 +230,6 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   private def cleanUp() {
     shovers.clear()
-  }
-
-  private def calculateOrigin: Pixel = {
-    if (toReturn.isDefined) {
-      toReturn.get
-    }
-
-    else if (toForm.isDefined) {
-      toForm.get
-    }
-    else if (toLeash.isDefined) {
-      toLeash.get.pixelCenter
-    }
-    toTravel
-      .flatMap(_.base)
-      .filter(_.owner.isUs)
-      .orElse(ByOption.minBy(With.geography.ourBases)(base => unit.pixelDistanceTravelling(base.heart) * (if (base.scoutedByEnemy || base.isNaturalOf.exists(_.scoutedByEnemy)) 1 else 1000)))
-      .map(_.heart.pixelCenter)
-      .getOrElse(With.geography.home.pixelCenter)
   }
 
   private def calculateDestination: Pixel = {

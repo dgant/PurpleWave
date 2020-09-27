@@ -43,7 +43,14 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
     new Blueprint(Protoss.Pylon),
     new Blueprint(Protoss.Pylon, requireZone = Some(With.geography.ourNatural.zone)))
 
-  override def aggressionPlan: Plan = new If(new UpgradeComplete(Protoss.ZealotSpeed), new Aggression(1.5), super.aggressionPlan)
+  override def aggressionPlan: Plan = new If(
+    new Or(
+      new UpgradeComplete(Protoss.ZealotSpeed),
+      new And(
+        new Not(new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway)),
+        new Not(new EnemyHasUpgrade(Protoss.DragoonRange)))),
+    new Aggression(1.5),
+    super.aggressionPlan)
 
   override def priorityAttackPlan: Plan = new Parallel(
     new If(

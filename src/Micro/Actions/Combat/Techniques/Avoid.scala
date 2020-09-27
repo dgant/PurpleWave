@@ -7,11 +7,10 @@ import Mathematics.Physics.ForceMath
 import Mathematics.Points.PixelRay
 import Mathematics.PurpleMath
 import Micro.Actions.Combat.Maneuvering.{DownhillPathfinder, Traverse}
-import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Heuristics.Potential
-import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWorkers}
+import Planning.UnitMatchers.UnitMatchSiegeTank
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, TakeN}
@@ -81,11 +80,12 @@ object Avoid extends ActionTechnique {
       else
         ((if (enemyCloser) 1 else 0) + (if (enemySooner) 1 else 0))
 
-    val desireForFreedom    = if (unit.flying && ! unit.matchups.threats.exists(_.unitClass.dealsRadialSplashDamage)) 0 else 1
-    val desireForSafety     = PurpleMath.clamp(0, 3, (3 * (1 - unit.matchups.framesOfSafety / 72)).toInt)
-    val desireProfile       = DesireProfile(desireToGoHome, desireForSafety, desireForFreedom)
+    val desireForFreedom  = if (unit.flying && ! unit.matchups.threats.exists(_.unitClass.dealsRadialSplashDamage)) 0 else 1
+    val desireForSafety   = PurpleMath.clamp(0, 3, (3 * (1 - unit.matchups.framesOfSafety / 72)).toInt)
+    val desireProfile     = DesireProfile(desireToGoHome, desireForSafety, desireForFreedom)
 
     // Don't spray out against melee units
+    /*
     if (unit.is(Protoss.Zealot)
       && unit.base == unit.agent.origin.base
       && unit.agent.origin.base.exists(_.isOurMain)
@@ -99,6 +99,7 @@ object Avoid extends ActionTechnique {
       Move.delegate(unit)
       return
     }
+    */
 
     // If traveling by air, potential provides the smoothest paths
     if (unit.flying || (unit.transport.exists(_.flying) && unit.matchups.framesOfSafety <= 0)) {
@@ -110,7 +111,7 @@ object Avoid extends ActionTechnique {
     avoidDirect(unit, desireProfile)
 
     // Try a perfect-match downhill, both for performance and because it's smoother
-    avoidDownhillPath(unit, desireProfile)
+    // avoidDownhillPath(unit, desireProfile)
 
     // Apply threat-aware pathfinding to try finding a better solution
     if ( ! With.performance.danger) {
@@ -164,10 +165,12 @@ object Avoid extends ActionTechnique {
     val forceSafety   = ForceMath.sumAll(forceThreat, forceTravel)
     val force         = ForceMath.sumAll(forceSafety.normalize, forceSpacing)
 
-    // If our safety force is tiny, it means the unit is torn between running away and going home
-    // In this case, we need to fall back to pathfinding.
-    if (forceSafety.lengthSquared < 1) {
-      return
+    // If the safety and travel forces are in conflict, we need to resolve it intelligently
+    if (forceSafety.lengthSquared > 0 && forceTravel.lengthSquared > 0) {
+      val radianDifference = PurpleMath.radiansTo(forceThreat.radians, forceTravel.radians)
+      if (radianDifference > Math.PI / 2) {
+        return
+      }
     }
 
     // Find a walkable path

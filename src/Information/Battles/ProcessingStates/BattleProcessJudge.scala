@@ -5,10 +5,14 @@ import Lifecycle.With
 
 class BattleProcessJudge extends BattleProcessState {
   override def step(): Unit = {
-    // TODO -- Split up
-    With.battles.nextBattlesLocal.foreach(battle => battle.judgement = Some(new BattleJudgment(battle)))
 
-    // TODO -- only when done
+    val unjudged = With.battles.nextBattlesLocal.find(_.judgement.isEmpty)
+
+    if (unjudged.isDefined) {
+      unjudged.get.judgement = Some(new BattleJudgment(unjudged.get))
+      return
+    }
+
     With.battles.measureReactionTime()
 
     transitionTo(new BattleProcessSwap)

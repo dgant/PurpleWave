@@ -50,7 +50,6 @@ class Configuration {
   var baseTarget                    = 0.04 // 0.55 -> 0.1 from SSCAIT 2018/ AIST2
   var simulationFrames              = GameTime(0, 12)()
   var simulationEstimationPeriod    = 6
-  var simulationScoreHalfLife       = GameTime(0, 2)()
   var simulationBonusTankRange      = 64.0
   var simulationDamageValueRatio    = 0.1
   

@@ -23,7 +23,7 @@ import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP2GateDTExpand
 
-class PvP2GateDarkTemplar extends GameplanTemplate {
+class PvP2GateDT extends GameplanTemplate {
   
   override val activationCriteria = new Employing(PvP2GateDTExpand)
   override val completionCriteria: Predicate = new Latch(new And(new UnitsAtLeast(1, Protoss.TemplarArchives), new BasesAtLeast(2)))
@@ -48,8 +48,9 @@ class PvP2GateDarkTemplar extends GameplanTemplate {
   override def placementPlan: Plan = new Parallel(
     super.placementPlan,
     new If(
-      new And(
-        new UnitsAtLeast(1, Protoss.CitadelOfAdun),
+      new Or(
+        new BasesAtLeast(2),
+        new UnitsAtLeast(1, Protoss.DarkTemplar),
         new Not(new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway))),
       new ProposePlacement {
         override lazy val blueprints = Vector(new Blueprint(Protoss.Pylon, requireZone = Some(With.geography.ourNatural.zone)))

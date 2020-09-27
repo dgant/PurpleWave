@@ -34,6 +34,10 @@ object PvPIdeas {
       new EnemyBasesAtLeast(3)),
     new Attack(Protoss.DarkTemplar))
 
+  class UnansweredDarkTemplar extends And(
+    new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
+    new EnemiesAtMost(0, Protoss.Observer))
+
   class PvPSafeToMoveOut extends Or(
     new BasesAtLeast(3),
     new EnemyBasesAtLeast(3),
@@ -83,6 +87,7 @@ object PvPIdeas {
       new Or(
         new BasesAtMost(1),
         new EnemyBasesAtLeast(2),
+        new UnansweredDarkTemplar,
         new Latch(new And(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new UnitsAtLeast(1, Protoss.Shuttle, complete = true))),
         new Latch(new UnitsAtLeast(15, UnitMatchWarriors))),
       // Don't mess with 4-Gates

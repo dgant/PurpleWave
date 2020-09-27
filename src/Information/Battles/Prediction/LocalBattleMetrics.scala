@@ -67,9 +67,10 @@ class LocalBattleMetrics(simulation: Simulation, previous: Option[LocalBattleMet
         (ratioLocalValueLostNet,        weightLife),
         (ratioLocalHealthLostNet,       weightHealth),
         (ratioLocalHealthValueLostNet,  weightHealth)))
-  val totalDecisiveness: Double = PurpleMath.mean(Seq(
+  val localTotalDecisiveness: Double = PurpleMath.mean(Seq(
     localValueDecisiveness,
     localHealthDecisiveness,
     localHealthValueDecisiveness
   ))
+  val cumulativeTotalDecisiveness: Double = previous.map(_.cumulativeTotalDecisiveness).sum + localTotalDecisiveness
 }

@@ -9,7 +9,7 @@ import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
-import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvP2GateDarkTemplar
+import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvP2GateDT
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -37,11 +37,11 @@ class PvRDT extends GameplanTemplate {
     new EnemyStrategy(With.fingerprints.twelveHatch),
     new ConsiderAttacking)
 
-  override def blueprints: Vector[Blueprint] = new PvP2GateDarkTemplar().blueprints
+  override def blueprints: Vector[Blueprint] = new PvP2GateDT().blueprints
   override def buildOrderPlan = new If(
     new EnemyIsZerg,
     new BuildOrder(ProtossBuilds.ZCoreZ: _*),
-    new BuildOrder(new PvP2GateDarkTemplar().buildOrder: _*))
+    new BuildOrder(new PvP2GateDT().buildOrder: _*))
 
   override def buildPlans: Seq[Plan] = Seq(
     new DefendFightersAgainstRush,

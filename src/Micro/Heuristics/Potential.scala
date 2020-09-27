@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Mathematics.PurpleMath
-import Mathematics.Shapes.Circle
+import Mathematics.Shapes.{Circle, Ring}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -213,16 +213,17 @@ object Potential {
   // Collisions //
   ////////////////
 
+  private val ringDistance = 5 * 5 * 32 * 32
   def preferTravel(unit: FriendlyUnitInfo, goal: Pixel): Force = {
     if (unit.flying) {
       new Force(goal.subtract(unit.pixelCenter)).normalize
     } else {
       val center = unit.tileIncludingCenter
-      val circle = Circle.points(5).map(center.add).filter(_.walkable)
-      if (circle.isEmpty) {
+      val ring = (if (unit.pixelDistanceSquared(goal) < ringDistance) Ring.points(5) else Circle.points(5)).map(center.add).filter(_.walkable)
+      if (ring.isEmpty) {
         new Force(goal.subtract(unit.pixelCenter)).normalize
       }
-      val path = circle.minBy(_.groundPixels(center))
+      val path = ring.minBy(_.groundPixels(goal))
       new Force(path.subtract(center)).normalize
     }
   }

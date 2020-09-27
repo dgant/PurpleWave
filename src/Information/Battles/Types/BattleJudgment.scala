@@ -82,13 +82,9 @@ class BattleJudgment(battle: BattleLocal) {
 
   def transformTotalScore(metrics: Seq[LocalBattleMetrics]): Double = {
     // This can happen when all simulated enemies run away and nobody does any damage
-    if (metrics.lastOption.exists(metric => metric.localHealthLostUs <= 0)) return 1.0
+    if (metrics.lastOption.forall(metric => metric.localHealthLostUs <= 0)) return 1.0
 
-    val average = PurpleMath.weightedMean(
-      metrics.map(metric => (
-        metric.totalScore,
-        // Weigh by decisiveness and ange
-        Math.max(1e-5, metric.totalDecisiveness * Math.pow(0.5, metric.framesIn / With.configuration.simulationScoreHalfLife)))))
+    val average = PurpleMath.weightedMean(metrics.view.map(m => (m.totalScore, m.cumulativeTotalDecisiveness)))
     val aggression = With.blackboard.aggressionRatio()
     val output = PurpleMath.clamp(
       aggression * (1.0 + average) - 1.0,

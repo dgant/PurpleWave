@@ -17,6 +17,7 @@ class TargetAction(val additionalFiltersRequired: TargetFilter*) extends Action 
   )
 
   val filtersAlwaysRequired = Vector(
+    TargetFilterPossible,
     TargetFilterFocus,
     TargetFilterStayCloaked,
     TargetFilterFutility,

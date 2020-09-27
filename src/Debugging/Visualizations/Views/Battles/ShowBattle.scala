@@ -45,34 +45,26 @@ object ShowBattle extends View {
 
     prediction.localBattleMetrics.lastOption.foreach(metrics => {
       DrawScreen.table(x, 4 * barHeight, Vector(
-        Vector("Attack",      format(battle.judgement.get.ratioAttack)),
-        Vector("Snipe",       format(battle.judgement.get.ratioSnipe)),
-        Vector("Target",      format(battle.judgement.get.ratioTarget)),
+        Vector("Attack",      format(battle.judgement.get.ratioAttack), "Survive:"),
+        Vector("Snipe",       format(battle.judgement.get.ratioSnipe),  With.self.name,   describeTeam(prediction.debugReport.filter(_._1.isFriendly) .filterNot(_._2.dead).keys)),
+        Vector("Target",      format(battle.judgement.get.ratioTarget), With.enemy.name,  describeTeam(prediction.debugReport.filter(_._1.isEnemy)    .filterNot(_._2.dead).keys)),
         Vector("Hysteresis",  format(battle.judgement.get.hysteresis)),
-        Vector("Trappedness", format(battle.judgement.get.trappedness)),
-        Vector("Turtle",      format(battle.judgement.get.turtleBonus)),
-        Vector("Hornet",      format(battle.judgement.get.hornetBonus)),
+        Vector("Trappedness", format(battle.judgement.get.trappedness), "Die:"),
+        Vector("Turtle",      format(battle.judgement.get.turtleBonus), With.self.name,   describeTeam(prediction.debugReport.filter(_._1.isFriendly) .filter(_._2.dead).keys)),
+        Vector("Hornet",      format(battle.judgement.get.hornetBonus), With.enemy.name,  describeTeam(prediction.debugReport.filter(_._1.isEnemy)    .filter(_._2.dead).keys)),
         Vector("Siege",       format(battle.judgement.get.siegeUrgency)),
-        Vector("LVLR",        format(metrics.localValueLostRatio)),
-        Vector("LHLR",        format(metrics.localHealthLostRatio)),
+        Vector("LVLR",        format(metrics.localValueLostRatio),      "Duration",       metrics.framesIn / 24 + "s"),
+        Vector("LHLR",        format(metrics.localHealthLostRatio),     "Metrics",        prediction.localBattleMetrics.size.toString),
         Vector("LHVLR",       format(metrics.localHealthValueLostRatio)),
         Vector("RLVLN",       format(metrics.ratioLocalValueLostNet)),
         Vector("RLHLN",       format(metrics.ratioLocalHealthLostNet)),
-        Vector("RLHVLN",      format(metrics.ratioLocalHealthValueLostNet)),
-        Vector("Duration",    metrics.framesIn / 24 + "s"),
-        Vector("Metrics",     prediction.localBattleMetrics.size.toString),
-        Vector("Survivors"),
-        Vector(With.self.name,  describeTeam(prediction.debugReport.filter(_._1.isFriendly) .filterNot(_._2.dead).keys)),
-        Vector(With.enemy.name, describeTeam(prediction.debugReport.filter(_._1.isEnemy)    .filterNot(_._2.dead).keys)),
-        Vector("Dead"),
-        Vector(With.self.name,  describeTeam(prediction.debugReport.filter(_._1.isFriendly) .filter(_._2.dead).keys)),
-        Vector(With.enemy.name, describeTeam(prediction.debugReport.filter(_._1.isEnemy)    .filter(_._2.dead).keys))
+        Vector("RLHVLN",      format(metrics.ratioLocalHealthValueLostNet))
       ))
     })
 
-    val graphWidth = 96
+    val graphWidth = 82
     DrawScreen.graph(
-      Pixel(320 - graphWidth / 2, 360 - graphWidth),
+      Pixel(1, 218),
       "Score",
       Seq(
         GraphCurve(Color.Black,         prediction.localBattleMetrics.map(unused =>  1.0)),

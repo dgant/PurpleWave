@@ -15,6 +15,10 @@ object Disengage extends Action {
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {
+    EngageDisengage.NewDisengage.consider(unit)
+  }
+
+  private def weigh(unit: FriendlyUnitInfo): Unit = {
     Weigh.consider(unit,
       Abuse,
       Aim,

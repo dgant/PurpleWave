@@ -6,7 +6,7 @@ import Lifecycle.With
 import Mathematics.Physics.ForceMath
 import Mathematics.Points.PixelRay
 import Mathematics.PurpleMath
-import Micro.Actions.Combat.Maneuvering.{DownhillPathfinder, Traverse}
+import Micro.Actions.Combat.Maneuvering.Traverse
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Gravitate, Move}
@@ -110,17 +110,9 @@ object Avoid extends ActionTechnique {
     // Try the smoothest, fastest solution: Direct potential
     avoidDirect(unit, desireProfile)
 
-    // Try a perfect-match downhill, both for performance and because it's smoother
-    // avoidDownhillPath(unit, desireProfile)
-
     // Apply threat-aware pathfinding to try finding a better solution
     if ( ! With.performance.danger) {
       avoidRealPath(unit, desireProfile)
-    }
-
-    // I guess at some point we deemed this necessary
-    if (unit.unitClass.isReaver && unit.transport.isDefined) {
-      DownhillPathfinder.decend(unit, 1, 1, 1, 1)
     }
 
     // If home is safe, run directly there, possibly through enemy fire
@@ -129,9 +121,6 @@ object Avoid extends ActionTechnique {
       unit.agent.toTravel = Some(unit.agent.origin)
       Move.delegate(unit)
     }
-
-    // Last resort: try SOME way of pathfinding around
-    avoidDownhillPath(unit, desireProfile)
 
     // Last resort: Potential fields, which by now are probably totally out-of-tune for ground units
     if (desireToGoHome >= 0) {
@@ -197,22 +186,6 @@ object Avoid extends ActionTechnique {
         }
       }
     })
-  }
-
-  def avoidDownhillPath(unit: FriendlyUnitInfo, desireProfile: DesireProfile): Unit = {
-    Seq(
-      DesireProfile(home = 1, safety = 2, freedom = 1),
-      DesireProfile(home = 0, safety = 2, freedom = 1),
-      DesireProfile(home = 0, safety = 2, freedom = 0),
-      DesireProfile(home = 2, safety = 0, freedom = 1),
-      DesireProfile(home = 2, safety = 0, freedom = 0))
-      .sortBy(_.distance(desireProfile)).foreach(someDesire =>
-        DownhillPathfinder.decend(
-          unit,
-          homeValue     = someDesire.home,
-          safetyValue   = someDesire.safety,
-          freedomValue  = someDesire.freedom,
-          targetValue   = someDesire.target))
   }
 
   def avoidRealPath(unit: FriendlyUnitInfo, desireProfile: DesireProfile): Unit = {

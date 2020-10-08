@@ -13,8 +13,8 @@ object Engage extends Action {
   }
 
   override def perform(unit: FriendlyUnitInfo): Unit = {
-
-    weigh(unit)
+    EngageDisengage.NewEngage.consider(unit)
+    //weigh(unit)
   }
   
   private def weigh(unit: FriendlyUnitInfo) {

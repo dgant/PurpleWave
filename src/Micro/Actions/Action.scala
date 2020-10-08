@@ -12,7 +12,7 @@ abstract class Action {
   def allowed(unit: FriendlyUnitInfo): Boolean
   protected def perform(unit: FriendlyUnitInfo)
   
-  final def consider(unit: FriendlyUnitInfo, giveCredit: Boolean = true) {
+  final def consider(unit: FriendlyUnitInfo, giveCredit: Boolean = true): Boolean = {
     if (( ! requiresReadiness || unit.ready) && allowed(unit)) {
       val previousCredit = unit.agent.lastAction
       if (giveCredit) unit.agent.lastAction = Some(this)
@@ -24,9 +24,10 @@ abstract class Action {
         unit.agent.lastAction = previousCredit
       }
     }
+    ! unit.ready
   }
   
-  final def delegate(unit: FriendlyUnitInfo) {
+  final def delegate(unit: FriendlyUnitInfo): Boolean = {
     consider(unit, giveCredit = false)
   }
 }

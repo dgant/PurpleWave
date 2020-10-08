@@ -58,8 +58,8 @@ object EngageDisengage extends Action {
     Target.consider(unit)
 
     // Decide how far from target/threat we want to be
-    val idealPixelsFromTarget= target.map(unit.pixelRangeAgainst).getOrElse(unit.effectiveRangePixels)
-    val idealPixelsFromThreat = ByOption.max(unit.matchups.threats.view.map(64d + _.pixelRangeAgainst(unit))).getOrElse(0d)
+    val idealPixelsFromTarget = target.map(unit.pixelRangeAgainst).getOrElse(unit.effectiveRangePixels)
+    val idealPixelsFromThreat = ByOption.max(unit.matchups.threats.view.map(64d + _.pixelRangeAgainst(unit))).getOrElse(0d) // TODO: Increase for abusable threat-targets
 
     // Decide how far from adjacent teammates we want to be
     val idealPixelsFromTeammatesCollision = if (unit.flying) 0 else unit.unitClass.dimensionMax / 2
@@ -67,7 +67,7 @@ object EngageDisengage extends Action {
     val idealPixelsFromTeammates = Math.max(idealPixelsFromTeammatesCollision, idealPixelsFromTeammatesSplash)
 
     // Check how far from target/threat/teammate we are
-    val currentPixelsFromThreat = ByOption.max(unit.matchups.threats.view.map(_.pixelsToGetInRange(unit))).getOrElse(LightYear().toDouble)
+    val currentPixelsFromThreat = ByOption.min(unit.matchups.threats.view.map(_.pixelsToGetInRange(unit))).getOrElse(LightYear().toDouble)
     val currentPixelsFromTarget = target.map(unit.pixelsToGetInRange).getOrElse(unit.pixelDistanceTravelling(unit.agent.destination))
     val currentPixelsFromTeammate = unit.matchups.allies.view.map(_.pixelDistanceEdge(unit))
 
@@ -94,11 +94,13 @@ object EngageDisengage extends Action {
     // TODO: When we have an ideal distance, only move/shove up to that distance and no further
     if (tooCloseToThreat) {
       if (shouldEngage) {
-        // BREATHE/ABUSE
+        // BREATHE
         val turnaroundFrames = unit.unitClass.framesToTurn180 + excessDistanceFromTarget * unit.topSpeed
         if (unit.cooldownLeft > turnaroundFrames) {
           Avoid.consider(unit)
         }
+        // ABUSE
+        // TODO
       } else {
         // Don't IGNORE
         Avoid.consider(unit)
@@ -120,6 +122,8 @@ object EngageDisengage extends Action {
       Attack.consider(unit)
     }
 
+
+    // Explicitly move, since we might have a target that we've simply chosen not to attack
     // TODO: Squad movement
     Move.consider(unit)
   }

@@ -128,7 +128,7 @@ class Storyteller {
 
     With.logger.debug(
       "The bot believes its performance"
-      + (if (Main.configuration.async) ", if running synchronously, would be " else " was ")
+      + (if (Main.configuration.getAsync) ", if running synchronously, would be " else " was ")
       + (if (With.performance.disqualified) "BAD" else if (With.performance.danger) "DANGEROUS" else "good"))
     With.logger.debug(JBWAPIClient.getPerformanceMetrics.toString)
   }
@@ -156,13 +156,13 @@ class Storyteller {
     } catch { case exception: Exception =>
         With.logger.debug("No deployment Git revision available")
     }
-    With.logger.debug("JBWAPI autocontinue: " + Main.configuration.autoContinue)
-    With.logger.debug("JBWAPI debugConnection: " + Main.configuration.debugConnection)
-    With.logger.debug("JBWAPI async: " + Main.configuration.async)
-    With.logger.debug("JBWAPI async unsafe: " + Main.configuration.asyncUnsafe)
-    With.logger.debug("JBWAPI async frame buffer size: " + Main.configuration.asyncFrameBufferCapacity)
-    With.logger.debug("JBWAPI unlimited frame zero: " + Main.configuration.unlimitedFrameZero)
-    With.logger.debug("JBWAPI max frame duration: " + Main.configuration.maxFrameDurationMs + "ms")
+    With.logger.debug("JBWAPI autocontinue: " + Main.configuration.getAutoContinue)
+    With.logger.debug("JBWAPI debugConnection: " + Main.configuration.getDebugConnection)
+    With.logger.debug("JBWAPI async: " + Main.configuration.getAsync)
+    With.logger.debug("JBWAPI async unsafe: " + Main.configuration.getAsyncUnsafe)
+    With.logger.debug("JBWAPI async frame buffer size: " + Main.configuration.getAsyncFrameBufferCapacity)
+    With.logger.debug("JBWAPI unlimited frame zero: " + Main.configuration.getUnlimitedFrameZero)
+    With.logger.debug("JBWAPI max frame duration: " + Main.configuration.getMaxFrameDurationMs + "ms")
   }
 
   private def logStrategyEvaluation(): Unit = {

@@ -9,7 +9,7 @@ object PushPriority {
 
   val Pardon = next
   val Nudge = next
-  val Push = next
+  val Elbow = next
   val Shove = next
   val Dodge = next
   val Dive = next

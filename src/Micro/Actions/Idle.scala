@@ -42,7 +42,6 @@ object Idle extends Action {
     Rally,
     ReloadInterceptors,
     ReloadScarabs,
-    Pardon,
     Transport,
     Scout,
     Bunk,

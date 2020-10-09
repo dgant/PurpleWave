@@ -5,7 +5,7 @@ import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-abstract class LinearPush extends PushType {
+abstract class LinearPush extends Push {
   protected def source: Pixel
   protected def destination: Pixel
   protected def sourceWidth: Double

@@ -3,8 +3,9 @@ package Micro.Coordination.Pathing
 import Information.Grids.ArrayTypes.GridItems
 import Mathematics.Points.Tile
 import Micro.Coordination.Pushing.Push
+import ProxyBwapi.UnitInfo.UnitInfo
 
-class GridsPush {
+class Pushes {
 
   private var current   : GridItems[Push] = new GridItems[Push]
   private var previous  : GridItems[Push] = new GridItems[Push]
@@ -21,6 +22,10 @@ class GridsPush {
   }
 
   def get(tile: Tile): Seq[Push] = {
-    current.get(tile).view ++ previous.get(tile)
+    (current.get(tile).view ++ previous.get(tile)).distinct
+  }
+
+  def get(unit: UnitInfo): Seq[Push] = {
+    unit.tiles.flatMap(get).distinct
   }
 }

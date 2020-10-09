@@ -17,17 +17,9 @@ import Utilities.ByOption
 import bwapi.Color
 
 import scala.collection.mutable
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.mutable.ArrayBuffer
 
 class Agent(val unit: FriendlyUnitInfo) {
-  
-  ///////////////
-  // Messaging //
-  ///////////////
-  
-  def shove(shover: FriendlyUnitInfo) {
-    shovers.append(shover)
-  }
   
   def intend(client: Plan, intent: Intention) {
     lastIntent = intent
@@ -40,7 +32,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   
   var combatHysteresisFrames: Int = 0
   var lastIntent: Intention = new Intention
-  var shovers: ListBuffer[FriendlyUnitInfo] = new ListBuffer[FriendlyUnitInfo]
   
   ///////////////
   // Decisions //
@@ -166,7 +157,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   ///////////////
   
   def execute() {
-    // ie. Mind Control
+    // Mind Control
     if ( ! unit.isFriendly) return
     
     resetState()
@@ -175,7 +166,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     lastFrame = With.frame
     updateRidesharing()
     Idle.consider(unit)
-    cleanUp()
   }
 
   private def resetState() {
@@ -222,10 +212,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     canCast       = false
     canCancel     = intent.canCancel
     canFocus      = intent.canFocus
-  }
-
-  private def cleanUp() {
-    shovers.clear()
   }
 
   private def calculateDestination: Pixel = {

@@ -219,8 +219,8 @@ object Avoid extends Action {
     unit.agent.forces.put(ForceColors.mobility,       forceMobility)
     unit.agent.forces.put(ForceColors.sneaking,       forceSneaking)
     unit.agent.resistances.put(ForceColors.mobility,  resistancesTerrain)
-    Gravitate.delegate(unit)
 
+    Gravitate.delegate(unit)
     Move.delegate(unit)
   }
 }

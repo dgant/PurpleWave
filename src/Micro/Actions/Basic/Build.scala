@@ -1,13 +1,13 @@
 package Micro.Actions.Basic
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.Tile
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
-import Micro.Actions.Combat.Maneuvering.{Traverse}
+import Micro.Actions.Combat.Maneuvering.Traverse
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Commands.{Attack, Move}
+import Micro.Coordination.Pushing.{CircularPush, PushPriority}
 import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -74,13 +74,12 @@ object Build extends Action {
     
     if ( ! unit.ready) return
     
-    blockersOurs
-      .flatMap(_.friendly)
-      .filter(_.matchups.framesOfSafety > GameTime(0, 2)())
-      .foreach(_.agent.shove(unit))
-    
     val buildClass = unit.agent.toBuild.get
     val buildTile = unit.agent.lastIntent.toBuildTile.get
+
+    val push = new CircularPush(PushPriority.Shove, buildArea.midPixel, 32 + buildClass.dimensionMax)
+    buildArea.tiles.foreach(With.coordinator.pushes.put(push, _))
+
     if (unit.tileIncludingCenter.tileDistanceFast(buildTile) < 5 && With.grids.friendlyVision.isSet(buildTile)) {
       With.commander.build(unit, buildClass, buildTile)
       return

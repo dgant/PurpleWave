@@ -4,9 +4,9 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Avoid
+import Micro.Actions.Combat.Tactics.Brawl
 import Micro.Actions.Combat.Tactics.Potshot.PotshotTarget
 import Micro.Actions.Combat.Targeting.{Target, TargetInRange}
-import Micro.Actions.Combat.Techniques.Brawl
 import Micro.Actions.Commands.{Attack, Move}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.{ByOption, LightYear}
@@ -63,8 +63,8 @@ object EngageDisengage extends Action {
     Target.consider(unit)
 
     // Decide how far from target/threat we want to be
-    val idealPixelsFromTarget = target.map(unit.pixelRangeAgainst).getOrElse(unit.effectiveRangePixels)
-    val idealPixelsFromThreat = target
+    val idealPixelsFromTargetRange = if (target.exists(_.speedApproaching(unit) < 0)) -16d else 0d
+    val idealPixelsFromThreatRange = target
       .filter(t => t.pixelRangeMin > 0 && t.canAttack(unit)).map(x => 0d) // Hug
       .orElse(ByOption.max(unit.matchups.threats.view.map(64d + _.pixelRangeAgainst(unit)))) // TODO: Increase for abusable threat-targets
       .getOrElse(0d)
@@ -76,12 +76,12 @@ object EngageDisengage extends Action {
     val idealPixelsFromTeammates = Math.max(idealPixelsFromTeammatesCollision, idealPixelsFromTeammatesSplash)
 
     // Check how far from target/threat/teammate we are
-    val currentPixelsFromThreat = ByOption.min(unit.matchups.threats.view.map(_.pixelsToGetInRange(unit))).getOrElse(LightYear().toDouble)
-    val currentPixelsFromTarget = target.map(unit.pixelsToGetInRange).getOrElse(unit.pixelDistanceTravelling(unit.agent.destination))
+    val currentPixelsFromThreatRange = ByOption.min(unit.matchups.threats.view.map(_.pixelsToGetInRange(unit))).getOrElse(LightYear().toDouble)
+    val currentPixelsFromTargetRange = target.map(unit.pixelsToGetInRange).getOrElse(unit.pixelDistanceTravelling(unit.agent.destination))
     val currentPixelsFromTeammate = unit.matchups.allies.view.map(_.pixelDistanceEdge(unit))
 
-    val missingDistanceFromThreat = idealPixelsFromThreat - currentPixelsFromThreat
-    val excessDistanceFromTarget = currentPixelsFromTarget - idealPixelsFromTarget
+    val missingDistanceFromThreat = idealPixelsFromThreatRange - currentPixelsFromThreatRange
+    val excessDistanceFromTarget = currentPixelsFromTargetRange - idealPixelsFromTargetRange
     val tooCloseToThreat = missingDistanceFromThreat >= 0
     val tooFarFromTarget = excessDistanceFromTarget > 0
 
@@ -98,12 +98,24 @@ object EngageDisengage extends Action {
         // BREATHE
         // TODO
 
-        // ABUSE
+        // ABUSE/BREATHE
         lazy val framesToOpenGap = PurpleMath.nanToInfinity(missingDistanceFromThreat / unit.topSpeed)
-        if (idealPixelsFromTarget > idealPixelsFromThreat && unit.matchups.threats.forall(threat =>
-          threat.topSpeed < unit.topSpeed
-          || threat.framesToGetInRange(unit) > framesToOpenGap
-          || ( ! threat.inRangeToAttack(unit) && (threat.speedApproaching(unit) < 0 || threat.target.exists(_ != unit))))) {
+        if (excessDistanceFromTarget < -24
+          && idealPixelsFromTargetRange > idealPixelsFromThreatRange
+          && (
+            // Breathe
+            ! unit.readyForAttackOrder
+            // Abuse
+            || unit.matchups.threats.forall(threat =>
+              threat.topSpeed < unit.topSpeed
+              || threat.framesToGetInRange(unit) > framesToOpenGap
+              || ( ! threat.inRangeToAttack(unit) && (threat.speedApproaching(unit) < 0 || threat.target.exists(_ != unit)))))) {
+          Avoid.consider(unit)
+        }
+
+        // BREATHE, sort of
+        // TODO: Account for 2x 180 time
+        if ( ! unit.readyForAttackOrder && tooCloseToThreat && excessDistanceFromTarget < -24) {
           Avoid.consider(unit)
         }
       } else {

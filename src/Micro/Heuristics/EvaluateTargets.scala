@@ -138,7 +138,7 @@ object EvaluateTargets extends {
 
     // Visibility bonus
     if (target.visibleToOpponents) {
-      output *= 1.25
+      output *= 2.0
     }
     if (target.likelyStillThere) {
       output *= 1.25

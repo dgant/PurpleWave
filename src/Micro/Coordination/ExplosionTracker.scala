@@ -40,7 +40,7 @@ class ExplosionTracker {
     battles.foreach(addToBattle(_, explosion))
   }
   
-  def run() {
+  def onAgentCycle() {
     byBattle.clear()
     With.bullets.all.foreach(explosionFromBullet)
     With.units.all.foreach(explosionFromUnit)

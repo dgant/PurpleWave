@@ -11,17 +11,17 @@ import Micro.Actions.Commands.{Attack, Move}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.{ByOption, LightYear}
 
-object EngageDisengage extends Action {
+object DefaultCombat extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove || unit.canAttack
 
-  object NewEngage extends Action {
-    override def allowed(unit: FriendlyUnitInfo): Boolean = true
-    override protected def perform(unit: FriendlyUnitInfo): Unit = EngageDisengage.micro(unit, shouldEngage = true)
+  object Engage extends Action {
+    override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove || unit.canAttack
+    override protected def perform(unit: FriendlyUnitInfo): Unit = DefaultCombat.micro(unit, shouldEngage = true)
   }
 
-  object NewDisengage extends Action {
-    override def allowed(unit: FriendlyUnitInfo): Boolean = true
-    override protected def perform(unit: FriendlyUnitInfo): Unit = EngageDisengage.micro(unit, shouldEngage = false)
+  object Disengage extends Action {
+    override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove || unit.canAttack
+    override protected def perform(unit: FriendlyUnitInfo): Unit = DefaultCombat.micro(unit, shouldEngage = false)
   }
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
@@ -64,7 +64,7 @@ object EngageDisengage extends Action {
 
     // Decide how far from target/threat we want to be
     val idealPixelsFromTargetRange = if (target.exists(_.speedApproaching(unit) < 0)) -16d else 0d
-    val idealPixelsFromThreatRange = 32 + (if (shouldEngage) 0 else Math.max(0, unit.effectiveRangePixels - ByOption.min(unit.matchups.allies.view.map(_.effectiveRangePixels)).getOrElse(unit.effectiveRangePixels))) / 2 // Induce sorting
+    val idealPixelsFromThreatRange = 64 + Math.max(0, unit.effectiveRangePixels - ByOption.min(unit.matchups.allies.view.map(_.effectiveRangePixels)).getOrElse(unit.effectiveRangePixels)) / 4 // Induce sorting
 
     // Decide how far from adjacent teammates we want to be
     val idealPixelsFromTeammatesCollision = if (unit.flying) 0 else unit.unitClass.dimensionMax / 2

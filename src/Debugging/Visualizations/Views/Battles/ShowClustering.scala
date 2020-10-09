@@ -28,7 +28,7 @@ object ShowClustering extends View {
   override def renderMap() {
     val battles = With.battles.local
     battles.foreach(b => Seq((b.us, With.self.colorNeon), (b.enemy, With.enemy.colorNeon)).foreach(p =>
-        DrawMap.polygonPixels(PurpleMath.convexHullPixels(p._1.units.flatMap(_.corners)), p._2)
+        DrawMap.polygonPixels(PurpleMath.convexHull(p._1.units.flatMap(_.corners.map(_.asPoint))).map(_.asPixel), p._2)
     ))
   }
   

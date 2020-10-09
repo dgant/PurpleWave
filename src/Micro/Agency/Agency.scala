@@ -27,7 +27,7 @@ class Agency {
       while (runtimes.sum > With.reaction.runtimeQueueDuration) { runtimes.dequeue() }
       lastQueueCompletion = With.frame
 
-      With.coordinator.runPerAgentCycle()
+      With.coordinator.onAgentCycle()
       With.squads.updateGoals()
       agentQueue ++= With.units.ours.view
         .filter(validAgent)

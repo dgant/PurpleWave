@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Actions.Action
-import Micro.Actions.Combat.Decisionmaking.Engage
+import Micro.Actions.Combat.Decisionmaking.DefaultCombat.Engage
 import Micro.Actions.Combat.Maneuvering.Avoid
 import Micro.Actions.Commands.Attack
 import ProxyBwapi.Races.{Protoss, Terran}

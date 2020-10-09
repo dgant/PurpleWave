@@ -275,13 +275,13 @@ object PurpleMath {
   /**
     * @return 0 if colinear, 1 if clockwise, -1 if counterclockwise
     */
-  @inline def clockDirection(a: AbstractPoint, b: AbstractPoint, c: AbstractPoint): Int = {
+  @inline final def clockDirection(a: AbstractPoint, b: AbstractPoint, c: AbstractPoint): Int = {
     // See https://stackoverflow.com/questions/1165647/how-to-determine-if-a-list-of-polygon-points-are-in-clockwise-order/1180256#1180256
     // and https://www.geeksforgeeks.org/orientation-3-ordered-points/
     signum((b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y))
   }
 
-  def convexHull(points: Seq[Point]): Seq[Point] = {
+  @inline final def convexHull(points: Seq[Point]): Seq[Point] = {
     // See https://en.wikipedia.org/wiki/Graham_scan
     if (points.isEmpty) return Seq.empty
     if (points.size == 2) return Seq(points.head, points.last)
@@ -314,5 +314,20 @@ object PurpleMath {
     stack
   }
 
-  def convexHullPixels(pixels: Seq[Pixel]): Seq[Pixel] = convexHull(pixels.map(_.toPoint)).map(p => Pixel(p.x, p.y))
+  @inline final def projectedPointOnLine(p: Point, v1: Point, v2: Point): Point = {
+    val e1x = v2.x - v1.x
+    val e1y = v2.y - v1.y
+    val e2x = p.x - v1.x
+    val e2y = p.y - v1.y
+    val edot = e1x * e2x + e1y * e2y
+    val eLength2 = e1x * e1x + e1y * e1y
+    Point(v1.x + (e1x * edot) / eLength2, v1.y + (e1y * edot) / eLength2)
+  }
+
+  @inline final def projectedPointOnSegment(p: Point, v1: Point, v2: Point): Point = {
+    val onLine = projectedPointOnSegment(p, v1, v2)
+    val segmentLength2 = v1.distanceSquared(v2)
+    val isOnSegment = onLine.distanceSquared(v1) < segmentLength2 && onLine.distanceSquared(v2) < segmentLength2
+    if (isOnSegment) onLine else Seq(v1, v2).minBy(_.distanceSquared(p))
+  }
 }

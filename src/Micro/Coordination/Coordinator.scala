@@ -1,19 +1,18 @@
 package Micro.Coordination
 
-import Micro.Coordination.Pathing.GridPathOccupancy
+import Micro.Coordination.Pathing.{GridPathOccupancy, GridsPush}
 
 class Coordinator {
   
   val explosions = new ExplosionTracker
   val gridPathOccupancy = new GridPathOccupancy
   val ridesharing = new Ridesharing
+  val gridsPush = new GridsPush
 
-  def runPerAgentCycle(): Unit = {
+  def onAgentCycle(): Unit = {
+    explosions.onAgentCycle()
+    ridesharing.onAgentCycle()
     gridPathOccupancy.update()
-    ridesharing.run()
-  }
-
-  def runPerTask() {
-    explosions.run()
+    gridsPush.onAgentCycle()
   }
 }

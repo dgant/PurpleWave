@@ -1,13 +1,13 @@
 package Information.Grids
 
-import Information.Grids.ArrayTypes.AbstractGridVector
+import Information.Grids.ArrayTypes.GridItems
 import Lifecycle.With
 import Mathematics.Points.Tile
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
 
-class GridUnits extends AbstractGridVector[UnitInfo] {
+class GridUnits extends GridItems[UnitInfo] {
 
   val updateIntervals = new mutable.Queue[Int]
   var lastUpdateDuration: Int = 0
@@ -20,6 +20,6 @@ class GridUnits extends AbstractGridVector[UnitInfo] {
     super.update()
   }
   
-  override protected def getObjects: Traversable[UnitInfo] = With.units.all
-  override protected def getTile(item: UnitInfo): Tile = item.tileIncludingCenter
+  override protected def getDefaultItems: Traversable[UnitInfo] = With.units.all
+  override protected def getItemTile(item: UnitInfo): Tile = item.tileIncludingCenter
 }

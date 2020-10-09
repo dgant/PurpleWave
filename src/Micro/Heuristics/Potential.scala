@@ -118,7 +118,7 @@ object Potential {
       output
     }
     
-    val forces  = splashAllies.map(Potential.unitAttraction(unit, _, magnifier = splashRepulsionMagnitude))
+    val forces  = splashAllies.map(Potential.unitAttraction(unit, _, splashRepulsionMagnitude(_, _)))
     val output  = ForceMath.sum(forces).normalize(forces.map(_.lengthFast).max)
     output
   }
@@ -276,15 +276,6 @@ object Potential {
     val destination   = if (path.isEmpty || path.get.steps.isEmpty) unit.agent.destination.zone.centroid.pixelCenter else path.get.steps.head.edge.pixelCenter
     val forceExiting  = ForceMath.fromPixels(unit.pixelCenter, destination, 1.0)
     forceExiting
-  }
-  
-  ///////////////
-  // Smuggling //
-  ///////////////
-  
-  def smuggleRepulsion(unit: FriendlyUnitInfo): Force = {
-    if (unit.tileIncludingCenter.tileDistanceFromEdge < 5) return new Force
-    -unit.mobilityForce.normalize
   }
 }
 

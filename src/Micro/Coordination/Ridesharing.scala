@@ -15,7 +15,7 @@ class Ridesharing {
     claims += Claim(transport, passenger)
   }
 
-  def run(): Unit = {
+  def onAgentCycle(): Unit = {
     claims.foreach(_.age += 1)
     claims --= claims.filter(_.age > 2)
   }

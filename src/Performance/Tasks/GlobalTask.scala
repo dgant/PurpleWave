@@ -48,7 +48,6 @@ class TaskMicro extends AbstractTask {
   override protected def onRun() {
     With.matchups.run()
     With.commander.run()
-    With.coordinator.runPerTask()
     With.agents.run()
   }
 }

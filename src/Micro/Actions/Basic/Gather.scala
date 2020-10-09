@@ -4,7 +4,7 @@ import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.SpecificPoints
 import Micro.Actions.Action
-import Micro.Actions.Combat.Decisionmaking.{Disengage, Engage}
+import Micro.Actions.Combat.Decisionmaking.DefaultCombat.{Disengage, Engage}
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Commands.Move
 import Planning.UnitMatchers.UnitMatchWorkers

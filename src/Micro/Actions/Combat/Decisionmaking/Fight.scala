@@ -40,7 +40,7 @@ object Fight extends Action {
     Sneak.consider(unit)
     Duck.consider(unit)
     Unduck.consider(unit)
-    EngageDisengage.consider(unit)
+    DefaultCombat.consider(unit)
     OccupyBunker.consider(unit)
   }
 }

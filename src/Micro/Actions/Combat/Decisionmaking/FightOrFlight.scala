@@ -49,7 +49,7 @@ object FightOrFlight extends Action {
     decide(true,  "Scourge",      () => unit.is(Zerg.Scourge) && unit.matchups.targets.exists(target => target.canAttack(unit) && target.matchups.targetsInRange.nonEmpty))
     decide(false, "Disrupted",    () => unit.underDisruptionWeb && ! unit.flying)
     decide(false, "Swarmed",      () => unit.underDarkSwarm && ! unit.unitClass.unaffectedByDarkSwarm && unit.matchups.targetsInRange.forall(t => ! t.flying || t.underDarkSwarm))
-    decide(true,  "CanAbuse",     () => unit.matchups.threats.forall(t => unit.canAttack(t) && unit.topSpeed > t.topSpeed && unit.pixelRangeAgainst(t) > t.pixelRangeAgainst(unit) + 32))
+    decide(true,  "Abuse",        () => unit.matchups.threats.forall(t => unit.canAttack(t) && unit.topSpeed > t.topSpeed && unit.pixelRangeAgainst(t) > t.pixelRangeAgainst(unit) + 32))
     decide(false, "WaitForSiege", () => unit.is(Terran.SiegeTankUnsieged) && unit.matchups.threats.exists(_.is(Protoss.Dragoon)) && With.units.ours.exists(_.techProducing.contains(Terran.SiegeMode)) && unit.matchups.allies.exists(a => a.is(Terran.Bunker) && a.complete && ! With.blackboard.wantToAttack()))
     decide(true,  "Energized", () =>
       unit.matchups.allies.exists(ally =>

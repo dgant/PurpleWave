@@ -64,6 +64,11 @@ object EvaluateTargets extends {
       output *= 1.5
     }
 
+    // Diving penalty
+    if (attacker.matchups.threatsInRange.exists(_ != target) && ! attacker.inRangeToAttack(target)) {
+      output *= 0.25
+    }
+
     // Melee hugging, like Zealots against Siege Tanks
     val meleeHug = ! attacker.unitClass.ranged && target.topSpeed < attacker.topSpeed
     if (meleeHug) {

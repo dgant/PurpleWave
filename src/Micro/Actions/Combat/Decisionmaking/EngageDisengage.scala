@@ -64,11 +64,7 @@ object EngageDisengage extends Action {
 
     // Decide how far from target/threat we want to be
     val idealPixelsFromTargetRange = if (target.exists(_.speedApproaching(unit) < 0)) -16d else 0d
-    val idealPixelsFromThreatRange = target
-      .filter(t => t.pixelRangeMin > 0 && t.canAttack(unit)).map(x => 0d) // Hug
-      .orElse(ByOption.max(unit.matchups.threats.view.map(64d + _.pixelRangeAgainst(unit)))) // TODO: Increase for abusable threat-targets
-      .getOrElse(0d)
-    // TODO: Modify to induce range-ordered formations
+    val idealPixelsFromThreatRange = 32 + (if (shouldEngage) 0 else Math.max(0, unit.effectiveRangePixels - ByOption.min(unit.matchups.allies.view.map(_.effectiveRangePixels)).getOrElse(unit.effectiveRangePixels))) / 2 // Induce sorting
 
     // Decide how far from adjacent teammates we want to be
     val idealPixelsFromTeammatesCollision = if (unit.flying) 0 else unit.unitClass.dimensionMax / 2
@@ -92,7 +88,6 @@ object EngageDisengage extends Action {
 
     // Back up if we need to
     // TODO: Shove when avoiding
-    // TODO: When we have an ideal distance, only move/shove up to that distance and no further
     if (tooCloseToThreat) {
       if (shouldEngage) {
         // BREATHE
@@ -130,6 +125,8 @@ object EngageDisengage extends Action {
     // - Can we open room for teammates behind us to enter?
     // TODO
 
+    // TODO: When we have an ideal distance, only move/shove up to that distance and no further
+
     // CHASE: Moving shot/pursue if we want to
     // TODO
 
@@ -138,7 +135,6 @@ object EngageDisengage extends Action {
     if (shouldEngage || target.exists(unit.inRangeToAttack)) {
       Attack.consider(unit)
     }
-
 
     // Explicitly move, since we might have a target that we've simply chosen not to attack
     // TODO: Squad movement

@@ -6,7 +6,6 @@ import Information.Geography.Pathfinding.Types.{TilePath, ZonePath}
 import Lifecycle.With
 import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, PixelRay, Tile}
-import Micro.Actions.Combat.Techniques.Common.ActionTechniqueEvaluation
 import Micro.Actions.{Action, Idle}
 import Performance.Cache
 import Planning.Plan
@@ -157,8 +156,6 @@ class Agent(val unit: FriendlyUnitInfo) {
       path.tiles.get.view.zipWithIndex.filter(_._2 % focusPathStepSize == 0).map(_._1)
     }
   })
-  
-  val techniques: ArrayBuffer[ActionTechniqueEvaluation] = new ArrayBuffer[ActionTechniqueEvaluation]
 
   val actionsPerformed: ArrayBuffer[Action] = new ArrayBuffer[Action]()
   
@@ -193,7 +190,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     pathAccepted        = Seq.empty
     focusPathGoal       = None
     cachedZonePath.clear()
-    techniques.clear()
     fightReason = ""
     actionsPerformed.clear()
     _umbrellas.clear()

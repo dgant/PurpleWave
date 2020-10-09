@@ -6,16 +6,17 @@ import Information.Geography.Types.Zone
 import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.PurpleMath
+import Micro.Actions.Action
+import Micro.Actions.Combat.Maneuvering.Avoid
 import Micro.Actions.Combat.Targeting.Filters.TargetFilterWhitelist
 import Micro.Actions.Combat.Targeting.TargetAction
-import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Attack, Move}
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 import bwapi.Race
 
-object Batter extends ActionTechnique {
+object Batter extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     (

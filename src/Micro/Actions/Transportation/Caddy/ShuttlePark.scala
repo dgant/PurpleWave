@@ -1,7 +1,7 @@
 package Micro.Actions.Transportation.Caddy
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Techniques.Avoid
+import Micro.Actions.Combat.Maneuvering.Avoid
 import Micro.Actions.Commands.Move
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo

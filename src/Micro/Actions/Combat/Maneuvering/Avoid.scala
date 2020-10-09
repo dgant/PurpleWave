@@ -1,4 +1,4 @@
-package Micro.Actions.Combat.Techniques
+package Micro.Actions.Combat.Maneuvering
 
 import Debugging.Visualizations.ForceColors
 import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
@@ -6,9 +6,8 @@ import Lifecycle.With
 import Mathematics.Physics.ForceMath
 import Mathematics.Points.PixelRay
 import Mathematics.PurpleMath
-import Micro.Actions.Combat.Maneuvering.Traverse
+import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Heuristics.Potential
 import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWorkers}
@@ -16,27 +15,9 @@ import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, TakeN}
 
-object Avoid extends ActionTechnique {
-
-  // Run away!
+object Avoid extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove && (unit.matchups.threats.nonEmpty || (unit.effectivelyCloaked && unit.matchups.enemyDetectors.nonEmpty))
-  
-  override val applicabilityBase: Double = 0.5
-  
-  override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
-    val meleeFactor   = if (unit.unitClass.ranged) 1.0 else 0.7
-    val visionFactor  = if (unit.visibleToOpponents) 1.0 else 0.5
-    val safetyFactor  = PurpleMath.clampToOne((36.0 + unit.matchups.framesOfEntanglement) / 24.0)
-    val output        = meleeFactor * visionFactor * safetyFactor
-    output
-  }
-  
-  override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
-    if (other.isFriendly) return None
-    if ( ! other.canAttack(unit)) return None
-    Some(1.0)
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove && unit.matchups.threats.nonEmpty
 
   case class DesireProfile(home: Int, safety: Int, freedom: Int, target: Int = 0) {
     def distance(other: DesireProfile): Double = Seq(

@@ -6,7 +6,7 @@ import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.Engage
-import Micro.Actions.Combat.Techniques.Avoid
+import Micro.Actions.Combat.Maneuvering.Avoid
 import Micro.Actions.Commands.Attack
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}

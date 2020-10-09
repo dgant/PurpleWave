@@ -2,7 +2,7 @@ package Micro.Actions.Transportation
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Techniques.Avoid
+import Micro.Actions.Combat.Maneuvering.Avoid
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Evacuate extends Action {

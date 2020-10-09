@@ -3,7 +3,6 @@ package Micro.Actions.Combat.Maneuvering
 import Debugging.Visualizations.ForceColors
 import Mathematics.Physics.ForceMath
 import Micro.Actions.Action
-import Micro.Actions.Combat.Techniques.Avoid
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Heuristics.Potential
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo

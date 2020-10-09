@@ -3,7 +3,6 @@ package Micro.Actions.Combat.Maneuvering
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Actions.Combat.Techniques.Avoid
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Sneak extends Action {

@@ -1,4 +1,4 @@
-package Micro.Actions.Combat.Techniques.Common
+package Micro.Actions.Combat.Techniques
 
 import Lifecycle.With
 import Micro.Actions.Action

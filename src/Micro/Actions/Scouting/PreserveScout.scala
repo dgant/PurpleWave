@@ -1,8 +1,7 @@
 package Micro.Actions.Scouting
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.GooseChase
-import Micro.Actions.Combat.Techniques.Avoid
+import Micro.Actions.Combat.Maneuvering.{Avoid, GooseChase}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object PreserveScout extends Action {

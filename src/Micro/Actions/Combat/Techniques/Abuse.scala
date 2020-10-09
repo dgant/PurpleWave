@@ -1,16 +1,17 @@
 package Micro.Actions.Combat.Techniques
 
 import Information.Fingerprinting.Generic.GameTime
+import Micro.Actions.Action
+import Micro.Actions.Combat.Maneuvering.Avoid
 import Micro.Actions.Combat.Tactics.Potshot
+import Micro.Actions.Combat.Tactics.Potshot.PotshotTargetFilter
 import Micro.Actions.Combat.Targeting.Target
-import Micro.Actions.Combat.Techniques.Common.Activators.WeightedMin
-import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, PotshotAsSoonAsPossible}
 import Micro.Actions.Commands.Attack
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
-object Abuse extends ActionTechnique {
+object Abuse extends Action {
   
   // If we outrange and out-speed our enemies,
   // we can painlessly kill them as long as we maintain the gap and don't get cornered.
@@ -25,10 +26,8 @@ object Abuse extends ActionTechnique {
     && unit.matchups.threats.nonEmpty
     && ! unit.isAny(Protoss.Reaver, Protoss.Corsair, Zerg.Lurker)
   )
-  
-  override val activator = new WeightedMin(this)
 
-  override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
+  def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
     lazy val defenders        = unit.matchups.threats.view.filter(t => t.matchups.threats.isEmpty || t.pixelRangeAgainst(unit) >= unit.effectiveRangePixels)
     lazy val targets          = unit.matchups.targets.view.filter(t => ! t.canAttack(unit) || unit.pixelRangeAgainst(t) > t.pixelRangeAgainst(unit))
     lazy val defenderNearest  = ByOption.minBy(defenders)(_.pixelDistanceEdge(unit))
@@ -50,7 +49,7 @@ object Abuse extends ActionTechnique {
     output
   }
   
-  override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
+  def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
     if (other.isFriendly) return None
     if ( ! other.canAttack(unit)) return None
     if ( ! unit.canAttack(other)) return None
@@ -101,6 +100,22 @@ object Abuse extends ActionTechnique {
     }
     if (unit.matchups.framesOfSafety < GameTime(0, 1)()) {
       Avoid.delegate(unit)
+    }
+  }
+
+  object PotshotAsSoonAsPossible extends Action {
+    override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove && unit.canAttack
+    override protected def perform(unit: FriendlyUnitInfo): Unit = {
+      val targets               = unit.matchups.targets.filter(PotshotTargetFilter.legal(unit, _))
+      val minFramesToGetInRange = ByOption.min(targets.map(unit.framesToGetInRange)).getOrElse(0)
+      val framesBeforeShooting  = unit.framesToBeReadyForAttackOrder
+
+      if (targets.isEmpty) return
+
+      if (minFramesToGetInRange >= framesBeforeShooting) {
+        Target.delegate(unit)
+        Attack.delegate(unit)
+      }
     }
   }
   

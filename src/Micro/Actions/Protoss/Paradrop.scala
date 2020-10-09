@@ -7,9 +7,8 @@ import Mathematics.Points.Tile
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Spiral
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Traverse
+import Micro.Actions.Combat.Maneuvering.{Avoid, Traverse}
 import Micro.Actions.Combat.Targeting.Target
-import Micro.Actions.Combat.Techniques.Avoid
 import Micro.Actions.Commands.Attack
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}

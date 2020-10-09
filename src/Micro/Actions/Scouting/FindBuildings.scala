@@ -5,8 +5,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Physics.Gravity
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Traverse
-import Micro.Actions.Combat.Techniques.Avoid
+import Micro.Actions.Combat.Maneuvering.{Avoid, Traverse}
 import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 

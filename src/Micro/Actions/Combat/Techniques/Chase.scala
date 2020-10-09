@@ -2,13 +2,13 @@ package Micro.Actions.Combat.Techniques
 
 import Lifecycle.With
 import Mathematics.PurpleMath
+import Micro.Actions.Action
 import Micro.Actions.Combat.Targeting.Target
-import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Attack, Move}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-object Chase extends ActionTechnique {
+object Chase extends Action {
   
   // Chase down an enemy that's running away
   // eg. Corsairs vs. Mutalisks
@@ -20,13 +20,13 @@ object Chase extends ActionTechnique {
     && ! unit.is(Terran.SCV) // SCVs are just really bad at this due to halt distance
   )
   
-  override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
+  def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
     if (unit.is(Zerg.Lurker)) return 0.0
     if (unit.unitClass.minStop > 0) return 0.0
     1.0
   }
   
-  override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
+  def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
     if (other.isFriendly) return None
     
     lazy val weCanAttack    = unit.canAttack(other)

@@ -2,7 +2,7 @@ package Micro.Actions.Scouting
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Techniques.Avoid
+import Micro.Actions.Combat.Maneuvering.Avoid
 import Micro.Actions.Commands.{Attack, Move}
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}

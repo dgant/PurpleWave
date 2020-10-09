@@ -5,9 +5,7 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Basic.MineralWalk
-import Micro.Actions.Combat.Maneuvering.Traverse
-import Micro.Actions.Combat.Techniques.Avoid
-import Micro.Actions.Combat.Techniques.Avoid.pathfindingRepulsion
+import Micro.Actions.Combat.Maneuvering.{Avoid, Traverse}
 import Micro.Actions.Commands.{Attack, Move}
 import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -242,7 +240,7 @@ object Tickle extends Action {
       profile.costOccupancy = 1f
       profile.costThreat = 5f
       profile.costRepulsion = 3f
-      profile.repulsors = pathfindingRepulsion(tickler)
+      profile.repulsors = Avoid.pathfindingRepulsion(tickler)
       profile.unit = Some(tickler)
       val path = profile.find
       new Traverse(path).delegate(tickler)

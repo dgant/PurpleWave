@@ -1,17 +1,18 @@
 package Micro.Actions.Combat.Decisionmaking
 
 import Lifecycle.With
+import Mathematics.PurpleMath
 import Micro.Actions.Action
+import Micro.Actions.Combat.Maneuvering.Avoid
 import Micro.Actions.Combat.Tactics.Potshot.PotshotTarget
-import Micro.Actions.Combat.Targeting.Target
-import Micro.Actions.Combat.Techniques.{Aim, Avoid}
+import Micro.Actions.Combat.Targeting.{Target, TargetInRange}
+import Micro.Actions.Combat.Techniques.Brawl
 import Micro.Actions.Commands.{Attack, Move}
-import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.{ByOption, LightYear}
 
 object EngageDisengage extends Action {
-  override def allowed(unit: FriendlyUnitInfo): Boolean = true
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove || unit.canAttack
 
   object NewEngage extends Action {
     override def allowed(unit: FriendlyUnitInfo): Boolean = true
@@ -39,8 +40,12 @@ object EngageDisengage extends Action {
     }
 
     // AIM: If we can't move, just fire at a target
-    if ( ! unit.canMove) {
-      if (Aim.consider(unit)) return
+    // PURR: If we're getting repaired, stand still and enjoy
+    if ( ! unit.canMove || (unit.unitClass.isTerran && unit.unitClass.isMechanical && unit.matchups.allies.exists(a => a.repairing && a.orderTarget.contains(unit)))) {
+      TargetInRange.delegate(unit)
+      Attack.delegate(unit)
+      With.commander.sleep(unit)
+      return
     }
 
     // Explosions: Dodge them
@@ -59,7 +64,11 @@ object EngageDisengage extends Action {
 
     // Decide how far from target/threat we want to be
     val idealPixelsFromTarget = target.map(unit.pixelRangeAgainst).getOrElse(unit.effectiveRangePixels)
-    val idealPixelsFromThreat = ByOption.max(unit.matchups.threats.view.map(64d + _.pixelRangeAgainst(unit))).getOrElse(0d) // TODO: Increase for abusable threat-targets
+    val idealPixelsFromThreat = target
+      .filter(t => t.pixelRangeMin > 0 && t.canAttack(unit)).map(x => 0d) // Hug
+      .orElse(ByOption.max(unit.matchups.threats.view.map(64d + _.pixelRangeAgainst(unit)))) // TODO: Increase for abusable threat-targets
+      .getOrElse(0d)
+    // TODO: Modify to induce range-ordered formations
 
     // Decide how far from adjacent teammates we want to be
     val idealPixelsFromTeammatesCollision = if (unit.flying) 0 else unit.unitClass.dimensionMax / 2
@@ -76,31 +85,27 @@ object EngageDisengage extends Action {
     val tooCloseToThreat = missingDistanceFromThreat >= 0
     val tooFarFromTarget = excessDistanceFromTarget > 0
 
-    // BRAWL: If we're in a melee mess
+    if (Brawl.consider(unit)) return
+
+    // BATTER
     // TODO
 
-    // BREATHE: Shoot if we want to
-    if (shouldEngage && target.isDefined && unit.framesToGetInRange(target.get) + With.reaction.agencyAverage + unit.unitClass.framesToTurn180 >= unit.cooldownLeft) {
-      Attack.delegate(unit)
-    }
-
-    // FALLBACK: Shoot if we want to
-    if ( ! shouldEngage && unit.isAny(Terran.SiegeTankUnsieged, Terran.Goliath, Protoss.Dragoon)) {
-      simplePotshot()
-    }
-
-    // Back up if we need to.
+    // Back up if we need to
     // TODO: Shove when avoiding
     // TODO: When we have an ideal distance, only move/shove up to that distance and no further
     if (tooCloseToThreat) {
       if (shouldEngage) {
         // BREATHE
-        val turnaroundFrames = unit.unitClass.framesToTurn180 + excessDistanceFromTarget * unit.topSpeed
-        if (unit.cooldownLeft > turnaroundFrames) {
+        // TODO
+
+        // ABUSE
+        lazy val framesToOpenGap = PurpleMath.nanToInfinity(missingDistanceFromThreat / unit.topSpeed)
+        if (idealPixelsFromTarget > idealPixelsFromThreat && unit.matchups.threats.forall(threat =>
+          threat.topSpeed < unit.topSpeed
+          || threat.framesToGetInRange(unit) > framesToOpenGap
+          || ( ! threat.inRangeToAttack(unit) && (threat.speedApproaching(unit) < 0 || threat.target.exists(_ != unit))))) {
           Avoid.consider(unit)
         }
-        // ABUSE
-        // TODO
       } else {
         // Don't IGNORE
         Avoid.consider(unit)
@@ -117,7 +122,7 @@ object EngageDisengage extends Action {
     // TODO
 
     // CHARGE
-      // TODO: Nudge when attacking something out of range or attacking
+    // TODO: Nudge when attacking something out of range or attacking
     if (shouldEngage || target.exists(unit.inRangeToAttack)) {
       Attack.consider(unit)
     }

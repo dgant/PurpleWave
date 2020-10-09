@@ -153,7 +153,6 @@ class Visualization {
     ShowStrategyInterest,
     ShowStrategyName,
     ShowStrategyEvaluations,
-    ShowTechniques,
     ShowTextOnly,
     ShowTextOnlyUnits,
     ShowTileInfo,

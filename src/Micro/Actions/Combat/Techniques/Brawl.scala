@@ -1,31 +1,28 @@
 package Micro.Actions.Combat.Techniques
 
 import Lifecycle.With
+import Micro.Actions.Action
 import Micro.Actions.Combat.Targeting.Filters.TargetFilterWhitelist
 import Micro.Actions.Combat.Targeting.{Target, TargetAction, TargetInRange}
-import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.Attack
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
-object Brawl extends ActionTechnique {
+object Brawl extends Action {
   
   // In close-quarters fights against other melee units,
   // prefer non-targeted commands to avoid glitching.
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.canMove
-    && (unit.is(Zerg.Zergling) || (unit.unitClass.melee && unit.matchups.threats.exists(_.is(Zerg.Zergling))))
-    && unit.matchups.targets.exists(t => ! t.flying && t.unitClass.melee)
-    && unit.matchups.threats.exists(t => ! t.flying && t.unitClass.melee && t.pixelDistanceEdge(unit) < 32.0)
-    && unit.matchups.targetsInRange.forall(_.canAttack(unit))
-    && unit.matchups.targetsInRange.exists(_.canAttack(unit))
-  )
-  
-  override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     lazy val brawlers = unit.matchups.threats.filter(t => ! t.flying && t.unitClass.melee && inBrawlRange(unit, t))
-    if (unit.unitClass.melee && brawlers.size >= 4) 1.0 else 0.0
+    (unit.canMove
+      && (unit.is(Zerg.Zergling) || (unit.unitClass.melee && unit.matchups.threats.exists(_.is(Zerg.Zergling))))
+      && unit.matchups.targets.exists(t => ! t.flying && t.unitClass.melee)
+      && unit.matchups.threats.exists(t => ! t.flying && t.unitClass.melee && t.pixelDistanceEdge(unit) < 32.0)
+      && unit.matchups.targetsInRange.forall(_.canAttack(unit))
+      && unit.matchups.targetsInRange.exists(_.canAttack(unit))
+      && brawlers.size >= 4)
   }
   
   private def inBrawlRange(unit: FriendlyUnitInfo, other: UnitInfo): Boolean = {

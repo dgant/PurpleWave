@@ -1,3 +1,3 @@
 package Micro.Actions.Combat.Targeting
 
-object Target extends TargetAction
+object Target extends TargetAction() {}

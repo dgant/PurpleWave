@@ -1,7 +1,7 @@
 package Micro.Coordination.Pushing
 
 object PushPriority {
-  private var nextValue: Integer = 0
+  private var nextValue: Int = 0
   private def next: Int = {
     nextValue += 1
     nextValue - 1

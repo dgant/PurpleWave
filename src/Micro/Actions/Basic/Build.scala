@@ -77,8 +77,7 @@ object Build extends Action {
     val buildClass = unit.agent.toBuild.get
     val buildTile = unit.agent.lastIntent.toBuildTile.get
 
-    val push = new CircularPush(PushPriority.Shove, buildArea.midPixel, 32 + buildClass.dimensionMax)
-    buildArea.tiles.foreach(With.coordinator.pushes.put(push, _))
+    With.coordinator.pushes.put(new CircularPush(PushPriority.Shove, buildArea.midPixel, 32 + buildClass.dimensionMax))
 
     if (unit.tileIncludingCenter.tileDistanceFast(buildTile) < 5 && With.grids.friendlyVision.isSet(buildTile)) {
       With.commander.build(unit, buildClass, buildTile)

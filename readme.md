@@ -28,7 +28,8 @@ Thanks to:
 * @jaj22/JohnJ for lots of advice navigating Brood War mechanics
 * @IMP42 @AdakiteSystems and @tscmoo for helping me get BWAPI up and running when I was getting started
 * @davechurchill @certicky @krasi0 @Bytekeeper @bgweber Nathan Roth and the Cognition & Intelligence Lab at Sejong University for hosting Brood War competitions
-* @kovarex and @heinermann for [BWAPI](https://github.com/bwapi/bwapi), @JasperGeurtz @Bytekeeper and @N00byEdge for [JBWAPI](https://github.com/JavaBWAPI/JBWAPI), @vjurenka for [BWMirror](https://github.com/vjurenka/BWMirror), @tscmoo for [OpenBW](https://github.com/OpenBW/openbw/), Luke Perkins for BWTA, and @CMcCrave for [MCRS/Horizon](https://github.com/Cmccrave/Horizon) 
+* @kovarex and @heinermann for [BWAPI](https://github.com/bwapi/bwapi), @JasperGeurtz @Bytekeeper and @N00byEdge for [JBWAPI](https://github.com/JavaBWAPI/JBWAPI), @vjurenka for [BWMirror](https://github.com/vjurenka/BWMirror), @tscmoo for [OpenBW](https://github.com/OpenBW/openbw/), Luke Perkins for BWTA, and @CMcCrave for [MCRS/Horizon](https://github.com/Cmccrave/Horizon)
+* @chriscoxe for solving technical issues in tournament environments that have affected PurpleWave  
 
 ## How to build PurpleWave
 [See build instructions in install.md](install/install.md)

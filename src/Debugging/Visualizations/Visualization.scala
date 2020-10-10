@@ -31,7 +31,7 @@ class Visualization {
     ShowUtilization,
     ShowUnitsFriendly,
     ShowUnitsEnemy,
-    ShowExplosions,
+    ShowPushes,
     ShowStatus,
     ShowPerformanceSummary,
 
@@ -124,7 +124,7 @@ class Visualization {
     ShowClustering,
     ShowDesire,
     ShowEconomy,
-    ShowExplosions,
+    ShowPushes,
     ShowFingerprints,
     ShowGas,
     ShowGradients,

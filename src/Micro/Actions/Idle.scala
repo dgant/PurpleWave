@@ -2,7 +2,7 @@ package Micro.Actions
 
 import Micro.Actions.Basic._
 import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
-import Micro.Actions.Combat.Maneuvering.{DodgeAll, ExplosionDrop, ExplosionHop, Yank}
+import Micro.Actions.Combat.Maneuvering.Yank
 import Micro.Actions.Combat.Tactics.{Tickle, Unbunk}
 import Micro.Actions.Commands.{Attack, Move}
 import Micro.Actions.Protoss.Meld
@@ -19,7 +19,6 @@ object Idle extends Action {
   final override def perform(unit: FriendlyUnitInfo): Unit = actions.foreach(_.consider(unit))
   
   private val actions = Vector(
-    //HackyRazeGasSteal,
     Liftoff,
     Cancel,
     Unbunk,
@@ -27,10 +26,7 @@ object Idle extends Action {
     Build,
     Finish,
     FightOrFlight,
-    ExplosionHop,
-    ExplosionDrop,
     Yank,
-    DodgeAll,
     Tickle,
     Repair,
     EmergencyRepair,

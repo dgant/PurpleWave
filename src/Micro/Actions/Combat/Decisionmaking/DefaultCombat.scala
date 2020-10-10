@@ -12,23 +12,20 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.{ByOption, LightYear}
 
 object DefaultCombat extends Action {
-  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove || unit.canAttack
-
   object Engage extends Action {
-    override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove || unit.canAttack
+    override def allowed(unit: FriendlyUnitInfo): Boolean = DefaultCombat.allowed(unit)
     override protected def perform(unit: FriendlyUnitInfo): Unit = DefaultCombat.micro(unit, shouldEngage = true)
   }
 
   object Disengage extends Action {
-    override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove || unit.canAttack
+    override def allowed(unit: FriendlyUnitInfo): Boolean = DefaultCombat.allowed(unit)
     override protected def perform(unit: FriendlyUnitInfo): Unit = DefaultCombat.micro(unit, shouldEngage = false)
   }
 
-  override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    micro(unit, unit.agent.shouldEngage)
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove || unit.canAttack
+  override protected def perform(unit: FriendlyUnitInfo): Unit = micro(unit, unit.agent.shouldEngage)
 
-  def micro(unit: FriendlyUnitInfo, shouldEngage: Boolean): Unit = {
+  protected def micro(unit: FriendlyUnitInfo, shouldEngage: Boolean): Unit = {
     def target = { unit.agent.toAttack }
     def simplePotshot(): Boolean = {
       val oldToAttack = unit.agent.toAttack
@@ -41,7 +38,8 @@ object DefaultCombat extends Action {
 
     // AIM: If we can't move, just fire at a target
     // PURR: If we're getting repaired, stand still and enjoy
-    if ( ! unit.canMove || (unit.unitClass.isTerran && unit.unitClass.isMechanical && unit.matchups.allies.exists(a => a.repairing && a.orderTarget.contains(unit)))) {
+    lazy val purring = (unit.unitClass.isTerran && unit.unitClass.isMechanical && unit.matchups.allies.exists(a => a.repairing && a.orderTarget.contains(unit)))
+    if ( ! unit.canMove || purring) {
       TargetInRange.delegate(unit)
       Attack.delegate(unit)
       With.commander.sleep(unit)
@@ -87,7 +85,7 @@ object DefaultCombat extends Action {
     // TODO
 
     // Back up if we need to
-    // TODO: Shove when avoiding
+    // TODO: Bump when avoiding
     if (tooCloseToThreat) {
       if (shouldEngage) {
         // BREATHE

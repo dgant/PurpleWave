@@ -7,10 +7,10 @@ object PushPriority {
     nextValue - 1
   }
 
-  val Pardon = next
-  val Nudge = next
-  val Elbow = next
-  val Shove = next
-  val Dodge = next
-  val Dive = next
+  val Pardon = next // Trying to walk here
+  val Nudge = next  // Trying to get into the fight
+  val Bump = next  // Trying to retreat
+  val Shove = next  // Trying to do something mission-critical (like construct a building)
+  val Dodge = next  // Trying to dodge explosion
+  val Dive = next   // Trying to dodge NUCLEAR EXPLOSION
 }

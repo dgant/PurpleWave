@@ -68,7 +68,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   var lastCloak: Int = 0
   var shouldEngage: Boolean = false
   val forces: mutable.Map[Color, Force] = new mutable.HashMap[Color, Force]
-  val resistances: mutable.Map[Color, Vector[Force]] = new mutable.HashMap[Color, Vector[Force]]
 
   def canScout: Boolean = lastIntent.toScoutTiles.nonEmpty
   
@@ -170,7 +169,6 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   private def resetState() {
     forces.clear()
-    resistances.clear()
     movingTo            = None
     path                = None
     pathBranches        = Seq.empty

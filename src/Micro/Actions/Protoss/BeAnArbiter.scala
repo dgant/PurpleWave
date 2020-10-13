@@ -1,13 +1,12 @@
 package Micro.Actions.Protoss
 
-import Debugging.Visualizations.ForceColors
 import Lifecycle.With
-import Mathematics.Physics.{Force, ForceMath}
+import Mathematics.Physics.Force
 import Mathematics.PurpleMath
 import Micro.Actions.Action
+import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Actions.Commands.{Gravitate, Move}
-import Micro.Heuristics.{Potential, SpellTargetAOE}
+import Micro.Heuristics.SpellTargetAOE
 import Planning.UnitMatchers.UnitMatchBuilding
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -74,34 +73,11 @@ object BeAnArbiter extends Action {
     val framesOfSafetyRequired = Math.max(0, 48 - With.framesSince(arbiter.lastFrameTakingDamage))
     if (arbiter.matchups.framesOfSafety <= framesOfSafetyRequired
       || (arbiter.energy > 40 && arbiter.matchups.enemyDetectors.exists(e => e.is(Terran.ScienceVessel) && e.pixelDistanceEdge(arbiter) < 32 * 6))) {
-      val forceThreat         = Potential.avoidThreats(arbiter)
-      val forceEMP            = Potential.avoidEmp(arbiter)
-      val resistancesTerrain  = Potential.resistTerrain(arbiter)
-      if (amCovering) {
-        arbiter.agent.forces.put(ForceColors.regrouping, forceUmbrella)
-      }
-      arbiter.agent.forces.put(ForceColors.spacing,     forceEMP)
-      arbiter.agent.forces.put(ForceColors.threat,      forceThreat)
-      arbiter.agent.resistances.put(ForceColors.mobility, resistancesTerrain)
-      Gravitate.consider(arbiter)
-      Move.delegate(arbiter)
+      Retreat.consider(arbiter)
       arbiter.agent.fightReason = "Unsafe"
     } else if (amCovering) {
       Potshot.delegate(arbiter)
-      val forcesThreats = arbiter.matchups.enemies
-        .map(enemy =>
-          Potential.unitAttraction(
-            arbiter,
-            enemy,
-                    enemy.matchups.targets.size
-            + 2.0 * enemy.matchups.targetsInRange.size))
-      val forceThreats = ForceMath.sum(forcesThreats).normalize
-      val forceEMP = Potential.avoidEmp(arbiter)
-      arbiter.agent.forces.put(ForceColors.threat,      forceThreats)
-      arbiter.agent.forces.put(ForceColors.spacing,     forceEMP)
-      arbiter.agent.forces.put(ForceColors.regrouping,  forceUmbrella)
-      Gravitate.consider(arbiter)
-      Move.delegate(arbiter)
+      Retreat.consider(arbiter)
       arbiter.agent.fightReason = "Umbrella"
     }
     if (arbiter.matchups.framesOfSafety < 48 || arbiter.matchups.threats.exists(_.topSpeed > arbiter.topSpeed)) {

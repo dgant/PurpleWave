@@ -6,7 +6,6 @@ import Mathematics.Points.PixelRay
 import Mathematics.PurpleMath
 import Micro.Actions.Action
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.ByOption
 
 object Gravitate extends Action {
   
@@ -29,19 +28,18 @@ object Gravitate extends Action {
     val forces      = unit.agent.forces.values
     val origin      = unit.pixelCenter
     val forceSum    = ForceMath.sum(forces).normalize
-    val forceTotal  = ByOption.maxBy(unit.agent.resistances.values.flatten)(_.lengthSquared).foldLeft(forceSum)(ForceMath.resist(_, _).normalize)
     val rayLength   = Math.max(rayDistance, minDistance)
     val pathfind    = useShortAreaPathfinding(unit)
     def makeRay(radians: Double): PixelRay = {
       PixelRay(unit.pixelCenter, unit.pixelCenter.radiateRadians(radians, rayLength))
     }
     
-    lazy val forceRadians = forceTotal.radians
+    lazy val forceRadians = forceSum.radians
     lazy val ray          = makeRay(forceRadians)
     lazy val rayWalkable  = ray.tilesIntersected.forall(With.grids.walkable.get)
     
     if ( ! pathfind || rayWalkable) {
-      var destination = unit.pixelCenter.add(forceTotal.normalize(rayLength).toPoint)
+      var destination = unit.pixelCenter.add(forceSum.normalize(rayLength).toPoint)
       // Prevent unit from getting confused from trying to move too close to unwalkable tiles
       if ( ! unit.unitClass.corners.map(destination.add(_).tileIncluding).forall(unit.canTraverse)) {
         destination = destination.tileIncluding.pixelCenter

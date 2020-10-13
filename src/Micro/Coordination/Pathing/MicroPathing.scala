@@ -1,8 +1,8 @@
 package Micro.Coordination.Pathing
 
 import Debugging.Visualizations.ForceColors
-import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Information.Geography.Pathfinding.Types.TilePath
+import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.PixelRay
@@ -10,6 +10,7 @@ import Mathematics.PurpleMath
 import Micro.Actions.Commands.Move
 import Micro.Coordination.Pushing.Push
 import Micro.Heuristics.Potential
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.TakeN
 
@@ -45,7 +46,7 @@ object MicroPathing {
       .toIndexedSeq
   }
 
-  def setAvoidPotentials(unit: FriendlyUnitInfo, desire: DesireProfile): Unit = {
+  def setRetreatPotentials(unit: FriendlyUnitInfo, desire: DesireProfile): Unit = {
     unit.agent.toTravel = Some(unit.agent.origin)
 
     val bonusAvoidThreats = PurpleMath.clamp(With.reaction.agencyAverage + unit.matchups.framesOfEntanglement, 12.0, 24.0) / 12.0
@@ -57,18 +58,24 @@ object MicroPathing {
     val forceExiting        = Potential.preferTravelling(unit)  * desire.home * bonusPreferExit
     val forceSpreading      = Potential.preferSpreading(unit)   * desire.safety * desire.freedom
     val forceRegrouping     = Potential.preferRegrouping(unit)  * bonusRegrouping
-    val forceMobility       = Potential.preferMobility(unit)
     val forceSneaking       = Potential.detectionRepulsion(unit)
-    val resistancesTerrain  = Potential.resistTerrain(unit)
+
+    if (unit.isAny(Protoss.Carrier, Zerg.Guardian)) {
+      val threats           = unit.matchups.threats
+      val walkers           = threats.filter(threat => ! threat.flying && threat.zone == unit.zone)
+      val dpfFromWalkers    = walkers.map(_.dpfOnNextHitAgainst(unit)).sum
+      val dpfFromThreats    = threats.map(_.dpfOnNextHitAgainst(unit)).sum
+      val cliffingMagnitude = PurpleMath.nanToZero(dpfFromWalkers / dpfFromThreats)
+      val forceCliffing     = Potential.cliffAttraction(unit).normalize(0.5 * cliffingMagnitude)
+      unit.agent.forces.put(ForceColors.sneaking, forceCliffing)
+    }
 
     unit.agent.forces.put(ForceColors.threat,         forceThreat)
     unit.agent.forces.put(ForceColors.traveling,      forceExiting)
     unit.agent.forces.put(ForceColors.spreading,      forceSpreading)
     unit.agent.forces.put(ForceColors.regrouping,     forceRegrouping)
     unit.agent.forces.put(ForceColors.spacing,        forceSpacing)
-    unit.agent.forces.put(ForceColors.mobility,       forceMobility)
     unit.agent.forces.put(ForceColors.sneaking,       forceSneaking)
-    unit.agent.resistances.put(ForceColors.mobility,  resistancesTerrain)
   }
 
   def getAvoidDirectForce(unit: FriendlyUnitInfo, desire: DesireProfile): Option[Force] = {

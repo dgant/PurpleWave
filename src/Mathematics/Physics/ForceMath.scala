@@ -15,10 +15,4 @@ object ForceMath {
     Force(
       magnitude * Math.cos(radians),
       magnitude * Math.sin(radians))
-  
-  def resist(force: Force, resistance: Force): Force = {
-    Force(
-      PurpleMath.clamp(force.x + resistance.x, 0.0, force.x),
-      PurpleMath.clamp(force.y + resistance.y, 0.0, force.y))
-  }
 }

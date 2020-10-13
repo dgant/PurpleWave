@@ -7,7 +7,7 @@ import Mathematics.Points.Tile
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Spiral
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.{Retreat, Traverse}
+import Micro.Actions.Combat.Maneuvering.Traverse
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Commands.Attack
 import Micro.Coordination.Pathing.MicroPathing

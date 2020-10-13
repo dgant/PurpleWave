@@ -23,6 +23,7 @@ object Retreat extends Action {
   }
 
   def retreatZealotsDirectly(unit: FriendlyUnitInfo): Unit = {
+    if ( ! unit.ready) return
     // Don't spray Zealots out against melee units, especially Zerglings
     if (unit.is(Protoss.Zealot)
       && unit.base == unit.agent.origin.base
@@ -62,7 +63,7 @@ object Retreat extends Action {
 
   def retreatForcePotential(unit: FriendlyUnitInfo, desire: DesireProfile): Unit = {
     if ( ! unit.ready) return
-    MicroPathing.setAvoidPotentials(unit, desire)
+    MicroPathing.setRetreatPotentials(unit, desire)
     Gravitate.delegate(unit)
     Move.delegate(unit)
   }

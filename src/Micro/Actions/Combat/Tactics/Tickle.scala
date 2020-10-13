@@ -5,8 +5,9 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Basic.MineralWalk
-import Micro.Actions.Combat.Maneuvering.{Avoid, Traverse}
+import Micro.Actions.Combat.Maneuvering.{Retreat, Traverse}
 import Micro.Actions.Commands.{Attack, Move}
+import Micro.Coordination.Pathing.MicroPathing
 import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -206,7 +207,7 @@ object Tickle extends Action {
             tickler.pixelDistanceEdge(freebie)))
       tickler.agent.toAttack = freebies
       Attack.consider(tickler)
-      Avoid.consider(tickler)
+      Retreat.consider(tickler)
     }
   }
 
@@ -240,7 +241,7 @@ object Tickle extends Action {
       profile.costOccupancy = 1f
       profile.costThreat = 5f
       profile.costRepulsion = 3f
-      profile.repulsors = Avoid.pathfindingRepulsion(tickler)
+      profile.repulsors = MicroPathing.getPathfindingRepulsors(tickler)
       profile.unit = Some(tickler)
       val path = profile.find
       new Traverse(path).delegate(tickler)

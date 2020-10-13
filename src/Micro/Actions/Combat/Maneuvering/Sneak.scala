@@ -24,7 +24,7 @@ object Sneak extends Action {
     if ( ! unit.ready) return
 
     if ( ! unit.effectivelyCloaked || unit.tileArea.expand(2, 2).tiles.exists(With.grids.enemyDetection.isDetected)) {
-      Avoid.delegate(unit)
+      Retreat.delegate(unit)
     }
   }
 }

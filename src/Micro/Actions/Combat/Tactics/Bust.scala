@@ -6,7 +6,7 @@ import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.DefaultCombat.Engage
-import Micro.Actions.Combat.Maneuvering.Avoid
+import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Commands.Attack
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -69,7 +69,7 @@ object Bust extends Action {
     }
 
     if (With.framesSince(unit.lastFrameTakingDamage) < GameTime(0, 1)()) {
-      Avoid.delegate(unit)
+      Retreat.delegate(unit)
     }
     else if (unit.matchups.targetsInRange.exists(_.canAttack(unit)) && unit.velocity.lengthSquared > 0) {
       With.commander.hold(unit)

@@ -2,7 +2,7 @@ package Micro.Actions.Scouting
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Avoid
+import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Targeting.Filters.TargetFilterWhitelist
 import Micro.Actions.Combat.Targeting.TargetAction
 import Micro.Actions.Commands.{Attack, Move}
@@ -53,7 +53,7 @@ object Poke extends Action {
     unit.agent.toTravel = Some(targetPosition)
     if ( ! unit.is(Terran.SCV) && framesToWait > 0) {
       if (framesToWait > framesAway && ! target.gathering) {
-        Avoid.delegate(unit)
+        Retreat.delegate(unit)
       }
       else {
         Move.delegate(unit)

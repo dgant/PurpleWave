@@ -2,7 +2,7 @@ package Micro.Actions.Transportation
 
 import Mathematics.PurpleMath
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Avoid
+import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -18,7 +18,7 @@ object Pickup extends Action {
     val passengersPotential = potentialPassengers(unit)
     if (passengersPotential.isEmpty && unit.loadedUnits.isEmpty && ! unit.unitClass.isDetector) {
       unit.agent.toTravel = Some(unit.agent.origin)
-      Avoid.consider(unit)
+      Retreat.consider(unit)
       return
     }
     val passengersAccepted  = new ArrayBuffer[FriendlyUnitInfo]

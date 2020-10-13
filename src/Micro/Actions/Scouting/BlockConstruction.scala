@@ -2,7 +2,7 @@ package Micro.Actions.Scouting
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Avoid
+import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Commands.{Attack, Move}
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
@@ -32,7 +32,7 @@ object BlockConstruction extends Action {
       Attack.delegate(unit)
     }
     else {
-      Avoid.delegate(unit)
+      Retreat.delegate(unit)
     }
   }
   

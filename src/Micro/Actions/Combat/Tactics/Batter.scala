@@ -7,7 +7,7 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Avoid
+import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Targeting.Filters.TargetFilterWhitelist
 import Micro.Actions.Combat.Targeting.TargetAction
 import Micro.Actions.Commands.{Attack, Move}
@@ -73,7 +73,7 @@ object Batter extends Action {
     lazy val shouldRetreat    = ! unit.agent.shouldEngage || (unit.unitClass.melee && dying)
     
     if (shouldRetreat) {
-      Avoid.consider(unit)
+      Retreat.consider(unit)
     }
   
     if (unit.ready) {

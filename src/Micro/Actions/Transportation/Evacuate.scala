@@ -2,7 +2,7 @@ package Micro.Actions.Transportation
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Avoid
+import Micro.Actions.Combat.Maneuvering.Retreat
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Evacuate extends Action {
@@ -13,6 +13,6 @@ object Evacuate extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     unit.loadedUnits.headOption.foreach(With.commander.unload(unit, _))
-    Avoid.delegate(unit)
+    Retreat.delegate(unit)
   }
 }

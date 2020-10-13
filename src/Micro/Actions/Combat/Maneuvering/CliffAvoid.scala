@@ -23,6 +23,6 @@ object CliffAvoid extends Action {
     val forceCliffing = Potential.cliffAttraction(unit).normalize(0.5 * cliffingMagnitude)
     unit.agent.forces.put(ForceColors.sneaking, forceCliffing)
     
-    Avoid.delegate(unit)
+    Retreat.delegate(unit)
   }
 }

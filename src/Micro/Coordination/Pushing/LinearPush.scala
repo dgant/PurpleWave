@@ -1,5 +1,6 @@
 package Micro.Coordination.Pushing
 
+import Debugging.Visualizations.Rendering.DrawMap
 import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.{Pixel, PixelRay, Tile}
 import Mathematics.PurpleMath
@@ -19,5 +20,19 @@ abstract class LinearPush extends Push {
     val magnitudeClamped = PurpleMath.clamp(magnitude, 0d, 1d)
     if (magnitudeClamped <= 0) return None
     Some(ForceMath.fromPixels(projection, recipient.pixelCenter, magnitudeClamped))
+  }
+
+  def corners: Vector[Pixel] = {
+    val radians = source.radiansTo(destination)
+    Vector(
+      source      .radiateRadians(radians + Math.PI / 2, sourceWidth),
+      source      .radiateRadians(radians - Math.PI / 2, sourceWidth),
+      destination .radiateRadians(radians - Math.PI / 2, sourceWidth),
+      destination .radiateRadians(radians + Math.PI / 2, sourceWidth))
+  }
+
+  override def draw(): Unit = {
+    DrawMap.label(toString, source.midpoint(destination))
+    DrawMap.polygonPixels(corners,  PushPriority.color(priority))
   }
 }

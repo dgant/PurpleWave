@@ -1,7 +1,7 @@
 package Micro.Actions.Scouting
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.{Avoid, GooseChase}
+import Micro.Actions.Combat.Maneuvering.{Retreat, GooseChase}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object PreserveScout extends Action {
@@ -16,6 +16,6 @@ object PreserveScout extends Action {
     // FindBuildings can usually safely path around threats
     FindBuildingsWhenBored.delegate(unit)
     GooseChase.consider(unit)
-    Avoid.delegate(unit)
+    Retreat.delegate(unit)
   }
 }

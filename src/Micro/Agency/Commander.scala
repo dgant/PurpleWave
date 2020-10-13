@@ -1,6 +1,5 @@
 package Micro.Agency
 
-import Debugging.Visualizations.Views.Micro.ShowUnitsFriendly
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints, Tile}
 import Mathematics.PurpleMath
@@ -142,7 +141,7 @@ class Commander {
     autoUnburrow(unit)
     // Send some flying units past their destination to maximize acceleration
     var destination = to
-    var overshoot = if (unit.flying) 288.0 else 32
+    var overshoot = if (unit.flying && ! unit.unitClass.isTransport) 288.0 else 32
     if ((unit.flying || unit.is(Protoss.HighTemplar)) && unit.pixelDistanceSquared(to) < overshoot * overshoot) {
       destination = unit.pixelCenter.project(to, overshoot)
       if (destination == unit.pixelCenter) {

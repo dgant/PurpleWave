@@ -2,7 +2,7 @@ package Micro.Actions.Scouting
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Avoid
+import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Commands.Attack
 import Planning.UnitMatchers.UnitMatchProxied
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -27,6 +27,6 @@ object Sabotage extends Action {
       Attack.delegate(unit)
     }
 
-    Avoid.delegate(unit)
+    Retreat.delegate(unit)
   }
 }

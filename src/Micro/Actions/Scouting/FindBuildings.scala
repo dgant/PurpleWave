@@ -5,8 +5,9 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Physics.Gravity
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.{Avoid, Traverse}
+import Micro.Actions.Combat.Maneuvering.Traverse
 import Micro.Actions.Commands.Move
+import Micro.Coordination.Pathing.MicroPathing
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object FindBuildings extends AbstractFindBuildings {
@@ -69,7 +70,7 @@ abstract class AbstractFindBuildings extends Action {
     profile.costOccupancy       = 0.01f
     profile.costThreat          = 5
     profile.costRepulsion       = 0.4f
-    profile.repulsors           = Avoid.pathfindingRepulsion(unit)
+    profile.repulsors           = MicroPathing.getPathfindingRepulsors(unit)
     profile.lengthMaximum       = Some(20)
     profile.unit                = Some(unit)
     val path = profile.find

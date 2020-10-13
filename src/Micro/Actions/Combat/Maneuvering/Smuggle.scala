@@ -15,7 +15,7 @@ object Smuggle extends Action {
   
   override def perform(unit: FriendlyUnitInfo) {
     if (unit.matchups.threats.exists(_.framesBeforeAttacking(unit) < 24)) {
-      Avoid.delegate(unit)
+      Retreat.delegate(unit)
     }
     else if (unit.visibleToOpponents && unit.matchups.threats.nonEmpty) {
       val threatMagnitude = if (unit.matchups.threatsInRange.nonEmpty) 2.0 else 1.0

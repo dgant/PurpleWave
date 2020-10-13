@@ -1,7 +1,7 @@
 package Micro.Actions.Combat.Tactics
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Avoid
+import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Commands.Move
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -43,7 +43,7 @@ object Detect extends Action {
     if (unit.matchups.framesOfSafety <= 0 && spookiestSpooky.forall(s =>
       s.detected
       || (s.matchups.targetsInRange.isEmpty && s.matchups.threatsInRange.isEmpty))) {
-      Avoid.delegate(unit)
+      Retreat.delegate(unit)
     }
     else {
       Move.delegate(unit)

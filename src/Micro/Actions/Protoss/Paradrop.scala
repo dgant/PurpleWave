@@ -7,9 +7,10 @@ import Mathematics.Points.Tile
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Spiral
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.{Avoid, Traverse}
+import Micro.Actions.Combat.Maneuvering.{Retreat, Traverse}
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Commands.Attack
+import Micro.Coordination.Pathing.MicroPathing
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
@@ -87,7 +88,7 @@ object Paradrop extends Action {
 
     val targetDistance: Float = (unit.effectiveRangePixels + (if (unit.unitClass != Protoss.HighTemplar) unit.topSpeed * unit.cooldownLeft else 0)).toFloat / 32f
     val endDistanceMaximum = if (target.isDefined && unit.pixelDistanceCenter(target.get.pixelCenter) > targetDistance) targetDistance else 0
-    val repulsors = Avoid.pathfindingRepulsion(unit)
+    val repulsors = MicroPathing.getPathfindingRepulsors(unit)
     var path = NoPath.value
     var crossTerrainOptions = if (unit.matchups.threatsInRange.nonEmpty) Seq(true) else Seq(false, true)
     Seq(Some(0), Some(With.grids.enemyRangeGround.addedRange - 1), None).foreach(maximumThreat =>

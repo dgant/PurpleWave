@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Decisionmaking
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Avoid
+import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Brawl
 import Micro.Actions.Combat.Tactics.Potshot.PotshotTarget
 import Micro.Actions.Combat.Targeting.{Target, TargetInRange}
@@ -103,17 +103,17 @@ object DefaultCombat extends Action {
               threat.topSpeed < unit.topSpeed
               || threat.framesToGetInRange(unit) > framesToOpenGap
               || ( ! threat.inRangeToAttack(unit) && (threat.speedApproaching(unit) < 0 || threat.target.exists(_ != unit)))))) {
-          Avoid.consider(unit)
+          Retreat.consider(unit)
         }
 
         // BREATHE, sort of
         // TODO: Account for 2x 180 time
         if ( ! unit.readyForAttackOrder && tooCloseToThreat && excessDistanceFromTarget < -24) {
-          Avoid.consider(unit)
+          Retreat.consider(unit)
         }
       } else {
         // Don't IGNORE
-        Avoid.consider(unit)
+        Retreat.consider(unit)
       }
     }
 

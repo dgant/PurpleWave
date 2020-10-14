@@ -1,7 +1,6 @@
 package Mathematics.Physics
 
 import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
 
 object ForceMath {
 

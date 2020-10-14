@@ -1,11 +1,12 @@
-package Micro.Actions.Protoss.Carrier
+package Micro.Actions.Combat.Targeting.Filters
 
-import Micro.Actions.Combat.Targeting.Filters.TargetFilter
-import ProxyBwapi.Races.Terran
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-object CarrierTargetFilterShootsUp extends TargetFilter {
+object TargetFilterCarrierShootsUp extends TargetFilter {
   override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
+    if ( ! actor.is(Protoss.Carrier)) return true
+
     lazy val isRepairer = (
       target.is(Terran.SCV)
       && target.matchups.allies.exists(repairee =>

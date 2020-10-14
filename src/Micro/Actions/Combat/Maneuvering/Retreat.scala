@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Maneuvering
 
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Actions.Commands.{Gravitate, Move}
+import Micro.Actions.Commands.Move
 import Micro.Coordination.Pathing.{DesireProfile, MicroPathing}
 import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -64,7 +64,7 @@ object Retreat extends Action {
   def retreatForcePotential(unit: FriendlyUnitInfo, desire: DesireProfile): Unit = {
     if ( ! unit.ready) return
     MicroPathing.setRetreatPotentials(unit, desire)
-    Gravitate.delegate(unit)
+    MicroPathing.setDestinationUsingAgentForces(unit)
     Move.delegate(unit)
   }
 

@@ -10,7 +10,7 @@ import Lifecycle.With
 import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.PurpleMath
-import Micro.Heuristics.EvaluateTargets
+import Micro.Actions.Combat.Targeting.EvaluateTargets
 import Micro.Matchups.MatchupAnalysis
 import Performance.Cache
 import Planning.Plan

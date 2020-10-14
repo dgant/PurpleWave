@@ -1,35 +1,46 @@
-package Micro.Heuristics
+package Micro.Actions.Combat.Targeting
 
 import Lifecycle.With
 import Mathematics.PurpleMath
+import Micro.Actions.Combat.Targeting.Filters.TargetFilter
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
 object EvaluateTargets extends {
-  
-  def best(attacker: FriendlyUnitInfo, targets: Iterable[UnitInfo]): Option[UnitInfo] = {
-    val output = ByOption.maxBy(targets)(evaluate(attacker, _))
-    output
+  def legalTargets(unit: FriendlyUnitInfo, additionalFiltersRequired: TargetFilter*): Iterable[UnitInfo] = {
+    val filtersRequired = TargetFilterGroups.filtersRequired ++ additionalFiltersRequired
+    unit.matchups.targets.view.filter(target => filtersRequired.forall(_.legal(unit, target)))
   }
 
-  def audit(attacker: FriendlyUnitInfo, targets: Iterable[UnitInfo]): Seq[(UnitInfo, Double, Double)] = {
+  def preferredTargets(unit: FriendlyUnitInfo, additionalFiltersRequired: TargetFilter*): Seq[UnitInfo] = {
+    val filtersPreferred = TargetFilterGroups.filtersPreferred
+    val targetsRequired = legalTargets(unit).toVector
+    var output: Seq[UnitInfo] = Seq.empty
+    for (filtersOptionalToDrop <- 0 to filtersPreferred.length) {
+      if (output.isEmpty && unit.agent.toAttack.isEmpty) {
+        val filtersOptionalActive = filtersPreferred.drop(filtersOptionalToDrop)
+        output = targetsRequired.filter(target => filtersOptionalActive.forall(_.legal(unit, target)))
+      }
+    }
+    output
+  }
+  
+  def best(attacker: FriendlyUnitInfo, targets: Iterable[UnitInfo]): Option[UnitInfo] = ByOption.maxBy(targets)(evaluate(attacker, _))
+  def pick(attacker: FriendlyUnitInfo): Option[UnitInfo] = best(attacker, preferredTargets(attacker))
+
+  def auditLegality(unit: FriendlyUnitInfo, additionalFiltersRequired: TargetFilter*): Vector[(UnitInfo, Vector[(Boolean, TargetFilter)])] = {
+      unit.matchups.targets.map(target => (
+        target,
+        (TargetFilterGroups.filtersRequired ++ additionalFiltersRequired ++ TargetFilterGroups.filtersPreferred).map(filter =>
+          (filter.legal(unit, target), filter)).sortBy(_._1)))
+  }
+
+  def auditValue(attacker: FriendlyUnitInfo, targets: Iterable[UnitInfo]): Seq[(UnitInfo, Double, Double)] = {
     var output = targets.map(target => (target, target.baseTargetValue(), evaluate(attacker, target))).toVector
     output = output.sortBy(-_._3)
     output
   }
-
-  def participatingInCombat(target: UnitInfo): Boolean = (
-    target.matchups.targets.nonEmpty
-      || target.isAny(
-        Terran.Dropship,
-        Terran.Medic,
-        Terran.ScienceVessel,
-        Terran.SpiderMine,
-        Protoss.DarkArchon,
-        Protoss.HighTemplar,
-        Protoss.Shuttle,
-        Zerg.Defiler))
 
   def evaluate(attacker: FriendlyUnitInfo, target: UnitInfo): Double = {
     evaluateInner(attacker, target, recur = true)

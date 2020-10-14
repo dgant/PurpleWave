@@ -6,9 +6,10 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Brawl
 import Micro.Actions.Combat.Tactics.Potshot.PotshotTarget
-import Micro.Actions.Combat.Targeting.{Target, TargetInRange}
+import Micro.Actions.Combat.Targeting.Filters.TargetFilter
+import Micro.Actions.Combat.Targeting.{EvaluateTargets, Target, TargetFilterGroups, TargetInRange}
 import Micro.Actions.Commands.{Attack, Move}
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, LightYear}
 
 object DefaultCombat extends Action {
@@ -25,8 +26,39 @@ object DefaultCombat extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove || unit.canAttack
   override protected def perform(unit: FriendlyUnitInfo): Unit = micro(unit, unit.agent.shouldEngage)
 
+  class MicroContext(unit: FriendlyUnitInfo, shouldEngage: Boolean) {
+    def retarget(filters: TargetFilter*): Unit = {
+      target = EvaluateTargets.best(unit, EvaluateTargets.preferredTargets(unit, filters: _*))
+      unit.agent.toAttack = target
+    }
+
+    var target: Option[UnitInfo] = None
+
+    lazy val legalTargets = unit.matchups.targets.filter(t => TargetFilterGroups.filtersRequired.forall(_.legal(unit, t)))
+
+    // Decide how far from target/threat we want to be
+    lazy val idealPixelsFromTargetRange = if (target.exists(_.speedApproaching(unit) < 0)) -16d else 0d
+    lazy val idealPixelsFromThreatRange = 64 + Math.max(0, unit.effectiveRangePixels - ByOption.min(unit.matchups.allies.view.map(_.effectiveRangePixels)).getOrElse(unit.effectiveRangePixels)) / 4 // Induce sorting
+
+    // Decide how far from adjacent teammates we want to be
+    lazy val idealPixelsFromTeammatesCollision = if (unit.flying) 0 else unit.unitClass.dimensionMax / 2
+    lazy val idealPixelsFromTeammatesSplash = ByOption.max(unit.matchups.threats.view.map(_.unitClass).filter(_.dealsRadialSplashDamage).map(t => 1 + (if (unit.flying) t.airSplashRadius25 else t.groundSplashRadius25))).getOrElse(0)
+    lazy val idealPixelsFromTeammates = Math.max(idealPixelsFromTeammatesCollision, idealPixelsFromTeammatesSplash)
+
+    // Check how far from target/threat/teammate we are
+    lazy val currentPixelsFromThreatRange = ByOption.min(unit.matchups.threats.view.map(_.pixelsToGetInRange(unit))).getOrElse(LightYear().toDouble)
+    lazy val currentPixelsFromTargetRange = target.map(unit.pixelsToGetInRange).getOrElse(unit.pixelDistanceTravelling(unit.agent.destination))
+    lazy val currentPixelsFromTeammate = unit.matchups.allies.view.map(_.pixelDistanceEdge(unit))
+
+    lazy val missingDistanceFromThreat = idealPixelsFromThreatRange - currentPixelsFromThreatRange
+    lazy val excessDistanceFromTarget = currentPixelsFromTargetRange - idealPixelsFromTargetRange
+    lazy val tooCloseToThreat = missingDistanceFromThreat >= 0
+    lazy val tooFarFromTarget = excessDistanceFromTarget > 0
+  }
+
   protected def micro(unit: FriendlyUnitInfo, shouldEngage: Boolean): Unit = {
-    def target = { unit.agent.toAttack }
+    val context = new MicroContext(unit, shouldEngage)
+
     def simplePotshot(): Boolean = {
       val oldToAttack = unit.agent.toAttack
       unit.agent.toAttack = None
@@ -60,24 +92,6 @@ object DefaultCombat extends Action {
     // then pick best target given filters
     Target.consider(unit)
 
-    // Decide how far from target/threat we want to be
-    val idealPixelsFromTargetRange = if (target.exists(_.speedApproaching(unit) < 0)) -16d else 0d
-    val idealPixelsFromThreatRange = 64 + Math.max(0, unit.effectiveRangePixels - ByOption.min(unit.matchups.allies.view.map(_.effectiveRangePixels)).getOrElse(unit.effectiveRangePixels)) / 4 // Induce sorting
-
-    // Decide how far from adjacent teammates we want to be
-    val idealPixelsFromTeammatesCollision = if (unit.flying) 0 else unit.unitClass.dimensionMax / 2
-    val idealPixelsFromTeammatesSplash = ByOption.max(unit.matchups.threats.view.map(_.unitClass).filter(_.dealsRadialSplashDamage).map(t => 1 + (if (unit.flying) t.airSplashRadius25 else t.groundSplashRadius25))).getOrElse(0)
-    val idealPixelsFromTeammates = Math.max(idealPixelsFromTeammatesCollision, idealPixelsFromTeammatesSplash)
-
-    // Check how far from target/threat/teammate we are
-    val currentPixelsFromThreatRange = ByOption.min(unit.matchups.threats.view.map(_.pixelsToGetInRange(unit))).getOrElse(LightYear().toDouble)
-    val currentPixelsFromTargetRange = target.map(unit.pixelsToGetInRange).getOrElse(unit.pixelDistanceTravelling(unit.agent.destination))
-    val currentPixelsFromTeammate = unit.matchups.allies.view.map(_.pixelDistanceEdge(unit))
-
-    val missingDistanceFromThreat = idealPixelsFromThreatRange - currentPixelsFromThreatRange
-    val excessDistanceFromTarget = currentPixelsFromTargetRange - idealPixelsFromTargetRange
-    val tooCloseToThreat = missingDistanceFromThreat >= 0
-    val tooFarFromTarget = excessDistanceFromTarget > 0
 
     if (Brawl.consider(unit)) return
 
@@ -86,15 +100,15 @@ object DefaultCombat extends Action {
 
     // Back up if we need to
     // TODO: Bump when avoiding
-    if (tooCloseToThreat) {
+    if (context.tooCloseToThreat) {
       if (shouldEngage) {
         // BREATHE
         // TODO
 
         // ABUSE/BREATHE
-        lazy val framesToOpenGap = PurpleMath.nanToInfinity(missingDistanceFromThreat / unit.topSpeed)
-        if (excessDistanceFromTarget < -24
-          && idealPixelsFromTargetRange > idealPixelsFromThreatRange
+        lazy val framesToOpenGap = PurpleMath.nanToInfinity(context.missingDistanceFromThreat / unit.topSpeed)
+        if (context.excessDistanceFromTarget < -24
+          && context.idealPixelsFromTargetRange > context.idealPixelsFromThreatRange
           && (
             // Breathe
             ! unit.readyForAttackOrder
@@ -108,7 +122,7 @@ object DefaultCombat extends Action {
 
         // BREATHE, sort of
         // TODO: Account for 2x 180 time
-        if ( ! unit.readyForAttackOrder && tooCloseToThreat && excessDistanceFromTarget < -24) {
+        if ( ! unit.readyForAttackOrder && context.tooCloseToThreat && context.excessDistanceFromTarget < -24) {
           Retreat.consider(unit)
         }
       } else {
@@ -130,7 +144,7 @@ object DefaultCombat extends Action {
 
     // CHARGE
     // TODO: Nudge when attacking something out of range or attacking
-    if (shouldEngage || target.exists(unit.inRangeToAttack)) {
+    if (shouldEngage || context.target.exists(unit.inRangeToAttack)) {
       Attack.consider(unit)
     }
 

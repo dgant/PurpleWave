@@ -4,7 +4,7 @@ import Debugging.Visualizations.Views.Battles.ShowBattle
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
-import Micro.Heuristics.EvaluateTargets
+import Micro.Actions.Combat.Targeting.EvaluateTargets
 import Planning.UnitMatchers.UnitMatchRecruitableForCombat
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Zerg

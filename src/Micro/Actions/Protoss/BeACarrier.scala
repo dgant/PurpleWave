@@ -2,6 +2,7 @@ package Micro.Actions.Protoss
 
 import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Commands.{Attack, AttackMove}
 import Micro.Actions.Protoss.Carrier._
 import ProxyBwapi.Races.{Protoss, Terran}
@@ -68,7 +69,7 @@ object BeACarrier extends Action {
         }
       }
       else {
-        CarrierTarget.consider(unit)
+        Target.consider(unit)
         if (safeFromThreats && interceptorsActive) {
           CarrierChase.consider(unit)
         }

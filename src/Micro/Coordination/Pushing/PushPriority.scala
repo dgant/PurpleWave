@@ -10,6 +10,7 @@ object PushPriority {
     nextValue - 1
   }
 
+  val None = next // No push
   val Pardon = next // Trying to walk here
   val Nudge = next  // Trying to get into the fight
   val Bump = next  // Trying to retreat

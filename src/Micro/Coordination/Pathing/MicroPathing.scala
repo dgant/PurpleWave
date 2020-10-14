@@ -5,7 +5,7 @@ import Information.Geography.Pathfinding.Types.TilePath
 import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
-import Mathematics.Points.PixelRay
+import Mathematics.Points.{Pixel, PixelRay}
 import Mathematics.PurpleMath
 import Micro.Actions.Commands.Move
 import Micro.Coordination.Pushing.Push
@@ -16,24 +16,42 @@ import Utilities.TakeN
 
 object MicroPathing {
 
-  def getRealPath(unit: FriendlyUnitInfo, desire: DesireProfile): TilePath = {
+  def getRealPath(unit: FriendlyUnitInfo, desire: DesireProfile): MicroPath = {
     val pathLengthMinimum = 7
-    val maximumDistance = PurpleMath.clamp((unit.matchups.framesOfEntanglement * unit.topSpeed + unit.effectiveRangePixels).toInt / 32, pathLengthMinimum, 15)
-    val profile = new PathfindProfile(unit.tileIncludingCenter)
-    profile.end                 = if (desire.home > 0) Some(unit.agent.origin.tileIncluding) else None
-    profile.lengthMinimum       = Some(pathLengthMinimum)
-    profile.lengthMaximum       = Some(maximumDistance)
-    profile.threatMaximum       = Some(0)
-    profile.canCrossUnwalkable  = unit.flying || unit.transport.exists(_.flying)
-    profile.allowGroundDist     = true
-    profile.costOccupancy       = if (profile.canCrossUnwalkable) 0f else 3f
-    profile.costThreat          = 6f
-    profile.costRepulsion       = 2.5f
-    profile.repulsors           = getPathfindingRepulsors(unit)
-    profile.unit = Some(unit)
-    profile.find
+
+    val output                                    = new MicroPath(unit)
+    output.desire                                 = Some(desire)
+    output.pathfindProfile                        = Some(new PathfindProfile(unit.tileIncludingCenter))
+    output.pathfindProfile.get.end                = if (output.desire.get.home > 0) Some(unit.agent.origin.tileIncluding) else None
+    output.pathfindProfile.get.lengthMinimum      = Some(pathLengthMinimum)
+    output.pathfindProfile.get.lengthMaximum      = Some(PurpleMath.clamp((unit.matchups.framesOfEntanglement * unit.topSpeed + unit.effectiveRangePixels).toInt / 32, pathLengthMinimum, 15))
+    output.pathfindProfile.get.threatMaximum      = Some(0)
+    output.pathfindProfile.get.canCrossUnwalkable = unit.flying || unit.transport.exists(_.flying)
+    output.pathfindProfile.get.allowGroundDist    = true
+    output.pathfindProfile.get.costOccupancy      = if (output.pathfindProfile.get.canCrossUnwalkable) 0f else 3f
+    output.pathfindProfile.get.costThreat         = 6f
+    output.pathfindProfile.get.costRepulsion      = 2.5f
+    output.pathfindProfile.get.repulsors          = getPathfindingRepulsors(unit)
+    output.pathfindProfile.get.unit               = Some(unit)
+    output.tilePath                               = Some(output.pathfindProfile.get.find)
+    output.to                                     = getWaypointAlongTilePath(output.tilePath.get)
+    output
   }
 
+  def getWaypointAlongTilePath(path: TilePath): Option[Pixel] = {
+    // Moving 5 tiles ahead was the recommendation from McRave.
+    // It avoids trying to move units immediately to the other side of a building,
+    // which can cause them to get stuck against that building.
+    if (path.pathExists) Some(path.tiles.get.take(5).last.pixelCenter) else None
+  }
+
+  def tryMovingAlongTilePath(unit: FriendlyUnitInfo, path: TilePath): Unit = {
+    val waypoint = getWaypointAlongTilePath(path)
+    waypoint.foreach(pixel => {
+      unit.agent.toTravel = waypoint
+      Move.delegate(unit)
+    })
+  }
 
   def getPathfindingRepulsors(unit: FriendlyUnitInfo, maxThreats: Int = 10): IndexedSeq[PathfindRepulsor] = {
     TakeN
@@ -105,16 +123,18 @@ object MicroPathing {
     Some(ForceMath.sumAll(forceSafety.normalize, forceSpacing))
   }
 
+  def combinePushForces(pushForces: Seq[(Push, Force)]): Force = {
+    if (pushForces.isEmpty) return new Force
+    val highestPriority = pushForces.view.map(_._1.priority).max
+    pushForces.filter(_._1.priority == highestPriority).map(_._2).reduce(_ + _)
+  }
+
   def getPushForces(unit: FriendlyUnitInfo): Seq[(Push, Force)] = {
     With.coordinator.pushes.get(unit).map(p => (p, p.force(unit))).filter(_._2.exists(_.lengthSquared > 0)).map(p => (p._1, p._2.get))
   }
 
-  def getPushForce(unit: FriendlyUnitInfo, minPriority: Int = -1): Option[Force] = {
-    val pushedForces = getPushForces(unit).filter(_._1.priority >= minPriority)
-    if (pushedForces.isEmpty) return None
-    val forces = pushedForces.map(p => p._2 * Math.pow(2, p._1.priority))
-    val output = ForceMath.sum(forces).normalize
-    Some(output)
+  def getPushForce(unit: FriendlyUnitInfo): Force = {
+    combinePushForces(getPushForces(unit))
   }
 
   def applyDirectForce(unit: FriendlyUnitInfo, desire: DesireProfile, force: Force): Unit = {
@@ -212,4 +232,6 @@ object MicroPathing {
       })
     }
   }
+
+
 }

@@ -7,7 +7,6 @@ import Mathematics.Points.Tile
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Spiral
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Traverse
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Commands.Attack
 import Micro.Coordination.Pathing.MicroPathing
@@ -110,7 +109,7 @@ object Paradrop extends Action {
     )
     if (path.pathExists) {
       unit.agent.toTravel = Some(path.end.pixelCenter)
-      new Traverse(path).delegate(unit)
+      MicroPathing.tryMovingAlongTilePath(unit, path)
     } else {
       Manners.debugChat(f"Failed to path $unit to $destinationGround")
       Manners.debugChat(f"Targeting $target")

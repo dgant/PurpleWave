@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Basic.MineralWalk
-import Micro.Actions.Combat.Maneuvering.{Retreat, Traverse}
+import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Commands.{Attack, Move}
 import Micro.Coordination.Pathing.MicroPathing
 import Planning.UnitMatchers.UnitMatchWorkers
@@ -244,7 +244,7 @@ object Tickle extends Action {
       profile.repulsors = MicroPathing.getPathfindingRepulsors(tickler)
       profile.unit = Some(tickler)
       val path = profile.find
-      new Traverse(path).delegate(tickler)
+      MicroPathing.tryMovingAlongTilePath(tickler, path)
     }
 
     // Mineral walk

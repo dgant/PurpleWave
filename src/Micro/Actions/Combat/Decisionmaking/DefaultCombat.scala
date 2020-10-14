@@ -7,8 +7,10 @@ import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Brawl
 import Micro.Actions.Combat.Tactics.Potshot.PotshotTarget
 import Micro.Actions.Combat.Targeting.Filters.TargetFilter
-import Micro.Actions.Combat.Targeting.{EvaluateTargets, Target, TargetFilterGroups, TargetInRange}
+import Micro.Actions.Combat.Targeting.{EvaluateTargets, TargetInRange}
 import Micro.Actions.Commands.{Attack, Move}
+import Micro.Coordination.Pathing.MicroPathing
+import Micro.Coordination.Pushing.PushPriority
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, LightYear}
 
@@ -26,15 +28,16 @@ object DefaultCombat extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove || unit.canAttack
   override protected def perform(unit: FriendlyUnitInfo): Unit = micro(unit, unit.agent.shouldEngage)
 
-  class MicroContext(unit: FriendlyUnitInfo, shouldEngage: Boolean) {
+  class MicroContext(val unit: FriendlyUnitInfo, val shouldEngage: Boolean) {
     def retarget(filters: TargetFilter*): Unit = {
-      target = EvaluateTargets.best(unit, EvaluateTargets.preferredTargets(unit, filters: _*))
-      unit.agent.toAttack = target
+      // TODO: Evaluate all targets once and cache values,
+      // then pick best target given custom filters
+      unit.agent.toAttack = EvaluateTargets.best(unit, EvaluateTargets.preferredTargets(unit, filters: _*))
     }
+    private def target: Option[UnitInfo] = unit.agent.toAttack
 
-    var target: Option[UnitInfo] = None
-
-    lazy val legalTargets = unit.matchups.targets.filter(t => TargetFilterGroups.filtersRequired.forall(_.legal(unit, t)))
+    lazy val pushes = With.coordinator.pushes.get(unit).map(p => (p, p.force(unit))).sortBy(-_._1.priority)
+    lazy val pushPriority = ByOption.max(pushes.view.map(_._1.priority)).getOrElse(PushPriority.None)
 
     // Decide how far from target/threat we want to be
     lazy val idealPixelsFromTargetRange = if (target.exists(_.speedApproaching(unit) < 0)) -16d else 0d
@@ -54,44 +57,77 @@ object DefaultCombat extends Action {
     lazy val excessDistanceFromTarget = currentPixelsFromTargetRange - idealPixelsFromTargetRange
     lazy val tooCloseToThreat = missingDistanceFromThreat >= 0
     lazy val tooFarFromTarget = excessDistanceFromTarget > 0
+
+    lazy val purring = (unit.unitClass.isTerran && unit.unitClass.isMechanical && unit.matchups.allies.exists(a => a.repairing && a.orderTarget.contains(unit)))
+  }
+
+  def simplePotshot(context: MicroContext): Boolean = {
+    val oldToAttack = context.unit.agent.toAttack
+    context.unit.agent.toAttack = None
+    // TODO: Handle extant targets
+    PotshotTarget.delegate(context.unit)
+    Attack.delegate(context.unit)
+    context.unit.agent.toAttack = context.unit.agent.toAttack.orElse(oldToAttack)
+    ! context.unit.ready
+  }
+
+  def propagatePush(context: MicroContext): Unit = {
+    // TODO
+    // Push along our expected path with the same priority
+    //
+    // Signal occupancy along expected path
+    // path.tiles.get.foreach(With.coordinator.gridPathOccupancy.addUnit(unit, _))
+  }
+
+  def followPush(context: MicroContext): Unit = {
+    val force = MicroPathing.getPushForce(context.unit)
+
+  }
+
+  def aimInPlace(context: MicroContext): Unit = {
+    TargetInRange.delegate(context.unit)
+    Attack.delegate(context.unit)
+    With.commander.hold(context.unit)
   }
 
   protected def micro(unit: FriendlyUnitInfo, shouldEngage: Boolean): Unit = {
     val context = new MicroContext(unit, shouldEngage)
 
-    def simplePotshot(): Boolean = {
-      val oldToAttack = unit.agent.toAttack
-      unit.agent.toAttack = None
-      PotshotTarget.delegate(unit)
-      Attack.delegate(unit)
-      unit.agent.toAttack = unit.agent.toAttack.orElse(oldToAttack)
-      ! unit.ready
-    }
-
     // AIM: If we can't move, just fire at a target
-    // PURR: If we're getting repaired, stand still and enjoy
-    lazy val purring = (unit.unitClass.isTerran && unit.unitClass.isMechanical && unit.matchups.allies.exists(a => a.repairing && a.orderTarget.contains(unit)))
-    if ( ! unit.canMove || purring) {
-      TargetInRange.delegate(unit)
-      Attack.delegate(unit)
-      With.commander.sleep(unit)
+    if ( ! unit.canMove) {
+      aimInPlace(context)
       return
     }
 
-    // Explosions: Dodge them
-    // TODO
+    // DODGE: Avoid explosions
+    if (context.pushPriority >= PushPriority.Dodge) {
+      followPush(context)
+      return
+    }
 
     // Shoves: Follow and propagate them
-    // TODO
+    if (context.pushPriority >= PushPriority.Dodge) {
+      // TODO: Do we actually want to follow the shove?
+      // Maybe the push is sending us where we want to go anyway,
+      // or the push is coming from a less important unit
+      // or the push is from a less-engaged unit in the previous agent cycle
+      // *Decide* whether pushing changes our behavior
+      if (simplePotshot(context)) return
+      followPush(context)
+      return
+    }
+
+    // PURR: If we're getting repaired, stand still and let it happen
+    if (context.purring) {
+      aimInPlace(context)
+      return
+    }
 
     // Fliers: Use group formation
     // TODO
 
     // Evaluate potential attacks
-    // TODO: Evaluate all targets once and cache values,
-    // then pick best target given filters
-    Target.consider(unit)
-
+    context.retarget()
 
     if (Brawl.consider(unit)) return
 
@@ -144,7 +180,8 @@ object DefaultCombat extends Action {
 
     // CHARGE
     // TODO: Nudge when attacking something out of range or attacking
-    if (shouldEngage || context.target.exists(unit.inRangeToAttack)) {
+    // TODO: Find position to shoot when distant
+    if (shouldEngage || unit.agent.toAttack.exists(unit.inRangeToAttack)) {
       Attack.consider(unit)
     }
 

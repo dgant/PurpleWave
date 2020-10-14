@@ -76,7 +76,7 @@ class ForeignUnitTracker {
   }
   
   private def updateMissing(unit: ForeignUnitInfo) {
-  
+    // TODO: Remove units we've mind controlled
     if (unit.visible)                                              return
     if ( ! unit.possiblyStillThere)                                return
     if (unit.lastSeen > With.grids.friendlyVision.frameUpdated)    return

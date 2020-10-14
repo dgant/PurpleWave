@@ -5,7 +5,6 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Physics.Gravity
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Traverse
 import Micro.Actions.Commands.Move
 import Micro.Coordination.Pathing.MicroPathing
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -75,7 +74,7 @@ abstract class AbstractFindBuildings extends Action {
     profile.unit                = Some(unit)
     val path = profile.find
     unit.agent.toTravel = Some(tileToScout.pixelCenter)
-    new Traverse(path).delegate(unit)
+    MicroPathing.tryMovingAlongTilePath(unit, path)
     Move.delegate(unit)
   }
 }

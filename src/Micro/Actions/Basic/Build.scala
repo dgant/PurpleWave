@@ -4,9 +4,9 @@ import Lifecycle.With
 import Mathematics.Points.Tile
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
-import Micro.Actions.Combat.Maneuvering.Traverse
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Commands.{Attack, Move}
+import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.{CircularPush, PushPriority}
 import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.Zerg
@@ -96,7 +96,7 @@ object Build extends Action {
       val profile = With.paths.profileDistance(unit.tileIncludingCenter, movePixel.tileIncluding)
       profile.allowGroundDist = true
       val path = profile.find
-      new Traverse(path).delegate(unit)
+      MicroPathing.tryMovingAlongTilePath(unit, path)
     }
 
     Move.delegate(unit)

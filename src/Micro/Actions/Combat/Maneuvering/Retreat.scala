@@ -58,7 +58,7 @@ object Retreat extends Action {
   def retreatRealPath(unit: FriendlyUnitInfo, desire: DesireProfile): Unit = {
     if ( ! unit.ready) return
     val path = MicroPathing.getRealPath(unit, desire)
-    new Traverse(path).delegate(unit)
+    path.tilePath.foreach(MicroPathing.tryMovingAlongTilePath(unit, _))
   }
 
   def retreatForcePotential(unit: FriendlyUnitInfo, desire: DesireProfile): Unit = {

@@ -3,7 +3,7 @@ package Micro.Actions.Commands
 import Information.Geography.Pathfinding.PathfindProfile
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Traverse
+import Micro.Coordination.Pathing.MicroPathing
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Strategery.MapGroups
 
@@ -31,8 +31,7 @@ object Move extends Action {
             profile.allowGroundDist     = true
             profile.unit = Some(unit)
         val path = profile.find
-        val traverse = new Traverse(path)
-        traverse.consider(unit)
+        MicroPathing.tryMovingAlongTilePath(unit, path)
       }
     }
     

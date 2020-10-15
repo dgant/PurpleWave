@@ -1,6 +1,5 @@
 package Information.Geography.Pathfinding
 
-import Debugging.Visualizations.Views.Micro.ShowUnitPaths
 import Information.Geography.Pathfinding.Types.TilePath
 import Information.Grids.Combat.AbstractGridEnemyRange
 import Lifecycle.With
@@ -124,16 +123,6 @@ trait TilePathfinder {
     costSoFar + costDistance + costThreat + costOccupancy + costRepulsion.toFloat
   }
 
-  @inline private final def drawOutput(profile: PathfindProfile, value: TilePath): Unit = {
-    if (ShowUnitPaths.mapInUse && profile.unit.exists(u => u.selected || u.transport.exists(_.selected))) {
-      profile.unit.foreach(unit =>
-        unit.agent.pathBranches = tiles
-          .view
-          .filter(t => t.enqueued && t.cameFrom.isDefined)
-          .map(t => (t.cameFrom.get.pixelCenter, t.tile.pixelCenter)))
-    }
-  }
-
   // The A* admissable heuristic: The lowest possible cost to the end of the path.
   // In common parlance, this is h()
   //
@@ -219,7 +208,6 @@ trait TilePathfinder {
           bestTile,
           costFromStart(profile, bestTileState.tile, threatGrid),
           Some(assemblePath(bestTileState)))
-        drawOutput(profile, output)
         return output
       }
 

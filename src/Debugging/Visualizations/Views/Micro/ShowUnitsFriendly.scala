@@ -118,10 +118,7 @@ object ShowUnitsFriendly extends View {
             Colors.White)
         }
       }
-      agent.pathBranches.foreach(pair => DrawMap.arrow(pair._1, pair._2, Colors.NeonBlue))
-      agent.path.foreach(drawTilePath)
-      agent.pathsAll.foreach(drawRayPath(_, Colors.BrightBlue))
-      agent.pathsAcceptable.foreach(drawRayPath(_, Colors.BrightYellow))
+      // TODO: Invoke this
     }
     
     if (showForces) {

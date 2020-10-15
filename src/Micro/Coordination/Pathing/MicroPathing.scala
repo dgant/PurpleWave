@@ -17,24 +17,31 @@ import Utilities.TakeN
 object MicroPathing {
 
   def getRealPath(unit: FriendlyUnitInfo, desire: DesireProfile): MicroPath = {
+    // TODO: It's dumb that this ONLY uses desire.home
     val pathLengthMinimum = 7
+    val pathfindProfile                     = new PathfindProfile(unit.tileIncludingCenter)
+    pathfindProfile.end                 = if (desire.home > 0) Some(unit.agent.origin.tileIncluding) else None
+    pathfindProfile.lengthMinimum       = Some(pathLengthMinimum)
+    pathfindProfile.lengthMaximum       = Some(PurpleMath.clamp((unit.matchups.framesOfEntanglement * unit.topSpeed + unit.effectiveRangePixels).toInt / 32, pathLengthMinimum, 15))
+    pathfindProfile.threatMaximum       = Some(0)
+    pathfindProfile.canCrossUnwalkable  = unit.flying || unit.transport.exists(_.flying)
+    pathfindProfile.allowGroundDist     = true
+    pathfindProfile.costOccupancy       = if (pathfindProfile.canCrossUnwalkable) 0f else 3f
+    pathfindProfile.costThreat          = 6f
+    pathfindProfile.costRepulsion       = 2.5f
+    pathfindProfile.repulsors           = getPathfindingRepulsors(unit)
+    pathfindProfile.unit                = Some(unit)
 
-    val output                                    = new MicroPath(unit)
-    output.desire                                 = Some(desire)
-    output.pathfindProfile                        = Some(new PathfindProfile(unit.tileIncludingCenter))
-    output.pathfindProfile.get.end                = if (output.desire.get.home > 0) Some(unit.agent.origin.tileIncluding) else None
-    output.pathfindProfile.get.lengthMinimum      = Some(pathLengthMinimum)
-    output.pathfindProfile.get.lengthMaximum      = Some(PurpleMath.clamp((unit.matchups.framesOfEntanglement * unit.topSpeed + unit.effectiveRangePixels).toInt / 32, pathLengthMinimum, 15))
-    output.pathfindProfile.get.threatMaximum      = Some(0)
-    output.pathfindProfile.get.canCrossUnwalkable = unit.flying || unit.transport.exists(_.flying)
-    output.pathfindProfile.get.allowGroundDist    = true
-    output.pathfindProfile.get.costOccupancy      = if (output.pathfindProfile.get.canCrossUnwalkable) 0f else 3f
-    output.pathfindProfile.get.costThreat         = 6f
-    output.pathfindProfile.get.costRepulsion      = 2.5f
-    output.pathfindProfile.get.repulsors          = getPathfindingRepulsors(unit)
-    output.pathfindProfile.get.unit               = Some(unit)
-    output.tilePath                               = Some(output.pathfindProfile.get.find)
-    output.to                                     = getWaypointAlongTilePath(output.tilePath.get)
+    val output = getRealPath(unit, pathfindProfile)
+    output.desire = Some(desire)
+    output
+  }
+
+  def getRealPath(unit: FriendlyUnitInfo, pathfindProfile: PathfindProfile): MicroPath = {
+    val output              = new MicroPath(unit)
+    output.pathfindProfile  = Some(pathfindProfile)
+    output.tilePath         = Some(pathfindProfile.find)
+    output.to               = getWaypointAlongTilePath(output.tilePath.get)
     output
   }
 
@@ -137,17 +144,27 @@ object MicroPathing {
     combinePushForces(getPushForces(unit))
   }
 
-  def applyDirectForce(unit: FriendlyUnitInfo, desire: DesireProfile, force: Force): Unit = {
+  @deprecated
+  def tryDirectRetreat(unit: FriendlyUnitInfo, desire: DesireProfile, radians: Double): Unit = {
+    val directPath = findDirectPath(unit, desire, radians)
+    if (directPath.isDefined) {
+      unit.agent.toTravel = Some(directPath.get)
+      Move.delegate(unit)
+    }
+  }
+
+  def findDirectPath(unit: FriendlyUnitInfo, desire: DesireProfile, radians: Double): Option[Pixel] = {
     val pathLength = 64 + unit.matchups.pixelsOfEntanglement
     val stepSize = Math.min(pathLength, Math.max(64, unit.topSpeed * With.reaction.agencyMax))
     val origin = unit.agent.origin
 
-    // Find a walkable path
+    // Find a traversable path
     val rotationSteps = 4
+    var output: Option[Pixel] = None
     (1 to 1 + 2 * rotationSteps).foreach(r => {
-      if (unit.ready) {
+      if (output.isEmpty) {
         val rotationRadians = ((r % 2) * 2 - 1) * (r / 2) * Math.PI / 3 / rotationSteps
-        val ray = PixelRay(unit.pixelCenter, unit.pixelCenter.radiateRadians(force.radians + rotationRadians, pathLength))
+        val ray = PixelRay(unit.pixelCenter, unit.pixelCenter.radiateRadians(radians + rotationRadians, pathLength))
         val destination = ray.to
         // Verify validity of the path
         if (destination.valid) {
@@ -157,15 +174,15 @@ object MicroPathing {
               // Verify that it gets us away from threats
               // Compare distance to a tiny incremental step so it rejects walking through enemies
               if (unit.matchups.threats.forall(threat => threat.pixelDistanceSquared(unit.pixelCenter) < threat.pixelDistanceSquared(unit.pixelCenter.project(destination, 16)))) {
-                ray.tilesIntersected.foreach(With.coordinator.gridPathOccupancy.addUnit(unit, _))
-                unit.agent.toTravel = Some(unit.pixelCenter.project(destination, stepSize)) // Use smaller step size to use direct line travel instead of BW's 8-directional long distance moves
-                Move.delegate(unit)
+                // Use smaller step size to use direct line travel instead of BW's 8-directional long distance moves
+                output = Some(unit.pixelCenter.project(destination, stepSize))
               }
             }
           }
         }
       }
     })
+    output
   }
 
   def setDestinationUsingAgentForces(unit: FriendlyUnitInfo) {
@@ -216,9 +233,6 @@ object MicroPathing {
 
     val pathAccepted = pathsTruncated.maxBy(ray => ray.length * (1.0 + Math.cos(ray.radians - forceRadians)))
     val commandPixel = unit.pixelCenter.project(pathAccepted.to, minDistance)
-    unit.agent.pathsAll = paths
-    unit.agent.pathsTruncated = pathsTruncated
-    unit.agent.pathsAcceptable = Vector(pathAccepted)
     unit.agent.toTravel = Some(commandPixel)
 
     if (!unit.flying) {

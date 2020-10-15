@@ -21,7 +21,8 @@ object Move extends Action {
     if ( ! With.performance.danger && MapGroups.needCustomPathing.exists(_.matches)) {
       lazy val tileToMove = pixelToMove.nearestWalkableTerrain
       if ( ! unit.flying
-        && unit.agent.path.isEmpty
+        // TODO: Don't re-path!
+        //&& unit.agent.path.isEmpty
         && unit.pixelDistanceTravelling(tileToMove) > 128 + unit.pixelDistanceCenter(pixelToMove)) {
          val profile = new PathfindProfile(unit.tileIncludingCenter)
             profile.end                 = Some(tileToMove)

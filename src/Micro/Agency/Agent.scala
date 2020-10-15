@@ -1,11 +1,10 @@
 
 package Micro.Agency
 
-import Information.Geography.Pathfinding.PathfindProfile
-import Information.Geography.Pathfinding.Types.{TilePath, ZonePath}
+import Information.Geography.Pathfinding.Types.ZonePath
 import Lifecycle.With
 import Mathematics.Physics.Force
-import Mathematics.Points.{Pixel, PixelRay, Tile}
+import Mathematics.Points.{Pixel, Tile}
 import Micro.Actions.{Action, Idle}
 import Performance.Cache
 import Planning.Plan
@@ -104,48 +103,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   var lastAction  : Option[Action]  = None
 
   var movingTo        : Option[Pixel]         = None
-  var path            : Option[TilePath]      = None
-  var pathBranches    : Seq[(Pixel, Pixel)]   = Seq.empty
-  var pathsAll        : Traversable[PixelRay] = Seq.empty
-  var pathsTruncated  : Traversable[PixelRay] = Seq.empty
-  var pathsAcceptable : Traversable[PixelRay] = Seq.empty
-  var pathAccepted    : Traversable[PixelRay] = Seq.empty
-
-  def focusPath: TilePath = {
-    refreshFocusPath()
-    focusPathCache()
-  }
-  def focusPathSteps: Seq[Tile] = {
-    focusPathStepsCache()
-  }
-  private def refreshFocusPath(): Unit = {
-    val destinationTile = destination.tileIncluding
-    if ( ! focusPathGoal.contains(destinationTile)) {
-      focusPathCache.invalidate()
-    }
-    focusPathGoal = Some(destinationTile)
-  }
-  private var focusPathGoal: Option[Tile] = None
-  private val focusPathCache = new Cache[TilePath](() => {
-    val profile = new PathfindProfile(unit.tileIncludingCenter)
-    profile.end                 = focusPathGoal
-    profile.canCrossUnwalkable  = unit.flying || unit.transport.exists(_.flying)
-    profile.allowGroundDist     = true
-    profile.costEnemyVision     = 1f
-    profile.costThreat          = 2f
-    profile.unit = Some(unit)
-    profile.find
-  })
-  val focusPathStepSize: Int = 6
-  val focusPathStepSizeSqrt2: Double = focusPathStepSize * Math.sqrt(2)
-  private val focusPathStepsCache = new Cache[Seq[Tile]](() => {
-    val path = focusPathCache()
-    if (path.tiles.isEmpty) {
-      Seq.empty
-    } else {
-      path.tiles.get.view.zipWithIndex.filter(_._2 % focusPathStepSize == 0).map(_._1)
-    }
-  })
 
   val actionsPerformed: ArrayBuffer[Action] = new ArrayBuffer[Action]()
   
@@ -169,14 +126,7 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   private def resetState() {
     forces.clear()
-    movingTo            = None
-    path                = None
-    pathBranches        = Seq.empty
-    pathsAll            = Seq.empty
-    pathsTruncated      = Seq.empty
-    pathsAcceptable     = Seq.empty
-    pathAccepted        = Seq.empty
-    focusPathGoal       = None
+    movingTo = None
     cachedZonePath.clear()
     fightReason = ""
     actionsPerformed.clear()

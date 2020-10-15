@@ -10,12 +10,8 @@ object TargetFilterFocus extends TargetFilter {
     || actor.base.exists(b => b.owner.isEnemy && actor.matchups.threats.forall(_.unitClass.isWorker))
     || actor.inRangeToAttack(target)
     || (target.canAttack(actor) && target.inRangeToAttack(actor))
-    || actor.agent.focusPathSteps.exists(tile =>
-      target.pixelDistanceCenter(tile.pixelCenter)
-      < Math.max(
-          actor.pixelRangeAgainst(target),
-          if (target.canAttack(actor)) target.pixelRangeAgainst(actor) else 0)
-      + 32 * actor.agent.focusPathStepSize)
     || target.interceptors.exists(legal(actor, _))
+    // TODO: This logic was modified untested when replacing micro code and removing "focus paths"
+    || (if (actor.flying) actor.pixelToFireAt(target).pixelDistance(actor.agent.destination) else actor.pixelToFireAt(target).nearestWalkableTerrain.groundPixels(actor.agent.destination)) <= actor.pixelDistanceTravelling(actor.agent.destination)
   )
 }

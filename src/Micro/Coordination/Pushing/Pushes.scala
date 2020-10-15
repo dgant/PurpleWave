@@ -50,6 +50,12 @@ class Pushes {
   }
 
   def addExplosions(): Unit = {
+    // TODO:
+    // - Disruption Web
+    // - Dark Swarm
+    // - Scourge
+    // - Splash radii?
+
     With.bullets.all.foreach(bullet =>
       bullet.bulletType match {
         case BulletType.EMP_Missile         => put(new ExplosionEMP(bullet))

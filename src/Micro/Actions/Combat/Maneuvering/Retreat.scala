@@ -52,7 +52,7 @@ object Retreat extends Action {
   def retreatForceDirect(unit: FriendlyUnitInfo, desire: DesireProfile): Unit = {
     if ( ! unit.ready) return
     val force = MicroPathing.getAvoidDirectForce(unit, desire)
-    force.foreach(MicroPathing.applyDirectForce(unit, desire, _))
+    force.foreach(f => MicroPathing.tryDirectRetreat(unit, desire, f.radians))
   }
 
   def retreatRealPath(unit: FriendlyUnitInfo, desire: DesireProfile): Unit = {

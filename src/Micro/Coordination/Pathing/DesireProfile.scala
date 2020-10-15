@@ -19,7 +19,7 @@ case class DesireProfile(var home: Int, var safety: Int, var freedom: Int) {
     val enemySooner         = timeOriginUs + 96 >= timeOriginEnemy
     val enemySieging        = unit.matchups.enemies.exists(_.isAny(UnitMatchSiegeTank, Zerg.Lurker)) && ! unit.base.exists(_.owner.isEnemy)
     val atHome              = unit.zone == unit.agent.origin.zone
-    val scouting            = unit.agent.canScout
+    val scouting            = unit.agent.isScout
     val desireToGoHome      =
       if (unit.is(Protoss.DarkTemplar))
         -1

@@ -12,7 +12,7 @@ import Utilities.ByOption
 object Sabotage extends Action {
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.agent.canScout
+    unit.agent.isScout
     && unit.matchups.targets.exists(_.is(UnitMatchProxied))
     && ! With.strategy.selectedCurrently.contains(ZvE4Pool))
 

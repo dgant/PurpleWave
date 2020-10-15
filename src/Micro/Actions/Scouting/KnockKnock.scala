@@ -7,7 +7,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object KnockKnock extends Action {
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.agent.canScout
+    unit.agent.isScout
     && (unit.zone != unit.agent.destination.zone || unit.agent.destination.zone.edges.exists(_.contains(unit.pixelCenter)))
     && unit.matchups.threats.size == 1
     && unit.matchups.threats.forall(threat =>

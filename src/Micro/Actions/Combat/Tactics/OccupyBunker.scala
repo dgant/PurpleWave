@@ -10,13 +10,13 @@ object OccupyBunker extends Action {
   
   override def allowed(unit: FriendlyUnitInfo) = (
     With.self.isTerran
-    && unit.agent.toForm.isDefined
+    && unit.agent.toReturn.isDefined
     && EmergencyBunk.classAllowedToBunk(unit)
     && unit.transport.isEmpty
     && unit.matchups.threatsInRange.isEmpty)
   
   override def perform(unit: FriendlyUnitInfo) {
-    val destination = unit.agent.toForm.get
+    val destination = unit.agent.toReturn.get
     
     val bunkers = With.units
       .inTileRadius(destination.tileIncluding, 5)

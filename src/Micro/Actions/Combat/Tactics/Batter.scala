@@ -20,13 +20,13 @@ object Batter extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     (
-      unit.canMove
+      With.frame < GameTime(7, 0)()
+      && unit.canMove
       && unit.canAttack
       && ! unit.flying
       && With.enemies.exists(_.raceInitial == Race.Terran)
       && ! unit.matchups.threatsInRange.exists(_.is(Terran.SiegeTankSieged))
-      && walledZone(unit).isDefined
-      && walledZone(unit).get.exit.exists(exit => unit.pixelDistanceCenter(exit.pixelCenter) < 32.0 * 12.0)
+      && walledZone(unit).exists(_.exit.exists(exit => unit.pixelDistanceCenter(exit.pixelCenter) < 32.0 * 12.0))
     )
   }
   
@@ -36,9 +36,7 @@ object Batter extends Action {
     if (destinationZone(unit).walledIn)
       Some(destinationZone(unit))
     else
-      unit.agent
-        .zonePath(unit.agent.destination)
-        .flatMap(_.steps.map(_.to).find(_.walledIn))
+      With.paths.zonePath(unit.zone, unit.agent.destination.zone).flatMap(_.steps.map(_.to).find(_.walledIn))
   
   override protected def perform(unit: FriendlyUnitInfo) {
     
@@ -50,7 +48,6 @@ object Batter extends Action {
         && ! u.flying
         && u.unitClass.isBuilding
         && u.pixelDistanceCenter(wallExit.pixelCenter) < 32.0 * 10.0)
-      .toSeq
       .sortBy(_.pixelDistanceCenter(wallExit.pixelCenter))
   
     lazy val outsideUnits   = unit.matchups.targetsInRange

@@ -10,9 +10,9 @@ object GooseChase extends Action {
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = false
 
-  def allowedOld(unit: FriendlyUnitInfo): Boolean = unit.agent.canScout || (
+  def allowedOld(unit: FriendlyUnitInfo): Boolean = unit.agent.isScout || (
     false
-    && (unit.isAny(Terran.Vulture, Zerg.Zergling) || unit.agent.canScout)
+    && (unit.isAny(Terran.Vulture, Zerg.Zergling) || unit.agent.isScout)
     && With.strategy.map.forall(_.trustGroundDistance)
     && unit.canMove
     && unit.matchups.threats.nonEmpty

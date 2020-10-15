@@ -180,7 +180,8 @@ object Potential {
   }
   
   protected def travelAttractionGround(unit: FriendlyUnitInfo): Force = {
-    val path          = unit.agent.zonePath(unit.agent.destination)
+    // TODO: Should be done with ground distance
+    val path          = With.paths.zonePath(unit.pixelCenter.zone, unit.agent.destination.zone)
     val destination   = if (path.isEmpty || path.get.steps.isEmpty) unit.agent.destination.zone.centroid.pixelCenter else path.get.steps.head.edge.pixelCenter
     val forceExiting  = ForceMath.fromPixels(unit.pixelCenter, destination, 1.0)
     forceExiting

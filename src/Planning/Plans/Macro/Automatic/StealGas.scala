@@ -15,7 +15,7 @@ class StealGas extends Plan {
   override def onUpdate(): Unit = {
     if (With.frame > GameTime(6, 0)()) return
 
-    val scouts = With.units.ours.filter(_.agent.canScout).map(_.asInstanceOf[UnitInfo]).toSet
+    val scouts = With.units.ours.filter(_.agent.isScout).map(_.asInstanceOf[UnitInfo]).toSet
     val base = With.geography.enemyBases.find(base => base.owner.isEnemy && scouts.exists(_.base == base))
     val gas = base.map(_.gas.filter(_.player.isNeutral)).getOrElse(Iterable.empty)
 

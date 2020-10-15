@@ -11,7 +11,7 @@ object Heal extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.is(Terran.Medic)
-    && (unit.matchups.battle.isDefined || unit.agent.toForm.isEmpty)
+    && (unit.matchups.battle.isDefined || unit.agent.toReturn.isEmpty)
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {

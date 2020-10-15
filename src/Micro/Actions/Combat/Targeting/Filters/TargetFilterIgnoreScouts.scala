@@ -26,7 +26,7 @@ object TargetFilterIgnoreScouts extends TargetFilter {
     lazy val beingWorkerRushed  = actor.matchups.targets.count(_.unitClass.isWorker) > 2
     lazy val beingProxied       = actor.matchups.targets.exists(_.unitClass.isBuilding)
     
-    lazy val hasFormation       = actor.agent.toForm.isDefined
+    lazy val hasFormation       = actor.agent.toReturn.isDefined
     lazy val targetingWorker    = target.unitClass.isWorker
     lazy val combatThreats      = actor.matchups.enemies.exists(e => e.unitClass.attacksGround && ! e.unitClass.isWorker)
     lazy val targetViolent      = target.isBeingViolent

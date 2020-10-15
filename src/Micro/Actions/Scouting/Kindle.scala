@@ -14,7 +14,7 @@ object Kindle extends Action {
   private val safetyMarginFrames = 6
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.agent.canScout
+    unit.agent.isScout
     && unit.agent.canFight
     && unit.canAttack
     && unit.matchups.framesOfSafety > safetyMarginFrames

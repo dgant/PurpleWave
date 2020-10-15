@@ -9,7 +9,6 @@ import ProxyBwapi.Upgrades.Upgrade
 
 class Intention {
   val frameCreated  : Int                       = With.frame
-  var toReturn      : Option[Pixel]             = None
   var toTravel      : Option[Pixel]             = None
   var toAttack      : Option[UnitInfo]          = None
   var toScan        : Option[Pixel]             = None
@@ -20,7 +19,7 @@ class Intention {
   var toTrain       : Option[UnitClass]         = None
   var toTech        : Option[Tech]              = None
   var toFinish      : Option[UnitInfo]          = None
-  var toForm        : Option[Pixel]             = None
+  var toReturn      : Option[Pixel]             = None
   var toNuke        : Option[Pixel]             = None
   var toUpgrade     : Option[Upgrade]           = None
   var toLeash       : Option[Leash]             = None

@@ -1,7 +1,6 @@
 
 package Micro.Agency
 
-import Information.Geography.Pathfinding.Types.ZonePath
 import Lifecycle.With
 import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, Tile}
@@ -30,14 +29,13 @@ class Agent(val unit: FriendlyUnitInfo) {
   /////////////
   
   var combatHysteresisFrames: Int = 0
-  var lastIntent: Intention = new Intention
   
   ///////////////
   // Decisions //
   ///////////////
   
-  var toReturn      : Option[Pixel]                 = None
   var toTravel      : Option[Pixel]                 = None
+  var toReturn      : Option[Pixel]                 = None
   var toAttack      : Option[UnitInfo]              = None
   var toScan        : Option[Pixel]                 = None
   var toGather      : Option[UnitInfo]              = None
@@ -47,7 +45,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   var toTrain       : Option[UnitClass]             = None
   var toTech        : Option[Tech]                  = None
   var toFinish      : Option[UnitInfo]              = None
-  var toForm        : Option[Pixel]                 = None
   var toUpgrade     : Option[Upgrade]               = None
   var toLeash       : Option[Leash]                 = None
   var toBoard       : Option[FriendlyUnitInfo]      = None
@@ -62,64 +59,51 @@ class Agent(val unit: FriendlyUnitInfo) {
   var canCast       : Boolean                       = false
   var canCancel     : Boolean                       = false
   var canFocus      : Boolean                       = false
-  
+
   var lastStim: Int = 0
   var lastCloak: Int = 0
   var shouldEngage: Boolean = false
   val forces: mutable.Map[Color, Force] = new mutable.HashMap[Color, Force]
 
-  def canScout: Boolean = lastIntent.toScoutTiles.nonEmpty
-  
-  def zonePath(to: Pixel): Option[ZonePath] = {
-    if ( ! cachedZonePath.contains(to)) {
-      cachedZonePath(to) = With.paths.zonePath(unit.zone, to.zone)
-    }
-    cachedZonePath(to)
-  }
-  private val cachedZonePath = new mutable.HashMap[Pixel, Option[ZonePath]]
-  
+  def isScout: Boolean = lastIntent.toScoutTiles.nonEmpty
+
   /////////////////
   // Suggestions //
   /////////////////
 
-  def origin: Pixel = toReturn.orElse(toForm).orElse(toLeash.map(_.pixelCenter)).getOrElse(originCache())
+  def destination: Pixel = toTravel.orElse(toReturn).getOrElse(origin)
+  def origin: Pixel = toReturn.orElse(toLeash.map(_.pixelCenter)).getOrElse(originCache())
   private val originCache = new Cache(() => toTravel
     .flatMap(_.base)
     .filter(_.owner.isUs)
     .orElse(ByOption.minBy(With.geography.ourBases)(base => unit.pixelDistanceTravelling(base.heart) * (if (base.scoutedByEnemy || base.isNaturalOf.exists(_.scoutedByEnemy)) 1 else 1000)))
     .map(_.heart.pixelCenter)
     .getOrElse(With.geography.home.pixelCenter))
-  
-  // This is kind of a mess.
-  def destination: Pixel = destinationCache()
-  private val destinationCache = new Cache(() => calculateDestination)
-  
+
   /////////////////
   // Diagnostics //
   /////////////////
-  
+
   var lastFrame   : Int             = 0
+  var lastIntent  : Intention       = new Intention
   var lastClient  : Option[Plan]    = None
   var lastAction  : Option[Action]  = None
-
-  var movingTo        : Option[Pixel]         = None
+  var movingTo    : Option[Pixel]   = None
 
   val actionsPerformed: ArrayBuffer[Action] = new ArrayBuffer[Action]()
-  
+
   var fightReason: String = ""
-  
+
   ///////////////
   // Execution //
   ///////////////
-  
+
   def execute() {
-    // Mind Control
-    if ( ! unit.isFriendly) return
-    
+    if ( ! unit.isFriendly) return // Mind Control
+    lastFrame = With.frame
     resetState()
     followIntent()
     combatHysteresisFrames = Math.max(0, combatHysteresisFrames - With.framesSince(lastFrame))
-    lastFrame = With.frame
     updateRidesharing()
     Idle.consider(unit)
   }
@@ -127,7 +111,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   private def resetState() {
     forces.clear()
     movingTo = None
-    cachedZonePath.clear()
     fightReason = ""
     actionsPerformed.clear()
     _umbrellas.clear()
@@ -136,8 +119,8 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   private def followIntent() {
     val intent    = lastIntent
-    toReturn      = intent.toReturn
     toTravel      = intent.toTravel
+    toReturn      = intent.toReturn
     toAttack      = intent.toAttack
     toScan        = intent.toScan
     toGather      = intent.toGather
@@ -150,28 +133,15 @@ class Agent(val unit: FriendlyUnitInfo) {
     toUpgrade     = intent.toUpgrade
     toLeash       = intent.toLeash
     toRepair      = intent.toRepair
-    toForm        = intent.toForm
     toBoard       = intent.toBoard.orElse(toBoard)
     toNuke        = intent.toNuke
     canFight      = intent.canAttack
     canFlee       = intent.canFlee
     canMeld       = intent.canMeld
     canLiftoff    = intent.canLiftoff
-    canCast       = false
     canCancel     = intent.canCancel
     canFocus      = intent.canFocus
-  }
-
-  private def calculateDestination: Pixel = {
-    if (toTravel.isDefined) {
-      toTravel.get
-    }
-    else if (toForm.isDefined) {
-      toForm.get
-    }
-    else {
-      origin
-    }
+    canCast       = false
   }
 
   //////////////////////
@@ -232,10 +202,4 @@ class Agent(val unit: FriendlyUnitInfo) {
   def prioritizedPassengers: Seq[FriendlyUnitInfo] = {
     passengers.sortBy(p => p.unitClass.subjectiveValue - p.frameDiscovered / 10000.0)
   }
-
-  ///////////////////////
-  // Explosion hopping //
-  ///////////////////////
-
-  var hoppingExplosion = false
 }

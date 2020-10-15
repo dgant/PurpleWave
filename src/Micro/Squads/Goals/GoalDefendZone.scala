@@ -145,7 +145,6 @@ class GoalDefendZone extends SquadGoalBasic {
       defender => {
         val spot = formation.placements.get(defender)
         defender.agent.intend(squad.client, new Intention {
-          toForm = spot
           toReturn = spot
           toTravel = spot.orElse(Some(zone.centroid.pixelCenter))
         })

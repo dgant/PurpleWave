@@ -6,7 +6,7 @@ import Mathematics.PurpleMath
 import Mathematics.Shapes.Circle
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class CircularPush(val priority: Int, center: Pixel, radius: Double) extends Push {
+class CircularPush(val priority: TrafficPriority, center: Pixel, radius: Double) extends Push {
   override val tiles: Seq[Tile] = Circle.points((radius.toInt + 31) / 32).view.map(center.tileIncluding.add)
   override def force(recipient: FriendlyUnitInfo): Option[Force] = {
     val target = recipient.pixelCenter
@@ -17,7 +17,7 @@ class CircularPush(val priority: Int, center: Pixel, radius: Double) extends Pus
   }
 
   override def draw(): Unit = {
-    val color = PushPriority.color(priority)
+    val color = priority.color
     drawLabel(center)
     DrawMap.circle(center, radius.toInt, color)
   }

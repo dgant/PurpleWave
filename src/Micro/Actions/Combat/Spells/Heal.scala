@@ -23,9 +23,9 @@ object Heal extends Action {
         patient.pixelDistanceCenter(unit.agent.destination))
     
     target.foreach(someTarget => {
-      val targetPixel = unit.pixelCenter.project(someTarget.pixelCenter, unit.pixelDistanceEdge(someTarget) - 16.0)
+      unit.agent.toStep = Some(unit.pixelCenter.project(someTarget.pixelCenter, unit.pixelDistanceEdge(someTarget) - 16.0))
       if (someTarget.pixelDistanceCenter(unit) < 96.0) {
-        With.commander.attackMove(unit, targetPixel)
+        With.commander.attackMove(unit)
       }
     })
   }

@@ -49,8 +49,9 @@ class Commander {
       sleep(unit)
     }
   }
-  
-  def attack(unit: FriendlyUnitInfo, target: UnitInfo) {
+
+  def attack(unit: FriendlyUnitInfo): Unit = unit.agent.toAttack.foreach(attack(unit, _))
+  private def attack(unit: FriendlyUnitInfo, target: UnitInfo) {
     if (unit.unready) return
     if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
     unit.agent.leadFollower = follower => attack(follower, target)
@@ -113,7 +114,8 @@ class Commander {
       PurpleMath.clamp(destination.y, unit.unitClass.height / 2,  With.mapPixelHeight - unit.unitClass.height / 2))
   }
 
-  def attackMove(unit: FriendlyUnitInfo, destination: Pixel) {
+  def attackMove(unit: FriendlyUnitInfo): Unit = unit.agent.toStep.orElse(unit.agent.toTravel).foreach(attackMove(unit, _))
+  private def attackMove(unit: FriendlyUnitInfo, destination: Pixel) {
     if (unit.unready) return
     if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
     val alreadyAttackMovingThere = unit.command.exists(c =>
@@ -127,18 +129,21 @@ class Commander {
     unit.agent.leadFollower = follower => attackMove(follower, destination)
     sleepAttack(unit)
   }
-  
-  def patrol(unit: FriendlyUnitInfo, destination: Pixel) {
+
+  def patrol(unit: FriendlyUnitInfo): Unit = unit.agent.toStep.orElse(unit.agent.toTravel).foreach(patrol(unit, _))
+  private def patrol(unit: FriendlyUnitInfo, to: Pixel) {
     if (unit.unready) return
     autoUnburrow(unit)
-    unit.baseUnit.patrol(destination.bwapi)
-    unit.agent.leadFollower = follower => patrol(follower, destination)
+    unit.baseUnit.patrol(to.bwapi)
+    unit.agent.leadFollower = follower => patrol(follower, to)
     sleepAttack(unit)
   }
-  
-  def move(unit: FriendlyUnitInfo, to: Pixel) {
+
+  def move(unit: FriendlyUnitInfo): Unit = unit.agent.toStep.orElse(unit.agent.toTravel).foreach(move(unit, _))
+  private def move(unit: FriendlyUnitInfo, to: Pixel) {
     if (unit.unready) return
     autoUnburrow(unit)
+
     // Send some flying units past their destination to maximize acceleration
     var destination = to
     var overshoot = if (unit.flying && ! unit.unitClass.isTransport) 288.0 else 32
@@ -158,7 +163,7 @@ class Commander {
    destination = limit(unit, destination)
     
     // Record the destination. This is mostly for diagnostic purposes (and identifying stuck units) so if the exact value changes later that's okay
-    unit.agent.movingTo = Some(destination)
+    unit.agent.toStep = Some(destination)
     
     // Mineral walk!
     if (unit.unitClass.isWorker
@@ -250,7 +255,6 @@ class Commander {
   def useTechOnPixel(unit: FriendlyUnitInfo, tech: Tech, target: Pixel) {
     if (unit.unready) return
     autoUnburrow(unit)
-    unit.agent.movingTo = Some(target)
     unit.baseUnit.useTech(tech.baseType, target.bwapi)
     if (tech == Terran.SpiderMinePlant) {
       sleep(unit, 12)
@@ -273,7 +277,8 @@ class Commander {
       sleepReturnCargo(unit)
     }
   }
-    
+
+  def gather(unit: FriendlyUnitInfo): Unit = unit.agent.toGather.foreach(gather(unit, _))
   def gather(unit: FriendlyUnitInfo, resource: UnitInfo, allowReturningCargo: Boolean = true) {
     if (unit.unready) return
     autoUnburrow(unit)
@@ -302,7 +307,7 @@ class Commander {
       sleep(unit)
     }
   }
-  
+
   def build(unit: FriendlyUnitInfo, unitClass: UnitClass) {
     if (unit.unready) return
     autoUnburrow(unit)
@@ -361,7 +366,7 @@ class Commander {
   
   
   def unload(transport: FriendlyUnitInfo, passenger: UnitInfo) {
-    //No sleeping required
+    // No sleeping required
     transport.baseUnit.unload(passenger.baseUnit)
   }
   
@@ -416,7 +421,7 @@ class Commander {
     sleep(unit)
   }
   
-  def autoUnburrow(unit: FriendlyUnitInfo): Unit = {
+  private def autoUnburrow(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return
     if (unit.burrowed) unburrow(unit)
   }
@@ -435,7 +440,7 @@ class Commander {
     sleep(unit, 8)
   }
   
-  def sleep(unit: FriendlyUnitInfo, requiredDelay: Int = 2) {
+  private def sleep(unit: FriendlyUnitInfo, requiredDelay: Int = 2) {
     val sleepUntil = Array(
       With.frame + With.configuration.performanceMinimumUnitSleep,
       With.frame + requiredDelay,

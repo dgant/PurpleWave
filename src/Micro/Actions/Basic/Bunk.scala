@@ -14,7 +14,7 @@ object Bunk extends Action {
   override def perform(unit: FriendlyUnitInfo) {
     if (unit.loaded) {
       if (unit.transport == unit.agent.toBoard) {
-        With.commander.sleep(unit)
+        With.commander.doNothing(unit)
       } else {
         unit.transport.foreach(With.commander.unload(_, unit))
       }

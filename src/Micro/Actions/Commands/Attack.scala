@@ -27,20 +27,20 @@ object Attack extends Action {
     }
 
     if (unit.is(Zerg.Lurker) && ! unit.burrowed) {
-      unit.agent.toTravel = Some(unit.agent.toAttack.get.pixelCenter)
+      unit.agent.toStep = Some(target.pixelCenter)
       Move.delegate(unit)
     }
     
     if (target.is(Protoss.Interceptor)) {
-      unit.agent.toTravel = Some(target.pixelCenter)
-      AttackMove.delegate(unit)
+      unit.agent.toStep = Some(target.pixelCenter)
+      With.commander.attackMove(unit)
     }
     
     if (unit.unitClass.accelerationFrames <= 1 && unit.matchups.targetsInRange.forall(unit.agent.toAttack.contains)) {
-      // TODO: Try enabling this; have never actually tested this
-      //With.commander.hold(unit)
+      With.commander.hold(unit)
+    } else {
+      With.commander.attack(unit)
     }
-    
-    With.commander.attack(unit, unit.agent.toAttack.get)
+
   }
 }

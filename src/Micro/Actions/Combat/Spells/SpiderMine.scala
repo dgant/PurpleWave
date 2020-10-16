@@ -85,7 +85,7 @@ object SpiderMine extends Action {
     } else {
       vulture.agent.toTravel = Some(
         vulture.pixelCenter
-          .project(target .pixelCenter, vulture.pixelDistanceEdge(target) + 64)
+          .project(target.pixelCenter, vulture.pixelDistanceEdge(target) + 64)
           .nearestWalkableTerrain
           .pixelCenter)
       Move.delegate(vulture)

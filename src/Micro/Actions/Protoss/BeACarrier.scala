@@ -3,7 +3,7 @@ package Micro.Actions.Protoss
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Targeting.Target
-import Micro.Actions.Commands.{Attack, AttackMove}
+import Micro.Actions.Commands.Attack
 import Micro.Actions.Protoss.Carrier._
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
@@ -82,7 +82,7 @@ object BeACarrier extends Action {
           .orElse(ByOption.minBy(unit.matchups.targets        .filter(u => u.canAttack(unit) && ! u.isInterceptor()))(_.pixelDistanceEdge(unit)))
         Attack.consider(unit)
       }
-      AttackMove.consider(unit)
+      With.commander.attackMove(unit)
     }
     else {
       CarrierRetreat.consider(unit)

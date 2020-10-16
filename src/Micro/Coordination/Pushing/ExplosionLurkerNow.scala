@@ -10,5 +10,5 @@ class ExplosionLurkerNow(spine: BulletInfo) extends LinearPush {
 
   override protected def sourceWidth: Double = 20
 
-  override val priority: Int = PushPriority.Shove
+  override val priority: TrafficPriority = TrafficPriorities.Shove
 }

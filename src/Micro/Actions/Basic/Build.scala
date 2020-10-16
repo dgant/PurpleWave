@@ -5,9 +5,9 @@ import Mathematics.Points.Tile
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
 import Micro.Actions.Combat.Targeting.Target
-import Micro.Actions.Commands.{Attack, Move}
+import Micro.Actions.Commands.Attack
 import Micro.Coordination.Pathing.MicroPathing
-import Micro.Coordination.Pushing.{CircularPush, PushPriority}
+import Micro.Coordination.Pushing.{CircularPush, TrafficPriorities}
 import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -77,7 +77,7 @@ object Build extends Action {
     val buildClass = unit.agent.toBuild.get
     val buildTile = unit.agent.lastIntent.toBuildTile.get
 
-    With.coordinator.pushes.put(new CircularPush(PushPriority.Shove, buildArea.midPixel, 32 + buildClass.dimensionMax))
+    With.coordinator.pushes.put(new CircularPush(TrafficPriorities.Shove, buildArea.midPixel, 32 + buildClass.dimensionMax))
 
     if (unit.tileIncludingCenter.tileDistanceFast(buildTile) < 5 && With.grids.friendlyVision.isSet(buildTile)) {
       With.commander.build(unit, buildClass, buildTile)
@@ -89,16 +89,7 @@ object Build extends Action {
       movePixel = movePixel.add(buildClass.width / 2, buildClass.height / 2)
     }
 
-    unit.agent.toTravel = Some(movePixel)
-
-    // Pathfind for cross-zone travel, eg to avoid getting stuck on mineral blocks
-    if (movePixel.zone != unit.zone) {
-      val profile = With.paths.profileDistance(unit.tileIncludingCenter, movePixel.tileIncluding)
-      profile.allowGroundDist = true
-      val path = profile.find
-      MicroPathing.tryMovingAlongTilePath(unit, path)
-    }
-
-    Move.delegate(unit)
+    unit.agent.toTravel = Some(MicroPathing.getWaypointNavigatingTerrain(unit, movePixel))
+    With.commander.move(unit)
   }
 }

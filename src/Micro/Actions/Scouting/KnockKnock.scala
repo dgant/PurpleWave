@@ -18,6 +18,6 @@ object KnockKnock extends Action {
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     unit.agent.toAttack = unit.matchups.threats.headOption
-    With.commander.attack(unit, unit.agent.toAttack.get)
+    With.commander.attack(unit)
   }
 }

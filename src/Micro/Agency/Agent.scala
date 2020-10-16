@@ -5,6 +5,7 @@ import Lifecycle.With
 import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, Tile}
 import Micro.Actions.{Action, Idle}
+import Micro.Coordination.Pushing.{TrafficPriorities, TrafficPriority}
 import Performance.Cache
 import Planning.Plan
 import ProxyBwapi.Techs.Tech
@@ -33,7 +34,9 @@ class Agent(val unit: FriendlyUnitInfo) {
   ///////////////
   // Decisions //
   ///////////////
-  
+
+  var priority      : TrafficPriority               = TrafficPriorities.None
+  var toStep        : Option[Pixel]                 = None
   var toTravel      : Option[Pixel]                 = None
   var toReturn      : Option[Pixel]                 = None
   var toAttack      : Option[UnitInfo]              = None
@@ -88,7 +91,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   var lastIntent  : Intention       = new Intention
   var lastClient  : Option[Plan]    = None
   var lastAction  : Option[Action]  = None
-  var movingTo    : Option[Pixel]   = None
 
   val actionsPerformed: ArrayBuffer[Action] = new ArrayBuffer[Action]()
 
@@ -110,7 +112,7 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   private def resetState() {
     forces.clear()
-    movingTo = None
+    toStep = None
     fightReason = ""
     actionsPerformed.clear()
     _umbrellas.clear()

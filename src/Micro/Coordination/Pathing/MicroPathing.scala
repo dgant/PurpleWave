@@ -7,12 +7,13 @@ import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.{Pixel, PixelRay}
 import Mathematics.PurpleMath
+import Mathematics.Shapes.Ring
 import Micro.Actions.Commands.Move
 import Micro.Coordination.Pushing.Push
 import Micro.Heuristics.Potential
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.TakeN
+import Utilities.{ByOption, TakeN}
 
 object MicroPathing {
 
@@ -43,6 +44,23 @@ object MicroPathing {
     output.tilePath         = Some(pathfindProfile.find)
     output.to               = getWaypointAlongTilePath(output.tilePath.get)
     output
+  }
+
+  val waypointDistanceTiles = 5
+  val waypointDistancePixels = 32 * waypointDistanceTiles
+  def getWaypointNavigatingTerrain(unit: FriendlyUnitInfo, to: Pixel): Pixel = {
+    if (unit.flying || unit.pixelDistanceTravelling(to) <= waypointDistancePixels || unit.zone == to.zone) {
+      to
+    } else {
+      ByOption
+        .minBy(
+          Ring
+            .points(waypointDistanceTiles)
+            .view
+            .map(p => unit.pixelCenter.add(32 * p.x, 32 * p.y))
+            .filter(p => With.grids.walkable.get(p.tileIncluding)))(_.groundPixels(to))
+        .getOrElse(to)
+    }
   }
 
   def getWaypointAlongTilePath(path: TilePath): Option[Pixel] = {

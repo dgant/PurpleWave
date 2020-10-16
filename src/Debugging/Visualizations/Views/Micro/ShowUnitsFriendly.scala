@@ -1,13 +1,12 @@
 package Debugging.Visualizations.Views.Micro
 
+import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
-import Debugging.Visualizations.{Colors, ForceColors}
 import Information.Geography.Pathfinding.Types.TilePath
 import Lifecycle.With
 import Mathematics.Points.PixelRay
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.ByOption
 import bwapi.Color
 
 object ShowUnitsFriendly extends View {
@@ -20,7 +19,6 @@ object ShowUnitsFriendly extends View {
   var showTargets     : Boolean = true
   var showFormation   : Boolean = true
   def showPaths       : Boolean = ShowUnitPaths.inUse
-  var showForces      : Boolean = true
   var showDesire      : Boolean = true
   var showDistance    : Boolean = false
   var showFightReason : Boolean = true
@@ -38,61 +36,36 @@ object ShowUnitsFriendly extends View {
     if (unit.transport.isDefined) return
     
     var labelY = -28
-    if (showFightReason) {
-      DrawMap.label(
-        unit.agent.fightReason,
-        unit.pixelCenter.add(0, labelY),
-        drawBackground = false)
+    def drawNextLabel(value: String): Unit = {
+      DrawMap.label(value, unit.pixelCenter.add(0, labelY), drawBackground = false)
       labelY += 7
     }
-    if (showClient) {
-      agent.lastClient.foreach(plan =>
-        DrawMap.label(
-          plan.toString,
-          unit.pixelCenter.add(0, labelY),
-          drawBackground = false))
-      labelY += 7
+
+    if (showCharge) {
+      if (unit.unitClass.spells.exists(spell => spell.energyCost > 0 && With.self.hasTech(spell) && unit.energy >= spell.energyCost)) {
+        val degrees = System.currentTimeMillis() % 360
+        val radians = degrees * Math.PI / 360
+        DrawMap.circle(unit.pixelCenter.radiateRadians(radians, 10), 2, Colors.NeonYellow, solid = true)
+        DrawMap.circle(unit.pixelCenter.radiateRadians(radians, 108), 3, Colors.NeonYellow, solid = true)
+      }
     }
-    if (showAction) {
-      DrawMap.label(
-        agent.lastAction.map(_.name).getOrElse(""),
-        unit.pixelCenter.add(0, labelY),
-        drawBackground = false)
-      labelY += 7
-    }
-    if (showCommand) {
-      DrawMap.label(
-        unit.command.map(_.getType.toString).getOrElse(""),
-        unit.pixelCenter.add(0, labelY),
-        drawBackground = false)
-      labelY += 7
-    }
-    if (showOrder) {
-      DrawMap.label(
-        unit.order.toString,
-        unit.pixelCenter.add(0, labelY),
-        drawBackground = false)
-      labelY += 7
-    }
+
+    if (showFightReason)  drawNextLabel(unit.agent.fightReason)
+    if (showClient)       drawNextLabel(agent.lastClient.map(_.toString).getOrElse(""))
+    if (showAction)       drawNextLabel(agent.lastAction.map(_.name).getOrElse(""))
+    if (showCommand)      drawNextLabel(unit.command.map(_.getType.toString).getOrElse(""))
+    if (showOrder)        drawNextLabel(unit.order.toString)
     
     if (showTargets) {
       val targetUnit = unit.target.orElse(unit.orderTarget)
-      if (targetUnit.nonEmpty) {
-        DrawMap.line(unit.pixelCenter, targetUnit.get.pixelCenter, unit.player.colorNeon)
-      }
       val targetPosition = unit.targetPixel.orElse(unit.orderTargetPixel)
-      if (targetPosition.nonEmpty && unit.target.isEmpty) {
-        DrawMap.line(unit.pixelCenter, targetPosition.get, unit.player.colorDark)
+      targetUnit.map(_.pixelCenter).foreach(DrawMap.line(unit.pixelCenter, _, Colors.MediumYellow))
+      if (unit.target.isEmpty) {
+        targetPosition.foreach(DrawMap.line(unit.pixelCenter, _, Colors.MidnightGray))
       }
-      if (agent.movingTo.isDefined) {
-        DrawMap.arrow(unit.pixelCenter, agent.movingTo.get, Colors.MidnightGray)
-      }
-      if (agent.toAttack.isDefined) {
-        DrawMap.arrow(unit.pixelCenter, agent.toAttack.get.pixelCenter, Colors.NeonYellow)
-      }
-      if (agent.toGather.isDefined) {
-        DrawMap.arrow(unit.pixelCenter, agent.toGather.get.pixelCenter, Colors.MidnightGreen)
-      }
+      agent.toStep.foreach(DrawMap.arrow(unit.pixelCenter, _, Colors.DarkGray))
+      agent.toAttack.map(_.pixelCenter).foreach(DrawMap.arrow(unit.pixelCenter, _, Colors.NeonYellow))
+      agent.toGather.map(_.pixelCenter).foreach(DrawMap.arrow(unit.pixelCenter, _, Colors.MidnightGreen))
     }
     if (showFormation) {
       if (agent.toReturn.isDefined) {
@@ -102,7 +75,6 @@ object ShowUnitsFriendly extends View {
         Colors.BrightViolet)
       }
     }
-    
     if (showPaths && (unit.selected || unit.transport.exists(_.selected) || With.units.selected().isEmpty)) {
       def drawRayPath(ray: PixelRay, color: Color) {
         ray.tilesIntersected.foreach(tile => DrawMap.box(
@@ -119,29 +91,6 @@ object ShowUnitsFriendly extends View {
         }
       }
       // TODO: Invoke this
-    }
-    
-    if (showForces) {
-      val length = 96.0
-      val maxForce = ByOption.max(agent.forces.values.map(_.lengthSlow)).getOrElse(0.0)
-      if (maxForce > 0.0) {
-        agent.forces.foreach(pair => {
-          val force           = pair._2
-          val forceNormalized = force.normalize(length * force.lengthSlow / maxForce)
-          DrawMap.arrow(
-            unit.pixelCenter,
-            unit.pixelCenter.add(
-              forceNormalized.x.toInt,
-              forceNormalized.y.toInt),
-            pair._1)
-        })
-        if (agent.movingTo.isDefined) {
-          DrawMap.arrow(
-            unit.pixelCenter,
-            agent.movingTo.get,
-            ForceColors.sum)
-        }
-      }
     }
     
     if (showDesire) {
@@ -165,13 +114,6 @@ object ShowUnitsFriendly extends View {
         val start = unit.pixelCenter.add(0, unit.unitClass.dimensionDown + 8)
         DrawMap.circle(start, 5, color = unit.player.colorMidnight, solid = true)
         DrawMap.drawStar(start, 4, Colors.NeonYellow)
-      }
-    }
-
-    if (showCharge) {
-      if (unit.unitClass.spells.exists(spell => spell.energyCost > 0 && With.self.hasTech(spell) && unit.energy >= spell.energyCost)) {
-        val r = unit.unitClass.radialHypotenuse * (0.5 + (With.frame % 7) / 7.0)
-        DrawMap.circle(unit.pixelCenter, r.toInt, Colors.NeonYellow)
       }
     }
   }

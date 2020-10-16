@@ -96,7 +96,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     }
     val moving = velocityX != 0 || velocityY != 0
     lazy val couldMove          = unitClass.canMove
-    lazy val tryingToMove       = canMove && friendly.flatMap(_.agent.movingTo).exists(_.pixelDistance(pixelCenter) > 32)
+    lazy val tryingToMove       = canMove && friendly.flatMap(_.agent.toStep).exists(_.pixelDistance(pixelCenter) > 32)
     lazy val tryingToAttackHere = canAttack && target.exists(t => t.isEnemyOf(this) &&  inRangeToAttack(t))
     lazy val tryingToAttackAway = canAttack && target.exists(t => t.isEnemyOf(this) && ! inRangeToAttack(t))
     if ( ! moving && couldMove && (tryingToMove || tryingToAttackAway)) {

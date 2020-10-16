@@ -10,7 +10,7 @@ import Micro.Actions.Combat.Targeting.Filters.TargetFilter
 import Micro.Actions.Combat.Targeting.{EvaluateTargets, TargetInRange}
 import Micro.Actions.Commands.{Attack, Move}
 import Micro.Coordination.Pathing.MicroPathing
-import Micro.Coordination.Pushing.PushPriority
+import Micro.Coordination.Pushing.{TrafficPriorities, TrafficPriority}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, LightYear}
 
@@ -36,8 +36,8 @@ object DefaultCombat extends Action {
     }
     private def target: Option[UnitInfo] = unit.agent.toAttack
 
-    lazy val pushes = With.coordinator.pushes.get(unit).map(p => (p, p.force(unit))).sortBy(-_._1.priority)
-    lazy val pushPriority = ByOption.max(pushes.view.map(_._1.priority)).getOrElse(PushPriority.None)
+    lazy val pushes = With.coordinator.pushes.get(unit).map(p => (p, p.force(unit))).sortBy(-_._1.priority.value)
+    lazy val pushPriority: TrafficPriority = ByOption.max(pushes.view.map(_._1.priority)).getOrElse(TrafficPriorities.None)
 
     // Decide how far from target/threat we want to be
     lazy val idealPixelsFromTargetRange = if (target.exists(_.speedApproaching(unit) < 0)) -16d else 0d
@@ -100,13 +100,13 @@ object DefaultCombat extends Action {
     }
 
     // DODGE: Avoid explosions
-    if (context.pushPriority >= PushPriority.Dodge) {
+    if (context.pushPriority >= TrafficPriorities.Dodge) {
       followPush(context)
       return
     }
 
     // Shoves: Follow and propagate them
-    if (context.pushPriority >= PushPriority.Dodge) {
+    if (context.pushPriority >= TrafficPriorities.Dodge) {
       // TODO: Do we actually want to follow the shove?
       // Maybe the push is sending us where we want to go anyway,
       // or the push is coming from a less important unit

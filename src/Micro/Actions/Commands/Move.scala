@@ -2,6 +2,7 @@ package Micro.Actions.Commands
 
 import Information.Geography.Pathfinding.PathfindProfile
 import Lifecycle.With
+import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Coordination.Pathing.MicroPathing
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -13,17 +14,19 @@ object Move extends Action {
     unit.canMove &&
     unit.agent.toTravel.isDefined
   }
-  
-  override def perform(unit: FriendlyUnitInfo) {
-    val pixelToMove = unit.agent.toTravel.get
+
+  def doMove(unit: FriendlyUnitInfo): Unit = {
+    if (unit.agent.toTravel.isEmpty) return
+
+    def toTravel: Pixel = unit.agent.toTravel.get
 
     // Do a pathfinding move
     if ( ! With.performance.danger && MapGroups.needCustomPathing.exists(_.matches)) {
-      lazy val tileToMove = pixelToMove.nearestWalkableTerrain
+      lazy val tileToMove = toTravel.nearestWalkableTerrain
       if ( ! unit.flying
         // TODO: Don't re-path!
         //&& unit.agent.path.isEmpty
-        && unit.pixelDistanceTravelling(tileToMove) > 128 + unit.pixelDistanceCenter(pixelToMove)) {
+        && unit.pixelDistanceTravelling(tileToMove) > 128 + unit.pixelDistanceCenter(toTravel)) {
          val profile = new PathfindProfile(unit.tileIncludingCenter)
             profile.end                 = Some(tileToMove)
             profile.lengthMaximum       = Some(24)
@@ -32,29 +35,35 @@ object Move extends Action {
             profile.allowGroundDist     = true
             profile.unit = Some(unit)
         val path = profile.find
-        MicroPathing.tryMovingAlongTilePath(unit, path)
+        unit.agent.toTravel = MicroPathing.getWaypointAlongTilePath(path).orElse(unit.agent.toTravel)
       }
     }
-    
+
+    // When bot is slowing down, use attack-move
     if (unit.agent.shouldEngage
       && With.reaction.agencyAverage > 12
       && ! unit.unitClass.isWorker
       && unit.canAttack) {
-      With.commander.attackMove(unit, pixelToMove)
+      With.commander.attackMove(unit)
     }
+
     else if (
       // If we have a ride
       unit.agent.ride.isDefined
       // and that ride can get us there faster
-      && unit.framesToTravelTo(pixelToMove) >
+      && unit.framesToTravelTo(toTravel) >
         4 * unit.unitClass.groundDamageCooldown
         + unit.agent.ride.get.framesToTravelTo(unit.pixelCenter)
-        + unit.agent.ride.get.framesToTravelPixels(unit.pixelDistanceCenter(pixelToMove))) {
+        + unit.agent.ride.get.framesToTravelPixels(unit.pixelDistanceCenter(toTravel))) {
       With.commander.rightClick(unit, unit.agent.ride.get)
     }
     else {
-      With.commander.move(unit, pixelToMove)
+      With.commander.move(unit)
     }
-    unit.agent.directRide(pixelToMove)
+    unit.agent.directRide(toTravel)
+  }
+  
+  override def perform(unit: FriendlyUnitInfo) {
+    doMove(unit)
   }
 }

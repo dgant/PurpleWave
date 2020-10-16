@@ -2,7 +2,6 @@ package Micro.Actions.Basic
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Repair extends Action {
@@ -20,7 +19,7 @@ object Repair extends Action {
       With.commander.repair(unit, target)
     } else {
       unit.agent.toTravel = Some(target.pixelCenter.project(unit.pixelCenter, 48))
-      Move.delegate(unit)
+      With.commander.move(unit)
     }
   }
 }

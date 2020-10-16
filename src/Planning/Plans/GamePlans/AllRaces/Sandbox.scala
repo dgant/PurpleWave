@@ -11,7 +11,7 @@ import ProxyBwapi.Races.Protoss
 
 class Sandbox extends GameplanTemplate {
 
-  override def attackPlan: Plan = new Attack
+  override def priorityAttackPlan: Plan = new Attack
 
   override def buildPlans: Seq[Plan] = Seq(
     new Build(

@@ -28,7 +28,7 @@ object SpiderMineMath {
   }
 }
 
-class ExplosionSpiderMineBlast(mine: UnitInfo) extends CircularPush(PushPriority.Dodge, SpiderMineMath.expectedPosition(mine), SpiderMineMath.radius ) {
+class ExplosionSpiderMineBlast(mine: UnitInfo) extends CircularPush(TrafficPriorities.Dodge, SpiderMineMath.expectedPosition(mine), SpiderMineMath.radius ) {
   val expectedTarget: Option[UnitInfo] = SpiderMineMath.expectedTarget(mine)
   val expectedTargetPosition: Pixel = SpiderMineMath.expectedPositionGivenTarget(mine, expectedTarget)
 

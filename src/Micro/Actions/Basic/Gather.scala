@@ -2,11 +2,10 @@ package Micro.Actions.Basic
 
 import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Mathematics.Points.SpecificPoints
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.DefaultCombat.{Disengage, Engage}
 import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Actions.Commands.Move
+import Micro.Coordination.Pathing.MicroPathing
 import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -104,11 +103,9 @@ object Gather extends Action {
     }
 
     // Benzene travel hack
-    if (resource.zone != unit.zone
-      && unit.zone == With.geography.ourMain.zone
-      && Benzene.matches) {
-      unit.agent.toTravel = Some(SpecificPoints.middle)
-      Move.delegate(unit)
+    if (Benzene.matches && resource.zone != unit.zone && unit.zone == With.geography.ourMain.zone) {
+      unit.agent.toTravel = Some(MicroPathing.getWaypointNavigatingTerrain(unit, resource.pixelCenter))
+      With.commander.move(unit)
     }
     
     With.commander.gather(unit, resource)

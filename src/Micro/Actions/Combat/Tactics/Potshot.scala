@@ -5,7 +5,6 @@ import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Targeting.Filters.{TargetFilter, TargetFilterCombatants, TargetFilterVisibleInRange}
 import Micro.Actions.Combat.Targeting.TargetAction
-import Micro.Actions.Commands.Attack
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Potshot extends Action {
@@ -33,6 +32,6 @@ object Potshot extends Action {
         unit.agent.toTravel = Some(target.pixelCenter)
         With.commander.patrol(unit)
       })
-    Attack.delegate(unit)
+    With.commander.attack(unit)
   }
 }

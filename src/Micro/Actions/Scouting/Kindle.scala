@@ -1,9 +1,9 @@
 package Micro.Actions.Scouting
 
+import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Targeting.Filters.TargetFilterWhitelist
 import Micro.Actions.Combat.Targeting.TargetAction
-import Micro.Actions.Commands.Attack
 import Micro.Matchups.{MatchupAnalysis, MatchupConditions}
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -33,6 +33,6 @@ object Kindle extends Action {
     val legalTargets = unit.matchups.targets.filter(legalTarget(unit, _))
     val targetAction = new TargetAction(TargetFilterWhitelist(legalTargets))
     targetAction.delegate(unit)
-    Attack.delegate(unit)
+    With.commander.attack(unit)
   }
 }

@@ -3,7 +3,6 @@ package Micro.Actions.Scouting
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
-import Micro.Actions.Commands.Attack
 import Planning.UnitMatchers.UnitMatchProxied
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Strategery.Strategies.Zerg.ZvE4Pool
@@ -24,9 +23,8 @@ object Sabotage extends Action {
         && (threat.totalHealth <= unit.totalHealth
           || buildingTarget.exists(b => Math.max(15 + threat.pixelRangeAgainst(unit), b.pixelDistanceEdge(unit)) < threat.pixelDistanceEdge(unit)))))) {
       unit.agent.toAttack = buildingTarget
-      Attack.delegate(unit)
+      With.commander.attack(unit)
     }
-
     Retreat.delegate(unit)
   }
 }

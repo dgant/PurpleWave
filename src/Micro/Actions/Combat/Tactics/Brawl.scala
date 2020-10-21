@@ -4,7 +4,6 @@ import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Targeting.Filters.TargetFilterWhitelist
 import Micro.Actions.Combat.Targeting.{Target, TargetAction, TargetInRange}
-import Micro.Actions.Commands.Attack
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -38,6 +37,6 @@ object Brawl extends Action {
     TargetInRange.delegate(unit)
     targetNear.delegate(unit)
     Target.delegate(unit)
-    Attack.delegate(unit)
+    With.commander.attack(unit)
   }
 }

@@ -7,7 +7,6 @@ import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.DefaultCombat.Engage
 import Micro.Actions.Combat.Maneuvering.Retreat
-import Micro.Actions.Commands.Attack
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -65,7 +64,7 @@ object Bust extends Action {
       && goons.length >= 6
       && repairers.nonEmpty) {
       unit.agent.toAttack = Some(repairers.minBy(_.pixelDistanceCenter(PurpleMath.centroid(goons.map(_.pixelCenter)))))
-      Attack.delegate(unit)
+      With.commander.attack(unit)
     }
 
     if (With.framesSince(unit.lastFrameTakingDamage) < GameTime(0, 1)()) {

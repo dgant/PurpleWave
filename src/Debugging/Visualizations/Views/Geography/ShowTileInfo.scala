@@ -14,7 +14,7 @@ object ShowTileInfo extends View {
     val mousePixelScreen  = new Pixel(With.game.getMousePosition)
     val mousePixelMap     = mousePixelScreen + With.viewport.start
     val mouseTile         = mousePixelMap.tileIncluding
-    val walkableTile      = mousePixelMap.nearestWalkableTerrain
+    val walkableTile      = mousePixelMap.nearestWalkableTile
     val zone              = With.geography.zoneByTile(mouseTile)
 
     if (true || With.game.getMouseState(MouseButton.M_LEFT)) {

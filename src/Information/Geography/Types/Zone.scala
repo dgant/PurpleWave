@@ -25,7 +25,7 @@ class Zone(
   lazy val  bases             : Array[Base]         = With.geography.bases.filter(_.townHallTile.zone == this).toArray
   lazy val  border            : Set[Tile]           = tiles.filter(_.adjacent8.exists( ! tiles.contains(_))).toSet
   lazy val  perimeter         : Set[Tile]           = tiles.filter(tile => tile.tileDistanceFromEdge <= 1 || ! tile.adjacent8.forall(With.grids.walkableTerrain.get)).toSet
-  lazy val  centroid          : Tile                = (if (tiles.isEmpty) new Pixel(bwtaRegion.getCenter).tileIncluding else tiles.minBy(_.tileDistanceSquared(new Pixel(bwtaRegion.getCenter).tileIncluding))).pixelCenter.nearestWalkableTerrain
+  lazy val  centroid          : Tile                = (if (tiles.isEmpty) new Pixel(bwtaRegion.getCenter).tileIncluding else tiles.minBy(_.tileDistanceSquared(new Pixel(bwtaRegion.getCenter).tileIncluding))).pixelCenter.nearestWalkableTile
   lazy val  area              : Double              = tiles.size // Previously taken from BWTA region area
   lazy val  island            : Boolean             = With.geography.startBases.count(st => With.paths.groundPathExists(st.heart, centroid)) < 2
   lazy val  tilesBuildable    : Array[Tile]         = { With.grids.buildableTerrain.initialize(); tiles.filter(With.grids.buildableTerrain.get).toArray }

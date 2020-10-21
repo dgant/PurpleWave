@@ -1,8 +1,8 @@
 package Micro.Actions.Transportation.Caddy
 
+import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
-import Micro.Actions.Commands.Move
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
@@ -29,7 +29,7 @@ object ShuttlePark extends Action {
         Retreat.delegate(shuttle)
       }
 
-      Move.delegate(shuttle)
+      With.commander.move(shuttle)
     })
   }
 }

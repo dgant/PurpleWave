@@ -5,8 +5,6 @@ import Mathematics.Points.Tile
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
 import Micro.Actions.Combat.Targeting.Target
-import Micro.Actions.Commands.Attack
-import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.{CircularPush, TrafficPriorities}
 import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.Zerg
@@ -64,7 +62,7 @@ object Build extends Action {
       if (noThreats || (allWorkers && healthy) && unit.cooldownLeft < With.reaction.agencyMax) {
         Target.delegate(unit)
         unit.agent.toAttack = unit.agent.toAttack.orElse(Some(blockersToKill.minBy(_.pixelDistanceEdge(unit))))
-        Attack.delegate(unit)
+        With.commander.attack(unit)
       }
       else if (unit.matchups.threats.exists( ! _.is(UnitMatchWorkers))) {
         FightOrFlight.consider(unit)
@@ -72,7 +70,7 @@ object Build extends Action {
       }
     }
     
-    if ( ! unit.ready) return
+    if (unit.unready) return
     
     val buildClass = unit.agent.toBuild.get
     val buildTile = unit.agent.lastIntent.toBuildTile.get
@@ -89,7 +87,6 @@ object Build extends Action {
       movePixel = movePixel.add(buildClass.width / 2, buildClass.height / 2)
     }
 
-    unit.agent.toTravel = Some(MicroPathing.getWaypointNavigatingTerrain(unit, movePixel))
     With.commander.move(unit)
   }
 }

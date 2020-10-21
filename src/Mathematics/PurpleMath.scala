@@ -320,12 +320,12 @@ object PurpleMath {
     val e2x = p.x - v1.x
     val e2y = p.y - v1.y
     val edot = e1x * e2x + e1y * e2y
-    val eLength2 = e1x * e1x + e1y * e1y
+    val eLength2 = Math.max(1, e1x * e1x + e1y * e1y)
     Point(v1.x + (e1x * edot) / eLength2, v1.y + (e1y * edot) / eLength2)
   }
 
   @inline final def projectedPointOnSegment(p: Point, v1: Point, v2: Point): Point = {
-    val onLine = projectedPointOnSegment(p, v1, v2)
+    val onLine = projectedPointOnLine(p, v1, v2)
     val segmentLength2 = v1.distanceSquared(v2)
     val isOnSegment = onLine.distanceSquared(v1) < segmentLength2 && onLine.distanceSquared(v2) < segmentLength2
     if (isOnSegment) onLine else Seq(v1, v2).minBy(_.distanceSquared(p))

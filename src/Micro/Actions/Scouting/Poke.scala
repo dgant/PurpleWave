@@ -5,7 +5,6 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Targeting.Filters.TargetFilterWhitelist
 import Micro.Actions.Combat.Targeting.TargetAction
-import Micro.Actions.Commands.{Attack, Move}
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
@@ -41,10 +40,10 @@ object Poke extends Action {
     val framesToWait  = unit.framesToBeReadyForAttackOrder
     
     if (otherThreats.exists(_.pixelDistanceEdge(unit) < 32)) {
-      val mineral = With.geography.ourBases.headOption.flatMap(_.minerals.headOption)
-      mineral.foreach(With.commander.gather(unit, _))
+      unit.agent.toGather = With.geography.ourBases.headOption.flatMap(_.minerals.headOption)
       unit.agent.toTravel = Some(With.geography.home.pixelCenter)
-      Move.delegate(unit)
+      With.commander.gather(unit)
+      With.commander.move(unit)
     }
     
     lazy val targetDistance = unit.pixelRangeAgainst(target) + target.unitClass.radialHypotenuse + unit.unitClass.radialHypotenuse
@@ -56,9 +55,9 @@ object Poke extends Action {
         Retreat.delegate(unit)
       }
       else {
-        Move.delegate(unit)
+        With.commander.move(unit)
       }
     }
-    Attack.delegate(unit)
+    With.commander.attack(unit)
   }
 }

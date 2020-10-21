@@ -68,7 +68,7 @@ class Pushes {
       if (unit.irradiated) {
         put(new ExplosionIrradiateSplash(unit))
       }
-      if (unit.is(Terran.SpiderMine) && (unit.isEnemy || ! unit.burrowed && With.framesSince(unit.frameDiscovered) > GameTime(3, 0)())) {
+      if (unit.is(Terran.SpiderMine) && unit.visible && (unit.isEnemy || ! unit.burrowed && With.framesSince(unit.frameDiscovered) > GameTime(3, 0)())) {
         put(new ExplosionSpiderMineBlast(unit))
       }
       if (unit.is(Zerg.InfestedTerran)) {

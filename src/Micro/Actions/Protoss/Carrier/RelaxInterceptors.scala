@@ -1,7 +1,7 @@
 package Micro.Actions.Protoss.Carrier
 
+import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders}
 import Utilities.ByOption
 
@@ -17,7 +17,7 @@ object RelaxInterceptors extends Action {
     val nearestTarget = ByOption.minBy(friendlyTargets)(_.pixelDistanceCenter(unit))
     nearestTarget.foreach(t => {
       unit.agent.toTravel = Some(t.pixelCenter.project(unit.pixelCenter, 32 * 12))
-      Move.delegate(unit)
+      With.commander.move(unit)
     })
   }
 }

@@ -120,7 +120,6 @@ class Visualization {
     ShowBattle,
     ShowBlackScreen,
     ShowBulletsAsHearts,
-    ShowCarriers,
     ShowClustering,
     ShowDesire,
     ShowEconomy,

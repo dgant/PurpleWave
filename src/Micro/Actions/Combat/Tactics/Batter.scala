@@ -10,7 +10,6 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Targeting.Filters.TargetFilterWhitelist
 import Micro.Actions.Combat.Targeting.TargetAction
-import Micro.Actions.Commands.{Attack, Move}
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
@@ -82,7 +81,7 @@ object Batter extends Action {
     // TODO: Walk up to the wall when our mobility > 1 and we're not shooting.
     
     if (unit.readyForAttackOrder || unit.agent.toAttack.forall(unit.inRangeToAttack)) {
-      Attack.delegate(unit)
+      With.commander.attack(unit)
     }
   
     if (unit.ready && altitudeHere < altitudeThere) {
@@ -97,7 +96,7 @@ object Batter extends Action {
       
       val destination = ByOption.minBy(walkableTiles)(_.pixelCenter.pixelDistance(unit.pixelCenter))
       unit.agent.toTravel = destination.map(_.pixelCenter).orElse(unit.agent.toTravel)
-      Move.delegate(unit)
+      With.commander.move(unit)
   
       //TMP
       walkableTiles.foreach(tile => DrawMap.circle(tile.pixelCenter, 15, Colors.DarkYellow))

@@ -1,8 +1,8 @@
 package Micro.Actions.Combat.Tactics
 
+import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
-import Micro.Actions.Commands.Move
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -46,7 +46,7 @@ object Detect extends Action {
       Retreat.delegate(unit)
     }
     else {
-      Move.delegate(unit)
+      With.commander.move(unit)
     }
   }
 

@@ -1,8 +1,8 @@
 package Micro.Actions.Combat.Maneuvering
 
+import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Yank extends Action {
@@ -19,6 +19,6 @@ object Yank extends Action {
     Potshot.delegate(unit)
     unit.agent.canFlee = true
     unit.agent.toTravel = Some(unit.agent.toLeash.get.pixelCenter)
-    Move.delegate(unit)
+    With.commander.move(unit)
   }
 }

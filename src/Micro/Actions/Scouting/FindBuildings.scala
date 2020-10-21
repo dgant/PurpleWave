@@ -75,6 +75,6 @@ abstract class AbstractFindBuildings extends Action {
     val path = profile.find
     unit.agent.toTravel = Some(tileToScout.pixelCenter)
     MicroPathing.tryMovingAlongTilePath(unit, path)
-    Move.delegate(unit)
+    With.commander.move(unit)
   }
 }

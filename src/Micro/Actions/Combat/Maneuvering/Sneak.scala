@@ -21,7 +21,7 @@ object Sneak extends Action {
   override protected def perform(unit: FriendlyUnitInfo) {
     Potshot.delegate(unit)
 
-    if ( ! unit.ready) return
+    if (unit.unready) return
 
     if ( ! unit.effectivelyCloaked || unit.tileArea.expand(2, 2).tiles.exists(With.grids.enemyDetection.isDetected)) {
       Retreat.delegate(unit)

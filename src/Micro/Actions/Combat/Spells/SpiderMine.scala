@@ -6,7 +6,6 @@ import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Targeting.Filters.TargetFilter
-import Micro.Actions.Commands.Move
 import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWorkers}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -73,7 +72,7 @@ object SpiderMine extends Action {
     val target = vulture.agent.toAttack.get
 
     Potshot.delegate(vulture)
-    if ( ! vulture.ready) return
+    if (vulture.unready) return
 
     val saboteurs = vulture.matchups.alliesInclSelf.filter(u => u.is(Terran.Vulture) && u.friendly.exists(_.spiderMines > 0))
     val saboteursInitial  = new mutable.PriorityQueue[UnitInfo]()(Ordering.by(v => victims.map(_.pixelDistanceEdge(v)).min)) ++ saboteurs
@@ -86,9 +85,9 @@ object SpiderMine extends Action {
       vulture.agent.toTravel = Some(
         vulture.pixelCenter
           .project(target.pixelCenter, vulture.pixelDistanceEdge(target) + 64)
-          .nearestWalkableTerrain
+          .nearestWalkableTile
           .pixelCenter)
-      Move.delegate(vulture)
+      With.commander.move(vulture)
     }
   }
   

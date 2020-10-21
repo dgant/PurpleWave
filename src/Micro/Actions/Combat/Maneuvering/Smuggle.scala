@@ -1,7 +1,7 @@
 package Micro.Actions.Combat.Maneuvering
 
+import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Smuggle extends Action {
@@ -14,6 +14,6 @@ object Smuggle extends Action {
     if (unit.matchups.threats.exists(_.framesBeforeAttacking(unit) < 24)) {
       Retreat.delegate(unit)
     }
-    Move.delegate(unit)
+    With.commander.move(unit)
   }
 }

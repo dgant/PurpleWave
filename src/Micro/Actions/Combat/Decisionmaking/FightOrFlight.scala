@@ -5,6 +5,7 @@ import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
+import Micro.Actions.Basic.Gather
 import Micro.Actions.Transportation.Caddy.Shuttling
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -64,7 +65,7 @@ object FightOrFlight extends Action {
       val output = (
         ally.unitClass.isWorker
         && ally.visibleToOpponents
-        && ally.agent.toGather.exists(_.pixelDistanceEdge(ally) < With.configuration.workerDefenseRadiusPixels)
+        && ally.agent.toGather.exists(_.pixelDistanceEdge(ally) < Gather.defenseRadiusPixels)
         && ally.matchups.pixelsOutOfNonWorkerRange <= 16 + unit.matchups.pixelsOutOfNonWorkerRange
         && ally.matchups.threats.exists(threat => u.canAttack && threat.framesToGetInRange(ally) <= 8 + unit.framesToGetInRange(threat))
       )

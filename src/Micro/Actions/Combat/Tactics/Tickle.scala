@@ -4,9 +4,7 @@ import Information.Geography.Pathfinding.PathfindProfile
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
-import Micro.Actions.Basic.MineralWalk
 import Micro.Actions.Combat.Maneuvering.Retreat
-import Micro.Actions.Commands.{Attack, Move}
 import Micro.Coordination.Pathing.MicroPathing
 import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -37,7 +35,7 @@ object Tickle extends Action {
     // * Fight when injured if everyone nearby is targeting someone else
     // * Don't get pulled out of the base
 
-    if ( ! tickler.ready) return
+    if (tickler.unready) return
 
     var attack                = true
 
@@ -64,7 +62,7 @@ object Tickle extends Action {
     if ( ! tickler.zone.bases.exists(_.owner.isEnemy)
       && ! enemies.exists(_.pixelDistanceEdge(tickler) < 48.0)
       && enemiesAttackingUs.size < 1) {
-      Move.consider(tickler)
+      With.commander.move(tickler)
       return
     }
 
@@ -132,7 +130,7 @@ object Tickle extends Action {
           .sortBy(_.remainingCompletionFrames)
           .sortBy(_.totalHealth)
           .headOption
-        Attack.delegate(tickler)
+        With.commander.attack(tickler)
       }
 
       val targets = tickler.matchups.targets.filter(target =>
@@ -181,7 +179,7 @@ object Tickle extends Action {
         || tickler.matchups.threats.forall(t => t.constructing || t.framesToGetInRange(tickler) > 48)
         || tickler.cooldownLeft - With.latency.framesRemaining <= targets.map(target => tickler.framesToTravelPixels(tickler.pixelDistanceEdge(target))).min) {
         tickler.agent.toAttack = Some(bestTarget)
-        Attack.consider(tickler)
+        With.commander.attack(tickler)
         return
       }
 
@@ -206,7 +204,7 @@ object Tickle extends Action {
             && tickler.pixelDistanceEdge(defender) >
             tickler.pixelDistanceEdge(freebie)))
       tickler.agent.toAttack = freebies
-      Attack.consider(tickler)
+      With.commander.attack(tickler)
       Retreat.consider(tickler)
     }
   }
@@ -249,9 +247,9 @@ object Tickle extends Action {
 
     // Mineral walk
     tickler.agent.toGather = With.geography.ourBases.flatMap(_.minerals).headOption
-    MineralWalk.consider(tickler)
     tickler.agent.toTravel = Some(tickler.agent.origin)
-    Move.consider(tickler)
+    With.commander.gather(tickler)
+    With.commander.move(tickler)
   }
   
   private def destroyBuildings(unit: FriendlyUnitInfo) {
@@ -260,6 +258,6 @@ object Tickle extends Action {
     val egg = With.units.enemy.view.filter(_.is(Zerg.Egg)).toVector.sortBy(_.totalHealth).headOption
     lazy val nonEgg = With.units.enemy.view.filter(_.unitClass.isBuilding).toVector.sortBy(_.totalHealth).headOption
     unit.agent.toAttack = egg.orElse(nonEgg)
-    Attack.consider(unit)
+    With.commander.attack(unit)
   }
 }

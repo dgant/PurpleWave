@@ -8,7 +8,6 @@ import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.{Pixel, PixelRay}
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Ring
-import Micro.Actions.Commands.Move
 import Micro.Coordination.Pushing.Push
 import Micro.Heuristics.Potential
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -16,6 +15,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.{ByOption, TakeN}
 
 object MicroPathing {
+
 
   def getRealPath(unit: FriendlyUnitInfo, desire: DesireProfile): MicroPath = {
     // TODO: It's dumb that this ONLY uses desire.home
@@ -46,6 +46,9 @@ object MicroPathing {
     output
   }
 
+  // McRave recommends moving 5 tiles at a time when following path waypoints.
+  // That distance avoids trying to move units immediately to the other side of a building,
+  // which can cause them to get stuck against that building.
   val waypointDistanceTiles = 5
   val waypointDistancePixels = 32 * waypointDistanceTiles
   def getWaypointNavigatingTerrain(unit: FriendlyUnitInfo, to: Pixel): Pixel = {
@@ -64,17 +67,14 @@ object MicroPathing {
   }
 
   def getWaypointAlongTilePath(path: TilePath): Option[Pixel] = {
-    // Moving 5 tiles ahead was the recommendation from McRave.
-    // It avoids trying to move units immediately to the other side of a building,
-    // which can cause them to get stuck against that building.
-    if (path.pathExists) Some(path.tiles.get.take(5).last.pixelCenter) else None
+    if (path.pathExists) Some(path.tiles.get.take(waypointDistanceTiles).last.pixelCenter) else None
   }
 
   def tryMovingAlongTilePath(unit: FriendlyUnitInfo, path: TilePath): Unit = {
     val waypoint = getWaypointAlongTilePath(path)
     waypoint.foreach(pixel => {
-      unit.agent.toTravel = waypoint
-      Move.delegate(unit)
+      unit.agent.waypoint = waypoint
+      With.commander.move(unit)
     })
   }
 
@@ -148,56 +148,62 @@ object MicroPathing {
     Some(ForceMath.sumAll(forceSafety.normalize, forceSpacing))
   }
 
-  def combinePushForces(pushForces: Seq[(Push, Force)]): Force = {
-    if (pushForces.isEmpty) return new Force
-    val highestPriority = pushForces.view.map(_._1.priority).max
-    pushForces.filter(_._1.priority == highestPriority).map(_._2).reduce(_ + _)
-  }
-
   def getPushForces(unit: FriendlyUnitInfo): Seq[(Push, Force)] = {
     With.coordinator.pushes.get(unit).map(p => (p, p.force(unit))).filter(_._2.exists(_.lengthSquared > 0)).map(p => (p._1, p._2.get))
   }
 
-  def getPushForce(unit: FriendlyUnitInfo): Force = {
-    combinePushForces(getPushForces(unit))
+  def getPushRadians(pushForces: Seq[(Push, Force)]): Option[Double] = {
+    val highestPriority = ByOption.max(pushForces.view.map(_._1.priority))
+    pushForces
+      .filter(pushForce => highestPriority.contains(pushForce._1.priority))
+      .map(_._2)
+      .reduceOption(_ + _)
+      .map(_.radians)
   }
 
-  @deprecated
+  def getPushRadians(unit: FriendlyUnitInfo): Option[Double] = {
+    getPushRadians(getPushForces(unit))
+  }
+
   def tryDirectRetreat(unit: FriendlyUnitInfo, desire: DesireProfile, radians: Double): Unit = {
-    val directPath = findDirectPath(unit, desire, radians)
+    val directPath = findRayTowards(unit, radians, desire)
     if (directPath.isDefined) {
       unit.agent.toTravel = Some(directPath.get)
-      Move.delegate(unit)
+      With.commander.move(unit)
     }
   }
 
-  def findDirectPath(unit: FriendlyUnitInfo, desire: DesireProfile, radians: Double): Option[Pixel] = {
+  def qualifyRetreatDirection(
+    unit: FriendlyUnitInfo,
+    radians: Double,
+    avoidThreats: Boolean = true,
+    towards: Option[Pixel] = None): Option[Pixel] = {
+    val pathLength = Math.max(waypointDistancePixels, 64 + unit.matchups.pixelsOfEntanglement)
+    val ray = new PixelRay(unit.pixelCenter, pathLength, radians)
+    // Is the endpoint valid?
+    if ( ! ray.to.valid) return None
+    // Is the path traversable?
+    if ( ! unit.flying && ! ray.tilesIntersected.forall(_.walkable)) return None
+    // Does it takes us towards our goal?
+    if (towards.exists(t => unit.zone != t.zone && unit.pixelDistanceTravelling(t) <= unit.pixelDistanceTravelling(ray.to, t))) return None
+    // Does it keep us safe?
+    if (avoidThreats && unit.matchups.threats.exists(t => t.pixelDistanceSquared(ray.to) <= t.pixelDistanceSquared(unit.pixelCenter))) return None
+    Some(ray.to)
+  }
+
+  def findRayTowards(unit: FriendlyUnitInfo, radians: Double, desire: DesireProfile = DesireProfile(0, 0, 0)): Option[Pixel] = {
     val pathLength = 64 + unit.matchups.pixelsOfEntanglement
     val stepSize = Math.min(pathLength, Math.max(64, unit.topSpeed * With.reaction.agencyMax))
     val origin = unit.agent.origin
 
     // Find a traversable path
+    // TODO: Control acceptable range of angles
     val rotationSteps = 4
     var output: Option[Pixel] = None
     (1 to 1 + 2 * rotationSteps).foreach(r => {
       if (output.isEmpty) {
         val rotationRadians = ((r % 2) * 2 - 1) * (r / 2) * Math.PI / 3 / rotationSteps
-        val ray = PixelRay(unit.pixelCenter, unit.pixelCenter.radiateRadians(radians + rotationRadians, pathLength))
-        val destination = ray.to
-        // Verify validity of the path
-        if (destination.valid) {
-          if (unit.flying || ray.tilesIntersected.forall(_.walkable)) {
-            // Verify that it takes us home, if necessary
-            if (unit.zone == origin.zone || desire.home * unit.pixelDistanceTravelling(destination, origin) <= desire.home * unit.pixelDistanceTravelling(origin)) {
-              // Verify that it gets us away from threats
-              // Compare distance to a tiny incremental step so it rejects walking through enemies
-              if (unit.matchups.threats.forall(threat => threat.pixelDistanceSquared(unit.pixelCenter) < threat.pixelDistanceSquared(unit.pixelCenter.project(destination, 16)))) {
-                // Use smaller step size to use direct line travel instead of BW's 8-directional long distance moves
-                output = Some(unit.pixelCenter.project(destination, stepSize))
-              }
-            }
-          }
-        }
+        output = qualifyRetreatDirection(unit, radians + rotationRadians, desire.safety > 0, Some(unit.agent.origin).filter(x => desire.home > 0))
       }
     })
     output

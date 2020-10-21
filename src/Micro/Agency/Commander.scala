@@ -3,6 +3,8 @@ package Micro.Agency
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints, Tile}
 import Mathematics.PurpleMath
+import Micro.Coordination.Pathing.MicroPathing
+import Micro.Coordination.Pushing.{TrafficPriorities, UnitLinearGroundPush}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
@@ -18,25 +20,26 @@ import bwapi.UnitCommandType
 // of Brood War's glitchy unit behavior.
 //
 class Commander {
-  def run() {
+  def run(): Unit = {
     With.units.ours.foreach(unit => unit.sleepUntil(Math.max(unit.nextOrderFrame.getOrElse(0), AttackDelay.nextSafeOrderFrame(unit))))
   }
   
-  def doNothing(unit: FriendlyUnitInfo) {
+  def doNothing(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return
     sleep(unit)
   }
   
-  def stop(unit: FriendlyUnitInfo) {
+  def stop(unit: FriendlyUnitInfo): Unit = {
+    leadFollower(unit, stop)
     if (unit.unready) return
     unit.baseUnit.stop()
     sleep(unit)
   }
   
-  def hold(unit: FriendlyUnitInfo) {
+  def hold(unit: FriendlyUnitInfo): Unit = {
+    leadFollower(unit, hold)
     if (unit.unready) return
     if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
-    unit.agent.leadFollower = follower => hold(follower)
     if (unit.velocity.lengthSquared > 0 && ! unit.holdingPosition) {
       unit.baseUnit.holdPosition()
       sleep(unit)
@@ -51,17 +54,27 @@ class Commander {
   }
 
   def attack(unit: FriendlyUnitInfo): Unit = unit.agent.toAttack.foreach(attack(unit, _))
-  private def attack(unit: FriendlyUnitInfo, target: UnitInfo) {
+  private def attack(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
+    leadFollower(unit, attack(_, target))
     if (unit.unready) return
-    if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
-    unit.agent.leadFollower = follower => attack(follower, target)
 
-    if ( ! unit.readyForAttackOrder) { // Necessary or redundant?
-      sleep(unit)
+    // Drop out of transport
+    val dropship = unit.transport.find(_.isAny(Terran.Dropship, Protoss.Shuttle, Zerg.Overlord))
+    val delay = unit.cooldownMaxAirGround
+    if (dropship.isDefined
+      && Math.min(unit.pixelDistanceEdge(target), unit.pixelDistanceEdge(target.projectFrames(delay)))
+      <= unit.pixelRangeAgainst(target)
+        + With.reaction.agencyAverage
+        + delay * unit.topSpeed) {
+      unload(dropship.get, unit)
       return
     }
+
+    if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
+    if ( ! unit.readyForAttackOrder) { sleep(unit); return }
   
     // TODO: Fix attack cancelling for Photon Cannons
+    //
     // Via Ankmairdor, the iscript:
     // PhotonCannonGndAttkInit:
     //   playfram           2
@@ -85,8 +98,10 @@ class Commander {
     // if you wait until a target is in range to issue attack, you save an average of 3 frames (LF3)
     // if you waited to issue attack and the tower autotargets before your order arrives, you lose at least 22 frames(cooldown)
     // as far as I can tell, no penalty for bad early guesses on attacking
-
     if (unit.is(Protoss.PhotonCannon)) return
+
+    if (unit.is(Zerg.Lurker) && ! unit.burrowed) { move(unit, target.pixelCenter); return }
+    if (target.is(Protoss.Interceptor)) { attackMove(unit, target.pixelCenter); return }
     
     if (target.visible) {
       lazy val moving           = unit.moving
@@ -97,101 +112,57 @@ class Commander {
       val shouldOrder = (
         thisIsANewTarget
         || (overdueToAttack && (moving || alreadyInRange))
-        || (target.isFriendly && unit.is(Protoss.Carrier))) // Carrier warmup
+        || (target.isFriendly && unit.is(Protoss.Carrier))) // Carrier warmup; spam attack
       
       if (shouldOrder) {
-        unit.baseUnit.attack(target.baseUnit)
+        if (unit.unitClass.accelerationFrames <= 1 && unit.matchups.targetsInRange.forall(unit.agent.toAttack.contains)) {
+          unit.baseUnit.holdPosition()
+        } else {
+          unit.baseUnit.attack(target.baseUnit)
+        }
       }
       sleepAttack(unit)
     } else {
       move(unit, target.pixelCenter)
     }
   }
-  
-  private def limit(unit: FriendlyUnitInfo, destination: Pixel): Pixel = {
-    Pixel(
-      PurpleMath.clamp(destination.x, unit.unitClass.width  / 2,  With.mapPixelWidth  - unit.unitClass.width  / 2),
-      PurpleMath.clamp(destination.y, unit.unitClass.height / 2,  With.mapPixelHeight - unit.unitClass.height / 2))
-  }
 
-  def attackMove(unit: FriendlyUnitInfo): Unit = unit.agent.toStep.orElse(unit.agent.toTravel).foreach(attackMove(unit, _))
-  private def attackMove(unit: FriendlyUnitInfo, destination: Pixel) {
-    if (unit.unready) return
-    if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
-    val alreadyAttackMovingThere = unit.command.exists(c =>
-      c.getType.toString == UnitCommandType.Attack_Move.toString &&
-      new Pixel(c.getTargetPosition).pixelDistance(destination) < 128)
-    
-    if ( ! alreadyAttackMovingThere || unit.seeminglyStuck) {
-      unit.baseUnit.attack(destination.bwapi)
-    }
-    
-    unit.agent.leadFollower = follower => attackMove(follower, destination)
-    sleepAttack(unit)
-  }
+  /**
+    * Adjust the unit's destination to ensure successful execution of the move.
+    */
 
-  def patrol(unit: FriendlyUnitInfo): Unit = unit.agent.toStep.orElse(unit.agent.toTravel).foreach(patrol(unit, _))
-  private def patrol(unit: FriendlyUnitInfo, to: Pixel) {
-    if (unit.unready) return
-    autoUnburrow(unit)
-    unit.baseUnit.patrol(to.bwapi)
-    unit.agent.leadFollower = follower => patrol(follower, to)
-    sleepAttack(unit)
-  }
+  def getAdjustedDestination(unit: FriendlyUnitInfo, argTo: Pixel): Pixel = {
+    var to: Pixel = argTo
 
-  def move(unit: FriendlyUnitInfo): Unit = unit.agent.toStep.orElse(unit.agent.toTravel).foreach(move(unit, _))
-  private def move(unit: FriendlyUnitInfo, to: Pixel) {
-    if (unit.unready) return
-    autoUnburrow(unit)
-
-    // Send some flying units past their destination to maximize acceleration
-    var destination = to
-    var overshoot = if (unit.flying && ! unit.unitClass.isTransport) 288.0 else 32
-    if ((unit.flying || unit.is(Protoss.HighTemplar)) && unit.pixelDistanceSquared(to) < overshoot * overshoot) {
-      destination = unit.pixelCenter.project(to, overshoot)
-      if (destination == unit.pixelCenter) {
-        val signX = PurpleMath.forcedSignum(SpecificPoints.middle.x - destination.x)
-        val signY = PurpleMath.forcedSignum(SpecificPoints.middle.y - destination.y)
-        destination = destination.add((signX * overshoot).toInt, (signY * overshoot).toInt)
-        if ( ! unit.flying) {
-          destination = destination.nearestWalkableTerrain.pixelCenter
-        }
+    // Send some units past their destination to maximize acceleration
+    val overshootDistance = if (unit.flying && ! unit.unitClass.isTransport) 288.0 else 8
+    if (unit.isAny(Terran.Dropship, Terran.ScienceVessel, Protoss.Observer, Protoss.HighTemplar, Zerg.Mutalisk, Zerg.Overlord, Zerg.Queen)) {
+      if (to == unit.pixelCenter) {
+        val signX = PurpleMath.forcedSignum(SpecificPoints.middle.x - to.x)
+        val signY = PurpleMath.forcedSignum(SpecificPoints.middle.y - to.y)
+        to = to.add((signX * overshootDistance).toInt, (signY * overshootDistance).toInt)
+      } else if(unit.pixelDistanceSquared(to) < overshootDistance * overshootDistance) {
+        to = unit.pixelCenter.project(to, overshootDistance)
       }
     }
-    
-    // Limit moves to map edge
-   destination = limit(unit, destination)
-    
-    // Record the destination. This is mostly for diagnostic purposes (and identifying stuck units) so if the exact value changes later that's okay
-    unit.agent.toStep = Some(destination)
-    
-    // Mineral walk!
-    if (unit.unitClass.isWorker
-      && With.strategy.map.forall(_.mineralWalkingOkay)
-      && unit.agent.toBuild.isEmpty
-      && ! unit.carryingMinerals
-    ) {
-      val from      = unit.pixelCenter
-      val fromZone  = from.zone
-      val toZone    = to.zone
-      if (fromZone != toZone) {
-        val walkableMineral = toZone.bases
-          .flatMap(_.minerals)
-          .find(mineral =>
-            mineral.visible && //Can't mineral walk to an invisible mineral
-            mineral.pixelDistanceEdge(unit) > 60.0 &&
-            (
-              //Don't get stuck by trying to mineral walk through a mineral
-              toZone != fromZone ||
-              Math.abs(from.degreesTo(to) - from.degreesTo(mineral.pixelCenter)) < 30
-            ))
-        if (walkableMineral.isDefined) {
-          gather(unit, walkableMineral.get, allowReturningCargo = false)
-          return
-        }
-      }
+
+    // Clip to map
+    to = Pixel(
+      PurpleMath.clamp(to.x, unit.unitClass.dimensionLeft, With.mapPixelWidth  - unit.unitClass.dimensionRight),
+      PurpleMath.clamp(to.y, unit.unitClass.dimensionUp,   With.mapPixelHeight - unit.unitClass.dimensionDown))
+
+    // Path around terrain (if we haven't already)
+    val hasUsedPathfinding = false // TODO
+    if ( ! unit.flying && ! hasUsedPathfinding && unit.pixelDistanceTravelling(to) > MicroPathing.waypointDistancePixels) {
+      to = MicroPathing.getWaypointNavigatingTerrain(unit, to)
     }
-    
+    // Cleave to walkable terrain
+    else if ( ! unit.flying && ! to.tileIncluding.walkable) {
+      to = to.nearestWalkableTile.pixelCenter
+    }
+
+    // Apply noise
+    //
     // According to https://github.com/tscmoo/tsc-bwai/commit/ceb13344f5994d28d6b601cef126f264ca97426b
     // ordering moves to the exact same destination causes Brood War to not recalculate the path.
     //
@@ -203,26 +174,82 @@ class Commander {
     // The neutral buildings on Roadrunner frequently cause this.
     //
     // So we'll try to get the best of both worlds, and recalculate paths *occasionally*
+    // and only at distances long enough to avoid the issue.
     //
     // Also, give different units different paths to avoid "conga line" behavior
     //
-    if (unit.pixelDistanceCenter(destination) > 160) {
-      destination = destination.add((unit.id + With.frame / 36) % 5 - 2, 0)
+    if (unit.pixelDistanceCenter(to) > 160) {
+      to = to.add((unit.id + With.frame / 24) % 3 - 1, 0)
     }
-    
-    if (unit.pixelDistanceCenter(destination) > 3) {
-      if (unit.is(Terran.Medic) && unit.agent.shouldEngage) {
-        unit.baseUnit.attack(destination.bwapi)
+    to
+  }
+
+  def attackMove(unit: FriendlyUnitInfo): Unit = unit.agent.waypoint.orElse(unit.agent.toTravel).foreach(attackMove(unit, _))
+  private def attackMove(unit: FriendlyUnitInfo, destination: Pixel) {
+    leadFollower(unit, attackMove(_, destination))
+    if (unit.unready) return
+    val to = getAdjustedDestination(unit, destination)
+    autoUnburrowUnlessLurkerInRangeOf(unit, to)
+    val alreadyAttackMovingThere = unit.command.exists(c => c.getType == UnitCommandType.Attack_Move && new Pixel(c.getTargetPosition).pixelDistance(to) < 128)
+    if ( ! alreadyAttackMovingThere || unit.seeminglyStuck) {
+      unit.baseUnit.attack(to.bwapi)
+    }
+    sleepAttack(unit)
+  }
+
+  def patrol(unit: FriendlyUnitInfo): Unit = unit.agent.waypoint.orElse(unit.agent.toTravel).foreach(patrol(unit, _))
+  private def patrol(unit: FriendlyUnitInfo, destination: Pixel) {
+    leadFollower(unit, patrol(_, destination))
+    if (unit.unready) return
+    val to = getAdjustedDestination(unit, destination)
+    autoUnburrowUnlessLurkerInRangeOf(unit, to)
+    unit.baseUnit.patrol(to.bwapi)
+    sleepAttack(unit)
+  }
+
+  def move(unit: FriendlyUnitInfo): Unit = unit.agent.waypoint.orElse(unit.agent.toTravel).foreach(move(unit, _))
+  private def move(unit: FriendlyUnitInfo, destination: Pixel) {
+    leadFollower(unit, move(_, destination))
+    unit.agent.directRide(destination)
+    if (unit.unready) return
+    autoUnburrow(unit)
+    val to = getAdjustedDestination(unit, destination)
+    if (unit.is(Terran.Medic) && unit.agent.shouldEngage) {
+      attackMove(unit, to)
+    } else if (unit.pixelDistanceCenter(to) > 3) {
+      // When bot is slowing down, use attack-move
+      if (unit.agent.shouldEngage
+        && With.reaction.agencyAverage > 12
+        && ! unit.unitClass.isWorker
+        && unit.canAttack) {
+        attackMove(unit, to)
+      } else if (
+        // If we have a ride which can get us there faster, take it
+        unit.agent.ride.isDefined
+          && unit.framesToTravelTo(destination) >
+          4 * unit.unitClass.groundDamageCooldown
+            + unit.agent.ride.get.framesToTravelTo(unit.pixelCenter)
+            + unit.agent.ride.get.framesToTravelPixels(unit.pixelDistanceCenter(destination))) {
+        rightClick(unit, unit.agent.ride.get)
       }
       else {
         unit.baseUnit.move(destination.bwapi)
       }
+      sleep(unit)
     }
-    unit.agent.leadFollower = follower => move(follower, destination)
-    sleep(unit)
+
+
+
+    if (unit.agent.priority > TrafficPriorities.None) {
+      With.coordinator.pushes.put(new UnitLinearGroundPush(
+        unit.agent.priority,
+        unit,
+        unit.pixelCenter.project(destination, Math.min(unit.pixelDistanceCenter(destination), MicroPathing.waypointDistancePixels))))
+    }
   }
   
   def rightClick(unit: FriendlyUnitInfo, target: UnitInfo) {
+    leadFollower(unit, rightClick(_, target))
     if (unit.unready) return
     if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
     unit.baseUnit.rightClick(target.baseUnit)
@@ -279,7 +306,7 @@ class Commander {
   }
 
   def gather(unit: FriendlyUnitInfo): Unit = unit.agent.toGather.foreach(gather(unit, _))
-  def gather(unit: FriendlyUnitInfo, resource: UnitInfo, allowReturningCargo: Boolean = true) {
+  private def gather(unit: FriendlyUnitInfo, resource: UnitInfo, allowReturningCargo: Boolean = true) {
     if (unit.unready) return
     autoUnburrow(unit)
     if (allowReturningCargo && (unit.carryingMinerals || unit.carryingGas)) {
@@ -389,16 +416,16 @@ class Commander {
   }
   
   def cloak(unit: FriendlyUnitInfo, tech: Tech) {
+    leadFollower(unit, cloak(_, tech))
     if (unit.unready) return
     unit.agent.lastCloak = With.frame
     unit.baseUnit.cloak()
-    unit.agent.leadFollower = follower => cloak(follower, tech)
     sleep(unit)
   }
   
   def decloak(unit: FriendlyUnitInfo, tech: Tech) {
+    leadFollower(unit, decloak(_, tech))
     if (unit.unready) return
-    unit.agent.leadFollower = follower => decloak(follower, tech)
     unit.baseUnit.decloak()
     sleep(unit)
   }
@@ -425,6 +452,10 @@ class Commander {
     if (unit.unready) return
     if (unit.burrowed) unburrow(unit)
   }
+
+  private def autoUnburrowUnlessLurkerInRangeOf(unit: FriendlyUnitInfo, to: Pixel): Unit = {
+    if ( ! unit.is(Zerg.Lurker) || unit.pixelDistanceCenter(to) > unit.pixelRangeGround) autoUnburrow(unit)
+  }
   
   private def sleepAttack(unit: FriendlyUnitInfo) {
     sleep(unit, AttackDelay.framesToWaitAfterIssuingAttackOrder(unit))
@@ -440,12 +471,18 @@ class Commander {
     sleep(unit, 8)
   }
   
-  private def sleep(unit: FriendlyUnitInfo, requiredDelay: Int = 2) {
+  private def sleep(unit: FriendlyUnitInfo, requiredDelay: Int = 2): Unit = {
     val sleepUntil = Array(
       With.frame + With.configuration.performanceMinimumUnitSleep,
       With.frame + requiredDelay,
       With.frame + With.latency.turnSize,
       unit.nextOrderFrame.getOrElse(0)).max
     unit.sleepUntil(sleepUntil)
+  }
+
+  private def leadFollower(unit: FriendlyUnitInfo, todo: (FriendlyUnitInfo) => Unit): Unit = {
+    if (unit.ready) {
+      unit.agent.leadFollower = todo
+    }
   }
 }

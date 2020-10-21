@@ -1,9 +1,9 @@
 package Micro.Actions.Transportation
 
+import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
-import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable.ArrayBuffer
@@ -41,7 +41,7 @@ object Pickup extends Action {
       val passengerCentroid = PurpleMath.centroid(passengersAccepted.map(_.pixelCenter))
       val passengerCentral  = passengersAccepted.minBy(_.pixelDistanceCenter(passengerCentroid))
       unit.agent.toTravel = Some(passengerCentral.pixelCenter)
-      Move.delegate(unit)
+      With.commander.move(unit)
     }
   }
   

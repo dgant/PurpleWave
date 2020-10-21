@@ -23,15 +23,15 @@ abstract class Action {
   final def act(unit: FriendlyUnitInfo, giveCredit: Boolean): Boolean = {
     if (( ! requiresReadiness || unit.ready) && allowed(unit)) {
       val previousCredit = unit.agent.lastAction
-      if (giveCredit) unit.agent.lastAction = Some(this)
+      if (giveCredit) unit.agent.act(name)
       if (With.configuration.debugging) {
         unit.agent.actionsPerformed += this
       }
       perform(unit)
       if (unit.ready) {
-        unit.agent.lastAction = previousCredit
+        previousCredit.foreach(unit.agent.act)
       }
     }
-    ! unit.ready
+   unit.unready
   }
 }

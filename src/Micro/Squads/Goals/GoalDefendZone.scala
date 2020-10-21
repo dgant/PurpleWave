@@ -26,7 +26,7 @@ class GoalDefendZone extends SquadGoalBasic {
 
   override def run() {
     lazy val base = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.scouting.threatOrigin))
-    _currentDestination = zone.centroid.pixelCenter.nearestWalkableTerrain.pixelCenter
+    _currentDestination = zone.centroid.pixelCenter.nearestWalkableTile.pixelCenter
 
     if (squad.units.isEmpty) return
 

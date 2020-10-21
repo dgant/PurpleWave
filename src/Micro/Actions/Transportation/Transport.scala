@@ -3,7 +3,6 @@ package Micro.Actions.Transportation
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Smuggle
-import Micro.Actions.Commands.Move
 import Micro.Actions.Transportation.Caddy.BeAShuttle
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -20,7 +19,7 @@ object Transport extends Action {
       DropOff.consider(unit)
       Pickup.consider(unit)
       Smuggle.consider(unit)
-      Move.delegate(unit)
+      With.commander.move(unit)
     }
     BeAShuttle.consider(unit)
   }

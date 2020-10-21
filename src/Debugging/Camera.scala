@@ -71,7 +71,7 @@ class Camera {
     
     tween()
   
-    visibleArea   = TileRectangle(With.viewport.start.tileIncluding, With.viewport.start.pixel.add(Pixel(640, 400)).tileIncluding)
+    visibleArea   = TileRectangle(With.viewport.start.tileIncluding, With.viewport.start.asPixel.add(Pixel(640, 400)).tileIncluding)
     visibleUnits  = With.units.inTileRectangle(visibleArea).filter(_.visible).toSet
   }
   

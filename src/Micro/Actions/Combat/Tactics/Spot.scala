@@ -4,7 +4,6 @@ import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Micro.Actions.Action
-import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
@@ -34,7 +33,7 @@ object Spot extends Action {
 
     if (goal.isDefined) {
       unit.agent.toTravel = goal
-      Move.delegate(unit)
+      With.commander.move(unit)
     }
   }
 

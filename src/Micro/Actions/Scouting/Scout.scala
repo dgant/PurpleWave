@@ -1,8 +1,8 @@
 package Micro.Actions.Scouting
 
+import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Scout extends Action {
@@ -24,6 +24,6 @@ object Scout extends Action {
     if (unit.matchups.threatsInRange.isEmpty) {
       Potshot.consider(unit)
     }
-    Move.consider(unit)
+    With.commander.move(unit)
   }
 }

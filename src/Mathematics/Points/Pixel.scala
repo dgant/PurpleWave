@@ -111,7 +111,7 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline final def groundPixels(other: Pixel): Double = {
     With.paths.groundPixels(this, other)
   }
-  @inline final def nearestWalkableTerrain: Tile = {
+  @inline final def nearestWalkableTile: Tile = {
     val ti = tileIncluding
     if (ti.valid && With.grids.walkable.getUnchecked(ti.i)) return ti
     val tx = x / 32

@@ -46,13 +46,13 @@ object ShowUnitsFriendly extends View {
         val degrees = System.currentTimeMillis() % 360
         val radians = degrees * Math.PI / 360
         DrawMap.circle(unit.pixelCenter.radiateRadians(radians, 10), 2, Colors.NeonYellow, solid = true)
-        DrawMap.circle(unit.pixelCenter.radiateRadians(radians, 108), 3, Colors.NeonYellow, solid = true)
+        DrawMap.circle(unit.pixelCenter.radiateRadians(radians, -10), 2, Colors.NeonYellow, solid = true)
       }
     }
 
     if (showFightReason)  drawNextLabel(unit.agent.fightReason)
     if (showClient)       drawNextLabel(agent.lastClient.map(_.toString).getOrElse(""))
-    if (showAction)       drawNextLabel(agent.lastAction.map(_.name).getOrElse(""))
+    if (showAction)       drawNextLabel(agent.lastAction.getOrElse(""))
     if (showCommand)      drawNextLabel(unit.command.map(_.getType.toString).getOrElse(""))
     if (showOrder)        drawNextLabel(unit.order.toString)
     
@@ -63,7 +63,7 @@ object ShowUnitsFriendly extends View {
       if (unit.target.isEmpty) {
         targetPosition.foreach(DrawMap.line(unit.pixelCenter, _, Colors.MidnightGray))
       }
-      agent.toStep.foreach(DrawMap.arrow(unit.pixelCenter, _, Colors.DarkGray))
+      agent.waypoint.foreach(DrawMap.arrow(unit.pixelCenter, _, Colors.DarkGray))
       agent.toAttack.map(_.pixelCenter).foreach(DrawMap.arrow(unit.pixelCenter, _, Colors.NeonYellow))
       agent.toGather.map(_.pixelCenter).foreach(DrawMap.arrow(unit.pixelCenter, _, Colors.MidnightGreen))
     }

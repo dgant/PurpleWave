@@ -10,8 +10,8 @@ case class Point(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     PurpleMath.atan2(other.y - y, other.x - x)
   }
   @inline final def distanceSquared(other: Point): Double = {
-    val dx = x - pixel.x
-    val dy = y - pixel.y
+    val dx = x - other.x
+    val dy = y - other.y
     dx * dx + dy * dy
   }
 }

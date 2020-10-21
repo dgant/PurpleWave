@@ -8,7 +8,6 @@ import Mathematics.PurpleMath
 import Mathematics.Shapes.Spiral
 import Micro.Actions.Action
 import Micro.Actions.Combat.Targeting.Target
-import Micro.Actions.Commands.Attack
 import Micro.Coordination.Pathing.MicroPathing
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -21,7 +20,7 @@ object Paradrop extends Action {
     val firingDistance  = (reaver.effectiveRangePixels + Math.min(reaver.effectiveRangePixels, target.effectiveRangePixels)) / 2
     val originTile      = reaver.tileIncludingCenter
     val goalTile        = target.projectFrames(reaver.cooldownLeft).tileIncluding
-    val naiveTile       = goalTile.pixelCenter.project(originTile.pixelCenter, firingDistance).nearestWalkableTerrain
+    val naiveTile       = goalTile.pixelCenter.project(originTile.pixelCenter, firingDistance).nearestWalkableTile
     val naiveDistance   = target.pixelCenter.tileIncluding.tileDistanceFast(naiveTile)
     val candidates = Spiral.points(7)
       .map(naiveTile.add)
@@ -69,7 +68,7 @@ object Paradrop extends Action {
     val destinationAir    = unit.agent.toAttack.map(findFiringPosition(unit, _))
       .orElse(toFollow.map(folks => PurpleMath.centroid(folks.map(_.pixelCenter)).tileIncluding))
       .getOrElse((if (unit.agent.shouldEngage) unit.agent.destination else unit.agent.origin).tileIncluding)
-    val destinationGround = destinationAir.pixelCenter.nearestWalkableTerrain
+    val destinationGround = destinationAir.pixelCenter.nearestWalkableTile
 
     // If we can drop out and attack now, do so
     if (target.isDefined) {
@@ -78,12 +77,12 @@ object Paradrop extends Action {
       shouldDrop = shouldDrop || here.tileDistanceSquared(destinationGround) < 4 && here.zone == destinationGround.zone
       shouldDrop = shouldDrop || unit.inRangeToAttack(target.get) && With.grids.enemyRangeGround.get(here) == 0 && ! unit.matchups.threats.exists(t => t.isSiegeTankSieged() && t.inRangeToAttack(unit, here.pixelCenter))
       if (shouldDrop) {
-        Attack.delegate(unit)
+        With.commander.attack(unit)
         return
       }
     }
 
-    unit.agent.toTravel   = Some(destinationGround.pixelCenter)
+    unit.agent.toTravel = Some(destinationGround.pixelCenter)
 
     val targetDistance: Float = (unit.effectiveRangePixels + (if (unit.unitClass != Protoss.HighTemplar) unit.topSpeed * unit.cooldownLeft else 0)).toFloat / 32f
     val endDistanceMaximum = if (target.isDefined && unit.pixelDistanceCenter(target.get.pixelCenter) > targetDistance) targetDistance else 0
@@ -91,9 +90,8 @@ object Paradrop extends Action {
     var path = NoPath.value
     var crossTerrainOptions = if (unit.matchups.threatsInRange.nonEmpty) Seq(true) else Seq(false, true)
     Seq(Some(0), Some(With.grids.enemyRangeGround.addedRange - 1), None).foreach(maximumThreat =>
-
       if ( ! path.pathExists) {
-        val profile = new PathfindProfile(unit.pixelCenter.nearestWalkableTerrain)
+        val profile = new PathfindProfile(unit.pixelCenter.nearestWalkableTile)
         profile.end                 = Some(destinationGround)
         profile.endDistanceMaximum  = endDistanceMaximum // Uses the distance implied by allowGroundDist
         profile.lengthMaximum       = Some(30)
@@ -108,8 +106,13 @@ object Paradrop extends Action {
       }
     )
     if (path.pathExists) {
-      unit.agent.toTravel = Some(path.end.pixelCenter)
-      MicroPathing.tryMovingAlongTilePath(unit, path)
+      if (unit.pixelDistanceSquared(path.end.pixelCenter) <= 16 * 16) {
+        unit.transport.foreach(With.commander.unload(_, unit))
+        With.commander.doNothing(unit)
+      } else {
+        unit.agent.toTravel = Some(path.end.pixelCenter)
+        MicroPathing.tryMovingAlongTilePath(unit, path)
+      }
     } else {
       Manners.debugChat(f"Failed to path $unit to $destinationGround")
       Manners.debugChat(f"Targeting $target")

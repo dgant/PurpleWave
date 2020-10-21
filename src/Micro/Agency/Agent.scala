@@ -36,7 +36,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   ///////////////
 
   var priority      : TrafficPriority               = TrafficPriorities.None
-  var toStep        : Option[Pixel]                 = None
+  var waypoint      : Option[Pixel]                 = None
   var toTravel      : Option[Pixel]                 = None
   var toReturn      : Option[Pixel]                 = None
   var toAttack      : Option[UnitInfo]              = None
@@ -90,7 +90,8 @@ class Agent(val unit: FriendlyUnitInfo) {
   var lastFrame   : Int             = 0
   var lastIntent  : Intention       = new Intention
   var lastClient  : Option[Plan]    = None
-  var lastAction  : Option[Action]  = None
+  var lastAction  : Option[String]  = None
+  def act(value: String): Unit = { lastAction = Some(value) }
 
   val actionsPerformed: ArrayBuffer[Action] = new ArrayBuffer[Action]()
 
@@ -112,7 +113,8 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   private def resetState() {
     forces.clear()
-    toStep = None
+    unit.agent.priority = TrafficPriorities.None
+    waypoint = None
     fightReason = ""
     actionsPerformed.clear()
     _umbrellas.clear()
@@ -145,6 +147,8 @@ class Agent(val unit: FriendlyUnitInfo) {
     canFocus      = intent.canFocus
     canCast       = false
   }
+
+  def escalatePriority(newPriority: TrafficPriority): Unit = if (priority < newPriority) priority = newPriority
 
   //////////////////////
   // Arbiter coverage //

@@ -18,7 +18,7 @@ class FormationPush(airDestination: Pixel) extends FormationDesigner {
 
      */
 
-    val groundDestination = airDestination.nearestWalkableTerrain.pixelCenter
+    val groundDestination = airDestination.nearestWalkableTile.pixelCenter
 
 
     val targets = new CountMap[Pixel]

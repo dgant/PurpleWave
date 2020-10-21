@@ -5,8 +5,8 @@ import Mathematics.PurpleMath
 
 case class PixelRay(from: Pixel, to: Pixel) {
   
-  def this(from: Pixel, lengthPixels: Double, angleRadians: Double) {
-    this(from, from.radiateRadians(angleRadians, lengthPixels))
+  def this(from: Pixel, lengthPixels: Double, radians: Double) {
+    this(from, from.radiateRadians(radians, lengthPixels))
   }
   
   lazy val radians: Double = PurpleMath.atan2(to.y - from.y, to.x - from.x)

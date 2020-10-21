@@ -96,7 +96,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     }
     val moving = velocityX != 0 || velocityY != 0
     lazy val couldMove          = unitClass.canMove
-    lazy val tryingToMove       = canMove && friendly.flatMap(_.agent.toStep).exists(_.pixelDistance(pixelCenter) > 32)
+    lazy val tryingToMove       = canMove && friendly.flatMap(_.agent.waypoint).exists(_.pixelDistance(pixelCenter) > 32)
     lazy val tryingToAttackHere = canAttack && target.exists(t => t.isEnemyOf(this) &&  inRangeToAttack(t))
     lazy val tryingToAttackAway = canAttack && target.exists(t => t.isEnemyOf(this) && ! inRangeToAttack(t))
     if ( ! moving && couldMove && (tryingToMove || tryingToAttackAway)) {
@@ -264,7 +264,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   @inline final def pixelDistanceSquared    (otherPixel:  Pixel)              : Double  = pixelCenter.pixelDistanceSquared(otherPixel)
   @inline final def pixelDistanceTravelling (destination: Pixel)              : Double  = pixelDistanceTravelling(pixelCenter, destination)
   @inline final def pixelDistanceTravelling (destination: Tile)               : Double  = pixelDistanceTravelling(pixelCenter, destination.pixelCenter)
-  @inline final def pixelDistanceTravelling (from: Pixel, to: Pixel)          : Double  = if (flying) from.pixelDistance(to) else from.nearestWalkableTerrain.groundPixels(to.nearestWalkableTerrain)
+  @inline final def pixelDistanceTravelling (from: Pixel, to: Pixel)          : Double  = if (flying) from.pixelDistance(to) else from.nearestWalkableTile.groundPixels(to.nearestWalkableTile)
 
   @inline final def velocity: Force = Force(velocityX, velocityY)
 

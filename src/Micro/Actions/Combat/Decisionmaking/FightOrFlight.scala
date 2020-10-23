@@ -105,8 +105,7 @@ object FightOrFlight extends Action {
       val rideWait = PurpleMath.nanToInfinity(rideDistance / (ride.topSpeed + unit.topSpeed))
       (unit.isAny(Protoss.Reaver, Protoss.HighTemplar)
         && ! unit.matchups.threats.exists(t => t.isSiegeTankSieged() && t.pixelsToGetInRange(unit) < 48)
-        && (rideWait <= Math.max(0.0, unit.matchups.framesOfSafety)
-          || (unit.loaded && unit.matchups.framesOfSafety > unit.cooldownMaxAirGround)))
+        && (rideWait <= 12 + Math.max(0.0, unit.matchups.framesOfSafety) || (unit.loaded && unit.matchups.framesOfSafety > unit.cooldownMaxAirGround)))
     }))
 
     if (decision.isDefined) {

@@ -10,7 +10,7 @@ object ForceMath {
   def fromPixels(from: Pixel, to: Pixel, magnitude: Double = 1.0): Force =
     fromRadians(from.radiansTo(to), magnitude)
   
-  def fromRadians(radians: Double, magnitude: Double): Force =
+  def fromRadians(radians: Double, magnitude: Double = 1.0): Force =
     Force(
       magnitude * Math.cos(radians),
       magnitude * Math.sin(radians))

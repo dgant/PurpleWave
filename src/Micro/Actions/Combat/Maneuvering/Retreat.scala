@@ -15,7 +15,7 @@ object Retreat extends Action {
 
   override def perform(unit: FriendlyUnitInfo): Unit = {
     if ( ! unit.flying) {
-      unit.agent.priority = TrafficPriorities.Shove
+      unit.agent.escalatePriority(TrafficPriorities.Shove)
     }
     val desire = new DesireProfile(unit)
     retreatZealotsDirectly(unit)

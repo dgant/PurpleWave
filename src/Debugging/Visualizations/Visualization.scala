@@ -31,7 +31,6 @@ class Visualization {
     ShowUtilization,
     ShowUnitsFriendly,
     ShowUnitsEnemy,
-    ShowPushes,
     ShowStatus,
     ShowPerformanceSummary,
 

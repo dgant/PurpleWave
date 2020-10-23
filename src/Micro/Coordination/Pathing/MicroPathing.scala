@@ -1,6 +1,6 @@
 package Micro.Coordination.Pathing
 
-import Debugging.Visualizations.ForceColors
+import Debugging.Visualizations.Forces
 import Information.Geography.Pathfinding.Types.TilePath
 import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Lifecycle.With
@@ -98,18 +98,18 @@ object MicroPathing {
       val dpfFromWalkers    = walkers.map(_.dpfOnNextHitAgainst(unit)).sum
       val cliffingMagnitude = PurpleMath.nanToZero(dpfFromWalkers / dpfFromThreats)
       val forceCliffing     = Potential.cliffAttraction(unit).normalize(0.5 * cliffingMagnitude)
-      unit.agent.forces.put(ForceColors.sneaking, forceCliffing)
+      unit.agent.forces.put(Forces.sneaking, forceCliffing)
     }
 
     val bonusPreferExit   = if (unit.agent.origin.zone != unit.zone) 1.0 else if (unit.matchups.threats.exists(_.topSpeed < unit.topSpeed)) 0.0 else 0.5
     val bonusRegrouping   = 9.0 / Math.max(24.0, unit.matchups.framesOfEntanglement)
 
-    unit.agent.forces.put(ForceColors.threat,     Potential.avoidThreats(unit)      * desire.safety)
-    unit.agent.forces.put(ForceColors.traveling,  Potential.preferTravelling(unit)  * desire.home * bonusPreferExit)
-    unit.agent.forces.put(ForceColors.spreading,  Potential.preferSpreading(unit)   * desire.safety * desire.freedom)
-    unit.agent.forces.put(ForceColors.regrouping, Potential.preferRegrouping(unit)  * bonusRegrouping)
-    unit.agent.forces.put(ForceColors.spacing,    Potential.avoidCollision(unit)    * desire.freedom)
-    unit.agent.forces.put(ForceColors.sneaking,   Potential.detectionRepulsion(unit))
+    unit.agent.forces.put(Forces.threat,     Potential.avoidThreats(unit)      * desire.safety)
+    unit.agent.forces.put(Forces.traveling,  Potential.preferTravelling(unit)  * desire.home * bonusPreferExit)
+    unit.agent.forces.put(Forces.spreading,  Potential.preferSpreading(unit)   * desire.safety * desire.freedom)
+    unit.agent.forces.put(Forces.regrouping, Potential.preferRegrouping(unit)  * bonusRegrouping)
+    unit.agent.forces.put(Forces.spacing,    Potential.avoidCollision(unit)    * desire.freedom)
+    unit.agent.forces.put(Forces.sneaking,   Potential.detectionRepulsion(unit))
   }
 
   def getAvoidDirectForce(unit: FriendlyUnitInfo, desire: DesireProfile): Option[Force] = {

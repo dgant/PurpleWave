@@ -12,8 +12,8 @@ case class Force(x: Double, y: Double) {
   @inline def +(other: Force)   : Force = Force(x + other.x, y + other.y)
   @inline def -(other: Force)   : Force = Force(x - other.x, y - other.y)
   @inline def *(other: Force)   : Double = x * other.x + y * other.y
-  @inline def *(value: Double)  : Force = Force(value * x, value * y)
-  @inline def /(value: Double)  : Force = Force(value / x, value / y)
+  @inline def *(value: Double)  : Force = Force(x * value, y * value)
+  @inline def /(value: Double)  : Force = Force(x / value, y / value)
   
   @inline def radians: Double = PurpleMath.atan2(y, x)
   @inline def lengthSquared: Double = x * x + y * y

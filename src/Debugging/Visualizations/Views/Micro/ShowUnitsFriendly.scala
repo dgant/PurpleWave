@@ -7,14 +7,15 @@ import Information.Geography.Pathfinding.Types.TilePath
 import Lifecycle.With
 import Mathematics.Points.PixelRay
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.ByOption
 import bwapi.Color
 
 object ShowUnitsFriendly extends View {
   
   var selectedOnly    : Boolean = false
-  var showClient      : Boolean = true
+  var showClient      : Boolean = false
   var showAction      : Boolean = true
-  var showCommand     : Boolean = true
+  var showCommand     : Boolean = false
   var showOrder       : Boolean = false
   var showTargets     : Boolean = true
   var showFormation   : Boolean = true
@@ -22,6 +23,7 @@ object ShowUnitsFriendly extends View {
   var showDesire      : Boolean = true
   var showDistance    : Boolean = false
   var showFightReason : Boolean = true
+  var showForces      : Boolean = true
   var showLeaders     : Boolean = true
   var showCharge      : Boolean = true
   
@@ -92,12 +94,29 @@ object ShowUnitsFriendly extends View {
       }
       // TODO: Invoke this
     }
+
+    if (showForces) {
+      val length = 72.0
+      val maxForce = ByOption.max(agent.forces.values.map(_.lengthSlow)).getOrElse(0.0)
+      if (maxForce > 0.0) {
+        agent.forces.foreach(pair => {
+          val force           = pair._2
+          val forceNormalized = force.normalize(length * force.lengthSlow / maxForce)
+          DrawMap.arrow(
+            unit.pixelCenter,
+            unit.pixelCenter.add(
+              forceNormalized.x.toInt,
+              forceNormalized.y.toInt),
+            pair._1)
+        })
+      }
+    }
     
     if (showDesire) {
       val color = if (agent.shouldEngage) Colors.NeonGreen else Colors.NeonRed
       val pixel = unit.pixelCenter.subtract(0, 6 + unit.unitClass.height / 2)
-      DrawMap.circle(pixel, 3, Color.Black, solid = true)
-      DrawMap.circle(pixel, 2, color,       solid = true)
+      DrawMap.box(pixel.subtract(2, 2), pixel.add(2, 2), Color.Black, solid = true)
+      DrawMap.box(pixel.subtract(1, 1), pixel.add(1, 1), color,       solid = true)
     }
     
     if (showDistance) {

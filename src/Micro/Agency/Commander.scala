@@ -238,13 +238,11 @@ class Commander {
       sleep(unit)
     }
 
-
-
     if (unit.agent.priority > TrafficPriorities.None) {
       With.coordinator.pushes.put(new UnitLinearGroundPush(
         unit.agent.priority,
         unit,
-        unit.pixelCenter.project(destination, Math.min(unit.pixelDistanceCenter(destination), MicroPathing.waypointDistancePixels))))
+        unit.pixelCenter.project(destination, Math.min(unit.pixelDistanceCenter(destination), 64))))
     }
   }
   

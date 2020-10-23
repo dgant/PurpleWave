@@ -15,20 +15,16 @@ object ShuttlePark extends Action {
     ByOption.minBy(shuttle.agent.passengers
       .filter( ! _.loaded))(_.matchups.framesOfSafety)
       .foreach(passenger => {
+        val eta = Math.max(0, (shuttle.pixelDistanceCenter(passenger) - Shuttling.pickupRadius) / (shuttle.topSpeed + passenger.topSpeed))
+        val curb = passenger.projectFrames(eta)
         shuttle.agent.toTravel =
           ByOption.minBy(shuttle.matchups.threats)(_.framesBeforeAttacking(shuttle))
-            .map(threat =>
-              threat.pixelCenter.project(
-                passenger.pixelCenter,
-                threat.pixelDistanceCenter(passenger) + Shuttling.pickupRadius))
-            .orElse(Some(passenger.projectFrames(
-              (shuttle.pixelDistanceEdge(passenger) + Shuttling.pickupRadius)
-              / (shuttle.topSpeed + passenger.topSpeed))))
+            .map(threat => curb.radiateRadians(threat.pixelCenter.radiansTo(curb), Shuttling.pickupRadius / 2))
+            .orElse(Some(curb))
 
       if (shuttle.pixelDistanceCenter(shuttle.agent.destination) > 32.0 * 12.0 && shuttle.matchups.framesOfSafety < shuttle.unitClass.framesToTurn180) {
         Retreat.delegate(shuttle)
       }
-
       With.commander.move(shuttle)
     })
   }

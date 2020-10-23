@@ -2,7 +2,7 @@
 package Micro.Agency
 
 import Lifecycle.With
-import Mathematics.Physics.Force
+import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.{Pixel, Tile}
 import Micro.Actions.{Action, Idle}
 import Micro.Coordination.Pushing.{TrafficPriorities, TrafficPriority}
@@ -67,6 +67,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   var lastCloak: Int = 0
   var shouldEngage: Boolean = false
   val forces: mutable.Map[Color, Force] = new mutable.HashMap[Color, Force]
+  def force = ForceMath.sum(forces.values)
 
   def isScout: Boolean = lastIntent.toScoutTiles.nonEmpty
 

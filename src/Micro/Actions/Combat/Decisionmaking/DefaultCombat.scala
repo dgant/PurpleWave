@@ -1,6 +1,8 @@
 package Micro.Actions.Combat.Decisionmaking
 
+import Debugging.Visualizations.Forces
 import Lifecycle.With
+import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
@@ -8,8 +10,10 @@ import Micro.Actions.Combat.Tactics.Brawl
 import Micro.Actions.Combat.Tactics.Potshot.PotshotTarget
 import Micro.Actions.Combat.Targeting.Filters.TargetFilter
 import Micro.Actions.Combat.Targeting.{EvaluateTargets, TargetInRange}
-import Micro.Coordination.Pathing.{DesireProfile, MicroPathing}
+import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.{TrafficPriorities, TrafficPriority}
+import Micro.Heuristics.Potential
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, LightYear}
 
@@ -36,10 +40,8 @@ object DefaultCombat extends Action {
     private def target: Option[UnitInfo] = unit.agent.toAttack
 
     lazy val receivedPushes = With.coordinator.pushes.get(unit).map(p => (p, p.force(unit))).sortBy(-_._1.priority.value)
+    lazy val receivedPushForces = receivedPushes.view.filter(_._2.nonEmpty).map(p => (p._1, p._2.get))
     lazy val receivedPushPriority: TrafficPriority = ByOption.max(receivedPushes.view.map(_._1.priority)).getOrElse(TrafficPriorities.None)
-
-    // Decide how we want to retreat, if we do so
-    lazy val desire = new DesireProfile(unit)
 
     // Decide how far from target/threat we want to be
     lazy val idealPixelsFromTargetRange = if (target.exists(_.speedApproaching(unit) < 0)) -16d else 0d
@@ -107,19 +109,6 @@ object DefaultCombat extends Action {
       return
     }
 
-    // Shoves: Follow and propagate them
-    if (context.receivedPushPriority >= TrafficPriorities.Shove) {
-      // TODO: Do we actually want to follow the shove?
-      // Maybe the push is sending us where we want to go anyway,
-      // or the push is coming from a less important unit
-      // or the push is from a less-engaged unit in the previous agent cycle
-      // *Decide* whether pushing changes our behavior
-      unit.agent.act("Shoved")
-      simplePotshot(context)
-      followPushing(context)
-      return
-    }
-
     // PURR: If we're getting repaired, stand still and let it happen
     if (context.purring) {
       unit.agent.act("Purr")
@@ -139,12 +128,10 @@ object DefaultCombat extends Action {
     // TODO
 
     // Back up if we need to
-    // TODO: Bump when avoiding
     if (context.tooCloseToThreat) {
+      // ENGAGE: Kite if appropriate
       if (shouldEngage) {
-        // BREATHE
-        // TODO
-        unit.agent.act("Breathe")
+        // TODO: BREATHE
 
         // ABUSE/BREATHE
         lazy val framesToOpenGap = PurpleMath.nanToInfinity(context.missingDistanceFromThreat / unit.topSpeed)
@@ -170,10 +157,74 @@ object DefaultCombat extends Action {
           unit.agent.act("Breathe")
           return
         }
-      } else {
-        // Don't IGNORE
+      }
+      // DISENGAGE: Run away!
+      else {
+        // FALLBACK
+        // If getting shots off while retreating is easy, go for it
+        if (
+          unit.isAny(Terran.Vulture, Terran.SiegeTankUnsieged, Terran.Goliath, Terran.Wraith, Protoss.Archon, Protoss.Dragoon, Protoss.Reaver, Protoss.Scout, Zerg.Hydralisk, Zerg.Mutalisk)
+          && unit.readyForAttackOrder
+          && ( unit.is(Protoss.Reaver) || context.receivedPushPriority < TrafficPriorities.Shove)
+          && ( ! unit.isAny(Protoss.Archon, Protoss.Dragoon) || ! unit.matchups.threats.exists(t => t.is(Protoss.Dragoon) && t.framesToGetInRange(t) < 12))) {
+          simplePotshot(context)
+          unit.agent.act("Fallback")
+        }
         Retreat.consider(unit)
         return
+      }
+    }
+
+
+    // Shoves: Follow and propagate them
+    if (context.receivedPushPriority >= TrafficPriorities.Shove) {
+      // TODO: Do we actually want to follow the shove?
+      // Maybe the push is sending us where we want to go anyway,
+      // or the push is coming from a less important unit
+      // or the push is from a less-engaged unit in the previous agent cycle
+      // *Decide* whether pushing changes our behavior
+      unit.agent.act("Shoved")
+      simplePotshot(context)
+      followPushing(context)
+      return
+    }
+
+    // If we have a target, use firing position as destination
+    // TODO: Find smarter firing positions. Find somewhere safe and unoccupied but not too far to stand.
+    // TODO: If we're retreating, destination should be origin
+    unit.agent.toTravel = unit.agent.toAttack.map(_.pixelCenter).filter(p => With.grids.walkable.get(p.tileIncluding) || unit.flying).orElse(unit.agent.toTravel)
+    val forces = unit.agent.forces
+    val destination = unit.agent.destination
+    val destinationDistance = unit.pixelDistanceTravelling(destination)
+    forces(Forces.traveling)  = Potential.preferTravel(unit, destination)
+    forces(Forces.threat)     = Potential.avoidThreats(unit)
+    forces(Forces.spacing)    = Potential.avoidCollision(unit)
+    forces(Forces.spreading)  = MicroPathing.getPushRadians(context.receivedPushForces).map(ForceMath.fromRadians(_)).getOrElse(new Force)
+    // TODO: avoid splash
+    // TODO: forceRegroup, forceCohesion
+    // Reference https://github.com/bmnielsen/Stardust/blob/master/src/General/UnitCluster/Tactics/Move.cpp#L69
+
+    if (shouldEngage) {
+      // Nudge through if we want to reach a target
+      if ( ! unit.flying && unit.agent.toAttack.exists( ! unit.inRangeToAttack(_))) {
+        unit.agent.escalatePriority(TrafficPriorities.Nudge)
+      }
+
+      if (context.tooFarFromTarget) {
+        forces(Forces.traveling) *= 2
+      }
+      if ( ! context.tooCloseToThreat) {
+        forces(Forces.threat) /= 2
+      }
+    } else {
+      if (context.tooCloseToThreat) {
+        // This case is already handled by retreat logic
+        unit.agent.escalatePriority(TrafficPriorities.Shove)
+      }
+      else if (context.tooFarFromTarget) {
+        forces(Forces.threat) /= 2
+      } else {
+        forces(Forces.traveling) /= 2
       }
     }
 
@@ -183,23 +234,20 @@ object DefaultCombat extends Action {
     // - Can we open room for teammates behind us to enter?
     // TODO
 
-    // TODO: When we have an ideal distance, only move/shove up to that distance and no further
-
-    // CHASE: Moving shot/pursue if we want to
-    // TODO
-
-    // CHARGE
-    // TODO: Nudge when attacking something out of range or attacking
-    // TODO: Find position to shoot when distant
-    if (shouldEngage || unit.agent.toAttack.exists(unit.inRangeToAttack)) {
-      unit.agent.act("ComAttack")
+    if (unit.agent.toAttack.exists(unit.pixelsToGetInRange(_) < 64) && (unit.unitClass.melee || unit.readyForAttackOrder)) {
       With.commander.attack(unit)
+      unit.agent.act("ComAttack")
       return
     }
 
-    // Explicitly move, since we might have a target that we've simply chosen not to attack
-    // TODO: Squad movement
-    unit.agent.act("ComMove")
-    With.commander.move(unit)
+    // TODO: CHASE: Moving shot/pursue if we want to
+    val groupTravel = MicroPathing.findRayTowards(unit, unit.agent.force.radians)
+
+    if (groupTravel.isDefined) {
+      unit.agent.toTravel = groupTravel
+      unit.agent.act("ComMove")
+      With.commander.move(unit)
+      return
+    }
   }
 }

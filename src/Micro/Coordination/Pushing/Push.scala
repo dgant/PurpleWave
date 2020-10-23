@@ -26,7 +26,7 @@ trait Push {
   }
 
   protected def drawLabel(center: Pixel): Unit = {
-    DrawMap.label(toString, center, drawBackground = true, backgroundColor = priority.color)
+    DrawMap.label(priority.toString, center, drawBackground = true, backgroundColor = priority.color)
   }
 
   override val toString: String = getClass.getSimpleName.replace("%", "")

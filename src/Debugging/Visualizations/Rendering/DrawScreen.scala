@@ -99,7 +99,7 @@ object DrawScreen {
 
     battle.teams.foreach(team => {
       val isUs = team == battle.us
-      val centroid = team.centroid
+      val centroid = team.centroidAir
       val radius = ByOption.max(team.units.map(u => u.unitClass.radialHypotenuse + u.pixelDistanceCenter(centroid))).getOrElse(0.0).toInt
       val thickness = if (weWin == isUs) 2 else 5
       (0 until thickness).foreach(t => DrawMap.circle(centroid, radius + t, if (isUs) ourColorNeon else enemyColorNeon))

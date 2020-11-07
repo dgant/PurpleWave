@@ -1,5 +1,6 @@
 package Information.Battles.Types
 
+import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Mathematics.PurpleMath
 import Performance.Cache
@@ -11,9 +12,10 @@ class Team(val units: Vector[UnitInfo]) {
   // Populate immediately after construction! //
   //////////////////////////////////////////////
   
-  var battle      : Battle  = _
-  var vanguard    : Pixel   = SpecificPoints.middle
-  var centroid    : Pixel   = SpecificPoints.middle
+  var battle          : Battle  = _
+  var vanguard        : Pixel   = SpecificPoints.middle
+  var centroidAir     : Pixel   = SpecificPoints.middle
+  var centroidGround  : Pixel   = if (With.frame == 0) centroidAir else SpecificPoints.middle.nearestWalkableTile.pixelCenter // Hack fix to startup initialization order
   
   //////////////
   // Features //
@@ -24,6 +26,4 @@ class Team(val units: Vector[UnitInfo]) {
   lazy val meanDamageGround = new Cache(() => PurpleMath.nanToZero(PurpleMath.weightedMean(units.map(u => (u.damageOnHitGround  .toDouble,  u.dpfGround)))))
   lazy val meanDamageAir    = new Cache(() => PurpleMath.nanToZero(PurpleMath.weightedMean(units.map(u => (u.damageOnHitAir     .toDouble,  u.dpfAir)))))
   def meanDamageAgainst(unit: UnitInfo): Double = if (unit.flying) meanDamageAir() else meanDamageGround()
-
-
 }

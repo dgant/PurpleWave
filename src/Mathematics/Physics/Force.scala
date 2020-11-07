@@ -24,7 +24,7 @@ case class Force(x: Double, y: Double) {
   @inline def normalize(scale: Double = 1.0): Force = {
     val length = Math.sqrt(x*x+y*y)
     if (length == 0)
-      Force(scale.toInt, 0)
+      this
     else
       Force(
         scale * x / length,

@@ -11,6 +11,7 @@ import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.PurpleMath
 import Micro.Actions.Combat.Targeting.EvaluateTargets
+import Micro.Coordination.Pathing.MicroPathing
 import Micro.Matchups.MatchupAnalysis
 import Performance.Cache
 import Planning.Plan
@@ -96,7 +97,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     }
     val moving = velocityX != 0 || velocityY != 0
     lazy val couldMove          = unitClass.canMove
-    lazy val tryingToMove       = canMove && friendly.flatMap(_.agent.waypoint).exists(_.pixelDistance(pixelCenter) > 32)
+    lazy val tryingToMove       = canMove && friendly.filter(_.agent.tryingToMove).exists(_.targetPixel.exists(_.pixelDistance(pixelCenter) > 32))
     lazy val tryingToAttackHere = canAttack && target.exists(t => t.isEnemyOf(this) &&  inRangeToAttack(t))
     lazy val tryingToAttackAway = canAttack && target.exists(t => t.isEnemyOf(this) && ! inRangeToAttack(t))
     if ( ! moving && couldMove && (tryingToMove || tryingToAttackAway)) {
@@ -609,8 +610,17 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   
   @inline final def carryingResources: Boolean = carryingMinerals || carryingGas
 
+  @inline final def presumptiveStep: Pixel = presumptiveStepCache()
+  private val presumptiveStepCache = new Cache(() => MicroPathing.getWaypointAlongTerrain(this, presumptiveDestination))
+  @inline final def presumptiveDestination: Pixel =
+    friendly.flatMap(_.agent.toTravel)
+      .orElse(targetPixel)
+      .orElse(orderTargetPixel)
+      .orElse(presumptiveTarget.map(pixelToFireAt))
+      .getOrElse(pixelCenter)
   @inline final def presumptiveTarget: Option[UnitInfo] =
-    target
+    friendly.flatMap(_.agent.toAttack)
+      .orElse(target)
       .orElse(orderTarget)
       .orElse(orderTargetPixel.flatMap(somePixel => ByOption.minBy(matchups.targets)(_.pixelDistanceEdge(somePixel))))
 
@@ -651,7 +661,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     ( ! canMove
       || With.framesSince(lastSeen) < With.configuration.fogPositionDurationFrames
       || is(UnitMatchSiegeTank)
-      || (player.isTerran && base.exists(_.owner == player))))
+      || base.exists(_.owner == player)))
   
   @inline final def likelyStillAlive: Boolean = (
     likelyStillThere

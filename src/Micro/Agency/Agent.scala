@@ -1,8 +1,9 @@
 
 package Micro.Agency
 
+import Debugging.Visualizations.ForceMap
+import Information.Geography.Pathfinding.Types.TilePath
 import Lifecycle.With
-import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.{Pixel, Tile}
 import Micro.Actions.{Action, Idle}
 import Micro.Coordination.Pushing.{TrafficPriorities, TrafficPriority}
@@ -13,9 +14,7 @@ import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
 import Utilities.ByOption
-import bwapi.Color
 
-import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 class Agent(val unit: FriendlyUnitInfo) {
@@ -36,7 +35,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   ///////////////
 
   var priority      : TrafficPriority               = TrafficPriorities.None
-  var waypoint      : Option[Pixel]                 = None
   var toTravel      : Option[Pixel]                 = None
   var toReturn      : Option[Pixel]                 = None
   var toAttack      : Option[UnitInfo]              = None
@@ -66,10 +64,10 @@ class Agent(val unit: FriendlyUnitInfo) {
   var lastStim: Int = 0
   var lastCloak: Int = 0
   var shouldEngage: Boolean = false
-  val forces: mutable.Map[Color, Force] = new mutable.HashMap[Color, Force]
-  def force = ForceMath.sum(forces.values)
 
   def isScout: Boolean = lastIntent.toScoutTiles.nonEmpty
+
+  val forces: ForceMap = new ForceMap
 
   /////////////////
   // Suggestions //
@@ -88,15 +86,18 @@ class Agent(val unit: FriendlyUnitInfo) {
   // Diagnostics //
   /////////////////
 
-  var lastFrame   : Int             = 0
-  var lastIntent  : Intention       = new Intention
-  var lastClient  : Option[Plan]    = None
-  var lastAction  : Option[String]  = None
+  var lastFrame   : Int               = 0
+  var lastIntent  : Intention         = new Intention
+  var lastPath    : Option[TilePath]  = None
+  var lastClient  : Option[Plan]      = None
+  var lastAction  : Option[String]    = None
   def act(value: String): Unit = { lastAction = Some(value) }
 
   val actionsPerformed: ArrayBuffer[Action] = new ArrayBuffer[Action]()
 
   var fightReason: String = ""
+
+  var tryingToMove: Boolean = false
 
   ///////////////
   // Execution //
@@ -114,9 +115,10 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   private def resetState() {
     forces.clear()
+    lastPath = None
     unit.agent.priority = TrafficPriorities.None
-    waypoint = None
     fightReason = ""
+    tryingToMove = false
     actionsPerformed.clear()
     _umbrellas.clear()
     _rideGoal = None

@@ -53,9 +53,13 @@ class Commander {
     }
   }
 
+  private val tryingToMoveThreshold = 32
+
   def attack(unit: FriendlyUnitInfo): Unit = unit.agent.toAttack.foreach(attack(unit, _))
   private def attack(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
     leadFollower(unit, attack(_, target))
+    unit.agent.directRide(target.pixelCenter)
+    unit.agent.tryingToMove = unit.pixelsToGetInRange(target) > tryingToMoveThreshold
     if (unit.unready) return
 
     // Drop out of transport
@@ -152,12 +156,13 @@ class Commander {
       PurpleMath.clamp(to.y, unit.unitClass.dimensionUp,   With.mapPixelHeight - unit.unitClass.dimensionDown))
 
     // Path around terrain (if we haven't already)
-    val hasUsedPathfinding = false // TODO
-    if ( ! unit.flying && ! hasUsedPathfinding && unit.pixelDistanceTravelling(to) > MicroPathing.waypointDistancePixels) {
-      to = MicroPathing.getWaypointNavigatingTerrain(unit, to)
+    if ( ! unit.flying && unit.pixelDistanceTravelling(to) > MicroPathing.waypointDistancePixels) {
+      to = MicroPathing.getWaypointAlongTerrain(unit, to)
     }
-    // Cleave to walkable terrain
-    else if ( ! unit.flying && ! to.tileIncluding.walkable) {
+
+    // Cleave to walkable terrain until we're arriving at the destination
+    // This could prevent getting stuck eg when trying to move behind a mineral line with a Dragoon
+    else if ( ! unit.flying && ! to.tileIncluding.walkable && unit.pixelDistanceCenter(to) > 32) {
       to = to.nearestWalkableTile.pixelCenter
     }
 
@@ -184,9 +189,11 @@ class Commander {
     to
   }
 
-  def attackMove(unit: FriendlyUnitInfo): Unit = unit.agent.waypoint.orElse(unit.agent.toTravel).foreach(attackMove(unit, _))
+  def attackMove(unit: FriendlyUnitInfo): Unit = unit.agent.toTravel.foreach(attackMove(unit, _))
   private def attackMove(unit: FriendlyUnitInfo, destination: Pixel) {
     leadFollower(unit, attackMove(_, destination))
+    unit.agent.directRide(destination)
+    unit.agent.tryingToMove = unit.pixelDistanceCenter(destination) > tryingToMoveThreshold
     if (unit.unready) return
     val to = getAdjustedDestination(unit, destination)
     autoUnburrowUnlessLurkerInRangeOf(unit, to)
@@ -197,9 +204,11 @@ class Commander {
     sleepAttack(unit)
   }
 
-  def patrol(unit: FriendlyUnitInfo): Unit = unit.agent.waypoint.orElse(unit.agent.toTravel).foreach(patrol(unit, _))
+  def patrol(unit: FriendlyUnitInfo): Unit = unit.agent.toTravel.foreach(patrol(unit, _))
   private def patrol(unit: FriendlyUnitInfo, destination: Pixel) {
     leadFollower(unit, patrol(_, destination))
+    unit.agent.directRide(destination)
+    unit.agent.tryingToMove = unit.pixelDistanceCenter(destination) > tryingToMoveThreshold
     if (unit.unready) return
     val to = getAdjustedDestination(unit, destination)
     autoUnburrowUnlessLurkerInRangeOf(unit, to)
@@ -207,10 +216,11 @@ class Commander {
     sleepAttack(unit)
   }
 
-  def move(unit: FriendlyUnitInfo): Unit = unit.agent.waypoint.orElse(unit.agent.toTravel).foreach(move(unit, _))
+  def move(unit: FriendlyUnitInfo): Unit = unit.agent.toTravel.foreach(move(unit, _))
   private def move(unit: FriendlyUnitInfo, destination: Pixel) {
     leadFollower(unit, move(_, destination))
     unit.agent.directRide(destination)
+    unit.agent.tryingToMove = unit.pixelDistanceCenter(destination) > tryingToMoveThreshold
     if (unit.unready) return
     autoUnburrow(unit)
     val to = getAdjustedDestination(unit, destination)
@@ -235,19 +245,20 @@ class Commander {
       else {
         unit.baseUnit.move(destination.bwapi)
       }
-      sleep(unit)
+      if (unit.agent.priority > TrafficPriorities.None) {
+        With.coordinator.pushes.put(new UnitLinearGroundPush(
+          unit.agent.priority,
+          unit,
+          unit.pixelCenter.project(destination, Math.min(unit.pixelDistanceCenter(destination), 64))))
+      }
     }
 
-    if (unit.agent.priority > TrafficPriorities.None) {
-      With.coordinator.pushes.put(new UnitLinearGroundPush(
-        unit.agent.priority,
-        unit,
-        unit.pixelCenter.project(destination, Math.min(unit.pixelDistanceCenter(destination), 64))))
-    }
+    sleep(unit)
   }
   
   def rightClick(unit: FriendlyUnitInfo, target: UnitInfo) {
     leadFollower(unit, rightClick(_, target))
+    unit.agent.directRide(target.pixelCenter)
     if (unit.unready) return
     if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
     unit.baseUnit.rightClick(target.baseUnit)
@@ -267,6 +278,7 @@ class Commander {
   
   def useTechOnUnit(unit: FriendlyUnitInfo, tech: Tech, target: UnitInfo) {
     if (unit.unready) return
+    unit.agent.directRide(target.pixelCenter)
     autoUnburrow(unit)
     unit.baseUnit.useTech(tech.baseType, target.baseUnit)
     if (tech == Protoss.ArchonMeld || tech == Protoss.DarkArchonMeld) {

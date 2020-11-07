@@ -1,82 +1,62 @@
 package Micro.Actions.Combat.Maneuvering
 
 import Lifecycle.With
+import Mathematics.PurpleMath
 import Micro.Actions.Action
-import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Coordination.Pathing.{DesireProfile, MicroPathing}
+import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.TrafficPriorities
-import Planning.UnitMatchers.UnitMatchWorkers
+import Planning.UnitMatchers.UnitMatchSiegeTank
 import ProxyBwapi.Races.{Protoss, Zerg}
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.{ByOption, TakeN}
 
 object Retreat extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove && unit.matchups.threats.nonEmpty
 
+  case class DesireProfile(var home: Int = 0, var safety: Int = 0) {
+    def this(unit: FriendlyUnitInfo) {
+      this(0, 0)
+      def timeOriginOfThreat(threat: UnitInfo): Double = threat.framesToTravelTo(unit.agent.origin) - threat.pixelRangeAgainst(unit) * threat.topSpeed
+      lazy val distanceOriginUs    = unit.pixelDistanceTravelling(unit.agent.origin)
+      lazy val distanceOriginEnemy = ByOption.min(unit.matchups.threats.view.map(t => t.pixelDistanceTravelling(unit.agent.origin) - t.pixelRangeAgainst(unit))).getOrElse(2.0 * With.mapPixelWidth)
+      lazy val enemyCloser         = distanceOriginUs + 160 >= distanceOriginEnemy
+      lazy val timeOriginUs        = unit.framesToTravelTo(unit.agent.origin)
+      lazy val timeOriginEnemy     = TakeN.percentile(0.1, unit.matchups.threats)(Ordering.by(timeOriginOfThreat)).map(timeOriginOfThreat).getOrElse(Double.PositiveInfinity)
+      lazy val enemySooner         = timeOriginUs + 96 >= timeOriginEnemy
+      lazy val enemySieging        = unit.matchups.enemies.exists(_.isAny(UnitMatchSiegeTank, Zerg.Lurker)) && ! unit.base.exists(_.owner.isEnemy)
+      home =
+        if (unit.is(Protoss.DarkTemplar))
+          -1
+        else if (enemySieging && ! enemyCloser && ! enemySooner)
+          -1
+        else if (unit.agent.isScout || unit.zone == unit.agent.origin.zone)
+          0
+        else if (unit.base.exists(_.owner.isEnemy))
+          2
+        else
+          ((if (enemyCloser) 1 else 0) + (if (enemySooner) 1 else 0))
+      safety = PurpleMath.clamp(0, 3, (3 * (1 - unit.matchups.framesOfSafety / 72d)).toInt)
+    }
+  }
+
   override def perform(unit: FriendlyUnitInfo): Unit = {
     if ( ! unit.flying) {
-      unit.agent.escalatePriority(TrafficPriorities.Shove)
+      unit.agent.escalatePriority(TrafficPriorities.Pardon)
+      if (unit.matchups.framesOfSafety < 48) unit.agent.escalatePriority(TrafficPriorities.Nudge)
+      if (unit.matchups.framesOfSafety < 24) unit.agent.escalatePriority(TrafficPriorities.Bump)
+      if (unit.matchups.framesOfSafety <= 0) unit.agent.escalatePriority(TrafficPriorities.Shove)
     }
     val desire = new DesireProfile(unit)
-    retreatZealotsDirectly(unit)
-    retreatFliers(unit, desire)
-    retreatForceDirect(unit, desire)
-    retreatRealPath(unit, desire)
-    retreatDirectlyHome(unit, desire)
-    retreatForcePotential(unit, desire)
-  }
-
-  def retreatZealotsDirectly(unit: FriendlyUnitInfo): Unit = {
-    if (unit.unready) return
-    // Don't spray Zealots out against melee units, especially Zerglings
-    if (unit.is(Protoss.Zealot)
-      && unit.base == unit.agent.origin.base
-      && unit.agent.origin.base.exists(_.isOurMain)
-      && unit.matchups.threats.exists( ! _.unitClass.isWorker)
-      && unit.matchups.threats.forall(_.isAny(Protoss.Zealot, Zerg.Zergling, UnitMatchWorkers))) {
-      unit.agent.toTravel = unit.agent.origin.base.map(_.heart.pixelCenter)
-
-      // Poke back at enemies -- likely Zerglings -- while retreating
-      if ( ! unit.matchups.threats.exists(_.is(Protoss.Zealot))) {
-        Potshot.delegate(unit)
-      }
-      With.commander.move(unit)
-      return
+    if (unit.agent.forces.isEmpty) {
+      MicroPathing.setDefaultForces(unit, desire)
     }
-  }
-
-  def retreatFliers(unit: FriendlyUnitInfo, desire: DesireProfile): Unit = {
-    if (unit.unready) return
-    if (unit.flying || (unit.transport.exists(_.flying) && unit.matchups.framesOfSafety <= 0)) {
-      retreatForcePotential(unit, desire)
-      return
-    }
-  }
-
-  def retreatForceDirect(unit: FriendlyUnitInfo, desire: DesireProfile): Unit = {
-    if (unit.unready) return
-    MicroPathing.getAvoidDirectForce(unit, desire).map(_.radians).foreach(MicroPathing.tryDirectRetreat(unit, desire, _))
-  }
-
-  def retreatRealPath(unit: FriendlyUnitInfo, desire: DesireProfile): Unit = {
-    if (unit.unready) return
-    val path = MicroPathing.getRealPath(unit, desire)
-    path.tilePath.foreach(MicroPathing.tryMovingAlongTilePath(unit, _))
-  }
-
-  def retreatForcePotential(unit: FriendlyUnitInfo, desire: DesireProfile): Unit = {
-    if (unit.unready) return
-    MicroPathing.setRetreatPotentials(unit, desire)
-    MicroPathing.setDestinationUsingAgentForces(unit)
+    lazy val force = unit.agent.forces.sum.radians
+    lazy val tilePath = MicroPathing.getRealPath(unit, preferHome = desire.home > 0)
+    unit.agent.toTravel = MicroPathing.findRayTowards(unit, force, desire)
+      .orElse(MicroPathing.getWaypointAlongTilePath(tilePath))
+      .orElse(MicroPathing.findRayTowards(unit, force))
+      .orElse(Some(unit.agent.origin))
     With.commander.move(unit)
-  }
-
-  def retreatDirectlyHome(unit: FriendlyUnitInfo, desire: DesireProfile): Unit = {
-    if (unit.unready) return
-    val originBase = unit.agent.origin.base
-    if (desire.home >= 0 || (originBase.isDefined && unit.base != originBase && ! unit.matchups.threats.exists(_.base == originBase))) {
-      unit.agent.toTravel = Some(unit.agent.origin)
-      With.commander.move(unit)
-    }
   }
 }

@@ -88,7 +88,7 @@ class Simulation(val prediction: PredictionLocal) {
   }
   
   private def getChokeMobility(zoneUs: Zone): Double = {
-    val zoneEnemy = prediction.battle.enemy.centroid.zone
+    val zoneEnemy = prediction.battle.enemy.centroidAir.zone
     if (zoneUs == zoneEnemy) return 1.0
     val edge      = zoneUs.edges.find(_.zones.contains(zoneEnemy))
     val edgeWidth = Math.max(32.0, edge.map(_.radiusPixels * 2.0).getOrElse(32.0 * 10.0))

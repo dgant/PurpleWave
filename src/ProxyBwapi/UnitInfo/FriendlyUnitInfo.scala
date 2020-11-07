@@ -19,6 +19,8 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
   def squadenemies: Seq[UnitInfo] = squad.map(_.enemies).getOrElse(Seq.empty)
   def teammates: Set[UnitInfo] = teammatesCache()
   def enemies: Seq[UnitInfo] = enemiesCache()
+  def immediateAllies: Iterable[UnitInfo] = if (battle.isDefined) matchups.allies else squadmates.view.filterNot(_ == this)
+  def immediateOthers: Iterable[UnitInfo] = if (battle.isDefined) matchups.others else squadmates.view.filterNot(_ == this)
   lazy val agent: Agent = new Agent(this)
 
   private val squadCache = new Cache(() => With.squads.all.find(_.units.contains(this)))

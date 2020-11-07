@@ -7,21 +7,22 @@ import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.{Pixel, PixelRay}
 import Mathematics.PurpleMath
-import Mathematics.Shapes.Ring
+import Mathematics.Shapes.{Circle, Ring}
+import Micro.Actions.Combat.Maneuvering.Retreat.DesireProfile
 import Micro.Coordination.Pushing.Push
 import Micro.Heuristics.Potential
 import ProxyBwapi.Races.{Protoss, Zerg}
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, TakeN}
+
+import scala.collection.SeqView
 
 object MicroPathing {
 
-
-  def getRealPath(unit: FriendlyUnitInfo, desire: DesireProfile): MicroPath = {
-    // TODO: It's dumb that this ONLY uses desire.home
+  def getRealPath(unit: FriendlyUnitInfo, preferHome: Boolean = true): TilePath = {
     val pathLengthMinimum = 7
-    val pathfindProfile                     = new PathfindProfile(unit.tileIncludingCenter)
-    pathfindProfile.end                 = if (desire.home > 0) Some(unit.agent.origin.tileIncluding) else None
+    val pathfindProfile                 = new PathfindProfile(unit.tileIncludingCenter)
+    pathfindProfile.end                 = if (preferHome) Some(unit.agent.origin.tileIncluding) else None
     pathfindProfile.lengthMinimum       = Some(pathLengthMinimum)
     pathfindProfile.lengthMaximum       = Some(PurpleMath.clamp((unit.matchups.framesOfEntanglement * unit.topSpeed + unit.effectiveRangePixels).toInt / 32, pathLengthMinimum, 15))
     pathfindProfile.threatMaximum       = Some(0)
@@ -32,37 +33,24 @@ object MicroPathing {
     pathfindProfile.costRepulsion       = 2.5f
     pathfindProfile.repulsors           = getPathfindingRepulsors(unit)
     pathfindProfile.unit                = Some(unit)
-
-    val output = getRealPath(unit, pathfindProfile)
-    output.desire = Some(desire)
-    output
-  }
-
-  def getRealPath(unit: FriendlyUnitInfo, pathfindProfile: PathfindProfile): MicroPath = {
-    val output              = new MicroPath(unit)
-    output.pathfindProfile  = Some(pathfindProfile)
-    output.tilePath         = Some(pathfindProfile.find)
-    output.to               = getWaypointAlongTilePath(output.tilePath.get)
-    output
+    pathfindProfile.find
   }
 
   // McRave recommends moving 5 tiles at a time when following path waypoints.
   // That distance avoids trying to move units immediately to the other side of a building,
   // which can cause them to get stuck against that building.
-  val waypointDistanceTiles = 5
-  val waypointDistancePixels = 32 * waypointDistanceTiles
-  def getWaypointNavigatingTerrain(unit: FriendlyUnitInfo, to: Pixel): Pixel = {
+  val waypointDistanceTiles: Int = 5
+  val waypointDistancePixels: Int = 32 * waypointDistanceTiles
+  private val ringDistance = waypointDistanceTiles * waypointDistanceTiles * 32 * 32
+  def getRingTowards(from: Pixel, to: Pixel): SeqView[Pixel, Seq[_]] = {
+    (if (from.pixelDistanceSquared(to) >= ringDistance) Ring.points(5) else Circle.points(5)).view.map(p => from.add(p.x * 32, p.y * 32))
+  }
+
+  def getWaypointAlongTerrain(unit: UnitInfo, to: Pixel): Pixel = {
     if (unit.flying || unit.pixelDistanceTravelling(to) <= waypointDistancePixels || unit.zone == to.zone) {
       to
     } else {
-      ByOption
-        .minBy(
-          Ring
-            .points(waypointDistanceTiles)
-            .view
-            .map(p => unit.pixelCenter.add(32 * p.x, 32 * p.y))
-            .filter(p => With.grids.walkable.get(p.tileIncluding)))(_.groundPixels(to))
-        .getOrElse(to)
+      ByOption.minBy(getRingTowards(unit.pixelCenter, to).filter(_.tileIncluding.walkable))(_.groundPixels(to)).getOrElse(to)
     }
   }
 
@@ -73,7 +61,8 @@ object MicroPathing {
   def tryMovingAlongTilePath(unit: FriendlyUnitInfo, path: TilePath): Unit = {
     val waypoint = getWaypointAlongTilePath(path)
     waypoint.foreach(pixel => {
-      unit.agent.waypoint = waypoint
+      unit.agent.lastPath = Some(path)
+      unit.agent.toTravel = waypoint
       With.commander.move(unit)
     })
   }
@@ -88,9 +77,10 @@ object MicroPathing {
       .toIndexedSeq
   }
 
-  def setRetreatPotentials(unit: FriendlyUnitInfo, desire: DesireProfile): Unit = {
-    unit.agent.toTravel = Some(unit.agent.origin)
+  def setDefaultForces(unit: FriendlyUnitInfo, desire: DesireProfile = DesireProfile()): Unit = {
+    val to = unit.agent.origin
 
+    // Add cliffing
     if (unit.isAny(Protoss.Carrier, Zerg.Guardian)) {
       val threats           = unit.matchups.threats
       val walkers           = threats.view.filter(threat => ! threat.flying && threat.zone == unit.zone)
@@ -101,51 +91,18 @@ object MicroPathing {
       unit.agent.forces.put(Forces.sneaking, forceCliffing)
     }
 
-    val bonusPreferExit   = if (unit.agent.origin.zone != unit.zone) 1.0 else if (unit.matchups.threats.exists(_.topSpeed < unit.topSpeed)) 0.0 else 0.5
-    val bonusRegrouping   = 9.0 / Math.max(24.0, unit.matchups.framesOfEntanglement)
+    // Where to go
+    unit.agent.forces(Forces.threat)      = (Potential.avoidThreats(unit)     * desire.safety)
+    unit.agent.forces(Forces.traveling)   = (Potential.preferTravel(unit, to) * desire.home)
+    unit.agent.forces(Forces.sneaking)    = (Potential.detectionRepulsion(unit))
 
-    unit.agent.forces.put(Forces.threat,     Potential.avoidThreats(unit)      * desire.safety)
-    unit.agent.forces.put(Forces.traveling,  Potential.preferTravelling(unit)  * desire.home * bonusPreferExit)
-    unit.agent.forces.put(Forces.spreading,  Potential.preferSpreading(unit)   * desire.safety * desire.freedom)
-    unit.agent.forces.put(Forces.regrouping, Potential.preferRegrouping(unit)  * bonusRegrouping)
-    unit.agent.forces.put(Forces.spacing,    Potential.avoidCollision(unit)    * desire.freedom)
-    unit.agent.forces.put(Forces.sneaking,   Potential.detectionRepulsion(unit))
-  }
+    // How to get there
+    unit.agent.forces(Forces.spreading)   = (Potential.preferSpreading(unit)  * desire.safety)
+    unit.agent.forces(Forces.regrouping)  = (Potential.preferRegrouping(unit) * Math.max(0, 1 - desire.safety))
+    unit.agent.forces(Forces.spacing)     = (Potential.avoidCollision(unit))
 
-  def getAvoidDirectForce(unit: FriendlyUnitInfo, desire: DesireProfile): Option[Force] = {
-    if (desire.safety <= 0) return None
-
-    val origin = unit.agent.origin
-    if (desire.home > 0 && origin.zone != unit.zone && unit.matchups.threats.exists(threat => {
-      val rangeThreat     = threat.pixelRangeAgainst(unit)
-      val distanceThreat  = threat.pixelDistanceTravelling(origin)
-      val distanceUs      = unit.pixelDistanceTravelling(origin)
-      // Do they cut us off (by speed or pure range) before we get home?
-      (distanceThreat - rangeThreat) / (Math.min(threat.topSpeed, unit.topSpeed)) < distanceUs / unit.topSpeed
-    })) {
-      return None
-    }
-
-    // Same as old, but with clipmin(1)
-    val forceThreat   = (Potential.avoidThreats(unit)                     * desire.safety).clipMin(1.0)
-    // Same as old, but old uses zone pathing and bonusPreferExit, while new uses ring + travel distance (though it should use straight directions for fliers
-    val forceTravel   = (Potential.preferTravel(unit, unit.agent.origin)  * desire.home)
-    // Same as old, but with clipmax(0.5)
-    val forceSpacing  = (Potential.avoidCollision(unit) * desire.freedom).clipMax(0.5)
-    // Missing: Regrouping
-    // Missing: Spreading
-    // New math
-    val forceSafety   = ForceMath.sumAll(forceThreat, forceTravel)
-
-    // If the safety and travel forces are in conflict, we need to resolve it intelligently
-    if (forceSafety.lengthSquared > 0 && forceTravel.lengthSquared > 0) {
-      val radianDifference = PurpleMath.radiansTo(forceThreat.radians, forceTravel.radians)
-      if (radianDifference > Math.PI / 2) {
-        return None
-      }
-    }
-
-    Some(ForceMath.sumAll(forceSafety.normalize, forceSpacing))
+    ForceMath.rebalance(unit.agent.forces, 1.5, Forces.threat, Forces.traveling, Forces.sneaking)
+    ForceMath.rebalance(unit.agent.forces, 1.0, Forces.spreading, Forces.regrouping, Forces.spacing)
   }
 
   def getPushForces(unit: FriendlyUnitInfo): Seq[(Push, Force)] = {
@@ -163,14 +120,6 @@ object MicroPathing {
 
   def getPushRadians(unit: FriendlyUnitInfo): Option[Double] = {
     getPushRadians(getPushForces(unit))
-  }
-
-  def tryDirectRetreat(unit: FriendlyUnitInfo, desire: DesireProfile, radians: Double): Unit = {
-    val directPath = findRayTowards(unit, radians, desire)
-    if (directPath.isDefined) {
-      unit.agent.toTravel = Some(directPath.get)
-      With.commander.move(unit)
-    }
   }
 
   def qualifyRetreatDirection(
@@ -191,85 +140,22 @@ object MicroPathing {
     Some(ray.to)
   }
 
-  def findRayTowards(unit: FriendlyUnitInfo, radians: Double, desire: DesireProfile = DesireProfile(0, 0, 0)): Option[Pixel] = {
+  private val rays = 16
+  private val rayRadians = (0 to rays).map(_ * Math.PI / rays - Math.PI / 2).toVector.sortBy(Math.abs)
+  def findRayTowards(unit: FriendlyUnitInfo, radians: Double, desire: DesireProfile = DesireProfile()): Option[Pixel] = {
     val pathLength = 64 + unit.matchups.pixelsOfEntanglement
     val stepSize = Math.min(pathLength, Math.max(64, unit.topSpeed * With.reaction.agencyMax))
     val origin = unit.agent.origin
-
-    // Find a traversable path
-    // TODO: Control acceptable range of angles
-    val rotationSteps = 4
-    var output: Option[Pixel] = None
-    (1 to 1 + 2 * rotationSteps).foreach(r => {
-      if (output.isEmpty) {
-        val rotationRadians = ((r % 2) * 2 - 1) * (r / 2) * Math.PI / 3 / rotationSteps
-        output = qualifyRetreatDirection(unit, radians + rotationRadians, desire.safety > 0, Some(unit.agent.origin).filter(x => desire.home > 0))
-      }
-    })
+    val output: Option[Pixel] = rayRadians.view.map(r =>
+      qualifyRetreatDirection(
+        unit,
+        radians + r,
+        desire.safety > 0,
+        Some(unit.agent.origin).filter(unused => desire.home > 0)))
+      .filter(_.isDefined)
+      .take(1)
+      .headOption
+      .flatten
     output
   }
-
-  def setDestinationUsingAgentForces(unit: FriendlyUnitInfo) {
-    def useShortAreaPathfinding(unit: FriendlyUnitInfo): Boolean = {
-      ! unit.flying && ! unit.transport.exists(_.flying) && unit.agent.destination.zone == unit.zone
-    }
-    val rayDistance = 32.0 * 3.0
-    val cardinal8directions = (0.0 until 2.0 by 0.25).map(_ * Math.PI).toVector
-    val framesAhead = With.reaction.agencyAverage + 1
-    val minDistance = Math.max(48, unit.unitClass.haltPixels + framesAhead * (unit.topSpeed + 0.5 * framesAhead * unit.topSpeed / Math.max(1, unit.unitClass.accelerationFrames)))
-    val forces      = unit.agent.forces.values
-    val origin      = unit.pixelCenter
-    val forceSum    = ForceMath.sum(forces).normalize
-    val rayLength   = Math.max(rayDistance, minDistance)
-    val pathfind    = useShortAreaPathfinding(unit)
-    def makeRay(radians: Double): PixelRay = {
-      PixelRay(unit.pixelCenter, unit.pixelCenter.radiateRadians(radians, rayLength))
-    }
-
-    lazy val forceRadians = forceSum.radians
-    lazy val ray          = makeRay(forceRadians)
-    lazy val rayWalkable  = ray.tilesIntersected.forall(With.grids.walkable.get)
-
-    if ( ! pathfind || rayWalkable) {
-      var destination = unit.pixelCenter.add(forceSum.normalize(rayLength).toPoint)
-      // Prevent unit from getting confused from trying to move too close to unwalkable tiles
-      if ( ! unit.unitClass.corners.map(destination.add(_).tileIncluding).forall(unit.canTraverse)) {
-        destination = destination.tileIncluding.pixelCenter
-      }
-      unit.agent.toTravel = Some(destination)
-
-      return
-    }
-
-    val angles = cardinal8directions.filter(r => Math.abs(PurpleMath.radiansTo(r, forceRadians)) <= Math.PI * 0.75)
-    val paths = angles.map(makeRay) :+ ray
-    val pathsTruncated = paths.map(ray =>
-      PixelRay(
-        ray.from,
-        ray.from.project(
-          ray.to,
-          ray
-            .tilesIntersected
-            .takeWhile(tile => tile.valid && With.grids.walkable.get(tile))
-            .lastOption
-            .map(_.pixelCenter.pixelDistance(ray.from))
-            .getOrElse(0.0))))
-
-    val pathAccepted = pathsTruncated.maxBy(ray => ray.length * (1.0 + Math.cos(ray.radians - forceRadians)))
-    val commandPixel = unit.pixelCenter.project(pathAccepted.to, minDistance)
-    unit.agent.toTravel = Some(commandPixel)
-
-    if (!unit.flying) {
-      unit.zone.edges.find(e => unit.pixelDistanceCenter(e.pixelCenter) < e.radiusPixels).foreach(edge => {
-        unit.agent.toTravel = Some(
-          unit.pixelCenter.project(
-            edge.sidePixels.minBy(ep => PurpleMath.radiansTo(
-              unit.pixelCenter.radiansTo(commandPixel),
-              edge.pixelCenter.radiansTo(ep))),
-          128))
-      })
-    }
-  }
-
-
 }

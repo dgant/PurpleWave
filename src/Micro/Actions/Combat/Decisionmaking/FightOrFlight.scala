@@ -35,6 +35,7 @@ object FightOrFlight extends Action {
       }
     }
 
+    decide(true,  "Static",       () => ! unit.canMove)
     decide(true,  "YOLO",         () => With.yolo.active() && unit.canAttack)
     decide(true,  "Bored",        () => unit.battle.isEmpty)
     decide(true,  "No threats",   () => unit.matchups.threats.isEmpty)

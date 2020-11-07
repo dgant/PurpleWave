@@ -1,11 +1,10 @@
 package Debugging.Visualizations.Views.Micro
 
-import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.{Colors, Forces}
 import Information.Geography.Pathfinding.Types.TilePath
 import Lifecycle.With
-import Mathematics.Points.PixelRay
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 import bwapi.Color
@@ -43,6 +42,43 @@ object ShowUnitsFriendly extends View {
       labelY += 7
     }
 
+    if (showFormation) {
+      if (agent.toReturn.isDefined) {
+        DrawMap.box(
+          agent.toReturn.get.subtract (unit.unitClass.width / 2, unit.unitClass.height / 2),
+          agent.toReturn.get.add      (unit.unitClass.width / 2, unit.unitClass.height / 2),
+        Colors.BrightViolet)
+      }
+    }
+
+    if (showTargets) {
+      val targetUnit = unit.agent.toAttack.orElse(unit.target).orElse(unit.orderTarget)
+      val targetPosition = unit.agent.toTravel.orElse(unit.targetPixel).orElse(unit.orderTargetPixel)
+      if (unit.agent.toGather.isDefined) {
+        agent.toGather.map(_.pixelCenter).foreach(DrawMap.arrow(unit.pixelCenter, _, Colors.MediumTeal))
+      } else if (targetUnit.isDefined) {
+        targetUnit.map(_.pixelCenter).foreach(DrawMap.line(unit.pixelCenter, _, Colors.MediumYellow))
+      } else {
+        targetPosition.foreach(DrawMap.line(unit.pixelCenter, _, Colors.MediumGray))
+      }
+      agent.toAttack.map(_.pixelCenter).foreach(DrawMap.arrow(unit.pixelCenter, _, Colors.MediumYellow))
+    }
+
+    if (showLeaders) {
+      if (agent.leader().contains(unit)) {
+        val start = unit.pixelCenter.add(0, unit.unitClass.dimensionDown + 8)
+        DrawMap.circle(start, 5, color = unit.player.colorMidnight, solid = true)
+        DrawMap.drawStar(start, 4, Colors.NeonYellow)
+      }
+    }
+
+    if (showDesire) {
+      val color = if (agent.shouldEngage) Colors.NeonGreen else Colors.NeonRed
+      val pixel = unit.pixelCenter.subtract(0, 6 + unit.unitClass.height / 2)
+      DrawMap.box(pixel.subtract(3, 3), pixel.add(3, 3), Color.Black, solid = true)
+      DrawMap.box(pixel.subtract(2, 2), pixel.add(2, 2), color,       solid = true)
+    }
+
     if (showCharge) {
       if (unit.unitClass.spells.exists(spell => spell.energyCost > 0 && With.self.hasTech(spell) && unit.energy >= spell.energyCost)) {
         val degrees = System.currentTimeMillis() % 360
@@ -52,38 +88,7 @@ object ShowUnitsFriendly extends View {
       }
     }
 
-    if (showFightReason)  drawNextLabel(unit.agent.fightReason)
-    if (showClient)       drawNextLabel(agent.lastClient.map(_.toString).getOrElse(""))
-    if (showAction)       drawNextLabel(agent.lastAction.getOrElse(""))
-    if (showCommand)      drawNextLabel(unit.command.map(_.getType.toString).getOrElse(""))
-    if (showOrder)        drawNextLabel(unit.order.toString)
-    
-    if (showTargets) {
-      val targetUnit = unit.target.orElse(unit.orderTarget)
-      val targetPosition = unit.targetPixel.orElse(unit.orderTargetPixel)
-      targetUnit.map(_.pixelCenter).foreach(DrawMap.line(unit.pixelCenter, _, Colors.MediumYellow))
-      if (unit.target.isEmpty) {
-        targetPosition.foreach(DrawMap.line(unit.pixelCenter, _, Colors.MidnightGray))
-      }
-      agent.waypoint.foreach(DrawMap.arrow(unit.pixelCenter, _, Colors.DarkGray))
-      agent.toAttack.map(_.pixelCenter).foreach(DrawMap.arrow(unit.pixelCenter, _, Colors.NeonYellow))
-      agent.toGather.map(_.pixelCenter).foreach(DrawMap.arrow(unit.pixelCenter, _, Colors.MidnightGreen))
-    }
-    if (showFormation) {
-      if (agent.toReturn.isDefined) {
-        DrawMap.box(
-          agent.toReturn.get.subtract (unit.unitClass.width / 2, unit.unitClass.height / 2),
-          agent.toReturn.get.add      (unit.unitClass.width / 2, unit.unitClass.height / 2),
-        Colors.BrightViolet)
-      }
-    }
     if (showPaths && (unit.selected || unit.transport.exists(_.selected) || With.units.selected().isEmpty)) {
-      def drawRayPath(ray: PixelRay, color: Color) {
-        ray.tilesIntersected.foreach(tile => DrawMap.box(
-          tile.topLeftPixel.add(1, 1),
-          tile.bottomRightPixel.subtract(1, 1),
-          if (With.grids.walkable.get(tile)) color else Colors.DarkRed))
-      }
       def drawTilePath(path: TilePath): Unit = {
         for (i <- 0 until path.tiles.get.size - 1) {
           DrawMap.arrow(
@@ -92,33 +97,34 @@ object ShowUnitsFriendly extends View {
             Colors.White)
         }
       }
-      // TODO: Invoke this
+      unit.agent.lastPath.foreach(drawTilePath)
     }
 
     if (showForces) {
-      val length = 72.0
-      val maxForce = ByOption.max(agent.forces.values.map(_.lengthSlow)).getOrElse(0.0)
+      val length = 64.0
+      val maxForce = ByOption.max(agent.forces.values.view.map(_.lengthSlow)).getOrElse(0.0)
       if (maxForce > 0.0) {
-        agent.forces.foreach(pair => {
-          val force           = pair._2
-          val forceNormalized = force.normalize(length * force.lengthSlow / maxForce)
-          DrawMap.arrow(
-            unit.pixelCenter,
-            unit.pixelCenter.add(
-              forceNormalized.x.toInt,
-              forceNormalized.y.toInt),
-            pair._1)
-        })
-      }
+        (agent.forces.view ++ Seq((Forces.sum, agent.forces.sum)))
+          .filter(_._2.lengthSquared > 0)
+          .foreach(pair => {
+            val force           = pair._2
+            val forceNormalized = force.normalize(Math.max(16, length * force.lengthSlow / maxForce))
+            DrawMap.arrow(
+              unit.pixelCenter,
+              unit.pixelCenter.add(
+                forceNormalized.x.toInt,
+                forceNormalized.y.toInt),
+              pair._1.color)
+          })
+        }
     }
-    
-    if (showDesire) {
-      val color = if (agent.shouldEngage) Colors.NeonGreen else Colors.NeonRed
-      val pixel = unit.pixelCenter.subtract(0, 6 + unit.unitClass.height / 2)
-      DrawMap.box(pixel.subtract(2, 2), pixel.add(2, 2), Color.Black, solid = true)
-      DrawMap.box(pixel.subtract(1, 1), pixel.add(1, 1), color,       solid = true)
-    }
-    
+
+    if (showFightReason)  drawNextLabel(unit.agent.fightReason)
+    if (showClient)       drawNextLabel(agent.lastClient.map(_.toString).getOrElse(""))
+    if (showAction)       drawNextLabel(agent.lastAction.getOrElse(""))
+    if (showCommand)      drawNextLabel(unit.command.map(_.getType.toString).getOrElse(""))
+    if (showOrder)        drawNextLabel(unit.order.toString)
+
     if (showDistance) {
       DrawMap.arrow(unit.pixelCenter, agent.destination, Color.Black)
       DrawMap.label(
@@ -126,14 +132,6 @@ object ShowUnitsFriendly extends View {
         agent.unit.pixelCenter.add(0, 21),
         drawBackground = true,
         Color.Black)
-    }
-
-    if (showLeaders) {
-      if (agent.leader().contains(unit)) {
-        val start = unit.pixelCenter.add(0, unit.unitClass.dimensionDown + 8)
-        DrawMap.circle(start, 5, color = unit.player.colorMidnight, solid = true)
-        DrawMap.drawStar(start, 4, Colors.NeonYellow)
-      }
     }
   }
 }

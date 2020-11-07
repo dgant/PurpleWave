@@ -1,10 +1,13 @@
 package Debugging.Visualizations
 
 object Forces {
-  lazy val traveling  = Colors.NeonBlue
-  lazy val threat     = Colors.NeonRed
-  lazy val sneaking   = Colors.NeonYellow
-  lazy val spacing    = Colors.NeonTeal
-  lazy val regrouping = Colors.NeonIndigo
-  lazy val spreading  = Colors.NeonViolet
+  lazy val traveling  : ForceLabel = ForceLabel("Traveling",  Colors.NeonBlue)
+  lazy val leaving    : ForceLabel = ForceLabel("Leaving",    Colors.NeonGreen)
+  lazy val threat     : ForceLabel = ForceLabel("Threat",     Colors.NeonRed)
+  lazy val sneaking   : ForceLabel = ForceLabel("Sneaking",   Colors.NeonYellow)
+  lazy val spacing    : ForceLabel = ForceLabel("Spacing",    Colors.NeonTeal)
+  lazy val regrouping : ForceLabel = ForceLabel("Regrouping", Colors.NeonIndigo)
+  lazy val cohesion   : ForceLabel = ForceLabel("Cohesion",   Colors.NeonOrange)
+  lazy val spreading  : ForceLabel = ForceLabel("Spreading",  Colors.NeonViolet)
+  lazy val sum        : ForceLabel = ForceLabel("Sum",        Colors.White)
 }

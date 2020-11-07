@@ -7,7 +7,7 @@ import Debugging.Visualizations.Views.Fun._
 import Debugging.Visualizations.Views.Geography._
 import Debugging.Visualizations.Views.Micro._
 import Debugging.Visualizations.Views.Performance.{ShowPerformanceDetails, ShowPerformanceSummary, ShowReactionTime}
-import Debugging.Visualizations.Views.Planning._
+import Debugging.Visualizations.Views.Planning.{ShowStatus, _}
 import Debugging.Visualizations.Views.{ShowClock, View}
 import Lifecycle.With
 import bwapi.Text
@@ -29,12 +29,12 @@ class Visualization {
     ShowStrategyName,
     ShowHealthAndCooldown,
     ShowUtilization,
+    ShowPushes,
     ShowUnitsFriendly,
     ShowUnitsEnemy,
+    ShowUnitPaths,
     ShowStatus,
     ShowPerformanceSummary,
-
-    ShowUnitPaths
   )
   
   var enabled   : Boolean = _

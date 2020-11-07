@@ -1,6 +1,8 @@
 package Mathematics.Physics
 
+import Debugging.Visualizations.{ForceLabel, ForceMap}
 import Mathematics.Points.Pixel
+import Mathematics.PurpleMath
 
 object ForceMath {
 
@@ -14,4 +16,9 @@ object ForceMath {
     Force(
       magnitude * Math.cos(radians),
       magnitude * Math.sin(radians))
+
+  def rebalance(forceMap: ForceMap, scale: Double, forces: ForceLabel*): Unit = {
+    val length = ForceMath.sum(forces.map(forceMap)).lengthFast
+    forces.foreach(f => forceMap(f) *= PurpleMath.nanToZero(scale / length))
+  }
 }

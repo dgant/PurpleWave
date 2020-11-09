@@ -1,5 +1,7 @@
 package Mathematics.Points
 
+import Utilities.ByOption
+
 import scala.collection.immutable
 
 case class TileRectangle(
@@ -14,16 +16,26 @@ case class TileRectangle(
     this(tile, tile.add(1, 1))
   }
 
+  def this(included: Seq[Tile]) {
+    this(
+      Tile(
+        ByOption.min(included.view.map(_.x)).getOrElse(0),
+        ByOption.min(included.view.map(_.y)).getOrElse(0)),
+      Tile(
+        ByOption.max(included.view.map(_.x)).getOrElse(0),
+        ByOption.max(included.view.map(_.y)).getOrElse(0)))
+  }
+
   if (endExclusive.x < startInclusive.x || endExclusive.y < startInclusive.y) {
     throw new Exception("Created an invalid (non-normalized) rectangle")
   }
   
-  def add(x:Int, y:Int): TileRectangle =
+  def add(x: Int, y: Int): TileRectangle =
     TileRectangle(
       startInclusive.add(x, y),
       endExclusive.add(x, y))
   
-  def expand(x:Int, y:Int): TileRectangle =
+  def expand(x: Int, y: Int): TileRectangle =
     TileRectangle(
       startInclusive.add(-x, -y),
       endExclusive  .add( x,  y))

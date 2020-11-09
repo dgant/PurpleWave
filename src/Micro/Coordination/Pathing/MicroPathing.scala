@@ -36,10 +36,9 @@ object MicroPathing {
     pathfindProfile.find
   }
 
-  // McRave recommends moving 5 tiles at a time when following path waypoints.
-  // That distance avoids trying to move units immediately to the other side of a building,
-  // which can cause them to get stuck against that building.
-  val waypointDistanceTiles: Int = 5
+  // Moving the wrong sorts of lengths can cause the unit to get stuck on obstacles.
+  // For example, this is at 5 tiles: https://cdn.discordapp.com/attachments/421808419482370059/774666718793564220/unknown.png
+  val waypointDistanceTiles: Int = 4
   val waypointDistancePixels: Int = 32 * waypointDistanceTiles
   private val ringDistance = waypointDistanceTiles * waypointDistanceTiles * 32 * 32
   def getRingTowards(from: Pixel, to: Pixel): SeqView[Pixel, Seq[_]] = {
@@ -58,10 +57,28 @@ object MicroPathing {
     if (path.pathExists) Some(path.tiles.get.take(waypointDistanceTiles).last.pixelCenter) else None
   }
 
+  private val rays = 16
+  private val rayRadians = (0 to rays).map(_ * Math.PI / rays - Math.PI / 2).toVector.sortBy(Math.abs)
+  def getWaypointInDirection(unit: FriendlyUnitInfo, radians: Double, desire: DesireProfile = DesireProfile()): Option[Pixel] = {
+    val pathLength = 64 + unit.matchups.pixelsOfEntanglement
+    val stepSize = Math.min(pathLength, Math.max(64, unit.topSpeed * With.reaction.agencyMax))
+    val origin = unit.agent.origin
+    val output: Option[Pixel] = rayRadians.view.map(r =>
+      qualifyRay(
+        unit,
+        radians + r,
+        desire.safety > 0,
+        Some(unit.agent.origin).filter(unused => desire.home > 0)))
+      .filter(_.isDefined)
+      .take(1)
+      .headOption
+      .flatten
+    output
+  }
+
   def tryMovingAlongTilePath(unit: FriendlyUnitInfo, path: TilePath): Unit = {
     val waypoint = getWaypointAlongTilePath(path)
     waypoint.foreach(pixel => {
-      unit.agent.lastPath = Some(path)
       unit.agent.toTravel = waypoint
       With.commander.move(unit)
     })
@@ -93,7 +110,7 @@ object MicroPathing {
 
     // Where to go
     unit.agent.forces(Forces.threat)      = (Potential.avoidThreats(unit)     * desire.safety)
-    unit.agent.forces(Forces.traveling)   = (Potential.preferTravel(unit, to) * desire.home)
+    unit.agent.forces(Forces.travel)   = (Potential.preferTravel(unit, to) * desire.home)
     unit.agent.forces(Forces.sneaking)    = (Potential.detectionRepulsion(unit))
 
     // How to get there
@@ -101,7 +118,7 @@ object MicroPathing {
     unit.agent.forces(Forces.regrouping)  = (Potential.preferRegrouping(unit) * Math.max(0, 1 - desire.safety))
     unit.agent.forces(Forces.spacing)     = (Potential.avoidCollision(unit))
 
-    ForceMath.rebalance(unit.agent.forces, 1.5, Forces.threat, Forces.traveling, Forces.sneaking)
+    ForceMath.rebalance(unit.agent.forces, 1.5, Forces.threat, Forces.travel, Forces.sneaking)
     ForceMath.rebalance(unit.agent.forces, 1.0, Forces.spreading, Forces.regrouping, Forces.spacing)
   }
 
@@ -118,11 +135,9 @@ object MicroPathing {
       .map(_.radians)
   }
 
-  def getPushRadians(unit: FriendlyUnitInfo): Option[Double] = {
-    getPushRadians(getPushForces(unit))
-  }
+  def getPushRadians(unit: FriendlyUnitInfo): Option[Double] = getPushRadians(getPushForces(unit))
 
-  def qualifyRetreatDirection(
+  private def qualifyRay(
     unit: FriendlyUnitInfo,
     radians: Double,
     avoidThreats: Boolean = true,
@@ -138,24 +153,5 @@ object MicroPathing {
     // Does it keep us safe?
     if (avoidThreats && unit.matchups.threats.exists(t => t.pixelDistanceSquared(ray.to) <= t.pixelDistanceSquared(unit.pixelCenter))) return None
     Some(ray.to)
-  }
-
-  private val rays = 16
-  private val rayRadians = (0 to rays).map(_ * Math.PI / rays - Math.PI / 2).toVector.sortBy(Math.abs)
-  def findRayTowards(unit: FriendlyUnitInfo, radians: Double, desire: DesireProfile = DesireProfile()): Option[Pixel] = {
-    val pathLength = 64 + unit.matchups.pixelsOfEntanglement
-    val stepSize = Math.min(pathLength, Math.max(64, unit.topSpeed * With.reaction.agencyMax))
-    val origin = unit.agent.origin
-    val output: Option[Pixel] = rayRadians.view.map(r =>
-      qualifyRetreatDirection(
-        unit,
-        radians + r,
-        desire.safety > 0,
-        Some(unit.agent.origin).filter(unused => desire.home > 0)))
-      .filter(_.isDefined)
-      .take(1)
-      .headOption
-      .flatten
-    output
   }
 }

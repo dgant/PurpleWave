@@ -610,19 +610,21 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   
   @inline final def carryingResources: Boolean = carryingMinerals || carryingGas
 
-  @inline final def presumptiveStep: Pixel = presumptiveStepCache()
+  final def presumptiveStep: Pixel = presumptiveStepCache()
   private val presumptiveStepCache = new Cache(() => MicroPathing.getWaypointAlongTerrain(this, presumptiveDestination))
-  @inline final def presumptiveDestination: Pixel =
+  final def presumptiveDestination: Pixel = {
     friendly.flatMap(_.agent.toTravel)
       .orElse(targetPixel)
       .orElse(orderTargetPixel)
       .orElse(presumptiveTarget.map(pixelToFireAt))
       .getOrElse(pixelCenter)
-  @inline final def presumptiveTarget: Option[UnitInfo] =
+  }
+  final def presumptiveTarget: Option[UnitInfo] = {
     friendly.flatMap(_.agent.toAttack)
       .orElse(target)
       .orElse(orderTarget)
       .orElse(orderTargetPixel.flatMap(somePixel => ByOption.minBy(matchups.targets)(_.pixelDistanceEdge(somePixel))))
+  }
 
   @inline final def isBeingViolent: Boolean = {
     unitClass.isStaticDefense ||

@@ -5,7 +5,7 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.Micro.ShowUnitsFriendly
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Micro.Agency.{Intention, Leash}
+import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountBetween
 import Planning.UnitMatchers.UnitMatchWorkers
@@ -80,7 +80,8 @@ abstract class DefendFFEWithProbes extends Plan {
       workers.foreach(_.agent.intend(this, new Intention {
         canFlee   = false
         toTravel  = Some(toDefend)
-        toLeash   = Some(Leash(toDefend, 32.0 * 5.0))
+        toReturn  = Some(toDefend)
+        toLeash   = Some(32.0 * 5.0)
       }))
       if (ShowUnitsFriendly.mapInUse) {
         workers.foreach(w => DrawMap.circle(toDefend, 16, Colors.NeonYellow))

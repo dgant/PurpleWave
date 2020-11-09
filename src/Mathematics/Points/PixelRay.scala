@@ -14,7 +14,6 @@ case class PixelRay(from: Pixel, to: Pixel) {
   lazy val toForce: Force = Force(to.x - from.x, to.y - from.y)
   
   def tilesIntersected: Array[Tile] = {
-    
     if (to.x == from.x) {
       val direction = PurpleMath.signum(to.y - from.y)
       if (direction == 0) return Array(to.tileIncluding)

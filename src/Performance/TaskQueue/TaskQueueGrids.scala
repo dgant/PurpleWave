@@ -28,6 +28,6 @@ class TaskQueueGrids extends AbstractTaskQueue {
     new TaskGridUnits                       { urgency = 1000; override def maxConsecutiveSkips = 8 },
     new TaskGridWalkable                    { urgency = 1    },
     new TaskGridWalkableTerrain             { urgency = 1    },
-    new TaskGridUnwalkableUnits             { urgency = 1    }
+    new TaskGridUnwalkableUnits             { urgency = 5    }
   )
 }

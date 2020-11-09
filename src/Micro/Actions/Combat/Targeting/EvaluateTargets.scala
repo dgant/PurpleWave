@@ -8,7 +8,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
 object EvaluateTargets extends {
-  def legalTargets(unit: FriendlyUnitInfo, additionalFiltersRequired: TargetFilter*): Iterable[UnitInfo] = {
+  def legalTargets(unit: FriendlyUnitInfo, additionalFiltersRequired: TargetFilter*): Seq[UnitInfo] = {
     val filtersRequired = TargetFilterGroups.filtersRequired ++ additionalFiltersRequired
     unit.matchups.targets.view.filter(target => filtersRequired.forall(_.legal(unit, target)))
   }
@@ -16,6 +16,10 @@ object EvaluateTargets extends {
   def preferredTargets(unit: FriendlyUnitInfo, additionalFiltersRequired: TargetFilter*): Seq[UnitInfo] = {
     val filtersPreferred = TargetFilterGroups.filtersPreferred
     val targetsRequired = legalTargets(unit).toVector
+
+    if (filtersPreferred.isEmpty) {
+
+    }
     var output: Seq[UnitInfo] = Seq.empty
     for (filtersOptionalToDrop <- 0 to filtersPreferred.length) {
       if (output.isEmpty && unit.agent.toAttack.isEmpty) {

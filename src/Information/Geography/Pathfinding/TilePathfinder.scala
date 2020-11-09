@@ -208,6 +208,7 @@ trait TilePathfinder {
           bestTile,
           costFromStart(profile, bestTileState.tile, threatGrid),
           Some(assemblePath(bestTileState)))
+        profile.unit.flatMap(_.friendly.map(_.agent)).foreach(_.lastPath = Some(output))
         return output
       }
 

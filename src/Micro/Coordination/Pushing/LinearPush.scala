@@ -2,7 +2,7 @@ package Micro.Coordination.Pushing
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Mathematics.Physics.{Force, ForceMath}
-import Mathematics.Points.{Pixel, PixelRay, Tile}
+import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.PurpleMath
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -11,7 +11,7 @@ abstract class LinearPush extends Push {
   protected def destination: Pixel
   protected def sourceWidth: Double // TODO: Not reflected in tiles!
 
-  override val tiles: Seq[Tile] = PixelRay(source, destination).tilesIntersected
+  override val tiles: Seq[Tile] = new TileRectangle(corners.view.map(_.tileIncluding)).tiles
   override def force(recipient: FriendlyUnitInfo): Option[Force] = {
     val projection = PurpleMath.projectedPointOnSegment(recipient.pixelCenter.asPoint, source.asPoint, destination.asPoint).asPixel
     val distance = recipient.pixelDistanceCenter(projection) - sourceWidth - recipient.unitClass.dimensionMax

@@ -6,7 +6,7 @@ import Mathematics.Formations.Designers.FormationZone
 import Mathematics.Formations.FormationAssigned
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
-import Micro.Agency.{Intention, Leash}
+import Micro.Agency.Intention
 import Performance.Cache
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -131,7 +131,6 @@ class GoalDefendZone extends SquadGoalBasic {
       unit.agent.intend(squad.client, new Intention {
         toTravel = Some(unitDestination)
         toReturn = if (zone.bases.exists(_.owner.isUs)) Some(unitDestination) else None
-        toLeash = Some(Leash(center, protectRange))
       })})
   }
 

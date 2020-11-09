@@ -4,7 +4,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 object TargetFilterLeash extends TargetFilter {
   override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
      actor.agent.toLeash.forall(leash => (
-      actor.inRangeToAttack(target) || actor.pixelDistanceEdge(target, leash.pixelCenter) < leash.pixelRange
+       actor.inRangeToAttack(target) || actor.pixelToFireAt(target).pixelDistance(actor.agent.origin) < leash
     ))
   }
 }

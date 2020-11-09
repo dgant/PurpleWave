@@ -1,7 +1,7 @@
 package Debugging.Visualizations
 
 object Forces {
-  lazy val traveling  : ForceLabel = ForceLabel("Traveling",  Colors.NeonBlue)
+  lazy val travel  : ForceLabel = ForceLabel("Traveling",  Colors.NeonBlue)
   lazy val leaving    : ForceLabel = ForceLabel("Leaving",    Colors.NeonGreen)
   lazy val threat     : ForceLabel = ForceLabel("Threat",     Colors.NeonRed)
   lazy val sneaking   : ForceLabel = ForceLabel("Sneaking",   Colors.NeonYellow)

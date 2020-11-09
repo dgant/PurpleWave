@@ -22,7 +22,9 @@ class BattleJudgment(battle: BattleLocal) {
   lazy val ratioSnipe       : Double  = transformTotalScore(battle.predictionSnipe.localBattleMetrics)
   lazy val totalTarget      : Double  = hysteresis + terranHomeBonus + terranMaxBonus + turtleBonus + hornetBonus + siegeUrgency + trappedness + With.configuration.baseTarget
   lazy val ratioTarget      : Double  = Math.min(.99, PurpleMath.nanToZero(totalTarget))
-  lazy val shouldFight      : Boolean = ratioAttack > ratioTarget || ratioSnipe > ratioTarget
+  lazy val shouldAttack     : Boolean = ratioAttack > ratioTarget
+  lazy val shouldSnipe      : Boolean = ratioSnipe > ratioTarget
+  lazy val shouldFight      : Boolean = shouldAttack || shouldSnipe
 
   def getTerranHomeBonus: Double = {
     if (battle.enemy.centroidAir.zone.owner.isTerran && battle.enemy.units.exists(u => u.is(UnitMatchSiegeTank) && u.matchups.targets.nonEmpty)) 0.2 else 0.0

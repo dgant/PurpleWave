@@ -13,14 +13,15 @@ trait Push {
   def draw(): Unit
 
   def drawTiles(): Unit = {
-    if (tiles.nonEmpty) {
+    val t = tiles
+    if (t.nonEmpty) {
       DrawMap.box(
         Pixel(
-          tiles.view.map(_.x).min * 32,
-          tiles.view.map(_.y).min * 32),
+          t.view.map(_.x).min * 32,
+          t.view.map(_.y).min * 32),
         Pixel(
-          31 + tiles.view.map(_.x).max * 32,
-          31 + tiles.view.map(_.y).max * 32),
+          31 + t.view.map(_.x).max * 32,
+          31 + t.view.map(_.y).max * 32),
         priority.color)
     }
   }

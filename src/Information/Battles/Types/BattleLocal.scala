@@ -8,7 +8,7 @@ import ProxyBwapi.Races.Terran
 
 class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
 
-  private def canSnipe = (
+  private def canSnipe = false && (
     // Acceptable, performance-wise
     (With.reaction.clusteringAverage < 8 || With.frame < GameTime(12, 0)())
     // Trying to snipe tanks leads to nasty surprises; tanks in fog tend to blast us and dissuade the snipe

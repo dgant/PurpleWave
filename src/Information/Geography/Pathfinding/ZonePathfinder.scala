@@ -13,7 +13,7 @@ trait ZonePathfinder {
   var pathfindId: Long = Long.MinValue
   private val paths = new mutable.HashMap[(Zone, Zone), Option[ZonePath]]
   def zonePath(from: Zone, to: Zone): Option[ZonePath] = {
-    if (! paths.contains((from, to))) {
+    if ( ! paths.contains((from, to))) {
       pathfindId += 1
       paths((from, to)) = zonePathfind(from, to)
     }
@@ -35,16 +35,16 @@ trait ZonePathfinder {
       : Option[ZonePath] = {
 
     from.lastPathfindId = pathfindId
-    val start = from.centroid
-    val end = to.centroid
-    if (!With.paths.groundPathExists(start, end)) return None
+    val startTile = from.centroid
+    val endTile = to.centroid
+    if ( ! With.paths.groundPathExists(startTile, endTile)) return None
 
     if (from == to) return Some(Types.ZonePath(from, to, pathHere))
-    val bestEdge = ByOption.minBy(from.edges.filter(_.otherSideof(from).lastPathfindId != pathfindId))(_.distanceGrid.get(end))
+    val bestEdge = ByOption.minBy(from.edges.filter(_.otherSideof(from).lastPathfindId != pathfindId))(_.distanceGrid.get(endTile))
     if (bestEdge.isEmpty) {
       return None
     }
-
-    zonePathfind(bestEdge.get.otherSideof(from), to, pathHere :+ ZonePathNode(from, to, bestEdge.get))
+    val nextZone = bestEdge.get.otherSideof(from)
+    zonePathfind(nextZone, to, pathHere :+ ZonePathNode(from, bestEdge.get))
   }
 }

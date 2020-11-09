@@ -3,20 +3,20 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.{BuildRequest, Get}
+import Macro.BuildRequests.Get
 import Planning.Plans.Army.EjectScout
-import Planning.Plans.Compound.{If, Or, Trigger}
+import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackWithDarkTemplar
-import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, GasCapsUntouched}
+import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAt, GasCapsUntouched, Pump}
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
 import Planning.Predicates.Compound.{And, Not}
+import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
+import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
@@ -42,10 +42,8 @@ class PvP3GateGoon extends GameplanTemplate {
   override def attackPlan: Plan = new Trigger(
     new Or(
       new EnemyStrategy(With.fingerprints.gasSteal),
-      new And(
-        new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
-        new Not(new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway))),
-      new UnitsAtLeast(3, Protoss.Dragoon, complete = true)),
+      new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
+      new UnitsAtLeast(5, Protoss.Dragoon, complete = true)),
     new PvPIdeas.AttackSafely)
 
   override def initialScoutPlan: Plan = new ScoutOn(Protoss.Gateway)
@@ -59,17 +57,31 @@ class PvP3GateGoon extends GameplanTemplate {
     new PvPIdeas.ReactToFFE,
     new ScoutForCannonRush)
   
-  override val buildOrder: Seq[BuildRequest] = ProtossBuilds.ThreeGateGoon
+  override def buildOrderPlan: Plan = new PvP1GateCoreIdeas.BuildOrderPlan
 
   override val buildPlans = Vector(
-    new If(
-      new GasCapsUntouched,
-      new If(
-        new UnitsAtMost(2, Protoss.Gateway),
-        new CapGasWorkersAt(2))),
 
     new EjectScout,
-    new BuildOrder(Get(8, Protoss.Dragoon)),
+
+    new If(
+      new GasCapsUntouched,
+      new Parallel(
+        new If(
+          new UnitsAtMost(0, Protoss.CyberneticsCore),
+          new CapGasWorkersAt(1),
+          new If(
+            new GasAtLeast(200),
+            new CapGasWorkersAt(1),
+            new If(
+              new UnitsAtMost(2, Protoss.Gateway),
+              new CapGasWorkersAt(2)))),
+        new CapGasAt(200))),
+
+    new BuildOrder(
+      Get(Protoss.DragoonRange),
+      Get(2, Protoss.Dragoon),
+      Get(3, Protoss.Gateway),
+      Get(8, Protoss.Dragoon)),
 
     // Kind of cowardly, but if we can't be sure they're not going DT, get a Forge before expanding so we can get cannons in time if necessary
     new If(
@@ -87,9 +99,15 @@ class PvP3GateGoon extends GameplanTemplate {
       new CancelIncomplete(Protoss.Forge),
       new Build(Get(Protoss.Forge))),
 
-    new RequireMiningBases(2),
-    new BuildOrder(Get(11, Protoss.Dragoon)),
+    new FlipIf(
+      new Or(
+        new EnemyBasesAtLeast(2),
+        new UnitsAtLeast(20, Protoss.Dragoon)),
+      new If(
+        new UnitsAtLeast(3, Protoss.Gateway, complete = true),
+        new RequireMiningBases(2)),
+      new Pump(Protoss.Dragoon)),
 
-    new PvPIdeas.TrainArmy,
+    new Build(Get(4, Protoss.Gateway))
   )
 }

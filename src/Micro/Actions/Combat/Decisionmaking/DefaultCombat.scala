@@ -35,7 +35,7 @@ object DefaultCombat extends Action {
     def canTransition(other: Technique): Boolean = {
       transitions.contains(other) || transitions.exists(_.canTransition(other))
     }
-    override val toString: String = getClass.getSimpleName
+    override val toString: String = getClass.getSimpleName.replace("$", "")
   }
 
   class MicroContext(val unit: FriendlyUnitInfo, val shouldEngage: Boolean) {
@@ -51,7 +51,7 @@ object DefaultCombat extends Action {
 
     lazy val receivedPushes = With.coordinator.pushes.get(unit).map(p => (p, p.force(unit))).sortBy(-_._1.priority.value)
     lazy val receivedPushForces = receivedPushes.view.filter(_._2.nonEmpty).map(p => (p._1, p._2.get))
-    lazy val receivedPushPriority: TrafficPriority = ByOption.max(receivedPushes.view.map(_._1.priority)).getOrElse(TrafficPriorities.None)
+    lazy val receivedPushPriority: TrafficPriority = ByOption.max(receivedPushes.view.filter(_._2.exists(_.lengthSquared > 0)).map(_._1.priority)).getOrElse(TrafficPriorities.None)
 
     // Decide how far from target/threat we want to be
     lazy val idealPixelsFromTargetRange = if (unit.target.exists(_.speedApproaching(unit) < 0)) -16d else 0d
@@ -81,7 +81,7 @@ object DefaultCombat extends Action {
         .getOrElse(if (shouldEngage) unit.agent.destination else unit.agent.origin)
   }
 
-  def takePotshot(context: MicroContext): Boolean = {
+  def takePotshot(context: MicroContext): Unit = {
     if (context.unit.unready) return true
     val oldToAttack = context.unit.agent.toAttack
     context.unit.agent.toAttack = None
@@ -89,14 +89,13 @@ object DefaultCombat extends Action {
     PotshotTarget.delegate(context.unit)
     With.commander.attack(context.unit)
     context.unit.agent.toAttack = context.unit.agent.toAttack.orElse(oldToAttack)
-    context.unit.ready
   }
 
   def followPushing(context: MicroContext): Unit = {
     if (context.unit.unready) return
     context.unit.agent.escalatePriority(context.receivedPushPriority)
     val force = MicroPathing.getPushRadians(context.unit)
-    val towards = force.flatMap(MicroPathing.findRayTowards(context.unit, _))
+    val towards = force.flatMap(MicroPathing.getWaypointInDirection(context.unit, _))
     if (towards.isDefined) {
       context.unit.agent.toTravel = towards
       With.commander.move(context.unit)
@@ -156,7 +155,11 @@ object DefaultCombat extends Action {
 
     transition(
       Organize,
-      () => context.missingDistanceFromThreat < -64)
+      () =>
+        unit.agent.toReturn.isEmpty
+        && unit.agent.toLeash.isEmpty
+        && context.receivedPushPriority < TrafficPriorities.Shove
+        && context.missingDistanceFromThreat < -64)
 
     // Evaluate potential attacks
     context.retarget()
@@ -171,7 +174,7 @@ object DefaultCombat extends Action {
         unit.isAny(Terran.Vulture, Terran.SiegeTankUnsieged, Terran.Goliath, Terran.Wraith, Protoss.Archon, Protoss.Dragoon, Protoss.Reaver, Protoss.Scout, Zerg.Hydralisk, Zerg.Mutalisk)
         && unit.readyForAttackOrder
         && ( unit.is(Protoss.Reaver) || context.receivedPushPriority < TrafficPriorities.Shove)
-        && ( ! unit.isAny(Protoss.Archon, Protoss.Dragoon) || ! unit.matchups.threats.exists(t => t.is(Protoss.Dragoon) && t.framesToGetInRange(t) < 12)))
+        && (unit.zone == unit.agent.origin.zone || ! unit.isAny(Protoss.Archon, Protoss.Dragoon) || ! unit.matchups.threats.exists(t => t.is(Protoss.Dragoon) && t.framesToGetInRange(t) < 12)))
 
     transition(
       Chase,
@@ -203,9 +206,13 @@ object DefaultCombat extends Action {
     /////////////
 
     // TODO: Move BATTER and other specialized techniques in here
-    if (Brawl.consider(unit)) return
+    Brawl.consider(unit)
+    if (unit.unready) return
 
-    if (goalPotshot && takePotshot(context)) return
+    if (goalPotshot) {
+      takePotshot(context)
+      if (unit.unready) return
+    }
 
     // Nudge if we're trying to reach a target
     if (goalEngage && ! unit.flying && unit.agent.toAttack.exists( ! unit.inRangeToAttack(_))) unit.agent.escalatePriority(TrafficPriorities.Nudge)
@@ -225,10 +232,10 @@ object DefaultCombat extends Action {
     // Calculate potential forces
     //
     val forces = unit.agent.forces
-    val forcesGoal = Seq(Forces.traveling, Forces.threat, Forces.leaving)
+    val forcesGoal = Seq(Forces.travel, Forces.threat, Forces.leaving)
     val forcesPositioning = Seq(Forces.spacing, Forces.spreading, Forces.cohesion)
     def mul(value: Double, force: Force): Force = force * value
-    forces(Forces.traveling)  = mul(1, Potential.preferTravel(unit, unit.agent.destination))
+    forces(Forces.travel)     = mul(1, Potential.preferTravel(unit, unit.agent.destination))
     forces(Forces.threat)     = mul(1, Potential.avoidThreats(unit))
     forces(Forces.leaving)    = mul(1, Potential.preferTravel(unit, unit.agent.origin))
     forces(Forces.spacing)    = mul(1, Potential.avoidCollision(unit))
@@ -236,20 +243,26 @@ object DefaultCombat extends Action {
     forces(Forces.cohesion)   = mul(1, Potential.preferCohesion(unit))
     // TODO: Splash force
     // TODO: Regroup force
-
     // Reference https://github.com/bmnielsen/Stardust/blob/master/src/General/UnitCluster/Tactics/Move.cpp#L69
 
+    if (unit.matchups.threats.isEmpty) {
+      forces(Forces.leaving) *= 0
+    }
+
     if (goalHover) {
-      if (context.tooCloseToThreat) {
-        forces(Forces.threat) *= 4
-      }
-      if (context.tooFarFromTarget) {
-        forces(Forces.traveling) *= 2
+      val closeEnough = unit.agent.toAttack.forall(unit.inRangeToAttack)
+      val exposed = unit.matchups.threatsInRange.exists(t => t.inRangeToAttack(unit) && ! unit.agent.toAttack.contains(t))
+      if (closeEnough) {
+        if (exposed) {
+          forces(Forces.threat) *= 4
+        }
+      } else {
+        forces(Forces.travel) *= 4
       }
     } else if (goalRegroup) {
-      forces(Forces.traveling) *= 4
+      forces(Forces.travel) *= 4
     } else if (goalEngage) {
-      forces(Forces.traveling) *= 4
+      forces(Forces.travel) *= 4
     } else if (goalRetreat) {
       forces(Forces.threat) *= 4
     }
@@ -275,7 +288,7 @@ object DefaultCombat extends Action {
     // TODO: If we like our position, HOLD
 
     // TODO: CHASE: Moving shot/pursue if we want to
-    val groupTravel = MicroPathing.findRayTowards(unit, unit.agent.forces.sum.radians)
+    val groupTravel = MicroPathing.getWaypointInDirection(unit, unit.agent.forces.sum.radians)
 
     if (groupTravel.isDefined) {
       unit.agent.toTravel = groupTravel

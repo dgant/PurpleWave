@@ -47,7 +47,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   var toTech        : Option[Tech]                  = None
   var toFinish      : Option[UnitInfo]              = None
   var toUpgrade     : Option[Upgrade]               = None
-  var toLeash       : Option[Leash]                 = None
+  var toLeash       : Option[Double]                = None
   var toBoard       : Option[FriendlyUnitInfo]      = None
   var toNuke        : Option[Pixel]                 = None
   var toRepair      : Option[UnitInfo]              = None
@@ -74,11 +74,15 @@ class Agent(val unit: FriendlyUnitInfo) {
   /////////////////
 
   def destination: Pixel = toTravel.orElse(toReturn).getOrElse(origin)
-  def origin: Pixel = toReturn.orElse(toLeash.map(_.pixelCenter)).getOrElse(originCache())
-  private val originCache = new Cache(() => toTravel
+  def origin: Pixel = toReturn.getOrElse(originCache())
+  private val originCache = new Cache(() => toReturn.orElse(lastIntent.toTravel)
     .flatMap(_.base)
     .filter(_.owner.isUs)
-    .orElse(ByOption.minBy(With.geography.ourBases)(base => unit.pixelDistanceTravelling(base.heart) * (if (base.scoutedByEnemy || base.isNaturalOf.exists(_.scoutedByEnemy)) 1 else 1000)))
+    .orElse(ByOption.minBy(With.geography.ourBases)(base =>
+      (
+        unit.pixelDistanceTravelling(base.heart)
+        + (if (base.isNaturalOf.exists(_.owner.isUs) && unit.battle.exists(_.enemy.centroidGround.base == base)) 32 * 40 else 0))
+      * (if (base.scoutedByEnemy || base.isNaturalOf.exists(_.scoutedByEnemy)) 1 else 1000)))
     .map(_.heart.pixelCenter)
     .getOrElse(With.geography.home.pixelCenter))
 

@@ -14,6 +14,7 @@ object ShowUnitsEnemy extends View {
   var showSiegeRadius = true
   var showFogged      = true
   var showCountdown   = true
+  var showTargets     = true
   
   override def renderMap() {
     With.units.enemy.foreach(renderUnit)
@@ -22,6 +23,10 @@ object ShowUnitsEnemy extends View {
   private def renderUnit(unit: ForeignUnitInfo) {
     
     val color = unit.color
+
+    if (showTargets && unit.visible) {
+      ShowUnitsFriendly.renderTargets(unit)
+    }
       
     if (showFogged) {
       if ( ! unit.visible || unit.effectivelyCloaked) {

@@ -51,12 +51,15 @@ object Retreat extends Action {
     if (unit.agent.forces.isEmpty) {
       MicroPathing.setDefaultForces(unit, desire)
     }
-    lazy val force = unit.agent.forces.sum.radians
-    lazy val tilePath = MicroPathing.getRealPath(unit, preferHome = desire.home > 0)
-    unit.agent.toTravel = MicroPathing.findRayTowards(unit, force, desire)
-      .orElse(MicroPathing.getWaypointAlongTilePath(tilePath))
-      .orElse(MicroPathing.findRayTowards(unit, force))
-      .orElse(Some(unit.agent.origin))
+    lazy val force            = unit.agent.forces.sum.radians
+    lazy val tilePath         = MicroPathing.getRealPath(unit, preferHome = desire.home > 0)
+    lazy val waypointSimple   = MicroPathing.getWaypointInDirection(unit, force, desire).map((_, "RetreatSimple"))
+    lazy val waypointPath     = MicroPathing.getWaypointAlongTilePath(tilePath).map((_, "RetreatPath"))
+    lazy val waypointForces   = MicroPathing.getWaypointInDirection(unit, force).map((_, "RetreatForce"))
+    lazy val waypointOrigin   = (unit.agent.origin, "RetreatOrigin")
+    val waypoint = waypointSimple.orElse(waypointPath).orElse(waypointForces).getOrElse(waypointOrigin)
+    unit.agent.toTravel = Some(waypoint._1)
+    unit.agent.act(waypoint._2)
     With.commander.move(unit)
   }
 }

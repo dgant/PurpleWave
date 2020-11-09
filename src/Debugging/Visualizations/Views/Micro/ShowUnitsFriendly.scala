@@ -5,7 +5,8 @@ import Debugging.Visualizations.Views.View
 import Debugging.Visualizations.{Colors, Forces}
 import Information.Geography.Pathfinding.Types.TilePath
 import Lifecycle.With
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Mathematics.Points.Pixel
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 import bwapi.Color
 
@@ -27,6 +28,26 @@ object ShowUnitsFriendly extends View {
   var showCharge      : Boolean = true
   
   override def renderMap() { With.units.ours.foreach(renderUnitState) }
+
+  def renderTargets(unit: UnitInfo): Unit = {
+    val targetUnit = unit.presumptiveTarget
+    val targetPosition = unit.presumptiveStep
+    if (targetUnit.exists(_.unitClass.isResource)) {
+      targetUnit.map(_.pixelCenter).foreach(DrawMap.line(unit.pixelCenter, _, Colors.MediumTeal))
+    } else if (targetUnit.isDefined) {
+      targetUnit.map(_.pixelCenter).foreach(DrawMap.line(unit.pixelCenter, _, Colors.MediumYellow))
+    } else if (targetPosition != unit.pixelCenter) {
+      DrawMap.line(unit.pixelCenter, targetPosition, Colors.MediumGray)
+      renderUnitBoxAt(unit, targetPosition, Colors.MediumGray)
+    }
+  }
+
+  def renderUnitBoxAt(unit: UnitInfo, at: Pixel, color: Color): Unit = {
+    DrawMap.box(
+      at.subtract (unit.unitClass.width / 2, unit.unitClass.height / 2),
+      at.add      (unit.unitClass.width / 2, unit.unitClass.height / 2),
+      color)
+  }
   
   def renderUnitState(unit: FriendlyUnitInfo) {
     val agent = unit.agent
@@ -42,26 +63,12 @@ object ShowUnitsFriendly extends View {
       labelY += 7
     }
 
-    if (showFormation) {
-      if (agent.toReturn.isDefined) {
-        DrawMap.box(
-          agent.toReturn.get.subtract (unit.unitClass.width / 2, unit.unitClass.height / 2),
-          agent.toReturn.get.add      (unit.unitClass.width / 2, unit.unitClass.height / 2),
-        Colors.BrightViolet)
-      }
+    if (showFormation && agent.toReturn.isDefined) {
+      renderUnitBoxAt(unit, agent.toReturn.get, Colors.DarkViolet)
     }
 
     if (showTargets) {
-      val targetUnit = unit.agent.toAttack.orElse(unit.target).orElse(unit.orderTarget)
-      val targetPosition = unit.agent.toTravel.orElse(unit.targetPixel).orElse(unit.orderTargetPixel)
-      if (unit.agent.toGather.isDefined) {
-        agent.toGather.map(_.pixelCenter).foreach(DrawMap.arrow(unit.pixelCenter, _, Colors.MediumTeal))
-      } else if (targetUnit.isDefined) {
-        targetUnit.map(_.pixelCenter).foreach(DrawMap.line(unit.pixelCenter, _, Colors.MediumYellow))
-      } else {
-        targetPosition.foreach(DrawMap.line(unit.pixelCenter, _, Colors.MediumGray))
-      }
-      agent.toAttack.map(_.pixelCenter).foreach(DrawMap.arrow(unit.pixelCenter, _, Colors.MediumYellow))
+      renderTargets(unit)
     }
 
     if (showLeaders) {

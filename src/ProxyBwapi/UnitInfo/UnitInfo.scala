@@ -611,7 +611,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   @inline final def carryingResources: Boolean = carryingMinerals || carryingGas
 
   final def presumptiveStep: Pixel = presumptiveStepCache()
-  private val presumptiveStepCache = new Cache(() => MicroPathing.getWaypointAlongTerrain(this, presumptiveDestination))
+  private val presumptiveStepCache = new Cache(() => MicroPathing.getWaypointToPixel(this, presumptiveDestination))
   final def presumptiveDestination: Pixel = {
     friendly.flatMap(_.agent.toTravel)
       .orElse(targetPixel)

@@ -7,7 +7,7 @@ import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.{Pixel, PixelRay}
 import Mathematics.PurpleMath
-import Mathematics.Shapes.{Circle, Ring}
+import Mathematics.Shapes.Circle
 import Micro.Actions.Combat.Maneuvering.Retreat.DesireProfile
 import Micro.Coordination.Pushing.Push
 import Micro.Heuristics.Potential
@@ -41,16 +41,21 @@ object MicroPathing {
   val waypointDistanceTiles: Int = 4
   val waypointDistancePixels: Int = 32 * waypointDistanceTiles
   private val ringDistance = waypointDistanceTiles * waypointDistanceTiles * 32 * 32
-  def getRingTowards(from: Pixel, to: Pixel): SeqView[Pixel, Seq[_]] = {
-    (if (from.pixelDistanceSquared(to) >= ringDistance) Ring.points(5) else Circle.points(5)).view.map(p => from.add(p.x * 32, p.y * 32))
+  def getCircleTowards(from: Pixel, to: Pixel): SeqView[Pixel, Seq[_]] = {
+    Circle.points(5).view.map(p => from.add(p.x * 32, p.y * 32))
   }
 
-  def getWaypointAlongTerrain(unit: UnitInfo, to: Pixel): Pixel = {
-    if (unit.flying || unit.pixelDistanceTravelling(to) <= waypointDistancePixels || unit.zone == to.zone) {
-      to
-    } else {
-      ByOption.minBy(getRingTowards(unit.pixelCenter, to).filter(_.tileIncluding.walkable))(_.groundPixels(to)).getOrElse(to)
-    }
+  def getWaypointToPixel(unit: UnitInfo, goal: Pixel): Pixel = {
+    lazy val line         = PixelRay(unit.pixelCenter, goal)
+    lazy val lineWaypoint = if (line.tilesIntersected.forall(_.walkable)) Some(unit.pixelCenter.project(goal, Math.min(unit.pixelDistanceCenter(goal), waypointDistancePixels))) else None
+    lazy val path         = With.paths.zonePath(unit.pixelCenter.zone, goal.zone)
+    lazy val pathWaypoint = path.flatMap(_.steps.find(_.from != unit.zone)).map(_.edge.pixelCenter)
+    lazy val goalWaypoint = pathWaypoint.getOrElse(goal)
+    lazy val ring         = MicroPathing.getCircleTowards(unit.pixelCenter, goalWaypoint)
+    lazy val ringFiltered = ring.filter(t => PixelRay(unit.pixelCenter, t).tilesIntersected.drop(1).forall(_.walkable))
+    lazy val ringWaypoint = ByOption.minBy(ring)(goal.groundPixels)
+    if (unit.flying) goal
+    else lineWaypoint.orElse(ringWaypoint).orElse(pathWaypoint).getOrElse(goal)
   }
 
   def getWaypointAlongTilePath(path: TilePath): Option[Pixel] = {

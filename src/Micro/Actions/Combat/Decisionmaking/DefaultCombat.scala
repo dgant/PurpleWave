@@ -187,7 +187,9 @@ object DefaultCombat extends Action {
 
     transition(
       Excuse,
-      () => context.receivedPushPriority >= TrafficPriorities.Shove && context.receivedPushPriority > unit.agent.pif (unit.unready) return
+      () => context.receivedPushPriority >= TrafficPriorities.Shove && context.receivedPushPriority > unit.agent.priority)
+
+    if (unit.unready) return
 
     ///////////////
     // Set goals //

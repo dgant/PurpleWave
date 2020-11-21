@@ -4,6 +4,7 @@ import Information.Fingerprinting.Generic._
 import Lifecycle.With
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.Protoss
+import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 import bwapi.Race
 
@@ -16,9 +17,10 @@ abstract class FingerprintFFE extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.nexusFirst)) {
   
   private class Status {
-    lazy val forge                  = With.units.enemy.find(u => u.is(Protoss.Forge) && ! u.zone.bases.exists(_.isStartLocation))
-    lazy val gateway                = With.units.enemy.find(_.is(Protoss.Gateway))
-    lazy val cannonsWalled          = With.units.enemy.view.filter(u => u.isAll(Protoss.PhotonCannon, UnitMatchNot(UnitMatchProxied)) && ! u.zone.bases.exists(_.isStartLocation)).toVector
+    def couldBeWall(unit: UnitInfo) = unit.base.forall(_.isNaturalOf.isDefined) && ! unit.is(UnitMatchProxied)
+    lazy val forge                  = With.units.enemy.find(u => u.is(Protoss.Forge)    && couldBeWall(u))
+    lazy val gateway                = With.units.enemy.find(u => u.is(Protoss.Gateway)  && couldBeWall(u))
+    lazy val cannonsWalled          = With.units.enemy.view.filter(u => u.is(Protoss.PhotonCannon) && couldBeWall(u)).toVector
     lazy val buildingsProxied       = With.units.enemy.view.filter(_.isAll(UnitMatchBuilding, UnitMatchProxied)).toVector
     lazy val zealot                 = With.units.enemy.view.filter(_.is(Protoss.Zealot)).toVector
     lazy val forgeOrCannon          = cannonsWalled ++ forge

@@ -376,7 +376,10 @@ object PvPIdeas {
     new Parallel(
       new WriteStatus("ReactToFFE"),
       new RequireMiningBases(2),
-      new PumpWorkers))
+      new PumpWorkers,
+      new If(
+        new MiningBasesAtMost(1),
+        new CapGasWorkersAt(0))))
 
   class TakeBase2 extends If(
     new Or(

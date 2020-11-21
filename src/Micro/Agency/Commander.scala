@@ -157,7 +157,7 @@ class Commander {
 
     // Path around terrain (if we haven't already)
     if ( ! unit.flying && unit.pixelDistanceTravelling(to) > MicroPathing.waypointDistancePixels) {
-      to = MicroPathing.getWaypointAlongTerrain(unit, to)
+      to = MicroPathing.getWaypointToPixel(unit, to)
     }
 
     // Cleave to walkable terrain until we're arriving at the destination
@@ -249,7 +249,7 @@ class Commander {
         With.coordinator.pushes.put(new UnitLinearGroundPush(
           unit.agent.priority,
           unit,
-          unit.pixelCenter.project(destination, Math.min(unit.pixelDistanceCenter(destination), 64))))
+          unit.pixelCenter.project(destination, Math.min(unit.pixelDistanceCenter(destination), 128))))
       }
     }
 

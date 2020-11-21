@@ -25,7 +25,7 @@ class Storyteller {
     def update(): Unit = {
       val valueNew = currentValue()
       if (valueLast != valueNew) {
-        With.logger.debug(label + (if (valueLast == "") " is " else " changed from " + valueLast + " to " ) + valueNew)
+        tell(label + (if (valueLast == "") " is " else " changed from " + valueLast + " to " ) + valueNew)
       }
       valueLast = valueNew
     }
@@ -90,19 +90,19 @@ class Storyteller {
     val enemyUnitsAfter = With.enemies.flatMap(With.unitsShown.all(_).view).filter(_._2.nonEmpty).map(_._1).toSet
     val enemyUnitsDiff = enemyUnitsAfter -- enemyUnitsBefore
     enemyUnitsDiff.foreach(newType => {
-      With.logger.debug("Discovered novel enemy unit: " + newType)
+      tell("Discovered novel enemy unit: " + newType)
       With.units.enemy.withFilter(_.is(newType)).foreach(unit => {
         if (newType.isBuilding) {
           if (unit.complete) {
-            With.logger.debug(unit + " is already complete")
+            tell(unit + " is already complete")
           } else {
             val remainingFrames = unit.completionFrame - With.frame
-            With.logger.debug(unit + " projects to complete in " + remainingFrames + " frames at " + new GameTime(unit.completionFrame) + "")
+            tell(unit + " projects to complete in " + remainingFrames + " frames at " + new GameTime(unit.completionFrame) + "")
           }
         } else {
           val arrivalFrame = unit.arrivalFrame()
           val arrivalFramesAhead = arrivalFrame - With.frame
-          With.logger.debug(unit + " projects to arrive in " + arrivalFramesAhead + " frames at " + new GameTime(arrivalFrame))
+          tell(unit + " projects to arrive in " + arrivalFramesAhead + " frames at " + new GameTime(arrivalFrame))
         }
       })
     })
@@ -119,50 +119,50 @@ class Storyteller {
   private def logPerformance() {
     val gameFastestSeconds = With.frame / 24
     val gameWallClockSeconds = (System.nanoTime() - With.startNanoTime) / 1000000000
-    With.logger.debug("Game duration (fastest):    " + gameFastestSeconds / 60 + "m " + gameFastestSeconds % 60 + "s")
-    With.logger.debug("Game duration (wall clock): " + gameWallClockSeconds / 60 + "m " + gameWallClockSeconds % 60 + "s")
-    With.logger.debug("\n" + Seq(
+    tell("Game duration (fastest):    " + gameFastestSeconds / 60 + "m " + gameFastestSeconds % 60 + "s")
+    tell("Game duration (wall clock): " + gameWallClockSeconds / 60 + "m " + gameWallClockSeconds % 60 + "s")
+    tell("\n" + Seq(
       Seq(With.configuration.frameMillisecondLimit, With.performance.framesOverShort),
       Seq(1000, With.performance.framesOver1000),
       Seq(10000, With.performance.framesOver10000)).map(line => "Bot frames over " + line.head.toString + "ms: " + line.last.toString).mkString("\n"))
 
-    With.logger.debug(
+    tell(
       "The bot believes its performance"
       + (if (Main.configuration.getAsync) ", if running synchronously, would be " else " was ")
       + (if (With.performance.disqualified) "BAD" else if (With.performance.danger) "DANGEROUS" else "good"))
-    With.logger.debug(JBWAPIClient.getPerformanceMetrics.toString)
+    tell(JBWAPIClient.getPerformanceMetrics.toString)
   }
 
   private def logEnvironment(): Unit = {
-    With.logger.debug("Game start time:  " + Calendar.getInstance().getTime.toString)
-    With.logger.debug("OS:               " + System.getProperty("os.name") + " " + System.getProperty("os.version") + " " + System.getProperty("os.arch"))
-    With.logger.debug("JRE:              " + System.getProperty("java.vendor") + " - " + System.getProperty("java.version"))
-    With.logger.debug("CPUs available:   " + Runtime.getRuntime.availableProcessors())
-    With.logger.debug("System memory:    " + ManagementFactory.getOperatingSystemMXBean.asInstanceOf[OperatingSystemMXBean].getTotalPhysicalMemorySize / 1000000 + " MB")
-    With.logger.debug("JVM Max memory:   " + Runtime.getRuntime.maxMemory()   / 1000000 + " MB")
-    With.logger.debug("JVM Total memory: " + Runtime.getRuntime.totalMemory() / 1000000 + " MB")
-    With.logger.debug("JVM Free memory:  " + Runtime.getRuntime.freeMemory()  / 1000000 + " MB")
+    tell("Game start time:  " + Calendar.getInstance().getTime.toString)
+    tell("OS:               " + System.getProperty("os.name") + " " + System.getProperty("os.version") + " " + System.getProperty("os.arch"))
+    tell("JRE:              " + System.getProperty("java.vendor") + " - " + System.getProperty("java.version"))
+    tell("CPUs available:   " + Runtime.getRuntime.availableProcessors())
+    tell("System memory:    " + ManagementFactory.getOperatingSystemMXBean.asInstanceOf[OperatingSystemMXBean].getTotalPhysicalMemorySize / 1000000 + " MB")
+    tell("JVM Max memory:   " + Runtime.getRuntime.maxMemory()   / 1000000 + " MB")
+    tell("JVM Total memory: " + Runtime.getRuntime.totalMemory() / 1000000 + " MB")
+    tell("JVM Free memory:  " + Runtime.getRuntime.freeMemory()  / 1000000 + " MB")
 
     try {
       val timestamp = Source.fromFile(With.bwapiData.ai + "timestamp.txt").getLines.mkString
-      With.logger.debug("This copy of PurpleWave was packaged for distribution on " + timestamp)
+      tell("This copy of PurpleWave was packaged for distribution on " + timestamp)
     } catch { case exception: Exception =>
-      With.logger.debug("No deployment timestamp available")
+      tell("No deployment timestamp available")
     }
 
     try {
       val revision = Source.fromFile(With.bwapiData.ai + "revision.txt").getLines.mkString
-      With.logger.debug("This copy of PurpleWave came from Git revision " + revision)
+      tell("This copy of PurpleWave came from Git revision " + revision)
     } catch { case exception: Exception =>
-        With.logger.debug("No deployment Git revision available")
+        tell("No deployment Git revision available")
     }
-    With.logger.debug("JBWAPI autocontinue: " + Main.configuration.getAutoContinue)
-    With.logger.debug("JBWAPI debugConnection: " + Main.configuration.getDebugConnection)
-    With.logger.debug("JBWAPI async: " + Main.configuration.getAsync)
-    With.logger.debug("JBWAPI async unsafe: " + Main.configuration.getAsyncUnsafe)
-    With.logger.debug("JBWAPI async frame buffer size: " + Main.configuration.getAsyncFrameBufferCapacity)
-    With.logger.debug("JBWAPI unlimited frame zero: " + Main.configuration.getUnlimitedFrameZero)
-    With.logger.debug("JBWAPI max frame duration: " + Main.configuration.getMaxFrameDurationMs + "ms")
+    tell("JBWAPI autocontinue: " + Main.configuration.getAutoContinue)
+    tell("JBWAPI debugConnection: " + Main.configuration.getDebugConnection)
+    tell("JBWAPI async: " + Main.configuration.getAsync)
+    tell("JBWAPI async unsafe: " + Main.configuration.getAsyncUnsafe)
+    tell("JBWAPI async frame buffer size: " + Main.configuration.getAsyncFrameBufferCapacity)
+    tell("JBWAPI unlimited frame zero: " + Main.configuration.getUnlimitedFrameZero)
+    tell("JBWAPI max frame duration: " + Main.configuration.getMaxFrameDurationMs + "ms")
   }
 
   private def logStrategyEvaluation(): Unit = {
@@ -176,12 +176,21 @@ class Storyteller {
         })
         rows += row
      })
-    columns.map(_.mkString("\t")).foreach(With.logger.debug)
+    columns.map(_.mkString("\t")).foreach(tell)
   }
 
   private def logStrategyInterest(): Unit = {
-    With.logger.debug("Strategy interest")
-    ShowStrategyInterest.evaluations.map(p => p._1 + " " + p._2).foreach(With.logger.debug)
+    tell("Strategy interest")
+    ShowStrategyInterest.evaluations.map(p => p._1 + " " + p._2).foreach(tell)
+  }
+
+  class Tale(val tale: String) { val frame: Int = With.frame }
+
+  val tales: mutable.ArrayBuffer[Tale] = new mutable.ArrayBuffer[Tale]
+
+  private def tell(value: String): Unit = {
+    With.logger.debug(value)
+    tales += new Tale(value)
   }
 
   def onEnd(): Unit = {

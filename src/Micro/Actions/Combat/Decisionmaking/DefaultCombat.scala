@@ -42,7 +42,7 @@ object DefaultCombat extends Action {
     def retarget(filters: TargetFilter*): Unit = {
       // TODO: Evaluate all targets once and cache values,
       // then pick best target given custom filters
-      if (unit.ready) {
+      if (unit.ready && unit.agent.canFight) {
         unit.agent.toAttack = EvaluateTargets.best(unit, EvaluateTargets.preferredTargets(unit, filters: _*))
       }
     }
@@ -82,7 +82,7 @@ object DefaultCombat extends Action {
   }
 
   def takePotshot(context: MicroContext): Unit = {
-    if (context.unit.unready) return true
+    if (context.unit.unready) return
     val oldToAttack = context.unit.agent.toAttack
     context.unit.agent.toAttack = None
     // TODO: Handle extant targets
@@ -157,6 +157,7 @@ object DefaultCombat extends Action {
       Organize,
       () =>
         unit.agent.toReturn.isEmpty
+        && unit.agent.canFight
         && unit.agent.toLeash.isEmpty
         && context.receivedPushPriority < TrafficPriorities.Shove
         && context.missingDistanceFromThreat < -64)
@@ -186,9 +187,7 @@ object DefaultCombat extends Action {
 
     transition(
       Excuse,
-      () => context.receivedPushPriority >= TrafficPriorities.Shove && context.receivedPushPriority > unit.agent.priority)
-
-    if (unit.unready) return
+      () => context.receivedPushPriority >= TrafficPriorities.Shove && context.receivedPushPriority > unit.agent.pif (unit.unready) return
 
     ///////////////
     // Set goals //
@@ -288,9 +287,13 @@ object DefaultCombat extends Action {
     // TODO: If we like our position, HOLD
 
     // TODO: CHASE: Moving shot/pursue if we want to
+    // TODO: Don't overshoot destination if we're just strolling there
     val groupTravel = MicroPathing.getWaypointInDirection(unit, unit.agent.forces.sum.radians)
-
     if (groupTravel.isDefined) {
+      if (techniqueIs(Fight) && unit.battle.isEmpty) {
+        unit.agent.act("Travel")
+      }
+
       unit.agent.toTravel = groupTravel
       With.commander.move(unit)
       return

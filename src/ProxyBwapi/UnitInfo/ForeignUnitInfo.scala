@@ -79,7 +79,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
     _hitPoints          = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxHitPoints  else _hitPoints     else baseUnit.getHitPoints
     _shieldPoints       = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxShields    else _shieldPoints  else baseUnit.getShields
     _pixelCenter        = new Pixel(baseUnit.getPosition)
-    _tileTopLeft        = _pixelCenter.subtract(unitClass.dimensionLeft, unitClass.dimensionUp).tileNearest
+    _tileTopLeft        = new Tile(baseUnit.getTilePosition)
   }
   
   private def updateTracking() {

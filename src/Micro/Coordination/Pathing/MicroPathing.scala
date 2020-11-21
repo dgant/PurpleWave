@@ -57,23 +57,32 @@ object MicroPathing {
     if (path.pathExists) Some(path.tiles.get.take(waypointDistanceTiles).last.pixelCenter) else None
   }
 
-  private val rays = 16
-  private val rayRadians = (0 to rays).map(_ * Math.PI / rays - Math.PI / 2).toVector.sortBy(Math.abs)
+  private val rays = 14
+  private val rayRadians = (0 to rays).map(_ * Math.PI / (2 + rays) - Math.PI / 2).toVector.sortBy(Math.abs).dropRight(2)
+  private val rayCosines = rayRadians.map(Math.cos)
+
   def getWaypointInDirection(unit: FriendlyUnitInfo, radians: Double, desire: DesireProfile = DesireProfile()): Option[Pixel] = {
-    val pathLength = 64 + unit.matchups.pixelsOfEntanglement
-    val stepSize = Math.min(pathLength, Math.max(64, unit.topSpeed * With.reaction.agencyMax))
-    val origin = unit.agent.origin
-    val output: Option[Pixel] = rayRadians.view.map(r =>
-      qualifyRay(
-        unit,
-        radians + r,
-        desire.safety > 0,
-        Some(unit.agent.origin).filter(unused => desire.home > 0)))
-      .filter(_.isDefined)
-      .take(1)
-      .headOption
-      .flatten
-    output
+    lazy val safetyPixels =  unit.matchups.pixelsOfEntanglement
+    val rayStart = unit.pixelCenter
+    val waypointDistance = Math.max(waypointDistancePixels, if (desire.safety > 0) 64 + safetyPixels else 0)
+    val termini = rayRadians
+      .indices
+      .view
+      .map(i => {
+        val deltaRadians = rayRadians(i)
+        val cosine = rayCosines(i)
+        val terminus = castRay(rayStart, lengthPixels = waypointDistance, radians = radians + deltaRadians, flying = unit.flying)
+        (terminus, cosine)
+      })
+      .filter(p => {
+        val terminus = p._1
+        val cosine = p._2
+        (
+          terminus != rayStart
+          && (desire.home <= 0 || unit.pixelDistanceCenter(p._1) >= safetyPixels)
+          && (desire.safety <= 0 || unit.matchups.threats.forall(t => t.pixelDistanceSquared(terminus) <= t.pixelDistanceSquared(unit.pixelCenter))))
+      })
+    ByOption.maxBy(termini)(p => rayStart.pixelDistance(p._1) * p._2).map(_._1) // Return the terminus that moves us furthest along the desired axis
   }
 
   def tryMovingAlongTilePath(unit: FriendlyUnitInfo, path: TilePath): Unit = {
@@ -137,21 +146,18 @@ object MicroPathing {
 
   def getPushRadians(unit: FriendlyUnitInfo): Option[Double] = getPushRadians(getPushForces(unit))
 
-  private def qualifyRay(
-    unit: FriendlyUnitInfo,
-    radians: Double,
-    avoidThreats: Boolean = true,
-    towards: Option[Pixel] = None): Option[Pixel] = {
-    val pathLength = Math.max(waypointDistancePixels, 64 + unit.matchups.pixelsOfEntanglement)
-    val ray = new PixelRay(unit.pixelCenter, pathLength, radians)
-    // Is the endpoint valid?
-    if ( ! ray.to.valid) return None
-    // Is the path traversable?
-    if ( ! unit.flying && ! ray.tilesIntersected.forall(_.walkable)) return None
-    // Does it takes us towards our goal?
-    if (towards.exists(t => unit.zone != t.zone && unit.pixelDistanceTravelling(t) <= unit.pixelDistanceTravelling(ray.to, t))) return None
-    // Does it keep us safe?
-    if (avoidThreats && unit.matchups.threats.exists(t => t.pixelDistanceSquared(ray.to) <= t.pixelDistanceSquared(unit.pixelCenter))) return None
-    Some(ray.to)
+  def castRay(from: Pixel, lengthPixels: Double, radians: Double, flying: Boolean): Pixel = {
+    val ray = new PixelRay(from, lengthPixels = lengthPixels, radians = radians)
+    val tiles = ray.tilesIntersected
+    var output = from
+    var i = 0
+    while (i < tiles.length) {
+      val tile = tiles(i)
+      if (tile.valid && (flying || tile.walkableUnchecked)) {
+        output = tile.pixelCenter
+        i += 1
+      } else i = tiles.length
+    }
+    output
   }
 }

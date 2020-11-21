@@ -141,14 +141,8 @@ object Potential {
     lazy val ring         = MicroPathing.getRingTowards(unit.pixelCenter, goal).filter(_.tileIncluding.walkable)
     lazy val ringWaypoint = ByOption.minBy(ring.filter(_.tileIncluding.walkable))(_.groundPixels(goal))
     lazy val path         = With.paths.zonePath(unit.pixelCenter.zone, goal.zone)
-    lazy val pathWaypoint = path.get.steps.head.edge.pixelCenter
-    val to =
-      if (unit.flying)
-        goal
-      else if (path.nonEmpty && path.get.steps.nonEmpty)
-        pathWaypoint
-      else
-        ringWaypoint.getOrElse(goal)
+    lazy val pathWaypoint = path.flatMap(_.steps.find(_.from != unit.zone)).map(_.edge.pixelCenter)
+    val to = if (unit.flying) goal else ringWaypoint.orElse(pathWaypoint).getOrElse(goal)
     val output = ForceMath.fromPixels(unit.pixelCenter, to, 1.0).normalize
     output
   }

@@ -3,6 +3,7 @@ package ProxyBwapi.UnitInfo
 import Information.Grids.Combat.AbstractGridEnemyRange
 import Lifecycle.With
 import Micro.Agency.Agent
+import Micro.Squads.Goals.SquadGoal
 import Micro.Squads.Squad
 import Performance.Cache
 import ProxyBwapi.Techs.{Tech, Techs}
@@ -15,6 +16,7 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
   override val friendly: Option[FriendlyUnitInfo] = Some(this)
   
   def squad: Option[Squad] = squadCache()
+  def goal: Option[SquadGoal] = squad.map(_.goal)
   def squadmates: Set[FriendlyUnitInfo] = squad.map(_.units).getOrElse(Set.empty)
   def squadenemies: Seq[UnitInfo] = squad.map(_.enemies).getOrElse(Seq.empty)
   def teammates: Set[UnitInfo] = teammatesCache()

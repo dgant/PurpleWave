@@ -8,7 +8,7 @@ import Debugging.Visualizations.Views.Geography._
 import Debugging.Visualizations.Views.Micro._
 import Debugging.Visualizations.Views.Performance.{ShowPerformanceDetails, ShowPerformanceSummary, ShowReactionTime}
 import Debugging.Visualizations.Views.Planning.{ShowStatus, _}
-import Debugging.Visualizations.Views.{ShowClock, View}
+import Debugging.Visualizations.Views.{ShowClock, ShowStoryteller, View}
 import Lifecycle.With
 import bwapi.Text
 import Mathematics.Points.Pixel
@@ -35,6 +35,7 @@ class Visualization {
     ShowUnitPaths,
     ShowStatus,
     ShowPerformanceSummary,
+    ShowStoryteller
   )
   
   var enabled   : Boolean = _
@@ -151,6 +152,7 @@ class Visualization {
     ShowStrategyInterest,
     ShowStrategyName,
     ShowStrategyEvaluations,
+    ShowStoryteller,
     ShowTextOnly,
     ShowTextOnlyUnits,
     ShowTileInfo,

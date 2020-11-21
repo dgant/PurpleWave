@@ -119,7 +119,7 @@ class Commander {
         || (target.isFriendly && unit.is(Protoss.Carrier))) // Carrier warmup; spam attack
       
       if (shouldOrder) {
-        if (unit.unitClass.accelerationFrames <= 1 && unit.matchups.targetsInRange.forall(unit.agent.toAttack.contains)) {
+        if ( ! unit.flying && ! unit.unitClass.floats && unit.matchups.targetsInRange.size == 1 && unit.matchups.targetsInRange.head == target) {
           unit.baseUnit.holdPosition()
         } else {
           unit.baseUnit.attack(target.baseUnit)

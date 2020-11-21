@@ -18,11 +18,11 @@ object EvaluateTargets extends {
     val targetsRequired = legalTargets(unit).toVector
 
     if (filtersPreferred.isEmpty) {
-
+      return targetsRequired
     }
     var output: Seq[UnitInfo] = Seq.empty
     for (filtersOptionalToDrop <- 0 to filtersPreferred.length) {
-      if (output.isEmpty && unit.agent.toAttack.isEmpty) {
+      if (output.isEmpty) {
         val filtersOptionalActive = filtersPreferred.drop(filtersOptionalToDrop)
         output = targetsRequired.filter(target => filtersOptionalActive.forall(_.legal(unit, target)))
       }

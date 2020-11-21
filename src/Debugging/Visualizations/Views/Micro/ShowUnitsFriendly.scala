@@ -18,7 +18,6 @@ object ShowUnitsFriendly extends View {
   var showCommand     : Boolean = false
   var showOrder       : Boolean = false
   var showTargets     : Boolean = true
-  var showFormation   : Boolean = true
   def showPaths       : Boolean = ShowUnitPaths.inUse
   var showDesire      : Boolean = true
   var showDistance    : Boolean = false
@@ -39,6 +38,15 @@ object ShowUnitsFriendly extends View {
     } else if (targetPosition != unit.pixelCenter) {
       DrawMap.line(unit.pixelCenter, targetPosition, Colors.MediumGray)
       renderUnitBoxAt(unit, targetPosition, Colors.MediumGray)
+      unit.friendly.map(_.agent).foreach(agent => {
+        agent.toReturn.foreach(toReturn => {
+          val returnColor = Colors.MediumViolet
+          if (targetPosition != toReturn) {
+            DrawMap.line(targetPosition, toReturn, returnColor)
+            renderUnitBoxAt(unit, agent.toReturn.get, returnColor)
+          }
+        })
+      })
     }
   }
 
@@ -63,10 +71,6 @@ object ShowUnitsFriendly extends View {
       labelY += 7
     }
 
-    if (showFormation && agent.toReturn.isDefined) {
-      renderUnitBoxAt(unit, agent.toReturn.get, Colors.DarkViolet)
-    }
-
     if (showTargets) {
       renderTargets(unit)
     }
@@ -79,7 +83,7 @@ object ShowUnitsFriendly extends View {
       }
     }
 
-    if (showDesire) {
+    if (showDesire && unit.battle.isDefined) {
       val color = if (agent.shouldEngage) Colors.NeonGreen else Colors.NeonRed
       val pixel = unit.pixelCenter.subtract(0, 6 + unit.unitClass.height / 2)
       DrawMap.box(pixel.subtract(3, 3), pixel.add(3, 3), Color.Black, solid = true)
@@ -126,7 +130,7 @@ object ShowUnitsFriendly extends View {
         }
     }
 
-    if (showFightReason)  drawNextLabel(unit.agent.fightReason)
+    if (showFightReason)  drawNextLabel(if (unit.battle.isDefined) unit.agent.fightReason else "")
     if (showClient)       drawNextLabel(agent.lastClient.map(_.toString).getOrElse(""))
     if (showAction)       drawNextLabel(agent.lastAction.getOrElse(""))
     if (showCommand)      drawNextLabel(unit.command.map(_.getType.toString).getOrElse(""))

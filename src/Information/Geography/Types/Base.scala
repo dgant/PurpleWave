@@ -114,5 +114,13 @@ class Base(val townHallTile: Tile)
   def resources: Vector[UnitInfo] = minerals ++ gas
   def natural: Option[Base] = With.geography.bases.find(_.isNaturalOf.contains(this))
   
-  override def toString: String = name + ", " + zone.name + " " + heart
+  override def toString: String = description + " " + name + ", " + zone.name + " " + heart
+
+  def description: String = (
+    if (this == With.geography.ourMain) "Our main"
+    else if (this == With.geography.ourNatural) "Our natural"
+    else (
+      (if (owner.isEnemy) "Enemy" else if (owner.isUs) "Our" else if (owner.isAlly) "Ally" else "Neutral")
+      + " "
+      + (if (isStartLocation) "main" else if (isNaturalOf.isDefined) "natural" else "base")))
 }

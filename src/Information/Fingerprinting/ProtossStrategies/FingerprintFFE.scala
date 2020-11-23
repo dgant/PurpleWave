@@ -20,6 +20,7 @@ abstract class FingerprintFFE extends FingerprintAnd(
     def couldBeWall(unit: UnitInfo) = unit.base.forall(_.isNaturalOf.isDefined) && ! unit.is(UnitMatchProxied)
     lazy val forge                  = With.units.enemy.find(u => u.is(Protoss.Forge)    && couldBeWall(u))
     lazy val gateway                = With.units.enemy.find(u => u.is(Protoss.Gateway)  && couldBeWall(u))
+    lazy val expanded               = With.units.countEnemy(Protoss.Nexus) > 1 || With.units.enemy.exists(u => u.is(Protoss.Nexus) && ! u.base.exists(_.isStartLocation))
     lazy val cannonsWalled          = With.units.enemy.view.filter(u => u.is(Protoss.PhotonCannon) && couldBeWall(u)).toVector
     lazy val buildingsProxied       = With.units.enemy.view.filter(_.isAll(UnitMatchBuilding, UnitMatchProxied)).toVector
     lazy val zealot                 = With.units.enemy.view.filter(_.is(Protoss.Zealot)).toVector
@@ -27,6 +28,7 @@ abstract class FingerprintFFE extends FingerprintAnd(
     lazy val gatewayOrZealot        = gateway ++ zealot
     lazy val forgeCompletionFrame   = forge.map(_.completionFrame).orElse(ByOption.min(cannonsWalled.map(_.frameDiscovered)))
     lazy val gatewayCompletionFrame = gateway.map(_.completionFrame).orElse(ByOption.min(zealot.map(_.frameDiscovered)))
+    lazy val isSomeKindOfFFE        = forgeOrCannon.nonEmpty || (gateway.isDefined && expanded)
   }
   
   private val expectedFFEForge          = GameTime(2, 6)()
@@ -73,10 +75,12 @@ abstract class FingerprintFFE extends FingerprintAnd(
     if ( ! super.investigate) return false
   
     val status = new Status
-    decidedForge = conclusivelyForge(status)
-    decidedGateway = conclusivelyGateway(status)
-    if (decidedForge) return isFFE
-    if (decidedGateway) return ! isFFE
+    if (status.isSomeKindOfFFE) {
+      decidedForge = conclusivelyForge(status)
+      decidedGateway = conclusivelyGateway(status)
+      if (decidedForge) return isFFE
+      if (decidedGateway) return !isFFE
+    }
     false
   }
   

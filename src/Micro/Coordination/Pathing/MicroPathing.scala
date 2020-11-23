@@ -8,7 +8,6 @@ import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.{Pixel, PixelRay}
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Circle
-import Micro.Actions.Combat.Maneuvering.Retreat.DesireProfile
 import Micro.Coordination.Pushing.Push
 import Micro.Heuristics.Potential
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -46,30 +45,31 @@ object MicroPathing {
   }
 
   def getWaypointToPixel(unit: UnitInfo, goal: Pixel): Pixel = {
-    lazy val line         = PixelRay(unit.pixelCenter, goal)
-    lazy val lineWaypoint = if (line.tilesIntersected.forall(_.walkable)) Some(unit.pixelCenter.project(goal, Math.min(unit.pixelDistanceCenter(goal), waypointDistancePixels))) else None
-    lazy val path         = With.paths.zonePath(unit.pixelCenter.zone, goal.zone)
-    lazy val pathWaypoint = path.flatMap(_.steps.find(_.from != unit.zone)).map(_.edge.pixelCenter)
-    lazy val goalWaypoint = pathWaypoint.getOrElse(goal)
-    lazy val ring         = MicroPathing.getCircleTowards(unit.pixelCenter, goalWaypoint)
-    lazy val ringFiltered = ring.filter(t => PixelRay(unit.pixelCenter, t).tilesIntersected.drop(1).forall(_.walkable))
-    lazy val ringWaypoint = ByOption.minBy(ring)(goal.groundPixels)
-    if (unit.flying) goal
-    else lineWaypoint.orElse(ringWaypoint).orElse(pathWaypoint).getOrElse(goal)
+    if (unit.flying) return goal
+    val line         = PixelRay(unit.pixelCenter, goal)
+    val lineWaypoint = if (line.tilesIntersected.forall(_.walkable)) Some(unit.pixelCenter.project(goal, Math.min(unit.pixelDistanceCenter(goal), waypointDistancePixels))) else None
+    val path         = With.paths.zonePath(unit.pixelCenter.zone, goal.zone)
+    val pathWaypoint = path.flatMap(_.steps.find(step => step.from != unit.zone || unit.pixelDistanceCenter(step.edge.pixelCenter) > step.edge.radiusPixels)).map(_.edge.pixelCenter)
+    val goalWaypoint = pathWaypoint.getOrElse(goal)
+    val ring         = MicroPathing.getCircleTowards(unit.pixelCenter, goalWaypoint)
+    val ringFiltered = ring.filter(t => PixelRay(unit.pixelCenter, t).tilesIntersected.drop(1).forall(_.walkable))
+    val ringWaypoint = ByOption.minBy(ringFiltered)(goal.groundPixels)
+    lineWaypoint.orElse(ringWaypoint).orElse(pathWaypoint).getOrElse(goal)
   }
 
   def getWaypointAlongTilePath(path: TilePath): Option[Pixel] = {
     if (path.pathExists) Some(path.tiles.get.take(waypointDistanceTiles).last.pixelCenter) else None
   }
 
-  private val rays = 14
-  private val rayRadians = (0 to rays).map(_ * Math.PI / (2 + rays) - Math.PI / 2).toVector.sortBy(Math.abs).dropRight(2)
+  private val rays = 32
+  private val rayRadians = (0 to rays).map(_ * 2 * Math.PI / rays - Math.PI).toVector.sortBy(Math.abs)
   private val rayCosines = rayRadians.map(Math.cos)
-
-  def getWaypointInDirection(unit: FriendlyUnitInfo, radians: Double, desire: DesireProfile = DesireProfile()): Option[Pixel] = {
+  def getWaypointInDirection(unit: FriendlyUnitInfo, radians: Double, requireApproaching: Option[Pixel] = None, requireSafety: Boolean = false): Option[Pixel] = {
     lazy val safetyPixels =  unit.matchups.pixelsOfEntanglement
+    lazy val travelDistanceCurrent = requireApproaching.map(unit.pixelDistanceTravelling)
+
     val rayStart = unit.pixelCenter
-    val waypointDistance = Math.max(waypointDistancePixels, if (desire.safety > 0) 64 + safetyPixels else 0)
+    val waypointDistance = Math.max(waypointDistancePixels, if (requireSafety) 64 + safetyPixels else 0)
     val termini = rayRadians
       .indices
       .view
@@ -82,10 +82,11 @@ object MicroPathing {
       .filter(p => {
         val terminus = p._1
         val cosine = p._2
+        lazy val travelDistanceTerminus = requireApproaching.map(a => if (unit.flying) terminus.pixelDistance(a) else terminus.groundPixels(a))
         (
           terminus != rayStart
-          && (desire.home <= 0 || unit.pixelDistanceCenter(p._1) >= safetyPixels)
-          && (desire.safety <= 0 || unit.matchups.threats.forall(t => t.pixelDistanceSquared(terminus) <= t.pixelDistanceSquared(unit.pixelCenter))))
+          && (travelDistanceTerminus.forall(_ < travelDistanceCurrent.get))
+          && ( ! requireSafety || unit.matchups.threats.forall(t => t.pixelDistanceSquared(terminus) <= t.pixelDistanceSquared(unit.pixelCenter))))
       })
     ByOption.maxBy(termini)(p => rayStart.pixelDistance(p._1) * p._2).map(_._1) // Return the terminus that moves us furthest along the desired axis
   }
@@ -108,7 +109,7 @@ object MicroPathing {
       .toIndexedSeq
   }
 
-  def setDefaultForces(unit: FriendlyUnitInfo, desire: DesireProfile = DesireProfile()): Unit = {
+  def setDefaultForces(unit: FriendlyUnitInfo, goalSafety: Boolean, goalHome: Boolean): Unit = {
     val to = unit.agent.origin
 
     // Add cliffing
@@ -123,13 +124,13 @@ object MicroPathing {
     }
 
     // Where to go
-    unit.agent.forces(Forces.threat)      = (Potential.avoidThreats(unit)     * desire.safety)
-    unit.agent.forces(Forces.travel)   = (Potential.preferTravel(unit, to) * desire.home)
+    unit.agent.forces(Forces.threat)      = (Potential.avoidThreats(unit)     * PurpleMath.toInt(goalSafety))
+    unit.agent.forces(Forces.travel)      = (Potential.preferTravel(unit, to) * PurpleMath.toInt(goalHome))
     unit.agent.forces(Forces.sneaking)    = (Potential.detectionRepulsion(unit))
 
     // How to get there
-    unit.agent.forces(Forces.spreading)   = (Potential.preferSpreading(unit)  * desire.safety)
-    unit.agent.forces(Forces.regrouping)  = (Potential.preferRegrouping(unit) * Math.max(0, 1 - desire.safety))
+    unit.agent.forces(Forces.spreading)   = (Potential.preferSpreading(unit)  * PurpleMath.toInt(goalSafety))
+    unit.agent.forces(Forces.regrouping)  = (Potential.preferRegrouping(unit) * PurpleMath.toInt( ! goalSafety))
     unit.agent.forces(Forces.spacing)     = (Potential.avoidCollision(unit))
 
     ForceMath.rebalance(unit.agent.forces, 1.5, Forces.threat, Forces.travel, Forces.sneaking)

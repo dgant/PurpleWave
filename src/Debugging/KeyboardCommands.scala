@@ -37,7 +37,6 @@ object KeyboardCommands {
 
   private var breakpointFodder = 1
   def breakpoint() {
-
     breakpointFodder = -breakpointFodder
   }
 

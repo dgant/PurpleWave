@@ -60,9 +60,8 @@ class Zone(
   
   override def toString: String = (
     name
+    + (if (bases.nonEmpty) " (" + bases.map(b => b.name + " - " + b.description).mkString(", ") + ")" else "")
     + " "
-    + (if (bases.nonEmpty) "(" + bases.map(_.name).mkString(", ") + ")" else "")
-      + " "
     + centroid
   )
 }

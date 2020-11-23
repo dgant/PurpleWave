@@ -196,7 +196,7 @@ object DefaultCombat extends Action {
     ///////////////
 
     def techniqueIs(techniques: Technique*): Boolean = techniques.contains(context.technique)
-    val goalPotshot = techniqueIs(Abuse, Fallback, Aim, Organize)
+    val goalPotshot = techniqueIs(Abuse, Fallback, Aim, Organize) || unit.is(Protoss.Reaver)
     val goalHover   = techniqueIs(Abuse, Reposition)
     val goalEngage  = techniqueIs(Surround, Chase, Fight, Abuse, Reposition)
     val goalRetreat = techniqueIs(Fallback, Flee)
@@ -290,7 +290,8 @@ object DefaultCombat extends Action {
 
     // TODO: CHASE: Moving shot/pursue if we want to
     // TODO: Don't overshoot destination if we're just strolling there
-    val groupTravel = MicroPathing.getWaypointInDirection(unit, unit.agent.forces.sum.radians)
+    val groupTravelGoal = unit.agent.toTravel
+    val groupTravel = MicroPathing.getWaypointInDirection(unit, unit.agent.forces.sum.radians, requireApproaching = groupTravelGoal)
     if (groupTravel.isDefined) {
       if (techniqueIs(Fight) && unit.battle.isEmpty) {
         unit.agent.act("Travel")

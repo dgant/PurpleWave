@@ -330,4 +330,6 @@ object PurpleMath {
     val isOnSegment = onLine.distanceSquared(v1) < segmentLength2 && onLine.distanceSquared(v2) < segmentLength2
     if (isOnSegment) onLine else Seq(v1, v2).minBy(_.distanceSquared(p))
   }
+
+  @inline final def toInt(value: Boolean): Int = if (value) 1 else 0
 }

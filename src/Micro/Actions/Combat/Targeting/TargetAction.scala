@@ -14,7 +14,7 @@ class TargetAction(val additionalFiltersRequired: TargetFilter*) extends Action 
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    unit.agent.toAttack = EvaluateTargets.best(unit, EvaluateTargets.preferredTargets(unit))
+    unit.agent.toAttack = EvaluateTargets.best(unit, EvaluateTargets.preferredTargets(unit, additionalFiltersRequired: _*))
   }
 }
 

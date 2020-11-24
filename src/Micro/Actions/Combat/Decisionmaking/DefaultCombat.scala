@@ -32,9 +32,7 @@ object DefaultCombat extends Action {
   override protected def perform(unit: FriendlyUnitInfo): Unit = micro(unit, unit.agent.shouldEngage)
 
   abstract class Technique(val transitions: Technique*) {
-    def canTransition(other: Technique): Boolean = {
-      transitions.contains(other) || transitions.exists(_.canTransition(other))
-    }
+    def canTransition(other: Technique): Boolean = transitions.contains(other)
     override val toString: String = getClass.getSimpleName.replace("$", "")
   }
 
@@ -81,14 +79,17 @@ object DefaultCombat extends Action {
         .getOrElse(if (shouldEngage) unit.agent.destination else unit.agent.origin)
   }
 
-  def takePotshot(context: MicroContext): Unit = {
-    if (context.unit.unready) return
-    val oldToAttack = context.unit.agent.toAttack
-    context.unit.agent.toAttack = None
-    // TODO: Handle extant targets
-    PotshotTarget.delegate(context.unit)
-    With.commander.attack(context.unit)
-    context.unit.agent.toAttack = context.unit.agent.toAttack.orElse(oldToAttack)
+  def takePotshot(unit: FriendlyUnitInfo): Unit = {
+    if (unit.unready) return
+    if ( ! unit.readyForAttackOrder) return
+    val oldToAttack = unit.agent.toAttack
+    unit.agent.toAttack = None
+    PotshotTarget.delegate(unit)
+    if (unit.agent.toAttack.isDefined) {
+      With.commander.attack(unit)
+    } else {
+      unit.agent.toAttack = oldToAttack
+    }
   }
 
   def followPushing(context: MicroContext): Unit = {
@@ -115,9 +116,9 @@ object DefaultCombat extends Action {
   object Chase      extends Technique(Dodge, Excuse) // Stay in fight and stay in range
   object Reposition extends Technique(Dodge, Excuse) // Stay in fight with better position
   object Abuse      extends Technique(Dodge, Excuse) // Pick fights from range
-  object Fallback   extends Technique(Dodge, Excuse) // Get out of fight while landing shots
+  object Fallback   extends Technique(Dodge) // Get out of fight while landing shots
   object Organize   extends Technique(Dodge, Excuse, Abuse, Fallback) // Get into ideal position for future fight
-  object Flee       extends Technique(Dodge, Excuse, Abuse, Fallback, Organize) // Get out of fight
+  object Flee       extends Technique(Dodge, Abuse, Fallback, Organize) // Get out of fight
   object Fight      extends Technique(Dodge, Excuse, Abuse, Surround, Chase, Reposition) // Pick fight ASAP
 
   @inline final protected def canAbuse(unit: FriendlyUnitInfo, target: UnitInfo): Boolean = {
@@ -165,15 +166,15 @@ object DefaultCombat extends Action {
     // Evaluate potential attacks
     context.retarget()
 
+    lazy val framesToGetInRangeOfTarget = unit.agent.toAttack.map(unit.framesToGetInRange)
     transition(
       Abuse,
-      () => unit.agent.toAttack.exists(canAbuse(unit, _)) && unit.matchups.threats.forall(t => canAbuse(unit, t) || t.framesToGetInRange(unit) > 12 + unit.framesToGetInRange(t)))
+      () => unit.agent.toAttack.exists(target => canAbuse(unit, target)) && unit.matchups.threats.forall(t => canAbuse(unit, t) || t.framesToGetInRange(unit) > 12 + framesToGetInRangeOfTarget.get))
 
     transition(
       Fallback,
       () =>
         unit.isAny(Terran.Vulture, Terran.SiegeTankUnsieged, Terran.Goliath, Terran.Wraith, Protoss.Archon, Protoss.Dragoon, Protoss.Reaver, Protoss.Scout, Zerg.Hydralisk, Zerg.Mutalisk)
-        && unit.readyForAttackOrder
         && ( unit.is(Protoss.Reaver) || context.receivedPushPriority < TrafficPriorities.Shove)
         && (unit.zone == unit.agent.origin.zone || ! unit.isAny(Protoss.Archon, Protoss.Dragoon) || ! unit.matchups.threats.exists(t => t.is(Protoss.Dragoon) && t.framesToGetInRange(t) < 12)))
 
@@ -197,9 +198,9 @@ object DefaultCombat extends Action {
 
     def techniqueIs(techniques: Technique*): Boolean = techniques.contains(context.technique)
     val goalPotshot = techniqueIs(Abuse, Fallback, Aim, Organize) || unit.is(Protoss.Reaver)
-    val goalHover   = techniqueIs(Abuse, Reposition)
+    val goalHover   = techniqueIs(Abuse, Reposition, Excuse)
     val goalEngage  = techniqueIs(Surround, Chase, Fight, Abuse, Reposition)
-    val goalRetreat = techniqueIs(Fallback, Flee)
+    val goalRetreat = techniqueIs(Fallback, Flee, Excuse)
     val goalRegroup = techniqueIs(Organize)
 
     /////////////
@@ -211,7 +212,7 @@ object DefaultCombat extends Action {
     if (unit.unready) return
 
     if (goalPotshot) {
-      takePotshot(context)
+      takePotshot(unit)
       if (unit.unready) return
     }
 
@@ -222,7 +223,7 @@ object DefaultCombat extends Action {
     if ((goalHover || goalRetreat) && ! unit.flying) unit.agent.escalatePriority(if (context.tooCloseToThreat) TrafficPriorities.Shove else TrafficPriorities.Bump)
 
     // TODO: Find smarter firing positions. Find somewhere safe and unoccupied but not too far to stand.
-    def firingPosition: Option[Pixel] = unit.agent.toAttack.map(_.pixelCenter).filter(p => unit.flying || p.tileIncluding.walkable).orElse(unit.agent.toTravel)
+    lazy val firingPosition: Option[Pixel] = unit.agent.toAttack.map(_.pixelCenter).filter(p => unit.flying || p.tileIncluding.walkable).orElse(unit.agent.toTravel)
     unit.agent.toTravel = Some(
       if (goalRegroup)
         context.regroupGoal
@@ -243,7 +244,7 @@ object DefaultCombat extends Action {
     forces(Forces.spreading)  = mul(1, MicroPathing.getPushRadians(context.receivedPushForces).map(ForceMath.fromRadians(_)).getOrElse(new Force))
     forces(Forces.cohesion)   = mul(1, Potential.preferCohesion(unit))
     // TODO: Splash force
-    // TODO: Regroup force
+    // TODO: Regroup force -- Proportional to distance from centroid divided by total length of army
     // Reference https://github.com/bmnielsen/Stardust/blob/master/src/General/UnitCluster/Tactics/Move.cpp#L69
 
     if (unit.matchups.threats.isEmpty) {
@@ -255,26 +256,28 @@ object DefaultCombat extends Action {
       val exposed = unit.matchups.threatsInRange.exists(t => t.inRangeToAttack(unit) && ! unit.agent.toAttack.contains(t))
       if (closeEnough) {
         if (exposed) {
-          forces(Forces.threat) *= 4
+          forces(Forces.threat) *= 3
         }
       } else {
-        forces(Forces.travel) *= 4
+        forces(Forces.travel) *= 3
       }
     } else if (goalRegroup) {
-      forces(Forces.travel) *= 4
+      forces(Forces.travel) *= 3
     } else if (goalEngage) {
-      forces(Forces.travel) *= 4
+      forces(Forces.travel) *= 3
     } else if (goalRetreat) {
-      forces(Forces.threat) *= 4
+      forces(Forces.threat) *= 2
+      forces(Forces.leaving) *= 2
     }
     val originFrames = unit.framesToTravelTo(unit.agent.origin)
     if (unit.matchups.threats.forall(threat => threat.framesToTravelPixels(threat.pixelDistanceTravelling(unit.agent.origin) - threat.pixelRangeAgainst(unit)) / threat.topSpeed > originFrames)) {
       forces(Forces.leaving) /= 4
     }
 
-    val maxPositioning = Math.min(1, forcesPositioning.map(forces).map(_.lengthFast).max)
-    ForceMath.rebalance(unit.agent.forces, 1.5, forcesGoal: _*)
-    ForceMath.rebalance(unit.agent.forces, maxPositioning, forcesPositioning: _*)
+    val weighGoal = if (goalEngage || goalRetreat) 1.5 else 0.75
+    val weighPositioning = Math.min(1, forcesPositioning.map(forces).map(_.lengthFast).max)
+    ForceMath.rebalance(unit.agent.forces, weighGoal, forcesGoal: _*)
+    ForceMath.rebalance(unit.agent.forces, weighPositioning, forcesPositioning: _*)
 
     if (goalEngage & unit.agent.toAttack.exists(unit.pixelsToGetInRange(_) < 64) && (unit.unitClass.melee || unit.readyForAttackOrder)) {
       With.commander.attack(unit)
@@ -290,14 +293,13 @@ object DefaultCombat extends Action {
 
     // TODO: CHASE: Moving shot/pursue if we want to
     // TODO: Don't overshoot destination if we're just strolling there
-    val groupTravelGoal = unit.agent.toTravel
-    val groupTravel = MicroPathing.getWaypointInDirection(unit, unit.agent.forces.sum.radians, requireApproaching = groupTravelGoal)
-    if (groupTravel.isDefined) {
+    val groupTravelGoal = unit.agent.toTravel.filter(goal => ! goalHover)
+    val groupTravelWaypoint = MicroPathing.getWaypointInDirection(unit, unit.agent.forces.sum.radians, mustApproach = groupTravelGoal)
+    if (groupTravelWaypoint.isDefined) {
       if (techniqueIs(Fight) && unit.battle.isEmpty) {
         unit.agent.act("Travel")
       }
-
-      unit.agent.toTravel = groupTravel
+      unit.agent.toTravel = groupTravelWaypoint
       With.commander.move(unit)
       return
     }

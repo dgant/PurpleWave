@@ -14,7 +14,7 @@ object PreserveScout extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     // FindBuildings can usually safely path around threats
-    FindBuildingsWhenBored.delegate(unit)
+    SearchWhenBored.delegate(unit)
     Retreat.delegate(unit)
   }
 }

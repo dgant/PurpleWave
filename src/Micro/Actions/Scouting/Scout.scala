@@ -18,9 +18,9 @@ object Scout extends Action {
     DisruptBuilder.consider(unit)
     BlockConstruction.consider(unit)
     Kindle.consider(unit)
-    FindBuildings.consider(unit)
+    Search.consider(unit)
     //Poke.consider(unit)
-    FindBuildingsWhenBored.consider(unit)
+    SearchWhenBored.consider(unit)
     if (unit.matchups.threatsInRange.isEmpty) {
       Potshot.consider(unit)
     }

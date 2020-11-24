@@ -20,8 +20,8 @@ trait Push {
           t.view.map(_.x).min * 32,
           t.view.map(_.y).min * 32),
         Pixel(
-          31 + t.view.map(_.x).max * 32,
-          31 + t.view.map(_.y).max * 32),
+          t.view.map(_.x).max * 32 + 31,
+          t.view.map(_.y).max * 32 + 31),
         priority.color)
     }
   }

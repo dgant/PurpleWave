@@ -30,12 +30,13 @@ object ShowUnitsFriendly extends View {
 
   def renderTargets(unit: UnitInfo): Unit = {
     val targetUnit = unit.presumptiveTarget
-    val targetPosition = unit.presumptiveStep
+    val targetPosition = unit.presumptiveDestination
     if (targetUnit.exists(_.unitClass.isResource)) {
       targetUnit.map(_.pixelCenter).foreach(DrawMap.line(unit.pixelCenter, _, Colors.MediumTeal))
     } else if (targetUnit.isDefined) {
       targetUnit.map(_.pixelCenter).foreach(DrawMap.line(unit.pixelCenter, _, Colors.MediumYellow))
-    } else if (targetPosition != unit.pixelCenter) {
+    }
+    if (targetPosition != unit.pixelCenter && unit.orderTarget.isEmpty) {
       DrawMap.line(unit.pixelCenter, targetPosition, Colors.MediumGray)
       renderUnitBoxAt(unit, targetPosition, Colors.MediumGray)
       unit.friendly.map(_.agent).foreach(agent => {
@@ -112,20 +113,20 @@ object ShowUnitsFriendly extends View {
     }
 
     if (showForces) {
-      val length = 64.0
+      val forceLengthMax = 48.0
+      val forceRadiusMin = 5
       val maxForce = ByOption.max(agent.forces.values.view.map(_.lengthSlow)).getOrElse(0.0)
       if (maxForce > 0.0) {
+        DrawMap.circle(unit.pixelCenter, forceRadiusMin, Color.White)
         (agent.forces.view ++ Seq((Forces.sum, agent.forces.sum)))
           .filter(_._2.lengthSquared > 0)
           .foreach(pair => {
             val force           = pair._2
-            val forceNormalized = force.normalize(Math.max(16, length * force.lengthSlow / maxForce))
-            DrawMap.arrow(
-              unit.pixelCenter,
-              unit.pixelCenter.add(
-                forceNormalized.x.toInt,
-                forceNormalized.y.toInt),
-              pair._1.color)
+            val forceNormalized = force.normalize(Math.max(24, forceLengthMax * force.lengthSlow / maxForce))
+            val to = unit.pixelCenter.add(
+              forceNormalized.x.toInt,
+              forceNormalized.y.toInt)
+            DrawMap.arrow(unit.pixelCenter.project(to, 8), to, pair._1.color)
           })
         }
     }

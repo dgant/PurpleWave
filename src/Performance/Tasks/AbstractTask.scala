@@ -77,7 +77,7 @@ abstract class AbstractTask {
     }
     if ( ! alreadyViolatedLimit && With.performance.violatedLimit) {
       violatedRules += 1
-      if (maxConsecutiveSkips > 1) {
+      if (maxConsecutiveSkips > 1 && With.performance.enablePerformancePauses) {
         With.logger.warn(
           toString
           + " crossed the "

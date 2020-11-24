@@ -388,7 +388,19 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   })
 
   //TODO: Ensnare
-  @inline final def cooldownLeft      : Int = if (complete) Math.max(Math.max(airCooldownLeft, groundCooldownLeft), if (friendly.exists(_.transport.exists(_.flying))) cooldownMaxAirGround / 2 else 0) else remainingCompletionFrames
+  @inline final def cooldownLeft : Int = (
+    (if (complete)
+      Seq(
+        airCooldownLeft,
+        groundCooldownLeft,
+        friendly.filter(_.transport.exists(_.flying)).map(unused => cooldownMaxAirGround / 2).getOrElse(0))
+      .max
+    else remainingCompletionFrames)
+    + friendly
+      .filter(u => u.unitClass.isReaver && u.scarabCount == 0)
+      .map(f => f.trainee.map(_.remainingCompletionFrames).getOrElse(Protoss.Scarab.buildFrames))
+      .getOrElse(0))
+
   @inline final def cooldownMaxAir    : Int = (2 + unitClass.airDamageCooldown)     / stimAttackSpeedBonus // +2 is the RNG
   @inline final def cooldownMaxGround : Int = (2 + unitClass.groundDamageCooldown)  / stimAttackSpeedBonus // +2 is the RNG
 

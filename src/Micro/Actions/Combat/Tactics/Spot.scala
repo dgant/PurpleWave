@@ -15,7 +15,7 @@ object Spot extends Action {
     && ! unit.unitClass.isTransport
     && ! unit.canAttack
     && ( ! unit.agent.canFocus || unit.unitClass.isFlyingBuilding)
-    && (unit.matchups.framesOfSafety > GameTime(0, 2)() || unit.totalHealth > 500)
+    && (unit.matchups.framesOfSafety > GameTime(0, 2)() || unit.totalHealth > 500 || (unit.cloaked && unit.matchups.enemyDetectors.isEmpty))
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {

@@ -64,9 +64,17 @@ object MicroPathing {
   private val rays = 32
   private val rayRadians = (0 to rays).map(_ * 2 * Math.PI / rays - Math.PI).toVector.sortBy(Math.abs)
   private val rayCosines = rayRadians.map(Math.cos)
-  def getWaypointInDirection(unit: FriendlyUnitInfo, radians: Double, requireApproaching: Option[Pixel] = None, requireSafety: Boolean = false): Option[Pixel] = {
+  def getWaypointInDirection(unit: FriendlyUnitInfo, radians: Double, mustApproach: Option[Pixel] = None, requireSafety: Boolean = false): Option[Pixel] = {
     lazy val safetyPixels =  unit.matchups.pixelsOfEntanglement
-    lazy val travelDistanceCurrent = requireApproaching.map(unit.pixelDistanceTravelling)
+    lazy val travelDistanceCurrent = mustApproach.map(unit.pixelDistanceTravelling)
+
+    def acceptableForSafety(pixel: Pixel): Boolean = {
+      ! requireSafety || unit.matchups.threats.forall(t => t.pixelDistanceSquared(pixel) > t.pixelDistanceSquared(unit.pixelCenter))
+    }
+
+    if (mustApproach.exists(a => unit.pixelDistanceCenter(a) <= 48 && acceptableForSafety(a))) {
+      return mustApproach
+    }
 
     val rayStart = unit.pixelCenter
     val waypointDistance = Math.max(waypointDistancePixels, if (requireSafety) 64 + safetyPixels else 0)
@@ -82,11 +90,12 @@ object MicroPathing {
       .filter(p => {
         val terminus = p._1
         val cosine = p._2
-        lazy val travelDistanceTerminus = requireApproaching.map(a => if (unit.flying) terminus.pixelDistance(a) else terminus.groundPixels(a))
+        lazy val towardsTerminus = unit.pixelCenter.project(terminus, 8)
+        lazy val travelDistanceTerminus = mustApproach.map(a => if (unit.flying) terminus.pixelDistance(a) else terminus.groundPixels(a))
         (
           terminus != rayStart
           && (travelDistanceTerminus.forall(_ < travelDistanceCurrent.get))
-          && ( ! requireSafety || unit.matchups.threats.forall(t => t.pixelDistanceSquared(terminus) <= t.pixelDistanceSquared(unit.pixelCenter))))
+          && (acceptableForSafety(towardsTerminus)))
       })
     ByOption.maxBy(termini)(p => rayStart.pixelDistance(p._1) * p._2).map(_._1) // Return the terminus that moves us furthest along the desired axis
   }

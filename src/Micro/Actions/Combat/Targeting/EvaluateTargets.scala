@@ -15,7 +15,7 @@ object EvaluateTargets extends {
 
   def preferredTargets(unit: FriendlyUnitInfo, additionalFiltersRequired: TargetFilter*): Seq[UnitInfo] = {
     val filtersPreferred = TargetFilterGroups.filtersPreferred
-    val targetsRequired = legalTargets(unit).toVector
+    val targetsRequired = legalTargets(unit, additionalFiltersRequired: _*).toVector
 
     if (filtersPreferred.isEmpty) {
       return targetsRequired

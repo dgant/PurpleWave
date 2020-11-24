@@ -16,11 +16,7 @@ PurpleWave has won:
  * :2nd_place_medal: 2nd Place in the [2018 IEEE CIG StarCraft AI Competition](https://cilab.gist.ac.kr/sc_competition2018/?cat=17)
  * :3rd_place_medal: 3rd Place in the [2017 IEEE CIG StarCraft AI Competition](https://cilab.gist.ac.kr/sc_competition2017/?cat=17)
  
-PurpleWave has also ranked #1 on the [BASIL](https://basil.bytekeeper.org/ranking.html), SSCAIT, and SAIL ladders.
-
-PurpleWave vs. Iron, AIIDE 2017:
-
-[![PurpleWave vs. Iron, AIIDE 2017](https://img.youtube.com/vi/g33PIqDdTqs/0.jpg)](https://www.youtube.com/watch?v=g33PIqDdTqs)
+PurpleWave has also ranked #1 on the [BASIL](https://basil.bytekeeper.org/ranking.html), SSCAIT, and [SAIL](https://www.cs.mun.ca/~z24rmk/starcraftailaddertest/about) ladders.
 
 ## Credits
 Thanks to:

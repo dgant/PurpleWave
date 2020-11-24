@@ -9,15 +9,15 @@ import Micro.Actions.Commands.Move
 import Micro.Coordination.Pathing.MicroPathing
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-object FindBuildings extends AbstractFindBuildings {
+object Search extends AbstractSearch {
   override protected val boredomFrames = 24 * 30
 }
 
-object FindBuildingsWhenBored extends AbstractFindBuildings {
+object SearchWhenBored extends AbstractSearch {
   override protected val boredomFrames = 24 * 3
 }
 
-abstract class AbstractFindBuildings extends Action {
+abstract class AbstractSearch extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     With.geography.enemyBases.nonEmpty || unit.agent.lastIntent.toScoutTiles.nonEmpty

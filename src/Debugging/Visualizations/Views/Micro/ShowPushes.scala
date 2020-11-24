@@ -12,7 +12,7 @@ object ShowPushes extends View {
   override def renderMap(): Unit = {
     val activePushes = new mutable.HashSet[Push]
     With.units.ours.view.filter(_.canMove).foreach(u => With.coordinator.pushes.get(u).foreach(push => {
-      if (push.priority >= u.agent.priority) {
+      if (push.priority > u.agent.priority) {
         val force = push.force(u)
         if (force.nonEmpty) {
           activePushes += push

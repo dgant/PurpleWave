@@ -76,12 +76,13 @@ object Potential {
   def preferCohesion(unit: FriendlyUnitInfo): Force = {
     if (unit.flying) return new Force
     ForceMath.sum(
-      unit.immediateAllies.view
-        .filter(a => a.canMove && ! a.flying)
-        .flatMap(_.friendly.map(f =>
-          ForceMath.sum(f.agent.forces.view.filterNot(_._1 == Forces.cohesion).map(_._2))
-          / (128 + f.pixelDistanceEdge(unit)))))
-        .normalize
+      unit
+        .immediateAllies
+        .view
+        .filter(a => a.canMove && ! a.flying && ! a.unitClass.isBuilding && ! a.is(Protoss.Reaver))
+        .flatMap(_.friendly.map(friend =>
+          ForceMath.sum(friend.agent.forces.view.filterNot(_._1 == Forces.cohesion).map(_._2)) * collisionRepulsionMagnitude(unit, friend))))
+        .clipMin(1.0)
   }
   
   ////////////
@@ -140,23 +141,33 @@ object Potential {
   def preferTravel(unit: FriendlyUnitInfo, goal: Pixel): Force = {
     ForceMath.fromPixels(unit.pixelCenter, MicroPathing.getWaypointToPixel(unit, goal), 1.0)
   }
-  
-  def collisionRepulsion(unit: FriendlyUnitInfo, other: UnitInfo): Force = {
-    if (unit.flying) return new Force
-    if (other.flying) return new Force
-    if (other.unitClass.isBuilding) return new Force
+
+  private def collisionRepulsionMagnitude(unit: FriendlyUnitInfo, other: UnitInfo): Double = {
+    if (unit.flying) return 0.0
+    if (other.flying) return 0.0
+    if (other.unitClass.isBuilding) return 0.0
     val maximumDistance   = Math.max(unit.unitClass.dimensionMax, other.unitClass.dimensionMax)
     val blockerDistance   = other.pixelDistanceEdge(unit)
     val magnitudeDistance = 1.0 - PurpleMath.clampToOne(blockerDistance / (1.0 + maximumDistance))
     val magnitudeSize     = unit.unitClass.dimensionMax * other.unitClass.dimensionMax / 32.0 / 32.0
-    val magnitude         = magnitudeSize * magnitudeDistance
-    unitAttraction(unit, other, -magnitude)
+    val output            = magnitudeSize * magnitudeDistance
+    output
+  }
+  
+  def collisionRepulsion(unit: FriendlyUnitInfo, other: UnitInfo): Force = {
+    val magnitude = collisionRepulsionMagnitude(unit, other)
+    if (magnitude == 0) new Force else unitAttraction(unit, other, -magnitude)
   }
   
   def avoidCollision(unit: FriendlyUnitInfo): Force = {
     if (unit.flying) return new Force
     val repulsions = unit.immediateOthers.filter(o => ! o.flying && ! o.unitClass.isBuilding).map(collisionRepulsion(unit, _))
-    ByOption.maxBy(repulsions)(_.lengthSquared).getOrElse(new Force)
+    // Is sum or max best?
+    // Sum:
+    val output = ForceMath.sum(repulsions).clipMin(Math.min(1.0, ByOption.max(repulsions.view.map(_.lengthFast)).getOrElse(0.0)))
+    // Max:
+    // val output = ByOption.maxBy(repulsions)(_.lengthSquared).getOrElse(new Force)
+    output
   }
 }
 

@@ -43,7 +43,7 @@ class Agency {
       if (agent.unit.unitClass.orderable && agent.unit.alive && agent.unit.ready) {
         val timeBefore = With.performance.millisecondsSpentThisFrame
         agent.execute()
-        if (With.performance.violatedLimit) {
+        if (With.performance.violatedLimit && With.performance.enablePerformancePauses) {
           val timeAfter = With.performance.millisecondsSpentThisFrame
           val timeDelta = timeAfter - timeBefore
           With.logger.warn(

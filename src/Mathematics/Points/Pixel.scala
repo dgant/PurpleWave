@@ -51,10 +51,10 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline final def divide(scale: Int): Pixel = {
     Pixel(x / scale, y / scale)
   }
-  @inline final def clamp: Pixel = {
+  @inline final def clamp(margin: Int): Pixel = {
     Pixel(
-      PurpleMath.clamp(x, 0, With.mapPixelWidth),
-      PurpleMath.clamp(y, 0, With.mapPixelHeight))
+      PurpleMath.clamp(x, margin, With.mapPixelWidth - margin),
+      PurpleMath.clamp(y, margin, With.mapPixelHeight - margin))
   }
   @inline final def project(destination: Pixel, pixels: Double): Pixel = {
     if (pixels == 0) return this

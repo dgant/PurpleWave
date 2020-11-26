@@ -61,7 +61,7 @@ object MicroPathing {
     if (path.pathExists) Some(path.tiles.get.take(waypointDistanceTiles).last.pixelCenter) else None
   }
 
-  private val rays = 32
+  private val rays = 256
   private val rayRadians = (0 to rays).map(_ * 2 * Math.PI / rays - Math.PI).toVector.sortBy(Math.abs)
   private val rayCosines = rayRadians.map(Math.cos)
   def getWaypointInDirection(unit: FriendlyUnitInfo, radians: Double, mustApproach: Option[Pixel] = None, requireSafety: Boolean = false): Option[Pixel] = {
@@ -88,7 +88,7 @@ object MicroPathing {
         (terminus, cosine)
       })
       .filter(p => {
-        val terminus = p._1
+        val terminus = p._1.clamp(unit.unitClass.dimensionMax / 2)
         val cosine = p._2
         lazy val towardsTerminus = unit.pixelCenter.project(terminus, 8)
         lazy val travelDistanceTerminus = mustApproach.map(a => if (unit.flying) terminus.pixelDistance(a) else terminus.groundPixels(a))

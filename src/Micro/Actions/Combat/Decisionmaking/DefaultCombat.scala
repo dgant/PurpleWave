@@ -289,11 +289,8 @@ object DefaultCombat extends Action {
       return
     }
 
-    // TODO: If we like our position, HOLD
-
     // TODO: CHASE: Moving shot/pursue if we want to
-    // TODO: Don't overshoot destination if we're just strolling there
-    val groupTravelGoal = unit.agent.toTravel.filter(goal => ! goalHover)
+    val groupTravelGoal = unit.agent.toTravel.filter(goal => ! goalHover && ! goalRegroup)
     val groupTravelWaypoint = MicroPathing.getWaypointInDirection(unit, unit.agent.forces.sum.radians, mustApproach = groupTravelGoal)
     if (groupTravelWaypoint.isDefined) {
       if (techniqueIs(Fight) && unit.battle.isEmpty) {

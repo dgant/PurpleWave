@@ -114,7 +114,7 @@ object ShowUnitsFriendly extends View {
 
     if (showForces) {
       val forceLengthMax = 48.0
-      val forceRadiusMin = 5
+      val forceRadiusMin = 4
       val maxForce = ByOption.max(agent.forces.values.view.map(_.lengthSlow)).getOrElse(0.0)
       if (maxForce > 0.0) {
         DrawMap.circle(unit.pixelCenter, forceRadiusMin, Color.White)

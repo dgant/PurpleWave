@@ -70,7 +70,9 @@ class PvPLateGame extends GameplanTemplate {
         Get(Protoss.TemplarArchives),
         Get(6, Protoss.Gateway),
         Get(2, Protoss.Assimilator)),
-      new BuildGasPumps,
+      new If(
+        new GasPumpsAtMost(300),
+        new BuildGasPumps),
       new Build(
         Get(Protoss.ZealotSpeed),
         Get(Protoss.Forge),

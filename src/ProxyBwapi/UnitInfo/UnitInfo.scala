@@ -34,13 +34,21 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def foreign   : Option[ForeignUnitInfo]   = None
   
   @inline override final def toString: String = (
-    unitClass.toString
-    + (if (selected) " (*)" else "")
+    (if (isFriendly) "Our" else if (isEnemy) "Foe" else "Neutral")
+    + " "
+    + unitClass.toString
+    + (if (selected) "*" else "")
     + " #" +
-    id + " " +
-    hitPoints + "/" + unitClass.maxHitPoints + " " +
-    (if (shieldPoints > 0) "(" + shieldPoints + "/" + unitClass.maxShields + ") " else "") +
-    tileIncludingCenter.toString + " " + pixelCenter.toString
+    id
+    + " "
+    + hitPoints
+    + "/"
+    + unitClass.maxHitPoints
+    + " "
+    + (if (shieldPoints > 0) "(" + shieldPoints + "/" + unitClass.maxShields + ") " else "")
+    + tileIncludingCenter.toString
+    + " "
+    + pixelCenter.toString
     )
 
   @inline final def is(unitMatcher: UnitMatcher): Boolean = unitMatcher.apply(this)
@@ -667,8 +675,10 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   @inline final def visibleToOpponents: Boolean =
     if (isEnemy)
       visible
-    else
-      With.grids.enemyVision.isSet(tileIncludingCenter) || With.framesSince(lastFrameTakingDamage) < GameTime(0, 2)() || With.framesSince(lastFrameStartingAttack) < GameTime(0, 2)()
+    else (
+      With.grids.enemyVision.isSet(tileIncludingCenter)
+      || With.framesSince(lastFrameTakingDamage) < GameTime(0, 2)()
+      || With.framesSince(lastFrameStartingAttack) < GameTime(0, 2)())
   
   @inline final def likelyStillThere: Boolean = cacheLikelyStillThere()
   private val cacheLikelyStillThere = new Cache(() => possiblyStillThere &&

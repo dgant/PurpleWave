@@ -210,6 +210,8 @@ class Agent(val unit: FriendlyUnitInfo) {
   private var _rideGoal: Option[Pixel] = None
   def rideGoal: Option[Pixel] = _rideGoal
   def directRide(to: Pixel): Unit = {
+
+    4
     _rideGoal = Some(to)
   }
   def prioritizedPassengers: Seq[FriendlyUnitInfo] = {

@@ -19,7 +19,7 @@ class BattleClustering {
   val exploredFriendly = new GridDisposableBoolean
   val exploredEnemy    = new GridDisposableBoolean
   
-  def clusters: Vector[Vector[UnitInfo]] = clusterComplete.clusters
+  def clusters: Iterable[Iterable[UnitInfo]] = clusterComplete.clusters
 
   def isComplete: Boolean = clusterInProgress.isComplete
 
@@ -48,16 +48,18 @@ class BattleClustering {
     clusterComplete.clusters
     clusterComplete = clusterInProgress
     With.battles.nextBattlesLocal = clusters
+      .view
       .map(cluster =>
         new BattleLocal(
-          new Team(cluster.filter(_.isOurs)),
-          new Team(cluster.filter(_.isEnemy))))
+          new Team(cluster.view.filter(_.isOurs).toVector),
+          new Team(cluster.view.filter(_.isEnemy).toVector)))
       .filter(_.teams.forall(_.units.exists(u =>
         u.canAttack
+        || u.unitClass.rawCanAttack
         || u.unitClass.isSpellcaster
         || u.unitClass.isDetector
         || u.unitClass.isTransport)))
-
+      .toVector
 
     // TODO: These can probably be done separately, and the global battle probably doesn't even need a focus
     With.battles.nextBattlesLocal.foreach(_.updateFoci())

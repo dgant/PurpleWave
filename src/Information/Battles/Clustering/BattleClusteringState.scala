@@ -5,6 +5,7 @@ import Mathematics.PurpleMath
 import Mathematics.Shapes.Circle
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.ByOption
 
 import scala.annotation.tailrec
 import scala.collection.mutable
@@ -14,13 +15,21 @@ class BattleClusteringState(seedUnits: Vector[UnitInfo]) {
 
   val unitLinks = new mutable.HashMap[UnitInfo, UnitInfo]
   val horizon: mutable.Stack[UnitInfo] = mutable.Stack[UnitInfo]()
-  horizon.pushAll(seedUnits.filter(_.isEnemy))
-  
-  def isComplete: Boolean = horizon.isEmpty
-  
+  val stragglers: mutable.Queue[UnitInfo] = new mutable.Queue[UnitInfo]()
+  seedUnits.view.filter(_.isEnemy).foreach(horizon.push)
+  seedUnits.view.filter(_.isFriendly).foreach(stragglers.+=)
+
+  private var _clusters: Option[Iterable[ArrayBuffer[UnitInfo]]] = None
+  def clusters: Iterable[Iterable[UnitInfo]] = _clusters.getOrElse(Iterable.empty)
+  def isComplete: Boolean = _clusters.isDefined
+
   def step() {
-    if (isComplete) return
-  
+    if (horizon.nonEmpty) linkFromHorizon()
+    else if (stragglers.nonEmpty) linkStraggler()
+    else if ( ! isComplete) compileClusters()
+  }
+
+  def linkFromHorizon() {
     var linkedFoe: Option[UnitInfo] = None
     var newFoes     = new ArrayBuffer[UnitInfo]
     val nextUnit    = horizon.pop()
@@ -67,27 +76,25 @@ class BattleClusteringState(seedUnits: Vector[UnitInfo]) {
     if ( ! unitLinks.contains(nextUnit)) {
       unitLinks.put(nextUnit, linkedFoe.getOrElse(nextUnit))
     }
-    horizon.pushAll(newFoes.filter(seedUnits.contains))
+    newFoes.view.filter(seedUnits.contains).foreach(horizon.push)
   }
 
-  private lazy val finalClusters: Vector[Vector[UnitInfo]] = {
-    val roots = unitLinks.toSeq.filter(p => p._1 == p._2).map(_._1)
-    val clusters = roots.map(root => (root, new ArrayBuffer[UnitInfo])).toMap
-    // This could be faster if we didn't have to find more
-    unitLinks.keys.foreach(unit => {
-      val unitRoot = getRoot(unit)
-      clusters(unitRoot) += unit
-    })
-    val output = clusters.toVector.map(_._2.toVector)
-    output
+  private def linkStraggler(): Unit = {
+    val straggler = stragglers.dequeue()
+    if (unitLinks.contains(straggler)) return
+    val clusteredSquadmates = straggler.friendly.get.squadmates.view.filter(unitLinks.contains)
+    val clusteredSquadmateClosest = ByOption.minBy(clusteredSquadmates)(straggler.pixelDistanceEdge)
+    clusteredSquadmateClosest.foreach(unitLinks(straggler) = _)
   }
-  
-  def clusters: Vector[Vector[UnitInfo]] = if (isComplete) finalClusters else Vector.empty
 
-  @inline
-  @tailrec
-  private def getRoot(unit: UnitInfo): UnitInfo = {
-    //val linkedUnit = unit.clusterParent.getOrElse(unit)
+  private def compileClusters(): Unit = {
+    val clusters = unitLinks.view.filter(p => p._1 == p._2).map(_._1).map(root => (root, new ArrayBuffer[UnitInfo])).toMap
+    unitLinks.keys.foreach(unit => clusters(getRoot(unit)) += unit)
+    _clusters = Some(clusters.values)
+  }
+
+
+  @inline @tailrec private def getRoot(unit: UnitInfo): UnitInfo = {
     val linkedUnit = unitLinks(unit)
     if (linkedUnit == unit) unit else getRoot(linkedUnit)
   }
@@ -99,11 +106,4 @@ class BattleClusteringState(seedUnits: Vector[UnitInfo]) {
       tilesMargin + unit.effectiveRangePixels.toInt / 32,
       With.configuration.battleMarginTileMinimum, With.configuration.battleMarginTileMaximum)
   }
-  
-  @inline
-  private def areOppositeTeams(a: UnitInfo, b: UnitInfo): Boolean = (
-    a.isFriendly != b.isFriendly
-    && ! a.isNeutral
-    && ! b.isNeutral
-  )
 }

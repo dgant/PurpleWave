@@ -50,7 +50,7 @@ class Simulacrum(
   var dead                : Boolean             = false
   var target              : Option[Simulacrum]  = None
   var pathBendiness       : Double              = 1.0
-  val fleePixel           : Pixel               = simulation.focus.project(pixel, 10000).clamp
+  val fleePixel           : Pixel               = simulation.focus.project(pixel, 10000).clamp()
   
   // Scorekeeping
   val nonCombat         : Boolean               = ! realUnit.is(UnitMatchRecruitableForCombat)

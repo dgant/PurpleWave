@@ -139,7 +139,7 @@ class Commander {
     var to: Pixel = argTo
 
     // Send some units past their destination to maximize acceleration
-    val overshootDistance = if (unit.flying && ! unit.unitClass.isTransport) 288.0 else 8
+    val overshootDistance = if (unit.flying) 288.0 else 8
     if (unit.isAny(Terran.Dropship, Terran.ScienceVessel, Protoss.Observer, Protoss.HighTemplar, Zerg.Mutalisk, Zerg.Overlord, Zerg.Queen)) {
       if (to == unit.pixelCenter) {
         val signX = PurpleMath.forcedSignum(SpecificPoints.middle.x - to.x)

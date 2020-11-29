@@ -39,6 +39,9 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
     val exitDirection         : Direction = exit.map(e => e.sidePixels.head.subtract(e.sidePixels.last).direction).getOrElse(Directions.Right)
     val meleeUnitSize         : Int = 3 + Math.max(16, slots.map(s => if (s.idealPixels > 32) 0 else if (exitDirection.isHorizontal) s.unitClass.width else s.unitClass.height).max)
     val meleeChokeWidthUnits  : Int = Math.max(1, Math.min(2 * exit.map(_.radiusPixels.toInt).getOrElse(0) / meleeUnitSize, slots.count(_.idealPixels <= 32)))
+    val altitudeInside  = With.grids.altitudeBonus.get(zone.centroid)
+    val altitudeOutside = zone.exitNow.map(_.otherSideof(zone).centroid).map(With.grids.altitudeBonus.get).getOrElse(altitudeInside)
+    val altitudeMinimum = if (enemyRangePixelsMax > 32 && altitudeInside > altitudeOutside) Some(altitudeInside) else None
 
     // TODO: Standardize definition of a melee slot
 
@@ -67,7 +70,7 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
       val idealPixels = slot.idealPixels.toInt
       val idealTiles = (idealPixels + 16) / 32
       val flyer = slot.unitClass.isFlyer && ! slot.unitClass.isFlyingBuilding && slot.unitClass != Protoss.Shuttle
-      if (enemyRangePixelsMin <= 32 && zone.exitNow.isDefined && idealPixels <= Math.max(32, enemyRangePixelsMin)) {
+      if (altitudeMinimum.isEmpty && enemyRangePixelsMin <= 32 && zone.exitNow.isDefined && idealPixels <= Math.max(32, enemyRangePixelsMin)) {
         // Against enemy melee units, place melee units directly into the exit
         val nextPixel = meleeSlotsEmpty(meleeSlots.size)
         meleeSlots += ((slot.unitClass, nextPixel))
@@ -90,16 +93,16 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
           } else {
             val tile = chokeCenterTile.add(p)
             if (tile.valid
+              && altitudeMinimum.forall(With.grids.altitudeBonus.get(tile)>=)
               && (flyer || (
                 zone.tileGrid.get(tile)
                 && ! occupied.get(tile)
                 && With.grids.walkable.get(tile)
                 && ! With.groundskeeper.isReserved(tile)))) {
               val exitDistance                = distanceGrid.get(tile)
-              val distanceIntoEnemyRangeNow   = 1 + With.grids.enemyRangeGround.get(tile) - With.grids.enemyRangeGround.addedRange
               val distanceIntoEnemyRangeExit  = Math.max(0, enemyRangePixelsMax / 32 - exitDistance)
               val distanceOutOfOurRange       = Math.max(0, exitDistance - idealTiles)
-              5 * distanceIntoEnemyRangeNow + 4 * distanceIntoEnemyRangeExit + 3 * distanceOutOfOurRange
+              4 * distanceIntoEnemyRangeExit + 3 * distanceOutOfOurRange
             } else {
               Int.MaxValue
             }

@@ -16,6 +16,6 @@ object BattleClassificationFilters {
     unit.likelyStillAlive
       && ! unit.unitClass.isSpell
       && ! unit.invincible
-      && (unit.complete || unit.unitClass.isBuilding || unit.isAny(Zerg.LurkerEgg, Zerg.Egg, Zerg.Cocoon))
+      && (unit.complete || unit.unitClass.isBuilding || unit.isAny(Zerg.Egg, Zerg.LurkerEgg, Zerg.Cocoon))
   )
 }

@@ -64,6 +64,7 @@ object MicroPathing {
   private val rays = 256
   private val rayRadians = (0 to rays).map(_ * 2 * Math.PI / rays - Math.PI).toVector.sortBy(Math.abs)
   private val rayCosines = rayRadians.map(Math.cos)
+  private val terminusPixelsMinimum = waypointDistancePixels * 3 / 4
   def getWaypointInDirection(unit: FriendlyUnitInfo, radians: Double, mustApproach: Option[Pixel] = None, requireSafety: Boolean = false): Option[Pixel] = {
     lazy val safetyPixels =  unit.matchups.pixelsOfEntanglement
     lazy val travelDistanceCurrent = mustApproach.map(unit.pixelDistanceTravelling)
@@ -72,7 +73,7 @@ object MicroPathing {
       ! requireSafety || unit.matchups.threats.forall(t => t.pixelDistanceSquared(pixel) > t.pixelDistanceSquared(unit.pixelCenter))
     }
 
-    if (mustApproach.exists(a => unit.pixelDistanceCenter(a) <= 48 && acceptableForSafety(a))) {
+    if (mustApproach.exists(a => unit.pixelDistanceCenter(a) < waypointDistancePixels && acceptableForSafety(a))) {
       return mustApproach
     }
 
@@ -93,7 +94,7 @@ object MicroPathing {
         lazy val towardsTerminus = unit.pixelCenter.project(terminus, 8)
         lazy val travelDistanceTerminus = mustApproach.map(a => if (unit.flying) terminus.pixelDistance(a) else terminus.groundPixels(a))
         (
-          terminus != rayStart
+          terminus.pixelDistance(rayStart) > terminusPixelsMinimum
           && (travelDistanceTerminus.forall(_ < travelDistanceCurrent.get))
           && (acceptableForSafety(towardsTerminus)))
       })

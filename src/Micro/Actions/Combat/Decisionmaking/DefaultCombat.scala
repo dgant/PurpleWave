@@ -157,10 +157,7 @@ object DefaultCombat extends Action {
     transition(
       Organize,
       () =>
-        unit.agent.toReturn.isEmpty
-        && unit.agent.canFight
-        && unit.agent.toLeash.isEmpty
-        && context.receivedPushPriority < TrafficPriorities.Shove
+        unit.agent.canFight
         && context.missingDistanceFromThreat < -64)
 
     // Evaluate potential attacks
@@ -169,7 +166,7 @@ object DefaultCombat extends Action {
     lazy val framesToGetInRangeOfTarget = unit.agent.toAttack.map(unit.framesToGetInRange)
     transition(
       Abuse,
-      () => unit.agent.toAttack.exists(target => canAbuse(unit, target)) && unit.matchups.threats.forall(t => canAbuse(unit, t) || t.framesToGetInRange(unit) > 12 + framesToGetInRangeOfTarget.get))
+      () => unit.agent.toAttack.exists(canAbuse(unit, _)) && unit.matchups.threats.forall(t => canAbuse(unit, t) || t.framesToGetInRange(unit) > 12 + framesToGetInRangeOfTarget.get))
 
     transition(
       Fallback,
@@ -178,17 +175,12 @@ object DefaultCombat extends Action {
         && ( unit.is(Protoss.Reaver) || context.receivedPushPriority < TrafficPriorities.Shove)
         && (unit.zone == unit.agent.origin.zone || ! unit.isAny(Protoss.Archon, Protoss.Dragoon) || ! unit.matchups.threats.exists(t => t.is(Protoss.Dragoon) && t.framesToGetInRange(t) < 12)))
 
-    transition(
-      Chase,
-      () => unit.agent.toAttack.exists(t => unit.pixelDistanceSquared(t.pixelCenter.project(t.presumptiveStep, unit.pixelRangeAgainst(t))) > unit.pixelDistanceSquared(t.pixelCenter)))
+    //transition(
+    //  Chase,
+    //  () => unit.agent.toAttack.exists(t => unit.pixelDistanceSquared(t.pixelCenter.project(t.presumptiveStep, unit.pixelRangeAgainst(t))) > unit.pixelDistanceSquared(t.pixelCenter)))
 
-    transition(
-      Reposition,
-      () => unit.agent.toAttack.map(unit.pixelRangeAgainst).exists(_ > 64))
-
-    transition(
-      Excuse,
-      () => context.receivedPushPriority >= TrafficPriorities.Shove && context.receivedPushPriority > unit.agent.priority)
+    transition(Reposition, () => unit.agent.toAttack.map(unit.pixelRangeAgainst).exists(_ > 64))
+    transition(Excuse, () => context.receivedPushPriority >= TrafficPriorities.Shove && context.receivedPushPriority > unit.agent.priority)
 
     if (unit.unready) return
 
@@ -279,7 +271,10 @@ object DefaultCombat extends Action {
     ForceMath.rebalance(unit.agent.forces, weighGoal, forcesGoal: _*)
     ForceMath.rebalance(unit.agent.forces, weighPositioning, forcesPositioning: _*)
 
-    if (goalEngage & unit.agent.toAttack.exists(unit.pixelsToGetInRange(_) < 64) && (unit.unitClass.melee || unit.readyForAttackOrder)) {
+    if (goalEngage
+      && unit.agent.toAttack.exists(unit.pixelsToGetInRange(_) < 64)
+      // Don't want to dance
+      && (unit.unitClass.melee || unit.readyForAttackOrder)) {
       With.commander.attack(unit)
       return
     }
@@ -289,13 +284,15 @@ object DefaultCombat extends Action {
       return
     }
 
+    // Avoid the hazards of vector travel when we're not crossing the map
+    if (unit.battle.isEmpty && unit.agent.destination.zone == unit.agent.origin.zone) {
+      return
+    }
+
     // TODO: CHASE: Moving shot/pursue if we want to
     val groupTravelGoal = unit.agent.toTravel.filter(goal => ! goalHover && ! goalRegroup)
     val groupTravelWaypoint = MicroPathing.getWaypointInDirection(unit, unit.agent.forces.sum.radians, mustApproach = groupTravelGoal)
     if (groupTravelWaypoint.isDefined) {
-      if (techniqueIs(Fight) && unit.battle.isEmpty) {
-        unit.agent.act("Travel")
-      }
       unit.agent.toTravel = groupTravelWaypoint
       With.commander.move(unit)
       return

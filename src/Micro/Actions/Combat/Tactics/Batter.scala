@@ -8,8 +8,7 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
-import Micro.Actions.Combat.Targeting.Filters.TargetFilterWhitelist
-import Micro.Actions.Combat.Targeting.TargetAction
+import Micro.Actions.Combat.Targeting.Target
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
@@ -54,13 +53,9 @@ object Batter extends Action {
     lazy val altitudeHere   = With.grids.altitudeBonus.get(unit.tileIncludingCenter)
     lazy val altitudeThere  = With.grids.altitudeBonus.get(unit.agent.destination.tileIncluding)
     
-    lazy val legalTargetOutsiders = outsideUnits.filter(_.visible)
-    lazy val legalTargetRepairers = if (unit.pixelRangeGround >= 32.0 * 4.0) repairingUnits.filter(_.visible) else Iterable.empty
-    lazy val legalTargetWall      = wallUnits.filter(_.visible)
-    
-    lazy val targetOutsiders  = new TargetAction(TargetFilterWhitelist(legalTargetOutsiders))
-    lazy val targetRepairers  = new TargetAction(TargetFilterWhitelist(legalTargetRepairers))
-    lazy val targetWall       = new TargetAction(TargetFilterWhitelist(legalTargetWall))
+    lazy val outsiders = outsideUnits.filter(_.visible)
+    lazy val repairers = if (unit.pixelRangeGround >= 32.0 * 4.0) repairingUnits.filter(_.visible) else Iterable.empty
+    lazy val wall      = wallUnits.filter(_.visible)
     
     lazy val shootingThreats  = unit.matchups.framesOfEntanglementPerThreat.filter(_._2 > - GameTime(0, 1)())
     lazy val dpfReceiving     = shootingThreats.map(_._1.dpfOnNextHitAgainst(unit)).sum
@@ -73,9 +68,10 @@ object Batter extends Action {
     }
   
     if (unit.ready) {
-      targetOutsiders.delegate(unit)
-      targetRepairers.delegate(unit)
-      targetWall.delegate(unit)
+      unit.agent.toAttack =
+        Target.best(unit, outsiders)
+          .orElse(Target.best(unit, repairers))
+          .orElse(Target.best(unit, wall))
     }
     
     // TODO: Walk up to the wall when our mobility > 1 and we're not shooting.
@@ -83,7 +79,10 @@ object Batter extends Action {
     if (unit.readyForAttackOrder || unit.agent.toAttack.forall(unit.inRangeToAttack)) {
       With.commander.attack(unit)
     }
-  
+
+    // Commanding a unit to move into a walled base, especially when uphill, results in pathing failure and the unit never gets uphill.
+    // This is logic for stepping up to a fogged wall to attack units inside.
+    // But really this should be part of the base Commander attack execution logic.
     if (unit.ready && altitudeHere < altitudeThere) {
       val walkableTiles = wallUnits
         .flatMap(building =>

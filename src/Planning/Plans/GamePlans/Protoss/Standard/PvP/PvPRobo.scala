@@ -13,7 +13,8 @@ import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutForCannonRush
-import Planning.Predicates.Compound.{And, Latch, Not, ConcludeWhen}
+import Planning.Predicates.Compound.{And, ConcludeWhen, Latch, Not}
+import Planning.Predicates.Economy.GasAtMost
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeAtHome}
 import Planning.Predicates.Strategy._
@@ -148,7 +149,9 @@ class PvPRobo extends GameplanTemplate {
     new BuildOrder(Get(Protoss.Dragoon)),
     new Pump(Protoss.Dragoon),
     new If(
-      new UnitsAtLeast(3, Protoss.Gateway),
+      new And(
+        new UnitsAtLeast(3, Protoss.Gateway),
+        new GasAtMost(45)),
       new Pump(Protoss.Zealot)))
 
   class Expand extends RequireMiningBases(2)

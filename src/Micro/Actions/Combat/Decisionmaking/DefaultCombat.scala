@@ -6,10 +6,9 @@ import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
-import Micro.Actions.Combat.Tactics.Brawl
-import Micro.Actions.Combat.Tactics.Potshot.PotshotTarget
-import Micro.Actions.Combat.Targeting.Filters.TargetFilter
-import Micro.Actions.Combat.Targeting.{EvaluateTargets, TargetInRange}
+import Micro.Actions.Combat.Tactics.{Brawl, Potshot}
+import Micro.Actions.Combat.Targeting.Target
+import Micro.Actions.Combat.Targeting.Filters.TargetFilterVisibleInRange
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.{TrafficPriorities, TrafficPriority}
 import Micro.Heuristics.Potential
@@ -37,14 +36,6 @@ object DefaultCombat extends Action {
   }
 
   class MicroContext(val unit: FriendlyUnitInfo, val shouldEngage: Boolean) {
-    def retarget(filters: TargetFilter*): Unit = {
-      // TODO: Evaluate all targets once and cache values,
-      // then pick best target given custom filters
-      if (unit.ready && unit.agent.canFight) {
-        unit.agent.toAttack = EvaluateTargets.best(unit, EvaluateTargets.preferredTargets(unit, filters: _*))
-      }
-    }
-
     var technique: Technique = _
 
     lazy val receivedPushes = With.coordinator.pushes.get(unit).map(p => (p, p.force(unit))).sortBy(-_._1.priority.value)
@@ -83,13 +74,8 @@ object DefaultCombat extends Action {
     if (unit.unready) return
     if ( ! unit.readyForAttackOrder) return
     val oldToAttack = unit.agent.toAttack
-    unit.agent.toAttack = None
-    PotshotTarget.delegate(unit)
-    if (unit.agent.toAttack.isDefined) {
-      With.commander.attack(unit)
-    } else {
-      unit.agent.toAttack = oldToAttack
-    }
+    Potshot.delegate(unit)
+    unit.agent.toAttack = unit.agent.toAttack.orElse(oldToAttack)
   }
 
   def followPushing(context: MicroContext): Unit = {
@@ -104,7 +90,7 @@ object DefaultCombat extends Action {
   }
 
   def aimInPlace(context: MicroContext): Unit = {
-    TargetInRange.delegate(context.unit)
+    Target.choose(context.unit, TargetFilterVisibleInRange)
     With.commander.attack(context.unit)
     With.commander.hold(context.unit)
   }
@@ -161,7 +147,7 @@ object DefaultCombat extends Action {
         && context.missingDistanceFromThreat < -64)
 
     // Evaluate potential attacks
-    context.retarget()
+    Target.choose(unit)
 
     lazy val framesToGetInRangeOfTarget = unit.agent.toAttack.map(unit.framesToGetInRange)
     transition(

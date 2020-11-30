@@ -4,7 +4,6 @@ import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Targeting.Filters.TargetFilterWhitelist
-import Micro.Actions.Combat.Targeting.TargetAction
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
@@ -35,7 +34,6 @@ object Poke extends Action {
 
     val exit          = unit.zone.exit.map(_.pixelCenter).getOrElse(With.geography.home.pixelCenter)
     val otherThreats  = targets.filter(t => t != target && t.pixelDistanceCenter(exit) <= unit.pixelDistanceCenter(exit))
-    val targetAction  = new TargetAction(TargetFilterWhitelist(targets))
     val framesAway    = targets.map(unit.framesToGetInRange).min
     val framesToWait  = unit.framesToBeReadyForAttackOrder
     

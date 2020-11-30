@@ -4,7 +4,7 @@ import Debugging.Visualizations.Views.Battles.ShowBattle
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
-import Micro.Actions.Combat.Targeting.EvaluateTargets
+import Micro.Actions.Combat.Targeting.Target
 import Planning.UnitMatchers.UnitMatchRecruitableForCombat
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Zerg
@@ -49,7 +49,7 @@ class Simulacrum(
   var pixel               : Pixel               = pixelInitial
   var dead                : Boolean             = false
   var target              : Option[Simulacrum]  = None
-  var pathBendiness       : Double              = 1.0
+  var pathBendiness       : Option[Double]      = None
   val fleePixel           : Pixel               = simulation.focus.project(pixel, 10000).clamp()
   
   // Scorekeeping
@@ -128,7 +128,7 @@ class Simulacrum(
 
   @inline final def targetValue(target: Simulacrum): Double = {
     val framesToFire = Math.max(0.0, target.pixel.pixelDistance(pixel) - realUnit.pixelRangeAgainst(target.realUnit)) / Math.max(0.001, topSpeed)
-    EvaluateTargets.baseAttackerToTargetValue(
+    Target.baseAttackerToTargetValue(
       baseTargetValue = target.realUnit.baseTargetValue(),
       totalHealth = target.hitPoints + target.shieldPoints,
       framesOutOfTheWay = framesToFire
@@ -153,13 +153,21 @@ class Simulacrum(
     }
     if (target.isEmpty) {
       fighting = false
+      pathBendiness = Some(1.0)
     }
     else if (target != lastTarget) {
       val targetPixel = target.get.pixel
       if (flying || pixel.zone == targetPixel.zone) {
-        pathBendiness = 1.0
+        pathBendiness = pathBendiness.orElse(Some(1.0))
       } else {
-        pathBendiness = PurpleMath.clamp(PurpleMath.nanToInfinity(pixel.pixelDistance(targetPixel) / pixel.groundPixels(targetPixel)), 1.0, 3.0)
+        pathBendiness = pathBendiness.orElse(Some(
+          Math.pow(
+            PurpleMath.clamp(
+              PurpleMath.nanToInfinity(
+                pixel.pixelDistance(targetPixel) / pixel.groundPixels(targetPixel)),
+                1.0,
+                3.0),
+            2)))
       }
     }
   }
@@ -183,14 +191,16 @@ class Simulacrum(
     // Assume units at home are trapped
     // Prevents us from thinking workers can easily escape
     if (pixel.base.exists(_.owner == player)) return
-    pathBendiness = 1.0
+    pathBendiness = Some(1.0)
     moveTowards(fleePixel)
   }
   
   @inline private final def dealDamage(victim: Simulacrum) {
     val splashFactor      = if (multiplierSplash == 1.0) 1.0 else Math.max(1.0, Math.min(targetQueue.count( ! _.dead) / 4.0, multiplierSplash))
     val victimWasAlive    = victim.hitPoints > 0
-    val damage            = realUnit.damageOnNextHitAgainst(victim.realUnit, Some(victim.shieldPoints), from = Some(pixel), to = Some(victim.pixel))
+    // Use the positions of real units, rather than simulations, to determine altitude effects,
+    // as units trivially cross terrain as part of simulation
+    val damage            = realUnit.damageOnNextHitAgainst(victim.realUnit, Some(victim.shieldPoints), from = Some(realUnit.pixelCenter), to = Some(victim.realUnit.pixelCenter))
     val damageTotal       = Math.min(victim.hitPoints, damage)
     val damageToShields   = Math.min(victim.shieldPoints, damageTotal)
     val damageToHitPoints = damageTotal - damageToShields
@@ -226,7 +236,7 @@ class Simulacrum(
   @inline private final def moveTowards(destination: Pixel) {
     if ( ! canMove)         return
     if (cooldownMoving > 0) return
-    val effectiveSpeed    = topSpeed / pathBendiness
+    val effectiveSpeed    = topSpeed / pathBendiness.getOrElse(1.0)
     val distancePerStep   = effectiveSpeed * SIMULATION_STEP_FRAMES
     val distanceBefore    = pixel.pixelDistance(destination)
     val distanceAfter     = Math.max(0.0, distanceBefore - effectiveSpeed * SIMULATION_STEP_FRAMES)

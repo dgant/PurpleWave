@@ -68,7 +68,7 @@ object BeACarrier extends Action {
         }
       }
       else {
-        Target.consider(unit)
+        Target.choose(unit)
         if (safeFromThreats && interceptorsActive) {
           CarrierChase.consider(unit)
         }

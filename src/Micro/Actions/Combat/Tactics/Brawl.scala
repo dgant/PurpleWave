@@ -2,8 +2,7 @@ package Micro.Actions.Combat.Tactics
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Targeting.Filters.TargetFilterWhitelist
-import Micro.Actions.Combat.Targeting.{Target, TargetAction, TargetInRange}
+import Micro.Actions.Combat.Targeting.Target
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -33,10 +32,10 @@ object Brawl extends Action {
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     lazy val framesClosest = ByOption.min(unit.matchups.targets.map(unit.framesBeforeAttacking))
     lazy val targetsNear = unit.matchups.targets.filter(t => framesClosest.exists(f => unit.framesBeforeAttacking(t) <= f))
-    lazy val targetNear = new TargetAction(TargetFilterWhitelist(targetsNear))
-    TargetInRange.delegate(unit)
-    targetNear.delegate(unit)
-    Target.delegate(unit)
+    unit.agent.toAttack =
+      Target.best(unit, unit.matchups.targetsInRange)
+        .orElse(Target.best(unit, targetsNear))
+        .orElse(Target.best(unit))
     With.commander.attack(unit)
   }
 }

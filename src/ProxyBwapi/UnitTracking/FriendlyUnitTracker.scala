@@ -48,7 +48,7 @@ class FriendlyUnitTracker {
     val id = unit.getID
     // TODO: Get this out of here. "With.blackboard.lastScout.exists( ! _.alive)"
     val friendly = get(id)
-    friendly.filter(_.unitClass.isWorker).filter(_.agent.lastIntent.toScoutTiles.nonEmpty).foreach(u => With.blackboard.lastScoutDeath = With.frame)
+    friendly.filter(_.unitClass.isWorker).filter(_.agent.intent.toScoutTiles.nonEmpty).foreach(u => With.blackboard.lastScoutDeath = With.frame)
     remove(id)
   }
   

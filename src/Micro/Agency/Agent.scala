@@ -20,16 +20,16 @@ import scala.collection.mutable.ArrayBuffer
 class Agent(val unit: FriendlyUnitInfo) {
   
   def intend(client: Plan, intent: Intention) {
-    lastIntent = intent
-    lastClient = Some(client)
+    this.intent = intent
+    this.client = Some(client)
   }
-  
+
   /////////////
   // History //
   /////////////
-  
+
   var combatHysteresisFrames: Int = 0
-  
+
   ///////////////
   // Decisions //
   ///////////////
@@ -65,7 +65,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   var lastCloak: Int = 0
   var shouldEngage: Boolean = false
 
-  def isScout: Boolean = lastIntent.toScoutTiles.nonEmpty
+  def isScout: Boolean = intent.toScoutTiles.nonEmpty
 
   val forces: ForceMap = new ForceMap
 
@@ -75,7 +75,7 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   def destination: Pixel = toTravel.orElse(toReturn).getOrElse(origin)
   def origin: Pixel = toReturn.getOrElse(originCache())
-  private val originCache = new Cache(() => toReturn.orElse(lastIntent.toTravel)
+  private val originCache = new Cache(() => toReturn.orElse(intent.toTravel)
     .flatMap(_.base)
     .filter(_.owner.isUs)
     .orElse(ByOption.minBy(With.geography.ourBases)(base =>
@@ -90,10 +90,10 @@ class Agent(val unit: FriendlyUnitInfo) {
   // Diagnostics //
   /////////////////
 
+  var intent      : Intention         = new Intention
+  var client      : Option[Plan]      = None
   var lastFrame   : Int               = 0
-  var lastIntent  : Intention         = new Intention
   var lastPath    : Option[TilePath]  = None
-  var lastClient  : Option[Plan]      = None
   var lastAction  : Option[String]    = None
   def act(value: String): Unit = { lastAction = Some(value) }
 
@@ -129,7 +129,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   }
 
   private def followIntent() {
-    val intent    = lastIntent
     toTravel      = intent.toTravel
     toReturn      = intent.toReturn
     toAttack      = intent.toAttack

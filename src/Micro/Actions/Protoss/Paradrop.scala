@@ -52,7 +52,7 @@ object Paradrop extends Action {
     // If we're able to fight, pick a target
     if (readyToDrop) {
       if (unit.is(Protoss.Reaver)) {
-        Target.consider(unit)
+        Target.choose(unit)
       }
     }
 

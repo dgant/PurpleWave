@@ -2,7 +2,7 @@ package Micro.Actions.Scouting
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Targeting.EvaluateTargets
+import Micro.Actions.Combat.Targeting.Target
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import bwapi.Race
 
@@ -28,9 +28,7 @@ object DisruptBuilder extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    val builders = disruptableBuilders(unit)
-    val target = EvaluateTargets.best(unit, builders)
-    unit.agent.toAttack = target
+    Target.chooseUnfiltered(unit, disruptableBuilders(unit))
     With.commander.attack(unit)
   }
 }

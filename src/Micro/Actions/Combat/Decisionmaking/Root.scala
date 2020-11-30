@@ -3,6 +3,7 @@ package Micro.Actions.Combat.Decisionmaking
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Targeting.Target
+import Micro.Actions.Combat.Targeting.Filters.TargetFilterVisibleInRange
 import Planning.UnitMatchers.UnitMatchSiegeTank
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
@@ -96,7 +97,7 @@ object Root extends Action {
     )
     
     override def perform(unit: FriendlyUnitInfo) {
-      Target.delegate(unit)
+      Target.choose(unit, TargetFilterVisibleInRange)
       if (shouldRoot)   root(unit)
       if (shouldUnroot) unroot(unit)
     }

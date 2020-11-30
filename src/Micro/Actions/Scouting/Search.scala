@@ -20,13 +20,13 @@ object SearchWhenBored extends AbstractSearch {
 abstract class AbstractSearch extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    With.geography.enemyBases.nonEmpty || unit.agent.lastIntent.toScoutTiles.nonEmpty
+    With.geography.enemyBases.nonEmpty || unit.agent.intent.toScoutTiles.nonEmpty
   }
   
   protected val boredomFrames: Int
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    if (unit.matchups.threats.isEmpty && ! unit.agent.lastIntent.toScoutTiles.exists(With.grids.friendlyVision.ever)) {
+    if (unit.matchups.threats.isEmpty && ! unit.agent.intent.toScoutTiles.exists(With.grids.friendlyVision.ever)) {
       Move.consider(unit)
     }
 
@@ -39,7 +39,7 @@ abstract class AbstractSearch extends Action {
         .take(count)
     }
 
-    val tilesToScout = unit.agent.lastIntent.toScoutTiles
+    val tilesToScout = unit.agent.intent.toScoutTiles
       .filter(tile =>
         With.grids.friendlyVision.framesSince(tile) > boredomFrames
         && With.grids.buildableTerrain.get(tile)

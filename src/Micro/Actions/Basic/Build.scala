@@ -60,7 +60,7 @@ object Build extends Action {
       lazy val allWorkers = unit.matchups.threats.size == 1 && unit.matchups.threats.head.unitClass.isWorker
       lazy val healthy    = unit.totalHealth > 10 || unit.totalHealth >= unit.matchups.threats.head.totalHealth
       if (noThreats || (allWorkers && healthy) && unit.cooldownLeft < With.reaction.agencyMax) {
-        Target.delegate(unit)
+        Target.choose(unit)
         unit.agent.toAttack = unit.agent.toAttack.orElse(Some(blockersToKill.minBy(_.pixelDistanceEdge(unit))))
         With.commander.attack(unit)
       }
@@ -73,7 +73,7 @@ object Build extends Action {
     if (unit.unready) return
     
     val buildClass = unit.agent.toBuild.get
-    val buildTile = unit.agent.lastIntent.toBuildTile.get
+    val buildTile = unit.agent.intent.toBuildTile.get
 
     val pushPixel = buildArea.midPixel
     val priority = if (unit.pixelDistanceCenter(pushPixel) < 128) TrafficPriorities.Shove else TrafficPriorities.Bump

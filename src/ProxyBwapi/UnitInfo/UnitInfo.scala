@@ -10,7 +10,7 @@ import Lifecycle.With
 import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.PurpleMath
-import Micro.Actions.Combat.Targeting.EvaluateTargets
+import Micro.Actions.Combat.Targeting.Target
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Matchups.MatchupAnalysis
 import Performance.Cache
@@ -360,7 +360,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     Zerg.SporeColony,
     Zerg.SunkenColony
   ))
-  val baseTargetValue = new Cache(() => EvaluateTargets.getTargetBaseValue(this))
+  val baseTargetValue = new Cache(() => Target.getTargetBaseValue(this))
 
   @inline final def battle: Option[BattleLocal] = With.battles.byUnit.get(this).orElse(With.matchups.entrants.find(_._2.contains(this)).map(_._1))
   @inline final def matchups: MatchupAnalysis = With.matchups.get(this)

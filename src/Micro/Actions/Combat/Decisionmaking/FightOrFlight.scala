@@ -89,24 +89,33 @@ object FightOrFlight extends Action {
     })
 
     val getaway = "Getaway"
-    decide(true, "Anchors", () => unit.matchups.allies.view.map(_.friendly).filter(_.isDefined).map(_.get).exists(ally => (
-      ! ally.unitClass.isWorker
-      && ally.agent.fightReason != getaway
-      && ! ally.loaded
-      && (ally.canAttack || (ally.unitClass.rawCanAttack && ally.unitClass.isBuilding) || ally.is(Zerg.CreepColony))
-      && (ally.unitClass.topSpeed <= Protoss.HighTemplar.topSpeed)
-      && (ally.subjectiveValue * (if (ally.unitClass.isBuilding) 2.0 else 1.0) > unit.subjectiveValue)
-      && (ally.matchups.framesOfSafety < 24 + Math.max(0, unit.matchups.framesOfSafety) || ( ! ally.unitClass.isBuilding && ally.matchups.targetsInRange.nonEmpty))
-      && (ally.friendly.forall(_.agent.ride.exists(_.pixelDistanceEdge(ally) > 96)) || ally.matchups.framesOfSafety <= PurpleMath.clamp(unit.matchups.framesOfSafety, 0, 3))
-      && (ally.unitClass.isSpellcaster || (ally.matchups.threats.exists(t => ! t.unitClass.isWorker && t.topSpeed > ally.topSpeed && unit.canAttack(t)) && (ally.agent.shouldEngage || ally.matchups.targetsInRange.nonEmpty)))
-    )))
+    decide(true, "Anchors", () => unit.matchups.allies.view
+      .map(_.friendly)
+      .filter(_.isDefined)
+      .map(_.get)
+      .exists(ally => (
+        ! ally.unitClass.isWorker
+        && ally.agent.fightReason != getaway
+        && ! ally.loaded
+        && (ally.canAttack || (ally.unitClass.rawCanAttack && ally.unitClass.isBuilding) || ally.is(Zerg.CreepColony))
+        && (ally.unitClass.topSpeed <= Protoss.HighTemplar.topSpeed)
+        && (ally.subjectiveValue * (if (ally.unitClass.isBuilding) 2.0 else 1.0) > unit.subjectiveValue)
+        && (ally.matchups.framesOfSafety < 24 + Math.max(0, unit.matchups.framesOfSafety) || ( ! ally.unitClass.isBuilding && ally.matchups.targetsInRange.nonEmpty))
+        && (ally.friendly.forall(_.agent.ride.exists(_.pixelDistanceEdge(ally) > 96)) || ally.matchups.framesOfSafety <= PurpleMath.clamp(unit.matchups.framesOfSafety, 0, 3))
+        && (ally.unitClass.isSpellcaster || (ally.matchups.threats.exists(t => ! t.unitClass.isWorker && t.topSpeed > ally.topSpeed && unit.canAttack(t)) && (ally.agent.shouldEngage || ally.matchups.targetsInRange.nonEmpty)))
+      )))
 
     decide(true, getaway, () => unit.agent.ride.exists(ride => {
-      val rideDistance = Math.max(0.0, ride.pixelDistanceCenter(unit) - Shuttling.pickupRadius - 32)
-      val rideWait = PurpleMath.nanToInfinity(rideDistance / (ride.topSpeed + unit.topSpeed))
+      lazy val rideDistance = Math.max(0.0, ride.pixelDistanceCenter(unit) - Shuttling.pickupRadius - 32)
+      lazy val rideWait = PurpleMath.nanToInfinity(rideDistance / (ride.topSpeed + unit.topSpeed))
+      lazy val firingDelay = if (unit.is(Protoss.HighTemplar)) 0 else unit.cooldownMaxAirGround
       (unit.isAny(Protoss.Reaver, Protoss.HighTemplar)
         && ! unit.matchups.threats.exists(t => t.isSiegeTankSieged() && t.pixelsToGetInRange(unit) < 48)
-        && (rideWait <= 12 + Math.max(0.0, unit.matchups.framesOfSafety) || (unit.loaded && unit.matchups.framesOfSafety > unit.cooldownMaxAirGround)))
+        && (rideWait <= 12 + Math.max(0.0, unit.matchups.framesOfSafety) || (unit.loaded && unit.matchups.framesOfSafety > firingDelay))
+        && ! unit.matchups.threats.exists(t =>
+          t.canAttack(ride)
+          && t.topSpeed > ride.topSpeed
+          && t.framesToGetInRange(unit) < firingDelay + 24))
     }))
 
     if (decision.isDefined) {

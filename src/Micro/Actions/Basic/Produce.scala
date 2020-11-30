@@ -19,7 +19,7 @@ object Produce extends Action {
   override def perform(unit: FriendlyUnitInfo) {
     
     if (unit.agent.toTrain.isDefined) {
-      if (With.framesSince(unit.agent.lastIntent.frameCreated) < Math.max(128, unit.agent.toTrain.get.buildFrames / 2)) {
+      if (With.framesSince(unit.agent.intent.frameCreated) < Math.max(128, unit.agent.toTrain.get.buildFrames / 2)) {
         With.commander.build(unit, unit.agent.toTrain.get)
       }
     }
@@ -30,8 +30,8 @@ object Produce extends Action {
       With.commander.upgrade(unit, unit.agent.toUpgrade.get)
     }
 
-      unit.agent.lastIntent.toTrain = None // Avoid training repeatedly
-    unit.agent.lastIntent.toTech = None // Avoid teching repeatedly (mostly impacts failure to renew the desire to tech)
-    unit.agent.lastIntent.toUpgrade = None //Avoid upgrading repeatedly
+      unit.agent.intent.toTrain = None // Avoid training repeatedly
+    unit.agent.intent.toTech = None // Avoid teching repeatedly (mostly impacts failure to renew the desire to tech)
+    unit.agent.intent.toUpgrade = None //Avoid upgrading repeatedly
   }
 }

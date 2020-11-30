@@ -8,7 +8,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, PumpWorkers, PylonBlock, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.{BuildGasPumps, BuildGasPumpsIfBelow, RequireBases, RequireMiningBases}
 import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.Predicates.Compound.{And, Latch, Not, Sticky}
 import Planning.Predicates.Milestones._
@@ -68,11 +68,8 @@ class PvPLateGame extends GameplanTemplate {
         Get(Protoss.CitadelOfAdun),
         Get(2, Protoss.Gateway),
         Get(Protoss.TemplarArchives),
-        Get(6, Protoss.Gateway),
-        Get(2, Protoss.Assimilator)),
-      new If(
-        new GasPumpsAtMost(300),
-        new BuildGasPumps),
+        Get(6, Protoss.Gateway)),
+      new BuildGasPumpsIfBelow(300),
       new Build(
         Get(Protoss.ZealotSpeed),
         Get(Protoss.Forge),
@@ -85,7 +82,7 @@ class PvPLateGame extends GameplanTemplate {
 
     new Parallel(
       new Build(Get(3, Protoss.Gateway)),
-      new If(new UnitsAtLeast(1, Protoss.RoboticsFacility), new BuildGasPumps),
+      new If(new UnitsAtLeast(1, Protoss.RoboticsFacility), new BuildGasPumpsIfBelow(150)),
       new FlipIf(
         new And(
           new SafeAtHome,
@@ -101,13 +98,14 @@ class PvPLateGame extends GameplanTemplate {
           Get(Protoss.Observatory),
           Get(Protoss.RoboticsSupportBay),
           Get(Protoss.ShuttleSpeed))),
-      new BuildGasPumps,
+      new BuildGasPumpsIfBelow(300),
       new Build(
         Get(6, Protoss.Gateway),
         Get(Protoss.CitadelOfAdun),
         Get(Protoss.ZealotSpeed),
         Get(7, Protoss.Gateway),
-        Get(Protoss.ScarabDamage))))
+        Get(Protoss.ScarabDamage)),
+      new BuildGasPumps))
 
   class AddLateTech extends Parallel(
     new Build(Get(Protoss.Forge)),

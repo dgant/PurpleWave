@@ -1,37 +1,17 @@
 package Micro.Actions.Combat.Tactics
 
 import Lifecycle.With
-import Mathematics.PurpleMath
 import Micro.Actions.Action
-import Micro.Actions.Combat.Targeting.Filters.{TargetFilter, TargetFilterCombatants, TargetFilterVisibleInRange}
-import Micro.Actions.Combat.Targeting.TargetAction
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Micro.Actions.Combat.Targeting.Target
+import Micro.Actions.Combat.Targeting.Filters.TargetFilterPotshot
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Potshot extends Action {
   
-  object PotshotTargetFilter extends TargetFilter {
-    override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = (
-      TargetFilterVisibleInRange.legal(actor, target)
-      && TargetFilterCombatants.legal(actor, target)
-      && ( ! target.unitClass.isBuilding || target.canAttack || target.unitClass.isDetector)
-    )
-  }
-  
-  object PotshotTarget extends TargetAction(PotshotTargetFilter)
-  
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.agent.canFight       &&
-    unit.readyForAttackOrder  &&
-    unit.matchups.targetsInRange.nonEmpty
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.agent.canFight && unit.readyForAttackOrder
   
   override def perform(unit: FriendlyUnitInfo) {
-    PotshotTarget.delegate(unit)
-    unit.target.foreach(target =>
-      if (unit.unitClass.isArbiter && PurpleMath.radiansTo(unit.angleRadians, unit.pixelCenter.radiansTo(target.pixelCenter)) > Math.PI / 2) {
-        unit.agent.toTravel = Some(target.pixelCenter)
-        With.commander.patrol(unit)
-      })
+    Target.choose(unit, TargetFilterPotshot)
     With.commander.attack(unit)
   }
 }

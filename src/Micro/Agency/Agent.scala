@@ -75,15 +75,19 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   def destination: Pixel = toTravel.orElse(toReturn).getOrElse(origin)
   def origin: Pixel = toReturn.getOrElse(originCache())
-  private val originCache = new Cache(() => toReturn.orElse(intent.toTravel)
-    .flatMap(_.base)
-    .filter(_.owner.isUs)
-    .orElse(ByOption.minBy(With.geography.ourBases)(base =>
-      (
+  private val originCache = new Cache(() =>
+    toReturn
+    .orElse(
+      ByOption.minBy(
+        With.geography.ourBases.filter(base =>
+          base.scoutedByEnemy
+          || base.isNaturalOf.exists(_.scoutedByEnemy)
+          || base == With.geography.ourNatural
+          || base == With.geography.ourMain))(base =>
         unit.pixelDistanceTravelling(base.heart)
-        + (if (base.isNaturalOf.exists(_.owner.isUs) && unit.battle.exists(_.enemy.centroidGround.base == base)) 32 * 40 else 0))
-      * (if (base.scoutedByEnemy || base.isNaturalOf.exists(_.scoutedByEnemy)) 1 else 1000)))
-    .map(_.heart.pixelCenter)
+        // Retreat into main
+        + (if (base.isNaturalOf.filter(_.owner.isUs).exists(_.heart.altitudeBonus >= base.heart.altitudeBonus) && unit.battle.exists(_.enemy.centroidGround.base == base)) 32 * 40 else 0))
+      .map(_.heart.pixelCenter))
     .getOrElse(With.geography.home.pixelCenter))
 
   /////////////////

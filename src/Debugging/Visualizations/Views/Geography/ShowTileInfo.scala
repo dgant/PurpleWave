@@ -18,7 +18,7 @@ object ShowTileInfo extends View {
     val zone              = With.geography.zoneByTile(mouseTile)
 
     if (true || With.game.getMouseState(MouseButton.M_LEFT)) {
-      val pathfindProfile = new PathfindProfile(With.geography.home.nearestWalkableTerrain)
+      val pathfindProfile = new PathfindProfile(With.geography.home.nearestWalkableTile)
       pathfindProfile.end = Some(walkableTile)
       val path = pathfindProfile.find
       if (path.pathExists) {

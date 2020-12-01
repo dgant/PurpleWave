@@ -11,6 +11,7 @@ import Micro.Actions.Combat.Targeting.Target
 import Micro.Coordination.Pathing.MicroPathing
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.ByOption
 
 object Paradrop extends Action {
 
@@ -18,11 +19,12 @@ object Paradrop extends Action {
 
   def findFiringPosition(reaver: FriendlyUnitInfo, target: UnitInfo): Tile = {
     val firingDistance  = (reaver.effectiveRangePixels + Math.min(reaver.effectiveRangePixels, target.effectiveRangePixels)) / 2
-    val originTile      = reaver.tileIncludingCenter
+    val originPixel     = reaver.pixelCenter
     val goalTile        = target.projectFrames(reaver.cooldownLeft).tileIncluding
-    val naiveTile       = goalTile.pixelCenter.project(originTile.pixelCenter, firingDistance).nearestWalkableTile
+    val naiveTile       = goalTile.pixelCenter.project(originPixel, firingDistance).nearestWalkableTile
     val naiveDistance   = target.pixelCenter.tileIncluding.tileDistanceFast(naiveTile)
     val candidates = Spiral.points(7)
+      .view
       .map(naiveTile.add)
       .filter(t =>
         t.valid
@@ -33,14 +35,12 @@ object Paradrop extends Action {
       .map(tile => (
         tile,
         Math.abs(naiveDistance - tile.tileDistanceFast(goalTile)),
-        tile.tileDistanceFast(originTile),
+        tile.tileDistanceFast(originPixel.tileIncluding),
         With.grids.enemyRangeGround.get(tile),
         With.grids.enemyRangeAir.get(tile)))
       .map(p => ((p._2 + p._3) * (p._4 + p._5), p))
-    if (candidates.isEmpty) {
-      return naiveTile
-    }
-    val output = candidates.minBy(_._1)._2._1
+      .toVector
+    val output = ByOption.minBy(candidates)(_._1).map(_._2._1).getOrElse(naiveTile)
     output
   }
 
@@ -57,9 +57,9 @@ object Paradrop extends Action {
     }
 
     val target = unit.agent.toAttack
-    def eligibleTeammate = (unit: UnitInfo) => ! unit.isAny(Protoss.Shuttle, Protoss.Reaver, Protoss.HighTemplar)
-    def isEngaged = (unit: UnitInfo) => unit.matchups.enemies.nonEmpty
-    def canFollow = (units: Iterable[UnitInfo]) => units.size > 2
+    def eligibleTeammate  = (unit: UnitInfo) => ! unit.isAny(Protoss.Shuttle, Protoss.Reaver, Protoss.HighTemplar)
+    def isEngaged         = (unit: UnitInfo) => unit.matchups.enemies.nonEmpty
+    def canFollow         = (units: Iterable[UnitInfo]) => units.size > 2
     val squadmates        = unit.squadmates.view.filter(eligibleTeammate)
     val squadmatesEngaged = squadmates.filter(isEngaged)
     val allies            = unit.matchups.allies.filter(eligibleTeammate)
@@ -84,19 +84,21 @@ object Paradrop extends Action {
 
     unit.agent.toTravel = Some(destinationGround.pixelCenter)
 
-    val targetDistance: Float = (unit.effectiveRangePixels + (if (unit.unitClass != Protoss.HighTemplar) unit.topSpeed * unit.cooldownLeft else 0)).toFloat / 32f
-    val endDistanceMaximum = if (target.isDefined && unit.pixelDistanceCenter(target.get.pixelCenter) > targetDistance) targetDistance else 0
+    val endDistanceMaximum = if (unit.is(Protoss.HighTemplar)) 0 else (unit.topSpeed * unit.cooldownLeft / 32).toInt
     val repulsors = MicroPathing.getPathfindingRepulsors(unit)
     var path = NoPath.value
-    var crossTerrainOptions = if (unit.matchups.threatsInRange.nonEmpty) Seq(true) else Seq(false, true)
-    Seq(Some(0), Some(With.grids.enemyRangeGround.addedRange - 1), None).foreach(maximumThreat =>
+    Seq(
+      Some(With.grids.enemyRangeGround.defaultValue),
+      Some(With.grids.enemyRangeGround.addedRange - 1),
+      None).foreach(maximumThreat =>
       if ( ! path.pathExists) {
         val profile = new PathfindProfile(unit.pixelCenter.nearestWalkableTile)
         profile.end                 = Some(destinationGround)
         profile.endDistanceMaximum  = endDistanceMaximum // Uses the distance implied by allowGroundDist
         profile.lengthMaximum       = Some(30)
         profile.threatMaximum       = maximumThreat
-        profile.canCrossUnwalkable  = true
+        profile.canCrossUnwalkable  = Some(true)
+        profile.canEndUnwalkable    = Some(false)
         profile.costOccupancy       = 0.25f
         profile.costThreat          = 5f
         profile.costRepulsion       = if (target.isDefined) 0.5f else 2f

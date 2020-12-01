@@ -78,7 +78,7 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     val dy = Math.abs(y - tile.y)
     0.941256 * Math.max(dx, dy) + Math.min(dx, dy) * sqrt2m1
   }
-  @inline def tileDistanceSquared(tile: Tile): Int = {
+  @inline final def tileDistanceSquared(tile: Tile): Int = {
     val dx = x - tile.x
     val dy = y - tile.y
     dx * dx + dy * dy
@@ -101,82 +101,64 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline final def pixelCenter: Pixel = {
     Pixel(x * 32 + 15, y * 32 + 15)
   }
-  @inline
-  final def topLeftWalkPixel: WalkTile = {
+  @inline final def topLeftWalkPixel: WalkTile = {
     WalkTile(x * 4, y * 4)
   }
-  @inline
-  final def left: Tile = {
+  @inline final def left: Tile = {
     Tile(x - 1, y)
   }
-  @inline
-  final def right: Tile = {
+  @inline final def right: Tile = {
     Tile(x+1, y)
   }
-  @inline
-  final def up: Tile = {
+  @inline final def up: Tile = {
     Tile(x, y-1) //Remember our flipped coordinate system
   }
-  @inline
-  final def down: Tile = {
+  @inline final def down: Tile = {
     Tile(x, y+1) //Remember our flipped coordinate system
   }
-  @inline
-  final def adjacent4: Array[Tile] = {
+  @inline final def adjacent4: Array[Tile] = {
     Array(up, down, left, right)
   }
-  @inline
-  final def adjacent5: Array[Tile] = {
+  @inline final def adjacent5: Array[Tile] = {
     Array(this, up, down, left, right)
   }
-  @inline
-  final def adjacent8: Array[Tile] = {
+  @inline final def adjacent8: Array[Tile] = {
     Array(up, down, left, right, up.left, up.right, down.left, down.right)
   }
-  @inline
-  final def adjacent9: Array[Tile] = {
+  @inline final def adjacent9: Array[Tile] = {
     Array(this, up, down, left, right, up.left, up.right, down.left, down.right)
   }
-  @inline
-  final def zone: Zone = {
+  @inline final def zone: Zone = {
     With.geography.zoneByTile(this)
   }
-  @inline
-  final def base: Option[Base] = {
+  @inline final def base: Option[Base] = {
     With.geography.baseByTile(this)
   }
-  @inline
-  final def groundPixels(other: Pixel): Double = {
+  @inline final def groundPixels(other: Pixel): Double = {
     With.paths.groundPixels(pixelCenter, other)
   }
-  @inline
-  final def groundPixels(other: Tile): Double = {
+  @inline final def groundPixels(other: Tile): Double = {
     With.paths.groundPixels(pixelCenter, other.pixelCenter)
   }
-  @inline
-  final def altitudeBonus: Double = {
+  @inline final def altitudeBonus: Double = {
     With.grids.altitudeBonus.get(this)
   }
-  @inline
-  final def toRectangle: TileRectangle = {
+  @inline final def toRectangle: TileRectangle = {
     TileRectangle(this, this.add(1, 1))
   }
-  @inline
-  final def walkable: Boolean = {
+  @inline final def walkable: Boolean = {
     With.grids.walkable.get(this)
   }
-  @inline
-  final def walkableUnchecked: Boolean = {
+  @inline final def walkableUnchecked: Boolean = {
     With.grids.walkable.getUnchecked(i)
   }
-  @inline
-  final def buildable: Boolean = {
+  @inline final def buildable: Boolean = {
     With.grids.buildable.get(this)
   }
   @inline final def bwapiVisible: Boolean = {
     With.game.isVisible(x, y)
   }
-  @inline final def nearestWalkableTerrain: Tile = {
+  @inline final def nearestWalkableTile: Tile = {
     if (valid && With.grids.walkable.getUnchecked(i)) return this
     val output = Spiral.points(16).view.map(add).find(tile => tile.valid && With.grids.walkable.getUnchecked(tile.i)).getOrElse(this)
     output

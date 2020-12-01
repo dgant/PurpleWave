@@ -1,7 +1,6 @@
 package Information.Geography.Pathfinding
 
 import Information.Geography.Pathfinding.Types.TilePath
-import Information.Grids.Combat.AbstractGridEnemyRange
 import Lifecycle.With
 import Mathematics.Points.Tile
 import Mathematics.PurpleMath
@@ -89,7 +88,6 @@ trait TilePathfinder {
   @inline private final def costFromStart(
     profile: PathfindProfile,
     toTile: Tile,
-    threatGrid: AbstractGridEnemyRange,
     hypotheticalFrom: Option[Tile] = None)
       : Float = {
 
@@ -100,7 +98,7 @@ trait TilePathfinder {
     val fromTile = fromState.get
     val costSoFar     : Float   = fromState.get.costFromStart
     val costDistance  : Float   = if (fromTile.tile.x == toTile.x || fromTile.tile.y == toTile.y) 1f else PurpleMath.sqrt2f
-    val costThreat    : Float   = if (profile.costThreat == 0) 0 else profile.costThreat * Math.max(0, threatGrid.getUnchecked(i) - threatGrid.getUnchecked(fromTile.i)) // Max?
+    val costThreat    : Float   = if (profile.costThreat == 0) 0 else profile.costThreat * Math.max(0, profile.threatGrid.getUnchecked(i) - profile.threatGrid.getUnchecked(fromTile.i)) // Max?
     val costOccupancy : Float   = if (profile.costOccupancy == 0)
       0
     else {
@@ -131,8 +129,7 @@ trait TilePathfinder {
   @inline private final def costToEndFloor(
     profile: PathfindProfile,
     tile: Tile,
-    end: Option[Tile],
-    threatGrid: AbstractGridEnemyRange): Float = {
+    end: Option[Tile]): Float = {
 
     val i = tile.i
 
@@ -142,9 +139,9 @@ trait TilePathfinder {
     // To escape a tile that's 5 tiles into enemy range means we have to pass through tiles of value 5+4+3+2+1
     // So the floor of the cost we'll pay is the Gaussian expansion of the threat cost at the current tile.
 
-    val costDistanceToEnd   : Float = end.map(end => if (profile.canCrossUnwalkable || ! profile.allowGroundDist) tile.tileDistanceFast(end) else tile.groundPixels(end) / 32.0).getOrElse(0.0).toFloat
+    val costDistanceToEnd   : Float = end.map(end => if (profile.crossUnwalkable || ! profile.employGroundDist) tile.tileDistanceFast(end) else tile.groundPixels(end) / 32.0).getOrElse(0.0).toFloat
     val costOutOfRepulsion  : Float = profile.costRepulsion * PurpleMath.fastSigmoid(tiles(i).repulsion.toFloat) // Hacky; used to smartly tiebreak tiles that are otherwise h() = 0. Using this formulation to minimize likelihood of breaking heuristic requirements
-    val costOutOfThreat     : Float = profile.costThreat * threatGrid.getUnchecked(i)
+    val costOutOfThreat     : Float = profile.costThreat * profile.threatGrid.getUnchecked(i)
 
     Math.max(costDistanceToEnd, costOutOfThreat)
   }
@@ -156,21 +153,10 @@ trait TilePathfinder {
   // Baby I'm A*. --Prince
   def aStar(profile: PathfindProfile): TilePath = {
     val startTile = profile.start
-    val endTile   = if (profile.canCrossUnwalkable) profile.end else profile.end.map(_.nearestWalkableTerrain)
+    val endTile   = if (profile.endUnwalkable) profile.end else profile.end.map(_.nearestWalkableTile)
 
     if ( ! startTile.valid) return failure(startTile)
 
-    val isFlying = profile.unit.exists(u => u.flying || u.transport.exists(_.flying)) || profile.canCrossUnwalkable
-    val isGround = profile.unit.exists(u => ! u.flying)
-    val threatGrid: AbstractGridEnemyRange  =
-      if (isFlying && isGround)
-        With.grids.enemyRangeAirGround
-      else if (isFlying)
-        With.grids.enemyRangeAir
-      else if (isGround)
-        With.grids.enemyRangeGround
-      else
-        With.grids.enemyRangeAirGround
     startNextSearch()
     profile.updateRepulsion()
     val horizon = new mutable.PriorityQueue[TileState]()(Ordering.by(t => -t.totalCostFloor))
@@ -179,8 +165,8 @@ trait TilePathfinder {
     startTileState.setEnqueued()
     startTileState.setCameFrom(startTile)
     startTileState.setRepulsion(totalRepulsion(profile, startTile))
-    startTileState.setCostFromStart(costFromStart(profile, startTile, threatGrid))
-    startTileState.setTotalCostFloor(costToEndFloor(profile, startTile, endTile, threatGrid))
+    startTileState.setCostFromStart(costFromStart(profile, startTile))
+    startTileState.setTotalCostFloor(costToEndFloor(profile, startTile, endTile))
     startTileState.setPathLength(1)
     horizon += startTileState
 
@@ -196,17 +182,17 @@ trait TilePathfinder {
         || (
           profile.endDistanceMaximum > 0
           && end.tileDistanceFast(bestTile) <= profile.endDistanceMaximum
-          && (profile.canCrossUnwalkable || end.groundPixels(bestTile) <= 32 * profile.endDistanceMaximum)))
+          && (profile.crossUnwalkable || end.groundPixels(bestTile) <= 32 * profile.endDistanceMaximum)))
       if (
         profile.lengthMaximum.exists(_ <= Math.round(bestTileState.pathLength)) // Rounding encourages picking diagonal paths for short maximum lengths
         || (
-          (atEnd || (endTile.isEmpty && (profile.canCrossUnwalkable || bestTile.walkableUnchecked)))
+          (atEnd || (endTile.isEmpty && (profile.endUnwalkable || bestTile.walkableUnchecked)))
           && profile.lengthMinimum.forall(_ <= bestTileState.pathLength)
-          && profile.threatMaximum.forall(_ >= threatGrid.getUnchecked(bestTile.i)))) {
+          && profile.threatMaximum.forall(_ >= profile.threatGrid.getUnchecked(bestTile.i)))) {
         val output = TilePath(
           startTile,
           bestTile,
-          costFromStart(profile, bestTileState.tile, threatGrid),
+          costFromStart(profile, bestTileState.tile),
           Some(assemblePath(bestTileState)))
         profile.unit.flatMap(_.friendly.map(_.agent)).foreach(_.lastPath = Some(output))
         return output
@@ -225,11 +211,11 @@ trait TilePathfinder {
             ! neighborState.visited
 
             // Is the neighbor pathable?
-            && (profile.canCrossUnwalkable || With.grids.walkable.getUnchecked(neighborState.i))
+            && (profile.crossUnwalkable || With.grids.walkable.getUnchecked(neighborState.i))
 
             // Can we path from here to the neighbor?
             // (Specifically, if it's a diagonal step, verify that it's achievable)
-            && (profile.canCrossUnwalkable
+            && (profile.crossUnwalkable
               || neighborOrthogonal
               || With.grids.walkable.getUnchecked(Tile(neighborTile.x, bestTileState.tile.y).i)
               || With.grids.walkable.getUnchecked(Tile(bestTileState.tile.x, neighborTile.y).i))) {
@@ -238,11 +224,11 @@ trait TilePathfinder {
             if ( ! wasEnqueued) {
               neighborState.setRepulsion(totalRepulsion(profile, neighborTile))
             }
-            val neighborCostFromStart = costFromStart(profile, neighborTile, threatGrid, Some(bestTile))
+            val neighborCostFromStart = costFromStart(profile, neighborTile, Some(bestTile))
             if ( ! wasEnqueued || neighborState.costFromStart > neighborCostFromStart) {
               neighborState.setCameFrom(bestTileState.tile)
               neighborState.setCostFromStart(neighborCostFromStart)
-              neighborState.setTotalCostFloor(neighborCostFromStart + costToEndFloor(profile, neighborTile, endTile, threatGrid))
+              neighborState.setTotalCostFloor(neighborCostFromStart + costToEndFloor(profile, neighborTile, endTile))
               neighborState.setPathLength(bestTileState.pathLength + (if (neighborOrthogonal) 1 else PurpleMath.sqrt2f))
             }
             if ( ! wasEnqueued) {

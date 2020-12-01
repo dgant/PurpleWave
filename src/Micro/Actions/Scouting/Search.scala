@@ -64,8 +64,7 @@ abstract class AbstractSearch extends Action {
 
     val profile = new PathfindProfile(unit.tileIncludingCenter)
     profile.end                 = Some(tileToScout)
-    profile.canCrossUnwalkable  = unit.flying
-    profile.allowGroundDist     = true
+    profile.employGroundDist     = true
     profile.costOccupancy       = 0.01f
     profile.costThreat          = 5
     profile.costRepulsion       = 0.4f

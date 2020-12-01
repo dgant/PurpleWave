@@ -6,6 +6,7 @@ import Mathematics.Formations.Designers.FormationZone
 import Mathematics.Formations.FormationAssigned
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
+import Micro.Actions.Combat.Targeting.Filters.TargetFilterDefend
 import Micro.Agency.Intention
 import Performance.Cache
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -113,8 +114,8 @@ class GoalDefendZone extends SquadGoalBasic {
       val onlyGround  = recruit.canAttack && !recruit.unitClass.attacksAir
       val thisTarget  = if (onlyAir) targetAir else if (onlyGround) targetGround else target
       recruit.agent.intend(squad.client, new Intention {
-        canFocus = true
         toTravel = Some(thisTarget.pixelCenter)
+        targetFilters = Seq(TargetFilterDefend(zone))
       })
     })
   }
@@ -131,6 +132,7 @@ class GoalDefendZone extends SquadGoalBasic {
       unit.agent.intend(squad.client, new Intention {
         toTravel = Some(unitDestination)
         toReturn = if (zone.bases.exists(_.owner.isUs)) Some(unitDestination) else None
+        targetFilters = Seq(TargetFilterDefend(zone))
       })})
   }
 
@@ -146,6 +148,7 @@ class GoalDefendZone extends SquadGoalBasic {
         defender.agent.intend(squad.client, new Intention {
           toReturn = spot
           toTravel = spot.orElse(Some(zone.centroid.pixelCenter))
+          targetFilters = Seq(TargetFilterDefend(zone))
         })
       })
   }

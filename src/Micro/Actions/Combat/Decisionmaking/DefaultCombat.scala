@@ -103,7 +103,7 @@ object DefaultCombat extends Action {
   object Reposition extends Technique(Dodge, Excuse) // Stay in fight with better position
   object Abuse      extends Technique(Dodge, Excuse) // Pick fights from range
   object Fallback   extends Technique(Dodge) // Get out of fight while landing shots
-  object Organize   extends Technique(Dodge, Excuse, Abuse, Fallback) // Get into ideal position for future fight
+  object Organize   extends Technique(Dodge, Excuse, Abuse) // Get into ideal position for future fight
   object Flee       extends Technique(Dodge, Abuse, Fallback, Organize) // Get out of fight
   object Fight      extends Technique(Dodge, Excuse, Abuse, Surround, Chase, Reposition) // Pick fight ASAP
 

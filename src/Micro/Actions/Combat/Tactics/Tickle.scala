@@ -234,8 +234,7 @@ object Tickle extends Action {
       profile.lengthMinimum = Some(pathLengthMinimum)
       profile.lengthMaximum = Some(maximumDistance)
       profile.threatMaximum = Some(0)
-      profile.canCrossUnwalkable = false
-      profile.allowGroundDist = true
+      profile.employGroundDist = true
       profile.costOccupancy = 1f
       profile.costThreat = 5f
       profile.costRepulsion = 3f

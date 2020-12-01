@@ -33,8 +33,8 @@ object Target extends {
   }
 
   def legal(attacker: FriendlyUnitInfo, required: TargetFilter*): Seq[UnitInfo] = {
-    val filtersRequired = TargetFilterGroups.filtersRequired.view ++ required
-    attacker.matchups.targets.view.filter(target => filtersRequired.forall(_.legal(attacker, target)))
+    val filters = filtersRequired(attacker) ++ required
+    attacker.matchups.targets.view.filter(target => filters.forall(_.legal(attacker, target)))
   }
 
   def preferred(attacker: FriendlyUnitInfo, required: TargetFilter*): Seq[UnitInfo] = {
@@ -47,6 +47,10 @@ object Target extends {
       }
     }
     output
+  }
+
+  def filtersRequired(attacker: FriendlyUnitInfo): Seq[TargetFilter] = {
+    TargetFilterGroups.filtersRequired.view ++ attacker.agent.intent.targetFilters
   }
 
   def auditLegality(attacker: FriendlyUnitInfo, additionalFiltersRequired: TargetFilter*): Vector[(UnitInfo, Vector[(Boolean, TargetFilter)])] = {

@@ -39,13 +39,13 @@ object Retreat extends Action {
     }
     lazy val force            = unit.agent.forces.sum.radians
     lazy val tilePath         = MicroPathing.getRealPath(unit, preferHome = goalHome)
-    lazy val waypointSimple   = MicroPathing.getWaypointInDirection(unit, force, if (goalHome) Some(unit.agent.origin) else None, requireSafety = goalSafety).map((_, "RetreatSimple"))
-    lazy val waypointPath     = MicroPathing.getWaypointAlongTilePath(tilePath).map((_, "RetreatPath"))
-    lazy val waypointForces   = Seq(true, false).view.map(safety => MicroPathing.getWaypointInDirection(unit, force, requireSafety = safety)).find(_.nonEmpty).flatten.map((_, "RetreatForce"))
-    lazy val waypointOrigin   = (unit.agent.origin, "RetreatOrigin")
+    lazy val waypointSimple   = MicroPathing.getWaypointInDirection(unit, force, if (goalHome) Some(unit.agent.origin) else None, requireSafety = goalSafety).map((_, "Simple"))
+    lazy val waypointPath     = MicroPathing.getWaypointAlongTilePath(tilePath).map((_, "Path"))
+    lazy val waypointForces   = Seq(true, false).view.map(safety => MicroPathing.getWaypointInDirection(unit, force, requireSafety = safety)).find(_.nonEmpty).flatten.map((_, "Force"))
+    lazy val waypointOrigin   = (unit.agent.origin, "Origin")
     val waypoint = waypointSimple.orElse(waypointPath).orElse(waypointForces).getOrElse(waypointOrigin)
     unit.agent.toTravel = Some(waypoint._1)
-    unit.agent.act(waypoint._2)
+    unit.agent.act(unit.agent.lastAction.getOrElse("Retreat") + waypoint._2)
     With.commander.move(unit)
   }
 }

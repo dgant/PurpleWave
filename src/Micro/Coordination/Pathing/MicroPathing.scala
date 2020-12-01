@@ -25,9 +25,8 @@ object MicroPathing {
     pathfindProfile.lengthMinimum       = Some(pathLengthMinimum)
     pathfindProfile.lengthMaximum       = Some(PurpleMath.clamp((unit.matchups.framesOfEntanglement * unit.topSpeed + unit.effectiveRangePixels).toInt / 32, pathLengthMinimum, 15))
     pathfindProfile.threatMaximum       = Some(0)
-    pathfindProfile.canCrossUnwalkable  = unit.flying || unit.transport.exists(_.flying)
-    pathfindProfile.allowGroundDist     = true
-    pathfindProfile.costOccupancy       = if (pathfindProfile.canCrossUnwalkable) 0f else 3f
+    pathfindProfile.employGroundDist     = true
+    pathfindProfile.costOccupancy       = if (unit.flying) 0f else 3f
     pathfindProfile.costThreat          = 6f
     pathfindProfile.costRepulsion       = 2.5f
     pathfindProfile.repulsors           = getPathfindingRepulsors(unit)

@@ -10,7 +10,7 @@ object PlacementHeuristicDistanceFromBase extends PlacementHeuristic {
 
     var seedTiles = (candidate.zone.bases.view ++ With.geography.ourBases.view).map(_.heart)
     if (seedTiles.isEmpty) {
-      seedTiles = Array(With.geography.home).view
+      seedTiles = Vector(With.geography.home).view
     }
 
     val distanceTotal = seedTiles

@@ -57,7 +57,7 @@ class TvZProxy8Fact extends GameplanTemplate {
       lock.units.foreach(_.agent.intend(this, new Intention {
         toTravel = Some(base.head.heart.pixelCenter)
         canFlee = false
-        canAttack = false
+        canFight = false
       }))
     }
   }

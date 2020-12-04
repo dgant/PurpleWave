@@ -17,9 +17,7 @@ class EscortSettlers(
     
     val settler = ByOption.minBy(With.units.ours.filter(builder =>
       builder.is(UnitMatchWorkers)
-      && builder.agent.toBuildTile.exists(
-        _.base.exists(
-          _.townHall.forall( ! _.complete)))))(_.matchups.threats.exists(_.is(UnitMatchWarriors)))
+      && builder.agent.toBuildTile.exists(_.base.exists(_.townHall.forall( ! _.complete)))))(_.matchups.threats.exists(_.is(UnitMatchWarriors)))
     
     if (settler.isEmpty) return
     

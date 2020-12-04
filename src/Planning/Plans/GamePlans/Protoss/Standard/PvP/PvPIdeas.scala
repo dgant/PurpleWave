@@ -13,6 +13,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildTowersAtBases, MeldArchons}
 import Planning.Predicates.Compound.{And, Latch, Not, Sticky}
+import Planning.Predicates.Economy.GasAtMost
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
@@ -420,9 +421,16 @@ object PvPIdeas {
     Friendly(Protoss.Zealot, 0.5),
     Friendly(Protoss.Archon, 3.0)))
 
-  class ZealotsAllowed extends Or(
-    new EnemiesAtMost(0, Protoss.Carrier),
-    new EnemiesAtLeast(7, UnitMatchAnd(UnitMatchWarriors, UnitMatchNot(Protoss.Zealot))))
+  class ZealotsAllowed extends And(
+    // It makes economic sense
+    new Or(
+      new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.Zealot.buildFrames),
+      new GasAtMost(40),
+      new UnitsAtMost(0, Protoss.CyberneticsCore, complete = true)),
+    // It makes military sense
+    new Or(
+      new EnemiesAtMost(0, Protoss.Carrier),
+      new EnemiesAtLeast(7, UnitMatchAnd(UnitMatchWarriors, UnitMatchNot(Protoss.Zealot)))))
 
   class PumpDragoonsAndZealots extends Parallel(
     new PumpRatio(Protoss.Dragoon, 0, 100, Seq(Enemy(Protoss.Carrier, 5.0))),

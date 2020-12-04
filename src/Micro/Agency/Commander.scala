@@ -140,7 +140,7 @@ class Commander {
 
     // Send some units past their destination to maximize acceleration
     val overshootDistance = if (unit.flying) 288.0 else 8
-    if (unit.isAny(Terran.Dropship, Terran.ScienceVessel, Protoss.Observer, Protoss.HighTemplar, Zerg.Mutalisk, Zerg.Overlord, Zerg.Queen)) {
+    if (unit.isAny(Terran.Dropship, Terran.ScienceVessel, Protoss.Shuttle, Protoss.Observer, Protoss.HighTemplar, Zerg.Mutalisk, Zerg.Overlord, Zerg.Queen)) {
       if (to == unit.pixelCenter) {
         val signX = PurpleMath.forcedSignum(SpecificPoints.middle.x - to.x)
         val signY = PurpleMath.forcedSignum(SpecificPoints.middle.y - to.y)
@@ -243,6 +243,7 @@ class Commander {
         rightClick(unit, unit.agent.ride.get)
       }
       else {
+
         unit.baseUnit.move(destination.bwapi)
       }
       if (unit.agent.priority > TrafficPriorities.None) {

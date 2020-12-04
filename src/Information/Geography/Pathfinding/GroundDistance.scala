@@ -1,6 +1,5 @@
 package Information.Geography.Pathfinding
 
-import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
 import Utilities.ByOption
 
@@ -13,13 +12,6 @@ trait GroundDistance {
   }
 
   def groundTilesManhattan(origin: Tile, destination: Tile): Long = {
-    // Some maps have broken ground distance (due to continued reliance on BWTA,
-    // which in particular seems to suffer on maps with narrow ramps, eg. Plasma, Third World
-    // TODO: I think that issue has been fixed by using sub-buildtile walkability on those maps
-    if (With.strategy.map.exists( ! _.trustGroundDistance)) {
-      return origin.tileDistanceManhattan(destination)
-    }
-
     // Let's first check if we can use air distance. It's cheaper and more accurate.
     // We can "get away" with using air distance if we're in the same zone
     if (origin.zone == destination.zone) {
@@ -37,9 +29,6 @@ trait GroundDistance {
   def groundPixels(origin: Pixel, destination: Pixel): Double = {
     // Some maps used to have broken ground distance (due to BWTA,
     // which in particular suffered on maps with narrow ramps, eg. Plasma, Third World
-    if (With.strategy.map.exists( ! _.trustGroundDistance)) {
-      return origin.pixelDistance(destination)
-    }
 
     // Let's first check if we can use air distance. It's cheaper and more accurate.
     // We can "get away" with using air distance if we're in the same zone

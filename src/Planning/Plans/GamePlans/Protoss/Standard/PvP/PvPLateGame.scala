@@ -98,7 +98,7 @@ class PvPLateGame extends GameplanTemplate {
           Get(Protoss.Observatory),
           Get(Protoss.RoboticsSupportBay),
           Get(Protoss.ShuttleSpeed))),
-      new BuildGasPumpsIfBelow(300),
+      new BuildGasPumpsIfBelow(200),
       new Build(
         Get(6, Protoss.Gateway),
         Get(Protoss.CitadelOfAdun),

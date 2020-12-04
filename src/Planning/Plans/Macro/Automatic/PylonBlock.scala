@@ -66,6 +66,7 @@ class PylonBlock extends Plan {
         var intent = new Intention {
           toTravel = Some(tileToBlock.pixelCenter)
           canFlee = true
+          canFight = false
           canFocus = true
         }
         if (blocker.pixelDistanceCenter(tileToBlock.pixelCenter) < 256 && With.self.supplyUsed + 24 >= With.self.supplyTotal) {

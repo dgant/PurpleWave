@@ -75,7 +75,7 @@ class WorkerRushLiftoff extends Parallel {
   
   private def runAway(unit: FriendlyUnitInfo) {
     val intent = new Intention {
-      canAttack = false
+      canFight = false
       toTravel = Some(bestGroundPixel)
     }
     unit.agent.intend(this, intent)
@@ -83,7 +83,7 @@ class WorkerRushLiftoff extends Parallel {
   
   private def flyAway(unit: FriendlyUnitInfo) {
     val intent = new Intention {
-      canAttack = false
+      canFight = false
       canLiftoff = true
       toTravel = Some(bestAirPixel)
     }

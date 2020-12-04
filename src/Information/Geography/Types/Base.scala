@@ -17,6 +17,7 @@ class Base(val townHallTile: Tile)
   lazy val  townHallArea    : TileRectangle     = Protoss.Nexus.tileArea.add(townHallTile)
   lazy val  isStartLocation : Boolean           = With.geography.startLocations.contains(townHallTile)
   lazy val  isOurMain       : Boolean           = With.geography.ourMain == this
+  lazy val  tiles           : Set[Tile]         = zone.tiles.view.filter(t => t.tileDistanceSlow(heart) < With.geography.baseMaxRadiusTiles && ! zone.bases.view.filter(_.heart != heart).exists(_.heart.groundPixels(t) < heart.groundPixels(t))).toSet
   var       isNaturalOf     : Option[Base]      = None
   var       townHall        : Option[UnitInfo]  = None
   var       units           : Vector[UnitInfo]  = Vector.empty

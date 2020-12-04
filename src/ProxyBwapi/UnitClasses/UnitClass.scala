@@ -212,7 +212,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     else if (isZerg)    12
     else                0
   
-  lazy val unitsTrained: Array[UnitClass] = UnitClasses.all.filter(_.whatBuilds._1 == this).toArray
+  lazy val unitsTrained: Vector[UnitClass] = UnitClasses.all.filter(_.whatBuilds._1 == this).toVector
   
   lazy val trainsUnits        : Boolean = UnitClasses.all.exists(unit => unit.whatBuilds._1 == this)
   lazy val trainsAirUnits     : Boolean = UnitClasses.all.exists(unit => unit.whatBuilds._1 == this && unit.isFlyer)

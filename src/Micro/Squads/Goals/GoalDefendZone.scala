@@ -68,12 +68,12 @@ class GoalDefendZone extends SquadGoalBasic {
     }
   }
 
-  private val pointsOfInterest = new Cache[Array[Pixel]](() => {
+  private val pointsOfInterest = new Cache[Vector[Pixel]](() => {
     val output = (
       zone.bases.filter(_.owner.isUs).map(_.heart.pixelCenter)
         ++ zone.units.view.filter(u => u.isOurs && u.unitClass.isBuilding).map(_.pixelCenter).toVector
       ).take(10)
-    if (output.isEmpty) Array(zone.centroid.pixelCenter) else output
+    if (output.isEmpty) Vector(zone.centroid.pixelCenter) else output
   } // For performance
   )
 

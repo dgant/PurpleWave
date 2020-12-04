@@ -120,14 +120,14 @@ class BuildBuilding(val buildingClass: UnitClass) extends ProductionPlan {
           // 1. Recall the builder
           // 2. Wait for the order to take effect
           waitForBuilderToRecallUntil = Some(With.frame + 24)
-          builder.agent.intend(this, new Intention { toTravel = Some(desiredTile.get.pixelCenter); canAttack = false })
+          builder.agent.intend(this, new Intention { toTravel = Some(desiredTile.get.pixelCenter); canFight = false })
         } else {
           orderedTile = desiredTile
           builder.agent.intend(this, new Intention {
             toBuild     = if (currencyLock.satisfied) Some(buildingClass) else None
             toBuildTile = if (currencyLock.satisfied) orderedTile         else None
             toTravel    = Some(orderedTile.get.pixelCenter)
-            canAttack   = false
+            canFight   = false
           })
         }
         desiredTile.foreach(With.groundskeeper.reserve(this, _, buildingClass))
@@ -135,7 +135,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends ProductionPlan {
       else if (buildingClass.isTerran) {
         builder.agent.intend(this, new Intention {
           toFinish = building
-          canAttack = false
+          canFight = false
         })
       }
     }

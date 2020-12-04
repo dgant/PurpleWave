@@ -9,7 +9,6 @@ abstract class StarCraftMap {
   def matches: Boolean = nameStub.contains(With.mapId) || With.mapId.contains(nameStub)
   
   val mineralWalkingOkay: Boolean = true
-  val trustGroundDistance: Boolean = true
 }
 object Alchemist extends StarCraftMap
 object Arcadia extends StarCraftMap

@@ -17,7 +17,7 @@ class BattleProcessCluster extends BattleProcessState {
       With.battles.clustering.step()
     } else {
       With.battles.clustering.publish()
-      transitionTo(new BattleProcessSimulate)
+      transitionTo(new BattleProcessDivisions)
     }
   }
 }

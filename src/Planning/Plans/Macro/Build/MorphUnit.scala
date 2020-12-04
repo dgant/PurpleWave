@@ -61,7 +61,7 @@ class MorphUnit(val classToMorph: UnitClass) extends ProductionPlan {
         toTrain = Some(classToMorph)
         // TODO: Include behavior for morphing Guardians/Devourers
         canFlee = classToMorph == Zerg.Lurker
-        canAttack = classToMorph != Zerg.Lurker
+        canFight = classToMorph != Zerg.Lurker
       }))
     }
     // TODO: Send Hydras/Mutas somewhere smart soon before they morph based on currency projection

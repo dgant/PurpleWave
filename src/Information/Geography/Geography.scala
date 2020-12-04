@@ -13,6 +13,8 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 class Geography {
+  val baseMaxRadiusTiles = 50
+
   lazy val mapArea            : TileRectangle         = TileRectangle(Tile(0, 0), Tile(With.mapTileWidth, With.mapTileHeight))
   lazy val allTiles           : Array[Tile]           = mapArea.tiles.indices.map(new Tile(_)).toArray
   lazy val startBases         : Vector[Base]          = bases.filter(_.isStartLocation)
@@ -25,6 +27,7 @@ class Geography {
   def ourNatural              : Base                  = ourNaturalCache()
   def ourZones                : Vector[Zone]          = ourZonesCache()
   def ourBases                : Vector[Base]          = ourBasesCache()
+  def ourUpcomingBases        : Vector[Base]          = ourUpcomingBasesCache()
   def ourSettlements          : Vector[Base]          = ourSettlementsCache()
   def ourBasesAndSettlements  : Vector[Base]          = (ourBases ++ ourSettlements).distinct
   def ourTownHalls            : Vector[UnitInfo]      = ourTownHallsCache()
@@ -36,6 +39,7 @@ class Geography {
   
   private val ourZonesCache           = new Cache(() => zones.filter(_.owner.isUs))
   private val ourBasesCache           = new Cache(() => bases.filter(_.owner.isUs))
+  private val ourUpcomingBasesCache   = new Cache(() => getUpcomingBases)
   private val ourSettlementsCache     = new Cache(() => getSettlements)
   private val enemyZonesCache         = new Cache(() => zones.filter(_.owner.isEnemy))
   private val enemyBasesCache         = new Cache(() => bases.filter(_.owner.isEnemy))
@@ -48,10 +52,9 @@ class Geography {
       .getOrElse(bases.minBy(_.townHallTile.groundPixels(ourMain.townHallTile)))))
   
   def zoneByTile(tile: Tile): Zone = if (tile.valid) zoneByTileCacheValid(tile.i) else zoneByTileCacheInvalid(tile)
-  def baseByTile(tile: Tile): Option[Base] = if (tile.valid) baseByTileCacheValid(tile.i) else getBaseForTile(tile)
+  def baseByTile(tile: Tile): Option[Base] = if (tile.valid) baseByTileCacheValid(tile.i) else None
 
-  private lazy val zoneByTileCacheValid = allTiles.map(tile =>
-    zones.find(_.tiles.contains(tile)).getOrElse(getZoneForTile(tile)))
+  private lazy val zoneByTileCacheValid = allTiles.map(tile => zones.find(_.tiles.contains(tile)).getOrElse(getZoneForTile(tile)))
   private lazy val baseByTileCacheValid = allTiles.map(getBaseForTile)
 
   private val zoneByTileCacheInvalid = new mutable.HashMap[Tile, Zone] {
@@ -75,8 +78,15 @@ class Geography {
           .groupBy(x => x))(_._2.size)
       .map(_._1)
       .getOrElse(zones.minBy(_.centroid.tileDistanceSquared(tile)))
-  private def getBaseForTile(tile: Tile): Option[Base] = ByOption.minBy(tile.zone.bases)(_.heart.tileDistanceSquared(tile))
+  private def getBaseForTile(tile: Tile): Option[Base] = tile.zone.bases.find(_.tiles.contains(tile))
 
+  private def getUpcomingBases: Vector[Base] = With.units.ours
+    .view
+    .filter(_.agent.toBuild.exists(_.isTownHall))
+    .flatMap(_.agent.toBuildTile)
+    .flatMap(_.base)
+    .filter(_.townHall.isEmpty)
+    .toVector
 
   private def getSettlements: Vector[Base] = (Vector.empty
   ++ With.geography.bases.view.filter(_.units.exists(u =>

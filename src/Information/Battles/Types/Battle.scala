@@ -14,8 +14,8 @@ abstract class Battle(val us: Team, val enemy: Team) {
   def focus: Pixel = PurpleMath.centroid(teams.map(_.vanguard))
 
   def updateFoci(): Unit = {
-     teams.foreach(group => {
-       val hasGround   = group.units.exists( ! _.flying)
+    teams.foreach(group => {
+      val hasGround   = group.units.exists( ! _.flying)
       val centroidAir = PurpleMath.centroid(group.units.view.map(_.pixelCenter))
       val centroidGround = if (hasGround) PurpleMath.centroid(group.units.view.filterNot(_.flying).map(_.pixelCenter)) else group.centroidAir.nearestWalkableTile.pixelCenter
       group.centroidAir     = PurpleMath.centroid(group.units.view.map(_.pixelCenter))

@@ -332,4 +332,6 @@ object PurpleMath {
   }
 
   @inline final def toInt(value: Boolean): Int = if (value) 1 else 0
+
+  @inline final def toSign(value: Boolean): Int = if (value) 1 else -1
 }

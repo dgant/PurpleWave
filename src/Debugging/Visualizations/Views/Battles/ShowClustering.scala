@@ -17,8 +17,8 @@ object ShowClustering extends View {
     val x1 = 325
     val rows0 = With.battles.local.map(_.us.units)
     val rows1 = With.battles.local.map(_.enemy.units)
-    DrawScreen.column(x0, y, rows0.map(renderScreenUnits))
-    DrawScreen.column(x1, y, rows1.map(renderScreenUnits))
+    DrawScreen.column(x0, y, "Battle, friendly: " +: rows0.map(renderScreenUnits))
+    DrawScreen.column(x1, y, "Battle, enemy: "    +: rows1.map(renderScreenUnits))
   }
   
   private def renderScreenUnits(units: Seq[UnitInfo]): String = {

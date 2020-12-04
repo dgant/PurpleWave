@@ -15,7 +15,7 @@ import Utilities.ByOption
 
 object Paradrop extends Action {
 
-  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.transport.isDefined && unit.isAny(Protoss.Reaver, Protoss.HighTemplar)
+  override def allowed(unit: FriendlyUnitInfo): Boolean = false && unit.transport.isDefined && unit.isAny(Protoss.Reaver, Protoss.HighTemplar)
 
   def findFiringPosition(reaver: FriendlyUnitInfo, target: UnitInfo): Tile = {
     val firingDistance  = (reaver.effectiveRangePixels + Math.min(reaver.effectiveRangePixels, target.effectiveRangePixels)) / 2

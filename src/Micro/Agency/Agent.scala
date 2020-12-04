@@ -149,7 +149,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     toRepair      = intent.toRepair
     toBoard       = intent.toBoard.orElse(toBoard)
     toNuke        = intent.toNuke
-    canFight      = intent.canAttack
+    canFight      = intent.canFight
     canFlee       = intent.canFlee
     canMeld       = intent.canMeld
     canLiftoff    = intent.canLiftoff

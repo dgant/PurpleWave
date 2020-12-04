@@ -70,7 +70,7 @@ class Base(val townHallTile: Tile)
       output
     }
   }
-  private def resourcePathTiles(resource: UnitInfo): Seq[Tile] = {
+  private def resourcePathTiles(resource: UnitInfo): Iterable[Tile] = {
     // Draw a shortest-path line from each resource to the town hall.
     // Where multiple equally-short lines are available, take the one closest to the heart.
     // Count all tiles in that line.
@@ -83,7 +83,7 @@ class Base(val townHallTile: Tile)
     val route           = PixelRay(from.pixelCenter, to.pixelCenter)
     route.tilesIntersected
   }
-  lazy val resourcePaths: Map[UnitInfo, Seq[Tile]] = {
+  lazy val resourcePaths: Map[UnitInfo, Iterable[Tile]] = {
     resources.map(resource => (resource, resourcePathTiles(resource))).toMap
   }
   lazy val resourcePathTiles: Set[Tile] = {

@@ -15,6 +15,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, TakeN}
 
 import scala.collection.SeqView
+import scala.util.control.Breaks
 
 object MicroPathing {
 
@@ -51,7 +52,7 @@ object MicroPathing {
     val pathWaypoint = path.flatMap(_.steps.find(step => step.from != unit.zone || unit.pixelDistanceCenter(step.edge.pixelCenter) > step.edge.radiusPixels)).map(_.edge.pixelCenter)
     val goalWaypoint = pathWaypoint.getOrElse(goal)
     val ring         = MicroPathing.getCircleTowards(unit.pixelCenter, goalWaypoint)
-    val ringFiltered = ring.filter(t => PixelRay(unit.pixelCenter, t).tilesIntersected.drop(1).forall(_.walkable))
+    val ringFiltered = ring.filter(t => PixelRay(unit.pixelCenter, t).tilesIntersected.view.drop(1).forall(_.walkable))
     val ringWaypoint = ByOption.minBy(ringFiltered)(goal.groundPixels)
     lineWaypoint.orElse(ringWaypoint).orElse(pathWaypoint).getOrElse(goal)
   }
@@ -60,7 +61,7 @@ object MicroPathing {
     if (path.pathExists) Some(path.tiles.get.take(waypointDistanceTiles).last.pixelCenter) else None
   }
 
-  private val rays = 256
+  private val rays = 8 //256
   private val rayRadians = (0 to rays).map(_ * 2 * Math.PI / rays - Math.PI).toVector.sortBy(Math.abs)
   private val rayCosines = rayRadians.map(Math.cos)
   private val terminusPixelsMinimum = waypointDistancePixels * 3 / 4
@@ -162,17 +163,14 @@ object MicroPathing {
   def getPushRadians(unit: FriendlyUnitInfo): Option[Double] = getPushRadians(getPushForces(unit))
 
   def castRay(from: Pixel, lengthPixels: Double, radians: Double, flying: Boolean): Pixel = {
-    val ray = new PixelRay(from, lengthPixels = lengthPixels, radians = radians)
-    val tiles = ray.tilesIntersected
     var output = from
-    var i = 0
-    while (i < tiles.length) {
-      val tile = tiles(i)
-      if (tile.valid && (flying || tile.walkableUnchecked)) {
-        output = tile.pixelCenter
-        i += 1
-      } else i = tiles.length
-    }
+    new PixelRay(from, lengthPixels = lengthPixels, radians = radians)
+      .tilesIntersected
+      .foreach(tile => {
+        if (tile.valid && (flying || tile.walkableUnchecked)) {
+          output = tile.pixelCenter
+        } else Breaks.break
+      })
     output
   }
 }

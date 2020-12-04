@@ -13,16 +13,16 @@ case class PixelRay(from: Pixel, to: Pixel) {
   lazy val length: Double = from.pixelDistance(to)
   lazy val toForce: Force = Force(to.x - from.x, to.y - from.y)
   
-  def tilesIntersected: Array[Tile] = {
+  def tilesIntersected: Iterable[Tile] = {
     if (to.x == from.x) {
       val direction = PurpleMath.signum(to.y - from.y)
       if (direction == 0) return Array(to.tileIncluding)
-      return (from.y / 32 to to.y / 32 by direction).map(tileY => Tile(to.x/32, tileY)).toArray
+      return (from.y / 32 to to.y / 32 by direction).view.map(tileY => Tile(to.x/32, tileY))
     }
     if (to.y == from.y) {
       val direction = PurpleMath.signum(to.x - from.x)
       if (direction == 0) return Array(to.tileIncluding)
-      return (from.x / 32 to to.x / 32 by direction).map(tileX => Tile(tileX, to.y/32)).toArray
+      return (from.x / 32 to to.x / 32 by direction).view.map(tileX => Tile(tileX, to.y/32))
     }
     
     val gridSize    = 32
@@ -53,7 +53,6 @@ case class PixelRay(from: Pixel, to: Pixel) {
         }
       }
     }
-    
     output
   }
 }

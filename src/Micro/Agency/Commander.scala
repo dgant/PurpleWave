@@ -119,7 +119,12 @@ class Commander {
         || (target.isFriendly && unit.is(Protoss.Carrier))) // Carrier warmup; spam attack
       
       if (shouldOrder) {
-        if ( ! unit.flying && ! unit.unitClass.floats && unit.matchups.targetsInRange.size == 1 && unit.matchups.targetsInRange.head == target) {
+        if ( ! unit.flying
+          && ! unit.unitClass.floats
+          && unit.matchups.targetsInRange.size == 1
+          && unit.matchups.targetsInRange.head == target
+          // Because Reavers use BW's internal ground distance we can't be sure the target is in range
+          && ! unit.is(Protoss.Reaver)) {
           unit.baseUnit.holdPosition()
         } else {
           unit.baseUnit.attack(target.baseUnit)

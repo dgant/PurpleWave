@@ -1,19 +1,14 @@
 package Mathematics.Points
 
-import Mathematics.Physics.Force
 import Mathematics.PurpleMath
 
-case class PixelRay(from: Pixel, to: Pixel) {
-  
-  def this(from: Pixel, lengthPixels: Double, radians: Double) {
-    this(from, from.radiateRadians(radians, lengthPixels))
+object PixelRay {
+
+  @inline final def apply(from: Pixel, lengthPixels: Double, radians: Double): Iterable[Tile] = {
+    apply(from, from.radiateRadians(radians, lengthPixels))
   }
   
-  lazy val radians: Double = PurpleMath.atan2(to.y - from.y, to.x - from.x)
-  lazy val length: Double = from.pixelDistance(to)
-  lazy val toForce: Force = Force(to.x - from.x, to.y - from.y)
-  
-  def tilesIntersected: Iterable[Tile] = {
+  @inline final def apply(from: Pixel, to: Pixel): Iterable[Tile] = {
     if (to.x == from.x) {
       val direction = PurpleMath.signum(to.y - from.y)
       if (direction == 0) return Array(to.tileIncluding)

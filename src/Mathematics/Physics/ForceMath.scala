@@ -7,7 +7,9 @@ import Mathematics.PurpleMath
 object ForceMath {
 
   def sumAll(forces: Force*): Force = sum(forces)
-  def sum(forces: Traversable[Force]): Force = forces.foldLeft(new Force)(_ + _)
+  def sum(forces: Traversable[Force]): Force = Force(
+    forces.view.map(_.x).sum,
+    forces.view.map(_.y).sum)
   
   def fromPixels(from: Pixel, to: Pixel, magnitude: Double = 1.0): Force = if (from == to) new Force() else fromRadians(from.radiansTo(to), magnitude)
   

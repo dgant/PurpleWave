@@ -11,7 +11,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 class Simulation(val prediction: PredictionLocal) {
   
-  private def buildSimulacra(team: Team) = if (With.blackboard.mcrs()) Vector.empty else team.units.filter(legalForSimulation).map(new Simulacrum(this, _))
+  private def buildSimulacra(team: Team) = if (With.blackboard.mcrs()) Vector.empty else team.units.view.filter(legalForSimulation).map(new Simulacrum(this, _)).toVector
   private def legalForSimulation(unit: UnitInfo): Boolean = (
     unit.complete&& ! unit.unitClass.isSpell
     && ! unit.invincible          // No stasised units

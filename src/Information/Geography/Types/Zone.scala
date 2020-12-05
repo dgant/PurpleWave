@@ -58,8 +58,11 @@ class Zone(
 
   // Cached information for pathfinding
   var lastPathfindId: Long = Long.MinValue
-  
-  override def toString: String = (
+
+  // Cache the hashCode
+  final override val hashCode: Int = super.hashCode
+
+  final override def toString: String = (
     name
     + (if (bases.nonEmpty) " (" + bases.map(b => b.name + " - " + b.description).mkString(", ") + ")" else "")
     + " "

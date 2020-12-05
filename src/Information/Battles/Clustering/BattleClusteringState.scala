@@ -11,7 +11,7 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-class BattleClusteringState(seedUnits: Vector[UnitInfo]) {
+class BattleClusteringState(seedUnits: Set[UnitInfo]) {
 
   val unitLinks = new mutable.HashMap[UnitInfo, UnitInfo]
   val horizon: mutable.Stack[UnitInfo] = mutable.Stack[UnitInfo]()

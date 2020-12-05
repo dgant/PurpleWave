@@ -13,8 +13,8 @@ class BattleClustering {
   var lastClusterCompletion = 0
   val runtimes = new mutable.Queue[Int]
   
-  private var clusterInProgress:  BattleClusteringState = new BattleClusteringState(Vector.empty)
-  private var clusterComplete:    BattleClusteringState = new BattleClusteringState(Vector.empty)
+  private var clusterInProgress:  BattleClusteringState = new BattleClusteringState(Set.empty)
+  private var clusterComplete:    BattleClusteringState = new BattleClusteringState(Set.empty)
 
   val exploredFriendly = new GridDisposableBoolean
   val exploredEnemy    = new GridDisposableBoolean
@@ -24,7 +24,7 @@ class BattleClustering {
   def isComplete: Boolean = clusterInProgress.isComplete
 
   def reset() {
-    val nextUnits = With.units.playerOwned.view.filter(BattleClassificationFilters.isEligibleLocal).toVector
+    val nextUnits = With.units.playerOwned.view.filter(BattleClassificationFilters.isEligibleLocal).toSet
     clusterInProgress = new BattleClusteringState(nextUnits)
 
     With.units.playerOwned.foreach(_.clusteringEnabled = false)

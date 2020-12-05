@@ -15,7 +15,6 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, TakeN}
 
 import scala.collection.SeqView
-import scala.util.control.Breaks
 
 object MicroPathing {
 
@@ -41,19 +40,18 @@ object MicroPathing {
   val waypointDistancePixels: Int = 32 * waypointDistanceTiles
   private val ringDistance = waypointDistanceTiles * waypointDistanceTiles * 32 * 32
   def getCircleTowards(from: Pixel, to: Pixel): SeqView[Pixel, Seq[_]] = {
-    Circle.points(5).view.map(p => from.add(p.x * 32, p.y * 32))
+    Circle.points(5).view.map(p => from.add(p.x * 32, p.y * 32)).filter(_.valid)
   }
 
   def getWaypointToPixel(unit: UnitInfo, goal: Pixel): Pixel = {
     if (unit.flying) return goal
-    val line         = PixelRay(unit.pixelCenter, goal)
-    val lineWaypoint = if (line.tilesIntersected.forall(_.walkable)) Some(unit.pixelCenter.project(goal, Math.min(unit.pixelDistanceCenter(goal), waypointDistancePixels))) else None
-    val path         = With.paths.zonePath(unit.pixelCenter.zone, goal.zone)
-    val pathWaypoint = path.flatMap(_.steps.find(step => step.from != unit.zone || unit.pixelDistanceCenter(step.edge.pixelCenter) > step.edge.radiusPixels)).map(_.edge.pixelCenter)
-    val goalWaypoint = pathWaypoint.getOrElse(goal)
-    val ring         = MicroPathing.getCircleTowards(unit.pixelCenter, goalWaypoint)
-    val ringFiltered = ring.filter(t => PixelRay(unit.pixelCenter, t).tilesIntersected.view.drop(1).forall(_.walkable))
-    val ringWaypoint = ByOption.minBy(ringFiltered)(goal.groundPixels)
+    val lineWaypoint      = if (PixelRay(unit.pixelCenter, goal).forall(_.walkable)) Some(unit.pixelCenter.project(goal, Math.min(unit.pixelDistanceCenter(goal), waypointDistancePixels))) else None
+    lazy val path         = With.paths.zonePath(unit.pixelCenter.zone, goal.zone)
+    lazy val pathWaypoint = path.flatMap(_.steps.find(step => step.from != unit.zone || unit.pixelDistanceCenter(step.edge.pixelCenter) > step.edge.radiusPixels)).map(_.edge.pixelCenter)
+    lazy val goalWaypoint = pathWaypoint.getOrElse(goal)
+    lazy val ring         = MicroPathing.getCircleTowards(unit.pixelCenter, goalWaypoint)
+    lazy val ringFiltered = ring.filter(t => t.walkable && PixelRay(unit.pixelCenter, t).view.drop(1).forall(_.walkable))
+    lazy val ringWaypoint = ByOption.minBy(ringFiltered)(goal.groundPixels)
     lineWaypoint.orElse(ringWaypoint).orElse(pathWaypoint).getOrElse(goal)
   }
 
@@ -164,13 +162,14 @@ object MicroPathing {
 
   def castRay(from: Pixel, lengthPixels: Double, radians: Double, flying: Boolean): Pixel = {
     var output = from
-    new PixelRay(from, lengthPixels = lengthPixels, radians = radians)
-      .tilesIntersected
-      .foreach(tile => {
+    var proceed = true
+    PixelRay(from, lengthPixels = lengthPixels, radians = radians).foreach(tile =>
+      if (proceed) {
         if (tile.valid && (flying || tile.walkableUnchecked)) {
           output = tile.pixelCenter
-        } else Breaks.break
-      })
+        } else proceed = false
+      }
+    )
     output
   }
 }

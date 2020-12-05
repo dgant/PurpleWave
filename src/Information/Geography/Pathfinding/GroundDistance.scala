@@ -45,10 +45,12 @@ trait GroundDistance {
   }
 
   protected def groundTiles(origin: Tile, destination: Tile): Long = {
+    if ( ! origin.valid) return impossiblyLargeDistance
+    if ( ! destination.valid) return impossiblyLargeDistance
     ByOption
-      .min(destination.zone.edges.map(edge =>
-        edge.distanceGrid.get(destination)
-        + edge.distanceGrid.get(origin).toLong))
+      .min(destination.zone.edges.view.map(edge =>
+        edge.distanceGrid.getUnchecked(destination.i)
+        + edge.distanceGrid.getUnchecked(origin.i).toLong))
       .getOrElse(impossiblyLargeDistance)
   }
 }

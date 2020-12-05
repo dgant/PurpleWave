@@ -23,7 +23,7 @@ class LocalBattleMetrics(simulation: Simulation, previous: Option[LocalBattleMet
   val localValueLostRatio             : Double = PurpleMath.nanToZero(2 * localValueLostEnemy / (localValueLostUs + localValueLostEnemy) - 1)
   val localValueLostUsHere            : Double = localValueLostUs - previous.map(_.localValueLostUs).getOrElse(0.0)
   val localValueLostEnemyHere         : Double = localValueLostEnemy - previous.map(_.localValueLostEnemy).getOrElse(0.0)
-  val localValueDecisiveness          : Double = PurpleMath.nanToZero((localValueLostUsHere + localValueLostEnemyHere) / (localValueTotalUs + localValueTotalEnemy))
+  val localValueDecisiveness          : Double = Math.max(PurpleMath.nanToZero(localValueLostUsHere / localValueTotalUs), PurpleMath.nanToZero(localValueLostEnemyHere / localValueTotalEnemy))
   val localHealthTotalUs              : Double = simulation.unitsOurs.view.map(unitHealthMax).sum
   val localHealthTotalEnemy           : Double = simulation.unitsEnemy.view.map(unitHealthMax).sum
   val localHealthLeftUs               : Double = simulation.unitsOurs.view.map(unitHealthLeft).sum
@@ -33,7 +33,7 @@ class LocalBattleMetrics(simulation: Simulation, previous: Option[LocalBattleMet
   val localHealthLostRatio            : Double = PurpleMath.nanToZero(2 * localHealthLostEnemy / (localHealthLostUs + localHealthLostEnemy) - 1)
   val localHealthLostUsHere           : Double = localHealthLostUs - previous.map(_.localHealthLostUs).getOrElse(0.0)
   val localHealthLostEnemyHere        : Double = localHealthLostEnemy - previous.map(_.localHealthLostEnemy).getOrElse(0.0)
-  val localHealthDecisiveness         : Double = PurpleMath.nanToZero((localHealthLostUsHere + localHealthLostEnemyHere) / (localHealthTotalUs + localHealthTotalEnemy))
+  val localHealthDecisiveness         : Double = Math.max(PurpleMath.nanToZero(localHealthLostUsHere / localHealthTotalUs), PurpleMath.nanToZero(localHealthLostEnemyHere / localHealthTotalEnemy))
   val localHealthValueTotalUs         : Double = simulation.unitsOurs.view.map(unitHealthValueMax).sum
   val localHealthValueTotalEnemy      : Double = simulation.unitsEnemy.view.map(unitHealthValueMax).sum
   val localHealthValueLeftUs          : Double = simulation.unitsOurs.view.map(unitHealthValueLeft).sum
@@ -42,7 +42,7 @@ class LocalBattleMetrics(simulation: Simulation, previous: Option[LocalBattleMet
   val localHealthValueLostEnemy       : Double = localHealthValueTotalEnemy - localHealthValueLeftEnemy
   val localHealthValueLostUsHere      : Double = localHealthValueLostUs - previous.map(_.localHealthValueLostUs).getOrElse(0.0)
   val localHealthValueLostEnemyHere   : Double = localHealthValueLostEnemy - previous.map(_.localHealthValueLostEnemy).getOrElse(0.0)
-  val localHealthValueDecisiveness    : Double = PurpleMath.nanToZero((localHealthValueLostUsHere + localHealthValueLostEnemyHere) / (localHealthValueTotalUs + localHealthValueTotalEnemy))
+  val localHealthValueDecisiveness    : Double = Math.max(PurpleMath.nanToZero(localHealthValueLostUsHere / localHealthValueTotalUs), PurpleMath.nanToZero(localHealthValueLostEnemyHere / localHealthValueTotalEnemy))
   val localHealthValueLostRatio       : Double = PurpleMath.nanToZero(2 * localHealthValueLostEnemy / (localHealthValueLostUs + localHealthValueLostEnemy) - 1)
   val ratioLocalValueLostUs           : Double = PurpleMath.nanToZero(localValueLostUs / localValueTotalUs)
   val ratioLocalValueLostEnemy        : Double = PurpleMath.nanToZero(localValueLostEnemy / localValueTotalEnemy)

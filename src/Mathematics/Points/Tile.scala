@@ -141,26 +141,30 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     With.paths.groundPixels(pixelCenter, other.pixelCenter)
   }
   @inline final def altitudeBonus: Double = {
-    With.grids.altitudeBonus.get(this)
+    if (valid) altitudeBonusUnchecked else With.grids.altitudeBonus.defaultValue
+  }
+  @inline final def altitudeBonusUnchecked: Double = {
+    With.grids.altitudeBonus.getUnchecked(i)
   }
   @inline final def toRectangle: TileRectangle = {
     TileRectangle(this, this.add(1, 1))
   }
   @inline final def walkable: Boolean = {
-    With.grids.walkable.get(this)
+    valid && walkableUnchecked
   }
   @inline final def walkableUnchecked: Boolean = {
     With.grids.walkable.getUnchecked(i)
   }
   @inline final def buildable: Boolean = {
-    With.grids.buildable.get(this)
+    valid && buildableUnchecked
+  }
+  @inline final def buildableUnchecked: Boolean = {
+    With.grids.buildable.getUnchecked(i)
   }
   @inline final def bwapiVisible: Boolean = {
     With.game.isVisible(x, y)
   }
   @inline final def nearestWalkableTile: Tile = {
-    if (valid && With.grids.walkable.getUnchecked(i)) return this
-    val output = Spiral.points(16).view.map(add).find(tile => tile.valid && With.grids.walkable.getUnchecked(tile.i)).getOrElse(this)
-    output
+    if (walkable) this else Spiral.points(16).view.map(add).find(_.walkable).getOrElse(this)
   }
 }

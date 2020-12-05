@@ -16,7 +16,7 @@ case class Force(x: Double, y: Double) {
   @inline def /(value: Double)  : Force = Force(x / value, y / value)
 
   @inline def degrees: Double = radians * 180 / Math.PI
-  @inline def radians: Double = PurpleMath.atan2(y, x)
+  @inline def radians: Double = PurpleMath.fastAtan2(y, x)
   @inline def lengthSquared: Double = x * x + y * y
   @inline def lengthSlow: Double = Math.sqrt(lengthSquared)
   @inline def lengthFast: Double = PurpleMath.broodWarDistanceDouble(0.0, 0.0, x, y)

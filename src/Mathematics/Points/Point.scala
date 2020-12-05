@@ -7,7 +7,7 @@ case class Point(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     radiansTo(other) / radiansOverDegrees
   }
   @inline final def radiansTo(other: Point): Double = {
-    PurpleMath.atan2(other.y - y, other.x - x)
+    PurpleMath.fastAtan2(other.y - y, other.x - x)
   }
   @inline final def distanceSquared(other: Point): Double = {
     val dx = x - other.x

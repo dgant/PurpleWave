@@ -535,7 +535,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   )
 
   @inline final def canBurrow: Boolean = canDoAnything && (is(Zerg.Lurker) || (player.hasTech(Zerg.Burrow) && isAny(Zerg.Drone, Zerg.Zergling, Zerg.Hydralisk, Zerg.Defiler)))
-  
+
   // Stupid, but helped BWMirror performance due to costliness of comparing unit classes with BWMirror limitations
   // Can probably be replaced by normal is() calls now or just direct comparisons
   protected class CacheIs(unitClass: UnitClass) extends Cache(() => is(unitClass))

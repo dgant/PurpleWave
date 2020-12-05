@@ -8,7 +8,8 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
 object PurpleMath {
-  
+
+  val halfPI: Double = Math.PI / 2
   val twoPI: Double = 2 * Math.PI
   val sqrt2: Double = Math.sqrt(2)
   val sqrt2f: Float = sqrt2.toFloat
@@ -214,7 +215,23 @@ object PurpleMath {
     x / (1.0 + Math.abs(x))
   }
 
-  @inline final def atan2(y: Double, x: Double): Double = {
+  // Via https://www.dsprelated.com/showarticle/1052.php
+  @inline final def fastAtan(r: Double): Double = (0.97239411 - 0.19194795 * r * r) * r
+
+  // Via https://www.dsprelated.com/showarticle/1052.php
+  @inline final def fastAtan2(y: Double, x: Double): Double = {
+    if (x == 0) {
+      if (y > 0) halfPI else - halfPI
+    } else if (x * x > y * y) {
+      val a = fastAtan(y / x)
+      if (x > 0) a else if (y > 0) a + Math.PI else a - Math.PI
+    } else {
+      val a = fastAtan(x / y)
+      if (y > 0) halfPI - a else - halfPI - a
+    }
+  }
+
+  @inline final def slowAtan2(y: Double, x: Double): Double = {
    normalize0To2Pi(Math.atan2(y, x))
   }
 

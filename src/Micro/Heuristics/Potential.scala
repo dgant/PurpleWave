@@ -161,7 +161,7 @@ object Potential {
   
   def avoidCollision(unit: FriendlyUnitInfo): Force = {
     if (unit.flying) return new Force
-    val repulsions = unit.immediateOthers.filter(o => ! o.flying && ! o.unitClass.isBuilding).map(collisionRepulsion(unit, _))
+    val repulsions = unit.immediateOthers.view.filter(o => ! o.flying && ! o.unitClass.isBuilding).map(collisionRepulsion(unit, _))
     // Is sum or max best?
     // Sum:
     val output = ForceMath.sum(repulsions).clipMin(Math.min(1.0, ByOption.max(repulsions.view.map(_.lengthFast)).getOrElse(0.0)))

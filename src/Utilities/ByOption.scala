@@ -3,15 +3,15 @@ package Utilities
 
 object ByOption {
   
-  def min[A](sequence: TraversableOnce[A])(implicit cmp: scala.Ordering[A]): Option[A] = {
+  @inline final def min[A](sequence: TraversableOnce[A])(implicit cmp: scala.Ordering[A]): Option[A] = {
     if (sequence.isEmpty) None else Some(sequence.min(cmp))
   }
   
-  def max[A](sequence: TraversableOnce[A])(implicit cmp: scala.Ordering[A]): Option[A] = {
+  @inline final def max[A](sequence: TraversableOnce[A])(implicit cmp: scala.Ordering[A]): Option[A] = {
     if (sequence.isEmpty) None else Some(sequence.max(cmp))
   }
   
-  def mean(sequence: TraversableOnce[Double]): Option[Double] = {
+  @inline final def mean(sequence: TraversableOnce[Double]): Option[Double] = {
     if (sequence.isEmpty)
       None
     else {
@@ -26,7 +26,7 @@ object ByOption {
   }
   
   // Root mean square
-  def rms(sequence: TraversableOnce[Double]): Option[Double] = {
+  @inline final def rms(sequence: TraversableOnce[Double]): Option[Double] = {
     if (sequence.isEmpty)
       None
     else {
@@ -42,11 +42,11 @@ object ByOption {
     }
   }
   
-  def minBy[A, B: Ordering](sequence: TraversableOnce[A])(feature: A => B): Option[A] = {
+  @inline final def minBy[A, B: Ordering](sequence: TraversableOnce[A])(feature: A => B): Option[A] = {
     sequence.reduceOption(Ordering.by(feature).min)
   }
   
-  def maxBy[A, B: Ordering](sequence: TraversableOnce[A])(feature: A => B): Option[A] = {
+  @inline final def maxBy[A, B: Ordering](sequence: TraversableOnce[A])(feature: A => B): Option[A] = {
     sequence.reduceOption(Ordering.by(feature).max)
   }
 }

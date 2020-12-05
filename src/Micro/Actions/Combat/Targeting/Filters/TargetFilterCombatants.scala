@@ -6,7 +6,6 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 object TargetFilterCombatants extends TargetFilter {
   
   // If we're fighting, target units that threaten to fight back
-  //
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
     
     if (actor.battle.forall(_.predictionAttack.deathsUs == 0)) return true

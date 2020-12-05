@@ -16,13 +16,13 @@ class Edge(choke: Chokepoint) {
   
   lazy val pixelCenter  : Pixel = new Pixel(choke.getCenter)
   lazy val radiusPixels : Double = choke.getWidth / 2
-  lazy val tiles        : Vector[Tile] = PixelRay(sidePixels.head, sidePixels.last).tilesIntersected.toVector
+  lazy val tiles        : Vector[Tile] = PixelRay(sidePixels.head, sidePixels.last).toVector
   lazy val sidePixels   : Seq[Pixel] = Vector(new Pixel(choke.getSides.getLeft), new Pixel(choke.getSides.getRight))
   lazy val direction    : Direction = new Direction(sidePixels.head, sidePixels.last)
   lazy val endPixels    : Vector[Pixel] = Vector(-1, 1)
     .map(m => pixelCenter
       .radiateRadians(
-        PurpleMath.atan2(
+        PurpleMath.slowAtan2(
           sidePixels(0).y - sidePixels(1).y,
           sidePixels(0).x - sidePixels(1).x)
         + m * Math.PI / 2,

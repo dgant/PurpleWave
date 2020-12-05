@@ -81,7 +81,7 @@ class Base(val townHallTile: Tile)
     val from            = resourceTiles.filter(hallDistanceSquared(_) <= bestDistance).minBy(_.tileDistanceSquared(heart))
     val to              = townHallArea.tiles.minBy(_.tileDistanceSquared(from))
     val route           = PixelRay(from.pixelCenter, to.pixelCenter)
-    route.tilesIntersected
+    route
   }
   lazy val resourcePaths: Map[UnitInfo, Iterable[Tile]] = {
     resources.map(resource => (resource, resourcePathTiles(resource))).toMap

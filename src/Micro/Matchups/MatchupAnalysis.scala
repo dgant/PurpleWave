@@ -41,7 +41,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val nearestArbiter         : Option[UnitInfo]    = ByOption.minBy(allies.view.filter(_.is(Protoss.Arbiter)))(_.pixelDistanceSquared(me))
   lazy val allyTemplarCount       : Int                 = allies.count(_.is(Protoss.HighTemplar))
 
-  def isCatcher(catcher: UnitInfo): Boolean = {
+  def canCatchMe(catcher: UnitInfo): Boolean = {
     if (catcher.unitClass.isWorker) return false
     lazy val catcherSpeed = Math.max(catcher.topSpeed, catcher.friendly.flatMap(_.transport.map(_.topSpeed)).getOrElse(0.0))
     lazy val catcherFlying = catcher.flying || catcher.friendly.exists(_.agent.ride.exists(_.flying)) && ! me.flying
@@ -59,7 +59,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
     output
   }
   lazy val busyForCatching  : Boolean           = me.gathering || me.constructing || me.repairing || ! me.canMove || BlockConstruction.buildOrders.contains(me.order)
-  lazy val catchers         : Vector[UnitInfo]  = threats.filter(isCatcher)
+  lazy val catchers         : Vector[UnitInfo]  = threats.filter(canCatchMe)
   
   private def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = {
     if (shooter.canAttack(victim)) return true

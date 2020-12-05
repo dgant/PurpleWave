@@ -20,13 +20,18 @@ object TargetFilterFutility extends TargetFilter {
       return true
     }
 
+    // This is a pretty expensive filter; avoid using it if possible
+    if (actor.matchups.allies.size > 12 || (With.frame > GameTime(0, 12)() && With.reaction.agencyAverage > 6)) {
+      return true
+    }
+
     lazy val atOurWorkers = target.base.exists(_.owner.isUs) && target.matchups.targetsInRange.exists(_.unitClass.isWorker)
     lazy val alliesAssisting = target.matchups.catchers.exists(ally =>
       ally != actor
       && (ally.topSpeed >= target.topSpeed || ally.pixelRangeAgainst(target) >= actor.pixelRangeAgainst(target))
       && ally.framesBeforeAttacking(target) <= actor.framesBeforeAttacking(target))
     
-    lazy val targetCatchable  = target.battle.isEmpty || target.matchups.catchers.contains(actor) || alliesAssisting
+    lazy val targetCatchable = target.battle.isEmpty || target.matchups.catchers.contains(actor) || alliesAssisting
     lazy val targetReachable  = (
       target.visible
       || actor.flying

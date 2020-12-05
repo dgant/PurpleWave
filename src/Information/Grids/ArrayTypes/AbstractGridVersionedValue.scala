@@ -12,7 +12,7 @@ abstract class AbstractGridVersionedValue[T] extends AbstractGridArray[T] {
   }
 
   @inline final override def getUnchecked(i: Int): T = {
-    if (framestamps.isSet(i)) values(i) else defaultValue
+    if (framestamps.isSetUnchecked(i)) values(i) else defaultValue
   }
 
   @inline final override def set(i: Int, value: T): Unit = {

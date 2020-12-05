@@ -37,16 +37,13 @@ object Target extends {
     attacker.matchups.targets.view.filter(target => filters.forall(_.legal(attacker, target)))
   }
 
-  def preferred(attacker: FriendlyUnitInfo, required: TargetFilter*): Seq[UnitInfo] = {
-    val filtersPreferred = TargetFilterGroups.filtersPreferred
+  def preferred(attacker: FriendlyUnitInfo, required: TargetFilter*): Iterable[UnitInfo] = {
+    val filtersPreferred = TargetFilterGroups.filtersPreferred.filter(_.appliesTo(attacker))
     val legalTargets = legal(attacker, required: _*).toVector
-    var output: Seq[UnitInfo] = Seq.empty
-    for (filtersOptionalToDrop <- 0 to filtersPreferred.length) {
-      if (output.isEmpty) {
-        output = legalTargets.filter(target => filtersPreferred.drop(filtersOptionalToDrop).forall(_.legal(attacker, target)))
-      }
-    }
-    output
+    (0 to filtersPreferred.length)
+      .map(i => legalTargets.view.filter(target => filtersPreferred.drop(i).forall(_.legal(attacker, target))))
+      .find(_.nonEmpty)
+      .getOrElse(legalTargets)
   }
 
   def filtersRequired(attacker: FriendlyUnitInfo): Seq[TargetFilter] = {
@@ -99,11 +96,6 @@ object Target extends {
       output *= 1.5
     }
 
-    // Diving penalty
-    if (attacker.matchups.threatsInRange.exists(_ != target) && ! attacker.inRangeToAttack(target)) {
-      output *= 0.25
-    }
-
     // Melee hugging, like Zealots against Siege Tanks
     val meleeHug = ! attacker.unitClass.ranged && target.topSpeed < attacker.topSpeed
     if (meleeHug) {
@@ -111,9 +103,14 @@ object Target extends {
     }
 
     // Free shots
-    val freeShot = attacker.enemyRangeGrid.get(attacker.pixelToFireAt(target).tileIncluding) == 0
+    lazy val attackPixel = attacker.pixelToFireAt(target)
+    lazy val requiresDiving = ! attacker.inRangeToAttack(target) && attacker.matchups.threats.exists(t => t != target && t.inRangeToAttack(attacker, attackPixel))
+    val freeShot = attacker.enemyRangeGrid.get(attackPixel.tileIncluding) == 0 && attacker.matchups.threatsInRange.isEmpty
     if (freeShot) {
       output *= 2.0
+    // Diving penalty
+    } else if (requiresDiving) {
+      output *= 0.25
     }
 
     output

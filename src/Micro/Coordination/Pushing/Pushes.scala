@@ -25,13 +25,9 @@ class Pushes {
 
   def all: Set[Push] = pushesPrevious.toSet ++ pushesCurrent
 
-  def get(tile: Tile): Seq[Push] = {
-    (gridCurrent.get(tile).view ++ gridPrevious.get(tile)).distinct
-  }
+  def get(tile: Tile): Seq[Push] = gridCurrent.get(tile).view ++ gridPrevious.get(tile)
 
-  def get(unit: UnitInfo): Seq[Push] = {
-    unit.tiles.flatMap(get).distinct
-  }
+  def get(unit: UnitInfo): Seq[Push] = get(unit.tileIncludingCenter)
 
   def onAgentCycle(): Unit = {
     val gridSwap = gridPrevious
@@ -82,6 +78,6 @@ class Pushes {
       }
     })
 
-    With.game.getNukeDots.asScala.foreach(dot => new ExplosionNuke(new Pixel(dot)))
+    With.game.getNukeDots.asScala.view.map(new Pixel(_)).map(new ExplosionNuke(_)).foreach(put)
   }
 }

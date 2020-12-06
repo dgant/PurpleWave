@@ -4,7 +4,7 @@ import Mathematics.Points.Tile
 
 abstract class AbstractGridVersionedValue[T] extends AbstractGridArray[T] {
   val framestamps: AbstractGridVersioned = new AbstractGridVersioned {
-    override protected def updateTimestamps(): Unit = {}
+    override protected def updateCells(): Unit = {}
   }
 
   @inline final override def get(i: Int): T = {

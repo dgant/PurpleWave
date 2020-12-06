@@ -6,9 +6,9 @@ import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
-import Micro.Actions.Combat.Tactics.{Brawl, Potshot}
+import Micro.Actions.Combat.Tactics.Brawl
+import Micro.Actions.Combat.Targeting.Filters.{TargetFilterPotshot, TargetFilterVisibleInRange}
 import Micro.Actions.Combat.Targeting.Target
-import Micro.Actions.Combat.Targeting.Filters.TargetFilterVisibleInRange
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.{TrafficPriorities, TrafficPriority}
 import Micro.Heuristics.Potential
@@ -72,10 +72,10 @@ object DefaultCombat extends Action {
 
   def takePotshot(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return
-    if ( ! unit.readyForAttackOrder) return
-    val oldToAttack = unit.agent.toAttack
-    Potshot.delegate(unit)
-    unit.agent.toAttack = unit.agent.toAttack.orElse(oldToAttack)
+    unit.agent.toAttack = Target.best(unit, TargetFilterPotshot).orElse(unit.agent.toAttack)
+    if (unit.readyForAttackOrder) {
+      With.commander.attack(unit)
+    }
   }
 
   def followPushing(context: MicroContext): Unit = {

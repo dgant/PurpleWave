@@ -77,7 +77,7 @@ object Build extends Action {
 
     val pushPixel = buildArea.midPixel
     val priority = if (unit.pixelDistanceCenter(pushPixel) < 128) TrafficPriorities.Shove else TrafficPriorities.Bump
-    With.coordinator.pushes.put(new CircularPush(priority, pushPixel, 32 + buildClass.dimensionMax))
+    With.coordinator.pushes.put(new CircularPush(priority, pushPixel, 32 + buildClass.dimensionMax, unit))
 
     if (unit.tileIncludingCenter.tileDistanceFast(buildTile) < 5 && With.grids.friendlyVision.isSet(buildTile)) {
       With.commander.build(unit, buildClass, buildTile)

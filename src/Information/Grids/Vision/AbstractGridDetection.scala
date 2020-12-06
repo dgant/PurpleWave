@@ -6,7 +6,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 abstract class AbstractGridDetection extends AbstractGridFramestamp {
   
-  override protected def updateTimestamps() {
+  override protected def updateCells() {
     detectors.foreach(detector => {
       val origin = detector.tileIncludingCenter
       val points = Circle.points(1 + (if (detector.unitClass.isBuilding) 9 else 11))

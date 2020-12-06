@@ -22,8 +22,8 @@ case class TileRectangle(
         ByOption.min(included.view.map(_.x)).getOrElse(0),
         ByOption.min(included.view.map(_.y)).getOrElse(0)),
       Tile(
-        ByOption.max(included.view.map(_.x)).getOrElse(0),
-        ByOption.max(included.view.map(_.y)).getOrElse(0)))
+        ByOption.max(included.view.map(_.x + 1)).getOrElse(0),
+        ByOption.max(included.view.map(_.y + 1)).getOrElse(0)))
   }
 
   if (endExclusive.x < startInclusive.x || endExclusive.y < startInclusive.y) {

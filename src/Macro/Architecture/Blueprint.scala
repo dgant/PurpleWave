@@ -74,7 +74,7 @@ class Blueprint(
       if (heightTiles.get == 3 && ! With.grids.psi3Height.isSet(tile) && With.architecture.powered3Height.get(tile) > request.map(_.requiredFrame).getOrElse(With.frame)) {
         return ArchitecturalAssessment.Unpowered
       }
-      if (heightTiles.get == 2 && ! With.grids.psi2Height.isSet(tile) && With.architecture.powered2Height.get(tile)> request.map(_.requiredFrame).getOrElse(With.frame)) {
+      if (heightTiles.get == 2 && ! With.grids.psi2Height.isSet(tile) && With.architecture.powered2Height.get(tile) > request.map(_.requiredFrame).getOrElse(With.frame)) {
         return ArchitecturalAssessment.Unpowered
       }
     }

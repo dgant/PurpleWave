@@ -6,7 +6,7 @@ import ProxyBwapi.Races.{Terran, Zerg}
 
 class GridUnwalkableUnits extends AbstractGridVersioned {
   
-  override protected def updateTimestamps() {
+  override protected def updateCells() {
     With.units.all
       .foreach(unit =>
         if ((unit.unitClass.isBuilding || unit.isAny(Zerg.Egg, Zerg.LurkerEgg))

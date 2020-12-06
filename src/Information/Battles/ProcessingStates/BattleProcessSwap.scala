@@ -6,6 +6,7 @@ import Lifecycle.With
 
 class BattleProcessSwap extends BattleProcessState {
   override def step(): Unit = {
+
     // Replace local
     With.battles.local = With.battles.nextBattlesLocal
     With.battles.byUnit = With.battles.local.flatten(battle => battle.teams.flatMap(_.units).map(unit => (unit, battle))).toMap

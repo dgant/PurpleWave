@@ -10,7 +10,7 @@ class GridEnemyVision extends AbstractGridFramestamp {
   def hasSeen(tile: Tile): Boolean = get(tile) > 0
   def hasSeen(i: Int): Boolean = get(i) > 0
   
-  override protected def updateTimestamps() {
+  override protected def updateCells() {
     With.units.enemy.foreach(unit =>
       if (unit.aliveAndComplete && unit.likelyStillThere) {
         val start = unit.tileIncludingCenter

@@ -14,7 +14,7 @@ class PlacementNode(request: PlacementRequest) extends PlacementState {
 
   def makeChild: Option[PlacementNode] = request.child.map(new PlacementNode(_))
 
-  val task: PlacementPolicy = request.task()
+  val task: PlacementPolicy = request.policy()
   val tileQueue = new mutable.PriorityQueue[TileScore]()(Ordering.by( - _.score))
   var needToLoadTiles: Boolean = true
   var child: Option[PlacementNode] = makeChild

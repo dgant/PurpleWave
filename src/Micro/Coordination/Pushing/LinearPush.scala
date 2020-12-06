@@ -11,7 +11,7 @@ abstract class LinearPush extends Push {
   protected def destination: Pixel
   protected def sourceWidth: Double // TODO: Not reflected in tiles!
 
-  override val tiles: Seq[Tile] = new TileRectangle(corners.view.map(_.tileIncluding)).tiles
+  override def tiles: Seq[Tile] = new TileRectangle(corners.view.map(_.tileIncluding)).tiles
   override def force(recipient: FriendlyUnitInfo): Option[Force] = {
     val projection = PurpleMath.projectedPointOnSegment(recipient.pixelCenter.asPoint, source.asPoint, destination.asPoint).asPixel
     val distance = recipient.pixelDistanceCenter(projection) - sourceWidth - recipient.unitClass.dimensionMax

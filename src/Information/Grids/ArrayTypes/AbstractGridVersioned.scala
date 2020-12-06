@@ -24,10 +24,10 @@ abstract class AbstractGridVersioned extends AbstractGridInt {
 
   override def update() {
     updateVersion()
-    updateTimestamps()
+    updateCells()
   }
 
   override def repr(value: Int): String = if (value >= version) "true" else ""
   
-  protected def updateTimestamps() {}
+  protected def updateCells() {}
 }

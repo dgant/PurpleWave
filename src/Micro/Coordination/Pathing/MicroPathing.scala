@@ -8,6 +8,7 @@ import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.{Pixel, PixelRay}
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Circle
+import Micro.Actions.Combat.Maneuvering.DownhillPathfinder
 import Micro.Coordination.Pushing.Push
 import Micro.Heuristics.Potential
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -46,13 +47,16 @@ object MicroPathing {
   def getWaypointToPixel(unit: UnitInfo, goal: Pixel): Pixel = {
     if (unit.flying) return goal
     val lineWaypoint      = if (PixelRay(unit.pixelCenter, goal).forall(_.walkable)) Some(unit.pixelCenter.project(goal, Math.min(unit.pixelDistanceCenter(goal), waypointDistancePixels))) else None
-    lazy val path         = With.paths.zonePath(unit.pixelCenter.zone, goal.zone)
-    lazy val pathWaypoint = path.flatMap(_.steps.find(step => step.from != unit.zone || unit.pixelDistanceCenter(step.edge.pixelCenter) > step.edge.radiusPixels)).map(_.edge.pixelCenter)
-    lazy val goalWaypoint = pathWaypoint.getOrElse(goal)
+    lazy val hillPath     = DownhillPathfinder.decend(unit.tileIncludingCenter, goal.tileIncluding)
+    lazy val hillWaypoint = hillPath.map(path => path.last.pixelCenter.add(unit.pixelCenter).subtract(path.head.pixelCenter))
+    lazy val zonePath     = With.paths.zonePath(unit.pixelCenter.zone, goal.zone)
+    lazy val zoneWaypoint = zonePath.flatMap(_.steps.find(step => step.from != unit.zone || unit.pixelDistanceCenter(step.edge.pixelCenter) > step.edge.radiusPixels)).map(_.edge.pixelCenter)
+    lazy val goalWaypoint = zoneWaypoint.getOrElse(goal)
     lazy val ring         = MicroPathing.getCircleTowards(unit.pixelCenter, goalWaypoint)
     lazy val ringFiltered = ring.filter(t => t.walkable && PixelRay(unit.pixelCenter, t).view.drop(1).forall(_.walkable))
     lazy val ringWaypoint = ByOption.minBy(ringFiltered)(goal.groundPixels)
-    lineWaypoint.orElse(ringWaypoint).orElse(pathWaypoint).getOrElse(goal)
+    //lineWaypoint.orElse(hillWaypoint).orElse(ringWaypoint).orElse(zoneWaypoint).getOrElse(goal)
+    lineWaypoint.orElse(hillWaypoint).getOrElse(goal)
   }
 
   def getWaypointAlongTilePath(path: TilePath): Option[Pixel] = {

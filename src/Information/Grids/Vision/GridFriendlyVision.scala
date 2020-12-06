@@ -9,7 +9,7 @@ class GridFriendlyVision extends AbstractGridFramestamp {
   def hasSeen(tile: Tile): Boolean = get(tile) > 0
   def hasSeen(i: Int): Boolean = get(i) > 0
   
-  override protected def updateTimestamps() {
+  override protected def updateCells() {
     var x = 0
     while (x < With.mapTileWidth) {
       var y = 0

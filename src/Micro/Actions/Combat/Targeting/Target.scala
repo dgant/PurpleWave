@@ -63,8 +63,15 @@ object Target extends {
     attacker.matchups.targets.view.map(target => (target, target.baseTargetValue(), score(attacker, target))).toVector.sortBy(-_._3)
   }
 
-  def score(attacker: FriendlyUnitInfo, target: UnitInfo): Double = {
-    scoreInner(attacker, target, recur = true)
+  @inline final def score(attacker: FriendlyUnitInfo, target: UnitInfo): Double = {
+    val framesOfFreedom = attacker.cooldownLeft
+    val framesOutOfWayToShoot = if (attacker.canMove) Math.max(0, attacker.framesToGetInRange(target) - framesOfFreedom) else 0
+    val output = baseAttackerToTargetValue(
+      baseTargetValue = target.baseTargetValue(),
+      totalHealth = target.totalHealth,
+      framesOutOfTheWay = framesOutOfWayToShoot,
+      dpf = attacker.dpfOnNextHitAgainst(target))
+    output
   }
 
   // Used by combat simulation as well, to keep targeting behavior somewhat consistent
@@ -73,48 +80,12 @@ object Target extends {
     baseTargetValue: Double,
     totalHealth: Double,
     framesOutOfTheWay: Double,
-    dpf: Double = 1.0): Double = {
-    baseTargetValue * dpf / (Math.max(1.0, totalHealth) * Math.max(6.0, framesOutOfTheWay))
-  }
-
-  def scoreInner(attacker: FriendlyUnitInfo, target: UnitInfo, recur: Boolean): Double = {
-    val framesToGoal          = attacker.framesToTravelTo(attacker.agent.destination)
-    val framesToGoalAtTarget  = attacker.framesToTravelPixels(attacker.pixelDistanceTravelling(attacker.agent.destination, attacker.pixelToFireAt(target)))
-    val framesOfFreedom       = Math.max(attacker.cooldownLeft, attacker.matchups.teamFramesOfSafety)
-    val framesOutOfWayToGoal  = if (attacker.canMove) Math.max(0, framesToGoalAtTarget - framesToGoal) else 0
-    val framesOutOfWayToShoot = if (attacker.canMove) Math.max(0, attacker.framesToGetInRange(target) - framesOfFreedom) else 0
-
-    var output = baseAttackerToTargetValue(
-      baseTargetValue = target.baseTargetValue(),
-      totalHealth = target.totalHealth,
-      framesOutOfTheWay = framesOutOfWayToGoal + framesOutOfWayToShoot,
-      dpf = attacker.dpfOnNextHitAgainst(target))
-
-    // Accessibility bonus
-    val accessibleCombatUnit = attacker.inRangeToAttack(target) && target.participatingInCombat() && ! target.isInterceptor()
-    if (accessibleCombatUnit) {
-      output *= 1.5
-    }
-
-    // Melee hugging, like Zealots against Siege Tanks
-    val meleeHug = ! attacker.unitClass.ranged && target.topSpeed < attacker.topSpeed
-    if (meleeHug) {
-      output *= (if (target.canMove) 1.5 else 2.0)
-    }
-
-    // Free shots
-    lazy val attackPixel = attacker.pixelToFireAt(target)
-    lazy val requiresDiving = ! attacker.inRangeToAttack(target) && attacker.matchups.threats.exists(t => t != target && t.inRangeToAttack(attacker, attackPixel))
-    val freeShot = attacker.enemyRangeGrid.get(attackPixel.tileIncluding) == 0 && attacker.matchups.threatsInRange.isEmpty
-    if (freeShot) {
-      output *= 2.0
-    // Diving penalty
-    } else if (requiresDiving) {
-      output *= 0.25
-    }
-
-    output
-  }
+    dpf: Double = 1.0): Double = (
+    baseTargetValue
+    * dpf
+    / Math.max(1.0, totalHealth)
+    / Math.max(6.0, framesOutOfTheWay)
+  )
 
   def getTargetBaseValue(target: UnitInfo, recur: Boolean = true): Double = {
     var output = target.subjectiveValue

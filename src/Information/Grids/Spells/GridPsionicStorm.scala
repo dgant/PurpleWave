@@ -6,7 +6,7 @@ import Mathematics.Points.Pixel
 
 class GridPsionicStorm extends AbstractGridFramestamp {
   
-  override protected def updateTimestamps(): Unit = {
+  override protected def updateCells(): Unit = {
     With.bullets.all.foreach(bullet => addPsionicStorm(bullet.pixel))
   }
   

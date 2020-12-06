@@ -5,7 +5,6 @@ import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.DefaultCombat.{Disengage, Engage}
 import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Coordination.Pathing.MicroPathing
 import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -18,7 +17,7 @@ object Gather extends Action {
   
   private val combatWindow = GameTime(0, 2)()
 
-  val defenseRadiusPixels = 128
+  val defenseRadiusPixels = 160
   
   override def perform(unit: FriendlyUnitInfo) {
 

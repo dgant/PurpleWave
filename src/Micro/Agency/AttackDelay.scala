@@ -58,10 +58,9 @@ object AttackDelay {
   def framesToWaitAfterIssuingAttackOrder(unit: FriendlyUnitInfo): Int = {
     if (unit.is(Protoss.Carrier)) {
       // Need a better answer than this
-      
       return 24
     }
-    1 + Math.max(With.latency.latencyFrames, unit.unitClass.stopFrames)                 + inexplicableExperimentalSafetyMargin
+    1 + Math.max(With.latency.latencyFrames, unit.unitClass.stopFrames) + inexplicableExperimentalSafetyMargin
   }
   
   def nextSafeOrderFrame(unit: FriendlyUnitInfo): Int = {
@@ -76,7 +75,7 @@ object AttackDelay {
   }
   
   private def nextSafeOrderFrameDragoon(dragoon: FriendlyUnitInfo): Int = {
-    dragoon.lastFrameStartingAttack + 1 + 9 - With.latency.latencyFrames                   + inexplicableExperimentalSafetyMargin
+    dragoon.lastFrameStartingAttack + 1 + 9 - With.latency.latencyFrames + inexplicableExperimentalSafetyMargin
   }
   
   /*

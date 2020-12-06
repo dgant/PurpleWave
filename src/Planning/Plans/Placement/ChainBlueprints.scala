@@ -12,7 +12,7 @@ object ChainBlueprints {
       requests(i).child = Some(requests(i + 1))
       i += 1
     }
-    requests.foreach(r => r.task = () => new PlacementPolicySimple(r))
+    requests.foreach(r => r.policy = () => new PlacementPolicySimple(r))
     requests.head
   }
 

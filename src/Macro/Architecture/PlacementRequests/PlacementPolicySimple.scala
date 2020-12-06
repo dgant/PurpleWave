@@ -5,7 +5,7 @@ import Mathematics.Points.Tile
 class PlacementPolicySimple(request: PlacementRequest) extends PlacementPolicy {
 
   override def retain(): Boolean = {
-    request.tile.isDefined && request.child.forall(child => child.tile.isDefined && child.task().retain())
+    request.tile.isDefined && request.child.forall(child => child.tile.isDefined && child.policy().retain())
   }
 
   override def tiles: Seq[Seq[Tile]] = tilesForRequest(request)

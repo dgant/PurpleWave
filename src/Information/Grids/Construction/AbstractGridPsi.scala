@@ -10,12 +10,13 @@ abstract class AbstractGridPsi extends AbstractGridFramestamp {
 
   val psiPoints: Array[Point]
 
-  private var lastPylons: Seq[FriendlyUnitInfo] = Seq.empty
+  private var lastPylons: Vector[FriendlyUnitInfo] = Vector.empty
 
   private val wrapThreshold = 18
   override def update(): Unit = {
-    val newPylons = With.units.ours.view.filter(unit => unit.aliveAndComplete && unit.is(Protoss.Pylon)).toSeq
+    val newPylons = With.units.ours.view.filter(unit => unit.aliveAndComplete && unit.is(Protoss.Pylon)).toVector
     if (newPylons != lastPylons) {
+      updateVersion()
       newPylons.foreach(pylon => {
       val pylonTile = pylon.tileIncludingCenter
       psiPoints.foreach(point => {

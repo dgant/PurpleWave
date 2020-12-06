@@ -39,9 +39,8 @@ class MatchupGraph {
     // For example: Spider mines that just popped up, or Siege Tanks/Lurkers that just started shooting at us unexpectedly.
     entrants.clear
     With.units.playerOwned.foreach(entrant => {
-      if (entrant.aliveAndComplete
-      //
-      //if (entrant.alive && (entrant.complete || entrant.remainingCompletionFrames < With.reaction.clusteringMax)
+      if (entrant.alive
+        && (entrant.complete || entrant.unitClass.isBuilding)
         &&  entrant.battle.isEmpty
         &&  With.framesSince(entrant.frameDiscovered) < 72) {
         val battle = assignToBattle(entrant)

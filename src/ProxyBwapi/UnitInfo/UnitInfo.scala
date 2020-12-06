@@ -146,7 +146,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     hasEverBeenCompleteHatch ||= is(Zerg.Hatchery) && complete
   }
   
-  private lazy val stuckMoveFrames    = 10
+  private lazy val stuckMoveFrames    = 24
   private lazy val stuckAttackFrames  = Math.max(stuckMoveFrames, cooldownMaxAirGround)
   @inline final def seeminglyStuck: Boolean = framesFailingToMove > stuckMoveFrames || framesFailingToAttack > stuckAttackFrames
   
@@ -586,7 +586,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   @inline final def pixelReachGround  (framesAhead: Int): Double = pixelsTravelledMax(framesAhead) + pixelRangeGround
   @inline final def pixelReachMax     (framesAhead: Int): Double = Math.max(pixelReachAir(framesAhead), pixelReachGround(framesAhead))
   @inline final def pixelReachAgainst (framesAhead: Int, enemy: UnitInfo): Double = if (enemy.flying) pixelReachAir(framesAhead) else pixelReachGround(framesAhead)
-  @inline final def pixelToFireAt(enemy: UnitInfo): Pixel = enemy.pixelCenter.project(pixelCenter, Math.min(pixelDistanceEdge(enemy), pixelRangeAgainst(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse))
+  @inline final def pixelToFireAt(enemy: UnitInfo): Pixel = if (inRangeToAttack(enemy)) pixelCenter else enemy.pixelCenter.project(pixelCenter, pixelRangeAgainst(enemy) + unitClass.dimensionMax + enemy.unitClass.dimensionMax)
   @inline final def inRangeToAttack(enemy: UnitInfo)                    : Boolean = pixelDistanceEdge(enemy)          <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy)          > pixelRangeMin)
   @inline final def inRangeToAttack(enemy: UnitInfo, enemyAt: Pixel)    : Boolean = pixelDistanceEdge(enemy, enemyAt) <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy, enemyAt) > pixelRangeMin)
   @inline final def inRangeToAttack(enemy: UnitInfo, framesAhead: Int)  : Boolean = inRangeToAttack(enemy, enemy.projectFrames(framesAhead))

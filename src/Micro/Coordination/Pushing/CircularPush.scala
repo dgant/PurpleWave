@@ -6,9 +6,10 @@ import Mathematics.PurpleMath
 import Mathematics.Shapes.Circle
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class CircularPush(val priority: TrafficPriority, center: Pixel, radius: Double) extends Push {
+class CircularPush(val priority: TrafficPriority, center: Pixel, radius: Double, originators: FriendlyUnitInfo*) extends Push {
   override val tiles: Seq[Tile] = Circle.points((radius.toInt + 31) / 32).view.map(center.tileIncluding.add)
   override def force(recipient: FriendlyUnitInfo): Option[Force] = {
+    if (originators.contains(recipient)) return None
     val target = recipient.pixelCenter
     val distance = target.pixelDistance(center)
     val magnitude = PurpleMath.nanToZero((radius - distance) / radius)

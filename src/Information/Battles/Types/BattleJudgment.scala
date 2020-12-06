@@ -9,22 +9,21 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 class BattleJudgment(battle: BattleLocal) {
 
-  lazy val baseHysteresis   : Double  = if (With.self.isZerg) 1.5 else 1.0
-  lazy val terranHomeBonus  : Double  =   0.2 * getTerranHomeBonus
-  lazy val hysteresis       : Double  =   0.2 * getHysteresis * baseHysteresis
-  lazy val turtleBonus      : Double  =   0.1 * getTurtleBonus
-  lazy val hornetBonus      : Double  =   0.3 * getHornetBonus
-  lazy val terranMaxBonus   : Double  = - 0.2 * getTerranMaxBonus
-  lazy val siegeUrgency     : Double  = - 0.5 * getSiegeUrgency
-  lazy val trappedness      : Double  = - 0.2 * getTrappedness
-  lazy val meleeCommitment  : Double  =   0.2 * getSkirmishModifier
-  lazy val ratioAttack      : Double  = transformTotalScore(battle.predictionAttack.localBattleMetrics)
-  lazy val ratioSnipe       : Double  = transformTotalScore(battle.predictionSnipe.localBattleMetrics)
-  lazy val totalTarget      : Double  = hysteresis + terranHomeBonus + terranMaxBonus + turtleBonus + hornetBonus + siegeUrgency + trappedness + With.configuration.baseTarget
-  lazy val ratioTarget      : Double  = Math.min(.99, PurpleMath.nanToZero(totalTarget))
-  lazy val shouldAttack     : Boolean = ratioAttack > ratioTarget
-  lazy val shouldSnipe      : Boolean = ratioSnipe > ratioTarget
-  lazy val shouldFight      : Boolean = shouldAttack || shouldSnipe
+  val baseHysteresis  : Double  = if (With.self.isZerg) 1.5 else 1.0
+  val terranHomeBonus : Double  =   0.2 * getTerranHomeBonus
+  val hysteresis      : Double  =   0.2 * getHysteresis * baseHysteresis
+  val turtleBonus     : Double  =   0.1 * getTurtleBonus
+  val hornetBonus     : Double  =   0.3 * getHornetBonus
+  val terranMaxBonus  : Double  = - 0.2 * getTerranMaxBonus
+  val siegeUrgency    : Double  = - 0.5 * getSiegeUrgency
+  val trappedness     : Double  = - 0.2 * getTrappedness
+  val ratioAttack     : Double  = transformTotalScore(battle.predictionAttack.localBattleMetrics)
+  val ratioSnipe      : Double  = transformTotalScore(battle.predictionSnipe.localBattleMetrics)
+  val totalTarget     : Double  = hysteresis + terranHomeBonus + terranMaxBonus + turtleBonus + hornetBonus + siegeUrgency + trappedness + With.configuration.baseTarget
+  val ratioTarget     : Double  = Math.min(.99, PurpleMath.nanToZero(totalTarget))
+  val shouldAttack    : Boolean = ratioAttack > ratioTarget
+  val shouldSnipe     : Boolean = ratioSnipe > ratioTarget
+  val shouldFight     : Boolean = shouldAttack || shouldSnipe
 
   def getTerranHomeBonus: Double = {
     if (battle.enemy.centroidAir.zone.owner.isTerran && battle.enemy.units.exists(u => u.is(UnitMatchSiegeTank) && u.matchups.targets.nonEmpty)) 0.2 else 0.0
@@ -67,19 +66,6 @@ class BattleJudgment(battle: BattleLocal) {
     val distanceEnemy  : Double  = eligibleUnits.map(_.pixelDistanceTravelling(With.scouting.mostBaselikeEnemyTile)).max
     val distanceRatio  : Double  = distanceEnemy / (distanceUs + distanceEnemy)
     distanceRatio
-  }
-  private def meanRange(team: Team): Double = PurpleMath.weightedMean(team.units.view.map(u => (u.effectiveRangePixels, u.subjectiveValue)))
-  private def outranges(unit: UnitInfo, threat: UnitInfo): Boolean = threat.pixelRangeAgainst(unit) > unit.effectiveRangePixels
-  def getSkirmishModifier: Double = {
-    val meanRangeUs     = meanRange(battle.us)
-
-    val meanRangeEnemy  = meanRange(battle.enemy)
-    val outrangeableUs  = battle.us.units.count(unit => unit.matchups.threats.exists(outranges(unit, _)))
-    val outrangedUs     = battle.us.units.count(unit => unit.matchups.threatsInRange.exists(outranges(unit, _)))
-    val ratioRange      = PurpleMath.nanToZero(meanRangeEnemy - meanRangeUs / (meanRangeEnemy + meanRangeUs))
-    val ratioOutranged  = PurpleMath.nanToZero(2 * outrangedUs / outrangeableUs - 1)
-    //val impact          = PurpleMath.nanToZero(outrangeableUs / team
-    0.0
   }
 
   def transformTotalScore(metrics: Seq[LocalBattleMetrics]): Double = {

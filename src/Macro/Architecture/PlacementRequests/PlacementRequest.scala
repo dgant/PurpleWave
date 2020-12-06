@@ -12,10 +12,10 @@ class PlacementRequest(
   var tile: Option[Tile] = None,
   var requiredFrame: Int = With.frame, // Frame this placement needs to be valid by; concerns future availability of Pylon power
   var child: Option[PlacementRequest] = Option.empty,
-  var task: () => PlacementPolicy = null) {
+  var policy: () => PlacementPolicy = null) {
 
-  if (task == null) {
-    task = () => new PlacementPolicyClassic(this)
+  if (policy == null) {
+    policy = () => new PlacementPolicyClassic(this)
   }
 
   var lastPlacementFrame: Int = - Forever()

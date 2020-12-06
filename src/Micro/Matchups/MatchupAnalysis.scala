@@ -88,7 +88,6 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val pixelsOfEntanglement           : Double                = ByOption.max(pixelsOfEntanglementPerThreat.values).getOrElse(- With.mapPixelWidth)
   lazy val framesOfSafety                 : Double                = - With.latency.latencyFrames - With.reaction.agencyAverage - ByOption.max(framesOfEntanglementPerThreat.values).getOrElse(- Forever().toDouble)
   lazy val pixelsOutOfNonWorkerRange      : Double                = ByOption.min(threats.view.filterNot(_.unitClass.isWorker).map(t => t.pixelDistanceEdge(me) - t.pixelRangeAgainst(me))).getOrElse(With.mapPixelWidth)
-  lazy val teamFramesOfSafety             : Double                = if (me == firstTeammate) ByOption.min(alliesInclSelf.view.map(_.matchups.framesOfSafety)).getOrElse(0) else firstTeammate.matchups.teamFramesOfSafety
   lazy val tilesOfInvisibility            : Double                = if (me.visibleToOpponents) 0 else Spiral.points(8).map(me.tileIncludingCenter.add).find(With.grids.enemyVision.isSet).map(_.tileDistanceFast(me.tileIncludingCenter)).getOrElse(maxTilesOfInvisibility)
   val maxTilesOfInvisibility = 8
 

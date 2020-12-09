@@ -36,10 +36,6 @@ class Visualization {
     ShowStatus,
     ShowPerformanceSummary,
     ShowStoryteller,
-
-    // Temporary
-    ShowClustering,
-    ShowDivisions
   )
 
   lazy val knownViews: Vector[View] = Vector[View](

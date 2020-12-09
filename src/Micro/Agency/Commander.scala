@@ -161,7 +161,7 @@ class Commander {
       PurpleMath.clamp(to.y, unit.unitClass.dimensionUp,   With.mapPixelHeight - unit.unitClass.dimensionDown))
 
     // Path around terrain (if we haven't already)
-    if ( ! unit.flying && unit.pixelDistanceTravelling(to) > 1.1 * MicroPathing.waypointDistancePixels) {
+    if ( ! unit.flying && unit.pixelDistanceTravelling(to) > 1.1 * MicroPathing.waypointDistancePixels && With.reaction.agencyAverage < 12) {
       to = MicroPathing.getWaypointToPixel(unit, to)
     }
 

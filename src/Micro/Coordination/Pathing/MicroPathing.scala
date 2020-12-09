@@ -24,7 +24,7 @@ object MicroPathing {
     val pathfindProfile                 = new PathfindProfile(unit.tileIncludingCenter)
     pathfindProfile.end                 = if (preferHome) Some(unit.agent.origin.tileIncluding) else None
     pathfindProfile.lengthMinimum       = Some(pathLengthMinimum)
-    pathfindProfile.lengthMaximum       = Some(PurpleMath.clamp((unit.matchups.framesOfEntanglement * unit.topSpeed + unit.effectiveRangePixels).toInt / 32, pathLengthMinimum, 15))
+    pathfindProfile.lengthMaximum       = Some(PurpleMath.clamp((unit.matchups.pixelsOfEntanglement + unit.effectiveRangePixels).toInt / 32, pathLengthMinimum, 15))
     pathfindProfile.threatMaximum       = Some(0)
     pathfindProfile.employGroundDist     = true
     pathfindProfile.costOccupancy       = if (unit.flying) 0f else 3f
@@ -113,7 +113,7 @@ object MicroPathing {
 
   def getPathfindingRepulsors(unit: FriendlyUnitInfo, maxThreats: Int = 10): IndexedSeq[PathfindRepulsor] = {
     TakeN
-      .by(maxThreats, unit.matchups.threats.view.filter(_.likelyStillThere))(Ordering.by(t => unit.matchups.framesOfEntanglementPerThreat(t)))
+      .by(maxThreats, unit.matchups.threats.view.filter(_.likelyStillThere))(Ordering.by(t => unit.matchups.pixelsOfEntanglementPerThreat(t)))
       .map(threat => PathfindRepulsor(
         threat.pixelCenter,
         threat.dpfOnNextHitAgainst(unit),

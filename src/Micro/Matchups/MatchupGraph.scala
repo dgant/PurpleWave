@@ -1,5 +1,6 @@
 package Micro.Matchups
 
+import Information.Battles.BattleClassificationFilters
 import Information.Battles.Types.BattleLocal
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -23,17 +24,17 @@ class MatchupGraph {
     entrants.clear
     With.units.playerOwned.foreach(entrant => {
       if (entrant.alive
-        && (entrant.complete || entrant.unitClass.isBuilding)
         &&  entrant.battle.isEmpty
-        &&  With.framesSince(entrant.frameDiscovered) < 72) {
-        val battle = ByOption.minBy(With.units.all.view.filter(_.battle.isDefined))(_.pixelDistanceSquared(entrant)).flatMap(_.battle)
-        if (battle.isDefined) {
-          if ( ! entrants.contains(battle.get)) {
-            entrants.put(battle.get, new mutable.ArrayBuffer[UnitInfo])
+        &&  With.framesSince(entrant.frameDiscovered) < 72
+        && BattleClassificationFilters.isEligibleLocal(entrant)) {
+          val battle = ByOption.minBy(With.units.all.view.filter(_.battle.isDefined))(_.pixelDistanceSquared(entrant)).flatMap(_.battle)
+          if (battle.isDefined) {
+            if ( ! entrants.contains(battle.get)) {
+              entrants.put(battle.get, new mutable.ArrayBuffer[UnitInfo])
+            }
+            entrants(battle.get) += entrant
           }
-          entrants(battle.get) += entrant
         }
-      }
-    })
+      })
   }
 }

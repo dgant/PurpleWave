@@ -57,7 +57,7 @@ object Batter extends Action {
     lazy val repairers = if (unit.pixelRangeGround >= 32.0 * 4.0) repairingUnits.filter(_.visible) else Iterable.empty
     lazy val wall      = wallUnits.filter(_.visible)
     
-    lazy val shootingThreats  = unit.matchups.framesOfEntanglementPerThreat.filter(_._2 > - GameTime(0, 1)())
+    lazy val shootingThreats  = unit.matchups.pixelsOfEntanglementPerThreat.filter(_._2 > -64)
     lazy val dpfReceiving     = shootingThreats.map(_._1.dpfOnNextHitAgainst(unit)).sum
     lazy val framesToLive     = PurpleMath.nanToInfinity(unit.totalHealth / dpfReceiving)
     lazy val dying            = framesToLive < GameTime(0, 1)()

@@ -10,7 +10,7 @@ import Micro.Actions.Combat.Tactics.Brawl
 import Micro.Actions.Combat.Targeting.Filters.{TargetFilterPotshot, TargetFilterVisibleInRange}
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Coordination.Pathing.MicroPathing
-import Micro.Coordination.Pushing.{TrafficPriorities, TrafficPriority}
+import Micro.Coordination.Pushing.{Push, TrafficPriorities, TrafficPriority}
 import Micro.Heuristics.Potential
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -38,9 +38,14 @@ object DefaultCombat extends Action {
   class MicroContext(val unit: FriendlyUnitInfo, val shouldEngage: Boolean) {
     var technique: Technique = _
 
-    lazy val receivedPushes = With.coordinator.pushes.get(unit).map(p => (p, p.force(unit))).sortBy(-_._1.priority.value)
-    lazy val receivedPushForces = receivedPushes.view.filter(_._2.nonEmpty).map(p => (p._1, p._2.get))
-    lazy val receivedPushPriority: TrafficPriority = ByOption.max(receivedPushes.view.filter(_._2.exists(_.lengthSquared > 0)).map(_._1.priority)).getOrElse(TrafficPriorities.None)
+    lazy val receivedPushForces: Vector[(Push, Force)] = With.coordinator.pushes
+      .get(unit)
+      .map(p => (p, p.force(unit)))
+      .filter(_._2.exists(_.lengthSquared > 0))
+      .map(p => (p._1, p._2.get))
+      .toVector
+      .sortBy(-_._1.priority.value)
+    lazy val receivedPushPriority: TrafficPriority = ByOption.max(receivedPushForces.view.map(_._1.priority)).getOrElse(TrafficPriorities.None)
 
     // Decide how far from target/threat we want to be
     lazy val idealPixelsFromTargetRange = if (unit.target.exists(_.speedApproaching(unit) < 0)) -16d else 0d
@@ -221,7 +226,8 @@ object DefaultCombat extends Action {
     forces(Forces.leaving)    = mul(1, Potential.preferTravel(unit, unit.agent.origin))
     forces(Forces.spacing)    = mul(1, Potential.avoidCollision(unit))
     forces(Forces.spreading)  = mul(1, MicroPathing.getPushRadians(context.receivedPushForces).map(ForceMath.fromRadians(_)).getOrElse(new Force))
-    forces(Forces.cohesion)   = mul(1, Potential.preferCohesion(unit))
+    // Verify necessity and improve performance
+    //forces(Forces.cohesion)   = mul(1, Potential.preferCohesion(unit))
     // TODO: Splash force
     // TODO: Regroup force -- Proportional to distance from centroid divided by total length of army
     // Reference https://github.com/bmnielsen/Stardust/blob/master/src/General/UnitCluster/Tactics/Move.cpp#L69

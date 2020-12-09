@@ -25,7 +25,7 @@ object TargetFilterFutility extends TargetFilter {
     }
 
     // This is a pretty expensive filter; avoid using it if possible
-    if (actor.matchups.allies.size > 12 || (With.frame > GameTime(0, 12)() && With.reaction.agencyAverage > 6)) {
+    if (actor.battle.exists(_.teamOf(actor).units.size > 12 || (With.frame > GameTime(0, 12)() && With.reaction.agencyAverage > 6))) {
       return true
     }
 

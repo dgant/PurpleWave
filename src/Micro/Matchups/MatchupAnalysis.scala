@@ -7,7 +7,7 @@ import Micro.Actions.Scouting.BlockConstruction
 import Micro.Heuristics.MicroValue
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.{ByOption, Forever}
+import Utilities.ByOption
 
 case class MatchupAnalysis(me: UnitInfo) {
   // Default units allow identification of targets when destroying an empty base, because no Battle is happening
@@ -43,10 +43,8 @@ case class MatchupAnalysis(me: UnitInfo) {
   lazy val vpfReceiving                  : Double                = valuePerDamage * dpfReceiving
   lazy val framesToLive                  : Double                = PurpleMath.nanToInfinity(me.totalHealth / dpfReceiving)
   lazy val pixelsOfEntanglementPerThreat : Map[UnitInfo, Double] = threats.view.map(threat => (threat, pixelsOfEntanglementWith(threat))).toMap
-  lazy val framesOfEntanglementPerThreat : Map[UnitInfo, Double] = threats.view.map(threat => (threat, framesOfEntanglementWith(threat))).toMap
-  lazy val framesOfEntanglement          : Double                = ByOption.max(framesOfEntanglementPerThreat.values).getOrElse(- Forever())
   lazy val pixelsOfEntanglement          : Double                = ByOption.max(pixelsOfEntanglementPerThreat.values).getOrElse(- With.mapPixelWidth)
-  lazy val framesOfSafety                : Double                = - With.latency.latencyFrames - With.reaction.agencyAverage - ByOption.max(framesOfEntanglementPerThreat.values).getOrElse(- Forever().toDouble)
+  lazy val framesOfSafety                : Double                = - With.latency.latencyFrames - With.reaction.agencyAverage - PurpleMath.nanToZero(pixelsOfEntanglement / me.topSpeed)
   lazy val pixelsOutOfNonWorkerRange     : Double                = ByOption.min(threats.view.filterNot(_.unitClass.isWorker).map(t => t.pixelDistanceEdge(me) - t.pixelRangeAgainst(me))).getOrElse(With.mapPixelWidth)
 
   protected def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = (
@@ -93,33 +91,6 @@ case class MatchupAnalysis(me: UnitInfo) {
     val distanceClosedByEnemy = if (threat.is(Protoss.Interceptor)) 0.0 else (threat.topSpeed * framesToFlee)
     val distanceEntangled     = threat.pixelRangeAgainst(me) - threat.pixelDistanceEdge(me)
     val output                = distanceEntangled + distanceClosedByEnemy
-    output
-  }
-
-  def framesOfEntanglementWith(threat: UnitInfo): Double = {
-    /*
-    This math stinks. I'm looking at a High Templar that's 407 pixels (12.7 tiles) away from a Marine,
-    with 8 avg agency frames, 3 latency frames,
-    and the entanglement is -6.8 while the safety is -4.2 frames
-    That is, we're saying the templar has 4 frames to turn and run before the marine will dash 7.7 tiles and shoot it.
-    Something's really busted here.
-     */
-    val approachSpeedMe      = me.speedApproaching(threat.pixelCenter)
-    val approachSpeedThreat  = if (threat.is(Protoss.Interceptor)) 0.0 else threat.speedApproaching(me.pixelCenter)
-    val approachSpeedTotal   = approachSpeedMe + approachSpeedThreat
-    val framesToTurn         = me.unitClass.framesToTurn180 // Should be this, but for performance limitations: me.unitClass.framesToTurn(me.angleRadians - threat.pixelCenter.radiansTo(me.pixelCenter))
-    val framesToAccelerate   = (me.topSpeed + approachSpeedMe + approachSpeedThreat) / me.unitClass.accelerationFrames
-    val blastoffFrames       = if (me.unitClass.canMove) framesToTurn + framesToAccelerate else 0 //How long for us to turn around and run
-    val reactionFrames       = With.reaction.agencyMax + 2 * With.latency.framesRemaining
-    val threatRangeBonus     = if (threat.isFriendly) 0.0 else Math.max(0.0, approachSpeedTotal * reactionFrames)
-    
-    val effectiveRange = threat.pixelRangeAgainst(me) + threatRangeBonus
-    val gapPixels = me.pixelDistanceEdge(threat) - effectiveRange
-    
-    val gapSpeed          = if (gapPixels >= 0 && threat.canMove) threat.topSpeed else me.topSpeed
-    val framesToCloseGap  = PurpleMath.nanToInfinity(Math.abs(gapPixels) / gapSpeed)
-    val output            = framesToCloseGap * PurpleMath.signum( - gapPixels) + blastoffFrames
-    
     output
   }
 }

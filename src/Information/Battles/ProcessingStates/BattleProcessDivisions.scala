@@ -1,5 +1,6 @@
 package Information.Battles.ProcessingStates
 
+import Information.Battles.BattleClassificationFilters
 import Information.Battles.Types.Division
 import Information.Geography.Types.Base
 import Lifecycle.With
@@ -29,7 +30,7 @@ class BattleProcessDivisions extends BattleProcessState {
 
     // Associate each group of enemies with the nearest base
     val baseRelevancePixels = 32 * 30
-    val enemiesAll = With.units.enemy
+    val enemiesAll = With.units.enemy.view.filter(BattleClassificationFilters.isEligibleLocal)
     val enemiesEmbattled = battles.view.map(_.enemy.units)
     val enemiesUnbattled = (enemiesAll.toSet -- battles.view.flatMap(_.enemy.units.view.flatMap(_.foreign)))
       .groupBy(e => e.base.getOrElse(With.geography.bases.minBy(distance(e, _)))).values

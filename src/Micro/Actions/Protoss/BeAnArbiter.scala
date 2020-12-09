@@ -30,7 +30,7 @@ object BeAnArbiter extends Action {
     if ( ! needsUmbrella(target)) return 0.0
     if (target.battle.isEmpty && friendlyUnitInfo.squad.exists(ourSquad => ! target.friendly.map(_.squad).exists(_.contains(ourSquad)))) return 0.0
     val value           = target.subjectiveValue
-    val dangerFactor    = 2.0 + PurpleMath.fastTanh(Math.max(-48, target.matchups.framesOfEntanglement))
+    val dangerFactor    = 2.0 + PurpleMath.fastTanh(Math.max(-64, target.matchups.pixelsOfEntanglement))
     val isolationFactor = if (target.friendly.exists(_.agent.umbrellas.nonEmpty) && target.matchups.nearestArbiter.exists(_ != friendlyUnitInfo)) 0.0 else 1.0
     val output          = value * dangerFactor * isolationFactor
     output

@@ -17,8 +17,7 @@ class BattleProcessMatchupAnalysis extends BattleProcessState {
     }
 
     val nextUnit = units.dequeue()
-    nextUnit.matchups.threatsInRange
-    nextUnit.matchups.targetsInRange
-    nextUnit.matchups.framesOfSafety
+
+    // TODO: Create matchup analyses here so it doesn't clog up expectations of agency duration
   }
 }

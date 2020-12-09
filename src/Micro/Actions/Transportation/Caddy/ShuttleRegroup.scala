@@ -33,8 +33,8 @@ object ShuttleRegroup extends Action {
       // Help!
       val support = unit.teammates.view.filter(u => u.canAttack && ! u.isAny(Protoss.Reaver, UnitMatchWorkers)).toVector
       if (support.nonEmpty) {
-        val supportDeepest = support.maxBy(_.matchups.framesOfEntanglement)
-        val supportSafest = support.maxBy(_.matchups.framesOfEntanglement)
+        val supportDeepest = support.maxBy(_.matchups.pixelsOfEntanglement)
+        val supportSafest = support.maxBy(_.matchups.pixelsOfEntanglement)
         var formation = supportDeepest.pixelCenter.project(
           supportSafest.pixelCenter,
           if (supportDeepest.matchups.threats.isEmpty)

@@ -1,7 +1,6 @@
 package Micro.Actions.Combat.Decisionmaking
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Duck
 import Micro.Actions.Combat.Maneuvering.{Sneak, Support}
 import Micro.Actions.Combat.Spells.{SpiderMine, Stim}
 import Micro.Actions.Combat.Tactics._
@@ -35,8 +34,6 @@ object Fight extends Action {
     Bust.consider(unit)
     Spot.consider(unit)
     Sneak.consider(unit)
-    Duck.consider(unit)
-    Unduck.consider(unit)
     DefaultCombat.consider(unit)
     OccupyBunker.consider(unit)
   }

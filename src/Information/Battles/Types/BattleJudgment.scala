@@ -16,10 +16,9 @@ class BattleJudgment(battle: BattleLocal) {
   val hornetBonus     : Double  =   0.3 * getHornetBonus
   val terranMaxBonus  : Double  = - 0.2 * getTerranMaxBonus
   val siegeUrgency    : Double  = - 0.5 * getSiegeUrgency
-  val trappedness     : Double  = - 0.2 * getTrappedness
   val ratioAttack     : Double  = transformTotalScore(battle.predictionAttack.localBattleMetrics)
   val ratioSnipe      : Double  = transformTotalScore(battle.predictionSnipe.localBattleMetrics)
-  val totalTarget     : Double  = hysteresis + terranHomeBonus + terranMaxBonus + turtleBonus + hornetBonus + siegeUrgency + trappedness + With.configuration.baseTarget
+  val totalTarget     : Double  = hysteresis + terranHomeBonus + terranMaxBonus + turtleBonus + hornetBonus + siegeUrgency + With.configuration.baseTarget
   val ratioTarget     : Double  = Math.min(.99, PurpleMath.nanToZero(totalTarget))
   val shouldAttack    : Boolean = ratioAttack > ratioTarget
   val shouldSnipe     : Boolean = ratioSnipe > ratioTarget
@@ -47,17 +46,6 @@ class BattleJudgment(battle: BattleLocal) {
       && (u.matchups.threatsInRange.isEmpty || ! u.visible))
     val home = battle.us.units.count(_.base.exists(_.owner.isUs))
     hornets.toDouble / Math.max(1, hornets + home)
-  }
-  def getTrappedness: Double = {
-    PurpleMath.nanToZero(
-      PurpleMath.weightedMean(battle.us.units.view.map(unit =>
-        ({
-          val entanglement = PurpleMath.clamp(unit.matchups.framesOfEntanglement, -72, 72)
-          val entanglementMin = -24
-          val entanglementMax = 24 + PurpleMath.clamp(unit.matchups.framesToLive, 0, 72)
-          Math.max(0, (entanglement - entanglementMin) / (entanglementMax - entanglementMin))
-        },
-        unit.subjectiveValue))))
   }
   def getSiegeUrgency: Double = {
     val eligibleUnits = battle.enemy.units.view.filter(_.isAny(UnitMatchSiegeTank, Protoss.Reaver, Zerg.Lurker))
@@ -89,7 +77,7 @@ class BattleJudgment(battle: BattleLocal) {
     if (unit.friendly.isEmpty) return 0.0
     val agent               = unit.friendly.get.agent
     val patienceHysteresis  = agent.combatHysteresisFrames.toDouble / With.configuration.battleHysteresisFrames
-    val patienceEntangled   = if (agent.shouldEngage) Math.max(0.0, unit.matchups.framesOfEntanglement) / With.configuration.battleHysteresisFrames else 0.0
+    val patienceEntangled   = if (agent.shouldEngage) Math.max(0.0, PurpleMath.nanToZero(unit.matchups.pixelsOfEntanglement / unit.topSpeed)) / With.configuration.battleHysteresisFrames else 0.0
     val patienceTotal       = Math.max(patienceEntangled, patienceHysteresis)
     val sign                = if (agent.shouldEngage) -1.0 else 1.0
     var output              = patienceTotal * sign * (if(unit.unitClass.melee) 2.0 else 1.0)

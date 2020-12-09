@@ -48,8 +48,8 @@ object Potential {
   }
   
   protected def threatRepulsion(unit: FriendlyUnitInfo, threat: UnitInfo): Force = {
-    val entanglement          = unit.matchups.framesOfEntanglementPerThreat.getOrElse(threat, threat.framesToGetInRange(unit).toDouble)
-    val magnitudeEntanglement = 1.0 + PurpleMath.fastTanh(entanglement/24.0) + Math.max(0.0, entanglement/24.0)
+    val entanglement          = unit.matchups.pixelsOfEntanglementPerThreat.getOrElse(threat, threat.pixelsToGetInRange(unit).toDouble)
+    val magnitudeEntanglement = 1.0 + PurpleMath.fastTanh(entanglement / 32.0) + Math.max(0.0, entanglement / 32.0)
     val magnitudeDamage       = threat.dpfOnNextHitAgainst(unit)
     val magnitudeFinal        = magnitudeDamage * magnitudeEntanglement
     val output                = unitAttraction(unit, threat, -magnitudeFinal)
@@ -161,12 +161,8 @@ object Potential {
   
   def avoidCollision(unit: FriendlyUnitInfo): Force = {
     if (unit.flying) return new Force
-    val repulsions = unit.immediateOthers.view.filter(o => ! o.flying && ! o.unitClass.isBuilding).map(collisionRepulsion(unit, _))
-    // Is sum or max best?
-    // Sum:
-    val output = ForceMath.sum(repulsions).clipMin(Math.min(1.0, ByOption.max(repulsions.view.map(_.lengthFast)).getOrElse(0.0)))
-    // Max:
-    // val output = ByOption.maxBy(repulsions)(_.lengthSquared).getOrElse(new Force)
+    val repulsions = unit.inTileRadius(3).filter(o => ! o.flying && ! o.unitClass.isBuilding).map(collisionRepulsion(unit, _))
+    val output = ForceMath.sum(repulsions).clipMin(1.0)
     output
   }
 }

@@ -7,8 +7,6 @@ import Performance.{Cache, TotalUnitCounter}
 import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 
-import scala.collection.mutable.ListBuffer
-
 class UnitTracker {
   
   private val friendlyUnitTracker = new FriendlyUnitTracker
@@ -46,7 +44,7 @@ class UnitTracker {
 
   val selected = new Cache(() => With.units.all.filter(_.selected))
   
-  def inTileRadius(tile: Tile, tiles: Int): Vector[UnitInfo] = {
+  def inTileRadius(tile: Tile, tiles: Int): Seq[UnitInfo] = {
     inTiles(
       Circle
         .points(tiles)
@@ -55,36 +53,14 @@ class UnitTracker {
         .filter(_.valid))
   }
   
-  def inPixelRadius(pixel: Pixel, pixels: Int): Vector[UnitInfo] = {
-    val tile = pixel.tileIncluding
+  def inPixelRadius(pixel: Pixel, pixels: Int): Seq[UnitInfo] = {
     val pixelsSquared = pixels * pixels
-    inTiles(
-      Circle
-        .points(pixels / 32 + 1)
-        .view
-        .map(tile.add)
-        .filter(_.valid))
-      .filter(_.pixelCenter.pixelDistanceSquared(pixel) <= pixelsSquared)
+    inTileRadius(pixel.tileIncluding, pixels / 32 + 1).filter(_.pixelCenter.pixelDistanceSquared(pixel) <= pixelsSquared)
   }
   
-  def inTileRectangle(rectangle: TileRectangle): Vector[UnitInfo] = {
-    inTiles(rectangle.tiles)
-  }
+  def inTileRectangle(rectangle: TileRectangle): Seq[UnitInfo] = inTiles(rectangle.tiles)
   
-  private def inTiles(tiles: Seq[Tile]): Vector[UnitInfo] = {
-    // This implementation induces a copy in toVector
-    // Would this be faster if it accumulated immutably?
-    val output = new ListBuffer[UnitInfo]
-    for (tile <- tiles) {
-      if (tile.valid) {
-        if (With.grids.units.rawValues(tile.i).nonEmpty) {
-          output ++= With.grids.units.rawValues(tile.i)
-        }
-      }
-    }
-    tiles.view.flatMap(With.grids.units.get)
-    output.toVector
-  }
+  private def inTiles(tiles: Seq[Tile]): Seq[UnitInfo] = tiles.view.flatMap(With.grids.units.get)
   
   def onFrame() {
     friendlyUnitTracker.update()

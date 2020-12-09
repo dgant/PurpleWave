@@ -41,7 +41,7 @@ object FightOrFlight extends Action {
     decide(true,  "No threats",   () => unit.matchups.threats.isEmpty)
     decide(true,  "Irradiated",   () => unit.irradiated && unit.unitClass.isOrganic)
     decide(true,  "CantFlee",     () => ! unit.agent.canFlee)
-    decide(true,  "Ignore",       () => unit.matchups.pixelsOfEntanglementPerThreat.forall(_._2 < -320))
+    decide(true,  "Ignore",       () => unit.matchups.pixelsOfEntanglement < -320)
     decide(true,  "Berzerk",      () => With.frame < GameTime(6, 0)() && unit.isAny(Protoss.Zealot, Zerg.Zergling) && unit.base.exists(b => b.owner.isEnemy || b.isNaturalOf.exists(_.owner.isEnemy)) && unit.matchups.threats.exists(t => t.is(Terran.Vulture) && t.matchups.catchers.isEmpty))
     decide(true,  "Hug",          () => ! unit.flying && unit.matchups.targets.exists(t => unit.pixelDistanceEdge(t) < t.pixelRangeMin))
     decide(true,  "Cloaked",      () => unit.effectivelyCloaked || (unit.is(Terran.Wraith) && unit.energy >= 50 && unit.matchups.enemyDetectors.isEmpty && With.self.hasTech(Terran.WraithCloak)))

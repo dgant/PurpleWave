@@ -56,7 +56,7 @@ object Bust extends Action {
     // Goal: Take down the bunker. Don't take any damage from it.
     // If we're getting shot at by the bunker, back off.
     lazy val bunkers = unit.matchups.threats.filter(_.is(Terran.Bunker))
-    lazy val repairers = bunkers.flatMap(_.matchups.repairers).distinct
+    lazy val repairers = bunkers.flatMap(_.matchups.repairers)
     lazy val goons = unit.matchups.allies.filter(u => u.is(Protoss.Dragoon) && u.matchups.targetsInRange.exists(_.is(Terran.Bunker)))
 
     if (unit.readyForAttackOrder

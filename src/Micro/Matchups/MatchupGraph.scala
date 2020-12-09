@@ -3,34 +3,17 @@ package Micro.Matchups
 import Information.Battles.Types.BattleLocal
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.ByOption
 
 import scala.collection.mutable
 
 class MatchupGraph {
-  
-  private val maxUnitId = 10000 // Per jaj22, as usual
-  
-  val analyses  = new Array[MatchupAnalysis](maxUnitId)
-  val entrants  = new mutable.HashMap[BattleLocal, mutable.HashSet[UnitInfo]]
-  
-  def get(unit: UnitInfo): MatchupAnalysis = {
-    if (analyses(unit.id) == null) {
-      analyses(unit.id) = new MatchupAnalysis(unit)
-    }
-    analyses(unit.id)
-  }
+
+  val entrants = new mutable.HashMap[BattleLocal, mutable.ArrayBuffer[UnitInfo]]
   
   def run() {
-    resetAnalyses()
     assignEntrants()
-  }
-  
-  private def resetAnalyses() {
-    var i = 0
-    while (i < maxUnitId) {
-      analyses(i) = null
-      i += 1
-    }
+    With.units.all.foreach(u => u.matchups = MatchupAnalysis(u))
   }
   
   private def assignEntrants() {
@@ -43,23 +26,14 @@ class MatchupGraph {
         && (entrant.complete || entrant.unitClass.isBuilding)
         &&  entrant.battle.isEmpty
         &&  With.framesSince(entrant.frameDiscovered) < 72) {
-        val battle = assignToBattle(entrant)
+        val battle = ByOption.minBy(With.units.all.view.filter(_.battle.isDefined))(_.pixelDistanceSquared(entrant)).flatMap(_.battle)
         if (battle.isDefined) {
           if ( ! entrants.contains(battle.get)) {
-            entrants.put(battle.get, new mutable.HashSet[UnitInfo])
+            entrants.put(battle.get, new mutable.ArrayBuffer[UnitInfo])
           }
           entrants(battle.get) += entrant
         }
       }
     })
   }
-  
-  private def assignToBattle(unit: UnitInfo): Option[BattleLocal] = {
-    val neighbors = With.units.inTileRadius(unit.tileIncludingCenter, 15).filter(_.battle.isDefined).groupBy(_.battle)
-    if (neighbors.nonEmpty) {
-      neighbors.maxBy(_._2.size)._1
-    }
-    else None
-  }
-  
 }

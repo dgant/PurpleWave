@@ -69,10 +69,6 @@ object EmergencyRepair extends Action {
     
     val output = (isAlreadyPatient || isDamagedBadly || isDamagedDefense) && (needsMoreRepair || needsRepairSoon)
     
-    if (output && ! isAlreadyPatient) {
-      patient.matchups.repairers += repairer
-    }
-    
     output
   }
 }

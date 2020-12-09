@@ -22,21 +22,27 @@ object PurpleMath {
   }
   
   @inline final def centroid(values: Iterable[Pixel]): Pixel = {
-    if (values.isEmpty)
-      SpecificPoints.middle
-    else
-      Pixel(
-        values.view.map(_.x).sum / values.size,
-        values.view.map(_.y).sum / values.size)
+    if (values.isEmpty) return SpecificPoints.middle
+    // Faster than .sum
+    var x: Int = 0
+    var y: Int = 0
+    values.foreach(v => {
+      x += v.x
+      y += v.y
+    })
+    Pixel(x / values.size, y / values.size)
   }
 
   @inline final def centroidTiles(values: Iterable[Tile]): Tile = {
-    if (values.isEmpty)
-      SpecificPoints.tileMiddle
-    else
-      Tile(
-        values.view.map(_.x).sum / values.size,
-        values.view.map(_.y).sum / values.size)
+    if (values.isEmpty) return SpecificPoints.tileMiddle
+    // Faster than .sum
+    var x: Int = 0
+    var y: Int = 0
+    values.foreach(v => {
+      x += v.x
+      y += v.y
+    })
+    Tile(x / values.size, y / values.size)
   }
 
   @inline final def nanToN(value: Double, n: Double): Double = {

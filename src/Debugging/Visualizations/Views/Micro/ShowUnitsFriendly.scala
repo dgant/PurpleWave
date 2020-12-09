@@ -106,7 +106,7 @@ object ShowUnitsFriendly extends View {
           DrawMap.arrow(
             path.tiles.get(i).pixelCenter,
             path.tiles.get(i + 1).pixelCenter,
-            Colors.White)
+            unit.unitColor)
         }
       }
       unit.agent.lastPath.foreach(drawTilePath)

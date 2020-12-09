@@ -43,8 +43,7 @@ class Configuration {
 
   var enableMCRS                    = false
   var avatarBattleDistancePixels    = 32.0 * 6.0
-  var battleMarginTileBase          = 12 + 2
-  var battleMarginTileMinimum       = 12 + 2
+  var battleMarginTileMinimum       = 6
   var battleMarginTileMaximum       = 12 * 2 + 2 // A bit over double Siege Tank range
   var battleHysteresisFrames        = GameTime(0, 6)()
   var baseTarget                    = 0.04 // 0.55 -> 0.1 from SSCAIT 2018/ AIST2

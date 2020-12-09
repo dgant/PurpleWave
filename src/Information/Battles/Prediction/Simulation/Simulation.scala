@@ -11,15 +11,29 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 class Simulation(val prediction: PredictionLocal) {
   
-  private def buildSimulacra(team: Team) = if (With.blackboard.mcrs()) Vector.empty else team.units.view.filter(legalForSimulation).map(new Simulacrum(this, _)).toVector
-  private def legalForSimulation(unit: UnitInfo): Boolean = (
-    unit.complete&& ! unit.unitClass.isSpell
-    && ! unit.invincible          // No stasised units
-    && ! unit.is(if (With.performance.danger) Protoss.Interceptor else Protoss.Carrier) // Interceptors produce more accurate results but are slower
-    && ! unit.is(Protoss.Scarab)
-    && ! (unit.unitClass.isWorker && unit.gathering && unit.isOurs)
-    && ! (unit.unitClass.isBuilding && ! unit.canAttack && ! unit.unitClass.isSpellcaster)
-  )
+  private def buildSimulacra(team: Team): Vector[Simulacrum] = {
+    if (With.blackboard.mcrs()) return Vector.empty
+
+    def legalForSimulation(unit: UnitInfo): Boolean = {
+      val effectiveRangePixels = unit.effectiveRangePixels
+      (
+        unit.complete
+          && ! unit.unitClass.isSpell
+          && ! unit.invincible          // No stasised units
+          && ! unit.is(if (With.performance.danger) Protoss.Interceptor else Protoss.Carrier) // Interceptors produce more accurate results but are slower
+          && ! unit.is(Protoss.Scarab)
+          && ! (unit.unitClass.isWorker && unit.gathering && unit.isOurs)
+          && ! (unit.unitClass.isBuilding && ! unit.canAttack && ! unit.unitClass.isSpellcaster)
+          // Is close enough to interact with anyone on the other team
+          && team.opponent.units.exists(other =>
+            unit.pixelDistanceEdge(other)
+            - Math.max(effectiveRangePixels, other.effectiveRangePixels)
+            < With.configuration.simulationFrames * (unit.topSpeed + other.topSpeed))
+      )
+    }
+
+    team.units.view.filter(legalForSimulation).map(new Simulacrum(this, _)).toVector
+  }
 
   val focus                 : Pixel               = prediction.battle.focus
   val unitsOurs             : Vector[Simulacrum]  = buildSimulacra(prediction.battle.us)

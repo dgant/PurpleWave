@@ -3,7 +3,6 @@ package Micro.Actions.Scouting
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Targeting.Target
-import Micro.Matchups.{MatchupAnalysis, MatchupConditions}
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Strategery.Strategies.Zerg.ZvE4Pool
@@ -24,7 +23,7 @@ object Kindle extends Action {
     unit.matchups.allies.exists(_.is(Zerg.Zergling))
     || (
       ( ! target.unitClass.attacks|| target.remainingCompletionFrames > unit.framesToTravelPixels(target.pixelRangeAgainst(unit)))
-      && MatchupAnalysis(unit, MatchupConditions(unit.pixelToFireAt(target), 0)).framesOfSafety > safetyMarginFrames
+      && unit.matchups.framesOfSafety > safetyMarginFrames
     )
   )
   

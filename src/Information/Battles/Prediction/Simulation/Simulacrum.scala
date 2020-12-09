@@ -129,7 +129,7 @@ class Simulacrum(
   @inline final def targetValue(target: Simulacrum): Double = {
     val framesToFire = Math.max(0.0, target.pixel.pixelDistance(pixel) - realUnit.pixelRangeAgainst(target.realUnit)) / Math.max(0.001, topSpeed)
     Target.baseAttackerToTargetValue(
-      baseTargetValue = target.realUnit.baseTargetValue(),
+      baseTargetValue = target.realUnit.targetBaseValue(),
       totalHealth = target.hitPoints + target.shieldPoints,
       framesOutOfTheWay = framesToFire
     )

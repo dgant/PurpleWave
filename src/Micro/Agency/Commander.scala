@@ -14,7 +14,7 @@ import bwapi.UnitCommandType
 
 // Commander is responsible for issuing unit commands
 // in a way that Brood War handles gracefully,
-// and to take advantage of Brood War mechanics to optimize commands.
+// while taking advantage of Brood War mechanics to optimize commands.
 //
 // The goal is for the rest of the code base to be blissfully unaware
 // of Brood War's glitchy unit behavior.

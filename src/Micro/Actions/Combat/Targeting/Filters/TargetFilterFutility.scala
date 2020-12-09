@@ -15,6 +15,10 @@ object TargetFilterFutility extends TargetFilter {
       return false
     }
 
+    if (actor.inRangeToAttack(target)) {
+      return true
+    }
+
     // Respect PushKiters (intended for eg. Proxy Zealot rushes coming up against Dragoons)
     if (With.blackboard.pushKiters.get && target.canAttack(actor) && target.pixelRangeAgainst(actor) > 32) {
       return true
@@ -31,7 +35,7 @@ object TargetFilterFutility extends TargetFilter {
       && (ally.topSpeed >= target.topSpeed || ally.pixelRangeAgainst(target) >= actor.pixelRangeAgainst(target))
       && ally.framesBeforeAttacking(target) <= actor.framesBeforeAttacking(target))
     
-    lazy val targetCatchable = target.battle.isEmpty || target.matchups.catchers.contains(actor) || alliesAssisting
+    lazy val targetCatchable = target.battle.isEmpty || actor.topSpeed >= target.topSpeed || target.matchups.catchers.contains(actor) || alliesAssisting
     lazy val targetReachable  = (
       target.visible
       || actor.flying

@@ -41,7 +41,7 @@ object Root extends Action {
     private lazy val threatsButNoTargets    = unit.matchups.threats.nonEmpty && visibleTargets.isEmpty
     private lazy val insideNarrowChoke      = unit.zone.edges.exists(e => e.radiusPixels < 32.0 * 4.0 && unit.pixelDistanceCenter(e.pixelCenter) < e.radiusPixels)
     private lazy val beingPickedUp          = unit.agent.toBoard.isDefined
-    private lazy val outOfCombat            = unit.matchups.battle.isEmpty
+    private lazy val outOfCombat            = unit.battle.isEmpty
     private lazy val inTheWay               = With.coordinator.pushes.get(unit).exists(p => p.force(unit).isDefined)
     private lazy val retreating             = ! unit.agent.shouldEngage
     private lazy val protectingBase         = unit.matchups.allies.exists(a => a.unitClass.isBuilding && a.matchups.framesOfSafety < unit.matchups.framesOfSafety)

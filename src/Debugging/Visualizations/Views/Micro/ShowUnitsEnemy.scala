@@ -22,7 +22,7 @@ object ShowUnitsEnemy extends View {
   
   private def renderUnit(unit: ForeignUnitInfo) {
     
-    val color = unit.color
+    val color = unit.teamColor
 
     if (showTargets && unit.visible) {
       ShowUnitsFriendly.renderTargets(unit)
@@ -46,7 +46,7 @@ object ShowUnitsEnemy extends View {
       if ( ! unit.complete && unit.remainingCompletionFrames > 0) {
         val time = new GameTime(unit.remainingCompletionFrames)
         val pctHp = unit.hitPoints.toDouble / unit.unitClass.maxHitPoints
-        DrawMap.labelBox(Array(time.toString, "%02f".format(pctHp) + "%"), Pixel(unit.x, unit.bottom), drawBackground = true, unit.color)
+        DrawMap.labelBox(Array(time.toString, "%02f".format(pctHp) + "%"), Pixel(unit.x, unit.bottom), drawBackground = true, unit.teamColor)
       }
     }
   }

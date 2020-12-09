@@ -3,7 +3,6 @@ package Information.Battles.Clustering
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Circle
-import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
@@ -99,11 +98,10 @@ class BattleClusteringState(seedUnits: Set[UnitInfo]) {
     if (linkedUnit == unit) unit else getRoot(linkedUnit)
   }
   
-  private def radiusTiles(unit: UnitInfo): Int ={
-    val tilesSpeed  = if (unit.is(Protoss.Interceptor)) 8 else (unit.topSpeed * With.reaction.clusteringMax / 32).toInt
-    val tilesMargin = Math.max(tilesSpeed, With.configuration.battleMarginTileBase)
+  @inline private def radiusTiles(unit: UnitInfo): Int = {
     PurpleMath.clamp(
-      tilesMargin + unit.effectiveRangePixels.toInt / 32,
-      With.configuration.battleMarginTileMinimum, With.configuration.battleMarginTileMaximum)
+      unit.effectiveRangePixels.toInt / 32 + 6,
+      With.configuration.battleMarginTileMinimum,
+      With.configuration.battleMarginTileMaximum)
   }
 }

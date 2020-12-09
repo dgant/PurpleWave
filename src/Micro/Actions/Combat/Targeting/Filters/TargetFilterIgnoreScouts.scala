@@ -10,6 +10,8 @@ object TargetFilterIgnoreScouts extends TargetFilter {
   // ignore scouting workers
   //
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
+    if (With.frame > GameTime(8, 0)()) return true
+
     /*
       Chase if:
       * We are not in our base

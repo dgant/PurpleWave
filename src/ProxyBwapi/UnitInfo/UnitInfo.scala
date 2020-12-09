@@ -342,6 +342,11 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   // Combat //
   ////////////
 
+  @inline final def battle: Option[BattleLocal] = With.battles.byUnit.get(this).orElse(With.matchups.entrants.find(_._2.contains(this)).map(_._1))
+  @inline var matchups: MatchupAnalysis = MatchupAnalysis(this)
+
+  val targetBaseValue = new Cache(() => Target.getTargetBaseValue(this), 24)
+
   val participatingInCombat = new Cache(() => matchups.targets.nonEmpty || isAny(
     // Spellcasters (which don't have targets)
     // Static defense (which doesn't have targets if incomplete)
@@ -360,10 +365,6 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     Zerg.SporeColony,
     Zerg.SunkenColony
   ))
-  val baseTargetValue = new Cache(() => Target.getTargetBaseValue(this))
-
-  @inline final def battle: Option[BattleLocal] = With.battles.byUnit.get(this).orElse(With.matchups.entrants.find(_._2.contains(this)).map(_._1))
-  @inline final def matchups: MatchupAnalysis = With.matchups.get(this)
 
   @inline final def armorHealth: Int = armorHealthCache()
   @inline final def armorShield: Int = armorShieldsCache()
@@ -722,10 +723,12 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   // Visualization //
   ///////////////////
   
-  @inline final def color: Color =
+  @inline final def teamColor: Color =
     if      (visible)             player.colorBright
     else if (likelyStillThere)    player.colorMedium
     else if (possiblyStillThere)  player.colorDark
     else if (likelyStillAlive)    player.colorMidnight
     else                          Colors.MidnightGray
+
+  @inline final def unitColor: Color = Colors.rainbow(frameDiscovered % Colors.rainbow.size)
 }

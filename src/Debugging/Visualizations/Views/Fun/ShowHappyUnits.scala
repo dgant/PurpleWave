@@ -29,7 +29,7 @@ object ShowHappyUnits extends View {
   
   def renderUnit(unit:UnitInfo) {
     
-    val color = unit.color
+    val color = unit.teamColor
     val isActiveBuilding = unit.friendly.nonEmpty && unit.friendly.get.trainingQueue.nonEmpty
     val animationFrame = unit.left + unit.top + With.frame
     

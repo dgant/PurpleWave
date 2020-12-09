@@ -68,5 +68,5 @@ class BattleProcessDivisions extends BattleProcessState {
     transitionTo(new BattleProcessSimulate)
   }
 
-  private def distance(unit: UnitInfo, base: Base): Double = (Iterable(base.heart.pixelCenter) ++ base.zone.exit.map(_.pixelCenter)).map(unit.pixelDistanceTravelling).min
+  private def distance(unit: UnitInfo, base: Base): Double = unit.pixelDistanceTravelling(base.heart)
 }

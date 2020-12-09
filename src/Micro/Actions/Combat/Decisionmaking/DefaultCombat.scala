@@ -72,8 +72,9 @@ object DefaultCombat extends Action {
 
   def takePotshot(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return
-    unit.agent.toAttack = Target.best(unit, TargetFilterPotshot).orElse(unit.agent.toAttack)
-    if (unit.readyForAttackOrder) {
+    val potshotTarget = Target.best(unit, TargetFilterPotshot)
+    unit.agent.toAttack = potshotTarget.orElse(unit.agent.toAttack)
+    if (potshotTarget.isDefined && unit.readyForAttackOrder) {
       With.commander.attack(unit)
     }
   }

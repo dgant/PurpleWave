@@ -11,13 +11,13 @@ object Heal extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.is(Terran.Medic)
-    && (unit.matchups.battle.isDefined || unit.agent.toReturn.isEmpty)
+    && (unit.battle.isDefined || unit.agent.toReturn.isEmpty)
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {
     val targets = validTargets(unit)
     val target  = ByOption.minBy(targets)(patient =>
-      if (unit.matchups.battle.isDefined && unit.matchups.threats.nonEmpty)
+      if (unit.battle.isDefined && unit.matchups.threats.nonEmpty)
         patient.pixelDistanceEdge(unit)
       else
         patient.pixelDistanceCenter(unit.agent.destination))

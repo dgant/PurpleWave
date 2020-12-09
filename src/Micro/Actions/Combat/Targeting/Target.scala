@@ -38,7 +38,7 @@ object Target extends {
   }
 
   def preferred(attacker: FriendlyUnitInfo, required: TargetFilter*): Iterable[UnitInfo] = {
-    val filtersPreferred = TargetFilterGroups.filtersPreferred.filter(_.appliesTo(attacker))
+    val filtersPreferred = TargetFilterGroups.filtersPreferred.view.filter(_.appliesTo(attacker))
     val legalTargets = legal(attacker, required: _*).toVector
     (0 to filtersPreferred.length)
       .map(i => legalTargets.view.filter(target => filtersPreferred.drop(i).forall(_.legal(attacker, target))))
@@ -51,23 +51,25 @@ object Target extends {
   }
 
   def auditLegality(attacker: FriendlyUnitInfo, additionalFiltersRequired: TargetFilter*): Vector[(UnitInfo, Vector[(Boolean, TargetFilter)])] = {
-    attacker.matchups.targets.map(target => (
-      target,
-      (TargetFilterGroups.filtersRequired.view ++ additionalFiltersRequired ++ TargetFilterGroups.filtersPreferred)
-        .map(filter => (filter.legal(attacker, target), filter))
-        .toVector
-        .sortBy(_._1)))
+    attacker.matchups.targets
+      .map(target => (
+        target,
+        (TargetFilterGroups.filtersRequired.view ++ additionalFiltersRequired ++ TargetFilterGroups.filtersPreferred)
+          .map(filter => (filter.legal(attacker, target), filter))
+          .toVector
+          .sortBy(_._1)))
+      .toVector
   }
 
   def auditScore(attacker: FriendlyUnitInfo): Seq[(UnitInfo, Double, Double)] = {
-    attacker.matchups.targets.view.map(target => (target, target.baseTargetValue(), score(attacker, target))).toVector.sortBy(-_._3)
+    attacker.matchups.targets.view.map(target => (target, target.targetBaseValue(), score(attacker, target))).toVector.sortBy(-_._3)
   }
 
   @inline final def score(attacker: FriendlyUnitInfo, target: UnitInfo): Double = {
     val framesOfFreedom = attacker.cooldownLeft
     val framesOutOfWayToShoot = if (attacker.canMove) Math.max(0, attacker.framesToGetInRange(target) - framesOfFreedom) else 0
     val output = baseAttackerToTargetValue(
-      baseTargetValue = target.baseTargetValue(),
+      baseTargetValue = target.targetBaseValue(),
       totalHealth = target.totalHealth,
       framesOutOfTheWay = framesOutOfWayToShoot,
       dpf = attacker.dpfOnNextHitAgainst(target))
@@ -162,7 +164,7 @@ object Target extends {
     }
 
     // Detection bonus
-    val weHaveCloakedThreat = target.matchups.enemies.headOption.exists(_.matchups.alliesInclSelfCloaked.exists(_.matchups.targets.nonEmpty)) && ! target.matchups.enemies.exists(_.isArbiter())
+    val weHaveCloakedThreat = target.matchups.enemies.exists(e => e.cloaked && e.matchups.targets.nonEmpty) && ! target.matchups.enemies.exists(_.isArbiter())
     if (weHaveCloakedThreat) {
       val building = target.constructing || target.repairing
       val buildTarget = if (building) target.target else None

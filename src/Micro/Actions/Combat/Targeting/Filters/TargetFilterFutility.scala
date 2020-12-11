@@ -1,9 +1,9 @@
 package Micro.Actions.Combat.Targeting.Filters
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.Seconds
 
 object TargetFilterFutility extends TargetFilter {
 
@@ -25,7 +25,7 @@ object TargetFilterFutility extends TargetFilter {
     }
 
     // This is a pretty expensive filter; avoid using it if possible
-    if (actor.battle.exists(_.teamOf(actor).units.size > 12 || (With.frame > GameTime(0, 12)() && With.reaction.agencyAverage > 6))) {
+    if (actor.battle.exists(_.teamOf(actor).units.size > 12 || (With.frame > Seconds(12)() && With.reaction.agencyAverage > 6))) {
       return true
     }
 
@@ -45,7 +45,7 @@ object TargetFilterFutility extends TargetFilter {
           With.grids.walkableTerrain.get(tile)
           && With.grids.altitudeBonus.get(tile) >= With.grids.altitudeBonus.get(target.tileIncludingCenter)))
 
-    if (actor.is(Terran.Vulture) && target.unitClass.isBuilding && With.frame < GameTime(0, 4)()) return false
+    if (actor.is(Terran.Vulture) && target.unitClass.isBuilding && With.frame < Seconds(4)()) return false
 
     val output = targetReachable && (atOurWorkers || targetCatchable)
     

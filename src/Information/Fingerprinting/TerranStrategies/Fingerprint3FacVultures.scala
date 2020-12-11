@@ -1,7 +1,8 @@
 package Information.Fingerprinting.TerranStrategies
 
-import Information.Fingerprinting.Generic.{FingerprintArrivesBy, FingerprintOr, GameTime}
+import Information.Fingerprinting.Generic.{FingerprintArrivesBy, FingerprintOr}
 import ProxyBwapi.Races.Terran
+import Utilities.GameTime
 
 class Fingerprint3FacVultures extends FingerprintOr(
   new FingerprintArrivesBy(Terran.Vulture, GameTime(5, 30), 3),

@@ -2,6 +2,7 @@ package Information.Fingerprinting.Generic
 
 import Lifecycle.With
 import Planning.UnitMatchers.UnitMatcher
+import Utilities.GameTime
 
 class FingerprintCompleteBy(
   unitMatcher : UnitMatcher,

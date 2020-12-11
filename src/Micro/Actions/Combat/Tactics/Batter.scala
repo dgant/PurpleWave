@@ -2,7 +2,6 @@ package Micro.Actions.Combat.Tactics
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
-import Information.Fingerprinting.Generic.GameTime
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.PurpleMath
@@ -11,14 +10,14 @@ import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Targeting.Target
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.ByOption
+import Utilities.{ByOption, Minutes, Seconds}
 import bwapi.Race
 
 object Batter extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     (
-      With.frame < GameTime(7, 0)()
+      With.frame < Minutes(70)()
       && unit.canMove
       && unit.canAttack
       && ! unit.flying
@@ -60,7 +59,7 @@ object Batter extends Action {
     lazy val shootingThreats  = unit.matchups.pixelsOfEntanglementPerThreat.filter(_._2 > -64)
     lazy val dpfReceiving     = shootingThreats.map(_._1.dpfOnNextHitAgainst(unit)).sum
     lazy val framesToLive     = PurpleMath.nanToInfinity(unit.totalHealth / dpfReceiving)
-    lazy val dying            = framesToLive < GameTime(0, 1)()
+    lazy val dying            = framesToLive < Seconds(1)()
     lazy val shouldRetreat    = ! unit.agent.shouldEngage || (unit.unitClass.melee && dying)
     
     if (shouldRetreat) {

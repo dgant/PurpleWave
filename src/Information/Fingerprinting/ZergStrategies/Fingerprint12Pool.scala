@@ -1,8 +1,9 @@
 package Information.Fingerprinting.ZergStrategies
 
-import Information.Fingerprinting.Generic.{FingerprintAnd, FingerprintCompleteBy, FingerprintNot, GameTime}
+import Information.Fingerprinting.Generic.{FingerprintAnd, FingerprintCompleteBy, FingerprintNot}
 import Lifecycle.With
 import ProxyBwapi.Races.Zerg
+import Utilities.GameTime
 
 class Fingerprint12Pool extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.fourPool),

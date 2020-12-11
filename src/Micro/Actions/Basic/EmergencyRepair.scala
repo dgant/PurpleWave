@@ -1,16 +1,16 @@
 package Micro.Actions.Basic
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Actions.Action
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.Seconds
 
 object EmergencyRepair extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.is(Terran.SCV)
-    && With.self.minerals + With.economy.ourIncomePerFrameMinerals * GameTime(0, 10)() > 25
+    && With.self.minerals + With.economy.ourIncomePerFrameMinerals * Seconds(10)() > 25
   )
   
   override def perform(unit: FriendlyUnitInfo) {

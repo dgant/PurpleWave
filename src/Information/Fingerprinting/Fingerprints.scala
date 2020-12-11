@@ -1,10 +1,10 @@
 package Information.Fingerprinting
 
-import Information.Fingerprinting.Generic.GameTime
 import Information.Fingerprinting.ProtossStrategies._
 import Information.Fingerprinting.TerranStrategies._
 import Information.Fingerprinting.ZergStrategies._
 import Lifecycle.With
+import Utilities.Minutes
 
 import scala.collection.mutable
 
@@ -55,7 +55,7 @@ class Fingerprints {
     ) else Seq.empty)
   
   def update() {
-    if (With.frame > GameTime(10, 0)()) {
+    if (With.frame > Minutes(10)()) {
       return
     }
 

@@ -1,7 +1,7 @@
 package Performance.Tasks
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.{Manners, With}
+import Utilities.Minutes
 
 class TaskArchitecture extends AbstractTask {
   urgency = With.configuration.urgencyArchitecture
@@ -54,9 +54,9 @@ class TaskMicro extends AbstractTask {
 class TaskPlanning extends AbstractTask {
   urgency = With.configuration.urgencyPlanning
   override def maxConsecutiveSkips: Int =
-    if (With.frame < GameTime(5, 0)())
+    if (With.frame < Minutes(5)())
       3
-    else if (With.frame < GameTime(10, 0)())
+    else if (With.frame < Minutes(10)())
       6
     else
       12

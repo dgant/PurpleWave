@@ -1,8 +1,8 @@
 package Information.Fingerprinting.ProtossStrategies
 
 import Information.Fingerprinting.Fingerprint
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
+import Utilities.GameTime
 
 class FingerprintGasSteal extends Fingerprint {
   

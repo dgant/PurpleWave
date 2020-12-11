@@ -7,6 +7,7 @@ import Micro.Squads.Goals.SquadGoal
 import Micro.Squads.Squad
 import Performance.Cache
 import ProxyBwapi.Techs.{Tech, Techs}
+import ProxyBwapi.UnitTracking.Visibility
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 
 import scala.collection.JavaConverters._
@@ -47,7 +48,9 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
   ////////////////
   // Visibility //
   ////////////////
-  
+
+  def visibility: Visibility.Value = if (alive) Visibility.Visible else Visibility.Dead
+
   private var knownToEnemyOnce: Boolean = false
   def knownToEnemy: Boolean = knownToEnemyOnce
   

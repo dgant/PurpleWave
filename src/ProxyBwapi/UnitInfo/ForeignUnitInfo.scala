@@ -2,49 +2,20 @@ package ProxyBwapi.UnitInfo
 
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
-import Mathematics.Shapes.Circle
 import Performance.Cache
-import ProxyBwapi.Players.Players
-import ProxyBwapi.Players.PlayerInfo
+import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
+import ProxyBwapi.UnitTracking.Visibility
 import ProxyBwapi.Upgrades.Upgrade
-import Utilities.ByOption
 import bwapi.Position
 
-class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(originalBaseUnit, id) {
+class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit, id) {
 
-  // Update foreign units
-  // Lots of shortcuts are taken here to avoid unnecessary updates
-  
   override val foreign: Option[ForeignUnitInfo] = Some(this)
-  
-  def flagDead()        { _alive    = false }
-  def flagVisible()     { _visible  = true  }
-  def flagInvisible()   { _visible  = false }
-  def flagBurrowed()    { _burrowed = true  }
-  def flagCloaked()     { _cloaked  = true  }
-  def flagUndetected()  { _detected = false }
-  def flagMissing() {
-    val repositionTo = (0 to 5).view.map(i =>
-      ByOption.minBy(Circle.points(i)
-        .map(tileIncludingCenter.add)
-        .filter(tile =>
-          tile.valid
-          && (flying || With.grids.walkable.get(tile))
-          && ! With.grids.friendlyVision.isSet(tile)))(_.pixelCenter.pixelDistanceSquared(projectFrames(8))))
-      .find(_.nonEmpty).flatten
 
-    if (repositionTo.isDefined) {
-      _pixelCenter = repositionTo.get.pixelCenter
-    } else {
-      _possiblyStillThere = false
-    }
-  }
-  
-  def update(unit: bwapi.Unit) {
-    baseUnit = unit
+  def update(): Unit = {
     updateTimeSensitiveInformation()
     updateTimeInsensitiveInformation()
     fixCloakedUnits()
@@ -73,28 +44,43 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
   ///////////////////
   
   private def updateTimeSensitiveInformation() {
-    _complete           = baseUnit.isCompleted
-    _lastSeen           = With.frame
-    _possiblyStillThere = true
-    _hitPoints          = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxHitPoints  else _hitPoints     else baseUnit.getHitPoints
-    _shieldPoints       = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxShields    else _shieldPoints  else baseUnit.getShields
-    _pixelCenter        = new Pixel(baseUnit.getPosition)
-    _tileTopLeft        = new Tile(baseUnit.getTilePosition)
+    _complete             = baseUnit.isCompleted
+    _lastSeen             = With.frame
+    _pixelCenter          = new Pixel(baseUnit.getPosition)
+    _pixelCenterObserved  = _pixelCenter
+    _tileTopLeft          = new Tile(baseUnit.getTilePosition)
+    _hitPoints            = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxHitPoints  else _hitPoints     else baseUnit.getHitPoints
+    _shieldPoints         = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxShields    else _shieldPoints  else baseUnit.getShields
   }
   
   private def updateTracking() {
     _player     = Players.get(baseUnit.getPlayer)
     _unitClass  = UnitClasses.get(baseUnit.getType)
   }
-  
-  private var _lastSeen           : Int         = _
-  private var _player             : PlayerInfo  = _
-  private var _possiblyStillThere : Boolean     = _
-  private var _unitClass          : UnitClass   = UnitClasses.None
+
+  def visibility: Visibility.Value = _visibility
+  def setVisbility(value: Visibility.Value): Unit = {
+    _visibility = value
+    visibility match {
+      case Visibility.Visible           => _burrowed = baseUnit.isBurrowed
+      case Visibility.InvisibleBurrowed => _burrowed = true
+      case Visibility.InvisibleNearby   => _burrowed = false
+      case Visibility.InvisibleMissing  => _burrowed = false
+      case Visibility.Dead              => _alive = false
+    }
+  }
+
+  def presumePixel(value: Pixel): Unit = {
+    _pixelCenter = value
+  }
+
+  private var _visibility         : Visibility.Value  = Visibility.Visible
+  private var _lastSeen           : Int               = _
+  private var _player             : PlayerInfo        = _
+  private var _unitClass          : UnitClass         = UnitClasses.None
   
   def lastSeen           : Int        = _lastSeen
   def player             : PlayerInfo = _player
-  def possiblyStillThere : Boolean    = _possiblyStillThere
   def unitClass          : UnitClass  = _unitClass
   
   def lastSeenWithin(frames: Int): Boolean = With.framesSince(_lastSeen) < frames
@@ -170,11 +156,13 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
   // Geometry //
   //////////////
   
-  private var _pixelCenter : Pixel  = Pixel(0, 0)
-  private var _tileTopLeft : Tile   = Tile(0, 0)
+  private var _pixelCenter          : Pixel  = Pixel(0, 0)
+  private var _pixelCenterObserved  : Pixel  = Pixel(0, 0)
+  private var _tileTopLeft          : Tile   = Tile(0, 0)
   
-  def pixelCenter : Pixel   = _pixelCenter
-  def tileTopLeft : Tile    = _tileTopLeft
+  def pixelCenter         : Pixel = _pixelCenter
+  def pixelCenterObserved : Pixel = _pixelCenterObserved
+  def tileTopLeft         : Tile  = _tileTopLeft
   
   ////////////
   // Orders //
@@ -258,7 +246,6 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
   ////////////////
   
   private def updateVisibility() {
-    _burrowed = unitClass.canBurrow && baseUnit.isBurrowed
     _cloaked  = ! player.isNeutral && baseUnit.isCloaked
     _detected = player.isNeutral || baseUnit.isDetected
   }
@@ -266,12 +253,11 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
   private var _burrowed  : Boolean  = _
   private var _cloaked   : Boolean  = _
   private var _detected  : Boolean  = _
-  private var _visible   : Boolean  = _
   
   def burrowed  : Boolean = _burrowed
   def cloaked   : Boolean = _cloaked
   def detected  : Boolean = _detected
-  def visible   : Boolean = _visible
+  def visible   : Boolean = visibility == Visibility.Visible
   
   //////////////
   // Movement //
@@ -343,12 +329,13 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
     _carryingGas            = unitClass.isWorker && ! carryingMinerals && baseUnit.isCarryingGas
     _powered                = unitClass.requiresPsi && baseUnit.isPowered
     _selected               = baseUnit.isSelected
-    _targetable             = true || baseUnit.isTargetable // Shortcut for performance; we don't use this anyway
+    _targetable             = baseUnit.isTargetable
     _underAttack            = ! player.isNeutral && baseUnit.isUnderAttack
     _underDarkSwarm         = ! player.isNeutral && baseUnit.isUnderDarkSwarm
     _underDisruptionWeb     = ! player.isNeutral && baseUnit.isUnderDisruptionWeb
     _underStorm             = ! player.isNeutral && baseUnit.isUnderStorm
     _addon                  = if (unitClass.canBuildAddon) With.units.get(baseUnit.getAddon) else None
+    _removalTimer           = baseUnit.getRemoveTimer
   }
 
   private var _remainingTrainFrames   : Int = _
@@ -368,6 +355,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
   private var _underDisruptionWeb     : Boolean = _
   private var _underStorm             : Boolean = _
   private var _addon                  : Option[UnitInfo] = None
+  private var _removalTimer           : Int = _
 
   protected def remainingFrames(snapshotHitPoints: Int, snapshotShields: Int, dataFrame: Int): Int = {
     val totalHealthInitial  = 1 + unitClass.maxTotalHealth / 10
@@ -406,6 +394,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(or
   
   def addon: Option[UnitInfo] = _addon
   def hasNuke: Boolean = false
+  def framesUntilRemoval: Int = _removalTimer
   
   // Cloaked units show up with 0 hit points/shields.
   // Presumably, if we've never seen them, then they're healthier than that.

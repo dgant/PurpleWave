@@ -1,7 +1,6 @@
 package Planning.Plans.Macro.Build
 
 import Debugging.Visualizations.Rendering.DrawMap
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.Buildables.{Buildable, BuildableUnit}
 import Macro.Scheduling.MacroCounter
@@ -14,6 +13,7 @@ import Planning.UnitPreferences.UnitPreference
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.Seconds
 
 class TrainUnit(val traineeClass: UnitClass) extends ProductionPlan {
 
@@ -72,7 +72,7 @@ class TrainUnit(val traineeClass: UnitClass) extends ProductionPlan {
     }
   }
 
-  private val safetyFramesMax = GameTime(0, 10)()
+  private val safetyFramesMax = Seconds(10)()
   private lazy val mapSize = With.mapTileWidth + With.mapTileHeight
   private lazy val preference = new UnitPreference {
     override def apply(trainer: FriendlyUnitInfo): Double = {

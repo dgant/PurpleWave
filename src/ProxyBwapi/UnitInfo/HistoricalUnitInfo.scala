@@ -3,13 +3,14 @@ import Mathematics.Points.{Pixel, Tile}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
+import ProxyBwapi.UnitTracking.Visibility
 import ProxyBwapi.Upgrades.Upgrade
 
 class HistoricalUnitInfo(unit: UnitInfo) extends UnitInfo(unit.baseUnit, unit.id) {
+  override def visibility: Visibility.Value = Visibility.Dead
   override val player: PlayerInfo = unit.player
   override val lastSeen: Int = unit.lastSeen
-  override val possiblyStillThere: Boolean = unit.possiblyStillThere
-  override val alive: Boolean = unit.alive
+  override val alive: Boolean = false
   override val complete: Boolean = unit.complete
   override val defensiveMatrixPoints: Int = unit.defensiveMatrixPoints
   override val hitPoints: Int = unit.hitPoints
@@ -88,7 +89,7 @@ class HistoricalUnitInfo(unit: UnitInfo) extends UnitInfo(unit.baseUnit, unit.id
   override val underStorm: Boolean = unit.underStorm
   override val addon: Option[UnitInfo] = None
   override val hasNuke: Boolean = unit.hasNuke
-
+  override val framesUntilRemoval: Int = 0
   override val techProducing: Option[Tech] = unit.techProducing
   override val upgradeProducing: Option[Upgrade]  = unit.upgradeProducing
   override val unitProducing: Option[UnitClass] = unit.unitProducing

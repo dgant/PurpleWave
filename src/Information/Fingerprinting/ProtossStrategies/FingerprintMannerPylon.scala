@@ -1,9 +1,9 @@
 package Information.Fingerprinting.ProtossStrategies
 
 import Information.Fingerprinting.Fingerprint
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
+import Utilities.GameTime
 
 class FingerprintMannerPylon extends Fingerprint {
   override protected def investigate: Boolean = (

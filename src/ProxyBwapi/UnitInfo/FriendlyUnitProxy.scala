@@ -28,7 +28,6 @@ abstract class FriendlyUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends UnitInf
   def player              : PlayerInfo  = cachePlayer()
   def unitClass           : UnitClass   = cacheClass()
   def lastSeen            : Int         = With.frame
-  def possiblyStillThere  : Boolean     = alive
 
   def update(newBase: bwapi.Unit) {
     baseUnit = newBase
@@ -210,6 +209,8 @@ abstract class FriendlyUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends UnitInf
     With.units.get(bwapiUnit.getAddon) else None)
 
   def hasNuke: Boolean = bwapiUnit.hasNuke
+
+  def framesUntilRemoval: Int = bwapiUnit.getRemoveTimer
 
   def spaceRemaining: Int = bwapiUnit.getSpaceRemaining
 

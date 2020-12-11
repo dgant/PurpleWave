@@ -1,10 +1,10 @@
 package Information.Fingerprinting.ProtossStrategies
 
 import Information.Fingerprinting.Fingerprint
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchWarriors, UnitMatchWorkers}
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.GameTime
 
 class FingerprintWorkerRush extends Fingerprint {
   

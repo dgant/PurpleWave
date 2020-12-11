@@ -1,6 +1,5 @@
 package Planning.Plans.Scouting
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
@@ -10,6 +9,7 @@ import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete, UnitMatchNotHoldi
 import Planning.UnitPreferences.UnitPreferClose
 import Planning.{Plan, Property}
 import ProxyBwapi.Races.Protoss
+import Utilities.GameTime
 
 class ScoutForCannonRush extends Plan {
   val scouts = new Property[LockUnits](new LockUnits {

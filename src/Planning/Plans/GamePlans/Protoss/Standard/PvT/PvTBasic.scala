@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.Get
@@ -25,6 +24,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyIsRandom, EnemyRecentStrate
 import Planning.UnitMatchers.{UnitMatchOr, UnitMatchSiegeTank, UnitMatchWorkers}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
+import Utilities.GameTime
 
 class PvTBasic extends GameplanTemplate {
 

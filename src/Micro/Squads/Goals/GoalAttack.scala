@@ -1,6 +1,5 @@
 package Micro.Squads.Goals
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
@@ -9,7 +8,7 @@ import Micro.Squads.SquadBatch
 import Planning.UnitMatchers.{UnitMatchProxied, UnitMatchWarriors}
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.ByOption
+import Utilities.{ByOption, Minutes}
 
 class GoalAttack extends SquadGoalBasic {
 
@@ -33,12 +32,12 @@ class GoalAttack extends SquadGoalBasic {
 
     def targetFilter(unit: UnitInfo): Boolean = (
       unit.isEnemy
-      && unit.likelyStillAlive
-      && unit.possiblyStillThere
+      && unit.alive
+      && unit.likelyStillThere
       && unit.unitClass.dealsDamage)
 
     val occupiedBases = squad.units.flatMap(_.base).filter(_.owner.isEnemy)
-    squad.enemies = With.units.enemy.view.filter(u => u.possiblyStillThere && targetFilter(u) && u.zone == target.zone || u.canMove || u.unitClass.isSiegeTank).toSeq
+    squad.enemies = With.units.enemy.view.filter(u => u.likelyStillThere && targetFilter(u) && u.zone == target.zone || u.canMove || u.unitClass.isSiegeTank).toSeq
   }
   
   protected def chooseTarget(): Unit = {
@@ -51,7 +50,7 @@ class GoalAttack extends SquadGoalBasic {
       ByOption.min(With.geography.enemyBases.map(_.heart.tileDistanceFast(focusUs)))
         .getOrElse(With.scouting.mostBaselikeEnemyTile.tileDistanceFast(focusUs))
 
-    lazy val enemyNonTrollyThreats = With.units.enemy.count(u => u.is(UnitMatchWarriors) && u.possiblyStillThere && ! u.is(Terran.Vulture) && u.detected)
+    lazy val enemyNonTrollyThreats = With.units.enemy.count(u => u.is(UnitMatchWarriors) && u.likelyStillThere && ! u.is(Terran.Vulture) && u.detected)
     if (With.enemies.exists( ! _.isZerg)
       && With.enemy.bases.size < 3
       && threatDistanceToUs < threatDistanceToEnemy
@@ -62,7 +61,7 @@ class GoalAttack extends SquadGoalBasic {
     target =
       ByOption.minBy(With.geography.ourBasesAndSettlements.flatMap(_.units.filter(u => u.isEnemy && u.unitClass.isBuilding).map(_.pixelCenter)))(_.groundPixels(With.geography.home.pixelCenter))
       .orElse(
-        if (With.geography.ourBases.size > 1 && With.frame > GameTime(10, 0)())
+        if (With.geography.ourBases.size > 1 && With.frame > Minutes(10)())
           None
         else
           ByOption.minBy(With.units.enemy.view.filter(_.is(UnitMatchProxied)).map(_.pixelCenter))(_.groundPixels(With.geography.home.pixelCenter)))

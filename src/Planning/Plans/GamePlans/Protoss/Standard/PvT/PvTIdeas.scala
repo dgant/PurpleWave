@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Attack, Hunt}
@@ -20,6 +19,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
+import Utilities.GameTime
 
 object PvTIdeas {
 

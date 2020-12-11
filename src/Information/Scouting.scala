@@ -1,13 +1,12 @@
 package Information
 
-import Information.Fingerprinting.Generic.GameTime
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Points.Tile
 import Performance.Cache
 import Planning.UnitMatchers.{UnitMatchBuilding, UnitMatchWorkers}
 import ProxyBwapi.Races.Zerg
-import Utilities.{ByOption, CountMap}
+import Utilities._
 
 class Scouting {
 
@@ -43,7 +42,7 @@ class Scouting {
   private val mostBaselikeEnemyTileCache = new Cache(() =>
     With.units.enemy
       .view
-      .filter(unit => unit.possiblyStillThere && ! unit.flying && unit.unitClass.isBuilding)
+      .filter(unit => unit.likelyStillThere && ! unit.flying && unit.unitClass.isBuilding)
       .toVector
       .sortBy(unit => ! unit.unitClass.isTownHall)
       .map(_.tileIncludingCenter)
@@ -91,7 +90,7 @@ class Scouting {
         With.logger.debug("Inferred enemy main from process of elimination.")
       }
       // Infer main by creep
-      else if (With.frame < GameTime(5, 0)() && With.enemies.exists(_.isZerg)) {
+      else if (With.frame < Minutes(5)() && With.enemies.exists(_.isZerg)) {
         val newlyCreepedBases = With.geography.startBases
           .filter(b => b.owner.isNeutral && b.zone.tiles.exists(t =>
             With.grids.creep.getUnchecked(t.i)
@@ -106,7 +105,7 @@ class Scouting {
         val overlords = With.units.enemy.filter(_.is(Zerg.Overlord))
         val overlordMains = overlords.map(overlord => (overlord, With.geography.startBases.filter(base =>
           base.owner.isNeutral
-          && overlord.framesToTravelTo(base.townHallArea.midPixel) < With.frame + GameTime(0, 5)()
+          && overlord.framesToTravelTo(base.townHallArea.midPixel) < With.frame + Seconds(5)()
         )))
         val overlordProofs = overlordMains.find(_._2.size == 1)
         overlordProofs.foreach(overlordProof => {

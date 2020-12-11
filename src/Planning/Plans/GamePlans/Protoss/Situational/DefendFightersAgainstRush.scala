@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Protoss.Situational
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
@@ -11,6 +10,7 @@ import Planning.UnitPreferences.UnitPreferClose
 import Planning.{Plan, Property}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.Seconds
 
 class DefendFightersAgainstRush extends Plan {
   
@@ -25,7 +25,7 @@ class DefendFightersAgainstRush extends Plan {
 
     def inOurBase(unit: UnitInfo): Boolean = unit.zone.bases.exists(_.owner.isUs)
 
-    val fighters          = With.units.ours .view.filter(u => u.unitClass.canMove && u.canAttack && ! u.unitClass.isWorker && inOurBase(u) && u.remainingCompletionFrames < GameTime(0, 5)())
+    val fighters          = With.units.ours .view.filter(u => u.unitClass.canMove && u.canAttack && ! u.unitClass.isWorker && inOurBase(u) && u.remainingCompletionFrames < Seconds(5)())
     lazy val cannons      = With.units.ours .view.filter(u => u.aliveAndComplete && u.isAny(Terran.Bunker, Protoss.PhotonCannon))
     lazy val aggressors   = With.units.enemy.view.filter(u => u.aliveAndComplete && u.is(UnitMatchWarriors) && inOurBase(u))
     lazy val workers      = With.units.ours.view.filter(u => u.aliveAndComplete && u.unitClass.isWorker)

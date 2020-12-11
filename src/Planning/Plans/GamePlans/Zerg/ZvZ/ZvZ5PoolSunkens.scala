@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Zerg.ZvZ
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
@@ -20,6 +19,7 @@ import Planning.Predicates.Strategy.Employing
 import Planning.{Plan, Predicate, ProxyPlanner}
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.ZvZ5PoolSunkens
+import Utilities.GameTime
 
 class ZvZ5PoolSunkens extends GameplanTemplate {
   

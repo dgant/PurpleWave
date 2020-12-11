@@ -3,6 +3,7 @@ package Information.Fingerprinting.Generic
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.UnitMatchers.UnitMatcher
+import Utilities.GameTime
 
 class FingerprintArrivesBy(
   unitMatcher : UnitMatcher,

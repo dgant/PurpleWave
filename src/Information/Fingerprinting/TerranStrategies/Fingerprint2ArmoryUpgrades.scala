@@ -1,9 +1,9 @@
 package Information.Fingerprinting.TerranStrategies
 
 import Information.Fingerprinting.Fingerprint
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import ProxyBwapi.Races.Terran
+import Utilities.GameTime
 
 class Fingerprint2ArmoryUpgrades extends Fingerprint {
 

@@ -3,6 +3,7 @@ package Information.Fingerprinting.TerranStrategies
 import Information.Fingerprinting.Generic._
 import Lifecycle.With
 import ProxyBwapi.Races.Terran
+import Utilities.GameTime
 
 class Fingerprint2Rax1113 extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.bbs),

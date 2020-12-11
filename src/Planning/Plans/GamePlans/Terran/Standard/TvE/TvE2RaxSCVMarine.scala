@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvE
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Aggression, AllIn, Attack, EjectScout}
@@ -22,6 +21,7 @@ import Planning.UnitMatchers.{UnitMatchMobile, UnitMatchWorkers}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Terran.TvE.TvE2RaxSCVMarine
+import Utilities.GameTime
 
 class TvE2RaxSCVMarine extends GameplanTemplate {
 

@@ -5,7 +5,7 @@ import Lifecycle.With
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.ByOption
+import Utilities.{ByOption, GameTime}
 import bwapi.Race
 
 abstract class FingerprintFFE extends FingerprintAnd(

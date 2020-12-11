@@ -3,7 +3,6 @@ package ProxyBwapi.UnitInfo
 import Debugging.Visualizations.Colors
 import Information.Battles.MCRS.MCRSUnit
 import Information.Battles.Types.BattleLocal
-import Information.Fingerprinting.Generic.GameTime
 import Information.Geography.Types.{Base, Zone}
 import Information.Grids.AbstractGrid
 import Lifecycle.With
@@ -15,13 +14,14 @@ import Micro.Coordination.Pathing.MicroPathing
 import Micro.Matchups.MatchupAnalysis
 import Performance.Cache
 import Planning.Plan
-import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatcher}
+import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
+import ProxyBwapi.UnitTracking.Visibility
 import ProxyBwapi.Upgrades.Upgrade
-import Utilities.{ByOption, Forever, LightYear}
+import Utilities._
 import bwapi._
 
 abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUnit, id) {
@@ -672,41 +672,25 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   ////////////////
   // Visibility //
   ////////////////
+
+  def visibility: Visibility.Value
   
-  @inline final def visibleToOpponents: Boolean =
-    if (isEnemy)
-      visible
-    else (
-      With.grids.enemyVision.isSet(tileIncludingCenter)
-      || With.framesSince(lastFrameTakingDamage) < GameTime(0, 2)()
-      || With.framesSince(lastFrameStartingAttack) < GameTime(0, 2)())
+  @inline final def visibleToOpponents: Boolean = if (isEnemy) true else (
+    tileIncludingCenter.visibleToEnemy
+    || With.framesSince(lastFrameTakingDamage) < Seconds(2)()
+    || With.framesSince(lastFrameStartingAttack) < Seconds(2)())
   
-  @inline final def likelyStillThere: Boolean = cacheLikelyStillThere()
-  private val cacheLikelyStillThere = new Cache(() => possiblyStillThere &&
-    ( ! canMove
-      || With.framesSince(lastSeen) < With.configuration.fogPositionDurationFrames
-      || is(UnitMatchSiegeTank)
-      || base.exists(_.owner == player)))
-  
-  @inline final def likelyStillAlive: Boolean = (
-    likelyStillThere
-    || unitClass.isBuilding
-    || unitClass.isWorker
-    || With.framesSince(lastSeen) < (
-      if (With.strategy.isFfa)
-        GameTime(2, 0)()
-      else
-        GameTime(5, 0)()
-    )
-  )
+  @inline final def likelyStillThere: Boolean = alive && visible || (
+    visibility == Visibility.Visible
+    || visibility == Visibility.InvisibleBurrowed
+    || visibility == Visibility.InvisibleNearby)
 
   @inline final def cloakedOrBurrowed: Boolean = cloaked || burrowed
-  @inline final def effectivelyCloaked: Boolean =
-    (burrowed || cloaked) &&
-    ( ! ensnared && ! plagued) && (
-      if (isFriendly) ! With.grids.enemyDetection.isDetected(tileIncludingCenter)
-      else ! detected
-    )
+  @inline final def effectivelyCloaked: Boolean = (
+    cloakedOrBurrowed
+    && ! ensnared
+    && ! plagued
+    && (if (isFriendly) ! tileIncludingCenter.enemyDetected else ! detected))
   
   /////////////
   // Players //
@@ -726,8 +710,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   @inline final def teamColor: Color =
     if      (visible)             player.colorBright
     else if (likelyStillThere)    player.colorMedium
-    else if (possiblyStillThere)  player.colorDark
-    else if (likelyStillAlive)    player.colorMidnight
+    else if (alive)               player.colorMidnight
     else                          Colors.MidnightGray
 
   @inline final def unitColor: Color = Colors.rainbow(frameDiscovered % Colors.rainbow.size)

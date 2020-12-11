@@ -1,10 +1,10 @@
 package Information.Fingerprinting.TerranStrategies
 
 import Information.Fingerprinting.Fingerprint
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Planning.UnitMatchers.UnitMatchSiegeTank
 import ProxyBwapi.Races.Terran
+import Utilities.GameTime
 
 class FingerprintBio extends Fingerprint {
   override protected def investigate: Boolean = {

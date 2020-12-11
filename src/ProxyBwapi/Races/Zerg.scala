@@ -42,7 +42,7 @@ object Zerg {
   def DefilerMound          = UnitClasses.get(UnitType.Zerg_Defiler_Mound)
   def NydusCanal            = UnitClasses.get(UnitType.Zerg_Nydus_Canal)
   def InfestedCommandCenter = UnitClasses.get(UnitType.Zerg_Infested_Command_Center)
-  def DarkSwarmCloud        = UnitClasses.get(UnitType.Spell_Dark_Swarm)
+  def SpelLDarkSwarm        = UnitClasses.get(UnitType.Spell_Dark_Swarm)
   def SpireOrGreaterSpire   = UnitMatchOr(Spire, GreaterSpire)
   def HatcheryLairOrHive    = UnitMatchOr(Hatchery, Lair, Hive)
   def LairOrHive            = UnitMatchOr(Lair, Hive)

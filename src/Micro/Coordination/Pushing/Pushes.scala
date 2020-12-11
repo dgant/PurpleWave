@@ -1,11 +1,11 @@
 package Micro.Coordination.Pushing
 
-import Information.Fingerprinting.Generic.GameTime
 import Information.Grids.ArrayTypes.GridItems
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.Minutes
 import bwapi.BulletType
 
 import scala.collection.JavaConverters._
@@ -64,7 +64,7 @@ class Pushes {
       if (unit.irradiated) {
         put(new ExplosionIrradiateSplash(unit))
       }
-      if (unit.is(Terran.SpiderMine) && unit.visible && (unit.isEnemy || ! unit.burrowed && With.framesSince(unit.frameDiscovered) > GameTime(3, 0)())) {
+      if (unit.is(Terran.SpiderMine) && unit.visible && (unit.isEnemy || ! unit.burrowed && With.framesSince(unit.frameDiscovered) > Minutes(3)())) {
         put(new ExplosionSpiderMineBlast(unit))
       }
       if (unit.is(Zerg.InfestedTerran)) {

@@ -2,12 +2,11 @@ package Information.Geography.Calculations
 
 import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Types.Zone
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.SpecificPoints
 import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.Terran
-import Utilities.ByOption
+import Utilities.{ByOption, Minutes}
 
 object ZoneUpdater {
   
@@ -73,7 +72,7 @@ object ZoneUpdater {
     lazy val canaryTileInside   = zone.tiles.find(With.grids.walkable.get)
     lazy val canaryTileOutside  = zone.exit.map(_.otherSideof(zone)).flatMap(_.tiles.find(With.grids.walkable.get))
     zone.walledIn = (
-      With.frame < GameTime(10, 0)()
+      With.frame < Minutes(10)()
       && exitBuildings.exists(_.isAny(Terran.SupplyDepot, Terran.EngineeringBay))
       && exitBuildings.exists(_.is(Terran.Barracks))
       && canaryTileInside.exists(tileInside =>

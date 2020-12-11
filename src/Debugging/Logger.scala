@@ -2,9 +2,8 @@ package Debugging
 
 import java.io.{File, PrintWriter}
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.{Manners, With}
-import Utilities.Forever
+import Utilities.{Forever, GameTime, Seconds}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -60,7 +59,7 @@ class Logger {
     output
   }
 
-  private val defaultSleepFrames = GameTime(0, 15)()
+  private val defaultSleepFrames = Seconds(15)()
 
   def debugCircuitBreaker(message: String, sleepFrames: Int = defaultSleepFrames): Unit = {
     if (canRelog(message, sleepFrames)) { debug(message) }

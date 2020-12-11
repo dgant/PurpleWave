@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvE
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Aggression, Attack, Hunt}
@@ -22,6 +21,7 @@ import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Protoss.{PvPProxy2Gate, PvRProxy2Gate, PvTProxy2Gate, PvZProxy2Gate}
+import Utilities.GameTime
 
 class PvEProxy2Gate extends GameplanTemplate {
 

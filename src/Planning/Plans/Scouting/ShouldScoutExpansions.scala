@@ -1,8 +1,8 @@
 package Planning.Plans.Scouting
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Planning.Predicate
+import Utilities.GameTime
 
 class ShouldScoutExpansions extends Predicate {
   def time: GameTime = {

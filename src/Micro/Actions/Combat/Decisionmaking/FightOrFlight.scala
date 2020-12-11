@@ -1,7 +1,6 @@
 
 package Micro.Actions.Combat.Decisionmaking
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
@@ -9,7 +8,7 @@ import Micro.Actions.Basic.Gather
 import Micro.Actions.Transportation.Caddy.Shuttling
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.ByOption
+import Utilities.{ByOption, Minutes}
 
 object FightOrFlight extends Action {
   
@@ -42,7 +41,7 @@ object FightOrFlight extends Action {
     decide(true,  "Irradiated",   () => unit.irradiated && unit.unitClass.isOrganic)
     decide(true,  "CantFlee",     () => ! unit.agent.canFlee)
     decide(true,  "Ignore",       () => unit.matchups.pixelsOfEntanglement < -320)
-    decide(true,  "Berzerk",      () => With.frame < GameTime(6, 0)() && unit.isAny(Protoss.Zealot, Zerg.Zergling) && unit.base.exists(b => b.owner.isEnemy || b.isNaturalOf.exists(_.owner.isEnemy)) && unit.matchups.threats.exists(t => t.is(Terran.Vulture) && t.matchups.catchers.isEmpty))
+    decide(true,  "Berzerk",      () => With.frame < Minutes(6)() && unit.isAny(Protoss.Zealot, Zerg.Zergling) && unit.base.exists(b => b.owner.isEnemy || b.isNaturalOf.exists(_.owner.isEnemy)) && unit.matchups.threats.exists(t => t.is(Terran.Vulture) && t.matchups.catchers.isEmpty))
     decide(true,  "Hug",          () => ! unit.flying && unit.matchups.targets.exists(t => unit.pixelDistanceEdge(t) < t.pixelRangeMin))
     decide(true,  "Cloaked",      () => unit.effectivelyCloaked || (unit.is(Terran.Wraith) && unit.energy >= 50 && unit.matchups.enemyDetectors.isEmpty && With.self.hasTech(Terran.WraithCloak)))
     decide(false, "CantFight",    () => ! unit.agent.canFight)

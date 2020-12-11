@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvR
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
@@ -19,6 +18,7 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvRTinfoil2018
+import Utilities.GameTime
 
 class PvRTinfoil extends GameplanTemplateVsRandom {
   

@@ -1,6 +1,5 @@
 package Macro.Architecture
 
-import Information.Fingerprinting.Generic.GameTime
 import Information.Geography.Types.Zone
 import Information.Grids.Disposable.GridDisposableInt
 import Lifecycle.With
@@ -8,7 +7,7 @@ import Macro.Architecture.PlacementRequests.PlacementRequest
 import Mathematics.Points.{Tile, TileRectangle}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
-import Utilities.Forever
+import Utilities.{Forever, Seconds}
 
 class Architecture {
   val unbuildable       : GridExclusion = new GridExclusion
@@ -134,7 +133,7 @@ class Architecture {
   ///////////
   
   private def recalculatePower() {
-    With.units.ours.filter(_.is(Protoss.Pylon)).foreach(unit => addPower(unit.tileTopLeft, unit.completionFrame + GameTime(0, 3)()))
+    With.units.ours.filter(_.is(Protoss.Pylon)).foreach(unit => addPower(unit.tileTopLeft, unit.completionFrame + Seconds(3)()))
   }
   
   private def addPower(tile: Tile, frame: Int) {

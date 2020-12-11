@@ -2,6 +2,7 @@ package Information.Fingerprinting.Generic
 
 import Lifecycle.With
 import ProxyBwapi.UnitClasses.UnitClass
+import Utilities.GameTime
 
 class FingerprintIncompleteBy(
   unitClass : UnitClass,

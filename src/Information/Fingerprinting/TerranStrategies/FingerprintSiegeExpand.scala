@@ -1,9 +1,10 @@
 package Information.Fingerprinting.TerranStrategies
 
 import Information.Fingerprinting.Fingerprint
-import Information.Fingerprinting.Generic.{FingerprintAnd, FingerprintNot, GameTime}
+import Information.Fingerprinting.Generic.{FingerprintAnd, FingerprintNot}
 import Lifecycle.With
 import ProxyBwapi.Races.Terran
+import Utilities.GameTime
 
 class FingerprintSiegeExpand extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.oneRaxFE),

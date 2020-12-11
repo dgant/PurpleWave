@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Zerg.ZvE
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
@@ -19,6 +18,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.UnitMatchOr
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Zerg.ZvE4Pool
+import Utilities.GameTime
 
 class ZvE4Pool extends GameplanTemplate {
   

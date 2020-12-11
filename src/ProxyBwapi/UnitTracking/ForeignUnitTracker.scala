@@ -1,130 +1,193 @@
 package ProxyBwapi.UnitTracking
 
 import Lifecycle.With
+import Mathematics.Points.Pixel
+import Mathematics.Shapes.Circle
+import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Players.Players
-import ProxyBwapi.Races.Terran
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, Orders}
+import Utilities._
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 class ForeignUnitTracker {
   
-  private val unitsByIdKnown = new mutable.HashMap[Int, ForeignUnitInfo].empty
-  
-  var enemyUnits: Iterable[ForeignUnitInfo] = Iterable.empty
-  var neutralUnits: Iterable[ForeignUnitInfo] = Iterable.empty
+  private val unitsById = new mutable.HashMap[Int, ForeignUnitInfo]()
 
-  var initialized = false
+  def allyUnits     : Iterable[ForeignUnitInfo] = unitsById.values.filter(_.player.isAlly)
+  def enemyUnits    : Iterable[ForeignUnitInfo] = unitsById.values.filter(_.player.isEnemy)
+  def neutralUnits  : Iterable[ForeignUnitInfo] = unitsById.values.filter(_.player.isNeutral)
 
-  def get(id: Int): Option[ForeignUnitInfo] = unitsByIdKnown.get(id)
+  def get(id: Int): Option[ForeignUnitInfo] = unitsById.get(id)
 
   def update() {
-    initialize()
+    // Remove any units who have changed owners
+    unitsById.values.filter(u => u.baseUnit.isVisible && u.baseUnit.getPlayer.getID != u.player.id).toVector.foreach(remove)
 
-    val unitsByIdVisible = Players.all.filterNot(_.isFriendly).flatMap(_.rawUnits)
-      .map(unit => (unit.getID, unit))
-      .filter(_._2.exists())
-
-    unitsByIdKnown.foreach(pair => pair._2.flagInvisible())
-    for (pair <- unitsByIdVisible) {
-      val knownUnit = unitsByIdKnown.get(pair._1)
-      if (knownUnit.isDefined) {
-        knownUnit.get.flagVisible()
-        knownUnit.get.update(pair._2)
-      }
-      else {
-        add(pair._2, pair._1).flagVisible()
-      }
+    // Add static neutral units
+    if (unitsById.isEmpty && With.frame < 24) {
+       With.game.getStaticNeutralUnits.asScala.foreach(add)
     }
 
-    unitsByIdKnown.values.foreach(updateMissing)
+    Players.all.view
+      .filterNot(_.isUs)
+      .flatMap(_.rawUnits)
+      .filter(_.exists)
+      .foreach(bwapiUnit => {
+        val unit = unitsById.get(bwapiUnit.getID)
+        if (unit.isDefined) {
+          unit.get.update()
+        } else {
+          add(bwapiUnit)
+        }
+      })
 
-    enemyUnits   = unitsByIdKnown.values.filter(_.player.isEnemy)
-    neutralUnits = unitsByIdKnown.values.filter(_.player.isNeutral)
+    unitsById.values.foreach(checkVisibility)
+
+    unitsById.values.view.filterNot(_.alive).toVector.foreach(remove)
   }
 
   def onUnitDestroy(unit: bwapi.Unit) {
-    unitsByIdKnown.get(unit.getID).foreach(remove)
+    unitsById.get(unit.getID).foreach(remove)
   }
 
-  private def initialize() {
-    if ( ! initialized) {
-      initialized = true
-      trackStaticUnits()
-    }
-  }
-  
-  private def trackStaticUnits() {
-    val staticNeutralUnits = With.game.getStaticNeutralUnits.asScala
-    if (staticNeutralUnits.size < 18) {
-      With.logger.warn("Encountered surprisingly few static neutral units: " + staticNeutralUnits.size)
-      staticNeutralUnits.foreach(u => With.logger.warn(u.getType.toString))
-    }
-    staticNeutralUnits.foreach(add)
+  private def add(bwapiUnit: bwapi.Unit): Unit = {
+    val newUnit = new ForeignUnitInfo(bwapiUnit, bwapiUnit.getID)
+    newUnit.update()
+    unitsById.put(bwapiUnit.getID, newUnit)
   }
 
-  private def add(unit: bwapi.Unit): ForeignUnitInfo = {
-    add(unit, unit.getID)
-  }
-  
-  private def add(unit: bwapi.Unit, id: Int): ForeignUnitInfo = {
-    val proxyUnit = new ForeignUnitInfo(unit, unit.getID)
-    proxyUnit.update(unit)
-    unitsByIdKnown.put(id, proxyUnit)
-    proxyUnit
-  }
-  
-  private def updateMissing(unit: ForeignUnitInfo) {
-    // TODO: Remove units we've mind controlled
-    if (unit.visible)                                              return
-    if ( ! unit.possiblyStillThere)                                return
-    if (unit.lastSeen > With.grids.friendlyVision.frameUpdated)    return
-    if (unit.lastSeen > With.grids.friendlyDetection.frameUpdated) return
-    if (With.framesSince(unit.lastSeen) < 24 * 1)                  return
-    
-    lazy val shouldBeVisible  = With.grids.friendlyVision.isSet(unit.tileIncludingCenter)
-    lazy val shouldBeDetected = With.grids.friendlyDetection.isSet(unit.tileIncludingCenter)
-    lazy val shouldUnburrow   = unit.burrowed && unit.is(Terran.SpiderMine) && unit.battle.isDefined && unit.matchups.enemies.exists(tripper => tripper.pixelDistanceEdge(unit) < 96 && tripper.unitClass.triggersSpiderMines)
-    lazy val wasBurrowing     = unit.burrowed || Array(Orders.Burrowing, Orders.VultureMine).contains(unit.order)
-    lazy val wasCloaking      = unit.cloaked  || unit.order == Orders.Cloak
-  
-    if (shouldUnburrow) {
-      remove(unit)
-    }
-    else if (shouldBeVisible) {
-      if (!shouldBeDetected) {
-        if (wasBurrowing) {
-          unit.flagBurrowed()
-          unit.flagUndetected()
-          return
-        }
-        else if (wasCloaking) {
-          unit.flagCloaked()
-          unit.flagUndetected()
-          return
-        }
-      }
-
-      if (unit.unitClass.isSpell && (With.framesSince(unit.frameDiscovered) > 240 || With.grids.friendlyVision.isSet(unit.tileIncludingCenter))) {
-        remove(unit)
-      }
-      // Well, if it can't move, it must be dead. Like a building that burned down or was otherwise destroyed.
-      // HACK: Vision grids can be out of date, causing us to think a unit is dead when we actually just can't see it
-      // The temporary fix is querying all the tiles to ensure it's not just in the fog
-      if ( ! unit.unitClass.canMove && ! unit.isSiegeTankSieged()) {
-        if (unit.tileArea.tiles.exists(_.bwapiVisible)) {
-          remove(unit)
-        }
-      } else {
-        unit.flagMissing()
-      }
-    }
-  }
-  
   private def remove(unit: ForeignUnitInfo) {
-    unit.flagDead()
-    unitsByIdKnown.remove(unit.id)
+    unit.setVisbility(Visibility.Dead)
+    unitsById.remove(unit.id)
     With.units.historicalUnitTracker.add(unit)
+  }
+
+  private def checkVisibility(unit: ForeignUnitInfo) {
+    lazy val shouldBeVisible = unit.tileIncludingCenter.visibleBwapi
+    lazy val shouldBeDetected = unit.tileIncludingCenter.friendlyDetected
+    lazy val likelyBurrowed = (
+      unit.visibility == Visibility.InvisibleBurrowed
+      || unit.burrowed
+      || Array(Orders.Burrowing, Orders.VultureMine).contains(unit.order)
+      || (unit.is(Terran.SpiderMine) && With.framesSince(unit.frameDiscovered) < 48))
+    lazy val shouldUnburrow = (
+      likelyBurrowed
+      && unit.is(Terran.SpiderMine)
+      && unit.inTileRadius(3).exists(tripper =>
+        tripper.unitClass.triggersSpiderMines
+        && tripper.isEnemyOf(unit)
+        && tripper.pixelDistanceEdge(unit) < 96
+        && unit.altitudeBonus >= tripper.altitudeBonus))
+
+    // Yay, we see the unit
+    if (unit.baseUnit.isVisible) {
+      unit.setVisbility(Visibility.Visible)
+      return
+    }
+
+    // Assume units we haven't seen in a very long time are dead
+    // - Timed units can just expire
+    //   https://bwapi.github.io/class_b_w_a_p_i_1_1_unit_interface.html#aab43c4ebf2bcb43986f3b4b101b79201
+    // - Irradiated biological units die eventually
+    // - In free-for-all settings, it's probable someone else killed them
+    val expectedSurvivalFrames =
+      if (unit.isAny(Zerg.Broodling, Zerg.SpelLDarkSwarm, Protoss.SpellDisruptionWeb, Terran.SpellScannerSweep))
+        unit.framesUntilRemoval - With.framesSince(unit.lastSeen)
+      else if (unit.unitClass.isOrganic && unit.irradiated)
+        unit.totalHealth * Seconds(37)() / 250 // https://liquipedia.net/starcraft/Irradiate
+      else if (unit.is(UnitMatchWarriors))
+        if (With.strategy.isFfa)
+          Minutes(4)()
+        else
+          Minutes(8)()
+      else
+        Forever()
+
+    if ( ! unit.lastSeenWithin(expectedSurvivalFrames)) {
+      unit.setVisbility(Visibility.Dead)
+      return
+    }
+
+    // If a Spider Mine should've been tripped, but hasn't, it's dead
+    if (shouldBeVisible && likelyBurrowed && shouldUnburrow) {
+      unit.setVisbility(Visibility.Dead)
+      return
+    }
+
+    // TODO: If a Lurker should have attacked, but hasn't, it's likely missing
+
+    // Missing units stay missing
+    if (unit.visibility == Visibility.InvisibleMissing) {
+      return
+    }
+
+    // Assume other burrowing units burrowed
+    if (likelyBurrowed) {
+      unit.setVisbility(Visibility.InvisibleBurrowed)
+      if (shouldBeVisible && shouldBeDetected) {
+        // This logic can fail if the detection grid is out of date.
+        // This should be uncommon, though,
+        // as it requires the unit to burrow in a tile that was recently detected but is no longer.
+        unit.setVisbility(Visibility.Dead)
+      }
+      return
+    }
+
+    // Presume the unit is alive but elsewhere
+    unit.setVisbility(Visibility.InvisibleNearby)
+
+    // Missing buildings must either be floated or dead
+    if (unit.unitClass.isBuilding && ! unit.unitClass.isFlyingBuilding) {
+      if (shouldBeVisible) {
+        unit.setVisbility(Visibility.Dead)
+      }
+      return
+    }
+
+    // If we haven't seen a unit in a long time, treat it as missing,
+    // which indicates distrust of its predicted location
+    if ( ! unit.lastSeenWithin(Seconds(20)()) && ! unit.base.exists(_.owner == unit.player)) {
+      unit.setVisbility(Visibility.InvisibleMissing)
+      return
+    }
+
+
+
+    // Predict the unit's location
+    // If we fail to come up with a reasonable prediction, treat the unit as missing
+    val predictedPixel = predictPixel(unit)
+    if (predictedPixel.isDefined) {
+      unit.presumePixel(predictedPixel.get)
+    } else {
+      unit.setVisbility(Visibility.InvisibleMissing)
+    }
+  }
+
+  private def predictPixel(unit: ForeignUnitInfo): Option[Pixel] = {
+    if ( ! unit.tileIncludingCenter.visible) {
+      return Some(unit.pixelCenter)
+    }
+
+    val tileLastSeen = unit.pixelCenterObserved.tileIncluding
+    val maxTilesAway = 1 + With.framesSince(unit.lastSeen) * unit.topSpeed / 32
+    val maxTilesAwaySquared = maxTilesAway * maxTilesAway
+
+    val output = (0 to 10).view.map(i =>
+      ByOption.minBy(Circle.points(i)
+        .map(unit.tileIncludingCenter.add)
+        .filter(tile =>
+          tile.valid
+          && (unit.flying || tile.walkableUnchecked)
+          && ! tile.visibleBwapi
+          && tile.tileDistanceSquared(tileLastSeen) <= maxTilesAway
+        ))(_.pixelCenter.pixelDistanceSquared(unit.projectFrames(8))))
+      .find(_.nonEmpty)
+      .flatten
+      .map(_.pixelCenter)
+
+    output
   }
 }

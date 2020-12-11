@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Zerg.ZvE
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Micro.Agency.Intention
@@ -21,6 +20,7 @@ import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import Strategery.Sparkle
+import Utilities.GameTime
 
 class ZvESparkle extends GameplanTemplate {
 

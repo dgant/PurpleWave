@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Terran.Situational
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
@@ -9,6 +8,7 @@ import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountBetween
 import Planning.UnitPreferences.UnitPreferClose
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import Utilities.GameTime
 
 class RepairBunker extends Plan {
   val lock = new LockUnits

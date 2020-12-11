@@ -1,6 +1,5 @@
 package Planning.Plans.Army
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
@@ -9,6 +8,7 @@ import Planning.UnitMatchers.{UnitMatchCustom, UnitMatchMobileDetectors}
 import Planning.UnitPreferences.UnitPreferClose
 import Planning.{Plan, Property}
 import ProxyBwapi.Races.Terran
+import Utilities.{Minutes, Seconds}
 
 import scala.util.Random
 
@@ -24,7 +24,7 @@ class ClearBurrowedBlockers extends Plan {
   
   override def onUpdate(): Unit = {
 
-    if (With.frame < GameTime(6, 0)()) {
+    if (With.frame < Minutes(6)()) {
       return
     }
     
@@ -50,7 +50,7 @@ class ClearBurrowedBlockers extends Plan {
       }))
     }
   
-    if (With.enemies.exists(_.isTerran) && detector.get.units.forall(_.framesToTravelTo(target.get) > GameTime(0, 5)())) {
+    if (With.enemies.exists(_.isTerran) && detector.get.units.forall(_.framesToTravelTo(target.get) > Seconds(5)())) {
       decoy.get.unitPreference.set(UnitPreferClose(target.get))
 
       decoy.get.acquire(this)

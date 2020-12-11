@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Aggression, Attack, Hunt}
@@ -21,7 +20,7 @@ import Planning.UnitMatchers._
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import Strategery.Strategies.Protoss.{PvP2Gate1012Goon, PvP2GateDTExpand, PvP3GateGoon, PvP4GateGoon}
-import Utilities.ByOption
+import Utilities.{ByOption, GameTime}
 
 object PvPIdeas {
 

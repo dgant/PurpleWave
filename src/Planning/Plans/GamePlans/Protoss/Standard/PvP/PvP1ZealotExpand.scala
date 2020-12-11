@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
@@ -21,6 +20,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvP1ZealotExpand, PvP2GateDTExpand, PvPRobo}
+import Utilities.GameTime
 
 class PvP1ZealotExpand extends GameplanTemplate {
 

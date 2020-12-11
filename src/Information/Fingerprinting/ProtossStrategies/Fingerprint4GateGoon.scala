@@ -2,6 +2,7 @@ package Information.Fingerprinting.ProtossStrategies
 
 import Information.Fingerprinting.Generic._
 import ProxyBwapi.Races.Protoss
+import Utilities.GameTime
 
 class Fingerprint4GateGoon extends FingerprintOr(
   new FingerprintAnd(

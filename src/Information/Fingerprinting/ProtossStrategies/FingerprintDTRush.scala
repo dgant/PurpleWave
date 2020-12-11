@@ -3,6 +3,7 @@ package Information.Fingerprinting.ProtossStrategies
 import Information.Fingerprinting.Generic._
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
+import Utilities.GameTime
 
 object FingerprintDTRushConstants {
   val dtArrivalFrame = GameTime(7, 15)

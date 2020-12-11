@@ -1,11 +1,11 @@
 package Planning.Plans.Army
 
 import Information.Geography.Types.Zone
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Planning.UnitMatchers.{UnitMatchRecruitableForCombat, UnitMatcher}
 import Planning.{Plan, Property}
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.Seconds
 
 class DefendZones extends Plan {
   
@@ -31,10 +31,10 @@ class DefendZones extends Plan {
     if (zoneScores.isEmpty) return
     
     val zoneByEnemy = With.units.enemy.view
-      .filter(e => e.likelyStillAlive && e.likelyStillThere && (e.unitClass.dealsDamage || e.unitClass.isDetector || e.isTransport))
+      .filter(e => e.likelyStillThere && (e.unitClass.dealsDamage || e.unitClass.isDetector || e.isTransport))
       .map(enemy => (enemy, zoneScores.minBy(z => enemy.pixelDistanceTravelling(z._1.centroid))._1))
       .filter(pair =>
-        pair._1.framesToTravelTo(pair._2.centroid.pixelCenter) < GameTime(0, 12)()
+        pair._1.framesToTravelTo(pair._2.centroid.pixelCenter) < Seconds(12)()
         && pair._1.pixelDistanceTravelling(pair._2.centroid.pixelCenter) < 32 * 64)
       .toMap
     

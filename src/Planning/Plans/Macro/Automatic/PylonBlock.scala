@@ -1,7 +1,6 @@
 package Planning.Plans.Macro.Automatic
 
 import Information.Geography.Types.Base
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.Plan
@@ -10,7 +9,7 @@ import Planning.UnitCounters.UnitCountOne
 import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.ByOption
+import Utilities.{ByOption, GameTime}
 
 class PylonBlock extends Plan {
 

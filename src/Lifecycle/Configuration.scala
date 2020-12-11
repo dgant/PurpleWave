@@ -1,7 +1,7 @@
 package Lifecycle
 
-import Information.Fingerprinting.Generic.GameTime
 import Strategery.{DefaultPlaybook, Playbook}
+import Utilities.GameTime
 
 class Configuration {
 
@@ -55,11 +55,9 @@ class Configuration {
   ///////////
   // Micro //
   ///////////
-  
-  var concaveMarginPixels             = 20.0
-  var fogPositionDurationFrames       = GameTime(0, 20)()
+
   var violenceThresholdFrames         = GameTime(0, 2)()
-  var pickupRadiusPixels              = 48 //No idea what actual value is
+  var pickupRadiusPixels              = 48 // No idea what actual value is
   
   ///////////
   // Macro //

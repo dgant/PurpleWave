@@ -3,6 +3,7 @@ package Information.Fingerprinting.ZergStrategies
 import Information.Fingerprinting.Generic._
 import Lifecycle.With
 import ProxyBwapi.Races.Zerg
+import Utilities.GameTime
 
 class Fingerprint9Pool extends FingerprintOr(
   With.fingerprints.ninePoolGas,

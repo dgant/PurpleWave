@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
@@ -22,6 +21,7 @@ import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP2GateDTExpand
+import Utilities.GameTime
 
 class PvP2GateDT extends GameplanTemplate {
   

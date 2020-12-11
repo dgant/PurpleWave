@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Zerg
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
@@ -11,6 +10,7 @@ import Planning.Predicates.Compound.{And, Check}
 import Planning.Predicates.Milestones.{EnemiesAtMost, EnemyHasShown, FrameAtMost, UpgradeComplete}
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import Utilities.GameTime
 
 object ZergIdeas {
   

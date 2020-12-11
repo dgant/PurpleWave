@@ -19,6 +19,7 @@ class GridEnemyDetection extends AbstractGridVersionedValue[Int] {
   // More accurately `get(i) >= addedRange` but this should be a bit more conservative
   def isDetected(i: Int): Boolean = get(i) >= addedRange - 1
   def isDetected(tile: Tile): Boolean = isSet(tile.i)
+  def isDetectedUnchecked(i: Int): Boolean = getUnchecked(i) >= addedRange - 1
 
   override def onUpdate(): Unit = {
     for (unit <- With.units.enemy) {

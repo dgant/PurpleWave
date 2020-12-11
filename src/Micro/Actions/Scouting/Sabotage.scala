@@ -12,6 +12,7 @@ object Sabotage extends Action {
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.agent.isScout
+    && unit.unitClass.isWorker
     && unit.matchups.targets.exists(_.is(UnitMatchProxied))
     && ! With.strategy.selectedCurrently.contains(ZvE4Pool))
 

@@ -3,6 +3,7 @@ package Information.Fingerprinting.ProtossStrategies
 import Information.Fingerprinting.Generic._
 import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchProxied}
 import ProxyBwapi.Races.Terran
+import Utilities.GameTime
 
 class FingerprintBunkerRush extends FingerprintCompleteBy(
   UnitMatchAnd(Terran.Bunker, UnitMatchProxied),

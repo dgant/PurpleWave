@@ -1,7 +1,7 @@
 package Lifecycle
 
-import Information.Fingerprinting.Generic.GameTime
 import Planning.UnitMatchers.UnitMatchWorkers
+import Utilities.Seconds
 
 object Manners {
   
@@ -15,7 +15,7 @@ object Manners {
       && With.units.existsEnemy(_.unitClass.isResourceDepot)) {
       surrender()
     }
-    if (With.frame == GameTime(0, 5)()) {
+    if (With.frame == Seconds(5)()) {
       if (With.configuration.humanMode) {
         chat("Good luck, " + With.enemy.name + ", and have fun!")
       }

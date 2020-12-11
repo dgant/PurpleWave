@@ -5,6 +5,7 @@ import Information.Fingerprinting.Generic._
 import Lifecycle.With
 import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchProxied}
 import ProxyBwapi.Races.Protoss
+import Utilities.GameTime
 
 class FingerprintProxyGateway extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.nexusFirst),

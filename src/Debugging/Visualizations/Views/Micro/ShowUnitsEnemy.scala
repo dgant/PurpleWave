@@ -3,11 +3,11 @@ package Debugging.Visualizations.Views.Micro
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
+import Utilities.GameTime
 
 object ShowUnitsEnemy extends View {
   
@@ -30,7 +30,15 @@ object ShowUnitsEnemy extends View {
       
     if (showFogged) {
       if ( ! unit.visible || unit.effectivelyCloaked) {
-        DrawMap.circle(unit.pixelCenter, unit.unitClass.dimensionMin / 2, color)
+        val radius = unit.unitClass.dimensionMin / 2
+        DrawMap.circle(unit.pixelCenter, radius, color)
+        if (unit.pixelCenter != unit.pixelCenterObserved) {
+          DrawMap.circle(unit.pixelCenterObserved, radius, color)
+          DrawMap.line(
+            unit.pixelCenter.project(unit.pixelCenterObserved, radius),
+            unit.pixelCenterObserved.project(unit.pixelCenter, radius),
+            color)
+        }
         DrawMap.label(unit.unitClass.toString, unit.pixelCenter, drawBackground = true, color)
       }
     }

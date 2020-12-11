@@ -1,8 +1,9 @@
 package Information.Fingerprinting.ZergStrategies
 
-import Information.Fingerprinting.Generic.{FingerprintAnd, FingerprintCompleteBy, GameTime}
+import Information.Fingerprinting.Generic.{FingerprintAnd, FingerprintCompleteBy}
 import Lifecycle.With
 import ProxyBwapi.Races.Zerg
+import Utilities.GameTime
 
 class Fingerprint10Hatch9Pool extends FingerprintAnd(
   new FingerprintCompleteBy(Zerg.Hatchery, GameTime(2, 40), 2),

@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Zerg.ZvT
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Aggression, Attack, EjectScout, Hunt}
@@ -23,6 +22,7 @@ import Planning.UnitMatchers._
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvT2HatchLurker
+import Utilities.GameTime
 
 class ZvT2HatchLurker extends GameplanTemplate {
 

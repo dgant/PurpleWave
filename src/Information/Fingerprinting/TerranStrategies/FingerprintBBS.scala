@@ -1,7 +1,8 @@
 package Information.Fingerprinting.TerranStrategies
 
-import Information.Fingerprinting.Generic.{FingerprintArrivesBy, FingerprintCompleteBy, FingerprintOr, GameTime}
+import Information.Fingerprinting.Generic.{FingerprintArrivesBy, FingerprintCompleteBy, FingerprintOr}
 import ProxyBwapi.Races.Terran
+import Utilities.GameTime
 
 class FingerprintBBS extends FingerprintOr(
   new FingerprintCompleteBy(Terran.Barracks,  GameTime(2, 35), 2),

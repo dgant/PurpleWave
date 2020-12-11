@@ -1,8 +1,8 @@
 package Information.Battles.MCRS
 
-import Information.Fingerprinting.Generic.GameTime
 import Mathematics.PurpleMath
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.Seconds
 
 object MCRSim {
 
@@ -16,7 +16,7 @@ object MCRSim {
     if (unit.topSpeed <= 0) return
 
     // McRave uses 5s and thinks scaling with fight size is a good idea
-    val simulationTime = GameTime(0, 5)() + Math.max(0.0, unit.pixelDistanceCenter(unit.mcrs.engagePosition()) / unit.topSpeed)
+    val simulationTime = Seconds(5)() + Math.max(0.0, unit.pixelDistanceCenter(unit.mcrs.engagePosition()) / unit.topSpeed)
 
     var enemyStrengthGround: Double = 0.0
     var enemyStrengthAir: Double = 0.0

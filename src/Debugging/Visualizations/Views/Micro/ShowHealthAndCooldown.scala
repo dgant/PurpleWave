@@ -14,8 +14,8 @@ object ShowHealthAndCooldown extends View {
   
   def renderUnit(unit: UnitInfo) {
     if ( ! With.viewport.contains(unit.pixelCenter)) return
-    if ( ! unit.likelyStillAlive) return
-    if ( ! unit.possiblyStillThere) return
+    if ( ! unit.alive) return
+    if ( ! unit.likelyStillThere) return
     if (unit.invincible) return
     
     val width = Math.min(48, Math.max(18, (unit.unitClass.maxTotalHealth + unit.defensiveMatrixPoints) / 5))

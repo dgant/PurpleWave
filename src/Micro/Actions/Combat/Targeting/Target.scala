@@ -153,9 +153,6 @@ object Target extends {
     if (target.likelyStillThere) {
       output *= 1.25
     }
-    if (target.possiblyStillThere) {
-      output *= 1.25
-    }
 
     // Temporary visibility bonus
     val temporarilyVisible = (target.cloaked || target.burrowed) && target.matchups.enemyDetectors.forall(_.isScannerSweep())

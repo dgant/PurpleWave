@@ -1,16 +1,16 @@
 package Information.Battles.Types
 
 import Information.Battles.Prediction.PredictionLocal
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Planning.UnitMatchers.UnitMatchSiegeTank
 import ProxyBwapi.Races.Terran
+import Utilities.Minutes
 
 class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
 
   private def canSnipe = false && (
     // Acceptable, performance-wise
-    (With.reaction.clusteringAverage < 8 || With.frame < GameTime(12, 0)())
+    (With.reaction.clusteringAverage < 8 || With.frame < Minutes(12)())
     // Trying to snipe tanks leads to nasty surprises; tanks in fog tend to blast us and dissuade the snipe
     && (
       ! With.enemies.exists(_.hasTech(Terran.SiegeMode))

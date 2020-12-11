@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Attack, EjectScout}
@@ -17,6 +16,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyRecentStrategy, EnemyStrate
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss._
+import Utilities.GameTime
 
 object PvZIdeas {
 

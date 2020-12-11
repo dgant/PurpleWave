@@ -4,7 +4,6 @@ import java.lang.management.ManagementFactory
 import java.util.Calendar
 
 import Debugging.Visualizations.Views.Planning.{ShowStrategyEvaluations, ShowStrategyInterest}
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.{JBWAPIClient, Main, With}
 import Planning.Predicates.Reactive.{SafeAtHome, SafeToMoveOut}
 import Planning.UnitMatchers.UnitMatchHatchery
@@ -12,7 +11,7 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrades
-import Utilities.ByOption
+import Utilities.{ByOption, GameTime}
 import com.sun.management.OperatingSystemMXBean
 
 import scala.collection.mutable

@@ -15,7 +15,7 @@ class Hunt(
   override val goal: GoalHunt = new GoalHunt(enemyMatcher)
 
   override def onUpdate() {
-    if (With.units.enemy.exists(u => u.is(enemyMatcher) && u.possiblyStillThere)) {
+    if (With.units.enemy.exists(u => u.is(enemyMatcher) && u.likelyStillThere)) {
       goal.unitMatcher = hunterMatcher
       goal.unitCounter = hunterCounter
       super.onUpdate()

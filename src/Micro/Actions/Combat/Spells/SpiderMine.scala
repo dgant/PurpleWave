@@ -1,6 +1,5 @@
 package Micro.Actions.Combat.Spells
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
@@ -9,7 +8,7 @@ import Micro.Actions.Combat.Targeting.Filters.TargetFilter
 import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWorkers}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.ByOption
+import Utilities.{ByOption, Seconds}
 
 import scala.collection.mutable
 
@@ -45,7 +44,7 @@ object SpiderMine extends Action {
     lazy val inChoke = unit.zone.edges.exists(e => unit.pixelDistanceCenter(e.pixelCenter) < e.radiusPixels)
     lazy val mineSpace = ! unit.tileArea.expand(1, 1).tiles.exists(With.grids.units.get(_).exists(_.is(Terran.SpiderMine)))
     lazy val retreating = unit.matchups.threats.nonEmpty && ! unit.agent.shouldEngage
-    lazy val timeToMine  = unit.matchups.framesOfSafety > GameTime(0, 2)()
+    lazy val timeToMine  = unit.matchups.framesOfSafety > Seconds(2)()
     lazy val inWorkerLine = unit.base.exists(base => base.owner.isUs && base.harvestingArea.contains(unit.tileIncludingCenter))
     if (mineSpace
       && timeToMine

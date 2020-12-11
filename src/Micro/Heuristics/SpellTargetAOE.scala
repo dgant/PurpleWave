@@ -22,7 +22,7 @@ class SpellTargetAOE {
       .view
       .filter(target =>
             ((target.likelyStillThere && With.framesSince(target.lastSeen) < 72)
-        ||  (target.burrowed && target.possiblyStillThere)))
+        ||  (target.burrowed && target.likelyStillThere)))
       .filter(_.pixelDistanceCenter(caster) <= searchRadiusPixels))
       .filter( ! _.invincible)
     val targets = finalCandidates.filter(evaluate(_, caster) > 0)

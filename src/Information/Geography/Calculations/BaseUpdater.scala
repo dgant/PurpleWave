@@ -1,11 +1,10 @@
 package Information.Geography.Calculations
 
 import Information.Geography.Types.Base
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.Protoss
-import Utilities.ByOption
+import Utilities.{ByOption, Minutes}
 
 object BaseUpdater {
   
@@ -34,7 +33,7 @@ object BaseUpdater {
     // Assume ownership of occupied base we haven't seen lately
     if (base.owner.isNeutral && With.framesSince(base.lastScoutedFrame) > Protoss.Nexus.buildFrames) {
       val building = base.zone.units.find(unit => unit.isEnemy && ! unit.flying && unit.unitClass.isBuilding)
-      if (building.exists(_.lastSeen > base.lastScoutedFrame + GameTime(3, 0)())) {
+      if (building.exists(_.lastSeen > base.lastScoutedFrame + Minutes(3)())) {
         base.owner = building.get.player
       }
     }

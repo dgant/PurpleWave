@@ -1,8 +1,8 @@
 package Micro.Actions.Combat.Targeting.Filters
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.GameTime
 
 object TargetFilterRush extends TargetFilter {
   val timeThreshold = GameTime(4, 30)()

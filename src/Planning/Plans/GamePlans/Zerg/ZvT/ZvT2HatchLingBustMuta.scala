@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Zerg.ZvT
 
-import Information.Fingerprinting.Generic.GameTime
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.{AllIn, Attack, EjectScout}
 import Planning.Plans.Compound.{If, Parallel, Trigger}
@@ -16,6 +15,7 @@ import Planning.Predicates.Strategy.Employing
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvT2HatchLingBustMuta
+import Utilities.GameTime
 
 class ZvT2HatchLingBustMuta extends GameplanTemplate {
 

@@ -1,7 +1,8 @@
 package Information.Fingerprinting.ProtossStrategies
 
-import Information.Fingerprinting.Generic.{FingerprintArrivesBy, FingerprintCompleteBy, FingerprintOr, GameTime}
+import Information.Fingerprinting.Generic.{FingerprintArrivesBy, FingerprintCompleteBy, FingerprintOr}
 import ProxyBwapi.Races.Protoss
+import Utilities.GameTime
 
 class FingerprintCarriers extends FingerprintOr(
   new FingerprintArrivesBy(Protoss.Zealot,    GameTime(3, 30), 2),

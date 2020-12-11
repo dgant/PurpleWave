@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Protoss.Situational
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Squads.Goals.GoalRazeProxies
 import Micro.Squads.Squad
@@ -10,7 +9,7 @@ import Planning.UnitMatchers._
 import Planning.{Plan, Property}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.{ByOption, Forever}
+import Utilities.{ByOption, Forever, Minutes}
 
 import scala.collection.mutable
 
@@ -20,7 +19,7 @@ class DefendAgainstProxy extends Plan {
   val squad = new Squad(this)
   
   override def onUpdate() {
-    if (With.frame > GameTime(7, 0)()) return
+    if (With.frame > Minutes(7)()) return
 
     // Get sorted list of proxies
     val proxies = getProxies.toVector
@@ -96,8 +95,7 @@ class DefendAgainstProxy extends Plan {
   private def getProxies: Iterable[UnitInfo] = {
     With.units.enemy.view.filter(e =>
       ! e.flying
-      && e.likelyStillAlive
-      && e.possiblyStillThere
+      && e.likelyStillThere
       && e.isAny(scaryTypes: _*)
       && e.is(UnitMatchProxied))
   }

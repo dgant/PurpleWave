@@ -38,6 +38,7 @@ object Protoss {
   def CitadelOfAdun       = UnitClasses.get(UnitType.Protoss_Citadel_of_Adun)
   def TemplarArchives     = UnitClasses.get(UnitType.Protoss_Templar_Archives)
   def ArbiterTribunal     = UnitClasses.get(UnitType.Protoss_Arbiter_Tribunal)
+  def SpellDisruptionWeb  = UnitClasses.get(UnitType.Spell_Disruption_Web)
   def GroundDamage        = Upgrades.get(UpgradeType.Protoss_Ground_Weapons)
   def GroundArmor         = Upgrades.get(UpgradeType.Protoss_Ground_Armor)
   def AirDamage           = Upgrades.get(UpgradeType.Protoss_Air_Weapons)

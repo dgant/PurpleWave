@@ -1,6 +1,5 @@
 package Micro.Actions.Basic
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.DefaultCombat.{Disengage, Engage}
@@ -9,13 +8,13 @@ import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Strategery.Benzene
-import Utilities.ByOption
+import Utilities.{ByOption, Seconds}
 
 object Gather extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.agent.toGather.isDefined
   
-  private val combatWindow = GameTime(0, 2)()
+  private val combatWindow = Seconds(2)()
 
   val defenseRadiusPixels = 160
   

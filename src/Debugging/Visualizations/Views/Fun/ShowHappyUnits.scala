@@ -15,7 +15,7 @@ object ShowHappyUnits extends View {
     With.units.all
       .filter(unit =>
         unit.alive &&
-        unit.possiblyStillThere &&
+        unit.likelyStillThere &&
         (unit.complete || unit.unitClass.isBuilding))
       .toVector
       .sortBy(_.y)

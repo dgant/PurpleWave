@@ -20,8 +20,8 @@ object ShowDesire extends View {
   }
 
   def renderMCRS(unit: UnitInfo): Unit = {
-    if (!unit.possiblyStillThere) return
-    if (!With.viewport.contains(unit.tileIncludingCenter)) return
+    if ( ! unit.likelyStillThere) return
+    if ( ! With.viewport.contains(unit.tileIncludingCenter)) return
     DrawMap.label(
       "%d: %ds %dd %dt".format(
         PurpleMath.nanToN(10 * unit.mcrs.sim().simValue, 10).toInt,

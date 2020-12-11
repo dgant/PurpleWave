@@ -1,12 +1,12 @@
 package Planning.Plans.Army
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import Planning.{Plan, Property}
 import ProxyBwapi.Races.Terran
+import Utilities.Seconds
 
 class Scan extends Plan {
   
@@ -55,7 +55,7 @@ class Scan extends Plan {
     
     val blockedBuilders = With.units.ours.filter(b =>
       b.agent.toBuild.exists(_.isTownHall)
-      && With.framesSince(b.lastFrameTryingToMove) > GameTime(0, 1)())
+      && With.framesSince(b.lastFrameTryingToMove) > Seconds(1)())
     
     if (blockedBuilders.nonEmpty) {
       scan(blockedBuilders.head.pixelCenter)

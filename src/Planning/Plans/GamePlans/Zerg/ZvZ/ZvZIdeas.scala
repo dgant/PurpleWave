@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Zerg.ZvZ
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Compound.{If, Parallel, Trigger}
@@ -11,6 +10,7 @@ import Planning.Predicates.Milestones.{FrameAtMost, UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Placement.BuildSunkensInMain
 import Planning.Predicates.Strategy.EnemyStrategy
 import ProxyBwapi.Races.Zerg
+import Utilities.GameTime
 
 object ZvZIdeas {
 

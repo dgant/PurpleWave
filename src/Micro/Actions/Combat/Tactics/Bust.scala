@@ -1,6 +1,5 @@
 package Micro.Actions.Combat.Tactics
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
@@ -9,7 +8,7 @@ import Micro.Actions.Combat.Decisionmaking.DefaultCombat.Engage
 import Micro.Actions.Combat.Maneuvering.Retreat
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.ByOption
+import Utilities.{ByOption, Seconds}
 import bwapi.Race
 
 object Bust extends Action {
@@ -67,7 +66,7 @@ object Bust extends Action {
       With.commander.attack(unit)
     }
 
-    if (With.framesSince(unit.lastFrameTakingDamage) < GameTime(0, 1)()) {
+    if (With.framesSince(unit.lastFrameTakingDamage) < Seconds(1)()) {
       Retreat.delegate(unit)
     }
     else if (unit.matchups.targetsInRange.exists(_.canAttack(unit)) && unit.velocity.lengthSquared > 0) {

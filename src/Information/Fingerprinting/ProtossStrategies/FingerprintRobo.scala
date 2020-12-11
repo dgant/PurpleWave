@@ -2,6 +2,7 @@ package Information.Fingerprinting.ProtossStrategies
 
 import Information.Fingerprinting.Generic._
 import ProxyBwapi.Races.Protoss
+import Utilities.GameTime
 
 class FingerprintRobo extends FingerprintOr(
   new FingerprintCompleteBy(Protoss.RoboticsFacility,   GameTime(6, 0)),

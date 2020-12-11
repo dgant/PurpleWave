@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Zerg.ZvT
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.{AllIn, Attack}
@@ -20,6 +19,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtL
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvT3HatchLing
+import Utilities.GameTime
 
 class ZvT3HatchLing extends GameplanTemplate {
 

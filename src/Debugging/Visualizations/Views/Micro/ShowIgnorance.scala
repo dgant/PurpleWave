@@ -13,7 +13,7 @@ object ShowIgnorance extends View {
 
   def renderUnit(unit: UnitInfo) {
     if ( ! With.viewport.contains(unit.pixelCenter)) return
-    if ( ! unit.likelyStillAlive) return
+    if ( ! unit.alive) return
     if (unit.isNeutral) return
     if ( ! BattleClassificationFilters.isEligibleLocal(unit)) return
     if (unit.battle.nonEmpty) return

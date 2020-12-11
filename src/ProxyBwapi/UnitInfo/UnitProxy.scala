@@ -12,7 +12,6 @@ abstract class UnitProxy(var baseUnit: bwapi.Unit, val id: Int) {
   
   def player: PlayerInfo
   def lastSeen: Int
-  def possiblyStillThere: Boolean
   
   ////////////
   // Health //
@@ -137,4 +136,6 @@ abstract class UnitProxy(var baseUnit: bwapi.Unit, val id: Int) {
   
   def addon: Option[UnitInfo]
   def hasNuke: Boolean
+
+  def framesUntilRemoval: Int
 }

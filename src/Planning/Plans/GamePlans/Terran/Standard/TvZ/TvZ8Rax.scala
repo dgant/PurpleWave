@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
-import Information.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.Attack
@@ -21,6 +20,7 @@ import Planning.UnitCounters.{UnitCountExactly, UnitCountExcept}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran.TvZ8Rax
+import Utilities.GameTime
 
 class TvZ8Rax extends GameplanTemplate {
 

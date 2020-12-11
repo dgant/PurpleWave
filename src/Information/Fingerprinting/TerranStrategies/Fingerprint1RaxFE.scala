@@ -1,7 +1,8 @@
 package Information.Fingerprinting.TerranStrategies
 
-import Information.Fingerprinting.Generic.{FingerprintAnd, FingerprintCompleteBy, GameTime}
+import Information.Fingerprinting.Generic.{FingerprintAnd, FingerprintCompleteBy}
 import ProxyBwapi.Races.Terran
+import Utilities.GameTime
 
 class Fingerprint1RaxFE extends FingerprintAnd(
   new FingerprintCompleteBy(Terran.Barracks, GameTime(3, 0)),

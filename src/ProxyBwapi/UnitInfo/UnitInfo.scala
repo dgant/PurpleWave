@@ -303,7 +303,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
       (isUltralisk()  && player.hasUpgrade(Zerg.UltraliskSpeed)))
       1.5 else 1.0)))
 
-  @inline final def projectFrames(framesToLookAhead: Double): Pixel = pixelCenter.add((velocityX * framesToLookAhead).toInt, (velocityY * framesToLookAhead).toInt)
+  @inline final def projectFrames(framesToLookAhead: Double): Pixel = pixelCenter.project(presumptiveStep, Math.min(pixelDistanceCenter(presumptiveStep), framesToLookAhead * topSpeed))
 
   @inline final def inTileRadius  (tiles: Int)  : Traversable[UnitInfo] = With.units.inTileRadius(tileIncludingCenter, tiles)
   @inline final def inPixelRadius (pixels: Int) : Traversable[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)
@@ -725,5 +725,5 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     else if (alive)               player.colorMidnight
     else                          Colors.MidnightGray
 
-  @inline final def unitColor: Color = Colors.rainbow(frameDiscovered % Colors.rainbow.size)
+  @inline final def unitColor: Color = Colors.rainbow(frameDiscovered % Colors.rainbow.length)
 }

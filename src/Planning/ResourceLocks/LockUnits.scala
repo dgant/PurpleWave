@@ -29,7 +29,7 @@ class LockUnits extends {
   }
   
   def inquire(plan: Plan): Option[Vector[FriendlyUnitInfo]] = {
-    val ownerBefore = owner // This is supposed to be free of side-effects so retain the owner
+    val ownerBefore = owner // Inquiring is supposed to be free of side-effects so retain the owner
     owner = plan
     val output = With.recruiter.inquire(this, isDryRun = true).map(_.toVector) // toVector ensures we don't return a view with invalid owner
     owner = ownerBefore
@@ -49,53 +49,53 @@ class LockUnits extends {
     val finalists = findFinalists(candidates)
     val finalistsSatisfy = unitCounter.get.accept(finalists)
     if ( ! dryRun) isSatisfied = finalistsSatisfy
-    if (finalistsSatisfy) Some(finalists.toSeq) else None
+    if (finalistsSatisfy) Some(finalists) else None
   }
 
-  private def findFinalists(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
-    // Here's a bunch of special-case performance improvements.
-    // offerMultipleUnits()
+  private def findFinalists(candidates: Iterable[FriendlyUnitInfo]): Seq[FriendlyUnitInfo] = {
+    // Here's a bunch of special-case performance shortcuts
     if (unitCounter.get == UnitCountEverything) {
       if (unitMatcher.get == UnitMatchAnything) {
-        candidates
+        candidates.toSeq
+      } else {
+        candidates.filter(weAccept).toSeq
       }
-      else {
-        candidates.filter(weAccept)
-      }
-    }
-    else if (unitCounter.get == UnitCountExactly(1)) {
+    } else if (unitCounter.get == UnitCountExactly(1)) {
       findSingleFinalist(candidates)
-    }
-    else {
+    } else {
       findMultipleFinalists(candidates)
     }
   }
 
-  protected def findSingleFinalist(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
-    ByOption.minBy(candidates.filter(weAccept))(unitPreference.get.apply)
+  protected def findSingleFinalist(candidates: Iterable[FriendlyUnitInfo]): Seq[FriendlyUnitInfo] = {
+    ByOption.minBy(candidates.filter(weAccept))(unitPreference.get.apply).toSeq
   }
 
-  protected def findMultipleFinalists(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
+  protected def findMultipleFinalists(candidates: Iterable[FriendlyUnitInfo]): Seq[FriendlyUnitInfo] = {
 
-    val desiredUnits = With.recruiter.getUnits(this).to[mutable.Set]
+    val desiredUnits = With.recruiter.getUnits(this).to[mutable.ArrayBuffer]
 
-    // Build a queue based on whether we ned to sort it
-    val (candidateQueue, dequeue) =
+    // Build a queue based on whether we need to sort it
+    val (candidateQueue, dequeue, preference) =
       if (unitPreference.get == UnitPreferAnything) {
-        val output = new mutable.Queue[FriendlyUnitInfo]()
-        (output, () => output.dequeue())
+        val output = new mutable.Queue[(FriendlyUnitInfo, Double)]()
+        (
+          output,
+          () => output.dequeue(),
+          (candidate: FriendlyUnitInfo) => 0.0)
       } else {
-        val output = new mutable.PriorityQueue[FriendlyUnitInfo]()(Ordering.by(candidate =>
-          // Negative because priority queue is highest-first
-          - unitPreference.get.apply(candidate)
-          * (if (units.contains(candidate)) 1.0 else 1.5)
-        ))
-        (output, () => output.dequeue())
+        val output = new mutable.PriorityQueue[(FriendlyUnitInfo, Double)]()(Ordering.by(_._2))
+        (
+          output,
+          () => output.dequeue(),
+          (candidate: FriendlyUnitInfo) =>
+            - unitPreference.get.apply(candidate)
+            * (if (units.contains(candidate)) 1.0 else 1.5))
       }
 
-    candidateQueue ++= candidates.filter(weAccept)
+    candidateQueue ++= candidates.filter(weAccept).map(c => (c, preference(c)))
     while (unitCounter.get.continue(desiredUnits) && candidateQueue.nonEmpty) {
-      desiredUnits += dequeue()
+      desiredUnits += dequeue()._1
     }
     desiredUnits
   }

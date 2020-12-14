@@ -63,9 +63,9 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
     _visibility = value
     visibility match {
       case Visibility.Visible           => _burrowed = baseUnit.isBurrowed
-      case Visibility.InvisibleBurrowed => _burrowed = true
-      case Visibility.InvisibleNearby   => _burrowed = false
-      case Visibility.InvisibleMissing  => _burrowed = false
+      case Visibility.InvisibleBurrowed => _burrowed = true;  _detected = false
+      case Visibility.InvisibleNearby   => _burrowed = false; _detected = false
+      case Visibility.InvisibleMissing  => _burrowed = false; _detected = false
       case Visibility.Dead              => _alive = false
     }
   }

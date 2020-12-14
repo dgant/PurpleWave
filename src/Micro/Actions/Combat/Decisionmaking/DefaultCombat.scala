@@ -27,7 +27,7 @@ object DefaultCombat extends Action {
     override protected def perform(unit: FriendlyUnitInfo): Unit = DefaultCombat.micro(unit, shouldEngage = false)
   }
 
-  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove || unit.canAttack
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (unit.canMove || unit.canAttack) && unit.agent.canFight
   override protected def perform(unit: FriendlyUnitInfo): Unit = micro(unit, unit.agent.shouldEngage)
 
   abstract class Technique(val transitions: Technique*) {

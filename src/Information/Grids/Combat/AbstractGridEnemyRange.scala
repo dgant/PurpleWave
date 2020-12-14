@@ -19,20 +19,18 @@ abstract class AbstractGridEnemyRange extends AbstractGridVersionedValue[Int] {
   protected def pixelRangeMax(unit: UnitInfo): Double
 
   override def onUpdate(): Unit = {
-    for (unit <- With.units.enemy) {
+    With.units.enemy.foreach(unit =>
       if (unit.likelyStillThere && (unit.canAttack || unit.unitClass.spells.nonEmpty) && unit.battle.nonEmpty) {
         val tileUnit = unit.projectFrames(framesAhead).tileIncluding
-        val rangeMax = addedRange + pixelRangeMax(unit).toInt/32
-        for (d <- 1 to rangeMax) {
-          for (point <- Ring.points(d)) {
+        val rangeMax = addedRange + pixelRangeMax(unit).toInt / 32
+        (1 to rangeMax).foreach(d =>
+          Ring.points(d).foreach(point => {
             val tile = tileUnit.add(point)
             if (tile.valid) {
               val range = rangeMax - d
               set(tile, if (isSet(tile)) Math.max(range, get(tile)) else range)
             }
-          }
-        }
-      }
-    }
+          }))
+      })
   }
 }

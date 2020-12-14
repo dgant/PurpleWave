@@ -24,6 +24,7 @@ class Attack(
   }
 
   override def onUpdate() {
+    if ( ! With.units.ours.exists(_.is(matcher))) // Performance short-circuit
     if (conscript) {
       attackers.acquire(this)
       squad.addConscripts(attackers.units)

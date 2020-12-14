@@ -56,10 +56,9 @@ class Recruiter {
       .flatMap(getUnits)
 
     lock.offerUnits(
-      Seq.empty.view
-        ++ unitsByLock.getOrElse(lock, Iterable.empty).view
-        ++ unassignedUnits.view
-        ++ assignedToLowerPriority.view,
+      unitsByLock.getOrElse(lock, Iterable.empty).view
+        ++ unassignedUnits
+        ++ assignedToLowerPriority,
       isDryRun)
   }
 
@@ -69,8 +68,7 @@ class Recruiter {
 
     if (requiredUnits.isEmpty) {
       release(lock)
-    }
-    else {
+    } else {
       // 1. Unassign all the current units
       // 2. Unassign all the required units
       // 3. Assign all the required unit

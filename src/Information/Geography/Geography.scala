@@ -88,24 +88,25 @@ class Geography {
     .filter(_.townHall.isEmpty)
     .toVector
 
-  private def getSettlements: Vector[Base] = (Vector.empty
-  ++ With.geography.bases.view.filter(_.units.exists(u =>
-      u.isOurs
-      && u.unitClass.isBuilding
-      && (u.unitClass.isTownHall || ! u.base.exists(_.townHallArea.intersects(u.tileArea)) // Ignore proxy base blockers
-    )))
-  ++ Vector(With.geography.ourNatural).filter(x =>
-      With.strategy.isInverted
-      && ! With.geography.ourMain.units.exists(_.unitClass.isStaticDefense)
-      && With.units.ours.exists(u => u.complete && u.unitClass.ranged && (u.unitClass.canMove || u.unitClass.isSiegeTank))
-      && (With.units.existsEnemy(_.unitClass.ranged) || With.battles.global.globalSafeToAttack))
-  ++ With.units.ours
-    .view
-    .filter(_.agent.toBuild.exists(_.isTownHall))
-    .flatMap(_.agent.toBuildTile.map(tile => tile.zone.bases.find(base => base.townHallTile == tile)))
-    .flatten
-    .filterNot(_.owner.isUs)
-  ).distinct
+  private def getSettlements: Vector[Base] = (
+    Vector.empty
+    ++ With.geography.bases.view.filter(_.units.exists(u =>
+        u.isOurs
+        && u.unitClass.isBuilding
+        && (u.unitClass.isTownHall || ! u.base.exists(_.townHallArea.intersects(u.tileArea)) // Ignore proxy base blockers
+      )))
+    ++ Vector(With.geography.ourNatural).filter(x =>
+        With.strategy.isInverted
+        && ! With.geography.ourMain.units.exists(_.unitClass.isStaticDefense)
+        && With.units.ours.exists(u => u.complete && u.unitClass.ranged && (u.unitClass.canMove || u.unitClass.isSiegeTank))
+        && (With.units.existsEnemy(_.unitClass.ranged) || With.battles.global.globalSafeToAttack))
+    ++ With.units.ours
+      .view
+      .filter(_.agent.toBuild.exists(_.isTownHall))
+      .flatMap(_.agent.toBuildTile.map(tile => tile.zone.bases.find(base => base.townHallTile == tile)))
+      .flatten
+      .filterNot(_.owner.isUs)
+    ).distinct
   
   var home: Tile = SpecificPoints.tileMiddle
   

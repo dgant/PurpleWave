@@ -7,9 +7,9 @@ import Planning.Plan
 
 class DefendBases extends Plan {
   
-  private lazy val bases = With.geography.bases.map(base => (base, new DefendBase(base))).toMap
+  private lazy val baseDefensePlans = With.geography.bases.map(base => (base, new DefendBase(base))).toMap
   
-  override def getChildren: Iterable[Plan] = bases.values
+  override def getChildren: Iterable[Plan] = baseDefensePlans.values
 
   private case class BaseScore(base: Base) {
     lazy val defensible: Boolean = division.exists(_.enemies.nonEmpty) && (
@@ -23,21 +23,19 @@ class DefendBases extends Plan {
   
   protected override def onUpdate() {
 
-    val zoneScores = bases.keys.map(BaseScore).filter(_.defensible)
+    val zoneScores = baseDefensePlans.keys.map(BaseScore).filter(_.defensible)
     
-    if (zoneScores.isEmpty) {
-      return
-    }
+    if (zoneScores.isEmpty) return
 
-    // For each
     zoneScores
         .groupBy(_.division.get)
         .toVector
         .sortBy(-_._2.map(_.score).sum)
         .foreach(baseGroup => {
-          // Take an arbitrary-but-preferably-stable base from the group
+          // When we have multiple viable defense plans for a division,
+          // delegate to an arbitrary-but-preferably-stable plan for that division.
           val baseScore = baseGroup._2.minBy(_.base.hashCode)
-          val defensePlan = bases(baseScore.base)
+          val defensePlan = baseDefensePlans(baseScore.base)
           defensePlan.enemies = baseScore.division.get.enemies.view.flatMap(_.foreign).toSeq
           delegate(defensePlan)
       })

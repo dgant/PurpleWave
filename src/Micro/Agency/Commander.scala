@@ -139,7 +139,6 @@ class Commander {
   /**
     * Adjust the unit's destination to ensure successful execution of the move.
     */
-
   def getAdjustedDestination(unit: FriendlyUnitInfo, argTo: Pixel): Pixel = {
     var to: Pixel = argTo
 

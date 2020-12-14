@@ -60,8 +60,6 @@ object MicroPathing {
   // 8 is definitely too little for competent mvoement
   private val rays = 32
   private val rayRadians = (0 until rays).map(_ * 2 * Math.PI / rays - Math.PI).toVector.sortBy(Math.abs)
-  private val rayCosines = rayRadians.map(Math.cos)
-  private val terminusPixelsMinimum = waypointDistancePixels * 3 / 4
   def getWaypointInDirection(unit: FriendlyUnitInfo, radians: Double, mustApproach: Option[Pixel] = None, requireSafety: Boolean = false): Option[Pixel] = {
     lazy val safetyPixels =  unit.matchups.pixelsOfEntanglement
     lazy val travelDistanceCurrent = mustApproach.map(unit.pixelDistanceTravelling)
@@ -76,25 +74,23 @@ object MicroPathing {
 
     val rayStart = unit.pixelCenter
     val waypointDistance = Math.max(waypointDistancePixels, if (requireSafety) 64 + safetyPixels else 0)
-    val termini = rayRadians
+    val terminus = rayRadians
       .indices
       .view
       .map(i => {
         val deltaRadians = rayRadians(i)
-        val cosine = rayCosines(i)
-        val terminus = castRay(rayStart, lengthPixels = waypointDistance, radians = radians + deltaRadians, flying = unit.flying)
-        (terminus, cosine)
+        castRay(rayStart, lengthPixels = waypointDistance, radians = radians + deltaRadians, flying = unit.flying)
       })
-      .filter(p => {
-        val terminus = p._1.clamp(unit.unitClass.dimensionMax / 2)
+      .find(p => {
+        val terminus = p.clamp(unit.unitClass.dimensionMax / 2)
         lazy val towardsTerminus = unit.pixelCenter.project(terminus, 8)
         lazy val travelDistanceTerminus = mustApproach.map(a => if (unit.flying) terminus.pixelDistance(a) else terminus.groundPixels(a))
         (
-          terminus.pixelDistance(rayStart) > terminusPixelsMinimum
+          terminus.pixelDistance(rayStart) >= 80
           && (travelDistanceTerminus.forall(_ < travelDistanceCurrent.get))
           && (acceptableForSafety(towardsTerminus)))
       })
-    ByOption.maxBy(termini)(p => rayStart.pixelDistance(p._1) * p._2).map(_._1) // Return the terminus that moves us furthest along the desired axis
+    terminus
   }
 
   def tryMovingAlongTilePath(unit: FriendlyUnitInfo, path: TilePath): Unit = {
@@ -107,7 +103,7 @@ object MicroPathing {
 
   def getPathfindingRepulsors(unit: FriendlyUnitInfo, maxThreats: Int = 10): IndexedSeq[PathfindRepulsor] = {
     TakeN
-      .by(maxThreats, unit.matchups.threats.view.filter(_.likelyStillThere))(Ordering.by(t => unit.matchups.pixelsOfEntanglementPerThreat(t)))
+      .by(maxThreats, unit.matchups.threats.view.filter(_.likelyStillThere))(Ordering.by(t => unit.pixelsOfEntanglement(t)))
       .map(threat => PathfindRepulsor(
         threat.pixelCenter,
         threat.dpfOnNextHitAgainst(unit),

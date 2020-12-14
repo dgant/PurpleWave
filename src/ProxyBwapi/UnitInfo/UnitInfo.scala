@@ -610,6 +610,16 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     }
     else Forever()
   }
+  @inline final def pixelsOfEntanglement(threat: UnitInfo): Double = {
+    val speedTowardsThreat    = speedApproaching(threat)
+    val framesToStopMe        = if(speedTowardsThreat <= 0) 0.0 else framesToStopRightNow
+    val framesToFlee          = framesToStopMe + unitClass.framesToTurn180 + With.latency.framesRemaining + With.reaction.agencyAverage
+    val distanceClosedByMe    = speedTowardsThreat * framesToFlee
+    val distanceClosedByEnemy = if (threat.isInterceptor()) 0.0 else (threat.topSpeed * framesToFlee)
+    val distanceEntangled     = threat.pixelRangeAgainst(this) - threat.pixelDistanceEdge(this)
+    val output                = distanceEntangled + distanceClosedByEnemy
+    output
+  }
   
   @inline final def canStim: Boolean = unitClass.canStim && player.hasTech(Terran.Stim) && hitPoints > 10
 

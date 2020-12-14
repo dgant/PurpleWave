@@ -8,7 +8,7 @@ import Micro.Actions.Combat.Decisionmaking.DefaultCombat.Engage
 import Micro.Actions.Combat.Maneuvering.Retreat
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.{ByOption, Seconds}
+import Utilities.{ByOption, Minutes, Seconds}
 import bwapi.Race
 
 object Bust extends Action {
@@ -32,7 +32,8 @@ object Bust extends Action {
   )
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.totalHealth >= unit.unitClass.maxHitPoints + 12 // Don't take hull damage
+    With.frame < Minutes(8)() // Performance short-circuit
+    && unit.totalHealth >= unit.unitClass.maxHitPoints + 12 // Don't take hull damage
     && With.enemies.exists(_.raceCurrent == Race.Terran)
     && unit.agent.canFight
     && unit.canMove
@@ -40,16 +41,15 @@ object Bust extends Action {
     && With.self.hasUpgrade(Protoss.DragoonRange)
     && unit.matchups.threats.forall(threat => safeFromThreat(unit, threat, unit.pixelCenter))
     && unit.matchups.targets.exists(bunker =>
-        (bunker.visible || bunker.altitudeBonus <= unit.altitudeBonus)
-        && bunker.aliveAndComplete
-        && bunker.is(Terran.Bunker)
-        && ! bunker.player.hasUpgrade(Terran.MarineRange)
-        && unit.matchups.threats.forall(threat =>
-          safeFromThreat(
-            unit,
-            threat,
-            unit.pixelCenter.project(bunker.pixelCenter, unit.pixelDistanceEdge(bunker) - unit.pixelRangeAgainst(bunker)))))
-  )
+      (bunker.visible || bunker.altitudeBonus <= unit.altitudeBonus)
+      && bunker.aliveAndComplete
+      && bunker.is(Terran.Bunker)
+      && ! bunker.player.hasUpgrade(Terran.MarineRange)
+      && unit.matchups.threats.forall(threat =>
+        safeFromThreat(
+          unit,
+          threat,
+          unit.pixelCenter.project(bunker.pixelCenter, unit.pixelDistanceEdge(bunker) - unit.pixelRangeAgainst(bunker))))))
   
   override protected def perform(unit: FriendlyUnitInfo) {
     // Goal: Take down the bunker. Don't take any damage from it.

@@ -29,7 +29,6 @@ object Fight extends Action {
     BeAnArbiter.consider(unit)
     BeAReaver.consider(unit)
     Recharge.consider(unit)
-    Reload.consider(unit)
     SpiderMine.consider(unit)
     Bust.consider(unit)
     Spot.consider(unit)

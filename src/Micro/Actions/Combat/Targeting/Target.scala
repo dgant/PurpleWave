@@ -20,8 +20,8 @@ object Target extends {
     attacker.agent.toAttack = bestUnfiltered(attacker, targets)
   }
 
-  def best(attacker: FriendlyUnitInfo, required: TargetFilter*): Option[UnitInfo] = {
-    bestUnfiltered(attacker, preferred(attacker, required: _*))
+  def best(attacker: FriendlyUnitInfo, filters: TargetFilter*): Option[UnitInfo] = {
+    bestUnfiltered(attacker, legal(attacker, filters: _*))
   }
 
   def best(attacker: FriendlyUnitInfo, whitelist: Iterable[UnitInfo]): Option[UnitInfo] = {
@@ -32,18 +32,9 @@ object Target extends {
     ByOption.maxBy(targets)(score(attacker, _))
   }
 
-  def legal(attacker: FriendlyUnitInfo, required: TargetFilter*): Seq[UnitInfo] = {
-    val filters = filtersRequired(attacker) ++ required
-    attacker.matchups.targets.view.filter(target => filters.forall(_.legal(attacker, target)))
-  }
-
-  def preferred(attacker: FriendlyUnitInfo, required: TargetFilter*): Iterable[UnitInfo] = {
-    val filtersPreferred = TargetFilterGroups.filtersPreferred.view.filter(_.appliesTo(attacker))
-    val legalTargets = legal(attacker, required: _*).toVector
-    (0 to filtersPreferred.length)
-      .map(i => legalTargets.view.filter(target => filtersPreferred.drop(i).forall(_.legal(attacker, target))))
-      .find(_.nonEmpty)
-      .getOrElse(legalTargets)
+  def legal(attacker: FriendlyUnitInfo, filters: TargetFilter*): Seq[UnitInfo] = {
+    val allFilters = filtersRequired(attacker) ++ filters
+    attacker.matchups.targets.view.filter(target => allFilters.forall(_.legal(attacker, target)))
   }
 
   def filtersRequired(attacker: FriendlyUnitInfo): Seq[TargetFilter] = {
@@ -54,7 +45,7 @@ object Target extends {
     attacker.matchups.targets
       .map(target => (
         target,
-        (TargetFilterGroups.filtersRequired.view ++ additionalFiltersRequired ++ TargetFilterGroups.filtersPreferred)
+        (TargetFilterGroups.filtersRequired.view ++ additionalFiltersRequired)
           .map(filter => (filter.legal(attacker, target), filter))
           .toVector
           .sortBy(_._1)))
@@ -68,11 +59,14 @@ object Target extends {
   @inline final def score(attacker: FriendlyUnitInfo, target: UnitInfo): Double = {
     val framesOfFreedom = attacker.cooldownLeft
     val framesOutOfWayToShoot = if (attacker.canMove) Math.max(0, attacker.framesToGetInRange(target) - framesOfFreedom) else 0
-    val output = baseAttackerToTargetValue(
+    val scoreBasic = baseAttackerToTargetValue(
       baseTargetValue = target.targetBaseValue(),
       totalHealth = target.totalHealth,
       framesOutOfTheWay = framesOutOfWayToShoot,
       dpf = attacker.dpfOnNextHitAgainst(target))
+    val preferences = TargetFilterGroups.filtersPreferred.view.filter(_.appliesTo(attacker)).count(_.legal(attacker, target))
+    val preferenceBonus = Math.pow(100, preferences)
+    val output = scoreBasic * preferenceBonus
     output
   }
 

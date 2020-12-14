@@ -42,8 +42,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   lazy val dpfReceiving                  : Double                = threatsInRange.view.map(_.matchups.dpfDealingDiffused(me)).sum
   lazy val vpfReceiving                  : Double                = valuePerDamage * dpfReceiving
   lazy val framesToLive                  : Double                = PurpleMath.nanToInfinity(me.totalHealth / dpfReceiving)
-  lazy val pixelsOfEntanglementPerThreat : Map[UnitInfo, Double] = threats.view.map(threat => (threat, pixelsOfEntanglementWith(threat))).toMap
-  lazy val pixelsOfEntanglement          : Double                = ByOption.max(pixelsOfEntanglementPerThreat.values).getOrElse(- With.mapPixelWidth)
+  lazy val pixelsOfEntanglement          : Double                = ByOption.max(threats.map(me.pixelsOfEntanglement)).getOrElse(- With.mapPixelWidth)
   lazy val framesOfSafety                : Double                = - With.latency.latencyFrames - With.reaction.agencyAverage - PurpleMath.nanToZero(pixelsOfEntanglement / me.topSpeed)
   lazy val pixelsOutOfNonWorkerRange     : Double                = ByOption.min(threats.view.filterNot(_.unitClass.isWorker).map(t => t.pixelDistanceEdge(me) - t.pixelRangeAgainst(me))).getOrElse(With.mapPixelWidth)
 
@@ -80,17 +79,6 @@ case class MatchupAnalysis(me: UnitInfo) {
         || (catcher.is(Zerg.Zergling) && With.self.hasUpgrade(Zerg.ZerglingSpeed) && ! me.player.hasUpgrade(Terran.VultureSpeed))
         || (catcher.is(Protoss.Zealot) && me.isDragoon() && ! me.player.hasUpgrade(Protoss.DragoonRange))
         || (catcher.is(Protoss.DarkTemplar) && me.isDragoon()))
-    output
-  }
-
-  def pixelsOfEntanglementWith(threat: UnitInfo, fixedRange: Option[Double] = None): Double = {
-    val speedTowardsThreat    = me.speedApproaching(threat)
-    val framesToStopMe        = if(speedTowardsThreat <= 0) 0.0 else me.framesToStopRightNow
-    val framesToFlee          = framesToStopMe + me.unitClass.framesToTurn180 + With.latency.framesRemaining + With.reaction.agencyAverage
-    val distanceClosedByMe    = speedTowardsThreat * framesToFlee
-    val distanceClosedByEnemy = if (threat.is(Protoss.Interceptor)) 0.0 else (threat.topSpeed * framesToFlee)
-    val distanceEntangled     = threat.pixelRangeAgainst(me) - threat.pixelDistanceEdge(me)
-    val output                = distanceEntangled + distanceClosedByEnemy
     output
   }
 }

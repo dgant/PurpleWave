@@ -8,7 +8,7 @@ import Utilities.ByOption
 
 object Follow extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    ! unit.matchups.threats.exists(_.unitClass.dealsRadialSplashDamage)
+    unit.flying // Performance shortcut
     && unit.isAny(
       Terran.Battlecruiser,
       Terran.Wraith,
@@ -17,7 +17,8 @@ object Follow extends Action {
       Protoss.Corsair,
       Protoss.Scout,
       Zerg.Mutalisk)
-    && ! unit.agent.leader().contains(unit))
+    && ! unit.agent.leader().contains(unit)
+    && ! unit.matchups.threats.exists(_.unitClass.dealsRadialSplashDamage))
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val maybeLeader = unit.agent.leader()

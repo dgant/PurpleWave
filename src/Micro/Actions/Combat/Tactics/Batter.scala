@@ -56,8 +56,8 @@ object Batter extends Action {
     lazy val repairers = if (unit.pixelRangeGround >= 32.0 * 4.0) repairingUnits.filter(_.visible) else Iterable.empty
     lazy val wall      = wallUnits.filter(_.visible)
     
-    lazy val shootingThreats  = unit.matchups.pixelsOfEntanglementPerThreat.filter(_._2 > -64)
-    lazy val dpfReceiving     = shootingThreats.map(_._1.dpfOnNextHitAgainst(unit)).sum
+    lazy val shootingThreats  = unit.matchups.threats.filter(unit.pixelsOfEntanglement(_) > -64)
+    lazy val dpfReceiving     = shootingThreats.map(_.dpfOnNextHitAgainst(unit)).sum
     lazy val framesToLive     = PurpleMath.nanToInfinity(unit.totalHealth / dpfReceiving)
     lazy val dying            = framesToLive < Seconds(1)()
     lazy val shouldRetreat    = ! unit.agent.shouldEngage || (unit.unitClass.melee && dying)

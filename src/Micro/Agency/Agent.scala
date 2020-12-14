@@ -67,7 +67,7 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   def isScout: Boolean = intent.toScoutTiles.nonEmpty
 
-  var forces: ForceMap = new ForceMap
+  val forces: ForceMap = new ForceMap
 
   /////////////////
   // Suggestions //
@@ -122,7 +122,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   }
 
   private def resetState() {
-    forces = new ForceMap // Faster than clearing existing maps, apparently
+    forces.clear()
     lastPath = None
     unit.agent.priority = TrafficPriorities.None
     fightReason = ""

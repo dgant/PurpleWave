@@ -236,10 +236,6 @@ object DefaultCombat extends Action {
     // TODO: Regroup force -- Proportional to distance from centroid divided by total length of army
     // Reference https://github.com/bmnielsen/Stardust/blob/master/src/General/UnitCluster/Tactics/Move.cpp#L69
 
-
-
-
-
     if (goalHover) {
       val closeEnough = unit.agent.toAttack.forall(unit.inRangeToAttack)
       val exposed = unit.matchups.threatsInRange.exists(t => t.inRangeToAttack(unit) && ! unit.agent.toAttack.contains(t))
@@ -269,9 +265,8 @@ object DefaultCombat extends Action {
     ForceMath.rebalance(unit.agent.forces, weighPositioning, forcesPositioning: _*)
 
     if (goalEngage
-      && unit.agent.toAttack.exists(unit.pixelsToGetInRange(_) < 64)
-      // Don't want to dance
-      && (unit.unitClass.melee || unit.readyForAttackOrder)) {
+      && (unit.unitClass.melee || unit.readyForAttackOrder) // Don't want to dance
+      && unit.agent.toAttack.exists(unit.pixelsToGetInRange(_) < Math.max(64, unit.topSpeed * With.reaction.agencyMax))) {
       With.commander.attack(unit)
       return
     }

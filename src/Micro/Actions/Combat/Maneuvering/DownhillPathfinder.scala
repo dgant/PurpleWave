@@ -15,7 +15,8 @@ object DownhillPathfinder {
     val directions = Ring.points(1)
     var firstDirection = 0 // Rotate the first direction we try to discover diagonals
 
-    val path = new ArrayBuffer[Tile]
+    // Pre-allocating is hopefully a performance improvement
+    val path = new ArrayBuffer[Tile](MicroPathing.waypointDistanceTiles)
     path += from
 
     def distance(tile: Tile): Double = tile.groundPixels(to)

@@ -4,6 +4,7 @@ import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Spiral
+import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Position
 
 case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
@@ -88,5 +89,18 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
       .orElse(Spiral.points(16).view.map(ti.add).find(_.walkable))
       .getOrElse(tileIncluding)
     output
+  }
+  @inline final def nearestTraversableTile(unit: UnitInfo): Tile = if (unit.flying) tileIncluding else nearestWalkableTile
+  @inline final def nearestWalkablePixel: Pixel = if (walkable) this else {
+    val center = nearestWalkableTile.pixelCenter
+    Pixel(
+      PurpleMath.clamp(x, center.x - 16, center.x + 16),
+      PurpleMath.clamp(y, center.y - 16, center.y + 16))
+  }
+  @inline final def nearestTraversablePixel(unit: UnitInfo): Pixel = if (unit.flying) this else {
+    val center = nearestWalkableTile.pixelCenter
+    Pixel(
+      PurpleMath.clamp(x, center.x - 16 + Math.min(16, unit.unitClass.dimensionLeft), center.x + 16 - Math.min(16, unit.unitClass.dimensionRight)),
+      PurpleMath.clamp(y, center.y - 16 + Math.min(16, unit.unitClass.dimensionUp),   center.y + 16 - Math.min(16, unit.unitClass.dimensionDown)))
   }
 }

@@ -24,8 +24,8 @@ class MatchupGraph {
     entrants.clear
     With.units.playerOwned.foreach(entrant => {
       if (entrant.alive
-        &&  entrant.battle.isEmpty
-        &&  With.framesSince(entrant.frameDiscovered) < 72
+        && entrant.battle.isEmpty
+        && With.framesSince(entrant.frameDiscovered) < 72
         && BattleClassificationFilters.isEligibleLocal(entrant)) {
           val battle = ByOption.minBy(With.units.all.view.filter(_.battle.isDefined))(_.pixelDistanceSquared(entrant)).flatMap(_.battle)
           if (battle.isDefined) {

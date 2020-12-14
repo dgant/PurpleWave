@@ -1,6 +1,6 @@
 package Information.Battles
 
-import ProxyBwapi.Races.Zerg
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object BattleClassificationFilters {

@@ -207,7 +207,11 @@ object DefaultCombat extends Action {
     if ((goalHover || goalRetreat) && ! unit.flying) unit.agent.escalatePriority(if (context.tooCloseToThreat) TrafficPriorities.Shove else TrafficPriorities.Bump)
 
     // TODO: Find smarter firing positions. Find somewhere safe and unoccupied but not too far to stand.
-    lazy val firingPosition: Option[Pixel] = unit.agent.toAttack.map(_.pixelCenter).filter(p => unit.flying || p.tileIncluding.walkable).orElse(unit.agent.toTravel)
+    lazy val firingPosition: Option[Pixel] =
+      unit.agent.toAttack
+        .map(target => target.pixelCenter.project(unit.pixelCenter, target.unitClass.dimensionMin + unit.unitClass.dimensionMin).nearestTraversablePixel(unit))
+        .filter(p => unit.agent.toAttack.exists(t => unit.inRangeToAttack(t, p)))
+        .orElse(unit.agent.toTravel)
     unit.agent.toTravel = Some(
       if (goalRegroup)
         context.regroupGoal
@@ -232,9 +236,9 @@ object DefaultCombat extends Action {
     // TODO: Regroup force -- Proportional to distance from centroid divided by total length of army
     // Reference https://github.com/bmnielsen/Stardust/blob/master/src/General/UnitCluster/Tactics/Move.cpp#L69
 
-    if (unit.matchups.threats.isEmpty) {
-      forces(Forces.leaving) *= 0
-    }
+
+
+
 
     if (goalHover) {
       val closeEnough = unit.agent.toAttack.forall(unit.inRangeToAttack)

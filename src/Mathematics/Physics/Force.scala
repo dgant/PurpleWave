@@ -42,7 +42,11 @@ case class Force(x: Double, y: Double) {
   
   @inline def toPoint: Point = Point(x.toInt, y.toInt)
 
-  override def toString: String = f"Force[${degrees.toInt}*,  $lengthSlow%1.3f]($x%1.3f, $y%1.3f)"
+  override def toString: String =
+    if (lengthSquared > 0)
+      f"Force[${degrees.toInt}*,  $lengthSlow%1.3f]($x%1.3f, $y%1.3f)"
+    else
+      "Force[Zero]"
 }
 
 

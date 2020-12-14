@@ -49,13 +49,6 @@ object MicroPathing {
     val lineWaypoint      = if (PixelRay(unit.pixelCenter, goal).forall(_.walkable)) Some(unit.pixelCenter.project(goal, Math.min(unit.pixelDistanceCenter(goal), waypointDistancePixels))) else None
     lazy val hillPath     = DownhillPathfinder.decend(unit.tileIncludingCenter, goal.tileIncluding)
     lazy val hillWaypoint = hillPath.map(path => path.last.pixelCenter.add(unit.pixelCenter).subtract(path.head.pixelCenter))
-    lazy val zonePath     = With.paths.zonePath(unit.pixelCenter.zone, goal.zone)
-    lazy val zoneWaypoint = zonePath.flatMap(_.steps.find(step => step.from != unit.zone || unit.pixelDistanceCenter(step.edge.pixelCenter) > step.edge.radiusPixels)).map(_.edge.pixelCenter)
-    lazy val goalWaypoint = zoneWaypoint.getOrElse(goal)
-    lazy val ring         = MicroPathing.getCircleTowards(unit.pixelCenter, goalWaypoint)
-    lazy val ringFiltered = ring.filter(t => t.walkable && PixelRay(unit.pixelCenter, t).view.drop(1).forall(_.walkable))
-    lazy val ringWaypoint = ByOption.minBy(ringFiltered)(goal.groundPixels)
-    //lineWaypoint.orElse(hillWaypoint).orElse(ringWaypoint).orElse(zoneWaypoint).getOrElse(goal)
     lineWaypoint.orElse(hillWaypoint).getOrElse(goal)
   }
 
@@ -63,8 +56,10 @@ object MicroPathing {
     if (path.pathExists) Some(path.tiles.get.take(waypointDistanceTiles).last.pixelCenter) else None
   }
 
-  private val rays = 8 //256
-  private val rayRadians = (0 to rays).map(_ * 2 * Math.PI / rays - Math.PI).toVector.sortBy(Math.abs)
+  // More rays = more accurate movement, but more expensive
+  // 8 is definitely too little for competent mvoement
+  private val rays = 32
+  private val rayRadians = (0 until rays).map(_ * 2 * Math.PI / rays - Math.PI).toVector.sortBy(Math.abs)
   private val rayCosines = rayRadians.map(Math.cos)
   private val terminusPixelsMinimum = waypointDistancePixels * 3 / 4
   def getWaypointInDirection(unit: FriendlyUnitInfo, radians: Double, mustApproach: Option[Pixel] = None, requireSafety: Boolean = false): Option[Pixel] = {
@@ -92,7 +87,6 @@ object MicroPathing {
       })
       .filter(p => {
         val terminus = p._1.clamp(unit.unitClass.dimensionMax / 2)
-        val cosine = p._2
         lazy val towardsTerminus = unit.pixelCenter.project(terminus, 8)
         lazy val travelDistanceTerminus = mustApproach.map(a => if (unit.flying) terminus.pixelDistance(a) else terminus.groundPixels(a))
         (

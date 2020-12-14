@@ -1,13 +1,17 @@
 package Planning.Plans.Army
 
-import Information.Geography.Types.Zone
+import Information.Geography.Types.Base
 import Micro.Squads.Goals.GoalDefendZone
+import Planning.UnitMatchers.UnitMatchRecruitableForCombat
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 
-class DefendZone(zone: Zone) extends SquadPlan[GoalDefendZone] {
+class DefendBase(base: Base) extends SquadPlan[GoalDefendZone] {
   
   val goal: GoalDefendZone = new GoalDefendZone
+  goal.unitMatcher = UnitMatchRecruitableForCombat
+
+
   var enemies: Seq[ForeignUnitInfo] = Seq.empty
   
   override def onUpdate() {
@@ -21,7 +25,7 @@ class DefendZone(zone: Zone) extends SquadPlan[GoalDefendZone] {
     }
   
     squad.enemies = enemies
-    goal.zone = zone
+    goal.zone = base.zone
     super.onUpdate()
   }
 }

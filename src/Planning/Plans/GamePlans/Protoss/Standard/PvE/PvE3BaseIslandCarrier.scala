@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvE
 
 import Lifecycle.With
 import Macro.BuildRequests.{Get, NextUpgrade}
-import Planning.Plans.Army.{Attack, ConsiderAttacking, DefendZones, RecruitFreelancers}
+import Planning.Plans.Army.{Attack, ConsiderAttacking, DefendBases, RecruitFreelancers}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
@@ -80,7 +80,7 @@ class PvE3BaseIslandCarrier extends Parallel {
     new Pump(Protoss.PhotonCannon, maximumConcurrently = 3),
     new ExpandOverIsland(12),
     new Attack(Protoss.Scout), // TODO: Scout expansions, don't attack
-    new DefendZones,
+    new DefendBases,
     new If(
       new UnitsAtLeast(8 * 8, Protoss.Interceptor),
       new ConsiderAttacking),

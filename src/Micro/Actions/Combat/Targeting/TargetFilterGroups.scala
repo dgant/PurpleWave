@@ -9,12 +9,11 @@ object TargetFilterGroups {
     TargetFilterLeash,
     TargetFilterFocus,
     TargetFilterStayCloaked,
-    TargetFilterFutility,
     TargetFilterScourge,
     TargetFilterReaver,
-    TargetFilterCrowded,
     TargetFilterTankFodder,
     TargetFilterRush,
+    TargetFilterFutility,
     TargetFilterCarrierIgnoreInterceptors)
 
   val filtersPreferred = Vector(

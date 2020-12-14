@@ -57,8 +57,6 @@ object StrategyGroups {
     ZvZ5PoolSunkens,
 
     PvTStove, // TODO: For ladder/fun play only
-
-    DarkArchonsWithNoDefense // Temporary for AIIDE testing
   )
 }
 

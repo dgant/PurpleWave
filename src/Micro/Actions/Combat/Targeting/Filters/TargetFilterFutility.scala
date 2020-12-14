@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Targeting.Filters
 import Lifecycle.With
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.Seconds
+import Utilities.{Minutes, Seconds}
 
 object TargetFilterFutility extends TargetFilter {
 
@@ -25,7 +25,7 @@ object TargetFilterFutility extends TargetFilter {
     }
 
     // This is a pretty expensive filter; avoid using it if possible
-    if (actor.battle.exists(_.teamOf(actor).units.size > 12 || (With.frame > Seconds(12)() && With.reaction.agencyAverage > 6))) {
+    if (actor.battle.exists(_.teamOf(actor).units.size > 12 || (With.frame > Minutes(12)() && With.reaction.agencyAverage > 6))) {
       return true
     }
 

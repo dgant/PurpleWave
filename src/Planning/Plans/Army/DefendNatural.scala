@@ -8,6 +8,7 @@ import Planning.UnitMatchers._
 class DefendNatural(
   unitMatcher: UnitMatcher = UnitMatchAnd(UnitMatchRecruitableForCombat, UnitMatchNot(UnitMatchWorkers)),
   unitCounter: UnitCounter = UnitCountEverything)
+
   extends SquadPlan[GoalDefendZone] {
   
   override val goal: GoalDefendZone = new GoalDefendZone

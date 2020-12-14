@@ -131,7 +131,6 @@ object ProtossChoices {
     PvTProxyDarkTemplar,
     PvE3BaseIslandCarrier,
     CarriersWithNoDefense,
-    DarkArchonsWithNoDefense,
     ProtossBigFFACarriers)
   
   val standardOpeners: Vector[Strategy] = (pvr ++ pvtOpenersAll ++ pvpOpenersAll ++ pvzOpenersAll).distinct

@@ -2,15 +2,14 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Predicates.Compound.Latch
-import Planning.UnitCounters.UnitCountOne
-import Planning.Plans.Army.{ConsiderAttacking, DefendEntrance}
+import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Compound.{If, Or}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Predicates.Milestones.{EnemyHasShown, MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Plans.Scouting.ScoutOn
+import Planning.Predicates.Compound.Latch
+import Planning.Predicates.Milestones.{EnemyHasShown, MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.PvTStove
@@ -20,7 +19,6 @@ class PvTStove extends GameplanTemplate {
   override val activationCriteria   = new Employing(PvTStove)
   override val completionCriteria   = new Latch(new Or(new MiningBasesAtLeast(3), new UnitsAtLeast(1, Protoss.ArbiterTribunal)))
   override def priorityAttackPlan   = new PvTIdeas.PriorityAttacks
-  override def priorityDefensePlan  = new If(new EnemyHasShown(Terran.Vulture), new DefendEntrance(Protoss.Dragoon, UnitCountOne))
   override def initialScoutPlan = new ScoutOn(Protoss.Pylon)
 
   override def emergencyPlans: Seq[Plan] = Vector(

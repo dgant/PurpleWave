@@ -47,7 +47,7 @@ object ShowBattle extends View {
       DrawScreen.table(x, 4 * barHeight, Vector(
         Vector("Attack",      format(battle.judgement.get.ratioAttack), "Survive:"),
         Vector("Snipe",       format(battle.judgement.get.ratioSnipe),  With.self.name,   describeTeam(prediction.debugReport.filter(_._1.isFriendly) .filterNot(_._2.dead).keys)),
-        Vector("Target",      format(battle.judgement.get.ratioTarget), With.enemy.name,  describeTeam(prediction.debugReport.filter(_._1.isEnemy)    .filterNot(_._2.dead).keys)),
+        Vector("Target",      format(battle.judgement.get.ratioThreshold), With.enemy.name,  describeTeam(prediction.debugReport.filter(_._1.isEnemy)    .filterNot(_._2.dead).keys)),
         Vector("Hysteresis",  format(battle.judgement.get.hysteresis)),
         Vector("Turtle",      format(battle.judgement.get.turtleBonus), "Die:"),
         Vector("Hornet",      format(battle.judgement.get.hornetBonus), With.self.name,   describeTeam(prediction.debugReport.filter(_._1.isFriendly) .filter(_._2.dead).keys)),
@@ -69,7 +69,7 @@ object ShowBattle extends View {
         GraphCurve(Color.Black,         prediction.localBattleMetrics.map(unused =>  1.0)),
         GraphCurve(Color.Black,         prediction.localBattleMetrics.map(unused =>  0.0)),
         GraphCurve(Color.Black,         prediction.localBattleMetrics.map(unused => -1.0)),
-        GraphCurve(Colors.MediumRed,    prediction.localBattleMetrics.map(unused => battle.judgement.get.ratioTarget)),
+        GraphCurve(Colors.MediumRed,    prediction.localBattleMetrics.map(unused => battle.judgement.get.ratioThreshold)),
         GraphCurve(Colors.BrightOrange, prediction.localBattleMetrics.map(unused => battle.judgement.get.ratioAttack)),
         GraphCurve(Color.Yellow,        prediction.localBattleMetrics.map(_.totalScore))),
       fixedYMin = Some(-1.0),

@@ -72,8 +72,8 @@ object ShowBattleSummary extends View {
     With.game.setTextSize(Text.Size.Large)
     With.game.drawTextScreen(tableHeader0.bwapi, With.self.name)
     With.game.drawTextScreen(tableHeader1.bwapi, With.enemy.name)
-    With.game.drawTextScreen(tableStart0.bwapi, "+" + estimation.costToEnemy.toInt)
-    With.game.drawTextScreen(tableStart1.bwapi, "-" + estimation.costToUs.toInt)
+    With.game.drawTextScreen(tableStart0.bwapi, "+" + estimation.simulation.unitsEnemy.view.map(_.valueReceived).sum.toInt)
+    With.game.drawTextScreen(tableStart1.bwapi, "-" + estimation.simulation.unitsOurs.view.map(_.valueReceived).sum.toInt)
     With.game.setTextSize(Text.Size.Small)
   }
 }

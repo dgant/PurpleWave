@@ -289,8 +289,6 @@ class Simulacrum(
   @inline final def reportCard: ReportCard = ReportCard(
     simulacrum      = this,
     estimation      = simulation.prediction, //TODO: Redundant
-    valueDealt      = valueDealt,
-    valueReceived   = valueReceived,
     damageDealt     = damageDealt,
     damageReceived  = damageReceived,
     dead            = dead,

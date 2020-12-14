@@ -86,14 +86,7 @@ class Simulation(val prediction: PredictionLocal) {
   }
   
   def cleanup() {
-    prediction.costToUs           = unitsOurs   .view.map(_.valueReceived).sum
-    prediction.costToEnemy        = unitsEnemy  .view.map(_.valueReceived).sum
-    prediction.damageToUs         = unitsOurs   .view.map(_.damageReceived).sum
-    prediction.damageToEnemy      = unitsEnemy  .view.map(_.damageReceived).sum
-    prediction.deathsUs           = unitsOurs   .count(_.dead)
-    prediction.deathsEnemy        = unitsEnemy  .count(_.dead)
-    prediction.totalUnitsUs       = unitsOurs   .size
-    prediction.totalUnitsEnemy    = unitsEnemy  .size
+    prediction.deathsUs     = unitsOurs.count(_.dead)
     if (With.configuration.debugging) {
       prediction.debugReport ++= everyone.map(simulacrum => (simulacrum.realUnit, simulacrum.reportCard))
       prediction.events = everyone.flatMap(_.events).sortBy(_.frame)

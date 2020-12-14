@@ -9,19 +9,23 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 class BattleJudgment(battle: BattleLocal) {
 
-  val baseHysteresis  : Double  = if (With.self.isZerg) 1.5 else 1.0
+  val baseHysteresis  : Double  = if (With.self.isZerg) 1.5 else 1.0 // Maybe base this on simulated decisiveness
   val terranHomeBonus : Double  =   0.2 * getTerranHomeBonus
   val hysteresis      : Double  =   0.2 * getHysteresis * baseHysteresis
   val turtleBonus     : Double  =   0.1 * getTurtleBonus
   val hornetBonus     : Double  =   0.3 * getHornetBonus
   val terranMaxBonus  : Double  = - 0.2 * getTerranMaxBonus
   val siegeUrgency    : Double  = - 0.5 * getSiegeUrgency
+
+  // "Ratios" here range on [-1, 1]
   val ratioAttack     : Double  = transformTotalScore(battle.predictionAttack.localBattleMetrics)
-  val ratioSnipe      : Double  = transformTotalScore(battle.predictionSnipe.localBattleMetrics)
-  val totalTarget     : Double  = hysteresis + terranHomeBonus + terranMaxBonus + turtleBonus + hornetBonus + siegeUrgency + With.configuration.baseTarget
-  val ratioTarget     : Double  = Math.min(.99, PurpleMath.nanToZero(totalTarget))
-  val shouldAttack    : Boolean = ratioAttack > ratioTarget
-  val shouldSnipe     : Boolean = ratioSnipe > ratioTarget
+  val ratioSnipe      : Double  = if (battle.predictionSnipe == battle.predictionAttack) ratioAttack else transformTotalScore(battle.predictionSnipe.localBattleMetrics)
+  val ratioBest       : Double  = Math.max(ratioAttack, ratioSnipe)
+  val totalTarget     : Double  = hysteresis + terranHomeBonus + terranMaxBonus + turtleBonus + hornetBonus + siegeUrgency + With.configuration.baseThreshold
+  val ratioThreshold  : Double  = Math.min(1, PurpleMath.nanToZero(totalTarget))
+  val confidence      : Double  = PurpleMath.nanToN((ratioBest - ratioThreshold) / Math.abs(Math.signum(ratioBest - ratioThreshold) - ratioThreshold), if (ratioBest >= ratioThreshold) 1 else -1)
+  val shouldAttack    : Boolean = ratioAttack >= ratioThreshold
+  val shouldSnipe     : Boolean = ratioSnipe >= ratioThreshold
   val shouldFight     : Boolean = shouldAttack || shouldSnipe
 
   def getTerranHomeBonus: Double = {

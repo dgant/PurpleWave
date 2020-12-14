@@ -14,13 +14,6 @@ class PredictionLocal(val battle: BattleLocal, val weAttack: Boolean, val weSnip
   var events: Iterable[SimulationEvent] = Iterable.empty
   val localBattleMetrics: mutable.ArrayBuffer[LocalBattleMetrics] = new mutable.ArrayBuffer[LocalBattleMetrics]
 
-  var frames          = 0
-  var damageToUs      = 0.0
-  var damageToEnemy   = 0.0
-  var costToUs        = 0.0
-  var costToEnemy     = 0.0
-  var totalUnitsUs    = 0.0
-  var totalUnitsEnemy = 0.0
-  var deathsUs        = 0.0
-  var deathsEnemy     = 0.0
+  var frames = 0
+  var deathsUs = 0.0
 }

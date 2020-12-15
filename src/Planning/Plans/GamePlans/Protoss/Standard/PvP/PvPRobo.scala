@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, ConsiderAttacking, DefendNatural, EjectScout}
+import Planning.Plans.Army.{Aggression, ConsiderAttacking, EjectScout}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -73,11 +73,12 @@ class PvPRobo extends GameplanTemplate {
         new And(new PvP1GateCoreIdeas.GateGate, new EnemyStrategy(With.fingerprints.oneGateCore), new Not(new EnemyStrategy(With.fingerprints.fourGateGoon))),
         new EnemyBasesAtLeast(2),
         new And(new EnemyStrategy(With.fingerprints.dtRush), new UnitsAtLeast(2, Protoss.Observer, complete = true)),
-        new And(new EnemyStrategy(With.fingerprints.twoGate),
+        new And(
+          new EnemyStrategy(With.fingerprints.twoGate),
+          new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
           new Or(
             new EnemyHasShown(Protoss.Gateway), // Don't abandon base vs. proxies
             new UnitsAtLeast(7, UnitMatchWarriors)),
-          new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
           new Or(
             new UpgradeComplete(Protoss.DragoonRange),
             new Not(new EnemyHasUpgrade(Protoss.DragoonRange)))),
@@ -109,7 +110,6 @@ class PvPRobo extends GameplanTemplate {
             Get(2, Protoss.Observer))))))
 
   override def scoutExposPlan: Plan = NoPlan()
-  override def defendEntrance: Plan = new Trigger(new ReadyToExpand, new DefendNatural, super.defendEntrance)
 
   override def aggressionPlan: Plan = new Trigger(
     new And(

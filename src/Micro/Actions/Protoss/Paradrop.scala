@@ -15,7 +15,7 @@ import Utilities.ByOption
 
 object Paradrop extends Action {
 
-  override def allowed(unit: FriendlyUnitInfo): Boolean = false && unit.transport.isDefined && unit.isAny(Protoss.Reaver, Protoss.HighTemplar)
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.transport.isDefined && unit.is(Protoss.Reaver)
 
   def findFiringPosition(reaver: FriendlyUnitInfo, target: UnitInfo): Tile = {
     val firingDistance  = (reaver.effectiveRangePixels + Math.min(reaver.effectiveRangePixels, target.effectiveRangePixels)) / 2
@@ -45,17 +45,9 @@ object Paradrop extends Action {
   }
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    val reaverCanFight  = unit.scarabCount > 0 && (unit.agent.shouldEngage || unit.matchups.threats.forall(_.pixelRangeAgainst(unit) <= unit.effectiveRangePixels))
-    val templarCanFight = unit.energy >= 75
-    val readyToDrop     = reaverCanFight || templarCanFight
-
-    // If we're able to fight, pick a target
-    if (readyToDrop) {
-      if (unit.is(Protoss.Reaver)) {
-        Target.choose(unit)
-      }
+    if (unit.agent.shouldEngage) {
+      Target.choose(unit)
     }
-
     val target = unit.agent.toAttack
     def eligibleTeammate  = (unit: UnitInfo) => ! unit.isAny(Protoss.Shuttle, Protoss.Reaver, Protoss.HighTemplar)
     def isEngaged         = (unit: UnitInfo) => unit.matchups.enemies.nonEmpty

@@ -62,7 +62,7 @@ class Team(val units: Vector[UnitInfo]) {
   val widthMeanActual     = new Cache(() => PurpleMath.mean(units.view.map(_.positioningWidthCached())))
   val depthMean           = new Cache(() => ByOption.mean(units.view.flatMap(_.positioningDepthCached())).getOrElse(0d))
   val depthSpread         = new Cache(() => ByOption.mean(units.view.flatMap(_.positioningDepthCached()).map(d => Math.abs(d - depthMean()))).getOrElse(0d))
-  val depthSpreadExpected = new Cache(() => units.size * 32 / 8)
+  val depthSpreadExpected = new Cache(() => units.size / 8) // Magic number
   val coherenceWidth      = new Cache(() => Math.min(PurpleMath.nanToOne(widthMeanExpected() / widthMeanActual()), PurpleMath.nanToOne(widthMeanActual() / widthMeanExpected())))
   val coherenceDepth      = new Cache(() => PurpleMath.nanToOne(1 - depthSpread() / (depthSpread() + depthSpreadExpected())))
   val coherence           = new Cache(() => Math.max(coherenceWidth(), coherenceDepth()))

@@ -171,7 +171,9 @@ object DefaultCombat extends Action {
     //  () => unit.agent.toAttack.exists(t => unit.pixelDistanceSquared(t.pixelCenter.project(t.presumptiveStep, unit.pixelRangeAgainst(t))) > unit.pixelDistanceSquared(t.pixelCenter)))
 
     transition(Reposition, () => unit.agent.toAttack.map(unit.pixelRangeAgainst).exists(_ > 64))
-    transition(Excuse, () => context.receivedPushPriority >= TrafficPriorities.Shove && context.receivedPushPriority > unit.agent.priority)
+
+    // TODO: Reenable once we stop shoving so needlessly
+    //transition(Excuse, () => context.receivedPushPriority >= TrafficPriorities.Shove && context.receivedPushPriority > unit.agent.priority)
 
     if (unit.unready) return
 
@@ -209,7 +211,7 @@ object DefaultCombat extends Action {
     lazy val firingPosition: Option[Pixel] =
       unit.agent.toAttack
         .map(target => target.pixelCenter.project(unit.pixelCenter, target.unitClass.dimensionMin + unit.unitClass.dimensionMin).nearestTraversablePixel(unit))
-        .filter(p => unit.agent.toAttack.exists(t => unit.inRangeToAttack(t, p)))
+        .filter(p => unit.agent.toAttack.exists(t => ! t.flying || unit.inRangeToAttack(t, p)))
         .orElse(unit.agent.toTravel)
     unit.agent.toTravel = Some(
       if (goalRegroup)

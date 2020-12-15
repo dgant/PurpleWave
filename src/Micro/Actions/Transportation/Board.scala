@@ -2,6 +2,7 @@ package Micro.Actions.Transportation
 
 import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Actions.Transportation.Caddy.Shuttling
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Board extends Action {
@@ -18,7 +19,7 @@ object Board extends Action {
     val transport = unit.agent.toBoard.get
     
     unit.agent.toTravel = Some(transport.pixelCenter)
-    if (transport.pixelDistanceEdge(unit) < With.configuration.pickupRadiusPixels) {
+    if (transport.pixelDistanceEdge(unit) < Shuttling.pickupRadius) {
       unit.hijack()
       With.commander.rightClick(unit, transport)
     }

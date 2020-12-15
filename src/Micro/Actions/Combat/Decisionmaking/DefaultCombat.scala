@@ -69,10 +69,9 @@ object DefaultCombat extends Action {
     lazy val purring = (unit.unitClass.isTerran && unit.unitClass.isMechanical && unit.immediateAllies.exists(a => a.repairing && a.orderTarget.contains(unit)))
 
     lazy val regroupGoal: Pixel =
-      unit.battle
-        .filter(_.us.units.exists(u => u != unit && u.flying == unit.flying))
-        .map(battle => if (unit.flying) battle.us.centroidAir else battle.us.centroidGround)
-        .getOrElse(if (shouldEngage) unit.agent.destination else unit.agent.origin)
+      if (unit.battle.isDefined) unit.positioningWidthTargetCached()
+      else if (shouldEngage) unit.agent.destination
+      else unit.agent.origin
   }
 
   def takePotshot(unit: FriendlyUnitInfo): Unit = {

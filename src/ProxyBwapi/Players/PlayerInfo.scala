@@ -4,7 +4,6 @@ import Debugging.Visualizations.Colors
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Performance.Cache
-import ProxyBwapi.UnitInfo.UnitInfo
 import ProxyBwapi.Upgrades.Upgrade
 import bwapi.{Player, Race}
 

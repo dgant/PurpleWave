@@ -1,6 +1,6 @@
 package Information.Battles.Prediction.Simulation
 
-import Debugging.Visualizations.Views.Battles.ShowBattle
+import Debugging.Visualizations.Views.Battles.ShowBattles
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
@@ -257,7 +257,7 @@ class Simulacrum(
   }
   
   @inline private final def addEvent(event: () => SimulationEvent) {
-    if (ShowBattle.inUse) {
+    if (ShowBattles.inUse) {
       events += event()
     }
   }

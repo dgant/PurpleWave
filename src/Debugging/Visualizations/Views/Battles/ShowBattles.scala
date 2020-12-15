@@ -12,7 +12,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 import bwapi.Color
 
-object ShowBattle extends View {
+object ShowBattles extends View {
   
   override def renderScreen() {
     localBattle.foreach(renderBattleScreen)
@@ -57,7 +57,8 @@ object ShowBattle extends View {
         Vector("LHVLR",       format(metrics.localHealthValueLostRatio), "Metrics",        prediction.localBattleMetrics.size.toString),
         Vector("RLVLN",       format(metrics.ratioLocalValueLostNet)),
         Vector("RLHLN",       format(metrics.ratioLocalHealthLostNet)),
-        Vector("RLHVLN",      format(metrics.ratioLocalHealthValueLostNet))
+        Vector("RLHVLN",      format(metrics.ratioLocalHealthValueLostNet)),
+        Vector("Confidence",  format(battle.judgement.get.confidence))
       ))
     })
 

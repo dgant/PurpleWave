@@ -188,7 +188,7 @@ class Gathering {
       }
       // Don't encourage redistributing a worker who's currently approaching their minerals
       val resourceBeforeEdgePixels    = resourceBefore.map(_.pixelDistanceEdge(worker))
-      val stick                       = resourceBefore.contains(resource) && ! worker.carryingResources && resourceBeforeEdgePixels.forall(_ < 64)
+      val stick                       = resourceBefore.contains(resource) && ! worker.carrying && resourceBeforeEdgePixels.forall(_ < 64)
       val baseFrom                    = worker.base.orElse(resourceBefore.flatMap(_.base))
       val baseTo                      = resource.base
       val workerToResourceCost        = baseFrom.flatMap(baseA => baseTo.map(baseB => baseCosts(baseA, baseB)())).getOrElse(worker.pixelDistanceTravelling(resource.pixelCenter))

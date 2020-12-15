@@ -313,7 +313,7 @@ class Commander {
   
   def returnCargo(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return
-    if (unit.carryingResources) {
+    if (unit.carrying) {
       autoUnburrow(unit)
       unit.baseUnit.returnCargo
       sleepReturnCargo(unit)

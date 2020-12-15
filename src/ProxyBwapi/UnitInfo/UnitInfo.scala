@@ -367,16 +367,13 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     Zerg.SunkenColony
   ))
 
+  @inline final def totalHealth: Int = hitPoints + shieldPoints + defensiveMatrixPoints
   @inline final def armorHealth: Int = armorHealthCache()
   @inline final def armorShield: Int = armorShieldsCache()
-
-  lazy val armorHealthCache   = new Cache(() => unitClass.armor + unitClass.armorUpgrade.map(player.getUpgradeLevel).getOrElse(0))
-  lazy val armorShieldsCache  = new Cache(() => player.getUpgradeLevel(Protoss.Shields))
-
-  @inline final def totalHealth: Int = hitPoints + shieldPoints + defensiveMatrixPoints
+  private lazy val armorHealthCache   = new Cache(() => unitClass.armor + unitClass.armorUpgrade.map(player.getUpgradeLevel).getOrElse(0))
+  private lazy val armorShieldsCache  = new Cache(() => player.getUpgradeLevel(Protoss.Shields))
 
   @inline final def stimAttackSpeedBonus: Int = if (stimmed) 2 else 1
-
   @inline final def dpfAir    : Double = damageOnHitAir     * attacksAgainstAir     / cooldownMaxAir.toDouble
   @inline final def dpfGround : Double = damageOnHitGround  * attacksAgainstGround  / cooldownMaxGround.toDouble
 
@@ -397,8 +394,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     output
   })
 
-  //TODO: Ensnare
   @inline final def cooldownLeft : Int = (
+    //TODO: Ensnare
     (if (complete)
       Seq(
         airCooldownLeft,
@@ -413,40 +410,20 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
 
   @inline final def cooldownMaxAir    : Int = (2 + unitClass.airDamageCooldown)     / stimAttackSpeedBonus // +2 is the RNG
   @inline final def cooldownMaxGround : Int = (2 + unitClass.groundDamageCooldown)  / stimAttackSpeedBonus // +2 is the RNG
-
   @inline final def cooldownMaxAirGround: Int = Math.max(
     if (unitClass.attacksAir)     cooldownMaxAir    else 0,
     if (unitClass.attacksGround)  cooldownMaxGround else 0)
-
   @inline final def cooldownMaxAgainst(enemy: UnitInfo): Int = if (enemy.flying) cooldownMaxAir else cooldownMaxGround
-
   @inline final def pixelRangeAgainst(enemy: UnitInfo): Double = if (enemy.flying) pixelRangeAir else pixelRangeGround
   @inline final def effectiveRangePixels: Double = Math.max(pixelRangeMax, unitClass.effectiveRangePixels)
 
-  @inline final def hitChanceAgainst(
-    enemy : UnitInfo,
-    from  : Option[Pixel] = None,
-    to    : Option[Pixel] = None)
-  : Double = {
-    if (guaranteedToHit(enemy, from, to)) 1.0 else 0.47
+  @inline final def hitChanceAgainst(enemy : UnitInfo, from: Option[Pixel] = None, to: Option[Pixel] = None): Double = if (guaranteedToHit(enemy, from, to)) 1.0 else 0.47
+  @inline final def guaranteedToHit(enemy : UnitInfo, from: Option[Pixel] = None, to: Option[Pixel] = None): Boolean = {
+    val tileFrom  = from.getOrElse(pixelCenter)       .tileIncluding
+    val tileTo    =   to.getOrElse(enemy.pixelCenter) .tileIncluding
+    flying || enemy.flying || unitClass.unaffectedByDarkSwarm || tileFrom.altitudeBonus >= tileTo.altitudeBonus
   }
 
-  @inline final def guaranteedToHit(
-    enemy : UnitInfo,
-    from  : Option[Pixel] = None,
-    to    : Option[Pixel] = None)
-  : Boolean = {
-    val tileFrom  = from.getOrElse(pixelCenter).tileIncluding
-    val tileTo    =   to.getOrElse(pixelCenter).tileIncluding
-    (
-      flying
-      || enemy.flying
-      || unitClass.isReaver
-      || unitClass.unaffectedByDarkSwarm
-      || With.grids.altitudeBonus.get(tileFrom) >= With.grids.altitudeBonus.get(tileTo)
-    )
-  }
-  
   @inline final def damageTypeAgainst (enemy: UnitInfo)  : Damage.Type  = if (enemy.flying) unitClass.airDamageType    else unitClass.groundDamageType
   @inline final def attacksAgainst    (enemy: UnitInfo)  : Int          = if (enemy.flying) attacksAgainstAir          else attacksAgainstGround
   
@@ -640,24 +617,26 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   ////////////
   
   @inline final def gathering: Boolean = gatheringMinerals || gatheringGas
-  
-  @inline final def carryingResources: Boolean = carryingMinerals || carryingGas
+  @inline final def carrying: Boolean = carryingMinerals || carryingGas
 
-  final def presumptiveStep: Pixel = presumptiveStepCache()
-  private val presumptiveStepCache = new Cache(() => MicroPathing.getWaypointToPixel(this, presumptiveDestination))
-  final def presumptiveDestination: Pixel = {
+  @inline final def presumptiveDestination: Pixel = if (isOurs) calculatePresumptiveDestination else presumptiveDestinationCached()
+  @inline final def presumptiveStep: Pixel = if (isOurs) MicroPathing.getWaypointToPixel(this, presumptiveDestination) else presumptiveStepCached()
+  @inline final def presumptiveTarget: Option[UnitInfo] = if (isOurs) calculatePresumptiveTarget else presumptiveTargetCached()
+  val presumptiveDestinationCached = new Cache(() => presumptiveDestination)
+  val presumptiveStepCached = new Cache(() => MicroPathing.getWaypointToPixel(this, presumptiveDestinationCached()))
+  val presumptiveTargetCached = new Cache(() => presumptiveTarget)
+  val positioningDepthCached = new Cache(() => presumptiveTarget.map(t => pixelDistanceEdge(t) - pixelRangeAgainst(t) / 3))
+  private def calculatePresumptiveDestination: Pixel =
     friendly.flatMap(_.agent.toTravel)
       .orElse(targetPixel)
       .orElse(orderTargetPixel)
       .orElse(presumptiveTarget.map(pixelToFireAt))
       .getOrElse(pixelCenter)
-  }
-  final def presumptiveTarget: Option[UnitInfo] = {
+  private def calculatePresumptiveTarget: Option[UnitInfo] =
     friendly.flatMap(_.agent.toAttack)
       .orElse(target)
       .orElse(orderTarget)
       .orElse(ByOption.minBy(matchups.targets)(_.pixelDistanceEdge(targetPixel.orElse(orderTargetPixel).getOrElse(pixelCenter))))
-  }
 
   @inline final def isBeingViolent: Boolean = {
     unitClass.isStaticDefense ||

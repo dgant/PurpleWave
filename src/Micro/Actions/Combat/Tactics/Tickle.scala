@@ -25,7 +25,7 @@ object Tickle extends Action {
   override protected def perform(tickler: FriendlyUnitInfo) {
 
     // Return resources now so we can mine again later
-    if (tickler.carryingResources && tickler.base.exists(_.owner.isUs)) {
+    if (tickler.carrying && tickler.base.exists(_.owner.isUs)) {
       With.commander.returnCargo(tickler)
       return
     }

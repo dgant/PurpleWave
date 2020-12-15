@@ -515,7 +515,12 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
 
   @inline final def canBurrow: Boolean = canDoAnything && (is(Zerg.Lurker) || (player.hasTech(Zerg.Burrow) && isAny(Zerg.Drone, Zerg.Zergling, Zerg.Hydralisk, Zerg.Defiler)))
 
-  // Stupid, but helped BWMirror performance due to costliness of comparing unit classes with BWMirror limitations
+  val positioningWidthPixelCached = new Cache(() => battle.map(_.teamOf(this)).map(team => if (flying) team.centroidAir else PurpleMath.projectedPointOnLine(pixelCenter, team.centroidOf(this), team.lineWidth())).getOrElse(pixelCenter))
+  val positioningDepthCached = new Cache(() => presumptiveTarget.map(t => pixelDistanceEdge(t) - pixelRangeAgainst(t) / 3))
+  val positioningWidthCached = new Cache(() => pixelCenter.pixelDistance(positioningWidthPixelCached()))
+
+  // TODO: These checks are fast now so we can delete these  //
+  // PREVIOUSLY: Stupid, but helped BWMirror performance due to costliness of comparing unit classes with BWMirror limitations
   // Can probably be replaced by normal is() calls now or just direct comparisons
   protected class CacheIs(unitClass: UnitClass) extends Cache(() => is(unitClass))
   lazy val isSpiderMine         : CacheIs = new CacheIs(Terran.SpiderMine)
@@ -625,7 +630,6 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   val presumptiveDestinationCached = new Cache(() => presumptiveDestination)
   val presumptiveStepCached = new Cache(() => MicroPathing.getWaypointToPixel(this, presumptiveDestinationCached()))
   val presumptiveTargetCached = new Cache(() => presumptiveTarget)
-  val positioningDepthCached = new Cache(() => presumptiveTarget.map(t => pixelDistanceEdge(t) - pixelRangeAgainst(t) / 3))
   private def calculatePresumptiveDestination: Pixel =
     friendly.flatMap(_.agent.toTravel)
       .orElse(targetPixel)

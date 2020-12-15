@@ -337,21 +337,31 @@ object PurpleMath {
     stack
   }
 
-  @inline final def projectedPointOnLine(p: Point, v1: Point, v2: Point): Point = {
+  @inline final def projectedPointOnLine(p: Pixel, v1: Pixel, v2: Pixel): Pixel = {
     val e1x = v2.x - v1.x
     val e1y = v2.y - v1.y
     val e2x = p.x - v1.x
     val e2y = p.y - v1.y
     val edot = e1x * e2x + e1y * e2y
     val eLength2 = Math.max(1, e1x * e1x + e1y * e1y)
-    Point(v1.x + (e1x * edot) / eLength2, v1.y + (e1y * edot) / eLength2)
+    Pixel(v1.x + (e1x * edot) / eLength2, v1.y + (e1y * edot) / eLength2)
   }
 
-  @inline final def projectedPointOnSegment(p: Point, v1: Point, v2: Point): Point = {
-    val onLine = projectedPointOnLine(p, v1, v2)
-    val segmentLength2 = v1.distanceSquared(v2)
-    val isOnSegment = onLine.distanceSquared(v1) < segmentLength2 && onLine.distanceSquared(v2) < segmentLength2
-    if (isOnSegment) onLine else Seq(v1, v2).minBy(_.distanceSquared(p))
+  @inline final def projectedPointOnSegment(p: Pixel, v1: Pixel, v2: Pixel): Pixel = {
+    val on = projectedPointOnLine(p, v1, v2)
+    val segmentLengthSquared = (
+        (v1.x - v2.x) * (v1.x - v2.x)
+      + (v1.y - v2.y) * (v1.y - v2.y))
+    val isOnSegment = (
+        (on.x - v1.x) * (on.x - v1.x)
+      + (on.y - v1.y) * (on.y - v1.y)
+      < segmentLengthSquared &&
+        (on.x - v2.x) * (on.x - v2.x)
+      + (on.y - v2.y) * (on.y - v2.y)
+      < segmentLengthSquared)
+    if (isOnSegment) on else Seq(v1, v2).minBy(v =>
+        (v.x - p.x) * (v.x - p.x)
+      + (v.y - p.y) * (v.y - p.y))
   }
 
   @inline final def toInt(value: Boolean): Int = if (value) 1 else 0

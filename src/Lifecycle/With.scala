@@ -91,10 +91,11 @@ object With {
   var yolo              : Yolo                    = _
 
   def enemy: PlayerInfo = enemies.head
-  def mapPixelWidth   : Int = mapTileWidth * 32
-  def mapPixelHeight  : Int = mapTileHeight * 32
-  def mapWalkWidth    : Int = mapTileWidth * 4
-  def mapWalkHeight   : Int = mapTileHeight * 4
+  def mapPixelWidth     : Int = mapTileWidth * 32
+  def mapPixelHeight    : Int = mapTileHeight * 32
+  def mapPixelPerimeter : Int = 2 * mapPixelWidth + 2 * mapPixelHeight
+  def mapWalkWidth      : Int = mapTileWidth * 4
+  def mapWalkHeight     : Int = mapTileHeight * 4
   def framesSince(previousFrame: Int): Int = Math.max(0, frame - previousFrame)
 
   def onFrame() {

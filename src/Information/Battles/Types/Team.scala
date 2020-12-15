@@ -22,20 +22,28 @@ class Team(val units: Vector[UnitInfo]) {
   // Features //
   //////////////
   
-  def opponent: Team = if (battle.us == this) battle.enemy else battle.us
+  lazy val opponent: Team = if (battle.us == this) battle.enemy else battle.us
   def centroidOf(unit: UnitInfo): Pixel = if (unit.flying) centroidAir else centroidGround
 
-  lazy val meanDamageGround = new Cache(() => PurpleMath.nanToZero(PurpleMath.weightedMean(units.map(u => (u.damageOnHitGround  .toDouble,  u.dpfGround)))))
-  lazy val meanDamageAir    = new Cache(() => PurpleMath.nanToZero(PurpleMath.weightedMean(units.map(u => (u.damageOnHitAir     .toDouble,  u.dpfAir)))))
+  // Used by MCRS
+  private lazy val meanDamageGround = new Cache(() => PurpleMath.nanToZero(PurpleMath.weightedMean(units.map(u => (u.damageOnHitGround  .toDouble,  u.dpfGround)))))
+  private lazy val meanDamageAir    = new Cache(() => PurpleMath.nanToZero(PurpleMath.weightedMean(units.map(u => (u.damageOnHitAir     .toDouble,  u.dpfAir)))))
   def meanDamageAgainst(unit: UnitInfo): Double = if (unit.flying) meanDamageAir() else meanDamageGround()
 
   val engaged = new Cache(() => units.exists(_.matchups.framesOfSafety <= 0))
+  val axisDepth = new Cache(() => centroidAir.radiansTo(opponent.centroidAir))
+  val axisWidth = new Cache(() => PurpleMath.normalizeAroundZero(axisDepth() + Math.PI / 2))
+  val lineDepth = new Cache(() => centroidGround.radiateRadians(axisDepth(), With.mapPixelPerimeter))
+  val lineWidth = new Cache(() => centroidGround.radiateRadians(axisWidth(), With.mapPixelPerimeter))
 
-  // COHERENCE: A metric of how organized the team is
+  // COHERENCE: A metric of how organized the team is.
+  //
+  // A fully (1.0) organized team is a few-rank arc equidistant from enemy targets.
   // The less organized the team is, the more attractive it is to reorganize.
+  //
   // Aspects of coherence:
   // - Depth: Average distance from target (as a delta from each unit's ideal)
-  // - Width: Distance from team (compared to expectation based on size of team)
+  // - Width: Distance from the depth axis (compared to expectation based on size of team)
   //
   // For elements on a line, mean distance from center scales with scale of number of units.
   // Example:
@@ -46,12 +54,15 @@ class Team(val units: Vector[UnitInfo]) {
   // Width / 2   = 0 1 1 2 2 3 3  4  4  5  5  6  6  7  7
   // Width       = 1 2 3 4 5 6 7  8  9  10 11 12 13 14 15
   // Thus "width" = 2 * sqrt(sumDistance)
-  val widthMinimum        = new Cache(() => units.view.map(_.unitClass.radialHypotenuse * 2).sum)
-  val widthActual         = new Cache(() => 2 * Math.sqrt(PurpleMath.mean(units.view.map(u => u.pixelDistanceCenter(centroidOf(u))))))
+  private def groundUnits = units.view.filterNot(_.flying)
+  val widthOrder          = new Cache(() => groundUnits.sortBy(_.positioningWidthPixelCached().pixelDistanceSquared(lineWidth())).toVector)
+  val widthMinimum        = new Cache(() => groundUnits.map(_.unitClass.radialHypotenuse * 2).sum)
+  val widthMeanExpected   = new Cache(() => Math.pow(widthMinimum() / 2, 2))
+  val widthMeanActual     = new Cache(() => PurpleMath.mean(units.view.map(_.positioningWidthCached())))
   val depthMean           = new Cache(() => ByOption.mean(units.view.flatMap(_.positioningDepthCached())).getOrElse(0d))
   val depthSpread         = new Cache(() => ByOption.mean(units.view.flatMap(_.positioningDepthCached()).map(d => Math.abs(d - depthMean()))).getOrElse(0d))
   val depthSpreadExpected = new Cache(() => units.size * 32 / 8)
-  val coherenceWidth      = new Cache(() => PurpleMath.clamp(PurpleMath.nanToOne(widthActual() / widthMinimum()),0, 1))
+  val coherenceWidth      = new Cache(() => Math.min(PurpleMath.nanToOne(widthMeanExpected() / widthMeanActual()), PurpleMath.nanToOne(widthMeanActual() / widthMeanExpected())))
   val coherenceDepth      = new Cache(() => PurpleMath.nanToOne(1 - depthSpread() / (depthSpread() + depthSpreadExpected())))
   val coherence           = new Cache(() => Math.min(coherenceWidth(), coherenceDepth()))
 }

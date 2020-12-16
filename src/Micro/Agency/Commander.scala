@@ -1,5 +1,6 @@
 package Micro.Agency
 
+import Debugging.KeyboardCommands
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints, Tile}
 import Mathematics.PurpleMath
@@ -493,6 +494,9 @@ class Commander {
       With.frame + With.latency.turnSize,
       unit.nextOrderFrame.getOrElse(0)).max
     unit.sleepUntil(sleepUntil)
+    if (With.configuration.trackUnit && unit.selected) {
+      KeyboardCommands.breakpointFodder = - KeyboardCommands.breakpointFodder
+    }
   }
 
   private def leadFollower(unit: FriendlyUnitInfo, todo: (FriendlyUnitInfo) => Unit): Unit = {

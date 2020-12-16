@@ -7,7 +7,9 @@ import Utilities.GameTime
 
 class Fingerprint1GateCore extends FingerprintOr(
   With.fingerprints.fourGateGoon,
-  new FingerprintCompleteBy(Protoss.Assimilator,      GameTime(2, 15)),
+  new FingerprintAnd(
+    new FingerprintNot(With.fingerprints.gasSteal),
+    new FingerprintCompleteBy(Protoss.Assimilator,    GameTime(2, 45))),
   new FingerprintCompleteBy(Protoss.CyberneticsCore,  GameTime(3, 30)),
   new FingerprintArrivesBy(Protoss.Dragoon,           GameTime(4, 40)),
   new FingerprintArrivesBy(Protoss.DarkTemplar,       GameTime(6, 0)),

@@ -6,7 +6,7 @@ import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Predicate
+import Planning.{Plan, Predicate}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyNaturalConfirmed
@@ -30,7 +30,7 @@ class PvPVsForge extends PvP3GateGoon {
 
   class ExpandASAP extends Parallel(new RequireMiningBases(2), new CapGasWorkersAt(0))
 
-  override def buildOrderPlan = new Parallel(
+  override def buildOrderPlan: Plan = new Parallel(
     new PvPIdeas.CancelAirWeapons,
     new If(
       new Not(new EnemyStrategy(With.fingerprints.cannonRush)),

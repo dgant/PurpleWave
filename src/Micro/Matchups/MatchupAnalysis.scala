@@ -18,11 +18,11 @@ case class MatchupAnalysis(me: UnitInfo) {
   private def battleUs      : Option[Seq[UnitInfo]] = me.battle.map(_.teamOf(me).units.view)
   private def entrants      : Seq[UnitInfo]         = me.battle.flatMap(With.matchups.entrants.get).getOrElse(Seq.empty).view
 
-  private def withEntrants(source: Seq[UnitInfo]): Seq[UnitInfo] = source ++ entrants.filterNot(source.contains)
+  private def withEntrants(source: Seq[UnitInfo], filter: (UnitInfo) => Boolean = (unit) => true): Seq[UnitInfo] = source ++ entrants.filter(filter).filterNot(source.contains)
 
-  def allUnits              : Seq[UnitInfo] = battleUnits.map(withEntrants).getOrElse(defaultUnits)
-  def enemies               : Seq[UnitInfo] = battleEnemies.map(withEntrants).getOrElse(defaultUnits.filter(_.isEnemyOf(me)))
-  def alliesInclSelf        : Seq[UnitInfo] = battleUs.map(withEntrants).getOrElse(defaultUnits.filterNot(_.isEnemyOf(me)))
+  def allUnits              : Seq[UnitInfo] = battleUnits.map(withEntrants(_)).getOrElse(defaultUnits)
+  def enemies               : Seq[UnitInfo] = battleEnemies.map(withEntrants(_, _.isEnemy)).getOrElse(defaultUnits.filter(_.isEnemyOf(me)))
+  def alliesInclSelf        : Seq[UnitInfo] = battleUs.map(withEntrants(_, _.isFriendly)).getOrElse(defaultUnits.filterNot(_.isEnemyOf(me)))
   def alliesInclSelfCloaked : Seq[UnitInfo] = alliesInclSelf.filter(_.cloakedOrBurrowed)
   def allies                : Seq[UnitInfo] = alliesInclSelf.filterNot(_.id == me.id)
   def others                : Seq[UnitInfo] = enemies ++ allies

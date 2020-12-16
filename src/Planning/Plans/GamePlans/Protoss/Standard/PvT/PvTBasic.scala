@@ -161,7 +161,11 @@ class PvTBasic extends GameplanTemplate {
       new If(new UnitsAtLeast(3, Protoss.Forge), new UpgradeContinuously(Protoss.Shields))))
 
   class HighPriorityTech extends Parallel(
-    new If(new EnemyHasShownWraithCloak, new GoObs),
+    new If(
+      new EnemyHasShownWraithCloak,
+      new Parallel(
+        new GoObs,
+        new UpgradeContinuously(Protoss.ObserverSpeed))),
 
     new UpgradeContinuously(Protoss.CarrierCapacity),
 

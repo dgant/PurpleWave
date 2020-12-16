@@ -232,6 +232,9 @@ object PvTIdeas {
           new UnitsAtMost(2, Protoss.DarkArchon),
           new MeldDarkArchons,
           new Pump(Protoss.DarkTemplar, maximumTotal = 4, maximumConcurrently = 2)))),
+    new If(
+      new And(new UnitsAtLeast(1, Protoss.FleetBeacon), new EnemyHasShownWraithCloak),
+      new PumpRatio(Protoss.Corsair, 0, 8, Seq(Enemy(Terran.Wraith, 2.0)))),
     new TrainCarriers,
     new PumpRatio(Protoss.Arbiter, 2, 8, Seq(Enemy(UnitMatchSiegeTank, 0.5))),
     new TrainScouts,

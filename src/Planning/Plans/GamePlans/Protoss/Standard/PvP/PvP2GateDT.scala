@@ -78,7 +78,9 @@ class PvP2GateDT extends GameplanTemplate {
     new PvPIdeas.ReactToFFE,
     new ScoutForCannonRush)
 
-  override def buildOrderPlan = new PvP1GateCoreIdeas.BuildOrderPlan(allowZealotBeforeCore = false)
+  val oneGateCoreLogic = new PvP1GateCoreLogic(allowZealotBeforeCore = false)
+
+  override def buildOrderPlan = new oneGateCoreLogic.BuildOrderPlan
   
   override val buildPlans = Vector(
     new Trigger(
@@ -92,6 +94,8 @@ class PvP2GateDT extends GameplanTemplate {
         new UnitsAtLeast(1, Protoss.CitadelOfAdun),
         new CapGasAt(300),
         new CapGasAt(200))),
+
+    new oneGateCoreLogic.WriteStatuses,
 
     new If(
       new And(

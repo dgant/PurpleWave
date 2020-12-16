@@ -58,28 +58,12 @@ object PvZIdeas {
         new UnitsAtLeast(10, UnitMatchWarriors, complete = true)),
       new UnitsAtLeast(14, UnitMatchWarriors, complete = true)),
     new RequireMiningBases(2))
-  
-  class TakeSafeThirdBase extends If(
-    new Or(
-      new And(
-        new SafeToMoveOut,
-        new UnitsAtLeast(15, UnitMatchWarriors, complete = true)),
-      new And(
-        new SafeAtHome,
-        new UnitsAtLeast(20, UnitMatchWarriors, complete = true)),
-      new UnitsAtLeast(25, UnitMatchWarriors, complete = true)),
-    new RequireMiningBases(3))
-  
-  class TakeSafeFourthBase extends If(
-    new Or(
-      new And(
-        new SafeToMoveOut,
-        new UnitsAtLeast(30, UnitMatchWarriors, complete = true)),
-      new And(
-        new SafeAtHome,
-        new UnitsAtLeast(35, UnitMatchWarriors, complete = true)),
-      new UnitsAtLeast(40, UnitMatchWarriors, complete = true)),
-    new RequireMiningBases(4))
+
+  class PvZRequireMiningBases(bases: Int) extends Parallel(
+    new FlipIf(
+      new EnemyHasTech(Zerg.Burrow),
+      new RequireMiningBases(bases),
+      new Build(Get(Protoss.RoboticsFacility), Get(Protoss.Observatory), Get(Protoss.Observer))))
   
   class ReactToLurkers extends Parallel(
     new If(

@@ -29,15 +29,15 @@ class Visualization {
     ShowStrategyName,
     ShowHealthAndCooldown,
     ShowUtilization,
-    ShowPushes,
+    ShowTeams, // Temporary
+    ShowUnitPaths,
     ShowUnitsFriendly,
     ShowUnitsEnemy,
-    ShowUnitPaths,
     ShowStatus,
     ShowPerformanceSummary,
     ShowStoryteller,
 
-    ShowTeams
+
   )
 
   lazy val knownViews: Vector[View] = Vector[View](

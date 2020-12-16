@@ -5,8 +5,9 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.PvZRequireMiningBases
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.BuildGasPumps
 import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.Predicates.Economy.GasAtLeast
@@ -68,9 +69,9 @@ class PvZLateGameCarrier extends GameplanTemplate {
         Get(Protoss.ZealotSpeed))))
 
   override def buildPlans: Seq[Plan] = Vector(
-    new RequireMiningBases(2),
-    new If(new UnitsAtLeast(4, Protoss.Reaver), new RequireMiningBases(3)),
-    new If(new UnitsAtLeast(30, Protoss.Interceptor), new RequireMiningBases(3)),
+    new PvZRequireMiningBases(2),
+    new If(new UnitsAtLeast(4, Protoss.Reaver), new PvZRequireMiningBases(3)),
+    new If(new UnitsAtLeast(30, Protoss.Interceptor), new PvZRequireMiningBases(3)),
     new AddPriorityTech,
     new Trigger(
       new GasAtLeast(1000),
@@ -82,7 +83,7 @@ class PvZLateGameCarrier extends GameplanTemplate {
     new BuildCannonsAtExpansions(6),
     new BuildCannonsAtNatural(5),
     new AddTech,
-    new RequireMiningBases(4),
+    new PvZRequireMiningBases(4),
     new PvZIdeas.AddGateways,
   )
 }

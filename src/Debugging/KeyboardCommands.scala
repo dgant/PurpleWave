@@ -26,6 +26,7 @@ object KeyboardCommands {
       case "map"        => With.logger.debug("The current map is " + With.game.mapName + ": " + With.game.mapFileName)
       case "pm"         => With.logger.debug(JBWAPIClient.getPerformanceMetrics.toString)
       case "task"       => With.configuration.logTaskDuration = ! With.configuration.logTaskDuration
+      case "track"      => With.configuration.trackUnit = ! With.configuration.trackUnit
 
       case "get out"    => quitVsHuman()
       case "quit"       => quitVsHuman()
@@ -35,7 +36,7 @@ object KeyboardCommands {
     }
   }
 
-  private var breakpointFodder = 1
+  var breakpointFodder = 1
   def breakpoint() {
     breakpointFodder = -breakpointFodder
   }

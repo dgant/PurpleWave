@@ -5,9 +5,10 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.PvZRequireMiningBases
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.BuildGasPumps
 import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.Predicates.Compound.{And, Latch}
 import Planning.Predicates.Milestones._
@@ -66,7 +67,7 @@ class PvZ5GateGoon extends GameplanTemplate {
             new And(
               new Employing(PvZMidgame5GateGoonReaver),
               new UnitsAtLeast(4, Protoss.Reaver))),
-          new RequireMiningBases(3)),
+          new PvZRequireMiningBases(3)),
         new If(
           new NeedCorsairs,
           new PumpRatio(Protoss.Corsair, 0, 12, Seq(Enemy(Zerg.Mutalisk, 0.6)))),
@@ -106,7 +107,7 @@ class PvZ5GateGoon extends GameplanTemplate {
           new Employing(PvZMidgame5GateGoon),
           new Latch(new UnitsAtLeast(1, Protoss.Reaver)))),
       new Parallel(
-        new RequireMiningBases(3),
+        new PvZRequireMiningBases(3),
         new Build(
           Get(Protoss.ZealotSpeed),
           Get(Protoss.Gateway, 12)),

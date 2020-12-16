@@ -110,4 +110,9 @@ class Configuration {
   var cameraViewportHeight        = 362
   var conservativeViewportWidth   = 640 + cameraViewportWidth
   var conservativeViewportHeight  = 480 + cameraViewportHeight
+
+  ///////////////
+  // Debugging //
+  ///////////////
+  var trackUnit = false
 }

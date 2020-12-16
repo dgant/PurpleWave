@@ -5,9 +5,9 @@ import Planning.Plan
 import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.PvZRequireMiningBases
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Compound.{And, Latch}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyMutalisks
@@ -42,7 +42,7 @@ class PvZCorsairReaver extends GameplanTemplate {
           new UnitsAtLeast(1, Protoss.Shuttle, complete = true))),
       new Parallel(
         new Attack,
-        new RequireMiningBases(3))),
+        new PvZRequireMiningBases(3))),
     new If(
       new Employing(PvZLateGameCarrier),
       new PumpShuttleAndReavers(shuttleFirst = false),

@@ -3,6 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
+import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.BuildOrder
@@ -14,7 +15,23 @@ import Planning.Predicates.Strategy._
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPRobo
 
-object PvP1GateCoreIdeas {
+class PvP1GateCoreLogic(allowZealotBeforeCore: Boolean = true) {
+
+  class PossibleZealotPressure extends Not(new EnemyStrategy(With.fingerprints.forgeFe, With.fingerprints.oneGateCore))
+
+  class WriteStatuses extends Parallel(
+    new If(new GateGate, new WriteStatus("GateGate")),
+    new If(new PossibleZealotPressure, new WriteStatus("PossibleZealotPressure")),
+    new If(
+      new ZealotBeforeCore,
+      new If(
+        new ZealotAfterCore,
+        new WriteStatus("ZCoreZ"),
+        new WriteStatus("ZCore")),
+      new If(
+        new ZealotAfterCore,
+        new WriteStatus("CoreZ"),
+        new WriteStatus("NZCore"))))
 
   class GateGate extends And(
     new Employing(PvPRobo),
@@ -29,18 +46,20 @@ object PvP1GateCoreIdeas {
           new UnitsAtMost(0, Protoss.RoboticsFacility))),
       new Check(() => With.strategy.isFlat || With.strategy.isInverted)))
 
-  class PossibleZealotPressure extends Not(new EnemyStrategy(With.fingerprints.forgeFe, With.fingerprints.oneGateCore))
-
   class ZealotBeforeCore extends And(
-    new PossibleZealotPressure,
-    new EnemyRecentStrategy(
-      With.fingerprints.workerRush,
-      With.fingerprints.mannerPylon,
-      With.fingerprints.cannonRush,
-      With.fingerprints.proxyGateway,
-      With.fingerprints.twoGate,
-      With.fingerprints.nexusFirst,
-      With.fingerprints.gasSteal))
+    new Check(() => allowZealotBeforeCore),
+    new Or(
+      new EnemyRecentStrategy(
+        With.fingerprints.gasSteal,
+        With.fingerprints.mannerPylon,
+        With.fingerprints.workerRush,
+        With.fingerprints.cannonRush,
+        With.fingerprints.nexusFirst),
+      new And(
+        new PossibleZealotPressure,
+        new EnemyRecentStrategy(
+          With.fingerprints.proxyGateway,
+          With.fingerprints.twoGate))))
 
   class ZealotAfterCore extends Or(
     new EnemyStrategy(
@@ -72,28 +91,27 @@ object PvP1GateCoreIdeas {
             Get(Protoss.Observatory),
             Get(2, Protoss.Observer))))))
 
-  class BuildOrderPlan(allowZealotBeforeCore: Boolean = true) extends Parallel(
+  class BuildOrderPlan extends Parallel(
     new BuildOrder(
       Get(8, Protoss.Probe),
       Get(Protoss.Pylon),
       Get(10, Protoss.Probe),
       Get(Protoss.Gateway),
-      Get(12, Protoss.Probe),
-      Get(Protoss.Assimilator),
-      Get(13, Protoss.Probe)),
+      Get(12, Protoss.Probe)),
     new If(
-      new And(new ZealotBeforeCore, new Check(() => allowZealotBeforeCore)),
+      new ZealotBeforeCore,
 
       // ZCore*
       new Parallel(
         new BuildOrder(
+          Get(2, Protoss.Pylon),
+          Get(13, Protoss.Probe),
           Get(Protoss.Zealot),
           Get(14, Protoss.Probe),
-          Get(2, Protoss.Pylon),
+          Get(Protoss.Assimilator),
           Get(15, Protoss.Probe),
           Get(Protoss.CyberneticsCore),
           Get(16, Protoss.Probe)),
-
         new If(
           new ZealotAfterCore,
           // ZCoreZ
@@ -102,17 +120,16 @@ object PvP1GateCoreIdeas {
       // Core*
       new Parallel(
         new BuildOrder(
+          Get(Protoss.Assimilator),
           Get(14, Protoss.Probe),
           Get(Protoss.CyberneticsCore)),
-
         new If(
           new ZealotAfterCore,
-          // CoreZ
+          //CoreZ
           new BuildOrder(
             Get(Protoss.Zealot),
             Get(2, Protoss.Pylon),
             Get(16, Protoss.Probe)),
-
           // NZCore
           new BuildOrder(
             Get(15, Protoss.Probe),

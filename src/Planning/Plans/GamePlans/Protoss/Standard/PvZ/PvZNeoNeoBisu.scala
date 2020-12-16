@@ -5,9 +5,9 @@ import Planning.Plan
 import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.PvZRequireMiningBases
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Compound.Latch
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyMutalisks
@@ -32,7 +32,7 @@ class PvZNeoNeoBisu extends GameplanTemplate {
     new PumpRatio(Protoss.Corsair, 1, 12, Seq(Enemy(Zerg.Mutalisk, 1.0))),
     new If(new EnemyMutalisks, new UpgradeContinuously(Protoss.AirDamage)),
     new If(new UnitsAtLeast(2, Protoss.Dragoon), new UpgradeContinuously(Protoss.DragoonRange)),
-    new If(new UnitsAtLeast(1, Protoss.Arbiter, complete = true), new RequireMiningBases(3)),
+    new If(new UnitsAtLeast(1, Protoss.Arbiter, complete = true), new PvZRequireMiningBases(3)),
     new PumpRatio(Protoss.Dragoon, 1, 8, Seq(Enemy(Zerg.Mutalisk, 1.0), Friendly(Protoss.Corsair, -1.0))),
     new UpgradeContinuously(Protoss.ArbiterEnergy),
     new Pump(Protoss.Arbiter),
@@ -54,6 +54,6 @@ class PvZNeoNeoBisu extends GameplanTemplate {
       Get(Protoss.ArbiterTribunal),
       Get(6, Protoss.Gateway)),
     new Pump(Protoss.HighTemplar),
-    new RequireMiningBases(3)
+    new PvZRequireMiningBases(3)
   )
 }

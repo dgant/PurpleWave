@@ -19,7 +19,7 @@ class BattleClusteringState(seedUnits: Set[UnitInfo]) {
   seedUnits.view.filter(_.isFriendly).foreach(stragglers.+=)
 
   private var _clusters: Option[Iterable[ArrayBuffer[UnitInfo]]] = None
-  def clusters: Iterable[Iterable[UnitInfo]] = _clusters.getOrElse(Iterable.empty)
+  def clusters: Iterable[Seq[UnitInfo]] = _clusters.getOrElse(Iterable.empty)
   def isComplete: Boolean = _clusters.isDefined
 
   def step() {

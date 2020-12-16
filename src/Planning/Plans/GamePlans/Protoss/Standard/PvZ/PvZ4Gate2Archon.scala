@@ -6,9 +6,9 @@ import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.PvZRequireMiningBases
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Predicates.Compound.{And, Latch}
 import Planning.Predicates.Milestones._
@@ -29,7 +29,6 @@ class PvZ4Gate2Archon extends GameplanTemplate {
       override def minimumArchons = 2 },
     new MeldArchons)
 
-
   override def workerPlan: Plan = NoPlan()
   override def emergencyPlans: Seq[Plan] = Seq(new PvZIdeas.ReactToLurkers, new PvZIdeas.ReactToMutalisks)
   
@@ -43,7 +42,7 @@ class PvZ4Gate2Archon extends GameplanTemplate {
         new UnitsAtLeast(20, UnitMatchWarriors)),
       new Parallel(
         new Build(Get(Protoss.PsionicStorm)),
-        new RequireMiningBases(3))),
+        new PvZRequireMiningBases(3))),
     new If(
       new UnitsAtLeast(2, Protoss.Archon),
       new Pump(Protoss.DarkTemplar, 1)),
@@ -77,6 +76,6 @@ class PvZ4Gate2Archon extends GameplanTemplate {
       Get(Protoss.PsionicStorm),
       Get(8, Protoss.Gateway)),
 
-    new RequireMiningBases(3)
+    new PvZRequireMiningBases(3)
   )
 }

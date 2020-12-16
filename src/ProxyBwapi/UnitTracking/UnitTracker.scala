@@ -67,7 +67,11 @@ class UnitTracker {
     foreignUnitTracker.update()
     all.foreach(historicalUnitTracker.remove)
   }
-  
+
+  def onUnitRenegade(unit: bwapi.Unit): Unit = {
+    onUnitDestroyOrRenegade(unit)
+  }
+
   def onUnitDestroy(unit: bwapi.Unit) {
     get(unit).foreach(unitInfo => {
       historicalUnitTracker.add(unitInfo)
@@ -75,7 +79,11 @@ class UnitTracker {
         With.blackboard.enemyUnitDied = true
       }
     })
-    friendlyUnitTracker.onUnitDestroy(unit)
-    foreignUnitTracker.onUnitDestroy(unit)
+    onUnitDestroyOrRenegade(unit)
+  }
+
+  private def onUnitDestroyOrRenegade(unit: bwapi.Unit): Unit = {
+    friendlyUnitTracker.onUnitDestroyOrRenegade(unit)
+    foreignUnitTracker.onUnitDestroyOrRenegade(unit)
   }
 }

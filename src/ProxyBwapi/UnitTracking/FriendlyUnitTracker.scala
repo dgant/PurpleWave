@@ -44,7 +44,7 @@ class FriendlyUnitTracker {
     ourUnits = unitInfosById.values.view.filter(_.isOurs)
   }
   
-  def onUnitDestroy(unit: bwapi.Unit) {
+  def onUnitDestroyOrRenegade(unit: bwapi.Unit) {
     val id = unit.getID
     // TODO: Get this out of here. "With.blackboard.lastScout.exists( ! _.alive)"
     val friendly = get(id)

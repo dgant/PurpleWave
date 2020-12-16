@@ -49,7 +49,7 @@ class ForeignUnitTracker {
     unitsById.values.view.filterNot(_.alive).toVector.foreach(remove)
   }
 
-  def onUnitDestroy(unit: bwapi.Unit) {
+  def onUnitDestroyOrRenegade(unit: bwapi.Unit) {
     unitsById.get(unit.getID).foreach(remove)
   }
 

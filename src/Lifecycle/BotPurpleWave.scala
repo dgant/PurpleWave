@@ -58,6 +58,13 @@ class BotPurpleWave extends DefaultBWListener {
     }
     catch { case exception: Exception => With.logger.onException(exception) }
   }
+
+  override def onUnitRenegade(unit: bwapi.Unit): Unit = {
+    try {
+      With.units.onUnitRenegade(unit)
+    }
+    catch { case exception: Exception => With.logger.onException(exception) }
+  }
   
   override def onEnd(isWinner: Boolean) {
     try {

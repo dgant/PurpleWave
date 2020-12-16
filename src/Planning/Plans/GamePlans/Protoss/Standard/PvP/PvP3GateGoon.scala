@@ -12,7 +12,6 @@ import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAt, GasCapsUntouch
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
@@ -45,23 +44,17 @@ class PvP3GateGoon extends GameplanTemplate {
       new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
       new UnitsAtLeast(5, Protoss.Dragoon, complete = true)),
     new PvPIdeas.AttackSafely)
-
-  override def initialScoutPlan: Plan = new ScoutOn(Protoss.Gateway)
-
-  override def emergencyPlans: Seq[Plan] = Vector(
-    new PvPIdeas.ReactToDarkTemplarEmergencies,
-    new PvPIdeas.ReactToGasSteal,
-    new PvPIdeas.ReactToCannonRush,
-    new PvPIdeas.ReactToProxyGateways,
-    new PvPIdeas.ReactTo2Gate,
-    new PvPIdeas.ReactToFFE,
-    new ScoutForCannonRush)
   
-  override def buildOrderPlan: Plan = new PvP1GateCoreIdeas.BuildOrderPlan
+  val oneGateCoreLogic = new PvP1GateCoreLogic(allowZealotBeforeCore = false)
+
+  override def emergencyPlans: Seq[Plan] = Seq(new oneGateCoreLogic.BuildOrderPlan)
+
+  override def buildOrderPlan: Plan = new oneGateCoreLogic.BuildOrderPlan
 
   override val buildPlans = Vector(
 
     new EjectScout,
+    new oneGateCoreLogic.WriteStatuses,
 
     new If(
       new GasCapsUntouched,

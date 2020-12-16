@@ -519,6 +519,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   val positioningWidthTargetCached  = new Cache(() => battle.map(_.teamOf(this)).map(team => if (flying) team.centroidAir else team.widthOrder().zipWithIndex.find(_._1 == this).map(p => team.centroidGround.project(team.lineWidth(), team.widthIdeal() * (team.widthOrder().size / 2 - p._2) / team.widthOrder().size)).getOrElse(positioningWidthCurrentCached())).getOrElse(pixelCenter))
   val positioningDepthCached = new Cache(() => presumptiveTarget.map(t => pixelDistanceEdge(t) - pixelRangeAgainst(t)))
   val positioningWidthCached = new Cache(() => pixelCenter.pixelDistance(positioningWidthCurrentCached()))
+  def confidence: Double = battle.flatMap(_.judgement.map(_.confidence)).getOrElse(1.0)
 
   // TODO: These checks are fast now so we can delete these  //
   // PREVIOUSLY: Stupid, but helped BWMirror performance due to costliness of comparing unit classes with BWMirror limitations

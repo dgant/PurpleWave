@@ -4,7 +4,6 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Actions.Action
-import Micro.Actions.Combat.Decisionmaking.DefaultCombat.Engage
 import Micro.Actions.Combat.Maneuvering.Retreat
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -73,6 +72,6 @@ object Bust extends Action {
       With.commander.hold(unit)
     }
     unit.agent.toAttack = ByOption.minBy(unit.matchups.threats)(_.pixelDistanceEdge(unit))
-    Engage.delegate(unit)
+    With.commander.attack(unit)
   }
 }

@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints, Tile, TileRectangle}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.ByOption
+import Utilities.{ByOption, Seconds}
 import bwapi.MouseButton
 
 class Camera {
@@ -24,10 +24,11 @@ class Camera {
   var enabled           : Boolean               = true
 
   private def totalInterest(unit: UnitInfo): Double = {
-    val interestBattle    = if (unit.battle.exists(_.enemy.units.exists(u => u.canAttack && ! u.unitClass.isWorker))) 10.0 else 1.0
-    val obscurityUnit     = obscurityByUnit(unit)
+    val interestBattle    = if (unit.battle.exists(_.enemy.units.exists(u => u.canAttack && ! u.unitClass.isWorker))) 100.0 else 1.0
+    val obscurityUnit     = 15 * 24 + obscurityByUnit(unit)
     val interestActivity  = if (unit.training || unit.upgrading || unit.teching || unit.moving || unit.attacking) 3.0 else 1.0
-    interestBattle * obscurityUnit * interestActivity
+    val interestNovelty   = if (With.framesSince(unit.frameDiscovered) < Seconds(15)() && With.units.countOurs(unit.unitClass) == 1) 5.0 else 1.0
+    interestBattle * obscurityUnit * interestActivity * interestNovelty
   }
 
   def onFrame() {
@@ -90,9 +91,9 @@ class Camera {
   
   def tween() {
     if (focusUnit != null && focusUnit.alive) {
-      val start = focusUnit.pixelCenter
-      focus = if (focusUnit.battle.exists(_.enemy.units.nonEmpty)) start.project(focusUnit.battle.get.focus, 120) else start
-      val tweenFraction = Math.max(0.0, Math.min(1.0, (With.framesSince(focusFrame) + 1).toDouble/tweenFrames))
+      focus = focusUnit.pixelCenter
+      focusUnit.battle.map(_.focus).foreach(battleFocus => focus = battleFocus.project(focusUnit.pixelCenter, Math.max(0, focusUnit.pixelDistanceCenter(battleFocus) - 220)))
+      val tweenFraction = Math.max(0.0, Math.min(1.0, (With.framesSince(focusFrame) + 1).toDouble / tweenFrames))
       val tweenPoint    = tweenFrom.project(focus, tweenFrom.pixelDistance(focus) * tweenFraction)
       With.viewport.centerOn(tweenPoint)
     }

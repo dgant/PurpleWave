@@ -2,8 +2,9 @@ package Micro.Actions.Basic
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Decisionmaking.DefaultCombat.{Disengage, Engage}
+import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Potshot
+import Micro.Actions.Combat.Targeting.Target
 import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -53,7 +54,8 @@ object Gather extends Action {
         && target.pixelDistanceCenter(unit)     < defenseRadiusPixels
         && target.pixelDistanceCenter(resource) < defenseRadiusPixels)
       if (unit.totalHealth > 32 && beckonedToFight) {
-        Engage.consider(unit)
+        Target.choose(unit)
+        With.commander.attack(unit)
       }
 
       // Escape dangerous melee units
@@ -92,9 +94,8 @@ object Gather extends Action {
       if (transferring
         && threatened
         && threatCloser
-        && (unit.visibleToOpponents || unit.matchups.framesOfSafety < unit.unitClass.framesToTurn180)) {
-        unit.agent.canFight = false
-        Disengage.consider(unit)
+        && (unit.visibleToOpponents || unit.matchups.pixelsOfEntanglement > -128 || unit.zone.edges.exists(_.contains(unit.pixelCenter)))) {
+        Retreat.consider(unit)
       }
     }
 

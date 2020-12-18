@@ -43,24 +43,20 @@ class BattleClusteringState(seedUnits: Set[UnitInfo]) {
       iPoint += 1
       if (nextTile.valid) {
         val nextTileI = nextTile.i
-        val explorationGrid = if (isFriendly) With.battles.clustering.exploredFriendly else With.battles.clustering.exploredEnemy
-        if ( ! explorationGrid.getUnchecked(nextTileI)) {
-          explorationGrid.setUnchecked(nextTileI, true)
-          val neighbors = With.grids.units.getUnchecked(nextTileI)
-          val nNeighbors = neighbors.size
-          var iNeighbor = 0
-          while (iNeighbor < nNeighbors) {
-            val neighbor = neighbors(iNeighbor)
-            iNeighbor += 1
-            if (neighbor.clusteringEnabled && nextUnit.isFriendly != neighbor.isFriendly) {
-              if (unitLinks.contains(neighbor)) {
-                if (linkedFoe.isEmpty) {
-                  linkedFoe = Some(neighbor)
-                }
+        val neighbors = With.grids.units.getUnchecked(nextTileI)
+        val nNeighbors = neighbors.size
+        var iNeighbor = 0
+        while (iNeighbor < nNeighbors) {
+          val neighbor = neighbors(iNeighbor)
+          iNeighbor += 1
+          if (neighbor.clusteringEnabled && nextUnit.isFriendly != neighbor.isFriendly) {
+            if (unitLinks.contains(neighbor)) {
+              if (linkedFoe.isEmpty) {
+                linkedFoe = Some(neighbor)
               }
-              else {
-                newFoes += neighbor
-              }
+            }
+            else {
+              newFoes += neighbor
             }
           }
         }

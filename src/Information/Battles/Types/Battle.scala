@@ -11,23 +11,4 @@ abstract class Battle(val us: Team, val enemy: Team) {
   
   def teams: Vector[Team] = Vector(us, enemy)
   def teamOf(unit: UnitInfo): Team = if (unit.isFriendly) us else enemy
-  def focus: Pixel = PurpleMath.centroid(teams.map(_.vanguard))
-
-  def updateFoci(): Unit = {
-    teams.foreach(group => {
-      val hasGround         = group.units.exists( ! _.flying)
-      val centroidAir       = PurpleMath.centroid(group.units.view.map(_.pixelCenter))
-      val centroidGround    = if (hasGround) PurpleMath.centroid(group.units.view.filterNot(_.flying).map(_.pixelCenter)) else group.centroidAir.nearestWalkableTile.pixelCenter
-      group.centroidAir     = PurpleMath.centroid(group.units.view.map(_.pixelCenter))
-      // Should probably switch to ground distance, but for performance
-      group.centroidGround  = ByOption.minBy(group.units.view.filterNot(_.flying && hasGround))(_.pixelDistanceSquared(centroidGround)).map(_.pixelCenter).getOrElse(centroidGround)
-
-    })
-
-    teams.foreach(group =>
-      group.vanguard = ByOption
-        .minBy(group.units)(_.pixelDistanceSquared(group.opponent.centroidAir))
-        .map(_.pixelCenter)
-        .getOrElse(SpecificPoints.middle))
-  }
 }

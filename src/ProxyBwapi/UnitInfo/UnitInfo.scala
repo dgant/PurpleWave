@@ -69,6 +69,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
 
   // Used in clustering; attached to unit for performance to avoid use of sets/maps
   var clusteringEnabled: Boolean = false
+  var clusteringFound: Boolean = false
+  var cluster: Option[Object] = None
 
   val frameDiscovered           : Int = With.frame
   val initialHitPoints          : Int = baseUnit.getHitPoints

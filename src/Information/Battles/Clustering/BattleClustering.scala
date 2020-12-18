@@ -2,13 +2,25 @@ package Information.Battles.Clustering
 
 import Information.Battles.BattleClassificationFilters
 import Information.Battles.Types.{BattleLocal, Team}
-import Information.Grids.Disposable.GridDisposableBoolean
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
 
 class BattleClustering {
+
+  class Cluster {
+    var units: mutable.HashSet[UnitInfo] = new mutable.HashSet[UnitInfo]
+    def merge(other: Cluster): Unit = {
+      val useOurUnits = units.size > other.units.size
+      val newUnits = if (useOurUnits) units else other.units
+      val oldUnits = if (useOurUnits) other.units else units
+      newUnits ++= oldUnits
+      units = newUnits
+      other.units = newUnits
+    }
+    override def equals(other: scala.Any): Boolean = other.isInstanceOf[Cluster] && other.asInstanceOf[Cluster].units.eq(units)
+  }
   
   var lastClusterCompletion = 0
   val runtimes = new mutable.Queue[Int]
@@ -16,11 +28,7 @@ class BattleClustering {
   private var clusterInProgress:  BattleClusteringState = new BattleClusteringState(Set.empty)
   private var clusterComplete:    BattleClusteringState = new BattleClusteringState(Set.empty)
 
-  val exploredFriendly = new GridDisposableBoolean
-  val exploredEnemy    = new GridDisposableBoolean
-  
   def clusters: Iterable[Seq[UnitInfo]] = clusterComplete.clusters
-
   def isComplete: Boolean = clusterInProgress.isComplete
 
   def reset() {
@@ -29,9 +37,8 @@ class BattleClustering {
 
     With.units.playerOwned.foreach(_.clusteringEnabled = false)
     nextUnits.foreach(_.clusteringEnabled = true)
-
-    exploredFriendly.update()
-    exploredEnemy.update()
+    nextUnits.foreach(_.clusteringFound = false)
+    nextUnits.foreach(_.cluster = None)
   }
   
   def step() {
@@ -64,6 +71,5 @@ class BattleClustering {
 
     // TODO: These can probably be done separately, and the global battle probably doesn't even need a focus
     With.battles.nextBattlesLocal.foreach(_.updateFoci())
-    With.battles.nextBattleGlobal.foreach(_.updateFoci())
   }
 }

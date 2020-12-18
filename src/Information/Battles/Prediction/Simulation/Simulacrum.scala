@@ -79,17 +79,13 @@ class Simulacrum(
   var fightingInitially: Boolean = {
     if ( ! realUnit.canAttack) {
       false
-    }
-    else if ( ! realUnit.unitClass.dealsDamage) {
+    } else if ( ! realUnit.unitClass.dealsDamage) {
       false
-    }
-    else if (realUnit.unitClass.isWorker) {
+    } else if (realUnit.unitClass.isWorker) {
       realUnit.attacking || realUnit.friendly.exists(_.squad.isDefined)
-    }
-    else if (realUnit.isEnemy) {
+    } else if (realUnit.isEnemy) {
       true
-    }
-    else {
+    } else {
       realUnit.canMove || realUnit.matchups.targetsInRange.nonEmpty
     }
   }
@@ -295,4 +291,6 @@ class Simulacrum(
     kills           = kills,
     events          = events
   )
+
+  override def toString: String = "Simulacrum: " + realUnit.toString
 }

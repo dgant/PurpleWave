@@ -53,25 +53,39 @@ object Bust extends Action {
   override protected def perform(unit: FriendlyUnitInfo) {
     // Goal: Take down the bunker. Don't take any damage from it.
     // If we're getting shot at by the bunker, back off.
-    lazy val bunkers = unit.matchups.threats.filter(_.is(Terran.Bunker))
+    lazy val bunkers = unit.matchups.targets.filter(_.is(Terran.Bunker))
     lazy val repairers = bunkers.flatMap(_.matchups.repairers)
-    lazy val goons = unit.matchups.allies.filter(u => u.is(Protoss.Dragoon) && u.matchups.targetsInRange.exists(_.is(Terran.Bunker)))
+    lazy val goons = unit.matchups.allies.filter(u => u.friendly.exists(Bust.allowed) && bunkers.exists(b => u.framesToGetInRange(b) < 24))
 
-    if (unit.readyForAttackOrder
-      && unit.matchups.targetsInRange.exists(_.is(Terran.Bunker))
-      && goons.length >= 6
-      && repairers.nonEmpty) {
-      unit.agent.toAttack = Some(repairers.minBy(_.pixelDistanceCenter(PurpleMath.centroid(goons.map(_.pixelCenter)))))
+    if (unit.readyForAttackOrder && repairers.nonEmpty && goons.length >= repairers.map(_.hitPoints).min / 10) {
+      unit.agent.toAttack = Some(repairers.sortBy(_.pixelDistanceCenter(PurpleMath.centroid(goons.map(_.pixelCenter)))).minBy(_.hitPoints))
       With.commander.attack(unit)
     }
 
     if (With.framesSince(unit.lastFrameTakingDamage) < Seconds(1)()) {
       Retreat.delegate(unit)
     }
-    else if (unit.matchups.targetsInRange.exists(_.canAttack(unit)) && unit.velocity.lengthSquared > 0) {
-      With.commander.hold(unit)
+
+    unit.agent.toAttack = ByOption.minBy(unit.matchups.targets)(_.pixelDistanceEdge(unit))
+    if (unit.agent.toAttack.exists(t => t.unitClass == Terran.Bunker && ! unit.inRangeToAttack(t))) {
+      val bunker = unit.agent.toAttack.get
+      val range = unit.pixelRangeAgainst(bunker)
+      val bunkerDistance = unit.pixelDistanceEdge(bunker)
+      def stationAcceptable(pixel: Pixel) = pixel.walkable && ! unit.matchups.allies.exists(a => ! a.flying && a.pixelDistanceEdge(unit, pixel) <= 0)
+      var station = Some(unit.pixelCenter.project(bunker.pixelCenter, Math.max(4, range - bunkerDistance))).filter(stationAcceptable)
+      if (station.isEmpty && bunkerDistance > range + 32) {
+        val stationCount = 64
+        val stations = (0 until stationCount)
+          .map(_ * 2 * Math.PI / stationCount)
+          .map(bunker.pixelCenter.radiateRadians(_ , range + unit.unitClass.dimensionMax + bunker.unitClass.dimensionMax))
+          .filter(stationAcceptable)
+        station = ByOption.minBy(stations)(unit.pixelDistanceCenter)
+      }
+      if (station.nonEmpty) {
+        unit.agent.toTravel = station
+        With.commander.move(unit)
+      }
     }
-    unit.agent.toAttack = ByOption.minBy(unit.matchups.threats)(_.pixelDistanceEdge(unit))
     With.commander.attack(unit)
   }
 }

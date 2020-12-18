@@ -103,4 +103,5 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
       PurpleMath.clamp(x, center.x - 16 + Math.min(16, unit.unitClass.dimensionLeft), center.x + 16 - Math.min(16, unit.unitClass.dimensionRight)),
       PurpleMath.clamp(y, center.y - 16 + Math.min(16, unit.unitClass.dimensionUp),   center.y + 16 - Math.min(16, unit.unitClass.dimensionDown)))
   }
+  @inline final def relativeToTileCenter: Pixel = Pixel(x % 32 - 16, y % 32 - 16)
 }

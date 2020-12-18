@@ -15,7 +15,7 @@ import Micro.Coordination.Pushing.{Push, TrafficPriorities, TrafficPriority}
 import Micro.Heuristics.Potential
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.ByOption
+import Utilities.{ByOption, Seconds}
 
 object DefaultCombat extends Action {
 
@@ -99,7 +99,7 @@ object DefaultCombat extends Action {
     transition(Dodge, () => unit.canMove && receivedPushPriority >= TrafficPriorities.Dodge, () => dodge())
     transition(Aim, () => ! unit.canMove || purring, () => aim())
     transition(Regroup, () => ! unit.agent.shouldEngage && unit.matchups.pixelsOfEntanglement < -64)
-    transition(Regroup, () =>   unit.agent.shouldEngage && unit.battle.map(_.us).exists(team => ! team.engaged() && team.coherence() < unit.confidence))
+    transition(Regroup, () =>   unit.agent.shouldEngage && unit.battle.map(_.us).exists(team => ! team.engaged() && team.coherence() + team.impatience() / Seconds(20)() < unit.confidence()))
 
     // Evaluate potential attacks
     Target.choose(unit)
@@ -117,7 +117,7 @@ object DefaultCombat extends Action {
       Fallback,
       () =>
         unit.isAny(Terran.Vulture, Terran.SiegeTankUnsieged, Terran.Goliath, Terran.Wraith, Protoss.Archon, Protoss.Dragoon, Protoss.Reaver, Protoss.Scout, Zerg.Hydralisk, Zerg.Mutalisk)
-        && ( unit.is(Protoss.Reaver) || receivedPushPriority < TrafficPriorities.Shove)
+        && (unit.is(Protoss.Reaver) || receivedPushPriority < TrafficPriorities.Shove)
         && (unit.zone == unit.agent.origin.zone || ! unit.isAny(Protoss.Archon, Protoss.Dragoon) || ! unit.matchups.threats.exists(t => t.is(Protoss.Dragoon) && t.framesToGetInRange(t) < 12)))
 
     transition(Dance, () => unit.agent.toAttack.map(unit.pixelRangeAgainst).exists(_ > 64))
@@ -157,6 +157,11 @@ object DefaultCombat extends Action {
       && unit.agent.toAttack.exists(unit.pixelsToGetInRange(_) < Math.max(64, unit.topSpeed * With.reaction.agencyMax))) {
       With.commander.attack(unit)
       return
+    }
+
+    // Get impatient with regrouping when the sim wants to fight
+    if (goalRegroup && unit.agent.shouldEngage) {
+      unit.agent.increaseImpatience()
     }
 
     // Nudge if we're trying to reach a target

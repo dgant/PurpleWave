@@ -67,7 +67,13 @@ object Target extends {
     val preferences = TargetFilterGroups.filtersPreferred.view.filter(_.appliesTo(attacker)).count(_.legal(attacker, target))
     val preferenceBonus = Math.pow(100, preferences)
     val firingPixel = attacker.pixelToFireAt(target)
-    val threatPenalty = 1 + attacker.matchups.threats.count(threat => threat.inRangeToAttack(attacker, firingPixel.project(threat.pixelCenter, if (threat.canMove) 32 else 0)))
+    val firingPixelDistance = attacker.pixelDistanceCenter(firingPixel)
+    val firingPixelFrames = firingPixelDistance / (0.0001 + attacker.topSpeed)
+    val threatPenalty = 1 + attacker.matchups.threats.count(threat =>
+      threat.inRangeToAttack(
+        attacker,
+        threat.pixelCenter.project(firingPixel, Math.min(attacker.pixelDistanceCenter(firingPixel), attacker.topSpeed * firingPixelFrames)),
+        firingPixel))
     val output = scoreBasic * preferenceBonus / threatPenalty
     output
   }

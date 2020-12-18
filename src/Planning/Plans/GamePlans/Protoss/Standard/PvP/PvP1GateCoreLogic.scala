@@ -121,8 +121,9 @@ class PvP1GateCoreLogic(allowZealotBeforeCore: Boolean = true) {
       new Parallel(
         new BuildOrder(
           Get(Protoss.Assimilator),
-          Get(14, Protoss.Probe),
-          Get(Protoss.CyberneticsCore)),
+          Get(13, Protoss.Probe),
+          Get(Protoss.CyberneticsCore),
+          Get(14, Protoss.Probe)),
         new If(
           new ZealotAfterCore,
           //CoreZ
@@ -134,6 +135,5 @@ class PvP1GateCoreLogic(allowZealotBeforeCore: Boolean = true) {
           new BuildOrder(
             Get(15, Protoss.Probe),
             Get(2, Protoss.Pylon),
-            Get(17, Protoss.Probe)))
-      )))
+            Get(17, Protoss.Probe))))))
 }

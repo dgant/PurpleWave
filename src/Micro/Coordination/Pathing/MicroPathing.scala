@@ -28,8 +28,8 @@ object MicroPathing {
     pathfindProfile.threatMaximum       = Some(0)
     pathfindProfile.employGroundDist     = true
     pathfindProfile.costOccupancy       = if (unit.flying) 0f else 3f
-    pathfindProfile.costThreat          = 6f
-    pathfindProfile.costRepulsion       = 2.5f
+    pathfindProfile.costThreat          = 3f
+    pathfindProfile.costRepulsion       = 6f
     pathfindProfile.repulsors           = getPathfindingRepulsors(unit)
     pathfindProfile.unit                = Some(unit)
     pathfindProfile.find
@@ -48,7 +48,7 @@ object MicroPathing {
     if (unit.flying) return goal
     val lineWaypoint      = if (PixelRay(unit.pixelCenter, goal).forall(_.walkable)) Some(unit.pixelCenter.project(goal, Math.min(unit.pixelDistanceCenter(goal), waypointDistancePixels))) else None
     lazy val hillPath     = DownhillPathfinder.decend(unit.tileIncludingCenter, goal.tileIncluding)
-    lazy val hillWaypoint = hillPath.map(path => path.last.pixelCenter.add(unit.pixelCenter).subtract(path.head.pixelCenter))
+    lazy val hillWaypoint = hillPath.map(path => path.last.pixelCenter.add(unit.pixelCenter.relativeToTileCenter))
     lineWaypoint.orElse(hillWaypoint).getOrElse(goal)
   }
 
@@ -94,7 +94,7 @@ object MicroPathing {
   }
 
   def tryMovingAlongTilePath(unit: FriendlyUnitInfo, path: TilePath): Unit = {
-    val waypoint = getWaypointAlongTilePath(path)
+    val waypoint = getWaypointAlongTilePath(path).map(_.add(unit.pixelCenter.relativeToTileCenter))
     waypoint.foreach(pixel => {
       unit.agent.toTravel = waypoint
       With.commander.move(unit)

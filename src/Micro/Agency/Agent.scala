@@ -28,7 +28,8 @@ class Agent(val unit: FriendlyUnitInfo) {
   // History //
   /////////////
 
-  var combatHysteresisFrames: Int = 0
+  var fightHysteresisFrames: Int = 0
+  var impatience: Int = 0
 
   ///////////////
   // Decisions //
@@ -116,9 +117,18 @@ class Agent(val unit: FriendlyUnitInfo) {
     lastFrame = With.frame
     resetState()
     followIntent()
-    combatHysteresisFrames = Math.max(0, combatHysteresisFrames - With.framesSince(lastFrame))
+    fightHysteresisFrames = Math.max(0, fightHysteresisFrames - With.framesSince(lastFrame))
+    decreaseImpatience()
     updateRidesharing()
     Idle.consider(unit)
+  }
+
+  def decreaseImpatience(): Unit = {
+    impatience = Math.max(0, impatience - With.framesSince(lastFrame))
+  }
+
+  def increaseImpatience(): Unit = {
+    impatience += 2 * With.framesSince(lastFrame)
   }
 
   private def resetState() {
@@ -213,8 +223,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   private var _rideGoal: Option[Pixel] = None
   def rideGoal: Option[Pixel] = _rideGoal
   def directRide(to: Pixel): Unit = {
-
-    4
     _rideGoal = Some(to)
   }
   def prioritizedPassengers: Seq[FriendlyUnitInfo] = {

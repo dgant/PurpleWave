@@ -57,13 +57,13 @@ class Team(val units: Vector[UnitInfo]) {
   private def groundUnits = units.view.filterNot(_.flying)
   val widthOrder          = new Cache(() => groundUnits.sortBy(_.positioningWidthCurrentCached().pixelDistanceSquared(lineWidth())).toVector)
   val widthIdeal          = new Cache(() => groundUnits.map(_.unitClass.radialHypotenuse * 3).sum) // x3 = x2 for diameter, then x1.5 for spacing
-  val widthMeanExpected
-  = new Cache(() => widthIdeal() / 2)
+  val widthMeanExpected   = new Cache(() => widthIdeal() / 2)
   val widthMeanActual     = new Cache(() => PurpleMath.mean(units.view.map(_.positioningWidthCached())))
   val depthMean           = new Cache(() => ByOption.mean(units.view.flatMap(_.positioningDepthCached())).getOrElse(0d))
   val depthSpread         = new Cache(() => ByOption.mean(units.view.flatMap(_.positioningDepthCached()).map(d => Math.abs(d - depthMean()))).getOrElse(0d))
   val depthSpreadExpected = new Cache(() => units.size / 8) // Magic number
-  val coherenceWidth      = new Cache(() => Math.min(PurpleMath.nanToOne(widthMeanExpected() / widthMeanActual()), PurpleMath.nanToOne(widthMeanActual() / widthMeanExpected())))
+  val coherenceWidth      = new Cache(() => if (units.size == 1) 1 else Math.min(PurpleMath.nanToOne(widthMeanExpected() / widthMeanActual()), PurpleMath.nanToOne(widthMeanActual() / widthMeanExpected())))
   val coherenceDepth      = new Cache(() => PurpleMath.nanToOne(1 - depthSpread() / (depthSpread() + depthSpreadExpected())))
   val coherence           = new Cache(() => Math.max(coherenceWidth(), coherenceDepth()))
+  val impatience          = new Cache(() => units.flatMap(_.friendly.map(_.agent.impatience)).sum.toDouble / Math.max(1, units.size))
 }

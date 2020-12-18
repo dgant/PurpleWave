@@ -17,9 +17,7 @@ case class RequestSafeLanding(destination: Option[Pixel] = None) extends Action 
     val landingOption = Spiral
       .points(6)
       .map(searchOriginTile.add)
-      .find(tile =>
-        tile.valid && With.grids.walkable.get(tile) && unit.enemyRangeGrid.get(tile) <= 0
-      )
+      .find(tile => tile.walkable && unit.enemyRangeGrid.get(tile) <= 0)
     landingOption.foreach(landing => {
       unit.agent.directRide(landing.pixelCenter)
       if (unit.pixelDistanceEdge(landing.pixelCenter) < 48) {

@@ -104,7 +104,7 @@ object FightOrFlight extends Action {
 
     if (decision.isDefined) {
       unit.agent.shouldEngage = decision.get
-      unit.agent.combatHysteresisFrames = 0
+      unit.agent.fightHysteresisFrames = 0
       return
     }
 
@@ -125,7 +125,7 @@ object FightOrFlight extends Action {
     }
   
     if (unit.agent.shouldEngage != shouldEngage) {
-      unit.agent.combatHysteresisFrames = With.configuration.battleHysteresisFrames
+      unit.agent.fightHysteresisFrames = With.configuration.battleHysteresisFrames
     }
     unit.agent.shouldEngage = shouldEngage
 

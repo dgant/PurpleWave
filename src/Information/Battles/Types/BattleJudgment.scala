@@ -80,7 +80,7 @@ class BattleJudgment(battle: BattleLocal) {
   def unitHysteresis(unit: UnitInfo): Double = {
     if (unit.friendly.isEmpty) return 0.0
     val agent               = unit.friendly.get.agent
-    val patienceHysteresis  = agent.combatHysteresisFrames.toDouble / With.configuration.battleHysteresisFrames
+    val patienceHysteresis  = agent.fightHysteresisFrames.toDouble / With.configuration.battleHysteresisFrames
     val patienceEntangled   = if (agent.shouldEngage) Math.max(0.0, PurpleMath.nanToZero(unit.matchups.pixelsOfEntanglement / unit.topSpeed)) / With.configuration.battleHysteresisFrames else 0.0
     val patienceTotal       = Math.max(patienceEntangled, patienceHysteresis)
     val sign                = if (agent.shouldEngage) -1.0 else 1.0

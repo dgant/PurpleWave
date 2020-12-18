@@ -92,8 +92,8 @@ object Paradrop extends Action {
         profile.canCrossUnwalkable  = Some(true)
         profile.canEndUnwalkable    = Some(false)
         profile.costOccupancy       = 0.25f
-        profile.costThreat          = 5f
-        profile.costRepulsion       = if (target.isDefined) 0.5f else 2f
+        profile.costThreat          = if (target.isDefined) 0.5f else 3f
+        profile.costRepulsion       = if (target.isDefined) 0.5f else 6f
         profile.repulsors           = repulsors
         profile.unit                = Some(unit)
         path = profile.find

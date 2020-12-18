@@ -48,9 +48,11 @@ case class MatchupAnalysis(me: UnitInfo) {
 
   protected def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = (
     shooter.canAttack(victim)
-    || (shooter.unitClass.canAttack(victim)
-      && victim.detected
-      && shooter.framesToBeReadyForAttackOrder < victim.framesToTravelPixels(shooter.pixelRangeAgainst(victim) - shooter.pixelDistanceEdge(victim))))
+    || victim.friendly.exists(_.transport.exists(threatens(shooter, _)))
+    || (shooter.cloaked
+      && shooter.unitClass.canAttack(victim)
+      && shooter.unitClass.isDetector
+      && shooter.framesToBeReadyForAttackOrder <= victim.framesToTravelPixels(shooter.pixelRangeAgainst(victim) - shooter.pixelDistanceEdge(victim))))
 
   def repairers: Seq[UnitInfo] = {
     allies.view.filter(a => a.unitClass == Terran.SCV && a.friendly.map(_.agent.toRepair.contains(me)).getOrElse(a.orderTarget.contains(me)))

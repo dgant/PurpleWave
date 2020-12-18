@@ -85,12 +85,7 @@ trait TilePathfinder {
 
   // Best cost from the start tile to this tile.
   // In common A* parlance, this is the gScore.
-  @inline private final def costFromStart(
-    profile: PathfindProfile,
-    toTile: Tile,
-    hypotheticalFrom: Option[Tile] = None)
-      : Float = {
-
+  @inline private final def costFromStart(profile: PathfindProfile, toTile: Tile, hypotheticalFrom: Option[Tile] = None): Float = {
     val i = toTile.i
     val toState = tiles(i)
     val fromState = hypotheticalFrom.map(t => tiles(t.i)).orElse(toState.cameFrom.map(t => tiles(t.i)))
@@ -126,11 +121,7 @@ trait TilePathfinder {
   //
   // Threat-aware pathfinding makes it easy to introduce a non-admissible heuristic,
   // so be careful when modifying this.
-  @inline private final def costToEndFloor(
-    profile: PathfindProfile,
-    tile: Tile,
-    end: Option[Tile]): Float = {
-
+  @inline private final def costToEndFloor(profile: PathfindProfile, tile: Tile): Float = {
     val i = tile.i
 
     // We're using "Depth into enemy range" as our threat cost.
@@ -139,7 +130,7 @@ trait TilePathfinder {
     // To escape a tile that's 5 tiles into enemy range means we have to pass through tiles of value 5+4+3+2+1
     // So the floor of the cost we'll pay is the Gaussian expansion of the threat cost at the current tile.
 
-    val costDistanceToEnd   : Float = end.map(end => if (profile.crossUnwalkable || ! profile.employGroundDist) tile.tileDistanceFast(end) else tile.groundPixels(end) / 32.0).getOrElse(0.0).toFloat
+    val costDistanceToEnd   : Float = profile.end.map(end => if (profile.crossUnwalkable || ! profile.employGroundDist) tile.tileDistanceFast(end) else tile.groundPixels(end) / 32.0).getOrElse(0.0).toFloat
     val costOutOfRepulsion  : Float = profile.costRepulsion * PurpleMath.fastSigmoid(tiles(i).repulsion.toFloat) // Hacky; used to smartly tiebreak tiles that are otherwise h() = 0. Using this formulation to minimize likelihood of breaking heuristic requirements
     val costOutOfThreat     : Float = profile.costThreat * profile.threatGrid.getUnchecked(i)
 
@@ -153,7 +144,6 @@ trait TilePathfinder {
   // Baby I'm A*. --Prince
   def aStar(profile: PathfindProfile): TilePath = {
     val startTile = profile.start
-    val endTile   = if (profile.endUnwalkable) profile.end else profile.end.map(_.nearestWalkableTile)
 
     if ( ! startTile.valid) return failure(startTile)
 
@@ -166,7 +156,7 @@ trait TilePathfinder {
     startTileState.setCameFrom(startTile)
     startTileState.setRepulsion(totalRepulsion(profile, startTile))
     startTileState.setCostFromStart(costFromStart(profile, startTile))
-    startTileState.setTotalCostFloor(costToEndFloor(profile, startTile, endTile))
+    startTileState.setTotalCostFloor(costToEndFloor(profile, startTile))
     startTileState.setPathLength(1)
     horizon += startTileState
 
@@ -177,7 +167,7 @@ trait TilePathfinder {
       bestTileState.setVisited()
 
       // Are we done?
-      val atEnd = endTile.exists(end =>
+      val atEnd = profile.end.exists(end =>
         end.i == bestTileState.i
         || (
           profile.endDistanceMaximum > 0
@@ -186,7 +176,7 @@ trait TilePathfinder {
       if (
         profile.lengthMaximum.exists(_ <= Math.round(bestTileState.pathLength)) // Rounding encourages picking diagonal paths for short maximum lengths
         || (
-          (atEnd || (endTile.isEmpty && (profile.endUnwalkable || bestTile.walkableUnchecked)))
+          (atEnd || (profile.end.isEmpty && (profile.endUnwalkable || bestTile.walkableUnchecked)))
           && profile.lengthMinimum.forall(_ <= bestTileState.pathLength)
           && profile.threatMaximum.forall(_ >= profile.threatGrid.getUnchecked(bestTile.i)))) {
         val output = TilePath(
@@ -228,7 +218,7 @@ trait TilePathfinder {
             if ( ! wasEnqueued || neighborState.costFromStart > neighborCostFromStart) {
               neighborState.setCameFrom(bestTileState.tile)
               neighborState.setCostFromStart(neighborCostFromStart)
-              neighborState.setTotalCostFloor(neighborCostFromStart + costToEndFloor(profile, neighborTile, endTile))
+              neighborState.setTotalCostFloor(neighborCostFromStart + costToEndFloor(profile, neighborTile))
               neighborState.setPathLength(bestTileState.pathLength + (if (neighborOrthogonal) 1 else PurpleMath.sqrt2f))
             }
             if ( ! wasEnqueued) {

@@ -8,37 +8,20 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import scala.collection.mutable
 
 class BattleClustering {
-
-  class Cluster {
-    var units: mutable.HashSet[UnitInfo] = new mutable.HashSet[UnitInfo]
-    def merge(other: Cluster): Unit = {
-      val useOurUnits = units.size > other.units.size
-      val newUnits = if (useOurUnits) units else other.units
-      val oldUnits = if (useOurUnits) other.units else units
-      newUnits ++= oldUnits
-      units = newUnits
-      other.units = newUnits
-    }
-    override def equals(other: scala.Any): Boolean = other.isInstanceOf[Cluster] && other.asInstanceOf[Cluster].units.eq(units)
-  }
   
   var lastClusterCompletion = 0
   val runtimes = new mutable.Queue[Int]
   
-  private var clusterInProgress:  BattleClusteringState = new BattleClusteringState(Set.empty)
-  private var clusterComplete:    BattleClusteringState = new BattleClusteringState(Set.empty)
+  private var clusterInProgress:  BattleClusteringState = new BattleClusteringState(Vector.empty)
+  private var clusterComplete:    BattleClusteringState = new BattleClusteringState(Vector.empty)
 
-  def clusters: Iterable[Seq[UnitInfo]] = clusterComplete.clusters
+  def clusters: Vector[Iterable[UnitInfo]] = clusterComplete.clusters
   def isComplete: Boolean = clusterInProgress.isComplete
 
   def reset() {
-    val nextUnits = With.units.playerOwned.view.filter(BattleClassificationFilters.isEligibleLocal).toSet
-    clusterInProgress = new BattleClusteringState(nextUnits)
-
     With.units.playerOwned.foreach(_.clusteringEnabled = false)
-    nextUnits.foreach(_.clusteringEnabled = true)
-    nextUnits.foreach(_.clusteringFound = false)
-    nextUnits.foreach(_.cluster = None)
+    val nextUnits = With.units.playerOwned.view.filter(BattleClassificationFilters.isEligibleLocal).toVector
+    clusterInProgress = new BattleClusteringState(nextUnits)
   }
   
   def step() {

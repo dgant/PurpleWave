@@ -1,103 +1,73 @@
 package Information.Battles.Clustering
 
-import Lifecycle.With
-import Mathematics.PurpleMath
-import Mathematics.Shapes.Circle
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.ByOption
 
-import scala.annotation.tailrec
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 
-class BattleClusteringState(seedUnits: Set[UnitInfo]) {
+class BattleClusteringState(val seedUnits: Vector[UnitInfo]) {
 
-  val unitLinks = new mutable.HashMap[UnitInfo, UnitInfo]
-  val horizon: mutable.Stack[UnitInfo] = mutable.Stack[UnitInfo]()
-  val stragglers: mutable.Queue[UnitInfo] = new mutable.Queue[UnitInfo]()
-  seedUnits.view.filter(_.isEnemy).foreach(horizon.push)
-  seedUnits.view.filter(_.isFriendly).foreach(stragglers.+=)
-
-  private var _clusters: Option[Iterable[ArrayBuffer[UnitInfo]]] = None
-  def clusters: Iterable[Seq[UnitInfo]] = _clusters.getOrElse(Iterable.empty)
+  private var _clusters: Option[Vector[Iterable[UnitInfo]]] = None
+  def clusters: Vector[Iterable[UnitInfo]] = _clusters.getOrElse(Vector.empty)
   def isComplete: Boolean = _clusters.isDefined
 
+  val enemyQueue: mutable.Queue[UnitInfo] = mutable.Queue[UnitInfo]()
+  val friendlyQueue: mutable.Queue[UnitInfo] = new mutable.Queue[UnitInfo]()
+  seedUnits.foreach(u => {
+    if (u.isEnemy) enemyQueue += u else if (u.isFriendly) friendlyQueue += u
+    u.clusteringEnabled = true
+    u.clusteringRadiusSquared = u.effectiveRangePixels + 32 * 6
+    u.clusteringRadiusSquared = u.clusteringRadiusSquared * u.clusteringRadiusSquared
+    u.cluster = None
+  })
+
   def step() {
-    if (horizon.nonEmpty) linkFromHorizon()
-    else if (stragglers.nonEmpty) linkStraggler()
+    if (enemyQueue.nonEmpty) linkEnemy()
+    else if (friendlyQueue.nonEmpty) linkFriendly()
     else if ( ! isComplete) compileClusters()
   }
 
-  def linkFromHorizon() {
-    var linkedFoe: Option[UnitInfo] = None
-    var newFoes     = new ArrayBuffer[UnitInfo]
-    val nextUnit    = horizon.pop()
-    val tileRadius  = radiusTiles(nextUnit)
-    val tileCenter  = nextUnit.tileIncludingCenter
-    val isFriendly  = nextUnit.isFriendly
-    val points      = Circle.points(tileRadius)
-    val nPoints     = points.size
-    var iPoint      = 0
-    while (iPoint < nPoints) {
-      val nextTile = tileCenter.add(points(iPoint))
-      iPoint += 1
-      if (nextTile.valid) {
-        val nextTileI = nextTile.i
-        val neighbors = With.grids.units.getUnchecked(nextTileI)
-        val nNeighbors = neighbors.size
-        var iNeighbor = 0
-        while (iNeighbor < nNeighbors) {
-          val neighbor = neighbors(iNeighbor)
-          iNeighbor += 1
-          if (neighbor.clusteringEnabled && nextUnit.isFriendly != neighbor.isFriendly) {
-            if (unitLinks.contains(neighbor)) {
-              if (linkedFoe.isEmpty) {
-                linkedFoe = Some(neighbor)
-              }
-            }
-            else {
-              newFoes += neighbor
-            }
-          }
-        }
+  @inline private def link(a: UnitInfo, b: UnitInfo): Unit = {
+    if (a.cluster.isDefined) {
+      if (b.cluster.isDefined) {
+        a.cluster.get.merge(b.cluster.get)
+      } else {
+        a.cluster.get.units += b
+        b.cluster = a.cluster
       }
+    } else if (b.cluster.isDefined) {
+      b.cluster.get.units += a
+      a.cluster = b.cluster
+    } else {
+      val newCluster = new BattleCluster
+      newCluster.units += a
+      newCluster.units += b
+      a.cluster = Some(newCluster)
+      b.cluster = a.cluster
     }
-    val nFoes = newFoes.size
-    var iFoe = 0
-    while (iFoe < nFoes) {
-      unitLinks.put(newFoes(iFoe), nextUnit)
-      iFoe += 1
-    }
-    if ( ! unitLinks.contains(nextUnit)) {
-      unitLinks.put(nextUnit, linkedFoe.getOrElse(nextUnit))
-    }
-    newFoes.view.filter(seedUnits.contains).foreach(horizon.push)
   }
 
-  private def linkStraggler(): Unit = {
-    val straggler = stragglers.dequeue()
-    if (unitLinks.contains(straggler)) return
-    val clusteredSquadmates = straggler.friendly.get.squadmates.view.filter(unitLinks.contains)
-    val clusteredSquadmateClosest = ByOption.minBy(clusteredSquadmates)(straggler.pixelDistanceEdge)
-    clusteredSquadmateClosest.foreach(unitLinks(straggler) = _)
+  private def linkEnemy(): Unit = {
+    val enemy = enemyQueue.dequeue()
+    friendlyQueue.foreach(friendly => {
+      val distanceSquared = enemy.pixelDistanceSquared(friendly)
+      if (distanceSquared < enemy.clusteringRadiusSquared || distanceSquared < friendly.clusteringRadiusSquared) {
+        link(enemy, friendly)
+      }
+    })
+  }
+
+  private def linkFriendly(): Unit = {
+    val friendly = friendlyQueue.dequeue()
+    if (friendly.cluster.isDefined) {
+      friendly.friendly.get.squadmates.foreach(squadmate => {
+        if (squadmate.clusteringEnabled && squadmate.cluster.isEmpty) {
+          link(friendly, squadmate)
+        }
+      })
+    }
   }
 
   private def compileClusters(): Unit = {
-    val clusters = unitLinks.view.filter(p => p._1 == p._2).map(_._1).map(root => (root, new ArrayBuffer[UnitInfo])).toMap
-    unitLinks.keys.foreach(unit => clusters(getRoot(unit)) += unit)
-    _clusters = Some(clusters.values)
-  }
-
-
-  @inline @tailrec private def getRoot(unit: UnitInfo): UnitInfo = {
-    val linkedUnit = unitLinks(unit)
-    if (linkedUnit == unit) unit else getRoot(linkedUnit)
-  }
-  
-  @inline private def radiusTiles(unit: UnitInfo): Int = {
-    PurpleMath.clamp(
-      unit.effectiveRangePixels.toInt / 32 + 6,
-      With.configuration.battleMarginTileMinimum,
-      With.configuration.battleMarginTileMaximum)
+    _clusters = Some(seedUnits.view.flatMap(_.cluster).map(_.units).distinct.toVector)
   }
 }

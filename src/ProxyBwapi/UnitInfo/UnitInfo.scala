@@ -1,6 +1,7 @@
 package ProxyBwapi.UnitInfo
 
 import Debugging.Visualizations.Colors
+import Information.Battles.Clustering.BattleCluster
 import Information.Battles.MCRS.MCRSUnit
 import Information.Battles.Types.BattleLocal
 import Information.Geography.Types.{Base, Zone}
@@ -68,9 +69,9 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   val mcrs: MCRSUnit = new MCRSUnit(this)
 
   // Used in clustering; attached to unit for performance to avoid use of sets/maps
-  var clusteringEnabled: Boolean = false
-  var clusteringFound: Boolean = false
-  var cluster: Option[Object] = None
+  var clusteringEnabled: Boolean = _
+  var clusteringRadiusSquared: Double = _
+  var cluster: Option[BattleCluster] = _
 
   val frameDiscovered           : Int = With.frame
   val initialHitPoints          : Int = baseUnit.getHitPoints

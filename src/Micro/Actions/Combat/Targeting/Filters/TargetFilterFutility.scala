@@ -3,31 +3,24 @@ package Micro.Actions.Combat.Targeting.Filters
 import Lifecycle.With
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.{Minutes, Seconds}
+import Utilities.Minutes
 
 object TargetFilterFutility extends TargetFilter {
 
-  // Target units according to our goals.
-  // Ignore them if they're distractions.
+  // Ignore targets we have no chance of killing
   //
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
-    if ( ! actor.canMove && ! actor.inRangeToAttack(target)) {
-      return false
-    }
+    if ( ! actor.canMove && ! actor.inRangeToAttack(target)) return false
 
-    if (actor.inRangeToAttack(target)) {
-      return true
-    }
+    if (actor.inRangeToAttack(target)) return true
 
     // Respect PushKiters (intended for eg. Proxy Zealot rushes coming up against Dragoons)
-    if (With.blackboard.pushKiters.get && target.canAttack(actor) && target.pixelRangeAgainst(actor) > 32) {
-      return true
-    }
+    if (With.blackboard.pushKiters.get && target.canAttack(actor) && target.pixelRangeAgainst(actor) > 32) return true
 
     // This is a pretty expensive filter; avoid using it if possible
-    if (actor.battle.exists(_.teamOf(actor).units.size > 12 || (With.frame > Minutes(12)() && With.reaction.agencyAverage > 6))) {
-      return true
-    }
+    if (With.frame > Minutes(15)()) return true
+
+    if (actor.is(Terran.Vulture) && target.unitClass.isBuilding && ! target.unitClass.canAttack && With.frame < Minutes(4)()) return false
 
     lazy val atOurWorkers = target.base.exists(_.owner.isUs) && target.matchups.targetsInRange.exists(_.unitClass.isWorker)
     lazy val alliesAssisting = target.matchups.catchers.exists(ally =>
@@ -44,8 +37,6 @@ object TargetFilterFutility extends TargetFilter {
         .exists(tile =>
           With.grids.walkableTerrain.get(tile)
           && With.grids.altitudeBonus.get(tile) >= With.grids.altitudeBonus.get(target.tileIncludingCenter)))
-
-    if (actor.is(Terran.Vulture) && target.unitClass.isBuilding && With.frame < Seconds(4)()) return false
 
     val output = targetReachable && (atOurWorkers || targetCatchable)
     

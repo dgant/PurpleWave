@@ -10,7 +10,7 @@ object TargetFilterReaver extends TargetFilter {
     val worthAttacking = (
       actor.base.exists(_.owner.isUs) // Make sure we hit Pylons or whatever other garbage is around
       || target.canAttack
-      || target.unitClass.attacks
+      || target.unitClass.canAttack
       || (target.base.exists(b => b.resources.forall(u => With.grids.friendlyVision.isSet(u.tileIncludingCenter))) && target.base.forall(_.workerCount == 0)))
 
     val safeToAttack = (

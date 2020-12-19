@@ -96,31 +96,25 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
 
   private var lastUnitClass: UnitClass = _
   def updateCommon() {
-    val thisFrame = With.frame
     if (totalHealth < lastTotalHealthPoints) {
-      lastFrameTakingDamage = thisFrame
+      lastFrameTakingDamage = With.frame
     }
     if (cooldownLeft > lastCooldown) {
-      lastFrameStartingAttack = thisFrame
+      lastFrameStartingAttack = With.frame
     }
-    if (visibleToOpponents) {
-      discoveredByEnemy = true
-    }
+    discoveredByEnemy ||= visibleToOpponents
     val moving = velocityX != 0 || velocityY != 0
-    lazy val couldMove          = unitClass.canMove
-    lazy val tryingToMove       = canMove && friendly.filter(_.agent.tryingToMove).exists(_.pixelDistanceCenter(presumptiveDestination) > 32)
+    lazy val tryingToMove       = friendly.filter(_.agent.tryingToMove).exists(_.pixelDistanceCenter(presumptiveDestination) > 32)
     lazy val tryingToAttackHere = canAttack && target.exists(t => t.isEnemyOf(this) &&  inRangeToAttack(t))
     lazy val tryingToAttackAway = canAttack && target.exists(t => t.isEnemyOf(this) && ! inRangeToAttack(t))
-    if ( ! moving && couldMove && (tryingToMove || tryingToAttackAway)) {
+    if ( ! moving && canMove && (tryingToMove || tryingToAttackAway)) {
       framesFailingToMove += 1
-    }
-    else {
+    } else {
       framesFailingToMove = 0
     }
     if (cooldownLeft == 0 && tryingToAttackHere) {
       framesFailingToAttack += 1
-    }
-    else {
+    } else {
       framesFailingToAttack = 0
     }
     if (complete) {
@@ -128,7 +122,6 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
       if (unitClass != lastUnitClass) {
         completionFrame = With.frame
       }
-
       // We don't know exactly when it finished; now is our best guess.
       // The most important consumer of this estimate is fingerprinting.
       // For fingerprinting, "finished now" is a pretty decent metric.

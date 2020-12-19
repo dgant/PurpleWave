@@ -23,12 +23,12 @@ class AOETarget(
   private val evalPixelEnd = Pixel(xs.max, ys.max)
   val rectangle = PixelRectangle(evalPixelStart, evalPixelEnd)
   // Get units in the *expanded* rectangle to handle the potential out-of-dateness of the unit grid
-  val units: Iterable[UnitInfo] = rectangle.expand(64, 64)
+  def units: Iterable[UnitInfo] = rectangle.expand(64, 64)
     .pixelsEach32
     .view
     .map(_.tileIncluding)
     .filter(_.valid)
-    .flatMap(With.grids.units.get(_).filter(u =>
+    .flatMap(With.grids.units.get(_).view.filter(u =>
       u.likelyStillThere
       && rectangle.contains(u.pixelCenter))) // Require the unit to actually be there; don't trust the grid))
   val netValue: Double = units.view.map(evaluate(_, caster)).sum

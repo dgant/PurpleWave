@@ -111,13 +111,18 @@ object DefaultCombat extends Action {
     lazy val framesToGetInRangeOfTarget = unit.agent.toAttack.map(unit.framesToGetInRange)
     transition(
       Abuse,
-      () => unit.agent.toAttack.exists(canAbuse(unit, _)) && unit.matchups.threats.forall(t => canAbuse(unit, t) || t.framesToGetInRange(unit) > 12 + framesToGetInRangeOfTarget.get))
+      () =>
+        unit.agent.toAttack.exists(canAbuse(unit, _))
+        && unit.matchups.threats.forall(t => canAbuse(unit, t) || t.framesToGetInRange(unit) > 12 + framesToGetInRangeOfTarget.get))
 
     transition(
       Fallback,
       () =>
-        unit.isAny(Terran.Vulture, Terran.SiegeTankUnsieged, Terran.Goliath, Terran.Wraith, Protoss.Archon, Protoss.Dragoon, Protoss.Reaver, Protoss.Scout, Zerg.Hydralisk, Zerg.Mutalisk)
-        && (unit.is(Protoss.Reaver) || receivedPushPriority < TrafficPriorities.Shove)
+        // Units that can decently shoot while running
+        unit.isAny(Terran.Marine, Terran.Vulture, Terran.SiegeTankUnsieged, Terran.Goliath, Terran.Wraith, Protoss.Archon, Protoss.Dragoon, Protoss.Reaver, Protoss.Scout, Zerg.Hydralisk)
+        // It's worth shooting even if we're blocking retreaters
+        && (unit.isAny(Terran.SiegeTankUnsieged, Terran.Goliath, Protoss.Reaver) || receivedPushPriority < TrafficPriorities.Shove)
+        // Shooting won't delay our retreat, or it's worth doing so anyway
         && (unit.zone == unit.agent.origin.zone || ! unit.isAny(Protoss.Archon, Protoss.Dragoon) || ! unit.matchups.threats.exists(t => t.is(Protoss.Dragoon) && t.framesToGetInRange(t) < 12)))
 
     transition(Dance, () => unit.agent.toAttack.map(unit.pixelRangeAgainst).exists(_ > 64))

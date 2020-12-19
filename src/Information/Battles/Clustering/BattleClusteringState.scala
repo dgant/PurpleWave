@@ -1,15 +1,19 @@
 package Information.Battles.Clustering
 
+import Information.Battles.BattleClassificationFilters
+import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
 
-class BattleClusteringState(val seedUnits: Vector[UnitInfo]) {
+class BattleClusteringState() {
 
   private var _clusters: Option[Vector[Iterable[UnitInfo]]] = None
   def clusters: Vector[Iterable[UnitInfo]] = _clusters.getOrElse(Vector.empty)
   def isComplete: Boolean = _clusters.isDefined
 
+
+  val seedUnits = With.units.playerOwned.view.filter(BattleClassificationFilters.isEligibleLocal).toVector
   val enemyQueue: mutable.Queue[UnitInfo] = mutable.Queue[UnitInfo]()
   val friendlyQueue: mutable.Queue[UnitInfo] = new mutable.Queue[UnitInfo]()
   seedUnits.foreach(u => {
@@ -54,17 +58,26 @@ class BattleClusteringState(val seedUnits: Vector[UnitInfo]) {
         link(enemy, friendly)
       }
     })
+    friendlyQueue.foreach(other => {
+      if (enemy.unitClass.attacksOrCastsOrDetectsOrTransports || other.unitClass.attacksOrCastsOrDetectsOrTransports) {
+        val distanceSquared = enemy.pixelDistanceSquared(other)
+        if (distanceSquared < enemy.clusteringRadiusSquared || distanceSquared < other.clusteringRadiusSquared) {
+          link(enemy, other)
+        }
+      }
+    })
   }
 
   private def linkFriendly(): Unit = {
     val friendly = friendlyQueue.dequeue()
-    if (friendly.cluster.isDefined) {
-      friendly.friendly.get.squadmates.foreach(squadmate => {
-        if (squadmate.clusteringEnabled && squadmate.cluster.isEmpty) {
-          link(friendly, squadmate)
+    friendlyQueue.foreach(other => {
+      if (friendly.unitClass.attacksOrCastsOrDetectsOrTransports || other.unitClass.attacksOrCastsOrDetectsOrTransports) {
+        val distanceSquared = friendly.pixelDistanceSquared(other)
+        if (distanceSquared < friendly.clusteringRadiusSquared || distanceSquared < other.clusteringRadiusSquared) {
+          link(friendly, other)
         }
-      })
-    }
+      }
+    })
   }
 
   private def compileClusters(): Unit = {

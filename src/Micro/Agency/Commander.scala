@@ -499,6 +499,10 @@ class Commander {
     }
   }
 
+  private def untrack(): Unit = {
+    With.configuration.trackUnit = false
+  }
+
   private def leadFollower(unit: FriendlyUnitInfo, todo: (FriendlyUnitInfo) => Unit): Unit = {
     if (unit.ready) {
       unit.agent.leadFollower = todo

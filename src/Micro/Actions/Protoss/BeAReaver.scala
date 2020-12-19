@@ -7,10 +7,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object BeAReaver extends Action {
 
-  override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.is(Protoss.Reaver)
-    && unit.agent.ride.exists(_.canTransport(unit))
-  )
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.is(Protoss.Reaver) && unit.agent.ride.exists(_.canTransport(unit))
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     lazy val inRangeNeedlessly = unit.matchups.threatsInRange.exists(t => ! t.flying && t.pixelRangeAgainst(unit) < unit.pixelRangeAgainst(t))

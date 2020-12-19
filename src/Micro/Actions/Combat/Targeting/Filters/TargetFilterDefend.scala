@@ -1,11 +1,19 @@
 package Micro.Actions.Combat.Targeting.Filters
 
 import Information.Geography.Types.Zone
+import Lifecycle.With
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.Minutes
 
 case class TargetFilterDefend(zone: Zone) extends TargetFilter {
   override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
     lazy val firingPixel = actor.pixelToFireAt(target)
+
+    // If we want to attack anyway there's no need to ignore targets
+    if (With.blackboard.wantToAttack()) return true
+
+    // Expensive
+    if (With.frame > Minutes(10)()) return true
 
     // Fire at enemies we can hit from inside the zone
     if (target.zone == zone) return true

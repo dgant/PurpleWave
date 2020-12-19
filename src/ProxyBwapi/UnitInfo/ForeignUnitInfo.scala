@@ -15,7 +15,7 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
 
   override val foreign: Option[ForeignUnitInfo] = Some(this)
 
-  def update(): Unit = {
+  @inline final def update(): Unit = {
     updateTimeSensitiveInformation()
     updateTimeInsensitiveInformation()
     fixCloakedUnits()
@@ -58,8 +58,8 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
     _unitClass  = UnitClasses.get(baseUnit.getType)
   }
 
-  def visibility: Visibility.Value = _visibility
-  def setVisbility(value: Visibility.Value): Unit = {
+  @inline final def visibility: Visibility.Value = _visibility
+  @inline final def setVisbility(value: Visibility.Value): Unit = {
     _visibility = value
     visibility match {
       case Visibility.Visible           => _burrowed = baseUnit.isBurrowed
@@ -70,7 +70,7 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
     }
   }
 
-  def presumePixel(value: Pixel): Unit = {
+  @inline final def presumePixel(value: Pixel): Unit = {
     _pixelCenter = value
   }
 
@@ -79,11 +79,11 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   private var _player             : PlayerInfo        = _
   private var _unitClass          : UnitClass         = UnitClasses.None
   
-  def lastSeen           : Int        = _lastSeen
-  def player             : PlayerInfo = _player
-  def unitClass          : UnitClass  = _unitClass
+  @inline final def lastSeen           : Int        = _lastSeen
+  @inline final def player             : PlayerInfo = _player
+  @inline final def unitClass          : UnitClass  = _unitClass
   
-  def lastSeenWithin(frames: Int): Boolean = With.framesSince(_lastSeen) < frames
+  @inline final def lastSeenWithin(frames: Int): Boolean = With.framesSince(_lastSeen) < frames
   
   ////////////
   // Health //
@@ -109,24 +109,24 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   private var _energy                 : Int       = _
   private var _plagued                : Boolean   = _
   
-  def alive                 : Boolean   = _alive
-  def complete              : Boolean   = _complete
-  def defensiveMatrixPoints : Int       = _defensiveMatrixPoints
-  def hitPoints             : Int       = _hitPoints
-  def initialResources      : Int       = _initialResources
-  def invincible            : Boolean   = _invincible
-  def resourcesLeft         : Int       = _resourcesLeft
-  def shieldPoints          : Int       = _shieldPoints
-  def energy                : Int       = _energy
-  def plagued               : Boolean   = _plagued
+  @inline final def alive                 : Boolean   = _alive
+  @inline final def complete              : Boolean   = _complete
+  @inline final def defensiveMatrixPoints : Int       = _defensiveMatrixPoints
+  @inline final def hitPoints             : Int       = _hitPoints
+  @inline final def initialResources      : Int       = _initialResources
+  @inline final def invincible            : Boolean   = _invincible
+  @inline final def resourcesLeft         : Int       = _resourcesLeft
+  @inline final def shieldPoints          : Int       = _shieldPoints
+  @inline final def energy                : Int       = _energy
+  @inline final def plagued               : Boolean   = _plagued
   
   ////////////
   // Combat //
   ////////////
   
-  def scarabCount       : Int = if (is(Protoss.Reaver)) 3 else 0 // BWAPI probably doens't give this for enemy units. Here's an approximation.
-  def interceptorCount  : Int = interceptorCountCache()
-  def spiderMines       : Int = spiderMineCountCache()
+  @inline final def scarabCount       : Int = if (is(Protoss.Reaver)) 3 else 0 // BWAPI probably doens't give this for enemy units. Here's an approximation.
+  @inline final def interceptorCount  : Int = interceptorCountCache()
+  @inline final def spiderMines       : Int = spiderMineCountCache()
   private val interceptorCountCache = new Cache(() => if (is(Protoss.Carrier))  baseUnit.getInterceptorCount  else 0)
   private val spiderMineCountCache  = new Cache(() => if (is(Terran.Vulture))   baseUnit.getSpiderMineCount   else 0)
   
@@ -145,12 +145,12 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   var _groundWeaponCooldownLeft : Int                 = _
   var _spellCooldownLeft        : Int                 = _
   
-  def interceptors              : Iterable[UnitInfo]  = Iterable.empty // BWAPI doesn't publish this for enemy interceptors
-  def attackStarting            : Boolean             = ! player.isNeutral && _attackStarting
-  def attackAnimationHappening  : Boolean             = ! player.isNeutral && _attackAnimationHappening
-  def airCooldownLeft           : Int                 = if (! player.isNeutral) _airWeaponCooldownLeft else 0
-  def groundCooldownLeft        : Int                 = if (! player.isNeutral) _groundWeaponCooldownLeft  else 0
-  def spellCooldownLeft         : Int                 = if (! player.isNeutral) _spellCooldownLeft  else 0
+  @inline final def interceptors              : Iterable[UnitInfo]  = Iterable.empty // BWAPI doesn't publish this for enemy interceptors
+  @inline final def attackStarting            : Boolean             = _attackStarting
+  @inline final def attackAnimationHappening  : Boolean             = _attackAnimationHappening
+  @inline final def airCooldownLeft           : Int                 = _airWeaponCooldownLeft
+  @inline final def groundCooldownLeft        : Int                 = _groundWeaponCooldownLeft
+  @inline final def spellCooldownLeft         : Int                 = _spellCooldownLeft
   
   //////////////
   // Geometry //
@@ -160,9 +160,9 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   private var _pixelCenterObserved  : Pixel  = Pixel(0, 0)
   private var _tileTopLeft          : Tile   = Tile(0, 0)
   
-  def pixelCenter         : Pixel = _pixelCenter
-  def pixelCenterObserved : Pixel = _pixelCenterObserved
-  def tileTopLeft         : Tile  = _tileTopLeft
+  @inline final def pixelCenter         : Pixel = _pixelCenter
+  @inline final def pixelCenterObserved : Pixel = _pixelCenterObserved
+  @inline final def tileTopLeft         : Tile  = _tileTopLeft
   
   ////////////
   // Orders //
@@ -204,16 +204,16 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   private var _gatheringGas         : Boolean           = _
   
   private val badPositions = Vector(Position.Invalid, Position.None, Position.Unknown, null)
-  def target            : Option[UnitInfo]    = _target
-  def targetPixel       : Option[Pixel]       = _targetPixel
-  def order             : String              = _order
-  def orderTarget       : Option[UnitInfo]    = _orderTarget
-  def orderTargetPixel  : Option[Pixel]       = _orderTargetPixel
-  def gatheringMinerals : Boolean             = _gatheringMinerals
-  def gatheringGas      : Boolean             = _gatheringGas
-  def techProducing     : Option[Tech]        = None
-  def upgradeProducing  : Option[Upgrade]     = None
-  def unitProducing     : Option[UnitClass]   = None
+  @inline final def target            : Option[UnitInfo]    = _target
+  @inline final def targetPixel       : Option[Pixel]       = _targetPixel
+  @inline final def order             : String              = _order
+  @inline final def orderTarget       : Option[UnitInfo]    = _orderTarget
+  @inline final def orderTargetPixel  : Option[Pixel]       = _orderTargetPixel
+  @inline final def gatheringMinerals : Boolean             = _gatheringMinerals
+  @inline final def gatheringGas      : Boolean             = _gatheringGas
+  @inline final def techProducing     : Option[Tech]        = None
+  @inline final def upgradeProducing  : Option[Upgrade]     = None
+  @inline final def unitProducing     : Option[UnitClass]   = None
   
   private var _attacking        : Boolean = _
   private var _constructing     : Boolean = _
@@ -228,19 +228,19 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   private var _training         : Boolean = _
   private var _upgrading        : Boolean = _
   
-  def attacking       : Boolean = _attacking
-  def constructing    : Boolean = _constructing
-  def following       : Boolean = _following
-  def holdingPosition : Boolean = _holdingPosition
-  def idle            : Boolean = _idle
-  def interruptible   : Boolean = _interruptible
-  def morphing        : Boolean = _morphing
-  def repairing       : Boolean = _repairing
-  def teching         : Boolean = _researching
-  def patrolling      : Boolean = _patrolling
-  def training        : Boolean = _training
-  def upgrading       : Boolean = _upgrading
-  
+  @inline final def attacking       : Boolean = _attacking
+  @inline final def constructing    : Boolean = _constructing
+  @inline final def following       : Boolean = _following
+  @inline final def holdingPosition : Boolean = _holdingPosition
+  @inline final def idle            : Boolean = _idle
+  @inline final def interruptible   : Boolean = _interruptible
+  @inline final def morphing        : Boolean = _morphing
+  @inline final def repairing       : Boolean = _repairing
+  @inline final def teching         : Boolean = _researching
+  @inline final def patrolling      : Boolean = _patrolling
+  @inline final def training        : Boolean = _training
+  @inline final def upgrading       : Boolean = _upgrading
+
   ////////////////
   // Visibility //
   ////////////////
@@ -249,20 +249,20 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
     _cloaked  = ! player.isNeutral && baseUnit.isCloaked
     _detected = player.isNeutral || baseUnit.isDetected
   }
-  
+
   private var _burrowed  : Boolean  = _
   private var _cloaked   : Boolean  = _
   private var _detected  : Boolean  = _
-  
-  def burrowed  : Boolean = _burrowed
-  def cloaked   : Boolean = _cloaked
-  def detected  : Boolean = _detected
-  def visible   : Boolean = visibility == Visibility.Visible
-  
+
+  @inline final def burrowed  : Boolean = _burrowed
+  @inline final def cloaked   : Boolean = _cloaked
+  @inline final def detected  : Boolean = _detected
+  @inline final def visible   : Boolean = visibility == Visibility.Visible
+
   //////////////
   // Movement //
   //////////////
-  
+
   private def updateMovement() {
     _accelerating = unitClass.canMove           &&  baseUnit.isAccelerating
     _angle        = if (unitClass.canMove || unitClass.rawCanAttack) baseUnit.getAngle else 0
@@ -280,7 +280,7 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
     _velocityX    = if(unitClass.canMove)           baseUnit.getVelocityX else 0
     _velocityY    = if(unitClass.canMove)           baseUnit.getVelocityY else 0
   }
-  
+
   private var _accelerating   : Boolean   = _
   private var _angle          : Double    = _
   private var _braking        : Boolean   = _
@@ -296,27 +296,27 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   private var _stuck          : Boolean   = _
   private var _velocityX      : Double    = _
   private var _velocityY      : Double    = _
-  
-  def accelerating  : Boolean = _accelerating
-  def angleRadians  : Double  = _angle
-  def braking       : Boolean = _braking
-  def ensnared      : Boolean = _ensnared
-  def flying        : Boolean = _flying
-  def irradiated    : Boolean = _irradiated
-  def lifted        : Boolean = _lifted
-  def lockedDown    : Boolean = _lockedDown
-  def maelstrommed  : Boolean = _maelstrommed
-  def sieged        : Boolean = _sieged
-  def stasised      : Boolean = _stasised
-  def stimmed       : Boolean = _stimmed
-  def stuck         : Boolean = _stuck
-  def velocityX     : Double  = _velocityX
-  def velocityY     : Double  = _velocityY
-  
+
+  @inline final def accelerating  : Boolean = _accelerating
+  @inline final def angleRadians  : Double  = _angle
+  @inline final def braking       : Boolean = _braking
+  @inline final def ensnared      : Boolean = _ensnared
+  @inline final def flying        : Boolean = _flying
+  @inline final def irradiated    : Boolean = _irradiated
+  @inline final def lifted        : Boolean = _lifted
+  @inline final def lockedDown    : Boolean = _lockedDown
+  @inline final def maelstrommed  : Boolean = _maelstrommed
+  @inline final def sieged        : Boolean = _sieged
+  @inline final def stasised      : Boolean = _stasised
+  @inline final def stimmed       : Boolean = _stimmed
+  @inline final def stuck         : Boolean = _stuck
+  @inline final def velocityX     : Double  = _velocityX
+  @inline final def velocityY     : Double  = _velocityY
+
   //////////////
   // Statuses //
   //////////////
-  
+
   private def updateStatuses() {
     _remainingTrainFrames   = if (unitClass.trainsUnits) baseUnit.getRemainingTrainTime else 0
     _remainingUpgradeFrames = if (unitClass.upgradesWhat.nonEmpty) baseUnit.getRemainingUpgradeTime else 0
@@ -365,7 +365,7 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
     val output              = progressLeft * unitClass.buildFrames - With.framesSince(dataFrame)
     output.toInt
   }
-  def remainingCompletionFrames: Int = {
+  @inline final def remainingCompletionFrames: Int = {
     if (complete) return 0
     // Use both the initial projection and the up-to-date projection
     // We can't always trust the most up-to-date projection in case the unit has taken damage
@@ -375,31 +375,30 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
     output
   }
 
-  def remainingTrainFrames    : Int     = _remainingTrainFrames
-  def remainingUpgradeFrames  : Int     = _remainingUpgradeFrames
-  def remainingTechFrames     : Int     = _remainingTechFrames
-  def beingConstructed        : Boolean = _beingConstructed
-  def beingGathered           : Boolean = _beingGathered
-  def beingHealed             : Boolean = _beingHealed
-  def blind                   : Boolean = _blind
-  def carryingGas             : Boolean = _carryingGas
-  def carryingMinerals        : Boolean = _carryingMinerals
-  def powered                 : Boolean = _powered
-  def selected                : Boolean = _selected
-  def targetable              : Boolean = _targetable
-  def underAttack             : Boolean = _underAttack
-  def underDarkSwarm          : Boolean = _underDarkSwarm
-  def underDisruptionWeb      : Boolean = _underDisruptionWeb
-  def underStorm              : Boolean = _underStorm
+  @inline final def remainingTrainFrames    : Int     = _remainingTrainFrames
+  @inline final def remainingUpgradeFrames  : Int     = _remainingUpgradeFrames
+  @inline final def remainingTechFrames     : Int     = _remainingTechFrames
+  @inline final def beingConstructed        : Boolean = _beingConstructed
+  @inline final def beingGathered           : Boolean = _beingGathered
+  @inline final def beingHealed             : Boolean = _beingHealed
+  @inline final def blind                   : Boolean = _blind
+  @inline final def carryingGas             : Boolean = _carryingGas
+  @inline final def carryingMinerals        : Boolean = _carryingMinerals
+  @inline final def powered                 : Boolean = _powered
+  @inline final def selected                : Boolean = _selected
+  @inline final def targetable              : Boolean = _targetable
+  @inline final def underAttack             : Boolean = _underAttack
+  @inline final def underDarkSwarm          : Boolean = _underDarkSwarm
+  @inline final def underDisruptionWeb      : Boolean = _underDisruptionWeb
+  @inline final def underStorm              : Boolean = _underStorm
   
-  def addon: Option[UnitInfo] = _addon
-  def hasNuke: Boolean = false
-  def framesUntilRemoval: Int = _removalTimer
+  @inline final def addon: Option[UnitInfo] = _addon
+  @inline final def hasNuke: Boolean = false
+  @inline final def framesUntilRemoval: Int = _removalTimer
   
   // Cloaked units show up with 0 hit points/shields.
   // Presumably, if we've never seen them, then they're healthier than that.
-  //
-  def fixCloakedUnits() {
+  @inline final def fixCloakedUnits() {
     if (alive && cloaked && hitPoints == 0) {
       _hitPoints = unitClass.maxHitPoints
       _shieldPoints = unitClass.maxShields

@@ -54,9 +54,9 @@ class Team(val units: Vector[UnitInfo]) {
   // Width / 2   = 0 1 1 2 2 3 3  4  4  5  5  6  6  7  7
   // Width       = 1 2 3 4 5 6 7  8  9  10 11 12 13 14 15
   // Thus "width" = 2 * sqrt(sumDistance)
-  private def groundUnits = units.view.filterNot(_.flying)
-  val widthOrder          = new Cache(() => groundUnits.sortBy(_.positioningWidthCurrentCached().pixelDistanceSquared(lineWidth())).toVector)
-  val widthIdeal          = new Cache(() => groundUnits.map(_.unitClass.radialHypotenuse * 3).sum) // x3 = x2 for diameter, then x1.5 for spacing
+  private def groundCombatUnits = units.view.filter(u => u.canMove && u.unitClass.attacksOrCastsOrDetectsOrTransports && ! u.flying)
+  val widthOrder          = new Cache(() => groundCombatUnits.sortBy(_.positioningWidthCurrentCached().pixelDistanceSquared(lineWidth())).toVector)
+  val widthIdeal          = new Cache(() => groundCombatUnits.map(_.unitClass.radialHypotenuse * 3).sum) // x3 = x2 for diameter, then x1.5 for spacing
   val widthMeanExpected   = new Cache(() => widthIdeal() / 2)
   val widthMeanActual     = new Cache(() => PurpleMath.mean(units.view.map(_.positioningWidthCached())))
   val depthMean           = new Cache(() => ByOption.mean(units.view.flatMap(_.positioningDepthCached())).getOrElse(0d))

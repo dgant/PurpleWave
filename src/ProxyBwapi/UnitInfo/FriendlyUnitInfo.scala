@@ -32,7 +32,7 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
   
   override def updateCommon() {
     super.updateCommon()
-    knownToEnemyOnce = knownToEnemyOnce || visibleToOpponents
+    _knownToEnemyOnce = _knownToEnemyOnce || visibleToOpponents
   }
   
   ////////////
@@ -51,8 +51,8 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
 
   def visibility: Visibility.Value = if (alive) Visibility.Visible else Visibility.Dead
 
-  private var knownToEnemyOnce: Boolean = false
-  def knownToEnemy: Boolean = knownToEnemyOnce
+  private var _knownToEnemyOnce: Boolean = false
+  def knownToEnemy: Boolean = _knownToEnemyOnce
   
   //////////////
   // Statuses //

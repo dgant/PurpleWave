@@ -13,9 +13,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object BeAnArbiter extends Action {
 
-  override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.aliveAndComplete && unit.is(Protoss.Arbiter)
-  )
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.is(Protoss.Arbiter)
   
   protected def needsUmbrella(target: UnitInfo): Boolean =
     ! target.isAny(
@@ -39,8 +37,7 @@ object BeAnArbiter extends Action {
   override protected def perform(arbiter: FriendlyUnitInfo) {
     val umbrellaSearchRadius    = 32.0 * 20.0
     val threatened              = arbiter.matchups.framesOfSafety <= 12.0 && ! With.yolo.active()
-    val arbiters                = arbiter.teammates.filter(_.is(Protoss.Arbiter))
-    val needUmbrella            = arbiter.teammates.toSeq.filter(needsUmbrella)
+    val needUmbrella            = arbiter.teammates.view.filter(needsUmbrella)
     val needUmbrellaNearby      = needUmbrella.filter(_.pixelDistanceCenter(arbiter) < umbrellaSearchRadius)
     val needUmbrellaBadly       = needUmbrellaNearby.filter(_.friendly.forall(_.agent.umbrellas.isEmpty))
     val toUmbrella              = if (arbiter.matchups.enemies.exists(_.is(Terran.ScienceVessel))) needUmbrellaBadly else needUmbrellaNearby
@@ -61,7 +58,6 @@ object BeAnArbiter extends Action {
         needUmbrella.foreach(ally => if (ally.pixelDistanceCenter(someDestination) < 32 * 7) {
           ally.friendly.foreach(_.agent.addUmbrella(arbiter))
         })})
-
       arbiter.agent.toReturn = destination.orElse(
         Some(needUmbrella
           .minBy(_.pixelDistanceCenter(arbiter.agent.destination))

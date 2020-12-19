@@ -27,7 +27,7 @@ object PlacementProfiles {
       else
         factory
     }
-    else if (blueprint.building.attacks || blueprint.building == Zerg.CreepColony || blueprint.building == Protoss.ShieldBattery)
+    else if (blueprint.building.canAttack || blueprint.building == Zerg.CreepColony || blueprint.building == Protoss.ShieldBattery)
       defensive
     else
       tech

@@ -11,7 +11,7 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrades
-import Utilities.{ByOption, GameTime}
+import Utilities.{ByOption, GameTime, Minutes}
 import com.sun.management.OperatingSystemMXBean
 
 import scala.collection.mutable
@@ -71,7 +71,11 @@ class Storyteller {
     Story("Status",             () => With.blackboard.status.get.mkString(", ")),
     Story("Performance danger", () => With.performance.danger.toString)
   )
+
   var firstLog: Boolean = true
+  val performanceThresholds = Vector(
+    (Minutes(10), 24),
+    (Minutes(15), 24 * 10))
   def onFrame(): Unit = {
     if (firstLog) {
       firstLog = false
@@ -79,9 +83,16 @@ class Storyteller {
       logStrategyEvaluation()
       logStrategyInterest()
     }
-    stories.foreach(_.update())
-    logIntelligence()
-    logOurUnits()
+
+    if (performanceThresholds.exists(_._1() == With.frame)) {
+      tell("Storyteller moving to more intermittent updates")
+    }
+    val updateFrequency = ByOption.maxBy(performanceThresholds.filter(_._1() <= With.frame))(_._1()).map(_._2).getOrElse(1)
+    if (With.frame % updateFrequency == 0) {
+      stories.foreach(_.update())
+      logIntelligence()
+      logOurUnits()
+    }
   }
 
   var enemyUnitsBefore: Set[UnitClass] = Set.empty
@@ -124,7 +135,6 @@ class Storyteller {
       Seq(With.configuration.frameMillisecondLimit, With.performance.framesOverShort),
       Seq(1000, With.performance.framesOver1000),
       Seq(10000, With.performance.framesOver10000)).map(line => "Bot frames over " + line.head.toString + "ms: " + line.last.toString).mkString("\n"))
-
     tell(
       "The bot believes its performance"
       + (if (Main.configuration.getAsync) ", if running synchronously, would be " else " was ")

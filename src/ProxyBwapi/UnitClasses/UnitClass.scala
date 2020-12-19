@@ -57,9 +57,10 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   // Combat //
   ////////////
 
-  lazy val ranged: Boolean = rawCanAttack && pixelRangeMax > 32 * 2
-  lazy val melee: Boolean = rawCanAttack && !ranged
+  lazy val ranged: Boolean = canAttack && pixelRangeMax > 32 * 2
+  lazy val melee: Boolean = canAttack && ! ranged
   lazy val castsSpells: Boolean = spells.nonEmpty
+  lazy val attacksOrCastsOrDetectsOrTransports = canAttack || castsSpells || isDetector || isTransport
 
   lazy val suicides: Boolean = Array(
     Terran.SpiderMine,
@@ -142,7 +143,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     else if (this == Protoss.Reaver) 60
     else cooldownZeroBecomesInfinity(groundDamageCooldownRaw)
 
-  lazy val attacks: Boolean = attacksGround || attacksAir
+  lazy val canAttack: Boolean = attacksGround || attacksAir
   lazy val attacksGround: Boolean = effectiveGroundDamage > 0
   lazy val attacksAir: Boolean = effectiveAirDamage > 0
 
@@ -183,7 +184,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val isMinerals: Boolean = isMineralField
   lazy val isGas: Boolean = Vector(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this)
   lazy val isTownHall: Boolean = Vector(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this)
-  lazy val isStaticDefense: Boolean = (isBuilding && attacks || this == Terran.Bunker || this == Protoss.ShieldBattery) && this != Terran.SiegeTankSieged
+  lazy val isStaticDefense: Boolean = (isBuilding && canAttack || this == Terran.Bunker || this == Protoss.ShieldBattery) && this != Terran.SiegeTankSieged
   lazy val isTransport: Boolean = spaceProvided > 0 && isFlyer && this != Protoss.Carrier
   lazy val shootsScarabs: Boolean = this == Protoss.Reaver // Performance shortcut
 

@@ -22,7 +22,7 @@ object Kindle extends Action {
   def legalTarget(unit: FriendlyUnitInfo, target: UnitInfo): Boolean = (
     unit.matchups.allies.exists(_.is(Zerg.Zergling))
     || (
-      ( ! target.unitClass.attacks|| target.remainingCompletionFrames > unit.framesToTravelPixels(target.pixelRangeAgainst(unit)))
+      ( ! target.unitClass.canAttack|| target.remainingCompletionFrames > unit.framesToTravelPixels(target.pixelRangeAgainst(unit)))
       && unit.matchups.framesOfSafety > safetyMarginFrames
     )
   )

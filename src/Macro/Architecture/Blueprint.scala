@@ -42,7 +42,7 @@ class Blueprint(
   placement                   = placement                   .orElse(Some(PlacementProfiles.default(this)))
   respectHarvesting           = respectHarvesting           .orElse(Some( ! requireTownHallTile.get))
   marginPixels = marginPixels
-    .orElse(Some(building).filter(_.attacks).map(_.effectiveRangePixels.toDouble))
+    .orElse(Some(building).filter(_.canAttack).map(_.effectiveRangePixels.toDouble))
     .orElse(Some(building).filter(_ == Protoss.ShieldBattery).map(b => 0.0))
     .orElse(Some(building).filter(_ == Zerg.CreepColony).map(b => 32.0 * 7.0))
     .orElse(Some(32.0 * 11.0))

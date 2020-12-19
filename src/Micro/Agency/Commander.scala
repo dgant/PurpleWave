@@ -161,7 +161,7 @@ class Commander {
       PurpleMath.clamp(to.y, unit.unitClass.dimensionUp,   With.mapPixelHeight - unit.unitClass.dimensionDown))
 
     // Path around terrain (if we haven't already)
-    if ( ! unit.flying && unit.pixelDistanceTravelling(to) >= 2 * MicroPathing.waypointDistancePixels && With.reaction.agencyAverage < 6 && unit.zone != to.zone) {
+    if ( ! unit.flying && unit.pixelDistanceTravelling(to) >= 2 * MicroPathing.waypointDistancePixels && With.reaction.sluggishness < 2 && unit.zone != to.zone) {
       to = MicroPathing.getWaypointToPixel(unit, to)
     }
 
@@ -234,7 +234,7 @@ class Commander {
     } else if (unit.pixelDistanceCenter(to) > 3) {
       // When bot is slowing down, use attack-move
       if (unit.agent.shouldEngage
-        && With.reaction.agencyAverage > 12
+        && With.reaction.sluggishness >= 3
         && ! unit.unitClass.isWorker
         && unit.canAttack) {
         attackMove(unit, to)

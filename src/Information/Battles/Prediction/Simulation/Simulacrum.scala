@@ -197,7 +197,7 @@ class Simulacrum(
     // Use the positions of real units, rather than simulations, to determine altitude effects,
     // as units trivially cross terrain as part of simulation
     val damage            = realUnit.damageOnNextHitAgainst(victim.realUnit, Some(victim.shieldPoints), from = Some(realUnit.pixelCenter), to = Some(victim.realUnit.pixelCenter))
-    val damageTotal       = Math.min(victim.hitPoints, damage)
+    val damageTotal       = Math.min(victim.shieldPoints + victim.hitPoints, damage)
     val damageToShields   = Math.min(victim.shieldPoints, damageTotal)
     val damageToHitPoints = damageTotal - damageToShields
     val valueDamage       = damageTotal * victim.valuePerDamage * With.configuration.simulationDamageValueRatio

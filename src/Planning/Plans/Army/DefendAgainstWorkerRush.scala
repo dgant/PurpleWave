@@ -29,7 +29,7 @@ class DefendAgainstWorkerRush extends Plan {
     
     if (attackingWorkers.size < 3 || ourCombatUnits >= 3) return
       
-    var workersToDefend = attackingWorkers.size + 3 - ourCombatUnits * 2
+    val workersToDefend = attackingWorkers.size + 3 - ourCombatUnits * 2
     if (defenders.get.units.size > workersToDefend) {
       defenders.get.release()
     }

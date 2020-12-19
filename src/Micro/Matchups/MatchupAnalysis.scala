@@ -59,7 +59,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   }
 
   protected def splashFactorForUnits(targetsConsidered: Iterable[UnitInfo]): Double = {
-    PurpleMath.clamp(me.unitClass.splashFactor, 1.0, targetsConsidered.size)
+    if (With.reaction.sluggishness > 0) me.unitClass.splashFactor else PurpleMath.clamp(me.unitClass.splashFactor, 1.0, targetsConsidered.size)
   }
 
   def dpfDealingDiffused(target: UnitInfo): Double = {

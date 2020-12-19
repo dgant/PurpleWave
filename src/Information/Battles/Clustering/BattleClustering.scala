@@ -1,5 +1,6 @@
 package Information.Battles.Clustering
 
+import Information.Battles.BattleClassificationFilters
 import Information.Battles.Types.{BattleLocal, Team}
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -11,15 +12,15 @@ class BattleClustering {
   var lastClusterCompletion = 0
   val runtimes = new mutable.Queue[Int]
   
-  private var clusterInProgress:  BattleClusteringState = new BattleClusteringState()
-  private var clusterComplete:    BattleClusteringState = new BattleClusteringState()
+  private var clusterInProgress:  BattleClusteringState = new BattleClusteringState(Vector.empty)
+  private var clusterComplete:    BattleClusteringState = new BattleClusteringState(Vector.empty)
 
   def clusters: Vector[Iterable[UnitInfo]] = clusterComplete.clusters
   def isComplete: Boolean = clusterInProgress.isComplete
 
   def reset() {
     With.units.playerOwned.foreach(_.clusteringEnabled = false)
-    clusterInProgress = new BattleClusteringState()
+    clusterInProgress = new BattleClusteringState(With.units.playerOwned.view.filter(BattleClassificationFilters.isEligibleLocal).toVector)
   }
   
   def step() {

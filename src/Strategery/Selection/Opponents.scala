@@ -22,7 +22,7 @@ object Opponents {
   val stardust    : Opponent = add("Stardust",    new StrategySelectionRecommended(StrategySelectionGreedy(), PvP2GateDTExpand, PvP3rdBaseSlow))
   val steamhammer : Opponent = add("Steamhammer", new StrategySelectionRecommended(StrategySelectionDynamic,  PvZ2Gate1012, PvZ4GateGoon, PvZMidgame5GateGoonReaver, PvZLateGameReaver))
   val taij        : Opponent = add("Taij",        defaultPvT)
-  val willyt      : Opponent = add("WillyT",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvT28Nexus, PvT2BaseReaver, PvT3BaseArbiter))
+  val willyt      : Opponent = add("WillyT",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvT24Nexus, PvT2BaseReaver, PvT3BaseArbiter))
   val zzzkbot     : Opponent = add("ZZZKBot",     new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ1BaseForgeTech, PvZMidgameNeoBisu, PvZLateGameTemplar))
   val daqin       : Opponent = add("DaQin",       new StrategySelectionRecommended(StrategySelectionGreedy(), PvPRobo, PvP3rdBaseSlow))
   val ualbertabot : Opponent = add("UAlbertaBot", StrategySelectionFixed(PvR1BaseDT))

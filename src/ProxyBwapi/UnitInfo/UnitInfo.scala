@@ -651,13 +651,10 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   
   @inline final def isBeingViolentTo(victim: UnitInfo): Boolean = {
     isBeingViolent &&
-    //Are we capable of hurting the victim?
     isEnemyOf(victim) &&
     canAttack(victim) &&
-    //Are we not attacking anyone else?
-    ! target.exists(_ != victim) &&
-    //Are we close to being able to hit the victim?
-    framesToGetInRange(victim) < With.configuration.violenceThresholdFrames
+    target.forall(_ == victim) &&
+    framesToGetInRange(victim) < 48
   }
 
   def techProducing: Option[Tech]

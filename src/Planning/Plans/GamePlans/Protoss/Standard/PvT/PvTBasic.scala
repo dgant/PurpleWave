@@ -50,8 +50,7 @@ class PvTBasic extends GameplanTemplate {
   override def initialScoutPlan: Plan = new Parallel(
     new If(new EnemyIsRandom,                   new ScoutOn(Protoss.Pylon)), // Continue scouting from a PvR opening
     new If(new Employing(PvT13Nexus),           new ScoutOn(Protoss.Nexus, quantity = 2)),
-    new If(new Employing(PvT21Nexus),           new ScoutOn(Protoss.Gateway)),
-    new If(new Employing(PvT28Nexus),           new ScoutOn(Protoss.Gateway)),
+    new If(new Employing(PvT24Nexus),           new ScoutOn(Protoss.Gateway)),
     new If(new Employing(PvT32Nexus),           new ScoutOn(Protoss.Pylon)),
     new If(new Employing(PvT2GateRangeExpand),  new ScoutOn(Protoss.Pylon)),
     new If(new Employing(PvT1GateReaver),       new ScoutOn(Protoss.CyberneticsCore)),
@@ -78,8 +77,7 @@ class PvTBasic extends GameplanTemplate {
   override def buildOrderPlan: Plan = new Parallel(
     new ConsiderTakingFastSecondBase,
     new If(new Employing(PvT13Nexus),           new BuildOrder(ProtossBuilds.PvT13Nexus_GateCoreGateZ: _*)),
-    new If(new Employing(PvT21Nexus),           new BuildOrder(ProtossBuilds.PvT21Nexus: _*)),
-    new If(new Employing(PvT28Nexus),           new BuildOrder(ProtossBuilds.PvT28Nexus: _*)),
+    new If(new Employing(PvT24Nexus),           new BuildOrder(ProtossBuilds.PvT24Nexus: _*)),
     new If(new Employing(PvT32Nexus),           new BuildOrder(ProtossBuilds.PvT32Nexus: _*)),
     new If(new Employing(PvT2GateRangeExpand),  new BuildOrder(ProtossBuilds.PvT2GateRangeExpand: _*)),
     new If(new Employing(PvT1015DT),            new BuildOrder(ProtossBuilds.PvT1015GateGoonDT: _*)),
@@ -201,7 +199,7 @@ class PvTBasic extends GameplanTemplate {
   class ConsiderTakingFastSecondBase extends If(
     new And(
       new UnitsAtLeast(1, Protoss.CyberneticsCore),
-      new Employing(PvT21Nexus, PvT28Nexus, PvT32Nexus),
+      new Employing(PvT24Nexus, PvT32Nexus),
       new Not(new EnemyStrategy(With.fingerprints.bunkerRush, With.fingerprints.bbs, With.fingerprints.twoRax1113)),
       new Or(
         new EnemyNaturalConfirmed,
@@ -300,7 +298,7 @@ class PvTBasic extends GameplanTemplate {
           new If(
             new And(new GasForUpgrade(Protoss.DragoonRange), new UnitsAtLeast(1, Protoss.Dragoon)),
             new If(
-              new Employing(PvT21Nexus, PvT28Nexus, PvT32Nexus),
+              new Employing(PvT24Nexus, PvT32Nexus),
               new CapGasWorkersAt(1),
               new If(
                 new Employing(PvT1015Expand, PvT2GateRangeExpand),

@@ -65,5 +65,5 @@ class Team(val units: Vector[UnitInfo]) {
   val coherenceWidth      = new Cache(() => if (units.size == 1) 1 else Math.min(PurpleMath.nanToOne(widthMeanExpected() / widthMeanActual()), PurpleMath.nanToOne(widthMeanActual() / widthMeanExpected())))
   val coherenceDepth      = new Cache(() => PurpleMath.nanToOne(1 - depthSpread() / (depthSpread() + depthSpreadExpected())))
   val coherence           = new Cache(() => Math.max(coherenceWidth(), coherenceDepth()))
-  val impatience          = new Cache(() => units.flatMap(_.friendly.map(_.agent.impatience)).sum.toDouble / Math.max(1, units.size))
+  val impatience          = new Cache(() => units.view.flatMap(_.friendly.map(_.agent.impatience)).sum.toDouble / Math.max(1, units.size))
 }

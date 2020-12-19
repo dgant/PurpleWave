@@ -1,19 +1,15 @@
 package Information.Battles.Clustering
 
-import Information.Battles.BattleClassificationFilters
-import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
 
-class BattleClusteringState() {
+class BattleClusteringState(val seedUnits: Vector[UnitInfo]) {
 
   private var _clusters: Option[Vector[Iterable[UnitInfo]]] = None
   def clusters: Vector[Iterable[UnitInfo]] = _clusters.getOrElse(Vector.empty)
   def isComplete: Boolean = _clusters.isDefined
 
-
-  val seedUnits = With.units.playerOwned.view.filter(BattleClassificationFilters.isEligibleLocal).toVector
   val enemyQueue: mutable.Queue[UnitInfo] = mutable.Queue[UnitInfo]()
   val friendlyQueue: mutable.Queue[UnitInfo] = new mutable.Queue[UnitInfo]()
   seedUnits.foreach(u => {

@@ -138,7 +138,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     fightReason = ""
     tryingToMove = false
     actionsPerformed.clear()
-    _umbrellas.clear()
     _rideGoal = None
   }
 
@@ -169,16 +168,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   }
 
   def escalatePriority(newPriority: TrafficPriority): Unit = if (priority < newPriority) priority = newPriority
-
-  //////////////////////
-  // Arbiter coverage //
-  //////////////////////
-
-  private var _umbrellas = new ArrayBuffer[FriendlyUnitInfo]
-  def addUmbrella(umbrella: FriendlyUnitInfo): Unit = {
-    _umbrellas += umbrella
-  }
-  def umbrellas: Seq[FriendlyUnitInfo] = _umbrellas
 
   /////////////
   // Leading //

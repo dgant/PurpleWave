@@ -73,7 +73,7 @@ class LockUnits extends {
 
   protected def findMultipleFinalists(candidates: Iterable[FriendlyUnitInfo]): Seq[FriendlyUnitInfo] = {
 
-    val desiredUnits = With.recruiter.getUnits(this).to[mutable.ArrayBuffer]
+    val desiredUnits = new mutable.ArrayBuffer[FriendlyUnitInfo]()
 
     // Build a queue based on whether we need to sort it
     val (candidateQueue, dequeue, preference) =

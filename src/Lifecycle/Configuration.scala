@@ -46,17 +46,11 @@ class Configuration {
   var battleMarginTileMinimum       = 6
   var battleMarginTileMaximum       = 12 * 2 + 2 // A bit over double Siege Tank range
   var battleHysteresisFrames        = GameTime(0, 6)()
-  var baseThreshold                    = 0.04
+  var baseThreshold                 = 0.04
   var simulationFrames              = GameTime(0, 12)()
   var simulationEstimationPeriod    = 6
   var simulationBonusTankRange      = 64.0
   var simulationDamageValueRatio    = 0.1
-  
-  ///////////
-  // Micro //
-  ///////////
-
-  var violenceThresholdFrames         = GameTime(0, 2)()
   
   ///////////
   // Macro //
@@ -86,12 +80,11 @@ class Configuration {
   var urgencyGather             = 1
   var urgencyGeography          = 1
   var urgencyArchitecture       = 1
-  var urgencyGrids              = 2
-  var urgencyPlanning           = 5
-  var urgencySquads             = 20
+  var urgencyGrids              = 1
+  var urgencyPlanning           = 3
+  var urgencySquads             = 10
   var urgencyBattles            = 20
-  var urgencyUnitTracking       = 20
-  var urgencyMicro              = 50
+  var urgencyMicro              = 100
   
   ///////////////////
   // Visualization //

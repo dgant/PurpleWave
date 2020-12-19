@@ -96,7 +96,7 @@ object PvTIdeas {
       new WriteStatus("ReactToWorkerRush"),
       new Pump(Protoss.Probe, 9),
       new If(
-        new UnitsAtMost(5, UnitMatchWarriors),
+        new UnitsAtMost(3, UnitMatchWarriors),
         new CancelIncomplete(Protoss.Nexus)),
       new CapGasAt(50),
       new If(

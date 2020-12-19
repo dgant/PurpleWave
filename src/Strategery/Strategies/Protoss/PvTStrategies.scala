@@ -32,18 +32,7 @@ object PvT13Nexus extends PvTBasicOpener {
     With.fingerprints.bunkerRush,
     With.fingerprints.twoRax1113)
 }
-object PvT21Nexus extends PvTBasicOpener {
-  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
-    With.fingerprints.fiveRax,
-    With.fingerprints.bbs,
-    With.fingerprints.bunkerRush,
-    With.fingerprints.twoRax1113,
-    With.fingerprints.twoFac,
-    With.fingerprints.twoFacVultures,
-    With.fingerprints.threeFac,
-    With.fingerprints.threeFacVultures)
-}
-object PvT28Nexus extends PvTBasicOpener
+object PvT24Nexus extends PvTBasicOpener
 object PvT32Nexus extends PvTBasicOpener {
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.wallIn

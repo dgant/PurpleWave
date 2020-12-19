@@ -58,22 +58,24 @@ object Target extends {
 
   @inline final def score(attacker: FriendlyUnitInfo, target: UnitInfo): Double = {
     val framesOfFreedom = attacker.cooldownLeft
-    val framesOutOfWayToShoot = if (attacker.canMove) Math.max(0, attacker.framesToGetInRange(target) - framesOfFreedom) else 0
+    val framesOutOfWay = if (attacker.canMove) Math.max(0, attacker.framesToGetInRange(target) - framesOfFreedom) else 0
     val scoreBasic = baseAttackerToTargetValue(
       baseTargetValue = target.targetBaseValue(),
       totalHealth = target.totalHealth,
-      framesOutOfTheWay = framesOutOfWayToShoot,
+      framesOutOfTheWay = framesOutOfWay,
       dpf = attacker.dpfOnNextHitAgainst(target))
     val preferences = TargetFilterGroups.filtersPreferred.view.filter(_.appliesTo(attacker)).count(_.legal(attacker, target))
     val preferenceBonus = Math.pow(100, preferences)
     val firingPixel = attacker.pixelToFireAt(target)
     val firingPixelDistance = attacker.pixelDistanceCenter(firingPixel)
     val firingPixelFrames = firingPixelDistance / (0.0001 + attacker.topSpeed)
-    val threatPenalty = 1 + attacker.matchups.threats.count(threat =>
+    val threatPenalty = if (With.reaction.sluggishness < 2)
+      1 + attacker.matchups.threats.count(threat =>
       threat.inRangeToAttack(
         attacker,
         threat.pixelCenter.project(firingPixel, Math.min(attacker.pixelDistanceCenter(firingPixel), attacker.topSpeed * firingPixelFrames)),
         firingPixel))
+    else framesOutOfWay
     val output = scoreBasic * preferenceBonus / threatPenalty
     output
   }
@@ -128,7 +130,7 @@ object Target extends {
     }
 
     // Immediate combat value bonus
-    val hurtingUsBonus = target.matchups.targetsInRange.nonEmpty || (target.energy > 40 && ! target.isAny(Terran.Wraith, Protoss.Corsair))
+    val hurtingUsBonus = target.presumptiveTarget.exists(target.inRangeToAttack)
     if (hurtingUsBonus) {
       output *= 1.25
     }
@@ -139,7 +141,7 @@ object Target extends {
     }
 
     // Anti-air bonus
-    val antiAirBonus = target.attacksAgainstAir > 0 && target.matchups.targets.exists(t => t.flying && t.attacksAgainstGround > 0)
+    val antiAirBonus = target.attacksAgainstAir > 0 && target.presumptiveTarget.exists(t => t.flying && t.attacksAgainstGround > 0)
     if (antiAirBonus) {
       output *= 2.0
     }
@@ -149,7 +151,7 @@ object Target extends {
     }
 
     // Visibility bonus
-    if (target.visibleToOpponents) {
+    if (target.visible) {
       output *= 2.0
     }
     if (target.likelyStillThere) {
@@ -157,25 +159,39 @@ object Target extends {
     }
 
     // Temporary visibility bonus
-    val temporarilyVisible = (target.cloaked || target.burrowed) && target.matchups.enemyDetectors.forall(_.isScannerSweep())
+    val temporarilyVisible = (
+      (target.cloaked || target.burrowed)
+      && With.self.isTerran
+      && With.units.existsOurs(Terran.SpellScannerSweep))
     if (temporarilyVisible) {
       output *= 2.0
     }
 
     // Detection bonus
-    val weHaveCloakedThreat = target.matchups.enemies.exists(e => e.cloaked && e.matchups.targets.nonEmpty) && ! target.matchups.enemies.exists(_.isArbiter())
+    val aggressivelyDenyDetection = With.reaction.sluggishness > 0
+    val weHaveCloakedThreat = if (aggressivelyDenyDetection)
+      target.matchups.enemies.exists(e => e.cloaked && e.matchups.targets.nonEmpty) && ! target.matchups.enemies.exists(_.isArbiter())
+    else (
+      With.self.hasTech(Terran.WraithCloak)
+      || With.self.hasTech(Zerg.LurkerMorph)
+      || With.units.existsOurs(Protoss.Arbiter)
+      || With.units.existsOurs(Protoss.DarkTemplar))
     if (weHaveCloakedThreat) {
       val building = target.constructing || target.repairing
       val buildTarget = if (building) target.target else None
       val detects = aidsDetection(target) || buildTarget.exists(aidsDetection)
       if (detects) {
-        output *= 40.0
+        if (aggressivelyDenyDetection) {
+          output *= 40.0
+        } else {
+          output *= 4.0
+        }
       }
     }
 
     // Cloaked bonus
     // Prefer taking out cloaked units before any detection is eliminated
-    if (target.cloaked && target.matchups.threats.nonEmpty && target.matchups.enemyDetectors.forall(_.matchups.threats.nonEmpty) && target.matchups.nearestArbiter.isEmpty) {
+    if (target.cloaked && ! With.units.existsEnemy(Protoss.Arbiter)) {
       output *= 2.0
     }
 

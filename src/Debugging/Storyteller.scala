@@ -69,7 +69,8 @@ class Storyteller {
     Story("Should attack",      () => With.blackboard.wantToAttack.get.toString),
     Story("Fingerprints",       () => With.fingerprints.status.mkString(" ")),
     Story("Status",             () => With.blackboard.status.get.mkString(", ")),
-    Story("Performance danger", () => With.performance.danger.toString)
+    Story("Performance danger", () => With.performance.danger.toString),
+    Story("Sluggishness",       () => With.reaction.sluggishness.toString)
   )
 
   var firstLog: Boolean = true

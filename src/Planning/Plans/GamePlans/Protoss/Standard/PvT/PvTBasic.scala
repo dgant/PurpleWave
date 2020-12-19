@@ -72,7 +72,7 @@ class PvTBasic extends GameplanTemplate {
         new UpgradeStarted(Protoss.DragoonRange)),
       new PvTIdeas.AttackSafely))
 
-  override def emergencyPlans: Seq[Plan] = Vector(new PvTIdeas.ReactToBBS, new PvTIdeas.ReactToWorkerRush)
+  override def emergencyPlans: Seq[Plan] = Vector(new PvTIdeas.ReactToBBS, new PvTIdeas.ReactToBunkerRush, new PvTIdeas.ReactToWorkerRush)
 
   override def buildOrderPlan: Plan = new Parallel(
     new ConsiderTakingFastSecondBase,

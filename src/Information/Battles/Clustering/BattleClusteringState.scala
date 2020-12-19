@@ -45,7 +45,6 @@ class BattleClusteringState(val seedUnits: Vector[UnitInfo]) {
       b.cluster = a.cluster
     }
   }
-
   private def linkEnemy(): Unit = {
     val enemy = enemyQueue.dequeue()
     friendlyQueue.foreach(friendly => {
@@ -54,7 +53,7 @@ class BattleClusteringState(val seedUnits: Vector[UnitInfo]) {
         link(enemy, friendly)
       }
     })
-    friendlyQueue.foreach(other => {
+    enemyQueue.foreach(other => {
       if (enemy.unitClass.attacksOrCastsOrDetectsOrTransports || other.unitClass.attacksOrCastsOrDetectsOrTransports) {
         val distanceSquared = enemy.pixelDistanceSquared(other)
         if (distanceSquared < enemy.clusteringRadiusSquared || distanceSquared < other.clusteringRadiusSquared) {

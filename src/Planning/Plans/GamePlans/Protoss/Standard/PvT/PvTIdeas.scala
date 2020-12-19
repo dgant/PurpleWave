@@ -19,7 +19,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
-import Utilities.GameTime
+import Utilities.{GameTime, Minutes}
 
 object PvTIdeas {
 
@@ -117,6 +117,18 @@ object PvTIdeas {
       new PumpWorkers,
       new BuildHuggingNexus,
       new Build(Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore), Get(2, Protoss.Pylon), Get(2, Protoss.Gateway), Get(Protoss.DragoonRange))))
+
+  class ReactToBunkerRush extends If(
+    new And(
+      new EnemyStrategy(With.fingerprints.bunkerRush),
+      new FrameAtMost(Minutes(7)()),
+      new Or(
+        new EnemiesAtLeast(1, UnitMatchAnd(Terran.Bunker, UnitMatchProxied)),
+        new EnemiesAtLeast(1, Terran.Marine))),
+    new If(
+      new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
+      new Pump(Protoss.Dragoon, 3),
+      new Pump(Protoss.Zealot, 3)))
 
   class ReactToBBS extends If(
     new And(

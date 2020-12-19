@@ -71,7 +71,7 @@ object Bust extends Action {
       val bunker = unit.agent.toAttack.get
       val range = unit.pixelRangeAgainst(bunker)
       val bunkerDistance = unit.pixelDistanceEdge(bunker)
-      def stationAcceptable(pixel: Pixel) = pixel.walkable && ! unit.matchups.allies.exists(a => ! a.flying && a.pixelDistanceEdge(unit, pixel) <= 0)
+      def stationAcceptable(pixel: Pixel) = pixel.walkable && ! unit.matchups.allies.exists(a => ! a.flying && a.pixelDistanceEdge(unit, pixel) < 4)
       var station = Some(unit.pixelCenter.project(bunker.pixelCenter, Math.max(4, bunkerDistance - range))).filter(stationAcceptable)
       if (station.isEmpty && bunkerDistance > range + 32) {
         val stationCount = 64

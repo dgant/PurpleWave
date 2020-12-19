@@ -32,8 +32,7 @@ object Gather extends Action {
       lazy val baseRemote = ByOption.minBy(With.geography.ourBases.filterNot(baseOriginal.contains))(_.heart.groundPixels(baseOriginal.map(_.heart).getOrElse(resource.tileTopLeft)))
       lazy val basePaired = baseOpposite.orElse(baseRemote)
       if (
-        unit.visibleToOpponents
-        && basePaired.exists(_.owner.isUs)
+        basePaired.exists(_.owner.isUs)
         && unit.matchups.threats.exists(threat => ! threat.unitClass.isWorker && threat.pixelsToGetInRange(unit, resource.pixelCenter) < defenseRadiusPixels)) {
         unit.agent.toGather = ByOption.minBy(basePaired.get.minerals.filter(_.alive))(_.pixelDistanceEdge(unit)).orElse(unit.agent.toGather)
       }

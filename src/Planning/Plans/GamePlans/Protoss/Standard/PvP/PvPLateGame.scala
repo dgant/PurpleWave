@@ -196,7 +196,7 @@ class PvPLateGame extends GameplanTemplate {
   override def buildPlans: Seq[Plan] = Seq(
     new CapGasAt(500),
     new FinishDarkTemplarRush,
-    new If(new Not(new NeedToCutWorkersForGateways), new PumpWorkers),
+    new If(new Not(new NeedToCutWorkersForGateways), new PumpWorkers(maximumConcurrently = 1)),
     new Build(Get(Protoss.Pylon), Get(Protoss.Gateway), Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore), Get(Protoss.DragoonRange), Get(2, Protoss.Gateway)),
 
     // Detection

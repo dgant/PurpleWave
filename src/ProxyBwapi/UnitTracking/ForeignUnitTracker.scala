@@ -149,12 +149,10 @@ class ForeignUnitTracker {
 
     // If we haven't seen a unit in a long time, treat it as missing,
     // which indicates distrust of its predicted location
-    if ( ! unit.lastSeenWithin(Seconds(20)()) && ! unit.base.exists(_.owner == unit.player)) {
+    if ( ! unit.lastSeenWithin(Seconds(60)()) && ! unit.base.exists(_.owner == unit.player)) {
       unit.setVisbility(Visibility.InvisibleMissing)
       return
     }
-
-
 
     // Predict the unit's location
     // If we fail to come up with a reasonable prediction, treat the unit as missing

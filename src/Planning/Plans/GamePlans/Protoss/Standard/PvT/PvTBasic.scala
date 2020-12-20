@@ -9,7 +9,6 @@ import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{Or, Parallel, _}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTIdeas.PvTAttack
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
@@ -58,24 +57,16 @@ class PvTBasic extends GameplanTemplate {
     new If(new Employing(PvTDTExpand),          new ScoutOn(Protoss.CyberneticsCore)))
 
   override val priorityAttackPlan = new PvTIdeas.PriorityAttacks
-  override val attackPlan = new Parallel(
-    // COG 2019 hack -- Don't get locked in our base
-    new If(
-      new And(
-        new Latch(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true)),
-        new BasesAtMost(1)),
-      new PvTAttack),
-    new If(
-      new Or(
-        new Not(new Employing(PvTDTExpand, PvT1GateReaver)),
-        new Latch(new UnitsAtLeast(1, UnitMatchOr(Protoss.DarkTemplar, Protoss.Reaver), complete = true)),
-        new UpgradeStarted(Protoss.DragoonRange)),
-      new PvTIdeas.AttackSafely))
+  override val attackPlan = new If(
+    new Or(
+      new Not(new Employing(PvTDTExpand, PvT1GateReaver)),
+      new Latch(new UnitsAtLeast(1, UnitMatchOr(Protoss.DarkTemplar, Protoss.Reaver), complete = true)),
+      new UpgradeStarted(Protoss.DragoonRange)),
+    new PvTIdeas.AttackSafely)
 
   override def emergencyPlans: Seq[Plan] = Vector(new PvTIdeas.ReactToBBS, new PvTIdeas.ReactToBunkerRush, new PvTIdeas.ReactToWorkerRush)
 
   override def buildOrderPlan: Plan = new Parallel(
-    new ConsiderTakingFastSecondBase,
     new If(new Employing(PvT13Nexus),           new BuildOrder(ProtossBuilds.PvT13Nexus_GateCoreGateZ: _*)),
     new If(new Employing(PvT24Nexus),           new BuildOrder(ProtossBuilds.PvT24Nexus: _*)),
     new If(new Employing(PvT32Nexus),           new BuildOrder(ProtossBuilds.PvT32Nexus: _*)),
@@ -194,17 +185,8 @@ class PvTBasic extends GameplanTemplate {
     new If(new EmployingCarriers, new UpgradeContinuously(Protoss.Shields, 1)),
     new GatewayUpgrades,
     new If(new And(new EnemiesAtLeast(3, Terran.SpiderMine), new GasPumpsAtLeast(3)), new UpgradeContinuously(Protoss.ObserverSpeed)),
+    new If(new And(new EnemiesAtLeast(3, Terran.SpiderMine), new GasPumpsAtLeast(3)), new If(new UpgradeComplete(Protoss.ObserverSpeed), new UpgradeContinuously(Protoss.ObserverVisionRange))),
     new If(new UnitsAtLeast(2, Protoss.Reaver), new UpgradeContinuously(Protoss.ScarabDamage)))
-
-  class ConsiderTakingFastSecondBase extends If(
-    new And(
-      new UnitsAtLeast(1, Protoss.CyberneticsCore),
-      new Employing(PvT24Nexus, PvT32Nexus),
-      new Not(new EnemyStrategy(With.fingerprints.bunkerRush, With.fingerprints.bbs, With.fingerprints.twoRax1113)),
-      new Or(
-        new EnemyNaturalConfirmed,
-        new EnemiesAtLeast(1, Terran.Bunker))),
-    new RequireBases(2))
 
   class ConsiderTakingFastThirdBase extends If(
     new And(
@@ -317,7 +299,7 @@ class PvTBasic extends GameplanTemplate {
               new CapGasAt(250)),
             new If(
               new UnitsAtMost(45, UnitMatchWorkers),
-              new CapGasAt(500))))),
+              new CapGasAt(400))))),
 
     // Scout with Observer
     new If(

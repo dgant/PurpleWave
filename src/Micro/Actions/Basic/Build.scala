@@ -13,10 +13,7 @@ import Utilities.ByOption
 
 object Build extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.agent.toBuild.isDefined &&
-    unit.agent.toBuildTile.isDefined
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.agent.toBuild.isDefined && unit.agent.toBuildTile.isDefined
   
   override def perform(unit: FriendlyUnitInfo) {
     

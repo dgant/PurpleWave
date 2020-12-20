@@ -183,7 +183,7 @@ object PvZIdeas {
       new Pump(Protoss.DarkTemplar, 3),
       new Pump(Protoss.DarkTemplar, 1)),
     new If(
-      new Employing(PvZLateGameReaver, PvZLateGameCarrier),
+      new Employing(PvZLateGameReaver),
       new Parallel(
         new PumpShuttleAndReavers(6),
         new If(

@@ -4,6 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Mathematics.PurpleMath
 import Performance.Cache
+import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
@@ -66,4 +67,5 @@ class Team(val units: Vector[UnitInfo]) {
   val coherenceDepth      = new Cache(() => PurpleMath.nanToOne(1 - depthSpread() / (depthSpread() + depthSpreadExpected())))
   val coherence           = new Cache(() => Math.max(coherenceWidth(), coherenceDepth()))
   val impatience          = new Cache(() => units.view.flatMap(_.friendly.map(_.agent.impatience)).sum.toDouble / Math.max(1, units.size))
+  val totalArmyFraction   = new Cache(() => units.view.filter(_.is(UnitMatchWarriors)).map(_.subjectiveValue).sum / Math.max(1d, With.units.ours.view.filter(_.is(UnitMatchWarriors)).map(_.subjectiveValue).sum))
 }

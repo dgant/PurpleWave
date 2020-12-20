@@ -44,12 +44,11 @@ object StrategyGroups {
     PvZDT,       // Requires better micro on one base
     PvZCorsair,  // Requires better micro on one base
     PvZSpeedlot, // Requires better micro on one base
-    PvZGatewayFE, // Execution needs work; in particular, Zealots need to protect cannons
-    PvZMidgame4Gate2Archon,
-    PvZMidgameNeoNeoBisu,
-    PvZMidgameCorsairReaverGoon, // Too fragile
-    PvZMidgameCorsairReaverZealot, // Too fragile; especially bad at dealing with Mutalisks
-    PvZLateGameCarrier, // Needs island tech
+
+    // Experimentally reenabling these 12-19-2020
+    //PvZGatewayFE, // Execution needs work; in particular, Zealots need to protect cannons
+    //PvZMidgameCorsairReaverGoon, // Too fragile
+    //PvZMidgameCorsairReaverZealot, // Too fragile; especially bad at dealing with Mutalisks
 
     ZvTProxyHatchZerglings,
     ZvTProxyHatchHydras,

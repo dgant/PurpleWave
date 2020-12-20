@@ -14,7 +14,7 @@ import Planning.Predicates.Reactive.EnemyMutalisks
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Protoss.{PvZLateGameCarrier, PvZMidgameCorsairReaverGoon, PvZMidgameCorsairReaverZealot}
+import Strategery.Strategies.Protoss.{PvZMidgameCorsairReaverGoon, PvZMidgameCorsairReaverZealot}
 
 class PvZCorsairReaver extends GameplanTemplate {
 
@@ -44,10 +44,6 @@ class PvZCorsairReaver extends GameplanTemplate {
         new Attack,
         new PvZRequireMiningBases(3))),
     new If(
-      new Employing(PvZLateGameCarrier),
-      new PumpShuttleAndReavers(shuttleFirst = false),
-      new PumpShuttleAndReavers),
-    new If(
       new Or(
         new Employing(PvZMidgameCorsairReaverGoon),
         new UpgradeStarted(Protoss.ShuttleSpeed)),
@@ -64,9 +60,7 @@ class PvZCorsairReaver extends GameplanTemplate {
       Get(Protoss.Stargate),
       Get(Protoss.RoboticsFacility)),
     new If(
-      new Or(
-        new EnemyMutalisks,
-        new Employing(PvZLateGameCarrier)),
+      new EnemyMutalisks,
       new UpgradeContinuously(Protoss.AirDamage),
       new BuildOrder(Get(Protoss.Shuttle))),
     new BuildOrder(

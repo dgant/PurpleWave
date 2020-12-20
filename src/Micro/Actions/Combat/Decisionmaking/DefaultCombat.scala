@@ -13,8 +13,8 @@ import Micro.Actions.Commands.Move
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.{Push, TrafficPriorities, TrafficPriority}
 import Micro.Heuristics.Potential
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.{ByOption, Seconds}
 
 object DefaultCombat extends Action {
@@ -35,10 +35,6 @@ object DefaultCombat extends Action {
   private object Regroup    extends Technique(Dodge, Excuse, Abuse) // Get into ideal position for future fight
   private object Flee       extends Technique(Dodge, Abuse, Fallback, Regroup) // Get out of fight
   private object Fight      extends Technique(Dodge, Excuse, Abuse, Dance, Flee) // Pick fight ASAP
-
-  @inline final protected def canAbuse(unit: FriendlyUnitInfo, target: UnitInfo): Boolean = {
-    ( ! target.canAttack(unit)) || (unit.topSpeed > target.topSpeed && unit.pixelRangeAgainst(target) > target.pixelRangeAgainst(unit))
-  }
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     var technique: Technique = if (unit.agent.shouldEngage) Fight else Flee
@@ -96,34 +92,38 @@ object DefaultCombat extends Action {
       doTransition
     }
 
+    lazy val safetyMargin = 64 - Math.min(0, unit.confidence()) * 256
+
     transition(Dodge, () => unit.canMove && receivedPushPriority >= TrafficPriorities.Dodge, () => dodge())
     transition(Aim, () => ! unit.canMove || purring, () => aim())
-    transition(Regroup, () => ! unit.agent.shouldEngage && unit.matchups.pixelsOfEntanglement < -64)
+    transition(Regroup, () => ! unit.agent.shouldEngage && unit.matchups.pixelsOfEntanglement < -safetyMargin)
     transition(Regroup, () =>   unit.agent.shouldEngage && unit.battle.map(_.us).exists(team => ! team.engaged() && team.coherence() + team.impatience() / Seconds(20)() < unit.confidence()))
 
     // Evaluate potential attacks
     Target.choose(unit)
 
+    // Don't run into combat if we have no purpose.
+    // This includes casters.
     transition(
       Flee,
-      () => unit.agent.toAttack.isEmpty && unit.matchups.pixelsOfEntanglement > -128)
+      () => unit.agent.toAttack.isEmpty && unit.matchups.pixelsOfEntanglement > -safetyMargin && unit.matchups.targets.isEmpty)
 
     lazy val framesToGetInRangeOfTarget = unit.agent.toAttack.map(unit.framesToGetInRange)
-    transition(
-      Abuse,
-      () =>
-        unit.agent.toAttack.exists(canAbuse(unit, _))
-        && unit.matchups.threats.forall(t => canAbuse(unit, t) || t.framesToGetInRange(unit) > 12 + framesToGetInRangeOfTarget.get))
+    lazy val targetAbusable = unit.agent.toAttack.exists(target => ! target.canAttack(unit) || (unit.topSpeed > target.topSpeed && unit.pixelRangeAgainst(target) > target.pixelRangeAgainst(unit)))
+    lazy val canKite = unit.agent.toAttack.exists(target => {
+      val frames = unit.framesToGetInRange(target) + unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate
+      unit.matchups.threats.forall(_.pixelsToGetInRange(unit) > frames)
+    })
+    transition(Abuse, () => unit.unitClass.abuseAllowed && targetAbusable && canKite)
 
     transition(
       Fallback,
       () =>
-        // Units that can decently shoot while running
-        unit.isAny(Terran.Marine, Terran.Vulture, Terran.SiegeTankUnsieged, Terran.Goliath, Terran.Wraith, Protoss.Archon, Protoss.Dragoon, Protoss.Reaver, Protoss.Scout, Zerg.Hydralisk)
+        // Units that can decently attack while running
+        unit.unitClass.fallbackAllowed
         // It's worth shooting even if we're blocking retreaters
-        && (unit.isAny(Terran.SiegeTankUnsieged, Terran.Goliath, Protoss.Reaver) || receivedPushPriority < TrafficPriorities.Shove)
-        // Shooting won't delay our retreat, or it's worth doing so anyway
-        && (unit.zone == unit.agent.origin.zone || ! unit.isAny(Protoss.Archon, Protoss.Dragoon) || ! unit.matchups.threats.exists(t => t.is(Protoss.Dragoon) && t.framesToGetInRange(t) < 12)))
+        && (unit.isAny(Terran.SiegeTankUnsieged, Terran.Goliath, Protoss.Reaver)
+          || (receivedPushPriority < TrafficPriorities.Shove && ! unit.matchups.threatsInRange.forall(_.topSpeed > unit.topSpeed))))
 
     transition(Dance, () => unit.agent.toAttack.map(unit.pixelRangeAgainst).exists(_ > 64))
 
@@ -173,7 +173,7 @@ object DefaultCombat extends Action {
     if (goalEngage && ! unit.flying && unit.agent.toAttack.exists( ! unit.inRangeToAttack(_))) unit.agent.escalatePriority(TrafficPriorities.Nudge)
 
     // Shove if we're retreating and endangered
-    if ((goalHover || goalRetreat) && ! unit.flying) unit.agent.escalatePriority(if (unit.matchups.pixelsOfEntanglement >= -64) TrafficPriorities.Shove else TrafficPriorities.Bump)
+    if ((goalHover || goalRetreat) && ! unit.flying) unit.agent.escalatePriority(if (unit.matchups.pixelsOfEntanglement >= -safetyMargin) TrafficPriorities.Shove else TrafficPriorities.Bump)
 
     // TODO: Find smarter firing positions. Find somewhere safe and unoccupied but not too far to stand.
     lazy val firingPosition: Option[Pixel] =

@@ -82,9 +82,11 @@ object PvTIdeas {
         new EnemyStrategy(With.fingerprints.fiveRax),
         new FramesUntilUnitAtLeast(Protoss.CyberneticsCore, Protoss.Zealot.buildFrames / 3)),
       new BuildOrder(Get(2, Protoss.Zealot))),
-    new If(
-      new EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113),
-      new DefendFightersAgainstRush))
+    new Parallel(
+      new WriteStatus("ReactToFiveRaxAs2GateCore"),
+      new If(
+        new EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113),
+        new DefendFightersAgainstRush)))
 
   class ReactToWorkerRush extends If(
     new And(
@@ -125,10 +127,12 @@ object PvTIdeas {
       new Or(
         new EnemiesAtLeast(1, UnitMatchAnd(Terran.Bunker, UnitMatchProxied)),
         new EnemiesAtLeast(1, Terran.Marine))),
-    new If(
-      new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
-      new Pump(Protoss.Dragoon, 3),
-      new Pump(Protoss.Zealot, 3)))
+    new Parallel(
+      new WriteStatus("ReactToBunkerRush"),
+      new If(
+        new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
+        new Pump(Protoss.Dragoon, 3),
+        new Pump(Protoss.Zealot, 3))))
 
   class ReactToBBS extends If(
     new And(
@@ -205,8 +209,8 @@ object PvTIdeas {
     new Pump(Protoss.Scout, 5))
 
   class TrainGatewayUnits extends Parallel(
-    new PumpRatio(Protoss.Dragoon, 0, 100, Seq(Enemy(Terran.Wraith, 1.0), Enemy(Terran.Battlecruiser, 5.0))),
-    new PumpRatio(Protoss.Dragoon, 0, 24, Seq(Flat(3.0), Enemy(Terran.Vulture, .75))),
+    new PumpRatio(Protoss.Dragoon, 0, 100, Seq(Enemy(Terran.Wraith, 2.0), Enemy(Terran.Battlecruiser, 5.0))),
+    new PumpRatio(Protoss.Dragoon, 8, 24, Seq(Flat(4.0), Enemy(Terran.Vulture, .75))),
     new If(
       new EnemyStrategy(With.fingerprints.bio),
       new Parallel(
@@ -219,7 +223,7 @@ object PvTIdeas {
             Enemy(UnitMatchSiegeTank, 2.5),
             Enemy(Terran.Goliath,     1.5),
             Enemy(Terran.Marine,      1.0),
-            Enemy(Terran.Vulture,     -1.0)))),
+            Enemy(Terran.Vulture,     -1.25)))),
         new If(new GasAtLeast(800), new Pump(Protoss.HighTemplar, 6, maximumConcurrently = 2)),
         new If(new Employing(PvEStormYes), new PumpRatio(Protoss.HighTemplar, 0, 4, Seq(Flat(-2.0), Friendly(UnitMatchWarriors, 0.1)))),
         new Pump(Protoss.Dragoon))))

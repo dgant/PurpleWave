@@ -58,8 +58,10 @@ object MicroPathing {
 
   // More rays = more accurate movement, but more expensive
   // 8 is definitely too little for competent mvoement
-  private val rays = 32
-  private val rayRadians = (0 until rays).map(_ * 2 * Math.PI / rays - Math.PI).toVector.sortBy(Math.abs)
+  private def rayRadiansN(rays: Int) = (0 until rays).map(_ * 2 * Math.PI / rays - Math.PI).toVector.sortBy(Math.abs)
+  private val rayRadians12 = rayRadiansN(12)
+  private val rayRadians16 = rayRadiansN(16)
+  private val rayRadians32 = rayRadiansN(32)
   def getWaypointInDirection(unit: FriendlyUnitInfo, radians: Double, mustApproach: Option[Pixel] = None, requireSafety: Boolean = false): Option[Pixel] = {
     lazy val safetyPixels =  unit.matchups.pixelsOfEntanglement
     lazy val travelDistanceCurrent = mustApproach.map(unit.pixelDistanceTravelling)
@@ -74,6 +76,7 @@ object MicroPathing {
 
     val rayStart = unit.pixelCenter
     val waypointDistance = Math.max(waypointDistancePixels, if (requireSafety) 64 + safetyPixels else 0)
+    val rayRadians = if (With.reaction.sluggishness <= 1) rayRadians32 else if (With.reaction.sluggishness <= 2) rayRadians16 else rayRadians12
     val terminus = rayRadians
       .indices
       .view

@@ -39,19 +39,14 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   // Movement //
   //////////////
 
-  lazy val accelerationFrames: Int =
-    if (acceleration > 1)
-      Math.ceil(256.0 * topSpeed / acceleration).toInt
-    else
-      8 // Arbitrary
-
+  lazy val accelerationFrames: Int = if (acceleration > 1) Math.ceil(256.0 * topSpeed / acceleration).toInt else 1
   lazy val framesToTurn180: Int = framesToTurn(Math.PI)
 
-  def framesToTurn(radians: Double): Int = Math.abs(PurpleMath.nanToZero(Math.ceil(128.0 * radians / Math.PI / turnRadius))).toInt
+  def framesToTurn(radians: Double): Int = Math.abs(PurpleMath.nanToZero(Math.ceil(127.0 * PurpleMath.normalizeAroundZero(radians) / Math.PI / turnRadius))).toInt
 
-  lazy val needsToTurnToShoot = !Vector(Terran.Goliath, Terran.SiegeTankUnsieged, Protoss.Dragoon).contains(this)
+  lazy val needsToTurnToShoot = ! Vector(Terran.Goliath, Terran.SiegeTankUnsieged, Protoss.Dragoon).contains(this)
   lazy val framesToTurnAndShootAndTurnBackAndAccelerate: Int = stopFrames + accelerationFrames + (if (needsToTurnToShoot) framesToTurn180 else 0)
-  lazy val hasMomentum = isFlyer || isWorker || floats
+  lazy val hasMomentum = isFlyer || floats
 
   ////////////
   // Combat //
@@ -80,9 +75,9 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     .contains(this)
 
   lazy val triggersSpiderMines: Boolean = (
-    !floats
-      && !isFlyer
-      && !isBuilding)
+    ! floats
+      && ! isFlyer
+      && ! isBuilding)
 
   lazy val splashesFriendly: Boolean = Array(
     Terran.SiegeTankSieged,
@@ -494,6 +489,30 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val spells: Array[Tech] =
     if (this == Terran.Battlecruiser) Array(Terran.Yamato) else if (this == Terran.Ghost) Array(Terran.GhostCloak, Terran.Lockdown, Terran.NuclearStrike) else if (this == Terran.Medic) Array(Terran.Healing, Terran.OpticalFlare, Terran.Restoration) else if (this == Terran.ScienceVessel) Array(Terran.DefensiveMatrix, Terran.EMP, Terran.Irradiate) else if (this == Terran.Wraith) Array(Terran.WraithCloak) else if (this == Protoss.Arbiter) Array(Protoss.Recall, Protoss.Stasis) else if (this == Protoss.DarkArchon) Array(Protoss.Feedback, Protoss.Maelstrom, Protoss.MindControl) else if (this == Protoss.HighTemplar) Array(Protoss.Hallucination, Protoss.PsionicStorm) else if (this == Zerg.Defiler) Array(Zerg.Consume, Zerg.DarkSwarm, Zerg.Plague) else if (this == Zerg.Queen) Array(Zerg.Ensnare, Zerg.InfestCommandCenter, Zerg.Parasite, Zerg.SpawnBroodlings) else
       Array()
+
+  //////////////////////////////
+  // Performance optimization //
+  //////////////////////////////
+
+  lazy val abuseAllowed: Boolean = Vector(
+    Terran.Marine,
+    Terran.Vulture,
+    Terran.SiegeTankUnsieged,
+    Terran.Goliath,
+    Protoss.Dragoon,
+    Zerg.Hydralisk).contains(this)
+
+  lazy val fallbackAllowed: Boolean = Vector(
+    Terran.Marine,
+    Terran.Firebat,
+    Terran.Vulture,
+    Terran.SiegeTankUnsieged,
+    Terran.Goliath,
+    Protoss.Archon,
+    Protoss.Dragoon,
+    Protoss.Reaver,
+    Protoss.Scout,
+    Zerg.Hydralisk).contains(this)
 
   /////////////////
   // Convenience //

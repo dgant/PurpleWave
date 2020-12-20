@@ -19,11 +19,11 @@ import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvP3GateGoon
+import Strategery.Strategies.Protoss.{PvP3GateGoon, PvP4GateGoon}
 
-class PvP3GateGoon extends GameplanTemplate {
+class PvP34GateGoon extends GameplanTemplate {
   
-  override val activationCriteria : Predicate = new Employing(PvP3GateGoon)
+  override val activationCriteria : Predicate = new Employing(PvP3GateGoon, PvP4GateGoon)
   override val completionCriteria : Predicate = new MiningBasesAtLeast(2)
 
   override def blueprints = Vector(
@@ -70,11 +70,11 @@ class PvP3GateGoon extends GameplanTemplate {
               new CapGasWorkersAt(2)))),
         new CapGasAt(200))),
 
-    new BuildOrder(
-      Get(Protoss.DragoonRange),
-      Get(2, Protoss.Dragoon),
-      Get(3, Protoss.Gateway),
-      Get(8, Protoss.Dragoon)),
+    new BuildOrder(Get(Protoss.DragoonRange),  Get(2, Protoss.Dragoon)),
+    new If(
+      new Employing(PvP3GateGoon),
+      new BuildOrder(Get(3, Protoss.Gateway), Get(8, Protoss.Dragoon)),
+      new BuildOrder(Get(4, Protoss.Gateway), Get(10, Protoss.Dragoon))),
 
     // Kind of cowardly, but if we can't be sure they're not going DT, get a Forge before expanding so we can get cannons in time if necessary
     new If(
@@ -97,7 +97,11 @@ class PvP3GateGoon extends GameplanTemplate {
         new EnemyBasesAtLeast(2),
         new UnitsAtLeast(20, Protoss.Dragoon)),
       new If(
-        new UnitsAtLeast(3, Protoss.Gateway, complete = true),
+        new Or(
+          new And(
+            new Employing(PvP3GateGoon),
+            new UnitsAtLeast(3, Protoss.Gateway, complete = true)),
+          new UnitsAtLeast(14, Protoss.Dragoon)),
         new RequireMiningBases(2)),
       new Pump(Protoss.Dragoon)),
 

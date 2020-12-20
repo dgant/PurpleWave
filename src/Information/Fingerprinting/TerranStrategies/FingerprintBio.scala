@@ -14,7 +14,6 @@ class FingerprintBio extends Fingerprint {
     if (With.units.countEnemy(Terran.Barracks) > 1 && ! With.fingerprints.bbs.matches) {
       return true
     }
-
     if (With.unitsShown.allEnemies(Terran.Vulture) < 4) {
       if (With.enemies.exists(_.hasUpgrade(Terran.MarineRange))) {
         return true
@@ -28,7 +27,7 @@ class FingerprintBio extends Fingerprint {
       if (With.unitsShown.allEnemies(Terran.Firebat) > 0) {
         return true
       }
-      if (With.unitsShown.allEnemies(Terran.Marine) > 8) {
+      if (With.unitsShown.allEnemies(Terran.Marine) > 15) {
         return true
       }
       if (With.units.existsEnemy(u => u.is(Terran.Academy) && u.upgrading)) {

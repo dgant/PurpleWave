@@ -4,7 +4,6 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Spells._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.Seconds
 
 object Cast extends Action {
   
@@ -13,21 +12,14 @@ object Cast extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    unit.agent.canCast = spells.exists(_.allowed(unit))
-    
-    if (unit.agent.canCast) {
-      spells.foreach(_.consider(unit))
-    }
-    if (unit.ready
-      && unit.matchups.threats.nonEmpty
-      && unit.isAny(
-        Terran.ScienceVessel,
-        Protoss.Arbiter,
-        Protoss.DarkArchon,
-        Protoss.HighTemplar,
-        Zerg.Defiler,
-        Zerg.Queen)
-      && unit.matchups.framesOfSafety < Seconds(5)()) {
+    spells.foreach(_.consider(unit))
+    if (unit.ready && unit.isAny(
+      Terran.ScienceVessel,
+      Protoss.Arbiter,
+      Protoss.DarkArchon,
+      Protoss.HighTemplar,
+      Zerg.Defiler,
+      Zerg.Queen)) {
       unit.agent.shouldEngage = false
     }
   }

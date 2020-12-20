@@ -1,17 +1,16 @@
 package Planning.Plans.GamePlans.Protoss.Standard.FFA
 
-import Macro.BuildRequests.Get
+import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Basic.NoPlan
-import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Predicates.Always
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases, RequireMiningBasesFFA}
 import Planning.Plans.Placement.BuildCannonsAtExpansions
+import Planning.Predicates.Always
 import Planning.Predicates.Milestones.UnitsAtLeast
+import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 
 class ProtossHuntersFFAGatewayAggro extends GameplanTemplate {
@@ -19,7 +18,17 @@ class ProtossHuntersFFAGatewayAggro extends GameplanTemplate {
   override val activationCriteria   : Predicate = new Always
   override val initialScoutPlan     : Plan = NoPlan()
   
-  override val buildOrder = ProtossBuilds.NZ12Gas14Core
+  override val buildOrder = Vector[BuildRequest] (
+    Get(8,   Protoss.Probe),
+    Get(Protoss.Pylon),
+    Get(10,  Protoss.Probe),
+    Get(Protoss.Gateway),
+    Get(12,  Protoss.Probe),
+    Get(Protoss.Assimilator),
+    Get(14,  Protoss.Probe),
+    Get(Protoss.CyberneticsCore),
+    Get(15,  Protoss.Probe),
+    Get(2,   Protoss.Pylon))
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(new UnitsAtLeast(1, Protoss.Dragoon),      new Build(Get(Protoss.DragoonRange))),

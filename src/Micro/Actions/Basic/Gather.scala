@@ -6,8 +6,8 @@ import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Targeting.Target
 import Planning.UnitMatchers.UnitMatchWorkers
-import ProxyBwapi.Races.{Protoss, Terran}
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Strategery.Benzene
 import Utilities.{ByOption, Seconds}
 
@@ -26,15 +26,21 @@ object Gather extends Action {
     // Gatherer combat micro
     if (unit.battle.nonEmpty) {
 
-      // Move between bases if resource isn't safe to mine
-      val baseOriginal = resource.base
-      lazy val baseOpposite = unit.base.flatMap(b => b.isNaturalOf.orElse(b.natural))
-      lazy val baseRemote = ByOption.minBy(With.geography.ourBases.filterNot(baseOriginal.contains))(_.heart.groundPixels(baseOriginal.map(_.heart).getOrElse(resource.tileTopLeft)))
-      lazy val basePaired = baseOpposite.orElse(baseRemote)
-      if (
-        basePaired.exists(_.owner.isUs)
-        && unit.matchups.threats.exists(threat => ! threat.unitClass.isWorker && threat.pixelsToGetInRange(unit, resource.pixelCenter) < defenseRadiusPixels)) {
-        unit.agent.toGather = ByOption.minBy(basePaired.get.minerals.filter(_.alive))(_.pixelDistanceEdge(unit)).orElse(unit.agent.toGather)
+      // Move between bases if resource isn't safe to mine and we hope help will arrive
+      if (With.reaction.sluggishness < 2 && unit.battle.exists(_.us.totalArmyFraction() < 0.5)) {
+        val baseOriginal = resource.base
+        lazy val baseOpposite = baseOriginal.flatMap(b => b.isNaturalOf.orElse(b.natural))
+        lazy val baseRemote = ByOption.minBy(With.geography.ourBases.filterNot(baseOriginal.contains))(_.heart.groundPixels(baseOriginal.map(_.heart).getOrElse(resource.tileTopLeft)))
+        lazy val basePaired = baseOpposite.orElse(baseRemote)
+
+        def threatenedAt(atResource: UnitInfo): Boolean = unit.matchups.threats.exists(threat =>
+          ! threat.isAny(UnitMatchWorkers, Terran.Wraith, Protoss.Arbiter, Protoss.Scout, Zerg.Mutalisk)
+            && threat.pixelsToGetInRange(unit, atResource.pixelCenter) < defenseRadiusPixels)
+
+        if (basePaired.exists(_.owner.isUs) && threatenedAt(resource)) {
+          val alternativeMineral = ByOption.minBy(basePaired.get.minerals.filter(_.alive))(_.pixelDistanceEdge(unit)).orElse(unit.agent.toGather)
+          unit.agent.toGather = alternativeMineral.filterNot(threatenedAt).orElse(Some(resource))
+        }
       }
 
       // Burrow from threats
@@ -42,7 +48,7 @@ object Gather extends Action {
         && unit.matchups.enemies.exists(enemy =>
           ! enemy.isAny(UnitMatchWorkers, Terran.Wraith, Protoss.Arbiter, Protoss.Scout)
           && enemy.pixelDistanceEdge(unit) < enemy.pixelRangeAgainst(unit) + 32)
-          && ! With.grids.enemyDetection.isDetected(unit.tileIncludingCenter)) {
+          && ! unit.tileIncludingCenter.enemyDetected) {
         With.commander.burrow(unit)
       }
 

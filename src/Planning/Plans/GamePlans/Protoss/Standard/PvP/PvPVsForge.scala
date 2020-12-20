@@ -13,7 +13,7 @@ import Planning.Predicates.Reactive.EnemyNaturalConfirmed
 import Planning.Predicates.Strategy.EnemyStrategy
 import ProxyBwapi.Races.Protoss
 
-class PvPVsForge extends PvP3GateGoon {
+class PvPVsForge extends PvP34GateGoon {
 
   // Bots have done a variety of nonsense behind FFE:
   // * Real FFE into macro

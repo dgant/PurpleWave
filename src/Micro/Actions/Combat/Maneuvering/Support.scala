@@ -32,7 +32,7 @@ object Support extends Action {
       })
 
     // Retreat to help
-    if (!unit.visibleToOpponents) {
+    if ( ! unit.visibleToOpponents) {
       unit.agent.toReturn = Some(destination)
     }
 

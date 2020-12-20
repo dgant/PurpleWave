@@ -28,47 +28,43 @@ class Agent(val unit: FriendlyUnitInfo) {
   // History //
   /////////////
 
-  var fightHysteresisFrames: Int = 0
-  var impatience: Int = 0
+  var lastFrame             : Int = 0
+  var lastStim              : Int = 0
+  var lastCloak             : Int = 0
+  var fightHysteresisFrames : Int = 0
+  var impatience            : Int = 0
+
+  var tryingToMove: Boolean = false
 
   ///////////////
   // Decisions //
   ///////////////
 
-  var priority      : TrafficPriority               = TrafficPriorities.None
-  var toTravel      : Option[Pixel]                 = None
-  var toReturn      : Option[Pixel]                 = None
-  var toAttack      : Option[UnitInfo]              = None
-  var toScan        : Option[Pixel]                 = None
-  var toGather      : Option[UnitInfo]              = None
-  var toAddon       : Option[UnitClass]             = None
-  var toBuild       : Option[UnitClass]             = None
-  var toBuildTile   : Option[Tile]                  = None
-  var toTrain       : Option[UnitClass]             = None
-  var toTech        : Option[Tech]                  = None
-  var toFinish      : Option[UnitInfo]              = None
-  var toUpgrade     : Option[Upgrade]               = None
-  var toLeash       : Option[Double]                = None
-  var toBoard       : Option[FriendlyUnitInfo]      = None
-  var toNuke        : Option[Pixel]                 = None
-  var toRepair      : Option[UnitInfo]              = None
-  var canFight      : Boolean                       = true
-  var canFlee       : Boolean                       = true
-  var canCower      : Boolean                       = false
-  var canMeld       : Boolean                       = false
-  var canPillage    : Boolean                       = false
-  var canLiftoff    : Boolean                       = false
-  var canCast       : Boolean                       = false
-  var canCancel     : Boolean                       = false
-  var canFocus      : Boolean                       = false
-
-  var lastStim: Int = 0
-  var lastCloak: Int = 0
-  var shouldEngage: Boolean = false
-
-  def isScout: Boolean = intent.toScoutTiles.nonEmpty
-
-  val forces: ForceMap = new ForceMap
+  var priority      : TrafficPriority           = TrafficPriorities.None
+  var toTravel      : Option[Pixel]             = None
+  var toReturn      : Option[Pixel]             = None
+  var toAttack      : Option[UnitInfo]          = None
+  var toScan        : Option[Pixel]             = None
+  var toGather      : Option[UnitInfo]          = None
+  var toAddon       : Option[UnitClass]         = None
+  var toBuild       : Option[UnitClass]         = None
+  var toBuildTile   : Option[Tile]              = None
+  var toTrain       : Option[UnitClass]         = None
+  var toTech        : Option[Tech]              = None
+  var toFinish      : Option[UnitInfo]          = None
+  var toUpgrade     : Option[Upgrade]           = None
+  var toLeash       : Option[Double]            = None
+  var toBoard       : Option[FriendlyUnitInfo]  = None
+  var toNuke        : Option[Pixel]             = None
+  var toRepair      : Option[UnitInfo]          = None
+  var canFight      : Boolean                   = true
+  var canFlee       : Boolean                   = true
+  var canMeld       : Boolean                   = false
+  var canLiftoff    : Boolean                   = false
+  var canCancel     : Boolean                   = false
+  var canFocus      : Boolean                   = false
+  var shouldEngage  : Boolean                   = false
+  val forces        : ForceMap                  = new ForceMap
 
   /////////////////
   // Suggestions //
@@ -77,7 +73,8 @@ class Agent(val unit: FriendlyUnitInfo) {
   def destination: Pixel = toTravel.orElse(toReturn).getOrElse(origin)
   def origin: Pixel = toReturn.getOrElse(originCache())
   private val originCache = new Cache(() =>
-    toReturn
+    ride.filterNot(unit.transport.contains).map(_.pixelCenter)
+    .orElse(toReturn)
     .orElse(
       ByOption.minBy(
         With.geography.ourBases.filter(base =>
@@ -91,22 +88,22 @@ class Agent(val unit: FriendlyUnitInfo) {
       .map(_.heart.pixelCenter))
     .getOrElse(With.geography.home.pixelCenter))
 
+
+  def isScout: Boolean = intent.toScoutTiles.nonEmpty
+
   /////////////////
   // Diagnostics //
   /////////////////
 
   var intent      : Intention         = new Intention
   var client      : Option[Plan]      = None
-  var lastFrame   : Int               = 0
   var lastPath    : Option[TilePath]  = None
   var lastAction  : Option[String]    = None
+  var fightReason : String            = ""
+
   def act(value: String): Unit = { lastAction = Some(value) }
 
   val actionsPerformed: ArrayBuffer[Action] = new ArrayBuffer[Action]()
-
-  var fightReason: String = ""
-
-  var tryingToMove: Boolean = false
 
   ///////////////
   // Execution //
@@ -164,7 +161,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     canLiftoff    = intent.canLiftoff
     canCancel     = intent.canCancel
     canFocus      = intent.canFocus
-    canCast       = false
   }
 
   def escalatePriority(newPriority: TrafficPriority): Unit = if (priority < newPriority) priority = newPriority

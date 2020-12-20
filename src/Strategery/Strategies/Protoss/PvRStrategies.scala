@@ -35,7 +35,7 @@ object PvRDT extends PvRStrategy {
   override lazy val choices = Vector(
     Seq(PvTDTExpand),
     Seq(PvP2GateDTExpand),
-    Seq(PvZMidgameBisu, PvZMidgameNeoBisu, PvZMidgameNeoNeoBisu))
+    Seq(PvZMidgameBisu, PvZMidgameNeoBisu))
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.fourPool)
 }
 object PvRProxy2Gate extends PvR2GateStrategy {

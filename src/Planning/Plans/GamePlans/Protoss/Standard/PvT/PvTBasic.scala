@@ -255,7 +255,7 @@ class PvTBasic extends GameplanTemplate {
   class GoReaver  extends Parallel(new WriteStatus("GoReaver"),   new BuildOrder(Get(Protoss.RoboticsFacility), Get(Protoss.Shuttle), Get(Protoss.RoboticsSupportBay), Get(Protoss.Reaver)), new If(new And(new MiningBasesAtLeast(3), new EnemiesAtLeast(30, UnitMatchOr(Terran.Marine, Terran.Medic, Terran.Firebat, Terran.Ghost))), new If(new EnemiesAtMost(0, UnitMatchSiegeTank), new Build(Get(3, Protoss.RoboticsFacility)), new Build(Get(2, Protoss.RoboticsFacility)))))
   class GoDT      extends Parallel(new WriteStatus("GoDT"),       new BuildOrder(Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives), Get(2, Protoss.DarkTemplar)))
   class GoStorm   extends Parallel(new WriteStatus("GoStorm"),    new BuildOrder(Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives), Get(Protoss.PsionicStorm), Get(2, Protoss.HighTemplar)))
-  class GoCarrier extends Parallel(new WriteStatus("GoCarrier"),  new BuildOrder(Get(Protoss.Stargate), Get(2, Protoss.Gateway), Get(2, Protoss.Stargate), Get(Protoss.FleetBeacon), Get(2, Protoss.Carrier), Get(4, Protoss.Gateway), Get(Protoss.CarrierCapacity), Get(Protoss.AirDamage)))
+  class GoCarrier extends Parallel(new WriteStatus("GoCarrier"),  new BuildOrder(Get(Protoss.Stargate), Get(2, Protoss.Stargate), Get(Protoss.FleetBeacon), Get(2, Protoss.Carrier), Get(Protoss.AirDamage), Get(4, Protoss.Gateway), Get(Protoss.CarrierCapacity)))
   class GoArbiter extends Parallel(new WriteStatus("GoArbiter"),  new BuildOrder(Get(Protoss.CitadelOfAdun), Get(2, Protoss.Gateway), Get(Protoss.Stargate), Get(Protoss.TemplarArchives), Get(Protoss.ArbiterTribunal), Get(Protoss.ArbiterEnergy), Get(Protoss.Arbiter), Get(6, Protoss.Gateway)))
   class GoGateway extends Parallel(new WriteStatus("GoGateway"),  new BuildOrder(Get(3, Protoss.Gateway), Get(Protoss.CitadelOfAdun), Get(2, Protoss.Forge), Get(5, Protoss.Gateway), Get(Protoss.GroundDamage), Get(Protoss.GroundArmor), Get(Protoss.ZealotSpeed), Get(Protoss.TemplarArchives), Get(7, Protoss.Gateway)))
 
@@ -376,7 +376,7 @@ class PvTBasic extends GameplanTemplate {
 
     // Gas pump timing
     new PumpRatio(Protoss.Assimilator, 1, 2, Seq(Friendly(Protoss.Gateway, 0.2), Friendly(Protoss.RoboticsSupportBay, 0.4), Friendly(Protoss.TemplarArchives, 0.2), Friendly(Protoss.Stargate, 2.0))),
-    new If(new EmployingTwoBase, new BuildGasPumps),
+    new If(new And(new UnitsAtLeast(30, UnitMatchWorkers), new EmployingTwoBase), new BuildGasPumps),
     new If(new UnitsAtLeast(45, UnitMatchWorkers), new BuildGasPumps),
 
     ////////////////////////////

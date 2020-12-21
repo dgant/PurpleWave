@@ -264,13 +264,18 @@ object DefaultCombat extends Action {
         val distanceCurrent = unit.pixelDistanceEdge(target.get)
         val distanceTowards = distanceCurrent - distanceIdeal
         val danceForce      = if (distanceTowards > 0) Forces.threat else Forces.travel
-        if (distanceTowards > 0) unit.agent.act("Chase")
-        if (distanceTowards < 0) unit.agent.act("Snipe")
-        exactDistance      = Some(Math.abs(distanceTowards))
+        exactDistance = Some(Math.abs(distanceTowards))
         if (exactDistance.exists(_ < 4)) {
+          unit.agent.act("Stand") c
           With.commander.attack(unit)
           return
+        } else if (distanceTowards > 0) {
+          unit.agent.act("Chase")
+          unit.agent.toTravel = unit.agent.toAttack.map(_.presumptiveStep)
+          Move.delegate(unit)
+          return
         }
+        unit.agent.act("Parry")
         forces(danceForce) = Potential.unitAttraction(unit, target.get, distanceTowards)
         forces(Forces.spreading) = unit.agent.receivedPushForce()
       }

@@ -55,7 +55,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val ranged: Boolean = canAttack && pixelRangeMax > 32 * 2
   lazy val melee: Boolean = canAttack && ! ranged
   lazy val castsSpells: Boolean = spells.nonEmpty
-  lazy val attacksOrCastsOrDetectsOrTransports = canAttack || castsSpells || isDetector || isTransport
+  lazy val attacksOrCastsOrDetectsOrTransports = canAttack || castsSpells || isDetector || isTransport || this == Zerg.LurkerEgg
 
   lazy val suicides: Boolean = Array(
     Terran.SpiderMine,

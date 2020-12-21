@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.Attack
+import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, PumpWorkers, PylonBlock, UpgradeContinuously}
@@ -14,7 +14,7 @@ import Planning.Predicates.Compound.{And, Latch, Not, Sticky}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBasesAtMost, SafeAtHome, SafeToMoveOut}
 import Planning.Predicates.Strategy.{Employing, EnemyRecentStrategy, EnemyStrategy}
-import Planning.UnitMatchers.{UnitMatchMobileDetectors, UnitMatchOr, UnitMatchWarriors, UnitMatchWorkers}
+import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors, UnitMatchWorkers}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP3rdBaseFast
 
@@ -27,9 +27,7 @@ class PvPLateGame extends GameplanTemplate {
     new PvPIdeas.ReactToArbiters)
 
   override def priorityAttackPlan: Plan = new PvPIdeas.AttackWithDarkTemplar
-  override val attackPlan: Plan = new Parallel(
-    new If(new EnemiesAtMost(0, UnitMatchMobileDetectors), new Attack(Protoss.DarkTemplar)),
-    new PvPIdeas.AttackSafely)
+  override val attackPlan: Plan = new PvPIdeas.AttackSafely
 
   override def archonPlan: Plan = new PvPIdeas.MeldArchonsPvP
 
@@ -196,7 +194,7 @@ class PvPLateGame extends GameplanTemplate {
   override def buildPlans: Seq[Plan] = Seq(
     new CapGasAt(500),
     new FinishDarkTemplarRush,
-    new If(new Not(new NeedToCutWorkersForGateways), new PumpWorkers(maximumConcurrently = 1)),
+    new If(new Not(new NeedToCutWorkersForGateways), new Parallel(new WriteStatus("GatewayCut"), new PumpWorkers(maximumConcurrently = 1))),
     new Build(Get(Protoss.Pylon), Get(Protoss.Gateway), Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore), Get(Protoss.DragoonRange), Get(2, Protoss.Gateway)),
 
     // Detection

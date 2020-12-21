@@ -14,11 +14,11 @@ import Planning.Predicates.Reactive.EnemyMutalisks
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Protoss.{PvZMidgameCorsairReaverGoon, PvZMidgameCorsairReaverZealot}
+import Strategery.Strategies.Protoss.PvZMidgameCorsairReaverGoon
 
 class PvZCorsairReaver extends GameplanTemplate {
 
-  override val activationCriteria = new Employing(PvZMidgameCorsairReaverZealot, PvZMidgameCorsairReaverGoon)
+  override val activationCriteria = new Employing(PvZMidgameCorsairReaverGoon)
   override val completionCriteria = new Latch(new BasesAtLeast(3))
   override def archonPlan: Plan = new PvZIdeas.TemplarUpToEight
   override def attackPlan: Plan = new Attack(Protoss.Corsair)
@@ -69,11 +69,10 @@ class PvZCorsairReaver extends GameplanTemplate {
       Get(Protoss.ShuttleSpeed)),
     new UpgradeContinuously(Protoss.GroundDamage),
     new If(
-      new Employing(PvZMidgameCorsairReaverZealot),
+      new UnitsAtLeast(12, Protoss.Dragoon),
       new Build(
         Get(Protoss.CitadelOfAdun),
         Get(Protoss.ZealotSpeed))),
-    new Build(
-      Get(6, Protoss.Gateway)),
+    new Build(Get(8, Protoss.Gateway)),
   )
 }

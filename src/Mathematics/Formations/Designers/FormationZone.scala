@@ -84,8 +84,7 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
         }
       }
       else {
-        // Apply arc positioning
-        // Find the best point for this unit
+        // Apply arc positioning to find the best spot for this unit
         val distanceGrid = zone.exitNow.map(_.distanceGrid).getOrElse(zone.exitDistanceGrid)
         val point = (Spiral.points(11) ++ nullPoints).minBy(p => {
           if (p == nullPoint) {

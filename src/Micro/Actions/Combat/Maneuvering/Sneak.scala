@@ -3,6 +3,7 @@ package Micro.Actions.Combat.Maneuvering
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Sneak extends Action {
@@ -13,7 +14,7 @@ object Sneak extends Action {
     && unit.agent.canFlee
     && ! With.yolo.active()
     && ! unit.agent.shouldEngage
-    && unit.matchups.nearestArbiter.isEmpty
+    && ! unit.matchups.allies.exists(_.is(Protoss.Arbiter))
     && unit.matchups.enemyDetectors.isEmpty
     && unit.matchups.enemies.exists(e => e.complete && ! e.unitClass.isWorker && (if (unit.flying) e.unitClass.attacksGround else e.unitClass.attacksAir))
   )

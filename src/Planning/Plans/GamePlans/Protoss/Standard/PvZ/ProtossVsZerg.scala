@@ -12,7 +12,6 @@ class ProtossVsZerg extends ModalGameplan(
 
   // Midgames
   new PvZBisu,
-  new PvZNeoBisu,
   new PvZ5GateGoon,
   new PvZCorsairReaver,
 

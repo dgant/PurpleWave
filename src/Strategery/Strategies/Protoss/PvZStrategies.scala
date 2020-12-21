@@ -27,19 +27,19 @@ object PvZ1BaseForgeTech extends PvZStrategy {
   //Disabled for AIIDE round robin
   //override def responsesWhitelisted: Iterable[Fingerprint] = Seq(With.fingerprints.fourPool)
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.twelvePool, With.fingerprints.overpool)
-  override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgameNeoBisu))
+  override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgameBisu))
 }
 object PvZSpeedlot extends PvZStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgameBisu, PvZMidgameNeoBisu))
+  override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgameBisu))
 }
 object PvZ4GateGoon extends PvZStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgame5GateGoon, PvZMidgame5GateGoonReaver))
 }
 object PvZCorsair extends PvZStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgameBisu, PvZMidgameNeoBisu))
+  override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgameBisu))
 }
 object PvZDT extends PvZStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgameBisu, PvZMidgameNeoBisu))
+  override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgameBisu))
 }
 object PvZProxy2Gate extends PvZ2GateOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
@@ -77,4 +77,3 @@ object PvZMidgame5GateGoonReaver      extends PvZStrategy { override def choices
 object PvZMidgameCorsairReaverZealot  extends PvZStrategy { override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvZLateGameReaver)) }
 object PvZMidgameCorsairReaverGoon    extends PvZStrategy { override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvZLateGameReaver)) }
 object PvZMidgameBisu                 extends PvZStrategy { override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvZLateGameTemplar)) }
-object PvZMidgameNeoBisu              extends PvZStrategy { override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvZLateGameTemplar)) }

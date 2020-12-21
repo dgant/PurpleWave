@@ -17,6 +17,19 @@ object ForceMath {
     })
     Force(x, y)
   }
+
+  def mean(forces: Traversable[Force]): Force = {
+    // Loop unwound in an attempt to spare performance
+    var i: Int = 0
+    var x: Double = 0d
+    var y: Double = 0d
+    forces.foreach(f => {
+      i += 1
+      x += f.x
+      y += f.y
+    })
+    Force(x/i, y/i)
+  }
   
   def fromPixels(from: Pixel, to: Pixel, magnitude: Double = 1.0): Force = if (from == to) new Force() else fromRadians(from.radiansTo(to), magnitude)
   

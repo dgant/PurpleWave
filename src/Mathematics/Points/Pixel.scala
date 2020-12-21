@@ -27,6 +27,10 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   }
   @inline final def +(other: Pixel): Pixel = add(other)
   @inline final def -(other: Pixel): Pixel = subtract(other)
+  @inline final def /(value: Int): Pixel = if (value == 0) this else Pixel(x / value, y / value)
+  @inline final def *(value: Int): Pixel = Pixel(x * value, y * value)
+  @inline final def /(value: Double): Pixel = if (value == 0) this else Pixel((x / value).toInt, (y / value).toInt)
+  @inline final def *(value: Double): Pixel = Pixel((x * value).toInt, (y * value).toInt)
   @inline final def add(dx: Int, dy: Int): Pixel = Pixel(x + dx, y + dy)
   @inline final def add(point: Point): Pixel = add(point.x, point.y)
   @inline final def add(pixel: Pixel): Pixel = add(pixel.x, pixel.y)
@@ -47,6 +51,8 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     val delta = destination.subtract(this)
     delta.multiply(pixels/distance).add(this)
   }
+  @inline final def projectUpTo(destination: Pixel, maxPixels: Double): Pixel =
+    if (maxPixels * maxPixels >= pixelDistanceSquared(destination)) destination else project(destination, maxPixels)
   @inline final def radiateRadians(angleRadians: Double, pixels: Double): Pixel = add(
     (pixels * Math.cos(angleRadians)).toInt,
     (pixels * Math.sin(angleRadians)).toInt)

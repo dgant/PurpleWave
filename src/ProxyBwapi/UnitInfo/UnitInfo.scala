@@ -13,7 +13,7 @@ import Mathematics.PurpleMath
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Matchups.MatchupAnalysis
-import Performance.Cache
+import Performance.{Cache, KeyedCache}
 import Planning.Plan
 import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.Engine.Damage
@@ -300,7 +300,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
       (isUltralisk()  && player.hasUpgrade(Zerg.UltraliskSpeed)))
       1.5 else 1.0)))
 
-  @inline final def projectFrames(framesToLookAhead: Double): Pixel = pixelCenter.project(presumptiveStep, Math.min(pixelDistanceCenter(presumptiveStep), framesToLookAhead * topSpeed))
+  @inline final def projectFrames(framesToLookAhead: Double): Pixel = pixelCenter.projectUpTo(presumptiveStep, framesToLookAhead * topSpeed)
 
   @inline final def inTileRadius  (tiles: Int)  : Traversable[UnitInfo] = With.units.inTileRadius(tileIncludingCenter, tiles)
   @inline final def inPixelRadius (pixels: Int) : Traversable[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)
@@ -512,10 +512,12 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
 
   @inline final def canBurrow: Boolean = canDoAnything && (is(Zerg.Lurker) || (player.hasTech(Zerg.Burrow) && isAny(Zerg.Drone, Zerg.Zergling, Zerg.Hydralisk, Zerg.Defiler)))
 
-  val positioningWidthCurrentCached = new Cache(() => battle.map(_.teamOf(this)).map(team => if (flying) team.centroidAir else PurpleMath.projectedPointOnLine(pixelCenter, team.centroidGround, team.lineWidth())).getOrElse(pixelCenter))
-  val positioningWidthTargetCached  = new Cache(() => battle.map(_.teamOf(this)).map(team => if (flying) team.centroidAir else team.widthOrder().zipWithIndex.find(_._1 == this).map(p => team.centroidGround.project(team.lineWidth(), team.widthIdeal() * (team.widthOrder().size / 2 - p._2) / team.widthOrder().size)).getOrElse(positioningWidthCurrentCached())).getOrElse(pixelCenter))
-  val positioningDepthCached = new Cache(() => presumptiveTarget.map(t => pixelDistanceEdge(t) - pixelRangeAgainst(t)))
-  val positioningWidthCached = new Cache(() => pixelCenter.pixelDistance(positioningWidthCurrentCached()))
+  val teamHorizontalSlot  = new Cache(() => battle.map(_.teamOf(this)).map(team => if (flying) team.centroidAir else PurpleMath.projectedPointOnLine(pixelCenter, team.centroidGround, team.lineWidth())).getOrElse(pixelCenter))
+  val teamWidthCurrent    = new Cache(() => pixelCenter.pixelDistance(teamHorizontalSlot()))
+  val teamWidthGoal       = new Cache(() => battle.map(_.teamOf(this)).map(team => if (flying) team.centroidAir else team.widthOrder().zipWithIndex.find(_._1 == this).map(p => team.centroidGround.project(team.lineWidth(), team.widthIdeal() * (team.widthOrder().size / 2 - p._2) / team.widthOrder().size)).getOrElse(teamHorizontalSlot())).getOrElse(pixelCenter))
+  val teamDepthOrigin     = new Cache(() => presumptiveTarget.map(_.pixelCenter).orElse(battle.map(_.enemy.vanguard)))
+  val teamDepthCurrent    = new Cache(() => teamDepthOrigin().map(pixelDistanceCenter(_) - effectiveRangePixels))
+
   val confidence = new Cache(() => if (matchups.threats.isEmpty) 1.0 else battle.flatMap(_.judgement.map(_.confidence)).getOrElse(1.0))
 
   // TODO: These checks are fast now so we can delete these  //
@@ -627,9 +629,9 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   @inline final def presumptiveDestination: Pixel = if (isOurs) calculatePresumptiveDestination else presumptiveDestinationCached()
   @inline final def presumptiveStep: Pixel = if (isOurs) MicroPathing.getWaypointToPixel(this, presumptiveDestination) else presumptiveStepCached()
   @inline final def presumptiveTarget: Option[UnitInfo] = if (isOurs) calculatePresumptiveTarget else presumptiveTargetCached()
-  val presumptiveDestinationCached = new Cache(() => calculatePresumptiveDestination)
-  val presumptiveStepCached = new Cache(() => MicroPathing.getWaypointToPixel(this, presumptiveDestinationCached()))
-  val presumptiveTargetCached = new Cache(() => calculatePresumptiveTarget)
+  val presumptiveDestinationCached = new KeyedCache(() => calculatePresumptiveDestination, () => friendly.map(_.agent.destination))
+  val presumptiveStepCached = new KeyedCache(() => MicroPathing.getWaypointToPixel(this, presumptiveDestinationCached()), () => presumptiveDestinationCached(), 240)
+  val presumptiveTargetCached = new KeyedCache(() => calculatePresumptiveTarget, () => friendly.map(_.agent.toAttack))
   private def calculatePresumptiveDestination: Pixel =
     friendly.flatMap(_.agent.toTravel)
       .orElse(targetPixel)

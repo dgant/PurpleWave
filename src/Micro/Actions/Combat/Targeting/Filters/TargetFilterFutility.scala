@@ -10,14 +10,15 @@ object TargetFilterFutility extends TargetFilter {
   // Ignore targets we have no chance of killing
   //
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
+
+    if (actor.is(Terran.Vulture) && target.unitClass.isBuilding && ! target.unitClass.canAttack && With.frame < Minutes(4)()) return false
+
     if ( ! actor.canMove && ! actor.inRangeToAttack(target)) return false
 
     if (actor.inRangeToAttack(target)) return true
 
     // Respect PushKiters (intended for eg. Proxy Zealot rushes coming up against Dragoons)
     if (With.blackboard.pushKiters.get && target.canAttack(actor) && target.pixelRangeAgainst(actor) > 32) return true
-
-    if (actor.is(Terran.Vulture) && target.unitClass.isBuilding && ! target.unitClass.canAttack && With.frame < Minutes(4)()) return false
 
     // This is a pretty expensive filter; avoid using it if possible
     if (With.reaction.sluggishness > 0) return true

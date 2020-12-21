@@ -8,16 +8,18 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
 object Target extends {
-  def choose(attacker: FriendlyUnitInfo, required: TargetFilter*): Unit = {
+  def choose(attacker: FriendlyUnitInfo, required: TargetFilter*): Option[UnitInfo] = {
     attacker.agent.toAttack = best(attacker, required: _*)
+    attacker.agent.toAttack
   }
 
-  def choose(attacker: FriendlyUnitInfo, whitelist: Iterable[UnitInfo]): Unit = {
+  def choose(attacker: FriendlyUnitInfo, whitelist: Iterable[UnitInfo]): Option[UnitInfo] = {
     choose(attacker, TargetFilterWhitelist(whitelist))
   }
 
-  def chooseUnfiltered(attacker: FriendlyUnitInfo, targets: Iterable[UnitInfo]): Unit = {
+  def chooseUnfiltered(attacker: FriendlyUnitInfo, targets: Iterable[UnitInfo]): Option[UnitInfo] = {
     attacker.agent.toAttack = bestUnfiltered(attacker, targets)
+    attacker.agent.toAttack
   }
 
   def best(attacker: FriendlyUnitInfo, filters: TargetFilter*): Option[UnitInfo] = {

@@ -1,16 +1,11 @@
 package Information.Battles
 
-import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object BattleClassificationFilters {
-  def isEligibleLocal(unit: UnitInfo): Boolean = {
-    isEligible(unit) && unit.likelyStillThere
-  }
-  
-  def isEligibleGlobal(unit: UnitInfo): Boolean = {
-    isEligible(unit)
-  }
+  def isEligibleLocal(unit: UnitInfo): Boolean = isEligible(unit) && unit.likelyStillThere
+  def isEligibleGlobal(unit: UnitInfo): Boolean = isEligible(unit)
   
   private def isEligible(unit: UnitInfo): Boolean = (
     unit.alive

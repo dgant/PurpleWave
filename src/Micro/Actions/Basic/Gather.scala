@@ -99,7 +99,7 @@ object Gather extends Action {
       if (transferring
         && threatened
         && threatCloser
-        && (unit.visibleToOpponents || unit.matchups.pixelsOfEntanglement > -128 || unit.zone.edges.exists(_.contains(unit.pixelCenter)))) {
+        && (unit.visibleToOpponents || ! unit.agent.withinSafetyMargin || unit.zone.edges.exists(_.contains(unit.pixelCenter)))) {
         Retreat.consider(unit)
       }
     }

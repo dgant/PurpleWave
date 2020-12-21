@@ -1,6 +1,5 @@
 package Micro.Heuristics
 
-import Debugging.Visualizations.Forces
 import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.Pixel
@@ -59,7 +58,7 @@ object Potential {
   //////////
   // Team //
   //////////
-  
+
   def preferRegrouping(unit: FriendlyUnitInfo): Force = {
     if (unit.base.exists(_.owner.isUs)) return new Force
     val allies                = unit.teammates.view.filter(_ != unit)
@@ -73,16 +72,19 @@ object Potential {
     output
   }
 
+  def correctDepth(unit: FriendlyUnitInfo): Force = {
+    unit.battle.map(_.us).flatMap(team =>
+      unit.teamDepthCurrent().map(depth => {
+        ForceMath.fromRadians(team.axisDepth(), unit.teamDepthCurrent().get -  team.depthMean())
+      })).getOrElse(new Force)
+  }
+
+  def correctWidth(unit: FriendlyUnitInfo): Force = {
+    ForceMath.fromPixels(unit.pixelCenter, unit.teamWidthGoal(), unit.pixelDistanceCenter(unit.teamWidthGoal()))
+  }
+
   def preferCohesion(unit: FriendlyUnitInfo): Force = {
-    if (unit.flying) return new Force
-    ForceMath.sum(
-      unit
-        .immediateAllies
-        .view
-        .filter(a => a.canMove && ! a.flying && ! a.unitClass.isBuilding && ! a.is(Protoss.Reaver))
-        .flatMap(_.friendly.map(friend =>
-          ForceMath.sum(friend.agent.forces.view.filterNot(_._1 == Forces.cohesion).map(_._2)) * collisionRepulsionMagnitude(unit, friend))))
-        .clipMin(1.0)
+    (correctDepth(unit) + correctWidth(unit)).normalize
   }
   
   ////////////
@@ -142,6 +144,7 @@ object Potential {
     ForceMath.fromPixels(unit.pixelCenter, MicroPathing.getWaypointToPixel(unit, goal), 1.0)
   }
 
+  private val tts = 1d / 32d / 32d
   private def collisionRepulsionMagnitude(unit: FriendlyUnitInfo, other: UnitInfo): Double = {
     if (unit.flying) return 0.0
     if (other.flying) return 0.0
@@ -149,7 +152,7 @@ object Potential {
     val maximumDistance   = Math.max(unit.unitClass.dimensionMax, other.unitClass.dimensionMax)
     val blockerDistance   = other.pixelDistanceEdge(unit)
     val magnitudeDistance = 1.0 - PurpleMath.clampToOne(blockerDistance / (1.0 + maximumDistance))
-    val magnitudeSize     = unit.unitClass.dimensionMax * other.unitClass.dimensionMax / 32.0 / 32.0
+    val magnitudeSize     = unit.unitClass.dimensionMax * other.unitClass.dimensionMax * tts
     val output            = magnitudeSize * magnitudeDistance
     output
   }
@@ -161,8 +164,8 @@ object Potential {
   
   def avoidCollision(unit: FriendlyUnitInfo): Force = {
     if (unit.flying) return new Force
-    val repulsions = unit.inTileRadius(3).filter(o => ! o.flying && ! o.unitClass.isBuilding).map(collisionRepulsion(unit, _))
-    val output = ForceMath.sum(repulsions).clipMin(1.0)
+    val repulsions = unit.inTileRadius(3).map(collisionRepulsion(unit, _))
+    val output = ForceMath.mean(repulsions).clipMin(1.0)
     output
   }
 }

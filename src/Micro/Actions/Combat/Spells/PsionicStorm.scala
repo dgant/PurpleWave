@@ -14,7 +14,7 @@ object PsionicStorm extends TargetedSpell {
   override protected def aoe              : Boolean   = true
   override protected def castRangeTiles   : Int       = 9
   override protected def thresholdValue   : Double    = 14 * Terran.Marine.subjectiveValue
-  override protected def lookaheadFrames  : Int       = 8
+  override protected def lookaheadPixels  : Int       = 24
 
   override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
     if (With.grids.psionicStorm.isSet(target.tileIncludingCenter)) return 0.0

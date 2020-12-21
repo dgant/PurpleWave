@@ -62,20 +62,27 @@ object MicroPathing {
   private val rayRadians12 = rayRadiansN(12)
   private val rayRadians16 = rayRadiansN(16)
   private val rayRadians32 = rayRadiansN(32)
-  def getWaypointInDirection(unit: FriendlyUnitInfo, radians: Double, mustApproach: Option[Pixel] = None, requireSafety: Boolean = false): Option[Pixel] = {
-    lazy val safetyPixels =  unit.matchups.pixelsOfEntanglement
+  def getWaypointInDirection(
+    unit          : FriendlyUnitInfo,
+    radians       : Double,
+    mustApproach  : Option[Pixel] = None,
+    requireSafety : Boolean = false,
+    exactDistance : Option[Double] = None): Option[Pixel] = {
+
+    val distance = exactDistance.getOrElse(waypointDistancePixels.toDouble)
+
     lazy val travelDistanceCurrent = mustApproach.map(unit.pixelDistanceTravelling)
 
     def acceptableForSafety(pixel: Pixel): Boolean = {
       ! requireSafety || unit.matchups.threats.forall(t => t.pixelDistanceSquared(pixel) > t.pixelDistanceSquared(unit.pixelCenter))
     }
 
-    if (mustApproach.exists(a => unit.pixelDistanceCenter(a) < waypointDistancePixels && acceptableForSafety(a))) {
+    if (mustApproach.exists(a => unit.pixelDistanceCenter(a) < distance && acceptableForSafety(a))) {
       return mustApproach
     }
 
     val rayStart = unit.pixelCenter
-    val waypointDistance = Math.max(waypointDistancePixels, if (requireSafety) 64 + safetyPixels else 0)
+    val waypointDistance = Math.max(distance, if (requireSafety) 64 + unit.matchups.pixelsOfEntanglement else 0)
     val rayRadians = if (With.reaction.sluggishness <= 1) rayRadians32 else if (With.reaction.sluggishness <= 2) rayRadians16 else rayRadians12
     val terminus = rayRadians
       .indices

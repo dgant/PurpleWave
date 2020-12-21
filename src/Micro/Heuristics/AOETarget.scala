@@ -4,6 +4,7 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import Mathematics.Points.{Pixel, PixelRectangle}
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 class AOETarget(
@@ -13,7 +14,7 @@ class AOETarget(
     my: Int,
     pixelWidth: Int,
     pixelHeight: Int,
-    projectionFrames: Double,
+    lookaheadPixels: Double,
     evaluate: (UnitInfo, FriendlyUnitInfo) => Double) {
   val margin = 8
   private val p = target.pixelCenter
@@ -43,7 +44,7 @@ class AOETarget(
     yMax = evalPixelEnd.y
   }
   units.foreach(unit => {
-    val positionProjected = unit.projectFrames(projectionFrames)
+    val positionProjected = if (lookaheadPixels == 0 || unit.is(Protoss.Dragoon)) unit.pixelCenter else unit.pixelCenter.radiateRadians(unit.angleRadians, lookaheadPixels)
     xMin = Math.min(xMin, positionProjected.x)
     yMin = Math.min(yMin, positionProjected.y)
     xMax = Math.max(xMax, positionProjected.x)

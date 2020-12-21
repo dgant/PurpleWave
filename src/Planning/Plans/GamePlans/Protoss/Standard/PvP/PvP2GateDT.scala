@@ -15,7 +15,7 @@ import Planning.Plans.Placement.{BuildCannonsAtNatural, BuildCannonsInMain, Prop
 import Planning.Plans.Scouting.{ScoutCleared, ScoutForCannonRush}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyDarkTemplarLikely, SafeAtHome}
+import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, Predicate}
@@ -32,18 +32,9 @@ class PvP2GateDT extends GameplanTemplate {
 
   override val attackPlan = new If(
     new Or(
-      // It's our timing
-      new Latch(new UnitsAtLeast(1, Protoss.DarkTemplar)),
-      new And(
-        new FoundEnemyBase,
-        // Attack greedy openings
-        new EnemyStrategy(With.fingerprints.nexusFirst),
-        // Pressure proxy opening
-        new Or(
-          new Not(new EnemyStrategy(With.fingerprints.proxyGateway)),
-          new UnitsAtLeast(1, Protoss.Dragoon, complete = true)))),
-    new Attack,
-    new PvPIdeas.AttackSafely)
+      new Latch(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true)),
+      new EnemyBasesAtLeast(2)),
+    new Attack)
 
   override def placementPlan: Plan = new Parallel(
     super.placementPlan,

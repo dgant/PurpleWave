@@ -4,10 +4,11 @@ package Micro.Agency
 import Debugging.Visualizations.ForceMap
 import Information.Geography.Pathfinding.Types.TilePath
 import Lifecycle.With
+import Mathematics.Physics.ForceMath
 import Mathematics.Points.{Pixel, Tile}
 import Micro.Actions.{Action, Idle}
 import Micro.Coordination.Pushing.{TrafficPriorities, TrafficPriority}
-import Performance.Cache
+import Performance.{Cache, KeyedCache}
 import Planning.Plan
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
@@ -72,24 +73,29 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   def destination: Pixel = toTravel.orElse(toReturn).getOrElse(origin)
   def origin: Pixel = toReturn.getOrElse(originCache())
-  private val originCache = new Cache(() =>
-    ride.filterNot(unit.transport.contains).map(_.pixelCenter)
-    .orElse(toReturn)
-    .orElse(
-      ByOption.minBy(
-        With.geography.ourBases.filter(base =>
-          base.scoutedByEnemy
-          || base.isNaturalOf.exists(_.scoutedByEnemy)
-          || base == With.geography.ourNatural
-          || base == With.geography.ourMain))(base =>
-        unit.pixelDistanceTravelling(base.heart)
-        // Retreat into main
-        + (if (base.isNaturalOf.filter(_.owner.isUs).exists(_.heart.altitudeBonus >= base.heart.altitudeBonus) && unit.battle.exists(_.enemy.centroidGround.base == base)) 32 * 40 else 0))
-      .map(_.heart.pixelCenter))
-    .getOrElse(With.geography.home.pixelCenter))
+  private val originCache = new KeyedCache(
+    () =>
+      ride.filterNot(unit.transport.contains).map(_.pixelCenter)
+      .orElse(toReturn)
+      .orElse(
+        ByOption.minBy(
+          With.geography.ourBases.filter(base =>
+            base.scoutedByEnemy
+            || base.isNaturalOf.exists(_.scoutedByEnemy)
+            || base == With.geography.ourNatural
+            || base == With.geography.ourMain))(base =>
+          unit.pixelDistanceTravelling(base.heart)
+          // Retreat into main
+          + (if (base.isNaturalOf.filter(_.owner.isUs).exists(_.heart.altitudeBonus >= base.heart.altitudeBonus) && unit.battle.exists(_.enemy.centroidGround.base == base)) 32 * 40 else 0))
+        .map(_.heart.pixelCenter))
+      .getOrElse(With.geography.home.pixelCenter),
+    () => unit.agent.toReturn)
 
 
   def isScout: Boolean = intent.toScoutTiles.nonEmpty
+
+  def safetyMargin: Double = 64 - Math.min(0, unit.confidence()) * 256
+  def withinSafetyMargin: Boolean = unit.matchups.pixelsOfEntanglement < -safetyMargin
 
   /////////////////
   // Diagnostics //
@@ -163,7 +169,19 @@ class Agent(val unit: FriendlyUnitInfo) {
     canFocus      = intent.canFocus
   }
 
-  def escalatePriority(newPriority: TrafficPriority): Unit = if (priority < newPriority) priority = newPriority
+  /////////////
+  // Pushing //
+  /////////////
+
+  def escalatePriority(newPriority: TrafficPriority): Unit = if (priority < newPriority && ! unit.flying) priority = newPriority
+  val receivedPushForces = new Cache(() => With.coordinator.pushes
+    .get(unit)
+    .map(p => (p, p.force(unit)))
+    .filter(_._2.exists(_.lengthSquared > 0))
+    .map(p => (p._1, p._2.get))
+    .toVector)
+  val receivedPushForce = new KeyedCache(() => ForceMath.sum(receivedPushForces().view.map(_._2)), () => priority)
+  val receivedPushPriority = new Cache(() => ByOption.max(receivedPushForces().view.map(_._1.priority)).getOrElse(TrafficPriorities.None))
 
   /////////////
   // Leading //

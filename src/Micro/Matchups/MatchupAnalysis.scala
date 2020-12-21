@@ -20,31 +20,31 @@ case class MatchupAnalysis(me: UnitInfo) {
 
   private def withEntrants(source: Seq[UnitInfo], filter: (UnitInfo) => Boolean = (unit) => true): Seq[UnitInfo] = source ++ entrants.filter(filter).filterNot(source.contains)
 
-  def allUnits              : Seq[UnitInfo] = battleUnits.map(withEntrants(_)).getOrElse(defaultUnits)
-  def enemies               : Seq[UnitInfo] = battleEnemies.map(withEntrants(_, _.isEnemy)).getOrElse(defaultUnits.filter(_.isEnemyOf(me)))
-  def alliesInclSelf        : Seq[UnitInfo] = battleUs.map(withEntrants(_, _.isFriendly)).getOrElse(defaultUnits.filterNot(_.isEnemyOf(me)))
-  def alliesInclSelfCloaked : Seq[UnitInfo] = alliesInclSelf.filter(_.cloakedOrBurrowed)
-  def allies                : Seq[UnitInfo] = alliesInclSelf.filterNot(_.id == me.id)
-  def others                : Seq[UnitInfo] = enemies ++ allies
-  def enemyDetectors        : Seq[UnitInfo] = enemies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
-  def threats               : Seq[UnitInfo] = enemies.filter(threatens(_, me))
-  def targets               : Seq[UnitInfo] = enemies.filter(threatens(me, _))
-  def threatsInRange        : Seq[UnitInfo] = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me))
-  def targetsInRange        : Seq[UnitInfo] = targets.filter(target => target.visible && me.pixelRangeAgainst(target) >= target.pixelDistanceEdge(me) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
-  lazy val nearestArbiter                : Option[UnitInfo]      = ByOption.minBy(allies.view.filter(_.is(Protoss.Arbiter)))(_.pixelDistanceSquared(me))
-  lazy val allyTemplarCount              : Int                   = allies.count(_.is(Protoss.HighTemplar))
-  lazy val busyForCatching               : Boolean               = me.gathering || me.constructing || me.repairing || ! me.canMove || BlockConstruction.buildOrders.contains(me.order)
-  lazy val catchers                      : Vector[UnitInfo]      = threats.filter(canCatchMe).toVector
-  lazy val splashFactorMax               : Double                = splashFactorForUnits(targets)
-  lazy val splashFactorInRange           : Double                = splashFactorForUnits(targetsInRange)
-  lazy val valuePerDamage                : Double                = MicroValue.valuePerDamageCurrentHp(me)
-  lazy val vpfDealingInRange             : Double                = splashFactorInRange * ByOption.max(targetsInRange.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
-  lazy val dpfReceiving                  : Double                = threatsInRange.view.map(_.matchups.dpfDealingDiffused(me)).sum
-  lazy val vpfReceiving                  : Double                = valuePerDamage * dpfReceiving
-  lazy val framesToLive                  : Double                = PurpleMath.nanToInfinity(me.totalHealth / dpfReceiving)
-  lazy val pixelsOfEntanglement          : Double                = ByOption.max(threats.map(me.pixelsOfEntanglement)).getOrElse(- With.mapPixelWidth)
-  lazy val framesOfSafety                : Double                = - With.latency.latencyFrames - With.reaction.agencyAverage - PurpleMath.nanToZero(pixelsOfEntanglement / me.topSpeed)
-  lazy val pixelsOutOfNonWorkerRange     : Double                = ByOption.min(threats.view.filterNot(_.unitClass.isWorker).map(t => t.pixelDistanceEdge(me) - t.pixelRangeAgainst(me))).getOrElse(With.mapPixelWidth)
+  def allUnits                : Seq[UnitInfo] = battleUnits.map(withEntrants(_)).getOrElse(defaultUnits)
+  def enemies                 : Seq[UnitInfo] = battleEnemies.map(withEntrants(_, _.isEnemy)).getOrElse(defaultUnits.filter(_.isEnemyOf(me)))
+  def alliesInclSelf          : Seq[UnitInfo] = battleUs.map(withEntrants(_, _.isFriendly)).getOrElse(defaultUnits.filterNot(_.isEnemyOf(me)))
+  def alliesInclSelfCloaked   : Seq[UnitInfo] = alliesInclSelf.filter(_.cloakedOrBurrowed)
+  def allies                  : Seq[UnitInfo] = alliesInclSelf.filterNot(_.id == me.id)
+  def others                  : Seq[UnitInfo] = enemies ++ allies
+  def enemyDetectors          : Seq[UnitInfo] = enemies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
+  def threats                 : Seq[UnitInfo] = enemies.filter(threatens(_, me))
+  def targets                 : Seq[UnitInfo] = enemies.filter(threatens(me, _))
+  def threatsInRange          : Seq[UnitInfo] = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me))
+  def threatsInFrames(f: Int) : Seq[UnitInfo] = threats.filter(_.framesToGetInRange(me) < f)
+  def targetsInRange          : Seq[UnitInfo] = targets.filter(target => target.visible && me.pixelRangeAgainst(target) >= target.pixelDistanceEdge(me) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
+  lazy val allyTemplarCount           : Int                   = allies.count(_.is(Protoss.HighTemplar))
+  lazy val busyForCatching            : Boolean               = me.gathering || me.constructing || me.repairing || ! me.canMove || BlockConstruction.buildOrders.contains(me.order)
+  lazy val catchers                   : Vector[UnitInfo]      = threats.filter(canCatchMe).toVector
+  lazy val splashFactorMax            : Double                = splashFactorForUnits(targets)
+  lazy val splashFactorInRange        : Double                = splashFactorForUnits(targetsInRange)
+  lazy val valuePerDamage             : Double                = MicroValue.valuePerDamageCurrentHp(me)
+  lazy val vpfDealingInRange          : Double                = splashFactorInRange * ByOption.max(targetsInRange.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
+  lazy val dpfReceiving               : Double                = threatsInRange.view.map(_.matchups.dpfDealingDiffused(me)).sum
+  lazy val vpfReceiving               : Double                = valuePerDamage * dpfReceiving
+  lazy val framesToLive               : Double                = PurpleMath.nanToInfinity(me.totalHealth / dpfReceiving)
+  lazy val framesOfSafety             : Double                = - With.latency.latencyFrames - With.reaction.agencyAverage - PurpleMath.nanToZero(pixelsOfEntanglement / me.topSpeed)
+  lazy val pixelsOfEntanglement       : Double                = ByOption.max(threats.map(me.pixelsOfEntanglement)).getOrElse(- With.mapPixelWidth)
+  lazy val pixelsOutOfNonWorkerRange  : Double                = ByOption.min(threats.view.filterNot(_.unitClass.isWorker).map(t => t.pixelDistanceEdge(me) - t.pixelRangeAgainst(me))).getOrElse(With.mapPixelWidth)
 
   protected def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = (
     shooter.canAttack(victim)

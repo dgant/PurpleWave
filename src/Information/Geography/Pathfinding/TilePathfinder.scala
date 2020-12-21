@@ -22,9 +22,9 @@ trait TilePathfinder {
     var _visitedStamp   : Long  = _stampDefault
     var _enqueuedStamp  : Long  = _stampDefault
     var _cameFrom       : Tile  = _
-    var _costFromStart  : Float = _
-    var _costToEndFloor : Float = _
-    var _pathLength     : Float = _
+    var _costFromStart  : Double = _
+    var _costToEndFloor : Double = _
+    var _pathLength     : Double = _
     var _repulsion      : Double = _
     @inline def setEnqueued() {
       _enqueuedStamp = _stampCurrent
@@ -37,15 +37,15 @@ trait TilePathfinder {
     }
     // Cost of best-known path from the start tile.
     // In common A* parlance, this is the gScore.
-    @inline def setCostFromStart(value: Float) {
+    @inline def setCostFromStart(value: Double) {
       _costFromStart = value
     }
     // Minimum possible cost to the end.
     // In common A* parlance, this is the fScore.
-    @inline def setTotalCostFloor(value: Float) {
+    @inline def setTotalCostFloor(value: Double) {
       _costToEndFloor = value
     }
-    @inline def setPathLength(value: Float) {
+    @inline def setPathLength(value: Double) {
       _pathLength = value
     }
     @inline def setRepulsion(value: Double): Unit = {
@@ -54,10 +54,10 @@ trait TilePathfinder {
     @inline def enqueued        : Boolean           = _enqueuedStamp  == _stampCurrent
     @inline def visited         : Boolean           = _visitedStamp  == _stampCurrent
     @inline def cameFrom        : Option[Tile]      = if (enqueued && _cameFrom.i != i) Some(_cameFrom) else None
-    @inline def costFromStart   : Float             = _costFromStart
-    @inline def totalCostFloor  : Float             = _costToEndFloor
-    @inline def pathLength      : Float             = _pathLength
-    @inline def repulsion       : Double            = _repulsion
+    @inline def costFromStart   : Double             = _costFromStart
+    @inline def totalCostFloor  : Double             = _costToEndFloor
+    @inline def pathLength      : Double             = _pathLength
+    @inline def repulsion       : Double             = _repulsion
   }
 
   private def startNextSearch() {
@@ -85,35 +85,36 @@ trait TilePathfinder {
 
   // Best cost from the start tile to this tile.
   // In common A* parlance, this is the gScore.
-  @inline private final def costFromStart(profile: PathfindProfile, toTile: Tile, hypotheticalFrom: Option[Tile] = None): Float = {
+  @inline private final def costFromStart(profile: PathfindProfile, toTile: Tile, hypotheticalFrom: Option[Tile] = None): Double = {
     val i = toTile.i
     val toState = tiles(i)
     val fromState = hypotheticalFrom.map(t => tiles(t.i)).orElse(toState.cameFrom.map(t => tiles(t.i)))
     if (fromState.isEmpty) return 0
     val fromTile = fromState.get
-    val costSoFar     : Float   = fromState.get.costFromStart
-    val costDistance  : Float   = if (fromTile.tile.x == toTile.x || fromTile.tile.y == toTile.y) 1f else PurpleMath.sqrt2f
-    val costThreat    : Float   = if (profile.costThreat == 0) 0 else profile.costThreat * Math.max(0, profile.threatGrid.getUnchecked(i) - profile.threatGrid.getUnchecked(fromTile.i)) // Max?
-    val costOccupancy : Float   = if (profile.costOccupancy == 0)
+    val costSoFar     : Double  = fromState.get.costFromStart
+    val costDistance  : Double  = if (fromTile.tile.x == toTile.x || fromTile.tile.y == toTile.y) 1f else PurpleMath.sqrt2f
+    val costThreat    : Double  = if (profile.costThreat == 0) 0 else profile.costThreat * Math.max(0, profile.threatGrid.getUnchecked(i) - profile.threatGrid.getUnchecked(fromTile.i)) // Max?
+    val costOccupancy : Double  = if (profile.costOccupancy == 0)
       0
     else {
       // Intuition: We want to keep this value scaled around 0-1 so we can reason about costOccupancy
       // Signum: Scale-invariant
       // Sigmoid: Tiebreaks equally signed vectors with different scales
       val diff = With.coordinator.gridPathOccupancy.getUnchecked(i) - With.coordinator.gridPathOccupancy.getUnchecked(fromTile.i)
-      profile.costOccupancy * 0.5f * (PurpleMath.fastSigmoid(diff) + PurpleMath.signum(diff))
+      profile.costOccupancy * 0.5f * (PurpleMath.fastSigmoid(diff) + 0.5 + 0.5 * PurpleMath.signum(diff))
     }
-    val costRepulsion : Double  = if (profile.costRepulsion == 0 || profile.maxRepulsion == 0)
+    val costRepulsion: Double  = if (profile.costRepulsion == 0 || profile.maxRepulsion == 0)
       0
     else {
-      // Intuition: We want to keep this value scaled around 0-1 so we can reason about costOccupancy
+      // Intuition: We want to keep this value scaled around 0-1 so we can reason about costRepulsion
+      // and it must be non-negative to preserve heuristic admissibility
       // Signum: Scale-invariant
       // Sigmoid: Tiebreaks equally signed vectors with different scales
       val diff = toState.repulsion - fromState.get.repulsion
-      profile.costRepulsion * 0.5f * (PurpleMath.fastSigmoid(diff) + PurpleMath.signum(diff))
+      profile.costRepulsion * 0.5f * (PurpleMath.fastSigmoid(diff) + 0.5 + 0.5 * PurpleMath.signum(diff))
     }
 
-    costSoFar + costDistance + costThreat + costOccupancy + costRepulsion.toFloat
+    costSoFar + costDistance + costThreat + costOccupancy + costRepulsion
   }
 
   // The A* admissable heuristic: The lowest possible cost to the end of the path.
@@ -121,7 +122,7 @@ trait TilePathfinder {
   //
   // Threat-aware pathfinding makes it easy to introduce a non-admissible heuristic,
   // so be careful when modifying this.
-  @inline private final def costToEndFloor(profile: PathfindProfile, tile: Tile): Float = {
+  @inline private final def costToEndFloor(profile: PathfindProfile, tile: Tile): Double = {
     val i = tile.i
 
     // We're using "Depth into enemy range" as our threat cost.
@@ -130,9 +131,9 @@ trait TilePathfinder {
     // To escape a tile that's 5 tiles into enemy range means we have to pass through tiles of value 5+4+3+2+1
     // So the floor of the cost we'll pay is the Gaussian expansion of the threat cost at the current tile.
 
-    val costDistanceToEnd   : Float = profile.end.map(end => if (profile.crossUnwalkable || ! profile.employGroundDist) tile.tileDistanceFast(end) else tile.groundPixels(end) / 32.0).getOrElse(0.0).toFloat
-    val costOutOfRepulsion  : Float = profile.costRepulsion * PurpleMath.fastSigmoid(tiles(i).repulsion.toFloat) // Hacky; used to smartly tiebreak tiles that are otherwise h() = 0. Using this formulation to minimize likelihood of breaking heuristic requirements
-    val costOutOfThreat     : Float = profile.costThreat * profile.threatGrid.getUnchecked(i)
+    val costDistanceToEnd   : Double = profile.end.map(end => if (profile.crossUnwalkable || ! profile.employGroundDist) tile.tileDistanceFast(end) else tile.groundPixels(end) / 32.0).getOrElse(0.0)
+    val costOutOfRepulsion  : Double = profile.costRepulsion * PurpleMath.fastSigmoid(tiles(i).repulsion) // Hacky; used to smartly tiebreak tiles that are otherwise h() = 0. Using this formulation to minimize likelihood of breaking heuristic requirements
+    val costOutOfThreat     : Double = profile.costThreat * profile.threatGrid.getUnchecked(i)
 
     Math.max(costDistanceToEnd, costOutOfThreat)
   }

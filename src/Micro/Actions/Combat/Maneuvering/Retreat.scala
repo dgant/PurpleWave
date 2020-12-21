@@ -1,6 +1,7 @@
 package Micro.Actions.Combat.Maneuvering
 
 import Lifecycle.With
+import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.TrafficPriorities
@@ -13,7 +14,13 @@ object Retreat extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove && unit.matchups.threats.nonEmpty
 
+  case class Retreat(unit: FriendlyUnitInfo, to: Pixel, name: String)
+
   override def perform(unit: FriendlyUnitInfo): Unit = {
+    applyRetreat(getRetreat(unit))
+  }
+
+  def getRetreat(unit: FriendlyUnitInfo): Retreat = {
     // Decide our goals in retreating
     def timeOriginOfThreat(threat: UnitInfo): Double = threat.framesToTravelTo(unit.agent.origin) - threat.pixelRangeAgainst(unit) * threat.topSpeed
     lazy val distanceOriginUs     = unit.pixelDistanceTravelling(unit.agent.origin)
@@ -25,14 +32,14 @@ object Retreat extends Action {
     lazy val enemySieging         = unit.matchups.enemies.exists(_.isAny(UnitMatchSiegeTank, Zerg.Lurker)) && ! unit.base.exists(_.owner.isEnemy)
     lazy val goalSidestep         = unit.is(Protoss.DarkTemplar) || (enemySieging && ! enemyCloser && ! enemySooner)
     lazy val goalHome             = ! unit.agent.isScout && unit.zone != unit.agent.origin.zone && ! goalSidestep && (enemyCloser || enemySooner)
-    lazy val goalSafety           = unit.matchups.pixelsOfEntanglement > -64
+    lazy val goalSafety           = ! unit.agent.withinSafetyMargin
 
     // Decide how to retreat
     if ( ! unit.flying) {
       unit.agent.escalatePriority(TrafficPriorities.Pardon)
-      if (unit.matchups.framesOfSafety < 48) unit.agent.escalatePriority(TrafficPriorities.Nudge)
-      if (unit.matchups.framesOfSafety < 24) unit.agent.escalatePriority(TrafficPriorities.Bump)
-      if (unit.matchups.framesOfSafety <= 0) unit.agent.escalatePriority(TrafficPriorities.Shove)
+      if (unit.matchups.pixelsOfEntanglement > -80) unit.agent.escalatePriority(TrafficPriorities.Nudge)
+      if (unit.matchups.pixelsOfEntanglement > -48) unit.agent.escalatePriority(TrafficPriorities.Bump)
+      if (unit.matchups.pixelsOfEntanglement > -16) unit.agent.escalatePriority(TrafficPriorities.Shove)
     }
     if (unit.agent.forces.isEmpty) {
       MicroPathing.setDefaultForces(unit, goalHome = goalHome, goalSafety = goalSafety)
@@ -43,9 +50,16 @@ object Retreat extends Action {
     lazy val waypointPath     = MicroPathing.getWaypointAlongTilePath(tilePath).map(_.add(unit.pixelCenter.relativeToTileCenter)).map((_, "Path"))
     lazy val waypointForces   = Seq(true, false).view.map(safety => MicroPathing.getWaypointInDirection(unit, force, requireSafety = safety)).find(_.nonEmpty).flatten.map((_, "Force"))
     lazy val waypointOrigin   = (unit.agent.origin, "Origin")
-    val waypoint = waypointSimple.orElse(waypointPath).orElse(waypointForces).getOrElse(waypointOrigin)
-    unit.agent.toTravel = Some(waypoint._1)
-    unit.agent.act(unit.agent.lastAction.getOrElse("Retreat") + waypoint._2)
-    With.commander.move(unit)
+    val waypoint              = waypointSimple.orElse(waypointPath).orElse(waypointForces).getOrElse(waypointOrigin)
+    Retreat(unit, waypoint._1, waypoint._2)
+  }
+
+  def applyRetreat(retreat: Retreat): Unit = {
+    if (retreat.unit.unready) return
+    retreat.unit.agent.toTravel = Some(retreat.to)
+    if (With.configuration.debugging) {
+      retreat.unit.agent.act("Retreat" + retreat.name)
+    }
+    With.commander.move(retreat.unit)
   }
 }

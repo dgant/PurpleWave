@@ -15,7 +15,7 @@ abstract class TargetedSpell extends Action {
   protected def aoe             : Boolean
   protected def castRangeTiles  : Int
   protected def thresholdValue  : Double
-  protected def lookaheadFrames : Int = With.latency.latencyFrames
+  protected def lookaheadPixels : Int = 0
   protected def pixelWidth      : Int = 96
   protected def pixelHeight     : Int = 96
   
@@ -37,7 +37,7 @@ abstract class TargetedSpell extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     val safeDistance  = Math.max(0, -unit.matchups.pixelsOfEntanglement)
-    val totalRange    = safeDistance + 32.0 * castRangeTiles + 64 // +64 is just some encouragement
+    val totalRange    = safeDistance + 32.0 * castRangeTiles + 32 // The margin is just some encouragement
     
     if (aoe) {
       val targetPixel = new SpellTargetAOE().chooseTargetPixel(unit, totalRange, thresholdValue, valueTarget, pixelWidth = pixelWidth, pixelHeight = pixelHeight)

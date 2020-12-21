@@ -18,13 +18,13 @@ object ShowTeams extends View {
       DrawMap.arrow(team.centroidGround, team.centroidGround.project(team.lineWidth(),   team.widthIdeal() / 2), bright)
       DrawMap.arrow(team.centroidGround, team.centroidGround.project(team.lineWidth(), - team.widthIdeal() / 2), bright)
       team.units.foreach(unit => {
-        DrawMap.line(unit.pixelCenter, unit.positioningWidthCurrentCached(), medium)
-        DrawMap.line(unit.pixelCenter, unit.positioningWidthTargetCached(), dark)
+        DrawMap.line(unit.pixelCenter, unit.teamHorizontalSlot(), medium)
+        DrawMap.line(unit.pixelCenter, unit.teamWidthGoal(), dark)
         DrawMap.box(
-          unit.positioningWidthCurrentCached().subtract(unit.unitClass.dimensionLeft, unit.unitClass.dimensionUp),
-          unit.positioningWidthCurrentCached().add(unit.unitClass.dimensionRight, unit.unitClass.dimensionDown),
+          unit.teamHorizontalSlot().subtract(unit.unitClass.dimensionLeft, unit.unitClass.dimensionUp),
+          unit.teamHorizontalSlot().add(unit.unitClass.dimensionRight, unit.unitClass.dimensionDown),
           medium)
-        DrawMap.circle(unit.positioningWidthTargetCached(), unit.unitClass.radialHypotenuse.toInt, dark)
+        DrawMap.circle(unit.teamWidthGoal(), unit.unitClass.radialHypotenuse.toInt, dark)
       })
       DrawMap.label(f"W: ${(team.coherenceWidth() * 100).toInt}%%", team.centroidGround.add(0, 16), drawBackground = true, backgroundColor = Color.Black)
       DrawMap.label(f"D: ${(team.coherenceDepth() * 100).toInt}%%", team.centroidGround.add(0, 26), drawBackground = true, backgroundColor = Color.Black)

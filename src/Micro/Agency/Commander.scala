@@ -144,13 +144,13 @@ class Commander {
     var to: Pixel = argTo
 
     // Send some units past their destination to maximize acceleration
-    val overshootDistance = if (unit.flying) 288.0 else 8
     if (unit.isAny(Terran.Dropship, Terran.ScienceVessel, Protoss.Shuttle, Protoss.Observer, Protoss.HighTemplar, Zerg.Mutalisk, Zerg.Overlord, Zerg.Queen)) {
+      val overshootDistance = if (unit.flying) 288.0 else 8
       if (to == unit.pixelCenter) {
         val signX = PurpleMath.forcedSignum(SpecificPoints.middle.x - to.x)
         val signY = PurpleMath.forcedSignum(SpecificPoints.middle.y - to.y)
         to = to.add((signX * overshootDistance).toInt, (signY * overshootDistance).toInt)
-      } else if(unit.pixelDistanceSquared(to) < overshootDistance * overshootDistance) {
+      } else if (unit.pixelDistanceSquared(to) < overshootDistance * overshootDistance) {
         to = unit.pixelCenter.project(to, overshootDistance)
       }
     }
@@ -248,14 +248,13 @@ class Commander {
         rightClick(unit, unit.agent.ride.get)
       }
       else {
-
         unit.baseUnit.move(destination.bwapi)
       }
       if (unit.agent.priority > TrafficPriorities.None) {
         With.coordinator.pushes.put(new UnitLinearGroundPush(
           unit.agent.priority,
           unit,
-          unit.pixelCenter.project(destination, Math.min(unit.pixelDistanceCenter(destination), 128))))
+          unit.pixelCenter.project(destination, Math.min(unit.pixelDistanceCenter(destination), 80))))
       }
     }
 
@@ -494,7 +493,7 @@ class Commander {
       With.frame + With.latency.turnSize,
       unit.nextOrderFrame.getOrElse(0)).max
     unit.sleepUntil(sleepUntil)
-    if (With.configuration.trackUnit && unit.selected) {
+    if (With.configuration.trackUnit && (unit.selected || unit.transport.exists(_.selected))) {
       KeyboardCommands.breakpointFodder = - KeyboardCommands.breakpointFodder
     }
   }

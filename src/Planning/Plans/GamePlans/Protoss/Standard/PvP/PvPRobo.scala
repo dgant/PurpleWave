@@ -66,7 +66,7 @@ class PvPRobo extends GameplanTemplate {
         new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
         new UnitsAtLeast(1, Protoss.Reaver, complete = true),
         new EnemiesAtMost(0, Protoss.PhotonCannon, complete = true),
-        new EnemiesAtMost(1, UnitMatchWarriors)),
+        new EnemiesAtMost(0, UnitMatchWarriors)),
       new Or(
         new Not(new EnemyHasShown(Protoss.DarkTemplar)),
         new UnitsAtLeast(2, Protoss.Observer, complete = true)),

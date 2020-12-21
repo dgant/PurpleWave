@@ -9,6 +9,6 @@ object TargetFilterCombatants extends TargetFilter {
     (
       target.unitClass.attacksOrCastsOrDetectsOrTransports
       || actor.battle.forall(_.predictionAttack.deathsUs == 0)
-      || ! actor.battle.exists(_.teamOf(actor).engaged()))
+      || ! actor.team.exists(_.engaged()))
   }
 }

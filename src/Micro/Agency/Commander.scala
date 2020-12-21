@@ -160,14 +160,21 @@ class Commander {
       PurpleMath.clamp(to.x, unit.unitClass.dimensionLeft, With.mapPixelWidth  - unit.unitClass.dimensionRight),
       PurpleMath.clamp(to.y, unit.unitClass.dimensionUp,   With.mapPixelHeight - unit.unitClass.dimensionDown))
 
+    if (unit.flying) return to
+
     // Path around terrain (if we haven't already)
-    if ( ! unit.flying && unit.pixelDistanceTravelling(to) >= 2 * MicroPathing.waypointDistancePixels && With.reaction.sluggishness < 2 && unit.zone != to.zone) {
+    if (unit.pixelDistanceTravelling(to) >= 2 * MicroPathing.waypointDistancePixels && With.reaction.sluggishness < 2 && unit.zone != to.zone) {
       to = MicroPathing.getWaypointToPixel(unit, to)
     }
 
-    // Cleave to walkable terrain until we're arriving at the destination
+    // Even slight intersection with a non-walkable tile can cause a unit to refuse movement
     // This could prevent getting stuck eg when trying to move behind a mineral line with a Dragoon
-    else if ( ! unit.flying && ! to.tileIncluding.walkable && unit.pixelDistanceCenter(to) > 32) {
+    var walkabilityAssured = to.walkable
+    walkabilityAssured &&= to.add( - unit.unitClass.dimensionLeft,  - unit.unitClass.dimensionUp    ).walkable
+    walkabilityAssured &&= to.add(   unit.unitClass.dimensionRight,   unit.unitClass.dimensionDown  ).walkable
+    walkabilityAssured &&= to.add(   unit.unitClass.dimensionRight, - unit.unitClass.dimensionUp    ).walkable
+    walkabilityAssured &&= to.add( - unit.unitClass.dimensionLeft,    unit.unitClass.dimensionDown  ).walkable
+    if ( ! walkabilityAssured && unit.pixelDistanceCenter(to) > 32) {
       to = to.nearestWalkableTile.pixelCenter
     }
 

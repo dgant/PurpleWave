@@ -84,14 +84,13 @@ object Paradrop extends Action {
       Some(With.grids.enemyRangeGround.addedRange - 1),
       None).foreach(maximumThreat =>
       if ( ! path.pathExists) {
-        val profile = new PathfindProfile(unit.pixelCenter.nearestWalkableTile)
+        val profile = new PathfindProfile(unit.tileIncludingCenter)
         profile.end                 = Some(destinationGround)
         profile.endDistanceMaximum  = endDistanceMaximum // Uses the distance implied by allowGroundDist
         profile.lengthMaximum       = Some(30)
         profile.threatMaximum       = maximumThreat
         profile.canCrossUnwalkable  = Some(true)
         profile.canEndUnwalkable    = Some(false)
-        profile.costOccupancy       = 0.25f
         profile.costThreat          = if (target.isDefined) 0.5f else 3f
         profile.costRepulsion       = if (target.isDefined) 0.5f else 6f
         profile.repulsors           = repulsors

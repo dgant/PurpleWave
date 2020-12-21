@@ -1,5 +1,6 @@
 package Information.Battles.Types
 
+import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Mathematics.PurpleMath
@@ -22,8 +23,11 @@ class Team(val units: Vector[UnitInfo]) {
   //////////////
   // Features //
   //////////////
-  
-  lazy val opponent: Team = if (battle.us == this) battle.enemy else battle.us
+
+  lazy val us: Boolean = this == battle.us
+  lazy val enemy: Boolean = this == battle.enemy
+  lazy val opponent: Team = if (us) battle.enemy else battle.us
+  lazy val zones: Set[Zone] = units.map(_.zone).toSet
   def centroidOf(unit: UnitInfo): Pixel = if (unit.flying) centroidAir else centroidGround
 
   // Used by MCRS
@@ -55,17 +59,16 @@ class Team(val units: Vector[UnitInfo]) {
   // Width / 2   = 0 1 1 2 2 3 3  4  4  5  5  6  6  7  7
   // Width       = 1 2 3 4 5 6 7  8  9  10 11 12 13 14 15
   // Thus "width" = 2 * sqrt(sumDistance)
-  private def groundCombatUnits = units.view.filter(u => u.canMove && u.unitClass.canAttack && ! u.flying && ! u.friendly.exists(_.agent.toGather.isDefined))
-  val widthOrder          = new Cache(() => groundCombatUnits.sortBy(_.teamHorizontalSlot().pixelDistanceSquared(lineWidth())).toVector)
+  def groundCombatUnits = units.view.filter(u => u.canMove && u.unitClass.canAttack && ! u.flying && ! u.friendly.exists(_.agent.toGather.isDefined))
+  val widthOrder          = new Cache(() => groundCombatUnits.sortBy(_.widthSlotProjected().pixelDistanceSquared(lineWidth())).toVector)
   //val widthOrder          = new Cache(() => groundCombatUnits.sortBy(_.teamDepthCurrent()).toVector)
   val widthIdeal          = new Cache(() => groundCombatUnits.map(_.unitClass.radialHypotenuse * 3).sum) // x3 = x2 for diameter, then x1.5 for spacing
   val widthMeanExpected   = new Cache(() => widthIdeal() / 2)
-  val widthMeanActual     = new Cache(() => PurpleMath.mean(units.view.map(_.teamWidthCurrent())))
-  val depthMean           = new Cache(() => ByOption.mean(units.view.flatMap(_.teamDepthCurrent())).getOrElse(0d))
-  val depthSpread         = new Cache(() => ByOption.mean(units.view.flatMap(_.teamDepthCurrent()).map(d => Math.abs(d - depthMean()))).getOrElse(0d))
-  val depthSpreadExpected = new Cache(() => units.size / 8) // Magic number
+  val widthMeanActual     = new Cache(() => PurpleMath.mean(units.view.flatMap(_.widthContribution())))
+  val depthMean           = new Cache(() => ByOption.mean(units.view.flatMap(_.depthCurrent())).getOrElse(0d))
+  val depthSpread         = new Cache(() => ByOption.mean(units.view.flatMap(_.depthCurrent()).map(d => Math.abs(d - depthMean()))).getOrElse(0d))
   val coherenceWidth      = new Cache(() => if (units.size == 1) 1 else Math.min(PurpleMath.nanToOne(widthMeanExpected() / widthMeanActual()), PurpleMath.nanToOne(widthMeanActual() / widthMeanExpected())))
-  val coherenceDepth      = new Cache(() => PurpleMath.nanToOne(1 - depthSpread() / (depthSpread() + depthSpreadExpected())))
+  val coherenceDepth      = new Cache(() => 1 - PurpleMath.clamp(2 * depthSpread() / (1 + widthIdeal()), 0, 1))
   val coherence           = new Cache(() => Math.max(coherenceWidth(), coherenceDepth()))
   val impatience          = new Cache(() => units.view.flatMap(_.friendly.map(_.agent.impatience)).sum.toDouble / Math.max(1, units.size))
   val totalArmyFraction   = new Cache(() => units.view.filter(_.is(UnitMatchWarriors)).map(_.subjectiveValue).sum / Math.max(1d, With.units.ours.view.filter(_.is(UnitMatchWarriors)).map(_.subjectiveValue).sum))

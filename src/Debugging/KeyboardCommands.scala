@@ -41,5 +41,5 @@ object KeyboardCommands {
     breakpointFodder = -breakpointFodder
   }
 
-  def selected: FriendlyUnitInfo = With.units.ours.find(_.selected).get
+  def unit: FriendlyUnitInfo = With.units.ours.find(_.selected).get
 }

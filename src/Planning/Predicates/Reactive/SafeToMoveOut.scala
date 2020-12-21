@@ -71,22 +71,24 @@ class SafeToMoveOut extends Predicate {
     
     val scoreDragoon  = 1.0
     val scoreSpeedlot = 1.0
+    val scoreTRexArms = 0.5
+    val scoreSlowlot  = 0.5
     val scoreReaver   = 2.0
     val scoreShuttle  = 1.25
     val scoreArchon   = 2.0
     val scoreCarrier  = 3.0
     
     val scoreUs = (
-        dragoonsUs  * (if (rangeUs) scoreDragoon else 0.0)
-      + zealotsUs   * (if (speedUs) scoreSpeedlot else 0.0)
+        dragoonsUs  * (if (rangeUs) scoreDragoon else scoreTRexArms)
+      + zealotsUs   * (if (speedUs) scoreSpeedlot else scoreSlowlot)
       + reaversUs   * scoreReaver
       + Math.min(shuttlesUs, reaversUs) * scoreShuttle
       + archonsUs   * scoreArchon
       + carriersUs  * scoreCarrier
     )
     val scoreEnemy = (
-        dragoonsEnemy * (if (rangeEnemy) scoreDragoon else 0.0)
-      + zealotsEnemy  * (if (speedEnemy) scoreSpeedlot else 0.0)
+        dragoonsEnemy * (if (rangeEnemy) scoreDragoon else scoreTRexArms)
+      + zealotsEnemy  * (if (speedEnemy) scoreSpeedlot else scoreSlowlot)
       + Math.min(shuttlesEnemy, shuttlesEnemy) * scoreShuttle
       + archonsEnemy  * scoreArchon
       + shuttlesEnemy * scoreShuttle

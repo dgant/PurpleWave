@@ -3,7 +3,7 @@ package ProxyBwapi.UnitInfo
 import Debugging.Visualizations.Colors
 import Information.Battles.Clustering.BattleCluster
 import Information.Battles.MCRS.MCRSUnit
-import Information.Battles.Types.BattleLocal
+import Information.Battles.Types.{BattleLocal, Team}
 import Information.Geography.Types.{Base, Zone}
 import Information.Grids.AbstractGrid
 import Lifecycle.With
@@ -341,6 +341,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   ////////////
 
   @inline final def battle: Option[BattleLocal] = With.battles.byUnit.get(this).orElse(With.matchups.entrants.find(_._2.contains(this)).map(_._1))
+  @inline final def team: Option[Team] = battle.map(_.teamOf(this))
   @inline var matchups: MatchupAnalysis = MatchupAnalysis(this)
 
   val targetBaseValue = new Cache(() => Target.getTargetBaseValue(this), 24)
@@ -512,13 +513,12 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
 
   @inline final def canBurrow: Boolean = canDoAnything && (is(Zerg.Lurker) || (player.hasTech(Zerg.Burrow) && isAny(Zerg.Drone, Zerg.Zergling, Zerg.Hydralisk, Zerg.Defiler)))
 
-  val teamHorizontalSlot  = new Cache(() => battle.map(_.teamOf(this)).map(team => if (flying) team.centroidAir else PurpleMath.projectedPointOnLine(pixelCenter, team.centroidGround, team.lineWidth())).getOrElse(pixelCenter))
-  val teamWidthCurrent    = new Cache(() => pixelCenter.pixelDistance(teamHorizontalSlot()))
-  val teamWidthGoal       = new Cache(() => battle.map(_.teamOf(this)).map(team => if (flying) team.centroidAir else team.widthOrder().zipWithIndex.find(_._1 == this).map(p => team.centroidGround.project(team.lineWidth(), team.widthIdeal() * (team.widthOrder().size / 2 - p._2) / team.widthOrder().size)).getOrElse(teamHorizontalSlot())).getOrElse(pixelCenter))
-  val teamDepthOrigin     = new Cache(() => presumptiveTarget.map(_.pixelCenter).orElse(battle.map(_.enemy.vanguard)))
-  val teamDepthCurrent    = new Cache(() => teamDepthOrigin().map(pixelDistanceCenter(_) - effectiveRangePixels))
-
-  val confidence = new Cache(() => if (matchups.threats.isEmpty) 1.0 else battle.flatMap(_.judgement.map(_.confidence)).getOrElse(1.0))
+  val widthSlotProjected  = new Cache(() => team.map(team => if (flying) team.centroidAir else PurpleMath.projectedPointOnLine(pixelCenter, team.centroidGround, team.lineWidth())).getOrElse(pixelCenter))
+  val widthSlotIdeal      = new Cache(() => team.map(team => if (flying) team.centroidAir else team.widthOrder().zipWithIndex.find(_._1 == this).map(p => team.centroidGround.project(team.lineWidth(), team.widthIdeal() * (team.widthOrder().size / 2 - p._2) / team.widthOrder().size)).getOrElse(widthSlotProjected())).getOrElse(pixelCenter))
+  val widthContribution   = new Cache(() => team.map(_.centroidOf(this).pixelDistance(widthSlotProjected()) * 2))
+  val depthMeasuredFrom   = new Cache(() => presumptiveTarget.map(_.pixelCenter).orElse(team.map(_.opponent.vanguard)))
+  val depthCurrent        = new Cache(() => depthMeasuredFrom().map(pixelDistanceCenter(_) - effectiveRangePixels))
+  val confidence          = new Cache(() => if (matchups.threats.isEmpty) 1.0 else battle.flatMap(_.judgement.map(_.confidence)).getOrElse(1.0))
 
   // TODO: These checks are fast now so we can delete these  //
   // PREVIOUSLY: Stupid, but helped BWMirror performance due to costliness of comparing unit classes with BWMirror limitations

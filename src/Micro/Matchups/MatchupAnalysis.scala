@@ -14,8 +14,8 @@ case class MatchupAnalysis(me: UnitInfo) {
   // The necessity of this is a good argument for defining battles even if they would have trivial simulation results
   private def defaultUnits  : Seq[UnitInfo]         = if (me.canAttack) me.zone.units.view.filter(u => u.isEnemy && BattleClassificationFilters.isEligibleLocal(u)) else Seq.empty.view
   private def battleUnits   : Option[Seq[UnitInfo]] = me.battle.map(_.teams.view.flatMap(_.units))
-  private def battleEnemies : Option[Seq[UnitInfo]] = me.battle.map(_.teamOf(me).opponent.units.view)
-  private def battleUs      : Option[Seq[UnitInfo]] = me.battle.map(_.teamOf(me).units.view)
+  private def battleEnemies : Option[Seq[UnitInfo]] = me.team.map(_.opponent.units.view)
+  private def battleUs      : Option[Seq[UnitInfo]] = me.team.map(_.units.view)
   private def entrants      : Seq[UnitInfo]         = me.battle.flatMap(With.matchups.entrants.get).getOrElse(Seq.empty).view
 
   private def withEntrants(source: Seq[UnitInfo], filter: (UnitInfo) => Boolean = (unit) => true): Seq[UnitInfo] = source ++ entrants.filter(filter).filterNot(source.contains)

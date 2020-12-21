@@ -103,7 +103,7 @@ trait TilePathfinder {
       val diff = With.coordinator.gridPathOccupancy.getUnchecked(i) - With.coordinator.gridPathOccupancy.getUnchecked(fromTile.i)
       profile.costOccupancy * 0.5f * (PurpleMath.fastSigmoid(diff) + 0.5 + 0.5 * PurpleMath.signum(diff))
     }
-    val costRepulsion: Double  = if (profile.costRepulsion == 0 || profile.maxRepulsion == 0)
+    val costRepulsion: Double = if (profile.costRepulsion == 0 || profile.maxRepulsion == 0)
       0
     else {
       // Intuition: We want to keep this value scaled around 0-1 so we can reason about costRepulsion

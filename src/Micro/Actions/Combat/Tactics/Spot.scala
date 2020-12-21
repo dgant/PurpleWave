@@ -19,7 +19,7 @@ object Spot extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     val goal: Option[Pixel] = destinationFromTeammates(unit, unit.squadmates)
-      .orElse(destinationFromTeammates(unit, unit.battle.map(_.teamOf(unit).units).getOrElse(Iterable.empty)))
+      .orElse(destinationFromTeammates(unit, unit.team.map(_.units).getOrElse(Iterable.empty)))
       .map(p =>
         if (With.grids.friendlyVision.isSet(p.tileIncluding))
           ByOption.minBy(unit.squadenemies.view.filter(!_.visible))(_.pixelDistanceCenter(p)).orElse(

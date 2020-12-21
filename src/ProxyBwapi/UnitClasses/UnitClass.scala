@@ -1,5 +1,6 @@
 package ProxyBwapi.UnitClasses
 
+import Lifecycle.With
 import Mathematics.Points.{Point, Tile, TileRectangle}
 import Mathematics.PurpleMath
 import Micro.Heuristics.MicroValue
@@ -45,7 +46,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   def framesToTurn(radians: Double): Int = Math.abs(PurpleMath.nanToZero(Math.ceil(127.0 * PurpleMath.normalizeAroundZero(radians) / Math.PI / turnRadius))).toInt
 
   lazy val needsToTurnToShoot = ! Vector(Terran.Goliath, Terran.SiegeTankUnsieged, Protoss.Dragoon).contains(this)
-  lazy val framesToTurnAndShootAndTurnBackAndAccelerate: Int = stopFrames + accelerationFrames + (if (needsToTurnToShoot) framesToTurn180 else 0)
+  lazy val framesToTurnAndShootAndTurnBackAndAccelerate: Int = stopFrames + accelerationFrames + (if (needsToTurnToShoot) framesToTurn180 else 0) + With.latency.latencyFrames
   lazy val hasMomentum = isFlyer || floats
 
   ////////////

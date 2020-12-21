@@ -2,7 +2,6 @@ package Micro.Actions.Combat.Decisionmaking
 
 import Debugging.Visualizations.Forces
 import Lifecycle.With
-import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Actions.Action
@@ -31,10 +30,10 @@ object DefaultCombat extends Action {
   private object Excuse     extends Technique(Dodge) // Let other units shove through us
   private object Dance      extends Technique(Dodge, Excuse) // Stay in fight with better position
   private object Abuse      extends Technique(Dodge, Excuse) // Pick fights from range
-  private object Fallback   extends Technique(Dodge) // Get out of fight while landing shots
   private object Regroup    extends Technique(Dodge, Excuse, Abuse) // Get into ideal position for future fight
+  private object Fallback   extends Technique(Dodge, Regroup) // Get out of fight while landing shots
   private object Flee       extends Technique(Dodge, Abuse, Fallback, Regroup) // Get out of fight
-  private object Fight      extends Technique(Dodge, Excuse, Abuse, Dance, Flee) // Pick fight ASAP
+  private object Fight      extends Technique(Dodge, Excuse, Regroup, Abuse, Dance) // Pick fight ASAP
 
   def potshot(unit: FriendlyUnitInfo): Boolean = {
     if (unit.unready) return false
@@ -99,7 +98,6 @@ object DefaultCombat extends Action {
     lazy val nudgedTowards      = ! unit.flying && target.pixelDistanceSquared(unit.pixelCenter.add(unit.agent.receivedPushForce().normalize(distance / 2).toPoint)) < unit.pixelDistanceSquared(target)
     lazy val sameThreatsChasing = unit.matchups.threats.forall(t => t.inRangeToAttack(unit) == t.inRangeToAttack(unit, projectedUs))
 
-
     // Chase if they outrange us
     if (pixelsOutranged.isDefined) return 0
 
@@ -131,7 +129,7 @@ object DefaultCombat extends Action {
     rangeAgainstUs.map(r => Math.min(r + 32, range)).getOrElse(range - 16)
   }
   def regroupGoal(unit: FriendlyUnitInfo): Pixel = {
-    if (unit.battle.exists(_.us.units.size > 1)) unit.teamWidthGoal()
+    if (unit.battle.exists(_.us.units.size > 1)) unit.widthSlotIdeal()
     else if (unit.agent.shouldEngage) unit.agent.destination
     else unit.agent.origin
   }
@@ -170,9 +168,11 @@ object DefaultCombat extends Action {
     lazy val purring = (unit.unitClass.isTerran && unit.unitClass.isMechanical && unit.immediateAllies.exists(a => a.repairing && a.orderTarget.contains(unit)))
     transition(Aim, () => ! unit.canMove || purring, () => aim(unit))
 
-    lazy val opponentBlocksGoal = unit.battle.exists(b => b.us.centroidAir.pixelDistanceSquared(unit.agent.destination) <= b.us.centroidGround.pixelDistanceSquared(unit.agent.destination))
+    lazy val opponentBlocksGoal = unit.battle.exists(b => b.enemy.zones.contains(unit.agent.destination.zone) || b.teams.minBy(_.centroidAir.pixelDistanceSquared(unit.agent.destination)).enemy)
     transition(Regroup, () => ! unit.agent.shouldEngage && opponentBlocksGoal && unit.agent.withinSafetyMargin)
-    transition(Regroup, () =>   unit.agent.shouldEngage && opponentBlocksGoal && unit.battle.map(_.us).exists(team => ! team.engaged() && team.coherence() + team.impatience() / Seconds(20)() < unit.confidence()))
+    transition(Regroup, () =>   unit.agent.shouldEngage && opponentBlocksGoal && unit.team.exists(team =>
+      ! team.engaged()
+      && unit.confidence() + team.coherence() + team.impatience() / Seconds(20)() < 1))
 
     // Evaluate potential attacks -- lazily, because targeting is expensive
     lazy val target = Target.choose(unit)
@@ -232,32 +232,23 @@ object DefaultCombat extends Action {
     if (goalRegroup && unit.agent.shouldEngage) unit.agent.increaseImpatience()
 
     // Decide where to go
-    val destination = if (goalRegroup) regroupGoal(unit) else if (goalRetreat) unit.agent.origin else firingPosition(unit).getOrElse(unit.agent.destination)
+    unit.agent.toTravel = Some(if (goalRegroup) regroupGoal(unit) else if (goalRetreat) unit.agent.origin else firingPosition(unit).getOrElse(unit.agent.destination))
+    def destination = unit.agent.toTravel.get
 
     // Avoid the hazards and expense of vector travel when we're not in harm's way
     if (unit.matchups.pixelsOfEntanglement < -320) return
 
     // Calculate potential forces
     val forces = unit.agent.forces
-    val forcesGoal = Seq(Forces.travel, Forces.threat, Forces.leaving)
-    val forcesPositioning = Seq(Forces.spacing, Forces.spreading, Forces.cohesion)
-    def mul(value: Double, force: Force): Force = force * value
-    forces(Forces.travel)     = mul(1, Potential.preferTravel(unit, unit.agent.destination))
-    forces(Forces.threat)     = mul(1, Potential.avoidThreats(unit))
-    forces(Forces.leaving)    = mul(1, Potential.preferTravel(unit, unit.agent.origin))
-    forces(Forces.spacing)    = mul(1, Potential.avoidCollision(unit))
-    forces(Forces.spreading)  = mul(1, MicroPathing.getPushRadians(unit.agent.receivedPushForces()).map(ForceMath.fromRadians(_)).getOrElse(new Force))
-
     var exactDistance: Option[Double] = None
-
     if (goalRetreat) {
       val originPixelsUs        = unit.pixelDistanceTravelling(unit.agent.origin)
-      val originPixelsEnemy     = ByOption.min(unit.matchups.threats.map(_.pixelDistanceCenter(unit.agent.origin))).getOrElse(With.mapPixelPerimeter.toDouble)
+      val originPixelsEnemy     = ByOption.minBy(unit.matchups.threats)(_.pixelDistanceEdge(unit)).map(t => t.pixelDistanceTravelling(unit.agent.origin) - t.pixelRangeAgainst(unit)).getOrElse(With.mapPixelPerimeter.toDouble)
       val margin                = 320d
-      val marginExit            = originPixelsEnemy - originPixelsUs
+      val marginExit            = originPixelsUs - originPixelsEnemy
       val marginThreat          = unit.matchups.pixelsOfEntanglement
-      val ratioExit             = PurpleMath.clamp((margin + marginExit) / margin, 0, 1)
-      val ratioThreat           = PurpleMath.clamp((margin + marginThreat) / margin, 0, 1)
+      val ratioExit             = PurpleMath.clamp(marginExit   / margin, -1, 1)
+      val ratioThreat           = PurpleMath.clamp(marginThreat / margin, -1, 1)
       forces(Forces.leaving)    = Potential.preferTravel(unit, destination) * (1 + ratioExit)
       forces(Forces.threat)     = Potential.avoidThreats(unit) * (1 + ratioThreat)
       forces(Forces.spacing)    = Potential.avoidCollision(unit)
@@ -273,6 +264,8 @@ object DefaultCombat extends Action {
         val distanceCurrent = unit.pixelDistanceEdge(target.get)
         val distanceTowards = distanceCurrent - distanceIdeal
         val danceForce      = if (distanceTowards > 0) Forces.threat else Forces.travel
+        if (distanceTowards > 0) unit.agent.act("Chase")
+        if (distanceTowards < 0) unit.agent.act("Snipe")
         exactDistance      = Some(Math.abs(distanceTowards))
         if (exactDistance.exists(_ < 4)) {
           With.commander.attack(unit)

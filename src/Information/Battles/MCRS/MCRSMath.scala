@@ -8,7 +8,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 object MCRSMath {
 
 	def survivability(unit: UnitInfo): Double = {
-		val damageIn = unit.battle.map(_.teamOf(unit).opponent.meanDamageAgainst(unit)).getOrElse(0.0)
+		val damageIn = unit.team.map(_.opponent.meanDamageAgainst(unit)).getOrElse(0.0)
 		val armor = if (unit.totalHealth > 0) (unit.armorHealth * unit.hitPoints + unit.armorShield * unit.shieldPoints) / unit.totalHealth else 0
 		val armorBonus = 1.0 + PurpleMath.nanToOne(Math.max(0.5, damageIn - armor.toDouble) / damageIn)
 		val typeBonus = if (unit.unitClass.size == Size.Small || unit.unitClass.size == Size.Large) 1.3 else 1.0 // TODO: Base on threat damage type

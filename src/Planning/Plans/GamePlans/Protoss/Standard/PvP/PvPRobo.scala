@@ -35,10 +35,8 @@ class PvPRobo extends GameplanTemplate {
       new UnitsAtMost(0, Protoss.RoboticsSupportBay),
       new Not(new EnemyStrategy(With.fingerprints.dtRush)),
       new Or(
-        new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.twoGate),
-        new EnemyBasesAtLeast(2),
-        new EnemyStrategy(With.fingerprints.robo),
-        new EnemyRecentStrategy(With.fingerprints.fourGateGoon))))
+        new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.robo),
+        new EnemyBasesAtLeast(2))))
 
   class GetObservers extends Or(
     new EnemyDarkTemplarLikely,
@@ -170,15 +168,16 @@ class PvPRobo extends GameplanTemplate {
       new oneGateCoreLogic.GateGate,
       new BuildOrder(
         Get(Protoss.Dragoon),
+        Get(Protoss.DragoonRange),
+        Get(3, Protoss.Pylon),
         Get(Protoss.RoboticsFacility),
-        Get(2, Protoss.Dragoon),
-        Get(Protoss.DragoonRange)),
+        Get(2, Protoss.Dragoon)),
       new BuildOrder(
         Get(2, Protoss.Gateway),
         Get(Protoss.Dragoon),
         Get(Protoss.DragoonRange),
-        Get(2, Protoss.Dragoon))),
-    new BuildOrder(Get(3, Protoss.Dragoon)),
+        Get(3, Protoss.Pylon),
+        Get(3, Protoss.Dragoon))),
 
     new If(
       new GetObservers,

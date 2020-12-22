@@ -9,7 +9,10 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   lazy val predictionAttack = new PredictionLocal(this, weAttack = true, weSnipe = false)
   lazy val predictions      = Vector(predictionAttack).distinct
 
-  var judgement: Option[NewBattleJudgment] = None
+  var judgement: Option[BattleJudgment] = None
+  val judgmentModifiers: Seq[JudgmentModifier] = JudgmentModifiers(this)
+  val gainedValueMultiplier: Double = judgmentModifiers.map(_.gainedValueMultiplier).product
+
 
   def focus: Pixel = PurpleMath.centroid(teams.map(_.vanguard))
 

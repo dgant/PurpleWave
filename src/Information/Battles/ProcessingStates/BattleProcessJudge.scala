@@ -1,6 +1,6 @@
 package Information.Battles.ProcessingStates
 
-import Information.Battles.Types.NewBattleJudgment
+import Information.Battles.Types.BattleJudgment
 import Lifecycle.With
 
 class BattleProcessJudge extends BattleProcessState {
@@ -9,7 +9,7 @@ class BattleProcessJudge extends BattleProcessState {
     val unjudged = With.battles.nextBattlesLocal.find(_.judgement.isEmpty)
 
     if (unjudged.isDefined) {
-      unjudged.get.judgement = Some(new NewBattleJudgment(unjudged.get))
+      unjudged.get.judgement = Some(new BattleJudgment(unjudged.get))
       return
     }
 

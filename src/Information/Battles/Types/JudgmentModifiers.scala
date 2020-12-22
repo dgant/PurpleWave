@@ -49,7 +49,7 @@ object JudgmentModifiers {
     val keyBases      = With.geography.ourBasesAndSettlements.filter(b => b.isOurMain || b.isNaturalOf.exists(_.isOurMain))
     val distanceMax   = With.mapPixelWidth
     val distanceHome  = (if (keyBases.isEmpty) Seq(With.geography.home) else keyBases.map(_.heart)).map(centroid.groundPixels).min
-    val distanceRatio = PurpleMath.clamp(distanceHome / distanceMax, 0, 1)
+    val distanceRatio = PurpleMath.clamp(distanceHome.toDouble / distanceMax, 0, 1)
     val multiplier    = 1.2 - 0.4 * distanceRatio
     Some(JudgmentModifier(gainedValueMultiplier = multiplier))
   }
@@ -76,7 +76,7 @@ object JudgmentModifiers {
       ! unit.flying
       && unit.zone.edges.exists(edge =>
         edge.contains(unit.pixelCenter)
-        && edge.radiusPixels < battleLocal.enemy.widthIdeal() / 4))
+        && edge.radiusPixels < battleLocal.enemy.widthIdeal() / 4d))
     if (choked) Some(JudgmentModifier(speedMultiplier = 1.1)) else None
   }
 
@@ -144,7 +144,7 @@ object JudgmentModifiers {
   //     because surprise is on the enemy's side
   def commitment(battleLocal: BattleLocal): Option[JudgmentModifier] = {
     def fighters = battleLocal.us.units.view.filter(_.unitClass.attacksOrCastsOrDetectsOrTransports)
-    val commitment = PurpleMath.mean(fighters.map(u => PurpleMath.clamp((32 + u.matchups.pixelsOfEntanglement) / 96, 0, 1)))
+    val commitment = PurpleMath.mean(fighters.map(u => PurpleMath.clamp((32 + u.matchups.pixelsOfEntanglement) / 96d, 0, 1)))
     Some(JudgmentModifier(targetDelta = if (commitment > 0) -commitment * 0.2 else 0.2))
   }
 

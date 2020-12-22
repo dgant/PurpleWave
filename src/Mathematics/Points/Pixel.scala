@@ -51,32 +51,67 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     val delta = destination.subtract(this)
     delta.multiply(pixels/distance).add(this)
   }
-  @inline final def projectUpTo(destination: Pixel, maxPixels: Double): Pixel =
+  @inline final def projectUpTo(destination: Pixel, maxPixels: Double): Pixel = {
     if (maxPixels * maxPixels >= pixelDistanceSquared(destination)) destination else project(destination, maxPixels)
-  @inline final def radiateRadians(angleRadians: Double, pixels: Double): Pixel = add(
-    (pixels * Math.cos(angleRadians)).toInt,
-    (pixels * Math.sin(angleRadians)).toInt)
-  @inline final def degreesTo(other: Pixel): Double = radiansTo(other) / radiansOverDegrees
-  @inline final def radiansTo(other: Pixel): Double = PurpleMath.fastAtan2(other.y - y, other.x - x)
-  @inline final def midpoint(pixel: Pixel): Pixel = add(pixel).divide(2)
-  @inline final def pixelDistance(pixel: Pixel): Double = PurpleMath.broodWarDistance(x, y, pixel.x, pixel.y)
+  }
+  @inline final def radiateRadians(angleRadians: Double, pixels: Double): Pixel = {
+    add(
+      (pixels * Math.cos(angleRadians)).toInt,
+      (pixels * Math.sin(angleRadians)).toInt)
+  }
+  @inline final def degreesTo(other: Pixel): Double = {
+    radiansTo(other) / radiansOverDegrees
+  }
+  @inline final def radiansTo(other: Pixel): Double = {
+    PurpleMath.fastAtan2(other.y - y, other.x - x)
+  }
+  @inline final def midpoint(pixel: Pixel): Pixel = {
+    add(pixel).divide(2)
+  }
+  @inline final def pixelDistance(pixel: Pixel): Double = {
+    PurpleMath.broodWarDistance(x, y, pixel.x, pixel.y)
+  }
   @inline final def pixelDistanceSquared(other: Pixel): Int = {
     val dx = x - other.x
     val dy = y - other.y
     dx * dx + dy * dy
   }
-  @inline final def tileIncluding: Tile = Tile(x/32, y/32)
-  @inline final def toPoint: Point = Point(x, y)
-  @inline final def zone: Zone = tileIncluding.zone
-  @inline final def base: Option[Base] = tileIncluding.base
-  @inline final def groundPixels(other: Tile): Double = With.paths.groundPixels(this, other.pixelCenter)
-  @inline final def groundPixels(other: Pixel): Double = With.paths.groundPixels(this, other)
-  @inline final def buildable: Boolean = tileIncluding.buildable
-  @inline final def buildableUnchecked: Boolean = tileIncluding.buildableUnchecked
-  @inline final def walkable: Boolean = tileIncluding.walkable
-  @inline final def walkableUnchecked: Boolean = tileIncluding.walkableUnchecked
-  @inline final def altitudeBonus: Double = tileIncluding.altitudeBonus
-  @inline final def altitudeBonusUnchecked: Double = tileIncluding.altitudeBonusUnchecked
+  @inline final def tileIncluding: Tile = {
+    Tile(x / 32, y / 32)
+  }
+  @inline final def toPoint: Point = {
+    Point(x, y)
+  }
+  @inline final def zone: Zone = {
+    tileIncluding.zone
+  }
+  @inline final def base: Option[Base] = {
+    tileIncluding.base
+  }
+  @inline final def groundPixels(other: Tile): Double = {
+    With.paths.groundPixels(this, other.pixelCenter)
+  }
+  @inline final def groundPixels(other: Pixel): Double = {
+    With.paths.groundPixels(this, other)
+  }
+  @inline final def buildable: Boolean = {
+    tileIncluding.buildable
+  }
+  @inline final def buildableUnchecked: Boolean = {
+    tileIncluding.buildableUnchecked
+  }
+  @inline final def walkable: Boolean = {
+    tileIncluding.walkable
+  }
+  @inline final def walkableUnchecked: Boolean = {
+    tileIncluding.walkableUnchecked
+  }
+  @inline final def altitude: Double = {
+    tileIncluding.altitude
+  }
+  @inline final def altitudeUnchecked: Double = {
+    tileIncluding.altitudeUnchecked
+  }
   @inline final def nearestWalkableTile: Tile = {
     val ti = tileIncluding
     if (ti.walkable) return ti
@@ -96,7 +131,12 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
       .getOrElse(tileIncluding)
     output
   }
-  @inline final def nearestTraversableTile(unit: UnitInfo): Tile = if (unit.flying) tileIncluding else nearestWalkableTile
+  @inline final def traversableBy(unit: UnitInfo): Boolean = {
+    unit.flying || walkable
+  }
+  @inline final def nearestTraversableBy(unit: UnitInfo): Pixel = {
+    if (unit.flying) this else nearestWalkablePixel
+  }
   @inline final def nearestWalkablePixel: Pixel = if (walkable) this else {
     val center = nearestWalkableTile.pixelCenter
     Pixel(
@@ -109,5 +149,5 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
       PurpleMath.clamp(x, center.x - 16 + Math.min(16, unit.unitClass.dimensionLeft), center.x + 16 - Math.min(16, unit.unitClass.dimensionRight)),
       PurpleMath.clamp(y, center.y - 16 + Math.min(16, unit.unitClass.dimensionUp),   center.y + 16 - Math.min(16, unit.unitClass.dimensionDown)))
   }
-  @inline final def relativeToTileCenter: Pixel = Pixel(x % 32 - 16, y % 32 - 16)
+  @inline final def offsetFromTileCenter: Pixel = Pixel(x % 32 - 16, y % 32 - 16)
 }

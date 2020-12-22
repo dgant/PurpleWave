@@ -27,7 +27,7 @@ object BeAnArbiter extends Action {
       Retreat.delegate(arbiter)
       return
     }
-    val goal                  = arbiter.battle.map(_.us.vanguard).getOrElse(arbiter.agent.destination)
+    val goal                  = arbiter.battle.map(_.us.vanguard()).getOrElse(arbiter.agent.destination)
     val goalDistanceSquared   = arbiter.pixelDistanceSquared(goal)
     val closerArbiters        = arbiter.battle.map(_.us.units.view.filter(_.is(Protoss.Arbiter)).filter(_.pixelDistanceSquared(goal) < goalDistanceSquared)).getOrElse(Iterable.empty).toVector
     val umbrellables          = arbiter.immediateAllies.view.filter(needsUmbrella)

@@ -2,10 +2,8 @@ package Information.Battles.Prediction.Simulation
 
 import Information.Battles.Prediction.{LocalBattleMetrics, PredictionLocal}
 import Information.Battles.Types.Team
-import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -35,14 +33,12 @@ class Simulation(val prediction: PredictionLocal) {
     team.units.view.filter(legalForSimulation).map(new Simulacrum(this, _)).toVector
   }
 
-  val focus                 : Pixel               = prediction.battle.focus
-  val unitsOurs             : Vector[Simulacrum]  = buildSimulacra(prediction.battle.us)
-  val unitsEnemy            : Vector[Simulacrum]  = buildSimulacra(prediction.battle.enemy)
-  val everyone              : Vector[Simulacrum]  = unitsOurs ++ unitsEnemy
-  var updated               : Boolean             = true
-  var fleeing               : Boolean             = ! prediction.weAttack
-  lazy val ourWidth         : Double              = prediction.battle.us.units.filterNot(_.flying).map(unit => if (unit.flying) 0.0 else unit.unitClass.dimensionMin + unit.unitClass.dimensionMax).sum
-  lazy val chokeMobility    : Map[Zone, Double]   = prediction.battle.us.units.map(_.zone).distinct.map(zone => (zone, getChokeMobility(zone))).toMap
+  val focus       : Pixel               = prediction.battle.focus
+  val unitsOurs   : Vector[Simulacrum]  = buildSimulacra(prediction.battle.us)
+  val unitsEnemy  : Vector[Simulacrum]  = buildSimulacra(prediction.battle.enemy)
+  val everyone    : Vector[Simulacrum]  = unitsOurs ++ unitsEnemy
+  var updated     : Boolean             = true
+  var fleeing     : Boolean             = ! prediction.weAttack
   
   val simulacra: Map[UnitInfo, Simulacrum] = if (With.blackboard.mcrs()) Map.empty else
     (unitsOurs.filter(_.canMove) ++ unitsEnemy)
@@ -92,14 +88,5 @@ class Simulation(val prediction: PredictionLocal) {
       prediction.events = everyone.flatMap(_.events).sortBy(_.frame)
     }
     recordMetrics()
-  }
-  
-  private def getChokeMobility(zoneUs: Zone): Double = {
-    val zoneEnemy = prediction.battle.enemy.centroidAir.zone
-    if (zoneUs == zoneEnemy) return 1.0
-    val edge      = zoneUs.edges.find(_.zones.contains(zoneEnemy))
-    val edgeWidth = Math.max(32.0, edge.map(_.radiusPixels * 2.0).getOrElse(32.0 * 10.0))
-    val output    = PurpleMath.clamp(PurpleMath.nanToOne(2.5 * edgeWidth / ourWidth), 0.25, 1.0)
-    output
   }
 }

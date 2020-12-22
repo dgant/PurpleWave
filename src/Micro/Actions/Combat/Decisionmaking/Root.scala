@@ -35,7 +35,7 @@ object Root extends Action {
     private lazy val rootersInPush          = unit.squadmates.filter(s => unit != s && Zerg.Lurker.apply(s) || UnitMatchSiegeTank.apply(s))
     private lazy val rootersInPushCloser    = rootersInPush.count(distanceToGoal(_) < ourDistanceToGoal + pushSpacing)
 
-    def notHiddenUphill(target: UnitInfo): Boolean = target.visible || target.altitudeBonus <=  unit.altitudeBonus
+    def notHiddenUphill(target: UnitInfo): Boolean = target.visible || target.altitude <=  unit.altitude
     private lazy val visibleTargets         = unit.matchups.targets.filter(notHiddenUphill)
     private lazy val visibleTargetsInRange  = unit.matchups.targetsInRange.filter(notHiddenUphill)
     private lazy val threatsButNoTargets    = unit.matchups.threats.nonEmpty && visibleTargets.isEmpty

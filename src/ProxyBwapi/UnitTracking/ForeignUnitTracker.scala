@@ -80,7 +80,7 @@ class ForeignUnitTracker {
         tripper.unitClass.triggersSpiderMines
         && tripper.isEnemyOf(unit)
         && tripper.pixelDistanceEdge(unit) < 96
-        && unit.altitudeBonus >= tripper.altitudeBonus))
+        && unit.altitude >= tripper.altitude))
 
     // Yay, we see the unit
     if (unit.baseUnit.isVisible) {

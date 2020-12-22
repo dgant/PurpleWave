@@ -45,6 +45,5 @@ class BattleClustering {
       .filter(_.teams.forall(_.units.exists(_.unitClass.attacksOrCastsOrDetectsOrTransports)))
       .toVector
     With.battles.nextBattlesLocal = battlesFromClusters
-    With.battles.nextBattlesLocal.foreach(_.updateFoci())
   }
 }

@@ -8,8 +8,9 @@ import Information.Geography.Types.{Base, Zone}
 import Information.Grids.AbstractGrid
 import Lifecycle.With
 import Mathematics.Physics.Force
-import Mathematics.Points.{Pixel, Tile, TileRectangle}
+import Mathematics.Points.{Pixel, PixelRay, Tile, TileRectangle}
 import Mathematics.PurpleMath
+import Mathematics.Shapes.Ring
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Matchups.MatchupAnalysis
@@ -237,8 +238,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
       (if (isMarine()     && player.hasUpgrade(Terran.MarineRange))     32.0 else 0.0) +
       (if (isGoliath()    && player.hasUpgrade(Terran.GoliathAirRange)) 96.0 else 0.0) +
       (if (isDragoon()    && player.hasUpgrade(Protoss.DragoonRange))   64.0 else 0.0) +
-      (if (isHydralisk()  && player.hasUpgrade(Zerg.HydraliskRange))    32.0 else 0.0),
-    24) // Cache to avoid a bunch of IS calls
+      (if (isHydralisk()  && player.hasUpgrade(Zerg.HydraliskRange))    32.0 else 0.0))
   
   @inline final def pixelRangeGround: Double = pixelRangeGroundCache()
   private val pixelRangeGroundCache = new Cache(() =>
@@ -247,13 +247,12 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
       (if (isBunker()     && player.hasUpgrade(Terran.MarineRange))   32.0 else 0.0) +
       (if (isMarine()     && player.hasUpgrade(Terran.MarineRange))   32.0 else 0.0) +
       (if (isDragoon()    && player.hasUpgrade(Protoss.DragoonRange)) 64.0 else 0.0) +
-      (if (isHydralisk()  && player.hasUpgrade(Zerg.HydraliskRange))  32.0 else 0.0),
-    24)  // Cache to avoid a bunch of IS calls
-  
+      (if (isHydralisk()  && player.hasUpgrade(Zerg.HydraliskRange))  32.0 else 0.0))
   @inline final def pixelRangeMax: Double = Math.max(pixelRangeAir, pixelRangeGround)
-  
-  @inline final def canTraverse(tile: Tile): Boolean = flying || With.grids.walkable.get(tile)
-  
+
+  @inline final def canTraverse(pixel: Pixel): Boolean = pixel.traversableBy(this)
+  @inline final def canTraverse(tile: Tile): Boolean = tile.traversableBy(this)
+
   @inline final def pixelStart                                                : Pixel   = Pixel(left, top)
   @inline final def pixelEnd                                                  : Pixel   = Pixel(right, bottom)
   @inline final def pixelStartAt            (at: Pixel)                       : Pixel   = at.subtract(pixelCenter).add(left, top)
@@ -307,8 +306,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
 
   @inline final def isTransport: Boolean = unitClass.isTransport && ( ! isOverlord() || player.hasUpgrade(Zerg.OverlordDrops))
 
-  @inline final def detectionRangePixels: Int = if (unitClass.isDetector) (if (unitClass.isBuilding) 32 * 7 else sightRangePixels) else 0
-  @inline final def sightRangePixels: Int = sightRangePixelsCache()
+  @inline final def detectionRangePixels: Int = if (unitClass.isDetector) (if (unitClass.isBuilding) 32 * 7 else sightPixels) else 0
+  @inline final def sightPixels: Int = sightRangePixelsCache()
   private val sightRangePixelsCache = new Cache(() =>
     if (blind) 32 else
     unitClass.sightRangePixels +
@@ -319,7 +318,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
         (isOverlord() && player.hasUpgrade(Zerg.OverlordVisionRange)))
       64 else 0))
 
-  @inline final def altitudeBonus: Double = tileIncludingCenter.altitudeBonus
+  @inline final def altitude: Double = tileIncludingCenter.altitude
 
   val arrivalFrame = new Cache(() => {
     val home        = With.geography.home.pixelCenter
@@ -419,25 +418,25 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   @inline final def guaranteedToHit(enemy : UnitInfo, from: Option[Pixel] = None, to: Option[Pixel] = None): Boolean = {
     val tileFrom  = from.getOrElse(pixelCenter)       .tileIncluding
     val tileTo    =   to.getOrElse(enemy.pixelCenter) .tileIncluding
-    flying || enemy.flying || unitClass.unaffectedByDarkSwarm || tileFrom.altitudeBonus >= tileTo.altitudeBonus
+    flying || enemy.flying || unitClass.unaffectedByDarkSwarm || tileFrom.altitude >= tileTo.altitude
   }
 
   @inline final def damageTypeAgainst (enemy: UnitInfo)  : Damage.Type  = if (enemy.flying) unitClass.airDamageType    else unitClass.groundDamageType
   @inline final def attacksAgainst    (enemy: UnitInfo)  : Int          = if (enemy.flying) attacksAgainstAir          else attacksAgainstGround
-  
+
   @inline final def damageScaleAgainstHitPoints(enemy: UnitInfo): Double = {
     if (dpfAir    <= 0 && enemy.flying)   return 0.0
     if (dpfGround <= 0&& ! enemy.flying)  return 0.0
     Damage.scaleBySize(damageTypeAgainst(enemy), enemy.unitClass.size)
   }
-  
+
   @inline final def damageUpgradeLevel  : Int = unitClass.damageUpgradeType.map(player.getUpgradeLevel).getOrElse(0)
   @inline final def damageOnHitGround   : Int = damageOnHitGroundCache()
   @inline final def damageOnHitAir      : Int = damageOnHitAirCache()
   @inline final def damageOnHitMax      : Int = Math.max(damageOnHitAir, damageOnHitGround)
   private val damageOnHitGroundCache  = new Cache(() => unitClass.effectiveGroundDamage  + unitClass.groundDamageBonusRaw  * damageUpgradeLevel)
   private val damageOnHitAirCache     = new Cache(() => unitClass.effectiveAirDamage     + unitClass.airDamageBonusRaw     * damageUpgradeLevel)
-  
+
   @inline final def damageOnHitBeforeShieldsArmorAndDamageType(enemy: UnitInfo): Int = if(enemy.flying) damageOnHitAir else damageOnHitGround
   @inline final def damageOnNextHitAgainst(
     enemy   : UnitInfo,
@@ -459,7 +458,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     val output                  = (hitChance * Math.max(1.0, damageDealtTotal)).toInt
     output
   }
-  
+
   @inline final def dpfOnNextHitAgainst(enemy: UnitInfo): Double = {
     if (unitClass.suicides) {
       damageOnNextHitAgainst(enemy)
@@ -473,7 +472,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     }
   }
   @inline final def vpfOnNextHitAgainst(enemy: UnitInfo): Double = dpfOnNextHitAgainst(enemy) / enemy.subjectiveValue
-  
+
   @inline final def canDoAnything: Boolean = canDoAnythingCache()
   private val canDoAnythingCache = new Cache(() =>
     aliveAndComplete
@@ -481,7 +480,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     && ! stasised
     && ! maelstrommed
     && ! lockedDown)
-  
+
   @inline final def canBeAttacked: Boolean = canBeAttackedCache()
   private val canBeAttackedCache = new Cache(() =>
       alive &&
@@ -489,7 +488,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
       totalHealth > 0 &&
       ! invincible &&
       ! stasised)
-  
+
   @inline final def canAttack: Boolean = canAttackCache()
   private val canAttackCache = new Cache(() =>
     canDoAnything
@@ -501,7 +500,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
       || (isReaver()  && scarabCount > 0)
       || (isLurker()  && burrowed))
     && (flying || ! underDisruptionWeb))
-  
+
   @inline final def canAttack(enemy: UnitInfo): Boolean = (
     canAttack
     && enemy.canBeAttacked
@@ -513,10 +512,10 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
 
   @inline final def canBurrow: Boolean = canDoAnything && (is(Zerg.Lurker) || (player.hasTech(Zerg.Burrow) && isAny(Zerg.Drone, Zerg.Zergling, Zerg.Hydralisk, Zerg.Defiler)))
 
-  val widthSlotProjected  = new Cache(() => team.map(team => if (flying) team.centroidAir else PurpleMath.projectedPointOnLine(pixelCenter, team.centroidGround, team.lineWidth())).getOrElse(pixelCenter))
-  val widthSlotIdeal      = new Cache(() => team.map(team => if (flying) team.centroidAir else team.widthOrder().zipWithIndex.find(_._1 == this).map(p => team.centroidGround.project(team.lineWidth(), team.widthIdeal() * (team.widthOrder().size / 2 - p._2) / team.widthOrder().size)).getOrElse(widthSlotProjected())).getOrElse(pixelCenter))
+  val widthSlotProjected  = new Cache(() => team.map(team => if (flying) team.centroidAir() else PurpleMath.projectedPointOnLine(pixelCenter, team.centroidGround(), team.lineWidth())).getOrElse(pixelCenter))
+  val widthSlotIdeal      = new Cache(() => team.map(team => if (flying) team.centroidAir() else team.widthOrder().zipWithIndex.find(_._1 == this).map(p => team.centroidGround().project(team.lineWidth(), team.widthIdeal() * (team.widthOrder().size / 2 - p._2) / team.widthOrder().size)).getOrElse(widthSlotProjected())).getOrElse(pixelCenter))
   val widthContribution   = new Cache(() => team.map(_.centroidOf(this).pixelDistance(widthSlotProjected()) * 2))
-  val depthMeasuredFrom   = new Cache(() => presumptiveTarget.map(_.pixelCenter).orElse(team.map(_.opponent.vanguard)))
+  val depthMeasuredFrom   = new Cache(() => presumptiveTarget.map(_.pixelCenter).orElse(team.map(_.opponent.vanguard())))
   val depthCurrent        = new Cache(() => depthMeasuredFrom().map(pixelDistanceCenter(_) - effectiveRangePixels))
   val confidence          = new Cache(() => if (matchups.threats.isEmpty) 1.0 else battle.flatMap(_.judgement.map(_.confidence)).getOrElse(1.0))
 
@@ -558,19 +557,18 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   lazy val isMutalisk           : CacheIs = new CacheIs(Zerg.Mutalisk)
   lazy val isLurker             : CacheIs = new CacheIs(Zerg.Lurker)
   lazy val isUltralisk          : CacheIs = new CacheIs(Zerg.Ultralisk)
-  
+
   // Frame X:     Unit's cooldown is 0.   Unit starts attacking.
   // Frame X-1:   Unit's cooldown is 1.   Unit receives attack order.
   // Frame X-1-L: Unit's cooldown is L+1. Send attack order.
   @inline final def framesToBeReadyForAttackOrder: Int = cooldownLeft - With.latency.framesRemaining - With.reaction.agencyMin
   @inline final def readyForAttackOrder: Boolean = canAttack && framesToBeReadyForAttackOrder <= 0
-  
+
   @inline final def pixelsTravelledMax(framesAhead: Int): Double = if (canMove) topSpeed * framesAhead else 0.0
   @inline final def pixelReachAir     (framesAhead: Int): Double = pixelsTravelledMax(framesAhead) + pixelRangeAir
   @inline final def pixelReachGround  (framesAhead: Int): Double = pixelsTravelledMax(framesAhead) + pixelRangeGround
   @inline final def pixelReachMax     (framesAhead: Int): Double = Math.max(pixelReachAir(framesAhead), pixelReachGround(framesAhead))
   @inline final def pixelReachAgainst (framesAhead: Int, enemy: UnitInfo): Double = if (enemy.flying) pixelReachAir(framesAhead) else pixelReachGround(framesAhead)
-  @inline final def pixelToFireAt(enemy: UnitInfo): Pixel = if (inRangeToAttack(enemy)) pixelCenter else enemy.pixelCenter.project(pixelCenter, pixelRangeAgainst(enemy) + unitClass.dimensionMax + enemy.unitClass.dimensionMax).nearestTraversablePixel(this)
   @inline final def inRangeToAttack(enemy: UnitInfo)                    : Boolean = pixelDistanceEdge(enemy)          <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy)          > pixelRangeMin)
   @inline final def inRangeToAttack(enemy: UnitInfo, enemyAt: Pixel)    : Boolean = pixelDistanceEdge(enemy, enemyAt) <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy, enemyAt) > pixelRangeMin)
   @inline final def inRangeToAttack(enemy: UnitInfo, framesAhead: Int)  : Boolean = inRangeToAttack(enemy, enemy.projectFrames(framesAhead))
@@ -603,7 +601,60 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     val output                = distanceEntangled + distanceClosedByEnemy
     output
   }
-  
+  @inline final def pixelToFireAt(enemy: UnitInfo): Pixel = pixelToFireAt(enemy, exhaustive = false)
+  @inline final def pixelToFireAt(enemy: UnitInfo, exhaustive: Boolean): Pixel = {
+    if (With.reaction.sluggishness > 1 || ! canMove) {
+      return if (inRangeToAttack(enemy)) pixelCenter else enemy.pixelCenter.project(pixelCenter, pixelRangeAgainst(enemy))
+    }
+
+    val range = pixelRangeAgainst(enemy)
+    val distance = pixelDistanceEdge(enemy)
+    val distanceSquared = pixelDistanceSquared(enemy)
+    val enemyAltitude = enemy.altitude
+    val veryFarSquared = With.mapPixelPerimeter * With.mapPixelPerimeter
+    val altitudeMatters = ! flying && ! enemy.flying && ! unitClass.melee
+    def badAltitudePenalty(pixel: Pixel): Int = if (altitudeMatters && pixel.altitude < enemyAltitude) veryFarSquared  else 0
+    def goodAltitudeBonus(pixel: Pixel): Double = if ( ! altitudeMatters || pixel.altitude > enemyAltitude) 1 else 0
+
+    if (enemy.visible || (flying && sightPixels >= range)) {
+      if (range >= distance) return pixelCenter
+      // First, check if the simplest possible spot is acceptable
+      val pixelClose  = enemy.pixelCenter.project(pixelCenter, range)
+      val gapRight    =    enemy.x - enemy.unitClass.dimensionLeft   - x - unitClass.dimensionRight
+      val gapLeft     = - (enemy.x - enemy.unitClass.dimensionRight  - x - unitClass.dimensionLeft)
+      val gapDown     =    enemy.y - enemy.unitClass.dimensionUp     - y - unitClass.dimensionDown
+      val gapUp       = - (enemy.y - enemy.unitClass.dimensionDown   - y - unitClass.dimensionUp)
+      val pixelFar = pixelClose
+        .add(
+          Math.max(0, gapLeft)  - Math.max(0, gapRight),
+          Math.max(0, gapUp)    - Math.max(0, gapDown))
+      if ( ! exhaustive || With.reaction.sluggishness > 0) {
+        return pixelFar.nearestTraversableBy(this)
+      }
+      else if (badAltitudePenalty(pixelFar) == 0 && goodAltitudeBonus(pixelFar) > 0) {
+        return pixelFar
+      }
+
+      // Search for the ideal firing position
+      val offset = pixelCenter.offsetFromTileCenter
+      val ringPixels =
+        Ring
+          .points(range.toInt / 32)
+          .map(enemy.tileIncludingCenter.add(_).pixelCenter.add(offset))
+          .filter(p => canTraverse(p) && pixelDistanceSquared(p) < distanceSquared)
+      val ringSpot = ByOption.minBy(ringPixels)(p => pixelDistanceSquared(p) * (2 - goodAltitudeBonus(p)) - badAltitudePenalty(p))
+      val output = ringSpot.getOrElse(pixelFar.nearestTraversableBy(this))
+      return output
+    }
+
+    // If the enemy isn't visible (likely uphill) we not only need to get in physical range, but altitude-adjusted sight range as well
+    val sightPixel = enemy.pixelCenter.projectUpTo(pixelCenter, Math.min(sightPixels, range))
+    PixelRay(sightPixel, enemy.pixelCenter)
+      .find(t => t.traversableBy(this) && ( ! altitudeMatters || t.altitude >= enemyAltitude))
+      .map(_.pixelCenter)
+      .getOrElse(enemy.pixelCenter.nearestTraversableBy(this))
+  }
+
   @inline final def canStim: Boolean = unitClass.canStim && player.hasTech(Terran.Stim) && hitPoints > 10
 
   @inline final def moving: Boolean = velocityX != 0 || velocityY != 0

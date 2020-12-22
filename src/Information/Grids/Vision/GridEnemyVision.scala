@@ -15,7 +15,7 @@ class GridEnemyVision extends AbstractGridFramestamp {
       if (unit.aliveAndComplete && unit.likelyStillThere) {
         val start = unit.tileIncludingCenter
         val altitude = With.grids.altitudeBonus.rawValues(start.i)
-        val points = Circle.points(unit.sightRangePixels/32)
+        val points = Circle.points(unit.sightPixels/32)
         val nPoints = points.length
         var iPoint = 0
         while (iPoint < nPoints) {

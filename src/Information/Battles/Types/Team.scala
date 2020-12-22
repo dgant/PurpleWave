@@ -10,15 +10,12 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
 class Team(val units: Vector[UnitInfo]) {
-  
+
   //////////////////////////////////////////////
   // Populate immediately after construction! //
   //////////////////////////////////////////////
   
-  var battle          : Battle  = _
-  var vanguard        : Pixel   = SpecificPoints.middle
-  var centroidAir     : Pixel   = SpecificPoints.middle
-  var centroidGround  : Pixel   = if (With.frame == 0) centroidAir else centroidAir.nearestWalkableTile.pixelCenter // Hack fix to startup initialization order
+  var battle: Battle  = _
 
   //////////////
   // Features //
@@ -28,18 +25,30 @@ class Team(val units: Vector[UnitInfo]) {
   lazy val enemy: Boolean = this == battle.enemy
   lazy val opponent: Team = if (us) battle.enemy else battle.us
   lazy val zones: Set[Zone] = units.map(_.zone).toSet
-  def centroidOf(unit: UnitInfo): Pixel = if (unit.flying) centroidAir else centroidGround
+  def attackers       : Seq[UnitInfo] = units.view.filter(u => u.unitClass.canAttack  && ! u.unitClass.isWorker )
+  def attackersGround : Seq[UnitInfo] = attackers.view.filterNot(_.flying)
+  val hasGround = new Cache(() => attackersGround.nonEmpty)
+  val centroidAir = new Cache(() => PurpleMath.centroid(attackers.view.map(_.pixelCenter)))
+  val centroidGround = new Cache(() => {
+    val center = if (hasGround()) PurpleMath.centroid(attackersGround.view.map(_.pixelCenter)) else centroidAir().nearestWalkableTile.pixelCenter
+    ByOption.minBy(attackersGround)(_.pixelDistanceSquared(center)).map(_.pixelCenter).getOrElse(center)})
+  def centroidOf(unit: UnitInfo): Pixel = if (unit.flying) centroidAir() else centroidGround()
+  val vanguard = new Cache(() =>
+    ByOption.minBy(attackers)(_.pixelDistanceSquared(opponent.centroidAir()))
+    .orElse(ByOption.minBy(units)(_.pixelDistanceSquared(opponent.centroidAir())))
+    .map(_.pixelCenter)
+    .getOrElse(SpecificPoints.middle))
 
   // Used by MCRS
   private lazy val meanDamageGround = new Cache(() => PurpleMath.nanToZero(PurpleMath.weightedMean(units.map(u => (u.damageOnHitGround  .toDouble,  u.dpfGround)))))
   private lazy val meanDamageAir    = new Cache(() => PurpleMath.nanToZero(PurpleMath.weightedMean(units.map(u => (u.damageOnHitAir     .toDouble,  u.dpfAir)))))
   def meanDamageAgainst(unit: UnitInfo): Double = if (unit.flying) meanDamageAir() else meanDamageGround()
 
-  val engaged = new Cache(() => units.exists(_.matchups.framesOfSafety <= 0))
-  val axisDepth = new Cache(() => centroidAir.radiansTo(opponent.centroidAir))
+  val engaged   = new Cache(() => units.exists(_.matchups.framesOfSafety <= 0))
+  val axisDepth = new Cache(() => centroidAir().radiansTo(opponent.centroidAir()))
   val axisWidth = new Cache(() => PurpleMath.normalizeAroundZero(axisDepth() + Math.PI / 2))
-  val lineDepth = new Cache(() => centroidGround.radiateRadians(axisDepth(), With.mapPixelPerimeter))
-  val lineWidth = new Cache(() => centroidGround.radiateRadians(axisWidth(), With.mapPixelPerimeter))
+  val lineDepth = new Cache(() => centroidGround().radiateRadians(axisDepth(), With.mapPixelPerimeter))
+  val lineWidth = new Cache(() => centroidGround().radiateRadians(axisWidth(), With.mapPixelPerimeter))
 
   // COHERENCE: A metric of how organized the team is.
   //
@@ -59,10 +68,8 @@ class Team(val units: Vector[UnitInfo]) {
   // Width / 2   = 0 1 1 2 2 3 3  4  4  5  5  6  6  7  7
   // Width       = 1 2 3 4 5 6 7  8  9  10 11 12 13 14 15
   // Thus "width" = 2 * sqrt(sumDistance)
-  def groundCombatUnits: Seq[UnitInfo] = units.view.filter(u => u.canMove && u.unitClass.canAttack && ! u.unitClass.isWorker && ! u.flying && ! u.friendly.exists(_.agent.toGather.isDefined))
-  val widthOrder          = new Cache(() => groundCombatUnits.sortBy(_.widthSlotProjected().pixelDistanceSquared(lineWidth())).toVector)
-  //val widthOrder          = new Cache(() => groundCombatUnits.sortBy(_.teamDepthCurrent()).toVector)
-  val widthIdeal          = new Cache(() => groundCombatUnits.map(_.unitClass.radialHypotenuse * 2.5).sum) // x2.5 = x2 for diameter, then x1.25 for spacing
+  val widthOrder          = new Cache(() => attackersGround.sortBy(_.widthSlotProjected().pixelDistanceSquared(lineWidth())).toVector)
+  val widthIdeal          = new Cache(() => attackersGround.map(_.unitClass.radialHypotenuse * 2.5).sum) // x2.5 = x2 for diameter, then x1.25 for spacing
   val widthMeanExpected   = new Cache(() => widthIdeal() / 2)
   val widthMeanActual     = new Cache(() => PurpleMath.mean(units.view.flatMap(_.widthContribution())))
   val depthMean           = new Cache(() => ByOption.mean(units.view.flatMap(_.depthCurrent())).getOrElse(0d))

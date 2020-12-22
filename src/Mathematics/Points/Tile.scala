@@ -4,6 +4,7 @@ import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Spiral
+import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.TilePosition
 
 case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
@@ -140,10 +141,10 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline final def groundPixels(other: Tile): Double = {
     With.paths.groundPixels(pixelCenter, other.pixelCenter)
   }
-  @inline final def altitudeBonus: Double = {
-    if (valid) altitudeBonusUnchecked else With.grids.altitudeBonus.defaultValue
+  @inline final def altitude: Double = {
+    if (valid) altitudeUnchecked else With.grids.altitudeBonus.defaultValue
   }
-  @inline final def altitudeBonusUnchecked: Double = {
+  @inline final def altitudeUnchecked: Double = {
     With.grids.altitudeBonus.getUnchecked(i)
   }
   @inline final def toRectangle: TileRectangle = {
@@ -154,6 +155,15 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   }
   @inline final def walkableUnchecked: Boolean = {
     With.grids.walkable.getUnchecked(i)
+  }
+  @inline final def traversableBy(unit: UnitInfo): Boolean = {
+    unit.flying || walkable
+  }
+  @inline final def nearestTraversableBy(unit: UnitInfo): Tile = {
+    if (unit.flying) this else pixelCenter.nearestTraversableBy(unit).tileIncluding
+  }
+  @inline final def nearestWalkableTile: Tile = {
+    if (walkable) this else Spiral.points(16).view.map(add).find(_.walkable).getOrElse(this)
   }
   @inline final def buildable: Boolean = {
     valid && buildableUnchecked
@@ -187,8 +197,5 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   }
   @inline final def visibleBwapi: Boolean = {
     With.game.isVisible(x, y)
-  }
-  @inline final def nearestWalkableTile: Tile = {
-    if (walkable) this else Spiral.points(16).view.map(add).find(_.walkable).getOrElse(this)
   }
 }

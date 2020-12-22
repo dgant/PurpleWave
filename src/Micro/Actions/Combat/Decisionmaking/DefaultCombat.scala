@@ -41,6 +41,7 @@ object DefaultCombat extends Action {
     val potshotTarget = Target.best(unit, TargetFilterPotshot)
     unit.agent.toAttack = potshotTarget.orElse(unit.agent.toAttack)
     if (potshotTarget.isDefined) {
+      unit.agent.act("Potshot")
       With.commander.attack(unit)
     }
     unit.unready
@@ -97,21 +98,29 @@ object DefaultCombat extends Action {
     lazy val inChoke            = ! unit.flying && unit.zone.edges.exists(_.contains(unit.pixelCenter))
     lazy val nudgedTowards      = ! unit.flying && target.pixelDistanceSquared(unit.pixelCenter.add(unit.agent.receivedPushForce().normalize(distance / 2).toPoint)) < unit.pixelDistanceSquared(target)
     lazy val sameThreatsChasing = unit.matchups.threats.forall(t => t.inRangeToAttack(unit) == t.inRangeToAttack(unit, projectedUs))
+    lazy val obiwanned          = ! unit.flying && ! target.flying && ! unit.unitClass.melee && target.altitude > unit.altitude
 
-    // Chase if they outrange us
-    if (pixelsOutranged.isDefined) return 0
+    // Chasing behaviors
+    // Reavers shouldn't even try
+    if ( ! unit.is(Protoss.Reaver)) {
+      // Chase if they outrange us
+      if (pixelsOutranged.isDefined) return 0
 
-    // Chase if we're in a choke and being nudged towards them
-    if (inChoke && nudgedTowards) return 0
+      // Chase if we're in a choke and being nudged towards them
+      if (inChoke && nudgedTowards) return 0
 
-    // Chase if we're confident and being nudged towards them
-    if (confidentToChase && nudgedTowards) return 0
+      // Chase if we're confident and being nudged towards them
+      if (confidentToChase && nudgedTowards) return 0
 
-    // Chase if they're escaping out of our ideal range and chasing won't bring us into range of anyone new
-    if (threatEscaping && sameThreatsChasing) return 0
+      // Chase if we're confident and fighting up high ground
+      if (obiwanned) return 0
 
-    // Chase if they're escaping out of our ideal range and we're VERY confident
-    if (threatEscaping && confidentToDive) return 0
+      // Chase if they're escaping out of our ideal range and chasing won't bring us into range of anyone new
+      if (threatEscaping && sameThreatsChasing) return 0
+
+      // Chase if they're escaping out of our ideal range and we're VERY confident
+      if (threatEscaping && confidentToDive) return 0
+    }
 
     // Breathe if range is equal and they shoot first
     if (rangeEqual && target.cooldownLeft < unit.cooldownLeft) return range + 32
@@ -132,14 +141,6 @@ object DefaultCombat extends Action {
     if (unit.battle.exists(_.us.units.size > 1)) unit.battle.get.us.centroidOf(unit)
     else if (unit.agent.shouldEngage) unit.agent.destination
     else unit.agent.origin
-  }
-  def firingPosition(unit: FriendlyUnitInfo): Option[Pixel] = {
-    // TODO: Find smarter firing positions. Find somewhere safe and unoccupied but not too far to stand.
-    // TODO: Reconcile with UnitInfo.getFiringPixel. Maybe we need several versions based on acceptable performance
-     unit.agent.toAttack
-      .map(t => t.pixelCenter.project(unit.pixelCenter, t.unitClass.dimensionMin + unit.unitClass.dimensionMin).nearestTraversablePixel(unit))
-      .filter(p => unit.agent.toAttack.exists(t => ! t.flying || unit.inRangeToAttack(t, p)))
-      .orElse(unit.agent.toTravel)
   }
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
@@ -168,7 +169,7 @@ object DefaultCombat extends Action {
     lazy val purring = (unit.unitClass.isTerran && unit.unitClass.isMechanical && unit.immediateAllies.exists(a => a.repairing && a.orderTarget.contains(unit)))
     transition(Aim, () => ! unit.canMove || purring, () => aim(unit))
 
-    lazy val opponentBlocksGoal = unit.battle.exists(b => b.enemy.zones.contains(unit.agent.destination.zone) || b.teams.minBy(_.centroidAir.pixelDistanceSquared(unit.agent.destination)).enemy)
+    lazy val opponentBlocksGoal = unit.battle.exists(b => b.enemy.zones.contains(unit.agent.destination.zone) || b.teams.minBy(_.centroidAir().pixelDistanceSquared(unit.agent.destination)).enemy)
     transition(Regroup, () => ! unit.agent.shouldEngage && opponentBlocksGoal && unit.agent.withinSafetyMargin)
     transition(Regroup, () =>   unit.agent.shouldEngage && opponentBlocksGoal && unit.team.exists(team =>
       ! team.engaged()
@@ -232,7 +233,7 @@ object DefaultCombat extends Action {
     if (goalRegroup && unit.agent.shouldEngage) unit.agent.increaseImpatience()
 
     // Decide where to go
-    unit.agent.toTravel = Some(if (goalRegroup) regroupGoal(unit) else if (goalRetreat) unit.agent.origin else firingPosition(unit).getOrElse(unit.agent.destination))
+    unit.agent.toTravel = Some(if (goalRegroup) regroupGoal(unit) else if (goalRetreat) unit.agent.origin else target.map(unit.pixelToFireAt(_, exhaustive = true)).getOrElse(unit.agent.destination))
     def destination = unit.agent.toTravel.get
 
     // Avoid the hazards and expense of vector travel when we're not in harm's way

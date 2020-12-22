@@ -32,7 +32,7 @@ class Simulacrum(
   val flying      : Boolean     = realUnit.flying
   val value       : Double      = realUnit.subjectiveValue
 
-  val speedMultiplier   : Double  = if (isEnemy || flying) 1.0 else PurpleMath.clamp(simulation.chokeMobility.getOrElse(realUnit.zone, 1.0), 0.75, 1.0)
+  val speedMultiplier   : Double  = if (flying) 1.0 else Math.pow(simulation.prediction.battle.judgmentModifiers.view.map(_.speedMultiplier).product, if (isFriendly) 1 else -1)
   val bonusRange        : Double  = if (isFriendly || ! unitClass.isSiegeTank || ! simulation.prediction.weAttack) 0.0 else With.configuration.simulationBonusTankRange
   val multiplierSplash  : Double  = realUnit.matchups.splashFactorMax
 
@@ -160,7 +160,7 @@ class Simulacrum(
           Math.pow(
             PurpleMath.clamp(
               PurpleMath.nanToInfinity(
-                pixel.pixelDistance(targetPixel) / pixel.groundPixels(targetPixel)),
+                pixel.pixelDistance(targetPixel) / pixel.nearestWalkablePixel.groundPixels(targetPixel.nearestWalkablePixel)),
                 1.0,
                 3.0),
             2)))

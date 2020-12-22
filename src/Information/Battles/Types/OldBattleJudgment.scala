@@ -27,7 +27,7 @@ class OldBattleJudgment(battle: BattleLocal) {
   val shouldFight     : Boolean = shouldAttack
 
   def getTerranHomeBonus: Double = {
-    if (battle.enemy.centroidAir.zone.owner.isTerran && battle.enemy.units.exists(u => u.is(UnitMatchSiegeTank) && u.matchups.targets.nonEmpty)) 0.2 else 0.0
+    if (battle.enemy.centroidAir().zone.owner.isTerran && battle.enemy.units.exists(u => u.is(UnitMatchSiegeTank) && u.matchups.targets.nonEmpty)) 0.2 else 0.0
   }
   def getTerranMaxBonus: Double = {
     if (With.enemies.forall(_.isTerran)) PurpleMath.clamp(0.0, 1.0, (With.self.supplyUsed - 300) / 100.0) else 0

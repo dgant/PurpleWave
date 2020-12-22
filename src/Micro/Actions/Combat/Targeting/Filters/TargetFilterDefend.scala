@@ -17,7 +17,7 @@ case class TargetFilterDefend(zone: Zone) extends TargetFilter {
 
     // Fire at enemies we can hit from inside the zone
     if (target.zone == zone) return true
-    if (firingPixel.zone == zone && firingPixel.altitudeBonus >= actor.altitudeBonus) return true
+    if (firingPixel.zone == zone && firingPixel.altitude >= actor.altitude && ! zone.edges.exists(_.contains(firingPixel))) return true
 
     // Target enemies between us and the goal zone
     if (actor.inRangeToAttack(target) && actor.readyForAttackOrder) return true

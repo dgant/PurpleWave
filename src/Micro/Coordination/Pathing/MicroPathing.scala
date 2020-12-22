@@ -56,7 +56,7 @@ object MicroPathing {
     if (unit.flying) return goal
     val lineWaypoint      = if (PixelRay(unit.pixelCenter, goal).forall(_.walkable)) Some(unit.pixelCenter.project(goal, Math.min(unit.pixelDistanceCenter(goal), waypointDistancePixels))) else None
     lazy val hillPath     = DownhillPathfinder.decend(unit.tileIncludingCenter, goal.tileIncluding)
-    lazy val hillWaypoint = hillPath.map(path => path.last.pixelCenter.add(unit.pixelCenter.relativeToTileCenter))
+    lazy val hillWaypoint = hillPath.map(path => path.last.pixelCenter.add(unit.pixelCenter.offsetFromTileCenter))
     lineWaypoint.orElse(hillWaypoint).getOrElse(goal)
   }
 
@@ -112,7 +112,7 @@ object MicroPathing {
   }
 
   def tryMovingAlongTilePath(unit: FriendlyUnitInfo, path: TilePath): Unit = {
-    val waypoint = getWaypointAlongTilePath(path).map(_.add(unit.pixelCenter.relativeToTileCenter))
+    val waypoint = getWaypointAlongTilePath(path).map(_.add(unit.pixelCenter.offsetFromTileCenter))
     waypoint.foreach(pixel => {
       unit.agent.toTravel = waypoint
       With.commander.move(unit)

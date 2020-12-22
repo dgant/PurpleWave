@@ -42,7 +42,7 @@ object Bust extends Action {
     && With.self.hasUpgrade(Protoss.DragoonRange)
     && unit.matchups.threats.forall(threat => safeFromThreat(unit, threat, unit.pixelCenter))
     && unit.matchups.targets.exists(bunker =>
-      (bunker.visible || bunker.altitudeBonus <= unit.altitudeBonus)
+      (bunker.visible || bunker.altitude <= unit.altitude)
       && bunker.aliveAndComplete
       && bunker.is(Terran.Bunker)
       && ! bunker.player.hasUpgrade(Terran.MarineRange)

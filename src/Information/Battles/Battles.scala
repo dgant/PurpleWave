@@ -29,7 +29,6 @@ class Battles {
   }
 
   def run() {
-    local.foreach(_.updateFoci())
     var proceed = true
     while (proceed && With.performance.continueRunning) {
       proceed = ! _processingState.isFinalStep

@@ -22,7 +22,7 @@ class FormationPush(airDestination: Pixel) extends FormationDesigner {
 
 
     val targets = new CountMap[Pixel]
-    units.foreach(u => u.battle.foreach(b => targets.add(b.enemy.vanguard, u.subjectiveValue.toInt)))
+    units.foreach(u => u.battle.foreach(b => targets.add(b.enemy.vanguard(), u.subjectiveValue.toInt)))
     val target = targets.mode.getOrElse(groundDestination)
     null
   }

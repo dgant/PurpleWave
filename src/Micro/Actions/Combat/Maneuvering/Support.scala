@@ -25,7 +25,7 @@ object Support extends Action {
     if (supportables.isEmpty) supportables = unit.squad.map(_.units.view.filterNot(isSupport).toVector).getOrElse(Vector.empty)
     if (supportables.isEmpty) return
     val destination = unit.battle
-      .map(_.us.vanguard)
+      .map(_.us.vanguard())
       .getOrElse({
         val centroid = PurpleMath.centroid(supportables.map(_.pixelCenter))
         supportables.minBy(_.pixelDistanceTravelling(unit.agent.destination)).pixelCenter

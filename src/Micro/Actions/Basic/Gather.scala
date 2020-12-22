@@ -27,7 +27,7 @@ object Gather extends Action {
     if (unit.battle.nonEmpty) {
 
       // Move between bases if resource isn't safe to mine and we hope help will arrive
-      if (With.reaction.sluggishness < 2 && unit.battle.exists(_.us.totalArmyFraction() < 0.5)) {
+      if (With.reaction.sluggishness < 2) {
         val baseOriginal = resource.base
         lazy val baseOpposite = baseOriginal.flatMap(b => b.isNaturalOf.orElse(b.natural))
         lazy val baseRemote = ByOption.minBy(With.geography.ourBases.filterNot(baseOriginal.contains))(_.heart.groundPixels(baseOriginal.map(_.heart).getOrElse(resource.tileTopLeft)))

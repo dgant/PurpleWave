@@ -36,7 +36,8 @@ class Visualization {
     ShowPerformanceSummary,
     ShowStoryteller,
 
-    ShowJudgment
+    ShowTeams,
+    ShowJudgment,
   )
 
   lazy val knownViews: Vector[View] = Vector[View](

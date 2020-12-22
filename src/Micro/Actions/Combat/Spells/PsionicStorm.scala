@@ -37,7 +37,7 @@ object PsionicStorm extends TargetedSpell {
       && templar < 3
       && target.is(Terran.SiegeTankSieged)
       && caster.pixelDistanceCenter(target) > 32 * castRangeTiles
-      && (caster.visibleToOpponents || target.tileIncludingCenter.altitudeBonus >= caster.tileIncludingCenter.altitudeBonus)
+      && (caster.visibleToOpponents || target.tileIncludingCenter.altitude >= caster.tileIncludingCenter.altitude)
       && target.matchups.targetsInRange.isEmpty) {
       return 0.0
     }

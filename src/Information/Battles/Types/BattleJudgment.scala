@@ -20,7 +20,7 @@ class BattleJudgment(battle: BattleLocal) {
   // "Ratios" here range on [-1, 1]
   val ratioAttack     : Double  = transformTotalScore(battle.predictionAttack.localBattleMetrics)
   val ratioBest       : Double  = ratioAttack
-  val totalTarget     : Double  = hysteresis + terranHomeBonus + terranMaxBonus + turtleBonus + hornetBonus + siegeUrgency + With.configuration.baseThreshold
+  val totalTarget     : Double  = hysteresis + terranHomeBonus + terranMaxBonus + turtleBonus + hornetBonus + siegeUrgency + 0.04
   val ratioThreshold  : Double  = Math.min(1, PurpleMath.nanToZero(totalTarget))
   val confidence      : Double  = PurpleMath.nanToN((ratioBest - ratioThreshold) / Math.abs(Math.signum(ratioBest - ratioThreshold) - ratioThreshold), if (ratioBest >= ratioThreshold) 1 else -1)
   val shouldAttack    : Boolean = ratioAttack >= ratioThreshold

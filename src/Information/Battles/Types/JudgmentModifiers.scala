@@ -1,25 +1,42 @@
 package Information.Battles.Types
 
+import Debugging.Visualizations.Colors
+import Lifecycle.With
+import Mathematics.PurpleMath
+import Micro.Actions.Basic.Gather
+import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWorkers}
+import ProxyBwapi.Races.Terran
+import bwapi.Color
+
 import scala.collection.mutable.ArrayBuffer
 
 object JudgmentModifiers {
+
   def apply(battle: BattleLocal): Seq[JudgmentModifier] = {
     val output = new ArrayBuffer[JudgmentModifier]
-    def add(name: String, modifier: Option[JudgmentModifier]) {
+    def add(name: String, color: Color, modifier: Option[JudgmentModifier]) {
       modifier.foreach(m => {
         m.name = name
+        m.color = color
         output += m })
     }
-    add("Proximity",    proximity(battle))
-    add("Coherence",    coherence(battle))
-    add("EnemyChoked",  enemyChoked(battle))
-    add("Rout",         rout(battle))
-    add("Maxed",        maxed(battle))
-    add("Gatherers",    gatherers(battle))
-    add("HornetNest",   hornetNest(battle))
-    add("Commitment",   commitment(battle))
-    add("Patience",     patience(battle))
+    add("Aggression",   Colors.MidnightRed, aggression(battle))
+    add("Proximity",    Colors.NeonRed,     proximity(battle))
+    add("Coherence",    Colors.NeonOrange,  coherence(battle))
+    add("EnemyChoked",  Colors.NeonYellow,  enemyChoked(battle))
+    add("Rout",         Colors.NeonGreen,   rout(battle))
+    add("Maxed",        Colors.NeonTeal,    maxed(battle))
+    add("Gatherers",    Colors.NeonBlue,    gatherers(battle))
+    add("HornetNest",   Colors.NeonIndigo,  hornetNest(battle))
+    add("Commitment",   Colors.NeonViolet,  commitment(battle))
+    add("Patience",     Color.Black,        patience(battle))
     output
+  }
+
+  // Evaluate gains proportionate to aggression
+  def aggression(local: BattleLocal): Option[JudgmentModifier] = {
+    val aggro = With.blackboard.aggressionRatio()
+    if (aggro == 1) None else Some(JudgmentModifier(gainedValueMultiplier = aggro))
   }
 
   // Prefer fighting
@@ -28,7 +45,13 @@ object JudgmentModifiers {
   //    because we will run out of room to retreat
   //    and because workers or buildings will be endangered if we don't
   def proximity(battleLocal: BattleLocal): Option[JudgmentModifier] = {
-    None
+    val centroid      = battleLocal.enemy.centroidGround
+    val keyBases      = With.geography.ourBasesAndSettlements.filter(b => b.isOurMain || b.isNaturalOf.exists(_.isOurMain))
+    val distanceMax   = With.mapPixelWidth
+    val distanceHome  = (if (keyBases.isEmpty) Seq(With.geography.home) else keyBases.map(_.heart)).map(centroid.groundPixels).min
+    val distanceRatio = PurpleMath.clamp(distanceHome / distanceMax, 0, 1)
+    val multiplier    = 1.2 - 0.4 * distanceRatio
+    Some(JudgmentModifier(gainedValueMultiplier = multiplier))
   }
 
   // Prefer fighting
@@ -36,7 +59,10 @@ object JudgmentModifiers {
   //    because the benefits of this are underrepresented in simulation
   //      due to the absence of collisions
   def coherence(battleLocal: BattleLocal): Option[JudgmentModifier] = {
-    None
+    val us    = battleLocal.us.coherence()
+    val enemy = battleLocal.enemy.coherence()
+    val bonus = us - enemy
+    Some(JudgmentModifier(speedMultiplier = 1 + 0.1 * bonus))
   }
 
   // Prefer fighting
@@ -46,7 +72,12 @@ object JudgmentModifiers {
   //    and because the situation is likely to get worse for us
   //      once they have gotten through the choke
   def enemyChoked(battleLocal: BattleLocal): Option[JudgmentModifier] = {
-    None
+    val choked = battleLocal.enemy.units.exists(unit =>
+      ! unit.flying
+      && unit.zone.edges.exists(edge =>
+        edge.contains(unit.pixelCenter)
+        && edge.radiusPixels < battleLocal.enemy.widthIdeal() / 4))
+    if (choked) Some(JudgmentModifier(speedMultiplier = 1.1)) else None
   }
 
   // Prefer fighting
@@ -63,7 +94,9 @@ object JudgmentModifiers {
   //   especially with a bank
   //     because from here the enemy will only get stronger relative to us
   def maxed(battleLocal: BattleLocal): Option[JudgmentModifier] = {
-    None
+    val maxedness = (With.self.supplyUsed + With.self.minerals / 25d) / 400d
+    val targetDelta = .9 - maxedness
+    if (targetDelta < 0) Some(JudgmentModifier(targetDelta = targetDelta)) else None
   }
 
   // Prefer fighting
@@ -71,7 +104,14 @@ object JudgmentModifiers {
   //    because they are very fragile
   //    and if they die we will probably lose the game
   def gatherers(battleLocal: BattleLocal): Option[JudgmentModifier] = {
-    None
+    val workersImperiled = battleLocal.us.units.count(ally =>
+      ally.unitClass.isWorker
+      && ally.visibleToOpponents
+      && ally.friendly.exists(_.agent.toGather.exists(_.pixelDistanceEdge(ally) < Gather.defenseRadiusPixels))
+      && ally.matchups.pixelsOfEntanglementWarrior > -32)
+    val workersTotal = With.units.countOurs(UnitMatchWorkers)
+    val workersRatio = PurpleMath.nanToZero(workersImperiled.toDouble / workersTotal)
+    if (workersRatio > 0) Some(JudgmentModifier(gainedValueMultiplier = 1 + workersRatio)) else None
   }
 
   // Avoid fighting
@@ -81,7 +121,15 @@ object JudgmentModifiers {
   //     and if we attacked in error once, we will likely keep doing it
   //     and thus systematically bleed units
   def hornetNest(battleLocal: BattleLocal): Option[JudgmentModifier] = {
-    None
+    if (With.enemies.forall(e => ! e.isTerran || ! e.hasTech(Terran.SiegeMode))) return None
+    val tanks           = battleLocal.enemy.units.count(u => u.is(UnitMatchSiegeTank) && u.base.exists(_.owner.isEnemy) && ! u.visible)
+    if (tanks == 0) return None
+    def ourCombatUnits  = battleLocal.us.units.view.filter(_.canAttack)
+    val valueUs         = ourCombatUnits.map(_.subjectiveValue).sum
+    val valueUsGround   = ourCombatUnits.filterNot(_.flying).map(_.subjectiveValue).sum
+    val ratioUsGround   = PurpleMath.nanToZero(valueUsGround / valueUs)
+    val enemyBonus      = Math.min(ratioUsGround * tanks * 0.1, 0.3)
+    if (enemyBonus > 0) Some(JudgmentModifier(speedMultiplier = 1 - enemyBonus)) else None
   }
 
   // Avoid disengaging
@@ -90,8 +138,14 @@ object JudgmentModifiers {
   //     because leaving a battle is costly
   //     and if it's a large battle, our reinforcements won't make up
   //       for the units we lose in the retreat
+  // Avoid engaging
+  //   in a fight we have not yet committed to
+  //   until conditions look advantageous
+  //     because surprise is on the enemy's side
   def commitment(battleLocal: BattleLocal): Option[JudgmentModifier] = {
-    None
+    def fighters = battleLocal.us.units.view.filter(_.unitClass.attacksOrCastsOrDetectsOrTransports)
+    val commitment = PurpleMath.mean(fighters.map(u => PurpleMath.clamp((32 + u.matchups.pixelsOfEntanglement) / 96, 0, 1)))
+    Some(JudgmentModifier(targetDelta = if (commitment > 0) -commitment * 0.2 else 0.2))
   }
 
   // Avoid engaging

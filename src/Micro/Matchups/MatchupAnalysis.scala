@@ -44,7 +44,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   lazy val framesToLive               : Double                = PurpleMath.nanToInfinity(me.totalHealth / dpfReceiving)
   lazy val framesOfSafety             : Double                = - With.latency.latencyFrames - With.reaction.agencyAverage - PurpleMath.nanToZero(pixelsOfEntanglement / me.topSpeed)
   lazy val pixelsOfEntanglement       : Double                = ByOption.max(threats.map(me.pixelsOfEntanglement)).getOrElse(- With.mapPixelWidth)
-  lazy val pixelsOutOfNonWorkerRange  : Double                = ByOption.min(threats.view.filterNot(_.unitClass.isWorker).map(t => t.pixelDistanceEdge(me) - t.pixelRangeAgainst(me))).getOrElse(With.mapPixelWidth)
+  lazy val pixelsOfEntanglementWarrior: Double                = ByOption.max(threats.filterNot(_.unitClass.isWorker).map(me.pixelsOfEntanglement)).getOrElse(- With.mapPixelWidth)
 
   protected def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = (
     shooter.canAttack(victim)

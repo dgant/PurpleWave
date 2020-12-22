@@ -18,7 +18,7 @@ class Team(val units: Vector[UnitInfo]) {
   var battle          : Battle  = _
   var vanguard        : Pixel   = SpecificPoints.middle
   var centroidAir     : Pixel   = SpecificPoints.middle
-  var centroidGround  : Pixel   = if (With.frame == 0) centroidAir else SpecificPoints.middle.nearestWalkableTile.pixelCenter // Hack fix to startup initialization order
+  var centroidGround  : Pixel   = if (With.frame == 0) centroidAir else centroidAir.nearestWalkableTile.pixelCenter // Hack fix to startup initialization order
 
   //////////////
   // Features //

@@ -4,8 +4,6 @@ package Micro.Actions.Combat.Decisionmaking
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
-import Micro.Actions.Basic.Gather
-import Micro.Actions.Transportation.Caddy.Shuttling
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.{ByOption, Minutes}
@@ -59,23 +57,12 @@ object FightOrFlight extends Action {
         && ally.energy > 20
         && ally.pixelDistanceEdge(unit, otherAt = ByOption.minBy(unit.matchups.targets.view.map(unit.pixelToFireAt))(unit.pixelDistanceCenter).getOrElse(unit.pixelCenter)) < 72))
 
-    decide(true, "Workers", () => unit.matchups.allies.exists(u => u.friendly.isDefined && {
-      val ally = u.friendly.get
-      (ally.unitClass.isWorker
-        && ally.visibleToOpponents
-        && ally.agent.toGather.exists(_.pixelDistanceEdge(ally) < Gather.defenseRadiusPixels)
-        && ally.matchups.pixelsOutOfNonWorkerRange <= 16 + unit.matchups.pixelsOutOfNonWorkerRange
-        && ally.matchups.threats.exists(threat => u.canAttack && threat.framesToGetInRange(ally) <= 8 + unit.framesToGetInRange(threat)))
-    }))
-
-    val getaway = "Getaway"
     decide(true, "Anchors", () => unit.matchups.allies.view
       .map(_.friendly)
       .filter(_.isDefined)
       .map(_.get)
       .exists(ally => (
         ! ally.unitClass.isWorker
-        && ally.agent.fightReason != getaway
         && ! ally.loaded
         && ally.visibleToOpponents
         && (ally.canAttack || (ally.unitClass.rawCanAttack && ally.unitClass.isBuilding) || ally.is(Zerg.CreepColony))
@@ -85,19 +72,6 @@ object FightOrFlight extends Action {
         && (ally.friendly.forall(_.agent.ride.exists(_.pixelDistanceEdge(ally) > 96)) || ally.matchups.framesOfSafety <= PurpleMath.clamp(unit.matchups.framesOfSafety, 0, 3))
         && (ally.unitClass.isSpellcaster || (ally.matchups.threats.exists(t => ! t.unitClass.isWorker && t.topSpeed > ally.topSpeed && unit.canAttack(t)) && (ally.agent.shouldEngage || ally.matchups.targetsInRange.nonEmpty)))
       )))
-
-    decide(true, getaway, () => unit.agent.ride.exists(ride => {
-      lazy val rideDistance = Math.max(0.0, ride.pixelDistanceCenter(unit) - Shuttling.pickupRadius - 32)
-      lazy val rideWait = PurpleMath.nanToInfinity(rideDistance / (ride.topSpeed + unit.topSpeed))
-      lazy val firingDelay = if (unit.is(Protoss.HighTemplar)) 0 else unit.cooldownMaxAirGround
-      (unit.isAny(Protoss.Reaver, Protoss.HighTemplar)
-        && ! unit.matchups.threats.exists(t => t.isSiegeTankSieged() && t.pixelsToGetInRange(unit) < 48)
-        && (rideWait <= 12 + Math.max(0.0, unit.matchups.framesOfSafety) || (unit.loaded && unit.matchups.framesOfSafety > firingDelay))
-        && ! unit.matchups.threats.exists(t =>
-          t.canAttack(ride)
-          && t.topSpeed > ride.topSpeed
-          && t.framesToGetInRange(unit) < firingDelay + 24))
-    }))
 
     if (decision.isDefined) {
       unit.agent.shouldEngage = decision.get

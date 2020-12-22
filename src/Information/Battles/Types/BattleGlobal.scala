@@ -11,7 +11,7 @@ class BattleGlobal(us: Team, enemy: Team) extends Battle(us, enemy) {
   private lazy val estimationAbstractDefense: PredictionGlobal = estimateAvatar(this, weAttack = false)
   
   lazy val globalSafeToAttack: Boolean = globalSafe(estimationAbstractOffense, With.blackboard.aggressionRatio())
-  lazy val globalSafeToDefend: Boolean = globalSafe(estimationAbstractDefense, With.blackboard.safetyRatio()) || globalSafeToAttack
+  lazy val globalSafeToDefend: Boolean = globalSafe(estimationAbstractDefense, 1.2) || globalSafeToAttack
   
   private def globalSafe(estimation: PredictionGlobal, discountFactor: Double): Boolean = {
     val tradesEffectively = discountFactor * estimation.costToEnemy - estimation.costToUs >= 0

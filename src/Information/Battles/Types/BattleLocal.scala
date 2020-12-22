@@ -1,34 +1,15 @@
 package Information.Battles.Types
 
 import Information.Battles.Prediction.PredictionLocal
-import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Mathematics.PurpleMath
-import Planning.UnitMatchers.UnitMatchSiegeTank
-import ProxyBwapi.Races.Terran
-import Utilities.{ByOption, Minutes}
+import Utilities.ByOption
 
 class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
-
-  private def canSnipe = false && (
-    // Acceptable, performance-wise
-    (With.reaction.clusteringAverage < 8 || With.frame < Minutes(12)())
-    // Trying to snipe tanks leads to nasty surprises; tanks in fog tend to blast us and dissuade the snipe
-    && (
-      ! With.enemies.exists(_.hasTech(Terran.SiegeMode))
-      || ! enemy.units.exists(_.is(UnitMatchSiegeTank))
-      || us.units.view.map(u => u.subjectiveValue * (if (u.flying) 1 else -1)).sum > 0
-    )
-    // Snipe simulation is just really bad against long range static defense
-    && (
-      ! enemy.units.exists(u => u.unitClass.isStaticDefense && u.matchups.targets.nonEmpty)
-    ))
-
   lazy val predictionAttack = new PredictionLocal(this, weAttack = true, weSnipe = false)
-  lazy val predictionSnipe  = if (canSnipe) new PredictionLocal(this, weAttack = true, weSnipe = true) else predictionAttack
-  lazy val predictions      = Vector(predictionAttack, predictionSnipe).distinct
+  lazy val predictions      = Vector(predictionAttack).distinct
 
-  var judgement: Option[BattleJudgment] = None
+  var judgement: Option[NewBattleJudgment] = None
 
   def focus: Pixel = PurpleMath.centroid(teams.map(_.vanguard))
 

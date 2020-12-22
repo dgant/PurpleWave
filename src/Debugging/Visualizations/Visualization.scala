@@ -1,7 +1,7 @@
 package Debugging.Visualizations
 
 import Debugging.Visualizations.Rendering.DrawMap
-import Debugging.Visualizations.Views.Battles.{ShowBattles, ShowClustering, ShowDivisions, ShowTeams}
+import Debugging.Visualizations.Views.Battles._
 import Debugging.Visualizations.Views.Economy._
 import Debugging.Visualizations.Views.Fun._
 import Debugging.Visualizations.Views.Geography._
@@ -29,7 +29,6 @@ class Visualization {
     ShowStrategyName,
     ShowHealthAndCooldown,
     ShowUtilization,
-    ShowTeams, // Temporary
     ShowUnitPaths,
     ShowUnitsFriendly,
     ShowUnitsEnemy,
@@ -37,7 +36,7 @@ class Visualization {
     ShowPerformanceSummary,
     ShowStoryteller,
 
-
+    ShowJudgment
   )
 
   lazy val knownViews: Vector[View] = Vector[View](

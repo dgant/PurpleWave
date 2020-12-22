@@ -1,21 +1,16 @@
 package Debugging.Visualizations.Views.Battles
 
-import Debugging.Visualizations.Colors
-import Debugging.Visualizations.Rendering.DrawScreen.GraphCurve
-import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
+import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.View
-import Information.Battles.Prediction.Simulation.Simulacrum
 import Information.Battles.Types.BattleLocal
 import Lifecycle.With
-import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
-import bwapi.Color
 
 object ShowBattles extends View {
   
   override def renderScreen() {
-    localBattle.foreach(renderBattleScreen)
+    //localBattle.foreach(renderBattleScreen)
 
     if (With.yolo.active() && With.frame / 24 % 2 == 0) {
       DrawScreen.column(610, 230, "YOLO")
@@ -23,7 +18,7 @@ object ShowBattles extends View {
   }
 
   override def renderMap(): Unit = {
-    localBattle.foreach(renderBattleMap)
+    //localBattle.foreach(renderBattleMap)
   }
 
   def localBattle: Option[BattleLocal] = {
@@ -38,6 +33,7 @@ object ShowBattles extends View {
     units.groupBy(_.unitClass).toVector.sortBy( - _._2.size).map(p => p._2.size + " " + p._1).mkString(", ")
   }
 
+  /*
   def renderBattleScreen(battle: BattleLocal) {
     val prediction = battle.predictionAttack
     val barHeight = With.visualization.lineHeightSmall
@@ -45,16 +41,16 @@ object ShowBattles extends View {
 
     prediction.localBattleMetrics.lastOption.foreach(metrics => {
       DrawScreen.table(x, 4 * barHeight, Vector(
-        Vector("Attack",      format(battle.judgement.get.ratioAttack), "Survive:"),
-        Vector("Snipe",       format(battle.judgement.get.ratioSnipe),  With.self.name,   describeTeam(prediction.debugReport.filter(_._1.isFriendly) .filterNot(_._2.dead).keys)),
-        Vector("Target",      format(battle.judgement.get.ratioThreshold), With.enemy.name,  describeTeam(prediction.debugReport.filter(_._1.isEnemy)    .filterNot(_._2.dead).keys)),
+        Vector("",            "",                                           "Survive:"),
+        Vector("Snipe",       format(battle.judgement.get.ratioAttack),     With.self.name,   describeTeam(prediction.debugReport.filter(_._1.isFriendly) .filterNot(_._2.dead).keys)),
+        Vector("Target",      format(battle.judgement.get.ratioThreshold),  With.enemy.name,  describeTeam(prediction.debugReport.filter(_._1.isEnemy)    .filterNot(_._2.dead).keys)),
         Vector("Hysteresis",  format(battle.judgement.get.hysteresis)),
-        Vector("Turtle",      format(battle.judgement.get.turtleBonus), "Die:"),
-        Vector("Hornet",      format(battle.judgement.get.hornetBonus), With.self.name,   describeTeam(prediction.debugReport.filter(_._1.isFriendly) .filter(_._2.dead).keys)),
-        Vector("Siege",       format(battle.judgement.get.siegeUrgency), With.enemy.name,  describeTeam(prediction.debugReport.filter(_._1.isEnemy)    .filter(_._2.dead).keys)),
+        Vector("Turtle",      format(battle.judgement.get.turtleBonus),     "Die:"),
+        Vector("Hornet",      format(battle.judgement.get.hornetBonus),     With.self.name,   describeTeam(prediction.debugReport.filter(_._1.isFriendly) .filter(_._2.dead).keys)),
+        Vector("Siege",       format(battle.judgement.get.siegeUrgency),    With.enemy.name,  describeTeam(prediction.debugReport.filter(_._1.isEnemy)    .filter(_._2.dead).keys)),
         Vector("LVLR",        format(metrics.localValueLostRatio)),
-        Vector("LHLR",        format(metrics.localHealthLostRatio),      "Duration",       metrics.framesIn / 24 + "s"),
-        Vector("LHVLR",       format(metrics.localHealthValueLostRatio), "Metrics",        prediction.localBattleMetrics.size.toString),
+        Vector("LHLR",        format(metrics.localHealthLostRatio),         "Duration",       metrics.framesIn / 24 + "s"),
+        Vector("LHVLR",       format(metrics.localHealthValueLostRatio),    "Metrics",        prediction.localBattleMetrics.size.toString),
         Vector("RLVLN",       format(metrics.ratioLocalValueLostNet)),
         Vector("RLHLN",       format(metrics.ratioLocalHealthLostNet)),
         Vector("RLHVLN",      format(metrics.ratioLocalHealthValueLostNet)),
@@ -116,5 +112,6 @@ object ShowBattles extends View {
       DrawMap.line(sim.pixel.add(1,  3), sim.pixel.add(2,  9), dark)
     }
   }
+  */
 }
 

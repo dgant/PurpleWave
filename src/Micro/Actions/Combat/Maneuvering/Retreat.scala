@@ -45,7 +45,7 @@ object Retreat extends Action {
       MicroPathing.setDefaultForces(unit, goalHome = goalHome, goalSafety = goalSafety)
     }
     lazy val force            = unit.agent.forces.sum.radians
-    lazy val tilePath         = MicroPathing.getRealPath(unit, preferHome = goalHome)
+    lazy val tilePath         = MicroPathing.getThreatAwarePath(unit, preferHome = goalHome)
     lazy val waypointSimple   = MicroPathing.getWaypointInDirection(unit, force, if (goalHome) Some(unit.agent.origin) else None, requireSafety = goalSafety).map((_, "Simple"))
     lazy val waypointPath     = MicroPathing.getWaypointAlongTilePath(tilePath).map(_.add(unit.pixelCenter.relativeToTileCenter)).map((_, "Path"))
     lazy val waypointForces   = Seq(true, false).view.map(safety => MicroPathing.getWaypointInDirection(unit, force, requireSafety = safety)).find(_.nonEmpty).flatten.map((_, "Force"))

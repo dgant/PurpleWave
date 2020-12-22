@@ -19,19 +19,27 @@ import scala.collection.SeqView
 
 object MicroPathing {
 
-  def getRealPath(unit: FriendlyUnitInfo, preferHome: Boolean = true): TilePath = {
-    val pathLengthMinimum = 7
-    val pathfindProfile                 = new PathfindProfile(unit.tileIncludingCenter)
-    pathfindProfile.end                 = if (preferHome) Some(unit.agent.origin.tileIncluding) else None
-    pathfindProfile.lengthMinimum       = Some(pathLengthMinimum)
-    pathfindProfile.lengthMaximum       = Some(PurpleMath.clamp((unit.matchups.pixelsOfEntanglement + unit.effectiveRangePixels).toInt / 32, pathLengthMinimum, 15))
-    pathfindProfile.threatMaximum       = Some(0)
-    pathfindProfile.employGroundDist     = true
-    pathfindProfile.costOccupancy       = if (unit.flying) 0f else 3f
-    pathfindProfile.costThreat          = 3f
-    pathfindProfile.costRepulsion       = 6f
-    pathfindProfile.repulsors           = getPathfindingRepulsors(unit)
-    pathfindProfile.unit                = Some(unit)
+  def getSimplePath(unit: FriendlyUnitInfo, to: Option[Pixel]): TilePath = {
+    val pathfindProfile               = new PathfindProfile(unit.tileIncludingCenter)
+    pathfindProfile.end               = to.orElse(unit.agent.toTravel).map(_.tileIncluding)
+    pathfindProfile.employGroundDist  = true
+    pathfindProfile.unit              = Some(unit)
+    pathfindProfile.find
+  }
+
+  def getThreatAwarePath(unit: FriendlyUnitInfo, preferHome: Boolean = true): TilePath = {
+    val pathLengthMinimum             = 7
+    val pathfindProfile               = new PathfindProfile(unit.tileIncludingCenter)
+    pathfindProfile.end               = if (preferHome) Some(unit.agent.origin.tileIncluding) else None
+    pathfindProfile.lengthMinimum     = Some(pathLengthMinimum)
+    pathfindProfile.lengthMaximum     = Some(PurpleMath.clamp((unit.matchups.pixelsOfEntanglement + unit.effectiveRangePixels).toInt / 32, pathLengthMinimum, 15))
+    pathfindProfile.threatMaximum     = Some(0)
+    pathfindProfile.employGroundDist  = true
+    pathfindProfile.costOccupancy     = if (unit.flying) 0f else 3f
+    pathfindProfile.costThreat        = 3f
+    pathfindProfile.costRepulsion     = 6f
+    pathfindProfile.repulsors         = getPathfindingRepulsors(unit)
+    pathfindProfile.unit              = Some(unit)
     pathfindProfile.find
   }
 

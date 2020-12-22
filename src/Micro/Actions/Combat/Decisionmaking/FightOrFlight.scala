@@ -113,12 +113,9 @@ object FightOrFlight extends Action {
     val battle = unit.battle.get
     var shouldEngage = false
     unit.agent.fightReason = "No"
-    if (battle.judgement.get.shouldAttack) {
+    if (battle.judgement.get.shouldFight) {
       shouldEngage = true
       unit.agent.fightReason = "Yes"
-    } else if (battle.judgement.get.shouldSnipe) {
-      shouldEngage = true
-      unit.agent.fightReason = "Snipe"
     }
   
     if (unit.agent.shouldEngage != shouldEngage) {

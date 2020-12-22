@@ -5,6 +5,7 @@ import Mathematics.Points.Tile
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
 import Micro.Actions.Combat.Targeting.Target
+import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.{CircularPush, TrafficPriorities}
 import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.Zerg
@@ -76,7 +77,7 @@ object Build extends Action {
     val priority = if (unit.pixelDistanceCenter(pushPixel) < 128) TrafficPriorities.Shove else TrafficPriorities.Bump
     With.coordinator.pushes.put(new CircularPush(priority, pushPixel, 32 + buildClass.dimensionMax, unit))
 
-    if (unit.tileIncludingCenter.tileDistanceFast(buildTile) < 5 && With.grids.friendlyVision.isSet(buildTile)) {
+    if (unit.tileIncludingCenter.tileDistanceFast(buildTile) < 5 && buildTile.visible) {
       With.commander.build(unit, buildClass, buildTile)
       return
     }
@@ -85,7 +86,7 @@ object Build extends Action {
     if (unit.is(Zerg.Drone)) {
       movePixel = movePixel.add(buildClass.width / 2, buildClass.height / 2)
     }
-
+    MicroPathing.tryMovingAlongTilePath(unit, MicroPathing.getThreatAwarePath(unit))
     With.commander.move(unit)
   }
 }

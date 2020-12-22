@@ -10,7 +10,7 @@ import Planning.Plans.Macro.Automatic.{CapGasAt, PumpWorkers, PylonBlock, Upgrad
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, BuildGasPumpsIfBelow, RequireBases, RequireMiningBases}
 import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
-import Planning.Predicates.Compound.{And, Latch, Not, Sticky}
+import Planning.Predicates.Compound._
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBasesAtMost, SafeAtHome, SafeToMoveOut}
 import Planning.Predicates.Strategy.{Employing, EnemyRecentStrategy, EnemyStrategy}
@@ -203,7 +203,7 @@ class PvPLateGame extends GameplanTemplate {
     new GetReactiveObservers,
 
     // Expansions
-    new If(new And(new MiningBasesAtLeast(2), new UnitsAtLeast(36, UnitMatchWorkers)), new PylonBlock),
+    new If(new And(new MiningBasesAtLeast(2), new UnitsAtLeast(36, UnitMatchWorkers), new Check(() => With.blackboard.wantToAttack())), new PylonBlock),
     new RequireMiningBases(2),
     new If(new And(new ReadyForThirdIfSafe, new SafeForThird), new RequireBases(3)),
     new Trigger(

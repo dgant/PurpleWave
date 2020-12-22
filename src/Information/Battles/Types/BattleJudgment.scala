@@ -19,14 +19,12 @@ class BattleJudgment(battle: BattleLocal) {
 
   // "Ratios" here range on [-1, 1]
   val ratioAttack     : Double  = transformTotalScore(battle.predictionAttack.localBattleMetrics)
-  val ratioSnipe      : Double  = if (battle.predictionSnipe == battle.predictionAttack) ratioAttack else transformTotalScore(battle.predictionSnipe.localBattleMetrics)
-  val ratioBest       : Double  = Math.max(ratioAttack, ratioSnipe)
+  val ratioBest       : Double  = ratioAttack
   val totalTarget     : Double  = hysteresis + terranHomeBonus + terranMaxBonus + turtleBonus + hornetBonus + siegeUrgency + With.configuration.baseThreshold
   val ratioThreshold  : Double  = Math.min(1, PurpleMath.nanToZero(totalTarget))
   val confidence      : Double  = PurpleMath.nanToN((ratioBest - ratioThreshold) / Math.abs(Math.signum(ratioBest - ratioThreshold) - ratioThreshold), if (ratioBest >= ratioThreshold) 1 else -1)
   val shouldAttack    : Boolean = ratioAttack >= ratioThreshold
-  val shouldSnipe     : Boolean = ratioSnipe >= ratioThreshold
-  val shouldFight     : Boolean = shouldAttack || shouldSnipe
+  val shouldFight     : Boolean = shouldAttack
 
   def getTerranHomeBonus: Double = {
     if (battle.enemy.centroidAir.zone.owner.isTerran && battle.enemy.units.exists(u => u.is(UnitMatchSiegeTank) && u.matchups.targets.nonEmpty)) 0.2 else 0.0

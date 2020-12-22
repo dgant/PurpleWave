@@ -92,11 +92,15 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
           } else {
             val tile = chokeCenterTile.add(p)
             if (tile.valid
-              && altitudeMinimum.forall(With.grids.altitudeBonus.get(tile)>=)
+              // Stand uphill if possible
+              && altitudeMinimum.forall(tile.altitudeBonus >=)
+              // Don't stand in a choke
+              && ! zone.edges.exists(e => e.radiusPixels < 96 && e.pixelCenter.pixelDistance(tile.pixelCenter) < e.radiusPixels + 16)
+              // Stand in an unoccupied tile
               && (flyer || (
                 zone.tileGrid.get(tile)
+                && tile.walkableUnchecked
                 && ! occupied.get(tile)
-                && With.grids.walkable.get(tile)
                 && ! With.groundskeeper.isReserved(tile)))) {
               val exitDistance                = distanceGrid.get(tile)
               val distanceIntoEnemyRangeExit  = Math.max(0, enemyRangePixelsMax / 32 - exitDistance)

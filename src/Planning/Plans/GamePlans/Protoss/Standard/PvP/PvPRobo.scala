@@ -15,7 +15,7 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Compound.{And, ConcludeWhen, Latch, Not}
 import Planning.Predicates.Economy.GasAtMost
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeAtHome}
+import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeToMoveOut}
 import Planning.Predicates.Strategy._
 import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
@@ -93,17 +93,12 @@ class PvPRobo extends GameplanTemplate {
       new ConsiderAttacking)
 
   override def emergencyPlans: Seq[Plan] = oneGateCoreLogic.emergencyPlans
-
   override def initialScoutPlan: Plan = new If(new EnemiesAtMost(0, Protoss.Dragoon), super.initialScoutPlan)
   override def scoutExposPlan: Plan = NoPlan()
 
   override def aggressionPlan: Plan = new Trigger(
-    new And(
-      new ReadyToExpand,
-      new BasesAtMost(1),
-      new EnemyStrategy(With.fingerprints.fourGateGoon)),
-    new Aggression(1.5)
-  )
+    new And(new ReadyToExpand, new BasesAtMost(1)),
+    new Aggression(1.5))
 
   override def buildOrderPlan: Plan = new oneGateCoreLogic.BuildOrderPlan
 
@@ -139,8 +134,6 @@ class PvPRobo extends GameplanTemplate {
         new GasAtMost(45)),
       new Pump(Protoss.Zealot)))
 
-  class Expand extends RequireMiningBases(2)
-
   class EnemyLowUnitCount extends Or(
     new EnemyBasesAtLeast(2),
     new EnemyStrategy(
@@ -151,20 +144,17 @@ class PvPRobo extends GameplanTemplate {
   class ReadyToExpand extends And(
     new UnitsAtLeast(2, Protoss.Gateway),
     new Or(
-      new And(new UnitsAtLeast(1, Protoss.Reaver), new EnemyLowUnitCount),
-      new And(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new And(new SafeAtHome, new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)))),
+      new And(new UnitsAtLeast(1, Protoss.Reaver, complete = true), new SafeToMoveOut, new EnemyLowUnitCount),
+      new And(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new SafeToMoveOut, new Not(new EnemyStrategy(With.fingerprints.fourGateGoon))),
       new And(
-        new Latch(new UnitsAtLeast(3, UnitMatchOr(Protoss.Shuttle, Protoss.Reaver), complete = true)),
-        new UnitsAtLeast(2, UnitMatchOr(Protoss.Shuttle, Protoss.Reaver), complete = true))))
+        new UnitsAtLeast(2, UnitMatchOr(Protoss.Shuttle, Protoss.Reaver), complete = true),
+        new Latch(new UnitsAtLeast(3, UnitMatchOr(Protoss.Shuttle, Protoss.Reaver), complete = true)))))
 
   override def buildPlans: Seq[Plan] = Seq(
-    new EjectScout,
-    new If(new GasCapsUntouched, new CapGasAt(350)),
     new oneGateCoreLogic.WriteStatuses,
     new If(new GetObservers, new WriteStatus("Obs"), new WriteStatus("NoObs")),
-
-    // Keep pumping robo units even if expanding
-    new If(new ReadyToExpand, new Expand),
+    new If(new GasCapsUntouched, new CapGasAt(350)),
+    new EjectScout,
 
     new FlipIf(
       new oneGateCoreLogic.GateGate,
@@ -181,17 +171,19 @@ class PvPRobo extends GameplanTemplate {
         Get(3, Protoss.Pylon),
         Get(3, Protoss.Dragoon))),
 
+    new TrainRoboUnits,
+
     new If(
       new GetObservers,
-      new Build(Get(Protoss.Observatory)),
-      new Parallel(new CancelIncomplete(Protoss.Observatory), new Build(Get(Protoss.RoboticsSupportBay)))),
+      new BuildOrder(Get(Protoss.Observatory)),
+      new Parallel(
+        new CancelIncomplete(Protoss.Observatory),
+        new Build(Get(Protoss.RoboticsSupportBay)))),
     new If(new UnitsAtLeast(1, Protoss.Observatory), new Build(Get(Protoss.RoboticsSupportBay))),
 
-    new TrainRoboUnits,
+    new If(new ReadyToExpand, new RequireMiningBases(2)),
     new TrainGatewayUnits,
-
     new If(new EnemyStrategy(With.fingerprints.dtRush), new Build(Get(Protoss.ObserverSpeed))),
-    new If(new Not(new EnemyLowUnitCount), new Build(Get(3, Protoss.Gateway))),
-    new Expand,
+    new Build(Get(3, Protoss.Gateway)),
   )
 }

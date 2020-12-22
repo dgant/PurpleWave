@@ -19,7 +19,7 @@ import scala.collection.SeqView
 
 object MicroPathing {
 
-  def getSimplePath(unit: FriendlyUnitInfo, to: Option[Pixel]): TilePath = {
+  def getSimplePath(unit: FriendlyUnitInfo, to: Option[Pixel] = None): TilePath = {
     val pathfindProfile               = new PathfindProfile(unit.tileIncludingCenter)
     pathfindProfile.end               = to.orElse(unit.agent.toTravel).map(_.tileIncluding)
     pathfindProfile.employGroundDist  = true

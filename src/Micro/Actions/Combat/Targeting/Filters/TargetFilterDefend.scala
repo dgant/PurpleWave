@@ -24,7 +24,11 @@ case class TargetFilterDefend(zone: Zone) extends TargetFilter {
     if (actor.zone != zone && actor.pixelDistanceTravelling(zone.centroid) > target.pixelDistanceTravelling(zone.centroid)) return true
 
     // Fire at enemies unavoidably threatening the zone (perhaps sieging it from outside)
-    if (target.presumptiveTarget.exists(ally => ally.zone == zone && ally.visibleToOpponents && ally != actor)) return true
+    if (target.presumptiveTarget.exists(ally =>
+      ally != actor
+      && ally.zone == zone
+      && ally.visibleToOpponents
+      && (ally.unitClass.melee || ! zone.edges.exists(_.contains(ally.pixelCenter))))) return true
 
     false
   }

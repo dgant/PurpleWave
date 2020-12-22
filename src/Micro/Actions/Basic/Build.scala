@@ -86,7 +86,8 @@ object Build extends Action {
     if (unit.is(Zerg.Drone)) {
       movePixel = movePixel.add(buildClass.width / 2, buildClass.height / 2)
     }
-    MicroPathing.tryMovingAlongTilePath(unit, MicroPathing.getThreatAwarePath(unit))
+    unit.agent.toTravel = Some(movePixel)
+    MicroPathing.tryMovingAlongTilePath(unit, MicroPathing.getSimplePath(unit))
     With.commander.move(unit)
   }
 }

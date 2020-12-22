@@ -55,7 +55,7 @@ class PvPRobo extends GameplanTemplate {
     new Blueprint(Protoss.ShieldBattery),
     new Blueprint(Protoss.ShieldBattery))
 
-  override def workerPlan: Plan = new PumpWorkers(oversaturate = true)
+  override def workerPlan: Plan = new PumpWorkers
 
   // TODO: Replace with (or merge into) PvPSafeToMoveOut?
   // TODO: Handle 4-Gate Zealot
@@ -179,11 +179,14 @@ class PvPRobo extends GameplanTemplate {
       new Parallel(
         new CancelIncomplete(Protoss.Observatory),
         new Build(Get(Protoss.RoboticsSupportBay)))),
-    new If(new UnitsAtLeast(1, Protoss.Observatory), new Build(Get(Protoss.RoboticsSupportBay))),
+    new If(
+      new UnitsAtLeast(1, Protoss.Observatory, complete = true),
+      new Build(Get(Protoss.RoboticsSupportBay))),
 
     new If(new ReadyToExpand, new RequireMiningBases(2)),
     new TrainGatewayUnits,
     new If(new EnemyStrategy(With.fingerprints.dtRush), new Build(Get(Protoss.ObserverSpeed))),
     new Build(Get(3, Protoss.Gateway)),
+    new PumpWorkers(oversaturate = true)
   )
 }

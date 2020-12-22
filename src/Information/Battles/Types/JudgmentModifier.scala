@@ -1,15 +1,13 @@
 package Information.Battles.Types
 
-trait JudgmentModifier {
-  def name                      : String = getClass.getSimpleName.replace("$", "")
-  def applies(to: BattleLocal)  : Boolean = true
-  def gainedValueMultiplier     : Double
-  def friendlyMovementMultplier : Double
-  def friendlyAttackMultiplier  : Double
-  def enemyMovementMultplier    : Double
-  def enemyAttackMultiplier     : Double
-  def patienceMultiplier        : Double
-  def moraleMultiplier          : Double
-  def confidenceMultiplier      : Double
-  def thresholdModifier         : Double
-}
+case class JudgmentModifier(
+  var name                  : String,
+  gainedValueMultiplier     : Double = 0,
+  friendlyMovementMultplier : Double = 0,
+  friendlyAttackMultiplier  : Double = 0,
+  enemyMovementMultplier    : Double = 0,
+  enemyAttackMultiplier     : Double = 0,
+  patienceMultiplier        : Double = 0,
+  moraleMultiplier          : Double = 0,
+  confidenceMultiplier      : Double = 0,
+  targetDelta               : Double = 0)

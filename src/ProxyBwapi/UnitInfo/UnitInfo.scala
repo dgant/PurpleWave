@@ -603,6 +603,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   }
   @inline final def pixelToFireAt(enemy: UnitInfo): Pixel = pixelToFireAt(enemy, exhaustive = false)
   @inline final def pixelToFireAt(enemy: UnitInfo, exhaustive: Boolean): Pixel = {
+    if (unitClass.melee) return enemy.pixelCenter
+
     if (With.reaction.sluggishness > 1 || ! canMove) {
       return if (inRangeToAttack(enemy)) pixelCenter else enemy.pixelCenter.project(pixelCenter, pixelRangeAgainst(enemy))
     }
@@ -617,17 +619,18 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     def goodAltitudeBonus(pixel: Pixel): Double = if ( ! altitudeMatters || pixel.altitude > enemyAltitude) 1 else 0
 
     if (enemy.visible || (flying && sightPixels >= range)) {
-      if (range >= distance) return pixelCenter
+      if (range >= distance && ( ! exhaustive || ! altitudeMatters)) return pixelCenter
       // First, check if the simplest possible spot is acceptable
       val pixelClose  = enemy.pixelCenter.project(pixelCenter, range)
-      val gapRight    =    enemy.x - enemy.unitClass.dimensionLeft   - x - unitClass.dimensionRight
-      val gapLeft     = - (enemy.x - enemy.unitClass.dimensionRight  - x - unitClass.dimensionLeft)
-      val gapDown     =    enemy.y - enemy.unitClass.dimensionUp     - y - unitClass.dimensionDown
-      val gapUp       = - (enemy.y - enemy.unitClass.dimensionDown   - y - unitClass.dimensionUp)
+      val usToEnemyGapFacingRight    =    enemy.x - enemy.unitClass.dimensionLeft   - x - unitClass.dimensionRight
+      val usToEnemyGapFacingLeft     = - (enemy.x - enemy.unitClass.dimensionRight  - x - unitClass.dimensionLeft)
+      val usToEnemyGapFacingDown     =    enemy.y - enemy.unitClass.dimensionUp     - y - unitClass.dimensionDown
+      val usToEnemyGapFacingUp       = - (enemy.y - enemy.unitClass.dimensionDown   - y - unitClass.dimensionUp)
       val pixelFar = pixelClose
         .add(
-          Math.max(0, gapLeft)  - Math.max(0, gapRight),
-          Math.max(0, gapUp)    - Math.max(0, gapDown))
+          // DOUBLE CHECK CLAMPS
+          PurpleMath.clamp(usToEnemyGapFacingLeft, 0, enemy.unitClass.dimensionRight + unitClass.dimensionLeft)  - PurpleMath.clamp(usToEnemyGapFacingRight, 0, enemy.unitClass.dimensionLeft + unitClass.dimensionRight),
+          PurpleMath.clamp(usToEnemyGapFacingUp,   0, enemy.unitClass.dimensionDown  + unitClass.dimensionUp)    - PurpleMath.clamp(usToEnemyGapFacingDown, 0, enemy.unitClass.dimensionUp + unitClass.dimensionDown))
       if ( ! exhaustive || With.reaction.sluggishness > 0) {
         return pixelFar.nearestTraversableBy(this)
       }

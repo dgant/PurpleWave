@@ -11,7 +11,7 @@ object ShowJudgment extends View {
   }
 
   private def render(battle: BattleLocal): Unit = {
-    val x = 5
+    val x = 540
     val y = 40
     val mx = 2
     val my = 2
@@ -20,7 +20,7 @@ object ShowJudgment extends View {
       val yb = y + p._2 * 15
       val s = p._1.toString
       val sp = s + " " * (smax - s.length)
-      val w = sp.length * 9 / 2
+      val w = 95
       With.game.drawBoxScreen(x, yb, x + w + 2 * mx + 1, yb + 2 * my + With.visualization.lineHeightSmall + 1, p._1.color, true)
       With.game.drawTextScreen(x + mx, yb + my, sp)
     })

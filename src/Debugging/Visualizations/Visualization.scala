@@ -58,6 +58,7 @@ class Visualization {
     ShowHappyVision,
     ShowHistory,
     ShowIgnorance,
+    ShowJudgment,
     ShowKills,
     ShowMobility,
     ShowHealthAndCooldown,

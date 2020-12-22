@@ -13,7 +13,7 @@ import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Compound.{And, ConcludeWhen, Latch, Not}
-import Planning.Predicates.Economy.GasAtMost
+import Planning.Predicates.Economy.{GasAtMost, MineralsAtLeast}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeToMoveOut}
 import Planning.Predicates.Strategy._
@@ -98,7 +98,7 @@ class PvPRobo extends GameplanTemplate {
 
   override def aggressionPlan: Plan = new Trigger(
     new And(new ReadyToExpand, new BasesAtMost(1)),
-    new Aggression(1.5))
+    new Aggression(3.0))
 
   override def buildOrderPlan: Plan = new oneGateCoreLogic.BuildOrderPlan
 
@@ -131,7 +131,11 @@ class PvPRobo extends GameplanTemplate {
     new If(
       new And(
         new UnitsAtLeast(3, Protoss.Gateway),
-        new GasAtMost(45)),
+        new Or(
+          new GasAtMost(45),
+          new And(
+            new MineralsAtLeast(175),
+            new GasAtMost(95)))),
       new Pump(Protoss.Zealot)))
 
   class EnemyLowUnitCount extends Or(

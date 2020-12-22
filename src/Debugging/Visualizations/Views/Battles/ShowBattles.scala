@@ -15,15 +15,14 @@ import bwapi.Color
 object ShowBattles extends View {
   
   override def renderScreen() {
-    //localBattle.foreach(renderBattleScreen)
-
+    localBattle.foreach(renderBattleScreen)
     if (With.yolo.active() && With.frame / 24 % 2 == 0) {
       DrawScreen.column(610, 230, "YOLO")
     }
   }
 
   override def renderMap(): Unit = {
-    //localBattle.foreach(renderBattleMap)
+    localBattle.foreach(renderBattleMap)
   }
 
   def localBattle: Option[BattleLocal] = {

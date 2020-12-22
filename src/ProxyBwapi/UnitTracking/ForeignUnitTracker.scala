@@ -170,8 +170,8 @@ class ForeignUnitTracker {
     }
 
     val tileLastSeen = unit.pixelCenterObserved.tileIncluding
-    val maxTilesAway = 1 + With.framesSince(unit.lastSeen) * unit.topSpeed / 32
-    val maxTilesAwaySquared = maxTilesAway * maxTilesAway
+    val maxTilesAway = With.framesSince(unit.lastSeen) * unit.topSpeed / 32
+    val maxTilesAwaySquared = 2 + maxTilesAway * maxTilesAway
 
     val output = (0 to 10).view.map(i =>
       ByOption.minBy(Circle.points(i)
@@ -180,12 +180,11 @@ class ForeignUnitTracker {
           tile.valid
           && (unit.flying || tile.walkableUnchecked)
           && ! tile.visibleBwapi
-          && tile.tileDistanceSquared(tileLastSeen) <= maxTilesAway
+          && tile.tileDistanceSquared(tileLastSeen) <= maxTilesAwaySquared
         ))(_.pixelCenter.pixelDistanceSquared(unit.projectFrames(8))))
       .find(_.nonEmpty)
       .flatten
       .map(_.pixelCenter)
-
     output
   }
 }

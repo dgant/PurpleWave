@@ -13,7 +13,6 @@ import scala.collection.JavaConverters._
 abstract class FriendlyUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit, id) {
 
   override def equals(obj: Any): Boolean = obj.isInstanceOf[FriendlyUnitProxy] && obj.asInstanceOf[FriendlyUnitProxy].id == id
-  override def hashCode(): Int = id.hashCode
 
   private val cacheClass     = new Cache[UnitClass]  (() =>  UnitClasses.get(bwapiUnit.getType))
   private val cachePlayer    = new Cache[PlayerInfo] (() =>  Players.get(bwapiUnit.getPlayer))

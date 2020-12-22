@@ -59,7 +59,7 @@ class Team(val units: Vector[UnitInfo]) {
   // Width / 2   = 0 1 1 2 2 3 3  4  4  5  5  6  6  7  7
   // Width       = 1 2 3 4 5 6 7  8  9  10 11 12 13 14 15
   // Thus "width" = 2 * sqrt(sumDistance)
-  def groundCombatUnits = units.view.filter(u => u.canMove && u.unitClass.canAttack && ! u.flying && ! u.friendly.exists(_.agent.toGather.isDefined))
+  def groundCombatUnits: Seq[UnitInfo] = units.view.filter(u => u.canMove && u.unitClass.canAttack && ! u.unitClass.isWorker && ! u.flying && ! u.friendly.exists(_.agent.toGather.isDefined))
   val widthOrder          = new Cache(() => groundCombatUnits.sortBy(_.widthSlotProjected().pixelDistanceSquared(lineWidth())).toVector)
   //val widthOrder          = new Cache(() => groundCombatUnits.sortBy(_.teamDepthCurrent()).toVector)
   val widthIdeal          = new Cache(() => groundCombatUnits.map(_.unitClass.radialHypotenuse * 2.5).sum) // x2.5 = x2 for diameter, then x1.25 for spacing

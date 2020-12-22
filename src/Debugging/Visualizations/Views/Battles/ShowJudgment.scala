@@ -3,6 +3,7 @@ package Debugging.Visualizations.Views.Battles
 import Debugging.Visualizations.Views.View
 import Information.Battles.Types.BattleLocal
 import Lifecycle.With
+import Utilities.ByOption
 
 object ShowJudgment extends View {
   override def renderScreen(): Unit = {
@@ -14,12 +15,14 @@ object ShowJudgment extends View {
     val y = 40
     val mx = 2
     val my = 2
+    val smax: Int = ByOption.max(battle.judgmentModifiers.view.map(_.name.length)).getOrElse(1)
     battle.judgmentModifiers.zipWithIndex.foreach(p => {
       val yb = y + p._2 * 15
       val s = p._1.toString
-      val w = s.length * 9 / 2
-      With.game.drawBoxScreen(x, yb, x + w + 2 * mx, yb + 2 * my + With.visualization.lineHeightSmall, p._1.color, true)
-      With.game.drawTextScreen(x + mx, yb + my, s)
+      val sp = s + " " * (smax - s.length)
+      val w = sp.length * 9 / 2
+      With.game.drawBoxScreen(x, yb, x + w + 2 * mx + 1, yb + 2 * my + With.visualization.lineHeightSmall + 1, p._1.color, true)
+      With.game.drawTextScreen(x + mx, yb + my, sp)
     })
   }
 }

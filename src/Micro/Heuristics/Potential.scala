@@ -80,7 +80,7 @@ object Potential {
   }
 
   def correctWidth(unit: FriendlyUnitInfo): Force = {
-    ForceMath.fromPixels(unit.pixelCenter, unit.widthSlotIdeal(), unit.pixelDistanceCenter(unit.widthSlotIdeal()))
+    unit.battle.map(b => ForceMath.fromPixels(b.us.centroidGround, unit.widthSlotIdeal(), b.us.centroidGround.pixelDistance(unit.widthSlotIdeal()))).getOrElse(new Force)
   }
 
   def preferCohesion(unit: FriendlyUnitInfo): Force = {

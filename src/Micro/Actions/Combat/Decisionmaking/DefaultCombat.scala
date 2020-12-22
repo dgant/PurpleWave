@@ -129,7 +129,7 @@ object DefaultCombat extends Action {
     rangeAgainstUs.map(r => Math.min(r + 32, range)).getOrElse(range - 16)
   }
   def regroupGoal(unit: FriendlyUnitInfo): Pixel = {
-    if (unit.battle.exists(_.us.units.size > 1)) unit.widthSlotIdeal()
+    if (unit.battle.exists(_.us.units.size > 1)) unit.battle.get.us.centroidOf(unit)
     else if (unit.agent.shouldEngage) unit.agent.destination
     else unit.agent.origin
   }

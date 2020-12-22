@@ -20,16 +20,16 @@ object JudgmentModifiers {
         m.color = color
         output += m })
     }
-    add("Aggression",   Colors.MidnightRed, aggression(battle))
-    add("Proximity",    Colors.NeonRed,     proximity(battle))
-    add("Coherence",    Colors.NeonOrange,  coherence(battle))
-    add("EnemyChoked",  Colors.NeonYellow,  enemyChoked(battle))
-    add("Rout",         Colors.NeonGreen,   rout(battle))
-    add("Maxed",        Colors.NeonTeal,    maxed(battle))
-    add("Gatherers",    Colors.NeonBlue,    gatherers(battle))
-    add("HornetNest",   Colors.NeonIndigo,  hornetNest(battle))
-    add("Commitment",   Colors.NeonViolet,  commitment(battle))
-    add("Patience",     Color.Black,        patience(battle))
+    add("Aggression",   Colors.MidnightRed,   aggression(battle))
+    add("Proximity",    Colors.NeonRed,       proximity(battle))
+    add("Coherence",    Colors.MediumOrange,  coherence(battle))
+    add("EnemyChoked",  Colors.MediumYellow,  enemyChoked(battle))
+    add("Rout",         Colors.MediumGreen,   rout(battle))
+    add("Maxed",        Colors.MediumTeal,    maxed(battle))
+    add("Gatherers",    Colors.MediumBlue,    gatherers(battle))
+    add("HornetNest",   Colors.NeonIndigo,    hornetNest(battle))
+    add("Commitment",   Colors.NeonViolet,    commitment(battle))
+    add("Patience",     Color.Black,          patience(battle))
     output
   }
 
@@ -48,7 +48,7 @@ object JudgmentModifiers {
     val centroid      = battleLocal.enemy.centroidGround
     val keyBases      = With.geography.ourBasesAndSettlements.filter(b => b.isOurMain || b.isNaturalOf.exists(_.isOurMain))
     val distanceMax   = With.mapPixelWidth
-    val distanceHome  = (if (keyBases.isEmpty) Seq(With.geography.home) else keyBases.map(_.heart)).map(centroid.groundPixels).min
+    val distanceHome  = (if (keyBases.isEmpty) Seq(With.geography.home) else keyBases.map(_.heart.nearestWalkableTile)).map(centroid.groundPixels).min
     val distanceRatio = PurpleMath.clamp(distanceHome.toDouble / distanceMax, 0, 1)
     val multiplier    = 1.2 - 0.4 * distanceRatio
     Some(JudgmentModifier(gainedValueMultiplier = multiplier))

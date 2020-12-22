@@ -707,4 +707,6 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     else                          Colors.MidnightGray
 
   @inline final val unitColor: Color = Colors.hsv(hashCode % 256, 255, 128 + (hashCode / 256) % 128)
+
+  @inline final override val hashCode: Int = id + With.frame * 10000
 }

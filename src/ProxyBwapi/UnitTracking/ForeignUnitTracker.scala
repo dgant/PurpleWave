@@ -170,7 +170,7 @@ class ForeignUnitTracker {
     }
 
     val tileLastSeen = unit.pixelCenterObserved.tileIncluding
-    val maxTilesAway = With.framesSince(unit.lastSeen) * unit.topSpeed / 32
+    val maxTilesAway = Math.min(12, With.framesSince(unit.lastSeen) * unit.topSpeed / 32)
     val maxTilesAwaySquared = 2 + maxTilesAway * maxTilesAway
 
     val output = (0 to 10).view.map(i =>

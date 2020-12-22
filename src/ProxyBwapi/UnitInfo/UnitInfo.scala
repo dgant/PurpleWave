@@ -558,7 +558,6 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   lazy val isMutalisk           : CacheIs = new CacheIs(Zerg.Mutalisk)
   lazy val isLurker             : CacheIs = new CacheIs(Zerg.Lurker)
   lazy val isUltralisk          : CacheIs = new CacheIs(Zerg.Ultralisk)
-  lazy val isGuardian           : CacheIs = new CacheIs(Zerg.Guardian)
   
   // Frame X:     Unit's cooldown is 0.   Unit starts attacking.
   // Frame X-1:   Unit's cooldown is 1.   Unit receives attack order.

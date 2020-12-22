@@ -11,4 +11,5 @@ trait JudgmentModifier {
   def patienceMultiplier        : Double
   def moraleMultiplier          : Double
   def confidenceMultiplier      : Double
+  def thresholdModifier         : Double
 }

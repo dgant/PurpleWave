@@ -29,8 +29,8 @@ class Strategist {
     selectedLast.get
   }
 
-  lazy val heightMain       : Double  = With.grids.altitudeBonus.get(With.self.startTile)
-  lazy val heightNatural    : Double  = With.grids.altitudeBonus.get(With.geography.ourNatural.townHallTile)
+  lazy val heightMain       : Double  = With.grids.altitude.get(With.self.startTile)
+  lazy val heightNatural    : Double  = With.grids.altitude.get(With.geography.ourNatural.townHallTile)
   lazy val isRamped         : Boolean = heightMain > heightNatural
   lazy val isFlat           : Boolean = heightMain == heightNatural
   lazy val isInverted       : Boolean = heightMain < heightNatural

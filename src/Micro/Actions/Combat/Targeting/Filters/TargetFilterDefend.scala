@@ -7,7 +7,6 @@ import Utilities.Minutes
 
 case class TargetFilterDefend(zone: Zone) extends TargetFilter {
   override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
-    lazy val firingPixel = actor.pixelToFireAt(target)
 
     // If we want to attack anyway there's no need to ignore targets
     if (With.blackboard.wantToAttack()) return true
@@ -17,7 +16,12 @@ case class TargetFilterDefend(zone: Zone) extends TargetFilter {
 
     // Fire at enemies we can hit from inside the zone
     if (target.zone == zone) return true
-    if (firingPixel.zone == zone && firingPixel.altitude >= actor.altitude && ! zone.edges.exists(_.contains(firingPixel))) return true
+
+    val firingPixel = actor.pixelToFireAt(target)
+    if (firingPixel.zone == zone
+      && firingPixel.altitude >= actor.agent.toReturn.getOrElse(actor.pixelCenter).altitude
+      && actor.inRangeToAttackFrom(target, firingPixel) // TODO: Walkability constraints can produce a firing pixel that's not actually in range
+      && ! zone.edges.exists(_.contains(firingPixel))) return true
 
     // Target enemies between us and the goal zone
     if (actor.inRangeToAttack(target) && actor.readyForAttackOrder) return true

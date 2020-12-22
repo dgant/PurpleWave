@@ -19,8 +19,8 @@ object PlacementProfiles {
       gas
     else if (blueprint.powers.get)
       pylon
-    else if (blueprint.building == Protoss.RoboticsFacility)
-      robo
+    //else if (blueprint.building == Protoss.RoboticsFacility)
+    //  robo
     else if (blueprint.building.trainsGroundUnits) {
       if (blueprint.building == Terran.Barracks)
         factoryNoSpace

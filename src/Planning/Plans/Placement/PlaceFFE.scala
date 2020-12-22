@@ -45,7 +45,7 @@ class PlaceFFE extends Plan {
     val naturalGoalPost = naturalExit.pixelCenter.project(naturalBase.townHallArea.midPixel, - 5 * 32).tileIncluding
     val naturalHomeTile = Spiral.points(6).map(naturalHomePost.add).filter(_.zone == naturalZone).find(validWalkable)
     val naturalGoalTile = Spiral.points(6).map(naturalGoalPost.add).filterNot(_.zone == naturalZone).find(validWalkable)
-    val naturalAltitude = With.grids.altitudeBonus.get(naturalBase.townHallTile)
+    val naturalAltitude = With.grids.altitude.get(naturalBase.townHallTile)
     val geyserTiles     = naturalBase.gas.map(_.tileArea.tiles).reduceLeft(_ ++ _)
     val exitDeltaX      = Math.abs(naturalSideRaw1.x - naturalSideRaw2.x)
     val exitDeltaY      = Math.abs(naturalSideRaw1.y - naturalSideRaw2.y)
@@ -72,7 +72,7 @@ class PlaceFFE extends Plan {
       def addPlacementOptions(tile: Tile, unitClass: UnitClass, sideTiles: mutable.Set[Tile], buildingTiles: mutable.Set[Tile]): Unit = {
         if ( ! tile.valid) return
         if ( ! With.grids.walkable.get(tile)) sideTiles += tile
-        if (With.grids.altitudeBonus.get(tile) != naturalAltitude) return
+        if (With.grids.altitude.get(tile) != naturalAltitude) return
         val isForge = unitClass == Protoss.Forge
         val isGate = unitClass == Protoss.Gateway
         val geyserBlocksUp    = adjacentUp    .map(tile.add).exists(geyserTiles.contains)

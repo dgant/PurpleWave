@@ -68,17 +68,24 @@ object Target extends {
       dpf = attacker.dpfOnNextHitAgainst(target))
     val preferences = TargetFilterGroups.filtersPreferred.view.filter(_.appliesTo(attacker)).count(_.legal(attacker, target))
     val preferenceBonus = Math.pow(100, preferences)
-    val firingPixel = attacker.pixelToFireAt(target)
-    val firingPixelDistance = attacker.pixelDistanceCenter(firingPixel)
-    val firingPixelFrames = firingPixelDistance / (0.0001 + attacker.topSpeed)
-    val threatPenalty = if (With.reaction.sluggishness < 2)
+    val threatPenalty = if (With.reaction.sluggishness > 1) framesOutOfWay else {
+      val firingPixel = attacker.pixelToFireAt(target)
+      // TODO: Do it through argument to pixelToFireAt
+      val firingPixelSafer = target.pixelCenter.project(attacker.pixelCenter, attacker.pixelRangeAgainst(target) + attacker.unitClass.dimensionMin + target.unitClass.dimensionMin)
+      val firingPixelFrames = attacker.pixelDistanceCenter(firingPixel) / (0.01 + attacker.topSpeed)
       1 + attacker.matchups.threats.count(threat =>
-      threat.inRangeToAttack(
-        attacker,
-        threat.pixelCenter.project(firingPixel, Math.min(attacker.pixelDistanceCenter(firingPixel), attacker.topSpeed * firingPixelFrames)),
-        firingPixel))
-    else framesOutOfWay
-    val output = scoreBasic * preferenceBonus / threatPenalty
+        // In range to attack at the firing pixel?
+        threat.inRangeToAttack(
+          attacker,
+          threat.pixelCenter.projectUpTo(firingPixel, threat.topSpeed * firingPixelFrames),
+          firingPixel)
+          // In range to attack if we choose somewhere safer to shoot from?
+          && threat.inRangeToAttack(
+          attacker,
+          threat.pixelCenter.projectUpTo(firingPixelSafer, threat.topSpeed * firingPixelFrames),
+          firingPixelSafer))
+    }
+    val output = scoreBasic * preferenceBonus / threatPenalty / threatPenalty
     output
   }
 

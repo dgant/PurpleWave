@@ -62,7 +62,7 @@ object JudgmentModifiers {
     val us    = battleLocal.us.coherence()
     val enemy = battleLocal.enemy.coherence()
     val bonus = us - enemy
-    Some(JudgmentModifier(speedMultiplier = 1 + 0.1 * bonus))
+    Some(JudgmentModifier(speedMultiplier = 1 + 0.2 * bonus))
   }
 
   // Prefer fighting
@@ -77,7 +77,7 @@ object JudgmentModifiers {
       && unit.zone.edges.exists(edge =>
         edge.contains(unit.pixelCenter)
         && edge.radiusPixels < battleLocal.enemy.widthIdeal() / 4d))
-    if (choked) Some(JudgmentModifier(speedMultiplier = 1.1)) else None
+    if (choked) Some(JudgmentModifier(speedMultiplier = 1.2)) else None
   }
 
   // Prefer fighting
@@ -128,7 +128,7 @@ object JudgmentModifiers {
     val valueUs         = ourCombatUnits.map(_.subjectiveValue).sum
     val valueUsGround   = ourCombatUnits.filterNot(_.flying).map(_.subjectiveValue).sum
     val ratioUsGround   = PurpleMath.nanToZero(valueUsGround / valueUs)
-    val enemyBonus      = Math.min(ratioUsGround * tanks * 0.1, 0.3)
+    val enemyBonus      = Math.min(ratioUsGround * tanks * 0.1, 0.4)
     if (enemyBonus > 0) Some(JudgmentModifier(speedMultiplier = 1 - enemyBonus)) else None
   }
 

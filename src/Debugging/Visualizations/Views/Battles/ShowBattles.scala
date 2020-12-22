@@ -44,8 +44,8 @@ object ShowBattles extends View {
 
     prediction.localBattleMetrics.lastOption.foreach(metrics => {
       DrawScreen.table(x, 4 * barHeight, Vector(
-        Vector("",            "",                                             "Survive:"),
-        Vector("Score",       format(battle.judgement.get.scoreFinal),        With.self.name,   describeTeam(prediction.debugReport.filter(_._1.isFriendly) .filterNot(_._2.dead).keys)),
+        Vector("Score",       format(battle.judgement.get.scoreFinal),        "Survive:"),
+        Vector("Target",      format(battle.judgement.get.scoreTarget),       With.self.name,   describeTeam(prediction.debugReport.filter(_._1.isFriendly) .filterNot(_._2.dead).keys)),
         Vector("LVLR",        format(metrics.localValueLostRatio),            With.enemy.name,  describeTeam(prediction.debugReport.filter(_._1.isEnemy)    .filterNot(_._2.dead).keys)),
         Vector("LHLR",        format(metrics.localHealthLostRatio)),
         Vector("LHVLR",       format(metrics.localHealthValueLostRatio),     "Die:"),

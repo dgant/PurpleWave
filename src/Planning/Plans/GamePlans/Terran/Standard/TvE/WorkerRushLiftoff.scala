@@ -154,7 +154,7 @@ class WorkerRushLiftoff extends Parallel {
     val scoreIsland     = if (tile.zone.island || tile.zone.unwalkable) 1000000.0 else 1.0
     val scoreObscurity  = 1.0 + tile.zone.edges.map(_.pixelCenter.pixelDistance(tile.pixelCenter)).sum
     val scoreCentrality = 1.0 + tile.tileDistanceFromEdge
-    val scoreAltitude   = 1.0 + With.grids.altitudeBonus.get(tile)
+    val scoreAltitude   = 1.0 + With.grids.altitude.get(tile)
     val scoreTotal      = scoreIsland * scoreAltitude *  scoreObscurity / scoreCentrality
     scoreTotal
   }

@@ -35,7 +35,7 @@ abstract class PlaceProxies(buildings: UnitClass*) extends Plan {
   val groundProxyScore: Tile => Double = tile => {
     (
       (if (With.grids.enemyVision.isSet(tile)) 1 else 10)
-      * With.grids.altitudeBonus.get(tile)
+      * With.grids.altitude.get(tile)
       * Math.max(minSight, With.grids.scoutingPathsBases.get(tile))
       * Math.max(minSight, With.grids.scoutingPathsStartLocations.get(tile))
       / Math.max(minDistance, groundDistanceMax(tile))
@@ -48,7 +48,7 @@ abstract class PlaceProxies(buildings: UnitClass*) extends Plan {
     val airDistanceMax = this.airDistanceMax(tile)
     (
       (if (With.grids.enemyVision.isSet(tile)) 1 else 10)
-      * With.grids.altitudeBonus.get(tile)
+      * With.grids.altitude.get(tile)
       * Math.max(minSight, With.grids.scoutingPathsBases.get(tile))
       * Math.max(minSight, With.grids.scoutingPathsStartLocations.get(tile))
       * Math.max(minDistance, groundDistanceMax(tile))
@@ -62,7 +62,7 @@ abstract class PlaceProxies(buildings: UnitClass*) extends Plan {
     val target = With.scouting.threatOrigin
     (
       (if (With.grids.enemyVision.isSet(tile)) 1 else 10)
-      * With.grids.altitudeBonus.get(tile)
+      * With.grids.altitude.get(tile)
       * Math.max(minSight, With.grids.scoutingPathsBases.get(tile))
       * Math.max(minSight, With.grids.scoutingPathsStartLocations.get(tile))
       * Math.max(minDistance, groundDistanceMax(tile))

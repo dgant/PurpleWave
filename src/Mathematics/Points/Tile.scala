@@ -142,10 +142,10 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     With.paths.groundPixels(pixelCenter, other.pixelCenter)
   }
   @inline final def altitude: Double = {
-    if (valid) altitudeUnchecked else With.grids.altitudeBonus.defaultValue
+    if (valid) altitudeUnchecked else With.grids.altitude.defaultValue
   }
   @inline final def altitudeUnchecked: Double = {
-    With.grids.altitudeBonus.getUnchecked(i)
+    With.grids.altitude.getUnchecked(i)
   }
   @inline final def toRectangle: TileRectangle = {
     TileRectangle(this, this.add(1, 1))

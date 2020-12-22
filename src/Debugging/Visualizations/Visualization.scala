@@ -87,7 +87,7 @@ class Visualization {
     ShowTileInfo,
     ShowUnitCounts,
     ShowUnitPaths,
-    ShowZoneBorderTiles,
+    ShowZoneBorders,
     ShowZoneLabels,
     ShowZonePathDemo,
     ShowZones

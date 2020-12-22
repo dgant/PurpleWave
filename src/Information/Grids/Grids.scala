@@ -13,7 +13,7 @@ class Grids {
 
   lazy val tasks = new TaskQueueGrids
 
-  val altitudeBonus               = new GridAltitudeBonus
+  val altitude               = new GridAltitudeBonus
   val buildable                   = new GridBuildable
   val buildableTerrain            = new GridBuildableTerrain
   val buildableTownHall           = new GridBuildableTownHall

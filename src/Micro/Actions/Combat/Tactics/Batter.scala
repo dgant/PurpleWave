@@ -49,8 +49,8 @@ object Batter extends Action {
   
     lazy val outsideUnits   = unit.matchups.targetsInRange
     lazy val repairingUnits = wallUnits.flatMap(_.matchups.repairers)
-    lazy val altitudeHere   = With.grids.altitudeBonus.get(unit.tileIncludingCenter)
-    lazy val altitudeThere  = With.grids.altitudeBonus.get(unit.agent.destination.tileIncluding)
+    lazy val altitudeHere   = With.grids.altitude.get(unit.tileIncludingCenter)
+    lazy val altitudeThere  = With.grids.altitude.get(unit.agent.destination.tileIncluding)
     
     lazy val outsiders = outsideUnits.filter(_.visible)
     lazy val repairers = if (unit.pixelRangeGround >= 32.0 * 4.0) repairingUnits.filter(_.visible) else Iterable.empty

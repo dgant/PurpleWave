@@ -7,7 +7,7 @@ abstract class GridTask[T](grid: AbstractGrid[T]) extends AbstractTask {
   override protected def onRun(): Unit = grid.update()
 }
 
-class TaskGridAltitudeBonus               extends GridTask(With.grids.altitudeBonus)
+class TaskGridAltitudeBonus               extends GridTask(With.grids.altitude)
 class TaskGridBuildable                   extends GridTask(With.grids.buildable)
 class TaskGridBuildableTerrain            extends GridTask(With.grids.buildableTerrain)
 class TaskGridBuildableTownHall           extends GridTask(With.grids.buildableTownHall)

@@ -10,7 +10,8 @@ object ShowGrids extends View {
 
   override def renderMap() {
     //renderGridArray(With.units.all.find(_.selected).map(_.tileIncludingCenter).getOrElse(With.geography.home).zone.distanceGrid, 0, 1)
-    renderGridArray(With.grids.enemyRangeGround, 0, 0)
+    //renderGridArray(With.grids.enemyRangeGround, 0, 0)
+    renderGridArray(With.grids.altitude, 0, 0)
     //renderGridArray(With.grids.units, 1, 0)
   }
   

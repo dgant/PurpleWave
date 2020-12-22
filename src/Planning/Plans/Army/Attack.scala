@@ -16,7 +16,10 @@ class Attack(
   override val goal: GoalAttack = new GoalAttack
 
   val conscript = matcherArgument != UnitMatchNone
-  val matcher = if (matcherArgument == UnitMatchNone) UnitMatchAnd(UnitMatchRecruitableForCombat, UnitMatchNot(UnitMatchWorkers)) else matcherArgument
+  val matcher = if (matcherArgument == UnitMatchNone)
+    UnitMatchAnd(UnitMatchRecruitableForCombat, UnitMatchNot(UnitMatchWorkers))
+  else
+    UnitMatchAnd(UnitMatchComplete, matcherArgument)
 
   private val attackers: LockUnits = new LockUnits{
     unitMatcher.set(matcher)

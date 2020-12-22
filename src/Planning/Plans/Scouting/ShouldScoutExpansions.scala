@@ -20,5 +20,5 @@ class ShouldScoutExpansions extends Predicate {
       else                            GameTime(12, 0)
   }
 
-  override def isComplete: Boolean = With.frame > time()
+  override def isComplete: Boolean = With.blackboard.wantToAttack() && With.frame > time()
 }

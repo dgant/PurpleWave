@@ -39,7 +39,13 @@ object StrategyGroups {
     PvE2BaseIslandCarrier, // Disabled for Sparkle in TorchUp
     PvE3BaseIslandCarrier, // Disabled for Sparkle in TorchUp
 
-    PvTProxyDarkTemplar,
+
+    PvT13Nexus, // Good Terran bots are bunker rushing this too effectively
+
+    PvTProxyDarkTemplar, // Proxy builds are temporarily broken due to new building placer
+    PvTProxy2Gate, // Proxy builds are temporarily broken due to new building placer
+    PvPProxy2Gate, // Proxy builds are temporarily broken due to new building placer
+    PvZProxy2Gate, // Proxy builds are temporarily broken due to new building placer
 
     PvZDT,       // Requires better micro on one base
     PvZCorsair,  // Requires better micro on one base

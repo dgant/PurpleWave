@@ -21,6 +21,7 @@ import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPRobo
+import Utilities.GameTime
 
 class PvPRobo extends GameplanTemplate {
 
@@ -42,10 +43,11 @@ class PvPRobo extends GameplanTemplate {
     new EnemyDarkTemplarLikely,
     new EnemiesAtLeast(1, Protoss.CitadelOfAdun),
     new And(
-      new Not(new EnemyStrategy(With.fingerprints.robo, With.fingerprints.nexusFirst, With.fingerprints.fourGateGoon)),
-      new Or(
-        new Not(new EnemyStrategy(With.fingerprints.dragoonRange)),
-        new EnemyRecentStrategy(With.fingerprints.dtRush))))
+      new EnemyRecentStrategy(With.fingerprints.dtRush),
+      new Not(new EnemyStrategy(With.fingerprints.robo, With.fingerprints.nexusFirst, With.fingerprints.fourGateGoon))),
+    new Or(
+      new Not(new EnemyStrategy(With.fingerprints.dragoonRange, With.fingerprints.dragoonRange)),
+      new FrameAtLeast(GameTime(6, 0)())))
 
   override def blueprints = Vector(
     new Blueprint(Protoss.Pylon),
@@ -144,7 +146,7 @@ class PvPRobo extends GameplanTemplate {
     new EnemyStrategy(
       With.fingerprints.robo,
       With.fingerprints.dtRush,
-      With.fingerprints.earlyForge))
+      With.fingerprints.forgeFe))
 
   class ReadyToExpand extends And(
     new UnitsAtLeast(2, Protoss.Gateway),

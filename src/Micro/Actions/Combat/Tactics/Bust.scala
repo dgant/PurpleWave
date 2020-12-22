@@ -10,6 +10,8 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, Minutes, Seconds}
 import bwapi.Race
 
+import scala.util.Random
+
 object Bust extends Action {
   
   // TODO:
@@ -72,7 +74,7 @@ object Bust extends Action {
       val range = unit.pixelRangeAgainst(bunker)
       val bunkerDistance = unit.pixelDistanceEdge(bunker)
       def stationAcceptable(pixel: Pixel) = pixel.walkable && ! unit.matchups.allies.exists(a => ! a.flying && a.pixelDistanceEdge(unit, pixel) < 4)
-      var station = Some(unit.pixelCenter.project(bunker.pixelCenter, Math.max(4, bunkerDistance - range))).filter(stationAcceptable)
+      var station = Some(unit.pixelCenter.project(bunker.pixelCenter, Math.max(Random.nextInt(9), bunkerDistance - range))).filter(stationAcceptable)
       if (station.isEmpty && bunkerDistance > range + 32) {
         val stationCount = 64
         val stations = (0 until stationCount)

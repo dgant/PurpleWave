@@ -15,7 +15,7 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely}
+import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
@@ -76,7 +76,8 @@ class PvP34GateGoon extends GameplanTemplate {
       new BuildOrder(Get(3, Protoss.Gateway), Get(8, Protoss.Dragoon)),
       new BuildOrder(Get(4, Protoss.Gateway), Get(10, Protoss.Dragoon))),
 
-    // Kind of cowardly, but if we can't be sure they're not going DT, get a Forge before expanding so we can get cannons in time if necessary
+    // Kind of cowardly, but if we can't be sure they're not going DT,
+    // get a Forge before expanding so we can get cannons in time if necessary
     new If(
       new And(
         new Not(new EnemyDarkTemplarLikely),
@@ -92,19 +93,17 @@ class PvP34GateGoon extends GameplanTemplate {
       new CancelIncomplete(Protoss.Forge),
       new Build(Get(Protoss.Forge))),
 
-    new FlipIf(
+    new If(
       new Or(
-        new EnemyBasesAtLeast(2),
-        new UnitsAtLeast(20, Protoss.Dragoon)),
-      new If(
-        new Or(
-          new And(
-            new Employing(PvP3GateGoon),
-            new UnitsAtLeast(3, Protoss.Gateway, complete = true)),
-          new UnitsAtLeast(14, Protoss.Dragoon)),
-        new RequireMiningBases(2)),
-      new Pump(Protoss.Dragoon)),
+        new And(
+          new Employing(PvP3GateGoon),
+          new UnitsAtLeast(3, Protoss.Gateway, complete = true)),
+        new And(
+          new UnitsAtLeast(14, Protoss.Dragoon),
+          new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)))),
+      new RequireMiningBases(2)),
 
+    new Pump(Protoss.Dragoon),
     new Build(Get(4, Protoss.Gateway))
   )
 }

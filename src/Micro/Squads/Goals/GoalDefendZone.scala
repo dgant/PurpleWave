@@ -123,8 +123,12 @@ class GoalDefendZone extends SquadGoalBasic {
   def defendHeart(center: Pixel) {
     _currentDestination = center
     val protectables  = center.zone.units.filter(u => u.isOurs && u.unitClass.isBuilding && u.hitPoints < 300 && (u.discoveredByEnemy || u.canAttack))
-    val protectRange  = ByOption.max(protectables.map(_.pixelDistanceCenter(center))).getOrElse(32.0 * 8.0)
-    val destination   = ByOption.minBy(protectables)(u => u.matchups.framesOfSafety + 0.0001 * u.pixelDistanceCenter(center)).map(_.pixelCenter).getOrElse(center)
+    val destination   = ByOption
+      .minBy(protectables.view.filter(p =>
+        p.zone != With.geography.ourMain.zone || p.matchups.threats.exists( ! _.unitClass.isWorker)))(u =>
+          u.matchups.framesOfSafety + 0.0001 * u.pixelDistanceCenter(center))
+      .map(_.pixelCenter)
+      .getOrElse(center)
     val groupArea     = squad.units.view.map(_.unitClass.area).sum
     val groupRadius   = Math.sqrt(groupArea)
     squad.units.foreach(unit => {

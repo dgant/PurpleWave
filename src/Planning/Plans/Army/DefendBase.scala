@@ -15,7 +15,6 @@ class DefendBase(base: Base) extends SquadPlan[GoalDefendZone] {
   var enemies: Seq[ForeignUnitInfo] = Seq.empty
   
   override def onUpdate() {
-    With.blackboard.defendingBase.set(true)
   
     if (enemies.size < 3 && enemies.forall(e => (e.unitClass.isWorker || ! e.canAttack) && (e.isOverlord() || ! e.unitClass.isTransport))) {
       return
@@ -24,7 +23,8 @@ class DefendBase(base: Base) extends SquadPlan[GoalDefendZone] {
     if (enemies.forall(e => e.is(Protoss.Observer) && ! e.matchups.enemyDetectors.exists(_.canMove))) {
       return
     }
-  
+
+    With.blackboard.defendingBase.set(true)
     squad.enemies = enemies
     goal.zone = base.zone
     super.onUpdate()

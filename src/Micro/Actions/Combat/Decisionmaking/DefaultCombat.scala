@@ -272,7 +272,7 @@ object DefaultCombat extends Action {
           return
         } else if (distanceTowards > 0) {
           unit.agent.act("Chase")
-          unit.agent.toTravel = unit.agent.toAttack.map(_.presumptiveStep)
+          unit.agent.toTravel = unit.agent.toAttack.map(u => if (u.visible) u.presumptiveStep else u.pixelCenter)
           Move.delegate(unit)
           return
         }

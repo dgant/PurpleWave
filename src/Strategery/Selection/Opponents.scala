@@ -13,7 +13,7 @@ object Opponents {
   // SSCAIT 2019-2020
   val stardust    : Opponent = add("Stardust",    new StrategySelectionRecommended(StrategySelectionGreedy(), PvPRobo, PvP3rdBaseSlow) { duration = 2 })
   val bananabrain : Opponent = add("BananaBrain", new StrategySelectionRecommended(StrategySelectionGreedy(), PvPRobo, PvP3rdBaseSlow) { duration = 2 })
-  val monster     : Opponent = add("Monster",     new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ2Gate1012, PvZ4GateGoon, PvZMidgame5GateGoonReaver) { duration = 3 })
+  val monster     : Opponent = add("Monster",     new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ2Gate1012, PvZ4GateGoon, PvZMidgame5GateGoonReaver, PvZLateGameReaver) { duration = 3 })
   val dragon      : Opponent = add("Dragon",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvT1015Expand, PvT3rdFast, PvT3BaseArbiter, PvEStormNo) { duration = 2 })
   val haopan      : Opponent = add("Hao Pan",     new StrategySelectionRecommended(StrategySelectionGreedy(), PvT32Nexus, PvT2BaseCarrier, PvEStormNo)  { duration = 3 })
   val adias       : Opponent = add("adias",       StrategySelectionFixed(PvT24Nexus, PvT2BaseCarrier, PvEStormNo))

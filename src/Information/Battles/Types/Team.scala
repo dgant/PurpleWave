@@ -75,7 +75,7 @@ class Team(val units: Vector[UnitInfo]) {
   val depthMean           = new Cache(() => ByOption.mean(units.view.flatMap(_.depthCurrent())).getOrElse(0d))
   val depthSpread         = new Cache(() => ByOption.mean(units.view.flatMap(_.depthCurrent()).map(d => Math.abs(d - depthMean()))).getOrElse(0d))
   val coherenceWidth      = new Cache(() => if (units.size == 1) 1 else Math.min(PurpleMath.nanToOne(widthMeanExpected() / widthMeanActual()), PurpleMath.nanToOne(widthMeanActual() / widthMeanExpected())))
-  val coherenceDepth      = new Cache(() => 1 - PurpleMath.clamp(2 * depthSpread() / (1 + widthIdeal()), 0, 1))
+  val coherenceDepth      = new Cache(() => 1 - PurpleMath.clamp(2 * depthSpread() / (128 + widthIdeal()), 0, 1))
   val coherence           = new Cache(() => coherenceDepth()) // Math.max(coherenceWidth(), coherenceDepth()))
   val impatience          = new Cache(() => units.view.flatMap(_.friendly.map(_.agent.impatience)).sum.toDouble / Math.max(1, units.size))
   val totalArmyFraction   = new Cache(() => units.view.filter(_.is(UnitMatchWarriors)).map(_.subjectiveValue).sum / Math.max(1d, With.units.ours.view.filter(_.is(UnitMatchWarriors)).map(_.subjectiveValue).sum))

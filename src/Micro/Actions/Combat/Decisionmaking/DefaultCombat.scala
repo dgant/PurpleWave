@@ -100,6 +100,10 @@ object DefaultCombat extends Action {
     lazy val sameThreatsChasing = unit.matchups.threats.forall(t => t.inRangeToAttack(unit) == t.inRangeToAttack(unit, projectedUs))
     lazy val obiwanned          = ! unit.flying && ! target.flying && ! unit.unitClass.melee && target.altitude > unit.altitude
 
+    if ( ! target.canMove) {
+      return if (inChoke && nudgedTowards) 0 else range
+    }
+
     // Chasing behaviors
     // Reavers shouldn't even try
     if ( ! unit.is(Protoss.Reaver)) {
@@ -134,8 +138,8 @@ object DefaultCombat extends Action {
     // Maintain just enough range if we're being nudged
     if (nudgedTowards) return rangeAgainstUs.map(r => Math.min(r + 32, range)).getOrElse(0)
 
-    // Otherwise, stay just short of maximum range (so they're in range if they turn around)
-    rangeAgainstUs.map(r => Math.min(r + 32, range)).getOrElse(range - 16)
+    // Otherwise, stay near max range. Get a little closer if we can in case they try to flee
+    rangeAgainstUs.map(rangeAgainst => PurpleMath.clamp(rangeAgainst + 64, range - 16, range)).getOrElse(range - 16)
   }
   def regroupGoal(unit: FriendlyUnitInfo): Pixel = {
     if (unit.battle.exists(_.us.units.size > 1)) unit.battle.get.us.centroidOf(unit)

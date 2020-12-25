@@ -686,11 +686,13 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   val presumptiveStepCached = new KeyedCache(() => MicroPathing.getWaypointToPixel(this, presumptiveDestinationCached()), () => presumptiveDestinationCached(), 240)
   val presumptiveTargetCached = new KeyedCache(() => calculatePresumptiveTarget, () => friendly.map(_.agent.toAttack))
   private def calculatePresumptiveDestination: Pixel =
-    friendly.flatMap(_.agent.toTravel)
-      .orElse(targetPixel)
-      .orElse(orderTargetPixel)
-      .orElse(presumptiveTarget.map(pixelToFireAt))
-      .getOrElse(pixelCenter)
+    if (canMove)
+      friendly.flatMap(_.agent.toTravel)
+        .orElse(targetPixel)
+        .orElse(orderTargetPixel)
+        .orElse(presumptiveTarget.map(pixelToFireAt))
+        .getOrElse(pixelCenter)
+    else pixelCenter
   private def calculatePresumptiveTarget: Option[UnitInfo] =
     friendly.flatMap(_.agent.toAttack)
       .orElse(target)

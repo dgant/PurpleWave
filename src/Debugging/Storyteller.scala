@@ -143,15 +143,19 @@ class Storyteller {
     tell(JBWAPIClient.getPerformanceMetrics.toString)
   }
 
+  private def logMemoryUsage(): Unit = {
+    tell("JVM Max memory:   " + Runtime.getRuntime.maxMemory()   / 1000000 + " MB")
+    tell("JVM Total memory: " + Runtime.getRuntime.totalMemory() / 1000000 + " MB")
+    tell("JVM Free memory:  " + Runtime.getRuntime.freeMemory()  / 1000000 + " MB")
+  }
+
   private def logEnvironment(): Unit = {
     tell("Game start time:  " + Calendar.getInstance().getTime.toString)
     tell("OS:               " + System.getProperty("os.name") + " " + System.getProperty("os.version") + " " + System.getProperty("os.arch"))
     tell("JRE:              " + System.getProperty("java.vendor") + " - " + System.getProperty("java.version"))
     tell("CPUs available:   " + Runtime.getRuntime.availableProcessors())
     tell("System memory:    " + ManagementFactory.getOperatingSystemMXBean.asInstanceOf[OperatingSystemMXBean].getTotalPhysicalMemorySize / 1000000 + " MB")
-    tell("JVM Max memory:   " + Runtime.getRuntime.maxMemory()   / 1000000 + " MB")
-    tell("JVM Total memory: " + Runtime.getRuntime.totalMemory() / 1000000 + " MB")
-    tell("JVM Free memory:  " + Runtime.getRuntime.freeMemory()  / 1000000 + " MB")
+    logMemoryUsage()
 
     try {
       val timestamp = Source.fromFile(With.bwapiData.ai + "timestamp.txt").getLines.mkString
@@ -205,6 +209,7 @@ class Storyteller {
 
   def onEnd(): Unit = {
     logPerformance()
+    logMemoryUsage()
   }
 }
 

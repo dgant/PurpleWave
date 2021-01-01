@@ -23,12 +23,12 @@ object Paradrop extends Action {
     val goalTile        = target.projectFrames(reaver.cooldownLeft).tileIncluding
     val naiveTile       = goalTile.pixelCenter.project(originPixel, firingDistance).nearestWalkableTile
     val naiveDistance   = target.pixelCenter.tileIncluding.tileDistanceFast(naiveTile)
-    val candidates = Spiral.points(7)
+    val candidates      = Spiral.points(7)
       .view
       .map(naiveTile.add)
       .filter(t =>
         t.valid
-        && With.grids.walkable.get(t)
+        && t.walkable
         && With.grids.enemyRangeAirGround.get(t) == 0
         && t.groundPixels(goalTile) < 1.5 * reaver.effectiveRangePixels
         && ! reaver.matchups.threats.exists(t => t.isSiegeTankSieged() && t.inRangeToAttack(reaver, t.pixelCenter)))

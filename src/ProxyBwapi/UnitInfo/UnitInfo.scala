@@ -507,8 +507,10 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     && (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround)
     && ! enemy.effectivelyCloaked
     && (enemy.unitClass.triggersSpiderMines || ! isSpiderMine())
-    && (unitClass.unaffectedByDarkSwarm || ! enemy.underDarkSwarm)
-  )
+    && (unitClass.unaffectedByDarkSwarm || ! enemy.underDarkSwarm))
+
+  @inline final def canAttackAir: Boolean = canAttack && attacksAgainstAir > 0
+  @inline final def canAttackGround: Boolean = canAttack && attacksAgainstGround > 0
 
   @inline final def canBurrow: Boolean = canDoAnything && (is(Zerg.Lurker) || (player.hasTech(Zerg.Burrow) && isAny(Zerg.Drone, Zerg.Zergling, Zerg.Hydralisk, Zerg.Defiler)))
 

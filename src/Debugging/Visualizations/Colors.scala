@@ -31,13 +31,6 @@ object Colors {
   private val medium    = 160
   private val bright    = 192
   private val neon      = 255
-
-  val rainbow: Array[Color] =
-    (0 to 255).flatMap(r =>
-      (0 to 255).flatMap(g =>
-        (0 to 255).map(b =>
-          new Color(r, g, b))))
-      .toArray
   
   val ShadowRed       : Color = hv(Hues.Red,      shadow)
   val ShadowOrange    : Color = hv(Hues.Orange,   shadow)

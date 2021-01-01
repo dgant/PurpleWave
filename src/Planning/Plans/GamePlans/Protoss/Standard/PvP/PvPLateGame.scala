@@ -203,7 +203,7 @@ class PvPLateGame extends GameplanTemplate {
     new GetReactiveObservers,
 
     // Expansions
-    new If(new And(new MiningBasesAtLeast(2), new UnitsAtLeast(36, UnitMatchWorkers), new Check(() => With.blackboard.wantToAttack())), new PylonBlock),
+    new If(new And(new MiningBasesAtLeast(2), new UnitsAtLeast(39, UnitMatchWorkers), new Check(() => With.blackboard.wantToAttack() && With.blackboard.safeToMoveOut())), new PylonBlock),
     new RequireMiningBases(2),
     new If(new And(new ReadyForThirdIfSafe, new SafeForThird), new RequireBases(3)),
     new Trigger(

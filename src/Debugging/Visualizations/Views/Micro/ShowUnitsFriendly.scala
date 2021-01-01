@@ -102,10 +102,11 @@ object ShowUnitsFriendly extends View {
 
     if (showPaths && (unit.selected || unit.transport.exists(_.selected) || With.units.selected().isEmpty)) {
       def drawTilePath(path: TilePath): Unit = {
+        val offset = unit.pixelCenter.offsetFromTileCenter
         for (i <- 0 until path.tiles.get.size - 1) {
           DrawMap.arrow(
-            path.tiles.get(i).pixelCenter,
-            path.tiles.get(i + 1).pixelCenter,
+            path.tiles.get(i).pixelCenter.add(offset),
+            path.tiles.get(i + 1).pixelCenter.add(offset),
             unit.unitColor)
         }
       }

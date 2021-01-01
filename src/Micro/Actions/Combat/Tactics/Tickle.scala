@@ -236,8 +236,7 @@ object Tickle extends Action {
       profile.threatMaximum = Some(0)
       profile.employGroundDist = true
       profile.costOccupancy = 1f
-      profile.costThreat = 5f
-      profile.costRepulsion = 3f
+      profile.costRepulsion = 8f
       profile.repulsors = MicroPathing.getPathfindingRepulsors(tickler)
       profile.unit = Some(tickler)
       val path = profile.find

@@ -14,13 +14,13 @@ object Retreat extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove && unit.matchups.threats.nonEmpty
 
-  case class Retreat(unit: FriendlyUnitInfo, to: Pixel, name: String)
+  case class RetreatPlan(unit: FriendlyUnitInfo, to: Pixel, name: String)
 
   override def perform(unit: FriendlyUnitInfo): Unit = {
     applyRetreat(getRetreat(unit))
   }
 
-  def getRetreat(unit: FriendlyUnitInfo): Retreat = {
+  def getRetreat(unit: FriendlyUnitInfo): RetreatPlan = {
     // Decide our goals in retreating
     def timeOriginOfThreat(threat: UnitInfo): Double = threat.framesToTravelTo(unit.agent.origin) - threat.pixelRangeAgainst(unit) * threat.topSpeed
     lazy val distanceOriginUs     = unit.pixelDistanceTravelling(unit.agent.origin)
@@ -35,7 +35,7 @@ object Retreat extends Action {
     lazy val goalSafety           = ! unit.agent.withinSafetyMargin
 
     // Decide how to retreat
-    if ( ! unit.flying) {
+    if ( ! unit.airborne) {
       unit.agent.escalatePriority(TrafficPriorities.Pardon)
       if (unit.matchups.pixelsOfEntanglement > -80) unit.agent.escalatePriority(TrafficPriorities.Nudge)
       if (unit.matchups.pixelsOfEntanglement > -48) unit.agent.escalatePriority(TrafficPriorities.Bump)
@@ -51,10 +51,10 @@ object Retreat extends Action {
     lazy val waypointForces   = Seq(true, false).view.map(safety => MicroPathing.getWaypointInDirection(unit, force, requireSafety = safety)).find(_.nonEmpty).flatten.map((_, "Force"))
     lazy val waypointOrigin   = (unit.agent.origin, "Origin")
     val waypoint              = waypointSimple.orElse(waypointPath).orElse(waypointForces).getOrElse(waypointOrigin)
-    Retreat(unit, waypoint._1, waypoint._2)
+    RetreatPlan(unit, waypoint._1, waypoint._2)
   }
 
-  def applyRetreat(retreat: Retreat): Unit = {
+  def applyRetreat(retreat: RetreatPlan): Unit = {
     if (retreat.unit.unready) return
     retreat.unit.agent.toTravel = Some(retreat.to)
     if (With.configuration.debugging) {

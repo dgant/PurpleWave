@@ -25,7 +25,7 @@ final class PathfindProfile(
 
   lazy val crossUnwalkable: Boolean = {
     warnIfUnfinalized()
-    canCrossUnwalkable.getOrElse(unit.exists(u => u.flying || u.transport.exists(_.flying)))
+    canCrossUnwalkable.getOrElse(unit.exists(_.airborne))
   }
   lazy val endUnwalkable: Boolean = {
     warnIfUnfinalized()

@@ -12,7 +12,7 @@ import Utilities.ByOption
 
 object BeFlier extends Action {
 
-  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.flying && unit.canMove && ! unit.unitClass.isBuilding
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.airborne && unit.canMove && ! unit.unitClass.isBuilding
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val scourge = unit.matchups.threats

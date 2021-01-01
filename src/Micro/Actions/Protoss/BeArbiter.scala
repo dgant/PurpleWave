@@ -9,7 +9,7 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
-object BeAnArbiter extends Action {
+object BeArbiter extends Action {
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.is(Protoss.Arbiter)
   

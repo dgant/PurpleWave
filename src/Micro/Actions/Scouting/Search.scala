@@ -66,8 +66,7 @@ abstract class AbstractSearch extends Action {
     profile.end                 = Some(tileToScout)
     profile.employGroundDist     = true
     profile.costOccupancy       = 0.01f
-    profile.costThreat          = 5
-    profile.costRepulsion       = 0.4f
+    profile.costRepulsion       = 5f
     profile.repulsors           = MicroPathing.getPathfindingRepulsors(unit)
     profile.lengthMaximum       = Some(20)
     profile.unit                = Some(unit)

@@ -12,7 +12,7 @@ import Utilities.{ByOption, Seconds}
 
 import scala.collection.mutable
 
-object SpiderMine extends Action {
+object BeVulture extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.is(Terran.Vulture)

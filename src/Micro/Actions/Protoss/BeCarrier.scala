@@ -8,7 +8,7 @@ import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
 import Utilities.ByOption
 
-object BeACarrier extends Action {
+object BeCarrier extends Action {
   
   // Carriers are really finicky.
   

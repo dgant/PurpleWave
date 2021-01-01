@@ -673,6 +673,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     output
   }
   @inline final def speedApproachingEachOther(other: UnitInfo): Double = speedApproaching(other) + other.speedApproaching(this)
+  @inline final def airborne: Boolean = flying || friendly.exists(_.transport.exists(_.flying))
   
   ////////////
   // Orders //

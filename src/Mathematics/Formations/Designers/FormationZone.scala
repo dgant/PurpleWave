@@ -39,8 +39,8 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
     val exitDirection         : Direction = exit.map(e => e.sidePixels.head.subtract(e.sidePixels.last).direction).getOrElse(Directions.Right)
     val meleeUnitSize         : Int = 3 + Math.max(16, slots.map(s => if (s.idealPixels > 32) 0 else if (exitDirection.isHorizontal) s.unitClass.width else s.unitClass.height).max)
     val meleeChokeWidthUnits  : Int = Math.max(1, Math.min(2 * exit.map(_.radiusPixels.toInt).getOrElse(0) / meleeUnitSize, slots.count(_.idealPixels <= 32)))
-    val altitudeInside  = With.grids.altitude.get(zone.centroid)
-    val altitudeOutside = zone.exitNow.map(_.otherSideof(zone).centroid).map(With.grids.altitude.get).getOrElse(altitudeInside)
+    val altitudeInside  = zone.centroid.altitude
+    val altitudeOutside = zone.exitNow.map(_.otherSideof(zone).centroid).map(_.altitude).getOrElse(altitudeInside)
     val altitudeMinimum = if (enemyRangePixelsMax > 32 && altitudeInside > altitudeOutside) Some(altitudeInside) else None
 
     // TODO: Standardize definition of a melee slot

@@ -23,7 +23,7 @@ class FingerprintProxyGateway extends FingerprintAnd(
         && With.geography.enemyBases.exists(_.owner.isProtoss)
         && With.geography.enemyBases.filter(_.isStartLocation).forall(base => {
           val scoutableTiles = base.zone.tiles.view.filter(With.grids.buildableTerrain.get)
-          val tilesSeen = scoutableTiles.count(tile => tile.valid && With.grids.friendlyVision.rawValues(tile.i) > 0)
+          val tilesSeen = scoutableTiles.count(_.explored)
           tilesSeen >= scoutableTiles.size * 0.9
         }))
     })) {

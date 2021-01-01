@@ -7,7 +7,6 @@ abstract class GridTask[T](grid: AbstractGrid[T]) extends AbstractTask {
   override protected def onRun(): Unit = grid.update()
 }
 
-class TaskGridAltitudeBonus               extends GridTask(With.grids.altitude)
 class TaskGridBuildable                   extends GridTask(With.grids.buildable)
 class TaskGridBuildableTerrain            extends GridTask(With.grids.buildableTerrain)
 class TaskGridBuildableTownHall           extends GridTask(With.grids.buildableTownHall)
@@ -20,7 +19,6 @@ class TaskGridEnemyRangeAirGround         extends GridTask(With.grids.enemyRange
 class TaskGridEnemyVision                 extends GridTask(With.grids.enemyVision)
 class TaskGridEnemyVulnerabilityGround    extends GridTask(With.grids.enemyVulnerabilityGround)
 class TaskGridFriendlyDetection           extends GridTask(With.grids.friendlyDetection)
-class TaskGridFriendlyVision              extends GridTask(With.grids.friendlyVision)
 class TaskGridMobilityBorder              extends GridTask(With.grids.mobilityAir)
 class TaskGridMobilityTerrain             extends GridTask(With.grids.mobilityTerrain)
 class TaskGridPsionicStorm                extends GridTask(With.grids.psionicStorm)

@@ -142,10 +142,10 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     With.paths.groundPixels(pixelCenter, other.pixelCenter)
   }
   @inline final def altitude: Double = {
-    if (valid) altitudeUnchecked else With.grids.altitude.defaultValue
+    With.game.getGroundHeight(x, y)
   }
   @inline final def altitudeUnchecked: Double = {
-    With.grids.altitude.getUnchecked(i)
+    With.game.getGroundHeight(x, y)
   }
   @inline final def toRectangle: TileRectangle = {
     TileRectangle(this, this.add(1, 1))
@@ -171,11 +171,14 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline final def buildableUnchecked: Boolean = {
     With.grids.buildable.getUnchecked(i)
   }
+  @inline final def explored: Boolean = {
+    With.game.isExplored(x, y)
+  }
   @inline final def visible: Boolean = {
     valid && visibleUnchecked
   }
   @inline final def visibleUnchecked: Boolean = {
-    With.grids.friendlyVision.isSetUnchecked(i)
+    With.game.isVisible(x, y) // TODO: Replace with actually unchecked variant
   }
   @inline final def visibleToEnemy: Boolean = {
     valid && visibleToEnemyUnchecked
@@ -197,5 +200,11 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   }
   @inline final def visibleBwapi: Boolean = {
     With.game.isVisible(x, y)
+  }
+  @inline final def scoutingPathDistanceBases: Int = {
+    With.grids.scoutingPathsBases.get(this)
+  }
+  @inline final def scoutingPathDistanceStartLocations: Int = {
+    With.grids.scoutingPathsStartLocations.get(this)
   }
 }

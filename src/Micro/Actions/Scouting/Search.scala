@@ -26,7 +26,7 @@ abstract class AbstractSearch extends Action {
   protected val boredomFrames: Int
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    if (unit.matchups.threats.isEmpty && ! unit.agent.intent.toScoutTiles.exists(With.grids.friendlyVision.ever)) {
+    if (unit.matchups.threats.isEmpty && ! unit.agent.intent.toScoutTiles.exists(_.explored)) {
       Move.consider(unit)
     }
 

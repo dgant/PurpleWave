@@ -34,10 +34,10 @@ abstract class PlaceProxies(buildings: UnitClass*) extends Plan {
   val minDistance: Double = 40
   val groundProxyScore: Tile => Double = tile => {
     (
-      (if (With.grids.enemyVision.isSet(tile)) 1 else 10)
-      * With.grids.altitude.get(tile)
-      * Math.max(minSight, With.grids.scoutingPathsBases.get(tile))
-      * Math.max(minSight, With.grids.scoutingPathsStartLocations.get(tile))
+      (if (tile.visibleToEnemy) 1 else 10)
+      * tile.altitude
+      * Math.max(minSight, tile.scoutingPathDistanceBases)
+      * Math.max(minSight, tile.scoutingPathDistanceStartLocations)
       / Math.max(minDistance, groundDistanceMax(tile))
       / Math.max(minDistance, groundDistanceMax(tile))
       / Math.max(minDistance, groundDistanceMax(tile))
@@ -47,10 +47,10 @@ abstract class PlaceProxies(buildings: UnitClass*) extends Plan {
   val airProxyScore: Tile => Double = tile => {
     val airDistanceMax = this.airDistanceMax(tile)
     (
-      (if (With.grids.enemyVision.isSet(tile)) 1 else 10)
-      * With.grids.altitude.get(tile)
-      * Math.max(minSight, With.grids.scoutingPathsBases.get(tile))
-      * Math.max(minSight, With.grids.scoutingPathsStartLocations.get(tile))
+      (if (tile.visibleToEnemy) 1 else 10)
+      * tile.altitude
+      * Math.max(minSight, tile.scoutingPathDistanceBases)
+      * Math.max(minSight, tile.scoutingPathDistanceStartLocations)
       * Math.max(minDistance, groundDistanceMax(tile))
       / Math.max(minDistance, airDistanceMax)
       / Math.max(minDistance, airDistanceMax)
@@ -61,10 +61,10 @@ abstract class PlaceProxies(buildings: UnitClass*) extends Plan {
   val techProxyScore: Tile => Double = tile => {
     val target = With.scouting.threatOrigin
     (
-      (if (With.grids.enemyVision.isSet(tile)) 1 else 10)
-      * With.grids.altitude.get(tile)
-      * Math.max(minSight, With.grids.scoutingPathsBases.get(tile))
-      * Math.max(minSight, With.grids.scoutingPathsStartLocations.get(tile))
+      (if (tile.visibleToEnemy) 1 else 10)
+      * tile.altitude
+      * Math.max(minSight, tile.scoutingPathDistanceBases)
+      * Math.max(minSight, tile.scoutingPathDistanceStartLocations)
       * Math.max(minDistance, groundDistanceMax(tile))
     )
   }
@@ -79,7 +79,7 @@ abstract class PlaceProxies(buildings: UnitClass*) extends Plan {
   }
 
   def calculatePlacements: Seq[Blueprint] = {
-    // Our placement logic can't try-and-place multiple buildings that rely on each other.
+    // Our placement logic (at the time we wrote this; maybe not anymore) can't try-and-place multiple buildings that rely on each other.
     // So the workaround is to try to fit all the buildings we need into one block, then
     // manually try to place that block.
     //

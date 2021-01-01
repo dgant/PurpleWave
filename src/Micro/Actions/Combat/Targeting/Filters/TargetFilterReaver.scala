@@ -1,5 +1,4 @@
 package Micro.Actions.Combat.Targeting.Filters
-import Lifecycle.With
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterReaver extends TargetFilter {
@@ -11,7 +10,9 @@ object TargetFilterReaver extends TargetFilter {
       actor.base.exists(_.owner.isUs) // Make sure we hit Pylons or whatever other garbage is around
       || target.canAttack
       || target.unitClass.canAttack
-      || (target.base.exists(b => b.resources.forall(u => With.grids.friendlyVision.isSet(u.tileIncludingCenter))) && target.base.forall(_.workerCount == 0)))
+      || (
+        target.base.exists(b => b.resources.forall(u => u.tileIncludingCenter.visible))
+        && target.base.forall(_.workerCount == 0)))
 
     val safeToAttack = (
       ! target.canAttack(actor)

@@ -4,7 +4,6 @@ import Performance.Tasks._
 class TaskQueueGrids extends AbstractTaskQueue {
   
   override val tasks: Vector[AbstractTask] = Vector (
-    new TaskGridAltitudeBonus               { urgency = 1    },
     new TaskGridBuildable                   { urgency = 10   },
     new TaskGridBuildableTerrain            { urgency = 10   },
     new TaskGridBuildableTownHall           { urgency = 1    },
@@ -17,7 +16,6 @@ class TaskQueueGrids extends AbstractTaskQueue {
     new TaskGridEnemyVision                 { urgency = 10   },
     new TaskGridEnemyVulnerabilityGround    { urgency = 100  },
     new TaskGridFriendlyDetection           { urgency = 10   },
-    new TaskGridFriendlyVision              { urgency = 10   },
     new TaskGridMobilityBorder              { urgency = 1    },
     new TaskGridMobilityTerrain             { urgency = 1    },
     new TaskGridPsionicStorm                { urgency = 100  },

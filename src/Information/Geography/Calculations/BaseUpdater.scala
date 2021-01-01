@@ -9,7 +9,7 @@ import Utilities.{ByOption, Minutes}
 object BaseUpdater {
   
   def updateBase(base: Base) {
-    if (With.grids.friendlyVision.isSet(base.townHallTile)) {
+    if (base.townHallTile.visibleUnchecked) {
       base.lastScoutedFrame = With.frame
     }
     if (With.grids.enemyVision.isSet(base.townHallTile)) {

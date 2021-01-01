@@ -1,6 +1,5 @@
 package Planning.Plans.Scouting
 
-import Lifecycle.With
 import Planning.Predicate
 
 class ScoutCleared extends Predicate {
@@ -8,5 +7,5 @@ class ScoutCleared extends Predicate {
     ScoutTracking.enemyScouts.isEmpty
     || (
       ScoutTracking.enemyScouts.forall( ! _.likelyStillThere)
-      && ScoutTracking.basesToConsider.forall(_.zone.tiles.forall(With.grids.friendlyVision.get(_) > 0))))
+      && ScoutTracking.basesToConsider.forall(_.zone.tiles.forall(_.explored))))
 }

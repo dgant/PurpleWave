@@ -1,7 +1,7 @@
 
 package Information.Grids
 
-import Information.Grids.Combat.{GridEnemyRangeAir, GridEnemyRangeAirGround, GridEnemyRangeGround, GridEnemyVulnerabilityGround}
+import Information.Grids.Combat.{GridEnemyRangeAir, GridEnemyRangeAirGround, GridEnemyRangeGround}
 import Information.Grids.Construction._
 import Information.Grids.Disposable.{GridDisposableBoolean, GridDisposableDouble, GridDisposableInt}
 import Information.Grids.Movement._
@@ -16,22 +16,13 @@ class Grids {
   val buildable                   = new GridBuildable
   val buildableTerrain            = new GridBuildableTerrain
   val buildableTownHall           = new GridBuildableTownHall
-  val creepInitial                = new GridCreepInitial
-  val creep                       = new GridCreep
   val enemyDetection              = new GridEnemyDetection
   val enemyRangeAir               = new GridEnemyRangeAir
   val enemyRangeGround            = new GridEnemyRangeGround
   val enemyRangeAirGround         = new GridEnemyRangeAirGround
   val enemyVision                 = new GridEnemyVision
-  val enemyVulnerabilityGround    = new GridEnemyVulnerabilityGround
   val friendlyDetection           = new GridFriendlyDetection
   val friendlyVision              = new GridFriendlyVision
-  val mobilityAir                 = new GridMobilityAir
-  val mobilityBuildings           = new GridMobilityBuildings
-  val mobilityGround              = new GridMobilityGround
-  val mobilityForceAir            = new GridMobilityForceAir
-  val mobilityForceGround         = new GridMobilityForceGround
-  val mobilityTerrain             = new GridMobilityTerrain
   val psi2Height                  = new GridPsi2Height
   val psi3Height                  = new GridPsi3Height
   val psionicStorm                = new GridPsionicStorm

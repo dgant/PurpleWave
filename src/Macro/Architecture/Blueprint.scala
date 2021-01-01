@@ -114,7 +114,7 @@ class Blueprint(
         if (nextTile.zone.perimeter.contains(nextTile)) {
           return ArchitecturalAssessment.ViolatesPerimeter
         }
-        if (requireCreep.get != With.grids.creep.get(nextTile)) {
+        if (requireCreep.get != nextTile.creep) {
           return ArchitecturalAssessment.CreepMismatch
         }
         if (respectHarvesting.get && thisZone.bases.exists(_.harvestingArea.contains(nextTile))) {

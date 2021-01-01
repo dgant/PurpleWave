@@ -1,6 +1,5 @@
 package Micro.Heuristics
 
-import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
@@ -131,14 +130,9 @@ object Potential {
     output
   }
   
-  def cliffAttraction(unit: FriendlyUnitInfo): Force = {
-    With.grids.mobilityForceGround.get(unit.tileIncludingCenter).normalize(-1.0)
-  }
-  
   ////////////////
   // Collisions //
   ////////////////
-
 
   def preferTravel(unit: FriendlyUnitInfo, goal: Pixel): Force = {
     ForceMath.fromPixels(unit.pixelCenter, MicroPathing.getWaypointToPixel(unit, goal), 1.0)

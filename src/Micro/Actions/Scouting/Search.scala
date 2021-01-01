@@ -48,7 +48,7 @@ abstract class AbstractSearch extends Action {
         && tile.base.forall(base =>
           ! base.owner.isEnemy
           || ! base.owner.isZerg
-          || With.grids.creep.get(tile)
+          || tile.creep
           || tile.tileDistanceFast(base.townHallArea.midpoint) < 9.0))
   
     if (tilesToScout.isEmpty) return

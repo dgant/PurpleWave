@@ -3,11 +3,15 @@ package Information.Grids.Spells
 import Information.Grids.ArrayTypes.AbstractGridFramestamp
 import Lifecycle.With
 import Mathematics.Points.Pixel
+import bwapi.BulletType
 
 class GridPsionicStorm extends AbstractGridFramestamp {
   
   override protected def updateCells(): Unit = {
-    With.bullets.all.foreach(bullet => addPsionicStorm(bullet.pixel))
+    With.bullets.all
+      .view
+      .filter(_.bulletType == BulletType.Psionic_Storm)
+      .foreach(bullet => addPsionicStorm(bullet.pixel))
   }
   
   def addPsionicStorm(pixel: Pixel) {

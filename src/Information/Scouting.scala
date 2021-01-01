@@ -91,10 +91,7 @@ class Scouting {
       }
       // Infer main by creep
       else if (With.frame < Minutes(5)() && With.enemies.exists(_.isZerg)) {
-        val newlyCreepedBases = With.geography.startBases
-          .filter(b => b.owner.isNeutral && b.zone.tiles.exists(t =>
-            With.grids.creep.getUnchecked(t.i)
-            && ! With.grids.creepInitial.getUnchecked(t.i)))
+        val newlyCreepedBases = With.geography.startBases.filter(b => b.owner.isNeutral && b.zone.tiles.exists(_.creep))
         if (newlyCreepedBases.size == 1) {
           _firstEnemyMain = newlyCreepedBases.headOption
           With.logger.debug("Inferred enemy main from presence of creep: " + _firstEnemyMain.get.toString)

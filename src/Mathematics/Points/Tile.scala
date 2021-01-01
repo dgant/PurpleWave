@@ -145,7 +145,7 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     With.game.getGroundHeight(x, y)
   }
   @inline final def altitudeUnchecked: Double = {
-    With.game.getGroundHeight(x, y)
+    With.game.getGroundHeight(x, y) // TODO: Replace with actually unchecked variant
   }
   @inline final def toRectangle: TileRectangle = {
     TileRectangle(this, this.add(1, 1))
@@ -206,5 +206,11 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   }
   @inline final def scoutingPathDistanceStartLocations: Int = {
     With.grids.scoutingPathsStartLocations.get(this)
+  }
+  @inline final def creep: Boolean = {
+    With.game.hasCreep(x, y)
+  }
+  @inline final def creepUnchecked: Boolean = {
+    With.game.hasCreep(x, y) // TODO: Replace with actually unchecked variant
   }
 }

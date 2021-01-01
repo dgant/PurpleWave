@@ -60,7 +60,6 @@ class Visualization {
     ShowIgnorance,
     ShowJudgment,
     ShowKills,
-    ShowMobility,
     ShowHealthAndCooldown,
     ShowUnitsEnemy,
     ShowUnitsFriendly,

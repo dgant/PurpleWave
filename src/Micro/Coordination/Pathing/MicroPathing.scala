@@ -131,17 +131,6 @@ object MicroPathing {
   def setDefaultForces(unit: FriendlyUnitInfo, goalSafety: Boolean, goalHome: Boolean): Unit = {
     val to = unit.agent.origin
 
-    // Add cliffing
-    if (unit.isAny(Protoss.Carrier, Zerg.Guardian)) {
-      val threats           = unit.matchups.threats
-      val walkers           = threats.view.filter(threat => ! threat.flying && threat.zone == unit.zone)
-      val dpfFromThreats    = threats.map(_.dpfOnNextHitAgainst(unit)).sum
-      val dpfFromWalkers    = walkers.map(_.dpfOnNextHitAgainst(unit)).sum
-      val cliffingMagnitude = PurpleMath.nanToZero(dpfFromWalkers / dpfFromThreats)
-      val forceCliffing     = Potential.cliffAttraction(unit).normalize(0.5 * cliffingMagnitude)
-      unit.agent.forces.put(Forces.sneaking, forceCliffing)
-    }
-
     // Where to go
     unit.agent.forces(Forces.threat)      = (Potential.avoidThreats(unit)     * PurpleMath.toInt(goalSafety))
     unit.agent.forces(Forces.travel)      = (Potential.preferTravel(unit, to) * PurpleMath.toInt(goalHome))

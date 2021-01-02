@@ -84,12 +84,6 @@ object ShowHealthAndCooldown extends View {
       if (unit.cooldownLeft > 0) {
         DrawMap.box(Pixel(xStartCooldown, yStartCooldown), Pixel(xStartCooldown + widthCooldownNow, yEndCooldown), unit.teamColor, solid = true)
       }
-      if (unit.attackStarting) {
-        DrawMap.box(Pixel(xStartCooldownButton1, yStartCooldown), Pixel(xStartCooldownButton1 + widthCooldownButton, yEndCooldown), Colors.BrightGreen, solid = true)
-      }
-      if (unit.attackAnimationHappening) {
-        DrawMap.box(Pixel(xStartCooldownButton0, yStartCooldown), Pixel(xStartCooldownButton0 + widthCooldownButton, yEndCooldown), Colors.BrightOrange, solid = true)
-      }
     }
   }
 }

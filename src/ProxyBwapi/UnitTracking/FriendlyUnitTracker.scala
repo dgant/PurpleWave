@@ -12,7 +12,7 @@ class FriendlyUnitTracker {
   
   def get(id: Int): Option[FriendlyUnitInfo] = unitInfosById.get(id)
   
-  def update() {
+  def updateFriendly() {
   
     //Important to remember: bwapi.Units are not persisted frame-to-frame
     //So we do all our comparisons by ID, rather than by object
@@ -38,7 +38,7 @@ class FriendlyUnitTracker {
           remove(idToUnitInfo._1))
     }
     
-    unitInfosById.foreach(pair => pair._2.update(newBwapiUnitsById(pair._1)))
+    unitInfosById.foreach(pair => pair._2.updateFriendly(newBwapiUnitsById(pair._1)))
 
     // TODO: This can probably just stay a view or otherwise not converted to a set for performance's sake
     ourUnits = unitInfosById.values.view.filter(_.isOurs)

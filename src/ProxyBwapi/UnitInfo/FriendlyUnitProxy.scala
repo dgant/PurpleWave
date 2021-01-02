@@ -10,7 +10,7 @@ import bwapi._
 
 import scala.collection.JavaConverters._
 
-abstract class FriendlyUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit, id) {
+abstract class FriendlyUnitProxy(originalBwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(originalBwapiUnit, id) {
 
   override def equals(obj: Any): Boolean = obj.isInstanceOf[FriendlyUnitProxy] && obj.asInstanceOf[FriendlyUnitProxy].id == id
 
@@ -24,12 +24,12 @@ abstract class FriendlyUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends UnitInf
   // Tracking info //
   ///////////////////
 
-  def player              : PlayerInfo  = cachePlayer()
-  def unitClass           : UnitClass   = cacheClass()
-  def lastSeen            : Int         = With.frame
+  def player    : PlayerInfo  = cachePlayer()
+  def unitClass : UnitClass   = cacheClass()
+  def lastSeen  : Int         = With.frame
 
-  def update(newBase: bwapi.Unit) {
-    baseUnit = newBase
+  def updateFriendly(newBase: bwapi.Unit) {
+    bwapiUnit = newBase
     updateCommon()
   }
 
@@ -52,14 +52,11 @@ abstract class FriendlyUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends UnitInf
   // Combat //
   ////////////
 
-  def interceptors      : Iterable[UnitInfo] = interceptorsCache()
-  def interceptorCount  : Int = bwapiUnit.getInterceptorCount
-  def scarabCount       : Int = bwapiUnit.getScarabCount
+  def interceptors: Iterable[UnitInfo] = interceptorsCache()
+  def scarabCount: Int = bwapiUnit.getScarabCount
 
   private val interceptorsCache = new Cache(() => bwapiUnit.getInterceptors.asScala.flatMap(With.units.get))
 
-  def attackStarting            : Boolean = bwapiUnit.isStartingAttack
-  def attackAnimationHappening  : Boolean = bwapiUnit.isAttackFrame
   def airCooldownLeft           : Int     = bwapiUnit.getAirWeaponCooldown
   def groundCooldownLeft        : Int     = bwapiUnit.getGroundWeaponCooldown
   def spellCooldownLeft         : Int     = bwapiUnit.getSpellCooldown
@@ -136,12 +133,12 @@ abstract class FriendlyUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends UnitInf
   )
   private val techProducingCache = new Cache[Option[Tech]](() =>
     if (unitClass.techsWhat.nonEmpty && teching)
-      Some(Techs.get(baseUnit.getTech)).filter(x => x != Techs.None && x != Techs.Unknown)
+      Some(Techs.get(bwapiUnit.getTech)).filter(x => x != Techs.None && x != Techs.Unknown)
     else None
   )
   private val upgradeProducingCache = new Cache[Option[Upgrade]](() =>
     if (unitClass.upgradesWhat.nonEmpty && upgrading)
-      Some(Upgrades.get(baseUnit.getUpgrade)).filter(x => x != Upgrades.None && x != Upgrades.Unknown)
+      Some(Upgrades.get(bwapiUnit.getUpgrade)).filter(x => x != Upgrades.None && x != Upgrades.Unknown)
     else None
   )
 

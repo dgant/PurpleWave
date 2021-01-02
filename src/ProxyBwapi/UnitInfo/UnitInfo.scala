@@ -25,15 +25,15 @@ import ProxyBwapi.Upgrades.Upgrade
 import Utilities._
 import bwapi._
 
-abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUnit, id) {
+abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiUnit, id) {
 
   //////////////
   // Identity //
   //////////////
-  
+
   def friendly  : Option[FriendlyUnitInfo]  = None
   def foreign   : Option[ForeignUnitInfo]   = None
-  
+
   @inline override final def toString: String = (
     (if (isFriendly) "Our" else if (isEnemy) "Foe" else "Neutral")
     + " "
@@ -74,8 +74,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   var cluster: Option[BattleCluster] = _
 
   val frameDiscovered           : Int = With.frame
-  val initialHitPoints          : Int = baseUnit.getHitPoints
-  val initialShields            : Int = baseUnit.getShields
+  val initialHitPoints          : Int = bwapiUnit.getHitPoints
+  val initialShields            : Int = bwapiUnit.getShields
   var completionFrame           : Int = Forever() // Can't use unitClass during construction
   var lastHitPoints             : Int = _
   var lastShieldPoints          : Int = _
@@ -169,7 +169,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   private val subjectiveValueCache = new Cache(() =>
     unitClass.subjectiveValue
       + scarabCount * Protoss.Scarab.subjectiveValue
-      + interceptorCount * Protoss.Interceptor.subjectiveValue
+      + interceptors.size * Protoss.Interceptor.subjectiveValue
       + (if (unitClass.isTransport) friendly.map(_.loadedUnits.map(_.subjectiveValue).sum).sum else 0))
 
   @inline final def remainingOccupationFrames: Int = Vector(
@@ -372,7 +372,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   private val attacksAgainstAirCache = new Cache(() => {
     var output = unitClass.airDamageFactorRaw * unitClass.maxAirHitsRaw
     if (output == 0  && isBunker())   output = 4
-    if (output == 0  && isCarrier())  output = interceptorCount
+    if (output == 0  && isCarrier())  output = if (isEnemy) 8 else interceptors.size
     output
   })
 
@@ -380,7 +380,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   private val attacksAgainstGroundCache = new Cache(() => {
     var output = unitClass.groundDamageFactorRaw * unitClass.maxGroundHitsRaw
     if (output == 0  && isBunker())   output = 4
-    if (output == 0  && isCarrier())  output = interceptorCount
+    if (output == 0  && isCarrier())  output = if (isEnemy) 8 else interceptors.size
     if (output == 0  && isReaver())   output = 1
     output
   })
@@ -490,7 +490,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     && (
       unitClass.rawCanAttack
       || isBunker()
-      || (isCarrier() && interceptorCount > 0)
+      || (isCarrier() && (isEnemy || interceptors.exists(_.complete)))
       || (isReaver()  && scarabCount > 0)
       || (isLurker()  && burrowed))
     && (flying || ! underDisruptionWeb))

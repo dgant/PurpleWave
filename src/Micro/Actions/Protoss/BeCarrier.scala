@@ -45,13 +45,12 @@ object BeCarrier extends Action {
 
     lazy val framesToAccelerate = unit.framesToAccelerate
     lazy val interceptorsDone   = unit.interceptors.filter(_.complete)
-    lazy val interceptorCount   = interceptorsDone.size
     lazy val interceptorsActive = interceptorsDone.count(interceptorActive) >= interceptorsDone.size / 2
     lazy val canLeave           = airToAirSupply(unit.matchups.threats) < airToAirSupply(unit.matchups.alliesInclSelf) || unit.matchups.threats.exists(_.isAny(Terran.Battlecruiser, Protoss.Carrier))
     lazy val exitingLeash       = unit.matchups.targets.filter(_.matchups.framesToLive > 48).forall(_.pixelDistanceEdge(unit) > 32.0 * 7.0)
     lazy val inRangeNeedlessly  = unit.matchups.threats.exists(threat => shouldNeverHitUs(threat) && unit.pixelsOfEntanglement(threat) > - 32)
     lazy val safeFromThreats    = unit.matchups.threats.forall(threat => threat.pixelDistanceCenter(unit) > threat.pixelRangeAir + 8 * 32 && ! threat.is(Protoss.Carrier)) // Protect interceptors!
-    lazy val shouldFight        = interceptorCount > 0 && ! inRangeNeedlessly && (unit.agent.shouldEngage || safeFromThreats || (interceptorCount > 1 && ! canLeave))
+    lazy val shouldFight        = interceptorsDone.nonEmpty && ! inRangeNeedlessly && (unit.agent.shouldEngage || safeFromThreats || (interceptorsDone.nonEmpty && ! canLeave))
 
     if (shouldFight) {
       // Avoid changing targets (causes interceptors to not attack)

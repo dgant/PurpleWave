@@ -63,8 +63,8 @@ class UnitTracker {
   private def inTiles(tiles: Seq[Tile]): Seq[UnitInfo] = tiles.view.flatMap(With.grids.units.get)
   
   def onFrame() {
-    friendlyUnitTracker.update()
-    foreignUnitTracker.update()
+    friendlyUnitTracker.updateFriendly()
+    foreignUnitTracker.updateForeign()
     all.foreach(historicalUnitTracker.remove)
   }
 

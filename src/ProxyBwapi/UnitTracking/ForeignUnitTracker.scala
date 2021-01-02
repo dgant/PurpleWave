@@ -16,15 +16,14 @@ class ForeignUnitTracker {
   
   private val unitsById = new mutable.HashMap[Int, ForeignUnitInfo]()
 
-  def allyUnits     : Iterable[ForeignUnitInfo] = unitsById.values.filter(_.player.isAlly)
   def enemyUnits    : Iterable[ForeignUnitInfo] = unitsById.values.filter(_.player.isEnemy)
   def neutralUnits  : Iterable[ForeignUnitInfo] = unitsById.values.filter(_.player.isNeutral)
 
   def get(id: Int): Option[ForeignUnitInfo] = unitsById.get(id)
 
-  def update() {
+  def updateForeign() {
     // Remove any units who have changed owners
-    unitsById.values.filter(u => u.baseUnit.isVisible && u.baseUnit.getPlayer.getID != u.player.id).toVector.foreach(remove)
+    unitsById.values.filter(u => u.bwapiUnit.isVisible && u.bwapiUnit.getPlayer.getID != u.player.id).toVector.foreach(remove)
 
     // Add static neutral units
     if (unitsById.isEmpty && With.frame < 24) {
@@ -45,7 +44,6 @@ class ForeignUnitTracker {
       })
 
     unitsById.values.foreach(checkVisibility)
-
     unitsById.values.view.filterNot(_.alive).toVector.foreach(remove)
   }
 
@@ -83,7 +81,7 @@ class ForeignUnitTracker {
         && unit.altitude >= tripper.altitude))
 
     // Yay, we see the unit
-    if (unit.baseUnit.isVisible) {
+    if (unit.bwapiUnit.isVisible) {
       unit.setVisbility(Visibility.Visible)
       return
     }

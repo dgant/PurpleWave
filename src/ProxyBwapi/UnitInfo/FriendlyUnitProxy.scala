@@ -2,11 +2,11 @@ package ProxyBwapi.UnitInfo
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
 import Performance.Cache
+import ProxyBwapi.ConvertBWAPI
 import ProxyBwapi.Players.{PlayerInfo, Players}
-import ProxyBwapi.Techs.{Tech, Techs}
+import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
-import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
-import bwapi._
+import ProxyBwapi.Upgrades.Upgrade
 
 import scala.collection.JavaConverters._
 
@@ -75,48 +75,24 @@ abstract class FriendlyUnitProxy(originalBwapiUnit: bwapi.Unit, id: Int) extends
   def gatheringMinerals : Boolean = bwapiUnit.isGatheringMinerals
   def gatheringGas      : Boolean = bwapiUnit.isGatheringGas
 
-  private val badPositions = Vector(null, Position.Invalid, Position.None, Position.Unknown)
-
   def target            : Option[UnitInfo]  = targetCache()
   def targetPixel       : Option[Pixel]     = targetPixelCache()
   def order             : String            = bwapiUnit.getOrder.toString
   def orderTarget       : Option[UnitInfo]  = orderTargetCache()
   def orderTargetPixel  : Option[Pixel]     = orderTargetPixelCache()
 
-  private val orderTargetCache = new Cache(() => {
-    val target = if (unitClass.targetsMatter) bwapiUnit.getOrderTarget else null
-    if (target == null) None else With.units.get(target)
-  })
-  private val orderTargetPixelCache = new Cache(() => {
-    val position = if (unitClass.targetPositionsMatter) bwapiUnit.getOrderTargetPosition else null
-    if (badPositions.contains(position)) None else Some(new Pixel(position))
-  })
-  private val targetCache = new Cache(() => {
-    val target = if (unitClass.targetsMatter) bwapiUnit.getTarget else null
-    if (target == null) None else With.units.get(target)
-  })
-  private val targetPixelCache = new Cache(() => {
-    val position = if (unitClass.targetPositionsMatter) bwapiUnit.getTargetPosition else null
-    if (badPositions.contains(position)) None else Some(new Pixel(position))
-  })
+  private val orderTargetCache      = new Cache(() => With.units.get(bwapiUnit.getOrderTarget))
+  private val orderTargetPixelCache = new Cache(() => ConvertBWAPI.position(bwapiUnit.getOrderTargetPosition))
+  private val targetCache           = new Cache(() => With.units.get(bwapiUnit.getTarget))
+  private val targetPixelCache      = new Cache(() => ConvertBWAPI.position(bwapiUnit.getTargetPosition))
 
   def attacking       : Boolean = bwapiUnit.isAttacking
   def constructing    : Boolean = bwapiUnit.isConstructing
-  def following       : Boolean = bwapiUnit.isFollowing
-  def holdingPosition : Boolean = bwapiUnit.isHoldingPosition
-  def idle            : Boolean = bwapiUnit.isIdle
-  def interruptible   : Boolean = bwapiUnit.isInterruptible
   def morphing        : Boolean = bwapiUnit.isMorphing
   def repairing       : Boolean = bwapiUnit.isRepairing
   def teching         : Boolean = bwapiUnit.isResearching
   def upgrading       : Boolean = bwapiUnit.isUpgrading
-  def patrolling      : Boolean = bwapiUnit.isPatrolling
   def training        : Boolean = bwapiUnit.isTraining
-
-  def command: Option[UnitCommand]  = getLastCommandCache()
-  def commandFrame: Int             = bwapiUnit.getLastCommandFrame
-
-  private val getLastCommandCache = new Cache(() => Option(bwapiUnit.getLastCommand) )
 
   def buildType: UnitClass = buildTypeCache()
   def trainingQueue: Iterable[UnitClass] = trainingQueueCache()
@@ -125,22 +101,9 @@ abstract class FriendlyUnitProxy(originalBwapiUnit: bwapi.Unit, id: Int) extends
   def unitProducing: Option[UnitClass] = trainingQueue.headOption
 
   private val buildTypeCache = new Cache(() => UnitClasses.get(bwapiUnit.getBuildType))
-  private val trainingQueueCache = new Cache(() =>
-    if (unitClass.trainsUnits)
-      bwapiUnit.getTrainingQueue.asScala.map(UnitClasses.get)
-    else
-      Iterable.empty // Performance optimization
-  )
-  private val techProducingCache = new Cache[Option[Tech]](() =>
-    if (unitClass.techsWhat.nonEmpty && teching)
-      Some(Techs.get(bwapiUnit.getTech)).filter(x => x != Techs.None && x != Techs.Unknown)
-    else None
-  )
-  private val upgradeProducingCache = new Cache[Option[Upgrade]](() =>
-    if (unitClass.upgradesWhat.nonEmpty && upgrading)
-      Some(Upgrades.get(bwapiUnit.getUpgrade)).filter(x => x != Upgrades.None && x != Upgrades.Unknown)
-    else None
-  )
+  private val trainingQueueCache = new Cache(() => if (unitClass.trainsUnits) bwapiUnit.getTrainingQueue.asScala.map(UnitClasses.get) else Iterable.empty)
+  private val techProducingCache = new Cache(() => ConvertBWAPI.tech(bwapiUnit.getTech))
+  private val upgradeProducingCache = new Cache(() => ConvertBWAPI.upgrade(bwapiUnit.getUpgrade))
 
   ////////////////
   // Visibility //
@@ -176,7 +139,7 @@ abstract class FriendlyUnitProxy(originalBwapiUnit: bwapi.Unit, id: Int) extends
   // Statuses //
   //////////////
 
-  def remainingCompletionFrames : Int = if (complete) 0 else bwapiUnit.getRemainingBuildTime
+  def remainingCompletionFrames : Int = bwapiUnit.getRemainingBuildTime
   def remainingUpgradeFrames    : Int = bwapiUnit.getRemainingUpgradeTime
   def remainingTechFrames       : Int = bwapiUnit.getRemainingResearchTime
   def remainingTrainFrames      : Int = bwapiUnit.getRemainingTrainTime
@@ -189,7 +152,6 @@ abstract class FriendlyUnitProxy(originalBwapiUnit: bwapi.Unit, id: Int) extends
   def carryingGas         : Boolean = bwapiUnit.isCarryingGas
   def powered             : Boolean = bwapiUnit.isPowered
   def selected            : Boolean = bwapiUnit.isSelected
-  def targetable          : Boolean = bwapiUnit.isTargetable
   def underAttack         : Boolean = bwapiUnit.isUnderAttack
   def underDarkSwarm      : Boolean = bwapiUnit.isUnderDarkSwarm
   def underDisruptionWeb  : Boolean = bwapiUnit.isUnderDisruptionWeb

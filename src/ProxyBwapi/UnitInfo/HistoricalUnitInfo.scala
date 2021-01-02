@@ -7,7 +7,7 @@ import ProxyBwapi.UnitTracking.Visibility
 import ProxyBwapi.Upgrades.Upgrade
 
 class HistoricalUnitInfo(unit: UnitInfo) extends UnitInfo(unit.bwapiUnit, unit.id) {
-  override def visibility: Visibility.Value = Visibility.Dead
+  override val visibility: Visibility.Value = Visibility.Dead
   override val player: PlayerInfo = unit.player
   override val lastSeen: Int = unit.lastSeen
   override val alive: Boolean = false
@@ -38,7 +38,6 @@ class HistoricalUnitInfo(unit: UnitInfo) extends UnitInfo(unit.bwapiUnit, unit.i
   override val order: String = unit.order
   override val attacking: Boolean = unit.attacking
   override val constructing: Boolean = unit.constructing
-  override val holdingPosition: Boolean = unit.holdingPosition
   override val morphing: Boolean = unit.morphing
   override val repairing: Boolean = unit.repairing
   override val teching: Boolean = unit.teching
@@ -70,7 +69,6 @@ class HistoricalUnitInfo(unit: UnitInfo) extends UnitInfo(unit.bwapiUnit, unit.i
   override val carryingGas: Boolean = unit.carryingGas
   override val powered: Boolean = unit.powered
   override val selected: Boolean = unit.selected
-  override val targetable: Boolean = unit.targetable
   override val underDarkSwarm: Boolean = unit.underDarkSwarm
   override val underDisruptionWeb: Boolean = unit.underDisruptionWeb
   override val underStorm: Boolean = unit.underStorm

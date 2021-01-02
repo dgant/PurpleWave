@@ -2,14 +2,13 @@ package ProxyBwapi.UnitInfo
 
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
-import Performance.Cache
+import ProxyBwapi.ConvertBWAPI
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
 import ProxyBwapi.UnitTracking.Visibility
 import ProxyBwapi.Upgrades.Upgrade
-import bwapi.Position
 
 class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit, id) {
 
@@ -79,9 +78,9 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   private var _player             : PlayerInfo        = _
   private var _unitClass          : UnitClass         = UnitClasses.None
   
-  @inline final def lastSeen           : Int        = _lastSeen
-  @inline final def player             : PlayerInfo = _player
-  @inline final def unitClass          : UnitClass  = _unitClass
+  @inline final def lastSeen  : Int        = _lastSeen
+  @inline final def player    : PlayerInfo = _player
+  @inline final def unitClass : UnitClass  = _unitClass
   
   @inline final def lastSeenWithin(frames: Int): Boolean = With.framesSince(_lastSeen) < frames
   
@@ -94,7 +93,6 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
     _initialResources       = bwapiUnit.getInitialResources
     _invincible             = bwapiUnit.isInvincible
     _resourcesLeft          = bwapiUnit.getResources
-    _energy                 = bwapiUnit.getEnergy
     _plagued                = bwapiUnit.isPlagued
   }
   
@@ -106,7 +104,6 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   private var _invincible             : Boolean   = _
   private var _resourcesLeft          : Int       = _
   private var _shieldPoints           : Int       = _
-  private var _energy                 : Int       = _
   private var _plagued                : Boolean   = _
   
   @inline final def alive                 : Boolean   = _alive
@@ -117,29 +114,28 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   @inline final def invincible            : Boolean   = _invincible
   @inline final def resourcesLeft         : Int       = _resourcesLeft
   @inline final def shieldPoints          : Int       = _shieldPoints
-  @inline final def energy                : Int       = _energy
   @inline final def plagued               : Boolean   = _plagued
+  @inline final def energy                : Int       = 0 // TODO: Model enemy energy
   
   ////////////
   // Combat //
   ////////////
-  
-  @inline final def scarabCount       : Int = if (is(Protoss.Reaver)) 3 else 0 // BWAPI probably doens't give this for enemy units. Here's an approximation.
-  @inline final def spiderMines       : Int = spiderMineCountCache()
-  private val spiderMineCountCache  = new Cache(() => if (is(Terran.Vulture))   bwapiUnit.getSpiderMineCount   else 0)
-  
+
   private def updateCombat() {
+    _spiderMines              = bwapiUnit.getSpiderMineCount
     _airWeaponCooldownLeft    = bwapiUnit.getAirWeaponCooldown
     _groundWeaponCooldownLeft = bwapiUnit.getGroundWeaponCooldown
     _spellCooldownLeft        = bwapiUnit.getSpellCooldown
   }
-  
-  var _interceptors             : Iterable[UnitInfo]  = Iterable.empty
+
+  var _spiderMines              : Int                 = _
   var _airWeaponCooldownLeft    : Int                 = _
   var _groundWeaponCooldownLeft : Int                 = _
   var _spellCooldownLeft        : Int                 = _
-  
-  @inline final def interceptors              : Iterable[UnitInfo]  = Iterable.empty // BWAPI doesn't publish this for enemy interceptors
+
+  @inline final val scarabCount               : Int                 = if (is(Protoss.Reaver)) 5 else 0
+  @inline final val interceptors              : Iterable[UnitInfo]  = Iterable.empty // BWAPI doesn't publish this for enemy interceptors
+  @inline final def spiderMines               : Int                 = _spiderMines
   @inline final def airCooldownLeft           : Int                 = _airWeaponCooldownLeft
   @inline final def groundCooldownLeft        : Int                 = _groundWeaponCooldownLeft
   @inline final def spellCooldownLeft         : Int                 = _spellCooldownLeft
@@ -152,7 +148,7 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   private var _pixelCenterObserved  : Pixel  = Pixel(0, 0)
   private var _tileTopLeft          : Tile   = Tile(0, 0)
   
-  @inline final def pixel         : Pixel = _pixelCenter
+  @inline final def pixel               : Pixel = _pixelCenter
   @inline final def pixelCenterObserved : Pixel = _pixelCenterObserved
   @inline final def tileTopLeft         : Tile  = _tileTopLeft
   
@@ -160,42 +156,38 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   // Orders //
   ////////////
 
-  private def convertPosition(position: bwapi.Position): Option[Pixel] = {
-    if (badPositions.contains(position)) None else Some(new Pixel(position))
-  }
-
   private def updateOrders() {
-    // Performance optmization -- spare the expensive target calls for irrelevant units
-    _target               = if (unitClass.targetsMatter)         With.units.get(bwapiUnit.getTarget)               else None
-    _targetPixel          = if (unitClass.targetPositionsMatter) convertPosition(bwapiUnit.getTargetPosition)      else None
-    _order                = if (unitClass.ordersMatter)          bwapiUnit.getOrder.toString                       else Orders.Nothing
-    _orderTarget          = if (unitClass.targetsMatter)         With.units.get(bwapiUnit.getOrderTarget)          else None
-    _orderTargetPixel     = if (unitClass.targetPositionsMatter) convertPosition(bwapiUnit.getOrderTargetPosition) else None
-    _gatheringMinerals    = unitClass.ordersMatter && bwapiUnit.isGatheringMinerals
-    _gatheringGas         = unitClass.ordersMatter && bwapiUnit.isGatheringGas
-    _attacking            = unitClass.ordersMatter && bwapiUnit.isAttacking
-    _constructing         = unitClass.ordersMatter && _order == Orders.ConstructingBuilding // baseUnit.isConstructing
-    _following            = unitClass.ordersMatter && bwapiUnit.isFollowing
-    _holdingPosition      = unitClass.ordersMatter && bwapiUnit.isHoldingPosition
-    _idle                 = unitClass.ordersMatter && bwapiUnit.isIdle
-    _interruptible        = unitClass.ordersMatter && bwapiUnit.isInterruptible
-    _morphing             = unitClass.ordersMatter && bwapiUnit.isMorphing
-    _repairing            = unitClass.ordersMatter && _order == Orders.Repair // baseUnit.isRepairing doesn't seem to work
-    _researching          = unitClass.ordersMatter && bwapiUnit.isResearching
-    _patrolling           = unitClass.ordersMatter && bwapiUnit.isPatrolling
-    _training             = unitClass.ordersMatter && bwapiUnit.isTraining
-    _upgrading            = unitClass.ordersMatter && bwapiUnit.isUpgrading
+    _target             = With.units.get(bwapiUnit.getTarget)
+    _targetPixel        = ConvertBWAPI.position(bwapiUnit.getTargetPosition)
+    _order              = bwapiUnit.getOrder.toString
+    _orderTarget        = With.units.get(bwapiUnit.getOrderTarget)
+    _orderTargetPixel   = ConvertBWAPI.position(bwapiUnit.getOrderTargetPosition)
+    _gatheringMinerals  = bwapiUnit.isGatheringMinerals
+    _gatheringGas       = bwapiUnit.isGatheringGas
+    _attacking          = bwapiUnit.isAttacking
+    _constructing       = bwapiUnit.isConstructing
+    _morphing           = bwapiUnit.isMorphing
+    _repairing          = bwapiUnit.isRepairing
+    _researching        = bwapiUnit.isResearching
+    _training           = bwapiUnit.isTraining
+    _upgrading          = bwapiUnit.isUpgrading
   }
   
-  private var _target               : Option[UnitInfo]  = None
-  private var _targetPixel          : Option[Pixel]     = None
-  private var _order                : String            = "Stop"
-  private var _orderTarget          : Option[UnitInfo]  = None
-  private var _orderTargetPixel     : Option[Pixel]     = None
-  private var _gatheringMinerals    : Boolean           = _
-  private var _gatheringGas         : Boolean           = _
-  
-  private val badPositions = Vector(Position.Invalid, Position.None, Position.Unknown, null)
+  private var _target             : Option[UnitInfo]  = None
+  private var _targetPixel        : Option[Pixel]     = None
+  private var _order              : String            = "Stop"
+  private var _orderTarget        : Option[UnitInfo]  = None
+  private var _orderTargetPixel   : Option[Pixel]     = None
+  private var _gatheringMinerals  : Boolean           = _
+  private var _gatheringGas       : Boolean           = _
+  private var _attacking          : Boolean = _
+  private var _constructing       : Boolean = _
+  private var _morphing           : Boolean = _
+  private var _repairing          : Boolean = _
+  private var _researching        : Boolean = _
+  private var _training           : Boolean = _
+  private var _upgrading          : Boolean = _
+
   @inline final def target            : Option[UnitInfo]    = _target
   @inline final def targetPixel       : Option[Pixel]       = _targetPixel
   @inline final def order             : String              = _order
@@ -206,40 +198,21 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   @inline final def techProducing     : Option[Tech]        = None
   @inline final def upgradeProducing  : Option[Upgrade]     = None
   @inline final def unitProducing     : Option[UnitClass]   = None
-  
-  private var _attacking        : Boolean = _
-  private var _constructing     : Boolean = _
-  private var _following        : Boolean = _
-  private var _holdingPosition  : Boolean = _
-  private var _idle             : Boolean = _
-  private var _interruptible    : Boolean = _
-  private var _morphing         : Boolean = _
-  private var _repairing        : Boolean = _
-  private var _researching      : Boolean = _
-  private var _patrolling       : Boolean = _
-  private var _training         : Boolean = _
-  private var _upgrading        : Boolean = _
-  
-  @inline final def attacking       : Boolean = _attacking
-  @inline final def constructing    : Boolean = _constructing
-  @inline final def following       : Boolean = _following
-  @inline final def holdingPosition : Boolean = _holdingPosition
-  @inline final def idle            : Boolean = _idle
-  @inline final def interruptible   : Boolean = _interruptible
-  @inline final def morphing        : Boolean = _morphing
-  @inline final def repairing       : Boolean = _repairing
-  @inline final def teching         : Boolean = _researching
-  @inline final def patrolling      : Boolean = _patrolling
-  @inline final def training        : Boolean = _training
-  @inline final def upgrading       : Boolean = _upgrading
+  @inline final def attacking         : Boolean             = _attacking
+  @inline final def constructing      : Boolean             = _constructing
+  @inline final def morphing          : Boolean             = _morphing
+  @inline final def repairing         : Boolean             = _repairing
+  @inline final def teching           : Boolean             = _researching
+  @inline final def training          : Boolean             = _training
+  @inline final def upgrading         : Boolean             = _upgrading
 
   ////////////////
   // Visibility //
   ////////////////
   
   private def updateVisibility() {
-    _cloaked  = ! player.isNeutral && bwapiUnit.isCloaked
-    _detected = player.isNeutral || bwapiUnit.isDetected
+    _cloaked  = bwapiUnit.isCloaked
+    _detected = bwapiUnit.isDetected
   }
 
   private var _burrowed  : Boolean  = _
@@ -256,30 +229,24 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   //////////////
 
   private def updateMovement() {
-    _accelerating = unitClass.canMove           &&  bwapiUnit.isAccelerating
-    _angle        = if (unitClass.canMove || unitClass.rawCanAttack) bwapiUnit.getAngle else 0
-    _braking      = unitClass.canMove           &&  bwapiUnit.isBraking
-    _ensnared     = ! unitClass.isBuilding      &&  bwapiUnit.isEnsnared
-    _flying       = unitClass.canFly            &&  bwapiUnit.isFlying
-    _irradiated   = unitClass.canBeIrradiated   &&  bwapiUnit.isIrradiated
-    _lifted       = unitClass.isFlyingBuilding  &&  bwapiUnit.isLifted
-    _lockedDown   = unitClass.canBeLockedDown   &&  bwapiUnit.isLockedDown
-    _maelstrommed = unitClass.canBeMaelstrommed &&  bwapiUnit.isMaelstrommed
-    _sieged       = unitClass.canSiege          &&  bwapiUnit.isSieged
-    _stasised     = unitClass.canBeStasised     &&  bwapiUnit.isStasised
-    _stimmed      = unitClass.canStim           &&  bwapiUnit.isStimmed
-    _stuck        = unitClass.canMove           &&  bwapiUnit.isStuck
-    _velocityX    = if(unitClass.canMove)           bwapiUnit.getVelocityX else 0
-    _velocityY    = if(unitClass.canMove)           bwapiUnit.getVelocityY else 0
+    _angle        = bwapiUnit.getAngle
+    _ensnared     = bwapiUnit.isEnsnared
+    _flying       = bwapiUnit.isFlying
+    _irradiated   = bwapiUnit.isIrradiated
+    _lockedDown   = bwapiUnit.isLockedDown
+    _maelstrommed = bwapiUnit.isMaelstrommed
+    _sieged       = bwapiUnit.isSieged
+    _stasised     = bwapiUnit.isStasised
+    _stimmed      = bwapiUnit.isStimmed
+    _stuck        = bwapiUnit.isStuck
+    _velocityX    = bwapiUnit.getVelocityX
+    _velocityY    = bwapiUnit.getVelocityY
   }
 
-  private var _accelerating   : Boolean   = _
   private var _angle          : Double    = _
-  private var _braking        : Boolean   = _
   private var _ensnared       : Boolean   = _
   private var _flying         : Boolean   = _
   private var _irradiated     : Boolean   = _
-  private var _lifted         : Boolean   = _
   private var _lockedDown     : Boolean   = _
   private var _maelstrommed   : Boolean   = _
   private var _sieged         : Boolean   = _
@@ -289,13 +256,10 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   private var _velocityX      : Double    = _
   private var _velocityY      : Double    = _
 
-  @inline final def accelerating  : Boolean = _accelerating
   @inline final def angleRadians  : Double  = _angle
-  @inline final def braking       : Boolean = _braking
   @inline final def ensnared      : Boolean = _ensnared
   @inline final def flying        : Boolean = _flying
   @inline final def irradiated    : Boolean = _irradiated
-  @inline final def lifted        : Boolean = _lifted
   @inline final def lockedDown    : Boolean = _lockedDown
   @inline final def maelstrommed  : Boolean = _maelstrommed
   @inline final def sieged        : Boolean = _sieged
@@ -310,23 +274,21 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   //////////////
 
   private def updateStatuses() {
-    _remainingTrainFrames   = if (unitClass.trainsUnits) bwapiUnit.getRemainingTrainTime else 0
-    _remainingUpgradeFrames = if (unitClass.upgradesWhat.nonEmpty) bwapiUnit.getRemainingUpgradeTime else 0
-    _remainingTechFrames    = if (unitClass.techsWhat.nonEmpty) bwapiUnit.getRemainingResearchTime else 0
-    _beingConstructed       = ! player.isNeutral && unitClass.isBuilding && ! complete && (! unitClass.isTerran || bwapiUnit.isBeingConstructed)
-    _beingGathered          = ! player.isNeutral && unitClass.isResource && bwapiUnit.isBeingGathered
-    _beingHealed            = ! player.isNeutral && unitClass.isOrganic && bwapiUnit.isBeingHealed
-    _blind                  = ! player.isNeutral && ! unitClass.isBuilding && bwapiUnit.isBlind
-    _carryingMinerals       = unitClass.isWorker && bwapiUnit.isCarryingMinerals
-    _carryingGas            = unitClass.isWorker && ! carryingMinerals && bwapiUnit.isCarryingGas
-    _powered                = unitClass.requiresPsi && bwapiUnit.isPowered
+    _remainingTrainFrames   = bwapiUnit.getRemainingTrainTime
+    _remainingUpgradeFrames = bwapiUnit.getRemainingUpgradeTime
+    _remainingTechFrames    = bwapiUnit.getRemainingResearchTime
+    _beingConstructed       = bwapiUnit.isBeingConstructed
+    _beingGathered          = bwapiUnit.isBeingGathered
+    _beingHealed            = bwapiUnit.isBeingHealed
+    _blind                  = bwapiUnit.isBlind
+    _carryingMinerals       = bwapiUnit.isCarryingMinerals
+    _carryingGas            = bwapiUnit.isCarryingGas
+    _powered                = bwapiUnit.isPowered
     _selected               = bwapiUnit.isSelected
-    _targetable             = bwapiUnit.isTargetable
-    _underAttack            = ! player.isNeutral && bwapiUnit.isUnderAttack
-    _underDarkSwarm         = ! player.isNeutral && bwapiUnit.isUnderDarkSwarm
-    _underDisruptionWeb     = ! player.isNeutral && bwapiUnit.isUnderDisruptionWeb
-    _underStorm             = ! player.isNeutral && bwapiUnit.isUnderStorm
-    _addon                  = if (unitClass.canBuildAddon) With.units.get(bwapiUnit.getAddon) else None
+    _underDarkSwarm         = bwapiUnit.isUnderDarkSwarm
+    _underDisruptionWeb     = bwapiUnit.isUnderDisruptionWeb
+    _underStorm             = bwapiUnit.isUnderStorm
+    _addon                  = With.units.get(bwapiUnit.getAddon)
     _removalTimer           = bwapiUnit.getRemoveTimer
   }
 
@@ -341,15 +303,13 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   private var _carryingGas            : Boolean = _
   private var _powered                : Boolean = _
   private var _selected               : Boolean = _
-  private var _targetable             : Boolean = _
-  private var _underAttack            : Boolean = _
   private var _underDarkSwarm         : Boolean = _
   private var _underDisruptionWeb     : Boolean = _
   private var _underStorm             : Boolean = _
   private var _addon                  : Option[UnitInfo] = None
   private var _removalTimer           : Int = _
 
-  protected def remainingFrames(snapshotHitPoints: Int, snapshotShields: Int, dataFrame: Int): Int = {
+  @inline final protected def remainingFrames(snapshotHitPoints: Int, snapshotShields: Int, dataFrame: Int): Int = {
     val totalHealthInitial  = 1 + unitClass.maxTotalHealth / 10
     val totalHealthSnapshot = snapshotHitPoints + snapshotShields
     val progress            = Math.max(0.0, (totalHealthSnapshot - totalHealthInitial).toDouble / (unitClass.maxTotalHealth - totalHealthInitial))
@@ -366,7 +326,6 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
     val output            = Math.min(remainingNow, remainingInitial)
     output
   }
-
   @inline final def remainingTrainFrames    : Int     = _remainingTrainFrames
   @inline final def remainingUpgradeFrames  : Int     = _remainingUpgradeFrames
   @inline final def remainingTechFrames     : Int     = _remainingTechFrames
@@ -378,8 +337,6 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   @inline final def carryingMinerals        : Boolean = _carryingMinerals
   @inline final def powered                 : Boolean = _powered
   @inline final def selected                : Boolean = _selected
-  @inline final def targetable              : Boolean = _targetable
-  @inline final def underAttack             : Boolean = _underAttack
   @inline final def underDarkSwarm          : Boolean = _underDarkSwarm
   @inline final def underDisruptionWeb      : Boolean = _underDisruptionWeb
   @inline final def underStorm              : Boolean = _underStorm

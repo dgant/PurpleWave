@@ -15,7 +15,6 @@ object ShowUnitsFriendly extends View {
   var selectedOnly    : Boolean = false
   var showClient      : Boolean = false
   var showAction      : Boolean = true
-  var showCommand     : Boolean = false
   var showOrder       : Boolean = false
   var showTargets     : Boolean = true
   def showPaths       : Boolean = ShowUnitPaths.inUse
@@ -135,7 +134,6 @@ object ShowUnitsFriendly extends View {
     if (showFightReason)  drawNextLabel(if (unit.battle.isDefined) unit.agent.fightReason else "")
     if (showClient)       drawNextLabel(agent.client.map(_.toString).getOrElse(""))
     if (showAction)       drawNextLabel(agent.lastAction.getOrElse(""))
-    if (showCommand)      drawNextLabel(unit.command.map(_.getType.toString).getOrElse(""))
     if (showOrder)        drawNextLabel(unit.order.toString)
 
     if (showDistance) {

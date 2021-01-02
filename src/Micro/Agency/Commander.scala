@@ -9,9 +9,8 @@ import Micro.Coordination.Pushing.{TrafficPriorities, UnitLinearGroundPush}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
-import bwapi.UnitCommandType
 
 // Commander is responsible for issuing unit commands
 // in a way that Brood War handles gracefully,
@@ -41,7 +40,7 @@ class Commander {
     leadFollower(unit, hold)
     if (unit.unready) return
     if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
-    if (unit.velocity.lengthSquared > 0 && ! unit.holdingPosition) {
+    if (unit.velocity.lengthSquared > 0 && unit.order != Orders.HoldPosition) {
       unit.bwapiUnit.holdPosition()
       sleep(unit)
     }
@@ -209,7 +208,7 @@ class Commander {
     if (unit.unready) return
     val to = getAdjustedDestination(unit, destination)
     autoUnburrowUnlessLurkerInRangeOf(unit, to)
-    val alreadyAttackMovingThere = unit.command.exists(c => c.getType == UnitCommandType.Attack_Move && new Pixel(c.getTargetPosition).pixelDistance(to) < 128)
+    val alreadyAttackMovingThere = unit.order == Orders.AttackMove && unit.orderTargetPixel.exists(_.pixelDistance(to) < 128)
     if ( ! alreadyAttackMovingThere || unit.seeminglyStuck) {
       unit.bwapiUnit.attack(to.bwapi)
     }

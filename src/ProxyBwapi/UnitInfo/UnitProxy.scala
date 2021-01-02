@@ -67,7 +67,6 @@ abstract class UnitProxy(var bwapiUnit: bwapi.Unit, val id: Int) {
   
   def attacking: Boolean
   def constructing: Boolean
-  def holdingPosition: Boolean
   def morphing: Boolean
   def repairing: Boolean
   def teching: Boolean
@@ -115,7 +114,6 @@ abstract class UnitProxy(var bwapiUnit: bwapi.Unit, val id: Int) {
   def carryingGas: Boolean
   def powered: Boolean
   def selected: Boolean
-  def targetable: Boolean
   def underDarkSwarm: Boolean
   def underDisruptionWeb: Boolean
   def underStorm: Boolean

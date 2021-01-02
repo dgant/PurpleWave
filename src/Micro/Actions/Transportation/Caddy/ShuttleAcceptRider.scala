@@ -31,7 +31,7 @@ object ShuttleAcceptRider extends Action {
     val pickupCandidates = With.units.ours
       .view
       .filter(passenger =>
-        passenger.unitClass.isReaver && (
+        passenger.is(Protoss.Reaver) && (
           // If the candidate has different goals than our passenger, and aren't in immediate danger, we can't help them
           shuttle.agent.passengers.isEmpty
           || shuttle.battle.exists(passenger.battle.contains)

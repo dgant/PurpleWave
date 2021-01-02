@@ -17,7 +17,7 @@ class FingerprintSiegeExpand extends FingerprintAnd(
           + With.unitsShown(e, Terran.SiegeTankSieged)) > 0
         val expand = (
           With.unitsShown(e, Terran.CommandCenter) > 1
-          || With.units.enemy.exists(u => u.player == e && u.isCommandCenter() && ! With.geography.startLocations.contains(u.tileTopLeft))
+          || With.units.enemy.exists(u => u.player == e && u.is(Terran.CommandCenter) && ! With.geography.startLocations.contains(u.tileTopLeft))
           || e.bases.size > 1)
         siege && expand
       })

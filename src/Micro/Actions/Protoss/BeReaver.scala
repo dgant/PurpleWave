@@ -9,7 +9,7 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Coordination.Pathing.MicroPathing
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
@@ -47,7 +47,7 @@ object BeReaver extends Action {
     val here = unit.tile
     var shouldDrop = false
     shouldDrop = shouldDrop || here.groundPixels(destinationGround) < 32
-    shouldDrop = shouldDrop || unit.inRangeToAttack(target) && With.grids.enemyRangeGround.get(here) == 0 && ! unit.matchups.threats.exists(t => t.isSiegeTankSieged() && t.inRangeToAttack(unit, here.pixelCenter))
+    shouldDrop = shouldDrop || unit.inRangeToAttack(target) && With.grids.enemyRangeGround.get(here) == 0 && ! unit.matchups.threats.exists(t => t.is(Terran.SiegeTankSieged) && t.inRangeToAttack(unit, here.pixelCenter))
     if (shouldDrop) {
       With.commander.attack(unit)
       return
@@ -104,7 +104,7 @@ object BeReaver extends Action {
         && t.walkable
         && With.grids.enemyRangeAirGround.get(t) == 0
         && t.groundPixels(goalTile) < 1.5 * reaver.effectiveRangePixels
-        && ! reaver.matchups.threats.exists(t => t.isSiegeTankSieged() && t.inRangeToAttack(reaver, t.pixel)))
+        && ! reaver.matchups.threats.exists(t => t.is(Terran.SiegeTankSieged) && t.inRangeToAttack(reaver, t.pixel)))
       .map(tile => (
         tile,
         Math.abs(naiveDistance - tile.tileDistanceFast(goalTile)),

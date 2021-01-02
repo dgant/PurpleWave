@@ -1,9 +1,11 @@
 package Micro.Actions.Combat.Targeting.Filters
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterReaver extends TargetFilter {
+  override def appliesTo(actor: FriendlyUnitInfo): Boolean = actor.is(Protoss.Reaver)
   override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
-    if ( ! actor.isReaver() || actor.agent.ride.isEmpty) return true
+    if ( ! actor.is(Protoss.Reaver) || actor.agent.ride.isEmpty) return true
 
     // Don't hit eg. random buildings in bases
     val worthAttacking = (

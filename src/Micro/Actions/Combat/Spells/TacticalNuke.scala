@@ -25,7 +25,7 @@ object TacticalNuke extends TargetedSpell {
     if (target.is(Zerg.Larva))                          return 0.0
     if (target.is(Zerg.Egg))                            return 0.0
 
-    val multiplierPurpose = if (target.unitClass.isStaticDefense || target.isSiegeTankSieged()) 2.5 else 1.0
+    val multiplierPurpose = if (target.unitClass.isStaticDefense || target.is(Terran.SiegeTankSieged)) 2.5 else 1.0
     val multiplierSpeed = if (target.moving) 0.5 else if (target.canMove) 0.75 else 1.0
     val multiplierOwner = if (target.isEnemy) 1.0 else if (target.isOurs && ! target.canMove) -4.0 else 0.0
     val output          = multiplierPurpose * multiplierSpeed * multiplierOwner * target.subjectiveValue

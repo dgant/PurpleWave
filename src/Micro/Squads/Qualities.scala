@@ -74,7 +74,7 @@ object Qualities {
     def apply(u: UnitInfo): Boolean = u.unitClass.attacksGround && u.unitClass.isBuilding
   }
   object AntiStaticDefense extends Quality {
-    def apply(u: UnitInfo): Boolean = u.pixelRangeGround > 32.0 * 7.0 || u.isSiegeTankUnsieged()
+    def apply(u: UnitInfo): Boolean = u.pixelRangeGround > 32.0 * 7.0 || u.is(Terran.SiegeTankUnsieged)
   }
   val enemy: Array[Quality] = Array(
     Cloaked,

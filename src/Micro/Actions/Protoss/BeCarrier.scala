@@ -76,8 +76,8 @@ object BeCarrier extends Action {
       WarmUpInterceptors.consider(unit)
       if (unit.matchups.targets.exists(_.isAny(Protoss.Carrier, Protoss.Interceptor))) {
         unit.agent.toAttack = unit.agent.toAttack
-          .orElse(ByOption.minBy(unit.matchups.targetsInRange .filter(u => u.canAttack(unit) && ! u.isInterceptor()))(u => u.totalHealth / (1 + u.subjectiveValue)))
-          .orElse(ByOption.minBy(unit.matchups.targets        .filter(u => u.canAttack(unit) && ! u.isInterceptor()))(_.pixelDistanceEdge(unit)))
+          .orElse(ByOption.minBy(unit.matchups.targetsInRange .filter(u => u.canAttack(unit) && ! u.is(Protoss.Interceptor)))(u => u.totalHealth / (1 + u.subjectiveValue)))
+          .orElse(ByOption.minBy(unit.matchups.targets        .filter(u => u.canAttack(unit) && ! u.is(Protoss.Interceptor)))(_.pixelDistanceEdge(unit)))
         With.commander.attack(unit)
       }
       With.commander.attackMove(unit)

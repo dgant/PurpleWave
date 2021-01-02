@@ -26,7 +26,7 @@ object Follow extends Action {
     maybeLeader
       .withFilter(leader =>
         unit.pixelDistanceCenter(leader) < Seq(256, ByOption.min(unit.matchups.threats.view.map(_.pixelsToGetInRange(unit).toInt)).getOrElse(0)).max
-        && ( ! unit.isCarrier() || leader.matchups.threatsInRange.forall(unit.matchups.threatsInRange.contains))
+        && ( ! unit.is(Protoss.Carrier) || leader.matchups.threatsInRange.forall(unit.matchups.threatsInRange.contains))
       )
       .foreach(leader => {
         if (unit.matchups.targetsInRange.isEmpty

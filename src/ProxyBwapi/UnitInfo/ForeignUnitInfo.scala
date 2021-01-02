@@ -20,7 +20,7 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
     updateTimeInsensitiveInformation()
     fixCloakedUnits()
     updateCommon()
-    if ( ! lastSeenWithin(24) && isSiegeTankUnsieged()) {
+    if ( ! lastSeenWithin(24) && is(Terran.SiegeTankUnsieged)) {
       _unitClass = Terran.SiegeTankSieged
     }
   }

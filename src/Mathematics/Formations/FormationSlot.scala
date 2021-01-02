@@ -9,7 +9,7 @@ class FormationSlot(unit: FriendlyUnitInfo) {
   val idealPixels : Double = range(unit)
   
   private def range(unit: FriendlyUnitInfo): Double = {
-    if (unit.isSiegeTankUnsieged() && unit.player.hasTech(Terran.SiegeMode))
+    if (unit.is(Terran.SiegeTankUnsieged) && unit.player.hasTech(Terran.SiegeMode))
       Terran.SiegeTankSieged.effectiveRangePixels
     else if (unit.is(Terran.Medic))
       Terran.Marine.effectiveRangePixels - 16

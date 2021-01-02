@@ -1,7 +1,7 @@
 package Micro.Actions.Combat.Spells
 
 import Lifecycle.With
-import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -37,7 +37,7 @@ object Stasis extends TargetedSpell {
         else if (target.isEnemy) (
           1.0
           + (if (target.unitClass.isDetector) 2.0 else 0.0)
-          + (if (target.isSiegeTankSieged()) 0.5 else if (target.isSiegeTankUnsieged()) 0.25 else 0.0)
+          + (if (target.is(Terran.SiegeTankSieged)) 0.5 else if (target.is(Terran.SiegeTankUnsieged)) 0.25 else 0.0)
         )
       else 0.0)
       )

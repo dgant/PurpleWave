@@ -179,7 +179,7 @@ object Target extends {
     // Detection bonus
     val aggressivelyDenyDetection = With.reaction.sluggishness > 0
     val weHaveCloakedThreat = if (aggressivelyDenyDetection)
-      target.matchups.enemies.exists(e => e.cloaked && e.matchups.targets.nonEmpty) && ! target.matchups.enemies.exists(_.isArbiter())
+      target.matchups.enemies.exists(e => e.cloaked && e.matchups.targets.nonEmpty) && ! target.matchups.enemies.exists(_.is(Protoss.Arbiter))
     else (
       With.self.hasTech(Terran.WraithCloak)
       || With.self.hasTech(Zerg.LurkerMorph)
@@ -205,7 +205,7 @@ object Target extends {
     }
 
     // Interceptor penalty
-    if (target.isInterceptor()) {
+    if (target.is(Protoss.Interceptor)) {
       output *= 0.25
     }
 
@@ -221,10 +221,10 @@ object Target extends {
     if (target.unitClass.isDetector) {
       return true
     }
-    if (target.isComsat() || target.isControlTower() || target.isRoboticsFacility() || target.isEngineeringBay() || target.isForge()) {
+    if (target.isAny(Terran.Comsat, Terran.ControlTower, Protoss.RoboticsFacility, Terran.EngineeringBay, Protoss.Forge)) {
       return true
     }
-    if ((target.isAcademy() || target.isScienceFacility() || target.isObservatory()) && ! target.complete) {
+    if (target.isAny(Terran.Academy, Terran.ScienceFacility, Protoss.Observatory) && ! target.complete) {
       return true
     }
     false

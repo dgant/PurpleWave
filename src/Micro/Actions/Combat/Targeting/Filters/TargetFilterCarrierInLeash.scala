@@ -4,7 +4,7 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterCarrierInLeash extends TargetFilter {
-  override def appliesTo(actor: FriendlyUnitInfo): Boolean = actor.isCarrier()
+  override def appliesTo(actor: FriendlyUnitInfo): Boolean = actor.is(Protoss.Carrier)
   override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
     if ( ! actor.is(Protoss.Carrier)) return true
 

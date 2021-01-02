@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Targeting.Filters
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterFocus extends TargetFilter {
-  
+  override def appliesTo(actor: FriendlyUnitInfo): Boolean = actor.agent.canFocus
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = (
     ! actor.agent.canFocus
     || actor.agent.destination.zone == target.zone

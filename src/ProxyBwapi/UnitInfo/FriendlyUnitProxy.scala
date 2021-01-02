@@ -197,12 +197,7 @@ abstract class FriendlyUnitProxy(originalBwapiUnit: bwapi.Unit, id: Int) extends
 
   def spiderMines: Int = bwapiUnit.getSpiderMineCount
 
-  def addon: Option[UnitInfo] = cachedAddon()
-  private val cachedAddon = new Cache(() =>
-    if (unitClass.isTerran
-    && unitClass.isBuilding
-    && (unitClass.isTownHall || unitClass.isFactory || unitClass.isStarport || unitClass.isScienceFacility))
-    With.units.get(bwapiUnit.getAddon) else None)
+  def addon: Option[UnitInfo] = With.units.get(bwapiUnit.getAddon)
 
   def hasNuke: Boolean = bwapiUnit.hasNuke
 

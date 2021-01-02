@@ -79,8 +79,8 @@ case class MatchupAnalysis(me: UnitInfo) {
         || catcher.framesToGetInRange(me) < 8
         || (me.unitClass.isWorker && me.base.exists(_.harvestingArea.contains(me.tile)))
         || (catcher.is(Zerg.Zergling) && With.self.hasUpgrade(Zerg.ZerglingSpeed) && ! me.player.hasUpgrade(Terran.VultureSpeed))
-        || (catcher.is(Protoss.Zealot) && me.isDragoon() && ! me.player.hasUpgrade(Protoss.DragoonRange))
-        || (catcher.is(Protoss.DarkTemplar) && me.isDragoon()))
+        || (catcher.is(Protoss.Zealot) && me.is(Protoss.Dragoon) && ! me.player.hasUpgrade(Protoss.DragoonRange))
+        || (catcher.is(Protoss.DarkTemplar) && me.is(Protoss.Dragoon)))
     output
   }
 }

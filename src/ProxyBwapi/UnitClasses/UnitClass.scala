@@ -45,9 +45,9 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
 
   def framesToTurn(radians: Double): Int = Math.abs(PurpleMath.nanToZero(Math.ceil(127.0 * PurpleMath.normalizeAroundZero(radians) / Math.PI / turnRadius))).toInt
 
-  lazy val needsToTurnToShoot = ! Vector(Terran.Goliath, Terran.SiegeTankUnsieged, Protoss.Dragoon).contains(this)
+  lazy val needsToTurnToShoot: Boolean = ! Vector(Terran.Goliath, Terran.SiegeTankUnsieged, Protoss.Dragoon).contains(this)
   lazy val framesToTurnAndShootAndTurnBackAndAccelerate: Int = stopFrames + accelerationFrames + (if (needsToTurnToShoot) framesToTurn180 else 0) + With.latency.latencyFrames
-  lazy val hasMomentum = isFlyer || floats
+  lazy val hasMomentum: Boolean = isFlyer || floats
 
   ////////////
   // Combat //
@@ -56,7 +56,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val ranged: Boolean = canAttack && pixelRangeMax > 32 * 2
   lazy val melee: Boolean = canAttack && ! ranged
   lazy val castsSpells: Boolean = spells.nonEmpty
-  lazy val attacksOrCastsOrDetectsOrTransports = canAttack || castsSpells || isDetector || isTransport || this == Zerg.LurkerEgg
+  lazy val attacksOrCastsOrDetectsOrTransports: Boolean = canAttack || castsSpells || isDetector || isTransport || this == Zerg.LurkerEgg
 
   lazy val suicides: Boolean = Array(
     Terran.SpiderMine,
@@ -105,8 +105,6 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     1.25
   else
     1.0
-
-  lazy val isReaver: Boolean = this == Protoss.Reaver
 
   lazy val maxTotalHealth: Int = maxHitPoints + maxShields
 
@@ -185,14 +183,6 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val shootsScarabs: Boolean = this == Protoss.Reaver // Performance shortcut
 
   // Performance shortcut -- comparing types
-  lazy val isArbiter: Boolean = this == Protoss.Arbiter
-  lazy val isCarrier: Boolean = this == Protoss.Carrier
-  lazy val isSiegeTank: Boolean = this == Terran.SiegeTankSieged || this == Terran.SiegeTankUnsieged
-  lazy val isFactory: Boolean = this == Terran.Factory
-  lazy val isStarport: Boolean = this == Terran.Starport
-  lazy val isScienceFacility: Boolean = this == Terran.ScienceFacility
-  lazy val isZergling: Boolean = this == Zerg.Zergling
-
   lazy val unaffectedByDarkSwarm: Boolean = Vector(
     Terran.SiegeTankSieged,
     Terran.Firebat,
@@ -438,7 +428,6 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
           / (if (this == Protoss.Interceptor) 4.0 else 1.0)
           / copiesProduced
         )
-  lazy val logSubjectiveValue = Math.log(subjectiveValue)
 
   //////////////////////
   // Micro frame data //
@@ -452,21 +441,61 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   //
   lazy val stopFrames: Int = {
     if (this == Terran.SCV) 2
-    if (this == Terran.Marine) 8 else if (this == Terran.Firebat) 8 else if (this == Terran.Ghost) 3 else if (this == Terran.Vulture) 2 else if (this == Terran.Goliath) 1 else if (this == Terran.SiegeTankUnsieged) 1 else if (this == Terran.SiegeTankSieged) 1 else if (this == Terran.Wraith) 2 else if (this == Terran.Battlecruiser) 2 else if (this == Terran.Valkyrie) 40 else if (this == Protoss.Probe) 2 else if (this == Protoss.Zealot) 7 else if (this == Protoss.Dragoon) 2 else if (this == Protoss.DarkTemplar) 9 else if (this == Protoss.Archon) 15 else if (this == Protoss.Reaver) 1 else if (this == Protoss.Scout) 2 else if (this == Protoss.Corsair) 8 else if (this == Protoss.Arbiter) 4 else if (this == Zerg.Drone) 2 else if (this == Zerg.Zergling) 4 else if (this == Zerg.Hydralisk) 3 else if (this == Zerg.Lurker) 2 else if (this == Zerg.Ultralisk) 14 else if (this == Zerg.Mutalisk) 2 else if (this == Zerg.Devourer) 9 else
-      2 // Arbitrary.
+    else if (this == Terran.Marine) 8
+    else if (this == Terran.Firebat) 8
+    else if (this == Terran.Ghost) 3
+    else if (this == Terran.Vulture) 2
+    else if (this == Terran.Goliath) 1
+    else if (this == Terran.SiegeTankUnsieged) 1
+    else if (this == Terran.SiegeTankSieged) 1
+    else if (this == Terran.Wraith) 2
+    else if (this == Terran.Battlecruiser) 2
+    else if (this == Terran.Valkyrie) 40
+    else if (this == Protoss.Probe) 2
+    else if (this == Protoss.Zealot) 7
+    else if (this == Protoss.Dragoon) 2
+    else if (this == Protoss.DarkTemplar) 9
+    else if (this == Protoss.Archon) 15
+    else if (this == Protoss.Reaver) 1
+    else if (this == Protoss.Scout) 2
+    else if (this == Protoss.Corsair) 8
+    else if (this == Protoss.Arbiter) 4
+    else if (this == Zerg.Drone) 2
+    else if (this == Zerg.Zergling) 4
+    else if (this == Zerg.Hydralisk) 3
+    else if (this == Zerg.Lurker) 2
+    else if (this == Zerg.Ultralisk) 14
+    else if (this == Zerg.Mutalisk) 2
+    else if (this == Zerg.Devourer) 9
+    else 2 // Arbitrary default.
   }
 
   // These numbers are taken from Dave Churchill's table,
   // but the Dragoon number at least doesn't seem to correlate to the required delay to prevent attack cancelling.
-  lazy val minStop: Int = {
-    if (this == Protoss.Dragoon) 5 else if (this == Zerg.Devourer) 7 else if (this == Protoss.Carrier) 48 else
-      0
-  }
+  lazy val minStop: Int =
+    if (this == Protoss.Dragoon) 5
+    else if (this == Zerg.Devourer) 7
+    else if (this == Protoss.Carrier) 48
+    else 0
 
-  lazy val attackAnimationFrames: Int = {
-    if (this == Terran.SCV) 2 else if (this == Terran.Marine) 8 else if (this == Terran.Firebat) 8 else if (this == Terran.Ghost) 4 else if (this == Terran.Goliath) 1 else if (this == Terran.SiegeTankUnsieged) 1 else if (this == Terran.SiegeTankSieged) 1 else if (this == Protoss.Zealot) 8 else if (this == Protoss.Dragoon) 9 else if (this == Protoss.DarkTemplar) 9 else if (this == Protoss.Reaver) 1 else if (this == Protoss.Corsair) 8 else if (this == Protoss.Arbiter) 5 else if (this == Zerg.Zergling) 5 else if (this == Zerg.Hydralisk) 3 else if (this == Zerg.Ultralisk) 15 else
-      0
-  }
+  lazy val attackAnimationFrames: Int =
+    if (this == Terran.SCV) 2
+    else if (this == Terran.Marine) 8
+    else if (this == Terran.Firebat) 8
+    else if (this == Terran.Ghost) 4
+    else if (this == Terran.Goliath) 1
+    else if (this == Terran.SiegeTankUnsieged) 1
+    else if (this == Terran.SiegeTankSieged) 1
+    else if (this == Protoss.Zealot) 8
+    else if (this == Protoss.Dragoon) 9
+    else if (this == Protoss.DarkTemplar) 9
+    else if (this == Protoss.Reaver) 1
+    else if (this == Protoss.Corsair) 8
+    else if (this == Protoss.Arbiter) 5
+    else if (this == Zerg.Zergling) 5
+    else if (this == Zerg.Hydralisk) 3
+    else if (this == Zerg.Ultralisk) 15
+    else 0
 
   //////////////////
   // Capabilities //
@@ -486,7 +515,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val canBeEnsnared: Boolean = Players.all.exists(_.isUnknownOrZerg) && !isBuilding
   lazy val canBeStasised: Boolean = Players.all.exists(_.isUnknownOrProtoss) && !isBuilding
   lazy val canLoadUnits: Boolean = Vector(Terran.Bunker, Terran.Dropship, Protoss.Shuttle, Zerg.Overlord).contains(this)
-  lazy val canBeTransported: Boolean = !isBuilding && spaceRequired <= 8 // BWAPI gives 255 for unloadable units
+  lazy val canBeTransported: Boolean = ! isBuilding && spaceRequired <= 8 // BWAPI gives 255 for unloadable units
   lazy val spells: Array[Tech] =
     if (this == Terran.Battlecruiser) Array(Terran.Yamato) else if (this == Terran.Ghost) Array(Terran.GhostCloak, Terran.Lockdown, Terran.NuclearStrike) else if (this == Terran.Medic) Array(Terran.Healing, Terran.OpticalFlare, Terran.Restoration) else if (this == Terran.ScienceVessel) Array(Terran.DefensiveMatrix, Terran.EMP, Terran.Irradiate) else if (this == Terran.Wraith) Array(Terran.WraithCloak) else if (this == Protoss.Arbiter) Array(Protoss.Recall, Protoss.Stasis) else if (this == Protoss.DarkArchon) Array(Protoss.Feedback, Protoss.Maelstrom, Protoss.MindControl) else if (this == Protoss.HighTemplar) Array(Protoss.Hallucination, Protoss.PsionicStorm) else if (this == Zerg.Defiler) Array(Zerg.Consume, Zerg.DarkSwarm, Zerg.Plague) else if (this == Zerg.Queen) Array(Zerg.Ensnare, Zerg.InfestCommandCenter, Zerg.Parasite, Zerg.SpawnBroodlings) else
       Array()

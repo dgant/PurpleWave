@@ -4,6 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
+import Planning.UnitMatchers.UnitMatchSiegeTank
 import Planning.{Plan, Property}
 import ProxyBwapi.Races.Terran
 import Utilities.Seconds
@@ -39,14 +40,14 @@ class Scan extends Plan {
     }
     
     val contentiousTanks = With.units.enemy.view.filter(u =>
-      ! u.visible &&
-      u.likelyStillThere &&
-      u.unitClass.isSiegeTank &&
-      u.matchups.enemies.exists(e =>
-        e.is(Terran.SiegeTankSieged)  &&
-        e.cooldownLeft == 0           &&
-        e.inRangeToAttack(u)      &&
-        ! e.matchups.targetsInRange.exists(_.visible)))
+      ! u.visible
+      && u.likelyStillThere
+      && u.is(UnitMatchSiegeTank)
+      &&u.matchups.enemies.exists(e =>
+        e.is(Terran.SiegeTankSieged)
+        && e.cooldownLeft == 0
+        && e.inRangeToAttack(u)
+        && ! e.matchups.targetsInRange.exists(_.visible)))
   
     if (contentiousTanks.nonEmpty) {
       scan(contentiousTanks.minBy(_.totalHealth).pixel)

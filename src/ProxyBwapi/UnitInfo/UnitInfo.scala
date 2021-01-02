@@ -482,7 +482,6 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   @inline final def canAttack: Boolean = canAttackCache()
   private val canAttackCache = new Cache(() =>
     canDoAnything
-    && ( ! unitClass.shootsScarabs || scarabCount > 0)
     && (
       unitClass.rawCanAttack
       || is(Terran.Bunker)

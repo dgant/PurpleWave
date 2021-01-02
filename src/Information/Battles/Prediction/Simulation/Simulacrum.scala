@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Actions.Combat.Targeting.Target
-import Planning.UnitMatchers.UnitMatchRecruitableForCombat
+import Planning.UnitMatchers.{UnitMatchRecruitableForCombat, UnitMatchSiegeTank}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
@@ -33,7 +33,7 @@ class Simulacrum(
   val value       : Double      = realUnit.subjectiveValue
 
   val speedMultiplier   : Double  = if (flying) 1.0 else Math.pow(simulation.prediction.battle.judgmentModifiers.view.map(_.speedMultiplier).product, if (isFriendly) 1 else -1)
-  val bonusRange        : Double  = if (isFriendly || ! unitClass.isSiegeTank || ! simulation.prediction.weAttack) 0.0 else With.configuration.simulationBonusTankRange
+  val bonusRange        : Double  = if (isFriendly || ! realUnit.is(UnitMatchSiegeTank) || ! simulation.prediction.weAttack) 0.0 else With.configuration.simulationBonusTankRange
   val multiplierSplash  : Double  = realUnit.matchups.splashFactorMax
 
   val canMove             : Boolean             = realUnit.canMove

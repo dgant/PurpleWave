@@ -2,6 +2,7 @@ package Information.Fingerprinting.TerranStrategies
 
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
+import ProxyBwapi.Races.Terran
 import Utilities.GameTime
 
 class FingerprintNFactories(thresholdFactories: Double) extends Fingerprint {
@@ -13,7 +14,7 @@ class FingerprintNFactories(thresholdFactories: Double) extends Fingerprint {
       return matched
     }
     var factoryUnitTime: Int = 0
-    With.units.ever.foreach(u => if (u.isEnemy && u.unitClass.whatBuilds._1.isFactory) {
+    With.units.ever.foreach(u => if (u.isEnemy && u.unitClass.whatBuilds._1 == Terran.Factory) {
       factoryUnitTime += u.unitClass.buildFrames
     })
     val discoveryRatio      = 1.0

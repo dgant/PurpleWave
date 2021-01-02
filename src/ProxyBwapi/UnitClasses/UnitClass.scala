@@ -174,15 +174,12 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val targetsMatter: Boolean = this != Protoss.Interceptor && !this.isResource
   lazy val targetPositionsMatter: Boolean = this != Protoss.Interceptor && !this.isResource && (this.isFlyingBuilding || !this.isBuilding)
   lazy val orderable: Boolean = !isSpell && !Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
-  lazy val isResource: Boolean = isMinerals || isGas
   lazy val isMinerals: Boolean = isMineralField
   lazy val isGas: Boolean = Vector(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this)
+  lazy val isResource: Boolean = isMinerals || isGas
   lazy val isTownHall: Boolean = Vector(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this)
   lazy val isStaticDefense: Boolean = (isBuilding && canAttack || this == Terran.Bunker || this == Protoss.ShieldBattery) && this != Terran.SiegeTankSieged
   lazy val isTransport: Boolean = spaceProvided > 0 && isFlyer && this != Protoss.Carrier
-  lazy val shootsScarabs: Boolean = this == Protoss.Reaver // Performance shortcut
-
-  // Performance shortcut -- comparing types
   lazy val unaffectedByDarkSwarm: Boolean = Vector(
     Terran.SiegeTankSieged,
     Terran.Firebat,
@@ -231,13 +228,13 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
 
     val output = new ListBuffer[UnitClass]
 
-    //Probes (Protoss buildings)
+    // Probes (Protoss buildings)
     addBuildUnitIf(output, isProtoss && isBuilding, Protoss.Probe)
 
-    //Pylon (Protoss buildings except Nexus/Pylon/Assimilator)
+    // Pylon (Protoss buildings except Nexus/Pylon/Assimilator)
     addBuildUnitIf(output, requiresPsi, Protoss.Pylon)
 
-    //Obvious prerequisites
+    // Obvious prerequisites
     addBuildUnitIf(output, Terran.Firebat, Terran.Academy)
     addBuildUnitIf(output, Terran.Medic, Terran.Academy)
     addBuildUnitIf(output, Terran.Ghost, Terran.Academy)
@@ -309,7 +306,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
 
     val output = new ListBuffer[UnitClass]
 
-    //All Terran units that train from buildings
+    // All Terran units that train from buildings
     addBuildUnitIf(output, Terran.SCV, Terran.CommandCenter)
     addBuildUnitIf(output, Terran.Marine, Terran.Barracks)
     addBuildUnitIf(output, Terran.Firebat, Terran.Barracks)
@@ -325,16 +322,16 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     addBuildUnitIf(output, Terran.Battlecruiser, Terran.Starport)
     addBuildUnitIf(output, Terran.NuclearMissile, Terran.NuclearSilo)
 
-    //SCV (for all Terran building except add-ons)
+    // SCV (for all Terran building except add-ons)
     addBuildUnitIf(output, isBuilding && race == Race.Terran && !isAddon, Terran.SCV)
 
-    //Factory (for Machine Shop)
-    //Starport (for Control Tower)
-    //Science Facility (for Covert Ops/Physics Lab)
-    //Command Center (for Comsat/Nuke Silo)
+    // Factory (for Machine Shop)
+    // Starport (for Control Tower)
+    // Science Facility (for Covert Ops/Physics Lab)
+    // Command Center (for Comsat/Nuke Silo)
     addBuildUnitIf(output, isAddon, whatBuilds._1)
 
-    //All Protoss units that train from buildings
+    // All Protoss units that train from buildings
     addBuildUnitIf(output, Protoss.Probe, Protoss.Nexus)
     addBuildUnitIf(output, Protoss.Zealot, Protoss.Gateway)
     addBuildUnitIf(output, Protoss.Dragoon, Protoss.Gateway)
@@ -439,7 +436,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   // Well, the stop frames are the main guide (to how many frames of movement are lost by attacking)
   // But that won't strictly tell you how many frames you lose.
   //
-  lazy val stopFrames: Int = {
+  lazy val stopFrames: Int =
     if (this == Terran.SCV) 2
     else if (this == Terran.Marine) 8
     else if (this == Terran.Firebat) 8
@@ -468,7 +465,6 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     else if (this == Zerg.Mutalisk) 2
     else if (this == Zerg.Devourer) 9
     else 2 // Arbitrary default.
-  }
 
   // These numbers are taken from Dave Churchill's table,
   // but the Dragoon number at least doesn't seem to correlate to the required delay to prevent attack cancelling.
@@ -517,8 +513,17 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val canLoadUnits: Boolean = Vector(Terran.Bunker, Terran.Dropship, Protoss.Shuttle, Zerg.Overlord).contains(this)
   lazy val canBeTransported: Boolean = ! isBuilding && spaceRequired <= 8 // BWAPI gives 255 for unloadable units
   lazy val spells: Array[Tech] =
-    if (this == Terran.Battlecruiser) Array(Terran.Yamato) else if (this == Terran.Ghost) Array(Terran.GhostCloak, Terran.Lockdown, Terran.NuclearStrike) else if (this == Terran.Medic) Array(Terran.Healing, Terran.OpticalFlare, Terran.Restoration) else if (this == Terran.ScienceVessel) Array(Terran.DefensiveMatrix, Terran.EMP, Terran.Irradiate) else if (this == Terran.Wraith) Array(Terran.WraithCloak) else if (this == Protoss.Arbiter) Array(Protoss.Recall, Protoss.Stasis) else if (this == Protoss.DarkArchon) Array(Protoss.Feedback, Protoss.Maelstrom, Protoss.MindControl) else if (this == Protoss.HighTemplar) Array(Protoss.Hallucination, Protoss.PsionicStorm) else if (this == Zerg.Defiler) Array(Zerg.Consume, Zerg.DarkSwarm, Zerg.Plague) else if (this == Zerg.Queen) Array(Zerg.Ensnare, Zerg.InfestCommandCenter, Zerg.Parasite, Zerg.SpawnBroodlings) else
-      Array()
+    if (this == Terran.Battlecruiser) Array(Terran.Yamato)
+    else if (this == Terran.Ghost) Array(Terran.GhostCloak, Terran.Lockdown, Terran.NuclearStrike)
+    else if (this == Terran.Medic) Array(Terran.Healing, Terran.OpticalFlare, Terran.Restoration)
+    else if (this == Terran.ScienceVessel) Array(Terran.DefensiveMatrix, Terran.EMP, Terran.Irradiate)
+    else if (this == Terran.Wraith) Array(Terran.WraithCloak)
+    else if (this == Protoss.Arbiter) Array(Protoss.Recall, Protoss.Stasis)
+    else if (this == Protoss.DarkArchon) Array(Protoss.Feedback, Protoss.Maelstrom, Protoss.MindControl)
+    else if (this == Protoss.HighTemplar) Array(Protoss.Hallucination, Protoss.PsionicStorm)
+    else if (this == Zerg.Defiler) Array(Zerg.Consume, Zerg.DarkSwarm, Zerg.Plague)
+    else if (this == Zerg.Queen) Array(Zerg.Ensnare, Zerg.InfestCommandCenter, Zerg.Parasite, Zerg.SpawnBroodlings)
+    else Array()
 
   //////////////////////////////
   // Performance optimization //

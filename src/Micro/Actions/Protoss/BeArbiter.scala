@@ -33,7 +33,7 @@ object BeArbiter extends Action {
     val umbrellables          = arbiter.immediateAllies.view.filter(needsUmbrella)
     val umbrellablesUncovered = umbrellables.filterNot(u => closerArbiters.exists(a => a.pixelDistanceCenter(u) < cloakRadiusPixels))
     val umbrellable           = ByOption.minBy(umbrellables)(_.pixelDistanceSquared(goal))
-    arbiter.agent.toTravel    = umbrellable.map(_.pixelCenter).orElse(arbiter.agent.toTravel)
+    arbiter.agent.toTravel    = umbrellable.map(_.pixel).orElse(arbiter.agent.toTravel)
     if (umbrellable.forall(arbiter.pixelDistanceCenter(_) < 32 * 3)) {
       Potshot.delegate(arbiter)
     }

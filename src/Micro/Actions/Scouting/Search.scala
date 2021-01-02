@@ -57,12 +57,12 @@ abstract class AbstractSearch extends Action {
       tile.pixelCenter,
       With.grids.friendlyVision.framesSince(tile)))
     
-    val force = pulls.map(_.apply(unit.pixelCenter)).reduce(_ + _)
+    val force = pulls.map(_.apply(unit.pixel)).reduce(_ + _)
 
-    val target = unit.pixelCenter.add(force.normalize(64.0).toPoint)
+    val target = unit.pixel.add(force.normalize(64.0).toPoint)
     val tileToScout = tilesToScout.minBy(_.pixelCenter.pixelDistance(target))
 
-    val profile = new PathfindProfile(unit.tileIncludingCenter)
+    val profile = new PathfindProfile(unit.tile)
     profile.end                 = Some(tileToScout)
     profile.employGroundDist     = true
     profile.costOccupancy       = 0.01f

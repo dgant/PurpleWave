@@ -17,10 +17,10 @@ object ShowPushes extends View {
         if (force.nonEmpty) {
           activePushes += push
           DrawMap.arrow(
-            ByOption.minBy(push.tiles.map(_.pixelCorners.minBy(u.pixelDistanceSquared)))(u.pixelDistanceSquared).getOrElse(u.pixelCenter),
-            u.pixelCenter,
+            ByOption.minBy(push.tiles.map(_.pixelCorners.minBy(u.pixelDistanceSquared)))(u.pixelDistanceSquared).getOrElse(u.pixel),
+            u.pixel,
             push.priority.color)
-          DrawMap.arrow(u.pixelCenter, u.pixelCenter.radiateRadians(force.get.radians, 64), push.priority.color)
+          DrawMap.arrow(u.pixel, u.pixel.radiateRadians(force.get.radians, 64), push.priority.color)
         }
       }
     }))

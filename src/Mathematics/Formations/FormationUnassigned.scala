@@ -19,7 +19,7 @@ class FormationUnassigned(var spots: Map[UnitClass, Iterable[Pixel]]) {
 
   def assignClass(unitClass: UnitClass, units: Iterable[UnitInfo]): Map[UnitInfo, Pixel] = {
     if (units.isEmpty) return Map.empty
-    val centroid = PurpleMath.centroid(units.map(_.pixelCenter))
+    val centroid = PurpleMath.centroid(units.map(_.pixel))
     val pixels = spots(unitClass).toSeq.sortBy(-_.pixelDistanceSquared(centroid))
     val unitsLeft = new ListBuffer[UnitInfo]
     unitsLeft ++= units

@@ -27,14 +27,12 @@ class SpellTargetAOE {
       .filter( ! _.invincible)
     val targets = finalCandidates.filter(evaluate(_, caster) > 0)
     val boxes = targets.flatMap(target => Seq(
-      new AOETarget(target, caster,  1,  1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, projectionFrames = projectionFrames, evaluate = evaluate),
-      new AOETarget(target, caster, -1,  1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, projectionFrames = projectionFrames, evaluate = evaluate),
-      new AOETarget(target, caster,  1, -1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, projectionFrames = projectionFrames, evaluate = evaluate),
-      new AOETarget(target, caster, -1, -1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, projectionFrames = projectionFrames, evaluate = evaluate)))
+      new AOETarget(target, caster,  1,  1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, lookaheadPixels = projectionFrames, evaluate = evaluate),
+      new AOETarget(target, caster, -1,  1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, lookaheadPixels = projectionFrames, evaluate = evaluate),
+      new AOETarget(target, caster,  1, -1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, lookaheadPixels = projectionFrames, evaluate = evaluate),
+      new AOETarget(target, caster, -1, -1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, lookaheadPixels = projectionFrames, evaluate = evaluate)))
     val bestBox = ByOption.maxBy(boxes)(_.netValue).filter(_.netValue >= minimumValue)
     val output = bestBox.map(_.finalTarget)
-    //We were invoking this way too frequently and I think breaking the BWAPI client socket
-    //bestBox.filter(_.netValue > minimumValue).foreach(box => With.animations.addMap(box.drawMap))
     output
   }
 }

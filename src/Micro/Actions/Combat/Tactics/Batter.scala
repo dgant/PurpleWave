@@ -49,8 +49,8 @@ object Batter extends Action {
   
     lazy val outsideUnits   = unit.matchups.targetsInRange
     lazy val repairingUnits = wallUnits.flatMap(_.matchups.repairers)
-    lazy val altitudeHere   = unit.tileIncludingCenter.altitude
-    lazy val altitudeThere  = unit.agent.destination.tileIncluding.altitude
+    lazy val altitudeHere   = unit.tile.altitude
+    lazy val altitudeThere  = unit.agent.destination.tile.altitude
     
     lazy val outsiders = outsideUnits.filter(_.visible)
     lazy val repairers = if (unit.pixelRangeGround >= 32.0 * 4.0) repairingUnits.filter(_.visible) else Iterable.empty
@@ -89,10 +89,10 @@ object Batter extends Action {
             .filter(With.grids.walkable.get)
             .filter(
               _.pixelCenter.pixelDistance(wallExit.pixelCenter)
-              < building.pixelCenter.pixelDistance(wallExit.pixelCenter)))
+              < building.pixel.pixelDistance(wallExit.pixelCenter)))
         .distinct
       
-      val destination = ByOption.minBy(walkableTiles)(_.pixelCenter.pixelDistance(unit.pixelCenter))
+      val destination = ByOption.minBy(walkableTiles)(_.pixelCenter.pixelDistance(unit.pixel))
       unit.agent.toTravel = destination.map(_.pixelCenter).orElse(unit.agent.toTravel)
       With.commander.move(unit)
   

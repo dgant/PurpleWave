@@ -68,7 +68,7 @@ abstract class FriendlyUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends UnitInf
   // Geometry //
   //////////////
 
-  def pixelCenter : Pixel = cachePixel()
+  def pixel : Pixel = cachePixel()
   def tileTopLeft : Tile  = cacheTile()
 
   ////////////

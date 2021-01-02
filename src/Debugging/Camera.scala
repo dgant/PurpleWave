@@ -72,7 +72,7 @@ class Camera {
     
     tween()
   
-    visibleArea   = TileRectangle(With.viewport.start.tileIncluding, With.viewport.start.asPixel.add(Pixel(640, 400)).tileIncluding)
+    visibleArea   = TileRectangle(With.viewport.start.tile, With.viewport.start.asPixel.add(Pixel(640, 400)).tile)
     visibleUnits  = With.units.inTileRectangle(visibleArea).filter(_.visible).toSet
   }
   
@@ -91,8 +91,8 @@ class Camera {
   
   def tween() {
     if (focusUnit != null && focusUnit.alive) {
-      focus = focusUnit.pixelCenter
-      focusUnit.battle.map(_.focus).foreach(battleFocus => focus = battleFocus.project(focusUnit.pixelCenter, Math.max(0, focusUnit.pixelDistanceCenter(battleFocus) - 220)))
+      focus = focusUnit.pixel
+      focusUnit.battle.map(_.focus).foreach(battleFocus => focus = battleFocus.project(focusUnit.pixel, Math.max(0, focusUnit.pixelDistanceCenter(battleFocus) - 220)))
       val tweenFraction = Math.max(0.0, Math.min(1.0, (With.framesSince(focusFrame) + 1).toDouble / tweenFrames))
       val tweenPoint    = tweenFrom.project(focus, tweenFrom.pixelDistance(focus) * tweenFraction)
       With.viewport.centerOn(tweenPoint)

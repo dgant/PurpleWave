@@ -19,7 +19,7 @@ object ShuttlePark extends Action {
         val curb = passenger.projectFrames(eta)
         shuttle.agent.toTravel =
           ByOption.minBy(shuttle.matchups.threats)(_.framesBeforeAttacking(shuttle))
-            .map(threat => curb.radiateRadians(threat.pixelCenter.radiansTo(curb), Shuttling.pickupRadius / 2))
+            .map(threat => curb.radiateRadians(threat.pixel.radiansTo(curb), Shuttling.pickupRadius / 2))
             .orElse(Some(curb))
 
       if (shuttle.pixelDistanceCenter(shuttle.agent.destination) > 32.0 * 12.0 && shuttle.matchups.framesOfSafety < shuttle.unitClass.framesToTurn180) {

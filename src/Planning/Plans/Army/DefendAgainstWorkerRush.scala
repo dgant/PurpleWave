@@ -23,7 +23,7 @@ class DefendAgainstWorkerRush extends Plan {
           && u.framesToGetInRange(ally) < 24 * 3)))
       .distinct
   
-    lazy val attackingCentroid = PurpleMath.centroid(attackingWorkers.map(_.pixelCenter))
+    lazy val attackingCentroid = PurpleMath.centroid(attackingWorkers.map(_.pixel))
     lazy val ourWorkers = With.units.countOurs(UnitMatchWorkers)
     lazy val ourCombatUnits = With.units.countOurs(UnitMatchWarriors)
     

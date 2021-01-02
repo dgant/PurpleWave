@@ -59,7 +59,7 @@ class Commander {
   def attack(unit: FriendlyUnitInfo): Unit = unit.agent.toAttack.foreach(attack(unit, _))
   private def attack(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
     leadFollower(unit, attack(_, target))
-    unit.agent.directRide(target.pixelCenter)
+    unit.agent.directRide(target.pixel)
     unit.agent.tryingToMove = unit.pixelsToGetInRange(target) > tryingToMoveThreshold
     if (unit.unready) return
 
@@ -105,8 +105,8 @@ class Commander {
     // as far as I can tell, no penalty for bad early guesses on attacking
     if (unit.is(Protoss.PhotonCannon)) return
 
-    if (unit.is(Zerg.Lurker) && ! unit.burrowed) { move(unit, target.pixelCenter); return }
-    if (target.is(Protoss.Interceptor)) { attackMove(unit, target.pixelCenter); return }
+    if (unit.is(Zerg.Lurker) && ! unit.burrowed) { move(unit, target.pixel); return }
+    if (target.is(Protoss.Interceptor)) { attackMove(unit, target.pixel); return }
     
     if (target.visible) {
       lazy val moving           = unit.moving
@@ -133,7 +133,7 @@ class Commander {
       }
       sleepAttack(unit)
     } else {
-      move(unit, target.pixelCenter)
+      move(unit, target.pixel)
     }
   }
 
@@ -146,12 +146,12 @@ class Commander {
     // Send some units past their destination to maximize acceleration
     if (unit.isAny(Terran.Dropship, Terran.ScienceVessel, Protoss.Shuttle, Protoss.Observer, Protoss.HighTemplar, Zerg.Mutalisk, Zerg.Overlord, Zerg.Queen)) {
       val overshootDistance = if (unit.flying) 288.0 else 8
-      if (to == unit.pixelCenter) {
+      if (to == unit.pixel) {
         val signX = PurpleMath.forcedSignum(SpecificPoints.middle.x - to.x)
         val signY = PurpleMath.forcedSignum(SpecificPoints.middle.y - to.y)
         to = to.add((signX * overshootDistance).toInt, (signY * overshootDistance).toInt)
       } else if (unit.pixelDistanceSquared(to) < overshootDistance * overshootDistance) {
-        to = unit.pixelCenter.project(to, overshootDistance)
+        to = unit.pixel.project(to, overshootDistance)
       }
     }
 
@@ -250,7 +250,7 @@ class Commander {
         unit.agent.ride.isDefined
           && unit.framesToTravelTo(destination) >
           4 * unit.unitClass.groundDamageCooldown
-            + unit.agent.ride.get.framesToTravelTo(unit.pixelCenter)
+            + unit.agent.ride.get.framesToTravelTo(unit.pixel)
             + unit.agent.ride.get.framesToTravelPixels(unit.pixelDistanceCenter(destination))) {
         rightClick(unit, unit.agent.ride.get)
       }
@@ -261,7 +261,7 @@ class Commander {
         With.coordinator.pushes.put(new UnitLinearGroundPush(
           unit.agent.priority,
           unit,
-          unit.pixelCenter.project(destination, Math.min(unit.pixelDistanceCenter(destination), 80))))
+          unit.pixel.project(destination, Math.min(unit.pixelDistanceCenter(destination), 80))))
       }
     }
 
@@ -270,7 +270,7 @@ class Commander {
   
   def rightClick(unit: FriendlyUnitInfo, target: UnitInfo) {
     leadFollower(unit, rightClick(_, target))
-    unit.agent.directRide(target.pixelCenter)
+    unit.agent.directRide(target.pixel)
     if (unit.unready) return
     if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
     unit.baseUnit.rightClick(target.baseUnit)
@@ -290,7 +290,7 @@ class Commander {
   
   def useTechOnUnit(unit: FriendlyUnitInfo, tech: Tech, target: UnitInfo) {
     if (unit.unready) return
-    unit.agent.directRide(target.pixelCenter)
+    unit.agent.directRide(target.pixel)
     autoUnburrow(unit)
     unit.baseUnit.useTech(tech.baseType, target.baseUnit)
     if (tech == Protoss.ArchonMeld || tech == Protoss.DarkArchonMeld) {
@@ -349,7 +349,7 @@ class Commander {
         sleep(unit)
       }
       else {
-        move(unit, resource.pixelCenter)
+        move(unit, resource.pixel)
       }
     }
     else {

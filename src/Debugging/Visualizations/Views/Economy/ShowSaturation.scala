@@ -26,11 +26,11 @@ object ShowSaturation extends View {
       .flatMap(base => base.resources)
       .foreach(resource => {
         if (resourcesSaturated.contains(resource)) {
-          DrawMap.circle(resource.pixelCenter, 16, Colors.DarkRed, solid = true)
+          DrawMap.circle(resource.pixel, 16, Colors.DarkRed, solid = true)
         } else {
-          DrawMap.circle(resource.pixelCenter, 16, Color.Black, solid = true)
+          DrawMap.circle(resource.pixel, 16, Color.Black, solid = true)
         }
-        DrawMap.label(gathererCounts.getOrElse(resource, 0).toString, resource.pixelCenter)
+        DrawMap.label(gathererCounts.getOrElse(resource, 0).toString, resource.pixel)
       })
   }
 }

@@ -25,7 +25,7 @@ class Zone(
   lazy val  bases             : Vector[Base]        = With.geography.bases.filter(_.townHallTile.zone == this)
   lazy val  border            : Set[Tile]           = tiles.filter(_.adjacent8.exists( ! tiles.contains(_))).toSet
   lazy val  perimeter         : Set[Tile]           = tiles.filter(tile => tile.tileDistanceFromEdge <= 1 || ! tile.adjacent8.forall(With.grids.walkableTerrain.get)).toSet
-  lazy val  centroid          : Tile                = (if (tiles.isEmpty) new Pixel(bwtaRegion.getCenter).tileIncluding else tiles.minBy(_.tileDistanceSquared(new Pixel(bwtaRegion.getCenter).tileIncluding))).pixelCenter.nearestWalkableTile
+  lazy val  centroid          : Tile                = (if (tiles.isEmpty) new Pixel(bwtaRegion.getCenter).tile else tiles.minBy(_.tileDistanceSquared(new Pixel(bwtaRegion.getCenter).tile))).pixelCenter.nearestWalkableTile
   lazy val  area              : Double              = tiles.size // Previously taken from BWTA region area
   lazy val  island            : Boolean             = With.geography.startBases.count(st => With.paths.groundPathExists(st.heart, centroid)) < 2
   lazy val  tilesBuildable    : Vector[Tile]         = { With.grids.buildableTerrain.initialize(); tiles.view.filter(With.grids.buildableTerrain.get).toVector }
@@ -49,7 +49,7 @@ class Zone(
   }
   
   def contains(tile: Tile)    : Boolean = boundary.contains(tile) && tiles.contains(tile)
-  def contains(pixel: Pixel)  : Boolean = contains(pixel.tileIncluding)
+  def contains(pixel: Pixel)  : Boolean = contains(pixel.tile)
   
   def pathTo          (to: Zone): Option[ZonePath]  = With.paths.zonePath(this, to)
   def canWalkTo       (to: Zone): Boolean           = pathTo(to).isDefined

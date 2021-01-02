@@ -9,7 +9,7 @@ object DropOff extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.isTransport                                  &&
     unit.loadedUnits.nonEmpty                         &&
-    With.grids.walkable.get(unit.tileIncludingCenter)
+    With.grids.walkable.get(unit.tile)
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {

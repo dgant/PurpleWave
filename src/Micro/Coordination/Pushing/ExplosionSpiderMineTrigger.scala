@@ -10,7 +10,7 @@ object SpiderMineActivation {
   val radius = 128
 }
 
-class ExplosionSpiderMineTrigger(mine: UnitInfo) extends CircularPush(TrafficPriorities.Dodge, mine.pixelCenter, SpiderMineActivation.radius) {
+class ExplosionSpiderMineTrigger(mine: UnitInfo) extends CircularPush(TrafficPriorities.Dodge, mine.pixel, SpiderMineActivation.radius) {
   override def force(recipient: FriendlyUnitInfo): Option[Force] = {
     if (recipient.flying) {
       None

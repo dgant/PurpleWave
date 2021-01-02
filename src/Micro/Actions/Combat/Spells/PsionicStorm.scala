@@ -17,7 +17,7 @@ object PsionicStorm extends TargetedSpell {
   override protected def lookaheadPixels  : Int       = 24
 
   override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
-    if (With.grids.psionicStorm.isSet(target.tileIncludingCenter)) return 0.0
+    if (With.grids.psionicStorm.isSet(target.tile)) return 0.0
     if (target.unitClass.isSpell)       return 0.0
     if (target.unitClass.isBuilding)    return 0.0
     if (target.underStorm)              return 0.0
@@ -37,7 +37,7 @@ object PsionicStorm extends TargetedSpell {
       && templar < 3
       && target.is(Terran.SiegeTankSieged)
       && caster.pixelDistanceCenter(target) > 32 * castRangeTiles
-      && (caster.visibleToOpponents || target.tileIncludingCenter.altitude >= caster.tileIncludingCenter.altitude)
+      && (caster.visibleToOpponents || target.tile.altitude >= caster.tile.altitude)
       && target.matchups.targetsInRange.isEmpty) {
       return 0.0
     }

@@ -55,7 +55,7 @@ object FightOrFlight extends Action {
         ally.is(Protoss.ShieldBattery)
         && ally.complete
         && ally.energy > 20
-        && ally.pixelDistanceEdge(unit, otherAt = ByOption.minBy(unit.matchups.targets.view.map(unit.pixelToFireAt))(unit.pixelDistanceCenter).getOrElse(unit.pixelCenter)) < 72))
+        && ally.pixelDistanceEdge(unit, otherAt = ByOption.minBy(unit.matchups.targets.view.map(unit.pixelToFireAt))(unit.pixelDistanceCenter).getOrElse(unit.pixel)) < 72))
 
     decide(true, "Anchors", () => unit.matchups.allies.view
       .map(_.friendly)

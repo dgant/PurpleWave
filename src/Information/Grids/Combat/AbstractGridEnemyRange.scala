@@ -21,7 +21,7 @@ abstract class AbstractGridEnemyRange extends AbstractGridVersionedValue[Int] {
   override def onUpdate(): Unit = {
     With.units.enemy.foreach(unit =>
       if (unit.likelyStillThere && (unit.canAttack || unit.unitClass.spells.nonEmpty) && unit.battle.nonEmpty) {
-        val tileUnit = unit.projectFrames(framesAhead).tileIncluding
+        val tileUnit = unit.projectFrames(framesAhead).tile
         val rangeMax = addedRange + pixelRangeMax(unit).toInt / 32
         (1 to rangeMax).foreach(d =>
           Ring.points(d).foreach(point => {

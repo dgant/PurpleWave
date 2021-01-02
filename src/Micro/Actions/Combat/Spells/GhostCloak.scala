@@ -13,7 +13,7 @@ object GhostCloak extends Action {
     ! unit.cloaked                                                          &&
     unit.energy >= Terran.GhostCloak.energyCost + 30                        &&
     unit.matchups.framesOfSafety < 12 + With.reaction.agencyAverage &&
-    ! With.grids.enemyDetection.isDetected(unit.tileIncludingCenter)
+    ! With.grids.enemyDetection.isDetected(unit.tile)
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {

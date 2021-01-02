@@ -32,12 +32,12 @@ object ShowUnitsFriendly extends View {
     val targetUnit = unit.presumptiveTarget
     val targetPosition = unit.presumptiveDestination
     if (targetUnit.exists(_.unitClass.isResource)) {
-      targetUnit.map(_.pixelCenter).foreach(DrawMap.line(unit.pixelCenter, _, Colors.MediumTeal))
+      targetUnit.map(_.pixel).foreach(DrawMap.line(unit.pixel, _, Colors.MediumTeal))
     } else if (targetUnit.isDefined) {
-      targetUnit.map(_.pixelCenter).foreach(DrawMap.line(unit.pixelCenter, _, Colors.MediumYellow))
+      targetUnit.map(_.pixel).foreach(DrawMap.line(unit.pixel, _, Colors.MediumYellow))
     }
-    if (targetPosition != unit.pixelCenter && unit.orderTarget.isEmpty) {
-      DrawMap.line(unit.pixelCenter, targetPosition, Colors.MediumGray)
+    if (targetPosition != unit.pixel && unit.orderTarget.isEmpty) {
+      DrawMap.line(unit.pixel, targetPosition, Colors.MediumGray)
       renderUnitBoxAt(unit, targetPosition, Colors.MediumGray)
       unit.friendly.map(_.agent).foreach(agent => {
         agent.toReturn.foreach(toReturn => {
@@ -62,13 +62,13 @@ object ShowUnitsFriendly extends View {
     val agent = unit.agent
     if (selectedOnly && ! unit.selected) return
     if ( ! unit.aliveAndComplete && ! unit.unitClass.isBuilding) return
-    if ( ! With.viewport.contains(unit.pixelCenter)) return
+    if ( ! With.viewport.contains(unit.pixel)) return
     if ( ! unit.unitClass.orderable) return
     if (unit.transport.isDefined) return
     
     var labelY = -28
     def drawNextLabel(value: String): Unit = {
-      DrawMap.label(value, unit.pixelCenter.add(0, labelY), drawBackground = false)
+      DrawMap.label(value, unit.pixel.add(0, labelY), drawBackground = false)
       labelY += 7
     }
 
@@ -78,7 +78,7 @@ object ShowUnitsFriendly extends View {
 
     if (showLeaders) {
       if (agent.leader().contains(unit)) {
-        val start = unit.pixelCenter.add(0, unit.unitClass.dimensionDown + 8)
+        val start = unit.pixel.add(0, unit.unitClass.dimensionDown + 8)
         DrawMap.circle(start, 5, color = unit.player.colorMidnight, solid = true)
         DrawMap.drawStar(start, 4, Colors.NeonYellow)
       }
@@ -86,7 +86,7 @@ object ShowUnitsFriendly extends View {
 
     if (showDesire && unit.battle.isDefined && (unit.canMove || unit.canAttack)) {
       val color = if (agent.shouldEngage) Colors.NeonGreen else Colors.NeonRed
-      val pixel = unit.pixelCenter.subtract(0, 6 + unit.unitClass.height / 2)
+      val pixel = unit.pixel.subtract(0, 6 + unit.unitClass.height / 2)
       DrawMap.box(pixel.subtract(3, 3), pixel.add(3, 3), Color.Black, solid = true)
       DrawMap.box(pixel.subtract(2, 2), pixel.add(2, 2), color,       solid = true)
     }
@@ -95,14 +95,14 @@ object ShowUnitsFriendly extends View {
       if (unit.unitClass.spells.exists(spell => spell.energyCost > 0 && With.self.hasTech(spell) && unit.energy >= spell.energyCost)) {
         val degrees = System.currentTimeMillis() % 360
         val radians = degrees * Math.PI / 360
-        DrawMap.circle(unit.pixelCenter.radiateRadians(radians, 10), 2, Colors.NeonYellow, solid = true)
-        DrawMap.circle(unit.pixelCenter.radiateRadians(radians, -10), 2, Colors.NeonYellow, solid = true)
+        DrawMap.circle(unit.pixel.radiateRadians(radians, 10), 2, Colors.NeonYellow, solid = true)
+        DrawMap.circle(unit.pixel.radiateRadians(radians, -10), 2, Colors.NeonYellow, solid = true)
       }
     }
 
     if (showPaths && (unit.selected || unit.transport.exists(_.selected) || With.units.selected().isEmpty)) {
       def drawTilePath(path: TilePath): Unit = {
-        val offset = unit.pixelCenter.offsetFromTileCenter
+        val offset = unit.pixel.offsetFromTileCenter
         for (i <- 0 until path.tiles.get.size - 1) {
           DrawMap.arrow(
             path.tiles.get(i).pixelCenter.add(offset),
@@ -118,16 +118,16 @@ object ShowUnitsFriendly extends View {
       val forceRadiusMin = 4
       val maxForce = ByOption.max(agent.forces.values.view.map(_.lengthSlow)).getOrElse(0.0)
       if (maxForce > 0.0) {
-        DrawMap.circle(unit.pixelCenter, forceRadiusMin, Color.White)
+        DrawMap.circle(unit.pixel, forceRadiusMin, Color.White)
         (agent.forces.view ++ Seq((Forces.sum, agent.forces.sum)))
           .filter(_._2.lengthSquared > 0)
           .foreach(pair => {
             val force           = pair._2
             val forceNormalized = force.normalize(Math.max(24, forceLengthMax * force.lengthSlow / maxForce))
-            val to = unit.pixelCenter.add(
+            val to = unit.pixel.add(
               forceNormalized.x.toInt,
               forceNormalized.y.toInt)
-            DrawMap.arrow(unit.pixelCenter.project(to, 8), to, pair._1.color)
+            DrawMap.arrow(unit.pixel.project(to, 8), to, pair._1.color)
           })
         }
     }
@@ -139,10 +139,10 @@ object ShowUnitsFriendly extends View {
     if (showOrder)        drawNextLabel(unit.order.toString)
 
     if (showDistance) {
-      DrawMap.arrow(unit.pixelCenter, agent.destination, Color.Black)
+      DrawMap.arrow(unit.pixel, agent.destination, Color.Black)
       DrawMap.label(
         unit.pixelDistanceTravelling(unit.agent.destination).toInt.toString,
-        agent.unit.pixelCenter.add(0, 21),
+        agent.unit.pixel.add(0, 21),
         drawBackground = true,
         Color.Black)
     }

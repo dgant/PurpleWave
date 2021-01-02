@@ -43,8 +43,8 @@ class DefendAgainstProxy extends Plan {
     proxies.foreach(proxy => {
       val isAnnoying          = proxy.unitClass.isGas || proxy.base.exists(_.resourcePathTiles.exists(proxy.tileArea.contains))
       val isEmergency         = proxy.isAny(Terran.Barracks, Terran.Bunker, Protoss.PhotonCannon, Protoss.Gateway)
-      val isCloseEnoughToPull = Seq(With.geography.ourMain, With.geography.ourNatural).exists(_.townHallArea.midpoint.groundPixels(proxy.tileIncludingCenter) < 32 * 21)
-      val mustPull            = proxy.dpfGround > 0 && With.geography.ourBases.exists(_.resourcePathTiles.exists(_.pixelCenter.pixelDistance(proxy.pixelCenter) < proxy.effectiveRangePixels + 32))
+      val isCloseEnoughToPull = Seq(With.geography.ourMain, With.geography.ourNatural).exists(_.townHallArea.midpoint.groundPixels(proxy.tile) < 32 * 21)
+      val mustPull            = proxy.dpfGround > 0 && With.geography.ourBases.exists(_.resourcePathTiles.exists(_.pixelCenter.pixelDistance(proxy.pixel) < proxy.effectiveRangePixels + 32))
       val framesBeforeDamage  = ByOption
         .min(With.units.enemy.filter(u =>
           u.dpfGround > 0
@@ -63,7 +63,7 @@ class DefendAgainstProxy extends Plan {
             && (
               defender.pixelDistanceEdge(proxy) < 64
               || defender.framesToGetInRange(proxy) < framesBeforeDamage)))
-        .sortBy(_.pixelDistanceTravelling(proxy.pixelCenter))
+        .sortBy(_.pixelDistanceTravelling(proxy.pixel))
         .sortBy(-_.dpfOnNextHitAgainst(proxy))
       val defendersRequested = defendersViable.take(defendersRequired)
       defendersRequested.foreach(defender => {

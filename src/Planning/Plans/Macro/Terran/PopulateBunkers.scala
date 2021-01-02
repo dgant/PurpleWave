@@ -28,7 +28,7 @@ class PopulateBunkers extends Plan {
     val output = new LockUnits
     output.unitMatcher.set(Terran.Marine)
     output.unitCounter.set(new UnitCountBetween(1, 4))
-    output.unitPreference.set(UnitPreferClose(bunker.pixelCenter))
+    output.unitPreference.set(UnitPreferClose(bunker.pixel))
     output
   }
   
@@ -37,7 +37,7 @@ class PopulateBunkers extends Plan {
     lock.acquire(this)
     lock.units.foreach(unit => {
       val intent = new Intention
-      intent.toTravel = Some(bunker.pixelCenter)
+      intent.toTravel = Some(bunker.pixel)
       intent.toBoard = Some(bunker)
       unit.agent.intend(this, intent)
     })

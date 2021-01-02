@@ -26,8 +26,8 @@ object Clustering {
         groupsByLeader(thing) ++= neighborsByUnit(thing).filter(neighbor =>
           ! limitRegion ||
           (
-            extractPixel(thing).tileIncluding.altitude ==
-            extractPixel(neighbor).tileIncluding.altitude &&
+            extractPixel(thing).tile.altitude ==
+            extractPixel(neighbor).tile.altitude &&
             extractPixel(thing).zone ==
             extractPixel(neighbor).zone
           ))

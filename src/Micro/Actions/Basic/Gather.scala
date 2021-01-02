@@ -35,7 +35,7 @@ object Gather extends Action {
 
         def threatenedAt(atResource: UnitInfo): Boolean = unit.matchups.threats.exists(threat =>
           ! threat.isAny(UnitMatchWorkers, Terran.Wraith, Protoss.Arbiter, Protoss.Scout, Zerg.Mutalisk)
-            && threat.pixelsToGetInRange(unit, atResource.pixelCenter) < defenseRadiusPixels)
+            && threat.pixelsToGetInRange(unit, atResource.pixel) < defenseRadiusPixels)
 
         if (basePaired.exists(_.owner.isUs) && threatenedAt(resource)) {
           val alternativeMineral = ByOption.minBy(basePaired.get.minerals.filter(_.alive))(_.pixelDistanceEdge(unit)).orElse(unit.agent.toGather)
@@ -48,7 +48,7 @@ object Gather extends Action {
         && unit.matchups.enemies.exists(enemy =>
           ! enemy.isAny(UnitMatchWorkers, Terran.Wraith, Protoss.Arbiter, Protoss.Scout)
           && enemy.pixelDistanceEdge(unit) < enemy.pixelRangeAgainst(unit) + 32)
-          && ! unit.tileIncludingCenter.enemyDetected) {
+          && ! unit.tile.enemyDetected) {
         With.commander.burrow(unit)
       }
 
@@ -95,11 +95,11 @@ object Gather extends Action {
       lazy val mainAndNatural   = Vector(With.geography.ourMain, With.geography.ourNatural).map(_.zone)
       lazy val transferring     = ! unit.base.exists(_.owner.isUs) && zoneNow != zoneTo && ! (mainAndNatural.contains(zoneNow) && mainAndNatural.contains(zoneTo))
       lazy val threatened       = unit.battle.isDefined && unit.matchups.framesOfSafety < combatWindow && unit.matchups.threats.exists(!_.unitClass.isWorker)
-      lazy val threatCloser     = unit.matchups.threats.exists(_.pixelDistanceCenter(resource.pixelCenter) < unit.pixelDistanceCenter(resource.pixelCenter))
+      lazy val threatCloser     = unit.matchups.threats.exists(_.pixelDistanceCenter(resource.pixel) < unit.pixelDistanceCenter(resource.pixel))
       if (transferring
         && threatened
         && threatCloser
-        && (unit.visibleToOpponents || ! unit.agent.withinSafetyMargin || unit.zone.edges.exists(_.contains(unit.pixelCenter)))) {
+        && (unit.visibleToOpponents || ! unit.agent.withinSafetyMargin || unit.zone.edges.exists(_.contains(unit.pixel)))) {
         Retreat.consider(unit)
       }
     }

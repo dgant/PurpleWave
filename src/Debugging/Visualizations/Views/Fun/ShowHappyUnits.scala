@@ -145,10 +145,10 @@ object ShowHappyUnits extends View {
       color)
     
     if (unit.carryingMinerals) {
-      DrawMap.circle(unit.pixelCenter.add(-10, 0), 4, Colors.NeonTeal, true)
+      DrawMap.circle(unit.pixel.add(-10, 0), 4, Colors.NeonTeal, true)
     }
     if (unit.carryingGas) {
-      DrawMap.circle(unit.pixelCenter.add(-10, 0), 4, Colors.NeonGreen, true)
+      DrawMap.circle(unit.pixel.add(-10, 0), 4, Colors.NeonGreen, true)
     }
   }
   

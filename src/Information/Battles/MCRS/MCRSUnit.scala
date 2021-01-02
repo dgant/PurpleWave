@@ -11,7 +11,7 @@ class MCRSUnit(val unit: UnitInfo) {
     unit.friendly.flatMap(_.agent.toAttack)
     .orElse(unit.orderTarget.filter(_.isEnemyOf(unit)))
     .orElse(ByOption.minBy(unit.matchups.targets)(t => t.pixelDistanceEdge(unit) + (if (t.canAttack || t.unitClass.spells.nonEmpty) 32 * 15 else 0))))
-  val engagePosition = new Cache(() => target().map(unit.pixelToFireAt).getOrElse(unit.pixelCenter))
+  val engagePosition = new Cache(() => target().map(unit.pixelToFireAt).getOrElse(unit.pixel))
   val sim = new Cache(() => MCRSim.getSimValue(unit))
 
   def percentHealth: Double = MCRSMath.percentHealth(unit)

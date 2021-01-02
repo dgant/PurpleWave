@@ -11,12 +11,12 @@ object PixelRay {
   @inline final def apply(from: Pixel, to: Pixel): Iterable[Tile] = {
     if (to.x == from.x) {
       val direction = PurpleMath.signum(to.y - from.y)
-      if (direction == 0) return Array(to.tileIncluding)
+      if (direction == 0) return Array(to.tile)
       return (from.y / 32 to to.y / 32 by direction).view.map(tileY => Tile(to.x/32, tileY))
     }
     if (to.y == from.y) {
       val direction = PurpleMath.signum(to.x - from.x)
-      if (direction == 0) return Array(to.tileIncluding)
+      if (direction == 0) return Array(to.tile)
       return (from.x / 32 to to.x / 32 by direction).view.map(tileX => Tile(tileX, to.y/32))
     }
     
@@ -27,7 +27,7 @@ object PixelRay {
     var y           = from.y
     val velocityX   = to.x - from.x.toDouble
     val velocityY   = to.y - from.y.toDouble
-    val tileCount   = 1 + from.tileIncluding.tileDistanceManhattan(to.tileIncluding)
+    val tileCount   = 1 + from.tile.tileDistanceManhattan(to.tile)
     val output      = new Array[Tile](tileCount)
     var tileIndex   = 0
     while (tileIndex < tileCount) {

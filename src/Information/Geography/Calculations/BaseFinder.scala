@@ -27,7 +27,7 @@ object BaseFinder {
     
     // Get every resource that isn't a mineral block and isn't tied to a start location
     val baseResources = allResources.filterNot(_.isBlocker)
-    val expoResources = baseResources.filterNot(r => startPixels.exists(_.pixelDistance(r.pixelCenter) <= baseRadiusPixels))
+    val expoResources = baseResources.filterNot(r => startPixels.exists(_.pixelDistance(r.pixel) <= baseRadiusPixels))
     
     // Cluster the expansion resources
     val clusters = clusterResourcePatches(expoResources)
@@ -58,7 +58,7 @@ object BaseFinder {
       resources,
       baseRadiusPixels,
       limitRegion = shouldLimitRegion,
-      (unit) => unit.pixelCenter).values
+      (unit) => unit.pixel).values
   }
   
   private def measureExclusions(expansionResources: Iterable[ForeignUnitInfo]): Set[Tile] = {
@@ -70,7 +70,7 @@ object BaseFinder {
     exclusions  : Set[Tile])
       : Option[Tile] = {
   
-    val centroid      = PurpleMath.centroid(resources.map(_.pixelCenter)).tileIncluding
+    val centroid      = PurpleMath.centroid(resources.map(_.pixel)).tile
     val altitude      = With.game.getGroundHeight(centroid.bwapi)
     val searchRadius  = 10
     val candidates =

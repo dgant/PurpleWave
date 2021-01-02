@@ -75,7 +75,7 @@ object JudgmentModifiers {
     val choked = battleLocal.enemy.units.exists(unit =>
       ! unit.flying
       && unit.zone.edges.exists(edge =>
-        edge.contains(unit.pixelCenter)
+        edge.contains(unit.pixel)
         && edge.radiusPixels < battleLocal.enemy.widthIdeal() / 4d))
     if (choked) Some(JudgmentModifier(speedMultiplier = 1.2)) else None
   }

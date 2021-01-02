@@ -71,7 +71,7 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
       With.units.ours.find(u =>
         ! u.complete
         && u.alive
-        && u.pixelCenter == pixelCenter
+        && u.pixel == pixel
         && is(u.unitClass.whatBuilds._1))
     else None)
   

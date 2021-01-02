@@ -191,7 +191,7 @@ class Gathering {
       val stick                       = resourceBefore.contains(resource) && ! worker.carrying && resourceBeforeEdgePixels.forall(_ < 64)
       val baseFrom                    = worker.base.orElse(resourceBefore.flatMap(_.base))
       val baseTo                      = resource.base
-      val workerToResourceCost        = baseFrom.flatMap(baseA => baseTo.map(baseB => baseCosts(baseA, baseB)())).getOrElse(worker.pixelDistanceTravelling(resource.pixelCenter))
+      val workerToResourceCost        = baseFrom.flatMap(baseA => baseTo.map(baseB => baseCosts(baseA, baseB)())).getOrElse(worker.pixelDistanceTravelling(resource.pixel))
       val workerToResourceHysteresis  = if (stick) 0 else 32
       val framesToResource            = worker.framesToTravelPixels(workerToResourceCost + workerToResourceHysteresis)
       val framesSpentGathering        = Math.max(24, kLookaheadFrames - framesToResource)
@@ -220,7 +220,7 @@ class Gathering {
               .min(
                 workersByResource
                   .filter(pair => pair._1.unitClass.isGas && pair._2.size < 3)
-                  .map(resource => worker.pixelDistanceTravelling(resource._1.pixelCenter))) // TODO: Used edge distance?
+                  .map(resource => worker.pixelDistanceTravelling(resource._1.pixel))) // TODO: Used edge distance?
             ))
           .toMap
       } else Map.empty

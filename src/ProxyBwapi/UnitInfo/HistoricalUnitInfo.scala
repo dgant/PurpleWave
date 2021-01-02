@@ -30,7 +30,7 @@ class HistoricalUnitInfo(unit: UnitInfo) extends UnitInfo(unit.baseUnit, unit.id
   override val airCooldownLeft: Int = unit.airCooldownLeft
   override val groundCooldownLeft: Int = unit.groundCooldownLeft
   override val spellCooldownLeft: Int = unit.spellCooldownLeft
-  override val pixelCenter: Pixel = unit.pixelCenter
+  override val pixel: Pixel = unit.pixel
   override val tileTopLeft: Tile = unit.tileTopLeft
   override val gatheringMinerals: Boolean = unit.gatheringMinerals
   override val gatheringGas: Boolean = unit.gatheringGas

@@ -40,7 +40,7 @@ object Bust extends Action {
     && unit.canMove
     && unit.is(Protoss.Dragoon)
     && With.self.hasUpgrade(Protoss.DragoonRange)
-    && unit.matchups.threats.forall(threat => safeFromThreat(unit, threat, unit.pixelCenter))
+    && unit.matchups.threats.forall(threat => safeFromThreat(unit, threat, unit.pixel))
     && unit.matchups.targets.exists(bunker =>
       (bunker.visible || bunker.altitude <= unit.altitude)
       && bunker.aliveAndComplete
@@ -50,7 +50,7 @@ object Bust extends Action {
         safeFromThreat(
           unit,
           threat,
-          unit.pixelCenter.project(bunker.pixelCenter, unit.pixelDistanceEdge(bunker) - unit.pixelRangeAgainst(bunker))))))
+          unit.pixel.project(bunker.pixel, unit.pixelDistanceEdge(bunker) - unit.pixelRangeAgainst(bunker))))))
   
   override protected def perform(unit: FriendlyUnitInfo) {
     // Goal: Take down the bunker. Don't take any damage from it.
@@ -60,7 +60,7 @@ object Bust extends Action {
     lazy val goons = unit.matchups.allies.filter(u => u.friendly.exists(Bust.allowed) && bunkers.exists(b => u.framesToGetInRange(b) < 24))
 
     if (unit.readyForAttackOrder && repairers.nonEmpty && goons.length >= repairers.map(_.hitPoints).min / 10) {
-      unit.agent.toAttack = Some(repairers.sortBy(_.pixelDistanceCenter(PurpleMath.centroid(goons.map(_.pixelCenter)))).minBy(_.hitPoints))
+      unit.agent.toAttack = Some(repairers.sortBy(_.pixelDistanceCenter(PurpleMath.centroid(goons.map(_.pixel)))).minBy(_.hitPoints))
       With.commander.attack(unit)
     }
 
@@ -74,12 +74,12 @@ object Bust extends Action {
       val range = unit.pixelRangeAgainst(bunker)
       val bunkerDistance = unit.pixelDistanceEdge(bunker)
       def stationAcceptable(pixel: Pixel) = pixel.walkable && ! unit.matchups.allies.exists(a => ! a.flying && a.pixelDistanceEdge(unit, pixel) < 4)
-      var station = Some(unit.pixelCenter.project(bunker.pixelCenter, Math.max(Random.nextInt(9), bunkerDistance - range))).filter(stationAcceptable)
+      var station = Some(unit.pixel.project(bunker.pixel, Math.max(Random.nextInt(9), bunkerDistance - range))).filter(stationAcceptable)
       if (station.isEmpty && bunkerDistance > range + 32) {
         val stationCount = 64
         val stations = (0 until stationCount)
           .map(_ * 2 * Math.PI / stationCount)
-          .map(bunker.pixelCenter.radiateRadians(_ , range + unit.unitClass.dimensionMax + bunker.unitClass.dimensionMax))
+          .map(bunker.pixel.radiateRadians(_ , range + unit.unitClass.dimensionMax + bunker.unitClass.dimensionMax))
           .filter(stationAcceptable)
         station = ByOption.minBy(stations)(unit.pixelDistanceCenter)
       }

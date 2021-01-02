@@ -31,21 +31,21 @@ object ShowUnitsEnemy extends View {
     if (showFogged) {
       if ( ! unit.visible || unit.effectivelyCloaked) {
         val radius = unit.unitClass.dimensionMin / 2
-        DrawMap.circle(unit.pixelCenter, radius, color)
-        if (unit.pixelCenter != unit.pixelCenterObserved) {
+        DrawMap.circle(unit.pixel, radius, color)
+        if (unit.pixel != unit.pixelCenterObserved) {
           DrawMap.circle(unit.pixelCenterObserved, radius, color)
           DrawMap.line(
-            unit.pixelCenter.project(unit.pixelCenterObserved, radius),
-            unit.pixelCenterObserved.project(unit.pixelCenter, radius),
+            unit.pixel.project(unit.pixelCenterObserved, radius),
+            unit.pixelCenterObserved.project(unit.pixel, radius),
             color)
         }
-        DrawMap.label(unit.unitClass.toString, unit.pixelCenter, drawBackground = true, color)
+        DrawMap.label(unit.unitClass.toString, unit.pixel, drawBackground = true, color)
       }
     }
     if (showSiegeRadius) {
       if (unit.is(Terran.SiegeTankSieged)) {
         With.game.drawCircleMap(
-          unit.pixelCenter.bwapi,
+          unit.pixel.bwapi,
           (unit.pixelRangeGround + unit.unitClass.radialHypotenuse).toInt,
           Colors.DarkOrange)
       }

@@ -44,7 +44,7 @@ object BeReaver extends Action {
     val destinationGround = destinationAir.pixelCenter.nearestWalkableTile
 
     // If we can drop out and attack now, do so
-    val here = unit.tileIncludingCenter
+    val here = unit.tile
     var shouldDrop = false
     shouldDrop = shouldDrop || here.groundPixels(destinationGround) < 32
     shouldDrop = shouldDrop || unit.inRangeToAttack(target) && With.grids.enemyRangeGround.get(here) == 0 && ! unit.matchups.threats.exists(t => t.isSiegeTankSieged() && t.inRangeToAttack(unit, here.pixelCenter))
@@ -63,7 +63,7 @@ object BeReaver extends Action {
       Some(With.grids.enemyRangeGround.addedRange - 1),
       None).foreach(maximumThreat =>
       if ( ! path.pathExists) {
-        val profile = new PathfindProfile(unit.tileIncludingCenter)
+        val profile = new PathfindProfile(unit.tile)
         profile.end                 = Some(destinationGround)
         profile.endDistanceMaximum  = endDistanceMaximum // Uses the distance implied by allowGroundDist
         profile.lengthMaximum       = Some(30)
@@ -92,10 +92,10 @@ object BeReaver extends Action {
 
   def findFiringPosition(reaver: FriendlyUnitInfo, target: UnitInfo): Tile = {
     val firingDistance  = (reaver.effectiveRangePixels + Math.min(reaver.effectiveRangePixels, target.effectiveRangePixels)) / 2
-    val originPixel     = reaver.pixelCenter
-    val goalTile        = target.projectFrames(reaver.cooldownLeft).tileIncluding
+    val originPixel     = reaver.pixel
+    val goalTile        = target.projectFrames(reaver.cooldownLeft).tile
     val naiveTile       = goalTile.pixelCenter.project(originPixel, firingDistance).nearestWalkableTile
-    val naiveDistance   = target.pixelCenter.tileIncluding.tileDistanceFast(naiveTile)
+    val naiveDistance   = target.pixel.tile.tileDistanceFast(naiveTile)
     val candidates      = Spiral.points(7)
       .view
       .map(naiveTile.add)
@@ -104,11 +104,11 @@ object BeReaver extends Action {
         && t.walkable
         && With.grids.enemyRangeAirGround.get(t) == 0
         && t.groundPixels(goalTile) < 1.5 * reaver.effectiveRangePixels
-        && ! reaver.matchups.threats.exists(t => t.isSiegeTankSieged() && t.inRangeToAttack(reaver, t.pixelCenter)))
+        && ! reaver.matchups.threats.exists(t => t.isSiegeTankSieged() && t.inRangeToAttack(reaver, t.pixel)))
       .map(tile => (
         tile,
         Math.abs(naiveDistance - tile.tileDistanceFast(goalTile)),
-        tile.tileDistanceFast(originPixel.tileIncluding),
+        tile.tileDistanceFast(originPixel.tile),
         With.grids.enemyRangeGround.get(tile),
         With.grids.enemyRangeAir.get(tile)))
       .map(p => ((p._2 + p._3) * (p._4 + p._5), p))

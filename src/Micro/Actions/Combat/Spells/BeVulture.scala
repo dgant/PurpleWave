@@ -34,7 +34,7 @@ object BeVulture extends Action {
     if (unit.pixelDistanceCenter(target) > 32) return target
     if ( ! unit.moving) return target
     val velocity = unit.velocity.normalize(6)
-    unit.pixelCenter.add(velocity.x.toInt, velocity.y.toInt)
+    unit.pixel.add(velocity.x.toInt, velocity.y.toInt)
   }
   
   protected def layTrap(unit: FriendlyUnitInfo) {
@@ -45,12 +45,12 @@ object BeVulture extends Action {
     lazy val mineSpace = ! unit.tileArea.expand(1, 1).tiles.exists(With.grids.units.get(_).exists(_.is(Terran.SpiderMine)))
     lazy val retreating = unit.matchups.threats.nonEmpty && ! unit.agent.shouldEngage
     lazy val timeToMine  = unit.matchups.framesOfSafety > Seconds(2)()
-    lazy val inWorkerLine = unit.base.exists(base => base.owner.isUs && base.harvestingArea.contains(unit.tileIncludingCenter))
+    lazy val inWorkerLine = unit.base.exists(base => base.owner.isUs && base.harvestingArea.contains(unit.tile))
     if (mineSpace
       && timeToMine
       && ! inWorkerLine
       && ((inChoke && unit.spiderMines == 3) || retreating)) {
-      placeMine(unit, unit.pixelCenter)
+      placeMine(unit, unit.pixel)
     }
   }
   
@@ -82,8 +82,8 @@ object BeVulture extends Action {
       placeMine(vulture, vulture.projectFrames(1))
     } else {
       vulture.agent.toTravel = Some(
-        vulture.pixelCenter
-          .project(target.pixelCenter, vulture.pixelDistanceEdge(target) + 64)
+        vulture.pixel
+          .project(target.pixel, vulture.pixelDistanceEdge(target) + 64)
           .nearestWalkableTile
           .pixelCenter)
       With.commander.move(vulture)

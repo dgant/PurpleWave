@@ -18,7 +18,7 @@ class GoalEscort extends SquadGoalBasic {
       .map(thePrincipal =>
         ByOption
           .minBy(squad.enemies.filter(_.canAttack(thePrincipal)))(_.framesBeforeAttacking(thePrincipal))
-          .map(_.pixelCenter)
+          .map(_.pixel)
           .getOrElse(thePrincipal.projectFrames(24 * 5)))
         .getOrElse(With.scouting.mostBaselikeEnemyTile.pixelCenter)
 }

@@ -37,7 +37,7 @@ object ShowClustering extends View {
   private def renderMapBattle(battle: BattleLocal, color: Color) {
     battle.teams.foreach(team =>
       team.units.foreach(unit =>
-        DrawMap.line(unit.pixelCenter, team.centroidAir(), color)))
+        DrawMap.line(unit.pixel, team.centroidAir(), color)))
   }
 }
 

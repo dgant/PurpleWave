@@ -89,7 +89,7 @@ class TrainUnit(val traineeClass: UnitClass) extends ProductionPlan {
       val workers   = if (traineeClass.isWorker) PurpleMath.clamp(trainer.base.map(_.saturation()).getOrElse(0.0), 0.0, 1.0) else 0.0
       val health    = trainer.totalHealth / trainer.unitClass.maxTotalHealth.toDouble
       val safety    = PurpleMath.clamp(trainer.matchups.framesOfSafety, 0, safetyFramesMax) / safetyFramesMax.toDouble
-      val distance  = 1.0 - PurpleMath.clamp(trainer.tileIncludingCenter.groundPixels(With.scouting.mostBaselikeEnemyTile) / mapSize, 0.0, 1.0)
+      val distance  = 1.0 - PurpleMath.clamp(trainer.tile.groundPixels(With.scouting.mostBaselikeEnemyTile) / mapSize, 0.0, 1.0)
       val score = (
           1000000000000.0 * already
         + 10000000000.0   * addon
@@ -112,7 +112,7 @@ class TrainUnit(val traineeClass: UnitClass) extends ProductionPlan {
       With.self.colorDark)
     DrawMap.label(
       description.get,
-      trainer.get.pixelCenter,
+      trainer.get.pixel,
       drawBackground = true,
       With.self.colorDark)
   }

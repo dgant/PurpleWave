@@ -55,8 +55,8 @@ object Tickle extends Action {
     val enemyFighterStrength  = strength(enemyFighters)
 
     // We want to avoid big drilling stacks
-    val centroidSoft  = PurpleMath.centroid(enemies.map(_.pixelCenter))
-    val centroidHard  = if (enemies.size > 3) PurpleMath.centroid(enemies.sortBy(_.pixelDistanceCenter(centroidSoft)).take(enemies.size/2).map(_.pixelCenter)) else centroidSoft //Don't centroid an empty list
+    val centroidSoft  = PurpleMath.centroid(enemies.map(_.pixel))
+    val centroidHard  = if (enemies.size > 3) PurpleMath.centroid(enemies.sortBy(_.pixelDistanceCenter(centroidSoft)).take(enemies.size/2).map(_.pixel)) else centroidSoft //Don't centroid an empty list
 
     // Get in their base!
     if ( ! tickler.zone.bases.exists(_.owner.isEnemy)
@@ -69,7 +69,7 @@ object Tickle extends Action {
     // Don't get surrounded if we're trying to unite
     if (
       workersUnite
-      && zone.bases.exists(_.harvestingArea.contains(tickler.tileIncludingCenter)
+      && zone.bases.exists(_.harvestingArea.contains(tickler.tile)
       && enemies.exists(enemy =>
         enemy.zone == zone
         && enemy.pixelDistanceEdge(tickler) < 64.0
@@ -229,7 +229,7 @@ object Tickle extends Action {
       // Pathfind away
       val pathLengthMinimum = 7
       val maximumDistance = 10
-      val profile = new PathfindProfile(tickler.tileIncludingCenter)
+      val profile = new PathfindProfile(tickler.tile)
       profile.end = None
       profile.lengthMinimum = Some(pathLengthMinimum)
       profile.lengthMaximum = Some(maximumDistance)

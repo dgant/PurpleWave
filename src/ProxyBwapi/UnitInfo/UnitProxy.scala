@@ -48,7 +48,7 @@ abstract class UnitProxy(var baseUnit: bwapi.Unit, val id: Int) {
   // Geometry //
   //////////////
   
-  def pixelCenter: Pixel
+  def pixel: Pixel
   def tileTopLeft: Tile
   def top: Int
   def left: Int

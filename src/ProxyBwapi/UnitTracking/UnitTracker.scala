@@ -55,7 +55,7 @@ class UnitTracker {
   
   def inPixelRadius(pixel: Pixel, pixels: Int): Seq[UnitInfo] = {
     val pixelsSquared = pixels * pixels
-    inTileRadius(pixel.tileIncluding, pixels / 32 + 1).filter(_.pixelCenter.pixelDistanceSquared(pixel) <= pixelsSquared)
+    inTileRadius(pixel.tile, pixels / 32 + 1).filter(_.pixel.pixelDistanceSquared(pixel) <= pixelsSquared)
   }
   
   def inTileRectangle(rectangle: TileRectangle): Seq[UnitInfo] = inTiles(rectangle.tiles)

@@ -76,17 +76,17 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     val dy = y - other.y
     dx * dx + dy * dy
   }
-  @inline final def tileIncluding: Tile = {
+  @inline final def tile: Tile = {
     Tile(x / 32, y / 32)
   }
   @inline final def toPoint: Point = {
     Point(x, y)
   }
   @inline final def zone: Zone = {
-    tileIncluding.zone
+    tile.zone
   }
   @inline final def base: Option[Base] = {
-    tileIncluding.base
+    tile.base
   }
   @inline final def groundPixels(other: Tile): Double = {
     With.paths.groundPixels(this, other.pixelCenter)
@@ -95,25 +95,25 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     With.paths.groundPixels(this, other)
   }
   @inline final def buildable: Boolean = {
-    tileIncluding.buildable
+    tile.buildable
   }
   @inline final def buildableUnchecked: Boolean = {
-    tileIncluding.buildableUnchecked
+    tile.buildableUnchecked
   }
   @inline final def walkable: Boolean = {
-    tileIncluding.walkable
+    tile.walkable
   }
   @inline final def walkableUnchecked: Boolean = {
-    tileIncluding.walkableUnchecked
+    tile.walkableUnchecked
   }
   @inline final def altitude: Double = {
-    tileIncluding.altitude
+    tile.altitude
   }
   @inline final def altitudeUnchecked: Double = {
-    tileIncluding.altitudeUnchecked
+    tile.altitudeUnchecked
   }
   @inline final def nearestWalkableTile: Tile = {
-    val ti = tileIncluding
+    val ti = tile
     if (ti.walkable) return ti
     val tx = x / 32
     val ty = y / 32
@@ -128,7 +128,7 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
       .orElse(flip(Tile(tx + dx, ty - dy), Tile(tx - dx, ty + dy)))
       .orElse(test(Tile(tx - dx, ty - dy)))
       .orElse(Spiral.points(16).view.map(ti.add).find(_.walkable))
-      .getOrElse(tileIncluding)
+      .getOrElse(tile)
     output
   }
   @inline final def traversableBy(unit: UnitInfo): Boolean = {

@@ -19,13 +19,13 @@ object ShowSquads extends View {
     (squad.units ++ squad.enemies).foreach(unit =>
       DrawMap.label(
         squad.goal.toString,
-        unit.pixelCenter.add(0, unit.unitClass.height),
+        unit.pixel.add(0, unit.unitClass.height),
         drawBackground = true,
         color,
         drawBorder = unit.isEnemy,
         unit.player.colorMedium))
 
-    val centroid = PurpleMath.centroid(squad.units.view.map(_.pixelCenter))
+    val centroid = PurpleMath.centroid(squad.units.view.map(_.pixel))
     With.game.drawCircleMap(centroid.bwapi, squad.units.map(_.pixelDistanceCenter(centroid)).max.toInt, color)
   }
   

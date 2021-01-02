@@ -44,7 +44,7 @@ class ChillOverlords extends Plan {
   
   private def chillOut(overlord: FriendlyUnitInfo, count: Int) {
     val base = ByOption.minBy(With.geography.ourBases.map(_.heart.pixelCenter))(overlord.pixelDistanceSquared)
-    val tile = base.map(b => PurpleMath.sample(Circle.points(Math.sqrt(count).toInt).map(b.tileIncluding.add))).getOrElse(With.geography.home)
+    val tile = base.map(b => PurpleMath.sample(Circle.points(Math.sqrt(count).toInt).map(b.tile.add))).getOrElse(With.geography.home)
     val intent = new Intention
     intent.toTravel = Some(tile.pixelCenter)
     intent.canFlee = true

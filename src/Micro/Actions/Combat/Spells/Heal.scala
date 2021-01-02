@@ -23,7 +23,7 @@ object Heal extends Action {
         patient.pixelDistanceCenter(unit.agent.destination))
     
     target.foreach(someTarget => {
-      unit.agent.toTravel = Some(unit.pixelCenter.project(someTarget.pixelCenter, unit.pixelDistanceEdge(someTarget) - 16.0))
+      unit.agent.toTravel = Some(unit.pixel.project(someTarget.pixel, unit.pixelDistanceEdge(someTarget) - 16.0))
       if (someTarget.pixelDistanceCenter(unit) < 96.0) {
         With.commander.attackMove(unit)
       }

@@ -15,9 +15,9 @@ object ShuttleAcceptRider extends Action {
 
   protected def pickupNeed(shuttle: FriendlyUnitInfo, hailer: FriendlyUnitInfo): Double = {
     val targetedByScarab = hailer.matchups.enemies.exists(r => r.is(Protoss.Reaver) && r.cooldownLeft > 0) &&
-      With.units.inPixelRadius(hailer.pixelCenter, 32*7).exists(s => s.orderTarget.contains(hailer) && s.is(Protoss.Scarab))
-    val endangered = hailer.matchups.framesOfSafety < shuttle.framesToTravelTo(hailer.pixelCenter) + 2 * shuttle.unitClass.framesToTurn180
-    val sojourning = hailer.agent.toTravel.exists(_.pixelDistance(hailer.pixelCenter) > 32.0 * 20)
+      With.units.inPixelRadius(hailer.pixel, 32*7).exists(s => s.orderTarget.contains(hailer) && s.is(Protoss.Scarab))
+    val endangered = hailer.matchups.framesOfSafety < shuttle.framesToTravelTo(hailer.pixel) + 2 * shuttle.unitClass.framesToTurn180
+    val sojourning = hailer.agent.toTravel.exists(_.pixelDistance(hailer.pixel) > 32.0 * 20)
 
     (
       (if (shuttle.teammates.contains(hailer)) 5 else 1)

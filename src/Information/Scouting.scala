@@ -45,7 +45,7 @@ class Scouting {
       .filter(unit => unit.likelyStillThere && ! unit.flying && unit.unitClass.isBuilding)
       .toVector
       .sortBy(unit => ! unit.unitClass.isTownHall)
-      .map(_.tileIncludingCenter)
+      .map(_.tile)
       .headOption
       .getOrElse(cacheBaseIntrigueInitial().maxBy(_._2)._1.townHallArea.midpoint))
 
@@ -64,7 +64,7 @@ class Scouting {
     y += enemyThreatOriginBaseFactor * mostBaselikeEnemyTile.y
     n += enemyThreatOriginBaseFactor
     val airCentroid = Tile(x/n, y/n)
-    ByOption.minBy(With.units.enemy.view.map(_.tileIncludingCenter))(_.tileDistanceSquared(airCentroid)).getOrElse(airCentroid)
+    ByOption.minBy(With.units.enemy.view.map(_.tile))(_.tileDistanceSquared(airCentroid)).getOrElse(airCentroid)
   })
 
   def firstEnemyMain: Option[Base] = _firstEnemyMain

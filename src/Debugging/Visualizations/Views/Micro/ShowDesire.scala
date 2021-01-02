@@ -21,31 +21,31 @@ object ShowDesire extends View {
 
   def renderMCRS(unit: UnitInfo): Unit = {
     if ( ! unit.likelyStillThere) return
-    if ( ! With.viewport.contains(unit.tileIncludingCenter)) return
+    if ( ! With.viewport.contains(unit.tile)) return
     DrawMap.label(
       "%d: %ds %dd %dt".format(
         PurpleMath.nanToN(10 * unit.mcrs.sim().simValue, 10).toInt,
         unit.mcrs.survivability().toInt / 50,
         unit.mcrs.dpsGround().toInt * 10,
         unit.mcrs.strengthGround().toInt / 100),
-      unit.pixelCenter,
+      unit.pixel,
       true,
       if (unit.mcrs.shouldFight) Colors.DarkGreen else Colors.DarkRed)
   }
   
   def renderUnitState(unit: FriendlyUnitInfo) {
     val agent = unit.agent
-    if ( ! With.viewport.contains(unit.pixelCenter)) return
+    if ( ! With.viewport.contains(unit.pixel)) return
     if ( ! unit.unitClass.orderable) return
     if (unit.battle.isEmpty) return
     
-    var x = unit.pixelCenter.x
-    var y = unit.pixelCenter.y + 28
+    var x = unit.pixel.x
+    var y = unit.pixel.y + 28
     var width = 18
     
     width = 27
-    x = unit.pixelCenter.x
-    y = unit.pixelCenter.y + 28 + With.visualization.lineHeightSmall + 2
+    x = unit.pixel.x
+    y = unit.pixel.y + 28 + With.visualization.lineHeightSmall + 2
     drawNumber(unit.matchups.vpfDealingInRange, x - width,  y, width, With.self.colorMedium)
     drawNumber(unit.matchups.vpfReceiving,      x,          y, width, With.enemy.colorMedium)
   }

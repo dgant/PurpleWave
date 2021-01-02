@@ -71,18 +71,18 @@ object Target extends {
     val threatPenalty = if (With.reaction.sluggishness > 1) framesOutOfWay else {
       val firingPixel = attacker.pixelToFireAt(target)
       // TODO: Do it through argument to pixelToFireAt
-      val firingPixelSafer = target.pixelCenter.project(attacker.pixelCenter, attacker.pixelRangeAgainst(target) + attacker.unitClass.dimensionMin + target.unitClass.dimensionMin)
+      val firingPixelSafer = target.pixel.project(attacker.pixel, attacker.pixelRangeAgainst(target) + attacker.unitClass.dimensionMin + target.unitClass.dimensionMin)
       val firingPixelFrames = attacker.pixelDistanceCenter(firingPixel) / (0.01 + attacker.topSpeed)
       1 + attacker.matchups.threats.count(threat =>
         // In range to attack at the firing pixel?
         threat.inRangeToAttack(
           attacker,
-          threat.pixelCenter.projectUpTo(firingPixel, threat.topSpeed * firingPixelFrames),
+          threat.pixel.projectUpTo(firingPixel, threat.topSpeed * firingPixelFrames),
           firingPixel)
           // In range to attack if we choose somewhere safer to shoot from?
           && threat.inRangeToAttack(
           attacker,
-          threat.pixelCenter.projectUpTo(firingPixelSafer, threat.topSpeed * firingPixelFrames),
+          threat.pixel.projectUpTo(firingPixelSafer, threat.topSpeed * firingPixelFrames),
           firingPixelSafer))
     }
     val output = scoreBasic * preferenceBonus / threatPenalty / threatPenalty

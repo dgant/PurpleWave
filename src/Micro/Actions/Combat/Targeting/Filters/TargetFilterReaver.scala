@@ -11,7 +11,7 @@ object TargetFilterReaver extends TargetFilter {
       || target.canAttack
       || target.unitClass.canAttack
       || (
-        target.base.exists(b => b.resources.forall(u => u.tileIncludingCenter.visible))
+        target.base.exists(b => b.resources.forall(u => u.tile.visible))
         && target.base.forall(_.workerCount == 0)))
 
     val safeToAttack = (

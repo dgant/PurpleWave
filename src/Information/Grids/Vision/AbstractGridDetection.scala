@@ -8,7 +8,7 @@ abstract class AbstractGridDetection extends AbstractGridFramestamp {
   
   override protected def updateCells() {
     detectors.foreach(detector => {
-      val origin = detector.tileIncludingCenter
+      val origin = detector.tile
       val points = Circle.points(1 + (if (detector.unitClass.isBuilding) 9 else 11))
       val nPoints = points.length
       var iPoint = 0

@@ -160,7 +160,7 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     unit.flying || walkable
   }
   @inline final def nearestTraversableBy(unit: UnitInfo): Tile = {
-    if (unit.flying) this else pixelCenter.nearestTraversableBy(unit).tileIncluding
+    if (unit.flying) this else pixelCenter.nearestTraversableBy(unit).tile
   }
   @inline final def nearestWalkableTile: Tile = {
     if (walkable) this else Spiral.points(16).view.map(add).find(_.walkable).getOrElse(this)

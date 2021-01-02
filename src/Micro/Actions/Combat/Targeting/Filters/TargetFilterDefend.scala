@@ -19,7 +19,7 @@ case class TargetFilterDefend(zone: Zone) extends TargetFilter {
 
     val firingPixel = actor.pixelToFireAt(target)
     if (firingPixel.zone == zone
-      && firingPixel.altitude >= actor.agent.toReturn.getOrElse(actor.pixelCenter).altitude
+      && firingPixel.altitude >= actor.agent.toReturn.getOrElse(actor.pixel).altitude
       && actor.inRangeToAttackFrom(target, firingPixel) // TODO: Walkability constraints can produce a firing pixel that's not actually in range
       && ! zone.edges.exists(_.contains(firingPixel))) return true
 
@@ -32,7 +32,7 @@ case class TargetFilterDefend(zone: Zone) extends TargetFilter {
       ally != actor
       && ally.zone == zone
       && ally.visibleToOpponents
-      && (ally.unitClass.melee || ! zone.edges.exists(_.contains(ally.pixelCenter))))) return true
+      && (ally.unitClass.melee || ! zone.edges.exists(_.contains(ally.pixel))))) return true
 
     false
   }

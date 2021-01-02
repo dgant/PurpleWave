@@ -12,7 +12,7 @@ object Unbunk extends Action {
     && ! unit.agent.toBoard.exists(unit.transport.contains)
     && unit.transport.exists(_.is(Terran.Bunker))
     && unit.transport.get.matchups.targetsInRange.isEmpty
-    && unit.agent.toReturn.forall(_.pixelDistance(unit.pixelCenter) > 32.0 * 7.0)
+    && unit.agent.toReturn.forall(_.pixelDistance(unit.pixel) > 32.0 * 7.0)
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {

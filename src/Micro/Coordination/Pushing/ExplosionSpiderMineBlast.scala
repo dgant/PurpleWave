@@ -9,7 +9,7 @@ import Utilities.ByOption
 object SpiderMineMath {
   val radius = 100
   def expectedTarget(mine: UnitInfo): Option[UnitInfo] = {
-    val targetPosition = mine.orderTargetPixel.getOrElse(mine.pixelCenter)
+    val targetPosition = mine.orderTargetPixel.getOrElse(mine.pixel)
     val target = ByOption.minBy(mine.matchups.targets)(_.pixelDistanceEdge(targetPosition))
     if (target.forall(_.pixelDistanceEdge(targetPosition) > radius))
       None
@@ -18,10 +18,10 @@ object SpiderMineMath {
   }
   def expectedPositionGivenTarget(mine: UnitInfo, target: Option[UnitInfo]): Pixel = {
     target
-      .map(t => t.pixelCenter.project(mine.pixelCenter, t.unitClass.dimensionMax + Terran.SpiderMine.dimensionMax))
+      .map(t => t.pixel.project(mine.pixel, t.unitClass.dimensionMax + Terran.SpiderMine.dimensionMax))
       .orElse(mine.targetPixel)
       .orElse(mine.orderTargetPixel)
-      .getOrElse(mine.pixelCenter)
+      .getOrElse(mine.pixel)
   }
   def expectedPosition(mine: UnitInfo): Pixel = {
     expectedPositionGivenTarget(mine, expectedTarget(mine))

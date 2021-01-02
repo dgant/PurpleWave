@@ -35,8 +35,8 @@ class Grids {
 
   private val _disposableBoolean1 = new GridDisposableBoolean
   private val _disposableBoolean2 = new GridDisposableBoolean
-  private val _disposableInt = new GridDisposableInt
-  private val _disposableDouble = new GridDisposableDouble
+  private val _disposableInt      = new GridDisposableInt
+  private val _disposableDouble   = new GridDisposableDouble
 
   def disposableBoolean1(): GridDisposableBoolean = {
     _disposableBoolean1.update()

@@ -18,7 +18,7 @@ abstract class AbstractGridPsi extends AbstractGridFramestamp {
     if (newPylons != lastPylons) {
       updateVersion()
       newPylons.foreach(pylon => {
-      val pylonTile = pylon.tileIncludingCenter
+      val pylonTile = pylon.tile
       psiPoints.foreach(point => {
         val tile = pylon.tileTopLeft.add(point)
         if (tile.valid

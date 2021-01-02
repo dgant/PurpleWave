@@ -141,7 +141,7 @@ class Visualization {
         if (With.game.getMouseState(MouseButton.M_LEFT)) {
           val mouse = new Pixel(With.game.getMousePosition)
           val pixel = With.viewport.start + mouse
-          val tile = pixel.tileIncluding
+          val tile = pixel.tile
           DrawMap.label(tile.toString, pixel.subtract(0, 15))
         }
       }

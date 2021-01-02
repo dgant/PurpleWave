@@ -30,7 +30,7 @@ abstract class DefendFFEWithProbes extends Plan {
     if (cannons.isEmpty) cannons = With.units.ours.filter(_.is(Protoss.Forge))
     
     lazy val zerglings    = With.units.enemy.find(_.is(Zerg.Zergling))
-    lazy val threatSource = zerglings.map(_.pixelCenter).getOrElse(With.scouting.mostBaselikeEnemyTile.pixelCenter)
+    lazy val threatSource = zerglings.map(_.pixel).getOrElse(With.scouting.mostBaselikeEnemyTile.pixelCenter)
 
     if (cannons.isEmpty) return
     cannons.toVector.sortBy(_.totalHealth)
@@ -39,7 +39,7 @@ abstract class DefendFFEWithProbes extends Plan {
     if (defenders.get.units.size > probesRequired) {
       defenders.get.release()
     }
-    defenders.get.unitPreference.set(UnitPreferClose(cannons.map(_.pixelCenter).minBy(_.groundPixels(threatSource))))
+    defenders.get.unitPreference.set(UnitPreferClose(cannons.map(_.pixel).minBy(_.groundPixels(threatSource))))
     defenders.get.unitCounter.set(new UnitCountBetween(0, probesRequired))
     defenders.get.acquire(this)
     val closestDistance = cannons.map(_.pixelDistanceTravelling(threatSource)).min
@@ -58,12 +58,12 @@ abstract class DefendFFEWithProbes extends Plan {
     }
 
     def occupied(pixel: Pixel): Boolean = (
-      pixel.tileIncluding.adjacent9.exists(With.groundskeeper.isReserved(_))
+      pixel.tile.adjacent9.exists(With.groundskeeper.isReserved(_))
     )
     workersByCannon.foreach(pair => {
       val cannon = pair._1
       val workers = pair._2
-      var toDefend = cannon.pixelCenter.project(threatSource, 48.0)
+      var toDefend = cannon.pixel.project(threatSource, 48.0)
       var steps = 0
       while (steps < 8 && occupied(toDefend)) {
         steps += 1
@@ -73,7 +73,7 @@ abstract class DefendFFEWithProbes extends Plan {
       nearestThreat.foreach(someNearestThreat => {
         val threatDistanceToCannon = cannon.pixelDistanceEdge(threatSource)
         if (cannon.pixelDistanceEdge(toDefend) > threatDistanceToCannon) {
-          toDefend = cannon.pixelCenter.project(someNearestThreat.pixelCenter, threatDistanceToCannon + 16)
+          toDefend = cannon.pixel.project(someNearestThreat.pixel, threatDistanceToCannon + 16)
         }
       })
 

@@ -13,7 +13,7 @@ object ShowTileInfo extends View {
   override def renderScreen(): Unit = {
     val mousePixelScreen  = new Pixel(With.game.getMousePosition)
     val mousePixelMap     = mousePixelScreen + With.viewport.start
-    val mouseTile         = mousePixelMap.tileIncluding
+    val mouseTile         = mousePixelMap.tile
     val walkableTile      = mousePixelMap.nearestWalkableTile
     val zone              = With.geography.zoneByTile(mouseTile)
 

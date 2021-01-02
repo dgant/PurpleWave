@@ -22,7 +22,7 @@ object Follow extends Action {
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val maybeLeader = unit.agent.leader()
-    unit.agent.toTravel = maybeLeader.map(_.pixelCenter).orElse(unit.agent.toTravel)
+    unit.agent.toTravel = maybeLeader.map(_.pixel).orElse(unit.agent.toTravel)
     maybeLeader
       .withFilter(leader =>
         unit.pixelDistanceCenter(leader) < Seq(256, ByOption.min(unit.matchups.threats.view.map(_.pixelsToGetInRange(unit).toInt)).getOrElse(0)).max

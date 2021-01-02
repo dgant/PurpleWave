@@ -13,7 +13,7 @@ object ShowHealthAndCooldown extends View {
   override def renderMap() { With.units.all.foreach(renderUnit) }
   
   def renderUnit(unit: UnitInfo) {
-    if ( ! With.viewport.contains(unit.pixelCenter)) return
+    if ( ! With.viewport.contains(unit.pixel)) return
     if ( ! unit.alive) return
     if ( ! unit.likelyStillThere) return
     if (unit.invincible) return
@@ -37,13 +37,13 @@ object ShowHealthAndCooldown extends View {
     val widthCooldown = width - 2 * widthCooldownButton - 2
     val widthCooldownNow = widthCooldown * Math.max(unit.cooldownLeft, unit.spellCooldownLeft) / Math.max(1, unit.cooldownMaxAirGround) //TODO: Max spell cooldown?
     
-    val yStartHp = unit.pixelCenter.y + unit.unitClass.height / 2 - marginTopHp
+    val yStartHp = unit.pixel.y + unit.unitClass.height / 2 - marginTopHp
     val yEndHp = yStartHp + 4
     val yStartEnergy = yEndHp + 2
     val yEndEnergy = yStartEnergy + 4
     val yStartCooldown = if (unit.energyMax > 0) yEndEnergy + 3 else yEndHp + 3
     val yEndCooldown = yStartCooldown + 3
-    val xStart = unit.pixelCenter.x - width / 2
+    val xStart = unit.pixel.x - width / 2
     val xStartSh = xStart + widthHpMax
     val xStartDm = xStartSh + widthShMax
     val xStartCooldown = xStart

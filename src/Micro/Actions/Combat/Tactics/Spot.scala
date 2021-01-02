@@ -21,12 +21,12 @@ object Spot extends Action {
     val goal: Option[Pixel] = destinationFromTeammates(unit, unit.squadmates)
       .orElse(destinationFromTeammates(unit, unit.team.map(_.units).getOrElse(Iterable.empty)))
       .map(p =>
-        if (p.tileIncluding.visible)
+        if (p.tile.visible)
           ByOption.minBy(unit.squadenemies.view.filter(!_.visible))(_.pixelDistanceCenter(p)).orElse(
             ByOption.minBy(unit.squadenemies)(_.pixelDistanceCenter(p)).orElse(
               ByOption.minBy(unit.matchups.enemies.view.filter(!_.visible))(_.pixelDistanceCenter(p)).orElse(
                 ByOption.minBy(unit.matchups.enemies)(_.pixelDistanceCenter(p)))))
-              .map(_.pixelCenter)
+              .map(_.pixel)
               .getOrElse(p.project(SpecificPoints.middle, 2 * unit.sightPixels))
         else p)
 
@@ -44,6 +44,6 @@ object Spot extends Action {
   }
 
   protected def destinationFromTeammates(unit: FriendlyUnitInfo, teammates: Iterable[UnitInfo]): Option[Pixel] = {
-    ByOption.minBy(unit.squadmates.filter(_.canAttack).map(u => u.pixelCenter.project(u.agent.destination, bonusDistance)))(_.pixelDistance(unit.agent.destination))
+    ByOption.minBy(unit.squadmates.filter(_.canAttack).map(u => u.pixel.project(u.agent.destination, bonusDistance)))(_.pixelDistance(unit.agent.destination))
   }
 }

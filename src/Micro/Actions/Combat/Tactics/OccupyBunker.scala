@@ -19,7 +19,7 @@ object OccupyBunker extends Action {
     val destination = unit.agent.toReturn.get
     
     val bunkers = With.units
-      .inTileRadius(destination.tileIncluding, 5)
+      .inTileRadius(destination.tile, 5)
       .filter(bunker =>
         bunker.isOurs
         && bunker.complete

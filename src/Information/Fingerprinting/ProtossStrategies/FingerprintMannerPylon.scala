@@ -11,7 +11,7 @@ class FingerprintMannerPylon extends Fingerprint {
     && With.geography.ourMain.units.exists(u =>
       u.is(Protoss.Pylon)
       && u.player.isEnemy
-      && With.geography.ourMain.harvestingArea.contains(u.tileIncludingCenter))
+      && With.geography.ourMain.harvestingArea.contains(u.tile))
   )
 
   override val sticky = true

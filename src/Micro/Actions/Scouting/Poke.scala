@@ -45,7 +45,7 @@ object Poke extends Action {
     }
     
     lazy val targetDistance = unit.pixelRangeAgainst(target) + target.unitClass.radialHypotenuse + unit.unitClass.radialHypotenuse
-    lazy val targetPosition = target.pixelCenter.project(target.zone.exit.map(_.pixelCenter).getOrElse(unit.pixelCenter), targetDistance)
+    lazy val targetPosition = target.pixel.project(target.zone.exit.map(_.pixelCenter).getOrElse(unit.pixel), targetDistance)
     unit.agent.toAttack = Some(target)
     unit.agent.toTravel = Some(targetPosition)
     if ( ! unit.is(Terran.SCV) && framesToWait > 0) {

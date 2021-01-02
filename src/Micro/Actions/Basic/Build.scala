@@ -21,7 +21,7 @@ object Build extends Action {
     val ourBuilding = With.grids.units.get(unit.agent.toBuildTile.get).find(_.unitClass == unit.agent.toBuild.get)
     
     if (ourBuilding.isDefined) {
-      unit.agent.toGather = ByOption.minBy(With.geography.ourBases.flatMap(_.minerals))(_.pixelDistanceCenter(unit.pixelCenter))
+      unit.agent.toGather = ByOption.minBy(With.geography.ourBases.flatMap(_.minerals))(_.pixelDistanceCenter(unit.pixel))
       Gather.consider(unit)
       return
     }
@@ -77,7 +77,7 @@ object Build extends Action {
     val priority = if (unit.pixelDistanceCenter(pushPixel) < 128) TrafficPriorities.Shove else TrafficPriorities.Bump
     With.coordinator.pushes.put(new CircularPush(priority, pushPixel, 32 + buildClass.dimensionMax, unit))
 
-    if (unit.tileIncludingCenter.tileDistanceFast(buildTile) < 5 && buildTile.visible) {
+    if (unit.tile.tileDistanceFast(buildTile) < 5 && buildTile.visible) {
       With.commander.build(unit, buildClass, buildTile)
       return
     }

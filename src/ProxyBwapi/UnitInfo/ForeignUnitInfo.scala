@@ -160,7 +160,7 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   private var _pixelCenterObserved  : Pixel  = Pixel(0, 0)
   private var _tileTopLeft          : Tile   = Tile(0, 0)
   
-  @inline final def pixelCenter         : Pixel = _pixelCenter
+  @inline final def pixel         : Pixel = _pixelCenter
   @inline final def pixelCenterObserved : Pixel = _pixelCenterObserved
   @inline final def tileTopLeft         : Tile  = _tileTopLeft
   

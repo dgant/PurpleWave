@@ -13,7 +13,7 @@ case class RequestSafeLanding(destination: Option[Pixel] = None) extends Action 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val goal = destination.getOrElse(if (unit.agent.shouldEngage) unit.agent.destination else unit.agent.origin)
     val distanceToGoal = unit.pixelDistanceCenter(goal)
-    val searchOriginTile = unit.pixelCenter.project(goal, Math.min(distanceToGoal, 96)).tileIncluding
+    val searchOriginTile = unit.pixel.project(goal, Math.min(distanceToGoal, 96)).tile
     val landingOption = Spiral
       .points(6)
       .map(searchOriginTile.add)

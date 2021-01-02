@@ -75,7 +75,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   def origin: Pixel = toReturn.getOrElse(originCache())
   private val originCache = new KeyedCache(
     () =>
-      ride.filterNot(unit.transport.contains).map(_.pixelCenter)
+      ride.filterNot(unit.transport.contains).map(_.pixel)
       .orElse(toReturn)
       .orElse(
         ByOption.minBy(

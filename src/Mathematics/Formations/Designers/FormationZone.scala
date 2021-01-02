@@ -22,7 +22,7 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
     val chokeSides      = zone.exitNow.get.sidePixels
     val chokeCenter     = zone.exitNow.map(_.pixelCenter).getOrElse(zone.centroid.pixelCenter)
     val chokeEnd        = chokeCenter.project(zone.exitNow.map(_.pixelTowards(zone)).getOrElse(zone.centroid.pixelCenter), 300)
-    val chokeCenterTile = chokeCenter.tileIncluding
+    val chokeCenterTile = chokeCenter.tile
 
     // Avoid colliding with stuff
     zone.bases.flatMap(_.townHallArea.tiles).foreach(occupied.set(_, true))
@@ -77,10 +77,10 @@ class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigne
         if ( ! flyer) {
           val w = slot.unitClass.width / 2
           val h = slot.unitClass.height / 2
-          occupied.set(nextPixel.add(+w, +h).tileIncluding, true)
-          occupied.set(nextPixel.add(-w, +h).tileIncluding, true)
-          occupied.set(nextPixel.add(+w, -h).tileIncluding, true)
-          occupied.set(nextPixel.add(-w, -h).tileIncluding, true)
+          occupied.set(nextPixel.add(+w, +h).tile, true)
+          occupied.set(nextPixel.add(-w, +h).tile, true)
+          occupied.set(nextPixel.add(+w, -h).tile, true)
+          occupied.set(nextPixel.add(-w, -h).tile, true)
         }
       }
       else {

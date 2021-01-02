@@ -13,7 +13,7 @@ class GoalEjectScout extends SquadGoalBasic {
   override def toString: String = "Eject scouts"
   
   override def destination: Pixel = targetScout
-    .map(_.pixelCenter)
+    .map(_.pixel)
     .getOrElse(
       ByOption.minBy(tilesToConsider)(With.grids.friendlyVision.get).getOrElse(With.geography.home).pixelCenter)
 

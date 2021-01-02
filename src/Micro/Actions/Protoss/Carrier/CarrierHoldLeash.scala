@@ -9,7 +9,7 @@ object CarrierHoldLeash extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.is(Protoss.Carrier)
   override def perform(unit: FriendlyUnitInfo): Unit = {
     unit.agent.toAttack.foreach(target => {
-      unit.agent.toTravel = Some(target.pixelCenter.project(unit.pixelCenter, 7.5 * 32.0))
+      unit.agent.toTravel = Some(target.pixel.project(unit.pixel, 7.5 * 32.0))
       With.commander.move(unit)
     })
   }

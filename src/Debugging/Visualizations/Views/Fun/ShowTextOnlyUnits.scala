@@ -16,7 +16,7 @@ object ShowTextOnlyUnits extends View {
         if (unit.player == With.neutral) "" else unit.totalHealth.toString + "/" + unit.unitClass.maxTotalHealth,
         if (unit.complete) "" else "In progress"
       )
-      DrawMap.labelBox(text, unit.pixelCenter, false)
+      DrawMap.labelBox(text, unit.pixel, false)
     })
     
   }

@@ -31,7 +31,7 @@ object Recharge extends Action {
     val battery = ByOption.minBy(batteries)(_.pixelDistanceEdge(unit))
     if (battery.isEmpty) return
     
-    unit.agent.toTravel = battery.map(_.pixelCenter)
+    unit.agent.toTravel = battery.map(_.pixel)
   
     // Shield battery range is 2 tiles.
     // Don't right click it from too far -- that gets you killed en route.

@@ -41,7 +41,7 @@ trait GroundDistance {
     // before which we're getting pixel-resolution distance and after which we're getting tile-resolution distance
     Math.max(
       origin.pixelDistance(destination),
-      32.0 * groundTiles(origin.tileIncluding, destination.tileIncluding))
+      32.0 * groundTiles(origin.tile, destination.tile))
   }
 
   protected def groundTiles(origin: Tile, destination: Tile): Long = {

@@ -26,8 +26,8 @@ class LayoutWall extends Plan {
     if (natural.zone.exit.isEmpty) return Seq.empty
     if (main.zone.exit.isEmpty) return Seq.empty
 
-    val entrance = main.zone.exit.get.pixelCenter.tileIncluding
-    val exit = natural.zone.exit.get.pixelCenter.tileIncluding
+    val entrance = main.zone.exit.get.pixelCenter.tile
+    val exit = natural.zone.exit.get.pixelCenter.tile
     val origin = natural.townHallArea.tiles.minBy(t => t.tileDistanceManhattan(entrance) + t.tileDistanceManhattan(exit))
 
     val exitDirection = exit.subtract(origin).direction

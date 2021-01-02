@@ -50,7 +50,7 @@ class DefendFightersAgainstRush extends Plan {
     val workersNeeded   = 1 + 3 * aggressors.size - 3 * fighters.filter(_.complete).map(_.unitClass.mineralValue).sum / 100.0
     val workerCap       = workers.size - 4
     val workersToFight  = PurpleMath.clamp(workersNeeded, 0, workerCap)
-    val target          = fighters.minBy(fighter => aggressors.map(_.pixelDistanceEdge(fighter)).min).pixelCenter
+    val target          = fighters.minBy(fighter => aggressors.map(_.pixelDistanceEdge(fighter)).min).pixel
     
     defenders.get.unitCounter.set(UnitCountExactly(workersToFight.toInt))
     defenders.get.unitPreference.set(UnitPreferClose(target))

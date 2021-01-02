@@ -18,7 +18,7 @@ object Board extends Action {
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val transport = unit.agent.toBoard.get
     
-    unit.agent.toTravel = Some(transport.pixelCenter)
+    unit.agent.toTravel = Some(transport.pixel)
     if (transport.pixelDistanceEdge(unit) < Shuttling.pickupRadius) {
       unit.hijack()
       With.commander.rightClick(unit, transport)

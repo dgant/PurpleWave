@@ -32,7 +32,7 @@ class Preplacement {
   private def preplaceZone(zone: Zone): Unit = {
     val bounds        = zone.boundary
     val exitDirection = zone.exit.map(_.direction).getOrElse(zone.centroid.subtract(SpecificPoints.tileMiddle).direction)
-    val exitTile      = zone.exit.map(_.pixelCenter.tileIncluding).getOrElse(zone.centroid)
+    val exitTile      = zone.exit.map(_.pixelCenter.tile).getOrElse(zone.centroid)
     val tilesFront    = bounds.cornerTilesInclusive.sortBy(t => Math.min(Math.abs(t.x - exitTile.x), Math.abs(t.y - exitTile.y))).take(2)
     val tilesBack     = bounds.cornerTilesInclusive.filterNot(tilesFront.contains)
     val cornerFront   = tilesFront.maxBy(_.tileDistanceSquared(SpecificPoints.tileMiddle))

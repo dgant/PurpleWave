@@ -32,10 +32,10 @@ class GoalHunt(val enemyMatcher: UnitMatcher) extends SquadGoalBasic {
   }
   
   protected def chooseTarget(): Pixel = {
-    val centroid = PurpleMath.centroid(squad.enemies.view.map(_.pixelCenter))
+    val centroid = PurpleMath.centroid(squad.enemies.view.map(_.pixel))
     val flying = squad.units.forall(_.flying)
     ByOption
-      .minBy(squad.enemies.view.filter(_.likelyStillThere).map(_.pixelCenter))(_.pixelDistance(centroid))
+      .minBy(squad.enemies.view.filter(_.likelyStillThere).map(_.pixel))(_.pixelDistance(centroid))
       .getOrElse(With.scouting.baseIntrigue.maxBy(_._2)._1.heart.pixelCenter)
   }
 }

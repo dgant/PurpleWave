@@ -15,7 +15,7 @@ class GridPsionicStorm extends AbstractGridFramestamp {
   }
   
   def addPsionicStorm(pixel: Pixel) {
-    val tile = pixel.tileIncluding
+    val tile = pixel.tile
     for (dx <- Array(-1, 0, 1)) {
       for (dy <- Array(-1, 0, 1)) {
         stamp(tile.add(dx, dy))

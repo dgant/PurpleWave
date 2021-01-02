@@ -33,8 +33,8 @@ object Irradiate extends TargetedSpell {
   override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
     val targetValue = valueUnit(target) * target.hitPoints / target.unitClass.maxHitPoints
     val neighborValue = With.units.inTileRectangle(TileRectangle(
-      target.tileIncludingCenter.subtract(1, 1),
-      target.tileIncludingCenter.add(1, 1))).view.map(valueUnit).sum
+      target.tile.subtract(1, 1),
+      target.tile.add(1, 1))).view.map(valueUnit).sum
 
     targetValue + neighborValue / 2.0
   }

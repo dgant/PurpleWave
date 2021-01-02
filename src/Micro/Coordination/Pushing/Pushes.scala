@@ -27,7 +27,7 @@ class Pushes {
 
   def get(tile: Tile): Seq[Push] = gridCurrent.get(tile).view ++ gridPrevious.get(tile)
 
-  def get(unit: UnitInfo): Seq[Push] = get(unit.tileIncludingCenter)
+  def get(unit: UnitInfo): Seq[Push] = get(unit.tile)
 
   def onAgentCycle(): Unit = {
     val gridSwap = gridPrevious
@@ -74,7 +74,7 @@ class Pushes {
         put(new ExplosionScarab(unit))
       }
       if (unit.is(Terran.NuclearMissile)) {
-        put(new ExplosionNuke(unit.targetPixel.getOrElse(unit.pixelCenter)))
+        put(new ExplosionNuke(unit.targetPixel.getOrElse(unit.pixel)))
       }
     })
 

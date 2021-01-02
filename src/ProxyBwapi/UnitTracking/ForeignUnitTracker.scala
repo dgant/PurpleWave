@@ -66,8 +66,8 @@ class ForeignUnitTracker {
   }
 
   private def checkVisibility(unit: ForeignUnitInfo) {
-    lazy val shouldBeVisible = unit.tileIncludingCenter.visibleBwapi
-    lazy val shouldBeDetected = unit.tileIncludingCenter.friendlyDetected
+    lazy val shouldBeVisible = unit.tile.visibleBwapi
+    lazy val shouldBeDetected = unit.tile.friendlyDetected
     lazy val likelyBurrowed = (
       unit.visibility == Visibility.InvisibleBurrowed
       || unit.burrowed
@@ -165,17 +165,17 @@ class ForeignUnitTracker {
   }
 
   private def predictPixel(unit: ForeignUnitInfo): Option[Pixel] = {
-    if ( ! unit.tileIncludingCenter.visible) {
-      return Some(unit.pixelCenter)
+    if ( ! unit.tile.visible) {
+      return Some(unit.pixel)
     }
 
-    val tileLastSeen = unit.pixelCenterObserved.tileIncluding
+    val tileLastSeen = unit.pixelCenterObserved.tile
     val maxTilesAway = Math.min(12, With.framesSince(unit.lastSeen) * unit.topSpeed / 32)
     val maxTilesAwaySquared = 2 + maxTilesAway * maxTilesAway
 
     val output = (0 to 10).view.map(i =>
       ByOption.minBy(Circle.points(i)
-        .map(unit.tileIncludingCenter.add)
+        .map(unit.tile.add)
         .filter(tile =>
           tile.valid
           && (unit.flying || tile.walkableUnchecked)

@@ -38,7 +38,7 @@ class ScoutWithOverlord extends AbstractScoutPlan {
             .pixelDistance(
               scouts
                 .headOption
-                .map(_.pixelCenter)
+                .map(_.pixel)
                 .getOrElse(With.geography.home.pixelCenter))
       })
       val scoutBases = startBases

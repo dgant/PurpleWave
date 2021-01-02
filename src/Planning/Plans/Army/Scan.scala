@@ -34,7 +34,7 @@ class Scan extends Plan {
     
     if (cloakedTargets.nonEmpty) {
       val biggestThreat = cloakedTargets.maxBy(_.matchups.vpfDealingInRange)
-      scan(biggestThreat.pixelCenter)
+      scan(biggestThreat.pixel)
       return
     }
     
@@ -49,7 +49,7 @@ class Scan extends Plan {
         ! e.matchups.targetsInRange.exists(_.visible)))
   
     if (contentiousTanks.nonEmpty) {
-      scan(contentiousTanks.minBy(_.totalHealth).pixelCenter)
+      scan(contentiousTanks.minBy(_.totalHealth).pixel)
       return
     }
     
@@ -58,7 +58,7 @@ class Scan extends Plan {
       && With.framesSince(b.lastFrameTryingToMove) > Seconds(1)())
     
     if (blockedBuilders.nonEmpty) {
-      scan(blockedBuilders.head.pixelCenter)
+      scan(blockedBuilders.head.pixel)
       return
     }
   }

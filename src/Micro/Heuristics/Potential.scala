@@ -15,8 +15,8 @@ object Potential {
   }
   
   def unitAttraction(unit: FriendlyUnitInfo, other: UnitInfo, magnitude: Double): Force = {
-    val pixelFrom = unit.pixelCenter
-    val pixelTo   = other.pixelCenter
+    val pixelFrom = unit.pixel
+    val pixelTo   = other.pixel
     val output    = ForceMath.fromPixels(pixelFrom, pixelTo, magnitude)
     output
   }
@@ -135,7 +135,7 @@ object Potential {
   ////////////////
 
   def preferTravel(unit: FriendlyUnitInfo, goal: Pixel): Force = {
-    ForceMath.fromPixels(unit.pixelCenter, MicroPathing.getWaypointToPixel(unit, goal), 1.0)
+    ForceMath.fromPixels(unit.pixel, MicroPathing.getWaypointToPixel(unit, goal), 1.0)
   }
 
   private val tts = 1d / 32d / 32d

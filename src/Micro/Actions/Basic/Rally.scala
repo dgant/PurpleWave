@@ -36,7 +36,7 @@ object Rally extends Action {
       val minerals = unit.base.map(_.minerals).getOrElse(Set.empty)
       if (minerals.nonEmpty) {
         val mineral = minerals.minBy(_.pixelDistanceEdge(unit))
-        With.commander.rally(unit, mineral.pixelCenter)
+        With.commander.rally(unit, mineral.pixel)
         return
       }
     }

@@ -22,7 +22,7 @@ object Pickup extends Action {
       return
     }
     val passengersAccepted  = new ArrayBuffer[FriendlyUnitInfo]
-    passengersPotential.toSeq.sortBy(_.framesToTravelTo(unit.pixelCenter))
+    passengersPotential.toSeq.sortBy(_.framesToTravelTo(unit.pixel))
     
     var spaceRemaining = unit.spaceRemaining
     passengersPotential.foreach(passenger => {
@@ -38,9 +38,9 @@ object Pickup extends Action {
     })
     
     if (passengersAccepted.nonEmpty) {
-      val passengerCentroid = PurpleMath.centroid(passengersAccepted.map(_.pixelCenter))
+      val passengerCentroid = PurpleMath.centroid(passengersAccepted.map(_.pixel))
       val passengerCentral  = passengersAccepted.minBy(_.pixelDistanceCenter(passengerCentroid))
-      unit.agent.toTravel = Some(passengerCentral.pixelCenter)
+      unit.agent.toTravel = Some(passengerCentral.pixel)
       With.commander.move(unit)
     }
   }

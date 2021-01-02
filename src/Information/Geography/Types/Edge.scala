@@ -39,9 +39,9 @@ class Edge(choke: Chokepoint) {
   
   def contains(pixel: Pixel): Boolean = pixelCenter.pixelDistance(pixel) <= radiusPixels
 
-  private lazy val endsWalkable = endPixels.map(_.tileIncluding).forall(With.grids.walkableTerrain.get)
+  private lazy val endsWalkable = endPixels.map(_.tile).forall(With.grids.walkableTerrain.get)
   def pixelTowards(zone: Zone): Pixel = if (endsWalkable)
-      endPixels.minBy(p => zone.distanceGrid.get(p.tileIncluding))
+      endPixels.minBy(p => zone.distanceGrid.get(p.tile))
     else
       endPixels.minBy(_.pixelDistanceSquared(zone.centroid.pixelCenter))
 }

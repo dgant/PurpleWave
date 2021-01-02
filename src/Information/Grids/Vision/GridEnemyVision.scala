@@ -13,7 +13,7 @@ class GridEnemyVision extends AbstractGridFramestamp {
   override protected def updateCells() {
     With.units.enemy.foreach(unit =>
       if (unit.aliveAndComplete && unit.likelyStillThere) {
-        val start = unit.tileIncludingCenter
+        val start = unit.tile
         val altitude = start.altitude
         val points = Circle.points(unit.sightPixels/32)
         val nPoints = points.length

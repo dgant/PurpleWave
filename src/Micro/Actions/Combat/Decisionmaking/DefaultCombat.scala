@@ -74,7 +74,7 @@ object DefaultCombat extends Action {
     val retreat = Retreat.getRetreat(unit)
     if (unit.unitClass.fallbackAllowed) {
       val retreatDistance = unit.pixelDistanceCenter(retreat.to)
-      val retreatStep = unit.pixelCenter.project(retreat.to, Math.min(retreatDistance, 40 + Math.max(0, unit.matchups.pixelsOfEntanglement)))
+      val retreatStep = unit.pixel.project(retreat.to, Math.min(retreatDistance, 40 + Math.max(0, unit.matchups.pixelsOfEntanglement)))
       if (unit.matchups.threats.exists(threat => threat.inRangeToAttack(unit, retreatStep))) {
         if (potshot(unit)) return true
       }
@@ -91,12 +91,12 @@ object DefaultCombat extends Action {
     lazy val pixelsOutranged    = rangeAgainstUs.map(_ - unit.pixelRangeAgainst(target)).filter(_ > 0)
     lazy val confidentToChase   = unit.confidence() > 0.2
     lazy val confidentToDive    = unit.confidence() > 0.5
-    lazy val projectedUs        = unit.pixelCenter.projectUpTo(target.pixelCenter, 16)
-    lazy val projectedTarget    = target.pixelCenter.projectUpTo(target.presumptiveStep, 16)
+    lazy val projectedUs        = unit.pixel.projectUpTo(target.pixel, 16)
+    lazy val projectedTarget    = target.pixel.projectUpTo(target.presumptiveStep, 16)
     lazy val threatApproaching  = unit.pixelDistanceSquared(target) > unit.pixelDistanceSquared(projectedTarget)
     lazy val threatEscaping     = unit.pixelDistanceSquared(target) < unit.pixelDistanceSquared(projectedTarget)
-    lazy val inChoke            = ! unit.flying && unit.zone.edges.exists(_.contains(unit.pixelCenter))
-    lazy val nudgedTowards      = ! unit.flying && target.pixelDistanceSquared(unit.pixelCenter.add(unit.agent.receivedPushForce().normalize(distance / 2).toPoint)) < unit.pixelDistanceSquared(target)
+    lazy val inChoke            = ! unit.flying && unit.zone.edges.exists(_.contains(unit.pixel))
+    lazy val nudgedTowards      = ! unit.flying && target.pixelDistanceSquared(unit.pixel.add(unit.agent.receivedPushForce().normalize(distance / 2).toPoint)) < unit.pixelDistanceSquared(target)
     lazy val sameThreatsChasing = unit.matchups.threats.forall(t => t.inRangeToAttack(unit) == t.inRangeToAttack(unit, projectedUs))
     lazy val obiwanned          = ! unit.flying && ! target.flying && ! unit.unitClass.melee && target.altitude > unit.altitude
 
@@ -276,7 +276,7 @@ object DefaultCombat extends Action {
           return
         } else if (distanceTowards > 0) {
           unit.agent.act("Chase")
-          unit.agent.toTravel = unit.agent.toAttack.map(u => if (u.visible) u.presumptiveStep else u.pixelCenter)
+          unit.agent.toTravel = unit.agent.toAttack.map(u => if (u.visible) u.presumptiveStep else u.pixel)
           Move.delegate(unit)
           return
         }

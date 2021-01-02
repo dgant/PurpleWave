@@ -11,7 +11,7 @@ class GridPathOccupancy extends AbstractGridVersionedValue[Int] {
   override def defaultValue: Int = 0
 
   override protected def onUpdate(): Unit = {
-    With.units.enemy.foreach(enemy => if (! enemy.flying && ! enemy.unitClass.isBuilding) addUnit(enemy, enemy.tileIncludingCenter))
+    With.units.enemy.foreach(enemy => if (! enemy.flying && ! enemy.unitClass.isBuilding) addUnit(enemy, enemy.tile))
   }
 
   protected def add(tile: Tile, value: Int): Unit = set(tile, get(tile) + value)

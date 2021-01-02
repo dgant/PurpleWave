@@ -45,7 +45,7 @@ class Simulacrum(
   var cooldownShooting    : Int                 = Math.max(realUnit.remainingCompletionFrames, 1 + realUnit.cooldownLeft)
   var cooldownMoving      : Int                 = Math.max(realUnit.remainingCompletionFrames, 0)
   val pixelRangeMin       : Double              = realUnit.pixelRangeMin
-  val pixelInitial        : Pixel               = realUnit.pixelCenter
+  val pixelInitial        : Pixel               = realUnit.pixel
   var pixel               : Pixel               = pixelInitial
   var dead                : Boolean             = false
   var target              : Option[Simulacrum]  = None
@@ -196,7 +196,7 @@ class Simulacrum(
     val victimWasAlive    = victim.hitPoints > 0
     // Use the positions of real units, rather than simulations, to determine altitude effects,
     // as units trivially cross terrain as part of simulation
-    val damage            = realUnit.damageOnNextHitAgainst(victim.realUnit, Some(victim.shieldPoints), from = Some(realUnit.pixelCenter), to = Some(victim.realUnit.pixelCenter))
+    val damage            = realUnit.damageOnNextHitAgainst(victim.realUnit, Some(victim.shieldPoints), from = Some(realUnit.pixel), to = Some(victim.realUnit.pixel))
     val damageTotal       = Math.min(victim.shieldPoints + victim.hitPoints, damage)
     val damageToShields   = Math.min(victim.shieldPoints, damageTotal)
     val damageToHitPoints = damageTotal - damageToShields

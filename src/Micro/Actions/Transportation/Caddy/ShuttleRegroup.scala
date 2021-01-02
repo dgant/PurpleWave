@@ -35,8 +35,8 @@ object ShuttleRegroup extends Action {
       if (support.nonEmpty) {
         val supportDeepest = support.maxBy(_.matchups.pixelsOfEntanglement)
         val supportSafest = support.maxBy(_.matchups.pixelsOfEntanglement)
-        var formation = supportDeepest.pixelCenter.project(
-          supportSafest.pixelCenter,
+        var formation = supportDeepest.pixel.project(
+          supportSafest.pixel,
           if (supportDeepest.matchups.threats.isEmpty)
             32.0 * 7.0 - supportDeepest.effectiveRangePixels
           else
@@ -44,7 +44,7 @@ object ShuttleRegroup extends Action {
         formation = Spiral
           .points(8)
           .map(p => formation.add(32 * p.x, 32* p.y))
-          .find(p => With.grids.walkable.get(p.tileIncluding))
+          .find(p => With.grids.walkable.get(p.tile))
           .getOrElse(formation)
 
         if (unit.pixelDistanceCenter(formation) > 32.0 * 12.0) {

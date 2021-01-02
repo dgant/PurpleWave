@@ -38,7 +38,7 @@ object Detect extends Action {
     val ghostbusters = spooky.matchups.enemies.filter(e => e.canMove && (if (spooky.flying) e.unitClass.attacksAir else e.unitClass.attacksGround))
     val ghostbuster = ByOption.minBy(ghostbusters)(_.framesBeforeAttacking(spooky))
 
-    unit.agent.toTravel = ghostbuster.map(_.pixelCenter).orElse(Some(spooky.pixelCenter))
+    unit.agent.toTravel = ghostbuster.map(_.pixel).orElse(Some(spooky.pixel))
 
     if (unit.matchups.framesOfSafety <= 0 && spookiestSpooky.forall(s =>
       s.detected

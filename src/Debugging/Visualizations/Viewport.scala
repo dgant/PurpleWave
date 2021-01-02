@@ -29,8 +29,8 @@ class Viewport {
     contains(tile.pixelCenter)
   }
 
-  val rectangle: Cache[TileRectangle] = new Cache(() => TileRectangle(start.tileIncluding, end.tileIncluding))
-  val rectangleTight: Cache[TileRectangle] = new Cache(() => TileRectangle(start.tileIncluding, start.add(640, 440).tileIncluding))
+  val rectangle: Cache[TileRectangle] = new Cache(() => TileRectangle(start.tile, end.tile))
+  val rectangleTight: Cache[TileRectangle] = new Cache(() => TileRectangle(start.tile, start.add(640, 440).tile))
   
   private val startCache  = new Cache[Pixel](() => startRecalculate)
   private val endcache    = new Cache[Pixel](() => endRecalculate)

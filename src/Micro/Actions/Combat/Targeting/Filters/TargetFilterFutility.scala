@@ -27,7 +27,7 @@ object TargetFilterFutility extends TargetFilter {
       target.visible
       || actor.flying
       || ! target.flying
-      || Vector(actor.pixelToFireAt(target).tileIncluding, target.tileIncludingCenter).exists(t => t.walkable && t.altitude >= target.tileIncludingCenter.altitude))
+      || Vector(actor.pixelToFireAt(target).tile, target.tile).exists(t => t.walkable && t.altitude >= target.tile.altitude))
     if ( ! targetReachable) return false
 
     lazy val atOurWorkers = target.base.exists(_.owner.isUs) && target.matchups.targetsInRange.exists(_.unitClass.isWorker)

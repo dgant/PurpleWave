@@ -18,11 +18,11 @@ object BlockConstruction extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     val builder = blockableBuilders(unit).minBy(_.pixelDistanceEdge(unit))
-    val destination = builder.targetPixel.getOrElse(builder.pixelCenter)
+    val destination = builder.targetPixel.getOrElse(builder.pixel)
     unit.agent.toAttack = Some(builder)
     
     if (unit.framesToGetInRange(builder) > With.reaction.agencyAverage) {
-      unit.agent.toTravel = Some(unit.pixelCenter.project(builder.pixelCenter, unit.pixelDistanceCenter(builder) + 48))
+      unit.agent.toTravel = Some(unit.pixel.project(builder.pixel, unit.pixelDistanceCenter(builder) + 48))
       With.commander.move(unit)
     }
     else if (unit.readyForAttackOrder
@@ -48,7 +48,7 @@ object BlockConstruction extends Action {
       lazy val hasBuildOrder        = buildOrders.contains(builder.order)
       lazy val hasMoveOrder         = builder.order == Orders.Move
       lazy val hasRelevantOrder     = hasBuildOrder  || hasMoveOrder
-      lazy val targetPixel          = builder.orderTargetPixel.orElse(builder.targetPixel).getOrElse(builder.pixelCenter)
+      lazy val targetPixel          = builder.orderTargetPixel.orElse(builder.targetPixel).getOrElse(builder.pixel)
       lazy val movingToRelevantBase = (
         hasRelevantOrder
         && targetPixel.base.exists(base =>

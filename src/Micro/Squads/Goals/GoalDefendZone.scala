@@ -35,7 +35,7 @@ class GoalDefendZone extends SquadGoalBasic {
     lazy val walls = zone.units.filter(u =>
       u.isOurs
         && u.unitClass.isStaticDefense
-        && ( ! u.is(Protoss.ShieldBattery) || choke.forall(_.pixelCenter.pixelDistance(u.pixelCenter) > 96 + u.effectiveRangePixels))
+        && ( ! u.is(Protoss.ShieldBattery) || choke.forall(_.pixelCenter.pixelDistance(u.pixel) > 96 + u.effectiveRangePixels))
         && (squad.enemies.isEmpty || squad.enemies.exists(u.canAttack)))
 
     lazy val allowWandering = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || squad.enemies.exists(_.unitClass.ranged) || With.blackboard.wantToAttack()
@@ -56,7 +56,7 @@ class GoalDefendZone extends SquadGoalBasic {
     }
     else if (wallExistsButNoneNearChoke) {
       lastAction = "Protect wall of "
-      defendHeart(walls.minBy(_.pixelCenter.groundPixels(With.scouting.mostBaselikeEnemyTile)).pixelCenter)
+      defendHeart(walls.minBy(_.pixel.groundPixels(With.scouting.mostBaselikeEnemyTile)).pixel)
     }
     else if (! entranceBreached && canDefendChoke) {
       lastAction = "Protect choke of "
@@ -71,7 +71,7 @@ class GoalDefendZone extends SquadGoalBasic {
   private val pointsOfInterest = new Cache[Vector[Pixel]](() => {
     val output = (
       zone.bases.filter(_.owner.isUs).map(_.heart.pixelCenter)
-        ++ zone.units.view.filter(u => u.isOurs && u.unitClass.isBuilding).map(_.pixelCenter).toVector
+        ++ zone.units.view.filter(u => u.isOurs && u.unitClass.isBuilding).map(_.pixel).toVector
       ).take(10)
     if (output.isEmpty) Vector(zone.centroid.pixelCenter) else output
   } // For performance
@@ -100,11 +100,11 @@ class GoalDefendZone extends SquadGoalBasic {
       .pixelCenter
 
     def distance(enemy: UnitInfo): Double = {
-      ByOption.min(pointsOfInterest().map(_.pixelDistance(enemy.pixelCenter))).getOrElse(enemy.pixelDistanceCenter(home))
+      ByOption.min(pointsOfInterest().map(_.pixelDistance(enemy.pixel))).getOrElse(enemy.pixelDistanceCenter(home))
     }
 
     val huntables = huntableEnemies()
-    _currentDestination = PurpleMath.centroid(huntables.view.map(_.pixelCenter))
+    _currentDestination = PurpleMath.centroid(huntables.view.map(_.pixel))
 
     lazy val target = huntables.minBy(distance)
     lazy val targetAir = ByOption.minBy(huntables.filter(_.flying))(distance).getOrElse(target)
@@ -114,7 +114,7 @@ class GoalDefendZone extends SquadGoalBasic {
       val onlyGround  = recruit.canAttack && !recruit.unitClass.attacksAir
       val thisTarget  = if (onlyAir) targetAir else if (onlyGround) targetGround else target
       recruit.agent.intend(squad.client, new Intention {
-        toTravel = Some(thisTarget.pixelCenter)
+        toTravel = Some(thisTarget.pixel)
         targetFilters = Seq(TargetFilterDefend(zone))
       })
     })
@@ -127,12 +127,12 @@ class GoalDefendZone extends SquadGoalBasic {
       .minBy(protectables.view.filter(p =>
         p.zone != With.geography.ourMain.zone || p.matchups.threats.exists( ! _.unitClass.isWorker)))(u =>
           u.matchups.framesOfSafety + 0.0001 * u.pixelDistanceCenter(center))
-      .map(_.pixelCenter)
+      .map(_.pixel)
       .getOrElse(center)
     val groupArea     = squad.units.view.map(_.unitClass.area).sum
     val groupRadius   = Math.sqrt(groupArea)
     squad.units.foreach(unit => {
-      val unitDestination = if (unit.flying || unit.pixelDistanceCenter(destination) > groupRadius) destination else unit.pixelCenter
+      val unitDestination = if (unit.flying || unit.pixelDistanceCenter(destination) > groupRadius) destination else unit.pixel
       unit.agent.intend(squad.client, new Intention {
         toTravel = Some(unitDestination)
         toReturn = if (zone.bases.exists(_.owner.isUs)) Some(unitDestination) else None

@@ -20,8 +20,8 @@ import scala.collection.SeqView
 object MicroPathing {
 
   def getSimplePath(unit: FriendlyUnitInfo, to: Option[Pixel] = None): TilePath = {
-    val pathfindProfile               = new PathfindProfile(unit.tileIncludingCenter)
-    pathfindProfile.end               = to.orElse(unit.agent.toTravel).map(_.tileIncluding)
+    val pathfindProfile               = new PathfindProfile(unit.tile)
+    pathfindProfile.end               = to.orElse(unit.agent.toTravel).map(_.tile)
     pathfindProfile.employGroundDist  = true
     pathfindProfile.unit              = Some(unit)
     pathfindProfile.find
@@ -29,8 +29,8 @@ object MicroPathing {
 
   def getThreatAwarePath(unit: FriendlyUnitInfo, preferHome: Boolean = true): TilePath = {
     val pathLengthMinimum             = 7
-    val pathfindProfile               = new PathfindProfile(unit.tileIncludingCenter)
-    pathfindProfile.end               = if (preferHome) Some(unit.agent.origin.tileIncluding) else None
+    val pathfindProfile               = new PathfindProfile(unit.tile)
+    pathfindProfile.end               = if (preferHome) Some(unit.agent.origin.tile) else None
     pathfindProfile.lengthMinimum     = Some(pathLengthMinimum)
     pathfindProfile.lengthMaximum     = Some(PurpleMath.clamp((unit.matchups.pixelsOfEntanglement + unit.effectiveRangePixels).toInt / 32, pathLengthMinimum, 15))
     pathfindProfile.threatMaximum     = Some(0)
@@ -53,9 +53,9 @@ object MicroPathing {
 
   def getWaypointToPixel(unit: UnitInfo, goal: Pixel): Pixel = {
     if (unit.flying) return goal
-    val lineWaypoint      = if (PixelRay(unit.pixelCenter, goal).forall(_.walkable)) Some(unit.pixelCenter.project(goal, Math.min(unit.pixelDistanceCenter(goal), waypointDistancePixels))) else None
-    lazy val hillPath     = DownhillPathfinder.decend(unit.tileIncludingCenter, goal.tileIncluding)
-    lazy val hillWaypoint = hillPath.map(path => path.last.pixelCenter.add(unit.pixelCenter.offsetFromTileCenter))
+    val lineWaypoint      = if (PixelRay(unit.pixel, goal).forall(_.walkable)) Some(unit.pixel.project(goal, Math.min(unit.pixelDistanceCenter(goal), waypointDistancePixels))) else None
+    lazy val hillPath     = DownhillPathfinder.decend(unit.tile, goal.tile)
+    lazy val hillWaypoint = hillPath.map(path => path.last.pixelCenter.add(unit.pixel.offsetFromTileCenter))
     lineWaypoint.orElse(hillWaypoint).getOrElse(goal)
   }
 
@@ -81,14 +81,14 @@ object MicroPathing {
     lazy val travelDistanceCurrent = mustApproach.map(unit.pixelDistanceTravelling)
 
     def acceptableForSafety(pixel: Pixel): Boolean = {
-      ! requireSafety || unit.matchups.threats.forall(t => t.pixelDistanceSquared(pixel) > t.pixelDistanceSquared(unit.pixelCenter))
+      ! requireSafety || unit.matchups.threats.forall(t => t.pixelDistanceSquared(pixel) > t.pixelDistanceSquared(unit.pixel))
     }
 
     if (mustApproach.exists(a => unit.pixelDistanceCenter(a) < distance && acceptableForSafety(a))) {
       return mustApproach
     }
 
-    val rayStart = unit.pixelCenter
+    val rayStart = unit.pixel
     val waypointDistance = Math.max(distance, if (requireSafety) 64 + unit.matchups.pixelsOfEntanglement else 0)
     val rayRadians = if (With.reaction.sluggishness <= 1) rayRadians32 else if (With.reaction.sluggishness <= 2) rayRadians16 else rayRadians12
     val terminus = rayRadians
@@ -100,7 +100,7 @@ object MicroPathing {
       })
       .find(p => {
         val terminus = p.clamp(unit.unitClass.dimensionMax / 2)
-        lazy val towardsTerminus = unit.pixelCenter.project(terminus, 8)
+        lazy val towardsTerminus = unit.pixel.project(terminus, 8)
         lazy val travelDistanceTerminus = mustApproach.map(a => if (unit.flying) terminus.pixelDistance(a) else terminus.groundPixels(a))
         (
           terminus.pixelDistance(rayStart) >= 80
@@ -111,7 +111,7 @@ object MicroPathing {
   }
 
   def tryMovingAlongTilePath(unit: FriendlyUnitInfo, path: TilePath): Unit = {
-    val waypoint = getWaypointAlongTilePath(path).map(_.add(unit.pixelCenter.offsetFromTileCenter))
+    val waypoint = getWaypointAlongTilePath(path).map(_.add(unit.pixel.offsetFromTileCenter))
     waypoint.foreach(pixel => {
       unit.agent.toTravel = waypoint
       With.commander.move(unit)
@@ -122,7 +122,7 @@ object MicroPathing {
     TakeN
       .by(maxThreats, unit.matchups.threats.view.filter(_.likelyStillThere))(Ordering.by(t => unit.pixelsOfEntanglement(t)))
       .map(threat => PathfindRepulsor(
-        threat.pixelCenter,
+        threat.pixel,
         threat.dpfOnNextHitAgainst(unit),
         64 + threat.pixelRangeAgainst(unit)))
       .toIndexedSeq

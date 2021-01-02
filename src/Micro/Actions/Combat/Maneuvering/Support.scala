@@ -27,8 +27,8 @@ object Support extends Action {
     val destination = unit.battle
       .map(_.us.vanguard())
       .getOrElse({
-        val centroid = PurpleMath.centroid(supportables.map(_.pixelCenter))
-        supportables.minBy(_.pixelDistanceTravelling(unit.agent.destination)).pixelCenter
+        val centroid = PurpleMath.centroid(supportables.map(_.pixel))
+        supportables.minBy(_.pixelDistanceTravelling(unit.agent.destination)).pixel
       })
 
     // Retreat to help

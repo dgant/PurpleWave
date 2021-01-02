@@ -21,5 +21,5 @@ class GridUnits extends GridItems[UnitInfo] {
   }
   
   override protected def getDefaultItems: Traversable[UnitInfo] = With.units.all
-  override protected def getItemTile(item: UnitInfo): Tile = item.tileIncludingCenter
+  override protected def getItemTile(item: UnitInfo): Tile = item.tile
 }

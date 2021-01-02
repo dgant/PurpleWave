@@ -42,7 +42,7 @@ class GoalAttack extends SquadGoalBasic {
   
   protected def chooseTarget(): Unit = {
     val focusEnemy = With.scouting.threatOrigin
-    val focusUs = PurpleMath.centroid(squad.units.view.map(_.pixelCenter)).tileIncluding
+    val focusUs = PurpleMath.centroid(squad.units.view.map(_.pixel)).tile
     val threatDistanceToUs =
       ByOption.min(With.geography.ourBases.map(_.heart.tileDistanceFast(focusEnemy)))
         .getOrElse(With.geography.home.tileDistanceFast(focusEnemy))
@@ -59,12 +59,12 @@ class GoalAttack extends SquadGoalBasic {
       return
     }
     target =
-      ByOption.minBy(With.geography.ourBasesAndSettlements.flatMap(_.units.filter(u => u.isEnemy && u.unitClass.isBuilding).map(_.pixelCenter)))(_.groundPixels(With.geography.home.pixelCenter))
+      ByOption.minBy(With.geography.ourBasesAndSettlements.flatMap(_.units.filter(u => u.isEnemy && u.unitClass.isBuilding).map(_.pixel)))(_.groundPixels(With.geography.home.pixelCenter))
       .orElse(
         if (With.geography.ourBases.size > 1 && With.frame > Minutes(10)())
           None
         else
-          ByOption.minBy(With.units.enemy.view.filter(_.is(UnitMatchProxied)).map(_.pixelCenter))(_.groundPixels(With.geography.home.pixelCenter)))
+          ByOption.minBy(With.units.enemy.view.filter(_.is(UnitMatchProxied)).map(_.pixel))(_.groundPixels(With.geography.home.pixelCenter)))
       .orElse(
         ByOption
           .maxBy(With.geography.enemyBases)(base => {
@@ -75,7 +75,7 @@ class GoalAttack extends SquadGoalBasic {
             output
           })
           .map(base => ByOption.minBy(base.units.filter(u => u.isEnemy && u.unitClass.isBuilding))(_.pixelDistanceCenter(base.townHallArea.midPixel))
-            .map(_.pixelCenter)
+            .map(_.pixel)
             .getOrElse(base.townHallArea.midPixel)))
       .orElse(if (enemyNonTrollyThreats > 0) Some(With.scouting.threatOrigin.pixelCenter) else None)
       .getOrElse(With.scouting.mostBaselikeEnemyTile.pixelCenter)

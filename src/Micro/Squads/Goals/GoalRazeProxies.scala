@@ -10,7 +10,7 @@ import Utilities.ByOption
 
 class GoalRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends SquadGoalBasic {
 
-  private val proxyPixels   = assignments.values.toSeq.map(_.pixelCenter).distinct
+  private val proxyPixels   = assignments.values.toSeq.map(_.pixel).distinct
   private val centroidPixel = PurpleMath.centroid(proxyPixels)
   private val centroidUnit  = ByOption.minBy(proxyPixels)(_.pixelDistance(centroidPixel)).getOrElse(super.destination)
 
@@ -24,7 +24,7 @@ class GoalRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends Squa
       val assignee = assignments.get(unit)
       val attackTarget = if (With.units.existsEnemy(UnitMatchWarriors)) None else assignee
       unit.agent.intend(squad.client, new Intention {
-        toTravel  = Some(assignee.map(_.pixelCenter).getOrElse(destination))
+        toTravel  = Some(assignee.map(_.pixel).getOrElse(destination))
         toAttack  = attackTarget
         canFlee   = assignments.keys.forall( ! _.unitClass.isWorker)
       })

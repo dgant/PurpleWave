@@ -17,7 +17,7 @@ import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyBasesAtMost, SafeAtHome}
+import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBasesAtMost, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
 import Planning.UnitCounters.UnitCountExactly
 import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
@@ -61,6 +61,12 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
   override def attackPlan: Plan = new If(
     new Or(
       new Not(new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway)),
+      new EnemyHasShown(Protoss.Assimilator),
+      new EnemyHasShown(Protoss.CyberneticsCore),
+      new EnemyHasShown(Protoss.Dragoon),
+      new EnemyHasShown(Protoss.CitadelOfAdun),
+      new EnemyHasShown(Protoss.TemplarArchives),
+      new EnemyBasesAtLeast(2),
       new UnitsAtLeast(3, Protoss.Dragoon, complete = true)),
     new If(
       new And(

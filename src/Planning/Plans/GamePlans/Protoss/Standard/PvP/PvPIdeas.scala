@@ -19,7 +19,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
-import Strategery.Strategies.Protoss.{PvP2Gate1012Goon, PvP2GateDTExpand, PvP3GateGoon, PvP4GateGoon}
+import Strategery.Strategies.Protoss._
 import Utilities.{ByOption, GameTime}
 
 object PvPIdeas {
@@ -63,13 +63,10 @@ object PvPIdeas {
           new Or(
             new UnitsAtLeast(1, Protoss.Reaver, complete = true),
             new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
-            // ---
-            // Experimental, 4/9/20 -- 4 Gate should be able to resume pressure immediately, and maybe other aggressive builds as well
             new Employing(PvP4GateGoon),
             new And(
               new Employing(PvP3GateGoon, PvP2Gate1012Goon),
               new Not(new EnemyStrategy(With.fingerprints.fourGateGoon))),
-            // ---
             new And(
               new Latch(new UnitsAtLeast(5, Protoss.Gateway, complete = true)),
               new Latch(new UnitsAtLeast(20, UnitMatchWorkers, complete = true))),
@@ -92,7 +89,7 @@ object PvPIdeas {
         new Latch(new UnitsAtLeast(15, UnitMatchWarriors))),
       // Don't mess with 4-Gates
       new Or(
-        new Employing(PvP2Gate1012Goon, PvP4GateGoon),
+        new Employing(PvP2Gate1012Goon, PvPRobo1012, PvP4GateGoon),
         new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
         new UnitsAtLeast(4, Protoss.Gateway, complete = true),
         new And(

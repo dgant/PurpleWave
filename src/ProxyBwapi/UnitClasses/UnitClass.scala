@@ -534,6 +534,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     Terran.Vulture,
     Terran.SiegeTankUnsieged,
     Terran.Goliath,
+    Terran.Wraith,
     Protoss.Dragoon,
     Zerg.Hydralisk).contains(this)
 

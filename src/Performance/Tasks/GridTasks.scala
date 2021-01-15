@@ -16,6 +16,7 @@ class TaskGridEnemyRangeGround            extends GridTask(With.grids.enemyRange
 class TaskGridEnemyRangeAirGround         extends GridTask(With.grids.enemyRangeAirGround)
 class TaskGridEnemyVision                 extends GridTask(With.grids.enemyVision)
 class TaskGridFriendlyDetection           extends GridTask(With.grids.friendlyDetection)
+class TaskGridFriendlyVision              extends GridTask(With.grids.lastSeen)
 class TaskGridPsionicStorm                extends GridTask(With.grids.psionicStorm)
 class TaskGridPsi2x2and3x2                extends GridTask(With.grids.psi2Height)
 class TaskGridPsi4x3                      extends GridTask(With.grids.psi3Height)

@@ -17,7 +17,6 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   @inline final def update(): Unit = {
     updateTimeSensitiveInformation()
     updateTimeInsensitiveInformation()
-    fixCloakedUnits()
     updateCommon()
     if ( ! lastSeenWithin(24) && is(Terran.SiegeTankUnsieged)) {
       _unitClass = Terran.SiegeTankSieged
@@ -26,7 +25,7 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   
   private var updateCount = 0
   private def updateTimeInsensitiveInformation() {
-    if (updateCount == 0 || (updateCount + id) % With.configuration.foreignUnitUpdatePeriod == 0) {
+    if (updateCount == 0 || (updateCount + id) % With.configuration.foreignUnitUpdatePeriod == 0 || ! lastSeenWithin(With.configuration.foreignUnitUpdatePeriod)) {
       updateTracking()
       updateVisibility()
       updateHealth()
@@ -50,6 +49,10 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
     _tileTopLeft          = new Tile(bwapiUnit.getTilePosition)
     _hitPoints            = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxHitPoints  else _hitPoints     else bwapiUnit.getHitPoints
     _shieldPoints         = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxShields    else _shieldPoints  else bwapiUnit.getShields
+    if (alive && cloaked && hitPoints == 0) {
+      _hitPoints = unitClass.maxHitPoints
+      _shieldPoints = unitClass.maxShields
+    }
   }
   
   private def updateTracking() {
@@ -344,13 +347,4 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   @inline final def addon: Option[UnitInfo] = _addon
   @inline final def hasNuke: Boolean = false
   @inline final def framesUntilRemoval: Int = _removalTimer
-  
-  // Cloaked units show up with 0 hit points/shields.
-  // Presumably, if we've never seen them, then they're healthier than that.
-  @inline final def fixCloakedUnits() {
-    if (alive && cloaked && hitPoints == 0) {
-      _hitPoints = unitClass.maxHitPoints
-      _shieldPoints = unitClass.maxShields
-    }
-  }
 }

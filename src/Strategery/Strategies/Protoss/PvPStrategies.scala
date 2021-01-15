@@ -17,7 +17,11 @@ object PvP3rdBaseSlow extends PvPStrategy
 abstract class PvPOpening extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(PvP3rdBaseSlow, PvP3rdBaseFast))
 }
-object PvPRobo extends PvPOpening
+object PvPRobo1012 extends PvPStrategy
+object PvPRobo1Gate extends PvPStrategy
+object PvPRobo extends PvPOpening {
+  override def choices: Iterable[Iterable[Strategy]] = super.choices ++ Seq(Seq(PvPRobo1012, PvPRobo1Gate))
+}
 object PvP2GateDTExpand extends PvPOpening
 object PvP2Gate1012Goon extends PvPOpening {
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.earlyForge, With.fingerprints.forgeFe, With.fingerprints.gatewayFe)

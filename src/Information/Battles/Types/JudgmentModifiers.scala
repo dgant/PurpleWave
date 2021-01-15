@@ -107,11 +107,12 @@ object JudgmentModifiers {
     val workersImperiled = battleLocal.us.units.count(ally =>
       ally.unitClass.isWorker
       && ally.visibleToOpponents
-      && ally.friendly.exists(_.agent.toGather.exists(_.pixelDistanceEdge(ally) < Gather.defenseRadiusPixels))
-      && ally.matchups.pixelsOfEntanglementWarrior > -32)
+      && ally.friendly.exists(_.agent.toGather.exists(g =>
+        g.pixelDistanceEdge(ally) <= Gather.defenseRadiusPixels
+        && ally.matchups.threats.exists(_.pixelsToGetInRange(ally, g.pixel) <= Gather.defenseRadiusPixels))))
     val workersTotal = With.units.countOurs(UnitMatchWorkers)
     val workersRatio = PurpleMath.nanToZero(workersImperiled.toDouble / workersTotal)
-    if (workersRatio > 0) Some(JudgmentModifier(gainedValueMultiplier = 1 + workersRatio)) else None
+    if (workersRatio > 0) Some(JudgmentModifier(targetDelta = -workersRatio)) else None
   }
 
   // Avoid fighting

@@ -41,7 +41,7 @@ abstract class AbstractSearch extends Action {
 
     val tilesToScout = unit.agent.intent.toScoutTiles
       .filter(tile =>
-        With.grids.friendlyVision.framesSince(tile) > boredomFrames
+        With.grids.lastSeen.framesSince(tile) > boredomFrames
         && With.grids.buildableTerrain.get(tile)
         && (unit.enemyRangeGrid.get(tile) <= 0 || ( unit.cloaked && ! With.grids.enemyDetection.isDetected(tile.i)))
         && ! unit.matchups.threats.exists(_.inRangeToAttack(unit, tile.pixelCenter))
@@ -55,7 +55,7 @@ abstract class AbstractSearch extends Action {
   
     val pulls = tilesToScout.map(tile => Gravity(
       tile.pixelCenter,
-      With.grids.friendlyVision.framesSince(tile)))
+      With.grids.lastSeen.framesSince(tile)))
     
     val force = pulls.map(_.apply(unit.pixel)).reduce(_ + _)
 

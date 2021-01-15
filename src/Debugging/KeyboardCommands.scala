@@ -18,10 +18,10 @@ object KeyboardCommands {
       case "vh"         => With.visualization.happy       = ! With.visualization.happy
       case "vt"         => With.visualization.textOnly    = ! With.visualization.textOnly
 
-      case "1"          => With.game.setLocalSpeed(1000)  ; With.camera.enabled = false
-      case "2"          => With.game.setLocalSpeed(60)    ; With.camera.enabled = false
-      case "3"          => With.game.setLocalSpeed(30)    ; With.camera.enabled = false
-      case "4"          => With.game.setLocalSpeed(0)     ; With.camera.enabled = false
+      case "1"          => With.game.setLocalSpeed(24 * 32) ; With.camera.enabled = false
+      case "2"          => With.game.setLocalSpeed(24 * 8)  ; With.camera.enabled = false
+      case "3"          => With.game.setLocalSpeed(24)      ; With.camera.enabled = false
+      case "4"          => With.game.setLocalSpeed(0)       ; With.camera.enabled = false
       case "perform"    => { With.configuration.enablePerformancePauses = ! With.performance.enablePerformancePauses; Manners.chat("Performance stops? " + With.configuration.enablePerformancePauses) }
       case "map"        => With.logger.debug("The current map is " + With.game.mapName + ": " + With.game.mapFileName)
       case "pm"         => With.logger.debug(JBWAPIClient.getPerformanceMetrics.toString)

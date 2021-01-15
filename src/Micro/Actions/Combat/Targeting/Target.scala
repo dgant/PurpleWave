@@ -54,13 +54,13 @@ object Target extends {
       .toVector
   }
 
-  def auditScore(attacker: FriendlyUnitInfo): Seq[(UnitInfo, Double, Double)] = {
-    attacker.matchups.targets.view.map(target => (target, target.targetBaseValue(), score(attacker, target))).toVector.sortBy(-_._3)
+  def auditScore(attacker: FriendlyUnitInfo): Seq[(UnitInfo, Double, Double, Double)] = {
+    attacker.matchups.targets.view.map(target => (target, attacker.pixelDistanceEdge(target) / 32d, target.targetBaseValue(), score(attacker, target))).toVector.sortBy(-_._3)
   }
 
-  @inline final def score(attacker: FriendlyUnitInfo, target: UnitInfo): Double = {
-    val framesOfFreedom = attacker.cooldownLeft
-    val framesOutOfWay = if (attacker.canMove) Math.max(0, attacker.framesToGetInRange(target) - framesOfFreedom) else 0
+  // TODO: Re-inline
+  def score(attacker: FriendlyUnitInfo, target: UnitInfo): Double = {
+    val framesOutOfWay = if (attacker.canMove) Math.max(0, attacker.framesToGetInRange(target) - attacker.cooldownLeft) else 0
     val scoreBasic = baseAttackerToTargetValue(
       baseTargetValue = target.targetBaseValue(),
       totalHealth = target.totalHealth,
@@ -108,22 +108,14 @@ object Target extends {
     // Gathering bonus
     val gathering = target.gathering
     if (gathering) {
-      output *= 2.0
+      output *= 1.1
     }
 
     // Construction bonus
     val constructing = target.constructing
     if (constructing) {
-      output *= 2.0
+      output *= 1.5
     }
-
-    // Repair bonus
-    val repairValue = target.orderTarget.map(targetOrderTarget =>
-      if (target.repairing && ! targetOrderTarget.repairing && recur)
-        1.1 * getTargetBaseValue(targetOrderTarget, recur = false)
-      else
-        0.0).getOrElse(0.0)
-    output = Math.max(output, repairValue)
 
     // Combat bonus
     if (target.participatingInCombat()) {
@@ -178,8 +170,7 @@ object Target extends {
 
     // Detection bonus
     val aggressivelyDenyDetection = With.reaction.sluggishness > 0
-    val weHaveCloakedThreat = if (aggressivelyDenyDetection)
-      target.matchups.enemies.exists(e => e.cloaked && e.matchups.targets.nonEmpty) && ! target.matchups.enemies.exists(_.is(Protoss.Arbiter))
+    val weHaveCloakedThreat = if (aggressivelyDenyDetection) target.matchups.enemies.exists(e => e.cloaked && e.matchups.targets.nonEmpty) && ! target.matchups.enemies.exists(_.is(Protoss.Arbiter))
     else (
       With.self.hasTech(Terran.WraithCloak)
       || With.self.hasTech(Zerg.LurkerMorph)
@@ -213,6 +204,14 @@ object Target extends {
     if (target.unitClass.isTownHall && target.base.forall(base => ! With.scouting.enemyMain.contains(base) && ! With.scouting.enemyNatural.contains(base))) {
       output *= 3.0
     }
+
+    // Repair bonus
+    val repairValue = target.orderTarget.map(targetOrderTarget =>
+      if (target.repairing && ! targetOrderTarget.repairing && recur)
+        1.1 * getTargetBaseValue(targetOrderTarget, recur = false)
+      else
+        0.0).getOrElse(0.0)
+    output = Math.max(output, repairValue)
 
     output
   }

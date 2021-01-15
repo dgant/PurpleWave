@@ -22,7 +22,7 @@ class Grids {
   val enemyRangeAirGround         = new GridEnemyRangeAirGround
   val enemyVision                 = new GridEnemyVision
   val friendlyDetection           = new GridFriendlyDetection
-  val friendlyVision              = new GridFriendlyVision
+  val lastSeen                    = new GridLastSeen
   val psi2Height                  = new GridPsi2Height
   val psi3Height                  = new GridPsi3Height
   val psionicStorm                = new GridPsionicStorm

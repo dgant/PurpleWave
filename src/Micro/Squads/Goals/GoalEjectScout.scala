@@ -15,7 +15,7 @@ class GoalEjectScout extends SquadGoalBasic {
   override def destination: Pixel = targetScout
     .map(_.pixel)
     .getOrElse(
-      ByOption.minBy(tilesToConsider)(With.grids.friendlyVision.get).getOrElse(With.geography.home).pixelCenter)
+      ByOption.minBy(tilesToConsider)(With.grids.lastSeen.get).getOrElse(With.geography.home).pixelCenter)
 
   private def tilesToConsider: Seq[Tile] = ScoutTracking.basesToConsider.view.flatMap(_.zone.tiles)
 

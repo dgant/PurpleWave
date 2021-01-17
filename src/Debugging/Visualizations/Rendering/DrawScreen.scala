@@ -36,6 +36,15 @@ object DrawScreen {
         y + rowIndex * 13,
         pair._1))
   }
+
+  def padTable(cells: Iterable[Iterable[String]]): Iterable[Iterable[String]] = {
+    val max: Int = ByOption.max(cells.view.flatten.map(_.length)).getOrElse(0)
+    cells.map(_.map(_.padTo(max, ' ')))
+  }
+
+  def tableToString(cells: Iterable[Iterable[String]]): String = {
+    cells.map(_.mkString(" ")).mkString("\n")
+  }
   
   case class GraphCurve(color: Color, points: IndexedSeq[Double])
   

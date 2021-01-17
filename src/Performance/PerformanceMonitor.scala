@@ -1,6 +1,9 @@
 package Performance
 
 import Lifecycle.{JBWAPIClient, With}
+import Performance.Tasks.TimedTask
+
+import scala.collection.mutable.ArrayBuffer
 
 class PerformanceMonitor {
   
@@ -69,4 +72,8 @@ class PerformanceMonitor {
   def meanFrameMilliseconds : Long = frameTimes.view.map(Math.min(_, 100)).sum / framesToTrack
 
   def disqualified: Boolean = framesOverShort >= 320 || framesOver1000  >= 10
+
+  private val _tasks = new ArrayBuffer[TimedTask]
+  def addTask(task: TimedTask): Unit = { _tasks += task}
+  def tasks: Seq[TimedTask] = _tasks
 }

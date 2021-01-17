@@ -3,24 +3,34 @@ package Debugging.Visualizations.Views.Performance
 import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
+import Performance.Tasks.TimedTask
 
 object ShowPerformanceDetails extends View {
   
   override def renderScreen() {
-    val headers = Vector("Task", "Last run", " Run %", "Seconds", "Avg ms", "Max (Recent)", "Max (All time)", "Extended", "Disqualifying")
-    val body = With.tasks.tasks
-      .sortBy(_.getClass.getSimpleName)
+    DrawScreen.table(5, With.visualization.lineHeightSmall * 6, statusTable(sortTasks(With.performance.tasks)))
+  }
+
+  def sortTasks(tasks: Seq[TimedTask]): Seq[TimedTask] = tasks
+    .sortBy(_.getClass.getSimpleName)
+    .sortBy(_.runMsTotal)
+    .sortBy(_.runsCrossingTarget)
+    .sortBy(_.runsCrossingLimit)
+
+  def statusTable(tasks: Seq[TimedTask]): Seq[Seq[String]] = {
+    val title = Vector("Cutoff: ", With.configuration.frameMillisecondLimit + "ms")
+    val headers = Vector("Task", "Last run", "Seconds", "Avg ms", "Max (Recent)", "Max (All time)", "AcrossTarget", "AcrossLimit")
+    val body = tasks
       .map(task => Vector(
-        task.getClass.getSimpleName.replace("Task", ""),
+        task.getClass.getSimpleName.replace("Task", "").padTo(20, ' '),
         "X" * Math.min(10, Math.max(0, task.framesSinceRunning - 1)),
-        " " + (100 * (1.0 + task.totalRuns) / (1.0 + task.totalSkips + task.totalRuns)).toInt.toString + "%%",
-        (task.runMillisecondsTotal / 1000).toString,
-        task.runMillisecondsMean.toString,
-        task.runMillisecondsMaxRecent().toString,
-        task.runMillisecondsMaxAllTime.toString,
-        task.totalViolatedThreshold.toString,
-        task.totalViolatedRules.toString
+        (task.runMsTotal / 1000).toString,
+        task.runMsRecentMean.toString,
+        task.runMsRecentMax().toString,
+        task.runMsMax.toString,
+        task.runsCrossingTarget.toString,
+        task.runsCrossingLimit.toString
       ))
-    DrawScreen.table(5, With.visualization.lineHeightSmall * 6, With.tasks.statusTable)
+    Vector(title) ++ Vector(headers) ++ body
   }
 }

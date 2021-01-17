@@ -16,7 +16,7 @@ import Micro.Agency.{Agency, Commander}
 import Micro.Coordination.Coordinator
 import Micro.Matchups.MatchupGraph
 import Micro.Squads.Squads
-import Performance.TaskQueue.{AbstractTaskQueue, TaskQueueGlobal}
+import Performance.TaskQueue.{TaskQueueParallel, TaskQueueGlobal}
 import Placement.Preplacement
 import Planning.{Blackboard, Yolo}
 import ProxyBwapi.Bullets.Bullets
@@ -83,7 +83,7 @@ object With {
   var strategy          : Strategist              = _
   var storyteller       : Storyteller             = _
   var squads            : Squads                  = _
-  var tasks             : AbstractTaskQueue       = _
+  var tasks             : TaskQueueParallel       = _
   var units             : UnitTracker             = _
   var unitsShown        : UnitsShown              = _
   var viewport          : Viewport                = _

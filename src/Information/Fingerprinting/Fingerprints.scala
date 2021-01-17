@@ -55,17 +55,12 @@ class Fingerprints {
     ) else Seq.empty)
   
   def update() {
-    if (With.frame > Minutes(10)()) {
-      return
-    }
+    if (With.frame > Minutes(10)()) return
 
-    val fingerprints = relevantFingerprints.toVector.sortBy(_.lastUpdateFrame)
-
-    fingerprints.foreach(fingerprint => {
-      if (With.performance.continueRunning) {
-        fingerprint.update()
-      }
-    })
+    relevantFingerprints
+      .toVector
+      .sortBy(_.lastUpdateFrame)
+      .foreach(f => if (With.performance.continueRunning) f.update())
   }
 
   val all: mutable.ArrayBuffer[Fingerprint] = new mutable.ArrayBuffer[Fingerprint]

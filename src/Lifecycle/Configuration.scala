@@ -23,7 +23,7 @@ class Configuration {
   var visualizeDebug                  = false
   var debugging                       = false
   var logstd                          = false
-  var debugPauseThreshold: Int        = 24 * 60 * 60
+  var debugPauseThreshold: Int        = 24 * 60 * 5
 
   //////////////
   // Strategy //
@@ -78,7 +78,7 @@ class Configuration {
   var urgencyEconomy            = 1
   var urgencyGather             = 1
   var urgencyGeography          = 1
-  var urgencyArchitecture       = 1
+  var urgencyPlacement       = 1
   var urgencyGrids              = 1
   var urgencyPlanning           = 3
   var urgencySquads             = 10

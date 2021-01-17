@@ -3,7 +3,7 @@ package Performance.Tasks
 import Information.Grids.AbstractGrid
 import Lifecycle.With
 
-abstract class GridTask[T](grid: AbstractGrid[T]) extends AbstractTask {
+abstract class GridTask[T](grid: AbstractGrid[T]) extends TimedTask {
   override protected def onRun(): Unit = grid.update()
 }
 

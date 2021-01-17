@@ -7,12 +7,8 @@ import Information.Grids.Disposable.{GridDisposableBoolean, GridDisposableDouble
 import Information.Grids.Movement._
 import Information.Grids.Spells.GridPsionicStorm
 import Information.Grids.Vision._
-import Performance.TaskQueue.TaskQueueGrids
 
 class Grids {
-
-  lazy val tasks = new TaskQueueGrids
-
   val buildable                   = new GridBuildable
   val buildableTerrain            = new GridBuildableTerrain
   val buildableTownHall           = new GridBuildableTownHall

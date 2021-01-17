@@ -3,6 +3,8 @@ package Debugging
 import java.lang.management.ManagementFactory
 import java.util.Calendar
 
+import Debugging.Visualizations.Rendering.DrawScreen
+import Debugging.Visualizations.Views.Performance.ShowPerformanceDetails
 import Debugging.Visualizations.Views.Planning.{ShowStrategyEvaluations, ShowStrategyInterest}
 import Lifecycle.{JBWAPIClient, Main, With}
 import Planning.Predicates.Reactive.{SafeAtHome, SafeToMoveOut}
@@ -141,6 +143,11 @@ class Storyteller {
       + (if (Main.configuration.getAsync) ", if running synchronously, would be " else " was ")
       + (if (With.performance.disqualified) "BAD" else if (With.performance.danger) "DANGEROUS" else "good"))
     tell(JBWAPIClient.getPerformanceMetrics.toString)
+    tell(
+      DrawScreen.tableToString(
+        DrawScreen.padTable(
+          ShowPerformanceDetails.statusTable(
+            ShowPerformanceDetails.sortTasks(With.performance.tasks)))))
   }
 
   private def logMemoryUsage(): Unit = {

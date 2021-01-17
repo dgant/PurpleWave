@@ -123,7 +123,7 @@ class Visualization {
   def render() {
     requireInitialization()
     if ( ! enabled) return
-    if (With.tasks.tasks.exists(_.totalRuns == 0)) return
+    if (With.tasks.tasks.exists(_.runsTotal == 0)) return
     With.game.setTextSize(Text.Size.Small)
     
     if (happy) {

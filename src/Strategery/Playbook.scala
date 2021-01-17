@@ -39,6 +39,8 @@ object StrategyGroups {
     PvE2BaseIslandCarrier, // Disabled for Sparkle in TorchUp
     PvE3BaseIslandCarrier, // Disabled for Sparkle in TorchUp
 
+    PvEStormNo, // Let's try storming again with the fixed storm micro
+
 
     PvT13Nexus, // Good Terran bots are bunker rushing this too effectively
 

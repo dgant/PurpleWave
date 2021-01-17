@@ -89,8 +89,7 @@ object DefaultCombat extends Action {
     lazy val rangeAgainstUs     = if (target.canAttack(unit)) Some(target.pixelRangeAgainst(unit)) else None
     lazy val rangeEqual         = rangeAgainstUs.contains(range)
     lazy val pixelsOutranged    = rangeAgainstUs.map(_ - unit.pixelRangeAgainst(target)).filter(_ > 0)
-    lazy val confidentToChase   = unit.confidence() > 0.2
-    lazy val confidentToDive    = unit.confidence() > 0.5
+    lazy val confidentToChase   = true //unit.confidence() > 0
     lazy val projectedUs        = unit.pixel.projectUpTo(target.pixel, 16)
     lazy val projectedTarget    = target.pixel.projectUpTo(target.presumptiveStep, 16)
     lazy val targetApproaching  = unit.pixelDistanceSquared(target) > unit.pixelDistanceSquared(projectedTarget)
@@ -107,25 +106,25 @@ object DefaultCombat extends Action {
 
     // Chasing behaviors
     // Reavers shouldn't even try
-    if ( ! unit.is(Protoss.Reaver)) {
-      // Chase if they outrange us
-      if (pixelsOutranged.isDefined) return chaseDistance
+    if (unit.is(Protoss.Reaver)) return range
 
-      // Chase if we're in a choke and being nudged towards them
-      if (inChoke && nudgedTowards) return chaseDistance
+    // Chase if they outrange us
+    if (pixelsOutranged.isDefined) return chaseDistance
 
-      // Chase if we're confident and being nudged towards them
-      if (confidentToChase && nudgedTowards) return chaseDistance
+    // Chase if we're in a choke and being nudged towards them
+    if (inChoke && nudgedTowards) return chaseDistance
 
-      // Chase if we're confident and fighting up high ground
-      if (obiwanned) return chaseDistance
+    // Chase if we're confident and fighting up high ground
+    if (obiwanned) return chaseDistance
 
-      // Chase if they're escaping out of our ideal range and chasing won't bring us into range of anyone new
-      if (targetEscaping && sameThreatsChasing) return chaseDistance
+    // Chase if we're confident and being nudged towards them
+    if (confidentToChase && nudgedTowards) return chaseDistance
 
-      // Chase if they're escaping out of our ideal range and we're VERY confident
-      if (targetEscaping && confidentToDive) return chaseDistance
-    }
+    // Chase if we're confident and they're about to escape us
+    if (confidentToChase && targetEscaping) return chaseDistance
+
+    // Chase if they're escaping out of our ideal range and chasing won't bring us into range of anyone new
+    if (targetEscaping && sameThreatsChasing) return chaseDistance
 
     // Breathe if range is equal and they shoot first
     if (rangeEqual && target.cooldownLeft < unit.cooldownLeft) return range + Math.max(0, unit.cooldownLeft - With.latency.latencyFrames - unit.framesToTurnTo(target)) * unit.topSpeed
@@ -137,7 +136,7 @@ object DefaultCombat extends Action {
     if (targetApproaching) return range
 
     // Maintain just enough range if we're being nudged
-    if (nudgedTowards) return rangeAgainstUs.map(r => Math.min(r + 32, range)).getOrElse(0)
+    if (nudgedTowards) return chaseDistance
 
     // Otherwise, stay near max range. Get a little closer if we can in case they try to flee
     rangeAgainstUs.map(rangeAgainst => PurpleMath.clamp(rangeAgainst + 64, range - 16, range)).getOrElse(range - 16)

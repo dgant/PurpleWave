@@ -147,7 +147,8 @@ class Storyteller {
       DrawScreen.tableToString(
         DrawScreen.padTable(
           ShowPerformanceDetails.statusTable(
-            ShowPerformanceDetails.sortTasks(With.performance.tasks)))))
+            ShowPerformanceDetails.sortTasks(
+              With.performance.tasks)))))
   }
 
   private def logMemoryUsage(): Unit = {

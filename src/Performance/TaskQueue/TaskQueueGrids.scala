@@ -1,23 +1,29 @@
 package Performance.TaskQueue
+import Information.Grids.AbstractGrid
+import Lifecycle.With
 import Performance.Tasks._
 
+class GridTask[T](grid: AbstractGrid[T]) extends TimedTask {
+  override protected def onRun(): Unit = grid.update()
+}
+
 class TaskQueueGrids extends TaskQueueParallel(
-  new TaskGridBuildable                   { urgency = 10   },
-  new TaskGridBuildableTerrain            { urgency = 10   },
-  new TaskGridBuildableTownHall           { urgency = 1    },
-  new TaskGridEnemyDetection              { urgency = 100  },
-  new TaskGridEnemyRangeAir               { urgency = 100  },
-  new TaskGridEnemyRangeGround            { urgency = 100  },
-  new TaskGridEnemyRangeAirGround         { urgency = 100  },
-  new TaskGridEnemyVision                 { urgency = 10   },
-  new TaskGridFriendlyDetection           { urgency = 10   },
-  new TaskGridFriendlyVision              { urgency = 10   },
-  new TaskGridPsionicStorm                { urgency = 100  },
-  new TaskGridPsi2x2and3x2                { urgency = 10   },
-  new TaskGridPsi4x3                      { urgency = 10   },
-  new TaskGridScoutingPathBases           { urgency = 1    },
-  new TaskGridScoutingPathStartLocations  { urgency = 1    },
-  new TaskGridUnits                       { urgency = 1000 },
-  new TaskGridWalkable                    { urgency = 1    },
-  new TaskGridWalkableTerrain             { urgency = 1    },
-  new TaskGridUnwalkableUnits             { urgency = 5    })
+  new GridTask(With.grids.buildable)                    .withUrgency(10),
+  new GridTask(With.grids.buildableTerrain)             .withUrgency(10),
+  new GridTask(With.grids.buildableTownHall)            .withUrgency(1),
+  new GridTask(With.grids.enemyDetection)               .withUrgency(100),
+  new GridTask(With.grids.enemyRangeAir)                .withUrgency(100),
+  new GridTask(With.grids.enemyRangeGround)             .withUrgency(100),
+  new GridTask(With.grids.enemyRangeAirGround)          .withUrgency(100),
+  new GridTask(With.grids.enemyVision)                  .withUrgency(10),
+  new GridTask(With.grids.friendlyDetection)            .withUrgency(10),
+  new GridTask(With.grids.lastSeen)                     .withUrgency(10),
+  new GridTask(With.grids.psionicStorm)                 .withUrgency(100),
+  new GridTask(With.grids.psi2Height)                   .withUrgency(10),
+  new GridTask(With.grids.psi3Height)                   .withUrgency(10),
+  new GridTask(With.grids.scoutingPathsBases)           .withUrgency(1),
+  new GridTask(With.grids.scoutingPathsStartLocations)  .withUrgency(1),
+  new GridTask(With.grids.units)                        .withUrgency(1000),
+  new GridTask(With.grids.walkable)                     .withUrgency(1),
+  new GridTask(With.grids.walkableTerrain)              .withUrgency(1),
+  new GridTask(With.grids.unwalkableUnits)              .withUrgency(5))

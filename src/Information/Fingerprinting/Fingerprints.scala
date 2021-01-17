@@ -4,13 +4,16 @@ import Information.Fingerprinting.ProtossStrategies._
 import Information.Fingerprinting.TerranStrategies._
 import Information.Fingerprinting.ZergStrategies._
 import Lifecycle.With
-import Utilities.Minutes
 
 import scala.collection.mutable
 
 class Fingerprints {
 
-  private def relevantFingerprints =
+  val all: mutable.ArrayBuffer[Fingerprint] = new mutable.ArrayBuffer[Fingerprint]
+
+  def status: Seq[String] = all.filter(_.matches).map(_.toString.replaceAll("Fingerprint", ""))
+
+  def relevant: Seq[Fingerprint] =
     Seq(
       workerRush,
       gasSteal) ++
@@ -53,24 +56,11 @@ class Fingerprints {
       twelveHatch,
       oneHatchGas
     ) else Seq.empty)
-  
-  def update() {
-    if (With.frame > Minutes(10)()) return
-
-    relevantFingerprints
-      .toVector
-      .sortBy(_.lastUpdateFrame)
-      .foreach(f => if (With.performance.continueRunning) f.update())
-  }
-
-  val all: mutable.ArrayBuffer[Fingerprint] = new mutable.ArrayBuffer[Fingerprint]
 
   private def addFingerprint(fingerprint: Fingerprint): Fingerprint = {
     all += fingerprint
     fingerprint
   }
-
-  def status: Seq[String] = all.filter(_.matches).map(_.toString.replaceAll("Fingerprint", ""))
 
   // Generic
   lazy val workerRush         = addFingerprint(new FingerprintWorkerRush)

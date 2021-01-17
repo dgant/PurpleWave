@@ -13,9 +13,9 @@ object ShowPerformanceDetails extends View {
 
   def sortTasks(tasks: Seq[TimedTask]): Seq[TimedTask] = tasks
     .sortBy(_.getClass.getSimpleName)
-    .sortBy(_.runMsTotal)
-    .sortBy(_.runsCrossingTarget)
-    .sortBy(_.runsCrossingLimit)
+    .sortBy(-_.runMsTotal)
+    .sortBy(-_.runsCrossingTarget)
+    .sortBy(-_.runsCrossingLimit)
 
   def statusTable(tasks: Seq[TimedTask]): Seq[Seq[String]] = {
     val title = Vector("Cutoff: ", With.configuration.frameMillisecondLimit + "ms")

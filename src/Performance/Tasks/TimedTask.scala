@@ -91,5 +91,5 @@ abstract class TimedTask {
     }
   }
 
-  override val toString: String = name
+  override def toString: String = name
 }

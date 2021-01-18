@@ -52,12 +52,12 @@ object ConfigurationLoader {
       val debugging     = getOrDefault(config, "debugging",     false)
       val debugginglive = getOrDefault(config, "debugginglive", false)
       val logstd        = getOrDefault(config, "logstd",        false)
-      val frameMsTarget = getOrDefault(config, "framemstarget", With.configuration.frameMillisecondTarget)
-      val frameMsLimit  = getOrDefault(config, "framemslimit",  With.configuration.frameMillisecondLimit)
+      val frameMsTarget = getOrDefault(config, "framemstarget", With.configuration.frameTargetMs)
+      val frameMsLimit  = getOrDefault(config, "framemslimit",  With.configuration.frameLimitMs)
       val fixedbuilds   = new FileFlag("fixedbuilds.txt").contents
 
-      With.configuration.frameMillisecondTarget = frameMsTarget
-      With.configuration.frameMillisecondLimit = frameMsLimit
+      With.configuration.frameTargetMs = frameMsTarget
+      With.configuration.frameLimitMs = frameMsLimit
 
       if (tournament    && ladder)      With.logger.warn("Both tournament and ladder modes are enabled")
       if (tournament    && livestream)  With.logger.warn("Both tournament and livestream modes are enabled")
@@ -96,47 +96,47 @@ object ConfigurationLoader {
   }
 
   private def setLadderMode(): Unit = {
-    config.historyHalfLife                  = 40
-    config.recentFingerprints               = 4
+    config.historyHalfLife    = 40
+    config.recentFingerprints = 4
   }
 
   private def setEliminationMode(): Unit = {
-    config.recentFingerprints               = 2
+    config.recentFingerprints = 2
   }
 
   private def setRoundRobinMode(): Unit = {
-    config.historyHalfLife                  = 40
-    config.recentFingerprints               = 4
+    config.historyHalfLife    = 40
+    config.recentFingerprints = 4
   }
 
   private def setLivestreamMode(): Unit = {
-    config.visualizeFun                     = true
-    config.enableChat                       = true
-    config.enableSurrenders                 = true
+    config.visualizeFun       = true
+    config.enableChat         = true
+    config.enableSurrenders   = true
   }
 
   private def setHumanMode(): Unit = {
-    config.humanMode                        = true
-    config.enableChat                       = true
-    config.enableSurrenders                 = true
-    config.forcedPlaybook                   = Some(HumanPlaybook)
+    config.humanMode          = true
+    config.enableChat         = true
+    config.enableSurrenders   = true
+    config.forcedPlaybook     = Some(HumanPlaybook)
   }
 
   private def setPretraining(): Unit = {
-    config.forcedPlaybook                   = Some(PretrainingPlaybook)
+    config.forcedPlaybook     = Some(PretrainingPlaybook)
   }
 
   private def setDebugMode(): Unit = {
-    config.enableChat                       = true
-    config.enableSurrenders                 = true
-    config.debugging                        = true
+    config.enableChat         = true
+    config.enableSurrenders   = true
+    config.debugging          = true
   }
 
   private def setDebugLiveMode(): Unit = {
     setDebugMode()
-    config.visualizeDebug                   = true
-    config.debugPauseThreshold              = 24 * 5
-    config.forcedPlaybook                   = Some(new TestingPlaybook)
+    config.visualizeDebug     = true
+    config.detectBreakpoints  = true
+    config.forcedPlaybook     = Some(new TestingPlaybook)
   }
 
   def matchNames(names: Seq[String], branches: Seq[Seq[Strategy]]): Seq[Seq[Strategy]] = {

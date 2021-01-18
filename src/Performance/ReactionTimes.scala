@@ -32,7 +32,7 @@ class ReactionTimes {
   private val sluggishThresholds = Seq(4, 8, 12)
   private val _sluggishness = new Cache(() => sluggishThresholds.zipWithIndex.find(agencyAverage < _._1).map(_._2).getOrElse(sluggishThresholds.size))
 
-  def filterTimes(times: Seq[Int]): Seq[Int] = if (With.configuration.debugging) times.view.filter(_ < With.configuration.debugPauseThreshold) else times
+  def filterTimes(times: Seq[Int]): Seq[Int] = times // Optional: Remove outliers
   
   private val agencyMinCache            = new Cache(() => ByOption.min(With.agents.runtimes).getOrElse(0))
   private val agencyMaxCache            = new Cache(() => ByOption.max(With.agents.runtimes).getOrElse(0))

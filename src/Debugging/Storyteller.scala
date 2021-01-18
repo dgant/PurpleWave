@@ -135,12 +135,12 @@ class Storyteller {
     tell("Game duration (fastest):    " + gameFastestSeconds / 60 + "m " + gameFastestSeconds % 60 + "s")
     tell("Game duration (wall clock): " + gameWallClockSeconds / 60 + "m " + gameWallClockSeconds % 60 + "s")
     tell("\n" + Seq(
-      Seq(With.configuration.frameMillisecondLimit, With.performance.framesOverShort),
+      Seq(With.configuration.frameLimitMs, With.performance.framesOverShort),
       Seq(1000, With.performance.framesOver1000),
       Seq(10000, With.performance.framesOver10000)).map(line => "Bot frames over " + line.head.toString + "ms: " + line.last.toString).mkString("\n"))
     tell(
       "The bot believes its performance"
-      + (if (Main.configuration.getAsync) ", if running synchronously, would be " else " was ")
+      + (if (Main.configuration.getAsync) ", if it were running synchronously, would have been " else " was ")
       + (if (With.performance.disqualified) "BAD" else if (With.performance.danger) "DANGEROUS" else "good"))
     tell(JBWAPIClient.getPerformanceMetrics.toString)
     tell(

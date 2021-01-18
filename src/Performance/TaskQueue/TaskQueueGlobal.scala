@@ -53,4 +53,6 @@ class TaskQueueGlobal extends TaskQueueParallel(
     .withWeight(TaskQueueGlobalWeights.Micro),
   new SimpleTask("Manners", Manners.run),
   new SimpleTask("Camera", With.camera.onFrame).withSkipsMax(0).withCosmetic(true),
-  new SimpleTask("Visuals", With.visualization.render).withSkipsMax(0).withCosmetic(true))
+  new SimpleTask("Visuals", With.visualization.render).withSkipsMax(0).withCosmetic(true)) {
+  withName("Global")
+}

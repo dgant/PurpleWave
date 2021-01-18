@@ -1,6 +1,7 @@
 package Performance.TaskQueue
 
 import Lifecycle.With
+import Mathematics.PurpleMath
 import Performance.Tasks.TimedTask
 import Performance.Timer
 
@@ -23,27 +24,37 @@ class TaskQueueParallel(val tasks: TimedTask*) extends TimedTask {
     // This is because the global task queue needs to be initialized in the given order
     if (tasks.exists(_.hasNeverRun)) {
       while (With.performance.continueRunning && tasks.exists(_.hasNeverRun)) {
-        tasks.find(_.hasNeverRun).get.run(With.performance.millisecondsUntilTarget)
+        tasks.find(_.hasNeverRun).get.run(With.performance.msBeforeTarget)
       }
       return
     }
-  
+
+    val taskWeightTotal = tasks.view.map(_.weight).sum
     val tasksSorted = tasks
-      .sortBy(task => - task.weight * task.framesSinceRunning)
+      .sortBy(task => task.runMsRecentTotal() / Math.max(1, task.weight))
       .sortBy( ! _.due) // Ensure we run any due tasks
       .sortBy(_.cosmetic) // Don't let a cosmetic task overtake a due task
 
     var i = 0
     while (i < tasksSorted.length) {
       val task = tasksSorted(i)
+
+      val budgetRatio         = task.weight.toDouble / taskWeightTotal
+      val budgetMsPerFrame    = With.configuration.frameTargetMs * budgetRatio
+      val budgetMsRecent      = budgetMsPerFrame * task.runMsSamplesMax
+      val budgetMsRecentSpent = task.runMsRecentTotal()
+      val budgetMs            = PurpleMath.clamp(budgetMsRecent - budgetMsRecentSpent, 0, With.performance.msBeforeTarget).toLong
+
       if (i == 0 || task.safeToRun(timer.remainingUntil(budgetMs))) {
         task.run(timer.remainingUntil(budgetMs)) // TODO: Use per-task budget
+      } else {
+        task.skip()
       }
       i += 1
     }
 
     if (With.performance.violatedLimit) {
-      With.logger.debug(f"$toString crossed the ${With.configuration.frameMillisecondLimit}ms limit to {With.performance.millisecondsSpentThisFrame}ms. Task durations: ${
+      With.logger.debug(f"$toString crossed the ${With.configuration.frameLimitMs}ms limit to {With.performance.millisecondsSpentThisFrame}ms. Task durations: ${
         tasksSorted
           .filter(_.framesSinceRunning <= 1)
           .sortBy(- _.runMsLast)

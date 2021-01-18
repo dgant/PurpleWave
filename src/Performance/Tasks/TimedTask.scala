@@ -11,7 +11,7 @@ abstract class TimedTask {
 
   With.performance.addTask(this)
 
-  var skipsMax    : Int     = 48
+  var skipsMax    : Int     = 24
   var weight      : Int     = 1
   var cosmetic    : Boolean = false
   var alwaysSafe  : Boolean = false
@@ -26,6 +26,11 @@ abstract class TimedTask {
   private var _runsCrossingLimit  : Int   = 0
   private val runMs = new mutable.Queue[Long]
 
+  final def withSkipsMax    (value: Int)      : TimedTask = { skipsMax    = value; this }
+  final def withWeight      (value: Int)      : TimedTask = { weight      = value; this }
+  final def withCosmetic    (value: Boolean)  : TimedTask = { cosmetic    = value; this }
+  final def withAlwaysSafe  (value: Boolean)  : TimedTask = { alwaysSafe  = value; this }
+  final def withName        (value: String)   : TimedTask = { name        = value; this }
   final def due                 : Boolean = framesSinceRunning > skipsMax
   final def framesSinceRunning  : Int     = With.framesSince(lastRunFrame)
   final def hasNeverRun         : Boolean = runsTotal == 0
@@ -35,14 +40,16 @@ abstract class TimedTask {
   final def runMsTotal          : Long    = _runMsTotal
   final def runMsMax            : Long    = _runMsMax
   final def runMsLast           : Long    = runMs.headOption.getOrElse(0L)
-  final val runMsRecentMax  = new Cache[Long](() => ByOption.max(runMs).getOrElse(0))
-  final val runMsRecentMean = new Cache(() => runMs.view.map(Math.min(_, 100)).sum / Math.max(1, runMs.size))
-  final def runMsProjected: Double = Math.max(if (runsTotal < 10) 5 else 1, if (With.performance.danger) runMsMax else runMsRecentMax())
-  final def withSkipsMax    (value: Int)      : TimedTask = { skipsMax    = value; this }
-  final def withWeight      (value: Int)      : TimedTask = { weight      = value; this }
-  final def withCosmetic    (value: Boolean)  : TimedTask = { cosmetic    = value; this }
-  final def withAlwaysSafe  (value: Boolean)  : TimedTask = { alwaysSafe  = value; this }
-  final def withName        (value: String)   : TimedTask = { name        = value; this }
+  final def runMsRecentSamples  : Int     = runMs.length
+  final val runMsRecentMax      = new Cache[Long](() => ByOption.max(runMs).getOrElse(0))
+  final val runMsRecentMean     = new Cache(() => runMs.view.map(Math.min(_, 100)).sum / Math.max(1, runMs.size))
+  final val runMsRecentTotal    = new Cache(() => runMs.sum)
+  final val runMsSamplesMax     = 24
+  private def runMsProjected: Double = Math.max(if (runsTotal < 10) 5 else 1, if (With.performance.danger) runMsMax else runMsRecentMax())
+  private def runMsEnqueue(value: Long): Unit = {
+    runMs.enqueue(Math.max(0L, value))
+    while (runMs.size > runMsSamplesMax) runMs.dequeue()
+  }
 
   protected def onRun(budgetMs: Long)
 
@@ -50,12 +57,16 @@ abstract class TimedTask {
 
   final def safeToRun(budgetMs: Long): Boolean = (
     hasNeverRun
-    || framesSinceRunning > skipsMax
-    || budgetMs > runMsProjected
+    || due
+    || budgetMs >= runMsProjected
     || ! With.configuration.enablePerformancePauses)
 
+  final def skip(): Unit = {
+    runMsEnqueue(0)
+  }
+
   final def run(budgetMs: Long) {
-    val budgetMsCapped        = Math.min(budgetMs, With.performance.millisecondsUntilTarget)
+    val budgetMsCapped        = Math.min(budgetMs, With.performance.msBeforeTarget)
     val millisecondsBefore    = With.performance.systemMillis
     val targetAlreadyViolated = With.performance.violatedTarget
     val limitAlreadyViolated  = With.performance.violatedLimit
@@ -65,7 +76,7 @@ abstract class TimedTask {
 
     // Debug pauses (ie. setting breakpoints) produce measurement outliers and throw off performance tuning
     // Detect and ignore debug pauses; use a reasonable default value in their place
-    if (With.configuration.debugging && millisecondsDuration >= With.configuration.debugPauseThreshold) {
+    if (With.performance.hitBreakpointThisFrame) {
       millisecondsDuration = runMsRecentMean()
     }
 
@@ -73,15 +84,12 @@ abstract class TimedTask {
     if (With.frame > 5) {
       _runMsMax = Math.max(_runMsMax, millisecondsDuration)
     }
-    runMs.enqueue(Math.max(0L, millisecondsDuration))
-    while (runMs.size > 10) {
-      runMs.dequeue()
-    }
+    runMsEnqueue(millisecondsDuration)
     _runsCrossingTarget += PurpleMath.fromBoolean( ! targetAlreadyViolated && With.performance.violatedTarget)
     if ( ! limitAlreadyViolated && With.performance.violatedLimit) {
       _runsCrossingLimit += 1
-      if (skipsMax > 0 && With.performance.enablePerformancePauses) {
-        With.logger.warn(f"$toString${if(due)" (Due)" else ""} crossed the ${With.configuration.frameMillisecondLimit}ms limit, taking ${millisecondsDuration}ms, reaching {With.performance.millisecondsSpentThisFrame}ms on the frame.")
+      if (skipsMax > 0 && With.configuration.enablePerformancePauses) {
+        With.logger.warn(f"$toString${if(due)" (Due)" else ""} crossed the ${With.configuration.frameLimitMs}ms limit, taking ${millisecondsDuration}ms, reaching {With.performance.millisecondsSpentThisFrame}ms on the frame.")
       }
     }
     lastRunFrame = With.frame

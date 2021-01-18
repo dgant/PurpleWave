@@ -22,7 +22,7 @@ object KeyboardCommands {
       case "2"          => With.game.setLocalSpeed(24 * 8)  ; With.camera.enabled = false
       case "3"          => With.game.setLocalSpeed(24)      ; With.camera.enabled = false
       case "4"          => With.game.setLocalSpeed(0)       ; With.camera.enabled = false
-      case "perform"    => { With.configuration.enablePerformancePauses = ! With.performance.enablePerformancePauses; Manners.chat("Performance stops? " + With.configuration.enablePerformancePauses) }
+      case "perform"    => { With.configuration.enablePerformancePauses = ! With.configuration.enablePerformancePauses; Manners.chat("Performance stops? " + With.configuration.enablePerformancePauses) }
       case "map"        => With.logger.debug("The current map is " + With.game.mapName + ": " + With.game.mapFileName)
       case "pm"         => With.logger.debug(JBWAPIClient.getPerformanceMetrics.toString)
       case "task"       => With.configuration.logTaskDuration = ! With.configuration.logTaskDuration
@@ -38,7 +38,7 @@ object KeyboardCommands {
 
   var breakpointFodder = 1
   def breakpoint() {
-    breakpointFodder = -breakpointFodder
+     breakpointFodder = -breakpointFodder
   }
 
   def unit: FriendlyUnitInfo = With.units.ours.find(_.selected).get

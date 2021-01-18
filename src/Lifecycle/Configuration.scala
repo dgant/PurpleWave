@@ -11,19 +11,20 @@ class Configuration {
 
   var enableSurrenders        = false
   var enableChat              = false
-  var frameMillisecondTarget  = 20
-  var frameMillisecondLimit   = 55
+  var frameTargetMs  = 20
+  var frameLimitMs   = 55
 
   ///////////////////
   // Mode settings //
   ///////////////////
 
-  var humanMode                       = false
-  var visualizeFun                    = false
-  var visualizeDebug                  = false
-  var debugging                       = false
-  var logstd                          = false
-  var debugPauseThreshold: Int        = 24 * 60 * 5
+
+  var logstd            = false
+  var humanMode         = false
+  var visualizeFun      = false
+  var visualizeDebug    = false
+  var debugging         = false
+  var detectBreakpoints = false
 
   //////////////
   // Strategy //

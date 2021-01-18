@@ -20,7 +20,7 @@ class BotPurpleWave extends DefaultBWListener {
       With.latency.onFrame()
       With.units.onFrame()
       With.lambdas.onFrame()
-      With.tasks.run(With.performance.millisecondsUntilTarget)
+      With.tasks.run(With.performance.msBeforeTarget)
       With.storyteller.onFrame()
       With.performance.endFrame()
     }

@@ -6,7 +6,7 @@ class Timer {
   val start: Long = With.performance.systemMillis
   def elapsed: Long = {
     val output = With.performance.systemMillis - start
-    if (With.configuration.debugging && output > With.configuration.debugPauseThreshold) {
+    if (With.performance.hitBreakpointThisFrame) {
       return 0
     }
     output

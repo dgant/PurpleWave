@@ -35,8 +35,8 @@ class Pump(
     val gas                 = With.self.gas       // To improve: Measure existing expediture commitments
     val mineralPrice        = unitClass.mineralPrice
     val gasPrice            = unitClass.gasPrice
-    val budgetedByMinerals  = if (mineralPrice  <= 0) 400 else (minerals + (1.0 - buildersReadiness) * With.economy.ourIncomePerFrameMinerals * unitClass.buildFrames) / mineralPrice
-    val budgetedByGas       = if (gasPrice      <= 0) 400 else (gas      + (1.0 - buildersReadiness) * With.economy.ourIncomePerFrameGas      * unitClass.buildFrames) / gasPrice
+    val budgetedByMinerals  = if (mineralPrice  <= 0) 400 else (minerals + (1.0 - buildersReadiness) * With.accounting.ourIncomePerFrameMinerals * unitClass.buildFrames) / mineralPrice
+    val budgetedByGas       = if (gasPrice      <= 0) 400 else (gas      + (1.0 - buildersReadiness) * With.accounting.ourIncomePerFrameGas      * unitClass.buildFrames) / gasPrice
     val budgeted            = Math.max(1, Math.ceil(Math.min(budgetedByMinerals, budgetedByGas))) // 3/4/2020 change: To encourage saving budget for eg. Dragoon instead of burning on Zealot, using ceil instead of round
     
     val buildersToConsume   = Math.max(0, Vector(maximumConcurrently, builderOutputCap, budgeted, unitsToAddCeiling / unitClass.copiesProduced).min.toInt)

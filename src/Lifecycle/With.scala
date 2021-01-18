@@ -16,7 +16,7 @@ import Micro.Agency.{Agency, Commander}
 import Micro.Coordination.Coordinator
 import Micro.Matchups.MatchupGraph
 import Micro.Squads.Squads
-import Performance.TaskQueue.{TaskQueueParallel, TaskQueueGlobal}
+import Performance.TaskQueue.{TaskQueueGlobal, TaskQueueParallel}
 import Placement.Preplacement
 import Planning.{Blackboard, Yolo}
 import ProxyBwapi.Bullets.Bullets
@@ -58,7 +58,7 @@ object With {
   var commander         : Commander               = _
   var coordinator       : Coordinator             = _
   var configuration     : Configuration           = _
-  var economy           : Economy                 = _
+  var accounting        : Accounting              = _
   var fingerprints      : Fingerprints            = _
   var gathering         : Gathering               = _
   var geography         : Geography               = _
@@ -150,7 +150,7 @@ object With {
     camera            = new Camera
     commander         = new Commander
     coordinator       = new Coordinator
-    economy           = new Economy
+    accounting        = new Accounting
     fingerprints      = new Fingerprints
     groundskeeper     = new Groundskeeper
     gathering         = new Gathering
@@ -173,12 +173,12 @@ object With {
     strategy          = new Strategist
     storyteller       = new Storyteller
     squads            = new Squads
-    tasks             = new TaskQueueGlobal
     units             = new UnitTracker
     unitsShown        = new UnitsShown
     viewport          = new Viewport
     visualization     = new Visualization
     yolo              = new Yolo
+    tasks             = new TaskQueueGlobal // Comes last because it references other systems
   }
   
   private def analyzeTerrain() {

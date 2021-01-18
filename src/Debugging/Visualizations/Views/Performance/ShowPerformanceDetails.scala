@@ -22,7 +22,7 @@ object ShowPerformanceDetails extends View {
     val headers = Vector("Task", "Last run", "Seconds", "Avg ms", "Max (Recent)", "Max (All time)", "AcrossTarget", "AcrossLimit")
     val body = tasks
       .map(task => Vector(
-        task.getClass.getSimpleName.replace("Task", "").padTo(20, ' '),
+        task.toString,
         "X" * Math.min(10, Math.max(0, task.framesSinceRunning - 1)),
         (task.runMsTotal / 1000).toString,
         task.runMsRecentMean.toString,
@@ -31,6 +31,7 @@ object ShowPerformanceDetails extends View {
         task.runsCrossingTarget.toString,
         task.runsCrossingLimit.toString
       ))
+      .take(20) // We risk exceeding the number of rendered shapes if we draw too many
     Vector(title) ++ Vector(headers) ++ body
   }
 }

@@ -2,6 +2,7 @@ package Performance
 
 import Lifecycle.{JBWAPIClient, With}
 import Performance.Tasks.TimedTask
+import Utilities.Forever
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -41,7 +42,7 @@ class PerformanceMonitor {
   }
 
   def millisecondsUntilTarget: Long = {
-    With.configuration.frameMillisecondTarget - millisecondsSpentThisFrame
+    if (With.frame == 0) Forever() else With.configuration.frameMillisecondTarget - millisecondsSpentThisFrame
   }
 
   def millisecondsSpentThisFrame: Long = {

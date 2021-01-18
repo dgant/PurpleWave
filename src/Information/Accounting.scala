@@ -4,7 +4,7 @@ import Lifecycle.With
 import Performance.Cache
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class Economy {
+class Accounting {
   
   val incomePerFrameMinerals = 0.046
   val incomePerFrameGas = 0.069

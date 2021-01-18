@@ -12,7 +12,7 @@ abstract class TimedTask {
   With.performance.addTask(this)
 
   var skipsMax    : Int     = 48
-  var urgency     : Int     = 1
+  var weight      : Int     = 1
   var cosmetic    : Boolean = false
   var alwaysSafe  : Boolean = false
   var name        : String = if (getClass.getSimpleName.contains("anon")) getClass.getSuperclass.getSimpleName else getClass.getSimpleName
@@ -24,8 +24,7 @@ abstract class TimedTask {
   private var _runMsMax           : Long  = 0
   private var _runsCrossingTarget : Int   = 0
   private var _runsCrossingLimit  : Int   = 0
-
-  final val runMs = new mutable.Queue[Long]
+  private val runMs = new mutable.Queue[Long]
 
   final def due                 : Boolean = framesSinceRunning > skipsMax
   final def framesSinceRunning  : Int     = With.framesSince(lastRunFrame)
@@ -39,27 +38,28 @@ abstract class TimedTask {
   final val runMsRecentMax  = new Cache[Long](() => ByOption.max(runMs).getOrElse(0))
   final val runMsRecentMean = new Cache(() => runMs.view.map(Math.min(_, 100)).sum / Math.max(1, runMs.size))
   final def runMsProjected: Double = Math.max(if (runsTotal < 10) 5 else 1, if (With.performance.danger) runMsMax else runMsRecentMax())
-  final def withSkipsMax    (value: Int)      : TimedTask = { skipsMax = value    ; this }
-  final def withUrgency     (value: Int)      : TimedTask = { urgency = value     ; this }
-  final def withCosmetic    (value: Boolean)  : TimedTask = { cosmetic = value    ; this }
-  final def withAlwaysSafe  (value: Boolean)  : TimedTask = { alwaysSafe = value  ; this }
-  final def withName        (value: String)   : TimedTask = { name = value        ; this }
+  final def withSkipsMax    (value: Int)      : TimedTask = { skipsMax    = value; this }
+  final def withWeight      (value: Int)      : TimedTask = { weight      = value; this }
+  final def withCosmetic    (value: Boolean)  : TimedTask = { cosmetic    = value; this }
+  final def withAlwaysSafe  (value: Boolean)  : TimedTask = { alwaysSafe  = value; this }
+  final def withName        (value: String)   : TimedTask = { name        = value; this }
 
-  protected def onRun()
+  protected def onRun(budgetMs: Long)
 
   def isComplete: Boolean = true
 
-  final def safeToRun: Boolean = (
+  final def safeToRun(budgetMs: Long): Boolean = (
     hasNeverRun
     || framesSinceRunning > skipsMax
-    || With.performance.millisecondsUntilTarget > runMsProjected
+    || budgetMs > runMsProjected
     || ! With.configuration.enablePerformancePauses)
 
-  final def run(budgetMs: Int = 20) {
+  final def run(budgetMs: Long) {
+    val budgetMsCapped        = Math.min(budgetMs, With.performance.millisecondsUntilTarget)
     val millisecondsBefore    = With.performance.systemMillis
     val targetAlreadyViolated = With.performance.violatedTarget
     val limitAlreadyViolated  = With.performance.violatedLimit
-    onRun()
+    onRun(budgetMsCapped)
     val millisecondsAfter     = With.performance.systemMillis
     var millisecondsDuration  = millisecondsAfter - millisecondsBefore
 

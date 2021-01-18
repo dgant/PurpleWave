@@ -19,19 +19,19 @@ object ShowEconomy extends View {
       "Accuracy (minerals):",
       "Accuracy (gas):"
     )
-    val mineralAccuracyRatio  = With.economy.ourEstimatedTotalMinerals  / With.economy.ourActualTotalMinerals
-    val gasAccuracyRatio      = With.economy.ourEstimatedTotalGas       / With.economy.ourActualTotalGas
+    val mineralAccuracyRatio  = With.accounting.ourEstimatedTotalMinerals  / With.accounting.ourActualTotalMinerals
+    val gasAccuracyRatio      = With.accounting.ourEstimatedTotalGas       / With.accounting.ourActualTotalGas
     val mineralAccuracy       = Math.min(mineralAccuracyRatio, 1.0 / mineralAccuracyRatio)
     val gasAccuracy           = Math.min(gasAccuracyRatio, 1.0 / gasAccuracyRatio)
     val values = Vector(
-      With.economy.ourActiveMiners,
-      With.economy.ourActiveDrillers,
-      (With.economy.ourIncomePerFrameMinerals * 24 * 60).toInt,
-      (With.economy.ourIncomePerFrameGas * 24 * 60).toInt,
-      With.economy.ourEstimatedTotalMinerals.toInt,
-      With.economy.ourActualTotalMinerals,
-      With.economy.ourEstimatedTotalGas.toInt,
-      With.economy.ourActualTotalGas,
+      With.accounting.ourActiveMiners,
+      With.accounting.ourActiveDrillers,
+      (With.accounting.ourIncomePerFrameMinerals * 24 * 60).toInt,
+      (With.accounting.ourIncomePerFrameGas * 24 * 60).toInt,
+      With.accounting.ourEstimatedTotalMinerals.toInt,
+      With.accounting.ourActualTotalMinerals,
+      With.accounting.ourEstimatedTotalGas.toInt,
+      With.accounting.ourActualTotalGas,
       mineralAccuracy.toString,
       gasAccuracy.toString
     )

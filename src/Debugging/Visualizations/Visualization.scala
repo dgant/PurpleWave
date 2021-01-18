@@ -146,6 +146,7 @@ class Visualization {
         }
       }
     }
+    With.animations.render()
   }
   
   private var initialized = false

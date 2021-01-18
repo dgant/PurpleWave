@@ -57,7 +57,7 @@ class RequireSufficientSupply extends Plan {
     val currentSupplyUsed         = With.self.supplyUsed
     val unitSpendingRatio         = if (With.geography.ourBases.size < 3) 0.5 else 0.75 //This is the metric that needs the most improvement
     val costPerUnitSupply         = 50.0 / 2.0 // Assume 50 minerals buys 1 supply (then divide by two because 1 supply = 2 BWAPI supply)
-    val incomePerFrame            = With.economy.ourIncomePerFrameMinerals + With.economy.ourIncomePerFrameGas
+    val incomePerFrame            = With.accounting.ourIncomePerFrameMinerals + With.accounting.ourIncomePerFrameGas
     val supplyUsedPerFrame        = incomePerFrame * unitSpendingRatio / costPerUnitSupply
     val supplyBanked              = unitSpendingRatio * With.self.minerals / costPerUnitSupply
     lazy val larva                = With.units.countOurs(Zerg.Larva)

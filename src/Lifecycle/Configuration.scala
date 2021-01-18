@@ -74,17 +74,6 @@ class Configuration {
   var buildingPlacementMaxTilesToEvaluate = 300
   var buildingPlacementMaximumQueue       = 12
   
-  var urgencyManners            = 1
-  var urgencyEconomy            = 1
-  var urgencyGather             = 1
-  var urgencyGeography          = 1
-  var urgencyPlacement       = 1
-  var urgencyGrids              = 1
-  var urgencyPlanning           = 3
-  var urgencySquads             = 10
-  var urgencyBattles            = 20
-  var urgencyMicro              = 100
-  
   ///////////////////
   // Visualization //
   ///////////////////

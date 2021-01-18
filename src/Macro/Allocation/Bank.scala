@@ -30,8 +30,8 @@ class Bank {
   
   private def recountResources() {
     val framesAhead = 4 * With.reaction.planningAverage
-    mineralsLeft  = With.self.minerals  + (framesAhead * With.economy.incomePerFrameMinerals).toInt
-    gasLeft       = With.self.gas       + (framesAhead * With.economy.incomePerFrameGas).toInt
+    mineralsLeft  = With.self.minerals  + (framesAhead * With.accounting.incomePerFrameMinerals).toInt
+    gasLeft       = With.self.gas       + (framesAhead * With.accounting.incomePerFrameGas).toInt
     supplyLeft    = With.self.supplyTotal - With.self.supplyUsed
     requests.foreach(queueBuyer)
   }
@@ -71,15 +71,15 @@ class Bank {
     else if (rate <= 0.0)
       Int.MaxValue
     else
-      Math.ceil(value / With.economy.ourIncomePerFrameMinerals).toInt
+      Math.ceil(value / With.accounting.ourIncomePerFrameMinerals).toInt
   }
   
   private def framesToEarnMinerals(minerals: Int): Int = {
-    framesToEarn(minerals, With.economy.ourIncomePerFrameMinerals)
+    framesToEarn(minerals, With.accounting.ourIncomePerFrameMinerals)
   }
   
   private def framesToEarnGas(gas: Int): Int = {
-    framesToEarn(gas, With.economy.ourIncomePerFrameGas)
+    framesToEarn(gas, With.accounting.ourIncomePerFrameGas)
   }
   
   private def expectedFrames(request: LockCurrency): Int = {

@@ -10,7 +10,7 @@ object EmergencyRepair extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.is(Terran.SCV)
-    && With.self.minerals + With.economy.ourIncomePerFrameMinerals * Seconds(10)() > 25
+    && With.self.minerals + With.accounting.ourIncomePerFrameMinerals * Seconds(10)() > 25
   )
   
   override def perform(unit: FriendlyUnitInfo) {

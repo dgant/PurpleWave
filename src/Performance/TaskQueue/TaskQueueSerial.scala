@@ -1,20 +1,14 @@
 package Performance.TaskQueue
 
 import Performance.Tasks.TimedTask
+import Performance.Timer
 
 /**
   * Runs a group of tasks to be performed in order, and resumed when time expires
   */
-class TaskQueueSerial(getTasks: () => Seq[TimedTask]) extends TimedTask {
-  def this(name: String, tasks: () => Seq[TimedTask]) {
-    this(tasks)
-    withName(name)
-  }
-  def this(fixedTasks: TimedTask*) {
-    this(() => fixedTasks)
-  }
-  def this(name: String, fixedTasks: TimedTask*) {
-    this(() => fixedTasks)
+class TaskQueueSerial(val tasks: TimedTask*) extends TimedTask {
+  def this(name: String, t: TimedTask*) {
+    this(t: _*)
     withName(name)
   }
 
@@ -24,28 +18,30 @@ class TaskQueueSerial(getTasks: () => Seq[TimedTask]) extends TimedTask {
 
   override def isComplete: Boolean = framesSinceRunning < 1 && index == 0
 
-  override def onRun(): Unit = {
-    val tasks = getTasks()
+  override def onRun(budgetMs: Long): Unit = {
+    val timer = new Timer
     var proceed = true
     while (proceed) {
-      if (index >= tasks.length) {
-        // We have reached the end of the task queue
-        // Start from the beginning next time
+      if (timer.elapsed >= budgetMs) {
+        proceed = false
+      } else if (index >= tasks.length) {
+        // We have reached the end of the task queue.
+        // Start from the beginning next time.
         proceed = false
         index = 0
       } else {
         val task = tasks(index)
-        proceed = task.safeToRun
+        proceed = task.safeToRun(timer.remainingUntil(budgetMs))
         if (proceed) {
-          task.run()
+          task.run(timer.remainingUntil(budgetMs))
           index += 1
-        }
-        if (!task.isComplete) {
-          // The task isn't complete,
-          // but refused to keep running,
-          // presumably because it exited for performance safety.
-          // So we'll have to revisit it next time
-          proceed = false
+          if ( ! task.isComplete) {
+            // The task isn't complete,
+            // but refused to keep running,
+            // presumably because it exited for performance safety.
+            // so we'll have to revisit it next time.
+            proceed = false
+          }
         }
       }
     }

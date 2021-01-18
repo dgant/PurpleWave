@@ -5,5 +5,5 @@ class SimpleTask(lambda: () => Unit) extends TimedTask {
     this(lambda)
     withName(name)
   }
-  override def onRun(): Unit = lambda()
+  override def onRun(budgetMs: Long): Unit = lambda()
 }

@@ -43,7 +43,7 @@ class TaskQueueGlobal extends TaskQueueParallel(
     new SimpleTask("SquadGoals", With.squads.updateGoals),
     new SimpleTask("SquadBatching", With.squads.stepBatching).withAlwaysSafe(true))
     .withWeight(TaskQueueGlobalWeights.Squads),
-  new SimpleTask("Placement", With.placement.update).withWeight(TaskQueueGlobalWeights.Placement),
+  new SimpleTask("Placement", With.placement.update).withAlwaysSafe(true).withWeight(TaskQueueGlobalWeights.Placement),
   new TaskQueueSerial(
     "Micro",
     new SimpleTask("Matchups", With.matchups.run),

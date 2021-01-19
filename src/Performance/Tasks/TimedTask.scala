@@ -56,7 +56,8 @@ abstract class TimedTask {
   def isComplete: Boolean = true
 
   final def safeToRun(budgetMs: Long): Boolean = (
-    hasNeverRun
+    alwaysSafe
+    || hasNeverRun
     || due
     || budgetMs >= runMsProjected
     || ! With.configuration.enablePerformancePauses)

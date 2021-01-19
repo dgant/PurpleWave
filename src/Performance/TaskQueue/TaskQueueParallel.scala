@@ -37,8 +37,7 @@ class TaskQueueParallel(val tasks: TimedTask*) extends TimedTask {
 
     var i = 0
     while (i < tasksSorted.length) {
-      val task = tasksSorted(i)
-
+      val task                = tasksSorted(i)
       val budgetRatio         = task.weight.toDouble / taskWeightTotal
       val budgetMsPerFrame    = With.configuration.frameTargetMs * budgetRatio
       val budgetMsRecent      = budgetMsPerFrame * task.runMsSamplesMax

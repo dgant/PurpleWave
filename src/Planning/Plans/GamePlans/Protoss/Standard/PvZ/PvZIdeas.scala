@@ -183,7 +183,10 @@ object PvZIdeas {
       new Pump(Protoss.DarkTemplar, 3),
       new Pump(Protoss.DarkTemplar, 1)),
     new If(
-      new Employing(PvZLateGameReaver),
+      new UpgradeComplete(Protoss.ShuttleSpeed),
+      new Build(Get(Protoss.RoboticsSupportBay))),
+    new If(
+      new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
       new Parallel(
         new PumpShuttleAndReavers(6),
         new If(

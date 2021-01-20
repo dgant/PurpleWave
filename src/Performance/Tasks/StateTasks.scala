@@ -7,7 +7,7 @@ class StateTasks {
   def get(state: Any): DummyTask = {
     val stateClass = state.getClass
     if ( ! tasks.contains(stateClass)) {
-      tasks(stateClass) = new DummyTask
+      tasks(stateClass) = new DummyTask(stateClass)
     }
     tasks(stateClass)
   }

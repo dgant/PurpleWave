@@ -8,7 +8,7 @@ import Performance.Tasks.TimedTask
 object ShowPerformanceDetails extends View {
   
   override def renderScreen() {
-    DrawScreen.table(5, With.visualization.lineHeightSmall * 6, statusTable(sortTasks(With.performance.tasks)))
+    DrawScreen.table(5, With.visualization.lineHeightSmall * 6, statusTable(sortTasks(With.performance.tasks)).take(20))
   }
 
   def sortTasks(tasks: Seq[TimedTask]): Seq[TimedTask] = tasks
@@ -31,7 +31,6 @@ object ShowPerformanceDetails extends View {
         task.runsCrossingTarget.toString,
         task.runsCrossingLimit.toString
       ))
-      .take(20) // We risk exceeding the number of rendered shapes if we draw too many
     Vector(title) ++ Vector(headers) ++ body
   }
 }

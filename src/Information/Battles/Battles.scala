@@ -5,7 +5,7 @@ import Information.Battles.ProcessingStates.{BattleProcessInitial, BattleProcess
 import Information.Battles.Types.{BattleGlobal, BattleLocal, Division, Team}
 import Lifecycle.With
 import Performance.TaskQueue.TaskQueueGlobalWeights
-import Performance.Tasks.TimedTask
+import Performance.Tasks.{StateTasks, TimedTask}
 import Performance.Timer
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -36,12 +36,21 @@ class Battles extends TimedTask {
     _processingState = newState
   }
 
+  val stateTasks = new StateTasks
+
   override def onRun(budgetMs: Long) {
     val timer = new Timer(budgetMs)
-    var proceed = true
-    while (proceed && timer.ongoing) {
-      proceed = ! _processingState.isFinalStep
-      _processingState.step()
+    while (timer.ongoing) {
+      val task = stateTasks.get(_processingState)
+      if (task.safeToRun(timer.remaining)) {
+        task.runFunction = _processingState.step
+        task.run(timer.remaining)
+      } else {
+        return
+      }
+      if ( _processingState.isFinalStep) {
+        return
+      }
     }
   }
 

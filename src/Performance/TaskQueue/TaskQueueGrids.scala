@@ -3,7 +3,9 @@ import Information.Grids.AbstractGrid
 import Lifecycle.With
 import Performance.Tasks._
 
-class GridTask[T](grid: AbstractGrid[T]) extends SimpleTask(grid.update)
+class GridTask[T](grid: AbstractGrid[T]) extends SimpleTask(grid.update) {
+  withName(grid.getClass.getSimpleName)
+}
 
 class TaskQueueGrids extends TaskQueueParallel(
   new GridTask(With.grids.buildable)                    .withWeight(10),

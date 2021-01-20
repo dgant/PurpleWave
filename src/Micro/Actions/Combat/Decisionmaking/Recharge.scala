@@ -1,7 +1,7 @@
 package Micro.Actions.Combat.Decisionmaking
 
-import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -46,7 +46,7 @@ object Recharge extends Action {
       safe
     })
     if (inRangeToRecharge || safeToRecharge) {
-      battery.foreach(With.commander.rightClick(unit, _))
+      battery.foreach(Commander.rightClick(unit, _))
     }
   }
 }

@@ -3,6 +3,7 @@ package Micro.Actions.Combat.Maneuvering
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.TrafficPriorities
 import Planning.UnitMatchers.UnitMatchSiegeTank
@@ -60,6 +61,6 @@ object Retreat extends Action {
     if (With.configuration.debugging) {
       retreat.unit.agent.act("Retreat" + retreat.name)
     }
-    With.commander.move(retreat.unit)
+    Commander.move(retreat.unit)
   }
 }

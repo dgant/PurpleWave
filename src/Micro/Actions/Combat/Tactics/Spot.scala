@@ -3,6 +3,7 @@ package Micro.Actions.Combat.Tactics
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, Seconds}
 
@@ -32,7 +33,7 @@ object Spot extends Action {
 
     if (goal.isDefined) {
       unit.agent.toTravel = goal
-      With.commander.move(unit)
+      Commander.move(unit)
     }
   }
 

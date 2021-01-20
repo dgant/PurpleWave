@@ -1,7 +1,7 @@
 package Micro.Actions.Transportation.Caddy
 
-import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
@@ -21,7 +21,7 @@ object ShuttleCarry extends Action {
       .find(_.agent.rideGoal.nonEmpty)
       .foreach(passenger => {
         shuttle.agent.toTravel = passenger.agent.rideGoal
-        With.commander.move(shuttle)
+        Commander.move(shuttle)
       })
   }
 }

@@ -5,6 +5,7 @@ import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Targeting.Filters.TargetFilter
+import Micro.Agency.Commander
 import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWorkers}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -27,7 +28,7 @@ object BeVulture extends Action {
   
   protected def placeMine(unit: FriendlyUnitInfo, target: Pixel) {
     val finalTarget = calculateMineTarget(unit, target)
-    With.commander.useTechOnPixel(unit, Terran.SpiderMinePlant, finalTarget)
+    Commander.useTechOnPixel(unit, Terran.SpiderMinePlant, finalTarget)
   }
   
   protected def calculateMineTarget(unit: FriendlyUnitInfo, target: Pixel): Pixel = {
@@ -86,7 +87,7 @@ object BeVulture extends Action {
           .project(target.pixel, vulture.pixelDistanceEdge(target) + 64)
           .nearestWalkableTile
           .pixelCenter)
-      With.commander.move(vulture)
+      Commander.move(vulture)
     }
   }
   

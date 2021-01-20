@@ -1,8 +1,8 @@
 package Micro.Actions.Transportation
 
-import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Transportation.Caddy.Shuttling
+import Micro.Agency.Commander
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Board extends Action {
@@ -21,7 +21,7 @@ object Board extends Action {
     unit.agent.toTravel = Some(transport.pixel)
     if (transport.pixelDistanceEdge(unit) < Shuttling.pickupRadius) {
       unit.hijack()
-      With.commander.rightClick(unit, transport)
+      Commander.rightClick(unit, transport)
     }
   }
 }

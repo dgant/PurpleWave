@@ -4,6 +4,7 @@ import Debugging.Visualizations.Forces
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.FewShot
+import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Heuristics.Potential
 import ProxyBwapi.Races.{Terran, Zerg}
@@ -37,7 +38,7 @@ object BeFlier extends Action {
       val waypoint = MicroPathing.getWaypointInDirection(unit, unit.agent.forces.sum.radians)
       if (waypoint.isDefined) {
         unit.agent.toTravel = waypoint
-        With.commander.move(unit)
+        Commander.move(unit)
       }
     }
   }

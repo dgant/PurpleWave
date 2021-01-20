@@ -1,9 +1,9 @@
 package Micro.Actions.Transportation
 
-import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.Shapes.Spiral
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 case class RequestSafeLanding(destination: Option[Pixel] = None) extends Action {
@@ -21,7 +21,7 @@ case class RequestSafeLanding(destination: Option[Pixel] = None) extends Action 
     landingOption.foreach(landing => {
       unit.agent.directRide(landing.pixelCenter)
       if (unit.pixelDistanceEdge(landing.pixelCenter) < 48) {
-        With.commander.unload(unit.transport.get, unit)
+        Commander.unload(unit.transport.get, unit)
       }
     })
 

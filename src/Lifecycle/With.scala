@@ -12,7 +12,7 @@ import Macro.Allocation._
 import Macro.Architecture.Architecture
 import Macro.Gathering
 import Macro.Scheduling.{MasterBuildOrderHistory, MasterBuildPlans, Projections, Scheduler}
-import Micro.Agency.{Agency, Commander}
+import Micro.Agency.Agency
 import Micro.Coordination.Coordinator
 import Micro.Matchups.MatchupGraph
 import Micro.Squads.Squads
@@ -55,7 +55,6 @@ object With {
   var bullets           : Bullets                 = _
   var bwapiData         : BwapiData               = _
   var camera            : Camera                  = _
-  var commander         : Commander               = _
   var coordinator       : Coordinator             = _
   var configuration     : Configuration           = _
   var accounting        : Accounting              = _
@@ -68,6 +67,7 @@ object With {
   var lambdas           : LambdaQueue             = _
   var latency           : Latency                 = _
   var logger            : Logger                  = _
+  var manners           : Manners                 = _
   var matchups          : MatchupGraph            = _
   var paths             : Paths                   = _
   var performance       : PerformanceMonitor      = _
@@ -148,7 +148,6 @@ object With {
     buildPlans        = new MasterBuildPlans
     bullets           = new Bullets
     camera            = new Camera
-    commander         = new Commander
     coordinator       = new Coordinator
     accounting        = new Accounting
     fingerprints      = new Fingerprints
@@ -159,6 +158,7 @@ object With {
     history           = new History
     lambdas           = new LambdaQueue
     latency           = new Latency
+    manners           = new Manners
     matchups          = new MatchupGraph
     paths             = new Paths
     performance       = new PerformanceMonitor

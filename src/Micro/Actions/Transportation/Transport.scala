@@ -4,6 +4,7 @@ import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Smuggle
 import Micro.Actions.Transportation.Caddy.BeAShuttle
+import Micro.Agency.Commander
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Transport extends Action {
@@ -19,7 +20,7 @@ object Transport extends Action {
       DropOff.consider(unit)
       Pickup.consider(unit)
       Smuggle.consider(unit)
-      With.commander.move(unit)
+      Commander.move(unit)
     }
     BeAShuttle.consider(unit)
   }

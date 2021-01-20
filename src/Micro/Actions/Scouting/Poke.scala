@@ -3,7 +3,7 @@ package Micro.Actions.Scouting
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
-import Micro.Actions.Combat.Targeting.Filters.TargetFilterWhitelist
+import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
@@ -40,8 +40,8 @@ object Poke extends Action {
     if (otherThreats.exists(_.pixelDistanceEdge(unit) < 32)) {
       unit.agent.toGather = With.geography.ourBases.headOption.flatMap(_.minerals.headOption)
       unit.agent.toTravel = Some(With.geography.home.pixelCenter)
-      With.commander.gather(unit)
-      With.commander.move(unit)
+      Commander.gather(unit)
+      Commander.move(unit)
     }
     
     lazy val targetDistance = unit.pixelRangeAgainst(target) + target.unitClass.radialHypotenuse + unit.unitClass.radialHypotenuse
@@ -53,9 +53,9 @@ object Poke extends Action {
         Retreat.delegate(unit)
       }
       else {
-        With.commander.move(unit)
+        Commander.move(unit)
       }
     }
-    With.commander.attack(unit)
+    Commander.attack(unit)
   }
 }

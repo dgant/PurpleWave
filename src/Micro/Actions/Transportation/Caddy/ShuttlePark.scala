@@ -1,8 +1,8 @@
 package Micro.Actions.Transportation.Caddy
 
-import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
+import Micro.Agency.Commander
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
@@ -25,7 +25,7 @@ object ShuttlePark extends Action {
       if (shuttle.pixelDistanceCenter(shuttle.agent.destination) > 32.0 * 12.0 && shuttle.matchups.framesOfSafety < shuttle.unitClass.framesToTurn180) {
         Retreat.delegate(shuttle)
       }
-      With.commander.move(shuttle)
+      Commander.move(shuttle)
     })
   }
 }

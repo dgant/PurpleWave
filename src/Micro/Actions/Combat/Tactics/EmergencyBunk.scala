@@ -2,6 +2,7 @@ package Micro.Actions.Combat.Tactics
 
 import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -32,7 +33,7 @@ object EmergencyBunk extends Action {
     val openBunkerToEnter   = ByOption.minBy(openBunkersEngaged)(_.pixelDistanceEdge(unit))
     
     if (openBunkerToEnter.isDefined) {
-      With.commander.rightClick(unit, openBunkerToEnter.get)
+      Commander.rightClick(unit, openBunkerToEnter.get)
     }
   }
 }

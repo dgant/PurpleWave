@@ -10,6 +10,7 @@ import Micro.Actions.Combat.Tactics.Brawl
 import Micro.Actions.Combat.Targeting.Filters.{TargetFilterPotshot, TargetFilterVisibleInRange}
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Commands.Move
+import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.TrafficPriorities
 import Micro.Heuristics.Potential
@@ -42,7 +43,7 @@ object DefaultCombat extends Action {
     unit.agent.toAttack = potshotTarget.orElse(unit.agent.toAttack)
     if (potshotTarget.isDefined) {
       unit.agent.act("Potshot")
-      With.commander.attack(unit)
+      Commander.attack(unit)
     }
     unit.unready
   }
@@ -52,21 +53,21 @@ object DefaultCombat extends Action {
     val towards = MicroPathing.getPushRadians(unit).flatMap(MicroPathing.getWaypointInDirection(unit, _))
     if (towards.isDefined) {
       unit.agent.toTravel = towards
-      With.commander.move(unit)
+      Commander.move(unit)
     }
     unit.unready
   }
   def aim(unit: FriendlyUnitInfo): Boolean = {
     if (unit.unready) return false
     Target.choose(unit, TargetFilterVisibleInRange)
-    With.commander.attack(unit)
-    With.commander.hold(unit)
+    Commander.attack(unit)
+    Commander.hold(unit)
     unit.unready
   }
   def attackIfReady(unit: FriendlyUnitInfo): Boolean = {
     if (unit.unitClass.ranged && ! unit.readyForAttackOrder) return false
     if (unit.agent.toAttack.forall(unit.pixelsToGetInRange(_) > Math.max(64, unit.topSpeed * With.reaction.agencyMax))) return false
-    With.commander.attack(unit)
+    Commander.attack(unit)
     true
   }
   def retreat(unit: FriendlyUnitInfo): Boolean = {
@@ -278,7 +279,7 @@ object DefaultCombat extends Action {
         exactDistance = Some(Math.abs(distanceTowards))
         if (exactDistance.exists(_ < 4)) {
           unit.agent.act("Stand")
-          With.commander.attack(unit)
+          Commander.attack(unit)
           return
         } else if (distanceTowards > 0) {
           unit.agent.act("Chase")

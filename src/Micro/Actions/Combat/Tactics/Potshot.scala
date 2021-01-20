@@ -1,9 +1,9 @@
 package Micro.Actions.Combat.Tactics
 
-import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Combat.Targeting.Filters.TargetFilterPotshot
+import Micro.Actions.Combat.Targeting.Target
+import Micro.Agency.Commander
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Potshot extends Action {
@@ -12,6 +12,6 @@ object Potshot extends Action {
   
   override def perform(unit: FriendlyUnitInfo) {
     Target.choose(unit, TargetFilterPotshot)
-    With.commander.attack(unit)
+    Commander.attack(unit)
   }
 }

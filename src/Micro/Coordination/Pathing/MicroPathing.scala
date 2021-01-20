@@ -9,6 +9,7 @@ import Mathematics.Points.{Pixel, PixelRay}
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Circle
 import Micro.Actions.Combat.Maneuvering.DownhillPathfinder
+import Micro.Agency.Commander
 import Micro.Coordination.Pushing.Push
 import Micro.Heuristics.Potential
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -114,7 +115,7 @@ object MicroPathing {
     val waypoint = getWaypointAlongTilePath(path).map(_.add(unit.pixel.offsetFromTileCenter))
     waypoint.foreach(pixel => {
       unit.agent.toTravel = waypoint
-      With.commander.move(unit)
+      Commander.move(unit)
     })
   }
 

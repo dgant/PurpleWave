@@ -2,12 +2,16 @@ package Debugging
 
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints, Tile, TileRectangle}
+import Performance.Tasks.TimedTask
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.{ByOption, Seconds}
 import bwapi.MouseButton
 
-class Camera {
+class Camera extends TimedTask {
+
+  withSkipsMax(0)
+  withCosmetic(true)
   
   private var tweenFrom   : Pixel     = SpecificPoints.middle
   private var focus       : Pixel     = With.self.startTile.pixelCenter
@@ -31,7 +35,7 @@ class Camera {
     interestBattle * obscurityUnit * interestActivity * interestNovelty
   }
 
-  def onFrame() {
+  override def onRun(budgetMs: Long) {
     if ( ! With.configuration.debugging) { return }
 
     // Enable autocamera until we interact with the screen

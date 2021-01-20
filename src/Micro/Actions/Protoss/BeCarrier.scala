@@ -4,6 +4,7 @@ import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Protoss.Carrier._
+import Micro.Agency.Commander
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
 import Utilities.ByOption
@@ -71,16 +72,16 @@ object BeCarrier extends Action {
         if (safeFromThreats && interceptorsActive) {
           CarrierChase.consider(unit)
         }
-        With.commander.attack(unit)
+        Commander.attack(unit)
       }
       WarmUpInterceptors.consider(unit)
       if (unit.matchups.targets.exists(_.isAny(Protoss.Carrier, Protoss.Interceptor))) {
         unit.agent.toAttack = unit.agent.toAttack
           .orElse(ByOption.minBy(unit.matchups.targetsInRange .filter(u => u.canAttack(unit) && ! u.is(Protoss.Interceptor)))(u => u.totalHealth / (1 + u.subjectiveValue)))
           .orElse(ByOption.minBy(unit.matchups.targets        .filter(u => u.canAttack(unit) && ! u.is(Protoss.Interceptor)))(_.pixelDistanceEdge(unit)))
-        With.commander.attack(unit)
+        Commander.attack(unit)
       }
-      With.commander.attackMove(unit)
+      Commander.attackMove(unit)
     }
     else {
       CarrierRetreat.consider(unit)

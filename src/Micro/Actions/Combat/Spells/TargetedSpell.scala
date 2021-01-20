@@ -3,6 +3,7 @@ package Micro.Actions.Combat.Spells
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import Micro.Heuristics.{SpellTargetAOE, SpellTargetSingle}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
@@ -41,12 +42,12 @@ abstract class TargetedSpell extends Action {
     
     if (aoe) {
       val targetPixel = new SpellTargetAOE().chooseTargetPixel(unit, totalRange, thresholdValue, valueTarget, pixelWidth = pixelWidth, pixelHeight = pixelHeight)
-      targetPixel.foreach(With.commander.useTechOnPixel(unit, tech, _))
+      targetPixel.foreach(Commander.useTechOnPixel(unit, tech, _))
       targetPixel.foreach(onCast(unit, _))
     }
     else {
       val targetUnit = SpellTargetSingle.chooseTarget(unit, totalRange, thresholdValue, valueTarget)
-      targetUnit.foreach(With.commander.useTechOnUnit(unit, tech, _))
+      targetUnit.foreach(Commander.useTechOnUnit(unit, tech, _))
     }
   }
   

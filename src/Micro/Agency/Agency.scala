@@ -1,23 +1,26 @@
 package Micro.Agency
 
 import Lifecycle.With
+import Performance.Tasks.TimedTask
+import Performance.Timer
 
 import scala.collection.mutable
 
-class Agency {
-  
-  //////////////
-  // Batching //
-  //////////////
+class Agency extends TimedTask {
+
+  withAlwaysSafe(true)
   
   val agentQueue          = new mutable.Queue[Agent]
-  val runtimes            = new mutable.Queue[Int]
+  val cycleLengths        = new mutable.Queue[Int]
   var lastQueueCompletion = 0
-  
-  def run() {
+
+  override def onRun(budgetMs: Long) {
+
+    val timer = new Timer(budgetMs)
+
     if (agentQueue.isEmpty) {
-      runtimes.enqueue(With.framesSince(lastQueueCompletion))
-      while (runtimes.sum > With.reaction.runtimeQueueDuration) { runtimes.dequeue() }
+      cycleLengths.enqueue(With.framesSince(lastQueueCompletion))
+      while (cycleLengths.sum > With.reaction.runtimeQueueDuration) { cycleLengths.dequeue() }
       lastQueueCompletion = With.frame
 
       With.coordinator.onAgentCycle()
@@ -30,23 +33,17 @@ class Agency {
         .sortBy(_.unit.unitClass.isTransport) // Make transports go after their passengers so they know what passengers want
     }
 
-    while (agentQueue.nonEmpty && With.performance.continueRunning) {
+    while (agentQueue.nonEmpty && timer.ongoing) {
       val agent = agentQueue.dequeue()
-      if (agent.unit.unitClass.orderable && agent.unit.alive && agent.unit.ready) {
+      val unit = agent.unit
+      unit.sleepUntil(Math.max(unit.nextOrderFrame.getOrElse(0), AttackDelay.nextSafeOrderFrame(unit)))
+      if (unit.unitClass.orderable && agent.unit.alive && agent.unit.ready) {
         val timeBefore = With.performance.frameMs
         agent.execute()
         if (With.performance.violatedLimit && With.configuration.enablePerformancePauses) {
           val timeAfter = With.performance.frameMs
           val timeDelta = timeAfter - timeBefore
-          With.logger.warn(
-            "Microing "
-            + agent.unit.unitClass
-            + " crossed the "
-            + With.configuration.frameLimitMs
-            + "ms threshold by taking "
-            + timeDelta
-            + "ms considering "
-            + agent.actionsPerformed.map(_.toString).mkString(", "))
+          With.logger.warn(f"Microing ${unit.unitClass} crossed the ${With.configuration.frameLimitMs} threshold by taking ${timeDelta}ms considering ${agent.actionsPerformed.map(_.toString).mkString(", ")}")
         }
       }
     }

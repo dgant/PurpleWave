@@ -3,10 +3,16 @@ package Macro.Allocation
 import Lifecycle.With
 import Macro.Architecture.PlacementRequests.PlacementRequest
 import Macro.Architecture.PlacementStates.{PlacementState, PlacementStateInitial}
+import Performance.TaskQueue.TaskQueueGlobalWeights
+import Performance.Tasks.TimedTask
+import Performance.Timer
 
 import scala.collection.mutable
 
-class PlacementCycle {
+class PlacementCycle extends TimedTask {
+
+  withAlwaysSafe(true)
+  withWeight(TaskQueueGlobalWeights.Placement)
 
   private val queue: mutable.ListBuffer[PlacementRequest] = new mutable.ListBuffer[PlacementRequest]
   private var state: PlacementState = new PlacementStateInitial
@@ -14,7 +20,9 @@ class PlacementCycle {
   /**
     * Runs placement.
     */
-  def update(): Unit = {
+  override def onRun(budgetMs: Long): Unit = {
+
+    val timer = new Timer(budgetMs)
 
     // Repopulate the queue if empty
     if (queue.isEmpty || state.isComplete) {
@@ -23,7 +31,7 @@ class PlacementCycle {
     }
 
     // Place each item in the queue
-    while (With.performance.continueRunning && ! state.isComplete) {
+    while ( ! state.isComplete && timer.ongoing) {
       state.step()
     }
   }

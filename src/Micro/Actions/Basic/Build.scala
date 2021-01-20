@@ -5,6 +5,7 @@ import Mathematics.Points.Tile
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
 import Micro.Actions.Combat.Targeting.Target
+import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.{CircularPush, TrafficPriorities}
 import Planning.UnitMatchers.UnitMatchWorkers
@@ -60,7 +61,7 @@ object Build extends Action {
       if (noThreats || (allWorkers && healthy) && unit.cooldownLeft < With.reaction.agencyMax) {
         Target.choose(unit)
         unit.agent.toAttack = unit.agent.toAttack.orElse(Some(blockersToKill.minBy(_.pixelDistanceEdge(unit))))
-        With.commander.attack(unit)
+        Commander.attack(unit)
       }
       else if (unit.matchups.threats.exists( ! _.is(UnitMatchWorkers))) {
         FightOrFlight.consider(unit)
@@ -78,7 +79,7 @@ object Build extends Action {
     With.coordinator.pushes.put(new CircularPush(priority, pushPixel, 32 + buildClass.dimensionMax, unit))
 
     if (unit.tile.tileDistanceFast(buildTile) < 5 && buildTile.visible) {
-      With.commander.build(unit, buildClass, buildTile)
+      Commander.build(unit, buildClass, buildTile)
       return
     }
 
@@ -88,6 +89,6 @@ object Build extends Action {
     }
     unit.agent.toTravel = Some(movePixel)
     MicroPathing.tryMovingAlongTilePath(unit, MicroPathing.getSimplePath(unit))
-    With.commander.move(unit)
+    Commander.move(unit)
   }
 }

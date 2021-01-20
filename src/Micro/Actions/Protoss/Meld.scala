@@ -1,7 +1,7 @@
 package Micro.Actions.Protoss
 
-import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -22,10 +22,10 @@ object Meld extends Action {
     if (besties.nonEmpty) {
       val bestBestie = besties.minBy(_.pixelDistanceEdge(unit))
       if (unit.is(Protoss.HighTemplar)) {
-        With.commander.useTechOnUnit(unit, Protoss.ArchonMeld, bestBestie)
+        Commander.useTechOnUnit(unit, Protoss.ArchonMeld, bestBestie)
       }
       else {
-        With.commander.useTechOnUnit(unit, Protoss.DarkArchonMeld, bestBestie)
+        Commander.useTechOnUnit(unit, Protoss.DarkArchonMeld, bestBestie)
       }
     }
   }

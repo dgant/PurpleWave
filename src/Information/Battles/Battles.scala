@@ -4,11 +4,19 @@ import Information.Battles.Clustering.BattleClustering
 import Information.Battles.ProcessingStates.{BattleProcessInitial, BattleProcessState}
 import Information.Battles.Types.{BattleGlobal, BattleLocal, Division, Team}
 import Lifecycle.With
+import Performance.TaskQueue.TaskQueueGlobalWeights
+import Performance.Tasks.TimedTask
+import Performance.Timer
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
 
-class Battles {
+class Battles extends TimedTask {
+
+  withAlwaysSafe(true)
+  withSkipsMax(3)
+  withWeight(TaskQueueGlobalWeights.Battles)
+
   var global    : BattleGlobal                = new BattleGlobal(new Team(Vector.empty), new Team(Vector.empty))
   var byUnit    : Map[UnitInfo, BattleLocal]  = Map.empty
   var local     : Vector[BattleLocal]         = Vector.empty
@@ -28,9 +36,10 @@ class Battles {
     _processingState = newState
   }
 
-  def run() {
+  override def onRun(budgetMs: Long) {
+    val timer = new Timer(budgetMs)
     var proceed = true
-    while (proceed && With.performance.continueRunning) {
+    while (proceed && timer.ongoing) {
       proceed = ! _processingState.isFinalStep
       _processingState.step()
     }

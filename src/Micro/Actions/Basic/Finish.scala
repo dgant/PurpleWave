@@ -1,7 +1,7 @@
 package Micro.Actions.Basic
 
-import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Finish extends Action {
@@ -11,7 +11,6 @@ object Finish extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-    
-    With.commander.rightClick(unit, unit.agent.toFinish.get)
+    Commander.rightClick(unit, unit.agent.toFinish.get)
   }
 }

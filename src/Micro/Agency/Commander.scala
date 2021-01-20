@@ -19,10 +19,7 @@ import ProxyBwapi.Upgrades.Upgrade
 // The goal is for the rest of the code base to be blissfully unaware
 // of Brood War's glitchy unit behavior.
 //
-class Commander {
-  def run(): Unit = {
-    With.units.ours.foreach(unit => unit.sleepUntil(Math.max(unit.nextOrderFrame.getOrElse(0), AttackDelay.nextSafeOrderFrame(unit))))
-  }
+object Commander {
   
   def doNothing(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return

@@ -2,6 +2,7 @@ package Micro.Actions.Transportation
 
 import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object DropOff extends Action {
@@ -19,7 +20,7 @@ object DropOff extends Action {
     val inHurry           = unit.matchups.framesToLive < (24 + With.reaction.agencyMax) * (1 +  unit.loadedUnits.size)
     
     if (inZone && (onRunway || inHurry)) {
-      With.commander.unload(unit, unit.loadedUnits.head)
+      Commander.unload(unit, unit.loadedUnits.head)
     }
   }
 }

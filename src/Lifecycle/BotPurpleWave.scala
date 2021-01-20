@@ -6,15 +6,14 @@ import bwapi.DefaultBWListener
 class BotPurpleWave extends DefaultBWListener {
 
   override def onStart() {
-    try {
+    tryCatch(() => {
       With.onStart()
       With.history.onStart()
-    }
-    catch { case exception: Exception => With.logger.onException(exception) }
+    })
   }
 
   override def onFrame() {
-    try {
+    tryCatch(() => {
       With.performance.startFrame()
       With.onFrame()
       With.latency.onFrame()
@@ -23,64 +22,42 @@ class BotPurpleWave extends DefaultBWListener {
       With.tasks.run(With.performance.msBeforeTarget)
       With.storyteller.onFrame()
       With.performance.endFrame()
-    }
-    catch { case exception: Exception => With.logger.onException(exception) }
-
+    })
     // If we don't initialize static units on frame 0 we're in trouble
-    try {
-      if (With.frame == 0 && With.units.neutral.isEmpty) {
-        With.units.onFrame()
-      }
-    } catch { case exception: Exception => With.logger.onException(exception) }
-  }
-
-  override def onUnitComplete(unit: bwapi.Unit) {
-    try {
-    }
-    catch { case exception: Exception => With.logger.onException(exception) }
+    tryCatch(() => if (With.frame == 0 && With.units.neutral.isEmpty) { With.units.onFrame() })
   }
 
   override def onUnitDestroy(unit: bwapi.Unit) {
-    try {
-      With.units.onUnitDestroy(unit)
-    }
-    catch { case exception: Exception => With.logger.onException(exception) }
+    tryCatch(() => With.units.onUnitDestroy(unit))
   }
 
-  override def onUnitDiscover(unit: bwapi.Unit) {
-    try {
-    }
-    catch { case exception: Exception => With.logger.onException(exception) }
-  }
-  
-  override def onUnitHide(unit: bwapi.Unit) {
-    try {
-    }
-    catch { case exception: Exception => With.logger.onException(exception) }
-  }
+  override def onUnitComplete(unit: bwapi.Unit) {}
+  override def onUnitDiscover(unit: bwapi.Unit) {}
+  override def onUnitHide(unit: bwapi.Unit) {}
 
   override def onUnitRenegade(unit: bwapi.Unit): Unit = {
-    try {
-      With.units.onUnitRenegade(unit)
-    }
-    catch { case exception: Exception => With.logger.onException(exception) }
+    tryCatch(() => With.units.onUnitRenegade(unit))
   }
   
   override def onEnd(isWinner: Boolean) {
-    try {
+    tryCatch(() => {
       With.logger.debug("Game ended in " + (if (isWinner) "victory" else "defeat"))
       With.history.onEnd(isWinner)
       With.storyteller.onEnd()
-      Manners.onEnd(isWinner)
+      With.manners.onEnd(isWinner)
       With.logger.flush()
-    }
-    catch { case exception: Exception => With.logger.onException(exception) }
+    })
   }
   
   override def onSendText(text: String) {
+    tryCatch(() => KeyboardCommands.onSendText(text))
+  }
+
+  private def tryCatch(lambda: () => Unit): Unit = {
     try {
-      KeyboardCommands.onSendText(text)
+      lambda()
+    } catch { case exception: Exception =>
+      With.logger.onException(exception)
     }
-    catch { case exception: Exception => With.logger.onException(exception) }
   }
 }

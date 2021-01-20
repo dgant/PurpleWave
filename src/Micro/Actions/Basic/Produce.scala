@@ -2,6 +2,7 @@ package Micro.Actions.Basic
 
 import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Produce extends Action {
@@ -17,20 +18,18 @@ object Produce extends Action {
   )
   
   override def perform(unit: FriendlyUnitInfo) {
-    
     if (unit.agent.toTrain.isDefined) {
       if (With.framesSince(unit.agent.intent.frameCreated) < Math.max(128, unit.agent.toTrain.get.buildFrames / 2)) {
-        With.commander.build(unit, unit.agent.toTrain.get)
+        Commander.build(unit, unit.agent.toTrain.get)
       }
     }
     else if (unit.agent.toTech.isDefined) {
-      With.commander.tech(unit, unit.agent.toTech.get)
+      Commander.tech(unit, unit.agent.toTech.get)
     }
     else if (unit.agent.toUpgrade.isDefined) {
-      With.commander.upgrade(unit, unit.agent.toUpgrade.get)
+      Commander.upgrade(unit, unit.agent.toUpgrade.get)
     }
-
-      unit.agent.intent.toTrain = None // Avoid training repeatedly
+    unit.agent.intent.toTrain = None // Avoid training repeatedly
     unit.agent.intent.toTech = None // Avoid teching repeatedly (mostly impacts failure to renew the desire to tech)
     unit.agent.intent.toUpgrade = None //Avoid upgrading repeatedly
   }

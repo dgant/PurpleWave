@@ -3,6 +3,7 @@ package Micro.Actions.Basic
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Transportation.RequestSafeLanding
+import Micro.Agency.Commander
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -34,7 +35,7 @@ object ReloadScarabs extends Action {
       if (unit.transport.isDefined) {
         RequestSafeLanding().consider(unit)
       } else {
-        With.commander.buildScarab(unit)
+        Commander.buildScarab(unit)
       }
     }
   }

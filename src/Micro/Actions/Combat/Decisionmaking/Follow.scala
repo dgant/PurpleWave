@@ -1,7 +1,7 @@
 package Micro.Actions.Combat.Decisionmaking
 
-import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
@@ -32,7 +32,7 @@ object Follow extends Action {
         if (unit.matchups.targetsInRange.isEmpty
           && unit.matchups.framesOfSafety > 24
           && unit.pixelDistanceCenter(leader) > 64) {
-          With.commander.move(unit)
+          Commander.move(unit)
         }
         leader.agent.leadFollower(unit)
       })

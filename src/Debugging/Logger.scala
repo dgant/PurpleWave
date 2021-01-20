@@ -2,7 +2,7 @@ package Debugging
 
 import java.io.{File, PrintWriter}
 
-import Lifecycle.{Manners, With}
+import Lifecycle.With
 import Utilities.{Forever, GameTime, Seconds}
 
 import scala.collection.mutable
@@ -81,7 +81,7 @@ class Logger {
       System.err.println(logMessage)
     }
     if (chat && With.configuration.debugging) {
-      Manners.chat(message)
+      With.manners.chat(message)
     }
   }
   

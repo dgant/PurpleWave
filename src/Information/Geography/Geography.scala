@@ -6,6 +6,7 @@ import Lifecycle.With
 import Mathematics.Points.{SpecificPoints, Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
 import Performance.Cache
+import Performance.Tasks.TimedTask
 import Planning.UnitMatchers.UnitMatchSiegeTank
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
@@ -13,7 +14,7 @@ import Utilities.ByOption
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
-class Geography {
+class Geography extends TimedTask {
   val baseMaxRadiusTiles = 50
 
   lazy val mapArea            : TileRectangle         = TileRectangle(Tile(0, 0), Tile(With.mapTileWidth, With.mapTileHeight))
@@ -113,7 +114,7 @@ class Geography {
   
   var naturalsSearched: Boolean = false
   
-  def update() {
+  override def onRun(budgetMs: Long) {
     if (With.frame == 0) {
       // Grid tasks update for the first time after Geography because many need to understand zones
       // But for us to initialize zones properly, we need the unit grid ready.

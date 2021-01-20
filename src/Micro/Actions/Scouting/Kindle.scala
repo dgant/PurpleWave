@@ -1,8 +1,8 @@
 package Micro.Actions.Scouting
 
-import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Targeting.Target
+import Micro.Agency.Commander
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Strategery.Strategies.Zerg.ZvE4Pool
@@ -30,6 +30,6 @@ object Kindle extends Action {
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val legalTargets = unit.matchups.targets.filter(legalTarget(unit, _))
     Target.choose(unit, legalTargets)
-    With.commander.attack(unit)
+    Commander.attack(unit)
   }
 }

@@ -3,6 +3,7 @@ package Micro.Actions.Scouting
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
+import Micro.Agency.Commander
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
 
@@ -23,12 +24,12 @@ object BlockConstruction extends Action {
     
     if (unit.framesToGetInRange(builder) > With.reaction.agencyAverage) {
       unit.agent.toTravel = Some(unit.pixel.project(builder.pixel, unit.pixelDistanceCenter(builder) + 48))
-      With.commander.move(unit)
+      Commander.move(unit)
     }
     else if (unit.readyForAttackOrder
       || unit.totalHealth > builder.totalHealth
       || unit.pixelDistanceEdge(builder) > 8) {
-      With.commander.attack(unit)
+      Commander.attack(unit)
     }
     else {
       Retreat.delegate(unit)

@@ -2,9 +2,10 @@ package Information
 
 import Lifecycle.With
 import Performance.Cache
+import Performance.Tasks.TimedTask
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class Accounting {
+class Accounting extends TimedTask {
   
   val incomePerFrameMinerals = 0.046
   val incomePerFrameGas = 0.069
@@ -14,7 +15,7 @@ class Accounting {
   var ourEstimatedTotalGas = 0.0
   
   var _lastFrame = 0
-  def update() {
+  override def onRun(budgetMs: Long) {
     val frameDiff = With.framesSince(_lastFrame)
     ourEstimatedTotalMinerals += frameDiff * ourIncomePerFrameMinerals
     ourEstimatedTotalGas      += frameDiff * ourIncomePerFrameGas

@@ -1,7 +1,7 @@
 package Micro.Actions.Scouting
 
-import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object KnockKnock extends Action {
@@ -18,6 +18,6 @@ object KnockKnock extends Action {
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     unit.agent.toAttack = unit.matchups.threats.headOption
-    With.commander.attack(unit)
+    Commander.attack(unit)
   }
 }

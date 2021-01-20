@@ -4,6 +4,7 @@ import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Combat.Targeting.Filters.TargetFilterVisibleInRange
+import Micro.Agency.Commander
 import Planning.UnitMatchers.UnitMatchSiegeTank
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
@@ -107,10 +108,10 @@ object Root extends Action {
         return
       }
       if (weAreALurker) {
-        With.commander.burrow(unit)
+        Commander.burrow(unit)
       }
       if (weAreATank) {
-        With.commander.useTech(unit, Terran.SiegeMode)
+        Commander.useTech(unit, Terran.SiegeMode)
       }
     }
   
@@ -119,10 +120,10 @@ object Root extends Action {
         return
       }
       if (weAreALurker) {
-        With.commander.unburrow(unit)
+        Commander.unburrow(unit)
       }
       if (weAreATank) {
-        With.commander.useTech(unit, Terran.SiegeMode)
+        Commander.useTech(unit, Terran.SiegeMode)
       }
     }
   }

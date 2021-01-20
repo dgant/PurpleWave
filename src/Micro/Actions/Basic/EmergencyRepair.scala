@@ -2,6 +2,7 @@ package Micro.Actions.Basic
 
 import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.Seconds
@@ -21,7 +22,7 @@ object EmergencyRepair extends Action {
     val patient = patients.minBy(_.pixelDistanceEdge(unit))
     
     unit.agent.toRepair = Some(patient)
-    With.commander.repair(unit, patient)
+    Commander.repair(unit, patient)
   }
   
   def eligiblePatients(repairer: FriendlyUnitInfo): Seq[UnitInfo] =

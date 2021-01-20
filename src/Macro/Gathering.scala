@@ -5,6 +5,8 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Performance.Cache
+import Performance.TaskQueue.TaskQueueGlobalWeights
+import Performance.Tasks.TimedTask
 import Planning.Plans.Macro.Automatic.Gather
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -12,7 +14,9 @@ import Utilities.ByOption
 import scala.collection.mutable
 import scala.util.Random
 
-class Gathering {
+class Gathering extends TimedTask {
+
+  withWeight(TaskQueueGlobalWeights.Gather)
 
   private val kDistanceMining: Int = 32 * 12
   private val kInvalidResourceScore = 1e100d
@@ -104,8 +108,9 @@ class Gathering {
     workersByResource.get(resource).map(_.size).getOrElse(0)
   }
 
-  def run() {
+  override def onRun(budgetMs: Long) {
     if (workers.isEmpty) return
+
     resourceByWorker.keys.withFilter( ! workers.contains(_)).foreach(unassignWorker)
     workerCooldownUntil.keys.withFilter( ! workers.contains(_)).foreach(workerCooldownUntil.remove)
     // TODO: Unassign any workers who are no longer in the squad -- TCAI does this with the controller
@@ -247,7 +252,6 @@ class Gathering {
       .map(new OrderedWorker(_))
       .toVector
       .sortBy(_.order)
-
     workersToUpdate
       .foreach(orderedWorker => {
         val worker = orderedWorker.worker

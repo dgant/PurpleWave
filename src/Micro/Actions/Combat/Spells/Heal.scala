@@ -1,8 +1,8 @@
 package Micro.Actions.Combat.Spells
 
-import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -25,7 +25,7 @@ object Heal extends Action {
     target.foreach(someTarget => {
       unit.agent.toTravel = Some(unit.pixel.project(someTarget.pixel, unit.pixelDistanceEdge(someTarget) - 16.0))
       if (someTarget.pixelDistanceCenter(unit) < 96.0) {
-        With.commander.attackMove(unit)
+        Commander.attackMove(unit)
       }
     })
   }

@@ -3,6 +3,7 @@ package Micro.Actions.Combat.Tactics
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Targeting.Target
+import Micro.Agency.Commander
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -37,6 +38,6 @@ object Brawl extends Action {
       Target.best(unit, unit.matchups.targetsInRange)
         .orElse(Target.best(unit, targetsNear))
         .orElse(Target.best(unit))
-    With.commander.attack(unit)
+    Commander.attack(unit)
   }
 }

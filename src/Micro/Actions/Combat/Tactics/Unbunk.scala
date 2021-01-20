@@ -2,6 +2,7 @@ package Micro.Actions.Combat.Tactics
 
 import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -16,6 +17,6 @@ object Unbunk extends Action {
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    With.commander.unload(unit.transport.get, unit)
+    Commander.unload(unit.transport.get, unit)
   }
 }

@@ -5,6 +5,7 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Targeting.Target
+import Micro.Agency.Commander
 import Planning.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -49,7 +50,7 @@ object Gather extends Action {
           ! enemy.isAny(UnitMatchWorkers, Terran.Wraith, Protoss.Arbiter, Protoss.Scout)
           && enemy.pixelDistanceEdge(unit) < enemy.pixelRangeAgainst(unit) + 32)
           && ! unit.tile.enemyDetected) {
-        With.commander.burrow(unit)
+        Commander.burrow(unit)
       }
 
       // Help with fights when appropriate
@@ -60,7 +61,7 @@ object Gather extends Action {
         && target.pixelDistanceCenter(resource) < defenseRadiusPixels)
       if (unit.totalHealth > 32 && beckonedToFight) {
         Target.choose(unit)
-        With.commander.attack(unit)
+        Commander.attack(unit)
       }
 
       // Escape dangerous melee units
@@ -75,14 +76,14 @@ object Gather extends Action {
             (!unit.carryingMinerals                       && goal.unitClass.isMinerals))
         val bestGoal = ByOption.maxBy(drillGoal)(resource => lethalStabbers.map(stabber => resource.pixelDistanceCenter(stabber)).max)
         if (bestGoal.exists(_.unitClass.isTownHall)) {
-          With.commander.returnCargo(unit)
+          Commander.returnCargo(unit)
         } else if (bestGoal.isDefined) {
           // If we expect to die anyway
           if (unit.pixelDistanceEdge(bestGoal.get) < 32) {
             Potshot.consider(unit)
           } else {
             unit.agent.toGather = bestGoal
-            With.commander.gather(unit)
+            Commander.gather(unit)
           }
         }
       }
@@ -106,9 +107,9 @@ object Gather extends Action {
 
     // Benzene travel hack
     if (Benzene.matches && resource.zone != unit.zone && unit.zone == With.geography.ourMain.zone) {
-      With.commander.move(unit)
+      Commander.move(unit)
     }
     
-    With.commander.gather(unit)
+    Commander.gather(unit)
   }
 }

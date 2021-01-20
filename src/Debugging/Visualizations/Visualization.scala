@@ -12,12 +12,16 @@ import Debugging.Visualizations.Views.{ShowClock, ShowStoryteller, View}
 import Lifecycle.With
 import bwapi.Text
 import Mathematics.Points.Pixel
+import Performance.Tasks.TimedTask
 import bwapi.MouseButton
 
 import scala.collection.mutable
 import scala.util.Random
 
-class Visualization {
+class Visualization extends TimedTask {
+
+  withSkipsMax(0)
+  withCosmetic(true)
   
   //////////////
   // Settings //
@@ -120,7 +124,7 @@ class Visualization {
     matched
   }
   
-  def render() {
+  override def onRun(budgetMs: Long) {
     requireInitialization()
     if ( ! enabled) return
     if (With.tasks.tasks.exists(_.runsTotal == 0)) return

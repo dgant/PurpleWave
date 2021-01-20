@@ -6,6 +6,7 @@ import Lifecycle.With
 import Mathematics.Physics.Gravity
 import Micro.Actions.Action
 import Micro.Actions.Commands.Move
+import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -73,6 +74,6 @@ abstract class AbstractSearch extends Action {
     val path = profile.find
     unit.agent.toTravel = Some(tileToScout.pixelCenter)
     MicroPathing.tryMovingAlongTilePath(unit, path)
-    With.commander.move(unit)
+    Commander.move(unit)
   }
 }

@@ -1,7 +1,7 @@
 package Micro.Actions.Basic
 
-import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Repair extends Action {
@@ -12,14 +12,14 @@ object Repair extends Action {
   
   override def perform(unit: FriendlyUnitInfo) {
     if (unit.loaded) {
-      unit.transport.foreach(With.commander.unload(_, unit))
+      unit.transport.foreach(Commander.unload(_, unit))
     }
     val target = unit.agent.toRepair.get
     if (target.totalHealth < target.unitClass.maxHitPoints) {
-      With.commander.repair(unit, target)
+      Commander.repair(unit, target)
     } else {
       unit.agent.toTravel = Some(target.pixel.project(unit.pixel, 48))
-      With.commander.move(unit)
+      Commander.move(unit)
     }
   }
 }

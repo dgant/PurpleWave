@@ -3,6 +3,7 @@ package Micro.Actions.Transportation.Caddy
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
+import Micro.Agency.Commander
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -27,7 +28,7 @@ object ShuttleCircle extends Action {
       if (shuttle.matchups.framesOfSafety < 48 && (framesToRobotics < framesToReaver || robo.matchups.enemies.isEmpty)) {
         Retreat.consider(shuttle)
       } else {
-        With.commander.move(shuttle)
+        Commander.move(shuttle)
       }
     })
   }

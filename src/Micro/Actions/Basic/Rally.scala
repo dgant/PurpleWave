@@ -2,6 +2,7 @@ package Micro.Actions.Basic
 
 import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
@@ -36,11 +37,11 @@ object Rally extends Action {
       val minerals = unit.base.map(_.minerals).getOrElse(Set.empty)
       if (minerals.nonEmpty) {
         val mineral = minerals.minBy(_.pixelDistanceEdge(unit))
-        With.commander.rally(unit, mineral.pixel)
+        Commander.rally(unit, mineral.pixel)
         return
       }
     }
 
-    With.commander.rally(unit, With.scouting.mostBaselikeEnemyTile.pixelCenter)
+    Commander.rally(unit, With.scouting.mostBaselikeEnemyTile.pixelCenter)
   }
 }

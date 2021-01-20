@@ -5,6 +5,7 @@ import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
+import Micro.Agency.Commander
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, Minutes, Seconds}
@@ -61,7 +62,7 @@ object Bust extends Action {
 
     if (unit.readyForAttackOrder && repairers.nonEmpty && goons.length >= repairers.map(_.hitPoints).min / 10) {
       unit.agent.toAttack = Some(repairers.sortBy(_.pixelDistanceCenter(PurpleMath.centroid(goons.map(_.pixel)))).minBy(_.hitPoints))
-      With.commander.attack(unit)
+      Commander.attack(unit)
     }
 
     if (With.framesSince(unit.lastFrameTakingDamage) < Seconds(1)()) {
@@ -85,9 +86,9 @@ object Bust extends Action {
       }
       if (station.nonEmpty) {
         unit.agent.toTravel = station
-        With.commander.move(unit)
+        Commander.move(unit)
       }
     }
-    With.commander.attack(unit)
+    Commander.attack(unit)
   }
 }

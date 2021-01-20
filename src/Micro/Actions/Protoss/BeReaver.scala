@@ -2,12 +2,13 @@ package Micro.Actions.Protoss
 
 import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Pathfinding.Types.NoPath
-import Lifecycle.{Manners, With}
+import Lifecycle.With
 import Mathematics.Points.Tile
 import Mathematics.Shapes.Spiral
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Targeting.Target
+import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -27,7 +28,7 @@ object BeReaver extends Action {
     lazy val attackingSoon = unit.matchups.targetsInRange.nonEmpty && unit.cooldownLeft < Math.min(unit.cooldownMaxGround / 4, unit.matchups.framesToLive)
     if (unit.transport.isEmpty && inRangeNeedlessly && ! attackingSoon) {
       // TODO: What if multiple Reavers?
-      unit.agent.ride.foreach(With.commander.rightClick(unit, _))
+      unit.agent.ride.foreach(Commander.rightClick(unit, _))
       if (Retreat.allowed(unit)) {
         Retreat.consider(unit)
         unit.agent.act("Hop:" + unit.agent.lastAction)
@@ -49,7 +50,7 @@ object BeReaver extends Action {
     shouldDrop = shouldDrop || here.groundPixels(destinationGround) < 32
     shouldDrop = shouldDrop || unit.inRangeToAttack(target) && With.grids.enemyRangeGround.get(here) == 0 && ! unit.matchups.threats.exists(t => t.is(Terran.SiegeTankSieged) && t.inRangeToAttack(unit, here.pixelCenter))
     if (shouldDrop) {
-      With.commander.attack(unit)
+      Commander.attack(unit)
       return
     }
 
@@ -78,15 +79,15 @@ object BeReaver extends Action {
     )
     if (path.pathExists) {
       if (unit.pixelDistanceSquared(path.end.pixelCenter) <= 16 * 16) {
-        unit.transport.foreach(With.commander.unload(_, unit))
-        With.commander.doNothing(unit)
+        unit.transport.foreach(Commander.unload(_, unit))
+        Commander.doNothing(unit)
       } else {
         unit.agent.toTravel = Some(path.end.pixelCenter)
         MicroPathing.tryMovingAlongTilePath(unit, path)
       }
     } else {
-      Manners.debugChat(f"Failed to path $unit to $destinationGround")
-      Manners.debugChat(f"Targeting $target")
+      With.logger.warn(f"Failed to path $unit to $destinationGround")
+      With.logger.warn(f"Targeting $target")
     }
   }
 

@@ -2,6 +2,7 @@ package Micro.Actions.Combat.Tactics
 
 import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
@@ -26,7 +27,6 @@ object OccupyBunker extends Action {
         && bunker.is(Terran.Bunker)
         && bunker.friendly.get.loadedUnits.size < 4)
   
-    ByOption.minBy(bunkers)(_.pixelDistanceEdge(unit))
-      .foreach(bunker => With.commander.rightClick(unit, bunker))
+    ByOption.minBy(bunkers)(_.pixelDistanceEdge(unit)).foreach(Commander.rightClick(unit, _))
   }
 }

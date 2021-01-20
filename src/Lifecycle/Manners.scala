@@ -1,13 +1,14 @@
 package Lifecycle
 
+import Performance.Tasks.TimedTask
 import Planning.UnitMatchers.UnitMatchWorkers
 import Utilities.Seconds
 
-object Manners {
+class Manners extends TimedTask {
   
   def enabled: Boolean = With.configuration.enableChat
   
-  def run() {
+  override def onRun(budgetMs: Long) {
     if (With.configuration.enableSurrenders
       && With.self.supplyUsed == 0
       && With.self.minerals < 50

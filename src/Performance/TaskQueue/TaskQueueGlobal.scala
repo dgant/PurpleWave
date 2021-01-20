@@ -1,5 +1,5 @@
 package Performance.TaskQueue
-import Lifecycle.{Manners, With}
+import Lifecycle.With
 import Performance.Tasks._
 
 object TaskQueueGlobalWeights {
@@ -13,10 +13,10 @@ object TaskQueueGlobalWeights {
 
 class TaskQueueGlobal extends TaskQueueParallel(
   new TaskQueueSerial("Fingerprinting", With.fingerprints.relevant.map(f => new SimpleTask(f.toString, f.update)): _*),
-  new SimpleTask("Geography", With.geography.update),
-  new TaskQueueGrids(),
-  new SimpleTask("Battles", With.battles.run).withAlwaysSafe(true).withSkipsMax(3).withWeight(TaskQueueGlobalWeights.Battles),
-  new SimpleTask("Accounting", With.accounting.update),
+  With.geography,
+  new TaskQueueGrids,
+  With.battles,
+  With.accounting,
   new SimpleTask(
     "Planning",
     () => {
@@ -37,22 +37,21 @@ class TaskQueueGlobal extends TaskQueueParallel(
     })
     .withSkipsMax(6)
     .withWeight(TaskQueueGlobalWeights.Planning),
-  new SimpleTask("Gathering", With.gathering.run).withWeight(TaskQueueGlobalWeights.Gather),
+  With.gathering,
   new TaskQueueSerial(
     "Squads",
     new SimpleTask("SquadGoals", With.squads.updateGoals),
     new SimpleTask("SquadBatching", With.squads.stepBatching).withAlwaysSafe(true))
     .withWeight(TaskQueueGlobalWeights.Squads),
-  new SimpleTask("Placement", With.placement.update).withAlwaysSafe(true).withWeight(TaskQueueGlobalWeights.Placement),
+  With.placement,
   new TaskQueueSerial(
     "Micro",
     new SimpleTask("Matchups", With.matchups.run),
-    new SimpleTask("Commander", With.commander.run).withAlwaysSafe(true),
-    new SimpleTask("Agents", With.agents.run).withAlwaysSafe(true))
+    With.agents)
     .withSkipsMax(1)
     .withWeight(TaskQueueGlobalWeights.Micro),
-  new SimpleTask("Manners", Manners.run),
-  new SimpleTask("Camera", With.camera.onFrame).withSkipsMax(0).withCosmetic(true),
-  new SimpleTask("Visuals", With.visualization.render).withSkipsMax(0).withCosmetic(true)) {
+  With.manners,
+  With.camera,
+  With.visualization) {
   withName("Global")
 }

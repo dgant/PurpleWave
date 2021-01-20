@@ -3,6 +3,7 @@ package Micro.Actions.Scouting
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Targeting.Target
+import Micro.Agency.Commander
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import bwapi.Race
 
@@ -29,6 +30,6 @@ object DisruptBuilder extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     Target.chooseUnfiltered(unit, disruptableBuilders(unit))
-    With.commander.attack(unit)
+    Commander.attack(unit)
   }
 }

@@ -1,6 +1,6 @@
 package Debugging
 
-import Lifecycle.{JBWAPIClient, Manners, With}
+import Lifecycle.{JBWAPIClient, With}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object KeyboardCommands {
@@ -22,7 +22,7 @@ object KeyboardCommands {
       case "2"          => With.game.setLocalSpeed(24 * 8)  ; With.camera.enabled = false
       case "3"          => With.game.setLocalSpeed(24)      ; With.camera.enabled = false
       case "4"          => With.game.setLocalSpeed(0)       ; With.camera.enabled = false
-      case "perform"    => { With.configuration.enablePerformancePauses = ! With.configuration.enablePerformancePauses; Manners.chat("Performance stops? " + With.configuration.enablePerformancePauses) }
+      case "perform"    => { With.configuration.enablePerformancePauses = ! With.configuration.enablePerformancePauses; With.manners.chat("Performance stops? " + With.configuration.enablePerformancePauses) }
       case "map"        => With.logger.debug("The current map is " + With.game.mapName + ": " + With.game.mapFileName)
       case "pm"         => With.logger.debug(JBWAPIClient.getPerformanceMetrics.toString)
       case "task"       => With.configuration.logTaskDuration = ! With.configuration.logTaskDuration

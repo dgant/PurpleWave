@@ -8,6 +8,7 @@ import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Targeting.Target
+import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.{ByOption, Minutes, Seconds}
@@ -76,7 +77,7 @@ object Batter extends Action {
     // TODO: Walk up to the wall when our mobility > 1 and we're not shooting.
     
     if (unit.readyForAttackOrder || unit.agent.toAttack.forall(unit.inRangeToAttack)) {
-      With.commander.attack(unit)
+      Commander.attack(unit)
     }
 
     // Commanding a unit to move into a walled base, especially when uphill, results in pathing failure and the unit never gets uphill.
@@ -94,7 +95,7 @@ object Batter extends Action {
       
       val destination = ByOption.minBy(walkableTiles)(_.pixelCenter.pixelDistance(unit.pixel))
       unit.agent.toTravel = destination.map(_.pixelCenter).orElse(unit.agent.toTravel)
-      With.commander.move(unit)
+      Commander.move(unit)
   
       //TMP
       walkableTiles.foreach(tile => DrawMap.circle(tile.pixelCenter, 15, Colors.DarkYellow))

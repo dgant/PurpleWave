@@ -2,6 +2,7 @@ package Micro.Actions.Combat.Spells
 
 import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -15,6 +16,6 @@ object WraithUncloak extends Action {
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    With.commander.decloak(unit, Terran.GhostCloak)
+    Commander.decloak(unit, Terran.GhostCloak)
   }
 }

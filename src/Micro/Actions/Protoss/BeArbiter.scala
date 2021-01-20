@@ -1,9 +1,9 @@
 package Micro.Actions.Protoss
 
-import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Potshot
+import Micro.Agency.Commander
 import Planning.UnitMatchers.UnitMatchBuilding
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -37,6 +37,6 @@ object BeArbiter extends Action {
     if (umbrellable.forall(arbiter.pixelDistanceCenter(_) < 32 * 3)) {
       Potshot.delegate(arbiter)
     }
-    With.commander.move(arbiter)
+    Commander.move(arbiter)
   }
 }

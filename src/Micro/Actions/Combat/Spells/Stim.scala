@@ -1,7 +1,7 @@
 package Micro.Actions.Combat.Spells
 
-import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -17,6 +17,6 @@ object Stim extends Action {
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    With.commander.useTech(unit, Terran.Stim)
+    Commander.useTech(unit, Terran.Stim)
   }
 }

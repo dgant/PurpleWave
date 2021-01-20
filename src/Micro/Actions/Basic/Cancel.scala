@@ -2,6 +2,7 @@ package Micro.Actions.Basic
 
 import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import Planning.UnitMatchers.UnitMatchBuilding
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -33,6 +34,6 @@ object Cancel extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-    With.commander.cancel(unit)
+    Commander.cancel(unit)
   }
 }

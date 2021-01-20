@@ -2,6 +2,7 @@ package Micro.Actions.Basic
 
 import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Agency.Commander
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -17,6 +18,6 @@ object ReloadInterceptors extends Action {
   )
   
   override def perform(unit: FriendlyUnitInfo) {
-    With.commander.buildInterceptor(unit)
+    Commander.buildInterceptor(unit)
   }
 }

@@ -19,10 +19,10 @@ class TaskQueueSerial(val tasks: TimedTask*) extends TimedTask {
   override def isComplete: Boolean = framesSinceRunning < 1 && index == 0
 
   override def onRun(budgetMs: Long): Unit = {
-    val timer = new Timer
+    val timer = new Timer(budgetMs)
     var proceed = true
     while (proceed) {
-      if (timer.elapsed >= budgetMs) {
+      if (timer.expired) {
         proceed = false
       } else if (index >= tasks.length) {
         // We have reached the end of the task queue.
@@ -31,9 +31,9 @@ class TaskQueueSerial(val tasks: TimedTask*) extends TimedTask {
         index = 0
       } else {
         val task = tasks(index)
-        proceed = task.safeToRun(timer.remainingUntil(budgetMs))
+        proceed = task.safeToRun(timer.remaining)
         if (proceed) {
-          task.run(timer.remainingUntil(budgetMs))
+          task.run(timer.remaining)
           index += 1
           if ( ! task.isComplete) {
             // The task isn't complete,

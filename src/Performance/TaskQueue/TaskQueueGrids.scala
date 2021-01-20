@@ -3,7 +3,7 @@ import Information.Grids.AbstractGrid
 import Lifecycle.With
 import Performance.Tasks._
 
-class GridTask[T](grid: AbstractGrid[T]) extends SimpleTask(grid.toString, grid.update)
+class GridTask[T](grid: AbstractGrid[T]) extends SimpleTask(grid.update)
 
 class TaskQueueGrids extends TaskQueueParallel(
   new GridTask(With.grids.buildable)                    .withWeight(10),
@@ -24,4 +24,6 @@ class TaskQueueGrids extends TaskQueueParallel(
   new GridTask(With.grids.units)                        .withWeight(1000),
   new GridTask(With.grids.walkable)                     .withWeight(1),
   new GridTask(With.grids.walkableTerrain)              .withWeight(1),
-  new GridTask(With.grids.unwalkableUnits)              .withWeight(5))
+  new GridTask(With.grids.unwalkableUnits)              .withWeight(5)) {
+  withName("Grids")
+}

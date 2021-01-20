@@ -18,7 +18,7 @@ class TaskQueueParallel(val tasks: TimedTask*) extends TimedTask {
 
   override def onRun(budgetMs: Long)
   {
-    val timer = new Timer
+    val timer = new Timer(budgetMs)
 
     // Run each task in order until we've run everything once.
     // This is because the global task queue needs to be initialized in the given order
@@ -42,10 +42,10 @@ class TaskQueueParallel(val tasks: TimedTask*) extends TimedTask {
       val budgetMsPerFrame    = With.configuration.frameTargetMs * budgetRatio
       val budgetMsRecent      = budgetMsPerFrame * task.runMsSamplesMax
       val budgetMsRecentSpent = task.runMsRecentTotal()
-      val budgetMs            = PurpleMath.clamp(budgetMsRecent - budgetMsRecentSpent, 0, With.performance.msBeforeTarget).toLong
+      val taskBudgetMs        = PurpleMath.clamp(budgetMsRecent - budgetMsRecentSpent, 0, With.performance.msBeforeTarget).toLong
 
-      if (i == 0 || task.safeToRun(timer.remainingUntil(budgetMs))) {
-        task.run(timer.remainingUntil(budgetMs)) // TODO: Use per-task budget
+      if (i == 0 || task.safeToRun(taskBudgetMs)) {
+        task.run(taskBudgetMs)
       } else {
         task.skip()
       }

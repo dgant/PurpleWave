@@ -1,7 +1,6 @@
 package Performance.Tasks
 
 import Lifecycle.With
-import Mathematics.PurpleMath
 import Performance.Cache
 import Utilities.ByOption
 
@@ -86,11 +85,13 @@ abstract class TimedTask {
       _runMsMax = Math.max(_runMsMax, millisecondsDuration)
     }
     runMsEnqueue(millisecondsDuration)
-    _runsCrossingTarget += PurpleMath.fromBoolean( ! targetAlreadyViolated && With.performance.violatedTarget)
+    if ( ! targetAlreadyViolated && With.performance.violatedTarget) {
+      _runsCrossingTarget += 1
+    }
     if ( ! limitAlreadyViolated && With.performance.violatedLimit) {
       _runsCrossingLimit += 1
       if (skipsMax > 0 && With.configuration.enablePerformancePauses) {
-        With.logger.warn(f"$toString${if(due)" (Due)" else ""} crossed the ${With.configuration.frameLimitMs}ms limit, taking ${millisecondsDuration}ms, reaching {With.performance.millisecondsSpentThisFrame}ms on the frame.")
+        With.logger.warn(f"$toString${if(due)" (Due)" else ""} crossed the ${With.configuration.frameLimitMs}ms limit, taking ${millisecondsDuration}ms, reaching ${With.performance.frameMs}ms on the frame.")
       }
     }
     lastRunFrame = With.frame

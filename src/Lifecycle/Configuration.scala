@@ -9,10 +9,10 @@ class Configuration {
   // Tournament settings //s
   /////////////////////////
 
-  var enableSurrenders        = false
-  var enableChat              = false
-  var frameTargetMs  = 20
-  var frameLimitMs   = 55
+  var enableSurrenders  = false
+  var enableChat        = false
+  var frameTargetMs     = 20
+  var frameLimitMs      = 55
 
   ///////////////////
   // Mode settings //

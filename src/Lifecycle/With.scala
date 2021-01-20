@@ -138,6 +138,10 @@ object With {
 
     analyzeTerrain()
 
+    // Order-dependent initialization:
+    // PerformanceMonitor required to exist for creating any task
+    performance       = new PerformanceMonitor
+
     agents            = new Agency
     animations        = new Animations
     architecture      = new Architecture
@@ -161,7 +165,6 @@ object With {
     manners           = new Manners
     matchups          = new MatchupGraph
     paths             = new Paths
-    performance       = new PerformanceMonitor
     placement         = new PlacementCycle
     preplacement      = new Preplacement
     prioritizer       = new Prioritizer

@@ -481,14 +481,9 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
 
   @inline final def canAttack: Boolean = canAttackCache()
   private val canAttackCache = new Cache(() =>
-    canDoAnything
-    && (
-      unitClass.rawCanAttack
-      || is(Terran.Bunker)
-      || (is(Protoss.Carrier) && (isEnemy || interceptors.exists(_.complete)))
-      || (is(Protoss.Reaver) && scarabCount > 0)
-      || (is(Zerg.Lurker) && burrowed))
-    && (flying || ! underDisruptionWeb))
+    (unitClass.rawCanAttack || (is(Terran.Bunker) && (isEnemy || friendly.exists(_.loadedUnits.exists(_.canAttack)))))
+    && (flying || ! underDisruptionWeb)
+    && canDoAnything)
 
   @inline final def canAttack(enemy: UnitInfo): Boolean = (
     canAttack

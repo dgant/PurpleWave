@@ -19,7 +19,7 @@ class UnorderedBuffer[T >: Null](val capacity: Int) {
     while (i < size) {
       if (values(i) == value) {
         values(i) = values(size - 1)
-        values.remove(size - 1)
+        values(size - 1) =  null
         size -= 1
         return
       }
@@ -33,8 +33,8 @@ class UnorderedBuffer[T >: Null](val capacity: Int) {
     while (i < size) {
       val value = values(i)
       if (predicate(value)) {
-        values(i) = values(size)
-        values.remove(size)
+        values(i) = values(size - 1)
+        values(size - 1) =  null
         size -= 1
       }
       i += 1

@@ -4,66 +4,13 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.Shapes.Circle
 import Planning.UnitMatchers.UnitMatchWarriors
-import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, Orders}
 import Utilities._
 
-import scala.collection.JavaConverters._
-import scala.collection.mutable
+object Imagination {
 
-class ForeignUnitTracker {
-  
-  private val unitsById = new mutable.HashMap[Int, ForeignUnitInfo]()
-
-  def enemyUnits    : Iterable[ForeignUnitInfo] = unitsById.values.filter(_.player.isEnemy)
-  def neutralUnits  : Iterable[ForeignUnitInfo] = unitsById.values.filter(_.player.isNeutral)
-
-  def get(id: Int): Option[ForeignUnitInfo] = unitsById.get(id)
-
-  def updateForeign() {
-    // Remove any units who have changed owners
-    unitsById.values.filter(u => u.bwapiUnit.isVisible && u.bwapiUnit.getPlayer.getID != u.player.id).toVector.foreach(remove)
-
-    // Add static neutral units
-    if (unitsById.isEmpty && With.frame < 24) {
-       With.game.getStaticNeutralUnits.asScala.foreach(add)
-    }
-
-    Players.all.view
-      .filterNot(_.isUs)
-      .flatMap(_.rawUnits)
-      .filter(_.exists)
-      .foreach(bwapiUnit => {
-        val unit = unitsById.get(bwapiUnit.getID)
-        if (unit.isDefined) {
-          unit.get.update()
-        } else {
-          add(bwapiUnit)
-        }
-      })
-
-    unitsById.values.foreach(checkVisibility)
-    unitsById.values.view.filterNot(_.alive).toVector.foreach(remove)
-  }
-
-  def onUnitDestroyOrRenegade(unit: bwapi.Unit) {
-    unitsById.get(unit.getID).foreach(remove)
-  }
-
-  private def add(bwapiUnit: bwapi.Unit): Unit = {
-    val newUnit = new ForeignUnitInfo(bwapiUnit, bwapiUnit.getID)
-    newUnit.update()
-    unitsById.put(bwapiUnit.getID, newUnit)
-  }
-
-  private def remove(unit: ForeignUnitInfo) {
-    unit.setVisbility(Visibility.Dead)
-    unitsById.remove(unit.id)
-    With.units.historicalUnitTracker.add(unit)
-  }
-
-  private def checkVisibility(unit: ForeignUnitInfo) {
+  def checkVisibility(unit: ForeignUnitInfo): Unit = {
     lazy val shouldBeVisible = unit.tile.visibleBwapi
     lazy val shouldBeDetected = unit.tile.friendlyDetected
     lazy val likelyBurrowed = (

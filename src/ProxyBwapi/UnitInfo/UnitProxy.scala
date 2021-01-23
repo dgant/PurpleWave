@@ -4,12 +4,12 @@ import Mathematics.Points.{Pixel, Tile}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClasses.UnitClass
 
-abstract class UnitProxy(var bwapiUnit: bwapi.Unit, val id: Int) {
+abstract class UnitProxy(val bwapiUnit: bwapi.Unit, val id: Int) {
   
   ///////////////////
   // Tracking info //
   ///////////////////
-  
+
   def player: PlayerInfo
   def lastSeen: Int
   

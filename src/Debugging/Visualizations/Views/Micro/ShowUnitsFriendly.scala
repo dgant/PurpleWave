@@ -99,7 +99,7 @@ object ShowUnitsFriendly extends View {
       }
     }
 
-    if (showPaths && (unit.selected || unit.transport.exists(_.selected) || With.units.selected().isEmpty)) {
+    if (showPaths && (unit.selected || unit.transport.exists(_.selected) || With.units.selected.isEmpty)) {
       def drawTilePath(path: TilePath): Unit = {
         val offset = unit.pixel.offsetFromTileCenter
         for (i <- 0 until path.tiles.get.size - 1) {

@@ -37,7 +37,7 @@ class GoalAttack extends SquadGoalBasic {
       && unit.unitClass.dealsDamage)
 
     val occupiedBases = squad.units.flatMap(_.base).filter(_.owner.isEnemy)
-    squad.enemies = With.units.enemy.view.filter(u => u.likelyStillThere && targetFilter(u) && u.zone == target.zone || u.canMove || u.is(Terran.SiegeTankSieged)).toSeq
+    squad.enemies = With.units.enemy.view.filter(u => u.likelyStillThere && targetFilter(u) && u.zone == target.zone || u.canMove || u.is(Terran.SiegeTankSieged)).toVector
   }
   
   protected def chooseTarget(): Unit = {

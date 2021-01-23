@@ -95,7 +95,7 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   @inline final def lastTotalHealthPoints: Int = lastHitPoints + lastShieldPoints + lastDefensiveMatrixPoints
 
   private var lastUnitClass: UnitClass = _
-  def updateCommon() {
+  def update() {
     if (totalHealth < lastTotalHealthPoints) {
       lastFrameTakingDamage = With.frame
     }

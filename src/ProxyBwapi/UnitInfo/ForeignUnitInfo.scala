@@ -7,41 +7,26 @@ import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
-import ProxyBwapi.UnitTracking.Visibility
+import ProxyBwapi.UnitTracking.{Imagination, Visibility}
 import ProxyBwapi.Upgrades.Upgrade
 
 class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit, id) {
 
   override val foreign: Option[ForeignUnitInfo] = Some(this)
 
-  @inline final def update(): Unit = {
-    updateTimeSensitiveInformation()
-    updateTimeInsensitiveInformation()
-    updateCommon()
+  override def update(): Unit = {
+    if (bwapiUnit.isVisible || With.frame == 0) {
+      readProxy()
+    }
+    super.update()
     if ( ! lastSeenWithin(24) && is(Terran.SiegeTankUnsieged)) {
       _unitClass = Terran.SiegeTankSieged
     }
+    Imagination.checkVisibility(this)
   }
-  
+
   private var updateCount = 0
-  private def updateTimeInsensitiveInformation() {
-    if (updateCount == 0 || (updateCount + id) % With.configuration.foreignUnitUpdatePeriod == 0 || ! lastSeenWithin(With.configuration.foreignUnitUpdatePeriod)) {
-      updateTracking()
-      updateVisibility()
-      updateHealth()
-      updateCombat()
-      updateMovement()
-      updateOrders()
-      updateStatuses()
-    }
-    updateCount += 1
-  }
-  
-  ///////////////////
-  // Tracking info //
-  ///////////////////
-  
-  private def updateTimeSensitiveInformation() {
+  def readProxy() {
     _complete             = bwapiUnit.isCompleted
     _lastSeen             = With.frame
     _pixelCenter          = new Pixel(bwapiUnit.getPosition)
@@ -53,6 +38,17 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
       _hitPoints = unitClass.maxHitPoints
       _shieldPoints = unitClass.maxShields
     }
+    // Time-insensitive information
+    if (updateCount == 0 || (updateCount + id) % With.configuration.foreignUnitUpdatePeriod == 0 || ! lastSeenWithin(With.configuration.foreignUnitUpdatePeriod)) {
+      updateTracking()
+      updateVisibility()
+      updateHealth()
+      updateCombat()
+      updateMovement()
+      updateOrders()
+      updateStatuses()
+    }
+    updateCount += 1
   }
   
   private def updateTracking() {

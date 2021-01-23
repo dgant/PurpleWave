@@ -28,11 +28,6 @@ abstract class FriendlyUnitProxy(originalBwapiUnit: bwapi.Unit, id: Int) extends
   def unitClass : UnitClass   = cacheClass()
   def lastSeen  : Int         = With.frame
 
-  def updateFriendly(newBase: bwapi.Unit) {
-    bwapiUnit = newBase
-    updateCommon()
-  }
-
   ////////////
   // Health //
   ////////////

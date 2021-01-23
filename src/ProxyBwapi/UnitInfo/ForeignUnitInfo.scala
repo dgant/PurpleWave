@@ -15,7 +15,7 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   override val foreign: Option[ForeignUnitInfo] = Some(this)
 
   override def update(): Unit = {
-    if (bwapiUnit.isVisible || With.frame == 0) {
+    if (frameDiscovered < With.frame && bwapiUnit.isVisible) {
       readProxy()
     }
     super.update()
@@ -26,7 +26,7 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitInfo(bwapiUnit
   }
 
   private var updateCount = 0
-  def readProxy() {
+  override def readProxy() {
     _complete             = bwapiUnit.isCompleted
     _lastSeen             = With.frame
     _pixelCenter          = new Pixel(bwapiUnit.getPosition)

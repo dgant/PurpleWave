@@ -22,15 +22,20 @@ class UnitTracker {
 
   private def birth(bwapiUnit: bwapi.Unit): Unit = {
     val id = bwapiUnit.getID
-    if (units(id).isEmpty) { bufferHistoric.removeIf(_.id == id) }
-    // TODO: Remove a unit if its isFriendly/isEnemy/isNeutral status has changed
-    units(id) = units(id).orElse(Some(
-      if (bwapiUnit.getPlayer.getID == With.self.id)                    bufferFriendly  .add(new FriendlyUnitInfo(bwapiUnit, id))
-      else if (With.enemies.exists(_.id == bwapiUnit.getPlayer.getID))  bufferEnemy     .add(new ForeignUnitInfo(bwapiUnit, id))
-      else                                                              bufferNeutral   .add(new ForeignUnitInfo(bwapiUnit, id))))
+    if (units(id).isEmpty) {
+      With.logger.debug(f"Birthing #$id")
+      bufferHistoric.removeIf(_.id == id)
+      val newUnit = if (bwapiUnit.getPlayer.getID == With.self.id)                    bufferFriendly  .add(new FriendlyUnitInfo(bwapiUnit, id))
+        else if (With.enemies.exists(_.id == bwapiUnit.getPlayer.getID))  bufferEnemy     .add(new ForeignUnitInfo(bwapiUnit, id))
+        else                                                              bufferNeutral   .add(new ForeignUnitInfo(bwapiUnit, id))
+      units(id) = Some(newUnit)
+      newUnit.readProxy()
+    }
   }
   private def kill(id: Int): Unit = {
+    With.logger.debug(f"Attempting to kill #$id")
     getId(id).foreach(unit => {
+      With.logger.debug(f"Killing #$id")
       bufferHistoric.add(new HistoricalUnitInfo(unit))
       unit.friendly.foreach(bufferFriendly.remove)
       unit.foreign.filter(_.isEnemy).foreach(bufferEnemy.remove)
@@ -41,6 +46,7 @@ class UnitTracker {
   def onFrame() {
     With.game.getAllUnits.asScala.foreach(u => {
       val id = u.getID
+      // TODO: First remove a unit if its isFriendly/isEnemy/isNeutral status has changed
       if (units(id).isEmpty) {
         birth(u)
       }
@@ -50,9 +56,12 @@ class UnitTracker {
     foreign.filter(_.visibility == Visibility.Dead).map(_.id).foreach(kill)
   }
   def onUnitRenegade(bwapiUnit: bwapi.Unit): Unit = {
+    With.logger.debug(f"OnUnitRenegade #${bwapiUnit.getID}")
+    kill(bwapiUnit.getID)
     birth(bwapiUnit)
   }
   def onUnitDestroy(bwapiUnit: bwapi.Unit) {
+    With.logger.debug(f"OnUnitDestroy #${bwapiUnit.getID}")
     get(bwapiUnit).flatMap(_.foreign).foreach(_.setVisbility(Visibility.Dead))
     kill(bwapiUnit.getID)
   }

@@ -12,6 +12,8 @@ abstract class UnitProxy(val bwapiUnit: bwapi.Unit, val id: Int) {
 
   def player: PlayerInfo
   def lastSeen: Int
+
+  def readProxy(): Unit = {}
   
   ////////////
   // Health //

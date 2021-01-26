@@ -19,7 +19,7 @@ object ReloadScarabs extends Action {
   override def perform(unit: FriendlyUnitInfo) {
 
     val scarabGoal = if(unit.matchups.targetsInRange.isEmpty || unit.cooldownLeft > With.reaction.agencyMax) maxScarabCount else 1
-    val scarabsNow = unit.scarabCount + unit.trainingQueue.size
+    val scarabsNow = unit.scarabs + unit.trainingQueue.size
     val needRefill = scarabsNow < scarabGoal && (
       // Refill while riding
       unit.agent.ride.isDefined

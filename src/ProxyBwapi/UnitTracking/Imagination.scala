@@ -29,7 +29,7 @@ object Imagination {
 
     // Yay, we see the unit
     if (unit.bwapiUnit.isVisible) {
-      unit.setVisbility(Visibility.Visible)
+      unit.changeVisibility(Visibility.Visible)
       return
     }
 
@@ -40,7 +40,7 @@ object Imagination {
     // - In free-for-all settings, it's probable someone else killed them
     val expectedSurvivalFrames =
       if (unit.isAny(Zerg.Broodling, Zerg.SpelLDarkSwarm, Protoss.SpellDisruptionWeb, Terran.SpellScannerSweep))
-        unit.framesUntilRemoval - With.framesSince(unit.lastSeen)
+        unit.removalFrames - With.framesSince(unit.lastSeen)
       else if (unit.unitClass.isOrganic && unit.irradiated)
         unit.totalHealth * Seconds(37)() / 250 // https://liquipedia.net/starcraft/Irradiate
       else if (unit.is(UnitMatchWarriors))
@@ -51,14 +51,14 @@ object Imagination {
       else
         Forever()
 
-    if ( ! unit.lastSeenWithin(expectedSurvivalFrames)) {
-      unit.setVisbility(Visibility.Dead)
+    if (With.framesSince(unit.lastSeen) > expectedSurvivalFrames) {
+      unit.changeVisibility(Visibility.Dead)
       return
     }
 
     // If a Spider Mine should've been tripped, but hasn't, it's dead
     if (shouldBeVisible && likelyBurrowed && shouldUnburrow) {
-      unit.setVisbility(Visibility.Dead)
+      unit.changeVisibility(Visibility.Dead)
       return
     }
 
@@ -71,31 +71,31 @@ object Imagination {
 
     // Assume other burrowing units burrowed
     if (likelyBurrowed) {
-      unit.setVisbility(Visibility.InvisibleBurrowed)
+      unit.changeVisibility(Visibility.InvisibleBurrowed)
       if (shouldBeVisible && shouldBeDetected) {
         // This logic can fail if the detection grid is out of date.
         // This should be uncommon, though,
         // as it requires the unit to burrow in a tile that was recently detected but is no longer.
-        unit.setVisbility(Visibility.Dead)
+        unit.changeVisibility(Visibility.Dead)
       }
       return
     }
 
     // Presume the unit is alive but elsewhere
-    unit.setVisbility(Visibility.InvisibleNearby)
+    unit.changeVisibility(Visibility.InvisibleNearby)
 
     // Missing buildings must either be floated or dead
     if (unit.unitClass.isBuilding && ! unit.unitClass.isFlyingBuilding) {
       if (shouldBeVisible) {
-        unit.setVisbility(Visibility.Dead)
+        unit.changeVisibility(Visibility.Dead)
       }
       return
     }
 
     // If we haven't seen a unit in a long time, treat it as missing,
     // which indicates distrust of its predicted location
-    if ( ! unit.lastSeenWithin(Seconds(60)()) && ! unit.base.exists(_.owner == unit.player)) {
-      unit.setVisbility(Visibility.InvisibleMissing)
+    if (With.framesSince(unit.lastSeen) > Seconds(60)() && ! unit.base.exists(_.owner == unit.player)) {
+      unit.changeVisibility(Visibility.InvisibleMissing)
       return
     }
 
@@ -103,9 +103,9 @@ object Imagination {
     // If we fail to come up with a reasonable prediction, treat the unit as missing
     val predictedPixel = predictPixel(unit)
     if (predictedPixel.isDefined) {
-      unit.presumePixel(predictedPixel.get)
+      unit.changePixel(predictedPixel.get)
     } else {
-      unit.setVisbility(Visibility.InvisibleMissing)
+      unit.changeVisibility(Visibility.InvisibleMissing)
     }
   }
 
@@ -114,7 +114,7 @@ object Imagination {
       return Some(unit.pixel)
     }
 
-    val tileLastSeen = unit.pixelCenterObserved.tile
+    val tileLastSeen = unit.pixelObserved.tile
     val maxTilesAway = Math.min(12, With.framesSince(unit.lastSeen) * unit.topSpeed / 32)
     val maxTilesAwaySquared = 2 + maxTilesAway * maxTilesAway
 

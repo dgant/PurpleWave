@@ -32,11 +32,11 @@ object ShowUnitsEnemy extends View {
       if ( ! unit.visible || unit.effectivelyCloaked) {
         val radius = unit.unitClass.dimensionMin / 2
         DrawMap.circle(unit.pixel, radius, color)
-        if (unit.pixel != unit.pixelCenterObserved) {
-          DrawMap.circle(unit.pixelCenterObserved, radius, color)
+        if (unit.pixel != unit.pixelObserved) {
+          DrawMap.circle(unit.pixelObserved, radius, color)
           DrawMap.line(
-            unit.pixel.project(unit.pixelCenterObserved, radius),
-            unit.pixelCenterObserved.project(unit.pixel, radius),
+            unit.pixel.project(unit.pixelObserved, radius),
+            unit.pixelObserved.project(unit.pixel, radius),
             color)
         }
         DrawMap.label(unit.unitClass.toString, unit.pixel, drawBackground = true, color)

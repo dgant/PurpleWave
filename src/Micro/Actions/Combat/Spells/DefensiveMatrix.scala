@@ -22,7 +22,7 @@ object DefensiveMatrix extends TargetedSpell {
   override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
     if (target.unitClass.isBuilding)      return 0.0
     if (target.isEnemy)                   return 0.0
-    if (target.defensiveMatrixPoints > 0) return 0.0
+    if (target.matrixPoints > 0) return 0.0
   
     val dangerFrames  = 128.0
     val dangerBonus   = dangerFrames / Math.max(dangerFrames, target.matchups.framesToLive)

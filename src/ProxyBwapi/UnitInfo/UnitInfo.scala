@@ -27,30 +27,10 @@ import bwapi._
 
 abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiUnit, id) {
 
-  //////////////
-  // Identity //
-  //////////////
-
   def friendly  : Option[FriendlyUnitInfo]  = None
   def foreign   : Option[ForeignUnitInfo]   = None
 
-  @inline override final def toString: String = (
-    (if (isFriendly) "Our" else if (isEnemy) "Foe" else "Neutral")
-    + " "
-    + unitClass.toString
-    + (if (selected) "*" else "")
-    + " #" +
-    id
-    + " "
-    + hitPoints
-    + "/"
-    + unitClass.maxHitPoints
-    + " "
-    + (if (shieldPoints > 0) "(" + shieldPoints + "/" + unitClass.maxShields + ") " else "")
-    + tile.toString
-    + " "
-    + pixel.toString
-    )
+  @inline override final def toString: String = f"${if (isFriendly) "Our" else if (isEnemy) "Foe" else "Neutral"} $unitClass ${if (selected) "*" else ""} #$id $hitPoints/${unitClass.maxHitPoints} ${if (shieldPoints > 0) f"($shieldPoints/${unitClass.maxShields})" else ""} $tile $pixel"
 
   @inline final def is(unitMatcher: UnitMatcher): Boolean = unitMatcher.apply(this)
   @inline final def isPrerequisite(unitMatcher: UnitMatcher): Boolean = (
@@ -89,14 +69,10 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   var framesFailingToMove       : Int = 0
   var framesFailingToAttack     : Int = 0
   var hasEverBeenCompleteHatch  : Boolean = false // Stupid AIST hack fix for detecting whether a base is mineable
-  var lastAttacker              : Option[UnitInfo] = None
-  var lastGatheringUpdate       : Int = Int.MinValue
   var discoveredByEnemy         : Boolean = false
-  @inline final def lastTotalHealthPoints: Int = lastHitPoints + lastShieldPoints + lastDefensiveMatrixPoints
-
   private var lastUnitClass: UnitClass = _
   def update() {
-    if (totalHealth < lastTotalHealthPoints) {
+    if (totalHealth < lastHitPoints + lastShieldPoints + lastDefensiveMatrixPoints) {
       lastFrameTakingDamage = With.frame
     }
     if (cooldownLeft > lastCooldown) {
@@ -137,7 +113,7 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
     lastUnitClass             = unitClass
     lastHitPoints             = hitPoints
     lastShieldPoints          = shieldPoints
-    lastDefensiveMatrixPoints = defensiveMatrixPoints
+    lastDefensiveMatrixPoints = matrixPoints
     lastCooldown              = cooldownLeft
     hasEverBeenCompleteHatch ||= is(Zerg.Hatchery) && complete
   }
@@ -152,7 +128,7 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
 
   @inline final def aliveAndComplete:Boolean = alive && complete
 
-  @inline final def energyMax     : Int = unitClass.maxEnergy //TODO: Add upgrades
+  @inline final def energyMax     : Int = unitClass.maxEnergy // TODO: Count effects of upgrades
   @inline final def mineralsLeft  : Int = if (unitClass.isMinerals) resourcesLeft else 0
   @inline final def gasLeft       : Int = if (unitClass.isGas)      resourcesLeft else 0
 
@@ -168,7 +144,7 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   @inline final def subjectiveValue: Double = subjectiveValueCache()
   private val subjectiveValueCache = new Cache(() =>
     unitClass.subjectiveValue
-      + scarabCount * Protoss.Scarab.subjectiveValue
+      + scarabs * Protoss.Scarab.subjectiveValue
       + interceptors.size * Protoss.Interceptor.subjectiveValue
       + (if (unitClass.isTransport) friendly.map(_.loadedUnits.map(_.subjectiveValue).sum).sum else 0))
 
@@ -206,7 +182,6 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   @inline final def bottomRight : Pixel = Pixel(right, bottom)
   @inline final def corners: Vector[Pixel] = Vector(topLeft, topRight, bottomLeft, bottomRight)
 
-  @inline final def tile:  Tile          = pixel.tile
   @inline final def tiles:                Seq[Tile]     = cacheTiles()
   @inline final def tileArea:             TileRectangle = cacheTileArea()
   @inline final def addonArea:            TileRectangle = TileRectangle(Tile(0, 0), Tile(2, 2)).add(tileTopLeft).add(4,1)
@@ -274,7 +249,7 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
     && unitClass.topSpeed > 0
     && canDoAnything
     && ! burrowed
-    && ! sieged)
+    && ! is(Terran.SiegeTankSieged))
 
   @inline final def topSpeed: Double = if (canMove) topSpeedPossibleCache() else 0
   @inline final def topSpeedPossible: Double = topSpeedPossibleCache()
@@ -358,7 +333,7 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
     Zerg.SunkenColony
   ))
 
-  @inline final def totalHealth: Int = hitPoints + shieldPoints + defensiveMatrixPoints
+  @inline final def totalHealth: Int = hitPoints + shieldPoints + matrixPoints
   @inline final def armorHealth: Int = armorHealthCache()
   @inline final def armorShield: Int = armorShieldsCache()
   private lazy val armorHealthCache   = new Cache(() => unitClass.armor + unitClass.armorUpgrade.map(player.getUpgradeLevel).getOrElse(0))
@@ -389,13 +364,13 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
     //TODO: Ensnare
     (if (complete)
       Seq(
-        airCooldownLeft,
-        groundCooldownLeft,
+        cooldownAir,
+        cooldownGround,
         friendly.filter(_.transport.exists(_.flying)).map(unused => cooldownMaxAirGround / 2).getOrElse(0))
       .max
     else remainingCompletionFrames)
     + friendly
-      .filter(u => u.is(Protoss.Reaver) && u.scarabCount == 0)
+      .filter(u => u.is(Protoss.Reaver) && u.scarabs == 0)
       .map(f => f.trainee.map(_.remainingCompletionFrames).getOrElse(Protoss.Scarab.buildFrames))
       .getOrElse(0))
 
@@ -523,7 +498,7 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   @inline final def pixelsToGetInRange(enemy: UnitInfo)                 : Double = if (canAttack(enemy)) (pixelDistanceEdge(enemy) - pixelRangeAgainst(enemy)) else LightYear()
   @inline final def pixelsToGetInRange(enemy: UnitInfo, enemyAt: Pixel) : Double = if (canAttack(enemy)) (pixelDistanceEdge(enemy, enemyAt) - pixelRangeAgainst(enemy)) else LightYear()
   @inline final def framesToTravelTo(destination: Pixel)  : Int = framesToTravelPixels(pixelDistanceTravelling(destination))
-  @inline final def framesToTravelPixels(pixels: Double)  : Int = (if (pixels <= 0.0) 0 else if (canMove) Math.max(0, Math.ceil(pixels / topSpeedPossible).toInt) else Forever()) + (if (burrowed || sieged) 24 else 0)
+  @inline final def framesToTravelPixels(pixels: Double)  : Int = (if (pixels <= 0.0) 0 else if (canMove) Math.max(0, Math.ceil(pixels / topSpeedPossible).toInt) else Forever()) + (if (burrowed || is(Terran.SiegeTankSieged)) 24 else 0)
   @inline final def framesToTurnTo    (radiansTo: Double)   : Double = unitClass.framesToTurn(PurpleMath.normalizeAroundZero(PurpleMath.radiansTo(angleRadians, radiansTo)))
   @inline final def framesToTurnTo    (pixelTo: Pixel)      : Double = framesToTurnTo(pixel.radiansTo(pixelTo))
   @inline final def framesToTurnFrom  (pixelTo: Pixel)      : Double = framesToTurnTo(pixelTo.radiansTo(pixel))
@@ -651,9 +626,8 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
 
   @inline final def isBeingViolent: Boolean = {
     unitClass.isStaticDefense ||
-    attacking                 ||
     cooldownLeft > 0          ||
-    target.exists(isEnemyOf)
+    orderTarget.exists(isEnemyOf)
   }
 
   @inline final def isBeingViolentTo(victim: UnitInfo): Boolean = {
@@ -666,7 +640,6 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
 
   def techProducing: Option[Tech]
   def upgradeProducing: Option[Upgrade]
-  def unitProducing: Option[UnitClass]
 
   ////////////////
   // Visibility //
@@ -712,7 +685,7 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
     else if (alive)               player.colorMidnight
     else                          Colors.MidnightGray
 
-  @inline final val unitColor: Color = Colors.hsv(hashCode % 256, 255, 128 + (hashCode / 256) % 128)
-
   @inline final override val hashCode: Int = id + With.frame * 10000
+
+  @inline final val unitColor: Color = Colors.hsv(hashCode % 256, 255, 128 + (hashCode / 256) % 128)
 }

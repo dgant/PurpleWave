@@ -7,14 +7,25 @@ import Micro.Squads.Goals.SquadGoal
 import Micro.Squads.Squad
 import Performance.Cache
 import ProxyBwapi.Techs.{Tech, Techs}
-import ProxyBwapi.UnitTracking.Visibility
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 
 import scala.collection.JavaConverters._
 
-class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base, id) {
+class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(base, id) {
   
   override val friendly: Option[FriendlyUnitInfo] = Some(this)
+
+  override def update() {
+    if (frameDiscovered < With.frame) {
+      readProxy()
+    }
+    super.update()
+    _knownToEnemyOnce = _knownToEnemyOnce || visibleToOpponents
+  }
+
+  def remainingCompletionFrames : Int = bwapiUnit.getRemainingBuildTime
+  def spaceRemaining: Int = bwapiUnit.getSpaceRemaining
+  def kills: Int = bwapiUnit.getKillCount
   
   def squad: Option[Squad] = squadCache()
   def goal: Option[SquadGoal] = squad.map(_.goal)
@@ -29,36 +40,16 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
   private val squadCache = new Cache(() => With.squads.all.find(_.units.contains(this)))
   private val teammatesCache = new Cache(() => (squadmates ++ matchups.allies))
   private val enemiesCache = new Cache(() => (squadenemies ++ matchups.enemies).distinct)
-  
-  override def update() {
-    super.update()
-    _knownToEnemyOnce = _knownToEnemyOnce || visibleToOpponents
-  }
-  
-  ////////////
-  // Orders //
-  ////////////
-  
+
+
   var lastSetRally: Int = 0
   
   def buildUnit     : Option[UnitInfo]  = With.units.get(base.getBuildUnit)
   def techingType   : Tech              = Techs.get(base.getTech)
   def upgradingType : Upgrade           = Upgrades.get(base.getUpgrade)
-  
-  ////////////////
-  // Visibility //
-  ////////////////
-
-  def visibility: Visibility.Value = if (alive) Visibility.Visible else Visibility.Dead
-
   private var _knownToEnemyOnce: Boolean = false
   def knownToEnemy: Boolean = _knownToEnemyOnce
-  
-  //////////////
-  // Statuses //
-  //////////////
 
-  // Commander readiness
   var nextOrderFrame: Option[Int] = None
   @inline def ready: Boolean = nextOrderFrame.forall(_ <= With.frame)
   @inline def unready: Boolean = ! ready
@@ -95,9 +86,6 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
     passenger.canMove                     &&
     passenger.transport.forall(_ == this) &&
     loadedUnits.view.filterNot(_ == passenger).map(_.unitClass.spaceRequired).sum <= unitClass.spaceProvided
-
-  // More accurate, but avoiding for performance reasons
-  // override def subjectiveValue: Double = super.subjectiveValue + trainee.map(_.subjectiveValue).sum
 
   def enemyRangeGrid: AbstractGridEnemyRange =
     if (flying || transport.exists(_.flying))

@@ -38,7 +38,7 @@ class Simulacrum(
 
   val canMove             : Boolean             = realUnit.canMove
   var topSpeed            : Double              = realUnit.topSpeed * speedMultiplier
-  var shieldPointsInitial : Int                 = realUnit.shieldPoints + realUnit.defensiveMatrixPoints
+  var shieldPointsInitial : Int                 = realUnit.shieldPoints + realUnit.matrixPoints
   var shieldPoints        : Int                 = shieldPointsInitial
   val hitPointsInitial    : Int                 = realUnit.hitPoints
   var hitPoints           : Int                 = hitPointsInitial
@@ -82,7 +82,7 @@ class Simulacrum(
     } else if ( ! realUnit.unitClass.dealsDamage) {
       false
     } else if (realUnit.unitClass.isWorker) {
-      realUnit.attacking || realUnit.friendly.exists(_.squad.isDefined)
+      realUnit.orderTarget.exists(_.isEnemyOf(realUnit)) || realUnit.friendly.exists(_.squad.isDefined)
     } else if (realUnit.isEnemy) {
       true
     } else {

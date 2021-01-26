@@ -23,7 +23,6 @@ class UnitTracker {
   private def birth(bwapiUnit: bwapi.Unit): Unit = {
     val id = bwapiUnit.getID
     if (units(id).isEmpty) {
-      With.logger.debug(f"Birthing #$id")
       bufferHistoric.removeIf(_.id == id)
       val newUnit = if (bwapiUnit.getPlayer.getID == With.self.id)                    bufferFriendly  .add(new FriendlyUnitInfo(bwapiUnit, id))
         else if (With.enemies.exists(_.id == bwapiUnit.getPlayer.getID))  bufferEnemy     .add(new ForeignUnitInfo(bwapiUnit, id))
@@ -33,9 +32,7 @@ class UnitTracker {
     }
   }
   private def kill(id: Int): Unit = {
-    With.logger.debug(f"Attempting to kill #$id")
     getId(id).foreach(unit => {
-      With.logger.debug(f"Killing #$id")
       bufferHistoric.add(new HistoricalUnitInfo(unit))
       unit.friendly.foreach(bufferFriendly.remove)
       unit.foreign.filter(_.isEnemy).foreach(bufferEnemy.remove)
@@ -62,7 +59,7 @@ class UnitTracker {
   }
   def onUnitDestroy(bwapiUnit: bwapi.Unit) {
     With.logger.debug(f"OnUnitDestroy #${bwapiUnit.getID}")
-    get(bwapiUnit).flatMap(_.foreign).foreach(_.setVisbility(Visibility.Dead))
+    get(bwapiUnit).flatMap(_.foreign).foreach(_.changeVisibility(Visibility.Dead))
     kill(bwapiUnit.getID)
   }
 

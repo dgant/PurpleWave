@@ -21,7 +21,7 @@ abstract class UnitProxy(val bwapiUnit: bwapi.Unit, val id: Int) {
   
   def alive: Boolean
   def complete: Boolean
-  def defensiveMatrixPoints: Int
+  def matrixPoints: Int
   def hitPoints: Int
   def initialResources: Int
   def invincible: Boolean
@@ -36,18 +36,19 @@ abstract class UnitProxy(val bwapiUnit: bwapi.Unit, val id: Int) {
   ////////////
   
   def interceptors: Iterable[UnitInfo]
-  def scarabCount: Int
+  def scarabs: Int
   def spiderMines: Int
 
-  def airCooldownLeft: Int
-  def groundCooldownLeft: Int
-  def spellCooldownLeft: Int
+  def cooldownAir: Int
+  def cooldownGround: Int
+  def cooldownSpell: Int
   
   //////////////
   // Geometry //
   //////////////
   
   def pixel: Pixel
+  def tile: Tile // Center tile; not part of BWAPI but we always want it
   def tileTopLeft: Tile
   def top: Int
   def left: Int
@@ -66,8 +67,7 @@ abstract class UnitProxy(val bwapiUnit: bwapi.Unit, val id: Int) {
   def orderTarget: Option[UnitInfo]
   def orderTargetPixel: Option[Pixel]
   def order: String
-  
-  def attacking: Boolean
+
   def constructing: Boolean
   def morphing: Boolean
   def repairing: Boolean
@@ -94,10 +94,8 @@ abstract class UnitProxy(val bwapiUnit: bwapi.Unit, val id: Int) {
   def irradiated: Boolean
   def lockedDown: Boolean
   def maelstrommed: Boolean
-  def sieged: Boolean
   def stasised: Boolean
   def stimmed: Boolean
-  def stuck: Boolean
   def velocityX: Double
   def velocityY: Double
   
@@ -123,5 +121,5 @@ abstract class UnitProxy(val bwapiUnit: bwapi.Unit, val id: Int) {
   def addon: Option[UnitInfo]
   def hasNuke: Boolean
 
-  def framesUntilRemoval: Int
+  def removalFrames: Int
 }

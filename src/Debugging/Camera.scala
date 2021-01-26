@@ -30,7 +30,7 @@ class Camera extends TimedTask {
   private def totalInterest(unit: UnitInfo): Double = {
     val interestBattle    = if (unit.battle.exists(_.enemy.units.exists(u => u.canAttack && ! u.unitClass.isWorker))) 100.0 else 1.0
     val obscurityUnit     = 15 * 24 + obscurityByUnit(unit)
-    val interestActivity  = if (unit.training || unit.upgrading || unit.teching || unit.moving || unit.attacking) 3.0 else 1.0
+    val interestActivity  = if (unit.training || unit.upgrading || unit.teching || unit.moving || unit.presumptiveTarget.exists(_.isEnemyOf(unit))) 3.0 else 1.0
     val interestNovelty   = if (With.framesSince(unit.frameDiscovered) < Seconds(15)() && With.units.countOurs(unit.unitClass) == 1) 5.0 else 1.0
     interestBattle * obscurityUnit * interestActivity * interestNovelty
   }

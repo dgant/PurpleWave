@@ -18,24 +18,24 @@ object ShowHealthAndCooldown extends View {
     if ( ! unit.likelyStillThere) return
     if (unit.invincible) return
     
-    val width = Math.min(48, Math.max(18, (unit.unitClass.maxTotalHealth + unit.defensiveMatrixPoints) / 5))
+    val width = Math.min(48, Math.max(18, (unit.unitClass.maxTotalHealth + unit.matrixPoints) / 5))
     val marginTopHp = 3
-    val denominator = unit.unitClass.maxTotalHealth + (if (unit.defensiveMatrixPoints > 0) width * 250 else 0)
+    val denominator = unit.unitClass.maxTotalHealth + (if (unit.matrixPoints > 0) width * 250 else 0)
     
     if (denominator == 0) return
     
     val widthHpMax = width * unit.unitClass.maxHitPoints / denominator
     val widthShMax = width * unit.unitClass.maxShields / denominator
-    val widthDmMax = if (unit.defensiveMatrixPoints > 0) width * 250 / denominator else 0
+    val widthDmMax = if (unit.matrixPoints > 0) width * 250 / denominator else 0
     val widthHpNow = width * unit.hitPoints / denominator
     val widthShNow = width * unit.shieldPoints / denominator
-    val widthDmNow = width * unit.defensiveMatrixPoints / denominator
+    val widthDmNow = width * unit.matrixPoints / denominator
     val widthEnergyNow = if (unit.energyMax == 0) 0 else Math.min(width, width * unit.energy / unit.energyMax)
 
     // Min, because I haven't yet accounted for energy max upgrades
     val widthCooldownButton = 3
     val widthCooldown = width - 2 * widthCooldownButton - 2
-    val widthCooldownNow = widthCooldown * Math.max(unit.cooldownLeft, unit.spellCooldownLeft) / Math.max(1, unit.cooldownMaxAirGround) //TODO: Max spell cooldown?
+    val widthCooldownNow = widthCooldown * Math.max(unit.cooldownLeft, unit.cooldownSpell) / Math.max(1, unit.cooldownMaxAirGround) //TODO: Max spell cooldown?
     
     val yStartHp = unit.pixel.y + unit.unitClass.height / 2 - marginTopHp
     val yEndHp = yStartHp + 4
@@ -63,7 +63,7 @@ object ShowHealthAndCooldown extends View {
       DrawMap.box(Pixel(xStartSh, yStartHp), Pixel(xStartSh + widthShNow, yEndHp), colorSh, solid = true)
       DrawMap.box(Pixel(xStart, yStartHp), Pixel(xStart + widthHpNow, yEndHp), colorHp, solid = true)
   
-      val healthBarEvery = Math.max(3, width * 25 / (unit.unitClass.maxTotalHealth + unit.defensiveMatrixPoints))
+      val healthBarEvery = Math.max(3, width * 25 / (unit.unitClass.maxTotalHealth + unit.matrixPoints))
       (0 until width by healthBarEvery).foreach(healthX => {
         val x = xStart + healthX - 1
         DrawMap.line(Pixel(x, yStartHp), Pixel(x, yEndHp), Color.Black)

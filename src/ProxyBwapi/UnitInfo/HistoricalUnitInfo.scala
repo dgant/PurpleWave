@@ -12,7 +12,7 @@ class HistoricalUnitInfo(unit: UnitInfo) extends UnitInfo(unit.bwapiUnit, unit.i
   override val lastSeen: Int = unit.lastSeen
   override val alive: Boolean = false
   override val complete: Boolean = unit.complete
-  override val defensiveMatrixPoints: Int = unit.defensiveMatrixPoints
+  override val matrixPoints: Int = unit.matrixPoints
   override val hitPoints: Int = unit.hitPoints
   override val initialResources: Int = unit.initialResources
   override val invincible: Boolean = unit.invincible
@@ -22,11 +22,11 @@ class HistoricalUnitInfo(unit: UnitInfo) extends UnitInfo(unit.bwapiUnit, unit.i
   override val unitClass: UnitClass = unit.unitClass
   override val plagued: Boolean = unit.plagued
   override val interceptors: Iterable[UnitInfo] = Iterable.empty
-  override val scarabCount: Int = unit.scarabCount
+  override val scarabs: Int = unit.scarabs
   override val spiderMines: Int = unit.spiderMines
-  override val airCooldownLeft: Int = unit.airCooldownLeft
-  override val groundCooldownLeft: Int = unit.groundCooldownLeft
-  override val spellCooldownLeft: Int = unit.spellCooldownLeft
+  override val cooldownAir: Int = unit.cooldownAir
+  override val cooldownGround: Int = unit.cooldownGround
+  override val cooldownSpell: Int = unit.cooldownSpell
   override val pixel: Pixel = unit.pixel
   override val tileTopLeft: Tile = unit.tileTopLeft
   override val gatheringMinerals: Boolean = unit.gatheringMinerals
@@ -36,7 +36,6 @@ class HistoricalUnitInfo(unit: UnitInfo) extends UnitInfo(unit.bwapiUnit, unit.i
   override val orderTarget: Option[UnitInfo] = None
   override val orderTargetPixel: Option[Pixel] = unit.orderTargetPixel
   override val order: String = unit.order
-  override val attacking: Boolean = unit.attacking
   override val constructing: Boolean = unit.constructing
   override val morphing: Boolean = unit.morphing
   override val repairing: Boolean = unit.repairing
@@ -53,10 +52,8 @@ class HistoricalUnitInfo(unit: UnitInfo) extends UnitInfo(unit.bwapiUnit, unit.i
   override val irradiated: Boolean = unit.irradiated
   override val lockedDown: Boolean = unit.lockedDown
   override val maelstrommed: Boolean = unit.maelstrommed
-  override val sieged: Boolean = unit.sieged
   override val stasised: Boolean = unit.stasised
   override val stimmed: Boolean = unit.stimmed
-  override val stuck: Boolean = unit.stuck
   override val velocityX: Double = unit.velocityX
   override val velocityY: Double = unit.velocityY
   override val remainingCompletionFrames: Int = unit.remainingCompletionFrames
@@ -74,8 +71,8 @@ class HistoricalUnitInfo(unit: UnitInfo) extends UnitInfo(unit.bwapiUnit, unit.i
   override val underStorm: Boolean = unit.underStorm
   override val addon: Option[UnitInfo] = None
   override val hasNuke: Boolean = unit.hasNuke
-  override val framesUntilRemoval: Int = 0
+  override val removalFrames: Int = 0
   override val techProducing: Option[Tech] = unit.techProducing
   override val upgradeProducing: Option[Upgrade]  = unit.upgradeProducing
-  override val unitProducing: Option[UnitClass] = unit.unitProducing
+  override val tile: Tile = unit.tile
 }

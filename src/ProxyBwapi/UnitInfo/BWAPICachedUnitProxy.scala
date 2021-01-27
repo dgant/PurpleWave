@@ -2,6 +2,7 @@ package ProxyBwapi.UnitInfo
 
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchEnemy}
 import ProxyBwapi.ConvertBWAPI
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.Races.{Protoss, Terran}
@@ -84,6 +85,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
   private var _buildType              : UnitClass           = _
   private var _trainingQueue          : Seq[UnitClass]      = Seq.empty
   private var _interceptors           : Seq[UnitInfo]       = Seq.empty
+  private var _transport              : Option[FriendlyUnitInfo] = None
   @inline final def visibility              : Visibility.Value  = _visibility
   @inline final def player                  : PlayerInfo        = _player
   @inline final def unitClass               : UnitClass         = _unitClass
@@ -158,11 +160,10 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
   @inline final def buildType               : UnitClass         = _buildType
   @inline final def trainingQueue           : Seq[UnitClass]    = _trainingQueue
   @inline final def interceptors            : Seq[UnitInfo]     = _interceptors
+  @inline final def transport               : Option[FriendlyUnitInfo] = _transport
   def readProxy(): Unit = {
     if (With.frame == 0 || bwapiUnit.isVisible) {
       changeVisibility(Visibility.Visible)
-      // TODO: Handle foreign cloaked units
-      // In particular, handle 0-hp cloaked units
       _player                 = Players.get(bwapiUnit.getPlayer)
       _unitClass              = UnitClasses.get(bwapiUnit.getType)
       changePixel(new Pixel(bwapiUnit.getPosition))
@@ -203,9 +204,6 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
       _hasNuke                = bwapiUnit.hasNuke
       _resourcesInitial       = bwapiUnit.getInitialResources // TODO: Only get once? Or maybe faster to just get every time and not check
       _resourcesLeft          = bwapiUnit.getResources
-      _hitPoints              = bwapiUnit.getHitPoints
-      _shieldPoints           = bwapiUnit.getShields
-      _matrixPoints           = bwapiUnit.getDefenseMatrixPoints
       _cooldownRaw            = Math.max(bwapiUnit.getAirWeaponCooldown, bwapiUnit.getGroundWeaponCooldown) // TODO: Calculate up front for each unit?
       _cooldownSpell          = bwapiUnit.getSpellCooldown
       _remainingTrainFrames   = bwapiUnit.getRemainingTrainTime
@@ -224,6 +222,9 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
       _addon                  = With.units.get(bwapiUnit.getAddon)
       if (_player.isUs) {
         _loaded               = bwapiUnit.isLoaded
+        _hitPoints            = bwapiUnit.getHitPoints
+        _shieldPoints         = bwapiUnit.getShields
+        _matrixPoints         = bwapiUnit.getDefenseMatrixPoints
         _energy               = bwapiUnit.getEnergy
         _scarabs              = bwapiUnit.getScarabCount
         _techProducing        = ConvertBWAPI.tech(bwapiUnit.getTech)
@@ -231,30 +232,17 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
         _trainingQueue        = if (training) bwapiUnit.getTrainingQueue.asScala.map(UnitClasses.get) else Seq.empty
         _interceptors         = if (bwapiUnit.getInterceptorCount > 0) bwapiUnit.getInterceptors.asScala.flatMap(With.units.get) else Seq.empty
         _buildType            = UnitClasses.get(bwapiUnit.getBuildType)
-        // TODO: scarabCount
-        // TODO: Loaded
-        // TODO: spaceremaining
-        // TODO: transport
+        _transport            = if (loaded) With.units.get(bwapiUnit.getTransport).flatMap(_.friendly) else None
       } else {
         _scarabs              = if (unitClass == Protoss.Reaver) 5 else 0
+        _hitPoints            = if (_detected || ! _cloaked) bwapiUnit.getHitPoints           else if (_hitPoints == 0) _unitClass.maxHitPoints else _hitPoints
+        _shieldPoints         = if (_detected || ! _cloaked) bwapiUnit.getShields             else if (_hitPoints == 0) _unitClass.maxShields   else _shieldPoints
+        _matrixPoints         = if (_detected || ! _cloaked) bwapiUnit.getDefenseMatrixPoints else _matrixPoints
         // TODO: Model energy
-        // TODO: Get this part right
-        if (detected) {
-        } else {
-          // TODO: Use prior values when available
-          _hitPoints = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxHitPoints else _hitPoints else bwapiUnit.getHitPoints
-          _shieldPoints = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxShields else _shieldPoints else bwapiUnit.getShields
-          if (alive && cloaked && hitPoints == 0) {
-            _hitPoints = unitClass.maxHitPoints
-            _shieldPoints = unitClass.maxShields
-          }
-        }
       }
-    } else {
-      if (_player.isEnemy) {
-        if ( With.framesSince(_lastSeen) > 24 && is(Terran.SiegeTankUnsieged)) {
-          _unitClass = Terran.SiegeTankSieged
-        }
+    } else if (_player.isEnemy) {
+      if (With.framesSince(_lastSeen) > 24 && is(Terran.SiegeTankUnsieged) && With.units.existsEver(UnitMatchAnd(UnitMatchEnemy, Terran.SiegeTankSieged))) {
+        _unitClass = Terran.SiegeTankSieged
       }
     }
   }

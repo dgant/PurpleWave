@@ -72,13 +72,6 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(b
     else
       Vector.empty)
   
-  def transport: Option[FriendlyUnitInfo] = transportCache()
-  private val transportCache = new Cache(() =>
-    if (unitClass.isBuilding)
-      None
-    else
-      With.units.get(base.getTransport).flatMap(_.friendly))
-  
   def canTransport(passenger: FriendlyUnitInfo): Boolean =
     isTransport                           &&
     passenger.unitClass.canBeTransported  &&

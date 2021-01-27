@@ -41,7 +41,6 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(b
   private val teammatesCache = new Cache(() => (squadmates ++ matchups.allies))
   private val enemiesCache = new Cache(() => (squadenemies ++ matchups.enemies).distinct)
 
-
   var lastSetRally: Int = 0
   
   def buildUnit     : Option[UnitInfo]  = With.units.get(base.getBuildUnit)

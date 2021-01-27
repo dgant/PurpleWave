@@ -6,9 +6,9 @@ import ProxyBwapi.Upgrades.Upgrade
 import bwapi.{Position, TechType, UpgradeType}
 
 object ConvertBWAPI {
-  private val badPositions: Vector[Position] = Vector(Position.Invalid, Position.None, Position.Unknown, null)
   def position(position: Position): Option[Pixel] = {
-    if (badPositions.contains(position)) None else Some(new Pixel(position))
+    // Comparing to x/y coordinates of Position.[Invalid, None, Unknown]
+    if (position == null || position.x >= 32000 || position.y >= 32000) None else Some(new Pixel(position))
   }
 
   private val badTechs = Vector(TechType.None, TechType.Unknown, null)

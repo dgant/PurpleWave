@@ -21,7 +21,7 @@ class HistoricalUnitInfo(unit: UnitInfo) extends UnitInfo(unit.bwapiUnit, unit.i
   override val energy: Int = unit.energy
   override val unitClass: UnitClass = unit.unitClass
   override val plagued: Boolean = unit.plagued
-  override val interceptors: Iterable[UnitInfo] = Iterable.empty
+  override val interceptors: Seq[UnitInfo] = Seq.empty
   override val scarabs: Int = unit.scarabs
   override val spiderMines: Int = unit.spiderMines
   override val cooldownAir: Int = unit.cooldownAir
@@ -75,4 +75,11 @@ class HistoricalUnitInfo(unit: UnitInfo) extends UnitInfo(unit.bwapiUnit, unit.i
   override val techProducing: Option[Tech] = unit.techProducing
   override val upgradeProducing: Option[Upgrade]  = unit.upgradeProducing
   override val tile: Tile = unit.tile
+  override val loaded: Boolean = unit.loaded
+  override def pixelObserved: Pixel = unit.pixelObserved
+  override def beingConstructed: Boolean = unit.beingConstructed
+  override def beingGathered: Boolean = unit.beingGathered
+  override def cooldownRaw: Int = unit.cooldownRaw
+  override def buildType: UnitClass = unit.buildType
+  override def trainingQueue: Seq[UnitClass] = Seq.empty
 }

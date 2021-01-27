@@ -80,8 +80,8 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
     }
     discoveredByEnemy ||= visibleToOpponents
     val moving = velocityX != 0 || velocityY != 0
-    lazy val tryingToMove       = friendly.filter(_.agent.tryingToMove).exists(_.pixelDistanceCenter(presumptiveDestination) > 32)
-    lazy val tryingToAttackHere = canAttack && target.exists(t => t.isEnemyOf(this) &&  inRangeToAttack(t))
+    lazy val tryingToMove       = friendly.exists(f => f.agent.tryingToMove && f.pixelDistanceCenter(presumptiveDestination) > 32)
+    lazy val tryingToAttackHere = canAttack && target.exists(t => t.isEnemyOf(this) &&   inRangeToAttack(t))
     lazy val tryingToAttackAway = canAttack && target.exists(t => t.isEnemyOf(this) && ! inRangeToAttack(t))
     if ( ! moving && canMove && (tryingToMove || tryingToAttackAway)) {
       framesFailingToMove += 1
@@ -148,13 +148,13 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
       + interceptors.size * Protoss.Interceptor.subjectiveValue
       + (if (unitClass.isTransport) friendly.map(_.loadedUnits.map(_.subjectiveValue).sum).sum else 0))
 
-  @inline final def remainingOccupationFrames: Int = Vector(
-    remainingCompletionFrames,
-    remainingTechFrames,
-    remainingUpgradeFrames,
+  @inline final def remainingOccupationFrames: Int = Math.max(
+    remainingCompletionFrames,  Math.max(
+    remainingTechFrames,        Math.max(
+    remainingUpgradeFrames,     Math.max(
     remainingTrainFrames,
     addon.map(_.remainingCompletionFrames).getOrElse(0)
-  ).max
+  ))))
 
   private var producer: Option[Plan] = None
   @inline final def setProducer(plan: Plan) {
@@ -363,7 +363,7 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   @inline final def cooldownLeft : Int = (
     //TODO: Ensnare
     (if (complete)
-      Seq(
+      Iterable(
         cooldownAir,
         cooldownGround,
         friendly.filter(_.transport.exists(_.flying)).map(unused => cooldownMaxAirGround / 2).getOrElse(0))

@@ -158,7 +158,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
   @inline final def buildType               : UnitClass         = _buildType
   @inline final def trainingQueue           : Seq[UnitClass]    = _trainingQueue
   @inline final def interceptors            : Seq[UnitInfo]     = _interceptors
-  override def readProxy(): Unit = {
+  def readProxy(): Unit = {
     if (With.frame == 0 || bwapiUnit.isVisible) {
       changeVisibility(Visibility.Visible)
       // TODO: Handle foreign cloaked units
@@ -181,8 +181,8 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
       _maelstrommed           = bwapiUnit.isMaelstrommed
       _stasised               = bwapiUnit.isStasised
       _stimmed                = bwapiUnit.isStimmed
-      _gatheringMinerals      = bwapiUnit.isGatheringMinerals
-      _gatheringGas           = bwapiUnit.isGatheringGas
+      _gatheringMinerals      = unitClass.isWorker && bwapiUnit.isGatheringMinerals
+      _gatheringGas           = unitClass.isWorker && bwapiUnit.isGatheringGas
       _morphing               = bwapiUnit.isMorphing
       _constructing           = bwapiUnit.isConstructing
       _repairing              = bwapiUnit.isRepairing
@@ -228,8 +228,8 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
         _scarabs              = bwapiUnit.getScarabCount
         _techProducing        = ConvertBWAPI.tech(bwapiUnit.getTech)
         _upgradeProducing     = ConvertBWAPI.upgrade(bwapiUnit.getUpgrade)
-        _trainingQueue        = bwapiUnit.getTrainingQueue.asScala.map(UnitClasses.get)
-        _interceptors         = bwapiUnit.getInterceptors.asScala.flatMap(With.units.get)
+        _trainingQueue        = if (training) bwapiUnit.getTrainingQueue.asScala.map(UnitClasses.get) else Seq.empty
+        _interceptors         = if (bwapiUnit.getInterceptorCount > 0) bwapiUnit.getInterceptors.asScala.flatMap(With.units.get) else Seq.empty
         _buildType            = UnitClasses.get(bwapiUnit.getBuildType)
         // TODO: scarabCount
         // TODO: Loaded

@@ -39,13 +39,10 @@ object Commander {
     if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
     if (unit.velocity.lengthSquared > 0 && unit.order != Orders.HoldPosition) {
       unit.bwapiUnit.holdPosition()
-      sleep(unit)
     }
     if (unit.matchups.targetsInRange.nonEmpty) {
       sleepAttack(unit)
-    }
-    else {
-      unit.bwapiUnit.holdPosition()
+    } else {
       sleep(unit)
     }
   }
@@ -114,9 +111,16 @@ object Commander {
         thisIsANewTarget
         || (overdueToAttack && (moving || alreadyInRange))
         || (target.isFriendly && unit.is(Protoss.Carrier))) // Carrier warmup; spam attack
-      
+
       if (shouldOrder) {
-        if ( ! unit.flying
+        // Hold position attacks currently don't work reliably.
+        // A unit get commanded to hold position next to a target but just stands there and doesn't attack it
+        // My hypothesis is that a hold position unit refuses to *turn* to face a target,
+        // so if the solo hold-position target is behind a unit that can't attack backwards, the holder won't attack.
+        // This could of course be tested manually in-game.
+        val allowHoldingPosition = false
+        if (allowHoldingPosition
+          && ! unit.flying
           && ! unit.unitClass.floats
           && unit.matchups.targetsInRange.size == 1
           && unit.matchups.targetsInRange.head == target

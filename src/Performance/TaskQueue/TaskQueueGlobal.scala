@@ -17,24 +17,23 @@ class TaskQueueGlobal extends TaskQueueParallel(
   new TaskQueueGrids,
   With.battles,
   With.accounting,
-  new SimpleTask(
+  new TaskQueueSerial(
     "Planning",
-    () => {
-      With.unitsShown.update()
-      With.scouting.update()
-      With.yolo.update()
+    new SimpleTask("UnitsShown",        With.unitsShown.update),
+    new SimpleTask("Scouting",          With.scouting.update),
+    new SimpleTask("YOLO",              With.yolo.update),
+    new SimpleTask("Preplacement",      With.preplacement.update),
+    new SimpleTask("BuildOrderHistory", With.buildOrderHistory.update),
+    new SimpleTask("Gameplan", () => {
+      With.squads.clearConscripts() // Synchronous with gameplan; clearing squads leaves units squadless in the inteirm
+      With.squads.startNewBatch() // Synchronous with gameplan; clearing squads leaves units squadless in the inteirm
       With.bank.update()
       With.recruiter.update()
       With.prioritizer.update()
-      With.preplacement.update()
-      With.scheduler.reset()
-      With.squads.clearConscripts()
-      With.squads.startNewBatch()
-      With.buildOrderHistory.update()
-      With.blackboard.reset()
-      With.strategy.gameplan.update()
-      With.groundskeeper.update()
-    })
+      With.scheduler.reset() // Synchronous with gameplan; Flickers ShowProduction otherwise
+      With.blackboard.reset() // Synchronous with gameplan; Flickers flags otherwise
+      With.strategy.gameplan.update()}),
+    new SimpleTask(With.groundskeeper.update))
     .withSkipsMax(6)
     .withWeight(TaskQueueGlobalWeights.Planning),
   With.gathering,

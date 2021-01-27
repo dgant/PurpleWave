@@ -2,7 +2,6 @@ package ProxyBwapi.UnitInfo
 
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
-import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchEnemy}
 import ProxyBwapi.ConvertBWAPI
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.Races.{Protoss, Terran}
@@ -241,7 +240,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
         // TODO: Model energy
       }
     } else if (_player.isEnemy) {
-      if (With.framesSince(_lastSeen) > 24 && is(Terran.SiegeTankUnsieged) && With.units.existsEver(UnitMatchAnd(UnitMatchEnemy, Terran.SiegeTankSieged))) {
+      if (With.framesSince(_lastSeen) > 24 && is(Terran.SiegeTankUnsieged) && With.unitsShown(_player, Terran.SiegeTankSieged) > 0) {
         _unitClass = Terran.SiegeTankSieged
       }
     }

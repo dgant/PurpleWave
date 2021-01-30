@@ -48,7 +48,6 @@ object Commander {
   }
 
   private val tryingToMoveThreshold = 32
-
   def attack(unit: FriendlyUnitInfo): Unit = unit.agent.toAttack.foreach(attack(unit, _))
   private def attack(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
     leadFollower(unit, attack(_, target))

@@ -56,7 +56,8 @@ class Scan extends Plan {
     
     val blockedBuilders = With.units.ours.filter(b =>
       b.agent.toBuild.exists(_.isTownHall)
-      && With.framesSince(b.lastFrameTryingToMove) > Seconds(1)())
+      && b.agent.toBuildTile.map(_.pixelCenter).exists(b.pixelDistanceCenter(_) < 96)
+      && b.framesFailingToMove > Seconds(1)())
     
     if (blockedBuilders.nonEmpty) {
       scan(blockedBuilders.head.pixel)

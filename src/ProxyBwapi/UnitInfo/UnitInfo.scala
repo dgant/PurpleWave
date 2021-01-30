@@ -59,87 +59,44 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   var completionFrame           : Int = Forever() // Can't use unitClass during construction
   var lastHitPoints             : Int = _
   var lastShieldPoints          : Int = _
-  var lastDefensiveMatrixPoints : Int = _
+  var lastMatrixPoints          : Int = _
   var lastCooldown              : Int = _
   var lastFrameTakingDamage     : Int = - Forever()
-  var lastFrameTryingToMove     : Int = - Forever()
   var lastFrameTryingToAttack   : Int = - Forever()
   var lastFrameStartingAttack   : Int = - Forever()
-  var lastFrameOccupied         : Int = - Forever()
-  var framesFailingToMove       : Int = 0
-  var framesFailingToAttack     : Int = 0
   var hasEverBeenCompleteHatch  : Boolean = false // Stupid AIST hack fix for detecting whether a base is mineable
-  var discoveredByEnemy         : Boolean = false
   private var lastUnitClass: UnitClass = _
   def update() {
-    if (totalHealth < lastHitPoints + lastShieldPoints + lastDefensiveMatrixPoints) {
-      lastFrameTakingDamage = With.frame
-    }
-    if (cooldownLeft > lastCooldown) {
-      lastFrameStartingAttack = With.frame
-    }
-    discoveredByEnemy ||= visibleToOpponents
-    val moving = velocityX != 0 || velocityY != 0
-    lazy val tryingToMove       = friendly.exists(f => f.agent.tryingToMove && f.pixelDistanceCenter(presumptiveDestination) > 32)
-    lazy val tryingToAttackHere = canAttack && target.exists(t => t.isEnemyOf(this) &&   inRangeToAttack(t))
-    lazy val tryingToAttackAway = canAttack && target.exists(t => t.isEnemyOf(this) && ! inRangeToAttack(t))
-    if ( ! moving && canMove && (tryingToMove || tryingToAttackAway)) {
-      framesFailingToMove += 1
-    } else {
-      framesFailingToMove = 0
-    }
-    if (cooldownLeft == 0 && tryingToAttackHere) {
-      framesFailingToAttack += 1
-    } else {
-      framesFailingToAttack = 0
-    }
+    if (cooldownLeft > lastCooldown) lastFrameStartingAttack = With.frame
+    if (totalHealth < lastHitPoints + lastShieldPoints + lastMatrixPoints) lastFrameTakingDamage = With.frame
     if (complete) {
       // If the unit class changes (eg. Geyser -> Extractor) update the completion frame
-      if (unitClass != lastUnitClass) {
-        completionFrame = With.frame
-      }
-      // We don't know exactly when it finished; now is our best guess.
+      if (unitClass != lastUnitClass) completionFrame = With.frame
+      // We may not know exactly when it finished; if so now is our best guess.
       // The most important consumer of this estimate is fingerprinting.
-      // For fingerprinting, "finished now" is a pretty decent metric.
+      // For fingerprinting, "finished now" is a pretty decent heuristic.
       completionFrame = Math.min(completionFrame, With.frame)
-    }
-    // The latter case is for units that have *never* had an assigned completion time (eg. == Forever())
-    if ( ! complete || completionFrame > 24 * 60 * 180) {
+    } else {
       completionFrame = With.frame + remainingCompletionFrames
     }
-    if (remainingOccupationFrames > 0) {
-      lastFrameOccupied = With.frame
-    }
-    lastUnitClass             = unitClass
-    lastHitPoints             = hitPoints
-    lastShieldPoints          = shieldPoints
-    lastDefensiveMatrixPoints = matrixPoints
-    lastCooldown              = cooldownLeft
-    hasEverBeenCompleteHatch ||= is(Zerg.Hatchery) && complete
+    lastUnitClass     = unitClass
+    lastHitPoints     = hitPoints
+    lastShieldPoints  = shieldPoints
+    lastMatrixPoints  = matrixPoints
+    lastCooldown      = cooldownLeft
+    hasEverBeenCompleteHatch ||= complete && is(Zerg.Hatchery)
   }
 
-  private lazy val stuckMoveFrames    = 24
-  private lazy val stuckAttackFrames  = Math.max(stuckMoveFrames, cooldownMaxAirGround)
-  @inline final def seeminglyStuck: Boolean = framesFailingToMove > stuckMoveFrames || framesFailingToAttack > stuckAttackFrames
-
-  ////////////
-  // Health //
-  ////////////
-
-  @inline final def aliveAndComplete:Boolean = alive && complete
+  @inline final def aliveAndComplete: Boolean = alive && complete
 
   @inline final def energyMax     : Int = unitClass.maxEnergy // TODO: Count effects of upgrades
   @inline final def mineralsLeft  : Int = if (unitClass.isMinerals) resourcesLeft else 0
   @inline final def gasLeft       : Int = if (unitClass.isGas)      resourcesLeft else 0
 
-  ///////////////
-  // Economics //
-  ///////////////
-
   // When a Larva is about to morph, but hasn't turned into an egg, remainingCompletionFrames is ZERO
   @inline final def completeOrNearlyComplete: Boolean = complete || (remainingCompletionFrames < With.latency.framesRemaining && ( ! isAny(Zerg.Larva, Zerg.Hydralisk, Zerg.Mutalisk)))
 
-  lazy val isBlocker: Boolean = gasLeft + mineralsLeft < With.configuration.blockerMineralThreshold
+  lazy val isBlocker: Boolean = (unitClass.isMinerals || unitClass.isGas) && gasLeft + mineralsLeft < With.configuration.blockerMineralThreshold
 
   @inline final def subjectiveValue: Double = subjectiveValueCache()
   private val subjectiveValueCache = new Cache(() =>

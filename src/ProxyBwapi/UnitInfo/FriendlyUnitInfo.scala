@@ -8,6 +8,7 @@ import Micro.Squads.Squad
 import Performance.Cache
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
+import Utilities.Forever
 
 import scala.collection.JavaConverters._
 
@@ -15,13 +16,20 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(b
   
   override val friendly: Option[FriendlyUnitInfo] = Some(this)
 
+  var framesFailingToMove       : Int = 0
+  var framesFailingToAttack     : Int = 0
+  var lastFrameOccupied         : Int = - Forever()
   override def update() {
-    if (frameDiscovered < With.frame) {
-      readProxy()
-    }
+    if (frameDiscovered < With.frame) readProxy()
     super.update()
-    _knownToEnemyOnce = _knownToEnemyOnce || visibleToOpponents
+    _discoveredByEnemy = _discoveredByEnemy || visibleToOpponents
+    lazy val tryingToAttackHere = canAttack && target.exists(t => t.isEnemyOf(this) &&   inRangeToAttack(t))
+    lazy val tryingToAttackAway = canAttack && target.exists(t => t.isEnemyOf(this) && ! inRangeToAttack(t))
+    framesFailingToMove = if (flying || unitClass.floats || velocityX > 0 || velocityY > 0 || ! canMove || ( ! agent.tryingToMove && ! tryingToAttackAway)) 0 else framesFailingToMove + 1
+    framesFailingToAttack = if (cooldownLeft > 0 || ! tryingToAttackHere) 0 else framesFailingToAttack + 1
+    if (remainingOccupationFrames > 0) lastFrameOccupied = With.frame
   }
+  @inline final def seeminglyStuck: Boolean = framesFailingToMove > 24 || framesFailingToAttack > 24
 
   def remainingCompletionFrames : Int = bwapiUnit.getRemainingBuildTime
   def spaceRemaining: Int = bwapiUnit.getSpaceRemaining
@@ -46,8 +54,8 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(b
   def buildUnit     : Option[UnitInfo]  = With.units.get(base.getBuildUnit)
   def techingType   : Tech              = Techs.get(base.getTech)
   def upgradingType : Upgrade           = Upgrades.get(base.getUpgrade)
-  private var _knownToEnemyOnce: Boolean = false
-  def knownToEnemy: Boolean = _knownToEnemyOnce
+  private var _discoveredByEnemy: Boolean = false
+  def knownToEnemy: Boolean = _discoveredByEnemy
 
   var nextOrderFrame: Option[Int] = None
   @inline def ready: Boolean = nextOrderFrame.forall(_ <= With.frame)

@@ -122,7 +122,7 @@ class GoalDefendZone extends SquadGoalBasic {
 
   def defendHeart(center: Pixel) {
     _currentDestination = center
-    val protectables  = center.zone.units.filter(u => u.isOurs && u.unitClass.isBuilding && u.hitPoints < 300 && (u.discoveredByEnemy || u.canAttack))
+    val protectables  = center.zone.units.filter(u => u.isOurs && u.unitClass.isBuilding && u.hitPoints < 300 && (u.friendly.exists(_.knownToEnemy) || u.canAttack))
     val destination   = ByOption
       .minBy(protectables.view.filter(p =>
         p.zone != With.geography.ourMain.zone || p.matchups.threats.exists( ! _.unitClass.isWorker)))(u =>

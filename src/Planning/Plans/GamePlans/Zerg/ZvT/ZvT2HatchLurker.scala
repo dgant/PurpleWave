@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, Attack, EjectScout, Hunt}
+import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Basic.Write
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -110,7 +110,6 @@ class ZvT2HatchLurker extends GameplanTemplate {
     new If(
       new MiningBasesAtMost(2),
       new Parallel(
-        new Hunt(Zerg.Mutalisk, UnitMatchWarriors),
         new Pump(Zerg.Mutalisk, 12),
         new Pump(Zerg.Lurker, 1), // In case we wound up with Lurker Aspect
         new Pump(Zerg.Drone, 24),

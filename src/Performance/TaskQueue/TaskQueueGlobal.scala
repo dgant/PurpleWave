@@ -33,6 +33,7 @@ class TaskQueueGlobal extends TaskQueueParallel(
       With.scheduler.reset() // Synchronous with gameplan; Flickers ShowProduction otherwise
       With.blackboard.reset() // Synchronous with gameplan; Flickers flags otherwise
       With.strategy.gameplan.update()}),
+    new SimpleTask(With.tactics.update),
     new SimpleTask(With.groundskeeper.update))
     .withSkipsMax(6)
     .withWeight(TaskQueueGlobalWeights.Planning),

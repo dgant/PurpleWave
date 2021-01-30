@@ -18,6 +18,7 @@ import Micro.Matchups.MatchupGraph
 import Micro.Squads.Squads
 import Performance.TaskQueue.{TaskQueueGlobal, TaskQueueParallel}
 import Placement.Preplacement
+import Planning.Tactics.Tactics
 import Planning.{Blackboard, Yolo}
 import ProxyBwapi.Bullets.Bullets
 import ProxyBwapi.Players.{PlayerInfo, Players}
@@ -83,6 +84,7 @@ object With {
   var strategy          : Strategist              = _
   var storyteller       : Storyteller             = _
   var squads            : Squads                  = _
+  var tactics           : Tactics                 = _
   var tasks             : TaskQueueParallel       = _
   var units             : UnitTracker             = _
   var unitsShown        : UnitsShown              = _
@@ -176,6 +178,7 @@ object With {
     strategy          = new Strategist
     storyteller       = new Storyteller
     squads            = new Squads
+    tactics           = new Tactics
     units             = new UnitTracker
     unitsShown        = new UnitsShown
     viewport          = new Viewport

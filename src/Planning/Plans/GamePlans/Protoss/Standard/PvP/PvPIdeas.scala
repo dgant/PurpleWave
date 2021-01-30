@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, Attack, Hunt}
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{If, Parallel, _}
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -18,7 +18,6 @@ import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitInfo.UnitInfo
 import Strategery.Strategies.Protoss._
 import Utilities.{ByOption, GameTime}
 
@@ -344,10 +343,6 @@ object PvPIdeas {
     new Parallel(
       new WriteStatus("ReactToProxyGate"),
       new PerformReactionTo2Gate,
-      new Hunt(Protoss.Dragoon, UnitMatchAnd(Protoss.Zealot, (unit: UnitInfo) =>
-        unit.base.exists(_.isOurMain)
-        || unit.base.exists(_.isNaturalOf.exists(_.isOurMain))
-        || unit.orderTargetPixel.exists(_.base.exists(_.owner.isUs)))),
       new If(new UpgradeStarted(Protoss.DragoonRange), new Attack),
       new If(
         new Not(new SafeAtHome),

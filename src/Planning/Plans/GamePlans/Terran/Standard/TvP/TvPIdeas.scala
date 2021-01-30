@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvP
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.{Attack, ConsiderAttacking, Hunt}
+import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
@@ -45,8 +45,6 @@ object TvPIdeas {
             Get(1, Terran.Academy)))))
 
   class TvPAttack extends Parallel(
-    new Hunt(Terran.Wraith, Protoss.Shuttle),
-    new Hunt(Terran.Wraith, Protoss.Reaver),
     // Keep pressuring if appropriate
     new If(
       new Employing(TvP2FacJoyO),

@@ -54,7 +54,6 @@ class ZvZ10HatchLing extends GameplanTemplate {
   
   override def attackPlan: Plan = new Parallel(
     new Attack(Zerg.Mutalisk),
-    new Hunt(Zerg.Scourge, Zerg.Mutalisk),
     new If(
       new EnemiesAtLeast(1, Zerg.Mutalisk),
       new Attack,

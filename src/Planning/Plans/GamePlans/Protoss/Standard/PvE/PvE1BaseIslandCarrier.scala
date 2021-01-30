@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvE
 
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Attack, Hunt}
+import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -25,9 +25,7 @@ class PvE1BaseIslandCarrier extends GameplanTemplate {
   override def attackPlan: Plan = new Parallel(
     new If(
       new And(new EnemiesAtMost(0, Zerg.Scourge), new EnemiesAtMost(0, Zerg.Mutalisk)),
-      new Parallel(
-        new Hunt(Protoss.Corsair, Zerg.Overlord),
-        new Attack(Protoss.Corsair))),
+      new Attack(Protoss.Corsair)),
     new Trigger(
       new UnitsAtLeast(4, Protoss.Carrier, complete = true),
       super.attackPlan))

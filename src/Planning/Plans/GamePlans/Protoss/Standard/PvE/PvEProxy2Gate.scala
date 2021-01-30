@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvE
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, Attack, Hunt}
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.{Do, NoPlan, Write}
 import Planning.Plans.Compound.{Or, _}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -16,7 +16,6 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy}
-import Planning.UnitCounters.UnitCountOne
 import Planning.UnitMatchers.UnitMatchWarriors
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -34,11 +33,7 @@ class PvEProxy2Gate extends GameplanTemplate {
   override def aggressionPlan: Plan = new Aggression(1.2)
   override def workerPlan: Plan = NoPlan()
 
-  override def priorityAttackPlan: Plan = new Parallel(
-    new If(
-      new EnemyStrategy(With.fingerprints.cannonRush),
-      new Hunt(Protoss.Zealot, Protoss.Probe, UnitCountOne)),
-    new Attack)
+  override def priorityAttackPlan: Plan = new Attack
   
   private class BeforeProxy extends Parallel(
     new PlaceGatewaysProxied(2, () => ProxyPlanner.proxyMiddle),

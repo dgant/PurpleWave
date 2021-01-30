@@ -5,7 +5,7 @@ import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.{Attack, Chill, ConsiderAttacking, Hunt}
+import Planning.Plans.Army.{Attack, Chill, ConsiderAttacking}
 import Planning.Plans.Basic.{NoPlan, WriteStatus}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -44,7 +44,6 @@ abstract class PvZ1Base extends GameplanTemplate {
   override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
   override def attackPlan: Plan = new Parallel(
     new Chill(Protoss.HighTemplar),
-    new Hunt(Protoss.Corsair, Zerg.Overlord),
     new If(
       new And(new EnemiesAtMost(0, Zerg.Mutalisk), new EnemiesAtMost(0, Zerg.Scourge)),
       new Attack(Protoss.Corsair)),

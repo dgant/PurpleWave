@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.{Attack, ConsiderAttacking, Hunt}
+import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
@@ -16,10 +16,6 @@ import ProxyBwapi.Races.{Terran, Zerg}
 class ZvTLateGame extends GameplanTemplate  {
 
   override def attackPlan: Plan = new Parallel(
-    new Hunt(Zerg.Scourge, Terran.Dropship),
-    new Hunt(Zerg.Scourge, Terran.ScienceVessel),
-    new Hunt(Zerg.Scourge, Terran.Wraith),
-    new Hunt(Zerg.Scourge, Terran.Valkyrie),
     new Attack(Zerg.Mutalisk),
     new If(
       new BasesAtLeast(3),

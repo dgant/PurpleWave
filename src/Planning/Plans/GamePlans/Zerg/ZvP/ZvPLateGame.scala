@@ -4,6 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Performance.Cache
 import Planning.Plan
+import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.{NoPlan, WriteStatus}
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -51,7 +52,7 @@ class ZvPLateGame extends GameplanTemplate {
   class GoHydraliskOnly     extends Check(() => composition() == compositionHydraliskOnly)
 
   override def initialScoutPlan: Plan = NoPlan()
-  override def attackPlan: Plan = new ZvPIdeas.AttackPlans
+  override def attackPlan: Plan = new Attack
 
   override def buildPlans: Seq[Plan] = Seq(
     new CapGasAt(800),

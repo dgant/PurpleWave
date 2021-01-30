@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{Attack, Hunt}
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.{Eject4PoolScout, MeldArchonsUntilStorm}
@@ -41,7 +41,6 @@ class PvZ1BaseForgeTech extends GameplanTemplate {
 
   override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
   override def attackPlan: Plan = new Parallel(
-    new Hunt(Zerg.Overlord, Protoss.Corsair),
     new MonitorBases(Protoss.Corsair, initialUnitCounter = UnitCountEverything),
     super.attackPlan)
 

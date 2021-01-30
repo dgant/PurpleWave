@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Attack, Hunt}
+import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{If, Trigger, _}
 import Planning.Plans.GamePlans.Protoss.Situational.{BuildHuggingNexus, DefendFightersAgainstRush}
@@ -24,8 +24,6 @@ import Utilities.{GameTime, Minutes}
 object PvTIdeas {
 
   class PriorityAttacks extends Parallel(
-    new Hunt(Protoss.DarkArchon, Terran.Ghost),
-    new Hunt(Protoss.DarkArchon, Terran.ScienceVessel),
     new If(new Or(new EnemyUnitsNone(Protoss.Observer), new EnemyBasesAtLeast(3)), new Attack(Protoss.DarkTemplar)),
     new Attack(Protoss.Scout),
     new Trigger(new UnitsAtLeast(4, Protoss.Carrier, complete = true), initialAfter = new Attack(Protoss.Carrier)))

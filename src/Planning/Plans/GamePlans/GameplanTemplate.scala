@@ -19,7 +19,6 @@ import Planning.Predicates.Milestones.BasesAtLeast
 import Planning.Predicates.Strategy.WeAreZerg
 
 abstract class GameplanTemplate extends GameplanMode {
-  
   val meldArchonsAt         : Int               = 40
   val removeMineralBlocksAt : Int               = 80
   def status                : String            = this.toString
@@ -34,25 +33,18 @@ abstract class GameplanTemplate extends GameplanMode {
   def buildOrderPlan        : Plan              = new BuildOrder(buildOrder: _*)
   def supplyPlan            : Plan              = new RequireSufficientSupply
   def workerPlan            : Plan              = new If(new Not(new WeAreZerg), new PumpWorkers)
-  def scoutOverlordPlan     : Plan              = new ConsiderScoutingWithOverlords
   def initialScoutPlan      : Plan              = new ConsiderScoutingWithWorker
   def scoutExposPlan        : Plan              = new If(new And(new BasesAtLeast(2), new ShouldScoutExpansions), new ScoutExpansions)
-  def yoloPlan              : Plan              = new If(new Check(() => With.yolo.active()), new Attack)
   def priorityDefensePlan   : Plan              = NoPlan()
   def priorityAttackPlan    : Plan              = NoPlan()
-  def nukePlan              : Plan              = NoPlan() // new NukeBase
   def attackPlan            : Plan              = new ConsiderAttacking
-  def dropPlan              : Plan              = NoPlan() //new DropAttack
-  def defendEntrance        : Plan              = new DefendEntrance()
 
   def tacticsPlans: Vector[Plan] = Vector(
     aggressionPlan,
-    yoloPlan,
-    scoutOverlordPlan,
+    new If(new Check(() => With.yolo.active()), new Attack),
+    new ConsiderScoutingWithOverlords,
     priorityDefensePlan,
     priorityAttackPlan,
-    nukePlan,
-    dropPlan,
     initialScoutPlan,
     new DefendAgainstProxy,
     new DefendBases,
@@ -60,7 +52,7 @@ abstract class GameplanTemplate extends GameplanMode {
     new CatchDTRunby,
     scoutExposPlan,
     attackPlan,
-    defendEntrance,
+    new DefendEntrance(),
     new Gather,
     new ChillOverlords,
     new RecruitFreelancers,

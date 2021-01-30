@@ -56,7 +56,6 @@ class PvTBasic extends GameplanTemplate {
     new If(new Employing(PvT1015DT),            new If(new UpgradeStarted(Protoss.DragoonRange), new ScoutWithWorkers)),
     new If(new Employing(PvTDTExpand),          new ScoutOn(Protoss.CyberneticsCore)))
 
-  override val priorityAttackPlan = new PvTIdeas.PriorityAttacks
   override val attackPlan = new If(
     new Or(
       new Not(new Employing(PvTDTExpand, PvT1GateReaver)),

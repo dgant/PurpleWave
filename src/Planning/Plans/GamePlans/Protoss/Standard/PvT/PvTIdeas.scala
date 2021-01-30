@@ -23,11 +23,6 @@ import Utilities.{GameTime, Minutes}
 
 object PvTIdeas {
 
-  class PriorityAttacks extends Parallel(
-    new If(new Or(new EnemyUnitsNone(Protoss.Observer), new EnemyBasesAtLeast(3)), new Attack(Protoss.DarkTemplar)),
-    new Attack(Protoss.Scout),
-    new Trigger(new UnitsAtLeast(4, Protoss.Carrier, complete = true), initialAfter = new Attack(Protoss.Carrier)))
-
   class PvTAttack extends Trigger(
     new UnitsAtLeast(4, Protoss.Carrier, complete = true),
     new Attack,

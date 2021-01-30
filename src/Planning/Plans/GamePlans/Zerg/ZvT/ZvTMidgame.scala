@@ -23,13 +23,6 @@ class ZvTMidgame extends GameplanTemplate {
 
   class GoMutalisk extends Sticky(new Not(new EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.oneRaxFE)))
 
-  // Avoid suiciding Hydralisks destined to become Lurkers
-  override def priorityDefensePlan: Plan = new If(
-    new And(
-      new Not(new SafeToMoveOut),
-      new TechStarted(Zerg.LurkerMorph)),
-    new Chill(Zerg.Hydralisk))
-
   override def attackPlan: Plan = new Parallel(
     new Attack(Zerg.Mutalisk),
     new If(

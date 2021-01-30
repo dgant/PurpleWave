@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvE
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{Attack, EjectScout}
+import Planning.Plans.Army.EjectScout
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -52,7 +52,6 @@ class ProxyDarkTemplarRush extends GameplanTemplate {
     Get(4, Protoss.Gateway))
 
   override def initialScoutPlan: Plan = new If(new Not(new FoundEnemyBase), new ScoutOn(Protoss.Pylon))
-  override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
   override def attackPlan: Plan = new Trigger(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true), super.attackPlan)
   override def workerPlan: Plan = NoPlan()
   override def supplyPlan: Plan = NoPlan()

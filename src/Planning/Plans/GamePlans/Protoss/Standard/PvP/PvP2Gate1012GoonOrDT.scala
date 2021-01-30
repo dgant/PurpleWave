@@ -8,7 +8,6 @@ import Planning.Plans.Army.{Aggression, Attack, EjectScout}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackWithDarkTemplar
 import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAt, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -19,7 +18,6 @@ import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBasesAtMost, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
-import Planning.UnitCounters.UnitCountExactly
 import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
@@ -51,12 +49,6 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
         new Not(new EnemyHasUpgrade(Protoss.DragoonRange)))),
     new Aggression(1.25),
     super.aggressionPlan)
-
-  override def priorityAttackPlan: Plan = new Parallel(
-    new If(
-      new EnemyStrategy(With.fingerprints.proxyGateway),
-      new Attack(Protoss.Zealot, UnitCountExactly(1))),
-    new AttackWithDarkTemplar)
 
   override def attackPlan: Plan = new If(
     new Or(

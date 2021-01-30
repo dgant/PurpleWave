@@ -53,7 +53,6 @@ class TvZSK extends GameplanTemplate {
     new If(new CanAttack, new Attack),
     new ScoutExpansions(Terran.Wraith),
     new Attack(Terran.Battlecruiser))
-  override def priorityAttackPlan: Plan = new If(new CanAttack, new Attack(UnitMatchOr(Terran.Ghost, Terran.Vulture)))
   override def workerPlan: Plan = new Parallel(
     new Pump(Terran.NuclearSilo, 1),
     new Trigger(
@@ -159,7 +158,6 @@ class TvZSK extends GameplanTemplate {
       new EnemyHasShown(Zerg.Defiler),
       new PumpRatio(Terran.Firebat, 0, 15, Seq(Friendly(Terran.Marine, 0.5)))),
     new Pump(Terran.Marine),
-    new Pump(Terran.Vulture, 1),
 
     new If(
       new Employing(TvZRaxCCRax),

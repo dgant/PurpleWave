@@ -26,13 +26,6 @@ object PvPIdeas {
   class EnemyCarriersOnly extends And(
     new EnemyCarriers,
     new EnemiesAtMost(6, UnitMatchAnd(UnitMatchWarriors,  UnitMatchNot(UnitMatchMobileFlying))))
-
-  class AttackWithDarkTemplar extends If(
-    new Or(
-      new EnemyUnitsNone(Protoss.Observer),
-      new EnemyBasesAtLeast(3)),
-    new Attack(Protoss.DarkTemplar))
-
   class UnansweredDarkTemplar extends And(
     new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
     new EnemiesAtMost(0, Protoss.Observer))

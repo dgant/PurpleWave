@@ -41,7 +41,6 @@ abstract class PvZ1Base extends GameplanTemplate {
       new Blueprint(Protoss.Pylon,   placement = Some(PlacementProfiles.hugTownHall)),
       new Blueprint(Protoss.Pylon,   placement = Some(PlacementProfiles.hugTownHall))) }
 
-  override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
   override def attackPlan: Plan = new Parallel(
     new Chill(Protoss.HighTemplar),
     new If(

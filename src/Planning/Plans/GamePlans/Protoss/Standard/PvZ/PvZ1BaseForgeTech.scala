@@ -39,7 +39,6 @@ class PvZ1BaseForgeTech extends GameplanTemplate {
     new Blueprint(Protoss.Forge,        placement = Some(PlacementProfiles.hugTownHall)),
     new Blueprint(Protoss.Gateway,      placement = Some(PlacementProfiles.hugTownHall)))
 
-  override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
   override def attackPlan: Plan = new Parallel(
     new MonitorBases(Protoss.Corsair, initialUnitCounter = UnitCountEverything),
     super.attackPlan)

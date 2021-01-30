@@ -28,8 +28,6 @@ class PvP2GateDT extends GameplanTemplate {
   override val activationCriteria = new Employing(PvP2GateDTExpand)
   override val completionCriteria: Predicate = new Latch(new And(new UnitsAtLeast(1, Protoss.TemplarArchives), new BasesAtLeast(2)))
 
-  override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
-
   override val attackPlan = new If(
     new Or(
       new Latch(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true)),

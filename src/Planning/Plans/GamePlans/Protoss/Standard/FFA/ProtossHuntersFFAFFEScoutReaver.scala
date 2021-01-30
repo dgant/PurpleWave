@@ -35,8 +35,6 @@ class ProtossHuntersFFAFFEScoutReaver extends GameplanTemplate {
     Get(2,   Protoss.PhotonCannon),
     Get(1,   Protoss.Gateway))
   
-  override def priorityAttackPlan: Plan = new Attack(Protoss.Scout)
-  
   override def buildPlans: Seq[Plan] = Vector(
     new If(
       new UnitsAtLeast(12, UnitMatchWarriors),

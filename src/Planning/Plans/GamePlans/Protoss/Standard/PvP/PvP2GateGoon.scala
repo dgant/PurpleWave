@@ -43,7 +43,6 @@ class PvP2GateGoon extends GameplanTemplate {
           new Not(new EnemyStrategy(With.fingerprints.proxyGateway)))),
       new ProposePlacement(new Blueprint(Protoss.Pylon, preferZone = Some(With.geography.ourNatural.zone)))))
 
-  override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
   override def attackPlan: Plan = new If(
     new And(
       new Or(

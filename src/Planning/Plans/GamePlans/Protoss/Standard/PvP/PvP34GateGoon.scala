@@ -7,7 +7,6 @@ import Macro.BuildRequests.Get
 import Planning.Plans.Army.EjectScout
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackWithDarkTemplar
 import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAt, GasCapsUntouched, Pump}
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -37,7 +36,6 @@ class PvP34GateGoon extends GameplanTemplate {
     new Blueprint(Protoss.Pylon),
     new Blueprint(Protoss.Pylon, requireZone = Some(With.geography.ourNatural.zone))) // If we need emergency cannons in the natural, this is the Pylon we need done
 
-  override def priorityAttackPlan : Plan = new AttackWithDarkTemplar
   override def attackPlan: Plan = new Trigger(
     new Or(
       new EnemyStrategy(With.fingerprints.gasSteal),

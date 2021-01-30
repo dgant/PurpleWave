@@ -33,7 +33,7 @@ class PvEProxy2Gate extends GameplanTemplate {
   override def aggressionPlan: Plan = new Aggression(1.2)
   override def workerPlan: Plan = NoPlan()
 
-  override def priorityAttackPlan: Plan = new Attack
+  override def attackPlan: Plan = new Attack
   
   private class BeforeProxy extends Parallel(
     new PlaceGatewaysProxied(2, () => ProxyPlanner.proxyMiddle),

@@ -35,16 +35,12 @@ abstract class GameplanTemplate extends GameplanMode {
   def workerPlan            : Plan              = new If(new Not(new WeAreZerg), new PumpWorkers)
   def initialScoutPlan      : Plan              = new ConsiderScoutingWithWorker
   def scoutExposPlan        : Plan              = new If(new And(new BasesAtLeast(2), new ShouldScoutExpansions), new ScoutExpansions)
-  def priorityDefensePlan   : Plan              = NoPlan()
-  def priorityAttackPlan    : Plan              = NoPlan()
   def attackPlan            : Plan              = new ConsiderAttacking
 
   def tacticsPlans: Vector[Plan] = Vector(
     aggressionPlan,
     new If(new Check(() => With.yolo.active()), new Attack),
     new ConsiderScoutingWithOverlords,
-    priorityDefensePlan,
-    priorityAttackPlan,
     initialScoutPlan,
     new DefendAgainstProxy,
     new DefendBases,

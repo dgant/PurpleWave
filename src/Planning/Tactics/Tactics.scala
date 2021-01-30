@@ -13,8 +13,6 @@ class Tactics {
 
   private val yoloPlan                : Plan = new If(new Check(() => With.yolo.active()), new Attack)
   private val scoutOverlordPlan       : Plan = new ConsiderScoutingWithOverlords
-  private val priorityDefensePlan     : Plan = null
-  private val priorityAttackPlan      : Plan = null
   private val initialScoutPlan        : Plan = null
   private val defendAgainstProxy      : Plan = new DefendAgainstProxy
   private val defendBases             : Plan = new DefendBases
@@ -29,11 +27,15 @@ class Tactics {
   private val scan                    : Plan = new Scan
 
   def update(): Unit = {
+    // TODO: Attack with units that can safely harass:
+    // - Dark Templar/Lurkers/Cloaky Ghosts/Cloaky Wraiths
+    // - Vultures/Zerglings (except against faster enemy units, or ranged units vs short-range vision of lings)
+    // - Air units (except against faster enemy air-to-air)
+    // - Speed Zerglings
+    // - Carriers at 4+ (except against cloaked wraiths and no observer)
     Vector(
       yoloPlan,
       scoutOverlordPlan,
-      priorityDefensePlan,
-      priorityAttackPlan,
       initialScoutPlan,
       defendAgainstProxy,
       defendBases,

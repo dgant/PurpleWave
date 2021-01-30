@@ -25,15 +25,13 @@ class ZvT3HatchLing extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(ZvT3HatchLing)
 
-  override def priorityAttackPlan: Plan = new If(
-    new UpgradeComplete(Zerg.HydraliskRange),
-    new Attack)
-
-  override def attackPlan: Plan = new If(
-    new Or(
-      new EnemiesAtMost(0, Terran.Factory),
-      new UpgradeComplete(Zerg.ZerglingSpeed)),
-    new Attack(Zerg.Zergling))
+  override def attackPlan: Plan = new Parallel(
+    new If(new UpgradeComplete(Zerg.HydraliskRange), new Attack),
+    new If(
+      new Or(
+        new EnemiesAtMost(0, Terran.Factory),
+        new UpgradeComplete(Zerg.ZerglingSpeed)),
+      new Attack(Zerg.Zergling)))
 
   override def initialScoutPlan: Plan = new If(
     new And(

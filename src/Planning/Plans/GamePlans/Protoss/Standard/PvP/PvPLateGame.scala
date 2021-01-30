@@ -26,7 +26,6 @@ class PvPLateGame extends GameplanTemplate {
     new PvPIdeas.ReactToRoboAsDT,
     new PvPIdeas.ReactToArbiters)
 
-  override def priorityAttackPlan: Plan = new PvPIdeas.AttackWithDarkTemplar
   override val attackPlan: Plan = new PvPIdeas.AttackSafely
 
   override def archonPlan: Plan = new PvPIdeas.MeldArchonsPvP

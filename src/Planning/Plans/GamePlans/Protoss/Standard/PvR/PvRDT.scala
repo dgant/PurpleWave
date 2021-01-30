@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvR
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Attack, ConsiderAttacking}
+import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -30,8 +30,6 @@ class PvRDT extends GameplanTemplate {
 
   override val workerPlan = NoPlan()
   override def initialScoutPlan: Plan = new ScoutOn(Protoss.Pylon)
-
-  override def priorityAttackPlan: Plan = new Attack(Protoss.DarkTemplar)
 
   override def attackPlan: Plan = new If(
     new EnemyStrategy(With.fingerprints.twelveHatch),

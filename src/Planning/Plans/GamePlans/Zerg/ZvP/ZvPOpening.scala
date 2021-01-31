@@ -27,7 +27,7 @@ class ZvPOpening extends GameplanTemplate {
 
   override def attackPlan: Plan = new Attack
 
-  override def initialScoutPlan: Plan = new If(
+  override def scoutPlan: Plan = new If(
     new Not(new EnemyStrategy(With.fingerprints.forgeFe)),
     new If(
       new Employing(ZvP12Hatch),

@@ -51,7 +51,7 @@ class ProxyDarkTemplarRush extends GameplanTemplate {
     Get(15, Protoss.Probe),
     Get(4, Protoss.Gateway))
 
-  override def initialScoutPlan: Plan = new If(new Not(new FoundEnemyBase), new ScoutOn(Protoss.Pylon))
+  override def scoutPlan: Plan = new If(new Not(new FoundEnemyBase), new ScoutOn(Protoss.Pylon))
   override def attackPlan: Plan = new Trigger(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true), super.attackPlan)
   override def workerPlan: Plan = NoPlan()
   override def supplyPlan: Plan = NoPlan()

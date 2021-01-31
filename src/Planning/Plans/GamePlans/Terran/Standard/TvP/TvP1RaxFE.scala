@@ -41,7 +41,7 @@ class TvP1RaxFE extends GameplanTemplate {
        new Blueprint(Terran.SupplyDepot,  preferZone = Some(With.geography.ourNatural.zone)))
    }
 
-  override def initialScoutPlan: Plan = new ScoutOn(Terran.SupplyDepot)
+  override def scoutPlan: Plan = new ScoutOn(Terran.SupplyDepot)
 
   override def attackPlan = new If(
     new EnemyStrategy(With.fingerprints.nexusFirst),

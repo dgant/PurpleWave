@@ -33,7 +33,7 @@ class ZvT3HatchLing extends GameplanTemplate {
         new UpgradeComplete(Zerg.ZerglingSpeed)),
       new Attack))
 
-  override def initialScoutPlan: Plan = new If(
+  override def scoutPlan: Plan = new If(
     new And(
       new Not(new EnemyWalledIn),
       new Not(new EnemyStrategy(With.fingerprints.twoFacVultures))),

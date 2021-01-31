@@ -20,7 +20,7 @@ import ProxyBwapi.Races.Zerg
 
 class ZvE9Pool2HatchSpeed extends GameplanTemplate {
 
-  override def initialScoutPlan: Plan = NoPlan()
+  override def scoutPlan: Plan = NoPlan()
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new ZvZIdeas.ReactToFourPool,

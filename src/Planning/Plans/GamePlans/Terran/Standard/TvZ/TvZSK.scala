@@ -47,7 +47,7 @@ class TvZSK extends GameplanTemplate {
       new EnemyHasShown(Zerg.LurkerEgg),
       new EnemiesAtLeast(4, UnitMatchOr(Zerg.SunkenColony, Zerg.CreepColony))))
 
-  override def initialScoutPlan: Plan = NoPlan()
+  override def scoutPlan: Plan = NoPlan()
   override def attackPlan: Plan = new If(new CanAttack, new Attack)
   override def workerPlan: Plan = new Parallel(
     new Pump(Terran.NuclearSilo, 1),

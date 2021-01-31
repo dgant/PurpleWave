@@ -29,7 +29,7 @@ class TvT1RaxFE extends GameplanTemplate {
       new EnemyStrategy(With.fingerprints.fourteenCC, With.fingerprints.oneRaxFE),
       new UnitsAtLeast(1, Terran.Factory))))
 
-  override def initialScoutPlan = new ScoutAt(12)
+  override def scoutPlan = new ScoutAt(12)
   override def attackPlan = new If(new EnemyStrategy(With.fingerprints.fourteenCC), new Attack)
 
   val naturalZone: Zone = With.geography.ourNatural.zone

@@ -20,7 +20,7 @@ class ProtossHuntersFFAFFEGatewayCarriers extends GameplanTemplate {
   
   override val activationCriteria   : Predicate = new Always
   override def placementPlan : Plan = new PlacementForgeFastExpand
-  override val initialScoutPlan     : Plan = NoPlan()
+  override val scoutPlan     : Plan = NoPlan()
   override def aggressionPlan: Plan = new Aggression(0.6)
   
   override val buildOrder = Vector(

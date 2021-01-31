@@ -46,7 +46,7 @@ class PvTBasic extends GameplanTemplate {
       new Blueprint(Protoss.Pylon,           requireZone = Some(With.geography.ourMain.zone)),
       new Blueprint(Protoss.CyberneticsCore, requireZone = Some(With.geography.ourMain.zone))))
 
-  override def initialScoutPlan: Plan = new Parallel(
+  override def scoutPlan: Plan = new Parallel(
     new If(new EnemyIsRandom,                   new ScoutOn(Protoss.Pylon)), // Continue scouting from a PvR opening
     new If(new Employing(PvT13Nexus),           new ScoutOn(Protoss.Nexus, quantity = 2)),
     new If(new Employing(PvT24Nexus),           new ScoutOn(Protoss.Gateway)),

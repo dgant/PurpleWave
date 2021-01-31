@@ -42,7 +42,7 @@ class FFETest extends Plan {
 }
 
 class PvEFFETestBuild extends GameplanTemplate {
-  override def initialScoutPlan: Plan = new ScoutOn(Protoss.Pylon)
+  override def scoutPlan: Plan = new ScoutOn(Protoss.Pylon)
 
   override def buildOrder: Seq[BuildRequest] = Seq(
     Get(8, Protoss.Probe),

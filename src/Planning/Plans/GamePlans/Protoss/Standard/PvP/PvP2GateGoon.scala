@@ -57,7 +57,7 @@ class PvP2GateGoon extends GameplanTemplate {
         new UnitsAtLeast(7, Protoss.Dragoon, complete = true))),
       new PvPIdeas.AttackSafely)
 
-  override def initialScoutPlan: Plan = new ScoutOn(Protoss.Zealot)
+  override def scoutPlan: Plan = new ScoutOn(Protoss.Zealot)
 
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvPIdeas.ReactToGasSteal,

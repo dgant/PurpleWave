@@ -27,7 +27,7 @@ class ZvZ5PoolSunkens extends GameplanTemplate {
 
   override def supplyPlan: Plan = NoPlan()
   override def attackPlan: Plan = new Attack
-  override def initialScoutPlan: Plan = NoPlan()
+  override def scoutPlan: Plan = NoPlan()
   
   private def blueprintCreepColony: Blueprint = new Blueprint(
     Zerg.CreepColony,

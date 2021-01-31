@@ -11,7 +11,6 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Placement.BuildSunkensAtNatural
-import Planning.Plans.Scouting.ScoutExpansions
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
 import Planning.Predicates.Milestones._
@@ -78,10 +77,6 @@ class ZvP2HatchMuta extends GameplanTemplate {
       new ShouldDoSpeedlingAllIn,
       new EnemyBasesAtLeast(2)),
     new Attack)
-  
-  override def scoutExposPlan: Plan = new If(
-    new UnitsAtLeast(8, Zerg.Mutalisk),
-    new ScoutExpansions)
 
   override def buildOrderPlan: Plan = new Parallel(
     new BuildOrder(

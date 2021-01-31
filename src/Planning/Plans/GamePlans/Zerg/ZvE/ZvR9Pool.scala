@@ -26,7 +26,7 @@ class ZvR9Pool extends GameplanTemplate {
   
   override val activationCriteria = new Employing(ZvR9Pool)
 
-  override def initialScoutPlan: Plan = NoPlan()
+  override def scoutPlan: Plan = NoPlan()
 
   override def attackPlan: Plan = new If(
     new Or(

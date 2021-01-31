@@ -17,7 +17,7 @@ import ProxyBwapi.Races.Protoss
 class ProtossHuntersFFAGatewayAggro extends GameplanTemplate {
   
   override val activationCriteria   : Predicate = new Always
-  override val initialScoutPlan     : Plan = NoPlan()
+  override val scoutPlan     : Plan = NoPlan()
   
   override val buildOrder = Vector[BuildRequest] (
     Get(8,   Protoss.Probe),

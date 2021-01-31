@@ -23,7 +23,7 @@ import Utilities.GameTime
 class PvRTinfoil extends GameplanTemplateVsRandom {
   
   override val activationCriteria = new Employing(PvRTinfoil2018)
-  override def initialScoutPlan   = NoPlan()
+  override def scoutPlan   = NoPlan()
 
   override lazy val blueprints = Vector(
     new Blueprint(Protoss.Pylon,              placement = Some(PlacementProfiles.hugTownHall)),

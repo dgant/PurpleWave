@@ -93,8 +93,7 @@ class PvPRobo extends GameplanTemplate {
       new ConsiderAttacking)
 
   override def emergencyPlans: Seq[Plan] = oneGateCoreLogic.emergencyPlans
-  override def initialScoutPlan: Plan = new If(new EnemiesAtMost(0, Protoss.Dragoon), super.initialScoutPlan)
-  override def scoutExposPlan: Plan = NoPlan()
+  override def scoutPlan: Plan = new If(new EnemiesAtMost(0, Protoss.Dragoon), super.scoutPlan)
 
   override def aggressionPlan: Plan = new Trigger(
     new And(new ReadyToExpand, new BasesAtMost(1)),

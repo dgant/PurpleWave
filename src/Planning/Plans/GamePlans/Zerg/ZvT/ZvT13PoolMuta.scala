@@ -24,7 +24,7 @@ class ZvT13PoolMuta extends GameplanTemplate {
   
   override def aggressionPlan: Plan = new Aggression(0.7)
   
-  override def initialScoutPlan: Plan = new ScoutWithZergling
+  override def scoutPlan: Plan = new ScoutWithZergling
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new ZvTIdeas.ReactToBarracksCheese,

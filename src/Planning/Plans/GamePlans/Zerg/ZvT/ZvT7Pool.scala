@@ -26,7 +26,7 @@ class ZvT7Pool extends GameplanTemplate {
 
   override def attackPlan: Plan = new Attack
 
-  override def initialScoutPlan: Plan = new If(
+  override def scoutPlan: Plan = new If(
     new And(
       new StartPositionsAtLeast(3),
       new Not(new FoundEnemyBase)),

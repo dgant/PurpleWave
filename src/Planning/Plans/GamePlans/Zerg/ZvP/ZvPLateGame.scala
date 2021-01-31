@@ -51,7 +51,7 @@ class ZvPLateGame extends GameplanTemplate {
   class GoHydraliskLurker   extends Check(() => composition() == compositionHydraliskLurker)
   class GoHydraliskOnly     extends Check(() => composition() == compositionHydraliskOnly)
 
-  override def initialScoutPlan: Plan = NoPlan()
+  override def scoutPlan: Plan = NoPlan()
   override def attackPlan: Plan = new Attack
 
   override def buildPlans: Seq[Plan] = Seq(

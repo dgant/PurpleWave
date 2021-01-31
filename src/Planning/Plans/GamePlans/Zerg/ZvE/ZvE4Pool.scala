@@ -33,7 +33,7 @@ class ZvE4Pool extends GameplanTemplate {
     new Aggression(99),
     new Aggression(1.5))
   
-  override def initialScoutPlan: Plan = new If(
+  override def scoutPlan: Plan = new If(
     new And(
       new Latch(
         new And(

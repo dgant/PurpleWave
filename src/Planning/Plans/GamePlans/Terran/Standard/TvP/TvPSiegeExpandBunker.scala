@@ -29,7 +29,7 @@ class TvPSiegeExpandBunker extends GameplanTemplate {
     new UnitsAtLeast(1, Terran.EngineeringBay)
   ))
 
-  override def initialScoutPlan: Plan = new ScoutOn(Terran.Factory)
+  override def scoutPlan: Plan = new ScoutOn(Terran.Factory)
 
   override def attackPlan = new If(
     new EnemyStrategy(With.fingerprints.nexusFirst),

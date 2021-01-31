@@ -50,7 +50,7 @@ class ZvZ10HatchLing extends GameplanTemplate {
       Get(12, Zerg.Drone),
       Get(6, Zerg.Zergling))))
   
-  override def initialScoutPlan: Plan = NoPlan()
+  override def scoutPlan: Plan = NoPlan()
   
   override def attackPlan: Plan = new Parallel(
     new If(new UnitsAtLeast(1, Zerg.Mutalisk, complete = true), new Attack),

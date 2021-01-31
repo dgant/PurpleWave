@@ -1,6 +1,7 @@
 package Planning
 
 import Lifecycle.With
+import Planning.Plans.Basic.NoPlan
 
 class Blackboard {
   
@@ -21,6 +22,7 @@ class Blackboard {
   var wantToAttack          : Property[Boolean]     = add(new Property(false))
   var defendingBase         : Property[Boolean]     = add(new Property(false))
   var safeToMoveOut         : Property[Boolean]     = add(new Property(false))
+  var scoutPlan             : Property[Plan]        = add(new Property(NoPlan()))
   var gasWorkerFloor        : Property[Int]         = add(new Property(0))      // Require at least this many gas workers
   var gasWorkerCeiling      : Property[Int]         = add(new Property(200))    // Require no more than this many gas workers (unless saturated on minerals)
   var gasLimitFloor         : Property[Int]         = add(new Property(0))      // Max gas mining until at least this much gas
@@ -34,7 +36,6 @@ class Blackboard {
   var stealGas              : Property[Boolean]     = add(new Property(false))
   var mcrs                  : Property[Boolean]     = add(new Property(With.configuration.enableMCRS))
   var preferCloseExpansion  : Property[Boolean]     = add(new Property(false))
-  
-  var lastScoutDeath: Int = -24 * 60
-  var enemyUnitDied: Boolean = false
+  var lastScoutDeath        : Int                   = -24 * 60
+  var enemyUnitDied         : Boolean               = false
 }

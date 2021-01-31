@@ -25,7 +25,7 @@ class ZvZ9PoolSpeed extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(ZvZ9PoolSpeed)
 
-  override def initialScoutPlan: Plan = NoPlan()
+  override def scoutPlan: Plan = NoPlan()
   
   override def attackPlan: Plan = new If(
     new Or(

@@ -70,7 +70,7 @@ class ZvESparkle extends GameplanTemplate {
     new BuildOrder(Get(7, Zerg.Mutalisk))
   )
   
-  override def initialScoutPlan = NoPlan()
+  override def scoutPlan = NoPlan()
   override def supplyPlan: Plan = NoPlan()
   override def buildPlans: Seq[Plan] = Vector(
     new If(

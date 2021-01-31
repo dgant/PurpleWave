@@ -30,7 +30,7 @@ class TvEProxyBBS extends GameplanTemplate {
   
   lazy val proxyZone: Option[Zone] = ProxyPlanner.proxyMiddle
   
-  override def initialScoutPlan: Plan = new If(
+  override def scoutPlan: Plan = new If(
     new Not(new FoundEnemyBase),
     new ScoutOn(Terran.Marine))
 

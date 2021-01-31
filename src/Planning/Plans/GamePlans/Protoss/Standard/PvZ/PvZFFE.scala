@@ -25,7 +25,7 @@ class PvZFFE extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(PvZGatewayFE, PvZFFEConservative, PvZFFEEconomic)
   override val completionCriteria: Predicate = new Latch(new And(new BasesAtLeast(2), new UnitsAtLeast(1, Protoss.CyberneticsCore)))
   
-  override def initialScoutPlan: Plan = new If(
+  override def scoutPlan: Plan = new If(
     new Not(new EnemyStrategy(With.fingerprints.fourPool)),
     new If(
       new Employing(PvZFFEConservative),

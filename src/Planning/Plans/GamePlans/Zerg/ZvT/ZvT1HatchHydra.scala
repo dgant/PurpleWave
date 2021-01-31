@@ -21,7 +21,7 @@ class ZvT1HatchHydra extends GameplanTemplate {
 
   override val activationCriteria = new Employing(ZvT1HatchHydra)
 
-  override def initialScoutPlan: Plan = new If(
+  override def scoutPlan: Plan = new If(
     new StartPositionsAtLeast(3),
     new If(
       new StartPositionsAtLeast(4),

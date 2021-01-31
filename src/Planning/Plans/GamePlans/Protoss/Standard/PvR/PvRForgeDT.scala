@@ -22,7 +22,7 @@ import Strategery.Strategies.Protoss.PvR1BaseDT
 class PvRForgeDT extends GameplanTemplateVsRandom {
 
   override val activationCriteria = new Employing(PvR1BaseDT)
-  override def initialScoutPlan = NoPlan()
+  override def scoutPlan = NoPlan()
 
   override def attackPlan = new If(new UnitsAtLeast(6, Protoss.Gateway, complete = true), new ConsiderAttacking)
 

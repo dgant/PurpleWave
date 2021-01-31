@@ -24,7 +24,7 @@ class ZvPMain extends GameplanTemplate {
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(5, Zerg.Hatchery))
 
   override def attackPlan: Plan = new Attack
-  override def initialScoutPlan: Plan = NoPlan()
+  override def scoutPlan: Plan = NoPlan()
 
   class AttemptZerglingBust extends And(
     new UnitsAtMost(0, Zerg.Lair),

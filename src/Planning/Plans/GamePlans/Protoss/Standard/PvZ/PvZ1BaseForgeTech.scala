@@ -27,7 +27,7 @@ class PvZ1BaseForgeTech extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(PvZ1BaseForgeTech)
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(5, Protoss.Gateway))
 
-  override def initialScoutPlan: Plan = new ScoutOn(Protoss.Pylon)
+  override def scoutPlan: Plan = new ScoutOn(Protoss.Pylon)
 
   override def blueprints: Seq[Blueprint] = Vector(
     new Blueprint(Protoss.Pylon,        placement = Some(PlacementProfiles.hugTownHallTowardsEntrance)),

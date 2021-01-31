@@ -26,7 +26,7 @@ class TvZ1RaxFE extends GameplanTemplate {
   override val completionCriteria: Predicate = new Latch(new MiningBasesAtLeast(2))
 
   override def attackPlan: Plan = NoPlan()
-  override def initialScoutPlan: Plan = new If(
+  override def scoutPlan: Plan = new If(
     new Not(new EnemyStrategy(With.fingerprints.fourPool)),
     new If(
       new StartPositionsAtLeast(3),

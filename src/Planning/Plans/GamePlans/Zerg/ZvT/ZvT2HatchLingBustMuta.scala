@@ -21,7 +21,7 @@ class ZvT2HatchLingBustMuta extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(ZvT2HatchLingBustMuta)
 
-  override def initialScoutPlan: Plan = new ScoutWithZergling
+  override def scoutPlan: Plan = new ScoutWithZergling
 
   override def attackPlan: Plan = new Trigger(
     new UpgradeComplete(Zerg.ZerglingSpeed, 1, GameTime(0, 10)()),

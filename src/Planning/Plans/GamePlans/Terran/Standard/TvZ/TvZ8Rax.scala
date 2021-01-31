@@ -46,7 +46,7 @@ class TvZ8Rax extends GameplanTemplate {
           new AttackWithWorkers(new UnitCountExcept(8, Terran.SCV)),
           new AttackWithWorkers(UnitCountExactly(2))))))
 
-  override def initialScoutPlan: Plan = new If(
+  override def scoutPlan: Plan = new If(
     new Not(new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.fourPool)),
     new If(
       new StartPositionsAtLeast(3),

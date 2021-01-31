@@ -27,7 +27,7 @@ class TvE2RaxSCVMarine extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(TvE2RaxSCVMarine)
 
-  override def initialScoutPlan: Plan = new If(
+  override def scoutPlan: Plan = new If(
     new Not(new FoundEnemyBase),
     new ScoutAt(10))
 

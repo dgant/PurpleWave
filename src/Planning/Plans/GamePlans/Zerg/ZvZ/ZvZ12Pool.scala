@@ -24,7 +24,7 @@ class ZvZ12Pool extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(ZvZ12Pool)
 
-  override def initialScoutPlan: Plan = NoPlan()
+  override def scoutPlan: Plan = NoPlan()
 
   override def attackPlan: Plan = new Parallel(
     new If(new UnitsAtLeast(1, Zerg.Mutalisk, complete = true), new Attack),

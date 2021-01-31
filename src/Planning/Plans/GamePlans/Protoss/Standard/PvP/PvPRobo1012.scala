@@ -17,7 +17,7 @@ class PvPRobo1012 extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(PvPRobo1012)
   override val completionCriteria: Predicate = new UnitsAtLeast(1, Protoss.RoboticsFacility)
 
-  override def initialScoutPlan: Plan = new If(new StartPositionsAtLeast(3), new ScoutOn(Protoss.Gateway, quantity = 2))
+  override def scoutPlan: Plan = new If(new StartPositionsAtLeast(3), new ScoutOn(Protoss.Gateway, quantity = 2))
   override def attackPlan: Plan = new Trigger(new UnitsAtLeast(3, Protoss.Zealot, complete = true), new PvPIdeas.AttackSafely)
 
   override def emergencyPlans: Seq[Plan] = Seq(

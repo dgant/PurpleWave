@@ -23,8 +23,6 @@ class TvPDeep4 extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(TvPDeep4)
 
-  override def scoutExposPlan: Plan = NoPlan()
-
   override def attackPlan: Plan = new Parallel(
     new TvPIdeas.TvPAttack,
     new Trigger(

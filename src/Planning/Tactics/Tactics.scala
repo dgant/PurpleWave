@@ -6,24 +6,23 @@ import Planning.Plans.Army._
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.Protoss.Situational.{CatchDTRunby, DefendAgainstProxy}
 import Planning.Plans.Macro.Automatic.Gather
-import Planning.Plans.Scouting.ConsiderScoutingWithOverlords
+import Planning.Plans.Scouting.{ConsiderScoutingWithOverlords, ScoutExpansions, ShouldScoutExpansions}
 import Planning.Predicates.Compound.Check
 
 class Tactics {
-  private val yoloPlan                : Plan = new If(new Check(() => With.yolo.active()), new Attack)
-  private val scoutOverlordPlan       : Plan = new ConsiderScoutingWithOverlords
-  private val initialScoutPlan        : Plan = null
-  private val defendAgainstProxy      : Plan = new DefendAgainstProxy
-  private val defendBases             : Plan = new DefendBases
-  private val defendAgainstWorkerRush : Plan = new DefendAgainstWorkerRush
-  private val catchDTRunby            : Plan = new CatchDTRunby
-  private def scoutExposPlan          : Plan = null
-  private def attackPlan              : Plan = null
-  private val defendEntrance          : Plan = new DefendEntrance
-  private val gather                  : Plan = new Gather
-  private val chillOverlords          : Plan = new ChillOverlords
-  private val recruitFreelancers      : Plan = new RecruitFreelancers
-  private val scan                    : Plan = new Scan
+  private lazy val yoloPlan                 : Plan = new If(new Check(() => With.yolo.active()), new Attack)
+  private lazy val scoutOverlordPlan        : Plan = new ConsiderScoutingWithOverlords
+  private lazy val defendAgainstProxy       : Plan = new DefendAgainstProxy
+  private lazy val defendBases              : Plan = new DefendBases
+  private lazy val defendAgainstWorkerRush  : Plan = new DefendAgainstWorkerRush
+  private lazy val catchDTRunby             : Plan = new CatchDTRunby
+  private lazy val scoutExposPlan           : Plan = new If(new ShouldScoutExpansions, new ScoutExpansions)
+  private lazy val attackPlan               : Plan = new DoAttack
+  private lazy val defendEntrance           : Plan = new DefendEntrance
+  private lazy val gather                   : Plan = new Gather
+  private lazy val chillOverlords           : Plan = new ChillOverlords
+  private lazy val recruitFreelancers       : Plan = new RecruitFreelancers
+  private lazy val scan                     : Plan = new Scan
 
   def update(): Unit = {
     // TODO: Attack with units that can safely harass:
@@ -35,7 +34,7 @@ class Tactics {
     Vector(
       yoloPlan,
       scoutOverlordPlan,
-      initialScoutPlan,
+      With.blackboard.scoutPlan(),
       defendAgainstProxy,
       defendBases,
       defendAgainstWorkerRush,

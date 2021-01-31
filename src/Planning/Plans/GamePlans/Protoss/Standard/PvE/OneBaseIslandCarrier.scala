@@ -17,8 +17,7 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
 class OneBaseIslandCarrier extends GameplanTemplate {
 
-  override def initialScoutPlan: Plan = NoPlan()
-  override def scoutExposPlan: Plan = NoPlan()
+  override def scoutPlan: Plan = NoPlan()
   override def workerPlan: Plan = NoPlan()
 
   protected def extraSpaceZone: Zone = {

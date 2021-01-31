@@ -21,7 +21,7 @@ import ProxyBwapi.UnitClasses.UnitClass
 class TerranFFAMech extends GameplanTemplate {
   
   override def placementPlan : Plan  = new PlaceBunkersAtNatural(2)
-  override val initialScoutPlan     : Plan  = NoPlan()
+  override val scoutPlan     : Plan  = NoPlan()
   override def aggressionPlan: Plan = new Aggression(0.8)
   
   private class UpgradeMech extends Parallel(

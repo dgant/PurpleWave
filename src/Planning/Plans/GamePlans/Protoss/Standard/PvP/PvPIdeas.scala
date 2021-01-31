@@ -97,7 +97,6 @@ object PvPIdeas {
       new FrameAtMost(GameTime(10, 0)())),
     new Parallel(
       new WriteStatus("ReactToCannonRush"),
-      new Attack(Protoss.Reaver),
       new BuildOrder(ProtossBuilds.ZZCore: _*),
       new RequireSufficientSupply,
       new PumpWorkers,

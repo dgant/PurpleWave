@@ -16,13 +16,11 @@ import Strategery.Strategies.Terran.TvT2Base2Port
 
 class TvTLateGame extends GameplanTemplate {
 
-  override def attackPlan: Plan = new Parallel(
-    new Attack(Terran.Wraith),
-    new Trigger(
-      new Or(
-        new UnitsAtLeast(5, Terran.Factory, complete = true),
-        new TechStarted(Terran.WraithCloak)),
-      new Attack))
+  override def attackPlan: Plan = new Trigger(
+    new Or(
+      new UnitsAtLeast(5, Terran.Factory, complete = true),
+      new TechStarted(Terran.WraithCloak)),
+    new Attack)
 
   override def workerPlan: Plan = new Parallel(
     new Pump(Terran.Comsat),

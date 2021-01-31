@@ -5,7 +5,7 @@ import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
-import Planning.Plans.Army.{Attack, ConsiderAttacking}
+import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplateVsRandom
@@ -24,10 +24,7 @@ class PvRForgeDT extends GameplanTemplateVsRandom {
   override val activationCriteria = new Employing(PvR1BaseDT)
   override def initialScoutPlan = NoPlan()
 
-  override def attackPlan = new Parallel(
-    new Attack(Protoss.DarkTemplar),
-    new If(new UnitsAtLeast(6, Protoss.Gateway, complete = true), new ConsiderAttacking)
-  )
+  override def attackPlan = new If(new UnitsAtLeast(6, Protoss.Gateway, complete = true), new ConsiderAttacking)
 
   override lazy val blueprints = Vector(
     new Blueprint(Protoss.Pylon,        placement = Some(PlacementProfiles.hugTownHall)),

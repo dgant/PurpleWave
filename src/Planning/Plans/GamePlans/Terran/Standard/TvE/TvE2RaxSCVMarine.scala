@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvE
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, AllIn, Attack, EjectScout}
+import Planning.Plans.Army._
 import Planning.Plans.Basic.{NoPlan, Write}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -45,7 +45,7 @@ class TvE2RaxSCVMarine extends GameplanTemplate {
         new EnemiesAtLeast(1, Terran.Bunker),
         new EnemiesAtLeast(1, Protoss.PhotonCannon),
         new EnemiesAtLeast(1, Zerg.SunkenColony)),
-      new AllIn,
+      new AllInIf,
       new Aggression(2.0)),
     super.aggressionPlan)
 
@@ -53,7 +53,7 @@ class TvE2RaxSCVMarine extends GameplanTemplate {
     new ReadyToAttack,
     new Parallel(
       new Delay(GameTime(0, 7)(), new Attack),
-      new Attack(UnitMatchWorkers, new UnitCountExcept(4, UnitMatchWorkers))))
+      new AttackWithWorkers(new UnitCountExcept(4, UnitMatchWorkers))))
 
   override def supplyPlan: Plan = NoPlan()
 

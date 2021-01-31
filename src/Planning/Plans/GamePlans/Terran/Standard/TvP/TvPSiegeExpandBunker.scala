@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvP
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
-import Planning.Plans.Army.{Attack, ConsiderAttacking, EjectScout}
+import Planning.Plans.Army.{AttackWithWorkers, ConsiderAttacking, EjectScout}
 import Planning.Plans.Compound.{FlipIf, If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Terran.Situational.RepairBunker
@@ -31,11 +31,9 @@ class TvPSiegeExpandBunker extends GameplanTemplate {
 
   override def initialScoutPlan: Plan = new ScoutOn(Terran.Factory)
 
-  override def attackPlan = new Parallel(
-    new Attack(Terran.Vulture),
-    new If(
-      new EnemyStrategy(With.fingerprints.nexusFirst),
-      new ConsiderAttacking))
+  override def attackPlan = new If(
+    new EnemyStrategy(With.fingerprints.nexusFirst),
+    new ConsiderAttacking)
 
   override def buildOrder: Seq[BuildRequest] = Seq(
     Get(9,  Terran.SCV),
@@ -75,7 +73,7 @@ class TvPSiegeExpandBunker extends GameplanTemplate {
         new EnemyStrategy(With.fingerprints.nexusFirst)),
       new Parallel(
         new BuildBunkersAtEnemyNatural(1),
-        new Attack(Terran.SCV, UnitCountExactly(5))),
+        new AttackWithWorkers(UnitCountExactly(5))),
       new Parallel(
         new EjectScout,
         new PopulateBunkers,

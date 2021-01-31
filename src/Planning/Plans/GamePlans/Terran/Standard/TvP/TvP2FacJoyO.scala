@@ -25,13 +25,11 @@ class TvP2FacJoyO extends GameplanTemplate {
   override def initialScoutPlan: Plan = new ScoutOn(Terran.SupplyDepot, quantity = 2)
   override def aggressionPlan: Plan = new Aggression(1.5)
   
-  override def attackPlan: Plan = new Parallel(
-    new Attack(Terran.Vulture),
-    new Trigger(
-      new Or(
-        new UnitsAtLeast(3, UnitMatchSiegeTank, complete = true),
-        new EnemyStrategy(With.fingerprints.nexusFirst)),
-      new Attack))
+  override def attackPlan: Plan = new Trigger(
+    new Or(
+      new UnitsAtLeast(3, UnitMatchSiegeTank, complete = true),
+      new EnemyStrategy(With.fingerprints.nexusFirst)),
+    new Attack)
 
   val vulturesVs2Gate = 7
   override def emergencyPlans: Seq[Plan] = Seq(new If(

@@ -2,7 +2,6 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -17,10 +16,7 @@ class PvZLateGameTemplar extends GameplanTemplate {
 
   override val activationCriteria = new Employing(PvZLateGameTemplar)
 
-  override def attackPlan: Plan = new Parallel(
-    new Attack(Protoss.Corsair),
-    new Attack(Protoss.DarkTemplar),
-    new PvZIdeas.ConditionalAttack)
+  override def attackPlan: Plan = new PvZIdeas.ConditionalAttack
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvZIdeas.ReactToLurkers,

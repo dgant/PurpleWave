@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Army.{Aggression, Attack, AttackWithWorkers}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
@@ -17,7 +17,6 @@ import Planning.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.Employing
 import Planning.ProxyPlanner
 import Planning.UnitCounters.UnitCountExactly
-import Planning.UnitMatchers.{UnitMatchMobileFlying, UnitMatchWorkers}
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.{ZvTProxyHatchHydras, ZvTProxyHatchSunkens, ZvTProxyHatchZerglings}
 
@@ -161,8 +160,8 @@ class ZvTProxyHatch extends Parallel {
           new UnitsAtLeast(2, Zerg.Hatchery,      complete = false),
           new UnitsAtLeast(1, Zerg.SpawningPool,  complete = false),
           new Not(new WeHaveEnoughSunkens)),
-        new Attack(UnitMatchWorkers, UnitCountExactly(2)),
-        new Attack(UnitMatchMobileFlying))),
+        new AttackWithWorkers(UnitCountExactly(2)),
+        new Attack)),
     
     new Gather
   ))

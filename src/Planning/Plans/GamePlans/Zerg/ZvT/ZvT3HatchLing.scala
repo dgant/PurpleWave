@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{AllIn, Attack}
+import Planning.Plans.Army.{AllInIf, Attack}
 import Planning.Plans.Basic.{Do, Write}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -31,7 +31,7 @@ class ZvT3HatchLing extends GameplanTemplate {
       new Or(
         new EnemiesAtMost(0, Terran.Factory),
         new UpgradeComplete(Zerg.ZerglingSpeed)),
-      new Attack(Zerg.Zergling)))
+      new Attack))
 
   override def initialScoutPlan: Plan = new If(
     new And(
@@ -104,7 +104,7 @@ class ZvT3HatchLing extends GameplanTemplate {
         new EnemiesAtLeast(1, Terran.Vulture),
         new UpgradeComplete(Zerg.ZerglingSpeed),
         new UnitsAtMost(0, Zerg.Hydralisk, complete = true)),
-      new AllIn),
+      new AllInIf),
 
     new RequireMiningBases(3),
     new Trigger(

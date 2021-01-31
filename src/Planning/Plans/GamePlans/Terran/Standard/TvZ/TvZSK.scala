@@ -10,7 +10,6 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Placement.{BuildBunkersAtNatural, BuildMissileTurretsAtBases, BuildMissileTurretsAtNatural}
-import Planning.Plans.Scouting.ScoutExpansions
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyLurkers, EnemyMutalisks, SafeToMoveOut}
@@ -49,10 +48,7 @@ class TvZSK extends GameplanTemplate {
       new EnemiesAtLeast(4, UnitMatchOr(Zerg.SunkenColony, Zerg.CreepColony))))
 
   override def initialScoutPlan: Plan = NoPlan()
-  override def attackPlan: Plan = new Parallel(
-    new If(new CanAttack, new Attack),
-    new ScoutExpansions(Terran.Wraith),
-    new Attack(Terran.Battlecruiser))
+  override def attackPlan: Plan = new If(new CanAttack, new Attack)
   override def workerPlan: Plan = new Parallel(
     new Pump(Terran.NuclearSilo, 1),
     new Trigger(

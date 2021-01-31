@@ -53,7 +53,7 @@ class ZvZ10HatchLing extends GameplanTemplate {
   override def initialScoutPlan: Plan = NoPlan()
   
   override def attackPlan: Plan = new Parallel(
-    new Attack(Zerg.Mutalisk),
+    new If(new UnitsAtLeast(1, Zerg.Mutalisk, complete = true), new Attack),
     new If(
       new EnemiesAtLeast(1, Zerg.Mutalisk),
       new Attack,
@@ -85,7 +85,7 @@ class ZvZ10HatchLing extends GameplanTemplate {
             new CapGasAtRatioToMinerals(3.0, margin = 75), // For Scourge
             new CapGasAtRatioToMinerals(1.0, margin = 75))))), // For Mutalisk
 
-    new AllIn(
+    new AllInIf(
       new And(
         new UnitsAtMost(0, Zerg.Mutalisk, complete = true),
         new Or(

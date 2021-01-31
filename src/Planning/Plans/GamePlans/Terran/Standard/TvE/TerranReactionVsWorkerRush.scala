@@ -24,7 +24,7 @@ class TerranReactionVsWorkerRush extends GameplanTemplate {
     Get(8, Terran.SCV),
     Get(Terran.Barracks))
 
-  override def attackPlan: Plan = new Attack(Terran.Vulture)
+  override def attackPlan: Plan = new If(new UnitsAtLeast(1, Terran.Vulture), new Attack)
 
   override def workerPlan: Plan = NoPlan()
 

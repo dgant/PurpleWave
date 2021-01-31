@@ -24,14 +24,12 @@ class TvPFDStrong extends GameplanTemplate {
   override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
 
   override def initialScoutPlan: Plan = new ScoutAt(13)
-  override def attackPlan: Plan = new Parallel(
-    new Attack(Terran.Vulture),
-    new Trigger(
-      new UnitsAtLeast(2, UnitMatchSiegeTank, complete = true),
-      new If(
-        new EnemiesAtLeast(2, Protoss.Gateway),
-        new ConsiderAttacking,
-        new Attack)))
+  override def attackPlan: Plan = new Trigger(
+    new UnitsAtLeast(2, UnitMatchSiegeTank, complete = true),
+    new If(
+      new EnemiesAtLeast(2, Protoss.Gateway),
+      new ConsiderAttacking,
+      new Attack))
   
   override def emergencyPlans: Seq[Plan] = super.emergencyPlans ++
     TvPIdeas.emergencyPlans

@@ -4,20 +4,17 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Predicates.Compound.Not
-import Planning.UnitCounters.UnitCountOne
-import Planning.{Plan, Predicate}
 import Planning.Plans.Army.{Aggression, Attack}
-import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.Scouting.ScoutWithZergling
+import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy.Employing
+import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.ZvT13PoolMuta
 
@@ -31,10 +28,9 @@ class ZvT13PoolMuta extends GameplanTemplate {
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new ZvTIdeas.ReactToBarracksCheese,
-    new ZergReactionVsWorkerRush
-  )
+    new ZergReactionVsWorkerRush)
 
-  override def attackPlan: Plan = new Attack(Zerg.Mutalisk)
+  override def attackPlan: Plan = new If(new UnitsAtLeast(1, Zerg.Mutalisk, complete = true), new Attack)
   
   override def buildOrderPlan: Plan = new Parallel (
     new BuildOrder(

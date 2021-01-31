@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Attack, Chill, ConsiderAttacking, EjectScout}
+import Planning.Plans.Army.{ConsiderAttacking, EjectScout}
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{FlipIf, If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -12,7 +12,6 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Placement.BuildSunkensAtNatural
 import Planning.Predicates.Compound.{And, Latch, Not, Sticky}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.SafeToMoveOut
 import Planning.Predicates.Strategy.EnemyStrategy
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
@@ -23,16 +22,14 @@ class ZvTMidgame extends GameplanTemplate {
 
   class GoMutalisk extends Sticky(new Not(new EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.oneRaxFE)))
 
-  override def attackPlan: Plan = new Parallel(
-    new Attack(Zerg.Mutalisk),
-    new If(
-      new Or(
-        new UnitsAtLeast(1, Zerg.Lurker, complete = true),
-        new EnemiesAtMost(0, Terran.Vulture),
-        new And(
-          new UpgradeComplete(Zerg.ZerglingSpeed),
-          new Not(new EnemyHasUpgrade(Terran.VultureSpeed)))),
-      new ConsiderAttacking))
+  override def attackPlan: Plan = new If(
+    new Or(
+      new UnitsAtLeast(1, Zerg.Lurker, complete = true),
+      new EnemiesAtMost(0, Terran.Vulture),
+      new And(
+        new UpgradeComplete(Zerg.ZerglingSpeed),
+        new Not(new EnemyHasUpgrade(Terran.VultureSpeed)))),
+    new ConsiderAttacking)
 
   override def buildPlans: Seq[Plan] = Seq(
     new EjectScout,

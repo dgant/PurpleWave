@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.WriteStatus
-import Planning.Plans.Compound.{If, Trigger, _}
+import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.Protoss.Situational.{BuildHuggingNexus, DefendFightersAgainstRush}
 import Planning.Plans.Macro.Automatic.{PumpWorkers, _}
 import Planning.Plans.Macro.Build.CancelIncomplete
@@ -22,11 +22,6 @@ import Strategery.Strategies.Protoss._
 import Utilities.{GameTime, Minutes}
 
 object PvTIdeas {
-
-  class PvTAttack extends Trigger(
-    new UnitsAtLeast(4, Protoss.Carrier, complete = true),
-    new Attack,
-    new Attack(UnitMatchAnd(UnitMatchRecruitableForCombat, UnitMatchNot(UnitMatchWorkers), UnitMatchNot(Protoss.Carrier))))
 
   class EnemyBarracksCheese extends And(
     new EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113),
@@ -67,7 +62,7 @@ object PvTIdeas {
                 new Latch(new UnitsAtLeast(12, UnitMatchWarriors)),
                 new Not(new EnemyStrategy(With.fingerprints.threeFac))),
               new Not(new EnemyStrategy(With.fingerprints.twoFac, With.fingerprints.threeFac))))),
-          new PvTAttack)))
+          new Attack)))
 
   class ReactToFiveRaxAs2GateCore extends Parallel(
     new If(

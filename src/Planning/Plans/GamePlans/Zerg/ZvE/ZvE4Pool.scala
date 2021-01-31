@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.{Aggression, AllIn, Attack}
+import Planning.Plans.Army.{Aggression, AllInIf, Attack}
 import Planning.Plans.Basic.{NoPlan, Write}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -50,7 +50,7 @@ class ZvE4Pool extends GameplanTemplate {
   override def buildPlans: Seq[Plan] = Vector(
     new CapGasAt(0, 0),
     new Write(With.blackboard.pushKiters, true),
-    new AllIn(new EnemiesAtLeast(1, Protoss.PhotonCannon)),
+    new AllInIf(new EnemiesAtLeast(1, Protoss.PhotonCannon)),
   
     new Pump(Zerg.Drone, 3),
     

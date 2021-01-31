@@ -49,7 +49,8 @@ class Tactics {
       recruitFreelancers,
       scan).foreach(_.update())
 
-      // TODO: EjectScout
-      // TODO: EscortSettlers is no longer being used but we do need to do it
+    // TODO: EjectScout
+    // TODO: EscortSettlers is no longer being used but we do need to do it
+    // TODO: Hide Carriers until 4x vs. Terran
   }
 }

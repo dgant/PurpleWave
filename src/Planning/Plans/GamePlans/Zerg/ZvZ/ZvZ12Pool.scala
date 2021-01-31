@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvZ
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{AllIn, Attack, ConsiderAttacking}
+import Planning.Plans.Army.{AllInIf, Attack, ConsiderAttacking}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -25,9 +25,9 @@ class ZvZ12Pool extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(ZvZ12Pool)
 
   override def initialScoutPlan: Plan = NoPlan()
-  
+
   override def attackPlan: Plan = new Parallel(
-    new Attack(Zerg.Mutalisk),
+    new If(new UnitsAtLeast(1, Zerg.Mutalisk, complete = true), new Attack),
     new If(
       new EnemyHasShown(Zerg.Mutalisk),
       new Attack),
@@ -47,10 +47,10 @@ class ZvZ12Pool extends GameplanTemplate {
     Get(Zerg.SpawningPool),
     Get(13, Zerg.Drone),
     Get(Zerg.Extractor))
-  
+
   override def buildPlans: Seq[Plan] = Vector(
 
-    new AllIn(
+    new AllInIf(
       new And(
         new UnitsAtMost(0, Zerg.Spire, complete = true),
         new EnemiesAtLeast(1, Zerg.Mutalisk))),

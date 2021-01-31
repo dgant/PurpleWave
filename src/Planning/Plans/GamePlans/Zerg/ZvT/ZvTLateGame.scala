@@ -15,13 +15,10 @@ import ProxyBwapi.Races.{Terran, Zerg}
 
 class ZvTLateGame extends GameplanTemplate  {
 
-  override def attackPlan: Plan = new Parallel(
-    new Attack(Zerg.Mutalisk),
-    new If(
-      new BasesAtLeast(3),
-      new Attack,
-      new ConsiderAttacking)
-  )
+  override def attackPlan: Plan = new If(
+    new BasesAtLeast(3),
+    new Attack,
+    new ConsiderAttacking)
 
   override def buildPlans: Seq[Plan] = Seq(
 

@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.{Aggression, AllIn, Attack}
+import Planning.Plans.Army.{Aggression, AllInIf, Attack}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -69,7 +69,7 @@ class ZvE9Pool2HatchSpeed extends GameplanTemplate {
               new Or(
                 new EnemyBasesAtLeast(2),
                 new EnemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.twelveHatch, With.fingerprints.twelvePool)))),
-          new AllIn),
+          new AllInIf),
 
         new Build(Get(2, Zerg.Hatchery)),
         new If(new UnitsAtLeast(2, Zerg.Hatchery), new Build(Get(Zerg.Extractor))),

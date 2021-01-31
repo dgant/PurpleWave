@@ -50,10 +50,8 @@ class ZvT2HatchLurker extends GameplanTemplate {
       new ScoutWithWorkers))
 
   override def attackPlan: Plan = new Parallel(
-    new Attack(Zerg.Mutalisk),
-    new If(
-      new TechComplete(Zerg.LurkerMorph),
-      new Attack),
+    new If(new UnitsAtLeast(1, Zerg.Mutalisk, complete = true), new Attack),
+    new If(new TechComplete(Zerg.LurkerMorph), new Attack),
     new If(
       new EnemyMech,
       new If(

@@ -2,8 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvT
 
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
-import Planning.Plans.Army.{Attack, ConsiderAttacking}
-import Planning.Plans.Compound.{FlipIf, Parallel}
+import Planning.Plans.Compound.FlipIf
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
@@ -17,10 +16,6 @@ class TvT2Port extends GameplanTemplate {
 
   override val activationCriteria = new Employing(TvT2Port)
   override val completionCriteria = new Latch(new MiningBasesAtLeast(2))
-
-  override def attackPlan: Plan = new Parallel(
-    new Attack(Terran.Wraith),
-    new ConsiderAttacking)
 
   override def workerPlan: Plan = new PumpWorkers(oversaturate = false)
 

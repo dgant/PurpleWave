@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.{Attack, AttackWithWorkers}
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
@@ -43,8 +43,8 @@ class TvZ8Rax extends GameplanTemplate {
         new CanBunkerRush,
         new If(
           new UnitsAtMost(0, Terran.Bunker, complete = true),
-          new Attack(Terran.SCV, new UnitCountExcept(8, Terran.SCV)),
-          new Attack(Terran.SCV, UnitCountExactly(2))))))
+          new AttackWithWorkers(new UnitCountExcept(8, Terran.SCV)),
+          new AttackWithWorkers(UnitCountExactly(2))))))
 
   override def initialScoutPlan: Plan = new If(
     new Not(new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.fourPool)),

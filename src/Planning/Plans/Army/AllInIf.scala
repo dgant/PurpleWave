@@ -4,7 +4,7 @@ import Lifecycle.With
 import Planning.{Plan, Predicate, Property}
 import Planning.Predicates.Always
 
-class AllIn(initialPredicate: Predicate = new Always) extends Plan {
+class AllInIf(initialPredicate: Predicate = new Always) extends Plan {
   
   val predicate: Property[Predicate] = new Property(initialPredicate)
   

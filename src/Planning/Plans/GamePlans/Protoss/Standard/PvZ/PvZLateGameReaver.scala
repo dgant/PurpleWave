@@ -2,7 +2,6 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.PvZRequireMiningBases
@@ -19,9 +18,7 @@ class PvZLateGameReaver extends GameplanTemplate {
 
   override val activationCriteria = new Employing(PvZLateGameReaver)
 
-  override def attackPlan: Plan = new Parallel(
-    new Attack(Protoss.Corsair),
-    new PvZIdeas.ConditionalAttack)
+  override def attackPlan: Plan = new PvZIdeas.ConditionalAttack
 
   override def emergencyPlans: Seq[Plan] = Seq(new PvZIdeas.ReactToLurkers)
 

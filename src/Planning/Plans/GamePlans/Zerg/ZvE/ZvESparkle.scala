@@ -42,7 +42,7 @@ class ZvESparkle extends GameplanTemplate {
   
   override def aggressionPlan: Plan = new Aggression(0.8)
   
-  override def attackPlan: Plan = new Attack(Zerg.Mutalisk)
+  override def attackPlan: Plan = new If(new UnitsAtLeast(1, Zerg.Mutalisk, complete = true), new Attack)
   
   override def buildOrderPlan: Plan = new Parallel (
     new BuildOrder(

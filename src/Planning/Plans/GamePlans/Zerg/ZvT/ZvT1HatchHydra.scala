@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
-import Planning.Plans.Army.{AllIn, Attack}
+import Planning.Plans.Army.{AllInIf, Attack}
 import Planning.Plans.Basic.Write
 import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -61,7 +61,7 @@ class ZvT1HatchHydra extends GameplanTemplate {
   override def buildPlans = Seq(
     new Write(With.blackboard.pushKiters, true),
     new FloorGasWorkersAt(1),
-    new AllIn(new EnemiesAtLeast(1, Terran.Bunker)),
+    new AllInIf(new EnemiesAtLeast(1, Terran.Bunker)),
     new If(
       new GasForUnit(Zerg.HydraliskDen),
       new If(

@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.{Plan, Predicate}
-import Planning.Plans.Army.{AllIn, Attack}
+import Planning.Plans.Army.{AllInIf, Attack}
 import Planning.Plans.Basic.Write
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -53,7 +53,7 @@ class ZvT7Pool extends GameplanTemplate {
 
   override def buildPlans: Seq[Plan] = Seq(
     new Write(With.blackboard.pushKiters, true),
-    new AllIn(new EnemiesAtLeast(1, UnitMatchOr(Terran.Vulture, Terran.Factory), complete = true)),
+    new AllInIf(new EnemiesAtLeast(1, UnitMatchOr(Terran.Vulture, Terran.Factory), complete = true)),
     new If(
       new GasForUpgrade(Zerg.ZerglingSpeed),
       new CapGasWorkersAt(0),

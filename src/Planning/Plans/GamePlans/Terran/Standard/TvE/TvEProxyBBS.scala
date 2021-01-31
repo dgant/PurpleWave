@@ -5,7 +5,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Army.{Aggression, Attack, AttackWithWorkers}
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -44,7 +44,7 @@ class TvEProxyBBS extends GameplanTemplate {
     new Attack,
     new Trigger(
       new UnitsAtLeast(2, Terran.Marine),
-      new Attack(UnitMatchWorkers, new UnitCountExcept(8, UnitMatchWorkers))))
+      new AttackWithWorkers(new UnitCountExcept(8, UnitMatchWorkers))))
   
   override def workerPlan: Plan = NoPlan()
   override def supplyPlan: Plan = new If(

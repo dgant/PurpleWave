@@ -13,7 +13,6 @@ import Planning.Plans.Placement.BuildMissileTurretsAtBases
 import Planning.Predicates.Compound.Latch
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.Employing
-import Planning.UnitMatchers.UnitMatchOr
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvT2BaseBC
 
@@ -22,7 +21,7 @@ class TvT2BaseBC extends GameplanTemplate {
   override val activationCriteria = new Employing(TvT2BaseBC)
   override val completionCriteria = new Latch(new MiningBasesAtLeast(3))
 
-  override def attackPlan: Plan = new Parallel(new Attack(UnitMatchOr(Terran.Wraith, Terran.Battlecruiser)))
+  override def attackPlan: Plan = new If(new UnitsAtLeast(1, Terran.Battlecruiser, complete = true), new Attack)
 
   override def workerPlan: Plan = new Parallel(
     new Pump(Terran.Comsat),

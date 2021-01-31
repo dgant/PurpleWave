@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{AllIn, Attack, EjectScout}
+import Planning.Plans.Army.{AllInIf, Attack, EjectScout}
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
@@ -58,7 +58,7 @@ class ZvT2HatchLingBustMuta extends GameplanTemplate {
     new If(
       new EnemiesAtLeast(1, Terran.Vulture),
       new Parallel(
-        new AllIn(new Not(new EnemyWalledIn)),
+        new AllInIf(new Not(new EnemyWalledIn)),
         new BuildSunkensAtNatural(1),
         new BuildSunkensAtExpansions(1)
       )),

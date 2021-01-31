@@ -8,7 +8,6 @@ import Strategery.Strategies.Protoss._
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TvE._
 import Strategery.Strategies.Terran.TvR.TvR1Rax
-import Strategery.Strategies.Terran.TvZ.TvZProxy8Fact
 import Strategery.Strategies.Terran._
 import Strategery.Strategies.Zerg._
 
@@ -30,7 +29,6 @@ object StrategyGroups {
 
     TvEWorkerRushLiftoff,
     TvR1Rax, // Why is this disabled? Is it broken?
-    TvZProxy8Fact,
     TvZ2RaxNuke,
 
     PvROpenZZCore,

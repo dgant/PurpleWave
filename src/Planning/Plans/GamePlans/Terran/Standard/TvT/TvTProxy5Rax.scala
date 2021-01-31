@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Army.{Aggression, Attack, AttackWithWorkers}
 import Planning.Plans.Basic.{Do, NoPlan, Write}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -44,7 +44,7 @@ class TvTProxy5Rax extends GameplanTemplate {
   override def aggressionPlan = new Aggression(1.5)
   override def workerPlan: Plan = NoPlan()
   override def supplyPlan: Plan = NoPlan()
-  override def attackPlan: Plan = new Parallel(new Attack, new Attack(UnitMatchWorkers, new UnitCountExcept(3, UnitMatchWorkers)))
+  override def attackPlan: Plan = new Parallel(new Attack, new AttackWithWorkers(new UnitCountExcept(3, UnitMatchWorkers)))
 
   override val buildOrder = Vector(
     Get(5, Terran.SCV),

@@ -3,6 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.{Attack, EjectScout}
+import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.PvZRequireMiningBases
@@ -21,7 +22,7 @@ class PvZCorsairReaver extends GameplanTemplate {
   override val activationCriteria = new Employing(PvZMidgameCorsairReaverGoon)
   override val completionCriteria = new Latch(new BasesAtLeast(3))
   override def archonPlan: Plan = new PvZIdeas.TemplarUpToEight
-  override def attackPlan: Plan = new Attack(Protoss.Corsair)
+  override def attackPlan: Plan = NoPlan()
 
   override def emergencyPlans: Seq[Plan] = Seq(new PvZIdeas.ReactToLurkers)
 

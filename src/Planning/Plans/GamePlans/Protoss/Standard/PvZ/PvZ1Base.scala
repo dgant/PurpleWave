@@ -44,9 +44,6 @@ abstract class PvZ1Base extends GameplanTemplate {
   override def attackPlan: Plan = new Parallel(
     new Chill(Protoss.HighTemplar),
     new If(
-      new And(new EnemiesAtMost(0, Zerg.Mutalisk), new EnemiesAtMost(0, Zerg.Scourge)),
-      new Attack(Protoss.Corsair)),
-    new If(
       new Or(
         new UpgradeComplete(Protoss.GroundDamage),
         new UnitsAtLeast(6, Protoss.Dragoon, complete = true)),

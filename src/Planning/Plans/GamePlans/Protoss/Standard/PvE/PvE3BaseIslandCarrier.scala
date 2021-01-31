@@ -79,7 +79,6 @@ class PvE3BaseIslandCarrier extends Parallel {
     new OnGasPumps(4, new Build(Get(12, Protoss.Stargate))),
     new Pump(Protoss.PhotonCannon, maximumConcurrently = 3),
     new ExpandOverIsland(12),
-    new Attack(Protoss.Scout), // TODO: Scout expansions, don't attack
     new DefendBases,
     new If(
       new UnitsAtLeast(8 * 8, Protoss.Interceptor),

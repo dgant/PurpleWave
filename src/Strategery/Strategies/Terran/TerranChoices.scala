@@ -3,7 +3,6 @@ package Strategery.Strategies.Terran
 import Strategery.Strategies.Terran.FFA.TerranFFABio
 import Strategery.Strategies.Terran.TvE._
 import Strategery.Strategies.Terran.TvR.{TvR1Rax, TvRTinfoil}
-import Strategery.Strategies.Terran.TvZ.TvZProxy8Fact
 import Strategery.Strategies._
 
 object TerranChoices {
@@ -53,7 +52,6 @@ object TerranChoices {
     TvZ1RaxFE,
     TvZ2RaxAcademy,
     TvZ8Rax,
-    TvZProxy8Fact,
   )
   
   val normalOpeners: Vector[Strategy] = (tvr ++ tvtOpeners ++ tvpOpeners ++ tvzOpeners).distinct

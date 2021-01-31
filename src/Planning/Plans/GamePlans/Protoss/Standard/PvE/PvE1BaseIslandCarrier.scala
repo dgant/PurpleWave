@@ -1,16 +1,14 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvE
 
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.BuildOrders.BuildOrder
-import Planning.Predicates.Compound.And
-import Planning.Predicates.Milestones.{EnemiesAtMost, UnitsAtLeast}
+import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy.Employing
 import Planning.{Plan, Predicate}
-import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.Races.Protoss
 import Strategery.Sparkle
 import Strategery.Strategies.Protoss.PvE.PvE1BaseIslandCarrier
 
@@ -22,13 +20,9 @@ class PvE1BaseIslandCarrier extends GameplanTemplate {
   override def scoutExposPlan: Plan = NoPlan()
   override def workerPlan: Plan = NoPlan()
 
-  override def attackPlan: Plan = new Parallel(
-    new If(
-      new And(new EnemiesAtMost(0, Zerg.Scourge), new EnemiesAtMost(0, Zerg.Mutalisk)),
-      new Attack(Protoss.Corsair)),
-    new Trigger(
-      new UnitsAtLeast(4, Protoss.Carrier, complete = true),
-      super.attackPlan))
+  override def attackPlan: Plan = new Trigger(
+    new UnitsAtLeast(4, Protoss.Carrier, complete = true),
+    super.attackPlan)
 
   override def placementPlan: Plan = new PlaceIslandPylons
 

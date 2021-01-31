@@ -12,6 +12,6 @@ abstract class SquadPlan[T <: SquadGoal] extends Plan {
   
   override def onUpdate() {
     squad.setGoal(goal)
-    With.squads.commission(squad)
+    squad.commission()
   }
 }

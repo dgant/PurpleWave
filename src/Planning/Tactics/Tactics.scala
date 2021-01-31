@@ -10,7 +10,6 @@ import Planning.Plans.Scouting.ConsiderScoutingWithOverlords
 import Planning.Predicates.Compound.Check
 
 class Tactics {
-
   private val yoloPlan                : Plan = new If(new Check(() => With.yolo.active()), new Attack)
   private val scoutOverlordPlan       : Plan = new ConsiderScoutingWithOverlords
   private val initialScoutPlan        : Plan = null

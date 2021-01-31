@@ -1,14 +1,14 @@
 package Macro.Allocation
 
 import Lifecycle.With
-import Planning.Plan
+import Planning.Prioritized
 
 import scala.collection.mutable
 
 class Prioritizer {
   
-  private val priorities: mutable.HashMap[Plan, Integer] = new mutable.HashMap[Plan, Integer] {
-    override def default(key: Plan): Integer = Integer.MAX_VALUE
+  private val priorities: mutable.HashMap[Prioritized, Integer] = new mutable.HashMap[Prioritized, Integer] {
+    override def default(key: Prioritized): Integer = Integer.MAX_VALUE
   }
   
   var nextPriority: Int = 0
@@ -25,19 +25,19 @@ class Prioritizer {
     priorities.clear()
   }
   
-  def all: List[(Plan, Integer)] = priorities.toList.sortBy(_._2)
+  def all: List[(Prioritized, Integer)] = priorities.toList.sortBy(_._2)
   
-  def isPrioritized(plan: Plan): Boolean = {
-    priorities.contains(plan)
+  def isPrioritized(client: Prioritized): Boolean = {
+    priorities.contains(client)
   }
   
-  def getPriority(plan: Plan): Integer = {
-    priorities(plan)
+  def getPriority(client: Prioritized): Integer = {
+    priorities(client)
   }
   
-  def prioritize(plan: Plan) {
-    if ( ! priorities.contains(plan)) {
-      priorities.put(plan, nextPriority)
+  def prioritize(client: Prioritized) {
+    if ( ! priorities.contains(client)) {
+      priorities.put(client, nextPriority)
       nextPriority += 1
     }
   }

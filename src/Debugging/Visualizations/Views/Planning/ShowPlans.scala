@@ -8,7 +8,7 @@ import Planning.Plans.Basic.NoPlan
 object ShowPlans extends View {
   
   override def renderMap() {
-    With.prioritizer.all.foreach(_._1.renderMap())
+    With.prioritizer.all.view.filter(_._1.isInstanceOf[Plan]).foreach(_._1.asInstanceOf[Plan].renderMap())
   }
 
   var screenEnabled = false

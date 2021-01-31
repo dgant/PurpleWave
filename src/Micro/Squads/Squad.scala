@@ -1,5 +1,6 @@
 package Micro.Squads
 
+import Lifecycle.With
 import Micro.Squads.Goals.{GoalChill, SquadGoal}
 import Performance.Cache
 import Planning.Plan
@@ -24,6 +25,8 @@ class Squad(val client: Plan) {
   private val leaders: Cache[Map[UnitClass, FriendlyUnitInfo]] = new Cache(() =>
     units.toSeq.groupBy(_.unitClass).map(group => (group._1, group._2.maxBy(unit => age.getOrElse(unit, 0))))
   )
+
+  def commission(): Unit = { With.squads.commission(this) }
 
   //////////////////
   // Goal aspects //

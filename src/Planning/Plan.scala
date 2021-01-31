@@ -2,7 +2,7 @@ package Planning
 
 import Lifecycle.With
 
-class Plan {
+class Plan extends Prioritized {
   
   val description = new Property[String](realName)
   val frameCreated = With.frame
@@ -35,9 +35,6 @@ class Plan {
       description.get
     else
       if (description.get == "") realName else description.get
-  
-  final def isPrioritized: Boolean = With.prioritizer.isPrioritized(this)
-  final def priority: Int = With.prioritizer.getPriority(this)
 
   def isEmpty: Boolean = false
 

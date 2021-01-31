@@ -73,7 +73,6 @@ abstract class GameplanTemplate extends GameplanMode {
             new ClearBurrowedBlockers,
             new FollowBuildOrder,
             new RemoveMineralBlocksAt(removeMineralBlocksAt))
-          ++ tacticsPlans
       )
     }
     super.onUpdate()

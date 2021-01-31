@@ -89,7 +89,7 @@ class DefendAgainstProxy extends Plan {
     squad.enemies = defendersAssigned.values.toSeq.distinct
     squad.setGoal(new GoalRazeProxies(defendersAssigned.toMap))
     squad.addConscripts(defenders.get.units)
-    With.squads.commission(squad)
+    squad.commission()
   }
   
   private def getProxies: Iterable[UnitInfo] = {

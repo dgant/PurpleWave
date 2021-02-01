@@ -3,17 +3,14 @@ package Planning.Plans.Army
 import Lifecycle.With
 import Planning.Plan
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.{UnitCountEverything, UnitCounter}
-import Planning.UnitMatchers.{UnitMatchRecruitableForCombat, UnitMatcher}
+import Planning.UnitCounters.UnitCountEverything
+import Planning.UnitMatchers.UnitMatchRecruitableForCombat
 
-class RecruitFreelancers(
-  initialMatcher: UnitMatcher = UnitMatchRecruitableForCombat,
-  initialCounter: UnitCounter = UnitCountEverything) extends Plan {
+class RecruitFreelancers extends Plan {
   
-  val freelancers: LockUnits = new LockUnits {
-    unitMatcher.set(initialMatcher)
-    unitCounter.set(initialCounter)
-  }
+  val freelancers: LockUnits = new LockUnits
+  freelancers.unitMatcher.set(UnitMatchRecruitableForCombat)
+  freelancers.unitCounter.set(UnitCountEverything)
   
   override def onUpdate() {
     freelancers.acquire(this)

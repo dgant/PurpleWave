@@ -26,11 +26,9 @@ class BuildAddon(val addonClass: UnitClass) extends ProductionPlan {
     override def apply(unit: UnitInfo): Boolean = unit.addon.forall(addon.contains)
   })
   
-  val builderLock: LockUnits = new LockUnits {
-    description.set("Get a builder")
-    unitCounter.set(UnitCountOne)
-    unitMatcher.set(builderMatcher)
-  }
+  val builderLock: LockUnits = new LockUnits
+  builderLock.unitCounter.set(UnitCountOne)
+  builderLock.unitMatcher.set(builderMatcher)
     
   description.set("Add on a " + addonClass)
   

@@ -7,7 +7,8 @@ import Planning.UnitMatchers.UnitMatchWorkers
 
 class Gather extends Plan {
 
-  val workerLock: LockUnits = new LockUnits { unitMatcher.set(UnitMatchWorkers) }
+  val workerLock: LockUnits = new LockUnits
+  workerLock.unitMatcher.set(UnitMatchWorkers)
 
   override def onUpdate() {
     workerLock.acquire(this)

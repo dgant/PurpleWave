@@ -16,12 +16,11 @@ abstract class AbstractScoutPlan extends Plan {
   protected def replaceDeadScouts: Boolean = true
   protected final def enemyFound: Boolean = With.scouting.enemyMain.isDefined
 
-  protected val scoutLock: LockUnits = new LockUnits {
-    unitMatcher.set(UnitMatchMobile)
-    unitCounter.set(UnitCountOne)
-    unitPreference.set(UnitPreferIdle)
-    interruptable.set(false)
-  }
+  protected val scoutLock: LockUnits = new LockUnits
+  scoutLock.unitMatcher.set(UnitMatchMobile)
+  scoutLock.unitCounter.set(UnitCountOne)
+  scoutLock.unitPreference.set(UnitPreferIdle)
+  scoutLock.interruptable.set(false)
 
   protected final def getScouts(matcher: UnitMatcher, count: Int): Iterable[FriendlyUnitInfo] = {
     if (scoutLock.units.size > count) {

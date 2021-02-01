@@ -10,7 +10,7 @@ import Utilities.ByOption
 
 import scala.collection.mutable
 
-class LockUnits extends {
+class LockUnits {
   
   var canPoach          = new Property[Boolean](false)
   var interruptable     = new Property[Boolean](true)

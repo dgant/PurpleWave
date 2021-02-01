@@ -21,10 +21,10 @@ object ProtossChoices {
     ProtossHuntersFFAAggroGateway,
     ProtossHuntersFFAFFEScoutReaver,
     ProtossHuntersFFAFFECarriers,
+    ProtossBigFFACarriers,
     PvE1BaseIslandCarrier,
     PvE15BaseIslandCarrier,
     PvE2BaseIslandCarrier,
-    PvE3BaseIslandCarrier
   )
   
   /////////
@@ -63,7 +63,6 @@ object ProtossChoices {
     PvE1BaseIslandCarrier,
     PvE15BaseIslandCarrier,
     PvE2BaseIslandCarrier,
-    PvE3BaseIslandCarrier
   )
 
   val pvpOpenersWithoutTransitions = Vector(
@@ -98,7 +97,7 @@ object ProtossChoices {
     PvZProxy2Gate,
     PvZ1BaseForgeTech,
   )
-  
+
   val pvzOpenersTransitioningFrom1GateCore = Vector(
     PvZ10Gate
   )
@@ -120,12 +119,6 @@ object ProtossChoices {
   /////////
   // All //
   /////////
-  
-  val gimmickOpeners = Vector(
-    PvE3BaseIslandCarrier,
-    ProtossBigFFACarriers)
-  
-  val standardOpeners: Vector[Strategy] = (pvr ++ pvtOpenersAll ++ pvpOpenersAll ++ pvzOpenersAll).distinct
-  
-  val all: Vector[Strategy] = (gimmickOpeners ++ standardOpeners).distinct
+
+  val all: Vector[Strategy] = (pvr ++ pvtOpenersAll ++ pvpOpenersAll ++ pvzOpenersAll).distinct
 }

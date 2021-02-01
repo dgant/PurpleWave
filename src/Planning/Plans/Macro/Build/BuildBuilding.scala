@@ -29,11 +29,10 @@ class BuildBuilding(val buildingClass: UnitClass) extends ProductionPlan {
   val currencyLock = new LockCurrencyForUnit(buildingClass)
 
   val builderMatcher: UnitClass = buildingClass.whatBuilds._1
-  val builderLock: LockUnits = new LockUnits {
-    unitCounter.set(UnitCountOne)
-    unitMatcher.set(builderMatcher)
-    interruptable.set(false)
-  }
+  val builderLock: LockUnits = new LockUnits
+  builderLock.unitCounter.set(UnitCountOne)
+  builderLock.unitMatcher.set(builderMatcher)
+  builderLock.interruptable.set(false)
     
   var waitForBuilderToRecallUntil: Option[Int] = None
   var placement: Option[PlacementRequest] = None

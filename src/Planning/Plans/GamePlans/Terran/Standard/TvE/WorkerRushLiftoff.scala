@@ -5,14 +5,14 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Mathematics.Points.{Pixel, Tile}
 import Micro.Agency.Intention
-import Planning.ResourceLocks.LockUnits
-import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete, UnitMatchWorkers, UnitMatcher}
 import Planning.Plans.Army.AttackWithWorkers
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.BuildOrders.{BuildOrder, FollowBuildOrder}
+import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountEverything
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete, UnitMatchWorkers}
 import ProxyBwapi.Races.Terran
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
 class WorkerRushLiftoff extends Parallel {
@@ -24,9 +24,7 @@ class WorkerRushLiftoff extends Parallel {
   ))
   
   val dyingLock = new LockUnits
-  dyingLock.unitMatcher.set(new UnitMatcher {
-    override def apply(unit: UnitInfo) = unit.totalHealth < 21
-  })
+  dyingLock.unitMatcher.set((unit) => unit.totalHealth < 21)
   dyingLock.unitCounter.set(UnitCountEverything)
   
   val flyerLock = new LockUnits

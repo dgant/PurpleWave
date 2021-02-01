@@ -9,7 +9,6 @@ object ProtossChoices {
   val pvr = Vector(
     PvROpen2Gate910,
     PvROpen2Gate1012,
-    PvROpenZZCore,
     PvROpenZCoreZ,
     PvRDT,
     PvRProxy2Gate,
@@ -123,9 +122,7 @@ object ProtossChoices {
   /////////
   
   val gimmickOpeners = Vector(
-    PvTProxyDarkTemplar,
     PvE3BaseIslandCarrier,
-    CarriersWithNoDefense,
     ProtossBigFFACarriers)
   
   val standardOpeners: Vector[Strategy] = (pvr ++ pvtOpenersAll ++ pvpOpenersAll ++ pvzOpenersAll).distinct

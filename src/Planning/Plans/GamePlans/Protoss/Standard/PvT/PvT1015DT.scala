@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Macro.BuildRequests.BuildRequest
 import Planning.Plan
-import Planning.Plans.Army.{Attack, EjectScout}
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.Trigger
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -30,7 +30,6 @@ class PvT1015DT extends GameplanTemplate {
     new PvTIdeas.ReactToWorkerRush)
 
   override val buildPlans = Vector(
-    new EjectScout,
     new Trigger(
       new UnitsAtLeast(2, Protoss.DarkTemplar),
       new RequireMiningBases(2)),

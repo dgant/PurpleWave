@@ -8,7 +8,6 @@ import Strategery.Strategies.Protoss._
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TvE._
 import Strategery.Strategies.Terran.TvR.TvR1Rax
-import Strategery.Strategies.Terran._
 import Strategery.Strategies.Zerg._
 
 class Playbook {
@@ -25,24 +24,16 @@ object StrategyGroups {
   val disabled: Vector[Strategy] = WorkerRushes.all ++ Vector[Strategy](
     Sandbox,
 
-    CarriersWithNoDefense,
-
     TvEWorkerRushLiftoff,
     TvR1Rax, // Why is this disabled? Is it broken?
-    TvZ2RaxNuke,
-
-    PvROpenZZCore,
 
     PvE15BaseIslandCarrier, // Disabled for Sparkle in TorchUp
     PvE2BaseIslandCarrier, // Disabled for Sparkle in TorchUp
     PvE3BaseIslandCarrier, // Disabled for Sparkle in TorchUp
 
     PvEStormNo, // Let's try storming again with the fixed storm micro
-
-
     PvT13Nexus, // Good Terran bots are bunker rushing this too effectively
 
-    PvTProxyDarkTemplar, // Proxy builds are temporarily broken due to new building placer
     PvTProxy2Gate, // Proxy builds are temporarily broken due to new building placer
     PvPProxy2Gate, // Proxy builds are temporarily broken due to new building placer
     PvZProxy2Gate, // Proxy builds are temporarily broken due to new building placer
@@ -56,10 +47,10 @@ object StrategyGroups {
     //PvZMidgameCorsairReaverGoon, // Too fragile
     //PvZMidgameCorsairReaverZealot, // Too fragile; especially bad at dealing with Mutalisks
 
-    ZvTProxyHatchZerglings,
-    ZvTProxyHatchHydras,
-    ZvTProxyHatchSunkens,
-    ZvZ5PoolSunkens,
+    ZvTProxyHatchZerglings, // Proxy builds are temporarily broken due to new building placer
+    ZvTProxyHatchHydras,    // Proxy builds are temporarily broken due to new building placer
+    ZvTProxyHatchSunkens,   // Proxy builds are temporarily broken due to new building placer
+    ZvZ5PoolSunkens,         // Proxy builds are temporarily broken due to new building placer
 
     PvTStove, // TODO: For ladder/fun play only
   )

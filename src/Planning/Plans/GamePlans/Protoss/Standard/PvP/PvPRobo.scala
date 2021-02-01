@@ -4,8 +4,8 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, ConsiderAttacking, EjectScout}
-import Planning.Plans.Basic.{NoPlan, WriteStatus}
+import Planning.Plans.Army.{Aggression, ConsiderAttacking}
+import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{Or, _}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
@@ -157,8 +157,6 @@ class PvPRobo extends GameplanTemplate {
     new oneGateCoreLogic.WriteStatuses,
     new If(new GetObservers, new WriteStatus("Obs"), new WriteStatus("NoObs")),
     new If(new GasCapsUntouched, new CapGasAt(350)),
-    new EjectScout,
-
     new FlipIf(
       new oneGateCoreLogic.GateGate,
       new BuildOrder(

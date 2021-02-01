@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, Attack, EjectScout, FloatBuildings}
+import Planning.Plans.Army.{Aggression, Attack, FloatBuildings}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -21,7 +21,7 @@ import Strategery.Strategies.Terran._
 
 class TvZSK extends GameplanTemplate {
   
-  override val activationCriteria: Predicate = new Employing(TvZ5Rax, TvZ2RaxTank, TvZ2RaxNuke, TvZSK)
+  override val activationCriteria: Predicate = new Employing(TvZ5Rax, TvZ2RaxTank, TvZSK)
 
   class CanAttack extends And(
     new Or(
@@ -50,19 +50,12 @@ class TvZSK extends GameplanTemplate {
   override def scoutPlan: Plan = NoPlan()
   override def attackPlan: Plan = new If(new CanAttack, new Attack)
   override def workerPlan: Plan = new Parallel(
-    new Pump(Terran.NuclearSilo, 1),
     new Trigger(
       new Or(
         new EnemyLurkers,
         new UnitsAtLeast(5, Terran.Barracks),
         new UnitsAtLeast(1, Terran.Factory)),
-      new If(
-        new Or(
-          new Not(new Employing(TvZ2RaxNuke)),
-          new UnitsAtLeast(1, Terran.NuclearSilo)),
-        new Pump(Terran.Comsat),
-        new Pump(Terran.Comsat, 1)
-      )),
+      new Pump(Terran.Comsat)),
     new PumpWorkers(oversaturate = false))
 
   override def aggressionPlan: Plan = new Trigger(
@@ -76,9 +69,6 @@ class TvZSK extends GameplanTemplate {
   
   override def buildPlans: Seq[Plan] = Vector(
     new RepairBunker,
-    new If(
-      new UnitsAtLeast(5, Terran.Marine, complete = true),
-      new EjectScout),
 
     new If(new BasesAtMost(1), new Pump(Terran.Marine, 24, maximumConcurrently = 3)),
     new BuildBunkersAtNatural(1),
@@ -94,14 +84,8 @@ class TvZSK extends GameplanTemplate {
     new Trigger(
       new UnitsAtLeast(1, Terran.Factory),
       new UpgradeContinuously(Terran.MarineRange)),
-    new If(new Employing(TvZ2RaxNuke), new Pump(Terran.CovertOps, 1)),
     new If(new GoTank, new Pump(Terran.MachineShop, 1)),
     new Pump(Terran.NuclearMissile, 1),
-    new If(
-      new Or(
-        new Not(new Employing(TvZ2RaxNuke)),
-        new UnitsAtLeast(1, Terran.CovertOps))),
-    new UpgradeContinuously(Terran.GhostVisionRange),
     new Trigger(
       new UnitsAtLeast(1, Terran.ScienceVessel),
       new Parallel(
@@ -140,10 +124,7 @@ class TvZSK extends GameplanTemplate {
         new UnitsAtLeast(12, Terran.ScienceVessel),
         new EnemyHasShown(Zerg.Ultralisk)),
       new Build(Get(Terran.PhysicsLab))),
-    new If(
-      new Employing(TvZ2RaxNuke),
-      new PumpRatio(Terran.Medic, 2, 20, Seq(Friendly(Terran.Marine, 1.0/6.0))),
-      new PumpRatio(Terran.Medic, 2, 20, Seq(Friendly(Terran.Marine, 1.0/4.0)))),
+    new PumpRatio(Terran.Medic, 2, 20, Seq(Friendly(Terran.Marine, 1.0/4.0))),
     new PumpRatio(Terran.Marine, 0, 120, Seq(Enemy(Zerg.Mutalisk, 5.0))),
     new If(
       new CanAttack,

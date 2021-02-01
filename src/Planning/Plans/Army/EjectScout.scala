@@ -3,14 +3,11 @@ package Planning.Plans.Army
 import Lifecycle.With
 import Micro.Squads.Goals.GoalEjectScout
 import Planning.Plans.Scouting.{ScoutCleared, ScoutTracking}
-import Planning.UnitCounters.{UnitCountOne, UnitCounter}
+import Planning.UnitCounters.UnitCountOne
 import Planning.UnitMatchers._
 import Utilities.{ByOption, Minutes}
 
-class EjectScout(
-  matcher: UnitMatcher = UnitMatchCanCatchScouts,
-  counter: UnitCounter = UnitCountOne)
-  extends SquadPlan[GoalEjectScout] {
+class EjectScout extends SquadPlan[GoalEjectScout] {
 
   override val goal: GoalEjectScout = new GoalEjectScout
 
@@ -25,8 +22,8 @@ class EjectScout(
     if (scouts.isEmpty) return
 
     squad.enemies = ScoutTracking.enemyScouts.toSeq
-    goal.unitMatcher = matcher
-    goal.unitCounter = counter
+    goal.unitMatcher = UnitMatchAnd(UnitMatchCanCatchScouts, (unit) => unit.base.exists(b => b.isOurMain || b.isNaturalOf.exists(_.isOurMain)) || unit.pixelsToGetInRange(scout.get) < 32)
+    goal.unitCounter = UnitCountOne
     super.onUpdate()
   }
 }

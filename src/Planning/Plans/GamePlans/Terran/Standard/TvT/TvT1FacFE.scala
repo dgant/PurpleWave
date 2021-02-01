@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvT
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{Attack, EjectScout, FloatBuildings}
+import Planning.Plans.Army.{Attack, FloatBuildings}
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump}
@@ -43,7 +43,6 @@ class TvT1FacFE extends GameplanTemplate {
     Get(2, Terran.Factory))
 
   override def buildPlans: Seq[Plan] = Seq(
-    new EjectScout,
     new If(
       new And(
         new UnitsAtLeast(1, Terran.Factory),

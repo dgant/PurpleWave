@@ -4,7 +4,6 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.EjectScout
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAt, GasCapsUntouched, Pump}
@@ -51,7 +50,6 @@ class PvP34GateGoon extends GameplanTemplate {
 
   override val buildPlans = Vector(
 
-    new EjectScout,
     new oneGateCoreLogic.WriteStatuses,
 
     new If(

@@ -5,7 +5,6 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.EjectScout
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -53,7 +52,6 @@ class TvT14CC extends GameplanTemplate {
     Get(2, Terran.Marine))
 
   override def buildPlans: Seq[Plan] = Seq(
-    new EjectScout,
     new If(
       new Not(new EnemyStrategy(With.fingerprints.fourteenCC)),
       new Parallel(

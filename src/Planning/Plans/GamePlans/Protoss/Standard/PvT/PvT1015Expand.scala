@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 import Lifecycle.With
 import Macro.BuildRequests.BuildRequest
 import Planning.Plan
-import Planning.Plans.Army.{Aggression, Attack, EjectScout}
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound.{If, Or, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -44,9 +44,6 @@ class PvT1015Expand extends GameplanTemplate {
     new PvTIdeas.ReactToWorkerRush)
   
   override def buildPlans: Seq[Plan] = Vector(
-    new If(
-      new UnitsAtMost(3, Protoss.Dragoon, complete = true),
-      new EjectScout),
 
     new Trigger(
       new And(

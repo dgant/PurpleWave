@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{Aggression, Attack, EjectScout}
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -110,19 +110,11 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
         new Not(new GoDT)),
       new CapGasWorkersAt(2)),
 
-    new If(new UnitsAtLeast(1, Protoss.Dragoon, complete = true), new EjectScout),
-
     new If(new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.proxyGateway, With.fingerprints.twoGate), new BuildOrder(Get(7, Protoss.Zealot))),
 
     new Build(
       Get(Protoss.Assimilator),
       Get(Protoss.CyberneticsCore)),
-
-    new If(
-      new And(
-        new GoDT,
-        new UnitsAtLeast(1, Protoss.CyberneticsCore)),
-      new EjectScout(Protoss.Probe)),
 
     new If(
       new EnemyStrategy(With.fingerprints.forgeFe),

@@ -28,7 +28,6 @@ abstract class PvR2GateStrategy extends PvRStrategy {
 }
 
 object PvROpenZCoreZ extends PvR1GateCoreStrategy
-object PvROpenZZCore extends PvR1GateCoreStrategy
 object PvROpen2Gate910 extends PvR2GateStrategy
 object PvROpen2Gate1012 extends PvR2GateStrategy
 object PvRDT extends PvRStrategy {

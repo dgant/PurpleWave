@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvT
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{Attack, EjectScout}
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
@@ -46,7 +46,6 @@ class TvT1FacPort extends GameplanTemplate {
     Get(Terran.Starport))
 
   override def buildPlans: Seq[Plan] = Seq(
-    new EjectScout,
     new Pump(Terran.ControlTower),
     new TechContinuously(Terran.WraithCloak),
     new Pump(Terran.Wraith),

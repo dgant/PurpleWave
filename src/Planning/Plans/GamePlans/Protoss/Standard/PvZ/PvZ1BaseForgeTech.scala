@@ -4,10 +4,9 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.{Eject4PoolScout, MeldArchonsUntilStorm}
+import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.MeldArchonsUntilStorm
 import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpRatio, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -71,7 +70,6 @@ class PvZ1BaseForgeTech extends GameplanTemplate {
   override def archonPlan: Plan = new MeldArchonsUntilStorm
 
   override def buildPlans: Seq[Plan] = Seq(
-    new Eject4PoolScout,
     new BuildOrder(
       Get(12, Protoss.Probe),
       Get(2, Protoss.PhotonCannon)),

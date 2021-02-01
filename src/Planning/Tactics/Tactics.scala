@@ -11,6 +11,7 @@ import Planning.Predicates.Compound.Check
 
 class Tactics {
   private lazy val yoloPlan                 : Plan = new If(new Check(() => With.yolo.active()), new Attack)
+  private lazy val ejectScout               : Plan = new EjectScout
   private lazy val scoutOverlordPlan        : Plan = new ConsiderScoutingWithOverlords
   private lazy val defendAgainstProxy       : Plan = new DefendAgainstProxy
   private lazy val defendBases              : Plan = new DefendBases
@@ -33,6 +34,7 @@ class Tactics {
     // - Carriers at 4+ (except against cloaked wraiths and no observer)
     Vector(
       yoloPlan,
+      ejectScout,
       scoutOverlordPlan,
       With.blackboard.scoutPlan(),
       defendAgainstProxy,

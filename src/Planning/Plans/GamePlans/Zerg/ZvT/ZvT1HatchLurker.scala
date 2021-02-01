@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{Attack, EjectScout}
+import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -41,7 +41,6 @@ class ZvT1HatchLurker extends GameplanTemplate {
   )
 
   override def buildPlans: Seq[Plan] = Vector(
-    new EjectScout,
     new If(
       new UnitsAtMost(0, Zerg.Lair),
       new CapGasAt(100, 150, 3.0 / 9.0),

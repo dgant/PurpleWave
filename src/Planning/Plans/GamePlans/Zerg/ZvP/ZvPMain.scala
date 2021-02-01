@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, Attack, EjectScout}
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.{NoPlan, WriteStatus}
 import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -148,7 +148,6 @@ class ZvPMain extends GameplanTemplate {
   )
 
   override def buildPlans: Seq[Plan] = Seq(
-    new EjectScout,
     new CapGasAtRatioToMinerals(1.0, 300),
     new Pump(Zerg.Drone, 12),
     new RequireMiningBases(2),

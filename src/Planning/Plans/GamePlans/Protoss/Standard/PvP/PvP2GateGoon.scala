@@ -4,7 +4,6 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{Attack, EjectScout}
 import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -75,8 +74,6 @@ class PvP2GateGoon extends GameplanTemplate {
       new Not(new EnemyStrategy(With.fingerprints.robo))))
 
   override val buildPlans = Vector(
-
-    new If(new Not(new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway)), new EjectScout),
 
     new If(new GoDT, new CapGasAt(0, 350), new CapGasAt(0, 250)),
     new If(

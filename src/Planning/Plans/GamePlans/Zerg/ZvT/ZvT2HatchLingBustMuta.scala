@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{AllInIf, Attack, EjectScout}
+import Planning.Plans.Army.{AllInIf, Attack}
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
@@ -53,7 +53,6 @@ class ZvT2HatchLingBustMuta extends GameplanTemplate {
   )
 
   override def buildPlans: Seq[Plan] = Seq(
-    new EjectScout,
     new Pump(Zerg.Mutalisk),
     new If(
       new EnemiesAtLeast(1, Terran.Vulture),

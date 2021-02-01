@@ -83,7 +83,6 @@ class TvE2RaxSCVMarine extends GameplanTemplate {
     new Pump(Terran.SCV, 3),
     new If(
       new ReadyToAttack,
-      new If(new FoundEnemyBase, new BuildBunkersAtEnemy(1)),
-      new EjectScout)
+      new If(new FoundEnemyBase, new BuildBunkersAtEnemy(1)))
   )
 }

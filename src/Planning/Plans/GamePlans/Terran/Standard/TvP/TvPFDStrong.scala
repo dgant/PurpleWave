@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Attack, ConsiderAttacking, EjectScout}
+import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
@@ -59,7 +59,6 @@ class TvPFDStrong extends GameplanTemplate {
       Get(3,  Terran.SupplyDepot)))
   
   override def buildPlans: Seq[Plan] = Vector(
-    new EjectScout,
     new TvPIdeas.CutGasDuringFactory,
     new TvPIdeas.ReactiveEarlyVulture,
     new Pump(Terran.MachineShop, 1),

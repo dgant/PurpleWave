@@ -5,7 +5,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{Attack, EjectScout}
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
@@ -58,7 +58,6 @@ class TvT1RaxFE extends GameplanTemplate {
 
   override def buildPlans: Seq[Plan] = Seq(
     new PopulateBunkers,
-    new EjectScout,
      new If(
       new Not(new EnemyStrategy(With.fingerprints.fourteenCC, With.fingerprints.oneRaxFE)),
       new Parallel(

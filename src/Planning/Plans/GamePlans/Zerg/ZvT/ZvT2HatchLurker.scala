@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, Attack, EjectScout}
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.Write
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -142,8 +142,6 @@ class ZvT2HatchLurker extends GameplanTemplate {
   )
 
   class LurkerLing extends Parallel(
-
-    new EjectScout,
 
     new CapGasAtRatioToMinerals(2.0, 200),
     new CapGasWorkersAt(5),

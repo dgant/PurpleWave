@@ -2,7 +2,6 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.EjectScout
 import Planning.Plans.Compound.{FlipIf, If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpRatio, PumpWorkers}
@@ -50,7 +49,6 @@ class ZvTOpening extends GameplanTemplate {
       new Build(Get(Zerg.SpawningPool))))
 
   override def buildPlans: Seq[Plan] = Seq(
-    new EjectScout,
     new Pump(Zerg.SunkenColony),
     new If(
       new EnemyStrategy(With.fingerprints.oneRaxFE, With.fingerprints.twoRax1113),

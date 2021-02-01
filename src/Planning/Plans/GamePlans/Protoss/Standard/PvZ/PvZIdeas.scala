@@ -216,6 +216,4 @@ object PvZIdeas {
       new Pump(Protoss.HighTemplar)),
     new Pump(Protoss.Zealot)
   )
-
-  class Eject4PoolScout extends If(new FrameAtMost(GameTime(2, 30)()), new EjectScout(Protoss.Probe))
 }

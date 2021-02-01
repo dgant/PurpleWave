@@ -2,7 +2,6 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.EjectScout
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.PvZRequireMiningBases
@@ -25,7 +24,6 @@ class PvZBisu extends GameplanTemplate {
   override def emergencyPlans: Seq[Plan] = Seq(new PvZIdeas.ReactToLurkers)
 
   override def buildPlans: Seq[Plan] = Vector(
-    new EjectScout,
     new PvZIdeas.TakeSafeNatural,
     new PvZIdeas.AddEarlyCannons,
     new PumpRatio(Protoss.Corsair, 1, 12, Seq(Enemy(Zerg.Mutalisk, 1.0))),

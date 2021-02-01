@@ -8,7 +8,6 @@ class ProtossVsRandom extends ModalGameplan(
   new PvR2Gate910,
   new PvR2Gate1012,
   new PvRZCoreZ,
-  new PvRZZCore,
   new PvRDT,
   new PvRTinfoil
 )

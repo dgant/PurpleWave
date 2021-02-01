@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{ConsiderAttacking, EjectScout}
+import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{FlipIf, If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -32,7 +32,6 @@ class ZvTMidgame extends GameplanTemplate {
     new ConsiderAttacking)
 
   override def buildPlans: Seq[Plan] = Seq(
-    new EjectScout,
     new Build(Get(12, Zerg.Drone)),
     new If(new And(new UnitsAtLeast(1, Zerg.Lair), new Not(new GoMutalisk)), new Build(Get(Zerg.HydraliskDen))),
     new If(new And(new UnitsAtLeast(1, Zerg.Lair), new UnitsAtLeast(1, Zerg.HydraliskDen)), new Build(Get(Zerg.LurkerMorph))),

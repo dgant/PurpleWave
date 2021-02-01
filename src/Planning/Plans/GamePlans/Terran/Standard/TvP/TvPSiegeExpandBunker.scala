@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvP
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
-import Planning.Plans.Army.{AttackWithWorkers, ConsiderAttacking, EjectScout}
+import Planning.Plans.Army.{AttackWithWorkers, ConsiderAttacking}
 import Planning.Plans.Compound.{FlipIf, If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Terran.Situational.RepairBunker
@@ -75,7 +75,6 @@ class TvPSiegeExpandBunker extends GameplanTemplate {
         new BuildBunkersAtEnemyNatural(1),
         new AttackWithWorkers(UnitCountExactly(5))),
       new Parallel(
-        new EjectScout,
         new PopulateBunkers,
         new BuildBunkersAtNatural(1))),
 

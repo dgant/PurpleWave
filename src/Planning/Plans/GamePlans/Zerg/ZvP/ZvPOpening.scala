@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Attack, DefendAgainstWorkerRush, EjectScout}
+import Planning.Plans.Army.{Attack, DefendAgainstWorkerRush}
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -66,7 +66,6 @@ class ZvPOpening extends GameplanTemplate {
   class PumpEnoughZerglings extends PumpRatio(Zerg.Zergling, 6, 18, Seq(Enemy(UnitMatchGroundWarriors, 4.5), Friendly(Zerg.Mutalisk, -6.0), Friendly(Zerg.SunkenColony, -4.0)))
 
   override def buildPlans: Seq[Plan] = Seq(
-    new EjectScout,
     new If(
       new UnitsAtMost(0, Zerg.Spire),
       new CapGasAt(150),

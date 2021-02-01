@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.{Attack, EjectScout}
+import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -27,7 +27,6 @@ class PvZCorsairReaver extends GameplanTemplate {
   override def emergencyPlans: Seq[Plan] = Seq(new PvZIdeas.ReactToLurkers)
 
   override def buildPlans: Seq[Plan] = Vector(
-    new EjectScout,
     new PvZIdeas.TakeSafeNatural,
     new PvZIdeas.AddEarlyCannons,
     // TODO: Skip reavers when doing 2-Base Goon Reaver

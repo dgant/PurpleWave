@@ -4,7 +4,6 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.EjectScout
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{Or, Parallel, _}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -265,8 +264,6 @@ class PvTBasic extends GameplanTemplate {
     ////////////////
     // Logistics //
     //////////////
-
-    new EjectScout,
 
     // Gas management
     new If(

@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Attack, EjectScout}
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
@@ -70,12 +70,8 @@ class PvP2GateDT extends GameplanTemplate {
   val oneGateCoreLogic = new PvP1GateCoreLogic(allowZealotBeforeCore = false)
 
   override def buildOrderPlan = new oneGateCoreLogic.BuildOrderPlan
-  
+
   override val buildPlans = Vector(
-    new Trigger(
-      new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
-      new EjectScout,
-      new EjectScout(Protoss.Probe)),
 
     new If(
       new GasCapsUntouched,

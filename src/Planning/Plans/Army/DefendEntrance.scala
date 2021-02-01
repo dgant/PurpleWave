@@ -6,13 +6,13 @@ import Planning.UnitCounters.UnitCountEverything
 import Planning.UnitMatchers._
 import Utilities.ByOption
 
-class DefendEntrance extends SquadPlan[GoalDefendZone] {
+class DefendEntrance extends Squadify[GoalDefendZone] {
   
   override val goal: GoalDefendZone = new GoalDefendZone
   goal.unitMatcher = UnitMatchAnd(UnitMatchRecruitableForCombat, UnitMatchNot(UnitMatchWorkers))
   goal.unitCounter = UnitCountEverything
   
-  override def onUpdate() {
+  override def update() {
     // If we're defending a base already, let the defense squad recruit everyone for greater squad cohesion
     if (With.blackboard.defendingBase()) return
 
@@ -20,6 +20,6 @@ class DefendEntrance extends SquadPlan[GoalDefendZone] {
       .minBy(With.geography.ourBasesAndSettlements)(_.heart.groundPixels(With.scouting.threatOrigin))
       .map(_.zone)
       .getOrElse(With.geography.home.zone)
-    super.onUpdate()
+    super.update()
   }
 }

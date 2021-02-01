@@ -25,7 +25,7 @@ class GoalHunt(val enemyMatcher: UnitMatcher) extends SquadGoalBasic {
     squad.enemies = With.units.enemy.view.filter(_.is(enemyMatcher)).toSeq
     target = chooseTarget()
     squad.units.foreach(attacker => {
-      attacker.agent.intend(squad.client, new Intention {
+      attacker.agent.intend(this, new Intention {
         toTravel = Some(target)
       })
     })

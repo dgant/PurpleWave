@@ -7,14 +7,14 @@ import Planning.UnitMatchers.UnitMatchRecruitableForCombat
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 
-class DefendBase(base: Base) extends SquadPlan[GoalDefendZone] {
+class DefendBase(base: Base) extends Squadify[GoalDefendZone] {
   
   val goal: GoalDefendZone = new GoalDefendZone
   goal.unitMatcher = UnitMatchRecruitableForCombat
 
   var enemies: Seq[ForeignUnitInfo] = Seq.empty
   
-  override def onUpdate() {
+  override def update() {
   
     if (enemies.size < 3 && enemies.forall(e => (e.unitClass.isWorker || ! e.canAttack) && ! e.isTransport)) {
       return
@@ -27,6 +27,6 @@ class DefendBase(base: Base) extends SquadPlan[GoalDefendZone] {
     With.blackboard.defendingBase.set(true)
     squad.enemies = enemies
     goal.zone = base.zone
-    super.onUpdate()
+    super.update()
   }
 }

@@ -160,20 +160,6 @@ class BuildBuilding(val buildingClass: UnitClass) extends ProductionPlan {
     val travelFrames = (if (builderLock.units.isEmpty) 1.4 else 1.25) * proposedBuilder.get.framesToTravelTo(desiredTile.get.pixelCenter)
     travelFrames + 48 >= currencyLock.expectedFrames
   }
-  
-  override def renderMap() {
-    if (isComplete) return
-    if (orderedTile.isEmpty) return
-    DrawMap.box(
-      buildingClass.tileArea.startInclusive.add(orderedTile.get).topLeftPixel,
-      buildingClass.tileArea.endExclusive.add(orderedTile.get).topLeftPixel,
-      With.self.colorDark)
-    DrawMap.label(
-      "Building a " + buildingClass.toString,
-      orderedTile.get.topLeftPixel,
-      drawBackground = true,
-      With.self.colorDark)
-  }
 
   description.set("Build a " + buildingClass)
 }

@@ -5,6 +5,7 @@ import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Aggression, Attack, AttackWithWorkers}
+import Planning.Plans.Basic.Do
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
@@ -151,7 +152,7 @@ class ZvTProxyHatch extends Parallel {
     
     new Aggression(1.5),
     new Attack,
-    new FollowBuildOrder,
+    new Do(() => new FollowBuildOrder()),
   
     new If(
       new Employing(ZvTProxyHatchSunkens),

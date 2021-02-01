@@ -2,25 +2,19 @@ package Planning.Plans.GamePlans.Protoss.Situational
 
 import Lifecycle.With
 import Micro.Squads.Goals.GoalCatchDTRunby
-import Planning.Plans.Army.SquadPlan
-import Planning.UnitCounters.{UnitCountOne, UnitCounter}
+import Planning.Plans.Army.Squadify
+import Planning.UnitCounters.UnitCountOne
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.Protoss
 
-class CatchDTRunby(
-  matcher: UnitMatcher = UnitMatchMobileDetectors,
-  counter: UnitCounter = UnitCountOne)
-  extends SquadPlan[GoalCatchDTRunby] {
+class CatchDTRunby extends Squadify[GoalCatchDTRunby] {
 
   override val goal: GoalCatchDTRunby = new GoalCatchDTRunby
+  goal.unitMatcher = UnitMatchMobileDetectors
+  goal.unitCounter = UnitCountOne
 
-  override def onUpdate() {
-    if (With.enemies.map(With.unitsShown(_, Protoss.DarkTemplar)).sum == 0) {
-      return
-    }
-
-    goal.unitMatcher = matcher
-    goal.unitCounter = counter
-    super.onUpdate()
+  override def update() {
+    if (With.enemies.map(With.unitsShown(_, Protoss.DarkTemplar)).sum == 0) return
+    super.update()
   }
 }

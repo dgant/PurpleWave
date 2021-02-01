@@ -5,11 +5,9 @@ import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackSafely
 import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Placement.{BuildBunkersAtMain, BuildBunkersAtNatural, BuildMissileTurretsAtNatural}
 import Planning.Plans.Scouting.ScoutOn
@@ -84,12 +82,6 @@ class TvZ2RaxAcademy extends GameplanTemplate {
     new EnemyHasShown(Zerg.Lurker))
 
   override def buildPlans: Seq[Plan] = Seq(
-    new DefendFightersAgainstRush,
-    // Hack to work around bug where we frequently build an extra Barracks
-    new If(
-      new UnitsAtLeast(2, Terran.Barracks, complete = true),
-      new CancelIncomplete(Terran.Barracks)),
-
     new FlipIf(
       new And(
         new SafeAtHome,

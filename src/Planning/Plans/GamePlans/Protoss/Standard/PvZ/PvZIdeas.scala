@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Attack, EjectScout}
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.Protoss.Situational.{DefendFFEWithProbesAgainst4Pool, PlacementForgeFastExpand}
 import Planning.Plans.Macro.Automatic._
@@ -12,7 +12,7 @@ import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones.{EnemyHasShownCloakedThreat, _}
 import Planning.Predicates.Reactive.{EnemyMutalisks, SafeAtHome, SafeToMoveOut}
-import Planning.Predicates.Strategy.{Employing, EnemyRecentStrategy, EnemyStrategy}
+import Planning.Predicates.Strategy._
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss._
@@ -22,16 +22,19 @@ object PvZIdeas {
 
   class ConditionalDefendFFEWithProbesAgainst4Pool extends If(
     new And(
-      new Latch(new Check(() => With.units.countOurs(Protoss.PhotonCannon) + (With.self.minerals + 24) / 150 >= 2)),
+      new FrameAtMost(GameTime(6, 0)()),
       new Or(
         new EnemyStrategy(With.fingerprints.fourPool),
         new And(
+          new Or(
+            new EnemyIsZerg,
+            new EnemyIsRandom),
           new Not(new EnemyRecentStrategy(With.fingerprints.twelveHatch, With.fingerprints.twelvePool, With.fingerprints.tenHatch, With.fingerprints.ninePool, With.fingerprints.overpool)),
           new EnemyRecentStrategy(With.fingerprints.fourPool),
           new Check(() => With.scouting.enemyHasScoutedUsWithWorker))),
-      new FrameAtMost(GameTime(6, 0)()),
       new UnitsAtLeast(1, Protoss.PhotonCannon, complete = false),
-      new UnitsAtMost(3, Protoss.PhotonCannon, complete = true)),
+      new UnitsAtMost(3, Protoss.PhotonCannon, complete = true),
+      new Latch(new Check(() => With.units.countOurs(Protoss.PhotonCannon) + (With.self.minerals + 24) / 150 >= 2))),
     new DefendFFEWithProbesAgainst4Pool)
 
   class ConditionalAttack extends If(

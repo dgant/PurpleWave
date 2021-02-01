@@ -1,7 +1,7 @@
 package Macro.Allocation
 
 import Lifecycle.With
-import Planning.Plan
+import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -88,7 +88,7 @@ class Recruiter {
     unitsByLock.remove(lock)
   }
 
-  def release(plan: Plan): Unit = {
+  def release(plan: Prioritized): Unit = {
     unitsByLock.keys.foreach(lock => if (lock.owner == plan) release(lock))
   }
   
@@ -106,7 +106,7 @@ class Recruiter {
     unitsByLock.getOrElse(lock, Set.empty)
   }
   
-  def audit: Vector[(Plan, mutable.Set[FriendlyUnitInfo])] = {
+  def audit: Vector[(Prioritized, mutable.Set[FriendlyUnitInfo])] = {
     unitsByLock.toVector.sortBy(_._1.owner.priority).map(p => (p._1.owner, p._2))
   }
 }

@@ -35,7 +35,7 @@ class WorkerRush extends Trigger {
     new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = 0),
     new If(new Check(() => With.self.supplyUsed == With.self.supplyTotal), new RequireSufficientSupply),
     new Pump(With.self.workerClass),
-    new FollowBuildOrder,
+    new Do(() => new FollowBuildOrder().update()),
     new ConsiderScoutingWithOverlords,
     new If(
       new And(new Not(new TimeToAtack), new Not(new FoundEnemyBase)),

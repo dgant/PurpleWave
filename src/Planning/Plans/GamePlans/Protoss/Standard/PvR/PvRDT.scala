@@ -77,7 +77,6 @@ class PvRDT extends GameplanTemplate {
       Get(5,   Protoss.Pylon)))
 
   override def buildPlans: Seq[Plan] = Seq(
-    new DefendFightersAgainstRush,
     new Trigger(
       new UnitsAtLeast(1, Protoss.CitadelOfAdun),
       initialBefore = new CapGasWorkersAt(2)),

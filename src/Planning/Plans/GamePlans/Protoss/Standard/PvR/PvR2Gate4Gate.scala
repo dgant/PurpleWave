@@ -40,7 +40,6 @@ class PvR2Gate4Gate extends GameplanTemplate {
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.TwoGate910
 
   override def buildPlans = Vector(
-    new DefendFightersAgainstRush,
     new CapGasAt(400),
 
     new BuildOrder(Get(5, Protoss.Zealot)),

@@ -60,8 +60,6 @@ class ZvR9Pool extends GameplanTemplate {
 
   override def buildPlans: Seq[Plan] = Vector(
 
-    new DefendFightersAgainstRush,
-
     new If(
       new Or(
         new UnitsAtLeast(1, Zerg.Spire),

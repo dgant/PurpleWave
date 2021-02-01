@@ -7,17 +7,17 @@ import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountExactly
 import Planning.UnitMatchers.{UnitMatchWarriors, UnitMatchWorkers}
 import Planning.UnitPreferences.UnitPreferClose
-import Planning.{Plan, Property}
+import Planning.{Prioritized, Property}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.Seconds
 
-class DefendFightersAgainstRush extends Plan {
+class DefendFightersAgainstRush extends Prioritized {
   
   val defenders = new Property[LockUnits](new LockUnits)
   defenders.get.unitMatcher.set(UnitMatchWorkers)
   
-  override def onUpdate() {
+  def update() {
 
     if ( ! Seq(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113).exists(_.matches)) {
       return

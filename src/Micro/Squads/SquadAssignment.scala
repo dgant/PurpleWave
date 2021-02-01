@@ -14,5 +14,5 @@ class SquadAssignment(val squad: Squad) {
     squad.goal.addCandidate(unit)
   }
 
-  override def toString: String = "SquadAssignment: " + squad.client.toString + " (" + units.size + " units)"
+  override def toString: String = "SquadAssignment: " + squad.toString + " (" + units.size + " units)"
 }

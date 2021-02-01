@@ -82,6 +82,6 @@ trait SquadGoal extends SquadRecruiter {
 
 trait SquadGoalBasic extends SquadGoal with SquadRecruiterSimple with SquadGoalWithSquad {
   def run() {
-    squad.units.foreach(_.agent.intend(squad.client, new Intention { toTravel = Some(destination) }))
+    squad.units.foreach(_.agent.intend(this, new Intention { toTravel = Some(destination) }))
   }
 }

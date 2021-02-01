@@ -6,6 +6,7 @@ import Macro.BuildRequests.Get
 import Mathematics.Points.{Pixel, Tile}
 import Micro.Agency.Intention
 import Planning.Plans.Army.AttackWithWorkers
+import Planning.Plans.Basic.Do
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.BuildOrders.{BuildOrder, FollowBuildOrder}
 import Planning.ResourceLocks.LockUnits
@@ -20,7 +21,7 @@ class WorkerRushLiftoff extends Parallel {
   children.set(Vector(
     new AttackWithWorkers,
     new BuildOrder(Get(5, Terran.SCV)),
-    new FollowBuildOrder
+    new Do(() => new FollowBuildOrder().update())
   ))
   
   val dyingLock = new LockUnits

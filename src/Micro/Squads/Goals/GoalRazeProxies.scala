@@ -23,7 +23,7 @@ class GoalRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends Squa
     squad.units.foreach(unit => {
       val assignee = assignments.get(unit)
       val attackTarget = if (With.units.existsEnemy(UnitMatchWarriors)) None else assignee
-      unit.agent.intend(squad.client, new Intention {
+      unit.agent.intend(this, new Intention {
         toTravel  = Some(assignee.map(_.pixel).getOrElse(destination))
         toAttack  = attackTarget
         canFlee   = assignments.keys.forall( ! _.unitClass.isWorker)

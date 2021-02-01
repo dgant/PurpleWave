@@ -9,7 +9,6 @@ import Mathematics.Points.{Pixel, Tile}
 import Micro.Actions.{Action, Idle}
 import Micro.Coordination.Pushing.{TrafficPriorities, TrafficPriority}
 import Performance.{Cache, KeyedCache}
-import Planning.Plan
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -20,7 +19,7 @@ import scala.collection.mutable.ArrayBuffer
 
 class Agent(val unit: FriendlyUnitInfo) {
   
-  def intend(client: Plan, intent: Intention) {
+  def intend(client: Any, intent: Intention) {
     this.intent = intent
     this.client = Some(client)
   }
@@ -101,11 +100,11 @@ class Agent(val unit: FriendlyUnitInfo) {
   // Diagnostics //
   /////////////////
 
-  var intent      : Intention         = new Intention
-  var client      : Option[Plan]      = None
-  var lastPath    : Option[TilePath]  = None
-  var lastAction  : Option[String]    = None
-  var fightReason : String            = ""
+  var intent      : Intention           = new Intention
+  var client      : Option[Any]         = None
+  var lastPath    : Option[TilePath]    = None
+  var lastAction  : Option[String]      = None
+  var fightReason : String              = ""
 
   def act(value: String): Unit = { lastAction = Some(value) }
 

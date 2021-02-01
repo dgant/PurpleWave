@@ -4,9 +4,9 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Circle
 import Micro.Agency.Intention
-import Planning.Plan
 import Planning.Predicates.Compound.Latch
 import Planning.Predicates.Milestones.EnemiesAtLeast
+import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountEverything
 import Planning.UnitMatchers.UnitMatchOr
@@ -14,7 +14,7 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
-class ChillOverlords extends Plan {
+class ChillOverlords extends Prioritized {
   
   val overlords = new LockUnits
   overlords.unitMatcher.set(Zerg.Overlord)
@@ -28,7 +28,7 @@ class ChillOverlords extends Plan {
     Zerg.Lurker
   )))
 
-  override def onUpdate() {
+  def update() {
     if ( ! With.self.isZerg) {
       return
     }

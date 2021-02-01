@@ -27,7 +27,7 @@ class Intention {
   var toRepair      : Option[UnitInfo]          = None
   var toBoard       : Option[FriendlyUnitInfo]  = None
   var toScoutTiles  : Seq[Tile]                 = Seq.empty
-  var canFight     : Boolean                   = true
+  var canFight      : Boolean                   = true
   var canFlee       : Boolean                   = true
   var canMeld       : Boolean                   = false
   var canTickle     : Boolean                   = false

@@ -3,13 +3,11 @@ package Planning.Plans.Army
 import Information.Battles.Types.Division
 import Information.Geography.Types.Base
 import Lifecycle.With
-import Planning.Plan
+import Planning.Prioritized
 
-class DefendBases extends Plan {
+class DefendBases extends Prioritized {
   
   private lazy val baseDefensePlans = With.geography.bases.map(base => (base, new DefendBase(base))).toMap
-  
-  override def getChildren: Iterable[Plan] = baseDefensePlans.values
 
   private case class BaseScore(base: Base) {
     lazy val defensible: Boolean = division.exists(_.enemies.nonEmpty) && (
@@ -21,7 +19,7 @@ class DefendBases extends Plan {
     lazy val score: Double = division.map(_.enemies.view.map(_.subjectiveValue).sum).sum
   }
   
-  protected override def onUpdate() {
+  def update() {
 
     val zoneScores = baseDefensePlans.keys.map(BaseScore).filter(_.defensible)
     
@@ -37,7 +35,7 @@ class DefendBases extends Plan {
           val baseScore = baseGroup._2.minBy(_.base.hashCode)
           val defensePlan = baseDefensePlans(baseScore.base)
           defensePlan.enemies = baseScore.division.get.enemies.view.flatMap(_.foreign).toSeq
-          delegate(defensePlan)
+          defensePlan.update()
       })
   }
 }

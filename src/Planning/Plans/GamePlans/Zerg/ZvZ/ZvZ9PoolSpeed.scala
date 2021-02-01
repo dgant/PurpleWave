@@ -53,7 +53,6 @@ class ZvZ9PoolSpeed extends GameplanTemplate {
     Get(6, Zerg.Zergling))
   
   override def buildPlans: Seq[Plan] = Vector(
-    new DefendFightersAgainstRush,
     new CapGasAtRatioToMinerals(1.0, 50),
     new If(
       new Not(new UnitsAtLeast(1, Zerg.Spire)),

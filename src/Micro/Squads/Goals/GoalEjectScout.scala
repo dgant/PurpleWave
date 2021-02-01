@@ -23,7 +23,7 @@ class GoalEjectScout extends SquadGoalBasic {
   
   override def run() {
     squad.units.foreach(ejector => {
-      ejector.agent.intend(squad.client, new Intention {
+      ejector.agent.intend(this, new Intention {
         toScoutTiles = if (targetScout.exists(_.likelyStillThere)) Seq.empty else tilesToConsider
         toTravel = Some(destination)
         toAttack = if (ejector.matchups.targets.forall(targetScout.contains)) targetScout else None

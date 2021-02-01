@@ -66,7 +66,6 @@ class TvZ8Rax extends GameplanTemplate {
 
   override def buildPlans: Seq[Plan] = Seq(
     new RepairBunker,
-    new DefendFightersAgainstRush,
 
     new If(
       new CanBunkerRush,

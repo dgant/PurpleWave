@@ -23,7 +23,6 @@ class ZergReactionVsWorkerRush extends GameplanTemplate {
   override def attackPlan: Plan = new Attack
 
   override def buildPlans: Seq[Plan] = Seq(
-    new DefendAgainstWorkerRush,
     new If(
       new And(
         new UnitsAtLeast(2, Zerg.Zergling, countEggs = true),

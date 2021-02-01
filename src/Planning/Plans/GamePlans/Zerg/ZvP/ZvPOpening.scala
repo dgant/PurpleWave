@@ -34,10 +34,6 @@ class ZvPOpening extends GameplanTemplate {
       new ScoutAt(8),
       new ScoutOn(Zerg.SpawningPool)))
 
-  override def emergencyPlans: Seq[Plan] = Seq(
-    new DefendAgainstWorkerRush,
-    new DefendAgainstProxy)
-
   override def buildOrderPlan = new Parallel(
     new If(
       new Employing(ZvP12Hatch),

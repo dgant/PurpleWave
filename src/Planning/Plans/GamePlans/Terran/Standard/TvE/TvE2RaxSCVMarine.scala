@@ -77,7 +77,6 @@ class TvE2RaxSCVMarine extends GameplanTemplate {
   
   override def buildPlans: Seq[Plan] = Vector(
     new Write(With.blackboard.pushKiters, true),
-    new DefendFightersAgainstRush,
     new Pump(Terran.Marine),
     new BuildOrder(Get(20, Terran.SCV)),
     new Pump(Terran.SCV, 3),

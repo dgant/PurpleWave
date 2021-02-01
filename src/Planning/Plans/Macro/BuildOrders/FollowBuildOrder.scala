@@ -1,14 +1,11 @@
 package Planning.Plans.Macro.BuildOrders
 
 import Lifecycle.With
-import Planning.Plan
+import Planning.Prioritized
 
-class FollowBuildOrder extends Plan {
-
-  override def getChildren: Iterable[Plan] = With.buildPlans.getChildren
-
-  override def onUpdate() {
+class FollowBuildOrder extends Prioritized {
+  def update() {
     With.buildPlans.update(this)
-    getChildren.foreach(delegate)
+    With.buildPlans.getChildren.foreach(_.update())
   }
 }

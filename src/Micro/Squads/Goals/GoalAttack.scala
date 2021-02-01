@@ -25,7 +25,7 @@ class GoalAttack extends SquadGoalBasic {
   override def run() {
     chooseTarget()
     squad.units.foreach(attacker => {
-      attacker.agent.intend(squad.client, new Intention {
+      attacker.agent.intend(this, new Intention {
         toTravel = Some(target)
       })
     })

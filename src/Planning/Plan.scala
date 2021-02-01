@@ -9,7 +9,6 @@ class Plan extends Prioritized {
   
   def isComplete: Boolean = false
   def getChildren: Iterable[Plan] = Vector.empty
-  def renderMap(): Unit = {}
   
   protected def onUpdate() {}
   

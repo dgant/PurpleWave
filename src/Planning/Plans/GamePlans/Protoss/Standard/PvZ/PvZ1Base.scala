@@ -97,8 +97,6 @@ abstract class PvZ1Base extends GameplanTemplate {
 
   override def buildPlans = Vector(
 
-    new DefendFightersAgainstRush,
-
     new If(new GettingAntiAirASAP,  new WriteStatus("Anti-AirASAP")),
     new If(new GettingGoons,        new WriteStatus("4-Gate Goons")),
     new If(new GettingZealots,      new WriteStatus("+1 Speedlot")),

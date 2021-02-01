@@ -46,7 +46,6 @@ class TvZ1RaxFE extends GameplanTemplate {
 
   override def buildPlans: Seq[Plan] = Seq(
     new RepairBunker,
-    new DefendFightersAgainstRush,
     new If(
       new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.tenHatch),
       new RequireMiningBases(2)),

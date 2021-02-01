@@ -64,17 +64,11 @@ object PvTIdeas {
               new Not(new EnemyStrategy(With.fingerprints.twoFac, With.fingerprints.threeFac))))),
           new Attack)))
 
-  class ReactToFiveRaxAs2GateCore extends Parallel(
-    new If(
-      new And(
-        new EnemyStrategy(With.fingerprints.fiveRax),
-        new FramesUntilUnitAtLeast(Protoss.CyberneticsCore, Protoss.Zealot.buildFrames / 3)),
-      new BuildOrder(Get(2, Protoss.Zealot))),
-    new Parallel(
-      new WriteStatus("ReactToFiveRaxAs2GateCore"),
-      new If(
-        new EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113),
-        new DefendFightersAgainstRush)))
+  class ReactToFiveRaxAs2GateCore extends If(
+    new And(
+      new EnemyStrategy(With.fingerprints.fiveRax),
+      new FramesUntilUnitAtLeast(Protoss.CyberneticsCore, Protoss.Zealot.buildFrames / 3)),
+    new BuildOrder(Get(2, Protoss.Zealot)))
 
   class ReactToWorkerRush extends If(
     new And(
@@ -128,7 +122,6 @@ object PvTIdeas {
       new EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113)),
     new Parallel(
       new WriteStatus("ReactToBBS"),
-      new DefendFightersAgainstRush,
       new CapGasAt(250),
       new If(new UnitsAtMost(1, Protoss.Gateway, complete = true), new CapGasWorkersAt(1)),
       new If(new UnitsAtMost(5, UnitMatchWarriors), new CancelIncomplete(Protoss.Nexus, Protoss.CitadelOfAdun, Protoss.TemplarArchives)),

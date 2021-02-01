@@ -43,7 +43,6 @@ class PvZ1BaseForgeTech extends GameplanTemplate {
     super.attackPlan)
 
   override def emergencyPlans: Seq[Plan] = Seq(
-    new PvZIdeas.ConditionalDefendFFEWithProbesAgainst4Pool,
     new If(
       new EnemyStrategy(With.fingerprints.fourPool),
       new Parallel(

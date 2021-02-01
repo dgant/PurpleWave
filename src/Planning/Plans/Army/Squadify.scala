@@ -1,16 +1,15 @@
 package Planning.Plans.Army
 
-import Lifecycle.With
 import Micro.Squads.Goals.SquadGoal
 import Micro.Squads.Squad
-import Planning.Plan
+import Planning.Prioritized
 
-abstract class SquadPlan[T <: SquadGoal] extends Plan {
+abstract class Squadify[T <: SquadGoal] extends Prioritized {
   
-  val squad: Squad = new Squad(this)
+  val squad: Squad = new Squad
   val goal: T
   
-  override def onUpdate() {
+  def update() {
     squad.setGoal(goal)
     squad.commission()
   }

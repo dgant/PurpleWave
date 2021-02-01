@@ -102,18 +102,4 @@ class TrainUnit(val traineeClass: UnitClass) extends ProductionPlan {
       score
     }
   }
-  
-  override def renderMap() {
-    if (isComplete) return
-    if (trainer.isEmpty) return
-    DrawMap.box(
-      trainer.get.tileArea.startPixel,
-      trainer.get.tileArea.endPixel,
-      With.self.colorDark)
-    DrawMap.label(
-      description.get,
-      trainer.get.pixel,
-      drawBackground = true,
-      With.self.colorDark)
-  }
 }

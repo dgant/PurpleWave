@@ -71,8 +71,7 @@ class PvZFFE extends GameplanTemplate {
     new Trigger(
       new Or(
         new UnitsAtLeast(2, Protoss.PhotonCannon),
-        new FrameAtLeast(GameTime(2, 20)())),
-      new PvZIdeas.ConditionalDefendFFEWithProbesAgainst4Pool))
+        new FrameAtLeast(GameTime(2, 20)()))))
   
   override def buildPlans: Seq[Plan] = Vector(
     new Build(

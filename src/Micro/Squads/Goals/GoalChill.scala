@@ -7,7 +7,7 @@ import Micro.Agency.Intention
 class GoalChill extends SquadGoalBasic {
   
   override def run() {
-    squad.units.foreach(_.agent.intend(squad.client, new Intention))
+    squad.units.foreach(_.agent.intend(this, new Intention))
   }
 
   override def destination: Pixel = With.geography.home.pixelCenter

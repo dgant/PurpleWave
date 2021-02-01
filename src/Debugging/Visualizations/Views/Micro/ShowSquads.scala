@@ -11,7 +11,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 object ShowSquads extends View {
   
   override def renderMap() {
-    With.squads.allByPriority.filter(_.units.nonEmpty).foreach(renderSquadMap)
+    With.squads.all.filter(_.units.nonEmpty).foreach(renderSquadMap)
   }
   
   def renderSquadMap(squad: Squad) {
@@ -31,16 +31,15 @@ object ShowSquads extends View {
   
   override def renderScreen() {
     val table =
-      Vector(Vector("Squad", "",  "Goal",  "", "", "", "Recruits", "",  "Enemies")) ++
-      With.squads.allByPriority.map(squad =>
+      Vector(Vector("Goal",  "", "", "", "Recruits", "",  "", "Enemies")) ++
+      With.squads.all.map(squad =>
         Vector(
-          squad.client.toString,
-          "",
           squad.goal.toString,
           "",
           "",
           "",
           enumerateUnits(squad.units),
+          "",
           "",
           enumerateUnits(squad.enemies)))
   

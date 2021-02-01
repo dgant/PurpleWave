@@ -6,14 +6,14 @@ import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountBetween
 import Planning.UnitMatchers.{UnitMatchWarriors, UnitMatchWorkers}
-import Planning.{Plan, Property}
+import Planning.{Prioritized, Property}
 
-class DefendAgainstWorkerRush extends Plan {
+class DefendAgainstWorkerRush extends Prioritized {
   
   val defenders = new Property[LockUnits](new LockUnits)
   defenders.get.unitMatcher.set(UnitMatchWorkers)
   
-  override def onUpdate() {
+  def update() {
     val attackingWorkers = With.geography.ourBases
       .flatMap(_.units.filter(u =>
         u.isEnemy

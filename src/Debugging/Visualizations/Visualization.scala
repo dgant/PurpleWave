@@ -70,7 +70,6 @@ class Visualization extends TimedTask {
     ShowPerformanceDetails,
     ShowPerformanceSummary,
     ShowProduction,
-    ShowPlans,
     ShowPreplacement,
     ShowPushes,
     ShowReactionTime,

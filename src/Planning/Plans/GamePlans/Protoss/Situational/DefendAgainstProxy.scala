@@ -6,19 +6,19 @@ import Micro.Squads.Squad
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.{UnitCountEverything, UnitCountExactly}
 import Planning.UnitMatchers._
-import Planning.{Plan, Property}
+import Planning.{Prioritized, Property}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, Forever, Minutes}
 
 import scala.collection.mutable
 
-class DefendAgainstProxy extends Plan {
+class DefendAgainstProxy extends Prioritized {
 
   val defenders = new Property[LockUnits](new LockUnits)
-  val squad = new Squad(this)
+  val squad = new Squad
   
-  override def onUpdate() {
+  def update() {
     if (With.frame > Minutes(7)()) return
 
     // Get sorted list of proxies

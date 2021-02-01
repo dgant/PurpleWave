@@ -8,7 +8,7 @@ import Planning.Plans.Army._
 import Planning.Plans.Basic.{NoPlan, Write, WriteStatus}
 import Planning.Plans.Compound.If
 import Planning.Plans.Macro.Automatic.{PumpWorkers, RequireSufficientSupply}
-import Planning.Plans.Macro.BuildOrders.{BuildOrder, FollowBuildOrder, RequireEssentials}
+import Planning.Plans.Macro.BuildOrders.{BuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.RemoveMineralBlocksAt
 import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Plans.Placement.ProposePlacement
@@ -49,8 +49,6 @@ abstract class GameplanTemplate extends GameplanMode {
           ++ buildPlans
           ++ Vector(
             archonPlan,
-            new ClearBurrowedBlockers,
-            new FollowBuildOrder,
             new RemoveMineralBlocksAt(removeMineralBlocksAt),
             new Write(With.blackboard.scoutPlan, scoutPlan),
             attackPlan)

@@ -1,10 +1,10 @@
 package Planning.ResourceLocks
 
-import Planning.{Plan, Property}
 import Lifecycle.With
 import Planning.UnitCounters.{UnitCountEverything, UnitCountExactly, UnitCounter}
 import Planning.UnitMatchers.{UnitMatchAnything, UnitMatcher}
 import Planning.UnitPreferences.{UnitPreferAnything, UnitPreference}
+import Planning.{Prioritized, Property}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
@@ -18,22 +18,21 @@ class LockUnits {
   val unitPreference    = new Property[UnitPreference](UnitPreferAnything)
   val unitCounter       = new Property[UnitCounter](UnitCountEverything)
   
-  var owner: Plan = _
+  var owner: Prioritized = _
   
   var isSatisfied:Boolean = false
   def satisfied: Boolean = isSatisfied
   
-  def acquire(plan: Plan) {
-    owner = plan
+  def acquire(prioritized: Prioritized) {
+    owner = prioritized
+    owner.prioritize()
     With.recruiter.add(this)
   }
   
-  def inquire(plan: Plan): Option[Vector[FriendlyUnitInfo]] = {
-    val ownerBefore = owner // Inquiring is supposed to be free of side-effects so retain the owner
-    owner = plan
-    val output = With.recruiter.inquire(this, isDryRun = true).map(_.toVector) // toVector ensures we don't return a view with invalid owner
-    owner = ownerBefore
-    output
+  def inquire(prioritized: Prioritized): Option[Vector[FriendlyUnitInfo]] = {
+    owner = prioritized
+    owner.prioritize()
+    With.recruiter.inquire(this, isDryRun = true).map(_.toVector) // toVector ensures we don't return a view with invalid owner
   }
   
   def release() {

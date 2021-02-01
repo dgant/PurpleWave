@@ -3,14 +3,13 @@ package Micro.Squads
 import Lifecycle.With
 import Micro.Squads.Goals.{GoalChill, SquadGoal}
 import Performance.Cache
-import Planning.Plan
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.CountMap
 
 import scala.collection.mutable
 
-class Squad(val client: Plan) {
+class Squad {
   
   var enemies: Seq[UnitInfo] = Seq.empty
   

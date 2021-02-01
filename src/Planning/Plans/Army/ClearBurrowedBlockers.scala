@@ -6,13 +6,13 @@ import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountOne
 import Planning.UnitMatchers.{UnitMatchMobileDetectors, UnitMatchOr}
 import Planning.UnitPreferences.UnitPreferClose
-import Planning.{Plan, Property}
+import Planning.{Prioritized, Property}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.{Minutes, Seconds}
 
 import scala.util.Random
 
-class ClearBurrowedBlockers extends Plan {
+class ClearBurrowedBlockers extends Prioritized {
   
   val detector = new Property(new LockUnits)
   detector.get.unitMatcher.set(UnitMatchMobileDetectors)
@@ -22,7 +22,7 @@ class ClearBurrowedBlockers extends Plan {
   clearer.get.unitMatcher.set(UnitMatchOr(Terran.Marine, Terran.Firebat, Terran.Goliath, Terran.Wraith, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk, Zerg.Mutalisk))
   clearer.get.unitCounter.set(UnitCountOne)
 
-  override def onUpdate(): Unit = {
+  def update(): Unit = {
 
     if (With.frame < Minutes(6)()) {
       return

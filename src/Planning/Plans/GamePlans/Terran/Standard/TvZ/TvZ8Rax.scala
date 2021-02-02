@@ -50,7 +50,7 @@ class TvZ8Rax extends GameplanTemplate {
     new Not(new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.fourPool)),
     new If(
       new StartPositionsAtLeast(3),
-      new ScoutAt(10, scoutCount = 2),
+      new ScoutAt(10, maxScouts = 2),
       new ScoutAt(10)))
 
   override def buildOrder: Seq[BuildRequest] = Seq(

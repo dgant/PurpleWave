@@ -8,7 +8,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.StandardGamePlan
 import Planning.Plans.Macro.Automatic.{Gather, Pump, RequireSufficientSupply}
 import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
-import Planning.Plans.Scouting.{ConsiderScoutingWithOverlords, ScoutWithWorkers}
+import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemiesAtMost, FoundEnemyBase}
 import Planning.Predicates.Strategy.Employing
@@ -36,13 +36,12 @@ class WorkerRush extends Trigger {
     new If(new Check(() => With.self.supplyUsed == With.self.supplyTotal), new RequireSufficientSupply),
     new Pump(With.self.workerClass),
     new Do(() => new FollowBuildOrder().update()),
-    new ConsiderScoutingWithOverlords,
     new If(
       new And(new Not(new TimeToAtack), new Not(new FoundEnemyBase)),
       new If(
         new Employing(WorkerRushOnScout),
-        new ScoutWithWorkers(maxScouts = PurpleMath.clamp(With.game.getStartLocations.size() - 2, 1, 2)),
-        new ScoutWithWorkers)),
+        new ScoutAt(1, maxScouts = PurpleMath.clamp(With.game.getStartLocations.size() - 2, 1, 2)),
+        new ScoutAt(1))),
     new Gather {
       var seenFiveWorkers: Boolean = false
       override def onUpdate(): Unit = {

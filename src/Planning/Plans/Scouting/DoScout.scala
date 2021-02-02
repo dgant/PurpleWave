@@ -4,14 +4,14 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
-import Planning.Plan
+import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.{UnitCountBetween, UnitCountOne}
 import Planning.UnitMatchers.{UnitMatchMobile, UnitMatcher}
 import Planning.UnitPreferences.UnitPreferIdle
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-abstract class AbstractScoutPlan extends Plan {
+abstract class DoScout extends Prioritized {
 
   protected def replaceDeadScouts: Boolean = true
   protected final def enemyFound: Boolean = With.scouting.enemyMain.isDefined

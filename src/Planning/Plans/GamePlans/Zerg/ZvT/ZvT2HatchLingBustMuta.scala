@@ -2,13 +2,13 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.{AllInIf, Attack}
+import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases}
 import Planning.Plans.Placement.{BuildSunkensAtExpansions, BuildSunkensAtNatural}
-import Planning.Plans.Scouting.ScoutWithZergling
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemyWalledIn, UpgradeComplete}
 import Planning.Predicates.Strategy.Employing
@@ -20,9 +20,7 @@ import Utilities.GameTime
 class ZvT2HatchLingBustMuta extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(ZvT2HatchLingBustMuta)
-
-  override def scoutPlan: Plan = new ScoutWithZergling
-
+  override def scoutPlan: Plan = NoPlan()
   override def attackPlan: Plan = new Trigger(
     new UpgradeComplete(Zerg.ZerglingSpeed, 1, GameTime(0, 10)()),
     new Attack)

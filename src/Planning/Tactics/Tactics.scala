@@ -7,7 +7,7 @@ import Planning.Plans.GamePlans.Protoss.Situational.{CatchDTRunby, DefendAgainst
 import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.ConditionalDefendFFEWithProbesAgainst4Pool
 import Planning.Plans.Macro.Automatic.Gather
 import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
-import Planning.Plans.Scouting.{ConsiderScoutingWithOverlords, ScoutExpansions, ShouldScoutExpansions}
+import Planning.Plans.Scouting.{DoScoutWithWorkers, ScoutExpansions, ScoutWithOverlord}
 import Planning.Predicates.Compound.Check
 
 class Tactics {
@@ -15,14 +15,15 @@ class Tactics {
   private lazy val followBuildOrder           = new FollowBuildOrder
   private lazy val yolo                       = new If(new Check(() => With.yolo.active()), new Attack)
   private lazy val ejectScout                 = new EjectScout
-  private lazy val scoutWithOverlord          = new ConsiderScoutingWithOverlords
+  private lazy val scoutWithOverlord          = new ScoutWithOverlord
   private lazy val defendAgainstProxy         = new DefendAgainstProxy
   private lazy val defendBases                = new DefendBases
   private lazy val defendFightersAgainstRush  = new DefendFightersAgainstRush
   private lazy val defendAgainstWorkerRush    = new DefendAgainstWorkerRush
   private lazy val defendFFEAgainst4Pool      = new ConditionalDefendFFEWithProbesAgainst4Pool
   private lazy val catchDTRunby               = new CatchDTRunby
-  private lazy val scoutExpansions            = new If(new ShouldScoutExpansions, new ScoutExpansions)
+  private lazy val scoutWithWorkers           = new DoScoutWithWorkers
+  private lazy val scoutExpansions            = new ScoutExpansions
   private lazy val attack                     = new DoAttack
   private lazy val defendEntrance             = new DefendEntrance
   private lazy val gather                     = new Gather
@@ -49,6 +50,7 @@ class Tactics {
     defendAgainstWorkerRush.update()
     defendFFEAgainst4Pool.update()
     catchDTRunby.update()
+    scoutWithWorkers.update()
     scoutExpansions.update()
     attack.update()
     defendEntrance.update()
@@ -59,5 +61,6 @@ class Tactics {
 
     // TODO: EscortSettlers is no longer being used but we do need to do it
     // TODO: Hide Carriers until 4x vs. Terran
+    // TODO: Plant Overlords around the map, as appropriate
   }
 }

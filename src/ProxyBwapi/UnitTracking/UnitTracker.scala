@@ -5,7 +5,7 @@ import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.Shapes.Circle
 import Performance.TotalUnitCounter
 import Planning.UnitMatchers.UnitMatcher
-import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, HistoricalUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo._
 
 import scala.collection.JavaConverters._
 
@@ -59,7 +59,7 @@ class UnitTracker {
   }
   def onUnitDestroy(bwapiUnit: bwapi.Unit) {
     With.logger.debug(f"OnUnitDestroy #${bwapiUnit.getID}")
-    get(bwapiUnit).flatMap(_.foreign).foreach(_.changeVisibility(Visibility.Dead))
+    get(bwapiUnit).foreach(_.asInstanceOf[BWAPICachedUnitProxy].changeVisibility(Visibility.Dead))
     kill(bwapiUnit.getID)
   }
 

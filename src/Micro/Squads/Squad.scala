@@ -71,4 +71,6 @@ class Squad {
   final private def updateUnits(): Unit = {
     _units = _conscripts.toSet ++ _freelancers
   }
+
+  override def toString: String = f"Squad to $goal"
 }

@@ -12,10 +12,10 @@ import scala.collection.mutable.ListBuffer
 class MasterBuildPlans {
 
   private val maxToFollow = 200
-  private val plans = new mutable.HashMap[Buildable, ListBuffer[ProductionPlan]]
+  private val plans = new mutable.HashMap[Buildable, ListBuffer[Production]]
 
-  def getChildren: Iterable[ProductionPlan] = buildChildren
-  private var buildChildren: Iterable[ProductionPlan] = Iterable.empty
+  def getChildren: Iterable[Production] = buildChildren
+  private var buildChildren: Iterable[Production] = Iterable.empty
 
   def update(invoker: FollowBuildOrder) {
 
@@ -32,7 +32,7 @@ class MasterBuildPlans {
     // Add needed builds
     buildsNeeded.keys.foreach(build => {
       if ( ! plans.contains(build)) {
-        plans.put(build, new ListBuffer[ProductionPlan])
+        plans.put(build, new ListBuffer[Production])
       }
       while (plans(build).size < buildsNeeded(build)) {
         plans(build).append(buildPlan(build))
@@ -78,7 +78,7 @@ class MasterBuildPlans {
       ++ childrenUnmappedFromQueue.filterNot(With.bank.hasSpentRequest).toVector.sortBy(_.frameCreated))
   }
 
-  private def buildPlan(buildable: Buildable): ProductionPlan = {
+  private def buildPlan(buildable: Buildable): Production = {
     if (buildable.unitOption.nonEmpty) {
       val unitClass = buildable.unitOption.get
       if (unitClass.isAddon) {

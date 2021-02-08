@@ -4,11 +4,12 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Points.Tile
 import Performance.Cache
+import Performance.Tasks.TimedTask
 import Planning.UnitMatchers.{UnitMatchBuilding, UnitMatchWorkers}
 import ProxyBwapi.Races.Zerg
 import Utilities._
 
-class Scouting {
+class Scouting extends TimedTask {
 
   private val baseScoutMap = new CountMap[Base]
   def baseScouts(base: Base): Int = baseScoutMap(base)
@@ -77,7 +78,7 @@ class Scouting {
   private var _enemyHasScoutedUs = false
   private var _enemyHasScoutedUsWithWorker = false
   
-  def update() {
+  override protected def onRun(budgetMs: Long): Unit = {
     baseScoutMap.clear()
     if (_firstEnemyMain.isEmpty) {
       _firstEnemyMain = With.geography.startBases.find(_.owner.isEnemy)

@@ -6,7 +6,6 @@ import Strategery.Strategies.AllRaces.{Sandbox, WorkerRushes}
 import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss._
 import Strategery.Strategies.Strategy
-import Strategery.Strategies.Terran.TvE._
 import Strategery.Strategies.Terran.TvR.TvR1Rax
 import Strategery.Strategies.Zerg._
 
@@ -24,7 +23,6 @@ object StrategyGroups {
   val disabled: Vector[Strategy] = WorkerRushes.all ++ Vector[Strategy](
     Sandbox,
 
-    TvEWorkerRushLiftoff,
     TvR1Rax, // Why is this disabled? Is it broken?
 
     PvE15BaseIslandCarrier, // Disabled for Sparkle in TorchUp

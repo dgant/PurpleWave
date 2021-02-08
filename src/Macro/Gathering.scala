@@ -8,6 +8,7 @@ import Performance.Cache
 import Performance.TaskQueue.TaskQueueGlobalWeights
 import Performance.Tasks.TimedTask
 import Planning.Plans.Macro.Automatic.Gather
+import Planning.{Plan, Prioritized}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
@@ -29,7 +30,7 @@ class Gathering extends TimedTask {
   // See LICENSE: https://github.com/TorchCraft/TorchCraftAI/blob/master/LICENSE
 
   var workers: collection.Set[FriendlyUnitInfo] = Set.empty
-  var gatheringPlan: Gather = new Gather
+  var gatheringPlan: Prioritized = new Gather
 
   private val resourceByWorker = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
   private val workersByResource = new mutable.HashMap[UnitInfo, mutable.Set[FriendlyUnitInfo]]

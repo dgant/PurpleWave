@@ -2,16 +2,18 @@ package Planning.Plans.GamePlans.AllRaces
 
 import Lifecycle.With
 import Mathematics.PurpleMath
+import Planning.Plan
 import Planning.Plans.Army.AttackWithWorkers
 import Planning.Plans.Basic.Do
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.StandardGamePlan
-import Planning.Plans.Macro.Automatic.{Gather, Pump, RequireSufficientSupply}
+import Planning.Plans.Macro.Automatic.{Pump, RequireSufficientSupply}
 import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
 import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemiesAtMost, FoundEnemyBase}
 import Planning.Predicates.Strategy.Employing
+import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountBetween
 import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete, UnitMatchWorkers}
 import Planning.UnitPreferences.UnitPreferClose
@@ -42,7 +44,9 @@ class WorkerRush extends Trigger {
         new Employing(WorkerRushOnScout),
         new ScoutAt(1, maxScouts = PurpleMath.clamp(With.game.getStartLocations.size() - 2, 1, 2)),
         new ScoutAt(1))),
-    new Gather {
+    new Plan {
+      val workerLock: LockUnits = new LockUnits
+      workerLock.unitMatcher.set(UnitMatchWorkers)
       var seenFiveWorkers: Boolean = false
       override def onUpdate(): Unit = {
         seenFiveWorkers = seenFiveWorkers || With.units.countOurs(UnitMatchAnd(UnitMatchWorkers, UnitMatchComplete)) >= 5
@@ -61,7 +65,9 @@ class WorkerRush extends Trigger {
         workerLock.unitCounter.set(new UnitCountBetween(1, goalWorkers))
         workerLock.unitPreference.set(UnitPreferClose(With.geography.home.pixelCenter))
         workerLock.canPoach.set(true)
-        super.onUpdate()
+        workerLock.acquire(this)
+        With.gathering.gatheringPlan = this
+        With.gathering.workers = workerLock.units
       }
     },
     new If(timeToAtack, new AttackWithWorkers))

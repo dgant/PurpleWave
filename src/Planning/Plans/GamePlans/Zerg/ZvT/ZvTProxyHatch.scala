@@ -163,7 +163,5 @@ class ZvTProxyHatch extends Parallel {
           new Not(new WeHaveEnoughSunkens)),
         new AttackWithWorkers(UnitCountExactly(2)),
         new Attack)),
-    
-    new Gather
   ))
 }

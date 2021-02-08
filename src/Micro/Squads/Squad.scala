@@ -14,15 +14,15 @@ class Squad {
   var enemies: Seq[UnitInfo] = Seq.empty
   
   def run() {
-    age --= age.keys.filterNot(units.contains)
-    units.foreach(age.add(_, 1))
+    unitAges --= unitAges.keys.view.filterNot(units.contains)
+    units.foreach(unitAges.add(_, 1))
     goal.run()
   }
 
-  val age: CountMap[FriendlyUnitInfo] = new CountMap[FriendlyUnitInfo]
+  val unitAges: CountMap[FriendlyUnitInfo] = new CountMap[FriendlyUnitInfo]
   def leader(unitClass: UnitClass): Option[FriendlyUnitInfo] = leaders().get(unitClass)
   private val leaders: Cache[Map[UnitClass, FriendlyUnitInfo]] = new Cache(() =>
-    units.toSeq.groupBy(_.unitClass).map(group => (group._1, group._2.maxBy(unit => age.getOrElse(unit, 0))))
+    units.toSeq.groupBy(_.unitClass).map(group => (group._1, group._2.maxBy(unit => unit.id + 10000 * unitAges.getOrElse(unit, 0))))
   )
 
   def commission(): Unit = { With.squads.commission(this) }
@@ -45,31 +45,21 @@ class Squad {
 
   def units: Set[FriendlyUnitInfo] = _units
   private var _units: Set[FriendlyUnitInfo] = Set.empty
-  private var _conscripts: mutable.Set[FriendlyUnitInfo] = mutable.Set.empty
-  private var _freelancers: mutable.Set[FriendlyUnitInfo] = mutable.Set.empty
+  private var _conscripts   : mutable.ArrayBuffer[FriendlyUnitInfo] = mutable.ArrayBuffer.empty
+  private var _freelancers  : mutable.ArrayBuffer[FriendlyUnitInfo] = mutable.ArrayBuffer.empty
 
-  final def clearFreelancers(): Unit = {
-    _freelancers = mutable.Set.empty
-    updateUnits()
-  }
-
-  final def clearConscripts(): Unit = {
-    _conscripts.clear()
-    updateUnits()
+  final def recalculateRosters(): Unit = {
+    _units = (_conscripts.view ++ _freelancers).toSet
+    _conscripts = mutable.ArrayBuffer.empty
+    _freelancers = mutable.ArrayBuffer.empty
   }
 
   final def addFreelancers(units: Iterable[FriendlyUnitInfo]): Unit = {
     _freelancers ++= units
-    updateUnits()
   }
 
   final def addConscripts(units: Iterable[FriendlyUnitInfo]): Unit = {
     _conscripts ++= units
-    updateUnits()
-  }
-
-  final private def updateUnits(): Unit = {
-    _units = _conscripts.toSet ++ _freelancers
   }
 
   override def toString: String = f"Squad to $goal"

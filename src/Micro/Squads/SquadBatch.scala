@@ -58,13 +58,13 @@ class SquadBatch {
     bestSquad.addUnit(freelancer)
   }
 
-  def bestValueOfFreelancer(freelancer: FriendlyUnitInfo): Double = {
+  def bestValueOfFreelancer(freelancer: FriendlyUnitInfo): Double =
     ByOption.max(
-      eligibleSquads.view
+      eligibleSquads
+        .view
         .filter(_.squad.goal.candidateWelcome(this, freelancer))
-        .map(s => s.squad.goal.candidateValue(this, freelancer)))
+        .map(_.squad.goal.candidateValue(this, freelancer)))
       .getOrElse(0.0)
-  }
 
   def squadValue(freelancer: FriendlyUnitInfo, squad: SquadAssignment): Double = {
     val inherentValue = squad.squad.goal.inherentValue
@@ -73,8 +73,8 @@ class SquadBatch {
     output
   }
 
-  def apply(): Unit = {
-    With.squads.all.foreach(squad => squad.clearFreelancers())
+  def finish(): Unit = {
     assignments.foreach(assignment => assignment.squad.addFreelancers(assignment.units))
+    squads.foreach(_.recalculateRosters())
   }
 }

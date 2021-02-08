@@ -77,7 +77,7 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     dx * dx + dy * dy
   }
   @inline final def tile: Tile = {
-    Tile(x / 32, y / 32)
+    Tile(x / 32, y / 32) // Note! This will handle negative coordinates incorrectly
   }
   @inline final def toPoint: Point = {
     Point(x, y)

@@ -1,6 +1,5 @@
 package Planning.Plans.Macro.Build
 
-import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import Macro.Buildables.{Buildable, BuildableUnit}
 import Macro.Scheduling.MacroCounter
@@ -15,15 +14,13 @@ import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.Seconds
 
-class TrainUnit(val traineeClass: UnitClass) extends ProductionPlan {
+class TrainUnit(val traineeClass: UnitClass) extends Production {
 
   override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
   override def producerUnitLocks: Seq[LockUnits] = Seq(trainerLock)
   override def producerInProgress: Boolean = trainee.isDefined
   override def buildable: Buildable = BuildableUnit(traineeClass)
 
-  description.set("Train a " + traineeClass)
-  
   val currencyLock    = new LockCurrencyForUnit(traineeClass)
   val trainerClass    = traineeClass.whatBuilds._1
   val addonsRequired  = traineeClass.buildUnitsEnabling.find(b => b.isAddon && b.whatBuilds._1 == trainerClass)

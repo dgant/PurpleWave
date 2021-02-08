@@ -97,6 +97,6 @@ class TvTLateGame extends GameplanTemplate {
     new RequireMiningBases(3),
     new PumpWorkers,
     new RequireMiningBases(5),
-    new FloatBuildings
+    new FloatBuildings(Terran.Barracks, Terran.EngineeringBay)
   )
 }

@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views.Economy
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
-import Planning.Plans.Macro.Build.ProductionPlan
+import Planning.Plans.Macro.Build.Production
 import ProxyBwapi.Races.Zerg
 import bwapi.Color
 
@@ -43,9 +43,9 @@ object ShowProduction extends View {
     .flatten
     .toVector ++ With.bank.requests
       .withFilter( ! _.isSpent)
-      .withFilter(_.owner.isInstanceOf[ProductionPlan])
+      .withFilter(_.owner.isInstanceOf[Production])
       .map(request => {
-        val productionPlan = request.owner.asInstanceOf[ProductionPlan]
+        val productionPlan = request.owner.asInstanceOf[Production]
         val duration = if (productionPlan != null) productionPlan.buildable.frames else 24 * 45
         Producible(
           request.owner.toString

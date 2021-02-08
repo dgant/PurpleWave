@@ -9,7 +9,7 @@ import Planning.UnitPreferences.UnitPreferIdle
 import ProxyBwapi.Techs.Tech
 import Utilities.ByOption
 
-class ResearchTech(tech: Tech) extends ProductionPlan {
+class ResearchTech(tech: Tech) extends Production {
 
   override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
   override def producerUnitLocks: Seq[LockUnits] = Seq(techers)
@@ -23,8 +23,6 @@ class ResearchTech(tech: Tech) extends ProductionPlan {
     unitMatcher.set(techerClass)
     unitPreference.set(UnitPreferIdle)
   }
-  
-  description.set("Tech " + tech)
   
   override def isComplete: Boolean = With.self.hasTech(tech)
   

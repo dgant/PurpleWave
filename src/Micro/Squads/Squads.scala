@@ -1,14 +1,35 @@
 package Micro.Squads
 
-class Squads extends SquadBatcher {
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-  def all: Seq[Squad] = activeBatch.squads.view
+class Squads {
 
-  def updateGoals() {
-    all.foreach(_.run())
+  private var batchActive: SquadBatch = new SquadBatch
+  private var batchNext: SquadBatch = new SquadBatch
+
+  def all: Seq[Squad] = batchActive.squads.view
+
+  def commission(squad: Squad): Unit = {
+    batchNext.squads += squad
   }
 
-  def clearConscripts(): Unit = {
-    all.foreach(_.clearConscripts())
+  def freelance(freelancer: FriendlyUnitInfo) {
+    batchNext.freelancers += freelancer
+  }
+
+  def finishRecruitment(): Unit = {
+    while ( ! batchNext.processingFinished) {
+      batchNext.step()
+      if (batchNext.processingFinished) {
+        batchActive = batchNext
+        batchActive.finish()
+        batchNext = new SquadBatch
+        return
+      }
+    }
+  }
+
+  def runSquads() {
+    all.foreach(_.run())
   }
 }

@@ -10,7 +10,7 @@ class Accounting extends TimedTask {
   val incomePerFrameMinerals = 0.046
   val incomePerFrameGas = 0.069
   
-  //Should start at 50, of course but this -30 offsets the effect of starting workers all being far from minerals
+  // Should start at 50, of course,but this -30 offsets the effect of starting workers all being far from minerals
   var ourEstimatedTotalMinerals = 20.0
   var ourEstimatedTotalGas = 0.0
   

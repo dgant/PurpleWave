@@ -3,16 +3,17 @@ package Micro.Matchups
 import Information.Battles.BattleClassificationFilters
 import Information.Battles.Types.BattleLocal
 import Lifecycle.With
+import Performance.Tasks.TimedTask
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
 import scala.collection.mutable
 
-class MatchupGraph {
+class MatchupGraph extends TimedTask {
 
   val entrants = new mutable.HashMap[BattleLocal, mutable.ArrayBuffer[UnitInfo]]
   
-  def run() {
+  override protected def onRun(budgetMs: Long): Unit = {
     assignEntrants()
     With.units.all.foreach(u => u.matchups = MatchupAnalysis(u))
   }

@@ -1,11 +1,12 @@
 package Macro.Scheduling
 
 import Lifecycle.With
+import Performance.Tasks.TimedTask
 import ProxyBwapi.UnitClasses.UnitClass
 
 import scala.collection.mutable
 
-class MasterBuildOrderHistory {
+class MasterBuildOrderHistory extends TimedTask {
   
   private val countByClassAllTime = new mutable.HashMap[UnitClass, mutable.HashSet[Int]] {
     override def default(key: UnitClass): mutable.HashSet[Int] = {
@@ -15,8 +16,8 @@ class MasterBuildOrderHistory {
   }
   
   def doneAllTime(unitClass: UnitClass): Int = countByClassAllTime(unitClass).size
-  
-  def update() {
+
+  override protected def onRun(budgetMs: Long): Unit = {
     With.units.ours.foreach(unit => MacroCounter.countComplete(unit).foreach(p => countByClassAllTime(p._1).add(unit.id)))
   }
 }

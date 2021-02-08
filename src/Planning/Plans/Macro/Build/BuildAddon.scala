@@ -10,7 +10,7 @@ import Planning.UnitMatchers.{UnitMatchAnd, UnitMatcher}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class BuildAddon(val addonClass: UnitClass) extends ProductionPlan {
+class BuildAddon(val addonClass: UnitClass) extends Production {
 
   override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
   override def producerUnitLocks: Seq[LockUnits] = Seq(builderLock)
@@ -29,8 +29,6 @@ class BuildAddon(val addonClass: UnitClass) extends ProductionPlan {
   val builderLock: LockUnits = new LockUnits
   builderLock.unitCounter.set(UnitCountOne)
   builderLock.unitMatcher.set(builderMatcher)
-    
-  description.set("Add on a " + addonClass)
   
   override def isComplete: Boolean = addon.exists(_.aliveAndComplete)
   

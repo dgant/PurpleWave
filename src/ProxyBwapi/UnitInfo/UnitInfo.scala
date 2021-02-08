@@ -14,7 +14,7 @@ import Micro.Actions.Combat.Targeting.Target
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Matchups.MatchupAnalysis
 import Performance.{Cache, KeyedCache}
-import Planning.Plan
+import Planning.{Plan, Prioritized}
 import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -113,11 +113,11 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
     addon.map(_.remainingCompletionFrames).getOrElse(0)
   ))))
 
-  private var producer: Option[Plan] = None
-  @inline final def setProducer(plan: Plan) {
+  private var producer: Option[Prioritized] = None
+  @inline final def setProducer(plan: Prioritized) {
     producer = Some(plan)
   }
-  @inline final def getProducer: Option[Plan] = {
+  @inline final def getProducer: Option[Prioritized] = {
     producer.filter(_.isPrioritized)
   }
 

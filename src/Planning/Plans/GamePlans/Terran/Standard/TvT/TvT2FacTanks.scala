@@ -67,6 +67,6 @@ class TvT2FacTanks extends GameplanTemplate {
       new RequireMiningBases(2)),
     new If(
       new UnitsAtLeast(1, Terran.Factory, complete = true),
-      new FloatBuildings)
+      new FloatBuildings(Terran.Barracks, Terran.EngineeringBay))
   )
 }

@@ -51,6 +51,6 @@ class TvT1FacFE extends GameplanTemplate {
     new Pump(Terran.SiegeTankUnsieged),
     new If(
       new UnitsAtLeast(1, Terran.Vulture),
-      new FloatBuildings),
+      new FloatBuildings(Terran.Barracks, Terran.EngineeringBay)),
   )
 }

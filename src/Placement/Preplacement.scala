@@ -3,21 +3,18 @@ package Placement
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Points.{Direction, SpecificPoints}
+import Performance.Tasks.TimedTask
 
 import scala.collection.mutable.ArrayBuffer
 
-class Preplacement {
+class Preplacement extends TimedTask {
 
   private var initialized: Boolean = false
 
   val preplacement: Preplacer = new Preplacer
   val fits = new ArrayBuffer[Fit]
 
-  def update(): Unit = {
-    initialize()
-  }
-
-  private def initialize(): Unit = {
+  override protected def onRun(budgetMs: Long): Unit = {
     if (initialized) return
     initialized = true
 

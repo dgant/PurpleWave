@@ -4,8 +4,9 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.PlacementRequests.PlacementRequest
 import Mathematics.Points.Tile
-import Planning.Plan
+import Performance.Tasks.TimedTask
 import Planning.Plans.Basic.NoPlan
+import Planning.Prioritized
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.Forever
@@ -13,15 +14,15 @@ import Utilities.Forever
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-case class TileReservation(plan: Plan, target: Tile, update: Int) {
+case class TileReservation(plan: Prioritized, target: Tile, update: Int) {
   def active: Boolean = update >= With.groundskeeper.updates - 1
 }
 
-case class RequestReservation(plan: Plan, update: Int) {
+case class RequestReservation(plan: Prioritized, update: Int) {
   def active: Boolean = update >= With.groundskeeper.updates - 1
 }
 
-class Groundskeeper {
+class Groundskeeper extends TimedTask {
   var updates: Int = 0
   val reserved: Array[TileReservation] = Array.fill(With.mapTileWidth * With.mapTileHeight)(TileReservation(NoPlan(), Tile(0, 0), -Forever()))
 
@@ -30,7 +31,7 @@ class Groundskeeper {
   var blueprintConsumers  : mutable.Map[Blueprint, FriendlyUnitInfo] = mutable.HashMap.empty
   var requestHolders      : mutable.Map[PlacementRequest, RequestReservation] = mutable.HashMap.empty
 
-  def update(): Unit = {
+  override protected def onRun(budgetMs: Long): Unit = {
     updates += 1
     suggestionsBefore   = suggestionsNow
     suggestionsNow      = ArrayBuffer.empty
@@ -38,11 +39,11 @@ class Groundskeeper {
     requestHolders.view.filterNot(_._2.active).toSeq.foreach(r => requestHolders.remove(r._1))
   }
 
-  def getRequestHolder(request: PlacementRequest): Option[Plan] = {
+  def getRequestHolder(request: PlacementRequest): Option[Prioritized] = {
     requestHolders.get(request).map(_.plan)
   }
 
-  private def setRequestHolder(request: PlacementRequest, holder: Plan): Unit = {
+  private def setRequestHolder(request: PlacementRequest, holder: Prioritized): Unit = {
     requestHolders(request) = RequestReservation(holder, updates)
   }
 
@@ -77,7 +78,7 @@ class Groundskeeper {
   }
 
   // I am a building plan. I want to indicate that I will need placement for a Gateway.
-  def request(requestingPlan: Plan, unitClass: UnitClass): PlacementRequest = {
+  def request(requestingPlan: Prioritized, unitClass: UnitClass): PlacementRequest = {
     val matched = matchSuggestion(requestingPlan, unitClass)
     matched.foreach(refresh)
     val output =
@@ -113,12 +114,12 @@ class Groundskeeper {
     suggestionsWithDuplicates.find(s => s.unitClass == unitClass && s.tile.contains(tile))
   }
 
-  private def matchSuggestion(plan: Plan, unitClass: UnitClass): Option[PlacementRequest] = {
+  private def matchSuggestion(plan: Prioritized, unitClass: UnitClass): Option[PlacementRequest] = {
     // Put the blueprint consumer check at the end because it's the slowest
     suggestionsWithDuplicates.find(s => s.unitClass == unitClass && s.plan.forall(_ == plan))
   }
 
-  def isReserved(tile: Tile, plan: Option[Plan] = None): Boolean = {
+  def isReserved(tile: Tile, plan: Option[Prioritized] = None): Boolean = {
     if ( ! tile.valid) return true
     val reservation = reserved(tile.i)
     if ( ! reservation.active) return false
@@ -126,11 +127,11 @@ class Groundskeeper {
     false
   }
 
-  def reserve(plan: Plan, target: Tile, unitClass: UnitClass): Boolean = {
+  def reserve(plan: Prioritized, target: Tile, unitClass: UnitClass): Boolean = {
     reserve(plan, unitClass.tileArea.add(target).tiles)
   }
 
-  def reserve(plan: Plan, tiles: Seq[Tile]): Boolean = {
+  def reserve(plan: Prioritized, tiles: Seq[Tile]): Boolean = {
     val canReserve = tiles.forall(tile => ! isReserved(tile, plan = Some(plan)))
     if (canReserve) {
       tiles.foreach(tile => reserved(tile.i) = TileReservation(plan, tile, updates))

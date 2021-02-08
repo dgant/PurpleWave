@@ -1,6 +1,7 @@
 package Planning.Tactics
 
 import Lifecycle.With
+import Performance.Tasks.TimedTask
 import Planning.Plans.Army._
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.Protoss.Situational.{CatchDTRunby, DefendAgainstProxy, DefendFightersAgainstRush}
@@ -10,7 +11,7 @@ import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
 import Planning.Plans.Scouting.{DoScoutWithWorkers, ScoutExpansions, ScoutWithOverlord}
 import Planning.Predicates.Compound.Check
 
-class Tactics {
+class Tactics extends TimedTask {
   private lazy val clearBurrowedBlockers      = new ClearBurrowedBlockers
   private lazy val followBuildOrder           = new FollowBuildOrder
   private lazy val yolo                       = new If(new Check(() => With.yolo.active()), new Attack)
@@ -29,9 +30,10 @@ class Tactics {
   private lazy val gather                     = new Gather
   private lazy val chillOverlords             = new ChillOverlords
   private lazy val recruitFreelancers         = new RecruitFreelancers
+  private lazy val doFloatBuildings           = new DoFloatBuildings
   private lazy val scan                       = new Scan
 
-  def update(): Unit = {
+  override protected def onRun(budgetMs: Long): Unit = {
     // TODO: Attack with units that can safely harass:
     // - Dark Templar/Lurkers/Cloaky Ghosts/Cloaky Wraiths
     // - Vultures/Zerglings (except against faster enemy units, or ranged units vs short-range vision of lings)
@@ -57,6 +59,7 @@ class Tactics {
     gather.update()
     chillOverlords.update()
     recruitFreelancers.update()
+    doFloatBuildings.update()
     scan.update()
 
     // TODO: EscortSettlers is no longer being used but we do need to do it

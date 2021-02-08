@@ -19,7 +19,7 @@ class GoalDefendZone extends SquadGoalBasic {
 
   private var lastAction = "Defend "
 
-  override def toString: String = lastAction + zone
+  override def toString: String = lastAction + zone.name
   override def destination: Pixel = _currentDestination
 
   var zone: Zone = _

@@ -13,14 +13,12 @@ import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
-class MorphUnit(val classToMorph: UnitClass) extends ProductionPlan {
+class MorphUnit(val classToMorph: UnitClass) extends Production {
 
   override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
   override def producerUnitLocks: Seq[LockUnits] = Seq(morpherLock)
   override def producerInProgress: Boolean = morpher.exists(_.morphing)
   override def buildable: Buildable = BuildableUnit(classToMorph)
-
-  description.set("Morph a " + classToMorph)
   
   val currencyLock  = new LockCurrencyForUnit(classToMorph)
   val morpherClass  = classToMorph.whatBuilds._1

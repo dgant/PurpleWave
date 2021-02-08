@@ -3,7 +3,7 @@ package Macro.Architecture.PlacementRequests
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Mathematics.Points.Tile
-import Planning.Plan
+import Planning.Prioritized
 import ProxyBwapi.UnitClasses.UnitClass
 import Utilities.Forever
 
@@ -21,7 +21,7 @@ class PlacementRequest(
   var lastPlacementFrame: Int = - Forever()
 
   def unitClass: UnitClass = blueprint.building
-  def plan: Option[Plan] = With.groundskeeper.getRequestHolder(this)
+  def plan: Option[Prioritized] = With.groundskeeper.getRequestHolder(this)
 
   // Attempted performance improvement
   final override val hashCode: Int = super.hashCode()

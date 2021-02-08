@@ -12,7 +12,6 @@ object TerranChoices {
   /////////
   
   val tvr = Vector(
-    TvEWorkerRushLiftoff,
     TvEProxyBBS,
     TvE2RaxSCVMarine,
     TvR1Rax,

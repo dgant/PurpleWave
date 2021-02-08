@@ -10,7 +10,7 @@ import Planning.UnitPreferences.UnitPreferIdle
 import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.Upgrades.Upgrade
 
-class ResearchUpgrade(upgrade: Upgrade, level: Int) extends ProductionPlan {
+class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Production {
 
   override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
   override def producerUnitLocks: Seq[LockUnits] = Seq(upgraders)
@@ -24,8 +24,6 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends ProductionPlan {
     unitMatcher.set(UnitMatchAnd(upgraderClass, UnitMatchIdle))
     unitPreference.set(UnitPreferIdle)
   }
-
-  description.set("Upgrade " + upgrade + " " + level)
 
   override def isComplete: Boolean = With.self.getUpgradeLevel(upgrade) >= level
 

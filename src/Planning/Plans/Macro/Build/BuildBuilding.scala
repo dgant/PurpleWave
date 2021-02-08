@@ -16,7 +16,7 @@ import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
-class BuildBuilding(val buildingClass: UnitClass) extends ProductionPlan {
+class BuildBuilding(val buildingClass: UnitClass) extends Production {
 
   override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
   override def producerUnitLocks: Seq[LockUnits] = Seq(builderLock)
@@ -160,6 +160,4 @@ class BuildBuilding(val buildingClass: UnitClass) extends ProductionPlan {
     val travelFrames = (if (builderLock.units.isEmpty) 1.4 else 1.25) * proposedBuilder.get.framesToTravelTo(desiredTile.get.pixelCenter)
     travelFrames + 48 >= currencyLock.expectedFrames
   }
-
-  description.set("Build a " + buildingClass)
 }

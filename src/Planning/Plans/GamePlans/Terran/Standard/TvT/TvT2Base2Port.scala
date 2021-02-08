@@ -42,6 +42,6 @@ class TvT2Base2Port extends GameplanTemplate {
       new RequireMiningBases(3)),
     new Build(Get(3, Terran.Factory)),
     new Pump(Terran.Vulture),
-    new FloatBuildings
+    new FloatBuildings(Terran.Barracks, Terran.EngineeringBay)
   )
 }

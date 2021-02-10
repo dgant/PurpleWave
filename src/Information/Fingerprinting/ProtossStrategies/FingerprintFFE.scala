@@ -17,12 +17,12 @@ abstract class FingerprintFFE extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.nexusFirst)) {
   
   private class Status {
-    def couldBeWall(unit: UnitInfo) = unit.base.forall(_.isNaturalOf.isDefined) && ! unit.is(UnitMatchProxied)
+    def couldBeWall(unit: UnitInfo) = unit.base.forall(_.isNaturalOf.isDefined) && ! unit.is(MatchProxied)
     lazy val forge                  = With.units.enemy.find(u => u.is(Protoss.Forge)    && couldBeWall(u))
     lazy val gateway                = With.units.enemy.find(u => u.is(Protoss.Gateway)  && couldBeWall(u))
     lazy val expanded               = With.units.countEnemy(Protoss.Nexus) > 1 || With.units.enemy.exists(u => u.is(Protoss.Nexus) && ! u.base.exists(_.isStartLocation))
     lazy val cannonsWalled          = With.units.enemy.view.filter(u => u.is(Protoss.PhotonCannon) && couldBeWall(u)).toVector
-    lazy val buildingsProxied       = With.units.enemy.view.filter(_.isAll(UnitMatchBuilding, UnitMatchProxied)).toVector
+    lazy val buildingsProxied       = With.units.enemy.view.filter(_.isAll(MatchBuilding, MatchProxied)).toVector
     lazy val zealot                 = With.units.enemy.view.filter(_.is(Protoss.Zealot)).toVector
     lazy val forgeOrCannon          = cannonsWalled ++ forge
     lazy val gatewayOrZealot        = gateway ++ zealot
@@ -55,7 +55,7 @@ abstract class FingerprintFFE extends FingerprintAnd(
     status.buildingsProxied.isEmpty
       && (
       (With.fingerprints.gatewayFirst.matches && With.units.existsEnemy(Protoss.Forge))
-      || (With.units.existsEnemy(UnitMatchAnd(Protoss.Gateway, UnitMatchComplete)) && With.units.existsEnemy(UnitMatchAnd(Protoss.Gateway, UnitMatchNot(UnitMatchComplete))))
+      || (With.units.existsEnemy(MatchAnd(Protoss.Gateway, MatchComplete)) && With.units.existsEnemy(MatchAnd(Protoss.Gateway, MatchNot(MatchComplete))))
       || (readyToDecide(status) && ! gatewayUnlikely(status) && lossFFE(status) >= lossGatewayFE(status)))
   )
   

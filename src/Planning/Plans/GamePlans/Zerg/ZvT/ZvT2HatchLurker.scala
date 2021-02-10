@@ -91,8 +91,8 @@ class ZvT2HatchLurker extends GameplanTemplate {
 
     new CapGasAtRatioToMinerals(1.0, 100),
     new Write(With.blackboard.preferCloseExpansion, true),
-    new CancelOrders(UnitMatchTeching(Zerg.LurkerMorph)),
-    new CancelOrders(UnitMatchUpgrading(Zerg.ZerglingSpeed)),
+    new CancelOrders(MatchTeching(Zerg.LurkerMorph)),
+    new CancelOrders(MatchUpgrading(Zerg.ZerglingSpeed)),
 
     new Pump(Zerg.SunkenColony),
     new BuildSunkensAtNatural(1),
@@ -152,7 +152,7 @@ class ZvT2HatchLurker extends GameplanTemplate {
     new BuildOrder(
       Get(Zerg.ZerglingSpeed),
       Get(Zerg.HydraliskDen)),
-    new PumpRatio(Zerg.Drone, 20, 40, Seq(Friendly(UnitMatchHatchery, 10.0))),
+    new PumpRatio(Zerg.Drone, 20, 40, Seq(Friendly(MatchHatcherylike, 10.0))),
     new Build(Get(Zerg.LurkerMorph)),
     new BuildGasPumps,
     new If(

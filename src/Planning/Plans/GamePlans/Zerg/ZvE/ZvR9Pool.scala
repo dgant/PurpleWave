@@ -18,7 +18,7 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones.{TechComplete, TechStarted, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy._
-import Planning.UnitMatchers.UnitMatchOr
+import Planning.UnitMatchers.MatchOr
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.ZvR9Pool
 
@@ -79,7 +79,7 @@ class ZvR9Pool extends GameplanTemplate {
         new BuildSunkensInMain(4),
         new If(
           new And(
-            new UnitsAtMost(3, UnitMatchOr(Zerg.CreepColony, Zerg.SunkenColony)),
+            new UnitsAtMost(3, MatchOr(Zerg.CreepColony, Zerg.SunkenColony)),
             new UnitsAtMost(0, Zerg.Spire)),
           new CapGasWorkersAt(1)))),
 

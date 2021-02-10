@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Tactics
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Agency.Commander
-import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete}
+import Planning.UnitMatchers.{MatchAnd, MatchComplete}
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -16,7 +16,7 @@ object StrategicNuke extends Action {
     val target = unit.agent.toNuke.get
     unit.agent.toTravel = Some(target)
     
-    lazy val haveANuke = With.units.existsOurs(UnitMatchAnd(Terran.NuclearMissile, UnitMatchComplete))
+    lazy val haveANuke = With.units.existsOurs(MatchAnd(Terran.NuclearMissile, MatchComplete))
     if (unit.pixelDistanceCenter(target) < 11.0 * 32.0 && haveANuke) {
       Commander.useTechOnPixel(unit, Terran.NuclearStrike, target)
     }

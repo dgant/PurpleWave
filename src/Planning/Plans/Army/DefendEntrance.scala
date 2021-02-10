@@ -9,7 +9,7 @@ import Utilities.ByOption
 class DefendEntrance extends Squadify[GoalDefendZone] {
   
   override val goal: GoalDefendZone = new GoalDefendZone
-  goal.unitMatcher = UnitMatchAnd(UnitMatchRecruitableForCombat, UnitMatchNot(UnitMatchWorkers))
+  goal.unitMatcher = MatchAnd(MatchRecruitableForCombat, MatchNot(MatchWorkers))
   goal.unitCounter = UnitCountEverything
   
   override def update() {

@@ -7,7 +7,7 @@ import Micro.Agency.Intention
 import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.{UnitCountBetween, UnitCountOne}
-import Planning.UnitMatchers.{UnitMatchMobile, UnitMatcher}
+import Planning.UnitMatchers.{MatchMobile, Matcher}
 import Planning.UnitPreferences.UnitPreferIdle
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -17,12 +17,12 @@ abstract class DoScout extends Prioritized {
   protected final def enemyFound: Boolean = With.scouting.enemyMain.isDefined
 
   protected val scoutLock: LockUnits = new LockUnits
-  scoutLock.unitMatcher.set(UnitMatchMobile)
+  scoutLock.unitMatcher.set(MatchMobile)
   scoutLock.unitCounter.set(UnitCountOne)
   scoutLock.unitPreference.set(UnitPreferIdle)
   scoutLock.interruptable.set(false)
 
-  protected final def getScouts(matcher: UnitMatcher, count: Int): Iterable[FriendlyUnitInfo] = {
+  protected final def getScouts(matcher: Matcher, count: Int): Iterable[FriendlyUnitInfo] = {
     if (scoutLock.units.size > count) {
       scoutLock.release()
     }

@@ -10,7 +10,7 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases, Requir
 import Planning.Plans.Placement.BuildCannonsAtExpansions
 import Planning.Predicates.Always
 import Planning.Predicates.Milestones.UnitsAtLeast
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.UnitMatchers.MatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 
@@ -40,7 +40,7 @@ class ProtossHuntersFFAGatewayAggro extends GameplanTemplate {
     new If(new UnitsAtLeast(2, Protoss.Observatory),  new Build(Get(Protoss.ObserverSpeed))),
     new If(new UnitsAtLeast(4, Protoss.Zealot),       new Build(Get(Protoss.ZealotSpeed))),
     new If(new UnitsAtLeast(2, Protoss.Arbiter),      new Build(Get(Protoss.Stasis))),
-    new If(new UnitsAtLeast(12, UnitMatchWarriors, complete = true), new RequireMiningBases(2)),
+    new If(new UnitsAtLeast(12, MatchWarriors, complete = true), new RequireMiningBases(2)),
     new If(new UnitsAtLeast(1, Protoss.Reaver, complete = true), new RequireMiningBases(2)),
     new Pump(Protoss.Arbiter,      2),
     new Pump(Protoss.Observer,     2),

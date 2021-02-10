@@ -34,7 +34,7 @@ class TvTLateGame extends GameplanTemplate {
       Get(Terran.Factory),
       Get(Terran.MachineShop)),
     new BuildGasPumps,
-    new If(new UnitsAtLeast(8, UnitMatchSiegeTank, complete = true), new RequireMiningBases(3)),
+    new If(new UnitsAtLeast(8, MatchSiegeTank, complete = true), new RequireMiningBases(3)),
     new UpgradeContinuously(Terran.MechDamage),
     new If(
       new UnitsAtLeast(2, Terran.Battlecruiser),
@@ -70,7 +70,7 @@ class TvTLateGame extends GameplanTemplate {
     new If(
       new Or(
         new EnemyHasShown(Terran.Wraith),
-        new EnemiesAtLeast(1, UnitMatchAnd(UnitMatchBuilding, UnitMatchCustom(u => u.flying)))),
+        new EnemiesAtLeast(1, MatchAnd(MatchBuilding, Match(u => u.flying)))),
       new UpgradeContinuously(Terran.GoliathAirRange)),
     new Pump(Terran.Battlecruiser),
     new PumpRatio(Terran.Goliath, 0, 50, Seq(Enemy(Terran.Wraith, 3.0), Enemy(Terran.Dropship, 2.0), Enemy(Terran.Battlecruiser, 6.0))),

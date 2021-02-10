@@ -2,7 +2,7 @@ package Information.Fingerprinting.ZergStrategies
 
 import Information.Fingerprinting.Generic._
 import Lifecycle.With
-import Planning.UnitMatchers.UnitMatchNonStartingTownHall
+import Planning.UnitMatchers.MatchNonStartingTownHall
 import Utilities.GameTime
 import bwapi.Race
 
@@ -14,4 +14,4 @@ class Fingerprint12Hatch extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.overpool),
   new FingerprintNot(With.fingerprints.tenHatch),
   new FingerprintNot(With.fingerprints.twelvePool),
-  new FingerprintCompleteBy(UnitMatchNonStartingTownHall, GameTime(3, 10)))
+  new FingerprintCompleteBy(MatchNonStartingTownHall, GameTime(3, 10)))

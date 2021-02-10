@@ -5,7 +5,7 @@ import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountExactly
-import Planning.UnitMatchers.{UnitMatchWarriors, UnitMatchWorkers}
+import Planning.UnitMatchers.{MatchWarriors, MatchWorkers}
 import Planning.UnitPreferences.UnitPreferClose
 import Planning.{Prioritized, Property}
 import ProxyBwapi.Races.{Protoss, Terran}
@@ -15,13 +15,13 @@ import Utilities.Seconds
 class DefendFightersAgainstRush extends Prioritized {
   
   val defenders = new Property[LockUnits](new LockUnits)
-  defenders.get.unitMatcher.set(UnitMatchWorkers)
+  defenders.get.unitMatcher.set(MatchWorkers)
 
   private def inOurBase(unit: UnitInfo): Boolean = unit.zone.bases.exists(_.owner.isUs)
   def update() {
     lazy val fighters     = With.units.ours .filter(u => u.unitClass.canMove && u.canAttack && ! u.unitClass.isWorker && inOurBase(u) && u.remainingCompletionFrames < Seconds(5)())
     lazy val cannons      = With.units.ours .filter(u => u.aliveAndComplete && u.isAny(Terran.Bunker, Protoss.PhotonCannon))
-    lazy val aggressors   = With.units.enemy.filter(u => u.aliveAndComplete && u.is(UnitMatchWarriors) && inOurBase(u))
+    lazy val aggressors   = With.units.enemy.filter(u => u.aliveAndComplete && u.is(MatchWarriors) && inOurBase(u))
     lazy val workers      = With.units.ours .filter(u => u.aliveAndComplete && u.unitClass.isWorker)
     lazy val threatening  = aggressors.filter(_.inPixelRadius(32 * 4).exists(n => n.isOurs && n.totalHealth < 200))
     if ( ! fingerprintsRequiringFighterProtection.exists(_.matches)) return

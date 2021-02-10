@@ -2,7 +2,7 @@ package Macro.Scheduling
 
 import Lifecycle.With
 import Performance.Cache
-import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete}
+import Planning.UnitMatchers.{MatchAnd, MatchComplete}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
@@ -45,7 +45,7 @@ class Projections {
     unitsInCycle: Array[UnitClass] = null): Int = {
 
     // Do we have it already?
-    if (With.units.existsOurs(UnitMatchAnd(unitClass, UnitMatchComplete))) return 0
+    if (With.units.existsOurs(MatchAnd(unitClass, MatchComplete))) return 0
 
     // Are we building what we need already?
     val soonestUnit = ByOption.minBy(With.units.ours.view.filter(_.isPrerequisite(unitClass)))(_.remainingCompletionFrames)

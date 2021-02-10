@@ -13,7 +13,7 @@ import Planning.Plans.Macro.Expanding.BuildGasPumps
 import Planning.Plans.Macro.Terran.PopulateBunkers
 import Planning.Predicates.Milestones.{UnitsAtLeast, UpgradeComplete}
 import Planning.Predicates.Strategy.Employing
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.UnitMatchers.MatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvR.TvRTinfoil
@@ -46,7 +46,7 @@ class TvRTinfoil extends GameplanTemplateVsRandom {
   override def buildPlans: Seq[Plan] = Vector(
     new RepairBunker,
     new Trigger(
-      new UnitsAtLeast(10, UnitMatchWarriors),
+      new UnitsAtLeast(10, MatchWarriors),
       initialBefore = new PopulateBunkers),
     new PumpRatio(Terran.Medic, 0, 4, Seq(Friendly(Terran.Marine, 0.2))),
     new Pump(Terran.SiegeTankUnsieged),

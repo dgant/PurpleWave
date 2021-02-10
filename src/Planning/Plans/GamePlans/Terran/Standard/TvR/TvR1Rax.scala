@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvR
 
 import Macro.BuildRequests.Get
 import Planning.Predicates.Compound.Not
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.UnitMatchers.MatchWarriors
 import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplateVsRandom
@@ -19,7 +19,7 @@ import Strategery.Strategies.Terran.TvR.TvR1Rax
 class TvR1Rax extends GameplanTemplateVsRandom {
   
   override val activationCriteria: Predicate = new Employing(TvR1Rax)
-  override val completionCriteria: Predicate = new UnitsAtLeast(2, UnitMatchWarriors)
+  override val completionCriteria: Predicate = new UnitsAtLeast(2, MatchWarriors)
   
   override val buildOrder = Vector(
     Get(9,Terran.SCV),

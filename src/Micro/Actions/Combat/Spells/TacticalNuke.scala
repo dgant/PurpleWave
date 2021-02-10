@@ -1,7 +1,7 @@
 package Micro.Actions.Combat.Spells
 
 import Lifecycle.With
-import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete}
+import Planning.UnitMatchers.{MatchAnd, MatchComplete}
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
@@ -17,7 +17,7 @@ object TacticalNuke extends TargetedSpell {
   
   override protected def additionalConditions(unit: FriendlyUnitInfo): Boolean = (
     (unit.cloaked || unit.agent.shouldEngage)
-    && With.units.existsOurs(UnitMatchAnd(Terran.NuclearMissile, UnitMatchComplete))
+    && With.units.existsOurs(MatchAnd(Terran.NuclearMissile, MatchComplete))
   )
 
   override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {

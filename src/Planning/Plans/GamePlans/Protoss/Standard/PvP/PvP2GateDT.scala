@@ -17,7 +17,7 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.UnitMatchers.MatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP2GateDTExpand
@@ -136,7 +136,7 @@ class PvP2GateDT extends GameplanTemplate {
           new And(
             new EnemyStrategy(With.fingerprints.twoGate),
             new Not(new SafeAtHome),
-            new UnitsAtMost(12, UnitMatchWarriors)),
+            new UnitsAtMost(12, MatchWarriors)),
           new Pump(Protoss.Dragoon)),
         new If(
           new EnemyStrategy(With.fingerprints.proxyGateway),

@@ -15,7 +15,7 @@ import Micro.Coordination.Pathing.MicroPathing
 import Micro.Matchups.MatchupAnalysis
 import Performance.{Cache, KeyedCache}
 import Planning.{Plan, Prioritized}
-import Planning.UnitMatchers.UnitMatcher
+import Planning.UnitMatchers.Matcher
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
@@ -32,15 +32,15 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
 
   @inline override final def toString: String = f"${if (isFriendly) "Our" else if (isEnemy) "Foe" else "Neutral"} $unitClass ${if (selected) "*" else ""} #$id $hitPoints/${unitClass.maxHitPoints} ${if (shieldPoints > 0) f"($shieldPoints/${unitClass.maxShields})" else ""} $tile $pixel"
 
-  @inline final def is(unitMatcher: UnitMatcher): Boolean = unitMatcher.apply(this)
-  @inline final def isPrerequisite(unitMatcher: UnitMatcher): Boolean = (
+  @inline final def is(unitMatcher: Matcher): Boolean = unitMatcher.apply(this)
+  @inline final def isPrerequisite(unitMatcher: Matcher): Boolean = (
     unitMatcher(this)
       || unitMatcher == Zerg.Hatchery && isAny(Zerg.Lair, Zerg.Hive)
       || unitMatcher == Zerg.Lair && is(Zerg.Hatchery)
       || unitMatcher == Zerg.Spire && is(Zerg.GreaterSpire))
-  @inline final def isNone(unitMatchers: UnitMatcher*): Boolean = ! unitMatchers.exists(_.apply(this))
-  @inline final def isAny(unitMatchers: UnitMatcher*): Boolean = unitMatchers.exists(_.apply(this))
-  @inline final def isAll(unitMatchers: UnitMatcher*): Boolean = unitMatchers.forall(_.apply(this))
+  @inline final def isNone(unitMatchers: Matcher*): Boolean = ! unitMatchers.exists(_.apply(this))
+  @inline final def isAny(unitMatchers: Matcher*): Boolean = unitMatchers.exists(_.apply(this))
+  @inline final def isAll(unitMatchers: Matcher*): Boolean = unitMatchers.forall(_.apply(this))
 
   //////////////////
   // Statefulness //

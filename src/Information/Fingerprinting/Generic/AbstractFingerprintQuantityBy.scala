@@ -2,12 +2,12 @@ package Information.Fingerprinting.Generic
 
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
-import Planning.UnitMatchers.UnitMatcher
+import Planning.UnitMatchers.Matcher
 import Utilities.GameTime
 
 abstract class AbstractFingerprintQuantityBy(
-  unitMatcher : UnitMatcher,
-  gameTime    : GameTime)
+                                              unitMatcher : Matcher,
+                                              gameTime    : GameTime)
     extends Fingerprint {
 
   def observed: Int = {

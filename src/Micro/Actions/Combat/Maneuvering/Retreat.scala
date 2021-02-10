@@ -6,7 +6,7 @@ import Micro.Actions.Action
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.TrafficPriorities
-import Planning.UnitMatchers.UnitMatchSiegeTank
+import Planning.UnitMatchers.MatchSiegeTank
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, TakeN}
@@ -30,7 +30,7 @@ object Retreat extends Action {
     lazy val timeOriginUs         = unit.framesToTravelTo(unit.agent.origin)
     lazy val timeOriginEnemy      = TakeN.percentile(0.1, unit.matchups.threats)(Ordering.by(timeOriginOfThreat)).map(timeOriginOfThreat).getOrElse(Double.PositiveInfinity)
     lazy val enemySooner          = timeOriginUs + 96 >= timeOriginEnemy
-    lazy val enemySieging         = unit.matchups.enemies.exists(_.isAny(UnitMatchSiegeTank, Zerg.Lurker)) && ! unit.base.exists(_.owner.isEnemy)
+    lazy val enemySieging         = unit.matchups.enemies.exists(_.isAny(MatchSiegeTank, Zerg.Lurker)) && ! unit.base.exists(_.owner.isEnemy)
     lazy val goalSidestep         = unit.is(Protoss.DarkTemplar) || (enemySieging && ! enemyCloser && ! enemySooner)
     lazy val goalHome             = ! unit.agent.isScout && unit.zone != unit.agent.origin.zone && ! goalSidestep && (enemyCloser || enemySooner)
     lazy val goalSafety           = ! unit.agent.withinSafetyMargin

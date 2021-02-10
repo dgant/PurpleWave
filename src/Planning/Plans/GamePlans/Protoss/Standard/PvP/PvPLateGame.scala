@@ -14,7 +14,7 @@ import Planning.Predicates.Compound._
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBasesAtMost, SafeAtHome, SafeToMoveOut}
 import Planning.Predicates.Strategy.{Employing, EnemyRecentStrategy, EnemyStrategy}
-import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors, UnitMatchWorkers}
+import Planning.UnitMatchers.{MatchOr, MatchWarriors, MatchWorkers}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP3rdBaseFast
 
@@ -168,7 +168,7 @@ class PvPLateGame extends GameplanTemplate {
     new If(
       new And(
         new GasPumpsAtLeast(3),
-        new UnitsAtLeast(24, UnitMatchWarriors)),
+        new UnitsAtLeast(24, MatchWarriors)),
       new Parallel(
         new Build(Get(Protoss.Forge)),
         new UpgradeContinuously(Protoss.GroundDamage),
@@ -187,7 +187,7 @@ class PvPLateGame extends GameplanTemplate {
 
   class NeedToCutWorkersForGateways extends And(
     new Latch(new And(new MiningBasesAtLeast(2), new EnemyBasesAtMost(1))),
-    new UnitsAtMost(4, UnitMatchOr(Protoss.Gateway, Protoss.RoboticsFacility)),
+    new UnitsAtMost(4, MatchOr(Protoss.Gateway, Protoss.RoboticsFacility)),
     new Not(new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.dtRush)))
 
   override def buildPlans: Seq[Plan] = Seq(
@@ -202,7 +202,7 @@ class PvPLateGame extends GameplanTemplate {
     new GetReactiveObservers,
 
     // Expansions
-    new If(new And(new MiningBasesAtLeast(2), new UnitsAtLeast(39, UnitMatchWorkers), new Check(() => With.blackboard.wantToAttack() && With.blackboard.safeToMoveOut())), new PylonBlock),
+    new If(new And(new MiningBasesAtLeast(2), new UnitsAtLeast(39, MatchWorkers), new Check(() => With.blackboard.wantToAttack() && With.blackboard.safeToMoveOut())), new PylonBlock),
     new RequireMiningBases(2),
     new If(new And(new ReadyForThirdIfSafe, new SafeForThird), new RequireBases(3)),
     new Trigger(

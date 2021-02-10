@@ -6,7 +6,7 @@ import Macro.Scheduling.MacroCounter
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.UnitCountOne
-import Planning.UnitMatchers.{UnitMatchMorphingInto, UnitMatchOr, UnitMatchSpecific}
+import Planning.UnitMatchers.{MatchMorphingInto, MatchOr, MatchSpecific}
 import Planning.UnitPreferences._
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
@@ -23,7 +23,7 @@ class MorphUnit(val classToMorph: UnitClass) extends Production {
   val currencyLock  = new LockCurrencyForUnit(classToMorph)
   val morpherClass  = classToMorph.whatBuilds._1
   val morpherLock   = new LockUnits {
-    unitMatcher.set(UnitMatchOr(morpherClass, UnitMatchMorphingInto(classToMorph)))
+    unitMatcher.set(MatchOr(morpherClass, MatchMorphingInto(classToMorph)))
     unitCounter.set(UnitCountOne)
   }
   
@@ -52,7 +52,7 @@ class MorphUnit(val classToMorph: UnitClass) extends Production {
     currencyLock.acquire(this)
     if (currencyLock.satisfied && ! currencyLock.isSpent) {
       setPreference()
-      morpherLock.unitMatcher.set(morpher.map(m => new UnitMatchSpecific(Set(m))).getOrElse(morpherClass))
+      morpherLock.unitMatcher.set(morpher.map(m => new MatchSpecific(Set(m))).getOrElse(morpherClass))
       morpherLock.acquire(this)
       morpher = morpherLock.units.headOption
       morpher.foreach(_.agent.intend(this, new Intention {

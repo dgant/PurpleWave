@@ -3,7 +3,7 @@ package ProxyBwapi.UnitTracking
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.Shapes.Circle
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, Orders}
 import Utilities._
@@ -43,7 +43,7 @@ object Imagination {
         unit.removalFrames - With.framesSince(unit.lastSeen)
       else if (unit.unitClass.isOrganic && unit.irradiated)
         unit.totalHealth * Seconds(37)() / 250 // https://liquipedia.net/starcraft/Irradiate
-      else if (unit.is(UnitMatchWarriors))
+      else if (unit.is(MatchWarriors))
         if (With.strategy.isFfa)
           Minutes(4)()
         else

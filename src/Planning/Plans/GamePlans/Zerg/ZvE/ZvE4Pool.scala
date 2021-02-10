@@ -15,7 +15,7 @@ import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.UnitMatchOr
+import Planning.UnitMatchers.MatchOr
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Zerg.ZvE4Pool
 import Utilities.GameTime
@@ -40,7 +40,7 @@ class ZvE4Pool extends GameplanTemplate {
           new MineralsAtLeast(126),
           new UnitsAtLeast(1, Zerg.SpawningPool))),
       new Not(new EnemyStrategy(With.fingerprints.twoGate)),
-      new UnitsAtLeast(4, UnitMatchOr(Zerg.Drone, Zerg.Extractor))),
+      new UnitsAtLeast(4, MatchOr(Zerg.Drone, Zerg.Extractor))),
     new ScoutWithWorkers)
   
   override def supplyPlan: Plan = NoPlan()

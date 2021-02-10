@@ -3,14 +3,14 @@ package Planning.Plans.Army
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Micro.Squads.Goals.GoalDefendZone
-import Planning.UnitMatchers.UnitMatchRecruitableForCombat
+import Planning.UnitMatchers.MatchRecruitableForCombat
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 
 class DefendBase(base: Base) extends Squadify[GoalDefendZone] {
   
   val goal: GoalDefendZone = new GoalDefendZone
-  goal.unitMatcher = UnitMatchRecruitableForCombat
+  goal.unitMatcher = MatchRecruitableForCombat
 
   var enemies: Seq[ForeignUnitInfo] = Seq.empty
   

@@ -13,7 +13,7 @@ import Planning.Predicates.Compound.{And, Latch}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyMutalisks
 import Planning.Predicates.Strategy.Employing
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss.PvZMidgameCorsairReaverGoon
 
@@ -37,7 +37,7 @@ class PvZCorsairReaver extends GameplanTemplate {
       new Or(
         new UnitsAtLeast(16, Protoss.Dragoon),
         new And(
-          new UnitsAtLeast(30, UnitMatchWarriors),
+          new UnitsAtLeast(30, MatchWarriors),
           new UnitsAtLeast(2, Protoss.Reaver, complete = true),
           new UnitsAtLeast(1, Protoss.Shuttle, complete = true))),
       new Parallel(

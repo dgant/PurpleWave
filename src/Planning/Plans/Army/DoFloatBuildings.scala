@@ -5,14 +5,14 @@ import Micro.Agency.Intention
 import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountEverything
-import Planning.UnitMatchers.UnitMatchOr
+import Planning.UnitMatchers.MatchOr
 
 class DoFloatBuildings extends Prioritized {
 
   val floaties: LockUnits = new LockUnits
   floaties.unitCounter.set(UnitCountEverything)
   def update() {
-    floaties.unitMatcher.set(UnitMatchOr(With.blackboard.floatableBuildings(): _*))
+    floaties.unitMatcher.set(MatchOr(With.blackboard.floatableBuildings(): _*))
     floaties.acquire(this)
     floaties.units.foreach(floatie => {
       if (floatie.flying) {

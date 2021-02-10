@@ -6,7 +6,7 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Targeting.Filters.TargetFilter
 import Micro.Agency.Commander
-import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWorkers}
+import Planning.UnitMatchers.{MatchSiegeTank, MatchWorkers}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, Seconds}
@@ -65,7 +65,7 @@ object BeVulture extends Action {
 
     val victims = vulture.matchups.enemies.filter(e =>
       e.unitClass.triggersSpiderMines
-      && ! e.matchups.threatsInRange.exists(t => t.isAny(UnitMatchSiegeTank, UnitMatchWorkers) && t.pixelDistanceEdge(e) < 32 * 5))
+      && ! e.matchups.threatsInRange.exists(t => t.isAny(MatchSiegeTank, MatchWorkers) && t.pixelDistanceEdge(e) < 32 * 5))
 
     vulture.agent.toAttack = ByOption.minBy(victims)(_.pixelDistanceEdge(vulture))
     if (vulture.agent.toAttack.isEmpty) return

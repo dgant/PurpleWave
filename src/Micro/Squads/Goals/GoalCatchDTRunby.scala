@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Performance.Cache
 import Planning.UnitCounters.UnitCountUpToLambda
-import Planning.UnitMatchers.{UnitMatchMobileDetectors, UnitMatcher}
+import Planning.UnitMatchers.{MatchMobileDetector, Matcher}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.{ByOption, CountMap}
@@ -29,12 +29,12 @@ class GoalCatchDTRunby extends SquadGoalBasic {
       .getOrElse(With.geography.home.pixelCenter)
   }
 
-  override def qualityNeeds: CountMap[UnitMatcher] = {
-    val output = new CountMap[UnitMatcher]
-    output(UnitMatchMobileDetectors) = 1
+  override def qualityNeeds: CountMap[Matcher] = {
+    val output = new CountMap[Matcher]
+    output(MatchMobileDetector) = 1
     output
   }
 
-  unitMatcher = UnitMatchMobileDetectors
+  unitMatcher = MatchMobileDetector
   unitCounter = new UnitCountUpToLambda(() => if (needed()) 1 else 0)
 }

@@ -10,7 +10,7 @@ import Planning.Plans.Macro.Automatic.Pump
 import Planning.Predicates.Compound.And
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyRaceKnown, EnemyStrategy}
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.UnitMatchers.MatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvROpenZCoreZ
@@ -19,7 +19,7 @@ class PvRZCoreZ extends GameplanTemplateVsRandom {
   
   override val activationCriteria: Predicate = new Employing(PvROpenZCoreZ)
   override val completionCriteria: Predicate = new Or(
-    new UnitsAtLeast(2, UnitMatchWarriors),
+    new UnitsAtLeast(2, MatchWarriors),
     new And(
       new EnemyRaceKnown,
       new UnitsAtLeast(1, Protoss.CyberneticsCore)))

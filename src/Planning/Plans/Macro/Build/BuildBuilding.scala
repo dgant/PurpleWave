@@ -9,7 +9,7 @@ import Mathematics.Points.Tile
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.UnitCountOne
-import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchCustom, UnitMatchSpecific}
+import Planning.UnitMatchers.{MatchAnd, Match, MatchSpecific}
 import Planning.UnitPreferences.UnitPreferCloseAndNotMining
 import ProxyBwapi.Races.Neutral
 import ProxyBwapi.UnitClasses.UnitClass
@@ -82,9 +82,9 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
     // Find an appropriate builder (or make sure we use the current builder)
     val desiredZone = desiredTile.map(_.zone)
     if (building.exists(_.buildUnit.isDefined)) {
-      builderLock.unitMatcher.set(new UnitMatchSpecific(Set(building.get.buildUnit.get)))
+      builderLock.unitMatcher.set(new MatchSpecific(Set(building.get.buildUnit.get)))
     } else if ( ! builderLock.satisfied && desiredZone.exists(_.bases.exists(_.workerCount > 5))) {
-      builderLock.unitMatcher.set(UnitMatchAnd(UnitMatchCustom(_.zone == desiredZone.get), builderMatcher))
+      builderLock.unitMatcher.set(MatchAnd(Match(_.zone == desiredZone.get), builderMatcher))
     } else {
       builderLock.unitMatcher.set(builderMatcher)
     }

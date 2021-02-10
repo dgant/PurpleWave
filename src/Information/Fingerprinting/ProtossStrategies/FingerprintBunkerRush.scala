@@ -1,12 +1,12 @@
 package Information.Fingerprinting.ProtossStrategies
 
 import Information.Fingerprinting.Generic._
-import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchProxied}
+import Planning.UnitMatchers.{MatchAnd, MatchProxied}
 import ProxyBwapi.Races.Terran
 import Utilities.GameTime
 
 class FingerprintBunkerRush extends FingerprintCompleteBy(
-  UnitMatchAnd(Terran.Bunker, UnitMatchProxied),
+  MatchAnd(Terran.Bunker, MatchProxied),
   GameTime(5,  0)) {
   
   override val sticky = true

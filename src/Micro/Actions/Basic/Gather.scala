@@ -6,7 +6,7 @@ import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Agency.Commander
-import Planning.UnitMatchers.UnitMatchWorkers
+import Planning.UnitMatchers.MatchWorkers
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Strategery.Benzene
@@ -35,7 +35,7 @@ object Gather extends Action {
         lazy val basePaired = baseOpposite.orElse(baseRemote)
 
         def threatenedAt(atResource: UnitInfo): Boolean = unit.matchups.threats.exists(threat =>
-          ! threat.isAny(UnitMatchWorkers, Terran.Wraith, Protoss.Arbiter, Protoss.Scout, Zerg.Mutalisk)
+          ! threat.isAny(MatchWorkers, Terran.Wraith, Protoss.Arbiter, Protoss.Scout, Zerg.Mutalisk)
             && threat.pixelsToGetInRange(unit, atResource.pixel) < defenseRadiusPixels)
 
         if (basePaired.exists(_.owner.isUs) && threatenedAt(resource)) {
@@ -47,7 +47,7 @@ object Gather extends Action {
       // Burrow from threats
       if (unit.canBurrow
         && unit.matchups.enemies.exists(enemy =>
-          ! enemy.isAny(UnitMatchWorkers, Terran.Wraith, Protoss.Arbiter, Protoss.Scout)
+          ! enemy.isAny(MatchWorkers, Terran.Wraith, Protoss.Arbiter, Protoss.Scout)
           && enemy.pixelDistanceEdge(unit) < enemy.pixelRangeAgainst(unit) + 32)
           && ! unit.tile.enemyDetected) {
         Commander.burrow(unit)

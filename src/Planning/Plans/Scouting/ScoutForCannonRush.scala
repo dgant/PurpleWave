@@ -5,7 +5,7 @@ import Mathematics.Points.Tile
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountOne
-import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete, UnitMatchNotHoldingResources, UnitMatchWorkers}
+import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchNotHoldingResources, MatchWorkers}
 import Planning.UnitPreferences.UnitPreferClose
 import Planning.{Plan, Property}
 import ProxyBwapi.Races.Protoss
@@ -13,7 +13,7 @@ import Utilities.GameTime
 
 class ScoutForCannonRush extends Plan {
   val scouts = new Property[LockUnits](new LockUnits {
-    unitMatcher.set(UnitMatchAnd(UnitMatchWorkers, UnitMatchNotHoldingResources))
+    unitMatcher.set(MatchAnd(MatchWorkers, MatchNotHoldingResources))
     unitCounter.set(UnitCountOne)
     interruptable.set(false)
   })
@@ -38,7 +38,7 @@ class ScoutForCannonRush extends Plan {
 
     var shouldScout = (
       previouslyCannonRushed
-        && ! With.units.existsEnemy(UnitMatchAnd(Protoss.PhotonCannon, UnitMatchComplete))
+        && ! With.units.existsEnemy(MatchAnd(Protoss.PhotonCannon, MatchComplete))
         && ! With.fingerprints.gatewayFirst.matches
         && With.frame > GameTime(1, 30)()
         && With.frame < GameTime(6, 0)())

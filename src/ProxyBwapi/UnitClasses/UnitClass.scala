@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.{Point, Tile, TileRectangle}
 import Mathematics.PurpleMath
 import Micro.Heuristics.MicroValue
-import Planning.UnitMatchers.UnitMatcher
+import Planning.UnitMatchers.Matcher
 import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}
@@ -13,7 +13,7 @@ import bwapi.{Race, UnitType}
 
 import scala.collection.mutable.ListBuffer
 
-case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatcher {
+case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Matcher {
 
   //////////////
   // Geometry //

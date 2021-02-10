@@ -4,12 +4,12 @@ import Lifecycle.With
 import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountEverything
-import Planning.UnitMatchers.UnitMatchRecruitableForCombat
+import Planning.UnitMatchers.MatchRecruitableForCombat
 
 class RecruitFreelancers extends Prioritized {
   
   val freelancers: LockUnits = new LockUnits
-  freelancers.unitMatcher.set(UnitMatchRecruitableForCombat)
+  freelancers.unitMatcher.set(MatchRecruitableForCombat)
   freelancers.unitCounter.set(UnitCountEverything)
   
   def update() {

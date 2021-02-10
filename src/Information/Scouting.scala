@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Points.Tile
 import Performance.Cache
 import Performance.Tasks.TimedTask
-import Planning.UnitMatchers.{UnitMatchBuilding, UnitMatchWorkers}
+import Planning.UnitMatchers.{MatchBuilding, MatchWorkers}
 import ProxyBwapi.Races.Zerg
 import Utilities._
 
@@ -112,7 +112,7 @@ class Scouting extends TimedTask {
         })
       }
     }
-    _enemyHasScoutedUsWithWorker = _enemyHasScoutedUsWithWorker || With.geography.ourBases.exists(_.units.exists(u => u.isEnemy && u.is(UnitMatchWorkers)))
-    _enemyHasScoutedUs = _enemyHasScoutedUs || _enemyHasScoutedUsWithWorker || With.units.ours.view.filter(_.is(UnitMatchBuilding)).exists(u => u.tileArea.tiles.exists(With.grids.enemyVision.isSet))
+    _enemyHasScoutedUsWithWorker = _enemyHasScoutedUsWithWorker || With.geography.ourBases.exists(_.units.exists(u => u.isEnemy && u.is(MatchWorkers)))
+    _enemyHasScoutedUs = _enemyHasScoutedUs || _enemyHasScoutedUsWithWorker || With.units.ours.view.filter(_.is(MatchBuilding)).exists(u => u.tileArea.tiles.exists(With.grids.enemyVision.isSet))
   }
 }

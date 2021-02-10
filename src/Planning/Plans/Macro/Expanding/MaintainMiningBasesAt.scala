@@ -5,7 +5,7 @@ import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Predicates.Compound.And
 import Planning.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Predicates.Reactive.SafeToMoveOut
-import Planning.UnitMatchers.UnitMatchWorkers
+import Planning.UnitMatchers.MatchWorkers
 
 class MaintainMiningBasesAt(bases: Int) extends Parallel(
   new Trigger(
@@ -13,7 +13,7 @@ class MaintainMiningBasesAt(bases: Int) extends Parallel(
       new MiningBasesAtLeast(bases),
       new UnitsAtLeast(bases, With.self.townHallClass, complete = true)),
     new If(
-      new UnitsAtLeast(bases * 15, UnitMatchWorkers),
+      new UnitsAtLeast(bases * 15, MatchWorkers),
       new If(
         new SafeToMoveOut,
         new RequireMiningBases(bases),

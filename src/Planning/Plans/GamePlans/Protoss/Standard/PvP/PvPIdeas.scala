@@ -25,7 +25,7 @@ object PvPIdeas {
 
   class EnemyCarriersOnly extends And(
     new EnemyCarriers,
-    new EnemiesAtMost(6, UnitMatchAnd(UnitMatchWarriors,  UnitMatchNot(UnitMatchMobileFlying))))
+    new EnemiesAtMost(6, MatchAnd(MatchWarriors,  MatchNot(MatchMobileFlying))))
   class UnansweredDarkTemplar extends And(
     new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
     new EnemiesAtMost(0, Protoss.Observer))
@@ -35,7 +35,7 @@ object PvPIdeas {
     new EnemyBasesAtLeast(3),
     new And(
       new EnemyStrategy(With.fingerprints.cannonRush),
-      new EnemiesAtMost(0, UnitMatchWarriors)),
+      new EnemiesAtMost(0, MatchWarriors)),
     new And(
       // Are we safe against Dark Templar?
       new Or(
@@ -45,7 +45,7 @@ object PvPIdeas {
       new Or(
         new And(
           new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
-          new EnemiesAtMost(0, UnitMatchOr(Protoss.Observer, Protoss.PhotonCannon))),
+          new EnemiesAtMost(0, MatchOr(Protoss.Observer, Protoss.PhotonCannon))),
         new EnemyStrategy(With.fingerprints.cannonRush),
         new SafeToMoveOut),
       // Is an attack less likely to succeed than we are to get backstabbed or counter-pushed?
@@ -61,7 +61,7 @@ object PvPIdeas {
               new Not(new EnemyStrategy(With.fingerprints.fourGateGoon))),
             new And(
               new Latch(new UnitsAtLeast(5, Protoss.Gateway, complete = true)),
-              new Latch(new UnitsAtLeast(20, UnitMatchWorkers, complete = true))),
+              new Latch(new UnitsAtLeast(20, MatchWorkers, complete = true))),
             new BasesAtMost(1))),
         new EnemyBasesAtLeast(2)),
       // Can our army contend with theirs?
@@ -69,7 +69,7 @@ object PvPIdeas {
         new And(
           new UnitsAtLeast(2, Protoss.Reaver, complete = true),
           new UnitsAtLeast(1, Protoss.Shuttle, complete = true)),
-        new UnitsAtLeast(1, UnitMatchAnd(UnitMatchWarriors, UnitMatchNot(Protoss.Dragoon))),
+        new UnitsAtLeast(1, MatchAnd(MatchWarriors, MatchNot(Protoss.Dragoon))),
         new UpgradeComplete(Protoss.DragoonRange),
         new Not(new EnemyHasUpgrade(Protoss.DragoonRange))),
       // If we expanded, wait until we can capitalize or if they've already expanded too
@@ -78,7 +78,7 @@ object PvPIdeas {
         new EnemyBasesAtLeast(2),
         new UnansweredDarkTemplar,
         new Latch(new And(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new UnitsAtLeast(1, Protoss.Shuttle, complete = true))),
-        new Latch(new UnitsAtLeast(15, UnitMatchWarriors))),
+        new Latch(new UnitsAtLeast(15, MatchWarriors))),
       // Don't mess with 4-Gates
       new Or(
         new Employing(PvP2Gate1012Goon, PvPRobo1012, PvP4GateGoon),
@@ -316,7 +316,7 @@ object PvPIdeas {
     new RequireSufficientSupply,
     new Pump(Protoss.Probe, 16),
     new FlipIf(
-      new UnitsAtLeast(5, UnitMatchWarriors),
+      new UnitsAtLeast(5, MatchWarriors),
       new TrainArmy,
       new Parallel(
         new PumpWorkers,
@@ -352,7 +352,7 @@ object PvPIdeas {
         new UnitsAtLeast(1, Protoss.Gateway)),
       new And(
         new EnemyStrategy(With.fingerprints.gatewayFe),
-        new UnitsAtLeast(2, UnitMatchOr(Protoss.Gateway, Protoss.CyberneticsCore))),
+        new UnitsAtLeast(2, MatchOr(Protoss.Gateway, Protoss.CyberneticsCore))),
       new And(
         new Not(new EnemyStrategy(With.fingerprints.cannonRush)),
         new EnemiesAtLeast(1, Protoss.PhotonCannon),
@@ -370,8 +370,8 @@ object PvPIdeas {
       new UnitsAtLeast(2, Protoss.Reaver, complete = true),
       new And(
         new SafeAtHome,
-        new UnitsAtLeast(8, UnitMatchWarriors, complete = true)),
-      new UnitsAtLeast(16, UnitMatchWarriors, complete = true)),
+        new UnitsAtLeast(8, MatchWarriors, complete = true)),
+      new UnitsAtLeast(16, MatchWarriors, complete = true)),
     new RequireMiningBases(2))
 
   class TakeBase3WithGateways extends If(
@@ -380,7 +380,7 @@ object PvPIdeas {
         new Latch(new UnitsAtLeast(1, Protoss.Observer, complete = true)),
         new EnemyRobo),
       new Or(
-        new UnitsAtLeast(15, UnitMatchWarriors),
+        new UnitsAtLeast(15, MatchWarriors),
         new EnemiesAtLeast(6, Protoss.PhotonCannon),
         new And(
           new SafeAtHome,
@@ -413,7 +413,7 @@ object PvPIdeas {
     // It makes military sense
     new Or(
       new EnemiesAtMost(0, Protoss.Carrier),
-      new EnemiesAtLeast(7, UnitMatchAnd(UnitMatchWarriors, UnitMatchNot(Protoss.Zealot)))))
+      new EnemiesAtLeast(7, MatchAnd(MatchWarriors, MatchNot(Protoss.Zealot)))))
 
   class PumpDragoonsAndZealots extends Parallel(
     new PumpRatio(Protoss.Dragoon, 0, 100, Seq(Enemy(Protoss.Carrier, 5.0))),
@@ -461,7 +461,7 @@ object PvPIdeas {
       new Parallel(
         new PumpShuttleAndReavers(6, shuttleFirst = false),
         new PumpRatio(Protoss.Dragoon, 3, 24, Seq(Friendly(Protoss.Zealot, 1.5))),
-        new PumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-1), Friendly(UnitMatchWarriors, 1.0 / 4.0))),
+        new PumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-1), Friendly(MatchWarriors, 1.0 / 4.0))),
         new If(new ZealotsAllowed, new Pump(Protoss.Zealot))),
 
       // Dragoon-Reaver composition

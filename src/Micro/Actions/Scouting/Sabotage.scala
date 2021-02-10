@@ -4,7 +4,7 @@ import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
-import Planning.UnitMatchers.UnitMatchProxied
+import Planning.UnitMatchers.MatchProxied
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Strategery.Strategies.Zerg.ZvE4Pool
 import Utilities.ByOption
@@ -14,7 +14,7 @@ object Sabotage extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.agent.isScout
     && unit.unitClass.isWorker
-    && unit.matchups.targets.exists(_.is(UnitMatchProxied))
+    && unit.matchups.targets.exists(_.is(MatchProxied))
     && ! With.strategy.selectedCurrently.contains(ZvE4Pool))
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {

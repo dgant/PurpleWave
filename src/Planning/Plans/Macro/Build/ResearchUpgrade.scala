@@ -5,7 +5,7 @@ import Macro.Buildables.{Buildable, BuildableUpgrade}
 import Micro.Agency.Intention
 import Planning.ResourceLocks._
 import Planning.UnitCounters.UnitCountOne
-import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchIdle}
+import Planning.UnitMatchers.{MatchAnd, MatchIdle}
 import Planning.UnitPreferences.UnitPreferIdle
 import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.Upgrades.Upgrade
@@ -21,7 +21,7 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Production {
   val currencyLock = new LockCurrencyForUpgrade(upgrade, level)
   val upgraders = new LockUnits {
     unitCounter.set(UnitCountOne)
-    unitMatcher.set(UnitMatchAnd(upgraderClass, UnitMatchIdle))
+    unitMatcher.set(MatchAnd(upgraderClass, MatchIdle))
     unitPreference.set(UnitPreferIdle)
   }
 

@@ -4,7 +4,7 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Agency.Commander
-import Planning.UnitMatchers.UnitMatchBuilding
+import Planning.UnitMatchers.MatchBuilding
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -19,7 +19,7 @@ object BeArbiter extends Action {
       Protoss.DarkTemplar,
       Protoss.Interceptor,
       Protoss.Observer,
-      UnitMatchBuilding)
+      MatchBuilding)
 
   val cloakRadiusPixels = 32 * 7
   override protected def perform(arbiter: FriendlyUnitInfo): Unit = {

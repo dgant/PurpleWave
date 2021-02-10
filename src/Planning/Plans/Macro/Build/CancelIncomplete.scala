@@ -5,7 +5,7 @@ import Micro.Agency.Commander
 import Planning.Plan
 import Planning.UnitMatchers._
 
-class CancelIncomplete(matchers: UnitMatcher*) extends Plan {
+class CancelIncomplete(matchers: Matcher*) extends Plan {
   override def onUpdate(): Unit = {
     val incompletes = With.units.ours.view.filter(u => ! u.complete && u.isAny(matchers: _*))
 

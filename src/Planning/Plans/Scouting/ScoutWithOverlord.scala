@@ -1,7 +1,7 @@
 package Planning.Plans.Scouting
 
 import Lifecycle.With
-import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete}
+import Planning.UnitMatchers.{MatchAnd, MatchComplete}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
 class ScoutWithOverlord extends DoScout {
@@ -12,17 +12,17 @@ class ScoutWithOverlord extends DoScout {
     endScouting ||= With.units.existsEnemy(Terran.Goliath)
     endScouting ||= With.units.existsEnemy(Terran.Marine)
     endScouting ||= With.units.existsEnemy(Terran.Wraith)
-    endScouting ||= With.units.existsEnemy(UnitMatchAnd(UnitMatchComplete, Terran.Barracks))
-    endScouting ||= With.units.existsEnemy(UnitMatchAnd(UnitMatchComplete, Terran.Starport))
+    endScouting ||= With.units.existsEnemy(MatchAnd(MatchComplete, Terran.Barracks))
+    endScouting ||= With.units.existsEnemy(MatchAnd(MatchComplete, Terran.Starport))
     endScouting ||= With.units.existsEnemy(Protoss.Dragoon)
     endScouting ||= With.units.existsEnemy(Protoss.Corsair)
-    endScouting ||= With.units.existsEnemy(UnitMatchAnd(UnitMatchComplete, Protoss.Stargate))
-    endScouting ||= With.units.existsEnemy(UnitMatchAnd(UnitMatchComplete, Protoss.CyberneticsCore))
+    endScouting ||= With.units.existsEnemy(MatchAnd(MatchComplete, Protoss.Stargate))
+    endScouting ||= With.units.existsEnemy(MatchAnd(MatchComplete, Protoss.CyberneticsCore))
     endScouting ||= With.units.existsEnemy(Zerg.Mutalisk)
     endScouting ||= With.units.existsEnemy(Zerg.Hydralisk)
     endScouting ||= With.units.existsEnemy(Zerg.Scourge)
-    endScouting ||= With.units.existsEnemy(UnitMatchAnd(UnitMatchComplete, Zerg.HydraliskDen))
-    endScouting ||= With.units.existsEnemy(UnitMatchAnd(UnitMatchComplete, Zerg.Spire))
+    endScouting ||= With.units.existsEnemy(MatchAnd(MatchComplete, Zerg.HydraliskDen))
+    endScouting ||= With.units.existsEnemy(MatchAnd(MatchComplete, Zerg.Spire))
 
 
 

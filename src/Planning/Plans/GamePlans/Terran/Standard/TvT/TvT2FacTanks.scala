@@ -14,7 +14,7 @@ import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.{BasesAtLeast, EnemiesAtLeast, UnitsAtLeast}
 import Planning.Predicates.Reactive.EnemyBasesAtMost
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.UnitMatchSiegeTank
+import Planning.UnitMatchers.MatchSiegeTank
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvT2FacTanks
 
@@ -52,7 +52,7 @@ class TvT2FacTanks extends GameplanTemplate {
         new PumpRatio(Terran.Marine, 0, 8, Seq(Enemy(Terran.Marine, 2.0))))),
     new Pump(Terran.MachineShop),
     new If(
-      new UnitsAtLeast(4, UnitMatchSiegeTank),
+      new UnitsAtLeast(4, MatchSiegeTank),
       new Build(Get(Terran.SiegeMode))),
     new PumpRatio(Terran.Goliath, 0, 8, Seq(Enemy(Terran.Vulture, 1.0), Enemy(Terran.Wraith, 2.9))),
     new If(
@@ -63,7 +63,7 @@ class TvT2FacTanks extends GameplanTemplate {
       new EnemyBasesAtMost(1),
       new Build(Get(Terran.Armory))),
     new Trigger(
-      new UnitsAtLeast(2, UnitMatchSiegeTank),
+      new UnitsAtLeast(2, MatchSiegeTank),
       new RequireMiningBases(2)),
     new If(
       new UnitsAtLeast(1, Terran.Factory, complete = true),

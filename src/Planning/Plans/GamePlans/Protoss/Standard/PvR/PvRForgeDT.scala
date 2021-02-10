@@ -9,7 +9,6 @@ import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplateVsRandom
-import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.ConditionalDefendFFEWithProbesAgainst4Pool
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, PumpWorkers}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases

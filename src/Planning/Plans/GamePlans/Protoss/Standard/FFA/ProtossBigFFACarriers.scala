@@ -4,7 +4,7 @@ import Macro.BuildRequests.Get
 import Planning.Plans.Army.Aggression
 import Planning.Plans.Basic.NoPlan
 import Planning.Predicates.Compound.{And, Not}
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.UnitMatchers.MatchWarriors
 import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -55,7 +55,7 @@ class ProtossBigFFACarriers extends GameplanTemplate {
     new Pump(Protoss.Carrier),
     new FlipIf(
       new And(
-        new UnitsAtLeast(8, UnitMatchWarriors),
+        new UnitsAtLeast(8, MatchWarriors),
         new Or(
           new Not(new CanBuildZealots),
           new Or(new GasAtLeast(300), new MineralsAtMost(1000)))),

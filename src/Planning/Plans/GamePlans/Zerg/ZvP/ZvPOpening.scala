@@ -15,7 +15,7 @@ import Planning.Plans.Scouting.{ScoutAt, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones.{BasesAtLeast, GasForUpgrade, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.UnitMatchGroundWarriors
+import Planning.UnitMatchers.MatchGroundWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Zerg.{ZvP12Hatch, ZvP9Pool, ZvPOverpool}
@@ -59,7 +59,7 @@ class ZvPOpening extends GameplanTemplate {
           Get(11, Zerg.Drone)),
         new Trigger(new UnitsAtLeast(2, Zerg.Overlord), initialBefore = new ExtractorTrick))))
 
-  class PumpEnoughZerglings extends PumpRatio(Zerg.Zergling, 6, 18, Seq(Enemy(UnitMatchGroundWarriors, 4.5), Friendly(Zerg.Mutalisk, -6.0), Friendly(Zerg.SunkenColony, -4.0)))
+  class PumpEnoughZerglings extends PumpRatio(Zerg.Zergling, 6, 18, Seq(Enemy(MatchGroundWarriors, 4.5), Friendly(Zerg.Mutalisk, -6.0), Friendly(Zerg.SunkenColony, -4.0)))
 
   override def buildPlans: Seq[Plan] = Seq(
     new If(

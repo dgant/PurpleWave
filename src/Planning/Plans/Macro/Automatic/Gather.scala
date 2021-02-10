@@ -3,12 +3,12 @@ package Planning.Plans.Macro.Automatic
 import Lifecycle.With
 import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitMatchers.UnitMatchWorkers
+import Planning.UnitMatchers.MatchWorkers
 
 class Gather extends Prioritized {
 
   val workerLock: LockUnits = new LockUnits
-  workerLock.unitMatcher.set(UnitMatchWorkers)
+  workerLock.unitMatcher.set(MatchWorkers)
 
   def update() {
     workerLock.acquire(this)

@@ -2,13 +2,13 @@ package Information.Fingerprinting.Generic
 
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
-import Planning.UnitMatchers.UnitMatcher
+import Planning.UnitMatchers.Matcher
 import Utilities.GameTime
 
 class FingerprintArrivesBy(
-  unitMatcher : UnitMatcher,
-  gameTime    : GameTime,
-  quantity    : Int = 1)
+                            unitMatcher : Matcher,
+                            gameTime    : GameTime,
+                            quantity    : Int = 1)
     extends Fingerprint {
   
   override val sticky = true

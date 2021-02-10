@@ -2,7 +2,7 @@ package Planning.ResourceLocks
 
 import Lifecycle.With
 import Planning.UnitCounters.{UnitCountEverything, UnitCountExactly, UnitCounter}
-import Planning.UnitMatchers.{UnitMatchAnything, UnitMatcher}
+import Planning.UnitMatchers.{MatchAnything, Matcher}
 import Planning.UnitPreferences.{UnitPreferAnything, UnitPreference}
 import Planning.{Prioritized, Property}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -14,7 +14,7 @@ class LockUnits {
   
   var canPoach          = new Property[Boolean](false)
   var interruptable     = new Property[Boolean](true)
-  val unitMatcher       = new Property[UnitMatcher](UnitMatchAnything)
+  val unitMatcher       = new Property[Matcher](MatchAnything)
   val unitPreference    = new Property[UnitPreference](UnitPreferAnything)
   val unitCounter       = new Property[UnitCounter](UnitCountEverything)
   
@@ -54,7 +54,7 @@ class LockUnits {
   private def findFinalists(candidates: Iterable[FriendlyUnitInfo]): Seq[FriendlyUnitInfo] = {
     // Here's a bunch of special-case performance shortcuts
     if (unitCounter.get == UnitCountEverything) {
-      if (unitMatcher.get == UnitMatchAnything) {
+      if (unitMatcher.get == MatchAnything) {
         candidates.toSeq
       } else {
         candidates.filter(weAccept).toSeq

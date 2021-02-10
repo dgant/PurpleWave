@@ -16,7 +16,7 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBasesAtMost}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.UnitMatchers.MatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP2GateGoon
@@ -104,7 +104,7 @@ class PvP2GateGoon extends GameplanTemplate {
 
     new If(new EnemyStrategy(With.fingerprints.oneGateCore), new RequireMiningBases(2)),
     new If(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true), new RequireMiningBases(2)),
-    new If(new UnitsAtLeast(12, UnitMatchWarriors), new RequireMiningBases(2)),
+    new If(new UnitsAtLeast(12, MatchWarriors), new RequireMiningBases(2)),
 
     new PvPIdeas.TrainArmy,
 

@@ -3,14 +3,14 @@ package Planning
 import Lifecycle.With
 import Performance.Cache
 import Performance.Tasks.TimedTask
-import Planning.UnitMatchers.UnitMatchWorkers
+import Planning.UnitMatchers.MatchWorkers
 import ProxyBwapi.Races.Protoss
 import Utilities.Minutes
 
 class Yolo extends TimedTask {
 
   private def activeByDefault: Boolean = With.blackboard.yoloEnabled() && (
-    ! With.units.existsOurs(UnitMatchWorkers)
+    ! With.units.existsOurs(MatchWorkers)
     || With.geography.ourBases.forall(_.mineralsLeft == 0)
     || With.blackboard.allIn())
 

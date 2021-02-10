@@ -7,11 +7,11 @@ import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountEverything
-import Planning.UnitMatchers.UnitMatcher
+import Planning.UnitMatchers.Matcher
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
-class Chill(initialMatcher: UnitMatcher) extends Plan {
+class Chill(initialMatcher: Matcher) extends Plan {
   
   val chillers = new LockUnits
   chillers.unitMatcher.set(initialMatcher)

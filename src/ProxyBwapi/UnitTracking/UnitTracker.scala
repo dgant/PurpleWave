@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.Shapes.Circle
 import Performance.TotalUnitCounter
-import Planning.UnitMatchers.UnitMatcher
+import Planning.UnitMatchers.Matcher
 import ProxyBwapi.UnitInfo._
 
 import scala.collection.JavaConverters._
@@ -93,17 +93,17 @@ class UnitTracker {
   //////////////
 
   private val counterOurs = new TotalUnitCounter(() => ours)
-  @inline def existsOurs(matcher: UnitMatcher*): Boolean = countOurs(matcher: _*) > 0
-  @inline def countOurs(matcher: UnitMatcher*): Int = counterOurs(matcher: _*)
+  @inline def existsOurs(matcher: Matcher*): Boolean = countOurs(matcher: _*) > 0
+  @inline def countOurs(matcher: Matcher*): Int = counterOurs(matcher: _*)
   @inline def countOursP(predicate: (UnitInfo) => Boolean): Int = counterOurs.p(predicate)
 
   private val counterEnemy = new TotalUnitCounter(() => enemy)
-  @inline def existsEnemy(matcher: UnitMatcher*): Boolean = countEnemy(matcher: _*) > 0
-  @inline def countEnemy(matcher: UnitMatcher*): Int = counterEnemy(matcher: _*)
+  @inline def existsEnemy(matcher: Matcher*): Boolean = countEnemy(matcher: _*) > 0
+  @inline def countEnemy(matcher: Matcher*): Int = counterEnemy(matcher: _*)
   @inline def countEnemyP(predicate: (UnitInfo) => Boolean): Int = counterEnemy.p(predicate)
 
   private val counterEver = new TotalUnitCounter(() => With.units.ever)
-  @inline def existsEver(matcher: UnitMatcher*): Boolean = countEver(matcher: _*) > 0
-  @inline def countEver(matcher: UnitMatcher*): Int = counterEver(matcher: _*)
+  @inline def existsEver(matcher: Matcher*): Boolean = countEver(matcher: _*) > 0
+  @inline def countEver(matcher: Matcher*): Int = counterEver(matcher: _*)
   @inline def countEverP(predicate: (UnitInfo) => Boolean): Int = counterEver.p(predicate)
 }

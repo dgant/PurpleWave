@@ -17,7 +17,7 @@ import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.{EnemiesAtLeast, FoundEnemyBase, UnitsAtLeast}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitCounters.UnitCountExcept
-import Planning.UnitMatchers.{UnitMatchMobile, UnitMatchWorkers}
+import Planning.UnitMatchers.{MatchMobile, MatchWorkers}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Terran.TvE.TvE2RaxSCVMarine
@@ -32,7 +32,7 @@ class TvE2RaxSCVMarine extends GameplanTemplate {
     new ScoutAt(10))
 
   class ReadyToAttack extends Latch(new Or(
-    new UnitsAtLeast(26, UnitMatchMobile),
+    new UnitsAtLeast(26, MatchMobile),
     new And(
       new UnitsAtLeast(2, Terran.Marine),
       new EnemyStrategy(With.fingerprints.fourteenCC, With.fingerprints.nexusFirst, With.fingerprints.twelveHatch))))
@@ -53,7 +53,7 @@ class TvE2RaxSCVMarine extends GameplanTemplate {
     new ReadyToAttack,
     new Parallel(
       new Delay(GameTime(0, 7)(), new Attack),
-      new AttackWithWorkers(new UnitCountExcept(4, UnitMatchWorkers))))
+      new AttackWithWorkers(new UnitCountExcept(4, MatchWorkers))))
 
   override def supplyPlan: Plan = NoPlan()
 

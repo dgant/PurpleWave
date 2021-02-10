@@ -1,7 +1,7 @@
 package Lifecycle
 
 import Performance.Tasks.TimedTask
-import Planning.UnitMatchers.UnitMatchWorkers
+import Planning.UnitMatchers.MatchWorkers
 import Utilities.Seconds
 
 class Manners extends TimedTask {
@@ -12,7 +12,7 @@ class Manners extends TimedTask {
     if (With.configuration.enableSurrenders
       && With.self.supplyUsed == 0
       && With.self.minerals < 50
-      && With.units.existsEnemy(UnitMatchWorkers)
+      && With.units.existsEnemy(MatchWorkers)
       && With.units.existsEnemy(_.unitClass.isResourceDepot)) {
       surrender()
     }

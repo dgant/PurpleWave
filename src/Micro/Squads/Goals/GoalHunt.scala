@@ -4,10 +4,10 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
-import Planning.UnitMatchers.UnitMatcher
+import Planning.UnitMatchers.Matcher
 import Utilities.ByOption
 
-class GoalHunt(val enemyMatcher: UnitMatcher) extends SquadGoalBasic {
+class GoalHunt(val enemyMatcher: Matcher) extends SquadGoalBasic {
 
   override def inherentValue: Double = GoalValue.harass
   

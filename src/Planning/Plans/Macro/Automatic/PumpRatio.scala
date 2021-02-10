@@ -3,7 +3,7 @@ package Planning.Plans.Macro.Automatic
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Planning.Plans.Macro.Automatic.Rounding.Rounding
-import Planning.UnitMatchers.UnitMatcher
+import Planning.UnitMatchers.Matcher
 import ProxyBwapi.UnitClasses.UnitClass
 
 
@@ -38,9 +38,9 @@ trait MatchingRatio { def quantity: Double }
 case class Flat(value: Double) extends MatchingRatio {
   def quantity: Double = value
 }
-case class Enemy(enemyMatcher: UnitMatcher, ratio: Double) extends MatchingRatio {
+case class Enemy(enemyMatcher: Matcher, ratio: Double) extends MatchingRatio {
   def quantity: Double = With.units.countEnemy(enemyMatcher) * ratio
 }
-case class Friendly(unitMatcher: UnitMatcher, ratio: Double) extends MatchingRatio {
+case class Friendly(unitMatcher: Matcher, ratio: Double) extends MatchingRatio {
   def quantity: Double = With.units.countOurs(unitMatcher) * ratio
 }

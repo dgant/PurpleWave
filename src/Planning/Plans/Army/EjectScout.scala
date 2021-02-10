@@ -22,7 +22,7 @@ class EjectScout extends Squadify[GoalEjectScout] {
     if (scouts.isEmpty) return
 
     squad.enemies = ScoutTracking.enemyScouts.toSeq
-    goal.unitMatcher = UnitMatchAnd(UnitMatchCanCatchScouts, (unit) => unit.base.exists(b => b.isOurMain || b.isNaturalOf.exists(_.isOurMain)) || unit.pixelsToGetInRange(scout.get) < 32)
+    goal.unitMatcher = MatchAnd(MatchScoutCatcher, (unit) => unit.base.exists(b => b.isOurMain || b.isNaturalOf.exists(_.isOurMain)) || unit.pixelsToGetInRange(scout.get) < 32)
     goal.unitCounter = UnitCountOne
     super.update()
   }

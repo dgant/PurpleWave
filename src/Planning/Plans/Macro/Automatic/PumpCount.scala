@@ -10,13 +10,13 @@ object PumpCount {
   def currentCount(unitClass: UnitClass): Int = {
     val matcher =
       if (unitClass == Terran.SiegeTankSieged || unitClass == Terran.SiegeTankUnsieged) {
-        UnitMatchSiegeTank
+        MatchSiegeTank
       } else if (unitClass == Zerg.Hatchery) {
-        UnitMatchHatchery
+        MatchHatcherylike
       } else if (unitClass == Zerg.Lair) {
-        UnitMatchLair
+        MatchLairlike
       } else if (unitClass == Zerg.Spire) {
-        UnitMatchSpire
+        MatchSpire
       } else unitClass
 
     // Should this just be unit.alive?

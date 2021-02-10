@@ -18,7 +18,7 @@ import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBasesAtMost, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
-import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
+import Planning.UnitMatchers.{MatchOr, MatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvP2Gate1012DT, PvP2Gate1012Goon}
@@ -127,8 +127,8 @@ class PvP2Gate1012GoonOrDT extends GameplanTemplate {
 
     new If(
       new Or(
-        new UnitsAtLeast(2, UnitMatchOr(Protoss.DarkTemplar, Protoss.Reaver), complete = true),
-        new And(new SafeAtHome, new UnitsAtLeast(12, UnitMatchWarriors))),
+        new UnitsAtLeast(2, MatchOr(Protoss.DarkTemplar, Protoss.Reaver), complete = true),
+        new And(new SafeAtHome, new UnitsAtLeast(12, MatchWarriors))),
       new Expand),
 
     new If(

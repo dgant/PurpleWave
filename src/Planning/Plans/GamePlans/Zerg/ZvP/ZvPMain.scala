@@ -14,7 +14,7 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete, UnitMatchOr, UnitMatchWarriors}
+import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchOr, MatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Zerg.{ZvPHydraBust, ZvPMutaliskBust, ZvPReactiveBust, ZvPZerglingBust}
@@ -59,9 +59,9 @@ class ZvPMain extends GameplanTemplate {
     new BuildOrder(
       Get(Zerg.Extractor),
       Get(Zerg.ZerglingSpeed)),
-    new PumpRatio(Zerg.Drone, 12, 18, Seq(Friendly(UnitMatchAnd(UnitMatchComplete, Zerg.Hatchery), 4.0))),
+    new PumpRatio(Zerg.Drone, 12, 18, Seq(Friendly(MatchAnd(MatchComplete, Zerg.Hatchery), 4.0))),
     new If(
-      new EnemiesAtLeast(1, UnitMatchOr(Protoss.Stargate, Protoss.Corsair, Protoss.Scout)),
+      new EnemiesAtLeast(1, MatchOr(Protoss.Stargate, Protoss.Corsair, Protoss.Scout)),
       new Parallel(
         new Build(Get(Zerg.Lair), Get(Zerg.Spire)),
         new ZvPIdeas.PumpScourgeAgainstAir),
@@ -79,7 +79,7 @@ class ZvPMain extends GameplanTemplate {
     new Aggression(1.2),
     new CapGasWorkersAt(4),
     new CapGasAt(225),
-    new PumpRatio(Zerg.Drone, 21, 35, Seq(Friendly(UnitMatchAnd(UnitMatchComplete, Zerg.Hatchery), 7.0))),
+    new PumpRatio(Zerg.Drone, 21, 35, Seq(Friendly(MatchAnd(MatchComplete, Zerg.Hatchery), 7.0))),
     new Build(Get(Zerg.HydraliskDen), Get(Zerg.HydraliskSpeed)),
     new If(new UpgradeComplete(Zerg.HydraliskSpeed),new Build(Get(Zerg.HydraliskRange))),
     new If(new UnitsAtLeast(14, Zerg.Drone), new Build(Get(2, Zerg.Extractor))),
@@ -123,7 +123,7 @@ class ZvPMain extends GameplanTemplate {
     // Get just enough army to defend while we go five Hatch
     new If(
       new And(
-        new UnitsAtLeast(30, UnitMatchWarriors, countEggs = true),
+        new UnitsAtLeast(30, MatchWarriors, countEggs = true),
         new SafeAtHome),
       new Pump(Zerg.Drone, 30)),
 
@@ -135,9 +135,9 @@ class ZvPMain extends GameplanTemplate {
         new EnemyHasShown(Protoss.Corsair)),
       new Build(Get(Zerg.Spire))),
 
-    new PumpRatio(Zerg.Hydralisk, 12, 24, Seq(Enemy(UnitMatchWarriors, 1.5), Friendly(Zerg.Zergling, -0.25), Friendly(Zerg.Mutalisk, -2.0))),
+    new PumpRatio(Zerg.Hydralisk, 12, 24, Seq(Enemy(MatchWarriors, 1.5), Friendly(Zerg.Zergling, -0.25), Friendly(Zerg.Mutalisk, -2.0))),
     new ZvPIdeas.PumpScourgeAgainstAir,
-    new PumpRatio(Zerg.Zergling, 12, 24, Seq(Enemy(UnitMatchWarriors, 4.0), Friendly(Zerg.Hydralisk, -4.0), Friendly(Zerg.Mutalisk, -7.0))),
+    new PumpRatio(Zerg.Zergling, 12, 24, Seq(Enemy(MatchWarriors, 4.0), Friendly(Zerg.Hydralisk, -4.0), Friendly(Zerg.Mutalisk, -7.0))),
 
     new PumpWorkers,
     new Build(

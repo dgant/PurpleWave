@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.FFA
 
 import Macro.BuildRequests.Get
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.UnitMatchers.MatchWarriors
 import Planning.{Plan, Predicate}
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.NoPlan
@@ -37,7 +37,7 @@ class ProtossHuntersFFAFFEScoutReaver extends GameplanTemplate {
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(
-      new UnitsAtLeast(12, UnitMatchWarriors),
+      new UnitsAtLeast(12, MatchWarriors),
       new Parallel(
         new UpgradeContinuously(Protoss.AirDamage),
         new UpgradeContinuously(Protoss.AirArmor),

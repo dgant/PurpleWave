@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.FFA
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.Aggression
 import Planning.Plans.Basic.NoPlan
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.UnitMatchers.MatchWarriors
 import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -53,7 +53,7 @@ class ProtossHuntersFFAFFEGatewayCarriers extends GameplanTemplate {
     new Pump(Protoss.Carrier),
     new Pump(Protoss.DarkTemplar,    1),
     new If(
-      new UnitsAtLeast(8, UnitMatchWarriors),
+      new UnitsAtLeast(8, MatchWarriors),
       new Pump(Protoss.HighTemplar,  4, 1)),
     new Pump(Protoss.Dragoon,        12, 6),
     new Pump(Protoss.Zealot),

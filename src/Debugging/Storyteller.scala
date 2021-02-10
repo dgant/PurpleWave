@@ -8,7 +8,7 @@ import Debugging.Visualizations.Views.Performance.ShowPerformanceDetails
 import Debugging.Visualizations.Views.Planning.{ShowStrategyEvaluations, ShowStrategyInterest}
 import Lifecycle.{JBWAPIClient, Main, With}
 import Planning.Predicates.Reactive.{SafeAtHome, SafeToMoveOut}
-import Planning.UnitMatchers.UnitMatchHatchery
+import Planning.UnitMatchers.MatchHatcherylike
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClass
@@ -61,11 +61,11 @@ class Storyteller {
     Story("Our Factories",      () => With.units.countOurs(Terran.Factory).toString),
     Story("Our Barracks",       () => With.units.countOurs(Terran.Barracks).toString),
     Story("Our Gateways",       () => With.units.countOurs(Protoss.Gateway).toString),
-    Story("Our Hatcheries",     () => With.units.countOurs(UnitMatchHatchery).toString),
+    Story("Our Hatcheries",     () => With.units.countOurs(MatchHatcherylike).toString),
     Story("Enemy Factories",    () => With.units.countEnemy(Terran.Factory).toString),
     Story("Enemy Barracks",     () => With.units.countEnemy(Terran.Barracks).toString),
     Story("Enemy Gateways",     () => With.units.countEnemy(Protoss.Gateway).toString),
-    Story("Enemy Hatcheries",   () => With.units.countEnemy(UnitMatchHatchery).toString),
+    Story("Enemy Hatcheries",   () => With.units.countEnemy(MatchHatcherylike).toString),
     Story("Safe at home",       () => new SafeAtHome().isComplete.toString),
     Story("Safe to move out",   () => new SafeToMoveOut().isComplete.toString),
     Story("Should attack",      () => With.blackboard.wantToAttack.get.toString),

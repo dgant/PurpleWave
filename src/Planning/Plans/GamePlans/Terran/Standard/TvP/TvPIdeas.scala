@@ -12,7 +12,7 @@ import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeToMoveOut
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.UnitMatchSiegeTank
+import Planning.UnitMatchers.MatchSiegeTank
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvP2FacJoyO
 
@@ -104,5 +104,5 @@ object TvPIdeas {
       Enemy(Protoss.Arbiter,  2.0),
       Enemy(Protoss.Scout,    2.0),
       Enemy(Protoss.Shuttle,  1.0),
-      Friendly(UnitMatchSiegeTank, 0.2)))
+      Friendly(MatchSiegeTank, 0.2)))
 }

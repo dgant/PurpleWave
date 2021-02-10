@@ -16,7 +16,7 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy}
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.UnitMatchers.MatchWarriors
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Protoss.{PvPProxy2Gate, PvRProxy2Gate, PvTProxy2Gate, PvZProxy2Gate}
@@ -79,7 +79,7 @@ class PvEProxy2Gate extends GameplanTemplate {
 
     new BuildOrder(Get(10, Protoss.Probe), Get(Protoss.Pylon), Get(2, Protoss.Gateway)),
 
-    new If(new And(new EnemiesAtLeast(4, Protoss.PhotonCannon), new EnemyUnitsNone(UnitMatchWarriors)), new RequireMiningBases(2)),
+    new If(new And(new EnemiesAtLeast(4, Protoss.PhotonCannon), new EnemyUnitsNone(MatchWarriors)), new RequireMiningBases(2)),
 
     new If(
       new And(

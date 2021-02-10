@@ -16,7 +16,7 @@ import Planning.Predicates.Compound.{Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitCounters.UnitCountEverything
-import Planning.UnitMatchers.UnitMatchWarriors
+import Planning.UnitMatchers.MatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss.PvZ1BaseForgeTech
@@ -105,7 +105,7 @@ class PvZ1BaseForgeTech extends GameplanTemplate {
     new If(
       new Or(
         new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
-        new UnitsAtLeast(12, UnitMatchWarriors)),
+        new UnitsAtLeast(12, MatchWarriors)),
       new Parallel(
         new BuildCannonsAtNatural(2),
         new RequireMiningBases(2))),

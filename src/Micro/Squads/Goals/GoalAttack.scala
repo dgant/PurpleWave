@@ -5,7 +5,7 @@ import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Micro.Squads.SquadBatch
-import Planning.UnitMatchers.{UnitMatchProxied, UnitMatchWarriors}
+import Planning.UnitMatchers.{MatchProxied, MatchWarriors}
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, Minutes}
@@ -17,11 +17,11 @@ class GoalAttack extends SquadGoalBasic {
   override def candidateValue(batch: SquadBatch, candidate: FriendlyUnitInfo): Double = {
     PurpleMath.clamp(super.candidateValue(batch, candidate), 0.5, 5.0)
   }
-  
+
   override def toString: String = "Attack " + target.zone.name
-  
+
   var target: Pixel = With.scouting.mostBaselikeEnemyTile.pixelCenter
-  
+
   override def run() {
     chooseTarget()
     squad.units.foreach(attacker => {
@@ -39,7 +39,7 @@ class GoalAttack extends SquadGoalBasic {
     val occupiedBases = squad.units.flatMap(_.base).filter(_.owner.isEnemy)
     squad.enemies = With.units.enemy.view.filter(u => u.likelyStillThere && targetFilter(u) && u.zone == target.zone || u.canMove || u.is(Terran.SiegeTankSieged)).toVector
   }
-  
+
   protected def chooseTarget(): Unit = {
     val focusEnemy = With.scouting.threatOrigin
     val focusUs = PurpleMath.centroid(squad.units.view.map(_.pixel)).tile
@@ -50,7 +50,7 @@ class GoalAttack extends SquadGoalBasic {
       ByOption.min(With.geography.enemyBases.map(_.heart.tileDistanceFast(focusUs)))
         .getOrElse(With.scouting.mostBaselikeEnemyTile.tileDistanceFast(focusUs))
 
-    lazy val enemyNonTrollyThreats = With.units.enemy.count(u => u.is(UnitMatchWarriors) && u.likelyStillThere && ! u.is(Terran.Vulture) && u.detected)
+    lazy val enemyNonTrollyThreats = With.units.enemy.count(u => u.is(MatchWarriors) && u.likelyStillThere && ! u.is(Terran.Vulture) && u.detected)
     if (With.enemies.exists( ! _.isZerg)
       && With.enemy.bases.size < 3
       && threatDistanceToUs < threatDistanceToEnemy
@@ -64,7 +64,7 @@ class GoalAttack extends SquadGoalBasic {
         if (With.geography.ourBases.size > 1 && With.frame > Minutes(10)())
           None
         else
-          ByOption.minBy(With.units.enemy.view.filter(_.is(UnitMatchProxied)).map(_.pixel))(_.groundPixels(With.geography.home.pixelCenter)))
+          ByOption.minBy(With.units.enemy.view.filter(_.is(MatchProxied)).map(_.pixel))(_.groundPixels(With.geography.home.pixelCenter)))
       .orElse(
         ByOption
           .maxBy(With.geography.enemyBases)(base => {

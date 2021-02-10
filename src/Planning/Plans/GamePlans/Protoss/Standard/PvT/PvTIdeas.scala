@@ -36,7 +36,7 @@ object PvTIdeas {
     new Attack,
     new If(
       new Or(
-        new Latch(new UnitsAtLeast(8, UnitMatchWarriors)),
+        new Latch(new UnitsAtLeast(8, MatchWarriors)),
         new Not(new EnemyBarracksCheese)),
       new If(
         new And(
@@ -56,10 +56,10 @@ object PvTIdeas {
               // Don't get sieged in
               new EnemyHasTech(Terran.SiegeMode),
               // Vs 3-fac: Turtle hard
-              new Latch(new UnitsAtLeast(24, UnitMatchWarriors)),
+              new Latch(new UnitsAtLeast(24, MatchWarriors)),
               // Vs 2-fac: Turtle medium
               new And(
-                new Latch(new UnitsAtLeast(12, UnitMatchWarriors)),
+                new Latch(new UnitsAtLeast(12, MatchWarriors)),
                 new Not(new EnemyStrategy(With.fingerprints.threeFac))),
               new Not(new EnemyStrategy(With.fingerprints.twoFac, With.fingerprints.threeFac))))),
           new Attack)))
@@ -73,14 +73,14 @@ object PvTIdeas {
   class ReactToWorkerRush extends If(
     new And(
       new EnemyStrategy(With.fingerprints.workerRush),
-      new EnemiesAtMost(0, UnitMatchWarriors),
+      new EnemiesAtMost(0, MatchWarriors),
       new BasesAtMost(2),
       new FrameAtMost(GameTime(8, 0)())),
     new Parallel(
       new WriteStatus("ReactToWorkerRush"),
       new Pump(Protoss.Probe, 9),
       new If(
-        new UnitsAtMost(3, UnitMatchWarriors),
+        new UnitsAtMost(3, MatchWarriors),
         new CancelIncomplete(Protoss.Nexus)),
       new CapGasAt(50),
       new If(
@@ -107,7 +107,7 @@ object PvTIdeas {
       new EnemyStrategy(With.fingerprints.bunkerRush),
       new FrameAtMost(Minutes(7)()),
       new Or(
-        new EnemiesAtLeast(1, UnitMatchAnd(Terran.Bunker, UnitMatchProxied)),
+        new EnemiesAtLeast(1, MatchAnd(Terran.Bunker, MatchProxied)),
         new EnemiesAtLeast(1, Terran.Marine))),
     new Parallel(
       new WriteStatus("ReactToBunkerRush"),
@@ -124,8 +124,8 @@ object PvTIdeas {
       new WriteStatus("ReactToBBS"),
       new CapGasAt(250),
       new If(new UnitsAtMost(1, Protoss.Gateway, complete = true), new CapGasWorkersAt(1)),
-      new If(new UnitsAtMost(5, UnitMatchWarriors), new CancelIncomplete(Protoss.Nexus, Protoss.CitadelOfAdun, Protoss.TemplarArchives)),
-      new If(new UnitsAtMost(1, Protoss.Gateway), new CancelIncomplete(UnitMatchOr(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Nexus, Protoss.Stargate))),
+      new If(new UnitsAtMost(5, MatchWarriors), new CancelIncomplete(Protoss.Nexus, Protoss.CitadelOfAdun, Protoss.TemplarArchives)),
+      new If(new UnitsAtMost(1, Protoss.Gateway), new CancelIncomplete(MatchOr(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Nexus, Protoss.Stargate))),
       new RequireSufficientSupply,
       new If(new UnitsAtLeast(1, Protoss.Reaver, complete = true), new RequireMiningBases(2)),
       new Pump(Protoss.Reaver),
@@ -166,10 +166,10 @@ object PvTIdeas {
     new Pump(Protoss.DarkTemplar, 2))
 
   private class TrainObservers extends If(
-    new UnitsAtLeast(24, UnitMatchWarriors),
+    new UnitsAtLeast(24, MatchWarriors),
     new Pump(Protoss.Observer, 4),
     new If(
-      new UnitsAtLeast(18, UnitMatchWarriors),
+      new UnitsAtLeast(18, MatchWarriors),
       new Pump(Protoss.Observer, 3),
       new Pump(Protoss.Observer, 2)))
 
@@ -201,12 +201,12 @@ object PvTIdeas {
         new If(
           new Or(new UpgradeStarted(Protoss.ZealotSpeed), new And(new MineralsAtLeast(600), new GasAtMost(200))),
           new PumpRatio(Protoss.Zealot, 0, 50, Seq(
-            Enemy(UnitMatchSiegeTank, 2.5),
+            Enemy(MatchSiegeTank, 2.5),
             Enemy(Terran.Goliath,     1.5),
             Enemy(Terran.Marine,      1.0),
             Enemy(Terran.Vulture,     -1.25)))),
         new If(new GasAtLeast(800), new Pump(Protoss.HighTemplar, 6, maximumConcurrently = 2)),
-        new If(new Employing(PvEStormYes), new PumpRatio(Protoss.HighTemplar, 0, 4, Seq(Flat(-2.0), Friendly(UnitMatchWarriors, 0.1)))),
+        new If(new Employing(PvEStormYes), new PumpRatio(Protoss.HighTemplar, 0, 4, Seq(Flat(-2.0), Friendly(MatchWarriors, 0.1)))),
         new Pump(Protoss.Dragoon))))
 
   class TrainCarriers extends If(
@@ -233,7 +233,7 @@ object PvTIdeas {
       new And(new UnitsAtLeast(1, Protoss.FleetBeacon), new EnemyHasShownWraithCloak),
       new PumpRatio(Protoss.Corsair, 0, 8, Seq(Enemy(Terran.Wraith, 2.0)))),
     new TrainCarriers,
-    new PumpRatio(Protoss.Arbiter, 2, 8, Seq(Enemy(UnitMatchSiegeTank, 0.5))),
+    new PumpRatio(Protoss.Arbiter, 2, 8, Seq(Enemy(MatchSiegeTank, 0.5))),
     new TrainScouts,
     new TrainGatewayUnits)
 }

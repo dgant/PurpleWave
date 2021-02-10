@@ -3,7 +3,7 @@ package Micro.Actions.Transportation.Caddy
 import Lifecycle.With
 import Mathematics.Shapes.Spiral
 import Micro.Actions.Action
-import Planning.UnitMatchers.UnitMatchWorkers
+import Planning.UnitMatchers.MatchWorkers
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
@@ -31,7 +31,7 @@ object ShuttleRegroup extends Action {
     if (antiAir.nonEmpty) {
 
       // Help!
-      val support = unit.teammates.view.filter(u => u.canAttack && ! u.isAny(Protoss.Reaver, UnitMatchWorkers)).toVector
+      val support = unit.teammates.view.filter(u => u.canAttack && ! u.isAny(Protoss.Reaver, MatchWorkers)).toVector
       if (support.nonEmpty) {
         val supportDeepest = support.maxBy(_.matchups.pixelsOfEntanglement)
         val supportSafest = support.maxBy(_.matchups.pixelsOfEntanglement)

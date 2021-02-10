@@ -24,12 +24,12 @@ class TrainUnit(val traineeClass: UnitClass) extends Production {
   val currencyLock    = new LockCurrencyForUnit(traineeClass)
   val trainerClass    = traineeClass.whatBuilds._1
   val addonsRequired  = traineeClass.buildUnitsEnabling.find(b => b.isAddon && b.whatBuilds._1 == trainerClass)
-  val matchTrainer    = UnitMatchAnd(trainerClass, UnitMatchNot(UnitMatchMobileFlying))
+  val matchTrainer    = MatchAnd(trainerClass, MatchNot(MatchMobileFlying))
   val trainerMatcher  =
     if (addonsRequired.isDefined)
-      UnitMatchAnd(matchTrainer, UnitMatchHasAddon(addonsRequired.head))
+      MatchAnd(matchTrainer, MatchHasAddon(addonsRequired.head))
     else if (traineeClass == Terran.NuclearMissile)
-      UnitMatchAnd(matchTrainer, UnitMatchNot(UnitMatchHasNuke))
+      MatchAnd(matchTrainer, MatchNot(MatchHasNuke))
     else
       matchTrainer
     

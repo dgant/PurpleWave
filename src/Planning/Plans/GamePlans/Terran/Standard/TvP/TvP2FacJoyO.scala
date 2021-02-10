@@ -12,7 +12,7 @@ import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.{UnitMatchOr, UnitMatchSiegeTank}
+import Planning.UnitMatchers.{MatchOr, MatchSiegeTank}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvP2FacJoyO
@@ -27,7 +27,7 @@ class TvP2FacJoyO extends GameplanTemplate {
   
   override def attackPlan: Plan = new Trigger(
     new Or(
-      new UnitsAtLeast(3, UnitMatchSiegeTank, complete = true),
+      new UnitsAtLeast(3, MatchSiegeTank, complete = true),
       new EnemyStrategy(With.fingerprints.nexusFirst)),
     new Attack)
 
@@ -69,13 +69,13 @@ class TvP2FacJoyO extends GameplanTemplate {
         new EnemyHasShown(Protoss.PhotonCannon)),
       new Build(Get(Terran.SiegeMode))),
     new Trigger(
-      new UnitsAtLeast(3, UnitMatchSiegeTank),
+      new UnitsAtLeast(3, MatchSiegeTank),
       new Parallel(
         new If(
           new UnitsAtMost(2, Terran.Factory, complete = true),
           new Pump(Terran.Marine)),
         new Build(Get(Terran.VultureSpeed), Get(Terran.SpiderMinePlant)),
-        new PumpRatio(Terran.Armory, 0, 1, Seq(Enemy(UnitMatchOr(Protoss.Stargate, Protoss.Carrier, Protoss.Scout, Protoss.Arbiter), 1.0))),
+        new PumpRatio(Terran.Armory, 0, 1, Seq(Enemy(MatchOr(Protoss.Stargate, Protoss.Carrier, Protoss.Scout, Protoss.Arbiter), 1.0))),
         new If(
           new UnitsAtLeast(1, Terran.Armory),
           new Parallel(

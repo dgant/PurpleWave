@@ -2,7 +2,7 @@ package Information.Geography.Calculations
 
 import Information.Geography.Types.Base
 import Lifecycle.With
-import Planning.UnitMatchers.UnitMatchWorkers
+import Planning.UnitMatchers.MatchWorkers
 import ProxyBwapi.Races.Protoss
 import Utilities.{ByOption, Minutes}
 
@@ -49,7 +49,7 @@ object BaseUpdater {
     base.townHall       = ByOption.minBy(base.units.view.filter(u => u.unitClass.isTownHall && ! u.flying))(_.tileTopLeft.tileDistanceManhattan(base.townHallTile))
     base.minerals       = base.units.filter(u => u.mineralsLeft > 0 && ! u.isBlocker)
     base.gas            = base.units.filter(_.unitClass.isGas)
-    base.workerCount    = base.units.count(u => u.player == base.owner && u.is(UnitMatchWorkers))
+    base.workerCount    = base.units.count(u => u.player == base.owner && u.is(MatchWorkers))
     base.defenseValue   = base.units.iterator.map(u => if (u.player == base.owner && ! u.unitClass.isWorker && (u.canAttack || u.unitClass.spells.nonEmpty)) u.subjectiveValue else 0).sum
     base.mineralsLeft   = base.minerals.iterator.map(_.mineralsLeft).sum
     base.gasLeft        = base.gas.iterator.map(_.gasLeft).sum

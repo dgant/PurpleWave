@@ -4,7 +4,7 @@ import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountOne
-import Planning.UnitMatchers.{UnitMatchMobileDetectors, UnitMatchOr}
+import Planning.UnitMatchers.{MatchMobileDetector, MatchOr}
 import Planning.UnitPreferences.UnitPreferClose
 import Planning.{Prioritized, Property}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -15,11 +15,11 @@ import scala.util.Random
 class ClearBurrowedBlockers extends Prioritized {
   
   val detector = new Property(new LockUnits)
-  detector.get.unitMatcher.set(UnitMatchMobileDetectors)
+  detector.get.unitMatcher.set(MatchMobileDetector)
   detector.get.unitCounter.set(UnitCountOne)
   
   val clearer = new Property(new LockUnits)
-  clearer.get.unitMatcher.set(UnitMatchOr(Terran.Marine, Terran.Firebat, Terran.Goliath, Terran.Wraith, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk, Zerg.Mutalisk))
+  clearer.get.unitMatcher.set(MatchOr(Terran.Marine, Terran.Firebat, Terran.Goliath, Terran.Wraith, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk, Zerg.Mutalisk))
   clearer.get.unitCounter.set(UnitCountOne)
 
   def update(): Unit = {

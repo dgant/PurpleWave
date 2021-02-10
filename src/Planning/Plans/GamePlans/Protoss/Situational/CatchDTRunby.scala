@@ -10,7 +10,7 @@ import ProxyBwapi.Races.Protoss
 class CatchDTRunby extends Squadify[GoalCatchDTRunby] {
 
   override val goal: GoalCatchDTRunby = new GoalCatchDTRunby
-  goal.unitMatcher = UnitMatchMobileDetectors
+  goal.unitMatcher = MatchMobileDetector
   goal.unitCounter = UnitCountOne
 
   override def update() {

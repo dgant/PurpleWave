@@ -16,8 +16,8 @@ object ZergIdeas {
   
   class SafeForOverlords extends And(
     new FrameAtMost(GameTime(4, 0)()),
-    new EnemiesAtMost(0, UnitMatchOr(
-      UnitMatchAntiAir,
+    new EnemiesAtMost(0, MatchOr(
+      MatchAntiAir,
       Terran.Barracks,
       Terran.Marine,
       Protoss.Stargate,
@@ -31,7 +31,7 @@ object ZergIdeas {
       Zerg.Mutalisk,
       Zerg.Scourge)))
   
-  class ScoutSafelyWithDrone extends If(new EnemiesAtMost(0, UnitMatchAntiGround), new ScoutWithWorkers)
+  class ScoutSafelyWithDrone extends If(new EnemiesAtMost(0, MatchAntiGround), new ScoutWithWorkers)
   
   class PumpJustEnoughZerglings(minimum: Int = 2, maximum: Int = 12) extends PumpRatio(
     Zerg.Zergling, minimum, maximum,
@@ -42,7 +42,7 @@ object ZergIdeas {
       Enemy(Terran.Ghost, 2.0),
       // Ignore Vultures
       Enemy(Terran.Goliath, 4.0),
-      Enemy(UnitMatchSiegeTank, 4.0),
+      Enemy(MatchSiegeTank, 4.0),
       Enemy(Protoss.Zealot, 4.5),
       Enemy(Protoss.Dragoon, 3.0),
       Enemy(Protoss.DarkTemplar, 6.0),
@@ -51,10 +51,10 @@ object ZergIdeas {
       Enemy(Zerg.Zergling, 1.5),
       Enemy(Zerg.Hydralisk, 3.0),
       Enemy(Zerg.Ultralisk, 10.0),
-      Enemy(UnitMatchAnd(UnitMatchProxied, Terran.Bunker), 12.0),
-      Enemy(UnitMatchAnd(UnitMatchProxied, Protoss.PhotonCannon), 8.0),
-      Enemy(UnitMatchAnd(UnitMatchProxied, Zerg.CreepColony), 4.0),
-      Enemy(UnitMatchAnd(UnitMatchProxied, Zerg.SunkenColony), 8.0)))
+      Enemy(MatchAnd(MatchProxied, Terran.Bunker), 12.0),
+      Enemy(MatchAnd(MatchProxied, Protoss.PhotonCannon), 8.0),
+      Enemy(MatchAnd(MatchProxied, Zerg.CreepColony), 4.0),
+      Enemy(MatchAnd(MatchProxied, Zerg.SunkenColony), 8.0)))
   
   class PumpJustEnoughHydralisks(minimum: Int = 0, maximum: Int = 100) extends PumpRatio(
     Zerg.Hydralisk, minimum, maximum,
@@ -67,7 +67,7 @@ object ZergIdeas {
       Enemy(Terran.Goliath, 2.0),
       Enemy(Terran.Wraith, 2.0),
       Enemy(Terran.Battlecruiser, 4.0),
-      Enemy(UnitMatchSiegeTank, 4.0),
+      Enemy(MatchSiegeTank, 4.0),
       Enemy(Protoss.Zealot, 1.5),
       Enemy(Protoss.Dragoon, 1.5),
       Enemy(Protoss.DarkTemplar, 2.0),
@@ -79,10 +79,10 @@ object ZergIdeas {
       Enemy(Zerg.Zergling, 0.5),
       Enemy(Zerg.Hydralisk, 1.0),
       Enemy(Zerg.Ultralisk, 4.0),
-      Enemy(UnitMatchAnd(UnitMatchProxied, Terran.Bunker), 5.0),
-      Enemy(UnitMatchAnd(UnitMatchProxied, Protoss.PhotonCannon), 4.0),
-      Enemy(UnitMatchAnd(UnitMatchProxied, Zerg.CreepColony), 2.0),
-      Enemy(UnitMatchAnd(UnitMatchProxied, Zerg.SunkenColony), 4.0)))
+      Enemy(MatchAnd(MatchProxied, Terran.Bunker), 5.0),
+      Enemy(MatchAnd(MatchProxied, Protoss.PhotonCannon), 4.0),
+      Enemy(MatchAnd(MatchProxied, Zerg.CreepColony), 2.0),
+      Enemy(MatchAnd(MatchProxied, Zerg.SunkenColony), 4.0)))
   
   class PumpJustEnoughScourge extends Trigger(
     new Or(

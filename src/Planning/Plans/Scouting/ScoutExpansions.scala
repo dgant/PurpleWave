@@ -23,16 +23,16 @@ class ScoutExpansions extends DoScout {
       else                            GameTime(12, 0)
   }
 
-  val matcher: UnitMatcher = UnitMatchAnd(
-    UnitMatchRecruitableForCombat,
-    UnitMatchNot(_.topSpeed < Protoss.Zealot.topSpeed),
-    UnitMatchNot(UnitMatchWorkers),
-    UnitMatchNot(Terran.Battlecruiser),
-    UnitMatchNot(Terran.Medic),
-    UnitMatchNot(Terran.Dropship),
-    UnitMatchNot(Terran.Valkyrie),
-    UnitMatchNot(Protoss.Shuttle),
-    UnitMatchNot(Protoss.Carrier))
+  val matcher: Matcher = MatchAnd(
+    MatchRecruitableForCombat,
+    MatchNot(_.topSpeed < Protoss.Zealot.topSpeed),
+    MatchNot(MatchWorkers),
+    MatchNot(Terran.Battlecruiser),
+    MatchNot(Terran.Medic),
+    MatchNot(Terran.Dropship),
+    MatchNot(Terran.Valkyrie),
+    MatchNot(Protoss.Shuttle),
+    MatchNot(Protoss.Carrier))
 
   def update(): Unit = {
     if ( ! With.blackboard.wantToAttack()) return

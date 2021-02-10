@@ -23,7 +23,7 @@ class Pump(
   
     val unitsNow            = PumpCount.currentCount(unitClass)
     val unitsToAddCeiling   = Math.max(0, Math.min(maximumTotal, maxDesirable) - unitsNow) // TODO: Clamp Nukes to #Silos
-    val buildersSpawning    = if (unitClass.whatBuilds._1 == Zerg.Larva) With.units.countOurs(UnitMatchAnd(UnitMatchHatchery, UnitMatchComplete)) else 0
+    val buildersSpawning    = if (unitClass.whatBuilds._1 == Zerg.Larva) With.units.countOurs(MatchAnd(MatchHatcherylike, MatchComplete)) else 0
     val buildersExisting    = builders.toVector
     val buildersReserved    = With.scheduler.buildersAllocated(unitClass)
     val buildersReadiness   = getBuilderReadiness(buildersExisting)

@@ -4,7 +4,7 @@ import Debugging.Visualizations.Colors
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Basic.Gather
-import Planning.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWorkers}
+import Planning.UnitMatchers.{MatchSiegeTank, MatchWorkers}
 import ProxyBwapi.Races.Terran
 import bwapi.Color
 
@@ -110,7 +110,7 @@ object JudgmentModifiers {
       && ally.friendly.exists(_.agent.toGather.exists(g =>
         g.pixelDistanceEdge(ally) <= Gather.defenseRadiusPixels
         && ally.matchups.threats.exists(_.pixelsToGetInRange(ally, g.pixel) <= Gather.defenseRadiusPixels))))
-    val workersTotal = With.units.countOurs(UnitMatchWorkers)
+    val workersTotal = With.units.countOurs(MatchWorkers)
     val workersRatio = PurpleMath.nanToZero(workersImperiled.toDouble / workersTotal)
     if (workersRatio > 0) Some(JudgmentModifier(targetDelta = -workersRatio)) else None
   }
@@ -123,7 +123,7 @@ object JudgmentModifiers {
   //     and thus systematically bleed units
   def hornetNest(battleLocal: BattleLocal): Option[JudgmentModifier] = {
     if (With.enemies.forall(e => ! e.isTerran || ! e.hasTech(Terran.SiegeMode))) return None
-    val tanks           = battleLocal.enemy.units.count(u => u.is(UnitMatchSiegeTank) && u.base.exists(_.owner.isEnemy) && ! u.visible)
+    val tanks           = battleLocal.enemy.units.count(u => u.is(MatchSiegeTank) && u.base.exists(_.owner.isEnemy) && ! u.visible)
     if (tanks == 0) return None
     def ourCombatUnits  = battleLocal.us.units.view.filter(_.canAttack)
     val valueUs         = ourCombatUnits.map(_.subjectiveValue).sum

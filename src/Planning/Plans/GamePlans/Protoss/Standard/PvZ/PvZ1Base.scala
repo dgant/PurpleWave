@@ -22,7 +22,7 @@ import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
-import Planning.UnitMatchers.{UnitMatchAntiAir, UnitMatchWarriors}
+import Planning.UnitMatchers.{MatchAntiAir, MatchWarriors}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss._
 
@@ -55,7 +55,7 @@ abstract class PvZ1Base extends GameplanTemplate {
             new Employing(PvZ2Gate910),
             new EnemyStrategy(With.fingerprints.tenHatch, With.fingerprints.overpool))),
         new ConsiderAttacking,
-        new Trigger(new UnitsAtLeast(7, UnitMatchWarriors, complete = true), new ConsiderAttacking))))
+        new Trigger(new UnitsAtLeast(7, MatchWarriors, complete = true), new ConsiderAttacking))))
 
   class EnemyHydralisks extends Or(
     new EnemyHasShown(Zerg.Hydralisk),
@@ -155,13 +155,13 @@ abstract class PvZ1Base extends GameplanTemplate {
             new UnitsAtLeast(1, Protoss.TemplarArchives)),
           new Or(
             new Not(new GettingAntiAirASAP),
-            new UnitsAtLeast(8, UnitMatchAntiAir, complete = true)),
+            new UnitsAtLeast(8, MatchAntiAir, complete = true)),
           new Or(
-            new And(new UnitsAtLeast(6,   UnitMatchWarriors), new EnemiesAtLeast(4, Zerg.SunkenColony, complete = true)),
-            new And(new UnitsAtLeast(8,   UnitMatchWarriors), new EnemiesAtLeast(3, Zerg.SunkenColony, complete = true)),
-            new And(new UnitsAtLeast(12,  UnitMatchWarriors), new EnemiesAtLeast(2, Zerg.SunkenColony, complete = true)),
-            new And(new UnitsAtLeast(14,  UnitMatchWarriors), new SafeAtHome),
-            new UnitsAtLeast(20, UnitMatchWarriors, complete = true)))),
+            new And(new UnitsAtLeast(6,   MatchWarriors), new EnemiesAtLeast(4, Zerg.SunkenColony, complete = true)),
+            new And(new UnitsAtLeast(8,   MatchWarriors), new EnemiesAtLeast(3, Zerg.SunkenColony, complete = true)),
+            new And(new UnitsAtLeast(12,  MatchWarriors), new EnemiesAtLeast(2, Zerg.SunkenColony, complete = true)),
+            new And(new UnitsAtLeast(14,  MatchWarriors), new SafeAtHome),
+            new UnitsAtLeast(20, MatchWarriors, complete = true)))),
       new RequireMiningBases(2)),
 
     // Train army/workers

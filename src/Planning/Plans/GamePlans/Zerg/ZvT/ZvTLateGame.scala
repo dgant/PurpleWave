@@ -9,7 +9,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Milestones.{BasesAtLeast, EnemiesAtLeast, UnitsAtLeast, UpgradeComplete}
-import Planning.UnitMatchers.UnitMatchSiegeTank
+import Planning.UnitMatchers.MatchSiegeTank
 import ProxyBwapi.Races.{Terran, Zerg}
 
 
@@ -43,7 +43,7 @@ class ZvTLateGame extends GameplanTemplate  {
 
     new If(new UnitsAtLeast(1, Zerg.HydraliskDen), new Build(Get(Zerg.LurkerMorph))),
     new If(
-      new EnemiesAtLeast(1, UnitMatchSiegeTank),
+      new EnemiesAtLeast(1, MatchSiegeTank),
       new Parallel(
         new UpgradeContinuously(Zerg.UltraliskSpeed),
         new If(new UpgradeComplete(Zerg.UltraliskSpeed), new UpgradeContinuously(Zerg.UltraliskArmor))),
@@ -63,14 +63,14 @@ class ZvTLateGame extends GameplanTemplate  {
     new PumpRatio(Zerg.Scourge, 0, 30, Seq(Enemy(Terran.Wraith, 3), Enemy(Terran.Valkyrie, 4), Enemy(Terran.Battlecruiser, 8))),
     new If(
       new Or(
-        new EnemiesAtLeast(1, UnitMatchSiegeTank),
+        new EnemiesAtLeast(1, MatchSiegeTank),
         new EnemiesAtLeast(1, Terran.Wraith)),
       new Pump(Zerg.Mutalisk, 6)),
     new Pump(Zerg.Ultralisk),
     new Pump(Zerg.Lurker),
     new PumpRatio(Zerg.Scourge, 0, 12, Seq(Enemy(Terran.ScienceVessel, 2))),
     new PumpRatio(Zerg.Hydralisk, 0, 10, Seq(Flat(5), Friendly(Zerg.Lurker, -1), Enemy(Terran.Marine, 0.3), Enemy(Terran.Medic, 0.5), Enemy(Terran.Firebat, 0.5))),
-    new PumpRatio(Zerg.Zergling, 12, 30, Seq(Enemy(Terran.Marine, 3), Enemy(Terran.Firebat, 5), Enemy(Terran.Goliath, 6), Enemy(UnitMatchSiegeTank, 8))),
+    new PumpRatio(Zerg.Zergling, 12, 30, Seq(Enemy(Terran.Marine, 3), Enemy(Terran.Firebat, 5), Enemy(Terran.Goliath, 6), Enemy(MatchSiegeTank, 8))),
 
     new PumpRatio(Zerg.Drone, 30, 65, Seq(Friendly(Zerg.Hatchery, 10))),
     new Pump(Zerg.Hatchery, 8, maximumConcurrently = 1),

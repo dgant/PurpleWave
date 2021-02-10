@@ -17,7 +17,7 @@ import Planning.Predicates.Economy.{GasAtMost, MineralsAtLeast}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeToMoveOut}
 import Planning.Predicates.Strategy._
-import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
+import Planning.UnitMatchers.{MatchOr, MatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPRobo
@@ -66,7 +66,7 @@ class PvPRobo extends GameplanTemplate {
         new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
         new UnitsAtLeast(1, Protoss.Reaver, complete = true),
         new EnemiesAtMost(0, Protoss.PhotonCannon, complete = true),
-        new EnemiesAtMost(0, UnitMatchWarriors)),
+        new EnemiesAtMost(0, MatchWarriors)),
       new Or(
         new Not(new EnemyHasShown(Protoss.DarkTemplar)),
         new UnitsAtLeast(2, Protoss.Observer, complete = true)),
@@ -80,7 +80,7 @@ class PvPRobo extends GameplanTemplate {
           new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
           new Or(
             new EnemyHasShown(Protoss.Gateway), // Don't abandon base vs. proxies
-            new UnitsAtLeast(7, UnitMatchWarriors)),
+            new UnitsAtLeast(7, MatchWarriors)),
           new Or(
             new UpgradeComplete(Protoss.DragoonRange),
             new Not(new EnemyHasUpgrade(Protoss.DragoonRange)))),
@@ -150,8 +150,8 @@ class PvPRobo extends GameplanTemplate {
       new And(new UnitsAtLeast(1, Protoss.Reaver, complete = true), new SafeToMoveOut, new EnemyLowUnitCount),
       new And(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new SafeToMoveOut, new Not(new EnemyStrategy(With.fingerprints.fourGateGoon))),
       new And(
-        new UnitsAtLeast(2, UnitMatchOr(Protoss.Shuttle, Protoss.Reaver), complete = true),
-        new Latch(new UnitsAtLeast(3, UnitMatchOr(Protoss.Shuttle, Protoss.Reaver), complete = true)))))
+        new UnitsAtLeast(2, MatchOr(Protoss.Shuttle, Protoss.Reaver), complete = true),
+        new Latch(new UnitsAtLeast(3, MatchOr(Protoss.Shuttle, Protoss.Reaver), complete = true)))))
 
   override def buildPlans: Seq[Plan] = Seq(
     new oneGateCoreLogic.WriteStatuses,

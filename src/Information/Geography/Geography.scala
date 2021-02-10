@@ -7,7 +7,7 @@ import Mathematics.Points.{SpecificPoints, Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
 import Performance.Cache
 import Performance.Tasks.TimedTask
-import Planning.UnitMatchers.UnitMatchSiegeTank
+import Planning.UnitMatchers.MatchSiegeTank
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
@@ -100,7 +100,7 @@ class Geography extends TimedTask {
     ++ Vector(With.geography.ourNatural).filter(x =>
         With.strategy.isInverted
         && ! With.geography.ourMain.units.exists(_.unitClass.isStaticDefense)
-        && With.units.ours.exists(u => u.complete && u.unitClass.ranged && (u.unitClass.canMove || u.is(UnitMatchSiegeTank)))
+        && With.units.ours.exists(u => u.complete && u.unitClass.ranged && (u.unitClass.canMove || u.is(MatchSiegeTank)))
         && (With.units.existsEnemy(_.unitClass.ranged) || With.battles.global.globalSafeToAttack))
     ++ With.units.ours
       .view

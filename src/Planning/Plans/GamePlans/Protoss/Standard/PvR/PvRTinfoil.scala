@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvR
 
-import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
@@ -8,17 +7,15 @@ import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplateVsRandom
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFFEWithProbesAgainst4Pool
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, PumpShuttleAndReavers, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Predicates.Compound.And
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvRTinfoil2018
-import Utilities.GameTime
 
 class PvRTinfoil extends GameplanTemplateVsRandom {
   

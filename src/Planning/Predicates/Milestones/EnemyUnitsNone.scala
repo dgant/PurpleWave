@@ -1,5 +1,5 @@
 package Planning.Predicates.Milestones
 
-import Planning.UnitMatchers.{UnitMatchAnything, UnitMatcher}
+import Planning.UnitMatchers.{MatchAnything, Matcher}
 
-class EnemyUnitsNone(matcher: UnitMatcher = UnitMatchAnything) extends EnemiesAtMost(0, matcher)
+class EnemyUnitsNone(matcher: Matcher = MatchAnything) extends EnemiesAtMost(0, matcher)

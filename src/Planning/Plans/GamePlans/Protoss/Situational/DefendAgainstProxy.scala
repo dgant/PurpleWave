@@ -31,12 +31,12 @@ class DefendAgainstProxy extends Prioritized {
     if (proxies.isEmpty) return
 
     // Set up collections of available and assigned defenders
-    var additionalWorkersAllowed  = With.units.countOurs(UnitMatchWorkers) - 6
+    var additionalWorkersAllowed  = With.units.countOurs(MatchWorkers) - 6
     val defendersAssigned         = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
     val defendersAvailable        = new mutable.HashSet[FriendlyUnitInfo]
     defenders.get.release()
     defenders.get.unitCounter.set(UnitCountEverything)
-    defenders.get.unitMatcher.set(UnitMatchOr(UnitMatchWorkers, UnitMatchWarriors))
+    defenders.get.unitMatcher.set(MatchOr(MatchWorkers, MatchWarriors))
     defenders.get.inquire(this).toVector.foreach(defendersAvailable ++= _)
 
     // For each proxy, in priority order, decide who if anyone to assign to it
@@ -80,7 +80,7 @@ class DefendAgainstProxy extends Prioritized {
     })
 
     defenders.get.unitCounter.set(UnitCountExactly(defendersAssigned.size))
-    defenders.get.unitMatcher.set(UnitMatchCustom(_.friendly.exists(defendersAssigned.contains)))
+    defenders.get.unitMatcher.set(Match(_.friendly.exists(defendersAssigned.contains)))
     defenders.get.acquire(this)
     if (defenders.get.units.isEmpty) {
       return
@@ -97,7 +97,7 @@ class DefendAgainstProxy extends Prioritized {
       ! e.flying
       && e.likelyStillThere
       && e.isAny(scaryTypes: _*)
-      && e.is(UnitMatchProxied))
+      && e.is(MatchProxied))
   }
   
   lazy val scaryTypes = Vector(

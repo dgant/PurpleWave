@@ -1,6 +1,6 @@
 package Micro.Squads
 
-import Planning.UnitMatchers.{UnitMatchCombatSpellcaster, UnitMatchWorkers}
+import Planning.UnitMatchers.{MatchCombatSpellcaster, MatchWorkers}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -51,16 +51,16 @@ object Qualities {
     override val counteredBy: Array[Quality] = Array(AntiGroundCombat)
   }
   object AntiAir extends Quality {
-    def apply(u: UnitInfo): Boolean = u.is(UnitMatchCombatSpellcaster) || u.attacksAgainstAir > 0
+    def apply(u: UnitInfo): Boolean = u.is(MatchCombatSpellcaster) || u.attacksAgainstAir > 0
   }
   object AntiGround extends Quality {
-    def apply(u: UnitInfo): Boolean = u.is(UnitMatchCombatSpellcaster) || (u.attacksAgainstGround > 0 && ! u.unitClass.isWorker)
+    def apply(u: UnitInfo): Boolean = u.is(MatchCombatSpellcaster) || (u.attacksAgainstGround > 0 && ! u.unitClass.isWorker)
   }
   object AntiAirCombat extends Quality {
     def apply(u: UnitInfo): Boolean = u.attacksAgainstAir > 0 && ! u.isAny(Terran.Ghost, Protoss.Arbiter)
   }
   object AntiGroundCombat extends Quality {
-    def apply(u: UnitInfo): Boolean = u.attacksAgainstGround > 0 && ! u.isAny(Terran.Ghost, Protoss.Arbiter, UnitMatchWorkers)
+    def apply(u: UnitInfo): Boolean = u.attacksAgainstGround > 0 && ! u.isAny(Terran.Ghost, Protoss.Arbiter, MatchWorkers)
   }
   object Combat extends Quality {
     def apply(u: UnitInfo): Boolean = (u.canAttack && ! u.unitClass.isWorker)

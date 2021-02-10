@@ -15,7 +15,7 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones.{EnemyHasShown, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
-import Planning.UnitMatchers.{UnitMatchOr, UnitMatchWarriors}
+import Planning.UnitMatchers.{MatchOr, MatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran.TvZ2RaxAcademy
@@ -90,9 +90,9 @@ class TvZ2RaxAcademy extends GameplanTemplate {
         new If(new NeedTurret, new BuildMissileTurretsAtNatural(1)),
         new PumpWorkers(oversaturate = true),
         new If(
-          new UnitsAtMost(2, UnitMatchWarriors),
+          new UnitsAtMost(2, MatchWarriors),
           new Pump(Terran.Firebat, 2)),
-        new PumpRatio(Terran.Medic, 2, 6, Seq(Friendly(UnitMatchOr(Terran.Marine, Terran.Firebat), 0.2))),
+        new PumpRatio(Terran.Medic, 2, 6, Seq(Friendly(MatchOr(Terran.Marine, Terran.Firebat), 0.2))),
         new PumpRatio(Terran.Firebat, 0, 2, Seq(Friendly(Terran.Marine, 0.1))),
         new Pump(Terran.Marine),
         // Hack to force placement of emergency bunkers in the main, not the natural

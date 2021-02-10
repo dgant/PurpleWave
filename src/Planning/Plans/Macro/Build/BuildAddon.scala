@@ -6,7 +6,7 @@ import Macro.Buildables.{Buildable, BuildableUnit}
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.UnitCountOne
-import Planning.UnitMatchers.{UnitMatchAnd, UnitMatcher}
+import Planning.UnitMatchers.{MatchAnd, Matcher}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -22,7 +22,7 @@ class BuildAddon(val addonClass: UnitClass) extends Production {
   
   private var addon: Option[UnitInfo] = None
   
-  val builderMatcher = UnitMatchAnd(addonClass.whatBuilds._1, new UnitMatcher {
+  val builderMatcher = MatchAnd(addonClass.whatBuilds._1, new Matcher {
     override def apply(unit: UnitInfo): Boolean = unit.addon.forall(addon.contains)
   })
   

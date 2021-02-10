@@ -6,7 +6,7 @@ import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.{CountBetween, CountOne}
+import Planning.UnitCounters.{CountUpTo, CountOne}
 import Planning.UnitMatchers.{MatchMobile, UnitMatcher}
 import Planning.UnitPreferences.PreferIdle
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -27,7 +27,7 @@ abstract class DoScout extends Prioritized {
       scoutLock.release()
     }
     scoutLock.matcher.set(matcher)
-    scoutLock.counter.set(new CountBetween(0, count))
+    scoutLock.counter.set(CountUpTo(count))
     scoutLock.preference.set(PreferIdle)
     scoutLock.acquire(this)
     scoutLock.units

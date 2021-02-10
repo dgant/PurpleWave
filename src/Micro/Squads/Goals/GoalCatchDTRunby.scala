@@ -3,7 +3,7 @@ package Micro.Squads.Goals
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Performance.Cache
-import Planning.UnitCounters.{CountExactly, CountOne}
+import Planning.UnitCounters.{CountUpTo, CountOne}
 import Planning.UnitMatchers.{MatchMobileDetector, UnitMatcher}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -22,7 +22,7 @@ class GoalCatchDTRunby extends SquadGoalBasic {
     if (needed()) {
       unitCounter = CountOne
     } else {
-      unitCounter = CountExactly(0)
+      unitCounter = CountUpTo(0)
     }
     super.run()
   }

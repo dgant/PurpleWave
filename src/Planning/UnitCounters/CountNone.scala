@@ -1,3 +1,3 @@
 package Planning.UnitCounters
 
-object CountNone extends CountExactly(0)
+object CountNone extends CountUpTo(0)

@@ -8,10 +8,10 @@ import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Planning.Predicates.Strategy.EnemyRecentStrategy
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.CountBetween
+import Planning.UnitCounters.CountUpTo
 import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchWorkers}
 import Planning.UnitPreferences.PreferClose
-import Planning.{Plan, Prioritized, Property}
+import Planning.{Prioritized, Property}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.{ByOption, Minutes}
@@ -64,7 +64,7 @@ class DefendFFEWithProbes extends Prioritized {
       defenders.get.release()
     }
     defenders.get.preference.set(PreferClose(cannons.map(_.pixel).minBy(_.groundPixels(threatSource))))
-    defenders.get.counter.set(new CountBetween(0, probesRequired))
+    defenders.get.counter.set(CountUpTo(probesRequired))
     defenders.get.acquire(this)
     val closestDistance = cannons.map(_.pixelDistanceTravelling(threatSource)).min
     val threatenedCannons = cannons.filter(_.pixelDistanceTravelling(threatSource) <= closestDistance + 96)

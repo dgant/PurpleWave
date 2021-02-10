@@ -1,12 +1,10 @@
 package Planning.UnitCounters
 
 import Lifecycle.With
+import Performance.Cache
 import Planning.UnitMatchers.UnitMatcher
 
-class CountExcept(buffer: Int, matcher: UnitMatcher) extends CountBetween(0, 0) {
-  
-  override def reset() {
-    val cap = With.units.countOursP(unit => unit.friendly.exists(With.recruiter.eligible) && matcher.apply(unit))
-    maximum.set(Math.max(0, cap - buffer))
-  }
+class CountExcept(buffer: Int, matcher: UnitMatcher) extends UnitCounter {
+  private val matched = new Cache(() => With.units.countOurs(matcher))
+  override def maximum: Int = Math.max(0, matched() - 3)
 }

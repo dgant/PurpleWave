@@ -16,7 +16,7 @@ import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound._
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
-import Planning.UnitCounters.{CountExactly, CountExcept}
+import Planning.UnitCounters.{CountUpTo, CountExcept}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran.TvZ8Rax
@@ -44,7 +44,7 @@ class TvZ8Rax extends GameplanTemplate {
         new If(
           new UnitsAtMost(0, Terran.Bunker, complete = true),
           new AttackWithWorkers(new CountExcept(8, Terran.SCV)),
-          new AttackWithWorkers(CountExactly(2))))))
+          new AttackWithWorkers(CountUpTo(2))))))
 
   override def scoutPlan: Plan = new If(
     new Not(new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.fourPool)),

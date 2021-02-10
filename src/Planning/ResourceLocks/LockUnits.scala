@@ -1,7 +1,7 @@
 package Planning.ResourceLocks
 
 import Lifecycle.With
-import Planning.UnitCounters.{CountEverything, CountExactly, UnitCounter}
+import Planning.UnitCounters.{CountEverything, CountUpTo, UnitCounter}
 import Planning.UnitMatchers.{MatchAnything, UnitMatcher}
 import Planning.UnitPreferences.{PreferAnything, UnitPreference}
 import Planning.{Prioritized, Property}
@@ -44,7 +44,6 @@ class LockUnits {
   protected def weAccept(unit: FriendlyUnitInfo): Boolean = matcher.get.apply(unit)
 
   def offerUnits(candidates: Iterable[FriendlyUnitInfo], dryRun: Boolean): Option[Seq[FriendlyUnitInfo]] = {
-    counter.get.reset()
     val finalists = findFinalists(candidates)
     val finalistsSatisfy = counter.get.accept(finalists)
     if ( ! dryRun) isSatisfied = finalistsSatisfy
@@ -59,7 +58,7 @@ class LockUnits {
       } else {
         candidates.filter(weAccept).toSeq
       }
-    } else if (counter.get == CountExactly(1)) {
+    } else if (counter.get == CountUpTo(1)) {
       findSingleFinalist(candidates)
     } else {
       findMultipleFinalists(candidates)

@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.CountExactly
+import Planning.UnitCounters.CountUpTo
 import Planning.UnitMatchers.{MatchWarriors, MatchWorkers}
 import Planning.UnitPreferences.PreferClose
 import Planning.{Prioritized, Property}
@@ -36,7 +36,7 @@ class DefendFightersAgainstRush extends Prioritized {
     val workersToFight  = PurpleMath.clamp(workersNeeded, 0, workerCap)
     val target          = fighters.minBy(fighter => aggressors.map(_.pixelDistanceEdge(fighter)).min).pixel
     
-    defenders.get.counter.set(CountExactly(workersToFight.toInt))
+    defenders.get.counter.set(CountUpTo(workersToFight.toInt))
     defenders.get.preference.set(PreferClose(target))
     defenders.get.acquire(this)
     defenders.get.units.foreach(_.agent.intend(this, new Intention {

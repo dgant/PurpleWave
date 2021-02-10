@@ -4,7 +4,7 @@ import Lifecycle.With
 import Micro.Squads.Goals.GoalRazeProxies
 import Micro.Squads.Squad
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.{CountEverything, CountExactly}
+import Planning.UnitCounters.{CountEverything, CountUpTo}
 import Planning.UnitMatchers._
 import Planning.{Prioritized, Property}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -79,7 +79,7 @@ class DefendAgainstProxy extends Prioritized {
       })
     })
 
-    defenders.get.counter.set(CountExactly(defendersAssigned.size))
+    defenders.get.counter.set(CountUpTo(defendersAssigned.size))
     defenders.get.matcher.set(Match(_.friendly.exists(defendersAssigned.contains)))
     defenders.get.acquire(this)
     if (defenders.get.units.isEmpty) {

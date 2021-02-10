@@ -14,7 +14,7 @@ import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemiesAtMost, FoundEnemyBase}
 import Planning.Predicates.Strategy.Employing
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.CountBetween
+import Planning.UnitCounters.CountUpTo
 import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchWorkers}
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -62,7 +62,7 @@ class WorkerRush extends Trigger {
         if (workerLock.units.size > goalWorkers) {
           workerLock.release()
         }
-        workerLock.counter.set(new CountBetween(1, goalWorkers))
+        workerLock.counter.set(CountUpTo(goalWorkers))
         workerLock.preference.set(PreferClose(With.geography.home.pixelCenter))
         workerLock.canPoach.set(true)
         workerLock.acquire(this)

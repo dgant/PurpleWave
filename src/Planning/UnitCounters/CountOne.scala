@@ -1,3 +1,3 @@
 package Planning.UnitCounters
 
-object CountOne extends CountExactly(1)
+object CountOne extends CountUpTo(1)

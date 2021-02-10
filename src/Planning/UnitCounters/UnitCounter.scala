@@ -1,9 +1,7 @@
 package Planning.UnitCounters
 
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-
 trait UnitCounter {
-  def reset() {}
-  def continue  (units: Iterable[FriendlyUnitInfo]): Boolean
-  def accept    (units: Iterable[FriendlyUnitInfo]): Boolean
+  def maximum: Int
+  final def continue[T](iterable: Iterable[T]): Boolean = iterable.size < maximum
+  final def accept[T](iterable: Iterable[T]): Boolean = iterable.size <= maximum
 }

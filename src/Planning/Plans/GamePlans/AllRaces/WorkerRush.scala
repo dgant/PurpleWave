@@ -16,7 +16,7 @@ import Planning.Predicates.Strategy.Employing
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountBetween
 import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchWorkers}
-import Planning.UnitPreferences.UnitPreferClose
+import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.AllRaces.{WorkerRushContinuousProduction, WorkerRushImmediate, WorkerRushOnScout, WorkerRushOnSupplyBlock}
 
@@ -63,7 +63,7 @@ class WorkerRush extends Trigger {
           workerLock.release()
         }
         workerLock.unitCounter.set(new UnitCountBetween(1, goalWorkers))
-        workerLock.unitPreference.set(UnitPreferClose(With.geography.home.pixelCenter))
+        workerLock.unitPreference.set(PreferClose(With.geography.home.pixelCenter))
         workerLock.canPoach.set(true)
         workerLock.acquire(this)
         With.gathering.gatheringPlan = this

@@ -6,7 +6,7 @@ import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountExactly
 import Planning.UnitMatchers.{MatchWarriors, MatchWorkers}
-import Planning.UnitPreferences.UnitPreferClose
+import Planning.UnitPreferences.PreferClose
 import Planning.{Prioritized, Property}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -37,7 +37,7 @@ class DefendFightersAgainstRush extends Prioritized {
     val target          = fighters.minBy(fighter => aggressors.map(_.pixelDistanceEdge(fighter)).min).pixel
     
     defenders.get.unitCounter.set(UnitCountExactly(workersToFight.toInt))
-    defenders.get.unitPreference.set(UnitPreferClose(target))
+    defenders.get.unitPreference.set(PreferClose(target))
     defenders.get.acquire(this)
     defenders.get.units.foreach(_.agent.intend(this, new Intention {
       toTravel = Some(target)

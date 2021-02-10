@@ -10,7 +10,7 @@ import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.UnitCountOne
 import Planning.UnitMatchers.{MatchAnd, Match, MatchSpecific}
-import Planning.UnitPreferences.UnitPreferCloseAndNotMining
+import Planning.UnitPreferences.PreferCloseAndNotMining
 import ProxyBwapi.Races.Neutral
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -93,7 +93,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
     if (orderedTile.isDefined && orderedTile != desiredTile) {
       builderLock.release()
     }
-    builderLock.unitPreference.set(UnitPreferCloseAndNotMining(desiredTile.get.pixelCenter))
+    builderLock.unitPreference.set(PreferCloseAndNotMining(desiredTile.get.pixelCenter))
     builderLock.acquire(this)
     
     if (waitForBuilderToRecallUntil.isDefined) {

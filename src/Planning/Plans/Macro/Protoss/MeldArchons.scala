@@ -4,7 +4,7 @@ import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountBetween
-import Planning.UnitPreferences.UnitPreferLowEnergy
+import Planning.UnitPreferences.PreferLowEnergy
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
 
@@ -15,7 +15,7 @@ class MeldArchons(maxEnergy: Int = 251) extends Plan {
   
   val templar = new LockUnits
   templar.unitMatcher.set(Protoss.HighTemplar)
-  templar.unitPreference.set(UnitPreferLowEnergy)
+  templar.unitPreference.set(PreferLowEnergy)
   
   override def onUpdate() {
     // Fast check for performance

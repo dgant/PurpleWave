@@ -4,7 +4,7 @@ import Lifecycle.With
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-object UnitPreferHatcheryWithThreeLarva extends UnitPreference {
+object PreferHatcheryWithThreeLarva extends Preference {
   
   override def apply(unit: FriendlyUnitInfo): Double =
     Math.max(2, With.units

@@ -3,7 +3,7 @@ package Planning.ResourceLocks
 import Lifecycle.With
 import Planning.UnitCounters.{UnitCountEverything, UnitCountExactly, UnitCounter}
 import Planning.UnitMatchers.{MatchAnything, Matcher}
-import Planning.UnitPreferences.{UnitPreferAnything, UnitPreference}
+import Planning.UnitPreferences.{PreferAnything, Preference}
 import Planning.{Prioritized, Property}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
@@ -15,7 +15,7 @@ class LockUnits {
   var canPoach          = new Property[Boolean](false)
   var interruptable     = new Property[Boolean](true)
   val unitMatcher       = new Property[Matcher](MatchAnything)
-  val unitPreference    = new Property[UnitPreference](UnitPreferAnything)
+  val unitPreference    = new Property[Preference](PreferAnything)
   val unitCounter       = new Property[UnitCounter](UnitCountEverything)
   
   var owner: Prioritized = _
@@ -76,7 +76,7 @@ class LockUnits {
 
     // Build a queue based on whether we need to sort it
     val (candidateQueue, dequeue, preference) =
-      if (unitPreference.get == UnitPreferAnything) {
+      if (unitPreference.get == PreferAnything) {
         val output = new mutable.Queue[(FriendlyUnitInfo, Double)]()
         (
           output,

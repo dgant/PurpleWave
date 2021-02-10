@@ -2,6 +2,6 @@ package Planning.UnitPreferences
 
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-trait UnitPreference {
+trait Preference {
   def apply(unit: FriendlyUnitInfo): Double
 }

@@ -5,7 +5,7 @@ import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountOne
 import Planning.UnitMatchers.MatchWorkers
-import Planning.UnitPreferences.UnitPreferClose
+import Planning.UnitPreferences.PreferClose
 import Planning.{Plan, Property}
 
 class RemoveMineralBlocks extends Plan {
@@ -27,7 +27,7 @@ class RemoveMineralBlocks extends Plan {
     if (ourMineralBlocks.isEmpty) return
     
     val mineral = ourMineralBlocks.head
-    miners.get.unitPreference.set(UnitPreferClose(mineral.pixel))
+    miners.get.unitPreference.set(PreferClose(mineral.pixel))
     miners.get.acquire(this)
     miners.get.units.foreach(_.agent.intend(this, new Intention {
       toGather = Some(mineral)

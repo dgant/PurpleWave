@@ -5,7 +5,7 @@ import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountOne
 import Planning.UnitMatchers.{MatchMobileDetector, MatchOr}
-import Planning.UnitPreferences.UnitPreferClose
+import Planning.UnitPreferences.PreferClose
 import Planning.{Prioritized, Property}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.{Minutes, Seconds}
@@ -41,7 +41,7 @@ class ClearBurrowedBlockers extends Prioritized {
 
     if (target.isEmpty) return
 
-    detector.get.unitPreference.set(UnitPreferClose(target.get))
+    detector.get.unitPreference.set(PreferClose(target.get))
     detector.get.acquire(this)
     detector.get.units.foreach(_.agent.intend(this, new Intention {
       toTravel = target
@@ -49,7 +49,7 @@ class ClearBurrowedBlockers extends Prioritized {
     }))
 
     if (With.enemies.exists(_.isZerg) || detector.get.units.forall(_.framesToTravelTo(target.get) > Seconds(5)())) {
-      clearer.get.unitPreference.set(UnitPreferClose(target.get))
+      clearer.get.unitPreference.set(PreferClose(target.get))
       clearer.get.acquire(this)
       clearer.get.units.foreach(_.agent.intend(this, new Intention {
         toTravel = Some(target.get.add(Random.nextInt(160) - 80, Random.nextInt(128) - 64))

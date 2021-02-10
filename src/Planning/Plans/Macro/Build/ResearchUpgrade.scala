@@ -6,7 +6,7 @@ import Micro.Agency.Intention
 import Planning.ResourceLocks._
 import Planning.UnitCounters.UnitCountOne
 import Planning.UnitMatchers.{MatchAnd, MatchIdle}
-import Planning.UnitPreferences.UnitPreferIdle
+import Planning.UnitPreferences.PreferIdle
 import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.Upgrades.Upgrade
 
@@ -22,7 +22,7 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Production {
   val upgraders = new LockUnits {
     unitCounter.set(UnitCountOne)
     unitMatcher.set(MatchAnd(upgraderClass, MatchIdle))
-    unitPreference.set(UnitPreferIdle)
+    unitPreference.set(PreferIdle)
   }
 
   override def isComplete: Boolean = With.self.getUpgradeLevel(upgrade) >= level

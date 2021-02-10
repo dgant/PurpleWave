@@ -10,7 +10,7 @@ import Planning.Predicates.Strategy.EnemyRecentStrategy
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountBetween
 import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchWorkers}
-import Planning.UnitPreferences.UnitPreferClose
+import Planning.UnitPreferences.PreferClose
 import Planning.{Plan, Prioritized, Property}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -63,7 +63,7 @@ class DefendFFEWithProbes extends Prioritized {
     if (defenders.get.units.size > probesRequired) {
       defenders.get.release()
     }
-    defenders.get.unitPreference.set(UnitPreferClose(cannons.map(_.pixel).minBy(_.groundPixels(threatSource))))
+    defenders.get.unitPreference.set(PreferClose(cannons.map(_.pixel).minBy(_.groundPixels(threatSource))))
     defenders.get.unitCounter.set(new UnitCountBetween(0, probesRequired))
     defenders.get.acquire(this)
     val closestDistance = cannons.map(_.pixelDistanceTravelling(threatSource)).min

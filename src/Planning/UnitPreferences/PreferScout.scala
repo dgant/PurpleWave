@@ -1,7 +1,7 @@
 package Planning.UnitPreferences
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-object UnitPreferScout extends UnitPreference {
+object PreferScout extends Preference {
   
   override def apply(unit: FriendlyUnitInfo): Double = {
     if (unit.canMove) (

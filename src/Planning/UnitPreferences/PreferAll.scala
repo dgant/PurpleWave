@@ -1,7 +1,7 @@
 package Planning.UnitPreferences
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-case class UnitPreferAll(preferences: UnitPreference*) extends UnitPreference {
+case class PreferAll(preferences: Preference*) extends Preference {
   
   override def apply(unit: FriendlyUnitInfo): Double = {
     val weighted = preferences

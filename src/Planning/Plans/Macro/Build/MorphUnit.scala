@@ -68,14 +68,14 @@ class MorphUnit(val classToMorph: UnitClass) extends Production {
   
   protected def setPreference() {
     if (classToMorph.isWorker) {
-      morpherLock.unitPreference.set(UnitPreferAll(
-        UnitPreferHatcheryWithThreeLarva,
-        UnitPreferBaseWithFewerWorkers
+      morpherLock.unitPreference.set(PreferAll(
+        PreferHatcheryWithThreeLarva,
+        PreferBaseWithFewerWorkers
       ))
     } else if (morpherClass == Zerg.Larva) {
-      morpherLock.unitPreference.set(UnitPreferAll(
-        UnitPreferHatcheryWithThreeLarva,
-        UnitPreferBaseWithMoreWorkers
+      morpherLock.unitPreference.set(PreferAll(
+        PreferHatcheryWithThreeLarva,
+        PreferBaseWithMoreWorkers
       ))
     } else {
       morpherLock.unitPreference.set(u => (if (u.visibleToOpponents) 0 else 1) - u.matchups.framesOfSafety)

@@ -8,7 +8,7 @@ import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.UnitCountOne
 import Planning.UnitMatchers._
-import Planning.UnitPreferences.UnitPreference
+import Planning.UnitPreferences.Preference
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -71,7 +71,7 @@ class TrainUnit(val traineeClass: UnitClass) extends Production {
 
   private val safetyFramesMax = Seconds(10)()
   private lazy val mapSize = With.mapTileWidth + With.mapTileHeight
-  private lazy val preference = new UnitPreference {
+  private lazy val preference = new Preference {
     override def apply(trainer: FriendlyUnitInfo): Double = {
       // Lower score -> More preferred
 

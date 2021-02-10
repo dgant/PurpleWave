@@ -8,7 +8,7 @@ import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.{UnitCountBetween, UnitCountOne}
 import Planning.UnitMatchers.{MatchMobile, Matcher}
-import Planning.UnitPreferences.UnitPreferIdle
+import Planning.UnitPreferences.PreferIdle
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 abstract class DoScout extends Prioritized {
@@ -19,7 +19,7 @@ abstract class DoScout extends Prioritized {
   protected val scoutLock: LockUnits = new LockUnits
   scoutLock.unitMatcher.set(MatchMobile)
   scoutLock.unitCounter.set(UnitCountOne)
-  scoutLock.unitPreference.set(UnitPreferIdle)
+  scoutLock.unitPreference.set(PreferIdle)
   scoutLock.interruptable.set(false)
 
   protected final def getScouts(matcher: Matcher, count: Int): Iterable[FriendlyUnitInfo] = {
@@ -28,7 +28,7 @@ abstract class DoScout extends Prioritized {
     }
     scoutLock.unitMatcher.set(matcher)
     scoutLock.unitCounter.set(new UnitCountBetween(0, count))
-    scoutLock.unitPreference.set(UnitPreferIdle)
+    scoutLock.unitPreference.set(PreferIdle)
     scoutLock.acquire(this)
     scoutLock.units
   }

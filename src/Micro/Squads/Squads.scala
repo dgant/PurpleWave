@@ -17,7 +17,7 @@ class Squads {
     batchNext.freelancers += freelancer
   }
 
-  def finishRecruitment(): Unit = {
+  def recruit(): Unit = {
     while ( ! batchNext.processingFinished) {
       batchNext.step()
       if (batchNext.processingFinished) {
@@ -29,7 +29,7 @@ class Squads {
     }
   }
 
-  def runSquads() {
+  def run() {
     all.foreach(_.run())
   }
 }

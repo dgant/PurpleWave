@@ -33,8 +33,8 @@ class TaskQueueGlobal extends TaskQueueParallel(
       With.strategy.gameplan.update()
     }),
     With.tactics,
-    new SimpleTask("SquadBatching", With.squads.finishRecruitment),
-    new SimpleTask("SquadGoals", With.squads.runSquads),
+    new SimpleTask("SquadBatching", With.squads.recruit),
+    new SimpleTask("SquadGoals", With.squads.run),
     With.gathering,
     With.groundskeeper)
     .withSkipsMax(6)

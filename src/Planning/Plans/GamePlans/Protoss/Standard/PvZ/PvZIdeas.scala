@@ -4,38 +4,20 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.Protoss.Situational.{DefendFFEWithProbesAgainst4Pool, PlacementForgeFastExpand}
+import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.MeldArchons
-import Planning.Predicates.Compound.{And, Check, Latch, Not}
+import Planning.Predicates.Compound.And
 import Planning.Predicates.Milestones.{EnemyHasShownCloakedThreat, _}
 import Planning.Predicates.Reactive.{EnemyMutalisks, SafeAtHome, SafeToMoveOut}
 import Planning.Predicates.Strategy._
 import Planning.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss._
-import Utilities.GameTime
 
 object PvZIdeas {
-
-  class ConditionalDefendFFEWithProbesAgainst4Pool extends If(
-    new And(
-      new FrameAtMost(GameTime(6, 0)()),
-      new Or(
-        new EnemyStrategy(With.fingerprints.fourPool),
-        new And(
-          new Or(
-            new EnemyIsZerg,
-            new EnemyIsRandom),
-          new Not(new EnemyRecentStrategy(With.fingerprints.twelveHatch, With.fingerprints.twelvePool, With.fingerprints.tenHatch, With.fingerprints.ninePool, With.fingerprints.overpool)),
-          new EnemyRecentStrategy(With.fingerprints.fourPool),
-          new Check(() => With.scouting.enemyHasScoutedUsWithWorker))),
-      new UnitsAtLeast(1, Protoss.PhotonCannon, complete = false),
-      new UnitsAtMost(3, Protoss.PhotonCannon, complete = true),
-      new Latch(new Check(() => With.units.countOurs(Protoss.PhotonCannon) + (With.self.minerals + 24) / 150 >= 2))),
-    new DefendFFEWithProbesAgainst4Pool)
 
   class ConditionalAttack extends If(
     new Or(

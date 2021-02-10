@@ -246,14 +246,13 @@ object Commander {
         attackMove(unit, to)
       } else if (
         // If we have a ride which can get us there faster, take it
-        unit.agent.ride.isDefined
+        unit.agent.ride.exists( ! _.loadedUnits.contains(unit))
           && unit.framesToTravelTo(destination) >
           4 * unit.unitClass.groundDamageCooldown
             + unit.agent.ride.get.framesToTravelTo(unit.pixel)
             + unit.agent.ride.get.framesToTravelPixels(unit.pixelDistanceCenter(destination))) {
         rightClick(unit, unit.agent.ride.get)
-      }
-      else {
+      } else {
         unit.bwapiUnit.move(destination.bwapi)
       }
       if (unit.agent.priority > TrafficPriorities.None) {
@@ -269,7 +268,9 @@ object Commander {
   
   def rightClick(unit: FriendlyUnitInfo, target: UnitInfo) {
     leadFollower(unit, rightClick(_, target))
-    unit.agent.directRide(target.pixel)
+    if ( ! unit.agent.ride.contains(target)) {
+      unit.agent.directRide(target.pixel)
+    }
     if (unit.unready) return
     if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
     unit.bwapiUnit.rightClick(target.bwapiUnit)

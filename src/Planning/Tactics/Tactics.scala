@@ -4,8 +4,7 @@ import Lifecycle.With
 import Performance.Tasks.TimedTask
 import Planning.Plans.Army._
 import Planning.Plans.Compound.If
-import Planning.Plans.GamePlans.Protoss.Situational.{CatchDTRunby, DefendAgainstProxy, DefendFightersAgainstRush}
-import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.ConditionalDefendFFEWithProbesAgainst4Pool
+import Planning.Plans.GamePlans.Protoss.Situational.{CatchDTRunby, DefendAgainstProxy, DefendFFEWithProbes, DefendFightersAgainstRush}
 import Planning.Plans.Macro.Automatic.Gather
 import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
 import Planning.Plans.Scouting.{DoScoutWithWorkers, ScoutExpansions, ScoutWithOverlord}
@@ -21,7 +20,7 @@ class Tactics extends TimedTask {
   private lazy val defendBases                = new DefendBases
   private lazy val defendFightersAgainstRush  = new DefendFightersAgainstRush
   private lazy val defendAgainstWorkerRush    = new DefendAgainstWorkerRush
-  private lazy val defendFFEAgainst4Pool      = new ConditionalDefendFFEWithProbesAgainst4Pool
+  private lazy val defendFFEAgainst4Pool      = new DefendFFEWithProbes
   private lazy val catchDTRunby               = new CatchDTRunby
   private lazy val scoutWithWorkers           = new DoScoutWithWorkers
   private lazy val scoutExpansions            = new ScoutExpansions
@@ -40,6 +39,16 @@ class Tactics extends TimedTask {
     // - Air units (except against faster enemy air-to-air)
     // - Speed Zerglings
     // - Carriers at 4+ (except against cloaked wraiths and no observer)
+    launchMissions()
+    runMissions()
+    runPrioritySquads()
+    runCoreTactics()
+    runBackgroundSquads()
+  }
+
+  private def launchMissions(): Unit = {}
+  private def runMissions(): Unit = {}
+  private def runPrioritySquads(): Unit = {
     clearBurrowedBlockers.update()
     followBuildOrder.update()
     yolo.update()
@@ -55,15 +64,21 @@ class Tactics extends TimedTask {
     scoutWithWorkers.update()
     scoutExpansions.update()
     attack.update()
+    // TODO: EscortSettlers is no longer being used but we do need to do it
+    // TODO: Hide Carriers until 4x vs. Terran
+    // TODO: Plant Overlords around the map, as appropriate
+  }
+
+  private def runCoreTactics(): Unit = {
+
+  }
+
+  private def runBackgroundSquads(): Unit = {
     defendEntrance.update()
     gather.update()
     chillOverlords.update()
     recruitFreelancers.update()
     doFloatBuildings.update()
     scan.update()
-
-    // TODO: EscortSettlers is no longer being used but we do need to do it
-    // TODO: Hide Carriers until 4x vs. Terran
-    // TODO: Plant Overlords around the map, as appropriate
   }
 }

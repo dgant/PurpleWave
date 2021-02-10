@@ -6,26 +6,50 @@ import Debugging.Visualizations.Views.Micro.ShowUnitsFriendly
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
+import Planning.Predicates.Strategy.EnemyRecentStrategy
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.UnitCountBetween
-import Planning.UnitMatchers.UnitMatchWorkers
+import Planning.UnitMatchers.{UnitMatchAnd, UnitMatchComplete, UnitMatchWorkers}
 import Planning.UnitPreferences.UnitPreferClose
-import Planning.{Plan, Property}
+import Planning.{Plan, Prioritized, Property}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.ByOption
+import Utilities.{ByOption, Minutes}
 
 import scala.collection.mutable.ArrayBuffer
 
-abstract class DefendFFEWithProbes extends Plan {
+class DefendFFEWithProbes extends Prioritized {
   
   val defenders = new Property[LockUnits](new LockUnits)
   defenders.get.unitMatcher.set(UnitMatchWorkers)
   
-  protected def probeCount: Int
+  protected def probeCount: Int = {
+    val zerglings           = Seq(4, With.units.countEnemy(Zerg.Zergling), 8 - With.units.countEver(Zerg.Zergling)).max
+    val cannonsComplete     = With.units.countOurs(UnitMatchAnd(Protoss.PhotonCannon, UnitMatchComplete))
+    val cannonsIncomplete   = With.units.countOurs(Protoss.PhotonCannon) - cannonsComplete
+    val workerCount         = With.units.countOurs(UnitMatchWorkers)
+    val workersToMine       = if (cannonsComplete < 2) 4 else 4 + 2 * cannonsComplete
+    val workersDesired      = if (cannonsComplete >= 5) 0 else Math.min(workerCount - workersToMine - With.units.ours.count(_.agent.isScout), zerglings * 4 - cannonsComplete * 3)
+    workersDesired
+  }
+
+  var haveMinedEnoughForTwoCannons: Boolean = false
   
-  override def onUpdate() {
-  
+  def update() {
+    if (With.frame > Minutes(6)()) return
+    haveMinedEnoughForTwoCannons ||= With.units.countOurs(Protoss.PhotonCannon) + (With.self.minerals + 24) / 150 >= 2
+    if (With.units.countOurs(Protoss.PhotonCannon) == 0) return
+    if (With.units.countOurs(UnitMatchAnd(Protoss.PhotonCannon, UnitMatchComplete)) > 3) return
+    if ( ! haveMinedEnoughForTwoCannons) return
+    if ( ! With.enemies.exists(_.isUnknownOrZerg)) return
+    if (With.fingerprints.twelveHatch.matches) return
+    if (With.fingerprints.tenHatch.matches) return
+    if (With.fingerprints.twelvePool.matches) return
+    if (With.fingerprints.overpool.matches) return
+    if (With.fingerprints.ninePool.matches) return
+    if ( ! new EnemyRecentStrategy(With.fingerprints.fourPool).isComplete) return
+    if ( ! With.fingerprints.fourPool.matches && ! With.scouting.enemyHasScoutedUsWithWorker) return
+
     var cannons = With.units.ours.filter(_.is(Protoss.PhotonCannon))
     if (cannons.isEmpty) cannons = With.units.ours.filter(_.is(Protoss.Forge))
     

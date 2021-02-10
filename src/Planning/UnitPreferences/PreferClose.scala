@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-case class PreferClose(pixel: Pixel = SpecificPoints.middle) extends Preference {
+case class PreferClose(pixel: Pixel = SpecificPoints.middle) extends UnitPreference {
   
   override def apply(unit: FriendlyUnitInfo): Double = (
     (if (With.performance.danger)

@@ -5,14 +5,14 @@ import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.UnitCountBetween
+import Planning.UnitCounters.CountBetween
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.GameTime
 
 class RepairBunker extends Plan {
   val lock = new LockUnits
-  lock.unitMatcher.set(Terran.SCV)
+  lock.matcher.set(Terran.SCV)
 
   override def onUpdate(): Unit = {
     val bunkers = With.units.ours
@@ -54,8 +54,8 @@ class RepairBunker extends Plan {
       Math.min(6, With.units.countOurs(Terran.SCV) / 2 - 1))
 
     lock.release()
-    lock.unitCounter.set(new UnitCountBetween(0, repairersNeeded))
-    lock.unitPreference.set(PreferClose(bunker.pixel))
+    lock.counter.set(new CountBetween(0, repairersNeeded))
+    lock.preference.set(PreferClose(bunker.pixel))
     lock.acquire(this)
     lock.units.foreach(scv => scv.agent.intend(this, new Intention {
       toRepair = Some(bunker)

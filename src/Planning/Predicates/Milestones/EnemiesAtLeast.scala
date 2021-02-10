@@ -1,12 +1,12 @@
 package Planning.Predicates.Milestones
 
 import Lifecycle.With
-import Planning.UnitMatchers.{MatchAnd, MatchAnything, MatchComplete, Matcher}
+import Planning.UnitMatchers.{MatchAnd, MatchAnything, MatchComplete, UnitMatcher}
 import Planning.Predicate
 
 class EnemiesAtLeast(
                       quantity  : Int         = 0,
-                      matcher   : Matcher = MatchAnything,
+                      matcher   : UnitMatcher = MatchAnything,
                       complete  : Boolean     = false)
   
   extends Predicate {

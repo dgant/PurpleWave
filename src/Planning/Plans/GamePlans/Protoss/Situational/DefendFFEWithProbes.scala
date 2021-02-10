@@ -8,7 +8,7 @@ import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Planning.Predicates.Strategy.EnemyRecentStrategy
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.UnitCountBetween
+import Planning.UnitCounters.CountBetween
 import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchWorkers}
 import Planning.UnitPreferences.PreferClose
 import Planning.{Plan, Prioritized, Property}
@@ -21,7 +21,7 @@ import scala.collection.mutable.ArrayBuffer
 class DefendFFEWithProbes extends Prioritized {
   
   val defenders = new Property[LockUnits](new LockUnits)
-  defenders.get.unitMatcher.set(MatchWorkers)
+  defenders.get.matcher.set(MatchWorkers)
   
   protected def probeCount: Int = {
     val zerglings           = Seq(4, With.units.countEnemy(Zerg.Zergling), 8 - With.units.countEver(Zerg.Zergling)).max
@@ -63,8 +63,8 @@ class DefendFFEWithProbes extends Prioritized {
     if (defenders.get.units.size > probesRequired) {
       defenders.get.release()
     }
-    defenders.get.unitPreference.set(PreferClose(cannons.map(_.pixel).minBy(_.groundPixels(threatSource))))
-    defenders.get.unitCounter.set(new UnitCountBetween(0, probesRequired))
+    defenders.get.preference.set(PreferClose(cannons.map(_.pixel).minBy(_.groundPixels(threatSource))))
+    defenders.get.counter.set(new CountBetween(0, probesRequired))
     defenders.get.acquire(this)
     val closestDistance = cannons.map(_.pixelDistanceTravelling(threatSource)).min
     val threatenedCannons = cannons.filter(_.pixelDistanceTravelling(threatSource) <= closestDistance + 96)

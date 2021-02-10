@@ -2,7 +2,7 @@ package Planning.UnitMatchers
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
 
-object MatchMobile extends Matcher {
+object MatchMobile extends UnitMatcher {
   
   override def apply(unit: UnitInfo): Boolean = (
     unit.unitClass.canMove

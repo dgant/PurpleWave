@@ -1,7 +1,7 @@
 package Micro.Squads
 
 import Mathematics.PurpleMath
-import Planning.UnitMatchers.Matcher
+import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.CountMap
 
@@ -10,10 +10,10 @@ class QualityCounter {
   final protected val qualitiesEnemy = new CountMap[Quality]
   final protected val qualitiesPossessed = new CountMap[Quality]
 
-  final protected var unitsNeeded = new CountMap[Matcher]
-  final protected var unitsPossessed = new CountMap[Matcher]
+  final protected var unitsNeeded = new CountMap[UnitMatcher]
+  final protected var unitsPossessed = new CountMap[UnitMatcher]
 
-  def setNeeds(needs: CountMap[Matcher]): Unit = {
+  def setNeeds(needs: CountMap[UnitMatcher]): Unit = {
     unitsNeeded = needs
   }
 
@@ -34,7 +34,7 @@ class QualityCounter {
     }
   }
 
-  protected def countUnitNeed(unit: FriendlyUnitInfo, matcher: Matcher): Unit = {
+  protected def countUnitNeed(unit: FriendlyUnitInfo, matcher: UnitMatcher): Unit = {
     if (unit.is(matcher)) unitsPossessed(matcher) += 1
   }
 
@@ -67,7 +67,7 @@ class QualityCounter {
     qualities
   }
 
-  def utilityNeed(unit: FriendlyUnitInfo): Seq[(Matcher, Double)] = {
+  def utilityNeed(unit: FriendlyUnitInfo): Seq[(UnitMatcher, Double)] = {
     val needs = unitsNeeded.keys.view.filter(_.apply(unit)).map(need => {
       val valueNeeded = unitsNeeded(need)
       val valuePossessed = unitsPossessed(need)

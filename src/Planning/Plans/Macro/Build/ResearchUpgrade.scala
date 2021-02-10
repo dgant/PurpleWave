@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Buildables.{Buildable, BuildableUpgrade}
 import Micro.Agency.Intention
 import Planning.ResourceLocks._
-import Planning.UnitCounters.UnitCountOne
+import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers.{MatchAnd, MatchIdle}
 import Planning.UnitPreferences.PreferIdle
 import ProxyBwapi.UnitClasses.UnitClasses
@@ -20,9 +20,9 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Production {
   val upgraderClass = upgrade.whatUpgrades
   val currencyLock = new LockCurrencyForUpgrade(upgrade, level)
   val upgraders = new LockUnits {
-    unitCounter.set(UnitCountOne)
-    unitMatcher.set(MatchAnd(upgraderClass, MatchIdle))
-    unitPreference.set(PreferIdle)
+    counter.set(CountOne)
+    matcher.set(MatchAnd(upgraderClass, MatchIdle))
+    preference.set(PreferIdle)
   }
 
   override def isComplete: Boolean = With.self.getUpgradeLevel(upgrade) >= level

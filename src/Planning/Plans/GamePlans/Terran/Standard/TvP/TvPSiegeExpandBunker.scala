@@ -16,7 +16,7 @@ import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitCounters.UnitCountExactly
+import Planning.UnitCounters.CountExactly
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvPSiegeExpandBunker
 
@@ -73,7 +73,7 @@ class TvPSiegeExpandBunker extends GameplanTemplate {
         new EnemyStrategy(With.fingerprints.nexusFirst)),
       new Parallel(
         new BuildBunkersAtEnemyNatural(1),
-        new AttackWithWorkers(UnitCountExactly(5))),
+        new AttackWithWorkers(CountExactly(5))),
       new Parallel(
         new PopulateBunkers,
         new BuildBunkersAtNatural(1))),

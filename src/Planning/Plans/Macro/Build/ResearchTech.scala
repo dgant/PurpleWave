@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Buildables.{Buildable, BuildableTech}
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyForTech, LockUnits}
-import Planning.UnitCounters.UnitCountOne
+import Planning.UnitCounters.CountOne
 import Planning.UnitPreferences.PreferIdle
 import ProxyBwapi.Techs.Tech
 import Utilities.ByOption
@@ -19,9 +19,9 @@ class ResearchTech(tech: Tech) extends Production {
   val techerClass = tech.whatResearches
   val currencyLock = new LockCurrencyForTech(tech)
   val techers = new LockUnits {
-    unitCounter.set(UnitCountOne)
-    unitMatcher.set(techerClass)
-    unitPreference.set(PreferIdle)
+    counter.set(CountOne)
+    matcher.set(techerClass)
+    preference.set(PreferIdle)
   }
   
   override def isComplete: Boolean = With.self.hasTech(tech)

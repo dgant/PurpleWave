@@ -15,7 +15,7 @@ import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.UnitCountEverything
+import Planning.UnitCounters.CountEverything
 import Planning.UnitMatchers.{MatchOr, MatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
@@ -28,8 +28,8 @@ class ZvESparkle extends GameplanTemplate {
   
   class KillNeutralBlocker extends Plan() {
     val killers = new LockUnits
-    killers.unitMatcher.set(MatchWarriors)
-    killers.unitCounter.set(UnitCountEverything)
+    killers.matcher.set(MatchWarriors)
+    killers.counter.set(CountEverything)
     override def onUpdate() {
       val targets = With.geography.ourZones.flatMap(_.units.filter(_.is(Neutral.PsiDisruptor)))
       if (targets.isEmpty) return

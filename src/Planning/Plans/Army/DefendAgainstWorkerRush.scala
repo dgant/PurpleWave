@@ -4,14 +4,14 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.UnitCountBetween
+import Planning.UnitCounters.CountBetween
 import Planning.UnitMatchers.{MatchWarriors, MatchWorkers}
 import Planning.{Prioritized, Property}
 
 class DefendAgainstWorkerRush extends Prioritized {
   
   val defenders = new Property[LockUnits](new LockUnits)
-  defenders.get.unitMatcher.set(MatchWorkers)
+  defenders.get.matcher.set(MatchWorkers)
   
   def update() {
     val attackingWorkers = With.geography.ourBases
@@ -33,7 +33,7 @@ class DefendAgainstWorkerRush extends Prioritized {
     if (defenders.get.units.size > workersToDefend) {
       defenders.get.release()
     }
-    defenders.get.unitCounter.set(new UnitCountBetween(0, workersToDefend))
+    defenders.get.counter.set(new CountBetween(0, workersToDefend))
     defenders.get.acquire(this)
     defenders.get.units.foreach(unit => unit.agent.intend(this, new Intention {
       canFlee   = false

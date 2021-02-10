@@ -15,7 +15,7 @@ import Planning.Plans.Scouting.{MonitorBases, ScoutOn}
 import Planning.Predicates.Compound.{Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitCounters.UnitCountEverything
+import Planning.UnitCounters.CountEverything
 import Planning.UnitMatchers.MatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -39,7 +39,7 @@ class PvZ1BaseForgeTech extends GameplanTemplate {
     new Blueprint(Protoss.Gateway,      placement = Some(PlacementProfiles.hugTownHall)))
 
   override def attackPlan: Plan = new Parallel(
-    new MonitorBases(Protoss.Corsair, initialUnitCounter = UnitCountEverything),
+    new MonitorBases(Protoss.Corsair, initialUnitCounter = CountEverything),
     super.attackPlan)
 
   override def emergencyPlans: Seq[Plan] = Seq(

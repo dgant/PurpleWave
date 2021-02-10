@@ -6,8 +6,8 @@ import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.{UnitCountBetween, UnitCountOne}
-import Planning.UnitMatchers.{MatchMobile, Matcher}
+import Planning.UnitCounters.{CountBetween, CountOne}
+import Planning.UnitMatchers.{MatchMobile, UnitMatcher}
 import Planning.UnitPreferences.PreferIdle
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -17,18 +17,18 @@ abstract class DoScout extends Prioritized {
   protected final def enemyFound: Boolean = With.scouting.enemyMain.isDefined
 
   protected val scoutLock: LockUnits = new LockUnits
-  scoutLock.unitMatcher.set(MatchMobile)
-  scoutLock.unitCounter.set(UnitCountOne)
-  scoutLock.unitPreference.set(PreferIdle)
+  scoutLock.matcher.set(MatchMobile)
+  scoutLock.counter.set(CountOne)
+  scoutLock.preference.set(PreferIdle)
   scoutLock.interruptable.set(false)
 
-  protected final def getScouts(matcher: Matcher, count: Int): Iterable[FriendlyUnitInfo] = {
+  protected final def getScouts(matcher: UnitMatcher, count: Int): Iterable[FriendlyUnitInfo] = {
     if (scoutLock.units.size > count) {
       scoutLock.release()
     }
-    scoutLock.unitMatcher.set(matcher)
-    scoutLock.unitCounter.set(new UnitCountBetween(0, count))
-    scoutLock.unitPreference.set(PreferIdle)
+    scoutLock.matcher.set(matcher)
+    scoutLock.counter.set(new CountBetween(0, count))
+    scoutLock.preference.set(PreferIdle)
     scoutLock.acquire(this)
     scoutLock.units
   }

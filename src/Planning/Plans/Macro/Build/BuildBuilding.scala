@@ -8,7 +8,7 @@ import Macro.Architecture.PlacementRequests.PlacementRequest
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
-import Planning.UnitCounters.UnitCountOne
+import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers.{MatchAnd, Match, MatchSpecific}
 import Planning.UnitPreferences.PreferCloseAndNotMining
 import ProxyBwapi.Races.Neutral
@@ -30,8 +30,8 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
 
   val builderMatcher: UnitClass = buildingClass.whatBuilds._1
   val builderLock: LockUnits = new LockUnits
-  builderLock.unitCounter.set(UnitCountOne)
-  builderLock.unitMatcher.set(builderMatcher)
+  builderLock.counter.set(CountOne)
+  builderLock.matcher.set(builderMatcher)
   builderLock.interruptable.set(false)
     
   var waitForBuilderToRecallUntil: Option[Int] = None
@@ -82,18 +82,18 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
     // Find an appropriate builder (or make sure we use the current builder)
     val desiredZone = desiredTile.map(_.zone)
     if (building.exists(_.buildUnit.isDefined)) {
-      builderLock.unitMatcher.set(new MatchSpecific(Set(building.get.buildUnit.get)))
+      builderLock.matcher.set(new MatchSpecific(Set(building.get.buildUnit.get)))
     } else if ( ! builderLock.satisfied && desiredZone.exists(_.bases.exists(_.workerCount > 5))) {
-      builderLock.unitMatcher.set(MatchAnd(Match(_.zone == desiredZone.get), builderMatcher))
+      builderLock.matcher.set(MatchAnd(Match(_.zone == desiredZone.get), builderMatcher))
     } else {
-      builderLock.unitMatcher.set(builderMatcher)
+      builderLock.matcher.set(builderMatcher)
     }
   
     // When building placement changes we want a builder closer to the new placement
     if (orderedTile.isDefined && orderedTile != desiredTile) {
       builderLock.release()
     }
-    builderLock.unitPreference.set(PreferCloseAndNotMining(desiredTile.get.pixelCenter))
+    builderLock.preference.set(PreferCloseAndNotMining(desiredTile.get.pixelCenter))
     builderLock.acquire(this)
     
     if (waitForBuilderToRecallUntil.isDefined) {

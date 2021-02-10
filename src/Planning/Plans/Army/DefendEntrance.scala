@@ -2,7 +2,7 @@ package Planning.Plans.Army
 
 import Lifecycle.With
 import Micro.Squads.Goals.GoalDefendZone
-import Planning.UnitCounters.UnitCountEverything
+import Planning.UnitCounters.CountEverything
 import Planning.UnitMatchers._
 import Utilities.ByOption
 
@@ -10,7 +10,7 @@ class DefendEntrance extends Squadify[GoalDefendZone] {
   
   override val goal: GoalDefendZone = new GoalDefendZone
   goal.unitMatcher = MatchAnd(MatchRecruitableForCombat, MatchNot(MatchWorkers))
-  goal.unitCounter = UnitCountEverything
+  goal.unitCounter = CountEverything
   
   override def update() {
     // If we're defending a base already, let the defense squad recruit everyone for greater squad cohesion

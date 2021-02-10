@@ -1,11 +1,11 @@
 package Information.Fingerprinting.Generic
 
 import Lifecycle.With
-import Planning.UnitMatchers.Matcher
+import Planning.UnitMatchers.UnitMatcher
 import Utilities.GameTime
 
 class FingerprintCompleteBy(
-                             unitMatcher : Matcher,
+                             unitMatcher : UnitMatcher,
                              gameTime    : GameTime,
                              quantity    : Int = 1)
     extends AbstractFingerprintQuantityBy(unitMatcher, gameTime) {

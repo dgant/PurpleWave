@@ -3,7 +3,7 @@ package Planning.Plans.Macro.Expanding
 import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.UnitCountOne
+import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers.MatchWorkers
 import Planning.UnitPreferences.PreferClose
 import Planning.{Plan, Property}
@@ -13,8 +13,8 @@ class RemoveMineralBlocks extends Plan {
   description.set("Remove nearby mineral blocks")
   
   val miners = new Property[LockUnits](new LockUnits)
-  miners.get.unitMatcher.set(MatchWorkers)
-  miners.get.unitCounter.set(UnitCountOne)
+  miners.get.matcher.set(MatchWorkers)
+  miners.get.counter.set(CountOne)
   miners.get.interruptable.set(false)
   
   override def onUpdate() {
@@ -27,7 +27,7 @@ class RemoveMineralBlocks extends Plan {
     if (ourMineralBlocks.isEmpty) return
     
     val mineral = ourMineralBlocks.head
-    miners.get.unitPreference.set(PreferClose(mineral.pixel))
+    miners.get.preference.set(PreferClose(mineral.pixel))
     miners.get.acquire(this)
     miners.get.units.foreach(_.agent.intend(this, new Intention {
       toGather = Some(mineral)

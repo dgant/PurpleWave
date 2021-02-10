@@ -3,7 +3,7 @@ package Planning.Plans.Macro.Protoss
 import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.UnitCountBetween
+import Planning.UnitCounters.CountBetween
 import Planning.UnitPreferences.PreferLowEnergy
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
@@ -14,8 +14,8 @@ class MeldArchons(maxEnergy: Int = 251) extends Plan {
   protected def minimumArchons: Int = 0
   
   val templar = new LockUnits
-  templar.unitMatcher.set(Protoss.HighTemplar)
-  templar.unitPreference.set(PreferLowEnergy)
+  templar.matcher.set(Protoss.HighTemplar)
+  templar.preference.set(PreferLowEnergy)
   
   override def onUpdate() {
     // Fast check for performance
@@ -28,7 +28,7 @@ class MeldArchons(maxEnergy: Int = 251) extends Plan {
     val archonsNow    = With.units.countOurs(Protoss.Archon)
     val archonsToAdd  = Vector(0, minimumArchons - archonsNow, templarExcess / 2).max
     val templarToMeld = Math.max(templarLow, 2 * archonsToAdd)
-    templar.unitCounter.set(new UnitCountBetween(0, templarToMeld))
+    templar.counter.set(new CountBetween(0, templarToMeld))
     With.blackboard.keepingHighTemplar.set(templarExcess < templarNow)
     
     templar.release()

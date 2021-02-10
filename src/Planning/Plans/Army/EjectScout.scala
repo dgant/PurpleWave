@@ -3,7 +3,7 @@ package Planning.Plans.Army
 import Lifecycle.With
 import Micro.Squads.Goals.GoalEjectScout
 import Planning.Plans.Scouting.{ScoutCleared, ScoutTracking}
-import Planning.UnitCounters.UnitCountOne
+import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers._
 import Utilities.{ByOption, Minutes}
 
@@ -23,7 +23,7 @@ class EjectScout extends Squadify[GoalEjectScout] {
 
     squad.enemies = ScoutTracking.enemyScouts.toSeq
     goal.unitMatcher = MatchAnd(MatchScoutCatcher, (unit) => unit.base.exists(b => b.isOurMain || b.isNaturalOf.exists(_.isOurMain)) || unit.pixelsToGetInRange(scout.get) < 32)
-    goal.unitCounter = UnitCountOne
+    goal.unitCounter = CountOne
     super.update()
   }
 }

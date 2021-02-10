@@ -3,7 +3,7 @@ package Planning.UnitMatchers
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.UnitInfo
 
-object MatchTransport extends Matcher {
+object MatchTransport extends UnitMatcher {
   
   override def apply(unit: UnitInfo): Boolean =
     unit.aliveAndComplete             &&

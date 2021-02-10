@@ -2,7 +2,7 @@ package Planning.UnitMatchers
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 
-object MatchCombatSpellcaster extends Matcher {
+object MatchCombatSpellcaster extends UnitMatcher {
   override def apply(unit: UnitInfo): Boolean = unit.isAny(
     Terran.ScienceVessel,
     Terran.Medic,

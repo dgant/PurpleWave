@@ -3,7 +3,7 @@ package Planning.Plans.Macro.Terran
 import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.UnitCountBetween
+import Planning.UnitCounters.CountBetween
 import Planning.UnitPreferences.PreferClose
 import Planning.Plan
 import ProxyBwapi.Races.Terran
@@ -26,9 +26,9 @@ class PopulateBunkers extends Plan {
   
   private def newLock(bunker: FriendlyUnitInfo): LockUnits = {
     val output = new LockUnits
-    output.unitMatcher.set(Terran.Marine)
-    output.unitCounter.set(new UnitCountBetween(1, 4))
-    output.unitPreference.set(PreferClose(bunker.pixel))
+    output.matcher.set(Terran.Marine)
+    output.counter.set(new CountBetween(1, 4))
+    output.preference.set(PreferClose(bunker.pixel))
     output
   }
   

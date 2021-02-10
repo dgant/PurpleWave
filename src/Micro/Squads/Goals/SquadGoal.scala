@@ -4,8 +4,8 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Micro.Squads.{QualityCounter, Squad, SquadBatch}
-import Planning.UnitCounters.{UnitCountEverything, UnitCounter}
-import Planning.UnitMatchers.{MatchAnything, Matcher}
+import Planning.UnitCounters.{CountEverything, UnitCounter}
+import Planning.UnitMatchers.{MatchAnything, UnitMatcher}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.{ByOption, CountMap}
 
@@ -54,7 +54,7 @@ trait SquadRecruiterSimple extends SquadRecruiter {
     invalidateBatch(batch)
     ProximityValue(candidate, destinations) * qualityCounter.utility(candidate)
   }
-  def qualityNeeds: CountMap[Matcher] = new CountMap[Matcher]
+  def qualityNeeds: CountMap[UnitMatcher] = new CountMap[UnitMatcher]
   protected def invalidateBatch(batch: SquadBatch): Unit = {
     if (batch != currentBatch) {
       currentBatch = batch
@@ -68,8 +68,8 @@ trait SquadRecruiterSimple extends SquadRecruiter {
   protected var currentBatch: SquadBatch = _
   protected var qualityCounter: QualityCounter = _
   protected val _candidates = new ArrayBuffer[FriendlyUnitInfo]
-  var unitMatcher: Matcher = MatchAnything
-  var unitCounter: UnitCounter = UnitCountEverything
+  var unitMatcher: UnitMatcher = MatchAnything
+  var unitCounter: UnitCounter = CountEverything
 }
 
 trait SquadGoal extends SquadRecruiter {

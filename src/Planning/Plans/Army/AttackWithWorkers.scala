@@ -6,17 +6,17 @@ import Mathematics.Points.{Pixel, Tile}
 import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.{UnitCountEverything, UnitCounter}
+import Planning.UnitCounters.{CountEverything, UnitCounter}
 import Planning.UnitMatchers.MatchWorkers
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable
 
-class AttackWithWorkers(counter: UnitCounter = UnitCountEverything) extends Plan {
+class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
   
   val fighters = new LockUnits
-  fighters.unitMatcher.set(MatchWorkers)
-  fighters.unitCounter.set(counter)
+  fighters.matcher.set(MatchWorkers)
+  fighters.counter.set(counter)
   fighters.interruptable.set(false)
   
   var haveSeenABase = false

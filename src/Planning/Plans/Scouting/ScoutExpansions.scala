@@ -23,7 +23,7 @@ class ScoutExpansions extends DoScout {
       else                            GameTime(12, 0)
   }
 
-  val matcher: Matcher = MatchAnd(
+  val matcher: UnitMatcher = MatchAnd(
     MatchRecruitableForCombat,
     MatchNot(_.topSpeed < Protoss.Zealot.topSpeed),
     MatchNot(MatchWorkers),

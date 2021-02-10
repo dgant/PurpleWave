@@ -7,7 +7,7 @@ import ProxyBwapi.Races.Zerg
 
 class UnitsAtLeast(
                     quantity  : Int,
-                    matcher   : Matcher,
+                    matcher   : UnitMatcher,
                     complete  : Boolean     = false,
                     countEggs : Boolean     = false) // TMP: Resolve after AIST1
   

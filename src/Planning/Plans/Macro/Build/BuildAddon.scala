@@ -5,8 +5,8 @@ import Macro.Architecture.Blueprint
 import Macro.Buildables.{Buildable, BuildableUnit}
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
-import Planning.UnitCounters.UnitCountOne
-import Planning.UnitMatchers.{MatchAnd, Matcher}
+import Planning.UnitCounters.CountOne
+import Planning.UnitMatchers.{MatchAnd, UnitMatcher}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -22,13 +22,13 @@ class BuildAddon(val addonClass: UnitClass) extends Production {
   
   private var addon: Option[UnitInfo] = None
   
-  val builderMatcher = MatchAnd(addonClass.whatBuilds._1, new Matcher {
+  val builderMatcher = MatchAnd(addonClass.whatBuilds._1, new UnitMatcher {
     override def apply(unit: UnitInfo): Boolean = unit.addon.forall(addon.contains)
   })
   
   val builderLock: LockUnits = new LockUnits
-  builderLock.unitCounter.set(UnitCountOne)
-  builderLock.unitMatcher.set(builderMatcher)
+  builderLock.counter.set(CountOne)
+  builderLock.matcher.set(builderMatcher)
   
   override def isComplete: Boolean = addon.exists(_.aliveAndComplete)
   

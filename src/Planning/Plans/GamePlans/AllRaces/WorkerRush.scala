@@ -14,7 +14,7 @@ import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemiesAtMost, FoundEnemyBase}
 import Planning.Predicates.Strategy.Employing
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.UnitCountBetween
+import Planning.UnitCounters.CountBetween
 import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchWorkers}
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -46,7 +46,7 @@ class WorkerRush extends Trigger {
         new ScoutAt(1))),
     new Plan {
       val workerLock: LockUnits = new LockUnits
-      workerLock.unitMatcher.set(MatchWorkers)
+      workerLock.matcher.set(MatchWorkers)
       var seenFiveWorkers: Boolean = false
       override def onUpdate(): Unit = {
         seenFiveWorkers = seenFiveWorkers || With.units.countOurs(MatchAnd(MatchWorkers, MatchComplete)) >= 5
@@ -62,8 +62,8 @@ class WorkerRush extends Trigger {
         if (workerLock.units.size > goalWorkers) {
           workerLock.release()
         }
-        workerLock.unitCounter.set(new UnitCountBetween(1, goalWorkers))
-        workerLock.unitPreference.set(PreferClose(With.geography.home.pixelCenter))
+        workerLock.counter.set(new CountBetween(1, goalWorkers))
+        workerLock.preference.set(PreferClose(With.geography.home.pixelCenter))
         workerLock.canPoach.set(true)
         workerLock.acquire(this)
         With.gathering.gatheringPlan = this

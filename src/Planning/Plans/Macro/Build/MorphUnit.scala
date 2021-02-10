@@ -5,7 +5,7 @@ import Macro.Buildables.{Buildable, BuildableUnit}
 import Macro.Scheduling.MacroCounter
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
-import Planning.UnitCounters.UnitCountOne
+import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers.{MatchMorphingInto, MatchOr, MatchSpecific}
 import Planning.UnitPreferences._
 import ProxyBwapi.Races.Zerg
@@ -23,8 +23,8 @@ class MorphUnit(val classToMorph: UnitClass) extends Production {
   val currencyLock  = new LockCurrencyForUnit(classToMorph)
   val morpherClass  = classToMorph.whatBuilds._1
   val morpherLock   = new LockUnits {
-    unitMatcher.set(MatchOr(morpherClass, MatchMorphingInto(classToMorph)))
-    unitCounter.set(UnitCountOne)
+    matcher.set(MatchOr(morpherClass, MatchMorphingInto(classToMorph)))
+    counter.set(CountOne)
   }
   
   private var morpher: Option[FriendlyUnitInfo] = None
@@ -52,7 +52,7 @@ class MorphUnit(val classToMorph: UnitClass) extends Production {
     currencyLock.acquire(this)
     if (currencyLock.satisfied && ! currencyLock.isSpent) {
       setPreference()
-      morpherLock.unitMatcher.set(morpher.map(m => new MatchSpecific(Set(m))).getOrElse(morpherClass))
+      morpherLock.matcher.set(morpher.map(m => new MatchSpecific(Set(m))).getOrElse(morpherClass))
       morpherLock.acquire(this)
       morpher = morpherLock.units.headOption
       morpher.foreach(_.agent.intend(this, new Intention {
@@ -68,17 +68,17 @@ class MorphUnit(val classToMorph: UnitClass) extends Production {
   
   protected def setPreference() {
     if (classToMorph.isWorker) {
-      morpherLock.unitPreference.set(PreferAll(
+      morpherLock.preference.set(PreferAll(
         PreferHatcheryWithThreeLarva,
         PreferBaseWithFewerWorkers
       ))
     } else if (morpherClass == Zerg.Larva) {
-      morpherLock.unitPreference.set(PreferAll(
+      morpherLock.preference.set(PreferAll(
         PreferHatcheryWithThreeLarva,
         PreferBaseWithMoreWorkers
       ))
     } else {
-      morpherLock.unitPreference.set(u => (if (u.visibleToOpponents) 0 else 1) - u.matchups.framesOfSafety)
+      morpherLock.preference.set(u => (if (u.visibleToOpponents) 0 else 1) - u.matchups.framesOfSafety)
     }
   }
 }

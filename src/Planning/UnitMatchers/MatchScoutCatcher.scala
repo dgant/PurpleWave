@@ -3,7 +3,7 @@ package Planning.UnitMatchers
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
 
-object MatchScoutCatcher extends Matcher {
+object MatchScoutCatcher extends UnitMatcher {
   override def apply(unit: UnitInfo): Boolean = (
     unit.canMove
     && unit.unitClass.attacksGround

@@ -9,7 +9,7 @@ import ProxyBwapi.Races.Protoss
 class MeldDarkArchons extends Plan {
   
   val templar = new LockUnits
-  templar.unitMatcher.set(Protoss.DarkTemplar)
+  templar.matcher.set(Protoss.DarkTemplar)
   
   override def onUpdate() {
     templar.release() //We don't want them if they're Dark Archons now.

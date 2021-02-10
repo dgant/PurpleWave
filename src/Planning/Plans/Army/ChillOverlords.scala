@@ -8,7 +8,7 @@ import Planning.Predicates.Compound.Latch
 import Planning.Predicates.Milestones.EnemiesAtLeast
 import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.UnitCountEverything
+import Planning.UnitCounters.CountEverything
 import Planning.UnitMatchers.MatchOr
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -17,8 +17,8 @@ import Utilities.ByOption
 class ChillOverlords extends Prioritized {
   
   val overlords = new LockUnits
-  overlords.unitMatcher.set(Zerg.Overlord)
-  overlords.unitCounter.set(UnitCountEverything)
+  overlords.matcher.set(Zerg.Overlord)
+  overlords.counter.set(CountEverything)
 
   val cloakedThreat = new Latch(new EnemiesAtLeast(1, MatchOr(
     Terran.Wraith,

@@ -6,16 +6,16 @@ import Mathematics.Shapes.Circle
 import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.UnitCountEverything
-import Planning.UnitMatchers.Matcher
+import Planning.UnitCounters.CountEverything
+import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
-class Chill(initialMatcher: Matcher) extends Plan {
+class Chill(initialMatcher: UnitMatcher) extends Plan {
   
   val chillers = new LockUnits
-  chillers.unitMatcher.set(initialMatcher)
-  chillers.unitCounter.set(UnitCountEverything)
+  chillers.matcher.set(initialMatcher)
+  chillers.counter.set(CountEverything)
 
   override def onUpdate() {
     chillers.acquire(this)

@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.UnitCountOne
+import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchNotHoldingResources, MatchWorkers}
 import Planning.UnitPreferences.PreferClose
 import Planning.{Plan, Property}
@@ -13,8 +13,8 @@ import Utilities.GameTime
 
 class ScoutForCannonRush extends Plan {
   val scouts = new Property[LockUnits](new LockUnits {
-    unitMatcher.set(MatchAnd(MatchWorkers, MatchNotHoldingResources))
-    unitCounter.set(UnitCountOne)
+    matcher.set(MatchAnd(MatchWorkers, MatchNotHoldingResources))
+    counter.set(CountOne)
     interruptable.set(false)
   })
 
@@ -46,7 +46,7 @@ class ScoutForCannonRush extends Plan {
 
     if ( ! shouldScout) return
 
-    scouts.get.unitPreference.set(PreferClose(
+    scouts.get.preference.set(PreferClose(
     scouts.get.units.headOption.map(_.pixel).getOrElse(With.geography.home.pixelCenter)))
     scouts.get.acquire(this)
     scouts.get.units.foreach(scout => scout.agent.intend(this, new Intention {

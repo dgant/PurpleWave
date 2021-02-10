@@ -17,7 +17,7 @@ import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.Employing
 import Planning.ProxyPlanner
-import Planning.UnitCounters.UnitCountExactly
+import Planning.UnitCounters.CountExactly
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.{ZvTProxyHatchHydras, ZvTProxyHatchSunkens, ZvTProxyHatchZerglings}
 
@@ -161,7 +161,7 @@ class ZvTProxyHatch extends Parallel {
           new UnitsAtLeast(2, Zerg.Hatchery,      complete = false),
           new UnitsAtLeast(1, Zerg.SpawningPool,  complete = false),
           new Not(new WeHaveEnoughSunkens)),
-        new AttackWithWorkers(UnitCountExactly(2)),
+        new AttackWithWorkers(CountExactly(2)),
         new Attack)),
   ))
 }

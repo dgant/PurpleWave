@@ -16,7 +16,7 @@ import Planning.Predicates.Compound.Not
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.{FoundEnemyBase, UnitsAtLeast}
 import Planning.Predicates.Strategy.Employing
-import Planning.UnitCounters.UnitCountExcept
+import Planning.UnitCounters.CountExcept
 import Planning.UnitMatchers.MatchWorkers
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.Terran
@@ -44,7 +44,7 @@ class TvEProxyBBS extends GameplanTemplate {
     new Attack,
     new Trigger(
       new UnitsAtLeast(2, Terran.Marine),
-      new AttackWithWorkers(new UnitCountExcept(8, MatchWorkers))))
+      new AttackWithWorkers(new CountExcept(8, MatchWorkers))))
   
   override def workerPlan: Plan = NoPlan()
   override def supplyPlan: Plan = new If(

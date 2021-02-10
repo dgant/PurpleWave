@@ -1,6 +1,6 @@
 package Performance
 
-import Planning.UnitMatchers.Matcher
+import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
@@ -8,15 +8,15 @@ import scala.collection.mutable
 class TotalUnitCounter[T <: UnitInfo](source: () => Iterable[T]) {
   
   val units = new Cache(source)
-  val counts = new Cache(() => new mutable.HashMap[Matcher, Int] {
-    override def default(key: Matcher): Int = {
+  val counts = new Cache(() => new mutable.HashMap[UnitMatcher, Int] {
+    override def default(key: UnitMatcher): Int = {
       val count = units().count(_.isPrerequisite(key))
       put(key, count)
       count
     }
   })
   
-  def apply(matcher: Matcher*): Int = {
+  def apply(matcher: UnitMatcher*): Int = {
     matcher.map(m => counts()(m)).sum
   }
   

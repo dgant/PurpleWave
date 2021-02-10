@@ -13,7 +13,7 @@ class Scan extends Plan {
   
   description.set("Use Scanner Sweep")
   
-  val scanners = new Property[LockUnits](new LockUnits { unitMatcher.set(Terran.Comsat) })
+  val scanners = new Property[LockUnits](new LockUnits { matcher.set(Terran.Comsat) })
   
   var lastScan = 0
   

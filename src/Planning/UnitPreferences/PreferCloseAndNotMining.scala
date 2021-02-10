@@ -3,7 +3,7 @@ package Planning.UnitPreferences
 import Mathematics.Points.{Pixel, SpecificPoints}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-case class PreferCloseAndNotMining(pixel: Pixel = SpecificPoints.middle) extends Preference {
+case class PreferCloseAndNotMining(pixel: Pixel = SpecificPoints.middle) extends UnitPreference {
   
   override def apply(unit: FriendlyUnitInfo): Double = {
     val busyCarrying  = unit.carrying

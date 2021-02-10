@@ -5,7 +5,7 @@ import Lifecycle.With
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitInfo.UnitInfo
 
-abstract class MatchAnyProxy extends Matcher {
+abstract class MatchAnyProxy extends UnitMatcher {
 
   private def mainBases(player: PlayerInfo): Seq[Base] = {
     if (player.isUs) return Seq(With.geography.ourMain)

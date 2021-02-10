@@ -1,7 +1,7 @@
 package Planning.UnitMatchers
 import ProxyBwapi.UnitInfo.UnitInfo
 
-object MatchIdle extends Matcher{
+object MatchIdle extends UnitMatcher{
   override def apply(unit: UnitInfo): Boolean = {
     Seq(
       unit.remainingCompletionFrames,

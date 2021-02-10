@@ -6,9 +6,9 @@ import Macro.Scheduling.MacroCounter
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
-import Planning.UnitCounters.UnitCountOne
+import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers._
-import Planning.UnitPreferences.Preference
+import Planning.UnitPreferences.UnitPreference
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -33,11 +33,10 @@ class TrainUnit(val traineeClass: UnitClass) extends Production {
     else
       matchTrainer
     
-  lazy val trainerLock = new LockUnits {
-    unitMatcher.set(u => trainerMatcher.apply(u) && (trainer.contains(u) || u.friendly.exists(_.trainee.forall(t => t.is(traineeClass) || t.completeOrNearlyComplete))))
-    unitCounter.set(UnitCountOne)
-    unitPreference.set(preference)
-  }
+  lazy val trainerLock = new LockUnits
+  trainerLock.matcher.set(u => trainerMatcher.apply(u) && (trainer.contains(u) || u.friendly.exists(_.trainee.forall(t => t.is(traineeClass) || t.completeOrNearlyComplete))))
+  trainerLock.counter.set(CountOne)
+  trainerLock.preference.set(preference)
   
   def trainer: Option[FriendlyUnitInfo] = trainerLock.units.headOption
   def trainee: Option[FriendlyUnitInfo] = trainer.flatMap(_.trainee.filter(_.is(traineeClass)))
@@ -71,7 +70,7 @@ class TrainUnit(val traineeClass: UnitClass) extends Production {
 
   private val safetyFramesMax = Seconds(10)()
   private lazy val mapSize = With.mapTileWidth + With.mapTileHeight
-  private lazy val preference = new Preference {
+  private lazy val preference = new UnitPreference {
     override def apply(trainer: FriendlyUnitInfo): Double = {
       // Lower score -> More preferred
 

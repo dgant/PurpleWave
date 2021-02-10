@@ -2,7 +2,7 @@ package Planning.UnitMatchers
 
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class MatchSpecific(defaultUnits: Set[UnitInfo] = Set.empty) extends Matcher {
+class MatchSpecific(defaultUnits: Set[UnitInfo] = Set.empty) extends UnitMatcher {
   
   var specificUnits: Set[UnitInfo] = defaultUnits
   

@@ -16,7 +16,7 @@ object ShowSquads extends View {
   
   def renderSquadMap(squad: Squad) {
     val color = squadColors(squad.hashCode % squadColors.length)
-    (squad.units ++ squad.enemies).foreach(unit =>
+    squad.units.foreach(unit =>
       DrawMap.label(
         squad.goal.toString,
         unit.pixel.add(0, unit.unitClass.height),
@@ -38,11 +38,7 @@ object ShowSquads extends View {
           "",
           "",
           "",
-          enumerateUnits(squad.units),
-          "",
-          "",
-          enumerateUnits(squad.enemies)))
-  
+          enumerateUnits(squad.units)))
     DrawScreen.table(5, 7 * With.visualization.lineHeightSmall, table)
   }
   

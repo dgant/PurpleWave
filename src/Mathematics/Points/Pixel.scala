@@ -100,6 +100,9 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline final def buildableUnchecked: Boolean = {
     tile.buildableUnchecked
   }
+  @inline final def visible: Boolean = {
+    tile.visible
+  }
   @inline final def walkable: Boolean = {
     tile.walkable
   }

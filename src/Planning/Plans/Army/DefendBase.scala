@@ -25,7 +25,6 @@ class DefendBase(base: Base) extends Squadify[GoalDefendZone] {
     }
 
     With.blackboard.defendingBase.set(true)
-    squad.enemies = enemies
     goal.zone = base.zone
     super.update()
   }

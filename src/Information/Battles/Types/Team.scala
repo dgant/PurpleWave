@@ -28,10 +28,8 @@ class Team(val units: Vector[UnitInfo]) {
   def attackers       : Seq[UnitInfo] = units.view.filter(u => u.unitClass.canAttack  && ! u.unitClass.isWorker )
   def attackersGround : Seq[UnitInfo] = attackers.view.filterNot(_.flying)
   val hasGround = new Cache(() => attackersGround.nonEmpty)
-  val centroidAir = new Cache(() => PurpleMath.centroid(attackers.view.map(_.pixel)))
-  val centroidGround = new Cache(() => {
-    val center = if (hasGround()) PurpleMath.centroid(attackersGround.view.map(_.pixel)) else centroidAir().nearestWalkableTile.pixelCenter
-    ByOption.minBy(attackersGround)(_.pixelDistanceSquared(center)).map(_.pixel).getOrElse(center)})
+  val centroidAir = new Cache(() => GroupCentroid.air(attackers))
+  val centroidGround = new Cache(() => GroupCentroid.ground(attackers))
   def centroidOf(unit: UnitInfo): Pixel = if (unit.flying) centroidAir() else centroidGround()
   val vanguard = new Cache(() =>
     ByOption.minBy(attackers)(_.pixelDistanceSquared(opponent.centroidAir()))

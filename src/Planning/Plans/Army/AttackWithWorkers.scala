@@ -24,9 +24,7 @@ class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
   override def onUpdate() {
     fighters.acquire(this)
     
-    if (With.geography.enemyBases.nonEmpty) {
-      haveSeenABase = true
-    }
+    haveSeenABase ||= With.geography.enemyBases.nonEmpty
     
     if ( ! haveSeenABase) {
       findStartLocation()

@@ -31,7 +31,7 @@ object ShuttleRegroup extends Action {
     if (antiAir.nonEmpty) {
 
       // Help!
-      val support = unit.teammates.view.filter(u => u.canAttack && ! u.isAny(Protoss.Reaver, MatchWorkers)).toVector
+      val support = unit.alliesBattleThenSquad.flatten.filter(u => u.canAttack && ! u.isAny(Protoss.Reaver, MatchWorkers)).toVector
       if (support.nonEmpty) {
         val supportDeepest = support.maxBy(_.matchups.pixelsOfEntanglement)
         val supportSafest = support.maxBy(_.matchups.pixelsOfEntanglement)

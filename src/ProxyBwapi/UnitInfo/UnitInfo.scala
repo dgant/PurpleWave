@@ -14,7 +14,7 @@ import Micro.Actions.Combat.Targeting.Target
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Matchups.MatchupAnalysis
 import Performance.{Cache, KeyedCache}
-import Planning.{Plan, Prioritized}
+import Planning.Prioritized
 import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -485,11 +485,9 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   @inline final def pixelToFireAt(enemy: UnitInfo): Pixel = pixelToFireAt(enemy, exhaustive = false)
   @inline final def pixelToFireAt(enemy: UnitInfo, exhaustive: Boolean): Pixel = {
     if (unitClass.melee) return enemy.pixel
-
     if (With.reaction.sluggishness > 1 || ! canMove) {
       return if (inRangeToAttack(enemy)) pixel else enemy.pixel.project(pixel, pixelRangeAgainst(enemy))
     }
-
     val range = pixelRangeAgainst(enemy)
     val distance = pixelDistanceEdge(enemy)
     val distanceSquared = pixelDistanceSquared(enemy)
@@ -498,7 +496,6 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
     val altitudeMatters = ! flying && ! enemy.flying && ! unitClass.melee
     def badAltitudePenalty(pixel: Pixel): Int = if (altitudeMatters && pixel.altitude < enemyAltitude) veryFarSquared  else 0
     def goodAltitudeBonus(pixel: Pixel): Double = if ( ! altitudeMatters || pixel.altitude > enemyAltitude) 1 else 0
-
     if (enemy.visible || (flying && sightPixels >= range)) {
       if (range >= distance && ( ! exhaustive || ! altitudeMatters)) return pixel
       // First, check if the simplest possible spot is acceptable
@@ -518,7 +515,6 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
       else if (badAltitudePenalty(pixelFar) == 0 && goodAltitudeBonus(pixelFar) > 0) {
         return pixelFar
       }
-
       // Search for the ideal firing position
       val offset = pixel.offsetFromTileCenter
       val ringPixels =
@@ -530,7 +526,6 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
       val output = ringSpot.getOrElse(pixelFar.nearestTraversableBy(this))
       return output
     }
-
     // If the enemy isn't visible (likely uphill) we not only need to get in physical range, but altitude-adjusted sight range as well
     val sightPixel = enemy.pixel.projectUpTo(pixel, Math.min(sightPixels, range))
     PixelRay(sightPixel, enemy.pixel)
@@ -538,6 +533,9 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
       .map(_.pixelCenter)
       .getOrElse(enemy.pixel.nearestTraversableBy(this))
   }
+  @inline final def canSee(other: UnitInfo): Boolean = (
+    (sightPixels >= pixelDistanceEdge(other) && (flying|| altitude >= other.altitude))
+    || (tile.tileDistanceSquared(other.tile) < 4 && tile.adjacent9.contains(other.tile)))
 
   @inline final def canStim: Boolean = unitClass.canStim && player.hasTech(Terran.Stim) && hitPoints > 10
 

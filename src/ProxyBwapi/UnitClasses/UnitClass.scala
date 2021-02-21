@@ -557,5 +557,16 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   // UnitMatcher
   @inline def apply(unit: UnitInfo): Boolean = unit.unitClass == this
 
+  override val toString: String = asString
+    .replace("Terran_", "")
+    .replace("Zerg_", "")
+    .replace("Protoss_", "")
+    .replace("Neutral_", "")
+    .replace("Resource_", "")
+    .replace("Critter_", "")
+    .replace("Special_", "")
+    .replace("Vulture_Spider", "Spider")
+    .replaceAll("_", " ")
+
   override val hashCode: Int = toString.hashCode
 }

@@ -77,7 +77,10 @@ class Scouting extends TimedTask {
   def enemyHasScoutedUsWithWorker: Boolean = _enemyHasScoutedUsWithWorker
   private var _enemyHasScoutedUs = false
   private var _enemyHasScoutedUsWithWorker = false
-  
+
+  val basesToLookForEnemyScouts = new Cache(() => (With.geography.ourBases :+ With.geography.ourNatural).distinct)
+  val enemyScouts = new Cache(() => With.units.enemy.filter(u => u.isAny(Zerg.Overlord, MatchWorkers) && u.base.exists(basesToLookForEnemyScouts().contains)))
+
   override protected def onRun(budgetMs: Long): Unit = {
     baseScoutMap.clear()
     if (_firstEnemyMain.isEmpty) {

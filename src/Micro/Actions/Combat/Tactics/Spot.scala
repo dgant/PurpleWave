@@ -1,11 +1,12 @@
 package Micro.Actions.Combat.Tactics
 
-import Lifecycle.With
-import Mathematics.Points.{Pixel, SpecificPoints}
+import Mathematics.Points.Pixel
+import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Agency.Commander
+import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.{ByOption, Seconds}
+import Utilities.ByOption
 
 object Spot extends Action {
   
@@ -15,36 +16,36 @@ object Spot extends Action {
     && ! unit.unitClass.isTransport
     && ! unit.canAttack
     && ( ! unit.agent.canFocus || unit.unitClass.isFlyingBuilding)
-    && (unit.matchups.framesOfSafety > Seconds(2)() || unit.totalHealth > 500 || (unit.cloaked && unit.matchups.enemyDetectors.isEmpty))
+    && (unit.matchups.pixelsOfEntanglement > -32 || unit.totalHealth > 500 || (unit.cloaked && unit.matchups.enemyDetectors.isEmpty))
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    val goal: Option[Pixel] = destinationFromTeammates(unit, unit.squadmates)
-      .orElse(destinationFromTeammates(unit, unit.team.map(_.units).getOrElse(Iterable.empty)))
+    lazy val tankVulnerableAllyCentroid = PurpleMath.centroid(unit.alliesSquad.filter( ! _.flying).map(_.pixel))
+    val tanksToSpot = unit.enemiesSquad.filter(t => t.is(Terran.SiegeTankSieged) && t.matchups.enemies.forall(a => a == unit || ! a.canSee(t)))
+    val tankToSpot = ByOption.minBy(tanksToSpot)(_.pixelDistanceSquared(tankVulnerableAllyCentroid))
+
+    lazy val enemyToSpot = unit.enemiesSquad
+
+    val goal: Option[Pixel] = destinationFromTeammates(unit, unit.alliesSquad)
       .map(p =>
-        if (p.tile.visible)
-          ByOption.minBy(unit.squadenemies.view.filter(!_.visible))(_.pixelDistanceCenter(p)).orElse(
-            ByOption.minBy(unit.squadenemies)(_.pixelDistanceCenter(p)).orElse(
-              ByOption.minBy(unit.matchups.enemies.view.filter(!_.visible))(_.pixelDistanceCenter(p)).orElse(
-                ByOption.minBy(unit.matchups.enemies)(_.pixelDistanceCenter(p)))))
+        if ( ! p.tile.visible) p else
+          ByOption.minBy(unit.enemiesSquadOrBattle.filter( ! _.visible))(_.pixelDistanceCenter(p)).orElse(
+            ByOption.minBy(unit.enemiesSquadOrBattle)(_.pixelDistanceCenter(p)))
               .map(_.pixel)
-              .getOrElse(p.project(SpecificPoints.middle, 2 * unit.sightPixels))
-        else p)
+              .getOrElse(p))
 
     if (goal.isDefined) {
       unit.agent.toTravel = goal
+      Potshot.delegate(unit)
       Commander.move(unit)
     }
   }
 
-  def bonusDistance: Double = {
-    if (With.enemies.exists(_.isTerran))
-      5.0 * 32.0
-    else
-      3.0 * 32.0
-  }
-
   protected def destinationFromTeammates(unit: FriendlyUnitInfo, teammates: Iterable[UnitInfo]): Option[Pixel] = {
-    ByOption.minBy(unit.squadmates.filter(_.canAttack).map(u => u.pixel.project(u.agent.destination, bonusDistance)))(_.pixelDistance(unit.agent.destination))
+    ByOption.minBy(
+      unit.alliesSquad
+        .filter(_.canAttack)
+        .flatMap(_.friendly)
+        .map(u => u.pixel.project(u.agent.destination, unit.sightPixels)))(_.pixelDistance(unit.agent.destination))
   }
 }

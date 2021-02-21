@@ -60,7 +60,7 @@ object Potential {
 
   def preferRegrouping(unit: FriendlyUnitInfo): Force = {
     if (unit.base.exists(_.owner.isUs)) return new Force
-    val allies                = unit.teammates.view.filter(_ != unit)
+    val allies                = unit.alliesBattleOrSquad.view.filter(_ != unit)
     val alliesUseful          = allies.filter(ally => unit.matchups.threats.exists(ally.canAttack))
     val allyNearestUseful     = ByOption.minBy(alliesUseful)(ally => ally.pixelDistanceCenter(unit) - ally.effectiveRangePixels)
     if (allyNearestUseful.isEmpty) return new Force

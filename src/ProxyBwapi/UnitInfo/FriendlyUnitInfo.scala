@@ -3,7 +3,6 @@ package ProxyBwapi.UnitInfo
 import Information.Grids.Combat.AbstractGridEnemyRange
 import Lifecycle.With
 import Micro.Agency.Agent
-import Micro.Squads.Goals.SquadGoal
 import Micro.Squads.Squad
 import Performance.Cache
 import ProxyBwapi.Techs.{Tech, Techs}
@@ -40,14 +39,32 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(b
   def kills: Int = bwapiUnit.getKillCount
   def lastFrameOccupied: Int = _lastFrameOccupied
   def framesFailingToMove: Int = _framesFailingToMove
+
   def squad: Option[Squad] = _squadCache()
-  def goal: Option[SquadGoal] = squad.map(_.goal)
-  def squadmates: Set[FriendlyUnitInfo] = squad.map(_.units).getOrElse(Set.empty)
-  def squadenemies: Seq[UnitInfo] = squad.map(_.enemies).getOrElse(Seq.empty)
-  def teammates: Set[UnitInfo] = _teammatesCache()
-  def enemies: Seq[UnitInfo] = _enemiesCache()
-  def immediateAllies: Iterable[UnitInfo] = if (battle.isDefined) matchups.allies else squadmates.view.filterNot(_ == this)
-  def immediateOthers: Iterable[UnitInfo] = if (battle.isDefined) matchups.others else squadmates.view.filterNot(_ == this)
+  def alliesSquad                   : Iterable[FriendlyUnitInfo]      = squad.map(_.units.view).filter(_ != this).getOrElse(Seq.empty)
+  def alliesBattle                  : Iterable[FriendlyUnitInfo]      = battle.map(_.us.units.view.map(_.friendly).filter(_.nonEmpty).map(_.get)).getOrElse(Iterable.empty).filter(_ != this)
+  def alliesAll                     : Iterable[FriendlyUnitInfo]      = With.units.ours.filter(_ != this)
+  def enemiesSquad                  : Iterable[UnitInfo]              = squad.map(_.enemies).getOrElse(Iterable.empty)
+  def enemiesBattle                 : Iterable[UnitInfo]              = battle.map(_.enemy.units.view).getOrElse(Seq.empty)
+  def enemiesAll                    : Iterable[UnitInfo]              = With.units.enemy
+  def alliesBattleThenSquad         : Seq[Iterable[FriendlyUnitInfo]] = Seq(alliesBattle, alliesSquad)
+  def alliesBattleThenSquadThenAll  : Seq[Iterable[FriendlyUnitInfo]] = Seq(alliesBattle, alliesSquad, alliesAll)
+  def alliesSquadThenBattle         : Seq[Iterable[FriendlyUnitInfo]] = Seq(alliesSquad, alliesBattle)
+  def alliesSquadThenBattleThenAll  : Seq[Iterable[FriendlyUnitInfo]] = Seq(alliesSquad, alliesBattle, alliesAll)
+  def alliesBattleOrSquad           : Iterable[FriendlyUnitInfo]      = if (alliesBattle.nonEmpty) alliesBattle else alliesSquad
+  def alliesBattleOrSquadOrAll      : Iterable[FriendlyUnitInfo]      = if (alliesBattle.nonEmpty) alliesBattle else if (alliesSquad.nonEmpty) alliesSquad else alliesAll
+  def alliesSquadOrBattle           : Iterable[FriendlyUnitInfo]      = if (alliesSquad.nonEmpty) alliesSquad else alliesBattle
+  def alliesSquadOrBattleOrAll      : Iterable[FriendlyUnitInfo]      = if (alliesSquad.nonEmpty) alliesSquad else if (alliesBattle.nonEmpty) alliesBattle else alliesAll
+  def enemiesBattleThenSquad        : Seq[Iterable[UnitInfo]]         = Seq(enemiesBattle, enemiesSquad)
+  def enemiesBattleThenSquadThenAll : Seq[Iterable[UnitInfo]]         = Seq(enemiesBattle, enemiesSquad, enemiesAll)
+  def enemiesSquadThenBattle        : Seq[Iterable[UnitInfo]]         = Seq(enemiesSquad, enemiesBattle)
+  def enemiesSquadThenBattleThenAll : Seq[Iterable[UnitInfo]]         = Seq(enemiesSquad, enemiesBattle, enemiesAll)
+  def enemiesBattleOrSquad          : Iterable[UnitInfo]              = if (enemiesBattle.nonEmpty) enemiesBattle else enemiesSquad
+  def enemiesBattleOrSquadOrAll     : Iterable[UnitInfo]              = if (enemiesBattle.nonEmpty) enemiesBattle else if (enemiesSquad.nonEmpty) enemiesSquad else enemiesAll
+  def enemiesSquadOrBattle          : Iterable[UnitInfo]              = if (enemiesSquad.nonEmpty) enemiesSquad else enemiesBattle
+  def enemiesSquadOrBattleOrAll     : Iterable[UnitInfo]              = if (enemiesSquad.nonEmpty) enemiesSquad else if (enemiesBattle.nonEmpty) enemiesBattle else enemiesAll
+
+
   lazy val agent: Agent = new Agent(this)
   private val _squadCache = new Cache(() => {
     val nextSquad = With.squads.all.find(_.units.contains(this))
@@ -55,8 +72,6 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(b
     _lastSquad = nextSquad
     _lastSquad
   })
-  private val _teammatesCache = new Cache(() => (squadmates ++ matchups.allies))
-  private val _enemiesCache = new Cache(() => (squadenemies ++ matchups.enemies).distinct)
   
   def buildUnit     : Option[UnitInfo]  = With.units.get(base.getBuildUnit)
   def techingType   : Tech              = Techs.get(base.getTech)

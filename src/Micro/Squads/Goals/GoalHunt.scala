@@ -11,18 +11,11 @@ class GoalHunt(val enemyMatcher: UnitMatcher) extends SquadGoalBasic {
 
   override def inherentValue: Double = GoalValue.harass
   
-  override def toString: String = (
-    "Hunt "
-    + enemyMatcher.toString.replaceAll("UnitMatch", "")
-    + " with "
-    + unitMatcher.toString.replaceAll("UnitMatch", "")
-    + " in "
-    + target.zone.name)
+  override def toString: String = f"Hunt ${enemyMatcher.toString.replaceAll("Match", "")} with ${unitMatcher.toString.replaceAll("UnitMatch", "")} in ${target.zone}"
 
   var target: Pixel = With.scouting.mostBaselikeEnemyTile.pixelCenter
   
   override def run() {
-    squad.enemies = With.units.enemy.view.filter(_.is(enemyMatcher)).toSeq
     target = chooseTarget()
     squad.units.foreach(attacker => {
       attacker.agent.intend(this, new Intention {
@@ -32,10 +25,11 @@ class GoalHunt(val enemyMatcher: UnitMatcher) extends SquadGoalBasic {
   }
   
   protected def chooseTarget(): Pixel = {
-    val centroid = PurpleMath.centroid(squad.enemies.view.map(_.pixel))
+    val targets = With.units.enemy.filter(enemyMatcher).filter(_.likelyStillThere)
+    val centroid = PurpleMath.centroid(targets.map(_.pixel))
     val flying = squad.units.forall(_.flying)
     ByOption
-      .minBy(squad.enemies.view.filter(_.likelyStillThere).map(_.pixel))(_.pixelDistance(centroid))
+      .minBy(targets.map(_.pixel))(_.pixelDistance(centroid))
       .getOrElse(With.scouting.baseIntrigue.maxBy(_._2)._1.heart.pixelCenter)
   }
 }

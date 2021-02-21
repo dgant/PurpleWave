@@ -61,7 +61,7 @@ object BeVulture extends Action {
   
   protected def sabotage(vulture: FriendlyUnitInfo) {
     // TODO: Do it if we have enough Vultures with mines
-    if ( ! vulture.agent.shouldEngage && ! vulture.enemies.exists(e => e.is(Protoss.DarkTemplar) && e.effectivelyCloaked)) return
+    if ( ! vulture.agent.shouldEngage && ! vulture.matchups.enemies.exists(e => e.is(Protoss.DarkTemplar) && e.effectivelyCloaked)) return
 
     val victims = vulture.matchups.enemies.filter(e =>
       e.unitClass.triggersSpiderMines

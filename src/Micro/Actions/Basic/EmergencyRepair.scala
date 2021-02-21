@@ -26,7 +26,7 @@ object EmergencyRepair extends Action {
   }
   
   def eligiblePatients(repairer: FriendlyUnitInfo): Seq[UnitInfo] =
-    repairer.teammates.view.filter(patient =>
+    repairer.alliesSquadThenBattle.flatten.view.filter(patient =>
       patient != repairer
       && patient.complete
       && patient.unitClass.isMechanical
@@ -35,7 +35,7 @@ object EmergencyRepair extends Action {
       && ! patient.is(Terran.SCV)
       && ! patient.moving
       && ! patient.plagued
-    ).toSeq
+    )
   
   def isCloseEnough(repairer: FriendlyUnitInfo, patient: UnitInfo): Boolean = {
     if (repairer.pixelDistanceEdge(patient) > 32.0 * 30.0) return false

@@ -1,5 +1,6 @@
 package Micro.Squads
 
+import Information.Battles.Types.GroupCentroid
 import Lifecycle.With
 import Micro.Squads.Goals.{GoalChill, SquadGoal}
 import Performance.Cache
@@ -10,9 +11,14 @@ import Utilities.CountMap
 import scala.collection.mutable
 
 class Squad {
-  
-  var enemies: Seq[UnitInfo] = Seq.empty
-  
+
+  private var _enemies: Option[Seq[UnitInfo]] = None
+  def targetsEnemies: Boolean = _enemies.isDefined
+  def enemies: Seq[UnitInfo] = _enemies.getOrElse(Seq.empty)
+  def setEnemies(value: Seq[UnitInfo]): Unit = {
+    _enemies = Some(value)
+  }
+
   def run() {
     unitAges --= unitAges.keys.view.filterNot(units.contains)
     units.foreach(unitAges.add(_, 1))
@@ -61,6 +67,9 @@ class Squad {
   final def addConscripts(units: Iterable[FriendlyUnitInfo]): Unit = {
     _conscripts ++= units
   }
+
+  val centroidAir = new Cache(() => GroupCentroid.air(units))
+  val centroidGround = new Cache(() => GroupCentroid.ground(units))
 
   override def toString: String = f"Squad to $goal"
 }

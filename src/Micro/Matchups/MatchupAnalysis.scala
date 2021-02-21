@@ -73,12 +73,12 @@ case class MatchupAnalysis(me: UnitInfo) {
     val output = (
       catcherSpeed * (if (catcherFlying) 2 else 1) >= me.topSpeed
         // The Math.max prevents Zealots from thinking they can catch SCVs
-        || (catcher.pixelRangeAgainst(me) > Math.max(32 * 2, me.effectiveRangePixels) && catcher.friendly.exists(_.squadenemies.contains(me)))
+        || (catcher.pixelRangeAgainst(me) > Math.max(32 * 2, me.effectiveRangePixels) && catcher.framesToGetInRange(me) < 72)
         || busyForCatching
         || catcher.is(Zerg.Scourge)
         || catcher.framesToGetInRange(me) < 8
         || (me.unitClass.isWorker && me.base.exists(_.harvestingArea.contains(me.tile)))
-        || (catcher.is(Zerg.Zergling) && With.self.hasUpgrade(Zerg.ZerglingSpeed) && ! me.player.hasUpgrade(Terran.VultureSpeed))
+        || (catcher.is(Zerg.Zergling) && me.is(Terran.Vulture) && catcher.player.hasUpgrade(Zerg.ZerglingSpeed) && ! me.player.hasUpgrade(Terran.VultureSpeed))
         || (catcher.is(Protoss.Zealot) && me.is(Protoss.Dragoon) && ! me.player.hasUpgrade(Protoss.DragoonRange))
         || (catcher.is(Protoss.DarkTemplar) && me.is(Protoss.Dragoon)))
     output

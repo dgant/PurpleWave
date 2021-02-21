@@ -171,7 +171,7 @@ object DefaultCombat extends Action {
 
     transition(Dodge, () => unit.canMove && unit.agent.receivedPushPriority() >= TrafficPriorities.Dodge, () => dodge(unit))
 
-    lazy val purring = (unit.unitClass.isTerran && unit.unitClass.isMechanical && unit.immediateAllies.exists(a => a.repairing && a.orderTarget.contains(unit)))
+    lazy val purring = (unit.unitClass.isTerran && unit.unitClass.isMechanical && unit.alliesSquadThenBattle.flatten.exists(a => a.repairing && a.orderTarget.contains(unit)))
     transition(Aim, () => !unit.canMove || purring, () => aim(unit))
 
     lazy val opponentBlocksGoal = unit.battle.exists(b => b.enemy.zones.contains(unit.agent.destination.zone) || b.teams.minBy(_.centroidAir().pixelDistanceSquared(unit.agent.destination)).enemy)

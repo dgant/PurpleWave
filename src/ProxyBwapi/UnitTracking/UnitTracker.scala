@@ -53,12 +53,10 @@ class UnitTracker {
     foreign.filter(_.visibility == Visibility.Dead).map(_.id).foreach(kill)
   }
   def onUnitRenegade(bwapiUnit: bwapi.Unit): Unit = {
-    With.logger.debug(f"OnUnitRenegade #${bwapiUnit.getID}")
     kill(bwapiUnit.getID)
     birth(bwapiUnit)
   }
   def onUnitDestroy(bwapiUnit: bwapi.Unit) {
-    With.logger.debug(f"OnUnitDestroy #${bwapiUnit.getID}")
     get(bwapiUnit).foreach(_.asInstanceOf[BWAPICachedUnitProxy].changeVisibility(Visibility.Dead))
     kill(bwapiUnit.getID)
   }

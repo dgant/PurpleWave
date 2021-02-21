@@ -20,7 +20,7 @@ object ShuttleAcceptRider extends Action {
     val sojourning = hailer.agent.toTravel.exists(_.pixelDistance(hailer.pixel) > 32.0 * 20)
 
     (
-      (if (shuttle.teammates.contains(hailer)) 5 else 1)
+      (if (shuttle.alliesSquadOrBattle.exists(_ == hailer)) 5 else 1)
       + (if (targetedByScarab) 100 else 1)
       + (if (endangered) 10 else 1)
       + (if (sojourning) 1 else 0)
@@ -43,7 +43,7 @@ object ShuttleAcceptRider extends Action {
           && passenger.transport.isEmpty
           && passenger.agent.ride.forall(_ == shuttle)
           && passenger.unitClass.spaceRequired + shuttle.agent.passengers.view.map(_.unitClass.spaceRequired).sum <= shuttle.unitClass.spaceProvided
-          && ! shuttle.teammates.exists(otherShuttle =>
+          && ! shuttle.alliesSquadOrBattle.exists(otherShuttle =>
             otherShuttle.is(Protoss.Shuttle)
             && otherShuttle.complete
             && otherShuttle.pixelDistanceEdge(passenger) < shuttle.pixelDistanceEdge(passenger)

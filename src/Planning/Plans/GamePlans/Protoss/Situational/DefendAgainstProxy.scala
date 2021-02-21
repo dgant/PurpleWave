@@ -86,7 +86,6 @@ class DefendAgainstProxy extends Prioritized {
       return
     }
     With.blackboard.status.set(With.blackboard.status.get :+ "DefendingProxy")
-    squad.enemies = defendersAssigned.values.toSeq.distinct
     squad.setGoal(new GoalRazeProxies(defendersAssigned.toMap))
     squad.addConscripts(defenders.get.units)
     squad.commission()

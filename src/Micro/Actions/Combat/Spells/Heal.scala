@@ -31,7 +31,7 @@ object Heal extends Action {
   }
   
   private def validTargets(unit: FriendlyUnitInfo): Vector[UnitInfo] = {
-    unit.teammates
+    unit.alliesSquadOrBattle
       .toVector
       .filter(u =>
         u.unitClass.isOrganic

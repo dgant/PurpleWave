@@ -12,12 +12,14 @@ class GoalEscort extends SquadGoalBasic {
   override def toString: String = "Escort to " + destination.zone
   
   var principal: Option[FriendlyUnitInfo] = None
+
+  private def escortEnemies = With.units.enemy // TODO: Just the nearby ones!
   
   override def destination: Pixel =
     principal
       .map(thePrincipal =>
         ByOption
-          .minBy(squad.enemies.filter(_.canAttack(thePrincipal)))(_.framesBeforeAttacking(thePrincipal))
+          .minBy(escortEnemies.filter(_.canAttack(thePrincipal)))(_.framesBeforeAttacking(thePrincipal))
           .map(_.pixel)
           .getOrElse(thePrincipal.projectFrames(24 * 5)))
         .getOrElse(With.scouting.mostBaselikeEnemyTile.pixelCenter)

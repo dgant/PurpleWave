@@ -25,6 +25,8 @@ class GoalDefendZone extends SquadGoalBasic {
   var zone: Zone = _
   private var _currentDestination: Pixel = Pixel(0, 0)
 
+  private def zoneEnemies = With.units.enemy // TODO: Just base enemies!
+
   override def run() {
     lazy val base = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.scouting.threatOrigin))
     _currentDestination = zone.centroid.pixelCenter.nearestWalkableTile.pixelCenter
@@ -36,9 +38,9 @@ class GoalDefendZone extends SquadGoalBasic {
       u.isOurs
         && u.unitClass.isStaticDefense
         && ( ! u.is(Protoss.ShieldBattery) || choke.forall(_.pixelCenter.pixelDistance(u.pixel) > 96 + u.effectiveRangePixels))
-        && (squad.enemies.isEmpty || squad.enemies.exists(u.canAttack)))
+        && (zoneEnemies.isEmpty || zoneEnemies.exists(u.canAttack)))
 
-    lazy val allowWandering = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || squad.enemies.exists(_.unitClass.ranged) || With.blackboard.wantToAttack()
+    lazy val allowWandering = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || zoneEnemies.exists(_.unitClass.ranged) || With.blackboard.wantToAttack()
     lazy val canHuntEnemies = huntableEnemies().nonEmpty
     lazy val canDefendChoke = (squad.units.size > 3 && choke.isDefined) || ! With.enemies.exists(_.isZerg)
     lazy val wallExistsButNoneNearChoke = walls.nonEmpty && walls.forall(wall =>
@@ -89,8 +91,8 @@ class GoalDefendZone extends SquadGoalBasic {
           < (exit.endPixels ++ exit.sidePixels :+ exit.pixelCenter).map(_.groundPixels(zone.centroid)).min))
 
   private val huntableEnemies = new Cache(() => {
-    val huntableInZone = squad.enemies.filter(e => e.zone == zone && huntableFilter(e)) ++ zone.units.filter(u => u.isEnemy && u.unitClass.isGas)
-    if (huntableInZone.nonEmpty) huntableInZone else squad.enemies.filter(huntableFilter)
+    val huntableInZone = zoneEnemies.filter(e => e.zone == zone && huntableFilter(e)) ++ zone.units.filter(u => u.isEnemy && u.unitClass.isGas)
+    if (huntableInZone.nonEmpty) huntableInZone else zoneEnemies.filter(huntableFilter)
   })
 
   def huntEnemies() {
@@ -142,7 +144,7 @@ class GoalDefendZone extends SquadGoalBasic {
 
   def defendChoke() {
     _currentDestination = zone.exit.map(_.pixelCenter).getOrElse(zone.centroid.pixelCenter)
-    assignToFormation(new FormationZone(zone, squad.enemies).form(squad.units.toSeq))
+    assignToFormation(new FormationZone(zone, zoneEnemies.toSeq).form(squad.units.toSeq))
   }
 
   def assignToFormation(formation: FormationAssigned): Unit = {

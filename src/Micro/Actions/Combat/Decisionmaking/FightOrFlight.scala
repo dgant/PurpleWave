@@ -13,13 +13,6 @@ object FightOrFlight extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.canMove
   }
-
-  def potentiallyUseful(unit: FriendlyUnitInfo): Boolean = {
-    if (unit.matchups.targets.nonEmpty) return true
-    if (unit.unitClass.spells.exists(spell => With.self.hasTech(spell) && unit.energy >= spell.energyCost)) return true
-    if (unit.unitClass.isDetector && ! unit.matchups.enemies.exists(t => t.cloaked && ( ! unit.agent.canFocus || unit.squadenemies.contains(t)))) return true
-    false
-  }
   
   override def perform(unit: FriendlyUnitInfo) {
   

@@ -9,7 +9,7 @@ import bwapi.UnitType
 
 import scala.collection.JavaConverters._
 
-class UnitClassProxy(val baseType: UnitType) {
+abstract class UnitClassProxy(val baseType: UnitType) {
   lazy val abilities                = baseType.abilities.asScala.map(Techs.get)
   lazy val acceleration             = baseType.acceleration
   lazy val armor                    = baseType.armor
@@ -309,18 +309,4 @@ class UnitClassProxy(val baseType: UnitType) {
     else
       None
   }
-
-  override val toString: String = asString
-    .replace("Terran_", "")
-    .replace("Zerg_", "")
-    .replace("Protoss_", "")
-    .replace("Neutral_", "")
-    .replace("Resource_", "")
-    .replace("Critter_", "")
-    .replace("Special_", "")
-    .replace("Vulture_Spider", "Spider")
-    .replaceAll("_", " ")
-
-  // For performance
-  override val hashCode: Int = toString.hashCode
 }

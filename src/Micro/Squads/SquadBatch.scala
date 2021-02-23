@@ -47,8 +47,6 @@ class SquadBatch {
     val squadsEligibleForUnit = eligibleSquads.filter(_.squad.goal.candidateWelcome(this, freelancer))
 
     if (squadsEligibleForUnit.isEmpty) {
-      //This is happening a lot and producing log spam
-      //With.logger.warn("No eligible squads accept " + freelancer + ". Eligible squads remaining: " + eligibleSquads + " out of total squads " + squads)
       return
     }
 

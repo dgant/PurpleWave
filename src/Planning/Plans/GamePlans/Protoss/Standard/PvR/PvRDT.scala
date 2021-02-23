@@ -8,7 +8,6 @@ import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvP2GateDT
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -17,6 +16,7 @@ import Planning.Plans.Placement.BuildCannonsAtNatural
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy._
+import Planning.Tactics.DefendFightersAgainstRush
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvRDT

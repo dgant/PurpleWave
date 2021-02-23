@@ -1,5 +1,5 @@
 
-package Planning.Plans.Army
+package Planning.Tactics
 
 import Lifecycle.With
 import Micro.Squads.Goals.GoalAttack

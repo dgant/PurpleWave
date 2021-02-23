@@ -6,7 +6,6 @@ import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.PumpMutalisks
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
@@ -16,6 +15,7 @@ import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.Tactics.DefendFightersAgainstRush
 import Planning.UnitMatchers.MatchHatcherylike
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Zerg

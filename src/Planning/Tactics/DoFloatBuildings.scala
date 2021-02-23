@@ -1,4 +1,4 @@
-package Planning.Plans.Army
+package Planning.Tactics
 
 import Lifecycle.With
 import Micro.Agency.Intention
@@ -11,19 +11,16 @@ class DoFloatBuildings extends Prioritized {
 
   val floaties: LockUnits = new LockUnits
   floaties.counter.set(CountEverything)
+
   def update() {
     floaties.matcher.set(MatchOr(With.blackboard.floatableBuildings(): _*))
     floaties.acquire(this)
     floaties.units.foreach(floatie => {
       if (floatie.flying) {
-        With.squads.freelance(floatie)
-      }
-      else {
-        floatie.agent.intend(this, new Intention {
-          canLiftoff = true
-        })
+        // TODO: Make recruitable!
+      } else {
+        floatie.agent.intend(this, new Intention { canLiftoff = true })
       }
     })
-
   }
 }

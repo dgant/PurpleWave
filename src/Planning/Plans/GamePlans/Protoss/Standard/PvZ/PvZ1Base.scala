@@ -10,7 +10,6 @@ import Planning.Plans.Basic.{NoPlan, WriteStatus}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
 import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.MeldArchonsUntilStorm
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders._
@@ -22,6 +21,7 @@ import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
+import Planning.Tactics.DefendFightersAgainstRush
 import Planning.UnitMatchers.{MatchAntiAir, MatchWarriors}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss._

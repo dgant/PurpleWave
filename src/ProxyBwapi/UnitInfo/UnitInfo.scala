@@ -1,8 +1,7 @@
 package ProxyBwapi.UnitInfo
 
 import Debugging.Visualizations.Colors
-import Information.Battles.Clustering.BattleCluster
-import Information.Battles.MCRS.MCRSUnit
+import Information.Battles.Prediction.Simulation.ReportCard
 import Information.Battles.Types.{BattleLocal, Team}
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
@@ -30,7 +29,8 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   def friendly  : Option[FriendlyUnitInfo]  = None
   def foreign   : Option[ForeignUnitInfo]   = None
 
-  @inline override final def toString: String = f"${if (isFriendly) "Our" else if (isEnemy) "Foe" else "Neutral"} $unitClass ${if (selected) "*" else ""} #$id $hitPoints/${unitClass.maxHitPoints} ${if (shieldPoints > 0) f"($shieldPoints/${unitClass.maxShields})" else ""} $tile $pixel"
+  @inline final override val hashCode: Int = id + With.frame * 10000
+  @inline final override def toString: String = f"${if (isFriendly) "Our" else if (isEnemy) "Foe" else "Neutral"} $unitClass ${if (selected) "*" else ""} #$id $hitPoints/${unitClass.maxHitPoints} ${if (shieldPoints > 0) f"($shieldPoints/${unitClass.maxShields})" else ""} $tile $pixel"
 
   @inline final def is(unitMatcher: UnitMatcher): Boolean = unitMatcher.apply(this)
   @inline final def isPrerequisite(unitMatcher: UnitMatcher): Boolean = (
@@ -41,17 +41,6 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   @inline final def isNone(unitMatchers: UnitMatcher*): Boolean = ! unitMatchers.exists(_.apply(this))
   @inline final def isAny(unitMatchers: UnitMatcher*): Boolean = unitMatchers.exists(_.apply(this))
   @inline final def isAll(unitMatchers: UnitMatcher*): Boolean = unitMatchers.forall(_.apply(this))
-
-  //////////////////
-  // Statefulness //
-  //////////////////
-
-  val mcrs: MCRSUnit = new MCRSUnit(this)
-
-  // Used in clustering; attached to unit for performance to avoid use of sets/maps
-  var clusteringEnabled: Boolean = _
-  var clusteringRadiusSquared: Double = _
-  var cluster: Option[BattleCluster] = _
 
   val frameDiscovered           : Int = With.frame
   val initialHitPoints          : Int = bwapiUnit.getHitPoints
@@ -88,7 +77,6 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   }
 
   @inline final def aliveAndComplete: Boolean = alive && complete
-
   @inline final def energyMax     : Int = unitClass.maxEnergy // TODO: Count effects of upgrades
   @inline final def mineralsLeft  : Int = if (unitClass.isMinerals) resourcesLeft else 0
   @inline final def gasLeft       : Int = if (unitClass.isGas)      resourcesLeft else 0
@@ -121,39 +109,27 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
     producer.filter(_.isPrioritized)
   }
 
-  //////////////
-  // Geometry //
-  //////////////
-
-  @inline final def x: Int = pixel.x
-  @inline final def y: Int = pixel.y
-
-  @inline final def left    : Int = x - unitClass.dimensionLeft
-  @inline final def right   : Int = x + unitClass.dimensionRight
-  @inline final def top     : Int = y - unitClass.dimensionUp
-  @inline final def bottom  : Int = y + unitClass.dimensionDown
-
+  @inline final def x           : Int   = pixel.x
+  @inline final def y           : Int   = pixel.y
+  @inline final def left        : Int   = x - unitClass.dimensionLeft
+  @inline final def right       : Int   = x + unitClass.dimensionRight
+  @inline final def top         : Int   = y - unitClass.dimensionUp
+  @inline final def bottom      : Int   = y + unitClass.dimensionDown
   @inline final def topLeft     : Pixel = Pixel(left, top)
   @inline final def topRight    : Pixel = Pixel(right, top)
   @inline final def bottomLeft  : Pixel = Pixel(left, bottom)
   @inline final def bottomRight : Pixel = Pixel(right, bottom)
-  @inline final def corners: Vector[Pixel] = Vector(topLeft, topRight, bottomLeft, bottomRight)
-
-  @inline final def tiles:                Seq[Tile]     = cacheTiles()
-  @inline final def tileArea:             TileRectangle = cacheTileArea()
-  @inline final def addonArea:            TileRectangle = TileRectangle(Tile(0, 0), Tile(2, 2)).add(tileTopLeft).add(4,1)
+  @inline final def corners   : Vector[Pixel] = Vector(topLeft, topRight, bottomLeft, bottomRight)
+  @inline final def tiles     : Seq[Tile]     = cacheTiles() // TODO: Set this on type/pixel change
+  @inline final def tileArea  : TileRectangle = cacheTileArea() // TODO: Set this on type/pixel change
+  @inline final def addonArea : TileRectangle = TileRectangle(Tile(0, 0), Tile(2, 2)).add(tileTopLeft).add(4,1)
 
   private def tileCacheDuration: Int = { if (unitClass.isBuilding) (if (unitClass.canFly) 24 * 5 else 24 * 60) else 1 }
   private lazy val cacheTileArea = new Cache(() => unitClass.tileArea.add(tileTopLeft), refreshPeriod = tileCacheDuration)
   private lazy val cacheTiles = new Cache(() => cacheTileArea().tiles.toVector, refreshPeriod = tileCacheDuration)
 
-  @inline final def zone: Zone = cacheZone()
-
-  // Hack to get buildings categorized in zone they were intended to be constructed in
-  private val cacheZone = new Cache(() => if (unitClass.isBuilding) topLeft.zone else pixel.zone)
-
-  @inline final def base: Option[Base] = cacheBase()
-  private val cacheBase = new Cache(() => pixel.base)
+  @inline final def zone: Zone = if (unitClass.isBuilding) tileTopLeft.zone else tile.zone // Hack to get buildings categorized in zone they were intended to be constructed in
+  @inline final def base: Option[Base] = tile.base
 
   @inline final def pixelRangeMin: Double = unitClass.groundMinRangeRaw
   @inline final def pixelRangeAir: Double = pixelRangeAirCache()
@@ -165,7 +141,6 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
       (if (is(Terran.Goliath)   && player.hasUpgrade(Terran.GoliathAirRange)) 96.0 else 0.0) +
       (if (is(Protoss.Dragoon)  && player.hasUpgrade(Protoss.DragoonRange))   64.0 else 0.0) +
       (if (is(Zerg.Hydralisk)   && player.hasUpgrade(Zerg.HydraliskRange))    32.0 else 0.0))
-
   @inline final def pixelRangeGround: Double = pixelRangeGroundCache()
   private val pixelRangeGroundCache = new Cache(() =>
     unitClass.pixelRangeGround +
@@ -198,8 +173,6 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   @inline final def pixelDistanceTravelling (destination: Tile)               : Double  = pixelDistanceTravelling(pixel, destination.pixelCenter)
   @inline final def pixelDistanceTravelling (from: Pixel, to: Pixel)          : Double  = if (flying) from.pixelDistance(to) else from.nearestWalkableTile.groundPixels(to.nearestWalkableTile)
 
-  @inline final def velocity: Force = Force(velocityX, velocityY)
-
   @inline final def canMove: Boolean = canMoveCache()
   private val canMoveCache = new Cache(() =>
     (unitClass.canMove || (unitClass.isBuilding && flying))
@@ -207,7 +180,7 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
     && canDoAnything
     && ! burrowed
     && ! is(Terran.SiegeTankSieged))
-
+  @inline final def velocity: Force = Force(velocityX, velocityY)
   @inline final def topSpeed: Double = if (canMove) topSpeedPossibleCache() else 0
   @inline final def topSpeedPossible: Double = topSpeedPossibleCache()
   private val topSpeedPossibleCache = new Cache(() =>
@@ -224,8 +197,6 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
       (is(Zerg.Hydralisk)   && player.hasUpgrade(Zerg.HydraliskSpeed))    ||
       (is(Zerg.Ultralisk)   && player.hasUpgrade(Zerg.UltraliskSpeed)))
       1.5 else 1.0)))
-
-  @inline final def projectFrames(framesToLookAhead: Double): Pixel = pixel.projectUpTo(presumptiveStep, framesToLookAhead * topSpeed)
 
   @inline final def inTileRadius  (tiles: Int)  : Traversable[UnitInfo] = With.units.inTileRadius(tile, tiles)
   @inline final def inPixelRadius (pixels: Int) : Traversable[UnitInfo] = With.units.inPixelRadius(pixel, pixels)
@@ -267,6 +238,7 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
 
   @inline final def battle: Option[BattleLocal] = With.battles.byUnit.get(this).orElse(With.matchups.entrants.find(_._2.contains(this)).map(_._1))
   @inline final def team: Option[Team] = battle.map(_.teamOf(this))
+  @inline final def report: Option[ReportCard] = battle.flatMap(_.predictionAttack.debugReport.get(this))
   @inline var matchups: MatchupAnalysis = MatchupAnalysis(this)
 
   val targetBaseValue = new Cache(() => Target.getTargetBaseValue(this), 24)
@@ -384,17 +356,11 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
     output
   }
 
-  @inline final def dpfOnNextHitAgainst(enemy: UnitInfo): Double = {
-    if (unitClass.suicides) {
-      damageOnNextHitAgainst(enemy)
-    } else {
+  @inline final def dpfOnNextHitAgainst(enemy: UnitInfo): Double =
+    if (unitClass.suicides) damageOnNextHitAgainst(enemy) else {
       val cooldownVs = cooldownMaxAgainst(enemy)
-      if (cooldownVs == 0)
-        0.0
-      else
-        damageOnNextHitAgainst(enemy).toDouble / cooldownVs
+      if (cooldownVs == 0) 0.0 else damageOnNextHitAgainst(enemy).toDouble / cooldownVs
     }
-  }
 
   @inline final def canDoAnything: Boolean = canDoAnythingCache()
   private val canDoAnythingCache = new Cache(() =>
@@ -466,12 +432,7 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   @inline final def framesToGetInRange(enemy: UnitInfo)                 : Int = if (canAttack(enemy)) framesToTravelPixels(pixelsToGetInRange(enemy)) else Forever()
   @inline final def framesToGetInRange(enemy: UnitInfo, enemyAt: Pixel) : Int = if (canAttack(enemy)) framesToTravelPixels(pixelsToGetInRange(enemy, enemyAt)) else Forever()
   @inline final def framesBeforeAttacking(enemy: UnitInfo)              : Int = framesBeforeAttacking(enemy, enemy.pixel)
-  @inline final def framesBeforeAttacking(enemy: UnitInfo, at: Pixel)   : Int = {
-    if (canAttack(enemy)) {
-      Math.max(cooldownLeft, framesToGetInRange(enemy))
-    }
-    else Forever()
-  }
+  @inline final def framesBeforeAttacking(enemy: UnitInfo, at: Pixel)   : Int = if (canAttack(enemy))  Math.max(cooldownLeft, framesToGetInRange(enemy)) else Forever()
   @inline final def pixelsOfEntanglement(threat: UnitInfo): Double = {
     val speedTowardsThreat    = speedApproaching(threat)
     val framesToStopMe        = if(speedTowardsThreat <= 0) 0.0 else framesToStopRightNow
@@ -540,7 +501,6 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   @inline final def canStim: Boolean = unitClass.canStim && player.hasTech(Terran.Stim) && hitPoints > 10
 
   @inline final def moving: Boolean = velocityX != 0 || velocityY != 0
-
   @inline final def speed: Double = velocity.lengthFast
   @inline final def speedApproaching(other: UnitInfo): Double = speedApproaching(other.pixel)
   @inline final def speedApproaching(pixel: Pixel): Double = {
@@ -551,17 +511,13 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   }
   @inline final def speedApproachingEachOther(other: UnitInfo): Double = speedApproaching(other) + other.speedApproaching(this)
   @inline final def airborne: Boolean = flying || friendly.exists(_.transport.exists(_.flying))
-
-  ////////////
-  // Orders //
-  ////////////
-
   @inline final def gathering: Boolean = gatheringMinerals || gatheringGas
   @inline final def carrying: Boolean = carryingMinerals || carryingGas
 
   @inline final def presumptiveDestination: Pixel = if (isOurs) calculatePresumptiveDestination else presumptiveDestinationCached()
   @inline final def presumptiveStep: Pixel = if (isOurs) MicroPathing.getWaypointToPixel(this, presumptiveDestination) else presumptiveStepCached()
   @inline final def presumptiveTarget: Option[UnitInfo] = if (isOurs) calculatePresumptiveTarget else presumptiveTargetCached()
+  @inline final def projectFrames(framesToLookAhead: Double): Pixel = pixel.projectUpTo(presumptiveStep, framesToLookAhead * topSpeed)
   val presumptiveDestinationCached = new KeyedCache(() => calculatePresumptiveDestination, () => friendly.map(_.agent.destination))
   val presumptiveStepCached = new KeyedCache(() => MicroPathing.getWaypointToPixel(this, presumptiveDestinationCached()), () => presumptiveDestinationCached(), 240)
   val presumptiveTargetCached = new KeyedCache(() => calculatePresumptiveTarget, () => friendly.map(_.agent.toAttack))
@@ -601,27 +557,20 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   ////////////////
 
   def visibility: Visibility.Value
-
   @inline final def visibleToOpponents: Boolean = if (isEnemy) true else (
     tile.visibleToEnemy
     || With.framesSince(lastFrameTakingDamage) < Seconds(2)()
     || With.framesSince(lastFrameStartingAttack) < Seconds(2)())
-
   @inline final def likelyStillThere: Boolean = alive && visible || (
     visibility == Visibility.Visible
     || visibility == Visibility.InvisibleBurrowed
     || visibility == Visibility.InvisibleNearby)
-
   @inline final def cloakedOrBurrowed: Boolean = cloaked || burrowed
   @inline final def effectivelyCloaked: Boolean = (
     cloakedOrBurrowed
     && ! ensnared
     && ! plagued
     && (if (isFriendly) ! tile.enemyDetected else ! detected))
-  
-  /////////////
-  // Players //
-  /////////////
   
   @inline final def isOurs     : Boolean = player.isUs
   @inline final def isNeutral  : Boolean = player.isNeutral
@@ -630,17 +579,10 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   @inline final def isEnemyOf(otherUnit: UnitInfo): Boolean = (isFriendly && otherUnit.isEnemy) || (isEnemy && otherUnit.isFriendly)
   @inline final def isAllyOf(otherUnit: UnitInfo): Boolean = (isFriendly && otherUnit.isFriendly) || (isEnemy && otherUnit.isEnemy)
   
-  ///////////////////
-  // Visualization //
-  ///////////////////
-  
   @inline final def teamColor: Color =
     if      (visible)             player.colorBright
     else if (likelyStillThere)    player.colorMedium
     else if (alive)               player.colorMidnight
     else                          Colors.MidnightGray
-
-  @inline final override val hashCode: Int = id + With.frame * 10000
-
   @inline final val unitColor: Color = Colors.hsv(hashCode % 256, 255, 128 + (hashCode / 256) % 128)
 }

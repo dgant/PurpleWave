@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Protoss.Situational
+package Planning.Tactics
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap

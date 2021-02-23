@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Attack, DefendAgainstWorkerRush}
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Or}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}

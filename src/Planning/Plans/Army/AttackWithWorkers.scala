@@ -28,11 +28,9 @@ class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
     
     if ( ! haveSeenABase) {
       findStartLocation()
-    }
-    else if (With.geography.enemyBases.isEmpty && ! With.units.enemy.exists(unit => unit.unitClass.isBuilding && ! unit.flying)) {
+    } else if (With.geography.enemyBases.isEmpty && ! With.units.enemy.exists(unit => unit.unitClass.isBuilding && ! unit.flying)) {
       findBases()
-    }
-    else {
+    } else {
       tickle()
     }
   }

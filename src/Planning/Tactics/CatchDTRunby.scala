@@ -1,8 +1,7 @@
-package Planning.Plans.GamePlans.Protoss.Situational
+package Planning.Tactics
 
 import Lifecycle.With
 import Micro.Squads.Goals.GoalCatchDTRunby
-import Planning.Plans.Army.Squadify
 import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.Protoss

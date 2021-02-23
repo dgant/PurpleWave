@@ -5,7 +5,7 @@ import Macro.BuildRequests.Get
 import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.GamePlans.Protoss.Situational.{BuildHuggingNexus, DefendFightersAgainstRush}
+import Planning.Plans.GamePlans.Protoss.Situational.BuildHuggingNexus
 import Planning.Plans.Macro.Automatic.{PumpWorkers, _}
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}

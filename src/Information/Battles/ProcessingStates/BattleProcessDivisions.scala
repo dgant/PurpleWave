@@ -29,7 +29,7 @@ class BattleProcessDivisions extends BattleProcessState {
         battle.enemy.centroidGround().groundPixels(z.heart)))
 
     // Associate each group of enemies with the nearest base
-    val baseRelevancePixels = 32 * 50
+    val baseRelevancePixels = 32 * 40
     val enemiesAll = With.units.enemy.view.filter(BattleClassificationFilters.isEligibleLocal)
     val enemiesEmbattled = battles.view.map(_.enemy.units)
     val enemiesUnbattled = (enemiesAll.toSet -- battles.view.flatMap(_.enemy.units.view.flatMap(_.foreign)))

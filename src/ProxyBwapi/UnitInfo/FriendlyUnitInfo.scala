@@ -2,7 +2,7 @@ package ProxyBwapi.UnitInfo
 
 import Information.Grids.Combat.AbstractGridEnemyRange
 import Lifecycle.With
-import Micro.Agency.Agent
+import Micro.Agency.{Agent, Intention}
 import Micro.Squads.Squad
 import Performance.Cache
 import ProxyBwapi.Techs.{Tech, Techs}
@@ -40,7 +40,16 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(b
   def lastFrameOccupied: Int = _lastFrameOccupied
   def framesFailingToMove: Int = _framesFailingToMove
 
+  lazy val agent: Agent = new Agent(this)
+  def intent: Intention = agent.intent
   def squad: Option[Squad] = _squadCache()
+  private val _squadCache = new Cache(() => {
+    val nextSquad = With.squads.all.find(_.units.contains(this))
+    if (nextSquad != _lastSquad) { _lastSquadChange = With.frame }
+    _lastSquad = nextSquad
+    _lastSquad
+  })
+
   def alliesSquad                   : Iterable[FriendlyUnitInfo]      = squad.map(_.units.view).filter(_ != this).getOrElse(Seq.empty)
   def alliesBattle                  : Iterable[FriendlyUnitInfo]      = battle.map(_.us.units.view.map(_.friendly).filter(_.nonEmpty).map(_.get)).getOrElse(Iterable.empty).filter(_ != this)
   def alliesAll                     : Iterable[FriendlyUnitInfo]      = With.units.ours.filter(_ != this)
@@ -63,15 +72,6 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(b
   def enemiesBattleOrSquadOrAll     : Iterable[UnitInfo]              = if (enemiesBattle.nonEmpty) enemiesBattle else if (enemiesSquad.nonEmpty) enemiesSquad else enemiesAll
   def enemiesSquadOrBattle          : Iterable[UnitInfo]              = if (enemiesSquad.nonEmpty) enemiesSquad else enemiesBattle
   def enemiesSquadOrBattleOrAll     : Iterable[UnitInfo]              = if (enemiesSquad.nonEmpty) enemiesSquad else if (enemiesBattle.nonEmpty) enemiesBattle else enemiesAll
-
-
-  lazy val agent: Agent = new Agent(this)
-  private val _squadCache = new Cache(() => {
-    val nextSquad = With.squads.all.find(_.units.contains(this))
-    if (nextSquad != _lastSquad) { _lastSquadChange = With.frame }
-    _lastSquad = nextSquad
-    _lastSquad
-  })
   
   def buildUnit     : Option[UnitInfo]  = With.units.get(base.getBuildUnit)
   def techingType   : Tech              = Techs.get(base.getTech)

@@ -7,7 +7,6 @@ import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.PumpMutalisks
 import Planning.Plans.GamePlans.Zerg.ZvZ.ZvZIdeas
 import Planning.Plans.Macro.Automatic._
@@ -18,6 +17,7 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones.{TechComplete, TechStarted, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy._
+import Planning.Tactics.DefendFightersAgainstRush
 import Planning.UnitMatchers.MatchOr
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.ZvR9Pool

@@ -2,11 +2,10 @@ package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Attack, DefendAgainstWorkerRush}
+import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.Situational.DefendAgainstProxy
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -15,6 +14,7 @@ import Planning.Plans.Scouting.{ScoutAt, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones.{BasesAtLeast, GasForUpgrade, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.Tactics.DefendAgainstProxy
 import Planning.UnitMatchers.MatchGroundWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Zerg}

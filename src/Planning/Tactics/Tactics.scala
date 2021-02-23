@@ -4,7 +4,7 @@ import Lifecycle.With
 import Performance.Tasks.TimedTask
 import Planning.Plans.Army._
 import Planning.Plans.Compound.If
-import Planning.Plans.GamePlans.Protoss.Situational.{CatchDTRunby, DefendAgainstProxy, DefendFFEWithProbes, DefendFightersAgainstRush}
+import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
 import Planning.Plans.Macro.Automatic.Gather
 import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
 import Planning.Plans.Scouting.{DoScoutWithWorkers, ScoutExpansions, ScoutWithOverlord}
@@ -70,7 +70,16 @@ class Tactics extends TimedTask {
   }
 
   private def runCoreTactics(): Unit = {
-
+    val divisions = With.battles.divisions.filter(d =>
+      if (With.blackboard.wantToAttack()) true
+      else d.bases.exists(_.owner.isUs))
+    // We're killing freelancer drafting for top-down approach:
+    // 1. Sort divisions by descending importance
+    // 2. Pick a squad for each
+    // 3a. Attempt to fill each squad
+    // 3b. Squads that fail to fill go to low-pri queue
+    // 3c. NOT SURE IF BEST: If all squads fail to fill, replace queue with low-pri queue
+    // 4. Assign remaining units to nearest squad
   }
 
   private def runBackgroundSquads(): Unit = {

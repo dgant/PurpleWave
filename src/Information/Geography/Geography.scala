@@ -54,7 +54,7 @@ class Geography extends TimedTask {
       .getOrElse(bases.minBy(_.townHallTile.groundPixels(ourMain.townHallTile)))))
   
   def zoneByTile(tile: Tile): Zone = if (tile.valid) zoneByTileCacheValid(tile.i) else zoneByTileCacheInvalid(tile)
-  def baseByTile(tile: Tile): Option[Base] = if (tile.valid) baseByTileCacheValid(tile.i) else None
+  def baseByTile(tile: Tile): Option[Base] = if (tile.valid) baseByTileCacheValid(tile.i) else ByOption.minBy(zoneByTileCacheInvalid(tile).bases)(_.heart.tileDistanceSquared(tile))
 
   private lazy val zoneByTileCacheValid = allTiles.map(tile => zones.find(_.tiles.contains(tile)).getOrElse(getZoneForTile(tile)))
   private lazy val baseByTileCacheValid = allTiles.map(getBaseForTile)

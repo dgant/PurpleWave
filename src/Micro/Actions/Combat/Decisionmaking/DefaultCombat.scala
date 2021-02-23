@@ -73,7 +73,7 @@ object DefaultCombat extends Action {
   def retreat(unit: FriendlyUnitInfo): Boolean = {
     // Retreat, but potshot if we're trapped
     val retreat = Retreat.getRetreat(unit)
-    if (unit.unitClass.fallbackAllowed) {
+    if (unit.unitClass.fallbackAllowed && ! unit.loaded) {
       val retreatDistance = unit.pixelDistanceCenter(retreat.to)
       val retreatStep = unit.pixel.project(retreat.to, Math.min(retreatDistance, 40 + Math.max(0, unit.matchups.pixelsOfEntanglement)))
       if (unit.matchups.threats.exists(threat => threat.inRangeToAttack(unit, retreatStep))) {

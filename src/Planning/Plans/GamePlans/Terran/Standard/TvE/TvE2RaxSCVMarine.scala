@@ -6,7 +6,6 @@ import Planning.Plans.Army._
 import Planning.Plans.Basic.{NoPlan, Write}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
 import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.BuildOrder
@@ -16,6 +15,7 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.{EnemiesAtLeast, FoundEnemyBase, UnitsAtLeast}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.Tactics.DefendFightersAgainstRush
 import Planning.UnitCounters.CountExcept
 import Planning.UnitMatchers.{MatchMobile, MatchWorkers}
 import Planning.{Plan, Predicate}

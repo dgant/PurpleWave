@@ -5,7 +5,6 @@ import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.{Attack, AttackWithWorkers}
 import Planning.Plans.Compound.{If, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
 import Planning.Plans.GamePlans.Terran.Situational.RepairBunker
 import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic.Pump
@@ -16,7 +15,8 @@ import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound._
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
-import Planning.UnitCounters.{CountUpTo, CountExcept}
+import Planning.Tactics.DefendFightersAgainstRush
+import Planning.UnitCounters.{CountExcept, CountUpTo}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran.TvZ8Rax

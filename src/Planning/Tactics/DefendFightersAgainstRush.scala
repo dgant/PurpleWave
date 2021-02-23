@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Protoss.Situational
+package Planning.Tactics
 
 import Lifecycle.With
 import Mathematics.PurpleMath

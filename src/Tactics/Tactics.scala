@@ -1,19 +1,13 @@
-package Planning.Tactics
+package Tactics
 
 import Lifecycle.With
 import Performance.Tasks.TimedTask
 import Planning.Plans.Army._
-import Planning.Plans.Compound.If
-import Planning.Plans.GamePlans.Protoss.Situational.DefendFightersAgainstRush
-import Planning.Plans.Macro.Automatic.Gather
-import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
 import Planning.Plans.Scouting.{DoScoutWithWorkers, ScoutExpansions, ScoutWithOverlord}
-import Planning.Predicates.Compound.Check
 
 class Tactics extends TimedTask {
   private lazy val clearBurrowedBlockers      = new ClearBurrowedBlockers
   private lazy val followBuildOrder           = new FollowBuildOrder
-  private lazy val yolo                       = new If(new Check(() => With.yolo.active()), new Attack)
   private lazy val ejectScout                 = new EjectScout
   private lazy val scoutWithOverlord          = new ScoutWithOverlord
   private lazy val defendAgainstProxy         = new DefendAgainstProxy
@@ -51,7 +45,6 @@ class Tactics extends TimedTask {
   private def runPrioritySquads(): Unit = {
     clearBurrowedBlockers.update()
     followBuildOrder.update()
-    yolo.update()
     ejectScout.update()
     scoutWithOverlord.update()
     With.blackboard.scoutPlan().update()
@@ -73,6 +66,10 @@ class Tactics extends TimedTask {
     val divisions = With.battles.divisions.filter(d =>
       if (With.blackboard.wantToAttack()) true
       else d.bases.exists(_.owner.isUs))
+    divisions
+      .sortBy( ! _.bases.exists(_.owner.isEnemy))
+      // TODO: Sort by "We want to expand here"
+      .sortBy( ! _.bases.exists(_.owner.isUs))
     // We're killing freelancer drafting for top-down approach:
     // 1. Sort divisions by descending importance
     // 2. Pick a squad for each

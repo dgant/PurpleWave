@@ -1,5 +1,6 @@
 package Micro.Coordination.Pushing
 
+import Debugging.ToString
 import Debugging.Visualizations.Rendering.DrawMap
 import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, Tile}
@@ -30,5 +31,5 @@ trait Push {
     DrawMap.label(priority.toString, center, drawBackground = true, backgroundColor = priority.color)
   }
 
-  override def toString: String = getClass.getSimpleName.replace("%", "").replace("Push", "")
+  override val toString: String = ToString(this).replace("Push", "")
 }

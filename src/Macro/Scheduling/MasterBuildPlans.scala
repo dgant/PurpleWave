@@ -3,7 +3,7 @@ package Macro.Scheduling
 import Lifecycle.With
 import Macro.Buildables.Buildable
 import Planning.Plans.Macro.Build._
-import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
+import Tactics.FollowBuildOrder
 import Utilities.ByOption
 
 import scala.collection.mutable

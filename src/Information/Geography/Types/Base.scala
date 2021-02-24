@@ -14,6 +14,7 @@ import scala.collection.mutable
 class Base(val townHallTile: Tile)
 {
   lazy val  zone            : Zone              = With.geography.zoneByTile(townHallTile)
+  lazy val  metro           : Metro             = With.geography.metros.find(_.bases.contains(this)).get
   lazy val  townHallArea    : TileRectangle     = Protoss.Nexus.tileArea.add(townHallTile)
   lazy val  isStartLocation : Boolean           = With.geography.startLocations.contains(townHallTile)
   lazy val  isOurMain       : Boolean           = With.geography.ourMain == this
@@ -115,7 +116,7 @@ class Base(val townHallTile: Tile)
   def resources: Vector[UnitInfo] = minerals ++ gas
   def natural: Option[Base] = With.geography.bases.find(_.isNaturalOf.contains(this))
   
-  override def toString: String = description + " " + name + ", " + zone.name + " " + heart
+  override def toString: String = f"description $name, ${zone.name} $heart"
 
   def description: String = (
     if (this == With.geography.ourMain) "Our main"

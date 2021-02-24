@@ -1,6 +1,6 @@
 package Information.Geography.Calculations
 
-import Information.Geography.Types.{Base, Edge, Zone}
+import Information.Geography.Types.{Base, Edge, Metro, Zone}
 import Lifecycle.With
 import Mathematics.Points.{Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
@@ -43,6 +43,36 @@ object ZoneBuilder {
       base.name = nameQ.dequeue
     })
     bases
+  }
+
+  private def metroDistance(origin: Metro, other: Metro): Double = {
+    val originBases = if (origin.main.isDefined) origin.main ++ origin.natural else origin.bases
+    other.bases.view.flatMap(b => originBases.map(o => (o, b))).map(p => p._1.heart.groundPixels(p._2.heart)).min
+  }
+  def metros: Iterable[Metro] = {
+    val mainMetros = With.geography.startBases.map(main => Metro(Seq(main) ++ main.natural))
+    val otherMetros = With.geography.bases
+      .filterNot(base => mainMetros.exists(_.bases.contains(base)))
+      .sortBy(base => With.geography.startLocations.map(_.groundPixels(base.heart)).min)
+      .map(base => Metro(Seq(base)))
+    var metros = mainMetros ++ otherMetros
+    var i = 0
+    while(i < metros.length) {
+      val metro = metros(i)
+      if (metro.main.isDefined) {
+        i += 1
+      } else {
+        val closestMetro = metros.take(i).minBy(metroDistance(_, metro))
+        val closestMetroDistance = metroDistance(closestMetro, metro)
+        if (closestMetroDistance < 32 * 30) {
+          val j = metros.indexOf(closestMetro)
+          metros = metros.take(j) ++ Vector(closestMetro.merge(metro)) ++ metros.drop(j + 1).filterNot(_ == metro)
+        } else {
+          i += 1
+        }
+      }
+    }
+    metros
   }
   
   def mapObviousTilesToZones(zones: Iterable[Zone]) {

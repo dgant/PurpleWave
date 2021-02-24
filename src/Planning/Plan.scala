@@ -1,5 +1,6 @@
 package Planning
 
+import Debugging.ToString
 import Lifecycle.With
 
 class Plan extends Prioritized {
@@ -24,10 +25,7 @@ class Plan extends Prioritized {
     child.update()
   }
   
-  final lazy val realName: String = {
-    val name = getClass.getSimpleName
-    if (name.contains("$anon$")) "" else name
-  }
+  final lazy val realName: String = ToString(this)
   
   final override def toString: String =
     if (realName == "")

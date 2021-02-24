@@ -1,4 +1,4 @@
-package Planning.Plans.Macro.BuildOrders
+package Tactics
 
 import Lifecycle.With
 import Planning.Prioritized

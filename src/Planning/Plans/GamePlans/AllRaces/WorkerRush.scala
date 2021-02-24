@@ -8,7 +8,6 @@ import Planning.Plans.Basic.Do
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.StandardGamePlan
 import Planning.Plans.Macro.Automatic.{Pump, RequireSufficientSupply}
-import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
 import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemiesAtMost, FoundEnemyBase}
@@ -19,6 +18,7 @@ import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchWorkers}
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.AllRaces.{WorkerRushContinuousProduction, WorkerRushImmediate, WorkerRushOnScout, WorkerRushOnSupplyBlock}
+import Tactics.FollowBuildOrder
 
 class WorkerRush extends Trigger {
 

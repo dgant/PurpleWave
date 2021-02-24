@@ -14,7 +14,7 @@ import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Milestones.{UnitsAtLeast, UpgradeComplete}
 import Planning.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy}
-import Planning.Tactics.DefendFightersAgainstRush
+import Tactics.DefendFightersAgainstRush
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvR2Gate4Gate

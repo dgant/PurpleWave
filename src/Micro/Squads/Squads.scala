@@ -1,8 +1,9 @@
 package Micro.Squads
 
+import Performance.Tasks.TimedTask
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class Squads {
+class Squads extends TimedTask {
 
   private var batchActive: SquadBatch = new SquadBatch
   private var batchNext: SquadBatch = new SquadBatch
@@ -29,7 +30,7 @@ class Squads {
     }
   }
 
-  def run() {
+  override protected def onRun(budgetMs: Long): Unit = {
     all.foreach(_.run())
   }
 }

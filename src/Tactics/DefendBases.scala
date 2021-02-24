@@ -1,4 +1,4 @@
-package Planning.Tactics
+package Tactics
 
 import Information.Battles.Types.Division
 import Information.Geography.Types.Base

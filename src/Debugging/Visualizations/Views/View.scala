@@ -1,10 +1,11 @@
 package Debugging.Visualizations.Views
 
+import Debugging.ToString
 import Lifecycle.With
 
 abstract class View {
   
-  lazy val name: String = getClass.getSimpleName.replace("$", "").replace("Show", "")
+  lazy val name: String = ToString(this).replace("Show", "")
   
   def renderScreen(): Unit = {}
   def renderMap(): Unit = {}

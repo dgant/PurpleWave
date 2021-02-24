@@ -1,4 +1,4 @@
-package Planning.Tactics
+package Tactics
 
 class WorkerPulls {
 

@@ -16,7 +16,7 @@ import Planning.Plans.Placement.BuildCannonsAtNatural
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy._
-import Planning.Tactics.DefendFightersAgainstRush
+import Tactics.DefendFightersAgainstRush
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvRDT

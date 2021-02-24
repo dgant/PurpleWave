@@ -29,7 +29,7 @@ object ShowDesire extends View {
         unit.mcrs.dpsGround().toInt * 10,
         unit.mcrs.strengthGround().toInt / 100),
       unit.pixel,
-      true,
+      drawBackground = true,
       if (unit.mcrs.shouldFight) Colors.DarkGreen else Colors.DarkRed)
   }
   

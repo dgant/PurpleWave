@@ -15,7 +15,7 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.{EnemiesAtLeast, FoundEnemyBase, UnitsAtLeast}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.Tactics.DefendFightersAgainstRush
+import Tactics.DefendFightersAgainstRush
 import Planning.UnitCounters.CountExcept
 import Planning.UnitMatchers.{MatchMobile, MatchWorkers}
 import Planning.{Plan, Predicate}

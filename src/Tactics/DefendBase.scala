@@ -1,4 +1,4 @@
-package Planning.Tactics
+package Tactics
 
 import Information.Geography.Types.Base
 import Lifecycle.With

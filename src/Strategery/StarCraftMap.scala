@@ -1,14 +1,12 @@
 package Strategery
 
+import Debugging.ToString
 import Lifecycle.With
 abstract class StarCraftMap {
-  
-  val name: String = this.getClass.getSimpleName
-  val nameStub  = StarCraftMapMatcher.clean(name)
-
+  val name: String = ToString(this)
+  val nameStub: String = StarCraftMapMatcher.clean(name)
   def matches: Boolean = nameStub.contains(With.mapId) || With.mapId.contains(nameStub)
-  
-  val mineralWalkingOkay: Boolean = true
+  var mineralWalkingOkay: Boolean = true
 }
 object Alchemist extends StarCraftMap
 object Arcadia extends StarCraftMap
@@ -20,7 +18,7 @@ object Eddy extends StarCraftMap
 object EmpireOfTheSun extends StarCraftMap
 object Gladiator extends StarCraftMap
 object GoldRush extends StarCraftMap
-object GreatBarrierReef extends StarCraftMap { override val mineralWalkingOkay = false }
+object GreatBarrierReef extends StarCraftMap { mineralWalkingOkay = false }
 object Heartbreak extends StarCraftMap
 object Hitchhiker extends StarCraftMap
 object Hunters extends StarCraftMap

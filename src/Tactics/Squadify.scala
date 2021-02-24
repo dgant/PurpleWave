@@ -1,4 +1,4 @@
-package Planning.Tactics
+package Tactics
 
 import Micro.Squads.Goals.SquadGoal
 import Micro.Squads.Squad

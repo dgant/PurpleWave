@@ -1,11 +1,12 @@
 package Micro.Actions
 
+import Debugging.ToString
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 abstract class Action {
   
-  val name: String = getClass.getSimpleName.replaceAllLiterally("$", "")
+  val name: String = ToString(this)
 
   protected def requiresReadiness: Boolean = true
   

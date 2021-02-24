@@ -1,5 +1,6 @@
 package Information.Fingerprinting
 
+import Debugging.ToString
 import Lifecycle.With
 import Utilities.{Forever, Minutes}
 
@@ -25,7 +26,5 @@ abstract class Fingerprint {
     }
   }
   
-  override val toString: String = {
-    getClass.getSimpleName.replaceAllLiterally("$", "")
-  }
+  override val toString: String = ToString(this)
 }

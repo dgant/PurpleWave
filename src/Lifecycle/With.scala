@@ -18,7 +18,7 @@ import Micro.Matchups.MatchupGraph
 import Micro.Squads.Squads
 import Performance.TaskQueue.{TaskQueueGlobal, TaskQueueParallel}
 import Placement.Preplacement
-import Planning.Tactics.Tactics
+import Tactics.Tactics
 import Planning.{Blackboard, Yolo}
 import ProxyBwapi.Bullets.Bullets
 import ProxyBwapi.Players.{PlayerInfo, Players}

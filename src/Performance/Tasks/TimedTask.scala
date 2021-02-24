@@ -1,5 +1,6 @@
 package Performance.Tasks
 
+import Debugging.ToString
 import Lifecycle.With
 import Performance.Cache
 import Utilities.ByOption
@@ -14,7 +15,7 @@ abstract class TimedTask {
   var weight      : Int     = 1
   var cosmetic    : Boolean = false
   var alwaysSafe  : Boolean = false
-  var name        : String = if (getClass.getSimpleName.contains("anon")) getClass.getSuperclass.getSimpleName else getClass.getSimpleName
+  var name        : String  = ToString(this)
 
   private var lastRunFrame        : Int   = -1
   private var _runsTotal          : Int   = 0

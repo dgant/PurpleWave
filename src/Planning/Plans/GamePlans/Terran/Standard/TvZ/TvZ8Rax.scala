@@ -15,7 +15,7 @@ import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound._
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
-import Planning.Tactics.DefendFightersAgainstRush
+import Tactics.DefendFightersAgainstRush
 import Planning.UnitCounters.{CountExcept, CountUpTo}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}

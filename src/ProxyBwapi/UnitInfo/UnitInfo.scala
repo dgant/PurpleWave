@@ -1,6 +1,8 @@
 package ProxyBwapi.UnitInfo
 
 import Debugging.Visualizations.Colors
+import Information.Battles.Clustering.BattleCluster
+import Information.Battles.MCRS.MCRSUnit
 import Information.Battles.Prediction.Simulation.ReportCard
 import Information.Battles.Types.{BattleLocal, Team}
 import Information.Geography.Types.{Base, Zone}
@@ -239,7 +241,11 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   @inline final def battle: Option[BattleLocal] = With.battles.byUnit.get(this).orElse(With.matchups.entrants.find(_._2.contains(this)).map(_._1))
   @inline final def team: Option[Team] = battle.map(_.teamOf(this))
   @inline final def report: Option[ReportCard] = battle.flatMap(_.predictionAttack.debugReport.get(this))
-  @inline var matchups: MatchupAnalysis = MatchupAnalysis(this)
+  var matchups: MatchupAnalysis = MatchupAnalysis(this)
+  val mcrs: MCRSUnit = new MCRSUnit(this)
+  var clusteringEnabled: Boolean = _
+  var clusteringRadiusSquared: Double = _
+  var cluster: Option[BattleCluster] = _
 
   val targetBaseValue = new Cache(() => Target.getTargetBaseValue(this), 24)
 

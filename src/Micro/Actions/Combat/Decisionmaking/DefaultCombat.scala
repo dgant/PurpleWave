@@ -1,5 +1,6 @@
 package Micro.Actions.Combat.Decisionmaking
 
+import Debugging.ToString
 import Debugging.Visualizations.Forces
 import Lifecycle.With
 import Mathematics.Points.Pixel
@@ -24,7 +25,7 @@ object DefaultCombat extends Action {
 
   private abstract class Technique(val transitions: Technique*) {
     def canTransition(other: Technique): Boolean = transitions.contains(other)
-    override val toString: String = getClass.getSimpleName.replace("$", "")
+    override val toString: String = ToString(this)
   }
   private object Aim        extends Technique // Stand in place and shoot
   private object Dodge      extends Technique // Heed pushes

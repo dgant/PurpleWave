@@ -1,5 +1,6 @@
 package Strategery.Strategies
 
+import Debugging.ToString
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.Plan
@@ -8,7 +9,7 @@ import bwapi.Race
 
 abstract class Strategy {
   
-  override val toString: String = getClass.getSimpleName.replace("$", "")
+  override val toString: String = ToString(this)
   
   def gameplan: Option[Plan] = { None }
   

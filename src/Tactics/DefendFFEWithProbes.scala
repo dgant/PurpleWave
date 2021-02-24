@@ -1,4 +1,4 @@
-package Planning.Tactics
+package Tactics
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap

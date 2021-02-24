@@ -85,13 +85,11 @@ class Logger {
     }
   }
   
-  private def formatException(exception: Exception): String = {
-    exception.getClass.getSimpleName + "\n" +
-    exception.getMessage + "\n" +
-    exception.getStackTrace.map(stackElement => {
-      stackElement.getClassName + "." +
-      stackElement.getMethodName + "(): " +
-      stackElement.getLineNumber
-    }).mkString("\n")
-  }
+  private def formatException(exception: Exception): String = (
+    f"{ToString(exception.getClass)}\n"
+    + f"{exception.getMessage}\n"
+    + exception
+      .getStackTrace
+      .map(stackElement => f"{stackElement.getClassName}.${stackElement.getMethodName}(): ${stackElement.getLineNumber}")
+      .mkString("\n"))
 }

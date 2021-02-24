@@ -1,10 +1,11 @@
 package Performance.TaskQueue
+import Debugging.ToString
 import Information.Grids.AbstractGrid
 import Lifecycle.With
 import Performance.Tasks._
 
 class GridTask[T](grid: AbstractGrid[T]) extends SimpleTask(grid.update) {
-  withName(grid.getClass.getSimpleName)
+  withName(ToString(this))
 }
 
 class TaskQueueGrids extends TaskQueueParallel(

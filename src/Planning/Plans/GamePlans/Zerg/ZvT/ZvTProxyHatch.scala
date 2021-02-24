@@ -9,7 +9,7 @@ import Planning.Plans.Basic.Do
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.{UpgradeContinuously, _}
-import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
+import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.BuildGasPumps
 import Planning.Plans.Placement.ProposePlacement
 import Planning.Plans.Scouting.ScoutAt
@@ -20,6 +20,7 @@ import Planning.ProxyPlanner
 import Planning.UnitCounters.CountUpTo
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.{ZvTProxyHatchHydras, ZvTProxyHatchSunkens, ZvTProxyHatchZerglings}
+import Tactics.FollowBuildOrder
 
 class ZvTProxyHatch extends Parallel {
   

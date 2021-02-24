@@ -7,7 +7,7 @@ import Micro.Agency.Intention
 import Performance.Cache
 import Performance.TaskQueue.TaskQueueGlobalWeights
 import Performance.Tasks.TimedTask
-import Planning.Plans.Macro.Automatic.Gather
+import Tactics.Gather
 import Planning.{Plan, Prioritized}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption

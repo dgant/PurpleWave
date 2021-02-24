@@ -14,7 +14,7 @@ import Planning.Plans.Scouting.{ScoutAt, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones.{BasesAtLeast, GasForUpgrade, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.Tactics.DefendAgainstProxy
+import Tactics.DefendAgainstProxy
 import Planning.UnitMatchers.MatchGroundWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Zerg}

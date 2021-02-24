@@ -1,7 +1,7 @@
 package Information.Geography
 
 import Information.Geography.Calculations.{ZoneBuilder, ZoneUpdater}
-import Information.Geography.Types.{Base, Edge, Zone}
+import Information.Geography.Types.{Base, Edge, Metro, Zone}
 import Lifecycle.With
 import Mathematics.Points.{SpecificPoints, Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
@@ -24,6 +24,7 @@ class Geography extends TimedTask {
   lazy val zones              : Vector[Zone]          = ZoneBuilder.zones.toVector
   lazy val edges              : Vector[Edge]          = ZoneBuilder.edges.toVector
   lazy val bases              : Vector[Base]          = ZoneBuilder.bases.toVector
+  lazy val metros             : Vector[Metro]         = ZoneBuilder.metros.toVector
   lazy val ourMain            : Base                  = With.geography.ourBases.find(_.isStartLocation).getOrElse(With.geography.bases.minBy(_.heart.tileDistanceFast(With.self.startTile)))
   lazy val rushDistances      : Vector[Double]        = startLocations.flatMap(s1 => startLocations.filterNot(_ == s1).map(s2 => s1.groundPixels(s2))).toSet.toVector
   def ourNatural              : Base                  = ourNaturalCache()

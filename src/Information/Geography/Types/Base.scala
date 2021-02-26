@@ -4,6 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.{PixelRay, Tile, TileRectangle}
 import Mathematics.PurpleMath
 import Performance.Cache
+import Planning.UnitMatchers.{MatchBuilding, MatchWorkers}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -19,6 +20,8 @@ class Base(val townHallTile: Tile)
   lazy val  isStartLocation : Boolean           = With.geography.startLocations.contains(townHallTile)
   lazy val  isOurMain       : Boolean           = With.geography.ourMain == this
   lazy val  tiles           : Set[Tile]         = zone.tiles.view.filter(t => t.tileDistanceSlow(heart) < With.geography.baseMaxRadiusTiles && ! zone.bases.view.filter(_.heart != heart).exists(_.heart.groundPixels(t) < heart.groundPixels(t))).toSet
+  lazy val  economicValue   : Cache[Double]     = new Cache(() => units.view.filter(_.isAny(MatchBuilding, MatchWorkers)).map(_.subjectiveValue).sum)
+  lazy val  plannedExpo     : Cache[Boolean]    = new Cache(() => With.units.ours.exists(_.agent.toBuildTile.exists(_.base.contains(this))))
   var       isNaturalOf     : Option[Base]      = None
   var       townHall        : Option[UnitInfo]  = None
   var       units           : Vector[UnitInfo]  = Vector.empty

@@ -1,4 +1,4 @@
-package Micro.Squads
+package Micro.Squads.QualityCounter
 
 import Mathematics.PurpleMath
 import Planning.UnitMatchers.UnitMatcher
@@ -28,7 +28,7 @@ class QualityCounter {
 
   protected def countUnitQuality(unit: UnitInfo, quality: Quality): Unit = {
     if (unit.is(quality)) {
-      // TODO: Scale by more appropriate value eg Wraith not as good as Siege Tank vs ground
+      // TODO: Scale by more appropriate value, eg. a Wraith not as good as a Siege Tank vs ground
       val value = unit.subjectiveValue
       (if (unit.isFriendly) qualitiesPossessed else qualitiesEnemy)(quality) += value.toInt
     }
@@ -40,9 +40,7 @@ class QualityCounter {
 
   // Captures the idea that if we have *no* units which serve a role, we really want at least one (eg anti-air, detector, etc)
   // but as we pass the amount we need, the marginal value rapidly declines
-  def scaleNeed(value: Double): Double = {
-    PurpleMath.clamp(value, 0.01, 100)
-  }
+  def scaleNeed(value: Double): Double = PurpleMath.clamp(value, 0.01, 100)
 
   def utility(unit: FriendlyUnitInfo): Double = {
     val utilitiesQualities = utilityQualities(unit)

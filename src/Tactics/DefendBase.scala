@@ -2,19 +2,13 @@ package Tactics
 
 import Information.Geography.Types.Base
 import Lifecycle.With
-import Micro.Squads.Goals.GoalDefendZone
-import Planning.UnitMatchers.MatchRecruitableForCombat
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 
-class DefendBase(base: Base) extends Squadify[GoalDefendZone] {
-  
-  val goal: GoalDefendZone = new GoalDefendZone
-  goal.unitMatcher = MatchRecruitableForCombat
-
+class DefendBase(base: Base) {
   var enemies: Seq[ForeignUnitInfo] = Seq.empty
   
-  override def update() {
+  def update() {
   
     if (enemies.size < 3 && enemies.forall(e => (e.unitClass.isWorker || ! e.canAttack) && ! e.isTransport)) {
       return
@@ -25,7 +19,5 @@ class DefendBase(base: Base) extends Squadify[GoalDefendZone] {
     }
 
     With.blackboard.defendingBase.set(true)
-    goal.zone = base.zone
-    super.update()
   }
 }

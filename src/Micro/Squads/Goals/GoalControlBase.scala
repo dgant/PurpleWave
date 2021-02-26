@@ -1,6 +1,7 @@
 package Micro.Squads.Goals
 
-import Information.Geography.Types.Zone
+import Information.Battles.Types.Division
+import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Mathematics.Formations.Designers.FormationZone
 import Mathematics.Formations.FormationAssigned
@@ -13,19 +14,19 @@ import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
-class GoalDefendZone extends SquadGoalBasic {
+class GoalControlBase(base: Base) extends SquadGoal {
 
-  override def inherentValue: Double = GoalValue.defendBase
+  private var _division = Division(Iterable.empty, Set(base))
+  def setDivision(division: Division): Unit = { _division = division }
 
   private var lastAction = "Defend "
 
   override def toString: String = lastAction + zone.name
-  override def destination: Pixel = _currentDestination
 
-  var zone: Zone = _
+  def destination: Pixel = _currentDestination
+
+  val zone: Zone = base.zone
   private var _currentDestination: Pixel = Pixel(0, 0)
-
-  private def zoneEnemies = With.units.enemy // TODO: Just base enemies!
 
   override def run() {
     lazy val base = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.scouting.threatOrigin))
@@ -38,9 +39,9 @@ class GoalDefendZone extends SquadGoalBasic {
       u.isOurs
         && u.unitClass.isStaticDefense
         && ( ! u.is(Protoss.ShieldBattery) || choke.forall(_.pixelCenter.pixelDistance(u.pixel) > 96 + u.effectiveRangePixels))
-        && (zoneEnemies.isEmpty || zoneEnemies.exists(u.canAttack)))
+        && (_division.enemies.isEmpty || _division.enemies.exists(u.canAttack)))
 
-    lazy val allowWandering = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || zoneEnemies.exists(_.unitClass.ranged) || With.blackboard.wantToAttack()
+    lazy val allowWandering = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || _division.enemies.exists(_.unitClass.ranged) || With.blackboard.wantToAttack()
     lazy val canHuntEnemies = huntableEnemies().nonEmpty
     lazy val canDefendChoke = (squad.units.size > 3 && choke.isDefined) || ! With.enemies.exists(_.isZerg)
     lazy val wallExistsButNoneNearChoke = walls.nonEmpty && walls.forall(wall =>
@@ -91,11 +92,11 @@ class GoalDefendZone extends SquadGoalBasic {
           < (exit.endPixels ++ exit.sidePixels :+ exit.pixelCenter).map(_.groundPixels(zone.centroid)).min))
 
   private val huntableEnemies = new Cache(() => {
-    val huntableInZone = zoneEnemies.filter(e => e.zone == zone && huntableFilter(e)) ++ zone.units.filter(u => u.isEnemy && u.unitClass.isGas)
-    if (huntableInZone.nonEmpty) huntableInZone else zoneEnemies.filter(huntableFilter)
+    val huntableInZone = _division.enemies.filter(e => e.zone == zone && huntableFilter(e)) ++ zone.units.filter(u => u.isEnemy && u.unitClass.isGas)
+    if (huntableInZone.nonEmpty) huntableInZone else _division.enemies.filter(huntableFilter)
   })
 
-  def huntEnemies() {
+  private def huntEnemies() {
     lazy val home = ByOption.minBy(zone.bases.filter(_.owner.isUs).map(_.heart))(_.groundPixels(zone.centroid))
       .orElse(ByOption.minBy(With.geography.ourBases.map(_.heart))(_.groundPixels(zone.centroid)))
       .getOrElse(With.geography.home)
@@ -122,7 +123,7 @@ class GoalDefendZone extends SquadGoalBasic {
     })
   }
 
-  def defendHeart(center: Pixel) {
+  private def defendHeart(center: Pixel) {
     _currentDestination = center
     val protectables  = center.zone.units.filter(u => u.isOurs && u.unitClass.isBuilding && u.hitPoints < 300 && (u.friendly.exists(_.knownToEnemy) || u.canAttack))
     val destination   = ByOption
@@ -142,12 +143,12 @@ class GoalDefendZone extends SquadGoalBasic {
       })})
   }
 
-  def defendChoke() {
+  private def defendChoke() {
     _currentDestination = zone.exit.map(_.pixelCenter).getOrElse(zone.centroid.pixelCenter)
-    assignToFormation(new FormationZone(zone, zoneEnemies.toSeq).form(squad.units.toSeq))
+    assignToFormation(new FormationZone(zone, _division.enemies.toSeq).form(squad.units.toSeq))
   }
 
-  def assignToFormation(formation: FormationAssigned): Unit = {
+  private def assignToFormation(formation: FormationAssigned): Unit = {
     squad.units.foreach(
       defender => {
         val spot = formation.placements.get(defender)

@@ -11,13 +11,15 @@ import Utilities.CountMap
 import scala.collection.mutable
 
 class Squad {
-
-  private var _enemies: Option[Seq[UnitInfo]] = None
-  def targetsEnemies: Boolean = _enemies.isDefined
-  def enemies: Seq[UnitInfo] = _enemies.getOrElse(Seq.empty)
-  def setEnemies(value: Seq[UnitInfo]): Unit = {
-    _enemies = Some(value)
+  def this(goal: SquadGoal) {
+    this()
+    setGoal(goal)
   }
+
+  private var _enemies: Option[Iterable[UnitInfo]] = None
+  def enemies: Iterable[UnitInfo] = _enemies.getOrElse(Seq.empty)
+  def targetsEnemies: Boolean = _enemies.isDefined
+  def setEnemies(value: Iterable[UnitInfo]): Unit = { _enemies = Some(value) }
 
   def run() {
     unitAges --= unitAges.keys.view.filterNot(units.contains)
@@ -41,7 +43,7 @@ class Squad {
   final def goal: SquadGoal = _ourGoal
   final def setGoal(goal: SquadGoal) {
     _ourGoal = goal
-    goal.setSquad(this.asInstanceOf[Squad])
+    goal.squad = this
   }
   setGoal(new GoalChill)
 

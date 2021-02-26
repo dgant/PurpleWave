@@ -1,21 +1,17 @@
 package Micro.Squads.Goals
 
 import Lifecycle.With
-import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
-class GoalRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends SquadGoalBasic {
+class GoalRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends SquadGoal {
 
   private val proxyPixels   = assignments.values.toSeq.map(_.pixel).distinct
   private val centroidPixel = PurpleMath.centroid(proxyPixels)
-  private val centroidUnit  = ByOption.minBy(proxyPixels)(_.pixelDistance(centroidPixel)).getOrElse(super.destination)
-
-  override def destination: Pixel = centroidUnit
-  override def inherentValue: Double = GoalValue.defendBase
+  private val centroidUnit  = ByOption.minBy(proxyPixels)(_.pixelDistance(centroidPixel)).getOrElse(With.scouting.threatOrigin.pixelCenter)
 
   override def toString: String = "Raze proxies"
 
@@ -24,7 +20,7 @@ class GoalRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends Squa
       val assignee = assignments.get(unit)
       val attackTarget = if (With.units.existsEnemy(MatchWarriors)) None else assignee
       unit.agent.intend(this, new Intention {
-        toTravel  = Some(assignee.map(_.pixel).getOrElse(destination))
+        toTravel  = Some(assignee.map(_.pixel).getOrElse(centroidUnit))
         toAttack  = attackTarget
         canFlee   = assignments.keys.forall( ! _.unitClass.isWorker)
       })

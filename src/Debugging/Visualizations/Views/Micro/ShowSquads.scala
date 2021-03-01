@@ -38,7 +38,10 @@ object ShowSquads extends View {
           "",
           "",
           "",
-          enumerateUnits(squad.units)))
+          enumerateUnits(squad.units),
+          "",
+          "",
+          enumerateUnits(squad.enemies)))
     DrawScreen.table(5, 7 * With.visualization.lineHeightSmall, table)
   }
   

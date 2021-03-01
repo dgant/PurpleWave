@@ -21,7 +21,7 @@ trait SquadRecruiter {
     qualityCounter.countUnit(candidate)
   }
 
-  def resetCandidates(): Unit = {
+  def onSquadCommission(): Unit = {
     _candidates.clear()
     qualityCounter = new QualityCounter
     squad.enemies.foreach(qualityCounter.countUnit)

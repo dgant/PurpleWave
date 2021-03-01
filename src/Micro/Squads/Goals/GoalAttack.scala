@@ -10,7 +10,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.{ByOption, Minutes}
 
 class GoalAttack extends SquadGoal {
-  override def toString: String = "Attack " + target.zone.name
+  override def toString: String = f"Attack ${target.base.getOrElse(target.zone)}"
 
   var target: Pixel = With.scouting.mostBaselikeEnemyTile.pixelCenter
 

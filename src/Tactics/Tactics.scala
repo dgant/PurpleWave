@@ -64,14 +64,13 @@ class Tactics extends TimedTask {
     // TODO: Plant Overlords around the map, as appropriate
   }
 
-  def assignIf(freelancers: mutable.Buffer[FriendlyUnitInfo], squads: Seq[Squad], terminationCondition: (Squad, FriendlyUnitInfo) => Boolean): Unit = {
+  def assignIf(freelancers: mutable.Buffer[FriendlyUnitInfo], squads: Seq[Squad], inclusionCondition: (Squad, FriendlyUnitInfo) => Boolean): Unit = {
     var eligibleSquads: Seq[Squad] = Seq.empty
     var i = 0
     while (i < freelancers.length) {
-      eligibleSquads = squads.view.filterNot(terminationCondition(_, freelancers.head))
-      if (eligibleSquads.nonEmpty) {
-        val freelancer = freelancers.remove(i)
-        eligibleSquads.head.addFreelancers(Seq(freelancer))
+      val eligibleSquad = squads.find(inclusionCondition(_, freelancers.head))
+      if (eligibleSquad.isDefined) {
+        eligibleSquad.get.addFreelancers(Seq(freelancers.remove(i)))
       } else {
         i += 1
       }
@@ -103,10 +102,10 @@ class Tactics extends TimedTask {
       .minBy(  ! _.owner.isUs))))
 
     // Assign division to each squad goal
-    squadsDefending.foreach(_._2.commission())
     squadsDefending.foreach(p => p._2.setEnemies(p._1.enemies))
     squadsDefending.foreach(p => p._2.goal.asInstanceOf[GoalControlBase].setDivision(p._1))
-    squadsDefending.foreach(_._2.goal.resetCandidates())
+    squadsDefending.foreach(_._2.commission())
+    squadsDefending.foreach(_._2.goal.onSquadCommission())
 
     // Get freelancers
     recruitFreelancers.update()
@@ -124,14 +123,14 @@ class Tactics extends TimedTask {
     // If we want to attack and enough freelancers remain, populate the attack squad
     // TODO: If the attack goal is the enemy army, and we have a defense squad handling it, skip this step
     if (With.blackboard.wantToAttack() && (With.blackboard.yoloing() || freelancerValue >= freelancerValueInitial * .6)) {
-      attackSquad.commission()
-      assignIf(freelancers, Seq(attackSquad), (s, u) => true)
+      assignIf(freelancers, Seq(attackSquad.commission()), (s, u) => true)
     }
 
     // If there are no active defense squads, activate one to defend our entrance
-    val squadsDefendingOrWaiting: Seq[Squad] = if (squadsDefending.nonEmpty) squadsDefending.view.map(_._2) else ByOption.maxBy(With.geography.ourBases)(_.economicValue()).map(baseSquads).toSeq
+    val squadsDefendingOrWaiting: Seq[Squad] =
+      if (squadsDefending.nonEmpty) squadsDefending.view.map(_._2)
+      else ByOption.maxBy(With.geography.ourBases)(_.economicValue()).map(baseSquads).map(_.commission()).toSeq
     assignIf(freelancers, squadsDefendingOrWaiting, (s, u) => true)
-
 
     // Consider sending flier packs to one of these squads
 

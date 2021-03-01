@@ -15,7 +15,7 @@ class Squads extends TimedTask {
   def all: Seq[Squad] = _batchActive.squads.view
   def freelancersMutable: mutable.Buffer[FriendlyUnitInfo] = _batchNext.freelancers
 
-  def commission(squad: Squad): Unit = { _batchNext.squads += squad }
+  def commission(squad: Squad): Unit = { if ( ! _batchNext.squads.contains(squad)) _batchNext.squads += squad }
   def freelance(freelancer: FriendlyUnitInfo) { _batchNext.freelancers += freelancer }
 
   override protected def onRun(budgetMs: Long): Unit = {

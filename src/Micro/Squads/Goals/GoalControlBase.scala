@@ -19,9 +19,9 @@ class GoalControlBase(base: Base) extends SquadGoal {
   private var _division = Division(Iterable.empty, Set(base))
   def setDivision(division: Division): Unit = { _division = division }
 
-  private var lastAction = "Defend "
+  private var lastAction = "Defend"
 
-  override def toString: String = lastAction + zone.name
+  override def toString: String = f"$lastAction $base"
 
   def destination: Pixel = _currentDestination
 
@@ -54,19 +54,19 @@ class GoalControlBase(base: Base) extends SquadGoal {
       && ! zone.edges.exists(edge => e.pixelDistanceCenter(edge.pixelCenter) < 64 + edge.radiusPixels))
 
     if ((allowWandering || entranceBreached) && canHuntEnemies) {
-      lastAction = "Scour "
+      lastAction = "Scour"
       huntEnemies()
     }
     else if (wallExistsButNoneNearChoke) {
-      lastAction = "Protect wall of "
+      lastAction = "Protect wall of"
       defendHeart(walls.minBy(_.pixel.groundPixels(With.scouting.mostBaselikeEnemyTile)).pixel)
     }
     else if (! entranceBreached && canDefendChoke) {
-      lastAction = "Protect choke of "
+      lastAction = "Protect choke of"
       defendChoke()
     }
     else {
-      lastAction = "Protect heart of "
+      lastAction = "Protect heart of"
       defendHeart(base.map(_.heart.pixelCenter).getOrElse(zone.centroid.pixelCenter))
     }
   }

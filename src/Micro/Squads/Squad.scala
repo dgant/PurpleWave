@@ -33,7 +33,11 @@ class Squad {
     units.toSeq.groupBy(_.unitClass).map(group => (group._1, group._2.maxBy(unit => unit.id + 10000 * unitAges.getOrElse(unit, 0))))
   )
 
-  def commission(): Unit = { With.squads.commission(this) }
+  def commission(): Squad = {
+    With.squads.commission(this);
+    goal.onSquadCommission()
+    this
+  }
 
   //////////////////
   // Goal aspects //
@@ -64,10 +68,12 @@ class Squad {
 
   final def addFreelancers(units: Iterable[FriendlyUnitInfo]): Unit = {
     _freelancers ++= units
+    units.foreach(goal.addCandidate)
   }
 
   final def addConscripts(units: Iterable[FriendlyUnitInfo]): Unit = {
     _conscripts ++= units
+    units.foreach(goal.addCandidate)
   }
 
   val centroidAir = new Cache(() => GroupCentroid.air(units))

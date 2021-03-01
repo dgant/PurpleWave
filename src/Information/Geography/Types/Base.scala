@@ -119,7 +119,7 @@ class Base(val townHallTile: Tile)
   def resources: Vector[UnitInfo] = minerals ++ gas
   def natural: Option[Base] = With.geography.bases.find(_.isNaturalOf.contains(this))
   
-  override def toString: String = f"description $name, ${zone.name} $heart"
+  override def toString: String = f"$description $name, ${zone.name} $heart"
 
   def description: String = (
     if (this == With.geography.ourMain) "Our main"

@@ -2,9 +2,7 @@ package Micro.Squads.Goals
 
 import Micro.Squads.QualityCounter.QualityCounter
 import Micro.Squads.Squad
-import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.CountMap
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -26,7 +24,6 @@ trait SquadRecruiter {
   def resetCandidates(): Unit = {
     _candidates.clear()
     qualityCounter = new QualityCounter
-    qualityCounter.setNeeds(new CountMap[UnitMatcher])
     squad.enemies.foreach(qualityCounter.countUnit)
   }
 }

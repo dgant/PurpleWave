@@ -7,7 +7,7 @@ import Utilities.ByOption
 
 class GoalEjectScout extends SquadGoal {
 
-  private val targetScout = new Cache(() => ByOption.minBy(With.scouting.enemyScouts())(_.frameDiscovered))
+  val targetScout = new Cache(() => ByOption.minBy(With.scouting.enemyScouts())(_.frameDiscovered))
   private val tilesToConsider = new Cache(() => With.scouting.basesToLookForEnemyScouts().view.flatMap(_.zone.tiles))
   private val destination = new Cache(() => targetScout()
     .map(_.pixel)

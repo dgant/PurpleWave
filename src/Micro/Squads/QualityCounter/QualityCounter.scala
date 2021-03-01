@@ -3,74 +3,54 @@ package Micro.Squads.QualityCounter
 import Mathematics.PurpleMath
 import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.CountMap
+import Utilities.{ByOption, CountMap}
 
 class QualityCounter {
 
-  final protected val qualitiesEnemy = new CountMap[Quality]
-  final protected val qualitiesPossessed = new CountMap[Quality]
-
-  final protected var unitsNeeded = new CountMap[UnitMatcher]
-  final protected var unitsPossessed = new CountMap[UnitMatcher]
-
-  def setNeeds(needs: CountMap[UnitMatcher]): Unit = {
-    unitsNeeded = needs
-  }
+  private val qualitiesEnemy = new CountMap[Quality]
+  private val qualitiesFriendly = new CountMap[Quality]
+  private val unitsPossessed = new CountMap[UnitMatcher]
 
   def countUnit(unit: UnitInfo): Unit = {
-    if (unit.isFriendly) {
-      Qualities.friendly.foreach(countUnitQuality(unit, _))
-      unitsNeeded.keys.foreach(countUnitNeed(unit.friendly.get, _))
-    } else {
-      Qualities.enemy.foreach(countUnitQuality(unit, _))
-    }
+    (if (unit.isFriendly) Qualities.friendly else Qualities.enemy).foreach(countUnitQuality(unit, _))
   }
 
-  protected def countUnitQuality(unit: UnitInfo, quality: Quality): Unit = {
-    if (unit.is(quality)) {
-      // TODO: Scale by more appropriate value, eg. a Wraith not as good as a Siege Tank vs ground
-      val value = unit.subjectiveValue
-      (if (unit.isFriendly) qualitiesPossessed else qualitiesEnemy)(quality) += value.toInt
-    }
+  private def countUnitQuality(unit: UnitInfo, quality: Quality): Unit = {
+    (if (unit.isFriendly) qualitiesFriendly else qualitiesEnemy)(quality) += unitValue(unit, quality)
   }
 
-  protected def countUnitNeed(unit: FriendlyUnitInfo, matcher: UnitMatcher): Unit = {
-    if (unit.is(matcher)) unitsPossessed(matcher) += 1
+  private def unitValue(unit: UnitInfo, quality: Quality): Int = {
+    if (unit.is(quality)) unit.subjectiveValue.toInt else 0
+  }
+
+  private def countUnitNeed(unit: FriendlyUnitInfo, matcher: UnitMatcher): Unit = {
+    unitsPossessed(matcher) += PurpleMath.fromBoolean(unit.is(matcher))
   }
 
   // Captures the idea that if we have *no* units which serve a role, we really want at least one (eg anti-air, detector, etc)
   // but as we pass the amount we need, the marginal value rapidly declines
   def scaleNeed(value: Double): Double = PurpleMath.clamp(value, 0.01, 100)
 
-  def utility(unit: FriendlyUnitInfo): Double = {
-    val utilitiesQualities = utilityQualities(unit)
-    val utilitiesNeed = utilityNeed(unit)
-    val output = (utilitiesQualities.map(_._3) ++ utilitiesNeed.map(_._2) :+ 0.01).max
-    output
-  }
+  def utility(unit: FriendlyUnitInfo): Double = ByOption.max(utilityQualities(unit).view.map(_._3)).getOrElse(0.0)
 
-  def utilityQualities(unit: FriendlyUnitInfo): Seq[(Quality, Quality, Double)] = {
-    val friendlyQualities = Qualities.friendly.view.filter(_.apply(unit))
-    val qualities = friendlyQualities.flatMap(friendlyQuality =>
-      qualitiesEnemy.view.flatMap(enemyQuality =>
-        enemyQuality._1.counteredBy.view
-          .filter(_ == friendlyQuality)
-          .map(counterQuality => {
-            val baseValue = counterQuality.counterScaling
-            val valueEnemy = enemyQuality._2
-            val valueFriendly = qualitiesPossessed(counterQuality)
-            val needMultiplier = scaleNeed(PurpleMath.nanToInfinity(valueEnemy.toDouble / valueFriendly))
-            (friendlyQuality, enemyQuality._1, baseValue * needMultiplier)
-        })))
-    qualities
-  }
-
-  def utilityNeed(unit: FriendlyUnitInfo): Seq[(UnitMatcher, Double)] = {
-    val needs = unitsNeeded.keys.view.filter(_.apply(unit)).map(need => {
-      val valueNeeded = unitsNeeded(need)
-      val valuePossessed = unitsPossessed(need)
-      (need, scaleNeed(PurpleMath.nanToInfinity(valueNeeded.toDouble / valuePossessed)))
-    }).toSeq
-    needs
-  }
+  def utilityQualities(unit: FriendlyUnitInfo): Seq[(Quality, Quality, Double)] =
+    Qualities.friendly
+      .view
+      .filter(_(unit))
+      .flatMap(friendlyQuality =>
+        qualitiesEnemy
+          .view
+          .flatMap(enemyQuality =>
+            enemyQuality._1.counteredBy
+              .view
+              .filter(_ == friendlyQuality)
+              .map(unused => {
+                val valueRequired = enemyQuality._2
+                val valuePossessed = qualitiesFriendly(friendlyQuality) * friendlyQuality.counterScaling
+                // We have thoroughly surpassed the required value: 0.0
+                // We are already at exact match value: 1.0
+                // We have no existing value: 2.0
+                val score = 1 + PurpleMath.clamp((valueRequired - valuePossessed) / valueRequired, -1, 1)
+                (friendlyQuality, enemyQuality._1, score)
+            })))
 }

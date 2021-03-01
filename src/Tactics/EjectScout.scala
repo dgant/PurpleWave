@@ -3,7 +3,6 @@ package Tactics
 import Lifecycle.With
 import Micro.Squads.Goals.GoalEjectScout
 import Planning.Plans.Scouting.ScoutCleared
-import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers._
 import Utilities.Minutes
 
@@ -19,8 +18,9 @@ class EjectScout extends Squadify[GoalEjectScout] {
     val scouts = With.scouting.enemyScouts()
     if (scouts.isEmpty) return
 
-    goal.unitMatcher = MatchAnd(MatchScoutCatcher, (unit) => unit.base.exists(With.scouting.basesToLookForEnemyScouts().contains) || unit.pixelsToGetInRange(goal.targetScout().get) < 32)
-    goal.unitCounter = CountOne
+    //goal.unitMatcher =
+    MatchAnd(MatchScoutCatcher, (unit) => unit.base.exists(With.scouting.basesToLookForEnemyScouts().contains) || unit.pixelsToGetInRange(goal.targetScout().get) < 32)
+
     super.update()
   }
 }

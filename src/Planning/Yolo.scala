@@ -9,7 +9,7 @@ import Utilities.Minutes
 
 class Yolo extends TimedTask {
 
-  private def activeByDefault: Boolean = With.blackboard.yoloEnabled() && (
+  private def activeByDefault: Boolean = With.blackboard.yoloing() && (
     ! With.units.existsOurs(MatchWorkers)
     || With.geography.ourBases.forall(_.mineralsLeft == 0)
     || With.blackboard.allIn())

@@ -17,7 +17,7 @@ class DoFloatBuildings extends Prioritized {
     floaties.acquire(this)
     floaties.units.foreach(floatie => {
       if (floatie.flying) {
-        // TODO: Make recruitable!
+        With.squads.freelance(floatie)
       } else {
         floatie.agent.intend(this, new Intention { canLiftoff = true })
       }

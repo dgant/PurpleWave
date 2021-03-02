@@ -1,5 +1,6 @@
 package Micro.Squads
 
+import Debugging.Decap
 import Information.Battles.Types.GroupCentroid
 import Lifecycle.With
 import Micro.Squads.Goals.{GoalChill, SquadGoal}
@@ -30,10 +31,11 @@ class Squad {
   val unitAges: CountMap[FriendlyUnitInfo] = new CountMap[FriendlyUnitInfo]
   def leader(unitClass: UnitClass): Option[FriendlyUnitInfo] = leaders().get(unitClass)
   private val leaders: Cache[Map[UnitClass, FriendlyUnitInfo]] = new Cache(() =>
-    units.toSeq.groupBy(_.unitClass).map(group => (group._1, group._2.maxBy(unit => unit.id + 10000 * unitAges.getOrElse(unit, 0))))
+    units.groupBy(_.unitClass).map(group => (group._1, group._2.maxBy(unit => unit.id + 10000 * unitAges.getOrElse(unit, 0))))
   )
 
   def commission(): Squad = {
+    _units.clear()
     With.squads.commission(this);
     goal.onSquadCommission()
     this
@@ -48,6 +50,7 @@ class Squad {
   final def setGoal(goal: SquadGoal) {
     _ourGoal = goal
     goal.squad = this
+    goal.onSquadCommission()
   }
   setGoal(new GoalChill)
 
@@ -55,29 +58,20 @@ class Squad {
   // Unit aspects //
   //////////////////
 
-  def units: Set[FriendlyUnitInfo] = _units
-  private var _units: Set[FriendlyUnitInfo] = Set.empty
-  private var _conscripts   : mutable.ArrayBuffer[FriendlyUnitInfo] = mutable.ArrayBuffer.empty
-  private var _freelancers  : mutable.ArrayBuffer[FriendlyUnitInfo] = mutable.ArrayBuffer.empty
+  def units: Seq[FriendlyUnitInfo] = _units
+  private val _units: mutable.ArrayBuffer[FriendlyUnitInfo] = new mutable.ArrayBuffer[FriendlyUnitInfo]()
 
-  final def recalculateRosters(): Unit = {
-    _units = (_conscripts.view ++ _freelancers).toSet
-    _conscripts = mutable.ArrayBuffer.empty
-    _freelancers = mutable.ArrayBuffer.empty
+  final def addUnit(unit: FriendlyUnitInfo): Unit = {
+    _units += unit
+    goal.addUnit(unit)
   }
 
-  final def addFreelancers(units: Iterable[FriendlyUnitInfo]): Unit = {
-    _freelancers ++= units
-    units.foreach(goal.addCandidate)
-  }
-
-  final def addConscripts(units: Iterable[FriendlyUnitInfo]): Unit = {
-    _conscripts ++= units
-    units.foreach(goal.addCandidate)
+  final def addUnits(units: Iterable[FriendlyUnitInfo]): Unit = {
+    units.foreach(addUnit)
   }
 
   val centroidAir = new Cache(() => GroupCentroid.air(units))
   val centroidGround = new Cache(() => GroupCentroid.ground(units))
 
-  override def toString: String = f"Squad to $goal"
+  override def toString: String = f"Squad to ${Decap(goal)}"
 }

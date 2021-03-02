@@ -1,5 +1,6 @@
 package Micro.Squads.Goals
 
+import Debugging.Decap
 import Information.Battles.Types.Division
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
@@ -14,16 +15,14 @@ import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
-class GoalControlBase(base: Base) extends SquadGoal {
+class GoalDefendBase(base: Base) extends SquadGoal {
 
   private var _division = Division(Iterable.empty, Set(base))
   def setDivision(division: Division): Unit = { _division = division }
 
   private var lastAction = "Defend"
 
-  override def toString: String = f"$lastAction $base"
-
-  def destination: Pixel = _currentDestination
+  override def toString: String = f"$lastAction ${Decap(base)}"
 
   val zone: Zone = base.zone
   private var _currentDestination: Pixel = Pixel(0, 0)

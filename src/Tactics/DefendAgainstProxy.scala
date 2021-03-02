@@ -87,8 +87,8 @@ class DefendAgainstProxy extends Prioritized {
     }
     With.blackboard.status.set(With.blackboard.status.get :+ "DefendingProxy")
     squad.setGoal(new GoalRazeProxies(defendersAssigned.toMap))
-    squad.addConscripts(defenders.get.units)
     squad.commission()
+    squad.addUnits(defenders.get.units)
   }
   
   private def getProxies: Iterable[UnitInfo] = {

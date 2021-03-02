@@ -21,7 +21,6 @@ class Squads extends TimedTask {
   override protected def onRun(budgetMs: Long): Unit = {
     _batchActive = _batchNext
     _batchNext = SquadBatch()
-    all.foreach(_.recalculateRosters())
     all.foreach(_.run())
   }
 }

@@ -1,4 +1,4 @@
-package Micro.Squads.Goals
+package Micro.Squads
 
 import Lifecycle.With
 import Mathematics.Points.Pixel
@@ -6,10 +6,10 @@ import Micro.Agency.Intention
 import ProxyBwapi.Races.Protoss
 import Utilities.ByOption
 
-class GoalCatchDTRunby extends SquadGoal {
+class SquadCatchDTRunby extends Squad {
 
   override def run(): Unit = {
-    squad.units.foreach(_.agent.intend(this, new Intention { toTravel = Some(destination)}))
+    units.foreach(_.agent.intend(this, new Intention { toTravel = Some(destination)}))
   }
 
   private def destination: Pixel = {

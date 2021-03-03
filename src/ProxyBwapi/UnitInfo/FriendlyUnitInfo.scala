@@ -20,8 +20,6 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(b
   private var _lastFrameOccupied      : Int           = - Forever()
   private var _framesFailingToMove    : Int           = 0
   private var _framesFailingToAttack  : Int           = 0
-  private var _lastSquadChange        : Int           = 0
-  private var _lastSquad              : Option[Squad] = None
   override def update() {
     if (frameDiscovered < With.frame) readProxy()
     super.update()
@@ -42,15 +40,19 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(b
 
   lazy val agent: Agent = new Agent(this)
   def intent: Intention = agent.intent
-  def squad: Option[Squad] = _squadCache()
-  private val _squadCache = new Cache(() => {
-    val nextSquad = With.squads.all.find(_.units.contains(this))
-    if (nextSquad != _lastSquad) { _lastSquadChange = With.frame }
-    _lastSquad = nextSquad
-    _lastSquad
-  })
 
-  def alliesSquad                   : Iterable[FriendlyUnitInfo]      = squad.map(_.units.view).filter(_ != this).getOrElse(Seq.empty)
+  var _squad: Option[Squad] = None
+  var _lastSquadChange: Int = 0
+  def squad: Option[Squad] = _squad
+  def squadAge: Int = With.framesSince(_lastSquadChange)
+  def setSquad(newSquad: Option[Squad]): Unit = {
+    if (newSquad != _squad) {
+      _squad = newSquad
+      _lastSquadChange = With.frame
+    }
+  }
+
+  def alliesSquad                   : Iterable[FriendlyUnitInfo]      = squad.map(_.units.view).filter(_ != this).getOrElse(Iterable.empty)
   def alliesBattle                  : Iterable[FriendlyUnitInfo]      = battle.map(_.us.units.view.map(_.friendly).filter(_.nonEmpty).map(_.get)).getOrElse(Iterable.empty).filter(_ != this)
   def alliesAll                     : Iterable[FriendlyUnitInfo]      = With.units.ours.filter(_ != this)
   def enemiesSquad                  : Iterable[UnitInfo]              = squad.map(_.enemies).getOrElse(Iterable.empty)

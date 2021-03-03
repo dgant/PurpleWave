@@ -1,8 +1,7 @@
 package Tactics
 
 import Lifecycle.With
-import Micro.Squads.Goals.GoalRazeProxies
-import Micro.Squads.Squad
+import Micro.Squads.SquadRazeProxies
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.{CountEverything, CountUpTo}
 import Planning.UnitMatchers._
@@ -16,7 +15,6 @@ import scala.collection.mutable
 class DefendAgainstProxy extends Prioritized {
 
   val defenders = new Property[LockUnits](new LockUnits)
-  val squad = new Squad
   
   def update() {
     if (With.frame > Minutes(7)()) return
@@ -86,8 +84,7 @@ class DefendAgainstProxy extends Prioritized {
       return
     }
     With.blackboard.status.set(With.blackboard.status.get :+ "DefendingProxy")
-    squad.setGoal(new GoalRazeProxies(defendersAssigned.toMap))
-    squad.commission()
+    val squad = new SquadRazeProxies(defendersAssigned.toMap)
     squad.addUnits(defenders.get.units)
   }
   

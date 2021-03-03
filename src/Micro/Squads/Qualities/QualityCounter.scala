@@ -1,4 +1,4 @@
-package Micro.Squads.QualityCounter
+package Micro.Squads.Qualities
 
 import Mathematics.PurpleMath
 import Planning.UnitMatchers.UnitMatcher
@@ -10,6 +10,12 @@ class QualityCounter {
   private val qualitiesEnemy = new CountMap[Quality]
   private val qualitiesFriendly = new CountMap[Quality]
   private val unitsPossessed = new CountMap[UnitMatcher]
+
+  def clear(): Unit = {
+    qualitiesEnemy.clear()
+    qualitiesFriendly.clear()
+    unitsPossessed.clear()
+  }
 
   def countUnit(unit: UnitInfo): Unit = {
     (if (unit.isFriendly) Qualities.friendly else Qualities.enemy).foreach(countUnitQuality(unit, _))

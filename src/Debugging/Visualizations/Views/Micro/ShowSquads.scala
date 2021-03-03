@@ -18,7 +18,7 @@ object ShowSquads extends View {
     val color = squadColors(squad.hashCode % squadColors.length)
     squad.units.foreach(unit =>
       DrawMap.label(
-        squad.goal.toString,
+        squad.toString,
         unit.pixel.add(0, unit.unitClass.height),
         drawBackground = true,
         color,
@@ -34,7 +34,7 @@ object ShowSquads extends View {
       Vector(Vector("Goal",  "", "", "", "Recruits", "",  "", "Enemies")) ++
       With.squads.all.map(squad =>
         Vector(
-          squad.goal.toString,
+          squad.toString,
           "",
           "",
           "",

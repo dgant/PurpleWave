@@ -159,7 +159,12 @@ class PvTBasic extends GameplanTemplate {
     new If(
       new And(
         new Employing(PvEStormYes),
-        new Or(new UnitsAtLeast(1, Protoss.HighTemplar), new GasAtLeast(800))),
+        new Or(
+          new UnitsAtLeast(1, Protoss.HighTemplar),
+          new And(
+            new GasAtLeast(800),
+            new BasesAtLeast(3),
+            new FrameAtLeast(GameTime(9, 0)())))),
       new GoStorm),
 
     new If(new UnitsAtLeast(1, Protoss.ArbiterTribunal),  new Build(Get(Protoss.ArbiterEnergy))),

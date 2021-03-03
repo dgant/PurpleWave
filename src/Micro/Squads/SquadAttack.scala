@@ -1,4 +1,4 @@
-package Micro.Squads.Goals
+package Micro.Squads
 
 import Lifecycle.With
 import Mathematics.Points.Pixel
@@ -9,14 +9,14 @@ import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.{ByOption, Minutes}
 
-class GoalAttack extends SquadGoal {
+class SquadAttack extends Squad {
   override def toString: String = f"Attack ${target.base.getOrElse(target.zone)}"
 
   var target: Pixel = With.scouting.mostBaselikeEnemyTile.pixelCenter
 
   override def run() {
     chooseTarget()
-    squad.units.foreach(attacker => {
+    units.foreach(attacker => {
       attacker.agent.intend(this, new Intention {
         toTravel = Some(target)
       })
@@ -28,12 +28,12 @@ class GoalAttack extends SquadGoal {
       && unit.likelyStillThere
       && unit.unitClass.dealsDamage)
 
-    val occupiedBases = squad.units.flatMap(_.base).filter(_.owner.isEnemy)
+    val occupiedBases = units.flatMap(_.base).filter(_.owner.isEnemy)
   }
 
   protected def chooseTarget(): Unit = {
     val focusEnemy = With.scouting.threatOrigin
-    val focusUs = PurpleMath.centroid(squad.units.view.map(_.pixel)).tile
+    val focusUs = PurpleMath.centroid(units.view.map(_.pixel)).tile
     val threatDistanceToUs =
       ByOption.min(With.geography.ourBases.map(_.heart.tileDistanceFast(focusEnemy)))
         .getOrElse(With.geography.home.tileDistanceFast(focusEnemy))

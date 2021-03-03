@@ -2,8 +2,7 @@ package Tactics
 
 import Lifecycle.With
 import Mathematics.PurpleMath
-import Micro.Squads.Goals.{GoalAttack, GoalDefendBase}
-import Micro.Squads.Squad
+import Micro.Squads._
 import Performance.Tasks.TimedTask
 import Planning.Plans.Army._
 import Planning.Plans.Scouting.{DoScoutWithWorkers, ScoutExpansions, ScoutWithOverlord}
@@ -16,13 +15,13 @@ import scala.collection.mutable
 class Tactics extends TimedTask {
   private lazy val clearBurrowedBlockers      = new ClearBurrowedBlockers
   private lazy val followBuildOrder           = new FollowBuildOrder
-  private lazy val ejectScout                 = new EjectScout
+  private lazy val ejectScout                 = new SquadEjectScout
   private lazy val scoutWithOverlord          = new ScoutWithOverlord
   private lazy val defendAgainstProxy         = new DefendAgainstProxy
   private lazy val defendFightersAgainstRush  = new DefendFightersAgainstRush
   private lazy val defendAgainstWorkerRush    = new DefendAgainstWorkerRush
   private lazy val defendFFEAgainst4Pool      = new DefendFFEWithProbes
-  private lazy val catchDTRunby               = new CatchDTRunby
+  private lazy val catchDTRunby               = new SquadCatchDTRunby
   private lazy val scoutWithWorkers           = new DoScoutWithWorkers
   private lazy val scoutExpansions            = new ScoutExpansions
   private lazy val gather                     = new Gather
@@ -50,14 +49,13 @@ class Tactics extends TimedTask {
   private def runPrioritySquads(): Unit = {
     clearBurrowedBlockers.update()
     followBuildOrder.update()
-    ejectScout.update()
+    ejectScout.recruit()
     scoutWithOverlord.update()
     With.blackboard.scoutPlan().update()
     defendAgainstProxy.update()
     defendFightersAgainstRush.update()
     defendAgainstWorkerRush.update()
     defendFFEAgainst4Pool.update()
-    catchDTRunby.update()
     scoutWithWorkers.update()
     scoutExpansions.update()
     // TODO: EscortSettlers is no longer being used but we do need to do it
@@ -66,25 +64,25 @@ class Tactics extends TimedTask {
   }
 
   private def assignIf(
-    freelancers: mutable.Buffer[FriendlyUnitInfo],
-    squads: Seq[Squad],
-    minimumValue: Double = Double.NegativeInfinity): Unit = {
+      freelancers: mutable.Buffer[FriendlyUnitInfo],
+      squads: Seq[Squad],
+      minimumValue: Double = Double.NegativeInfinity): Unit = {
     var eligibleSquads: Seq[Squad] = Seq.empty
     var i = 0
     while (i < freelancers.length) {
       val freelancer = freelancers(i)
-      val squadValues = squads.filter(_.goal.candidateValue(freelancer) > minimumValue)
-      val bestSquad = ByOption.minBy(squadValues)(squad => freelancer.pixelDistanceTravelling(squad.goal.vicinity))
+      val squadValues = squads.filter(_.candidateValue(freelancer) > minimumValue)
+      val bestSquad = ByOption.minBy(squadValues)(squad => freelancer.pixelDistanceTravelling(squad.vicinity))
       if (bestSquad.isDefined) {
-        bestSquad.get.addUnits(Seq(freelancers.remove(i)))
+        bestSquad.get.addUnit(freelancers.remove(i))
       } else {
         i += 1
       }
     }
   }
 
-  private lazy val baseSquads = With.geography.bases.map(base => (base, new Squad(new GoalDefendBase(base)))).toMap
-  private lazy val attackSquad = new Squad(new GoalAttack)
+  private lazy val baseSquads = With.geography.bases.map(base => (base, new SquadDefendBase(base))).toMap
+  private lazy val attackSquad = new SquadAttack
   private def runCoreTactics(): Unit = {
     // Sort defense divisions by descending importance
     var divisionsDefending = With.battles.divisions.filter(_.bases.exists(b => b.owner.isUs || b.plannedExpo()))
@@ -102,13 +100,10 @@ class Tactics extends TimedTask {
       .sortBy( ! _.plannedExpo())
       .minBy(  ! _.owner.isUs))))
 
-    // Assign division to each squad goal
-    baseSquads.foreach(_._2.setEnemies(Iterable.empty))
-    squadsDefending.foreach(p => p._2.goal.vicinity = PurpleMath.centroid(p._2.enemies.view.map(_.pixel)))
-    squadsDefending.foreach(p => p._2.setEnemies(p._1.enemies))
-    squadsDefending.foreach(p => p._2.goal.asInstanceOf[GoalDefendBase].setDivision(p._1))
-    squadsDefending.foreach(_._2.commission())
-    squadsDefending.foreach(_._2.goal.onSquadCommission())
+    // Assign division to each squad
+    squadsDefending.foreach(p => p._2.vicinity = PurpleMath.centroid(p._2.enemies.view.map(_.pixel)))
+    squadsDefending.foreach(p => p._2.addEnemies(p._1.enemies))
+    squadsDefending.foreach(p => p._2.asInstanceOf[SquadDefendBase].setDivision(p._1))
 
     // Get freelancers
     recruitFreelancers.update()
@@ -126,12 +121,12 @@ class Tactics extends TimedTask {
     // If we want to attack and enough freelancers remain, populate the attack squad
     // TODO: If the attack goal is the enemy army, and we have a defense squad handling it, skip this step
     if (With.blackboard.wantToAttack() && (With.blackboard.yoloing() || freelancerValue >= freelancerValueInitial * .6)) {
-      assignIf(freelancers, Seq(attackSquad.commission()))
+      assignIf(freelancers, Seq(attackSquad))
     } else {
       // If there are no active defense squads, activate one to defend our entrance
       val squadsDefendingOrWaiting: Seq[Squad] =
         if (squadsDefending.nonEmpty) squadsDefending.view.map(_._2)
-        else ByOption.maxBy(With.geography.ourBases)(_.economicValue()).map(b => b.natural.filter(_.owner.isUs).getOrElse(b)).map(baseSquads).map(_.commission()).toSeq
+        else ByOption.maxBy(With.geography.ourBases)(_.economicValue()).map(b => b.natural.filter(_.owner.isUs).getOrElse(b)).map(baseSquads).toSeq
       assignIf(freelancers, squadsDefendingOrWaiting)
     }
 

@@ -1,4 +1,4 @@
-package Micro.Squads.QualityCounter
+package Micro.Squads.Qualities
 
 import Planning.UnitMatchers.UnitMatcher
 

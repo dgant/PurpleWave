@@ -1,4 +1,4 @@
-package Micro.Squads.Goals
+package Micro.Squads
 
 import Debugging.Decap
 import Information.Battles.Types.Division
@@ -15,7 +15,7 @@ import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
-class GoalDefendBase(base: Base) extends SquadGoal {
+class SquadDefendBase(base: Base) extends Squad {
 
   private var _division = Division(Iterable.empty, Set(base))
   def setDivision(division: Division): Unit = { _division = division }
@@ -31,7 +31,7 @@ class GoalDefendBase(base: Base) extends SquadGoal {
     lazy val base = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.scouting.threatOrigin))
     _currentDestination = zone.centroid.pixelCenter.nearestWalkableTile.pixelCenter
 
-    if (squad.units.isEmpty) return
+    if (units.isEmpty) return
 
     lazy val choke = zone.exit
     lazy val walls = zone.units.filter(u =>
@@ -42,7 +42,7 @@ class GoalDefendBase(base: Base) extends SquadGoal {
 
     lazy val allowWandering = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || _division.enemies.exists(_.unitClass.ranged) || With.blackboard.wantToAttack()
     lazy val canHuntEnemies = huntableEnemies().nonEmpty
-    lazy val canDefendChoke = (squad.units.size > 3 && choke.isDefined) || ! With.enemies.exists(_.isZerg)
+    lazy val canDefendChoke = (units.size > 3 && choke.isDefined) || ! With.enemies.exists(_.isZerg)
     lazy val wallExistsButNoneNearChoke = walls.nonEmpty && walls.forall(wall =>
       choke.forall(chokepoint =>
         (chokepoint.sidePixels :+ chokepoint.pixelCenter).forall(wall.pixelDistanceCenter(_) > 8 * 32)))
@@ -81,7 +81,7 @@ class GoalDefendBase(base: Base) extends SquadGoal {
 
   private def huntableFilter(enemy: UnitInfo): Boolean = (
     ! (enemy.is(Zerg.Drone) && With.fingerprints.fourPool.matches) // Don't get baited by 4-pool scouts
-      && (squad.units.exists(_.canAttack(enemy)) || (enemy.cloaked && squad.units.exists(_.unitClass.isDetector)))
+      && (units.exists(_.canAttack(enemy)) || (enemy.cloaked && units.exists(_.unitClass.isDetector)))
       && (enemy.matchups.targets.nonEmpty || enemy.matchups.allies.forall(_.matchups.targets.isEmpty)) // Don't, for example, chase Overlords that have ally Zerglings nearby
       // If we don't really want to fight, wait until they push into the base
       && zone.exit.forall(exit =>
@@ -111,11 +111,11 @@ class GoalDefendBase(base: Base) extends SquadGoal {
     lazy val target = huntables.minBy(distance)
     lazy val targetAir = ByOption.minBy(huntables.filter(_.flying))(distance).getOrElse(target)
     lazy val targetGround = ByOption.minBy(huntables.filterNot(_.flying))(distance).getOrElse(target)
-    squad.units.foreach(recruit => {
+    units.foreach(recruit => {
       val onlyAir     = recruit.canAttack && !recruit.unitClass.attacksGround
       val onlyGround  = recruit.canAttack && !recruit.unitClass.attacksAir
       val thisTarget  = if (onlyAir) targetAir else if (onlyGround) targetGround else target
-      recruit.agent.intend(squad, new Intention {
+      recruit.agent.intend(this, new Intention {
         toTravel = Some(thisTarget.pixel)
         targetFilters = Seq(TargetFilterDefend(zone))
       })
@@ -131,9 +131,9 @@ class GoalDefendBase(base: Base) extends SquadGoal {
           u.matchups.framesOfSafety + 0.0001 * u.pixelDistanceCenter(center))
       .map(_.pixel)
       .getOrElse(center)
-    val groupArea     = squad.units.view.map(_.unitClass.area).sum
+    val groupArea     = units.view.map(_.unitClass.area).sum
     val groupRadius   = Math.sqrt(groupArea)
-    squad.units.foreach(unit => {
+    units.foreach(unit => {
       val unitDestination = if (unit.flying || unit.pixelDistanceCenter(destination) > groupRadius) destination else unit.pixel
       unit.agent.intend(this, new Intention {
         toTravel = Some(unitDestination)
@@ -144,11 +144,11 @@ class GoalDefendBase(base: Base) extends SquadGoal {
 
   private def defendChoke() {
     _currentDestination = zone.exit.map(_.pixelCenter).getOrElse(zone.centroid.pixelCenter)
-    assignToFormation(new FormationZone(zone, _division.enemies.toSeq).form(squad.units.toSeq))
+    assignToFormation(new FormationZone(zone, _division.enemies.toSeq).form(units.toSeq))
   }
 
   private def assignToFormation(formation: FormationAssigned): Unit = {
-    squad.units.foreach(
+    units.foreach(
       defender => {
         val spot = formation.placements.get(defender)
         defender.agent.intend(this, new Intention {

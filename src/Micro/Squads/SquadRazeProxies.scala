@@ -1,4 +1,4 @@
-package Micro.Squads.Goals
+package Micro.Squads
 
 import Lifecycle.With
 import Mathematics.PurpleMath
@@ -7,16 +7,13 @@ import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
-class GoalRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends SquadGoal {
-
+class SquadRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends Squad {
   private val proxyPixels   = assignments.values.toSeq.map(_.pixel).distinct
   private val centroidPixel = PurpleMath.centroid(proxyPixels)
   private val centroidUnit  = ByOption.minBy(proxyPixels)(_.pixelDistance(centroidPixel)).getOrElse(With.scouting.threatOrigin.pixelCenter)
 
-  override def toString: String = "Raze proxies"
-
   override def run() {
-    squad.units.foreach(unit => {
+    units.foreach(unit => {
       val assignee = assignments.get(unit)
       val attackTarget = if (With.units.existsEnemy(MatchWarriors)) None else assignee
       unit.agent.intend(this, new Intention {
@@ -26,4 +23,6 @@ class GoalRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends Squa
       })
     })
   }
+
+  override val toString: String = "Raze proxies"
 }

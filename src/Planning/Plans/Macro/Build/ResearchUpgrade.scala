@@ -19,11 +19,10 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Production {
   
   val upgraderClass = upgrade.whatUpgrades
   val currencyLock = new LockCurrencyForUpgrade(upgrade, level)
-  val upgraders = new LockUnits {
-    counter.set(CountOne)
-    matcher.set(MatchAnd(upgraderClass, MatchIdle))
-    preference.set(PreferIdle)
-  }
+  val upgraders = new LockUnits
+  upgraders.counter = CountOne
+  upgraders.matcher = MatchAnd(upgraderClass, MatchIdle)
+  upgraders.preference = PreferIdle
 
   override def isComplete: Boolean = With.self.getUpgradeLevel(upgrade) >= level
 

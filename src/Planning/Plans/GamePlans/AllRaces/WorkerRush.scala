@@ -46,7 +46,7 @@ class WorkerRush extends Trigger {
         new ScoutAt(1))),
     new Plan {
       val workerLock: LockUnits = new LockUnits
-      workerLock.matcher.set(MatchWorkers)
+      workerLock.matcher = MatchWorkers
       var seenFiveWorkers: Boolean = false
       override def onUpdate(): Unit = {
         seenFiveWorkers = seenFiveWorkers || With.units.countOurs(MatchAnd(MatchWorkers, MatchComplete)) >= 5
@@ -62,9 +62,8 @@ class WorkerRush extends Trigger {
         if (workerLock.units.size > goalWorkers) {
           workerLock.release()
         }
-        workerLock.counter.set(CountUpTo(goalWorkers))
-        workerLock.preference.set(PreferClose(With.geography.home.pixelCenter))
-        workerLock.canPoach.set(true)
+        workerLock.counter = CountUpTo(goalWorkers)
+        workerLock.preference = PreferClose(With.geography.home.pixelCenter)
         workerLock.acquire(this)
         With.gathering.gatheringPlan = this
         With.gathering.workers = workerLock.units

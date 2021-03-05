@@ -5,9 +5,13 @@ import Mathematics.PurpleMath
 import Micro.Squads._
 import Performance.Tasks.TimedTask
 import Planning.Plans.Army._
-import Planning.Plans.Scouting.{DoScoutWithWorkers, ScoutExpansions, ScoutWithOverlord}
+import Planning.Plans.Compound.{If, Or}
+import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTIdeas
+import Planning.Plans.Scouting.{DoScoutWithWorkers, MonitorBases, ScoutExpansions, ScoutWithOverlord}
+import Planning.Predicates.Compound.{And, Not}
+import Planning.Predicates.Milestones.{EnemiesAtMost, EnemyHasShownWraithCloak, UnitsAtLeast}
 import Planning.UnitMatchers.MatchRecruitableForCombat
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
@@ -30,6 +34,15 @@ class Tactics extends TimedTask {
   private lazy val chillOverlords             = new ChillOverlords
   private lazy val doFloatBuildings           = new DoFloatBuildings
   private lazy val scan                       = new Scan
+  private lazy val monitorWithObserver        = new If(
+    new And(
+      new EnemiesAtMost(7, Terran.Factory),
+      new Or(
+        new UnitsAtLeast(2, Protoss.Observer, complete = true),
+        new And(
+          new Not(new EnemyHasShownWraithCloak),
+          new Not(new PvTIdeas.EnemyHasMines)))),
+    new MonitorBases(Protoss.Observer))
 
   override protected def onRun(budgetMs: Long): Unit = {
     // TODO: Attack with units that can safely harass:
@@ -59,6 +72,7 @@ class Tactics extends TimedTask {
     defendFFEAgainst4Pool.update()
     scoutWithWorkers.update()
     scoutExpansions.update()
+    monitorWithObserver.update()
     // TODO: EscortSettlers is no longer being used but we do need to do it
     // TODO: Hide Carriers until 4x vs. Terran
     // TODO: Plant Overlords around the map, as appropriate
@@ -111,7 +125,7 @@ class Tactics extends TimedTask {
     squadsDefending.foreach(p => p._2.asInstanceOf[SquadDefendBase].setDivision(p._1))
 
     // Get freelancers
-    val freelancers = (new ListBuffer[FriendlyUnitInfo] ++ With.recruiter.unassigned.view.filter(MatchRecruitableForCombat))
+    val freelancers = (new ListBuffer[FriendlyUnitInfo] ++ With.recruiter.unlocked.view.filter(MatchRecruitableForCombat))
       .sortBy(_.topSpeed) // Assign fast units last, as they're more flexible
       .sortBy(_.flying) // Assign fliers last, as they're more flexible
       .sortBy(_.unitClass.isTransport) // So transports can go to squads which need them

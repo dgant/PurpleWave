@@ -11,11 +11,10 @@ import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpRatio, UpgradeContinuous
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Placement.BuildCannonsAtNatural
-import Planning.Plans.Scouting.{MonitorBases, ScoutOn}
+import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitCounters.CountEverything
 import Planning.UnitMatchers.MatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -37,10 +36,6 @@ class PvZ1BaseForgeTech extends GameplanTemplate {
     new Blueprint(Protoss.Pylon,        placement = Some(PlacementProfiles.hugTownHall)),
     new Blueprint(Protoss.Forge,        placement = Some(PlacementProfiles.hugTownHall)),
     new Blueprint(Protoss.Gateway,      placement = Some(PlacementProfiles.hugTownHall)))
-
-  override def attackPlan: Plan = new Parallel(
-    new MonitorBases(Protoss.Corsair, initialUnitCounter = CountEverything),
-    super.attackPlan)
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new If(

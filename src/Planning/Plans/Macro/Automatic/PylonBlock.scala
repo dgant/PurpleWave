@@ -13,14 +13,12 @@ import Utilities.{ByOption, GameTime}
 
 class PylonBlock extends Plan {
 
-  val blockerLock = new LockUnits {
-    matcher.set(MatchWorkers)
-    counter.set(CountOne)
-  }
+  val blockerLock = new LockUnits
+  blockerLock.matcher = MatchWorkers
+  blockerLock.counter = CountOne
 
-  val currencyLock = new LockCurrency {
-    minerals = 100
-  }
+  val currencyLock = new LockCurrency
+  currencyLock.minerals = 100
 
   var lastWorkerDeathFrame: Int = 0
   var lastWorker: Option[FriendlyUnitInfo] = None

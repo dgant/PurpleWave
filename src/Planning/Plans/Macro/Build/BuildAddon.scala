@@ -27,8 +27,8 @@ class BuildAddon(val addonClass: UnitClass) extends Production {
   })
   
   val builderLock: LockUnits = new LockUnits
-  builderLock.counter.set(CountOne)
-  builderLock.matcher.set(builderMatcher)
+  builderLock.counter = CountOne
+  builderLock.matcher = builderMatcher
   
   override def isComplete: Boolean = addon.exists(_.aliveAndComplete)
   

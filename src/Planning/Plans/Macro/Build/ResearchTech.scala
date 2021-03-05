@@ -18,11 +18,10 @@ class ResearchTech(tech: Tech) extends Production {
 
   val techerClass = tech.whatResearches
   val currencyLock = new LockCurrencyForTech(tech)
-  val techers = new LockUnits {
-    counter.set(CountOne)
-    matcher.set(techerClass)
-    preference.set(PreferIdle)
-  }
+  val techers = new LockUnits
+  techers.matcher = techerClass
+  techers.counter = CountOne
+  techers.preference = PreferIdle
   
   override def isComplete: Boolean = With.self.hasTech(tech)
   

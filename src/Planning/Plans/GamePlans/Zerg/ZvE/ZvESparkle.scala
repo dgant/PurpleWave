@@ -28,8 +28,8 @@ class ZvESparkle extends GameplanTemplate {
   
   class KillNeutralBlocker extends Plan() {
     val killers = new LockUnits
-    killers.matcher.set(MatchWarriors)
-    killers.counter.set(CountEverything)
+    killers.matcher = MatchWarriors
+    killers.counter = CountEverything
     override def onUpdate() {
       val targets = With.geography.ourZones.flatMap(_.units.filter(_.is(Neutral.PsiDisruptor)))
       if (targets.isEmpty) return

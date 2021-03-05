@@ -11,7 +11,7 @@ import Planning.UnitMatchers.{MatchWarriors, MatchWorkers}
 class DefendAgainstWorkerRush extends Prioritized {
   
   val defenders = new LockUnits
-  defenders.matcher.set(MatchWorkers)
+  defenders.matcher = MatchWorkers
   
   def update() {
     val attackingWorkers = With.geography.ourBases
@@ -33,7 +33,7 @@ class DefendAgainstWorkerRush extends Prioritized {
     if (defenders.units.size > workersToDefend) {
       defenders.release()
     }
-    defenders.counter.set(CountUpTo(workersToDefend))
+    defenders.counter = CountUpTo(workersToDefend)
     defenders.acquire(this)
     defenders.units.foreach(unit => unit.agent.intend(this, new Intention {
       canFlee   = false

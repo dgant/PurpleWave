@@ -8,7 +8,7 @@ import Planning.UnitMatchers.MatchWorkers
 class Gather extends Prioritized {
 
   val workerLock: LockUnits = new LockUnits
-  workerLock.matcher.set(MatchWorkers)
+  workerLock.matcher = MatchWorkers
 
   def update() {
     workerLock.acquire(this)

@@ -12,7 +12,7 @@ import Utilities.GameTime
 
 class RepairBunker extends Plan {
   val lock = new LockUnits
-  lock.matcher.set(Terran.SCV)
+  lock.matcher = Terran.SCV
 
   override def onUpdate(): Unit = {
     val bunkers = With.units.ours
@@ -54,8 +54,8 @@ class RepairBunker extends Plan {
       Math.min(6, With.units.countOurs(Terran.SCV) / 2 - 1))
 
     lock.release()
-    lock.counter.set(CountUpTo(repairersNeeded))
-    lock.preference.set(PreferClose(bunker.pixel))
+    lock.counter = CountUpTo(repairersNeeded)
+    lock.preference = PreferClose(bunker.pixel)
     lock.acquire(this)
     lock.units.foreach(scv => scv.agent.intend(this, new Intention {
       toRepair = Some(bunker)

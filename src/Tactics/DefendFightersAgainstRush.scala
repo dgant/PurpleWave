@@ -3,19 +3,19 @@ package Tactics
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
+import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountUpTo
 import Planning.UnitMatchers.{MatchWarriors, MatchWorkers}
 import Planning.UnitPreferences.PreferClose
-import Planning.{Prioritized, Property}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.Seconds
 
 class DefendFightersAgainstRush extends Prioritized {
   
-  val defenders = new Property[LockUnits](new LockUnits)
-  defenders.get.matcher.set(MatchWorkers)
+  val defenders = new LockUnits
+  defenders.matcher = MatchWorkers
 
   private def inOurBase(unit: UnitInfo): Boolean = unit.zone.bases.exists(_.owner.isUs)
   def update() {
@@ -36,10 +36,10 @@ class DefendFightersAgainstRush extends Prioritized {
     val workersToFight  = PurpleMath.clamp(workersNeeded, 0, workerCap)
     val target          = fighters.minBy(fighter => aggressors.map(_.pixelDistanceEdge(fighter)).min).pixel
     
-    defenders.get.counter.set(CountUpTo(workersToFight.toInt))
-    defenders.get.preference.set(PreferClose(target))
-    defenders.get.acquire(this)
-    defenders.get.units.foreach(_.agent.intend(this, new Intention {
+    defenders.counter = CountUpTo(workersToFight.toInt)
+    defenders.preference = PreferClose(target)
+    defenders.acquire(this)
+    defenders.units.foreach(_.agent.intend(this, new Intention {
       toTravel = Some(target)
       canFlee = false
     }))

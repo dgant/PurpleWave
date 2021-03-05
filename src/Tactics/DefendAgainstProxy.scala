@@ -2,10 +2,10 @@ package Tactics
 
 import Lifecycle.With
 import Micro.Squads.SquadRazeProxies
+import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.{CountEverything, CountUpTo}
 import Planning.UnitMatchers._
-import Planning.{Prioritized, Property}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, Forever, Minutes}
@@ -14,7 +14,7 @@ import scala.collection.mutable
 
 class DefendAgainstProxy extends Prioritized {
 
-  val defenders = new Property[LockUnits](new LockUnits)
+  val defenders = new LockUnits
   
   def update() {
     if (With.frame > Minutes(7)()) return
@@ -32,10 +32,10 @@ class DefendAgainstProxy extends Prioritized {
     var additionalWorkersAllowed  = With.units.countOurs(MatchWorkers) - 6
     val defendersAssigned         = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
     val defendersAvailable        = new mutable.HashSet[FriendlyUnitInfo]
-    defenders.get.release()
-    defenders.get.counter.set(CountEverything)
-    defenders.get.matcher.set(MatchOr(MatchWorkers, MatchWarriors))
-    defenders.get.inquire(this).toVector.foreach(defendersAvailable ++= _)
+    defenders.release()
+    defenders.counter = CountEverything
+    defenders.matcher = MatchOr(MatchWorkers, MatchWarriors)
+    defenders.inquire(this).toVector.foreach(defendersAvailable ++= _)
 
     // For each proxy, in priority order, decide who if anyone to assign to it
     proxies.foreach(proxy => {
@@ -77,15 +77,15 @@ class DefendAgainstProxy extends Prioritized {
       })
     })
 
-    defenders.get.counter.set(CountUpTo(defendersAssigned.size))
-    defenders.get.matcher.set(Match(_.friendly.exists(defendersAssigned.contains)))
-    defenders.get.acquire(this)
-    if (defenders.get.units.isEmpty) {
+    defenders.counter = CountUpTo(defendersAssigned.size)
+    defenders.matcher = Match(_.friendly.exists(defendersAssigned.contains))
+    defenders.acquire(this)
+    if (defenders.units.isEmpty) {
       return
     }
     With.blackboard.status.set(With.blackboard.status.get :+ "DefendingProxy")
     val squad = new SquadRazeProxies(defendersAssigned.toMap)
-    squad.addUnits(defenders.get.units)
+    squad.addUnits(defenders.units)
   }
   
   private def getProxies: Iterable[UnitInfo] = {

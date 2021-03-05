@@ -17,8 +17,8 @@ import Utilities.ByOption
 class ChillOverlords extends Prioritized {
   
   val overlords = new LockUnits
-  overlords.matcher.set(Zerg.Overlord)
-  overlords.counter.set(CountEverything)
+  overlords.matcher = Zerg.Overlord
+  overlords.counter = CountEverything
 
   val cloakedThreat = new Latch(new EnemiesAtLeast(1, MatchOr(
     Terran.Wraith,

@@ -9,55 +9,57 @@ import scala.collection.mutable
 
 class Recruiter {
   
-  private val unitsByLock     : mutable.HashMap[LockUnits, mutable.Set[FriendlyUnitInfo]] = mutable.HashMap.empty
-  private val unassignedUnits : mutable.Set[FriendlyUnitInfo]                             = mutable.Set.empty
-  private val activeLocks     : mutable.Set[LockUnits]                                    = mutable.Set.empty
+  private val unitsByLock   : mutable.HashMap[LockUnits, mutable.Set[FriendlyUnitInfo]] = mutable.HashMap.empty
+  private val unlockedUnits : mutable.Set[FriendlyUnitInfo]                             = mutable.Set.empty
+  private val activeLocks   : mutable.Set[LockUnits]                                    = mutable.Set.empty
+
+  def unlocked: Iterable[FriendlyUnitInfo] = unlockedUnits
+  def lockedBy(lock: LockUnits): collection.Set[FriendlyUnitInfo] = unitsByLock.getOrElse(lock, Set.empty)
+
+  def lockTo(lock: LockUnits, units: Iterable[FriendlyUnitInfo]): Unit = {
+    activateLock(lock)
+    if ( ! units.forall(unlockedUnits.contains)) {
+      With.logger.warn(f"Directly locking already-locked units to ${lock.owner}: ${units.filterNot(unlockedUnits.contains)}")
+      unitsByLock.foreach(_._2 --= units)
+    }
+    unlockedUnits --= units
+    unitsByLock(lock) ++= units
+  }
+
+  def release(lock: LockUnits) {
+    unitsByLock.get(lock).foreach(_.foreach(unassign))
+    unitsByLock.remove(lock)
+  }
+
+  def release(plan: Prioritized): Unit = {
+    unitsByLock.keys.view.filter(_.owner == plan).foreach(release)
+  }
 
   def update() {
     // Remove ineligible units
-    unitsByLock.values.foreach(_.filterNot(eligible).foreach(unassign))
-    
-    // Free units held by inactive locks
-    unitsByLock.keys.filterNot(activeLocks.contains).foreach(release)
+    unitsByLock.values.foreach(_.view.filterNot(recruitable).foreach(unassign))
+
+    // Remove inactive locks (freeing their units)
+    unitsByLock.keys.view.filterNot(activeLocks.contains).foreach(release)
     activeLocks.clear()
 
     // Populate unassigned units
-    unassignedUnits.clear()
-    With.units.ours
-      .filter(unit => eligible(unit) && ! unitsByLock.values.exists(_.contains(unit)))
-      .foreach(unassignedUnits.add)
+    unlockedUnits.clear()
+    unlockedUnits ++= With.units.ours
+      .filter(recruitable)
+      .filterNot(unit => unitsByLock.values.exists(_.contains(unit)))
   }
 
-  def unassigned: Iterable[FriendlyUnitInfo] = unassignedUnits
-
-  private def eligible(unit: FriendlyUnitInfo): Boolean = unit.aliveAndComplete && unit.unitClass.orderable
-
-  def add(lock: LockUnits) {
-    activeLocks.add(lock)
-    unitsByLock(lock) = unitsByLock.getOrElse(lock, mutable.Set.empty)
-    tryToSatisfy(lock)
-  }
-
+  // Called by LockUnits
   def inquire(lock: LockUnits, isDryRun: Boolean): Option[Iterable[FriendlyUnitInfo]] = {
-    // Offer batches of unit for the lock to choose.
-    //  Batch 0: Current units
-    //  Batch 1: Unassigned units
-    //  Batch 2+: Units assigned to weaker-priority locks
-    val assignedToLowerPriority = unitsByLock.keys
-      .view
-      .filter(otherRequest =>
-        (otherRequest.interruptable.get || lock.canPoach.get)
-        && lock.owner.priority < otherRequest.owner.priority)
-      .flatMap(getUnits)
-
-    lock.offerUnits(
-      unitsByLock.getOrElse(lock, Iterable.empty).view
-        ++ unassignedUnits
-        ++ assignedToLowerPriority,
-      isDryRun)
+    val assignedToWeakerLock = unitsByLock.keys.view
+      .filter(otherLock => otherLock.interruptable && lock.owner.priority < otherLock.owner.priority)
+      .flatMap(lockedBy)
+    lock.offerUnits(unlockedUnits.view ++ lock.units ++ assignedToWeakerLock, isDryRun)
   }
 
-  private def tryToSatisfy(lock: LockUnits) {
+  def satisfy(lock: LockUnits) {
+    activateLock(lock)
 
     val requiredUnits = inquire(lock, isDryRun = false)
 
@@ -67,7 +69,7 @@ class Recruiter {
       // 1. Unassign all the current units
       // 2. Unassign all the required units
       // 3. Assign all the required unit
-      val unitsBefore   = getUnits(lock)
+      val unitsBefore   = lockedBy(lock)
       val unitsAfter    = requiredUnits.get.toSet
       val unitsObsolete = unitsBefore.diff(unitsAfter)
       val unitsNew      = unitsAfter.diff(unitsBefore)
@@ -78,29 +80,24 @@ class Recruiter {
     }
   }
 
-  def release(lock: LockUnits) {
-    unitsByLock.get(lock).foreach(_.foreach(unassign))
-    unitsByLock.remove(lock)
+  private def activateLock(lock: LockUnits): Unit = {
+    activeLocks.add(lock)
+    unitsByLock(lock) = unitsByLock.getOrElse(lock, mutable.Set.empty)
   }
 
-  def release(plan: Prioritized): Unit = {
-    unitsByLock.keys.foreach(lock => if (lock.owner == plan) release(lock))
-  }
+  private def recruitable(unit: FriendlyUnitInfo): Boolean = unit.alive && unit.unitClass.orderable && unit.remainingCompletionFrames < With.latency.framesRemaining
   
   private def assign(unit: FriendlyUnitInfo, lock: LockUnits) {
     unitsByLock(lock).add(unit)
-    unassignedUnits.remove(unit)
+    unlockedUnits.remove(unit)
   }
   
   private def unassign(unit: FriendlyUnitInfo) {
-    unassignedUnits.add(unit)
+    unlockedUnits.add(unit)
     unitsByLock.find(_._2.contains(unit)).foreach(pair => unitsByLock(pair._1).remove(unit))
   }
-  
-  def getUnits(lock: LockUnits): collection.Set[FriendlyUnitInfo] = {
-    unitsByLock.getOrElse(lock, Set.empty)
-  }
-  
+
+  // Debugging information
   def audit: Vector[(Prioritized, mutable.Set[FriendlyUnitInfo])] = {
     unitsByLock.toVector.sortBy(_._1.owner.priority).map(p => (p._1.owner, p._2))
   }

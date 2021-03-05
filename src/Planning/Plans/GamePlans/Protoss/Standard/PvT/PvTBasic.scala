@@ -302,17 +302,6 @@ class PvTBasic extends GameplanTemplate {
               new UnitsAtMost(45, MatchWorkers),
               new CapGasAt(400))))),
 
-    // Scout with Observer
-    new If(
-      new And(
-        new EnemiesAtMost(7, Terran.Factory),
-        new Or(
-          new UnitsAtLeast(2, Protoss.Observer, complete = true),
-          new And(
-            new Not(new EnemyHasShownWraithCloak),
-            new Not(new PvTIdeas.EnemyHasMines)))),
-      new MonitorBases(Protoss.Observer)),
-
     // Pylon block
     new If(new And(new BasesAtLeast(3), new MiningBasesAtLeast(2), new UnitsAtLeast(45, MatchWorkers)), new PylonBlock),
 

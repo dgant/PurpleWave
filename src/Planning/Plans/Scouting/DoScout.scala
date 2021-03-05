@@ -17,18 +17,18 @@ abstract class DoScout extends Prioritized {
   protected final def enemyFound: Boolean = With.scouting.enemyMain.isDefined
 
   protected val scoutLock: LockUnits = new LockUnits
-  scoutLock.matcher.set(MatchMobile)
-  scoutLock.counter.set(CountOne)
-  scoutLock.preference.set(PreferIdle)
-  scoutLock.interruptable.set(false)
+  scoutLock.interruptable = false
+  scoutLock.matcher = MatchMobile
+  scoutLock.counter = CountOne
+  scoutLock.preference = PreferIdle
 
   protected final def getScouts(matcher: UnitMatcher, count: Int): Iterable[FriendlyUnitInfo] = {
     if (scoutLock.units.size > count) {
       scoutLock.release()
     }
-    scoutLock.matcher.set(matcher)
-    scoutLock.counter.set(CountUpTo(count))
-    scoutLock.preference.set(PreferIdle)
+    scoutLock.matcher = matcher
+    scoutLock.counter = CountUpTo(count)
+    scoutLock.preference = PreferIdle
     scoutLock.acquire(this)
     scoutLock.units
   }

@@ -1,32 +1,30 @@
 package Planning.ResourceLocks
 
 import Lifecycle.With
+import Planning.Prioritized
 import Planning.UnitCounters.{CountEverything, CountUpTo, UnitCounter}
 import Planning.UnitMatchers.{MatchAnything, UnitMatcher}
 import Planning.UnitPreferences.{PreferAnything, UnitPreference}
-import Planning.{Prioritized, Property}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
 import scala.collection.mutable
 
 class LockUnits {
-  
-  var canPoach      = new Property[Boolean](false)
-  var interruptable = new Property[Boolean](true)
-  val matcher       = new Property[UnitMatcher](MatchAnything)
-  val preference    = new Property[UnitPreference](PreferAnything)
-  val counter       = new Property[UnitCounter](CountEverything)
 
-  var owner: Prioritized = _
+  var owner         : Prioritized     = _
+  var interruptable : Boolean         = true
+  var matcher       : UnitMatcher     = MatchAnything
+  var preference    : UnitPreference  = PreferAnything
+  var counter       : UnitCounter     = CountEverything
 
-  var isSatisfied:Boolean = false
-  def satisfied: Boolean = isSatisfied
+  private var _isSatisfied: Boolean = false
+  def satisfied: Boolean = _isSatisfied
 
   def acquire(prioritized: Prioritized) {
     owner = prioritized
     owner.prioritize()
-    With.recruiter.add(this)
+    With.recruiter.satisfy(this)
   }
 
   def inquire(prioritized: Prioritized): Option[Vector[FriendlyUnitInfo]] = {
@@ -39,44 +37,42 @@ class LockUnits {
     With.recruiter.release(this)
   }
 
-  def units: collection.Set[FriendlyUnitInfo] = With.recruiter.getUnits(this)
-
-  private def weAccept(unit: FriendlyUnitInfo): Boolean = matcher.get(unit)
+  def units: collection.Set[FriendlyUnitInfo] = With.recruiter.lockedBy(this)
 
   // Invoked by Recruiter
   def offerUnits(candidates: Iterable[FriendlyUnitInfo], dryRun: Boolean): Option[Seq[FriendlyUnitInfo]] = {
     val finalists = findFinalists(candidates)
-    val finalistsSatisfy = counter.get.accept(finalists)
-    if ( ! dryRun) isSatisfied = finalistsSatisfy
+    val finalistsSatisfy = counter.accept(finalists)
+    if ( ! dryRun) _isSatisfied = finalistsSatisfy
     if (finalistsSatisfy) Some(finalists) else None
   }
 
   private def findFinalists(candidates: Iterable[FriendlyUnitInfo]): Seq[FriendlyUnitInfo] = {
     // Here's a bunch of special-case performance shortcuts
-    if (counter.get == CountEverything) {
-      if (matcher.get == MatchAnything) {
+    if (counter == CountEverything) {
+      if (matcher == MatchAnything) {
         candidates.toSeq
       } else {
-        candidates.filter(weAccept).toSeq
+        candidates.filter(matcher).toSeq
       }
-    } else if (counter.get == CountUpTo(1)) {
+    } else if (counter == CountUpTo(1)) {
       findSingleFinalist(candidates)
     } else {
       findMultipleFinalists(candidates)
     }
   }
 
-  protected def findSingleFinalist(candidates: Iterable[FriendlyUnitInfo]): Seq[FriendlyUnitInfo] = {
-    ByOption.minBy(candidates.filter(weAccept))(preference.get.apply).toSeq
+  private def findSingleFinalist(candidates: Iterable[FriendlyUnitInfo]): Seq[FriendlyUnitInfo] = {
+    ByOption.minBy(candidates.filter(matcher))(preference.apply).toSeq
   }
 
-  protected def findMultipleFinalists(candidates: Iterable[FriendlyUnitInfo]): Seq[FriendlyUnitInfo] = {
+  private def findMultipleFinalists(candidates: Iterable[FriendlyUnitInfo]): Seq[FriendlyUnitInfo] = {
 
     val desiredUnits = new mutable.ArrayBuffer[FriendlyUnitInfo]()
 
     // Build a queue based on whether we need to sort it
     val (candidateQueue, dequeue, preference) =
-      if (this.preference.get == PreferAnything) {
+      if (this.preference == PreferAnything) {
         val output = new mutable.Queue[(FriendlyUnitInfo, Double)]()
         (
           output,
@@ -88,12 +84,12 @@ class LockUnits {
           output,
           () => output.dequeue(),
           (candidate: FriendlyUnitInfo) =>
-            - this.preference.get.apply(candidate)
+            - this.preference(candidate)
             * (if (units.contains(candidate)) 1.0 else 1.5))
       }
 
-    candidateQueue ++= candidates.filter(weAccept).map(c => (c, preference(c)))
-    while (counter.get.continue(desiredUnits) && candidateQueue.nonEmpty) {
+    candidateQueue ++= candidates.filter(matcher).map(c => (c, preference(c)))
+    while (counter.continue(desiredUnits) && candidateQueue.nonEmpty) {
       desiredUnits += dequeue()._1
     }
     desiredUnits

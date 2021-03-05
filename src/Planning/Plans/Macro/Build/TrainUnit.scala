@@ -34,9 +34,9 @@ class TrainUnit(val traineeClass: UnitClass) extends Production {
       matchTrainer
     
   lazy val trainerLock = new LockUnits
-  trainerLock.matcher.set(u => trainerMatcher.apply(u) && (trainer.contains(u) || u.friendly.exists(_.trainee.forall(t => t.is(traineeClass) || t.completeOrNearlyComplete))))
-  trainerLock.counter.set(CountOne)
-  trainerLock.preference.set(preference)
+  trainerLock.matcher = u => trainerMatcher.apply(u) && (trainer.contains(u) || u.friendly.exists(_.trainee.forall(t => t.is(traineeClass) || t.completeOrNearlyComplete)))
+  trainerLock.counter = CountOne
+  trainerLock.preference = preference
   
   def trainer: Option[FriendlyUnitInfo] = trainerLock.units.headOption
   def trainee: Option[FriendlyUnitInfo] = trainer.flatMap(_.trainee.filter(_.is(traineeClass)))

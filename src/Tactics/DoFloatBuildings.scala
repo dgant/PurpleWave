@@ -10,16 +10,13 @@ import Planning.UnitMatchers.{MatchAnd, MatchMobileFlying, MatchNot, MatchOr}
 class DoFloatBuildings extends Prioritized {
 
   val floaties: LockUnits = new LockUnits
-  floaties.counter.set(CountEverything)
+  floaties.counter = CountEverything
 
   def update() {
-    floaties.matcher.set(
-      MatchAnd(
-        MatchOr(With.blackboard.floatableBuildings(): _*),
-        MatchNot(MatchMobileFlying)))
+    floaties.matcher = MatchAnd(
+      MatchNot(MatchMobileFlying),
+      MatchOr(With.blackboard.floatableBuildings(): _*))
     floaties.acquire(this)
-    floaties.units.foreach(floatie => {
-      floatie.agent.intend(this, new Intention { canLiftoff = true })
-    })
+    floaties.units.foreach(_.agent.intend(this, new Intention { canLiftoff = true }))
   }
 }

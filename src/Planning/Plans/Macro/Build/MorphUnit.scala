@@ -22,10 +22,9 @@ class MorphUnit(val classToMorph: UnitClass) extends Production {
   
   val currencyLock  = new LockCurrencyForUnit(classToMorph)
   val morpherClass  = classToMorph.whatBuilds._1
-  val morpherLock   = new LockUnits {
-    matcher.set(MatchOr(morpherClass, MatchMorphingInto(classToMorph)))
-    counter.set(CountOne)
-  }
+  val morpherLock   = new LockUnits
+  morpherLock.matcher = MatchOr(morpherClass, MatchMorphingInto(classToMorph))
+  morpherLock.counter = CountOne
   
   private var morpher: Option[FriendlyUnitInfo] = None
   
@@ -52,7 +51,7 @@ class MorphUnit(val classToMorph: UnitClass) extends Production {
     currencyLock.acquire(this)
     if (currencyLock.satisfied && ! currencyLock.isSpent) {
       setPreference()
-      morpherLock.matcher.set(morpher.map(m => new MatchSpecific(Set(m))).getOrElse(morpherClass))
+      morpherLock.matcher = morpher.map(m => new MatchSpecific(Set(m))).getOrElse(morpherClass)
       morpherLock.acquire(this)
       morpher = morpherLock.units.headOption
       morpher.foreach(_.agent.intend(this, new Intention {
@@ -68,17 +67,11 @@ class MorphUnit(val classToMorph: UnitClass) extends Production {
   
   protected def setPreference() {
     if (classToMorph.isWorker) {
-      morpherLock.preference.set(PreferAll(
-        PreferHatcheryWithThreeLarva,
-        PreferBaseWithFewerWorkers
-      ))
+      morpherLock.preference = PreferAll(PreferHatcheryWithThreeLarva, PreferBaseWithFewerWorkers)
     } else if (morpherClass == Zerg.Larva) {
-      morpherLock.preference.set(PreferAll(
-        PreferHatcheryWithThreeLarva,
-        PreferBaseWithMoreWorkers
-      ))
+      morpherLock.preference = PreferAll(PreferHatcheryWithThreeLarva, PreferBaseWithMoreWorkers)
     } else {
-      morpherLock.preference.set(u => (if (u.visibleToOpponents) 0 else 1) - u.matchups.framesOfSafety)
+      morpherLock.preference = u => (if (u.visibleToOpponents) 0 else 1) - u.matchups.framesOfSafety
     }
   }
 }

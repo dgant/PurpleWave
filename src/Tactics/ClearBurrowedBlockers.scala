@@ -15,19 +15,17 @@ import scala.util.Random
 class ClearBurrowedBlockers extends Prioritized {
   
   val detector = new Property(new LockUnits)
-  detector.get.matcher.set(MatchMobileDetector)
-  detector.get.counter.set(CountOne)
+  detector.get.matcher = MatchMobileDetector
+  detector.get.counter = CountOne
   
   val clearer = new Property(new LockUnits)
-  clearer.get.matcher.set(MatchOr(Terran.Marine, Terran.Firebat, Terran.Goliath, Terran.Wraith, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk, Zerg.Mutalisk))
-  clearer.get.counter.set(CountOne)
+  clearer.get.matcher = MatchOr(Terran.Marine, Terran.Firebat, Terran.Goliath, Terran.Wraith, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk, Zerg.Mutalisk)
+  clearer.get.counter = CountOne
 
   def update(): Unit = {
-
     if (With.frame < Minutes(6)()) {
       return
     }
-
     if ( ! With.enemies.exists(_.isZerg) && ! With.enemies.exists(_.isTerran)) {
       return
     }
@@ -41,14 +39,14 @@ class ClearBurrowedBlockers extends Prioritized {
 
     if (target.isEmpty) return
 
-    detector.get.preference.set(PreferClose(target.get))
+    detector.get.preference = PreferClose(target.get)
     detector.get.acquire(this)
     detector.get.units.foreach(_.agent.intend(this, new Intention {
       toTravel = target
     }))
 
     if (With.enemies.exists(_.isZerg) || detector.get.units.forall(_.framesToTravelTo(target.get) > Seconds(5)())) {
-      clearer.get.preference.set(PreferClose(target.get))
+      clearer.get.preference = PreferClose(target.get)
       clearer.get.acquire(this)
       clearer.get.units.foreach(_.agent.intend(this, new Intention {
         toTravel = Some(target.get.add(Random.nextInt(160) - 80, Random.nextInt(128) - 64))

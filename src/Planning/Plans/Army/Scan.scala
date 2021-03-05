@@ -3,9 +3,9 @@ package Planning.Plans.Army
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
+import Planning.Plan
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitMatchers.MatchSiegeTank
-import Planning.{Plan, Property}
 import ProxyBwapi.Races.Terran
 import Utilities.Seconds
 
@@ -13,17 +13,14 @@ class Scan extends Plan {
   
   description.set("Use Scanner Sweep")
   
-  val scanners = new Property[LockUnits](new LockUnits { matcher.set(Terran.Comsat) })
+  val scanners = new LockUnits
+  scanners.matcher = Terran.Comsat
   
   var lastScan = 0
   
   override def onUpdate() {
-    if (With.units.countOurs(Terran.Comsat) == 0) {
-      return
-    }
-    if (With.framesSince(lastScan) < 72) {
-      return
-    }
+    if ( ! With.units.existsOurs(Terran.Comsat)) return
+    if (With.framesSince(lastScan) < 72) return
     
     // TODO: Actually check whether we can attack the darned thing.
     val cloakedTargets = With.units.enemy.view.filter(ninja =>
@@ -66,12 +63,10 @@ class Scan extends Plan {
   }
   
   def scan(targetPixel: Pixel) {
-    scanners.get.acquire(this)
-    val units = scanners.get.units
+    scanners.acquire(this)
+    val units = scanners.units
     if (units.nonEmpty) {
-      units.maxBy(_.energy).agent.intend(this, new Intention {
-        toScan = Some(targetPixel)
-      })
+      units.maxBy(_.energy).agent.intend(this, new Intention { toScan = Some(targetPixel) })
       lastScan = With.frame
     }
   }

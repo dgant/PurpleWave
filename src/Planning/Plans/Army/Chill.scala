@@ -14,8 +14,8 @@ import Utilities.ByOption
 class Chill(initialMatcher: UnitMatcher) extends Plan {
   
   val chillers = new LockUnits
-  chillers.matcher.set(initialMatcher)
-  chillers.counter.set(CountEverything)
+  chillers.matcher = initialMatcher
+  chillers.counter = CountEverything
 
   override def onUpdate() {
     chillers.acquire(this)

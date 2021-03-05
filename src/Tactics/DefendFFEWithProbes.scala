@@ -7,11 +7,11 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Planning.Predicates.Strategy.EnemyRecentStrategy
+import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountUpTo
 import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchWorkers}
 import Planning.UnitPreferences.PreferClose
-import Planning.{Prioritized, Property}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.{ByOption, Minutes}
@@ -20,8 +20,8 @@ import scala.collection.mutable.ArrayBuffer
 
 class DefendFFEWithProbes extends Prioritized {
   
-  val defenders = new Property[LockUnits](new LockUnits)
-  defenders.get.matcher.set(MatchWorkers)
+  val defenders = new LockUnits
+  defenders.matcher = MatchWorkers
   
   protected def probeCount: Int = {
     val zerglings           = Seq(4, With.units.countEnemy(Zerg.Zergling), 8 - With.units.countEver(Zerg.Zergling)).max
@@ -60,17 +60,17 @@ class DefendFFEWithProbes extends Prioritized {
     cannons.toVector.sortBy(_.totalHealth)
     
     val probesRequired = probeCount
-    if (defenders.get.units.size > probesRequired) {
-      defenders.get.release()
+    if (defenders.units.size > probesRequired) {
+      defenders.release()
     }
-    defenders.get.preference.set(PreferClose(cannons.map(_.pixel).minBy(_.groundPixels(threatSource))))
-    defenders.get.counter.set(CountUpTo(probesRequired))
-    defenders.get.acquire(this)
+    defenders.preference = PreferClose(cannons.map(_.pixel).minBy(_.groundPixels(threatSource)))
+    defenders.counter = CountUpTo(probesRequired)
+    defenders.acquire(this)
     val closestDistance = cannons.map(_.pixelDistanceTravelling(threatSource)).min
     val threatenedCannons = cannons.filter(_.pixelDistanceTravelling(threatSource) <= closestDistance + 96)
     val workers = new ArrayBuffer[FriendlyUnitInfo]
     val workersByCannon = threatenedCannons.map(c => (c, new ArrayBuffer[FriendlyUnitInfo])).toMap
-    workers ++= defenders.get.units
+    workers ++= defenders.units
     while (workers.nonEmpty) {
       threatenedCannons.foreach(cannon => {
         if (workers.nonEmpty) {

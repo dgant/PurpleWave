@@ -1,15 +1,14 @@
 package Planning.Plans.Macro.Build
 
-import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
+import Macro.Architecture.PlacementRequests.PlacementRequest
 import Macro.Buildables.{Buildable, BuildableUnit}
 import Macro.Scheduling.MacroCounter
-import Macro.Architecture.PlacementRequests.PlacementRequest
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.CountOne
-import Planning.UnitMatchers.{MatchAnd, Match, MatchSpecific}
+import Planning.UnitMatchers.{Match, MatchAnd, MatchSpecific}
 import Planning.UnitPreferences.PreferCloseAndNotMining
 import ProxyBwapi.Races.Neutral
 import ProxyBwapi.UnitClasses.UnitClass
@@ -30,9 +29,10 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
 
   val builderMatcher: UnitClass = buildingClass.whatBuilds._1
   val builderLock: LockUnits = new LockUnits
-  builderLock.counter.set(CountOne)
-  builderLock.matcher.set(builderMatcher)
-  builderLock.interruptable.set(false)
+  builderLock.interruptable = false
+  builderLock.matcher = builderMatcher
+  builderLock.counter = CountOne
+
     
   var waitForBuilderToRecallUntil: Option[Int] = None
   var placement: Option[PlacementRequest] = None
@@ -82,18 +82,18 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
     // Find an appropriate builder (or make sure we use the current builder)
     val desiredZone = desiredTile.map(_.zone)
     if (building.exists(_.buildUnit.isDefined)) {
-      builderLock.matcher.set(new MatchSpecific(Set(building.get.buildUnit.get)))
+      builderLock.matcher = new MatchSpecific(Set(building.get.buildUnit.get))
     } else if ( ! builderLock.satisfied && desiredZone.exists(_.bases.exists(_.workerCount > 5))) {
-      builderLock.matcher.set(MatchAnd(Match(_.zone == desiredZone.get), builderMatcher))
+      builderLock.matcher = MatchAnd(Match(_.zone == desiredZone.get), builderMatcher)
     } else {
-      builderLock.matcher.set(builderMatcher)
+      builderLock.matcher = builderMatcher
     }
   
     // When building placement changes we want a builder closer to the new placement
     if (orderedTile.isDefined && orderedTile != desiredTile) {
       builderLock.release()
     }
-    builderLock.preference.set(PreferCloseAndNotMining(desiredTile.get.pixelCenter))
+    builderLock.preference = PreferCloseAndNotMining(desiredTile.get.pixelCenter)
     builderLock.acquire(this)
     
     if (waitForBuilderToRecallUntil.isDefined) {

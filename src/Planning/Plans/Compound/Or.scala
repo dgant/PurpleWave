@@ -4,5 +4,5 @@ import Planning.Predicate
 
 class Or(children: Predicate*) extends Predicate{
   
-  override def isComplete: Boolean = children.exists(_.isComplete)
+  override def apply: Boolean = children.exists(_.apply)
 }

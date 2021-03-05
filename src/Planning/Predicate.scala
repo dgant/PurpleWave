@@ -1,3 +1,3 @@
 package Planning
 
-trait Predicate { def isComplete: Boolean }
+trait Predicate { def apply(): Boolean }

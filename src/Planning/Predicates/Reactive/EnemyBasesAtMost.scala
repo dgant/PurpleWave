@@ -5,6 +5,6 @@ import Planning.Predicate
 
 class EnemyBasesAtMost(value: Int) extends Predicate {
   
-  override def isComplete: Boolean = With.geography.enemyBases.size <= value
+  override def apply: Boolean = With.geography.enemyBases.size <= value
   
 }

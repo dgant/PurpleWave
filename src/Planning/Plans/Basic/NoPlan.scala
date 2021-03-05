@@ -2,9 +2,4 @@ package Planning.Plans.Basic
 
 import Planning.Plan
 
-object NoPlan {
-  def apply(): Plan = new Plan {
-    description.set("[Empty]")
-    override def isEmpty: Boolean = true
-  }
-}
+object NoPlan { def apply(): Plan = new Plan }

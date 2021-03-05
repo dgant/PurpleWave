@@ -6,6 +6,6 @@ import ProxyBwapi.Techs.Tech
 
 class EnemyHasTech(tech: Tech) extends Predicate {
   
-  override def isComplete: Boolean = With.enemies.exists(_.hasTech(tech))
+  override def apply: Boolean = With.enemies.exists(_.hasTech(tech))
   
 }

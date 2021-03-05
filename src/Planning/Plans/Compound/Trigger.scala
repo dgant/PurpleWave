@@ -11,8 +11,6 @@ class Trigger(
   initialBefore    : Plan = NoPlan())
     extends Plan {
   
-  description.set("Trigger when")
-  
   val predicate = new Property[Predicate](initialPredicate)
   val after     = new Property[Plan](initialAfter)
   val before    = new Property[Plan](initialBefore)
@@ -22,13 +20,11 @@ class Trigger(
   
   var triggered: Boolean = false
   
-  override def getChildren: Iterable[Plan] = Vector(after.get, before.get)
-  
   override def onUpdate() {
-    triggered = triggered || latch.isComplete
+    triggered = triggered || latch.apply
     if (triggered)
-      delegate(after.get)
+      after.get.update()
     else
-      delegate(before.get)
+      before.get.update()
   }
 }

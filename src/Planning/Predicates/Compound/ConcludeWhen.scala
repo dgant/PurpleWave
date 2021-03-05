@@ -7,11 +7,11 @@ class ConcludeWhen(permanencePredicate: Predicate, valuePredicate: Predicate) ex
   var isPermanent: Boolean = false
   var permanentValue: Option[Boolean] = None
 
-  override def isComplete: Boolean = {
-    isPermanent = isPermanent || permanencePredicate.isComplete
+  override def apply: Boolean = {
+    isPermanent = isPermanent || permanencePredicate.apply
 
     if (permanentValue.isEmpty || ! isPermanent) {
-      permanentValue = Some(valuePredicate.isComplete)
+      permanentValue = Some(valuePredicate.apply)
     }
 
     permanentValue.get

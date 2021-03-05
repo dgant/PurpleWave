@@ -4,6 +4,6 @@ import Planning.Predicate
 
 class MiningBasesAtLeast(requiredBases: Int) extends Predicate {
   
-  override def isComplete: Boolean = AllMiningBases().size >= requiredBases
+  override def apply: Boolean = AllMiningBases().size >= requiredBases
   
 }

@@ -44,9 +44,6 @@ object StrategyGroups {
     //PvZMidgameCorsairReaverGoon, // Too fragile
     //PvZMidgameCorsairReaverZealot, // Too fragile; especially bad at dealing with Mutalisks
 
-    ZvTProxyHatchZerglings, // Proxy builds are temporarily broken due to new building placer
-    ZvTProxyHatchHydras,    // Proxy builds are temporarily broken due to new building placer
-    ZvTProxyHatchSunkens,   // Proxy builds are temporarily broken due to new building placer
     ZvZ5PoolSunkens,         // Proxy builds are temporarily broken due to new building placer
 
     PvTStove, // TODO: For ladder/fun play only

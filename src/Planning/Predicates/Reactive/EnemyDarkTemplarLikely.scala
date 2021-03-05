@@ -6,7 +6,7 @@ import ProxyBwapi.Races.Protoss
 
 class EnemyDarkTemplarLikely extends Predicate {
   
-  override def isComplete: Boolean = (
+  override def apply: Boolean = (
     With.fingerprints.dtRush.matches
     || With.units.existsEnemy(
         Protoss.HighTemplar,

@@ -9,8 +9,6 @@ class RequireBases(basesInitial: Int = 1) extends Plan {
   
   val basesDesired = new Property(basesInitial)
   
-  description.set("Require " + basesDesired.get + English.pluralize(" base", basesDesired.get))
-  
   protected def basesNow: Int = {
     With.geography.ourBases.size
   }

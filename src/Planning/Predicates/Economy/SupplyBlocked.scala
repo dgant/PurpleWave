@@ -5,6 +5,6 @@ import Planning.Predicate
 
 class SupplyBlocked extends Predicate {
   
-  override def isComplete: Boolean = With.self.supplyUsed >= With.self.supplyTotal
+  override def apply: Boolean = With.self.supplyUsed >= With.self.supplyTotal
   
 }

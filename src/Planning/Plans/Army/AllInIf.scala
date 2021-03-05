@@ -1,15 +1,13 @@
 package Planning.Plans.Army
 
 import Lifecycle.With
-import Planning.{Plan, Predicate, Property}
 import Planning.Predicates.Always
+import Planning.{Plan, Predicate}
 
-class AllInIf(initialPredicate: Predicate = new Always) extends Plan {
-  
-  val predicate: Property[Predicate] = new Property(initialPredicate)
+class AllInIf(predicate: Predicate = new Always) extends Plan {
   
   override def onUpdate() {
     With.blackboard.wantToAttack.set(true)
-    With.blackboard.allIn.set(predicate.get.isComplete)
+    With.blackboard.allIn.set(With.blackboard.allIn() || predicate.apply)
   }
 }

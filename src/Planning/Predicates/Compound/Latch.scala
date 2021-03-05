@@ -11,8 +11,8 @@ class Latch(initialPredicate: Predicate = new Never, duration: Int = Forever()) 
   
   private var lastCompletedFrame: Int = - Forever()
   
-  override def isComplete: Boolean = {
-    if (predicate.get.isComplete) {
+  override def apply: Boolean = {
+    if (predicate.get.apply) {
       lastCompletedFrame = With.frame
     }
     lastCompletedFrame > 0 && With.framesSince(lastCompletedFrame) < duration

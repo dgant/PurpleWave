@@ -8,10 +8,8 @@ class UpgradeContinuously(upgrade: ProxyBwapi.Upgrades.Upgrade, maxLevel: Int = 
   
   description.set("Upgrade " + upgrade + " up to level " + maxLevel)
   
-  override def isComplete: Boolean = With.self.getUpgradeLevel(upgrade) >= Math.min(maxLevel, upgrade.levels.size)
-  
   override def onUpdate() {
-    if (isComplete) return
+    if (With.self.getUpgradeLevel(upgrade) >= Math.min(maxLevel, upgrade.levels.size)) return
     if ( ! With.units.existsOurs(upgrade.whatUpgrades)) return
     With.scheduler.request(this, Get(upgrade, With.self.getUpgradeLevel(upgrade) + 1))
   }

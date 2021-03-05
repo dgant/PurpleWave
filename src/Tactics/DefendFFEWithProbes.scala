@@ -47,7 +47,7 @@ class DefendFFEWithProbes extends Prioritized {
     if (With.fingerprints.twelvePool.matches) return
     if (With.fingerprints.overpool.matches) return
     if (With.fingerprints.ninePool.matches) return
-    if ( ! new EnemyRecentStrategy(With.fingerprints.fourPool).isComplete) return
+    if ( ! new EnemyRecentStrategy(With.fingerprints.fourPool).apply) return
     if ( ! With.fingerprints.fourPool.matches && ! With.scouting.enemyHasScoutedUsWithWorker) return
 
     var cannons = With.units.ours.filter(_.is(Protoss.PhotonCannon))

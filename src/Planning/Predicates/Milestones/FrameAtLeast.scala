@@ -7,6 +7,6 @@ class FrameAtLeast(frame: () => Int) extends Predicate {
 
   def this(specificFrame: Int) = this(() => specificFrame)
 
-  override def isComplete: Boolean = With.frame >= frame()
+  override def apply: Boolean = With.frame >= frame()
   
 }

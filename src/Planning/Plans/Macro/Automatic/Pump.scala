@@ -16,7 +16,7 @@ class Pump(
   maximumConcurrentlyRatio  : Double = 1.0)
     extends Plan {
     
-  description.set("Continuously train " + unitClass)
+  description.set("Pump " + unitClass)
   
   override def onUpdate() {
     if ( ! canBuild) return

@@ -7,5 +7,5 @@ class SupplyOutOf200(defaultQuantity: Int = 0) extends Predicate {
   
   val quantity = new Property[Int](defaultQuantity)
   
-  override def isComplete: Boolean = With.self.supplyUsed >= quantity.get * 2
+  override def apply: Boolean = With.self.supplyUsed >= quantity.get * 2
 }

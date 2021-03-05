@@ -7,5 +7,5 @@ class Employing(strategies: Strategy*) extends Predicate {
   
   override def toString: String = "Employing " + strategies.mkString("/")
   
-  override def isComplete: Boolean = strategies.exists(_.active)
+  override def apply: Boolean = strategies.exists(_.active)
 }

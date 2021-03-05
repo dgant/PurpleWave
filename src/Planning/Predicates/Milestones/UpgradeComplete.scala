@@ -6,7 +6,7 @@ import ProxyBwapi.Upgrades.Upgrade
 
 class UpgradeComplete(upgrade: Upgrade, level: Int = 1, withinFrames: Int = 0) extends Predicate {
   
-  override def isComplete: Boolean = (
+  override def apply: Boolean = (
     With.self.getUpgradeLevel(upgrade) >= level
     || (
       With.self.getUpgradeLevel(upgrade) == level - 1

@@ -8,7 +8,7 @@ import Planning.Predicate
 class EnemyRecentStrategy(fingerprints: Fingerprint*) extends Or(
   new EnemyStrategy(fingerprints: _*),
   new Predicate {
-    override def isComplete: Boolean = {
+    override def apply: Boolean = {
       fingerprints.map(_.toString).exists(With.strategy.enemyRecentFingerprints.contains)
     }
 })

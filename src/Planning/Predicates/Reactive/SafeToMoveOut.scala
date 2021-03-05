@@ -8,7 +8,7 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvZ9PoolSpeed
 
 class SafeToMoveOut extends Predicate {
-  override def isComplete: Boolean = {
+  override def apply: Boolean = {
     if (With.yolo.active()) return true
     
     if (With.self.isProtoss && With.enemies.forall(_.isTerran))   return pvtSafeToAttack
@@ -162,7 +162,7 @@ class SafeToMoveOut extends Predicate {
     val strategyUs = With.strategy.selectedCurrently
     val speedExpectedFirst = (
       strategyUs.contains(ZvZ9PoolSpeed)
-      || ( ! With.fingerprints.ninePool.matches && ! With.fingerprints.overpool.matches && new EnemyRecentStrategy(With.fingerprints.twelveHatch).isComplete)
+      || ( ! With.fingerprints.ninePool.matches && ! With.fingerprints.overpool.matches && new EnemyRecentStrategy(With.fingerprints.twelveHatch).apply)
       || With.fingerprints.twelveHatch.matches
       || With.fingerprints.twelvePool.matches)
     val okayOnSpeed = speedUs || (speedExpectedFirst && ! speedEnemy)

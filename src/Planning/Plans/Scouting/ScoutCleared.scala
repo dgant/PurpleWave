@@ -4,7 +4,7 @@ import Lifecycle.With
 import Planning.Predicate
 
 class ScoutCleared extends Predicate {
-  override def isComplete: Boolean = (
+  override def apply: Boolean = (
     With.scouting.enemyScouts().isEmpty
     || (
       With.scouting.enemyScouts().forall( ! _.likelyStillThere)

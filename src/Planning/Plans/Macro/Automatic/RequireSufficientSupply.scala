@@ -9,9 +9,7 @@ import ProxyBwapi.UnitClasses.UnitClasses
 
 class RequireSufficientSupply extends Plan {
   
-  description.set("Require enough supply to avoid supply block")
-  
-  val supplyProvider =  UnitClasses.get(With.self.raceInitial.getSupplyProvider)
+  private val supplyProvider =  UnitClasses.get(With.self.raceInitial.getSupplyProvider)
   
   override def onUpdate() {
     With.scheduler.request(this, Get(totalRequiredRecalculate, supplyProvider))
@@ -66,7 +64,7 @@ class RequireSufficientSupply extends Plan {
     val supplyAddableBeforeDepotCompletion: Double =
       if (With.self.isZerg)
         larva + larvaPerFrame * depotCompletionFrames * (if (With.units.existsOurs(Zerg.Spire)) 2 else 1) +
-        (if (new TechStarted(Zerg.LurkerMorph).isComplete) Math.min(6, With.units.countOurs(Zerg.Hydralisk)) else 0)
+        (if (new TechStarted(Zerg.LurkerMorph).apply) Math.min(6, With.units.countOurs(Zerg.Hydralisk)) else 0)
       else
         productionTypes
           .map(productionType =>

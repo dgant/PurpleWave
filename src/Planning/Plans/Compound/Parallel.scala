@@ -2,7 +2,6 @@ package Planning.Plans.Compound
 
 import Planning.Plan
 
-class Parallel(initialChildren: Plan*) extends AbstractAll(initialChildren: _*) {
-  
-  override def onUpdate() { getChildren.foreach(delegate) }
+class Parallel(children: Plan*) extends Plan {
+  override def onUpdate() { children.foreach(_.update()) }
 }

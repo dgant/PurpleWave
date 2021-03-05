@@ -12,9 +12,6 @@ object ZergChoices {
   )
 
   val zvt = Vector(
-    ZvTProxyHatchZerglings,
-    ZvTProxyHatchHydras,
-    ZvTProxyHatchSunkens,
     ZvT7Pool,
     ZvT2HatchLingBustMuta,
     ZvT3HatchLing,

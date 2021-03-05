@@ -10,8 +10,6 @@ import Planning.UnitPreferences.PreferClose
 
 class RemoveMineralBlocks extends Plan {
   
-  description.set("Remove nearby mineral blocks")
-  
   val miners = new LockUnits
   miners.interruptable = false
   miners.matcher = MatchWorkers

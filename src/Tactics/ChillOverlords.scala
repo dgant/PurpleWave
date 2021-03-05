@@ -35,7 +35,7 @@ class ChillOverlords extends Prioritized {
     if (With.self.hasUpgrade(Zerg.OverlordSpeed)) {
       return
     }
-    if (cloakedThreat.isComplete) {
+    if (cloakedThreat.apply) {
       return
     }
     overlords.acquire(this)

@@ -20,6 +20,7 @@ class Bank {
   }
   
   def request(request: LockCurrency) {
+    request.owner.prioritize()
     requests += request
     recountResources()
   }

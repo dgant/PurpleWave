@@ -3,5 +3,5 @@ package Planning.Predicates
 import Planning.Predicate
 
 class Never extends Predicate {
-  override def isComplete: Boolean = false
+  override def apply: Boolean = false
 }

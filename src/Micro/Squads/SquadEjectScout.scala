@@ -18,7 +18,7 @@ class SquadEjectScout extends Squad {
   private val scoutCleared = new ScoutCleared
   def recruit() {
     if (With.frame > Minutes(8)()) return
-    if (scoutCleared.isComplete) return
+    if (scoutCleared.apply) return
 
     val scouts = With.scouting.enemyScouts()
     if (scouts.isEmpty) return

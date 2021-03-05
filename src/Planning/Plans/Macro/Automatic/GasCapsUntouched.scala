@@ -4,7 +4,7 @@ import Lifecycle.With
 import Planning.Predicate
 
 class GasCapsUntouched extends Predicate {
-  override def isComplete: Boolean = (
+  override def apply: Boolean = (
     ! With.blackboard.gasWorkerCeiling.isSet
     && ! With.blackboard.gasWorkerFloor.isSet
     && ! With.blackboard.gasLimitFloor.isSet

@@ -5,6 +5,6 @@ import Strategery.StarCraftMap
 
 class OnMap(map: StarCraftMap*) extends Predicate {
   
-  override def isComplete: Boolean = map.exists(_.matches)
+  override def apply: Boolean = map.exists(_.matches)
   
 }

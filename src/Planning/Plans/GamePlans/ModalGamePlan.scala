@@ -1,14 +1,10 @@
 package Planning.Plans.GamePlans
 
 import Planning.Plan
-import Planning.Plans.Compound.AbstractAll
 
-class ModalGameplan(modes: Plan*) extends AbstractAll(modes: _*) {
-  
-  description.set("Modal game plan")
-  
+class ModalGameplan(modes: Modal*) extends Plan with Modal {
+  override def isComplete: Boolean = modes.forall(_.isComplete)
   override def onUpdate() {
-    val nextMode = children.get.find( ! _.isComplete)
-    nextMode.foreach(delegate)
+    modes.find( ! _.isComplete).foreach(_.update())
   }
 }

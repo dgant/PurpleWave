@@ -53,7 +53,7 @@ class WorkerRush extends Trigger {
         val goalWorkers =
           if (With.strategy.selectedCurrently.contains(WorkerRushContinuousProduction))
             3
-          else if ( ! timeToAtack.isComplete)
+          else if ( ! timeToAtack.apply)
             200
           else if (seenFiveWorkers)
             1

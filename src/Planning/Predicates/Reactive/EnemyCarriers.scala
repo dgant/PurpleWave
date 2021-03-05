@@ -6,7 +6,7 @@ import ProxyBwapi.Races.Protoss
 
 class EnemyCarriers extends Predicate {
   
-  override def isComplete: Boolean = {
+  override def apply: Boolean = {
     With.units.existsEnemy(Protoss.Carrier)      ||
     With.units.existsEnemy(Protoss.Interceptor)  ||
     With.units.existsEnemy(Protoss.FleetBeacon)  ||

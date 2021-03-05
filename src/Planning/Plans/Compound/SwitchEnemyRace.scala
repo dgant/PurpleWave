@@ -2,6 +2,7 @@ package Planning.Plans.Compound
 
 import Lifecycle.With
 import Planning.Plans.Basic.NoPlan
+import Planning.Plans.GamePlans.Modal
 import Planning.{Plan, Property}
 import bwapi.Race
 
@@ -10,21 +11,17 @@ class SwitchEnemyRace(
   whenProtoss : Plan = NoPlan(),
   whenZerg    : Plan = NoPlan(),
   whenRandom  : Plan = NoPlan())
-    extends Plan {
+    extends Plan with Modal {
   
   val terran  = new Property[Plan](whenTerran)
   val protoss = new Property[Plan](whenProtoss)
   val zerg    = new Property[Plan](whenZerg)
   val random  = new Property[Plan](whenRandom)
   
-  description.set("Given enemy race")
-  
-  override def getChildren: Iterable[Plan] = Vector(terran.get, protoss.get, zerg.get, random.get)
-  
-  override def isComplete: Boolean = appropriatePlan.isComplete
+  def isComplete: Boolean = false
   
   override def onUpdate() {
-    delegate(appropriatePlan)
+    appropriatePlan.update()
   }
   
   protected def appropriatePlan: Plan = {

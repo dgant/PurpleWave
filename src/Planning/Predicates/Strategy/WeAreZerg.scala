@@ -5,6 +5,6 @@ import Planning.Predicate
 
 class WeAreZerg extends Predicate {
   
-  override def isComplete: Boolean = With.self.isZerg
+  override def apply: Boolean = With.self.isZerg
   
 }

@@ -81,6 +81,7 @@ class Recruiter {
   }
 
   private def activateLock(lock: LockUnits): Unit = {
+    lock.owner.prioritize()
     activeLocks.add(lock)
     unitsByLock(lock) = unitsByLock.getOrElse(lock, mutable.Set.empty)
   }

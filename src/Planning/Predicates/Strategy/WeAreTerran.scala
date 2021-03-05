@@ -5,6 +5,6 @@ import Planning.Predicate
 
 class WeAreTerran extends Predicate {
   
-  override def isComplete: Boolean = With.self.isTerran
+  override def apply: Boolean = With.self.isTerran
   
 }

@@ -9,10 +9,8 @@ class TechContinuously(tech: Tech) extends Plan {
   
   description.set("Tech " + tech)
   
-  override def isComplete: Boolean = With.self.hasTech(tech)
-  
   override def onUpdate() {
-    if (isComplete) return
+    if (With.self.hasTech(tech)) return
     if ( ! With.units.existsOurs(tech.whatResearches)) return
     With.scheduler.request(this, Get(tech))
   }

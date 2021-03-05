@@ -11,8 +11,6 @@ import Utilities.Seconds
 
 class Scan extends Plan {
   
-  description.set("Use Scanner Sweep")
-  
   val scanners = new LockUnits
   scanners.matcher = Terran.Comsat
   

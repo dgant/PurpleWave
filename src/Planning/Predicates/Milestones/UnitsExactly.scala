@@ -11,7 +11,7 @@ class UnitsExactly(
   
   extends Predicate {
   
-  override def isComplete: Boolean = {
+  override def apply: Boolean = {
     val quantityFound =
       if (complete) {
         With.units.countOurs(MatchAnd(MatchComplete, matcher))

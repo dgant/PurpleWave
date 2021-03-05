@@ -5,6 +5,6 @@ import Planning.Predicate
 
 class MineralsAtMost(value: Int) extends Predicate {
   
-  override def isComplete: Boolean = With.self.minerals <= value
+  override def apply: Boolean = With.self.minerals <= value
   
 }

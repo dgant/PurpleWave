@@ -6,7 +6,7 @@ import ProxyBwapi.Races.Zerg
 
 class EnemyMutalisks extends Predicate {
   
-  override def isComplete: Boolean = {
+  override def apply: Boolean = {
     With.units.existsEnemy(Zerg.Mutalisk, Zerg.Spire)
   }
 }

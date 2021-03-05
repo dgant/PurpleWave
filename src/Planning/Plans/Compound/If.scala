@@ -10,24 +10,14 @@ class If(
   initialWhenFalse : Plan = NoPlan())
     extends Plan {
   
-  description.set("If")
-  
   val predicate = new Property[Predicate](initialPredicate)
   val whenTrue  = new Property[Plan](initialWhenTrue)
   val whenFalse = new Property[Plan](initialWhenFalse)
   
-  override def getChildren: Iterable[Plan] = {
-    Vector(whenTrue.get, whenFalse.get)
-  }
-  
-  override def isComplete: Boolean = {
-    predicate.get.isComplete && whenTrue.get.isComplete
-  }
-  
   override def onUpdate() {
-    if (predicate.get.isComplete)
-      delegate(whenTrue.get)
+    if (predicate.get.apply)
+      whenTrue.get.update()
     else
-      delegate(whenFalse.get)
+      whenFalse.get.update()
   }
 }

@@ -5,6 +5,6 @@ import Planning.Predicate
 
 class WeAreProtoss extends Predicate {
   
-  override def isComplete: Boolean = With.self.isProtoss
+  override def apply: Boolean = With.self.isProtoss
   
 }

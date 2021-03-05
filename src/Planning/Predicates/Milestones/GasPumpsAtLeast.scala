@@ -5,7 +5,7 @@ import Planning.Predicate
 
 class GasPumpsAtLeast(requiredPumps: Int) extends Predicate {
   
-  override def isComplete: Boolean =
+  override def apply: Boolean =
     With.geography.ourBases
       .map(_.gas.count(_.gasLeft > 300))
       .sum >= requiredPumps

@@ -8,5 +8,5 @@ class FramesUntilUnitAtLeast(unitClass: UnitClass, frames: () => Int) extends Pr
 
   def this(unitClass: UnitClass, specificFrames: Int) = this(unitClass, () => specificFrames)
 
-  override def isComplete: Boolean = With.projections.unit(unitClass) >= frames()
+  override def apply: Boolean = With.projections.unit(unitClass) >= frames()
 }

@@ -5,5 +5,5 @@ import Planning.Predicate
 import bwapi.Race
 
 class EnemyIsRace(val race: Race) extends Predicate {
-  override def isComplete: Boolean = With.enemies.exists(_.raceCurrent == race)
+  override def apply: Boolean = With.enemies.exists(_.raceCurrent == race)
 }

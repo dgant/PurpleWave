@@ -6,7 +6,7 @@ import Utilities.ByOption
 
 class WeAreBeingProxied extends Predicate {
   
-  override def isComplete: Boolean = {
+  override def apply: Boolean = {
     With.units.enemy.exists(unit => {
       lazy val scaryBuilding  = unit.unitClass.isBuilding && ! unit.unitClass.isGas
       lazy val tileBuilding   = unit.tile

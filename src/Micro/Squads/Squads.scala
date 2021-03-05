@@ -18,14 +18,12 @@ class Squads extends TimedTask {
   private var _batchNext: SquadBatch = SquadBatch(1)
 
   def all: Seq[Squad] = _batchActive.squads.view
-  def freelancersMutable: mutable.Buffer[FriendlyUnitInfo] = _batchNext.freelancers
 
   @inline final def isCommissioned(squad: Squad): Boolean = squad.batchId == _batchNext.id
   @inline final def commission(squad: Squad): Unit = {
     _batchNext.squads += squad
     squad.batchId = _batchNext.id
   }
-  def freelance(freelancer: FriendlyUnitInfo) { _batchNext.freelancers += freelancer }
 
   override protected def onRun(budgetMs: Long): Unit = {
     _batchActive = _batchNext

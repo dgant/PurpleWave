@@ -41,8 +41,9 @@ class LockUnits {
 
   def units: collection.Set[FriendlyUnitInfo] = With.recruiter.getUnits(this)
 
-  protected def weAccept(unit: FriendlyUnitInfo): Boolean = matcher.get.apply(unit)
+  private def weAccept(unit: FriendlyUnitInfo): Boolean = matcher.get(unit)
 
+  // Invoked by Recruiter
   def offerUnits(candidates: Iterable[FriendlyUnitInfo], dryRun: Boolean): Option[Seq[FriendlyUnitInfo]] = {
     val finalists = findFinalists(candidates)
     val finalistsSatisfy = counter.get.accept(finalists)

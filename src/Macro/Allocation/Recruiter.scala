@@ -28,6 +28,8 @@ class Recruiter {
       .foreach(unassignedUnits.add)
   }
 
+  def unassigned: Iterable[FriendlyUnitInfo] = unassignedUnits
+
   private def eligible(unit: FriendlyUnitInfo): Boolean = unit.aliveAndComplete && unit.unitClass.orderable
 
   def add(lock: LockUnits) {
@@ -37,7 +39,6 @@ class Recruiter {
   }
 
   def inquire(lock: LockUnits, isDryRun: Boolean): Option[Iterable[FriendlyUnitInfo]] = {
-
     // Offer batches of unit for the lock to choose.
     //  Batch 0: Current units
     //  Batch 1: Unassigned units

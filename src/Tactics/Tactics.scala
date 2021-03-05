@@ -6,11 +6,13 @@ import Micro.Squads._
 import Performance.Tasks.TimedTask
 import Planning.Plans.Army._
 import Planning.Plans.Scouting.{DoScoutWithWorkers, ScoutExpansions, ScoutWithOverlord}
+import Planning.UnitMatchers.MatchRecruitableForCombat
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 class Tactics extends TimedTask {
   private lazy val clearBurrowedBlockers      = new ClearBurrowedBlockers
@@ -26,7 +28,6 @@ class Tactics extends TimedTask {
   private lazy val scoutExpansions            = new ScoutExpansions
   private lazy val gather                     = new Gather
   private lazy val chillOverlords             = new ChillOverlords
-  private lazy val recruitFreelancers         = new RecruitFreelancers
   private lazy val doFloatBuildings           = new DoFloatBuildings
   private lazy val scan                       = new Scan
 
@@ -63,6 +64,7 @@ class Tactics extends TimedTask {
     // TODO: Plant Overlords around the map, as appropriate
   }
 
+  private def assign(freelancers: mutable.Buffer[FriendlyUnitInfo], squads: Squad*): Unit = assignIf(freelancers, squads)
   private def assignIf(
       freelancers: mutable.Buffer[FriendlyUnitInfo],
       squads: Seq[Squad],
@@ -80,7 +82,6 @@ class Tactics extends TimedTask {
       }
     }
   }
-
   private lazy val baseSquads = With.geography.bases.map(base => (base, new SquadDefendBase(base))).toMap
   private lazy val attackSquad = new SquadAttack
   private def runCoreTactics(): Unit = {
@@ -94,12 +95,15 @@ class Tactics extends TimedTask {
         || d.enemies.forall(e => e.is(Protoss.Observer) && ! e.matchups.enemyDetectors.exists(_.canMove)))
 
     // Pick a squad for each
-    val squadsDefending = divisionsDefending.map(d => (d, baseSquads(d.bases
-      .toVector
-      .sortBy( - _.economicValue())
-      .sortBy( ! _.owner.isEnemy)
-      .sortBy( ! _.plannedExpo())
-      .minBy(  ! _.owner.isUs))))
+    val squadsDefending = divisionsDefending.map(d => (d, baseSquads({
+      val base = d.bases
+        .toVector
+        .sortBy( - _.economicValue())
+        .sortBy( ! _.owner.isEnemy)
+        .sortBy( ! _.plannedExpo())
+        .minBy(  ! _.owner.isUs)
+      base.natural.filter(_.owner.isUs).getOrElse(base) // TODO: BAse defense logic needs to handle case where OTHER bases need scouring and not concave in just one
+    })))
 
     // Assign division to each squad
     squadsDefending.foreach(p => p._2.vicinity = PurpleMath.centroid(p._2.enemies.view.map(_.pixel)))
@@ -107,8 +111,7 @@ class Tactics extends TimedTask {
     squadsDefending.foreach(p => p._2.asInstanceOf[SquadDefendBase].setDivision(p._1))
 
     // Get freelancers
-    recruitFreelancers.update()
-    val freelancers = With.squads.freelancersMutable
+    val freelancers = (new ListBuffer[FriendlyUnitInfo] ++ With.recruiter.unassigned.view.filter(MatchRecruitableForCombat))
       .sortBy(_.topSpeed) // Assign fast units last, as they're more flexible
       .sortBy(_.flying) // Assign fliers last, as they're more flexible
       .sortBy(_.unitClass.isTransport) // So transports can go to squads which need them
@@ -118,7 +121,9 @@ class Tactics extends TimedTask {
     // First satisfy each defense squad
     assignIf(freelancers, squadsDefending.view.map(_._2), 1.0)
 
-    // If we want to attack and enough freelancers remain, populate the attack squad
+    // TODO: Always attack with Dark Templar
+
+    // If we want to attack and engough freelancers remain, populate the attack squad
     // TODO: If the attack goal is the enemy army, and we have a defense squad handling it, skip this step
     if (With.blackboard.wantToAttack() && (With.blackboard.yoloing() || freelancerValue >= freelancerValueInitial * .7)) {
       assignIf(freelancers, Seq(attackSquad))

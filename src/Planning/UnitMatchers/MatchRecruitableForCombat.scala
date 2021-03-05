@@ -1,8 +1,7 @@
 package Planning.UnitMatchers
 
-import ProxyBwapi.Races.Zerg
+import ProxyBwapi.Races.{Protoss, Zerg}
 
 object MatchRecruitableForCombat extends MatchAnd(
   MatchMobile,
-  MatchNot(MatchWorkers),
-  MatchNot(Zerg.Larva))
+  MatchNot(MatchWorkers, Protoss.Interceptor, Protoss.Scarab, Zerg.Larva))

@@ -179,7 +179,7 @@ object DefaultCombat extends Action {
     transition(Regroup, () => !unit.agent.shouldEngage && opponentBlocksGoal && unit.agent.withinSafetyMargin)
     transition(Regroup, () => unit.agent.shouldEngage && opponentBlocksGoal && unit.team.exists(team =>
       !team.engaged()
-        && unit.confidence() + team.coherence() + team.impatience() / Seconds(20)() < 1))
+        && unit.confidence() + team.coherence() + team.impatience() / Seconds(35)() < 1))
 
     // Evaluate potential attacks -- lazily, because targeting is expensive
     lazy val target = Target.choose(unit)

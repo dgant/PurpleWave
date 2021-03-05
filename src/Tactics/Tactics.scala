@@ -84,6 +84,7 @@ class Tactics extends TimedTask {
   private lazy val baseSquads = With.geography.bases.map(base => (base, new SquadDefendBase(base))).toMap
   private lazy val attackSquad = new SquadAttack
   private def runCoreTactics(): Unit = {
+
     // Sort defense divisions by descending importance
     var divisionsDefending = With.battles.divisions.filter(_.bases.exists(b => b.owner.isUs || b.plannedExpo()))
     divisionsDefending = divisionsDefending
@@ -115,27 +116,22 @@ class Tactics extends TimedTask {
     val freelancerValueInitial = freelancerValue
 
     // First satisfy each defense squad
-    // TODO: Do we want more than 1:1 defender:attacker?
     assignIf(freelancers, squadsDefending.view.map(_._2), 1.0)
 
     // If we want to attack and enough freelancers remain, populate the attack squad
     // TODO: If the attack goal is the enemy army, and we have a defense squad handling it, skip this step
-    if (With.blackboard.wantToAttack() && (With.blackboard.yoloing() || freelancerValue >= freelancerValueInitial * .6)) {
+    if (With.blackboard.wantToAttack() && (With.blackboard.yoloing() || freelancerValue >= freelancerValueInitial * .7)) {
       assignIf(freelancers, Seq(attackSquad))
     } else {
       // If there are no active defense squads, activate one to defend our entrance
       val squadsDefendingOrWaiting: Seq[Squad] =
         if (squadsDefending.nonEmpty) squadsDefending.view.map(_._2)
-        else ByOption.maxBy(With.geography.ourBases)(_.economicValue()).map(b => b.natural.filter(_.owner.isUs).getOrElse(b)).map(baseSquads).toSeq
+        else ByOption.maxBy(With.geography.ourBases)(_.economicValue())
+          .map(b => b.natural.filter(n => n.owner.isUs || n.townHallTile.altitude > b.townHallTile.altitude).getOrElse(b))
+          .map(baseSquads)
+          .toSeq
       assignIf(freelancers, squadsDefendingOrWaiting)
     }
-
-    // Consider sending flier packs to one of these squads
-
-    // TODO: If attack squad small relative to defense squads and enemy army, assign them to defense
-    // TODO: Ensure that the switch from "roamy defense of enemies outside our base" to "attack" seamless
-
-    lazy val defaultDefenseBase = ByOption.minBy(With.geography.ourBasesAndSettlements)(_.heart.groundPixels(With.scouting.threatOrigin))
   }
 
   private def runBackgroundSquads(): Unit = {

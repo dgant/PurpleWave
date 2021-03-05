@@ -46,6 +46,7 @@ trait Squad extends Prioritized {
   @inline final def addEnemies(enemies: Iterable[UnitInfo]): Unit = enemies.foreach(addEnemy)
   @inline final def addEnemy(enemy: UnitInfo): Unit = {
     commission()
+    // TODO: This process changes the squad's enemies on the fly while the friendly units update all at once.
     _enemies += enemy
     _qualityCounter.countUnit(enemy)
   }

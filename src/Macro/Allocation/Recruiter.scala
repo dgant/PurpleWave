@@ -28,12 +28,7 @@ class Recruiter {
       .foreach(unassignedUnits.add)
   }
 
-  def eligible(unit: FriendlyUnitInfo): Boolean = unit.aliveAndComplete && unit.unitClass.orderable
-
-  def onUnitDestroyed(unit: FriendlyUnitInfo) {
-    unassign(unit)
-    unassignedUnits.remove(unit)
-  }
+  private def eligible(unit: FriendlyUnitInfo): Boolean = unit.aliveAndComplete && unit.unitClass.orderable
 
   def add(lock: LockUnits) {
     activeLocks.add(lock)
@@ -47,7 +42,6 @@ class Recruiter {
     //  Batch 0: Current units
     //  Batch 1: Unassigned units
     //  Batch 2+: Units assigned to weaker-priority locks
-    //
     val assignedToLowerPriority = unitsByLock.keys
       .view
       .filter(otherRequest =>

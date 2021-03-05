@@ -1,5 +1,6 @@
 package Micro.Squads
 
+import Debugging.Decap
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
@@ -10,7 +11,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.{ByOption, Minutes}
 
 class SquadAttack extends Squad {
-  override def toString: String = f"Attack ${target.base.getOrElse(target.zone)}"
+  override def toString: String = f"Attack ${Decap(target.base.getOrElse(target.zone))}"
 
   var target: Pixel = With.scouting.mostBaselikeEnemyTile.pixelCenter
 

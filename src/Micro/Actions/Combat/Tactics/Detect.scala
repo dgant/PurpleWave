@@ -21,11 +21,11 @@ object Detect extends Action {
 
     val spookiestSpooky =
       pickBestSpooky(unit, unit.enemiesSquad.filter(_.effectivelyCloaked)).orElse(
-        pickBestSpooky(unit, unit.enemiesSquad.filter(_.cloakedOrBurrowed))).orElse(
-          pickBestSpooky(unit, unit.enemiesSquad.filter(canEventuallyCloak))).orElse(
-            pickBestSpooky(unit, unit.matchups.enemies.filter(_.effectivelyCloaked))).orElse(
-              pickBestSpooky(unit, unit.matchups.enemies.filter(_.cloakedOrBurrowed))).orElse(
-                pickBestSpooky(unit, unit.matchups.enemies.filter(canEventuallyCloak)))
+      pickBestSpooky(unit, unit.enemiesSquad.filter(_.cloakedOrBurrowed))).orElse(
+      pickBestSpooky(unit, unit.enemiesSquad.filter(canEventuallyCloak))).orElse(
+      pickBestSpooky(unit, unit.enemiesBattle.filter(_.effectivelyCloaked))).orElse(
+      pickBestSpooky(unit, unit.enemiesBattle.filter(_.cloakedOrBurrowed))).orElse(
+      pickBestSpooky(unit, unit.enemiesBattle.filter(canEventuallyCloak)))
 
     val spookiestPixel = spookiestSpooky.map(_.pixel).orElse(minesweepPoint(unit))
 

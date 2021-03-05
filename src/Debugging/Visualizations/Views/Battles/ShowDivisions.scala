@@ -14,16 +14,14 @@ object ShowDivisions extends View {
   override def renderScreen() {
     val y = 17 * With.visualization.lineHeightSmall
     val x0 = 5
-    val x1 = 325
+    val x1 = 220
     val rows0 = With.battles.divisions.map(_.enemies)
     val rows1 = With.battles.divisions.map(_.bases)
     DrawScreen.column(x0, y, "Division units: " +: rows0.map(renderScreenUnits))
     DrawScreen.column(x1, y, "Division bases: " +: rows1.map(_.map(_.toString).mkString))
   }
   
-  private def renderScreenUnits(units: Iterable[UnitInfo]): String = {
-    "(" + units.size + ") " + ShowSquads.enumerateUnits(units)
-  }
+  private def renderScreenUnits(units: Iterable[UnitInfo]): String = f"${units.size}: ${ShowSquads.enumerateUnits(units)}"
   
   override def renderMap() {
     With.battles.divisions.foreach(division => {

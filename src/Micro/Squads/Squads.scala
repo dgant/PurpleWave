@@ -1,5 +1,6 @@
 package Micro.Squads
 
+import Lifecycle.With
 import Performance.Tasks.TimedTask
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -29,6 +30,10 @@ class Squads extends TimedTask {
   override protected def onRun(budgetMs: Long): Unit = {
     _batchActive = _batchNext
     _batchNext = SquadBatch(_batchActive.id + 1)
+    With.units.ours.foreach(_.setSquad(None))
+    With.units.enemy.foreach(_.clearSquads())
+    all.foreach(s => s.units.foreach(_.setSquad(Some(s))))
+    all.foreach(s => s.enemies.foreach(_.foreign.foreach(_.addSquad(s))))
     all.foreach(_.run())
   }
 }

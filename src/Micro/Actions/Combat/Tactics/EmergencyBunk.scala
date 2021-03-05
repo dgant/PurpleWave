@@ -15,11 +15,11 @@ object EmergencyBunk extends Action {
     Terran.Ghost
   ).contains(unit.unitClass)
   
-  def openBunkersFor(forUnit: FriendlyUnitInfo): Seq[UnitInfo] = {
+  def openBunkersFor(forUnit: FriendlyUnitInfo): Iterable[UnitInfo] = {
     if (classAllowedToBunk(forUnit))
-      forUnit.matchups.allies.filter(ally => ally.is(Terran.Bunker) && ally.friendly.get.loadedUnits.size < 4)
+      forUnit.alliesBattle.filter(ally => ally.is(Terran.Bunker) && ally.friendly.get.loadedUnits.size < 4)
     else
-      Seq.empty
+      Iterable.empty
   }
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {

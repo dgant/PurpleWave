@@ -14,6 +14,7 @@ import Mathematics.Shapes.Ring
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Matchups.MatchupAnalysis
+import Micro.Squads.Squad
 import Performance.{Cache, KeyedCache}
 import Planning.Prioritized
 import Planning.UnitMatchers.UnitMatcher
@@ -174,6 +175,7 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   @inline final def pixelDistanceTravelling (destination: Pixel)              : Double  = pixelDistanceTravelling(pixel, destination)
   @inline final def pixelDistanceTravelling (destination: Tile)               : Double  = pixelDistanceTravelling(pixel, destination.pixelCenter)
   @inline final def pixelDistanceTravelling (from: Pixel, to: Pixel)          : Double  = if (flying) from.pixelDistance(to) else from.nearestWalkableTile.groundPixels(to.nearestWalkableTile)
+  @inline final def pixelDistanceTravelling (from: Tile,  to: Tile)           : Double  = if (flying) from.pixelCenter.pixelDistance(to.pixelCenter) else from.nearestWalkableTile.groundPixels(to.nearestWalkableTile)
 
   @inline final def canMove: Boolean = canMoveCache()
   private val canMoveCache = new Cache(() =>
@@ -238,6 +240,7 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   // Combat //
   ////////////
 
+  @inline final def squads: Seq[Squad] = foreign.map(_.enemyOfSquads).orElse(friendly.map(_.squad.toSeq)).getOrElse(Seq.empty)
   @inline final def battle: Option[BattleLocal] = With.battles.byUnit.get(this).orElse(With.matchups.entrants.find(_._2.contains(this)).map(_._1))
   @inline final def team: Option[Team] = battle.map(_.teamOf(this))
   @inline final def report: Option[ReportCard] = battle.flatMap(_.predictionAttack.debugReport.get(this))

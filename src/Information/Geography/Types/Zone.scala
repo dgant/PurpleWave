@@ -35,7 +35,7 @@ class Zone(
   lazy val exit: Option[Edge] = calculateExit
   lazy val distanceGrid: GridGroundDistance = new GridGroundDistance(if (bases.length == 1) bases.head.heart else centroid)
   
-  var units: Vector[UnitInfo]  = Vector.empty
+  def units: Seq[UnitInfo] = unitBuffer
   var unitBuffer: mutable.ArrayBuffer[UnitInfo] = new mutable.ArrayBuffer[UnitInfo]()
   var owner     : PlayerInfo        = With.neutral
   var contested : Boolean           = false

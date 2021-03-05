@@ -101,7 +101,7 @@ object Potential {
   def preferSpreading(unit: FriendlyUnitInfo): Force = {
     lazy val splashThreats = unit.matchups.threats.filter(_.unitClass.dealsRadialSplashDamage)
     lazy val splashRadius: Double = ByOption.max(splashThreats.map(_.unitClass.airSplashRadius25.toDouble)).getOrElse(0.0)
-    lazy val splashAllies = unit.matchups.allies.filter(ally =>
+    lazy val splashAllies = unit.alliesBattle.filter(ally =>
       ! ally.unitClass.isBuilding
       && (ally.flying == unit.flying || splashThreats.take(3).exists(_.canAttack(ally))))
     if (splashThreats.isEmpty) return new Force

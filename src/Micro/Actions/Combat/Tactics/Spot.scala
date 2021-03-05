@@ -15,7 +15,6 @@ object Spot extends Action {
     && unit.flying
     && ! unit.unitClass.isTransport
     && ! unit.canAttack
-    && ( ! unit.agent.canFocus || unit.unitClass.isFlyingBuilding)
     && (unit.matchups.pixelsOfEntanglement > -32 || unit.totalHealth > 500 || (unit.cloaked && unit.matchups.enemyDetectors.isEmpty))
   )
   

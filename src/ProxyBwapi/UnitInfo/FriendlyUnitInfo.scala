@@ -41,8 +41,8 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(b
   lazy val agent: Agent = new Agent(this)
   def intent: Intention = agent.intent
 
-  var _squad: Option[Squad] = None
-  var _lastSquadChange: Int = 0
+  private var _squad: Option[Squad] = None
+  private var _lastSquadChange: Int = 0
   def squad: Option[Squad] = _squad
   def squadAge: Int = With.framesSince(_lastSquadChange)
   def setSquad(newSquad: Option[Squad]): Unit = {

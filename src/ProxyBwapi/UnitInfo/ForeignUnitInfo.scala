@@ -1,7 +1,10 @@
 package ProxyBwapi.UnitInfo
 
 import Lifecycle.With
+import Micro.Squads.Squad
 import ProxyBwapi.UnitTracking.Imagination
+
+import scala.collection.mutable.ArrayBuffer
 
 class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(bwapiUnit, id) {
 
@@ -13,6 +16,13 @@ class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends BWAPICachedUnitPro
     }
     super.update()
     Imagination.checkVisibility(this)
+  }
+
+  private var _squads = new ArrayBuffer[Squad]()
+  def enemyOfSquads: Seq[Squad] = _squads
+  def clearSquads(): Unit = { _squads.clear() }
+  def addSquad(squad: Squad): Unit = {
+    _squads += squad
   }
 
   @inline final protected def remainingFrames(snapshotHitPoints: Int, snapshotShields: Int, dataFrame: Int): Int = {

@@ -62,7 +62,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   var canMeld       : Boolean                   = false
   var canLiftoff    : Boolean                   = false
   var canCancel     : Boolean                   = false
-  var canFocus      : Boolean                   = false
   var shouldEngage  : Boolean                   = false
   val forces        : ForceMap                  = new ForceMap
 
@@ -165,7 +164,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     canMeld       = intent.canMeld
     canLiftoff    = intent.canLiftoff
     canCancel     = intent.canCancel
-    canFocus      = intent.canFocus
   }
 
   /////////////

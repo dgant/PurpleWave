@@ -66,7 +66,6 @@ class PylonBlock extends Plan {
           toTravel = Some(tileToBlock.pixelCenter)
           canFlee = true
           canFight = false
-          canFocus = true
         }
         if (blocker.pixelDistanceCenter(tileToBlock.pixelCenter) < 256 && With.self.supplyUsed + 24 >= With.self.supplyTotal) {
           currencyLock.acquire(this)

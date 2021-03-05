@@ -58,9 +58,9 @@ object Bust extends Action {
     // If we're getting shot at by the bunker, back off.
     lazy val bunkers = unit.matchups.targets.filter(_.is(Terran.Bunker))
     lazy val repairers = bunkers.flatMap(_.matchups.repairers)
-    lazy val goons = unit.matchups.allies.filter(u => u.friendly.exists(Bust.allowed) && bunkers.exists(b => u.framesToGetInRange(b) < 24))
+    lazy val goons = unit.alliesSquad.filter(u => u.friendly.exists(Bust.allowed) && bunkers.exists(b => u.framesToGetInRange(b) < 24))
 
-    if (unit.readyForAttackOrder && repairers.nonEmpty && goons.length >= repairers.map(_.hitPoints).min / 10) {
+    if (unit.readyForAttackOrder && repairers.nonEmpty && goons.size >= repairers.map(_.hitPoints).min / 10) {
       unit.agent.toAttack = Some(repairers.sortBy(_.pixelDistanceCenter(PurpleMath.centroid(goons.map(_.pixel)))).minBy(_.hitPoints))
       Commander.attack(unit)
     }
@@ -74,7 +74,7 @@ object Bust extends Action {
       val bunker = unit.agent.toAttack.get
       val range = unit.pixelRangeAgainst(bunker)
       val bunkerDistance = unit.pixelDistanceEdge(bunker)
-      def stationAcceptable(pixel: Pixel) = pixel.walkable && ! unit.matchups.allies.exists(a => ! a.flying && a.pixelDistanceEdge(unit, pixel) < 4)
+      def stationAcceptable(pixel: Pixel) = pixel.walkable && ! unit.alliesSquad.exists(a => ! a.flying && a.pixelDistanceEdge(unit, pixel) < 4)
       var station = Some(unit.pixel.project(bunker.pixel, Math.max(Random.nextInt(9), bunkerDistance - range))).filter(stationAcceptable)
       if (station.isEmpty && bunkerDistance > range + 32) {
         val stationCount = 64

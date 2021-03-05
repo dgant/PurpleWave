@@ -45,7 +45,6 @@ class ClearBurrowedBlockers extends Prioritized {
     detector.get.acquire(this)
     detector.get.units.foreach(_.agent.intend(this, new Intention {
       toTravel = target
-      canFocus = true
     }))
 
     if (With.enemies.exists(_.isZerg) || detector.get.units.forall(_.framesToTravelTo(target.get) > Seconds(5)())) {
@@ -53,7 +52,6 @@ class ClearBurrowedBlockers extends Prioritized {
       clearer.get.acquire(this)
       clearer.get.units.foreach(_.agent.intend(this, new Intention {
         toTravel = Some(target.get.add(Random.nextInt(160) - 80, Random.nextInt(128) - 64))
-        canFocus = true
       }))
     }
   }

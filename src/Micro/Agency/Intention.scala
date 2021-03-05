@@ -33,6 +33,5 @@ class Intention {
   var canTickle     : Boolean                   = false
   var canLiftoff    : Boolean                   = false
   var canCancel     : Boolean                   = false
-  var canFocus      : Boolean                   = false
   var targetFilters : Seq[TargetFilter]         = Seq.empty
 }

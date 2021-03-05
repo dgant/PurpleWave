@@ -16,9 +16,9 @@ object ZoneUpdater {
     With.geography.zones.foreach(_.edges.foreach(_.distanceGrid))
 
     With.geography.zones.foreach(_.unitBuffer.clear())
-    for (unit <- With.units.all) {
+    With.units.all.filter(_.likelyStillThere).foreach(unit =>
       unit.zone.unitBuffer += unit
-    }
+    )
     With.geography.zones.foreach(updateZone)
   
     if ( ! With.geography.naturalsSearched) {
@@ -56,7 +56,6 @@ object ZoneUpdater {
 
   private val wallBuildingThresholdDistanceSquared = Math.pow(32 * 12, 2)
   def updateZone(zone: Zone) {
-    zone.units = zone.unitBuffer.toVector
     zone.distanceGrid.initialize()
     zone.edges.foreach(_.distanceGrid.initialize())
     zone.exitDistanceGrid.initialize()

@@ -127,5 +127,5 @@ class Base(val townHallTile: Tile)
     else (
       (if (owner.isEnemy) "Enemy" else if (owner.isUs) "Our" else if (owner.isAlly) "Ally" else "Neutral")
       + " "
-      + (if (isStartLocation) "main" else if (isNaturalOf.isDefined) "natural" else "base")))
+      + (if (isStartLocation && ! owner.isUs) "main" else if (isNaturalOf.isDefined && ! owner.isUs) "natural" else "base")))
 }

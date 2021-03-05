@@ -94,6 +94,12 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline final def groundPixels(other: Pixel): Double = {
     With.paths.groundPixels(this, other)
   }
+  @inline final def travelPixelsFor(other: Pixel, unit: UnitInfo): Double = {
+    unit.pixelDistanceTravelling(this, other)
+  }
+  @inline final def travelPixelsFor(other: Tile, unit: UnitInfo): Double = {
+    unit.pixelDistanceTravelling(tile, other)
+  }
   @inline final def buildable: Boolean = {
     tile.buildable
   }

@@ -50,7 +50,6 @@ abstract class DoScout extends Prioritized {
     unit.agent.intend(this, new Intention {
       toScoutTiles  = tiles
       toTravel      = Some(destination)
-      canFocus      = true
     })
     bases.foreach(With.scouting.registerScout)
   }

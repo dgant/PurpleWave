@@ -25,7 +25,7 @@ object Recharge extends Action {
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    var batteries = unit.matchups.allies.filter(validBattery)
+    var batteries: Iterable[UnitInfo] = unit.alliesBattle.filter(validBattery)
     if (batteries.isEmpty) batteries = unit.zone.units.filter(validBattery)
 
     val battery = ByOption.minBy(batteries)(_.pixelDistanceEdge(unit))

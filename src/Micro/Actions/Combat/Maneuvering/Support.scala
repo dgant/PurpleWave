@@ -21,8 +21,7 @@ object Support extends Action {
     }
 
     // Who can we support?
-    var supportables = unit.matchups.allies.filterNot(isSupport)
-    if (supportables.isEmpty) supportables = unit.squad.map(_.units.view.filterNot(isSupport).toVector).getOrElse(Vector.empty)
+    var supportables = unit.alliesSquadThenBattle.view.map(_.filterNot(isSupport)).find(_.nonEmpty).getOrElse(Vector.empty)
     if (supportables.isEmpty) return
     val destination = unit.battle
       .map(_.us.vanguard())

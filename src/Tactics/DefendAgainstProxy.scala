@@ -14,7 +14,7 @@ import scala.collection.mutable
 
 class DefendAgainstProxy extends Prioritized {
 
-  val defenders = new LockUnits
+  val defenders = new LockUnits(this)
   
   def update() {
     if (With.frame > Minutes(7)()) return

@@ -14,7 +14,7 @@ import Utilities.Seconds
 
 class DefendFightersAgainstRush extends Prioritized {
   
-  val defenders = new LockUnits
+  val defenders = new LockUnits(this)
   defenders.matcher = MatchWorkers
 
   private def inOurBase(unit: UnitInfo): Boolean = unit.zone.bases.exists(_.owner.isUs)

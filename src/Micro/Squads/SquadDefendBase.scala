@@ -1,6 +1,5 @@
 package Micro.Squads
 
-import Debugging.Decap
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Mathematics.Formations.Designers.FormationZone
@@ -17,7 +16,7 @@ class SquadDefendBase(base: Base) extends Squad {
 
   private var lastAction = "Defend"
 
-  override def toString: String = f"$lastAction ${Decap(base)}"
+  override def toString: String = f"$lastAction ${base.heart}"
 
   val zone: Zone = base.zone
 
@@ -31,9 +30,9 @@ class SquadDefendBase(base: Base) extends Squad {
       u.isOurs
         && u.unitClass.isStaticDefense
         && ( ! u.is(Protoss.ShieldBattery) || choke.forall(_.pixelCenter.pixelDistance(u.pixel) > 96 + u.effectiveRangePixels))
-        && (_enemies.isEmpty || _enemies.exists(u.canAttack)))
+        && (enemies.isEmpty || enemies.exists(u.canAttack)))
 
-    lazy val allowWandering = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || _enemies.exists(_.unitClass.ranged) || With.blackboard.wantToAttack()
+    lazy val allowWandering = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || enemies.exists(_.unitClass.ranged) || With.blackboard.wantToAttack()
     lazy val canHuntEnemies = huntableEnemies().nonEmpty
     lazy val canDefendChoke = (units.size > 3 && choke.isDefined) || ! With.enemies.exists(_.isZerg)
     lazy val wallExistsButNoneNearChoke = walls.nonEmpty && walls.forall(wall =>
@@ -84,8 +83,8 @@ class SquadDefendBase(base: Base) extends Squad {
           < (exit.endPixels ++ exit.sidePixels :+ exit.pixelCenter).map(_.groundPixels(zone.centroid)).min))
 
   private val huntableEnemies = new Cache(() => {
-    val huntableInZone = _enemies.filter(e => e.zone == zone && huntableFilter(e)) ++ zone.units.filter(u => u.isEnemy && u.unitClass.isGas)
-    if (huntableInZone.nonEmpty) huntableInZone else _enemies.filter(huntableFilter)
+    val huntableInZone = enemies.filter(e => e.zone == zone && huntableFilter(e)) ++ zone.units.filter(u => u.isEnemy && u.unitClass.isGas)
+    if (huntableInZone.nonEmpty) huntableInZone else enemies.filter(huntableFilter)
   })
 
   private def huntEnemies() {
@@ -133,7 +132,7 @@ class SquadDefendBase(base: Base) extends Squad {
   }
 
   private def defendChoke() {
-    assignToFormation(new FormationZone(zone, _enemies).form(units.toSeq))
+    assignToFormation(new FormationZone(zone, enemies).form(units.toSeq))
   }
 
   private def assignToFormation(formation: FormationAssigned): Unit = {

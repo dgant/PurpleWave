@@ -12,7 +12,7 @@ import ProxyBwapi.Races.Protoss
 import Utilities.GameTime
 
 class ScoutForCannonRush extends Plan {
-  val scouts = new LockUnits
+  val scouts = new LockUnits(this)
   scouts.matcher = MatchAnd(MatchWorkers, MatchNotHoldingResources)
   scouts.counter = CountOne
   scouts.interruptable = false

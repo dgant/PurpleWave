@@ -7,7 +7,7 @@ import Planning.UnitMatchers.{MatchOr, UnitMatcher}
 
 class CancelOrders(matchers: UnitMatcher*) extends Plan {
 
-  val lock = new LockUnits
+  val lock = new LockUnits(this)
   lock.matcher = MatchOr(matchers: _*)
 
   override def onUpdate(): Unit = {

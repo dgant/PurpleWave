@@ -14,11 +14,11 @@ import scala.util.Random
 
 class ClearBurrowedBlockers extends Prioritized {
   
-  val detector = new Property(new LockUnits)
+  val detector = new Property(new LockUnits(this))
   detector.get.matcher = MatchMobileDetector
   detector.get.counter = CountOne
   
-  val clearer = new Property(new LockUnits)
+  val clearer = new Property(new LockUnits(this))
   clearer.get.matcher = MatchOr(Terran.Marine, Terran.Firebat, Terran.Goliath, Terran.Wraith, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk, Zerg.Mutalisk)
   clearer.get.counter = CountOne
 

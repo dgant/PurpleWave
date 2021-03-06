@@ -16,7 +16,7 @@ abstract class DoScout extends Prioritized {
   protected def replaceDeadScouts: Boolean = true
   protected final def enemyFound: Boolean = With.scouting.enemyMain.isDefined
 
-  protected val scoutLock: LockUnits = new LockUnits
+  protected val scoutLock: LockUnits = new LockUnits(this)
   scoutLock.interruptable = false
   scoutLock.matcher = MatchMobile
   scoutLock.counter = CountOne
@@ -53,4 +53,6 @@ abstract class DoScout extends Prioritized {
     })
     bases.foreach(With.scouting.registerScout)
   }
+
+  override val toString = "Scout"
 }

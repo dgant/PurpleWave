@@ -11,7 +11,7 @@ import Utilities.Seconds
 
 class Scan extends Plan {
   
-  val scanners = new LockUnits
+  val scanners = new LockUnits(this)
   scanners.matcher = Terran.Comsat
   
   var lastScan = 0

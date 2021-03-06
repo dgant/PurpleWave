@@ -13,7 +13,7 @@ import bwapi.Color
 object ShowUnitsFriendly extends View {
   
   var selectedOnly    : Boolean = false
-  var showClient      : Boolean = false
+  var showClient      : Boolean = true
   var showAction      : Boolean = true
   var showOrder       : Boolean = false
   var showTargets     : Boolean = true

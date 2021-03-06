@@ -10,7 +10,7 @@ import Planning.UnitPreferences.PreferClose
 
 class RemoveMineralBlocks extends Plan {
   
-  val miners = new LockUnits
+  val miners = new LockUnits(this)
   miners.interruptable = false
   miners.matcher = MatchWorkers
   miners.counter = CountOne

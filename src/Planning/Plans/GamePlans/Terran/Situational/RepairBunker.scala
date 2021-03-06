@@ -11,7 +11,7 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.GameTime
 
 class RepairBunker extends Plan {
-  val lock = new LockUnits
+  val lock = new LockUnits(this)
   lock.matcher = Terran.SCV
 
   override def onUpdate(): Unit = {

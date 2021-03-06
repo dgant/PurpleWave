@@ -14,7 +14,7 @@ import scala.collection.mutable
 
 class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
   
-  val fighters = new LockUnits
+  val fighters = new LockUnits(this)
   fighters.matcher = MatchWorkers
   fighters.counter = counter
   fighters.interruptable = false

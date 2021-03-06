@@ -13,7 +13,7 @@ import Utilities.ByOption
 
 class Chill(initialMatcher: UnitMatcher) extends Plan {
   
-  val chillers = new LockUnits
+  val chillers = new LockUnits(this)
   chillers.matcher = initialMatcher
   chillers.counter = CountEverything
 

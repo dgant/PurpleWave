@@ -25,7 +25,7 @@ class PopulateBunkers extends Plan {
   }
   
   private def newLock(bunker: FriendlyUnitInfo): LockUnits = {
-    val output = new LockUnits
+    val output = new LockUnits(this)
     output.matcher = Terran.Marine
     output.counter = CountUpTo(4)
     output.preference = PreferClose(bunker.pixel)

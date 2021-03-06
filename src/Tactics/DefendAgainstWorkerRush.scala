@@ -10,7 +10,7 @@ import Planning.UnitMatchers.{MatchWarriors, MatchWorkers}
 
 class DefendAgainstWorkerRush extends Prioritized {
   
-  val defenders = new LockUnits
+  val defenders = new LockUnits(this)
   defenders.matcher = MatchWorkers
   
   def update() {

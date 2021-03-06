@@ -2,17 +2,13 @@ package Micro.Squads
 
 import Lifecycle.With
 import Performance.Tasks.TimedTask
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 class Squads extends TimedTask {
 
-  private case class SquadBatch(
-    id: Int,
-    squads: mutable.ArrayBuffer[Squad] = ArrayBuffer.empty,
-    freelancers: mutable.ArrayBuffer[FriendlyUnitInfo] = ArrayBuffer.empty)
+  private case class SquadBatch(var id: Int, squads: mutable.ArrayBuffer[Squad] = ArrayBuffer.empty)
 
   private var _batchActive: SquadBatch = SquadBatch(0)
   private var _batchNext: SquadBatch = SquadBatch(1)
@@ -26,12 +22,15 @@ class Squads extends TimedTask {
   }
 
   override protected def onRun(budgetMs: Long): Unit = {
-    _batchActive = _batchNext
-    _batchNext = SquadBatch(_batchActive.id + 1)
     With.units.ours.foreach(_.setSquad(None))
     With.units.enemy.foreach(_.clearSquads())
-    all.foreach(s => s.units.foreach(_.setSquad(Some(s))))
-    all.foreach(s => s.enemies.foreach(_.foreign.foreach(_.addSquad(s))))
+    all.foreach(_.clearUnits())
+    val swap = _batchActive
+    _batchActive = _batchNext
+    _batchNext = swap
+    _batchNext.id = _batchActive.id + 1
+    _batchNext.squads.clear()
+    all.foreach(_.swapUnits())
     all.foreach(_.run())
   }
 }

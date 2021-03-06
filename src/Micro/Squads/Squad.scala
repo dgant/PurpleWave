@@ -14,18 +14,19 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import scala.collection.mutable.ArrayBuffer
 
 trait Squad extends Prioritized {
-  val lock: LockUnits = new LockUnits
   var batchId: Int = Int.MinValue
   var vicinity: Pixel = SpecificPoints.middle
-  protected val _units = new ArrayBuffer[FriendlyUnitInfo]
-  protected val _enemies = new ArrayBuffer[UnitInfo]
-  protected val _qualityCounter = new QualityCounter
+  val lock: LockUnits = new LockUnits(this)
+  private var _unitsNow = new ArrayBuffer[FriendlyUnitInfo]
+  private var _unitsNext = new ArrayBuffer[FriendlyUnitInfo]
+  private var _enemiesNow = new ArrayBuffer[UnitInfo]
+  private var _enemiesNext = new ArrayBuffer[UnitInfo]
+  private val _qualityCounter = new QualityCounter
 
   private def commission(): Unit = {
     if ( ! With.squads.isCommissioned(this)) {
       With.squads.commission(this)
-      _units.clear()
-      _enemies.clear()
+      _enemiesNow.clear()
       _qualityCounter.clear()
     }
   }
@@ -35,23 +36,36 @@ trait Squad extends Prioritized {
     _qualityCounter.utility(candidate)
   }
 
-  def units: Iterable[FriendlyUnitInfo] = _units
+  def units: Iterable[FriendlyUnitInfo] = _unitsNow
   @inline final def addUnits(units: Iterable[FriendlyUnitInfo]): Unit = units.foreach(addUnit)
   @inline final def addUnit(unit: FriendlyUnitInfo): Unit = {
     commission()
-    _units += unit
+    _unitsNext += unit
     _qualityCounter.countUnit(unit)
   }
 
-  def enemies: Iterable[UnitInfo] = _enemies
+  def enemies: Iterable[UnitInfo] = _enemiesNow
   @inline final def addEnemies(enemies: Iterable[UnitInfo]): Unit = enemies.foreach(addEnemy)
   @inline final def addEnemy(enemy: UnitInfo): Unit = {
     commission()
-    // TODO: This process changes the squad's enemies on the fly while the friendly units update all at once.
-    _enemies += enemy
+    _enemiesNext += enemy
     _qualityCounter.countUnit(enemy)
   }
 
+  def clearUnits(): Unit = {
+    _unitsNow.clear()
+    _enemiesNow.clear()
+  }
+  def swapUnits(): Unit = {
+    val swapUnits = _unitsNow
+    _unitsNow = _unitsNext
+    _unitsNext = swapUnits
+    _unitsNow.foreach(_.setSquad(Some(this)))
+    val swapEnemies = _enemiesNow
+    _enemiesNow = _enemiesNext
+    _enemiesNext = swapEnemies
+    _enemiesNow.foreach(_.foreign.foreach(_.addSquad(this)))
+  }
   def run(): Unit
 
   val centroidAir = new Cache(() => GroupCentroid.air(units))

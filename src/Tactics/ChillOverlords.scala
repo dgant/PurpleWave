@@ -16,7 +16,7 @@ import Utilities.ByOption
 
 class ChillOverlords extends Prioritized {
   
-  val overlords = new LockUnits
+  val overlords = new LockUnits(this)
   overlords.matcher = Zerg.Overlord
   overlords.counter = CountEverything
 

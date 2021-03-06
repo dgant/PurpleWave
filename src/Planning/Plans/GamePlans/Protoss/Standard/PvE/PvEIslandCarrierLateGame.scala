@@ -73,7 +73,7 @@ class ExpandOverIsland(maxBases: Int) extends RequireBases {
 }
 
 class HackySparkleExpansion extends Plan {
-  val lock = new LockUnits
+  val lock = new LockUnits(this)
   lock.matcher = MatchWorkers
   lock.counter = CountOne
   private def base = ByOption.minBy(With.geography.neutralBases.filter(b => ! b.townHallArea.tiles.map(_.bwapi).exists(With.game.hasCreep)))(_.townHallTile.tileDistanceSquared(With.geography.home))

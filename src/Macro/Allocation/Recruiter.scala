@@ -57,7 +57,7 @@ class Recruiter {
     val assignedToWeakerLock = unitsByLock.keys.view
       .filter(otherLock => otherLock.interruptable && lock.owner.priority < otherLock.owner.priority)
       .flatMap(lockedBy)
-    lock.offerUnits(unlockedUnits.view ++ lock.units ++ assignedToWeakerLock, isDryRun)
+    lock.offerUnits(lock.units.view ++ unlockedUnits ++ assignedToWeakerLock, isDryRun)
   }
 
   def satisfy(lock: LockUnits) {

@@ -14,7 +14,7 @@ class MonitorBases(
   bases: () => Seq[Base] = () => With.geography.enemyBases,
   initialUnitCounter: UnitCounter = CountOne) extends Plan {
 
-  val scouts = new LockUnits
+  val scouts = new LockUnits(this)
   scouts.matcher = initialUnitMatcher
   scouts.counter = initialUnitCounter
   scouts.interruptable = false

@@ -10,8 +10,7 @@ import Utilities.ByOption
 
 import scala.collection.mutable
 
-class LockUnits {
-  var owner         : Prioritized     = _
+class LockUnits(val owner: Prioritized) {
   var interruptable : Boolean         = true
   var matcher       : UnitMatcher     = MatchAnything
   var preference    : UnitPreference  = PreferAnything
@@ -21,13 +20,11 @@ class LockUnits {
   def satisfied: Boolean = _isSatisfied
 
   def acquire(prioritized: Prioritized) {
-    owner = prioritized
     owner.prioritize()
     With.recruiter.satisfy(this)
   }
 
   def inquire(prioritized: Prioritized): Option[Vector[FriendlyUnitInfo]] = {
-    owner = prioritized
     owner.prioritize()
     With.recruiter.inquire(this, isDryRun = true).map(_.toVector) // toVector ensures we don't return a view with invalid owner
   }

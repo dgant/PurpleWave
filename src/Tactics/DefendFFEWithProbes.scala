@@ -20,7 +20,7 @@ import scala.collection.mutable.ArrayBuffer
 
 class DefendFFEWithProbes extends Prioritized {
   
-  val defenders = new LockUnits
+  val defenders = new LockUnits(this)
   defenders.matcher = MatchWorkers
   
   protected def probeCount: Int = {

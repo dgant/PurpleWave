@@ -8,7 +8,7 @@ import ProxyBwapi.Races.Protoss
 
 class MeldDarkArchons extends Plan {
   
-  val templar = new LockUnits
+  val templar = new LockUnits(this)
   templar.matcher = Protoss.DarkTemplar
   
   override def onUpdate() {

@@ -28,7 +28,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
   val currencyLock = new LockCurrencyForUnit(buildingClass)
 
   val builderMatcher: UnitClass = buildingClass.whatBuilds._1
-  val builderLock: LockUnits = new LockUnits
+  val builderLock: LockUnits = new LockUnits(this)
   builderLock.interruptable = false
   builderLock.matcher = builderMatcher
   builderLock.counter = CountOne
@@ -160,4 +160,6 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
     val travelFrames = (if (builderLock.units.isEmpty) 1.4 else 1.25) * proposedBuilder.get.framesToTravelTo(desiredTile.get.pixelCenter)
     travelFrames + 48 >= currencyLock.expectedFrames
   }
+
+  override val toString = f"Build $buildingClass"
 }

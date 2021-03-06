@@ -13,7 +13,7 @@ class MeldArchons(maxEnergy: Int = 251) extends Plan {
   protected def maximumTemplar: Int = 100
   protected def minimumArchons: Int = 0
   
-  val templar = new LockUnits
+  val templar = new LockUnits(this)
   templar.matcher = Protoss.HighTemplar
   templar.preference = PreferLowEnergy
   

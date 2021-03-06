@@ -9,7 +9,7 @@ import Planning.UnitMatchers.{MatchAnd, MatchMobileFlying, MatchNot, MatchOr}
 
 class DoFloatBuildings extends Prioritized {
 
-  val floaties: LockUnits = new LockUnits
+  val floaties: LockUnits = new LockUnits(this)
   floaties.counter = CountEverything
 
   def update() {

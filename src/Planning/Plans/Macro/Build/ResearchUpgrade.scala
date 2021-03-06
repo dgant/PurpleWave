@@ -19,7 +19,7 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Production {
   
   val upgraderClass = upgrade.whatUpgrades
   val currencyLock = new LockCurrencyForUpgrade(upgrade, level)
-  val upgraders = new LockUnits
+  val upgraders = new LockUnits(this)
   upgraders.counter = CountOne
   upgraders.matcher = MatchAnd(upgraderClass, MatchIdle)
   upgraders.preference = PreferIdle

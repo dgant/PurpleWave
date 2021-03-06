@@ -9,7 +9,7 @@ import Planning.UnitMatchers.{MatchAnd, MatchAntiGround, MatchWarriors}
 import ProxyBwapi.Races.Neutral
 
 class KillPsiDisruptor extends Plan() {
-  val killers = new LockUnits
+  val killers = new LockUnits(this)
   killers.matcher = MatchAnd(MatchWarriors, MatchAntiGround)
   killers.counter = CountEverything
   override def onUpdate() {

@@ -10,6 +10,7 @@ import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTIdeas
 import Planning.Plans.Scouting.{DoScoutWithWorkers, MonitorBases, ScoutExpansions, ScoutWithOverlord}
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Milestones.{EnemiesAtMost, EnemyHasShownWraithCloak, UnitsAtLeast}
+import Planning.Predicates.Strategy.EnemyIsTerran
 import Planning.UnitMatchers.MatchRecruitableForCombat
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -36,6 +37,7 @@ class Tactics extends TimedTask {
   private lazy val scan                       = new Scan
   private lazy val monitorWithObserver        = new If(
     new And(
+      new EnemyIsTerran,
       new EnemiesAtMost(7, Terran.Factory),
       new Or(
         new UnitsAtLeast(2, Protoss.Observer, complete = true),

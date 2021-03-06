@@ -45,7 +45,7 @@ class WorkerRush extends Trigger {
         new ScoutAt(1, maxScouts = PurpleMath.clamp(With.game.getStartLocations.size() - 2, 1, 2)),
         new ScoutAt(1))),
     new Plan {
-      val workerLock: LockUnits = new LockUnits
+      val workerLock: LockUnits = new LockUnits(this)
       workerLock.matcher = MatchWorkers
       var seenFiveWorkers: Boolean = false
       override def onUpdate(): Unit = {

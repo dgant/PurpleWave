@@ -27,7 +27,7 @@ class ZvESparkle extends GameplanTemplate {
   override val activationCriteria: Predicate = new Check(() => Sparkle.matches)
   
   class KillNeutralBlocker extends Plan() {
-    val killers = new LockUnits
+    val killers = new LockUnits(this)
     killers.matcher = MatchWarriors
     killers.counter = CountEverything
     override def onUpdate() {

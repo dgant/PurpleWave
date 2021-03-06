@@ -33,7 +33,7 @@ class TrainUnit(val traineeClass: UnitClass) extends Production {
     else
       matchTrainer
     
-  lazy val trainerLock = new LockUnits
+  lazy val trainerLock = new LockUnits(this)
   trainerLock.matcher = u => trainerMatcher.apply(u) && (trainer.contains(u) || u.friendly.exists(_.trainee.forall(t => t.is(traineeClass) || t.completeOrNearlyComplete)))
   trainerLock.counter = CountOne
   trainerLock.preference = preference

@@ -22,7 +22,7 @@ class MorphUnit(val classToMorph: UnitClass) extends Production {
   
   val currencyLock  = new LockCurrencyForUnit(classToMorph)
   val morpherClass  = classToMorph.whatBuilds._1
-  val morpherLock   = new LockUnits
+  val morpherLock   = new LockUnits(this)
   morpherLock.matcher = MatchOr(morpherClass, MatchMorphingInto(classToMorph))
   morpherLock.counter = CountOne
   

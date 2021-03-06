@@ -13,7 +13,7 @@ import Utilities.{ByOption, GameTime}
 
 class PylonBlock extends Plan {
 
-  val blockerLock = new LockUnits
+  val blockerLock = new LockUnits(this)
   blockerLock.matcher = MatchWorkers
   blockerLock.counter = CountOne
 

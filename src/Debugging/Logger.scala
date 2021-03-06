@@ -90,6 +90,6 @@ class Logger {
     + f"{exception.getMessage}\n"
     + exception
       .getStackTrace
-      .map(stackElement => f"{stackElement.getClassName}.${stackElement.getMethodName}(): ${stackElement.getLineNumber}")
+      .map(stackElement => f"${stackElement.getClassName}.${stackElement.getMethodName}(): ${stackElement.getLineNumber}")
       .mkString("\n"))
 }

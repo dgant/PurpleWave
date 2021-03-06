@@ -1,13 +1,11 @@
 package Micro.Squads
 
 import Debugging.Decap
-import Information.Battles.Types.Division
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Mathematics.Formations.Designers.FormationZone
 import Mathematics.Formations.FormationAssigned
 import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
 import Micro.Actions.Combat.Targeting.Filters.TargetFilterDefend
 import Micro.Agency.Intention
 import Performance.Cache
@@ -17,19 +15,14 @@ import Utilities.ByOption
 
 class SquadDefendBase(base: Base) extends Squad {
 
-  private var _division = Division(Iterable.empty, Set(base))
-  def setDivision(division: Division): Unit = { _division = division }
-
   private var lastAction = "Defend"
 
   override def toString: String = f"$lastAction ${Decap(base)}"
 
   val zone: Zone = base.zone
-  private var _currentDestination: Pixel = Pixel(0, 0)
 
   override def run() {
     lazy val base = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.scouting.threatOrigin))
-    _currentDestination = zone.centroid.pixelCenter.nearestWalkableTile.pixelCenter
 
     if (units.isEmpty) return
 
@@ -38,9 +31,9 @@ class SquadDefendBase(base: Base) extends Squad {
       u.isOurs
         && u.unitClass.isStaticDefense
         && ( ! u.is(Protoss.ShieldBattery) || choke.forall(_.pixelCenter.pixelDistance(u.pixel) > 96 + u.effectiveRangePixels))
-        && (_division.enemies.isEmpty || _division.enemies.exists(u.canAttack)))
+        && (_enemies.isEmpty || _enemies.exists(u.canAttack)))
 
-    lazy val allowWandering = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || _division.enemies.exists(_.unitClass.ranged) || With.blackboard.wantToAttack()
+    lazy val allowWandering = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || _enemies.exists(_.unitClass.ranged) || With.blackboard.wantToAttack()
     lazy val canHuntEnemies = huntableEnemies().nonEmpty
     lazy val canDefendChoke = (units.size > 3 && choke.isDefined) || ! With.enemies.exists(_.isZerg)
     lazy val wallExistsButNoneNearChoke = walls.nonEmpty && walls.forall(wall =>
@@ -49,7 +42,7 @@ class SquadDefendBase(base: Base) extends Squad {
     lazy val entranceBreached = huntableEnemies().exists(e =>
       e.attacksAgainstGround > 0
       && ! e.unitClass.isWorker
-      && e.zone == zone
+      && e.base.exists(_.owner.isUs)
       && ! zone.edges.exists(edge => e.pixelDistanceCenter(edge.pixelCenter) < 64 + edge.radiusPixels))
 
     if ((allowWandering || entranceBreached) && canHuntEnemies) {
@@ -60,7 +53,7 @@ class SquadDefendBase(base: Base) extends Squad {
       lastAction = "Protect wall of"
       defendHeart(walls.minBy(_.pixel.groundPixels(With.scouting.mostBaselikeEnemyTile)).pixel)
     }
-    else if (! entranceBreached && canDefendChoke) {
+    else if ( ! entranceBreached && canDefendChoke) {
       lastAction = "Protect choke of"
       defendChoke()
     }
@@ -91,8 +84,8 @@ class SquadDefendBase(base: Base) extends Squad {
           < (exit.endPixels ++ exit.sidePixels :+ exit.pixelCenter).map(_.groundPixels(zone.centroid)).min))
 
   private val huntableEnemies = new Cache(() => {
-    val huntableInZone = _division.enemies.filter(e => e.zone == zone && huntableFilter(e)) ++ zone.units.filter(u => u.isEnemy && u.unitClass.isGas)
-    if (huntableInZone.nonEmpty) huntableInZone else _division.enemies.filter(huntableFilter)
+    val huntableInZone = _enemies.filter(e => e.zone == zone && huntableFilter(e)) ++ zone.units.filter(u => u.isEnemy && u.unitClass.isGas)
+    if (huntableInZone.nonEmpty) huntableInZone else _enemies.filter(huntableFilter)
   })
 
   private def huntEnemies() {
@@ -106,8 +99,6 @@ class SquadDefendBase(base: Base) extends Squad {
     }
 
     val huntables = huntableEnemies()
-    _currentDestination = PurpleMath.centroid(huntables.view.map(_.pixel))
-
     lazy val target = huntables.minBy(distance)
     lazy val targetAir = ByOption.minBy(huntables.filter(_.flying))(distance).getOrElse(target)
     lazy val targetGround = ByOption.minBy(huntables.filterNot(_.flying))(distance).getOrElse(target)
@@ -123,7 +114,6 @@ class SquadDefendBase(base: Base) extends Squad {
   }
 
   private def defendHeart(center: Pixel) {
-    _currentDestination = center
     val protectables  = center.zone.units.filter(u => u.isOurs && u.unitClass.isBuilding && u.hitPoints < 300 && (u.friendly.exists(_.knownToEnemy) || u.canAttack))
     val destination   = ByOption
       .minBy(protectables.view.filter(p =>
@@ -143,8 +133,7 @@ class SquadDefendBase(base: Base) extends Squad {
   }
 
   private def defendChoke() {
-    _currentDestination = zone.exit.map(_.pixelCenter).getOrElse(zone.centroid.pixelCenter)
-    assignToFormation(new FormationZone(zone, _division.enemies.toSeq).form(units.toSeq))
+    assignToFormation(new FormationZone(zone, _enemies).form(units.toSeq))
   }
 
   private def assignToFormation(formation: FormationAssigned): Unit = {

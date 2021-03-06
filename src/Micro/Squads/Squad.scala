@@ -7,13 +7,14 @@ import Mathematics.Points.{Pixel, SpecificPoints}
 import Micro.Squads.Qualities.QualityCounter
 import Performance.Cache
 import Planning.Prioritized
+import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 import scala.collection.mutable.ArrayBuffer
 
 trait Squad extends Prioritized {
-
+  val lock: LockUnits = new LockUnits
   var batchId: Int = Int.MinValue
   var vicinity: Pixel = SpecificPoints.middle
   protected val _units = new ArrayBuffer[FriendlyUnitInfo]

@@ -4,7 +4,9 @@ import Lifecycle.With
 import Micro.Agency.Intention
 import Performance.Cache
 import Planning.Plans.Scouting.ScoutCleared
+import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers.{MatchAnd, MatchScoutCatcher}
+import Planning.UnitPreferences.PreferClose
 import Utilities.{ByOption, Minutes}
 
 class SquadEjectScout extends Squad {
@@ -19,12 +21,13 @@ class SquadEjectScout extends Squad {
   def recruit() {
     if (With.frame > Minutes(8)()) return
     if (scoutCleared.apply) return
+    if (targetScout().isEmpty) return
 
-    val scouts = With.scouting.enemyScouts()
-    if (scouts.isEmpty) return
-
-    // TODO: Lock one unit using this matcher
-    MatchAnd(MatchScoutCatcher, (unit) => unit.base.exists(With.scouting.basesToLookForEnemyScouts().contains) || unit.pixelsToGetInRange(targetScout().get) < 32)
+    lock.matcher = MatchAnd(MatchScoutCatcher, (unit) => unit.base.exists(With.scouting.basesToLookForEnemyScouts().contains) || unit.pixelsToGetInRange(targetScout().get) < 32)
+    lock.counter = CountOne
+    lock.preference = PreferClose(targetScout().get.pixel)
+    lock.acquire(this)
+    addUnits(lock.units)
   }
   
   override def run() {

@@ -11,7 +11,6 @@ import Utilities.ByOption
 import scala.collection.mutable
 
 class LockUnits {
-
   var owner         : Prioritized     = _
   var interruptable : Boolean         = true
   var matcher       : UnitMatcher     = MatchAnything

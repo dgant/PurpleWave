@@ -18,9 +18,5 @@ class Plan extends Prioritized {
   
   final lazy val realName: String = ToString(this)
   
-  final override def toString: String =
-    if (realName == "")
-      description.get
-    else
-      if (description.get == "") realName else description.get
+  final override def toString: String = if (description.get == "") realName else description.get
 }

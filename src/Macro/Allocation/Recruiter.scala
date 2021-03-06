@@ -13,9 +13,11 @@ class Recruiter {
   private val unlockedUnits : mutable.Set[FriendlyUnitInfo]                             = mutable.Set.empty
   private val activeLocks   : mutable.Set[LockUnits]                                    = mutable.Set.empty
 
+  def isUnlocked(unit: FriendlyUnitInfo): Boolean = unlockedUnits.contains(unit)
   def unlocked: Iterable[FriendlyUnitInfo] = unlockedUnits
   def lockedBy(lock: LockUnits): collection.Set[FriendlyUnitInfo] = unitsByLock.getOrElse(lock, Set.empty)
 
+  def lockTo(lock: LockUnits, unit: FriendlyUnitInfo): Unit = lockTo(lock, Iterable(unit))
   def lockTo(lock: LockUnits, units: Iterable[FriendlyUnitInfo]): Unit = {
     activateLock(lock)
     if ( ! units.forall(unlockedUnits.contains)) {

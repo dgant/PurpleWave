@@ -24,7 +24,7 @@ class SquadCloakedHarass extends Squad {
       .sortBy(_.heart.groundPixels(With.scouting.mostBaselikeEnemyTile))
       .sortBy(_.owner.isNeutral)
       .sortBy( - baseWorkers(_))
-      .sortBy(basesWithDetection.contains)
+      .sortBy(basesWithDetection)
     val basesAssigned = new CountMap[Base]
     lazy val detectionlessDivisions = With.battles.divisions.filter(d => ! d.enemies.exists(_.unitClass.isDetector))
 

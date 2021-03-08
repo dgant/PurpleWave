@@ -12,7 +12,7 @@ import Utilities.ByOption
 
 import scala.collection.mutable
 
-class FormationZone(zone: Zone, enemies: Seq[UnitInfo]) extends FormationDesigner {
+class FormationZone(zone: Zone, enemies: Iterable[UnitInfo]) extends FormationDesigner {
 
   override def form(units: Seq[FriendlyUnitInfo]): FormationAssigned = {
     if (units.isEmpty) return new FormationAssigned(Map.empty)

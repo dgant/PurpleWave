@@ -18,8 +18,6 @@ import Utilities.ByOption
 class BuildBuilding(val buildingClass: UnitClass) extends Production {
 
   override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
-  override def producerUnitLocks: Seq[LockUnits] = Seq(builderLock)
-  override def producerInProgress: Boolean = building.isDefined
   override def buildable: Buildable = BuildableUnit(buildingClass)
 
   private var orderedTile : Option[Tile]              = None

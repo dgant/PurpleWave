@@ -13,8 +13,6 @@ import ProxyBwapi.UnitInfo.UnitInfo
 class BuildAddon(val addonClass: UnitClass) extends Production {
 
   override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
-  override def producerUnitLocks: Seq[LockUnits] = Seq(builderLock)
-  override def producerInProgress: Boolean = addon.isDefined
   override def buildable: Buildable = BuildableUnit(addonClass)
 
   val buildingDescriptor  = new Blueprint(addonClass)

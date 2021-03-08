@@ -17,8 +17,6 @@ import Utilities.Seconds
 class TrainUnit(val traineeClass: UnitClass) extends Production {
 
   override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
-  override def producerUnitLocks: Seq[LockUnits] = Seq(trainerLock)
-  override def producerInProgress: Boolean = trainee.isDefined
   override def buildable: Buildable = BuildableUnit(traineeClass)
 
   val currencyLock    = new LockCurrencyForUnit(traineeClass)
@@ -98,4 +96,6 @@ class TrainUnit(val traineeClass: UnitClass) extends Production {
       score
     }
   }
+
+  override val toString: String = f"Train a $traineeClass"
 }

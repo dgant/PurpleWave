@@ -85,13 +85,12 @@ class Tactics extends TimedTask {
       squads: Seq[Squad],
       minimumValue: Double = Double.NegativeInfinity,
       freelancerFilter: FriendlyUnitInfo => Boolean = u => true): Unit = {
-    var eligibleSquads: Seq[Squad] = Seq.empty
     var i = 0
     while (i < freelancers.length) {
       val freelancer = freelancers(i)
-      if (freelancerFilter(freelancer) && With.recruiter.isUnlocked(freelancer)) {
-        val squadValues = squads.filter(_.candidateValue(freelancer) > minimumValue)
-        val bestSquad = ByOption.minBy(squadValues)(squad => freelancer.pixelDistanceTravelling(squad.vicinity))
+      if (freelancerFilter(freelancer)) {
+        val squadsEligible = squads.filter(_.candidateValue(freelancer) > minimumValue)
+        val bestSquad = ByOption.minBy(squadsEligible)(squad => freelancer.pixelDistanceTravelling(squad.vicinity))
         if (bestSquad.isDefined) {
           bestSquad.get.addUnit(freelancers.remove(i))
           With.recruiter.lockTo(bestSquad.get.lock, freelancer)
@@ -132,9 +131,8 @@ class Tactics extends TimedTask {
     squadsDefending.foreach(p => p._2.addEnemies(p._1.enemies))
 
     // Get freelancers
-    val freelancers = (new ListBuffer[FriendlyUnitInfo] ++ With.recruiter.unlocked.view.filter(MatchRecruitableForCombat))
-      .sortBy(_.topSpeed) // Assign fast units last, as they're more flexible
-      .sortBy(_.flying) // Assign fliers last, as they're more flexible
+    val freelancers = (new ListBuffer[FriendlyUnitInfo] ++ With.recruiter.available.view.filter(MatchRecruitableForCombat))
+      .sortBy(_.frameDiscovered) // Assign new units first, as they're most likely to be able to help on defense and least likely to have to abandon a push
       .sortBy(_.unitClass.isTransport) // So transports can go to squads which need them
     def freelancerValue = freelancers.view.map(_.subjectiveValue).sum
     val freelancerValueInitial = freelancerValue

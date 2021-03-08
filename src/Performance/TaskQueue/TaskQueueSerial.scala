@@ -1,5 +1,6 @@
 package Performance.TaskQueue
 
+import Lifecycle.With
 import Performance.Tasks.TimedTask
 import Performance.Timer
 
@@ -22,7 +23,7 @@ class TaskQueueSerial(val tasks: TimedTask*) extends TimedTask {
     val timer = new Timer(budgetMs)
     var proceed = true
     while (proceed) {
-      if (timer.expired) {
+      if (timer.expired && With.configuration.enablePerformancePauses) {
         proceed = false
       } else if (index >= tasks.length) {
         // We have reached the end of the task queue.

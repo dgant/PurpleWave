@@ -26,7 +26,7 @@ class PlacementCycle extends TimedTask {
       setState(new PlacementStateInitial)
     }
     // Place each item in the queue
-    while ( ! state.isComplete && timer.ongoing) {
+    while ( ! state.isComplete && (timer.ongoing || ! With.configuration.enablePerformancePauses)) {
       if (stateTasks.safeToRun(state, timer.remaining)) {
         stateTasks.run(state, state.step, timer.remaining)
       } else {

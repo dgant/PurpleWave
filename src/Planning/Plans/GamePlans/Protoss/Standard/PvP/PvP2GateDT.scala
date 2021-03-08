@@ -39,8 +39,14 @@ class PvP2GateDT extends GameplanTemplate {
     new If(
       new Or(
         new BasesAtLeast(2),
+        new EnemyBasesAtLeast(2),
+        new EnemiesAtLeast(1, Protoss.Forge),
+        new EnemiesAtLeast(1, Protoss.PhotonCannon),
+        new EnemyStrategy(With.fingerprints.dtRush),
         new UnitsAtLeast(1, Protoss.DarkTemplar),
-        new Not(new EnemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway))),
+        new And(
+          new UnitsAtLeast(1, Protoss.TemplarArchives),
+          new SafeAtHome)),
       new ProposePlacement {
         override lazy val blueprints = Vector(new Blueprint(Protoss.Pylon, requireZone = Some(With.geography.ourNatural.zone)))
       }))
@@ -53,8 +59,7 @@ class PvP2GateDT extends GameplanTemplate {
     new Blueprint(Protoss.Gateway,         placement = Some(PlacementProfiles.wallGathering)),
     new Blueprint(Protoss.CyberneticsCore, placement = Some(PlacementProfiles.wallGathering)),
     new Blueprint(Protoss.Pylon,           placement = Some(PlacementProfiles.backPylon)),
-    new Blueprint(Protoss.Forge,           placement = Some(PlacementProfiles.wallGathering)),
-    new Blueprint(Protoss.Pylon,           placement = Some(PlacementProfiles.wallGathering)))
+    new Blueprint(Protoss.Forge,           placement = Some(PlacementProfiles.wallGathering)))
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvPIdeas.ReactToGasSteal,

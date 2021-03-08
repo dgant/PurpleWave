@@ -9,6 +9,6 @@ object ShowStrategyName extends View {
     With.game.drawTextScreen(
       5,
       3 * With.visualization.lineHeightSmall,
-      With.strategy.selectedCurrently.map(_.toString).mkString(" ") + " | " + With.fingerprints.status.mkString(" "))
+      f"${With.strategy.selectedCurrently.map(_.toString).mkString(" ")} ${if (With.fingerprints.status.nonEmpty) " | " else ""} ${With.fingerprints.status.mkString(" ")}")
   }
 }

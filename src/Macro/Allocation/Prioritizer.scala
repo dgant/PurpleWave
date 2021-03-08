@@ -36,7 +36,7 @@ class Prioritizer {
   }
   
   def prioritize(client: Prioritized) {
-    if ( ! priorities.contains(client)) {
+    if ( ! isPrioritized(client)) {
       priorities.put(client, nextPriority)
       nextPriority += 1
     }

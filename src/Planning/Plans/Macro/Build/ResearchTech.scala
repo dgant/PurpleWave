@@ -12,8 +12,6 @@ import Utilities.ByOption
 class ResearchTech(tech: Tech) extends Production {
 
   override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
-  override def producerUnitLocks: Seq[LockUnits] = Seq(techers)
-  override def producerInProgress: Boolean = techers.units.exists(_.techProducing.contains(tech))
   override def buildable: Buildable = BuildableTech(tech)
 
   val techerClass = tech.whatResearches

@@ -16,8 +16,6 @@ import Utilities.ByOption
 class MorphUnit(val classToMorph: UnitClass) extends Production {
 
   override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
-  override def producerUnitLocks: Seq[LockUnits] = Seq(morpherLock)
-  override def producerInProgress: Boolean = morpher.exists(_.morphing)
   override def buildable: Buildable = BuildableUnit(classToMorph)
   
   val currencyLock  = new LockCurrencyForUnit(classToMorph)

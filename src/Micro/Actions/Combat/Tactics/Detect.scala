@@ -1,7 +1,5 @@
 package Micro.Actions.Combat.Tactics
 
-import Lifecycle.With
-import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
@@ -27,7 +25,11 @@ object Detect extends Action {
       pickBestSpooky(unit, unit.enemiesBattle.filter(_.cloakedOrBurrowed))).orElse(
       pickBestSpooky(unit, unit.enemiesBattle.filter(canEventuallyCloak)))
 
-    val spookiestPixel = spookiestSpooky.map(_.pixel).orElse(minesweepPoint(unit))
+    lazy val minesweepPoint = ByOption
+      .minBy(unit.alliesSquad.view.filter(_.canAttack))(_.pixelDistanceTravelling(unit.agent.destination))
+      .map(_.pixel.project(unit.agent.destination, unit.sightPixels))
+
+    val spookiestPixel = spookiestSpooky.map(_.pixel).orElse(minesweepPoint)
 
     if (spookiestPixel.isEmpty) return
 
@@ -38,7 +40,8 @@ object Detect extends Action {
     val center = ghostbuster.map(_.pixel).getOrElse(unit.agent.origin)
     unit.agent.toTravel = Some(spookiestPixel.get.project(center, idealDistance))
 
-    if (unit.matchups.pixelsOfEntanglement > -16) {
+    val safetyPixels = if (unit.is(Protoss.Observer)) -16 else -32 * 5
+    if (unit.matchups.pixelsOfEntanglement > safetyPixels) {
       Retreat.delegate(unit)
     } else {
       Commander.move(unit)
@@ -50,18 +53,5 @@ object Detect extends Action {
       ByOption
         .min(s.matchups.targets.map(s.pixelDistanceSquared))
         .getOrElse(s.pixelDistanceSquared(detector)))
-  }
-
-  def minesweepPoint(detector: FriendlyUnitInfo): Option[Pixel] = {
-    if (detector.alliesSquad.forall(_.flying)) return None
-    if (With.unitsShown.allEnemies(Terran.Vulture) == 0
-      && With.unitsShown.allEnemies(Terran.Wraith) == 0
-      && With.unitsShown.allEnemies(Protoss.DarkTemplar) == 0
-      && With.unitsShown.allEnemies(Protoss.Arbiter) == 0
-      && With.unitsShown.allEnemies(Protoss.TemplarArchives) == 0
-      && With.unitsShown.allEnemies(Protoss.ArbiterTribunal) == 0
-      && With.unitsShown.allEnemies(Zerg.Lurker) == 0) return  None
-    val destination = detector.agent.destination.nearestWalkablePixel
-    ByOption.minBy(detector.alliesSquad)(_.pixelDistanceTravelling(destination)).map(_.pixel.project(destination, detector.sightPixels))
   }
 }

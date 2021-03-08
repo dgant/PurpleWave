@@ -30,7 +30,7 @@ class LockUnits(val owner: Prioritized) {
   }
 
   def release() {
-    With.recruiter.release(this)
+    With.recruiter.deactivate(this)
   }
 
   def units: collection.Set[FriendlyUnitInfo] = With.recruiter.lockedBy(this)

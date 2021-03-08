@@ -13,8 +13,6 @@ import ProxyBwapi.Upgrades.Upgrade
 class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Production {
 
   override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
-  override def producerUnitLocks: Seq[LockUnits] = Seq(upgraders)
-  override def producerInProgress: Boolean = upgraders.units.exists(_.upgradeProducing.contains(upgrade) && With.self.getUpgradeLevel(upgrade) >= level - 1)
   override def buildable: Buildable = BuildableUpgrade(upgrade, level)
   
   val upgraderClass = upgrade.whatUpgrades

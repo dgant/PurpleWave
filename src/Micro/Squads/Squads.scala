@@ -13,7 +13,7 @@ class Squads extends TimedTask {
   private var _batchActive: SquadBatch = SquadBatch(0)
   private var _batchNext: SquadBatch = SquadBatch(1)
 
-  def all: Seq[Squad] = _batchActive.squads.view
+  def all: Seq[Squad] = _batchActive.squads
 
   @inline final def isCommissioned(squad: Squad): Boolean = squad.batchId == _batchNext.id
   @inline final def commission(squad: Squad): Unit = {
@@ -25,9 +25,9 @@ class Squads extends TimedTask {
     With.units.ours.foreach(_.setSquad(None))
     With.units.enemy.foreach(_.clearSquads())
     all.foreach(_.clearUnits())
-    val swap = _batchActive
+    val batchSwap = _batchActive
     _batchActive = _batchNext
-    _batchNext = swap
+    _batchNext = batchSwap
     _batchNext.id = _batchActive.id + 1
     _batchNext.squads.clear()
     all.foreach(_.swapUnits())

@@ -33,7 +33,7 @@ class Agency extends TimedTask {
         .sortBy(_.unit.unitClass.isTransport) // Make transports go after their passengers so they know what passengers want
     }
 
-    while (agentQueue.nonEmpty && timer.ongoing) {
+    while (agentQueue.nonEmpty && (timer.ongoing || ! With.configuration.enablePerformancePauses)) {
       val agent = agentQueue.dequeue()
       val unit = agent.unit
       unit.sleepUntil(Math.max(unit.nextOrderFrame.getOrElse(0), AttackDelay.nextSafeOrderFrame(unit)))
@@ -43,7 +43,7 @@ class Agency extends TimedTask {
         if (With.performance.violatedLimit && With.configuration.enablePerformancePauses) {
           val timeAfter = With.performance.frameMs
           val timeDelta = timeAfter - timeBefore
-          With.logger.warn(f"Microing ${unit.unitClass} crossed the ${With.configuration.frameLimitMs} threshold by taking ${timeDelta}ms considering ${agent.actionsPerformed.map(_.toString).mkString(", ")}")
+          With.logger.warn(f"Microing ${unit.unitClass} crossed the ${With.configuration.frameLimitMs} threshold by taking ${timeDelta}ms considering ${agent.actionsPerformed.map(_.name).mkString(", ")}")
         }
       }
     }

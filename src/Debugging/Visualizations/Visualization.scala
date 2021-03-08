@@ -44,8 +44,6 @@ class Visualization extends TimedTask {
     ShowJudgment,
 
     // For squad recruitment overhaul
-    ShowDivisions,
-    ShowBases,
     ShowSquads,
   )
 
@@ -113,8 +111,7 @@ class Visualization extends TimedTask {
   def toggle(view: View) {
     if (views.contains(view)) {
       views -= view
-    }
-    else {
+    } else {
       views += view
     }
   }

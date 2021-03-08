@@ -104,7 +104,7 @@ class Storyteller {
     val enemyUnitsDiff = enemyUnitsAfter -- enemyUnitsBefore
     enemyUnitsDiff.foreach(newType => {
       tell("Discovered novel enemy unit: " + newType)
-      With.units.enemy.withFilter(_.is(newType)).foreach(unit => {
+      With.units.enemy.withFilter(newType).foreach(unit => {
         if (newType.isBuilding) {
           if (unit.complete) {
             tell(unit + " is already complete")

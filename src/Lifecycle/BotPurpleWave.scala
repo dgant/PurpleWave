@@ -18,6 +18,7 @@ class BotPurpleWave extends DefaultBWListener {
       With.onFrame()
       With.latency.onFrame()
       With.units.onFrame()
+      With.gathering.updateAccelerantPixels()
       With.lambdas.onFrame()
       With.tasks.run(With.performance.msBeforeTarget)
       With.storyteller.onFrame()

@@ -60,7 +60,7 @@ class SquadCloakedHarass extends Squad {
   private def baseHasDetection(base: Base): Boolean = (
     base.units.exists(u => u.complete && u.unitClass.isDetector && u.isEnemy)
     || base.isNaturalOf.exists(baseHasDetection)
-    || With.battles.divisions.exists(d => d.bases.contains(base) && d.enemies.exists(_.is(MatchMobileDetector))))
+    || With.battles.divisions.exists(d => d.bases.contains(base) && d.enemies.exists(MatchMobileDetector)))
   private def baseWorkers(base: Base): Int= Math.max(
     base.units.count(u => u.isEnemy && u.unitClass.isWorker),
     if (base.scouted) 0 else if (base.owner.isEnemy || With.scouting.mostBaselikeEnemyTile.base.contains(base)) 21 else 0)

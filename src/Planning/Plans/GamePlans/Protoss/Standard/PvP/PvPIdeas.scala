@@ -147,9 +147,9 @@ object PvPIdeas {
           new UnitsAtMost(0, Protoss.RoboticsFacility),
           new FrameAtLeast(() =>
             dtArrivalTime
-            - ByOption.max(With.units.ours.view.filter(_.is(Protoss.RoboticsFacility)).map(_.remainingCompletionFrames)).getOrElse(Protoss.RoboticsFacility.buildFrames)
-            - ByOption.max(With.units.ours.view.filter(_.is(Protoss.Observatory)).map(_.remainingCompletionFrames)).getOrElse(Protoss.Observatory.buildFrames)
-            - ByOption.max(With.units.ours.view.filter(_.is(Protoss.Observatory)).map(_.remainingCompletionFrames)).getOrElse(Protoss.Observer.buildFrames)),
+            - ByOption.max(With.units.ours.view.filter(Protoss.RoboticsFacility).map(_.remainingCompletionFrames)).getOrElse(Protoss.RoboticsFacility.buildFrames)
+            - ByOption.max(With.units.ours.view.filter(Protoss.Observatory).map(_.remainingCompletionFrames)).getOrElse(Protoss.Observatory.buildFrames)
+            - ByOption.max(With.units.ours.view.filter(Protoss.Observatory).map(_.remainingCompletionFrames)).getOrElse(Protoss.Observer.buildFrames)),
           new FrameAtLeast(() =>
             dtArrivalTime
             - Protoss.Forge.buildFrames

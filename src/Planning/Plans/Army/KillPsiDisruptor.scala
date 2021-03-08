@@ -13,7 +13,7 @@ class KillPsiDisruptor extends Plan() {
   killers.matcher = MatchAnd(MatchWarriors, MatchAntiGround)
   killers.counter = CountEverything
   override def onUpdate() {
-    val targets = With.geography.ourZones.flatMap(_.units.filter(_.is(Neutral.PsiDisruptor)))
+    val targets = With.geography.ourZones.flatMap(_.units.filter(Neutral.PsiDisruptor))
     if (targets.isEmpty) return
     killers.acquire(this)
     killers.units.foreach(killer => killer.agent.intend(this, new Intention {

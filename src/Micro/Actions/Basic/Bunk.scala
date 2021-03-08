@@ -8,7 +8,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Bunk extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.agent.toBoard.exists(_.is(Terran.Bunker))
+    unit.agent.toBoard.exists(Terran.Bunker)
   }
   
   override def perform(unit: FriendlyUnitInfo) {

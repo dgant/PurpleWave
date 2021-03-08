@@ -103,7 +103,7 @@ class Scouting extends TimedTask {
       }
       // Infer main by Overlord
       else if (With.frame < GameTime(2, 30)()) {
-        val overlords = With.units.enemy.filter(_.is(Zerg.Overlord))
+        val overlords = With.units.enemy.filter(Zerg.Overlord)
         val overlordMains = overlords.map(overlord => (overlord, With.geography.startBases.filter(base =>
           base.owner.isNeutral
           && overlord.framesToTravelTo(base.townHallArea.midPixel) < With.frame + Seconds(5)()
@@ -116,6 +116,6 @@ class Scouting extends TimedTask {
       }
     }
     _enemyHasScoutedUsWithWorker = _enemyHasScoutedUsWithWorker || With.geography.ourBases.exists(_.units.exists(u => u.isEnemy && u.is(MatchWorkers)))
-    _enemyHasScoutedUs = _enemyHasScoutedUs || _enemyHasScoutedUsWithWorker || With.units.ours.view.filter(_.is(MatchBuilding)).exists(u => u.tileArea.tiles.exists(With.grids.enemyVision.isSet))
+    _enemyHasScoutedUs = _enemyHasScoutedUs || _enemyHasScoutedUsWithWorker || With.units.ours.view.filter(MatchBuilding).exists(u => u.tileArea.tiles.exists(With.grids.enemyVision.isSet))
   }
 }

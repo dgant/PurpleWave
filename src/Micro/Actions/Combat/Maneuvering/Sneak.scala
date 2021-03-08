@@ -14,7 +14,7 @@ object Sneak extends Action {
     && unit.agent.canFlee
     && ! With.yolo.active()
     && ! unit.agent.shouldEngage
-    && ! unit.alliesBattle.exists(_.is(Protoss.Arbiter))
+    && ! unit.alliesBattle.exists(Protoss.Arbiter)
     && unit.matchups.enemyDetectors.isEmpty
     && unit.matchups.enemies.exists(e => e.complete && ! e.unitClass.isWorker && (if (unit.flying) e.unitClass.attacksGround else e.unitClass.attacksAir))
   )

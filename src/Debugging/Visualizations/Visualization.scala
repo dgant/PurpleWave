@@ -43,11 +43,15 @@ class Visualization extends TimedTask {
     ShowTeams,
     ShowJudgment,
 
+    // For mining optimization
+    ShowAccelerants,
+
     // For squad recruitment overhaul
     ShowSquads,
   )
 
   lazy val knownViews: Vector[View] = Vector[View](
+    ShowAccelerants,
     ShowArchitecture,
     ShowBases,
     ShowBattles,

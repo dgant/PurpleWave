@@ -12,7 +12,7 @@ object BlockConstruction extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     blockableBuilders(unit).nonEmpty
       && ! unit.flying
-      && ! unit.matchups.threats.exists(_.is(MatchWarriors))
+      && ! unit.matchups.threats.exists(MatchWarriors)
       && With.geography.enemyBases.nonEmpty
       && (unit.hitPoints > 10 || ! unit.base.exists(_.owner.isEnemy))
   )

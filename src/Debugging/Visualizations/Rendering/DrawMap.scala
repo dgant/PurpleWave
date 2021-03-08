@@ -38,6 +38,14 @@ object DrawMap {
       color,
       solid = true)
   }
+
+  def cross(
+    at      : Pixel,
+    radius  : Int,
+    color   : Color = Colors.DefaultGray): Unit = {
+    line(at.add(  -radius, -radius), at.add(   radius, radius), color)
+    line(at.add(   radius, -radius), at.add(  -radius, radius), color)
+  }
   
   def tile(
     tile: Tile,

@@ -56,7 +56,7 @@ class SquadAttack extends Squad {
         if (With.geography.ourBases.size > 1 && With.frame > Minutes(10)())
           None
         else
-          ByOption.minBy(With.units.enemy.view.filter(_.is(MatchProxied)).map(_.pixel))(_.groundPixels(With.geography.home.pixelCenter)))
+          ByOption.minBy(With.units.enemy.view.filter(MatchProxied).map(_.pixel))(_.groundPixels(With.geography.home.pixelCenter)))
       .orElse(
         ByOption
           .maxBy(With.geography.enemyBases)(base => {

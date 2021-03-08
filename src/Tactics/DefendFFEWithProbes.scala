@@ -50,10 +50,10 @@ class DefendFFEWithProbes extends Prioritized {
     if ( ! new EnemyRecentStrategy(With.fingerprints.fourPool).apply) return
     if ( ! With.fingerprints.fourPool.matches && ! With.scouting.enemyHasScoutedUsWithWorker) return
 
-    var cannons = With.units.ours.filter(_.is(Protoss.PhotonCannon))
-    if (cannons.isEmpty) cannons = With.units.ours.filter(_.is(Protoss.Forge))
+    var cannons = With.units.ours.filter(Protoss.PhotonCannon)
+    if (cannons.isEmpty) cannons = With.units.ours.filter(Protoss.Forge)
     
-    lazy val zerglings    = With.units.enemy.find(_.is(Zerg.Zergling))
+    lazy val zerglings    = With.units.enemy.find(Zerg.Zergling)
     lazy val threatSource = zerglings.map(_.pixel).getOrElse(With.scouting.mostBaselikeEnemyTile.pixelCenter)
 
     if (cannons.isEmpty) return

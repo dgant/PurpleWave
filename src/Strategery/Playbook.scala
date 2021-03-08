@@ -35,6 +35,9 @@ object StrategyGroups {
     PvPProxy2Gate, // Proxy builds are temporarily broken due to new building placer
     PvZProxy2Gate, // Proxy builds are temporarily broken due to new building placer
 
+    // This was always an exploit build due to inability to deny scouting; disable before probable removal
+    PvP2Gate1012DT,
+
     PvZDT,       // Requires better micro on one base
     PvZCorsair,  // Requires better micro on one base
     PvZSpeedlot, // Requires better micro on one base

@@ -39,7 +39,7 @@ object Potential {
   }
 
   def avoidThreats(unit: FriendlyUnitInfo): Force = {
-    val threats = unit.matchups.threats.filterNot(_.is(Protoss.Interceptor))
+    val threats = unit.matchups.threats.filterNot(Protoss.Interceptor)
     val forces  = threats.map(threatRepulsion(unit, _))
     val output  = ForceMath.sum(forces).normalize
     output

@@ -41,7 +41,7 @@ object FightOrFlight extends Action {
     decide(false, "Drained",      () => ! unit.canAttack && unit.energyMax > 0 && unit.unitClass.spells.forall(s => s.energyCost > unit.energy || ! With.self.hasTech(s)))
     decide(false, "Disrupted",    () => unit.underDisruptionWeb && ! unit.flying && unit.matchups.threats.exists(t => t.flying || ! t.underDisruptionWeb))
     decide(false, "Swarmed",      () => unit.underDarkSwarm && ! unit.unitClass.unaffectedByDarkSwarm && unit.matchups.targetsInRange.forall(t => ! t.flying || t.underDarkSwarm))
-    decide(false, "BidingSiege",  () => unit.is(Terran.SiegeTankUnsieged) && ! With.blackboard.wantToAttack() && unit.matchups.threats.exists(_.is(Protoss.Dragoon)) && With.units.ours.exists(_.techProducing.contains(Terran.SiegeMode)) && unit.alliesBattle.exists(a => a.is(Terran.Bunker) && a.complete))
+    decide(false, "BidingSiege",  () => unit.is(Terran.SiegeTankUnsieged) && ! With.blackboard.wantToAttack() && unit.matchups.threats.exists(Protoss.Dragoon) && With.units.ours.exists(_.techProducing.contains(Terran.SiegeMode)) && unit.alliesBattle.exists(a => a.is(Terran.Bunker) && a.complete))
     decide(true,  "Energized", () =>
       unit.unitClass.maxShields > 10
       && unit.alliesBattle.exists(ally =>

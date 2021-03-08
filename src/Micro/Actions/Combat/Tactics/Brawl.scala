@@ -17,7 +17,7 @@ object Brawl extends Action {
     lazy val brawlers = unit.matchups.threats.filter(t => ! t.flying && t.unitClass.melee && inBrawlRange(unit, t))
     (unit.agent.shouldEngage
       && unit.canMove
-      && (unit.is(Zerg.Zergling) || (unit.unitClass.melee && unit.matchups.threats.exists(_.is(Zerg.Zergling))))
+      && (unit.is(Zerg.Zergling) || (unit.unitClass.melee && unit.matchups.threats.exists(Zerg.Zergling)))
       && unit.matchups.targets.exists(t => ! t.flying && t.unitClass.melee)
       && unit.matchups.threats.exists(t => ! t.flying && t.unitClass.melee && t.pixelDistanceEdge(unit) < 32.0)
       && unit.matchups.targetsInRange.forall(_.canAttack(unit))

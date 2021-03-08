@@ -1,6 +1,7 @@
 package Micro.Actions.Combat.Targeting.Filters
 
 import Lifecycle.With
+import Planning.UnitMatchers.{MatchBuilding, MatchWorkers}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.Minutes
 
@@ -25,8 +26,8 @@ object TargetFilterIgnoreScouts extends TargetFilter {
     lazy val inRange            = actor.inRangeToAttack(target)
     lazy val canCatch           = inRange || actor.pixelRangeAgainst(target) > 32.0 * 3.0 || actor.topSpeed > target.topSpeed * 1.25
     lazy val facingRealThreats  = actor.matchups.targets.exists(u => u.unitClass.attacksGround && ! u.unitClass.isWorker)
-    lazy val beingWorkerRushed  = actor.matchups.targets.count(_.unitClass.isWorker) > 2 || With.fingerprints.workerRush.matches
-    lazy val beingProxied       = actor.matchups.targets.exists(_.unitClass.isBuilding) || With.fingerprints.cannonRush.matches
+    lazy val beingWorkerRushed  = actor.matchups.targets.count(MatchWorkers) > 2 || With.fingerprints.workerRush.matches
+    lazy val beingProxied       = actor.matchups.targets.exists(MatchBuilding) || With.fingerprints.cannonRush.matches
     
     lazy val hasFormation       = actor.agent.toReturn.isDefined
     lazy val targetingWorker    = target.unitClass.isWorker

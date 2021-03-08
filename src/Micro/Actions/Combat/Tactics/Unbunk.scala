@@ -11,7 +11,7 @@ object Unbunk extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     With.self.isTerran
     && ! unit.agent.toBoard.exists(unit.transport.contains)
-    && unit.transport.exists(_.is(Terran.Bunker))
+    && unit.transport.exists(Terran.Bunker)
     && unit.transport.get.matchups.targetsInRange.isEmpty
     && unit.agent.toReturn.forall(_.pixelDistance(unit.pixel) > 32.0 * 7.0)
   )

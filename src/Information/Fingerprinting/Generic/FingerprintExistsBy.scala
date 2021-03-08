@@ -6,6 +6,6 @@ import Planning.UnitMatchers.UnitMatcher
 import Utilities.GameTime
 
 class FingerprintExistsBy(unitMatcher: UnitMatcher, gameTime: GameTime, quantity: Int = 1) extends Fingerprint {
-  override def investigate: Boolean = With.frame < gameTime() && With.units.countEverP(_.is(unitMatcher)) >= quantity
+  override def investigate: Boolean = With.frame < gameTime() && With.units.countEverP(unitMatcher) >= quantity
   override val sticky: Boolean = true
 }

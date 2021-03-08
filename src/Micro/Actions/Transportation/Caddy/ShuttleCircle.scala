@@ -12,10 +12,10 @@ object ShuttleCircle extends Action {
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
     val roboticsFacility = With.units.ours
-      .filter(_.is(Protoss.RoboticsFacility))
+      .filter(Protoss.RoboticsFacility)
       .toVector
       .sortBy(_.pixelDistanceCenter(shuttle))
-      .sortBy(! _.trainee.exists(_.is(Protoss.Reaver)))
+      .sortBy(! _.trainee.exists(Protoss.Reaver))
       .headOption
     roboticsFacility.foreach(robo => {
       val roboCorner = robo.bottomLeft.add(0, 16)

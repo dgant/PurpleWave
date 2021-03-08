@@ -133,7 +133,7 @@ class Architecture {
   ///////////
   
   private def recalculatePower() {
-    With.units.ours.filter(_.is(Protoss.Pylon)).foreach(unit => addPower(unit.tileTopLeft, unit.completionFrame + Seconds(3)()))
+    With.units.ours.filter(Protoss.Pylon).foreach(unit => addPower(unit.tileTopLeft, unit.completionFrame + Seconds(3)()))
   }
   
   private def addPower(tile: Tile, frame: Int) {

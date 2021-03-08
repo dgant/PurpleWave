@@ -73,7 +73,7 @@ object ZoneUpdater {
     zone.walledIn = (
       With.frame < Minutes(10)()
       && exitBuildings.exists(_.isAny(Terran.SupplyDepot, Terran.EngineeringBay))
-      && exitBuildings.exists(_.is(Terran.Barracks))
+      && exitBuildings.exists(Terran.Barracks)
       && canaryTileInside.exists(tileInside =>
           canaryTileOutside.exists(tileOutside =>
             ! new PathfindProfile(

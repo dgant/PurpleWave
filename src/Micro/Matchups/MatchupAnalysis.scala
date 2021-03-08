@@ -5,6 +5,7 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Scouting.BlockConstruction
 import Micro.Heuristics.MicroValue
+import Planning.UnitMatchers.MatchWorkers
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
@@ -32,7 +33,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   def threatsInRange          : Seq[UnitInfo] = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me))
   def threatsInFrames(f: Int) : Seq[UnitInfo] = threats.filter(_.framesToGetInRange(me) < f)
   def targetsInRange          : Seq[UnitInfo] = targets.filter(target => target.visible && me.pixelRangeAgainst(target) >= target.pixelDistanceEdge(me) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
-  lazy val allyTemplarCount           : Int                   = allies.count(_.is(Protoss.HighTemplar))
+  lazy val allyTemplarCount           : Int                   = allies.count(Protoss.HighTemplar)
   lazy val busyForCatching            : Boolean               = me.gathering || me.constructing || me.repairing || ! me.canMove || BlockConstruction.buildOrders.contains(me.order)
   lazy val catchers                   : Vector[UnitInfo]      = threats.filter(canCatchMe).toVector
   lazy val splashFactorMax            : Double                = splashFactorForUnits(targets)
@@ -44,7 +45,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   lazy val framesToLive               : Double                = PurpleMath.nanToInfinity(me.totalHealth / dpfReceiving)
   lazy val framesOfSafety             : Double                = - With.latency.latencyFrames - With.reaction.agencyAverage - PurpleMath.nanToZero(pixelsOfEntanglement / me.topSpeed)
   lazy val pixelsOfEntanglement       : Double                = ByOption.max(threats.map(me.pixelsOfEntanglement)).getOrElse(- With.mapPixelWidth)
-  lazy val pixelsOfEntanglementWarrior: Double                = ByOption.max(threats.filterNot(_.unitClass.isWorker).map(me.pixelsOfEntanglement)).getOrElse(- With.mapPixelWidth)
+  lazy val pixelsOfEntanglementWarrior: Double                = ByOption.max(threats.filterNot(MatchWorkers).map(me.pixelsOfEntanglement)).getOrElse(- With.mapPixelWidth)
 
   protected def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = (
     shooter.canAttack(victim)

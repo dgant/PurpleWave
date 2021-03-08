@@ -22,7 +22,7 @@ object Rally extends Action {
     if (unit.unitClass.isTownHall) {
       if (unit.unitClass.producesLarva) {
         val nearbyUnits = With.units.inTileRectangle(unit.tileArea.expand(2, 2))
-        val nearbyEggs = nearbyUnits.filter(_.is(Zerg.Egg))
+        val nearbyEggs = nearbyUnits.filter(Zerg.Egg)
         val soonestEgg = ByOption.minBy(nearbyEggs)(_.remainingCompletionFrames)
         if (soonestEgg.exists(_.friendly.exists(_.buildType.isWorker))) {
           shouldRallyToMinerals = true

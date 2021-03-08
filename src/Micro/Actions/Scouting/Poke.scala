@@ -4,6 +4,7 @@ import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
+import Planning.UnitMatchers.MatchWorkers
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
@@ -14,8 +15,8 @@ object Poke extends Action {
     With.scouting.enemyMain.isDefined
     && unit.canAttack
     && unit.totalHealth > 39
-    && unit.matchups.targets.exists(_.unitClass.isWorker)
-    && unit.matchups.threats.forall(_.unitClass.isWorker)
+    && unit.matchups.targets.exists(MatchWorkers)
+    && unit.matchups.threats.forall(MatchWorkers)
     && ( // Save our strength for blocking Hatcheries
       ! With.enemy.isZerg
       || unit.matchups.threats.size <= 5
@@ -24,7 +25,7 @@ object Poke extends Action {
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    val targets = unit.matchups.targets.filter(_.unitClass.isWorker)
+    val targets = unit.matchups.targets.filter(MatchWorkers)
     if (targets.isEmpty) return
 
     val targetHeart = unit.base.map(_.heart.pixelCenter).getOrElse(unit.zone.centroid)

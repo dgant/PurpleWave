@@ -13,7 +13,7 @@ object TileSourceOurPylons extends TileSource {
   
   override def tiles(blueprint: Blueprint): Iterable[Tile] = {
     With.units.ours
-      .filter(_.is(Protoss.Pylon))
+      .filter(Protoss.Pylon)
       .flatMap(pylon =>
         (if (blueprint.heightTiles.contains(2))
           With.grids.psi2Height.psiPoints

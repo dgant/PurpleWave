@@ -7,15 +7,15 @@ import Micro.Agency.Intention
 import Performance.Cache
 import Performance.TaskQueue.TaskQueueGlobalWeights
 import Performance.Tasks.TimedTask
-import Tactics.Gather
-import Planning.{Plan, Prioritized}
+import Planning.Prioritized
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Tactics.Gather
 import Utilities.ByOption
 
 import scala.collection.mutable
 import scala.util.Random
 
-class Gathering extends TimedTask {
+class Gathering extends TimedTask with AccelerantMinerals with AccelerantPixels {
 
   withWeight(TaskQueueGlobalWeights.Gather)
 
@@ -110,6 +110,7 @@ class Gathering extends TimedTask {
   }
 
   override def onRun(budgetMs: Long) {
+    initializeAccelerators()
     if (workers.isEmpty) return
 
     resourceByWorker.keys.withFilter( ! workers.contains(_)).foreach(unassignWorker)

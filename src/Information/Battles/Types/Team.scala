@@ -76,5 +76,5 @@ class Team(val units: Vector[UnitInfo]) {
   val coherenceDepth      = new Cache(() => 1 - PurpleMath.clamp(2 * depthSpread() / (128 + widthIdeal()), 0, 1))
   val coherence           = new Cache(() => coherenceDepth()) // Math.max(coherenceWidth(), coherenceDepth()))
   val impatience          = new Cache(() => units.view.flatMap(_.friendly.map(_.agent.impatience)).sum.toDouble / Math.max(1, units.size))
-  val totalArmyFraction   = new Cache(() => units.view.filter(_.is(MatchWarriors)).map(_.subjectiveValue).sum / Math.max(1d, With.units.ours.view.filter(_.is(MatchWarriors)).map(_.subjectiveValue).sum))
+  val totalArmyFraction   = new Cache(() => units.view.filter(MatchWarriors).map(_.subjectiveValue).sum / Math.max(1d, With.units.ours.view.filter(MatchWarriors).map(_.subjectiveValue).sum))
 }

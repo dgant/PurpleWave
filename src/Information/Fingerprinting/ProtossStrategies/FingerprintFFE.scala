@@ -23,7 +23,7 @@ abstract class FingerprintFFE extends FingerprintAnd(
     lazy val expanded               = With.units.countEnemy(Protoss.Nexus) > 1 || With.units.enemy.exists(u => u.is(Protoss.Nexus) && ! u.base.exists(_.isStartLocation))
     lazy val cannonsWalled          = With.units.enemy.view.filter(u => u.is(Protoss.PhotonCannon) && couldBeWall(u)).toVector
     lazy val buildingsProxied       = With.units.enemy.view.filter(_.isAll(MatchBuilding, MatchProxied)).toVector
-    lazy val zealot                 = With.units.enemy.view.filter(_.is(Protoss.Zealot)).toVector
+    lazy val zealot                 = With.units.enemy.view.filter(Protoss.Zealot).toVector
     lazy val forgeOrCannon          = cannonsWalled ++ forge
     lazy val gatewayOrZealot        = gateway ++ zealot
     lazy val forgeCompletionFrame   = forge.map(_.completionFrame).orElse(ByOption.min(cannonsWalled.map(_.frameDiscovered)))

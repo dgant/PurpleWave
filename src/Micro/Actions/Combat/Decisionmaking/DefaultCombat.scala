@@ -15,6 +15,7 @@ import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.TrafficPriorities
 import Micro.Heuristics.Potential
+import Planning.UnitMatchers.MatchWorkers
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, Seconds}
@@ -153,7 +154,7 @@ object DefaultCombat extends Action {
 
     // By now units have already done all non-combat activities
     // So if we have nothing to attack, but are threatened, flee
-    lazy val pointlessRisk = unit.matchups.targets.isEmpty && unit.matchups.threats.exists(!_.unitClass.isWorker)
+    lazy val pointlessRisk = unit.matchups.targets.isEmpty && ! unit.matchups.threats.forall(MatchWorkers)
     unit.agent.shouldEngage &&= !pointlessRisk
 
     //////////////////////

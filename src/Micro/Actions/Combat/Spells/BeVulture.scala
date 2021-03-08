@@ -43,7 +43,7 @@ object BeVulture extends Action {
     if (unit.matchups.framesOfSafety <= 0) return
     
     lazy val inChoke = unit.zone.edges.exists(e => unit.pixelDistanceCenter(e.pixelCenter) < e.radiusPixels)
-    lazy val mineSpace = ! unit.tileArea.expand(1, 1).tiles.exists(With.grids.units.get(_).exists(_.is(Terran.SpiderMine)))
+    lazy val mineSpace = ! unit.tileArea.expand(1, 1).tiles.exists(With.grids.units.get(_).exists(Terran.SpiderMine))
     lazy val retreating = unit.matchups.threats.nonEmpty && ! unit.agent.shouldEngage
     lazy val timeToMine  = unit.matchups.framesOfSafety > Seconds(2)()
     lazy val inWorkerLine = unit.base.exists(base => base.owner.isUs && base.harvestingArea.contains(unit.tile))

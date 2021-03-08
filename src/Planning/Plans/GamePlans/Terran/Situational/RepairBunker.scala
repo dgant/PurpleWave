@@ -49,7 +49,7 @@ class RepairBunker extends Plan {
           1.0
         else
           0.0)
-      .sum.toInt - 3 * bunker.alliesBattle.count(_.is(Terran.SiegeTankSieged)),
+      .sum.toInt - 3 * bunker.alliesBattle.count(Terran.SiegeTankSieged),
       0,
       Math.min(6, With.units.countOurs(Terran.SCV) / 2 - 1))
 

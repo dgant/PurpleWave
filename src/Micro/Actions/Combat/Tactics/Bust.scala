@@ -56,7 +56,7 @@ object Bust extends Action {
   override protected def perform(unit: FriendlyUnitInfo) {
     // Goal: Take down the bunker. Don't take any damage from it.
     // If we're getting shot at by the bunker, back off.
-    lazy val bunkers = unit.matchups.targets.filter(_.is(Terran.Bunker))
+    lazy val bunkers = unit.matchups.targets.filter(Terran.Bunker)
     lazy val repairers = bunkers.flatMap(_.matchups.repairers)
     lazy val goons = unit.alliesSquad.filter(u => u.friendly.exists(Bust.allowed) && bunkers.exists(b => u.framesToGetInRange(b) < 24))
 

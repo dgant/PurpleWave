@@ -37,7 +37,7 @@ class TrainUnit(val traineeClass: UnitClass) extends Production {
   trainerLock.preference = preference
   
   def trainer: Option[FriendlyUnitInfo] = trainerLock.units.headOption
-  def trainee: Option[FriendlyUnitInfo] = trainer.flatMap(_.trainee.filter(_.is(traineeClass)))
+  def trainee: Option[FriendlyUnitInfo] = trainer.flatMap(_.trainee.filter(traineeClass))
   override def isComplete: Boolean = trainee.exists(t => MacroCounter.countComplete(t)(traineeClass) > 0)
   
   override def onUpdate() {

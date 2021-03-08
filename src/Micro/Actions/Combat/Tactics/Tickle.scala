@@ -7,7 +7,7 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
-import Planning.UnitMatchers.MatchWorkers
+import Planning.UnitMatchers.{MatchBuilding, MatchWorkers}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Strategery.Strategies.AllRaces.{WorkersKill, WorkersRaze, WorkersSpread, WorkersUnite}
@@ -119,7 +119,7 @@ object Tickle extends Action {
     }
 
     // Lastly, if they've started training combat units, we are ALL IN
-    if (enemies.exists( ! _.unitClass.isWorker)) {
+    if ( ! enemies.forall(MatchWorkers)) {
       attack = true
     }
 
@@ -254,8 +254,8 @@ object Tickle extends Action {
   private def destroyBuildings(unit: FriendlyUnitInfo) {
     // Vs. 4-pool they will often be left with just an egg or two.
     // We need to surround it and do as much damage to it as possible
-    val egg = With.units.enemy.view.filter(_.is(Zerg.Egg)).toVector.sortBy(_.totalHealth).headOption
-    lazy val nonEgg = With.units.enemy.view.filter(_.unitClass.isBuilding).toVector.sortBy(_.totalHealth).headOption
+    val egg = With.units.enemy.view.filter(Zerg.Egg).toVector.sortBy(_.totalHealth).headOption
+    lazy val nonEgg = With.units.enemy.view.filter(MatchBuilding).toVector.sortBy(_.totalHealth).headOption
     unit.agent.toAttack = egg.orElse(nonEgg)
     Commander.attack(unit)
   }

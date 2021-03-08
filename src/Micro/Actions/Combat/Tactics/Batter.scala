@@ -23,7 +23,7 @@ object Batter extends Action {
       && unit.canAttack
       && ! unit.flying
       && With.enemies.exists(_.raceInitial == Race.Terran)
-      && ! unit.matchups.threatsInRange.exists(_.is(Terran.SiegeTankSieged))
+      && ! unit.matchups.threatsInRange.exists(Terran.SiegeTankSieged)
       && walledZone(unit).exists(_.exit.exists(exit => unit.pixelDistanceCenter(exit.pixelCenter) < 32.0 * 12.0))
     )
   }

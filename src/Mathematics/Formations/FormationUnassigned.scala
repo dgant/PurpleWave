@@ -13,7 +13,7 @@ class FormationUnassigned(var spots: Map[UnitClass, Iterable[Pixel]]) {
     new FormationAssigned(
       if (spots.isEmpty) Map.empty else
       spots.keys
-        .map(unitClass => assignClass(unitClass, units.filter(_.is(unitClass))))
+        .map(unitClass => assignClass(unitClass, units.filter(unitClass)))
         .reduce(_ ++ _))
   }
 

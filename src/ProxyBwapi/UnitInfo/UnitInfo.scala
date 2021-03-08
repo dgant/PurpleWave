@@ -8,7 +8,7 @@ import Information.Battles.Types.{BattleLocal, Team}
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Mathematics.Physics.Force
-import Mathematics.Points.{Pixel, PixelRay, Tile, TileRectangle}
+import Mathematics.Points._
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Ring
 import Micro.Actions.Combat.Targeting.Target
@@ -26,6 +26,8 @@ import ProxyBwapi.UnitTracking.Visibility
 import ProxyBwapi.Upgrades.Upgrade
 import Utilities._
 import bwapi._
+
+import scala.collection.mutable.ArrayBuffer
 
 abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiUnit, id) {
 
@@ -45,19 +47,22 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   @inline final def isAny(unitMatchers: UnitMatcher*): Boolean = unitMatchers.exists(_.apply(this))
   @inline final def isAll(unitMatchers: UnitMatcher*): Boolean = unitMatchers.forall(_.apply(this))
 
-  val frameDiscovered           : Int = With.frame
-  val initialHitPoints          : Int = bwapiUnit.getHitPoints
-  val initialShields            : Int = bwapiUnit.getShields
-  var completionFrame           : Int = Forever() // Can't use unitClass during construction
-  var lastHitPoints             : Int = _
-  var lastShieldPoints          : Int = _
-  var lastMatrixPoints          : Int = _
-  var lastCooldown              : Int = _
-  var lastFrameTakingDamage     : Int = - Forever()
-  var lastFrameTryingToAttack   : Int = - Forever()
-  var lastFrameStartingAttack   : Int = - Forever()
-  var hasEverBeenCompleteHatch  : Boolean = false // Stupid AIST hack fix for detecting whether a base is mineable
-  private var lastUnitClass: UnitClass = _
+  val frameDiscovered             : Int = With.frame
+  val initialHitPoints            : Int = bwapiUnit.getHitPoints
+  val initialShields              : Int = bwapiUnit.getShields
+  var completionFrame             : Int = Forever() // Can't use unitClass during construction
+  var lastHitPoints               : Int = _
+  var lastShieldPoints            : Int = _
+  var lastMatrixPoints            : Int = _
+  var lastCooldown                : Int = _
+  var lastFrameTakingDamage       : Int = - Forever()
+  var lastFrameTryingToAttack     : Int = - Forever()
+  var lastFrameStartingAttack     : Int = - Forever()
+  var hasEverBeenCompleteHatch    : Boolean = false // Stupid AIST hack fix for detecting whether a base is mineable
+  private var lastUnitClass       : UnitClass = _
+  private val previousPixels      : ArrayBuffer[Pixel] = ArrayBuffer.fill(24)(new Pixel(bwapiUnit.getPosition))
+  private var previousPixelIndex  : Int = 0
+  def previousPixel(framesAgo: Int): Pixel = previousPixels((previousPixels.length + previousPixelIndex - Math.min(previousPixels.length, framesAgo)) % previousPixels.length)
   def update() {
     if (cooldownLeft > lastCooldown) lastFrameStartingAttack = With.frame
     if (totalHealth < lastHitPoints + lastShieldPoints + lastMatrixPoints) lastFrameTakingDamage = With.frame
@@ -77,6 +82,8 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
     lastMatrixPoints  = matrixPoints
     lastCooldown      = cooldownLeft
     hasEverBeenCompleteHatch ||= complete && is(Zerg.Hatchery)
+    previousPixelIndex = (previousPixelIndex + 1) % previousPixels.length
+    previousPixels(previousPixelIndex) = pixel
   }
 
   @inline final def aliveAndComplete: Boolean = alive && complete

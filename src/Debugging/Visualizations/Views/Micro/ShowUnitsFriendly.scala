@@ -15,7 +15,7 @@ object ShowUnitsFriendly extends View {
   var selectedOnly    : Boolean = false
   var showClient      : Boolean = true
   var showAction      : Boolean = true
-  var showOrder       : Boolean = false
+  var showOrder       : Boolean = true
   var showTargets     : Boolean = true
   def showPaths       : Boolean = ShowUnitPaths.inUse
   var showDesire      : Boolean = true

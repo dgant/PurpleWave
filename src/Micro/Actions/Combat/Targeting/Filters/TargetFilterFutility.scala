@@ -1,6 +1,7 @@
 package Micro.Actions.Combat.Targeting.Filters
 
 import Lifecycle.With
+import Planning.UnitMatchers.MatchWorkers
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.Minutes
@@ -30,7 +31,7 @@ object TargetFilterFutility extends TargetFilter {
       || Vector(actor.pixelToFireAt(target).tile, target.tile).exists(t => t.walkable && t.altitude >= target.tile.altitude))
     if ( ! targetReachable) return false
 
-    lazy val atOurWorkers = target.base.exists(_.owner.isUs) && target.matchups.targetsInRange.exists(_.unitClass.isWorker)
+    lazy val atOurWorkers = target.base.exists(_.owner.isUs) && target.matchups.targetsInRange.exists(MatchWorkers)
     lazy val alliesAssisting = target.matchups.catchers.exists(ally =>
       ally != actor
       && (ally.topSpeed >= target.topSpeed || ally.pixelRangeAgainst(target) >= actor.pixelRangeAgainst(target))

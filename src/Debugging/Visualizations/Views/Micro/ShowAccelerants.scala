@@ -24,9 +24,9 @@ object ShowAccelerants extends View {
     )
 
     With.units.ours
-      .filter(u => u.orderTarget.exists(_.unitClass.isMinerals) && u.agent.intent.toGather.exists(With.gathering.onAccelerant(u, _)))
+      .filter(u => u.orderTarget.exists(_.unitClass.isMinerals) && u.agent.toGather.exists(With.gathering.onAccelerant(u, _)))
       .foreach(u => {
-        val accelerantPixel = With.gathering.getAccelerantPixel(u.agent.intent.toGather.get).get
+        val accelerantPixel = With.gathering.getAccelerantPixel(u.agent.toGather.get).get
         val distance = u.pixelDistanceCenter(accelerantPixel)
         val color = if (distance < 1) Colors.NeonRed else if (distance < 4) Colors.NeonOrange else Colors.NeonYellow
         DrawMap.circle(u.pixel, radius, color, solid = true)

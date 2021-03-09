@@ -66,7 +66,6 @@ class Configuration {
   /////////////////
 
   var enablePerformancePauses             = true
-  var performanceMinimumUnitSleep         = 2
   var maximumGamesHistoryPerOpponent      = 500
   var logTaskDuration                     = false
   

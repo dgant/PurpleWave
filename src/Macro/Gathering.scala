@@ -19,6 +19,8 @@ class Gathering extends TimedTask with AccelerantMinerals with AccelerantPixels 
 
   withWeight(TaskQueueGlobalWeights.Gather)
 
+  def getWorkersByResource(resource: UnitInfo): Iterable[FriendlyUnitInfo] = workersByResource.getOrElse(resource, Iterable.empty)
+
   private val kDistanceMining: Int = 32 * 12
   private val kInvalidResourceScore = 1e100d
   private val kHysteresisPixels = 12

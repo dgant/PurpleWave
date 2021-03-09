@@ -322,39 +322,64 @@ object Commander {
     if (unit.unready) return
     if (unit.carrying) {
       autoUnburrow(unit)
-      unit.bwapiUnit.returnCargo
+      unit.bwapiUnit.returnCargo()
       sleepReturnCargo(unit)
     }
   }
 
   def gather(unit: FriendlyUnitInfo): Unit = unit.agent.toGather.foreach(gather(unit, _))
-  private def gather(unit: FriendlyUnitInfo, resource: UnitInfo, allowReturningCargo: Boolean = true) {
+  private def gather(unit: FriendlyUnitInfo, resource: UnitInfo) {
     if (unit.unready) return
     autoUnburrow(unit)
-    if (allowReturningCargo && (unit.carryingMinerals || unit.carryingGas)) {
-      if ( ! unit.gatheringGas && ! unit.gatheringMinerals) {
-        returnCargo(unit)
+    if (unit.carrying) {
+      // Spamming return cargo can cause path wobbling and
+      if ( ! Vector(Orders.ResetCollision, Orders.ReturnMinerals, Orders.ReturnGas).contains(unit.order)) {
+        unit.bwapiUnit.returnCargo()
       }
-      else {
-        sleep(unit)
-      }
-    }
-      
-    // The logic of "If we're not carrying resources, spam gather until the unit's target is the intended resource"
-    // produces mineral locking, in which workers mine more efficiently because exactly 2 miners saturate a mineral patch.
-    //
-    else if ( ! unit.target.contains(resource)) {
+    } else {
       if (resource.visible) {
-        unit.bwapiUnit.gather(resource.bwapiUnit)
-        sleep(unit)
-      }
-      else {
+        def doGather() { unit.bwapiUnit.gather(resource.bwapiUnit) }
+        if (resource.unitClass.isGas) {
+          doGather()
+        } else {
+          lazy val coworkers            = With.gathering.getWorkersByResource(resource)
+          lazy val accelerantFrame      = 11 + With.latency.framesRemaining
+          lazy val accelerantMineral    = With.gathering.getAccelerantMineral(resource)
+          lazy val accelerantPixel      = With.gathering.getAccelerantPixel(resource)
+          lazy val distance             = unit.pixelDistanceEdge(resource)
+          lazy val projectedFrames      = PurpleMath.nanToZero(Math.max(0, distance - unit.unitClass.haltPixels) / unit.topSpeed + 2 * Math.min(distance, unit.unitClass.haltPixels) / unit.topSpeed)
+          lazy val onAccelerantPixel    = With.gathering.onAccelerant(unit, resource)
+          lazy val onTargetMineral      = unit.orderTarget.contains(resource)
+          lazy val onAccelerantMineral  = accelerantMineral.exists(unit.orderTarget.contains)
+          def doGatherFromAccelerant() { unit.bwapiUnit.gather(accelerantMineral.get.bwapiUnit) }
+          if (onAccelerantPixel) {
+            doGather()
+          // See https://github.com/bmnielsen/Stardust/blob/b8a91e52f453e6fdc60798edac569826df98148a/src/Workers/Workers.cpp#L587
+          } else if (coworkers.exists(w => w.orderTarget.contains(resource) && w.bwapiUnit.getOrderTimer + 7 == 11 + With.latency.framesRemaining)) {
+            doGather()
+          } else if (projectedFrames == accelerantFrame) {
+            doGather()
+          } else if (accelerantMineral.isDefined) {
+            if (onTargetMineral) {
+              if (projectedFrames > accelerantFrame) {
+                doGatherFromAccelerant()
+              }
+            } else if (onAccelerantMineral) {
+              if (unit.pixelDistanceEdge(accelerantMineral.get) < 32 || distance < 9 + unit.topSpeed * With.latency.framesRemaining) {
+                doGather()
+              }
+            } else if (projectedFrames > accelerantFrame) {
+              doGatherFromAccelerant()
+            }
+          } else if ( ! onTargetMineral) {
+            doGather()
+          }
+        }
+      } else {
         move(unit, resource.pixel)
       }
     }
-    else {
-      sleep(unit)
-    }
+    sleep(unit, 1)
   }
 
   def build(unit: FriendlyUnitInfo, unitClass: UnitClass) {
@@ -495,7 +520,6 @@ object Commander {
   
   private def sleep(unit: FriendlyUnitInfo, requiredDelay: Int = 2): Unit = {
     val sleepUntil = Array(
-      With.frame + With.configuration.performanceMinimumUnitSleep,
       With.frame + requiredDelay,
       With.frame + With.latency.turnSize,
       unit.nextOrderFrame.getOrElse(0)).max

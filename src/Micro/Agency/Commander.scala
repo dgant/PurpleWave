@@ -369,7 +369,7 @@ object Commander {
                 doGatherFromAccelerant()
               }
             } else if (onAccelerantMineral) {
-              if (unit.pixelDistanceEdge(accelerantMineral.get) < 32 || distance < 9 + unit.topSpeed * With.latency.framesRemaining) {
+              if (unit.pixelDistanceEdge(accelerantMineral.get) < 32 || distance < unit.topSpeed * With.latency.framesRemaining + unit.unitClass.framesToTurn180 / 2) {
                 doGather()
               }
             } else if (projectedFrames > accelerantFrame) {

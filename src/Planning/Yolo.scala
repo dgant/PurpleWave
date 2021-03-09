@@ -19,7 +19,7 @@ class Yolo extends TimedTask {
   private var maxoutYolo: Boolean = false
   private val maxoutYoloFrameThreshold = Minutes(2)()
 
-  private def maxouted = With.self.supplyUsed / 2 >= 192 && With.units.ours.forall(u => ! u.is(Protoss.Carrier) || u.interceptors.count(_.complete) > 7)
+  private def maxouted = With.self.supplyUsed / 2 >= 192 && With.units.ours.forall(u => ! u.is(Protoss.Carrier) || u.interceptorCount > 7)
 
   val active = new Cache(() => activeByDefault || maxoutYolo)
 

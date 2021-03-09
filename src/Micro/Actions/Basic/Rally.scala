@@ -27,19 +27,14 @@ object Rally extends Action {
         if (soonestEgg.exists(_.friendly.exists(_.buildType.isWorker))) {
           shouldRallyToMinerals = true
         }
-      }
-      else {
+      } else {
         shouldRallyToMinerals = true
       }
     }
     
     if (shouldRallyToMinerals) {
-      val minerals = unit.base.map(_.minerals).getOrElse(Set.empty)
-      if (minerals.nonEmpty) {
-        val mineral = minerals.minBy(_.pixelDistanceEdge(unit))
-        Commander.rally(unit, mineral.pixel)
-        return
-      }
+      unit.base.map(_.heart.pixelCenter).foreach(Commander.rally(unit, _))
+      return
     }
 
     Commander.rally(unit, With.scouting.mostBaselikeEnemyTile.pixelCenter)

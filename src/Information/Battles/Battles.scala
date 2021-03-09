@@ -38,6 +38,8 @@ class Battles extends TimedTask {
 
   val stateTasks = new StateTasks
 
+  override def isComplete: Boolean = framesSinceRunning < 1 && _processingState.isFinalStep
+
   override def onRun(budgetMs: Long) {
     val timer = new Timer(budgetMs)
     while (timer.ongoing) {
@@ -48,7 +50,7 @@ class Battles extends TimedTask {
       } else {
         return
       }
-      if ( _processingState.isFinalStep) {
+      if (_processingState.isFinalStep) {
         return
       }
     }

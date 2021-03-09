@@ -50,7 +50,7 @@ object With {
   var architecture      : Architecture            = _
   var bank              : Bank                    = _
   var blackboard        : Blackboard              = _
-  var battles           : Battles        = _
+  var battles           : Battles                 = _
   var buildOrderHistory : MasterBuildOrderHistory = _
   var buildPlans        : MasterBuildPlans        = _
   var bullets           : Bullets                 = _

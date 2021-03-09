@@ -34,8 +34,6 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
   private var _maelstrommed           : Boolean = _
   private var _stasised               : Boolean = _
   private var _stimmed                : Boolean = _
-  private var _gatheringMinerals      : Boolean = _
-  private var _gatheringGas           : Boolean = _
   private var _morphing               : Boolean = _
   private var _constructing           : Boolean = _
   private var _repairing              : Boolean = _
@@ -84,6 +82,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
   private var _buildType              : UnitClass           = _
   private var _trainingQueue          : Seq[UnitClass]      = Seq.empty
   private var _interceptors           : Seq[UnitInfo]       = Seq.empty
+  private var _interceptorCount       : Int                 = _
   private var _transport              : Option[FriendlyUnitInfo] = None
   @inline final def visibility              : Visibility.Value  = _visibility
   @inline final def player                  : PlayerInfo        = _player
@@ -107,8 +106,6 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
   @inline final def maelstrommed            : Boolean           = _maelstrommed
   @inline final def stasised                : Boolean           = _stasised
   @inline final def stimmed                 : Boolean           = _stimmed
-  @inline final def gatheringMinerals       : Boolean           = _gatheringMinerals
-  @inline final def gatheringGas            : Boolean           = _gatheringGas
   @inline final def morphing                : Boolean           = _morphing
   @inline final def constructing            : Boolean           = _constructing
   @inline final def repairing               : Boolean           = _repairing
@@ -159,9 +156,10 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
   @inline final def buildType               : UnitClass         = _buildType
   @inline final def trainingQueue           : Seq[UnitClass]    = _trainingQueue
   @inline final def interceptors            : Seq[UnitInfo]     = _interceptors
+  @inline final def interceptorCount        : Int               = _interceptorCount
   @inline final def transport               : Option[FriendlyUnitInfo] = _transport
   def readProxy(): Unit = {
-    if (With.frame == 0 || bwapiUnit.isVisible) {
+    if (With.frame == 0 || bwapiUnit.isVisible(With.self.bwapiPlayer)) {
       changeVisibility(Visibility.Visible)
       _player                 = Players.get(bwapiUnit.getPlayer)
       _unitClass              = UnitClasses.get(bwapiUnit.getType)
@@ -172,19 +170,17 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
       _burrowed               = bwapiUnit.isBurrowed
       _cloaked                = bwapiUnit.isCloaked
       _detected               = bwapiUnit.isDetected
-      _flying                 = bwapiUnit.isFlying
+      _flying                 = _unitClass.isFlyer || (_unitClass.isFlyingBuilding && bwapiUnit.isLifted)
       _plagued                = bwapiUnit.isPlagued
       _ensnared               = bwapiUnit.isEnsnared
       _invincible             = bwapiUnit.isInvincible
-      _irradiated             = bwapiUnit.isIrradiated
-      _lockedDown             = bwapiUnit.isLockedDown
-      _maelstrommed           = bwapiUnit.isMaelstrommed
-      _stasised               = bwapiUnit.isStasised
-      _stimmed                = bwapiUnit.isStimmed
-      _gatheringMinerals      = unitClass.isWorker && bwapiUnit.isGatheringMinerals
-      _gatheringGas           = unitClass.isWorker && bwapiUnit.isGatheringGas
+      _irradiated             = _unitClass.isOrganic    && bwapiUnit.isIrradiated
+      _lockedDown             = _unitClass.isMechanical && bwapiUnit.isLockedDown
+      _maelstrommed           = _unitClass.isOrganic    && bwapiUnit.isMaelstrommed
+      _stasised               = ! _unitClass.isBuilding && bwapiUnit.isStasised
+      _stimmed                = _unitClass.isTerran     && _unitClass.isOrganic && _unitClass.canAttack && bwapiUnit.isStimmed
       _morphing               = bwapiUnit.isMorphing
-      _constructing           = bwapiUnit.isConstructing
+      _constructing           = _unitClass.isWorker && bwapiUnit.isConstructing
       _repairing              = bwapiUnit.isRepairing
       _researching            = bwapiUnit.isResearching
       _training               = bwapiUnit.isTraining
@@ -226,10 +222,11 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
         _matrixPoints         = bwapiUnit.getDefenseMatrixPoints
         _energy               = bwapiUnit.getEnergy
         _scarabs              = bwapiUnit.getScarabCount
-        _techProducing        = ConvertBWAPI.tech(bwapiUnit.getTech)
-        _upgradeProducing     = ConvertBWAPI.upgrade(bwapiUnit.getUpgrade)
-        _trainingQueue        = if (training) bwapiUnit.getTrainingQueue.asScala.map(UnitClasses.get) else Seq.empty
-        _interceptors         = if (bwapiUnit.getInterceptorCount > 0) bwapiUnit.getInterceptors.asScala.flatMap(With.units.get) else Seq.empty
+        _techProducing        = if (_researching) ConvertBWAPI.tech(bwapiUnit.getTech) else None
+        _upgradeProducing     = if (_upgrading) ConvertBWAPI.upgrade(bwapiUnit.getUpgrade) else None
+        _trainingQueue        = if (training) Range(0, bwapiUnit.getTrainingQueueCount).map(i => UnitClasses.get(bwapiUnit.getTrainingQueueAt(i))) else Seq.empty
+        _interceptorCount     = if (unitClass == Protoss.Carrier) bwapiUnit.getInterceptorCount else 0
+        _interceptors         = if (_interceptorCount > 0) bwapiUnit.getInterceptors.asScala.flatMap(With.units.get) else Seq.empty // TODO: Slow because JBWAPI checks every unit for every carrier
         _buildType            = UnitClasses.get(bwapiUnit.getBuildType)
         _transport            = if (loaded) With.units.get(bwapiUnit.getTransport).flatMap(_.friendly) else None
       } else {

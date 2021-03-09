@@ -4,9 +4,8 @@ import Lifecycle.With
 import bwapi.UnitType
 
 object UnitClasses {
-  def all: Iterable[UnitClass] = With.proxy.unitClassByType.values
-  def None: UnitClass = get(UnitType.None)
-  def Unknown: UnitClass = get(UnitType.Unknown)
-  
-  def get(unitType: UnitType): UnitClass = With.proxy.unitClassByType(unitType)
+  def all: Vector[UnitClass] = With.proxy.unitClasses
+  def get(unitType: UnitType): UnitClass = With.proxy.unitClassesById(unitType.id)
+  lazy val None: UnitClass = get(UnitType.None)
+  lazy val Unknown: UnitClass = get(UnitType.Unknown)
 }

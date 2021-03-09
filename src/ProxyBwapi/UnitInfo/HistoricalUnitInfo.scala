@@ -29,8 +29,6 @@ class HistoricalUnitInfo(unit: UnitInfo) extends UnitInfo(unit.bwapiUnit, unit.i
   override val cooldownSpell: Int = unit.cooldownSpell
   override val pixel: Pixel = unit.pixel
   override val tileTopLeft: Tile = unit.tileTopLeft
-  override val gatheringMinerals: Boolean = unit.gatheringMinerals
-  override val gatheringGas: Boolean = unit.gatheringGas
   override val target: Option[UnitInfo] = None
   override val targetPixel: Option[Pixel] = unit.targetPixel
   override val orderTarget: Option[UnitInfo] = None

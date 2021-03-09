@@ -14,6 +14,8 @@ class Agency extends TimedTask {
   val cycleLengths        = new mutable.Queue[Int]
   var lastQueueCompletion = 0
 
+  override def isComplete: Boolean = agentQueue.isEmpty
+
   override def onRun(budgetMs: Long) {
 
     val timer = new Timer(budgetMs)
@@ -33,7 +35,7 @@ class Agency extends TimedTask {
         .sortBy(_.unit.unitClass.isTransport) // Make transports go after their passengers so they know what passengers want
     }
 
-    while (agentQueue.nonEmpty && (timer.ongoing || ! With.configuration.enablePerformancePauses)) {
+    while (agentQueue.nonEmpty && timer.ongoing) {
       val agent = agentQueue.dequeue()
       val unit = agent.unit
       unit.sleepUntil(Math.max(unit.nextOrderFrame.getOrElse(0), AttackDelay.nextSafeOrderFrame(unit)))

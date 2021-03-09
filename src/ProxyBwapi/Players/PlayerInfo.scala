@@ -7,7 +7,7 @@ import Performance.Cache
 import ProxyBwapi.Upgrades.Upgrade
 import bwapi.{Player, Race}
 
-case class PlayerInfo(basePlayer: Player) extends PlayerProxy(basePlayer) {
+case class PlayerInfo(bwapiPlayer: Player) extends PlayerProxy(bwapiPlayer) {
   
   private var permanentRace: Option[Race] = None
   def raceCurrent: Race = raceCurrentCache()

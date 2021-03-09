@@ -80,13 +80,20 @@ object ConfigurationLoader {
       if (fixedbuilds.nonEmpty) { setFixedBuild(fixedbuilds) }
 
       Seq(
-        ("Human", human.toString),
-        ("Ladder", ladder.toString),
-        ("Stream", livestream),
-        ("Tournament", tournament.toString),
-        ("Round-robin", roundrobin.toString),
-        ("Elimination", elimination.toString),
-        ("Debugging", debugging.toString))
+        ("Human",           human.toString),
+        ("Ladder",          ladder.toString),
+        ("Livestream",      livestream),
+        ("Tournament",      tournament.toString),
+        ("Round-robin",     roundrobin.toString),
+        ("Elimination",     elimination.toString),
+        ("Pretraining",     pretraining.toString),
+        ("Debugging",       debugging.toString),
+        ("DebuggingLive",   debugginglive.toString),
+        ("Log stdout",      logstd.toString),
+        ("Frame MS target", frameMsTarget),
+        ("Frame MS limit",  frameMsLimit),
+        ("Fixed build",     fixedbuilds)
+      )
       .foreach(pair => With.logger.debug(pair._1 + ": " + pair._2))
     } catch { case exception: Exception => With.logger.onException(exception) }
   }

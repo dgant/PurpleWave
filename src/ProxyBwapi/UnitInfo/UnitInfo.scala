@@ -100,7 +100,7 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   private val subjectiveValueCache = new Cache(() =>
     unitClass.subjectiveValue
       + scarabs * Protoss.Scarab.subjectiveValue
-      + interceptors.size * Protoss.Interceptor.subjectiveValue
+      + (if (is(Protoss.Carrier)) friendly.map(_.interceptorCount).getOrElse(8) * Protoss.Interceptor.subjectiveValue else 0)
       + (if (unitClass.isTransport) friendly.map(_.loadedUnits.map(_.subjectiveValue).sum).sum else 0))
 
   @inline final def remainingOccupationFrames: Int = Math.max(
@@ -291,16 +291,16 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   @inline final def attacksAgainstAir: Int = attacksAgainstAirCache()
   private val attacksAgainstAirCache = new Cache(() => {
     var output = unitClass.airDamageFactorRaw * unitClass.maxAirHitsRaw
-    if (output == 0  && is(Terran.Bunker))   output = 4
-    if (output == 0  && is(Protoss.Carrier))  output = if (isEnemy) 8 else interceptors.size
+    if (output == 0  && is(Terran.Bunker))    output = 4
+    if (output == 0  && is(Protoss.Carrier))  output = friendly.map(_.interceptorCount).getOrElse(8)
     output
   })
 
   @inline final def attacksAgainstGround: Int = attacksAgainstGroundCache()
   private val attacksAgainstGroundCache = new Cache(() => {
     var output = unitClass.groundDamageFactorRaw * unitClass.maxGroundHitsRaw
-    if (output == 0  && is(Terran.Bunker))   output = 4
-    if (output == 0  && is(Protoss.Carrier))  output = if (isEnemy) 8 else interceptors.size
+    if (output == 0  && is(Terran.Bunker))   output = friendly.map(_.loadedUnits.size).getOrElse(4)
+    if (output == 0  && is(Protoss.Carrier))  output = friendly.map(_.interceptorCount).getOrElse(8)
     if (output == 0  && is(Protoss.Reaver))   output = 1
     output
   })
@@ -527,7 +527,9 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   }
   @inline final def speedApproachingEachOther(other: UnitInfo): Double = speedApproaching(other) + other.speedApproaching(this)
   @inline final def airborne: Boolean = flying || friendly.exists(_.transport.exists(_.flying))
-  @inline final def gathering: Boolean = gatheringMinerals || gatheringGas
+  @inline final def gathering: Boolean = unitClass.isWorker && orderTarget.exists(_.unitClass.isResource)
+  @inline final def gatheringMinerals: Boolean = unitClass.isWorker && orderTarget.exists(_.unitClass.isMinerals)
+  @inline final def gatheringGas: Boolean = unitClass.isWorker && orderTarget.exists(_.unitClass.isGas)
   @inline final def carrying: Boolean = carryingMinerals || carryingGas
 
   @inline final def presumptiveDestination: Pixel = if (isOurs) calculatePresumptiveDestination else presumptiveDestinationCached()

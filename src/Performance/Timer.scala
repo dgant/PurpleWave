@@ -12,6 +12,6 @@ class Timer(duration: Long = With.performance.msBeforeTarget) {
       With.configuration.frameTargetMs
     else
       milliseconds - now
-  def expired: Boolean = remaining <= 0
+  def expired: Boolean = remaining <= 0 && With.configuration.enablePerformancePauses
   def ongoing: Boolean = ! expired
 }

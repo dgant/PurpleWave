@@ -284,7 +284,7 @@ object Commander {
       if (With.framesSince(unit.agent.lastStim) < 24) return
       unit.agent.lastStim = With.frame
     }
-    unit.bwapiUnit.useTech(tech.baseType)
+    unit.bwapiUnit.useTech(tech.bwapiTech)
     sleep(unit)
   }
   
@@ -292,7 +292,7 @@ object Commander {
     if (unit.unready) return
     unit.agent.directRide(target.pixel)
     autoUnburrow(unit)
-    unit.bwapiUnit.useTech(tech.baseType, target.bwapiUnit)
+    unit.bwapiUnit.useTech(tech.bwapiTech, target.bwapiUnit)
     if (tech == Protoss.ArchonMeld || tech == Protoss.DarkArchonMeld) {
       sleep(unit, 48)
     }
@@ -304,7 +304,7 @@ object Commander {
   def useTechOnPixel(unit: FriendlyUnitInfo, tech: Tech, target: Pixel) {
     if (unit.unready) return
     autoUnburrow(unit)
-    unit.bwapiUnit.useTech(tech.baseType, target.bwapi)
+    unit.bwapiUnit.useTech(tech.bwapiTech, target.bwapi)
     if (tech == Terran.SpiderMinePlant) {
       sleep(unit, 12)
     } else {
@@ -369,7 +369,7 @@ object Commander {
                 doGatherFromAccelerant()
               }
             } else if (onAccelerantMineral) {
-              if (unit.pixelDistanceEdge(accelerantMineral.get) < 32 || distance < unit.topSpeed * With.latency.framesRemaining + unit.unitClass.framesToTurn180 / 2) {
+              if (distance < 32 || unit.pixelDistanceEdge(accelerantMineral.get) < 32) {
                 doGather()
               }
             } else if (projectedFrames > accelerantFrame) {
@@ -389,7 +389,7 @@ object Commander {
   def build(unit: FriendlyUnitInfo, unitClass: UnitClass) {
     if (unit.unready) return
     autoUnburrow(unit)
-    unit.bwapiUnit.build(unitClass.baseType)
+    unit.bwapiUnit.build(unitClass.bwapiType)
     sleepBuild(unit)
   }
   
@@ -400,19 +400,19 @@ object Commander {
       move(unit, tile.pixelCenter)
       return
     }
-    unit.bwapiUnit.build(unitClass.baseType, tile.bwapi)
+    unit.bwapiUnit.build(unitClass.bwapiType, tile.bwapi)
     sleepBuild(unit)
   }
   
   def tech(unit: FriendlyUnitInfo, tech: Tech) {
     if (unit.unready) return
-    unit.bwapiUnit.research(tech.baseType)
+    unit.bwapiUnit.research(tech.bwapiTech)
     sleep(unit)
   }
   
   def upgrade(unit: FriendlyUnitInfo, upgrade: Upgrade) {
     if (unit.unready) return
-    unit.bwapiUnit.upgrade(upgrade.baseType)
+    unit.bwapiUnit.upgrade(upgrade.bwapiType)
     sleep(unit)
   }
   
@@ -450,19 +450,19 @@ object Commander {
   
   def addon(unit: FriendlyUnitInfo, unitClass: UnitClass) {
     if (unit.unready) return
-    unit.bwapiUnit.buildAddon(unitClass.baseType)
+    unit.bwapiUnit.buildAddon(unitClass.bwapiType)
     sleep(unit)
   }
   
   def buildScarab(unit: FriendlyUnitInfo) {
     if (unit.unready) return
-    unit.bwapiUnit.build(Protoss.Scarab.baseType)
+    unit.bwapiUnit.build(Protoss.Scarab.bwapiType)
     sleep(unit)
   }
   
   def buildInterceptor(unit: FriendlyUnitInfo) {
     if (unit.unready) return
-    unit.bwapiUnit.build(Protoss.Interceptor.baseType)
+    unit.bwapiUnit.build(Protoss.Interceptor.bwapiType)
     sleep(unit)
   }
   

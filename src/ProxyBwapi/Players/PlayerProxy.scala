@@ -46,7 +46,7 @@ abstract class PlayerProxy(base: Player) {
   private def recalculateUpgradeLevel(upgrade: Upgrade): Int = {
     // You can only see upgrades of enemy units that are *currently visible*
     // So let's add a ratchet.
-    val reportedLevel = base.getUpgradeLevel(upgrade.baseType)
+    val reportedLevel = base.getUpgradeLevel(upgrade.bwapiType)
     val previousLevel = maxUpgradeLevels(upgrade)
     val currentLevel  = Math.max(reportedLevel, previousLevel)
     maxUpgradeLevels(upgrade) = currentLevel
@@ -56,7 +56,7 @@ abstract class PlayerProxy(base: Player) {
   def hasTech(tech: Tech):Boolean = {
     //Further optimization: Stop expiring when researched
     if ( ! techsResearchedCaches.contains(tech)) {
-      techsResearchedCaches.put(tech, new Cache(() => base.hasResearched(tech.baseType)))
+      techsResearchedCaches.put(tech, new Cache(() => base.hasResearched(tech.bwapiTech)))
     }
     techsResearchedCaches(tech)()
   }

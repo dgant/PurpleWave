@@ -15,7 +15,7 @@ import scala.collection.mutable
   * Starting a cycle at 11 + LF from mineral adjacency causes the cycle to begin immediately.
   *
   * The logic and approach is borrowed from
-  * https://github.com/bmnielsen/Stardust/blob/b8a91e52f453e6fdc60798edac569826df98148a/src/Workers/WorkerOrderTimer.cpp
+  * </src/Workers/WorkerOrderTimer.cpp
   * which was in turn based on research done by, I think, Ankmairdor
   */
 trait AccelerantPixels {
@@ -35,7 +35,7 @@ trait AccelerantPixels {
       u.unitClass.isWorker
       && u.orderTarget.exists(t =>
         t.mineralsLeft > 0
-        && u.pixelDistanceEdge(t) < 5
+        && u.pixelDistanceEdge(t) <= 1
         && u.pixel != u.previousPixel(1)))
     arrivingWorkers.foreach(worker => {
       val framesAgo = 11 + With.latency.latencyFrames

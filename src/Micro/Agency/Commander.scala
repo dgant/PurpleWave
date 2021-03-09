@@ -340,7 +340,9 @@ object Commander {
       if (resource.visible) {
         def doGather() { unit.bwapiUnit.gather(resource.bwapiUnit) }
         if (resource.unitClass.isGas) {
-          doGather()
+          if ( ! unit.orderTarget.contains(resource)) {
+            doGather()
+          }
         } else {
           lazy val coworkers            = With.gathering.getWorkersByResource(resource)
           lazy val accelerantFrame      = 11 + With.latency.framesRemaining
@@ -352,10 +354,12 @@ object Commander {
           lazy val onTargetMineral      = unit.orderTarget.contains(resource)
           lazy val onAccelerantMineral  = accelerantMineral.exists(unit.orderTarget.contains)
           def doGatherFromAccelerant() { unit.bwapiUnit.gather(accelerantMineral.get.bwapiUnit) }
-          if (onAccelerantPixel) {
+          if (unit.order == Orders.MiningMinerals) {
+            // Leave well alone!
+          } else if (onAccelerantPixel) {
             doGather()
           // See https://github.com/bmnielsen/Stardust/blob/b8a91e52f453e6fdc60798edac569826df98148a/src/Workers/Workers.cpp#L587
-          } else if (coworkers.exists(w => w.orderTarget.contains(resource) && w.bwapiUnit.getOrderTimer + 7 == 11 + With.latency.framesRemaining)) {
+          } else if (coworkers.exists(w => w != unit && w.order == Orders.MiningMinerals && w.orderTarget.contains(resource) && w.bwapiUnit.getOrderTimer + 7 == 11 + With.latency.framesRemaining)) {
             doGather()
           } else if (projectedFrames == accelerantFrame) {
             doGather()

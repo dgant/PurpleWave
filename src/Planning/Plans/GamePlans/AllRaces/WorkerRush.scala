@@ -51,7 +51,7 @@ class WorkerRush extends Trigger {
       override def onUpdate(): Unit = {
         seenFiveWorkers = seenFiveWorkers || With.units.countOurs(MatchAnd(MatchWorkers, MatchComplete)) >= 5
         val goalWorkers =
-          if (With.strategy.selectedCurrently.contains(WorkerRushContinuousProduction))
+          if (WorkerRushContinuousProduction.registerActive)
             3
           else if ( ! timeToAtack.apply)
             200

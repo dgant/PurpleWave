@@ -36,7 +36,13 @@ abstract class Strategy {
   def allowedVsHuman          : Boolean                         = false
   def minimumGamesVsOpponent  : Int                             = 0
   
-  def active: Boolean = With.strategy.selectedCurrently.contains(this)
+  def registerActive(): Boolean = {
+    val output = With.strategy.selectedCurrently.contains(this)
+    if (output) {
+      With.strategy.registerActive(this)
+    }
+    output
+  }
 
   def legality: StrategyLegality      = With.strategy.legalities(this)
   def evaluation: StrategyEvaluation  = With.strategy.evaluations(this)

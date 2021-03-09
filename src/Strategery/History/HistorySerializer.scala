@@ -17,7 +17,7 @@ object HistorySerializer {
   
   // "Let's roll our own half-baked CSV because the CIG deadline is in two weeks and json4s is being stubborn and we are wise, experienced developers."
   // The half-backed CSV has lasted 2.5 years now.
-  val separator = ",,,"
+  val separator = ","
   
   def readGames(serializedHistory: Iterable[String]): Vector[HistoricalGame] = {
     serializedHistory.flatMap(readGame).toVector
@@ -25,11 +25,8 @@ object HistorySerializer {
   
   private def readGame(serializedGame: String): Option[HistoricalGame] = {
     try {
-      // Our crude CSV parsing can go wrong in plenty of ways, including unintentional version mismatch.
-      // Let's not let bad reads wreck the rest of our data.
-      Some(readGameFromColumns(serializedGame.split(separator)))
-    }
-    catch { case exception: Exception =>
+      Some(readGameFromColumns(serializedGame.replaceAll(",,,", ",").split(separator)))
+    } catch { case exception: Exception =>
       With.logger.warn("Failed to deserialize game: " + serializedGame)
       With.logger.onException(exception)
       None
@@ -54,7 +51,7 @@ object HistorySerializer {
       ourRace         = allRaces.find(_.toString == ourRace).getOrElse(Race.Unknown),
       enemyRace       = allRaces.find(_.toString == enemyRace).getOrElse(Race.Unknown),
       won             = won,
-      tags      = strategies)
+      tags            = strategies)
   }
   
   def writeGames(games: Iterable[HistoricalGame]): Iterable[String] = {

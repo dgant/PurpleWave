@@ -1,6 +1,7 @@
 package Strategery.History
 
 import Lifecycle.With
+import Utilities.GameTime
 import bwapi.Race
 
 import scala.collection.mutable
@@ -51,7 +52,9 @@ class History {
       enemyRace       = currentEnemyRace,
       won             = weWon,
       tags = (
-        With.strategy.selectedCurrently.map(_.toString).toVector
+        Vector(new GameTime(With.frame).toString)
+        ++ With.strategy.selectedCurrently.filter(With.strategy.isActive).map(_.toString)
+        ++ With.strategy.selectedCurrently.filterNot(With.strategy.isActive).map(s => f"[$s]").toVector
         ++ With.fingerprints.all.filter(_.matches).map(_.toString).sorted).distinct)
     HistoryLoader.save(games.toVector :+ thisGame)
   }

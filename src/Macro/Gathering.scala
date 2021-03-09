@@ -229,8 +229,7 @@ class Gathering extends TimedTask with AccelerantMinerals with AccelerantPixels 
               .min(
                 workersByResource
                   .filter(pair => pair._1.unitClass.isGas && pair._2.size < 3)
-                  .map(resource => worker.pixelDistanceTravelling(resource._1.pixel))) // TODO: Used edge distance?
-            ))
+                  .map(resource => worker.pixelDistanceTravelling(resource._1.pixel))))) // TODO: Used edge distance?
           .toMap
       } else Map.empty
     val respectCooldown = gasWorkersNow >= gasWorkerTarget
@@ -238,11 +237,7 @@ class Gathering extends TimedTask with AccelerantMinerals with AccelerantPixels 
     // Update workers in priority order
     class OrderedWorker(val worker: FriendlyUnitInfo) {
       lazy val cd: Double = workerCooldownUntil.getOrElse(worker, 0).toDouble
-      val order: Double = if (respectCooldown) {
-        cd
-      } else {
-        newResourceDistance(worker).orElse(minGasDistance(worker)).getOrElse(cd)
-      }
+      val order: Double = if (respectCooldown) cd else newResourceDistance(worker).orElse(minGasDistance(worker)).getOrElse(cd)
     }
     val workersToUpdate = workers
       .view
@@ -285,9 +280,7 @@ class Gathering extends TimedTask with AccelerantMinerals with AccelerantPixels 
           if (bestResource.unitClass.isGas) gasWorkersNow += 1
         })
 
-        worker.agent.intend(gatheringPlan, new Intention {
-          toGather = resourceByWorker.get(worker)
-        })
+        worker.agent.intend(gatheringPlan, new Intention { toGather = resourceByWorker.get(worker) })
         workerCooldownUntil(worker) = With.frame + 48 + Random.nextInt(48)
       })
   }

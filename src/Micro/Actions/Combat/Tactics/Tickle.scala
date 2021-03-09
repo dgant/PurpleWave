@@ -18,10 +18,10 @@ object Tickle extends Action {
     tickler.agent.intent.canTickle
   }
 
-  def workersSpread : Boolean = With.strategy.selectedCurrently.contains(WorkersSpread)
-  def workersUnite  : Boolean = With.strategy.selectedCurrently.contains(WorkersUnite)
-  def workersRaze   : Boolean = With.strategy.selectedCurrently.contains(WorkersRaze)
-  def workersKill   : Boolean = With.strategy.selectedCurrently.contains(WorkersKill)
+  def workersSpread : Boolean = WorkersSpread.registerActive
+  def workersUnite  : Boolean = WorkersUnite.registerActive
+  def workersRaze   : Boolean = WorkersRaze.registerActive
+  def workersKill   : Boolean = WorkersKill.registerActive
 
   override protected def perform(tickler: FriendlyUnitInfo) {
 

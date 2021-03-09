@@ -17,7 +17,7 @@ class DoScoutWithWorkers(maxScouts: Int = 1) extends DoScout {
     if (With.units.countOurs(MatchWorkers) < 3) return
     if (With.scouting.enemyMain.exists(main => ByOption.minBy(With.units.ours)(_.framesToTravelTo(main.heart.pixelCenter)).exists( ! _.unitClass.isWorker))) return
     // With 4Pool use the scout to help harass/distract
-    if ( ! ZvE4Pool.active && ! ZvT1HatchHydra.active && With.geography.enemyBases.exists(_.units.exists(u => u.unitClass.isStaticDefense && u.complete))) return
+    if ( ! ZvE4Pool.registerActive && ! ZvT1HatchHydra.registerActive && With.geography.enemyBases.exists(_.units.exists(u => u.unitClass.isStaticDefense && u.complete))) return
     if (With.scouting.firstEnemyMain.isDefined) {
       // Vs Non-random: Scout least-claimed known main + its natural
       // Vs Random:     Scout least-claimed known main (to determine race)

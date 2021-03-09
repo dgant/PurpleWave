@@ -10,6 +10,8 @@ import Strategery.Selection.{ExpandStrategy, WinProbability}
 import Strategery.Strategies.{AllChoices, Strategy}
 import bwapi.Race
 
+import scala.collection.mutable
+
 class Strategist {
 
   lazy val map: Option[StarCraftMap] = StarCraftMaps.all.find(_.matches)
@@ -21,12 +23,20 @@ class Strategist {
     val enemyRaceNow = With.enemy.raceCurrent
     if (selectedLast.isEmpty) {
       selectedLast = Some(selectedInitially)
-    }
-    else if (enemyRaceAtLastCheck != enemyRaceNow) { // Hack fix
+    } else if (enemyRaceAtLastCheck != enemyRaceNow) { // Hack fix
       selectedLast = Some(selectedInitially.filter(_.enemyRaces.exists(r => r == Race.Unknown || r == enemyRaceNow)))
     }
     enemyRaceAtLastCheck = enemyRaceNow
     selectedLast.get
+  }
+
+  private val registeredActive = new mutable.HashSet[Strategy]
+  def isActive(strategy: Strategy): Boolean = selectedCurrently.contains(strategy) && registeredActive.contains(strategy)
+  def registerActive(strategy: Strategy): Unit = {
+    if ( ! registeredActive.contains(strategy)) {
+      With.logger.debug(f"Activating strategy $strategy")
+    }
+    registeredActive += strategy
   }
 
   lazy val heightMain       : Double  = With.self.startTile.altitude

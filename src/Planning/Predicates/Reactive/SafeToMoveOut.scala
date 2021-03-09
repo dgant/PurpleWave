@@ -159,9 +159,8 @@ class SafeToMoveOut extends Predicate {
   def zvzSafeToAttack: Boolean = {
     val speedUs = With.self.hasUpgrade(Zerg.ZerglingSpeed)
     val speedEnemy = With.enemy.hasUpgrade(Zerg.ZerglingSpeed)
-    val strategyUs = With.strategy.selectedCurrently
     val speedExpectedFirst = (
-      strategyUs.contains(ZvZ9PoolSpeed)
+      ZvZ9PoolSpeed.registerActive
       || ( ! With.fingerprints.ninePool.matches && ! With.fingerprints.overpool.matches && new EnemyRecentStrategy(With.fingerprints.twelveHatch).apply)
       || With.fingerprints.twelveHatch.matches
       || With.fingerprints.twelvePool.matches)

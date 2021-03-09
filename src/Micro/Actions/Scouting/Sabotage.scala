@@ -1,6 +1,5 @@
 package Micro.Actions.Scouting
 
-import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
@@ -15,7 +14,7 @@ object Sabotage extends Action {
     unit.agent.isScout
     && unit.unitClass.isWorker
     && unit.matchups.targets.exists(MatchProxied)
-    && ! With.strategy.selectedCurrently.contains(ZvE4Pool))
+    && ! ZvE4Pool.registerActive)
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val buildingTarget = ByOption.minBy(unit.matchups.targets.view.filter(u => u.unitClass.isBuilding || (u.unitClass.isWorker && u.visible)))(_.unitClass.maxTotalHealth)

@@ -18,7 +18,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.MatchOr
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Zerg.ZvE4Pool
-import Utilities.GameTime
+import Utilities.Seconds
 
 class ZvE4Pool extends GameplanTemplate {
   
@@ -29,7 +29,7 @@ class ZvE4Pool extends GameplanTemplate {
       new And(
         new Check(() => With.self.supplyUsed >= 18),
         new UnitsAtLeast(3, Zerg.Larva)),
-      GameTime(0, 10)()),
+      Seconds(10)()),
     new Aggression(99),
     new Aggression(1.5))
   

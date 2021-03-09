@@ -15,13 +15,12 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.{EnemiesAtLeast, FoundEnemyBase, UnitsAtLeast}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Tactics.DefendFightersAgainstRush
 import Planning.UnitCounters.CountExcept
 import Planning.UnitMatchers.{MatchMobile, MatchWorkers}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Terran.TvE.TvE2RaxSCVMarine
-import Utilities.GameTime
+import Utilities.Seconds
 
 class TvE2RaxSCVMarine extends GameplanTemplate {
 
@@ -52,7 +51,7 @@ class TvE2RaxSCVMarine extends GameplanTemplate {
   override def attackPlan: Plan = new If(
     new ReadyToAttack,
     new Parallel(
-      new Delay(GameTime(0, 7)(), new Attack),
+      new Delay(Seconds(7)(), new Attack),
       new AttackWithWorkers(new CountExcept(4, MatchWorkers))))
 
   override def supplyPlan: Plan = NoPlan()

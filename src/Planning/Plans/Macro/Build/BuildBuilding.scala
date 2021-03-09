@@ -30,7 +30,6 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
   builderLock.interruptable = false
   builderLock.matcher = builderMatcher
   builderLock.counter = CountOne
-
     
   var waitForBuilderToRecallUntil: Option[Int] = None
   var placement: Option[PlacementRequest] = None
@@ -97,8 +96,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
     if (waitForBuilderToRecallUntil.isDefined) {
       if (With.frame < waitForBuilderToRecallUntil.get) {
         return
-      }
-      else {
+      } else {
         orderedTile = None
         waitForBuilderToRecallUntil = None
       }
@@ -144,19 +142,19 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
   def needBuilder: Boolean = {
     if (building.isDefined) {
       return buildingClass.isTerran
-    }
-    if (desiredTile.isEmpty) {
+    } else if (desiredTile.isEmpty) {
       return false
-    }
-    if (currencyLock.expectedFrames > With.blackboard.maxFramesToSendAdvanceBuilder) {
+    } else  if (currencyLock.expectedFrames > With.blackboard.maxFramesToSendAdvanceBuilder) {
       return false
     }
     val proposedBuilder = builderLock.inquire(this).flatMap(_.headOption)
     if (proposedBuilder.isEmpty) {
       return false
     }
-    val travelFrames = (if (builderLock.units.isEmpty) 1.4 else 1.25) * proposedBuilder.get.framesToTravelTo(desiredTile.get.pixelCenter)
-    travelFrames + 48 >= currencyLock.expectedFrames
+    val travelFrames                = proposedBuilder.get.framesToTravelTo(desiredTile.get.pixelCenter)
+    val travelHysteresisFrames      = if (builderLock.units.nonEmpty) 48 else 24
+    val travelHysteresisMultiplier  = if (builderLock.units.nonEmpty) 1.35 else 1.2
+    travelHysteresisFrames + travelHysteresisMultiplier * travelFrames >= currencyLock.expectedFrames
   }
 
   override val toString = f"Build $buildingClass"

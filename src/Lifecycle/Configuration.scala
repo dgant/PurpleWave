@@ -1,7 +1,7 @@
 package Lifecycle
 
 import Strategery.{DefaultPlaybook, Playbook}
-import Utilities.GameTime
+import Utilities.Seconds
 
 class Configuration {
 
@@ -46,8 +46,8 @@ class Configuration {
   var avatarBattleDistancePixels    = 32.0 * 6.0
   var battleMarginTileMinimum       = 6
   var battleMarginTileMaximum       = 12 * 2 + 2 // A bit over double Siege Tank range
-  var battleHysteresisFrames        = GameTime(0, 6)()
-  var simulationFrames              = GameTime(0, 15)()
+  var battleHysteresisFrames        = Seconds(6)()
+  var simulationFrames              = Seconds(15)()
   var simulationEstimationPeriod    = 6
   var simulationBonusTankRange      = 64.0
   var simulationDamageValueRatio    = 0.1
@@ -57,7 +57,7 @@ class Configuration {
   ///////////
   
   var minimumMineralsBeforeMinedOut   = 150 * 8
-  var maxFramesToSendAdvanceBuilder   = GameTime(0, 40)()
+  var maxFramesToSendAdvanceBuilder   = Seconds(40)()
   var blockerMineralThreshold         = 250 // Setting this goofily high as an AIIDE hack to account for the 249-mineral patches on Fortress
   var enableTightBuildingPlacement    = false
   
@@ -69,7 +69,7 @@ class Configuration {
   var maximumGamesHistoryPerOpponent      = 500
   var logTaskDuration                     = false
   
-  var buildingPlacementRefreshPeriod      = GameTime(0, 3)()
+  var buildingPlacementRefreshPeriod      = Seconds(3)()
   var buildingPlacementMaxTilesToEvaluate = 300
   var buildingPlacementMaximumQueue       = 12
   

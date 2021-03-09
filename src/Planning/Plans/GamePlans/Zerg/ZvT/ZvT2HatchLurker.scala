@@ -22,7 +22,7 @@ import Planning.UnitMatchers._
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvT2HatchLurker
-import Utilities.GameTime
+import Utilities.Seconds
 
 class ZvT2HatchLurker extends GameplanTemplate {
 
@@ -156,7 +156,7 @@ class ZvT2HatchLurker extends GameplanTemplate {
     new Build(Get(Zerg.LurkerMorph)),
     new BuildGasPumps,
     new If(
-      new TechComplete(Zerg.LurkerMorph, GameTime(0, 15)()),
+      new TechComplete(Zerg.LurkerMorph, Seconds(15)()),
       new MorphLurkers),
     new BuildOrder(
       Get(5, Zerg.Overlord),

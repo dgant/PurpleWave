@@ -30,7 +30,7 @@ class Blackboard {
   var gasLimitCeiling       : Property[Int]               = add(new Property(100000)) // Stop gas mining after this much gas
   var gasWorkerRatio        : Property[Double]            = add(new Property(if (With.self.isProtoss) 3.0 / 10.0 else 3.0 / 8.0))
   var allIn                 : Property[Boolean]           = add(new Property(false))
-  var yoloing           : Property[Boolean]           = add(new Property(true))
+  var yoloing               : Property[Boolean]           = add(new Property(true))
   var allowIslandBases      : Property[Boolean]           = add(new Property(false))
   var keepingHighTemplar    : Property[Boolean]           = add(new Property(true))
   var pushKiters            : Property[Boolean]           = add(new Property(false))

@@ -8,7 +8,7 @@ import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountUpTo
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import Utilities.GameTime
+import Utilities.Seconds
 
 class RepairBunker extends Plan {
   val lock = new LockUnits(this)
@@ -21,7 +21,7 @@ class RepairBunker extends Plan {
         u.is(Terran.Bunker)
         && ! u.base.exists(_.owner.isEnemy)
         && u.matchups.framesOfSafety < (if (u.hitPoints < u.unitClass.maxHitPoints) 72 else 12)
-        && u.remainingCompletionFrames < GameTime(0, 5)())
+        && u.remainingCompletionFrames < Seconds(5)())
       .toVector
       .sortBy(_.matchups.framesOfSafety)
       .sortBy(_.totalHealth)

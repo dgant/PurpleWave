@@ -19,7 +19,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss._
-import Utilities.{ByOption, GameTime}
+import Utilities.{ByOption, GameTime, Seconds}
 
 object PvPIdeas {
 
@@ -233,7 +233,7 @@ object PvPIdeas {
             Get(Protoss.Forge)),
       ))))
 
-  val lastChanceFor2GateShieldBatteryDefense: Int = GameTime(2, 50)() - Protoss.ShieldBattery.buildFrames - GameTime(0, 5)()
+  val lastChanceFor2GateShieldBatteryDefense: Int = GameTime(2, 50)() - Protoss.ShieldBattery.buildFrames - Seconds(5)()
 
   class AntiTwoGateProxyFrom1GateCore extends Parallel(
     new WriteStatus("ReactTo2GateProxyFrom1GateCore"),

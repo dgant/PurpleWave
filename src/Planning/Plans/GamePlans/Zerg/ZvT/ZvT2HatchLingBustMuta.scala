@@ -15,14 +15,14 @@ import Planning.Predicates.Strategy.Employing
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvT2HatchLingBustMuta
-import Utilities.GameTime
+import Utilities.Seconds
 
 class ZvT2HatchLingBustMuta extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(ZvT2HatchLingBustMuta)
   override def scoutPlan: Plan = NoPlan()
   override def attackPlan: Plan = new Trigger(
-    new UpgradeComplete(Zerg.ZerglingSpeed, 1, GameTime(0, 10)()),
+    new UpgradeComplete(Zerg.ZerglingSpeed, 1, Seconds(10)()),
     new Attack)
 
   override def emergencyPlans: Seq[Plan] = Seq(

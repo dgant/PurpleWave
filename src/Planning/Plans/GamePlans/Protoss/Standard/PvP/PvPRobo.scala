@@ -20,7 +20,7 @@ import Planning.Predicates.Strategy._
 import Planning.UnitMatchers.{MatchOr, MatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvPRobo
+import Strategery.Strategies.Protoss.{PvPRobo, PvPRobo1012}
 import Utilities.GameTime
 
 class PvPRobo extends GameplanTemplate {
@@ -61,8 +61,9 @@ class PvPRobo extends GameplanTemplate {
   // TODO: Handle 4-Gate Zealot
   override def attackPlan: Plan = new If(
     new And(
-      // No point attacking with Zealots if they have any defense whatsoever
+      // No point attacking with a couple of Zealots if they have any defense whatsoever
       new Or(
+        new Or(new Employing(PvPRobo1012)),
         new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
         new UnitsAtLeast(1, Protoss.Reaver, complete = true),
         new EnemiesAtMost(0, Protoss.PhotonCannon, complete = true),

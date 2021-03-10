@@ -17,7 +17,9 @@ object PvP3rdBaseSlow extends PvPStrategy
 abstract class PvPOpening extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(PvP3rdBaseSlow, PvP3rdBaseFast))
 }
-object PvPRobo1012 extends PvPStrategy
+object PvPRobo1012 extends PvPStrategy {
+  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(With.fingerprints.proxyGateway, With.fingerprints.nexusFirst) // TODO: Also NZCore
+}
 object PvPRobo1Gate extends PvPStrategy
 object PvPRobo extends PvPOpening {
   override def choices: Iterable[Iterable[Strategy]] = super.choices ++ Seq(Seq(PvPRobo1012, PvPRobo1Gate))
@@ -30,11 +32,12 @@ object PvP2Gate1012DT extends PvPOpening {
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.earlyForge, With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.robo)
 }
 object PvP2GateGoon extends PvPOpening {
-  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.dtRush, With.fingerprints.oneGateCore)
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.dtRush, With.fingerprints.oneGateCore, With.fingerprints.fourGateGoon)
   override def responsesWhitelisted: Iterable[Fingerprint] = Seq(With.fingerprints.proxyGateway, With.fingerprints.twoGate, With.fingerprints.nexusFirst)
+  override def minimumGamesVsOpponent: Int = 2
 }
 object PvP3GateGoon extends PvPOpening {
-  override def responsesWhitelisted: Iterable[Fingerprint] = Iterable(With.fingerprints.robo, With.fingerprints.nexusFirst, With.fingerprints.twoGate)
+  override def responsesWhitelisted: Iterable[Fingerprint] = Iterable(With.fingerprints.robo, With.fingerprints.nexusFirst, With.fingerprints.twoGate, With.fingerprints.fourGateGoon)
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
   override def minimumGamesVsOpponent: Int = 2
 }

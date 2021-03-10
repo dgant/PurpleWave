@@ -37,6 +37,8 @@ object StrategyGroups {
 
     // This was always an exploit build due to inability to deny scouting; disable before probable removal
     PvP2Gate1012DT,
+    // This is horrible against the 4-Gate meta
+    PvP2GateGoon,
 
     PvZDT,       // Requires better micro on one base
     PvZCorsair,  // Requires better micro on one base

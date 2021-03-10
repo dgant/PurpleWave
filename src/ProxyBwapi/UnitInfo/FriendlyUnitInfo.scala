@@ -34,12 +34,15 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(b
 
   @inline final def knownToEnemy  : Boolean = _knownToEnemy
   @inline final def seeminglyStuck: Boolean = _framesFailingToMove > 24 || _framesFailingToAttack > 24
+  @inline final def resetSticking(): Unit = {
+    _framesFailingToMove = 0
+    _framesFailingToAttack = 0
+  }
 
   def remainingCompletionFrames : Int = bwapiUnit.getRemainingBuildTime
   def spaceRemaining: Int = bwapiUnit.getSpaceRemaining
   def kills: Int = bwapiUnit.getKillCount
   @inline final def lastFrameOccupied: Int = _lastFrameOccupied
-
 
   lazy val agent: Agent = new Agent(this)
   def intent: Intention = agent.intent

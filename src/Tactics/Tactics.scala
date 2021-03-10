@@ -143,7 +143,7 @@ class Tactics extends TimedTask {
     // Always attack with Dark Templar
     assign(freelancers, Seq(cloakSquad), freelancerFilter = Protoss.DarkTemplar)
 
-    catchDTRunby.run()
+    catchDTRunby.recruit()
 
     // If we want to attack and engough freelancers remain, populate the attack squad
     // TODO: If the attack goal is the enemy army, and we have a defense squad handling it, skip this step

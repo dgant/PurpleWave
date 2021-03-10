@@ -31,6 +31,7 @@ object Commander {
     if (unit.unready) return
     unit.bwapiUnit.stop()
     sleep(unit)
+    unit.resetSticking()
   }
   
   def hold(unit: FriendlyUnitInfo): Unit = {
@@ -363,7 +364,7 @@ object Commander {
             doGather()
           } else if (projectedFrames == accelerantFrame) {
             doGather()
-          } else if (accelerantMineral.isDefined) {
+          } else if (accelerantMineral.isDefined && false) { // TODO: Need to filter accelerant minerals before relying on them; they need to pull the worker across their face relative to the town hall or at least be a straight horizontal shot
             if (onTargetMineral) {
               if (projectedFrames > accelerantFrame) {
                 doGatherFromAccelerant()

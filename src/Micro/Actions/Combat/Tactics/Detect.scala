@@ -1,5 +1,7 @@
 package Micro.Actions.Combat.Tactics
 
+import Lifecycle.With
+import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
@@ -36,7 +38,11 @@ object Detect extends Action {
     val ghostbusters = spookiestSpooky.map(s => s.matchups.enemies.filter(e => e.canMove && e.attacksAgainst(s) > 0))
     val ghostbuster = ghostbusters.flatMap(g => ByOption.minBy(g)(_.framesBeforeAttacking(spookiestSpooky.get)))
 
-    val idealDistance = Math.max(0, unit.sightPixels - Math.min(0, unit.matchups.pixelsOfEntanglement))
+    val idealDistance = PurpleMath.clamp(
+      if ( ! unit.cloaked || unit.matchups.enemyDetectors.nonEmpty ||With.enemies.exists(_.isTerran)) unit.matchups.pixelsOfEntanglement else 0,
+      unit.sightPixels / 2,
+      unit.sightPixels - 24)
+
     val center = ghostbuster.map(_.pixel).getOrElse(unit.agent.origin)
     unit.agent.toTravel = Some(spookiestPixel.get.project(center, idealDistance))
 

@@ -148,6 +148,7 @@ class PvPRobo extends GameplanTemplate {
   class ReadyToExpand extends And(
     new UnitsAtLeast(2, Protoss.Gateway),
     new Or(
+      new And(new UnitsAtLeast(1, Protoss.Observer, complete = true), new EnemyStrategy(With.fingerprints.dtRush)),
       new And(new UnitsAtLeast(1, Protoss.Reaver, complete = true), new SafeToMoveOut, new EnemyLowUnitCount),
       new And(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new SafeToMoveOut, new Not(new EnemyStrategy(With.fingerprints.fourGateGoon))),
       new And(
@@ -189,6 +190,7 @@ class PvPRobo extends GameplanTemplate {
     new TrainGatewayUnits,
     new If(new EnemyStrategy(With.fingerprints.dtRush), new Build(Get(Protoss.ObserverSpeed))),
     new Build(Get(3, Protoss.Gateway)),
-    new PumpWorkers(oversaturate = true)
+    new PumpWorkers(oversaturate = true),
+    new Build(Get(4, Protoss.Gateway)),
   )
 }

@@ -80,7 +80,7 @@ class Logger {
     if (With.configuration.logstd) {
       System.err.println(logMessage)
     }
-    if (chat && With.configuration.debugging) {
+    if (chat && With.configuration.debugging && With.manners != null) {
       With.manners.chat(message)
     }
   }

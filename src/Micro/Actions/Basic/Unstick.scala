@@ -13,6 +13,7 @@ object Unstick extends Action {
     && ! unit.unitClass.floats
     && unit.canAttack
     && unit.seeminglyStuck
+
   )
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {

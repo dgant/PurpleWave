@@ -12,7 +12,6 @@ import Utilities.ByOption
 class SquadCatchDTRunby extends Squad {
 
   def recruit(): Unit = {
-
     lock.matcher = MatchMobileDetector
     lock.counter = CountOne
     lock.preference = PreferClose(destination())

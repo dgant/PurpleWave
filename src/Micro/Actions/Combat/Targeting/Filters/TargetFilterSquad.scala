@@ -5,7 +5,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterSquad extends TargetFilter {
   simulationSafe = true
-  override def appliesTo(actor: FriendlyUnitInfo): Boolean = actor.squad.exists(_.enemies.nonEmpty)
+  override def appliesTo(actor: FriendlyUnitInfo): Boolean = actor.squad.exists(_.targetsEnemies)
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = (
     (actor.inRangeToAttack(target) && actor.readyForAttackOrder && target.matchups.targets.nonEmpty)
     || With.yolo.active()

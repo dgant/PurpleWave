@@ -21,6 +21,8 @@ trait Squad extends Prioritized {
   private var _unitsNext = new ArrayBuffer[FriendlyUnitInfo]
   private var _enemiesNow = new ArrayBuffer[UnitInfo]
   private var _enemiesNext = new ArrayBuffer[UnitInfo]
+  private var _targetsEnemiesNow = false
+  private var _targetsEnemiesNext = false
   private val _qualityCounter = new QualityCounter
 
   private def commission(): Unit = {
@@ -45,9 +47,18 @@ trait Squad extends Prioritized {
   }
 
   def enemies: Iterable[UnitInfo] = _enemiesNow
-  @inline final def addEnemies(enemies: Iterable[UnitInfo]): Unit = enemies.foreach(addEnemy)
+  @inline final def targetsEnemies: Boolean = enemies.nonEmpty || _targetsEnemiesNow
+  @inline final def addEnemies(enemies: Iterable[UnitInfo]): Unit = {
+    commission()
+    _targetsEnemiesNext = true
+    enemies.foreach(_includeEnemy)
+  }
   @inline final def addEnemy(enemy: UnitInfo): Unit = {
     commission()
+    _targetsEnemiesNext = true
+    _includeEnemy(enemy)
+  }
+  private def _includeEnemy(enemy: UnitInfo): Unit = {
     _enemiesNext += enemy
     _qualityCounter.countUnit(enemy)
   }
@@ -65,6 +76,8 @@ trait Squad extends Prioritized {
     _enemiesNow = _enemiesNext
     _enemiesNext = swapEnemies
     _enemiesNow.foreach(_.foreign.foreach(_.addSquad(this)))
+    _targetsEnemiesNow = _targetsEnemiesNext
+    _targetsEnemiesNext = false
   }
   def run(): Unit
 

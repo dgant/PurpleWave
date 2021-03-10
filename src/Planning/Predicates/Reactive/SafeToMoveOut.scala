@@ -93,7 +93,7 @@ class SafeToMoveOut extends Predicate {
       + archonsEnemy  * scoreArchon
       + shuttlesEnemy * scoreShuttle
     )
-    val output = scoreEnemy == 0 || scoreEnemy <= scoreUs * With.blackboard.aggressionRatio()
+    val output = scoreEnemy == 0 || scoreEnemy < scoreUs * With.blackboard.aggressionRatio()
     output 
   }
   

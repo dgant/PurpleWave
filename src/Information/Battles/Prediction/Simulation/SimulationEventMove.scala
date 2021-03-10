@@ -11,17 +11,7 @@ case class SimulationEventMove(
   frames    : Int)
     extends SimulationEvent {
 
-  override def toString: String = Vector(
-    frame + ":",
-    describe(sim),
-    "moves from",
-    pixelFrom,
-    "to",
-    pixelTo,
-    "in",
-    frames,
-    "frames"
-    ).map(_.toString).mkString(" ")
+  override def toString: String = f"$frame: ${describe(sim)} moves ${pixelTo.subtract(pixelFrom)} from $pixelFrom to $pixelTo in $frames frames"
 
   override def draw() {
     DrawMap.arrow(pixelFrom, pixelTo, sim.realUnit.player.colorMedium)

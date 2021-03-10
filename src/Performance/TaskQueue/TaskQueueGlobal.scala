@@ -3,12 +3,11 @@ import Lifecycle.With
 import Performance.Tasks._
 
 object TaskQueueGlobalWeights {
-  var Micro      = 40
-  var Battles    = 25
-  var Gather     = 5
-  var Placement  = 5
-  var Planning   = 5
-  var Squads     = 5
+  var Micro      = 55
+  var Battles    = 35
+  var Planning   = 6
+  var Gather     = 2
+  var Placement  = 2
 }
 
 class TaskQueueGlobal extends TaskQueueParallel(

@@ -15,9 +15,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-class Simulacrum(
-  val simulation  : Simulation,
-  val realUnit    : UnitInfo) {
+class Simulacrum(val simulation: Simulation, val realUnit: UnitInfo) {
   
   // Constant
   private val SIMULATION_STEP_FRAMES = 6
@@ -35,7 +33,7 @@ class Simulacrum(
 
   val speedMultiplier   : Double  = if (flying) 1.0 else Math.pow(simulation.prediction.battle.judgmentModifiers.view.map(_.speedMultiplier).product, if (isFriendly) 1 else -1)
   val bonusRange        : Double  = if (isFriendly || ! realUnit.is(MatchSiegeTank) || ! simulation.prediction.weAttack) 0.0 else With.configuration.simulationBonusTankRange
-  val multiplierSplash  : Double  = realUnit.matchups.splashFactorMax
+  val multiplierSplash  : Double  = 1.0 // realUnit.unitClass.splashFactor // TODO: Increase for large fights
 
   val canMove             : Boolean             = realUnit.canMove
   var topSpeed            : Double              = realUnit.topSpeed * speedMultiplier
@@ -61,29 +59,25 @@ class Simulacrum(
   var valueDealt        : Double                = 0.0
   var valueReceived     : Double                = 0.0
   var kills             : Int                   = 0
+
   var events: ArrayBuffer[SimulationEvent] = new ArrayBuffer[SimulationEvent]
 
+  val enemies: Vector[UnitInfo] = simulation.prediction.battle.teamOf(realUnit).opponent.units
   val filters: Iterable[TargetFilter] = realUnit.friendly.map(Target.filtersRequired(_).view.filter(_.simulationSafe)).getOrElse(Iterable.empty)
-  val realTargets: Seq[UnitInfo] = realUnit.matchups.targets.view.filter(t =>
-    realUnit.friendly.forall(u => ! simulation.fleeing && filters.forall(_.legal(u, t))))
-
+  val possibleTargets: Seq[UnitInfo] = enemies.view.filter(t => realUnit.friendly.forall(u => ! simulation.fleeing && filters.forall(_.legal(u, t))))
   lazy val targetQueue: ArrayBuffer[Simulacrum] = {
     val output = new mutable.ArrayBuffer[Simulacrum]
-    output.append(realTargets.view.flatMap(simulation.simulacra.get): _*)
+    output.append(possibleTargets.view.flatMap(simulation.simulacra.get): _*)
     output
   }
   
   var fightingInitially: Boolean = {
     if ( ! realUnit.canAttack) {
       false
-    } else if ( ! realUnit.unitClass.dealsDamage) {
-      false
     } else if (realUnit.unitClass.isWorker) {
       realUnit.orderTarget.exists(_.isEnemyOf(realUnit)) || realUnit.friendly.exists(_.squad.isDefined)
-    } else if (realUnit.isEnemy) {
-      true
     } else {
-      realUnit.canMove || realUnit.matchups.targetsInRange.nonEmpty
+      possibleTargets.nonEmpty
     }
   }
   var fighting: Boolean = fightingInitially

@@ -13,20 +13,7 @@ case class SimulationEventAttack(
   
   private val pixel = victim.pixel
   
-  override def toString: String = Vector(
-    frame + ":",
-    describe(shooter),
-    "@",
-    shooter.pixel,
-    "strikes",
-    describe(victim),
-    "@",
-    victim.pixel,
-    "for",
-    damage,
-    "damage",
-    if (fatal) "(Fatal)" else ""
-  ).map(_.toString).mkString(" ")
+  override def toString: String = f"$frame: ${describe(shooter)} ${shooter.pixel} strikes ${describe(victim)} ${victim.pixel}} for $damage damage ${if (fatal) "(Fatal)" else ""}"
   
   override def draw() {
     val size = 5

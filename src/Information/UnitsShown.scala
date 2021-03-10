@@ -18,6 +18,7 @@ class UnitsShown extends TimedTask {
   def apply(player: PlayerInfo, unitClass: UnitClass): Int = unitCounts(player)(unitClass).size
 
   def allEnemies(unitClass: UnitClass): Int = With.enemies.map(apply(_, unitClass)).sum
+  def any(unitClass: UnitClass): Boolean = With.enemies.exists(apply(_, unitClass) > 0)
 
   def all(player: PlayerInfo): Map[UnitClass, mutable.HashSet[Int]] = unitCounts(player)
 

@@ -257,25 +257,6 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
 
   val targetBaseValue = new Cache(() => Target.getTargetBaseValue(this), 24)
 
-  val participatingInCombat = new Cache(() => matchups.targets.nonEmpty || isAny(
-    // Spellcasters (which don't have targets)
-    // Static defense (which doesn't have targets if incomplete)
-    Terran.Dropship,
-    Terran.Medic,
-    Terran.ScienceVessel,
-    Terran.SpiderMine,
-    Terran.MissileTurret,
-    Terran.Bunker,
-    Protoss.DarkArchon,
-    Protoss.HighTemplar,
-    Protoss.Shuttle,
-    Protoss.ShieldBattery,
-    Zerg.CreepColony,
-    Zerg.Defiler,
-    Zerg.SporeColony,
-    Zerg.SunkenColony
-  ))
-
   @inline final def totalHealth: Int = hitPoints + shieldPoints + matrixPoints
   @inline final def armorHealth: Int = armorHealthCache()
   @inline final def armorShield: Int = armorShieldsCache()

@@ -20,6 +20,7 @@ object TargetFilterGroups {
     TargetFilterCarrierInLeash,
     TargetFilterCarrierShootsUp,
     TargetFilterCombatants,
+    TargetFilterFrontline,
     TargetFilterIgnoreScouts,
   )
 }

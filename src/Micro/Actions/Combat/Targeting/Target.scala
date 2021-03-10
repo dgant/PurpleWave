@@ -102,23 +102,25 @@ object Target extends {
     / Math.max(6.0, framesOutOfTheWay)
   )
 
+  def injury(target: UnitInfo): Double = (target.unitClass.maxTotalHealth - target.totalHealth) / target.unitClass.maxTotalHealth
+
   def getTargetBaseValue(target: UnitInfo, recur: Boolean = true): Double = {
     var output = target.subjectiveValue
 
-    // Gathering bonus
-    val gathering = target.gathering
-    if (gathering) {
+    // Injury bonus
+    output /= Math.max(0.1, injury(target))
+
+    // Immobility bonus
+    if (target.constructing || target.repairing) {
+      output *= 1.5
+    } else if ( ! target.canMove) {
+      output *= 1.25
+    } else if (target.gathering) {
       output *= 1.1
     }
 
-    // Construction bonus
-    val constructing = target.constructing
-    if (constructing) {
-      output *= 1.5
-    }
-
     // Combat bonus
-    if (target.participatingInCombat()) {
+    if (target.unitClass.attacksOrCastsOrDetectsOrTransports) {
       output *= Math.max(1.0, target.matchups.splashFactorMax)
       output *= 2.0
       if (target.complete) {
@@ -136,34 +138,22 @@ object Target extends {
       output *= 1.25
     }
 
-    // Immobility bonus
-    if ( ! target.canMove) {
-      output *= 1.25
-    }
-
     // Anti-air bonus
     val antiAirBonus = target.attacksAgainstAir > 0 && target.presumptiveTarget.exists(t => t.flying && t.attacksAgainstGround > 0)
     if (antiAirBonus) {
       output *= 2.0
     }
-    if (target.isAny(Terran.Armory, Protoss.CyberneticsCore, Zerg.Spire, Zerg.HydraliskDen)
-      && With.units.existsOurs(Terran.Battlecruiser, Terran.Wraith, Terran.ScienceVessel, Protoss.Carrier, Protoss.Scout, Zerg.Mutalisk, Zerg.Guardian)) {
-      output *= 2.5
-    }
 
     // Visibility bonus
     if (target.visible) {
-      output *= 2.0
+      output *= 4.0
     }
     if (target.likelyStillThere) {
-      output *= 1.25
+      output *= 4.0
     }
 
     // Temporary visibility bonus
-    val temporarilyVisible = (
-      (target.cloaked || target.burrowed)
-      && With.self.isTerran
-      && With.units.existsOurs(Terran.SpellScannerSweep))
+    val temporarilyVisible = (target.cloaked || target.burrowed) && With.self.isTerran && With.units.existsOurs(Terran.SpellScannerSweep)
     if (temporarilyVisible) {
       output *= 2.0
     }

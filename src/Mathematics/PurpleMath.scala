@@ -14,12 +14,8 @@ object PurpleMath {
   val sqrt2: Double = Math.sqrt(2)
   val sqrt2f: Float = sqrt2.toFloat
 
-  @inline final def mean(values: Traversable[Double]): Double = {
-    if (values.isEmpty)
-      0.0
-    else
-      values.sum / values.size
-  }
+  @inline final def mean(values: Iterable[Double]): Double = if (values.isEmpty) 0.0 else values.sum / values.size
+  @inline final def meanL(values: Iterable[Long]): Double = if (values.isEmpty) 0.0 else values.sum / values.size.toDouble
   
   @inline final def centroid(values: Iterable[Pixel]): Pixel = {
     if (values.isEmpty) return SpecificPoints.middle

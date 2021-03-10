@@ -12,10 +12,9 @@ import Utilities.ByOption
 class Pump(
   unitClass                 : UnitClass,
   maximumTotal              : Int = Int.MaxValue,
-  maximumConcurrently       : Int = Int.MaxValue,
-  maximumConcurrentlyRatio  : Double = 1.0)
+  maximumConcurrently       : Int = Int.MaxValue)
     extends Plan {
-    
+
   description.set("Pump " + unitClass)
   
   override def onUpdate() {
@@ -24,11 +23,11 @@ class Pump(
     val unitsNow            = PumpCount.currentCount(unitClass)
     val unitsToAddCeiling   = Math.max(0, Math.min(maximumTotal, maxDesirable) - unitsNow) // TODO: Clamp Nukes to #Silos
     val buildersSpawning    = if (unitClass.whatBuilds._1 == Zerg.Larva) With.units.countOurs(MatchAnd(MatchHatcherylike, MatchComplete)) else 0
-    val buildersExisting    = builders.toVector
+    val buildersExisting    = builders
     val buildersReserved    = With.scheduler.buildersAllocated(unitClass)
     val buildersReadiness   = getBuilderReadiness(buildersExisting)
     val buildersTotal       = buildersExisting.size + buildersSpawning
-    val buildersAllocatable = Math.max(0, Math.min(buildersTotal * maximumConcurrentlyRatio, buildersTotal - buildersReserved))
+    val buildersAllocatable = Math.max(0, buildersTotal - buildersReserved)
     val builderOutputCap    = Math.round(buildersReadiness * buildersAllocatable)
     
     val minerals            = With.self.minerals  // To improve: Measure existing expediture commitments
@@ -49,13 +48,10 @@ class Pump(
     With.scheduler.request(this, Get(unitsToRequest, unitClass))
   }
   
-  private def getBuilderReadiness(builders: Iterable[FriendlyUnitInfo]): Double = {
-    val output = ByOption
+  private def getBuilderReadiness(builders: Iterable[FriendlyUnitInfo]): Double =
+    ByOption
       .mean(builders.map(b => 1.0 - Math.min(1.0, Math.max(b.remainingTrainFrames, b.remainingCompletionFrames).toDouble / unitClass.buildFrames)))
       .getOrElse(0.5)
-    
-    output
-  }
   
   protected def canBuild: Boolean = (
     unitClass.buildTechEnabling.forall(With.self.hasTech)

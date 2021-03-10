@@ -2,6 +2,7 @@ package Performance.Tasks
 
 import Debugging.ToString
 import Lifecycle.With
+import Mathematics.PurpleMath
 import Performance.Cache
 import Utilities.ByOption
 
@@ -24,7 +25,8 @@ abstract class TimedTask {
   private var _runMsMax           : Long  = 0
   private var _runsCrossingTarget : Int   = 0
   private var _runsCrossingLimit  : Int   = 0
-  private val runMs = new mutable.Queue[Long]
+  private val runMsPast = new mutable.Queue[Long]
+  val budgetMsPast = new mutable.Queue[Long]
 
   final def withSkipsMax    (value: Int)      : TimedTask = { skipsMax    = value; this }
   final def withWeight      (value: Int)      : TimedTask = { weight      = value; this }
@@ -39,16 +41,20 @@ abstract class TimedTask {
   final def runsCrossingLimit   : Int     = _runsCrossingLimit
   final def runMsTotal          : Long    = _runMsTotal
   final def runMsMax            : Long    = _runMsMax
-  final def runMsLast           : Long    = runMs.headOption.getOrElse(0L)
-  final def runMsRecentSamples  : Int     = runMs.length
-  final val runMsRecentMax      = new Cache[Long](() => ByOption.max(runMs).getOrElse(0))
-  final val runMsRecentMean     = new Cache(() => runMs.view.map(Math.min(_, 100)).sum / Math.max(1, runMs.size))
-  final val runMsRecentTotal    = new Cache(() => runMs.sum)
+  final def runMsLast           : Long    = runMsPast.headOption.getOrElse(0L)
+  final def runMsRecentSamples  : Int     = runMsPast.length
+  final val runMsRecentMax      = new Cache[Long](() => ByOption.max(runMsPast).getOrElse(0))
+  final val runMsRecentMean     = new Cache(() => runMsPast.view.map(Math.min(_, 100)).sum / Math.max(1, runMsPast.size))
+  final val runMsRecentTotal    = new Cache(() => runMsPast.sum)
   final val runMsSamplesMax     = 24
   private def runMsProjected: Double = Math.max(if (runsTotal < 10) 5 else 1, if (With.performance.danger) runMsMax else runMsRecentMax())
   private def runMsEnqueue(value: Long): Unit = {
-    runMs.enqueue(Math.max(0L, value))
-    while (runMs.size > runMsSamplesMax) runMs.dequeue()
+    runMsPast.enqueue(Math.max(0L, value))
+    while (runMsPast.size > runMsSamplesMax) runMsPast.dequeue()
+  }
+  private def budgetMsEnqueue(value: Long): Unit = {
+    budgetMsPast.enqueue(value)
+    while (budgetMsPast.size > runMsSamplesMax) budgetMsPast.dequeue()
   }
 
   protected def onRun(budgetMs: Long)
@@ -67,6 +73,7 @@ abstract class TimedTask {
   }
 
   final def run(budgetMs: Long) {
+    budgetMsEnqueue(budgetMs)
     val budgetMsCapped        = Math.min(budgetMs, With.performance.msBeforeTarget)
     val millisecondsBefore    = With.performance.systemMillis
     val targetAlreadyViolated = With.performance.violatedTarget
@@ -92,7 +99,7 @@ abstract class TimedTask {
     if ( ! limitAlreadyViolated && With.performance.violatedLimit) {
       _runsCrossingLimit += 1
       if (skipsMax > 0 && With.configuration.enablePerformancePauses) {
-        With.logger.warn(f"$toString${if(due)" (Due)" else ""} crossed the ${With.configuration.frameLimitMs}ms limit, taking ${millisecondsDuration}ms, reaching ${With.performance.frameMs}ms on the frame.")
+        With.logger.warn(f"$toString${if(due)" (Due)" else ""} crossed ${With.configuration.frameLimitMs}ms limit on ${budgetMs}ms budget (${PurpleMath.meanL(budgetMsPast)}ms avg budget), taking ${millisecondsDuration}ms, reaching ${With.performance.frameMs}ms on the frame.")
       }
     }
     lastRunFrame = With.frame

@@ -27,9 +27,7 @@ import ProxyBwapi.Upgrades.Upgrade
 import Utilities._
 import bwapi._
 
-import scala.collection.mutable.ArrayBuffer
-
-abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiUnit, id) {
+abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProxy {
 
   def friendly  : Option[FriendlyUnitInfo]  = None
   def foreign   : Option[ForeignUnitInfo]   = None
@@ -60,9 +58,9 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   var lastFrameStartingAttack     : Int = - Forever()
   var hasEverBeenCompleteHatch    : Boolean = false // Stupid AIST hack fix for detecting whether a base is mineable
   private var lastUnitClass       : UnitClass = _
-  private val previousPixels      : ArrayBuffer[Pixel] = ArrayBuffer.fill(24)(new Pixel(bwapiUnit.getPosition))
+  private val previousPixels      : Array[Pixel] = Array.fill(24)(new Pixel(bwapiUnit.getPosition))
   private var previousPixelIndex  : Int = 0
-  def previousPixel(framesAgo: Int): Pixel = previousPixels((previousPixels.length + previousPixelIndex - Math.min(previousPixels.length, framesAgo)) % previousPixels.length)
+  @inline final def previousPixel(framesAgo: Int): Pixel = previousPixels((previousPixels.length + previousPixelIndex - Math.min(previousPixels.length, framesAgo)) % previousPixels.length)
   def update() {
     if (cooldownLeft > lastCooldown) lastFrameStartingAttack = With.frame
     if (totalHealth < lastHitPoints + lastShieldPoints + lastMatrixPoints) lastFrameTakingDamage = With.frame
@@ -308,15 +306,15 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   @inline final def cooldownLeft : Int = (
     //TODO: Ensnare
     (if (complete)
-      Iterable(
-        cooldownAir,
-        cooldownGround,
-        friendly.filter(_.transport.exists(_.flying)).map(unused => cooldownMaxAirGround / 2).getOrElse(0))
-      .max
+      Math.max(
+        friendly.filter(_.transport.exists(_.flying)).map(unused => cooldownMaxAirGround / 2).getOrElse(0),
+        Math.max(
+          cooldownAir,
+          cooldownGround))
     else remainingCompletionFrames)
     + friendly
       .filter(u => u.is(Protoss.Reaver) && u.scarabs == 0)
-      .map(f => f.trainee.map(_.remainingCompletionFrames).getOrElse(Protoss.Scarab.buildFrames))
+      .map(_.trainee.map(_.remainingCompletionFrames).getOrElse(Protoss.Scarab.buildFrames))
       .getOrElse(0))
 
   @inline final def cooldownMaxAir    : Int = (2 + unitClass.airDamageCooldown)     / stimAttackSpeedBonus // +2 is the RNG
@@ -529,7 +527,7 @@ abstract class UnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends UnitProxy(bwapiU
   @inline final def airborne: Boolean = flying || friendly.exists(_.transport.exists(_.flying))
   @inline final def gathering: Boolean = unitClass.isWorker && orderTarget.exists(_.unitClass.isResource)
   @inline final def gatheringMinerals: Boolean = unitClass.isWorker && orderTarget.exists(_.unitClass.isMinerals)
-  @inline final def gatheringGas: Boolean = unitClass.isWorker && orderTarget.exists(_.unitClass.isGas)
+  @inline final def gatheringGas: Boolean = unitClass.isWorker && orderTarget.exists(_.unitClass.isGas) && ! constructing
   @inline final def carrying: Boolean = carryingMinerals || carryingGas
 
   @inline final def presumptiveDestination: Pixel = if (isOurs) calculatePresumptiveDestination else presumptiveDestinationCached()

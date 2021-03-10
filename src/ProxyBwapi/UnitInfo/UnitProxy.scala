@@ -7,7 +7,9 @@ import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitTracking.Visibility
 import ProxyBwapi.Upgrades.Upgrade
 
-abstract class UnitProxy(val bwapiUnit  : bwapi.Unit, val id  : Int) {
+trait UnitProxy {
+  val bwapiUnit                 : bwapi.Unit
+  val id                        : Int
   def visibility                : Visibility.Value
   def player                    : PlayerInfo
   def unitClass                 : UnitClass

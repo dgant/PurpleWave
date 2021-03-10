@@ -6,13 +6,12 @@ object TargetFilterGroups {
   val filtersRequired = Vector(
     TargetFilterPossible,
     TargetFilterLarvaAndEgg,
-    TargetFilterLeash,
-    TargetFilterFocus,
-    TargetFilterStayCloaked,
+    TargetFilterSquad,
+    TargetFilterCloaked,
     TargetFilterScourge,
     TargetFilterReaver,
-    TargetFilterTankFodder,
     TargetFilterRush,
+    TargetFilterVulture,
     TargetFilterFutility,
     TargetFilterCarrierIgnoreInterceptors)
 

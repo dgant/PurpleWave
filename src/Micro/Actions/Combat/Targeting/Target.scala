@@ -40,14 +40,14 @@ object Target extends {
   }
 
   def filtersRequired(attacker: FriendlyUnitInfo): Seq[TargetFilter] = {
-    TargetFilterGroups.filtersRequired.view ++ attacker.agent.intent.targetFilters
+    (TargetFilterGroups.filtersRequired.view ++ attacker.agent.intent.targetFilters).filter(_.appliesTo(attacker))
   }
 
   def auditLegality(attacker: FriendlyUnitInfo, additionalFiltersRequired: TargetFilter*): Vector[(UnitInfo, Vector[(Boolean, TargetFilter)])] = {
     attacker.matchups.targets
       .map(target => (
         target,
-        (TargetFilterGroups.filtersRequired.view ++ additionalFiltersRequired)
+        (filtersRequired(attacker) ++ additionalFiltersRequired.filter(_.appliesTo(attacker)))
           .map(filter => (filter.legal(attacker, target), filter))
           .toVector
           .sortBy(_._1)))

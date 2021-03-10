@@ -7,7 +7,6 @@ import Planning.Plan
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitMatchers.MatchSiegeTank
 import ProxyBwapi.Races.Terran
-import Utilities.Seconds
 
 class Scan extends Plan {
   
@@ -52,7 +51,7 @@ class Scan extends Plan {
     val blockedBuilders = With.units.ours.filter(b =>
       b.agent.toBuild.exists(_.isTownHall)
       && b.agent.toBuildTile.map(_.pixelCenter).exists(b.pixelDistanceCenter(_) < 96)
-      && b.framesFailingToMove > Seconds(1)())
+      && b.seeminglyStuck)
     
     if (blockedBuilders.nonEmpty) {
       scan(blockedBuilders.head.pixel)

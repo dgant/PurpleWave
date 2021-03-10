@@ -5,6 +5,7 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Scouting.BlockConstruction
 import Micro.Heuristics.MicroValue
+import Performance.Cache
 import Planning.UnitMatchers.MatchWorkers
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -33,8 +34,9 @@ case class MatchupAnalysis(me: UnitInfo) {
   def threatsInRange          : Seq[UnitInfo] = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me))
   def threatsInFrames(f: Int) : Seq[UnitInfo] = threats.filter(_.framesToGetInRange(me) < f)
   def targetsInRange          : Seq[UnitInfo] = targets.filter(target => target.visible && me.pixelRangeAgainst(target) >= target.pixelDistanceEdge(me) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
+  lazy val arbiterCovering            : Cache[Boolean]        = new Cache(() => allies.exists(a => Protoss.Arbiter(a) && a.pixelDistanceEdge(me) < 160))
   lazy val allyTemplarCount           : Int                   = allies.count(Protoss.HighTemplar)
-  lazy val busyForCatching            : Boolean               = me.gathering || me.constructing || me.repairing || ! me.canMove || BlockConstruction.buildOrders.contains(me.order)
+  lazy val busyForCatching            : Boolean               = me.unitClass.isWorker && (me.gathering || me.constructing || me.repairing || BlockConstruction.constructionOrders.contains(me.order))
   lazy val catchers                   : Vector[UnitInfo]      = threats.filter(canCatchMe).toVector
   lazy val splashFactorMax            : Double                = splashFactorForUnits(targets)
   lazy val splashFactorInRange        : Double                = splashFactorForUnits(targetsInRange)
@@ -73,14 +75,11 @@ case class MatchupAnalysis(me: UnitInfo) {
     val catcherFlying = catcher.flying || catcher.friendly.exists(_.agent.ride.exists(_.flying)) && ! me.flying
     val output = (
       catcherSpeed * (if (catcherFlying) 2 else 1) >= me.topSpeed
-        // The Math.max prevents Zealots from thinking they can catch SCVs
-        || (catcher.pixelRangeAgainst(me) > Math.max(32 * 2, me.effectiveRangePixels) && catcher.framesToGetInRange(me) < 72)
+        || catcher.pixelRangeAgainst(me) > 32 * 3
         || busyForCatching
         || catcher.is(Zerg.Scourge)
-        || catcher.framesToGetInRange(me) < 8
-        || (me.unitClass.isWorker && me.base.exists(_.harvestingArea.contains(me.tile)))
-        || (catcher.is(Zerg.Zergling) && me.is(Terran.Vulture) && catcher.player.hasUpgrade(Zerg.ZerglingSpeed) && ! me.player.hasUpgrade(Terran.VultureSpeed))
-        || (catcher.is(Protoss.Zealot) && me.is(Protoss.Dragoon) && ! me.player.hasUpgrade(Protoss.DragoonRange))
+        || (catcher.framesToGetInRange(me) < 8 && me.speedApproaching(catcher) > 0)
+        || (catcher.isAny(Terran.Marine, Protoss.Zealot) && me.is(Protoss.Dragoon) && ! me.player.hasUpgrade(Protoss.DragoonRange))
         || (catcher.is(Protoss.DarkTemplar) && me.is(Protoss.Dragoon)))
     output
   }

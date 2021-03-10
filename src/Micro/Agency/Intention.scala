@@ -23,7 +23,6 @@ class Intention {
   var toReturn      : Option[Pixel]             = None
   var toNuke        : Option[Pixel]             = None
   var toUpgrade     : Option[Upgrade]           = None
-  var toLeash       : Option[Double]            = None
   var toRepair      : Option[UnitInfo]          = None
   var toBoard       : Option[FriendlyUnitInfo]  = None
   var toScoutTiles  : Seq[Tile]                 = Seq.empty

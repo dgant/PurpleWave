@@ -5,10 +5,11 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.GameTime
 
 object TargetFilterRush extends TargetFilter {
-  val timeThreshold = GameTime(4, 30)()
+  simulationSafe = true
+  private val timeThreshold = GameTime(4, 30)()
+  override def appliesTo(actor: FriendlyUnitInfo): Boolean = With.frame < timeThreshold
   override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = (
-    With.frame > timeThreshold
-      || ! target.unitClass.isBuilding
+    ! target.unitClass.isBuilding
       || ! target.base.exists(b => With.scouting.enemyMain.contains(b) || With.scouting.enemyNatural.contains(b))
       || target.base.forall(_.resourcePathTiles.forall(_.explored))
       || target.tileArea.contains(actor.agent.destination)

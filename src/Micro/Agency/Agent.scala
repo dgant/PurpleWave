@@ -53,7 +53,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   var toTech        : Option[Tech]              = None
   var toFinish      : Option[UnitInfo]          = None
   var toUpgrade     : Option[Upgrade]           = None
-  var toLeash       : Option[Double]            = None
   var toBoard       : Option[FriendlyUnitInfo]  = None
   var toNuke        : Option[Pixel]             = None
   var toRepair      : Option[UnitInfo]          = None
@@ -155,7 +154,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     toTech        = intent.toTech
     toFinish      = intent.toFinish
     toUpgrade     = intent.toUpgrade
-    toLeash       = intent.toLeash
     toRepair      = intent.toRepair
     toBoard       = intent.toBoard.orElse(toBoard)
     toNuke        = intent.toNuke

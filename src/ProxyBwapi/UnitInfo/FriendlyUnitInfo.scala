@@ -2,6 +2,7 @@ package ProxyBwapi.UnitInfo
 
 import Information.Grids.Combat.AbstractGridEnemyRange
 import Lifecycle.With
+import Mathematics.PurpleMath
 import Micro.Agency.{Agent, Intention}
 import Micro.Squads.Squad
 import Performance.Cache
@@ -15,28 +16,30 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(b
   
   override val friendly: Option[FriendlyUnitInfo] = Some(this)
 
-  var lastSetRally                    : Int           = 0
-  private var _discoveredByEnemy      : Boolean       = false
-  private var _lastFrameOccupied      : Int           = - Forever()
-  private var _framesFailingToMove    : Int           = 0
-  private var _framesFailingToAttack  : Int           = 0
+  var lastSetRally                    : Int     = 0
+  private var _knownToEnemy           : Boolean = false
+  private var _lastFrameOccupied      : Int     = - Forever()
+  private var _framesFailingToMove    : Int     = 0
+  private var _framesFailingToAttack  : Int     = 0
   override def update() {
     if (frameDiscovered < With.frame) readProxy()
     super.update()
-    _discoveredByEnemy = _discoveredByEnemy || visibleToOpponents
+    _knownToEnemy = _knownToEnemy || visibleToOpponents
     lazy val tryingToAttackHere = canAttack && target.exists(t => t.isEnemyOf(this) &&   inRangeToAttack(t))
     lazy val tryingToAttackAway = canAttack && target.exists(t => t.isEnemyOf(this) && ! inRangeToAttack(t))
-    _framesFailingToMove = if (flying || unitClass.floats || velocityX > 0 || velocityY > 0 || ! canMove || ( ! agent.tryingToMove && ! tryingToAttackAway)) 0 else _framesFailingToMove + 1
-    _framesFailingToAttack = if (cooldownLeft > 0 || ! tryingToAttackHere) 0 else _framesFailingToAttack + 1
+    _framesFailingToMove += 1 - PurpleMath.fromBoolean(flying || unitClass.floats || pixel != previousPixel(1) || ! canMove || ( ! agent.tryingToMove && ! tryingToAttackAway))
+    _framesFailingToAttack += 1 - PurpleMath.fromBoolean(cooldownLeft > 0 || ! tryingToAttackHere)
     if (remainingOccupationFrames > 0) _lastFrameOccupied = With.frame
   }
+
+  @inline final def knownToEnemy  : Boolean = _knownToEnemy
   @inline final def seeminglyStuck: Boolean = _framesFailingToMove > 24 || _framesFailingToAttack > 24
 
   def remainingCompletionFrames : Int = bwapiUnit.getRemainingBuildTime
   def spaceRemaining: Int = bwapiUnit.getSpaceRemaining
   def kills: Int = bwapiUnit.getKillCount
-  def lastFrameOccupied: Int = _lastFrameOccupied
-  def framesFailingToMove: Int = _framesFailingToMove
+  @inline final def lastFrameOccupied: Int = _lastFrameOccupied
+
 
   lazy val agent: Agent = new Agent(this)
   def intent: Intention = agent.intent
@@ -78,7 +81,6 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(b
   def buildUnit     : Option[UnitInfo]  = With.units.get(base.getBuildUnit)
   def techingType   : Tech              = Techs.get(base.getTech)
   def upgradingType : Upgrade           = Upgrades.get(base.getUpgrade)
-  def knownToEnemy: Boolean = _discoveredByEnemy
 
   var nextOrderFrame: Option[Int] = None
   @inline def ready: Boolean = nextOrderFrame.forall(_ <= With.frame)

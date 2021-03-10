@@ -4,6 +4,7 @@ import Debugging.Visualizations.Views.Battles.ShowBattles
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
+import Micro.Actions.Combat.Targeting.Filters.TargetFilter
 import Micro.Actions.Combat.Targeting.Target
 import Planning.UnitMatchers.{MatchRecruitableForCombat, MatchSiegeTank}
 import ProxyBwapi.Players.PlayerInfo
@@ -62,13 +63,9 @@ class Simulacrum(
   var kills             : Int                   = 0
   var events: ArrayBuffer[SimulationEvent] = new ArrayBuffer[SimulationEvent]
 
-
-  val realTargets: Seq[UnitInfo] = realUnit.matchups.targets
-    .view
-    .filter(target =>
-      ! simulation.fleeing
-      || realUnit.inRangeToAttack(target)
-      || ! realUnit.isOurs)
+  val filters: Iterable[TargetFilter] = realUnit.friendly.map(Target.filtersRequired(_).view.filter(_.simulationSafe)).getOrElse(Iterable.empty)
+  val realTargets: Seq[UnitInfo] = realUnit.matchups.targets.view.filter(t =>
+    realUnit.friendly.forall(u => ! simulation.fleeing && filters.forall(_.legal(u, t))))
 
   lazy val targetQueue: ArrayBuffer[Simulacrum] = {
     val output = new mutable.ArrayBuffer[Simulacrum]

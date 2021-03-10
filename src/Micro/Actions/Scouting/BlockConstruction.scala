@@ -36,17 +36,17 @@ object BlockConstruction extends Action {
     }
   }
   
-  val buildOrders = Vector(
+  val constructionOrders = Vector(
     Orders.PlaceBuilding,
     Orders.ZergBuildingMorph,
     Orders.ConstructingBuilding,
     Orders.CreateProtossBuilding,
     Orders.PlaceProtossBuilding
   )
-  
+
   def blockableBuilders(unit: FriendlyUnitInfo): Iterable[UnitInfo] = {
     unit.matchups.targets.filter(builder => {
-      lazy val hasBuildOrder        = buildOrders.contains(builder.order)
+      lazy val hasBuildOrder        = constructionOrders.contains(builder.order)
       lazy val hasMoveOrder         = builder.order == Orders.Move
       lazy val hasRelevantOrder     = hasBuildOrder  || hasMoveOrder
       lazy val targetPixel          = builder.orderTargetPixel.orElse(builder.targetPixel).getOrElse(builder.pixel)

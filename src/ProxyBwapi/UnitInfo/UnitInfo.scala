@@ -41,9 +41,9 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
       || unitMatcher == Zerg.Hatchery && isAny(Zerg.Lair, Zerg.Hive)
       || unitMatcher == Zerg.Lair && is(Zerg.Hatchery)
       || unitMatcher == Zerg.Spire && is(Zerg.GreaterSpire))
-  @inline final def isNone(unitMatchers: UnitMatcher*): Boolean = ! unitMatchers.exists(_.apply(this))
-  @inline final def isAny(unitMatchers: UnitMatcher*): Boolean = unitMatchers.exists(_.apply(this))
-  @inline final def isAll(unitMatchers: UnitMatcher*): Boolean = unitMatchers.forall(_.apply(this))
+  @inline final def isNone(unitMatchers: UnitMatcher*): Boolean = ! unitMatchers.exists(_(this))
+  @inline final def isAny(unitMatchers: UnitMatcher*): Boolean = unitMatchers.exists(_(this))
+  @inline final def isAll(unitMatchers: UnitMatcher*): Boolean = unitMatchers.forall(_(this))
 
   val frameDiscovered             : Int = With.frame
   val initialHitPoints            : Int = bwapiUnit.getHitPoints

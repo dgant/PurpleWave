@@ -2,7 +2,6 @@
 package Micro.Actions.Combat.Decisionmaking
 
 import Lifecycle.With
-import Mathematics.PurpleMath
 import Micro.Actions.Action
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -50,21 +49,8 @@ object FightOrFlight extends Action {
         && ally.energy > 20
         && ally.pixelDistanceEdge(unit, otherAt = ByOption.minBy(unit.matchups.targets.view.map(unit.pixelToFireAt))(unit.pixelDistanceCenter).getOrElse(unit.pixel)) < 72))
 
-    decide(true, "Anchors", () => unit.alliesSquadOrBattle.view
-      .map(_.friendly)
-      .filter(_.isDefined)
-      .map(_.get)
-      .exists(ally => (
-        ! ally.unitClass.isWorker
-        && ! ally.loaded
-        && ally.visibleToOpponents
-        && (ally.canAttack || (ally.unitClass.rawCanAttack && ally.unitClass.isBuilding) || ally.is(Zerg.CreepColony))
-        && (ally.unitClass.topSpeed <= Protoss.HighTemplar.topSpeed)
-        && (ally.subjectiveValue * (if (ally.unitClass.isBuilding) 2.0 else 1.0) > unit.subjectiveValue)
-        && (ally.matchups.framesOfSafety < 24 + Math.max(0, unit.matchups.framesOfSafety) || ( ! ally.unitClass.isBuilding && ally.matchups.targetsInRange.nonEmpty))
-        && (ally.friendly.forall(_.agent.ride.exists(_.pixelDistanceEdge(ally) > 96)) || ally.matchups.framesOfSafety <= PurpleMath.clamp(unit.matchups.framesOfSafety, 0, 3))
-        && (ally.unitClass.isSpellcaster || (ally.matchups.threats.exists(t => ! t.unitClass.isWorker && t.topSpeed > ally.topSpeed && unit.canAttack(t)) && (ally.agent.shouldEngage || ally.matchups.targetsInRange.nonEmpty)))
-      )))
+    decide(true, "Anchors", () => unit.matchups.anchors.exists(anchor =>
+        anchor.visibleToOpponents && anchor.matchups.pixelsOfEntanglement > unit.matchups.pixelsOfEntanglement - 64))
 
     if (decision.isDefined) {
       unit.agent.shouldEngage = decision.get

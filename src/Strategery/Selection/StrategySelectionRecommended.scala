@@ -8,7 +8,7 @@ class StrategySelectionRecommended(fallback: StrategySelectionPolicy, recommende
   var duration = 5
 
   def this(fallback: StrategySelectionPolicy, duration: Int, recommendedBranch: Strategy*) {
-    this(fallback, recommendedBranch)
+    this(fallback, recommendedBranch: _*)
     this.duration = duration
   }
 

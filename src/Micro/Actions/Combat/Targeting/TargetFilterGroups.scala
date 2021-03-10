@@ -13,7 +13,10 @@ object TargetFilterGroups {
     TargetFilterRush,
     TargetFilterVulture,
     TargetFilterFutility,
+    TargetFilterAnchor,
     TargetFilterCarrierIgnoreInterceptors)
+
+  val filtersForSimulation: Vector[TargetFilter] = filtersRequired.filter(_.simulationSafe)
 
   val filtersPreferred = Vector(
     TargetFilterCarrierInRange,

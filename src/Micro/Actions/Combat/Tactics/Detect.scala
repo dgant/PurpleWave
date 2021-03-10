@@ -27,7 +27,7 @@ object Detect extends Action {
       pickBestSpooky(unit, unit.enemiesBattle.filter(_.cloakedOrBurrowed))).orElse(
       pickBestSpooky(unit, unit.enemiesBattle.filter(canEventuallyCloak)))
 
-    lazy val minesweepingNeeded = Vector(Terran.SpiderMine, Terran.Vulture, Terran.Factory, Terran.Goliath, Terran.SiegeTankUnsieged, Terran.SiegeTankUnsieged, Protoss.Arbiter, Protoss.DarkTemplar, Zerg.Lurker).exists(With.unitsShown.any)
+    lazy val minesweepingNeeded = With.unitsShown.any(Terran.SpiderMine, Terran.Vulture, Terran.Factory, Terran.Goliath, Terran.SiegeTankUnsieged, Terran.SiegeTankUnsieged, Protoss.Arbiter, Protoss.DarkTemplar, Zerg.Lurker)
     lazy val minesweepPoint = if (minesweepingNeeded) ByOption
       .minBy(unit.alliesSquad.view.filter(_.canAttack))(_.pixelDistanceTravelling(unit.agent.destination))
       .map(_.pixel.project(unit.agent.destination, unit.sightPixels)) else None

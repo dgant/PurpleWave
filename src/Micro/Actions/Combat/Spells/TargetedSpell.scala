@@ -1,6 +1,5 @@
 package Micro.Actions.Combat.Spells
 
-import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Agency.Commander
@@ -21,18 +20,10 @@ abstract class TargetedSpell extends Action {
   protected def pixelHeight     : Int = 96
   
   protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double
-  
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.is(casterClass)            &&
-    With.self.hasTech(tech)         &&
-    hasEnoughEnergy(unit)           &&
-    unit.matchups.enemies.nonEmpty  &&
-    additionalConditions(unit)
-  }
-  
-  protected def hasEnoughEnergy(unit: FriendlyUnitInfo): Boolean = {
-    unit.energy >= tech.energyCost
-  }
+
+  def hasEnoughEnergy(unit: UnitInfo): Boolean = unit.energy >= tech.energyCost
+  def canCast(unit: UnitInfo): Boolean = casterClass(unit) && unit.player.hasTech(tech) && hasEnoughEnergy(unit)
+  override def allowed(unit: FriendlyUnitInfo): Boolean = canCast(unit) && unit.matchups.enemies.nonEmpty && additionalConditions(unit)
   
   protected def additionalConditions(unit: FriendlyUnitInfo): Boolean = true
   

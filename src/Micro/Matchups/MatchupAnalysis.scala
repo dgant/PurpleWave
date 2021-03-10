@@ -6,7 +6,7 @@ import Mathematics.PurpleMath
 import Micro.Actions.Scouting.BlockConstruction
 import Micro.Heuristics.MicroValue
 import Performance.Cache
-import Planning.UnitMatchers.MatchWorkers
+import Planning.UnitMatchers.{MatchSiegeTank, MatchWorkers}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
@@ -34,21 +34,22 @@ case class MatchupAnalysis(me: UnitInfo) {
   def threatsInRange          : Seq[UnitInfo] = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me))
   def threatsInFrames(f: Int) : Seq[UnitInfo] = threats.filter(_.framesToGetInRange(me) < f)
   def targetsInRange          : Seq[UnitInfo] = targets.filter(target => target.visible && me.pixelRangeAgainst(target) >= target.pixelDistanceEdge(me) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
-  lazy val arbiterCovering            : Cache[Boolean]        = new Cache(() => allies.exists(a => Protoss.Arbiter(a) && a.pixelDistanceEdge(me) < 160))
-  lazy val allyTemplarCount           : Int                   = allies.count(Protoss.HighTemplar)
-  lazy val busyForCatching            : Boolean               = me.unitClass.isWorker && (me.gathering || me.constructing || me.repairing || BlockConstruction.constructionOrders.contains(me.order))
-  lazy val catchers                   : Vector[UnitInfo]      = threats.filter(canCatchMe).toVector
-  lazy val splashFactorMax            : Double                = splashFactorForUnits(targets)
-  lazy val splashFactorInRange        : Double                = splashFactorForUnits(targetsInRange)
-  lazy val valuePerDamage             : Double                = MicroValue.valuePerDamageCurrentHp(me)
-  lazy val vpfDealingInRange          : Double                = splashFactorInRange * ByOption.max(targetsInRange.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
-  lazy val dpfReceiving               : Double                = threatsInRange.view.map(_.matchups.dpfDealingDiffused(me)).sum
-  lazy val vpfReceiving               : Double                = valuePerDamage * dpfReceiving
-  lazy val framesToLive               : Double                = PurpleMath.nanToInfinity(me.totalHealth / dpfReceiving)
-  lazy val framesOfSafety             : Double                = - With.latency.latencyFrames - With.reaction.agencyAverage - PurpleMath.nanToZero(pixelsOfEntanglement / me.topSpeed)
-  lazy val pixelsOfEntanglement       : Double                = ByOption.max(threats.map(me.pixelsOfEntanglement)).getOrElse(- With.mapPixelWidth)
-  lazy val pixelsOfEntanglementWarrior: Double                = ByOption.max(threats.filterNot(MatchWorkers).map(me.pixelsOfEntanglement)).getOrElse(- With.mapPixelWidth)
-  lazy val pixelsToReachAnyTarget     : Double                = ByOption.max(targets.map(me.pixelsToGetInRange)).getOrElse(With.mapPixelWidth)
+  def anchors            : Iterable[UnitInfo] = me.friendly.map(_.alliesSquad).getOrElse(allies).filter(anchors(_, me))
+  lazy val anchor                     : Option[UnitInfo]  = ByOption.minBy(anchors)(_.pixelDistanceSquared(me))
+  lazy val arbiterCovering            : Cache[Boolean]    = new Cache(() => allies.exists(a => Protoss.Arbiter(a) && a.pixelDistanceEdge(me) < 160))
+  lazy val allyTemplarCount           : Int               = allies.count(Protoss.HighTemplar)
+  lazy val busyForCatching            : Boolean           = me.unitClass.isWorker && (me.gathering || me.constructing || me.repairing || BlockConstruction.constructionOrders.contains(me.order))
+  lazy val catchers                   : Vector[UnitInfo]  = threats.filter(canCatchMe).toVector
+  lazy val splashFactorMax            : Double            = splashFactorForUnits(targets)
+  lazy val splashFactorInRange        : Double            = splashFactorForUnits(targetsInRange)
+  lazy val valuePerDamage             : Double            = MicroValue.valuePerDamageCurrentHp(me)
+  lazy val vpfDealingInRange          : Double            = splashFactorInRange * ByOption.max(targetsInRange.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
+  lazy val dpfReceiving               : Double            = threatsInRange.view.map(_.matchups.dpfDealingDiffused(me)).sum
+  lazy val vpfReceiving               : Double            = valuePerDamage * dpfReceiving
+  lazy val framesToLive               : Double            = PurpleMath.nanToInfinity(me.totalHealth / dpfReceiving)
+  lazy val framesOfSafety             : Double            = - With.latency.latencyFrames - With.reaction.agencyAverage - PurpleMath.nanToZero(pixelsOfEntanglement / me.topSpeed)
+  lazy val pixelsOfEntanglement       : Double            = ByOption.max(threats.map(me.pixelsOfEntanglement)).getOrElse(- With.mapPixelWidth)
+  lazy val pixelsToReachAnyTarget     : Double            = ByOption.max(targets.map(me.pixelsToGetInRange)).getOrElse(With.mapPixelWidth)
 
   protected def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = (
     shooter.canAttack(victim)
@@ -82,6 +83,18 @@ case class MatchupAnalysis(me: UnitInfo) {
         || (catcher.framesToGetInRange(me) < 8 && me.speedApproaching(catcher) > 0)
         || (catcher.isAny(Terran.Marine, Protoss.Zealot) && me.is(Protoss.Dragoon) && ! me.player.hasUpgrade(Protoss.DragoonRange))
         || (catcher.is(Protoss.DarkTemplar) && me.is(Protoss.Dragoon)))
+    output
+  }
+
+  def anchors(anchor: UnitInfo, support: UnitInfo): Boolean = {
+    var output = false
+    output ||= anchor.isAny(MatchSiegeTank, Terran.Battlecruiser) && ! support.isAny(MatchSiegeTank, Terran.Battlecruiser)
+    output ||= anchor.isAny(Terran.Medic) && support.isAny(Terran.Marine, Terran.Firebat)
+    output ||= anchor.isAny(Protoss.Carrier) && ! support.isAny(Protoss.Carrier, Protoss.Arbiter)
+    output ||= anchor.isAny(Protoss.Carrier, Protoss.Arbiter, Protoss.Reaver) && support.isAny(Protoss.Zealot, Protoss.Dragoon, Protoss.Archon)
+    output ||= anchor.isAny(Protoss.Dragoon, Protoss.Archon) && support.isAny(Protoss.Zealot)
+    output ||= anchor.isAny(Zerg.Lurker, Zerg.Defiler, Zerg.Ultralisk, Zerg.Guardian) && support.isAny(Zerg.Zergling, Zerg.Hydralisk)
+    output ||= anchor.isAny(Terran.MissileTurret, Protoss.PhotonCannon, Zerg.SporeColony, Zerg.SunkenColony) && support.isAny(Terran.Marine, Terran.Goliath)
     output
   }
 }

@@ -73,6 +73,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   private val originCache = new KeyedCache(
     () =>
       ride.filterNot(unit.transport.contains).map(_.pixel)
+      .orElse(unit.matchups.anchor.filter(_.matchups.threats.nonEmpty).map(a => a.pixel.project(unit.battle.map(_.enemy.centroidOf(unit)).getOrElse(a.pixel), 64)))
       .orElse(toReturn)
       .orElse(
         ByOption.minBy(

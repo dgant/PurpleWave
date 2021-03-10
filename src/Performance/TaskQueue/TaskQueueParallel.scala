@@ -53,7 +53,7 @@ class TaskQueueParallel(val tasks: TimedTask*) extends TimedTask {
     }
 
     if (With.performance.violatedLimit) {
-      With.logger.debug(f"$toString crossed the ${With.configuration.frameLimitMs}ms limit to {With.performance.millisecondsSpentThisFrame}ms. Task durations: ${
+      With.logger.debug(f"$toString crossed the ${With.configuration.frameLimitMs}ms limit to ${With.performance.frameMs}ms. Task durations: ${
         tasksSorted
           .filter(_.framesSinceRunning <= 1)
           .sortBy(- _.runMsLast)

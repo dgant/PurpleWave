@@ -26,7 +26,7 @@ object ShowPerformanceDetails extends View {
         task.toString,
         "X" * Math.min(10, Math.max(0, task.framesSinceRunning - 1)),
         (task.runMsTotal / 1000).toString,
-        PurpleMath.meanL(task.budgetMsPast).toString,
+        PurpleMath.meanL(task.budgetMsPast).toInt.toString,
         task.runMsRecentMean.toString,
         task.runMsRecentMax().toString,
         task.runMsMax.toString,

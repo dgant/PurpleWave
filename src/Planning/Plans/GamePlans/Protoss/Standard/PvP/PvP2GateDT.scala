@@ -17,7 +17,7 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.MatchWarriors
+import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP2GateDTExpand
@@ -91,7 +91,7 @@ class PvP2GateDT extends GameplanTemplate {
       new And(
         new UpgradeStarted(Protoss.AirDamage),
         new EnemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate)),
-      new CancelOrders(Protoss.CyberneticsCore)),
+      new CancelOrders(MatchAnd(Protoss.CyberneticsCore, MatchComplete))),
 
     // Delay build until scout cleared
     new If(

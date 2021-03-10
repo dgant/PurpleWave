@@ -28,10 +28,11 @@ class Storyteller {
 
   class Story[T](label: String, currentValue: () => T, stringify: (T) => String = (x: T) => x.toString) extends IStory {
     var valueLast: T = _
+    val valueInitial: T = valueLast
     def update(): Unit = {
       val valueNew = currentValue()
       if (valueLast != valueNew) {
-        tell(label + (if (valueLast == "") " is " else " changed from " + valueLast + " to " ) + valueNew)
+        tell(label + (if (valueLast == valueInitial) " is " else " changed from " + stringify(valueLast) + " to " ) + stringify(valueNew))
       }
       valueLast = valueNew
     }
@@ -51,18 +52,18 @@ class Storyteller {
   private lazy val interestingTechs = Techs.all.filterNot(defaultTechs.contains)
 
   val stories: Seq[IStory] = Seq(
-    new Story[Iterable[PlayerInfo]]     ("Opponents",          () => With.enemies.view.filter(_.isEnemy),                                                                                 _.map(_.name).mkString(", ")),
-    new Story[Iterable[Double]]         ("Rush distances",     () => With.geography.rushDistances,                                                                                        _.mkString(", ")),
+    new Story[Iterable[PlayerInfo]]     ("Opponents",          () => With.enemies.filter(_.isEnemy),                                                                                  _.map(_.name).mkString(", ")),
+    new Story[Iterable[Double]]         ("Rush distances",     () => With.geography.rushDistances,                                                                                    _.map(_.toString).mkString(", ")),
     new Story                           ("Playbook",           () => With.configuration.playbook),
     new Story                           ("Policy",             () => With.configuration.playbook.strategySelectionPolicy),
     new Story                           ("Enemy race",         () => With.enemy.raceCurrent),
-    new Story[Iterable[Strategy]]       ("Strategy",           () => With.strategy.selectedCurrently,                                                                                     _.map(_.toString).mkString(" ")),
+    new Story[Iterable[Strategy]]       ("Strategy",           () => With.strategy.selectedCurrently,                                                                                 _.map(_.toString).mkString(" ")),
     new Story                           ("Our bases",          () => With.geography.ourBases.size),
     new Story                           ("Enemy bases",        () => With.geography.enemyBases.size),
-    new Story[Iterable[Tech]]           ("Our techs",          () => interestingTechs.view.filter(With.self.hasTech),                                                                     _.mkString(", ")),
-    new Story[Iterable[Tech]]           ("Enemy techs",        () => interestingTechs.view.filter(t => With.enemies.exists(_.hasTech(t))),                                                _.mkString(", ")),
-    new Story[Iterable[(Upgrade, Int)]] ("Our upgrades",       () => Upgrades.all.view.map(u => (u, With.self.getUpgradeLevel(u))).filter(_._2 > 0),                                      _.map(u => f"${u._1} = ${u._2}").mkString(", ")),
-    new Story[Iterable[(Upgrade, Int)]] ("Enemy upgrades",     () => Upgrades.all.view.map(u => (u, ByOption.max(With.enemies.map(_.getUpgradeLevel(u))).getOrElse(0))).filter(_._2 > 0), _.map(u => f"${u._1} = ${u._2}").mkString(", ")),
+    new Story[Iterable[Tech]]           ("Our techs",          () => interestingTechs.filter(With.self.hasTech),                                                                      _.map(_.toString).mkString(", ")),
+    new Story[Iterable[Tech]]           ("Enemy techs",        () => interestingTechs.filter(t => With.enemies.exists(_.hasTech(t))),                                                 _.map(_.toString).mkString(", ")),
+    new Story[Iterable[(Upgrade, Int)]] ("Our upgrades",       () => Upgrades.all.map(u => (u, With.self.getUpgradeLevel(u))).filter(_._2 > 0),                                       _.map(u => f"${u._1} = ${u._2}").mkString(", ")),
+    new Story[Iterable[(Upgrade, Int)]] ("Enemy upgrades",     () => Upgrades.all.map(u => (u, ByOption.max(With.enemies.map(_.getUpgradeLevel(u))).getOrElse(0))).filter(_._2 > 0),  _.map(u => f"${u._1} = ${u._2}").mkString(", ")),
     new Story                           ("Our Factories",      () => With.units.countOurs(Terran.Factory)),
     new Story                           ("Our Barracks",       () => With.units.countOurs(Terran.Barracks)),
     new Story                           ("Our Gateways",       () => With.units.countOurs(Protoss.Gateway)),
@@ -74,8 +75,8 @@ class Storyteller {
     new Story                           ("Safe at home",       () => new SafeAtHome().apply.toString),
     new Story                           ("Safe to move out",   () => new SafeToMoveOut().apply.toString),
     new Story                           ("Should attack",      () => With.blackboard.wantToAttack.get.toString),
-    new Story[Iterable[String]]         ("Fingerprints",       () => With.fingerprints.status,                                                                                            _.mkString(" ")),
-    new Story[Iterable[String]]         ("Status",             () => With.blackboard.status.get,                                                                                          _.mkString(", ")),
+    new Story[Iterable[String]]         ("Fingerprints",       () => With.fingerprints.status,                                                                                        _.map(_.toString).mkString(" ")),
+    new Story[Iterable[String]]         ("Status",             () => With.blackboard.status.get,                                                                                      _.map(_.toString).mkString(", ")),
     new Story                           ("Performance danger", () => With.performance.danger),
     new Story                           ("Sluggishness",       () => With.reaction.sluggishness)
   )

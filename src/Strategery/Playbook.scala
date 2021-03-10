@@ -1,5 +1,6 @@
 package Strategery
 
+import Debugging.SimpleString
 import Lifecycle.With
 import Strategery.Selection._
 import Strategery.Strategies.AllRaces.{Sandbox, WorkerRushes}
@@ -9,7 +10,7 @@ import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TvR.TvR1Rax
 import Strategery.Strategies.Zerg._
 
-class Playbook {
+class Playbook extends SimpleString {
   val none: Seq[Strategy] = Seq.empty
   lazy val disabled : Seq[Strategy] = none
   def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy()
@@ -28,7 +29,7 @@ object StrategyGroups {
     PvE15BaseIslandCarrier, // Disabled for Sparkle in TorchUp
     PvE2BaseIslandCarrier, // Disabled for Sparkle in TorchUp
 
-    PvEStormNo, // Let's try storming again with the fixed storm micro
+    //PvEStormNo, // Let's try storming again with the fixed storm micro
     PvT13Nexus, // Good Terran bots are bunker rushing this too effectively
 
     PvTProxy2Gate, // Proxy builds are temporarily broken due to new building placer

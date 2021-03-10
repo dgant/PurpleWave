@@ -224,7 +224,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
         _scarabs              = bwapiUnit.getScarabCount
         _techProducing        = if (_researching) ConvertBWAPI.tech(bwapiUnit.getTech) else None
         _upgradeProducing     = if (_upgrading) ConvertBWAPI.upgrade(bwapiUnit.getUpgrade) else None
-        _trainingQueue        = if (training) (0 to bwapiUnit.getTrainingQueueCount).map(i => UnitClasses.get(bwapiUnit.getTrainingQueueAt(i))) else Seq.empty
+        _trainingQueue        = if (training) (0 until bwapiUnit.getTrainingQueueCount).map(i => UnitClasses.get(bwapiUnit.getTrainingQueueAt(i))) else Seq.empty
         _interceptorCount     = if (unitClass == Protoss.Carrier) bwapiUnit.getInterceptorCount else 0
         _interceptors         = if (_interceptorCount > 0) bwapiUnit.getInterceptors.asScala.flatMap(With.units.get) else Seq.empty // TODO: Slow because JBWAPI checks every unit for every carrier
         _buildType            = UnitClasses.get(bwapiUnit.getBuildType)

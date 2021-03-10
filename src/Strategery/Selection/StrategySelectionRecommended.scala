@@ -7,11 +7,16 @@ class StrategySelectionRecommended(fallback: StrategySelectionPolicy, recommende
 
   var duration = 5
 
+  def this(fallback: StrategySelectionPolicy, duration: Int, recommendedBranch: Strategy*) {
+    this(fallback, recommendedBranch)
+    this.duration = duration
+  }
+
   override def chooseBranch: Seq[Strategy] = {
-    var legalMatchedBranches = With.strategy.strategyBranchesLegal.filter(branch => recommendedBranch.forall(branch.contains))
+    val legalMatchedBranches = With.strategy.strategyBranchesLegal.filter(branch => recommendedBranch.forall(branch.contains))
 
     if (legalMatchedBranches.isEmpty) {
-      With.logger.warn(toString + " failed to find any matching branches filtered by legality")
+      With.logger.warn(f"$this failed to find any branches, filtered by legality, matching ${recommendedBranch.mkString(" + ")}")
       return fallback.chooseBranch
     }
 

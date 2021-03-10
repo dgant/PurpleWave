@@ -11,11 +11,11 @@ object Opponents {
   val defaultPvZ = new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ2Gate910, PvZ4GateGoon, PvZMidgame5GateGoonReaver, PvZLateGameTemplar)
 
   // AIST4
-  val stardust    : Opponent = add("Stardust",    new StrategySelectionRecommended(StrategySelectionGreedy(), PvPRobo1Gate, PvPRobo, PvP3rdBaseSlow, PvEStormYes) { duration = 22 })
-  val bananabrain : Opponent = add("BananaBrain", new StrategySelectionRecommended(StrategySelectionGreedy(), PvPRobo1Gate, PvPRobo, PvP3rdBaseSlow, PvEStormYes) { duration = 22 })
-  val dragon      : Opponent = add("Dragon",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvT24Nexus, PvT3rdFast, PvT3BaseArbiter, PvEStormNo) { duration = 22 })
-  val willyt      : Opponent = add("WillyT",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvT32Nexus, PvT2BaseReaver, PvT3BaseArbiter) { duration = 22 })
-  val steamhammer : Opponent = add("Steamhammer", new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ2Gate1012, PvZ4GateGoon, PvZMidgame5GateGoonReaver, PvZLateGameReaver) { duration = 22 })
+  val stardust    : Opponent = add("Stardust",    new StrategySelectionRecommended(StrategySelectionGreedy(), 22, PvPRobo1Gate, PvPRobo, PvP3rdBaseSlow))
+  val bananabrain : Opponent = add("BananaBrain", new StrategySelectionRecommended(StrategySelectionGreedy(), 22, PvPRobo1Gate, PvPRobo, PvP3rdBaseSlow))
+  val dragon      : Opponent = add("Dragon",      new StrategySelectionRecommended(StrategySelectionGreedy(), 22, PvT24Nexus, PvT3rdObs, PvT3BaseCarrier, PvEStormNo))
+  val willyt      : Opponent = add("WillyT",      new StrategySelectionRecommended(StrategySelectionGreedy(), 22, PvT32Nexus, PvT2BaseReaver, PvT3BaseArbiter))
+  val steamhammer : Opponent = add("Steamhammer", new StrategySelectionRecommended(StrategySelectionGreedy(), 22, PvZ2Gate1012, PvZ4GateGoon, PvZMidgame5GateGoonReaver, PvZLateGameReaver))
 
   // SSCAIT 2020-2021
   val monster     : Opponent = add("Monster",     new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ2Gate1012, PvZ4GateGoon, PvZMidgame5GateGoonReaver, PvZLateGameReaver) { duration = 3 })

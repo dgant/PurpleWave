@@ -1,13 +1,13 @@
 package Strategery.Strategies
 
-import Debugging.ToString
+import Debugging.{SimpleString, ToString}
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.Plan
 import Strategery.{StarCraftMap, StrategyEvaluation, StrategyLegality}
 import bwapi.Race
 
-abstract class Strategy {
+abstract class Strategy extends SimpleString {
   
   override val toString: String = ToString(this)
   

@@ -2,8 +2,7 @@ package Micro.Squads
 
 import Information.Geography.Types.{Base, Edge, Zone}
 import Lifecycle.With
-import Mathematics.Formations.Designers.FormationZone
-import Mathematics.Formations.FormationAssigned
+import Mathematics.Formations.{FormationAssigned, FormationZone}
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Actions.Combat.Targeting.Filters.TargetFilterDefend
@@ -26,9 +25,20 @@ class SquadDefendBase(base: Base) extends Squad {
     if ( ! threat.bases.exists(_.owner.isUs)) {
       val possiblePath = With.paths.zonePath(zone, threat)
       possiblePath.foreach(path => {
-        val stepScores = path.steps.dropRight(1).take(3).indices.map(i => {
+        val stepScores =path.steps.take(4).filter(_.from.centroid.tileDistanceManhattan(With.geography.home) < 48).indices.map(i => {
           val step = path.steps(i)
-          (step, step.edge.radiusPixels * i * (2 + PurpleMath.signum(step.to.centroid.altitude - step.from.centroid.altitude)))
+          val turtlePenalty = if (step.to.units.exists(u => u.isOurs && u.unitClass.isBuilding)) 10 else 1
+          val altitudeValue = if (With.enemies.forall(_.isZerg)) 1 else 2
+          val altitudeDiff = PurpleMath.signum(step.to.centroid.altitude - step.from.centroid.altitude)
+          val altitudeMult = Math.pow(altitudeValue, altitudeDiff)
+          val width = PurpleMath.clamp(step.edge.radiusPixels, 32 * 3, 32 * 16)
+          (step,
+            turtlePenalty,
+            altitudeValue,
+            altitudeDiff,
+            altitudeMult,
+            width,
+            width * turtlePenalty * (2 + i) * altitudeMult)
         })
         val scoreBest = ByOption.minBy(stepScores)(_._2)
         scoreBest.foreach(s => output = (s._1.from, Some(s._1.edge)))
@@ -39,13 +49,12 @@ class SquadDefendBase(base: Base) extends Squad {
   private def zone: Zone = zoneAndChoke()._1
   private def choke: Option[Edge] = zoneAndChoke()._2
 
-
   override def run() {
     if (units.isEmpty) return
 
     lazy val allowWandering = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || enemies.exists(_.unitClass.ranged) || With.blackboard.wantToAttack()
     lazy val canScour = scourables().nonEmpty
-    lazy val canDefendChoke = (units.size > 3 && choke.isDefined) || ! With.enemies.exists(_.isZerg)
+    lazy val canDefendChoke = choke.isDefined && (units.size > 3 || ! With.enemies.exists(_.isZerg))
     lazy val wallExistsButNoneNearChoke = walls().nonEmpty && walls().forall(wall => choke.forall(c => (c.sidePixels :+ c.pixelCenter).forall(wall.pixelDistanceCenter(_) > 8 * 32)))
     lazy val entranceBreached = scourables().exists(e =>
       e.unitClass.attacksGround
@@ -127,7 +136,7 @@ class SquadDefendBase(base: Base) extends Squad {
   }
 
   private def defendChoke() {
-    assignToFormation(new FormationZone(zone, enemies).form(units.toSeq))
+    assignToFormation(new FormationZone(zone, choke.get).form(units.toSeq))
   }
 
   private def assignToFormation(formation: FormationAssigned): Unit = {

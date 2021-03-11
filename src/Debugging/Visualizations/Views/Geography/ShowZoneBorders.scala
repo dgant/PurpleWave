@@ -13,7 +13,7 @@ object ShowZoneBorders extends View {
         DrawMap.box(
           tile.topLeftPixel,
           tile.bottomRightPixel,
-          Colors.BrightGray,
+          Colors.DarkGray,
           solid = false))
 
       zone.border.foreach(tile => {

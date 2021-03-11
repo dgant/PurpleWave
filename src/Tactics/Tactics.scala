@@ -1,5 +1,6 @@
 package Tactics
 
+import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Squads._
@@ -105,6 +106,8 @@ class Tactics extends TimedTask {
   private lazy val baseSquads = With.geography.bases.map(base => (base, new SquadDefendBase(base))).toMap
   private lazy val attackSquad = new SquadAttack
   private lazy val cloakSquad = new SquadCloakedHarass
+
+  private def adjustDefenseBase(base: Base): Base = base.natural.filter(b => b.owner.isUs || b.plannedExpo()).getOrElse(base)
   private def runCoreTactics(): Unit = {
 
     // Sort defense divisions by descending importance
@@ -121,9 +124,9 @@ class Tactics extends TimedTask {
         .toVector
         .sortBy( - _.economicValue())
         .sortBy( ! _.owner.isEnemy)
-        .sortBy( ! _.plannedExpo())
-        .minBy(  ! _.owner.isUs)
-      base.natural.filter(_.owner.isUs).getOrElse(base) // TODO: Base defense logic needs to handle case where OTHER bases need scouring and not concave in just one
+        .sortBy( ! _.owner.isUs)
+        .minBy( ! _.plannedExpo())
+       adjustDefenseBase(base) // TODO: Base defense logic needs to handle case where OTHER bases need scouring and not concave in just one
     })))
 
     // Assign division to each squad
@@ -153,10 +156,7 @@ class Tactics extends TimedTask {
       // If there are no active defense squads, activate one to defend our entrance
       val squadsDefendingOrWaiting: Seq[Squad] =
         if (squadsDefending.nonEmpty) squadsDefending.view.map(_._2)
-        else ByOption.maxBy(With.geography.ourBases)(_.economicValue())
-          .map(b => b.natural.filter(n => n.owner.isUs || n.townHallTile.altitude > b.townHallTile.altitude).getOrElse(b))
-          .map(baseSquads)
-          .toSeq
+        else ByOption.maxBy(With.geography.bases.filter(b => b.owner.isUs || b.plannedExpo()))(_.economicValue()).map(adjustDefenseBase).map(baseSquads).toSeq
       assign(freelancers, squadsDefendingOrWaiting)
     }
   }

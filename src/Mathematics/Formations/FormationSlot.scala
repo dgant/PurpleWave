@@ -6,14 +6,14 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class FormationSlot(unit: FriendlyUnitInfo) {
   val unitClass: UnitClass = unit.unitClass
-  val idealPixels : Double = range(unit)
+  val rangePixels : Double = range(unit)
   
   private def range(unit: FriendlyUnitInfo): Double = {
     if (unit.is(Terran.SiegeTankUnsieged) && unit.player.hasTech(Terran.SiegeMode))
       Terran.SiegeTankSieged.effectiveRangePixels
     else if (unit.is(Terran.Medic))
-      Terran.Marine.effectiveRangePixels - 16
+      Terran.Marine.effectiveRangePixels - 32
     else
-      (unit.loadedUnits.map(_.effectiveRangePixels) ++ Seq(unit.effectiveRangePixels)).max
+      unit.effectiveRangePixels
   }
 }

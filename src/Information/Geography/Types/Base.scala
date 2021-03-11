@@ -21,7 +21,9 @@ class Base(val townHallTile: Tile)
   lazy val  isOurMain       : Boolean           = With.geography.ourMain == this
   lazy val  tiles           : Set[Tile]         = zone.tiles.view.filter(t => t.tileDistanceSlow(heart) < With.geography.baseMaxRadiusTiles && ! zone.bases.view.filter(_.heart != heart).exists(_.heart.groundPixels(t) < heart.groundPixels(t))).toSet
   lazy val  economicValue   : Cache[Double]     = new Cache(() => units.view.filter(_.isAny(MatchBuilding, MatchWorkers)).map(_.subjectiveValue).sum)
-  lazy val  plannedExpo     : Cache[Boolean]    = new Cache(() => With.units.ours.exists(_.agent.toBuildTile.exists(_.base.contains(this))))
+  lazy val  plannedExpo     : Cache[Boolean]    = new Cache(() => owner.isNeutral && (
+    With.units.ours.exists(u => u.agent.toBuildTile.exists(t => t.base.contains(this) && (! townHallArea.contains(t) || u.agent.toBuild.exists(_.isTownHall))))
+    || units.exists(u => u.isOurs && u.unitClass.isBuilding && ! townHallArea.contains(u.tileTopLeft))))
   var       isNaturalOf     : Option[Base]      = None
   var       townHall        : Option[UnitInfo]  = None
   var       units           : Vector[UnitInfo]  = Vector.empty

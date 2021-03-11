@@ -9,19 +9,28 @@ object ShowZoneBorders extends View {
   
   override def renderMap() {
     With.geography.zones.foreach(zone => {
-      zone.border.foreach(tile =>
+      zone.perimeter.foreach(tile =>
         DrawMap.box(
           tile.topLeftPixel,
           tile.bottomRightPixel,
-          zone.owner.colorMedium,
+          Colors.BrightGray,
           solid = false))
-  
-      zone.perimeter.foreach(tile =>
-        DrawMap.circle(
-          tile.pixelCenter,
-          14,
-          zone.owner.colorMedium,
-          solid = false))
+
+      zone.border.foreach(tile => {
+        val color = Colors.White
+        if ( ! tile.up.valid || tile.up.zone != zone) {
+          DrawMap.line(tile.topLeftPixel, tile.topRightPixel, color)
+        }
+        if ( ! tile.down.valid || tile.down.zone != zone) {
+          DrawMap.line(tile.bottomLeftPixel, tile.bottomRightPixel, color)
+        }
+        if ( ! tile.left.valid || tile.left.zone != zone) {
+          DrawMap.line(tile.topLeftPixel, tile.bottomLeftPixel, color)
+        }
+        if ( ! tile.right.valid || tile.right.zone != zone) {
+          DrawMap.line(tile.topRightPixel, tile.bottomRightPixel, color)
+        }
+      })
     })
 
     With.geography.zones.foreach(_.edges.foreach(e => DrawMap.circle(e.pixelCenter, e.radiusPixels.toInt, Colors.MediumTeal)))

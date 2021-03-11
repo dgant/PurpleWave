@@ -10,9 +10,7 @@ import scala.collection.mutable.ArrayBuffer
 
 object Pickup extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.isTransport
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.isTransport
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val passengersPotential = potentialPassengers(unit)
@@ -47,8 +45,7 @@ object Pickup extends Action {
   
   protected def potentialPassengers(unit: FriendlyUnitInfo): Iterable[FriendlyUnitInfo] = {
     unit.squad.map(_.units.filter(passenger =>
-      ! passenger.zone.owner.isEnemy
-      && unit.canTransport(passenger)
+      unit.canTransport(passenger)
       && passenger.matchups.threatsInRange.isEmpty)).getOrElse(Iterable.empty)
   }
 }

@@ -98,7 +98,7 @@ class FormationZone(zone: Zone, enemies: Iterable[UnitInfo]) extends FormationDe
               && ! zone.edges.exists(e => e.radiusPixels < 96 && e.pixelCenter.pixelDistance(tile.pixelCenter) < e.radiusPixels + 32)
               // Stand in an unoccupied tile
               && (flyer || (
-                zone.tileGrid.get(tile)
+                tile.zone == zone
                 && tile.walkableUnchecked
                 && ! occupied.get(tile)
                 && ! With.groundskeeper.isReserved(tile)))) {

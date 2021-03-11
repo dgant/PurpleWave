@@ -9,9 +9,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Transport extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.isTransport
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.isTransport
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     Evacuate.consider(unit)

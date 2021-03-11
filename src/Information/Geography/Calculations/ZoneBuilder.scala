@@ -76,9 +76,9 @@ object ZoneBuilder {
   }
   
   def mapObviousTilesToZones(zones: Iterable[Zone]) {
-    //This will map most -- but not all tiles
+    // This will map most -- but not all -- tiles
     With.geography.allTiles
-      .filterNot(tile => zones.exists(_.contains(tile)))
+      .filterNot(tile => zones.exists(z => z.boundary.contains(tile) && z.tiles.contains(tile)))
       .foreach(assignTile(_, zones))
   }
   

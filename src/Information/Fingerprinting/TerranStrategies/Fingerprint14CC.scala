@@ -8,5 +8,5 @@ import Utilities.GameTime
 class Fingerprint14CC extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.oneRaxFE),
   new FingerprintCompleteBy(Terran.CommandCenter,  GameTime(4, 0), 2)) {
-  override val sticky = true
+  override def sticky: Boolean = With.frame > GameTime(4, 0)()
 }

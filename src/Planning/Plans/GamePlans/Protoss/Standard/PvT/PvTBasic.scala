@@ -13,7 +13,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural, ProposePlacement}
-import Planning.Plans.Scouting.{MonitorBases, ScoutCleared, ScoutOn, ScoutWithWorkers}
+import Planning.Plans.Scouting.{ScoutCleared, ScoutOn, ScoutWithWorkers}
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost}
 import Planning.Predicates.Milestones.{EnemyHasShownWraithCloak, _}
@@ -56,10 +56,10 @@ class PvTBasic extends GameplanTemplate {
     new If(new Employing(PvTDTExpand),          new ScoutOn(Protoss.CyberneticsCore)))
 
   override val attackPlan = new If(
-    new Or(
-      new Not(new Employing(PvTDTExpand, PvT1GateReaver)),
-      new Latch(new UnitsAtLeast(1, MatchOr(Protoss.DarkTemplar, Protoss.Reaver), complete = true)),
-      new UpgradeStarted(Protoss.DragoonRange)),
+    new And(
+      new Or(new Latch(new UnitsAtLeast(4, Protoss.Carrier, complete = true)),      new Not(new Employing(PvT2BaseCarrier)),  new UnitsAtMost(0, Protoss.FleetBeacon)),
+      new Or(new Latch(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true)),  new Not(new Employing(PvTDTExpand)),      new UpgradeStarted(Protoss.DragoonRange)),
+      new Or(new Latch(new UnitsAtLeast(1, Protoss.Reaver, complete = true)),       new Not(new Employing(PvT1GateReaver)),   new UpgradeStarted(Protoss.DragoonRange))),
     new PvTIdeas.AttackSafely)
 
   override def emergencyPlans: Seq[Plan] = Vector(new PvTIdeas.ReactToBBS, new PvTIdeas.ReactToBunkerRush, new PvTIdeas.ReactToWorkerRush)
@@ -445,6 +445,13 @@ class PvTBasic extends GameplanTemplate {
           new PumpReactiveGateways(3, 7)))),
 
     new RequireMiningBases(3),
+
+    // We need this potentially to take a 3rd base but also to protect from cloaked Wraith transition
+    new If(new UnitsAtLeast(4, Protoss.Carrier), new GoObs),
+    // Against mech, ground armies generally need obs
+    new If(
+      new And(new EnemyHasShown(Terran.SpiderMine), new Not(new EmployingCarriers)),
+      new GoObs),
 
     // Get our 3-base tech, but not before 3 bases
     new FlipIf(

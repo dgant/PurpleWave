@@ -72,25 +72,16 @@ class PvPRobo extends GameplanTemplate {
         new Not(new EnemyHasShown(Protoss.DarkTemplar)),
         new UnitsAtLeast(2, Protoss.Observer, complete = true)),
       new Or(
-        new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.gasSteal, With.fingerprints.cannonRush, With.fingerprints.earlyForge),
-        new And(new oneGateCoreLogic.GateGate, new EnemyStrategy(With.fingerprints.oneGateCore), new Not(new EnemyStrategy(With.fingerprints.fourGateGoon))),
-        new EnemyBasesAtLeast(2),
         new And(new EnemyStrategy(With.fingerprints.dtRush), new UnitsAtLeast(2, Protoss.Observer, complete = true)),
+        new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.gasSteal, With.fingerprints.cannonRush, With.fingerprints.earlyForge),
+        new EnemyBasesAtLeast(2),
         new And(
           new EnemyStrategy(With.fingerprints.twoGate),
+          new Not(new EnemyStrategy(With.fingerprints.proxyGateway)),
           new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
           new Or(
-            new EnemyHasShown(Protoss.Gateway), // Don't abandon base vs. proxies
-            new UnitsAtLeast(7, MatchWarriors)),
-          new Or(
             new UpgradeComplete(Protoss.DragoonRange),
-            new Not(new EnemyHasUpgrade(Protoss.DragoonRange)))),
-        new And(
-          new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),
-          new Latch(
-            new And(
-              new UnitsAtLeast(1, Protoss.Shuttle, complete = true),
-              new UnitsAtLeast(2, Protoss.Reaver, complete = true)))))),
+            new Not(new EnemyHasUpgrade(Protoss.DragoonRange)))))),
       new ConsiderAttacking)
 
   override def emergencyPlans: Seq[Plan] = oneGateCoreLogic.emergencyPlans

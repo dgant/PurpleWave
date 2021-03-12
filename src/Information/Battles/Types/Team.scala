@@ -35,7 +35,7 @@ class Team(val units: Vector[UnitInfo]) {
     ByOption.minBy(attackers)(_.pixelDistanceSquared(opponent.centroidAir()))
     .orElse(ByOption.minBy(units)(_.pixelDistanceSquared(opponent.centroidAir())))
     .map(_.pixel)
-    .getOrElse(SpecificPoints.middle))
+    .getOrElse(With.scouting.threatOrigin.pixelCenter))
 
   // Used by MCRS
   private lazy val meanDamageGround = new Cache(() => PurpleMath.nanToZero(PurpleMath.weightedMean(units.map(u => (u.damageOnHitGround  .toDouble,  u.dpfGround)))))

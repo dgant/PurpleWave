@@ -152,7 +152,7 @@ class ZvT2HatchLurker extends GameplanTemplate {
     new BuildOrder(
       Get(Zerg.ZerglingSpeed),
       Get(Zerg.HydraliskDen)),
-    new PumpRatio(Zerg.Drone, 20, 40, Seq(Friendly(MatchHatcherylike, 10.0))),
+    new PumpRatio(Zerg.Drone, 20, 40, Seq(Friendly(MatchHatchlike, 10.0))),
     new Build(Get(Zerg.LurkerMorph)),
     new BuildGasPumps,
     new If(

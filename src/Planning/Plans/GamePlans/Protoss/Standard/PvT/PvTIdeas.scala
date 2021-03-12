@@ -166,7 +166,9 @@ object PvTIdeas {
     new Pump(Protoss.DarkTemplar, 2))
 
   private class TrainObservers extends If(
-    new UnitsAtLeast(24, MatchWarriors),
+    new Or(
+      new UnitsAtLeast(24, MatchWarriors),
+      new EnemyHasShownWraithCloak),
     new Pump(Protoss.Observer, 4),
     new If(
       new UnitsAtLeast(18, MatchWarriors),
@@ -220,8 +222,8 @@ object PvTIdeas {
     new TrainReavers,
     new TrainObservers,
     new TrainMinimumDragoons,
-    new If(new And(new Employing(PvEStormYes), new EnemyStrategy(With.fingerprints.bio), new UnitsAtLeast(5, Protoss.Gateway)), new PumpRatio(Protoss.HighTemplar, 1, 5, Seq(Enemy(Terran.Marine, 1.0/5.0)))),
-    new If(new And(new Employing(PvEStormYes), new UnitsAtLeast(8, Protoss.Carrier)), new Pump(Protoss.HighTemplar, 2)),
+    new If(new And(new EnemyStrategy(With.fingerprints.bio), new UnitsAtLeast(5, Protoss.Gateway), new Employing(PvEStormYes)), new PumpRatio(Protoss.HighTemplar, 1, 5, Seq(Enemy(Terran.Marine, 1.0/5.0)))),
+    new If(new And(new UnitsAtLeast(8, Protoss.Carrier), new Employing(PvEStormYes)), new Pump(Protoss.HighTemplar, 2)),
     new If(
       new EnemyHasTech(Terran.Lockdown),
       new Parallel(

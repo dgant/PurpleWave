@@ -18,6 +18,7 @@ object TargetFilterFrontline extends TargetFilter {
     val valuePixels         = if (target.isAny(MatchSiegeTank, Protoss.Carrier, Protoss.Reaver, Zerg.Lurker)) 32 else 0
     val healingPixels       = if (target.beingHealed) -target.unitClass.dimensionMax else 0
     val bonusPixels         = injuryPixels + valuePixels + healingPixels
+    val kitingPixels        = if (actor.inRangeToAttack(target) || actor.topSpeed >= target.topSpeed || actor.pixelRangeAgainst(target) >= target.effectiveRangePixels) 0 else -32
     PurpleMath.clamp(bonusPixels, freedomPixelsSafety, freedomPixelsTime)
   }
 }

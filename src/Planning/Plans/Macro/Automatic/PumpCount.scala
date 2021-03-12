@@ -12,7 +12,7 @@ object PumpCount {
       if (unitClass == Terran.SiegeTankSieged || unitClass == Terran.SiegeTankUnsieged) {
         MatchSiegeTank
       } else if (unitClass == Zerg.Hatchery) {
-        MatchHatcherylike
+        MatchHatchlike
       } else if (unitClass == Zerg.Lair) {
         MatchLairlike
       } else if (unitClass == Zerg.Spire) {

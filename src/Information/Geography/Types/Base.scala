@@ -9,6 +9,7 @@ import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.EnrichPixel._
+import Utilities.{Forever, Minutes}
 
 import scala.collection.mutable
 
@@ -113,9 +114,11 @@ class Base(val townHallTile: Tile)
   
   var mineralsLeft              = 0
   var gasLeft                   = 0
+  var lastPlannedExpo           = - Forever()
   var lastScoutedFrame          = 0
   var lastScoutedByEnemyFrame   = 0
-  
+
+  def plannedExpoRecently = plannedExpo() || With.framesSince(lastPlannedExpo) < Minutes(1)()
   def scouted: Boolean = lastScoutedFrame > 0
   def scoutedByEnemy: Boolean = lastScoutedFrame > 0
   def resources: Vector[UnitInfo] = minerals ++ gas

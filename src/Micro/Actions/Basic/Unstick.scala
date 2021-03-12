@@ -2,6 +2,7 @@ package Micro.Actions.Basic
 
 import Micro.Actions.Action
 import Micro.Agency.Commander
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Unstick extends Action {
@@ -11,6 +12,7 @@ object Unstick extends Action {
     && ! unit.flying
     && ! unit.loaded
     && ! unit.unitClass.floats
+    && ! Protoss.Reaver(unit)
     && unit.canAttack
     && unit.seeminglyStuck
 

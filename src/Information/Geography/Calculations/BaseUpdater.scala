@@ -15,7 +15,17 @@ object BaseUpdater {
     if (With.grids.enemyVision.isSet(base.townHallTile)) {
       base.lastScoutedByEnemyFrame = With.frame
     }
-    updateAssets(base)
+
+    base.units            = base.zone.units.filter(u => u.base.contains(base) && u.likelyStillThere).toVector
+    base.townHall         = ByOption.minBy(base.units.view.filter(u => u.unitClass.isTownHall && ! u.flying))(_.tileTopLeft.tileDistanceManhattan(base.townHallTile))
+    base.minerals         = base.units.filter(u => u.mineralsLeft > 0 && ! u.isBlocker)
+    base.gas              = base.units.filter(_.unitClass.isGas)
+    base.workerCount      = base.units.count(u => u.player == base.owner && u.is(MatchWorkers))
+    base.defenseValue     = base.units.iterator.map(u => if (u.player == base.owner && ! u.unitClass.isWorker && (u.canAttack || u.unitClass.spells.nonEmpty)) u.subjectiveValue else 0).sum
+    base.mineralsLeft     = base.minerals.iterator.map(_.mineralsLeft).sum
+    base.gasLeft          = base.gas.iterator.map(_.gasLeft).sum
+    base.lastPlannedExpo  = if (base.plannedExpo()) With.frame else base.lastPlannedExpo
+
     updateOwner(base)
   }
   
@@ -42,16 +52,5 @@ object BaseUpdater {
     if (base.owner.isNeutral && ! base.scouted) {
       base.natural.filter(_.owner.isEnemy).foreach(natural => base.owner = natural.owner)
     }
-  }
-  
-  private def updateAssets(base: Base) {
-    base.units          = base.zone.units.filter(u => u.base.contains(base) && u.likelyStillThere).toVector
-    base.townHall       = ByOption.minBy(base.units.view.filter(u => u.unitClass.isTownHall && ! u.flying))(_.tileTopLeft.tileDistanceManhattan(base.townHallTile))
-    base.minerals       = base.units.filter(u => u.mineralsLeft > 0 && ! u.isBlocker)
-    base.gas            = base.units.filter(_.unitClass.isGas)
-    base.workerCount    = base.units.count(u => u.player == base.owner && u.is(MatchWorkers))
-    base.defenseValue   = base.units.iterator.map(u => if (u.player == base.owner && ! u.unitClass.isWorker && (u.canAttack || u.unitClass.spells.nonEmpty)) u.subjectiveValue else 0).sum
-    base.mineralsLeft   = base.minerals.iterator.map(_.mineralsLeft).sum
-    base.gasLeft        = base.gas.iterator.map(_.gasLeft).sum
   }
 }

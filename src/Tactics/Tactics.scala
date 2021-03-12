@@ -12,10 +12,10 @@ import Planning.Plans.Scouting.{DoScoutWithWorkers, MonitorBases, ScoutExpansion
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Milestones.{EnemiesAtMost, EnemyHasShownWraithCloak, UnitsAtLeast}
 import Planning.Predicates.Strategy.EnemyIsTerran
-import Planning.UnitMatchers.MatchRecruitableForCombat
-import ProxyBwapi.Races.{Protoss, Terran}
+import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchHatchlike, MatchRecruitableForCombat}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.ByOption
+import Utilities.{ByOption, Minutes}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -40,11 +40,10 @@ class Tactics extends TimedTask {
     new And(
       new EnemyIsTerran,
       new EnemiesAtMost(7, Terran.Factory),
+      new Not(new EnemyHasShownWraithCloak),
       new Or(
-        new UnitsAtLeast(2, Protoss.Observer, complete = true),
-        new And(
-          new Not(new EnemyHasShownWraithCloak),
-          new Not(new PvTIdeas.EnemyHasMines)))),
+        new UnitsAtLeast(3, Protoss.Observer, complete = true),
+        new Not(new PvTIdeas.EnemyHasMines))),
     new MonitorBases(Protoss.Observer))
 
   override protected def onRun(budgetMs: Long): Unit = {
@@ -85,19 +84,15 @@ class Tactics extends TimedTask {
       freelancers: mutable.Buffer[FriendlyUnitInfo],
       squads: Seq[Squad],
       minimumValue: Double = Double.NegativeInfinity,
-      freelancerFilter: FriendlyUnitInfo => Boolean = u => true): Unit = {
+      filter: (FriendlyUnitInfo, Squad) => Boolean = (f, s) => true): Unit = {
     var i = 0
     while (i < freelancers.length) {
       val freelancer = freelancers(i)
-      if (freelancerFilter(freelancer)) {
-        val squadsEligible = squads.filter(_.candidateValue(freelancer) > minimumValue)
-        val bestSquad = ByOption.minBy(squadsEligible)(squad => freelancer.pixelDistanceTravelling(squad.vicinity))
-        if (bestSquad.isDefined) {
-          bestSquad.get.addUnit(freelancers.remove(i))
-          With.recruiter.lockTo(bestSquad.get.lock, freelancer)
-        } else {
-          i += 1
-        }
+      val squadsEligible = squads.filter(squad => filter(freelancer, squad) && squad.candidateValue(freelancer) > minimumValue)
+      val bestSquad = ByOption.minBy(squadsEligible)(squad => freelancer.pixelDistanceTravelling(squad.vicinity))
+      if (bestSquad.isDefined) {
+        bestSquad.get.addUnit(freelancers.remove(i))
+        With.recruiter.lockTo(bestSquad.get.lock, freelancer)
       } else {
         i += 1
       }
@@ -107,11 +102,11 @@ class Tactics extends TimedTask {
   private lazy val attackSquad = new SquadAttack
   private lazy val cloakSquad = new SquadCloakedHarass
 
-  private def adjustDefenseBase(base: Base): Base = base.natural.filter(b => b.owner.isUs || b.plannedExpo()).getOrElse(base)
+  private def adjustDefenseBase(base: Base): Base = base.natural.filter(b => b.owner.isUs || b.plannedExpoRecently).getOrElse(base)
   private def runCoreTactics(): Unit = {
 
     // Sort defense divisions by descending importance
-    var divisionsDefending = With.battles.divisions.filter(_.bases.exists(b => b.owner.isUs || b.plannedExpo()))
+    var divisionsDefending = With.battles.divisions.filter(_.bases.exists(b => b.owner.isUs || b.plannedExpoRecently))
     divisionsDefending = divisionsDefending
       .filterNot(d =>
         // TODO: Old checks which we should probably generalize better
@@ -125,7 +120,7 @@ class Tactics extends TimedTask {
         .sortBy( - _.economicValue())
         .sortBy( ! _.owner.isEnemy)
         .sortBy( ! _.owner.isUs)
-        .minBy( ! _.plannedExpo())
+        .minBy( ! _.plannedExpoRecently)
        adjustDefenseBase(base) // TODO: Base defense logic needs to handle case where OTHER bases need scouring and not concave in just one
     })))
 
@@ -137,6 +132,7 @@ class Tactics extends TimedTask {
     val freelancers = (new ListBuffer[FriendlyUnitInfo] ++ With.recruiter.available.view.filter(MatchRecruitableForCombat))
       .sortBy(_.frameDiscovered) // Assign new units first, as they're most likely to be able to help on defense and least likely to have to abandon a push
       .sortBy(_.unitClass.isTransport) // So transports can go to squads which need them
+    val freelancerCountInitial = freelancers.size
     def freelancerValue = freelancers.view.map(_.subjectiveValue).sum
     val freelancerValueInitial = freelancerValue
 
@@ -144,7 +140,16 @@ class Tactics extends TimedTask {
     assign(freelancers, squadsDefending.view.map(_._2), 1.0)
 
     // Always attack with Dark Templar
-    assign(freelancers, Seq(cloakSquad), freelancerFilter = Protoss.DarkTemplar)
+    assign(freelancers, Seq(cloakSquad), filter = (f, s) => Protoss.DarkTemplar(f))
+
+    // Proactive drop/harassment defense
+    if ((With.geography.ourBases.size > 2 && With.frame > Minutes(10)()) || With.unitsShown.any(Terran.Dropship)) {
+      val dropVulnerableBases = With.geography.ourBases.filter(b =>
+        b.workerCount > 5
+        && ! divisionsDefending.exists(_.bases.contains(b)) // If it was in a defense division, it should have received some defenders already
+        && (b.units.view ++ b.isNaturalOf.map(_.units).getOrElse(Iterable.empty)).count(_.isAny(MatchAnd(MatchComplete, Terran.Factory, Terran.Barracks, Protoss.Gateway, MatchHatchlike, Protoss.PhotonCannon, Terran.Bunker, Zerg.SunkenColony))) < 3)
+      assign(freelancers, dropVulnerableBases.map(baseSquads), filter = (f, s) => f.isAny(Terran.Marine, Terran.Firebat, Terran.Vulture, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk) && s.unitsNext.size < Math.min(3, freelancerCountInitial / 10))
+    }
 
     catchDTRunby.recruit()
 
@@ -156,7 +161,7 @@ class Tactics extends TimedTask {
       // If there are no active defense squads, activate one to defend our entrance
       val squadsDefendingOrWaiting: Seq[Squad] =
         if (squadsDefending.nonEmpty) squadsDefending.view.map(_._2)
-        else ByOption.maxBy(With.geography.bases.filter(b => b.owner.isUs || b.plannedExpo()))(_.economicValue()).map(adjustDefenseBase).map(baseSquads).toSeq
+        else ByOption.maxBy(With.geography.bases.filter(b => b.owner.isUs || b.plannedExpoRecently))(_.economicValue()).map(adjustDefenseBase).map(baseSquads).toSeq
       assign(freelancers, squadsDefendingOrWaiting)
     }
   }

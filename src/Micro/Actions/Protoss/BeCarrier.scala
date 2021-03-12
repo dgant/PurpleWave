@@ -2,6 +2,7 @@ package Micro.Actions.Protoss
 
 import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Protoss.Carrier._
 import Micro.Agency.Commander
@@ -34,7 +35,7 @@ object BeCarrier extends Action {
       if ( ! threat.canMove) return true
       
       // We can't always run from faster flying units
-      if (threat.flying && threat.topSpeed >= unit.topSpeed)  return false
+      if (threat.flying && threat.topSpeed >= unit.topSpeed) return false
       
       // We can't kite Goliaths, but we should only take shots from them when launching interceptors
       // and if we can afford to take some damage
@@ -82,9 +83,8 @@ object BeCarrier extends Action {
         Commander.attack(unit)
       }
       Commander.attackMove(unit)
-    }
-    else {
-      CarrierRetreat.consider(unit)
+    } else {
+      Retreat.consider(unit)
     }
   }
 }

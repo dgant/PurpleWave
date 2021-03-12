@@ -34,7 +34,7 @@ object ReloadScarabs extends Action {
     if (needRefill && canRefill) {
       if (unit.transport.isDefined) {
         RequestSafeLanding().consider(unit)
-      } else {
+      } else if (unit.remainingTrainFrames <= Math.max(With.reaction.agencyMax, With.latency.framesRemaining)) {
         Commander.buildScarab(unit)
       }
     }

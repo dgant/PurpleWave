@@ -11,7 +11,7 @@ import Micro.Actions.Combat.Tactics.Brawl
 import Micro.Actions.Combat.Targeting.Filters.{TargetFilterPotshot, TargetFilterVisibleInRange}
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Commands.Move
-import Micro.Agency.Commander
+import Micro.Agency.{AnchorMargin, Commander}
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.TrafficPriorities
 import Micro.Heuristics.Potential
@@ -36,7 +36,7 @@ object DefaultCombat extends Action {
   private object Regroup    extends Technique(Dodge, Excuse, Abuse) // Get into ideal position for future fight
   private object Fallback   extends Technique(Dodge, Regroup) // Get out of fight while landing shots
   private object Flee       extends Technique(Dodge, Abuse, Fallback, Regroup) // Get out of fight
-  private object Fight      extends Technique(Dodge, Excuse, Regroup, Abuse, Dance) // Pick fight ASAP
+  private object Fight      extends Technique(Dodge, Excuse, Regroup, Abuse, Dance, Flee) // Pick fight ASAP
 
   def potshot(unit: FriendlyUnitInfo): Boolean = {
     if (unit.unready) return false
@@ -103,7 +103,7 @@ object DefaultCombat extends Action {
     lazy val obiwanned          = ! unit.flying && ! target.flying && ! unit.unitClass.melee && target.altitude > unit.altitude
     lazy val chaseDistance      = rangeAgainstUs.filter(_ < range).map(r => Math.max(24, (range - r) / 2)).getOrElse(0d)
 
-    if ( ! target.canMove) {
+    if ( ! target.canMove && ! target.canAttack(unit)) {
       return if (inChoke && nudgedTowards) 0 else range
     }
 
@@ -161,7 +161,12 @@ object DefaultCombat extends Action {
     // Choose technique //
     //////////////////////
 
-    var technique: Technique = if (unit.agent.shouldEngage) Fight else Flee
+    // Evaluate potential attacks -- lazily, because targeting is expensive
+    lazy val target = Target.choose(unit)
+
+    var technique: Technique =
+      if (unit.agent.shouldEngage && (unit.agent.withinSafetyMargin || ! unit.matchups.anchor.exists(a => a.pixelDistanceEdge(unit) > a.effectiveRangePixels + AnchorMargin()) && target.isDefined))
+        Fight else Flee
 
     def transition(newTechnique: Technique, predicate: () => Boolean = () => true, action: () => Unit = () => {}): Unit = {
       if (unit.ready && technique.canTransition(newTechnique) && predicate()) {
@@ -177,16 +182,13 @@ object DefaultCombat extends Action {
     transition(Aim, () => !unit.canMove || purring, () => aim(unit))
 
     lazy val opponentBlocksGoal = unit.battle.exists(b => b.enemy.zones.contains(unit.agent.destination.zone) || b.teams.minBy(_.centroidAir().pixelDistanceSquared(unit.agent.destination)).enemy)
-    transition(Regroup, () => !unit.agent.shouldEngage && opponentBlocksGoal && unit.agent.withinSafetyMargin)
+    transition(Regroup, () => ! unit.agent.shouldEngage && opponentBlocksGoal && unit.agent.withinSafetyMargin)
     transition(Regroup, () => unit.agent.shouldEngage && opponentBlocksGoal && unit.team.exists(team =>
-      !team.engaged()
-        && unit.confidence() + team.coherence() + team.impatience() / Seconds(35)() < 1))
+      ! team.engaged() && unit.confidence() + team.coherence() + team.impatience() / Seconds(35)() < 1))
 
-    // Evaluate potential attacks -- lazily, because targeting is expensive
-    lazy val target = Target.choose(unit)
     lazy val targetAbusable = target.exists(target => ! target.canAttack(unit) || (unit.topSpeed > target.topSpeed && unit.pixelRangeAgainst(target) > target.pixelRangeAgainst(unit)))
     lazy val canKite = target
-      .map(unit.framesToGetInRange(_) + unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate)
+      .map(unit.framesToGetInRange(_) + unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate + 8) // The flat margin at an edge is a fudge to prevent needlessly brave pokes
       .exists(f => unit.matchups.threats.forall(_.pixelsToGetInRange(unit) > f))
     transition(Abuse, () => unit.unitClass.abuseAllowed && targetAbusable && canKite)
 

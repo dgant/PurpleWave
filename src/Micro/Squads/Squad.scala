@@ -39,6 +39,7 @@ trait Squad extends Prioritized {
   }
 
   def units: Iterable[FriendlyUnitInfo] = _unitsNow
+  def unitsNext: Iterable[FriendlyUnitInfo] = _unitsNext
   @inline final def addUnits(units: Iterable[FriendlyUnitInfo]): Unit = units.foreach(addUnit)
   @inline final def addUnit(unit: FriendlyUnitInfo): Unit = {
     commission()

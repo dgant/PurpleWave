@@ -6,7 +6,7 @@ import Mathematics.PurpleMath
 import Micro.Actions.Scouting.BlockConstruction
 import Micro.Heuristics.MicroValue
 import Performance.Cache
-import Planning.UnitMatchers.{MatchSiegeTank, MatchWorkers}
+import Planning.UnitMatchers.MatchSiegeTank
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
@@ -34,8 +34,8 @@ case class MatchupAnalysis(me: UnitInfo) {
   def threatsInRange          : Seq[UnitInfo] = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me))
   def threatsInFrames(f: Int) : Seq[UnitInfo] = threats.filter(_.framesToGetInRange(me) < f)
   def targetsInRange          : Seq[UnitInfo] = targets.filter(target => target.visible && me.pixelRangeAgainst(target) >= target.pixelDistanceEdge(me) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
-  def anchors            : Iterable[UnitInfo] = me.friendly.map(_.alliesSquad).getOrElse(allies).filter(anchors(_, me))
-  lazy val anchor                     : Option[UnitInfo]  = ByOption.minBy(anchors)(_.pixelDistanceSquared(me))
+  lazy val anchor                     : Option[UnitInfo]  = ByOption.minBy(anchors.filter(_.unitClass.subjectiveValue == anchors.view.map(_.unitClass.subjectiveValue).max))(_.pixelDistanceSquared(me))
+  lazy val anchors                    : Vector[UnitInfo]  = me.friendly.map(_.alliesSquad).getOrElse(allies).filter(doesAnchor(_, me)).toVector
   lazy val arbiterCovering            : Cache[Boolean]    = new Cache(() => allies.exists(a => Protoss.Arbiter(a) && a.pixelDistanceEdge(me) < 160))
   lazy val allyTemplarCount           : Int               = allies.count(Protoss.HighTemplar)
   lazy val busyForCatching            : Boolean           = me.unitClass.isWorker && (me.gathering || me.constructing || me.repairing || BlockConstruction.constructionOrders.contains(me.order))
@@ -86,15 +86,18 @@ case class MatchupAnalysis(me: UnitInfo) {
     output
   }
 
-  def anchors(anchor: UnitInfo, support: UnitInfo): Boolean = {
+  private def doesAnchor(anchor: UnitInfo, support: UnitInfo): Boolean = {
     var output = false
-    output ||= anchor.isAny(MatchSiegeTank, Terran.Battlecruiser) && ! support.isAny(MatchSiegeTank, Terran.Battlecruiser)
-    output ||= anchor.isAny(Terran.Medic) && support.isAny(Terran.Marine, Terran.Firebat)
-    output ||= anchor.isAny(Protoss.Carrier) && ! support.isAny(Protoss.Carrier, Protoss.Arbiter)
-    output ||= anchor.isAny(Protoss.Carrier, Protoss.Arbiter, Protoss.Reaver) && support.isAny(Protoss.Zealot, Protoss.Dragoon, Protoss.Archon)
-    output ||= anchor.isAny(Protoss.Dragoon, Protoss.Archon) && support.isAny(Protoss.Zealot)
-    output ||= anchor.isAny(Zerg.Lurker, Zerg.Defiler, Zerg.Ultralisk, Zerg.Guardian) && support.isAny(Zerg.Zergling, Zerg.Hydralisk)
-    output ||= anchor.isAny(Terran.MissileTurret, Protoss.PhotonCannon, Zerg.SporeColony, Zerg.SunkenColony) && support.isAny(Terran.Marine, Terran.Goliath)
+    output ||= anchor.unitClass.isBuilding && anchor.unitClass.canAttack      && support.isAny(Terran.Marine, Terran.Goliath)
+    output ||= anchor.isAny(MatchSiegeTank, Terran.Battlecruiser)             && ! support.isAny(MatchSiegeTank, Terran.Battlecruiser)
+    output ||= anchor.isAny(Terran.Medic)                                     && support.isAny(Terran.Marine, Terran.Firebat)
+    output ||= anchor.isAny(Protoss.Carrier)                                  && ! support.isAny(Protoss.Carrier)
+    output ||= anchor.isAny(Protoss.Arbiter, Protoss.Reaver)                  && support.isAny(Protoss.Zealot, Protoss.Dragoon, Protoss.Archon, Protoss.HighTemplar, Protoss.Corsair)
+    output ||= anchor.isAny(Protoss.HighTemplar) && anchor.energy > 65        && support.isAny(Protoss.Zealot, Protoss.Dragoon, Protoss.Archon)
+    output ||= anchor.isAny(Protoss.Dragoon, Protoss.Archon)                  && support.isAny(Protoss.Zealot)
+    output ||= anchor.isAny(Zerg.Lurker, Zerg.Ultralisk)                      && support.isAny(Zerg.Zergling, Zerg.Hydralisk)
+    output ||= anchor.isAny(Zerg.Guardian)                                    && ! support.isAny(Zerg.Guardian)
+    output ||= anchor.isAny(Zerg.Mutalisk, Zerg.Devourer)                     && ! support.isAny(Zerg.Scourge)
     output
   }
 }

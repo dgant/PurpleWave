@@ -20,7 +20,7 @@ object Spot extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     val from = unit.matchups.anchor.map(_.pixel).orElse(unit.team.map(_.centroidAir())).getOrElse(unit.agent.origin)
-    val toSpotEnemy = best(from, unit, unit.alliesSquad).orElse(best(from, unit, unit.alliesBattle))
+    val toSpotEnemy = best(from, unit, unit.enemiesSquad).orElse(best(from, unit, unit.enemiesBattle))
     val toSpot = toSpotEnemy.map(_.pixel).getOrElse(With.scouting.threatOrigin.pixelCenter)
     unit.agent.toTravel = Some(toSpot)
     Commander.move(unit)

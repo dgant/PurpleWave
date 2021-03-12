@@ -43,4 +43,6 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Production {
     upgraders.acquire(this)
     upgraders.units.foreach(_.agent.intend(this, new Intention { toUpgrade = Some(upgrade) }))
   }
+
+  override val toString: String = f"Research $upgrade"
 }

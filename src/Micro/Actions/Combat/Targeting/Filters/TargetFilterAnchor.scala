@@ -18,4 +18,3 @@ object TargetFilterAnchor extends TargetFilter {
     output
   }
 }
-atu

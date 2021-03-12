@@ -77,7 +77,10 @@ object JudgmentModifiers {
       && unit.zone.edges.exists(edge =>
         edge.contains(unit.pixel)
         && edge.radiusPixels < battleLocal.enemy.widthIdeal() / 4d))
-    if (choked) Some(JudgmentModifier(speedMultiplier = 1.2)) else None
+
+    None
+    // TODO: This is proccing in bad situations like an enemy containing our natural from outside, but some of their units are in the choke AFTER that so not of salience to the battle
+    // if (choked) Some(JudgmentModifier(speedMultiplier = 1.2)) else None
   }
 
   // Prefer fighting

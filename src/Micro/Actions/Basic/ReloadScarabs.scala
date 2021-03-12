@@ -1,6 +1,7 @@
 package Micro.Actions.Basic
 
 import Lifecycle.With
+import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Transportation.RequestSafeLanding
 import Micro.Agency.Commander
@@ -32,9 +33,9 @@ object ReloadScarabs extends Action {
     val canRefill = unit.transport.isEmpty || unit.matchups.framesOfSafety > 24 + With.reaction.agencyMax
 
     if (needRefill && canRefill) {
-      if (unit.transport.isDefined) {
+      if (unit.transport.exists(_.pixelDistanceCenter(unit) < 72)) {
         RequestSafeLanding().consider(unit)
-      } else if (unit.remainingTrainFrames <= Math.max(With.reaction.agencyMax, With.latency.framesRemaining)) {
+      } else if (unit.bwapiUnit.getTrainingQueueCount <= PurpleMath.fromBoolean(unit.remainingTrainFrames <= Math.max(With.reaction.agencyMax, With.latency.framesRemaining))) {
         Commander.buildScarab(unit)
       }
     }

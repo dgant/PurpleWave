@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views.Planning
 import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
-import Planning.UnitMatchers.MatchWorkers
+import Planning.UnitMatchers.MatchWorker
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -46,7 +46,7 @@ object ShowResources extends View {
           
     var lineLast = Iterable("not happenin")
     val output = new ArrayBuffer[Iterable[String]]()
-    output += Vector("Copies", "M", "G", "S", "", "Workers:", With.units.countOurs(MatchWorkers).toString)
+    output += Vector("Copies", "M", "G", "S", "", "Workers:", With.units.countOurs(MatchWorker).toString)
     rawText.foreach(lineNext => {
       var lineFinal = lineNext
       if (lineFinal.drop(dropColumns) == lineLast.drop(dropColumns)) {

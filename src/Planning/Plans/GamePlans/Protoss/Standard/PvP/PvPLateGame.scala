@@ -14,7 +14,7 @@ import Planning.Predicates.Compound._
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBasesAtMost, SafeAtHome, SafeToMoveOut}
 import Planning.Predicates.Strategy.{Employing, EnemyRecentStrategy, EnemyStrategy}
-import Planning.UnitMatchers.{MatchOr, MatchWarriors, MatchWorkers}
+import Planning.UnitMatchers.{MatchOr, MatchWarriors, MatchWorker}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP3rdBaseFast
 
@@ -96,7 +96,7 @@ class PvPLateGame extends GameplanTemplate {
           Get(Protoss.RoboticsSupportBay),
           Get(Protoss.ShuttleSpeed))),
       new BuildGasPumpsIfBelow(200),
-      new Build(Get(7, Protoss.Gateway)),
+      new Build(Get(6, Protoss.Gateway)),
       new BuildGasPumps))
 
   class AddLateTech extends Parallel(
@@ -197,7 +197,7 @@ class PvPLateGame extends GameplanTemplate {
     new GetReactiveObservers,
 
     // Expansions
-    new If(new And(new MiningBasesAtLeast(2), new UnitsAtLeast(39, MatchWorkers), new Check(() => With.blackboard.wantToAttack() && With.blackboard.safeToMoveOut())), new PylonBlock),
+    new If(new And(new MiningBasesAtLeast(2), new UnitsAtLeast(39, MatchWorker), new Check(() => With.blackboard.wantToAttack() && With.blackboard.safeToMoveOut())), new PylonBlock),
     new RequireMiningBases(2),
     new If(new And(new ReadyForThirdIfSafe, new SafeForThird), new RequireBases(3)),
     new Trigger(

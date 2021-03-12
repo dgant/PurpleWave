@@ -14,7 +14,7 @@ object Opponents {
   // AIST4
   val stardust    : Opponent = add("Stardust",    if (Medusa.matches) StrategySelectionFixed(PvP3GateGoon, PvP3rdBaseSlow) else StrategySelectionFixed(PvPRobo1Gate, PvPRobo, PvP3rdBaseSlow))
   val bananabrain : Opponent = add("BananaBrain", if (Medusa.matches) StrategySelectionFixed(PvP3GateGoon, PvP3rdBaseSlow) else StrategySelectionFixed(PvPRobo1Gate, PvPRobo, PvP3rdBaseSlow))
-  val dragon      : Opponent = add("Dragon",      new StrategySelectionRecommended(StrategySelectionGreedy(), 22, PvT24Nexus, PvT3rdObs, PvT3BaseCarrier, PvEStormNo))
+  val dragon      : Opponent = add("Dragon",      new StrategySelectionRecommended(StrategySelectionGreedy(), 22, PvT24Nexus, PvT3rdObs, PvT3BaseGateway, PvEStormNo))
   val willyt      : Opponent = add("WillyT",      new StrategySelectionRecommended(StrategySelectionGreedy(), 22, PvT32Nexus, PvT2BaseReaver, PvT3BaseArbiter))
   val steamhammer : Opponent = add("Steamhammer", new StrategySelectionRecommended(StrategySelectionGreedy(), 22, PvZ2Gate1012, PvZ4GateGoon, PvZMidgame5GateGoonReaver, PvZLateGameReaver))
 

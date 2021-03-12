@@ -56,6 +56,10 @@ object Commander {
     unit.agent.tryingToMove = unit.pixelsToGetInRange(target) > tryingToMoveThreshold
     if (unit.unready) return
 
+    if (Protoss.Reaver(unit)) {
+      With.coordinator.pushes.put(new UnitLinearGroundPush(TrafficPriorities.Bump, unit, target.pixel))
+    }
+
     // Drop out of transport
     val dropship = unit.transport.find(_.isAny(Terran.Dropship, Protoss.Shuttle, Zerg.Overlord))
     val delay = unit.cooldownMaxAirGround

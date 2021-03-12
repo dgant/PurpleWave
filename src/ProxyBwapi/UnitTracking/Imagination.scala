@@ -95,9 +95,8 @@ object Imagination {
       return
     }
 
-    // If we haven't seen a unit in a long time, treat it as missing,
-    // which indicates distrust of its predicted location
-    if (With.framesSince(unit.lastSeen) > Seconds(60)() && ! unit.base.exists(_.owner == unit.player)) {
+    // Invalidate long-absent units in the middle of the map
+    if (With.framesSince(unit.lastSeen) > Seconds(60)() && ! unit.base.exists(_.owner.isPlayer)) {
       unit.changeVisibility(Visibility.InvisibleMissing)
       return
     }
@@ -126,7 +125,7 @@ object Imagination {
         .map(unit.tile.add)
         .filter(tile =>
           tile.valid
-          && (unit.flying || tile.walkableUnchecked)
+          && tile.traversableBy(unit)
           && ! tile.visibleBwapi
           && tile.tileDistanceSquared(tileLastSeen) <= maxTilesAwaySquared
         ))(_.pixelCenter.pixelDistanceSquared(unit.projectFrames(8))))

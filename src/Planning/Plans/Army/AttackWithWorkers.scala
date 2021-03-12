@@ -7,7 +7,7 @@ import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.{CountEverything, UnitCounter}
-import Planning.UnitMatchers.MatchWorkers
+import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable
@@ -15,7 +15,7 @@ import scala.collection.mutable
 class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
   
   val fighters = new LockUnits(this)
-  fighters.matcher = MatchWorkers
+  fighters.matcher = MatchWorker
   fighters.counter = counter
   fighters.interruptable = false
   

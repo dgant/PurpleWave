@@ -7,7 +7,7 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
-import Planning.UnitMatchers.{MatchBuilding, MatchWorkers}
+import Planning.UnitMatchers.{MatchBuilding, MatchWorker}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Strategery.Strategies.AllRaces.{WorkersKill, WorkersRaze, WorkersSpread, WorkersUnite}
@@ -95,7 +95,7 @@ object Tickle extends Action {
     }
 
     // Wait for re-enforcements
-    val workersTotal  = With.units.countOurs(MatchWorkers)
+    val workersTotal  = With.units.countOurs(MatchWorker)
     val workersHere   = With.units.countOursP(u => u.unitClass.isWorker && u.zone == zone)
     if (workersHere * 2 < workersTotal  // Tomorrow, there'll be more of us.
       && enemies.size > 4) {            // Verus 4-Pool need to start dealing damage immediately
@@ -119,7 +119,7 @@ object Tickle extends Action {
     }
 
     // Lastly, if they've started training combat units, we are ALL IN
-    if ( ! enemies.forall(MatchWorkers)) {
+    if ( ! enemies.forall(MatchWorker)) {
       attack = true
     }
 

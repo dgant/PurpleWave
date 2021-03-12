@@ -26,7 +26,7 @@ class ScoutExpansions extends DoScout {
   val matcher: UnitMatcher = MatchAnd(
     MatchRecruitableForCombat,
     MatchNot(_.topSpeed < Protoss.Zealot.topSpeed),
-    MatchNot(MatchWorkers),
+    MatchNot(MatchWorker),
     MatchNot(Terran.Battlecruiser),
     MatchNot(Terran.Medic),
     MatchNot(Terran.Dropship),

@@ -97,7 +97,6 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def subjectiveValue: Double = subjectiveValueCache()
   private val subjectiveValueCache = new Cache(() =>
     unitClass.subjectiveValue
-      + scarabs * Protoss.Scarab.subjectiveValue
       + (if (is(Protoss.Carrier)) friendly.map(_.interceptorCount).getOrElse(8) * Protoss.Interceptor.subjectiveValue else 0)
       + (if (unitClass.isTransport) friendly.map(_.loadedUnits.map(_.subjectiveValue).sum).sum else 0))
 

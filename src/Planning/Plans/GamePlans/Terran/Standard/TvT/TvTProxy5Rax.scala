@@ -15,7 +15,7 @@ import Planning.Predicates.Compound.Not
 import Planning.Predicates.Milestones.FoundEnemyBase
 import Planning.Predicates.Strategy.{Employing, StartPositionsAtLeast}
 import Planning.UnitCounters.CountExcept
-import Planning.UnitMatchers.MatchWorkers
+import Planning.UnitMatchers.MatchWorker
 import Planning.{Plan, Predicate, ProxyPlanner}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvTProxy5Rax
@@ -44,7 +44,7 @@ class TvTProxy5Rax extends GameplanTemplate {
   override def aggressionPlan = new Aggression(1.5)
   override def workerPlan: Plan = NoPlan()
   override def supplyPlan: Plan = NoPlan()
-  override def attackPlan: Plan = new Parallel(new Attack, new AttackWithWorkers(new CountExcept(3, MatchWorkers)))
+  override def attackPlan: Plan = new Parallel(new Attack, new AttackWithWorkers(new CountExcept(3, MatchWorker)))
 
   override val buildOrder = Vector(
     Get(5, Terran.SCV),

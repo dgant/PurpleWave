@@ -10,6 +10,7 @@ import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
+import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -47,6 +48,7 @@ object BeReaver extends Action {
     // If we can drop out and attack now, do so
     val here = unit.tile
     var shouldDrop = false
+    shouldDrop = shouldDrop || (unit.matchups.targetsInRange.exists(MatchWorker) && unit.matchups.threats.forall(t => MatchWorker(t) || (! t.canMove && t.pixelsToGetInRange(unit) > 32)))
     shouldDrop = shouldDrop || here.groundPixels(destinationGround) < 32
     shouldDrop = shouldDrop || unit.inRangeToAttack(target) && With.grids.enemyRangeGround.get(here) == 0 && ! unit.matchups.threats.exists(t => t.is(Terran.SiegeTankSieged) && t.inRangeToAttack(unit, here.pixelCenter))
     if (shouldDrop) {

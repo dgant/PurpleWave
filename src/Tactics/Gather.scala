@@ -4,12 +4,12 @@ import Debugging.ToString
 import Lifecycle.With
 import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitMatchers.MatchWorkers
+import Planning.UnitMatchers.MatchWorker
 
 class Gather extends Prioritized {
 
   val workerLock: LockUnits = new LockUnits(this)
-  workerLock.matcher = MatchWorkers
+  workerLock.matcher = MatchWorker
 
   def update() {
     workerLock.acquire(this)

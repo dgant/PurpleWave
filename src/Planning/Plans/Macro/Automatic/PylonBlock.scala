@@ -6,7 +6,7 @@ import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.{LockCurrency, LockUnits}
 import Planning.UnitCounters.CountOne
-import Planning.UnitMatchers.MatchWorkers
+import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.{ByOption, GameTime}
@@ -14,7 +14,7 @@ import Utilities.{ByOption, GameTime}
 class PylonBlock extends Plan {
 
   val blockerLock = new LockUnits(this)
-  blockerLock.matcher = MatchWorkers
+  blockerLock.matcher = MatchWorker
   blockerLock.counter = CountOne
 
   val currencyLock = new LockCurrency

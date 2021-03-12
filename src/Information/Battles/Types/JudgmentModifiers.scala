@@ -4,7 +4,7 @@ import Debugging.Visualizations.Colors
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Basic.Gather
-import Planning.UnitMatchers.{MatchSiegeTank, MatchWorkers}
+import Planning.UnitMatchers.{MatchSiegeTank, MatchWorker}
 import ProxyBwapi.Races.Terran
 import bwapi.Color
 
@@ -113,7 +113,7 @@ object JudgmentModifiers {
       && ally.friendly.exists(_.agent.toGather.exists(g =>
         g.pixelDistanceEdge(ally) <= Gather.defenseRadiusPixels
         && ally.matchups.threats.exists(_.pixelsToGetInRange(ally, g.pixel) <= Gather.defenseRadiusPixels))))
-    val workersTotal = With.units.countOurs(MatchWorkers)
+    val workersTotal = With.units.countOurs(MatchWorker)
     val workersRatio = PurpleMath.nanToZero(workersImperiled.toDouble / workersTotal)
     if (workersRatio > 0) Some(JudgmentModifier(targetDelta = -workersRatio)) else None
   }

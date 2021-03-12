@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Points.Tile
 import Performance.Cache
 import Performance.Tasks.TimedTask
-import Planning.UnitMatchers.{MatchBuilding, MatchWorkers}
+import Planning.UnitMatchers.{MatchBuilding, MatchWorker}
 import ProxyBwapi.Races.Zerg
 import Utilities._
 
@@ -79,7 +79,7 @@ class Scouting extends TimedTask {
   private var _enemyHasScoutedUsWithWorker = false
 
   val basesToLookForEnemyScouts = new Cache(() => (With.geography.ourBases :+ With.geography.ourNatural).distinct)
-  val enemyScouts = new Cache(() => With.units.enemy.filter(u => u.isAny(Zerg.Overlord, MatchWorkers) && u.base.exists(basesToLookForEnemyScouts().contains)))
+  val enemyScouts = new Cache(() => With.units.enemy.filter(u => u.isAny(Zerg.Overlord, MatchWorker) && u.base.exists(basesToLookForEnemyScouts().contains)))
 
   override protected def onRun(budgetMs: Long): Unit = {
     baseScoutMap.clear()
@@ -115,7 +115,7 @@ class Scouting extends TimedTask {
         })
       }
     }
-    _enemyHasScoutedUsWithWorker = _enemyHasScoutedUsWithWorker || With.geography.ourBases.exists(_.units.exists(u => u.isEnemy && u.is(MatchWorkers)))
+    _enemyHasScoutedUsWithWorker = _enemyHasScoutedUsWithWorker || With.geography.ourBases.exists(_.units.exists(u => u.isEnemy && u.is(MatchWorker)))
     _enemyHasScoutedUs = _enemyHasScoutedUs || _enemyHasScoutedUsWithWorker || With.units.ours.view.filter(MatchBuilding).exists(u => u.tileArea.tiles.exists(With.grids.enemyVision.isSet))
   }
 }

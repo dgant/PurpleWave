@@ -22,8 +22,10 @@ class PerformanceMonitor {
   // https://www.geeksforgeeks.org/java-system-nanotime-vs-system-currenttimemillis/
   def systemMillis: Long = System.nanoTime / 1000000
 
+  var gameStartMs: Long = 0l
   def startFrame() {
     frameStartMs = systemMillis
+    if (gameStartMs == 0) gameStartMs = frameStartMs
   }
 
   def endFrame() {

@@ -141,6 +141,7 @@ object ConfigurationLoader {
 
   private def setDebugLiveMode(): Unit = {
     setDebugMode()
+    With.camera.enabled       = true
     config.visualizeDebug     = true
     config.detectBreakpoints  = true
     config.forcedPlaybook     = Some(new TestingPlaybook)

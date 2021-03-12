@@ -1,7 +1,7 @@
 package Micro.Actions.Combat.Targeting.Filters
 
 import Lifecycle.With
-import Planning.UnitMatchers.MatchWorkers
+import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterFutility extends TargetFilter {
@@ -26,9 +26,9 @@ object TargetFilterFutility extends TargetFilter {
       || Vector(actor.pixelToFireAt(target).tile, target.tile).exists(t => t.walkable && t.altitude >= target.tile.altitude))
     if ( ! targetReachable) return false
 
-    lazy val atOurWorkers = target.base.exists(_.owner.isUs) && target.matchups.targetsInRange.exists(MatchWorkers)
+    lazy val atOurWorkers = target.base.exists(_.owner.isUs) && target.matchups.targetsInRange.exists(MatchWorker)
     lazy val iAmCatcher = target.matchups.canCatchMe(actor)
-    lazy val catcherExists = target.matchups.catchers.exists(ally => ally.framesToGetInRange(target) <= actor.framesToGetInRange(target))
+    lazy val catcherExists = target.matchups.catchers.exists(ally => ally.friendly.exists(_.agent.toAttack.contains(target)) || ally.framesToGetInRange(target) <= actor.framesToGetInRange(target))
     val output = atOurWorkers || catcherExists
     output
   }

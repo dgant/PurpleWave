@@ -14,7 +14,7 @@ import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemiesAtMost, FoundEnemy
 import Planning.Predicates.Strategy.Employing
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountUpTo
-import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchWorkers}
+import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchWorker}
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.AllRaces.{WorkerRushContinuousProduction, WorkerRushImmediate, WorkerRushOnScout, WorkerRushOnSupplyBlock}
@@ -46,10 +46,10 @@ class WorkerRush extends Trigger {
         new ScoutAt(1))),
     new Plan {
       val workerLock: LockUnits = new LockUnits(this)
-      workerLock.matcher = MatchWorkers
+      workerLock.matcher = MatchWorker
       var seenFiveWorkers: Boolean = false
       override def onUpdate(): Unit = {
-        seenFiveWorkers = seenFiveWorkers || With.units.countOurs(MatchAnd(MatchWorkers, MatchComplete)) >= 5
+        seenFiveWorkers = seenFiveWorkers || With.units.countOurs(MatchAnd(MatchWorker, MatchComplete)) >= 5
         val goalWorkers =
           if (WorkerRushContinuousProduction.registerActive)
             3
@@ -72,7 +72,7 @@ class WorkerRush extends Trigger {
     new If(timeToAtack, new AttackWithWorkers))
  
   private class TimeToEndTheRush extends And(
-    new EnemiesAtMost(1, MatchWorkers),
+    new EnemiesAtMost(1, MatchWorker),
     new Or(
       new EnemiesAtLeast(1, Protoss.PhotonCannon, complete = true),
       new EnemiesAtLeast(1, Zerg.SunkenColony, complete = true)))

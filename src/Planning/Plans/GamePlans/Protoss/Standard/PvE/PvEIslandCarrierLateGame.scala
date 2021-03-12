@@ -18,7 +18,7 @@ import Planning.Predicates.Reactive.EnemyMutalisks
 import Planning.Predicates.Strategy.OnMap
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountOne
-import Planning.UnitMatchers.MatchWorkers
+import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.{Plasma, Sparkle}
 import Utilities.ByOption
@@ -74,7 +74,7 @@ class ExpandOverIsland(maxBases: Int) extends RequireBases {
 
 class HackySparkleExpansion extends Plan {
   val lock = new LockUnits(this)
-  lock.matcher = MatchWorkers
+  lock.matcher = MatchWorker
   lock.counter = CountOne
   private def base = ByOption.minBy(With.geography.neutralBases.filter(b => ! b.townHallArea.tiles.map(_.bwapi).exists(With.game.hasCreep)))(_.townHallTile.tileDistanceSquared(With.geography.home))
 

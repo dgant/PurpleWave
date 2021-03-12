@@ -6,7 +6,7 @@ import Micro.Agency.Intention
 import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountUpTo
-import Planning.UnitMatchers.{MatchWarriors, MatchWorkers}
+import Planning.UnitMatchers.{MatchWarriors, MatchWorker}
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -15,7 +15,7 @@ import Utilities.Seconds
 class DefendFightersAgainstRush extends Prioritized {
   
   val defenders = new LockUnits(this)
-  defenders.matcher = MatchWorkers
+  defenders.matcher = MatchWorker
 
   private def inOurBase(unit: UnitInfo): Boolean = unit.zone.bases.exists(_.owner.isUs)
   def update() {

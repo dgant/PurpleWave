@@ -13,8 +13,9 @@ abstract class Fingerprint {
   protected def investigate: Boolean
   protected val children: Seq[Fingerprint] = Seq.empty
 
-  final def lastUpdateFrame: Int = _lastUpdateFrame
-  final def matches: Boolean = matched
+  @inline final def lastUpdateFrame: Int = _lastUpdateFrame
+  @inline final def matches: Boolean = matched
+  @inline final def apply(): Boolean = matches
   final def update() {
     _lastUpdateFrame = With.frame
     children.foreach(_.update())
@@ -26,5 +27,5 @@ abstract class Fingerprint {
     }
   }
   
-  override val toString: String = ToString(this)
+  override val toString: String = ToString(this).replace("Fingerprint", "Finger")
 }

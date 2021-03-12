@@ -24,6 +24,5 @@ object TargetFilterGroups {
     TargetFilterCarrierShootsUp,
     TargetFilterCombatants,
     TargetFilterFrontline,
-    TargetFilterIgnoreScouts,
   )
 }

@@ -25,7 +25,7 @@ class Camera extends TimedTask {
   var obscurityByUnit   : Map[UnitInfo, Double] = Map.empty
   var visibleArea       : TileRectangle         = TileRectangle(Tile(0, 0), Tile(0, 0))
   var visibleUnits      : Set[UnitInfo]         = Set.empty
-  var enabled           : Boolean               = true
+  var enabled           : Boolean               = false
 
   private def totalInterest(unit: UnitInfo): Double = {
     val interestBattle    = if (unit.battle.exists(_.enemy.units.exists(u => u.canAttack && ! u.unitClass.isWorker))) 100.0 else 1.0
@@ -36,8 +36,6 @@ class Camera extends TimedTask {
   }
 
   override def onRun(budgetMs: Long) {
-    if ( ! With.configuration.debugging) { return }
-
     // Enable autocamera until we interact with the screen
     val mousePosition = new Pixel(With.game.getMousePosition)
     if (mousePosition.x > 10 && mousePosition.x < 630 && mousePosition.y > 10 && mousePosition.y < 470) {

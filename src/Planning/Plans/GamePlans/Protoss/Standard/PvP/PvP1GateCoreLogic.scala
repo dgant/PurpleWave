@@ -20,7 +20,7 @@ class PvP1GateCoreLogic(allowZealotBeforeCore: Boolean = true) {
   class PossibleZealotPressure extends Not(new EnemyStrategy(With.fingerprints.forgeFe, With.fingerprints.oneGateCore))
 
   class WriteStatuses extends Parallel(
-    new If(new GateGate, new WriteStatus("GateGate")),
+    new If(new GateGate, new WriteStatus("GateGate"), new If(new GateTechGateGate, new WriteStatus("GateTechGateGate"))),
     new If(new PossibleZealotPressure, new WriteStatus("PossibleZealotPressure")),
     new If(
       new ZealotBeforeCore,
@@ -45,6 +45,11 @@ class PvP1GateCoreLogic(allowZealotBeforeCore: Boolean = true) {
             With.fingerprints.proxyGateway),
           new UnitsAtMost(0, Protoss.RoboticsFacility))),
       new Check(() => With.strategy.isFlat || With.strategy.isInverted)))
+
+  class GateTechGateGate extends And(
+    new Employing(PvPRobo),
+    new Not(new GateGate),
+    new Check(() => With.strategy.isInverted))
 
   class ZealotBeforeCore extends And(
     new Check(() => allowZealotBeforeCore),

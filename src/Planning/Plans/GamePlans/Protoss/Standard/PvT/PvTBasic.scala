@@ -19,7 +19,7 @@ import Planning.Predicates.Economy.{GasAtLeast, GasAtMost}
 import Planning.Predicates.Milestones.{EnemyHasShownWraithCloak, _}
 import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.{Employing, EnemyIsRandom, EnemyRecentStrategy, EnemyStrategy}
-import Planning.UnitMatchers.{MatchOr, MatchSiegeTank, MatchWorkers}
+import Planning.UnitMatchers.{MatchOr, MatchSiegeTank, MatchWorker}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
 import Utilities.GameTime
@@ -299,11 +299,11 @@ class PvTBasic extends GameplanTemplate {
                 new UnitsAtMost(4, Protoss.Gateway)),
               new CapGasAt(250)),
             new If(
-              new UnitsAtMost(45, MatchWorkers),
+              new UnitsAtMost(45, MatchWorker),
               new CapGasAt(400))))),
 
     // Pylon block
-    new If(new And(new BasesAtLeast(3), new MiningBasesAtLeast(2), new UnitsAtLeast(45, MatchWorkers)), new PylonBlock),
+    new If(new And(new BasesAtLeast(3), new MiningBasesAtLeast(2), new UnitsAtLeast(45, MatchWorker)), new PylonBlock),
 
     /////////////////////////
     // Actual build order //
@@ -366,8 +366,8 @@ class PvTBasic extends GameplanTemplate {
 
     // Gas pump timing
     new PumpRatio(Protoss.Assimilator, 1, 2, Seq(Friendly(Protoss.Gateway, 0.2), Friendly(Protoss.RoboticsSupportBay, 0.4), Friendly(Protoss.TemplarArchives, 0.2), Friendly(Protoss.Stargate, 2.0))),
-    new If(new And(new UnitsAtLeast(30, MatchWorkers), new EmployingTwoBase), new BuildGasPumps),
-    new If(new UnitsAtLeast(45, MatchWorkers), new BuildGasPumps),
+    new If(new And(new UnitsAtLeast(30, MatchWorker), new EmployingTwoBase), new BuildGasPumps),
+    new If(new UnitsAtLeast(45, MatchWorker), new BuildGasPumps),
 
     ////////////////////////////
     // Reactions from 2 base //

@@ -6,12 +6,12 @@ import Micro.Agency.Intention
 import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountUpTo
-import Planning.UnitMatchers.{MatchWarriors, MatchWorkers}
+import Planning.UnitMatchers.{MatchWarriors, MatchWorker}
 
 class DefendAgainstWorkerRush extends Prioritized {
   
   val defenders = new LockUnits(this)
-  defenders.matcher = MatchWorkers
+  defenders.matcher = MatchWorker
   
   def update() {
     val attackingWorkers = With.geography.ourBases
@@ -24,7 +24,7 @@ class DefendAgainstWorkerRush extends Prioritized {
       .distinct
   
     lazy val attackingCentroid = PurpleMath.centroid(attackingWorkers.map(_.pixel))
-    lazy val ourWorkers = With.units.countOurs(MatchWorkers)
+    lazy val ourWorkers = With.units.countOurs(MatchWorker)
     lazy val ourCombatUnits = With.units.countOurs(MatchWarriors)
     
     if (attackingWorkers.size < 3 || ourCombatUnits >= 3) return

@@ -15,7 +15,7 @@ import Micro.Agency.{AnchorMargin, Commander}
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.TrafficPriorities
 import Micro.Heuristics.Potential
-import Planning.UnitMatchers.MatchWorkers
+import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, Seconds}
@@ -154,7 +154,7 @@ object DefaultCombat extends Action {
 
     // By now units have already done all non-combat activities
     // So if we have nothing to attack, but are threatened, flee
-    lazy val pointlessRisk = unit.matchups.targets.isEmpty && ! unit.matchups.threats.forall(MatchWorkers)
+    lazy val pointlessRisk = unit.matchups.targets.isEmpty && ! unit.matchups.threats.forall(MatchWorker)
     unit.agent.shouldEngage &&= !pointlessRisk
 
     //////////////////////
@@ -188,7 +188,7 @@ object DefaultCombat extends Action {
 
     lazy val targetAbusable = target.exists(target => ! target.canAttack(unit) || (unit.topSpeed > target.topSpeed && unit.pixelRangeAgainst(target) > target.pixelRangeAgainst(unit)))
     lazy val canKite = target
-      .map(unit.framesToGetInRange(_) + unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate + 8) // The flat margin at an edge is a fudge to prevent needlessly brave pokes
+      .map(unit.framesToGetInRange(_) + unit.unitClass.framesToTurnShootTurnAccelerate + 8) // The flat margin at an edge is a fudge to prevent needlessly brave pokes
       .exists(f => unit.matchups.threats.forall(_.pixelsToGetInRange(unit) > f))
     transition(Abuse, () => unit.unitClass.abuseAllowed && targetAbusable && canKite)
 
@@ -205,7 +205,7 @@ object DefaultCombat extends Action {
             unit.agent.receivedPushPriority() < TrafficPriorities.Shove
               // Don't take unnecessary shots in the process
               && unit.matchups
-              .threatsInFrames(unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate)
+              .threatsInFrames(unit.unitClass.framesToTurnShootTurnAccelerate)
               .forall(_.topSpeed > unit.topSpeed))))
 
     transition(Dance, () => target.map(unit.pixelRangeAgainst).exists(_ > 64))

@@ -2,7 +2,7 @@ package Information.Fingerprinting.ProtossStrategies
 
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
-import Planning.UnitMatchers.{MatchAnd, MatchWarriors, MatchWorkers}
+import Planning.UnitMatchers.{MatchAnd, MatchWarriors, MatchWorker}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.GameTime
 
@@ -11,7 +11,7 @@ class FingerprintWorkerRush extends Fingerprint {
   override val sticky = true
 
   protected object MatchAttackingWorker$ extends MatchAnd(
-      MatchWorkers,
+      MatchWorker,
       (unit: UnitInfo) => {
         val distanceOurBase = unit.pixelDistanceTravelling(With.geography.ourMain.heart.pixelCenter)
         With.geography.startBases.forall(base =>

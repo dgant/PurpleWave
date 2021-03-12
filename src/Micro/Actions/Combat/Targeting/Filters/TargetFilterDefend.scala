@@ -2,6 +2,7 @@ package Micro.Actions.Combat.Targeting.Filters
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.Minutes
 
@@ -16,12 +17,17 @@ case class TargetFilterDefend(zone: Zone) extends TargetFilter {
 
     // Fire at enemies we can hit from inside the zone
     if (target.zone == zone) return true
-
-    val firingPixel = actor.pixelToFireAt(target)
-    if (firingPixel.zone == zone
-      && firingPixel.altitude >= actor.agent.toReturn.getOrElse(actor.pixel).altitude
-      && actor.inRangeToAttackFrom(target, firingPixel) // TODO: Walkability constraints can produce a firing pixel that's not actually in range
-      && ! zone.edges.exists(_.contains(firingPixel))) return true
+    // Reach, if we have to, and can do so safely
+    // Reavers are notably terrible at this
+    lazy val firingPixel = actor.pixelToFireAt(target)
+    if ( ! Protoss.Reaver(actor)
+        && firingPixel.zone == zone
+        && firingPixel.altitude > actor.agent.toReturn.getOrElse(actor.pixel).altitude
+        && actor.inRangeToAttackFrom(target, firingPixel) // Walkability constraints can produce a firing pixel that's not actually in range
+        && ! zone.edges.exists(_.contains(firingPixel))
+        && actor.matchups.threats.count(t => t.pixelRangeAgainst(actor) >= actor.pixelRangeAgainst(t) && t.cooldownLeft < actor.pixelsToGetInRange(target) + actor.unitClass.framesToTurnShootTurnAccelerate) < 2) {
+      return true
+    }
 
     // Target enemies between us and the goal zone
     if (actor.inRangeToAttack(target) && actor.readyForAttackOrder) return true

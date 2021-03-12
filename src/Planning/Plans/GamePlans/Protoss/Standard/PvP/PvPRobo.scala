@@ -12,7 +12,8 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Predicates.Compound.{And, ConcludeWhen, Latch, Not}
+import Planning.Predicates.Compound._
+import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeToMoveOut}
 import Planning.Predicates.Strategy._
@@ -20,7 +21,6 @@ import Planning.UnitMatchers.{MatchOr, MatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvPRobo, PvPRobo1012}
-import Utilities.GameTime
 
 class PvPRobo extends GameplanTemplate {
 
@@ -33,7 +33,8 @@ class PvPRobo extends GameplanTemplate {
     new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
     new And(
       new UnitsAtMost(0, Protoss.RoboticsSupportBay),
-      new Not(new EnemyStrategy(With.fingerprints.dtRush)),
+      new Not(new GetObservers),
+      new Not(new oneGateCoreLogic.GateTechGateGate),
       new Or(
         new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.robo),
         new EnemyBasesAtLeast(2))))
@@ -43,10 +44,8 @@ class PvPRobo extends GameplanTemplate {
     new EnemiesAtLeast(1, Protoss.CitadelOfAdun),
     new And(
       new EnemyRecentStrategy(With.fingerprints.dtRush),
-      new Not(new EnemyStrategy(With.fingerprints.robo, With.fingerprints.nexusFirst, With.fingerprints.fourGateGoon))),
-    new Or(
-      new Not(new EnemyStrategy(With.fingerprints.dragoonRange, With.fingerprints.dragoonRange)),
-      new FrameAtLeast(GameTime(6, 0)())))
+      new Not(new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.robo, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon))),
+    new Not(new EnemyStrategy(With.fingerprints.dragoonRange, With.fingerprints.dragoonRange)))
 
   override def blueprints = Vector(
     new Blueprint(Protoss.Pylon),
@@ -88,7 +87,11 @@ class PvPRobo extends GameplanTemplate {
 
   override def aggressionPlan: Plan = new Trigger(
     new And(new ReadyToExpand, new BasesAtMost(1)),
-    new Aggression(3.0))
+    new Aggression(3.0),
+    new If(
+      new Check(() => With.strategy.isInverted), new Aggression(1.5),
+      new If(
+        new Check(() => With.strategy.isFlat), new Aggression(1.2))))
 
   override def buildOrderPlan: Plan = new oneGateCoreLogic.BuildOrderPlan
 
@@ -108,7 +111,7 @@ class PvPRobo extends GameplanTemplate {
           new UnitsAtLeast(2, Protoss.Reaver),
           new If(
             new And(
-              new EnemyStrategy(With.fingerprints.fourGateGoon),
+              new EnemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon),
               new UnitsAtMost(3, Protoss.Reaver)),
             new Pump(Protoss.Reaver),
             new PumpShuttleAndReavers),
@@ -133,7 +136,7 @@ class PvPRobo extends GameplanTemplate {
     new Or(
       new And(new UnitsAtLeast(1, Protoss.Observer, complete = true), new EnemyStrategy(With.fingerprints.dtRush)),
       new And(new UnitsAtLeast(1, Protoss.Reaver, complete = true), new SafeToMoveOut, new EnemyLowUnitCount),
-      new And(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new SafeToMoveOut, new Not(new EnemyStrategy(With.fingerprints.fourGateGoon))),
+      new And(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new SafeToMoveOut, new Not(new EnemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon))),
       new And(
         new UnitsAtLeast(2, MatchOr(Protoss.Shuttle, Protoss.Reaver), complete = true),
         new Latch(new UnitsAtLeast(3, MatchOr(Protoss.Shuttle, Protoss.Reaver), complete = true)))))
@@ -144,12 +147,16 @@ class PvPRobo extends GameplanTemplate {
     new If(new GasCapsUntouched, new CapGasAt(350)),
     new FlipIf(
       new oneGateCoreLogic.GateGate,
-      new BuildOrder(
-        Get(Protoss.Dragoon),
-        Get(Protoss.DragoonRange),
-        Get(3, Protoss.Pylon),
-        Get(Protoss.RoboticsFacility),
-        Get(2, Protoss.Dragoon)),
+      new Parallel(
+        new BuildOrder(
+          Get(Protoss.Dragoon),
+          Get(Protoss.DragoonRange),
+          Get(3, Protoss.Pylon),
+          Get(Protoss.RoboticsFacility),
+          Get(2, Protoss.Dragoon)),
+        new If(
+          new oneGateCoreLogic.GateTechGateGate,
+          new Build(Get(3, Protoss.Gateway)))),
       new BuildOrder(
         Get(2, Protoss.Gateway),
         Get(Protoss.Dragoon),
@@ -161,19 +168,25 @@ class PvPRobo extends GameplanTemplate {
 
     new If(
       new GetObservers,
-      new BuildOrder(Get(Protoss.Observatory)),
+      new Parallel(
+        new BuildOrder(Get(Protoss.Observatory)),
+        new Trigger(
+          new UnitsAtLeast(1, Protoss.Observer),
+          new Build(Get(Protoss.RoboticsSupportBay)))),
       new Parallel(
         new CancelIncomplete(Protoss.Observatory),
+        new CancelIncomplete(Protoss.Observer),
         new Build(Get(Protoss.RoboticsSupportBay)))),
-    new If(
-      new UnitsAtLeast(1, Protoss.Observatory, complete = true),
-      new Build(Get(Protoss.RoboticsSupportBay))),
 
     new If(new ReadyToExpand, new RequireMiningBases(2)),
     new TrainGatewayUnits,
     new If(new EnemyStrategy(With.fingerprints.dtRush), new Build(Get(Protoss.ObserverSpeed))),
     new Build(Get(3, Protoss.Gateway)),
     new PumpWorkers(oversaturate = true),
-    new Build(Get(4, Protoss.Gateway)),
+    new If(
+      new And(
+        new UnitsAtLeast(3, Protoss.Gateway, complete = true),
+        new MineralsAtLeast(450)),
+      new Build(Get(4, Protoss.Gateway))),
   )
 }

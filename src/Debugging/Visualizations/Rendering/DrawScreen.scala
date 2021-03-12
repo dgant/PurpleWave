@@ -37,9 +37,11 @@ object DrawScreen {
         pair._1))
   }
 
-  def padTable(cells: Iterable[Iterable[String]]): Iterable[Iterable[String]] = {
-    val max: Int = ByOption.max(cells.view.flatten.map(_.length)).getOrElse(0)
-    cells.map(_.map(_.padTo(max, ' ')))
+  def padTable(rows: Iterable[Iterable[String]]): Iterable[Iterable[String]] = {
+    val columns = ByOption.max(rows.view.map(_.size)).getOrElse(0)
+    val columnWidths = rows.view.map(_.view.map(_.length).toIndexedSeq).reduce((r1, r2) => (0 until columns).map(i => Math.max(r1.view.padTo(columns, 0).drop(i).head, r2.view.padTo(columns, 0).drop(i).head)))
+    val max: Int = ByOption.max(rows.view.flatten.map(_.length)).getOrElse(0)
+    rows.map(_.zipWithIndex.map(p => p._1.padTo(columnWidths(p._2), ' ')))
   }
 
   def tableToString(cells: Iterable[Iterable[String]]): String = {

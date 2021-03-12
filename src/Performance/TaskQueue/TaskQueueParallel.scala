@@ -44,7 +44,7 @@ class TaskQueueParallel(val tasks: TimedTask*) extends TimedTask {
       val budgetMsRecentSpent = task.runMsRecentTotal()
       val taskBudgetMs        = PurpleMath.clamp(budgetMsRecent - budgetMsRecentSpent, 0, With.performance.msBeforeTarget).toLong
 
-      if (i == 0 || task.safeToRun(taskBudgetMs)) {
+      if (i == 0 || (task.due && ! With.performance.danger) || (timer.ongoing && task.safeToRun(taskBudgetMs))) {
         task.run(taskBudgetMs)
       } else {
         task.skip()

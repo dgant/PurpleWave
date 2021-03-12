@@ -29,12 +29,12 @@ class DefendAgainstProxy extends Prioritized {
     if (proxies.isEmpty) return
 
     // Set up collections of available and assigned defenders
-    var additionalWorkersAllowed  = With.units.countOurs(MatchWorkers) - 6
+    var additionalWorkersAllowed  = With.units.countOurs(MatchWorker) - 6
     val defendersAssigned         = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
     val defendersAvailable        = new mutable.HashSet[FriendlyUnitInfo]
     defenders.release()
     defenders.counter = CountEverything
-    defenders.matcher = MatchOr(MatchWorkers, MatchWarriors)
+    defenders.matcher = MatchOr(MatchWorker, MatchWarriors)
     defenders.inquire(this).toVector.foreach(defendersAvailable ++= _)
 
     // For each proxy, in priority order, decide who if anyone to assign to it

@@ -14,7 +14,7 @@ class PumpWorkers(oversaturate: Boolean = false, cap: Int = 75, maximumConcurren
     {
       var sum = (if (oversaturate) 18 else 0)
       With.geography.ourBases.foreach(base => {
-        sum += builderCount + 2 * base.minerals.count(_.resourcesLeft > 500) + 3 * base.gas.count(_.resourcesLeft > 500)
+        sum += builderCount + 2 * base.minerals.count(_.resourcesLeft > 200) + 3 * base.gas.count(_.resourcesLeft > 200)
       })
       sum = Math.max(sum, 21)
       sum

@@ -1,5 +1,6 @@
 package Debugging.Visualizations.Views.Performance
 
+import Debugging.Decimal
 import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
@@ -20,12 +21,13 @@ object ShowPerformanceDetails extends View {
 
   def statusTable(tasks: Seq[TimedTask]): Seq[Seq[String]] = {
     val title = Vector("Target:", With.configuration.frameTargetMs + "ms", "", "Cutoff:", With.configuration.frameLimitMs + "ms")
-    val headers = Vector("Task", "Last run", "Seconds", "Budget (Recent)", "Avg ms", "Max (Recent)", "Max (All time)", "AcrossTarget", "AcrossLimit")
+    val headers = Vector("Task", "Seconds", "%Time", "Budget (Recent)", "Avg ms", "Max (Recent)", "Max (All time)", "AcrossTarget", "AcrossLimit")
     val body = tasks
       .map(task => Vector(
         task.toString,
         "X" * Math.min(10, Math.max(0, task.framesSinceRunning - 1)),
         (task.runMsTotal / 1000).toString,
+        Decimal(task.runMsTotal / (With.performance.systemMillis - With.performance.gameStartMs), 1),
         PurpleMath.meanL(task.budgetMsPast).toInt.toString,
         task.runMsRecentMean.toString,
         task.runMsRecentMax().toString,

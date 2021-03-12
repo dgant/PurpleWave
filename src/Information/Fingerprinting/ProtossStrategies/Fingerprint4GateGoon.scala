@@ -1,10 +1,12 @@
 package Information.Fingerprinting.ProtossStrategies
 
 import Information.Fingerprinting.Generic._
+import Information.Fingerprinting.TerranStrategies.FingerprintNGateways
 import ProxyBwapi.Races.Protoss
 import Utilities.GameTime
 
 class Fingerprint4GateGoon extends FingerprintOr(
+  new FingerprintNGateways(4),
   new FingerprintAnd(
     new FingerprintCompleteBy(Protoss.Assimilator,      GameTime(6, 0)),
     new FingerprintCompleteBy(Protoss.CyberneticsCore,  GameTime(6, 0)),

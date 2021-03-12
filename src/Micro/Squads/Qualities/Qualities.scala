@@ -1,6 +1,6 @@
 package Micro.Squads.Qualities
 
-import Planning.UnitMatchers.{MatchCombatSpellcaster, MatchWorkers}
+import Planning.UnitMatchers.{MatchCombatSpellcaster, MatchWorker}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -60,7 +60,7 @@ object Qualities {
     def apply(u: UnitInfo): Boolean = u.attacksAgainstAir > 0 && ! u.isAny(Terran.Ghost, Protoss.Arbiter)
   }
   object AntiGroundCombat extends Quality {
-    def apply(u: UnitInfo): Boolean = u.attacksAgainstGround > 0 && ! u.isAny(Terran.Ghost, Protoss.Arbiter, MatchWorkers)
+    def apply(u: UnitInfo): Boolean = u.attacksAgainstGround > 0 && ! u.isAny(Terran.Ghost, Protoss.Arbiter, MatchWorker)
   }
   object Combat extends Quality {
     def apply(u: UnitInfo): Boolean = (u.canAttack && ! u.unitClass.isWorker)

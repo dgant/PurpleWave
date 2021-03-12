@@ -6,14 +6,14 @@ import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountOne
-import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchNotHoldingResources, MatchWorkers}
+import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchNotHoldingResources, MatchWorker}
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
 import Utilities.GameTime
 
 class ScoutForCannonRush extends Plan {
   val scouts = new LockUnits(this)
-  scouts.matcher = MatchAnd(MatchWorkers, MatchNotHoldingResources)
+  scouts.matcher = MatchAnd(MatchWorker, MatchNotHoldingResources)
   scouts.counter = CountOne
   scouts.interruptable = false
 

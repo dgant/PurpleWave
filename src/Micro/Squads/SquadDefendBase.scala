@@ -25,14 +25,14 @@ class SquadDefendBase(base: Base) extends Squad {
     if ( ! threat.bases.exists(_.owner.isUs)) {
       val possiblePath = With.paths.zonePath(zone, threat)
       possiblePath.foreach(path => {
-        val stepScores = path.steps.take(4).filter(_.from.centroid.tileDistanceManhattan(With.geography.home) < 48).indices.map(i => {
+        val stepScores = path.steps.take(4).filter(_.from.centroid.tileDistanceManhattan(With.geography.home) < 64).indices.map(i => {
           val step = path.steps(i)
           val turtlePenalty = if (step.to.units.exists(u => u.isOurs && u.unitClass.isBuilding)) 10 else 1
           val altitudeValue = if (With.enemies.forall(_.isZerg)) 1 else 2.5
           val altitudeDiff = PurpleMath.signum(step.to.centroid.altitude - step.from.centroid.altitude)
           val altitudeMult = Math.pow(altitudeValue, altitudeDiff)
           val width = PurpleMath.clamp(step.edge.radiusPixels, 32 * 3, 32 * 16)
-          val score = width * turtlePenalty * (2 + i) * altitudeMult
+          val score = width * turtlePenalty * (3 + i) * altitudeMult
           (step, score)
         })
         val scoreBest = ByOption.minBy(stepScores)(_._2)

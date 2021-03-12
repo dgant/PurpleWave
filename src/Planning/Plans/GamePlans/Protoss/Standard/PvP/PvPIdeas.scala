@@ -61,7 +61,7 @@ object PvPIdeas {
               new Not(new EnemyStrategy(With.fingerprints.fourGateGoon))),
             new And(
               new Latch(new UnitsAtLeast(5, Protoss.Gateway, complete = true)),
-              new Latch(new UnitsAtLeast(20, MatchWorkers, complete = true))),
+              new Latch(new UnitsAtLeast(20, MatchWorker, complete = true))),
             new BasesAtMost(1))),
         new EnemyBasesAtLeast(2)),
       // Can our army contend with theirs?

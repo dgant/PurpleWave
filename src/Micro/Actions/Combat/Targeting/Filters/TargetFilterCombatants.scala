@@ -8,6 +8,6 @@ object TargetFilterCombatants extends TargetFilter {
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
     (target.unitClass.attacksOrCastsOrDetectsOrTransports
       || actor.battle.forall(_.predictionAttack.deathsUs == 0)
-      || ( ! actor.team.exists(_.engaged()) && actor.matchups.framesOfSafety > actor.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate + actor.framesToGetInRange(target)))
+      || ( ! actor.team.exists(_.engaged()) && actor.matchups.framesOfSafety > actor.unitClass.framesToTurnShootTurnAccelerate + actor.framesToGetInRange(target)))
   }
 }

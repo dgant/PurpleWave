@@ -11,7 +11,7 @@ import Planning.Predicates.Strategy.EnemyRecentStrategy
 import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountUpTo
-import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchWorkers}
+import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchWorker}
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -22,13 +22,13 @@ import scala.collection.mutable.ArrayBuffer
 class DefendFFEWithProbes extends Prioritized {
   
   val defenders = new LockUnits(this)
-  defenders.matcher = MatchWorkers
+  defenders.matcher = MatchWorker
   
   protected def probeCount: Int = {
     val zerglings           = Seq(4, With.units.countEnemy(Zerg.Zergling), 8 - With.units.countEver(Zerg.Zergling)).max
     val cannonsComplete     = With.units.countOurs(MatchAnd(Protoss.PhotonCannon, MatchComplete))
     val cannonsIncomplete   = With.units.countOurs(Protoss.PhotonCannon) - cannonsComplete
-    val workerCount         = With.units.countOurs(MatchWorkers)
+    val workerCount         = With.units.countOurs(MatchWorker)
     val workersToMine       = if (cannonsComplete < 2) 4 else 4 + 2 * cannonsComplete
     val workersDesired      = if (cannonsComplete >= 5) 0 else Math.min(workerCount - workersToMine - With.units.ours.count(_.agent.isScout), zerglings * 4 - cannonsComplete * 3)
     workersDesired

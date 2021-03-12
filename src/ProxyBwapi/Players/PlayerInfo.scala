@@ -16,7 +16,8 @@ case class PlayerInfo(bwapiPlayer: Player) extends PlayerProxy(bwapiPlayer) {
     permanentRace = permanentRace.orElse(With.units.all.find(_.player == this).map(_.unitClass.race))
     permanentRace.getOrElse(raceInitial)
   })
-  
+
+  val isPlayer            : Boolean = ! isNeutral
   def isTerran            : Boolean = raceCurrent == Race.Terran
   def isProtoss           : Boolean = raceCurrent == Race.Protoss
   def isZerg              : Boolean = raceCurrent == Race.Zerg

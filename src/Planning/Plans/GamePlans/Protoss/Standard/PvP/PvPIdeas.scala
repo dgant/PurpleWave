@@ -405,12 +405,13 @@ object PvPIdeas {
     Friendly(Protoss.Archon, 3.0)))
 
   class ZealotsAllowed extends And(
-    // It makes economic sense
+    // Zealots work in our army
     new Or(
-      new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.Zealot.buildFrames),
       new GasAtMost(40),
+      new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
+      new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.Zealot.buildFrames),
       new UnitsAtMost(0, Protoss.CyberneticsCore, complete = true)),
-    // It makes military sense
+    // Zealots work against the enemy
     new Or(
       new EnemiesAtMost(0, Protoss.Carrier),
       new EnemiesAtLeast(7, MatchAnd(MatchWarriors, MatchNot(Protoss.Zealot)))))
@@ -418,9 +419,7 @@ object PvPIdeas {
   class PumpDragoonsAndZealots extends Parallel(
     new PumpRatio(Protoss.Dragoon, 0, 100, Seq(Enemy(Protoss.Carrier, 5.0))),
     new If(
-      new And(
-        new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.Zealot.buildFrames),
-        new ZealotsAllowed),
+      new And(new ZealotsAllowed, new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.Zealot.buildFrames)),
       new PumpRatio(Protoss.Zealot, 3, 100, Seq(
         Enemy(Protoss.Carrier, -8.0),
         Friendly(Protoss.Dragoon, 2.0),

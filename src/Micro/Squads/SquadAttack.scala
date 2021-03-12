@@ -66,6 +66,7 @@ class SquadAttack extends Squad {
             val output        = distanceLog / defendersLog
             output
           })
+          .map(base => base.natural.filter(_.owner == base.owner).getOrElse(base))
           .map(base => ByOption.minBy(base.units.filter(u => u.isEnemy && u.unitClass.isBuilding))(_.pixelDistanceCenter(base.townHallArea.midPixel))
             .map(_.pixel)
             .getOrElse(base.townHallArea.midPixel)))

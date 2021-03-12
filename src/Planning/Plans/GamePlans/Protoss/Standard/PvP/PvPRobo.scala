@@ -13,7 +13,6 @@ import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Compound.{And, ConcludeWhen, Latch, Not}
-import Planning.Predicates.Economy.{GasAtMost, MineralsAtLeast}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeToMoveOut}
 import Planning.Predicates.Strategy._
@@ -116,17 +115,10 @@ class PvPRobo extends GameplanTemplate {
           new Pump(Protoss.Reaver, 2)))))
 
   private class TrainGatewayUnits extends Parallel(
-    // Make sure we don't accidentally start an extra Zealot due to tight gas
     new BuildOrder(Get(Protoss.Dragoon)),
     new Pump(Protoss.Dragoon),
     new If(
-      new And(
-        new UnitsAtLeast(3, Protoss.Gateway),
-        new Or(
-          new GasAtMost(45),
-          new And(
-            new MineralsAtLeast(175),
-            new GasAtMost(95)))),
+      new UnitsAtLeast(3, Protoss.Gateway),
       new Pump(Protoss.Zealot)))
 
   class EnemyLowUnitCount extends Or(

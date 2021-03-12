@@ -24,6 +24,7 @@ object Hitchhiker extends StarCraftMap
 object Hunters extends StarCraftMap
 object LaMancha extends StarCraftMap
 object Luna extends StarCraftMap
+object Medusa extends StarCraftMap
 object Pathfinder extends StarCraftMap
 object Plasma extends StarCraftMap
 object Python extends StarCraftMap

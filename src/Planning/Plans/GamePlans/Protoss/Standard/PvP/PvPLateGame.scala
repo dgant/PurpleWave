@@ -96,12 +96,7 @@ class PvPLateGame extends GameplanTemplate {
           Get(Protoss.RoboticsSupportBay),
           Get(Protoss.ShuttleSpeed))),
       new BuildGasPumpsIfBelow(200),
-      new Build(
-        Get(6, Protoss.Gateway),
-        Get(Protoss.CitadelOfAdun),
-        Get(Protoss.ZealotSpeed),
-        Get(7, Protoss.Gateway),
-        Get(Protoss.ScarabDamage)),
+      new Build(Get(7, Protoss.Gateway)),
       new BuildGasPumps))
 
   class AddLateTech extends Parallel(

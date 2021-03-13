@@ -5,18 +5,17 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Performance.Tasks.TimedTask
-import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, Forever}
 
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 
 class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   private def isValidBase     (base: Base): Boolean = base.townHall.filter(_.isOurs).exists(_.remainingCompletionFrames < 24 * 10)
   private def isValidResource (unit: UnitInfo): Boolean = isValidMineral(unit) || isValidGas(unit)
   private def isValidMineral  (unit: UnitInfo): Boolean = unit.alive && (longDistance || unit.base.exists(isValidBase) && unit.mineralsLeft > 0)
   private def isValidGas      (unit: UnitInfo): Boolean = unit.alive && (longDistance || unit.base.exists(isValidBase) && unit.isOurs && unit.unitClass.isGas && unit.remainingCompletionFrames < 24 * 6)
-  private class Slot(var resource: ForeignUnitInfo, val order: Int) {
+  private class Slot(var resource: UnitInfo, val order: Int) {
     val base: Base = resource.base.getOrElse(With.geography.bases.minBy(_.heart.groundPixels(resource.tileTopLeft)))
     var worker: Option[FriendlyUnitInfo] = None
     var lastUpdate: Int = - Forever()
@@ -52,7 +51,6 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   private var bases: Vector[Base] = Vector.empty
   private var minerals: Vector[UnitInfo] = Vector.empty
   private var gasPumps: Vector[FriendlyUnitInfo] = Vector.empty
-  private val idlers: mutable.ArrayBuffer[FriendlyUnitInfo] = ArrayBuffer.empty
   private var longDistance: Boolean = false
   private var gasWorkersToAdd: Int = 0
 
@@ -62,12 +60,12 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
 
   override protected def onRun(budgetMs: Long): Unit = {
 
-    // TODO: Replace gas slots with new gas buildings
+    // Replace gas units
+    gasSlots.values.view.flatten.filter( ! _.resource.alive).foreach(slot => slot.resource = With.units.all.find(u => u.unitClass.isGas && u.tileTopLeft == slot.resource.tileTopLeft).getOrElse(slot.resource))
 
     // Respect gas limitations
     // - If our gas is below our floor,       use maximum gas worker count
     // - If our gas is at/above our ceiling,  use minimum gas worker count
-    idlers.clear()
     val basesBefore = bases
     bases         = With.geography.ourBases.filter(_.townHall.exists(t => t.hasEverBeenCompleteHatch || t.remainingCompletionFrames < 240))
     minerals      = bases.view.flatMap(_.minerals).filter(isValidMineral).toVector // TODO: Do we need this?
@@ -86,24 +84,30 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     var gasWorkersNow         = assignments.count(_._2.resource.unitClass.isGas)
     gasWorkersToAdd           = gasWorkerTarget - gasWorkersNow
 
+    if (doInitialSplit()) return
+
     // Unassign workers doing something invalid
-    // TODO: Do 3214 initial worker assignment (unless we're 4-pooling in which case 4321)
     assignments.view.filterNot(a => isValidResource(a._2.resource)).map(_._1).foreach(unassignWorker)
     assignments.keys.view.filterNot(workers.contains).foreach(unassignWorker)
-    idlers ++= workers.view.filterNot(assignments.contains)
 
     // Reassign workers who could be doing something better
     //
+    // Find workers to populate new base
+    val newBases = bases.filterNot(basesBefore.contains)
+    if (newBases.nonEmpty) {
+      val missingCandidates = newBases.view.map(_.minerals.size).sum - unassigned.size
+      bases.find( ! basesBefore.contains(_)).foreach(b => getWorkersClosestToBase(b, 1, b.minerals.size).foreach(unassignWorker))
+    }
     // Find some workers to reassign to gas
-    if (gasWorkersToAdd > idlers.size) {
+   else if (gasWorkersToAdd > unassigned.size) {
       val reassignableMineralSlots = bases.view
         .flatMap(gasSlots(_).view.filter(_.free)) // For each free gas slot,
         .sortBy(slot => mineralSaturation(slot.base)) // ordered by same-base mineral saturation,
         .flatMap(slot =>
-          bases
-            .sortBy(b => baseCosts((b, slot.base))) // look at bases in ascending distance to the gas
-            .view.flatMap(mineralSlots(_).view.reverse.filterNot(_.free)) // and their slots, starting with the weakest first
-            .take(Math.max(0, slot.resource.gasMinersRequired - slotsByResource(slot.resource).count( ! _.free)))) // taking the best workers for these slots
+        bases
+          .sortBy(b => baseCosts((b, slot.base))) // look at bases in ascending distance to the gas
+          .view.flatMap(mineralSlots(_).view.reverse.filterNot(_.free)) // and their slots, starting with the weakest first
+          .take(Math.max(0, slot.resource.gasMinersRequired - slotsByResource(slot.resource).count(!_.free)))) // taking the best workers for these slots
         .distinct
         .take(gasWorkersToAdd) // and take only as many mineral slots as we need (which may be an underestimate due to duplication above; this will resolve itself on successive runs)
       reassignableMineralSlots.view.flatMap(_.worker).foreach(reassignWorker) // Find a new job, hopefully in the gas industry!
@@ -113,40 +117,53 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
       val reassignableGasSlots = bases.view
         .flatMap(gasSlots(_).view.filterNot(_.free)) // Find gas workers to unassign
         .sortBy(slot => mineralSaturation(slot.base))
-        .take( - gasWorkersToAdd)
+        .take(-gasWorkersToAdd)
         .flatMap(_.worker)
       reassignableGasSlots.foreach(reassignWorker)
     }
-    // Find workers to populate new base
-    val newBases = bases.filterNot(basesBefore.contains)
-    if (newBases.nonEmpty) {
-      val missingCandidates = newBases.view.map(_.minerals.size).sum - idlers.size
-      bases.find( ! basesBefore.contains(_)).foreach(b => getWorkersClosestToBase(b, 1, b.minerals.size).foreach(unassignWorker))
-    }
-    // Reassign the longest-tenured mineral worker that's in a base with a lower-index slot available
+    // If nothing else is going on,
+    // reassign the longest-tenured mineral worker that's near a better slot
     // The magical drop(5) is because the first five slots are usually all roughly-equally good
-    val underemployed = bases.view
-      .flatMap(mineralSlots(_).view.drop(5).filter(s => With.framesSince(s.lastUpdate) > 480)) // Take tenured workers from mediocre slots
-      .filter(s1 => bases.view
+    else if (unassigned.isEmpty) {
+      val underemployed = bases.view
+        .flatMap(mineralSlots(_).view.drop(5).filter(s => With.framesSince(s.lastUpdate) > 480)) // Take tenured workers from mediocre slots
+        .filter(s1 => bases.view
         .filter(baseCosts(_, s1.base) <= naturalCost) // Look at bases which are close enough to merit a low-priority transfer
         .exists(base => mineralSlots(base).exists(s2 =>
-          s2.order > s1.order // Allow transfers even base-to-base to even slot saturation
+        s2.order > s1.order // Allow transfers even base-to-base to even slot saturation
           || (s2.distance > s1.distance + 16 && s2.base == s1.base)))) // Only allow same-base transfers for using faster minerals
-    ByOption.minBy(underemployed)(_.lastUpdate).foreach(_.worker.foreach(reassignWorker))
+      ByOption.minBy(underemployed)(_.lastUpdate).foreach(_.worker.foreach(reassignWorker))
+    }
 
     // Assign workers
     // Assign older workers first because they're most likely to keep the same or a similar assignment
-    workers.filterNot(assignments.contains).toVector.sortBy(_.frameDiscovered).foreach(findAssignment)
+    unassigned.toVector.sortBy(_.frameDiscovered).foreach(findAssignment)
 
     // Command workers
-    workers.view.filterNot(assignments.contains).foreach(i => i.agent.intend(this, new Intention { toTravel = Some(PurpleMath.sampleSet(nearestBase(i).tiles).pixelCenter) }))
+    unassigned.foreach(i => i.agent.intend(this, new Intention { toTravel = Some(PurpleMath.sampleSet(nearestBase(i).tiles).pixelCenter) }))
     assignments.foreach(a => a._1.agent.intend(this, new Intention { toGather = Some(a._2.resource) }))
   }
 
-  protected def mineralSaturation(base: Base): Double = PurpleMath.nanToOne(mineralSlots(base).count( ! _.free).toDouble / mineralSlots(base).size)
+  private def doInitialSplit(): Boolean = {
+    if (With.frame > 0 || workers.size != 4) return false
+    val minerals = bases.flatMgap(mineralSlots(_))
+    if (minerals.size < workers.size) return false
+    val splittees = workers.toVector.sortBy(worker => minerals.map(_.resource.pixelDistanceEdge(worker)).min)
+    // Most builds are bottlenecked on when we can produce the 6th worker, whose cost you can afford after 56 / 8 = 7 mineral trips
+    // Thus, you want to optimize for the return of the 7th mineral trip, which will ordinarily be done by the third-furthest initial worker
+    // This is even true for the 4-pool, which needs 150 minerals = 19 trips = 4 complete rounds + 3rd return from the fifth round
+    val splitteeOrder = Seq(3, 2, 1, 4)
+    val splitteesPrioritized = splitteeOrder.map(splittees(_)) ++ splittees.drop(splitteeOrder.size)
+    splitteesPrioritized.foreach(findAssignment)
+    true
+  }
+
+  private def unassigned: Iterable[FriendlyUnitInfo] = workers.view.filterNot(assignments.contains)
+
+  private def mineralSaturation(base: Base): Double = PurpleMath.nanToOne(mineralSlots(base).count( ! _.free).toDouble / mineralSlots(base).size)
 
   private def findAssignment(worker: FriendlyUnitInfo): Unit = {
-    (if (gasWorkersToAdd > 0) tryGas(worker) || tryMinerals(worker) || tryLongDistance(worker) else tryMinerals(worker) || tryLongDistance(worker) || tryGas(worker)) || idle(worker)
+    (if (gasWorkersToAdd > 0) tryGas(worker) || tryMinerals(worker) || tryLongDistance(worker) else tryMinerals(worker) || tryLongDistance(worker) || tryGas(worker))
   }
 
   private def assignWorker(worker: FriendlyUnitInfo, slot: Slot): Unit = {
@@ -207,10 +224,5 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   private def tryLongDistance(worker: FriendlyUnitInfo): Boolean = {
     if ( ! longDistance) return false
     false // TODO
-  }
-
-  private def idle(worker: FriendlyUnitInfo): Boolean = {
-    idlers.append(worker)
-    true
   }
 }

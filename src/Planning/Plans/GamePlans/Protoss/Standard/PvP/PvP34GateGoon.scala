@@ -84,6 +84,7 @@ class PvP34GateGoon extends GameplanTemplate {
           With.fingerprints.forgeFe,
           With.fingerprints.gatewayFe,
           With.fingerprints.dragoonRange,
+          With.fingerprints.threeGateGoon,
           With.fingerprints.fourGateGoon,
           With.fingerprints.robo)),
       new CancelIncomplete(Protoss.Forge),

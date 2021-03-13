@@ -94,6 +94,7 @@ class Fingerprints {
   lazy val twoGate        = addFingerprint(new Fingerprint2Gate)
   lazy val oneGateCore    = addFingerprint(new Fingerprint1GateCore)
   lazy val robo           = addFingerprint(new FingerprintRobo)
+  lazy val twoGateGoon    = addFingerprint(new FingerprintNGateways(2))
   lazy val threeGateGoon  = addFingerprint(new Fingerprint3GateGoon)
   lazy val fourGateGoon   = addFingerprint(new Fingerprint4GateGoon)
   lazy val nexusFirst     = addFingerprint(new FingerprintNexusFirst)

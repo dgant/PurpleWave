@@ -1,6 +1,5 @@
 package Debugging.Visualizations.Views.Performance
 
-import Debugging.Decimal
 import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
@@ -26,7 +25,7 @@ object ShowPerformanceDetails extends View {
       .map(task => Vector(
         task.toString,
         (task.runMsTotal / 1000).toString,
-        Decimal(task.runMsTotal.toDouble / (With.performance.systemMillis - With.performance.gameStartMs), 1),
+        f"${(100.0 * task.runMsTotal / (With.performance.systemMillis - With.performance.gameStartMs)).toInt}%",
         PurpleMath.meanL(task.budgetMsPast).toInt.toString,
         task.runMsRecentMean.toString,
         task.runMsRecentMax().toString,

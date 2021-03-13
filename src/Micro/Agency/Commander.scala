@@ -352,7 +352,7 @@ object Commander {
           lazy val coworkers            = With.gathering.getWorkersByResource(resource)
           lazy val accelerantFrame      = 11 + With.latency.framesRemaining
           lazy val accelerantMineral    = With.gathering.getAccelerantMineral(resource)
-          lazy val accelerantPixel      = With.gathering.getAccelerantPixel(resource)
+          lazy val accelerantPixel      = With.gathering.getAccelerantPixelSteady(resource)
           lazy val distance             = unit.pixelDistanceEdge(resource)
           lazy val projectedFrames      = PurpleMath.nanToZero(Math.max(0, distance - unit.unitClass.haltPixels) / unit.topSpeed + 2 * Math.min(distance, unit.unitClass.haltPixels) / unit.topSpeed)
           lazy val onAccelerantPixel    = With.gathering.onAccelerant(unit, resource)

@@ -15,7 +15,7 @@ import Utilities.ByOption
 import scala.collection.mutable
 import scala.util.Random
 
-class Gathering extends TimedTask with AccelerantMinerals with AccelerantPixels {
+class Gathering extends TimedTask with AccelerantMinerals with Zippers {
 
   withWeight(TaskQueueGlobalWeights.Gather)
 

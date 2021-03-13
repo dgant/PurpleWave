@@ -17,7 +17,6 @@ class SquadDefendBase(base: Base) extends Squad {
   private var lastAction = "Defend"
   override def toString: String = f"$lastAction ${base.heart}"
 
-  val walls = new Cache(() => base.units.filter(u => u.isOurs && u.unitClass.isBuilding && u.unitClass.attacksGround))
   val zoneAndChoke = new Cache(() => {
     val zone: Zone = base.zone
     val threat = With.scouting.threatOrigin.zone
@@ -50,7 +49,6 @@ class SquadDefendBase(base: Base) extends Squad {
     lazy val allowWandering = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || enemies.exists(_.unitClass.ranged) || With.blackboard.wantToAttack()
     lazy val canScour = scourables().nonEmpty
     lazy val canDefendChoke = choke.isDefined && (units.size > 3 || ! With.enemies.exists(_.isZerg))
-    lazy val wallExistsButNoneNearChoke = walls().nonEmpty && walls().forall(wall => choke.forall(c => (c.sidePixels :+ c.pixelCenter).forall(wall.pixelDistanceCenter(_) > 8 * 32)))
     lazy val entranceBreached = scourables().exists(e =>
       e.unitClass.attacksGround
       && ! e.unitClass.isWorker
@@ -60,9 +58,6 @@ class SquadDefendBase(base: Base) extends Squad {
     if (canScour && (allowWandering || entranceBreached)) {
       lastAction = "Scour"
       huntEnemies()
-    } else if (wallExistsButNoneNearChoke) {
-      lastAction = "Protect wall of"
-      defendHeart(walls().minBy(_.pixel.groundPixels(With.scouting.mostBaselikeEnemyTile)).pixel)
     } else if ( ! entranceBreached && canDefendChoke) {
       lastAction = "Protect choke of"
       defendChoke()

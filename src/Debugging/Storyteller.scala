@@ -38,7 +38,7 @@ class Storyteller {
     }
   }
 
-  lazy val defaultTechs = Seq(
+  private lazy val defaultTechs = Seq(
     Terran.ScannerSweep,
     Terran.NuclearStrike,
     Terran.DefensiveMatrix,
@@ -49,6 +49,7 @@ class Storyteller {
     Zerg.Parasite,
     Zerg.InfestCommandCenter,
     Zerg.DarkSwarm)
+
   private lazy val interestingTechs = Techs.all.filterNot(defaultTechs.contains)
 
   val stories: Seq[IStory] = Seq(
@@ -190,6 +191,10 @@ class Storyteller {
     tell("JBWAPI async frame buffer size: " + Main.configuration.getAsyncFrameBufferCapacity)
     tell("JBWAPI unlimited frame zero: " + Main.configuration.getUnlimitedFrameZero)
     tell("JBWAPI max frame duration: " + Main.configuration.getMaxFrameDurationMs + "ms")
+    tell(f"Map file: ${With.mapFileName}")
+    tell(f"Map hash: ${With.game.mapHash}")
+    tell(f"Map id: ${With.mapCleanName}")
+    tell(f"Start: ${With.mapClock} o'clock}")
   }
 
   private def logStrategyEvaluation(): Unit = {

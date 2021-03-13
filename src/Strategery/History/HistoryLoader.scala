@@ -43,8 +43,7 @@ object HistoryLoader {
   }
   
   private def saveName: String = {
-    saveFilesDirectory +
-    filenameTemplate.replace(filenameEnemyToken, With.history.currentEnemyName)
+    saveFilesDirectory + filenameTemplate.replace(filenameEnemyToken, With.history.currentEnemyName)
   }
   
   private def loadAllGames(directories: Iterable[String]): Iterable[String] = {

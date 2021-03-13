@@ -12,13 +12,13 @@ import Macro.Allocation._
 import Macro.Architecture.Architecture
 import Macro.Gathering
 import Macro.Scheduling.{MasterBuildOrderHistory, MasterBuildPlans, Projections, Scheduler}
+import Mathematics.Points.Tile
 import Micro.Agency.Agency
 import Micro.Coordination.Coordinator
 import Micro.Matchups.MatchupGraph
 import Micro.Squads.Squads
 import Performance.TaskQueue.{TaskQueueGlobal, TaskQueueParallel}
 import Placement.Preplacement
-import Tactics.Tactics
 import Planning.{Blackboard, Yolo}
 import ProxyBwapi.Bullets.Bullets
 import ProxyBwapi.Players.{PlayerInfo, Players}
@@ -26,6 +26,7 @@ import ProxyBwapi.ProxyBWAPI
 import ProxyBwapi.UnitTracking.UnitTracker
 import Strategery.History.History
 import Strategery.{StarCraftMapMatcher, Strategist}
+import Tactics.Tactics
 import _root_.Performance.{Latency, PerformanceMonitor, ReactionTimes}
 import bwapi.Flag
 import bwta.BWTA
@@ -41,7 +42,8 @@ object With {
   var mapTileWidth    : Int                 = 0
   var mapTileHeight   : Int                 = 0
   var mapFileName     : String              = _
-  var mapId           : String              = _
+  var mapCleanName    : String              = _
+  var mapClock        : String              = _
   var startNanoTime   : Long                = 0
 
   var game              : bwapi.Game              = _
@@ -115,15 +117,16 @@ object With {
     // Basic data //
     ////////////////
 
-    frame             = 0
-    proxy             = new ProxyBWAPI
-    self              = Players.get(game.self)
-    neutral           = Players.get(game.neutral)
-    enemies           = game.enemies.asScala.map(Players.get).toVector
-    mapTileWidth      = game.mapWidth
-    mapTileHeight     = game.mapHeight
-    mapFileName       = game.mapFileName
-    mapId             = StarCraftMapMatcher.clean(mapFileName)
+    frame         = 0
+    proxy         = new ProxyBWAPI
+    self          = Players.get(game.self)
+    neutral       = Players.get(game.neutral)
+    enemies       = game.enemies.asScala.map(Players.get).toVector
+    mapTileWidth  = game.mapWidth
+    mapTileHeight = game.mapHeight
+    mapFileName   = game.mapFileName
+    mapCleanName  = StarCraftMapMatcher.clean(mapFileName)
+    mapClock      = StarCraftMapMatcher.clock(new Tile(With.game.self.getUnits.asScala.maxBy(_.getHitPoints).getTilePosition).pixelCenter)
 
     ///////////////////
     // Configuration //

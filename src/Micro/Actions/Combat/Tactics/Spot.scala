@@ -1,6 +1,5 @@
 package Micro.Actions.Combat.Tactics
 
-import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Agency.Commander
@@ -14,14 +13,14 @@ object Spot extends Action {
     && unit.flying
     && ! unit.unitClass.isTransport
     && ! unit.canAttack
-    && unit.team.exists(_.units.exists(_.canAttack))
+    && unit.alliesSquad.exists(_.canAttack)
     && (unit.matchups.pixelsOfEntanglement > -58 || unit.totalHealth > 500 || (unit.cloaked && unit.matchups.enemyDetectors.isEmpty))
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {
     val from = unit.matchups.anchor.map(_.pixel).orElse(unit.team.map(_.centroidAir())).getOrElse(unit.agent.origin)
     val toSpotEnemy = best(from, unit, unit.enemiesSquad).orElse(best(from, unit, unit.enemiesBattle))
-    val toSpot = toSpotEnemy.map(_.pixel).getOrElse(With.scouting.threatOrigin.pixelCenter)
+    val toSpot = toSpotEnemy.map(_.pixel).getOrElse(unit.agent.destination)
     unit.agent.toTravel = Some(toSpot)
     Commander.move(unit)
   }

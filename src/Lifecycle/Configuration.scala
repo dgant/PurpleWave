@@ -25,6 +25,7 @@ class Configuration {
   var visualizeDebug    = false
   var debugging         = false
   var detectBreakpoints = false
+  var camera            = false
 
   //////////////
   // Strategy //

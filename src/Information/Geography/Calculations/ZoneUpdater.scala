@@ -14,11 +14,8 @@ object ZoneUpdater {
     // Precalculate these
     With.geography.zones.foreach(_.distanceGrid)
     With.geography.zones.foreach(_.edges.foreach(_.distanceGrid))
-
     With.geography.zones.foreach(_.unitBuffer.clear())
-    With.units.all.filter(_.likelyStillThere).foreach(unit =>
-      unit.zone.unitBuffer += unit
-    )
+    With.units.all.filter(_.likelyStillThere).foreach(unit => unit.zone.unitBuffer += unit)
     With.geography.zones.foreach(updateZone)
   
     if ( ! With.geography.naturalsSearched) {
@@ -38,13 +35,11 @@ object ZoneUpdater {
       .filterNot(_.isNeutral)
       .map(player => (player, BorderFinder.claimedZones(player)))
       .toMap
-    
     playerBorders.foreach(pair => pair._2.foreach(zone => {
       if ( ! zone.owner.isNeutral || zone.contested) {
         zone.owner = With.neutral
         zone.contested = true
-      }
-      else {
+      } else {
         zone.owner = pair._1
       }
     }))
@@ -55,7 +50,7 @@ object ZoneUpdater {
   }
 
   private val wallBuildingThresholdDistanceSquared = Math.pow(32 * 12, 2)
-  def updateZone(zone: Zone) {
+  private def updateZone(zone: Zone) {
     zone.distanceGrid.initialize()
     zone.edges.foreach(_.distanceGrid.initialize())
     zone.exitDistanceGrid.initialize()
@@ -67,20 +62,15 @@ object ZoneUpdater {
         .filter(_.pixelDistanceSquared(exit.pixelCenter) < wallBuildingThresholdDistanceSquared)
         .filter(u => u.unitClass.isBuilding && ! u.flying))
       .getOrElse(List.empty)
-  
     lazy val canaryTileInside   = zone.tiles.find(With.grids.walkable.get)
     lazy val canaryTileOutside  = zone.exit.map(_.otherSideof(zone)).flatMap(_.tiles.find(With.grids.walkable.get))
     zone.walledIn = (
-      With.frame < Minutes(10)()
+      With.frame < Minutes(6)()
       && exitBuildings.exists(_.isAny(Terran.SupplyDepot, Terran.EngineeringBay))
       && exitBuildings.exists(Terran.Barracks)
       && canaryTileInside.exists(tileInside =>
           canaryTileOutside.exists(tileOutside =>
-            ! new PathfindProfile(
-                tileInside,
-                end = Some(tileOutside),
-                lengthMaximum = Some(100))
-              .find.pathExists)))
+            ! new PathfindProfile(tileInside, end = Some(tileOutside), lengthMaximum = Some(100)).find.pathExists)))
   }
   
   

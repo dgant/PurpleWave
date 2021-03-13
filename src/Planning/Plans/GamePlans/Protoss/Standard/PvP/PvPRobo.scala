@@ -33,7 +33,9 @@ class PvPRobo extends GameplanTemplate {
     new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
     new And(
       new UnitsAtMost(0, Protoss.RoboticsSupportBay),
-      new Not(new GetObservers),
+      new Or(
+        new Check(() => With.strategy.isRamped),
+        new Not(new GetObservers)),
       new Not(new oneGateCoreLogic.GateTechGateGate),
       new Or(
         new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.robo),

@@ -25,7 +25,6 @@ class Camera extends TimedTask {
   var obscurityByUnit   : Map[UnitInfo, Double] = Map.empty
   var visibleArea       : TileRectangle         = TileRectangle(Tile(0, 0), Tile(0, 0))
   var visibleUnits      : Set[UnitInfo]         = Set.empty
-  var enabled           : Boolean               = false
 
   private def totalInterest(unit: UnitInfo): Double = {
     val interestBattle    = if (unit.battle.exists(_.enemy.units.exists(u => u.canAttack && ! u.unitClass.isWorker))) 100.0 else 1.0
@@ -39,12 +38,12 @@ class Camera extends TimedTask {
     // Enable autocamera until we interact with the screen
     val mousePosition = new Pixel(With.game.getMousePosition)
     if (mousePosition.x > 10 && mousePosition.x < 630 && mousePosition.y > 10 && mousePosition.y < 470) {
-      enabled = enabled && ! With.game.getMouseState(MouseButton.M_LEFT)
-      enabled = enabled && ! With.game.getMouseState(MouseButton.M_MIDDLE)
-      enabled = enabled && ! With.game.getMouseState(MouseButton.M_RIGHT)
+      With.configuration.camera = With.configuration.camera && ! With.game.getMouseState(MouseButton.M_LEFT)
+      With.configuration.camera = With.configuration.camera && ! With.game.getMouseState(MouseButton.M_MIDDLE)
+      With.configuration.camera = With.configuration.camera && ! With.game.getMouseState(MouseButton.M_RIGHT)
     }
 
-    if ( ! enabled) { return }
+    if ( ! With.configuration.camera) { return }
 
     val interestGain  = 1.0 / impatienceFrames
     val interestDecay = 2 * interestGain

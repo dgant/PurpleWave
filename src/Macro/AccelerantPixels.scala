@@ -1,10 +1,14 @@
 package Macro
 
+import java.io.PrintWriter
+import java.nio.file.Paths
+
 import Lifecycle.With
-import Mathematics.Points.Pixel
+import Mathematics.Points.{Pixel, Tile}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.CountMap
+import mjson.Json
 
 import scala.collection.mutable
 
@@ -54,6 +58,9 @@ trait AccelerantPixels {
   }
 
   def updateAccelerantPixels(): Unit = {
+    if (With.frame == 0) {
+      onStart()
+    }
     val arrivingWorkers = With.units.ours.filter(u =>
       u.unitClass.isWorker
       && u.orderTarget.exists(t =>
@@ -65,17 +72,98 @@ trait AccelerantPixels {
       val accelerantPixel = worker.previousPixel(framesAgo)
       if (accelerantPixel.pixelDistance(worker.pixel) > 32) {
         val mineral = worker.orderTarget.get
-        if ( ! accelerantPixels.contains(mineral)) {
-          accelerantPixels(mineral) = new CountMap[Pixel]()
-        }
-        val count = accelerantPixels(mineral)
-        count(accelerantPixel) += 1
-        // Limit the map size
-        if (count.keys.size > 12) {
-          count --= count.keys.toVector.sortBy(count).take(count.keys.size / 2)
-        }
-
+        add(mineral, accelerantPixel, 1)
       }
     })
+  }
+
+  private def add(mineral: UnitInfo, pixel: Pixel, value: Int): Unit = {
+    accelerantPixels(mineral) = accelerantPixels.getOrElse(mineral, new CountMap[Pixel]())
+    val count = accelerantPixels(mineral)
+    count(pixel) += value
+    if (count.keys.size > 12) {
+      count --= count.keys.toVector.sortBy(count).take(count.keys.size / 2)
+    }
+  }
+
+  ///////////////////
+  // Serialization //
+  ///////////////////
+
+  class MapInfo(var hash: String = "", val accelerants: mutable.Buffer[(Tile, Pixel)] = new mutable.ArrayBuffer[(Tile, Pixel)]()) {
+    def this(json: Json) {
+      this()
+      hash = json.at("mapHash").asString
+      val accelerantPixelsJson = json.at("tiles")
+      var i = 0
+      while (i < accelerantPixelsJson.asJsonList.size) {
+        val accelerantJson = accelerantPixelsJson.at(i)
+        accelerants.append((
+          Tile(accelerantJson.at("mineralTileX").asInteger, accelerantJson.at("mineralTileY").asInteger),
+          Pixel(accelerantJson.at("gatherPixelX").asInteger, accelerantJson.at("gatherPixelY").asInteger)))
+        i += 1
+      }
+    }
+    def asJson: Json = {
+      val output = Json.`object`()
+        .set("mapHash", hash)
+        .set("tiles", Json.array())
+      for (((t, p), i) <- accelerants.zipWithIndex) {
+        output.at("tiles")
+          .add(i)
+          .set(i, Json.`object`())
+          .at(i)
+          .set("mineralTileX", t.x)
+          .set("mineralTileY", t.y)
+          .set("gatherPixelX", p.x)
+          .set("gatherPixelY", p.y)
+      }
+      output
+    }
+  }
+
+
+  lazy val filename: String = f"accelerants-${With.mapCleanName}.json"
+
+  def read(): Unit = {
+    Seq(With.bwapiData.ai, With.bwapiData.read, With.bwapiData.write).foreach(directory => {
+      try {
+        val file = Paths.get(directory, filename).toFile
+        if (file.exists()) {
+          With.logger.debug(s"Found accelerant logs in ${file.getAbsoluteFile}")
+          val jsonText = scala.io.Source.fromFile(file).mkString
+          val json = Json.read(jsonText)
+          val mapInfo = new MapInfo(json)
+          if (mapInfo.hash == With.game.mapHash) {
+            mapInfo.accelerants.foreach(p => With.units.neutral.find(_.tileTopLeft == p._1).filterNot(accelerantPixels.contains).foreach(add(_, p._2, 10)))
+          }
+        }
+      } catch { case exception: Exception => With.logger.onException(exception) }
+    })
+  }
+
+  def write(): Unit = {
+    val info = new MapInfo(With.game.mapHash, accelerantPixels.filterNot(_._2.mode.isEmpty).map(p => (p._1.tileTopLeft, p._2.mode.get)).toBuffer)
+    val text = info.asJson.toString()
+    try {
+      val file = Paths.get(With.bwapiData.write, filename).toFile
+      val writer = new PrintWriter(file)
+      writer.print(text)
+      writer.close()
+    } catch { case exception: Exception => With.logger.onException(exception) }
+  }
+
+  def onStart(): Unit = {
+    read()
+    val loadedMinerals = With.units.neutral.view.count(accelerantPixels.contains)
+    if (loadedMinerals > 0) {
+      With.logger.debug(f"$loadedMinerals minerals have cached accelerants")
+    }
+  }
+
+  def onEnd(): Unit = {
+    // Read again in case we're running games in parallel so we don't lose data
+    read()
+    write()
   }
 }

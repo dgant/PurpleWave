@@ -5,7 +5,7 @@ import Lifecycle.With
 abstract class StarCraftMap {
   val name: String = ToString(this)
   val nameStub: String = StarCraftMapMatcher.clean(name)
-  def matches: Boolean = nameStub.contains(With.mapId) || With.mapId.contains(nameStub)
+  def matches: Boolean = nameStub.contains(With.mapCleanName) || With.mapCleanName.contains(nameStub)
   var mineralWalkingOkay: Boolean = true
 }
 object Alchemist extends StarCraftMap
@@ -35,16 +35,16 @@ object ThirdWorld extends StarCraftMap
 object Transistor extends StarCraftMap
 
 object StarCraftMaps {
-
   val all: Vector[StarCraftMap] = Vector(
     Alchemist,
+    Arcadia,
     Benzene,
     BlueStorm,
     ChupungRyeong,
     Eddy,
     EmpireOfTheSun,
-    GoldRush,
     Gladiator,
+    GoldRush,
     GreatBarrierReef,
     Heartbreak,
     Hitchhiker,
@@ -52,6 +52,7 @@ object StarCraftMaps {
     LaMancha,
     Pathfinder,
     Plasma,
+    Python,
     Roadrunner,
     Sparkle,
     TauCross,

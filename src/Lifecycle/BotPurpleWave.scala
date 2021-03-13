@@ -44,6 +44,7 @@ class BotPurpleWave extends DefaultBWListener {
     tryCatch(() => {
       With.logger.debug("Game ended in " + (if (isWinner) "victory" else "defeat"))
       With.history.onEnd(isWinner)
+      With.gathering.onEnd()
       With.storyteller.onEnd()
       With.manners.onEnd(isWinner)
       With.logger.flush()

@@ -25,7 +25,7 @@ object ShowPerformanceDetails extends View {
       .map(task => Vector(
         task.toString,
         (task.runMsTotal / 1000).toString,
-        f"${(100.0 * task.runMsTotal / (With.performance.systemMillis - With.performance.gameStartMs)).toInt}%",
+        f"${(100.0 * task.runMsTotal / (With.performance.systemMillis - With.performance.gameStartMs)).toInt}%%",
         PurpleMath.meanL(task.budgetMsPast).toInt.toString,
         task.runMsRecentMean.toString,
         task.runMsRecentMax().toString,

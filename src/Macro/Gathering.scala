@@ -71,13 +71,8 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     .map(resource => (resource, ByOption.min(miningBases().map(_.townHall.get.pixelDistanceEdge(resource))).getOrElse(kLightYear)))
     .toMap)
 
-  private def isLongDistanceResource(unit: UnitInfo): Boolean = {
-    ! miningBases().exists(unit.base.contains)
-  }
-
-  private def isNewResource(unit: UnitInfo): Boolean = {
-    ! workersByResource.contains(unit)
-  }
+  private def isLongDistanceResource(unit: UnitInfo): Boolean = ! miningBases().exists(unit.base.contains)
+  private def isNewResource(unit: UnitInfo): Boolean = ! workersByResource.contains(unit)
 
   private def assignWorker(worker: FriendlyUnitInfo, resource: UnitInfo): Unit = {
     unassignWorker(worker)
@@ -94,22 +89,16 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     workersByResource(resource) = workersByResource.getOrElse(resource, mutable.Set.empty)
   }
 
-  private def containsResource(resource: UnitInfo): Boolean = {
-    workersByResource.contains(resource)
-  }
+  private def containsResource(resource: UnitInfo): Boolean = workersByResource.contains(resource)
 
   private def excludeResource(resource: UnitInfo): Unit = {
     workersByResource.get(resource).foreach(_.foreach(resourceByWorker.remove))
     workersByResource.remove(resource)
   }
 
-  private def getResource(worker: FriendlyUnitInfo): Option[UnitInfo] = {
-    resourceByWorker.get(worker)
-  }
+  private def getResource(worker: FriendlyUnitInfo): Option[UnitInfo] = resourceByWorker.get(worker)
 
-  private def countWorkers(resource: UnitInfo): Int = {
-    workersByResource.get(resource).map(_.size).getOrElse(0)
-  }
+  private def countWorkers(resource: UnitInfo): Int = workersByResource.get(resource).map(_.size).getOrElse(0)
 
   override def onRun(budgetMs: Long) {
     initializeAccelerators()

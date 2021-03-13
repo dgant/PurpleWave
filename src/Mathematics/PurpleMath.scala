@@ -251,6 +251,9 @@ object PurpleMath {
   @inline final def sample[T](seq: Seq[T]): T = {
     seq(Random.nextInt(seq.size))
   }
+  @inline final def sampleSet[T](set: Set[T]): T = {
+    set.iterator.drop(Random.nextInt(set.size)).next
+  }
 
   @inline final def sampleWeighted[T](seq: Seq[T], extract: (T) => Double): Option[T] = {
     if (seq.isEmpty) return None

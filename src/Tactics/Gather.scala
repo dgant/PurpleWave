@@ -13,8 +13,7 @@ class Gather extends Prioritized {
 
   def update() {
     workerLock.acquire(this)
-    With.gathering.gatheringPlan = this
-    With.gathering.workers = workerLock.units
+    With.gathering.setWorkers(workerLock.units)
   }
 
   override val toString = ToString(this)

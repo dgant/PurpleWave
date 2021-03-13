@@ -62,7 +62,7 @@ object With {
   var configuration     : Configuration           = _
   var accounting        : Accounting              = _
   var fingerprints      : Fingerprints            = _
-  var gathering         : Gathering               = _
+  var gathering         : Gathering              = _
   var geography         : Geography               = _
   var grids             : Grids                   = _
   var groundskeeper     : Groundskeeper           = _

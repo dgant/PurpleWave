@@ -7,6 +7,9 @@ class StrategySelectionRecommended(fallback: StrategySelectionPolicy, recommende
 
   var duration = 5
 
+  override def respectMap     : Boolean = true
+  override def respectHistory : Boolean = false
+
   def this(fallback: StrategySelectionPolicy, duration: Int, recommendedBranch: Strategy*) {
     this(fallback, recommendedBranch: _*)
     this.duration = duration

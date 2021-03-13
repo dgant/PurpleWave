@@ -2,11 +2,15 @@ package Information.Fingerprinting.ProtossStrategies
 
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
-import Utilities.GameTime
+import Utilities.Minutes
 
 class FingerprintGasSteal extends Fingerprint {
-  
-  override val sticky = true
 
-  override protected def investigate: Boolean = With.frame < GameTime(5, 0)() && With.geography.ourMain.gas.exists(_.isEnemy)
+  override protected def investigate: Boolean = {
+    With.geography.ourMain.gas.exists(_.isEnemy)
+  }
+
+  override def lockAfter: Int = Minutes(5)()
+
+  override val sticky = true
 }

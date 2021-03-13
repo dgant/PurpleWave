@@ -15,7 +15,7 @@ import scala.collection.mutable
 class Strategist {
 
   lazy val map: Option[StarCraftMap] = StarCraftMaps.all.find(_.matches)
-  lazy val selectedInitially: Set[Strategy] = With.configuration.playbook.strategySelectionPolicy.chooseBranch.toSet
+  lazy val selectedInitially: Set[Strategy] = With.configuration.playbook.policy.chooseBranch.toSet
 
   private var enemyRaceAtLastCheck: Race = With.enemy.raceInitial
   private var selectedLast: Option[Set[Strategy]] = None

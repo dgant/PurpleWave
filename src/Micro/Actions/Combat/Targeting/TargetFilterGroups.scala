@@ -14,14 +14,15 @@ object TargetFilterGroups {
     TargetFilterVulture,
     TargetFilterFutility,
     TargetFilterAnchor,
-    TargetFilterCarrierIgnoreInterceptors)
+    TargetFilterVsInterceptors,
+    TargetFilterVsTank)
 
   val filtersForSimulation: Vector[TargetFilter] = filtersRequired.filter(_.simulationSafe)
 
   val filtersPreferred = Vector(
     TargetFilterCarrierInRange,
     TargetFilterCarrierInLeash,
-    TargetFilterCarrierShootsUp,
+    TargetFilterAntiAir,
     TargetFilterCombatants,
     TargetFilterFrontline,
   )

@@ -18,9 +18,10 @@ object Detect extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-
     val spookiestSpooky =
-      pickBestSpooky(unit, unit.enemiesSquad.filter(_.effectivelyCloaked)).orElse(
+      pickBestSpooky(unit, if (unit.matchups.anchor.exists(_.isAny(Terran.Battlecruiser, Protoss.Carrier, Zerg.Mutalisk, Zerg.Devourer))) unit.enemiesSquad.filter(Terran.Wraith) else Seq.empty).orElse(
+      pickBestSpooky(unit, if (unit.matchups.anchor.exists(_.isAny(Terran.Battlecruiser, Protoss.Carrier, Zerg.Mutalisk, Zerg.Devourer))) unit.enemiesBattle.filter(Terran.Wraith) else Seq.empty)).orElse(
+      pickBestSpooky(unit, unit.enemiesSquad.filter(_.effectivelyCloaked))).orElse(
       pickBestSpooky(unit, unit.enemiesSquad.filter(_.cloakedOrBurrowed))).orElse(
       pickBestSpooky(unit, unit.enemiesSquad.filter(canEventuallyCloak))).orElse(
       pickBestSpooky(unit, unit.enemiesBattle.filter(_.effectivelyCloaked))).orElse(

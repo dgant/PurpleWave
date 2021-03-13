@@ -11,13 +11,11 @@ import Strategery.Strategies.Terran.TvR.TvR1Rax
 import Strategery.Strategies.Zerg._
 
 class Playbook extends SimpleString {
-  val none: Seq[Strategy] = Seq.empty
-  lazy val disabled : Seq[Strategy] = none
-  def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy()
-  def enemyName: String = With.enemy.name
-  def respectOpponent: Boolean = true
-  def respectMap: Boolean = true
-  def respectHistory: Boolean = true
+  lazy val disabled   : Seq[Strategy]           = Seq.empty
+  def policy          : StrategySelectionPolicy = StrategySelectionGreedy()
+  def enemyName       : String                  = With.enemy.name
+  def respectMap      : Boolean                 = policy.respectMap
+  def respectHistory  : Boolean                 = policy.respectHistory
 }
 
 object StrategyGroups {
@@ -58,24 +56,23 @@ object StrategyGroups {
 
 class NormalPlaybook extends Playbook {
   override lazy val disabled: Seq[Strategy] = StrategyGroups.disabled
-  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy()
+  override def policy: StrategySelectionPolicy = StrategySelectionGreedy()
 }
 
 object TournamentPlaybook extends NormalPlaybook {
-  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionTournament
+  override def policy: StrategySelectionPolicy = StrategySelectionTournament
 }
 
 object HumanPlaybook extends NormalPlaybook {
-  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionDynamic
+  override def policy: StrategySelectionPolicy = StrategySelectionDynamic
 }
 
 object PretrainingPlaybook extends NormalPlaybook {
-  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionDynamic
+  override def policy: StrategySelectionPolicy = StrategySelectionDynamic
 }
 
 class TestingPlaybook extends NormalPlaybook {
-  override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionRandom
-  override def respectOpponent: Boolean = false
+  override def policy: StrategySelectionPolicy = StrategySelectionRandom
   override def respectMap: Boolean = false
   override def respectHistory: Boolean = false
 }

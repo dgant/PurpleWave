@@ -166,7 +166,7 @@ object ConfigurationLoader {
     if (matchingBranches.nonEmpty) {
       With.logger.debug("Using fixed build: " + strategyNamesText)
       config.forcedPlaybook = Some(new TestingPlaybook {
-        override def strategySelectionPolicy: StrategySelectionPolicy = StrategySelectionGreedy(Some(matchingBranches))
+        override def policy: StrategySelectionPolicy = StrategySelectionGreedy(Some(matchingBranches))
       })
     }
   }

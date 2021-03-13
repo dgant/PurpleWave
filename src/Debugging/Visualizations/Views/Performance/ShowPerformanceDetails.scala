@@ -20,14 +20,13 @@ object ShowPerformanceDetails extends View {
     .sortBy(-_.runsCrossingLimit)
 
   def statusTable(tasks: Seq[TimedTask]): Seq[Seq[String]] = {
-    val title = Vector("Target:", With.configuration.frameTargetMs + "ms", "", "Cutoff:", With.configuration.frameLimitMs + "ms")
+    val title = Vector("Target:", f"${With.configuration.frameTargetMs}ms", "Cutoff:", f"${With.configuration.frameLimitMs}ms")
     val headers = Vector("Task", "Seconds", "%Time", "Budget (Recent)", "Avg ms", "Max (Recent)", "Max (All time)", "AcrossTarget", "AcrossLimit")
     val body = tasks
       .map(task => Vector(
         task.toString,
-        "X" * Math.min(10, Math.max(0, task.framesSinceRunning - 1)),
         (task.runMsTotal / 1000).toString,
-        Decimal(task.runMsTotal / (With.performance.systemMillis - With.performance.gameStartMs), 1),
+        Decimal(task.runMsTotal.toDouble / (With.performance.systemMillis - With.performance.gameStartMs), 1),
         PurpleMath.meanL(task.budgetMsPast).toInt.toString,
         task.runMsRecentMean.toString,
         task.runMsRecentMax().toString,

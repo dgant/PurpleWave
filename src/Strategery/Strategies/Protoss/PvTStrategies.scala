@@ -65,7 +65,6 @@ object PvT1015Expand extends PvTBasicOpener {
 }
 object PvT1015DT extends PvTStrategy {
   override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Destination)
-  override def entranceRamped: Boolean = false
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     Vector(
       PvT2BaseArbiter,

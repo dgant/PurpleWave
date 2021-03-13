@@ -57,7 +57,7 @@ class PvTBasic extends GameplanTemplate {
 
   override val attackPlan = new If(
     new And(
-      new Or(new Latch(new UnitsAtLeast(4, Protoss.Carrier, complete = true)),      new Not(new Employing(PvT2BaseCarrier)),  new UnitsAtMost(0, Protoss.FleetBeacon)),
+      new Or(new Latch(new UnitsAtLeast(4, Protoss.Carrier, complete = true)),      new Not(new EmployingCarriers),           new UnitsAtMost(0, Protoss.FleetBeacon)),
       new Or(new Latch(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true)),  new Not(new Employing(PvTDTExpand)),      new UpgradeStarted(Protoss.DragoonRange)),
       new Or(new Latch(new UnitsAtLeast(1, Protoss.Reaver, complete = true)),       new Not(new Employing(PvT1GateReaver)),   new UpgradeStarted(Protoss.DragoonRange))),
     new PvTIdeas.AttackSafely)

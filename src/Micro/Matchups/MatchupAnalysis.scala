@@ -87,18 +87,19 @@ case class MatchupAnalysis(me: UnitInfo) {
   }
 
   private def doesAnchor(anchor: UnitInfo, support: UnitInfo): Boolean = {
+    if (anchor.unitClass == support.unitClass) return false // Safety valve
     var output = false
-    output ||= anchor.unitClass.isBuilding && anchor.unitClass.canAttack      && support.isAny(Terran.Marine, Terran.Goliath)
-    output ||= anchor.isAny(MatchSiegeTank, Terran.Battlecruiser)             && ! support.isAny(MatchSiegeTank, Terran.Battlecruiser)
-    output ||= anchor.isAny(Terran.Medic)                                     && support.isAny(Terran.Marine, Terran.Firebat)
-    output ||= anchor.isAny(Terran.Marine)                                    && support.isAny(Terran.SCV)
-    output ||= anchor.isAny(Protoss.Carrier)                                  && ! support.isAny(Protoss.Carrier)
-    output ||= anchor.isAny(Protoss.Arbiter, Protoss.Reaver)                  && support.isAny(Protoss.Zealot, Protoss.Dragoon, Protoss.Archon, Protoss.HighTemplar, Protoss.Corsair)
-    output ||= anchor.isAny(Protoss.HighTemplar) && anchor.energy > 65        && support.isAny(Protoss.Zealot, Protoss.Dragoon, Protoss.Archon)
-    output ||= anchor.isAny(Protoss.Dragoon, Protoss.Archon)                  && support.isAny(Protoss.Zealot)
-    output ||= anchor.isAny(Zerg.Lurker, Zerg.Ultralisk)                      && support.isAny(Zerg.Zergling, Zerg.Hydralisk)
-    output ||= anchor.isAny(Zerg.Guardian)                                    && ! support.isAny(Zerg.Guardian)
-    output ||= anchor.isAny(Zerg.Mutalisk, Zerg.Devourer)                     && ! support.isAny(Zerg.Scourge)
+    output ||= anchor.unitClass.isBuilding && anchor.unitClass.canAttack  && support.isAny(Terran.Marine, Terran.Goliath)
+    output ||= anchor.isAny(MatchSiegeTank, Terran.Battlecruiser)         && ! support.isAny(MatchSiegeTank, Terran.Battlecruiser)
+    output ||= anchor.isAny(Terran.Medic)                                 && support.isAny(Terran.Marine, Terran.Firebat)
+    output ||= anchor.isAny(Terran.Marine)                                && support.isAny(Terran.SCV)
+    output ||= anchor.isAny(Protoss.Carrier)                              && ! support.isAny(Protoss.Carrier)
+    output ||= anchor.isAny(Protoss.Arbiter, Protoss.Reaver)              && support.isAny(Protoss.Zealot, Protoss.Dragoon, Protoss.Archon, Protoss.HighTemplar, Protoss.Corsair)
+    output ||= anchor.isAny(Protoss.HighTemplar) && anchor.energy > 65    && support.isAny(Protoss.Zealot, Protoss.Dragoon, Protoss.Archon)
+    output ||= anchor.isAny(Protoss.Dragoon, Protoss.Archon)              && support.isAny(Protoss.Zealot)
+    output ||= anchor.isAny(Zerg.Lurker, Zerg.Ultralisk)                  && support.isAny(Zerg.Zergling, Zerg.Hydralisk)
+    output ||= anchor.isAny(Zerg.Guardian)                                && ! support.isAny(Zerg.Guardian)
+    output ||= anchor.isAny(Zerg.Mutalisk, Zerg.Devourer)                 && ! support.isAny(Zerg.Scourge)
     output
   }
 }

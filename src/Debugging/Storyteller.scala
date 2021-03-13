@@ -55,7 +55,7 @@ class Storyteller {
     new Story[Iterable[PlayerInfo]]     ("Opponents",          () => With.enemies.filter(_.isEnemy),                                                                                  _.map(_.name).mkString(", ")),
     new Story[Iterable[Double]]         ("Rush distances",     () => With.geography.rushDistances,                                                                                    _.map(d => (d / 32).toInt.toString).mkString(", ")),
     new Story                           ("Playbook",           () => With.configuration.playbook),
-    new Story                           ("Policy",             () => With.configuration.playbook.strategySelectionPolicy),
+    new Story                           ("Policy",             () => With.configuration.playbook.policy),
     new Story                           ("Enemy race",         () => With.enemy.raceCurrent),
     new Story[Iterable[Strategy]]       ("Strategy",           () => With.strategy.selectedCurrently,                                                                                 _.map(_.toString).mkString(" ")),
     new Story                           ("Our bases",          () => With.geography.ourBases.size),

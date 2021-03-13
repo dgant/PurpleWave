@@ -8,6 +8,7 @@ import Utilities.Minutes
 
 case class TargetFilterDefend(zone: Zone) extends TargetFilter {
   override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
+    if (With.frame > Minutes(10)() && With.reaction.sluggishness > 0) return true // Speculative since this can be N^2
 
     // If we want to attack anyway there's no need to ignore targets
     if (With.blackboard.wantToAttack()) return true

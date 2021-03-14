@@ -7,7 +7,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class Accounting extends TimedTask {
   
-  val incomePerFrameMinerals = 0.046
+  val incomePerFrameMinerals = 0.044 // 0.046 -- trying higher value due to more optimizations
   val incomePerFrameGas = 0.069
   
   // Should start at 50, of course,but this -30 offsets the effect of starting workers all being far from minerals
@@ -33,8 +33,8 @@ class Accounting extends TimedTask {
   
   private val ourPatchesMineralsCache = new Cache(() => With.geography.ourBases.map(_.minerals.size).sum)
   private val ourPatchesGasCache      = new Cache(() => With.geography.ourBases.map(_.gas.count(g => g.complete && g.isOurs)).sum)
-  private val ourActiveMinersCache    = new Cache(() => Math.max(0, With.units.countOursP(u => u.friendly.exists(isActivelyMining) && u.gatheringMinerals) - 1)) // Subtract one to account for a lone miner+builder
-  private val ourActiveDrillersCache  = new Cache(() => With.units.countOursP(u => u.friendly.exists(isActivelyMining) && u.gatheringGas))
+  private val ourActiveMinersCache    = new Cache(() => With.units.ours.count(u => isActivelyMining(u) && u.agent.toGather.exists(_.mineralsLeft > 0))) // Subtract one to account for a lone miner+builder
+  private val ourActiveDrillersCache  = new Cache(() => With.units.ours.count(u => isActivelyMining(u) && u.agent.toGather.exists(_.gasLeft > 0)))
   private val ourIncomePerFrameMineralsCache  = new Cache(() => Math.min(2.0 * ourPatchesMineralsCache(), ourActiveMinersCache())   * incomePerFrameMinerals)
   private val ourIncomePerFrameGasCache       = new Cache(() => Math.min(3.0 * ourPatchesGasCache(),      ourActiveDrillersCache()) * incomePerFrameGas)
 

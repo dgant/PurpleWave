@@ -91,12 +91,12 @@ object Gather extends Action {
       Potshot.consider(unit)
 
       // Run away if threatened during transfer
-      lazy val zoneNow          = unit.zone
-      lazy val zoneTo           = resource.zone
-      lazy val mainAndNatural   = Vector(With.geography.ourMain, With.geography.ourNatural).map(_.zone)
-      lazy val transferring     = ! unit.base.exists(_.owner.isUs) && zoneNow != zoneTo && ! (mainAndNatural.contains(zoneNow) && mainAndNatural.contains(zoneTo))
-      lazy val threatened       = unit.battle.isDefined && unit.matchups.framesOfSafety < combatWindow && ! unit.matchups.threats.forall(MatchWorker)
-      lazy val threatCloser     = unit.matchups.threats.exists(_.pixelDistanceCenter(resource.pixel) < unit.pixelDistanceCenter(resource.pixel))
+      lazy val zoneNow        = unit.zone
+      lazy val zoneTo         = resource.zone
+      lazy val mainAndNatural = Vector(With.geography.ourMain, With.geography.ourNatural).map(_.zone)
+      lazy val transferring   = ! unit.base.exists(_.owner.isUs) && zoneNow != zoneTo && ! (mainAndNatural.contains(zoneNow) && mainAndNatural.contains(zoneTo))
+      lazy val threatened     = unit.battle.isDefined && unit.matchups.framesOfSafety < combatWindow && ! unit.matchups.threats.forall(MatchWorker)
+      lazy val threatCloser   = unit.matchups.threats.exists(_.pixelDistanceCenter(resource.pixel) < unit.pixelDistanceCenter(resource.pixel))
       if (transferring
         && threatened
         && threatCloser

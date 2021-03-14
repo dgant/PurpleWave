@@ -505,11 +505,10 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     val output  = - velocity.lengthFast * (deltaXY.normalize * velocity.normalize)
     output
   }
+  private val gatheringOrders = Seq(Orders.WaitForMinerals, Orders.MiningMinerals, Orders.WaitForGas, Orders.HarvestGas, Orders.MoveToMinerals, Orders.MoveToGas, Orders.ReturnGas, Orders.ReturnMinerals, Orders.ResetCollision)
   @inline final def speedApproachingEachOther(other: UnitInfo): Double = speedApproaching(other) + other.speedApproaching(this)
   @inline final def airborne: Boolean = flying || friendly.exists(_.transport.exists(_.flying))
-  @inline final def gathering: Boolean = unitClass.isWorker && orderTarget.exists(_.unitClass.isResource)
-  @inline final def gatheringMinerals: Boolean = unitClass.isWorker && orderTarget.exists(_.unitClass.isMinerals)
-  @inline final def gatheringGas: Boolean = unitClass.isWorker && orderTarget.exists(_.unitClass.isGas) && ! constructing
+  @inline final def gathering: Boolean = unitClass.isWorker && gatheringOrders.contains(order)
   @inline final def carrying: Boolean = carryingMinerals || carryingGas
 
   @inline final def presumptiveDestination: Pixel = if (isOurs) calculatePresumptiveDestination else presumptiveDestinationCached()

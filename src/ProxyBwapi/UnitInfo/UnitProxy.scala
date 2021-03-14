@@ -32,8 +32,8 @@ trait UnitProxy {
   def maelstrommed              : Boolean
   def stasised                  : Boolean
   def stimmed                   : Boolean
-  def gatheringMinerals         : Boolean
-  def gatheringGas              : Boolean
+  //def gatheringMinerals         : Boolean -- Removed in haste pre-AIST4
+  //def gatheringGas              : Boolean -- Removed in haste pre-AIST4
   def morphing                  : Boolean
   def constructing              : Boolean
   def repairing                 : Boolean

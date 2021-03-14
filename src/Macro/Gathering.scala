@@ -14,8 +14,8 @@ import scala.collection.mutable
 class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   private def isValidBase     (base: Base): Boolean = base.townHall.filter(_.isOurs).exists(_.remainingCompletionFrames < 240)
   private def isValidResource (unit: UnitInfo): Boolean = isValidMineral(unit) || isValidGas(unit)
-  private def isValidMineral  (unit: UnitInfo): Boolean = unit.alive && (longDistanceMinerals.contains(unit) || unit.base.exists(isValidBase)) && unit.mineralsLeft > 0
-  private def isValidGas      (unit: UnitInfo): Boolean = unit.alive && (longDistanceMinerals.contains(unit) || unit.base.exists(isValidBase)) && unit.isOurs && unit.unitClass.isGas && unit.remainingCompletionFrames < 24 * 6
+  private def isValidMineral  (unit: UnitInfo): Boolean = unit.alive && (unit.base.exists(longDistanceBases.contains) || unit.base.exists(isValidBase)) && unit.mineralsLeft > 0
+  private def isValidGas      (unit: UnitInfo): Boolean = unit.alive && (unit.base.exists(longDistanceBases.contains) || unit.base.exists(isValidBase)) && unit.isOurs && unit.unitClass.isGas && unit.remainingCompletionFrames < 24 * 6
   private class Slot(var resource: UnitInfo, val order: Int) {
     val tile        : Tile    = resource.tileTopLeft
     val base        : Base    = resource.base.getOrElse(With.geography.bases.minBy(_.heart.groundPixels(resource.tileTopLeft)))
@@ -35,14 +35,15 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
           PurpleMath.broodWarDistanceBox(m.topLeft, m.bottomRight, base.townHallArea.startPixel.add(47, 80), base.townHallArea.startPixel.add(70, 103)) * 0.05 +
           PurpleMath.broodWarDistanceBox(m.topLeft, m.bottomRight, base.townHallArea.startPixel, base.townHallArea.endPixel))
       (base, (sorted.map(new Slot(_, 0)) ++ sorted.reverse.map(new Slot(_, 1)) ++ sorted.reverse.map(new Slot(_, 2)))) })
-  private lazy val gasSlots: Map[Base, Vector[Slot]] = With.units.neutral.filter(_.gasLeft > 0)
-    .groupBy(m => m.base.getOrElse(With.geography.bases.minBy(_.heart.groundPixels(m.pixel))))
-    .map(group => {
-      val base = group._1
-      val sorted = group._2.toVector
-        .sortBy(_.gasMinersRequired)
-        .sortBy(g => PurpleMath.broodWarDistanceBox(g.topLeft, g.bottomRight, base.townHallArea.startPixel, base.townHallArea.endPixel))
-      (base, sorted.flatMap(g => (0 until g.gasMinersRequired).map(new Slot(g, _)).toVector)) }) ++ With.geography.bases.map((_, new Vector[Slot])) // Not all bases have gas! Make sure map contains them
+  private lazy val gasSlots: Map[Base, Vector[Slot]] = With.geography.bases.map(b => (b, Vector[Slot]())).toMap ++ // Not all bases have gas! Make sure map contains them
+    With.units.neutral.filter(_.gasLeft > 0)
+      .groupBy(m => m.base.getOrElse(With.geography.bases.minBy(_.heart.groundPixels(m.pixel))))
+      .map(group => {
+        val base = group._1
+        val sorted = group._2.toVector
+          .sortBy(_.gasMinersRequired)
+          .sortBy(g => PurpleMath.broodWarDistanceBox(g.topLeft, g.bottomRight, base.townHallArea.startPixel, base.townHallArea.endPixel))
+        (base, sorted.flatMap(g => (0 until g.gasMinersRequired).map(new Slot(g, _)).toVector)) })
   private lazy val slotsByResource: mutable.Map[UnitInfo, Seq[Slot]] = new mutable.HashMap[UnitInfo, Seq[Slot]] ++ (mineralSlots.values.view.flatten ++ gasSlots.values.view.flatten).groupBy(_.resource).map(p => (p._1, p._2.toSeq))
   private lazy val baseCosts: Map[(Base, Base), Double] = With.geography.bases
     .flatMap(baseA => With.geography.bases.map(baseB => (baseA, baseB)))
@@ -54,7 +55,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   private var bases                 : Vector[Base] = Vector.empty
   private var gasPumps              : Vector[FriendlyUnitInfo] = Vector.empty
   private var mineralSlotCount      : Int = 0
-  private var longDistanceMinerals  : Set[UnitInfo] = Set.empty
+  private var longDistanceBases     : Seq[Base] = Seq.empty
   private var gasWorkersToAdd       : Int = 0
 
   def setWorkers(newWorkers: collection.Set[FriendlyUnitInfo]): Unit = { workers = newWorkers }
@@ -74,21 +75,20 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     gasPumps = With.units.ours.filter(isValidGas).toVector
     mineralSlotCount = bases.view.flatMap(mineralSlots).count(_.mineable)
     val distanceMineralBases = mineralSlots.view
-      .filter(_._1.townHall.isEmpty) // With unoccupied bases
-      .map(p => (p._1, p._2, bases.minBy(baseCosts(_, p._1)))) // associate each with the closest extant base
-      .map(p => (p._1, p._2, p._3, baseCosts(p._1, p._3))) // (and the score to there)
-      .filter(p => mineralSlotCount < 14 || (With.blackboard.safeToMoveOut() && p._4 < naturalCost)) // Distance mine only if it's safe or we're desperate
-      .toVector.sortBy(_._4) // sort the closest
+      .filter(s => ! isValidBase(s._1) && s._1.townHall.forall(_.isOurs)) // With unoccupied/incomplete bases
+      .map(p => (p._1, p._2, bases.map(b2 => baseCosts(b2, p._1)).min)) // associate each with the score to the closest extant base
+      .filter(p => mineralSlotCount < 14 || (p._3 <= naturalCost && ! p._1.units.exists(u => u.isEnemy && u.unitClass.attacksGround))) // Distance mine only if it's safe or we're desperate
+      .toVector.sortBy(_._3) // sort the closest
     val distanceMineralBasesNeeded = distanceMineralBases.indices.find(i => distanceMineralBases.take(i).view.map(_._2.size).sum > 5).getOrElse(distanceMineralBases.size)
-    longDistanceMinerals= distanceMineralBases.view.take(distanceMineralBasesNeeded).flatMap(_._2).map(_.resource).toSet
+    longDistanceBases = distanceMineralBases.view.take(distanceMineralBasesNeeded).map(_._1)
 
     // Replace gas pumps
-    gasPumps.foreach(activeGas => {
+    gasPumps.foreach(ourGas => {
       // The pump don't work 'cause the vandals took the handles
-      val slotsToReplace = activeGas.base.view.flatMap(gasSlots).filter(s => s.tile == activeGas.tileTopLeft && s.resource != activeGas)
+      val slotsToReplace = ourGas.base.view.flatMap(gasSlots).filter(gasSlot => gasSlot.tile == ourGas.tileTopLeft && gasSlot.resource != ourGas)
       slotsToReplace.foreach(slot => {
-        slotsByResource.remove(slot.resource).foreach(slotsByResource(activeGas) = _)
-        slot.resource = activeGas
+        slotsByResource.remove(slot.resource).foreach(slotsByResource(ourGas) = _)
+        slot.resource = ourGas
       })})
 
     // Respect gas limitations
@@ -186,7 +186,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   private def mineralSaturation(base: Base): Double = PurpleMath.nanToOne(mineralSlots(base).count( ! _.free).toDouble / mineralSlots(base).count(_.resource.alive))
 
   private def findAssignment(worker: FriendlyUnitInfo): Unit = {
-    (if (gasWorkersToAdd > 0) tryGas(worker) || tryMinerals(worker) else tryMinerals(worker) || tryGas(worker))
+    (if (gasWorkersToAdd > 0) tryGas(worker) || tryMinerals(worker) else tryMinerals(worker) || tryGas(worker)) || tryLongDistance(worker)
   }
 
   private def assignWorker(worker: FriendlyUnitInfo, slot: Slot): Unit = {
@@ -219,27 +219,34 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
 
   private def tryMinerals(worker: FriendlyUnitInfo): Boolean = {
     val base = nearestBase(worker)
-    def basesNear(worker: FriendlyUnitInfo): Seq[Base] = bases.view.filter(baseCosts(base, _) <= naturalCost)
-    def basesFar(worker: FriendlyUnitInfo): Seq[Base] = bases.view.filter(baseCosts(base, _) > naturalCost)
+    def basesNear(worker: FriendlyUnitInfo): Seq[Base] = bases.view.filter(baseCosts(_, base) <= naturalCost)
+    def basesFar(worker: FriendlyUnitInfo): Seq[Base] = bases.view.filter(baseCosts(_, base) > naturalCost)
     val slot = mineralSlots(base).find(s => s.free && s.order == 0).orElse(
-      basesNear(worker).sortBy(baseCosts(base, _)).flatMap(mineralSlots(_)).find(s => s.free && s.order == 0)).orElse(
+      basesNear(worker).sortBy(baseCosts(_, base)).flatMap(mineralSlots(_)).find(s => s.free && s.order == 0)).orElse(
         mineralSlots(base).find(s => s.free && s.order == 1)).orElse(
-          basesNear(worker).sortBy(baseCosts(base, _)).flatMap(mineralSlots(_)).find(s => s.free && s.order == 1)).orElse(
-            basesFar(worker).sortBy(baseCosts(base, _)).flatMap(mineralSlots(_)).find(s => s.free && s.order < 2))
+          basesNear(worker).sortBy(baseCosts(_, base)).flatMap(mineralSlots(_)).find(s => s.free && s.order == 1)).orElse(
+            basesFar(worker).sortBy(baseCosts(_, base)).flatMap(mineralSlots(_)).find(s => s.free && s.order < 2))
     slot.foreach(assignWorker(worker, _))
     slot.isDefined
   }
 
   private def tryGas(worker: FriendlyUnitInfo): Boolean = {
     val base = nearestBase(worker)
-    def basesNear(worker: FriendlyUnitInfo): Seq[Base] = bases.view.filter(baseCosts(base, _) <= naturalCost)
-    def basesFar(worker: FriendlyUnitInfo): Seq[Base] = bases.view.filter(baseCosts(base, _) > naturalCost)
+    def basesNear(worker: FriendlyUnitInfo): Seq[Base] = bases.view.filter(baseCosts(_, base) <= naturalCost)
+    def basesFar(worker: FriendlyUnitInfo): Seq[Base] = bases.view.filter(baseCosts(_, base) > naturalCost)
     val slot = gasSlots(base).find(s => s.free && s.order < 4).orElse(
-      basesNear(worker).sortBy(baseCosts(base, _)).flatMap(gasSlots(_)).find(s => s.free && s.order < 4)).orElse(
-        basesFar(worker).sortBy(baseCosts(base, _)).flatMap(gasSlots(_)).find(s => s.free && s.order < 4)).orElse(
+      basesNear(worker).sortBy(baseCosts(_, base)).flatMap(gasSlots(_)).find(s => s.free && s.order < 4)).orElse(
+        basesFar(worker).sortBy(baseCosts(_, base)).flatMap(gasSlots(_)).find(s => s.free && s.order < 4)).orElse(
           gasSlots(base).find(_.free)).orElse(
-            basesNear(worker).sortBy(baseCosts(base, _)).flatMap(gasSlots(_)).find(_.free)).orElse(
-                basesFar(worker).sortBy(baseCosts(base, _)).flatMap(gasSlots(_)).find(_.free))
+            basesNear(worker).sortBy(baseCosts(_, base)).flatMap(gasSlots(_)).find(_.free)).orElse(
+                basesFar(worker).sortBy(baseCosts(_, base)).flatMap(gasSlots(_)).find(_.free))
+    slot.foreach(assignWorker(worker, _))
+    slot.isDefined
+  }
+
+  private def tryLongDistance(worker: FriendlyUnitInfo): Boolean = {
+    val base = nearestBase(worker)
+    val slot = longDistanceBases.sortBy(baseCosts(_, base)).view.flatMap(mineralSlots).find(_.free)
     slot.foreach(assignWorker(worker, _))
     slot.isDefined
   }

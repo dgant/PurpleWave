@@ -149,7 +149,7 @@ object Commander {
 
     // Send some units past their destination to maximize acceleration
     if (unit.isAny(Terran.Dropship, Terran.ScienceVessel, Protoss.Shuttle, Protoss.Observer, Protoss.HighTemplar, Zerg.Mutalisk, Zerg.Overlord, Zerg.Queen)) {
-      val overshootDistance = if (unit.flying) 288.0 else 8
+      val overshootDistance = if (unit.flying || unit.transport.exists(_.flying)) 288.0 else 8
       if (to == unit.pixel) {
         val signX = PurpleMath.forcedSignum(SpecificPoints.middle.x - to.x)
         val signY = PurpleMath.forcedSignum(SpecificPoints.middle.y - to.y)
@@ -164,7 +164,7 @@ object Commander {
       PurpleMath.clamp(to.x, unit.unitClass.dimensionLeft, With.mapPixelWidth  - unit.unitClass.dimensionRight),
       PurpleMath.clamp(to.y, unit.unitClass.dimensionUp,   With.mapPixelHeight - unit.unitClass.dimensionDown))
 
-    if (unit.flying) return to
+    if (unit.flying || unit.transport.exists(_.flying)) return to
 
     // Path around terrain (if we haven't already)
     if (unit.pixelDistanceTravelling(to) >= 2 * MicroPathing.waypointDistancePixels && With.reaction.sluggishness < 2 && unit.zone != to.zone) {

@@ -2,8 +2,9 @@ package Information.Battles.Types
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
-import Mathematics.Points.{Pixel, SpecificPoints}
+import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
+import Micro.Agency.AnchorMargin
 import Performance.Cache
 import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -36,6 +37,7 @@ class Team(val units: Vector[UnitInfo]) {
     .orElse(ByOption.minBy(units)(_.pixelDistanceSquared(opponent.centroidAir())))
     .map(_.pixel)
     .getOrElse(With.scouting.threatOrigin.pixelCenter))
+  val anchorMargin = new Cache(() => AnchorMargin.marginOf(units.view.flatMap(_.friendly)))
 
   // Used by MCRS
   private lazy val meanDamageGround = new Cache(() => PurpleMath.nanToZero(PurpleMath.weightedMean(units.map(u => (u.damageOnHitGround  .toDouble,  u.dpfGround)))))

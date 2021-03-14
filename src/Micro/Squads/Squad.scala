@@ -4,6 +4,7 @@ import Debugging.ToString
 import Information.Battles.Types.GroupCentroid
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints}
+import Micro.Agency.AnchorMargin
 import Micro.Squads.Qualities.QualityCounter
 import Performance.Cache
 import Planning.Prioritized
@@ -84,6 +85,8 @@ trait Squad extends Prioritized {
 
   val centroidAir = new Cache(() => GroupCentroid.air(units))
   val centroidGround = new Cache(() => GroupCentroid.ground(units))
+  val area = new Cache(() => units.view.map(_.unitClass.area).sum)
+  val anchorMargin = new Cache(() => AnchorMargin.marginOf(units))
   def leader(unitClass: UnitClass): Option[FriendlyUnitInfo] = leaders().get(unitClass)
   private val leaders: Cache[Map[UnitClass, FriendlyUnitInfo]] = new Cache(() =>
     units.groupBy(_.unitClass).map(group => (group._1, group._2.maxBy(unit => unit.id + 10000 * unit.squadAge)))

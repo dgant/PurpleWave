@@ -32,7 +32,9 @@ class PvPLateGame extends GameplanTemplate {
 
   override def workerPlan: Plan = new PumpWorkers(maximumTotal = 25)
 
-  val goingTemplar = new Not(new Sticky(new UnitsAtLeast(1, Protoss.RoboticsSupportBay)))
+  val goingTemplar = new And(
+    new Not(new Sticky(new UnitsAtLeast(1, Protoss.RoboticsFacility))),
+    new Not(new EnemyStrategy(With.fingerprints.robo, With.fingerprints.dtRush)))
 
   val buildCannons = new And(
     // It's a good bet to do so; DT are the scariest threat

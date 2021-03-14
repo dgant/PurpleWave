@@ -144,7 +144,7 @@ object ConfigurationLoader {
     config.camera             = true
     config.visualizeDebug     = true
     config.detectBreakpoints  = true
-    config.forcedPlaybook     = Some(new TestingPlaybook)
+    //config.forcedPlaybook     = Some(new TestingPlaybook)
   }
 
   def matchNames(names: Seq[String], branches: Seq[Seq[Strategy]]): Seq[Seq[Strategy]] = {

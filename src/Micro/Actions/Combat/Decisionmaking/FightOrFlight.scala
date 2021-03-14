@@ -32,7 +32,7 @@ object FightOrFlight extends Action {
     decide(true,  "Hug",          () => ! unit.flying && unit.matchups.targetsInRange.exists(t => unit.pixelDistanceEdge(t) < t.pixelRangeMin))
     decide(true,  "Cloaked",      () => unit.effectivelyCloaked || (unit.is(Terran.Wraith) && unit.energy >= 50 && unit.matchups.enemyDetectors.isEmpty && With.self.hasTech(Terran.WraithCloak)))
     decide(false, "CantFight",    () => ! unit.agent.canFight)
-    decide(false, "Tethered",     () => unit.matchups.anchor.exists(a => a.pixelDistanceEdge(unit) > a.effectiveRangePixels + AnchorMargin() && { val to = a.battle.map(_.enemy.vanguard()).getOrElse(With.scouting.threatOrigin.pixelCenter); unit.pixelDistanceTravelling(to) + a.effectiveRangePixels + AnchorMargin() < a.pixelDistanceCenter(to) }))
+    decide(false, "Tethered",     () => unit.matchups.anchor.exists(a => unit.confidence() < 0.9 && a.pixelDistanceEdge(unit) > a.effectiveRangePixels + AnchorMargin(unit) && { val to = a.battle.map(_.enemy.vanguard()).getOrElse(With.scouting.threatOrigin.pixelCenter); unit.pixelDistanceTravelling(to) + a.effectiveRangePixels + AnchorMargin(unit) < a.pixelDistanceCenter(to) }))
     decide(true,  "Safe",         () => unit.matchups.threats.isEmpty)
     decide(true,  "Berzerk",      () => With.frame < Minutes(6)() && unit.isAny(Protoss.Zealot, Zerg.Zergling) && unit.base.exists(b => b.owner.isEnemy || b.isNaturalOf.exists(_.owner.isEnemy)) && unit.matchups.threats.exists(t => t.is(Terran.Vulture) && t.matchups.catchers.isEmpty))
     decide(true,  "Lurking",      () => unit.is(Zerg.Lurker) && unit.matchups.enemyDetectors.isEmpty)
@@ -50,7 +50,7 @@ object FightOrFlight extends Action {
         && ally.pixelDistanceEdge(unit, otherAt = ByOption.minBy(unit.matchups.targets.view.map(unit.pixelToFireAt))(unit.pixelDistanceCenter).getOrElse(unit.pixel)) < 72))
 
     decide(true, "Anchors", () => unit.matchups.anchors.exists(anchor =>
-        anchor.visibleToOpponents && anchor.matchups.pixelsOfEntanglement > unit.matchups.pixelsOfEntanglement - AnchorMargin()))
+      anchor.visibleToOpponents && anchor.matchups.pixelsOfEntanglement > unit.matchups.pixelsOfEntanglement - AnchorMargin(unit)))
 
     if (decision.isDefined) {
       unit.agent.shouldEngage = decision.get

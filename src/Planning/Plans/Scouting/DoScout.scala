@@ -6,8 +6,8 @@ import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.{CountUpTo, CountOne}
-import Planning.UnitMatchers.{MatchMobile, UnitMatcher}
+import Planning.UnitCounters.{CountOne, CountUpTo}
+import Planning.UnitMatchers.{MatchMobile, MatchWarriors, UnitMatcher}
 import Planning.UnitPreferences.PreferIdle
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -48,7 +48,7 @@ abstract class DoScout extends Prioritized {
       && ! zone.bases.exists(_.harvestingArea.contains(tile)))) // Don't walk into worker line
 
     unit.agent.intend(this, new Intention {
-      toScoutTiles  = tiles
+      toScoutTiles  = if (MatchWarriors(unit)) Seq.empty else tiles
       toTravel      = Some(destination)
     })
     bases.foreach(With.scouting.registerScout)

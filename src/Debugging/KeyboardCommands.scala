@@ -43,3 +43,4 @@ object KeyboardCommands {
 
   def unit: FriendlyUnitInfo = With.units.ours.find(_.selected).get
 }
+

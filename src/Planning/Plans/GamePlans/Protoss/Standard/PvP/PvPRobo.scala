@@ -180,7 +180,7 @@ class PvPRobo extends GameplanTemplate {
         new CancelIncomplete(Protoss.Observer),
         new Build(Get(Protoss.RoboticsSupportBay)))),
 
-    new If(new ReadyToExpand, new RequireMiningBases(2)),
+    new If(new ReadyToExpand, new Parallel(new WriteStatus("ReadyToExpand"), new RequireMiningBases(2))),
     new TrainGatewayUnits,
     new If(new EnemyStrategy(With.fingerprints.dtRush), new Build(Get(Protoss.ObserverSpeed))),
     new Build(Get(3, Protoss.Gateway)),

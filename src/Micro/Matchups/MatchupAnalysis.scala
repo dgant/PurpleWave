@@ -95,7 +95,7 @@ case class MatchupAnalysis(me: UnitInfo) {
     output ||= anchor.isAny(Terran.Marine)                                && support.isAny(Terran.SCV)
     output ||= anchor.isAny(Protoss.Carrier)                              && ! support.isAny(Protoss.Carrier)
     output ||= anchor.isAny(Protoss.Arbiter, Protoss.Reaver)              && support.isAny(Protoss.Zealot, Protoss.Dragoon, Protoss.Archon, Protoss.HighTemplar, Protoss.Corsair)
-    output ||= anchor.isAny(Protoss.HighTemplar) && anchor.energy > 65    && support.isAny(Protoss.Zealot, Protoss.Dragoon, Protoss.Archon)
+    //output ||= anchor.isAny(Protoss.HighTemplar) && anchor.energy > 65 && anchor.player.hasTech(Protoss.PsionicStorm)    && support.isAny(Protoss.Zealot, Protoss.Dragoon, Protoss.Archon)
     output ||= anchor.isAny(Protoss.Dragoon, Protoss.Archon)              && support.isAny(Protoss.Zealot)
     output ||= anchor.isAny(Zerg.Lurker, Zerg.Ultralisk)                  && support.isAny(Zerg.Zergling, Zerg.Hydralisk)
     output ||= anchor.isAny(Zerg.Guardian)                                && ! support.isAny(Zerg.Guardian)

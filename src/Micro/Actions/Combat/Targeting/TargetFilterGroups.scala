@@ -22,6 +22,7 @@ object TargetFilterGroups {
   val filtersPreferred = Vector(
     TargetFilterCarrierInRange,
     TargetFilterCarrierInLeash,
+    TargetFilterArchonOptional,
     TargetFilterAntiAir,
     TargetFilterCombatants,
     TargetFilterFrontline,

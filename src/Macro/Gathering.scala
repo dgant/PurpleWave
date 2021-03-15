@@ -7,7 +7,7 @@ import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Performance.Tasks.TimedTask
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.{ByOption, Forever, Minutes}
+import Utilities.{ByOption, Forever}
 
 import scala.collection.mutable
 
@@ -74,19 +74,17 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
 
     gasPumps = With.units.ours.filter(isValidGas).toVector
     mineralSlotCount = bases.view.flatMap(mineralSlots).count(_.mineable)
-    if (With.frame > Minutes(7)()) { // Check that should be unnecessary but is working around issue I can't reproduce locally (which itself is likely due to JRE initialization order differences)
-      val distanceMineralBases = mineralSlots.view
-        .filter(s => !isValidBase(s._1) && s._1.townHall.forall(_.isOurs)) // With unoccupied/incomplete bases
-        .map(p => (p._1, p._2, bases.map(b2 => baseCosts(b2, p._1)).min)) // associate each with the score to the closest extant base
-        .filter(p => mineralSlotCount < 14 || (
-          p._3 <= naturalCost // Distance mine only if it's safe or we're desperate
-          && With.blackboard.safeToMoveOut()
-          && With.blackboard.wantToAttack()
-          && ! p._1.units.exists(u => u.isEnemy && u.unitClass.attacksGround)))
-        .toVector.sortBy(_._3) // sort the closest
-      val distanceMineralBasesNeeded = distanceMineralBases.indices.find(i => distanceMineralBases.take(i).view.map(_._2.size).sum > 5).getOrElse(distanceMineralBases.size)
-      longDistanceBases = distanceMineralBases.view.take(distanceMineralBasesNeeded).map(_._1)
-    }
+    val distanceMineralBases = mineralSlots.view
+      .filter(s => !isValidBase(s._1) && s._1.townHall.forall(_.isOurs)) // With unoccupied/incomplete bases
+      .map(p => (p._1, p._2, bases.map(b2 => baseCosts(b2, p._1)).min)) // associate each with the score to the closest extant base
+      .filter(p => mineralSlotCount < 14 || (
+        p._3 <= naturalCost // Distance mine only if it's safe or we're desperate
+        && With.blackboard.safeToMoveOut()
+        && With.blackboard.wantToAttack()
+        && ! p._1.units.exists(u => u.isEnemy && u.unitClass.attacksGround)))
+      .toVector.sortBy(_._3) // sort the closest
+    val distanceMineralBasesNeeded = distanceMineralBases.indices.find(i => distanceMineralBases.take(i).view.map(_._2.size).sum > 5).getOrElse(distanceMineralBases.size)
+    longDistanceBases = distanceMineralBases.view.take(distanceMineralBasesNeeded).map(_._1)
 
     // Replace gas pumps
     gasPumps.foreach(ourGas => {
@@ -168,7 +166,10 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     // Assign older workers first because they're most likely to keep the same or a similar assignment
     unassigned.toVector.sortBy(_.frameDiscovered).foreach(findAssignment)
 
-    // Command workers
+    issueCommands()
+  }
+
+  private def issueCommands(): Unit = {
     unassigned.foreach(i => i.agent.intend(this, new Intention { toTravel = Some(PurpleMath.sampleSet(nearestBase(i).metro.bases.maxBy(_.heart.groundPixels(With.scouting.threatOrigin)).tiles).pixelCenter); canFight = false }))
     assignments.foreach(a => a._1.agent.intend(this, new Intention { toGather = Some(a._2.resource) }))
   }
@@ -184,6 +185,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     val splitteeOrder = Seq(2, 1, 0, 3)
     val splitteesPrioritized = splitteeOrder.map(splittees(_)) ++ splittees.drop(splitteeOrder.size)
     splitteesPrioritized.foreach(findAssignment)
+    issueCommands()
     true
   }
 

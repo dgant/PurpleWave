@@ -31,14 +31,14 @@ object PvP2GateGoon extends PvPStrategy {
   override def responsesWhitelisted: Iterable[Fingerprint] = Seq(With.fingerprints.proxyGateway, With.fingerprints.twoGate, With.fingerprints.nexusFirst)
 }
 object PvP3GateGoon extends PvPStrategy {
-  override def responsesWhitelisted: Iterable[Fingerprint] = Iterable(With.fingerprints.robo, With.fingerprints.nexusFirst, With.fingerprints.twoGate, With.fingerprints.fourGateGoon)
-  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
+  //override def responsesWhitelisted: Iterable[Fingerprint] = Iterable(With.fingerprints.robo, With.fingerprints.nexusFirst, With.fingerprints.twoGate, With.fingerprints.fourGateGoon)
+  //override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
   //override def minimumGamesVsOpponent: Int = 2 -- Disabled AIST4 because strategy picker refused to pick it
 }
 object PvP4GateGoon extends PvPStrategy {
-  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
-  override def minimumGamesVsOpponent: Int = 2
-  override def entranceRamped: Boolean = false
+  //override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
+  //override def minimumGamesVsOpponent: Int = 2
+  //override def entranceRamped: Boolean = false
 }
 object PvPProxy2Gate extends PvPStrategy {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying

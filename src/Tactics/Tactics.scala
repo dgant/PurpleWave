@@ -12,7 +12,7 @@ import Planning.Plans.Scouting.{DoScoutWithWorkers, MonitorBases, ScoutExpansion
 import Planning.Predicates.Compound.{And, Not}
 import Planning.Predicates.Milestones.{EnemiesAtMost, EnemyHasShownWraithCloak, UnitsAtLeast}
 import Planning.Predicates.Strategy.EnemyIsTerran
-import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchHatchlike, MatchRecruitableForCombat}
+import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.{ByOption, Minutes}
@@ -147,7 +147,7 @@ class Tactics extends TimedTask {
       val dropVulnerableBases = With.geography.ourBases.filter(b =>
         b.workerCount > 5
         && ! divisionsDefending.exists(_.bases.contains(b)) // If it was in a defense division, it should have received some defenders already
-        && (b.units.view ++ b.isNaturalOf.map(_.units).getOrElse(Iterable.empty)).count(_.isAny(MatchAnd(MatchComplete, Terran.Factory, Terran.Barracks, Protoss.Gateway, MatchHatchlike, Protoss.PhotonCannon, Terran.Bunker, Zerg.SunkenColony))) < 3)
+        && b.metro.bases.view.flatMap(_.units).count(_.isAny(MatchAnd(MatchComplete, MatchOr(Terran.Factory, Terran.Barracks, Protoss.Gateway, MatchHatchlike, Protoss.PhotonCannon, Terran.Bunker, Zerg.SunkenColony)))) < 3)
       assign(freelancers, dropVulnerableBases.map(baseSquads), filter = (f, s) => f.isAny(Terran.Marine, Terran.Firebat, Terran.Vulture, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk) && s.unitsNext.size < Math.min(3, freelancerCountInitial / 10))
     }
 

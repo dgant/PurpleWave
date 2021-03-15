@@ -331,7 +331,9 @@ object PvPIdeas {
       new PerformReactionTo2Gate))
 
   class ReactToProxyGateways extends If(
-    new EnemyStrategy(With.fingerprints.proxyGateway),
+    new And(
+      new EnemyStrategy(With.fingerprints.proxyGateway),
+      new FrameAtMost(GameTime(6, 0)())),
     new Parallel(
       new WriteStatus("ReactToProxyGate"),
       new PerformReactionTo2Gate,
@@ -339,11 +341,8 @@ object PvPIdeas {
       new If(
         new Not(new SafeAtHome),
         new Build(
-          Get(3, Protoss.Gateway),
-          Get(2, Protoss.ShieldBattery)),
-      new Build(
-        Get(Protoss.CitadelOfAdun),
-        Get(Protoss.TemplarArchives)))))
+          Get(2, Protoss.Gateway),
+          Get(2, Protoss.ShieldBattery)))))
 
   class ReactToFFE extends If(
     new Or(

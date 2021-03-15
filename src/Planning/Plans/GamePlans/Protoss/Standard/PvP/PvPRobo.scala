@@ -17,7 +17,7 @@ import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeToMoveOut}
 import Planning.Predicates.Strategy._
-import Planning.UnitMatchers.{MatchOr, MatchWarriors}
+import Planning.UnitMatchers.MatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvPRobo, PvPRobo1012}
@@ -32,7 +32,7 @@ class PvPRobo extends GameplanTemplate {
   class ShuttleFirst extends ConcludeWhen(
     new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
     new And(
-      new UnitsAtMost(0, Protoss.RoboticsSupportBay),
+      new UnitsAtMost(0, Protoss.RoboticsSupportBay ),
       new Or(
         new Check(() => With.strategy.isRamped),
         new Not(new GetObservers)),
@@ -58,7 +58,6 @@ class PvPRobo extends GameplanTemplate {
   override def workerPlan: Plan = new PumpWorkers
 
   // TODO: Replace with (or merge into) PvPSafeToMoveOut?
-  // TODO: Handle 4-Gate Zealot
   override def attackPlan: Plan = new If(
     new And(
       // No point attacking with a couple of Zealots if they have any defense whatsoever
@@ -135,13 +134,12 @@ class PvPRobo extends GameplanTemplate {
 
   class ReadyToExpand extends And(
     new UnitsAtLeast(2, Protoss.Gateway),
+    new Or(new Not(new EnemyStrategy(With.fingerprints.dtRush)), new UnitsAtLeast(1, Protoss.Observer, complete = true)),
+    new Or(new Not(new EnemyStrategy(With.fingerprints.dtRush)), new And(new UnitsAtLeast(1, Protoss.Observer), new EnemiesAtMost(0, Protoss.DarkTemplar))),
     new Or(
-      new And(new UnitsAtLeast(1, Protoss.Observer, complete = true), new EnemyStrategy(With.fingerprints.dtRush)),
-      new And(new UnitsAtLeast(1, Protoss.Reaver, complete = true), new SafeToMoveOut, new EnemyLowUnitCount),
-      new And(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new SafeToMoveOut, new Not(new EnemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon))),
-      new And(
-        new UnitsAtLeast(2, MatchOr(Protoss.Shuttle, Protoss.Reaver), complete = true),
-        new Latch(new UnitsAtLeast(3, MatchOr(Protoss.Shuttle, Protoss.Reaver), complete = true)))))
+      new And(new SafeToMoveOut, new EnemyStrategy(With.fingerprints.dtRush)),
+      new And(new SafeToMoveOut, new UnitsAtLeast(1, Protoss.Reaver, complete = true), new EnemyLowUnitCount),
+      new UnitsAtLeast(2, Protoss.Reaver, complete = true)))
 
   override def buildPlans: Seq[Plan] = Seq(
     new oneGateCoreLogic.WriteStatuses,

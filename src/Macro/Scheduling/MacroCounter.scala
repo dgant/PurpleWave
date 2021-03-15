@@ -1,7 +1,7 @@
 package Macro.Scheduling
 
 import Lifecycle.With
-import Planning.UnitMatchers.MatchSiegeTank
+import Planning.UnitMatchers.MatchTank
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -45,7 +45,7 @@ object MacroCounter {
     }
 
     // Count all tanks
-    if (unit.is(MatchSiegeTank)) {
+    if (unit.is(MatchTank)) {
       output(Terran.SiegeTankUnsieged) = 1
       output(Terran.SiegeTankSieged) = 1
     }

@@ -6,17 +6,18 @@ import Planning.Predicates.Strategy.EnemyRecentStrategy
 import Planning.UnitMatchers.{MatchAnd, MatchComplete, UnitMatcher}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvZ9PoolSpeed
+import Utilities.Minutes
 
 class SafeToMoveOut extends Predicate {
   override def apply: Boolean = {
-    if (With.yolo.active()) return true
-    
-    if (With.self.isProtoss && With.enemies.forall(_.isTerran))   return pvtSafeToAttack
-    if (With.self.isProtoss && With.enemies.forall(_.isProtoss))  return pvpSafeToAttack
-    if (With.self.isProtoss && With.enemies.forall(_.isZerg))     return pvzSafeToAttack
-    if (With.self.isZerg && With.enemies.forall(_.isZerg))        return zvzSafeToAttack
-    
-    val output = With.battles.global.globalSafeToAttack
+    val output =
+      if (With.yolo.active()) true
+      else if (With.self.isProtoss  && With.enemies.forall(_.isTerran))   pvtSafeToAttack
+      else if (With.self.isProtoss  && With.enemies.forall(_.isProtoss))  pvpSafeToAttack
+      else if (With.self.isProtoss  && With.enemies.forall(_.isZerg))     pvzSafeToAttack
+      else if (With.self.isZerg     && With.enemies.forall(_.isZerg))     zvzSafeToAttack
+      else With.battles.global.globalSafeToAttack
+
     With.blackboard.safeToMoveOut.set(output)
     output
   }
@@ -52,22 +53,24 @@ class SafeToMoveOut extends Predicate {
   }
   
   private def pvpSafeToAttack: Boolean = {
-    val rangeUs       = With.self.hasUpgrade(Protoss.DragoonRange)
-    val rangeEnemy    = With.enemies.exists(_.hasUpgrade(Protoss.DragoonRange))
-    val speedUs       = With.self.hasUpgrade(Protoss.ZealotSpeed)
-    val speedEnemy    = With.enemies.exists(_.hasUpgrade(Protoss.ZealotSpeed))
-    
-    val zealotsUs     = countOurs(Protoss.Zealot)
-    val dragoonsUs    = countOurs(Protoss.Dragoon)
-    val reaversUs     = countOurs(Protoss.Reaver)
-    val shuttlesUs    = countOurs(Protoss.Shuttle)
-    val archonsUs     = countOurs(Protoss.Archon)
-    val carriersUs    = countOurs(Protoss.Carrier)
-    val zealotsEnemy  = countEnemy(Protoss.Zealot)
-    val dragoonsEnemy = countEnemy(Protoss.Dragoon)
-    val archonsEnemy  = countEnemy(Protoss.Archon)
-    val reaversEnemy  = countEnemy(Protoss.Reaver)
-    val shuttlesEnemy = countEnemy(Protoss.Shuttle)
+    val rangeUs         = With.self.hasUpgrade(Protoss.DragoonRange)
+    val rangeEnemy      = With.enemies.exists(_.hasUpgrade(Protoss.DragoonRange))
+    val speedUs         = With.self.hasUpgrade(Protoss.ZealotSpeed)
+    val speedEnemy      = With.enemies.exists(_.hasUpgrade(Protoss.ZealotSpeed))
+
+    val zealotsUs       = countOurs(Protoss.Zealot)
+    val dragoonsUs      = countOurs(Protoss.Dragoon)
+    val reaversUs       = countOurs(Protoss.Reaver)
+    val shuttlesUs      = countOurs(Protoss.Shuttle)
+    val archonsUs       = countOurs(Protoss.Archon)
+    val carriersUs      = countOurs(Protoss.Carrier)
+    val zealotsEnemy    = countEnemy(Protoss.Zealot)
+    var dragoonsEnemy   = countEnemy(Protoss.Dragoon)
+    val archonsEnemy    = countEnemy(Protoss.Archon)
+    val reaversEnemy    = countEnemy(Protoss.Reaver)
+    val shuttlesEnemy   = countEnemy(Protoss.Shuttle)
+    val dragoonsHidden  = Math.max(0, Math.min(if (reaversUs > 0) 4 else 2, (With.frame - Minutes(4)()) / Minutes(1)()))
+    dragoonsEnemy += dragoonsHidden
     
     val scoreDragoon  = 1.0
     val scoreSpeedlot = 1.0
@@ -77,15 +80,18 @@ class SafeToMoveOut extends Predicate {
     val scoreShuttle  = 1.25
     val scoreArchon   = 2.0
     val scoreCarrier  = 3.0
-    
-    val scoreUs = (
+
+    val strengthInfantry = (
         dragoonsUs  * (if (rangeUs) scoreDragoon else scoreTRexArms)
       + zealotsUs   * (if (speedUs) scoreSpeedlot else scoreSlowlot)
-      + reaversUs   * scoreReaver
-      + Math.min(shuttlesUs, reaversUs) * scoreShuttle
       + archonsUs   * scoreArchon
-      + carriersUs  * scoreCarrier
-    )
+      + carriersUs  * scoreCarrier)
+    val strengthReaver = (
+        reaversUs * scoreReaver
+      + Math.min(shuttlesUs, reaversUs) * scoreShuttle)
+    
+    val scoreUs = strengthInfantry + Math.min(strengthInfantry / 3, strengthReaver + 2 * storms)
+
     val scoreEnemy = (
         dragoonsEnemy * (if (rangeEnemy) scoreDragoon else scoreTRexArms)
       + zealotsEnemy  * (if (speedEnemy) scoreSpeedlot else scoreSlowlot)
@@ -102,7 +108,6 @@ class SafeToMoveOut extends Predicate {
     val zealotSpeed   = With.self.hasUpgrade(Protoss.ZealotSpeed)
     val zerglingSpeed = With.enemies.exists(_.hasUpgrade(Zerg.ZerglingSpeed))
     val zerglingAspd  = With.enemies.exists(_.hasUpgrade(Zerg.ZerglingAttackSpeed))
-    val psionicStorm  = With.self.hasTech(Protoss.PsionicStorm)
     val zerglings     = countEnemy(Zerg.Zergling)
     val hydralisks    = countEnemy(Zerg.Hydralisk)
     val ultralisks    = countEnemy(Zerg.Ultralisk)
@@ -113,7 +118,6 @@ class SafeToMoveOut extends Predicate {
     val darkTemplar   = countOurs(Protoss.DarkTemplar)
     val dragoons      = countOurs(Protoss.Dragoon)
     val archons       = countOurs(Protoss.Archon)
-    val storms        = if (psionicStorm) With.units.ours.map(u => if (u.is(Protoss.HighTemplar)) u.energy / 75 else 0).sum else 0
     val reavers       = countOurs(Protoss.Reaver)
     val shuttles      = countOurs(Protoss.Shuttle)
     val corsairs      = countOurs(Protoss.Corsair)
@@ -174,5 +178,7 @@ class SafeToMoveOut extends Predicate {
     val output = okayOnZerglings && okayOnMutalisks
     output
   }
+
+  private def storms: Int = if (With.self.hasTech(Protoss.PsionicStorm)) With.units.ours.map(u => if (u.is(Protoss.HighTemplar)) u.energy / 75 else 0).sum else 0
   
 }

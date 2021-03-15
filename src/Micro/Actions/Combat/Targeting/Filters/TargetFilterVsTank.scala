@@ -1,6 +1,6 @@
 package Micro.Actions.Combat.Targeting.Filters
 import Lifecycle.With
-import Planning.UnitMatchers.MatchSiegeTank
+import Planning.UnitMatchers.MatchTank
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
 
@@ -12,8 +12,8 @@ object TargetFilterVsTank extends TargetFilter {
     if (With.reaction.sluggishness > 0) return true
     lazy val firingPixel = actor.pixelToFireAt(target)
     (
-      target.isAny(MatchSiegeTank, Terran.Battlecruiser)
-      || target.order == Orders.Repair && target.orderTarget.exists(_.isAny(MatchSiegeTank, Terran.Battlecruiser))
+      target.isAny(MatchTank, Terran.Battlecruiser)
+      || target.order == Orders.Repair && target.orderTarget.exists(_.isAny(MatchTank, Terran.Battlecruiser))
       || ! actor.matchups.threats.exists(t => Terran.SiegeTankSieged(t) && t.inRangeToAttack(actor, firingPixel)))
   }
 }

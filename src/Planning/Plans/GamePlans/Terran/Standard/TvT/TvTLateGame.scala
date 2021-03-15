@@ -34,7 +34,7 @@ class TvTLateGame extends GameplanTemplate {
       Get(Terran.Factory),
       Get(Terran.MachineShop)),
     new BuildGasPumps,
-    new If(new UnitsAtLeast(8, MatchSiegeTank, complete = true), new RequireMiningBases(3)),
+    new If(new UnitsAtLeast(8, MatchTank, complete = true), new RequireMiningBases(3)),
     new UpgradeContinuously(Terran.MechDamage),
     new If(
       new UnitsAtLeast(2, Terran.Battlecruiser),

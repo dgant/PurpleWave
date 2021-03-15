@@ -5,9 +5,9 @@ import Planning.UnitMatchers.{MatchAnd, MatchAnything, MatchComplete, UnitMatche
 import Planning.Predicate
 
 class EnemiesAtLeast(
-                      quantity  : Int         = 0,
-                      matcher   : UnitMatcher = MatchAnything,
-                      complete  : Boolean     = false)
+  quantity  : Int         = 0,
+  matcher   : UnitMatcher = MatchAnything,
+  complete  : Boolean     = false)
   
   extends Predicate {
   
@@ -15,11 +15,9 @@ class EnemiesAtLeast(
     val quantityFound =
       if (complete) {
         With.units.countEnemy(MatchAnd(MatchComplete, matcher))
-      }
-      else {
+      } else {
         With.units.countEnemy(matcher)
       }
-    val output = quantityFound >= quantity
-    output
+    quantityFound >= quantity
   }
 }

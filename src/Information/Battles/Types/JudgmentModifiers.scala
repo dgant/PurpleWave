@@ -4,7 +4,7 @@ import Debugging.Visualizations.Colors
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Basic.Gather
-import Planning.UnitMatchers.{MatchSiegeTank, MatchWorker}
+import Planning.UnitMatchers.{MatchTank, MatchWorker}
 import ProxyBwapi.Races.Terran
 import bwapi.Color
 
@@ -126,7 +126,7 @@ object JudgmentModifiers {
   //     and thus systematically bleed units
   def hornetNest(battleLocal: BattleLocal): Option[JudgmentModifier] = {
     if (With.enemies.forall(e => ! e.isTerran || ! e.hasTech(Terran.SiegeMode))) return None
-    val tanks           = battleLocal.enemy.units.count(u => u.is(MatchSiegeTank) && u.base.exists(_.owner.isEnemy) && ! u.visible)
+    val tanks           = battleLocal.enemy.units.count(u => u.is(MatchTank) && u.base.exists(_.owner.isEnemy) && ! u.visible)
     if (tanks == 0) return None
     def ourCombatUnits  = battleLocal.us.units.view.filter(_.canAttack)
     val valueUs         = ourCombatUnits.map(_.subjectiveValue).sum

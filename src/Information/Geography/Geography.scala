@@ -7,7 +7,7 @@ import Mathematics.Points.{SpecificPoints, Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
 import Performance.Cache
 import Performance.Tasks.TimedTask
-import Planning.UnitMatchers.MatchSiegeTank
+import Planning.UnitMatchers.MatchTank
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
@@ -31,8 +31,7 @@ class Geography extends TimedTask {
   def ourZones                : Vector[Zone]          = ourZonesCache()
   def ourBases                : Vector[Base]          = ourBasesCache()
   def ourUpcomingBases        : Vector[Base]          = ourUpcomingBasesCache()
-  def ourSettlements          : Vector[Base]          = ourSettlementsCache()
-  def ourBasesAndSettlements  : Vector[Base]          = (ourBases ++ ourSettlements).distinct
+  def ourBasesAndSettlements  : Vector[Base]          = (ourBases ++ ourSettlementsCache()).distinct
   def ourTownHalls            : Vector[UnitInfo]      = ourTownHallsCache()
   def ourHarvestingAreas      : Vector[TileRectangle] = ourHarvestingAreasCache()
   def ourBorder               : Vector[Edge]          = ourBorderCache()
@@ -101,7 +100,7 @@ class Geography extends TimedTask {
     ++ Vector(With.geography.ourNatural).filter(x =>
         With.strategy.isInverted
         && ! With.geography.ourMain.units.exists(_.unitClass.isStaticDefense)
-        && With.units.ours.exists(u => u.complete && u.unitClass.ranged && (u.unitClass.canMove || u.is(MatchSiegeTank)))
+        && With.units.ours.exists(u => u.complete && u.unitClass.ranged && (u.unitClass.canMove || u.is(MatchTank)))
         && (With.units.existsEnemy(_.unitClass.ranged) || With.battles.global.globalSafeToAttack))
     ++ With.units.ours
       .view

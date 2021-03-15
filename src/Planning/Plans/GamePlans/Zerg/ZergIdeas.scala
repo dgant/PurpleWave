@@ -42,7 +42,7 @@ object ZergIdeas {
       Enemy(Terran.Ghost, 2.0),
       // Ignore Vultures
       Enemy(Terran.Goliath, 4.0),
-      Enemy(MatchSiegeTank, 4.0),
+      Enemy(MatchTank, 4.0),
       Enemy(Protoss.Zealot, 4.5),
       Enemy(Protoss.Dragoon, 3.0),
       Enemy(Protoss.DarkTemplar, 6.0),
@@ -67,7 +67,7 @@ object ZergIdeas {
       Enemy(Terran.Goliath, 2.0),
       Enemy(Terran.Wraith, 2.0),
       Enemy(Terran.Battlecruiser, 4.0),
-      Enemy(MatchSiegeTank, 4.0),
+      Enemy(MatchTank, 4.0),
       Enemy(Protoss.Zealot, 1.5),
       Enemy(Protoss.Dragoon, 1.5),
       Enemy(Protoss.DarkTemplar, 2.0),

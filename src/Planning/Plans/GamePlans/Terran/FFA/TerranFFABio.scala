@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.FFA
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Predicates.Compound.Check
-import Planning.UnitMatchers.{MatchSiegeTank, MatchWarriors}
+import Planning.UnitMatchers.{MatchTank, MatchWarriors}
 import Planning.Plan
 import Planning.Plans.Army.Aggression
 import Planning.Plans.Basic.NoPlan
@@ -66,7 +66,7 @@ class TerranFFABio extends GameplanTemplate {
   )
   
   override def buildPlans: Seq[Plan] = Vector(
-    new If(new UnitsAtLeast(1,  MatchSiegeTank),    new Build(Get(Terran.SiegeMode))),
+    new If(new UnitsAtLeast(1,  MatchTank),    new Build(Get(Terran.SiegeMode))),
     new If(new UnitsAtLeast(12, MatchWarriors),     new RequireMiningBasesFFA(2)),
     new If(new UnitsAtLeast(60, MatchWarriors),     new RequireMiningBasesFFA(3)),
     new If(new UnitsAtLeast(90, MatchWarriors),     new RequireMiningBasesFFA(4)),
@@ -78,7 +78,7 @@ class TerranFFABio extends GameplanTemplate {
     new If(new UnitsAtLeast(1, Terran.NuclearMissile),  new Build(Get(Terran.GhostVisionRange))),
     new If(new UnitsAtLeast(3, Terran.Ghost),           new Build(Get(Terran.Lockdown))),
     new If(new UnitsAtLeast(8, Terran.Ghost),           new Build(Get(Terran.GhostEnergy))),
-    new If(new UnitsAtLeast(3, MatchSiegeTank),     new UpgradeMech),
+    new If(new UnitsAtLeast(3, MatchTank),     new UpgradeMech),
     new Pump(Terran.NuclearMissile),
     new Pump(Terran.NuclearSilo),
     new Pump(Terran.ScienceVessel, 2),

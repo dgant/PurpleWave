@@ -21,8 +21,9 @@ class DefendAgainstProxy extends Prioritized {
 
     // Get sorted list of proxies
     val proxies = getProxies.toVector
-      .sortBy(_.totalHealth)
       .sortBy(_.remainingCompletionFrames)
+      .sortBy(_.totalHealth)
+      .sortBy( ! _.unitClass.attacksGround)
       .sortBy( ! _.unitClass.trainsGroundUnits)
       .sortBy( - _.dpfGround)
 
@@ -37,10 +38,12 @@ class DefendAgainstProxy extends Prioritized {
     defenders.matcher = MatchOr(MatchWorker, MatchWarriors)
     defenders.inquire(this).toVector.foreach(defendersAvailable ++= _)
 
+    val isCannony = proxies.exists(_.isAny(Terran.Bunker, Protoss.PhotonCannon, Zerg.CreepColony))
+
     // For each proxy, in priority order, decide who if anyone to assign to it
     proxies.foreach(proxy => {
       val isAnnoying          = proxy.unitClass.isGas || proxy.base.exists(_.resourcePathTiles.exists(proxy.tileArea.contains))
-      val isEmergency         = proxy.isAny(Terran.Barracks, Terran.Bunker, Protoss.PhotonCannon, Protoss.Gateway)
+      val isEmergency         = proxy.isAny(Terran.Barracks, Terran.Bunker, Protoss.PhotonCannon, Protoss.Gateway) && (proxy.powered || ! proxy.unitClass.isProtoss || With.units.enemy.exists(u => u.is(Protoss.Pylon) && With.grids.psi3Height.psiPoints.view.map(u.tileTopLeft.add).contains(proxy.tileTopLeft)))
       val isCloseEnoughToPull = Seq(With.geography.ourMain, With.geography.ourNatural).exists(_.townHallArea.midpoint.groundPixels(proxy.tile) < 32 * 21)
       val mustPull            = proxy.dpfGround > 0 && With.geography.ourBases.exists(_.resourcePathTiles.exists(_.pixelCenter.pixelDistance(proxy.pixel) < proxy.effectiveRangePixels + 32))
       val framesBeforeDamage  = ByOption
@@ -77,12 +80,15 @@ class DefendAgainstProxy extends Prioritized {
       })
     })
 
+    // Re-simplifying it: Against proxies that don't attack, raze in pure priority order
+    if ( ! isCannony) {
+      defendersAssigned.keySet.foreach(k => defendersAssigned(k) = proxies.head)
+    }
+
     defenders.counter = CountUpTo(defendersAssigned.size)
     defenders.matcher = Match(_.friendly.exists(defendersAssigned.contains))
     defenders.acquire(this)
-    if (defenders.units.isEmpty) {
-      return
-    }
+    if (defenders.units.isEmpty) return
     With.blackboard.status.set(With.blackboard.status.get :+ "DefendingProxy")
     val squad = new SquadRazeProxies(defendersAssigned.toMap)
     squad.addUnits(defenders.units)

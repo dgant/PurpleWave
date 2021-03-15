@@ -6,15 +6,13 @@ import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAt, GasCapsUntouched, Pump}
-import Planning.Plans.Macro.Build.CancelIncomplete
+import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Predicates.Compound.{And, Not}
-import Planning.Predicates.Economy.GasAtLeast
+import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
-import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.Predicates.Reactive.EnemyBasesAtLeast
+import Planning.Predicates.Strategy.{Employing, EnemyRecentStrategy, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvP3GateGoon, PvP4GateGoon}
@@ -22,7 +20,7 @@ import Strategery.Strategies.Protoss.{PvP3GateGoon, PvP4GateGoon}
 class PvP34GateGoon extends GameplanTemplate {
   
   override val activationCriteria : Predicate = new Employing(PvP3GateGoon, PvP4GateGoon)
-  override val completionCriteria : Predicate = new MiningBasesAtLeast(2)
+  override val completionCriteria : Predicate = new Latch(new MiningBasesAtLeast(2))
 
   override def blueprints = Vector(
     new Blueprint(Protoss.Pylon,         placement = Some(PlacementProfiles.defensive), marginPixels = Some(32.0 * 10.0)),
@@ -37,16 +35,20 @@ class PvP34GateGoon extends GameplanTemplate {
 
   override def attackPlan: Plan = new Trigger(
     new Or(
-      new EnemyStrategy(With.fingerprints.gasSteal),
       new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
-      new UnitsAtLeast(5, Protoss.Dragoon, complete = true)),
+      new And(
+        new Latch(new UnitsAtLeast(5, Protoss.Dragoon, complete = true)),
+        new Or(
+          new Employing(PvP4GateGoon),
+          new EnemyStrategy(With.fingerprints.dtRush, With.fingerprints.robo, With.fingerprints.twoGate, With.fingerprints.gasSteal),
+          new EnemyBasesAtLeast(2)))),
     new PvPIdeas.AttackSafely)
   
   val oneGateCoreLogic = new PvP1GateCoreLogic(allowZealotBeforeCore = false)
 
-  override def emergencyPlans: Seq[Plan] = Seq(new oneGateCoreLogic.BuildOrderPlan)
+  override def emergencyPlans: Seq[Plan] = oneGateCoreLogic.emergencyPlans
 
-  override def buildOrderPlan: Plan = new oneGateCoreLogic.BuildOrderPlan
+  override def buildOrderPlan: Plan = new (oneGateCoreLogic.BuildOrderPlan)
 
   override val buildPlans = Vector(
 
@@ -55,16 +57,17 @@ class PvP34GateGoon extends GameplanTemplate {
     new If(
       new GasCapsUntouched,
       new Parallel(
+        new CapGasAt(200),
         new If(
           new UnitsAtMost(0, Protoss.CyberneticsCore),
           new CapGasWorkersAt(1),
           new If(
-            new GasAtLeast(200),
-            new CapGasWorkersAt(1),
+            new Not(new UpgradeStarted(Protoss.DragoonRange)),
+            new CapGasWorkersAt(2),
             new If(
-              new UnitsAtMost(2, Protoss.Gateway),
-              new CapGasWorkersAt(2)))),
-        new CapGasAt(200))),
+              new Employing(PvP3GateGoon),
+              new If(new UnitsAtMost(2, Protoss.Gateway), new CapGasWorkersAt(1)),
+              new If(new UnitsAtMost(3, Protoss.Gateway), new CapGasWorkersAt(1))))))),
 
     new BuildOrder(Get(Protoss.DragoonRange),  Get(2, Protoss.Dragoon)),
     new If(
@@ -72,23 +75,7 @@ class PvP34GateGoon extends GameplanTemplate {
       new BuildOrder(Get(3, Protoss.Gateway), Get(8, Protoss.Dragoon)),
       new BuildOrder(Get(4, Protoss.Gateway), Get(10, Protoss.Dragoon))),
 
-    // Kind of cowardly, but if we can't be sure they're not going DT,
-    // get a Forge before expanding so we can get cannons in time if necessary
-    new If(
-      new And(
-        new Not(new EnemyDarkTemplarLikely),
-        new Not(new EnemyHasShownCloakedThreat),
-        new EnemyStrategy(
-          With.fingerprints.nexusFirst,
-          With.fingerprints.twoGate,
-          With.fingerprints.forgeFe,
-          With.fingerprints.gatewayFe,
-          With.fingerprints.dragoonRange,
-          With.fingerprints.threeGateGoon,
-          With.fingerprints.fourGateGoon,
-          With.fingerprints.robo)),
-      new CancelIncomplete(Protoss.Forge),
-      new Build(Get(Protoss.Forge))),
+    new If(new EnemyRecentStrategy(With.fingerprints.dtRush), new Build(Get(Protoss.Forge))),
 
     new If(
       new Or(
@@ -96,11 +83,12 @@ class PvP34GateGoon extends GameplanTemplate {
           new Employing(PvP3GateGoon),
           new UnitsAtLeast(3, Protoss.Gateway, complete = true)),
         new And(
-          new UnitsAtLeast(14, Protoss.Dragoon),
+          new UnitsAtLeast(16, Protoss.Dragoon),
           new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)))),
       new RequireMiningBases(2)),
 
     new Pump(Protoss.Dragoon),
-    new Build(Get(4, Protoss.Gateway))
+    new Build(Get(4, Protoss.Gateway)),
+    new PumpWorkers(oversaturate = true)
   )
 }

@@ -4,20 +4,21 @@ package Micro.Actions.Combat.Decisionmaking
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Agency.AnchorMargin
+import Planning.UnitMatchers.MatchTank
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.{ByOption, Minutes}
 
 object FightOrFlight extends Action {
-  
+
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.canMove
   }
-  
+
   override def perform(unit: FriendlyUnitInfo) {
-  
+
     var decision: Option[Boolean] = None
-  
+
     def decide(shouldEngage: Boolean, description: String, condition: () => Boolean) {
       if (decision.isEmpty && condition()) {
         unit.agent.fightReason = description
@@ -32,7 +33,7 @@ object FightOrFlight extends Action {
     decide(true,  "Hug",          () => ! unit.flying && unit.matchups.targetsInRange.exists(t => unit.pixelDistanceEdge(t) < t.pixelRangeMin))
     decide(true,  "Cloaked",      () => unit.effectivelyCloaked || (unit.is(Terran.Wraith) && unit.energy >= 50 && unit.matchups.enemyDetectors.isEmpty && With.self.hasTech(Terran.WraithCloak)))
     decide(false, "CantFight",    () => ! unit.agent.canFight)
-    decide(false, "Tethered",     () => unit.matchups.anchor.exists(a => unit.confidence() < 0.9 && a.pixelDistanceEdge(unit) > a.effectiveRangePixels + AnchorMargin(unit) && { val to = a.battle.map(_.enemy.vanguard()).getOrElse(With.scouting.threatOrigin.pixelCenter); unit.pixelDistanceTravelling(to) + a.effectiveRangePixels + AnchorMargin(unit) < a.pixelDistanceCenter(to) }))
+    decide(false, "Tethered",     () => unit.matchups.anchor.exists(a => unit.confidence() < 0.9 && a.isAny(MatchTank, Protoss.Reaver) && a.pixelDistanceEdge(unit) > a.effectiveRangePixels + AnchorMargin(unit) && { val to = a.battle.map(_.enemy.vanguard()).getOrElse(With.scouting.threatOrigin.pixelCenter); unit.pixelDistanceTravelling(to) + a.effectiveRangePixels + AnchorMargin(unit) < a.pixelDistanceCenter(to) }))
     decide(true,  "Safe",         () => unit.matchups.threats.isEmpty)
     decide(true,  "Berzerk",      () => With.frame < Minutes(6)() && unit.isAny(Protoss.Zealot, Zerg.Zergling) && unit.base.exists(b => b.owner.isEnemy || b.isNaturalOf.exists(_.owner.isEnemy)) && unit.matchups.threats.exists(t => t.is(Terran.Vulture) && t.matchups.catchers.isEmpty))
     decide(true,  "Lurking",      () => unit.is(Zerg.Lurker) && unit.matchups.enemyDetectors.isEmpty)

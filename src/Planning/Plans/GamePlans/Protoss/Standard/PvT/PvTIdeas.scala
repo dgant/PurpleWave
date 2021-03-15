@@ -203,7 +203,7 @@ object PvTIdeas {
         new If(
           new Or(new UpgradeStarted(Protoss.ZealotSpeed), new And(new MineralsAtLeast(600), new GasAtMost(200))),
           new PumpRatio(Protoss.Zealot, 0, 50, Seq(
-            Enemy(MatchSiegeTank, 2.5),
+            Enemy(MatchTank, 2.5),
             Enemy(Terran.Goliath,     1.5),
             Enemy(Terran.Marine,      1.0),
             Enemy(Terran.Vulture,     -1.25)))),
@@ -235,7 +235,7 @@ object PvTIdeas {
       new And(new UnitsAtLeast(1, Protoss.FleetBeacon), new EnemyHasShownWraithCloak),
       new PumpRatio(Protoss.Corsair, 0, 8, Seq(Enemy(Terran.Wraith, 2.0)))),
     new TrainCarriers,
-    new PumpRatio(Protoss.Arbiter, 2, 8, Seq(Enemy(MatchSiegeTank, 0.5))),
+    new PumpRatio(Protoss.Arbiter, 2, 8, Seq(Enemy(MatchTank, 0.5))),
     new TrainScouts,
     new TrainGatewayUnits)
 }

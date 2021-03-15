@@ -10,7 +10,7 @@ object PumpCount {
   def currentCount(unitClass: UnitClass): Int = {
     val matcher =
       if (unitClass == Terran.SiegeTankSieged || unitClass == Terran.SiegeTankUnsieged) {
-        MatchSiegeTank
+        MatchTank
       } else if (unitClass == Zerg.Hatchery) {
         MatchHatchlike
       } else if (unitClass == Zerg.Lair) {

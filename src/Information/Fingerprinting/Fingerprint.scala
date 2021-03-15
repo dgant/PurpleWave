@@ -16,12 +16,11 @@ abstract class Fingerprint {
   @inline final def lastUpdateFrame: Int = _lastUpdateFrame
   @inline final def matches: Boolean = matched
   @inline final def apply(): Boolean = matches
-  final def update() {
+  @inline final def update() {
+    if (_lastUpdateFrame == With.frame) return
     _lastUpdateFrame = With.frame
     children.foreach(_.update())
-    if (sticky && matched) {
-      return
-    }
+    if (sticky && matched) return
     if (With.frame < lockAfter) {
       matched = investigate
     }

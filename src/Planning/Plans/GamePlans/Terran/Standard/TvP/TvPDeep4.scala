@@ -14,7 +14,7 @@ import Planning.Predicates.Compound.And
 import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemyHasShown, UnitsAtLeast}
 import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
 import Planning.Predicates.Strategy.Employing
-import Planning.UnitMatchers.{MatchOr, MatchSiegeTank}
+import Planning.UnitMatchers.{MatchOr, MatchTank}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvPDeep4
@@ -55,7 +55,7 @@ class TvPDeep4 extends GameplanTemplate {
     new BuildGasPumps,
     new If(
       new And(
-        new UnitsAtLeast(5, MatchSiegeTank),
+        new UnitsAtLeast(5, MatchTank),
         new EnemiesAtLeast(1, MatchOr(Protoss.Arbiter, Protoss.DarkTemplar))),
       new Build(
         Get(Terran.Starport),

@@ -6,7 +6,7 @@ import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Actions.Combat.Targeting.Filters.TargetFilter
 import Micro.Actions.Combat.Targeting.{Target, TargetFilterGroups}
-import Planning.UnitMatchers.{MatchRecruitableForCombat, MatchSiegeTank}
+import Planning.UnitMatchers.{MatchRecruitableForCombat, MatchTank}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
@@ -32,7 +32,7 @@ class Simulacrum(val simulation: Simulation, val realUnit: UnitInfo) {
   val value       : Double      = realUnit.subjectiveValue
 
   val speedMultiplier   : Double  = if (flying) 1.0 else Math.pow(simulation.prediction.battle.judgmentModifiers.view.map(_.speedMultiplier).product, if (isFriendly) 1 else -1)
-  val bonusRange        : Double  = if (isFriendly || ! realUnit.is(MatchSiegeTank) || ! simulation.prediction.weAttack) 0.0 else With.configuration.simulationBonusTankRange
+  val bonusRange        : Double  = if (isFriendly || ! realUnit.is(MatchTank) || ! simulation.prediction.weAttack) 0.0 else With.configuration.simulationBonusTankRange
   val multiplierSplash  : Double  = 1.0 // realUnit.unitClass.splashFactor // TODO: Increase for large fights
 
   val canMove             : Boolean             = realUnit.canMove

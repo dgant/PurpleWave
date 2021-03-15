@@ -8,7 +8,7 @@ object MatchWarriors extends UnitMatcher {
     unit.aliveAndComplete
     && unit.unitClass.dealsDamage
     && unit.unitClass.orderable
-    && (unit.unitClass.canMove || unit.is(MatchSiegeTank))
+    && (unit.unitClass.canMove || unit.is(MatchTank))
     && ! unit.unitClass.isWorker
   )
 }

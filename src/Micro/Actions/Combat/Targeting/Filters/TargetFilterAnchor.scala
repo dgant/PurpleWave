@@ -11,10 +11,8 @@ object TargetFilterAnchor extends TargetFilter {
     val anchors = actor.matchups.anchors
     var output = false
     output ||= actor.inRangeToAttack(target) && actor.readyForAttackOrder
-    output ||= anchors.exists(target.inRangeToAttack)
-    output ||= anchors.exists(_.inRangeToAttack(target))
-    output ||= anchors.exists(a => a.pixelDistanceEdge(target) < Math.max(96, Math.max(a.effectiveRangePixels, target.effectiveRangePixels)))
-    output ||= anchors.exists(a => a.friendly.exists(_.agent.toAttack.contains(target)) && actor.pixelsToGetInRange(target) < a.pixelsToGetInRange(target) + AnchorMargin())
+    output ||= anchors.exists(a => target.canAttack(a) && target.pixelDistanceEdge(a) < target.pixelRangeAgainst(a) + AnchorMargin(actor))
+    output ||= anchors.exists(a => a.pixelDistanceEdge(target) < a.effectiveRangePixels + AnchorMargin(actor))
     output
   }
 }

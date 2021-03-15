@@ -14,7 +14,7 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyLurkers, EnemyMutalisks, SafeToMoveOut}
 import Planning.Predicates.Strategy.Employing
-import Planning.UnitMatchers.{MatchOr, MatchSiegeTank, MatchWarriors}
+import Planning.UnitMatchers.{MatchOr, MatchTank, MatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran._
@@ -30,7 +30,7 @@ class TvZSK extends GameplanTemplate {
     new Or(
       new SafeToMoveOut,
       new BasesAtLeast(3),
-      new UnitsAtLeast(3, MatchSiegeTank),
+      new UnitsAtLeast(3, MatchTank),
       new UnitsAtLeast(1, Terran.NuclearMissile)))
 
   class LurkerLikely extends Or(
@@ -61,7 +61,7 @@ class TvZSK extends GameplanTemplate {
   override def aggressionPlan: Plan = new Trigger(
     new Or(
       new UnitsAtLeast(5, Terran.Barracks, complete = true),
-      new UnitsAtLeast(3, MatchSiegeTank),
+      new UnitsAtLeast(3, MatchTank),
       new UnitsAtLeast(1, Terran.NuclearMissile),
       new Employing(TvZ2RaxAcademy, TvZRaxCCRax)),
     new Aggression(1.2),

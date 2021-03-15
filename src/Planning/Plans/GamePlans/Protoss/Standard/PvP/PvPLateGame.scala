@@ -38,9 +38,7 @@ class PvPLateGame extends GameplanTemplate {
 
   val buildCannons = new And(
     // It's a good bet to do so; DT are the scariest threat
-    new Or(
-      new SafeAtHome,
-      new EnemyHasShownCloakedThreat),
+    new Or(new SafeAtHome, new EnemyHasShownCloakedThreat),
 
     // Templar are reasonably likely
     new Or(
@@ -48,11 +46,11 @@ class PvPLateGame extends GameplanTemplate {
       new ReadyForThirdIfSafe, // We're far enough along
       new And(
         new EnemyBasesAtMost(1),
-        new Not(new EnemyStrategy(With.fingerprints.robo, With.fingerprints.fourGateGoon)))),
+        new Not(new EnemyStrategy(With.fingerprints.robo, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)))),
 
     // We can't use a Robotics Facility
     // Note that this is deliberately placed after the Templar check so it only sticks at the point we're thinking about DTs
-    new Sticky(new UnitsAtMost(0, Protoss.RoboticsFacility)))
+    new Sticky(new And(new UnitsAtMost(0, Protoss.RoboticsFacility), goingTemplar)))
 
   class EnemyPassiveOpening extends Or(
     new And(
@@ -63,6 +61,9 @@ class PvPLateGame extends GameplanTemplate {
   class AddEarlyTech extends If(
     goingTemplar,
     new Parallel(
+      new If(
+        new UnitsAtLeast(3, Protoss.Gateway),
+        new Build(Get(2, Protoss.CitadelOfAdun))),
       new Build(
         Get(Protoss.CitadelOfAdun),
         Get(2, Protoss.Gateway),
@@ -178,9 +179,12 @@ class PvPLateGame extends GameplanTemplate {
   class FinishDarkTemplarRush extends If(
     new And(
       new UnitsAtLeast(1, Protoss.TemplarArchives),
-      new UnitsAtMost(0, Protoss.Observer),
-      new UnitsAtMost(0, Protoss.Observatory)),
-    new BuildOrder(Get(2, Protoss.DarkTemplar)))
+      new EnemiesAtMost(0, Protoss.Observer),
+      new EnemiesAtMost(0, Protoss.Observatory)),
+    new If(
+      new Or(new EnemiesAtLeast(1, Protoss.Forge), new EnemiesAtLeast(1, Protoss.PhotonCannon), new EnemiesAtLeast(1, Protoss.RoboticsFacility)),
+      new BuildOrder(Get(1, Protoss.DarkTemplar)),
+      new BuildOrder(Get(2, Protoss.DarkTemplar))))
 
   class NeedToCutWorkersForGateways extends And(
     new Latch(new And(new MiningBasesAtLeast(2), new EnemyBasesAtMost(1))),
@@ -190,7 +194,13 @@ class PvPLateGame extends GameplanTemplate {
   override def buildPlans: Seq[Plan] = Seq(
     new CapGasAt(500),
     new FinishDarkTemplarRush,
-    new If(new Not(new NeedToCutWorkersForGateways), new Parallel(new WriteStatus("GatewayCut"), new PumpWorkers(maximumConcurrently = 1))),
+    new If(
+      new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
+      new PumpWorkers(maximumConcurrently = 2),
+      new If(
+        new Not(new NeedToCutWorkersForGateways),
+        new Parallel(new WriteStatus("GatewayCut"), new PumpWorkers(maximumConcurrently = 1)))),
+
     new Build(Get(Protoss.Pylon), Get(Protoss.Gateway), Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore), Get(Protoss.DragoonRange), Get(2, Protoss.Gateway)),
 
     // Detection

@@ -194,7 +194,7 @@ class Storyteller {
     tell(f"Map file: ${With.mapFileName}")
     tell(f"Map hash: ${With.game.mapHash}")
     tell(f"Map id: ${With.mapCleanName}")
-    tell(f"Start: ${With.mapClock} o'clock}")
+    tell(f"Start: ${With.mapClock} o'clock")
   }
 
   private def logStrategyEvaluation(): Unit = {

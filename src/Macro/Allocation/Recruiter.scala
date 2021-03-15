@@ -15,6 +15,7 @@ class Recruiter {
 
   def available: Iterable[FriendlyUnitInfo] = unlockedUnits.view ++ unitsByLock.view.filter(_._1.interruptable).filterNot(_._1.owner.isPrioritized).flatMap(_._2.view)
   def lockedBy(lock: LockUnits): collection.Set[FriendlyUnitInfo] = unitsByLock.getOrElse(lock, Set.empty)
+  def lockedBy(client: Prioritized): collection.Set[FriendlyUnitInfo] = unitsByLock.find(_._1.owner == client).map(_._2).getOrElse(Set.empty)
 
   def lockTo(lock: LockUnits, unit: FriendlyUnitInfo): Unit = lockTo(lock, Iterable(unit))
   def lockTo(lock: LockUnits, units: Iterable[FriendlyUnitInfo]): Unit = {

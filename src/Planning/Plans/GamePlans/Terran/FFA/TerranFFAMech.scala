@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.FFA
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Predicates.Compound.{And, Check}
-import Planning.UnitMatchers.{MatchSiegeTank, MatchWarriors}
+import Planning.UnitMatchers.{MatchTank, MatchWarriors}
 import Planning.Plan
 import Planning.Plans.Army.Aggression
 import Planning.Plans.Basic.NoPlan
@@ -104,7 +104,7 @@ class TerranFFAMech extends GameplanTemplate {
         new Build(Get(1, Terran.CovertOps)),
         new Pump(Terran.Ghost))
     ),
-    new If(new UnitsAtLeast(1,  MatchSiegeTank),    new Build(Get(Terran.SiegeMode))),
+    new If(new UnitsAtLeast(1,  MatchTank),    new Build(Get(Terran.SiegeMode))),
     new If(new UnitsAtLeast(12, MatchWarriors),     new RequireMiningBasesFFA(2)),
     new If(new UnitsAtLeast(30, MatchWarriors),     new RequireMiningBasesFFA(3)),
     new If(new UnitsAtLeast(40, MatchWarriors),     new RequireMiningBasesFFA(4)),
@@ -120,7 +120,7 @@ class TerranFFAMech extends GameplanTemplate {
     new If(new UnitsAtLeast(3, Terran.Battlecruiser),   new Build(Get(Terran.Yamato))),
     new If(new UnitsAtLeast(6, Terran.Battlecruiser),   new Build(Get(Terran.BattlecruiserEnergy))),
     new If(new UnitsAtLeast(5, Terran.Battlecruiser),   new UpgradeAir),
-    new If(new UnitsAtLeast(3, MatchSiegeTank),     new UpgradeMech),
+    new If(new UnitsAtLeast(3, MatchTank),     new UpgradeMech),
     new Pump(Terran.ScienceVessel, 2, 1),
     new Pump(Terran.SiegeTankUnsieged, 30),
     new Pump(Terran.Ghost, 5, 2),

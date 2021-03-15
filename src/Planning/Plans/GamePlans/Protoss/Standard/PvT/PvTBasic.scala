@@ -19,7 +19,7 @@ import Planning.Predicates.Economy.{GasAtLeast, GasAtMost}
 import Planning.Predicates.Milestones.{EnemyHasShownWraithCloak, _}
 import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.{Employing, EnemyIsRandom, EnemyRecentStrategy, EnemyStrategy}
-import Planning.UnitMatchers.{MatchOr, MatchSiegeTank, MatchWorker}
+import Planning.UnitMatchers.{MatchOr, MatchTank, MatchWorker}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
 import Utilities.GameTime
@@ -255,7 +255,7 @@ class PvTBasic extends GameplanTemplate {
       new RequireBases(4)))
 
   class GoObs     extends Parallel(new WriteStatus("GoObs"),      new BuildOrder(Get(Protoss.RoboticsFacility), Get(Protoss.Observatory), Get(Protoss.Observer)))
-  class GoReaver  extends Parallel(new WriteStatus("GoReaver"),   new BuildOrder(Get(Protoss.RoboticsFacility), Get(Protoss.Shuttle), Get(Protoss.RoboticsSupportBay), Get(Protoss.Reaver)), new If(new And(new MiningBasesAtLeast(3), new EnemiesAtLeast(30, MatchOr(Terran.Marine, Terran.Medic, Terran.Firebat, Terran.Ghost))), new If(new EnemiesAtMost(0, MatchSiegeTank), new Build(Get(3, Protoss.RoboticsFacility)), new Build(Get(2, Protoss.RoboticsFacility)))))
+  class GoReaver  extends Parallel(new WriteStatus("GoReaver"),   new BuildOrder(Get(Protoss.RoboticsFacility), Get(Protoss.Shuttle), Get(Protoss.RoboticsSupportBay), Get(Protoss.Reaver)), new If(new And(new MiningBasesAtLeast(3), new EnemiesAtLeast(30, MatchOr(Terran.Marine, Terran.Medic, Terran.Firebat, Terran.Ghost))), new If(new EnemiesAtMost(0, MatchTank), new Build(Get(3, Protoss.RoboticsFacility)), new Build(Get(2, Protoss.RoboticsFacility)))))
   class GoDT      extends Parallel(new WriteStatus("GoDT"),       new BuildOrder(Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives), Get(2, Protoss.DarkTemplar)))
   class GoStorm   extends Parallel(new WriteStatus("GoStorm"),    new BuildOrder(Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives), Get(Protoss.PsionicStorm), Get(2, Protoss.HighTemplar)))
   class GoCarrier extends Parallel(new WriteStatus("GoCarrier"),  new BuildOrder(Get(Protoss.Stargate), Get(2, Protoss.Stargate), Get(Protoss.FleetBeacon), Get(2, Protoss.Carrier), Get(Protoss.AirDamage), Get(4, Protoss.Gateway), Get(Protoss.CarrierCapacity)))

@@ -12,7 +12,7 @@ import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.{MatchOr, MatchSiegeTank}
+import Planning.UnitMatchers.{MatchOr, MatchTank}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvP2FacJoyO
@@ -27,7 +27,7 @@ class TvP2FacJoyO extends GameplanTemplate {
   
   override def attackPlan: Plan = new Trigger(
     new Or(
-      new UnitsAtLeast(3, MatchSiegeTank, complete = true),
+      new UnitsAtLeast(3, MatchTank, complete = true),
       new EnemyStrategy(With.fingerprints.nexusFirst)),
     new Attack)
 
@@ -69,7 +69,7 @@ class TvP2FacJoyO extends GameplanTemplate {
         new EnemyHasShown(Protoss.PhotonCannon)),
       new Build(Get(Terran.SiegeMode))),
     new Trigger(
-      new UnitsAtLeast(3, MatchSiegeTank),
+      new UnitsAtLeast(3, MatchTank),
       new Parallel(
         new If(
           new UnitsAtMost(2, Terran.Factory, complete = true),

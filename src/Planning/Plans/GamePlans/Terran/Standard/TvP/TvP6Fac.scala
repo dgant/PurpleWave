@@ -15,7 +15,7 @@ import Planning.Predicates.Compound.Not
 import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemyHasShown, UnitsAtLeast}
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.Employing
-import Planning.UnitMatchers.{MatchOr, MatchSiegeTank}
+import Planning.UnitMatchers.{MatchOr, MatchTank}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvP6Fac
@@ -29,7 +29,7 @@ class TvP6Fac extends GameplanTemplate {
     new If(
       new Or(
         new UnitsAtLeast(6, Terran.Factory, complete = true),
-        new UnitsAtLeast(8, MatchSiegeTank, complete = true)),
+        new UnitsAtLeast(8, MatchTank, complete = true)),
     new Attack))
 
   override def workerPlan: Plan = new Parallel(

@@ -7,7 +7,7 @@ import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Performance.Tasks.TimedTask
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.{ByOption, Forever}
+import Utilities.{ByOption, Forever, Minutes}
 
 import scala.collection.mutable
 
@@ -32,7 +32,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
       val sorted = group._2.toVector
         .sortBy(m =>
           // Give slight edge to patches near the 3rd starting worker and where future workers will spawn if Terran/Protoss
-          PurpleMath.broodWarDistanceBox(m.topLeft, m.bottomRight, base.townHallArea.startPixel.add(47, 80), base.townHallArea.startPixel.add(70, 103)) * 0.05 +
+          PurpleMath.broodWarDistanceBox(m.topLeft, m.bottomRight, base.townHallArea.startPixel.add(47, 80), base.townHallArea.startPixel.add(70, 103)) * 0.1 +
           PurpleMath.broodWarDistanceBox(m.topLeft, m.bottomRight, base.townHallArea.startPixel, base.townHallArea.endPixel))
       (base, (sorted.map(new Slot(_, 0)) ++ sorted.reverse.map(new Slot(_, 1)) ++ sorted.reverse.map(new Slot(_, 2)))) })
   private lazy val gasSlots: Map[Base, Vector[Slot]] = With.geography.bases.map(b => (b, Vector[Slot]())).toMap ++ // Not all bases have gas! Make sure map contains them
@@ -74,13 +74,19 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
 
     gasPumps = With.units.ours.filter(isValidGas).toVector
     mineralSlotCount = bases.view.flatMap(mineralSlots).count(_.mineable)
-    val distanceMineralBases = mineralSlots.view
-      .filter(s => ! isValidBase(s._1) && s._1.townHall.forall(_.isOurs)) // With unoccupied/incomplete bases
-      .map(p => (p._1, p._2, bases.map(b2 => baseCosts(b2, p._1)).min)) // associate each with the score to the closest extant base
-      .filter(p => mineralSlotCount < 14 || (p._3 <= naturalCost && ! p._1.units.exists(u => u.isEnemy && u.unitClass.attacksGround))) // Distance mine only if it's safe or we're desperate
-      .toVector.sortBy(_._3) // sort the closest
-    val distanceMineralBasesNeeded = distanceMineralBases.indices.find(i => distanceMineralBases.take(i).view.map(_._2.size).sum > 5).getOrElse(distanceMineralBases.size)
-    longDistanceBases = distanceMineralBases.view.take(distanceMineralBasesNeeded).map(_._1)
+    if (With.frame > Minutes(7)()) { // Check that should be unnecessary but is working around issue I can't reproduce locally (which itself is likely due to JRE initialization order differences)
+      val distanceMineralBases = mineralSlots.view
+        .filter(s => !isValidBase(s._1) && s._1.townHall.forall(_.isOurs)) // With unoccupied/incomplete bases
+        .map(p => (p._1, p._2, bases.map(b2 => baseCosts(b2, p._1)).min)) // associate each with the score to the closest extant base
+        .filter(p => mineralSlotCount < 14 || (
+          p._3 <= naturalCost // Distance mine only if it's safe or we're desperate
+          && With.blackboard.safeToMoveOut()
+          && With.blackboard.wantToAttack()
+          && ! p._1.units.exists(u => u.isEnemy && u.unitClass.attacksGround)))
+        .toVector.sortBy(_._3) // sort the closest
+      val distanceMineralBasesNeeded = distanceMineralBases.indices.find(i => distanceMineralBases.take(i).view.map(_._2.size).sum > 5).getOrElse(distanceMineralBases.size)
+      longDistanceBases = distanceMineralBases.view.take(distanceMineralBasesNeeded).map(_._1)
+    }
 
     // Replace gas pumps
     gasPumps.foreach(ourGas => {
@@ -163,7 +169,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     unassigned.toVector.sortBy(_.frameDiscovered).foreach(findAssignment)
 
     // Command workers
-    unassigned.foreach(i => i.agent.intend(this, new Intention { toTravel = Some(PurpleMath.sampleSet(nearestBase(i).tiles).pixelCenter) }))
+    unassigned.foreach(i => i.agent.intend(this, new Intention { toTravel = Some(PurpleMath.sampleSet(nearestBase(i).tiles).pixelCenter); canFight = false }))
     assignments.foreach(a => a._1.agent.intend(this, new Intention { toGather = Some(a._2.resource) }))
   }
 
@@ -209,7 +215,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   }
 
   private def nearestBase(worker: FriendlyUnitInfo): Base =
-    worker.base.orElse(
+    worker.base.filter(bases.contains).orElse(
       ByOption.minBy(bases)(b => worker.pixelDistanceTravelling(b.heart))).getOrElse(
         With.geography.bases.minBy(b => worker.pixelDistanceTravelling(b.heart)))
 

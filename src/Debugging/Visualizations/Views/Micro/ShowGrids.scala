@@ -12,6 +12,7 @@ object ShowGrids extends View {
     //renderGridArray(With.units.all.find(_.selected).map(_.tileIncludingCenter).getOrElse(With.geography.home).zone.distanceGrid, 0, 1)
     //renderGridArray(With.grids.enemyRangeGround, 0, 0)
     //renderGridArray(With.grids.units, 1, 0)
+    renderGridArray(With.geography.ourMain.zone.distanceGrid)
   }
   
   private def renderGridArray[T](map: AbstractGrid[T], offsetX: Int = 0, offsetY: Int = 0) {

@@ -13,7 +13,7 @@ import Planning.Predicates.Compound.Latch
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.{BasesAtLeast, EnemiesAtLeast, UnitsAtLeast}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.MatchSiegeTank
+import Planning.UnitMatchers.MatchTank
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvPFDStrong
@@ -25,7 +25,7 @@ class TvPFDStrong extends GameplanTemplate {
 
   override def scoutPlan: Plan = new ScoutAt(13)
   override def attackPlan: Plan = new Trigger(
-    new UnitsAtLeast(2, MatchSiegeTank, complete = true),
+    new UnitsAtLeast(2, MatchTank, complete = true),
     new If(
       new EnemiesAtLeast(2, Protoss.Gateway),
       new ConsiderAttacking,

@@ -81,7 +81,8 @@ class PvP1GateCoreLogic(allowZealotBeforeCore: Boolean = true) {
     new PvPIdeas.ReactToGasSteal,
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToProxyGateways,
-    new PvPIdeas.ReactTo2Gate,
+    // We don't need to do anything special against standard 2-gate
+    // new PvPIdeas.ReactTo2Gate,
     new ScoutForCannonRush,
     new If(
       new EnemyDarkTemplarLikely,

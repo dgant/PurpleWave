@@ -15,8 +15,8 @@ object Opponents {
   val stardust    : Opponent = add("Stardust",    if (Medusa.matches) StrategySelectionFixed(PvP3GateGoon) else if (Eddy.matches) StrategySelectionFixed(PvP4GateGoon) else StrategySelectionFixed(PvPRobo1Gate, PvPRobo))
   val bananabrain : Opponent = add("BananaBrain", if (Medusa.matches) StrategySelectionFixed(PvP3GateGoon) else if (Eddy.matches) StrategySelectionFixed(PvP4GateGoon) else StrategySelectionFixed(PvPRobo1Gate, PvPRobo))
   val dragon      : Opponent = add("Dragon",      StrategySelectionFixed(PvT1015Expand, PvT2BaseReaver, PvT3BaseCarrier, PvEStormNo))
-  val willyt      : Opponent = add("WillyT",      new StrategySelectionRecommended(StrategySelectionGreedy(), 22, PvT32Nexus, PvT2BaseReaver, PvT3BaseArbiter, PvEStormYes))
-  val steamhammer : Opponent = add("Steamhammer", new StrategySelectionRecommended(StrategySelectionGreedy(), 22, PvZ2Gate1012, PvZ4GateGoon, PvZMidgame5GateGoonReaver, PvZLateGameReaver))
+  val willyt      : Opponent = add("WillyT",      new StrategySelectionRecommended(StrategySelectionGreedy(), 2, PvT32Nexus, PvT2BaseReaver, PvT3BaseArbiter, PvEStormYes))
+  val steamhammer : Opponent = add("Steamhammer", new StrategySelectionRecommended(StrategySelectionGreedy(), 2, PvZ2Gate1012, PvZ4GateGoon, PvZMidgame5GateGoonReaver, PvZLateGameReaver))
 
   // SSCAIT 2020-2021
   val monster     : Opponent = add("Monster",     new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ2Gate1012, PvZ4GateGoon, PvZMidgame5GateGoonReaver, PvZLateGameReaver) { duration = 3 })

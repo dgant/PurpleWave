@@ -33,7 +33,7 @@ object PvP2GateGoon extends PvPStrategy {
 object PvP3GateGoon extends PvPStrategy {
   override def responsesWhitelisted: Iterable[Fingerprint] = Iterable(With.fingerprints.robo, With.fingerprints.nexusFirst, With.fingerprints.twoGate, With.fingerprints.fourGateGoon)
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
-  override def minimumGamesVsOpponent: Int = 2
+  //override def minimumGamesVsOpponent: Int = 2 -- Disabled AIST4 because strategy picker refused to pick it
 }
 object PvP4GateGoon extends PvPStrategy {
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)

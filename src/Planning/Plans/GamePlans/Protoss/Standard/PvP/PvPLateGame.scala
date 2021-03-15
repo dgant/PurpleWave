@@ -61,9 +61,7 @@ class PvPLateGame extends GameplanTemplate {
   class AddEarlyTech extends If(
     goingTemplar,
     new Parallel(
-      new If(
-        new UnitsAtLeast(3, Protoss.Gateway),
-        new Build(Get(2, Protoss.CitadelOfAdun))),
+      new If(new UnitsAtLeast(3, Protoss.Gateway), new Build(Get(2, Protoss.Assimilator))),
       new Build(
         Get(Protoss.CitadelOfAdun),
         Get(2, Protoss.Gateway),

@@ -51,7 +51,7 @@ object FightOrFlight extends Action {
         && ally.pixelDistanceEdge(unit, otherAt = ByOption.minBy(unit.matchups.targets.view.map(unit.pixelToFireAt))(unit.pixelDistanceCenter).getOrElse(unit.pixel)) < 72))
 
     decide(true, "Anchors", () => unit.matchups.anchors.exists(anchor =>
-      anchor.visibleToOpponents && anchor.matchups.pixelsOfEntanglement > unit.matchups.pixelsOfEntanglement - AnchorMargin(unit)))
+      anchor.visibleToOpponents && anchor.matchups.pixelsOfEntanglement > unit.matchups.pixelsOfEntanglement - (if (anchor.topSpeed < unit.topSpeed) AnchorMargin(unit) else 0)))
 
     if (decision.isDefined) {
       unit.agent.shouldEngage = decision.get

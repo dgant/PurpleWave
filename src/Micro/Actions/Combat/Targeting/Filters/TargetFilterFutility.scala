@@ -28,7 +28,8 @@ object TargetFilterFutility extends TargetFilter {
     lazy val atOurWorkers = target.presumptiveTarget.exists(u => u.isOurs && u.unitClass.isWorker)
     lazy val iAmCatcher = target.matchups.canCatchMe(actor)
     lazy val catcherExists = target.matchups.catchers.exists(ally => ally.friendly.exists(_.agent.toAttack.contains(target)) || ally.framesToGetInRange(target) <= actor.framesToGetInRange(target))
-    val output = iAmCatcher || atOurWorkers || catcherExists
+    if (iAmCatcher) return true
+    val output = ! With.scouting.enemyScouts().exists(_ == target) && (atOurWorkers || catcherExists)
     output
   }
   

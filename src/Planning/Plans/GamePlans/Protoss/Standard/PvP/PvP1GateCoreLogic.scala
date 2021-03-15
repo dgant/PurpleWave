@@ -5,6 +5,7 @@ import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{If, Or, Parallel}
+import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.ReactToDarkTemplarEmergencies
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.BuildOrder
 import Planning.Plans.Scouting.ScoutForCannonRush
@@ -85,17 +86,20 @@ class PvP1GateCoreLogic(allowZealotBeforeCore: Boolean = true) {
     // new PvPIdeas.ReactTo2Gate,
     new ScoutForCannonRush,
     new If(
-      new EnemyDarkTemplarLikely,
+      new Employing(PvPRobo),
       new If(
-        new Latch(new UnitsAtMost(0, Protoss.CyberneticsCore)),
-        new PvPIdeas.ReactToDarkTemplarEmergencies,
-        new Parallel(
-          new If(new UnitsAtMost(0, Protoss.Observatory), new CancelIncomplete(Protoss.RoboticsSupportBay)),
-          new If(new UnitsAtMost(0, Protoss.Observer), new CancelIncomplete(Protoss.Shuttle, Protoss.Reaver)),
-          new BuildOrder(
-            Get(Protoss.RoboticsFacility),
-            Get(Protoss.Observatory),
-            Get(2, Protoss.Observer))))))
+        new EnemyDarkTemplarLikely,
+        new If(
+          new Latch(new UnitsAtMost(0, Protoss.CyberneticsCore)),
+          new PvPIdeas.ReactToDarkTemplarEmergencies,
+          new Parallel(
+            new If(new UnitsAtMost(0, Protoss.Observatory), new CancelIncomplete(Protoss.RoboticsSupportBay)),
+            new If(new UnitsAtMost(0, Protoss.Observer), new CancelIncomplete(Protoss.Shuttle, Protoss.Reaver)),
+            new BuildOrder(
+              Get(Protoss.RoboticsFacility),
+              Get(Protoss.Observatory),
+              Get(2, Protoss.Observer))))),
+      new ReactToDarkTemplarEmergencies))
 
   class BuildOrderPlan extends Parallel(
     new BuildOrder(

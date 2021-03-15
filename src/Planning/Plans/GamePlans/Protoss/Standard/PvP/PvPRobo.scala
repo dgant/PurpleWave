@@ -144,7 +144,11 @@ class PvPRobo extends GameplanTemplate {
   override def buildPlans: Seq[Plan] = Seq(
     new oneGateCoreLogic.WriteStatuses,
     new If(new GetObservers, new WriteStatus("Obs"), new WriteStatus("NoObs")),
-    new If(new GasCapsUntouched, new CapGasAt(350)),
+    new If(
+      new GasCapsUntouched,
+      new Parallel(
+        new CapGasAt(350),
+        new If(          new oneGateCoreLogic.GateGate))),
     new FlipIf(
       new oneGateCoreLogic.GateGate,
       new Parallel(

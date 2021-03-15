@@ -35,7 +35,8 @@ object Bust extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     With.frame < Minutes(8)() // Performance short-circuit
-    && unit.totalHealth >= unit.unitClass.maxHitPoints + 12 // Don't take hull damage
+    && unit.shieldPoints > 12 // Don't take hull damage
+    && unit.totalHealth > 24
     && With.enemies.exists(_.raceCurrent == Race.Terran)
     && unit.agent.canFight
     && unit.canMove
@@ -48,10 +49,12 @@ object Bust extends Action {
       && bunker.is(Terran.Bunker)
       && ! bunker.player.hasUpgrade(Terran.MarineRange)
       && unit.matchups.threats.forall(threat =>
-        safeFromThreat(
-          unit,
-          threat,
-          unit.pixel.project(bunker.pixel, unit.pixelDistanceEdge(bunker) - unit.pixelRangeAgainst(bunker))))))
+        threat == bunker || (
+          threat.pixelsToGetInRange(unit) > bunker.pixelsToGetInRange(unit)
+          && safeFromThreat(
+            unit,
+            threat,
+            unit.pixel.project(bunker.pixel, unit.pixelDistanceEdge(bunker) - unit.pixelRangeAgainst(bunker)))))))
   
   override protected def perform(unit: FriendlyUnitInfo) {
     // Goal: Take down the bunker. Don't take any damage from it.
@@ -74,10 +77,16 @@ object Bust extends Action {
       val bunker = unit.agent.toAttack.get
       val range = unit.pixelRangeAgainst(bunker)
       val bunkerDistance = unit.pixelDistanceEdge(bunker)
-      def stationAcceptable(pixel: Pixel) = pixel.walkable && ! unit.alliesSquad.exists(a => ! a.flying && a.pixelDistanceEdge(unit, pixel) < 4)
+      def stationAcceptable(pixel: Pixel) = (
+        pixel.walkable
+        && ! unit.alliesSquad.exists(a =>
+          ! a.flying
+          && unit.pixelDistanceEdge(a, pixel) < 4
+          && a.pixelDistanceEdge(bunker) < bunkerDistance)
+        && ! unit.matchups.enemies.exists(_.inRangeToAttack(unit, pixel)))
       var station = Some(unit.pixel.project(bunker.pixel, Math.max(Random.nextInt(9), bunkerDistance - range))).filter(stationAcceptable)
       if (station.isEmpty && bunkerDistance > range + 32) {
-        val stationCount = 64
+        val stationCount = 256
         val stations = (0 until stationCount)
           .map(_ * 2 * Math.PI / stationCount)
           .map(bunker.pixel.radiateRadians(_ , range + unit.unitClass.dimensionMax + bunker.unitClass.dimensionMax))

@@ -1,5 +1,6 @@
 package Macro.Allocation
 
+import Debugging.Visualizations.Views.Economy.ShowProduction
 import Lifecycle.With
 import Planning.Prioritized
 import Planning.ResourceLocks.LockCurrency
@@ -13,8 +14,12 @@ class Bank {
   private var supplyLeft      = 0
 
   val requests = new mutable.PriorityQueue[LockCurrency]()(Ordering.by( - _.owner.priority))
+  var requestsLast: Seq[LockCurrency] = Seq.empty
   
   def update() {
+    if (ShowProduction.inUse) {
+      requestsLast = requests.toVector
+    }
     requests.clear()
     recountResources()
   }

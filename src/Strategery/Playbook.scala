@@ -37,13 +37,11 @@ object StrategyGroups {
     // AIST4: This was always an exploit build due to inability to deny scouting; disable before probable removal
     PvP2Gate1012DT,
     // AIST4: This is horrible against the 4-Gate meta
-    PvP2GateGoon,
+    //PvP2GateGoon,
     // AIST4: Time to retire 2-gating except as win%rr safety pick. Maybe if we can catch an opponent who's skimping on zealots
     PvP2Gate1012Goon,
     // AIST4: Too many issues; too bad against 4-gate meta; needs polish we don't have time for
     PvP1ZealotExpand,
-    // AIST4: Probably worth retiring this
-    PvP3rdBaseFast,
 
     PvZDT,       // Requires better micro on one base
     PvZCorsair,  // Requires better micro on one base

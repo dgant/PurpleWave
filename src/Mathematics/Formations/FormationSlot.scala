@@ -6,7 +6,8 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class FormationSlot(unit: FriendlyUnitInfo) {
   val unitClass: UnitClass = unit.unitClass
-  val rangePixels : Double = range(unit)
+  val rangePixels: Double = range(unit)
+  val sightPixels: Int = unit.sightPixels
   
   private def range(unit: FriendlyUnitInfo): Double = {
     if (unit.is(Terran.SiegeTankUnsieged) && unit.player.hasTech(Terran.SiegeMode))

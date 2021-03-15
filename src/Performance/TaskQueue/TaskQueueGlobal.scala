@@ -45,8 +45,6 @@ class TaskQueueGlobal extends TaskQueueParallel(
     With.agents)
     .withSkipsMax(1)
     .withWeight(TaskQueueGlobalWeights.Micro),
-  With.manners,
-  With.camera,
-  With.visualization) {
+  With.manners) {
   withName("Global")
 }

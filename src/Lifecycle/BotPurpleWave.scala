@@ -23,6 +23,8 @@ class BotPurpleWave extends DefaultBWListener {
       With.tasks.run(With.performance.msBeforeTarget)
       With.storyteller.onFrame()
       With.performance.endFrame()
+      With.camera.onRun(24000)
+      With.visualization.onRun(24000)
     })
     // If we don't initialize static units on frame 0 we're in trouble
     tryCatch(() => if (With.frame == 0 && With.units.neutral.isEmpty) { With.units.onFrame() })

@@ -75,7 +75,12 @@ class PvP34GateGoon extends GameplanTemplate {
       new BuildOrder(Get(3, Protoss.Gateway), Get(8, Protoss.Dragoon)),
       new BuildOrder(Get(4, Protoss.Gateway), Get(10, Protoss.Dragoon))),
 
-    new If(new EnemyRecentStrategy(With.fingerprints.dtRush), new Build(Get(Protoss.Forge))),
+    new If(
+      new Or( // All smells of DT risk
+        new EnemyRecentStrategy(With.fingerprints.dtRush),
+        new EnemiesAtLeast(1, Protoss.Forge),
+        new EnemiesAtLeast(1, Protoss.PhotonCannon)),
+      new Build(Get(Protoss.Forge))),
 
     new If(
       new Or(

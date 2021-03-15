@@ -41,7 +41,7 @@ object ShowProduction extends View {
       else None
     })
     .flatten
-    .toVector ++ With.bank.requests
+    .toVector ++ (if (With.bank.requests.isEmpty) With.bank.requestsLast else With.bank.requests)
       .withFilter( ! _.isSpent)
       .withFilter(_.owner.isInstanceOf[Production])
       .map(request => {

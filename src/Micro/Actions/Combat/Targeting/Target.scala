@@ -43,14 +43,15 @@ object Target extends {
     (TargetFilterGroups.filtersRequired.view ++ attacker.agent.intent.targetFilters).filter(_.appliesTo(attacker))
   }
 
-  def auditLegality(attacker: FriendlyUnitInfo, additionalFiltersRequired: TargetFilter*): Vector[(UnitInfo, Vector[(Boolean, TargetFilter)])] = {
+  def auditLegality(attacker: FriendlyUnitInfo, additionalFiltersRequired: TargetFilter*): Vector[(UnitInfo, Vector[(Boolean, TargetFilter)], Vector[(Boolean, TargetFilter)])] = {
     attacker.matchups.targets
       .map(target => (
         target,
         (filtersRequired(attacker) ++ additionalFiltersRequired.filter(_.appliesTo(attacker)))
-          .map(filter => (filter.legal(attacker, target), filter))
-          .toVector
-          .sortBy(_._1)))
+          .map(filter => (filter.legal(attacker, target), filter)).toVector.sortBy(_._1),
+        TargetFilterGroups.filtersPreferred.filter(_.appliesTo(attacker))
+          .map(filter => (filter.legal(attacker, target), filter)).toVector.sortBy(_._1)
+      ))
       .toVector
   }
 

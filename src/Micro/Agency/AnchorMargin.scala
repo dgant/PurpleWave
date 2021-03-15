@@ -10,6 +10,6 @@ object AnchorMargin {
   }
 
   @inline final def marginOf(units: Iterable[FriendlyUnitInfo]): Double = {
-    base + Math.min(32 * 5, units.view.map(_.unitClass.dimensionMax).sum / 6)
+    base + Math.min(32 * 5, units.view.map(_.unitClass.dimensionMax).sum / 10)
   }
 }

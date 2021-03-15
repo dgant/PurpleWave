@@ -11,7 +11,7 @@ import Micro.Actions.Combat.Tactics.Brawl
 import Micro.Actions.Combat.Targeting.Filters.{TargetFilterPotshot, TargetFilterVisibleInRange}
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Commands.Move
-import Micro.Agency.{AnchorMargin, Commander}
+import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.TrafficPriorities
 import Micro.Heuristics.Potential
@@ -92,7 +92,7 @@ object DefaultCombat extends Action {
     lazy val rangeAgainstUs     = if (target.canAttack(unit)) Some(target.pixelRangeAgainst(unit)) else None
     lazy val rangeEqual         = rangeAgainstUs.contains(range)
     lazy val pixelsOutranged    = rangeAgainstUs.map(_ - unit.pixelRangeAgainst(target)).filter(_ > 0)
-    lazy val confidentToChase   = true //unit.confidence() > 0
+    lazy val confidentToChase   = unit.confidence() > .25
     lazy val projectedUs        = unit.pixel.projectUpTo(target.pixel, 16)
     lazy val projectedTarget    = target.pixel.projectUpTo(target.presumptiveStep, 16)
     lazy val targetApproaching  = unit.pixelDistanceSquared(target) > unit.pixelDistanceSquared(projectedTarget)
@@ -165,7 +165,7 @@ object DefaultCombat extends Action {
     lazy val target = Target.choose(unit)
 
     var technique: Technique =
-      if (unit.agent.shouldEngage && (unit.agent.withinSafetyMargin || ! unit.matchups.anchor.exists(a => a.pixelDistanceEdge(unit) > a.effectiveRangePixels + AnchorMargin()) && target.isDefined))
+      if (unit.agent.shouldEngage && (unit.agent.withinSafetyMargin || target.isDefined || unit.matchups.threatsInFrames(48).forall(MatchWorker)))
         Fight else Flee
 
     def transition(newTechnique: Technique, predicate: () => Boolean = () => true, action: () => Unit = () => {}): Unit = {
@@ -281,7 +281,7 @@ object DefaultCombat extends Action {
         val distanceTowards = distanceCurrent - distanceIdeal
         val danceForce      = if (distanceTowards > 0) Forces.threat else Forces.travel
         exactDistance = Some(Math.abs(distanceTowards))
-        if (exactDistance.exists(_ < 4)) {
+        if (exactDistance.exists(_ < 4) || ! target.get.visible) {
           unit.agent.act("Stand")
           Commander.attack(unit)
           return
@@ -289,9 +289,7 @@ object DefaultCombat extends Action {
           unit.agent.act("Chase")
           val to = target.get.pixel
           val step = target.get.presumptiveStep
-          val chaseGoal =
-            if (step.traversableBy(unit) && unit.pixelDistanceSquared(step) >= unit.pixelDistanceSquared(to)) step
-            else to
+          val chaseGoal = if (step.traversableBy(unit) && unit.pixelDistanceSquared(step) >= unit.pixelDistanceSquared(to)) step else to
           val extraChaseDistance = Math.max(0, unit.pixelDistanceCenter(chaseGoal) - unit.pixelDistanceCenter(to))
           unit.agent.toTravel = Some(unit.pixel.project(chaseGoal, distanceTowards + extraChaseDistance))
           Move.delegate(unit)

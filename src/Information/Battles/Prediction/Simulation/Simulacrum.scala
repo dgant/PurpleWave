@@ -258,12 +258,12 @@ class Simulacrum(val simulation: Simulation, val realUnit: UnitInfo) {
   @inline final def airDistance(target: Simulacrum): Double = PurpleMath.broodWarDistanceBox(
     pixel.x - unitClass.dimensionLeft,
     pixel.y - unitClass.dimensionUp,
-    pixel.x + unitClass.dimensionRight,
-    pixel.y + unitClass.dimensionDown,
+    pixel.x + unitClass.dimensionRight + 1,
+    pixel.y + unitClass.dimensionDown + 1,
     target.pixel.x - target.unitClass.dimensionLeft,
     target.pixel.y - target.unitClass.dimensionUp,
-    target.pixel.x + target.unitClass.dimensionRight,
-    target.pixel.y + target.unitClass.dimensionDown)
+    target.pixel.x + target.unitClass.dimensionRight + 1,
+    target.pixel.y + target.unitClass.dimensionDown + 1)
   
   @inline final def pixelsOutOfRange(target: Simulacrum): Double = {
     val output = airDistance(target) - realUnit.pixelRangeAgainst(target.realUnit) - bonusRange

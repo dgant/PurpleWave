@@ -98,7 +98,15 @@ class Tactics extends TimedTask {
       }
     }
   }
-  private lazy val baseSquads = With.geography.bases.map(base => (base, new SquadDefendBase(base))).toMap
+
+  // AIST4 last minute hack
+  // Getting bizarre ClassNotFound exceptions when creating this as a lazy, particularly when invoked from inside the practive drop defense
+  // so let's create this manually
+  private var _baseSquads: Option[Map[Base, SquadDefendBase]] = None
+  private def baseSquads: Map[Base, SquadDefendBase] = {
+    _baseSquads = _baseSquads.orElse(Some(With.geography.bases.map(base => (base, new SquadDefendBase(base))).toMap))
+    _baseSquads.get
+  }
   private lazy val attackSquad = new SquadAttack
   private lazy val cloakSquad = new SquadCloakedHarass
 
@@ -148,7 +156,7 @@ class Tactics extends TimedTask {
         b.workerCount > 5
         && ! divisionsDefending.exists(_.bases.contains(b)) // If it was in a defense division, it should have received some defenders already
         && b.metro.bases.view.flatMap(_.units).count(_.isAny(MatchAnd(MatchComplete, MatchOr(Terran.Factory, Terran.Barracks, Protoss.Gateway, MatchHatchlike, Protoss.PhotonCannon, Terran.Bunker, Zerg.SunkenColony)))) < 3)
-      assign(freelancers, dropVulnerableBases.map(baseSquads), filter = (f, s) => f.isAny(Terran.Marine, Terran.Firebat, Terran.Vulture, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk) && s.unitsNext.size < Math.min(3, freelancerCountInitial / 10))
+      assign(freelancers, dropVulnerableBases.map(baseSquads(_)), filter = (f, s) => f.isAny(Terran.Marine, Terran.Firebat, Terran.Vulture, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk) && s.unitsNext.size < Math.min(3, freelancerCountInitial / 10))
     }
 
     catchDTRunby.recruit()

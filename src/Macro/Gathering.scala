@@ -169,7 +169,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     unassigned.toVector.sortBy(_.frameDiscovered).foreach(findAssignment)
 
     // Command workers
-    unassigned.foreach(i => i.agent.intend(this, new Intention { toTravel = Some(PurpleMath.sampleSet(nearestBase(i).tiles).pixelCenter); canFight = false }))
+    unassigned.foreach(i => i.agent.intend(this, new Intention { toTravel = Some(PurpleMath.sampleSet(nearestBase(i).metro.bases.maxBy(_.heart.groundPixels(With.scouting.threatOrigin)).tiles).pixelCenter); canFight = false }))
     assignments.foreach(a => a._1.agent.intend(this, new Intention { toGather = Some(a._2.resource) }))
   }
 

@@ -125,28 +125,6 @@ class PvPLateGame extends GameplanTemplate {
         new UnitsAtLeast(1, Protoss.Shuttle, complete = true),
         new UnitsAtLeast(2, Protoss.Reaver, complete = true))))
 
-  class AddScalingTech extends Parallel(
-
-    new If(
-      new And(
-        new Not(goingTemplar),
-        new MiningBasesAtLeast(2),
-        new UnitsAtLeast(24, Protoss.Dragoon),
-        new UnitsAtLeast(5, Protoss.Gateway, complete = true)),
-      new Build(Get(Protoss.CitadelOfAdun), Get(Protoss.ZealotSpeed))),
-    new If(
-      new And(
-        new MiningBasesAtLeast(3),
-        new UnitsAtLeast(24, MatchWarriors)),
-      new Parallel(
-        new Build(Get(Protoss.Forge)),
-        new UpgradeContinuously(Protoss.GroundDamage),
-        new Build(
-          Get(Protoss.CitadelOfAdun),
-          Get(Protoss.TemplarArchives),
-          Get(Protoss.ZealotSpeed),
-          Get(Protoss.PsionicStorm)))))
-
   class FinishDarkTemplarRush extends If(
     new And(new UnitsAtLeast(1, Protoss.TemplarArchives), new Not(new EnemyStrategy(With.fingerprints.robo))),
     new If(

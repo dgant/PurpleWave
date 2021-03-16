@@ -55,7 +55,6 @@ object PvT2GateRangeExpand extends PvTBasicOpener {
 }
 object PvT1015Expand extends PvTBasicOpener {
   override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Destination)
-  /*
   override def entranceRamped: Boolean = false
   override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fourteenCC,
@@ -64,7 +63,6 @@ object PvT1015Expand extends PvTBasicOpener {
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.wallIn
   )
-  */
 }
 object PvT1015DT extends PvTStrategy {
   override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Destination)
@@ -119,14 +117,6 @@ object PvTProxy2Gate extends PvTStrategy {
 }
 
 object PvT2BaseReaver extends PvTStrategy {
-  /*
-  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
-    With.fingerprints.twoFac,
-    With.fingerprints.threeFac,
-    With.fingerprints.twoRaxAcad,
-    With.fingerprints.bio,
-    With.fingerprints.twoArmoryUpgrades)
-    */
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(PvT2BaseCarrier, PvT3BaseArbiter, PvT3BaseCarrier, PvT3BaseGateway))
 }
 object PvT3rdFast extends PvTStrategy {

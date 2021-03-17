@@ -89,7 +89,7 @@ object PreplaceTerranWall {
         }
       }
       if (aTop != aBottom) {
-        if (aTop._2 == Terran.Barracks) {
+        if (aTop._2 == Terran.Barracks && shouldBlock.width < Protoss.Dragoon.width) {
           output = false
         }
       }

@@ -23,6 +23,8 @@ class Preplacement extends TimedTask {
       .foreach(_.tileArea.tiles.foreach(t => preplacement.place(Fit(t, PreplacementTemplates.walkway))))
     With.geography.bases.foreach(b => preplacement.place(Fit(b.townHallTile, PreplacementTemplates.townhall)))
     With.geography.bases.foreach(b => b.resourcePathTiles.foreach(t => preplacement.place(Fit(t, PreplacementTemplates.walkway))))
+    // Reenable for Terran walls
+    //With.geography.zones.foreach(preplaceWalls)
     With.geography.zones.foreach(preplaceZone)
   }
 
@@ -45,5 +47,13 @@ class Preplacement extends TimedTask {
     fits ++= preplacement.fitAny  (cornerFront, bounds, directionToBack,  PreplacementTemplates.gateways, 2)
     fits ++= preplacement.fitAny  (cornerBack,  bounds, directionToFront, PreplacementTemplates.tech)
     fits ++= preplacement.fitAny  (cornerFront, bounds, directionToBack,  PreplacementTemplates.gateways, 5)
+  }
+
+  private def preplaceWalls(zone: Zone): Unit = {
+    if (With.self.isTerran) {
+      val terranWall = PreplaceTerranWall(zone)
+      terranWall.foreach(fits.+=)
+      terranWall.foreach(preplacement.place)
+    }
   }
 }

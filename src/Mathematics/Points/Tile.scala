@@ -147,10 +147,10 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline final def travelPixelsFor(other: Tile, unit: UnitInfo): Double = {
     unit.pixelDistanceTravelling(this, other)
   }
-  @inline final def altitude: Double = {
+  @inline final def altitude: Int = {
     With.game.getGroundHeight(x, y)
   }
-  @inline final def altitudeUnchecked: Double = {
+  @inline final def altitudeUnchecked: Int = {
     With.game.getGroundHeight(x, y) // TODO: Replace with actually unchecked variant
   }
   @inline final def toRectangle: TileRectangle = {

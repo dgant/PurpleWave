@@ -3,11 +3,23 @@ package Placement
 import Mathematics.Points._
 import Performance.{Cache, CacheForever}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import ProxyBwapi.UnitClasses.UnitClass
 import Utilities.ByOption
 
 import scala.collection.mutable.ArrayBuffer
 
 class PreplacementTemplate {
+
+  def this(units: Seq[(Tile, UnitClass)]) {
+    this()
+    val xMin = ByOption.min(units.view.map(_._1.x)).getOrElse(0)
+    val yMin = ByOption.min(units.view.map(_._1.y)).getOrElse(0)
+    units.foreach(tileUnit => add(
+      Point(
+        tileUnit._1.x - xMin,
+        tileUnit._1.y - yMin),
+      new PreplacementRequirement(tileUnit._2)))
+  }
 
   val points: ArrayBuffer[PreplacementSlot] = new ArrayBuffer[PreplacementSlot]()
 

@@ -2,7 +2,7 @@ package Mathematics.Points
 
 import Utilities.ByOption
 
-import scala.collection.immutable
+import scala.collection.SeqView
 
 case class TileRectangle(
   startInclusive : Tile,
@@ -79,9 +79,9 @@ case class TileRectangle(
   lazy val cornerPixels: Array[Pixel] = Array(startPixel, topRightPixel, endPixel, bottomleftPixel)
   lazy val cornerTilesInclusive: Array[Tile] = Array(startInclusive, Tile(endExclusive.x - 1, startInclusive.y), endExclusive.subtract(1, 1), Tile(startInclusive.x, endExclusive.y - 1))
   
-  lazy val tiles: immutable.IndexedSeq[Tile] =
-    (0 until endExclusive.x - startInclusive.x).flatMap(x =>
-      (0 until endExclusive.y - startInclusive.y).map(y =>
+  lazy val tiles: SeqView[Tile, Seq[_]] =
+    (0 until endExclusive.x - startInclusive.x).view.flatMap(x =>
+      (0 until endExclusive.y - startInclusive.y).view.map(y =>
         Tile(startInclusive.x + x, startInclusive.y + y)))
   
   lazy val tilesSurrounding: Iterable[Tile] = {

@@ -20,6 +20,7 @@ final class PathfindProfile(
    var costThreat               : Float           = 0f,
    var costRepulsion            : Float           = 0f,
    var costEnemyVision          : Float           = 0f,
+   var alsoUnwalkable           : Set[Tile]       = Set.empty,
    var repulsors: IndexedSeq[PathfindRepulsor] = IndexedSeq.empty,
    var unit: Option[FriendlyUnitInfo] = None) {
 

@@ -7,11 +7,11 @@ trait GroundDistance {
 
   val impossiblyLargeDistance: Long = 32L * 32L * 256L * 256L * 100L
 
-  def groundPathExists(origin: Tile, destination: Tile): Boolean = {
+  @inline final def groundPathExists(origin: Tile, destination: Tile): Boolean = {
     origin.zone == destination.zone || groundTiles(origin, destination) < impossiblyLargeDistance
   }
 
-  def groundTilesManhattan(origin: Tile, destination: Tile): Long = {
+  @inline final def groundTilesManhattan(origin: Tile, destination: Tile): Long = {
     // Let's first check if we can use air distance. It's cheaper and more accurate.
     // We can "get away" with using air distance if we're in the same zone
     if (origin.zone == destination.zone) {
@@ -26,7 +26,7 @@ trait GroundDistance {
       groundTiles(origin, destination))
   }
 
-  def groundPixels(origin: Pixel, destination: Pixel): Double = {
+  @inline final def groundPixels(origin: Pixel, destination: Pixel): Double = {
     // Some maps used to have broken ground distance (due to BWTA,
     // which in particular suffered on maps with narrow ramps, eg. Plasma, Third World
 
@@ -44,7 +44,7 @@ trait GroundDistance {
       32.0 * groundTiles(origin.tile, destination.tile))
   }
 
-  protected def groundTiles(origin: Tile, destination: Tile): Long = {
+  @inline final protected def groundTiles(origin: Tile, destination: Tile): Long = {
     if ( ! origin.valid) return impossiblyLargeDistance
     if ( ! destination.valid) return impossiblyLargeDistance
     ByOption

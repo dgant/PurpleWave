@@ -152,6 +152,7 @@ trait TilePathfinder {
     profile.updateRepulsion()
     val horizon = new mutable.PriorityQueue[TileState]()(Ordering.by(t => -t.totalCostFloor))
     val startTileState = tiles(startTile.i)
+    val alsoUnwalkableI = profile.alsoUnwalkable.map(_.i)
     startTileState.setVisited()
     startTileState.setEnqueued()
     startTileState.setCameFrom(startTile)
@@ -202,8 +203,7 @@ trait TilePathfinder {
             ! neighborState.visited
 
             // Is the neighbor pathable?
-            && (profile.crossUnwalkable || With.grids.walkable.getUnchecked(neighborState.i))
-
+            && (profile.crossUnwalkable || (With.grids.walkable.getUnchecked(neighborState.i) && ! alsoUnwalkableI.contains(neighborTile.i)))
             // Can we path from here to the neighbor?
             // (Specifically, if it's a diagonal step, verify that it's achievable)
             && (profile.crossUnwalkable

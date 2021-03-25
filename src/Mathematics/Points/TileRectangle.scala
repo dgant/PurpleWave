@@ -4,7 +4,7 @@ import Utilities.ByOption
 
 import scala.collection.SeqView
 
-case class TileRectangle(
+final case class TileRectangle(
   startInclusive : Tile,
   endExclusive   : Tile) {
 
@@ -26,65 +26,63 @@ case class TileRectangle(
         ByOption.max(included.view.map(_.y + 1)).getOrElse(0)))
   }
 
-  if (endExclusive.x < startInclusive.x || endExclusive.y < startInclusive.y) {
+  if (endExclusive.x < startInclusive.x) {
     throw new Exception("Created an invalid (non-normalized) rectangle")
   }
   
-  def add(x: Int, y: Int): TileRectangle =
+  @inline def add(x: Int, y: Int): TileRectangle =
     TileRectangle(
       startInclusive.add(x, y),
       endExclusive.add(x, y))
   
-  def expand(x: Int, y: Int): TileRectangle =
+  @inline def expand(x: Int, y: Int): TileRectangle =
     TileRectangle(
       startInclusive.add(-x, -y),
       endExclusive  .add( x,  y))
   
-  def add(Tile: Tile): TileRectangle =
+  @inline def add(Tile: Tile): TileRectangle =
     add(Tile.x, Tile.y)
 
-  def midPixel : Pixel = startPixel.midpoint(endPixel)
-  def midpoint : Tile  = startInclusive.midpoint(endExclusive)
+  @inline def midPixel : Pixel = startPixel.midpoint(endPixel)
+  @inline def midpoint : Tile  = startInclusive.midpoint(endExclusive)
   
-  def contains(x: Int, y: Int): Boolean =
+  @inline def contains(x: Int, y: Int): Boolean =
     x >= startInclusive.x &&
     y >= startInclusive.y &&
     x < endExclusive.x &&
     y < endExclusive.y
   
-  def contains(tile: Tile): Boolean = {
+  @inline def contains(tile: Tile): Boolean = {
     contains(tile.x, tile.y)
   }
 
-  def contains(pixel: Pixel): Boolean = {
+  @inline def contains(pixel: Pixel): Boolean = {
     contains(pixel.x / 32, pixel.y / 32)
   }
   
-  def intersects(otherRectangle: TileRectangle): Boolean = {
+  @inline def intersects(otherRectangle: TileRectangle): Boolean = {
     containsRectangle(otherRectangle) || otherRectangle.containsRectangle(this)
   }
   
-  private def containsRectangle(otherRectangle:TileRectangle):Boolean = {
+  @inline private def containsRectangle(otherRectangle:TileRectangle):Boolean = {
     contains(otherRectangle.startInclusive)                                       ||
     contains(otherRectangle.endExclusive.subtract(1, 1))                          ||
     contains(otherRectangle.startInclusive.x, otherRectangle.endExclusive.y - 1)  ||
     contains(otherRectangle.endExclusive.x - 1, otherRectangle.startInclusive.y)
   }
   
-  def startPixel      : Pixel = startInclusive.topLeftPixel
-  def endPixel        : Pixel = endExclusive.topLeftPixel.subtract(1, 1)
-  def topRightPixel   : Pixel = Pixel(endPixel.x, startPixel.y)
-  def bottomleftPixel : Pixel = Pixel(startPixel.x, endPixel.y)
+  @inline def startPixel      : Pixel = startInclusive.topLeftPixel
+  @inline def endPixel        : Pixel = endExclusive.topLeftPixel.subtract(1, 1)
+  @inline def topRightPixel   : Pixel = Pixel(endPixel.x, startPixel.y)
+  @inline def bottomleftPixel : Pixel = Pixel(startPixel.x, endPixel.y)
   
-  lazy val cornerPixels: Array[Pixel] = Array(startPixel, topRightPixel, endPixel, bottomleftPixel)
-  lazy val cornerTilesInclusive: Array[Tile] = Array(startInclusive, Tile(endExclusive.x - 1, startInclusive.y), endExclusive.subtract(1, 1), Tile(startInclusive.x, endExclusive.y - 1))
+  @inline def cornerPixels: Array[Pixel] = Array(startPixel, topRightPixel, endPixel, bottomleftPixel)
+  @inline def cornerTilesInclusive: Array[Tile] = Array(startInclusive, Tile(endExclusive.x - 1, startInclusive.y), endExclusive.subtract(1, 1), Tile(startInclusive.x, endExclusive.y - 1))
   
-  lazy val tiles: SeqView[Tile, Seq[_]] =
+  @inline def tiles: SeqView[Tile, Seq[_]] =
     (0 until endExclusive.x - startInclusive.x).view.flatMap(x =>
       (0 until endExclusive.y - startInclusive.y).view.map(y =>
         Tile(startInclusive.x + x, startInclusive.y + y)))
   
-  lazy val tilesSurrounding: Iterable[Tile] = {
-    expand(1, 1).tiles.filterNot(contains)
-  }
+  @inline def tilesSurrounding: Iterable[Tile] = expand(1, 1).tiles.filterNot(contains)
 }

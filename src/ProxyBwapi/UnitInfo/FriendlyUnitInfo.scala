@@ -12,7 +12,7 @@ import Utilities.Forever
 
 import scala.collection.JavaConverters._
 
-class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(base, id) {
+final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(base, id) {
   
   override val friendly: Option[FriendlyUnitInfo] = Some(this)
 
@@ -32,9 +32,9 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(b
     if (remainingOccupationFrames > 0) _lastFrameOccupied = With.frame
   }
 
-  @inline final def knownToEnemy  : Boolean = _knownToEnemy
-  @inline final def seeminglyStuck: Boolean = _framesFailingToMove > 24 || _framesFailingToAttack > 24
-  @inline final def resetSticking(): Unit = {
+  def knownToEnemy  : Boolean = _knownToEnemy
+  def seeminglyStuck: Boolean = _framesFailingToMove > 24 || _framesFailingToAttack > 24
+  def resetSticking(): Unit = {
     _framesFailingToMove = 0
     _framesFailingToAttack = 0
   }
@@ -42,7 +42,7 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(b
   def remainingCompletionFrames : Int = bwapiUnit.getRemainingBuildTime
   def spaceRemaining: Int = bwapiUnit.getSpaceRemaining
   def kills: Int = bwapiUnit.getKillCount
-  @inline final def lastFrameOccupied: Int = _lastFrameOccupied
+  def lastFrameOccupied: Int = _lastFrameOccupied
 
   lazy val agent: Agent = new Agent(this)
   def intent: Intention = agent.intent
@@ -86,9 +86,9 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(b
   def upgradingType : Upgrade           = Upgrades.get(base.getUpgrade)
 
   var nextOrderFrame: Option[Int] = None
-  @inline def ready: Boolean = nextOrderFrame.forall(_ <= With.frame)
-  @inline def unready: Boolean = ! ready
-  @inline def sleepUntil(frame: Int): Unit = nextOrderFrame = Some(frame)
+  def ready: Boolean = nextOrderFrame.forall(_ <= With.frame)
+  def unready: Boolean = ! ready
+  def sleepUntil(frame: Int): Unit = nextOrderFrame = Some(frame)
   def hijack(): Unit = nextOrderFrame = None
 
   def trainee: Option[FriendlyUnitInfo] = _traineeCache()
@@ -100,7 +100,8 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(b
         && u.pixel == pixel
         && is(u.unitClass.whatBuilds._1))
     else None)
-  
+
+  override def loadedUnitCount: Int = loadedUnits.size
   def loadedUnits: Vector[FriendlyUnitInfo] = _loadedUnitsCache()
   private val _loadedUnitsCache = new Cache(() => if (unitClass.canLoadUnits) base.getLoadedUnits.asScala.flatMap(With.units.get).flatMap(_.friendly).toVector else Vector.empty)
   

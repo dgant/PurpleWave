@@ -243,11 +243,7 @@ class Simulacrum(val simulation: Simulation, val realUnit: UnitInfo) {
     ))
   }
   
-  @inline private final def addEvent(event: () => SimulationEvent) {
-    if (ShowBattles.inUse) {
-      events += event()
-    }
-  }
+  @inline private final def addEvent(event: () => SimulationEvent) { if (ShowBattles.inUse) { events += event() }}
   
   @inline final def isValidTarget(target: Simulacrum): Boolean = (
     ! target.dead

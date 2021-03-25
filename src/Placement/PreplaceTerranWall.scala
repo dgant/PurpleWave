@@ -10,14 +10,6 @@ import Utilities.ByOption
 
 object PreplaceTerranWall {
 
-  // Started 10:10am
-  // Break 11:45am
-  // Resume 12:04pm
-  // Lunch 1:10
-  // Resume 3:08
-  // Demo posted 4:44pm
-  // Total time to demo:  1:35 + :56 + 1:36 = 4:07
-
   def apply(zone: Zone): Option[Fit] = {
     if (zone.exit.isEmpty) return None
     if (zone.exit.get.radiusPixels > 9 * 32 / 2) return None

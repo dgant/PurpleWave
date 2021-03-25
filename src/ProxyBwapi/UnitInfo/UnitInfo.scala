@@ -3,7 +3,7 @@ package ProxyBwapi.UnitInfo
 import Debugging.Visualizations.Colors
 import Information.Battles.Clustering.BattleCluster
 import Information.Battles.MCRS.MCRSUnit
-import Information.Battles.Prediction.Simulation.ReportCard
+import Information.Battles.Prediction.Simulation.{NewSimulacrum, ReportCard}
 import Information.Battles.Types.{BattleLocal, Team}
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
@@ -18,7 +18,6 @@ import Micro.Squads.Squad
 import Performance.{Cache, KeyedCache}
 import Planning.Prioritized
 import Planning.UnitMatchers.UnitMatcher
-import ProxyBwapi.Engine.Damage
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
@@ -27,7 +26,7 @@ import ProxyBwapi.Upgrades.Upgrade
 import Utilities._
 import bwapi._
 
-abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProxy {
+abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProxy with CombatUnit {
 
   def friendly  : Option[FriendlyUnitInfo]  = None
   def foreign   : Option[ForeignUnitInfo]   = None
@@ -109,6 +108,10 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     remainingTrainFrames,
     addon.map(_.remainingCompletionFrames).getOrElse(0)
   ))))
+  @inline final def remainingFramesUntilMoving: Int = Math.max(0, Math.max(
+    remainingCompletionFrames,
+    lastFrameStartingAttack + unitClass.stopFrames
+  ))
 
   private var producer: Option[Prioritized] = None
   @inline final def setProducer(plan: Prioritized) {
@@ -140,25 +143,6 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def zone: Zone = if (unitClass.isBuilding) tileTopLeft.zone else tile.zone // Hack to get buildings categorized in zone they were intended to be constructed in
   @inline final def base: Option[Base] = tile.base
 
-  @inline final def pixelRangeMin: Double = unitClass.groundMinRangeRaw
-  @inline final def pixelRangeAir: Double = pixelRangeAirCache()
-  private val pixelRangeAirCache = new Cache(() =>
-    unitClass.pixelRangeAir +
-      (if (is(Terran.Bunker))                                                 32.0 else 0.0) +
-      (if (is(Terran.Bunker)    && player.hasUpgrade(Terran.MarineRange))     32.0 else 0.0) +
-      (if (is(Terran.Marine)    && player.hasUpgrade(Terran.MarineRange))     32.0 else 0.0) +
-      (if (is(Terran.Goliath)   && player.hasUpgrade(Terran.GoliathAirRange)) 96.0 else 0.0) +
-      (if (is(Protoss.Dragoon)  && player.hasUpgrade(Protoss.DragoonRange))   64.0 else 0.0) +
-      (if (is(Zerg.Hydralisk)   && player.hasUpgrade(Zerg.HydraliskRange))    32.0 else 0.0))
-  @inline final def pixelRangeGround: Double = pixelRangeGroundCache()
-  private val pixelRangeGroundCache = new Cache(() =>
-    unitClass.pixelRangeGround +
-      (if (is(Terran.Bunker))                                               32.0 else 0.0) +
-      (if (is(Terran.Bunker)    && player.hasUpgrade(Terran.MarineRange))   32.0 else 0.0) +
-      (if (is(Terran.Marine)    && player.hasUpgrade(Terran.MarineRange))   32.0 else 0.0) +
-      (if (is(Protoss.Dragoon)  && player.hasUpgrade(Protoss.DragoonRange)) 64.0 else 0.0) +
-      (if (is(Zerg.Hydralisk)   && player.hasUpgrade(Zerg.HydraliskRange))  32.0 else 0.0))
-  @inline final def pixelRangeMax: Double = Math.max(pixelRangeAir, pixelRangeGround)
 
   @inline final def canTraverse(pixel: Pixel): Boolean = pixel.traversableBy(this)
   @inline final def canTraverse(tile: Tile): Boolean = tile.traversableBy(this)
@@ -252,6 +236,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def report: Option[ReportCard] = battle.flatMap(_.predictionAttack.debugReport.get(this))
   var matchups: MatchupAnalysis = MatchupAnalysis(this)
   val mcrs: MCRSUnit = new MCRSUnit(this)
+  val simulacrum: NewSimulacrum = new NewSimulacrum(this)
   var clusteringEnabled: Boolean = _
   var clusteringRadiusSquared: Double = _
   var cluster: Option[BattleCluster] = _
@@ -264,99 +249,21 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   private lazy val armorHealthCache   = new Cache(() => unitClass.armor + unitClass.armorUpgrade.map(player.getUpgradeLevel).getOrElse(0))
   private lazy val armorShieldsCache  = new Cache(() => player.getUpgradeLevel(Protoss.Shields))
 
-  @inline final def stimAttackSpeedBonus: Int = if (stimmed) 2 else 1
+  // Used by MCRS
   @inline final def dpfAir    : Double = damageOnHitAir     * attacksAgainstAir     / cooldownMaxAir.toDouble
   @inline final def dpfGround : Double = damageOnHitGround  * attacksAgainstGround  / cooldownMaxGround.toDouble
 
-  @inline final def attacksAgainstAir: Int = attacksAgainstAirCache()
-  private val attacksAgainstAirCache = new Cache(() => {
-    var output = unitClass.airDamageFactorRaw * unitClass.maxAirHitsRaw
-    if (output == 0  && is(Terran.Bunker))    output = 4
-    if (output == 0  && is(Protoss.Carrier))  output = friendly.map(_.interceptorCount).getOrElse(8)
-    output
-  })
-
-  @inline final def attacksAgainstGround: Int = attacksAgainstGroundCache()
-  private val attacksAgainstGroundCache = new Cache(() => {
-    var output = unitClass.groundDamageFactorRaw * unitClass.maxGroundHitsRaw
-    if (output == 0  && is(Terran.Bunker))   output = friendly.map(_.loadedUnits.size).getOrElse(4)
-    if (output == 0  && is(Protoss.Carrier))  output = friendly.map(_.interceptorCount).getOrElse(8)
-    if (output == 0  && is(Protoss.Reaver))   output = 1
-    output
-  })
-
-  @inline final def cooldownLeft : Int = (
+  @inline final def cooldownLeft : Int = (Math.max(remainingFramesUntilMoving,
     //TODO: Ensnare
-    (if (complete)
+    Math.max(
+      friendly.filter(_.transport.exists(_.flying)).map(unused => cooldownMaxAirGround / 2).getOrElse(0),
       Math.max(
-        friendly.filter(_.transport.exists(_.flying)).map(unused => cooldownMaxAirGround / 2).getOrElse(0),
-        Math.max(
-          cooldownAir,
-          cooldownGround))
-    else remainingCompletionFrames)
+        cooldownAir,
+        cooldownGround))
     + friendly
       .filter(u => u.is(Protoss.Reaver) && u.scarabs == 0)
       .map(_.trainee.map(_.remainingCompletionFrames).getOrElse(Protoss.Scarab.buildFrames))
-      .getOrElse(0))
-
-  @inline final def cooldownMaxAir    : Int = (2 + unitClass.airDamageCooldown)     / stimAttackSpeedBonus // +2 is the RNG
-  @inline final def cooldownMaxGround : Int = (2 + unitClass.groundDamageCooldown)  / stimAttackSpeedBonus // +2 is the RNG
-  @inline final def cooldownMaxAirGround: Int = Math.max(
-    if (unitClass.attacksAir)     cooldownMaxAir    else 0,
-    if (unitClass.attacksGround)  cooldownMaxGround else 0)
-  @inline final def cooldownMaxAgainst(enemy: UnitInfo): Int = if (enemy.flying) cooldownMaxAir else cooldownMaxGround
-  @inline final def pixelRangeAgainst(enemy: UnitInfo): Double = if (enemy.flying) pixelRangeAir else pixelRangeGround
-  @inline final def effectiveRangePixels: Double = Math.max(pixelRangeMax, unitClass.effectiveRangePixels)
-
-  @inline final def hitChanceAgainst(enemy : UnitInfo, from: Option[Pixel] = None, to: Option[Pixel] = None): Double = if (guaranteedToHit(enemy, from, to)) 1.0 else 0.47
-  @inline final def guaranteedToHit(enemy : UnitInfo, from: Option[Pixel] = None, to: Option[Pixel] = None): Boolean = {
-    val tileFrom  = from.getOrElse(pixel)       .tile
-    val tileTo    =   to.getOrElse(enemy.pixel) .tile
-    flying || enemy.flying || unitClass.unaffectedByDarkSwarm || tileFrom.altitude >= tileTo.altitude
-  }
-
-  @inline final def damageTypeAgainst (enemy: UnitInfo)  : Damage.Type  = if (enemy.flying) unitClass.airDamageType    else unitClass.groundDamageType
-  @inline final def attacksAgainst    (enemy: UnitInfo)  : Int          = if (enemy.flying) attacksAgainstAir          else attacksAgainstGround
-
-  @inline final def damageScaleAgainstHitPoints(enemy: UnitInfo): Double = {
-    if (dpfAir    <= 0 && enemy.flying)   return 0.0
-    if (dpfGround <= 0&& ! enemy.flying)  return 0.0
-    Damage.scaleBySize(damageTypeAgainst(enemy), enemy.unitClass.size)
-  }
-
-  @inline final def damageUpgradeLevel  : Int = unitClass.damageUpgradeType.map(player.getUpgradeLevel).getOrElse(0)
-  @inline final def damageOnHitGround   : Int = damageOnHitGroundCache()
-  @inline final def damageOnHitAir      : Int = damageOnHitAirCache()
-  private val damageOnHitGroundCache  = new Cache(() => unitClass.effectiveGroundDamage  + unitClass.groundDamageBonusRaw  * damageUpgradeLevel)
-  private val damageOnHitAirCache     = new Cache(() => unitClass.effectiveAirDamage     + unitClass.airDamageBonusRaw     * damageUpgradeLevel)
-
-  @inline final def damageOnHitBeforeShieldsArmorAndDamageType(enemy: UnitInfo): Int = if(enemy.flying) damageOnHitAir else damageOnHitGround
-  @inline final def damageOnNextHitAgainst(
-    enemy   : UnitInfo,
-    shields : Option[Int] = None,
-    from    : Option[Pixel] = None,
-    to      : Option[Pixel] = None)
-      : Int = {
-    val enemyShieldPoints       = shields.getOrElse(enemy.shieldPoints)
-    val hits                    = attacksAgainst(enemy)
-    val damagePerHit            = damageOnHitBeforeShieldsArmorAndDamageType(enemy: UnitInfo)
-    val damageAssignedTotal     = hits * damagePerHit
-    val damageAssignedToShields = Math.min(damageAssignedTotal, enemyShieldPoints + enemy.armorShield * hits)
-    val damageToShields         = damageAssignedToShields - enemy.armorShield * hits
-    val damageAssignedToHealth  = damageAssignedTotal - damageAssignedToShields
-    val damageToHealthScale     = damageScaleAgainstHitPoints(enemy)
-    val damageToHealth          = Math.max(0.0, (damageAssignedToHealth - enemy.armorHealth * hits) * damageToHealthScale)
-    val damageDealtTotal        = damageToHealth + damageToShields
-    val hitChance               = hitChanceAgainst(enemy, from, to)
-    val output                  = (hitChance * Math.max(1.0, damageDealtTotal)).toInt
-    output
-  }
-
-  @inline final def dpfOnNextHitAgainst(enemy: UnitInfo): Double =
-    if (unitClass.suicides) damageOnNextHitAgainst(enemy) else {
-      val cooldownVs = cooldownMaxAgainst(enemy)
-      if (cooldownVs == 0) 0.0 else damageOnNextHitAgainst(enemy).toDouble / cooldownVs
-    }
+      .getOrElse(0)))
 
   @inline final def canDoAnything: Boolean = canDoAnythingCache()
   private val canDoAnythingCache = new Cache(() =>

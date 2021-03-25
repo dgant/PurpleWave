@@ -74,10 +74,11 @@ class HistoricalUnitInfo(unit: UnitInfo) extends UnitInfo(unit.bwapiUnit, unit.i
   override val upgradeProducing: Option[Upgrade]  = unit.upgradeProducing
   override val tile: Tile = unit.tile
   override val loaded: Boolean = unit.loaded
-  override def pixelObserved: Pixel = unit.pixelObserved
-  override def beingConstructed: Boolean = unit.beingConstructed
-  override def beingGathered: Boolean = unit.beingGathered
-  override def cooldownRaw: Int = unit.cooldownRaw
-  override def buildType: UnitClass = unit.buildType
-  override def trainingQueue: Seq[UnitClass] = Seq.empty
+  override val pixelObserved: Pixel = unit.pixelObserved
+  override val beingConstructed: Boolean = unit.beingConstructed
+  override val beingGathered: Boolean = unit.beingGathered
+  override val cooldownRaw: Int = unit.cooldownRaw
+  override val buildType: UnitClass = unit.buildType
+  override val trainingQueue: Seq[UnitClass] = Seq.empty
+  override val loadedUnitCount: Int = 0
 }

@@ -3,7 +3,7 @@ package Mathematics.Physics
 import Mathematics.Points.{AbstractPoint, Point}
 import Mathematics.PurpleMath
 
-case class Force(x: Double, y: Double) {
+final case class Force(x: Double, y: Double) {
   
   def this() = this(0.0, 0.0)
   def this(point: AbstractPoint) = this(point.x, point.y)
@@ -31,15 +31,15 @@ case class Force(x: Double, y: Double) {
         scale * x / length,
         scale * y / length)
   }
-  
+
   @inline def clipMin(scale: Double): Force = {
     if (scale * scale >= lengthSquared) this else normalize(scale)
   }
-  
+
   @inline def clipMax(scale: Double): Force = {
     if (scale * scale <= lengthSquared) this else normalize(scale)
   }
-  
+
   @inline def toPoint: Point = Point(x.toInt, y.toInt)
 
   override def toString: String =

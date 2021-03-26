@@ -39,6 +39,7 @@ trait CombatUnit {
   def cooldownLeft              : Int
   def loadedUnitCount           : Int
 
+  @inline final def dead: Boolean = ! alive
   @inline final def attacksAgainstAir: Int = attacksAgainstAirCache()
   private val attacksAgainstAirCache = new Cache(() => {
     var output = unitClass.airDamageFactorRaw * unitClass.maxAirHitsRaw
@@ -118,4 +119,11 @@ trait CombatUnit {
     val output                  = (hitChance * Math.max(1.0, damageDealtTotal)).toInt
     output
   }
+
+  @inline final def isOurs     : Boolean = player.isUs
+  @inline final def isNeutral  : Boolean = player.isNeutral
+  @inline final def isFriendly : Boolean = player.isAlly || isOurs
+  @inline final def isEnemy    : Boolean = player.isEnemy
+  @inline final def isEnemyOf(otherUnit: UnitInfo): Boolean = (isFriendly && otherUnit.isEnemy) || (isEnemy && otherUnit.isFriendly)
+  @inline final def isAllyOf(otherUnit: UnitInfo): Boolean = (isFriendly && otherUnit.isFriendly) || (isEnemy && otherUnit.isEnemy)
 }

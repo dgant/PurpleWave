@@ -475,14 +475,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     && ! ensnared
     && ! plagued
     && (if (isFriendly) ! tile.enemyDetected else ! detected))
-  
-  @inline final def isOurs     : Boolean = player.isUs
-  @inline final def isNeutral  : Boolean = player.isNeutral
-  @inline final def isFriendly : Boolean = player.isAlly || isOurs
-  @inline final def isEnemy    : Boolean = player.isEnemy
-  @inline final def isEnemyOf(otherUnit: UnitInfo): Boolean = (isFriendly && otherUnit.isEnemy) || (isEnemy && otherUnit.isFriendly)
-  @inline final def isAllyOf(otherUnit: UnitInfo): Boolean = (isFriendly && otherUnit.isFriendly) || (isEnemy && otherUnit.isEnemy)
-  
+
   @inline final def teamColor: Color =
     if      (visible)             player.colorBright
     else if (likelyStillThere)    player.colorMedium

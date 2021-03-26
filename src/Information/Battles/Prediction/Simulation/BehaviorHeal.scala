@@ -1,14 +1,9 @@
 package Information.Battles.Prediction.Simulation
 
 object BehaviorHeal extends SimulacrumBehavior {
+  val fighting: Boolean = true
   @inline override def act(simulacrum: NewSimulacrum): Unit = {
-    // TODO: Clear invalid targets
-    // TODO: Sort targets
-    simulacrum.targets.clear()
-    if (simulacrum.targets.isEmpty) {
-      simulacrum.behavior = BehaviorFlee
-      simulacrum.act()
-      return
-    }
+    // TODO
+    simulacrum.doBehavior(BehaviorFlee)
   }
 }

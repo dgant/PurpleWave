@@ -12,7 +12,7 @@ class PredictionLocal(val battle: BattleLocal, val weAttack: Boolean, val weSnip
 
   var debugReport = new mutable.HashMap[UnitInfo, ReportCard]
   var events: Iterable[SimulationEvent] = Iterable.empty
-  val localBattleMetrics: mutable.ArrayBuffer[LocalBattleMetrics] = new mutable.ArrayBuffer[LocalBattleMetrics]
+  val localBattleMetrics: mutable.ArrayBuffer[SimulationCheckpoint] = new mutable.ArrayBuffer[SimulationCheckpoint]
 
   var frames = 0
   var deathsUs = 0.0

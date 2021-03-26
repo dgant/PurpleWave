@@ -1,6 +1,6 @@
 package Information.Battles.Prediction.Simulation
 
-import Information.Battles.Prediction.{LocalBattleMetrics, PredictionLocal}
+import Information.Battles.Prediction.{SimulationCheckpoint, PredictionLocal}
 import Information.Battles.Types.Team
 import Lifecycle.With
 import Mathematics.Points.Pixel
@@ -78,11 +78,11 @@ class Simulation(val prediction: PredictionLocal) {
   }
 
   def recordMetrics() {
-    prediction.localBattleMetrics += new LocalBattleMetrics(this, prediction.localBattleMetrics.lastOption)
+    prediction.localBattleMetrics += new SimulationCheckpoint(this, prediction.localBattleMetrics.lastOption)
   }
   
   def cleanup() {
-    prediction.deathsUs     = unitsOurs.count(_.dead)
+    prediction.deathsUs = unitsOurs.count(_.dead)
     if (With.configuration.debugging) {
       prediction.debugReport ++= everyone.map(simulacrum => (simulacrum.realUnit, simulacrum.reportCard))
       prediction.events = everyone.flatMap(_.events).sortBy(_.frame)

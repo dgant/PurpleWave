@@ -52,7 +52,7 @@ final class NewSimulacrum(baseUnit: UnitInfo) extends CombatUnit {
   var damageReceived: Double = _
   var valueReceived: Double = _
   var events: Option[ArrayBuffer[SimulationEvent]] = _
-  def sync(newSimulation: NewSimulation): Unit = {
+  def reset(newSimulation: NewSimulation): Unit = {
     visibility = baseUnit.visibility
     player = baseUnit.player
     unitClass = baseUnit.unitClass
@@ -95,9 +95,20 @@ final class NewSimulacrum(baseUnit: UnitInfo) extends CombatUnit {
   }
 
   @inline def act(): Unit = {
-    cooldownLeft = Math.max(0, cooldownLeft - 1)
-    cooldownMoving = Math.max(0, cooldownMoving - 1)
-    if (cooldownLeft == 0 || cooldownMoving == 0) { behavior.act(this) }
+    if (alive && (cooldownLeft == 0 || cooldownMoving == 0)) { behavior.act(this) }
+  }
+
+  @inline def update(): Unit = {
+    if (alive) {
+      if (hitPoints <= 0) {
+        alive = false
+        // TODO: If logging, add event
+      } else {
+        cooldownLeft = Math.max(0, cooldownLeft - 1)
+        cooldownMoving = Math.max(0, cooldownMoving - 1)
+        // TODO: Follow tweens
+      }
+    }
   }
 
   @inline def doBehavior(newBehavior: SimulacrumBehavior): Unit = {

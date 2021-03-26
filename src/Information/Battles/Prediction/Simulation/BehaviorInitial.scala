@@ -1,16 +1,19 @@
 package Information.Battles.Prediction.Simulation
 
-import ProxyBwapi.Races.Terran
+import ProxyBwapi.Races.{Protoss, Terran}
 
 object BehaviorInitial extends SimulacrumBehavior {
+  val fighting: Boolean = true
   @inline override def act(simulacrum: NewSimulacrum): Unit = {
     if (simulacrum.unitClass == Terran.Medic) {
-      simulacrum.doBehavior(BehaviorHeal)
-      // TODO: Populate targets
-      return
+      simulacrum.targets ++= simulacrum.simulation.simulacraOurs.filter(_.unitClass.isOrganic)
+      if (simulacrum.targets.nonEmpty) {
+        simulacrum.doBehavior(BehaviorHeal)
+        return
+      }
     }
     if (simulacrum.unitClass == Terran.SCV) {
-      // TODO: Populate repair targets
+      // TODO
       if (simulacrum.targets.nonEmpty) {
         simulacrum.doBehavior(BehaviorRepair)
         return
@@ -22,8 +25,17 @@ object BehaviorInitial extends SimulacrumBehavior {
         return
       }
     }
-    // TODO: Idle units go idle
-    // TODO: Pick targets
+    if (simulacrum.unitClass == Protoss.HighTemplar) {
+      simulacrum.targets ++= simulacrum.simulation.simulacraEnemy.filterNot(_.unitClass.isBuilding)
+      if (simulacrum.targets.nonEmpty) {
+        simulacrum.doBehavior(BehaviorStorm)
+        return
+      }
+    }
+
+    if (simulacrum.attacksAgainstAir > 0 || simulacrum.attacksAgainstGround > 0) {
+      simulacrum.targets ++= simulacrum.simulation.simulacraEnemy.filter(simulacrum.attacksAgainst(_) > 0)
+    }
     if (simulacrum.targets.isEmpty) {
       simulacrum.doBehavior(BehaviorFlee)
     } else {

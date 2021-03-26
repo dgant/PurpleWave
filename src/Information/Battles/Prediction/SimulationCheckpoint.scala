@@ -4,7 +4,7 @@ import Information.Battles.Prediction.Simulation.{Simulacrum, Simulation}
 import Lifecycle.With
 import Mathematics.PurpleMath
 
-class LocalBattleMetrics(simulation: Simulation, previous: Option[LocalBattleMetrics]) {
+class SimulationCheckpoint(simulation: Simulation, previous: Option[SimulationCheckpoint]) {
 
   @inline final def ValueMax(simulacrum: Simulacrum)            : Double  = simulacrum.value
   @inline final def ValueLeft(simulacrum: Simulacrum)           : Double  = if (simulacrum.dead) 0.0 else simulacrum.value

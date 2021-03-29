@@ -2,11 +2,11 @@ package Information.Battles.Prediction.Simulation
 
 import Debugging.Visualizations.Views.Battles.ShowBattles
 import Lifecycle.With
-import Mathematics.Points.{Pixel, Tile}
+import Mathematics.Points.Pixel
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{CombatUnit, UnitInfo}
-import ProxyBwapi.UnitTracking.Visibility
+import ProxyBwapi.UnitTracking.{UnorderedBuffer, Visibility}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -38,13 +38,22 @@ final class NewSimulacrum(baseUnit: UnitInfo) extends CombatUnit {
   var armorShield: Int = _
   var cooldownLeft: Int = _
   var loadedUnitCount: Int = _
+  var angleRadians: Double = _
+  var speed: Double = _
+  var topSpeed: Double = _
+  var topSpeedPossible: Double = _
   var subjectiveValue: Double = _
   // Simulacrum properties
   var simulation: NewSimulation = _
   var behavior: SimulacrumBehavior = _
-  val targets: ArrayBuffer[NewSimulacrum] = new ArrayBuffer[NewSimulacrum](50)
-  var tile: Tile = _
+  var target: Option[NewSimulacrum] = _
+  val targets: UnorderedBuffer[NewSimulacrum] = new UnorderedBuffer[NewSimulacrum](50)
+  var gridTile: SimulationGridTile = _
   var cooldownMoving: Int = _
+  var tweenFramesDone: Int = _
+  var tweenFramesLeft: Int = 0
+  var tweenFrom: Pixel = _
+  var tweenTo: Pixel = _
   var valuePerDamage: Double = _
   var kills: Int = _
   var damageDealt: Double = _
@@ -57,6 +66,9 @@ final class NewSimulacrum(baseUnit: UnitInfo) extends CombatUnit {
     player = baseUnit.player
     unitClass = baseUnit.unitClass
     pixel = baseUnit.pixel
+    gridTile = simulation.grid.tiles(pixel.tile.i)
+    gridTile.units.add(this)
+    gridTile.occupancy += unitClass.occupancy
     visible = baseUnit.visible
     alive = baseUnit.alive
     complete = baseUnit.complete
@@ -79,13 +91,19 @@ final class NewSimulacrum(baseUnit: UnitInfo) extends CombatUnit {
     armorShield = baseUnit.armorShield
     cooldownLeft = baseUnit.cooldownLeft
     loadedUnitCount = baseUnit.loadedUnitCount
+    angleRadians = baseUnit.angleRadians
+    speed = 0 // TODO: Model speed and start with baseUnit.speed
+    topSpeed = baseUnit.topSpeed
+    topSpeedPossible = baseUnit.topSpeedPossible
     subjectiveValue = baseUnit.subjectiveValue
     // Simulacrum properties
     simulation = newSimulation
     behavior = BehaviorInitial
+    target = None
     targets.clear()
-    tile = baseUnit.pixel.tile
+    gridTile = null
     cooldownMoving = baseUnit.remainingFramesUntilMoving
+    tweenFramesLeft = 0
     kills = 0
     damageDealt = 0
     valueDealt = 0
@@ -94,9 +112,9 @@ final class NewSimulacrum(baseUnit: UnitInfo) extends CombatUnit {
     events = if (ShowBattles.inUse) Some(new ArrayBuffer[SimulationEvent]()) else None
   }
 
-  @inline def act(): Unit = {
-    if (alive && (cooldownLeft == 0 || cooldownMoving == 0)) { behavior.act(this) }
-  }
+  @inline def canMove: Boolean = topSpeedPossible > 0
+  @inline def canAttack(other: CombatUnit): Boolean = (other.flying && attacksAgainstAir > 0) || ( ! other.flying && attacksAgainstGround > 0)
+  @inline def act(): Unit = { if (alive && (cooldownLeft == 0 || cooldownMoving == 0)) { behavior.act(this) } }
 
   @inline def update(): Unit = {
     if (alive) {
@@ -106,21 +124,29 @@ final class NewSimulacrum(baseUnit: UnitInfo) extends CombatUnit {
       } else {
         cooldownLeft = Math.max(0, cooldownLeft - 1)
         cooldownMoving = Math.max(0, cooldownMoving - 1)
-        // TODO: Follow tweens
+        if (tweenFramesLeft > 0) {
+          tweenFramesDone += 1
+          tweenFramesLeft -= 1
+          //TODO: Account for adjusted paths from eg. moving around obstacles
+          simulation.grid.tryMove(this, if (tweenFramesLeft == 0) tweenTo else tweenFrom.project(tweenTo, topSpeed * tweenFramesDone))
+        }
       }
     }
   }
 
   @inline def doBehavior(newBehavior: SimulacrumBehavior): Unit = {
-    behavior = newBehavior
     // TODO: If logging, add event
+    behavior = newBehavior
     act()
   }
 
   @inline def tween(to: Pixel, frames: Int): Unit = {
-    // TODO: Implement tween
     cooldownLeft = Math.max(cooldownLeft, frames)
     cooldownMoving = frames
+    tweenFrom = pixel
+    tweenTo = to
+    tweenFramesDone = 0
+    tweenFramesLeft = tweenFramesDone
     // TODO: If logging, add event
   }
 

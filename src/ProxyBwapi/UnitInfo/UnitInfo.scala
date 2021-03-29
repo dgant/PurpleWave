@@ -121,21 +121,9 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     producer.filter(_.isPrioritized)
   }
 
-  @inline final def x           : Int   = pixel.x
-  @inline final def y           : Int   = pixel.y
-  @inline final def left        : Int   = x - unitClass.dimensionLeft
-  @inline final def right       : Int   = x + unitClass.dimensionRight
-  @inline final def top         : Int   = y - unitClass.dimensionUp
-  @inline final def bottom      : Int   = y + unitClass.dimensionDown
-  @inline final def topLeft     : Pixel = Pixel(left, top)
-  @inline final def topRight    : Pixel = Pixel(right, top)
-  @inline final def bottomLeft  : Pixel = Pixel(left, bottom)
-  @inline final def bottomRight : Pixel = Pixel(right, bottom)
-  @inline final def corners   : Vector[Pixel] = Vector(topLeft, topRight, bottomLeft, bottomRight)
+  @inline final def addonArea : TileRectangle = TileRectangle(Tile(0, 0), Tile(2, 2)).add(tileTopLeft).add(4,1)
   @inline final def tiles     : Seq[Tile]     = cacheTiles() // TODO: Set this on type/pixel change
   @inline final def tileArea  : TileRectangle = cacheTileArea() // TODO: Set this on type/pixel change
-  @inline final def addonArea : TileRectangle = TileRectangle(Tile(0, 0), Tile(2, 2)).add(tileTopLeft).add(4,1)
-
   private def tileCacheDuration: Int = { if (unitClass.isBuilding) (if (unitClass.canFly) 24 * 5 else 24 * 60) else 1 }
   private lazy val cacheTileArea = new Cache(() => unitClass.tileArea.add(tileTopLeft), refreshPeriod = tileCacheDuration)
   private lazy val cacheTiles = new Cache(() => cacheTileArea().tiles.toVector, refreshPeriod = tileCacheDuration)
@@ -146,26 +134,6 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
 
   @inline final def canTraverse(pixel: Pixel): Boolean = pixel.traversableBy(this)
   @inline final def canTraverse(tile: Tile): Boolean = tile.traversableBy(this)
-
-  @inline final def pixelStart                                                : Pixel   = Pixel(left, top)
-  @inline final def pixelEnd                                                  : Pixel   = Pixel(right, bottom)
-  @inline final def pixelStartAt            (at: Pixel)                       : Pixel   = at.subtract(pixel).add(left, top)
-  @inline final def pixelEndAt              (at: Pixel)                       : Pixel   = at.subtract(pixel).add(right, bottom)
-  @inline final def pixelDistanceCenter     (otherPixel:  Pixel)              : Double  = pixel.pixelDistance(otherPixel)
-  @inline final def pixelDistanceCenter     (otherUnit:   UnitInfo)           : Double  = pixelDistanceCenter(otherUnit.pixel)
-  @inline final def pixelDistanceShooting   (other:       UnitInfo)           : Double  = if (is(Protoss.Reaver) && zone != other.zone) pixelDistanceTravelling(other.pixel) else pixelDistanceEdge(other.pixelStart, other.pixelEnd)
-  @inline final def pixelDistanceEdge       (other:       UnitInfo)           : Double  = pixelDistanceEdge(other.pixelStart, other.pixelEnd)
-  @inline final def pixelDistanceEdge       (other: UnitInfo, otherAt: Pixel) : Double  = pixelDistanceEdge(otherAt.subtract(other.unitClass.dimensionLeft, other.unitClass.dimensionUp), otherAt.add(1 + other.unitClass.dimensionRight, 1 + other.unitClass.dimensionDown))
-  @inline final def pixelDistanceEdge       (oStart: Pixel, oEnd: Pixel)      : Double  = PurpleMath.broodWarDistanceBox(pixelStart, pixelEnd, oStart, oEnd)
-  @inline final def pixelDistanceEdge       (destination: Pixel)              : Double  = PurpleMath.broodWarDistanceBox(pixelStart, pixelEnd, destination, destination)
-  @inline final def pixelDistanceEdge       (other: UnitInfo, usAt: Pixel, otherAt: Pixel): Double  = PurpleMath.broodWarDistanceBox(usAt.subtract(unitClass.dimensionLeft, unitClass.dimensionUp), usAt.add(1 + unitClass.dimensionRight, 1 + unitClass.dimensionDown), otherAt.subtract(other.unitClass.dimensionLeft, other.unitClass.dimensionUp), otherAt.add(other.unitClass.dimensionRight, other.unitClass.dimensionDown))
-  @inline final def pixelDistanceEdgeFrom   (other: UnitInfo, usAt: Pixel)    : Double  = other.pixelDistanceEdge(this, usAt)
-  @inline final def pixelDistanceSquared    (otherUnit:   UnitInfo)           : Double  = pixelDistanceSquared(otherUnit.pixel)
-  @inline final def pixelDistanceSquared    (otherPixel:  Pixel)              : Double  = pixel.pixelDistanceSquared(otherPixel)
-  @inline final def pixelDistanceTravelling (destination: Pixel)              : Double  = pixelDistanceTravelling(pixel, destination)
-  @inline final def pixelDistanceTravelling (destination: Tile)               : Double  = pixelDistanceTravelling(pixel, destination.pixelCenter)
-  @inline final def pixelDistanceTravelling (from: Pixel, to: Pixel)          : Double  = if (flying) from.pixelDistance(to) else from.nearestWalkableTile.groundPixels(to.nearestWalkableTile)
-  @inline final def pixelDistanceTravelling (from: Tile,  to: Tile)           : Double  = if (flying) from.pixelCenter.pixelDistance(to.pixelCenter) else from.nearestWalkableTile.groundPixels(to.nearestWalkableTile)
 
   @inline final def canMove: Boolean = canMoveCache()
   private val canMoveCache = new Cache(() =>
@@ -286,13 +254,13 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     && (flying || ! underDisruptionWeb)
     && canDoAnything)
 
-  @inline final def canAttack(enemy: UnitInfo): Boolean = (
+  @inline final def canAttack(enemy: CombatUnit): Boolean = (
     canAttack
-    && enemy.canBeAttacked
+    && enemy.asInstanceOf[UnitInfo].canBeAttacked
     && (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround)
-    && ! enemy.effectivelyCloaked
+    && ! enemy.asInstanceOf[UnitInfo].effectivelyCloaked
     && (enemy.unitClass.triggersSpiderMines || ! is(Terran.SpiderMine))
-    && (unitClass.unaffectedByDarkSwarm || ! enemy.underDarkSwarm))
+    && (unitClass.unaffectedByDarkSwarm || ! enemy.asInstanceOf[UnitInfo].underDarkSwarm))
 
   @inline final def canAttackAir: Boolean = canAttack && attacksAgainstAir > 0
   @inline final def canAttackGround: Boolean = canAttack && attacksAgainstGround > 0
@@ -310,32 +278,6 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   // Frame X-1-L: Unit's cooldown is L+1. Send attack order.
   @inline final def framesToBeReadyForAttackOrder: Int = cooldownLeft - With.latency.framesRemaining - With.reaction.agencyMin
   @inline final def readyForAttackOrder: Boolean = canAttack && framesToBeReadyForAttackOrder <= 0
-
-  @inline final def pixelsTravelledMax(framesAhead: Int): Double = if (canMove) topSpeed * framesAhead else 0.0
-  @inline final def pixelReachAir     (framesAhead: Int): Double = pixelsTravelledMax(framesAhead) + pixelRangeAir
-  @inline final def pixelReachGround  (framesAhead: Int): Double = pixelsTravelledMax(framesAhead) + pixelRangeGround
-  @inline final def pixelReachMax     (framesAhead: Int): Double = Math.max(pixelReachAir(framesAhead), pixelReachGround(framesAhead))
-  @inline final def pixelReachAgainst (framesAhead: Int, enemy: UnitInfo): Double = if (enemy.flying) pixelReachAir(framesAhead) else pixelReachGround(framesAhead)
-  @inline final def inRangeToAttack(enemy: UnitInfo)                    : Boolean = pixelDistanceEdge(enemy)          <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy)          > pixelRangeMin)
-  @inline final def inRangeToAttack(enemy: UnitInfo, enemyAt: Pixel)    : Boolean = pixelDistanceEdge(enemy, enemyAt) <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy, enemyAt) > pixelRangeMin)
-  @inline final def inRangeToAttack(enemy: UnitInfo, framesAhead: Int)  : Boolean = inRangeToAttack(enemy, enemy.projectFrames(framesAhead))
-  @inline final def inRangeToAttack(enemy: UnitInfo, usAt: Pixel, to: Pixel): Boolean = { val d = pixelDistanceEdge(enemy, usAt, to); d <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || d > pixelRangeMin) }
-  @inline final def inRangeToAttackFrom(enemy: UnitInfo, usAt: Pixel)   : Boolean = pixelDistanceEdgeFrom(enemy, usAt) <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdgeFrom(enemy, usAt) > pixelRangeMin)
-  @inline final def pixelsToGetInRange(enemy: UnitInfo)                 : Double = if (canAttack(enemy)) (pixelDistanceEdge(enemy) - pixelRangeAgainst(enemy)) else LightYear()
-  @inline final def pixelsToGetInRange(enemy: UnitInfo, enemyAt: Pixel) : Double = if (canAttack(enemy)) (pixelDistanceEdge(enemy, enemyAt) - pixelRangeAgainst(enemy)) else LightYear()
-  @inline final def framesToTravelTo(destination: Pixel)  : Int = framesToTravelPixels(pixelDistanceTravelling(destination))
-  @inline final def framesToTravelPixels(pixels: Double)  : Int = (if (pixels <= 0.0) 0 else if (canMove) Math.max(0, Math.ceil(pixels / topSpeedPossible).toInt) else Forever()) + (if (burrowed || is(Terran.SiegeTankSieged)) 24 else 0)
-  @inline final def framesToTurnTo    (radiansTo: Double)   : Double = unitClass.framesToTurn(PurpleMath.normalizeAroundZero(PurpleMath.radiansTo(angleRadians, radiansTo)))
-  @inline final def framesToTurnTo    (pixelTo: Pixel)      : Double = framesToTurnTo(pixel.radiansTo(pixelTo))
-  @inline final def framesToTurnFrom  (pixelTo: Pixel)      : Double = framesToTurnTo(pixelTo.radiansTo(pixel))
-  @inline final def framesToTurnTo    (enemyFrom: UnitInfo) : Double = framesToTurnTo(enemyFrom.pixel.radiansTo(pixel))
-  @inline final def framesToTurnFrom  (enemyFrom: UnitInfo) : Double = framesToTurnTo(pixel.radiansTo(enemyFrom.pixel))
-  @inline final def framesToStopRightNow: Double = if (unitClass.isFlyer || unitClass.floats) PurpleMath.clamp(PurpleMath.nanToZero(framesToAccelerate * speed / topSpeed), 0.0, framesToAccelerate) else 0.0
-  @inline final def framesToAccelerate: Double = PurpleMath.clamp(PurpleMath.nanToZero((topSpeed - speed) / unitClass.accelerationFrames), 0, unitClass.accelerationFrames)
-  @inline final def framesToGetInRange(enemy: UnitInfo)                 : Int = if (canAttack(enemy)) framesToTravelPixels(pixelsToGetInRange(enemy)) else Forever()
-  @inline final def framesToGetInRange(enemy: UnitInfo, enemyAt: Pixel) : Int = if (canAttack(enemy)) framesToTravelPixels(pixelsToGetInRange(enemy, enemyAt)) else Forever()
-  @inline final def framesBeforeAttacking(enemy: UnitInfo)              : Int = framesBeforeAttacking(enemy, enemy.pixel)
-  @inline final def framesBeforeAttacking(enemy: UnitInfo, at: Pixel)   : Int = if (canAttack(enemy))  Math.max(cooldownLeft, framesToGetInRange(enemy)) else Forever()
   @inline final def pixelsOfEntanglement(threat: UnitInfo): Double = {
     val speedTowardsThreat    = speedApproaching(threat)
     val framesToStopMe        = if(speedTowardsThreat <= 0) 0.0 else framesToStopRightNow

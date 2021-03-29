@@ -35,16 +35,23 @@ import scala.collection.JavaConverters._
 
 object With {
 
-  var self            : PlayerInfo          = _
-  var neutral         : PlayerInfo          = _
-  var enemies         : Vector[PlayerInfo]  = _
-  var frame           : Int                 = 0
-  var mapTileWidth    : Int                 = 0
-  var mapTileHeight   : Int                 = 0
-  var mapFileName     : String              = _
-  var mapCleanName    : String              = _
-  var mapClock        : String              = _
-  var startNanoTime   : Long                = 0
+  var frame             : Int                 = 0
+  var self              : PlayerInfo          = _
+  var neutral           : PlayerInfo          = _
+  var enemies           : Vector[PlayerInfo]  = _
+  var mapFileName       : String              = _
+  var mapCleanName      : String              = _
+  var mapClock          : String              = _
+  var startNanoTime     : Long                = 0
+  var mapTileWidth      : Int                 = 0
+  var mapTileHeight     : Int                 = 0
+  var mapTileArea       : Int                 = 0
+  var mapPixelWidth     : Int                 = 0
+  var mapPixelHeight    : Int                 = 0
+  var mapPixelPerimeter : Int                 = 0
+  var mapWalkWidth      : Int                 = 0
+  var mapWalkHeight     : Int                 = 0
+  var mapWalkArea       : Int                 = 0
 
   var game              : bwapi.Game              = _
   var agents            : Agency                  = _
@@ -95,12 +102,9 @@ object With {
   var yolo              : Yolo                    = _
 
   def enemy: PlayerInfo = enemies.head
-  def mapPixelWidth     : Int = mapTileWidth * 32
-  def mapPixelHeight    : Int = mapTileHeight * 32
-  def mapPixelPerimeter : Int = 2 * mapPixelWidth + 2 * mapPixelHeight
-  def mapWalkWidth      : Int = mapTileWidth * 4
-  def mapWalkHeight     : Int = mapTileHeight * 4
-  def framesSince(previousFrame: Int): Int = Math.max(0, frame - previousFrame)
+  def framesSince(previousFrame: Int): Int = {
+    Math.max(0, frame - previousFrame)
+  }
 
   def onFrame() {
     frame = With.game.getFrameCount
@@ -117,16 +121,23 @@ object With {
     // Basic data //
     ////////////////
 
-    frame         = 0
-    proxy         = new ProxyBWAPI
-    self          = Players.get(game.self)
-    neutral       = Players.get(game.neutral)
-    enemies       = game.enemies.asScala.map(Players.get).toVector
-    mapTileWidth  = game.mapWidth
-    mapTileHeight = game.mapHeight
-    mapFileName   = game.mapFileName
-    mapCleanName  = StarCraftMapMatcher.clean(mapFileName)
-    mapClock      = StarCraftMapMatcher.clock(new Tile(With.game.self.getUnits.asScala.maxBy(_.getHitPoints).getTilePosition).pixelCenter)
+    frame             = 0
+    proxy             = new ProxyBWAPI
+    self              = Players.get(game.self)
+    neutral           = Players.get(game.neutral)
+    enemies           = game.enemies.asScala.map(Players.get).toVector
+    mapFileName       = game.mapFileName
+    mapCleanName      = StarCraftMapMatcher.clean(mapFileName)
+    mapClock          = StarCraftMapMatcher.clock(new Tile(With.game.self.getUnits.asScala.maxBy(_.getHitPoints).getTilePosition).pixelCenter)
+    mapTileWidth      = game.mapWidth
+    mapTileHeight     = game.mapHeight
+    mapTileArea       = mapTileWidth * mapTileHeight
+    mapPixelWidth     = mapTileWidth * 32
+    mapPixelHeight    = mapTileHeight * 32
+    mapPixelPerimeter = 2 * mapPixelWidth + 2 * mapPixelHeight
+    mapWalkWidth      = mapTileWidth * 4
+    mapWalkHeight     = mapTileHeight * 4
+    mapWalkArea       = mapWalkWidth * mapWalkHeight
 
     ///////////////////
     // Configuration //
@@ -187,11 +198,14 @@ object With {
     viewport          = new Viewport
     visualization     = new Visualization
     yolo              = new Yolo
-    tasks             = new TaskQueueGlobal // Comes last because it references other systems
+
+    // Order-dependent initialization:
+    // TaskQueue comes last because it references other systems
+    tasks             = new TaskQueueGlobal
   }
   
   private def analyzeTerrain() {
-    With.logger.debug("Loading BWTA for " + With.game.mapName + " at " + With.game.mapFileName())
+    With.logger.debug(f"Loading fake BWTA for ${With.game.mapName} at ${With.game.mapFileName()}")
     try {
       BWTA.readMap(With.game)
       BWTA.analyze()

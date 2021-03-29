@@ -90,7 +90,7 @@ case class MatchupAnalysis(me: UnitInfo) {
     if (anchor.unitClass == support.unitClass) return false // Safety valve
     var output = false
     output ||= anchor.unitClass.isBuilding && anchor.unitClass.canAttack  && support.isAny(Terran.Marine, Terran.Goliath)
-    output ||= anchor.isAny(MatchTank, Terran.Battlecruiser)         && ! support.isAny(MatchTank, Terran.Battlecruiser)
+    output ||= anchor.isAny(MatchTank, Terran.Battlecruiser)              && ! support.isAny(MatchTank, Terran.Battlecruiser)
     output ||= anchor.isAny(Terran.Medic)                                 && support.isAny(Terran.Marine, Terran.Firebat)
     output ||= anchor.isAny(Terran.Marine)                                && support.isAny(Terran.SCV)
     output ||= anchor.isAny(Protoss.Carrier)                              && ! support.isAny(Protoss.Carrier)

@@ -58,7 +58,7 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
     }
   }
 
-  def alliesSquad                   : Iterable[FriendlyUnitInfo]      = squad.map(_.units.view).filter(_ != this).getOrElse(Iterable.empty)
+  def alliesSquad                   : Iterable[FriendlyUnitInfo]      = squad.map(_.units.view).map(_.filter(_ != this)).getOrElse(Iterable.empty)
   def alliesBattle                  : Iterable[FriendlyUnitInfo]      = battle.map(_.us.units.view.map(_.friendly).filter(_.nonEmpty).map(_.get)).getOrElse(Iterable.empty).filter(_ != this)
   def alliesAll                     : Iterable[FriendlyUnitInfo]      = With.units.ours.filter(_ != this)
   def enemiesSquad                  : Iterable[UnitInfo]              = squad.map(_.enemies).getOrElse(Iterable.empty)

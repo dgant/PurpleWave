@@ -9,7 +9,7 @@ import ProxyBwapi.UnitInfo._
 
 import scala.collection.JavaConverters._
 
-class UnitTracker {
+final class UnitTracker {
   private val bwapiIds        = 10000 // BWAPI IDs are on [0, 10k) and don't repeat
   private val units           = Array.fill[Option[UnitInfo]](bwapiIds)(None)
   private val bufferFriendly  = new UnorderedBuffer[FriendlyUnitInfo](bwapiIds)

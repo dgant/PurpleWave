@@ -15,7 +15,7 @@ class NewSimulation {
   val realUnits: ArrayBuffer[UnitInfo] = new ArrayBuffer(200)
   val realUnitsOurs: ArrayBuffer[UnitInfo] = new ArrayBuffer(100)
   val realUnitsEnemy: ArrayBuffer[UnitInfo] = new ArrayBuffer(100)
-
+  val grid: SimulationGrid = new SimulationGrid
   def setup(newPrediction: PredictionLocal): Unit = {
     prediction = newPrediction
     // TODO
@@ -27,6 +27,7 @@ class NewSimulation {
     realUnitsOurs.clear()
     realUnitsEnemy.clear()
     realUnits ++= prediction.battle.units.filter(simulatable)
+    realUnits.sortBy(_.pixelDistanceSquared(prediction.battle.focus))
     realUnitsOurs ++= realUnits.view.filter(_.isOurs)
     realUnitsEnemy ++= realUnits.view.filter(_.isEnemy)
     simulacra.foreach(_.reset(this))

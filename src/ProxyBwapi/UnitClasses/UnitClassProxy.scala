@@ -10,109 +10,108 @@ import bwapi.UnitType
 import scala.collection.JavaConverters._
 
 abstract class UnitClassProxy(val bwapiType: UnitType) {
-  lazy val id                       = bwapiType.id
+  val id                       = bwapiType.id
   lazy val abilities                = bwapiType.abilities.asScala.map(Techs.get)
-  lazy val acceleration             = bwapiType.acceleration
-  lazy val armor                    = bwapiType.armor
-  lazy val buildScore               = bwapiType.buildScore
-  lazy val buildFrames              = bwapiType.buildTime
-  lazy val rawCanAttack             = bwapiType.canAttack
-  lazy val canBuildAddon            = bwapiType.canBuildAddon
-  lazy val canMove                  = bwapiType.canMove
-  lazy val canProduce               = bwapiType.canProduce
+  val acceleration             = bwapiType.acceleration
+  val armor                    = bwapiType.armor
+  val buildScore               = bwapiType.buildScore
+  val buildFrames              = bwapiType.buildTime
+  val rawCanAttack             = bwapiType.canAttack
+  val canBuildAddon            = bwapiType.canBuildAddon
+  val canMove                  = bwapiType.canMove
+  val canProduce               = bwapiType.canProduce
   lazy val cloakingTech             = Techs.get(bwapiType.cloakingTech)
-  lazy val destroyScore             = bwapiType.destroyScore
-  lazy val dimensionDown            = bwapiType.dimensionDown
-  lazy val dimensionLeft            = bwapiType.dimensionLeft
-  lazy val dimensionRight           = bwapiType.dimensionRight
-  lazy val dimensionUp              = bwapiType.dimensionUp
-  lazy val gasPrice                 = bwapiType.gasPrice
-  lazy val haltPixels               = if (this == Protoss.DarkTemplar) 0 else bwapiType.haltDistance / 256
-  lazy val permanentlyCloaked       = bwapiType.hasPermanentCloak
-  lazy val height                   = bwapiType.height
-  lazy val isAddon                  = bwapiType.isAddon
-  lazy val isBeacon                 = bwapiType.isBeacon
-  lazy val isBuilding               = bwapiType.isBuilding
-  lazy val isBurrowable             = bwapiType.isBurrowable
-  lazy val isCloakable              = bwapiType.isCloakable
-  lazy val isCritter                = bwapiType.isCritter
-  lazy val isDetector               = bwapiType.isDetector
-  lazy val isFlagBeacon             = bwapiType.isFlagBeacon
-  lazy val isFlyer                  = bwapiType.isFlyer
-  lazy val isFlyingBuilding         = bwapiType.isFlyingBuilding
-  lazy val isHero                   = bwapiType.isHero
-  lazy val isInvincible             = bwapiType.isInvincible
-  lazy val isMechanical             = bwapiType.isMechanical
-  lazy val isMineralField           = bwapiType.isMineralField
-  lazy val isNeutral                = bwapiType.isNeutral
-  lazy val isOrganic                = bwapiType.isOrganic
-  lazy val isPowerup                = bwapiType.isPowerup
-  lazy val isRefinery               = bwapiType.isRefinery
-  lazy val isResourceContainer      = bwapiType.isResourceContainer
-  lazy val isResourceDepot          = bwapiType.isResourceDepot
-  lazy val isRobotic                = bwapiType.isRobotic
-  lazy val isSpecialBuilding        = bwapiType.isSpecialBuilding
-  lazy val isSpell                  = bwapiType.isSpell
-  lazy val isSpellcaster            = bwapiType.isSpellcaster
-  lazy val isTwoUnitsInOneEgg       = bwapiType.isTwoUnitsInOneEgg
-  lazy val isWorker                 = bwapiType.isWorker
-  lazy val maxAirHitsRaw            = bwapiType.maxAirHits
-  lazy val maxEnergy                = bwapiType.maxEnergy
-  lazy val maxGroundHitsRaw         = bwapiType.maxGroundHits
-  lazy val maxHitPoints             = bwapiType.maxHitPoints
-  lazy val maxShields               = bwapiType.maxShields
-  lazy val mineralPrice             = bwapiType.mineralPrice
-  lazy val producesCreep            = bwapiType.producesCreep
-  lazy val producesLarva            = bwapiType.producesLarva
-  lazy val regeneratesHP            = bwapiType.regeneratesHP
+  val destroyScore             = bwapiType.destroyScore
+  val dimensionDown            = bwapiType.dimensionDown
+  val dimensionLeft            = bwapiType.dimensionLeft
+  val dimensionRight           = bwapiType.dimensionRight
+  val dimensionUp              = bwapiType.dimensionUp
+  val gasPrice                 = bwapiType.gasPrice
+  val haltPixels               = if (bwapiType == UnitType.Protoss_Dark_Templar) 0 else bwapiType.haltDistance / 256
+  val permanentlyCloaked       = bwapiType.hasPermanentCloak
+  val height                   = bwapiType.height
+  val isAddon                  = bwapiType.isAddon
+  val isBeacon                 = bwapiType.isBeacon
+  val isBuilding               = bwapiType.isBuilding
+  val isBurrowable             = bwapiType.isBurrowable
+  val isCloakable              = bwapiType.isCloakable
+  val isCritter                = bwapiType.isCritter
+  val isDetector               = bwapiType.isDetector
+  val isFlagBeacon             = bwapiType.isFlagBeacon
+  val isFlyer                  = bwapiType.isFlyer
+  val isFlyingBuilding         = bwapiType.isFlyingBuilding
+  val isHero                   = bwapiType.isHero
+  val isInvincible             = bwapiType.isInvincible
+  val isMechanical             = bwapiType.isMechanical
+  val isMineralField           = bwapiType.isMineralField
+  val isNeutral                = bwapiType.isNeutral
+  val isOrganic                = bwapiType.isOrganic
+  val isPowerup                = bwapiType.isPowerup
+  val isRefinery               = bwapiType.isRefinery
+  val isResourceContainer      = bwapiType.isResourceContainer
+  val isResourceDepot          = bwapiType.isResourceDepot
+  val isRobotic                = bwapiType.isRobotic
+  val isSpecialBuilding        = bwapiType.isSpecialBuilding
+  val isSpell                  = bwapiType.isSpell
+  val isSpellcaster            = bwapiType.isSpellcaster
+  val isTwoUnitsInOneEgg       = bwapiType.isTwoUnitsInOneEgg
+  val isWorker                 = bwapiType.isWorker
+  val maxAirHitsRaw            = bwapiType.maxAirHits
+  val maxEnergy                = bwapiType.maxEnergy
+  val maxGroundHitsRaw         = bwapiType.maxGroundHits
+  val maxHitPoints             = bwapiType.maxHitPoints
+  val maxShields               = bwapiType.maxShields
+  val mineralPrice             = bwapiType.mineralPrice
+  val producesCreep            = bwapiType.producesCreep
+  val producesLarva            = bwapiType.producesLarva
+  val regeneratesHP            = bwapiType.regeneratesHP
   lazy val requiredTechRaw          = Techs.get(bwapiType.requiredTech)
   lazy val requiredUnits            = bwapiType.requiredUnits.asScala.map(pair => (UnitClasses.get(pair._1), pair._2))
-  lazy val requiresCreep            = bwapiType.requiresCreep
-  lazy val requiresPsi              = bwapiType.requiresPsi
+  val requiresCreep            = bwapiType.requiresCreep
+  val requiresPsi              = bwapiType.requiresPsi
   lazy val techsWhat                = bwapiType.researchesWhat.asScala.map(Techs.get)
-  lazy val seekRange                = bwapiType.seekRange
-  lazy val sightRangePixels         = bwapiType.sightRange
-  lazy val spaceProvided            = bwapiType.spaceProvided
-  lazy val spaceRequired            = bwapiType.spaceRequired
-  lazy val supplyProvided           = bwapiType.supplyProvided
-  lazy val supplyRequired           = bwapiType.supplyRequired
-  lazy val tileHeight               = bwapiType.tileHeight
-  lazy val tileSize                 = new Tile(bwapiType.tileSize)
-  lazy val tileWidth                = bwapiType.tileWidth
-  lazy val topSpeed                 = bwapiType.topSpeed
-  lazy val turnRadius               = bwapiType.turnRadius
+  val seekRange                = bwapiType.seekRange
+  val sightRangePixels         = bwapiType.sightRange
+  val spaceProvided            = bwapiType.spaceProvided
+  val spaceRequired            = bwapiType.spaceRequired
+  val supplyProvided           = bwapiType.supplyProvided
+  val supplyRequired           = bwapiType.supplyRequired
+  val tileHeight               = bwapiType.tileHeight
+  val tileSize                 = new Tile(bwapiType.tileSize)
+  val tileWidth                = bwapiType.tileWidth
+  val topSpeed                 = bwapiType.topSpeed
+  val turnRadius               = bwapiType.turnRadius
   lazy val upgrades                 = bwapiType.upgrades.asScala.map(Upgrades.get)
   lazy val upgradesWhat             = bwapiType.upgradesWhat.asScala.map(Upgrades.get)
   lazy val whatBuilds               = new Pair(UnitClasses.get(bwapiType.whatBuilds.getKey), bwapiType.whatBuilds.getValue)
-  lazy val width                    = bwapiType.width
-  lazy val race                     = bwapiType.getRace
-  lazy val sizeRaw                  = size
-  lazy val airWeaponRaw             = bwapiType.airWeapon
-  lazy val groundWeaponRaw          = bwapiType.groundWeapon
-  lazy val airDamageRaw             = bwapiType.airWeapon.damageAmount
-  lazy val airDamageBonusRaw        = bwapiType.airWeapon.damageBonus
-  lazy val airDamageCooldownRaw     = bwapiType.airWeapon.damageCooldown
-  lazy val airDamageFactorRaw       = bwapiType.airWeapon.damageFactor
-  lazy val airDamageTypeRaw         = bwapiType.airWeapon.damageType
-  lazy val airExplosionTypeRaw      = bwapiType.airWeapon.explosionType
-  lazy val airRangeRaw              = bwapiType.airWeapon.maxRange
-  lazy val airSplashRadius50        = bwapiType.airWeapon.innerSplashRadius
-  lazy val airSplashRadius25        = bwapiType.airWeapon.outerSplashRadius
-  lazy val groundDamageRaw          = bwapiType.groundWeapon.damageAmount
-  lazy val groundDamageBonusRaw     = bwapiType.groundWeapon.damageBonus
-  lazy val groundDamageCooldownRaw  = bwapiType.groundWeapon.damageCooldown
-  lazy val groundDamageFactorRaw    = bwapiType.groundWeapon.damageFactor
-  lazy val groundDamageTypeRaw      = bwapiType.groundWeapon.damageType
-  lazy val groundExplosionTypeRaw   = bwapiType.groundWeapon.explosionType
-  lazy val groundSplashRadius50     = bwapiType.groundWeapon.innerSplashRadius
-  lazy val groundSplashRadius25     = bwapiType.groundWeapon.outerSplashRadius
-  lazy val groundMinRangeRaw        = bwapiType.groundWeapon.minRange
-  lazy val groundRangeRaw           = bwapiType.groundWeapon.maxRange
-  lazy val asString                 = bwapiType.toString
+  val width                    = bwapiType.width
+  val race                     = bwapiType.getRace
+  val airWeaponRaw             = bwapiType.airWeapon
+  val groundWeaponRaw          = bwapiType.groundWeapon
+  val airDamageRaw             = bwapiType.airWeapon.damageAmount
+  val airDamageBonusRaw        = bwapiType.airWeapon.damageBonus
+  val airDamageCooldownRaw     = bwapiType.airWeapon.damageCooldown
+  val airDamageFactorRaw       = bwapiType.airWeapon.damageFactor
+  val airDamageTypeRaw         = bwapiType.airWeapon.damageType
+  val airExplosionTypeRaw      = bwapiType.airWeapon.explosionType
+  val airRangeRaw              = bwapiType.airWeapon.maxRange
+  val airSplashRadius50        = bwapiType.airWeapon.innerSplashRadius
+  val airSplashRadius25        = bwapiType.airWeapon.outerSplashRadius
+  val groundDamageRaw          = bwapiType.groundWeapon.damageAmount
+  val groundDamageBonusRaw     = bwapiType.groundWeapon.damageBonus
+  val groundDamageCooldownRaw  = bwapiType.groundWeapon.damageCooldown
+  val groundDamageFactorRaw    = bwapiType.groundWeapon.damageFactor
+  val groundDamageTypeRaw      = bwapiType.groundWeapon.damageType
+  val groundExplosionTypeRaw   = bwapiType.groundWeapon.explosionType
+  val groundSplashRadius50     = bwapiType.groundWeapon.innerSplashRadius
+  val groundSplashRadius25     = bwapiType.groundWeapon.outerSplashRadius
+  val groundMinRangeRaw        = bwapiType.groundWeapon.minRange
+  val groundRangeRaw           = bwapiType.groundWeapon.maxRange
+  val asString                 = bwapiType.toString
 
   // .size is broken in BWMirror. This is a manual replacement.
   // Data via http://classic.battle.net/scc/GS/damage.shtml
-  lazy val size: Size.Type = {
+  val size: Size.Type = {
     if (Vector(
       UnitType.Terran_SCV,
       UnitType.Terran_Marine,
@@ -146,7 +145,7 @@ abstract class UnitClassProxy(val bwapiType: UnitType) {
       Size.Large
   }
 
-  lazy val groundDamageType: Damage.Type = {
+  val groundDamageType: Damage.Type = {
     if (Vector(
       UnitType.Terran_Vulture,
       UnitType.Terran_Ghost,
@@ -168,7 +167,7 @@ abstract class UnitClassProxy(val bwapiType: UnitType) {
       Damage.Normal
   }
 
-  lazy val airDamageType: Damage.Type = {
+  val airDamageType: Damage.Type = {
     if (Vector(
       UnitType.Terran_Ghost
     ).contains(bwapiType))

@@ -13,7 +13,7 @@ import bwapi.{Race, UnitType}
 
 import scala.collection.mutable.ListBuffer
 
-case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatcher {
+final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatcher {
 
   //////////////
   // Geometry //
@@ -27,15 +27,11 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val radialHypotenuse: Double = Math.sqrt(width.toDouble * width.toDouble + height.toDouble * height.toDouble) / 2.0
   lazy val perimeter: Int = 2 * width + 2 * height
 
-  def topLeft: Point = Point(dimensionLeft, dimensionUp)
-
-  def topRight: Point = Point(dimensionRight, dimensionUp)
-
-  def bottomLeft: Point = Point(dimensionLeft, dimensionDown)
-
-  def bottomRight: Point = Point(dimensionRight, dimensionDown)
-
-  def corners: Vector[Point] = Vector(topLeft, topRight, bottomLeft, bottomRight)
+  lazy val topLeft: Point = Point(dimensionLeft, dimensionUp)
+  lazy val topRight: Point = Point(dimensionRight, dimensionUp)
+  lazy val bottomLeft: Point = Point(dimensionLeft, dimensionDown)
+  lazy val bottomRight: Point = Point(dimensionRight, dimensionDown)
+  lazy val corners: Vector[Point] = Vector(topLeft, topRight, bottomLeft, bottomRight)
 
   //////////////
   // Movement //
@@ -56,8 +52,6 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
 
   lazy val ranged: Boolean = canAttack && pixelRangeMax > 32 * 2
   lazy val melee: Boolean = canAttack && ! ranged
-  lazy val castsSpells: Boolean = spells.nonEmpty
-  lazy val attacksOrCastsOrDetectsOrTransports: Boolean = canAttack || castsSpells || isDetector || isTransport || this == Zerg.LurkerEgg
 
   lazy val suicides: Boolean = Array(
     Terran.SpiderMine,
@@ -76,10 +70,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     Zerg.Drone)
     .contains(this)
 
-  lazy val triggersSpiderMines: Boolean = (
-    ! floats
-      && ! isFlyer
-      && ! isBuilding)
+  lazy val triggersSpiderMines: Boolean = ! floats && ! isFlyer && ! isBuilding
 
   lazy val splashesFriendly: Boolean = Array(
     Terran.SiegeTankSieged,
@@ -138,9 +129,9 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     else if (this == Protoss.Reaver) 60
     else cooldownZeroBecomesInfinity(groundDamageCooldownRaw)
 
-  lazy val canAttack: Boolean = attacksGround || attacksAir
   lazy val attacksGround: Boolean = effectiveGroundDamage > 0
   lazy val attacksAir: Boolean = effectiveAirDamage > 0
+  lazy val canAttack: Boolean = attacksGround || attacksAir
 
   def canAttack(enemy: UnitClass): Boolean = if (enemy.isFlyer) attacksAir else attacksGround
   def canAttack(enemy: UnitInfo): Boolean = if (enemy.flying) attacksAir else attacksGround
@@ -170,14 +161,11 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     else pixelRangeMax
 
   lazy val tileArea: TileRectangle = TileRectangle(Tile(0, 0), tileSize)
-  lazy val ordersMatter: Boolean = !this.isResource
-  lazy val targetsMatter: Boolean = this != Protoss.Interceptor && !this.isResource
-  lazy val targetPositionsMatter: Boolean = this != Protoss.Interceptor && !this.isResource && (this.isFlyingBuilding || !this.isBuilding)
-  lazy val orderable: Boolean = !isSpell && !Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
+  lazy val orderable: Boolean = ! isSpell && ! Vector(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
   lazy val isMinerals: Boolean = isMineralField
   lazy val isGas: Boolean = Vector(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this)
   lazy val isResource: Boolean = isMinerals || isGas
-  lazy val isTownHall: Boolean = Vector(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this)
+  lazy val isTownHall: Boolean = isResourceDepot
   lazy val isStaticDefense: Boolean = (isBuilding && canAttack || this == Terran.Bunker || this == Protoss.ShieldBattery) && this != Terran.SiegeTankSieged
   lazy val isTransport: Boolean = spaceProvided > 0 && isFlyer && this != Protoss.Carrier
   lazy val unaffectedByDarkSwarm: Boolean = Vector(
@@ -197,11 +185,6 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   // Macro //
   ///////////
 
-  lazy val framesToFinishCompletion: Int =
-    if (isProtoss) 75
-    else if (isZerg) 12
-    else 0
-
   lazy val unitsTrained: Vector[UnitClass] = UnitClasses.all.filter(_.whatBuilds._1 == this).toVector
 
   lazy val trainsUnits: Boolean = UnitClasses.all.exists(unit => unit.whatBuilds._1 == this)
@@ -212,21 +195,15 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val isTerran: Boolean = race == Race.Terran
   lazy val isZerg: Boolean = race == Race.Zerg
 
-  lazy val buildTechEnabling: Option[Tech] = buildTechEnablingCalculate
-  lazy val buildUnitsEnabling: Vector[UnitClass] = buildUnitsEnablingCalculate
-  lazy val buildUnitsBorrowed: Vector[UnitClass] = buildUnitsBorrowedCalculate
-  lazy val buildUnitsSpent: Vector[UnitClass] = buildUnitsSpentCalculate
+  lazy val framesToFinishCompletion: Int = if (isProtoss) 75 else if (isZerg) 12 else 0
 
-  private def buildTechEnablingCalculate: Option[Tech] = {
-    if (requiredTechRaw == Techs.None || requiredTechRaw == Techs.Unknown)
-      None
-    else
-      Some(requiredTechRaw)
-  }
+  lazy val buildTechEnabling: Option[Tech] = if (requiredTechRaw == Techs.None || requiredTechRaw == Techs.Unknown) None else Some(requiredTechRaw)
+  lazy val buildUnitsEnabling: Vector[UnitClass] = _buildUnitsEnabling
+  lazy val buildUnitsBorrowed: Vector[UnitClass] = _buildUnitsBorrowed
+  lazy val buildUnitsSpent: Vector[UnitClass] = _buildUnitsSpent
 
-  private def buildUnitsEnablingCalculate: Vector[UnitClass] = {
-
-    val output = new ListBuffer[UnitClass]
+  private def _buildUnitsEnabling: Vector[UnitClass] = {
+    lazy val output = new ListBuffer[UnitClass]
 
     // Probes (Protoss buildings)
     addBuildUnitIf(output, isProtoss && isBuilding, Protoss.Probe)
@@ -302,9 +279,9 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     output.toVector
   }
 
-  private def buildUnitsBorrowedCalculate: Vector[UnitClass] = {
+  private def _buildUnitsBorrowed: Vector[UnitClass] = {
 
-    val output = new ListBuffer[UnitClass]
+    lazy val output = new ListBuffer[UnitClass]
 
     // All Terran units that train from buildings
     addBuildUnitIf(output, Terran.SCV, Terran.CommandCenter)
@@ -352,9 +329,9 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     output.toVector
   }
 
-  private def buildUnitsSpentCalculate: Vector[UnitClass] = {
+  private def _buildUnitsSpent: Vector[UnitClass] = {
 
-    val output = new ListBuffer[UnitClass]
+    lazy val output = new ListBuffer[UnitClass]
 
     // Archons
     addBuildUnitIf(output, Protoss.Archon, Protoss.HighTemplar)
@@ -524,6 +501,8 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     else if (this == Zerg.Defiler) Array(Zerg.Consume, Zerg.DarkSwarm, Zerg.Plague)
     else if (this == Zerg.Queen) Array(Zerg.Ensnare, Zerg.InfestCommandCenter, Zerg.Parasite, Zerg.SpawnBroodlings)
     else Array()
+  lazy val castsSpells: Boolean = spells.nonEmpty
+  lazy val attacksOrCastsOrDetectsOrTransports: Boolean = canAttack || castsSpells || isDetector || isTransport || this == Zerg.LurkerEgg
 
   //////////////////////////////
   // Performance optimization //

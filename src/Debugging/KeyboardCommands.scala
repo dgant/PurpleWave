@@ -34,6 +34,7 @@ object KeyboardCommands {
       case "surrender"  => quitVsHuman()
       case _            => With.visualization.tryToggle(text)
     }
+    With.game.sendText(text)
   }
 
   var breakpointFodder = 1

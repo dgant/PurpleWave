@@ -21,15 +21,15 @@ abstract class AbstractGridArray[T] extends AbstractGrid[T] {
   }
 
   final def isInitialized: Boolean = initialized
-  final def initialize()        { if ( ! initialized) { onInitialization(); initialized = true } }
-  override def update()         { initialize() }
-  def onInitialization()        {}
-  val indices: Range            = 0 until length
-  val tiles                     = indices.map(i => new Tile(i))
-  @inline def get(i: Int)                     : T     = if (valid(i)) values(i) else defaultValue
-  @inline def set(i: Int, value: T)           : Unit  = if (valid(i)) values(i) = value
-  @inline def set(tile: Tile, value: T)       : Unit  = set(tile.i, value)
-  @inline def getUnchecked(i: Int)            : T     = values(i)
-  @inline def setUnchecked(i: Int, value: T)  : Unit  = values(i) = value
+  final def initialize() { if ( ! initialized) { onInitialization(); initialized = true } }
+  override def update() { initialize() }
+  def onInitialization() {}
+  val indices: Range  = 0 until length
+  val tiles: Seq[Tile] = indices.map(i => new Tile(i))
+  def get(i: Int)                     : T     = if (valid(i)) values(i) else defaultValue
+  def set(i: Int, value: T)           : Unit  = if (valid(i)) values(i) = value
+  def set(tile: Tile, value: T)       : Unit  = set(tile.i, value)
+  def getUnchecked(i: Int)            : T     = values(i)
+  def setUnchecked(i: Int, value: T)  : Unit  = values(i) = value
 }
 

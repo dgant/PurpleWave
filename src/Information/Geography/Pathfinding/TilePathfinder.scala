@@ -11,63 +11,20 @@ import scala.language.postfixOps
 
 trait TilePathfinder {
 
-  def profileDistance(start: Tile, end: Tile): PathfindProfile = new PathfindProfile(start, Some(end))
+  val stampDefault: Long = Long.MinValue
+  var stampCurrent: Long = 0L
 
-  private val _stampDefault: Long = Long.MinValue
-  private var _stampCurrent: Long = 0L
+  def profileDistance(start: Tile, end: Tile): PathfindProfile = new PathfindProfile(start, Some(end))
   private var tiles: Array[TileState] = Array.empty
 
-  private final class TileState(val tile: Tile) {
-    val i: Int = tile.i
-    var _visitedStamp   : Long  = _stampDefault
-    var _enqueuedStamp  : Long  = _stampDefault
-    var _cameFrom       : Tile  = _
-    var _costFromStart  : Double = _
-    var _costToEndFloor : Double = _
-    var _pathLength     : Double = _
-    var _repulsion      : Double = _
-    @inline def setEnqueued() {
-      _enqueuedStamp = _stampCurrent
-    }
-    @inline def setVisited() {
-      _visitedStamp = _stampCurrent
-    }
-    @inline def setCameFrom(value: Tile) {
-      _cameFrom = value
-    }
-    // Cost of best-known path from the start tile.
-    // In common A* parlance, this is the gScore.
-    @inline def setCostFromStart(value: Double) {
-      _costFromStart = value
-    }
-    // Minimum possible cost to the end.
-    // In common A* parlance, this is the fScore.
-    @inline def setTotalCostFloor(value: Double) {
-      _costToEndFloor = value
-    }
-    @inline def setPathLength(value: Double) {
-      _pathLength = value
-    }
-    @inline def setRepulsion(value: Double): Unit = {
-      _repulsion = value
-    }
-    @inline def enqueued        : Boolean           = _enqueuedStamp  == _stampCurrent
-    @inline def visited         : Boolean           = _visitedStamp  == _stampCurrent
-    @inline def cameFrom        : Option[Tile]      = if (enqueued && _cameFrom.i != i) Some(_cameFrom) else None
-    @inline def costFromStart   : Double             = _costFromStart
-    @inline def totalCostFloor  : Double             = _costToEndFloor
-    @inline def pathLength      : Double             = _pathLength
-    @inline def repulsion       : Double             = _repulsion
-  }
-
   private def startNextSearch() {
-    if (tiles.isEmpty || _stampCurrent == Long.MaxValue) {
+    if (tiles.isEmpty || stampCurrent == Long.MaxValue) {
       tiles = With.geography.allTiles.indices.map(i => new TileState(new Tile(i))).toArray
     }
-    if (_stampCurrent == Long.MaxValue) {
-      _stampCurrent = _stampDefault
+    if (stampCurrent == Long.MaxValue) {
+      stampCurrent = stampDefault
     }
-    _stampCurrent += 1
+    stampCurrent += 1
   }
 
   @inline private final def totalRepulsion(profile: PathfindProfile, tile: Tile): Double = {

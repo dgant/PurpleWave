@@ -55,7 +55,7 @@ class PlaceFFE extends Plan {
     val (naturalSide1, naturalSide2) = if (wallDirection match {
       case WallDirection.Horizontal | WallDirection.Diagonal =>
         naturalSideRaw1.x < naturalSideRaw2.x
-      case WallDirection.Diagonal =>
+      case WallDirection.Vertical =>
         naturalSideRaw1.y < naturalSideRaw2.y
     }) sidesForwards else sidesBackwards
 

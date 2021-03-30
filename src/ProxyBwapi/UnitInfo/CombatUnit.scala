@@ -128,6 +128,7 @@ trait CombatUnit {
   @inline final def pixelReachMax     (framesAhead: Int): Double = Math.max(pixelReachAir(framesAhead), pixelReachGround(framesAhead))
   @inline final def pixelReachAgainst (framesAhead: Int, enemy: CombatUnit): Double = if (enemy.flying) pixelReachAir(framesAhead) else pixelReachGround(framesAhead)
   @inline final def inRangeToAttack(enemy: CombatUnit)                    : Boolean = pixelDistanceEdge(enemy)          <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy)          > pixelRangeMin)
+  @inline final def inRangeToAttack(enemy: UnitInfo, enemyAt: Pixel)      : Boolean = pixelDistanceEdge(enemy, enemyAt) <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy, enemyAt) > pixelRangeMin)
   @inline final def inRangeToAttack(enemy: CombatUnit, usAt: Pixel, to: Pixel): Boolean = { val d = pixelDistanceEdge(enemy, usAt, to); d <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || d > pixelRangeMin) }
   @inline final def inRangeToAttackFrom(enemy: CombatUnit, usAt: Pixel)   : Boolean = pixelDistanceEdgeFrom(enemy, usAt) <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdgeFrom(enemy, usAt) > pixelRangeMin)
   @inline final def pixelsToGetInRange(enemy: CombatUnit)                 : Double = if (canAttack(enemy)) (pixelDistanceEdge(enemy) - pixelRangeAgainst(enemy)) else LightYear()

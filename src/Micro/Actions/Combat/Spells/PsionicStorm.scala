@@ -18,11 +18,10 @@ object PsionicStorm extends TargetedSpell {
 
   override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
     if (With.grids.psionicStorm.isSet(target.tile)) return 0.0
-    if (target.unitClass.isSpell)       return 0.0
-    if (target.unitClass.isBuilding)    return 0.0
-    if (target.underStorm)              return 0.0
-    if (target.stasised)                return 0.0
-    if (target.invincible)              return 0.0
+    if ( ! target.unitClass.canBeStormed) return 0.0
+    if (target.underStorm)  return 0.0
+    if (target.stasised)    return 0.0
+    if (target.invincible)  return 0.0
     if (target.isAny(
       Protoss.Interceptor,
       Zerg.Larva,

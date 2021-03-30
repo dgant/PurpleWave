@@ -53,7 +53,7 @@ final class NewSimulacrum(baseUnit: UnitInfo) extends CombatUnit {
   var tweenFramesDone: Int = _
   var tweenFramesLeft: Int = 0
   var tweenFrom: Pixel = _
-  var tweenTo: Pixel = _
+  var tweenGoal: Pixel = _
   var valuePerDamage: Double = _
   var kills: Int = _
   var damageDealt: Double = _
@@ -128,7 +128,7 @@ final class NewSimulacrum(baseUnit: UnitInfo) extends CombatUnit {
           tweenFramesDone += 1
           tweenFramesLeft -= 1
           //TODO: Account for adjusted paths from eg. moving around obstacles
-          simulation.grid.tryMove(this, if (tweenFramesLeft == 0) tweenTo else tweenFrom.project(tweenTo, topSpeed * tweenFramesDone))
+          simulation.grid.tryMove(this, if (tweenFramesLeft == 0) tweenGoal else tweenFrom.project(tweenGoal, topSpeed * tweenFramesDone))
         }
       }
     }
@@ -140,17 +140,31 @@ final class NewSimulacrum(baseUnit: UnitInfo) extends CombatUnit {
     act()
   }
 
-  @inline def tween(to: Pixel, frames: Int): Unit = {
-    cooldownLeft = Math.max(cooldownLeft, frames)
-    cooldownMoving = frames
+  @inline def tween(to: Pixel, frames: Int, reason: Option[String] = None): Unit = {
+    // TODO: If logging, add event
+    // TODO: Some units can move 'n' shoot
+    val finalFrames = Math.max(1, frames)
+    cooldownLeft = Math.max(cooldownLeft, finalFrames)
+    cooldownMoving = finalFrames
     tweenFrom = pixel
-    tweenTo = to
+    tweenGoal = to
     tweenFramesDone = 0
     tweenFramesLeft = tweenFramesDone
-    // TODO: If logging, add event
+  }
+  @inline def tween(to: Pixel, reason: Option[String]): Unit = {
+    tween(to, (pixelDistanceCenter(to) / topSpeedPossible).toInt, reason)
+  }
+  @inline def tween(to: Pixel): Unit = {
+    tween(to, None)
   }
 
-  @inline private def dealDamage(victim: NewSimulacrum): Unit = {
+  @inline def sleep(frames: Int, reason: Option[String] = None): Unit = {
+    // TODO: If logging, add event
+    cooldownLeft = Math.max(cooldownLeft, frames)
+    cooldownMoving = Math.max(cooldownMoving, frames)
+  }
+
+  @inline def dealDamageTo(victim: NewSimulacrum): Unit = {
     val victimWasAlive    = victim.hitPoints > 0
     val damage            = damageOnNextHitAgainst(victim, Some(victim.shieldPoints), from = Some(pixel), to = Some(victim.pixel))
     val damageTotal       = Math.min(victim.shieldPoints + victim.hitPoints, damage)
@@ -158,7 +172,7 @@ final class NewSimulacrum(baseUnit: UnitInfo) extends CombatUnit {
     val damageToHitPoints = damageTotal - damageToShields
     val valueDamage       = damageTotal * victim.valuePerDamage * With.configuration.simulationDamageValueRatio
     cooldownLeft          = cooldownMaxAgainst(victim)
-    cooldownMoving        += unitClass.stopFrames
+    cooldownMoving        = Math.max(cooldownMoving, unitClass.stopFrames)
     valueDealt            += valueDamage
     damageDealt           += damageTotal
     victim.valueReceived  += valueDamage

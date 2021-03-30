@@ -26,15 +26,21 @@ object BehaviorInitial extends SimulacrumBehavior {
       }
     }
     if (simulacrum.unitClass == Protoss.HighTemplar) {
-      simulacrum.targets.addAll(simulacrum.simulation.simulacraEnemy.filterNot(_.unitClass.isBuilding))
+      simulacrum.targets.addAll(simulacrum.simulation.simulacraEnemy.view.filterNot(_.unitClass.canBeStormed))
       if (simulacrum.targets.nonEmpty) {
         simulacrum.doBehavior(BehaviorStorm)
         return
       }
     }
-
+    if (simulacrum.unitClass.isDetector && simulacrum.canMove) {
+      simulacrum.targets.addAll(simulacrum.simulation.simulacraEnemy.view.filter(_.cloaked))
+      if (simulacrum.targets.nonEmpty) {
+        simulacrum.doBehavior(BehaviorDetect)
+        return
+      }
+    }
     if (simulacrum.attacksAgainstAir > 0 || simulacrum.attacksAgainstGround > 0) {
-      simulacrum.targets.addAll(simulacrum.simulation.simulacraEnemy.filter(simulacrum.attacksAgainst(_) > 0))
+      simulacrum.targets.addAll(simulacrum.simulation.simulacraEnemy.view.filter(simulacrum.canAttack))
     }
     if (simulacrum.targets.isEmpty) {
       simulacrum.doBehavior(BehaviorFlee)

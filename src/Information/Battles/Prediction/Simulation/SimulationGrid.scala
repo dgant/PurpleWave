@@ -12,11 +12,10 @@ final class SimulationGrid {
     // TODO: Optimize these checks to avoid creating new pixels/tiles
     // TODO: Check walkability
     // TODO: Walk around obstacles
-    lazy val toGridTile = tiles(to.tile.i)
-    if (unit.gridTile.tile.contains(to) || (to.valid && toGridTile.occupancy + unit.unitClass.occupancy <= occupancyMax)) {
+    if (unit.gridTile.tile.contains(to) || (to.valid && tiles(to.tile.i).occupancy + unit.unitClass.occupancy <= occupancyMax)) {
       unit.gridTile -= unit
       unit.pixel = to
-      unit.gridTile = toGridTile
+      unit.gridTile = tiles(to.tile.i)
       unit.gridTile += unit
       true
     } else {

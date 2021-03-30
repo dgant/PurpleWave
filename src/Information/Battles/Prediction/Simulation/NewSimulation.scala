@@ -8,8 +8,9 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import scala.collection.mutable.ArrayBuffer
 
 class NewSimulation {
+  val resolution = 6
   var prediction: PredictionLocal = _
-  var frame: Int = _
+  var logEvents: Boolean = _
   var complete: Boolean = false
   val checkpoints: ArrayBuffer[SimulationCheckpoint] = ArrayBuffer.empty
   val realUnits: ArrayBuffer[UnitInfo] = new ArrayBuffer(200)
@@ -36,7 +37,7 @@ class NewSimulation {
   def step(): Unit = {
     simulacra.foreach(_.act())
     simulacra.foreach(_.update())
-    prediction.frames+= 1
+    prediction.frames += 1
     complete ||= prediction.frames >= 24 * 10
     complete ||= ! simulacraOurs.exists(_.alive)
     complete ||= ! simulacraEnemy.exists(_.alive)

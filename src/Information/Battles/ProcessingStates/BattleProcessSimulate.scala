@@ -1,27 +1,21 @@
 package Information.Battles.ProcessingStates
 
-import Information.Battles.Prediction.PredictionLocal
-import Information.Battles.Prediction.Simulation.Simulation
-import Information.Battles.Types.{Battle, BattleLocal}
+import Information.Battles.Types.Battle
 import Lifecycle.With
 
 class BattleProcessSimulate extends BattleProcessState {
-  class BattleSimulation(val battle: BattleLocal) {
-    var simulationAttack: Option[Simulation] = None
-    var simulationSnipe: Option[Simulation] = None
-
-    var predictionAttack: Option[PredictionLocal] = None
-    var predictionSnipe: Option[PredictionLocal] = None
-  }
 
   var battles: Seq[Battle] = _
 
   override def step(): Unit = {
     val battles = With.battles.nextBattlesLocal
 
-    val unsimulated = battles.view.flatMap(b => b.predictions.map(p => (b, p))).find( ! _._2.simulation.complete)
+    val unsimulated = battles.find( ! _.simulationComplete)
     if (unsimulated.isDefined) {
-      unsimulated.get._2.simulation.step()
+      if (With.simulation.prediction != unsimulated.get) {
+        With.simulation.reset(unsimulated.get)
+      }
+      With.simulation.step()
       return
     }
 

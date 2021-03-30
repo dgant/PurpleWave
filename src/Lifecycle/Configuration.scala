@@ -45,11 +45,9 @@ class Configuration {
 
   var enableMCRS                    = false
   var avatarBattleDistancePixels    = 32.0 * 6.0
-  var battleMarginTileMinimum       = 6
-  var battleMarginTileMaximum       = 12 * 2 + 2 // A bit over double Siege Tank range
   var battleHysteresisFrames        = Seconds(6)()
   var simulationFrames              = Seconds(15)()
-  var simulationEstimationPeriod    = 6
+  var simulationResolution    = 6
   var simulationBonusTankRange      = 64.0
   var simulationDamageValueRatio    = 0.1
   

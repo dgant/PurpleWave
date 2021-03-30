@@ -4,12 +4,12 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Mathematics.Points.Pixel
 
 case class SimulationEventAttack(
-  frame   : Int,
-  shooter : Simulacrum,
-  victim  : Simulacrum,
-  damage  : Int,
-  fatal   : Boolean)
-  extends SimulationEvent {
+                                  frame   : Int,
+                                  shooter : Simulacrum,
+                                  victim  : Simulacrum,
+                                  damage  : Int,
+                                  fatal   : Boolean)
+    extends SimulationEvent {
   
   private val pixel = victim.pixel
   

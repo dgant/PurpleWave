@@ -4,7 +4,7 @@ import ProxyBwapi.Races.{Protoss, Terran}
 
 object BehaviorInitial extends SimulacrumBehavior {
   val fighting: Boolean = true
-  @inline override def act(simulacrum: NewSimulacrum): Unit = {
+  @inline override def act(simulacrum: Simulacrum): Unit = {
     if (simulacrum.unitClass == Terran.Medic) {
       simulacrum.targets.addAll(simulacrum.simulation.simulacraOurs.filter(_.unitClass.isOrganic))
       if (simulacrum.targets.nonEmpty) {
@@ -43,6 +43,9 @@ object BehaviorInitial extends SimulacrumBehavior {
       simulacrum.targets.addAll(simulacrum.simulation.simulacraEnemy.view.filter(simulacrum.canAttack))
     }
     if (simulacrum.targets.isEmpty) {
+      if (simulacrum.unitClass.isBuilding) {
+        simulacrum.measureHealth = false
+      }
       simulacrum.doBehavior(BehaviorFlee)
     } else {
       simulacrum.doBehavior(BehaviorFight)

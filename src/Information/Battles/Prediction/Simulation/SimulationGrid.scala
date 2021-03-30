@@ -8,7 +8,7 @@ final class SimulationGrid {
   val occupancyMax: Int = Protoss.Dragoon.area
   val tiles: Array[SimulationGridTile] = (0 until With.mapTileArea).map(new SimulationGridTile(_)).toArray
 
-  @inline def tryMove(unit: NewSimulacrum, to: Pixel): Boolean = {
+  @inline def tryMove(unit: Simulacrum, to: Pixel): Boolean = {
     // TODO: Optimize these checks to avoid creating new pixels/tiles
     // TODO: Check walkability
     // TODO: Walk around obstacles

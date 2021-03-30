@@ -3,7 +3,7 @@ package ProxyBwapi.UnitInfo
 import Debugging.Visualizations.Colors
 import Information.Battles.Clustering.BattleCluster
 import Information.Battles.MCRS.MCRSUnit
-import Information.Battles.Prediction.Simulation.{NewSimulacrum, ReportCard}
+import Information.Battles.Prediction.Simulation.{Simulacrum, ReportCard}
 import Information.Battles.Types.{BattleLocal, Team}
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
@@ -201,10 +201,10 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def squads: Seq[Squad] = foreign.map(_.enemyOfSquads).orElse(friendly.map(_.squad.toSeq)).getOrElse(Seq.empty)
   @inline final def battle: Option[BattleLocal] = With.battles.byUnit.get(this).orElse(With.matchups.entrants.find(_._2.contains(this)).map(_._1))
   @inline final def team: Option[Team] = battle.map(_.teamOf(this))
-  @inline final def report: Option[ReportCard] = battle.flatMap(_.predictionAttack.debugReport.get(this))
+  @inline final def report: Option[ReportCard] = battle.flatMap(_.simulationReport.get(this))
   var matchups: MatchupAnalysis = MatchupAnalysis(this)
   val mcrs: MCRSUnit = new MCRSUnit(this)
-  val simulacrum: NewSimulacrum = new NewSimulacrum(this)
+  val simulacrum: Simulacrum = new Simulacrum(this)
   var clusteringEnabled: Boolean = _
   var clusteringRadiusSquared: Double = _
   var cluster: Option[BattleCluster] = _

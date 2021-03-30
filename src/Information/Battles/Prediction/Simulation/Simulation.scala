@@ -1,92 +1,67 @@
 package Information.Battles.Prediction.Simulation
 
-import Information.Battles.Prediction.{SimulationCheckpoint, PredictionLocal}
-import Information.Battles.Types.Team
+import Information.Battles.Prediction.PredictionLocal
 import Lifecycle.With
-import Mathematics.Points.Pixel
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class Simulation(val prediction: PredictionLocal) {
-  
-  private def buildSimulacra(team: Team): Vector[Simulacrum] = {
-    if (With.blackboard.mcrs()) return Vector.empty
+import scala.collection.mutable.ArrayBuffer
 
-    def legalForSimulation(unit: UnitInfo): Boolean = {
-      val effectiveRangePixels = unit.effectiveRangePixels
-      (
-        unit.complete
-          && ! unit.unitClass.isSpell
-          && ! unit.invincible          // No stasised units
-          && ! unit.is(if (With.performance.danger) Protoss.Interceptor else Protoss.Carrier) // Interceptors produce more accurate results but are slower
-          && ! unit.is(Protoss.Scarab)
-          && ! (unit.unitClass.isWorker && unit.gathering && unit.isOurs)
-          && ! (unit.unitClass.isBuilding && ! unit.canAttack && ! unit.unitClass.isSpellcaster)
-          // Is close enough to interact with anyone on the other team
-          && team.opponent.units.exists(other =>
-            unit.pixelDistanceEdge(other)
-            - Math.max(effectiveRangePixels, other.effectiveRangePixels)
-            < With.configuration.simulationFrames * (unit.topSpeed + other.topSpeed))
-      )
-    }
-
-    team.units.view.filter(legalForSimulation).map(new Simulacrum(this, _)).toVector
+final class Simulation {
+  val resolution: Int = With.configuration.simulationResolution
+  var prediction: PredictionLocal = _
+  var complete: Boolean = false
+  val realUnits: ArrayBuffer[UnitInfo] = new ArrayBuffer(200)
+  val realUnitsOurs: ArrayBuffer[UnitInfo] = new ArrayBuffer(100)
+  val realUnitsEnemy: ArrayBuffer[UnitInfo] = new ArrayBuffer(100)
+  val grid: SimulationGrid = new SimulationGrid
+  def reset(newPrediction: PredictionLocal): Unit = {
+    prediction = newPrediction
+    realUnits.clear()
+    realUnitsOurs.clear()
+    realUnitsEnemy.clear()
+    realUnits ++= prediction.battle.units.filter(simulatable)
+    realUnits.sortBy(_.pixelDistanceSquared(prediction.battle.focus))
+    realUnitsOurs ++= realUnits.view.filter(_.isOurs)
+    realUnitsEnemy ++= realUnits.view.filter(_.isEnemy)
+    simulacra.foreach(_.reset(this))
   }
 
-  val focus       : Pixel               = prediction.battle.focus
-  val unitsOurs   : Vector[Simulacrum]  = buildSimulacra(prediction.battle.us)
-  val unitsEnemy  : Vector[Simulacrum]  = buildSimulacra(prediction.battle.enemy)
-  val everyone    : Vector[Simulacrum]  = unitsOurs ++ unitsEnemy
-  var updated     : Boolean             = true
-  var fleeing     : Boolean             = ! prediction.weAttack
-  
-  val simulacra: Map[UnitInfo, Simulacrum] = if (With.blackboard.mcrs()) Map.empty else
-    (unitsOurs.filter(_.canMove) ++ unitsEnemy)
-      .map(simulacrum => (simulacrum.realUnit, simulacrum))
-      .toMap
-
-  def complete: Boolean = (
-    prediction.frames > With.configuration.simulationFrames
-    || ! updated
-    || unitsOurs.forall(_.dead)
-    || unitsEnemy.forall(_.dead)
-    || everyone.forall(u => u.dead || ! u.fighting)
-  )
-  
-  def step() {
-    updated = false
-    prediction.frames += 1
-    snipe()
-    everyone.foreach(_.step())
-    everyone.foreach(_.updateDeath())
-
+  @inline def step(): Unit = {
+    simulacra.foreach(_.act())
+    simulacra.foreach(_.update())
+    prediction.simulationFrames += 1
+    complete ||= prediction.simulationFrames >= 24 * 10
+    complete ||= ! simulacraOurs.exists(_.alive)
+    complete ||= ! simulacraEnemy.exists(_.alive)
+    complete ||= ! simulacra.exists(s => s.alive && s.behavior.fighting)
     if (complete) {
       cleanup()
-    } else if (prediction.frames - prediction.localBattleMetrics.lastOption.map(_.framesIn).getOrElse(0) >= With.configuration.simulationEstimationPeriod) {
-      recordMetrics()
-    }
-  }
-  
-  def snipe() {
-    if (prediction.weAttack
-      && prediction.weSnipe
-      && ! fleeing
-      && unitsEnemy.exists(e => e.dead && ! e.realUnit.unitClass.suicides)) {
-      fleeing = true
-      unitsOurs.foreach(_.cooldownMoving = 24)
+    } else if (prediction.simulationFrames - prediction.simulationCheckpoints.lastOption.map(_.framesIn).getOrElse(0) >= With.configuration.simulationResolution) {
+      checkpoint()
     }
   }
 
-  def recordMetrics() {
-    prediction.localBattleMetrics += new SimulationCheckpoint(this, prediction.localBattleMetrics.lastOption)
-  }
-  
-  def cleanup() {
-    prediction.deathsUs = unitsOurs.count(_.dead)
+  @inline private def simulatable(unit: UnitInfo): Boolean = (
+    ! unit.unitClass.isSpell
+    && ! unit.stasised
+    && ! unit.isAny(Protoss.Interceptor, Protoss.Scarab))
+
+  private def cleanup(): Unit = {
+    prediction.simulationDeaths = simulacra.count(u => u.dead && u.isOurs)
     if (With.configuration.debugging) {
-      prediction.debugReport ++= everyone.map(simulacrum => (simulacrum.realUnit, simulacrum.reportCard))
-      prediction.events = everyone.flatMap(_.events).sortBy(_.frame)
+      // TODO
+      // prediction.debugReport ++= everyone.map(simulacrum => (simulacrum.realUnit, simulacrum.reportCard))
+      // prediction.events = everyone.flatMap(_.events).sortBy(_.frame)
     }
-    recordMetrics()
+    checkpoint()
   }
+  private def checkpoint(): Unit = {
+    // TODO:
+    // checkpoints += new SimulationCheckpoint(this, prediction.localBattleMetrics.lastOption)
+  }
+
+  def simulacra       : Seq[Simulacrum] = realUnits.view.map(_.simulacrum)
+  def simulacraOurs   : Seq[Simulacrum] = realUnitsOurs.view.map(_.simulacrum)
+  def simulacraEnemy  : Seq[Simulacrum] = realUnitsEnemy.view.map(_.simulacrum)
 }

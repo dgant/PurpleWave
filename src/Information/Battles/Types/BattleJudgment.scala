@@ -12,7 +12,7 @@ class BattleJudgment(battle: BattleLocal) {
   val confidence  : Double  = calculateConfidence
 
   def calculateScore: Double = {
-    val metrics = battle.predictionAttack.localBattleMetrics
+    val metrics = battle.simulationCheckpoints
 
     // This can happen when all simulated enemies run away and nobody does any damage
     if (metrics.lastOption.forall(metric => metric.localHealthLostUs <= 0)) return 1.0

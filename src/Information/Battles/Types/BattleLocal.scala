@@ -5,9 +5,7 @@ import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
-  lazy val predictionAttack = new PredictionLocal(this, weAttack = true, weSnipe = false)
-  lazy val predictions      = Vector(predictionAttack).distinct
+class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) with PredictionLocal{
 
   val judgmentModifiers: Seq[JudgmentModifier] = JudgmentModifiers(this)
   val gainedValueMultiplier: Double = judgmentModifiers.map(_.gainedValueMultiplier).sum

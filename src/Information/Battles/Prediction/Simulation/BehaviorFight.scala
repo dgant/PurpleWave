@@ -4,7 +4,7 @@ import Utilities.ByOption
 
 object BehaviorFight extends SimulacrumBehavior {
   val fighting: Boolean = true
-  @inline override def act(simulacrum: NewSimulacrum): Unit = {
+  @inline override def act(simulacrum: Simulacrum): Unit = {
     // Remove target if invalid
     // If no valid target, pick target
     simulacrum.target = simulacrum.target.filter(validTarget(simulacrum, _)).orElse({
@@ -43,7 +43,7 @@ object BehaviorFight extends SimulacrumBehavior {
     }
   }
 
-  @inline def validTarget(attacker: NewSimulacrum, target: NewSimulacrum): Boolean = {
+  @inline def validTarget(attacker: Simulacrum, target: Simulacrum): Boolean = {
     // TODO: Check detection
     target.alive && attacker.canAttack(target)
   }

@@ -3,6 +3,7 @@ package Lifecycle
 import Debugging.Visualizations.{Animations, Viewport, Visualization}
 import Debugging.{Camera, LambdaQueue, Logger, Storyteller}
 import Information.Battles.Battles
+import Information.Battles.Prediction.Simulation.Simulation
 import Information.Fingerprinting.Fingerprints
 import Information.Geography.Geography
 import Information.Geography.Pathfinding.Paths
@@ -90,6 +91,7 @@ object With {
   var recruiter         : Recruiter               = _
   var scheduler         : Scheduler               = _
   var scouting          : Scouting                = _
+  var simulation        : Simulation           = _
   var strategy          : Strategist              = _
   var storyteller       : Storyteller             = _
   var squads            : Squads                  = _
@@ -189,6 +191,7 @@ object With {
     recruiter         = new Recruiter
     scheduler         = new Scheduler
     scouting          = new Scouting
+    simulation        = new Simulation
     strategy          = new Strategist
     storyteller       = new Storyteller
     squads            = new Squads

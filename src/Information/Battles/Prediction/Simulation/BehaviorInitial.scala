@@ -45,8 +45,10 @@ object BehaviorInitial extends SimulacrumBehavior {
     if (simulacrum.targets.isEmpty) {
       if (simulacrum.unitClass.isBuilding) {
         simulacrum.measureHealth = false
+        simulacrum.doBehavior(BehaviorIdle)
+      } else {
+        simulacrum.doBehavior(BehaviorFlee)
       }
-      simulacrum.doBehavior(BehaviorFlee)
     } else {
       simulacrum.doBehavior(BehaviorFight)
     }

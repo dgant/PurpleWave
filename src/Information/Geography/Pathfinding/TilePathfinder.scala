@@ -16,6 +16,7 @@ trait TilePathfinder {
 
   def profileDistance(start: Tile, end: Tile): PathfindProfile = new PathfindProfile(start, Some(end))
   private var tiles: Array[TileState] = Array.empty
+  private val horizon = new mutable.PriorityQueue[TileState]()(Ordering.by(t => -t.totalCostFloor))
 
   private def startNextSearch() {
     if (tiles.isEmpty || stampCurrent == Long.MaxValue) {
@@ -51,9 +52,7 @@ trait TilePathfinder {
     val costSoFar     : Double  = fromState.get.costFromStart
     val costDistance  : Double  = if (fromTile.tile.x == toTile.x || fromTile.tile.y == toTile.y) 1f else PurpleMath.sqrt2f
     val costThreat    : Double  = if (profile.costThreat == 0) 0 else profile.costThreat * Math.max(0, profile.threatGrid.getUnchecked(i) - profile.threatGrid.getUnchecked(fromTile.i)) // Max?
-    val costOccupancy : Double  = if (profile.costOccupancy == 0)
-      0
-    else {
+    val costOccupancy : Double  = if (profile.costOccupancy == 0) 0 else {
       // Intuition: We want to keep this value scaled around 0-1 so we can reason about costOccupancy
       // Signum: Scale-invariant
       // Sigmoid: Tiebreaks equally signed vectors with different scales
@@ -107,7 +106,7 @@ trait TilePathfinder {
 
     startNextSearch()
     profile.updateRepulsion()
-    val horizon = new mutable.PriorityQueue[TileState]()(Ordering.by(t => -t.totalCostFloor))
+    horizon.clear()
     val startTileState = tiles(startTile.i)
     val alsoUnwalkableI = profile.alsoUnwalkable.map(_.i)
     startTileState.setVisited()

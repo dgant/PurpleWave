@@ -1,6 +1,6 @@
 package Information.Battles.Prediction.Simulation
 
-import Information.Battles.Prediction.PredictionLocal
+import Information.Battles.Prediction.{PredictionLocal, SimulationCheckpoint}
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -49,16 +49,14 @@ final class Simulation {
 
   private def cleanup(): Unit = {
     prediction.simulationDeaths = simulacra.count(u => u.dead && u.isOurs)
-    if (With.configuration.debugging) {
-      // TODO
-      // prediction.debugReport ++= everyone.map(simulacrum => (simulacrum.realUnit, simulacrum.reportCard))
-      // prediction.events = everyone.flatMap(_.events).sortBy(_.frame)
+    if (prediction.logSimulation) {
+      prediction.simulationReport ++= simulacra.map(simulacrum => (simulacrum.realUnit, new ReportCard(simulacrum, prediction)))
+      prediction.simulationEvents = simulacra.flatMap(_.events).sortBy(_.frame)
     }
     checkpoint()
   }
   private def checkpoint(): Unit = {
-    // TODO:
-    // checkpoints += new SimulationCheckpoint(this, prediction.localBattleMetrics.lastOption)
+    prediction.simulationCheckpoints += new SimulationCheckpoint(this, prediction.simulationCheckpoints.lastOption)
   }
 
   def simulacra       : Seq[Simulacrum] = realUnits.view.map(_.simulacrum)

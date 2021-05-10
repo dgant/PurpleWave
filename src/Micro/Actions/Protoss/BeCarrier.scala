@@ -12,7 +12,23 @@ import Utilities.ByOption
 
 object BeCarrier extends Action {
   
-  // Carriers are really finicky.
+  // Carriers are really finicky and demand their own micro.
+
+  // TODO: Implement Stop-Hold (SH) micro:
+  // https://tl.net/forum/brood-war/572188-new-carrier-micro-sh-micro
+  // https://tl.net/forum/brood-war/572186-the-age-of-pusagi-new-carrier-micro-trick
+  // https://www.youtube.com/watch?v=6W0B0jZEQrc
+  // In short: Carrier DPS can be *doubled* if you're not picky about who they're targeting
+  // Plan for implementation:
+  // 1. Carrier micro test map
+  // 2. Extensive visualizations on Carriers
+  // Issue grouped commands using Game.issueCommand()
+  //
+  // Unfortunately BWAPI 4.4 does not support grouped commands for client bots.
+  // So this may not be achievable without an API change.
+  //
+  // On the other hand, similar performance against small units could potentially be achieved by
+  // having carriers target different enemies, which would reduce the frequency of carriers having to switch targets.
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.aliveAndComplete           &&

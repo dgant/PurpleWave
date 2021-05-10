@@ -13,7 +13,7 @@ object BehaviorInitial extends SimulacrumBehavior {
       }
     }
     if (simulacrum.unitClass == Terran.SCV) {
-      // TODO
+      // TODO: Add repair targets
       if (simulacrum.targets.nonEmpty) {
         simulacrum.doBehavior(BehaviorRepair)
         return

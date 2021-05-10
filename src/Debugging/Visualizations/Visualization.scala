@@ -43,8 +43,8 @@ class Visualization extends TimedTask {
     ShowTeams,
     ShowJudgment,
 
-    // For Terran walls
-    ShowPreplacement
+    // For combat sim overha
+    ShowBattles
   )
 
   lazy val knownViews: Vector[View] = Vector[View](

@@ -2,13 +2,17 @@ package ProxyBwapi.UnitTracking
 
 import scala.collection.mutable.ArrayBuffer
 
-final class UnorderedBuffer[T >: Null](val capacity: Int) extends Traversable[T] {
+final class UnorderedBuffer[T >: Null](capacity: Int) extends Traversable[T] {
   private val values: ArrayBuffer[T] = ArrayBuffer.fill[T](capacity)(null)
   private var size = 0
 
   // Add to end, for fast insertion
   @inline def add(value: T): T = {
-    values(size) = value
+    if (size >= values.size) {
+      values += value
+    } else {
+      values(size) = value
+    }
     size += 1
     value
   }
@@ -36,8 +40,9 @@ final class UnorderedBuffer[T >: Null](val capacity: Int) extends Traversable[T]
         values(i) = values(size - 1)
         values(size - 1) =  null
         size -= 1
+      } else {
+        i += 1
       }
-      i += 1
     }
   }
 
@@ -45,8 +50,11 @@ final class UnorderedBuffer[T >: Null](val capacity: Int) extends Traversable[T]
   @inline def removeAll(values: TraversableOnce[T]): Unit = { values.foreach(remove) }
 
   @inline def clear(): Unit = {
-    size = 0
-    values.clear()
+    // Empty all populated values without losing allocated space
+    while (size > 0) {
+      size -= 1
+      values(size) = null
+    }
   }
 
   // This view needs a null check for anyone who foolishly tries to hold on to a copy of the view,

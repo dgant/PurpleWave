@@ -10,7 +10,6 @@ import scala.collection.mutable.ArrayBuffer
 final class Simulation {
   val resolution: Int = With.configuration.simulationResolution
   var prediction: PredictionLocal = _
-  var complete: Boolean = false
   val realUnits: ArrayBuffer[UnitInfo] = new ArrayBuffer(200)
   val realUnitsOurs: ArrayBuffer[UnitInfo] = new ArrayBuffer(100)
   val realUnitsEnemy: ArrayBuffer[UnitInfo] = new ArrayBuffer(100)
@@ -31,11 +30,11 @@ final class Simulation {
     simulacra.foreach(_.act())
     simulacra.foreach(_.update())
     prediction.simulationFrames += 1
-    complete ||= prediction.simulationFrames >= 24 * 10
-    complete ||= ! simulacraOurs.exists(_.alive)
-    complete ||= ! simulacraEnemy.exists(_.alive)
-    complete ||= ! simulacra.exists(s => s.alive && s.behavior.fighting)
-    if (complete) {
+    prediction.simulationComplete ||= prediction.simulationFrames >= 24 * 10
+    prediction.simulationComplete ||= ! simulacraOurs.exists(_.alive)
+    prediction.simulationComplete ||= ! simulacraEnemy.exists(_.alive)
+    prediction.simulationComplete ||= ! simulacra.exists(s => s.alive && s.behavior.fighting)
+    if (prediction.simulationComplete) {
       cleanup()
     } else if (prediction.simulationFrames - prediction.simulationCheckpoints.lastOption.map(_.framesIn).getOrElse(0) >= With.configuration.simulationResolution) {
       checkpoint()

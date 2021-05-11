@@ -104,9 +104,8 @@ object With {
   var yolo              : Yolo                    = _
 
   def enemy: PlayerInfo = enemies.head
-  def framesSince(previousFrame: Int): Int = {
-    Math.max(0, frame - previousFrame)
-  }
+  def framesSince(previousFrame: Int): Int = Math.max(0, frame - previousFrame)
+  def framesUntil(futureFrame: Int): Int = Math.max(0, futureFrame - frame)
 
   def onFrame() {
     frame = With.game.getFrameCount

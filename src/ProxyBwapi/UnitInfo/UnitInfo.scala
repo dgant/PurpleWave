@@ -108,10 +108,9 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     remainingTrainFrames,
     addon.map(_.remainingCompletionFrames).getOrElse(0)
   ))))
-  @inline final def remainingFramesUntilMoving: Int = Math.max(0, Math.max(
+  @inline final def remainingFramesUntilMoving: Int = Math.max(
     remainingCompletionFrames,
-    lastFrameStartingAttack + unitClass.stopFrames
-  ))
+    With.framesUntil(lastFrameStartingAttack + unitClass.stopFrames))
 
   private var producer: Option[Prioritized] = None
   @inline final def setProducer(plan: Prioritized) {

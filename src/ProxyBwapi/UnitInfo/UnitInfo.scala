@@ -288,6 +288,9 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     output
   }
   @inline final def pixelToFireAt(enemy: UnitInfo): Pixel = pixelToFireAt(enemy, exhaustive = false)
+  @inline val ptfVeryFarSquared = With.mapPixelPerimeter * With.mapPixelPerimeter
+  @inline private final def ptfBadAltitudePenalty(altitudeMatters: Boolean, enemyAltitude: Double, pixel: Pixel): Int = if (altitudeMatters && pixel.altitude < enemyAltitude) ptfVeryFarSquared  else 0
+  @inline private final def ptfGoodAltitudeBonus(altitudeMatters: Boolean, enemyAltitude: Double, pixel: Pixel): Double = if ( ! altitudeMatters || pixel.altitude > enemyAltitude) 1 else 0
   @inline final def pixelToFireAt(enemy: UnitInfo, exhaustive: Boolean): Pixel = {
     if (unitClass.melee) return enemy.pixel
     if (With.reaction.sluggishness > 1 || ! canMove) {
@@ -297,10 +300,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     val distance = pixelDistanceEdge(enemy)
     val distanceSquared = pixelDistanceSquared(enemy)
     val enemyAltitude = enemy.altitude
-    val veryFarSquared = With.mapPixelPerimeter * With.mapPixelPerimeter
+
     val altitudeMatters = ! flying && ! enemy.flying && ! unitClass.melee
-    def badAltitudePenalty(pixel: Pixel): Int = if (altitudeMatters && pixel.altitude < enemyAltitude) veryFarSquared  else 0
-    def goodAltitudeBonus(pixel: Pixel): Double = if ( ! altitudeMatters || pixel.altitude > enemyAltitude) 1 else 0
     if (enemy.visible || (flying && sightPixels >= range)) {
       if (range >= distance && ( ! exhaustive || ! altitudeMatters)) return pixel
       // First, check if the simplest possible spot is acceptable
@@ -317,7 +318,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
       if ( ! exhaustive || With.reaction.sluggishness > 0) {
         return pixelFar.nearestTraversableBy(this)
       }
-      else if (badAltitudePenalty(pixelFar) == 0 && goodAltitudeBonus(pixelFar) > 0) {
+      else if (ptfBadAltitudePenalty(altitudeMatters, enemyAltitude, pixelFar) == 0 && ptfGoodAltitudeBonus(altitudeMatters, enemyAltitude, pixelFar) > 0) {
         return pixelFar
       }
       // Search for the ideal firing position
@@ -327,7 +328,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
           .points(range.toInt / 32)
           .map(enemy.tile.add(_).pixelCenter.add(offset))
           .filter(p => canTraverse(p) && pixelDistanceSquared(p) < distanceSquared)
-      val ringSpot = ByOption.minBy(ringPixels)(p => pixelDistanceSquared(p) * (2 - goodAltitudeBonus(p)) - badAltitudePenalty(p))
+      val ringSpot = ByOption.minBy(ringPixels)(p => pixelDistanceSquared(p) * (2 - ptfGoodAltitudeBonus(altitudeMatters, enemyAltitude, p)) - ptfBadAltitudePenalty(altitudeMatters, enemyAltitude, p))
       val output = ringSpot.getOrElse(pixelFar.nearestTraversableBy(this))
       return output
     }

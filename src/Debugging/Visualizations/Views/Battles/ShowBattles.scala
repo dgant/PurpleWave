@@ -41,8 +41,8 @@ object ShowBattles extends View {
     val x = 5
     battle.simulationCheckpoints.lastOption.foreach(metrics => {
       DrawScreen.table(x, 4 * barHeight, Vector(
-        Vector("Score",       format(battle.judgement.get.scoreFinal),        "Our survivors:", describeTeam(battle.simulationReport.filter(_._1.isFriendly) .filter(_._2.alive).keys)),
-        Vector("Target",      format(battle.judgement.get.scoreTarget),       "Foe survivors:", describeTeam(battle.simulationReport.filter(_._1.isFriendly) .filter(_._2.alive).keys)),
+        Vector("Score",       format(battle.judgement.get.scoreFinal),        "Our survivors:", describeTeam(battle.simulationReport.filter(_._1.isFriendly)  .filter(_._2.alive).keys)),
+        Vector("Target",      format(battle.judgement.get.scoreTarget),       "Foe survivors:", describeTeam(battle.simulationReport.filter(_._1.isEnemy)     .filter(_._2.alive).keys)),
         Vector("LVLR",        format(metrics.localValueLostRatio)),
         Vector("LHLR",        format(metrics.localHealthLostRatio),           "Our deaths:",    describeTeam(battle.simulationReport.filter(_._1.isFriendly) .filterNot(_._2.alive).keys)),
         Vector("LHVLR",       format(metrics.localHealthValueLostRatio),      "Foe deaths:",    describeTeam(battle.simulationReport.filter(_._1.isEnemy)    .filterNot(_._2.alive).keys)),

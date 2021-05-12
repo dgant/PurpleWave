@@ -17,9 +17,9 @@ final case class SimulationEventAttack(
   override val to: Pixel = from
   
   override def toString: String =
-    f"$frame: ${describe(shooter)} ${shooter.pixel} strikes ${describe(victim)} ${victim.pixel}} for $damage damage ${
+    f"$frame: ${describe(shooter)} ${shooter.pixel} strikes ${describe(victim)} ${victim.pixel} for $damage damage leaving ${
       if (fatal) "(Fatal)"
-      else f"${if (victim.shieldPointsInitial > 0) f"${victimShields}s + " else ""}${victimHp}hp left"
+      else f"${if (victim.shieldPointsInitial > 0) f"$victimShields shields + " else ""}$victimHp hp"
     }"
   
   override def draw() {

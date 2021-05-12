@@ -33,7 +33,7 @@ object BehaviorFight extends SimulacrumBehavior {
       if (false) {
         // TODO: Kite
       } else {
-        simulacrum.sleep(simulacrum.simulation.resolution)
+        simulacrum.sleep(Math.min(simulacrum.cooldownLeft, simulacrum.simulation.resolution))
       }
     } else if (simulacrum.canMove) {
       // TODO: Find walkable firing pixel (that's still in range)

@@ -47,7 +47,7 @@ class Configuration {
   var avatarBattleDistancePixels    = 32.0 * 6.0
   var battleHysteresisFrames        = Seconds(6)()
   var simulationFrames              = Seconds(15)()
-  var simulationResolution          = 6
+  var simulationResolution          = 8
   var simulationBonusTankRange      = 64.0
   var simulationDamageValueRatio    = 0.1
   

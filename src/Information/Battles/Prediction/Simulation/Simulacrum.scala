@@ -2,10 +2,12 @@ package Information.Battles.Prediction.Simulation
 
 import Lifecycle.With
 import Mathematics.Points.Pixel
+import Mathematics.PurpleMath
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{CombatUnit, UnitInfo}
 import ProxyBwapi.UnitTracking.{UnorderedBuffer, Visibility}
+import Utilities.Forever
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -133,7 +135,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
         if (tweenFramesLeft > 0) {
           tweenFramesDone += 1
           tweenFramesLeft -= 1
-          //TODO: Account for adjusted paths from eg. moving around obstacles
+          // TODO: Account for adjusted paths from eg. moving around obstacles
           simulation.grid.tryMove(this, if (tweenFramesLeft == 0) tweenGoal else tweenFrom.project(tweenGoal, topSpeed * tweenFramesDone))
         }
       }
@@ -150,7 +152,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
 
   @inline def tween(to: Pixel, frames: Int, reason: Option[String] = None): Unit = {
     if (simulation.prediction.logSimulation) {
-      addEvent(SimulationEventMove(this, to, frames))
+      addEvent(SimulationEventMove(this, to, frames, reason))
     }
     // TODO: Some units can move 'n' shoot
     val finalFrames = Math.max(1, frames)
@@ -162,14 +164,16 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     tweenFramesLeft = tweenFramesDone
   }
   @inline def tween(to: Pixel, reason: Option[String]): Unit = {
-    tween(to, (pixelDistanceCenter(to) / topSpeedPossible).toInt, reason)
+    tween(to, Math.max(1, PurpleMath.nanToN(pixelDistanceCenter(to) / topSpeedPossible, Forever())).toInt, reason)
   }
   @inline def tween(to: Pixel): Unit = {
     tween(to, None)
   }
 
   @inline def sleep(frames: Int, reason: Option[String] = None): Unit = {
-    // TODO: If logging, add event
+    if (simulation.prediction.logSimulation) {
+      addEvent(SimulationEventSleep(this, frames, reason))
+    }
     cooldownLeft = Math.max(cooldownLeft, frames)
     cooldownMoving = Math.max(cooldownMoving, frames)
   }
@@ -197,13 +201,11 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
       victim.valueReceived += valueKill
     }
     if (simulation.prediction.logSimulation) {
-      val buildEvent = () => SimulationEventAttack(
+      addEvent(SimulationEventAttack(
         this,
         victim,
         damageToHitPoints + damageToShields,
-        victim.hitPoints <= 0)
-      addEvent(buildEvent())
-      victim.addEvent(buildEvent())
+        victim.hitPoints <= 0))
     }
   }
 

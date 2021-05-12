@@ -141,13 +141,17 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   }
 
   @inline def doBehavior(newBehavior: SimulacrumBehavior): Unit = {
-    // TODO: If logging, add event
+    if (simulation.prediction.logSimulation) {
+      addEvent(SimulationEventBehavior(this, behavior, newBehavior))
+    }
     behavior = newBehavior
     act()
   }
 
   @inline def tween(to: Pixel, frames: Int, reason: Option[String] = None): Unit = {
-    // TODO: If logging, add event
+    if (simulation.prediction.logSimulation) {
+      addEvent(SimulationEventMove(this, to, frames))
+    }
     // TODO: Some units can move 'n' shoot
     val finalFrames = Math.max(1, frames)
     cooldownLeft = Math.max(cooldownLeft, finalFrames)
@@ -192,20 +196,16 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
       valueDealt += valueKill
       victim.valueReceived += valueKill
     }
-    // TODO: If logging, add event
-    /*
-    val buildEvent = () => SimulationEventAttack(
-      simulation.prediction.frames,
-      this,
-      victim,
-      damageToHitPoints + damageToShields,
-      victim.hitPoints <= 0
-    )
-
-    addEvent(buildEvent)
-    victim.addEvent(buildEvent)
-    */
+    if (simulation.prediction.logSimulation) {
+      val buildEvent = () => SimulationEventAttack(
+        this,
+        victim,
+        damageToHitPoints + damageToShields,
+        victim.hitPoints <= 0)
+      addEvent(buildEvent())
+      victim.addEvent(buildEvent())
+    }
   }
 
-  @inline private def addEvent(event: () => SimulationEvent) { events += event() }
+  @inline private def addEvent(event: SimulationEvent) { events += event }
 }

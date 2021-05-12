@@ -30,7 +30,7 @@ final class Simulation {
     simulacra.foreach(_.act())
     simulacra.foreach(_.update())
     prediction.simulationFrames += 1
-    prediction.simulationComplete ||= prediction.simulationFrames >= 24 * 10
+    prediction.simulationComplete ||= prediction.simulationFrames >= With.configuration.simulationFrames
     prediction.simulationComplete ||= ! simulacraOurs.exists(_.alive)
     prediction.simulationComplete ||= ! simulacraEnemy.exists(_.alive)
     prediction.simulationComplete ||= ! simulacra.exists(s => s.alive && s.behavior.fighting)
@@ -61,4 +61,6 @@ final class Simulation {
   def simulacra       : Seq[Simulacrum] = realUnits.view.map(_.simulacrum)
   def simulacraOurs   : Seq[Simulacrum] = realUnitsOurs.view.map(_.simulacrum)
   def simulacraEnemy  : Seq[Simulacrum] = realUnitsEnemy.view.map(_.simulacrum)
+  def simulacraAlliesOf(sim: Simulacrum): Seq[Simulacrum] = (if (sim.isFriendly) simulacraOurs else simulacraEnemy).filterNot(_ == sim)
+  def simulacraEnemiesOf(sim: Simulacrum): Seq[Simulacrum] = if (sim.isFriendly) simulacraEnemy else simulacraOurs
 }

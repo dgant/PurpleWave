@@ -33,7 +33,7 @@ object ShowBattles extends View {
   def format(value: Double): String = "%1.2f".format(value)
 
   def describeTeam(units: Iterable[UnitInfo]): String = {
-    units.groupBy(_.unitClass).toVector.sortBy( - _._2.size).map(p => p._2.size + " " + p._1).mkString(", ")
+    units.groupBy(_.unitClass).toVector.sortBy( - _._2.size).map(p => f"${p._2.size} ${p._1.toString.take(4)}").mkString(", ")
   }
 
   def renderBattleScreen(battle: BattleLocal) {
@@ -41,17 +41,15 @@ object ShowBattles extends View {
     val x = 5
     battle.simulationCheckpoints.lastOption.foreach(metrics => {
       DrawScreen.table(x, 4 * barHeight, Vector(
-        Vector("Score",       format(battle.judgement.get.scoreFinal),        "Survive:"),
-        Vector("Target",      format(battle.judgement.get.scoreTarget),       With.self.name,   describeTeam(battle.simulationReport.filter(_._1.isFriendly) .filter(_._2.alive).keys)),
-        Vector("LVLR",        format(metrics.localValueLostRatio),            With.enemy.name,  describeTeam(battle.simulationReport.filter(_._1.isEnemy)    .filter(_._2.alive).keys)),
-        Vector("LHLR",        format(metrics.localHealthLostRatio)),
-        Vector("LHVLR",       format(metrics.localHealthValueLostRatio),     "Die:"),
-        Vector("RLVLN",       format(metrics.ratioLocalValueLostNet),         With.self.name,   describeTeam(battle.simulationReport.filter(_._1.isFriendly) .filterNot(_._2.alive).keys)),
-        Vector("RLHLN",       format(metrics.ratioLocalHealthLostNet),        With.enemy.name,  describeTeam(battle.simulationReport.filter(_._1.isEnemy)    .filterNot(_._2.alive).keys)),
-        Vector("RLHVLN",      format(metrics.ratioLocalHealthValueLostNet)),
-        Vector("",            "",                                             "Duration",       metrics.framesIn / 24 + "s"),
-        Vector("Confidence",  format(battle.judgement.get.confidence),        "Metrics",        battle.simulationCheckpoints.size.toString)
-      ))
+        Vector("Score",       format(battle.judgement.get.scoreFinal),        "Our survivors:", describeTeam(battle.simulationReport.filter(_._1.isFriendly) .filter(_._2.alive).keys)),
+        Vector("Target",      format(battle.judgement.get.scoreTarget),       "Foe survivors:", describeTeam(battle.simulationReport.filter(_._1.isFriendly) .filter(_._2.alive).keys)),
+        Vector("LVLR",        format(metrics.localValueLostRatio)),
+        Vector("LHLR",        format(metrics.localHealthLostRatio),           "Our deaths:",    describeTeam(battle.simulationReport.filter(_._1.isFriendly) .filterNot(_._2.alive).keys)),
+        Vector("LHVLR",       format(metrics.localHealthValueLostRatio),      "Foe deaths:",    describeTeam(battle.simulationReport.filter(_._1.isEnemy)    .filterNot(_._2.alive).keys)),
+        Vector("RLVLN",       format(metrics.ratioLocalValueLostNet)),
+        Vector("RLHLN",       format(metrics.ratioLocalHealthLostNet),        f"${metrics.framesIn / 24} second duration"),
+        Vector("RLHVLN",      format(metrics.ratioLocalHealthValueLostNet),   f"${battle.simulationCheckpoints.size} metrics checkpoints"),
+        Vector("Confidence",  format(battle.judgement.get.confidence))))
     })
 
     val graphWidth = 82

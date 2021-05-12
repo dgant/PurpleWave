@@ -3,25 +3,29 @@ package Information.Battles.Prediction.Simulation
 import Debugging.Visualizations.Rendering.DrawMap
 import Mathematics.Points.Pixel
 
-case class SimulationEventAttack(
-                                  frame   : Int,
-                                  shooter : Simulacrum,
-                                  victim  : Simulacrum,
-                                  damage  : Int,
-                                  fatal   : Boolean)
-    extends SimulationEvent {
+final case class SimulationEventAttack(
+  shooter : Simulacrum,
+  victim  : Simulacrum,
+  damage  : Int,
+  fatal   : Boolean)
+    extends SimulationEvent(shooter) {
   
-  private val pixel = victim.pixel
+  private val victimPixel = victim.pixel
+  private val victimShields = victim.shieldPoints
+  private val victimHp = victim.hitPoints
+
+  override val to: Pixel = from
   
-  override def toString: String = f"$frame: ${describe(shooter)} ${shooter.pixel} strikes ${describe(victim)} ${victim.pixel}} for $damage damage ${if (fatal) "(Fatal)" else ""}"
+  override def toString: String =
+    f"$frame: ${describe(shooter)} ${shooter.pixel} strikes ${describe(victim)} ${victim.pixel}} for $damage damage ${
+      if (fatal) "(Fatal)"
+      else f"${if (victim.shieldPointsInitial > 0) f"${victimShields}s + " else ""}${victimHp}hp left"
+    }"
   
   override def draw() {
     val size = 5
     val color = victim.realUnit.player.colorBright
-    DrawMap.line(pixel.add(-5, -5), pixel.add(5, 5),  color)
-    DrawMap.line(pixel.add(5, -5),  pixel.add(-5, 5), color)
+    DrawMap.line(victimPixel.add(-5, -5), victimPixel.add(5, 5),  color)
+    DrawMap.line(victimPixel.add(5, -5),  victimPixel.add(-5, 5), color)
   }
-
-  override val from: Pixel = shooter.pixel
-  override val to: Pixel = shooter.pixel
 }

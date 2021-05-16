@@ -17,6 +17,7 @@ class PerformanceMonitor {
   var framesOverShort = 0
   var framesOver1000  = 0
   var framesOver10000 = 0
+  var lastTaskWarningFrame = -1
 
   // The tradeoff here is between using System.currentTimeMillis and System.nanoTime
   // https://www.geeksforgeeks.org/java-system-nanotime-vs-system-currenttimemillis/

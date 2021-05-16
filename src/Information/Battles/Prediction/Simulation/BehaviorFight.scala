@@ -1,5 +1,6 @@
 package Information.Battles.Prediction.Simulation
 
+import Micro.Actions.Combat.Targeting.Target
 import Utilities.ByOption
 
 object BehaviorFight extends SimulacrumBehavior {
@@ -9,7 +10,7 @@ object BehaviorFight extends SimulacrumBehavior {
     // If no valid target, pick target
     simulacrum.setTarget(simulacrum.target.filter(t => validTarget(simulacrum, t) && simulacrum.inRangeToAttack(t)).orElse({
       simulacrum.targets.removeIf(t => ! validTarget(simulacrum, t))
-      ByOption.minBy(simulacrum.targets)(e => e.pixelDistanceSquared(simulacrum) + (if (e.unitClass.attacksOrCastsOrDetectsOrTransports) 0 else 320))
+      ByOption.maxBy(simulacrum.targets)(Target.baseAttackerToTargetValue(simulacrum, _))
     }))
 
     // TODO: Retarget when target out of range

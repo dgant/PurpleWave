@@ -3,7 +3,7 @@ package ProxyBwapi.UnitInfo
 import Debugging.Visualizations.Colors
 import Information.Battles.Clustering.BattleCluster
 import Information.Battles.MCRS.MCRSUnit
-import Information.Battles.Prediction.Simulation.{Simulacrum, ReportCard}
+import Information.Battles.Prediction.Simulation.{ReportCard, Simulacrum}
 import Information.Battles.Types.{BattleLocal, Team}
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
@@ -17,7 +17,7 @@ import Micro.Matchups.MatchupAnalysis
 import Micro.Squads.Squad
 import Performance.{Cache, KeyedCache}
 import Planning.Prioritized
-import Planning.UnitMatchers.UnitMatcher
+import Planning.UnitMatchers.{MatchHatchlike, UnitMatcher}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
@@ -78,7 +78,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     lastShieldPoints  = shieldPoints
     lastMatrixPoints  = matrixPoints
     lastCooldown      = cooldownLeft
-    hasEverBeenCompleteHatch ||= complete && is(Zerg.Hatchery)
+    hasEverBeenCompleteHatch ||= complete && is(MatchHatchlike)
     previousPixelIndex = (previousPixelIndex + 1) % previousPixels.length
     previousPixels(previousPixelIndex) = pixel
   }
@@ -209,8 +209,6 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   var cluster: Option[BattleCluster] = _
 
   val targetBaseValue = new Cache(() => Target.getTargetBaseValue(this), 24)
-
-  @inline final def totalHealth: Int = hitPoints + shieldPoints + matrixPoints
   @inline final def armorHealth: Int = armorHealthCache()
   @inline final def armorShield: Int = armorShieldsCache()
   private lazy val armorHealthCache   = new Cache(() => unitClass.armor + unitClass.armorUpgrade.map(player.getUpgradeLevel).getOrElse(0))

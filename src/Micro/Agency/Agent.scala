@@ -123,15 +123,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     updateRidesharing()
     Idle.consider(unit)
   }
-
-  def decreaseImpatience(): Unit = {
-    impatience = Math.max(0, impatience - With.framesSince(lastFrame))
-  }
-
-  def increaseImpatience(): Unit = {
-    impatience += 2 * With.framesSince(lastFrame)
-  }
-
   private def resetState() {
     forces.clear()
     lastPath = None
@@ -140,6 +131,14 @@ class Agent(val unit: FriendlyUnitInfo) {
     tryingToMove = false
     actionsPerformed.clear()
     _rideGoal = None
+  }
+
+  def decreaseImpatience(): Unit = {
+    impatience = Math.max(0, impatience - With.framesSince(lastFrame))
+  }
+
+  def increaseImpatience(): Unit = {
+    impatience += 2 * With.framesSince(lastFrame)
   }
 
   private def followIntent() {

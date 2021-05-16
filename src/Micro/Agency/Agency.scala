@@ -45,7 +45,7 @@ class Agency extends TimedTask {
         if (With.performance.violatedLimit && With.configuration.enablePerformancePauses) {
           val timeAfter = With.performance.frameMs
           val timeDelta = timeAfter - timeBefore
-          With.logger.warn(f"Microing ${unit.unitClass} crossed the ${With.configuration.frameLimitMs} threshold by taking ${timeDelta}ms considering ${agent.actionsPerformed.map(_.name).mkString(", ")}")
+          With.logger.warn(f"Microing ${unit.unitClass} crossed the ${With.configuration.frameLimitMs} threshold by taking ${timeDelta}ms considering ${if (agent.actionsPerformed.isEmpty) agent.lastAction.get else agent.actionsPerformed.map(_.name).mkString(", ")}")
         }
       }
     }

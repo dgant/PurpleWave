@@ -24,7 +24,8 @@ final class UnitTracker {
     val id = bwapiUnit.getID
     if (units(id).isEmpty) {
       bufferHistoric.removeIf(_.id == id)
-      val newUnit = if (bwapiUnit.getPlayer.getID == With.self.id)                    bufferFriendly  .add(new FriendlyUnitInfo(bwapiUnit, id))
+      val newUnit =
+        if (bwapiUnit.getPlayer.getID == With.self.id)                    bufferFriendly  .add(new FriendlyUnitInfo(bwapiUnit, id))
         else if (With.enemies.exists(_.id == bwapiUnit.getPlayer.getID))  bufferEnemy     .add(new ForeignUnitInfo(bwapiUnit, id))
         else                                                              bufferNeutral   .add(new ForeignUnitInfo(bwapiUnit, id))
       units(id) = Some(newUnit)
@@ -42,11 +43,8 @@ final class UnitTracker {
   }
   def onFrame() {
     With.game.getAllUnits.asScala.foreach(u => {
-      val id = u.getID
       // TODO: First remove a unit if its isFriendly/isEnemy/isNeutral status has changed
-      if (units(id).isEmpty) {
-        birth(u)
-      }
+      if (units(u.getID).isEmpty) { birth(u) }
       // TODO: With new unit proxies, update proxy info here
     })
     all.foreach(_.update())

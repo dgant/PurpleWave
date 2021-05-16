@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Combat.Targeting.Filters.{TargetFilter, TargetFilterWhitelist}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.{CombatUnit, FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
 object Target extends {
@@ -59,17 +59,40 @@ object Target extends {
     attacker.matchups.targets.view.map(target => (target, attacker.pixelDistanceEdge(target) / 32d, target.targetBaseValue(), score(attacker, target))).toVector.sortBy(-_._3)
   }
 
+  @inline def framesOutOfTheWay(attacker: CombatUnit, target: CombatUnit): Double = {
+    if (attacker.canMove) Math.max(0, attacker.framesToGetInRange(target) - attacker.cooldownLeft) else 0
+  }
+
+
+  // Used by combat simulation as well, to keep targeting behavior somewhat consistent
+  // Thus the implementation needs to be FAST.
+  @inline final def baseAttackerToTargetValue(attacker: CombatUnit, target: CombatUnit): Double = baseAttackerToTargetValueRaw(
+    baseTargetValue = target.unitClass.subjectiveValue,
+    totalHealth = target.totalHealth,
+    framesOutOfTheWay = framesOutOfTheWay(attacker, target),
+    dpf = 1.0)
+  @inline final def baseAttackerToTargetValueRaw(
+    baseTargetValue: Double,
+    totalHealth: Double,
+    framesOutOfTheWay: Double,
+    dpf: Double = 1.0): Double = (
+    baseTargetValue
+    * dpf
+    / (
+      Math.max(1.0, totalHealth)
+      * Math.max(6.0, framesOutOfTheWay)))
+
   // TODO: Re-inline
   def score(attacker: FriendlyUnitInfo, target: UnitInfo): Double = {
-    val framesOutOfWay = if (attacker.canMove) Math.max(0, attacker.framesToGetInRange(target) - attacker.cooldownLeft) else 0
-    val scoreBasic = baseAttackerToTargetValue(
+    val _framesOutOfWay = framesOutOfTheWay(attacker, target)
+    val scoreBasic = baseAttackerToTargetValueRaw(
       baseTargetValue = target.targetBaseValue(),
       totalHealth = target.totalHealth,
-      framesOutOfTheWay = framesOutOfWay,
+      framesOutOfTheWay = _framesOutOfWay,
       dpf = attacker.dpfOnNextHitAgainst(target))
     val preferences = TargetFilterGroups.filtersPreferred.view.filter(_.appliesTo(attacker)).count(_.legal(attacker, target))
     val preferenceBonus = Math.pow(100, preferences)
-    val threatPenalty = if (With.reaction.sluggishness > 1) framesOutOfWay else {
+    val threatPenalty = if (With.reaction.sluggishness > 1) _framesOutOfWay else {
       val firingPixel = attacker.pixelToFireAt(target)
       // TODO: Do it through argument to pixelToFireAt
       val firingPixelSafer = target.pixel.project(attacker.pixel, attacker.pixelRangeAgainst(target) + attacker.unitClass.dimensionMin + target.unitClass.dimensionMin)
@@ -89,19 +112,6 @@ object Target extends {
     val output = scoreBasic * preferenceBonus / threatPenalty / threatPenalty
     output
   }
-
-  // Used by combat simulation as well, to keep targeting behavior somewhat consistent
-  // Thus the implementation needs to be FAST.
-  @inline final def baseAttackerToTargetValue(
-    baseTargetValue: Double,
-    totalHealth: Double,
-    framesOutOfTheWay: Double,
-    dpf: Double = 1.0): Double = (
-    baseTargetValue
-    * dpf
-    / Math.max(1.0, totalHealth)
-    / Math.max(6.0, framesOutOfTheWay)
-  )
 
   def injury(target: UnitInfo): Double = (target.unitClass.maxTotalHealth - target.totalHealth) / target.unitClass.maxTotalHealth
 

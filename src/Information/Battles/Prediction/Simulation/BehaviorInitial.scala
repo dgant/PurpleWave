@@ -20,7 +20,7 @@ object BehaviorInitial extends SimulacrumBehavior {
       }
     }
     if (simulacrum.unitClass.isWorker) {
-      if (simulacrum.pixel.base.exists(b => b.harvestingArea.contains(simulacrum.pixel) && b.owner == simulacrum.player)) {
+      if (simulacrum.pixel.base.exists(b => b.owner == simulacrum.player && (b.harvestingArea.contains(simulacrum.pixel) || simulacrum.realUnit.gathering || ! simulacrum.visible))) {
         simulacrum.doBehavior(BehaviorGather)
         return
       }

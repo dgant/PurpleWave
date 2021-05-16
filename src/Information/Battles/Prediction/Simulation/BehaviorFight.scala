@@ -7,10 +7,12 @@ object BehaviorFight extends SimulacrumBehavior {
   @inline override def act(simulacrum: Simulacrum): Unit = {
     // Remove target if invalid
     // If no valid target, pick target
-    simulacrum.target = simulacrum.target.filter(validTarget(simulacrum, _)).orElse({
+    simulacrum.setTarget(simulacrum.target.filter(t => validTarget(simulacrum, t) && simulacrum.inRangeToAttack(t)).orElse({
       simulacrum.targets.removeIf(t => ! validTarget(simulacrum, t))
-      ByOption.minBy(simulacrum.targets)(_.pixelDistanceSquared(simulacrum))
-    })
+      ByOption.minBy(simulacrum.targets)(e => e.pixelDistanceSquared(simulacrum) + (if (e.unitClass.attacksOrCastsOrDetectsOrTransports) 0 else 320))
+    }))
+
+    // TODO: Retarget when target out of range
 
     // If no valid target, flee
     if (simulacrum.target.isEmpty) {
@@ -33,11 +35,11 @@ object BehaviorFight extends SimulacrumBehavior {
       if (false) {
         // TODO: Kite
       } else {
-        simulacrum.sleep(Math.min(simulacrum.cooldownLeft, simulacrum.simulation.resolution))
+        simulacrum.sleep(Math.min(simulacrum.cooldownLeft, simulacrum.simulation.resolution), Some("Cooldown"))
       }
     } else if (simulacrum.canMove) {
       // TODO: Find walkable firing pixel (that's still in range)
-      simulacrum.tween(simulacrum.target.get.pixel.project(simulacrum.pixel, distance - range + 2), Some("Approaching target"))
+      simulacrum.tween(simulacrum.pixel.project(target.pixel, distance - range + 2), Some("Approaching target"))
     } else {
       simulacrum.sleep(simulacrum.simulation.resolution, Some("Target out of reach"))
     }

@@ -23,8 +23,7 @@ class Preplacement extends TimedTask {
       .foreach(_.tileArea.tiles.foreach(t => preplacement.place(Fit(t, PreplacementTemplates.walkway))))
     With.geography.bases.foreach(b => preplacement.place(Fit(b.townHallTile, PreplacementTemplates.townhall)))
     With.geography.bases.foreach(b => b.resourcePathTiles.foreach(t => preplacement.place(Fit(t, PreplacementTemplates.walkway))))
-    // Reenable for Terran walls
-    //With.geography.zones.foreach(preplaceWalls)
+    With.geography.zones.foreach(preplaceWalls)
     With.geography.zones.foreach(preplaceZone)
   }
 
@@ -50,7 +49,8 @@ class Preplacement extends TimedTask {
   }
 
   private def preplaceWalls(zone: Zone): Unit = {
-    if (With.self.isTerran) {
+    // DISABLED. Terran walls are too slow to use as-is
+    if (With.self.isTerran && false) {
       val terranWall = PreplaceTerranWall(zone)
       terranWall.foreach(fits.+=)
       terranWall.foreach(preplacement.place)

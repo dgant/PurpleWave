@@ -72,8 +72,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     unitClass = realUnit.unitClass
     pixel = realUnit.pixel
     gridTile = simulation.grid.tiles(pixel.tile.i)
-    gridTile.units.add(this)
-    gridTile.occupancy += unitClass.occupancy
+    gridTile += this
     visible = realUnit.visible
     alive = realUnit.alive
     complete = realUnit.complete
@@ -106,7 +105,6 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     behavior = BehaviorInitial
     target = None
     targets.clear()
-    gridTile = null
     measureHealth = true
     hitPointsInitial = realUnit.hitPoints
     shieldPointsInitial = realUnit.shieldPoints
@@ -150,21 +148,26 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     act()
   }
 
+  @inline def setTarget(targetNew: Option[Simulacrum]): Unit = {
+    if (simulation.prediction.logSimulation && target != targetNew) {
+      addEvent(SimulationEventSwitchTarget(this, target, targetNew))
+    }
+    target = targetNew
+  }
+
   @inline def tween(to: Pixel, frames: Int, reason: Option[String] = None): Unit = {
     if (simulation.prediction.logSimulation) {
-      addEvent(SimulationEventMove(this, to, frames, reason))
+      addEvent(SimulationEventTween(this, to, frames, reason))
     }
-    // TODO: Some units can move 'n' shoot
-    val finalFrames = Math.max(1, frames)
-    cooldownLeft = Math.max(cooldownLeft, finalFrames)
-    cooldownMoving = finalFrames
+    cooldownMoving = PurpleMath.clamp(frames, 1, With.configuration.simulationResolution)
+    cooldownLeft = Math.max(cooldownLeft, cooldownMoving)
     tweenFrom = pixel
     tweenGoal = to
     tweenFramesDone = 0
-    tweenFramesLeft = tweenFramesDone
+    tweenFramesLeft = cooldownMoving
   }
   @inline def tween(to: Pixel, reason: Option[String]): Unit = {
-    tween(to, Math.max(1, PurpleMath.nanToN(pixelDistanceCenter(to) / topSpeedPossible, Forever())).toInt, reason)
+    tween(to, (0.999 + PurpleMath.nanToN(pixelDistanceCenter(to) / topSpeedPossible, Forever())).toInt, reason)
   }
   @inline def tween(to: Pixel): Unit = {
     tween(to, None)

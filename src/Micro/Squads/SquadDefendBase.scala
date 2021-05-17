@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Formations.{FormationAssigned, FormationZone}
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
-import Micro.Actions.Combat.Targeting.Filters.TargetFilterDefend
+import Micro.Targeting.Filters.TargetFilterDefend
 import Micro.Agency.Intention
 import Performance.Cache
 import ProxyBwapi.Races.Zerg

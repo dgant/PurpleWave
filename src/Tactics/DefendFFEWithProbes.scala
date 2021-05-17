@@ -5,7 +5,7 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.Micro.ShowUnitsFriendly
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Micro.Actions.Combat.Targeting.Filters.TargetFilterLeash
+import Micro.Targeting.Filters.TargetFilterLeash
 import Micro.Agency.Intention
 import Planning.Predicates.Strategy.EnemyRecentStrategy
 import Planning.Prioritized

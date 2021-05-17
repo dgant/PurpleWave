@@ -1,6 +1,7 @@
 package Debugging
 
 import java.lang.management.ManagementFactory
+import java.text.DecimalFormat
 import java.util.Calendar
 
 import Debugging.Visualizations.Rendering.DrawScreen
@@ -155,6 +156,31 @@ class Storyteller {
           ShowPerformanceDetails.statusTable(
             ShowPerformanceDetails.sortTasks(
               With.performance.tasks)))))
+
+    val formatterMs = new DecimalFormat("#.###")
+    tell(
+      "Actions:\n"
+      + DrawScreen.tableToString(
+        DrawScreen.padTable(
+          Vector(Vector("Action", "Invocations", "Mean (ms)", "Total (secs)"))
+          ++ With.agents.actionPerformance.toVector.sortBy(- _._2.meanMs).map(p => Vector(
+            p._1.name,
+            p._2.invocations.toString,
+            formatterMs.format(p._2.meanMs),
+            formatterMs.format(p._2.totalMs.toInt / 1000))))))
+    tell(
+      "Pathfinding:\n"
+      + DrawScreen.tableToString(
+        DrawScreen.padTable(
+          Vector(
+            Vector("A* pathfinds:", With.paths.aStarPathfinds.toString),
+            Vector("Over 1ms:", With.paths.aStarOver1ms.toString),
+            Vector("Max ms:", (With.paths.aStarNanosMax / 1e6).toString),
+            Vector("Mean ms:", formatterMs.format(With.paths.aStarNanosTotal / 1e6d / With.paths.aStarPathfinds)),
+            Vector("Path length, max:", With.paths.aStarPathLengthMax.toString),
+            Vector("Path length, mean:", formatterMs.format(With.paths.aStarPathLengthTotal.toDouble / With.paths.aStarPathfinds)),
+            Vector("Tiles explored, max:", With.paths.aStarTilesExploredMax.toString),
+            Vector("Tiles explored, mean:", (With.paths.aStarTilesExploredTotal / With.paths.aStarPathfinds).toString)))))
   }
 
   private def logMemoryUsage(): Unit = {
@@ -172,18 +198,11 @@ class Storyteller {
     logMemoryUsage()
 
     try {
-      val timestamp = Source.fromFile(With.bwapiData.ai + "timestamp.txt").getLines.mkString
-      tell("This copy of PurpleWave was packaged for distribution on " + timestamp)
-    } catch { case exception: Exception =>
-      tell("No deployment timestamp available")
-    }
-
+      tell(f"This copy of PurpleWave was packaged for distribution on ${Source.fromFile(With.bwapiData.ai + "timestamp.txt").getLines.mkString}")
+    } catch { case exception: Exception => tell("No deployment timestamp available") }
     try {
-      val revision = Source.fromFile(With.bwapiData.ai + "revision.txt").getLines.mkString
-      tell("This copy of PurpleWave came from Git revision " + revision)
-    } catch { case exception: Exception =>
-        tell("No deployment Git revision available")
-    }
+      tell(f"This copy of PurpleWave came from Git revision ${Source.fromFile(With.bwapiData.ai + "revision.txt").getLines.mkString}")
+    } catch { case exception: Exception => tell("No deployment Git revision available") }
     tell("JBWAPI autocontinue: " + Main.configuration.getAutoContinue)
     tell("JBWAPI debugConnection: " + Main.configuration.getDebugConnection)
     tell("JBWAPI async: " + Main.configuration.getAsync)
@@ -203,9 +222,7 @@ class Storyteller {
       var rows = new ArrayBuffer[String]()
       (0 until columns.map(_.length).max).foreach(rowIndex => {
         var row: String = ""
-        columns.foreach(column => {
-          if (rowIndex < column.length) row += column(rowIndex)
-        })
+        columns.foreach(column => { if (rowIndex < column.length) row += column(rowIndex) })
         rows += row
      })
     columns.map(_.mkString("\t")).foreach(tell)

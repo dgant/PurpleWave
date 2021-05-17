@@ -1,4 +1,4 @@
-package Micro.Actions.Combat.Targeting.Filters
+package Micro.Targeting.Filters
 
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}

@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Actions.Combat.Targeting.Filters.TargetFilter
+import Micro.Targeting.Filters.TargetFilter
 import Micro.Agency.Commander
 import Planning.UnitMatchers.{MatchTank, MatchWorker}
 import ProxyBwapi.Races.{Protoss, Terran}

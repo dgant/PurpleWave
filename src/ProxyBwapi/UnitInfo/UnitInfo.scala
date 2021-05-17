@@ -11,7 +11,7 @@ import Mathematics.Physics.Force
 import Mathematics.Points._
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Ring
-import Micro.Actions.Combat.Targeting.Target
+import Micro.Targeting.Target
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Matchups.MatchupAnalysis
 import Micro.Squads.Squad

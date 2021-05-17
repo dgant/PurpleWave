@@ -3,7 +3,7 @@ package Micro.Actions.Protoss
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
-import Micro.Actions.Combat.Targeting.Target
+import Micro.Targeting.Target
 import Micro.Actions.Protoss.Carrier._
 import Micro.Agency.Commander
 import ProxyBwapi.Races.{Protoss, Terran}

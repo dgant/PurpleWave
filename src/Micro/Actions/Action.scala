@@ -22,6 +22,7 @@ abstract class Action {
   }
 
   final def act(unit: FriendlyUnitInfo, giveCredit: Boolean): Boolean = {
+    val nanosBefore = System.nanoTime()
     if (( ! requiresReadiness || unit.ready) && allowed(unit)) {
       val previousCredit = unit.agent.lastAction
       if (giveCredit) unit.agent.act(name)
@@ -33,6 +34,12 @@ abstract class Action {
         previousCredit.foreach(unit.agent.act)
       }
     }
+    With.agents.actionPerformance(this) = With.agents.actionPerformance.getOrElse(this, new ActionPerformance)
+    val performance = With.agents.actionPerformance(this)
+    val nanosAfter = System.nanoTime()
+    performance.durationNanos += Math.max(0, nanosAfter - nanosBefore)
+    performance.invocations += 1
+
    unit.unready
   }
 }

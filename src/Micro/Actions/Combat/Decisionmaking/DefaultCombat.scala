@@ -8,8 +8,8 @@ import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Brawl
-import Micro.Actions.Combat.Targeting.Filters.{TargetFilterPotshot, TargetFilterVisibleInRange}
-import Micro.Actions.Combat.Targeting.Target
+import Micro.Targeting.Filters.{TargetFilterPotshot, TargetFilterVisibleInRange}
+import Micro.Targeting.Target
 import Micro.Actions.Commands.Move
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing

@@ -1,8 +1,8 @@
 package Micro.Actions.Combat.Tactics
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Targeting.Filters.TargetFilterPotshot
-import Micro.Actions.Combat.Targeting.Target
+import Micro.Targeting.Filters.TargetFilterPotshot
+import Micro.Targeting.Target
 import Micro.Agency.Commander
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 

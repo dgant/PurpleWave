@@ -4,7 +4,7 @@ import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Actions.Combat.Targeting.Target
+import Micro.Targeting.Target
 import Micro.Agency.Commander
 import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}

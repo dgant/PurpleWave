@@ -1,4 +1,4 @@
-package Micro.Actions.Combat.Targeting.Filters
+package Micro.Targeting.Filters
 
 import Micro.Agency.AnchorMargin
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}

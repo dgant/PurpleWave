@@ -1,6 +1,6 @@
-package Micro.Actions.Combat.Targeting
+package Micro.Targeting
 
-import Micro.Actions.Combat.Targeting.Filters._
+import Micro.Targeting.Filters._
 
 object TargetFilterGroups {
   val filtersRequired = Vector(

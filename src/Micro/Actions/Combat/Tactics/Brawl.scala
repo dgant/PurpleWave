@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Tactics
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Targeting.Target
+import Micro.Targeting.Target
 import Micro.Agency.Commander
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}

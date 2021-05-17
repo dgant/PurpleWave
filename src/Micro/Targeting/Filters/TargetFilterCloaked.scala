@@ -1,4 +1,4 @@
-package Micro.Actions.Combat.Targeting.Filters
+package Micro.Targeting.Filters
 import Lifecycle.With
 import Mathematics.Points.TileRectangle
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}

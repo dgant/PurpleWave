@@ -1,8 +1,8 @@
-package Micro.Actions.Combat.Targeting
+package Micro.Targeting
 
 import Lifecycle.With
 import Mathematics.PurpleMath
-import Micro.Actions.Combat.Targeting.Filters.{TargetFilter, TargetFilterWhitelist}
+import Micro.Targeting.Filters.{TargetFilter, TargetFilterWhitelist}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{CombatUnit, FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption

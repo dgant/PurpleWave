@@ -1,4 +1,4 @@
-package Micro.Actions.Combat.Targeting.Filters
+package Micro.Targeting.Filters
 
 import Information.Geography.Types.Zone
 import Lifecycle.With

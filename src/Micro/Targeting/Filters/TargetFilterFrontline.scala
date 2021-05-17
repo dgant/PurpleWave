@@ -1,6 +1,6 @@
-package Micro.Actions.Combat.Targeting.Filters
+package Micro.Targeting.Filters
 import Mathematics.PurpleMath
-import Micro.Actions.Combat.Targeting.Target
+import Micro.Targeting.Target
 import Planning.UnitMatchers.MatchTank
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}

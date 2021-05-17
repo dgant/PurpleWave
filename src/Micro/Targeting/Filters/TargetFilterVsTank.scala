@@ -1,4 +1,4 @@
-package Micro.Actions.Combat.Targeting.Filters
+package Micro.Targeting.Filters
 import Lifecycle.With
 import Planning.UnitMatchers.MatchTank
 import ProxyBwapi.Races.Terran

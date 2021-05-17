@@ -2,7 +2,7 @@ package Micro.Agency
 
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
-import Micro.Actions.Combat.Targeting.Filters.TargetFilter
+import Micro.Targeting.Filters.TargetFilter
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}

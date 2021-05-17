@@ -7,7 +7,7 @@ import Mathematics.Points.Tile
 import Mathematics.Shapes.Spiral
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
-import Micro.Actions.Combat.Targeting.Target
+import Micro.Targeting.Target
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Planning.UnitMatchers.MatchWorker

@@ -2,7 +2,7 @@ package Micro.Actions.Scouting
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Targeting.Target
+import Micro.Targeting.Target
 import Micro.Agency.Commander
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import bwapi.Race

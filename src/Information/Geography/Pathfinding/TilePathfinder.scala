@@ -13,20 +13,21 @@ trait TilePathfinder {
 
   val stampDefault: Long = Long.MinValue
   var stampCurrent: Long = 0L
+  private var tilesExplored: Long = 0
+
+  // Performance metrics
+  var aStarPathfinds: Long = 0
+  var aStarOver1ms: Long = 0
+  var aStarNanosMax: Long = 0
+  var aStarNanosTotal: Long = 0
+  var aStarPathLengthMax: Long = 0
+  var aStarPathLengthTotal: Long = 0
+  var aStarTilesExploredMax: Long = 0
+  var aStarTilesExploredTotal: Long = 0
 
   def profileDistance(start: Tile, end: Tile): PathfindProfile = new PathfindProfile(start, Some(end))
   private var tiles: Array[TileState] = Array.empty
   private val horizon = new mutable.PriorityQueue[TileState]()(Ordering.by(t => -t.totalCostFloor))
-
-  private def startNextSearch() {
-    if (tiles.isEmpty || stampCurrent == Long.MaxValue) {
-      tiles = With.geography.allTiles.indices.map(i => new TileState(new Tile(i))).toArray
-    }
-    if (stampCurrent == Long.MaxValue) {
-      stampCurrent = stampDefault
-    }
-    stampCurrent += 1
-  }
 
   @inline private final def totalRepulsion(profile: PathfindProfile, tile: Tile): Double = {
     var output = 0.0
@@ -100,11 +101,29 @@ trait TilePathfinder {
   // until I reach the top.
   // Baby I'm A*. --Prince
   def aStar(profile: PathfindProfile): TilePath = {
+    val nanosBefore = System.nanoTime()
+    val output = aStarInner(profile)
+    val nanosDelta = Math.max(0, System.nanoTime() - nanosBefore)
+    val pathLength = output.tiles.map(_.length).getOrElse(0)
+    aStarPathfinds += 1
+    aStarOver1ms += PurpleMath.fromBoolean(nanosDelta > 1e6)
+    aStarNanosMax = Math.max(aStarNanosMax, nanosDelta)
+    aStarNanosTotal += nanosDelta
+    aStarPathLengthMax = Math.max(aStarPathLengthMax, pathLength)
+    aStarPathLengthTotal += pathLength
+    aStarTilesExploredMax = Math.max(aStarTilesExploredMax, tilesExplored)
+    aStarTilesExploredTotal += tilesExplored
+    output
+  }
+  private def aStarInner(profile: PathfindProfile): TilePath = {
     val startTile = profile.start
-
     if ( ! startTile.valid) return failure(startTile)
 
-    startNextSearch()
+    if (tiles.isEmpty || stampCurrent == Long.MaxValue) {
+      tiles = With.geography.allTiles.indices.map(i => new TileState(new Tile(i))).toArray
+    }
+    if (stampCurrent == Long.MaxValue) { stampCurrent = stampDefault }
+    stampCurrent += 1
     profile.updateRepulsion()
     horizon.clear()
     val startTileState = tiles(startTile.i)
@@ -117,9 +136,11 @@ trait TilePathfinder {
     startTileState.setTotalCostFloor(costToEndFloor(profile, startTile))
     startTileState.setPathLength(1)
     horizon += startTileState
+    tilesExplored = 0
 
     while (horizon.nonEmpty) {
 
+      tilesExplored += 1
       val bestTileState = horizon.dequeue()
       val bestTile = bestTileState.tile
       bestTileState.setVisited()

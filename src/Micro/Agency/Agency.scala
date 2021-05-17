@@ -1,6 +1,7 @@
 package Micro.Agency
 
 import Lifecycle.With
+import Micro.Actions.{Action, ActionPerformance}
 import Performance.Tasks.TimedTask
 import Performance.Timer
 
@@ -13,6 +14,8 @@ class Agency extends TimedTask {
   val agentQueue          = new mutable.Queue[Agent]
   val cycleLengths        = new mutable.Queue[Int]
   var lastQueueCompletion = 0
+
+  val actionPerformance = new mutable.HashMap[Action, ActionPerformance]()
 
   override def isComplete: Boolean = agentQueue.isEmpty
 

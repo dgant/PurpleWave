@@ -1,6 +1,6 @@
 package Information.Battles.Prediction.Simulation
 
-import Micro.Actions.Combat.Targeting.Target
+import Micro.Targeting.Target
 import Utilities.ByOption
 
 object BehaviorFight extends SimulacrumBehavior {

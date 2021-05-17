@@ -34,7 +34,7 @@ object ReloadScarabs extends Action {
 
     if (needRefill && canRefill) {
       if (unit.transport.exists(_.pixelDistanceCenter(unit) < 72)) {
-        RequestSafeLanding().consider(unit)
+        RequestSafeLanding(unit)
       } else if (unit.bwapiUnit.getTrainingQueueCount <= PurpleMath.fromBoolean(unit.remainingTrainFrames <= Math.max(With.reaction.agencyMax, With.latency.framesRemaining))) {
         Commander.buildScarab(unit)
       }

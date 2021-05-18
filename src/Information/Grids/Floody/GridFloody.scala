@@ -1,8 +1,11 @@
 package Information.Grids.Floody
 
 import Information.Grids.AbstractGrid
+import Mathematics.Points.Tile
+import Mathematics.Shapes.Ring
 import ProxyBwapi.UnitInfo.{CombatUnit, UnitInfo}
 import ProxyBwapi.UnitTracking.UnorderedBuffer
+import Utilities.ByOption
 
 import scala.collection.mutable
 
@@ -13,11 +16,11 @@ import scala.collection.mutable
   * The grid updates only when either the tile or radius of the source unit changes, or the unit ceases to exist.
   */
 abstract class GridFloody extends AbstractGrid[Int] {
-  private final val units = new mutable.HashMap[UnitInfo, FloodyUnit]()
-  private final val tiles = Array.fill(length)(new UnorderedBuffer[FloodyUnit](12))
-  private final val max = Array.fill(length)(0)
-  @inline final def getUnchecked(i: Int): Int = max(i)
+  @inline final def getUnchecked(i: Int): Int = values(i)
   @inline final override val defaultValue: Int = 0
+  private final val units = new mutable.HashMap[UnitInfo, FloodyUnit]()
+  private final val tiles = Array.fill(length)(new UnorderedBuffer[FloodyTile](12))
+  private final val values = Array.fill(length)(defaultValue)
 
   /**
    * How far out of a unit's radius to continue flooding
@@ -52,11 +55,22 @@ abstract class GridFloody extends AbstractGrid[Int] {
     }
   }
 
-  private final def addUnit(unit: FloodyUnit): Unit = {
-
+  private final def addUnit(floody: FloodyUnit): Unit = {
+    flood(floody).foreach {
+      case (tile, value) =>
+        tiles(tile.i).add(FloodyTile(floody, value))
+        values(tile.i) = Math.max(values(tile.i), value) }
   }
 
-  private final def removeUnit(unit: FloodyUnit): Unit = {
+  private final def removeUnit(floody: FloodyUnit): Unit = {
+    flood(floody).foreach {
+      case (tile, value) =>
+        tiles(tile.i).removeIf(_.unit == floody.unit)
+        values(tile.i) = ByOption.max(tiles(tile.i).view.map(_.value)).getOrElse(defaultValue) }
+  }
 
+  @inline private final def flood(floody: FloodyUnit): Seq[(Tile, Int)] = {
+    val max = floody.radius + margin
+    (1 to max).flatMap(d => Ring.points(d).map(p => (floody.tile.add(p), max - d))).filter(_._1.valid)
   }
 }

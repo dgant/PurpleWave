@@ -1,7 +1,7 @@
 package Information.Geography.Pathfinding
 
 import Information.Geography.Pathfinding.Types.TilePath
-import Information.Grids.Combat.AbstractGridEnemyRange
+import Information.Grids.Floody.GridFloody
 import Lifecycle.With
 import Mathematics.Points.Tile
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -40,7 +40,7 @@ final class PathfindProfile(
     warnIfUnfinalized()
     unit.map( ! _.flying).orElse(canCrossUnwalkable).getOrElse(true)
   }  
-  lazy val threatGrid: AbstractGridEnemyRange = {
+  lazy val threatGrid: GridFloody = {
     if (vulnerableByAir && vulnerableByGround)
       With.grids.enemyRangeAirGround
     else if (vulnerableByAir)

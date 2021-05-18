@@ -44,7 +44,7 @@ abstract class AbstractSearch extends Action {
       .filter(tile =>
         With.grids.lastSeen.framesSince(tile) > boredomFrames
         && With.grids.buildableTerrain.get(tile)
-        && (unit.enemyRangeGrid.get(tile) <= 0 || ( unit.cloaked && ! With.grids.enemyDetection.isDetected(tile.i)))
+        && (unit.enemyRangeGrid.get(tile) <= 0 || ( unit.cloaked && ! tile.enemyDetected))
         && ! unit.matchups.threats.exists(_.inRangeToAttack(unit, tile.pixelCenter))
         && tile.base.forall(base =>
           ! base.owner.isEnemy

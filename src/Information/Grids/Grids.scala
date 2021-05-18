@@ -1,8 +1,8 @@
 
 package Information.Grids
 
-import Information.Grids.Combat.{GridEnemyRangeAir, GridEnemyRangeAirGround, GridEnemyRangeGround}
 import Information.Grids.Construction._
+import Information.Grids.Floody._
 import Information.Grids.Versioned.{GridVersionedBoolean, GridVersionedDouble, GridVersionedInt}
 import Information.Grids.Movement._
 import Information.Grids.Spells.GridPsionicStorm

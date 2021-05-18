@@ -193,19 +193,19 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     valid && visibleToEnemyUnchecked
   }
   @inline def visibleToEnemyUnchecked: Boolean = {
-    With.grids.enemyVision.isSetUnchecked(i)
+    With.grids.enemyVision.inRangeUnchecked(i)
   }
   @inline def friendlyDetected: Boolean = {
     valid && friendlyDetectedUnchecked
   }
   @inline def friendlyDetectedUnchecked: Boolean = {
-    With.grids.friendlyDetection.isSetUnchecked(i)
+    With.grids.friendlyDetection.inRangeUnchecked(i)
   }
   @inline def enemyDetected: Boolean = {
     valid && enemyDetectedUnchecked
   }
   @inline def enemyDetectedUnchecked: Boolean = {
-    With.grids.enemyDetection.isDetectedUnchecked(i)
+    With.grids.enemyDetection.inRangeUnchecked(i)
   }
   @inline def visibleBwapi: Boolean = {
     With.game.isVisible(x, y)

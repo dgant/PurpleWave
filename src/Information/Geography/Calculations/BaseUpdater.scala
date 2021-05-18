@@ -12,7 +12,7 @@ object BaseUpdater {
     if (base.townHallTile.visibleUnchecked) {
       base.lastScoutedFrame = With.frame
     }
-    if (With.grids.enemyVision.isSet(base.townHallTile)) {
+    if (With.grids.enemyVision.inRange(base.townHallTile)) {
       base.lastScoutedByEnemyFrame = With.frame
     }
 

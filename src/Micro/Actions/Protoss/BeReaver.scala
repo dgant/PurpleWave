@@ -37,7 +37,6 @@ object BeReaver extends Action {
     }
   }
 
-  val maxSafeEnemyGroundRange = With.grids.enemyRangeGround.addedRange - 1
   def considerParadropping(unit: FriendlyUnitInfo) {
     if ( unit.transport.isDefined)
     if (unit.agent.shouldEngage) Target.choose(unit)
@@ -51,7 +50,7 @@ object BeReaver extends Action {
     var shouldDrop = false
     shouldDrop = shouldDrop || (unit.matchups.targetsInRange.exists(MatchWorker) && unit.matchups.threats.forall(t => MatchWorker(t) || (! t.canMove && t.pixelsToGetInRange(unit) > 32)))
     shouldDrop = shouldDrop || here.groundPixels(destinationGround) < 32
-    shouldDrop = shouldDrop || unit.inRangeToAttack(target) && With.grids.enemyRangeGround.get(here) <= maxSafeEnemyGroundRange && ! unit.matchups.threats.exists(t => t.is(Terran.SiegeTankSieged) && t.inRangeToAttack(unit, here.pixelCenter))
+    shouldDrop = shouldDrop || unit.inRangeToAttack(target) && ! With.grids.enemyRangeGround.inRange(here) && ! unit.matchups.threats.exists(t => t.is(Terran.SiegeTankSieged) && t.inRangeToAttack(unit, here.pixelCenter))
     if (shouldDrop) {
       Commander.attack(unit)
       return
@@ -64,7 +63,7 @@ object BeReaver extends Action {
     var path = NoPath.value
     Seq(
       Some(With.grids.enemyRangeGround.defaultValue),
-      Some(maxSafeEnemyGroundRange),
+      Some(With.grids.enemyRangeGround.margin),
       None).foreach(maximumThreat =>
       if ( ! path.pathExists) {
         val profile = new PathfindProfile(unit.tile)

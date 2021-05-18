@@ -43,7 +43,7 @@ abstract class GridFloody extends AbstractGrid[Int] {
   protected def range(unit: UnitInfo): Int
 
   final override def update(): Unit = {
-    units.view.filterNot(f => f._1.alive && f._1.likelyStillThere && include(f._1)).toVector.foreach(f => removeUnit(f._2))
+    units.view.filterNot(f => f._1.likelyStillThere && include(f._1)).toVector.foreach(f => removeUnit(f._2))
   }
 
   private final def shouldInclude(unit: UnitInfo): Boolean = unit.alive && unit.likelyStillThere && include(unit)

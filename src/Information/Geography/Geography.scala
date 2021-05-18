@@ -116,10 +116,6 @@ class Geography extends TimedTask {
   
   override def onRun(budgetMs: Long) {
     if (With.frame == 0) {
-      // Grid tasks update for the first time after Geography because many need to understand zones
-      // But for us to initialize zones properly, we need the unit grid ready.
-      With.grids.units.initialize()
-      With.grids.units.update()
       With.grids.walkableTerrain.initialize()
       With.grids.walkableTerrain.update()
       With.grids.unwalkableUnits.initialize()

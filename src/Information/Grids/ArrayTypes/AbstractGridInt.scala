@@ -3,9 +3,9 @@ package Information.Grids.ArrayTypes
 import Mathematics.Points.Tile
 
 class AbstractGridInt extends AbstractGridArray[Int] {
-  
+
+  override val defaultValue: Int = 0
   override protected var values: Array[Int] = Array.fill(length)(defaultValue)
-  override def defaultValue:Int = 0
   override def repr(value: Int): String = value.toString
   
   def add(i: Int,                 value: Int) { if (valid(i)) values(i) += value }

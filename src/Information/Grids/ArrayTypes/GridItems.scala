@@ -8,7 +8,7 @@ import scala.collection.mutable.ArrayBuffer
 class GridItems[T] extends AbstractGridArray[mutable.ArrayBuffer[T]] {
 
   override protected var values: Array[ArrayBuffer[T]] = Array.fill(length)(defaultValue)
-  override def defaultValue: mutable.ArrayBuffer[T] = new mutable.ArrayBuffer
+  final override val defaultValue: mutable.ArrayBuffer[T] = new mutable.ArrayBuffer
   override def repr(value: mutable.ArrayBuffer[T]): String  = value.size.toString
   
   private val populatedTiles = new mutable.ArrayBuffer[Int]()

@@ -1,8 +1,8 @@
-package Information.Grids.Disposable
+package Information.Grids.Versioned
 
 import Information.Grids.ArrayTypes.AbstractGridVersionedValue
 
-class GridDisposableDouble extends AbstractGridVersionedValue[Double] {
+class GridVersionedDouble extends AbstractGridVersionedValue[Double] {
   override protected var values: Array[Double] = Array.fill(length)(defaultValue)
-  override def defaultValue: Double = 0.0
+  override val defaultValue: Double = 0.0
 }

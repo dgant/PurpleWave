@@ -17,7 +17,7 @@ class FormationZone(zone: Zone, edge: Edge) {
   def form(units: Seq[FriendlyUnitInfo]): FormationAssigned = {
     if (units.isEmpty) return new FormationAssigned(Map.empty)
 
-    val occupied = With.grids.disposableBoolean1()
+    val occupied = With.grids.disposableBoolean()
     val slots    = units.map(new FormationSlot(_))
     val chokeEnd = edge.pixelCenter.project(zone.exitNow.map(_.pixelTowards(zone)).getOrElse(zone.centroid.pixelCenter), 300)
 

@@ -5,7 +5,7 @@ import Lifecycle.With
 
 class GridBuildableTownHall extends AbstractGridBoolean {
   
-  override def defaultValue: Boolean = true
+  final override val defaultValue: Boolean = true
   
   override def onInitialization() {
     reset()

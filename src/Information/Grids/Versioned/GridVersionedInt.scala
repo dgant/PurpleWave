@@ -1,8 +1,8 @@
-package Information.Grids.Disposable
+package Information.Grids.Versioned
 
 import Information.Grids.ArrayTypes.AbstractGridVersionedValue
 
-class GridDisposableInt extends AbstractGridVersionedValue[Int] {
+class GridVersionedInt extends AbstractGridVersionedValue[Int] {
   override protected var values: Array[Int] = Array.fill(length)(defaultValue)
-  override def defaultValue: Int = 0
+  override val defaultValue: Int = 0
 }

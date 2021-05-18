@@ -37,7 +37,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
   private var _morphing               : Boolean = _
   private var _constructing           : Boolean = _
   private var _repairing              : Boolean = _
-  private var _researching            : Boolean = _
+  private var _teching            : Boolean = _
   private var _training               : Boolean = _
   private var _upgrading              : Boolean = _
   private var _beingConstructed       : Boolean = _
@@ -109,7 +109,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
   @inline final def morphing                : Boolean           = _morphing
   @inline final def constructing            : Boolean           = _constructing
   @inline final def repairing               : Boolean           = _repairing
-  @inline final def teching                 : Boolean           = _researching // TODO: Resolve name
+  @inline final def teching                 : Boolean           = _teching
   @inline final def training                : Boolean           = _training
   @inline final def upgrading               : Boolean           = _upgrading
   @inline final def beingConstructed        : Boolean           = _beingConstructed
@@ -163,8 +163,8 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
       changeVisibility(Visibility.Visible)
       _player                 = Players.get(bwapiUnit.getPlayer)
       _unitClass              = UnitClasses.get(bwapiUnit.getType)
-      changePixel(new Pixel(bwapiUnit.getPosition))
-      _pixelObserved          = _pixel
+      _pixelObserved          = new Pixel(bwapiUnit.getPosition)
+      changePixel(_pixelObserved)
       _tileTopLeft            = new Tile(bwapiUnit.getTilePosition) // Set this via changePixel()
       _complete               = bwapiUnit.isCompleted
       _burrowed               = bwapiUnit.isBurrowed
@@ -182,7 +182,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
       _morphing               = bwapiUnit.isMorphing
       _constructing           = _unitClass.isWorker && bwapiUnit.isConstructing
       _repairing              = bwapiUnit.isRepairing
-      _researching            = bwapiUnit.isResearching
+      _teching                = bwapiUnit.isResearching
       _training               = bwapiUnit.isTraining
       _upgrading              = bwapiUnit.isUpgrading
       _beingConstructed       = bwapiUnit.isBeingConstructed
@@ -197,7 +197,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
       _underDisruptionWeb     = bwapiUnit.isUnderDisruptionWeb
       _underStorm             = bwapiUnit.isUnderStorm
       _hasNuke                = bwapiUnit.hasNuke
-      _resourcesInitial       = bwapiUnit.getInitialResources // TODO: Only get once? Or maybe faster to just get every time and not check
+      _resourcesInitial       = bwapiUnit.getInitialResources
       _resourcesLeft          = bwapiUnit.getResources
       _cooldownRaw            = Math.max(bwapiUnit.getAirWeaponCooldown, bwapiUnit.getGroundWeaponCooldown) // TODO: Calculate up front for each unit?
       _cooldownSpell          = bwapiUnit.getSpellCooldown
@@ -222,7 +222,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
         _matrixPoints         = bwapiUnit.getDefenseMatrixPoints
         _energy               = bwapiUnit.getEnergy
         _scarabs              = bwapiUnit.getScarabCount
-        _techProducing        = if (_researching) ConvertBWAPI.tech(bwapiUnit.getTech) else None
+        _techProducing        = if (_teching) ConvertBWAPI.tech(bwapiUnit.getTech) else None
         _upgradeProducing     = if (_upgrading) ConvertBWAPI.upgrade(bwapiUnit.getUpgrade) else None
         _trainingQueue        = if (training) (0 until bwapiUnit.getTrainingQueueCount).map(i => UnitClasses.get(bwapiUnit.getTrainingQueueAt(i))) else Seq.empty
         _interceptorCount     = if (unitClass == Protoss.Carrier) bwapiUnit.getInterceptorCount else 0
@@ -243,9 +243,13 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
     }
   }
 
-  @inline final def changePixel(newPixel: Pixel): Unit = {
-    _pixel = newPixel
-    _tile  = newPixel.tile
+  @inline final def changePixel(pixelNew: Pixel): Unit = {
+    val tileNew = pixelNew.tile
+    if (_tile != tileNew) {
+
+    }
+    _pixel = pixelNew
+    _tile  = pixelNew.tile
     // TODO: Track previous values
     // TODO: On position change, update grids
   }

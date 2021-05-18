@@ -7,6 +7,8 @@ import Mathematics.Shapes.Spiral
 
 class GridGroundDistance(initialOrigins: Tile*) extends AbstractGridInt {
 
+  override val defaultValue: Int = Int.MaxValue
+
   def origins: Seq[Tile] = initialOrigins
 
   @inline final def walkable(tile: Tile): Boolean = { tile.valid && (With.grids.walkable.get(tile) || (With.frame < 9 && With.units.ours.exists(_.tileArea.contains(tile)))) }
@@ -60,5 +62,4 @@ class GridGroundDistance(initialOrigins: Tile*) extends AbstractGridInt {
       distance += 1
     }
   }
-  override def defaultValue: Int = Int.MaxValue
 }

@@ -6,7 +6,7 @@ import Mathematics.Points.Tile
 abstract class AbstractGridVersioned extends AbstractGridInt {
 
   var version: Int = 0
-  override val defaultValue: Int = -1
+  override final val defaultValue: Int = -1
   reset()
   def updateVersion() { version = Math.max(1 + version, With.frame) }
 

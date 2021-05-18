@@ -7,10 +7,6 @@ abstract class AbstractGridVersionedValue[T] extends AbstractGridArray[T] {
     override protected def updateCells(): Unit = {}
   }
 
-  @inline final override def get(i: Int): T = {
-    if (framestamps.isSet(i) && i < length) values(i) else defaultValue
-  }
-
   @inline final override def getUnchecked(i: Int): T = {
     if (framestamps.isSetUnchecked(i)) values(i) else defaultValue
   }

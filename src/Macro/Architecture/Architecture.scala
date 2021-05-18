@@ -1,7 +1,7 @@
 package Macro.Architecture
 
 import Information.Geography.Types.Zone
-import Information.Grids.Disposable.GridDisposableInt
+import Information.Grids.Versioned.GridVersionedInt
 import Lifecycle.With
 import Macro.Architecture.PlacementRequests.PlacementRequest
 import Mathematics.Points.{Tile, TileRectangle}
@@ -15,8 +15,8 @@ class Architecture {
   val ungassable        : GridExclusion = new GridExclusion
   val untownhallable    : GridExclusion = new GridExclusion
   val creep             : GridExclusion = new GridExclusion
-  val powered2Height    : GridDisposableInt = new GridDisposableInt { override def defaultValue: Int = Forever() }
-  val powered3Height    : GridDisposableInt = new GridDisposableInt { override def defaultValue: Int = Forever() }
+  val powered2Height    : GridVersionedInt = new GridVersionedInt { override val defaultValue: Int = Forever() }
+  val powered3Height    : GridVersionedInt = new GridVersionedInt { override val defaultValue: Int = Forever() }
   var accessibleZones   : Vector[Zone] = Vector.empty
     
   def usuallyNeedsMargin(unitClass: UnitClass): Boolean = {

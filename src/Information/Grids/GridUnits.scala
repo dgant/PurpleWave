@@ -1,24 +1,27 @@
 package Information.Grids
 
+import Lifecycle.With
 import Mathematics.Points.Tile
 import ProxyBwapi.UnitInfo.UnitInfo
 import ProxyBwapi.UnitTracking.UnorderedBuffer
 
 import scala.collection.mutable
 
-class GridUnits extends AbstractGrid[Traversable[UnitInfo]] {
-  @inline final override val defaultValue: Traversable[UnitInfo] = Traversable.empty
-  @inline final def getUnchecked(i: Int): Traversable[UnitInfo] = values(i)
+final class GridUnits extends AbstractTypedGrid[Traversable[UnitInfo]] {
+  @inline override val defaultValue: Traversable[UnitInfo] = Traversable.empty
+  @inline def getUnchecked(i: Int): Traversable[UnitInfo] = values(i)
   private final val values = Array.fill(length)(new UnorderedBuffer[UnitInfo](12))
   private final val units = new mutable.HashMap[UnitInfo, Tile]()
+  override def repr(value: Traversable[UnitInfo]): String = value.size.toString
 
-  final override def update(): Unit = {
+  override def update(): Unit = {
     units.view.filterNot(_._1.likelyStillThere).toVector.foreach(u => removeUnit(u._1, u._2))
+    With.units.all.filter(shouldInclude).foreach(updateUnit)
   }
 
-  private final def shouldInclude(unit: UnitInfo): Boolean = unit.alive && unit.likelyStillThere
+  private def shouldInclude(unit: UnitInfo): Boolean = unit.alive && unit.likelyStillThere
 
-  final def updateUnit(unit: UnitInfo): Unit = {
+  def updateUnit(unit: UnitInfo): Unit = {
     val tileOld = units.get(unit)
     if (tileOld.isDefined) {
       if (unit.tile != tileOld.get) {
@@ -30,13 +33,13 @@ class GridUnits extends AbstractGrid[Traversable[UnitInfo]] {
     }
   }
 
-  private final def addUnit(unit: UnitInfo): Unit = {
+  private def addUnit(unit: UnitInfo): Unit = {
     val tile = unit.tile
     values(tile.i).add(unit)
     units(unit) = tile
   }
 
-  private final def removeUnit(unit: UnitInfo, tile: Tile): Unit = {
+  private def removeUnit(unit: UnitInfo, tile: Tile): Unit = {
     values(tile.i).remove(unit)
     units.remove(unit)
   }

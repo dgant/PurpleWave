@@ -89,7 +89,7 @@ trait Squad extends Prioritized {
   val anchorMargin = new Cache(() => AnchorMargin.marginOf(units))
   def leader(unitClass: UnitClass): Option[FriendlyUnitInfo] = leaders().get(unitClass)
   private val leaders: Cache[Map[UnitClass, FriendlyUnitInfo]] = new Cache(() =>
-    units.groupBy(_.unitClass).map(group => (group._1, group._2.maxBy(unit => unit.id + 10000 * unit.squadAge)))
+    units.groupBy(_.unitClass).map(group => (group._1, group._2.maxBy(unit => 100000L * unit.squadAge - unit.frameDiscovered)))
   )
 
   override def toString: String = ToString(this)

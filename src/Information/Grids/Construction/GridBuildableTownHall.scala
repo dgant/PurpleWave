@@ -1,9 +1,9 @@
 package Information.Grids.Construction
 
-import Information.Grids.ArrayTypes.AbstractGridBoolean
+import Information.Grids.ArrayTypes.AbstractGridArrayBoolean
 import Lifecycle.With
 
-class GridBuildableTownHall extends AbstractGridBoolean {
+class GridBuildableTownHall extends AbstractGridArrayBoolean {
   
   final override val defaultValue: Boolean = true
   

@@ -4,7 +4,7 @@ import Information.Grids.ArrayTypes.AbstractGridVersioned
 import Lifecycle.With
 import ProxyBwapi.Races.{Terran, Zerg}
 
-class GridUnwalkableUnits extends AbstractGridVersioned {
+final class GridUnwalkableUnits extends AbstractGridVersioned {
   
   override protected def updateCells() {
     With.units.all

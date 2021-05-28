@@ -1,9 +1,9 @@
 package Performance.TaskQueue
-import Information.Grids.AbstractGrid
+import Information.Grids.AbstractTypedGrid
 import Lifecycle.With
 import Performance.Tasks._
 
-class GridTask[T](name: String, grid: AbstractGrid[T]) extends SimpleTask(grid.update) {
+class GridTask[T](name: String, grid: AbstractTypedGrid[T]) extends SimpleTask(grid.update) {
   withName(f"Grid$name")
 }
 

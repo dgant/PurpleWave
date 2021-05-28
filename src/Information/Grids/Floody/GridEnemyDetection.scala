@@ -2,7 +2,7 @@ package Information.Grids.Floody
 
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class GridEnemyDetection extends GridFloody {
+final class GridEnemyDetection extends AbstractGridFloody {
 
   override protected def include(unit: UnitInfo): Boolean = unit.complete && unit.unitClass.isDetector && ! unit.blind && unit.isEnemy
 

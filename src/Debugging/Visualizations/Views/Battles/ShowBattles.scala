@@ -71,7 +71,7 @@ object ShowBattles extends View {
 
   def renderBattleMap(battle: BattleLocal) {
     val shouldFight = battle.judgement.get.shouldFight
-    battle.units.foreach(unit => {
+    battle.units.view.filter(_.simulacrum.initialized).foreach(unit => {
       val sim = unit.simulacrum
       val color = if (sim.player.isUs == shouldFight) sim.player.colorNeon else sim.player.colorDark
       val distanceTotal = sim.events.view.map(e => e.from.pixelDistance(e.to)).sum

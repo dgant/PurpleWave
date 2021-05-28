@@ -10,10 +10,9 @@ import Debugging.Visualizations.Views.Performance.{ShowPerformanceDetails, ShowP
 import Debugging.Visualizations.Views.Planning.{ShowStatus, _}
 import Debugging.Visualizations.Views.{ShowClock, ShowStoryteller, View}
 import Lifecycle.With
-import bwapi.Text
 import Mathematics.Points.Pixel
 import Performance.Tasks.TimedTask
-import bwapi.MouseButton
+import bwapi.{MouseButton, Text}
 
 import scala.collection.mutable
 import scala.util.Random
@@ -43,8 +42,11 @@ class Visualization extends TimedTask {
     ShowTeams,
     ShowJudgment,
 
-    // For combat sim overha
-    ShowBattles
+    // For combat sim overhaul
+    ShowBattles,
+
+    // Grid overhaul
+    ShowGrids
   )
 
   lazy val knownViews: Vector[View] = Vector[View](

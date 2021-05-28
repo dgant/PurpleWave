@@ -3,10 +3,10 @@ package Information.Grids.ArrayTypes
 import Lifecycle.With
 import Mathematics.Points.Tile
 
-abstract class AbstractGridVersioned extends AbstractGridInt {
-
+abstract class AbstractGridVersioned extends AbstractGridArray[Int] {
   var version: Int = 0
-  override final val defaultValue: Int = -1
+  final override val defaultValue: Int = version - 1
+  final override val values: Array[Int] = Array.fill(length)(defaultValue)
   reset()
   def updateVersion() { version = Math.max(1 + version, With.frame) }
 

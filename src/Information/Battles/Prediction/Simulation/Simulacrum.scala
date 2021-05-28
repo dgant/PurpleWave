@@ -12,6 +12,7 @@ import Utilities.Forever
 import scala.collection.mutable.ArrayBuffer
 
 final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
+  var initialized: Boolean = false
   // Real unit properties
   var visibility: Visibility.Value = _
   var player: PlayerInfo = _
@@ -66,6 +67,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   var valueReceived: Double = _
   var events: ArrayBuffer[SimulationEvent] = ArrayBuffer.empty
   def reset(newSimulation: Simulation): Unit = {
+    initialized = true
     simulation = newSimulation
     visibility = realUnit.visibility
     player = realUnit.player

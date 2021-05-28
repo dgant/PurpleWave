@@ -7,8 +7,8 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 class GridPathOccupancy extends AbstractGridVersionedValue[Int] {
 
-  override protected var values: Array[Int] = Array.fill(length)(defaultValue)
-  override val defaultValue: Int = 0
+  override final val defaultValue: Int = 0
+  override val values: Array[Int] = Array.fill(length)(defaultValue)
 
   override protected def onUpdate(): Unit = {
     With.units.enemy.foreach(enemy => if (! enemy.flying && ! enemy.unitClass.isBuilding) addUnit(enemy, enemy.tile))

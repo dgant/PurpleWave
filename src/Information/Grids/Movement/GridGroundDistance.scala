@@ -1,13 +1,14 @@
 package Information.Grids.Movement
 
-import Information.Grids.ArrayTypes.AbstractGridInt
+import Information.Grids.ArrayTypes.AbstractGridArray
 import Lifecycle.With
 import Mathematics.Points.Tile
 import Mathematics.Shapes.Spiral
 
-class GridGroundDistance(initialOrigins: Tile*) extends AbstractGridInt {
+class GridGroundDistance(initialOrigins: Tile*) extends AbstractGridArray[Int] {
 
-  override val defaultValue: Int = Int.MaxValue
+  final override val defaultValue: Int = Int.MaxValue
+  final override val values: Array[Int] = Array.fill(length)(defaultValue)
 
   def origins: Seq[Tile] = initialOrigins
 

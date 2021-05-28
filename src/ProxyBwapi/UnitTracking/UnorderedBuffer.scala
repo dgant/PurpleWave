@@ -17,7 +17,7 @@ import scala.collection.mutable.ArrayBuffer
   * - Reserving capacity on construction
   * - Never shrinking; holding its allocated capacity and dynamic growth forever
   */
-final class UnorderedBuffer[T >: Null](capacity: Int) extends Traversable[T] {
+final class UnorderedBuffer[T >: Null](capacity: Int) extends IndexedSeq[T] {
   private val values: ArrayBuffer[T] = ArrayBuffer.fill[T](capacity)(null)
   private var _size = 0
 
@@ -90,6 +90,10 @@ final class UnorderedBuffer[T >: Null](capacity: Int) extends Traversable[T] {
       i += 1
     }
   }
+
+  // Overrides for IndexedSeq
+  @inline override def length: Int = size
+  @inline override def apply(i: Int): T = values(i)
 
   // These overrides aren't strictly necessary because the supertrait TraversableLike implements these using foreach(),
   // but they may improve performance, as TraversibleLike's implementations of these produce a closure and a break

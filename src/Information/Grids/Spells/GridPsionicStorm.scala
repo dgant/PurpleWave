@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import bwapi.BulletType
 
-class GridPsionicStorm extends AbstractGridFramestamp {
+final class GridPsionicStorm extends AbstractGridFramestamp {
   
   override protected def updateCells(): Unit = {
     With.bullets.all

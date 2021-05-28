@@ -32,7 +32,7 @@ object KeyboardCommands {
       case "quit"       => quitVsHuman()
       case "uninstall"  => quitVsHuman()
       case "surrender"  => quitVsHuman()
-      case _            => With.visualization.tryToggle(text)
+      case _            => With.grids.select(text) || With.visualization.tryToggle(text)
     }
     With.game.sendText(text)
   }

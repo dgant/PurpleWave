@@ -1,12 +1,12 @@
 package Information.Grids.ArrayTypes
 
-import Information.Grids.AbstractGrid
+import Information.Grids.AbstractTypedGrid
 import Mathematics.Points.Tile
 
-abstract class AbstractGridArray[T] extends AbstractGrid[T] {
+abstract class AbstractGridArray[T] extends AbstractTypedGrid[T] {
 
   @inline def rawValues: Array[T] = values
-  protected var values: Array[T]
+  protected val values: Array[T]
   private var initialized = false
   
   def reset() {

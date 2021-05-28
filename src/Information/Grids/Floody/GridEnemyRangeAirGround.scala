@@ -2,7 +2,7 @@ package Information.Grids.Floody
 
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class GridEnemyRangeAirGround extends GridFloody {
+final class GridEnemyRangeAirGround extends AbstractGridFloody {
 
   override protected def include(unit: UnitInfo): Boolean = unit.isEnemy && unit.canAttack
 

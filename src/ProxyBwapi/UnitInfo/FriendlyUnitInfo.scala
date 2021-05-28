@@ -1,6 +1,6 @@
 package ProxyBwapi.UnitInfo
 
-import Information.Grids.Floody.GridFloody
+import Information.Grids.Floody.AbstractGridFloody
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Agency.{Agent, Intention}
@@ -112,5 +112,5 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
     && passenger.transport.forall(_ == this)
     && loadedUnits.view.filterNot(_ == passenger).map(_.unitClass.spaceRequired).sum <= unitClass.spaceProvided)
 
-  def enemyRangeGrid: GridFloody = if (flying || transport.exists(_.flying)) With.grids.enemyRangeAir else With.grids.enemyRangeGround
+  def enemyRangeGrid: AbstractGridFloody = if (flying || transport.exists(_.flying)) With.grids.enemyRangeAir else With.grids.enemyRangeGround
 }

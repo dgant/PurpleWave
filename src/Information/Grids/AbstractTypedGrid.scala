@@ -3,7 +3,7 @@ package Information.Grids
 import Lifecycle.With
 import Mathematics.Points.Tile
 
-abstract class AbstractGrid[T] {
+abstract class AbstractTypedGrid[T] extends Grid {
   final val width: Int = With.mapTileWidth
   final val height: Int = With.mapTileHeight
   final val length: Int = width * height
@@ -17,6 +17,5 @@ abstract class AbstractGrid[T] {
   def getUnchecked(i: Int): T
   val defaultValue: T
   def repr(value: T): String = value.toString
-
-  def update() {}
+  final def reprAt(i: Int): String = repr(get(i))
 }

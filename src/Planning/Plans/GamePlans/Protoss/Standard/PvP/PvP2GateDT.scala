@@ -17,7 +17,7 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchWarriors}
+import Planning.UnitMatchers.{MatchUpgrading, MatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP2GateDTExpand
@@ -88,10 +88,8 @@ class PvP2GateDT extends GameplanTemplate {
     new oneGateCoreLogic.WriteStatuses,
 
     new If(
-      new And(
-        new UpgradeStarted(Protoss.AirDamage),
-        new EnemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate)),
-      new CancelOrders(MatchAnd(Protoss.CyberneticsCore, MatchComplete))),
+      new EnemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate),
+      new CancelOrders(MatchUpgrading(Protoss.AirDamage))),
 
     // Delay build until scout cleared
     new If(
@@ -104,7 +102,7 @@ class PvP2GateDT extends GameplanTemplate {
         // Don't accidentally cancel range that we actually want/need
         new If(
           new Not(new EnemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate)),
-          new CancelOrders(Protoss.CyberneticsCore)),
+          new CancelOrders(MatchUpgrading())),
         new BuildOrder(
           Get(Protoss.Dragoon),
           Get(Protoss.CitadelOfAdun),

@@ -33,7 +33,8 @@ class ScoutForCannonRush extends Plan {
     val gettingCannonRushed = With.fingerprints.cannonRush.matches || (
       With.fingerprints.earlyForge.matches
       && ! With.fingerprints.forgeFe.matches
-      && ! With.fingerprints.gatewayFirst.matches)
+      && ! With.fingerprints.gatewayFirst.matches
+      && With.geography.enemyBases.size < 2)
 
     var shouldScout = (
       previouslyCannonRushed

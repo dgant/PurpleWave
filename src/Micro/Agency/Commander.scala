@@ -252,19 +252,19 @@ object Commander {
       } else if (
         // If we have a ride which can get us there faster, take it
         unit.agent.ride.exists( ! _.loadedUnits.contains(unit))
-          && unit.framesToTravelTo(destination) >
+          && unit.framesToTravelTo(to) >
           4 * unit.unitClass.groundDamageCooldown
             + unit.agent.ride.get.framesToTravelTo(unit.pixel)
-            + unit.agent.ride.get.framesToTravelPixels(unit.pixelDistanceCenter(destination))) {
+            + unit.agent.ride.get.framesToTravelPixels(unit.pixelDistanceCenter(to))) {
         rightClick(unit, unit.agent.ride.get)
       } else {
-        unit.bwapiUnit.move(destination.bwapi)
+        unit.bwapiUnit.move(to.bwapi)
       }
       if (unit.agent.priority > TrafficPriorities.None) {
         With.coordinator.pushes.put(new UnitLinearGroundPush(
           unit.agent.priority,
           unit,
-          unit.pixel.project(destination, Math.min(unit.pixelDistanceCenter(destination), 80))))
+          unit.pixel.project(to, Math.min(unit.pixelDistanceCenter(to), 80))))
       }
     }
 

@@ -33,8 +33,8 @@ object ShowPreplacement extends View {
         var i = 0
         while (generator.hasNext) {
           next = generator.next()
-          DrawMap.arrow(previous.pixelCenter, next.pixelCenter, Colors.NeonOrange)
-          DrawMap.label(i.toString, next.pixelCenter.add(0, 7))
+          DrawMap.arrow(previous.center, next.center, Colors.NeonOrange)
+          DrawMap.label(i.toString, next.center.add(0, 7))
           i += 1
           previous = next
         }

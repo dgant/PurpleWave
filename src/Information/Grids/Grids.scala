@@ -14,6 +14,8 @@ import scala.collection.mutable.ArrayBuffer
 
 class Grids extends TimedTask {
 
+  skipsMax = 1
+
   private val _grids = new ArrayBuffer[Grid]()
   def all: Seq[Grid] = _grids
   private def add[T <: Grid](grid: T): T = { _grids += grid; grid }

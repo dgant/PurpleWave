@@ -31,7 +31,7 @@ object ShowArchitecture extends View {
         val reservation = With.groundskeeper.reserved(tile.i)
         if (reservation.active) {
           DrawMap.tile(tile, color = Colors.NeonYellow)
-          DrawMap.label(reservation.plan.toString, tile.pixelCenter)
+          DrawMap.label(reservation.plan.toString, tile.center)
         }
         if (With.architecture.unbuildable.get(tile).isDefined) {
           DrawMap.tile(tile, 12, Colors.DarkRed)
@@ -49,14 +49,14 @@ object ShowArchitecture extends View {
           //DrawMap.circle(tile.pixelCenter, 4, Colors.BrightYellow)
         }
         if (With.architecture.powered3Height.get(tile) <= With.frame) {
-          DrawMap.circle(tile.pixelCenter, 4, Colors.BrightTeal)
+          DrawMap.circle(tile.center, 4, Colors.BrightTeal)
         }
       }
     })
     With.groundskeeper.suggestions.filter(_.tile.isDefined).foreach(suggestion => {
       val tile = suggestion.tile.get
       DrawMap.tileRectangle(suggestion.blueprint.relativeBuildArea.add(tile), Colors.MediumBlue)
-      DrawMap.label(suggestion.plan.map(_.toString).getOrElse("X"), tile.pixelCenter)
+      DrawMap.label(suggestion.plan.map(_.toString).getOrElse("X"), tile.center)
     })
   }
 

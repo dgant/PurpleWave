@@ -36,7 +36,7 @@ class Team(val units: Vector[UnitInfo]) {
     ByOption.minBy(attackers)(_.pixelDistanceSquared(opponent.centroidAir()))
     .orElse(ByOption.minBy(units)(_.pixelDistanceSquared(opponent.centroidAir())))
     .map(_.pixel)
-    .getOrElse(With.scouting.threatOrigin.pixelCenter))
+    .getOrElse(With.scouting.threatOrigin.center))
   val anchorMargin = new Cache(() => AnchorMargin.marginOf(units.view.flatMap(_.friendly)))
 
   // Used by MCRS

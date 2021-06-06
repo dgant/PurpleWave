@@ -41,7 +41,7 @@ object Tickle extends Action {
     var attack                = true
 
     val zone                  = tickler.agent.toTravel.get.zone
-    val exit                  = zone.edges.map(_.pixelCenter).sortBy(_.groundPixels(With.geography.home)).headOption.getOrElse(With.geography.home.pixelCenter)
+    val exit                  = zone.edges.map(_.pixelCenter).sortBy(_.groundPixels(With.geography.home)).headOption.getOrElse(With.geography.home.center)
     val hurtThreshold         = 30
     val dyingThreshold        = 6
     val hurt                  = tickler.totalHealth < hurtThreshold

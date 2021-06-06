@@ -96,7 +96,7 @@ object ZoneBuilder {
   }
   
   def buildZone(thisRegion: Region, name: String): Zone = {
-    val tiles = With.geography.allTiles.filter(tile => BWTA.getRegion(tile.pixelCenter.nearestWalkableTile.bwapi) == thisRegion)
+    val tiles = With.geography.allTiles.filter(tile => BWTA.getRegion(tile.center.nearestWalkableTile.bwapi) == thisRegion)
     val x = tiles.map(_.x)
     val y = tiles.map(_.y)
     val boundingBox = TileRectangle(

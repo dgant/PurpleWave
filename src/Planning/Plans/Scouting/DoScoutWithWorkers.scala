@@ -15,7 +15,7 @@ class DoScoutWithWorkers(maxScouts: Int = 1) extends DoScout {
     if (scoutDied) return
     if (With.blackboard.maximumScouts() < 1) return
     if (With.units.countOurs(MatchWorker) < 3) return
-    if (With.scouting.enemyMain.exists(main => ByOption.minBy(With.units.ours)(_.framesToTravelTo(main.heart.pixelCenter)).exists( ! _.unitClass.isWorker))) return
+    if (With.scouting.enemyMain.exists(main => ByOption.minBy(With.units.ours)(_.framesToTravelTo(main.heart.center)).exists( ! _.unitClass.isWorker))) return
     // With 4Pool use the scout to help harass/distract
     if ( ! ZvE4Pool.registerActive && ! ZvT1HatchHydra.registerActive && With.geography.enemyBases.exists(_.units.exists(u => u.unitClass.isStaticDefense && u.complete))) return
     if (With.scouting.firstEnemyMain.isDefined) {

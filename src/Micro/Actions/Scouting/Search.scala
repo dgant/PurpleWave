@@ -45,7 +45,7 @@ abstract class AbstractSearch extends Action {
         With.grids.lastSeen.framesSince(tile) > boredomFrames
         && With.grids.buildableTerrain.get(tile)
         && (unit.enemyRangeGrid.get(tile) <= 0 || ( unit.cloaked && ! tile.enemyDetected))
-        && ! unit.matchups.threats.exists(_.inRangeToAttack(unit, tile.pixelCenter))
+        && ! unit.matchups.threats.exists(_.inRangeToAttack(unit, tile.center))
         && tile.base.forall(base =>
           ! base.owner.isEnemy
           || ! base.owner.isZerg
@@ -55,13 +55,13 @@ abstract class AbstractSearch extends Action {
     if (tilesToScout.isEmpty) return
   
     val pulls = tilesToScout.map(tile => Gravity(
-      tile.pixelCenter,
+      tile.center,
       With.grids.lastSeen.framesSince(tile)))
     
     val force = pulls.map(_.apply(unit.pixel)).reduce(_ + _)
 
     val target = unit.pixel.add(force.normalize(64.0).toPoint)
-    val tileToScout = tilesToScout.minBy(_.pixelCenter.pixelDistance(target))
+    val tileToScout = tilesToScout.minBy(_.center.pixelDistance(target))
 
     val profile = new PathfindProfile(unit.tile)
     profile.end                 = Some(tileToScout)
@@ -72,7 +72,7 @@ abstract class AbstractSearch extends Action {
     profile.lengthMaximum       = Some(20)
     profile.unit                = Some(unit)
     val path = profile.find
-    unit.agent.toTravel = Some(tileToScout.pixelCenter)
+    unit.agent.toTravel = Some(tileToScout.center)
     MicroPathing.tryMovingAlongTilePath(unit, path)
     Commander.move(unit)
   }

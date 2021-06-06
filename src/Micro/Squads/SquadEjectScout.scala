@@ -15,7 +15,7 @@ class SquadEjectScout extends Squad {
   private val tilesToConsider = new Cache(() => With.scouting.basesToLookForEnemyScouts().view.flatMap(_.zone.tiles))
   private val destination = new Cache(() => targetScout()
     .map(_.pixel)
-    .getOrElse(ByOption.minBy(tilesToConsider())(With.grids.lastSeen.get).getOrElse(With.geography.home).pixelCenter))
+    .getOrElse(ByOption.minBy(tilesToConsider())(With.grids.lastSeen.get).getOrElse(With.geography.home).center))
 
   private val scoutCleared = new ScoutCleared
   def recruit() {

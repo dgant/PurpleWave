@@ -15,7 +15,7 @@ class MeldDarkArchons extends Plan {
     templar.release() //We don't want them if they're Dark Archons now.
     templar.acquire(this)
     templar.units.foreach(_.agent.intend(this, new Intention {
-      toTravel = Some(With.geography.home.pixelCenter)
+      toTravel = Some(With.geography.home.center)
       canMeld = true
     }))
   }

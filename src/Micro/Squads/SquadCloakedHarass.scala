@@ -42,17 +42,17 @@ class SquadCloakedHarass extends Squad {
         harassBase(unit, lastOptionBase.get)
         basesAssigned(lastOptionBase.get) += 1
       } else {
-        unit.agent.intend(this, new Intention { toTravel = Some(With.scouting.mostBaselikeEnemyTile.pixelCenter) })
+        unit.agent.intend(this, new Intention { toTravel = Some(With.scouting.mostBaselikeEnemyTile.center) })
       }
     })
   }
 
   def harassBase(unit: FriendlyUnitInfo, base: Base): Unit = {
-    unit.agent.intend(this, new Intention { toTravel = Some(base.heart.pixelCenter) })
+    unit.agent.intend(this, new Intention { toTravel = Some(base.heart.center) })
   }
 
   def harassDivision(unit: FriendlyUnitInfo, division: Division): Unit = {
-    val target = ByOption.minBy(division.enemies.view.filter(unit.canAttack))(unit.pixelsToGetInRange).map(_.pixel).getOrElse(With.scouting.mostBaselikeEnemyTile.pixelCenter)
+    val target = ByOption.minBy(division.enemies.view.filter(unit.canAttack))(unit.pixelsToGetInRange).map(_.pixel).getOrElse(With.scouting.mostBaselikeEnemyTile.center)
     unit.agent.intend(this, new Intention { toTravel = Some(target) })
   }
 

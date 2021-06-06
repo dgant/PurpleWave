@@ -26,7 +26,7 @@ class Viewport {
   }
   
   def contains(tile: Tile): Boolean = {
-    contains(tile.pixelCenter)
+    contains(tile.center)
   }
 
   val rectangle: Cache[TileRectangle] = new Cache(() => TileRectangle(start.tile, end.tile))

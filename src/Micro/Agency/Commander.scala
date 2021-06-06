@@ -179,7 +179,7 @@ object Commander {
     walkabilityAssured &&= to.add(   unit.unitClass.dimensionRight, - unit.unitClass.dimensionUp    ).walkable
     walkabilityAssured &&= to.add( - unit.unitClass.dimensionLeft,    unit.unitClass.dimensionDown  ).walkable
     if ( ! walkabilityAssured && unit.pixelDistanceCenter(to) > 32) {
-      to = to.nearestWalkableTile.pixelCenter
+      to = to.nearestWalkableTile.center
     }
 
     // Apply noise
@@ -401,8 +401,8 @@ object Commander {
   def build(unit: FriendlyUnitInfo, unitClass: UnitClass, tile: Tile) {
     if (unit.unready) return
     autoUnburrow(unit)
-    if (unit.pixelDistanceSquared(tile.pixelCenter) > Math.pow(32.0 * 5.0, 2)) {
-      move(unit, tile.pixelCenter)
+    if (unit.pixelDistanceSquared(tile.center) > Math.pow(32.0 * 5.0, 2)) {
+      move(unit, tile.center)
       return
     }
     unit.bwapiUnit.build(unitClass.bwapiType, tile.bwapi)

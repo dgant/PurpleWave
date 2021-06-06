@@ -14,8 +14,8 @@ object ShowZonePathDemo extends View {
           if (path.isDefined) {
             path.get.steps.foreach(pathNode =>
               DrawMap.line(
-                pathNode.from.centroid.pixelCenter,
-                pathNode.to.centroid.pixelCenter))
+                pathNode.from.centroid.center,
+                pathNode.to.centroid.center))
           }
         }
       ))

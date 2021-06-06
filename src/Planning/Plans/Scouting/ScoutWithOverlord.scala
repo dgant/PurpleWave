@@ -60,7 +60,7 @@ class ScoutWithOverlord extends DoScout {
               scouts
                 .headOption
                 .map(_.pixel)
-                .getOrElse(With.geography.home.pixelCenter))
+                .getOrElse(With.geography.home.center))
       })
       val scoutBases = startBases
         .map(b => b.natural.filter(

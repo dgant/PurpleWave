@@ -96,7 +96,7 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def pixelCorners: Array[Pixel] = {
     Array(topLeftPixel, topRightPixel, bottomRightPixel, bottomLeftPixel)
   }
-  @inline def pixelCenter: Pixel = {
+  @inline def center: Pixel = {
     Pixel(x * 32 + 15, y * 32 + 15)
   }
   @inline def contains(pixel: Pixel): Boolean = {
@@ -136,13 +136,16 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     With.geography.baseByTile(this)
   }
   @inline def groundPixels(other: Pixel): Double = {
-    With.paths.groundPixels(pixelCenter, other)
+    With.paths.groundPixels(center, other)
   }
   @inline def groundPixels(other: Tile): Double = {
-    With.paths.groundPixels(pixelCenter, other.pixelCenter)
+    With.paths.groundPixels(center, other.center)
+  }
+  @inline def groundTilesManhattan(other: Tile): Int = {
+    With.paths.groundTilesManhattan(this, other)
   }
   @inline def travelPixelsFor(other: Pixel, unit: UnitInfo): Double = {
-    unit.pixelDistanceTravelling(pixelCenter, other)
+    unit.pixelDistanceTravelling(center, other)
   }
   @inline def travelPixelsFor(other: Tile, unit: UnitInfo): Double = {
     unit.pixelDistanceTravelling(this, other)
@@ -166,7 +169,7 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     unit.flying || walkable
   }
   @inline def nearestTraversableBy(unit: UnitInfo): Tile = {
-    if (unit.flying) this else pixelCenter.nearestTraversableBy(unit).tile
+    if (unit.flying) this else center.nearestTraversableBy(unit).tile
   }
   @inline def nearestWalkableTile: Tile = {
     if (walkable) this else Spiral.points(16).view.map(add).find(_.walkable).getOrElse(this)

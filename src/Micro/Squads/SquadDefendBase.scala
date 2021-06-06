@@ -63,7 +63,7 @@ class SquadDefendBase(base: Base) extends Squad {
       defendChoke()
     } else {
       lastAction = "Protect heart of"
-      defendHeart(base.heart.pixelCenter)
+      defendHeart(base.heart.center)
     }
   }
 
@@ -87,9 +87,9 @@ class SquadDefendBase(base: Base) extends Squad {
     lazy val home = ByOption.minBy(zone.bases.filter(_.owner.isUs).map(_.heart))(_.groundPixels(zone.centroid))
       .orElse(ByOption.minBy(With.geography.ourBases.map(_.heart))(_.groundPixels(zone.centroid)))
       .getOrElse(With.geography.home)
-      .pixelCenter
+      .center
 
-    def distance(enemy: UnitInfo): Double = enemy.pixelDistanceSquared(base.heart.pixelCenter)
+    def distance(enemy: UnitInfo): Double = enemy.pixelDistanceSquared(base.heart.center)
 
     val huntables = scourables()
     lazy val target = huntables.minBy(distance)
@@ -135,7 +135,7 @@ class SquadDefendBase(base: Base) extends Squad {
         val spot = formation.placements.get(defender)
         defender.agent.intend(this, new Intention {
           toReturn = spot
-          toTravel = spot.orElse(Some(zone.centroid.pixelCenter))
+          toTravel = spot.orElse(Some(zone.centroid.center))
           targetFilters = Seq(TargetFilterDefend(zone))
         })
       })

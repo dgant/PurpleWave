@@ -33,10 +33,10 @@ object Rally extends Action {
     }
     
     if (shouldRallyToMinerals) {
-      unit.base.map(_.heart.pixelCenter).foreach(Commander.rally(unit, _))
+      unit.base.map(_.heart.center).foreach(Commander.rally(unit, _))
       return
     }
 
-    Commander.rally(unit, With.scouting.mostBaselikeEnemyTile.pixelCenter)
+    Commander.rally(unit, With.scouting.mostBaselikeEnemyTile.center)
   }
 }

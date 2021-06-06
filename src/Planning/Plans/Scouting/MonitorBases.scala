@@ -22,10 +22,10 @@ class MonitorBases(
   override def onUpdate(): Unit = {
     val basesToScout = bases()
     if (basesToScout.isEmpty) return
-    scouts.preference = PreferClose(scouts.units.headOption.map(_.pixel).getOrElse(With.geography.home.pixelCenter))
+    scouts.preference = PreferClose(scouts.units.headOption.map(_.pixel).getOrElse(With.geography.home.center))
     scouts.acquire(this)
     scouts.units.foreach(scout => scout.agent.intend(this, new Intention {
-      toTravel = Some(With.geography.home.pixelCenter)
+      toTravel = Some(With.geography.home.center)
       toScoutTiles = basesToScout.flatMap(_.zone.tiles)
     }))
   }

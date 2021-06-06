@@ -86,7 +86,7 @@ object BeVulture extends Action {
         vulture.pixel
           .project(target.pixel, vulture.pixelDistanceEdge(target) + 64)
           .nearestWalkableTile
-          .pixelCenter)
+          .center)
       Commander.move(vulture)
     }
   }

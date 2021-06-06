@@ -25,9 +25,9 @@ class SquadCatchDTRunby extends Squad {
 
   private val destination = new Cache(() => {
     val dts = With.units.enemy.view.filter(Protoss.DarkTemplar)
-    ByOption.minBy(With.geography.ourBases.map(_.heart.pixelCenter))(heart =>
+    ByOption.minBy(With.geography.ourBases.map(_.heart.center))(heart =>
       ByOption.min(dts.map(_.pixelDistanceCenter(heart)))
-        .getOrElse(heart.pixelDistance(With.scouting.mostBaselikeEnemyTile.pixelCenter)))
-      .getOrElse(With.geography.home.pixelCenter)
+        .getOrElse(heart.pixelDistance(With.scouting.mostBaselikeEnemyTile.center)))
+      .getOrElse(With.geography.home.center)
     })
 }

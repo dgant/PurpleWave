@@ -35,7 +35,7 @@ class ClearBurrowedBlockers extends Prioritized {
 
     val target = With.units.ours
       .find(u => u.agent.toBuild.exists(_.isTownHall) && ! u.unitClass.isBuilding)
-      .flatMap(_.agent.toBuildTile.map(_.pixelCenter))
+      .flatMap(_.agent.toBuildTile.map(_.center))
 
     if (target.isEmpty) return
 

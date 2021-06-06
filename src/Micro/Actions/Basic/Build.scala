@@ -27,7 +27,7 @@ object Build extends Action {
       return
     }
     
-    val distance  = unit.pixelDistanceCenter(unit.agent.toBuildTile.get.pixelCenter)
+    val distance  = unit.pixelDistanceCenter(unit.agent.toBuildTile.get.center)
     val buildArea = unit.agent.toBuild.get.tileArea.add(unit.agent.toBuildTile.get)
     
     def blockersForTile(tile: Tile) = {

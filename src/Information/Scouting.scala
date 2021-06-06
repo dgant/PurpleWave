@@ -22,8 +22,8 @@ class Scouting extends TimedTask {
   private val cacheBaseIntrigueInitial = new Cache(() => scoutableBases.map(base => (base, getBaseIntrigueInitial(base))).toMap)
   private def getBaseIntrigueInitial(base: Base): Double = {
     val enemyHearts         = With.geography.enemyBases.map(_.heart)
-    val heartMain           = base.heart.pixelCenter
-    val heartNatural        = base.natural.getOrElse(base).heart.pixelCenter
+    val heartMain           = base.heart.center
+    val heartNatural        = base.natural.getOrElse(base).heart.center
     val hearts              = Vector(heartMain, heartNatural)
     val distanceFromEnemy   = 32.0 * 32.0 + ByOption.min(enemyHearts.map(_.groundPixels(heartMain))).getOrElse(With.mapPixelWidth.toDouble)
     val informationAge      = 1.0 + With.framesSince(base.lastScoutedFrame)

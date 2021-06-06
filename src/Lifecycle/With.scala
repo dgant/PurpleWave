@@ -129,7 +129,7 @@ object With {
     enemies           = game.enemies.asScala.map(Players.get).toVector
     mapFileName       = game.mapFileName
     mapCleanName      = StarCraftMapMatcher.clean(mapFileName)
-    mapClock          = StarCraftMapMatcher.clock(new Tile(With.game.self.getUnits.asScala.maxBy(_.getHitPoints).getTilePosition).pixelCenter)
+    mapClock          = StarCraftMapMatcher.clock(new Tile(With.game.self.getUnits.asScala.maxBy(_.getHitPoints).getTilePosition).center)
     mapTileWidth      = game.mapWidth
     mapTileHeight     = game.mapHeight
     mapTileArea       = mapTileWidth * mapTileHeight

@@ -89,17 +89,17 @@ object Batter extends Action {
           building.tileArea.expand(1, 1).tiles
             .filter(With.grids.walkable.get)
             .filter(
-              _.pixelCenter.pixelDistance(wallExit.pixelCenter)
+              _.center.pixelDistance(wallExit.pixelCenter)
               < building.pixel.pixelDistance(wallExit.pixelCenter)))
         .distinct
       
-      val destination = ByOption.minBy(walkableTiles)(_.pixelCenter.pixelDistance(unit.pixel))
-      unit.agent.toTravel = destination.map(_.pixelCenter).orElse(unit.agent.toTravel)
+      val destination = ByOption.minBy(walkableTiles)(_.center.pixelDistance(unit.pixel))
+      unit.agent.toTravel = destination.map(_.center).orElse(unit.agent.toTravel)
       Commander.move(unit)
   
       //TMP
-      walkableTiles.foreach(tile => DrawMap.circle(tile.pixelCenter, 15, Colors.DarkYellow))
-      destination.foreach(tile => DrawMap.circle(tile.pixelCenter, 12, Colors.MediumYellow))
+      walkableTiles.foreach(tile => DrawMap.circle(tile.center, 15, Colors.DarkYellow))
+      destination.foreach(tile => DrawMap.circle(tile.center, 12, Colors.MediumYellow))
     }
   }
 }

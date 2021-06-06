@@ -61,11 +61,11 @@ class PylonBlock extends Plan {
         lastWorker = Some(blocker)
         val tileToBlock = baseToBlock.townHallTile.add(1, 1)
         var intent = new Intention {
-          toTravel = Some(tileToBlock.pixelCenter)
+          toTravel = Some(tileToBlock.center)
           canFlee = true
           canFight = false
         }
-        if (blocker.pixelDistanceCenter(tileToBlock.pixelCenter) < 256 && With.self.supplyUsed + 24 >= With.self.supplyTotal) {
+        if (blocker.pixelDistanceCenter(tileToBlock.center) < 256 && With.self.supplyUsed + 24 >= With.self.supplyTotal) {
           currencyLock.acquire(this)
           intent = new Intention {
             toBuild = Some(Protoss.Pylon)

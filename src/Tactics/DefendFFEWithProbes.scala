@@ -55,7 +55,7 @@ class DefendFFEWithProbes extends Prioritized {
     if (cannons.isEmpty) cannons = With.units.ours.filter(Protoss.Forge)
     
     lazy val zerglings    = With.units.enemy.find(Zerg.Zergling)
-    lazy val threatSource = zerglings.map(_.pixel).getOrElse(With.scouting.mostBaselikeEnemyTile.pixelCenter)
+    lazy val threatSource = zerglings.map(_.pixel).getOrElse(With.scouting.mostBaselikeEnemyTile.center)
 
     if (cannons.isEmpty) return
     cannons.toVector.sortBy(_.totalHealth)

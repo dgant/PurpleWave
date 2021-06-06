@@ -19,7 +19,7 @@ class FormationZone(zone: Zone, edge: Edge) {
 
     val occupied = With.grids.disposableBoolean()
     val slots    = units.map(new FormationSlot(_))
-    val chokeEnd = edge.pixelCenter.project(zone.exitNow.map(_.pixelTowards(zone)).getOrElse(zone.centroid.pixelCenter), 300)
+    val chokeEnd = edge.pixelCenter.project(zone.exitNow.map(_.pixelTowards(zone)).getOrElse(zone.centroid.center), 300)
 
     // Avoid colliding with stuff
     zone.bases.flatMap(_.townHallArea.tiles).foreach(occupied.set(_, true))
@@ -39,7 +39,7 @@ class FormationZone(zone: Zone, edge: Edge) {
     val altitudeInside    = zone.centroid.altitude
     val altitudeOutside   = edge.otherSideof(zone).centroid.altitude
     val altitudeRequired  = if (enemyRangePixelsMax > 32 && altitudeInside > altitudeOutside) Some(altitudeInside) else None
-    val nearSidePixel     = edge.sidePixels.minBy(_.pixelDistanceSquared(With.geography.home.pixelCenter))
+    val nearSidePixel     = edge.sidePixels.minBy(_.pixelDistanceSquared(With.geography.home.center))
     val maxSightPixels    = slots.view.map(_.sightPixels).max
     val formationCenter   = if (maxSightPixels >= edge.radiusPixels) edge.pixelCenter else nearSidePixel.project(edge.pixelCenter, maxSightPixels)
 
@@ -58,8 +58,8 @@ class FormationZone(zone: Zone, edge: Edge) {
 
     val meleeSlots    = new mutable.ArrayBuffer[(UnitClass, Pixel)]
     val arcSlots      = new mutable.ArrayBuffer[(UnitClass, Pixel)]
-    val escapeAir     = With.geography.home.pixelCenter
-    val escapeGround  = ByOption.minBy(zone.edges.view.filterNot(_ == edge).map(_.pixelCenter))(_.groundPixels(With.geography.home)).getOrElse(zone.centroid.pixelCenter)
+    val escapeAir     = With.geography.home.center
+    val escapeGround  = ByOption.minBy(zone.edges.view.filterNot(_ == edge).map(_.pixelCenter))(_.groundPixels(With.geography.home)).getOrElse(zone.centroid.center)
     slots.sortBy(_.rangePixels).foreach(slot => {
       val escape = if (slot.unitClass.isFlyer) escapeAir else escapeGround
       val rangeTiles = slot.rangePixels.toInt / 32
@@ -84,20 +84,20 @@ class FormationZone(zone: Zone, edge: Edge) {
             // Stand uphill if possible
             && altitudeRequired.forall(tile.altitude >=)
             // Don't stand in a choke
-            && ! zone.edges.exists(e => e.radiusPixels < 96 && e.pixelCenter.pixelDistance(tile.pixelCenter) < e.radiusPixels + 32)
+            && ! zone.edges.exists(e => e.radiusPixels < 96 && e.pixelCenter.pixelDistance(tile.center) < e.radiusPixels + 32)
             // Stand in an unoccupied tile
             && (flyer || (tile.walkableUnchecked && ! occupied.get(tile) && ! With.groundskeeper.isReserved(tile)))
         )
         val bestTile = ByOption.minBy(candidates)(tile => {
-          val exitDistanceTiles = tile.pixelCenter.pixelDistance(PurpleMath.projectedPointOnSegment(tile.pixelCenter, edge.sidePixels.head, edge.sidePixels.last)).toInt / 32
+          val exitDistanceTiles = tile.center.pixelDistance(PurpleMath.projectedPointOnSegment(tile.center, edge.sidePixels.head, edge.sidePixels.last)).toInt / 32
           val exitAttackingCost = Math.max(0, exitDistanceTiles - rangeTiles)
           val exitDefendingCost = Math.max(0, enemyRangePixelsMax / 32 - exitDistanceTiles)
-          val leanHomeCost = tile.pixelCenter.pixelDistance(escape) / 1000
+          val leanHomeCost = tile.center.pixelDistance(escape) / 1000
           Math.max(exitAttackingCost, exitDefendingCost) + leanHomeCost
         })
         bestTile.foreach(tile => {
           if ( ! flyer) { occupied.set(tile, true) }
-          arcSlots += ((slot.unitClass, tile.pixelCenter))
+          arcSlots += ((slot.unitClass, tile.center))
         })
       }
     })

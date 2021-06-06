@@ -9,7 +9,7 @@ object ShowBases extends View {
   
   override def renderMap() {
     With.geography.bases.foreach(base => {
-      base.resourcePathTiles.foreach(tile => DrawMap.circle(tile.pixelCenter, 16, Colors.MediumRed))
+      base.resourcePathTiles.foreach(tile => DrawMap.circle(tile.center, 16, Colors.MediumRed))
       DrawMap.tileRectangle(base.harvestingArea,  Colors.DarkGreen)
       DrawMap.tileRectangle(base.townHallArea,    base.owner.colorDark)
       DrawMap.labelBox(

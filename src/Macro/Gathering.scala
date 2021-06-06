@@ -67,7 +67,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     val basesBefore = bases
     bases = With.geography.bases.filter(_.townHall.exists(t => t.isOurs && (t.hasEverBeenCompleteHatch || t.remainingCompletionFrames < 240))) // Geography.ourBases isn't valid frame 0
     if (bases.isEmpty) { // Yikes. Wait for a base to finish or just go attack
-      val goal = ByOption.minBy(With.units.ours.filter(_.unitClass.isTownHall))(u => 10000 * u.remainingCompletionFrames + u.id).map(_.pixel).getOrElse(With.scouting.mostBaselikeEnemyTile.pixelCenter)
+      val goal = ByOption.minBy(With.units.ours.filter(_.unitClass.isTownHall))(u => 10000 * u.remainingCompletionFrames + u.id).map(_.pixel).getOrElse(With.scouting.mostBaselikeEnemyTile.center)
       workers.foreach(_.agent.intend(this, new Intention { toTravel = Some(goal) }))
       return
     }
@@ -170,7 +170,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   }
 
   private def issueCommands(): Unit = {
-    unassigned.foreach(i => i.agent.intend(this, new Intention { toTravel = Some(PurpleMath.sampleSet(nearestBase(i).metro.bases.maxBy(_.heart.groundPixels(With.scouting.threatOrigin)).tiles).pixelCenter); canFight = false }))
+    unassigned.foreach(i => i.agent.intend(this, new Intention { toTravel = Some(PurpleMath.sampleSet(nearestBase(i).metro.bases.maxBy(_.heart.groundPixels(With.scouting.threatOrigin)).tiles).center); canFight = false }))
     assignments.foreach(a => a._1.agent.intend(this, new Intention { toGather = Some(a._2.resource) }))
   }
 

@@ -23,10 +23,10 @@ class Chill(initialMatcher: UnitMatcher) extends Plan {
   }
   
   private def chillOut(chiller: FriendlyUnitInfo, count: Int) {
-    val base = ByOption.minBy(With.geography.ourBases.map(_.heart.pixelCenter))(chiller.pixelDistanceTravelling)
+    val base = ByOption.minBy(With.geography.ourBases.map(_.heart.center))(chiller.pixelDistanceTravelling)
     val tile = base.map(b => PurpleMath.sample(Circle.points(Math.sqrt(count).toInt).map(b.tile.add))).getOrElse(With.geography.home)
     val intent = new Intention
-    intent.toTravel = Some(tile.pixelCenter)
+    intent.toTravel = Some(tile.center)
     intent.canFlee = true
     chiller.agent.intend(this, intent)
   }

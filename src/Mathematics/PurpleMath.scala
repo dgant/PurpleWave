@@ -15,6 +15,8 @@ object PurpleMath {
   val sqrt2f: Float = sqrt2.toFloat
   val sqrt2m1d: Double = Math.sqrt(2) - 1
 
+  @inline final def mode[T](values: Traversable[T]): T = values.groupBy(x => x).maxBy(_._2.size)._1
+
   @inline final def mean(values: Iterable[Double]): Double = if (values.isEmpty) 0.0 else values.sum / values.size
   @inline final def meanL(values: Iterable[Long]): Double = if (values.isEmpty) 0.0 else values.sum / values.size.toDouble
   

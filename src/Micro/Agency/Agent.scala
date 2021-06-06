@@ -85,8 +85,8 @@ class Agent(val unit: FriendlyUnitInfo) {
           unit.pixelDistanceTravelling(base.heart)
           // Retreat into main
           + (if (base.isNaturalOf.filter(_.owner.isUs).exists(_.heart.altitude >= base.heart.altitude) && unit.battle.exists(_.enemy.centroidGround().base.contains(base))) 32 * 40 else 0))
-        .map(_.heart.pixelCenter))
-      .getOrElse(With.geography.home.pixelCenter),
+        .map(_.heart.center))
+      .getOrElse(With.geography.home.center),
     () => unit.agent.toReturn)
 
 

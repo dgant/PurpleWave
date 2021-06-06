@@ -32,7 +32,7 @@ class Edge(choke: Chokepoint) {
       choke.getRegions.getLeft,
       choke.getRegions.getRight)
     .map(region => With.geography.zones.minBy(
-      _.centroid.pixelCenter.pixelDistanceSquared(
+      _.centroid.center.pixelDistanceSquared(
         new Pixel(region.getCenter))))
   
   val distanceGrid: GridGroundDistance = new GridGroundDistance(tiles: _*)
@@ -43,5 +43,5 @@ class Edge(choke: Chokepoint) {
   def pixelTowards(zone: Zone): Pixel = if (endsWalkable)
       endPixels.minBy(p => zone.distanceGrid.get(p.tile))
     else
-      endPixels.minBy(_.pixelDistanceSquared(zone.centroid.pixelCenter))
+      endPixels.minBy(_.pixelDistanceSquared(zone.centroid.center))
 }

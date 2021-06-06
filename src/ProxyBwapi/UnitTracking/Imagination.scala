@@ -128,11 +128,11 @@ object Imagination {
           && tile.traversableBy(unit)
           && ! tile.visibleBwapi
           && tile.tileDistanceSquared(tileLastSeen) <= maxTilesAwaySquared
-          && (unit.flying || PixelRay(unit.pixel, tile.pixelCenter).forall(_.traversableBy(unit)))
-        ))(_.pixelCenter.pixelDistanceSquared(unit.projectFrames(8))))
+          && (unit.flying || PixelRay(unit.pixel, tile.center).forall(_.traversableBy(unit)))
+        ))(_.center.pixelDistanceSquared(unit.projectFrames(8))))
       .find(_.nonEmpty)
       .flatten
-      .map(_.pixelCenter)
+      .map(_.center)
     output
   }
 }

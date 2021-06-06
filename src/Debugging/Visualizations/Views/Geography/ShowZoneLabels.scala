@@ -12,11 +12,11 @@ object ShowZoneLabels extends View {
   }
   
   def renderZone(zone: Zone) {
-    zone.exit.foreach(exit => DrawMap.arrow(zone.centroid.pixelCenter, zone.centroid.pixelCenter.project(exit.pixelCenter, 128.0), zone.owner.colorDark))
-    DrawMap.label(zone.toString, zone.centroid.pixelCenter, drawBackground = true, backgroundColor = zone.owner.colorDark)
+    zone.exit.foreach(exit => DrawMap.arrow(zone.centroid.center, zone.centroid.center.project(exit.pixelCenter, 128.0), zone.owner.colorDark))
+    DrawMap.label(zone.toString, zone.centroid.center, drawBackground = true, backgroundColor = zone.owner.colorDark)
     zone.edges.foreach(edge =>
       edge.zones.foreach(edgeZone => {
-        val labelPixel = edge.pixelCenter.project(edgeZone.centroid.pixelCenter, 32)
+        val labelPixel = edge.pixelCenter.project(edgeZone.centroid.center, 32)
         val color = edgeZone.owner.colorDark
         DrawMap.line(edge.pixelCenter, labelPixel, color)
         DrawMap.label(edgeZone.name, labelPixel, drawBackground = true, backgroundColor = color)

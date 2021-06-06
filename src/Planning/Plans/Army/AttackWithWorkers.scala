@@ -56,13 +56,13 @@ class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
       val unassignedScouts  = new mutable.HashSet[FriendlyUnitInfo] ++ fighters.units
       while(unassignedScouts.nonEmpty && unscoutedBases.size > 1) {
         val nextBase = unscoutedBases.minBy(_.zone.distancePixels(With.geography.ourMain.zone))
-        val scout = unassignedScouts.minBy(_.framesToTravelTo(nextBase.heart.pixelCenter))
+        val scout = unassignedScouts.minBy(_.framesToTravelTo(nextBase.heart.center))
         unassignedScouts  -= scout
         unscoutedBases    -= nextBase
         tickle(scout, nextBase)
       }
 
-      unassignedScouts.foreach(tickle(_, waitingPoint.pixelCenter))
+      unassignedScouts.foreach(tickle(_, waitingPoint.center))
     }
   }
   
@@ -80,7 +80,7 @@ class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
     while(unassignedScouts.nonEmpty) {
       unscoutedBases.foreach(base => {
         if (unassignedScouts.nonEmpty) {
-          val scout = unassignedScouts.minBy(_.pixelDistanceCenter(base.heart.pixelCenter))
+          val scout = unassignedScouts.minBy(_.pixelDistanceCenter(base.heart.center))
           unassignedScouts.remove(scout)
           tickle(scout, base)
         }
@@ -89,12 +89,12 @@ class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
   }
   
   def tickle(unit: FriendlyUnitInfo, base: Base) {
-    tickle(unit, base.heart.pixelCenter)
+    tickle(unit, base.heart.center)
   }
   
   def tickle() {
     val base = With.geography.enemyBases.toList.sortBy(_.workerCount).lastOption
-    val target = base.map(_.heart.pixelCenter).getOrElse(With.scouting.mostBaselikeEnemyTile.pixelCenter)
+    val target = base.map(_.heart.center).getOrElse(With.scouting.mostBaselikeEnemyTile.center)
     fighters.units.foreach(tickle(_, target))
   }
   

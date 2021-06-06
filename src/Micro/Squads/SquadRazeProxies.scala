@@ -10,7 +10,7 @@ import Utilities.ByOption
 class SquadRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends Squad {
   private val proxyPixels   = assignments.values.toSeq.map(_.pixel).distinct
   private val centroidPixel = PurpleMath.centroid(proxyPixels)
-  private val centroidUnit  = ByOption.minBy(proxyPixels)(_.pixelDistance(centroidPixel)).getOrElse(With.scouting.threatOrigin.pixelCenter)
+  private val centroidUnit  = ByOption.minBy(proxyPixels)(_.pixelDistance(centroidPixel)).getOrElse(With.scouting.threatOrigin.center)
 
   override def run() {
     units.foreach(unit => {

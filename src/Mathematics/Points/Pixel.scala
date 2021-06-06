@@ -89,7 +89,7 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     tile.base
   }
   @inline def groundPixels(other: Tile): Double = {
-    With.paths.groundPixels(this, other.pixelCenter)
+    With.paths.groundPixels(this, other.center)
   }
   @inline def groundPixels(other: Pixel): Double = {
     With.paths.groundPixels(this, other)
@@ -151,13 +151,13 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     if (unit.flying) this else nearestWalkablePixel
   }
   @inline def nearestWalkablePixel: Pixel = if (walkable) this else {
-    val center = nearestWalkableTile.pixelCenter
+    val center = nearestWalkableTile.center
     Pixel(
       PurpleMath.clamp(x, center.x - 16, center.x + 16),
       PurpleMath.clamp(y, center.y - 16, center.y + 16))
   }
   @inline def nearestTraversablePixel(unit: UnitInfo): Pixel = if (unit.flying) this else {
-    val center = nearestWalkableTile.pixelCenter
+    val center = nearestWalkableTile.center
     Pixel(
       PurpleMath.clamp(x, center.x - 16 + Math.min(16, unit.unitClass.dimensionLeft), center.x + 16 - Math.min(16, unit.unitClass.dimensionRight)),
       PurpleMath.clamp(y, center.y - 16 + Math.min(16, unit.unitClass.dimensionUp),   center.y + 16 - Math.min(16, unit.unitClass.dimensionDown)))

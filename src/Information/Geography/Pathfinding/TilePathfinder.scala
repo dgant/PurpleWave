@@ -35,7 +35,7 @@ trait TilePathfinder {
     val length = profile.repulsors.length
     while (i < length) {
       val repsulsor = profile.repulsors(i)
-      val distance  = repsulsor.source.pixelDistance(tile.pixelCenter)
+      val distance  = repsulsor.source.pixelDistance(tile.center)
       output += repsulsor.magnitude * (1 + repsulsor.rangePixels) / (1 + distance)
       i += 1
     }

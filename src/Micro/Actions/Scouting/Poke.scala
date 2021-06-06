@@ -28,19 +28,19 @@ object Poke extends Action {
     val targets = unit.matchups.targets.filter(MatchWorker)
     if (targets.isEmpty) return
 
-    val targetHeart = unit.base.map(_.heart.pixelCenter).getOrElse(unit.zone.centroid)
+    val targetHeart = unit.base.map(_.heart.center).getOrElse(unit.zone.centroid)
     val target = targets.minBy(target =>
       target.pixelDistanceEdge(unit)
       - ByOption.min(unit.matchups.threats.filter(_ != target).map(_.pixelDistanceEdge(target))).getOrElse(0.0))
 
-    val exit          = unit.zone.exit.map(_.pixelCenter).getOrElse(With.geography.home.pixelCenter)
+    val exit          = unit.zone.exit.map(_.pixelCenter).getOrElse(With.geography.home.center)
     val otherThreats  = targets.filter(t => t != target && t.pixelDistanceCenter(exit) <= unit.pixelDistanceCenter(exit))
     val framesAway    = targets.map(unit.framesToGetInRange).min
     val framesToWait  = unit.framesToBeReadyForAttackOrder
     
     if (otherThreats.exists(_.pixelDistanceEdge(unit) < 32)) {
       unit.agent.toGather = With.geography.ourBases.headOption.flatMap(_.minerals.headOption)
-      unit.agent.toTravel = Some(With.geography.home.pixelCenter)
+      unit.agent.toTravel = Some(With.geography.home.center)
       Commander.gather(unit)
       Commander.move(unit)
     }

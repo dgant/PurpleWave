@@ -5,13 +5,13 @@ import Utilities.ByOption
 
 trait GroundDistance {
 
-  val impossiblyLargeDistance: Long = 32L * 32L * 256L * 256L * 100L
+  val impossiblyLargeDistanceTiles: Int = 256 * 256
 
   @inline final def groundPathExists(origin: Tile, destination: Tile): Boolean = {
-    origin.zone == destination.zone || groundTiles(origin, destination) < impossiblyLargeDistance
+    groundTilesManhattan(origin, destination) < impossiblyLargeDistanceTiles
   }
 
-  @inline final def groundTilesManhattan(origin: Tile, destination: Tile): Long = {
+  @inline final def groundTilesManhattan(origin: Tile, destination: Tile): Int = {
     // Let's first check if we can use air distance. It's cheaper and more accurate.
     // We can "get away" with using air distance if we're in the same zone
     if (origin.zone == destination.zone) {
@@ -44,13 +44,13 @@ trait GroundDistance {
       32.0 * groundTiles(origin.tile, destination.tile))
   }
 
-  @inline final protected def groundTiles(origin: Tile, destination: Tile): Long = {
-    if ( ! origin.valid) return impossiblyLargeDistance
-    if ( ! destination.valid) return impossiblyLargeDistance
+  @inline final protected def groundTiles(origin: Tile, destination: Tile): Int = {
+    if ( ! origin.valid) return impossiblyLargeDistanceTiles
+    if ( ! destination.valid) return impossiblyLargeDistanceTiles
     ByOption
       .min(destination.zone.edges.view.map(edge =>
         edge.distanceGrid.getUnchecked(destination.i)
-        + edge.distanceGrid.getUnchecked(origin.i).toLong))
-      .getOrElse(impossiblyLargeDistance)
+        + edge.distanceGrid.getUnchecked(origin.i)))
+      .getOrElse(impossiblyLargeDistanceTiles)
   }
 }

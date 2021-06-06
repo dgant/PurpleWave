@@ -104,8 +104,8 @@ object ShowUnitsFriendly extends View {
         val offset = unit.pixel.offsetFromTileCenter
         for (i <- 0 until path.tiles.get.size - 1) {
           DrawMap.arrow(
-            path.tiles.get(i).pixelCenter.add(offset),
-            path.tiles.get(i + 1).pixelCenter.add(offset),
+            path.tiles.get(i).center.add(offset),
+            path.tiles.get(i + 1).center.add(offset),
             unit.unitColor)
         }
       }

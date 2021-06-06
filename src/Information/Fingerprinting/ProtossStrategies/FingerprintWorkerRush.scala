@@ -13,9 +13,9 @@ class FingerprintWorkerRush extends Fingerprint {
   protected object MatchAttackingWorker$ extends MatchAnd(
       MatchWorker,
       (unit: UnitInfo) => {
-        val distanceOurBase = unit.pixelDistanceTravelling(With.geography.ourMain.heart.pixelCenter)
+        val distanceOurBase = unit.pixelDistanceTravelling(With.geography.ourMain.heart.center)
         With.geography.startBases.forall(base =>
-          base.isOurMain || unit.pixelDistanceTravelling(base.heart.pixelCenter) > distanceOurBase
+          base.isOurMain || unit.pixelDistanceTravelling(base.heart.center) > distanceOurBase
         )
       }
     )

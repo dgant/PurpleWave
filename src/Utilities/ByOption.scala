@@ -1,5 +1,7 @@
 package Utilities
 
+import Mathematics.PurpleMath
+
 
 object ByOption {
   
@@ -24,6 +26,8 @@ object ByOption {
       Some(numerator / denominator)
     }
   }
+
+  @inline final def mode[T](sequence: Traversable[T]): Option[T] = if (sequence.isEmpty) None else Some(PurpleMath.mode(sequence))
   
   // Root mean square
   @inline final def rms(sequence: TraversableOnce[Double]): Option[Double] = {

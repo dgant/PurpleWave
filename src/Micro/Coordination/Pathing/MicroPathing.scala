@@ -56,12 +56,12 @@ object MicroPathing {
     if (unit.flying) return goal
     val lineWaypoint      = if (PixelRay(unit.pixel, goal).forall(_.walkable)) Some(unit.pixel.project(goal, Math.min(unit.pixelDistanceCenter(goal), waypointDistancePixels))) else None
     lazy val hillPath     = DownhillPathfinder.decend(unit.tile, goal.tile)
-    lazy val hillWaypoint = hillPath.map(path => path.last.pixelCenter.add(unit.pixel.offsetFromTileCenter))
+    lazy val hillWaypoint = hillPath.map(path => path.last.center.add(unit.pixel.offsetFromTileCenter))
     lineWaypoint.orElse(hillWaypoint).getOrElse(goal)
   }
 
   def getWaypointAlongTilePath(path: TilePath): Option[Pixel] = {
-    if (path.pathExists) Some(path.tiles.get.take(waypointDistanceTiles).last.pixelCenter) else None
+    if (path.pathExists) Some(path.tiles.get.take(waypointDistanceTiles).last.center) else None
   }
 
   // More rays = more accurate movement, but more expensive
@@ -167,7 +167,7 @@ object MicroPathing {
     PixelRay(from, lengthPixels = lengthPixels, radians = radians).foreach(tile =>
       if (proceed) {
         if (tile.valid && (flying || tile.walkableUnchecked)) {
-          output = tile.pixelCenter
+          output = tile.center
         } else proceed = false
       }
     )

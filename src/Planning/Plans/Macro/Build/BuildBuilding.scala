@@ -90,7 +90,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
     if (orderedTile.isDefined && orderedTile != desiredTile) {
       builderLock.release()
     }
-    builderLock.preference = PreferCloseAndNotMining(desiredTile.get.pixelCenter)
+    builderLock.preference = PreferCloseAndNotMining(desiredTile.get.center)
     builderLock.acquire(this)
     
     if (waitForBuilderToRecallUntil.isDefined) {
@@ -116,7 +116,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
           // 2. Wait for the order to take effect
           waitForBuilderToRecallUntil = Some(With.frame + 24)
           builder.agent.intend(this, new Intention {
-            toTravel    = desiredTile.map(_.pixelCenter)
+            toTravel    = desiredTile.map(_.center)
             toBuildTile = desiredTile
             canFight    = false })
         } else {
@@ -124,7 +124,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
           builder.agent.intend(this, new Intention {
             toBuild     = if (currencyLock.satisfied) Some(buildingClass) else None
             toBuildTile = orderedTile
-            toTravel    = orderedTile.map(_.pixelCenter)
+            toTravel    = orderedTile.map(_.center)
             canFight    = false
           })
         }
@@ -151,7 +151,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
     if (proposedBuilder.isEmpty) {
       return false
     }
-    val travelFrames                = proposedBuilder.get.framesToTravelTo(desiredTile.get.pixelCenter)
+    val travelFrames                = proposedBuilder.get.framesToTravelTo(desiredTile.get.center)
     val travelHysteresisFrames      = if (builderLock.units.nonEmpty) 48 else 24
     val travelHysteresisMultiplier  = if (builderLock.units.nonEmpty) 1.35 else 1.2
     travelHysteresisFrames + travelHysteresisMultiplier * travelFrames >= currencyLock.expectedFrames

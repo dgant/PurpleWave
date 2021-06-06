@@ -43,20 +43,20 @@ object BeReaver extends Action {
     if (unit.agent.toAttack.isEmpty) return
     val target            = unit.agent.toAttack.get
     val destinationAir    = findFiringPosition(unit, target)
-    val destinationGround = destinationAir.pixelCenter.nearestWalkableTile
+    val destinationGround = destinationAir.center.nearestWalkableTile
 
     // If we can drop out and attack now, do so
     val here = unit.tile
     var shouldDrop = false
     shouldDrop = shouldDrop || (unit.matchups.targetsInRange.exists(MatchWorker) && unit.matchups.threats.forall(t => MatchWorker(t) || (! t.canMove && t.pixelsToGetInRange(unit) > 32)))
     shouldDrop = shouldDrop || here.groundPixels(destinationGround) < 32
-    shouldDrop = shouldDrop || unit.inRangeToAttack(target) && ! With.grids.enemyRangeGround.inRange(here) && ! unit.matchups.threats.exists(t => t.is(Terran.SiegeTankSieged) && t.inRangeToAttack(unit, here.pixelCenter))
+    shouldDrop = shouldDrop || unit.inRangeToAttack(target) && ! With.grids.enemyRangeGround.inRange(here) && ! unit.matchups.threats.exists(t => t.is(Terran.SiegeTankSieged) && t.inRangeToAttack(unit, here.center))
     if (shouldDrop) {
       Commander.attack(unit)
       return
     }
 
-    unit.agent.toTravel = Some(destinationGround.pixelCenter)
+    unit.agent.toTravel = Some(destinationGround.center)
 
     val endDistanceMaximum = if (unit.is(Protoss.HighTemplar)) 0 else (unit.topSpeed * unit.cooldownLeft / 32).toInt
     val repulsors = MicroPathing.getPathfindingRepulsors(unit)
@@ -80,11 +80,11 @@ object BeReaver extends Action {
       }
     )
     if (path.pathExists) {
-      if (unit.pixelDistanceSquared(path.end.pixelCenter) <= 16 * 16) {
+      if (unit.pixelDistanceSquared(path.end.center) <= 16 * 16) {
         unit.transport.foreach(Commander.unload(_, unit))
         Commander.doNothing(unit)
       } else {
-        unit.agent.toTravel = Some(path.end.pixelCenter)
+        unit.agent.toTravel = Some(path.end.center)
         MicroPathing.tryMovingAlongTilePath(unit, path)
       }
     } else {
@@ -97,7 +97,7 @@ object BeReaver extends Action {
     val firingDistance  = (reaver.effectiveRangePixels + Math.min(reaver.effectiveRangePixels, target.effectiveRangePixels)) / 2
     val originPixel     = reaver.pixel
     val goalTile        = target.projectFrames(reaver.cooldownLeft).tile
-    val naiveTile       = goalTile.pixelCenter.project(originPixel, firingDistance).nearestWalkableTile
+    val naiveTile       = goalTile.center.project(originPixel, firingDistance).nearestWalkableTile
     val naiveDistance   = target.pixel.tile.tileDistanceFast(naiveTile)
     val candidates      = Spiral.points(7)
       .view

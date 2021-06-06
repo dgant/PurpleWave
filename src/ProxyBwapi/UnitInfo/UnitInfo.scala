@@ -179,7 +179,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def altitude: Double = tile.altitude
 
   val arrivalFrame = new Cache(() => {
-    val home        = With.geography.home.pixelCenter
+    val home        = With.geography.home.center
     val classSpeed  = unitClass.topSpeed
     val travelTime  = Math.min(24 * 60 * 60,
       if (canMove)
@@ -324,7 +324,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
       val ringPixels =
         Ring
           .points(range.toInt / 32)
-          .map(enemy.tile.add(_).pixelCenter.add(offset))
+          .map(enemy.tile.add(_).center.add(offset))
           .filter(p => canTraverse(p) && pixelDistanceSquared(p) < distanceSquared)
       val ringSpot = ByOption.minBy(ringPixels)(p => pixelDistanceSquared(p) * (2 - ptfGoodAltitudeBonus(altitudeMatters, enemyAltitude, p)) - ptfBadAltitudePenalty(altitudeMatters, enemyAltitude, p))
       val output = ringSpot.getOrElse(pixelFar.nearestTraversableBy(this))
@@ -334,7 +334,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     val sightPixel = enemy.pixel.projectUpTo(pixel, Math.min(sightPixels, range))
     PixelRay(sightPixel, enemy.pixel)
       .find(t => t.traversableBy(this) && ( ! altitudeMatters || t.altitude >= enemyAltitude))
-      .map(_.pixelCenter)
+      .map(_.center)
       .getOrElse(enemy.pixel.nearestTraversableBy(this))
   }
   @inline final def canSee(other: UnitInfo): Boolean = (

@@ -14,7 +14,7 @@ class Camera extends TimedTask {
   withCosmetic(true)
   
   private var tweenFrom   : Pixel     = SpecificPoints.middle
-  private var focus       : Pixel     = With.self.startTile.pixelCenter
+  private var focus       : Pixel     = With.self.startTile.center
   private var focusUnit   : UnitInfo  = _
   
   private val refocusLimit      = 96

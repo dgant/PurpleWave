@@ -30,8 +30,9 @@ class Visualization extends TimedTask {
     // Evergreen views
     ShowClock,
     ShowStrategyName,
-    ShowHealthAndCooldown,
+    ShowGrids,
     ShowUtilization,
+    ShowHealthAndCooldown,
     ShowUnitPaths,
     ShowUnitsFriendly,
     ShowUnitsEnemy,
@@ -42,11 +43,8 @@ class Visualization extends TimedTask {
     ShowTeams,
     ShowJudgment,
 
-    // For combat sim overhaul
-    ShowBattles,
-
-    // Grid overhaul
-    ShowGrids
+    // For new formations
+    ShowFormations
   )
 
   lazy val knownViews: Vector[View] = Vector[View](

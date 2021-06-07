@@ -7,7 +7,7 @@ import Mathematics.Shapes.Spiral
 
 class GridGroundDistance(initialOrigins: Tile*) extends AbstractGridArray[Int] {
 
-  final override val defaultValue: Int = Int.MaxValue
+  final override val defaultValue: Int = 256 * 256
   final override val values: Array[Int] = Array.fill(length)(defaultValue)
 
   def origins: Seq[Tile] = initialOrigins

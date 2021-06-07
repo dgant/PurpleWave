@@ -56,6 +56,12 @@ class Grids extends TimedTask {
     _selected = all.find("g" + _.code == code).orElse(With.geography.zones.find("g" + _.name.toLowerCase == code.toLowerCase).map(_.distanceGrid))
     if (_selected.isDefined) {
       With.manners.chat(f"Selected ${_selected.get.getClass.getSimpleName.replace("Grid", "")}")
+    } else if (code == "gm") {
+      _selected = Some(With.geography.ourMain.zone.distanceGrid)
+    } else if (code == "gn") {
+      _selected = Some(With.geography.ourNatural.zone.distanceGrid)
+    } else if (code == "ge") {
+      _selected = Some(With.scouting.mostBaselikeEnemyTile.zone.distanceGrid)
     } else {
       With.manners.chat(f"No grid named $code")
     }

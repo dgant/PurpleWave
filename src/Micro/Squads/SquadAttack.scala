@@ -2,28 +2,27 @@ package Micro.Squads
 
 import Debugging.Decap
 import Lifecycle.With
-import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
+import Micro.Squads.Formation.NewFormation
 import Planning.UnitMatchers.{MatchProxied, MatchWarriors}
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.{ByOption, Minutes}
 
 class SquadAttack extends Squad {
-  override def toString: String = f"Attack ${Decap(target.base.getOrElse(target.zone))}"
-
-  var target: Pixel = With.scouting.mostBaselikeEnemyTile.center
+  override def toString: String = f"Attack ${Decap(vicinity.base.getOrElse(vicinity.zone))}"
 
   override def run() {
-    chooseTarget()
+    chooseVicinity()
+    formation = Some(NewFormation.march(units, vicinity))
     units.foreach(attacker => {
       attacker.agent.intend(this, new Intention {
-        toTravel = Some(target)
+        toTravel = formation.get.placements.get(attacker).orElse(Some(vicinity))
       })
     })
 
-    def targetFilter(unit: UnitInfo): Boolean = (
+    def vicinityFilter(unit: UnitInfo): Boolean = (
       unit.isEnemy
       && unit.alive
       && unit.likelyStillThere
@@ -32,7 +31,7 @@ class SquadAttack extends Squad {
     val occupiedBases = units.flatMap(_.base).filter(_.owner.isEnemy)
   }
 
-  protected def chooseTarget(): Unit = {
+  protected def chooseVicinity(): Unit = {
     val focusEnemy = With.scouting.threatOrigin
     val focusUs = PurpleMath.centroid(units.view.map(_.pixel)).tile
     val threatDistanceToUs =
@@ -47,10 +46,10 @@ class SquadAttack extends Squad {
       && With.enemy.bases.size < 3
       && threatDistanceToUs < threatDistanceToEnemy
       && enemyNonTrollyThreats > 6) {
-      target = With.scouting.threatOrigin.center
+      vicinity = With.scouting.threatOrigin.center
       return
     }
-    target =
+    vicinity =
       ByOption.minBy(With.geography.ourBasesAndSettlements.flatMap(_.units.filter(u => u.isEnemy && u.unitClass.isBuilding).map(_.pixel)))(_.groundPixels(With.geography.home.center))
       .orElse(
         if (With.geography.ourBases.size > 1 && With.frame > Minutes(10)())

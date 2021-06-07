@@ -48,6 +48,7 @@ class Battles extends TimedTask {
         task.runFunction = _processingState.step
         task.run(timer.remaining)
       } else {
+        task.skip()
         return
       }
       if (_processingState.isFinalStep) {

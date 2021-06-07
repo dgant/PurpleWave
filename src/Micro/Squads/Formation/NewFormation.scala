@@ -1,6 +1,5 @@
 package Micro.Squads.Formation
 
-import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Types.Edge
 import Lifecycle.With
 import Mathematics.Formations.{FormationAssigned, FormationEmpty}
@@ -12,24 +11,24 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 import scala.collection.mutable
 
-class NewFormation {
+object NewFormation {
 
   /**
     * Formation for units en route to a destination
     */
   def march(
-    units: Seq[FriendlyUnitInfo],
+    units: Iterable[FriendlyUnitInfo],
     destination: Pixel,
     origin: Option[Pixel] = None)
       : FormationAssigned = {
-    form(units, FormationStyle.Engage, origin = origin, destination = Some(destination))
+    form(units, FormationStyle.March, origin = origin, destination = Some(destination))
   }
 
   /**
     * Formation for units protecting a choke
     */
   def guard(
-    units: Seq[FriendlyUnitInfo],
+    units: Iterable[FriendlyUnitInfo],
     edge: Edge,
     origin: Option[Pixel] = None)
       : FormationAssigned = {
@@ -40,7 +39,7 @@ class NewFormation {
     * Formation for units trying to start a fight with an enemy
     */
   def engage(
-    units: Seq[FriendlyUnitInfo],
+    units: Iterable[FriendlyUnitInfo],
     origin: Option[Pixel] = None,
     destination: Option[Pixel] = None)
       : FormationAssigned = {
@@ -51,7 +50,7 @@ class NewFormation {
     * Formation for units backing off from an enemy
     */
   def disengage(
-    units: Seq[FriendlyUnitInfo],
+    units: Iterable[FriendlyUnitInfo],
     origin: Option[Pixel] = None,
     destination: Option[Pixel] = None)
       : FormationAssigned = {
@@ -64,7 +63,7 @@ class NewFormation {
   }
 
   private def form(
-    unitsUnfiltered: Seq[FriendlyUnitInfo],
+    unitsUnfiltered: Iterable[FriendlyUnitInfo],
     style: FormationStyle.Value,
     origin: Option[Pixel] = None,
     destination: Option[Pixel] = None)
@@ -89,21 +88,24 @@ class NewFormation {
     lazy val modeThreat       = origin.map(_.nearestWalkableTile).getOrElse(PurpleMath.mode(units.view.map(u => u.battle.map(_.enemy.centroidGround().tile).getOrElse(u.agent.destination.tile))))
 
     // Start flood filling!
+    val inf = With.mapTileArea
     var apex = centroid
     floodOrigin             = centroid.tile
     floodGoal               = destination.map(_.nearestWalkableTile).getOrElse(With.scouting.mostBaselikeEnemyTile)
     floodStart              = floodGoal
-    floodMinDistanceGoal    = - With.mapTileArea
-    floodMaxThreat          = With.mapTileArea
+    floodMinDistanceGoal    = - inf; floodMaxDistanceGoal    = inf
+    floodMaxThreat          = inf
     floodCostDistanceGoal   = 0
     floodCostDistanceOrigin = 0
     floodCostThreat         = 0
     floodCostRange          = 0
     if (style == FormationStyle.March) {
-      val path = destination.map(d => new PathfindProfile(centroid.tile, Some(d.tile)).find)
-      if ( ! path.exists(_.pathExists)) return FormationEmpty
-      floodStart              = path.get.tiles.get.view.drop(4).headOption.getOrElse(floodGoal)
-      floodMinDistanceGoal    = floodStart.groundPixels(floodGoal).toInt / 32
+      val path = With.paths.aStar(floodOrigin, floodGoal)
+      if ( ! path.pathExists) return FormationEmpty
+      val patht = path.tiles.get.view
+      floodMaxDistanceGoal    = floodOrigin.groundTilesManhattan(floodGoal) - 4
+      floodMinDistanceGoal    = floodMaxDistanceGoal - 8
+      floodStart              = patht.find(_.groundTilesManhattan(floodGoal) == floodMinDistanceGoal).orElse(patht.find(_.groundTilesManhattan(floodGoal) == floodMinDistanceGoal + 1)).getOrElse(floodGoal)
       floodCostDistanceGoal   = 5
       floodCostDistanceOrigin = 1
     } else if (style == FormationStyle.Guard) {
@@ -128,19 +130,19 @@ class NewFormation {
 
     val unplaced      = new mutable.Queue[FriendlyUnitInfo]()
     val placements    = new mutable.HashMap[UnitInfo, Pixel]()
-    val floodHorizon  = new mutable.PriorityQueue[(Tile, Int)]()(Ordering.by(_._2))
+    val floodHorizon  = new mutable.PriorityQueue[(Tile, Int)]()(Ordering.by(-_._2))
     val explored      = With.grids.disposableBoolean()
 
-    unplaced ++= groundUnits.get
-    unplaced.sortBy(_.pixelDistanceTravelling(floodGoal))
-    unplaced.sortBy(_.effectiveRangePixels)
-    floodHorizon += ((floodOrigin, cost(floodOrigin)))
+    unplaced ++= groundUnits.get.toVector.sortBy(_.pixelDistanceTravelling(floodGoal)).sortBy(_.effectiveRangePixels) // Maybe use frameDiscovered as first sort to get stabler formations
+    floodHorizon += ((floodStart, cost(floodStart)))
     floodHorizon.foreach(tile => explored.set(tile._1, true))
     while (floodHorizon.nonEmpty && unplaced.nonEmpty) {
       val tile = floodHorizon.dequeue()._1
+      lazy val distanceTileToGoal = tile.groundTilesManhattan(floodGoal)
       if (tile.walkable
-          && (floodMinDistanceGoal  <= 0 || floodMinDistanceGoal  <= tile.groundTilesManhattan(floodGoal))
-          && (floodMaxThreat        > 20 || floodMaxThreat        >= With.grids.enemyRangeGround(tile))) {
+          && (floodMinDistanceGoal  <= 0    || floodMinDistanceGoal  <= distanceTileToGoal)
+          && (floodMaxDistanceGoal  >= inf  || floodMaxDistanceGoal  >= distanceTileToGoal)
+          && (floodMaxThreat        >= inf  || floodMaxThreat        >= With.grids.enemyRangeGround(tile))) {
         placements(unplaced.dequeue()) = tile.center
       }
       val neighbors = tile
@@ -149,8 +151,8 @@ class NewFormation {
         .filter(_.valid)
         .filterNot(explored.get)
         .map(tile => (tile, cost(tile)))
-      neighbors.foreach(neighbor => explored.set(neighbor._1, true))
       floodHorizon ++= neighbors
+      neighbors.foreach(neighbor => explored.set(neighbor._1, true))
     }
     new FormationAssigned(placements.toMap)
 
@@ -166,6 +168,7 @@ class NewFormation {
   private var floodOrigin             = SpecificPoints.tileMiddle
   private var floodGoal               = SpecificPoints.tileMiddle
   private var floodStart              = SpecificPoints.tileMiddle
+  private var floodMaxDistanceGoal    = With.mapTileArea
   private var floodMinDistanceGoal    = - With.mapTileArea
   private var floodMaxThreat          = With.mapTileArea
   private var floodCostDistanceGoal   = 0

@@ -163,4 +163,6 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
       PurpleMath.clamp(y, center.y - 16 + Math.min(16, unit.unitClass.dimensionUp),   center.y + 16 - Math.min(16, unit.unitClass.dimensionDown)))
   }
   @inline def offsetFromTileCenter: Pixel = Pixel(x % 32 - 16, y % 32 - 16)
+
+  override def toString: String = f"[$x, $y](${PurpleMath.signum(x) * Math.abs(x/32)}, ${PurpleMath.signum(y) * Math.abs(y/32)})"
 }

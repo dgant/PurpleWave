@@ -8,16 +8,15 @@ import Utilities.Minutes
 
 case class TargetFilterDefend(zone: Zone) extends TargetFilter {
   override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
-    if (With.frame > Minutes(10)() && With.reaction.sluggishness > 0) return true // Speculative since this can be N^2
+    if (With.frame > Minutes(10)()) return true // Expensive
+    if (With.reaction.sluggishness > 0) return true // Speculative since this can be N^2
 
     // If we want to attack anyway there's no need to ignore targets
     if (With.blackboard.wantToAttack()) return true
 
-    // Expensive
-    if (With.frame > Minutes(10)()) return true
-
     // Fire at enemies we can hit from inside the zone
     if (target.zone == zone) return true
+
     // Reach, if we have to, and can do so safely
     // Reavers are notably terrible at this
     lazy val firingPixel = actor.pixelToFireAt(target)
@@ -32,7 +31,7 @@ case class TargetFilterDefend(zone: Zone) extends TargetFilter {
 
     // Target enemies between us and the goal zone
     if (actor.inRangeToAttack(target) && actor.readyForAttackOrder) return true
-    if (actor.zone != zone && actor.pixelDistanceTravelling(zone.centroid) > target.pixelDistanceTravelling(zone.centroid)) return true
+    if ( ! target.flying && actor.zone != zone && actor.pixelDistanceTravelling(zone.centroid) > target.pixelDistanceTravelling(zone.centroid)) return true
 
     // Fire at enemies unavoidably threatening the zone (perhaps sieging it from outside)
     if (target.presumptiveTarget.exists(ally =>

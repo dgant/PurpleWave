@@ -97,6 +97,8 @@ trait TilePathfinder {
 
   private def failure(tile: Tile) = TilePath(tile, tile, Int.MaxValue, None)
 
+  def aStar(from: Tile, to: Tile): TilePath = new PathfindProfile(from, Some(to)).find
+
   // I don't want to stop
   // until I reach the top.
   // Baby I'm A*. --Prince

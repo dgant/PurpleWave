@@ -27,9 +27,6 @@ trait GroundDistance {
   }
 
   @inline final def groundPixels(origin: Pixel, destination: Pixel): Double = {
-    // Some maps used to have broken ground distance (due to BWTA,
-    // which in particular suffered on maps with narrow ramps, eg. Plasma, Third World
-
     // Let's first check if we can use air distance. It's cheaper and more accurate.
     // We can "get away" with using air distance if we're in the same zone
     if (origin.zone == destination.zone) {
@@ -49,8 +46,8 @@ trait GroundDistance {
     if ( ! destination.valid) return impossiblyLargeDistanceTiles
     ByOption
       .min(destination.zone.edges.view.map(edge =>
-        edge.distanceGrid.getUnchecked(destination.i)
-        + edge.distanceGrid.getUnchecked(origin.i)))
+          edge.distanceGrid.getUnchecked(destination)
+        + edge.distanceGrid.getUnchecked(origin)))
       .getOrElse(impossiblyLargeDistanceTiles)
   }
 }

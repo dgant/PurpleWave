@@ -42,7 +42,7 @@ abstract class AbstractGridFloody extends AbstractTypedGrid[Int] {
     */
   protected def range(unit: UnitInfo): Int
 
-  final override def update(): Unit = {
+  override def update(): Unit = {
     units.view.filterNot(f => shouldInclude(f._1)).toVector.foreach(f => removeUnit(f._2))
     With.units.all.foreach(updateUnit)
   }

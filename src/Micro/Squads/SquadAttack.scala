@@ -4,10 +4,9 @@ import Debugging.Decap
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
-import Micro.Squads.Formation.NewFormation
+import Micro.Formation.FormationGeneric
 import Planning.UnitMatchers.{MatchProxied, MatchWarriors}
 import ProxyBwapi.Races.Terran
-import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.{ByOption, Minutes}
 
 class SquadAttack extends Squad {
@@ -15,31 +14,30 @@ class SquadAttack extends Squad {
 
   override def run() {
     chooseVicinity()
-    formation = Some(NewFormation.march(units, vicinity))
+    if (units.isEmpty) return
+    val fightConsensus = PurpleMath.mode(units.view.map(_.agent.shouldEngage))
+    formation = Some(if (fightConsensus) {
+      FormationGeneric.march(units, vicinity)
+    } else {
+      FormationGeneric.disengage(units)
+    })
+
     units.foreach(attacker => {
       attacker.agent.intend(this, new Intention {
         toTravel = formation.get.placements.get(attacker).orElse(Some(vicinity))
       })
     })
-
-    def vicinityFilter(unit: UnitInfo): Boolean = (
-      unit.isEnemy
-      && unit.alive
-      && unit.likelyStillThere
-      && unit.unitClass.dealsDamage)
-
-    val occupiedBases = units.flatMap(_.base).filter(_.owner.isEnemy)
   }
 
   protected def chooseVicinity(): Unit = {
-    val focusEnemy = With.scouting.threatOrigin
-    val focusUs = PurpleMath.centroid(units.view.map(_.pixel)).tile
+    val threatOrigin = With.scouting.threatOrigin
+    val centroid = PurpleMath.centroid(units.view.map(_.pixel)).tile
     val threatDistanceToUs =
-      ByOption.min(With.geography.ourBases.map(_.heart.tileDistanceFast(focusEnemy)))
-        .getOrElse(With.geography.home.tileDistanceFast(focusEnemy))
+      ByOption.min(With.geography.ourBases.map(_.heart.tileDistanceFast(threatOrigin)))
+        .getOrElse(With.geography.home.tileDistanceFast(threatOrigin))
     val threatDistanceToEnemy =
-      ByOption.min(With.geography.enemyBases.map(_.heart.tileDistanceFast(focusUs)))
-        .getOrElse(With.scouting.mostBaselikeEnemyTile.tileDistanceFast(focusUs))
+      ByOption.min(With.geography.enemyBases.map(_.heart.tileDistanceFast(centroid)))
+        .getOrElse(With.scouting.mostBaselikeEnemyTile.tileDistanceFast(centroid))
 
     lazy val enemyNonTrollyThreats = With.units.enemy.count(u => u.is(MatchWarriors) && u.likelyStillThere && ! u.is(Terran.Vulture) && u.detected)
     if (With.enemies.exists( ! _.isZerg)

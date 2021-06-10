@@ -44,11 +44,12 @@ class Grids extends TimedTask {
   // Updated on the fly
   val units                       = add("u",    new GridUnits)
 
-  // Flood-filly grids updated on unit birth/death/movement
-  val enemyDetection              = add("ed",   new GridEnemyDetection)
+  // Flood-filly grids
   val enemyRangeAir               = add("era",  new GridEnemyRangeAir)
   val enemyRangeGround            = add("erg",  new GridEnemyRangeGround)
   val enemyRangeAirGround         = add("erag", new GridEnemyRangeAirGround)
+  val enemyVulnerabilityGround    = add("evg",  new GridEnemyVulnerabilityGround)
+  val enemyDetection              = add("ed",   new GridEnemyDetection)
   val enemyVision                 = add("ev",   new GridEnemyVision)
   val friendlyDetection           = add("fd",   new GridFriendlyDetection)
 

@@ -1,19 +1,19 @@
-package Micro.Squads.Formation
+package Micro.Formation
 
 import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Types.Edge
 import Lifecycle.With
-import Mathematics.Formations.{FormationAssigned, FormationEmpty}
 import Mathematics.Points.{Pixel, SpecificPoints, Tile}
 import Mathematics.PurpleMath
 import Planning.UnitMatchers.MatchTank
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.UnitTracking.UnorderedBuffer
+import Utilities.ByOption
 
 import scala.collection.mutable
 
-object NewFormation {
+object FormationGeneric {
 
   /**
     * Formation for units en route to a destination
@@ -22,7 +22,7 @@ object NewFormation {
     units: Iterable[FriendlyUnitInfo],
     destination: Pixel,
     origin: Option[Pixel] = None)
-      : FormationAssigned = {
+      : Formation = {
     form(units, FormationStyle.March, origin = origin, destination = Some(destination))
   }
 
@@ -33,9 +33,7 @@ object NewFormation {
     units: Iterable[FriendlyUnitInfo],
     edge: Edge,
     origin: Option[Pixel] = None)
-      : FormationAssigned = {
-    form(units, FormationStyle.Guard, origin = origin, destination = Some(edge.pixelCenter))
-  }
+      : Formation = FormationZone(units, origin.orElse(ByOption.mode(units.view.map(_.agent.origin))).getOrElse(With.geography.home.center).zone, edge)
 
   /**
     * Formation for units trying to start a fight with an enemy
@@ -44,7 +42,7 @@ object NewFormation {
     units: Iterable[FriendlyUnitInfo],
     origin: Option[Pixel] = None,
     destination: Option[Pixel] = None)
-      : FormationAssigned = {
+      : Formation = {
     form(units, FormationStyle.Engage, origin = origin, destination = destination)
   }
 
@@ -55,7 +53,7 @@ object NewFormation {
     units: Iterable[FriendlyUnitInfo],
     origin: Option[Pixel] = None,
     destination: Option[Pixel] = None)
-      : FormationAssigned = {
+      : Formation = {
     form(units, FormationStyle.Disengage, origin = origin, destination = destination)
   }
 
@@ -69,7 +67,7 @@ object NewFormation {
     style: FormationStyle.Value,
     origin: Option[Pixel] = None,
     destination: Option[Pixel] = None)
-      : FormationAssigned = {
+      : Formation = {
 
     val units = unitsUnfiltered.view.filter(_.unitClass.orderable)
     if (units.forall(_.flying)) return FormationEmpty
@@ -100,7 +98,7 @@ object NewFormation {
     floodCostDistanceGoal   = 0
     floodCostDistanceOrigin = 0
     floodCostThreat         = 0
-    floodCostRange          = 0
+    floodCostVulnerability  = 0
     if (style == FormationStyle.March) {
       val path = new PathfindProfile(floodOrigin, Some(floodGoal), employGroundDist = true).find
       if ( ! path.pathExists) return FormationEmpty
@@ -120,7 +118,7 @@ object NewFormation {
       floodCostDistanceOrigin = 1
     } else if (style == FormationStyle.Engage) {
       floodStart              = modeTarget
-      floodCostRange          = 5
+      floodCostVulnerability  = 3
       floodCostDistanceOrigin = 1
     } else if (style == FormationStyle.Disengage) {
       floodOrigin             = modeOrigin // TOOD: May be self-flagellating by using toReturn; maybe create a new "home" property
@@ -147,7 +145,8 @@ object NewFormation {
       if (tile.walkable
           && (floodMinDistanceGoal  <= 0    || floodMinDistanceGoal  <= distanceTileToGoal)
           && (floodMaxDistanceGoal  >= inf  || floodMaxDistanceGoal  >= distanceTileToGoal)
-          && (floodMaxThreat        >= inf  || floodMaxThreat        >= With.grids.enemyRangeGround(tile))) {
+          && (floodMaxThreat        >= inf  || floodMaxThreat        >= With.grids.enemyRangeGround(tile))
+          && (With.grids.units(tile).forall(u => u.flying || (u.isFriendly && ! u.unitClass.isBuilding)))) {
         val pixel = tile.center
         val group = unplaced.find(_._1.nonEmpty).get
         val unit = group._1.minBy(_.pixelDistanceSquared(pixel))
@@ -167,7 +166,7 @@ object NewFormation {
     units
       .filter(_.flying)
       .foreach(u => placements(u) = floodOrigin.center.project(floodStart.center, Math.max(0, floodOrigin.center.pixelDistance(floodStart.center) - u.effectiveRangePixels)))
-    new FormationAssigned(placements.toMap)
+    new Formation(placements.toMap)
 
     // TODO:
     // - Implement cost function
@@ -187,15 +186,20 @@ object NewFormation {
   private var floodCostDistanceGoal   = 0
   private var floodCostDistanceOrigin = 0
   private var floodCostThreat         = 0
-  private var floodCostRange          = 0
+  private var floodCostVulnerability  = 0
+  @inline private final def vGrid = With.grids.enemyVulnerabilityGround
   private final def cost(tile: Tile): Int = {
     if ( ! tile.walkable) return With.mapPixelPerimeter
     val costDistanceGoal    = if (floodCostDistanceGoal == 0)   0 else floodCostDistanceGoal    * tile.groundTilesManhattan(floodGoal)
     val costDistanceOrigin  = if (floodCostDistanceOrigin == 0) 0 else floodCostDistanceOrigin  * tile.groundTilesManhattan(floodOrigin)
     val costThreat          = if (floodCostThreat == 0)         0 else With.grids.enemyRangeGround(tile)
-    val costRange           = if (floodCostRange == 0)          0 else 0 // TODO: Implement
-    costDistanceGoal + costDistanceOrigin + costThreat + costRange
+    val costVulnerability   = if (floodCostVulnerability == 0)  0 else Math.max(0, vGrid.margin + vGrid.maxVulnerability - vGrid(tile))
+    // TODO: The vulnerability cost should vary based on the range of the unit.
+    // Punishing, eg, a dragoon for not being adjacent to its target, doesn't allow sniping units from uphill
+    // Our current formula doesn't allow this, as we do a single flood-fill across unit types
+    costDistanceGoal + costDistanceOrigin + costThreat + costVulnerability
   }
+
 
   private def isAnchor1(unit: UnitInfo): Boolean = {
     if (MatchTank(unit)) return true

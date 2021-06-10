@@ -2,11 +2,11 @@ package Micro.Squads
 
 import Information.Geography.Types.{Base, Edge, Zone}
 import Lifecycle.With
-import Mathematics.Formations.{FormationAssigned, FormationZone}
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
-import Micro.Targeting.Filters.TargetFilterDefend
 import Micro.Agency.Intention
+import Micro.Formation.FormationZone
+import Micro.Targeting.Filters.TargetFilterDefend
 import Performance.Cache
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -44,6 +44,7 @@ class SquadDefendBase(base: Base) extends Squad {
   private def choke: Option[Edge] = zoneAndChoke()._2
 
   override def run() {
+    formation = None
     if (units.isEmpty) return
 
     lazy val allowWandering = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || enemies.exists(_.unitClass.ranged) || With.blackboard.wantToAttack()
@@ -126,13 +127,14 @@ class SquadDefendBase(base: Base) extends Squad {
   }
 
   private def defendChoke() {
-    assignToFormation(new FormationZone(zone, choke.get).form(units.toSeq))
+    formation = Some(FormationZone(units.toSeq, zone, choke.get))
+    intendFormation()
   }
 
-  private def assignToFormation(formation: FormationAssigned): Unit = {
+  private def intendFormation(): Unit = {
     units.foreach(
       defender => {
-        val spot = formation.placements.get(defender)
+        val spot = formation.get.placements.get(defender)
         defender.agent.intend(this, new Intention {
           toReturn = spot
           toTravel = spot.orElse(Some(zone.centroid.center))

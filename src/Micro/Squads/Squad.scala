@@ -3,9 +3,9 @@ package Micro.Squads
 import Debugging.ToString
 import Information.Battles.Types.GroupCentroid
 import Lifecycle.With
-import Mathematics.Formations.FormationAssigned
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Micro.Agency.AnchorMargin
+import Micro.Formation.Formation
 import Micro.Squads.Qualities.QualityCounter
 import Performance.Cache
 import Planning.Prioritized
@@ -18,7 +18,7 @@ import scala.collection.mutable.ArrayBuffer
 trait Squad extends Prioritized {
   var batchId: Int = Int.MinValue
   var vicinity: Pixel = SpecificPoints.middle
-  var formation: Option[FormationAssigned] = None
+  var formation: Option[Formation] = None
   val lock: LockUnits = new LockUnits(this)
   private var _unitsNow = new ArrayBuffer[FriendlyUnitInfo]
   private var _unitsNext = new ArrayBuffer[FriendlyUnitInfo]

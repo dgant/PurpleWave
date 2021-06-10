@@ -1,4 +1,4 @@
-package Mathematics.Formations
+package Micro.Formation
 
 import Information.Geography.Types.{Edge, Zone}
 import Lifecycle.With
@@ -12,13 +12,12 @@ import Utilities.{ByOption, Minutes}
 
 import scala.collection.mutable
 
-class FormationZone(zone: Zone, edge: Edge) {
+object FormationZone {
 
-  def form(units: Seq[FriendlyUnitInfo]): FormationAssigned = {
-    if (units.isEmpty) return new FormationAssigned(Map.empty)
+  def apply(units: Iterable[FriendlyUnitInfo], zone: Zone, edge: Edge): Formation = {
+    if (units.isEmpty) return FormationEmpty
 
     val occupied = With.grids.disposableBoolean()
-    val slots    = units.map(new FormationSlot(_))
     val chokeEnd = edge.pixelCenter.project(zone.exitNow.map(_.pixelTowards(zone)).getOrElse(zone.centroid.center), 300)
 
     // Avoid colliding with stuff
@@ -34,16 +33,18 @@ class FormationZone(zone: Zone, edge: Edge) {
       else if (With.enemies.exists(_.isTerran)) 4
       else 1)
     val enemyRangePixelsMax   : Int = Math.max(expectedRange, ByOption.max(With.units.enemy.filter(_.unitClass.attacksGround).view.map(_.effectiveRangePixels.toInt)).getOrElse(0))
-    val meleeUnitSize         : Int = 5 + Math.max(16, slots.map(s => if (s.rangePixels > 32) 0 else if (edge.direction.isHorizontal) s.unitClass.width else s.unitClass.height).max)
-    val meleeChokeWidthUnits  : Int = Math.max(1, Math.min(2 * edge.radiusPixels.toInt / meleeUnitSize, slots.count(_.rangePixels <= 32)))
+    val meleeUnitSize         : Int = 5 + Math.max(16, units.view.map(u => if (u.effectiveRangePixelsMax > 32) 0 else if (edge.direction.isHorizontal) u.unitClass.width else u.unitClass.height).max)
+    val meleeChokeWidthUnits  : Int = Math.max(1, Math.min(2 * edge.radiusPixels.toInt / meleeUnitSize, units.count(_.effectiveRangePixelsMax <= 32)))
     val altitudeInside    = zone.centroid.altitude
     val altitudeOutside   = edge.otherSideof(zone).centroid.altitude
     val altitudeRequired  = if (enemyRangePixelsMax > 32 && altitudeInside > altitudeOutside) Some(altitudeInside) else None
     val nearSidePixel     = edge.sidePixels.minBy(_.pixelDistanceSquared(With.geography.home.center))
-    val maxSightPixels    = slots.view.map(_.sightPixels).max
+    val maxSightPixels    = units.view.map(_.sightPixels).max
     val formationCenter   = if (maxSightPixels >= edge.radiusPixels) edge.pixelCenter else nearSidePixel.project(edge.pixelCenter, maxSightPixels)
 
-    val meleeSlotsEmpty = units.indices.map(i => {
+    val meleeSlotsEmpty = units.view.zipWithIndex.map(ui => {
+      val u = ui._1
+      val i = ui._2
       val unitsInThisRow = i % meleeChokeWidthUnits
       val rowsFilled = i / meleeChokeWidthUnits
       val targetSide = edge.sidePixels(unitsInThisRow % 2)
@@ -54,23 +55,23 @@ class FormationZone(zone: Zone, edge: Edge) {
       }
       val vectorDepth = edge.pixelCenter.project(chokeEnd, 24 + meleeUnitSize * rowsFilled) - edge.pixelCenter
       edge.pixelCenter + vectorLateral + vectorDepth
-    })
+    }).toIndexedSeq
 
     val meleeSlots    = new mutable.ArrayBuffer[(UnitClass, Pixel)]
     val arcSlots      = new mutable.ArrayBuffer[(UnitClass, Pixel)]
     val escapeAir     = With.geography.home.center
     val escapeGround  = ByOption.minBy(zone.edges.view.filterNot(_ == edge).map(_.pixelCenter))(_.groundPixels(With.geography.home)).getOrElse(zone.centroid.center)
-    slots.sortBy(_.rangePixels).foreach(slot => {
-      val escape = if (slot.unitClass.isFlyer) escapeAir else escapeGround
-      val rangeTiles = slot.rangePixels.toInt / 32
-      val flyer = slot.unitClass.isFlyer && ! slot.unitClass.isFlyingBuilding && slot.unitClass != Protoss.Shuttle
-      if (altitudeRequired.isEmpty && enemyRangePixelsMax <= 32 && slot.rangePixels <= 32 && edge.radiusPixels <= maxSightPixels) {
+    units.toVector.sortBy(_.effectiveRangePixelsMax).foreach(unit => {
+      val escape = if (unit.flying) escapeAir else escapeGround
+      val rangeTiles = unit.effectiveRangePixelsMax.toInt / 32
+      val flyer = unit.unitClass.isFlyer && ! unit.unitClass.isFlyingBuilding && unit.unitClass != Protoss.Shuttle
+      if (altitudeRequired.isEmpty && enemyRangePixelsMax <= 32 && unit.effectiveRangePixelsMax <= 32 && edge.radiusPixels <= maxSightPixels) {
         // Against enemy melee units, place melee units directly into the exit
         val nextPixel = meleeSlotsEmpty(meleeSlots.size)
-        meleeSlots += ((slot.unitClass, nextPixel))
+        meleeSlots += ((unit.unitClass, nextPixel))
         if ( ! flyer) {
-          val w = slot.unitClass.width / 2
-          val h = slot.unitClass.height / 2
+          val w = unit.unitClass.width / 2
+          val h = unit.unitClass.height / 2
           occupied.set(nextPixel.add(+w, +h).tile, true)
           occupied.set(nextPixel.add(-w, +h).tile, true)
           occupied.set(nextPixel.add(+w, -h).tile, true)
@@ -97,15 +98,15 @@ class FormationZone(zone: Zone, edge: Edge) {
         })
         bestTile.foreach(tile => {
           if ( ! flyer) { occupied.set(tile, true) }
-          arcSlots += ((slot.unitClass, tile.center))
+          arcSlots += ((unit.unitClass, tile.center))
         })
       }
     })
 
-    new FormationUnassigned(
+    FormationAssignment.outwardFromCentroid(
       (meleeSlots.view ++ arcSlots.view)
         .groupBy(_._1)
-        .mapValues(_.map(_._2)))
-      .assign(units)
+        .mapValues(_.map(_._2)),
+      units)
   }
 }

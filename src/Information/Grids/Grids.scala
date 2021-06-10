@@ -9,12 +9,14 @@ import Information.Grids.Versioned.{GridVersionedBoolean, GridVersionedDouble, G
 import Information.Grids.Vision._
 import Lifecycle.With
 import Performance.Tasks.TimedTask
+import Performance.Timer
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 class Grids extends TimedTask {
-
   skipsMax = 1
+  alwaysSafe = true // Until proven otherwise
 
   private val _grids = new ArrayBuffer[Grid]()
   def all: Seq[Grid] = _grids
@@ -62,6 +64,8 @@ class Grids extends TimedTask {
       _selected = Some(With.geography.ourNatural.zone.distanceGrid)
     } else if (code == "ge") {
       _selected = Some(With.scouting.mostBaselikeEnemyTile.zone.distanceGrid)
+    } else if (code == "g") {
+      _selected = None
     } else {
       With.manners.chat(f"No grid named $code")
     }
@@ -85,7 +89,17 @@ class Grids extends TimedTask {
     _disposableDouble
   }
 
+  private var _updateQueue = new mutable.Queue[Grid]()
+
   override protected def onRun(budgetMs: Long): Unit = {
-    all.foreach(_.update())
+    val timer = new Timer(budgetMs)
+    var gridsUpdated = 0
+    if (_updateQueue.isEmpty) { _updateQueue ++= all }
+    do {
+      val next = _updateQueue.dequeue()
+      _updateQueue.enqueue(next)
+      next.update()
+      gridsUpdated += 1
+    } while (gridsUpdated < all.size && timer.ongoing)
   }
 }

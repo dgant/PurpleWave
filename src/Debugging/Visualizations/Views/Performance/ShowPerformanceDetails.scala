@@ -20,7 +20,7 @@ object ShowPerformanceDetails extends View {
 
   def statusTable(tasks: Seq[TimedTask]): Seq[Seq[String]] = {
     val title = Vector("Target:", f"${With.configuration.frameTargetMs}ms", "Cutoff:", f"${With.configuration.frameLimitMs}ms")
-    val headers = Vector("Task", "Runs", "Seconds", "%Time", "Budget (Recent)", "Avg ms", "Max (Recent)", "Max (All time)", "AcrossTarget", "AcrossLimit")
+    val headers = Vector("Task", "Runs", "Seconds", "%Time", "Budgt (Recnt)", "Avg ms", "Max (Rcnt)", "Max (All time)", "AcrossTarget", "AcrossLimit")
     val body = tasks
       .map(task => Vector(
         task.toString,

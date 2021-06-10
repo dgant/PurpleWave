@@ -19,6 +19,7 @@ class BattleProcessSimulate extends BattleProcessState {
       return
     }
 
+
     transitionTo(new BattleProcessJudge)
   }
 }

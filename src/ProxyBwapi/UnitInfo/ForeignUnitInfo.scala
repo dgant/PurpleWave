@@ -2,8 +2,8 @@ package ProxyBwapi.UnitInfo
 
 import Lifecycle.With
 import Micro.Squads.Squad
-import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitTracking.Imagination
+import bwapi.UnitType
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -42,5 +42,6 @@ final class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends BWAPICachedU
     output
   }
 
-  override val loadedUnitCount: Int = if (is(Protoss.Carrier)) 8 else if (is(Terran.Bunker)) 4 else 0
+  // This check uses BWAPI unit type comparison because this unit's UnitClass isn't yet populated
+  override val loadedUnitCount: Int = if (bwapiUnit.getType == UnitType.Protoss_Carrier) 8 else if (bwapiUnit.getType == UnitType.Terran_Bunker) 4 else 0
 }

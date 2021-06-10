@@ -11,7 +11,7 @@ import scala.collection.JavaConverters._
 
 abstract class UnitClassProxy(val bwapiType: UnitType) {
   val id                       = bwapiType.id
-  lazy val abilities                = bwapiType.abilities.asScala.map(Techs.get)
+  lazy val abilities           = bwapiType.abilities.asScala.map(Techs.get)
   val acceleration             = bwapiType.acceleration
   val armor                    = bwapiType.armor
   val buildScore               = bwapiType.buildScore
@@ -20,7 +20,7 @@ abstract class UnitClassProxy(val bwapiType: UnitType) {
   val canBuildAddon            = bwapiType.canBuildAddon
   val canMove                  = bwapiType.canMove
   val canProduce               = bwapiType.canProduce
-  lazy val cloakingTech             = Techs.get(bwapiType.cloakingTech)
+  lazy val cloakingTech        = Techs.get(bwapiType.cloakingTech)
   val destroyScore             = bwapiType.destroyScore
   val dimensionDown            = bwapiType.dimensionDown
   val dimensionLeft            = bwapiType.dimensionLeft
@@ -65,11 +65,11 @@ abstract class UnitClassProxy(val bwapiType: UnitType) {
   val producesCreep            = bwapiType.producesCreep
   val producesLarva            = bwapiType.producesLarva
   val regeneratesHP            = bwapiType.regeneratesHP
-  lazy val requiredTechRaw          = Techs.get(bwapiType.requiredTech)
-  lazy val requiredUnits            = bwapiType.requiredUnits.asScala.map(pair => (UnitClasses.get(pair._1), pair._2))
+  lazy val requiredTechRaw     = Techs.get(bwapiType.requiredTech)
+  lazy val requiredUnits       = bwapiType.requiredUnits.asScala.map(pair => (UnitClasses.get(pair._1), pair._2))
   val requiresCreep            = bwapiType.requiresCreep
   val requiresPsi              = bwapiType.requiresPsi
-  lazy val techsWhat                = bwapiType.researchesWhat.asScala.map(Techs.get)
+  lazy val techsWhat           = bwapiType.researchesWhat.asScala.map(Techs.get)
   val seekRange                = bwapiType.seekRange
   val sightRangePixels         = bwapiType.sightRange
   val spaceProvided            = bwapiType.spaceProvided
@@ -81,9 +81,9 @@ abstract class UnitClassProxy(val bwapiType: UnitType) {
   val tileWidth                = bwapiType.tileWidth
   val topSpeed                 = bwapiType.topSpeed
   val turnRadius               = bwapiType.turnRadius
-  lazy val upgrades                 = bwapiType.upgrades.asScala.map(Upgrades.get)
-  lazy val upgradesWhat             = bwapiType.upgradesWhat.asScala.map(Upgrades.get)
-  lazy val whatBuilds               = new Pair(UnitClasses.get(bwapiType.whatBuilds.getKey), bwapiType.whatBuilds.getValue)
+  lazy val upgrades            = bwapiType.upgrades.asScala.map(Upgrades.get)
+  lazy val upgradesWhat        = bwapiType.upgradesWhat.asScala.map(Upgrades.get)
+  lazy val whatBuilds          = new Pair(UnitClasses.get(bwapiType.whatBuilds.getKey), bwapiType.whatBuilds.getValue)
   val width                    = bwapiType.width
   val race                     = bwapiType.getRace
   val airWeaponRaw             = bwapiType.airWeapon

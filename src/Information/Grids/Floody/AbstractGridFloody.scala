@@ -78,17 +78,15 @@ abstract class AbstractGridFloody extends AbstractTypedGrid[Int] {
     flood(floody).foreach {
       case (tile, value) =>
         val i = tile.i
-        if (value == maxValues(i)) {
-          val floodyTiles = tiles(i)
-          floodyTiles.removeIf(_.unit.unit == floody.unit)
-          var max = defaultValue
+        tiles(i).removeIf(_.unit.unit == floody.unit)
+        if (value >= maxValues(i)) {
           var j = 0
-          val size = floodyTiles.size
+          val size = tiles(i).size
+          maxValues(i) = defaultValue
           while (j < size) {
-            max = Math.max(max, floodyTiles(j).value)
+            maxValues(i) = Math.max(maxValues(i), tiles(i)(j).value)
             j += 1
           }
-          maxValues(i) = value
         }
     }
   }

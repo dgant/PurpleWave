@@ -11,7 +11,7 @@ object ShowFormations extends View {
       val unit = p._1
       val slot = p._2
       val c = unit.unitClass
-      DrawMap.line(p._1.pixel, slot, Colors.BrightGray)
+      DrawMap.line(p._1.pixel, slot, Colors.NeonBlue)
       DrawMap.box(slot.subtract(c.dimensionLeft, c.dimensionUp), slot.add(c.dimensionRight, c.dimensionDown), Colors.NeonBlue)
     })))
   }

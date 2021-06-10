@@ -1,5 +1,6 @@
 package Micro.Squads.Formation
 
+import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Types.Edge
 import Lifecycle.With
 import Mathematics.Formations.{FormationAssigned, FormationEmpty}
@@ -8,6 +9,7 @@ import Mathematics.PurpleMath
 import Planning.UnitMatchers.MatchTank
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitTracking.UnorderedBuffer
 
 import scala.collection.mutable
 
@@ -100,12 +102,13 @@ object NewFormation {
     floodCostThreat         = 0
     floodCostRange          = 0
     if (style == FormationStyle.March) {
-      val path = With.paths.aStar(floodOrigin, floodGoal)
+      val path = new PathfindProfile(floodOrigin, Some(floodGoal), employGroundDist = true).find
       if ( ! path.pathExists) return FormationEmpty
       val patht = path.tiles.get.view
       floodMaxDistanceGoal    = floodOrigin.groundTilesManhattan(floodGoal) - 4
       floodMinDistanceGoal    = floodMaxDistanceGoal - 8
       floodStart              = patht.find(_.groundTilesManhattan(floodGoal) == floodMinDistanceGoal).orElse(patht.find(_.groundTilesManhattan(floodGoal) == floodMinDistanceGoal + 1)).getOrElse(floodGoal)
+      floodMaxThreat          = 0
       floodCostDistanceGoal   = 5
       floodCostDistanceOrigin = 1
     } else if (style == FormationStyle.Guard) {
@@ -128,22 +131,28 @@ object NewFormation {
       floodMaxThreat          = 0
     }
 
-    val unplaced      = new mutable.Queue[FriendlyUnitInfo]()
     val placements    = new mutable.HashMap[UnitInfo, Pixel]()
     val floodHorizon  = new mutable.PriorityQueue[(Tile, Int)]()(Ordering.by(-_._2))
     val explored      = With.grids.disposableBoolean()
-
-    unplaced ++= groundUnits.get.toVector.sortBy(_.pixelDistanceTravelling(floodGoal)).sortBy(_.effectiveRangePixels) // Maybe use frameDiscovered as first sort to get stabler formations
+    val unplaced = groundUnits.get
+      .groupBy(_.unitClass)
+      .map(g => (new UnorderedBuffer[FriendlyUnitInfo](g._2), g._2.map(_.effectiveRangePixels).max))
+      .toVector
+      .sortBy(_._2)
     floodHorizon += ((floodStart, cost(floodStart)))
     floodHorizon.foreach(tile => explored.set(tile._1, true))
-    while (floodHorizon.nonEmpty && unplaced.nonEmpty) {
+    while (floodHorizon.nonEmpty && unplaced.exists(_._1.nonEmpty) ) {
       val tile = floodHorizon.dequeue()._1
       lazy val distanceTileToGoal = tile.groundTilesManhattan(floodGoal)
       if (tile.walkable
           && (floodMinDistanceGoal  <= 0    || floodMinDistanceGoal  <= distanceTileToGoal)
           && (floodMaxDistanceGoal  >= inf  || floodMaxDistanceGoal  >= distanceTileToGoal)
           && (floodMaxThreat        >= inf  || floodMaxThreat        >= With.grids.enemyRangeGround(tile))) {
-        placements(unplaced.dequeue()) = tile.center
+        val pixel = tile.center
+        val group = unplaced.find(_._1.nonEmpty).get
+        val unit = group._1.minBy(_.pixelDistanceSquared(pixel))
+        group._1.remove(unit)
+        placements(unit) = pixel
       }
       val neighbors = tile
         .adjacent4
@@ -154,6 +163,10 @@ object NewFormation {
       floodHorizon ++= neighbors
       neighbors.foreach(neighbor => explored.set(neighbor._1, true))
     }
+    lazy val groundPlacementCentroid = PurpleMath.centroid(placements.values)
+    units
+      .filter(_.flying)
+      .foreach(u => placements(u) = floodOrigin.center.project(floodStart.center, Math.max(0, floodOrigin.center.pixelDistance(floodStart.center) - u.effectiveRangePixels)))
     new FormationAssigned(placements.toMap)
 
     // TODO:

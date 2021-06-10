@@ -17,9 +17,14 @@ import scala.collection.mutable.ArrayBuffer
   * - Reserving capacity on construction
   * - Never shrinking; holding its allocated capacity and dynamic growth forever
   */
-final class UnorderedBuffer[T >: Null](capacity: Int) extends IndexedSeq[T] {
+final class UnorderedBuffer[T >: Null](capacity: Int = 8) extends IndexedSeq[T] {
   private val values: ArrayBuffer[T] = ArrayBuffer.fill[T](capacity)(null)
   private var _size = 0
+
+  @inline def this(initialValues: Iterable[T]) {
+    this(initialValues.size)
+    addAll(initialValues)
+  }
 
   // Add to end, for fast insertion
   @inline def add(value: T): T = {

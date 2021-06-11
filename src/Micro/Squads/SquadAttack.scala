@@ -15,16 +15,27 @@ class SquadAttack extends Squad {
   override def run() {
     chooseVicinity()
     if (units.isEmpty) return
-    val fightConsensus = PurpleMath.mode(units.view.map(_.agent.shouldEngage))
-    formation = Some(if (fightConsensus) {
-      FormationGeneric.march(units, vicinity)
+    lazy val centroid = PurpleMath.centroid(units.view.map(_.pixel))
+    lazy val fightConsensus = PurpleMath.mode(units.view.map(_.agent.shouldEngage))
+    lazy val originConsensus = PurpleMath.mode(units.view.map(_.agent.origin))
+    lazy val battleConsensus = PurpleMath.mode(units.view.map(_.battle))
+    formation = if (units.size > 4) Some(if (fightConsensus) {
+      val readyToEngage = units.exists(u => u.presumptiveTarget.exists(t => u.pixelsToGetInRange(t) < 64))
+      lazy val alreadyEngagedUpon = battleConsensus.exists(_.enemy.units.exists(e => e.presumptiveTarget.exists(e.inRangeToAttack)))
+      if (readyToEngage || alreadyEngagedUpon) {
+        FormationGeneric.engage(units)
+      } else {
+        FormationGeneric.march(units, vicinity)
+      }
+    } else if (centroid.zone == originConsensus.zone && With.scouting.threatOrigin.zone != originConsensus.zone) {
+      FormationGeneric.guard(units, Some(originConsensus))
     } else {
       FormationGeneric.disengage(units)
-    })
+    }) else None
 
     units.foreach(attacker => {
       attacker.agent.intend(this, new Intention {
-        toTravel = formation.get.placements.get(attacker).orElse(Some(vicinity))
+        toTravel = formation.flatMap(_.placements.get(attacker)).orElse(Some(vicinity))
       })
     })
   }

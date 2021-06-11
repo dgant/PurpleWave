@@ -39,6 +39,7 @@ class Tactics extends TimedTask {
   private lazy val monitorWithObserver        = new If(
     new And(
       new EnemyIsTerran,
+      new EnemiesAtMost(0, MatchMobileDetector),
       new EnemiesAtMost(7, Terran.Factory),
       new Not(new EnemyHasShownWraithCloak),
       new Or(

@@ -9,7 +9,7 @@ import scala.collection.mutable.ListBuffer
 
 object FormationAssignment {
 
-  def outwardFromCentroid(spots: Map[UnitClass, Iterable[Pixel]], units: Iterable[UnitInfo]): Formation = {
+  def outwardFromCentroid(style: FormationStyle, spots: Map[UnitClass, Iterable[Pixel]], units: Iterable[UnitInfo]): Formation = {
     if (spots.isEmpty) return FormationEmpty
     def assignUnitsOutward(unitClass: UnitClass, units: Iterable[UnitInfo]): Map[UnitInfo, Pixel] = {
       if (units.isEmpty) return Map.empty
@@ -26,6 +26,7 @@ object FormationAssignment {
       ).toMap
     }
     new Formation(
+      style,
       spots.keys
         .map(unitClass => assignUnitsOutward(unitClass, units.filter(unitClass)))
         .reduce(_ ++ _))

@@ -45,7 +45,8 @@ class Logger {
   }
   
   def warn(message: String) {
-    log("WARN  | " + message)
+    //log("WARN  | " + message)
+    log("WARN  | " + message, chat = false)
   }
   
   def error(message: String) {

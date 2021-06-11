@@ -1,7 +1,6 @@
 package Micro.Formation
 
 import Information.Geography.Pathfinding.PathfindProfile
-import Information.Geography.Types.Edge
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints, Tile}
 import Mathematics.PurpleMath
@@ -20,30 +19,29 @@ object FormationGeneric {
     */
   def march(
     units: Iterable[FriendlyUnitInfo],
-    destination: Pixel,
-    origin: Option[Pixel] = None)
+    destination: Pixel)
       : Formation = {
-    form(units, FormationStyle.March, origin = origin, destination = Some(destination))
+    form(units, FormationStyleMarch, destination = Some(destination))
   }
 
   /**
     * Formation for units protecting a choke
     */
-  def guard(
-    units: Iterable[FriendlyUnitInfo],
-    edge: Edge,
-    origin: Option[Pixel] = None)
-      : Formation = FormationZone(units, origin.orElse(ByOption.mode(units.view.map(_.agent.origin))).getOrElse(With.geography.home.center).zone, edge)
+  def guard(units: Iterable[FriendlyUnitInfo], origin: Option[Pixel] = None)
+      : Formation = {
+    val finalOrigin: Pixel = origin.getOrElse(ByOption.mode(units.view.map(_.agent.origin)).getOrElse(With.geography.home.center))
+    val output = finalOrigin.zone.exit
+      .map(exit => FormationZone(units, finalOrigin.zone, exit))
+      .getOrElse(form(units, FormationStyleGuard, origin = Some(finalOrigin), destination = Some(With.scouting.threatOrigin.center)))
+    output
+  }
 
   /**
     * Formation for units trying to start a fight with an enemy
     */
-  def engage(
-    units: Iterable[FriendlyUnitInfo],
-    origin: Option[Pixel] = None,
-    destination: Option[Pixel] = None)
+  def engage(units: Iterable[FriendlyUnitInfo], destination: Option[Pixel] = None)
       : Formation = {
-    form(units, FormationStyle.Engage, origin = origin, destination = destination)
+    form(units, FormationStyleEngage, destination = destination)
   }
 
   /**
@@ -54,17 +52,12 @@ object FormationGeneric {
     origin: Option[Pixel] = None,
     destination: Option[Pixel] = None)
       : Formation = {
-    form(units, FormationStyle.Disengage, origin = origin, destination = destination)
-  }
-
-  private object FormationStyle extends Enumeration {
-    type Style = Value
-    val March, Guard, Engage, Disengage = Value
+    form(units, FormationStyleDisengage, origin = origin, destination = destination)
   }
 
   private def form(
     unitsUnfiltered: Iterable[FriendlyUnitInfo],
-    style: FormationStyle.Value,
+    style: FormationStyle,
     origin: Option[Pixel] = None,
     destination: Option[Pixel] = None)
       : Formation = {
@@ -84,8 +77,8 @@ object FormationGeneric {
               units)
     val centroid              = keyUnits.view.map(_.pixel).minBy(_.pixelDistanceSquared(PurpleMath.centroid(keyUnits.view.map(_.pixel))))
     lazy val modeOrigin       = origin.map(_.nearestWalkableTile).getOrElse(PurpleMath.mode(units.view.map(_.agent.origin.tile)))
-    lazy val modeTarget       = origin.map(_.nearestWalkableTile).getOrElse(PurpleMath.mode(units.view.map(u => u.presumptiveTarget.map(_.tile).getOrElse(u.agent.destination.tile))))
-    lazy val modeThreat       = origin.map(_.nearestWalkableTile).getOrElse(PurpleMath.mode(units.view.map(u => u.battle.map(_.enemy.centroidGround().tile).getOrElse(u.agent.destination.tile))))
+    lazy val modeTarget       = PurpleMath.mode(units.view.map(u => ByOption.minBy(u.matchups.targets)(u.pixelDistanceEdge).map(_.tile).getOrElse(u.agent.destination.tile)))
+    lazy val modeThreat       = PurpleMath.mode(units.view.map(u => ByOption.minBy(u.matchups.threats)(_.pixelsToGetInRange(u)).map(_.tile).getOrElse(u.agent.destination.tile)))
 
     // Start flood filling!
     val inf = With.mapTileArea
@@ -99,28 +92,30 @@ object FormationGeneric {
     floodCostDistanceOrigin = 0
     floodCostThreat         = 0
     floodCostVulnerability  = 0
-    if (style == FormationStyle.March) {
+    if (style == FormationStyleMarch) {
       val path = new PathfindProfile(floodOrigin, Some(floodGoal), employGroundDist = true).find
       if ( ! path.pathExists) return FormationEmpty
       val patht = path.tiles.get.view
       floodMaxDistanceGoal    = floodOrigin.groundTilesManhattan(floodGoal) - 4
       floodMinDistanceGoal    = floodMaxDistanceGoal - 8
       floodStart              = patht.find(_.groundTilesManhattan(floodGoal) == floodMinDistanceGoal).orElse(patht.find(_.groundTilesManhattan(floodGoal) == floodMinDistanceGoal + 1)).getOrElse(floodGoal)
-      floodMaxThreat          = 0
+      floodMaxThreat          = With.grids.enemyRangeGround.margin
       floodCostDistanceGoal   = 5
       floodCostDistanceOrigin = 1
-    } else if (style == FormationStyle.Guard) {
+    } else if (style == FormationStyleGuard) {
       floodOrigin             = modeOrigin // TOOD: May be self-flagellating by using toReturn maybe create a new "home" property
       floodGoal               = With.scouting.mostBaselikeEnemyTile
       floodStart              = destination.get.tile
       floodMinDistanceGoal    = 1
       floodCostDistanceGoal   = 5
       floodCostDistanceOrigin = 1
-    } else if (style == FormationStyle.Engage) {
+    } else if (style == FormationStyleEngage) {
       floodStart              = modeTarget
-      floodCostVulnerability  = 3
+      floodCostVulnerability  = 7
+      floodCostThreat         = 1
       floodCostDistanceOrigin = 1
-    } else if (style == FormationStyle.Disengage) {
+      floodCostDistanceGoal   = 2
+    } else if (style == FormationStyleDisengage) {
       floodOrigin             = modeOrigin // TOOD: May be self-flagellating by using toReturn; maybe create a new "home" property
       floodStart              = centroid.tile
       floodCostDistanceOrigin = 1
@@ -166,7 +161,7 @@ object FormationGeneric {
     units
       .filter(_.flying)
       .foreach(u => placements(u) = floodOrigin.center.project(floodStart.center, Math.max(0, floodOrigin.center.pixelDistance(floodStart.center) - u.effectiveRangePixels)))
-    new Formation(placements.toMap)
+    new Formation(style, placements.toMap)
 
     // TODO:
     // - Implement cost function

@@ -11,7 +11,7 @@ import Planning.UnitPreferences.PreferClose
 
 class MonitorBases(
   initialUnitMatcher: UnitMatcher,
-  bases: () => Seq[Base] = () => With.geography.enemyBases,
+  bases: () => Seq[Base] = () => With.geography.enemyBases.filterNot(_.owner.isZerg),
   initialUnitCounter: UnitCounter = CountOne) extends Plan {
 
   val scouts = new LockUnits(this)

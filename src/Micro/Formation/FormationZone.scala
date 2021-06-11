@@ -104,6 +104,7 @@ object FormationZone {
     })
 
     FormationAssignment.outwardFromCentroid(
+      FormationStyleGuard,
       (meleeSlots.view ++ arcSlots.view)
         .groupBy(_._1)
         .mapValues(_.map(_._2)),

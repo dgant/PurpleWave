@@ -62,7 +62,6 @@ class PylonBlock extends Plan {
         val tileToBlock = baseToBlock.townHallTile.add(1, 1)
         var intent = new Intention {
           toTravel = Some(tileToBlock.center)
-          canFlee = true
           canFight = false
         }
         if (blocker.pixelDistanceCenter(tileToBlock.center) < 256 && With.self.supplyUsed + 24 >= With.self.supplyTotal) {

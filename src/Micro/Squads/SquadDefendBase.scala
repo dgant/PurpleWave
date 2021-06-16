@@ -14,13 +14,14 @@ import Utilities.ByOption
 
 class SquadDefendBase(base: Base) extends Squad {
 
-  private var lastAction = "Defend"
-  override def toString: String = f"$lastAction ${base.heart}"
+  private var lastAction = "Def"
+  override def toString: String = f"$lastAction ${base.name.take(5)}"
 
   val zoneAndChoke = new Cache(() => {
     val zone: Zone = base.zone
     val threat = With.scouting.threatOrigin.zone
     var output = (zone, zone.exitNow)
+    targetFilters = Seq(TargetFilterDefend(zone))
     if ( ! threat.bases.exists(_.owner.isUs)) {
       val possiblePath = With.paths.zonePath(zone, threat)
       possiblePath.foreach(path => {
@@ -60,10 +61,10 @@ class SquadDefendBase(base: Base) extends Squad {
       lastAction = "Scour"
       huntEnemies()
     } else if ( ! entranceBreached && canDefendChoke) {
-      lastAction = "Protect choke of"
+      lastAction = "Def choke"
       defendChoke()
     } else {
-      lastAction = "Protect heart of"
+      lastAction = "Def heart"
       defendHeart(base.heart.center)
     }
   }
@@ -102,7 +103,6 @@ class SquadDefendBase(base: Base) extends Squad {
       val thisTarget  = if (onlyAir) targetAir else if (onlyGround) targetGround else target
       recruit.agent.intend(this, new Intention {
         toTravel = Some(thisTarget.pixel)
-        targetFilters = Seq(TargetFilterDefend(zone))
       })
     })
   }
@@ -122,7 +122,6 @@ class SquadDefendBase(base: Base) extends Squad {
       unit.agent.intend(this, new Intention {
         toTravel = Some(unitDestination)
         toReturn = if (zone.bases.exists(_.owner.isUs)) Some(unitDestination) else None
-        targetFilters = Seq(TargetFilterDefend(zone))
       })})
   }
 
@@ -138,7 +137,6 @@ class SquadDefendBase(base: Base) extends Squad {
         defender.agent.intend(this, new Intention {
           toReturn = spot
           toTravel = spot.orElse(Some(zone.centroid.center))
-          targetFilters = Seq(TargetFilterDefend(zone))
         })
       })
   }

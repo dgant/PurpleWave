@@ -7,6 +7,7 @@ import Mathematics.Points.{Pixel, SpecificPoints}
 import Micro.Agency.AnchorMargin
 import Micro.Formation.Formation
 import Micro.Squads.Qualities.QualityCounter
+import Micro.Targeting.Filters.TargetFilter
 import Performance.Cache
 import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
@@ -20,6 +21,9 @@ trait Squad extends Prioritized {
   var vicinity: Pixel = SpecificPoints.middle
   var formation: Option[Formation] = None
   val lock: LockUnits = new LockUnits(this)
+  var targetQueue: Option[Seq[UnitInfo]] = None
+  var targetFilters: Seq[TargetFilter] = Seq.empty
+
   private var _unitsNow = new ArrayBuffer[FriendlyUnitInfo]
   private var _unitsNext = new ArrayBuffer[FriendlyUnitInfo]
   private var _enemiesNow = new ArrayBuffer[UnitInfo]
@@ -94,5 +98,5 @@ trait Squad extends Prioritized {
     units.groupBy(_.unitClass).map(group => (group._1, group._2.maxBy(unit => 100000L * unit.squadAge - unit.frameDiscovered)))
   )
 
-  override def toString: String = ToString(this)
+  override def toString: String = ToString(this).replace("Squad", "")
 }

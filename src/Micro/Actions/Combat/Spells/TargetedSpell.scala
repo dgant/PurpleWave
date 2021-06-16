@@ -1,12 +1,14 @@
 package Micro.Actions.Combat.Spells
 
 import Mathematics.Points.Pixel
+import Mathematics.Shapes.Ring
 import Micro.Actions.Action
 import Micro.Agency.Commander
 import Micro.Heuristics.{SpellTargetAOE, SpellTargetSingle}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.ByOption
 
 abstract class TargetedSpell extends Action {
   
@@ -18,6 +20,8 @@ abstract class TargetedSpell extends Action {
   protected def lookaheadPixels : Int = 0
   protected def pixelWidth      : Int = 96
   protected def pixelHeight     : Int = 96
+
+  final def castRangePixels: Int = castRangeTiles * 32
   
   protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double
 
@@ -33,15 +37,36 @@ abstract class TargetedSpell extends Action {
     
     if (aoe) {
       val targetPixel = new SpellTargetAOE().chooseTargetPixel(unit, totalRange, thresholdValue, valueTarget, pixelWidth = pixelWidth, pixelHeight = pixelHeight)
-      targetPixel.foreach(Commander.useTechOnPixel(unit, tech, _))
-      targetPixel.foreach(onCast(unit, _))
+      targetPixel.foreach(target => {
+        if (unit.pixelDistanceCenter(target) <= castRangePixels) {
+          targetPixel.foreach(Commander.useTechOnPixel(unit, tech, _))
+          targetPixel.foreach(onCast(unit, _))
+        } else {
+          moveInRange(unit, target)
+        }
+      })
     }
     else {
       val targetUnit = SpellTargetSingle.chooseTarget(unit, totalRange, thresholdValue, valueTarget)
-      targetUnit.foreach(Commander.useTechOnUnit(unit, tech, _))
+      targetUnit.foreach(target => {
+        if (unit.pixelDistanceEdge(target) < castRangePixels) {
+          targetUnit.foreach(Commander.useTechOnUnit(unit, tech, _))
+        } else {
+          moveInRange(unit, target.pixel)
+        }
+      })
     }
   }
   
   // Event handler for when the unit issues a cast
   protected def onCast(caster: FriendlyUnitInfo, target: Pixel) {}
+
+  private def moveInRange(caster: FriendlyUnitInfo, target: Pixel): Unit ={
+    if (caster.flying || caster.transport.exists(_.flying)) {
+      caster.agent.toTravel = Some(target)
+    } else {
+      caster.agent.toTravel = ByOption.minBy(Ring.points(castRangeTiles).map(target.tile.add).map(_.center))(caster.pixelDistanceTravelling)
+    }
+    Commander.move(caster)
+  }
 }

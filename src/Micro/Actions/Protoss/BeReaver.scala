@@ -80,7 +80,7 @@ object BeReaver extends Action {
       }
     )
     if (path.pathExists) {
-      if (unit.pixelDistanceSquared(path.end.center) <= 16 * 16) {
+      if (unit.pixelDistanceSquared(path.end.center) <= 16 * 16 && unit.agent.intent.dropOnArrival) {
         unit.transport.foreach(Commander.unload(_, unit))
         Commander.doNothing(unit)
       } else {

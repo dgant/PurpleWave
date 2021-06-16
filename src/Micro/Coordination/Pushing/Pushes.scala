@@ -1,6 +1,6 @@
 package Micro.Coordination.Pushing
 
-import Information.Grids.ArrayTypes.GridItems
+import Information.Grids.ArrayTypes.GridBuffer
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -13,8 +13,8 @@ import scala.collection.mutable.ArrayBuffer
 
 class Pushes {
 
-  private var gridCurrent   : GridItems[Push] = new GridItems[Push]
-  private var gridPrevious  : GridItems[Push] = new GridItems[Push]
+  private var gridCurrent   : GridBuffer[Push] = new GridBuffer[Push]
+  private var gridPrevious  : GridBuffer[Push] = new GridBuffer[Push]
   private var pushesCurrent : ArrayBuffer[Push] = new ArrayBuffer[Push]
   private var pushesPrevious : ArrayBuffer[Push] = new ArrayBuffer[Push]
 

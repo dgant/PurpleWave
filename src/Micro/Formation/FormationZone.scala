@@ -33,8 +33,8 @@ object FormationZone {
       else if (With.enemies.exists(_.isTerran)) 4
       else 1)
     val enemyRangePixelsMax   : Int = Math.max(expectedRange, ByOption.max(With.units.enemy.filter(_.unitClass.attacksGround).view.map(_.effectiveRangePixels.toInt)).getOrElse(0))
-    val meleeUnitSize         : Int = 5 + Math.max(16, units.view.map(u => if (u.effectiveRangePixelsMax > 32) 0 else if (edge.direction.isHorizontal) u.unitClass.width else u.unitClass.height).max)
-    val meleeChokeWidthUnits  : Int = Math.max(1, Math.min(2 * edge.radiusPixels.toInt / meleeUnitSize, units.count(_.effectiveRangePixelsMax <= 32)))
+    val meleeUnitSize         : Int = 5 + Math.max(16, units.view.map(u => if (u.formationRange > 32) 0 else if (edge.direction.isHorizontal) u.unitClass.width else u.unitClass.height).max)
+    val meleeChokeWidthUnits  : Int = Math.max(1, Math.min(2 * edge.radiusPixels.toInt / meleeUnitSize, units.count(_.formationRange <= 32)))
     val altitudeInside    = zone.centroid.altitude
     val altitudeOutside   = edge.otherSideof(zone).centroid.altitude
     val altitudeRequired  = if (enemyRangePixelsMax > 32 && altitudeInside > altitudeOutside) Some(altitudeInside) else None
@@ -61,11 +61,11 @@ object FormationZone {
     val arcSlots      = new mutable.ArrayBuffer[(UnitClass, Pixel)]
     val escapeAir     = With.geography.home.center
     val escapeGround  = ByOption.minBy(zone.edges.view.filterNot(_ == edge).map(_.pixelCenter))(_.groundPixels(With.geography.home)).getOrElse(zone.centroid.center)
-    units.toVector.sortBy(_.effectiveRangePixelsMax).foreach(unit => {
+    units.toVector.sortBy(_.formationRange).foreach(unit => {
       val escape = if (unit.flying) escapeAir else escapeGround
-      val rangeTiles = unit.effectiveRangePixelsMax.toInt / 32
+      val rangeTiles = unit.formationRange.toInt / 32
       val flyer = unit.unitClass.isFlyer && ! unit.unitClass.isFlyingBuilding && unit.unitClass != Protoss.Shuttle
-      if (altitudeRequired.isEmpty && enemyRangePixelsMax <= 32 && unit.effectiveRangePixelsMax <= 32 && edge.radiusPixels <= maxSightPixels) {
+      if (altitudeRequired.isEmpty && enemyRangePixelsMax <= 32 && unit.formationRange <= 32 && edge.radiusPixels <= maxSightPixels) {
         // Against enemy melee units, place melee units directly into the exit
         val nextPixel = meleeSlotsEmpty(meleeSlots.size)
         meleeSlots += ((unit.unitClass, nextPixel))

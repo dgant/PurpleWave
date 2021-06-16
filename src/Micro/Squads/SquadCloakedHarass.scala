@@ -10,6 +10,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.{ByOption, CountMap}
 
 class SquadCloakedHarass extends Squad {
+  override def toString: String = "Cloak"
   override def run(): Unit = {
     // Desired targets:
     // - Detectors in progress

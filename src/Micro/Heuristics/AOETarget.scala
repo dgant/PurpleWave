@@ -58,7 +58,7 @@ class AOETarget(
     DrawMap.circle(target.pixel, target.unitClass.dimensionMin + 2, Colors.MediumRed)
     DrawMap.box(Pixel(xMin, yMin), Pixel(xMax, yMax), colorBright)
     DrawMap.box(evalPixelStart, evalPixelEnd, colorDark)
-    DrawMap.drawStar(finalTarget, 7, colorBright, solid = true)
+    DrawMap.star(finalTarget, 7, colorBright, solid = true)
     units.foreach(unit => {
       DrawMap.circle(unit.pixel, unit.unitClass.dimensionMin, colorBright)
       DrawMap.label(evaluate(unit, caster).toInt.toString, unit.pixel.add(0, unit.unitClass.dimensionDown + 8))

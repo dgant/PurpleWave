@@ -176,7 +176,7 @@ object DrawMap {
     DrawMap.line(pixel.add( 1 * f, 4 * f), pixel.add( 1 * f, 6 * f - 1), colorDark)
   }
 
-  def drawStar(pixel: Pixel, radius: Int, color: Color, solid: Boolean = true): Unit = {
+  def star(pixel: Pixel, radius: Int, color: Color, solid: Boolean = true): Unit = {
     // Totally fudging the math on this -- might be better if I spent 2 minutes thinking or Googling
     val a = Math.max(4, radius)
     val b = Math.max(2, a / 2)
@@ -185,6 +185,18 @@ object DrawMap {
     DrawMap.triangle(pixel.add(0, -a),  pixel.add(0, c),  pixel.add(-b, b + 1), color, solid)
     DrawMap.triangle(pixel.add(0, -a),  pixel.add(0, c),  pixel.add( b, b + 1), color, solid)
   }
+
+  def crosshair(pixel: Pixel, radius: Int, color: Color): Unit = {
+    circle(pixel, radius, color)
+    val r3 = radius * 3 / 2
+    val r1 = radius / 2
+    box(pixel.add( -1, -r3), pixel.add( 1,  -r1), color)
+    box(pixel.add( -1,  r1), pixel.add( 1,   r3), color)
+    box(pixel.add(-r3,  -1), pixel.add(-r1,   1), color)
+    box(pixel.add( r1,  -1), pixel.add( r3,   1), color)
+  }
+
+
   
   def irrelevant(points: Iterable[Pixel]): Boolean = {
     With.configuration.visualizationCullViewport && points.forall(irrelevant)

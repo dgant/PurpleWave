@@ -25,7 +25,8 @@ class Zone(
   lazy val  centroid          : Tile                = (if (tiles.isEmpty) new Pixel(bwemRegion.getCenter).tile else tiles.minBy(_.tileDistanceSquared(new Pixel(bwemRegion.getCenter).tile))).center.nearestWalkableTile
   lazy val  area              : Double              = tiles.size // Previously taken from BWTA region area
   lazy val  island            : Boolean             = With.geography.startBases.count(st => With.paths.groundPathExists(st.heart, centroid)) < 2
-  lazy val  tilesBuildable    : Vector[Tile]         = { With.grids.buildableTerrain.initialize(); tiles.view.filter(With.grids.buildableTerrain.get).toVector }
+  lazy val  tilesBuildable    : Vector[Tile]        = { With.grids.buildableTerrain.initialize(); tiles.view.filter(With.grids.buildableTerrain.get).toVector }
+  lazy val  metro             : Option[Metro]       = With.geography.metros.find(_.zones.contains(this))
 
   lazy val exitDistanceGrid: GridGroundDistance = exit.map(_.distanceGrid).getOrElse(new GridGroundDistance(centroid))
   lazy val exit: Option[Edge] = calculateExit

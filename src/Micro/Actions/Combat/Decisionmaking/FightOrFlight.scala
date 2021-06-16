@@ -27,7 +27,7 @@ object FightOrFlight extends Action {
     decide(true,  "Static",       () => ! unit.canMove)
     decide(true,  "YOLO",         () => With.yolo.active() && unit.canAttack)
     decide(true,  "Irradiated",   () => unit.irradiated && unit.unitClass.isOrganic)
-    decide(true,  "CantFlee",     () => ! unit.agent.canFlee)
+    decide(true,  "CantFlee",     () => ! unit.agent.intent.canFlee)
     decide(true,  "Hug",          () => ! unit.flying && unit.matchups.targetsInRange.exists(t => unit.pixelDistanceEdge(t) < t.pixelRangeMin))
     decide(true,  "Cloaked",      () => unit.effectivelyCloaked || (unit.is(Terran.Wraith) && unit.energy >= 50 && unit.matchups.enemyDetectors.isEmpty && With.self.hasTech(Terran.WraithCloak)))
     decide(false, "CantFight",    () => ! unit.agent.canFight)

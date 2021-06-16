@@ -2,7 +2,6 @@ package Micro.Agency
 
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
-import Micro.Targeting.Filters.TargetFilter
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -32,5 +31,5 @@ class Intention {
   var canTickle     : Boolean                   = false
   var canLiftoff    : Boolean                   = false
   var canCancel     : Boolean                   = false
-  var targetFilters : Seq[TargetFilter]         = Seq.empty
+  var dropOnArrival : Boolean                   = true
 }

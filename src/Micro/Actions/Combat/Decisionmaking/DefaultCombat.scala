@@ -195,8 +195,9 @@ object DefaultCombat extends Action {
     transition(
       Fallback,
       () =>
+        ! unit.agent.shouldEngage
         // Units that can decently attack while retreating
-        unit.unitClass.fallbackAllowed
+        && unit.unitClass.fallbackAllowed
           && (
           // Tanks/Goliaths can attack while retreating. Reavers can't retreat and their shots are too valuable to waste
           unit.isAny(Terran.SiegeTankUnsieged, Terran.Goliath, Protoss.Reaver)
@@ -229,6 +230,8 @@ object DefaultCombat extends Action {
     /////////////
     // Execute //
     /////////////
+
+    unit.agent.shouldEngage ||= goalEngage
 
     // Set traffic priority
     if (goalEngage && target.exists(!unit.inRangeToAttack(_))) unit.agent.escalatePriority(TrafficPriorities.Nudge)
@@ -287,6 +290,10 @@ object DefaultCombat extends Action {
           return
         } else if (distanceTowards > 0) {
           unit.agent.act("Chase")
+          if (unit.inRangeToAttack(target.get) && unit.readyForAttackOrder) {
+            Commander.attack(unit)
+            return
+          }
           val to = target.get.pixel
           val step = target.get.presumptiveStep
           val chaseGoal = if (step.traversableBy(unit) && unit.pixelDistanceSquared(step) >= unit.pixelDistanceSquared(to)) step else to
@@ -294,10 +301,14 @@ object DefaultCombat extends Action {
           unit.agent.toTravel = Some(unit.pixel.project(chaseGoal, distanceTowards + extraChaseDistance))
           Move.delegate(unit)
           return
+        } else {
+          forces(danceForce) = Potential.unitAttraction(unit, target.get, distanceTowards)
+          forces(Forces.spreading) = unit.agent.receivedPushForce()
+          if (retreat(unit)) {
+            unit.agent.act(unit.agent.lastAction.map(_.replaceAll("Retreat", "Kite")).getOrElse("Kite"))
+            return
+          }
         }
-        forces(danceForce) = Potential.unitAttraction(unit, target.get, distanceTowards)
-        forces(Forces.spreading) = unit.agent.receivedPushForce()
-        if (retreat(unit)) return
       }
     } else if (goalEngage) {
       forces(Forces.travel)  = Potential.preferTravel(unit, destination)

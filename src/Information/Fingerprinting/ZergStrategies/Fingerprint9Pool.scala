@@ -10,7 +10,7 @@ class Fingerprint9Pool extends FingerprintOr(
   new FingerprintAnd(
     new FingerprintNot(With.fingerprints.fourPool),
     new FingerprintOr(
-      new FingerprintArrivesBy(Zerg.Zergling,       GameTime(3, 15)),
+      new FingerprintArrivesBy(Zerg.Zergling,       GameTime(3, 10)),
       new FingerprintCompleteBy(Zerg.SpawningPool,  GameTime(2, 2)))))
       // 9 Pool and Overpool are hard to differentiate because there's only a 10 second difference
       // to acquire the extra 100 minerals that Overpool requires for its Spawning Pool.

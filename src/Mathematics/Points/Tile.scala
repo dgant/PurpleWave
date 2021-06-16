@@ -1,6 +1,6 @@
 package Mathematics.Points
 
-import Information.Geography.Types.{Base, Zone}
+import Information.Geography.Types.{Base, Metro, Zone}
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Spiral
@@ -128,6 +128,9 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   }
   @inline def adjacent9: Array[Tile] = {
     Array(this, up, down, left, right, up.left, up.right, down.left, down.right)
+  }
+  @inline def metro: Option[Metro] = {
+    zone.metro
   }
   @inline def zone: Zone = {
     With.geography.zoneByTile(this)

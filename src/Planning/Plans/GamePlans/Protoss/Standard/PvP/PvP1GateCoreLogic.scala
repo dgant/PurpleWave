@@ -52,22 +52,36 @@ class PvP1GateCoreLogic(allowZealotBeforeCore: Boolean = true) {
     new Not(new GateGate),
     new Check(() => With.strategy.isInverted))
 
-  class ZealotBeforeCore extends And(
-    new Check(() => allowZealotBeforeCore),
-    new Or(
-      new EnemyRecentStrategy(
-        With.fingerprints.gasSteal,
-        With.fingerprints.mannerPylon,
-        With.fingerprints.workerRush,
-        With.fingerprints.cannonRush,
-        With.fingerprints.nexusFirst),
+  class ZealotBeforeCore extends Or(
+    new Latch(
       new And(
-        new PossibleZealotPressure,
+        new UnitsAtLeast(1, Protoss.Zealot),
+        new UnitsAtMost(0, Protoss.CyberneticsCore))),
+    new And(
+      new Check(() => allowZealotBeforeCore),
+      new Or(
         new EnemyRecentStrategy(
-          With.fingerprints.proxyGateway,
-          With.fingerprints.twoGate))))
+          With.fingerprints.gasSteal,
+          With.fingerprints.mannerPylon,
+          With.fingerprints.workerRush,
+          With.fingerprints.cannonRush,
+          With.fingerprints.nexusFirst),
+        new And(
+          new PossibleZealotPressure,
+          new EnemyRecentStrategy(
+            With.fingerprints.proxyGateway,
+            With.fingerprints.twoGate)))))
 
   class ZealotAfterCore extends Or(
+    new Latch(
+      new And(
+        new Not(new ZealotBeforeCore),
+        new UnitsAtLeast(1, Protoss.CyberneticsCore),
+        new UnitsAtLeast(1, Protoss.Zealot))),
+    new Latch(
+      new And(
+        new UnitsAtLeast(2, Protoss.Zealot),
+        new UnitsAtLeast(1, Protoss.CyberneticsCore))),
     new EnemyStrategy(
       With.fingerprints.workerRush,
       With.fingerprints.mannerPylon,

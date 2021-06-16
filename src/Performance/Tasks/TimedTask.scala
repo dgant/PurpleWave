@@ -100,7 +100,7 @@ abstract class TimedTask {
       _runsCrossingLimit += 1
       if (skipsMax > 0 && With.configuration.enablePerformancePauses && With.performance.lastTaskWarningFrame < With.frame) {
         With.performance.lastTaskWarningFrame = With.frame
-        With.logger.warn(f"$toString${if(due)" (Due)" else ""} crossed ${With.configuration.frameLimitMs}ms limit on ${budgetMs}ms budget (${PurpleMath.meanL(budgetMsPast).toInt}ms avg budget), taking ${millisecondsDuration}ms, reaching ${With.performance.frameMs}ms on the frame.")
+        With.logger.warn(f"$toString${if(due)" (Due)" else ""} crossed ${With.configuration.frameLimitMs}ms taking ${millisecondsDuration}ms on a ${budgetMs}ms budget (${PurpleMath.meanL(budgetMsPast).toInt}ms avg budget), reaching ${With.performance.frameMs}ms on the frame.")
       }
     }
     lastRunFrame = With.frame

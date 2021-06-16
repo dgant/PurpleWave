@@ -16,7 +16,7 @@ class StrategySelectionRecommended(fallback: StrategySelectionPolicy, recommende
   }
 
   override def chooseBranch: Seq[Strategy] = {
-    val legalMatchedBranches = With.strategy.strategyBranchesLegal.filter(branch => recommendedBranch.forall(branch.contains))
+    val legalMatchedBranches = With.strategy.strategyBranchesLegal.filter(branch => recommendedBranch.forall(branch.contains)).sortBy(_.length)
 
     if (legalMatchedBranches.isEmpty) {
       With.logger.warn(f"$this failed to find any branches, filtered by legality, matching ${recommendedBranch.mkString(" + ")}")

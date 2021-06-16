@@ -5,7 +5,6 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.Micro.ShowUnitsFriendly
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Micro.Targeting.Filters.TargetFilterLeash
 import Micro.Agency.Intention
 import Planning.Predicates.Strategy.EnemyRecentStrategy
 import Planning.Prioritized
@@ -106,7 +105,7 @@ class DefendFFEWithProbes extends Prioritized {
         canFlee   = false
         toTravel  = Some(toDefend)
         toReturn  = Some(toDefend)
-        targetFilters = Seq(TargetFilterLeash(32 * 5))
+        //targetFilters = Seq(TargetFilterLeash(32 * 5))
       }))
       if (ShowUnitsFriendly.mapInUse) {
         workers.foreach(w => DrawMap.circle(toDefend, 16, Colors.NeonYellow))

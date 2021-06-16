@@ -16,17 +16,30 @@ object ShowSquads extends View {
   
   def renderSquadMap(squad: Squad) {
     val color = squadColors(squad.hashCode % squadColors.length)
+    squad.formation.foreach(_.renderMap(color))
     squad.units.foreach(unit =>
       DrawMap.label(
         squad.toString,
         unit.pixel.add(0, unit.unitClass.height),
         drawBackground = true,
-        color,
+        backgroundColor = color,
         drawBorder = unit.isEnemy,
-        unit.player.colorMedium))
+        borderColor = With.enemy.colorMedium))
 
     val centroid = PurpleMath.centroid(squad.units.view.map(_.pixel))
     With.game.drawCircleMap(centroid.bwapi, squad.units.map(_.pixelDistanceCenter(centroid)).max.toInt, color)
+
+    squad.targetQueue.foreach(q => {
+      var i = 0
+      if (q.nonEmpty) {
+        val targetColor = Colors.BrightYellow
+        DrawMap.crosshair(q.head.pixel, q.head.unitClass.dimensionMax / 2, targetColor)
+        while (i < q.length - 1) {
+          DrawMap.arrow(q(i).pixel, q(i + 1).pixel, Colors.BrightRed)
+          i += 1
+        }
+      }
+    })
   }
   
   override def renderScreen() {

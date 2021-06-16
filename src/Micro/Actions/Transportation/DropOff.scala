@@ -7,11 +7,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object DropOff extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.isTransport                                  &&
-    unit.loadedUnits.nonEmpty                         &&
-    With.grids.walkable.get(unit.tile)
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.isTransport && unit.loadedUnits.nonEmpty && unit.tile.walkable
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val fastestPassenger  = unit.loadedUnits.maxBy(_.topSpeed)

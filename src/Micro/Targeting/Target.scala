@@ -40,7 +40,7 @@ object Target extends {
   }
 
   def filtersRequired(attacker: FriendlyUnitInfo): Seq[TargetFilter] = {
-    (TargetFilterGroups.filtersRequired.view ++ attacker.agent.intent.targetFilters).filter(_.appliesTo(attacker))
+    (TargetFilterGroups.filtersRequired.view ++ attacker.squad.map(_.targetFilters).getOrElse(Seq.empty)).filter(_.appliesTo(attacker))
   }
 
   def auditLegality(attacker: FriendlyUnitInfo, additionalFiltersRequired: TargetFilter*): Vector[(UnitInfo, Vector[(Boolean, TargetFilter)], Vector[(Boolean, TargetFilter)])] = {

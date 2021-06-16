@@ -1,6 +1,5 @@
 package Micro.Squads
 
-import Debugging.Decap
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
@@ -10,32 +9,38 @@ import ProxyBwapi.Races.Terran
 import Utilities.{ByOption, Minutes}
 
 class SquadAttack extends Squad {
-  override def toString: String = f"Attack ${Decap(vicinity.base.getOrElse(vicinity.zone))}"
+  override def toString: String = f"Atk ${vicinity.base.map(_.name).getOrElse(vicinity.zone.name).take(4)}"
 
   override def run() {
+    formation = None
     chooseVicinity()
     if (units.isEmpty) return
-    lazy val centroid = PurpleMath.centroid(units.view.map(_.pixel))
-    lazy val fightConsensus = PurpleMath.mode(units.view.map(_.agent.shouldEngage))
-    lazy val originConsensus = PurpleMath.mode(units.view.map(_.agent.origin))
-    lazy val battleConsensus = PurpleMath.mode(units.view.map(_.battle))
-    formation = if (units.size > 4) Some(if (fightConsensus) {
-      val readyToEngage = units.exists(u => u.presumptiveTarget.exists(t => u.pixelsToGetInRange(t) < 64))
-      lazy val alreadyEngagedUpon = battleConsensus.exists(_.enemy.units.exists(e => e.presumptiveTarget.exists(e.inRangeToAttack)))
-      if (readyToEngage || alreadyEngagedUpon) {
-        FormationGeneric.engage(units)
+    lazy val centroid             = PurpleMath.centroid(units.view.map(_.pixel))
+    lazy val fightConsensus       = PurpleMath.mode(units.view.map(_.agent.shouldEngage))
+    lazy val originConsensus      = PurpleMath.mode(units.view.map(_.agent.origin))
+    lazy val battleConsensus      = PurpleMath.mode(units.view.map(_.battle))
+    lazy val targetReadyToEngage  = targetQueue.get.find(t => units.exists(u => u.canAttack(t) && u.pixelsToGetInRange(t) < 64))
+    lazy val targetHasEngagedUs   = targetQueue.get.find(t => units.exists(u => t.canAttack(u) && t.inRangeToAttack(u)))
+    if (fightConsensus) {
+      targetQueue = Some(SquadTargeting.rank(units, SquadTargeting.enRouteTo(units, vicinity)))
+      if (targetReadyToEngage.isDefined || targetHasEngagedUs.isDefined) {
+        formation = Some(FormationGeneric.engage(units, targetReadyToEngage.orElse(targetHasEngagedUs).map(_.pixel)))
       } else {
-        FormationGeneric.march(units, vicinity)
+        formation = Some(FormationGeneric.march(units, vicinity))
       }
-    } else if (centroid.zone == originConsensus.zone && With.scouting.threatOrigin.zone != originConsensus.zone) {
-      FormationGeneric.guard(units, Some(originConsensus))
     } else {
-      FormationGeneric.disengage(units)
-    }) else None
+      targetQueue = Some(SquadTargeting.rank(units, SquadTargeting.enRouteTo(units, originConsensus)))
+      if (centroid.zone == originConsensus.zone && With.scouting.threatOrigin.zone != originConsensus.zone) {
+        formation = Some(FormationGeneric.guard(units, Some(originConsensus)))
+      } else {
+        formation = Some(FormationGeneric.disengage(units))
+      }
+    }
 
     units.foreach(attacker => {
       attacker.agent.intend(this, new Intention {
-        toTravel = formation.flatMap(_.placements.get(attacker)).orElse(Some(vicinity))
+        toTravel = formation.filter(_.placements.size > 4).flatMap(_.placements.get(attacker)).orElse(Some(vicinity))
+        dropOnArrival = false
       })
     })
   }

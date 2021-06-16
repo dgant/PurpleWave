@@ -91,7 +91,7 @@ trait CombatUnit {
   @inline final def cooldownMaxAgainst(enemy: CombatUnit): Int = if (enemy.flying) cooldownMaxAir else cooldownMaxGround
   @inline final def pixelRangeAgainst(enemy: CombatUnit): Double = if (enemy.flying) pixelRangeAir else pixelRangeGround
   @inline final def effectiveRangePixels: Double = Math.max(pixelRangeMax, unitClass.effectiveRangePixels)
-  @inline final def effectiveRangePixelsMax: Double = Math.max(effectiveRangePixels, if (unitClass == Terran.SiegeTankUnsieged) Terran.SiegeTankSieged.effectiveRangePixels else 0)
+  @inline final def formationRange: Double = Math.max(effectiveRangePixels, if (unitClass == Terran.SiegeTankUnsieged) Terran.SiegeTankSieged.effectiveRangePixels else 0) - (if (unitClass == Protoss.Reaver) 64 else 32)
   @inline final def totalHealth: Int = hitPoints + shieldPoints + matrixPoints
 
   @inline final def x           : Int   = pixel.x

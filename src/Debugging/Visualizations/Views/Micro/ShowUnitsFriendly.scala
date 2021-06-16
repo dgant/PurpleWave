@@ -13,10 +13,10 @@ import bwapi.Color
 object ShowUnitsFriendly extends View {
   
   var selectedOnly    : Boolean = false
-  var showClient      : Boolean = true
+  var showClient      : Boolean = false
   var showAction      : Boolean = true
   var showOrder       : Boolean = true
-  var showTargets     : Boolean = true
+  var showTargets     : Boolean = false
   def showPaths       : Boolean = ShowUnitPaths.inUse
   var showDesire      : Boolean = true
   var showDistance    : Boolean = false
@@ -79,7 +79,7 @@ object ShowUnitsFriendly extends View {
       if (agent.leader().contains(unit)) {
         val start = unit.pixel.add(0, unit.unitClass.dimensionDown + 8)
         DrawMap.circle(start, 5, color = unit.player.colorMidnight, solid = true)
-        DrawMap.drawStar(start, 4, Colors.NeonYellow)
+        DrawMap.star(start, 4, Colors.NeonYellow)
       }
     }
 

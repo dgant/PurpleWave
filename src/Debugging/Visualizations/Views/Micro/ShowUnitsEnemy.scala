@@ -11,10 +11,10 @@ import Utilities.GameTime
 
 object ShowUnitsEnemy extends View {
   
-  var showSiegeRadius = true
+  var showSiegeRadius = false
   var showFogged      = true
   var showCountdown   = true
-  var showTargets     = true
+  var showTargets     = false
   
   override def renderMap() {
     With.units.enemy.foreach(renderUnit)

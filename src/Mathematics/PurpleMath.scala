@@ -22,32 +22,38 @@ object PurpleMath {
   
   @inline final def centroid(values: Iterable[Pixel]): Pixel = {
     if (values.isEmpty) return SpecificPoints.middle
-    // Faster than .sum
-    var x: Int = 0
-    var y: Int = 0
-    values.foreach(v => {
-      x += v.x
-      y += v.y
-    })
+    var x, y: Int = 0
+    values.foreach(v => { x += v.x; y += v.y }) // Faster than .sum
     Pixel(x / values.size, y / values.size)
   }
 
   @inline final def centroidTiles(values: Iterable[Tile]): Tile = {
     if (values.isEmpty) return SpecificPoints.tileMiddle
-    // Faster than .sum
-    var x: Int = 0
-    var y: Int = 0
-    values.foreach(v => {
-      x += v.x
-      y += v.y
-    })
+    var x, y: Int = 0
+    values.foreach(v => { x += v.x; y += v.y }) // Faster than .sum
     Tile(x / values.size, y / values.size)
   }
 
-  @inline final def nanToN(value: Double, n: Double): Double = {
-    if (value.isNaN || value.isInfinity) n else value
+  @inline final def exemplar(values: Iterable[Pixel]): Pixel = {
+    if (values.isEmpty) return SpecificPoints.middle
+    val valuesCentroid = centroid(values)
+    values.minBy(_.pixelDistanceSquared(valuesCentroid))
   }
 
+  @inline final def weightedCentroid(values: Iterable[(Pixel, Double)]): Pixel = {
+    if (values.isEmpty) return SpecificPoints.middle
+    var x, y, d: Double = 0
+    values.foreach(v => { x += v._1.x * v._2;  y += v._1.y * v._2;  d += v._2 })
+    Pixel((x / d).toInt, (y / d).toInt)
+  }
+
+  @inline final def weightedExemplar(values: Iterable[(Pixel, Double)]): (Pixel, Double) = {
+    if (values.isEmpty) return (SpecificPoints.middle, 1.0)
+    val centroid = weightedCentroid(values)
+    values.minBy(_._1.pixelDistanceSquared(centroid))
+  }
+
+  @inline final def nanToN(value: Double, n: Double): Double = if (value.isNaN || value.isInfinity) n else value
   @inline final def nanToZero(value: Double): Double = nanToN(value, 0)
   @inline final def nanToOne(value: Double): Double = nanToN(value, 1)
   @inline final def nanToInfinity(value: Double): Double = nanToN(value, Double.PositiveInfinity)

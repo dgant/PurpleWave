@@ -57,7 +57,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   var toNuke        : Option[Pixel]             = None
   var toRepair      : Option[UnitInfo]          = None
   var canFight      : Boolean                   = true
-  var canFlee       : Boolean                   = true
   var canMeld       : Boolean                   = false
   var canLiftoff    : Boolean                   = false
   var canCancel     : Boolean                   = false
@@ -70,25 +69,26 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   def destination: Pixel = toTravel.orElse(toReturn).getOrElse(origin)
   def origin: Pixel = toReturn.getOrElse(originCache())
+  def simpleOrigin: Pixel = toReturn.getOrElse(simpleOriginCache())
   private val originCache = new KeyedCache(
     () =>
       ride.filterNot(unit.transport.contains).map(_.pixel)
       .orElse(unit.matchups.anchor.filter(_.matchups.threats.nonEmpty).map(a => a.pixel.project(unit.battle.map(_.enemy.centroidOf(unit)).getOrElse(a.pixel), AnchorMargin(unit))))
       .orElse(toReturn)
-      .orElse(
-        ByOption.minBy(
-          With.geography.ourBases.filter(base =>
-            base.scoutedByEnemy
-            || base.isNaturalOf.exists(_.scoutedByEnemy)
-            || base == With.geography.ourNatural
-            || base == With.geography.ourMain))(base =>
-          unit.pixelDistanceTravelling(base.heart)
-          // Retreat into main
-          + (if (base.isNaturalOf.filter(_.owner.isUs).exists(_.heart.altitude >= base.heart.altitude) && unit.battle.exists(_.enemy.centroidGround().base.contains(base))) 32 * 40 else 0))
-        .map(_.heart.center))
-      .getOrElse(With.geography.home.center),
+      .getOrElse(simpleOrigin),
     () => unit.agent.toReturn)
-
+  private val simpleOriginCache = new Cache[Pixel](() =>
+    ByOption.minBy(
+      With.geography.ourBases.filter(base =>
+        base.scoutedByEnemy
+        || base.isNaturalOf.exists(_.scoutedByEnemy)
+        || base == With.geography.ourNatural
+        || base == With.geography.ourMain))(base =>
+      unit.pixelDistanceTravelling(base.heart)
+      // Retreat into main
+      + (if (base.isNaturalOf.filter(_.owner.isUs).exists(_.heart.altitude >= base.heart.altitude) && unit.battle.exists(_.enemy.centroidGround().base.contains(base))) 32 * 40 else 0))
+    .map(_.heart.center)
+    .getOrElse(With.geography.home.center))
 
   def isScout: Boolean = intent.toScoutTiles.nonEmpty
 
@@ -158,7 +158,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     toBoard       = intent.toBoard.orElse(toBoard)
     toNuke        = intent.toNuke
     canFight      = intent.canFight
-    canFlee       = intent.canFlee
     canMeld       = intent.canMeld
     canLiftoff    = intent.canLiftoff
     canCancel     = intent.canCancel
@@ -182,7 +181,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   // Leading //
   /////////////
 
-  val leader = new Cache(() => unit.squad.flatMap(_.leader(unit.unitClass)))
+  val leader = new Cache(() => ride.flatMap(_.agent.prioritizedPassengers.headOption).orElse(unit.squad.flatMap(_.leader(unit.unitClass))))
   var leadFollower: (FriendlyUnitInfo) => Unit = x => {}
 
   /////////////////

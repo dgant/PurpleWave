@@ -10,6 +10,7 @@ import Planning.UnitPreferences.PreferClose
 import Utilities.{ByOption, Minutes}
 
 class SquadEjectScout extends Squad {
+  override def toString: String = "Eject"
 
   val targetScout = new Cache(() => ByOption.minBy(With.scouting.enemyScouts())(_.frameDiscovered))
   private val tilesToConsider = new Cache(() => With.scouting.basesToLookForEnemyScouts().view.flatMap(_.zone.tiles))

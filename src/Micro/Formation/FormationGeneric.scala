@@ -17,18 +17,14 @@ object FormationGeneric {
   /**
     * Formation for units en route to a destination
     */
-  def march(
-    units: Iterable[FriendlyUnitInfo],
-    destination: Pixel)
-      : Formation = {
+  def march(units: Iterable[FriendlyUnitInfo], destination: Pixel) : Formation = {
     form(units, FormationStyleMarch, destination = Some(destination))
   }
 
   /**
     * Formation for units protecting a choke
     */
-  def guard(units: Iterable[FriendlyUnitInfo], origin: Option[Pixel] = None)
-      : Formation = {
+  def guard(units: Iterable[FriendlyUnitInfo], origin: Option[Pixel] = None): Formation = {
     val finalOrigin: Pixel = origin.getOrElse(ByOption.mode(units.view.map(_.agent.origin)).getOrElse(With.geography.home.center))
     val output = finalOrigin.zone.exit
       .map(exit => FormationZone(units, finalOrigin.zone, exit))
@@ -39,8 +35,7 @@ object FormationGeneric {
   /**
     * Formation for units trying to start a fight with an enemy
     */
-  def engage(units: Iterable[FriendlyUnitInfo], destination: Option[Pixel] = None)
-      : Formation = {
+  def engage(units: Iterable[FriendlyUnitInfo], destination: Option[Pixel] = None): Formation = {
     form(units, FormationStyleEngage, destination = destination)
   }
 
@@ -76,7 +71,7 @@ object FormationGeneric {
             anchors.filter(_.nonEmpty)).getOrElse(
               units)
     val centroid              = keyUnits.view.map(_.pixel).minBy(_.pixelDistanceSquared(PurpleMath.centroid(keyUnits.view.map(_.pixel))))
-    lazy val modeOrigin       = origin.map(_.nearestWalkableTile).getOrElse(PurpleMath.mode(units.view.map(_.agent.origin.tile)))
+    lazy val modeOrigin       = origin.map(_.nearestWalkableTile).getOrElse(PurpleMath.mode(units.view.map(_.agent.simpleOrigin.tile)))
     lazy val modeTarget       = PurpleMath.mode(units.view.map(u => ByOption.minBy(u.matchups.targets)(u.pixelDistanceEdge).map(_.tile).getOrElse(u.agent.destination.tile)))
     lazy val modeThreat       = PurpleMath.mode(units.view.map(u => ByOption.minBy(u.matchups.threats)(_.pixelsToGetInRange(u)).map(_.tile).getOrElse(u.agent.destination.tile)))
 
@@ -86,7 +81,8 @@ object FormationGeneric {
     floodOrigin             = centroid.tile
     floodGoal               = destination.map(_.nearestWalkableTile).getOrElse(With.scouting.mostBaselikeEnemyTile)
     floodStart              = floodGoal
-    floodMinDistanceGoal    = - inf; floodMaxDistanceGoal    = inf
+    floodMinDistanceGoal    = - inf
+    floodMaxDistanceGoal    = inf
     floodMaxThreat          = inf
     floodCostDistanceGoal   = 0
     floodCostDistanceOrigin = 0
@@ -103,7 +99,7 @@ object FormationGeneric {
       floodCostDistanceGoal   = 5
       floodCostDistanceOrigin = 1
     } else if (style == FormationStyleGuard) {
-      floodOrigin             = modeOrigin // TOOD: May be self-flagellating by using toReturn maybe create a new "home" property
+      floodOrigin             = modeOrigin
       floodGoal               = With.scouting.mostBaselikeEnemyTile
       floodStart              = destination.get.tile
       floodMinDistanceGoal    = 1
@@ -111,16 +107,16 @@ object FormationGeneric {
       floodCostDistanceOrigin = 1
     } else if (style == FormationStyleEngage) {
       floodStart              = modeTarget
-      floodCostVulnerability  = 7
-      floodCostThreat         = 1
+      floodCostVulnerability  = 125 // Testing this
+      floodCostThreat         = 25
       floodCostDistanceOrigin = 1
-      floodCostDistanceGoal   = 2
+      floodCostDistanceGoal   = 5
     } else if (style == FormationStyleDisengage) {
-      floodOrigin             = modeOrigin // TOOD: May be self-flagellating by using toReturn; maybe create a new "home" property
+      floodOrigin             = modeOrigin
       floodStart              = centroid.tile
       floodCostDistanceOrigin = 1
-      floodCostDistanceGoal   = 1
-      floodCostThreat         = 25
+      floodCostDistanceGoal   = 5
+      floodCostThreat         = 100 // In practice we only need floodMaxThreat to enforce safe positions but this makes for efficient flood fill
       floodMaxThreat          = 0
     }
 
@@ -129,7 +125,7 @@ object FormationGeneric {
     val explored      = With.grids.disposableBoolean()
     val unplaced = groundUnits.get
       .groupBy(_.unitClass)
-      .map(g => (new UnorderedBuffer[FriendlyUnitInfo](g._2), g._2.map(_.effectiveRangePixels).max))
+      .map(g => (new UnorderedBuffer[FriendlyUnitInfo](g._2), Math.max(1, g._2.map(_.formationRange.toInt / 32).max)))
       .toVector
       .sortBy(_._2)
     floodHorizon += ((floodStart, cost(floodStart)))
@@ -187,7 +183,7 @@ object FormationGeneric {
     if ( ! tile.walkable) return With.mapPixelPerimeter
     val costDistanceGoal    = if (floodCostDistanceGoal == 0)   0 else floodCostDistanceGoal    * tile.groundTilesManhattan(floodGoal)
     val costDistanceOrigin  = if (floodCostDistanceOrigin == 0) 0 else floodCostDistanceOrigin  * tile.groundTilesManhattan(floodOrigin)
-    val costThreat          = if (floodCostThreat == 0)         0 else With.grids.enemyRangeGround(tile)
+    val costThreat          = if (floodCostThreat == 0)         0 else floodCostThreat          * With.grids.enemyRangeGround(tile)
     val costVulnerability   = if (floodCostVulnerability == 0)  0 else Math.max(0, vGrid.margin + vGrid.maxVulnerability - vGrid(tile))
     // TODO: The vulnerability cost should vary based on the range of the unit.
     // Punishing, eg, a dragoon for not being adjacent to its target, doesn't allow sniping units from uphill

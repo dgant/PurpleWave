@@ -2,7 +2,6 @@ package ProxyBwapi.UnitInfo
 
 import Debugging.Visualizations.Colors
 import Information.Battles.Clustering.BattleCluster
-import Information.Battles.MCRS.MCRSUnit
 import Information.Battles.Prediction.Simulation.{ReportCard, Simulacrum}
 import Information.Battles.Types.{BattleLocal, Team}
 import Information.Geography.Types.{Base, Metro, Zone}
@@ -203,7 +202,6 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def team: Option[Team] = battle.map(_.teamOf(this))
   @inline final def report: Option[ReportCard] = battle.flatMap(_.simulationReport.get(this))
   var matchups: MatchupAnalysis = MatchupAnalysis(this)
-  val mcrs: MCRSUnit = new MCRSUnit(this)
   val simulacrum: Simulacrum = new Simulacrum(this)
   var clusteringEnabled: Boolean = _
   var clusteringRadiusSquared: Double = _
@@ -327,7 +325,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
           .points(range.toInt / 32)
           .map(enemy.tile.add(_).center.add(offset))
           .filter(p => canTraverse(p) && pixelDistanceSquared(p) < distanceSquared)
-      val ringSpot = ByOption.minBy(ringPixels)(p => pixelDistanceSquared(p) * (2 - ptfGoodAltitudeBonus(altitudeMatters, enemyAltitude, p)) - ptfBadAltitudePenalty(altitudeMatters, enemyAltitude, p))
+      val ringSpot = Maff.minBy(ringPixels)(p => pixelDistanceSquared(p) * (2 - ptfGoodAltitudeBonus(altitudeMatters, enemyAltitude, p)) - ptfBadAltitudePenalty(altitudeMatters, enemyAltitude, p))
       val output = ringSpot.getOrElse(pixelFar.nearestTraversableBy(this))
       return output
     }
@@ -378,7 +376,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     friendly.flatMap(_.agent.toAttack)
       .orElse(target)
       .orElse(orderTarget)
-      .orElse(ByOption.minBy(matchups.targets)(_.pixelDistanceEdge(targetPixel.orElse(orderTargetPixel).getOrElse(pixel))))
+      .orElse(Maff.minBy(matchups.targets)(_.pixelDistanceEdge(targetPixel.orElse(orderTargetPixel).getOrElse(pixel))))
 
   @inline final def isBeingViolent: Boolean = {
     unitClass.isStaticDefense ||

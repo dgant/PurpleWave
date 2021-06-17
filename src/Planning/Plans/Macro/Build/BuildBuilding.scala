@@ -4,6 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.PlacementRequests.PlacementRequest
 import Macro.Buildables.{Buildable, BuildableUnit}
 import Macro.Scheduling.MacroCounter
+import Mathematics.Maff
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
@@ -13,7 +14,7 @@ import Planning.UnitPreferences.PreferCloseAndNotMining
 import ProxyBwapi.Races.Neutral
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.ByOption
+
 
 class BuildBuilding(val buildingClass: UnitClass) extends Production {
 
@@ -57,7 +58,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
       .orElse(possibleBuildings.find(pb => pb.buildUnit.flatMap(_.friendly).exists(_.friendly.exists(builderLock.units.contains))))
       .orElse(possibleBuildings.find(pb => orderedTile.contains(pb.tileTopLeft)))
       .orElse(possibleBuildings.find(pb => desiredTile.contains(pb.tileTopLeft)))
-      .orElse(ByOption.minBy(possibleBuildings)(_.frameDiscovered))
+      .orElse(Maff.minBy(possibleBuildings)(_.frameDiscovered))
     building.foreach(_.friendly.foreach(_.setProducer(this)))
 
     if (building.isEmpty) {

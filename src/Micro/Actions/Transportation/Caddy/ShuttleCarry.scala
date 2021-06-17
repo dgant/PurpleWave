@@ -1,10 +1,11 @@
 package Micro.Actions.Transportation.Caddy
 
+import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Agency.Commander
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.ByOption
+
 
 object ShuttleCarry extends Action {
 
@@ -13,7 +14,7 @@ object ShuttleCarry extends Action {
   }
 
   protected def mainPassenger(shuttle: FriendlyUnitInfo): Option[FriendlyUnitInfo] = {
-    ByOption.maxBy(shuttle.loadedUnits)(p => p.subjectiveValue + p.frameDiscovered / 10000.0)
+    Maff.maxBy(shuttle.loadedUnits)(p => p.subjectiveValue + p.frameDiscovered / 10000.0)
   }
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {

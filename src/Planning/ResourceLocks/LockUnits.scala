@@ -1,12 +1,12 @@
 package Planning.ResourceLocks
 
 import Lifecycle.With
+import Mathematics.Maff
 import Planning.Prioritized
 import Planning.UnitCounters.{CountEverything, CountUpTo, UnitCounter}
 import Planning.UnitMatchers.{MatchAnything, UnitMatcher}
 import Planning.UnitPreferences.{PreferAnything, UnitPreference}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.ByOption
 
 import scala.collection.mutable
 
@@ -59,7 +59,7 @@ class LockUnits(val owner: Prioritized) {
   }
 
   private def findSingleFinalist(candidates: Iterable[FriendlyUnitInfo]): Seq[FriendlyUnitInfo] = {
-    ByOption.minBy(candidates.filter(matcher))(preference.apply).toSeq
+    Maff.minBy(candidates.filter(matcher))(preference.apply).toSeq
   }
 
   private def findMultipleFinalists(candidates: Iterable[FriendlyUnitInfo]): Seq[FriendlyUnitInfo] = {

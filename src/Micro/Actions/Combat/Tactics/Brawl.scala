@@ -1,12 +1,13 @@
 package Micro.Actions.Combat.Tactics
 
 import Lifecycle.With
+import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Targeting.Target
 import Micro.Agency.Commander
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.ByOption
+
 
 object Brawl extends Action {
   
@@ -32,7 +33,7 @@ object Brawl extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    lazy val framesClosest = ByOption.min(unit.matchups.targets.map(unit.framesBeforeAttacking))
+    lazy val framesClosest = Maff.min(unit.matchups.targets.map(unit.framesBeforeAttacking))
     lazy val targetsNear = unit.matchups.targets.filter(t => framesClosest.exists(f => unit.framesBeforeAttacking(t) <= f))
     unit.agent.toAttack =
       Target.best(unit, unit.matchups.targetsInRange)

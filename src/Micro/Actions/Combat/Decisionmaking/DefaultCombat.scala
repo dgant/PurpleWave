@@ -18,7 +18,7 @@ import Micro.Heuristics.Potential
 import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.{ByOption, Seconds}
+import Utilities.Seconds
 
 object DefaultCombat extends Action {
 
@@ -262,7 +262,7 @@ object DefaultCombat extends Action {
     var exactDistance: Option[Double] = None
     if (goalRetreat) {
       val originPixelsUs        = unit.pixelDistanceTravelling(unit.agent.origin)
-      val originPixelsEnemy     = ByOption.minBy(unit.matchups.threats)(_.pixelDistanceEdge(unit)).map(t => t.pixelDistanceTravelling(unit.agent.origin) - t.pixelRangeAgainst(unit)).getOrElse(With.mapPixelPerimeter.toDouble)
+      val originPixelsEnemy     = Maff.minBy(unit.matchups.threats)(_.pixelDistanceEdge(unit)).map(t => t.pixelDistanceTravelling(unit.agent.origin) - t.pixelRangeAgainst(unit)).getOrElse(With.mapPixelPerimeter.toDouble)
       val margin                = 320d
       val marginExit            = originPixelsUs - originPixelsEnemy
       val marginThreat          = unit.matchups.pixelsOfEntanglement

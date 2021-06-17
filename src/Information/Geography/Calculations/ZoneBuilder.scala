@@ -2,9 +2,9 @@ package Information.Geography.Calculations
 
 import Information.Geography.Types.{Base, Edge, Metro, Zone}
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.{Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
-import Utilities.ByOption
 import bwta.{BWTA, Region}
 
 import scala.collection.JavaConverters._
@@ -88,7 +88,7 @@ object ZoneBuilder {
       .map(tile.add)
       .filter(_.valid)
       .flatMap(neighborTile => zones.view.find(candidate => candidate.tiles.contains(neighborTile)))
-    val consensusZone = ByOption.maxBy(neighborZones.groupBy(x => x))(_._2.size).map(_._1)
+    val consensusZone = Maff.maxBy(neighborZones.groupBy(x => x))(_._2.size).map(_._1)
     consensusZone
       .getOrElse(zones.minBy(_.centroid.tileDistanceSquared(tile)))
       .tiles
@@ -101,11 +101,11 @@ object ZoneBuilder {
     val y = tiles.map(_.y)
     val boundingBox = TileRectangle(
       Tile(
-        ByOption.min(x).getOrElse(0),
-        ByOption.min(y).getOrElse(0)),
+        Maff.min(x).getOrElse(0),
+        Maff.min(y).getOrElse(0)),
       Tile(
-        ByOption.max(x).getOrElse(0),
-        ByOption.max(y).getOrElse(0)))
+        Maff.max(x).getOrElse(0),
+        Maff.max(y).getOrElse(0)))
 
     val tileSet = new mutable.HashSet[Tile]
     tileSet ++= tiles

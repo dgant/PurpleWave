@@ -1,10 +1,11 @@
 package Micro.Actions.Combat.Tactics
 
+import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Agency.Commander
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.ByOption
+
 
 object Spot extends Action {
   
@@ -27,6 +28,6 @@ object Spot extends Action {
 
   def best(from: Pixel, spotter: FriendlyUnitInfo, enemies: Iterable[UnitInfo]): Option[UnitInfo] = {
     val invisible = enemies.filterNot(_.visible)
-    ByOption.minBy(if (invisible.nonEmpty) invisible else enemies)(_.pixelDistanceCenter(from))
+    Maff.minBy(if (invisible.nonEmpty) invisible else enemies)(_.pixelDistanceCenter(from))
   }
 }

@@ -3,7 +3,7 @@ package Micro.Squads.Qualities
 import Mathematics.Maff
 import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.{ByOption, CountMap}
+import Utilities.CountMap
 
 class QualityCounter {
 
@@ -37,7 +37,7 @@ class QualityCounter {
   // but as we pass the amount we need, the marginal value rapidly declines
   def scaleNeed(value: Double): Double = Maff.clamp(value, 0.01, 100)
 
-  def utility(unit: FriendlyUnitInfo): Double = ByOption.max(utilityQualities(unit).view.map(_._3)).getOrElse(0.0)
+  def utility(unit: FriendlyUnitInfo): Double = Maff.max(utilityQualities(unit).view.map(_._3)).getOrElse(0.0)
 
   def utilityQualities(unit: FriendlyUnitInfo): Seq[(Quality, Quality, Double)] =
     Qualities.friendly

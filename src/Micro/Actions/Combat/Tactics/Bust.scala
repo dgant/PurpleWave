@@ -8,7 +8,7 @@ import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.{ByOption, Minutes, Seconds}
+import Utilities.{Minutes, Seconds}
 import bwapi.Race
 
 import scala.util.Random
@@ -72,7 +72,7 @@ object Bust extends Action {
       Retreat.delegate(unit)
     }
 
-    unit.agent.toAttack = ByOption.minBy(unit.matchups.targets)(_.pixelDistanceEdge(unit))
+    unit.agent.toAttack = Maff.minBy(unit.matchups.targets)(_.pixelDistanceEdge(unit))
     if (unit.agent.toAttack.exists(t => t.unitClass == Terran.Bunker && ! unit.inRangeToAttack(t))) {
       val bunker = unit.agent.toAttack.get
       val range = unit.pixelRangeAgainst(bunker)
@@ -91,7 +91,7 @@ object Bust extends Action {
           .map(_ * 2 * Math.PI / stationCount)
           .map(bunker.pixel.radiateRadians(_ , range + unit.unitClass.dimensionMax + bunker.unitClass.dimensionMax))
           .filter(stationAcceptable)
-        station = ByOption.minBy(stations)(unit.pixelDistanceCenter)
+        station = Maff.minBy(stations)(unit.pixelDistanceCenter)
       }
       if (station.nonEmpty) {
         unit.agent.toTravel = station

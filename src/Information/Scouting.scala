@@ -2,6 +2,7 @@ package Information
 
 import Information.Geography.Types.Base
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.Tile
 import Performance.Cache
 import Performance.Tasks.TimedTask
@@ -25,7 +26,7 @@ class Scouting extends TimedTask {
     val heartMain           = base.heart.center
     val heartNatural        = base.natural.getOrElse(base).heart.center
     val hearts              = Vector(heartMain, heartNatural)
-    val distanceFromEnemy   = 32.0 * 32.0 + ByOption.min(enemyHearts.map(_.groundPixels(heartMain))).getOrElse(With.mapPixelWidth.toDouble)
+    val distanceFromEnemy   = 32.0 * 32.0 + Maff.min(enemyHearts.map(_.groundPixels(heartMain))).getOrElse(With.mapPixelWidth.toDouble)
     val informationAge      = 1.0 + With.framesSince(base.lastScoutedFrame)
     val startPositionBonus  = if (base.isStartLocation && base.lastScoutedFrame <= 0) 100.0 else 1.0
     val output              = startPositionBonus * informationAge / distanceFromEnemy
@@ -65,7 +66,7 @@ class Scouting extends TimedTask {
     y += enemyThreatOriginBaseFactor * mostBaselikeEnemyTile.y
     n += enemyThreatOriginBaseFactor
     val airCentroid = Tile(x/n, y/n)
-    ByOption.minBy(With.units.enemy.view.map(_.tile))(_.tileDistanceSquared(airCentroid)).getOrElse(airCentroid)
+    Maff.minBy(With.units.enemy.view.map(_.tile))(_.tileDistanceSquared(airCentroid)).getOrElse(airCentroid)
   })
 
   def firstEnemyMain: Option[Base] = _firstEnemyMain

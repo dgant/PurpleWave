@@ -3,10 +3,11 @@ package Information.Geography.Calculations
 import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Types.Zone
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.SpecificPoints
 import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.Terran
-import Utilities.{ByOption, Minutes}
+import Utilities.Minutes
 
 object ZoneUpdater {
   
@@ -44,7 +45,7 @@ object ZoneUpdater {
       }
     }))
   
-    With.geography.home = ByOption.minBy(With.geography.ourBases)(_.isStartLocation)
+    With.geography.home = Maff.minBy(With.geography.ourBases)(_.isStartLocation)
       .map(_.townHallArea.startInclusive)
       .getOrElse(SpecificPoints.tileMiddle)
   }

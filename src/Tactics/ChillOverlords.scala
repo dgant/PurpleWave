@@ -12,7 +12,7 @@ import Planning.UnitCounters.CountEverything
 import Planning.UnitMatchers.MatchOr
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.ByOption
+
 
 class ChillOverlords extends Prioritized {
   
@@ -43,7 +43,7 @@ class ChillOverlords extends Prioritized {
   }
   
   private def chillOut(overlord: FriendlyUnitInfo, count: Int) {
-    val base = ByOption.minBy(With.geography.ourBases.map(_.heart.center))(overlord.pixelDistanceSquared)
+    val base = Maff.minBy(With.geography.ourBases.map(_.heart.center))(overlord.pixelDistanceSquared)
     val tile = base.map(b => Maff.sample(Circle.points(Math.sqrt(count).toInt).map(b.tile.add))).getOrElse(With.geography.home)
     overlord.agent.intend(this, new Intention {
       toTravel = Some(tile.center)

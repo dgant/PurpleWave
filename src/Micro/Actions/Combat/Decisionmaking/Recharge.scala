@@ -1,11 +1,12 @@
 package Micro.Actions.Combat.Decisionmaking
 
 import Lifecycle.With
+import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Agency.Commander
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.ByOption
+
 
 object Recharge extends Action {
   
@@ -30,7 +31,7 @@ object Recharge extends Action {
     var batteries: Iterable[UnitInfo] = unit.alliesBattle.filter(validBattery)
     if (batteries.isEmpty) batteries = unit.zone.units.filter(validBattery)
 
-    val battery = ByOption.minBy(batteries)(_.pixelDistanceEdge(unit))
+    val battery = Maff.minBy(batteries)(_.pixelDistanceEdge(unit))
     if (battery.isEmpty) return
     
     unit.agent.toTravel = battery.map(_.pixel)

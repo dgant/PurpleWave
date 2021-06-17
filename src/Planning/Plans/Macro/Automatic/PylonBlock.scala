@@ -2,6 +2,7 @@ package Planning.Plans.Macro.Automatic
 
 import Information.Geography.Types.Base
 import Lifecycle.With
+import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.{LockCurrency, LockUnits}
@@ -9,7 +10,7 @@ import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.{ByOption, GameTime}
+import Utilities.GameTime
 
 class PylonBlock extends Plan {
 
@@ -40,8 +41,8 @@ class PylonBlock extends Plan {
     val basesByProxmity = With.geography.bases
       .filterNot(_.zone.island)
       .sortBy(base =>
-        ByOption.min(With.geography.ourBases.map(_.heart.groundPixels(base.heart))).getOrElse(0.0)
-        - ByOption.min(With.geography.enemyBases.map(_.heart.groundPixels(base.heart))).getOrElse(0.0) )
+        Maff.min(With.geography.ourBases.map(_.heart.groundPixels(base.heart))).getOrElse(0.0)
+        - Maff.min(With.geography.enemyBases.map(_.heart.groundPixels(base.heart))).getOrElse(0.0) )
 
     // Take the most distant bases
     // For maps with a middle base, ignore it

@@ -1,10 +1,11 @@
 package Micro.Actions.Transportation.Caddy
 
 import Lifecycle.With
+import Mathematics.Maff
 import Micro.Actions.Action
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.ByOption
+
 
 object ShuttleAcceptRider extends Action {
 
@@ -50,7 +51,7 @@ object ShuttleAcceptRider extends Action {
             && otherShuttle.friendly.exists(_.spaceRemaining >= shuttle.spaceRemaining))
       ).toSeq
 
-    val pickupCandidate = ByOption.maxBy(pickupCandidates)(c => pickupNeed(shuttle, c) / (1.0 + c.pixelDistanceSquared(shuttle)))
+    val pickupCandidate = Maff.maxBy(pickupCandidates)(c => pickupNeed(shuttle, c) / (1.0 + c.pixelDistanceSquared(shuttle)))
     pickupCandidate.foreach(hailer => {
       shuttle.agent.claimPassenger(hailer)
     })

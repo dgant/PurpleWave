@@ -3,13 +3,13 @@ package Information.Geography
 import Information.Geography.Calculations.{ZoneBuilder, ZoneUpdater}
 import Information.Geography.Types.{Base, Edge, Metro, Zone}
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.{SpecificPoints, Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
 import Performance.Cache
 import Performance.Tasks.TimedTask
 import Planning.UnitMatchers.MatchTank
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.ByOption
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -54,7 +54,7 @@ class Geography extends TimedTask {
       .getOrElse(bases.minBy(_.townHallTile.groundPixels(ourMain.townHallTile)))))
   
   def zoneByTile(tile: Tile): Zone = if (tile.valid) zoneByTileCacheValid(tile.i) else zoneByTileCacheInvalid(tile)
-  def baseByTile(tile: Tile): Option[Base] = if (tile.valid) baseByTileCacheValid(tile.i) else ByOption.minBy(zoneByTileCacheInvalid(tile).bases)(_.heart.tileDistanceSquared(tile))
+  def baseByTile(tile: Tile): Option[Base] = if (tile.valid) baseByTileCacheValid(tile.i) else Maff.minBy(zoneByTileCacheInvalid(tile).bases)(_.heart.tileDistanceSquared(tile))
 
   private lazy val zoneByTileCacheValid = allTiles.map(tile => zones.find(_.tiles.contains(tile)).getOrElse(getZoneForTile(tile)))
   private lazy val baseByTileCacheValid = allTiles.map(getBaseForTile)
@@ -67,7 +67,7 @@ class Geography extends TimedTask {
     }
   }
   private def getZoneForTile(tile: Tile): Zone =
-    ByOption
+    Maff
       .maxBy(
         Spiral
           .points(8)

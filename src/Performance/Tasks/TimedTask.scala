@@ -4,7 +4,7 @@ import Debugging.ToString
 import Lifecycle.{Main, With}
 import Mathematics.Maff
 import Performance.Cache
-import Utilities.ByOption
+
 
 import scala.collection.mutable
 
@@ -43,7 +43,7 @@ abstract class TimedTask {
   final def runMsMax            : Long    = _runMsMax
   final def runMsLast           : Long    = runMsPast.headOption.getOrElse(0L)
   final def runMsRecentSamples  : Int     = runMsPast.length
-  final val runMsRecentMax      = new Cache[Long](() => ByOption.max(runMsPast).getOrElse(0))
+  final val runMsRecentMax      = new Cache[Long](() => Maff.max(runMsPast).getOrElse(0))
   final val runMsRecentMean     = new Cache(() => runMsPast.view.map(Math.min(_, 100)).sum / Math.max(1, runMsPast.size))
   final val runMsRecentTotal    = new Cache(() => runMsPast.sum)
   final val runMsSamplesMax     = 8

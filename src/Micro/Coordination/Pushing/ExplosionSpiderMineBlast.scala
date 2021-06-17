@@ -1,16 +1,17 @@
 package Micro.Coordination.Pushing
 
+import Mathematics.Maff
 import Mathematics.Physics.Force
 import Mathematics.Points.Pixel
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.ByOption
+
 
 object SpiderMineMath {
   val radius = 100
   def expectedTarget(mine: UnitInfo): Option[UnitInfo] = {
     val targetPosition = mine.orderTargetPixel.getOrElse(mine.pixel)
-    val target = ByOption.minBy(mine.matchups.targets)(_.pixelDistanceEdge(targetPosition))
+    val target = Maff.minBy(mine.matchups.targets)(_.pixelDistanceEdge(targetPosition))
     if (target.forall(_.pixelDistanceEdge(targetPosition) > radius))
       None
     else

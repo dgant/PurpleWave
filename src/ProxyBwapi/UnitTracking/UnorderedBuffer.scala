@@ -21,7 +21,7 @@ final class UnorderedBuffer[T >: Null](capacity: Int = 8) extends IndexedSeq[T] 
   private val values: ArrayBuffer[T] = ArrayBuffer.fill[T](capacity)(null)
   private var _size = 0
 
-  @inline def this(initialValues: Iterable[T]) {
+  def this(initialValues: Iterable[T]) {
     this(initialValues.size)
     addAll(initialValues)
   }

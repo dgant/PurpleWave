@@ -3,8 +3,8 @@ package Debugging.Visualizations.Views.Micro
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
+import Mathematics.Maff
 import Micro.Coordination.Pushing.Push
-import Utilities.ByOption
 
 import scala.collection.mutable
 
@@ -17,7 +17,7 @@ object ShowPushes extends View {
         if (force.nonEmpty) {
           activePushes += push
           DrawMap.arrow(
-            ByOption.minBy(push.tiles.map(_.pixelCorners.minBy(u.pixelDistanceSquared)))(u.pixelDistanceSquared).getOrElse(u.pixel),
+            Maff.minBy(push.tiles.map(_.pixelCorners.minBy(u.pixelDistanceSquared)))(u.pixelDistanceSquared).getOrElse(u.pixel),
             u.pixel,
             push.priority.color)
           DrawMap.arrow(u.pixel, u.pixel.radiateRadians(force.get.radians, 64), push.priority.color)

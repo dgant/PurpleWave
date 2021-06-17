@@ -2,12 +2,13 @@ package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
+import Mathematics.Maff
 import Planning.Plan
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.ByOption
+
 
 class Pump(
   unitClass                 : UnitClass,
@@ -49,8 +50,8 @@ class Pump(
   }
   
   private def getBuilderReadiness(builders: Iterable[FriendlyUnitInfo]): Double =
-    ByOption
-      .mean(builders.map(b => 1.0 - Math.min(1.0, Math.max(b.remainingTrainFrames, b.remainingCompletionFrames).toDouble / unitClass.buildFrames)))
+    Maff
+      .optMean(builders.map(b => 1.0 - Math.min(1.0, Math.max(b.remainingTrainFrames, b.remainingCompletionFrames).toDouble / unitClass.buildFrames)))
       .getOrElse(0.5)
   
   protected def canBuild: Boolean = (

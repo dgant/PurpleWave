@@ -1,10 +1,11 @@
 package Micro.Actions.Combat.Spells
 
+import Mathematics.Maff
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo._
-import Utilities.ByOption
+
 
 object Lockdown extends TargetedSpell {
   
@@ -25,7 +26,7 @@ object Lockdown extends TargetedSpell {
     val fractionalValue         = cappedLifetime / thresholdLifetimeFrames
     val targetValueAbsolute     = target.subjectiveValue * fractionalValue
     val targetValueNow          = target.matchups.vpfDealingInRange * cappedLifetime
-    val targetValueDetecting    = if(target.unitClass.isDetector) ByOption.max(target.matchups.enemies.filter(_.cloaked).map(_.subjectiveValue.toDouble)).getOrElse(0.0) else 0.0
+    val targetValueDetecting    = if(target.unitClass.isDetector) Maff.max(target.matchups.enemies.filter(_.cloaked).map(_.subjectiveValue.toDouble)).getOrElse(0.0) else 0.0
     val values                  = Vector(targetValueAbsolute, targetValueNow, targetValueDetecting)
     val output: Double          = values.max
     output

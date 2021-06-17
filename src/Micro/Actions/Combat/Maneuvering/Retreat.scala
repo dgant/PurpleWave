@@ -1,6 +1,7 @@
 package Micro.Actions.Combat.Maneuvering
 
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Agency.Commander
@@ -9,7 +10,6 @@ import Micro.Coordination.Pushing.TrafficPriorities
 import Planning.UnitMatchers.MatchTank
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.{ByOption, TakeN}
 
 object Retreat extends Action {
   
@@ -25,10 +25,10 @@ object Retreat extends Action {
     // Decide our goals in retreating
     def timeOriginOfThreat(threat: UnitInfo): Double = threat.framesToTravelTo(unit.agent.origin) - threat.pixelRangeAgainst(unit) * threat.topSpeed
     lazy val distanceOriginUs     = unit.pixelDistanceTravelling(unit.agent.origin)
-    lazy val distanceOriginEnemy  = ByOption.min(unit.matchups.threats.view.map(t => t.pixelDistanceTravelling(unit.agent.origin) - t.pixelRangeAgainst(unit))).getOrElse(2.0 * With.mapPixelWidth)
+    lazy val distanceOriginEnemy  = Maff.min(unit.matchups.threats.view.map(t => t.pixelDistanceTravelling(unit.agent.origin) - t.pixelRangeAgainst(unit))).getOrElse(2.0 * With.mapPixelWidth)
     lazy val enemyCloser          = distanceOriginUs + 160 >= distanceOriginEnemy
     lazy val timeOriginUs         = unit.framesToTravelTo(unit.agent.origin)
-    lazy val timeOriginEnemy      = TakeN.percentile(0.1, unit.matchups.threats)(Ordering.by(timeOriginOfThreat)).map(timeOriginOfThreat).getOrElse(Double.PositiveInfinity)
+    lazy val timeOriginEnemy      = Maff.takePercentile(0.1, unit.matchups.threats)(Ordering.by(timeOriginOfThreat)).map(timeOriginOfThreat).getOrElse(Double.PositiveInfinity)
     lazy val enemySooner          = timeOriginUs + 96 >= timeOriginEnemy
     lazy val enemySieging         = unit.matchups.enemies.exists(_.isAny(MatchTank, Zerg.Lurker)) && ! unit.base.exists(_.owner.isEnemy)
     lazy val goalSidestep         = unit.is(Protoss.DarkTemplar) || (enemySieging && ! enemyCloser && ! enemySooner)

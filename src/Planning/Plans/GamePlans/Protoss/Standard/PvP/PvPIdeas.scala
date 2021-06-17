@@ -2,6 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
+import Mathematics.Maff
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{If, Parallel, _}
@@ -19,7 +20,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss._
-import Utilities.{ByOption, GameTime, Seconds}
+import Utilities.{GameTime, Seconds}
 
 object PvPIdeas {
 
@@ -147,9 +148,9 @@ object PvPIdeas {
           new UnitsAtMost(0, Protoss.RoboticsFacility),
           new FrameAtLeast(() =>
             dtArrivalTime
-            - ByOption.max(With.units.ours.view.filter(Protoss.RoboticsFacility).map(_.remainingCompletionFrames)).getOrElse(Protoss.RoboticsFacility.buildFrames)
-            - ByOption.max(With.units.ours.view.filter(Protoss.Observatory).map(_.remainingCompletionFrames)).getOrElse(Protoss.Observatory.buildFrames)
-            - ByOption.max(With.units.ours.view.filter(Protoss.Observatory).map(_.remainingCompletionFrames)).getOrElse(Protoss.Observer.buildFrames)),
+            - Maff.max(With.units.ours.view.filter(Protoss.RoboticsFacility).map(_.remainingCompletionFrames)).getOrElse(Protoss.RoboticsFacility.buildFrames)
+            - Maff.max(With.units.ours.view.filter(Protoss.Observatory).map(_.remainingCompletionFrames)).getOrElse(Protoss.Observatory.buildFrames)
+            - Maff.max(With.units.ours.view.filter(Protoss.Observatory).map(_.remainingCompletionFrames)).getOrElse(Protoss.Observer.buildFrames)),
           new FrameAtLeast(() =>
             dtArrivalTime
             - Protoss.Forge.buildFrames

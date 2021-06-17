@@ -3,9 +3,9 @@ package Micro.Matchups
 import Information.Battles.BattleClassificationFilters
 import Information.Battles.Types.BattleLocal
 import Lifecycle.With
+import Mathematics.Maff
 import Performance.Tasks.TimedTask
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.ByOption
 
 import scala.collection.mutable
 
@@ -28,7 +28,7 @@ class MatchupGraph extends TimedTask {
         && entrant.battle.isEmpty
         && With.framesSince(entrant.frameDiscovered) < 72
         && BattleClassificationFilters.isEligibleLocal(entrant)) {
-          val battle = ByOption.minBy(With.units.all.view.filter(_.battle.isDefined))(_.pixelDistanceSquared(entrant)).flatMap(_.battle)
+          val battle = Maff.minBy(With.units.all.view.filter(_.battle.isDefined))(_.pixelDistanceSquared(entrant)).flatMap(_.battle)
           if (battle.isDefined) {
             if ( ! entrants.contains(battle.get)) {
               entrants.put(battle.get, new mutable.ArrayBuffer[UnitInfo])

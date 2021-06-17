@@ -1,11 +1,12 @@
 package Debugging
 
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.{Pixel, SpecificPoints, Tile, TileRectangle}
 import Performance.Tasks.TimedTask
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.{ByOption, Seconds}
+import Utilities.Seconds
 import bwapi.MouseButton
 
 class Camera extends TimedTask {
@@ -58,7 +59,7 @@ class Camera extends TimedTask {
     
     val eligibleUnits       = With.units.ours.filterNot(_.isAny(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine))
     val unitInterests       = With.units.ours.map(unit => (unit, totalInterest(unit)))
-    val mostInterestingUnit = ByOption.maxBy(unitInterests)(_._2)
+    val mostInterestingUnit = Maff.maxBy(unitInterests)(_._2)
     
     if (mostInterestingUnit.isDefined) {
       focusOn(mostInterestingUnit.get._1)

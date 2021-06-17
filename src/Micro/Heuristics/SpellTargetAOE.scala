@@ -1,9 +1,10 @@
 package Micro.Heuristics
 
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.ByOption
+
 
 
 class SpellTargetAOE {
@@ -31,7 +32,7 @@ class SpellTargetAOE {
       new AOETarget(target, caster, -1,  1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, lookaheadPixels = projectionFrames, evaluate = evaluate),
       new AOETarget(target, caster,  1, -1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, lookaheadPixels = projectionFrames, evaluate = evaluate),
       new AOETarget(target, caster, -1, -1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, lookaheadPixels = projectionFrames, evaluate = evaluate)))
-    val bestBox = ByOption.maxBy(boxes)(_.netValue).filter(_.netValue >= minimumValue)
+    val bestBox = Maff.maxBy(boxes)(_.netValue).filter(_.netValue >= minimumValue)
     val output = bestBox.map(_.finalTarget)
     output
   }

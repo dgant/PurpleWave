@@ -1,6 +1,7 @@
 package Micro.Actions.Combat.Spells
 
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
@@ -9,7 +10,7 @@ import Micro.Agency.Commander
 import Planning.UnitMatchers.{MatchTank, MatchWorker}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.{ByOption, Seconds}
+import Utilities.Seconds
 
 import scala.collection.mutable
 
@@ -67,7 +68,7 @@ object BeVulture extends Action {
       e.unitClass.triggersSpiderMines
       && ! e.matchups.threatsInRange.exists(t => t.isAny(MatchTank, MatchWorker) && t.pixelDistanceEdge(e) < 32 * 5))
 
-    vulture.agent.toAttack = ByOption.minBy(victims)(_.pixelDistanceEdge(vulture))
+    vulture.agent.toAttack = Maff.minBy(victims)(_.pixelDistanceEdge(vulture))
     if (vulture.agent.toAttack.isEmpty) return
     val target = vulture.agent.toAttack.get
 

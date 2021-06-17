@@ -1,6 +1,8 @@
 package Mathematics.Points
 
-import Utilities.ByOption
+
+
+import Mathematics.Maff
 
 import scala.collection.SeqView
 
@@ -19,11 +21,11 @@ final case class TileRectangle(
   def this(included: Seq[Tile]) {
     this(
       Tile(
-        ByOption.min(included.view.map(_.x)).getOrElse(0),
-        ByOption.min(included.view.map(_.y)).getOrElse(0)),
+        Maff.min(included.view.map(_.x)).getOrElse(0),
+        Maff.min(included.view.map(_.y)).getOrElse(0)),
       Tile(
-        ByOption.max(included.view.map(_.x + 1)).getOrElse(0),
-        ByOption.max(included.view.map(_.y + 1)).getOrElse(0)))
+        Maff.max(included.view.map(_.x + 1)).getOrElse(0),
+        Maff.max(included.view.map(_.y + 1)).getOrElse(0)))
   }
 
   if (endExclusive.x < startInclusive.x) {

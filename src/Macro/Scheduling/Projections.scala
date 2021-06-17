@@ -1,12 +1,12 @@
 package Macro.Scheduling
 
 import Lifecycle.With
+import Mathematics.Maff
 import Performance.Cache
 import Planning.UnitMatchers.{MatchAnd, MatchComplete}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
-import Utilities.ByOption
 
 import scala.collection.mutable
 
@@ -48,7 +48,7 @@ class Projections {
     if (With.units.existsOurs(MatchAnd(unitClass, MatchComplete))) return 0
 
     // Are we building what we need already?
-    val soonestUnit = ByOption.minBy(With.units.ours.view.filter(_.isPrerequisite(unitClass)))(_.remainingCompletionFrames)
+    val soonestUnit = Maff.minBy(With.units.ours.view.filter(_.isPrerequisite(unitClass)))(_.remainingCompletionFrames)
     if (soonestUnit.isDefined) {
       return soonestUnit.get.remainingCompletionFrames
     }
@@ -67,7 +67,7 @@ class Projections {
                 requiredClass,
                 if (unitsInCycle == null) Array(requiredClass) else unitsInCycle :+ requiredClass))
 
-    unitClass.buildFrames + ByOption.max(frameLimits).getOrElse(0)
+    unitClass.buildFrames + Maff.max(frameLimits).getOrElse(0)
   }
 
   // Frames before we could possibly have this Tech, not considering income

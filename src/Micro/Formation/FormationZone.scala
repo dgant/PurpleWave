@@ -8,7 +8,7 @@ import Mathematics.Shapes.Spiral
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.{ByOption, Minutes}
+import Utilities.Minutes
 
 import scala.collection.mutable
 
@@ -32,7 +32,7 @@ object FormationZone {
       if (With.frame > Minutes(4)() && With.enemies.exists(_.isProtoss)) 6
       else if (With.enemies.exists(_.isTerran)) 4
       else 1)
-    val enemyRangePixelsMax   : Int = Math.max(expectedRange, ByOption.max(With.units.enemy.filter(_.unitClass.attacksGround).view.map(_.effectiveRangePixels.toInt)).getOrElse(0))
+    val enemyRangePixelsMax   : Int = Math.max(expectedRange, Maff.max(With.units.enemy.filter(_.unitClass.attacksGround).view.map(_.effectiveRangePixels.toInt)).getOrElse(0))
     val meleeUnitSize         : Int = 5 + Math.max(16, units.view.map(u => if (u.formationRange > 32) 0 else if (edge.direction.isHorizontal) u.unitClass.width else u.unitClass.height).max)
     val meleeChokeWidthUnits  : Int = Math.max(1, Math.min(2 * edge.radiusPixels.toInt / meleeUnitSize, units.count(_.formationRange <= 32)))
     val altitudeInside    = zone.centroid.altitude
@@ -60,7 +60,7 @@ object FormationZone {
     val meleeSlots    = new mutable.ArrayBuffer[(UnitClass, Pixel)]
     val arcSlots      = new mutable.ArrayBuffer[(UnitClass, Pixel)]
     val escapeAir     = With.geography.home.center
-    val escapeGround  = ByOption.minBy(zone.edges.view.filterNot(_ == edge).map(_.pixelCenter))(_.groundPixels(With.geography.home)).getOrElse(zone.centroid.center)
+    val escapeGround  = Maff.minBy(zone.edges.view.filterNot(_ == edge).map(_.pixelCenter))(_.groundPixels(With.geography.home)).getOrElse(zone.centroid.center)
     units.toVector.sortBy(_.formationRange).foreach(unit => {
       val escape = if (unit.flying) escapeAir else escapeGround
       val rangeTiles = unit.formationRange.toInt / 32
@@ -89,7 +89,7 @@ object FormationZone {
             // Stand in an unoccupied tile
             && (flyer || (tile.walkableUnchecked && ! occupied.get(tile) && ! With.groundskeeper.isReserved(tile)))
         )
-        val bestTile = ByOption.minBy(candidates)(tile => {
+        val bestTile = Maff.minBy(candidates)(tile => {
           val exitDistanceTiles = tile.center.pixelDistance(Maff.projectedPointOnSegment(tile.center, edge.sidePixels.head, edge.sidePixels.last)).toInt / 32
           val exitAttackingCost = Math.max(0, exitDistanceTiles - rangeTiles)
           val exitDefendingCost = Math.max(0, enemyRangePixelsMax / 32 - exitDistanceTiles)

@@ -16,41 +16,98 @@ object Maff {
   val sqrt2m1d: Double = Math.sqrt(2) - 1
 
   @inline final def mode[T](values: Traversable[T]): T = values.groupBy(x => x).maxBy(_._2.size)._1
+  @inline final def optMode[T](values: Traversable[T]): Option[T] = if (values.isEmpty) None else Some(Maff.mode(values))
 
-  @inline final def mean(values: Iterable[Double]): Double = if (values.isEmpty) 0.0 else values.sum / values.size
-  @inline final def meanL(values: Iterable[Long]): Double = if (values.isEmpty) 0.0 else values.sum / values.size.toDouble
+  @inline final def mean(values: TraversableOnce[Double]): Double = {
+    if (values.isEmpty) 0.0 else {
+      var numerator, denominator = 0.0
+      values.foreach(value => { numerator += value;  denominator += 1.0 })
+      numerator / denominator
+    }
+  }
+  @inline final def meanL(values: TraversableOnce[Long]): Double = {
+    if (values.isEmpty) 0L else {
+      var numerator, denominator = 0L
+      values.foreach(value => { numerator += value;  denominator += 1L })
+      numerator / denominator
+    }
+  }
+  @inline final def optMean(values: TraversableOnce[Double]): Option[Double] = {
+    if (values.isEmpty) None else Some(mean(values))
+  }
 
-  @inline final def centroid(values: Iterable[Pixel]): Pixel = {
+  @inline final def geometricMean(values: Iterable[Double]): Double = {
+    if (values.isEmpty) 1.0 else Math.pow(values.product, 1.0 / values.size)
+  }
+
+  @inline final def min[A](values: TraversableOnce[A])(implicit cmp: scala.Ordering[A]): Option[A] = {
+    if (values.isEmpty) None else Some(values.min(cmp))
+  }
+
+  @inline final def max[A](values: TraversableOnce[A])(implicit cmp: scala.Ordering[A]): Option[A] = {
+    if (values.isEmpty) None else Some(values.max(cmp))
+  }
+
+  @inline final def rms(values: TraversableOnce[Double]): Option[Double] = {
+    if (values.isEmpty) None else {
+      var numerator = 0.0
+      var denominator = 0.0
+      values.foreach(value => { numerator += value * value; denominator += 1.0 })
+      val sumOfSquares  = numerator / denominator
+      val output        = Math.sqrt(sumOfSquares)
+      Some(sumOfSquares)
+    }
+  }
+
+  @inline final def minBy[A, B: Ordering](values: TraversableOnce[A])(feature: A => B): Option[A] = {
+    values.reduceOption(Ordering.by(feature).min)
+  }
+
+  @inline final def maxBy[A, B: Ordering](values: TraversableOnce[A])(feature: A => B): Option[A] = {
+    values.reduceOption(Ordering.by(feature).max)
+  }
+
+  @inline final def takeN[T](number: Int, iterable: Iterable[T])(implicit ordering: Ordering[T]): IndexedSeq[T] = {
+    val queue = collection.mutable.PriorityQueue[T](iterable.toSeq: _*)
+    (0 until Math.min(number, queue.size)).map(i => queue.dequeue())
+  }
+
+  @inline final def takePercentile[T](percentile: Double, iterable: Iterable[T])(implicit ordering: Ordering[T]): Option[T] = {
+    val nth = (iterable.size * Maff.clamp(percentile, 0, 1)).toInt
+    val queue = collection.mutable.PriorityQueue[T](iterable.toSeq: _*)
+    (0 until nth).foreach(i => queue.dequeue())
+    queue.headOption
+  }
+
+  @inline final def centroid(values: TraversableOnce[Pixel]): Pixel = {
     if (values.isEmpty) return SpecificPoints.middle
-    var x, y: Int = 0
-    values.foreach(v => { x += v.x; y += v.y }) // Faster than .sum
-    Pixel(x / values.size, y / values.size)
+    var x, y, size: Int = 0
+    values.foreach(v => { x += v.x; y += v.y; size += 1 })
+    Pixel(x / size, y / size)
   }
 
-  @inline final def centroidTiles(values: Iterable[Tile]): Tile = {
+  @inline final def centroidTiles(values: TraversableOnce[Tile]): Tile = {
     if (values.isEmpty) return SpecificPoints.tileMiddle
-    var x, y: Int = 0
-    values.foreach(v => { x += v.x; y += v.y }) // Faster than .sum
-    Tile(x / values.size, y / values.size)
+    var x, y, size: Int = 0
+    values.foreach(v => { x += v.x; y += v.y; size += 1 })
+    Tile(x / size, y / size)
   }
 
-  @inline final def exemplar(values: Iterable[Pixel]): Pixel = {
+  @inline final def exemplar(values: Traversable[Pixel]): Pixel = {
     if (values.isEmpty) return SpecificPoints.middle
     val valuesCentroid = centroid(values)
     values.minBy(_.pixelDistanceSquared(valuesCentroid))
   }
 
-  @inline final def weightedCentroid(values: Iterable[(Pixel, Double)]): Pixel = {
+  @inline final def weightedCentroid(values: Traversable[(Pixel, Double)]): Pixel = {
     if (values.isEmpty) return SpecificPoints.middle
     var x, y, d: Double = 0
     values.foreach(v => { x += v._1.x * v._2;  y += v._1.y * v._2;  d += v._2 })
     Pixel((x / d).toInt, (y / d).toInt)
   }
 
-  @inline final def weightedExemplar(values: Iterable[(Pixel, Double)]): (Pixel, Double) = {
-    if (values.isEmpty) return (SpecificPoints.middle, 1.0)
-    val centroid = weightedCentroid(values)
-    values.minBy(_._1.pixelDistanceSquared(centroid))
+  @inline final def weightedExemplar(values: Iterable[(Pixel, Double)]): Pixel = {
+    minBy(values)(_._1.pixelDistanceSquared(weightedCentroid(values))).map(_._1).getOrElse(SpecificPoints.middle)
   }
 
   @inline final def nanToN(value: Double, n: Double): Double = if (value.isNaN || value.isInfinity) n else value
@@ -58,17 +115,15 @@ object Maff {
   @inline final def nanToOne(value: Double): Double = nanToN(value, 1)
   @inline final def nanToInfinity(value: Double): Double = nanToN(value, Double.PositiveInfinity)
 
-  @inline final def clampRatio(value: Double, ratio: Double): Double = clamp(value, ratio, 1.0 / ratio)
-
-  @inline final def clamp(value: Int, bound0: Int, bound1: Int): Int = {
-    val min = Math.min(bound0, bound1)
-    val max = Math.max(bound0, bound1)
+  @inline final def clamp(value: Int, bound1: Int, bound2: Int): Int = {
+    val min = Math.min(bound1, bound2)
+    val max = Math.max(bound1, bound2)
     Math.min(max, Math.max(min, value))
   }
 
-  @inline final def clamp(value: Double, value1: Double, value2: Double): Double = {
-    val min = Math.min(value1, value2)
-    val max = Math.max(value1, value2)
+  @inline final def clamp(value: Double, bound1: Double, bound2: Double): Double = {
+    val min = Math.min(bound1, bound2)
+    val max = Math.max(bound1, bound2)
     Math.min(max, Math.max(value, min))
   }
 
@@ -78,25 +133,19 @@ object Maff {
   @inline final def signum(double: Double)  : Int = if (double == 0.0) 0 else if (double < 0) -1 else 1
   @inline final def forcedSignum(int: Int)  : Int = if (int < 0) -1 else 1
 
-  val twoPi: Double = Math.PI * 2.0
-  @inline final def normalize0To2Pi(angleRadians: Double): Double = {
-    if      (angleRadians < 0) normalize0To2Pi(angleRadians + twoPi)
-    else if (angleRadians > twoPi) normalize0To2Pi(angleRadians - twoPi)
+  @inline final def normalizeAroundPi(angleRadians: Double): Double = {
+    if      (angleRadians < 0) normalizeAroundPi(angleRadians + twoPI)
+    else if (angleRadians > twoPI) normalizeAroundPi(angleRadians - twoPI)
     else    angleRadians
   }
   @inline final def normalizeAroundZero(angleRadians: Double): Double = {
-    if      (angleRadians < -Math.PI) normalize0To2Pi(angleRadians + twoPi)
-    else if (angleRadians > Math.PI) normalize0To2Pi(angleRadians - twoPi)
+    if      (angleRadians < -Math.PI) normalizeAroundPi(angleRadians + twoPI)
+    else if (angleRadians > Math.PI) normalizeAroundPi(angleRadians - twoPI)
     else    angleRadians
   }
   @inline final def radiansTo(from: Double, to: Double): Double = {
-    val distance = normalize0To2Pi(to - from)
+    val distance = normalizeAroundPi(to - from)
     if (distance > Math.PI) distance - twoPI else distance
-  }
-
-  @inline final def geometricMean(values: Iterable[Double]): Double = {
-    if (values.isEmpty) return 1.0
-    Math.pow(values.product, 1.0 / values.size)
   }
 
   @inline final def fromBoolean(value: Boolean): Int = if (value) 1 else 0
@@ -108,20 +157,14 @@ object Maff {
     val dy = Math.abs(y0 - y1)
     val d   = Math.min(dx, dy)
     val D   = Math.max(dx, dy)
-    if (d < D / 4) {
-      return D
-    }
-    D - D / 16 + d * 3 / 8 - D / 64 + d * 3 / 256
+    if (d < D / 4) D else D - D / 16 + d * 3 / 8 - D / 64 + d * 3 / 256
   }
   @inline final def broodWarDistanceDouble(x0: Double, y0: Double, x1: Double, y1: Double): Double = {
     val dx  = Math.abs(x0 - x1)
     val dy  = Math.abs(y0 - y1)
     val d   = Math.min(dx, dy)
     val D   = Math.max(dx, dy)
-    if (d < D / 4) {
-      return D
-    }
-    D - D / 16 + d * 3 / 8 - D / 64 + d * 3 / 256
+    if (d < D / 4) D else  D - D / 16 + d * 3 / 8 - D / 64 + d * 3 / 256
   }
   @inline final def broodWarDistanceBox(
     p00: AbstractPoint,
@@ -239,7 +282,7 @@ object Maff {
   }
 
   @inline final def slowAtan2(y: Double, x: Double): Double = {
-   normalize0To2Pi(Math.atan2(y, x))
+   normalizeAroundPi(Math.atan2(y, x))
   }
 
   @inline final def weightedMean(values: Seq[(Double, Double)]): Double = {

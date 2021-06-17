@@ -4,6 +4,7 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.Micro.ShowUnitsFriendly
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Planning.Predicates.Strategy.EnemyRecentStrategy
@@ -14,7 +15,7 @@ import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchWorker}
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.{ByOption, Minutes}
+import Utilities.Minutes
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -93,7 +94,7 @@ class DefendFFEWithProbes extends Prioritized {
         steps += 1
         toDefend = toDefend.project(threatSource, 16)
       }
-      val nearestThreat = ByOption.minBy(cannon.matchups.threats)(_.pixelDistanceEdge(cannon))
+      val nearestThreat = Maff.minBy(cannon.matchups.threats)(_.pixelDistanceEdge(cannon))
       nearestThreat.foreach(someNearestThreat => {
         val threatDistanceToCannon = cannon.pixelDistanceEdge(threatSource)
         if (cannon.pixelDistanceEdge(toDefend) > threatDistanceToCannon) {

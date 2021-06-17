@@ -3,6 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvE
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.Get
+import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.Plan
 import Planning.Plans.Army.KillPsiDisruptor
@@ -21,14 +22,14 @@ import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.{Plasma, Sparkle}
-import Utilities.ByOption
+
 
 class PlaceIslandPylons extends ProposePlacement {
   override lazy val blueprints = Vector(
     new Blueprint(Protoss.Pylon, preferZone = Some(With.geography.ourMain.zone)),
     new Blueprint(Protoss.Pylon, preferZone = Some(With.geography.ourNatural.zone)),
     new Blueprint(Protoss.Pylon, preferZone =
-      ByOption.minBy(
+      Maff.minBy(
         With.geography.bases
           .filter(b => b != With.geography.ourMain && b != With.geography.ourNatural)
           .map(_.zone))(_.centroid.groundPixels(With.geography.home)))
@@ -76,7 +77,7 @@ class HackySparkleExpansion extends Plan {
   val lock = new LockUnits(this)
   lock.matcher = MatchWorker
   lock.counter = CountOne
-  private def base = ByOption.minBy(With.geography.neutralBases.filter(b => ! b.townHallArea.tiles.map(_.bwapi).exists(With.game.hasCreep)))(_.townHallTile.tileDistanceSquared(With.geography.home))
+  private def base = Maff.minBy(With.geography.neutralBases.filter(b => ! b.townHallArea.tiles.map(_.bwapi).exists(With.game.hasCreep)))(_.townHallTile.tileDistanceSquared(With.geography.home))
 
   override def onUpdate(): Unit = {
     if (With.units.countOurs(Protoss.Nexus) > 1) return

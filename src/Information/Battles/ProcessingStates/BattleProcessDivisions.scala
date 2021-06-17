@@ -4,8 +4,9 @@ import Information.Battles.BattleClassificationFilters
 import Information.Battles.Types.Division
 import Information.Geography.Types.Base
 import Lifecycle.With
+import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.ByOption
+
 
 class BattleProcessDivisions extends BattleProcessState {
   override def step(): Unit = {
@@ -43,7 +44,7 @@ class BattleProcessDivisions extends BattleProcessState {
             .flatMap(enemy =>
               salientBaseGroups
                 .flatMap(bases =>
-                  ByOption.minBy(bases
+                  Maff.minBy(bases
                     .map(base => (base, distance(enemy, base)))
                     .filter(p => p._2 < baseRelevancePixels || enemy.base.contains(p._1)))(_._2)
                     .map(_._1)))

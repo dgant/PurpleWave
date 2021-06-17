@@ -6,7 +6,7 @@ import Mathematics.Points.{Pixel, SpecificPoints, Tile}
 import Mathematics.Maff
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.UnitTracking.UnorderedBuffer
-import Utilities.ByOption
+
 
 import scala.collection.mutable
 
@@ -17,7 +17,7 @@ object FormationGeneric {
   }
 
   def guard(units: Iterable[FriendlyUnitInfo], origin: Option[Pixel] = None): Formation = {
-    val finalOrigin: Pixel = origin.getOrElse(ByOption.mode(units.view.map(_.agent.origin)).getOrElse(With.geography.home.center))
+    val finalOrigin: Pixel = origin.getOrElse(Maff.optMode(units.view.map(_.agent.origin)).getOrElse(With.geography.home.center))
     val output = finalOrigin.zone.exit
       .map(exit => FormationZone(units, finalOrigin.zone, exit))
       .getOrElse(form(units, FormationStyleGuard, origin = Some(finalOrigin), destination = Some(With.scouting.threatOrigin.center)))
@@ -43,9 +43,9 @@ object FormationGeneric {
     if (units.forall(_.flying)) return FormationEmpty
 
     val groundUnits           = units.filterNot(_.flying)
-    val centroid              = Maff.weightedExemplar(units.view.map(u => (u.pixel, u.subjectiveValue)))._1
+    val centroid              = Maff.weightedExemplar(units.view.map(u => (u.pixel, u.subjectiveValue)))
     lazy val modeOrigin       = origin.map(_.nearestWalkableTile).getOrElse(Maff.mode(units.view.map(_.agent.simpleOrigin.tile)))
-    lazy val modeTarget       = Maff.mode(units.view.map(u => ByOption.minBy(u.matchups.targets)(u.pixelDistanceEdge).map(_.tile).getOrElse(u.agent.destination.tile)))
+    lazy val modeTarget       = Maff.mode(units.view.map(u => Maff.minBy(u.matchups.targets)(u.pixelDistanceEdge).map(_.tile).getOrElse(u.agent.destination.tile)))
 
     // Start flood filling!
     val inf = With.mapTileArea

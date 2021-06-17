@@ -3,11 +3,12 @@ package Micro.Squads
 import Information.Battles.Types.Division
 import Information.Geography.Types.Base
 import Lifecycle.With
+import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchMobileDetector}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.{ByOption, CountMap}
+import Utilities.CountMap
 
 class SquadCloakedHarass extends Squad {
   override def toString: String = "Cloak"
@@ -32,13 +33,13 @@ class SquadCloakedHarass extends Squad {
     val sneakies = units.toVector.sortBy(-_.squadAge)
     sneakies.foreach(unit => {
       val topBases = basesToHarass.filter(base => base.owner.isEnemy && ( ! basesWithDetection.contains(base) || unit.base.contains(base)))
-      lazy val lastOptionBase = basesToHarass.filterNot(basesWithDetection.contains).find(base => basesAssigned(base) <= ByOption.min(basesAssigned.values).getOrElse(0))
+      lazy val lastOptionBase = basesToHarass.filterNot(basesWithDetection.contains).find(base => basesAssigned(base) <= Maff.min(basesAssigned.values).getOrElse(0))
       if (topBases.nonEmpty) {
         val base = topBases.sortBy(base => unit.pixelDistanceTravelling(base.heart)).maxBy(baseProducingDetection)
         harassBase(unit, base)
         basesAssigned(base) += 1
       } else if (detectionlessDivisions.nonEmpty) {
-        harassDivision(unit, detectionlessDivisions.minBy(d => ByOption.min(d.enemies.view.filter(unit.canAttack).map(_.pixel).map(unit.pixelDistanceTravelling)).getOrElse(With.mapPixelPerimeter.toDouble)))
+        harassDivision(unit, detectionlessDivisions.minBy(d => Maff.min(d.enemies.view.filter(unit.canAttack).map(_.pixel).map(unit.pixelDistanceTravelling)).getOrElse(With.mapPixelPerimeter.toDouble)))
       } else if (lastOptionBase.isDefined) {
         harassBase(unit, lastOptionBase.get)
         basesAssigned(lastOptionBase.get) += 1
@@ -53,7 +54,7 @@ class SquadCloakedHarass extends Squad {
   }
 
   def harassDivision(unit: FriendlyUnitInfo, division: Division): Unit = {
-    val target = ByOption.minBy(division.enemies.view.filter(unit.canAttack))(unit.pixelsToGetInRange).map(_.pixel).getOrElse(With.scouting.mostBaselikeEnemyTile.center)
+    val target = Maff.minBy(division.enemies.view.filter(unit.canAttack))(unit.pixelsToGetInRange).map(_.pixel).getOrElse(With.scouting.mostBaselikeEnemyTile.center)
     unit.agent.intend(this, new Intention { toTravel = Some(target) })
   }
 

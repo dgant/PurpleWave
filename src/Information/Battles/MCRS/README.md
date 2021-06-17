@@ -1,1 +1,0 @@
-A Scala-fied and PurpleWave-ified version of MCRS (McRave Sim) by Christian McCrave: https://github.com/Cmccrave/MCRS

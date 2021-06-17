@@ -6,7 +6,7 @@ import Micro.Agency.Intention
 import Micro.Formation.FormationGeneric
 import Planning.UnitMatchers.{MatchProxied, MatchWarriors}
 import ProxyBwapi.Races.Terran
-import Utilities.{ByOption, Minutes}
+import Utilities.Minutes
 
 class SquadAttack extends Squad {
   override def toString: String = f"Atk ${vicinity.base.map(_.name).getOrElse(vicinity.zone.name).take(4)}"
@@ -49,10 +49,10 @@ class SquadAttack extends Squad {
     val threatOrigin = With.scouting.threatOrigin
     val centroid = Maff.centroid(units.view.map(_.pixel)).tile
     val threatDistanceToUs =
-      ByOption.min(With.geography.ourBases.map(_.heart.tileDistanceFast(threatOrigin)))
+      Maff.min(With.geography.ourBases.map(_.heart.tileDistanceFast(threatOrigin)))
         .getOrElse(With.geography.home.tileDistanceFast(threatOrigin))
     val threatDistanceToEnemy =
-      ByOption.min(With.geography.enemyBases.map(_.heart.tileDistanceFast(centroid)))
+      Maff.min(With.geography.enemyBases.map(_.heart.tileDistanceFast(centroid)))
         .getOrElse(With.scouting.mostBaselikeEnemyTile.tileDistanceFast(centroid))
 
     lazy val enemyNonTrollyThreats = With.units.enemy.count(u => u.is(MatchWarriors) && u.likelyStillThere && ! u.is(Terran.Vulture) && u.detected)
@@ -64,14 +64,14 @@ class SquadAttack extends Squad {
       return
     }
     vicinity =
-      ByOption.minBy(With.geography.ourBasesAndSettlements.flatMap(_.units.filter(u => u.isEnemy && u.unitClass.isBuilding).map(_.pixel)))(_.groundPixels(With.geography.home.center))
+      Maff.minBy(With.geography.ourBasesAndSettlements.flatMap(_.units.filter(u => u.isEnemy && u.unitClass.isBuilding).map(_.pixel)))(_.groundPixels(With.geography.home.center))
       .orElse(
         if (With.geography.ourBases.size > 1 && With.frame > Minutes(10)())
           None
         else
-          ByOption.minBy(With.units.enemy.view.filter(MatchProxied).map(_.pixel))(_.groundPixels(With.geography.home.center)))
+          Maff.minBy(With.units.enemy.view.filter(MatchProxied).map(_.pixel))(_.groundPixels(With.geography.home.center)))
       .orElse(
-        ByOption
+        Maff
           .maxBy(With.geography.enemyBases)(base => {
             val distance      = With.scouting.threatOrigin.center.pixelDistance(base.heart.center)
             val distanceLog   = 1 + Math.log(1 + distance)
@@ -80,7 +80,7 @@ class SquadAttack extends Squad {
             output
           })
           .map(base => base.natural.filter(_.owner == base.owner).getOrElse(base))
-          .map(base => ByOption.minBy(base.units.filter(u => u.isEnemy && u.unitClass.isBuilding))(_.pixelDistanceCenter(base.townHallArea.midPixel))
+          .map(base => Maff.minBy(base.units.filter(u => u.isEnemy && u.unitClass.isBuilding))(_.pixelDistanceCenter(base.townHallArea.midPixel))
             .map(_.pixel)
             .getOrElse(base.townHallArea.midPixel)))
       .orElse(if (enemyNonTrollyThreats > 0) Some(With.scouting.threatOrigin.center) else None)

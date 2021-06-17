@@ -2,10 +2,11 @@ package Information.Fingerprinting.ProtossStrategies
 
 import Information.Fingerprinting.Generic._
 import Lifecycle.With
+import Mathematics.Maff
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.{ByOption, GameTime}
+import Utilities.GameTime
 import bwapi.Race
 
 abstract class FingerprintFFE extends FingerprintAnd(
@@ -26,8 +27,8 @@ abstract class FingerprintFFE extends FingerprintAnd(
     lazy val zealot                 = With.units.enemy.view.filter(Protoss.Zealot).toVector
     lazy val forgeOrCannon          = cannonsWalled ++ forge
     lazy val gatewayOrZealot        = gateway ++ zealot
-    lazy val forgeCompletionFrame   = forge.map(_.completionFrame).orElse(ByOption.min(cannonsWalled.map(_.frameDiscovered)))
-    lazy val gatewayCompletionFrame = gateway.map(_.completionFrame).orElse(ByOption.min(zealot.map(_.frameDiscovered)))
+    lazy val forgeCompletionFrame   = forge.map(_.completionFrame).orElse(Maff.min(cannonsWalled.map(_.frameDiscovered)))
+    lazy val gatewayCompletionFrame = gateway.map(_.completionFrame).orElse(Maff.min(zealot.map(_.frameDiscovered)))
     lazy val isSomeKindOfFFE        = forgeOrCannon.nonEmpty || (gateway.isDefined && expanded)
   }
   

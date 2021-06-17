@@ -35,7 +35,6 @@ class Blackboard {
   var keepingHighTemplar    : Property[Boolean]           = add(new Property(true))
   var pushKiters            : Property[Boolean]           = add(new Property(false))
   var stealGas              : Property[Boolean]           = add(new Property(false))
-  var mcrs                  : Property[Boolean]           = add(new Property(With.configuration.enableMCRS))
   var preferCloseExpansion  : Property[Boolean]           = add(new Property(false))
   var floatableBuildings    : Property[Vector[UnitClass]] = add(new Property(Vector.empty))
 }

@@ -1,7 +1,7 @@
 package Performance
 
 import Lifecycle.With
-import Utilities.ByOption
+import Mathematics.Maff
 
 class ReactionTimes {
 
@@ -28,11 +28,11 @@ class ReactionTimes {
 
   def filterTimes(times: Seq[Int]): Seq[Int] = times // Optional: Remove outliers
   
-  private val agencyMinCache            = new Cache(() => ByOption.min(With.agents.cycleLengths).getOrElse(0))
-  private val agencyMaxCache            = new Cache(() => ByOption.max(With.agents.cycleLengths).getOrElse(0))
-  private val clusteringMaxCache        = new Cache(() => ByOption.max(With.battles.clustering.runtimes).getOrElse(0))
-  private val estimationMaxCache        = new Cache(() => ByOption.max(With.battles.estimationRuntimes).getOrElse(0))
-  private val planningMaxCache          = new Cache(() => ByOption.max(With.prioritizer.frameDelays).getOrElse(0))
+  private val agencyMinCache            = new Cache(() => Maff.min(With.agents.cycleLengths).getOrElse(0))
+  private val agencyMaxCache            = new Cache(() => Maff.max(With.agents.cycleLengths).getOrElse(0))
+  private val clusteringMaxCache        = new Cache(() => Maff.max(With.battles.clustering.runtimes).getOrElse(0))
+  private val estimationMaxCache        = new Cache(() => Maff.max(With.battles.estimationRuntimes).getOrElse(0))
+  private val planningMaxCache          = new Cache(() => Maff.max(With.prioritizer.frameDelays).getOrElse(0))
   private val agencyAverageCache        = new Cache(() => filterTimes(With.agents.cycleLengths).sum             / Math.max(1, filterTimes(With.agents.cycleLengths).size))
   private val estimationAverageCache    = new Cache(() => filterTimes(With.battles.estimationRuntimes).sum  / Math.max(1, filterTimes(With.battles.estimationRuntimes).size))
   private val clusteringAverageCache    = new Cache(() => filterTimes(With.battles.clustering.runtimes).sum / Math.max(1, filterTimes(With.battles.clustering.runtimes).size))

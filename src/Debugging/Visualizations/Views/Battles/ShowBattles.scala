@@ -6,9 +6,9 @@ import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Debugging.Visualizations.Views.View
 import Information.Battles.Types.BattleLocal
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.ByOption
 import bwapi.Color
 
 object ShowBattles extends View {
@@ -27,7 +27,7 @@ object ShowBattles extends View {
   def localBattle: Option[BattleLocal] = {
     val battlesSelected = With.units.ours.filter(_.selected).flatMap(_.battle)
     val battlesToShow = if (battlesSelected.isEmpty) With.battles.local else battlesSelected
-    ByOption.minBy(battlesToShow)(_.focus.pixelDistanceSquared(With.viewport.center))
+    Maff.minBy(battlesToShow)(_.focus.pixelDistanceSquared(With.viewport.center))
   }
 
   def format(value: Double): String = "%1.2f".format(value)

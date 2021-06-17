@@ -1,11 +1,12 @@
 package Micro.Actions.Combat.Tactics
 
 import Lifecycle.With
+import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.ByOption
+
 
 object EmergencyBunk extends Action {
   
@@ -30,7 +31,7 @@ object EmergencyBunk extends Action {
     val openBunkers         = openBunkersFor(unit)
     val openBunkersEngaged  = openBunkers.filter(_.matchups.targetsInRange.nonEmpty)
     val openBunkersInForm   = openBunkers.filter(bunker => unit.agent.toReturn.exists(_.pixelDistance(bunker.pixel) < 32.0 * 10.0))
-    val openBunkerToEnter   = ByOption.minBy(openBunkersEngaged)(_.pixelDistanceEdge(unit))
+    val openBunkerToEnter   = Maff.minBy(openBunkersEngaged)(_.pixelDistanceEdge(unit))
     
     if (openBunkerToEnter.isDefined) {
       Commander.rightClick(unit, openBunkerToEnter.get)

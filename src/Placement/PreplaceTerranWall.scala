@@ -3,10 +3,11 @@ package Placement
 import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Types.Zone
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.{Tile, TileRectangle}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
-import Utilities.ByOption
+
 
 object PreplaceTerranWall {
 
@@ -21,8 +22,8 @@ object PreplaceTerranWall {
     val searchEnd = searchStart.add(2 * searchRadius - 2, 2 * searchRadius - 1)
     val searchArea = TileRectangle(searchStart, searchEnd)
     val zoneOut = zone.exit.get.otherSideof(zone)
-    val tileIn = ByOption.minBy(zone.tilesBuildable.view.filterNot(searchArea.expand(1, 1).contains))(_.groundPixels(zone.exit.get.pixelCenter))
-    val tileOut = ByOption.minBy(zoneOut.tilesBuildable.view.filterNot(searchArea.expand(1, 1).contains))(_.groundPixels(zone.exit.get.pixelCenter))
+    val tileIn = Maff.minBy(zone.tilesBuildable.view.filterNot(searchArea.expand(1, 1).contains))(_.groundPixels(zone.exit.get.pixelCenter))
+    val tileOut = Maff.minBy(zoneOut.tilesBuildable.view.filterNot(searchArea.expand(1, 1).contains))(_.groundPixels(zone.exit.get.pixelCenter))
     if (tileIn.isEmpty) return None
     if (tileOut.isEmpty) return None
     val altitudes = Seq(tileIn.get.altitude, tileOut.get.altitude).distinct
@@ -39,8 +40,8 @@ object PreplaceTerranWall {
         Some(
           Fit(
             Tile(
-              ByOption.min(placed.view.map(_._1.x)).getOrElse(0),
-              ByOption.min(placed.view.map(_._1.y)).getOrElse(0)),
+              Maff.min(placed.view.map(_._1.x)).getOrElse(0),
+              Maff.min(placed.view.map(_._1.y)).getOrElse(0)),
             new PreplacementTemplate(placed)))
         else None
     }

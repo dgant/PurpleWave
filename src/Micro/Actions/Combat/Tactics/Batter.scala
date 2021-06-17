@@ -11,7 +11,7 @@ import Micro.Targeting.Target
 import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.{ByOption, Minutes, Seconds}
+import Utilities.{Minutes, Seconds}
 import bwapi.Race
 
 object Batter extends Action {
@@ -93,7 +93,7 @@ object Batter extends Action {
               < building.pixel.pixelDistance(wallExit.pixelCenter)))
         .distinct
       
-      val destination = ByOption.minBy(walkableTiles)(_.center.pixelDistance(unit.pixel))
+      val destination = Maff.minBy(walkableTiles)(_.center.pixelDistance(unit.pixel))
       unit.agent.toTravel = destination.map(_.center).orElse(unit.agent.toTravel)
       Commander.move(unit)
   

@@ -8,7 +8,6 @@ import Micro.Agency.AnchorMargin
 import Performance.Cache
 import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.ByOption
 
 class Team(val units: Vector[UnitInfo]) {
 
@@ -33,8 +32,8 @@ class Team(val units: Vector[UnitInfo]) {
   val centroidGround = new Cache(() => GroupCentroid.ground(attackers))
   def centroidOf(unit: UnitInfo): Pixel = if (unit.flying) centroidAir() else centroidGround()
   val vanguard = new Cache(() =>
-    ByOption.minBy(attackers)(_.pixelDistanceSquared(opponent.centroidAir()))
-    .orElse(ByOption.minBy(units)(_.pixelDistanceSquared(opponent.centroidAir())))
+    Maff.minBy(attackers)(_.pixelDistanceSquared(opponent.centroidAir()))
+    .orElse(Maff.minBy(units)(_.pixelDistanceSquared(opponent.centroidAir())))
     .map(_.pixel)
     .getOrElse(With.scouting.threatOrigin.center))
   val anchorMargin = new Cache(() => AnchorMargin.marginOf(units.view.flatMap(_.friendly)))
@@ -72,8 +71,8 @@ class Team(val units: Vector[UnitInfo]) {
   val widthIdeal          = new Cache(() => attackersGround.map(_.unitClass.radialHypotenuse * 2.5).sum) // x2.5 = x2 for diameter, then x1.25 for spacing
   val widthMeanExpected   = new Cache(() => widthIdeal() / 2)
   val widthMeanActual     = new Cache(() => Maff.mean(units.view.flatMap(_.widthContribution())))
-  val depthMean           = new Cache(() => ByOption.mean(units.view.flatMap(_.depthCurrent())).getOrElse(0d))
-  val depthSpread         = new Cache(() => ByOption.mean(units.view.flatMap(_.depthCurrent()).map(d => Math.abs(d - depthMean()))).getOrElse(0d))
+  val depthMean           = new Cache(() => Maff.optMean(units.view.flatMap(_.depthCurrent())).getOrElse(0d))
+  val depthSpread         = new Cache(() => Maff.optMean(units.view.flatMap(_.depthCurrent()).map(d => Math.abs(d - depthMean()))).getOrElse(0d))
   val coherenceWidth      = new Cache(() => if (units.size == 1) 1 else Math.min(Maff.nanToOne(widthMeanExpected() / widthMeanActual()), Maff.nanToOne(widthMeanActual() / widthMeanExpected())))
   val coherenceDepth      = new Cache(() => 1 - Maff.clamp(2 * depthSpread() / (128 + widthIdeal()), 0, 1))
   val coherence           = new Cache(() => coherenceDepth()) // Math.max(coherenceWidth(), coherenceDepth()))

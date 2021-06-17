@@ -1,7 +1,8 @@
 package Information.Battles.Prediction.Simulation
 
+import Mathematics.Maff
 import Micro.Targeting.Target
-import Utilities.ByOption
+
 
 object BehaviorFight extends SimulacrumBehavior {
   val fighting: Boolean = true
@@ -10,7 +11,7 @@ object BehaviorFight extends SimulacrumBehavior {
     // If no valid target, pick target
     simulacrum.setTarget(simulacrum.target.filter(t => validTarget(simulacrum, t) && simulacrum.inRangeToAttack(t)).orElse({
       simulacrum.targets.removeIf(t => ! validTarget(simulacrum, t))
-      ByOption.maxBy(simulacrum.targets)(Target.baseAttackerToTargetValue(simulacrum, _))
+      Maff.maxBy(simulacrum.targets)(Target.baseAttackerToTargetValue(simulacrum, _))
     }))
 
     // TODO: Retarget when target out of range

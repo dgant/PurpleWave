@@ -1,6 +1,7 @@
 package Micro.Actions.Basic
 
 import Lifecycle.With
+import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Potshot
@@ -11,7 +12,7 @@ import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Strategery.Benzene
-import Utilities.{ByOption, Seconds}
+import Utilities.Seconds
 
 object Gather extends Action {
   
@@ -32,7 +33,7 @@ object Gather extends Action {
       if (With.reaction.sluggishness < 2) {
         val baseOriginal = resource.base
         lazy val baseOpposite = baseOriginal.flatMap(b => b.isNaturalOf.orElse(b.natural))
-        lazy val baseRemote = ByOption.minBy(With.geography.ourBases.filterNot(baseOriginal.contains))(_.heart.groundPixels(baseOriginal.map(_.heart).getOrElse(resource.tileTopLeft)))
+        lazy val baseRemote = Maff.minBy(With.geography.ourBases.filterNot(baseOriginal.contains))(_.heart.groundPixels(baseOriginal.map(_.heart).getOrElse(resource.tileTopLeft)))
         lazy val basePaired = baseOpposite.orElse(baseRemote)
 
         def threatenedAt(atResource: UnitInfo): Boolean = unit.matchups.threats.exists(threat =>
@@ -40,7 +41,7 @@ object Gather extends Action {
             && threat.pixelsToGetInRange(unit, atResource.pixel) < defenseRadiusPixels)
 
         if (basePaired.exists(_.owner.isUs) && threatenedAt(resource)) {
-          val alternativeMineral = ByOption.minBy(basePaired.get.minerals.filter(_.alive))(_.pixelDistanceEdge(unit)).orElse(unit.agent.toGather)
+          val alternativeMineral = Maff.minBy(basePaired.get.minerals.filter(_.alive))(_.pixelDistanceEdge(unit)).orElse(unit.agent.toGather)
           unit.agent.toGather = alternativeMineral.filterNot(threatenedAt).orElse(Some(resource))
         }
       }
@@ -75,7 +76,7 @@ object Gather extends Action {
             ((unit.carryingGas || unit.carryingMinerals)  && goal.unitClass.isTownHall  && goal.isOurs) ||
             (!unit.carryingGas                            && goal.unitClass.isGas       && goal.isOurs) ||
             (!unit.carryingMinerals                       && goal.unitClass.isMinerals))
-        val bestGoal = ByOption.maxBy(drillGoal)(resource => lethalStabbers.map(stabber => resource.pixelDistanceCenter(stabber)).max)
+        val bestGoal = Maff.maxBy(drillGoal)(resource => lethalStabbers.map(stabber => resource.pixelDistanceCenter(stabber)).max)
         if (bestGoal.exists(_.unitClass.isTownHall)) {
           Commander.returnCargo(unit)
         } else if (bestGoal.isDefined) {
@@ -108,7 +109,7 @@ object Gather extends Action {
 
     // Take safe/hidden route to expansion
     if (unit.metro != resource.metro) {
-      val nextZone = ByOption.minBy(unit.zone.edges)(_.pixelCenter.groundPixels(resource.zone.centroid))
+      val nextZone = Maff.minBy(unit.zone.edges)(_.pixelCenter.groundPixels(resource.zone.centroid))
       unit.agent.toTravel = MicroPathing.getWaypointAlongTilePath(MicroPathing.getSneakyPath(unit, Some(resource.tile.nearestWalkableTile)))
       if (unit.agent.toTravel.isDefined) {
         Commander.move(unit)

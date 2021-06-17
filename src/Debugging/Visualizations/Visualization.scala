@@ -55,7 +55,6 @@ class Visualization extends TimedTask {
     ShowBlackScreen,
     ShowBulletsAsHearts,
     ShowClustering,
-    ShowDesire,
     ShowDivisions,
     ShowEconomy,
     ShowFingerprints,

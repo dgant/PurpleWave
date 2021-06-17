@@ -1,12 +1,13 @@
 package Micro.Actions.Scouting
 
+import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
 import Planning.UnitMatchers.MatchProxied
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Strategery.Strategies.Zerg.ZvE4Pool
-import Utilities.ByOption
+
 
 object Sabotage extends Action {
 
@@ -17,7 +18,7 @@ object Sabotage extends Action {
     && ! ZvE4Pool.registerActive)
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    val buildingTarget = ByOption.minBy(unit.matchups.targets.view.filter(u => u.unitClass.isBuilding || (u.unitClass.isWorker && u.visible)))(_.unitClass.maxTotalHealth)
+    val buildingTarget = Maff.minBy(unit.matchups.targets.view.filter(u => u.unitClass.isBuilding || (u.unitClass.isWorker && u.visible)))(_.unitClass.maxTotalHealth)
     if (unit.matchups.threats.forall(threat =>
       threat.framesToGetInRange(unit) > 12
       || (threat.unitClass.isWorker

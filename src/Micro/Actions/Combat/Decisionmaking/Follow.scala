@@ -1,10 +1,11 @@
 package Micro.Actions.Combat.Decisionmaking
 
+import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Agency.Commander
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.ByOption
+
 
 object Follow extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
@@ -28,7 +29,7 @@ object Follow extends Action {
     unit.agent.toTravel = maybeLeader.map(_.pixel).orElse(unit.agent.toTravel)
     maybeLeader
       .withFilter(leader =>
-        unit.pixelDistanceCenter(leader) < Seq(256, ByOption.min(unit.matchups.threats.view.map(_.pixelsToGetInRange(unit).toInt)).getOrElse(0)).max
+        unit.pixelDistanceCenter(leader) < Seq(256, Maff.min(unit.matchups.threats.view.map(_.pixelsToGetInRange(unit).toInt)).getOrElse(0)).max
         && ( ! unit.is(Protoss.Carrier) || leader.matchups.threatsInRange.forall(unit.matchups.threatsInRange.contains))
       )
       .foreach(leader => {

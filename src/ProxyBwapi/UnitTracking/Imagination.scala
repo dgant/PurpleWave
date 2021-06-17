@@ -1,6 +1,7 @@
 package ProxyBwapi.UnitTracking
 
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.{Pixel, PixelRay}
 import Mathematics.Shapes.Circle
 import Planning.UnitMatchers.MatchWarriors
@@ -121,7 +122,7 @@ object Imagination {
     val maxTilesAwaySquared = 2 + maxTilesAway * maxTilesAway
 
     val output = (0 to 10).view.map(i =>
-      ByOption.minBy(Circle.points(i)
+      Maff.minBy(Circle.points(i)
         .map(unit.tile.add)
         .filter(tile =>
           tile.valid

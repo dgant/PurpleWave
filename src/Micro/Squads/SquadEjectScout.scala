@@ -1,22 +1,23 @@
 package Micro.Squads
 
 import Lifecycle.With
+import Mathematics.Maff
 import Micro.Agency.Intention
 import Performance.Cache
 import Planning.Plans.Scouting.ScoutCleared
 import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers.{MatchAnd, MatchScoutCatcher}
 import Planning.UnitPreferences.PreferClose
-import Utilities.{ByOption, Minutes}
+import Utilities.Minutes
 
 class SquadEjectScout extends Squad {
   override def toString: String = "Eject"
 
-  val targetScout = new Cache(() => ByOption.minBy(With.scouting.enemyScouts())(_.frameDiscovered))
+  val targetScout = new Cache(() => Maff.minBy(With.scouting.enemyScouts())(_.frameDiscovered))
   private val tilesToConsider = new Cache(() => With.scouting.basesToLookForEnemyScouts().view.flatMap(_.zone.tiles))
   private val destination = new Cache(() => targetScout()
     .map(_.pixel)
-    .getOrElse(ByOption.minBy(tilesToConsider())(With.grids.lastSeen.get).getOrElse(With.geography.home).center))
+    .getOrElse(Maff.minBy(tilesToConsider())(With.grids.lastSeen.get).getOrElse(With.geography.home).center))
 
   private val scoutCleared = new ScoutCleared
   def recruit() {

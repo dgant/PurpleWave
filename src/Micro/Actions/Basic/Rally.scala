@@ -1,11 +1,12 @@
 package Micro.Actions.Basic
 
 import Lifecycle.With
+import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Agency.Commander
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.ByOption
+
 
 object Rally extends Action {
   
@@ -23,7 +24,7 @@ object Rally extends Action {
       if (unit.unitClass.producesLarva) {
         val nearbyUnits = With.units.inTileRectangle(unit.tileArea.expand(2, 2))
         val nearbyEggs = nearbyUnits.filter(Zerg.Egg)
-        val soonestEgg = ByOption.minBy(nearbyEggs)(_.remainingCompletionFrames)
+        val soonestEgg = Maff.minBy(nearbyEggs)(_.remainingCompletionFrames)
         if (soonestEgg.exists(_.friendly.exists(_.buildType.isWorker))) {
           shouldRallyToMinerals = true
         }

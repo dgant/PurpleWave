@@ -1,13 +1,14 @@
 package Micro.Squads
 
 import Lifecycle.With
+import Mathematics.Maff
 import Micro.Agency.Intention
 import Performance.Cache
 import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers.MatchMobileDetector
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
-import Utilities.ByOption
+
 
 class SquadCatchDTRunby extends Squad {
 
@@ -25,8 +26,8 @@ class SquadCatchDTRunby extends Squad {
 
   private val destination = new Cache(() => {
     val dts = With.units.enemy.view.filter(Protoss.DarkTemplar)
-    ByOption.minBy(With.geography.ourBases.map(_.heart.center))(heart =>
-      ByOption.min(dts.map(_.pixelDistanceCenter(heart)))
+    Maff.minBy(With.geography.ourBases.map(_.heart.center))(heart =>
+      Maff.min(dts.map(_.pixelDistanceCenter(heart)))
         .getOrElse(heart.pixelDistance(With.scouting.mostBaselikeEnemyTile.center)))
       .getOrElse(With.geography.home.center)
     })

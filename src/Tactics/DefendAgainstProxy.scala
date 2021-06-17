@@ -1,6 +1,7 @@
 package Tactics
 
 import Lifecycle.With
+import Mathematics.Maff
 import Micro.Squads.SquadRazeProxies
 import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
@@ -8,7 +9,7 @@ import Planning.UnitCounters.{CountEverything, CountUpTo}
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.{ByOption, Forever, Minutes}
+import Utilities.{Forever, Minutes}
 
 import scala.collection.mutable
 
@@ -46,7 +47,7 @@ class DefendAgainstProxy extends Prioritized {
       val isEmergency         = proxy.isAny(Terran.Barracks, Terran.Bunker, Protoss.PhotonCannon, Protoss.Gateway) && (proxy.powered || ! proxy.unitClass.isProtoss || With.units.enemy.exists(u => u.is(Protoss.Pylon) && With.grids.psi3Height.psiPoints.view.map(u.tileTopLeft.add).contains(proxy.tileTopLeft)))
       val isCloseEnoughToPull = Seq(With.geography.ourMain, With.geography.ourNatural).exists(_.townHallArea.midpoint.groundPixels(proxy.tile) < 32 * 21)
       val mustPull            = proxy.dpfGround > 0 && With.geography.ourBases.exists(_.resourcePathTiles.exists(_.center.pixelDistance(proxy.pixel) < proxy.effectiveRangePixels + 32))
-      val framesBeforeDamage  = ByOption
+      val framesBeforeDamage  = Maff
         .min(With.units.enemy.filter(u =>
           u.dpfGround > 0
           && u.unitClass.isBuilding

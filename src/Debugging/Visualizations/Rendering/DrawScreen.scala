@@ -4,8 +4,8 @@ import Debugging.Visualizations.Colors
 import Information.Battles.Prediction.PredictionLocal
 import Information.Battles.Types.BattleLocal
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.Pixel
-import Utilities.ByOption
 import bwapi.Color
 
 object DrawScreen {
@@ -38,9 +38,9 @@ object DrawScreen {
   }
 
   def padTable(rows: Iterable[Iterable[String]]): Iterable[Iterable[String]] = {
-    val columns = ByOption.max(rows.view.map(_.size)).getOrElse(0)
+    val columns = Maff.max(rows.view.map(_.size)).getOrElse(0)
     val columnWidths = rows.view.map(_.view.map(_.length).toIndexedSeq).reduce((r1, r2) => (0 until columns).map(i => Math.max(r1.view.padTo(columns, 0).drop(i).head, r2.view.padTo(columns, 0).drop(i).head)))
-    val max: Int = ByOption.max(rows.view.flatten.map(_.length)).getOrElse(0)
+    val max: Int = Maff.max(rows.view.flatten.map(_.length)).getOrElse(0)
     rows.map(_.zipWithIndex.map(p => p._1.padTo(columnWidths(p._2), ' ')))
   }
 
@@ -111,7 +111,7 @@ object DrawScreen {
     battle.teams.foreach(team => {
       val isUs = team == battle.us
       val centroid = team.centroidAir()
-      val radius = ByOption.max(team.units.map(u => u.unitClass.radialHypotenuse + u.pixelDistanceCenter(centroid))).getOrElse(0.0).toInt
+      val radius = Maff.max(team.units.map(u => u.unitClass.radialHypotenuse + u.pixelDistanceCenter(centroid))).getOrElse(0.0).toInt
       val thickness = if (weWin == isUs) 2 else 5
       (0 until thickness).foreach(t => DrawMap.circle(centroid, radius + t, if (isUs) ourColorNeon else enemyColorNeon))
     })

@@ -1,8 +1,8 @@
 package Planning.Predicates.Strategy
 
 import Lifecycle.With
+import Mathematics.Maff
 import Planning.Predicate
-import Utilities.ByOption
 
 class WeAreBeingProxied extends Predicate {
   
@@ -11,7 +11,7 @@ class WeAreBeingProxied extends Predicate {
       lazy val scaryBuilding  = unit.unitClass.isBuilding && ! unit.unitClass.isGas
       lazy val tileBuilding   = unit.tile
       lazy val tileComparison = With.geography.enemyBases.headOption
-        .orElse(ByOption.maxBy(With.geography.startBases.filterNot(_.owner.isUs))(_.heart.tileDistanceFast(With.geography.home)))
+        .orElse(Maff.maxBy(With.geography.startBases.filterNot(_.owner.isUs))(_.heart.tileDistanceFast(With.geography.home)))
         .map(_.heart)
       lazy val distanceUs     = With.geography.home.tileDistanceSquared(tileBuilding)
       lazy val distanceEnemy  = tileComparison.map(_.tileDistanceSquared(tileBuilding)).getOrElse(0)

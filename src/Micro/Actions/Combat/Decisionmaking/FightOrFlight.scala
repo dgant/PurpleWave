@@ -2,10 +2,11 @@
 package Micro.Actions.Combat.Decisionmaking
 
 import Lifecycle.With
+import Mathematics.Maff
 import Micro.Actions.Action
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.{ByOption, Minutes}
+import Utilities.Minutes
 
 object FightOrFlight extends Action {
 
@@ -46,7 +47,7 @@ object FightOrFlight extends Action {
         ally.is(Protoss.ShieldBattery)
         && ally.complete
         && ally.energy > 20
-        && ally.pixelDistanceEdge(unit, otherAt = ByOption.minBy(unit.matchups.targets.view.map(unit.pixelToFireAt))(unit.pixelDistanceCenter).getOrElse(unit.pixel)) < 72))
+        && ally.pixelDistanceEdge(unit, otherAt = Maff.minBy(unit.matchups.targets.view.map(unit.pixelToFireAt))(unit.pixelDistanceCenter).getOrElse(unit.pixel)) < 72))
 
     /*
     decide(true, "Anchors", () => unit.matchups.anchors.exists(anchor =>
@@ -75,9 +76,5 @@ object FightOrFlight extends Action {
       unit.agent.fightHysteresisFrames = With.configuration.battleHysteresisFrames
     }
     unit.agent.shouldEngage = shouldEngage
-
-    if (With.blackboard.mcrs()) {
-      unit.agent.shouldEngage = unit.mcrs.shouldFight
-    }
   }
 }

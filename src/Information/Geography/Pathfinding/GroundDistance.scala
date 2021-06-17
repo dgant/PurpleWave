@@ -1,7 +1,8 @@
 package Information.Geography.Pathfinding
 
+import Mathematics.Maff
 import Mathematics.Points.{Pixel, Tile}
-import Utilities.ByOption
+
 
 trait GroundDistance {
 
@@ -44,7 +45,7 @@ trait GroundDistance {
   @inline final protected def groundTiles(origin: Tile, destination: Tile): Int = {
     if ( ! origin.valid) return impossiblyLargeDistanceTiles
     if ( ! destination.valid) return impossiblyLargeDistanceTiles
-    ByOption
+    Maff
       .min(destination.zone.edges.view.map(edge =>
           edge.distanceGrid.getUnchecked(destination)
         + edge.distanceGrid.getUnchecked(origin)))

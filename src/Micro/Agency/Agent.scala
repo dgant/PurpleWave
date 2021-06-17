@@ -4,6 +4,7 @@ package Micro.Agency
 import Debugging.Visualizations.ForceMap
 import Information.Geography.Pathfinding.Types.TilePath
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Physics.ForceMath
 import Mathematics.Points.{Pixel, Tile}
 import Micro.Actions.{Action, Idle}
@@ -13,7 +14,6 @@ import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
-import Utilities.ByOption
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -78,7 +78,7 @@ class Agent(val unit: FriendlyUnitInfo) {
       .getOrElse(simpleOrigin),
     () => unit.agent.toReturn)
   private val simpleOriginCache = new Cache[Pixel](() =>
-    ByOption.minBy(
+    Maff.minBy(
       With.geography.ourBases.filter(base =>
         base.scoutedByEnemy
         || base.isNaturalOf.exists(_.scoutedByEnemy)
@@ -175,7 +175,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     .map(p => (p._1, p._2.get))
     .toVector)
   val receivedPushForce = new KeyedCache(() => ForceMath.sum(receivedPushForces().view.map(_._2)), () => priority)
-  val receivedPushPriority = new Cache(() => ByOption.max(receivedPushForces().view.map(_._1.priority)).getOrElse(TrafficPriorities.None))
+  val receivedPushPriority = new Cache(() => Maff.max(receivedPushForces().view.map(_._1.priority)).getOrElse(TrafficPriorities.None))
 
   /////////////
   // Leading //

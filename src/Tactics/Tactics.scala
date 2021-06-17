@@ -15,7 +15,7 @@ import Planning.Predicates.Strategy.EnemyIsTerran
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.{ByOption, Minutes}
+import Utilities.Minutes
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -90,7 +90,7 @@ class Tactics extends TimedTask {
     while (i < freelancers.length) {
       val freelancer = freelancers(i)
       val squadsEligible = squads.filter(squad => filter(freelancer, squad) && squad.candidateValue(freelancer) > minimumValue)
-      val bestSquad = ByOption.minBy(squadsEligible)(squad => freelancer.pixelDistanceTravelling(squad.vicinity))
+      val bestSquad = Maff.minBy(squadsEligible)(squad => freelancer.pixelDistanceTravelling(squad.vicinity))
       if (bestSquad.isDefined) {
         bestSquad.get.addUnit(freelancers.remove(i))
         With.recruiter.lockTo(bestSquad.get.lock, freelancer)
@@ -170,7 +170,7 @@ class Tactics extends TimedTask {
       // If there are no active defense squads, activate one to defend our entrance
       val squadsDefendingOrWaiting: Seq[Squad] =
         if (squadsDefending.nonEmpty) squadsDefending.view.map(_._2)
-        else ByOption.maxBy(With.geography.bases.filter(b => b.owner.isUs || b.plannedExpoRecently))(_.economicValue()).map(adjustDefenseBase).map(baseSquads).toSeq
+        else Maff.maxBy(With.geography.bases.filter(b => b.owner.isUs || b.plannedExpoRecently))(_.economicValue()).map(adjustDefenseBase).map(baseSquads).toSeq
       assign(freelancers, squadsDefendingOrWaiting)
     }
   }

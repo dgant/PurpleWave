@@ -1,13 +1,14 @@
 package Micro.Actions.Scouting
 
 import Lifecycle.With
+import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
 import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.ByOption
+
 
 object Poke extends Action {
   
@@ -31,7 +32,7 @@ object Poke extends Action {
     val targetHeart = unit.base.map(_.heart.center).getOrElse(unit.zone.centroid)
     val target = targets.minBy(target =>
       target.pixelDistanceEdge(unit)
-      - ByOption.min(unit.matchups.threats.filter(_ != target).map(_.pixelDistanceEdge(target))).getOrElse(0.0))
+      - Maff.min(unit.matchups.threats.filter(_ != target).map(_.pixelDistanceEdge(target))).getOrElse(0.0))
 
     val exit          = unit.zone.exit.map(_.pixelCenter).getOrElse(With.geography.home.center)
     val otherThreats  = targets.filter(t => t != target && t.pixelDistanceCenter(exit) <= unit.pixelDistanceCenter(exit))

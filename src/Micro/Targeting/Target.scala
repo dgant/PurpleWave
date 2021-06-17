@@ -5,7 +5,7 @@ import Mathematics.Maff
 import Micro.Targeting.Filters.{TargetFilter, TargetFilterWhitelist}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{CombatUnit, FriendlyUnitInfo, UnitInfo}
-import Utilities.ByOption
+
 
 object Target extends {
   def choose(attacker: FriendlyUnitInfo, required: TargetFilter*): Option[UnitInfo] = {
@@ -31,7 +31,7 @@ object Target extends {
   }
 
   private def bestUnfiltered(attacker: FriendlyUnitInfo, targets: Iterable[UnitInfo]): Option[UnitInfo] = {
-    ByOption.maxBy(targets)(score(attacker, _))
+    Maff.maxBy(targets)(score(attacker, _))
   }
 
   def legal(attacker: FriendlyUnitInfo, filters: TargetFilter*): Seq[UnitInfo] = {

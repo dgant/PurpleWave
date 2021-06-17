@@ -9,7 +9,7 @@ import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountEverything
 import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.ByOption
+
 
 class Chill(initialMatcher: UnitMatcher) extends Plan {
   
@@ -23,7 +23,7 @@ class Chill(initialMatcher: UnitMatcher) extends Plan {
   }
   
   private def chillOut(chiller: FriendlyUnitInfo, count: Int) {
-    val base = ByOption.minBy(With.geography.ourBases.map(_.heart.center))(chiller.pixelDistanceTravelling)
+    val base = Maff.minBy(With.geography.ourBases.map(_.heart.center))(chiller.pixelDistanceTravelling)
     val tile = base.map(b => Maff.sample(Circle.points(Math.sqrt(count).toInt).map(b.tile.add))).getOrElse(With.geography.home)
     val intent = new Intention
     intent.toTravel = Some(tile.center)

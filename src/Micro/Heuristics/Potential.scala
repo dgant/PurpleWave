@@ -6,7 +6,7 @@ import Mathematics.Maff
 import Micro.Coordination.Pathing.MicroPathing
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.ByOption
+
 
 object Potential {
   
@@ -62,7 +62,7 @@ object Potential {
     if (unit.base.exists(_.owner.isUs)) return new Force
     val allies                = unit.alliesBattleOrSquad.view.filter(_ != unit)
     val alliesUseful          = allies.filter(ally => unit.matchups.threats.exists(ally.canAttack))
-    val allyNearestUseful     = ByOption.minBy(alliesUseful)(ally => ally.pixelDistanceCenter(unit) - ally.effectiveRangePixels)
+    val allyNearestUseful     = Maff.minBy(alliesUseful)(ally => ally.pixelDistanceCenter(unit) - ally.effectiveRangePixels)
     if (allyNearestUseful.isEmpty) return new Force
     val allyDistance          = allyNearestUseful.get.pixelDistanceCenter(unit)
     val allyDistanceAlarming  = if (unit.flying) 1.0 else Math.max(32.0 * 2.0, Math.max(unit.effectiveRangePixels, allyNearestUseful.get.effectiveRangePixels))
@@ -100,7 +100,7 @@ object Potential {
   
   def preferSpreading(unit: FriendlyUnitInfo): Force = {
     lazy val splashThreats = unit.matchups.threats.filter(_.unitClass.dealsRadialSplashDamage)
-    lazy val splashRadius: Double = ByOption.max(splashThreats.map(_.unitClass.airSplashRadius25.toDouble)).getOrElse(0.0)
+    lazy val splashRadius: Double = Maff.max(splashThreats.map(_.unitClass.airSplashRadius25.toDouble)).getOrElse(0.0)
     lazy val splashAllies = unit.alliesBattle.filter(ally =>
       ! ally.unitClass.isBuilding
       && (ally.flying == unit.flying || splashThreats.take(3).exists(_.canAttack(ally))))

@@ -5,7 +5,7 @@ import Micro.Actions.Action
 import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.ByOption
+
 
 object Heal extends Action {
   
@@ -16,7 +16,7 @@ object Heal extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     val targets = validTargets(unit)
-    val target  = ByOption.minBy(targets)(patient =>
+    val target  = Maff.minBy(targets)(patient =>
       if (unit.battle.isDefined && unit.matchups.threats.nonEmpty)
         patient.pixelDistanceEdge(unit)
       else

@@ -2,9 +2,10 @@ package Information.Geography.Calculations
 
 import Information.Geography.Types.Base
 import Lifecycle.With
+import Mathematics.Maff
 import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.Protoss
-import Utilities.{ByOption, Minutes}
+import Utilities.Minutes
 
 object BaseUpdater {
   
@@ -17,7 +18,7 @@ object BaseUpdater {
     }
 
     base.units            = base.zone.units.filter(u => u.base.contains(base) && u.likelyStillThere).toVector
-    base.townHall         = ByOption.minBy(base.units.view.filter(u => u.unitClass.isTownHall && ! u.flying))(_.tileTopLeft.tileDistanceManhattan(base.townHallTile))
+    base.townHall         = Maff.minBy(base.units.view.filter(u => u.unitClass.isTownHall && ! u.flying))(_.tileTopLeft.tileDistanceManhattan(base.townHallTile))
     base.minerals         = base.units.filter(u => u.mineralsLeft > 0 && ! u.isBlocker)
     base.gas              = base.units.filter(_.unitClass.isGas)
     base.workerCount      = base.units.count(u => u.player == base.owner && u.is(MatchWorker))

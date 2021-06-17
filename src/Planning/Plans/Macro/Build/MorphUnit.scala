@@ -3,6 +3,7 @@ package Planning.Plans.Macro.Build
 import Lifecycle.With
 import Macro.Buildables.{Buildable, BuildableUnit}
 import Macro.Scheduling.MacroCounter
+import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.CountOne
@@ -11,7 +12,7 @@ import Planning.UnitPreferences._
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.ByOption
+
 
 class MorphUnit(val classToMorph: UnitClass) extends Production {
 
@@ -38,7 +39,7 @@ class MorphUnit(val classToMorph: UnitClass) extends Production {
       && u.getProducer.forall(p => p == this || ! With.prioritizer.isPrioritized(p)))
     morpher = morpher
       .filter(m => m.alive && (m.is(morpherClass) || MacroCounter.countCompleteOrIncomplete(m)(classToMorph) > 0))
-      .orElse(ByOption.minBy(alreadyMorphing)(_.frameDiscovered))
+      .orElse(Maff.minBy(alreadyMorphing)(_.frameDiscovered))
   
     // Shared somewhat with TrainUnit
     currencyLock.framesPreordered = (

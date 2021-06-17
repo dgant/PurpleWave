@@ -3,10 +3,10 @@ package Information.Geography.Types
 import Information.Geography.Pathfinding.Types.ZonePath
 import Information.Grids.Movement.GridGroundDistance
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.ByOption
 import bwta.Region
 
 import scala.collection.mutable
@@ -39,8 +39,8 @@ class Zone(
   var walledIn  : Boolean           = false
   var exitNow   : Option[Edge]      = None
 
-  def calculateExit: Option[Edge] = ByOption.minBy(edges)(edge =>
-    ByOption.min(With.geography.enemyBases.map(enemyBase => edge.distanceGrid.get(enemyBase.heart)))
+  def calculateExit: Option[Edge] = Maff.minBy(edges)(edge =>
+    Maff.min(With.geography.enemyBases.map(enemyBase => edge.distanceGrid.get(enemyBase.heart)))
       .getOrElse(edge.distanceGrid.get(With.scouting.threatOrigin)))
   
   def pathTo          (to: Zone): Option[ZonePath]  = With.paths.zonePath(this, to)

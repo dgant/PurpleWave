@@ -4,7 +4,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.ByOption
+
 
 import scala.collection.mutable
 
@@ -39,7 +39,7 @@ trait AccelerantMinerals {
     while (i < minerals.length) {
       val mineral = minerals(i)
       val acceleratorCandidates = minerals.drop(i).filter(_._2 > 24 + mineral._2).filter(_._1.pixelDistanceEdge(mineral._1) < 40)
-      val accelerator = ByOption.minBy(acceleratorCandidates)(_._1.pixelDistanceEdge(mineral._1))
+      val accelerator = Maff.minBy(acceleratorCandidates)(_._1.pixelDistanceEdge(mineral._1))
       accelerator.foreach(a => accelerantMinerals(mineral._1) = a._1)
       i += 1
     }

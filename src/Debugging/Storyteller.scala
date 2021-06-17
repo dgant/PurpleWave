@@ -8,6 +8,7 @@ import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.Performance.ShowPerformanceDetails
 import Debugging.Visualizations.Views.Planning.{ShowStrategyEvaluations, ShowStrategyInterest}
 import Lifecycle.{JBWAPIClient, Main, With}
+import Mathematics.Maff
 import Planning.Predicates.Reactive.{SafeAtHome, SafeToMoveOut}
 import Planning.UnitMatchers.MatchHatchlike
 import ProxyBwapi.Players.PlayerInfo
@@ -16,7 +17,7 @@ import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 import Strategery.Strategies.Strategy
-import Utilities.{ByOption, GameTime, Minutes}
+import Utilities.{GameTime, Minutes}
 import com.sun.management.OperatingSystemMXBean
 
 import scala.collection.mutable
@@ -65,7 +66,7 @@ class Storyteller {
     new Story[Iterable[Tech]]           ("Our techs",          () => interestingTechs.filter(With.self.hasTech),                                                                      _.map(_.toString).mkString(", ")),
     new Story[Iterable[Tech]]           ("Enemy techs",        () => interestingTechs.filter(t => With.enemies.exists(_.hasTech(t))),                                                 _.map(_.toString).mkString(", ")),
     new Story[Iterable[(Upgrade, Int)]] ("Our upgrades",       () => Upgrades.all.map(u => (u, With.self.getUpgradeLevel(u))).filter(_._2 > 0),                                       _.map(u => f"${u._1} = ${u._2}").mkString(", ")),
-    new Story[Iterable[(Upgrade, Int)]] ("Enemy upgrades",     () => Upgrades.all.map(u => (u, ByOption.max(With.enemies.map(_.getUpgradeLevel(u))).getOrElse(0))).filter(_._2 > 0),  _.map(u => f"${u._1} = ${u._2}").mkString(", ")),
+    new Story[Iterable[(Upgrade, Int)]] ("Enemy upgrades",     () => Upgrades.all.map(u => (u, Maff.max(With.enemies.map(_.getUpgradeLevel(u))).getOrElse(0))).filter(_._2 > 0),  _.map(u => f"${u._1} = ${u._2}").mkString(", ")),
     new Story                           ("Our Factories",      () => With.units.countOurs(Terran.Factory)),
     new Story                           ("Our Barracks",       () => With.units.countOurs(Terran.Barracks)),
     new Story                           ("Our Gateways",       () => With.units.countOurs(Protoss.Gateway)),
@@ -97,7 +98,7 @@ class Storyteller {
     if (performanceThresholds.exists(_._1() == With.frame)) {
       tell("Storyteller moving to more intermittent updates")
     }
-    val updateFrequency = ByOption.maxBy(performanceThresholds.filter(_._1() <= With.frame))(_._1()).map(_._2).getOrElse(1)
+    val updateFrequency = Maff.maxBy(performanceThresholds.filter(_._1() <= With.frame))(_._1()).map(_._2).getOrElse(1)
     if (With.frame % updateFrequency == 0) {
       stories.view.foreach(_.update())
       logIntelligence()

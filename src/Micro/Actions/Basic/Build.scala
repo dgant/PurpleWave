@@ -1,6 +1,7 @@
 package Micro.Actions.Basic
 
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.Tile
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
@@ -11,7 +12,7 @@ import Micro.Coordination.Pushing.{CircularPush, TrafficPriorities}
 import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.ByOption
+
 
 object Build extends Action {
   
@@ -22,7 +23,7 @@ object Build extends Action {
     val ourBuilding = With.grids.units.get(unit.agent.toBuildTile.get).find(_.unitClass == unit.agent.toBuild.get)
     
     if (ourBuilding.isDefined) {
-      unit.agent.toGather = ByOption.minBy(With.geography.ourBases.flatMap(_.minerals))(_.pixelDistanceCenter(unit.pixel))
+      unit.agent.toGather = Maff.minBy(With.geography.ourBases.flatMap(_.minerals))(_.pixelDistanceCenter(unit.pixel))
       Gather.consider(unit)
       return
     }

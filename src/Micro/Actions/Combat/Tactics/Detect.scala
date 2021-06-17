@@ -7,7 +7,7 @@ import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.ByOption
+
 
 object Detect extends Action {
   
@@ -29,7 +29,7 @@ object Detect extends Action {
       pickBestSpooky(unit, unit.enemiesBattle.filter(canEventuallyCloak)))
 
     lazy val minesweepingNeeded = With.unitsShown.any(Terran.SpiderMine, Terran.Vulture, Terran.Factory, Terran.Goliath, Terran.SiegeTankUnsieged, Terran.SiegeTankUnsieged, Protoss.Arbiter, Protoss.DarkTemplar, Zerg.Lurker)
-    lazy val minesweepPoint = if (minesweepingNeeded) ByOption
+    lazy val minesweepPoint = if (minesweepingNeeded) Maff
       .minBy(unit.alliesSquad.view.filter(_.canAttack))(_.pixelDistanceTravelling(unit.agent.destination))
       .map(_.pixel.project(unit.agent.destination, unit.sightPixels)) else None
 
@@ -38,7 +38,7 @@ object Detect extends Action {
     if (spookiestPixel.isEmpty) return
 
     val ghostbusters = spookiestSpooky.map(s => s.matchups.enemies.filter(e => e.canMove && e.attacksAgainst(s) > 0))
-    val ghostbuster = ghostbusters.flatMap(g => ByOption.minBy(g)(_.framesBeforeAttacking(spookiestSpooky.get)))
+    val ghostbuster = ghostbusters.flatMap(g => Maff.minBy(g)(_.framesBeforeAttacking(spookiestSpooky.get)))
 
     val idealDistance = Maff.clamp(
       if ( ! unit.cloaked || unit.matchups.enemyDetectors.nonEmpty ||With.enemies.exists(_.isTerran)) unit.matchups.pixelsOfEntanglement else 0,
@@ -57,8 +57,8 @@ object Detect extends Action {
   }
 
   def pickBestSpooky(detector: FriendlyUnitInfo, spookies: Iterable[UnitInfo]): Option[UnitInfo] = {
-    ByOption.minBy(spookies)(s =>
-      ByOption
+    Maff.minBy(spookies)(s =>
+      Maff
         .min(s.matchups.targets.map(s.pixelDistanceSquared))
         .getOrElse(s.pixelDistanceSquared(detector)))
   }

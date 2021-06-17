@@ -10,7 +10,7 @@ import Micro.Targeting.Filters.TargetFilterDefend
 import Performance.Cache
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.ByOption
+
 
 class SquadDefendBase(base: Base) extends Squad {
 
@@ -35,7 +35,7 @@ class SquadDefendBase(base: Base) extends Squad {
           val score = width * turtlePenalty * (3 + i) * altitudeMult
           (step, score)
         })
-        val scoreBest = ByOption.minBy(stepScores)(_._2)
+        val scoreBest = Maff.minBy(stepScores)(_._2)
         scoreBest.foreach(s => output = (s._1.from, Some(s._1.edge)))
       })
     }
@@ -86,8 +86,8 @@ class SquadDefendBase(base: Base) extends Squad {
   })
 
   private def huntEnemies() {
-    lazy val home = ByOption.minBy(zone.bases.filter(_.owner.isUs).map(_.heart))(_.groundPixels(zone.centroid))
-      .orElse(ByOption.minBy(With.geography.ourBases.map(_.heart))(_.groundPixels(zone.centroid)))
+    lazy val home = Maff.minBy(zone.bases.filter(_.owner.isUs).map(_.heart))(_.groundPixels(zone.centroid))
+      .orElse(Maff.minBy(With.geography.ourBases.map(_.heart))(_.groundPixels(zone.centroid)))
       .getOrElse(With.geography.home)
       .center
 
@@ -95,8 +95,8 @@ class SquadDefendBase(base: Base) extends Squad {
 
     val huntables = scourables()
     lazy val target = huntables.minBy(distance)
-    lazy val targetAir = ByOption.minBy(huntables.filter(_.flying))(distance).getOrElse(target)
-    lazy val targetGround = ByOption.minBy(huntables.filterNot(_.flying))(distance).getOrElse(target)
+    lazy val targetAir = Maff.minBy(huntables.filter(_.flying))(distance).getOrElse(target)
+    lazy val targetGround = Maff.minBy(huntables.filterNot(_.flying))(distance).getOrElse(target)
     units.foreach(recruit => {
       val onlyAir     = recruit.canAttack && ! recruit.unitClass.attacksGround
       val onlyGround  = recruit.canAttack && ! recruit.unitClass.attacksAir
@@ -109,7 +109,7 @@ class SquadDefendBase(base: Base) extends Squad {
 
   private def defendHeart(center: Pixel) {
     val protectables  = center.zone.units.filter(u => u.isOurs && u.unitClass.isBuilding && u.hitPoints < 300 && (u.friendly.exists(_.knownToEnemy) || u.canAttack))
-    val destination   = ByOption
+    val destination   = Maff
       .minBy(protectables.view.filter(p =>
         p.zone != With.geography.ourMain.zone || p.matchups.threats.exists( ! _.unitClass.isWorker)))(u =>
           u.matchups.framesOfSafety + 0.0001 * u.pixelDistanceCenter(center))

@@ -2,9 +2,9 @@ package Macro.Scheduling
 
 import Lifecycle.With
 import Macro.Buildables.Buildable
+import Mathematics.Maff
 import Planning.Plans.Macro.Build._
 import Tactics.FollowBuildOrder
-import Utilities.ByOption
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -58,7 +58,7 @@ class MasterBuildPlans {
     plans.keys.foreach(build => {
       // TODO: This can break really badly!
       while (plans(build).size > buildsNeeded.getOrElse(build, 0)) {
-        val removablePlan = ByOption.maxBy(plans(build).filterNot(With.bank.hasSpentRequest))(_.priority)
+        val removablePlan = Maff.maxBy(plans(build).filterNot(With.bank.hasSpentRequest))(_.priority)
         removablePlan.foreach(plans(build).-=)
       }
     })

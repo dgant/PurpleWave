@@ -7,7 +7,7 @@ import Mathematics.Maff
 import Micro.Agency.Intention
 import Performance.Tasks.TimedTask
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.{ByOption, Forever}
+import Utilities.Forever
 
 import scala.collection.mutable
 
@@ -67,7 +67,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     val basesBefore = bases
     bases = With.geography.bases.filter(_.townHall.exists(t => t.isOurs && (t.hasEverBeenCompleteHatch || t.remainingCompletionFrames < 240))) // Geography.ourBases isn't valid frame 0
     if (bases.isEmpty) { // Yikes. Wait for a base to finish or just go attack
-      val goal = ByOption.minBy(With.units.ours.filter(_.unitClass.isTownHall))(u => 10000 * u.remainingCompletionFrames + u.id).map(_.pixel).getOrElse(With.scouting.mostBaselikeEnemyTile.center)
+      val goal = Maff.minBy(With.units.ours.filter(_.unitClass.isTownHall))(u => 10000 * u.remainingCompletionFrames + u.id).map(_.pixel).getOrElse(With.scouting.mostBaselikeEnemyTile.center)
       workers.foreach(_.agent.intend(this, new Intention { toTravel = Some(goal) }))
       return
     }
@@ -159,7 +159,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
         .exists(base => mineralSlots(base).exists(s2 =>
         s2.order > s1.order // Allow transfers even base-to-base to even slot saturation
           || (s2.distance > s1.distance + 16 && s2.base == s1.base)))) // Only allow same-base transfers for using faster minerals
-      ByOption.minBy(underemployed)(_.lastUpdate).foreach(_.worker.foreach(reassignWorker))
+      Maff.minBy(underemployed)(_.lastUpdate).foreach(_.worker.foreach(reassignWorker))
     }
 
     // Assign workers
@@ -218,7 +218,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
 
   private def nearestBase(worker: FriendlyUnitInfo): Base =
     worker.base.filter(bases.contains).orElse(
-      ByOption.minBy(bases)(b => worker.pixelDistanceTravelling(b.heart))).getOrElse(
+      Maff.minBy(bases)(b => worker.pixelDistanceTravelling(b.heart))).getOrElse(
         With.geography.bases.minBy(b => worker.pixelDistanceTravelling(b.heart)))
 
   private def getWorkersClosestToBase(base: Base, minimumOrder: Int, count: Int): Iterable[FriendlyUnitInfo] = {

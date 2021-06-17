@@ -5,9 +5,9 @@ import Debugging.Visualizations.Views.View
 import Debugging.Visualizations.{Colors, Forces}
 import Information.Geography.Pathfinding.Types.TilePath
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.ByOption
 import bwapi.Color
 
 object ShowUnitsFriendly extends View {
@@ -115,7 +115,7 @@ object ShowUnitsFriendly extends View {
     if (showForces) {
       val forceLengthMax = 48.0
       val forceRadiusMin = 4
-      val maxForce = ByOption.max(agent.forces.values.view.map(_.lengthSlow)).getOrElse(0.0)
+      val maxForce = Maff.max(agent.forces.values.view.map(_.lengthSlow)).getOrElse(0.0)
       if (maxForce > 0.0) {
         DrawMap.circle(unit.pixel, forceRadiusMin, Color.White)
         (agent.forces.view ++ Seq((Forces.sum, agent.forces.sum)))

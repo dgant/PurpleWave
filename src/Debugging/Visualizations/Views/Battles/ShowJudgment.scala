@@ -3,7 +3,8 @@ package Debugging.Visualizations.Views.Battles
 import Debugging.Visualizations.Views.View
 import Information.Battles.Types.BattleLocal
 import Lifecycle.With
-import Utilities.ByOption
+import Mathematics.Maff
+
 
 object ShowJudgment extends View {
   override def renderScreen(): Unit = {
@@ -15,7 +16,7 @@ object ShowJudgment extends View {
     val y = 40
     val mx = 2
     val my = 2
-    val smax: Int = ByOption.max(battle.judgmentModifiers.view.map(_.name.length)).getOrElse(1)
+    val smax: Int = Maff.max(battle.judgmentModifiers.view.map(_.name.length)).getOrElse(1)
     battle.judgmentModifiers.zipWithIndex.foreach(p => {
       val yb = y + p._2 * 15
       val s = p._1.toString

@@ -9,7 +9,7 @@ import Performance.Cache
 import Planning.UnitMatchers.MatchTank
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.ByOption
+
 
 case class MatchupAnalysis(me: UnitInfo) {
   // Default units allow identification of targets when destroying an empty base, because no Battle is happening
@@ -34,7 +34,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   def threatsInRange          : Seq[UnitInfo] = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me))
   def threatsInFrames(f: Int) : Seq[UnitInfo] = threats.filter(_.framesToGetInRange(me) < f)
   def targetsInRange          : Seq[UnitInfo] = targets.filter(target => target.visible && me.pixelRangeAgainst(target) >= target.pixelDistanceEdge(me) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
-  lazy val anchor                     : Option[UnitInfo]  = ByOption.minBy(anchors.filter(_.unitClass.subjectiveValue == anchors.view.map(_.unitClass.subjectiveValue).max))(a => a.pixelDistanceEdge(me) + a.presumptiveTarget.map(a.pixelsToGetInRange).getOrElse(a.pixelDistanceTravelling(a.presumptiveDestination)))
+  lazy val anchor                     : Option[UnitInfo]  = Maff.minBy(anchors.filter(_.unitClass.subjectiveValue == anchors.view.map(_.unitClass.subjectiveValue).max))(a => a.pixelDistanceEdge(me) + a.presumptiveTarget.map(a.pixelsToGetInRange).getOrElse(a.pixelDistanceTravelling(a.presumptiveDestination)))
   lazy val anchors                    : Vector[UnitInfo]  = me.friendly.map(_.alliesSquad).getOrElse(allies).filter(doesAnchor(_, me)).toVector
   lazy val arbiterCovering            : Cache[Boolean]    = new Cache(() => allies.exists(a => Protoss.Arbiter(a) && a.pixelDistanceEdge(me) < 160))
   lazy val allyTemplarCount           : Int               = allies.count(Protoss.HighTemplar)
@@ -43,13 +43,13 @@ case class MatchupAnalysis(me: UnitInfo) {
   lazy val splashFactorMax            : Double            = splashFactorForUnits(targets)
   lazy val splashFactorInRange        : Double            = splashFactorForUnits(targetsInRange)
   lazy val valuePerDamage             : Double            = MicroValue.valuePerDamageCurrentHp(me)
-  lazy val vpfDealingInRange          : Double            = splashFactorInRange * ByOption.max(targetsInRange.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
+  lazy val vpfDealingInRange          : Double            = splashFactorInRange * Maff.max(targetsInRange.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
   lazy val dpfReceiving               : Double            = threatsInRange.view.map(_.matchups.dpfDealingDiffused(me)).sum
   lazy val vpfReceiving               : Double            = valuePerDamage * dpfReceiving
   lazy val framesToLive               : Double            = Maff.nanToInfinity(me.totalHealth / dpfReceiving)
   lazy val framesOfSafety             : Double            = - With.latency.latencyFrames - With.reaction.agencyAverage - Maff.nanToZero(pixelsOfEntanglement / me.topSpeed)
-  lazy val pixelsOfEntanglement       : Double            = ByOption.max(threats.map(me.pixelsOfEntanglement)).getOrElse(- With.mapPixelWidth)
-  lazy val pixelsToReachAnyTarget     : Double            = ByOption.max(targets.map(me.pixelsToGetInRange)).getOrElse(With.mapPixelWidth)
+  lazy val pixelsOfEntanglement       : Double            = Maff.max(threats.map(me.pixelsOfEntanglement)).getOrElse(- With.mapPixelWidth)
+  lazy val pixelsToReachAnyTarget     : Double            = Maff.max(targets.map(me.pixelsToGetInRange)).getOrElse(With.mapPixelWidth)
 
   protected def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = (
     shooter.canAttack(victim)

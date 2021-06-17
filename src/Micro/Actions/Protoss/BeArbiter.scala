@@ -1,5 +1,6 @@
 package Micro.Actions.Protoss
 
+import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Potshot
@@ -7,7 +8,7 @@ import Micro.Agency.Commander
 import Planning.UnitMatchers.MatchBuilding
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.ByOption
+
 
 object BeArbiter extends Action {
 
@@ -32,7 +33,7 @@ object BeArbiter extends Action {
     val closerArbiters        = arbiter.battle.map(_.us.units.view.filter(Protoss.Arbiter).filter(_.pixelDistanceSquared(goal) < goalDistanceSquared)).getOrElse(Iterable.empty).toVector
     val umbrellables          = arbiter.alliesSquadOrBattle.filter(needsUmbrella)
     val umbrellablesUncovered = umbrellables.filterNot(u => closerArbiters.exists(a => a.pixelDistanceCenter(u) < cloakRadiusPixels))
-    val umbrellable           = ByOption.minBy(umbrellables)(_.pixelDistanceSquared(goal))
+    val umbrellable           = Maff.minBy(umbrellables)(_.pixelDistanceSquared(goal))
     arbiter.agent.toTravel    = umbrellable.map(_.pixel).orElse(arbiter.agent.toTravel)
     if (umbrellable.forall(arbiter.pixelDistanceCenter(_) < 32 * 3)) {
       Potshot.delegate(arbiter)

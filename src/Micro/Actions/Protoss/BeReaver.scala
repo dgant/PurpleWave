@@ -3,6 +3,7 @@ package Micro.Actions.Protoss
 import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Pathfinding.Types.NoPath
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.Tile
 import Mathematics.Shapes.Spiral
 import Micro.Actions.Action
@@ -13,7 +14,7 @@ import Micro.Coordination.Pathing.MicroPathing
 import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.ByOption
+
 
 object BeReaver extends Action {
 
@@ -116,7 +117,7 @@ object BeReaver extends Action {
         With.grids.enemyRangeAir.get(tile)))
       .map(p => ((p._2 + p._3) * (p._4 + p._5), p))
       .toVector
-    val output = ByOption.minBy(candidates)(_._1).map(_._2._1).getOrElse(naiveTile)
+    val output = Maff.minBy(candidates)(_._1).map(_._2._1).getOrElse(naiveTile)
     output
   }
 }

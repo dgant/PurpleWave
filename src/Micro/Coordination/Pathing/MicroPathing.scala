@@ -13,7 +13,6 @@ import Micro.Agency.Commander
 import Micro.Coordination.Pushing.Push
 import Micro.Heuristics.Potential
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.{ByOption, TakeN}
 
 import scala.collection.SeqView
 
@@ -129,8 +128,8 @@ object MicroPathing {
   }
 
   def getPathfindingRepulsors(unit: FriendlyUnitInfo, maxThreats: Int = 10): IndexedSeq[PathfindRepulsor] = {
-    TakeN
-      .by(maxThreats, unit.matchups.threats.view.filter(_.likelyStillThere))(Ordering.by(t => unit.pixelsOfEntanglement(t)))
+    Maff
+      .takeN(maxThreats, unit.matchups.threats.view.filter(_.likelyStillThere))(Ordering.by(t => unit.pixelsOfEntanglement(t)))
       .map(threat => PathfindRepulsor(
         threat.pixel,
         threat.dpfOnNextHitAgainst(unit),
@@ -160,7 +159,7 @@ object MicroPathing {
   }
 
   def getPushRadians(pushForces: Seq[(Push, Force)]): Option[Double] = {
-    val highestPriority = ByOption.max(pushForces.view.map(_._1.priority))
+    val highestPriority = Maff.max(pushForces.view.map(_._1.priority))
     pushForces
       .filter(pushForce => highestPriority.contains(pushForce._1.priority))
       .map(_._2)

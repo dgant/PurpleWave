@@ -1,11 +1,12 @@
 package Placement
 
+import Mathematics.Maff
 import ProxyBwapi.UnitClasses.UnitClass
-import Utilities.ByOption
+
 
 class PreplacementRequirement(val buildings: UnitClass*) {
-  var width: Int = ByOption.max(buildings.map(_.tileWidth)).getOrElse(1)
-  var height: Int = ByOption.max(buildings.map(_.tileHeight)).getOrElse(1)
+  var width: Int = Maff.max(buildings.map(_.tileWidth)).getOrElse(1)
+  var height: Int = Maff.max(buildings.map(_.tileHeight)).getOrElse(1)
 
   def this(theWidth: Int, theHeight: Int) {
     this()

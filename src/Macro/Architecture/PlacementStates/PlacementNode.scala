@@ -2,9 +2,9 @@ package Macro.Architecture.PlacementStates
 
 import Lifecycle.With
 import Macro.Architecture.ArchitectureDiff
-import Macro.Architecture.PlacementRequests.{PlacementRequest, PlacementPolicy}
+import Macro.Architecture.PlacementRequests.{PlacementPolicy, PlacementRequest}
+import Mathematics.Maff
 import Mathematics.Points.Tile
-import Utilities.ByOption
 
 import scala.collection.mutable
 
@@ -67,7 +67,7 @@ class PlacementNode(request: PlacementRequest) extends PlacementState {
       }
 
       if (child.isEmpty) {
-        tileQueue ++= ByOption.minBy(allTiles.map(t => TileScore(t, task.score(t))))(_.score)
+        tileQueue ++= Maff.minBy(allTiles.map(t => TileScore(t, task.score(t))))(_.score)
       } else {
         tileQueue ++= allTiles.map(tile => TileScore(tile, task.score(tile)))
       }

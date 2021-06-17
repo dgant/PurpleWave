@@ -1,7 +1,7 @@
 package ProxyBwapi.UnitInfo
 
 import Mathematics.Points.{Pixel, Tile}
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Performance.Cache
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.Players.PlayerInfo
@@ -114,9 +114,9 @@ trait CombatUnit {
   @inline final def pixelDistanceShooting   (other:       CombatUnit)       : Double  = if (unitClass == Protoss.Reaver && pixel.zone != other.pixel.zone) pixelDistanceTravelling(other.pixel) else pixelDistanceEdge(other.pixelStart, other.pixelEnd)
   @inline final def pixelDistanceEdge       (other:       CombatUnit)       : Double  = pixelDistanceEdge(other.pixelStart, other.pixelEnd)
   @inline final def pixelDistanceEdge       (other: CombatUnit, otherAt: Pixel) : Double  = pixelDistanceEdge(otherAt.subtract(other.unitClass.dimensionLeft, other.unitClass.dimensionUp), otherAt.add(1 + other.unitClass.dimensionRight, 1 + other.unitClass.dimensionDown))
-  @inline final def pixelDistanceEdge       (oStart: Pixel, oEnd: Pixel)    : Double  = PurpleMath.broodWarDistanceBox(pixelStart, pixelEnd, oStart, oEnd)
-  @inline final def pixelDistanceEdge       (destination: Pixel)            : Double  = PurpleMath.broodWarDistanceBox(pixelStart, pixelEnd, destination, destination)
-  @inline final def pixelDistanceEdge       (other: CombatUnit, usAt: Pixel, otherAt: Pixel): Double  = PurpleMath.broodWarDistanceBox(usAt.subtract(unitClass.dimensionLeft, unitClass.dimensionUp), usAt.add(1 + unitClass.dimensionRight, 1 + unitClass.dimensionDown), otherAt.subtract(other.unitClass.dimensionLeft, other.unitClass.dimensionUp), otherAt.add(other.unitClass.dimensionRight, other.unitClass.dimensionDown))
+  @inline final def pixelDistanceEdge       (oStart: Pixel, oEnd: Pixel)    : Double  = Maff.broodWarDistanceBox(pixelStart, pixelEnd, oStart, oEnd)
+  @inline final def pixelDistanceEdge       (destination: Pixel)            : Double  = Maff.broodWarDistanceBox(pixelStart, pixelEnd, destination, destination)
+  @inline final def pixelDistanceEdge       (other: CombatUnit, usAt: Pixel, otherAt: Pixel): Double  = Maff.broodWarDistanceBox(usAt.subtract(unitClass.dimensionLeft, unitClass.dimensionUp), usAt.add(1 + unitClass.dimensionRight, 1 + unitClass.dimensionDown), otherAt.subtract(other.unitClass.dimensionLeft, other.unitClass.dimensionUp), otherAt.add(other.unitClass.dimensionRight, other.unitClass.dimensionDown))
   @inline final def pixelDistanceEdgeFrom   (other: CombatUnit, usAt: Pixel): Double  = other.pixelDistanceEdge(this, usAt)
   @inline final def pixelDistanceSquared    (otherUnit:   CombatUnit)       : Double  = pixelDistanceSquared(otherUnit.pixel)
   @inline final def pixelDistanceSquared    (otherPixel:  Pixel)            : Double  = pixel.pixelDistanceSquared(otherPixel)
@@ -137,13 +137,13 @@ trait CombatUnit {
   @inline final def pixelsToGetInRange(enemy: CombatUnit, enemyAt: Pixel) : Double = if (canAttack(enemy)) (pixelDistanceEdge(enemy, enemyAt) - pixelRangeAgainst(enemy)) else LightYear()
   @inline final def framesToTravelTo(destination: Pixel)  : Int = framesToTravelPixels(pixelDistanceTravelling(destination))
   @inline final def framesToTravelPixels(pixels: Double)  : Int = (if (pixels <= 0.0) 0 else if (canMove) Math.max(0, Math.ceil(pixels / topSpeedPossible).toInt) else Forever()) + (if (burrowed || unitClass == Terran.SiegeTankSieged) 24 else 0)
-  @inline final def framesToTurnTo    (radiansTo: Double)   : Double = unitClass.framesToTurn(PurpleMath.normalizeAroundZero(PurpleMath.radiansTo(angleRadians, radiansTo)))
+  @inline final def framesToTurnTo    (radiansTo: Double)   : Double = unitClass.framesToTurn(Maff.normalizeAroundZero(Maff.radiansTo(angleRadians, radiansTo)))
   @inline final def framesToTurnTo    (pixelTo: Pixel)      : Double = framesToTurnTo(pixel.radiansTo(pixelTo))
   @inline final def framesToTurnFrom  (pixelTo: Pixel)      : Double = framesToTurnTo(pixelTo.radiansTo(pixel))
   @inline final def framesToTurnTo    (enemyFrom: CombatUnit) : Double = framesToTurnTo(enemyFrom.pixel.radiansTo(pixel))
   @inline final def framesToTurnFrom  (enemyFrom: CombatUnit) : Double = framesToTurnTo(pixel.radiansTo(enemyFrom.pixel))
-  @inline final def framesToStopRightNow: Double = if (unitClass.isFlyer || unitClass.floats) PurpleMath.clamp(PurpleMath.nanToZero(framesToAccelerate * speed / topSpeed), 0.0, framesToAccelerate) else 0.0
-  @inline final def framesToAccelerate: Double = PurpleMath.clamp(PurpleMath.nanToZero((topSpeed - speed) / unitClass.accelerationFrames), 0, unitClass.accelerationFrames)
+  @inline final def framesToStopRightNow: Double = if (unitClass.isFlyer || unitClass.floats) Maff.clamp(Maff.nanToZero(framesToAccelerate * speed / topSpeed), 0.0, framesToAccelerate) else 0.0
+  @inline final def framesToAccelerate: Double = Maff.clamp(Maff.nanToZero((topSpeed - speed) / unitClass.accelerationFrames), 0, unitClass.accelerationFrames)
   @inline final def framesToGetInRange(enemy: CombatUnit)                 : Int = if (canAttack(enemy)) framesToTravelPixels(pixelsToGetInRange(enemy)) else Forever()
   @inline final def framesToGetInRange(enemy: CombatUnit, enemyAt: Pixel) : Int = if (canAttack(enemy)) framesToTravelPixels(pixelsToGetInRange(enemy, enemyAt)) else Forever()
   @inline final def framesBeforeAttacking(enemy: CombatUnit)              : Int = framesBeforeAttacking(enemy, enemy.pixel)

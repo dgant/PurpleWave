@@ -2,7 +2,7 @@ package Planning.Plans.Placement
 
 import Lifecycle.With
 import Mathematics.Points.{Point, Tile}
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
@@ -35,8 +35,8 @@ class LayoutWall extends Plan {
       Math.abs(exitDirection.y),
       Math.abs(exitDirection.x))
     val wallDirection = Point(
-      PurpleMath.signum(origin.subtract(entrance).x) * wallDirectionAbs.x,
-      PurpleMath.signum(origin.subtract(entrance).y) * wallDirectionAbs.y)
+      Maff.signum(origin.subtract(entrance).x) * wallDirectionAbs.x,
+      Maff.signum(origin.subtract(entrance).y) * wallDirectionAbs.y)
 
     case class Span(var distance: Int, var seed: Tile, var start: Tile, var end: Tile) {
       def length: Int = start.tileDistanceManhattan(end)

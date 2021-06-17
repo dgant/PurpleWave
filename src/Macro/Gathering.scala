@@ -3,7 +3,7 @@ package Macro
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Points.Tile
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Agency.Intention
 import Performance.Tasks.TimedTask
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -19,7 +19,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   private class Slot(var resource: UnitInfo, val order: Int) {
     val tile        : Tile    = resource.tileTopLeft
     val base        : Base    = resource.base.getOrElse(With.geography.bases.minBy(_.heart.groundPixels(resource.tileTopLeft)))
-    val distance    : Double  = PurpleMath.broodWarDistanceBox(resource.topLeft, resource.bottomRight, base.townHallArea.startPixel, base.townHallArea.endPixel)
+    val distance    : Double  = Maff.broodWarDistanceBox(resource.topLeft, resource.bottomRight, base.townHallArea.startPixel, base.townHallArea.endPixel)
     var lastUpdate  : Int     = - Forever()
     var worker      : Option[FriendlyUnitInfo] = None
     def free        : Boolean = worker.isEmpty && mineable
@@ -32,8 +32,8 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
       val sorted = group._2.toVector
         .sortBy(m =>
           // Give slight edge to patches near the 3rd starting worker and where future workers will spawn if Terran/Protoss
-          PurpleMath.broodWarDistanceBox(m.topLeft, m.bottomRight, base.townHallArea.startPixel.add(47, 80), base.townHallArea.startPixel.add(70, 103)) * 0.1 +
-          PurpleMath.broodWarDistanceBox(m.topLeft, m.bottomRight, base.townHallArea.startPixel, base.townHallArea.endPixel))
+          Maff.broodWarDistanceBox(m.topLeft, m.bottomRight, base.townHallArea.startPixel.add(47, 80), base.townHallArea.startPixel.add(70, 103)) * 0.1 +
+          Maff.broodWarDistanceBox(m.topLeft, m.bottomRight, base.townHallArea.startPixel, base.townHallArea.endPixel))
       (base, (sorted.map(new Slot(_, 0)) ++ sorted.reverse.map(new Slot(_, 1)) ++ sorted.reverse.map(new Slot(_, 2)))) })
   private lazy val gasSlots: Map[Base, Vector[Slot]] = With.geography.bases.map(b => (b, Vector[Slot]())).toMap ++ // Not all bases have gas! Make sure map contains them
     With.units.neutral.filter(_.gasLeft > 0)
@@ -42,7 +42,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
         val base = group._1
         val sorted = group._2.toVector
           .sortBy(_.gasMinersRequired)
-          .sortBy(g => PurpleMath.broodWarDistanceBox(g.topLeft, g.bottomRight, base.townHallArea.startPixel, base.townHallArea.endPixel))
+          .sortBy(g => Maff.broodWarDistanceBox(g.topLeft, g.bottomRight, base.townHallArea.startPixel, base.townHallArea.endPixel))
         (base, sorted.flatMap(g => (0 until g.gasMinersRequired).map(new Slot(g, _)).toVector)) })
   private lazy val slotsByResource: mutable.Map[UnitInfo, Seq[Slot]] = new mutable.HashMap[UnitInfo, Seq[Slot]] ++ (mineralSlots.values.view.flatten ++ gasSlots.values.view.flatten).groupBy(_.resource).map(p => (p._1, p._2.toSeq))
   private lazy val baseCosts: Map[(Base, Base), Double] = With.geography.bases
@@ -106,8 +106,8 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     val gasWorkersTripMinimum = (7 + gasGoalMinimum - With.self.gas) / 8
     val gasWorkersTripMaximum = (7 + gasGoalMaximum - With.self.gas) / 8
     val gasWorkersRatioTarget = Math.round(With.blackboard.gasWorkerRatio() * workers.size).toInt
-    val gasWorkersBaseTarget  = PurpleMath.clamp(gasWorkersRatioTarget, gasWorkersTripMinimum, gasWorkersTripMaximum)
-    val gasWorkerTarget       = PurpleMath.clamp(gasWorkersBaseTarget, gasWorkersHardMinimum, gasWorkersHardMaximum)
+    val gasWorkersBaseTarget  = Maff.clamp(gasWorkersRatioTarget, gasWorkersTripMinimum, gasWorkersTripMaximum)
+    val gasWorkerTarget       = Maff.clamp(gasWorkersBaseTarget, gasWorkersHardMinimum, gasWorkersHardMaximum)
     var gasWorkersNow         = assignments.count(_._2.resource.unitClass.isGas)
     gasWorkersToAdd           = gasWorkerTarget - gasWorkersNow
 
@@ -170,7 +170,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   }
 
   private def issueCommands(): Unit = {
-    unassigned.foreach(i => i.agent.intend(this, new Intention { toTravel = Some(PurpleMath.sampleSet(nearestBase(i).metro.bases.maxBy(_.heart.groundPixels(With.scouting.threatOrigin)).tiles).center); canFight = false }))
+    unassigned.foreach(i => i.agent.intend(this, new Intention { toTravel = Some(Maff.sampleSet(nearestBase(i).metro.bases.maxBy(_.heart.groundPixels(With.scouting.threatOrigin)).tiles).center); canFight = false }))
     assignments.foreach(a => a._1.agent.intend(this, new Intention { toGather = Some(a._2.resource) }))
   }
 
@@ -191,7 +191,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
 
   private def unassigned: Iterable[FriendlyUnitInfo] = workers.view.filterNot(assignments.contains)
 
-  private def mineralSaturation(base: Base): Double = PurpleMath.nanToOne(mineralSlots(base).count( ! _.free).toDouble / mineralSlots(base).count(_.resource.alive))
+  private def mineralSaturation(base: Base): Double = Maff.nanToOne(mineralSlots(base).count( ! _.free).toDouble / mineralSlots(base).count(_.resource.alive))
 
   private def findAssignment(worker: FriendlyUnitInfo): Unit = {
     (if (gasWorkersToAdd > 0) tryGas(worker) || tryMinerals(worker) else tryMinerals(worker) || tryGas(worker)) || tryLongDistance(worker)

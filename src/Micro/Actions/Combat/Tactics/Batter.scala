@@ -4,7 +4,7 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Information.Geography.Types.Zone
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Targeting.Target
@@ -59,7 +59,7 @@ object Batter extends Action {
     
     lazy val shootingThreats  = unit.matchups.threats.filter(unit.pixelsOfEntanglement(_) > -64)
     lazy val dpfReceiving     = shootingThreats.map(_.dpfOnNextHitAgainst(unit)).sum
-    lazy val framesToLive     = PurpleMath.nanToInfinity(unit.totalHealth / dpfReceiving)
+    lazy val framesToLive     = Maff.nanToInfinity(unit.totalHealth / dpfReceiving)
     lazy val dying            = framesToLive < Seconds(1)()
     lazy val shouldRetreat    = ! unit.agent.shouldEngage || (unit.unitClass.melee && dying)
     

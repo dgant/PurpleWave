@@ -2,7 +2,7 @@ package Lifecycle
 
 import java.io.File
 
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Strategery.Selection.{ExpandStrategy, StrategySelectionGreedy, StrategySelectionPolicy}
 import Strategery.Strategies.{AllChoices, Strategy}
 import Strategery.{HumanPlaybook, PretrainingPlaybook, TestingPlaybook, TournamentPlaybook}
@@ -156,7 +156,7 @@ object ConfigurationLoader {
 
     // Get all the strategy names
     val strategyNamesLines = strategyNamesText.replaceAll(",", " ").replaceAll("  ", " ").split("[\r\n]+").filter(_.nonEmpty).toVector
-    val strategyNames = PurpleMath.sample(strategyNamesLines).split(" ")
+    val strategyNames = Maff.sample(strategyNamesLines).split(" ")
 
     // Get all the mapped strategy objects
     var matchingBranches = matchNames(strategyNames, AllChoices.tree.flatMap(ExpandStrategy.apply).distinct)

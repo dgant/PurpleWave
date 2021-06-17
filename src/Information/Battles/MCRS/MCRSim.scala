@@ -1,6 +1,6 @@
 package Information.Battles.MCRS
 
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.Seconds
 
@@ -42,7 +42,7 @@ object MCRSim {
       }
       // If enemy can't move, it must be in range of our engage position to be added
       else if (enemy.inRangeToAttack(unit, unit.mcrs.engagePosition())) {
-        enemyToEngage = PurpleMath.nanToZero(Math.max(0.0, distance / unit.topSpeed))
+        enemyToEngage = Maff.nanToZero(Math.max(0.0, distance / unit.topSpeed))
 
       }
       else return
@@ -58,12 +58,12 @@ object MCRSim {
       if (ally.mcrs.target().isEmpty || ! ally.canDoAnything) return
       // This is original
       if (ally.unitClass.isWorker && ! ally.isBeingViolent) return
-      if (PurpleMath.nanToInfinity(ally.pixelDistanceCenter(unit.mcrs.engagePosition()) / ally.topSpeed) > simulationTime) return
+      if (Maff.nanToInfinity(ally.pixelDistanceCenter(unit.mcrs.engagePosition()) / ally.topSpeed) > simulationTime) return
 
       // Setup true distance
       val distance = ally.pixelDistanceCenter(ally.mcrs.engagePosition()) - ally.unitClass.radialHypotenuse
 
-      val allyToEngage = PurpleMath.nanToInfinity(Math.max(0.0, (distance / ally.topSpeed)))
+      val allyToEngage = Maff.nanToInfinity(Math.max(0.0, (distance / ally.topSpeed)))
       var simRatio = Math.max(0.0, simulationTime - allyToEngage)
 
       // Synchronize check
@@ -76,9 +76,9 @@ object MCRSim {
     unit.matchups.alliesInclSelf.foreach(countAlly)
     unit.matchups.enemies.foreach(countEnemy)
 
-    output.attackAirAsAir = PurpleMath.nanToInfinity(friendlyStrengthAir / enemyStrengthAir)
-    output.attackAirAsGround = PurpleMath.nanToInfinity(friendlyStrengthAir / enemyStrengthGround)
-    output.attackGroundAsAir = PurpleMath.nanToInfinity(friendlyStrengthGround / enemyStrengthAir)
-    output.attackGroundasGround = PurpleMath.nanToInfinity(friendlyStrengthGround / enemyStrengthGround)
+    output.attackAirAsAir = Maff.nanToInfinity(friendlyStrengthAir / enemyStrengthAir)
+    output.attackAirAsGround = Maff.nanToInfinity(friendlyStrengthAir / enemyStrengthGround)
+    output.attackGroundAsAir = Maff.nanToInfinity(friendlyStrengthGround / enemyStrengthAir)
+    output.attackGroundasGround = Maff.nanToInfinity(friendlyStrengthGround / enemyStrengthGround)
   }
 }

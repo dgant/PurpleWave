@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.AllRaces
 
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Planning.Plan
 import Planning.Plans.Army.AttackWithWorkers
 import Planning.Plans.Basic.Do
@@ -26,7 +26,7 @@ class WorkerRush extends Trigger {
     new And(new Employing(WorkerRushImmediate)),
     new And(new Employing(WorkerRushContinuousProduction)),
     new And(new Employing(WorkerRushOnScout), new FoundEnemyBase),
-    new And(new Employing(WorkerRushOnSupplyBlock), new Latch(new Check(() => With.self.supplyUsed >= PurpleMath.clamp(With.self.supplyTotal, 18, 20))))
+    new And(new Employing(WorkerRushOnSupplyBlock), new Latch(new Check(() => With.self.supplyUsed >= Maff.clamp(With.self.supplyTotal, 18, 20))))
   ))
 
   lazy val timeToAtack = new TimeToAtack
@@ -42,7 +42,7 @@ class WorkerRush extends Trigger {
       new And(new Not(new TimeToAtack), new Not(new FoundEnemyBase)),
       new If(
         new Employing(WorkerRushOnScout),
-        new ScoutAt(1, maxScouts = PurpleMath.clamp(With.game.getStartLocations.size() - 2, 1, 2)),
+        new ScoutAt(1, maxScouts = Maff.clamp(With.game.getStartLocations.size() - 2, 1, 2)),
         new ScoutAt(1))),
     new Plan {
       val workerLock: LockUnits = new LockUnits(this)

@@ -3,7 +3,7 @@ package Micro.Formation
 import Information.Geography.Pathfinding.PathfindProfile
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints, Tile}
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.UnitTracking.UnorderedBuffer
 import Utilities.ByOption
@@ -43,9 +43,9 @@ object FormationGeneric {
     if (units.forall(_.flying)) return FormationEmpty
 
     val groundUnits           = units.filterNot(_.flying)
-    val centroid              = PurpleMath.weightedExemplar(units.view.map(u => (u.pixel, u.subjectiveValue)))._1
-    lazy val modeOrigin       = origin.map(_.nearestWalkableTile).getOrElse(PurpleMath.mode(units.view.map(_.agent.simpleOrigin.tile)))
-    lazy val modeTarget       = PurpleMath.mode(units.view.map(u => ByOption.minBy(u.matchups.targets)(u.pixelDistanceEdge).map(_.tile).getOrElse(u.agent.destination.tile)))
+    val centroid              = Maff.weightedExemplar(units.view.map(u => (u.pixel, u.subjectiveValue)))._1
+    lazy val modeOrigin       = origin.map(_.nearestWalkableTile).getOrElse(Maff.mode(units.view.map(_.agent.simpleOrigin.tile)))
+    lazy val modeTarget       = Maff.mode(units.view.map(u => ByOption.minBy(u.matchups.targets)(u.pixelDistanceEdge).map(_.tile).getOrElse(u.agent.destination.tile)))
 
     // Start flood filling!
     val inf = With.mapTileArea
@@ -125,7 +125,7 @@ object FormationGeneric {
       floodHorizon ++= neighbors
       neighbors.foreach(neighbor => explored.set(neighbor._1, true))
     }
-    lazy val groundPlacementCentroid = PurpleMath.centroid(placements.values)
+    lazy val groundPlacementCentroid = Maff.centroid(placements.values)
     units
       .filter(_.flying)
       .foreach(u => placements(u) = floodOrigin.center.project(floodStart.center, Math.max(0, floodOrigin.center.pixelDistance(floodStart.center) - u.formationRange)))

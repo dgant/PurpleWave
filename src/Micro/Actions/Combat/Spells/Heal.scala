@@ -1,6 +1,6 @@
 package Micro.Actions.Combat.Spells
 
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
@@ -42,13 +42,13 @@ object Heal extends Action {
   
   private def targetValue(medic: FriendlyUnitInfo, patient: UnitInfo): Double = {
     val distancePixels  = medic.pixelDistanceEdge(patient)
-    val distanceFrames  = PurpleMath.nanToInfinity(distancePixels / medic.topSpeed)
+    val distanceFrames  = Maff.nanToInfinity(distancePixels / medic.topSpeed)
     val lifetimeFrames  = patient.matchups.framesToLive
     val damage          = patient.unitClass.maxHitPoints - patient.hitPoints
-    val safety          = PurpleMath.signum(Math.max(0.0, patient.matchups.framesOfSafety))
-    val receiving       = PurpleMath.signum(patient.matchups.vpfReceiving)
-    val dealing         = PurpleMath.signum(patient.matchups.vpfDealingInRange)
-    val valueWorthwhile = PurpleMath.clamp(Math.min(lifetimeFrames, safety) - distanceFrames, 1.0, 24.0)
+    val safety          = Maff.signum(Math.max(0.0, patient.matchups.framesOfSafety))
+    val receiving       = Maff.signum(patient.matchups.vpfReceiving)
+    val dealing         = Maff.signum(patient.matchups.vpfDealingInRange)
+    val valueWorthwhile = Maff.clamp(Math.min(lifetimeFrames, safety) - distanceFrames, 1.0, 24.0)
     val valueTrading    = (1.0 + receiving) * (1.0 + dealing)
     val output          = (1.0 + damage) * valueWorthwhile * valueTrading
     output

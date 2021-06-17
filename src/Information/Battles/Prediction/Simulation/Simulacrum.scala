@@ -2,7 +2,7 @@ package Information.Battles.Prediction.Simulation
 
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{CombatUnit, UnitInfo}
@@ -161,7 +161,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     if (simulation.prediction.logSimulation) {
       addEvent(SimulationEventTween(this, to, frames, reason))
     }
-    cooldownMoving = PurpleMath.clamp(frames, 1, With.configuration.simulationResolution)
+    cooldownMoving = Maff.clamp(frames, 1, With.configuration.simulationResolution)
     cooldownLeft = Math.max(cooldownLeft, cooldownMoving)
     tweenFrom = pixel
     tweenGoal = to
@@ -169,7 +169,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     tweenFramesLeft = cooldownMoving
   }
   @inline def tween(to: Pixel, reason: Option[String]): Unit = {
-    tween(to, (0.999 + PurpleMath.nanToN(pixelDistanceCenter(to) / topSpeedPossible, Forever())).toInt, reason)
+    tween(to, (0.999 + Maff.nanToN(pixelDistanceCenter(to) / topSpeedPossible, Forever())).toInt, reason)
   }
   @inline def tween(to: Pixel): Unit = {
     tween(to, None)

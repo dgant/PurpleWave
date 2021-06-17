@@ -1,7 +1,7 @@
 package Tactics
 
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
@@ -33,7 +33,7 @@ class DefendFightersAgainstRush extends Prioritized {
     
     val workersNeeded   = 1 + 3 * aggressors.size - 3 * fighters.filter(_.complete).map(_.unitClass.mineralValue).sum / 100.0
     val workerCap       = workers.size - 4
-    val workersToFight  = PurpleMath.clamp(workersNeeded, 0, workerCap)
+    val workersToFight  = Maff.clamp(workersNeeded, 0, workerCap)
     val target          = fighters.minBy(fighter => aggressors.map(_.pixelDistanceEdge(fighter)).min).pixel
     
     defenders.counter = CountUpTo(workersToFight.toInt)

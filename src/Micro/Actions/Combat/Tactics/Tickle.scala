@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Tactics
 
 import Information.Geography.Pathfinding.PathfindProfile
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
@@ -56,8 +56,8 @@ object Tickle extends Action {
     val enemyFighterStrength  = strength(enemyFighters)
 
     // We want to avoid big drilling stacks
-    val centroidSoft  = PurpleMath.centroid(enemies.map(_.pixel))
-    val centroidHard  = if (enemies.size > 3) PurpleMath.centroid(enemies.sortBy(_.pixelDistanceCenter(centroidSoft)).take(enemies.size/2).map(_.pixel)) else centroidSoft //Don't centroid an empty list
+    val centroidSoft  = Maff.centroid(enemies.map(_.pixel))
+    val centroidHard  = if (enemies.size > 3) Maff.centroid(enemies.sortBy(_.pixelDistanceCenter(centroidSoft)).take(enemies.size/2).map(_.pixel)) else centroidSoft //Don't centroid an empty list
 
     // Get in their base!
     if ( ! tickler.zone.bases.exists(_.owner.isEnemy)

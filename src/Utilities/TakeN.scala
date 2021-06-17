@@ -1,6 +1,6 @@
 package Utilities
 
-import Mathematics.PurpleMath
+import Mathematics.Maff
 
 object TakeN {
   def by[T](number: Int, iterable: Iterable[T])(implicit ordering: Ordering[T]): IndexedSeq[T] = {
@@ -9,7 +9,7 @@ object TakeN {
   }
 
   def percentile[T](percentile: Double, iterable: Iterable[T])(implicit ordering: Ordering[T]): Option[T] = {
-    val nth = (iterable.size * PurpleMath.clamp(percentile, 0, 1)).toInt
+    val nth = (iterable.size * Maff.clamp(percentile, 0, 1)).toInt
     val queue = collection.mutable.PriorityQueue[T](iterable.toSeq: _*)
     (0 until nth).foreach(i => queue.dequeue())
     queue.headOption

@@ -1,7 +1,7 @@
 package Micro.Actions.Basic
 
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Actions.Transportation.RequestSafeLanding
 import Micro.Agency.Commander
@@ -35,7 +35,7 @@ object ReloadScarabs extends Action {
     if (needRefill && canRefill) {
       if (unit.transport.exists(_.pixelDistanceCenter(unit) < 72)) {
         RequestSafeLanding(unit)
-      } else if (unit.bwapiUnit.getTrainingQueueCount <= PurpleMath.fromBoolean(unit.remainingTrainFrames <= Math.max(With.reaction.agencyMax, With.latency.framesRemaining))) {
+      } else if (unit.bwapiUnit.getTrainingQueueCount <= Maff.fromBoolean(unit.remainingTrainFrames <= Math.max(With.reaction.agencyMax, With.latency.framesRemaining))) {
         Commander.buildScarab(unit)
       }
     }

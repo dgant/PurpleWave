@@ -2,7 +2,7 @@ package Strategery.Selection
 
 import scala.util.Random
 
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Strategery.Strategies.Strategy
 
 object WinProbability {
@@ -22,7 +22,7 @@ object WinProbability {
   // Apply a small random factor to shuffle strategies with nearly-equal values
   val randomFactor = 1e-6
   def apply(strategies: Iterable[Strategy]): Double = {
-    val probability = PurpleMath.geometricMean(strategies.map(_.evaluation.probabilityWin))
+    val probability = Maff.geometricMean(strategies.map(_.evaluation.probabilityWin))
     val output = Random.nextDouble() * randomFactor + probability * (1.0 - randomFactor)
     output
   }

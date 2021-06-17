@@ -3,7 +3,7 @@ package Information.Geography.Calculations
 import Lifecycle.With
 import Mathematics.Points.{Tile, TileRectangle}
 import Mathematics.Shapes.Circle
-import Mathematics.{Clustering, PurpleMath}
+import Mathematics.{Clustering, Maff}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 import Strategery.Hunters
@@ -70,7 +70,7 @@ object BaseFinder {
     exclusions  : Set[Tile])
       : Option[Tile] = {
   
-    val centroid      = PurpleMath.centroid(resources.map(_.pixel)).tile
+    val centroid      = Maff.centroid(resources.map(_.pixel)).tile
     val altitude      = With.game.getGroundHeight(centroid.bwapi)
     val searchRadius  = 10
     val candidates =

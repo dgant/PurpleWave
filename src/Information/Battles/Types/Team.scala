@@ -3,7 +3,7 @@ package Information.Battles.Types
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Agency.AnchorMargin
 import Performance.Cache
 import Planning.UnitMatchers.MatchWarriors
@@ -40,13 +40,13 @@ class Team(val units: Vector[UnitInfo]) {
   val anchorMargin = new Cache(() => AnchorMargin.marginOf(units.view.flatMap(_.friendly)))
 
   // Used by MCRS
-  private lazy val meanDamageGround = new Cache(() => PurpleMath.nanToZero(PurpleMath.weightedMean(units.map(u => (u.damageOnHitGround  .toDouble,  u.dpfGround)))))
-  private lazy val meanDamageAir    = new Cache(() => PurpleMath.nanToZero(PurpleMath.weightedMean(units.map(u => (u.damageOnHitAir     .toDouble,  u.dpfAir)))))
+  private lazy val meanDamageGround = new Cache(() => Maff.nanToZero(Maff.weightedMean(units.map(u => (u.damageOnHitGround  .toDouble,  u.dpfGround)))))
+  private lazy val meanDamageAir    = new Cache(() => Maff.nanToZero(Maff.weightedMean(units.map(u => (u.damageOnHitAir     .toDouble,  u.dpfAir)))))
   def meanDamageAgainst(unit: UnitInfo): Double = if (unit.flying) meanDamageAir() else meanDamageGround()
 
   val engaged   = new Cache(() => units.exists(_.matchups.framesOfSafety <= 0))
   val axisDepth = new Cache(() => centroidAir().radiansTo(opponent.centroidAir()))
-  val axisWidth = new Cache(() => PurpleMath.normalizeAroundZero(axisDepth() + Math.PI / 2))
+  val axisWidth = new Cache(() => Maff.normalizeAroundZero(axisDepth() + Math.PI / 2))
   val lineDepth = new Cache(() => centroidGround().radiateRadians(axisDepth(), With.mapPixelPerimeter))
   val lineWidth = new Cache(() => centroidGround().radiateRadians(axisWidth(), With.mapPixelPerimeter))
 
@@ -71,11 +71,11 @@ class Team(val units: Vector[UnitInfo]) {
   val widthOrder          = new Cache(() => attackersGround.sortBy(_.widthSlotProjected().pixelDistanceSquared(lineWidth())).toVector)
   val widthIdeal          = new Cache(() => attackersGround.map(_.unitClass.radialHypotenuse * 2.5).sum) // x2.5 = x2 for diameter, then x1.25 for spacing
   val widthMeanExpected   = new Cache(() => widthIdeal() / 2)
-  val widthMeanActual     = new Cache(() => PurpleMath.mean(units.view.flatMap(_.widthContribution())))
+  val widthMeanActual     = new Cache(() => Maff.mean(units.view.flatMap(_.widthContribution())))
   val depthMean           = new Cache(() => ByOption.mean(units.view.flatMap(_.depthCurrent())).getOrElse(0d))
   val depthSpread         = new Cache(() => ByOption.mean(units.view.flatMap(_.depthCurrent()).map(d => Math.abs(d - depthMean()))).getOrElse(0d))
-  val coherenceWidth      = new Cache(() => if (units.size == 1) 1 else Math.min(PurpleMath.nanToOne(widthMeanExpected() / widthMeanActual()), PurpleMath.nanToOne(widthMeanActual() / widthMeanExpected())))
-  val coherenceDepth      = new Cache(() => 1 - PurpleMath.clamp(2 * depthSpread() / (128 + widthIdeal()), 0, 1))
+  val coherenceWidth      = new Cache(() => if (units.size == 1) 1 else Math.min(Maff.nanToOne(widthMeanExpected() / widthMeanActual()), Maff.nanToOne(widthMeanActual() / widthMeanExpected())))
+  val coherenceDepth      = new Cache(() => 1 - Maff.clamp(2 * depthSpread() / (128 + widthIdeal()), 0, 1))
   val coherence           = new Cache(() => coherenceDepth()) // Math.max(coherenceWidth(), coherenceDepth()))
   val impatience          = new Cache(() => units.view.flatMap(_.friendly.map(_.agent.impatience)).sum.toDouble / Math.max(1, units.size))
   val totalArmyFraction   = new Cache(() => units.view.filter(MatchWarriors).map(_.subjectiveValue).sum / Math.max(1d, With.units.ours.view.filter(MatchWarriors).map(_.subjectiveValue).sum))

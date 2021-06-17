@@ -6,7 +6,7 @@ import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.{Pixel, PixelRay, Tile}
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Mathematics.Shapes.Circle
 import Micro.Actions.Combat.Maneuvering.DownhillPathfinder
 import Micro.Agency.Commander
@@ -42,7 +42,7 @@ object MicroPathing {
     val pathfindProfile               = new PathfindProfile(unit.tile)
     pathfindProfile.end               = if (preferHome) Some(unit.agent.origin.tile) else None
     pathfindProfile.lengthMinimum     = Some(pathLengthMinimum)
-    pathfindProfile.lengthMaximum     = Some(PurpleMath.clamp((unit.matchups.pixelsOfEntanglement + unit.effectiveRangePixels).toInt / 32, pathLengthMinimum, 15))
+    pathfindProfile.lengthMaximum     = Some(Maff.clamp((unit.matchups.pixelsOfEntanglement + unit.effectiveRangePixels).toInt / 32, pathLengthMinimum, 15))
     pathfindProfile.threatMaximum     = Some(0)
     pathfindProfile.employGroundDist  = true
     pathfindProfile.costOccupancy     = if (unit.flying) 0f else 3f
@@ -142,13 +142,13 @@ object MicroPathing {
     val to = unit.agent.origin
 
     // Where to go
-    unit.agent.forces(Forces.threat)      = (Potential.avoidThreats(unit)     * PurpleMath.toInt(goalSafety))
-    unit.agent.forces(Forces.travel)      = (Potential.preferTravel(unit, to) * PurpleMath.toInt(goalHome))
+    unit.agent.forces(Forces.threat)      = (Potential.avoidThreats(unit)     * Maff.toInt(goalSafety))
+    unit.agent.forces(Forces.travel)      = (Potential.preferTravel(unit, to) * Maff.toInt(goalHome))
     unit.agent.forces(Forces.sneaking)    = (Potential.detectionRepulsion(unit))
 
     // How to get there
-    unit.agent.forces(Forces.spreading)   = (Potential.preferSpreading(unit)  * PurpleMath.toInt(goalSafety))
-    unit.agent.forces(Forces.regrouping)  = (Potential.preferRegrouping(unit) * PurpleMath.toInt( ! goalSafety))
+    unit.agent.forces(Forces.spreading)   = (Potential.preferSpreading(unit)  * Maff.toInt(goalSafety))
+    unit.agent.forces(Forces.regrouping)  = (Potential.preferRegrouping(unit) * Maff.toInt( ! goalSafety))
     unit.agent.forces(Forces.spacing)     = (Potential.avoidCollision(unit))
 
     ForceMath.rebalance(unit.agent.forces, 1.5, Forces.threat, Forces.travel, Forces.sneaking)

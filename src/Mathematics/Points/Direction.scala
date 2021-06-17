@@ -1,10 +1,10 @@
 package Mathematics.Points
 
-import Mathematics.PurpleMath
+import Mathematics.Maff
 
 class Direction(x: Int, y: Int) extends AbstractPoint (
-  if (x*x < y*y) 0 else PurpleMath.signum(x),
-  if (x*x >= y*y) 0 else PurpleMath.signum(y)) {
+  if (x*x < y*y) 0 else Maff.signum(x),
+  if (x*x >= y*y) 0 else Maff.signum(y)) {
 
   def this(start: AbstractPoint, end: AbstractPoint) {
     this(end.x - start.x, end.y - start.y)

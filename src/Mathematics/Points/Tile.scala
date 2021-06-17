@@ -2,7 +2,7 @@ package Mathematics.Points
 
 import Information.Geography.Types.{Base, Metro, Zone}
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Mathematics.Shapes.Spiral
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.TilePosition
@@ -28,8 +28,8 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     y < With.mapTileHeight
   }
   @inline def clip: Tile = Tile(
-    PurpleMath.clamp(x, 0, With.mapTileWidth - 1),
-    PurpleMath.clamp(y, 0, With.mapTileHeight - 1))
+    Maff.clamp(x, 0, With.mapTileWidth - 1),
+    Maff.clamp(y, 0, With.mapTileHeight - 1))
 
   @inline def tileDistanceFromEdge: Int = {
     var min = x
@@ -74,7 +74,7 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     // https://en.wikibooks.org/wiki/Algorithms/Distance_approximations#Octagonal
     val dx = Math.abs(x - tile.x)
     val dy = Math.abs(y - tile.y)
-    0.941256 * Math.max(dx, dy) + PurpleMath.sqrt2m1d * Math.min(dx, dy)
+    0.941256 * Math.max(dx, dy) + Maff.sqrt2m1d * Math.min(dx, dy)
   }
   @inline def tileDistanceSquared(tile: Tile): Int = {
     val dx = x - tile.x

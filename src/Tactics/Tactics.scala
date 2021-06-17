@@ -2,7 +2,7 @@ package Tactics
 
 import Information.Geography.Types.Base
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Squads._
 import Performance.Tasks.TimedTask
 import Planning.Plans.Army._
@@ -134,7 +134,7 @@ class Tactics extends TimedTask {
     })))
 
     // Assign division to each squad
-    squadsDefending.foreach(p => p._2.vicinity = PurpleMath.centroid(p._2.enemies.view.map(_.pixel)))
+    squadsDefending.foreach(p => p._2.vicinity = Maff.centroid(p._2.enemies.view.map(_.pixel)))
     squadsDefending.foreach(p => p._2.addEnemies(p._1.enemies))
 
     // Get freelancers

@@ -1,7 +1,7 @@
 package Micro.Actions.Combat.Maneuvering
 
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Actions.Action
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -26,7 +26,7 @@ object Support extends Action {
     val destination = unit.battle
       .map(_.us.vanguard())
       .getOrElse({
-        val centroid = PurpleMath.centroid(supportables.map(_.pixel))
+        val centroid = Maff.centroid(supportables.map(_.pixel))
         supportables.minBy(_.pixelDistanceTravelling(unit.agent.destination)).pixel
       })
 

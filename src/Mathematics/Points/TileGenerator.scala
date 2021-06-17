@@ -1,13 +1,13 @@
 package Mathematics.Points
 
-import Mathematics.PurpleMath
+import Mathematics.Maff
 
 class TileGenerator(suggestedOrigin: Tile, val boundA: Tile, val boundB: Tile, val direction: Direction) {
   private val xMin = Math.min(boundA.x, boundB.x)
   private val xMax = Math.max(boundA.x, boundB.x)
   private val yMin = Math.min(boundA.y, boundB.y)
   private val yMax = Math.max(boundA.y, boundB.y)
-  private val origin = Tile(PurpleMath.clamp(suggestedOrigin.x, xMin, xMax), PurpleMath.clamp(suggestedOrigin.y, yMin, yMax))
+  private val origin = Tile(Maff.clamp(suggestedOrigin.x, xMin, xMax), Maff.clamp(suggestedOrigin.y, yMin, yMax))
   private val dxMax = Math.max(suggestedOrigin.x - xMin, xMax - suggestedOrigin.x)
   private val dyMax = Math.max(suggestedOrigin.y - yMin, yMax - suggestedOrigin.y)
   private val breadthIsX = direction.y != 0

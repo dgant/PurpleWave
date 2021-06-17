@@ -2,7 +2,7 @@ package Information.Battles.Types
 
 import Information.Battles.Prediction.PredictionLocal
 import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) with PredictionLocal{
@@ -13,5 +13,5 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) with Predicti
 
   def units: Seq[UnitInfo] = us.units.view ++ enemy.units
 
-  def focus: Pixel = PurpleMath.centroid(teams.map(_.vanguard()))
+  def focus: Pixel = Maff.centroid(teams.map(_.vanguard()))
 }

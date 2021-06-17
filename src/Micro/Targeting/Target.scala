@@ -1,7 +1,7 @@
 package Micro.Targeting
 
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Targeting.Filters.{TargetFilter, TargetFilterWhitelist}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{CombatUnit, FriendlyUnitInfo, UnitInfo}
@@ -139,7 +139,7 @@ object Target extends {
       } else {
         // Prefer nearly-complete buildings
         val buildFrames = target.unitClass.buildFrames
-        output *= (1.0 + PurpleMath.clamp((buildFrames - target.remainingCompletionFrames) / buildFrames, 0, 1.0))
+        output *= (1.0 + Maff.clamp((buildFrames - target.remainingCompletionFrames) / buildFrames, 0, 1.0))
       }
     }
 

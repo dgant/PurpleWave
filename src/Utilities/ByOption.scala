@@ -1,6 +1,6 @@
 package Utilities
 
-import Mathematics.PurpleMath
+import Mathematics.Maff
 
 
 object ByOption {
@@ -27,7 +27,7 @@ object ByOption {
     }
   }
 
-  @inline final def mode[T](sequence: Traversable[T]): Option[T] = if (sequence.isEmpty) None else Some(PurpleMath.mode(sequence))
+  @inline final def mode[T](sequence: Traversable[T]): Option[T] = if (sequence.isEmpty) None else Some(Maff.mode(sequence))
   
   // Root mean square
   @inline final def rms(sequence: TraversableOnce[Double]): Option[Double] = {

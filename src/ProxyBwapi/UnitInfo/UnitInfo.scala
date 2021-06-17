@@ -9,7 +9,7 @@ import Information.Geography.Types.{Base, Metro, Zone}
 import Lifecycle.With
 import Mathematics.Physics.Force
 import Mathematics.Points._
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Mathematics.Shapes.Ring
 import Micro.Targeting.Target
 import Micro.Coordination.Pathing.MicroPathing
@@ -189,7 +189,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
         (pixelDistanceTravelling(home) / classSpeed).toInt
       else
         Int.MaxValue)
-    val completionTime  = PurpleMath.clamp(completionFrame, With.frame, With.frame + unitClass.buildFrames)
+    val completionTime  = Maff.clamp(completionFrame, With.frame, With.frame + unitClass.buildFrames)
     val arrivalTime     = completionTime + travelTime
     arrivalTime
   })
@@ -264,7 +264,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def canAttackGround: Boolean = canAttack && attacksAgainstGround > 0
   @inline final def canBurrow: Boolean = canDoAnything && (is(Zerg.Lurker) || (player.hasTech(Zerg.Burrow) && isAny(Zerg.Drone, Zerg.Zergling, Zerg.Hydralisk, Zerg.Defiler)))
 
-  val widthSlotProjected  = new Cache(() => team.map(team => if (flying) team.centroidAir() else PurpleMath.projectedPointOnLine(pixel, team.centroidGround(), team.lineWidth())).getOrElse(pixel))
+  val widthSlotProjected  = new Cache(() => team.map(team => if (flying) team.centroidAir() else Maff.projectedPointOnLine(pixel, team.centroidGround(), team.lineWidth())).getOrElse(pixel))
   val widthSlotIdeal      = new Cache(() => team.map(team => if (flying) team.centroidAir() else team.widthOrder().zipWithIndex.find(_._1 == this).map(p => team.centroidGround().project(team.lineWidth(), team.widthIdeal() * (team.widthOrder().size / 2 - p._2) / team.widthOrder().size)).getOrElse(widthSlotProjected())).getOrElse(pixel))
   val widthContribution   = new Cache(() => team.map(_.centroidOf(this).pixelDistance(widthSlotProjected()) * 2))
   val depthMeasuredFrom   = new Cache(() => presumptiveTarget.map(_.pixel).orElse(team.map(_.opponent.vanguard())))
@@ -312,8 +312,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
       val pixelFar = pixelClose
         .add(
           // DOUBLE CHECK CLAMPS
-          PurpleMath.clamp(usToEnemyGapFacingLeft, 0, enemy.unitClass.dimensionRight + unitClass.dimensionLeft)  - PurpleMath.clamp(usToEnemyGapFacingRight, 0, enemy.unitClass.dimensionLeft + unitClass.dimensionRight),
-          PurpleMath.clamp(usToEnemyGapFacingUp,   0, enemy.unitClass.dimensionDown  + unitClass.dimensionUp)    - PurpleMath.clamp(usToEnemyGapFacingDown, 0, enemy.unitClass.dimensionUp + unitClass.dimensionDown))
+          Maff.clamp(usToEnemyGapFacingLeft, 0, enemy.unitClass.dimensionRight + unitClass.dimensionLeft)  - Maff.clamp(usToEnemyGapFacingRight, 0, enemy.unitClass.dimensionLeft + unitClass.dimensionRight),
+          Maff.clamp(usToEnemyGapFacingUp,   0, enemy.unitClass.dimensionDown  + unitClass.dimensionUp)    - Maff.clamp(usToEnemyGapFacingDown, 0, enemy.unitClass.dimensionUp + unitClass.dimensionDown))
       if ( ! exhaustive || With.reaction.sluggishness > 0) {
         return pixelFar.nearestTraversableBy(this)
       }

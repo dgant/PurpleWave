@@ -2,7 +2,7 @@ package Macro
 
 import Information.Geography.Types.Base
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
@@ -34,7 +34,7 @@ trait AccelerantMinerals {
     val hallStart = base.townHallArea.startPixel
     val hallEnd = base.townHallArea.endPixel
 
-    val minerals = base.minerals.map(m => (m, PurpleMath.broodWarDistanceBox(m.topLeft, m.bottomRight, hallStart, hallEnd))).sortBy(_._2)
+    val minerals = base.minerals.map(m => (m, Maff.broodWarDistanceBox(m.topLeft, m.bottomRight, hallStart, hallEnd))).sortBy(_._2)
     var i = 0
     while (i < minerals.length) {
       val mineral = minerals(i)

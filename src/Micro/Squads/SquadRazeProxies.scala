@@ -1,7 +1,7 @@
 package Micro.Squads
 
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -9,7 +9,7 @@ import Utilities.ByOption
 
 class SquadRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends Squad {
   private val proxyPixels   = assignments.values.toSeq.map(_.pixel).distinct
-  private val centroidPixel = PurpleMath.centroid(proxyPixels)
+  private val centroidPixel = Maff.centroid(proxyPixels)
   private val centroidUnit  = ByOption.minBy(proxyPixels)(_.pixelDistance(centroidPixel)).getOrElse(With.scouting.threatOrigin.center)
 
   override def run() {

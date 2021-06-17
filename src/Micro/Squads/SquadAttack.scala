@@ -1,7 +1,7 @@
 package Micro.Squads
 
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Agency.Intention
 import Micro.Formation.FormationGeneric
 import Planning.UnitMatchers.{MatchProxied, MatchWarriors}
@@ -15,10 +15,10 @@ class SquadAttack extends Squad {
     formation = None
     chooseVicinity()
     if (units.isEmpty) return
-    lazy val centroid             = PurpleMath.centroid(units.view.map(_.pixel))
-    lazy val fightConsensus       = PurpleMath.mode(units.view.map(_.agent.shouldEngage))
-    lazy val originConsensus      = PurpleMath.mode(units.view.map(_.agent.origin))
-    lazy val battleConsensus      = PurpleMath.mode(units.view.map(_.battle))
+    lazy val centroid             = Maff.centroid(units.view.map(_.pixel))
+    lazy val fightConsensus       = Maff.mode(units.view.map(_.agent.shouldEngage))
+    lazy val originConsensus      = Maff.mode(units.view.map(_.agent.origin))
+    lazy val battleConsensus      = Maff.mode(units.view.map(_.battle))
     lazy val targetReadyToEngage  = targetQueue.get.find(t => units.exists(u => u.canAttack(t) && u.pixelsToGetInRange(t) < 64))
     lazy val targetHasEngagedUs   = targetQueue.get.find(t => units.exists(u => t.canAttack(u) && t.inRangeToAttack(u)))
     if (fightConsensus) {
@@ -47,7 +47,7 @@ class SquadAttack extends Squad {
 
   protected def chooseVicinity(): Unit = {
     val threatOrigin = With.scouting.threatOrigin
-    val centroid = PurpleMath.centroid(units.view.map(_.pixel)).tile
+    val centroid = Maff.centroid(units.view.map(_.pixel)).tile
     val threatDistanceToUs =
       ByOption.min(With.geography.ourBases.map(_.heart.tileDistanceFast(threatOrigin)))
         .getOrElse(With.geography.home.tileDistanceFast(threatOrigin))

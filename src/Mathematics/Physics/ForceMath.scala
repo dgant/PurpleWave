@@ -2,7 +2,7 @@ package Mathematics.Physics
 
 import Debugging.Visualizations.{ForceLabel, ForceMap}
 import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
+import Mathematics.Maff
 
 object ForceMath {
 
@@ -40,6 +40,6 @@ object ForceMath {
 
   def rebalance(forceMap: ForceMap, scale: Double, forces: ForceLabel*): Unit = {
     val length = ForceMath.sum(forces.map(forceMap)).lengthFast
-    forces.foreach(f => forceMap(f) *= PurpleMath.nanToZero(scale / length))
+    forces.foreach(f => forceMap(f) *= Maff.nanToZero(scale / length))
   }
 }

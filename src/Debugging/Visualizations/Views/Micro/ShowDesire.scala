@@ -5,7 +5,7 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import bwapi.Color
 
@@ -24,7 +24,7 @@ object ShowDesire extends View {
     if ( ! With.viewport.contains(unit.tile)) return
     DrawMap.label(
       "%d: %ds %dd %dt".format(
-        PurpleMath.nanToN(10 * unit.mcrs.sim().simValue, 10).toInt,
+        Maff.nanToN(10 * unit.mcrs.sim().simValue, 10).toInt,
         unit.mcrs.survivability().toInt / 50,
         unit.mcrs.dpsGround().toInt * 10,
         unit.mcrs.strengthGround().toInt / 100),

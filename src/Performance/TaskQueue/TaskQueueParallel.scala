@@ -1,7 +1,7 @@
 package Performance.TaskQueue
 
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Performance.Tasks.TimedTask
 import Performance.Timer
 
@@ -42,7 +42,7 @@ class TaskQueueParallel(val tasks: TimedTask*) extends TimedTask {
       val budgetMsPerFrame    = With.configuration.frameTargetMs * budgetRatio
       val budgetMsRecent      = budgetMsPerFrame * task.runMsSamplesMax
       val budgetMsRecentSpent = task.runMsRecentTotal()
-      val taskBudgetMs        = PurpleMath.clamp(budgetMsRecent - budgetMsRecentSpent, 0, With.performance.msBeforeTarget).toLong
+      val taskBudgetMs        = Maff.clamp(budgetMsRecent - budgetMsRecentSpent, 0, With.performance.msBeforeTarget).toLong
 
       if (i == 0 || (task.due && ! With.performance.danger) || (timer.ongoing && task.safeToRun(taskBudgetMs))) {
         task.run(taskBudgetMs)

@@ -1,6 +1,6 @@
 package Micro.Heuristics
 
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object MicroValue {
@@ -8,11 +8,11 @@ object MicroValue {
   val gasToMineralsRatio = 1.5
   
   def valuePerDamageMaxHp(unit: UnitInfo): Double = {
-    PurpleMath.nanToZero(unit.subjectiveValue / unit.totalHealth.toDouble)
+    Maff.nanToZero(unit.subjectiveValue / unit.totalHealth.toDouble)
   }
   
   def valuePerDamageCurrentHp(unit: UnitInfo): Double = {
-    PurpleMath.nanToZero(unit.subjectiveValue / unit.totalHealth.toDouble)
+    Maff.nanToZero(unit.subjectiveValue / unit.totalHealth.toDouble)
   }
   
   def valuePerAttackMaxHp(from: UnitInfo, to: UnitInfo): Double = {
@@ -24,16 +24,16 @@ object MicroValue {
   }
   
   def valuePerFrameMaxHp(from: UnitInfo, to: UnitInfo): Double = {
-    PurpleMath.nanToOne(valuePerAttackMaxHp(from, to) / from.cooldownMaxAgainst(to))
+    Maff.nanToOne(valuePerAttackMaxHp(from, to) / from.cooldownMaxAgainst(to))
   }
   
   def valuePerFrameCurrentHp(from: UnitInfo, to: UnitInfo): Double = {
-    PurpleMath.nanToOne(valuePerAttackCurrentHp(from, to) / from.cooldownMaxAgainst(to))
+    Maff.nanToOne(valuePerAttackCurrentHp(from, to) / from.cooldownMaxAgainst(to))
   }
   
   def valuePerFrameRepairing(target: UnitInfo): Double = {
     val valuePerDamage = MicroValue.valuePerDamageMaxHp(target)
-    val damagePerFrame = PurpleMath.nanToZero(0.9 * target.unitClass.maxHitPoints / target.unitClass.buildFrames)
+    val damagePerFrame = Maff.nanToZero(0.9 * target.unitClass.maxHitPoints / target.unitClass.buildFrames)
     val valuePerFrame = valuePerDamage * damagePerFrame
     valuePerFrame
   }

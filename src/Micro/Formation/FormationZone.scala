@@ -3,7 +3,7 @@ package Micro.Formation
 import Information.Geography.Types.{Edge, Zone}
 import Lifecycle.With
 import Mathematics.Points._
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Mathematics.Shapes.Spiral
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
@@ -90,7 +90,7 @@ object FormationZone {
             && (flyer || (tile.walkableUnchecked && ! occupied.get(tile) && ! With.groundskeeper.isReserved(tile)))
         )
         val bestTile = ByOption.minBy(candidates)(tile => {
-          val exitDistanceTiles = tile.center.pixelDistance(PurpleMath.projectedPointOnSegment(tile.center, edge.sidePixels.head, edge.sidePixels.last)).toInt / 32
+          val exitDistanceTiles = tile.center.pixelDistance(Maff.projectedPointOnSegment(tile.center, edge.sidePixels.head, edge.sidePixels.last)).toInt / 32
           val exitAttackingCost = Math.max(0, exitDistanceTiles - rangeTiles)
           val exitDefendingCost = Math.max(0, enemyRangePixelsMax / 32 - exitDistanceTiles)
           val leanHomeCost = tile.center.pixelDistance(escape) / 1000

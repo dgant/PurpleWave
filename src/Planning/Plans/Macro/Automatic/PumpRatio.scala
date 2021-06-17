@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Planning.Plans.Macro.Automatic.Rounding.Rounding
 import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitClasses.UnitClass
@@ -23,7 +23,7 @@ class PumpRatio(
   
   description.set("Train " + unitClass + " based on ratios")
   
-  override def maxDesirable: Int = PurpleMath.clamp(
+  override def maxDesirable: Int = Maff.clamp(
     (round match {
       case Rounding.Up => x: Double => Math.ceil(x)
       case Rounding.Down => x: Double => Math.floor(x)

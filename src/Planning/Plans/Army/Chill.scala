@@ -1,7 +1,7 @@
 package Planning.Plans.Army
 
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Mathematics.Shapes.Circle
 import Micro.Agency.Intention
 import Planning.Plan
@@ -24,7 +24,7 @@ class Chill(initialMatcher: UnitMatcher) extends Plan {
   
   private def chillOut(chiller: FriendlyUnitInfo, count: Int) {
     val base = ByOption.minBy(With.geography.ourBases.map(_.heart.center))(chiller.pixelDistanceTravelling)
-    val tile = base.map(b => PurpleMath.sample(Circle.points(Math.sqrt(count).toInt).map(b.tile.add))).getOrElse(With.geography.home)
+    val tile = base.map(b => Maff.sample(Circle.points(Math.sqrt(count).toInt).map(b.tile.add))).getOrElse(With.geography.home)
     val intent = new Intention
     intent.toTravel = Some(tile.center)
     chiller.agent.intend(this, intent)

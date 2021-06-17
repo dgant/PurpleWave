@@ -2,7 +2,7 @@ package Information.Battles.Types
 
 import Debugging.Visualizations.Colors
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Actions.Basic.Gather
 import Planning.UnitMatchers.{MatchTank, MatchWorker}
 import ProxyBwapi.Races.Terran
@@ -49,7 +49,7 @@ object JudgmentModifiers {
     val keyBases      = With.geography.ourBasesAndSettlements.filter(b => b.isOurMain || b.isNaturalOf.exists(_.isOurMain))
     val distanceMax   = With.mapPixelWidth
     val distanceHome  = (if (keyBases.isEmpty) Seq(With.geography.home) else keyBases.map(_.heart.nearestWalkableTile)).map(centroid().groundPixels).min
-    val distanceRatio = PurpleMath.clamp(distanceHome.toDouble / distanceMax, 0, 1)
+    val distanceRatio = Maff.clamp(distanceHome.toDouble / distanceMax, 0, 1)
     val multiplier    = 1.2 - 0.4 * distanceRatio
     Some(JudgmentModifier(gainedValueMultiplier = multiplier))
   }
@@ -114,7 +114,7 @@ object JudgmentModifiers {
         g.pixelDistanceEdge(ally) <= Gather.defenseRadiusPixels
         && ally.matchups.threats.exists(_.pixelsToGetInRange(ally, g.pixel) <= Gather.defenseRadiusPixels))))
     val workersTotal = With.units.countOurs(MatchWorker)
-    val workersRatio = PurpleMath.nanToZero(workersImperiled.toDouble / workersTotal)
+    val workersRatio = Maff.nanToZero(workersImperiled.toDouble / workersTotal)
     if (workersRatio > 0) Some(JudgmentModifier(targetDelta = -workersRatio)) else None
   }
 
@@ -131,7 +131,7 @@ object JudgmentModifiers {
     def ourCombatUnits  = battleLocal.us.units.view.filter(_.canAttack)
     val valueUs         = ourCombatUnits.map(_.subjectiveValue).sum
     val valueUsGround   = ourCombatUnits.filterNot(_.flying).map(_.subjectiveValue).sum
-    val ratioUsGround   = PurpleMath.nanToZero(valueUsGround / valueUs)
+    val ratioUsGround   = Maff.nanToZero(valueUsGround / valueUs)
     val enemyBonus      = Math.min(ratioUsGround * tanks * 0.1, 0.4)
     if (enemyBonus > 0) Some(JudgmentModifier(speedMultiplier = 1 - enemyBonus)) else None
   }
@@ -148,7 +148,7 @@ object JudgmentModifiers {
   //     because surprise is on the enemy's side
   def commitment(battleLocal: BattleLocal): Option[JudgmentModifier] = {
     def fighters = battleLocal.us.units.view.filter(_.unitClass.attacksOrCastsOrDetectsOrTransports)
-    val commitment = PurpleMath.mean(fighters.map(u => PurpleMath.clamp((32 + u.matchups.pixelsOfEntanglement) / 96d, 0, 1)))
+    val commitment = Maff.mean(fighters.map(u => Maff.clamp((32 + u.matchups.pixelsOfEntanglement) / 96d, 0, 1)))
     Some(JudgmentModifier(targetDelta = if (commitment > 0) -commitment * 0.2 else 0.2))
   }
 

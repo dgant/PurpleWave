@@ -7,7 +7,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
-object PurpleMath {
+object Maff {
 
   val halfPI: Double = Math.PI / 2
   val twoPI: Double = 2 * Math.PI
@@ -19,7 +19,7 @@ object PurpleMath {
 
   @inline final def mean(values: Iterable[Double]): Double = if (values.isEmpty) 0.0 else values.sum / values.size
   @inline final def meanL(values: Iterable[Long]): Double = if (values.isEmpty) 0.0 else values.sum / values.size.toDouble
-  
+
   @inline final def centroid(values: Iterable[Pixel]): Pixel = {
     if (values.isEmpty) return SpecificPoints.middle
     var x, y: Int = 0
@@ -57,27 +57,27 @@ object PurpleMath {
   @inline final def nanToZero(value: Double): Double = nanToN(value, 0)
   @inline final def nanToOne(value: Double): Double = nanToN(value, 1)
   @inline final def nanToInfinity(value: Double): Double = nanToN(value, Double.PositiveInfinity)
-  
+
   @inline final def clampRatio(value: Double, ratio: Double): Double = clamp(value, ratio, 1.0 / ratio)
-  
+
   @inline final def clamp(value: Int, bound0: Int, bound1: Int): Int = {
     val min = Math.min(bound0, bound1)
     val max = Math.max(bound0, bound1)
     Math.min(max, Math.max(min, value))
   }
-  
+
   @inline final def clamp(value: Double, value1: Double, value2: Double): Double = {
     val min = Math.min(value1, value2)
     val max = Math.max(value1, value2)
     Math.min(max, Math.max(value, min))
   }
-  
+
   @inline final def clampToOne(value: Double): Double = clamp(value, 0.0, 1.0)
-  
+
   @inline final def signum(int: Int)        : Int = if (int == 0) 0 else if (int < 0) -1 else 1
   @inline final def signum(double: Double)  : Int = if (double == 0.0) 0 else if (double < 0) -1 else 1
   @inline final def forcedSignum(int: Int)  : Int = if (int < 0) -1 else 1
-  
+
   val twoPi: Double = Math.PI * 2.0
   @inline final def normalize0To2Pi(angleRadians: Double): Double = {
     if      (angleRadians < 0) normalize0To2Pi(angleRadians + twoPi)
@@ -141,17 +141,17 @@ object PurpleMath {
     : Double = {
     if (x11 < x00) {
       if (y11 < y00) {
-        return PurpleMath.broodWarDistance(x11, y11, x00, y00)
+        return Maff.broodWarDistance(x11, y11, x00, y00)
       } else if (y10 > y01) {
-        return PurpleMath.broodWarDistance(x11, y10, x00, y01)
+        return Maff.broodWarDistance(x11, y10, x00, y01)
       } else {
         return x00 - x11
       }
     } else if (x10 > x01) {
       if (y11 < y00) {
-        return PurpleMath.broodWarDistance(x10, y11, x01, y00)
+        return Maff.broodWarDistance(x10, y11, x01, y00)
       } else if (y10 > y01) {
-        return PurpleMath.broodWarDistance(x10, y10, x01, y01)
+        return Maff.broodWarDistance(x10, y10, x01, y01)
       } else {
         return x10 - x01
       }

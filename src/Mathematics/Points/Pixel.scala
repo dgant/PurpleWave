@@ -2,7 +2,7 @@ package Mathematics.Points
 
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Mathematics.Shapes.Spiral
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Position
@@ -41,8 +41,8 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def divide(scale: Int): Pixel = Pixel(x / scale, y / scale)
   @inline def clamp(margin: Int = 0): Pixel = {
     Pixel(
-      PurpleMath.clamp(x, margin, With.mapPixelWidth - margin),
-      PurpleMath.clamp(y, margin, With.mapPixelHeight - margin))
+      Maff.clamp(x, margin, With.mapPixelWidth - margin),
+      Maff.clamp(y, margin, With.mapPixelHeight - margin))
   }
   @inline def project(destination: Pixel, pixels: Double): Pixel = {
     if (pixels == 0) return this
@@ -63,13 +63,13 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     radiansTo(other) / radiansOverDegrees
   }
   @inline def radiansTo(other: Pixel): Double = {
-    PurpleMath.fastAtan2(other.y - y, other.x - x)
+    Maff.fastAtan2(other.y - y, other.x - x)
   }
   @inline def midpoint(pixel: Pixel): Pixel = {
     add(pixel).divide(2)
   }
   @inline def pixelDistance(pixel: Pixel): Double = {
-    PurpleMath.broodWarDistance(x, y, pixel.x, pixel.y)
+    Maff.broodWarDistance(x, y, pixel.x, pixel.y)
   }
   @inline def pixelDistanceSquared(other: Pixel): Int = {
     val dx = x - other.x
@@ -153,16 +153,16 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def nearestWalkablePixel: Pixel = if (walkable) this else {
     val center = nearestWalkableTile.center
     Pixel(
-      PurpleMath.clamp(x, center.x - 16, center.x + 16),
-      PurpleMath.clamp(y, center.y - 16, center.y + 16))
+      Maff.clamp(x, center.x - 16, center.x + 16),
+      Maff.clamp(y, center.y - 16, center.y + 16))
   }
   @inline def nearestTraversablePixel(unit: UnitInfo): Pixel = if (unit.flying) this else {
     val center = nearestWalkableTile.center
     Pixel(
-      PurpleMath.clamp(x, center.x - 16 + Math.min(16, unit.unitClass.dimensionLeft), center.x + 16 - Math.min(16, unit.unitClass.dimensionRight)),
-      PurpleMath.clamp(y, center.y - 16 + Math.min(16, unit.unitClass.dimensionUp),   center.y + 16 - Math.min(16, unit.unitClass.dimensionDown)))
+      Maff.clamp(x, center.x - 16 + Math.min(16, unit.unitClass.dimensionLeft), center.x + 16 - Math.min(16, unit.unitClass.dimensionRight)),
+      Maff.clamp(y, center.y - 16 + Math.min(16, unit.unitClass.dimensionUp),   center.y + 16 - Math.min(16, unit.unitClass.dimensionDown)))
   }
   @inline def offsetFromTileCenter: Pixel = Pixel(x % 32 - 16, y % 32 - 16)
 
-  override def toString: String = f"[$x, $y](${PurpleMath.signum(x) * Math.abs(x/32)}, ${PurpleMath.signum(y) * Math.abs(y/32)})"
+  override def toString: String = f"[$x, $y](${Maff.signum(x) * Math.abs(x/32)}, ${Maff.signum(y) * Math.abs(y/32)})"
 }

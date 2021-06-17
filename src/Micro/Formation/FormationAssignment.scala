@@ -1,7 +1,7 @@
 package Micro.Formation
 
 import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -13,7 +13,7 @@ object FormationAssignment {
     if (spots.isEmpty) return FormationEmpty
     def assignUnitsOutward(unitClass: UnitClass, units: Iterable[UnitInfo]): Map[UnitInfo, Pixel] = {
       if (units.isEmpty) return Map.empty
-      val centroid = PurpleMath.centroid(units.map(_.pixel))
+      val centroid = Maff.centroid(units.map(_.pixel))
       val pixels = spots(unitClass).toSeq.sortBy(-_.pixelDistanceSquared(centroid))
       val unitsLeft = new ListBuffer[UnitInfo]
       unitsLeft ++= units

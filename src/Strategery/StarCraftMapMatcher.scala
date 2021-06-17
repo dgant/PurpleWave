@@ -1,7 +1,7 @@
 package Strategery
 
 import Mathematics.Points.{Pixel, SpecificPoints}
-import Mathematics.PurpleMath
+import Mathematics.Maff
 
 object StarCraftMapMatcher {
   def clean(mapString: String): String = {
@@ -12,7 +12,7 @@ object StarCraftMapMatcher {
   }
 
   def clock(pixel: Pixel): String = {
-    val output = Math.round(PurpleMath.normalize0To2Pi(SpecificPoints.middle.radiansTo(pixel)) * 6 / Math.PI).toInt.toString
+    val output = Math.round(Maff.normalize0To2Pi(SpecificPoints.middle.radiansTo(pixel)) * 6 / Math.PI).toInt.toString
     if (output == "0") "12" else output
   }
 }

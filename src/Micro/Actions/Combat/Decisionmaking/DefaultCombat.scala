@@ -4,7 +4,7 @@ import Debugging.ToString
 import Debugging.Visualizations.Forces
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Brawl
@@ -142,7 +142,7 @@ object DefaultCombat extends Action {
     if (nudgedTowards) return chaseDistance
 
     // Otherwise, stay near max range. Get a little closer if we can in case they try to flee
-    rangeAgainstUs.map(rangeAgainst => PurpleMath.clamp(rangeAgainst + 64, range - 16, range)).getOrElse(range - 16)
+    rangeAgainstUs.map(rangeAgainst => Maff.clamp(rangeAgainst + 64, range - 16, range)).getOrElse(range - 16)
   }
   def regroupGoal(unit: FriendlyUnitInfo): Pixel = {
     if (unit.battle.exists(_.us.units.size > 1)) unit.battle.get.us.centroidOf(unit)
@@ -266,8 +266,8 @@ object DefaultCombat extends Action {
       val margin                = 320d
       val marginExit            = originPixelsUs - originPixelsEnemy
       val marginThreat          = unit.matchups.pixelsOfEntanglement
-      val ratioExit             = PurpleMath.clamp(marginExit   / margin, -1, 1)
-      val ratioThreat           = PurpleMath.clamp(marginThreat / margin, -1, 1)
+      val ratioExit             = Maff.clamp(marginExit   / margin, -1, 1)
+      val ratioThreat           = Maff.clamp(marginThreat / margin, -1, 1)
       forces(Forces.leaving)    = Potential.preferTravel(unit, destination) * (1 + ratioExit)
       forces(Forces.threat)     = Potential.avoidThreats(unit) * (1 + ratioThreat)
       forces(Forces.spacing)    = Potential.avoidCollision(unit)

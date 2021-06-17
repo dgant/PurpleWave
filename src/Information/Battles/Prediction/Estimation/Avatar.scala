@@ -1,7 +1,7 @@
 package Information.Battles.Prediction.Estimation
 
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -41,7 +41,7 @@ class Avatar {
     val contributes   = unit.unitClass.dealsDamage
     val range         = unit.pixelRangeMax + 32.0 * (if (attacking || ! unit.canMove) 1.0 else 3.0)
     val pixelsAway    = With.configuration.avatarBattleDistancePixels
-    val framesAway    = if (pixelsAway <= range) 0.0 else PurpleMath.nanToInfinity(Math.max(0.0, pixelsAway - range) / unit.topSpeed * 0.5)
+    val framesAway    = if (pixelsAway <= range) 0.0 else Maff.nanToInfinity(Math.max(0.0, pixelsAway - range) / unit.topSpeed * 0.5)
     val framesTotal   = With.configuration.simulationFrames
     var efficacy      = splashFactor * Math.max(0.0, (framesTotal - framesAway) / framesTotal)
 

@@ -1,7 +1,7 @@
 package Tactics
 
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Mathematics.Shapes.Circle
 import Micro.Agency.Intention
 import Planning.Predicates.Compound.Latch
@@ -44,7 +44,7 @@ class ChillOverlords extends Prioritized {
   
   private def chillOut(overlord: FriendlyUnitInfo, count: Int) {
     val base = ByOption.minBy(With.geography.ourBases.map(_.heart.center))(overlord.pixelDistanceSquared)
-    val tile = base.map(b => PurpleMath.sample(Circle.points(Math.sqrt(count).toInt).map(b.tile.add))).getOrElse(With.geography.home)
+    val tile = base.map(b => Maff.sample(Circle.points(Math.sqrt(count).toInt).map(b.tile.add))).getOrElse(With.geography.home)
     overlord.agent.intend(this, new Intention {
       toTravel = Some(tile.center)
       canFlee = true

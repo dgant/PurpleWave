@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Tactics
 
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
@@ -64,7 +64,7 @@ object Bust extends Action {
     lazy val goons = unit.alliesSquad.filter(u => u.friendly.exists(Bust.allowed) && bunkers.exists(b => u.framesToGetInRange(b) < 24))
 
     if (unit.readyForAttackOrder && repairers.nonEmpty && goons.size >= repairers.map(_.hitPoints).min / 10) {
-      unit.agent.toAttack = Some(repairers.sortBy(_.pixelDistanceCenter(PurpleMath.centroid(goons.map(_.pixel)))).minBy(_.hitPoints))
+      unit.agent.toAttack = Some(repairers.sortBy(_.pixelDistanceCenter(Maff.centroid(goons.map(_.pixel)))).minBy(_.hitPoints))
       Commander.attack(unit)
     }
 

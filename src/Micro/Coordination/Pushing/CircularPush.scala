@@ -2,7 +2,7 @@ package Micro.Coordination.Pushing
 import Debugging.Visualizations.Rendering.DrawMap
 import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.{Pixel, Tile}
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Mathematics.Shapes.Circle
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -12,8 +12,8 @@ class CircularPush(val priority: TrafficPriority, center: Pixel, radius: Double,
     if (originators.contains(recipient)) return None
     val target = recipient.pixel
     val distance = target.pixelDistance(center)
-    val magnitude = PurpleMath.nanToZero((radius - distance) / radius)
-    val magnitudeClamped = PurpleMath.clamp(magnitude, 0, 1)
+    val magnitude = Maff.nanToZero((radius - distance) / radius)
+    val magnitudeClamped = Maff.clamp(magnitude, 0, 1)
     if (magnitudeClamped <= 0) None else Some(ForceMath.fromPixels(center, target, magnitudeClamped))
   }
 

@@ -3,7 +3,7 @@ package Information.Geography.Pathfinding
 import Information.Geography.Pathfinding.Types.TilePath
 import Lifecycle.With
 import Mathematics.Points.Tile
-import Mathematics.PurpleMath
+import Mathematics.Maff
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -51,14 +51,14 @@ trait TilePathfinder {
     if (fromState.isEmpty) return 0
     val fromTile = fromState.get
     val costSoFar     : Double  = fromState.get.costFromStart
-    val costDistance  : Double  = if (fromTile.tile.x == toTile.x || fromTile.tile.y == toTile.y) 1f else PurpleMath.sqrt2f
+    val costDistance  : Double  = if (fromTile.tile.x == toTile.x || fromTile.tile.y == toTile.y) 1f else Maff.sqrt2f
     val costThreat    : Double  = if (profile.costThreat == 0) 0 else profile.costThreat * Math.max(0, profile.threatGrid.getUnchecked(i) - profile.threatGrid.getUnchecked(fromTile.i)) // Max?
     val costOccupancy : Double  = if (profile.costOccupancy == 0) 0 else {
       // Intuition: We want to keep this value scaled around 0-1 so we can reason about costOccupancy
       // Signum: Scale-invariant
       // Sigmoid: Tiebreaks equally signed vectors with different scales
       val diff = With.coordinator.gridPathOccupancy.getUnchecked(i) - With.coordinator.gridPathOccupancy.getUnchecked(fromTile.i)
-      profile.costOccupancy * 0.5f * (PurpleMath.fastSigmoid(diff) + 0.5 + 0.5 * PurpleMath.signum(diff))
+      profile.costOccupancy * 0.5f * (Maff.fastSigmoid(diff) + 0.5 + 0.5 * Maff.signum(diff))
     }
     val costRepulsion: Double = if (profile.costRepulsion == 0 || profile.maxRepulsion == 0)
       0
@@ -68,7 +68,7 @@ trait TilePathfinder {
       // Signum: Scale-invariant
       // Sigmoid: Tiebreaks equally signed vectors with different scales
       val diff = toState.repulsion - fromState.get.repulsion
-      profile.costRepulsion * 0.5f * (PurpleMath.fastSigmoid(diff) + 0.5 + 0.5 * PurpleMath.signum(diff))
+      profile.costRepulsion * 0.5f * (Maff.fastSigmoid(diff) + 0.5 + 0.5 * Maff.signum(diff))
     }
 
     costSoFar + costDistance + costThreat + costOccupancy + costRepulsion
@@ -89,7 +89,7 @@ trait TilePathfinder {
     // So the floor of the cost we'll pay is the Gaussian expansion of the threat cost at the current tile.
 
     val costDistanceToEnd   : Double = profile.end.map(end => if (profile.crossUnwalkable || ! profile.employGroundDist) tile.tileDistanceFast(end) else tile.groundPixels(end) / 32.0).getOrElse(0.0)
-    val costOutOfRepulsion  : Double = profile.costRepulsion * PurpleMath.fastSigmoid(tiles(i).repulsion) // Hacky; used to smartly tiebreak tiles that are otherwise h() = 0. Using this formulation to minimize likelihood of breaking heuristic requirements
+    val costOutOfRepulsion  : Double = profile.costRepulsion * Maff.fastSigmoid(tiles(i).repulsion) // Hacky; used to smartly tiebreak tiles that are otherwise h() = 0. Using this formulation to minimize likelihood of breaking heuristic requirements
     val costOutOfThreat     : Double = profile.costThreat * profile.threatGrid.getUnchecked(i)
 
     Math.max(costDistanceToEnd, costOutOfThreat)
@@ -108,7 +108,7 @@ trait TilePathfinder {
     val nanosDelta = Math.max(0, System.nanoTime() - nanosBefore)
     val pathLength = output.tiles.map(_.length).getOrElse(0)
     aStarPathfinds += 1
-    aStarOver1ms += PurpleMath.fromBoolean(nanosDelta > 1e6)
+    aStarOver1ms += Maff.fromBoolean(nanosDelta > 1e6)
     aStarNanosMax = Math.max(aStarNanosMax, nanosDelta)
     aStarNanosTotal += nanosDelta
     aStarPathLengthMax = Math.max(aStarPathLengthMax, pathLength)
@@ -199,7 +199,7 @@ trait TilePathfinder {
               neighborState.setCameFrom(bestTileState.tile)
               neighborState.setCostFromStart(neighborCostFromStart)
               neighborState.setTotalCostFloor(neighborCostFromStart + costToEndFloor(profile, neighborTile))
-              neighborState.setPathLength(bestTileState.pathLength + (if (neighborOrthogonal) 1 else PurpleMath.sqrt2f))
+              neighborState.setPathLength(bestTileState.pathLength + (if (neighborOrthogonal) 1 else Maff.sqrt2f))
             }
             if ( ! wasEnqueued) {
               neighborState.setRepulsion(totalRepulsion(profile, neighborTile))

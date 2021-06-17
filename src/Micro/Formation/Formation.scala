@@ -2,7 +2,7 @@ package Micro.Formation
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
 
@@ -10,7 +10,7 @@ class Formation(style: FormationStyle, val placements: Map[UnitInfo, Pixel]) {
 
   def renderMap(color: Color): Unit = {
     if (placements.nonEmpty) {
-      DrawMap.label(style.name, PurpleMath.centroid(placements.values), true, style.color)
+      DrawMap.label(style.name, Maff.centroid(placements.values), true, style.color)
     }
     placements.foreach(p => {
       val unit = p._1

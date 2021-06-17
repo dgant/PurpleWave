@@ -3,7 +3,7 @@ package Micro.Agency
 import Debugging.KeyboardCommands
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints, Tile}
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.{TrafficPriorities, UnitLinearGroundPush}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -151,8 +151,8 @@ object Commander {
     if (unit.isAny(Terran.Dropship, Terran.ScienceVessel, Protoss.Shuttle, Protoss.Observer, Protoss.HighTemplar, Zerg.Mutalisk, Zerg.Overlord, Zerg.Queen)) {
       val overshootDistance = if (unit.flying || unit.transport.exists(_.flying)) 288.0 else 8
       if (to == unit.pixel) {
-        val signX = PurpleMath.forcedSignum(SpecificPoints.middle.x - to.x)
-        val signY = PurpleMath.forcedSignum(SpecificPoints.middle.y - to.y)
+        val signX = Maff.forcedSignum(SpecificPoints.middle.x - to.x)
+        val signY = Maff.forcedSignum(SpecificPoints.middle.y - to.y)
         to = to.add((signX * overshootDistance).toInt, (signY * overshootDistance).toInt)
       } else if (unit.pixelDistanceSquared(to) < overshootDistance * overshootDistance) {
         to = unit.pixel.project(to, overshootDistance)
@@ -161,8 +161,8 @@ object Commander {
 
     // Clip to map
     to = Pixel(
-      PurpleMath.clamp(to.x, unit.unitClass.dimensionLeft, With.mapPixelWidth  - unit.unitClass.dimensionRight),
-      PurpleMath.clamp(to.y, unit.unitClass.dimensionUp,   With.mapPixelHeight - unit.unitClass.dimensionDown))
+      Maff.clamp(to.x, unit.unitClass.dimensionLeft, With.mapPixelWidth  - unit.unitClass.dimensionRight),
+      Maff.clamp(to.y, unit.unitClass.dimensionUp,   With.mapPixelHeight - unit.unitClass.dimensionDown))
 
     if (unit.flying || unit.transport.exists(_.flying)) return to
 
@@ -354,7 +354,7 @@ object Commander {
           lazy val accelerantMineral    = With.gathering.getAccelerantMineral(resource)
           lazy val accelerantPixel      = With.gathering.getAccelerantPixelSteady(resource)
           lazy val distance             = unit.pixelDistanceEdge(resource)
-          lazy val projectedFrames      = PurpleMath.nanToZero(Math.max(0, distance - unit.unitClass.haltPixels) / unit.topSpeed + 2 * Math.min(distance, unit.unitClass.haltPixels) / unit.topSpeed)
+          lazy val projectedFrames      = Maff.nanToZero(Math.max(0, distance - unit.unitClass.haltPixels) / unit.topSpeed + 2 * Math.min(distance, unit.unitClass.haltPixels) / unit.topSpeed)
           lazy val onAccelerantPixel    = With.gathering.onAccelerant(unit, resource)
           lazy val onTargetMineral      = unit.orderTarget.contains(resource)
           lazy val onAccelerantMineral  = accelerantMineral.exists(unit.orderTarget.contains)

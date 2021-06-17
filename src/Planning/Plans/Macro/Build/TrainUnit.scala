@@ -3,7 +3,7 @@ package Planning.Plans.Macro.Build
 import Lifecycle.With
 import Macro.Buildables.{Buildable, BuildableUnit}
 import Macro.Scheduling.MacroCounter
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
 import Planning.UnitCounters.CountOne
@@ -80,10 +80,10 @@ class TrainUnit(val traineeClass: UnitClass) extends Production {
       val already   = trainer.trainee.map(t => if (t.is(traineeClass)) -1.0 else 1.0).getOrElse(0.0)
       val addon     = if (trainer.addon.isDefined) 0.0 else 1.0
       val readiness = trainer.remainingOccupationFrames.toDouble / Math.max(trainer.trainee.map(_.unitClass.buildFrames).getOrElse(0), traineeClass.buildFrames)
-      val workers   = if (traineeClass.isWorker) PurpleMath.clamp(trainer.base.map(_.saturation()).getOrElse(0.0), 0.0, 1.0) else 0.0
+      val workers   = if (traineeClass.isWorker) Maff.clamp(trainer.base.map(_.saturation()).getOrElse(0.0), 0.0, 1.0) else 0.0
       val health    = trainer.totalHealth / trainer.unitClass.maxTotalHealth.toDouble
-      val safety    = PurpleMath.clamp(trainer.matchups.framesOfSafety, 0, safetyFramesMax) / safetyFramesMax.toDouble
-      val distance  = 1.0 - PurpleMath.clamp(trainer.tile.groundPixels(With.scouting.mostBaselikeEnemyTile) / mapSize, 0.0, 1.0)
+      val safety    = Maff.clamp(trainer.matchups.framesOfSafety, 0, safetyFramesMax) / safetyFramesMax.toDouble
+      val distance  = 1.0 - Maff.clamp(trainer.tile.groundPixels(With.scouting.mostBaselikeEnemyTile) / mapSize, 0.0, 1.0)
       val score = (
           1000000000000.0 * already
         + 10000000000.0   * addon

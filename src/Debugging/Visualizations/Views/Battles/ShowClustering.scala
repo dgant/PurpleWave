@@ -5,7 +5,7 @@ import Debugging.Visualizations.Views.Micro.ShowSquads
 import Debugging.Visualizations.Views.View
 import Information.Battles.Types.BattleLocal
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
 
@@ -30,7 +30,7 @@ object ShowClustering extends View {
     battles.foreach(b => Seq(
       (b.us, With.self.colorNeon),
       (b.enemy, With.enemy.colorNeon)).foreach(p =>
-        DrawMap.polygonPixels(PurpleMath.convexHull(p._1.units.flatMap(_.corners.map(_.asPoint))).map(_.asPixel), p._2)
+        DrawMap.polygonPixels(Maff.convexHull(p._1.units.flatMap(_.corners.map(_.asPoint))).map(_.asPixel), p._2)
     ))
   }
   

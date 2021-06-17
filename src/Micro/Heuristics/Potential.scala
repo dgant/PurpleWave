@@ -2,7 +2,7 @@ package Micro.Heuristics
 
 import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Coordination.Pathing.MicroPathing
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -47,7 +47,7 @@ object Potential {
   
   protected def threatRepulsion(unit: FriendlyUnitInfo, threat: UnitInfo): Force = {
     val entanglement          = unit.pixelsOfEntanglement(threat)
-    val magnitudeEntanglement = 1.0 + PurpleMath.fastTanh(entanglement / 32.0) + Math.max(0.0, entanglement / 32.0)
+    val magnitudeEntanglement = 1.0 + Maff.fastTanh(entanglement / 32.0) + Math.max(0.0, entanglement / 32.0)
     val magnitudeDamage       = threat.dpfOnNextHitAgainst(unit)
     val magnitudeFinal        = magnitudeDamage * magnitudeEntanglement
     val output                = unitAttraction(unit, threat, -magnitudeFinal)
@@ -66,7 +66,7 @@ object Potential {
     if (allyNearestUseful.isEmpty) return new Force
     val allyDistance          = allyNearestUseful.get.pixelDistanceCenter(unit)
     val allyDistanceAlarming  = if (unit.flying) 1.0 else Math.max(32.0 * 2.0, Math.max(unit.effectiveRangePixels, allyNearestUseful.get.effectiveRangePixels))
-    val magnitude             = Math.min(1.0, PurpleMath.nanToOne(allyDistance / allyDistanceAlarming))
+    val magnitude             = Math.min(1.0, Maff.nanToOne(allyDistance / allyDistanceAlarming))
     val output                = unitAttraction(unit, allyNearestUseful.get, magnitude)
     output
   }
@@ -145,7 +145,7 @@ object Potential {
     if (other.unitClass.isBuilding) return 0.0
     val maximumDistance   = Math.max(unit.unitClass.dimensionMax, other.unitClass.dimensionMax)
     val blockerDistance   = other.pixelDistanceEdge(unit)
-    val magnitudeDistance = 1.0 - PurpleMath.clampToOne(blockerDistance / (1.0 + maximumDistance))
+    val magnitudeDistance = 1.0 - Maff.clampToOne(blockerDistance / (1.0 + maximumDistance))
     val magnitudeSize     = unit.unitClass.dimensionMax * other.unitClass.dimensionMax * tts
     val output            = magnitudeSize * magnitudeDistance
     output

@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views.Performance
 import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Performance.Tasks.TimedTask
 
 object ShowPerformanceDetails extends View {
@@ -27,7 +27,7 @@ object ShowPerformanceDetails extends View {
         task.runsTotal.toString,
         (task.runMsTotal / 1000).toString,
         f"${(100.0 * task.runMsTotal / (With.performance.systemMillis - With.performance.gameStartMs)).toInt}%%",
-        PurpleMath.meanL(task.budgetMsPast).toInt.toString,
+        Maff.meanL(task.budgetMsPast).toInt.toString,
         task.runMsRecentMean.toString,
         task.runMsRecentMax().toString,
         task.runMsMax.toString,

@@ -2,7 +2,7 @@ package Micro.Matchups
 
 import Information.Battles.BattleClassificationFilters
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Actions.Scouting.BlockConstruction
 import Micro.Heuristics.MicroValue
 import Performance.Cache
@@ -46,8 +46,8 @@ case class MatchupAnalysis(me: UnitInfo) {
   lazy val vpfDealingInRange          : Double            = splashFactorInRange * ByOption.max(targetsInRange.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
   lazy val dpfReceiving               : Double            = threatsInRange.view.map(_.matchups.dpfDealingDiffused(me)).sum
   lazy val vpfReceiving               : Double            = valuePerDamage * dpfReceiving
-  lazy val framesToLive               : Double            = PurpleMath.nanToInfinity(me.totalHealth / dpfReceiving)
-  lazy val framesOfSafety             : Double            = - With.latency.latencyFrames - With.reaction.agencyAverage - PurpleMath.nanToZero(pixelsOfEntanglement / me.topSpeed)
+  lazy val framesToLive               : Double            = Maff.nanToInfinity(me.totalHealth / dpfReceiving)
+  lazy val framesOfSafety             : Double            = - With.latency.latencyFrames - With.reaction.agencyAverage - Maff.nanToZero(pixelsOfEntanglement / me.topSpeed)
   lazy val pixelsOfEntanglement       : Double            = ByOption.max(threats.map(me.pixelsOfEntanglement)).getOrElse(- With.mapPixelWidth)
   lazy val pixelsToReachAnyTarget     : Double            = ByOption.max(targets.map(me.pixelsToGetInRange)).getOrElse(With.mapPixelWidth)
 
@@ -64,7 +64,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   }
 
   protected def splashFactorForUnits(targetsConsidered: Iterable[UnitInfo]): Double = {
-    if (With.reaction.sluggishness > 0) me.unitClass.splashFactor else PurpleMath.clamp(me.unitClass.splashFactor, 1.0, targetsConsidered.size)
+    if (With.reaction.sluggishness > 0) me.unitClass.splashFactor else Maff.clamp(me.unitClass.splashFactor, 1.0, targetsConsidered.size)
   }
 
   def dpfDealingDiffused(target: UnitInfo): Double = {

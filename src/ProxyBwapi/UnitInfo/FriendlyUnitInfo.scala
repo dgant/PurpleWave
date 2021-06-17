@@ -2,7 +2,7 @@ package ProxyBwapi.UnitInfo
 
 import Information.Grids.Floody.AbstractGridFloody
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Agency.{Agent, Intention}
 import Micro.Squads.Squad
 import Performance.Cache
@@ -27,8 +27,8 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
     _knownToEnemy = _knownToEnemy || visibleToOpponents
     lazy val tryingToAttackHere = canAttack && target.exists(t => t.isEnemyOf(this) &&   inRangeToAttack(t))
     lazy val tryingToAttackAway = canAttack && target.exists(t => t.isEnemyOf(this) && ! inRangeToAttack(t))
-    _framesFailingToMove += 1 - PurpleMath.fromBoolean(flying || unitClass.floats || pixel != previousPixel(1) || ! canMove || ( ! agent.tryingToMove && ! tryingToAttackAway))
-    _framesFailingToAttack += 1 - PurpleMath.fromBoolean(cooldownLeft > 0 || ! tryingToAttackHere)
+    _framesFailingToMove += 1 - Maff.fromBoolean(flying || unitClass.floats || pixel != previousPixel(1) || ! canMove || ( ! agent.tryingToMove && ! tryingToAttackAway))
+    _framesFailingToAttack += 1 - Maff.fromBoolean(cooldownLeft > 0 || ! tryingToAttackHere)
     if (remainingOccupationFrames > 0) _lastFrameOccupied = With.frame
   }
 

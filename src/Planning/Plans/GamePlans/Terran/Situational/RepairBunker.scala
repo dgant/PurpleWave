@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Situational
 
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.LockUnits
@@ -29,7 +29,7 @@ class RepairBunker extends Plan {
     if (bunkers.isEmpty) return
     val bunker = bunkers.head
 
-    val repairersNeeded = PurpleMath.clamp(bunker.matchups.threats
+    val repairersNeeded = Maff.clamp(bunker.matchups.threats
       .map(t =>
         if ( ! t.visible)
           0.0

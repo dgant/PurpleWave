@@ -1,7 +1,7 @@
 package Strategery
 
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Planning.Plan
 import Planning.Plans.GamePlans.StandardGamePlan
 import ProxyBwapi.Players.Players
@@ -44,7 +44,7 @@ class Strategist {
   lazy val isRamped         : Boolean = heightMain > heightNatural
   lazy val isFlat           : Boolean = heightMain == heightNatural
   lazy val isInverted       : Boolean = heightMain < heightNatural
-  lazy val rushDistanceMean : Double  = PurpleMath.mean(With.geography.rushDistances)
+  lazy val rushDistanceMean : Double  = Maff.mean(With.geography.rushDistances)
   lazy val isPlasma         : Boolean = Plasma.matches
   lazy val isIslandMap      : Boolean = isPlasma || With.geography.startBases.forall(base1 => With.geography.startBases.forall(base2 => base1 == base2 || With.paths.zonePath(base1.zone, base2.zone).isEmpty))
   lazy val isFfa            : Boolean = With.enemies.size > 1 && ! Players.all.exists(p => p.isAlly)

@@ -3,7 +3,7 @@ package Information.Geography.Types
 import Information.Grids.Movement.GridGroundDistance
 import Lifecycle.With
 import Mathematics.Points.{Direction, Pixel, PixelRay, Tile}
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import bwta.Chokepoint
 
 class Edge(choke: Chokepoint) {
@@ -22,7 +22,7 @@ class Edge(choke: Chokepoint) {
   lazy val endPixels    : Vector[Pixel] = Vector(-1, 1)
     .map(m => pixelCenter
       .radiateRadians(
-        PurpleMath.slowAtan2(
+        Maff.slowAtan2(
           sidePixels(0).y - sidePixels(1).y,
           sidePixels(0).x - sidePixels(1).x)
         + m * Math.PI / 2,

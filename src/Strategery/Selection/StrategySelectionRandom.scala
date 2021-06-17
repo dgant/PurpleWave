@@ -1,6 +1,6 @@
 package Strategery.Selection
 
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Strategery.Strategies.Strategy
 
 object StrategySelectionRandom extends StrategySelectionPolicy {
@@ -12,7 +12,7 @@ object StrategySelectionRandom extends StrategySelectionPolicy {
         branch._1,
         1.0 / branch._2
       ))
-    PurpleMath.sampleWeighted(weights.keys.toSeq, w => weights(w)).get
+    Maff.sampleWeighted(weights.keys.toSeq, w => weights(w)).get
   }
 
   override def toString = "StrategySelectionRandom"

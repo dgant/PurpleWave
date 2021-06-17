@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views.Geography
 import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 
 object ShowRushDistances extends View {
   
@@ -79,7 +79,7 @@ object ShowRushDistances extends View {
           With.mapFileName,
           "",
           distances.min.toInt.toString,
-          PurpleMath.mean(distances).toInt.toString,
+          Maff.mean(distances).toInt.toString,
           distances.max.toInt.toString
         )))
     DrawScreen.table(

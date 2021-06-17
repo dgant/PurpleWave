@@ -2,7 +2,7 @@ package Information.Geography.Types
 
 import Lifecycle.With
 import Mathematics.Points.{PixelRay, Tile, TileRectangle}
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Performance.Cache
 import Planning.UnitMatchers.{MatchBuilding, MatchWorker}
 import ProxyBwapi.Players.PlayerInfo
@@ -41,7 +41,7 @@ class Base(val townHallTile: Tile)
   def harvestingArea: TileRectangle = {
     if (calculatedHarvestingArea.isDefined) calculatedHarvestingArea.get else {
       // This is called during initialization! So variables like heart aren't populated yet
-      val centroid = PurpleMath.centroidTiles(minerals.map(_.tileTopLeft))
+      val centroid = Maff.centroidTiles(minerals.map(_.tileTopLeft))
       val townHall = townHallTile.add(2, 1)
       val dx = centroid.x - townHall.x
       val dy = centroid.y - townHall.y
@@ -53,14 +53,14 @@ class Base(val townHallTile: Tile)
         boxInitial
           .startInclusive
           .add(
-            if (   dxBigger) PurpleMath.clamp(dx, -1, 0) else 0,
-            if ( ! dxBigger) PurpleMath.clamp(dy, -1, 0) else 0)
+            if (   dxBigger) Maff.clamp(dx, -1, 0) else 0,
+            if ( ! dxBigger) Maff.clamp(dy, -1, 0) else 0)
           .clip,
       boxInitial
         .endExclusive
         .add(
-          if (   dxBigger) PurpleMath.clamp(dx, 0, 1) else 0,
-          if ( ! dxBigger) PurpleMath.clamp(dy, 0, 1) else 0)
+          if (   dxBigger) Maff.clamp(dx, 0, 1) else 0,
+          if ( ! dxBigger) Maff.clamp(dy, 0, 1) else 0)
         .clip)
       if (minerals.nonEmpty || gas.nonEmpty) {
         calculatedHarvestingArea = Some(output)

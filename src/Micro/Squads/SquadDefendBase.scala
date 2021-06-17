@@ -3,7 +3,7 @@ package Micro.Squads
 import Information.Geography.Types.{Base, Edge, Zone}
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Agency.Intention
 import Micro.Formation.FormationZone
 import Micro.Targeting.Filters.TargetFilterDefend
@@ -29,9 +29,9 @@ class SquadDefendBase(base: Base) extends Squad {
           val step = path.steps(i)
           val turtlePenalty = if (step.to.units.exists(u => u.isOurs && u.unitClass.isBuilding)) 10 else 1
           val altitudeValue = if (With.enemies.forall(_.isZerg)) 1 else 5
-          val altitudeDiff = PurpleMath.signum(step.to.centroid.altitude - step.from.centroid.altitude)
+          val altitudeDiff = Maff.signum(step.to.centroid.altitude - step.from.centroid.altitude)
           val altitudeMult = Math.pow(altitudeValue, altitudeDiff)
-          val width = PurpleMath.clamp(step.edge.radiusPixels, 32 * 3, 32 * 16)
+          val width = Maff.clamp(step.edge.radiusPixels, 32 * 3, 32 * 16)
           val score = width * turtlePenalty * (3 + i) * altitudeMult
           (step, score)
         })

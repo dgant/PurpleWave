@@ -1,7 +1,7 @@
 package Mathematics.Physics
 
 import Mathematics.Points.{AbstractPoint, Point}
-import Mathematics.PurpleMath
+import Mathematics.Maff
 
 final case class Force(x: Double, y: Double) {
   
@@ -16,10 +16,10 @@ final case class Force(x: Double, y: Double) {
   @inline def /(value: Double)  : Force = Force(x / value, y / value)
 
   @inline def degrees: Double = radians * 180 / Math.PI
-  @inline def radians: Double = PurpleMath.fastAtan2(y, x)
+  @inline def radians: Double = Maff.fastAtan2(y, x)
   @inline def lengthSquared: Double = x * x + y * y
   @inline def lengthSlow: Double = Math.sqrt(lengthSquared)
-  @inline def lengthFast: Double = PurpleMath.broodWarDistanceDouble(0.0, 0.0, x, y)
+  @inline def lengthFast: Double = Maff.broodWarDistanceDouble(0.0, 0.0, x, y)
 
   @inline def normalize: Force = normalize(1.0)
   @inline def normalize(scale: Double = 1.0): Force = {

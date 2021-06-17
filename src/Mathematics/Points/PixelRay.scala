@@ -1,6 +1,6 @@
 package Mathematics.Points
 
-import Mathematics.PurpleMath
+import Mathematics.Maff
 
 object PixelRay {
 
@@ -10,19 +10,19 @@ object PixelRay {
   
   @inline final def apply(from: Pixel, to: Pixel): Iterable[Tile] = {
     if (to.x == from.x) {
-      val direction = PurpleMath.signum(to.y - from.y)
+      val direction = Maff.signum(to.y - from.y)
       if (direction == 0) return Array(to.tile)
       return (from.y / 32 to to.y / 32 by direction).view.map(tileY => Tile(to.x/32, tileY))
     }
     if (to.y == from.y) {
-      val direction = PurpleMath.signum(to.x - from.x)
+      val direction = Maff.signum(to.x - from.x)
       if (direction == 0) return Array(to.tile)
       return (from.x / 32 to to.x / 32 by direction).view.map(tileX => Tile(tileX, to.y/32))
     }
     
     val gridSize    = 32
-    val signX       = PurpleMath.signum(to.x - from.x)
-    val signY       = PurpleMath.signum(to.y - from.y)
+    val signX       = Maff.signum(to.x - from.x)
+    val signY       = Maff.signum(to.y - from.y)
     var x           = from.x
     var y           = from.y
     val velocityX   = to.x - from.x.toDouble

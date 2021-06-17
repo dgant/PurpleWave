@@ -1,6 +1,6 @@
 package Micro.Squads.Qualities
 
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, CountMap}
@@ -30,12 +30,12 @@ class QualityCounter {
   }
 
   private def countUnitNeed(unit: FriendlyUnitInfo, matcher: UnitMatcher): Unit = {
-    unitsPossessed(matcher) += PurpleMath.fromBoolean(unit.is(matcher))
+    unitsPossessed(matcher) += Maff.fromBoolean(unit.is(matcher))
   }
 
   // Captures the idea that if we have *no* units which serve a role, we really want at least one (eg anti-air, detector, etc)
   // but as we pass the amount we need, the marginal value rapidly declines
-  def scaleNeed(value: Double): Double = PurpleMath.clamp(value, 0.01, 100)
+  def scaleNeed(value: Double): Double = Maff.clamp(value, 0.01, 100)
 
   def utility(unit: FriendlyUnitInfo): Double = ByOption.max(utilityQualities(unit).view.map(_._3)).getOrElse(0.0)
 
@@ -56,7 +56,7 @@ class QualityCounter {
                 // We have thoroughly surpassed the required value: 0.0
                 // We are already at exact match value: 1.0
                 // We have no existing value: 2.0
-                val score = 1 + PurpleMath.clamp((valueRequired - valuePossessed) / valueRequired, -1, 1)
+                val score = 1 + Maff.clamp((valueRequired - valuePossessed) / valueRequired, -1, 1)
                 (friendlyQuality, enemyQuality._1, score)
             })))
 }

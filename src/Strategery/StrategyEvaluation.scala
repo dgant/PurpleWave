@@ -1,7 +1,7 @@
 package Strategery
 
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Strategery.History.HistoricalGame
 import Strategery.Strategies.Strategy
 
@@ -17,7 +17,7 @@ class StrategyEvaluation(val strategy: Strategy) {
   val gamesUsWeightSum      : Double  = gamesUs     .map(_.weight).sum
   val gamesUsWonWeightSum   : Double  = gamesUsWon  .map(_.weight).sum
   val targetWins            : Double  = With.configuration.targetWinrate
-  val winrateVsEnemy        : Double  = PurpleMath.nanToZero(gamesUsWonWeightSum / gamesUsWeightSum)
+  val winrateVsEnemy        : Double  = Maff.nanToZero(gamesUsWonWeightSum / gamesUsWeightSum)
 
   // Probability we win given this strategy
   val probabilityWin: Double = (priorGames * targetWins + gamesUsWonWeightSum) / (priorGames + gamesUsWeightSum)

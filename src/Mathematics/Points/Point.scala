@@ -1,13 +1,13 @@
 package Mathematics.Points
 
-import Mathematics.PurpleMath
+import Mathematics.Maff
 
 case class Point(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline final def degreesTo(other: Point): Double = {
     radiansTo(other) / radiansOverDegrees
   }
   @inline final def radiansTo(other: Point): Double = {
-    PurpleMath.fastAtan2(other.y - y, other.x - x)
+    Maff.fastAtan2(other.y - y, other.x - x)
   }
   @inline final def distanceSquared(other: Point): Double = {
     val dx = x - other.x

@@ -4,7 +4,7 @@ import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 import scala.collection.immutable.ListSet
@@ -21,7 +21,7 @@ object SquadTargeting {
     val flying      = units.forall(_.flying)
     val antiAir     = units.exists(_.canAttackAir)
     val antiGround  = units.exists(_.canAttackGround)
-    val originAir   = PurpleMath.exemplar(units.view.map(_.pixel))
+    val originAir   = Maff.exemplar(units.view.map(_.pixel))
     val origin      = if (flying) originAir.tile else originAir.nearestWalkableTile
     val goal        = if (flying) goalAir.tile else goalAir.nearestWalkableTile
     val distancePx  = if (flying) origin.center.pixelDistance(goal.center) else origin.groundPixels(goal.center)
@@ -38,7 +38,7 @@ object SquadTargeting {
   def rankEnRouteTo(units: Iterable[FriendlyUnitInfo], goalAir: Pixel): Vector[UnitInfo] = rank(units, enRouteTo(units, goalAir))
 
   def rank(units: Iterable[FriendlyUnitInfo], targets: Vector[UnitInfo]): Vector[UnitInfo] = {
-    val centroid  = PurpleMath.exemplar(units.view.map(_.pixel))
+    val centroid  = Maff.exemplar(units.view.map(_.pixel))
     val engaged     = units.exists(_.matchups.threatsInRange.nonEmpty)
     targets.sortBy(t =>
       t.pixelDistanceTravelling(centroid)

@@ -1,7 +1,7 @@
 package Tactics
 
 import Lifecycle.With
-import Mathematics.PurpleMath
+import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
@@ -23,7 +23,7 @@ class DefendAgainstWorkerRush extends Prioritized {
           && u.framesToGetInRange(ally) < 24 * 3)))
       .distinct
   
-    lazy val attackingCentroid = PurpleMath.centroid(attackingWorkers.map(_.pixel))
+    lazy val attackingCentroid = Maff.centroid(attackingWorkers.map(_.pixel))
     lazy val ourWorkers = With.units.countOurs(MatchWorker)
     lazy val ourCombatUnits = With.units.countOurs(MatchWarriors)
     

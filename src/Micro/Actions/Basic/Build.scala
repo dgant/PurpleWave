@@ -88,7 +88,7 @@ object Build extends Action {
       movePixel = movePixel.add(buildClass.width / 2, buildClass.height / 2)
     }
     unit.agent.toTravel = Some(movePixel)
-    MicroPathing.tryMovingAlongTilePath(unit, MicroPathing.getSimplePath(unit))
+    MicroPathing.tryMovingAlongTilePath(unit, MicroPathing.getSneakyPath(unit))
     Commander.move(unit)
   }
 }

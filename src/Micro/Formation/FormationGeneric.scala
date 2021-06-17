@@ -4,8 +4,6 @@ import Information.Geography.Pathfinding.PathfindProfile
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints, Tile}
 import Mathematics.PurpleMath
-import Planning.UnitMatchers.MatchTank
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.UnitTracking.UnorderedBuffer
 import Utilities.ByOption
@@ -14,16 +12,10 @@ import scala.collection.mutable
 
 object FormationGeneric {
 
-  /**
-    * Formation for units en route to a destination
-    */
   def march(units: Iterable[FriendlyUnitInfo], destination: Pixel) : Formation = {
     form(units, FormationStyleMarch, destination = Some(destination))
   }
 
-  /**
-    * Formation for units protecting a choke
-    */
   def guard(units: Iterable[FriendlyUnitInfo], origin: Option[Pixel] = None): Formation = {
     val finalOrigin: Pixel = origin.getOrElse(ByOption.mode(units.view.map(_.agent.origin)).getOrElse(With.geography.home.center))
     val output = finalOrigin.zone.exit
@@ -32,21 +24,11 @@ object FormationGeneric {
     output
   }
 
-  /**
-    * Formation for units trying to start a fight with an enemy
-    */
   def engage(units: Iterable[FriendlyUnitInfo], destination: Option[Pixel] = None): Formation = {
     form(units, FormationStyleEngage, destination = destination)
   }
 
-  /**
-    * Formation for units backing off from an enemy
-    */
-  def disengage(
-    units: Iterable[FriendlyUnitInfo],
-    origin: Option[Pixel] = None,
-    destination: Option[Pixel] = None)
-      : Formation = {
+  def disengage(units: Iterable[FriendlyUnitInfo], origin: Option[Pixel] = None, destination: Option[Pixel] = None): Formation = {
     form(units, FormationStyleDisengage, origin = origin, destination = destination)
   }
 
@@ -60,20 +42,10 @@ object FormationGeneric {
     val units = unitsUnfiltered.view.filter(_.unitClass.orderable)
     if (units.forall(_.flying)) return FormationEmpty
 
-    val groundUnits   = Some(units.filterNot(_.flying))
-    val anchorsTier1  = Some(units.filter(isAnchor1).toVector).filter(_.nonEmpty)
-    val anchorsTier2  = Some(units.filter(isAnchor2).toVector).filter(_.nonEmpty)
-    val anchors       = anchorsTier1.orElse(anchorsTier2)
-    val keyUnits =
-      anchorsTier1.map(_.filterNot(_.flying)).filter(_.nonEmpty).orElse(
-        anchorsTier2.map(_.filterNot(_.flying)).filter(_.nonEmpty)).orElse(
-          groundUnits.filter(_.nonEmpty)).orElse(
-            anchors.filter(_.nonEmpty)).getOrElse(
-              units)
-    val centroid              = keyUnits.view.map(_.pixel).minBy(_.pixelDistanceSquared(PurpleMath.centroid(keyUnits.view.map(_.pixel))))
+    val groundUnits           = units.filterNot(_.flying)
+    val centroid              = PurpleMath.weightedExemplar(units.view.map(u => (u.pixel, u.subjectiveValue)))._1
     lazy val modeOrigin       = origin.map(_.nearestWalkableTile).getOrElse(PurpleMath.mode(units.view.map(_.agent.simpleOrigin.tile)))
     lazy val modeTarget       = PurpleMath.mode(units.view.map(u => ByOption.minBy(u.matchups.targets)(u.pixelDistanceEdge).map(_.tile).getOrElse(u.agent.destination.tile)))
-    lazy val modeThreat       = PurpleMath.mode(units.view.map(u => ByOption.minBy(u.matchups.threats)(_.pixelsToGetInRange(u)).map(_.tile).getOrElse(u.agent.destination.tile)))
 
     // Start flood filling!
     val inf = With.mapTileArea
@@ -123,7 +95,7 @@ object FormationGeneric {
     val placements    = new mutable.HashMap[UnitInfo, Pixel]()
     val floodHorizon  = new mutable.PriorityQueue[(Tile, Int)]()(Ordering.by(-_._2))
     val explored      = With.grids.disposableBoolean()
-    val unplaced = groundUnits.get
+    val unplaced = groundUnits
       .groupBy(_.unitClass)
       .map(g => (new UnorderedBuffer[FriendlyUnitInfo](g._2), Math.max(1, g._2.map(_.formationRange.toInt / 32).max)))
       .toVector
@@ -156,16 +128,8 @@ object FormationGeneric {
     lazy val groundPlacementCentroid = PurpleMath.centroid(placements.values)
     units
       .filter(_.flying)
-      .foreach(u => placements(u) = floodOrigin.center.project(floodStart.center, Math.max(0, floodOrigin.center.pixelDistance(floodStart.center) - u.effectiveRangePixels)))
+      .foreach(u => placements(u) = floodOrigin.center.project(floodStart.center, Math.max(0, floodOrigin.center.pixelDistance(floodStart.center) - u.formationRange)))
     new Formation(style, placements.toMap)
-
-    // TODO:
-    // - Implement cost function
-    // [x] We need to keep flooding walkable tiles, even if they're diqualified for placement due to being in enemy range
-    // - Hook up and test as-is
-    // - Later: Implement engage, using enemy range and use unit effective range
-    // - Later: For retreat, ban tiles that are closer to enemy than to home (max distance from origin)
-    // - Later: We will probably need access to more tiles if the horizon empties out due to bad horizon selection (eg inside a nook). Maybe spiral from origin
   }
 
   private var floodOrigin             = SpecificPoints.tileMiddle
@@ -189,18 +153,5 @@ object FormationGeneric {
     // Punishing, eg, a dragoon for not being adjacent to its target, doesn't allow sniping units from uphill
     // Our current formula doesn't allow this, as we do a single flood-fill across unit types
     costDistanceGoal + costDistanceOrigin + costThreat + costVulnerability
-  }
-
-
-  private def isAnchor1(unit: UnitInfo): Boolean = {
-    if (MatchTank(unit)) return true
-    if (Protoss.Reaver(unit)) return true
-    if (Protoss.HighTemplar(unit) && unit.energy >= 75 && unit.player.hasTech(Protoss.PsionicStorm)) return true
-    if (Zerg.Defiler(unit)) return true
-    false
-  }
-
-  private def isAnchor2(unit: UnitInfo): Boolean = {
-    unit.isAny(Terran.Battlecruiser, Protoss.Carrier, Zerg.Guardian, Zerg.Lurker)
   }
 }

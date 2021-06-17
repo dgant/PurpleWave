@@ -5,14 +5,13 @@ import Information.Geography.Pathfinding.Types.TilePath
 import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
-import Mathematics.Points.{Pixel, PixelRay}
+import Mathematics.Points.{Pixel, PixelRay, Tile}
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Circle
 import Micro.Actions.Combat.Maneuvering.DownhillPathfinder
 import Micro.Agency.Commander
 import Micro.Coordination.Pushing.Push
 import Micro.Heuristics.Potential
-import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{ByOption, TakeN}
 
@@ -20,11 +19,21 @@ import scala.collection.SeqView
 
 object MicroPathing {
 
-  def getSimplePath(unit: FriendlyUnitInfo, to: Option[Pixel] = None): TilePath = {
+  def getSimplePath(unit: FriendlyUnitInfo, to: Option[Tile] = None): TilePath = {
     val pathfindProfile               = new PathfindProfile(unit.tile)
-    pathfindProfile.end               = to.orElse(unit.agent.toTravel).map(_.tile)
-    pathfindProfile.employGroundDist  = true
+    pathfindProfile.end               = to.orElse(unit.agent.toTravel.map(_.tile))
+    pathfindProfile.employGroundDist  = ! unit.flying
     pathfindProfile.unit              = Some(unit)
+    pathfindProfile.find
+  }
+
+  def getSneakyPath(unit: FriendlyUnitInfo, to: Option[Tile] = None): TilePath = {
+    val pathfindProfile               = new PathfindProfile(unit.tile)
+    pathfindProfile.end               = to.orElse(unit.agent.toTravel.map(_.tile))
+    pathfindProfile.employGroundDist  = ! unit.flying
+    pathfindProfile.unit              = Some(unit)
+    pathfindProfile.costEnemyVision   = 5
+    pathfindProfile.costThreat        = 25
     pathfindProfile.find
   }
 

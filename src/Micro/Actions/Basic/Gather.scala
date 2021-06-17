@@ -6,6 +6,7 @@ import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Targeting.Target
 import Micro.Agency.Commander
+import Micro.Coordination.Pathing.MicroPathing
 import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -102,6 +103,15 @@ object Gather extends Action {
         && threatCloser
         && (unit.visibleToOpponents || ! unit.agent.withinSafetyMargin || unit.zone.edges.exists(_.contains(unit.pixel)))) {
         Retreat.consider(unit)
+      }
+    }
+
+    // Take safe/hidden route to expansion
+    if (unit.metro != resource.metro) {
+      val nextZone = ByOption.minBy(unit.zone.edges)(_.pixelCenter.groundPixels(resource.zone.centroid))
+      unit.agent.toTravel = MicroPathing.getWaypointAlongTilePath(MicroPathing.getSneakyPath(unit, Some(resource.tile.nearestWalkableTile)))
+      if (unit.agent.toTravel.isDefined) {
+        Commander.move(unit)
       }
     }
 

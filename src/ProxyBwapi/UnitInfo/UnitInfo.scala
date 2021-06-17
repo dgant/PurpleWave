@@ -5,7 +5,7 @@ import Information.Battles.Clustering.BattleCluster
 import Information.Battles.MCRS.MCRSUnit
 import Information.Battles.Prediction.Simulation.{ReportCard, Simulacrum}
 import Information.Battles.Types.{BattleLocal, Team}
-import Information.Geography.Types.{Base, Zone}
+import Information.Geography.Types.{Base, Metro, Zone}
 import Lifecycle.With
 import Mathematics.Physics.Force
 import Mathematics.Points._
@@ -129,6 +129,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
 
   @inline final def zone: Zone = if (unitClass.isBuilding) tileTopLeft.zone else tile.zone // Hack to get buildings categorized in zone they were intended to be constructed in
   @inline final def base: Option[Base] = tile.base
+  @inline final def metro: Option[Metro] = tile.metro
 
 
   @inline final def canTraverse(pixel: Pixel): Boolean = pixel.traversableBy(this)

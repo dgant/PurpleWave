@@ -72,7 +72,7 @@ class ZvZ12Pool extends GameplanTemplate {
       Get(Zerg.ZerglingSpeed)),
 
     new If(
-      new UnitsAtLeast(1, Zerg.Mutalisk, countEggs = true),
+      new UnitsAtLeast(1, Zerg.Mutalisk),
       new PumpJustEnoughScourge,
       new PumpRatio(Zerg.Scourge, 0, 12, Seq(Enemy(Zerg.Mutalisk, 2.0)))),
     new Pump(Zerg.Mutalisk, 5),

@@ -24,21 +24,21 @@ import Strategery.Transistor
 
 class ZvP2HatchMuta extends GameplanTemplate {
   
-  override val activationCriteria: Predicate = new Employing(ZvP2HatchMuta)
+  override val activationCriteria: Predicate = Employing(ZvP2HatchMuta)
   
-  class ProceedWithTech extends Or(
-      new Latch(new UnitsAtLeast(14, Zerg.Drone)),
-      new Latch(new UnitsAtLeast(8, Zerg.Zergling, countEggs = true)),
-      new Latch(new UnitsAtLeast(2, Zerg.SunkenColony)),
-      new Not(new EnemyStrategy(
-        With.fingerprints.twoGate,
-        With.fingerprints.proxyGateway)))
+  object ProceedWithTech extends Or(
+    Latch(UnitsAtLeast(14, Zerg.Drone)),
+    Latch(UnitsAtLeast(8, Zerg.Zergling)),
+    Latch(UnitsAtLeast(2, Zerg.SunkenColony)),
+    Not(EnemyStrategy(
+      With.fingerprints.twoGate,
+      With.fingerprints.proxyGateway)))
   
-  class ProceedWithDrones extends Or(
-    new ProceedWithTech,
-    new Latch(new UnitsAtLeast(1, Zerg.Zergling)))
+  object ProceedWithDrones extends Or(
+    ProceedWithTech,
+    Latch(UnitsAtLeast(1, Zerg.Zergling)))
 
-  class ShouldDoSpeedlingAllIn extends EnemyStrategy(
+  object ShouldDoSpeedlingAllIn extends EnemyStrategy(
     With.fingerprints.cannonRush,
     With.fingerprints.proxyGateway)
 
@@ -47,8 +47,8 @@ class ZvP2HatchMuta extends GameplanTemplate {
     new BuildOrder(Get(10, Zerg.Zergling)),
     new If(
       new Or(
-        new GasAtLeast(100),
-        new UpgradeComplete(Zerg.ZerglingSpeed, 1, Zerg.ZerglingSpeed.upgradeFrames(1))),
+        GasAtLeast(100),
+        UpgradeComplete(Zerg.ZerglingSpeed, 1, Zerg.ZerglingSpeed.upgradeFrames(1))),
       new CapGasAt(0)),
     new FlipIf(
       new SafeAtHome,
@@ -59,7 +59,7 @@ class ZvP2HatchMuta extends GameplanTemplate {
       Get(Zerg.ZerglingSpeed)),
     new RequireMiningBases(3),
     new If(
-      new MineralsAtLeast(400),
+      MineralsAtLeast(400),
       new RequireMiningBases(4)))
   
   private def sunkenProfile = if (Transistor.matches)
@@ -72,10 +72,10 @@ class ZvP2HatchMuta extends GameplanTemplate {
 
   override def attackPlan: Plan = new If(
     new Or(
-      new UnitsAtLeast(1, Zerg.Mutalisk, complete = true),
-      new UpgradeComplete(Zerg.ZerglingSpeed),
-      new ShouldDoSpeedlingAllIn,
-      new EnemyBasesAtLeast(2)),
+      UnitsAtLeast(1, Zerg.Mutalisk, complete = true),
+      UpgradeComplete(Zerg.ZerglingSpeed),
+      ShouldDoSpeedlingAllIn,
+      EnemyBasesAtLeast(2)),
     new Attack)
 
   override def buildOrderPlan: Plan = new Parallel(
@@ -88,7 +88,7 @@ class ZvP2HatchMuta extends GameplanTemplate {
       Get(Zerg.Extractor),
       Get(14, Zerg.Drone)),
     new If(
-      new EnemyStrategy(With.fingerprints.forgeFe, With.fingerprints.nexusFirst),
+      EnemyStrategy(With.fingerprints.forgeFe, With.fingerprints.nexusFirst),
       new Parallel(
         new BuildOrder(
           Get(17, Zerg.Drone),
@@ -100,7 +100,7 @@ class ZvP2HatchMuta extends GameplanTemplate {
           Get(Zerg.Spire),
           Get(24, Zerg.Drone)))), // 26 if we never made any Zerglings accidentally along the way
     new If(
-      new EnemyStrategy(With.fingerprints.gatewayFe),
+      EnemyStrategy(With.fingerprints.gatewayFe),
       new Parallel(
         new BuildOrder(
           Get(8, Zerg.Zergling),
@@ -117,33 +117,33 @@ class ZvP2HatchMuta extends GameplanTemplate {
   lazy val ZealotOrDragoon = MatchOr(Protoss.Zealot, Protoss.Dragoon)
   
   class ReactiveSunkensVsZealots extends If(
-    new And(
-      new UnitsAtLeast(12, Zerg.Drone),
-      new UnitsAtMost(0, Zerg.Spire, complete = true)),
+    And(
+      UnitsAtLeast(12, Zerg.Drone),
+      UnitsAtMost(0, Zerg.Spire, complete = true)),
     new If(
-      new EnemiesAtLeast(17, ZealotOrDragoon),
+      EnemiesAtLeast(17, ZealotOrDragoon),
       new BuildSunkensAtNatural(7, sunkenProfile),
       new If(
-        new EnemiesAtLeast(13, ZealotOrDragoon),
+        EnemiesAtLeast(13, ZealotOrDragoon),
         new BuildSunkensAtNatural(6, sunkenProfile),
         new If(
-          new EnemiesAtLeast(10, ZealotOrDragoon),
+          EnemiesAtLeast(10, ZealotOrDragoon),
           new BuildSunkensAtNatural(5, sunkenProfile),
           new If(
-            new EnemiesAtLeast(7, ZealotOrDragoon),
+            EnemiesAtLeast(7, ZealotOrDragoon),
             new BuildSunkensAtNatural(4, sunkenProfile),
             new If(
-              new EnemiesAtLeast(5, ZealotOrDragoon),
+              EnemiesAtLeast(5, ZealotOrDragoon),
               new BuildSunkensAtNatural(3, sunkenProfile),
               new If(
-                new EnemiesAtLeast(3, ZealotOrDragoon),
+                EnemiesAtLeast(3, ZealotOrDragoon),
                 new BuildSunkensAtNatural(2, sunkenProfile),
                 new If(
-                  new EnemyStrategy(With.fingerprints.twoGate),
+                  EnemyStrategy(With.fingerprints.twoGate),
                   new BuildSunkensAtNatural(2, sunkenProfile)))))))))
   
   class ReactiveZerglings extends If(
-    new UnitsAtMost(0, Zerg.Spire, complete = true),
+    UnitsAtMost(0, Zerg.Spire, complete = true),
     new PumpRatio(Zerg.Zergling, 0, 10, Seq(
       Friendly(MatchAnd(Zerg.SunkenColony, MatchComplete), -6.0),
       Enemy(Terran.Marine, 1.5),
@@ -152,13 +152,13 @@ class ZvP2HatchMuta extends GameplanTemplate {
       Enemy(Protoss.Zealot, 4.0),
       Enemy(Zerg.Zergling, 1.75))))
   
-  class NeedExpansion(droneCount: Int) extends Or(
-    new UnitsAtLeast(droneCount, Zerg.Drone),
-    new MineralsAtLeast(500))
+  case class NeedExpansion(droneCount: Int) extends Or(
+    UnitsAtLeast(droneCount, Zerg.Drone),
+    MineralsAtLeast(500))
   
-  class ReadyToExpand extends Or(
-    new UnitsAtLeast(1, Zerg.Spire, complete = true),
-    new MineralsAtLeast(300))
+  object ReadyToExpand extends Or(
+    UnitsAtLeast(1, Zerg.Spire, complete = true),
+    MineralsAtLeast(300))
   
   override def emergencyPlans: Seq[Plan] = Vector(
     new Pump(Zerg.SunkenColony),
@@ -181,7 +181,7 @@ class ZvP2HatchMuta extends GameplanTemplate {
   
     new CapGasAt(0),
     new If(
-      new Not(new ProceedWithTech)),
+      new Not(ProceedWithTech)),
       new CapGasAt(0),
       new If(
         new UnitsAtMost(1, Zerg.Spire),
@@ -262,7 +262,7 @@ class ZvP2HatchMuta extends GameplanTemplate {
         new Pump(Zerg.Mutalisk))),
     
     new If(
-      new ShouldDoSpeedlingAllIn,
+      ShouldDoSpeedlingAllIn,
       new DoSpeedlingAllIn),
     
     new ReactiveZerglings,
@@ -273,14 +273,14 @@ class ZvP2HatchMuta extends GameplanTemplate {
         Get(8, Zerg.Mutalisk))), // make sure we have enough when mutas pop
 
     new Pump(Zerg.Drone, 9),
-    new If(new ProceedWithDrones, new Pump(Zerg.Drone, 12)),
+    new If(ProceedWithDrones, new Pump(Zerg.Drone, 12)),
     new If(
-      new ProceedWithTech,
+      ProceedWithTech,
       new Build(
         Get(Zerg.Lair),
         Get(Zerg.Spire),
         Get(Zerg.ZerglingSpeed))),
-    new If(new ProceedWithDrones, new Pump(Zerg.Drone, 16)),
+    new If(ProceedWithDrones, new Pump(Zerg.Drone, 16)),
 
     new If(
       new UnitsAtLeast(1, Zerg.Spire),
@@ -294,38 +294,38 @@ class ZvP2HatchMuta extends GameplanTemplate {
         new If(
           new UnitsAtLeast(34, Zerg.Drone),
           new BuildGasPumps(5))),
-      new If(new ProceedWithDrones, new Pump(Zerg.Drone, 24))),
+      new If(ProceedWithDrones, new Pump(Zerg.Drone, 24))),
     new If(
       new And(
         new NeedExpansion(20),
-        new ReadyToExpand),
+        ReadyToExpand),
       new RequireMiningBases(3)),
     new If(
       new And(
         new NeedExpansion(26),
-        new ReadyToExpand),
+        ReadyToExpand),
       new RequireBases(4)),
     new If(
       new And(
         new NeedExpansion(32),
-        new ReadyToExpand),
+        ReadyToExpand),
       new RequireBases(5)),
     new If(
       new And(
         new NeedExpansion(40),
-        new ReadyToExpand),
+        ReadyToExpand),
       new RequireBases(6)),
     new If(
       new And(
         new NeedExpansion(50),
-        new ReadyToExpand),
+        ReadyToExpand),
       new RequireBases(7)),
     new If(
-      new ProceedWithDrones,
+      ProceedWithDrones,
       new Pump(Zerg.Drone, 16)),
     new Pump(Zerg.Zergling, 4),
     new If(
-      new ProceedWithDrones,
+      ProceedWithDrones,
       new Pump(Zerg.Drone, 24)),
     new IfOnMiningBases(3, new Pump(Zerg.Drone, 24)),
     new IfOnMiningBases(4, new Pump(Zerg.Drone, 32)),

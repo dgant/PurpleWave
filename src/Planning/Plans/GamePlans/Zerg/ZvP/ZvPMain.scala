@@ -123,7 +123,7 @@ class ZvPMain extends GameplanTemplate {
     // Get just enough army to defend while we go five Hatch
     new If(
       new And(
-        new UnitsAtLeast(30, MatchWarriors, countEggs = true),
+        new UnitsAtLeast(30, MatchWarriors),
         new SafeAtHome),
       new Pump(Zerg.Drone, 30)),
 

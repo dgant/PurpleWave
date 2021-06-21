@@ -25,7 +25,7 @@ class ZergReactionVsWorkerRush extends GameplanTemplate {
   override def buildPlans: Seq[Plan] = Seq(
     new If(
       new And(
-        new UnitsAtLeast(2, Zerg.Zergling, countEggs = true),
+        new UnitsAtLeast(2, Zerg.Zergling),
         new UnitsAtLeast(1, Zerg.SpawningPool)),
       new CapGasAt(100),
       new CapGasAt(0)),

@@ -33,7 +33,7 @@ object ZvZIdeas {
         new Pump(Zerg.Drone, 9)),
       new PumpRatio(Zerg.Zergling, 0, 12, Seq(Enemy(Zerg.Zergling, 1.0))),
       new If(
-        new UnitsAtLeast(8, Zerg.Drone, countEggs = true),
+        new UnitsAtLeast(8, Zerg.Drone),
         new BuildSunkensInMain(4))
     ))
 }

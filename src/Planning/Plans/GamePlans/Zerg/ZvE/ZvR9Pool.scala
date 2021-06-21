@@ -17,14 +17,13 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones.{TechComplete, TechStarted, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy._
-import Tactics.DefendFightersAgainstRush
 import Planning.UnitMatchers.MatchOr
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.ZvR9Pool
 
 class ZvR9Pool extends GameplanTemplate {
   
-  override val activationCriteria = new Employing(ZvR9Pool)
+  override val activationCriteria = Employing(ZvR9Pool)
 
   override def scoutPlan: Plan = NoPlan()
 
@@ -34,9 +33,9 @@ class ZvR9Pool extends GameplanTemplate {
       new EnemyIsProtoss,
       new And(
         new EnemyIsZerg,
-        new Not(new EnemyStrategy(With.fingerprints.fourPool))),
-      new UnitsAtLeast(1, Zerg.Mutalisk, complete = true),
-      new UnitsAtLeast(1, Zerg.Lurker, complete = true)),
+        new Not(EnemyStrategy(With.fingerprints.fourPool))),
+      UnitsAtLeast(1, Zerg.Mutalisk, complete = true),
+      UnitsAtLeast(1, Zerg.Lurker, complete = true)),
     new Attack)
 
   override def emergencyPlans: Seq[Plan] = Seq(
@@ -46,7 +45,7 @@ class ZvR9Pool extends GameplanTemplate {
 
   class GoLurkers extends Latch(
     new And(
-      new UnitsAtMost(0, Zerg.Spire),
+      UnitsAtMost(0, Zerg.Spire),
       new EnemyIsTerran))
 
   override def buildOrder: Seq[BuildRequest] = Vector(

@@ -5,7 +5,7 @@ import Planning.Predicates.Never
 import Planning.{Predicate, Property}
 import Utilities.Forever
 
-class Latch(initialPredicate: Predicate = new Never, duration: Int = Forever()) extends Predicate {
+case class Latch(initialPredicate: Predicate = new Never, duration: Int = Forever()) extends Predicate {
   
   val predicate = new Property[Predicate](initialPredicate)
   

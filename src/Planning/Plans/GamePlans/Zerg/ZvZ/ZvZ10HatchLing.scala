@@ -43,7 +43,7 @@ class ZvZ10HatchLing extends GameplanTemplate {
     new Trigger(
       new And(
         new UnitsAtLeast(1, Zerg.SpawningPool),
-        new UnitsAtLeast(9, Zerg.Drone, countEggs = true)),
+        new UnitsAtLeast(9, Zerg.Drone)),
       new BuildOrder(
       Get(Zerg.Extractor),
       Get(2, Zerg.Overlord),

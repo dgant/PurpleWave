@@ -83,12 +83,12 @@ class ZvT3HatchLing extends GameplanTemplate {
 
     new Build(Get(Zerg.HydraliskDen)),
     new If(
-      new UnitsAtLeast(16, Zerg.Drone, countEggs = true),
+      new UnitsAtLeast(16, Zerg.Drone),
       new BuildGasPumps(2)),
 
     new Pump(Zerg.Drone, 18),
     new FlipIf(
-      new UnitsAtLeast(2, Zerg.Hydralisk, countEggs = true),
+      new UnitsAtLeast(2, Zerg.Hydralisk),
       new UpgradeHydraRangeThenSpeed),
     new Pump(Zerg.Hydralisk),
     new Pump(Zerg.Drone, 20)

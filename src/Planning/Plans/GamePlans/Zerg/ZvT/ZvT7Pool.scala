@@ -2,10 +2,9 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.{Plan, Predicate}
 import Planning.Plans.Army.{AllInIf, Attack}
 import Planning.Plans.Basic.Write
-import Planning.Plans.Compound.{If, Parallel, Trigger}
+import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAt, Pump}
@@ -16,6 +15,7 @@ import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, StartPositionsAtLeast}
 import Planning.UnitMatchers.MatchOr
+import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvT7Pool
 
@@ -32,8 +32,8 @@ class ZvT7Pool extends GameplanTemplate {
       new Not(new FoundEnemyBase)),
     new Trigger(
       new And(
-        new UnitsAtLeast(2, Zerg.Overlord, countEggs = true),
-        new UnitsAtLeast(8, Zerg.Drone, countEggs = true)),
+        new UnitsAtLeast(2, Zerg.Overlord),
+        new UnitsAtLeast(8, Zerg.Drone)),
       new ScoutWithWorkers))
 
   override def emergencyPlans: Seq[Plan] = Seq(

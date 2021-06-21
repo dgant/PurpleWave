@@ -12,7 +12,7 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Placement.{BuildBunkersAtNatural, BuildMissileTurretsAtBases, BuildMissileTurretsAtNatural}
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyLurkers, EnemyMutalisks, SafeToMoveOut}
+import Planning.Predicates.Reactive.{EnemyLurkersLikely, EnemyMutalisksLikely, SafeToMoveOut}
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.{MatchOr, MatchTank, MatchWarriors}
 import Planning.{Plan, Predicate}
@@ -52,7 +52,7 @@ class TvZSK extends GameplanTemplate {
   override def workerPlan: Plan = new Parallel(
     new Trigger(
       new Or(
-        new EnemyLurkers,
+        new EnemyLurkersLikely,
         new UnitsAtLeast(5, Terran.Barracks),
         new UnitsAtLeast(1, Terran.Factory)),
       new Pump(Terran.Comsat)),
@@ -157,7 +157,7 @@ class TvZSK extends GameplanTemplate {
       Get(2, Terran.Barracks)),
 
     new FlipIf(
-      new EnemyLurkers,
+      new EnemyLurkersLikely,
       new If(new Not(new GoTank), new Build(Get(5, Terran.Barracks))),
       new Parallel(
         new Build(Get(Terran.Factory)),
@@ -165,8 +165,8 @@ class TvZSK extends GameplanTemplate {
         new BuildGasPumps,
         new If(
           new Or(
-            new EnemyMutalisks,
-            new Not(new EnemyLurkers)),
+            new EnemyMutalisksLikely,
+            new Not(new EnemyLurkersLikely)),
           new BuildMissileTurretsAtBases(3)),
         new Build(
           Get(Terran.Starport),

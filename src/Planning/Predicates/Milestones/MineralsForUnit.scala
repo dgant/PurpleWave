@@ -1,9 +1,9 @@
 package Planning.Predicates.Milestones
 
-import Planning.Plans.Compound.Or
-import Planning.Predicates.Economy.MineralsAtLeast
+import Planning.Predicate
+import Planning.Predicates.MacroFacts
 import ProxyBwapi.UnitClasses.UnitClass
 
-class MineralsForUnit(unitClass: UnitClass, quantity: Int = 1) extends Or(
-  new MineralsAtLeast(unitClass.mineralPrice),
-  new UnitsAtLeast(quantity, unitClass))
+case class MineralsForUnit(unitClass: UnitClass, quantity: Int = 1) extends Predicate {
+  override def apply: Boolean = MacroFacts.haveMineralsForUnit(unitClass, quantity)
+}

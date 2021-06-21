@@ -9,6 +9,6 @@ class IfOnMiningBases(
   argWhenTrue   : Plan = NoPlan(),
   argWhenFalse  : Plan = NoPlan())
   extends If(
-    new MiningBasesAtLeast(requiredBases),
+    MiningBasesAtLeast(requiredBases),
     argWhenTrue,
     argWhenFalse)

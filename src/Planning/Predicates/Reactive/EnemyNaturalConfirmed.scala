@@ -1,8 +1,8 @@
 package Planning.Predicates.Reactive
 
-import Lifecycle.With
 import Planning.Predicate
+import Planning.Predicates.MacroFacts
 
-class EnemyNaturalConfirmed extends Predicate {
-  override def apply: Boolean = With.geography.enemyBases.exists(b => b.isNaturalOf.isDefined && b.townHall.isDefined)
+case class EnemyNaturalConfirmed() extends Predicate {
+  override def apply: Boolean = MacroFacts.enemyNaturalConfirmed
 }

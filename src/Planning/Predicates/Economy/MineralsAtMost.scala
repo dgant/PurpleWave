@@ -1,10 +1,8 @@
 package Planning.Predicates.Economy
 
-import Lifecycle.With
 import Planning.Predicate
+import Planning.Predicates.MacroFacts
 
-class MineralsAtMost(value: Int) extends Predicate {
-  
-  override def apply: Boolean = With.self.minerals <= value
-  
+case class MineralsAtMost(value: Int) extends Predicate {
+  override def apply: Boolean = MacroFacts.minerals <= value
 }

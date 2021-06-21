@@ -1,18 +1,9 @@
 package Planning.Predicates.Milestones
 
-import Lifecycle.With
 import Planning.Predicate
+import Planning.Predicates.MacroFacts
 import ProxyBwapi.Upgrades.Upgrade
 
-class UpgradeComplete(upgrade: Upgrade, level: Int = 1, withinFrames: Int = 0) extends Predicate {
-  
-  override def apply: Boolean = (
-    With.self.getUpgradeLevel(upgrade) >= level
-    || (
-      With.self.getUpgradeLevel(upgrade) == level - 1
-      && withinFrames > 0
-      && With.units.ours.exists(unit =>
-        unit.upgrading
-        && unit.upgradingType == upgrade
-        && unit.remainingUpgradeFrames <= withinFrames)))
+case class UpgradeComplete(upgrade: Upgrade, level: Int = 1, withinFrames: Int = 0) extends Predicate {
+  override def apply: Boolean = MacroFacts.upgradeComplete(upgrade, level, withinFrames)
 }

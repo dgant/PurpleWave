@@ -7,7 +7,6 @@ import Mathematics.Points.{Pixel, SpecificPoints}
 import Micro.Agency.AnchorMargin
 import Micro.Formation.Formation
 import Micro.Squads.Qualities.QualityCounter
-import Micro.Targeting.Filters.TargetFilter
 import Performance.Cache
 import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
@@ -22,14 +21,11 @@ trait Squad extends Prioritized {
   var formation: Option[Formation] = None
   val lock: LockUnits = new LockUnits(this)
   var targetQueue: Option[Seq[UnitInfo]] = None
-  var targetFilters: Seq[TargetFilter] = Seq.empty
 
   private var _unitsNow = new ArrayBuffer[FriendlyUnitInfo]
   private var _unitsNext = new ArrayBuffer[FriendlyUnitInfo]
   private var _enemiesNow = new ArrayBuffer[UnitInfo]
   private var _enemiesNext = new ArrayBuffer[UnitInfo]
-  private var _targetsEnemiesNow = false
-  private var _targetsEnemiesNext = false
   private val _qualityCounter = new QualityCounter
 
   private def commission(): Unit = {
@@ -45,8 +41,8 @@ trait Squad extends Prioritized {
     _qualityCounter.utility(candidate)
   }
 
-  def units: Iterable[FriendlyUnitInfo] = _unitsNow
-  def unitsNext: Iterable[FriendlyUnitInfo] = _unitsNext
+  def units: Seq[FriendlyUnitInfo] = _unitsNow
+  def unitsNext: Seq[FriendlyUnitInfo] = _unitsNext
   @inline final def addUnits(units: Iterable[FriendlyUnitInfo]): Unit = units.foreach(addUnit)
   @inline final def addUnit(unit: FriendlyUnitInfo): Unit = {
     commission()
@@ -54,16 +50,13 @@ trait Squad extends Prioritized {
     _qualityCounter.countUnit(unit)
   }
 
-  def enemies: Iterable[UnitInfo] = _enemiesNow
-  @inline final def targetsEnemies: Boolean = enemies.nonEmpty || _targetsEnemiesNow
+  def enemies: Seq[UnitInfo] = _enemiesNow
   @inline final def addEnemies(enemies: Iterable[UnitInfo]): Unit = {
     commission()
-    _targetsEnemiesNext = true
     enemies.foreach(_includeEnemy)
   }
   @inline final def addEnemy(enemy: UnitInfo): Unit = {
     commission()
-    _targetsEnemiesNext = true
     _includeEnemy(enemy)
   }
   private def _includeEnemy(enemy: UnitInfo): Unit = {
@@ -84,8 +77,6 @@ trait Squad extends Prioritized {
     _enemiesNow = _enemiesNext
     _enemiesNext = swapEnemies
     _enemiesNow.foreach(_.foreign.foreach(_.addSquad(this)))
-    _targetsEnemiesNow = _targetsEnemiesNext
-    _targetsEnemiesNext = false
   }
   def run(): Unit
 

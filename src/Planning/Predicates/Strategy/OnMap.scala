@@ -1,10 +1,9 @@
 package Planning.Predicates.Strategy
 
 import Planning.Predicate
+import Planning.Predicates.MacroFacts
 import Strategery.StarCraftMap
 
-class OnMap(map: StarCraftMap*) extends Predicate {
-  
-  override def apply: Boolean = map.exists(_.matches)
-  
+case class OnMap(maps: StarCraftMap*) extends Predicate {
+  override def apply: Boolean = MacroFacts.onMap(maps: _*)
 }

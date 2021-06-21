@@ -1,10 +1,8 @@
 package Planning.Predicates.Reactive
 
-import Lifecycle.With
 import Planning.Predicate
+import Planning.Predicates.MacroFacts
 
-class EnemyBasesAtLeast(value: Int) extends Predicate {
-  
-  override def apply: Boolean = With.geography.enemyBases.size >= value
-  
+case class EnemyBasesAtLeast(value: Int) extends Predicate {
+  override def apply: Boolean = MacroFacts.enemyBases >= value
 }

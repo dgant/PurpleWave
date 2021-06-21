@@ -1,9 +1,8 @@
 package Planning.Predicates.Milestones
 
-import Planning.{Plan, Predicate}
+import Planning.Predicate
+import Planning.Predicates.MacroFacts
 
-class MiningBasesAtMost(requiredBases: Int) extends Predicate {
-  
-  override def apply: Boolean = AllMiningBases().size <= requiredBases
-  
+case class MiningBasesAtMost(requiredBases: Int) extends Predicate {
+  override def apply: Boolean = MacroFacts.miningBases <= requiredBases
 }

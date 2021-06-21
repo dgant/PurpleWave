@@ -1,14 +1,10 @@
 package Planning.Predicates.Strategy
 
 import Information.Fingerprinting.Fingerprint
-import Lifecycle.With
-import Planning.Plans.Compound.Or
 import Planning.Predicate
+import Planning.Predicates.MacroFacts
 
-class EnemyRecentStrategy(fingerprints: Fingerprint*) extends Or(
-  new EnemyStrategy(fingerprints: _*),
-  new Predicate {
-    override def apply: Boolean = {
-      fingerprints.map(_.toString).exists(With.strategy.enemyRecentFingerprints.contains)
-    }
-})
+case class EnemyRecentStrategy(fingerprints: Fingerprint*) extends Predicate {
+  override def apply: Boolean = MacroFacts.enemyRecentStrategy(fingerprints: _*)
+}
+

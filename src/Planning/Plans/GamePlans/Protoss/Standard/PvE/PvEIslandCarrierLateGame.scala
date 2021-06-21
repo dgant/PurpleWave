@@ -15,7 +15,7 @@ import Planning.Plans.Macro.Protoss.BuildTowersAtBases
 import Planning.Plans.Placement.ProposePlacement
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Milestones.{EnemyHasShown, OnGasPumps, UnitsAtLeast, UpgradeComplete}
-import Planning.Predicates.Reactive.EnemyMutalisks
+import Planning.Predicates.Reactive.EnemyMutalisksLikely
 import Planning.Predicates.Strategy.OnMap
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountOne
@@ -104,7 +104,7 @@ class PvEIslandCarrierLateGame extends Parallel(
 
   // Corsairs
   new If(
-    new EnemyMutalisks,
+    new EnemyMutalisksLikely,
     new Parallel(
       new Pump(Protoss.Corsair, 8),
       new BuildTowersAtBases(2),
@@ -123,7 +123,7 @@ class PvEIslandCarrierLateGame extends Parallel(
       Get(2, Protoss.Observer))),
 
   new If(
-    new EnemyMutalisks,
+    new EnemyMutalisksLikely,
     new IslandCarrierUpgrades),
 
   new Build(Get(Protoss.FleetBeacon)),

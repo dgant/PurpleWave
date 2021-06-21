@@ -1,12 +1,8 @@
 package Planning.Predicates.Milestones
 
-import Lifecycle.With
 import Planning.Predicate
+import Planning.Predicates.MacroFacts
 
-class GasPumpsAtMost(maxPumps: Int) extends Predicate {
-  
-  override def apply: Boolean =
-    With.geography.ourBases
-      .map(_.gas.count(_.gasLeft > 300))
-      .sum <= maxPumps
+case class GasPumpsAtMost(maxPumps: Int) extends Predicate {
+  override def apply: Boolean = MacroFacts.gasPumps <= maxPumps
 }

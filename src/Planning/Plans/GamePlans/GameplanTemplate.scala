@@ -17,7 +17,7 @@ import Planning.Predicates.{Always, Never}
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Strategy.WeAreZerg
 
-abstract class GameplanTemplate extends Plan with Modal{
+abstract class GameplanTemplate extends Plan with Modal {
   val activationCriteria    : Predicate         = new Always
   val completionCriteria    : Predicate         = new Never
   val meldArchonsAt         : Int               = 40

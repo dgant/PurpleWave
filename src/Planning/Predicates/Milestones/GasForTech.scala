@@ -1,9 +1,9 @@
 package Planning.Predicates.Milestones
 
-import Planning.Plans.Compound.Or
-import Planning.Predicates.Economy.GasAtLeast
+import Planning.Predicate
+import Planning.Predicates.MacroFacts
 import ProxyBwapi.Techs.Tech
 
-class GasForTech(tech: Tech) extends Or(
-  new GasAtLeast(tech.gasPrice),
-  new TechStarted(tech))
+case class GasForTech(tech: Tech) extends Predicate {
+  override def apply: Boolean = MacroFacts.haveGasForTech(tech)
+}

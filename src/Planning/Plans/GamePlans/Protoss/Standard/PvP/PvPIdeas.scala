@@ -432,9 +432,8 @@ object PvPIdeas {
     new EnemiesAtMost(0, Protoss.Observer),
     new If(
       new EnemiesAtMost(0, Protoss.PhotonCannon),
-      new Pump(Protoss.DarkTemplar, 3),
-      new Pump(Protoss.DarkTemplar, 2)),
-    new If(new GasPumpsAtLeast(2), new Pump(Protoss.DarkTemplar, 1)))
+      new Pump(Protoss.DarkTemplar, 2),
+      new Pump(Protoss.DarkTemplar, 1)))
 
   class TrainArmy extends Parallel(
     new Pump(Protoss.Carrier),

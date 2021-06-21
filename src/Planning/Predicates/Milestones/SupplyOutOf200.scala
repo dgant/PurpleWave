@@ -1,11 +1,8 @@
 package Planning.Predicates.Milestones
 
-import Lifecycle.With
-import Planning.{Predicate, Property}
+import Planning.Predicate
+import Planning.Predicates.MacroFacts
 
-class SupplyOutOf200(defaultQuantity: Int = 0) extends Predicate {
-  
-  val quantity = new Property[Int](defaultQuantity)
-  
-  override def apply: Boolean = With.self.supplyUsed >= quantity.get * 2
+case class SupplyOutOf200(quantity: Int = 0) extends Predicate {
+  override def apply: Boolean = MacroFacts.supplyUsed200 >= quantity
 }

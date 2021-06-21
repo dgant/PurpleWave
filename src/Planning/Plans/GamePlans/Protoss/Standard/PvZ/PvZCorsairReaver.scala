@@ -11,7 +11,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Predicates.Compound.{And, Latch}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.EnemyMutalisks
+import Planning.Predicates.Reactive.EnemyMutalisksLikely
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -60,7 +60,7 @@ class PvZCorsairReaver extends GameplanTemplate {
       Get(Protoss.Stargate),
       Get(Protoss.RoboticsFacility)),
     new If(
-      new EnemyMutalisks,
+      new EnemyMutalisksLikely,
       new UpgradeContinuously(Protoss.AirDamage),
       new BuildOrder(Get(Protoss.Shuttle))),
     new BuildOrder(

@@ -3,7 +3,7 @@ package Planning.Predicates.Milestones
 import Lifecycle.With
 import Planning.Predicate
 
-class FrameAtLeast(frame: () => Int) extends Predicate {
+case class FrameAtLeast(frame: () => Int) extends Predicate {
 
   def this(specificFrame: Int) = this(() => specificFrame)
 

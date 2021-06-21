@@ -1,18 +1,8 @@
 package Planning.Predicates.Reactive
 
-import Lifecycle.With
 import Planning.Predicate
-import ProxyBwapi.Races.Protoss
+import Planning.Predicates.MacroFacts
 
-class EnemyDarkTemplarLikely extends Predicate {
-  
-  override def apply: Boolean = (
-    With.fingerprints.dtRush.matches
-    || With.units.existsEnemy(
-        Protoss.HighTemplar,
-        Protoss.Archon,
-        Protoss.DarkArchon,
-        Protoss.TemplarArchives,
-        Protoss.ArbiterTribunal,
-        Protoss.Arbiter))
+case class EnemyDarkTemplarLikely() extends Predicate {
+  override def apply: Boolean = MacroFacts.enemyDarkTemplarLikely
 }

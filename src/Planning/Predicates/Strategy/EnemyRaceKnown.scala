@@ -1,8 +1,8 @@
 package Planning.Predicates.Strategy
 
-import Planning.Plans.Compound.Or
+import Planning.Predicate
+import Planning.Predicates.MacroFacts
 
-class EnemyRaceKnown extends Or(
-  new EnemyIsTerran,
-  new EnemyIsProtoss,
-  new EnemyIsZerg)
+case class EnemyRaceKnown() extends Predicate {
+  override def apply: Boolean = MacroFacts.enemyRaceKnown
+}

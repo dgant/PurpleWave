@@ -1,12 +1,17 @@
 package Micro.Formation
 
 import Debugging.Visualizations.Rendering.DrawMap
+import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
 
 class Formation(style: FormationStyle, val placements: Map[UnitInfo, Pixel]) {
+
+  private lazy val default = if (placements.isEmpty) With.geography.home.center else Maff.exemplar(placements.values)
+
+  def apply(unit: UnitInfo): Pixel = placements.getOrElse(unit, default)
 
   def renderMap(color: Color): Unit = {
     if (placements.nonEmpty) {

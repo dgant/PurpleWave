@@ -9,6 +9,6 @@ class OnGasPumps(
     argWhenTrue   : Plan = NoPlan(),
     argWhenFalse  : Plan = NoPlan())
   extends If(
-    new GasPumpsAtLeast(requiredPumps),
+    GasPumpsAtLeast(requiredPumps),
     argWhenTrue,
     argWhenFalse)

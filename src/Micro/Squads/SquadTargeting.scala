@@ -35,11 +35,11 @@ object SquadTargeting {
     output
   }
 
-  def rankEnRouteTo(units: Iterable[FriendlyUnitInfo], goalAir: Pixel): Vector[UnitInfo] = rank(units, enRouteTo(units, goalAir))
+  def rankEnRouteTo(units: Iterable[FriendlyUnitInfo], goalAir: Pixel): Seq[UnitInfo] = rankForArmy(units, enRouteTo(units, goalAir))
 
-  def rank(units: Iterable[FriendlyUnitInfo], targets: Vector[UnitInfo]): Vector[UnitInfo] = {
+  def rankForArmy(units: Iterable[FriendlyUnitInfo], targets: Seq[UnitInfo]): Seq[UnitInfo] = {
     val centroid  = Maff.exemplar(units.view.map(_.pixel))
-    val engaged     = units.exists(_.matchups.threatsInRange.nonEmpty)
+    val engaged   = units.exists(_.matchups.threatsInRange.nonEmpty)
     targets.sortBy(t =>
       t.pixelDistanceTravelling(centroid)
       + (32.0 * t.totalHealth / Math.max(1.0, t.unitClass.maxTotalHealth)) // Focus down weak units

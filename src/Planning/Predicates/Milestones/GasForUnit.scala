@@ -1,9 +1,9 @@
 package Planning.Predicates.Milestones
 
-import Planning.Plans.Compound.Or
-import Planning.Predicates.Economy.GasAtLeast
+import Planning.Predicate
+import Planning.Predicates.MacroFacts
 import ProxyBwapi.UnitClasses.UnitClass
 
-class GasForUnit(unitClass: UnitClass, quantity: Int = 1) extends Or(
-  new GasAtLeast(unitClass.gasValue),
-  new UnitsAtLeast(quantity, unitClass))
+case class GasForUnit(unitClass: UnitClass, quantity: Int = 1) extends Predicate {
+  override def apply: Boolean = MacroFacts.haveGasForUnit(unitClass, quantity)
+}

@@ -1,10 +1,8 @@
 package Planning.Predicates.Economy
 
-import Lifecycle.With
 import Planning.Predicate
+import Planning.Predicates.MacroFacts
 
-class SupplyBlocked extends Predicate {
-  
-  override def apply: Boolean = With.self.supplyUsed >= With.self.supplyTotal
-  
+case class SupplyBlocked() extends Predicate {
+  override def apply: Boolean = MacroFacts.supplyBlocked
 }

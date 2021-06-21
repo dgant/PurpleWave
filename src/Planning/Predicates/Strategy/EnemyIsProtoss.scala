@@ -1,5 +1,8 @@
 package Planning.Predicates.Strategy
 
-import bwapi.Race
+import Planning.Predicate
+import Planning.Predicates.MacroFacts
 
-class EnemyIsProtoss extends EnemyIsRace(Race.Protoss)
+case class EnemyIsProtoss() extends Predicate {
+  override def apply: Boolean = MacroFacts.enemyIsProtoss
+}

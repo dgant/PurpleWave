@@ -1,7 +1,8 @@
 package Planning.Predicates.Reactive
 
-import Lifecycle.With
+import Planning.Predicate
+import Planning.Predicates.MacroFacts
 
-class SafeAtHome extends SafeToMoveOut {
-  override def apply: Boolean = With.battles.global.globalSafeToDefend || super.apply
+case class SafeAtHome() extends Predicate {
+  override def apply: Boolean = MacroFacts.safeAtHome
 }

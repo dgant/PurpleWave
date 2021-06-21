@@ -11,7 +11,7 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Predicates.Compound.And
 import Planning.Predicates.Milestones.{EnemyHasShownCloakedThreat, _}
-import Planning.Predicates.Reactive.{EnemyMutalisks, SafeAtHome, SafeToMoveOut}
+import Planning.Predicates.Reactive.{EnemyMutalisksLikely, SafeAtHome, SafeToMoveOut}
 import Planning.Predicates.Strategy._
 import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -71,7 +71,7 @@ object PvZIdeas {
         new UpgradeContinuously(Protoss.ObserverSpeed))))
   
   class ReactToMutalisks extends If(
-    new EnemyMutalisks,
+    new EnemyMutalisksLikely,
     new Parallel(
       new Build(
         Get(1, Protoss.Assimilator),

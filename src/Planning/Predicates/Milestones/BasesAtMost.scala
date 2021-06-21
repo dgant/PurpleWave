@@ -1,10 +1,8 @@
 package Planning.Predicates.Milestones
 
-import Lifecycle.With
 import Planning.Predicate
+import Planning.Predicates.MacroFacts
 
-class BasesAtMost(requiredBases: Int) extends Predicate {
-  
-  override def apply: Boolean = With.geography.ourBases.size <= requiredBases
-  
+case class BasesAtMost(requiredBases: Int) extends Predicate {
+  override def apply: Boolean = MacroFacts.bases <= requiredBases
 }

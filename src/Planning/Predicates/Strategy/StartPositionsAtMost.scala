@@ -1,8 +1,8 @@
 package Planning.Predicates.Strategy
 
-import Lifecycle.With
 import Planning.Predicate
+import Planning.Predicates.MacroFacts
 
 class StartPositionsAtMost(count: Int) extends Predicate {
-  override def apply: Boolean = With.geography.startLocations.size <= count
+  override def apply: Boolean = MacroFacts.starts <= count
 }

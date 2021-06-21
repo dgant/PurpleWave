@@ -71,7 +71,7 @@ class PvEProxy2Gate extends GameplanTemplate {
       new If(
         new EnemyStrategy(With.fingerprints.oneGateCore),
         new If(
-          new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
+          UnitsAtLeast(1, Protoss.Dragoon, complete = true),
           new Aggression(2.0),
           new Aggression(1.9))),
 
@@ -79,12 +79,12 @@ class PvEProxy2Gate extends GameplanTemplate {
 
     new BuildOrder(Get(10, Protoss.Probe), Get(Protoss.Pylon), Get(2, Protoss.Gateway)),
 
-    new If(new And(new EnemiesAtLeast(4, Protoss.PhotonCannon), new EnemyUnitsNone(MatchWarriors)), new RequireMiningBases(2)),
+    new If(new And(EnemiesAtLeast(4, Protoss.PhotonCannon), EnemiesAtMost(0, MatchWarriors)), new RequireMiningBases(2)),
 
     new If(
       new And(
         new Not(new EnemyStrategy(With.fingerprints.wallIn)),
-        new EnemiesAtMost(0, Terran.Bunker, complete = true)),
+        EnemiesAtMost(0, Terran.Bunker, complete = true)),
       new BuildOrder(
         Get(11, Protoss.Probe),
         Get(2, Protoss.Zealot),

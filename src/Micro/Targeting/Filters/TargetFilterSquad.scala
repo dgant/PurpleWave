@@ -5,7 +5,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterSquad extends TargetFilter {
   simulationSafe = true
-  override def appliesTo(actor: FriendlyUnitInfo): Boolean = actor.squad.exists(_.targetsEnemies)
+  override def appliesTo(actor: FriendlyUnitInfo): Boolean = actor.squad.exists(_.targetQueue.isDefined)
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = (
     (actor.inRangeToAttack(target) && actor.readyForAttackOrder && target.matchups.targets.nonEmpty)
     || actor.matchups.anchor.isDefined // Let the anchor filter take care of it

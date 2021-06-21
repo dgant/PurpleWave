@@ -1,8 +1,8 @@
 package Planning.Predicates.Milestones
 
-import Lifecycle.With
-import Planning.Predicates.Compound.{Check, Latch}
+import Planning.Predicate
+import Planning.Predicates.MacroFacts
 
-class EnemyWalledIn extends Latch(new Check(() =>
-  With.geography.zones.exists(z => z.walledIn && ! z.owner.isUs)
-))
+case class EnemyWalledIn() extends Predicate {
+  override def apply: Boolean = MacroFacts.enemyWalledIn
+}

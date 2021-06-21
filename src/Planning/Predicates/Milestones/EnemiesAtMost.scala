@@ -1,25 +1,11 @@
 package Planning.Predicates.Milestones
 
-import Lifecycle.With
-import Planning.UnitMatchers.{MatchAnd, MatchAnything, MatchComplete, UnitMatcher}
 import Planning.Predicate
+import Planning.Predicates.MacroFacts
+import Planning.UnitMatchers.{MatchAnything, UnitMatcher}
 
-class EnemiesAtMost(
-                     quantity  : Int          = 0,
-                     matcher   : UnitMatcher  = MatchAnything,
-                     complete  : Boolean       = false)
-  
-  extends Predicate {
-  
+case class EnemiesAtMost(quantity: Int = 0, matcher: UnitMatcher = MatchAnything, complete: Boolean = false) extends Predicate {
   override def apply: Boolean = {
-    val quantityFound =
-      if (complete) {
-        With.units.countEnemy(MatchAnd(MatchComplete, matcher))
-      }
-      else {
-        With.units.countEnemy(matcher)
-      }
-    val output = quantityFound <= quantity
-    output
+    (if (complete) MacroFacts.enemiesComplete(matcher) else MacroFacts.enemies(matcher)) <= quantity
   }
 }

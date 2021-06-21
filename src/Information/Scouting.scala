@@ -10,7 +10,7 @@ import Planning.UnitMatchers.{MatchBuilding, MatchWorker}
 import ProxyBwapi.Races.Zerg
 import Utilities._
 
-class Scouting extends TimedTask {
+class Scouting extends TimedTask with EnemyTechs {
 
   private val baseScoutMap = new CountMap[Base]
   def baseScouts(base: Base): Int = baseScoutMap(base)
@@ -83,6 +83,7 @@ class Scouting extends TimedTask {
   val enemyScouts = new Cache(() => With.units.enemy.filter(u => u.isAny(Zerg.Overlord, MatchWorker) && u.likelyStillThere && u.base.exists(basesToLookForEnemyScouts().contains)))
 
   override protected def onRun(budgetMs: Long): Unit = {
+    updateTechs()
     baseScoutMap.clear()
     if (_firstEnemyMain.isEmpty) {
       _firstEnemyMain = With.geography.startBases.find(_.owner.isEnemy)

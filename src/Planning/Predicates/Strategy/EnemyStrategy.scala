@@ -2,8 +2,8 @@ package Planning.Predicates.Strategy
 
 import Information.Fingerprinting.Fingerprint
 import Planning.Predicate
+import Planning.Predicates.MacroFacts
 
-class EnemyStrategy(fingerprints: Fingerprint*) extends Predicate {
-  
-  override def apply: Boolean = fingerprints.exists(_.matches)
+case class EnemyStrategy(fingerprints: Fingerprint*) extends Predicate {
+  override def apply: Boolean = MacroFacts.enemyStrategy(fingerprints: _*)
 }

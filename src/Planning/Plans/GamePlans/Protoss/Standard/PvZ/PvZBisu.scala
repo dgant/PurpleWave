@@ -9,7 +9,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Compound.Latch
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.EnemyMutalisks
+import Planning.Predicates.Reactive.EnemyMutalisksLikely
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss.PvZMidgameBisu
@@ -27,7 +27,7 @@ class PvZBisu extends GameplanTemplate {
     new PvZIdeas.TakeSafeNatural,
     new PvZIdeas.AddEarlyCannons,
     new PumpRatio(Protoss.Corsair, 1, 12, Seq(Enemy(Zerg.Mutalisk, 1.0))),
-    new If(new EnemyMutalisks, new UpgradeContinuously(Protoss.AirDamage)),
+    new If(new EnemyMutalisksLikely, new UpgradeContinuously(Protoss.AirDamage)),
     new If(new UnitsAtLeast(1, Protoss.HighTemplar), new Build(Get(Protoss.PsionicStorm))),
     new If(new UnitsAtLeast(2, Protoss.Dragoon), new UpgradeContinuously(Protoss.DragoonRange)),
     new If(new TechComplete(Protoss.PsionicStorm), new PvZRequireMiningBases(3)),

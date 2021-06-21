@@ -22,14 +22,14 @@ class SquadAttack extends Squad {
     lazy val targetReadyToEngage  = targetQueue.get.find(t => units.exists(u => u.canAttack(t) && u.pixelsToGetInRange(t) < 64))
     lazy val targetHasEngagedUs   = targetQueue.get.find(t => units.exists(u => t.canAttack(u) && t.inRangeToAttack(u)))
     if (fightConsensus) {
-      targetQueue = Some(SquadTargeting.rank(units, SquadTargeting.enRouteTo(units, vicinity)))
+      targetQueue = Some(SquadTargeting.rankForArmy(units, SquadTargeting.enRouteTo(units, vicinity)))
       if (targetReadyToEngage.isDefined || targetHasEngagedUs.isDefined) {
         formation = Some(FormationGeneric.engage(units, targetReadyToEngage.orElse(targetHasEngagedUs).map(_.pixel)))
       } else {
         formation = Some(FormationGeneric.march(units, vicinity))
       }
     } else {
-      targetQueue = Some(SquadTargeting.rank(units, SquadTargeting.enRouteTo(units, originConsensus)))
+      targetQueue = Some(SquadTargeting.rankForArmy(units, SquadTargeting.enRouteTo(units, originConsensus)))
       if (centroid.zone == originConsensus.zone && With.scouting.threatOrigin.zone != originConsensus.zone) {
         formation = Some(FormationGeneric.guard(units, Some(originConsensus)))
       } else {

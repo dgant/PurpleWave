@@ -9,7 +9,10 @@ object TargetFilterReaver extends TargetFilter {
     if (actor.agent.ride.isEmpty) return true
 
     // Don't try to snipe tanks that will kill us first
-    if (actor.loaded && Terran.SiegeTankSieged(target) && target.cooldownLeft <= actor.cooldownLeft + actor.pixelsToGetInRange(target)) {
+    if (actor.loaded
+      && Terran.SiegeTankSieged(target)
+      && target.cooldownLeft <= actor.cooldownLeft
+      && target.matchups.targetsInRange.forall(_ == actor)) {
       return false
     }
 

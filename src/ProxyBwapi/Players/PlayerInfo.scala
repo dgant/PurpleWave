@@ -4,6 +4,7 @@ import Debugging.Visualizations.Colors
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Performance.Cache
+import ProxyBwapi.Techs.Tech
 import ProxyBwapi.Upgrades.Upgrade
 import bwapi.{Player, Race}
 
@@ -27,7 +28,11 @@ case class PlayerInfo(bwapiPlayer: Player) extends PlayerProxy(bwapiPlayer) {
   lazy val isFriendly : Boolean = isUs || isAlly
   
   def hasUpgrade(upgrade: Upgrade): Boolean = getUpgradeLevel(upgrade) > 0
-  
+
+  override def hasTech(tech: Tech): Boolean = {
+    super.hasTech(tech) || With.scouting.techsOwned(this).contains(tech)
+  }
+
   lazy val colorMidnight: bwapi.Color   =
     if      (isUs)      Colors.MidnightViolet
     else if (isNeutral) Colors.MidnightTeal

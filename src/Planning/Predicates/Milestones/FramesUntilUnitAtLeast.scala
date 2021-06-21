@@ -1,12 +1,12 @@
 package Planning.Predicates.Milestones
 
-import Lifecycle.With
 import Planning.Predicate
+import Planning.Predicates.MacroFacts
 import ProxyBwapi.UnitClasses.UnitClass
 
-class FramesUntilUnitAtLeast(unitClass: UnitClass, frames: () => Int) extends Predicate {
+case class FramesUntilUnitAtLeast(unitClass: UnitClass, frames: () => Int) extends Predicate {
 
   def this(unitClass: UnitClass, specificFrames: Int) = this(unitClass, () => specificFrames)
 
-  override def apply: Boolean = With.projections.unit(unitClass) >= frames()
+  override def apply: Boolean = MacroFacts.framesUntilUnit(unitClass) >= frames()
 }

@@ -1,6 +1,6 @@
 package Information.Battles.ProcessingStates
 
-import Information.Battles.BattleClassificationFilters
+import Information.Battles.{BattleClassificationFilters, GlobalSafeToMoveOut}
 import Information.Battles.Types.{BattleGlobal, Team}
 import Lifecycle.With
 
@@ -17,7 +17,7 @@ class BattleProcessSwap extends BattleProcessState {
     With.battles.global = new BattleGlobal(
       new Team(With.units.ours  .view.filter(BattleClassificationFilters.isEligibleGlobal).toVector),
       new Team(With.units.enemy .view.filter(BattleClassificationFilters.isEligibleGlobal).toVector))
-
+    With.blackboard.safeToMoveOut.set(GlobalSafeToMoveOut())
 
     transitionTo(new BattleProcessMatchupAnalysis)
   }

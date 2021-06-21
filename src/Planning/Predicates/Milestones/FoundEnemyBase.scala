@@ -1,6 +1,8 @@
 package Planning.Predicates.Milestones
 
-import Lifecycle.With
-import Planning.Predicates.Compound.Check
+import Planning.Predicate
+import Planning.Predicates.MacroFacts
 
-class FoundEnemyBase extends Check(() => With.geography.enemyBases.nonEmpty)
+case class FoundEnemyBase() extends Predicate {
+  override def apply: Boolean = MacroFacts.foundEnemyBase
+}

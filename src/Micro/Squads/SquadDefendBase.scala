@@ -2,15 +2,12 @@ package Micro.Squads
 
 import Information.Geography.Types.{Base, Edge, Zone}
 import Lifecycle.With
-import Mathematics.Points.Pixel
 import Mathematics.Maff
 import Micro.Agency.Intention
-import Micro.Formation.FormationZone
-import Micro.Targeting.Filters.TargetFilterDefend
+import Micro.Formation.{Formation, FormationEmpty, FormationGeneric, FormationZone}
 import Performance.Cache
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.UnitInfo
-
 
 class SquadDefendBase(base: Base) extends Squad {
 
@@ -21,7 +18,7 @@ class SquadDefendBase(base: Base) extends Squad {
     val zone: Zone = base.zone
     val threat = With.scouting.threatOrigin.zone
     var output = (zone, zone.exitNow)
-    targetFilters = Seq(TargetFilterDefend(zone))
+    targetQueue = Some(SquadTargeting.rankForArmy(units, enemies))
     if ( ! threat.bases.exists(_.owner.isUs)) {
       val possiblePath = With.paths.zonePath(zone, threat)
       possiblePath.foreach(path => {
@@ -41,103 +38,82 @@ class SquadDefendBase(base: Base) extends Squad {
     }
     output
   })
-  private def zone: Zone = zoneAndChoke()._1
-  private def choke: Option[Edge] = zoneAndChoke()._2
+  private def guardZone: Zone = zoneAndChoke()._1
+  private def guardChoke: Option[Edge] = zoneAndChoke()._2
+  lazy val enemyHasVision: Cache[Boolean] = new Cache(() => enemies.exists(e => e.flying || e.altitude >= base.heart.altitude))
+  lazy val heart = if (base.metro == With.geography.ourMain.metro) With.geography.ourMain.heart.center else base.heart.center
+  val bastion = new Cache(() =>
+    Maff.minBy(
+        base.units.view.filter(u =>
+          u.isOurs
+          && u.unitClass.isBuilding
+          && u.hitPoints < 300
+          && (u.friendly.exists(_.knownToEnemy) || u.canAttack)
+          && (u.zone != With.geography.ourMain.zone || u.matchups.threats.exists( ! _.unitClass.isWorker))))(u => u.matchups.framesOfSafety + 0.0001 * u.pixelDistanceCenter(heart))
+      .map(_.pixel)
+      .getOrElse(heart))
+
+  private var formationReturn: Formation = FormationEmpty
 
   override def run() {
     formation = None
     if (units.isEmpty) return
-
-    lazy val allowWandering = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || enemies.exists(_.unitClass.ranged) || With.blackboard.wantToAttack()
-    lazy val canScour = scourables().nonEmpty
-    lazy val canDefendChoke = choke.isDefined && (units.size > 3 || ! With.enemies.exists(_.isZerg))
-    lazy val entranceBreached = scourables().exists(e =>
-      e.unitClass.attacksGround
+    lazy val scourables   = enemies.filter(isHuntable)
+    lazy val canScour     = scourables.nonEmpty && (wander || breached)
+    lazy val wander       = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || With.blackboard.wantToAttack()
+    lazy val canGuard     = guardChoke.isDefined && (units.size > 3 || ! With.enemies.exists(_.isZerg))
+    lazy val breached     = scourables.exists(e =>
+      e.canAttackGround
       && ! e.unitClass.isWorker
       && e.base.exists(_.owner.isUs)
-      && ! zone.edges.exists(edge => e.pixelDistanceCenter(edge.pixelCenter) < 64 + edge.radiusPixels))
+      && ! guardZone.edges.exists(edge => e.pixelDistanceCenter(edge.pixelCenter) < 64 + edge.radiusPixels))
 
-    if (canScour && (allowWandering || entranceBreached)) {
+    lazy val formationBastion = FormationGeneric.march(units, bastion())
+    lazy val formationGuard = guardChoke.map(c => FormationZone(units, guardZone, c)).getOrElse(formationBastion)
+
+    if (canScour) {
       lastAction = "Scour"
-      huntEnemies()
-    } else if ( ! entranceBreached && canDefendChoke) {
-      lastAction = "Def choke"
-      defendChoke()
+      formation = Some(FormationGeneric.engage(units, targetQueue.get.headOption.map(_.pixel)))
+      formationReturn = formationGuard
+    } else if (canGuard) {
+      lastAction = "Guard"
+      formation = Some(formationGuard)
+      formationReturn = formationGuard
     } else {
-      lastAction = "Def heart"
-      defendHeart(base.heart.center)
+      lastAction = "Hold"
+      formation = Some(formationBastion)
+      formationReturn = formationBastion
     }
+    val targets = if (canScour) scourables else enemies.filter(threateningBase)
+    targetQueue = Some(SquadTargeting.rankForArmy(units, targets))
+    intendFormation()
   }
 
-  private def huntableFilter(enemy: UnitInfo): Boolean = (
+  private def isHuntable(enemy: UnitInfo): Boolean = (
     ! (enemy.is(Zerg.Drone) && With.fingerprints.fourPool.matches) // Don't get baited by 4-pool scouts
       && (units.exists(_.canAttack(enemy)) || (enemy.cloaked && units.exists(_.unitClass.isDetector)))
       && (enemy.matchups.targets.nonEmpty || enemy.matchups.allies.forall(_.matchups.targets.isEmpty)) // Don't, for example, chase Overlords that have ally Zerglings nearby
       // If we don't really want to fight, wait until they push into the base
-      && zone.exit.forall(exit =>
+      && guardZone.exit.forall(exit =>
         enemy.flying
           || With.blackboard.wantToAttack()
-          || enemy.pixelDistanceTravelling(zone.centroid)
-          < (exit.endPixels ++ exit.sidePixels :+ exit.pixelCenter).map(_.groundPixels(zone.centroid)).min))
+          || enemy.pixelDistanceTravelling(guardZone.centroid)
+          < (exit.endPixels ++ exit.sidePixels :+ exit.pixelCenter).map(_.groundPixels(guardZone.centroid)).min))
 
-  private val scourables = new Cache(() => {
-    val huntableInZone = enemies.filter(e => e.zone == zone && huntableFilter(e)) ++ zone.units.filter(u => u.isEnemy && u.unitClass.isGas)
-    if (huntableInZone.nonEmpty) huntableInZone else enemies.filter(huntableFilter)
-  })
-
-  private def huntEnemies() {
-    lazy val home = Maff.minBy(zone.bases.filter(_.owner.isUs).map(_.heart))(_.groundPixels(zone.centroid))
-      .orElse(Maff.minBy(With.geography.ourBases.map(_.heart))(_.groundPixels(zone.centroid)))
-      .getOrElse(With.geography.home)
-      .center
-
-    def distance(enemy: UnitInfo): Double = enemy.pixelDistanceSquared(base.heart.center)
-
-    val huntables = scourables()
-    lazy val target = huntables.minBy(distance)
-    lazy val targetAir = Maff.minBy(huntables.filter(_.flying))(distance).getOrElse(target)
-    lazy val targetGround = Maff.minBy(huntables.filterNot(_.flying))(distance).getOrElse(target)
-    units.foreach(recruit => {
-      val onlyAir     = recruit.canAttack && ! recruit.unitClass.attacksGround
-      val onlyGround  = recruit.canAttack && ! recruit.unitClass.attacksAir
-      val thisTarget  = if (onlyAir) targetAir else if (onlyGround) targetGround else target
-      recruit.agent.intend(this, new Intention {
-        toTravel = Some(thisTarget.pixel)
+  private def threateningBase(enemy: UnitInfo): Boolean = {
+    if (enemy.zone == base.zone) return true
+    // If they're between the bastion and the base
+    if ( ! enemy.flying && enemy.pixelDistanceTravelling(base.zone.centroid) < bastion().groundPixels(base.zone.centroid)) return true
+    // If they can assault our base from outside it
+    if (enemyHasVision() && base.zone.units.view.filter(enemy.inRangeToAttack).exists(u => u.unitClass.melee || ! base.zone.edges.exists(_.contains(u.pixel)))) return true
+    false
+  }
+  private def intendFormation(): Unit = {
+    units.foreach(unit => {
+      unit.agent.intend(this, new Intention {
+        toTravel = Some(formation.get(unit))
+        toReturn = Some(formationReturn(unit))
       })
     })
-  }
-
-  private def defendHeart(center: Pixel) {
-    val protectables  = center.zone.units.filter(u => u.isOurs && u.unitClass.isBuilding && u.hitPoints < 300 && (u.friendly.exists(_.knownToEnemy) || u.canAttack))
-    val destination   = Maff
-      .minBy(protectables.view.filter(p =>
-        p.zone != With.geography.ourMain.zone || p.matchups.threats.exists( ! _.unitClass.isWorker)))(u =>
-          u.matchups.framesOfSafety + 0.0001 * u.pixelDistanceCenter(center))
-      .map(_.pixel)
-      .getOrElse(center)
-    val groupArea     = units.view.map(_.unitClass.area).sum
-    val groupRadius   = Math.sqrt(groupArea)
-    units.foreach(unit => {
-      val unitDestination = if (unit.flying || unit.pixelDistanceCenter(destination) > groupRadius) destination else unit.pixel
-      unit.agent.intend(this, new Intention {
-        toTravel = Some(unitDestination)
-        toReturn = if (zone.bases.exists(_.owner.isUs)) Some(unitDestination) else None
-      })})
-  }
-
-  private def defendChoke() {
-    formation = Some(FormationZone(units.toSeq, zone, choke.get))
-    intendFormation()
-  }
-
-  private def intendFormation(): Unit = {
-    units.foreach(
-      defender => {
-        val spot = formation.get.placements.get(defender)
-        defender.agent.intend(this, new Intention {
-          toReturn = spot
-          toTravel = spot.orElse(Some(zone.centroid.center))
-        })
-      })
   }
 }

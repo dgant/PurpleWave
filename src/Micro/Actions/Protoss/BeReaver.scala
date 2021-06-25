@@ -15,7 +15,6 @@ import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-
 object BeReaver extends Action {
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.is(Protoss.Reaver)
@@ -26,7 +25,7 @@ object BeReaver extends Action {
   }
 
   def considerHopping(unit: FriendlyUnitInfo) {
-    lazy val inRangeNeedlessly = unit.matchups.threatsInRange.exists(t => !t.flying && t.pixelRangeAgainst(unit) < unit.pixelRangeAgainst(t))
+    lazy val inRangeNeedlessly = unit.matchups.threatsInRange.exists(t => ! t.flying && t.pixelRangeAgainst(unit) < unit.pixelRangeAgainst(t))
     lazy val attackingSoon = unit.matchups.targetsInRange.nonEmpty && unit.cooldownLeft < Math.min(unit.cooldownMaxGround / 4, unit.matchups.framesToLive)
     if (unit.transport.isEmpty && inRangeNeedlessly && ! attackingSoon) {
       // TODO: What if multiple Reavers?

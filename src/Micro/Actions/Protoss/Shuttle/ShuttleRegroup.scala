@@ -1,4 +1,4 @@
-package Micro.Actions.Transportation.Caddy
+package Micro.Actions.Protoss.Shuttle
 
 import Lifecycle.With
 import Mathematics.Shapes.Spiral

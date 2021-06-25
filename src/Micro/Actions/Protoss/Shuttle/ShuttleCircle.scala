@@ -1,4 +1,4 @@
-package Micro.Actions.Transportation.Caddy
+package Micro.Actions.Protoss.Shuttle
 
 import Lifecycle.With
 import Micro.Actions.Action
@@ -8,7 +8,7 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object ShuttleCircle extends Action {
-  override def allowed(unit: FriendlyUnitInfo): Boolean = BeAShuttle.allowed(unit) && unit.agent.passengers.isEmpty
+  override def allowed(unit: FriendlyUnitInfo): Boolean = BeShuttle.allowed(unit) && unit.agent.passengers.isEmpty
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
     val roboticsFacility = With.units.ours

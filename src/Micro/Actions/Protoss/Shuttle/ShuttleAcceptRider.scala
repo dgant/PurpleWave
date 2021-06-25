@@ -1,4 +1,4 @@
-package Micro.Actions.Transportation.Caddy
+package Micro.Actions.Protoss.Shuttle
 
 import Lifecycle.With
 import Mathematics.Maff
@@ -10,7 +10,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object ShuttleAcceptRider extends Action {
 
   override def allowed(shuttle: FriendlyUnitInfo): Boolean = (
-    BeAShuttle.allowed(shuttle)
+    BeShuttle.allowed(shuttle)
     && (shuttle.agent.passengers.isEmpty || shuttle.battle.isEmpty)
   )
 

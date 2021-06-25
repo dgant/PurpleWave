@@ -9,7 +9,6 @@ import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-
 object Poke extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
@@ -21,9 +20,7 @@ object Poke extends Action {
     && ( // Save our strength for blocking Hatcheries
       ! With.enemy.isZerg
       || unit.matchups.threats.size <= 5
-      || unit.totalHealth > 25)
-    
-  )
+      || unit.totalHealth > 25))
   
   override protected def perform(unit: FriendlyUnitInfo) {
     val targets = unit.matchups.targets.filter(MatchWorker)

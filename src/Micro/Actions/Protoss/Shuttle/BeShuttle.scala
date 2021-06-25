@@ -1,12 +1,12 @@
-package Micro.Actions.Transportation.Caddy
+package Micro.Actions.Protoss.Shuttle
 
 import Micro.Actions.Action
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-object BeAShuttle extends Action {
+object BeShuttle extends Action {
 
-  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.is(Protoss.Shuttle)
+  override def allowed(unit: FriendlyUnitInfo): Boolean = Protoss.Shuttle(unit)
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
     ShuttleAcceptRider.consider(shuttle)

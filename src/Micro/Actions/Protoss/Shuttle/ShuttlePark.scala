@@ -1,4 +1,4 @@
-package Micro.Actions.Transportation.Caddy
+package Micro.Actions.Protoss.Shuttle
 
 import Mathematics.Maff
 import Micro.Actions.Action

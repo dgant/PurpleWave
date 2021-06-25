@@ -38,6 +38,6 @@ class ResearchTech(tech: Tech) extends Production {
     if ( ! currencyLock.satisfied) return
   
     techers.acquire(this)
-    techers.units.foreach(_.agent.intend(this, new Intention { toTech = Some(tech) }))
+    techers.units.foreach(_.intend(this, new Intention { toTech = Some(tech) }))
   }
 }

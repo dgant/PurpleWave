@@ -53,7 +53,7 @@ class MorphUnit(val classToMorph: UnitClass) extends Production {
       morpherLock.matcher = morpher.map(m => new MatchSpecific(Set(m))).getOrElse(morpherClass)
       morpherLock.acquire(this)
       morpher = morpherLock.units.headOption
-      morpher.foreach(_.agent.intend(this, new Intention {
+      morpher.foreach(_.intend(this, new Intention {
         toTrain = Some(classToMorph)
         // TODO: Include behavior for morphing Guardians/Devourers
         canFlee = classToMorph == Zerg.Lurker

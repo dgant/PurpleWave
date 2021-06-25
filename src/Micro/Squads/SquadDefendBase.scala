@@ -110,7 +110,7 @@ class SquadDefendBase(base: Base) extends Squad {
   }
   private def intendFormation(): Unit = {
     units.foreach(unit => {
-      unit.agent.intend(this, new Intention {
+      unit.intend(this, new Intention {
         toTravel = Some(formation.get(unit))
         toReturn = Some(formationReturn(unit))
       })

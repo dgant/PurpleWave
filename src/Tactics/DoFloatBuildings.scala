@@ -17,6 +17,6 @@ class DoFloatBuildings extends Prioritized {
       MatchNot(MatchMobileFlying),
       MatchOr(With.blackboard.floatableBuildings(): _*))
     floaties.acquire(this)
-    floaties.units.foreach(_.agent.intend(this, new Intention { canLiftoff = true }))
+    floaties.units.foreach(_.intend(this, new Intention { shouldLiftoff = true }))
   }
 }

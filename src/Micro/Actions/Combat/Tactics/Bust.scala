@@ -38,7 +38,7 @@ object Bust extends Action {
     && unit.shieldPoints > 12 // Don't take hull damage
     && unit.totalHealth > 24
     && With.enemies.exists(_.raceCurrent == Race.Terran)
-    && unit.agent.canFight
+    && unit.intent.canFight
     && unit.canMove
     && unit.is(Protoss.Dragoon)
     && With.self.hasUpgrade(Protoss.DragoonRange)

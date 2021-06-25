@@ -34,7 +34,7 @@ class SquadEjectScout extends Squad {
   
   override def run() {
     units.foreach(ejector => {
-      ejector.agent.intend(this, new Intention {
+      ejector.intend(this, new Intention {
         toScoutTiles = if (targetScout().exists(_.likelyStillThere)) Seq.empty else tilesToConsider()
         toTravel = Some(destination())
         toAttack = if (ejector.matchups.targets.forall(targetScout().contains)) targetScout() else None

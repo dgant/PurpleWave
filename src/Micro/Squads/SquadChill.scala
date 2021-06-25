@@ -4,6 +4,6 @@ import Micro.Agency.Intention
 
 class SquadChill extends Squad {
   override def run() {
-    units.foreach(_.agent.intend(this, new Intention))
+    units.foreach(_.intend(this, new Intention))
   }
 }

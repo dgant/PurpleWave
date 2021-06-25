@@ -33,9 +33,9 @@ class MeldArchons(maxEnergy: Int = 251) extends Plan {
     
     templar.release()
     templar.acquire(this)
-    templar.units.foreach(_.agent.intend(this, new Intention {
+    templar.units.foreach(_.intend(this, new Intention {
       toTravel = Some(With.geography.home.center)
-      canMeld = true
+      shouldMeld = true
     }))
   }
 }

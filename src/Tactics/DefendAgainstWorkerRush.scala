@@ -19,7 +19,7 @@ class DefendAgainstWorkerRush extends Prioritized {
         u.isEnemy
         && u.unitClass.isWorker
         && u.matchups.targets.exists(ally =>
-          (ally.unitClass.isBuilding || ally.friendly.exists(_.agent.toBuild.isDefined))
+          (ally.unitClass.isBuilding || ally.friendly.exists(_.intent.toBuild.isDefined))
           && u.framesToGetInRange(ally) < 24 * 3)))
       .distinct
   
@@ -35,7 +35,7 @@ class DefendAgainstWorkerRush extends Prioritized {
     }
     defenders.counter = CountUpTo(workersToDefend)
     defenders.acquire(this)
-    defenders.units.foreach(unit => unit.agent.intend(this, new Intention {
+    defenders.units.foreach(unit => unit.intend(this, new Intention {
       canFlee   = false
       toTravel  = Some(attackingCentroid)
     }))

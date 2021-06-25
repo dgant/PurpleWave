@@ -102,7 +102,7 @@ class DefendFFEWithProbes extends Prioritized {
         }
       })
 
-      workers.foreach(_.agent.intend(this, new Intention {
+      workers.foreach(_.intend(this, new Intention {
         canFlee   = false
         toTravel  = Some(toDefend)
         toReturn  = Some(toDefend)

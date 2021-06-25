@@ -41,7 +41,7 @@ object SquadTargeting {
     val centroid  = Maff.exemplar(units.view.map(_.pixel))
     val engaged   = units.exists(_.matchups.threatsInRange.nonEmpty)
     targets.sortBy(t =>
-      t.pixelDistanceTravelling(centroid)
+      t.pixelDistanceSquared(centroid)
       + (32.0 * t.totalHealth / Math.max(1.0, t.unitClass.maxTotalHealth)) // Focus down weak units
       + (if (t.unitClass.attacksOrCastsOrDetectsOrTransports || ! engaged) 0 else With.mapPixelPerimeter))
   }

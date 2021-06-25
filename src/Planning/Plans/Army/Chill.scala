@@ -27,6 +27,6 @@ class Chill(initialMatcher: UnitMatcher) extends Plan {
     val tile = base.map(b => Maff.sample(Circle.points(Math.sqrt(count).toInt).map(b.tile.add))).getOrElse(With.geography.home)
     val intent = new Intention
     intent.toTravel = Some(tile.center)
-    chiller.agent.intend(this, intent)
+    chiller.intend(this, intent)
   }
 }

@@ -11,7 +11,7 @@ object Sneak extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.cloaked
     && unit.canMove
-    && unit.agent.intent.canFlee
+    && unit.intent.canFlee
     && ! With.yolo.active()
     && ! unit.agent.shouldEngage
     && ! unit.alliesBattle.exists(Protoss.Arbiter)

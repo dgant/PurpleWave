@@ -61,7 +61,7 @@ class TrainUnit(val traineeClass: UnitClass) extends Production {
         trainerLock.release()
       }
       if (trainee.isEmpty) {
-        trainer.foreach(_.agent.intend(this, new Intention { toTrain = Some(traineeClass) }))
+        trainer.foreach(_.intend(this, new Intention { toTrain = Some(traineeClass) }))
       }
     }
   }

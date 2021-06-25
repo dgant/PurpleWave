@@ -72,7 +72,7 @@ class PylonBlock extends Plan {
             toBuildTile = Some(tileToBlock)
           }
         }
-        blocker.agent.intend(this, intent)
+        blocker.intend(this, intent)
       })
     })
   }

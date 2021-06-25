@@ -45,7 +45,7 @@ class ChillOverlords extends Prioritized {
   private def chillOut(overlord: FriendlyUnitInfo, count: Int) {
     val base = Maff.minBy(With.geography.ourBases.map(_.heart.center))(overlord.pixelDistanceSquared)
     val tile = base.map(b => Maff.sample(Circle.points(Math.sqrt(count).toInt).map(b.tile.add))).getOrElse(With.geography.home)
-    overlord.agent.intend(this, new Intention {
+    overlord.intend(this, new Intention {
       toTravel = Some(tile.center)
       canFlee = true
     })

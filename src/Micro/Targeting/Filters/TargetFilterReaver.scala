@@ -1,4 +1,5 @@
 package Micro.Targeting.Filters
+import Lifecycle.With
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
@@ -11,7 +12,7 @@ object TargetFilterReaver extends TargetFilter {
     // Don't try to snipe tanks that will kill us first
     if (actor.loaded
       && Terran.SiegeTankSieged(target)
-      && target.cooldownLeft <= actor.cooldownLeft
+      && target.cooldownLeft < Math.max(actor.cooldownLeft, With.game.getRemainingLatencyFrames)
       && target.matchups.targetsInRange.forall(_ == actor)) {
       return false
     }
@@ -20,7 +21,7 @@ object TargetFilterReaver extends TargetFilter {
     val worthAttacking = (
       actor.base.exists(_.owner.isUs) // Make sure we hit Pylons or whatever other garbage is around
       || target.canAttack
-      || target.unitClass.canAttack
+      || target.unitClass.attacksOrCastsOrDetectsOrTransports
       || (target.base.exists(b => b.resources.forall(u => u.tile.visible)) && target.base.forall(_.workerCount == 0)))
 
     val safeToAttack = (

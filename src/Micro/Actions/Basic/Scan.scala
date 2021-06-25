@@ -8,11 +8,12 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Scan extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.agent.toScan.isDefined
+    unit.intent.toScan.isDefined
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-    Commander.useTechOnPixel(unit, Terran.ScannerSweep, unit.agent.toScan.get)
-    unit.agent.toScan = None
+    Commander.useTechOnPixel(unit, Terran.ScannerSweep, unit.intent.toScan.get)
+    // Ensure we don't spam scan in the absence of a new intention
+    unit.intent.toScan = None
   }
 }

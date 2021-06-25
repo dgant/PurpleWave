@@ -9,28 +9,28 @@ object Produce extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     (
-      unit.agent.toTrain.isDefined  ||
-      unit.agent.toTech.isDefined   ||
-      unit.agent.toUpgrade.isDefined
+      unit.intent.toTrain.isDefined  ||
+      unit.intent.toTech.isDefined   ||
+      unit.intent.toUpgrade.isDefined
     )
     && (unit.trainingQueue.isEmpty || (unit.trainingQueue.size == 1 && unit.remainingTrainFrames < With.reaction.agencyMax))
 
   )
   
   override def perform(unit: FriendlyUnitInfo) {
-    if (unit.agent.toTrain.isDefined) {
-      if (With.framesSince(unit.agent.intent.frameCreated) < Math.max(128, unit.agent.toTrain.get.buildFrames / 2)) {
-        Commander.build(unit, unit.agent.toTrain.get)
+    if (unit.intent.toTrain.isDefined) {
+      if (With.framesSince(unit.intent.frameCreated) < Math.max(128, unit.intent.toTrain.get.buildFrames / 2)) {
+        Commander.build(unit, unit.intent.toTrain.get)
       }
     }
-    else if (unit.agent.toTech.isDefined) {
-      Commander.tech(unit, unit.agent.toTech.get)
+    else if (unit.intent.toTech.isDefined) {
+      Commander.tech(unit, unit.intent.toTech.get)
     }
-    else if (unit.agent.toUpgrade.isDefined) {
-      Commander.upgrade(unit, unit.agent.toUpgrade.get)
+    else if (unit.intent.toUpgrade.isDefined) {
+      Commander.upgrade(unit, unit.intent.toUpgrade.get)
     }
-    unit.agent.intent.toTrain = None // Avoid training repeatedly
-    unit.agent.intent.toTech = None // Avoid teching repeatedly (mostly impacts failure to renew the desire to tech)
-    unit.agent.intent.toUpgrade = None //Avoid upgrading repeatedly
+    unit.intent.toTrain = None // Avoid training repeatedly
+    unit.intent.toTech = None // Avoid teching repeatedly (mostly impacts failure to renew the desire to tech)
+    unit.intent.toUpgrade = None //Avoid upgrading repeatedly
   }
 }

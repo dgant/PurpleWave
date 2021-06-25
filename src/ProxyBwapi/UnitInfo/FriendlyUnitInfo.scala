@@ -45,7 +45,13 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   def lastFrameOccupied: Int = _lastFrameOccupied
 
   lazy val agent: Agent = new Agent(this)
-  def intent: Intention = agent.intent
+  private var _intent: Intention = new Intention
+  private var _client: Any = None
+  def intent: Intention = _intent
+  def intend(client: Any, intent: Intention) {
+    _client = Some(client)
+    _intent = intent
+  }
 
   private var _squad: Option[Squad] = None
   private var _lastSquadChange: Int = 0

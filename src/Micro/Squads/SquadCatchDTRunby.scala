@@ -9,7 +9,6 @@ import Planning.UnitMatchers.MatchMobileDetector
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
 
-
 class SquadCatchDTRunby extends Squad {
 
   def recruit(): Unit = {
@@ -21,7 +20,7 @@ class SquadCatchDTRunby extends Squad {
   }
 
   override def run(): Unit = {
-    units.foreach(_.agent.intend(this, new Intention { toTravel = Some(destination())}))
+    units.foreach(_.intend(this, new Intention { toTravel = Some(destination())}))
   }
 
   private val destination = new Cache(() => {

@@ -47,7 +47,7 @@ abstract class DoScout extends Prioritized {
       With.grids.buildableTerrain.get(tile)
       && ! zone.bases.exists(_.harvestingArea.contains(tile)))) // Don't walk into worker line
 
-    unit.agent.intend(this, new Intention {
+    unit.intend(this, new Intention {
       toScoutTiles  = if (MatchWarriors(unit)) Seq.empty else tiles
       toTravel      = Some(destination)
     })

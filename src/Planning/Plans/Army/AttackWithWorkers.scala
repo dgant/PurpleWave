@@ -99,7 +99,7 @@ class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
   }
   
   def tickle(unit: FriendlyUnitInfo, target: Pixel) {
-    unit.agent.intend(this, new Intention {
+    unit.intend(this, new Intention {
       toTravel = Some(target)
       canTickle = true
     })

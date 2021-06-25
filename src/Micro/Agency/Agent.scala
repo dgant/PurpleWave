@@ -6,23 +6,15 @@ import Information.Geography.Pathfinding.Types.TilePath
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Physics.ForceMath
-import Mathematics.Points.{Pixel, Tile}
+import Mathematics.Points.Pixel
 import Micro.Actions.{Action, Idle}
 import Micro.Coordination.Pushing.{TrafficPriorities, TrafficPriority}
 import Performance.{Cache, KeyedCache}
-import ProxyBwapi.Techs.Tech
-import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import ProxyBwapi.Upgrades.Upgrade
 
 import scala.collection.mutable.ArrayBuffer
 
 class Agent(val unit: FriendlyUnitInfo) {
-  
-  def intend(client: Any, intent: Intention) {
-    this.intent = intent
-    this.client = Some(client)
-  }
 
   /////////////
   // History //
@@ -44,22 +36,10 @@ class Agent(val unit: FriendlyUnitInfo) {
   var toTravel      : Option[Pixel]             = None
   var toReturn      : Option[Pixel]             = None
   var toAttack      : Option[UnitInfo]          = None
-  var toScan        : Option[Pixel]             = None
   var toGather      : Option[UnitInfo]          = None
-  var toAddon       : Option[UnitClass]         = None
-  var toBuild       : Option[UnitClass]         = None
-  var toBuildTile   : Option[Tile]              = None
-  var toTrain       : Option[UnitClass]         = None
-  var toTech        : Option[Tech]              = None
-  var toFinish      : Option[UnitInfo]          = None
-  var toUpgrade     : Option[Upgrade]           = None
   var toBoard       : Option[FriendlyUnitInfo]  = None
   var toNuke        : Option[Pixel]             = None
   var toRepair      : Option[UnitInfo]          = None
-  var canFight      : Boolean                   = true
-  var canMeld       : Boolean                   = false
-  var canLiftoff    : Boolean                   = false
-  var canCancel     : Boolean                   = false
   var shouldEngage  : Boolean                   = false
   val forces        : ForceMap                  = new ForceMap
 
@@ -145,22 +125,10 @@ class Agent(val unit: FriendlyUnitInfo) {
     toTravel      = intent.toTravel
     toReturn      = intent.toReturn
     toAttack      = intent.toAttack
-    toScan        = intent.toScan
     toGather      = intent.toGather
-    toAddon       = intent.toAddon
-    toBuild       = intent.toBuild
-    toBuildTile   = intent.toBuildTile
-    toTrain       = intent.toTrain
-    toTech        = intent.toTech
-    toFinish      = intent.toFinish
-    toUpgrade     = intent.toUpgrade
     toRepair      = intent.toRepair
     toBoard       = intent.toBoard.orElse(toBoard)
     toNuke        = intent.toNuke
-    canFight      = intent.canFight
-    canMeld       = intent.canMeld
-    canLiftoff    = intent.canLiftoff
-    canCancel     = intent.canCancel
   }
 
   /////////////

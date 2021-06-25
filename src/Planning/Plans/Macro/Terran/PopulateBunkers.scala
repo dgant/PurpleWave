@@ -39,7 +39,7 @@ class PopulateBunkers extends Plan {
       val intent = new Intention
       intent.toTravel = Some(bunker.pixel)
       intent.toBoard = Some(bunker)
-      unit.agent.intend(this, intent)
+      unit.intend(this, intent)
     })
   }
 }

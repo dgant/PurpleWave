@@ -41,7 +41,7 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Production {
     if ( ! currencyLock.satisfied) return
     
     upgraders.acquire(this)
-    upgraders.units.foreach(_.agent.intend(this, new Intention { toUpgrade = Some(upgrade) }))
+    upgraders.units.foreach(_.intend(this, new Intention { toUpgrade = Some(upgrade) }))
   }
 
   override val toString: String = f"Research $upgrade"

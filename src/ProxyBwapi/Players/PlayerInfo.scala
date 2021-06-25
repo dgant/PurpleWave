@@ -30,7 +30,7 @@ case class PlayerInfo(bwapiPlayer: Player) extends PlayerProxy(bwapiPlayer) {
   def hasUpgrade(upgrade: Upgrade): Boolean = getUpgradeLevel(upgrade) > 0
 
   override def hasTech(tech: Tech): Boolean = {
-    super.hasTech(tech) || With.scouting.techsOwned(this).contains(tech)
+    super.hasTech(tech) || With.scouting.techsOwned.get(this).exists(_.contains(tech))
   }
 
   lazy val colorMidnight: bwapi.Color   =

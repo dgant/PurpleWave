@@ -14,7 +14,7 @@ object PsionicStorm extends TargetedSpell {
   override protected def tech             : Tech      = Protoss.PsionicStorm
   override protected def aoe              : Boolean   = true
   override protected def castRangeTiles   : Int       = 9
-  override protected def thresholdValue   : Double    = 14 * Terran.Marine.subjectiveValue
+  override protected def thresholdValue   : Double    = 12 * Terran.Marine.subjectiveValue
   override protected def lookaheadPixels  : Int       = 24
 
   override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
@@ -29,16 +29,18 @@ object PsionicStorm extends TargetedSpell {
       Zerg.Egg,
       Zerg.LurkerEgg)) return 0.0
 
-    val templar = caster.matchups.allyTemplarCount
+    val templar = caster.matchups.allyTemplarCount()
     val storms  = caster.energy / Protoss.PsionicStorm.energyCost
 
     // Don't wander into tank range
     if (target.isEnemy
       && templar < 3
-      && target.is(Terran.SiegeTankSieged)
+      && Terran.SiegeTankSieged(target)
       && caster.pixelDistanceCenter(target) > 32 * castRangeTiles
       && (caster.visibleToOpponents || target.tile.altitude >= caster.tile.altitude)
-      && target.matchups.targetsInRange.isEmpty) {
+      && target.matchups.targetsInRange.isEmpty
+      && ! caster.effectivelyCloaked
+      && target.cooldownLeft < Maff.nanToInfinity((caster.pixelDistanceEdge(target) - 32 * castRangeTiles) / caster.topSpeed)) {
       return 0.0
     }
 

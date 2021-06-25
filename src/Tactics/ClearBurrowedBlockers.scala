@@ -34,21 +34,21 @@ class ClearBurrowedBlockers extends Prioritized {
     }
 
     val target = With.units.ours
-      .find(u => u.agent.toBuild.exists(_.isTownHall) && ! u.unitClass.isBuilding)
-      .flatMap(_.agent.toBuildTile.map(_.center))
+      .find(u => u.intent.toBuild.exists(_.isTownHall) && ! u.unitClass.isBuilding)
+      .flatMap(_.intent.toBuildTile.map(_.center))
 
     if (target.isEmpty) return
 
     detector.get.preference = PreferClose(target.get)
     detector.get.acquire(this)
-    detector.get.units.foreach(_.agent.intend(this, new Intention {
+    detector.get.units.foreach(_.intend(this, new Intention {
       toTravel = target
     }))
 
     if (With.enemies.exists(_.isZerg) || detector.get.units.forall(_.framesToTravelTo(target.get) > Seconds(5)())) {
       clearer.get.preference = PreferClose(target.get)
       clearer.get.acquire(this)
-      clearer.get.units.foreach(_.agent.intend(this, new Intention {
+      clearer.get.units.foreach(_.intend(this, new Intention {
         toTravel = Some(target.get.add(Random.nextInt(160) - 80, Random.nextInt(128) - 64))
       }))
     }

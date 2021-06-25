@@ -57,7 +57,7 @@ class RepairBunker extends Plan {
     lock.counter = CountUpTo(repairersNeeded)
     lock.preference = PreferClose(bunker.pixel)
     lock.acquire(this)
-    lock.units.foreach(scv => scv.agent.intend(this, new Intention {
+    lock.units.foreach(scv => scv.intend(this, new Intention {
       toRepair = Some(bunker)
     }))
   }

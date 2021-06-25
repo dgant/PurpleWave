@@ -34,7 +34,7 @@ class ZvESparkle extends GameplanTemplate {
       val targets = With.geography.ourZones.flatMap(_.units.filter(Neutral.PsiDisruptor))
       if (targets.isEmpty) return
       killers.acquire(this)
-      killers.units.foreach(killer => killer.agent.intend(this, new Intention {
+      killers.units.foreach(killer => killer.intend(this, new Intention {
         toAttack = targets.headOption
       }))
     }

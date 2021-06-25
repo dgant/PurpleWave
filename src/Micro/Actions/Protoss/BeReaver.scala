@@ -81,13 +81,8 @@ object BeReaver extends Action {
       }
     )
     if (path.pathExists) {
-      if (unit.pixelDistanceSquared(path.end.center) <= 16 * 16 && unit.agent.intent.dropOnArrival) {
-        unit.transport.foreach(Commander.unload(_, unit))
-        Commander.doNothing(unit)
-      } else {
-        unit.agent.toTravel = Some(path.end.center)
-        MicroPathing.tryMovingAlongTilePath(unit, path)
-      }
+      unit.agent.toTravel = Some(path.end.center)
+      MicroPathing.tryMovingAlongTilePath(unit, path)
     } else {
       With.logger.warn(f"Failed to path $unit to $destinationGround")
       With.logger.warn(f"Targeting $target")

@@ -16,11 +16,11 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Build extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.agent.toBuild.isDefined && unit.agent.toBuildTile.isDefined
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.intent.toBuild.isDefined && unit.intent.toBuildTile.isDefined
   
   override def perform(unit: FriendlyUnitInfo) {
     
-    val ourBuilding = With.grids.units.get(unit.agent.toBuildTile.get).find(_.unitClass == unit.agent.toBuild.get)
+    val ourBuilding = With.grids.units.get(unit.intent.toBuildTile.get).find(_.unitClass == unit.intent.toBuild.get)
     
     if (ourBuilding.isDefined) {
       unit.agent.toGather = Maff.minBy(With.geography.ourBases.flatMap(_.minerals))(_.pixelDistanceCenter(unit.pixel))
@@ -28,8 +28,8 @@ object Build extends Action {
       return
     }
     
-    val distance  = unit.pixelDistanceCenter(unit.agent.toBuildTile.get.center)
-    val buildArea = unit.agent.toBuild.get.tileArea.add(unit.agent.toBuildTile.get)
+    val distance  = unit.pixelDistanceCenter(unit.intent.toBuildTile.get.center)
+    val buildArea = unit.intent.toBuild.get.tileArea.add(unit.intent.toBuildTile.get)
     
     def blockersForTile(tile: Tile) = {
       With.grids.units
@@ -55,7 +55,6 @@ object Build extends Action {
       Gather.delegate(unit)
     }
     else if(blockersToKill.nonEmpty) {
-      unit.agent.canFight = true
       lazy val noThreats  = unit.matchups.threats.isEmpty
       lazy val allWorkers = unit.matchups.threats.size == 1 && unit.matchups.threats.head.unitClass.isWorker
       lazy val healthy    = unit.totalHealth > 10 || unit.totalHealth >= unit.matchups.threats.head.totalHealth
@@ -72,8 +71,8 @@ object Build extends Action {
     
     if (unit.unready) return
     
-    val buildClass = unit.agent.toBuild.get
-    val buildTile = unit.agent.intent.toBuildTile.get
+    val buildClass = unit.intent.toBuild.get
+    val buildTile = unit.intent.toBuildTile.get
 
     val pushPixel = buildArea.midPixel
     val priority = if (unit.pixelDistanceCenter(pushPixel) < 128) TrafficPriorities.Shove else TrafficPriorities.Bump

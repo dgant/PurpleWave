@@ -148,7 +148,7 @@ object FormationGeneric {
     val costDistanceGoal    = if (floodCostDistanceGoal == 0)   0 else floodCostDistanceGoal    * tile.groundTilesManhattan(floodGoal)
     val costDistanceOrigin  = if (floodCostDistanceOrigin == 0) 0 else floodCostDistanceOrigin  * tile.groundTilesManhattan(floodOrigin)
     val costThreat          = if (floodCostThreat == 0)         0 else floodCostThreat          * With.grids.enemyRangeGround(tile)
-    val costVulnerability   = if (floodCostVulnerability == 0)  0 else Math.max(0, vGrid.margin + vGrid.maxVulnerability - vGrid(tile))
+    val costVulnerability   = if (floodCostVulnerability == 0)  0 else floodCostVulnerability   * Math.max(0, vGrid.margin + vGrid.maxVulnerability - vGrid(tile))
     // TODO: The vulnerability cost should vary based on the range of the unit.
     // Punishing, eg, a dragoon for not being adjacent to its target, doesn't allow sniping units from uphill
     // Our current formula doesn't allow this, as we do a single flood-fill across unit types

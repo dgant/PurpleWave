@@ -161,6 +161,7 @@ class Tactics extends TimedTask {
     }
 
     catchDTRunby.recruit()
+    freelancers --= catchDTRunby.lock.units
 
     // If we want to attack and engough freelancers remain, populate the attack squad
     // TODO: If the attack goal is the enemy army, and we have a defense squad handling it, skip this step

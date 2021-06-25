@@ -18,7 +18,7 @@ class Intention {
   var toBuildTile   : Option[Tile]              = None
   var toTrain       : Option[UnitClass]         = None
   var toTech        : Option[Tech]              = None
-  var toFinish      : Option[UnitInfo]          = None
+  var toFinishConstruction      : Option[UnitInfo]          = None
   var toReturn      : Option[Pixel]             = None
   var toNuke        : Option[Pixel]             = None
   var toUpgrade     : Option[Upgrade]           = None
@@ -27,9 +27,8 @@ class Intention {
   var toScoutTiles  : Seq[Tile]                 = Seq.empty
   var canFight      : Boolean                   = true
   var canFlee       : Boolean                   = true
-  var canMeld       : Boolean                   = false
+  var shouldMeld    : Boolean                   = false
   var canTickle     : Boolean                   = false
-  var canLiftoff    : Boolean                   = false
-  var canCancel     : Boolean                   = false
-  var dropOnArrival : Boolean                   = true
+  var shouldLiftoff : Boolean                   = false
+  var shouldCancel  : Boolean                   = false
 }

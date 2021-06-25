@@ -2,6 +2,7 @@ package Information.Geography.Types
 
 import Lifecycle.With
 import Mathematics.Points.Tile
+import ProxyBwapi.UnitInfo.UnitInfo
 
 case class Metro(bases: Seq[Base]) {
   def merge(other: Metro): Metro = Metro(bases ++ other.bases)
@@ -15,4 +16,6 @@ case class Metro(bases: Seq[Base]) {
     })
   )
   val tiles: Set[Tile] = zones.flatMap(_.tiles.view).toSet
+
+  def units: Seq[UnitInfo] = zones.view.flatMap(_.units)
 }

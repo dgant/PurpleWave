@@ -23,7 +23,7 @@ object Idle extends Action {
     Unbunk,
     Meld,
     Build,
-    Finish,
+    FinishConstruction,
     FightOrFlight,
     Tickle,
     Repair,

@@ -15,7 +15,7 @@ import Strategery.Strategies.AllRaces.{WorkersKill, WorkersRaze, WorkersSpread, 
 object Tickle extends Action {
   
   override def allowed(tickler: FriendlyUnitInfo): Boolean = {
-    tickler.agent.intent.canTickle
+    tickler.intent.canTickle
   }
 
   def workersSpread : Boolean = WorkersSpread.registerActive

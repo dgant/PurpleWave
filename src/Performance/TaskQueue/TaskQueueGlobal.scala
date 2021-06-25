@@ -1,4 +1,5 @@
 package Performance.TaskQueue
+import Information.Battles.GlobalSafeToMoveOut
 import Lifecycle.With
 import Performance.Tasks._
 
@@ -29,6 +30,7 @@ class TaskQueueGlobal extends TaskQueueParallel(
       With.prioritizer.update()
       With.scheduler.reset() // Synchronous with gameplan; Flickers ShowProduction otherwise
       With.blackboard.reset() // Synchronous with gameplan; Flickers flags otherwise
+      With.blackboard.safeToMoveOut.set(GlobalSafeToMoveOut())
       With.strategy.gameplan.update()
       if (With.yolo.active()) With.blackboard.wantToAttack.set(true)
     }),

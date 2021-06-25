@@ -38,9 +38,8 @@ class SquadAttack extends Squad {
     }
 
     units.foreach(attacker => {
-      attacker.agent.intend(this, new Intention {
+      attacker.intend(this, new Intention {
         toTravel = formation.filter(_.placements.size > 4).flatMap(_.placements.get(attacker)).orElse(Some(vicinity))
-        dropOnArrival = false
       })
     })
   }

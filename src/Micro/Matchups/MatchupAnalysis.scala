@@ -37,7 +37,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   lazy val anchor                     : Option[UnitInfo]  = Maff.minBy(anchors.filter(_.unitClass.subjectiveValue == anchors.view.map(_.unitClass.subjectiveValue).max))(a => a.pixelDistanceEdge(me) + a.presumptiveTarget.map(a.pixelsToGetInRange).getOrElse(a.pixelDistanceTravelling(a.presumptiveDestination)))
   lazy val anchors                    : Vector[UnitInfo]  = me.friendly.map(_.alliesSquad).getOrElse(allies).filter(doesAnchor(_, me)).toVector
   lazy val arbiterCovering            : Cache[Boolean]    = new Cache(() => allies.exists(a => Protoss.Arbiter(a) && a.pixelDistanceEdge(me) < 160))
-  lazy val allyTemplarCount           : Int               = allies.count(Protoss.HighTemplar)
+  lazy val allyTemplarCount           : Cache[Int]        = new Cache(() => allies.count(Protoss.HighTemplar))
   lazy val busyForCatching            : Boolean           = me.unitClass.isWorker && (me.gathering || me.constructing || me.repairing || BlockConstruction.constructionOrders.contains(me.order))
   lazy val catchers                   : Vector[UnitInfo]  = threats.filter(canCatchMe).toVector
   lazy val splashFactorMax            : Double            = splashFactorForUnits(targets)

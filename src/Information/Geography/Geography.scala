@@ -84,8 +84,8 @@ class Geography extends TimedTask {
 
   private def getUpcomingBases: Vector[Base] = With.units.ours
     .view
-    .filter(_.agent.toBuild.exists(_.isTownHall))
-    .flatMap(_.agent.toBuildTile)
+    .filter(_.intent.toBuild.exists(_.isTownHall))
+    .flatMap(_.intent.toBuildTile)
     .flatMap(_.base)
     .filter(_.townHall.isEmpty)
     .toVector
@@ -104,8 +104,8 @@ class Geography extends TimedTask {
         && (With.units.existsEnemy(_.unitClass.ranged) || With.battles.global.globalSafeToAttack))
     ++ With.units.ours
       .view
-      .filter(_.agent.toBuild.exists(_.isTownHall))
-      .flatMap(_.agent.toBuildTile.map(tile => tile.zone.bases.find(base => base.townHallTile == tile)))
+      .filter(_.intent.toBuild.exists(_.isTownHall))
+      .flatMap(_.intent.toBuildTile.map(tile => tile.zone.bases.find(base => base.townHallTile == tile)))
       .flatten
       .filterNot(_.owner.isUs)
     ).distinct

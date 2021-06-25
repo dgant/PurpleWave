@@ -46,7 +46,7 @@ class BuildAddon(val addonClass: UnitClass) extends Production {
       addon = builder.addon
       addon.foreach(_.setProducer(this))
       if (addon.isEmpty) {
-        builder.agent.intend(this, new Intention {
+        builder.intend(this, new Intention {
           toAddon = if (currencyLock.satisfied) Some(addonClass) else None
         })
       }

@@ -13,7 +13,6 @@ object TargetFilterGroups {
     TargetFilterRush,
     TargetFilterVulture,
     TargetFilterFutility,
-    TargetFilterAnchor,
     TargetFilterVsInterceptors,
     TargetFilterVsTank)
 
@@ -25,6 +24,5 @@ object TargetFilterGroups {
     TargetFilterArchonOptional,
     TargetFilterAntiAir,
     TargetFilterCombatants,
-    TargetFilterFrontline,
   )
 }

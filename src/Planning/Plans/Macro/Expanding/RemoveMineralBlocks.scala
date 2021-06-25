@@ -27,6 +27,6 @@ class RemoveMineralBlocks extends Plan {
     val mineral = ourMineralBlocks.head
     miners.preference = PreferClose(mineral.pixel)
     miners.acquire(this)
-    miners.units.foreach(_.agent.intend(this, new Intention { toGather = Some(mineral) }))
+    miners.units.foreach(_.intend(this, new Intention { toGather = Some(mineral) }))
   }
 }

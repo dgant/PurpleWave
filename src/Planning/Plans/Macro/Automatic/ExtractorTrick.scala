@@ -32,9 +32,9 @@ class ExtractorTrick extends Plan {
     else if (shouldCancelExtractor) {
       extractors.foreach(unit => {
         val intent = new Intention
-        intent.canCancel = true
+        intent.shouldCancel = true
         intent.toGather = unit.base.flatMap(_.minerals.headOption)
-        unit.agent.intend(this, intent)
+        unit.intend(this, intent)
       })
     }
   }

@@ -13,30 +13,36 @@ object Target extends {
     attacker.agent.toAttack
   }
 
-  def choose(attacker: FriendlyUnitInfo, whitelist: Iterable[UnitInfo]): Option[UnitInfo] = {
-    choose(attacker, TargetFilterWhitelist(whitelist))
-  }
-
-  def chooseUnfiltered(attacker: FriendlyUnitInfo, targets: Iterable[UnitInfo]): Option[UnitInfo] = {
-    attacker.agent.toAttack = bestUnfiltered(attacker, targets)
-    attacker.agent.toAttack
-  }
-
   def best(attacker: FriendlyUnitInfo, filters: TargetFilter*): Option[UnitInfo] = {
-    bestUnfiltered(attacker, legal(attacker, filters: _*))
+    val squadQueueRaw = attacker.squad.flatMap(_.targetQueue)
+
+    // If we have no squad guidance at all, use default targeting
+    if (squadQueueRaw.isEmpty) return bestUnfiltered(attacker, legal(attacker, filters: _*))
+
+    val squadQueue = legal(attacker, squadQueueRaw.get)
+    lazy val combatTargetInRangeSquad = squadQueue.find(t => t.unitClass.attacksOrCastsOrDetectsOrTransports && attacker.inRangeToAttack(t))
+    lazy val combatTargetInRangeAny = bestUnfiltered(attacker, attacker.matchups.targetsInRange.filter(_.unitClass.attacksOrCastsOrDetectsOrTransports))
+    val output = combatTargetInRangeSquad
+      .orElse(combatTargetInRangeAny)
+      .orElse(squadQueue.headOption)
+    output
   }
 
   def best(attacker: FriendlyUnitInfo, whitelist: Iterable[UnitInfo]): Option[UnitInfo] = {
     best(attacker, TargetFilterWhitelist(whitelist))
   }
 
-  private def bestUnfiltered(attacker: FriendlyUnitInfo, targets: Iterable[UnitInfo]): Option[UnitInfo] = {
+  def bestUnfiltered(attacker: FriendlyUnitInfo, targets: Iterable[UnitInfo]): Option[UnitInfo] = {
     Maff.maxBy(targets)(score(attacker, _))
   }
 
   def legal(attacker: FriendlyUnitInfo, filters: TargetFilter*): Seq[UnitInfo] = {
+    legal(attacker, attacker.matchups.targets, filters: _*)
+  }
+
+  def legal(attacker: FriendlyUnitInfo, targets: Seq[UnitInfo], filters: TargetFilter*): Seq[UnitInfo] = {
     val allFilters = filtersRequired(attacker) ++ filters
-    attacker.matchups.targets.view.filter(target => With.yolo.active() || allFilters.forall(_.legal(attacker, target)))
+    targets.view.filter(target => With.yolo.active() || allFilters.forall(_.legal(attacker, target)))
   }
 
   def filtersRequired(attacker: FriendlyUnitInfo): Seq[TargetFilter] = {
@@ -62,7 +68,6 @@ object Target extends {
   @inline def framesOutOfTheWay(attacker: CombatUnit, target: CombatUnit): Double = {
     if (attacker.canMove) Math.max(0, attacker.framesToGetInRange(target) - attacker.cooldownLeft) else 0
   }
-
 
   // Used by combat simulation as well, to keep targeting behavior somewhat consistent
   // Thus the implementation needs to be FAST.

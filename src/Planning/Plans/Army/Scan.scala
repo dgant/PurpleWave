@@ -49,8 +49,8 @@ class Scan extends Plan {
     }
     
     val blockedBuilders = With.units.ours.filter(b =>
-      b.agent.toBuild.exists(_.isTownHall)
-      && b.agent.toBuildTile.map(_.center).exists(b.pixelDistanceCenter(_) < 96)
+      b.intent.toBuild.exists(_.isTownHall)
+      && b.intent.toBuildTile.map(_.center).exists(b.pixelDistanceCenter(_) < 96)
       && b.seeminglyStuck)
     
     if (blockedBuilders.nonEmpty) {
@@ -63,7 +63,7 @@ class Scan extends Plan {
     scanners.acquire(this)
     val units = scanners.units
     if (units.nonEmpty) {
-      units.maxBy(_.energy).agent.intend(this, new Intention { toScan = Some(targetPixel) })
+      units.maxBy(_.energy).intend(this, new Intention { toScan = Some(targetPixel) })
       lastScan = With.frame
     }
   }

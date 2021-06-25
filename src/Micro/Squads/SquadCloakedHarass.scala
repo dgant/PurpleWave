@@ -44,18 +44,18 @@ class SquadCloakedHarass extends Squad {
         harassBase(unit, lastOptionBase.get)
         basesAssigned(lastOptionBase.get) += 1
       } else {
-        unit.agent.intend(this, new Intention { toTravel = Some(With.scouting.mostBaselikeEnemyTile.center) })
+        unit.intend(this, new Intention { toTravel = Some(With.scouting.mostBaselikeEnemyTile.center) })
       }
     })
   }
 
   def harassBase(unit: FriendlyUnitInfo, base: Base): Unit = {
-    unit.agent.intend(this, new Intention { toTravel = Some(base.heart.center) })
+    unit.intend(this, new Intention { toTravel = Some(base.heart.center) })
   }
 
   def harassDivision(unit: FriendlyUnitInfo, division: Division): Unit = {
     val target = Maff.minBy(division.enemies.view.filter(unit.canAttack))(unit.pixelsToGetInRange).map(_.pixel).getOrElse(With.scouting.mostBaselikeEnemyTile.center)
-    unit.agent.intend(this, new Intention { toTravel = Some(target) })
+    unit.intend(this, new Intention { toTravel = Some(target) })
   }
 
   private def baseProducingDetection(base: Base): Boolean = base.units.exists(u => ! u.complete && (u.unitClass.isDetector || u.isAny(Terran.EngineeringBay, Terran.Academy, Protoss.RoboticsFacility, Protoss.Observatory)))

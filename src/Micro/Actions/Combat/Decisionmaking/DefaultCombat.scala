@@ -22,7 +22,7 @@ import Utilities.Seconds
 
 object DefaultCombat extends Action {
 
-  override def allowed(unit: FriendlyUnitInfo): Boolean = (unit.canMove || unit.canAttack) && unit.agent.canFight
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (unit.canMove || unit.canAttack) && unit.intent.canFight
 
   private abstract class Technique(val transitions: Technique*) {
     def canTransition(other: Technique): Boolean = transitions.contains(other)

@@ -1,5 +1,6 @@
-package Micro.Targeting.Filters
+package Micro.Targeting.FiltersRequired
 
+import Micro.Targeting.TargetFilter
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 

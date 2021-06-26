@@ -1,5 +1,6 @@
 package ProxyBwapi.UnitInfo
 
+import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
 import Mathematics.Maff
 import Performance.Cache
@@ -9,6 +10,8 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitTracking.Visibility
 import Utilities.{Forever, LightYear}
+
+import scala.collection.mutable
 
 /**
   * Shared base type for units which could either be real or simulated
@@ -186,4 +189,70 @@ trait CombatUnit {
   @inline final def isEnemy    : Boolean = player.isEnemy
   @inline final def isEnemyOf(otherUnit: UnitInfo): Boolean = (isFriendly && otherUnit.isEnemy) || (isEnemy && otherUnit.isFriendly)
   @inline final def isAllyOf(otherUnit: UnitInfo): Boolean = (isFriendly && otherUnit.isFriendly) || (isEnemy && otherUnit.isEnemy)
+
+  ////////////
+  // Damage //
+  ////////////
+
+  case class DamageSource(source: CombatUnit, onFrame: Int, committed: Boolean, guaranteed: Boolean, damageTotal: Int) {
+    override def toString: String = f"$damageTotal from $source to $this in ${With.framesUntil(onFrame)} frames"
+  }
+  val damageQueue = new mutable.ArrayBuffer[DamageSource]()
+  def addDamage(source: CombatUnit, inFrames: Int, committed: Boolean) {
+    val damagePrevious = damageQueue.find(_.source == source)
+    val damageNew = DamageSource(
+      source = source,
+      onFrame = Math.min(With.frame + inFrames, damagePrevious.map(_.onFrame).getOrElse(Forever())),
+      committed = committed,
+      guaranteed = committed && source.hitChanceAgainst(this) > .9,
+      damageTotal = source.damageOnNextHitAgainst(this))
+    damagePrevious.foreach(damageQueue.-=)
+    val insertIndex = damageQueue.indexWhere(_.onFrame > damageNew.onFrame)
+    if (insertIndex >= 0) damageQueue.insert(insertIndex, damageNew) else damageQueue += damageNew
+  }
+  def addFutureAttack(source: CombatUnit): Unit = {
+    addDamage(
+      source,
+      Math.max(source.framesToGetInRange(this), source.cooldownLeft)
+      + source.unitClass.stopFrames
+      + source.expectedProjectileFrames,
+      committed = source.isOurs && source.inRangeToAttack(this))
+  }
+  /**
+   * For the very small number of units with substantial stop frames
+   * AND a travelling projectile,
+   * this gives the expected duration in which bullet is present but target has yet to receive damage
+   */
+  def expectedProjectileFrames: Int = {
+    // At max range it looks to be 12 frames for a Dragoon.
+    // Closer range can be 7 and possibly shorter
+    if (unitClass == Protoss.Dragoon) 7
+    // Measured minimum of 5 frames for a Vulture right next to a Cannon
+    else if (unitClass == Protoss.PhotonCannon) 5
+    // I definitely did not take the trouble to actually measure this
+    else if (unitClass == Zerg.Devourer) 7
+    else 0
+  }
+  def removeDamage(source: CombatUnit): Unit = {
+    val toRemove = damageQueue.view.filter(_.source == source).toVector
+    damageQueue --= toRemove
+  }
+  def clearDamage() {
+    damageQueue.clear()
+  }
+  def doomed: Boolean = doomFrame < Forever()
+  def doomFrame: Int = {
+    var damageRequired = totalHealth
+    var i = 0
+    var frame = Forever()
+    while (damageRequired > 0 && i < damageQueue.size) {
+      val next: DamageSource = damageQueue(i)
+      if (next.guaranteed) {
+        damageRequired -= next.damageTotal
+        frame = next.onFrame
+      }
+      i += 1
+    }
+    frame
+  }
 }

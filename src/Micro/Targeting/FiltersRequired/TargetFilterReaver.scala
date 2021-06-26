@@ -1,11 +1,13 @@
-package Micro.Targeting.Filters
+package Micro.Targeting.FiltersRequired
+
 import Lifecycle.With
+import Micro.Targeting.TargetFilter
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterReaver extends TargetFilter {
   simulationSafe = true
-  override def appliesTo(actor: FriendlyUnitInfo): Boolean = actor.is(Protoss.Reaver)
+  override def appliesTo(actor: FriendlyUnitInfo): Boolean = Protoss.Reaver(actor)
   override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
     if (actor.agent.ride.isEmpty) return true
 

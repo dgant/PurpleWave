@@ -1,9 +1,9 @@
 package Micro.Actions.Combat.Tactics
 
 import Micro.Actions.Action
-import Micro.Targeting.Filters.TargetFilterPotshot
 import Micro.Targeting.Target
 import Micro.Agency.Commander
+import Micro.Targeting.FiltersSituational.TargetFilterPotshot
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Potshot extends Action {

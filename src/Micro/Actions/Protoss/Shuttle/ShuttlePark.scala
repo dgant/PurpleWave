@@ -4,13 +4,11 @@ import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
-import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-
 
 object ShuttlePark extends Action {
 
-  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.is(Protoss.Shuttle) && unit.agent.passengers.exists( ! _.loaded)
+  override def allowed(unit: FriendlyUnitInfo): Boolean = BeShuttle.allowed(unit) && unit.agent.passengers.exists( ! _.loaded)
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
     Maff.minBy(shuttle.agent.passengers

@@ -8,7 +8,6 @@ import Micro.Agency.Commander
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-
 object Brawl extends Action {
   
   // In close-quarters fights against other melee units,

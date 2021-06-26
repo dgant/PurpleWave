@@ -1,13 +1,14 @@
 package Micro.Targeting
 
-import Micro.Targeting.Filters._
+import Micro.Targeting.FiltersOptional.{TargetFilterArchonOptional, TargetFilterCarrierInLeash, TargetFilterCarrierInRange, TargetFilterCombatants}
+import Micro.Targeting.FiltersRequired._
 
 object TargetFilterGroups {
   val filtersRequired = Vector(
     TargetFilterPossible,
     TargetFilterLarvaAndEgg,
-    TargetFilterSquad,
-    TargetFilterCloaked,
+    TargetFilterFocus,
+    TargetFilterStayCloaked,
     TargetFilterScourge,
     TargetFilterReaver,
     TargetFilterRush,
@@ -22,7 +23,6 @@ object TargetFilterGroups {
     TargetFilterCarrierInRange,
     TargetFilterCarrierInLeash,
     TargetFilterArchonOptional,
-    TargetFilterAntiAir,
     TargetFilterCombatants,
   )
 }

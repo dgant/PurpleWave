@@ -72,14 +72,14 @@ object Potential {
   }
 
   def correctDepth(unit: FriendlyUnitInfo): Force = {
-    unit.battle.map(_.us).flatMap(team =>
+    unit.team.flatMap(team =>
       unit.depthCurrent().map(depth => {
         ForceMath.fromRadians(team.axisDepth(), unit.depthCurrent().get -  team.depthMean())
       })).getOrElse(new Force)
   }
 
   def correctWidth(unit: FriendlyUnitInfo): Force = {
-    unit.battle.map(b => ForceMath.fromPixels(b.us.centroidGround(), unit.widthSlotIdeal(), b.us.centroidGround().pixelDistance(unit.widthSlotIdeal()))).getOrElse(new Force)
+    unit.team.map(t => ForceMath.fromPixels(t.centroidGround(), unit.widthSlotIdeal(), t.centroidGround().pixelDistance(unit.widthSlotIdeal()))).getOrElse(new Force)
   }
 
   def preferCohesion(unit: FriendlyUnitInfo): Force = {

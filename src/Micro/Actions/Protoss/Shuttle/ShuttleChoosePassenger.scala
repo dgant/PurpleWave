@@ -6,8 +6,7 @@ import Micro.Actions.Action
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-
-object ShuttleAcceptRider extends Action {
+object ShuttleChoosePassenger extends Action {
 
   override def allowed(shuttle: FriendlyUnitInfo): Boolean = (
     BeShuttle.allowed(shuttle)
@@ -33,9 +32,7 @@ object ShuttleAcceptRider extends Action {
       .view
       .filter(passenger =>
         passenger.is(Protoss.Reaver) && (
-          // If the candidate has different goals than our passenger, and aren't in immediate danger, we can't help them
           shuttle.agent.passengers.isEmpty
-          || shuttle.battle.exists(passenger.battle.contains)
           || shuttle.agent.passengers.headOption.map(_.squad).getOrElse(shuttle.squad).forall(passenger.squad.contains))
       )
       .flatMap(_.friendly)
@@ -48,12 +45,10 @@ object ShuttleAcceptRider extends Action {
             otherShuttle.is(Protoss.Shuttle)
             && otherShuttle.complete
             && otherShuttle.pixelDistanceEdge(passenger) < shuttle.pixelDistanceEdge(passenger)
-            && otherShuttle.friendly.exists(_.spaceRemaining >= shuttle.spaceRemaining))
-      ).toSeq
+            && otherShuttle.friendly.exists(_.spaceRemaining >= shuttle.spaceRemaining)))
+      .toVector
 
-    val pickupCandidate = Maff.maxBy(pickupCandidates)(c => pickupNeed(shuttle, c) / (1.0 + c.pixelDistanceSquared(shuttle)))
-    pickupCandidate.foreach(hailer => {
-      shuttle.agent.claimPassenger(hailer)
-    })
+    val candidate = Maff.maxBy(pickupCandidates)(c => pickupNeed(shuttle, c) / (1.0 + c.pixelDistanceSquared(shuttle)))
+    candidate.foreach(shuttle.agent.addPassenger)
   }
 }

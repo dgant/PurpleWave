@@ -5,12 +5,12 @@ import Micro.Coordination.Pushing.Pushes
 
 class Coordinator {
 
+  val damageTracker = new DamageTracker
   val gridPathOccupancy = new GridPathOccupancy
-  val ridesharing = new Ridesharing
   val pushes = new Pushes
 
   def onAgentCycle(): Unit = {
-    ridesharing.onAgentCycle()
+    damageTracker.update()
     gridPathOccupancy.update()
     pushes.onAgentCycle()
   }

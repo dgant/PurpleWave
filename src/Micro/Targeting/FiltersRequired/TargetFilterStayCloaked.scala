@@ -1,8 +1,10 @@
-package Micro.Targeting.Filters
+package Micro.Targeting.FiltersRequired
+
 import Mathematics.Points.TileRectangle
+import Micro.Targeting.TargetFilter
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-object TargetFilterCloaked extends TargetFilter {
+object TargetFilterStayCloaked extends TargetFilter {
   simulationSafe = true
   override def appliesTo(actor: FriendlyUnitInfo): Boolean = actor.cloaked && ! actor.matchups.arbiterCovering()
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {

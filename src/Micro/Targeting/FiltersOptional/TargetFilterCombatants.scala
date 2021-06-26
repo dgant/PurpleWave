@@ -1,5 +1,6 @@
-package Micro.Targeting.Filters
+package Micro.Targeting.FiltersOptional
 
+import Micro.Targeting.TargetFilter
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterCombatants extends TargetFilter {

@@ -65,7 +65,7 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   }
 
   def alliesSquad                   : Iterable[FriendlyUnitInfo]      = squad.map(_.units.view).map(_.filter(_ != this)).getOrElse(Iterable.empty)
-  def alliesBattle                  : Iterable[FriendlyUnitInfo]      = battle.map(_.us.units.view.map(_.friendly).filter(_.nonEmpty).map(_.get)).getOrElse(Iterable.empty).filter(_ != this)
+  def alliesBattle                  : Iterable[FriendlyUnitInfo]      = team.map(_.units.view.map(_.friendly).filter(_.nonEmpty).map(_.get)).getOrElse(Iterable.empty).filter(_ != this)
   def alliesAll                     : Iterable[FriendlyUnitInfo]      = With.units.ours.filter(_ != this)
   def enemiesSquad                  : Iterable[UnitInfo]              = squad.map(_.enemies).getOrElse(Iterable.empty)
   def enemiesBattle                 : Iterable[UnitInfo]              = battle.map(_.enemy.units.view).getOrElse(Seq.empty)
@@ -110,6 +110,7 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   override def loadedUnitCount: Int = loadedUnits.size
   def loadedUnits: Vector[FriendlyUnitInfo] = _loadedUnitsCache()
   private val _loadedUnitsCache = new Cache(() => if (unitClass.canLoadUnits) base.getLoadedUnits.asScala.flatMap(With.units.get).flatMap(_.friendly).toVector else Vector.empty)
+  def loadedUnitsSize: Int = loadedUnits.view.map(_.unitClass.spaceRequired).sum
   
   def canTransport(passenger: FriendlyUnitInfo): Boolean = (
     isTransport

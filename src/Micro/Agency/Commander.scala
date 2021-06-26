@@ -52,7 +52,7 @@ object Commander {
   def attack(unit: FriendlyUnitInfo): Unit = unit.agent.toAttack.foreach(attack(unit, _))
   private def attack(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
     leadFollower(unit, attack(_, target))
-    unit.agent.directRide(target.pixel)
+    unit.agent.setRideGoal(target.pixel)
     unit.agent.tryingToMove = unit.pixelsToGetInRange(target) > tryingToMoveThreshold
     if (unit.unready) return
 
@@ -74,10 +74,11 @@ object Commander {
 
     if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
     if ( ! unit.readyForAttackOrder) { sleep(unit); return }
-  
-    // TODO: Fix attack cancelling for Photon Cannons
+
+    // We used to skip Photon Cannons here due to inadvertent attack cancelling.
+    // Now experimenting with using a 6-frame stopFrame and resuming targeting.
     //
-    // Via Ankmairdor, the iscript:
+    // Via Ankmairdor, the iscript for Photon Cannon attacks:
     // PhotonCannonGndAttkInit:
     //   playfram           2
     //   wait               2
@@ -100,7 +101,6 @@ object Commander {
     // if you wait until a target is in range to issue attack, you save an average of 3 frames (LF3)
     // if you waited to issue attack and the tower autotargets before your order arrives, you lose at least 22 frames(cooldown)
     // as far as I can tell, no penalty for bad early guesses on attacking
-    if (unit.is(Protoss.PhotonCannon)) return
 
     if (unit.is(Zerg.Lurker) && ! unit.burrowed) { move(unit, target.pixel); return }
     if (target.is(Protoss.Interceptor)) { attackMove(unit, target.pixel); return }
@@ -134,6 +134,7 @@ object Commander {
         } else {
           unit.bwapiUnit.attack(target.bwapiUnit)
         }
+        target.addFutureAttack(unit)
       }
       sleepAttack(unit)
     } else {
@@ -208,7 +209,7 @@ object Commander {
   def attackMove(unit: FriendlyUnitInfo): Unit = unit.agent.toTravel.foreach(attackMove(unit, _))
   private def attackMove(unit: FriendlyUnitInfo, destination: Pixel) {
     leadFollower(unit, attackMove(_, destination))
-    unit.agent.directRide(destination)
+    unit.agent.setRideGoal(destination)
     unit.agent.tryingToMove = unit.pixelDistanceCenter(destination) > tryingToMoveThreshold
     if (unit.unready) return
     val to = getAdjustedDestination(unit, destination)
@@ -223,7 +224,7 @@ object Commander {
   def patrol(unit: FriendlyUnitInfo): Unit = unit.agent.toTravel.foreach(patrol(unit, _))
   private def patrol(unit: FriendlyUnitInfo, destination: Pixel) {
     leadFollower(unit, patrol(_, destination))
-    unit.agent.directRide(destination)
+    unit.agent.setRideGoal(destination)
     unit.agent.tryingToMove = unit.pixelDistanceCenter(destination) > tryingToMoveThreshold
     if (unit.unready) return
     val to = getAdjustedDestination(unit, destination)
@@ -235,7 +236,7 @@ object Commander {
   def move(unit: FriendlyUnitInfo): Unit = unit.agent.toTravel.foreach(move(unit, _))
   private def move(unit: FriendlyUnitInfo, destination: Pixel) {
     leadFollower(unit, move(_, destination))
-    unit.agent.directRide(destination)
+    unit.agent.setRideGoal(destination)
     unit.agent.tryingToMove = unit.pixelDistanceCenter(destination) > tryingToMoveThreshold
     if (unit.unready) return
     autoUnburrow(unit)
@@ -274,7 +275,7 @@ object Commander {
   def rightClick(unit: FriendlyUnitInfo, target: UnitInfo) {
     leadFollower(unit, rightClick(_, target))
     if ( ! unit.agent.ride.contains(target)) {
-      unit.agent.directRide(target.pixel)
+      unit.agent.setRideGoal(target.pixel)
     }
     if (unit.unready) return
     if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
@@ -295,7 +296,7 @@ object Commander {
   
   def useTechOnUnit(unit: FriendlyUnitInfo, tech: Tech, target: UnitInfo) {
     if (unit.unready) return
-    unit.agent.directRide(target.pixel)
+    unit.agent.setRideGoal(target.pixel)
     autoUnburrow(unit)
     unit.bwapiUnit.useTech(tech.bwapiTech, target.bwapiUnit)
     if (tech == Protoss.ArchonMeld || tech == Protoss.DarkArchonMeld) {

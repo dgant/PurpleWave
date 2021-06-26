@@ -76,7 +76,6 @@ trait Squad extends Prioritized {
     val swapEnemies = _enemiesNow
     _enemiesNow = _enemiesNext
     _enemiesNext = swapEnemies
-    _enemiesNow.foreach(_.foreign.foreach(_.addSquad(this)))
   }
   def run(): Unit
 

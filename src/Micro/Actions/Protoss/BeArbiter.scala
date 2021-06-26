@@ -28,9 +28,9 @@ object BeArbiter extends Action {
       Retreat.delegate(arbiter)
       return
     }
-    val goal                  = arbiter.battle.map(_.us.vanguard()).getOrElse(arbiter.agent.destination)
+    val goal                  = arbiter.team.map(_.vanguard()).getOrElse(arbiter.agent.destination)
     val goalDistanceSquared   = arbiter.pixelDistanceSquared(goal)
-    val closerArbiters        = arbiter.battle.map(_.us.units.view.filter(Protoss.Arbiter).filter(_.pixelDistanceSquared(goal) < goalDistanceSquared)).getOrElse(Iterable.empty).toVector
+    val closerArbiters        = arbiter.team.map(_.units.view.filter(Protoss.Arbiter).filter(_.pixelDistanceSquared(goal) < goalDistanceSquared)).getOrElse(Iterable.empty).toVector
     val umbrellables          = arbiter.alliesSquadOrBattle.filter(needsUmbrella)
     val umbrellablesUncovered = umbrellables.filterNot(u => closerArbiters.exists(a => a.pixelDistanceCenter(u) < cloakRadiusPixels))
     val umbrellable           = Maff.minBy(umbrellables)(_.pixelDistanceSquared(goal))

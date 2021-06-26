@@ -47,17 +47,23 @@ class Agent(val unit: FriendlyUnitInfo) {
   // Suggestions //
   /////////////////
 
-  def destination: Pixel = toTravel.orElse(toReturn).getOrElse(origin)
-  def origin: Pixel = toReturn.getOrElse(originCache())
-  def simpleOrigin: Pixel = toReturn.getOrElse(simpleOriginCache())
+  def destination: Pixel = toTravel
+    .orElse(toBoard.map(_.pixel))
+    .orElse(toAttack.orElse(toGather).orElse(toRepair).orElse(intent.toFinishConstruction).map(unit.pixelToFireAt))
+    .orElse(toNuke)
+    .orElse(intent.toBuildTile.map(_.center))
+    .orElse(intent.toScoutTiles.headOption.map(_.center))
+    .getOrElse(origin)
+  def origin: Pixel = toReturn.getOrElse(defaultOrigin)
+  def defaultOrigin: Pixel = defaultOriginCache()
   private val originCache = new KeyedCache(
     () =>
       ride.filterNot(unit.transport.contains).map(_.pixel)
       .orElse(unit.matchups.anchor.filter(_.matchups.threats.nonEmpty).map(a => a.pixel.project(unit.battle.map(_.enemy.centroidOf(unit)).getOrElse(a.pixel), AnchorMargin(unit))))
       .orElse(toReturn)
-      .getOrElse(simpleOrigin),
+      .getOrElse(defaultOrigin),
     () => unit.agent.toReturn)
-  private val simpleOriginCache = new Cache[Pixel](() =>
+  private val defaultOriginCache = new Cache[Pixel](() =>
     Maff.minBy(
       With.geography.ourBases.filter(base =>
         base.scoutedByEnemy
@@ -71,7 +77,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     .getOrElse(With.geography.home.center))
 
   def isScout: Boolean = intent.toScoutTiles.nonEmpty
-
   def safetyMargin: Double = 64 - Math.min(0, unit.confidence()) * 256
   def withinSafetyMargin: Boolean = unit.matchups.pixelsOfEntanglement < -safetyMargin
 
@@ -100,7 +105,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     followIntent()
     fightHysteresisFrames = Math.max(0, fightHysteresisFrames - With.framesSince(lastFrame))
     decreaseImpatience()
-    updateRidesharing()
+    updatePassengers()
     Idle.consider(unit)
   }
   private def resetState() {
@@ -111,6 +116,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     tryingToMove = false
     actionsPerformed.clear()
     _rideGoal = None
+    unit.orderTarget.foreach(_.removeDamage(unit))
   }
 
   def decreaseImpatience(): Unit = {
@@ -156,41 +162,29 @@ class Agent(val unit: FriendlyUnitInfo) {
   // Ridesharing //
   /////////////////
 
-  private var rideAge: Int = 0
   private var _ride: Option[FriendlyUnitInfo] = None
   private val _passengers: ArrayBuffer[FriendlyUnitInfo] = new ArrayBuffer[FriendlyUnitInfo]
   def ride: Option[FriendlyUnitInfo] = _ride
   def passengers: Seq[FriendlyUnitInfo] = (_passengers ++ unit.loadedUnits).distinct
-  def claimPassenger(passenger: FriendlyUnitInfo): Unit = {
+  def addPassenger(passenger: FriendlyUnitInfo): Unit = {
+    if (unit.loadedUnitsSize + passenger.unitClass.spaceRequired > 8 && ! passenger.transport.contains(unit)) return
     passenger.agent._ride = Some(unit)
-    passenger.agent.rideAge = 0
-    if ( ! _passengers.contains(passenger)) {
-      _passengers += passenger
-    }
+    _passengers -= passenger
+    _passengers += passenger
   }
-  def releasePassenger(passenger: FriendlyUnitInfo): Unit = {
-    passenger.agent._ride = passenger.agent._ride.filterNot(_ == unit)
+  def removePassenger(passenger: FriendlyUnitInfo): Unit = {
+    passenger.agent._ride = passenger.agent._ride.filter(_ != unit)
     _passengers -= passenger
   }
-  def updateRidesharing(): Unit = {
-    if (_passengers.nonEmpty) {
-      _passengers --= passengers.filter(u => !u.alive || !u.isOurs)
-    }
-    if (unit.transport.isDefined) {
-      unit.transport.foreach(_.agent.claimPassenger(unit))
-    } else {
-      rideAge += 1
-      if (rideAge > 2 || _ride.exists(!_.alive)) {
-        _ride.foreach(_.agent.releasePassenger(unit))
-      }
-    }
+  def updatePassengers(): Unit = {
+    passengers.view.filter(u => ! u.alive || ! u.isOurs || u.unitClass.isBuilding).foreach(removePassenger)
+    unit.loadedUnits.filterNot(_passengers.contains).foreach(addPassenger)
   }
   private var _rideGoal: Option[Pixel] = None
   def rideGoal: Option[Pixel] = _rideGoal
-  def directRide(to: Pixel): Unit = {
-    _rideGoal = Some(to)
-  }
+  def setRideGoal(to: Pixel): Unit = { _rideGoal = Some(to) }
   def prioritizedPassengers: Seq[FriendlyUnitInfo] = {
-    passengers.sortBy(p => p.unitClass.subjectiveValue - p.frameDiscovered / 10000.0)
+    passengers
+      .sortBy(p => p.unitClass.subjectiveValue - p.frameDiscovered / 10000.0)
   }
 }

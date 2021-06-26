@@ -8,7 +8,8 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object ShuttleCircle extends Action {
-  override def allowed(unit: FriendlyUnitInfo): Boolean = BeShuttle.allowed(unit) && unit.agent.passengers.isEmpty
+
+  override def allowed(shuttle: FriendlyUnitInfo): Boolean = BeShuttle.allowed(shuttle) && shuttle.agent.passengers.isEmpty
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
     val roboticsFacility = With.units.ours

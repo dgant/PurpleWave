@@ -1,5 +1,7 @@
-package Micro.Targeting.Filters
+package Micro.Targeting.FiltersRequired
+
 import Lifecycle.With
+import Micro.Targeting.TargetFilter
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.Minutes

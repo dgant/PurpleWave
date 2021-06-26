@@ -19,11 +19,6 @@ final class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends BWAPICachedU
     Imagination.checkVisibility(this)
   }
 
-  private var _squads = new ArrayBuffer[Squad]()
-  def enemyOfSquads: Seq[Squad] = _squads
-  def clearSquads(): Unit = { _squads.clear() }
-  def addSquad(squad: Squad): Unit = { _squads += squad }
-
   private def remainingFrames(snapshotHitPoints: Int, snapshotShields: Int, dataFrame: Int): Int = {
     val totalHealthInitial  = 1 + unitClass.maxTotalHealth / 10
     val totalHealthSnapshot = snapshotHitPoints + snapshotShields

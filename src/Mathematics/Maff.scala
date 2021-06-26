@@ -225,23 +225,17 @@ object Maff {
 
     val dotProduct = dx0 * dx1 + dy0 * dy1
     val lengthSquared = dx1 * dx1 + dy1 * dy1
-    var param = -1.0
-    if (lengthSquared != 0) {
-      param = dotProduct / lengthSquared
-    }
+    val param = if (lengthSquared != 0.0) dotProduct / lengthSquared else -1.0
 
     var xx = 0.0
     var yy = 0.0
-
     if (param < 0) {
       xx = x0
       yy = y0
-    }
-    else if (param > 1) {
+    } else if (param > 1) {
       xx = x1
       yy = y1
-    }
-    else {
+    } else {
       xx = x0 + param * dx1
       yy = y0 + param * dy1
     }

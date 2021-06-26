@@ -1,5 +1,7 @@
-package Micro.Targeting.Filters
+package Micro.Targeting.FiltersSituational
 
+import Micro.Targeting.FiltersOptional.TargetFilterCombatants
+import Micro.Targeting.TargetFilter
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterPotshot extends TargetFilter {

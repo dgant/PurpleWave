@@ -5,8 +5,8 @@ import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Targeting.Filters.TargetFilter
 import Micro.Agency.Commander
+import Micro.Targeting.TargetFilter
 import Planning.UnitMatchers.{MatchTank, MatchWorker}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}

@@ -8,7 +8,6 @@ import Planning.UnitMatchers.MatchProxied
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Strategery.Strategies.Zerg.ZvE4Pool
 
-
 object Sabotage extends Action {
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = (

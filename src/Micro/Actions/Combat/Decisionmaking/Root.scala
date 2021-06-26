@@ -3,8 +3,8 @@ package Micro.Actions.Combat.Decisionmaking
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Targeting.Target
-import Micro.Targeting.Filters.TargetFilterVisibleInRange
 import Micro.Agency.Commander
+import Micro.Targeting.FiltersSituational.TargetFilterVisibleInRange
 import Planning.UnitMatchers.MatchTank
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}

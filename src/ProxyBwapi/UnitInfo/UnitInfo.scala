@@ -6,14 +6,13 @@ import Information.Battles.Prediction.Simulation.{ReportCard, Simulacrum}
 import Information.Battles.Types.{BattleLocal, Team}
 import Information.Geography.Types.{Base, Metro, Zone}
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Physics.Force
 import Mathematics.Points._
-import Mathematics.Maff
 import Mathematics.Shapes.Ring
-import Micro.Targeting.Target
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Matchups.MatchupAnalysis
-import Micro.Squads.Squad
+import Micro.Targeting.Target
 import Performance.{Cache, KeyedCache}
 import Planning.Prioritized
 import Planning.UnitMatchers.{MatchHatchlike, UnitMatcher}
@@ -197,7 +196,6 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   // Combat //
   ////////////
 
-  @inline final def squads: Seq[Squad] = foreign.map(_.enemyOfSquads).orElse(friendly.map(_.squad.toSeq)).getOrElse(Seq.empty)
   @inline final def battle: Option[BattleLocal] = With.battles.byUnit.get(this).orElse(With.matchups.entrants.find(_._2.contains(this)).map(_._1))
   @inline final def team: Option[Team] = battle.map(_.teamOf(this))
   @inline final def report: Option[ReportCard] = battle.flatMap(_.simulationReport.get(this))
@@ -289,9 +287,10 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline private final def ptfBadAltitudePenalty(altitudeMatters: Boolean, enemyAltitude: Double, pixel: Pixel): Int = if (altitudeMatters && pixel.altitude < enemyAltitude) ptfVeryFarSquared  else 0
   @inline private final def ptfGoodAltitudeBonus(altitudeMatters: Boolean, enemyAltitude: Double, pixel: Pixel): Double = if ( ! altitudeMatters || pixel.altitude > enemyAltitude) 1 else 0
   @inline final def pixelToFireAt(enemy: UnitInfo, exhaustive: Boolean): Pixel = {
-    if (unitClass.melee) return enemy.pixel
-    if (With.reaction.sluggishness > 1 || ! canMove) {
-      return if (inRangeToAttack(enemy)) pixel else enemy.pixel.project(pixel, pixelRangeAgainst(enemy))
+    // Simple calculation
+    if (unitClass.melee || With.reaction.sluggishness > 1 || ! canMove) {
+      if (inRangeToAttack(enemy)) return pixel
+      return enemy.pixel.project(pixel, pixelRangeAgainst(enemy) + unitClass.dimensionMin)
     }
     val range = pixelRangeAgainst(enemy)
     val distance = pixelDistanceEdge(enemy)
@@ -314,8 +313,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
           Maff.clamp(usToEnemyGapFacingUp,   0, enemy.unitClass.dimensionDown  + unitClass.dimensionUp)    - Maff.clamp(usToEnemyGapFacingDown, 0, enemy.unitClass.dimensionUp + unitClass.dimensionDown))
       if ( ! exhaustive || With.reaction.sluggishness > 0) {
         return pixelFar.nearestTraversableBy(this)
-      }
-      else if (ptfBadAltitudePenalty(altitudeMatters, enemyAltitude, pixelFar) == 0 && ptfGoodAltitudeBonus(altitudeMatters, enemyAltitude, pixelFar) > 0) {
+      } else if (ptfBadAltitudePenalty(altitudeMatters, enemyAltitude, pixelFar) == 0 && ptfGoodAltitudeBonus(altitudeMatters, enemyAltitude, pixelFar) > 0) {
         return pixelFar
       }
       // Search for the ideal firing position
@@ -343,7 +341,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def canStim: Boolean = unitClass.canStim && player.hasTech(Terran.Stim) && hitPoints > 10
 
   @inline final def moving: Boolean = velocityX != 0 || velocityY != 0
-  @inline final def speed: Double = velocity.lengthFast
+  @inline final def speed: Double = Maff.broodWarDistanceDouble(0.0, 0.0, velocityX, velocityY)
   @inline final def speedApproaching(other: UnitInfo): Double = speedApproaching(other.pixel)
   @inline final def speedApproaching(pixel: Pixel): Double = {
     val deltaXY = Force(x - pixel.x, y - pixel.y)

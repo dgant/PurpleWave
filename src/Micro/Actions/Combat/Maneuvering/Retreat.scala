@@ -8,7 +8,7 @@ import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.TrafficPriorities
 import Planning.UnitMatchers.MatchTank
-import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Retreat extends Action {
@@ -36,6 +36,9 @@ object Retreat extends Action {
     lazy val goalSafety           = ! unit.agent.withinSafetyMargin
 
     // Decide how to retreat
+    if (unit.isAny(Terran.Marine, Protoss.Zealot) && unit.metro.contains(With.geography.ourMetro) && unit.matchups.threats.forall(_.pixelRangeAgainst(unit) < 64)) {
+      return RetreatPlan(unit, unit.agent.origin, "Run")
+    }
     if ( ! unit.airborne) {
       unit.agent.escalatePriority(TrafficPriorities.Pardon)
       if (unit.matchups.pixelsOfEntanglement > -80) unit.agent.escalatePriority(TrafficPriorities.Nudge)

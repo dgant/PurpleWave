@@ -7,7 +7,6 @@ import Mathematics.Maff
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.UnitTracking.UnorderedBuffer
 
-
 import scala.collection.mutable
 
 object FormationGeneric {
@@ -44,7 +43,7 @@ object FormationGeneric {
 
     val groundUnits           = units.filterNot(_.flying)
     val centroid              = Maff.weightedExemplar(units.view.map(u => (u.pixel, u.subjectiveValue)))
-    lazy val modeOrigin       = origin.map(_.nearestWalkableTile).getOrElse(Maff.mode(units.view.map(_.agent.simpleOrigin.tile)))
+    lazy val modeOrigin       = origin.map(_.nearestWalkableTile).getOrElse(Maff.mode(units.view.map(_.agent.defaultOrigin.tile)))
     lazy val modeTarget       = Maff.mode(units.view.map(u => Maff.minBy(u.matchups.targets)(u.pixelDistanceEdge).map(_.tile).getOrElse(u.agent.destination.tile)))
 
     // Start flood filling!

@@ -18,7 +18,7 @@ object RequestSafeLanding {
         .map(searchOriginTile.add)
         .find(tile => tile.walkable && With.grids.enemyRangeGround.get(tile) <= 0)
       landingOption.foreach(landing => {
-        unit.agent.directRide(landing.center)
+        unit.agent.setRideGoal(landing.center)
         if (unit.pixelDistanceEdge(landing.center) < 48) {
           Commander.unload(unit.transport.get, unit)
         }

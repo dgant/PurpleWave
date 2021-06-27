@@ -49,10 +49,10 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   def destination: Pixel = toTravel
     .orElse(toBoard.map(_.pixel))
-    .orElse(toAttack.orElse(toGather).orElse(toRepair).orElse(intent.toFinishConstruction).map(unit.pixelToFireAt))
+    .orElse(toAttack.orElse(toGather).orElse(toRepair).orElse(unit.intent.toFinishConstruction).map(unit.pixelToFireAt))
     .orElse(toNuke)
-    .orElse(intent.toBuildTile.map(_.center))
-    .orElse(intent.toScoutTiles.headOption.map(_.center))
+    .orElse(unit.intent.toBuildTile.map(_.center))
+    .orElse(unit.intent.toScoutTiles.headOption.map(_.center))
     .getOrElse(origin)
   def origin: Pixel = toReturn.getOrElse(defaultOrigin)
   def defaultOrigin: Pixel = defaultOriginCache()
@@ -76,7 +76,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     .map(_.heart.center)
     .getOrElse(With.geography.home.center))
 
-  def isScout: Boolean = intent.toScoutTiles.nonEmpty
+  def isScout: Boolean = unit.intent.toScoutTiles.nonEmpty
   def safetyMargin: Double = 64 - Math.min(0, unit.confidence()) * 256
   def withinSafetyMargin: Boolean = unit.matchups.pixelsOfEntanglement < -safetyMargin
 
@@ -84,8 +84,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   // Diagnostics //
   /////////////////
 
-  var intent      : Intention           = new Intention
-  var client      : Option[Any]         = None
   var lastPath    : Option[TilePath]    = None
   var lastAction  : Option[String]      = None
   var fightReason : String              = ""
@@ -128,13 +126,13 @@ class Agent(val unit: FriendlyUnitInfo) {
   }
 
   private def followIntent() {
-    toTravel      = intent.toTravel
-    toReturn      = intent.toReturn
-    toAttack      = intent.toAttack
-    toGather      = intent.toGather
-    toRepair      = intent.toRepair
-    toBoard       = intent.toBoard.orElse(toBoard)
-    toNuke        = intent.toNuke
+    toTravel      = unit.intent.toTravel
+    toReturn      = unit.intent.toReturn
+    toAttack      = unit.intent.toAttack
+    toGather      = unit.intent.toGather
+    toRepair      = unit.intent.toRepair
+    toBoard       = unit.intent.toBoard.orElse(toBoard)
+    toNuke        = unit.intent.toNuke
   }
 
   /////////////

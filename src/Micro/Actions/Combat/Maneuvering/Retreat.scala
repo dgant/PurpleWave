@@ -37,7 +37,7 @@ object Retreat extends Action {
 
     // Decide how to retreat
     if (unit.isAny(Terran.Marine, Protoss.Zealot) && unit.metro.contains(With.geography.ourMetro) && unit.matchups.threats.forall(_.pixelRangeAgainst(unit) < 64)) {
-      return RetreatPlan(unit, unit.agent.origin, "Run")
+      return RetreatPlan(unit, With.geography.ourMain.heart.center, "Run")
     }
     if ( ! unit.airborne) {
       unit.agent.escalatePriority(TrafficPriorities.Pardon)

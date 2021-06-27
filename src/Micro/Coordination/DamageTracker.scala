@@ -34,6 +34,7 @@ final class DamageTracker {
 
   @inline def countBullet(bullet: BulletInfo): Unit = {
     if ( ! bullet.sourceUnit.exists(source => bullet.targetUnit.exists(_.isEnemyOf(source)))) return
+    if ( ! bullet.moving) return
     val source      = bullet.sourceUnit.get
     val target      = bullet.targetUnit.get
     val bulletType  = bullet.bulletType
@@ -47,7 +48,8 @@ final class DamageTracker {
         // TODO: Assume it's dead from Spawn Broodling
       }
     } else if (hangtime.contains(bulletType)) {
-      target.addDamage(source, if (bullet.moving) 0 else (bullet.pixel.pixelDistance(target.pixel) / bullet.speed).toInt, committed = true)
+      val inFrames = Math.max(1, (source.expectedProjectileFrames(target) * bullet.pixel.pixelDistance(target.pixel) / source.pixel.pixelDistance(target.pixel)).toInt)
+      target.addDamage(source, inFrames, committed = true)
     }
   }
 
@@ -60,7 +62,7 @@ final class DamageTracker {
     lazy val attackFrameEnd = attackFrameStart + attacker.unitClass.stopFrames
     lazy val damageFrame = attackFrameEnd - With.frame + attacker.expectedProjectileFrames(target.get)
     if (target.exists(attacker.isEnemyOf)) {
-      if (With.frame < attackFrameEnd) {
+      if (attacker.expectedProjectileFrames(target.get) > 0 && With.frame < attackFrameEnd) {
         // Add frames for unit types with long projectile travel times.
         // The duration varies based on projectile travel time.
         target.get.addDamage(attacker, damageFrame, committed = true)

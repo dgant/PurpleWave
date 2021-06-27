@@ -132,7 +132,7 @@ object ShowUnitsFriendly extends View {
     }
 
     if (showFightReason)  drawNextLabel(if (unit.battle.isDefined) unit.agent.fightReason else "")
-    if (showClient)       drawNextLabel(agent.client.map(_.toString).getOrElse(""))
+    if (showClient)       drawNextLabel(unit.friendly.map(_.client.toString).getOrElse(""))
     if (showAction)       drawNextLabel(agent.lastAction.getOrElse(""))
     if (showOrder)        drawNextLabel(unit.order.toString)
 

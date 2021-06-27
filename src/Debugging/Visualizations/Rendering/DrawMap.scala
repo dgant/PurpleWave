@@ -63,6 +63,7 @@ object DrawMap {
     color : Color = Colors.DefaultGray,
     solid : Boolean = false) {
     if (irrelevant(Vector(start, end))) return
+
     With.game.drawBoxMap(start.bwapi, end.bwapi, color, solid)
   }
   

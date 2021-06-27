@@ -72,6 +72,7 @@ class Visualization extends TimedTask {
     ShowHealthAndCooldown,
     ShowUnitsEnemy,
     ShowUnitsFriendly,
+    ShowUtilization,
     ShowPerformanceDetails,
     ShowPerformanceSummary,
     ShowProduction,

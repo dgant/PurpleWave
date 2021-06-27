@@ -195,16 +195,16 @@ trait CombatUnit {
   ////////////
 
   case class DamageSource(source: CombatUnit, onFrame: Int, committed: Boolean, guaranteed: Boolean, damageTotal: Int) {
-    override def toString: String = f"$damageTotal from $source to $this in ${With.framesUntil(onFrame)} frames"
+    override def toString: String = f"$damageTotal from $source in ${With.framesUntil(onFrame)} frames ${if(guaranteed) "(Guaranteed)" else if (committed) "(Committed)" else ""}"
   }
   val damageQueue = new mutable.ArrayBuffer[DamageSource]()
   def addDamage(source: CombatUnit, inFrames: Int, committed: Boolean) {
     val damagePrevious = damageQueue.find(_.source == source)
     val damageNew = DamageSource(
-      source = source,
-      onFrame = Math.min(With.frame + inFrames, damagePrevious.map(_.onFrame).getOrElse(Forever())),
-      committed = committed,
-      guaranteed = committed && source.hitChanceAgainst(this) > .9,
+      source      = source,
+      onFrame     = Math.min(damagePrevious.map(_.onFrame).getOrElse(Forever()), With.frame + inFrames),
+      committed   = damagePrevious.exists(_.committed) || committed,
+      guaranteed  = damagePrevious.exists(_.guaranteed) || (committed && source.hitChanceAgainst(this) > .9),
       damageTotal = source.damageOnNextHitAgainst(this))
     damagePrevious.foreach(damageQueue.-=)
     val insertIndex = damageQueue.indexWhere(_.onFrame > damageNew.onFrame)
@@ -217,7 +217,12 @@ trait CombatUnit {
       committed = source.isOurs && source.inRangeToAttack(this))
   }
   def framesToConnectDamage(target: CombatUnit): Int = {
-    Math.max(cooldownLeft, framesToGetInRange(target)) + unitClass.stopFrames + expectedProjectileFrames(target)
+    // All of the math below here is approximate.
+    // - Melee units without bullets (seem to) deal damage instantly
+    // - Ranged units with instant-speed bullets (seem to) deal damage at the end of their attack animation
+    // - Ranged units with projectile bullets deal damage after the bullet has arrived, and bullet travel time varies on bullet type/distance
+    // As long as we don't overestimate the amount of damage actually done, and prefer underestimating time before attacks, we'll be okay
+    Math.max(cooldownLeft, framesToGetInRange(target)) + expectedProjectileFrames(target)
   }
   /**
    * For the very small number of units with substantial stop frames
@@ -227,11 +232,13 @@ trait CombatUnit {
   def expectedProjectileFrames(target: CombatUnit): Int = {
     // At max range it looks to be 12 frames for a Dragoon.
     // Closer range can be 7 and possibly shorter
-    if (unitClass == Protoss.Dragoon) 7
+    if (unitClass == Protoss.Dragoon) unitClass.stopFrames + 7
     // Measured minimum of 5 frames for a Vulture right next to a Cannon
-    else if (unitClass == Protoss.PhotonCannon) 5
+    else if (unitClass == Protoss.PhotonCannon) unitClass.stopFrames + 5
+    // Measured 7 at close-ish range; assuming 6 is possible when closer
+    else if (unitClass == Zerg.Mutalisk) 2
     // I definitely did not take the trouble to actually measure this
-    else if (unitClass == Zerg.Devourer) 7
+    else if (unitClass == Zerg.Devourer) unitClass.stopFrames + 7
     else 0
   }
   def removeDamage(source: CombatUnit): Unit = {
@@ -245,15 +252,18 @@ trait CombatUnit {
   def doomFrame: Int = {
     var damageRequired = totalHealth
     var i = 0
-    var frame = Forever()
+    var frame = 0
     while (damageRequired > 0 && i < damageQueue.size) {
       val next: DamageSource = damageQueue(i)
       if (next.guaranteed) {
         damageRequired -= next.damageTotal
         frame = next.onFrame
+        if (damageRequired <= 0) {
+          return frame
+        }
       }
       i += 1
     }
-    frame
+    Forever()
   }
 }

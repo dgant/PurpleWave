@@ -37,7 +37,7 @@ object FightOrFlight extends Action {
     decide(true,  "Berzerk",      () => With.frame < Minutes(6)() && unit.isAny(Protoss.Zealot, Zerg.Zergling) && unit.base.exists(b => b.owner.isEnemy || b.isNaturalOf.exists(_.owner.isEnemy)) && unit.matchups.threats.exists(t => Terran.Vulture(t) && t.matchups.catchers.isEmpty))
     decide(true,  "Lurking",      () => Zerg.Lurker(unit) && unit.matchups.enemyDetectors.isEmpty)
     decide(true,  "Detonated",    () => unit.isAny(Zerg.InfestedTerran, Zerg.Scourge) && unit.matchups.targets.exists(t => t.canAttack(unit) && t.matchups.targetsInRange.nonEmpty))
-    decide(true,  "Workers",      () => unit.matchups.allies.flatMap(_.friendly).exists(a => MatchWorker(a) && a.agent.toAttack.exists(_.isEnemy) && a.framesToGetInRange(a.orderTarget.get) <= 4 + unit.framesToGetInRange(a.orderTarget.get)))
+    decide(true,  "Workers",      () => unit.matchups.allies.flatMap(_.friendly).exists(a => MatchWorker(a) && (a.matchups.targetsInRange ++ a.orderTarget).exists(t => t.isEnemy && a.framesToGetInRange(t) <= 4 + unit.framesToGetInRange(t))))
     decide(false, "Scarabs",      () => unit.is(Protoss.Reaver) && unit.scarabs == 0 && ! unit.trainee.exists(_.remainingCompletionFrames < Math.max(unit.matchups.framesOfSafety, unit.cooldownLeft)))
     decide(false, "Drained",      () => ! unit.canAttack && unit.energyMax > 0 && unit.unitClass.spells.forall(s => s.energyCost > unit.energy || ! With.self.hasTech(s)))
     decide(false, "Disrupted",    () => unit.underDisruptionWeb && ! unit.flying && unit.matchups.threats.exists(t => t.flying || ! t.underDisruptionWeb))

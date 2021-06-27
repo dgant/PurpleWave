@@ -21,11 +21,13 @@ object ShowDoom extends View {
   }
 
   override def renderScreen(): Unit = {
-    With.units.all.find(_.selected).foreach(u =>
-      DrawScreen.column(5, 3 * With.visualization.lineHeightSmall,
+    val u = With.units.all.maxBy(_.damageQueue.size)
+    if (u.damageQueue.nonEmpty) {
+      DrawScreen.column(5, 5 * With.visualization.lineHeightSmall,
         Seq(
           u.toString,
-          if (u.doomed) "DOOMED" else "")
-        ++ u.damageQueue.map(_.toString)))
+          if (u.doomed) f"DOOMED in ${With.framesUntil(u.doomFrame)}" else "")
+          ++ u.damageQueue.map(_.toString))
+    }
   }
 }

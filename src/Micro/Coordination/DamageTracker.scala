@@ -58,7 +58,7 @@ final class DamageTracker {
     val target = attacker.orderTarget
     lazy val attackFrameStart = attacker.lastFrameStartingAttack
     lazy val attackFrameEnd = attackFrameStart + attacker.unitClass.stopFrames
-    lazy val damageFrame = attackFrameEnd - With.frame + attacker.expectedProjectileFrames
+    lazy val damageFrame = attackFrameEnd - With.frame + attacker.expectedProjectileFrames(target.get)
     if (target.exists(attacker.isEnemyOf)) {
       if (With.frame < attackFrameEnd) {
         // Add frames for unit types with long projectile travel times.

@@ -17,7 +17,7 @@ class SquadAttack extends Squad {
     if (units.isEmpty) return
     lazy val centroid             = Maff.centroid(units.view.map(_.pixel))
     lazy val fightConsensus       = Maff.mode(units.view.map(_.agent.shouldEngage))
-    lazy val originConsensus      = Maff.mode(units.view.map(_.agent.origin))
+    lazy val originConsensus      = Maff.mode(units.view.map(_.agent.defaultOrigin))
     lazy val battleConsensus      = Maff.mode(units.view.map(_.battle))
     lazy val targetReadyToEngage  = targetQueue.get.find(t => units.exists(u => u.canAttack(t) && u.pixelsToGetInRange(t) < 64))
     lazy val targetHasEngagedUs   = targetQueue.get.find(t => units.exists(u => t.canAttack(u) && t.inRangeToAttack(u)))

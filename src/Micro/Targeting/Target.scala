@@ -24,6 +24,7 @@ object Target extends {
     lazy val combatTargetInRangeAny = bestUnfiltered(attacker, attacker.matchups.targetsInRange.filter(_.unitClass.attacksOrCastsOrDetectsOrTransports))
     val output = combatTargetInRangeSquad
       .orElse(combatTargetInRangeAny)
+      .orElse(squadQueue.find(t => t.doomFrame > With.frame + attacker.framesToConnectDamage(t)))
       .orElse(squadQueue.headOption)
     output
   }

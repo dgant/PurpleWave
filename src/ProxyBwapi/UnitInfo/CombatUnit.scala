@@ -213,17 +213,18 @@ trait CombatUnit {
   def addFutureAttack(source: CombatUnit): Unit = {
     addDamage(
       source,
-      Math.max(source.framesToGetInRange(this), source.cooldownLeft)
-      + source.unitClass.stopFrames
-      + source.expectedProjectileFrames,
+      source.framesToConnectDamage(this),
       committed = source.isOurs && source.inRangeToAttack(this))
+  }
+  def framesToConnectDamage(target: CombatUnit): Int = {
+    Math.max(cooldownLeft, framesToGetInRange(target)) + unitClass.stopFrames + expectedProjectileFrames(target)
   }
   /**
    * For the very small number of units with substantial stop frames
    * AND a travelling projectile,
    * this gives the expected duration in which bullet is present but target has yet to receive damage
    */
-  def expectedProjectileFrames: Int = {
+  def expectedProjectileFrames(target: CombatUnit): Int = {
     // At max range it looks to be 12 frames for a Dragoon.
     // Closer range can be 7 and possibly shorter
     if (unitClass == Protoss.Dragoon) 7

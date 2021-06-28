@@ -72,11 +72,12 @@ object Maff {
     (0 until Math.min(number, queue.size)).map(i => queue.dequeue())
   }
 
-  @inline final def takePercentile[T](percentile: Double, iterable: Iterable[T])(implicit ordering: Ordering[T]): Option[T] = {
+  @inline final def takePercentile[T](percentile: Double, iterable: Iterable[T])(implicit ordering: Ordering[T]): IndexedSeq[T] = {
     val nth = (iterable.size * Maff.clamp(percentile, 0, 1)).toInt
     val queue = collection.mutable.PriorityQueue[T](iterable.toSeq: _*)
     (0 until nth).foreach(i => queue.dequeue())
-    queue.headOption
+    val finalSize = queue.size
+    (0 until finalSize).map(i => queue.dequeue())
   }
 
   @inline final def centroid(values: TraversableOnce[Pixel]): Pixel = {
@@ -108,6 +109,12 @@ object Maff {
 
   @inline final def weightedExemplar(values: Iterable[(Pixel, Double)]): Pixel = {
     minBy(values)(_._1.pixelDistanceSquared(weightedCentroid(values))).map(_._1).getOrElse(SpecificPoints.middle)
+  }
+
+  @inline final def weightedExemplarPercentile(values: Iterable[(Pixel, Double)], percentile: Double): Pixel = {
+    val centroidAll = weightedCentroid(values)
+    val closestValues = takePercentile(percentile, values)(Ordering.by(_._1.pixelDistanceSquared(centroidAll)))
+    minBy(closestValues)(_._1.pixelDistanceSquared(centroidAll)).map(_._1).getOrElse(SpecificPoints.middle)
   }
 
   @inline final def nanToN(value: Double, n: Double): Double = if (value.isNaN || value.isInfinity) n else value

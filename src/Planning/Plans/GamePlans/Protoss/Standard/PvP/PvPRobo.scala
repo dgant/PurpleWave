@@ -60,28 +60,30 @@ class PvPRobo extends GameplanTemplate {
   // TODO: Replace with (or merge into) PvPSafeToMoveOut?
   override def attackPlan: Plan = new If(
     And(
-      // No point attacking with a couple of Zealots if they have any defense whatsoever
+      EnemyStrategy(With.fingerprints.twoGate),
+      UnitsAtLeast(1, Protoss.Dragoon, complete = true),
       Or(
-        Or(Employing(PvPRobo1012)),
-        UnitsAtLeast(1, Protoss.Dragoon, complete = true),
-        UnitsAtLeast(1, Protoss.Reaver, complete = true),
-        EnemiesAtMost(0, Protoss.PhotonCannon, complete = true),
-        EnemiesAtMost(0, MatchWarriors)),
-      Or(
-        Not(EnemyHasShown(Protoss.DarkTemplar)),
-        UnitsAtLeast(2, Protoss.Observer, complete = true)),
-      Or(
-        And(EnemyStrategy(With.fingerprints.dtRush), UnitsAtLeast(2, Protoss.Observer, complete = true)),
-        EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.gasSteal, With.fingerprints.cannonRush, With.fingerprints.earlyForge),
-        EnemyBasesAtLeast(2),
-        And(
-          EnemyStrategy(With.fingerprints.twoGate),
-          Not(EnemyStrategy(With.fingerprints.proxyGateway)),
+        UpgradeComplete(Protoss.DragoonRange),
+        Not(EnemyHasUpgrade(Protoss.DragoonRange)),
+        SafeToMoveOut())),
+    new Attack,
+    new If(
+      And(
+        // No point attacking with a couple of Zealots if they have any defense whatsoever
+        Or(
+          Or(Employing(PvPRobo1012)),
           UnitsAtLeast(1, Protoss.Dragoon, complete = true),
-          Or(
-            UpgradeComplete(Protoss.DragoonRange),
-            Not(EnemyHasUpgrade(Protoss.DragoonRange)))))),
-      new ConsiderAttacking)
+          UnitsAtLeast(1, Protoss.Reaver, complete = true),
+          EnemiesAtMost(0, Protoss.PhotonCannon, complete = true),
+          EnemiesAtMost(0, MatchWarriors)),
+        Or(
+          Not(EnemyHasShown(Protoss.DarkTemplar)),
+          UnitsAtLeast(2, Protoss.Observer, complete = true)),
+        Or(
+          And(EnemyStrategy(With.fingerprints.dtRush), UnitsAtLeast(2, Protoss.Observer, complete = true)),
+          EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.gasSteal, With.fingerprints.cannonRush, With.fingerprints.earlyForge),
+          EnemyBasesAtLeast(2))),
+        new ConsiderAttacking))
 
   override def emergencyPlans: Seq[Plan] = oneGateCoreLogic.emergencyPlans
   override def scoutPlan: Plan = new If(EnemiesAtMost(0, Protoss.Dragoon), super.scoutPlan)
@@ -137,7 +139,7 @@ class PvPRobo extends GameplanTemplate {
     Or(Not(EnemyStrategy(With.fingerprints.dtRush)), UnitsAtLeast(1, Protoss.Observer, complete = true)),
     Or(Not(EnemyStrategy(With.fingerprints.dtRush)), And(UnitsAtLeast(1, Protoss.Observer), EnemiesAtMost(0, Protoss.DarkTemplar))),
     Or(
-      And(new SafeToMoveOut, EnemyStrategy(With.fingerprints.dtRush)),
+      And(new SafeToMoveOut, EnemyStrategy(With.fingerprints.dtRush, With.fingerprints.twoGate)),
       And(new SafeToMoveOut, UnitsAtLeast(1, Protoss.Reaver, complete = true), new EnemyLowUnitCount),
       UnitsAtLeast(2, Protoss.Reaver, complete = true)))
 

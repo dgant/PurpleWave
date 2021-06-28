@@ -42,7 +42,7 @@ object FormationGeneric {
     if (units.forall(_.flying)) return FormationEmpty
 
     val groundUnits           = units.filterNot(_.flying)
-    val centroid              = Maff.weightedExemplar(units.view.map(u => (u.pixel, u.subjectiveValue)))
+    val centroid              = Maff.weightedExemplarPercentile(units.view.map(u => (u.pixel, u.subjectiveValue)), 0.5)
     lazy val modeOrigin       = origin.map(_.nearestWalkableTile).getOrElse(Maff.mode(units.view.map(_.agent.defaultOrigin.tile)))
     lazy val modeTarget       = Maff.mode(units.view.map(u => Maff.minBy(u.matchups.targets)(u.pixelDistanceEdge).map(_.tile).getOrElse(u.agent.destination.tile)))
 

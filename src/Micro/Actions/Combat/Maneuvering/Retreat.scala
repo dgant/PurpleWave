@@ -28,7 +28,7 @@ object Retreat extends Action {
     lazy val distanceOriginEnemy  = Maff.min(unit.matchups.threats.view.map(t => t.pixelDistanceTravelling(unit.agent.origin) - t.pixelRangeAgainst(unit))).getOrElse(2.0 * With.mapPixelWidth)
     lazy val enemyCloser          = distanceOriginUs + 160 >= distanceOriginEnemy
     lazy val timeOriginUs         = unit.framesToTravelTo(unit.agent.origin)
-    lazy val timeOriginEnemy      = Maff.takePercentile(0.1, unit.matchups.threats)(Ordering.by(timeOriginOfThreat)).map(timeOriginOfThreat).getOrElse(Double.PositiveInfinity)
+    lazy val timeOriginEnemy      = Maff.takePercentile(0.1, unit.matchups.threats)(Ordering.by(timeOriginOfThreat)).map(timeOriginOfThreat).headOption.getOrElse(Double.PositiveInfinity)
     lazy val enemySooner          = timeOriginUs + 96 >= timeOriginEnemy
     lazy val enemySieging         = unit.matchups.enemies.exists(_.isAny(MatchTank, Zerg.Lurker)) && ! unit.base.exists(_.owner.isEnemy)
     lazy val goalSidestep         = unit.is(Protoss.DarkTemplar) || (enemySieging && ! enemyCloser && ! enemySooner)

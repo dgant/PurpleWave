@@ -18,7 +18,6 @@ class SquadDefendBase(base: Base) extends Squad {
     val zone: Zone = base.zone
     val threat = With.scouting.threatOrigin.zone
     var output = (zone, zone.exitNow)
-    targetQueue = Some(SquadTargeting.rankForArmy(units, enemies))
     if ( ! threat.bases.exists(_.owner.isUs)) {
       val possiblePath = With.paths.zonePath(zone, threat)
       possiblePath.foreach(path => {
@@ -58,6 +57,7 @@ class SquadDefendBase(base: Base) extends Squad {
   override def run() {
     formation = None
     if (units.isEmpty) return
+    targetQueue = Some(SquadTargeting.rankForArmy(units, enemies))
     lazy val scourables   = enemies.filter(isHuntable)
     lazy val canScour     = scourables.nonEmpty && (wander || breached)
     lazy val wander       = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || With.blackboard.wantToAttack()
@@ -85,20 +85,18 @@ class SquadDefendBase(base: Base) extends Squad {
       formationReturn = formationBastion
     }
     val targets = if (canScour) scourables else enemies.filter(threateningBase)
-    targetQueue = Some(SquadTargeting.rankForArmy(units, targets))
     intendFormation()
   }
 
   private def isHuntable(enemy: UnitInfo): Boolean = (
     ! (enemy.is(Zerg.Drone) && With.fingerprints.fourPool.matches) // Don't get baited by 4-pool scouts
-      && (units.exists(_.canAttack(enemy)) || (enemy.cloaked && units.exists(_.unitClass.isDetector)))
-      && (enemy.matchups.targets.nonEmpty || enemy.matchups.allies.forall(_.matchups.targets.isEmpty)) // Don't, for example, chase Overlords that have ally Zerglings nearby
-      // If we don't really want to fight, wait until they push into the base
-      && guardZone.exit.forall(exit =>
-        enemy.flying
-          || With.blackboard.wantToAttack()
-          || enemy.pixelDistanceTravelling(guardZone.centroid)
-          < (exit.endPixels ++ exit.sidePixels :+ exit.pixelCenter).map(_.groundPixels(guardZone.centroid)).min))
+    && (units.exists(_.canAttack(enemy)) || (enemy.cloaked && units.exists(_.unitClass.isDetector)))
+    && (enemy.matchups.targets.nonEmpty || enemy.matchups.allies.forall(_.matchups.targets.isEmpty)) // Don't, for example, chase Overlords that have ally Zerglings nearby
+    // If we don't really want to fight, wait until they push into the base
+    && (
+      enemy.flying
+      || With.blackboard.wantToAttack()
+      || (enemy.base.contains(base) && ! base.zone.exit.exists(_.contains(enemy.pixel)))))
 
   private def threateningBase(enemy: UnitInfo): Boolean = {
     if (enemy.zone == base.zone) return true

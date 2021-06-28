@@ -12,7 +12,7 @@ class FingerprintProxyGateway extends FingerprintAnd(
   new FingerprintOr(
     new FingerprintArrivesBy(Protoss.Zealot, GameTime(2, 50)),
     new FingerprintArrivesBy(Protoss.Zealot, GameTime(3, 15), 2),
-    new FingerprintArrivesBy(Protoss.Zealot, GameTime(3, 50), 4),
+    new FingerprintArrivesBy(Protoss.Zealot, GameTime(3, 40), 4),
     new FingerprintCompleteBy(MatchAnd(Protoss.Gateway, MatchProxied), GameTime(5,  0)),
     new Fingerprint {
       override protected def investigate: Boolean = (

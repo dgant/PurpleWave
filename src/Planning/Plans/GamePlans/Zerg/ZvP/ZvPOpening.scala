@@ -4,14 +4,14 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.WriteStatus
-import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
+import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Placement.BuildSunkensAtNatural
 import Planning.Plans.Scouting.{ScoutAt, ScoutOn}
-import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Milestones.{BasesAtLeast, GasForUpgrade, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Tactics.DefendAgainstProxy

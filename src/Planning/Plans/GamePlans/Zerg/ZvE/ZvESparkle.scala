@@ -10,7 +10,7 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireBases
-import Planning.Predicates.Compound.{And, Check, Not}
+import Planning.Predicates.Compound.{And, Check, Not, Or}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome

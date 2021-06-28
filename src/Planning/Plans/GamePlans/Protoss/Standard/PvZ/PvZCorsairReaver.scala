@@ -9,7 +9,7 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.PvZRequireMiningBases
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Predicates.Compound.{And, Latch}
+import Planning.Predicates.Compound.{And, Latch, Or}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyMutalisksLikely
 import Planning.Predicates.Strategy.Employing

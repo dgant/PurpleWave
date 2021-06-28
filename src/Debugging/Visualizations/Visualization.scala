@@ -40,12 +40,10 @@ class Visualization extends TimedTask {
     ShowPerformanceSummary,
     ShowStoryteller,
 
-    ShowTeams,
     ShowJudgment,
 
     // For new formations
     ShowSquads,
-    ShowDoom
   )
 
   lazy val knownViews: Vector[View] = Vector[View](

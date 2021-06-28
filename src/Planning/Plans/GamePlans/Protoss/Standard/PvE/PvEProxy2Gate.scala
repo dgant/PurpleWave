@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Basic.{Do, NoPlan, Write}
-import Planning.Plans.Compound.{Or, _}
+import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.PlaceGatewaysProxied
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas
@@ -12,7 +12,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{RequireBases, RequireMiningBases}
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy}

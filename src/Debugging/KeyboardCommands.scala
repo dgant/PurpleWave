@@ -42,6 +42,10 @@ object KeyboardCommands {
      breakpointFodder = -breakpointFodder
   }
 
+  def slow(): Unit = {
+    With.game.setLocalSpeed(1000)
+  }
+
   def unit: FriendlyUnitInfo = With.units.ours.find(_.selected).get
 }
 

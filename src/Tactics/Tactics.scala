@@ -6,10 +6,10 @@ import Mathematics.Maff
 import Micro.Squads._
 import Performance.Tasks.TimedTask
 import Planning.Plans.Army._
-import Planning.Plans.Compound.{If, Or}
+import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTIdeas
 import Planning.Plans.Scouting.{DoScoutWithWorkers, MonitorBases, ScoutExpansions, ScoutWithOverlord}
-import Planning.Predicates.Compound.{And, Not}
+import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.Predicates.Milestones.{EnemiesAtMost, EnemyHasShownWraithCloak, UnitsAtLeast}
 import Planning.Predicates.Strategy.EnemyIsTerran
 import Planning.UnitMatchers._
@@ -37,14 +37,14 @@ class Tactics extends TimedTask {
   private lazy val doFloatBuildings           = new DoFloatBuildings
   private lazy val scan                       = new Scan
   private lazy val monitorWithObserver        = new If(
-    new And(
-      new EnemyIsTerran,
-      new EnemiesAtMost(0, MatchMobileDetector),
-      new EnemiesAtMost(7, Terran.Factory),
-      new Not(new EnemyHasShownWraithCloak),
-      new Or(
-        new UnitsAtLeast(3, Protoss.Observer, complete = true),
-        new Not(new PvTIdeas.EnemyHasMines))),
+    And(
+      EnemyIsTerran(),
+      EnemiesAtMost(0, MatchMobileDetector),
+      EnemiesAtMost(7, Terran.Factory),
+      Not(new EnemyHasShownWraithCloak),
+      Or(
+        UnitsAtLeast(3, Protoss.Observer, complete = true),
+        Not(new PvTIdeas.EnemyHasMines))),
     new MonitorBases(Protoss.Observer))
 
   override protected def onRun(budgetMs: Long): Unit = {
@@ -59,6 +59,9 @@ class Tactics extends TimedTask {
     runPrioritySquads()
     runCoreTactics()
     runBackgroundSquads()
+
+    // Moved in here temporarily due to issue where Tactics adding units clears a Squad's current list of enemies
+    With.squads.run(budgetMs)
   }
 
   private def launchMissions(): Unit = {}

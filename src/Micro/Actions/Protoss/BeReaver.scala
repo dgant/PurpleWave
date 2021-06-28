@@ -31,13 +31,13 @@ object BeReaver extends Action {
       unit.agent.ride.foreach(Commander.rightClick(unit, _))
       if (Retreat.allowed(unit)) {
         Retreat.consider(unit)
-        unit.agent.act("Hop:" + unit.agent.lastAction)
+        unit.agent.act("Hop")
       }
     }
   }
 
   def considerParadropping(unit: FriendlyUnitInfo) {
-    if ( unit.transport.isDefined)
+    if (unit.transport.isDefined)
     if (unit.agent.shouldEngage) Target.choose(unit)
     if (unit.agent.toAttack.isEmpty) return
     val target            = unit.agent.toAttack.get
@@ -93,7 +93,7 @@ object BeReaver extends Action {
     val goalTile        = target.projectFrames(reaver.cooldownLeft).tile
     val naiveTile       = goalTile.center.project(originPixel, firingDistance).nearestWalkableTile
     val naiveDistance   = target.pixel.tile.tileDistanceFast(naiveTile)
-    val candidates      = Spiral.points(7)
+    val candidates      = Spiral.points(12)
       .view
       .map(naiveTile.add)
       .filter(t =>

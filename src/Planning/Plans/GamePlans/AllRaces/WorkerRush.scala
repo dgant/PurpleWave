@@ -9,7 +9,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.StandardGamePlan
 import Planning.Plans.Macro.Automatic.{Pump, RequireSufficientSupply}
 import Planning.Plans.Scouting.ScoutAt
-import Planning.Predicates.Compound.{And, Check, Latch, Not}
+import Planning.Predicates.Compound._
 import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemiesAtMost, FoundEnemyBase}
 import Planning.Predicates.Strategy.Employing
 import Planning.ResourceLocks.LockUnits

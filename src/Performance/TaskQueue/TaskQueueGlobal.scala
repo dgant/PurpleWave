@@ -35,7 +35,9 @@ class TaskQueueGlobal extends TaskQueueParallel(
       if (With.yolo.active()) With.blackboard.wantToAttack.set(true)
     }),
     With.tactics,
-    With.squads,
+    // With.squads,
+    // Running Squads inside Tactics for the moment,
+    // because when Tactics adds enemies it clears out the Squad's current enemies, potentially leaving it without enemies for a frame
     With.gathering,
     With.groundskeeper)
     .withSkipsMax(6)

@@ -19,9 +19,9 @@ object Target extends {
     // If we have no squad guidance at all, use default targeting
     if (squadQueueRaw.isEmpty) return bestUnfiltered(attacker, legal(attacker, filters: _*))
 
-    val squadQueue = legal(attacker, squadQueueRaw.get)
+    val squadQueue                    = legal(attacker, squadQueueRaw.get, filters: _*)
     lazy val combatTargetInRangeSquad = squadQueue.find(t => t.unitClass.attacksOrCastsOrDetectsOrTransports && attacker.inRangeToAttack(t))
-    lazy val combatTargetInRangeAny = bestUnfiltered(attacker, attacker.matchups.targetsInRange.filter(_.unitClass.attacksOrCastsOrDetectsOrTransports))
+    lazy val combatTargetInRangeAny = bestUnfiltered(attacker, legal(attacker, attacker.matchups.targetsInRange.filter(_.unitClass.attacksOrCastsOrDetectsOrTransports), filters: _*))
     val output = combatTargetInRangeSquad
       .orElse(combatTargetInRangeAny)
       .orElse(squadQueue.find(t => t.doomFrame > With.frame + attacker.framesToConnectDamage(t) + 24)) // The +delta is a buffer to avoid being too greedy about hastening a unit's death

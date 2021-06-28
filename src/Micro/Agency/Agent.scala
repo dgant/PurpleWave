@@ -153,7 +153,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   // Leading //
   /////////////
 
-  val leader = new Cache(() => ride.flatMap(_.agent.prioritizedPassengers.headOption).orElse(unit.squad.flatMap(_.leader(unit.unitClass))))
+  val leader = new Cache(() => unit.squad.flatMap(_.leader(unit.unitClass)))
   var leadFollower: (FriendlyUnitInfo) => Unit = x => {}
 
   /////////////////

@@ -3,11 +3,12 @@ package Planning.Plans.GamePlans.Terran.Standard.TvT
 import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.{Attack, FloatBuildings}
-import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
+import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
+import Planning.Predicates.Compound.Or
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.Employing
 import Planning.UnitMatchers._

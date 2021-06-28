@@ -10,7 +10,7 @@ import Planning.Plans.GamePlans.Zerg.ZergIdeas.{PumpJustEnoughScourge, PumpMutal
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Predicates.Compound.{And, Not}
+import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}

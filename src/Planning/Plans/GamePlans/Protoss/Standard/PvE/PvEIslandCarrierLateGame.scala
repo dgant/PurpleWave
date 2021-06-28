@@ -13,7 +13,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildTowersAtBases
 import Planning.Plans.Placement.ProposePlacement
-import Planning.Predicates.Compound.Not
+import Planning.Predicates.Compound.{Not, Or}
 import Planning.Predicates.Milestones.{EnemyHasShown, OnGasPumps, UnitsAtLeast, UpgradeComplete}
 import Planning.Predicates.Reactive.EnemyMutalisksLikely
 import Planning.Predicates.Strategy.OnMap

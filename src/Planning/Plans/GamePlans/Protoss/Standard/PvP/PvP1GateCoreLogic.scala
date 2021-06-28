@@ -4,21 +4,21 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Basic.WriteStatus
-import Planning.Plans.Compound.{If, Or, Parallel}
+import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.ReactToDarkTemplarEmergencies
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.BuildOrder
 import Planning.Plans.Scouting.ScoutForCannonRush
-import Planning.Predicates.Compound.{And, Check, Latch, Not}
+import Planning.Predicates.Compound._
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
 import Planning.Predicates.Strategy._
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPRobo
 
-class PvP1GateCoreLogic(allowZealotBeforeCore: Boolean = true) {
+class PvP1GateCoreLogic(allowZealotBeforeCore: Boolean = true, requireZealotBeforeCore: Boolean = false) {
 
-  class PossibleZealotPressure extends Not(new EnemyStrategy(With.fingerprints.forgeFe, With.fingerprints.oneGateCore))
+  class PossibleZealotPressure extends Not(EnemyStrategy(With.fingerprints.forgeFe, With.fingerprints.oneGateCore))
 
   class WriteStatuses extends Parallel(
     new If(new GateGate, new WriteStatus("GateGate"), new If(new GateTechGateGate, new WriteStatus("GateTechGateGate"))),
@@ -53,12 +53,18 @@ class PvP1GateCoreLogic(allowZealotBeforeCore: Boolean = true) {
     new Check(() => With.strategy.isInverted))
 
   class ZealotBeforeCore extends Or(
+    // If we've definitely started with ZCore*
+    new Check(() => requireZealotBeforeCore),
     new Latch(
       new And(
         new UnitsAtLeast(1, Protoss.Zealot),
         new UnitsAtMost(0, Protoss.CyberneticsCore))),
     new And(
       new Check(() => allowZealotBeforeCore),
+      // If we haven't committed to Core*
+      new Or(
+        new UnitsAtMost(0, Protoss.CyberneticsCore),
+        new UnitsAtLeast(1, Protoss.Zealot)),
       new Or(
         new EnemyRecentStrategy(
           With.fingerprints.gasSteal,

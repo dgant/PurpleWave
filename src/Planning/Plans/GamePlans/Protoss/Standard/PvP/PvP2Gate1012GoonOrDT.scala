@@ -13,7 +13,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Placement.BuildCannonsAtNatural
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBasesAtMost, SafeAtHome}

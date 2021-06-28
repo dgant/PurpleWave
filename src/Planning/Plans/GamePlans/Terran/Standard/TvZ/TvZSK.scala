@@ -10,7 +10,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Placement.{BuildBunkersAtNatural, BuildMissileTurretsAtBases, BuildMissileTurretsAtNatural}
-import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyLurkersLikely, EnemyMutalisksLikely, SafeToMoveOut}
 import Planning.Predicates.Strategy.Employing

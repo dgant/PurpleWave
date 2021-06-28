@@ -13,7 +13,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases}
 import Planning.Plans.Placement.BuildSunkensInMain
-import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones.{TechComplete, TechStarted, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy._

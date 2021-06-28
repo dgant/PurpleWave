@@ -3,11 +3,12 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
-import Planning.Plans.Compound.{If, Or, Parallel}
+import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Predicates.Compound.Or
 import Planning.Predicates.Milestones.{BasesAtLeast, EnemiesAtLeast, UnitsAtLeast, UpgradeComplete}
 import Planning.UnitMatchers.MatchTank
 import ProxyBwapi.Races.{Terran, Zerg}

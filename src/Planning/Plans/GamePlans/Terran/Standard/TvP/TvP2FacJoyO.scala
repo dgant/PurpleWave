@@ -9,7 +9,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.BuildGasPumps
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.{Latch, Not}
+import Planning.Predicates.Compound.{Latch, Not, Or}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{MatchOr, MatchTank}

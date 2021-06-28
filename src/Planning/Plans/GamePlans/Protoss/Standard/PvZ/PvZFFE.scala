@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Compound.{If, Or, Trigger}
+import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
@@ -10,7 +10,7 @@ import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}

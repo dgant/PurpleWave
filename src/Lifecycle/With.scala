@@ -91,7 +91,7 @@ object With {
   var recruiter         : Recruiter               = _
   var scheduler         : Scheduler               = _
   var scouting          : Scouting                = _
-  var simulation        : Simulation           = _
+  var simulation        : Simulation              = _
   var strategy          : Strategist              = _
   var storyteller       : Storyteller             = _
   var squads            : Squads                  = _

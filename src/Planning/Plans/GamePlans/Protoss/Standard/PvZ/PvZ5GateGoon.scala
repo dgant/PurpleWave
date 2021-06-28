@@ -10,7 +10,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.BuildGasPumps
 import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
-import Planning.Predicates.Compound.{And, Latch}
+import Planning.Predicates.Compound.{And, Latch, Or}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.Employing

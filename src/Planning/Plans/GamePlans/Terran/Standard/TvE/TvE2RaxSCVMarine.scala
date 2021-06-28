@@ -11,7 +11,7 @@ import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.BuildOrder
 import Planning.Plans.Placement.BuildBunkersAtEnemy
 import Planning.Plans.Scouting.ScoutAt
-import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.{EnemiesAtLeast, FoundEnemyBase, UnitsAtLeast}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}

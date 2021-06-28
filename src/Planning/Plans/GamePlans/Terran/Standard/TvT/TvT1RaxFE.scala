@@ -6,14 +6,14 @@ import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.Attack
-import Planning.Plans.Compound.{If, Or, Parallel}
+import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Terran.PopulateBunkers
 import Planning.Plans.Placement.BuildBunkersAtNatural
 import Planning.Plans.Scouting.ScoutAt
-import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}

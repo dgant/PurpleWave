@@ -3,10 +3,10 @@ package Planning.Plans.GamePlans.Zerg
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Compound.{If, Or, Trigger}
+import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpRatio, UpgradeContinuously}
 import Planning.Plans.Scouting.ScoutWithWorkers
-import Planning.Predicates.Compound.{And, Check}
+import Planning.Predicates.Compound.{And, Check, Or}
 import Planning.Predicates.Milestones.{EnemiesAtMost, EnemyHasShown, FrameAtMost, UpgradeComplete}
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}

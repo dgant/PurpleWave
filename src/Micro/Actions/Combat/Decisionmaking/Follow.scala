@@ -6,23 +6,20 @@ import Micro.Agency.Commander
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-
 object Follow extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     ! unit.agent.leader().contains(unit)
     && (
-      (Protoss.Reaver(unit) && unit.agent.leader().exists(_.agent.ride.exists(unit.agent.ride.contains)))
-      || (
-        unit.flying // Performance shortcut
-        && unit.isAny(
-          Terran.Battlecruiser,
-          Terran.Wraith,
-          Terran.Valkyrie,
-          Protoss.Carrier,
-          Protoss.Corsair,
-          Protoss.Scout,
-          Zerg.Mutalisk)
-        && ! unit.matchups.threats.exists(_.unitClass.dealsRadialSplashDamage))))
+      unit.flying // Performance shortcut
+      && unit.isAny(
+        Terran.Battlecruiser,
+        Terran.Wraith,
+        Terran.Valkyrie,
+        Protoss.Carrier,
+        Protoss.Corsair,
+        Protoss.Scout,
+        Zerg.Mutalisk)
+      && ! unit.matchups.threats.exists(_.unitClass.dealsRadialSplashDamage)))
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val maybeLeader = unit.agent.leader()

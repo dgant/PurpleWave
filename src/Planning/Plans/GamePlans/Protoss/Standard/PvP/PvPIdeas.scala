@@ -12,7 +12,7 @@ import Planning.Plans.Macro.Build.{CancelIncomplete, CancelOrders}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildTowersAtBases, MeldArchons}
-import Planning.Predicates.Compound.{And, Latch, Not, Sticky}
+import Planning.Predicates.Compound._
 import Planning.Predicates.Economy.GasAtMost
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._

@@ -8,7 +8,7 @@ object Opponents {
 
   val defaultPvT = StrategySelectionFixed(PvT13Nexus, PvT2BaseReaver, PvT3BaseGateway)
   val defaultPvP = StrategySelectionFixed(PvPRobo, PvPRobo1Gate)
-  val defaultPvZ = StrategySelectionFixed(PvZ10Gate, PvZ4GateGoon, PvZMidgame5GateGoon, PvZLateGameTemplar)
+  val defaultPvZ = StrategySelectionFixed(PvZ2Gate1012, PvZ4GateGoon, PvZMidgame5GateGoon, PvZLateGameTemplar)
 
   // COG 2021 PREP
   val stardust    : Opponent = add("Stardust",    defaultPvP)
@@ -19,7 +19,7 @@ object Opponents {
   val skynet      : Opponent = add("Skynet",      defaultPvP) // Metabot stand-in
   val ximp        : Opponent = add("XIMP",        defaultPvP) // Metabot stand-in
   val xiaoyi      : Opponent = add("XIAOYI",      defaultPvT)
-  val mcrave      : Opponent = add("McRave",      defaultPvZ)
+  val mcrave      : Opponent = add("McRave",      StrategySelectionFixed(PvZFFEEconomic, PvZMidgameBisu, PvZLateGameTemplar))
   val microwave   : Opponent = add("Microwave",   defaultPvZ)
   val cunybot     : Opponent = add("CUNYBot",     defaultPvZ)
 

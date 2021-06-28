@@ -3,13 +3,13 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.Attack
-import Planning.Plans.Compound.{If, Or}
+import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Placement.BuildSunkensInMain
-import Planning.Predicates.Compound.And
+import Planning.Predicates.Compound.{And, Or}
 import Planning.Predicates.Milestones.{UnitsAtLeast, UpgradeStarted}
 import Planning.Predicates.Strategy.EnemyStrategy
 import Planning.{Plan, Predicate}

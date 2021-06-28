@@ -9,7 +9,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.MeldArchons
-import Planning.Predicates.Compound.And
+import Planning.Predicates.Compound.{And, Or}
 import Planning.Predicates.Milestones.{EnemyHasShownCloakedThreat, _}
 import Planning.Predicates.Reactive.{EnemyMutalisksLikely, SafeAtHome, SafeToMoveOut}
 import Planning.Predicates.Strategy._

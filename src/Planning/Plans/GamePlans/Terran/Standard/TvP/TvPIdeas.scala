@@ -4,10 +4,10 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
-import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
+import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Predicates.Compound.{And, Check, Not}
+import Planning.Predicates.Compound.{And, Check, Not, Or}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeToMoveOut

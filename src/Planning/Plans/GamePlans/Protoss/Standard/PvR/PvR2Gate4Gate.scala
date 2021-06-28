@@ -11,6 +11,7 @@ import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Scouting.ScoutOn
+import Planning.Predicates.Compound.Or
 import Planning.Predicates.Milestones.{UnitsAtLeast, UpgradeComplete}
 import Planning.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy}

@@ -10,7 +10,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Placement.{BuildCannonsAtNatural, BuildCannonsInMain}
 import Planning.Plans.Scouting.{ScoutForCannonRush, ScoutOn}
-import Planning.Predicates.Compound.{And, Not}
+import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}

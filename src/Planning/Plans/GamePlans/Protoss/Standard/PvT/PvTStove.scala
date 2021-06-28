@@ -3,12 +3,12 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.ConsiderAttacking
-import Planning.Plans.Compound.{If, Or}
+import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.Latch
+import Planning.Predicates.Compound.{Latch, Or}
 import Planning.Predicates.Milestones.{EnemyHasShown, MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.{Protoss, Terran}

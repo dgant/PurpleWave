@@ -11,7 +11,7 @@ import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.MeldDarkArchons
-import Planning.Predicates.Compound.{And, Check, Latch, Not}
+import Planning.Predicates.Compound._
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeToMoveOut}

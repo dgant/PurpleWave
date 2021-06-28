@@ -11,7 +11,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Placement.{BuildBunkersAtMain, BuildBunkersAtNatural, BuildMissileTurretsAtNatural}
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Milestones.{EnemyHasShown, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}

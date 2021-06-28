@@ -16,7 +16,7 @@ import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Placement.ProposePlacement
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.{And, Latch, Not}
+import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome

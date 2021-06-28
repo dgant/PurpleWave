@@ -1,6 +1,6 @@
 package Planning.Plans.Macro.Expanding
 
-import Planning.Predicates.Compound.{And, Not}
+import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.UnitMatchers.{MatchWarriors, MatchWorker}
 import Planning.Plans.Compound._
 import Planning.Predicates.Milestones.{MiningBasesAtMost, UnitsAtLeast}

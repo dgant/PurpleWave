@@ -45,8 +45,9 @@ object MicroPathing {
     pathfindProfile.threatMaximum     = Some(0)
     pathfindProfile.employGroundDist  = true
     pathfindProfile.costOccupancy     = if (unit.flying) 0f else 3f
-    pathfindProfile.costRepulsion     = 9f
-    pathfindProfile.repulsors         = getPathfindingRepulsors(unit)
+    //pathfindProfile.costRepulsion     = 9f
+    pathfindProfile.costThreat        = 9f
+    //pathfindProfile.repulsors         = getPathfindingRepulsors(unit)
     pathfindProfile.unit              = Some(unit)
     pathfindProfile.find
   }

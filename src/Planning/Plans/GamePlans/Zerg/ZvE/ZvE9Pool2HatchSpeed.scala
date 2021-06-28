@@ -5,12 +5,12 @@ import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, AllInIf, Attack}
 import Planning.Plans.Basic.NoPlan
-import Planning.Plans.Compound.{If, Or, Parallel}
+import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZvZ.ZvZIdeas
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump}
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Predicates.Compound.{And, Not}
+import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyBasesAtLeast

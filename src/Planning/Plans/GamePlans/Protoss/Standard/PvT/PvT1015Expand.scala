@@ -4,13 +4,13 @@ import Lifecycle.With
 import Macro.BuildRequests.BuildRequest
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
-import Planning.Plans.Compound.{If, Or, Trigger}
+import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, GasCapsUntouched, Pump}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Scouting.ScoutWithWorkers
-import Planning.Predicates.Compound.{And, Not}
+import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{MatchAnd, MatchInNatural, MatchTank}

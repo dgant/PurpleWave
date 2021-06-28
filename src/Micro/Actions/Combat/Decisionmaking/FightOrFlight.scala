@@ -37,11 +37,11 @@ object FightOrFlight extends Action {
     decide(true,  "Berzerk",      () => With.frame < Minutes(6)() && unit.isAny(Protoss.Zealot, Zerg.Zergling) && unit.base.exists(b => b.owner.isEnemy || b.isNaturalOf.exists(_.owner.isEnemy)) && unit.matchups.threats.exists(t => Terran.Vulture(t) && t.matchups.catchers.isEmpty))
     decide(true,  "Lurking",      () => Zerg.Lurker(unit) && unit.matchups.enemyDetectors.isEmpty)
     decide(true,  "Detonated",    () => unit.isAny(Zerg.InfestedTerran, Zerg.Scourge) && unit.matchups.targets.exists(t => t.canAttack(unit) && t.matchups.targetsInRange.nonEmpty))
-    decide(true,  "Workers",      () => unit.matchups.allies.flatMap(_.friendly).exists(a => MatchWorker(a) && (a.matchups.targetsInRange ++ a.orderTarget).exists(t => t.isEnemy && a.framesToGetInRange(t) <= 4 + unit.framesToGetInRange(t))))
     decide(false, "Scarabs",      () => unit.is(Protoss.Reaver) && unit.scarabs == 0 && ! unit.trainee.exists(_.remainingCompletionFrames < Math.max(unit.matchups.framesOfSafety, unit.cooldownLeft)))
     decide(false, "Drained",      () => ! unit.canAttack && unit.energyMax > 0 && unit.unitClass.spells.forall(s => s.energyCost > unit.energy || ! With.self.hasTech(s)))
     decide(false, "Disrupted",    () => unit.underDisruptionWeb && ! unit.flying && unit.matchups.threats.exists(t => t.flying || ! t.underDisruptionWeb))
-    decide(false, "BidingSiege",  () => Terran.SiegeTankUnsieged(unit) && ! With.blackboard.wantToAttack() && unit.matchups.threats.exists(Protoss.Dragoon) && With.units.ours.exists(_.techProducing.contains(Terran.SiegeMode)) && unit.alliesBattle.exists(a => Terran.Bunker(a) && a.complete))
+    decide(false, "BidingSiege",  () => Terran.SiegeTankUnsieged(unit) && ! With.blackboard.wantToAttack() && unit.matchups.threats.exists(Protoss.Dragoon) && ! With.self.hasTech(Terran.SiegeMode) && With.units.ours.exists(_.techProducing.contains(Terran.SiegeMode)) && unit.alliesBattle.exists(a => Terran.Bunker(a) && a.complete))
+    decide(true,  "Workers",      () => unit.matchups.allies.flatMap(_.friendly).exists(a => MatchWorker(a) && (a.matchups.targetsInRange ++ a.orderTarget).exists(t => t.isEnemy && a.framesToGetInRange(t) <= 4 + unit.framesToGetInRange(t))))
     decide(true,  "Energized", () =>
       unit.unitClass.maxShields > 10
       && unit.alliesBattle.exists(ally =>

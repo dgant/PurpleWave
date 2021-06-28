@@ -5,7 +5,7 @@ import Macro.Architecture.Blueprint
 import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Basic.WriteStatus
-import Planning.Plans.Compound.{Or, Parallel, _}
+import Planning.Plans.Compound.{FlipIf, If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic._
@@ -14,7 +14,7 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMinin
 import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural, ProposePlacement}
 import Planning.Plans.Scouting.{ScoutCleared, ScoutOn, ScoutWithWorkers}
-import Planning.Predicates.Compound.{And, Check, Latch, Not}
+import Planning.Predicates.Compound._
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost}
 import Planning.Predicates.Milestones.{EnemyHasShownWraithCloak, _}
 import Planning.Predicates.Reactive._

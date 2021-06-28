@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Micro.Actions.Basic.Gather
 import Planning.UnitMatchers.{MatchTank, MatchWorker}
-import ProxyBwapi.Races.Terran
+import ProxyBwapi.Races.{Protoss, Terran}
 import bwapi.Color
 
 import scala.collection.mutable.ArrayBuffer
@@ -20,16 +20,14 @@ object JudgmentModifiers {
         m.color = color
         output += m })
     }
-    add("Aggression",   Colors.MidnightRed,   aggression(battle))
-    add("Proximity",    Colors.NeonRed,       proximity(battle))
-    add("Coherence",    Colors.MediumOrange,  coherence(battle))
-    add("EnemyChoked",  Colors.MediumYellow,  enemyChoked(battle))
-    add("Rout",         Colors.MediumGreen,   rout(battle))
-    add("Maxed",        Colors.MediumTeal,    maxed(battle))
-    add("Gatherers",    Colors.MediumBlue,    gatherers(battle))
-    add("HornetNest",   Colors.NeonIndigo,    hornetNest(battle))
-    add("Commitment",   Colors.NeonViolet,    commitment(battle))
-    add("Patience",     Color.Black,          patience(battle))
+    add("Aggression", Colors.MidnightRed,   aggression(battle))
+    add("Proximity",  Colors.NeonRed,       proximity(battle))
+    add("Maxed",      Colors.MediumTeal,    maxed(battle))
+    add("Gatherers",  Colors.MediumBlue,    gatherers(battle))
+    add("HornetNest", Colors.NeonIndigo,    hornetNest(battle))
+    add("Commitment", Colors.NeonViolet,    commitment(battle))
+    add("Towers",     Colors.MediumGreen,   towers(battle))
+    add("Anchors",    Colors.MediumOrange,   anchored(battle))
     output
   }
 
@@ -64,34 +62,6 @@ object JudgmentModifiers {
     val bonus = us - enemy
     Some(JudgmentModifier(speedMultiplier = 1 + 0.2 * bonus))
   }
-
-  // Prefer fighting
-  //  when the enemy is entering a choke
-  //    because the benefits of this are underrepresented in simulation
-  //      due to the absence of collisions,
-  //    and because the situation is likely to get worse for us
-  //      once they have gotten through the choke
-  def enemyChoked(battleLocal: BattleLocal): Option[JudgmentModifier] = {
-    val choked = battleLocal.enemy.units.exists(unit =>
-      ! unit.flying
-      && unit.zone.edges.exists(edge =>
-        edge.contains(unit.pixel)
-        && edge.radiusPixels < battleLocal.enemy.widthIdeal() / 4d))
-
-    None
-    // TODO: This is proccing in bad situations like an enemy containing our natural from outside, but some of their units are in the choke AFTER that so not of salience to the battle
-    // if (choked) Some(JudgmentModifier(speedMultiplier = 1.2)) else None
-  }
-
-  // Prefer fighting
-  //   when the enemy is running away
-  //     because we can get free damage in
-  //     and because perhaps the fight is good for us
-  //       due to reasons we haven't considered
-  def rout(battleLocal: BattleLocal): Option[JudgmentModifier] = {
-    None
-  }
-
   // Prefer fighting
   //   when we are maxed out
   //   especially with a bank
@@ -112,10 +82,10 @@ object JudgmentModifiers {
       && ally.visibleToOpponents
       && ally.friendly.exists(_.agent.toGather.exists(g =>
         g.pixelDistanceEdge(ally) <= Gather.defenseRadiusPixels
-        && ally.matchups.threats.exists(_.pixelsToGetInRange(ally, g.pixel) <= Gather.defenseRadiusPixels))))
+        && ally.matchups.threats.exists(t => t.pixelDistanceEdge(g) - t.pixelRangeAgainst(ally) <= Gather.defenseRadiusPixels))))
     val workersTotal = With.units.countOurs(MatchWorker)
     val workersRatio = Maff.nanToZero(workersImperiled.toDouble / workersTotal)
-    if (workersRatio > 0) Some(JudgmentModifier(targetDelta = -workersRatio)) else None
+    if (workersRatio > 0) Some(JudgmentModifier(targetDelta = -workersRatio / 2.0)) else None
   }
 
   // Avoid fighting
@@ -149,15 +119,32 @@ object JudgmentModifiers {
   def commitment(battleLocal: BattleLocal): Option[JudgmentModifier] = {
     def fighters = battleLocal.us.units.view.filter(_.unitClass.attacksOrCastsOrDetectsOrTransports)
     val commitment = Maff.mean(fighters.map(u => Maff.clamp((32 + u.matchups.pixelsOfEntanglement) / 96d, 0, 1)))
-    Some(JudgmentModifier(targetDelta = if (commitment > 0) -commitment * 0.2 else 0.2))
+    Some(JudgmentModifier(targetDelta = if (commitment > 0) -commitment * 0.15 else 0.15))
   }
 
-  // Avoid engaging
-  //   in a fight that's not obviously winnable
-  //   until we have gained confidence over time that it will be winnable
-  //     because high-frequency combat vacillation
-  //     systematically causes more bad decisions and bleeding
-  def patience(battleLocal: BattleLocal): Option[JudgmentModifier] = {
-    None
+  // Avoid disengaging
+  //   from a fight we have already committed to
+  //   if we have unshuttled Reavers engaged
+  //     because they are crawly slugs
+  //     and love dying
+  def anchored(battleLocal: BattleLocal): Option[JudgmentModifier] = {
+    lazy val fragileSlugs = battleLocal.us.units.exists(u => u.isAny(Terran.SiegeTankSieged, Protoss.Reaver) && ! u.friendly.exists(_.agent.ride.isDefined) && u.matchups.pixelsOfEntanglement > -32)
+    if (With.self.isProtoss && battleLocal.us.engaged() && fragileSlugs) {
+      Some(JudgmentModifier(targetDelta = -0.25))
+    } else None
+  }
+
+  // Avoid fighting
+  //   when the enemy has static defense at home
+  //   and we are equal on base count
+  //     because this is not a great use of resources
+  def towers(battleLocal: BattleLocal): Option[JudgmentModifier] = {
+    val satisfied = With.self.bases.size >= (if (With.self.isZerg) 1 else 0) + With.enemies.view.map(e => e.bases.size + (if (e.isZerg) 1 else 0)).max
+    lazy val haveAir = battleLocal.us.units.exists(_.flying)
+    lazy val haveGround = battleLocal.us.units.exists( ! _.flying)
+    lazy val staticDefenseCount = battleLocal.enemy.units.count(u => u.complete && u.unitClass.isBuilding && ((haveAir && u.unitClass.attacksAir) || (haveGround && u.unitClass.attacksGround)))
+    if (satisfied && staticDefenseCount > 0) {
+      Some(JudgmentModifier(gainedValueMultiplier = 1.0 - 0.1 * Math.min(5, staticDefenseCount)))
+    } else None
   }
 }

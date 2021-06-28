@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.FFA
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.Aggression
 import Planning.Plans.Basic.NoPlan
-import Planning.Predicates.Compound.{And, Not}
+import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.UnitMatchers.MatchWarriors
 import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._

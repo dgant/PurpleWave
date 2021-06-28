@@ -2,6 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic._
+import Planning.Predicates.Compound.Or
 import Planning.Predicates.Milestones._
 import ProxyBwapi.Races.{Protoss, Zerg}
 

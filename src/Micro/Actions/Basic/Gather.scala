@@ -58,9 +58,9 @@ object Gather extends Action {
       // Help with fights when appropriate
       lazy val beckonedToFight  = unit.matchups.targets.exists(target =>
         ! target.unitClass.isWorker
-        && (target.canAttack || target.unitClass.rawCanAttack)
-        && target.pixelDistanceCenter(unit)     < defenseRadiusPixels
-        && target.pixelDistanceCenter(resource) < defenseRadiusPixels)
+        && target.unitClass.attacksOrCastsOrDetectsOrTransports
+        && target.pixelDistanceCenter(resource) < defenseRadiusPixels
+        && unit.base.map(_.heart.center).forall(target.pixelDistanceCenter(_) < defenseRadiusPixels))
       if (unit.totalHealth > 32 && beckonedToFight) {
         Target.choose(unit)
         Commander.attack(unit)

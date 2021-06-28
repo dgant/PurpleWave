@@ -165,7 +165,7 @@ object DefaultCombat extends Action {
     lazy val target = Target.choose(unit)
 
     var technique: Technique =
-      if (unit.agent.shouldEngage && (unit.agent.withinSafetyMargin || target.isDefined || unit.matchups.threatsInFrames(48).forall(MatchWorker)))
+      if (unit.agent.shouldEngage && (unit.agent.withinSafetyMargin || unit.matchups.targets.nonEmpty || unit.matchups.threatsInFrames(48).forall(MatchWorker)))
         Fight else Flee
 
     def transition(newTechnique: Technique, predicate: () => Boolean = () => true, action: () => Unit = () => {}): Unit = {

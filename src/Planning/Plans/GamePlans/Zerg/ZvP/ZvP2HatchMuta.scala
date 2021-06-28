@@ -11,8 +11,9 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Placement.BuildSunkensAtNatural
-import Planning.Predicates.Compound.{And, Check, Latch, Not}
+import Planning.Predicates.Compound._
 import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
+import Planning.Predicates.MacroFacts
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
@@ -152,9 +153,7 @@ class ZvP2HatchMuta extends GameplanTemplate {
       Enemy(Protoss.Zealot, 4.0),
       Enemy(Zerg.Zergling, 1.75))))
   
-  case class NeedExpansion(droneCount: Int) extends Or(
-    UnitsAtLeast(droneCount, Zerg.Drone),
-    MineralsAtLeast(500))
+  def NeedExpansion(droneCount: Int) = Check(() => MacroFacts.units(Zerg.Drone) >= droneCount || MacroFacts.minerals >= 500)
   
   object ReadyToExpand extends Or(
     UnitsAtLeast(1, Zerg.Spire, complete = true),
@@ -297,27 +296,27 @@ class ZvP2HatchMuta extends GameplanTemplate {
       new If(ProceedWithDrones, new Pump(Zerg.Drone, 24))),
     new If(
       new And(
-        new NeedExpansion(20),
+        NeedExpansion(20),
         ReadyToExpand),
       new RequireMiningBases(3)),
     new If(
       new And(
-        new NeedExpansion(26),
+        NeedExpansion(26),
         ReadyToExpand),
       new RequireBases(4)),
     new If(
       new And(
-        new NeedExpansion(32),
+        NeedExpansion(32),
         ReadyToExpand),
       new RequireBases(5)),
     new If(
       new And(
-        new NeedExpansion(40),
+        NeedExpansion(40),
         ReadyToExpand),
       new RequireBases(6)),
     new If(
       new And(
-        new NeedExpansion(50),
+        NeedExpansion(50),
         ReadyToExpand),
       new RequireBases(7)),
     new If(

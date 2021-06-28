@@ -15,7 +15,7 @@ class FlipIf(
   val second = new Property[Plan](initialSecond)
   
   override def onUpdate() {
-    if (predicate.get()) {
+    if (predicate.get.apply) {
       second.get.update()
       first.get.update()
     } else {

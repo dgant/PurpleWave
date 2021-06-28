@@ -36,19 +36,32 @@ object Retreat extends Action {
     lazy val goalSafety           = ! unit.agent.withinSafetyMargin
 
     // Decide how to retreat
+
+    lazy val forceVector = {
+      if (unit.agent.forces.isEmpty) MicroPathing.setDefaultForces(unit, goalHome = goalHome, goalSafety = goalSafety)
+      unit.agent.forces.sum
+    }
+    lazy val force = forceVector.radians
+
+    // Against melee rush: Retreat directly to heart so workers can help
     if (unit.isAny(Terran.Marine, Protoss.Zealot) && unit.metro.contains(With.geography.ourMetro) && unit.matchups.threats.forall(_.pixelRangeAgainst(unit) < 64)) {
       return RetreatPlan(unit, With.geography.ourMain.heart.center, "Run")
     }
+
+    // Enshuttled VIPs: If not primary passenger, retreat towards primary passenger
+    val leadPassenger = unit.agent.ride.flatMap(_.agent.prioritizedPassengers.headOption)
+    if (leadPassenger.isDefined && ! leadPassenger.contains(unit)) {
+      return RetreatPlan(unit, leadPassenger.get.pixel.add(forceVector.normalize(32).toPoint.asPixel.nearestWalkablePixel), "Shotgun")
+    }
+
     if ( ! unit.airborne) {
       unit.agent.escalatePriority(TrafficPriorities.Pardon)
       if (unit.matchups.pixelsOfEntanglement > -80) unit.agent.escalatePriority(TrafficPriorities.Nudge)
       if (unit.matchups.pixelsOfEntanglement > -48) unit.agent.escalatePriority(TrafficPriorities.Bump)
       if (unit.matchups.pixelsOfEntanglement > -16) unit.agent.escalatePriority(TrafficPriorities.Shove)
     }
-    if (unit.agent.forces.isEmpty) {
-      MicroPathing.setDefaultForces(unit, goalHome = goalHome, goalSafety = goalSafety)
-    }
-    lazy val force            = unit.agent.forces.sum.radians
+
+
     lazy val tilePath         = MicroPathing.getThreatAwarePath(unit, preferHome = goalHome)
     lazy val waypointSimple   = MicroPathing.getWaypointInDirection(unit, force, if (goalHome) Some(unit.agent.origin) else None, requireSafety = goalSafety).map((_, "Simple"))
     lazy val waypointPath     = MicroPathing.getWaypointAlongTilePath(tilePath).map(_.add(unit.pixel.offsetFromTileCenter)).map((_, "Path"))

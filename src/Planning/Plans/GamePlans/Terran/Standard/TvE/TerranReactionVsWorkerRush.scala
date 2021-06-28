@@ -4,12 +4,13 @@ import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.NoPlan
-import Planning.Plans.Compound.{If, Or}
+import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, PumpWorkers}
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Placement.BuildBunkersAtMain
+import Planning.Predicates.Compound.Or
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy.EnemyStrategy
 import Planning.{Plan, Predicate}

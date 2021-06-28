@@ -6,13 +6,13 @@ import Performance.Cache
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.{NoPlan, WriteStatus}
-import Planning.Plans.Compound.{If, Or, Parallel}
+import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.UpgradeHydraSpeedThenRange
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Predicates.Compound.{Check, Not}
+import Planning.Predicates.Compound.{Check, Not, Or}
 import Planning.Predicates.Economy.GasAtMost
 import Planning.Predicates.Milestones.{EnemyHasShown, UnitsAtLeast}
 import Planning.UnitMatchers.MatchWarriors

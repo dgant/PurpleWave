@@ -3,11 +3,11 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvR
 import Lifecycle.With
 import Macro.BuildRequests.BuildRequest
 import Planning.Plans.Army.ConsiderAttacking
-import Planning.Plans.Compound.{If, Or}
+import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanTemplateVsRandom
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.Pump
-import Planning.Predicates.Compound.And
+import Planning.Predicates.Compound.{And, Or}
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyRaceKnown, EnemyStrategy}
 import Planning.UnitMatchers.MatchWarriors

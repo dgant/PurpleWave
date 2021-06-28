@@ -42,7 +42,8 @@ object SquadTargeting {
     val engaged   = units.exists(_.matchups.threatsInRange.nonEmpty)
     targets.sortBy(t =>
       t.pixelDistanceSquared(centroid)
-      + (32.0 * t.totalHealth / Math.max(1.0, t.unitClass.maxTotalHealth)) // Focus down weak units
+      - (if (t.totalHealth < t.unitClass.maxTotalHealth) -16.0 else 0) // Flat hysteresis: Focus units we've already started attacking
+      + (32.0 * t.totalHealth / Math.max(1.0, t.unitClass.maxTotalHealth)) // Scaling hysteresis: Focus down weak units
       + (if (t.unitClass.attacksOrCastsOrDetectsOrTransports || ! engaged) 0 else With.mapPixelPerimeter))
   }
 }

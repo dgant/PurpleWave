@@ -4,9 +4,9 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, ConsiderAttacking}
+import Planning.Plans.Army.{Aggression, Attack, ConsiderAttacking}
 import Planning.Plans.Basic.WriteStatus
-import Planning.Plans.Compound.{Or, _}
+import Planning.Plans.Compound.{_}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.CancelIncomplete
@@ -24,30 +24,30 @@ import Strategery.Strategies.Protoss.{PvPRobo, PvPRobo1012}
 
 class PvPRobo extends GameplanTemplate {
 
-  override val activationCriteria: Predicate = new Employing(PvPRobo)
-  override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
+  override val activationCriteria: Predicate = Employing(PvPRobo)
+  override val completionCriteria: Predicate = Latch(BasesAtLeast(2))
 
   val oneGateCoreLogic = new PvP1GateCoreLogic(allowZealotBeforeCore = true)
 
   class ShuttleFirst extends ConcludeWhen(
-    new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
-    new And(
-      new UnitsAtMost(0, Protoss.RoboticsSupportBay ),
-      new Or(
-        new Check(() => With.strategy.isRamped),
-        new Not(new GetObservers)),
-      new Not(new oneGateCoreLogic.GateTechGateGate),
-      new Or(
-        new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.robo),
-        new EnemyBasesAtLeast(2))))
+    UnitsAtLeast(1, Protoss.RoboticsSupportBay),
+    And(
+      UnitsAtMost(0, Protoss.RoboticsSupportBay),
+      Or(
+        Check(() => With.strategy.isRamped),
+        Not(new GetObservers)),
+      Not(new oneGateCoreLogic.GateTechGateGate),
+      Or(
+        EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.robo),
+        EnemyBasesAtLeast(2))))
 
   class GetObservers extends Or(
     new EnemyDarkTemplarLikely,
-    new EnemiesAtLeast(1, Protoss.CitadelOfAdun),
-    new And(
-      new EnemyRecentStrategy(With.fingerprints.dtRush),
-      new Not(new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.robo, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon))),
-    new Not(new EnemyStrategy(With.fingerprints.dragoonRange, With.fingerprints.dragoonRange)))
+    EnemiesAtLeast(1, Protoss.CitadelOfAdun),
+    And(
+      EnemyRecentStrategy(With.fingerprints.dtRush),
+      Not(EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.robo, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon))),
+    Not(EnemyStrategy(With.fingerprints.dragoonRange, With.fingerprints.dragoonRange)))
 
   override def blueprints = Vector(
     new Blueprint(Protoss.Pylon),
@@ -59,61 +59,61 @@ class PvPRobo extends GameplanTemplate {
 
   // TODO: Replace with (or merge into) PvPSafeToMoveOut?
   override def attackPlan: Plan = new If(
-    new And(
+    And(
       // No point attacking with a couple of Zealots if they have any defense whatsoever
-      new Or(
-        new Or(new Employing(PvPRobo1012)),
-        new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
-        new UnitsAtLeast(1, Protoss.Reaver, complete = true),
-        new EnemiesAtMost(0, Protoss.PhotonCannon, complete = true),
-        new EnemiesAtMost(0, MatchWarriors)),
-      new Or(
-        new Not(new EnemyHasShown(Protoss.DarkTemplar)),
-        new UnitsAtLeast(2, Protoss.Observer, complete = true)),
-      new Or(
-        new And(new EnemyStrategy(With.fingerprints.dtRush), new UnitsAtLeast(2, Protoss.Observer, complete = true)),
-        new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.gasSteal, With.fingerprints.cannonRush, With.fingerprints.earlyForge),
-        new EnemyBasesAtLeast(2),
-        new And(
-          new EnemyStrategy(With.fingerprints.twoGate),
-          new Not(new EnemyStrategy(With.fingerprints.proxyGateway)),
-          new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
-          new Or(
-            new UpgradeComplete(Protoss.DragoonRange),
-            new Not(new EnemyHasUpgrade(Protoss.DragoonRange)))))),
+      Or(
+        Or(Employing(PvPRobo1012)),
+        UnitsAtLeast(1, Protoss.Dragoon, complete = true),
+        UnitsAtLeast(1, Protoss.Reaver, complete = true),
+        EnemiesAtMost(0, Protoss.PhotonCannon, complete = true),
+        EnemiesAtMost(0, MatchWarriors)),
+      Or(
+        Not(EnemyHasShown(Protoss.DarkTemplar)),
+        UnitsAtLeast(2, Protoss.Observer, complete = true)),
+      Or(
+        And(EnemyStrategy(With.fingerprints.dtRush), UnitsAtLeast(2, Protoss.Observer, complete = true)),
+        EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.gasSteal, With.fingerprints.cannonRush, With.fingerprints.earlyForge),
+        EnemyBasesAtLeast(2),
+        And(
+          EnemyStrategy(With.fingerprints.twoGate),
+          Not(EnemyStrategy(With.fingerprints.proxyGateway)),
+          UnitsAtLeast(1, Protoss.Dragoon, complete = true),
+          Or(
+            UpgradeComplete(Protoss.DragoonRange),
+            Not(EnemyHasUpgrade(Protoss.DragoonRange)))))),
       new ConsiderAttacking)
 
   override def emergencyPlans: Seq[Plan] = oneGateCoreLogic.emergencyPlans
-  override def scoutPlan: Plan = new If(new EnemiesAtMost(0, Protoss.Dragoon), super.scoutPlan)
+  override def scoutPlan: Plan = new If(EnemiesAtMost(0, Protoss.Dragoon), super.scoutPlan)
 
   override def aggressionPlan: Plan = new Trigger(
-    new And(new ReadyToExpand, new BasesAtMost(1)),
+    And(new ReadyToExpand, BasesAtMost(1)),
     new Aggression(3.0),
     new If(
-      new Check(() => With.strategy.isInverted), new Aggression(1.5),
+      Check(() => With.strategy.isInverted), new Aggression(1.5),
       new If(
-        new Check(() => With.strategy.isFlat), new Aggression(1.2))))
+        Check(() => With.strategy.isFlat), new Aggression(1.2))))
 
   override def buildOrderPlan: Plan = new oneGateCoreLogic.BuildOrderPlan
 
   private class TrainRoboUnits extends Parallel(
     new Trigger(
-      new UnitsAtLeast(1, Protoss.RoboticsFacility),
+      UnitsAtLeast(1, Protoss.RoboticsFacility),
       new Parallel(
         new If(
           new GetObservers,
           new Parallel(
             new If(
-              new EnemyStrategy(With.fingerprints.dtRush),
+              EnemyStrategy(With.fingerprints.dtRush),
               new Pump(Protoss.Observer, 2)),
           new BuildOrder(Get(Protoss.Observer)))),
         new If(new ShuttleFirst, new BuildOrder(Get(Protoss.Shuttle))),
         new Trigger(
-          new UnitsAtLeast(2, Protoss.Reaver),
+          UnitsAtLeast(2, Protoss.Reaver),
           new If(
-            new And(
-              new EnemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon),
-              new UnitsAtMost(3, Protoss.Reaver)),
+            And(
+              EnemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon),
+              UnitsAtMost(3, Protoss.Reaver)),
             new Pump(Protoss.Reaver),
             new PumpShuttleAndReavers),
           new Pump(Protoss.Reaver, 2)))))
@@ -122,33 +122,29 @@ class PvPRobo extends GameplanTemplate {
     new BuildOrder(Get(Protoss.Dragoon)),
     new Pump(Protoss.Dragoon),
     new If(
-      new UnitsAtLeast(3, Protoss.Gateway),
+      UnitsAtLeast(3, Protoss.Gateway),
       new Pump(Protoss.Zealot)))
 
   class EnemyLowUnitCount extends Or(
-    new EnemyBasesAtLeast(2),
-    new EnemyStrategy(
+    EnemyBasesAtLeast(2),
+    EnemyStrategy(
       With.fingerprints.robo,
       With.fingerprints.dtRush,
       With.fingerprints.forgeFe))
 
   class ReadyToExpand extends And(
-    new UnitsAtLeast(2, Protoss.Gateway),
-    new Or(new Not(new EnemyStrategy(With.fingerprints.dtRush)), new UnitsAtLeast(1, Protoss.Observer, complete = true)),
-    new Or(new Not(new EnemyStrategy(With.fingerprints.dtRush)), new And(new UnitsAtLeast(1, Protoss.Observer), new EnemiesAtMost(0, Protoss.DarkTemplar))),
-    new Or(
-      new And(new SafeToMoveOut, new EnemyStrategy(With.fingerprints.dtRush)),
-      new And(new SafeToMoveOut, new UnitsAtLeast(1, Protoss.Reaver, complete = true), new EnemyLowUnitCount),
-      new UnitsAtLeast(2, Protoss.Reaver, complete = true)))
+    UnitsAtLeast(2, Protoss.Gateway),
+    Or(Not(EnemyStrategy(With.fingerprints.dtRush)), UnitsAtLeast(1, Protoss.Observer, complete = true)),
+    Or(Not(EnemyStrategy(With.fingerprints.dtRush)), And(UnitsAtLeast(1, Protoss.Observer), EnemiesAtMost(0, Protoss.DarkTemplar))),
+    Or(
+      And(new SafeToMoveOut, EnemyStrategy(With.fingerprints.dtRush)),
+      And(new SafeToMoveOut, UnitsAtLeast(1, Protoss.Reaver, complete = true), new EnemyLowUnitCount),
+      UnitsAtLeast(2, Protoss.Reaver, complete = true)))
 
   override def buildPlans: Seq[Plan] = Seq(
     new oneGateCoreLogic.WriteStatuses,
     new If(new GetObservers, new WriteStatus("Obs"), new WriteStatus("NoObs")),
-    new If(
-      new GasCapsUntouched,
-      new Parallel(
-        new CapGasAt(350),
-        new If(          new oneGateCoreLogic.GateGate))),
+    new If(new GasCapsUntouched, new CapGasAt(350)),
     new FlipIf(
       new oneGateCoreLogic.GateGate,
       new Parallel(
@@ -175,22 +171,28 @@ class PvPRobo extends GameplanTemplate {
       new Parallel(
         new BuildOrder(Get(Protoss.Observatory)),
         new Trigger(
-          new UnitsAtLeast(1, Protoss.Observer),
+          UnitsAtLeast(1, Protoss.Observer),
           new Build(Get(Protoss.RoboticsSupportBay)))),
       new Parallel(
         new CancelIncomplete(Protoss.Observatory),
         new CancelIncomplete(Protoss.Observer),
         new Build(Get(Protoss.RoboticsSupportBay)))),
 
-    new If(new ReadyToExpand, new Parallel(new WriteStatus("ReadyToExpand"), new RequireMiningBases(2))),
+    new If(
+      new ReadyToExpand,
+      new Parallel(new WriteStatus("ReadyToExpand"),
+        new If(
+          Check(() => With.geography.ourNatural.units.exists(u => u.isEnemy && u.canAttack)),
+          new Attack,
+          new RequireMiningBases(2)))),
+
     new TrainGatewayUnits,
-    new If(new EnemyStrategy(With.fingerprints.dtRush), new Build(Get(Protoss.ObserverSpeed))),
+    new If(EnemyStrategy(With.fingerprints.dtRush), new Build(Get(Protoss.ObserverSpeed))),
     new Build(Get(3, Protoss.Gateway)),
     new PumpWorkers(oversaturate = true),
     new If(
-      new And(
-        new UnitsAtLeast(3, Protoss.Gateway, complete = true),
-        new MineralsAtLeast(450)),
-      new Build(Get(4, Protoss.Gateway))),
+      And(
+        UnitsAtLeast(3, Protoss.Gateway, complete = true),
+        MineralsAtLeast(450))),
   )
 }

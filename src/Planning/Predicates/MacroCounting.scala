@@ -3,7 +3,7 @@ package Planning.Predicates
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.Predicates.Milestones.AllMiningBases
-import Planning.UnitMatchers.{MatchAnd, MatchComplete, UnitMatcher}
+import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchOr, UnitMatcher}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
@@ -52,12 +52,13 @@ trait MacroCounting {
         && unit.remainingUpgradeFrames <= withinFrames))
   }
 
-  def units(matcher: UnitMatcher): Int = {
-    With.units.countOurs(matcher) + (if (With.self.isZerg) With.units.countOursP(_.buildType == matcher) else 0)
-  }
+  def units(matchers: UnitMatcher*): Int = (
+    With.units.countOurs(MatchOr(matchers: _*)) +
+      (if (With.self.isZerg) With.units.ours.map(u => if (matchers.contains(u.buildType)) u.buildType.copiesProduced else 0).sum else 0)
+  )
 
-  def unitsComplete(matcher: UnitMatcher): Int = {
-    With.units.countOurs(MatchAnd(MatchComplete, matcher))
+  def unitsComplete(matchers: UnitMatcher*): Int = {
+    With.units.countOurs(MatchAnd(MatchComplete, MatchOr(matchers: _*)))
   }
 
   def framesUntilUnit(unitClass: UnitClass): Int = {
@@ -96,6 +97,14 @@ trait MacroCounting {
     With.blackboard.safeToMoveOut()
   }
 
+  def gasCapsUntouched: Boolean = (
+    ! With.blackboard.gasWorkerCeiling.isSet
+    && ! With.blackboard.gasWorkerFloor.isSet
+    && ! With.blackboard.gasLimitFloor.isSet
+    && ! With.blackboard.gasLimitCeiling.isSet
+    && ! With.blackboard.gasWorkerRatio.isSet
+  )
+
   def employing(strategies: Strategy*): Boolean = {
     strategies.exists(_.registerActive())
   }
@@ -104,12 +113,12 @@ trait MacroCounting {
 
   def starts: Int = With.geography.startLocations.size
 
-  def enemies(matcher: UnitMatcher): Int = {
-    With.units.countEnemy(matcher)
+  def enemies(matchers: UnitMatcher*): Int = {
+    With.units.countEnemy(MatchOr(matchers: _*))
   }
 
-  def enemiesComplete(matcher: UnitMatcher): Int = {
-    With.units.countEnemy(MatchAnd(MatchComplete, matcher))
+  def enemiesComplete(matchers: UnitMatcher*): Int = {
+    With.units.countEnemy(MatchAnd(MatchComplete, MatchOr(matchers: _*)))
   }
 
   def enemiesShown(unitClasses: UnitClass*): Int = {

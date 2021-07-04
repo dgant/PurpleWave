@@ -47,7 +47,7 @@ class PvPRobo extends GameplanTemplate {
     And(
       EnemyRecentStrategy(With.fingerprints.dtRush),
       Not(EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.robo, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon))),
-    Not(EnemyStrategy(With.fingerprints.dragoonRange, With.fingerprints.dragoonRange)))
+    Not(EnemyStrategy(With.fingerprints.dragoonRange)))
 
   override def blueprints = Vector(
     new Blueprint(Protoss.Pylon),

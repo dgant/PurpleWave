@@ -9,11 +9,10 @@ import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-
 class Pump(
-  unitClass                 : UnitClass,
-  maximumTotal              : Int = Int.MaxValue,
-  maximumConcurrently       : Int = Int.MaxValue)
+  unitClass           : UnitClass,
+  maximumTotal        : Int = Int.MaxValue,
+  maximumConcurrently : Int = Int.MaxValue)
     extends Plan {
 
   description.set("Pump " + unitClass)

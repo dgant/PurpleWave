@@ -16,12 +16,9 @@ object Get {
   }
   
   def apply(quantity: Int, buildableType: Any): BuildRequest = {
-    val shouldAdd = false
-    val buildable = toBuildable(buildableType, quantity)
-    val output = new BuildRequest(buildable) {
-      override val total  : Int = if (shouldAdd) 0 else quantity
+    new BuildRequest(toBuildable(buildableType, quantity)) {
+      override val total: Int = quantity
     }
-    output
   }
   
   def apply(buildable: Any, quantity: Int = 1): BuildRequest = apply(quantity, buildable)

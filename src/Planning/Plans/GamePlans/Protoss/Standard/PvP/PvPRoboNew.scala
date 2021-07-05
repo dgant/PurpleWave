@@ -233,7 +233,7 @@ class PvPRoboNew extends GameplanImperative {
     if (shouldAttack) { attack() }
     if (enemies(Protoss.Dragoon) == 0) {
       if (twoGateZealot) {
-        if (starts > 2) scoutOn(Protoss.Gateway)
+        if ( ! foundEnemyBase) scoutOn(Protoss.Gateway, quantity = 2)
       } else if (starts > 3) {
         scoutOn(Protoss.Gateway)
       } else {
@@ -288,6 +288,7 @@ class PvPRoboNew extends GameplanImperative {
     trainGatewayUnits()
 
     if (With.fingerprints.dtRush.matches) { get(Protoss.ObserverSpeed) }
+    get(2, Protoss.Gateway)
     pumpWorkers(oversaturate = true)
     get(3, Protoss.Gateway)
   }

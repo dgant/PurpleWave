@@ -64,8 +64,8 @@ object FormationGeneric {
       val path = new PathfindProfile(floodOrigin, Some(floodGoal), employGroundDist = true).find
       if ( ! path.pathExists) return FormationEmpty
       val patht = path.tiles.get.view
-      floodMaxDistanceGoal    = floodOrigin.groundTilesManhattan(floodGoal) - 4
-      floodMinDistanceGoal    = floodMaxDistanceGoal - 8
+      floodMaxDistanceGoal    = floodOrigin.groundTilesManhattan(floodGoal) - 2
+      floodMinDistanceGoal    = floodMaxDistanceGoal - 6
       floodStart              = patht.find(_.groundTilesManhattan(floodGoal) == floodMinDistanceGoal).orElse(patht.find(_.groundTilesManhattan(floodGoal) == floodMinDistanceGoal + 1)).getOrElse(floodGoal)
       floodMaxThreat          = With.grids.enemyRangeGround.margin
       floodCostDistanceGoal   = 5

@@ -4,18 +4,19 @@ import Planning.Plan
 import Planning.Predicates.MacroCounting
 
 abstract class GameplanImperative extends Plan with Modal with MacroCounting with MacroActions {
-  var complete: Boolean = false
+  def activated: Boolean = true
+  def completed: Boolean = false
+
   var doBasics: Boolean = true
   var doBuildOrder: Boolean = true
-  override def isComplete: Boolean = complete
 
   override def onUpdate(): Unit = {
-    if (isComplete) return
+    if (completed) return
     if (doBasics) {
       requireEssentials()
     }
     if (doBuildOrder) {
-      buildOrder()
+      executeBuild()
     }
     if (doBasics) {
       pumpSupply()
@@ -24,9 +25,7 @@ abstract class GameplanImperative extends Plan with Modal with MacroCounting wit
     execute()
   }
 
-  def doIf: Boolean = true
-
-  def buildOrder(): Unit = {}
+  def executeBuild(): Unit = {}
 
   def execute(): Unit
 }

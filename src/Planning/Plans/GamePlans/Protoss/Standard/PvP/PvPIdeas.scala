@@ -11,7 +11,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.{CancelIncomplete, CancelOrders}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{RequireBases, RequireMiningBases}
-import Planning.Plans.Macro.Protoss.{BuildTowersAtBases, MeldArchons}
+import Planning.Plans.Macro.Protoss.{BuildTowersAtBases, MeldArchons, MeldDarkArchons}
 import Planning.Predicates.Compound._
 import Planning.Predicates.Economy.GasAtMost
 import Planning.Predicates.Milestones._
@@ -437,6 +437,16 @@ object PvPIdeas {
 
   class TrainArmy extends Parallel(
     new Pump(Protoss.Carrier),
+    new If(
+      And(new EnemyCarriersOnly, GasPumpsAtLeast(2)),
+      new Parallel(
+        new Build(Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore), Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives)),
+        new MeldDarkArchons,
+        new Build(Get(Protoss.DarkArchonEnergy)),
+        new BuildOrder(Get(6, Protoss.DarkTemplar)),
+        new If(UpgradeComplete(Protoss.DarkArchonEnergy), new Build(Get(Protoss.MindControl))),
+        new If(UnitsAtLeast(2, Protoss.DarkArchon), new Build(Get(Protoss.MindControl))),
+        new PumpRatio(Protoss.DarkTemplar, 0, 12, Seq(Flat(2.0), Enemy(Protoss.Carrier, 2.0), Friendly(Protoss.DarkArchon, -2.0))))),
     new PumpRatio(Protoss.Observer, 0, 1, Seq(Enemy(Protoss.DarkTemplar, 1.0))),
     new PumpRatio(Protoss.Dragoon, 0, 80, Seq(Enemy(Protoss.Carrier, 6.0))),
     new If(

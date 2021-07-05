@@ -14,7 +14,7 @@ import Planning.Predicates.Compound._
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBasesAtMost, SafeAtHome, SafeToMoveOut}
 import Planning.Predicates.Strategy.{EnemyRecentStrategy, EnemyStrategy}
-import Planning.UnitMatchers.{MatchOr, MatchWarriors}
+import Planning.UnitMatchers.MatchOr
 import ProxyBwapi.Races.Protoss
 
 class PvPLateGame extends GameplanTemplate {

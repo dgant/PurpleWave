@@ -38,11 +38,11 @@ trait MacroCounting {
       unit.teching && unit.techingType == tech && unit.remainingTechFrames <= withinFrames))
   }
 
-  def upgradeStarted(upgrade: Upgrade, level: Int): Boolean = {
+  def upgradeStarted(upgrade: Upgrade, level: Int = 1): Boolean = {
     upgradeComplete(upgrade, level, upgrade.upgradeFrames(level))
   }
 
-  def upgradeComplete(upgrade: Upgrade, level: Int, withinFrames: Int = 0): Boolean = {
+  def upgradeComplete(upgrade: Upgrade, level: Int = 1, withinFrames: Int = 0): Boolean = {
     With.self.getUpgradeLevel(upgrade) >= level  || (
       With.self.getUpgradeLevel(upgrade) == level - 1
       && withinFrames > 0

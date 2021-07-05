@@ -8,6 +8,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.{CancelIncomplete, CancelOrders}
 import Planning.Plans.Macro.BuildOrders.{BuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
+import Planning.Plans.Scouting.{ScoutAt, ScoutOn}
 import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
@@ -15,8 +16,18 @@ import ProxyBwapi.Upgrades.Upgrade
 
 trait MacroActions {
   def status(text: String): Unit = With.blackboard.status.set(With.blackboard.status() :+ text)
+
   def attack(): Unit = With.blackboard.wantToAttack.set(true)
   def allIn(): Unit = { With.blackboard.allIn.set(true); attack() }
+  def scoutOn(unitMatcher: UnitMatcher, scoutCount: Int = 1, quantity: Int = 1): Unit = {
+    new ScoutOn(unitMatcher, scoutCount = scoutCount, quantity = quantity).update()
+  }
+  def scoutAt(minimumSupply: Int, maxScouts: Int = 1): Unit = {
+    new ScoutAt(minimumSupply = minimumSupply, maxScouts = maxScouts).update()
+  }
+  def aggression(value: Double): Unit = {
+    With.blackboard.aggressionRatio.set(value)
+  }
   def gasWorkerFloor(value: Int): Unit = With.blackboard.gasWorkerFloor.set(value)
   def gasWorkerCeiling(value: Int): Unit = With.blackboard.gasWorkerCeiling.set(value)
   def gasLimitFloor(value: Int): Unit = With.blackboard.gasLimitFloor.set(value)

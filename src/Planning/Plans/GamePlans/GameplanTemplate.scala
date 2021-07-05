@@ -51,7 +51,7 @@ abstract class GameplanTemplate extends Plan with Modal {
       new Write(With.blackboard.scoutPlan, scoutPlan),
       attackPlan))
 
-  override def isComplete: Boolean = completionCriteria.apply || ! activationCriteria.apply
+  override def completed: Boolean = completionCriteria.apply || ! activationCriteria.apply
 
   override def onUpdate() {
     children.foreach(_.update())

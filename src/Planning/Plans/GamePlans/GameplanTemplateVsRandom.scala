@@ -4,5 +4,5 @@ import Lifecycle.With
 
 class GameplanTemplateVsRandom extends GameplanTemplate {
   
-  override def isComplete: Boolean = super.isComplete && With.enemies.exists(e => e.isTerran || e.isProtoss || e.isZerg)
+  override def completed: Boolean = super.completed && With.enemies.exists(e => e.isTerran || e.isProtoss || e.isZerg)
 }

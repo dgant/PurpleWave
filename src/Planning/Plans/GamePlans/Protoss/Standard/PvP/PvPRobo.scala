@@ -6,14 +6,13 @@ import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
 import Planning.Plans.Army.{Aggression, Attack, ConsiderAttacking}
 import Planning.Plans.Basic.WriteStatus
-import Planning.Plans.Compound.{_}
+import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Compound._
-import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeToMoveOut}
 import Planning.Predicates.Strategy._
@@ -192,9 +191,5 @@ class PvPRobo extends GameplanTemplate {
     new If(EnemyStrategy(With.fingerprints.dtRush), new Build(Get(Protoss.ObserverSpeed))),
     new Build(Get(3, Protoss.Gateway)),
     new PumpWorkers(oversaturate = true),
-    new If(
-      And(
-        UnitsAtLeast(3, Protoss.Gateway, complete = true),
-        MineralsAtLeast(450))),
   )
 }

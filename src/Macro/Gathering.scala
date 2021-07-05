@@ -79,8 +79,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
       .map(p => (p._1, p._2, bases.map(b2 => baseCosts(b2, p._1)).min)) // associate each with the score to the closest extant base
       .filter(p => mineralSlotCount < 14 || (
         p._3 <= naturalCost // Distance mine only if it's safe or we're desperate
-        && With.blackboard.safeToMoveOut()
-        && With.blackboard.wantToAttack()
+        && (With.blackboard.safeToMoveOut() || With.blackboard.wantToAttack())
         && ! p._1.units.exists(u => u.isEnemy && u.unitClass.attacksGround)))
       .toVector.sortBy(_._3) // sort the closest
     val distanceMineralBasesNeeded = distanceMineralBases.indices.find(i => distanceMineralBases.take(i).view.map(_._2.size).sum > 5).getOrElse(distanceMineralBases.size)

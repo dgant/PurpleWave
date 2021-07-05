@@ -44,4 +44,6 @@ class Edge(choke: Chokepoint) {
       endPixels.minBy(p => zone.distanceGrid.get(p.tile))
     else
       endPixels.minBy(_.pixelDistanceSquared(zone.centroid.center))
+
+  override def toString: String = f"Edge @ $pixelCenter (${radiusPixels.toInt}px)"
 }

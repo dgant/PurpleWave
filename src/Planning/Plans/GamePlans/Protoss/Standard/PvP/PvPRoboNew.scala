@@ -62,7 +62,7 @@ class PvPRoboNew extends GameplanImperative {
   }
 
   def execute(): Unit = {
-    complete ||= bases > 0
+    complete ||= bases > 1
     if (units(Protoss.CyberneticsCore) == 0) {
       zBeforeCore = With.geography.startLocations.size < 3
       zBeforeCore &&= ! enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.oneGateCore)
@@ -110,20 +110,20 @@ class PvPRoboNew extends GameplanImperative {
     shouldAttack ||= (
       (enemyLowUnitStrategy || enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate))
       && unitsComplete(Protoss.Dragoon) > 0
-      && ( ! With.fingerprints.dtRush.matches || unitsComplete(Protoss.Observer) > 1)
       && (upgradeComplete(Protoss.DragoonRange) || ! enemyHasUpgrade(Protoss.DragoonRange) || safeToMoveOut))
+    shouldAttack &&= ( ! With.fingerprints.dtRush.matches || unitsComplete(Protoss.Observer) > 1)
 
     if (zBeforeCore)  { (if (zAfterCore) status("ZCoreZ") else status("ZCore")) }
     else              { (if (zAfterCore) status("CoreZ") else status("NZCore")) }
     if (getObservers) status("Obs") else status("NoObs")
     if (shuttleFirst) status("ShuttleFirst") else status("ShuttleLater")
-    if (shouldExpand) status("Expand") else status("NoExpand")
     if (shouldAttack) status("Attack") else status("Defend")
+    if (shouldExpand) status("ExpandNow") else status("ExpandLater")
 
     new ScoutForCannonRush().update()
     if (shouldAttack) { attack() }
     if (enemies(Protoss.Dragoon) == 0) { if (starts > 3) scoutOn(Protoss.Gateway) else scoutOn(Protoss.CyberneticsCore) }
-    if (shouldExpand && bases <= 1) { aggression(3.0) }
+    if (shouldExpand) { aggression(3.0) }
     else if (With.strategy.isInverted) {  aggression(1.5) }
     else if (With.strategy.isFlat) {  aggression(1.2) }
     gasLimitCeiling(300)
@@ -186,7 +186,10 @@ class PvPRoboNew extends GameplanImperative {
 
   private def trainRoboUnits(): Unit = {
     if (units(Protoss.RoboticsFacility) > 0) {
-      if (getObservers) { if (With.fingerprints.dtRush.matches) pump(Protoss.Observer, 2) else buildOrder(Get(Protoss.Observer)) }
+      if (getObservers) {
+        buildOrder(Get(Protoss.Observer))
+        if (With.fingerprints.dtRush.matches) pump(Protoss.Observer, 2)
+      }
       if (shuttleFirst) buildOrder(Get(Protoss.Shuttle))
       if (units(Protoss.Reaver) >= (if (enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)) 3 else 2)) pumpShuttleAndReavers() else pump(Protoss.Reaver)
     }

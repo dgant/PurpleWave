@@ -11,6 +11,7 @@ abstract class GameplanImperative extends Plan with Modal with MacroCounting wit
   var doBuildOrder: Boolean = true
 
   override def onUpdate(): Unit = {
+    if ( ! activated) return
     if (completed) return
     if (doBasics) {
       requireEssentials()

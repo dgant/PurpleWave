@@ -284,7 +284,7 @@ object DefaultCombat extends Action {
         val distanceTowards = distanceCurrent - distanceIdeal
         val danceForce      = if (distanceTowards > 0) Forces.threat else Forces.travel
         exactDistance = Some(Math.abs(distanceTowards))
-        if (exactDistance.exists(_ < 4) || ! target.get.visible) {
+        if (exactDistance.exists(_ <= 16) || ! target.get.visible) {
           unit.agent.act("Stand")
           Commander.attack(unit)
           return

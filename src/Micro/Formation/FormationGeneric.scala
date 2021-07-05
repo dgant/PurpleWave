@@ -47,7 +47,6 @@ object FormationGeneric {
     lazy val vanguardUnits    = Maff.takePercentile(0.5, groundUnits)(Ordering.by(_.pixelDistanceTravelling(modeTarget)))
     lazy val centroid         = Maff.weightedExemplar(vanguardUnits.view.map(u => (u.pixel, u.subjectiveValue)))
 
-
     // Start flood filling!
     val inf = With.mapTileArea
     var apex = centroid

@@ -108,7 +108,7 @@ object Gather extends Action {
     }
 
     // Take safe/hidden route to expansion
-    if (unit.metro != resource.metro) {
+    if (unit.metro != resource.metro && ! unit.carrying) {
       val nextZone = Maff.minBy(unit.zone.edges)(_.pixelCenter.groundPixels(resource.zone.centroid))
       unit.agent.toTravel = MicroPathing.getWaypointAlongTilePath(MicroPathing.getSneakyPath(unit, Some(resource.tile.nearestWalkableTile)))
       if (unit.agent.toTravel.isDefined) {

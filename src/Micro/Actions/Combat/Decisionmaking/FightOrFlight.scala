@@ -58,7 +58,12 @@ object FightOrFlight extends Action {
   }
   
   private def applyEstimation(unit: FriendlyUnitInfo) {
-    if (unit.battle.isEmpty) return
+    if (unit.battle.isEmpty) {
+      // Important for things which care about unit willingness to trot around
+      unit.agent.shouldEngage = true
+      unit.agent.fightReason = ""
+      return
+    }
     var shouldEngage = false
     unit.agent.fightReason = "No"
     if (unit.battle.get.judgement.get.shouldFight) {

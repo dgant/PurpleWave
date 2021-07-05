@@ -17,11 +17,11 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.MatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvP2GateGoon
+import Strategery.Strategies.Protoss.PvPRobo2GateGoon
 
 class PvP2GateGoon extends GameplanTemplate {
 
-  override val activationCriteria : Predicate = new Employing(PvP2GateGoon)
+  override val activationCriteria : Predicate = new Employing(PvPRobo2GateGoon)
   override val completionCriteria : Predicate = new BasesAtLeast(2)
 
   override def scoutPlan: Plan = new ScoutOn(Protoss.Zealot)

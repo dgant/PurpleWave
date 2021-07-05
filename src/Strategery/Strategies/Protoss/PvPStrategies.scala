@@ -16,8 +16,9 @@ object PvPRobo1012 extends PvPStrategy {
   override def entranceFlat: Boolean = false
 }
 object PvPRobo1Gate extends PvPStrategy
+object PvPRobo2GateGoon extends PvPStrategy
 object PvPRobo extends PvPStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = super.choices ++ Seq(Seq(PvPRobo1012, PvPRobo1Gate))
+  override def choices: Iterable[Iterable[Strategy]] = super.choices ++ Seq(Seq(PvPRobo1012, PvPRobo1Gate, PvPRobo2GateGoon))
 }
 object PvP2GateDTExpand extends PvPStrategy
 object PvP2Gate1012Goon extends PvPStrategy {
@@ -25,10 +26,6 @@ object PvP2Gate1012Goon extends PvPStrategy {
 }
 object PvP2Gate1012DT extends PvPStrategy {
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.earlyForge, With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.robo)
-}
-object PvP2GateGoon extends PvPStrategy {
-  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.dtRush, With.fingerprints.oneGateCore, With.fingerprints.fourGateGoon)
-  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(With.fingerprints.proxyGateway, With.fingerprints.twoGate, With.fingerprints.nexusFirst)
 }
 object PvP3GateGoon extends PvPStrategy {
   override def responsesWhitelisted: Iterable[Fingerprint] = Iterable(With.fingerprints.robo, With.fingerprints.nexusFirst, With.fingerprints.twoGate, With.fingerprints.fourGateGoon)

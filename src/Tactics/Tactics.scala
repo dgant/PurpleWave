@@ -93,7 +93,7 @@ class Tactics extends TimedTask {
     while (i < freelancers.length) {
       val freelancer = freelancers(i)
       val squadsEligible = squads.filter(squad => filter(freelancer, squad) && squad.candidateValue(freelancer) > minimumValue)
-      val bestSquad = Maff.minBy(squadsEligible)(squad => freelancer.pixelDistanceTravelling(squad.vicinity))
+      val bestSquad = Maff.minBy(squadsEligible)(squad => freelancer.pixelDistanceTravelling(squad.vicinity) + (if (freelancer.squad.contains(squad)) 0 else 320))
       if (bestSquad.isDefined) {
         bestSquad.get.addUnit(freelancers.remove(i))
         With.recruiter.lockTo(bestSquad.get.lock, freelancer)
@@ -142,7 +142,7 @@ class Tactics extends TimedTask {
 
     // Get freelancers
     val freelancers = (new ListBuffer[FriendlyUnitInfo] ++ With.recruiter.available.view.filter(MatchRecruitableForCombat))
-      .sortBy(_.frameDiscovered) // Assign new units first, as they're most likely to be able to help on defense and least likely to have to abandon a push
+      .sortBy(-_.frameDiscovered) // Assign new units first, as they're most likely to be able to help on defense and least likely to have to abandon a push
       .sortBy(_.unitClass.isTransport) // So transports can go to squads which need them
     val freelancerCountInitial = freelancers.size
     def freelancerValue = freelancers.view.map(_.subjectiveValue).sum
@@ -155,12 +155,17 @@ class Tactics extends TimedTask {
     assign(freelancers, Seq(cloakSquad), filter = (f, s) => Protoss.DarkTemplar(f))
 
     // Proactive drop/harassment defense
-    if ((With.geography.ourBases.size > 2 && With.frame > Minutes(10)()) || With.unitsShown.any(Terran.Dropship)) {
+    if ((With.geography.ourBases.map(_.metro).distinct.size > 1 && With.frame > Minutes(10)()) || With.unitsShown.any(Terran.Dropship)) {
       val dropVulnerableBases = With.geography.ourBases.filter(b =>
         b.workerCount > 5
         && ! divisionsDefending.exists(_.bases.contains(b)) // If it was in a defense division, it should have received some defenders already
         && b.metro.bases.view.flatMap(_.units).count(_.isAny(MatchAnd(MatchComplete, MatchOr(Terran.Factory, Terran.Barracks, Protoss.Gateway, MatchHatchlike, Protoss.PhotonCannon, Terran.Bunker, Zerg.SunkenColony)))) < 3)
-      assign(freelancers, dropVulnerableBases.map(baseSquads(_)), filter = (f, s) => f.isAny(Terran.Marine, Terran.Firebat, Terran.Vulture, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk) && s.unitsNext.size < Math.min(3, freelancerCountInitial / 10))
+      assign(
+        freelancers,
+        dropVulnerableBases.map(baseSquads(_)),
+        filter = (f, s) =>
+          f.isAny(Terran.Marine, Terran.Firebat, Terran.Vulture, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk)
+          && s.unitsNext.size < Math.min(3, freelancerCountInitial / 12))
     }
 
     catchDTRunby.recruit()

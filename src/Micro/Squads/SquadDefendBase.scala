@@ -11,6 +11,8 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 class SquadDefendBase(base: Base) extends Squad {
 
+  vicinity = base.heart.center
+
   private var lastAction = "Def"
   override def toString: String = f"$lastAction ${base.name.take(5)}"
 

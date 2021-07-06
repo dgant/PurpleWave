@@ -53,16 +53,6 @@ object JudgmentModifiers {
   }
 
   // Prefer fighting
-  //  when we have a coherence advantage,
-  //    because the benefits of this are underrepresented in simulation
-  //      due to the absence of collisions
-  def coherence(battleLocal: BattleLocal): Option[JudgmentModifier] = {
-    val us    = battleLocal.us.coherence()
-    val enemy = battleLocal.enemy.coherence()
-    val bonus = us - enemy
-    Some(JudgmentModifier(speedMultiplier = 1 + 0.2 * bonus))
-  }
-  // Prefer fighting
   //   when we are maxed out
   //   especially with a bank
   //     because from here the enemy will only get stronger relative to us

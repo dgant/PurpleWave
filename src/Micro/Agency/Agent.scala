@@ -41,6 +41,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   var toNuke        : Option[Pixel]             = None
   var toRepair      : Option[UnitInfo]          = None
   var shouldEngage  : Boolean                   = false
+  var commit        : Boolean                   = false
   val forces        : ForceMap                  = new ForceMap
 
   /////////////////
@@ -59,7 +60,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   private val originCache = new KeyedCache(
     () =>
       ride.filterNot(unit.transport.contains).map(_.pixel)
-      .orElse(unit.matchups.anchor.filter(_.matchups.threats.nonEmpty).map(a => a.pixel.project(unit.battle.map(_.enemy.centroidOf(unit)).getOrElse(a.pixel), AnchorMargin(unit))))
       .orElse(toReturn)
       .getOrElse(defaultOrigin),
     () => unit.agent.toReturn)
@@ -126,13 +126,13 @@ class Agent(val unit: FriendlyUnitInfo) {
   }
 
   private def followIntent() {
-    toTravel      = unit.intent.toTravel
-    toReturn      = unit.intent.toReturn
-    toAttack      = unit.intent.toAttack
-    toGather      = unit.intent.toGather
-    toRepair      = unit.intent.toRepair
-    toBoard       = unit.intent.toBoard.orElse(toBoard)
-    toNuke        = unit.intent.toNuke
+    toTravel  = unit.intent.toTravel
+    toReturn  = unit.intent.toReturn
+    toAttack  = unit.intent.toAttack
+    toGather  = unit.intent.toGather
+    toRepair  = unit.intent.toRepair
+    toBoard   = unit.intent.toBoard.orElse(toBoard)
+    toNuke    = unit.intent.toNuke
   }
 
   /////////////

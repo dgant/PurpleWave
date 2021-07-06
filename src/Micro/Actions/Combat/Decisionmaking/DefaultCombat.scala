@@ -3,22 +3,21 @@ package Micro.Actions.Combat.Decisionmaking
 import Debugging.ToString
 import Debugging.Visualizations.Forces
 import Lifecycle.With
-import Mathematics.Points.Pixel
 import Mathematics.Maff
+import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Brawl
-import Micro.Targeting.Target
 import Micro.Actions.Commands.Move
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.TrafficPriorities
 import Micro.Heuristics.Potential
 import Micro.Targeting.FiltersSituational.{TargetFilterPotshot, TargetFilterVisibleInRange}
+import Micro.Targeting.Target
 import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.Seconds
 
 object DefaultCombat extends Action {
 
@@ -182,9 +181,10 @@ object DefaultCombat extends Action {
     transition(Aim, () => !unit.canMove || purring, () => aim(unit))
 
     lazy val opponentBlocksGoal = unit.battle.exists(b => b.enemy.zones.contains(unit.agent.destination.zone) || b.teams.minBy(_.centroidAir().pixelDistanceSquared(unit.agent.destination)).enemy)
-    transition(Regroup, () => ! unit.agent.shouldEngage && opponentBlocksGoal && unit.agent.withinSafetyMargin)
-    transition(Regroup, () => unit.agent.shouldEngage && opponentBlocksGoal && unit.team.exists(team =>
-      ! team.engaged() && unit.confidence() + team.coherence() + team.impatience() / Seconds(35)() < 1))
+
+    // COG 2021: Disabling Regroup now that we have marching formations
+    // transition(Regroup, () => ! unit.agent.shouldEngage && opponentBlocksGoal && unit.agent.withinSafetyMargin)
+    // transition(Regroup, () => unit.agent.shouldEngage && opponentBlocksGoal && unit.team.exists(team => ! team.engaged() && unit.confidence() + team.coherence() + team.impatience() / Seconds(35)() < 1))
 
     lazy val targetAbusable = target.exists(target => ! target.canAttack(unit) || (unit.topSpeed > target.topSpeed && unit.pixelRangeAgainst(target) > target.pixelRangeAgainst(unit)))
     lazy val canKite = target
@@ -273,8 +273,9 @@ object DefaultCombat extends Action {
       forces(Forces.spacing)    = Potential.avoidCollision(unit)
       forces(Forces.spreading)  = unit.agent.receivedPushForce()
     } else if (goalRegroup) {
+      // TODO: If we reenable regrouping, just use the formation position
+
       forces(Forces.travel)     = Potential.preferTravel(unit, destination)
-      forces(Forces.cohesion)   = Potential.preferCohesion(unit)
       forces(Forces.spacing)    = Potential.avoidCollision(unit)
       forces(Forces.spreading)  = unit.agent.receivedPushForce()
     } else if (goalDance) {

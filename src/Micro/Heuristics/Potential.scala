@@ -70,21 +70,6 @@ object Potential {
     val output                = unitAttraction(unit, allyNearestUseful.get, magnitude)
     output
   }
-
-  def correctDepth(unit: FriendlyUnitInfo): Force = {
-    unit.team.flatMap(team =>
-      unit.depthCurrent().map(depth => {
-        ForceMath.fromRadians(team.axisDepth(), unit.depthCurrent().get -  team.depthMean())
-      })).getOrElse(new Force)
-  }
-
-  def correctWidth(unit: FriendlyUnitInfo): Force = {
-    unit.team.map(t => ForceMath.fromPixels(t.centroidGround(), unit.widthSlotIdeal(), t.centroidGround().pixelDistance(unit.widthSlotIdeal()))).getOrElse(new Force)
-  }
-
-  def preferCohesion(unit: FriendlyUnitInfo): Force = {
-    (correctDepth(unit) + correctWidth(unit)).normalize
-  }
   
   ////////////
   // Splash //

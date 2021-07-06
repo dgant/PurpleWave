@@ -260,12 +260,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def canAttackGround: Boolean = canAttack && attacksAgainstGround > 0
   @inline final def canBurrow: Boolean = canDoAnything && (is(Zerg.Lurker) || (player.hasTech(Zerg.Burrow) && isAny(Zerg.Drone, Zerg.Zergling, Zerg.Hydralisk, Zerg.Defiler)))
 
-  val widthSlotProjected  = new Cache(() => team.map(team => if (flying) team.centroidAir() else Maff.projectedPointOnLine(pixel, team.centroidGround(), team.lineWidth())).getOrElse(pixel))
-  val widthSlotIdeal      = new Cache(() => team.map(team => if (flying) team.centroidAir() else team.widthOrder().zipWithIndex.find(_._1 == this).map(p => team.centroidGround().project(team.lineWidth(), team.widthIdeal() * (team.widthOrder().size / 2 - p._2) / team.widthOrder().size)).getOrElse(widthSlotProjected())).getOrElse(pixel))
-  val widthContribution   = new Cache(() => team.map(_.centroidOf(this).pixelDistance(widthSlotProjected()) * 2))
-  val depthMeasuredFrom   = new Cache(() => presumptiveTarget.map(_.pixel).orElse(team.map(_.opponent.vanguard())))
-  val depthCurrent        = new Cache(() => depthMeasuredFrom().map(pixelDistanceCenter(_) - effectiveRangePixels))
-  val confidence          = new Cache(() => if (matchups.threats.isEmpty) 1.0 else battle.flatMap(_.judgement.map(_.confidence)).getOrElse(1.0))
+  val confidence = new Cache(() => if (matchups.threats.isEmpty) 1.0 else battle.flatMap(_.judgement.map(_.confidence)).getOrElse(1.0))
 
   // Frame X:     Unit's cooldown is 0.   Unit starts attacking.
   // Frame X-1:   Unit's cooldown is 1.   Unit receives attack order.
@@ -283,7 +278,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     output
   }
   @inline final def pixelToFireAt(enemy: UnitInfo): Pixel = pixelToFireAt(enemy, exhaustive = false)
-  @inline val ptfVeryFarSquared = With.mapPixelPerimeter * With.mapPixelPerimeter
+  @inline val ptfVeryFarSquared: Int = With.mapPixelPerimeter * With.mapPixelPerimeter
   @inline private final def ptfBadAltitudePenalty(altitudeMatters: Boolean, enemyAltitude: Double, pixel: Pixel): Int = if (altitudeMatters && pixel.altitude < enemyAltitude) ptfVeryFarSquared  else 0
   @inline private final def ptfGoodAltitudeBonus(altitudeMatters: Boolean, enemyAltitude: Double, pixel: Pixel): Double = if ( ! altitudeMatters || pixel.altitude > enemyAltitude) 1 else 0
   @inline final def pixelToFireAt(enemy: UnitInfo, exhaustive: Boolean): Pixel = {

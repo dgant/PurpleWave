@@ -8,12 +8,14 @@ import Planning.Plans.Scouting.ScoutForCannonRush
 import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvPRobo, PvPRobo1012, PvPRobo1Gate, PvPRobo2GateGoon}
+import Utilities.GameTime
 
 class PvPRobo extends GameplanImperative {
 
   var complete: Boolean = false
   var twoGateZealot: Boolean = false
   var twoGateGoon: Boolean = false
+  var twoGateReady: Boolean = false
   var zBeforeCore: Boolean = true
   var zAfterCore: Boolean = true
   var fiveZealot: Boolean = false
@@ -191,7 +193,7 @@ class PvPRobo extends GameplanImperative {
       With.fingerprints.robo,
       With.fingerprints.threeGateGoon,
       With.fingerprints.fourGateGoon)
-      shuttleFirst = With.strategy.isRamped || ! getObservers
+      shuttleFirst = (With.strategy.isRamped || ! getObservers) && ! enemyDarkTemplarLikely
     }
     shouldExpand = units(Protoss.Gateway) >= 2
     shouldExpand &&= ! With.fingerprints.dtRush.matches || unitsComplete(Protoss.Observer) > 0
@@ -242,10 +244,24 @@ class PvPRobo extends GameplanImperative {
         scoutOn(Protoss.CyberneticsCore)
       }
     }
-    if (shouldExpand && With.geography.ourNatural.units.exists(u => u.isEnemy && u.canAttackGround)) { aggression(2.0) }
-    else if (twoGateZealot && units(Protoss.Zealot) > 0) { aggression(1.5) }
-    else if (With.strategy.isInverted) { aggression(1.5) }
-    else if (With.strategy.isFlat) { aggression(1.2) }
+    if (shouldExpand && With.geography.ourNatural.units.exists(u => u.isEnemy && u.canAttackGround)) { aggression(1.5) }
+    else if (twoGateZealot) {
+      if (enemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway)) {
+        With.blackboard.pushKiters.set(false)
+        With.units.ours.foreach(_.agent.commit = false)
+      } else if (frame < GameTime(4, 15)() && enemiesComplete(Protoss.PhotonCannon) == 0) {
+        // Wait until we have at least three Zealots together; then go in hard
+        aggression(0.75)
+        val zealots = With.units.ours.filter(u => Protoss.Zealot(u) && u.battle.exists(_.us.units.count(Protoss.Zealot) > 2)).toVector
+        twoGateReady ||= zealots.size > 2
+        if (twoGateReady) {
+          With.blackboard.pushKiters.set(true)
+          zealots.foreach(_.agent.commit = true)
+        }
+
+      }
+    }
+    else if (With.strategy.isInverted) { aggression(1.2) }
     gasLimitCeiling(350)
 
     if (zBeforeCore && units(Protoss.CyberneticsCore) < 1) {

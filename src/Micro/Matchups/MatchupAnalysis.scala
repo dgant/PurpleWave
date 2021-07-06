@@ -3,7 +3,6 @@ package Micro.Matchups
 import Information.Battles.BattleClassificationFilters
 import Lifecycle.With
 import Mathematics.Maff
-import Micro.Actions.Scouting.BlockConstruction
 import Micro.Heuristics.MicroValue
 import Performance.Cache
 import Planning.UnitMatchers.MatchTank
@@ -38,18 +37,16 @@ case class MatchupAnalysis(me: UnitInfo) {
   lazy val anchors                    : Vector[UnitInfo]  = me.friendly.map(_.alliesSquad).getOrElse(allies).filter(doesAnchor(_, me)).toVector
   lazy val arbiterCovering            : Cache[Boolean]    = new Cache(() => allies.exists(a => Protoss.Arbiter(a) && a.pixelDistanceEdge(me) < 160))
   lazy val allyTemplarCount           : Cache[Int]        = new Cache(() => allies.count(Protoss.HighTemplar))
-  lazy val busyForCatching            : Boolean           = me.unitClass.isWorker && (me.gathering || me.constructing || me.repairing || BlockConstruction.constructionOrders.contains(me.order))
-  lazy val catchers                   : Vector[UnitInfo]  = threats.filter(canCatchMe).toVector
-  lazy val splashFactorMax            : Double            = splashFactorForUnits(targets)
-  lazy val splashFactorInRange        : Double            = splashFactorForUnits(targetsInRange)
-  lazy val valuePerDamage             : Double            = MicroValue.valuePerDamageCurrentHp(me)
-  lazy val vpfDealingInRange          : Double            = splashFactorInRange * Maff.max(targetsInRange.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
-  lazy val dpfReceiving               : Double            = threatsInRange.view.map(_.matchups.dpfDealingDiffused(me)).sum
-  lazy val vpfReceiving               : Double            = valuePerDamage * dpfReceiving
-  lazy val framesToLive               : Double            = Maff.nanToInfinity(me.totalHealth / dpfReceiving)
-  lazy val framesOfSafety             : Double            = - With.latency.latencyFrames - With.reaction.agencyAverage - Maff.nanToZero(pixelsOfEntanglement / me.topSpeed)
-  lazy val pixelsOfEntanglement       : Double            = Maff.max(threats.map(me.pixelsOfEntanglement)).getOrElse(- With.mapPixelWidth)
-  lazy val pixelsToReachAnyTarget     : Double            = Maff.max(targets.map(me.pixelsToGetInRange)).getOrElse(With.mapPixelWidth)
+  lazy val splashFactorMax            : Double  = splashFactorForUnits(targets)
+  lazy val splashFactorInRange        : Double  = splashFactorForUnits(targetsInRange)
+  lazy val valuePerDamage             : Double  = MicroValue.valuePerDamageCurrentHp(me)
+  lazy val vpfDealingInRange          : Double  = splashFactorInRange * Maff.max(targetsInRange.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
+  lazy val dpfReceiving               : Double  = threatsInRange.view.map(_.matchups.dpfDealingDiffused(me)).sum
+  lazy val vpfReceiving               : Double  = valuePerDamage * dpfReceiving
+  lazy val framesToLive               : Double  = Maff.nanToInfinity(me.totalHealth / dpfReceiving)
+  lazy val framesOfSafety             : Double  = - With.latency.latencyFrames - With.reaction.agencyAverage - Maff.nanToZero(pixelsOfEntanglement / me.topSpeed)
+  lazy val pixelsOfEntanglement       : Double  = Maff.max(threats.map(me.pixelsOfEntanglement)).getOrElse(- With.mapPixelWidth)
+  lazy val pixelsToReachAnyTarget     : Double  = Maff.max(targets.map(me.pixelsToGetInRange)).getOrElse(With.mapPixelWidth)
 
   protected def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = (
     shooter.canAttack(victim)
@@ -69,21 +66,6 @@ case class MatchupAnalysis(me: UnitInfo) {
 
   def dpfDealingDiffused(target: UnitInfo): Double = {
     splashFactorInRange * me.dpfOnNextHitAgainst(target) / Math.max(1.0, targetsInRange.size)
-  }
-
-  def canCatchMe(catcher: UnitInfo): Boolean = {
-    if (catcher.unitClass.isWorker) return false
-    val catcherSpeed = Math.max(catcher.topSpeed, catcher.friendly.flatMap(_.transport.map(_.topSpeed)).getOrElse(0.0))
-    val catcherFlying = catcher.flying || catcher.friendly.exists(_.agent.ride.exists(_.flying)) && ! me.flying
-    val output = (
-      catcherSpeed * (if (catcherFlying) 2 else 1) >= me.topSpeed
-        || catcher.pixelRangeAgainst(me) > 32 * 3
-        || busyForCatching
-        || catcher.is(Zerg.Scourge)
-        || (catcher.framesToGetInRange(me) < 8 && me.speedApproaching(catcher) > 0)
-        || (catcher.isAny(Terran.Marine, Protoss.Zealot) && me.is(Protoss.Dragoon) && ! me.player.hasUpgrade(Protoss.DragoonRange))
-        || (catcher.is(Protoss.DarkTemplar) && me.is(Protoss.Dragoon)))
-    output
   }
 
   private def doesAnchor(anchor: UnitInfo, support: UnitInfo): Boolean = {

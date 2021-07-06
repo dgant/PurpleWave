@@ -13,7 +13,7 @@ object Opponents {
   // COG 2021 PREP
   val stardust    : Opponent = add("Stardust",    StrategySelectionFixed(PvPRobo, PvPRobo1012))
   val bananabrain : Opponent = add("BananaBrain", StrategySelectionFixed(PvPRobo, PvPRobo1012))
-  val betastar    : Opponent = add("BetaStar",    StrategySelectionFixed(PvPRobo, PvPRobo1012))
+  val betastar    : Opponent = add("BetaStar",    StrategySelectionFixed(PvPRobo, PvPRobo2GateGoon))
   val metabot     : Opponent = add("MetaBot",     defaultPvP)
   val aiur        : Opponent = add("AIUR",        defaultPvP) // Metabot stand-in
   val skynet      : Opponent = add("Skynet",      defaultPvP) // Metabot stand-in

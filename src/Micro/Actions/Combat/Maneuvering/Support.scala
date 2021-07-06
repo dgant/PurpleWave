@@ -10,7 +10,7 @@ object Support extends Action {
 
   def isSupport(unit: UnitInfo): Boolean = ! unit.canAttack || unit.unitClass.isWorker
 
-  override def allowed(unit: FriendlyUnitInfo): Boolean = isSupport(unit)
+  override def allowed(unit: FriendlyUnitInfo): Boolean = isSupport(unit) && false // COG 2021: Experimenting with disabling this now that we have formations
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
 

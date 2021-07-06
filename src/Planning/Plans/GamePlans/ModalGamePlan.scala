@@ -3,8 +3,8 @@ package Planning.Plans.GamePlans
 import Planning.Plan
 
 class ModalGameplan(modes: Modal*) extends Plan with Modal {
-  override def completed: Boolean = modes.forall(_.completed)
+  override def isComplete: Boolean = modes.forall(_.isComplete)
   override def onUpdate() {
-    modes.find( ! _.completed).foreach(_.update())
+    modes.find( ! _.isComplete).foreach(_.update())
   }
 }

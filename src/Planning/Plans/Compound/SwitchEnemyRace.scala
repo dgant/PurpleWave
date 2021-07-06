@@ -18,7 +18,7 @@ class SwitchEnemyRace(
   val zerg    = new Property[Plan](whenZerg)
   val random  = new Property[Plan](whenRandom)
   
-  def completed: Boolean = false
+  def isComplete: Boolean = false
   
   override def onUpdate() {
     appropriatePlan.update()

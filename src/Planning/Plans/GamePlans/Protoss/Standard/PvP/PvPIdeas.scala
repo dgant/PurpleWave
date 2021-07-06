@@ -392,7 +392,6 @@ object PvPIdeas {
       new Build(Get(5, Protoss.Gateway)),
       new RequireBases(3)))
 
-
   class MeldArchonsPvP extends MeldArchons(0) {
     override def minimumArchons: Int = Math.min(6, With.units.countEnemy(Protoss.Zealot) / 6)
   }
@@ -440,10 +439,11 @@ object PvPIdeas {
     new If(
       And(new EnemyCarriersOnly, GasPumpsAtLeast(2)),
       new Parallel(
-        new Build(Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore), Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives)),
-        new MeldDarkArchons,
-        new Build(Get(Protoss.DarkArchonEnergy)),
-        new BuildOrder(Get(6, Protoss.DarkTemplar)),
+        new Build(Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore), Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives), Get(Protoss.DarkArchonEnergy)),
+        new If(
+          UpgradeComplete(Protoss.DarkArchonEnergy, withinFrames = Seconds(5)()),
+          new MeldDarkArchons),
+        new BuildOrder(Get(8, Protoss.DarkTemplar)),
         new If(UpgradeComplete(Protoss.DarkArchonEnergy), new Build(Get(Protoss.MindControl))),
         new If(UnitsAtLeast(2, Protoss.DarkArchon), new Build(Get(Protoss.MindControl))),
         new PumpRatio(Protoss.DarkTemplar, 0, 12, Seq(Flat(2.0), Enemy(Protoss.Carrier, 2.0), Friendly(Protoss.DarkArchon, -2.0))))),

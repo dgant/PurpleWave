@@ -29,7 +29,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   def allies                  : Seq[UnitInfo] = alliesInclSelf.filterNot(_.id == me.id)
   def others                  : Seq[UnitInfo] = enemies ++ allies
   def enemyDetectors          : Seq[UnitInfo] = enemies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
-  def threats                 : Seq[UnitInfo] = enemies.filter(threatens(_, me))
+  def threats                 : Seq[UnitInfo] = enemies.filter(threatens(_, me)).filterNot(Protoss.Interceptor)
   def targets                 : Seq[UnitInfo] = enemies.filter(threatens(me, _))
   def threatsInRange          : Seq[UnitInfo] = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me))
   def threatsInFrames(f: Int) : Seq[UnitInfo] = threats.filter(_.framesToGetInRange(me) < f)

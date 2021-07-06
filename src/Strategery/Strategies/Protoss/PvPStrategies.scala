@@ -10,11 +10,7 @@ abstract class PvPStrategy extends Strategy {
   override def ourRaces   : Iterable[Race]  = Vector(Race.Protoss)
   override def enemyRaces : Iterable[Race]  = Vector(Race.Protoss)
 }
-object PvPRobo1012 extends PvPStrategy {
-  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(With.fingerprints.proxyGateway, With.fingerprints.nexusFirst) // TODO: Also NZCore
-  override def entranceRamped: Boolean = false
-  override def entranceFlat: Boolean = false
-}
+object PvPRobo1012 extends PvPStrategy
 object PvPRobo1Gate extends PvPStrategy
 object PvPRobo2GateGoon extends PvPStrategy
 object PvPRobo extends PvPStrategy {

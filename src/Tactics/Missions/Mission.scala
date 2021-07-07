@@ -4,9 +4,9 @@ import Lifecycle.With
 import Tactics.Squads.Squad
 
 trait Mission extends Squad {
-  def shouldForm: Boolean
-  def shouldTerminate: Boolean
-  def recruit(): Unit
+  protected def shouldForm: Boolean
+  protected def shouldTerminate: Boolean
+  protected def recruit(): Unit
 
   var launched: Boolean = false
   var launchFrame: Int = 0

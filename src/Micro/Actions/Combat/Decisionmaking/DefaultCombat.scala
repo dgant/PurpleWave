@@ -186,7 +186,7 @@ object DefaultCombat extends Action {
     // transition(Regroup, () => ! unit.agent.shouldEngage && opponentBlocksGoal && unit.agent.withinSafetyMargin)
     // transition(Regroup, () => unit.agent.shouldEngage && opponentBlocksGoal && unit.team.exists(team => ! team.engaged() && unit.confidence() + team.coherence() + team.impatience() / Seconds(35)() < 1))
 
-    lazy val targetAbusable = target.exists(target => ! target.canAttack(unit) || (unit.topSpeed > target.topSpeed && unit.pixelRangeAgainst(target) > target.pixelRangeAgainst(unit)))
+    lazy val targetAbusable = target.exists(t => ! t.canAttack(unit) || (unit.topSpeed > t.topSpeed && unit.pixelRangeAgainst(t) > t.pixelRangeAgainst(unit)))
     lazy val canKite = target
       .map(unit.framesToGetInRange(_) + unit.unitClass.framesToTurnShootTurnAccelerate + 8) // The flat margin at an edge is a fudge to prevent needlessly brave pokes
       .exists(f => unit.matchups.threats.forall(_.pixelsToGetInRange(unit) > f))

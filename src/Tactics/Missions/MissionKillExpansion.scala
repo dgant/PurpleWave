@@ -3,6 +3,9 @@ package Tactics.Missions
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
+import Planning.UnitCounters.CountUpTo
+import Planning.UnitMatchers.{MatchAnd, MatchAntiGround, MatchWarriors}
+import Planning.UnitPreferences.PreferClose
 import Tactics.Squads.SquadAutomation
 import Utilities.Minutes
 
@@ -23,13 +26,18 @@ class MissionKillExpansion extends Mission {
 
   var lastFrameInBase = 0
 
-  override def recruit(): Unit = {
+  // TODO: Should squads have a built-in default lock? Seems like recipe for bugs
+  lock.matcher = MatchAnd(MatchWarriors, MatchAntiGround)
+  lock.counter = CountUpTo(4)
+  override protected def recruit(): Unit = {
     val targetBase = best
     if (targetBase.isEmpty) {
       terminate()
       return
     }
     vicinity = targetBase.get.heart.center
+    lock.preference = PreferClose(vicinity)
+    addUnits(lock.acquire(this))
   }
 
   override def run(): Unit = {

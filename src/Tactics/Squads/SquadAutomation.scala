@@ -13,9 +13,11 @@ import scala.collection.immutable.ListSet
 
 object SquadAutomation {
 
-  def targetAndSend(squad: Squad): Unit = targetAndSend(squad, squad.vicinity)
-  def targetAndSend(squad: Squad, to: Pixel): Unit = targetAndSend(squad, squad.units, to)
-  def targetAndSend(squad: Squad, units: Iterable[FriendlyUnitInfo], to: Pixel): Unit = {
+  def targetAndSend(squad: Squad): Unit = targetAndSend(squad, minToForm = 0)
+  def targetAndSend(squad: Squad, minToForm: Int): Unit = targetAndSend(squad, squad.vicinity, minToForm)
+  def targetAndSend(squad: Squad, to: Pixel): Unit = targetAndSend(squad, to, minToForm = 0)
+  def targetAndSend(squad: Squad, to: Pixel, minToForm: Int): Unit = targetAndSend(squad, squad.units, to, minToForm)
+  def targetAndSend(squad: Squad, units: Iterable[FriendlyUnitInfo], to: Pixel, minToForm: Int): Unit = {
     lazy val centroid             = Maff.centroid(units.view.map(_.pixel))
     lazy val fightConsensus       = Maff.mode(units.view.map(_.agent.shouldEngage))
     lazy val originConsensus      = Maff.mode(units.view.map(_.agent.defaultOrigin))
@@ -40,7 +42,7 @@ object SquadAutomation {
 
     units.foreach(unit => {
       unit.intend(this, new Intention {
-        toTravel = squad.formations.find(_.placements.contains(unit)).map(_.placements(unit)).orElse(Some(to))
+        toTravel = squad.formations.filter(_.placements.size >= minToForm).find(_.placements.contains(unit)).map(_.placements(unit)).orElse(Some(to))
       })
     })
   }
@@ -63,10 +65,16 @@ object SquadAutomation {
     val pathfind    = new PathfindProfile(origin, Some(goal), employGroundDist = true, canCrossUnwalkable = Some(flying), canEndUnwalkable = Some(flying))
     val path        = pathfind.find
     val zones       = new ListSet[Zone]() ++ (path.tiles.map(_.view.map(_.zone)).getOrElse(Seq.empty) ++ goal.metro.map(_.zones).getOrElse(Seq(goal.zone)))
+    val visible     = units.exists(_.visibleToOpponents)
+    //val hull        = Maff.convexHull(units.view.map(_.pixel.asPoint).toSeq).view.map(_.asPixel)
     val output      = With.units.enemy
       .filter(e => if (e.flying) antiAir else antiGround)
       .filter(_.likelyStillThere)
-      .filter(u => zones.contains(u.zone) || u.pixelDistanceTravelling(origin) + u.pixelDistanceTravelling(goal) < distanceRatio * distancePx).toVector
+      .filter(e =>
+        e.pixelDistanceTravelling(origin) + e.pixelDistanceTravelling(goal) < distanceRatio * distancePx
+        || e.presumptiveTarget.exists(t => units.exists(_ == t) && e.inRangeToAttack(t))
+        //|| hull.exists(u.pixelDistanceCenter(_) <= u.effectiveRangePixels)
+      ).toVector
     output
   }
 
@@ -76,10 +84,11 @@ object SquadAutomation {
     val centroid  = Maff.exemplar(units.view.map(_.pixel))
     val engaged   = units.exists(_.matchups.threatsInRange.nonEmpty)
     targets.sortBy(t =>
-      t.pixelDistanceSquared(centroid)
-      - (if (t.totalHealth < t.unitClass.maxTotalHealth) -16.0 else 0) // Flat hysteresis: Focus units we've already started attacking
-      + (32.0 * t.totalHealth / Math.max(1.0, t.unitClass.maxTotalHealth)) // Scaling hysteresis: Focus down weak units
-      + (if (t.unitClass.attacksOrCastsOrDetectsOrTransports || ! engaged) 0 else With.mapPixelPerimeter))
+      (t.pixelDistanceCenter(centroid)
+      + (if (t.totalHealth < t.unitClass.maxTotalHealth) -16.0 else 0)
+      + (16.0 * t.totalHealth / Math.max(1.0, t.unitClass.maxTotalHealth))
+      + 160)
+      * (if (t.unitClass.attacksOrCastsOrDetectsOrTransports || ! engaged) 1 else 2))
   }
 
 

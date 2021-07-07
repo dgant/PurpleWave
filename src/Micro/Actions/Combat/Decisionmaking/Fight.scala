@@ -10,11 +10,10 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Fight extends Action {
 
-  override def allowed(unit: FriendlyUnitInfo): Boolean = (
+  override def allowed(unit: FriendlyUnitInfo): Boolean = ! unit.agent.isScout && (
     unit.canMove
     || unit.is(MatchTank)
-    || unit.readyForAttackOrder
-  )
+    || unit.readyForAttackOrder)
 
   override def perform(unit: FriendlyUnitInfo) {
     Follow.consider(unit)

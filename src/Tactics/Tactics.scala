@@ -15,6 +15,7 @@ import Planning.Predicates.Strategy.EnemyIsTerran
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Tactics.Missions.MissionKillExpansion
 import Utilities.Minutes
 
 import scala.collection.mutable
@@ -47,6 +48,7 @@ class Tactics extends TimedTask {
         UnitsAtLeast(3, Protoss.Observer, complete = true),
         Not(new PvTIdeas.EnemyHasMines))),
     new MonitorBases(Protoss.Observer))
+  private lazy val missionKillExpansion       = new MissionKillExpansion
 
   override protected def onRun(budgetMs: Long): Unit = {
     // TODO: Attack with units that can safely harass:
@@ -55,7 +57,6 @@ class Tactics extends TimedTask {
     // - Air units (except against faster enemy air-to-air)
     // - Speed Zerglings
     // - Carriers at 4+ (except against cloaked wraiths and no observer)
-    launchMissions()
     runMissions()
     runPrioritySquads()
     runCoreTactics()
@@ -65,8 +66,10 @@ class Tactics extends TimedTask {
     With.squads.run(budgetMs)
   }
 
-  private def launchMissions(): Unit = {}
-  private def runMissions(): Unit = {}
+  private def runMissions(): Unit = {
+    missionKillExpansion.consider()
+  }
+
   private def runPrioritySquads(): Unit = {
     clearBurrowedBlockers.recruit()
     followBuildOrder.update()

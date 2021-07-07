@@ -13,7 +13,7 @@ trait Mission extends Squad {
   final def duration: Int = if (launched) With.framesSince(launchFrame) else 0
 
   final def consider(): Unit = {
-    lazy val nextUnits = With.recruiter.lockedBy(this)
+    def nextUnits = With.recruiter.lockedBy(this)
     if (launched) {
       if (shouldTerminate || nextUnits.isEmpty) {
         terminate()
@@ -21,10 +21,10 @@ trait Mission extends Squad {
         With.recruiter.renew(this)
       }
     } else if (shouldForm && ! shouldTerminate) {
-      With.logger.debug(f"Launching $this")
       launched = true
       launchFrame = With.frame
       recruit()
+      With.logger.debug(f"Launching $this to ${vicinity.base.getOrElse(vicinity.tile)} with ${unitsNext.view.map(_.toString).mkString(", ")}")
     }
     if (launched) {
       addUnits(nextUnits)

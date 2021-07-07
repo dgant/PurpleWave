@@ -22,7 +22,7 @@ class MissionKillExpansion extends Mission {
 
   override def shouldForm: Boolean = With.blackboard.wantToAttack() && best.isDefined
 
-  override def shouldTerminate: Boolean = duration > Minutes(3)() || With.framesSince(lastFrameInBase) > Minutes(1)()
+  override def shouldTerminate: Boolean = launched && (duration > Minutes(3)() || With.framesSince(lastFrameInBase) > Minutes(1)())
 
   var lastFrameInBase = 0
 
@@ -37,7 +37,7 @@ class MissionKillExpansion extends Mission {
     }
     vicinity = targetBase.get.heart.center
     lock.preference = PreferClose(vicinity)
-    addUnits(lock.acquire(this))
+    lock.acquire(this)
   }
 
   override def run(): Unit = {

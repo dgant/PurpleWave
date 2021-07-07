@@ -75,7 +75,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     gasPumps = With.units.ours.filter(isValidGas).toVector
     mineralSlotCount = bases.view.flatMap(mineralSlots).count(_.mineable)
     val distanceMineralBases = mineralSlots.view
-      .filter(s => !isValidBase(s._1) && s._1.townHall.forall(_.isOurs)) // With unoccupied/incomplete bases
+      .filter(s => ! isValidBase(s._1) && ! s._1.owner.isEnemy && s._1.townHall.forall(_.isOurs)) // With unoccupied/incomplete bases
       .map(p => (p._1, p._2, bases.map(b2 => baseCosts(b2, p._1)).min)) // associate each with the score to the closest extant base
       .filter(p => mineralSlotCount < 14 || (
         p._3 <= naturalCost // Distance mine only if it's safe or we're desperate

@@ -4,13 +4,13 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Tile
 import Micro.Actions.Action
-import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
-import Micro.Targeting.Target
+import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlee}
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.{CircularPush, TrafficPriorities}
+import Micro.Targeting.Target
 import Planning.UnitMatchers.MatchWorker
-import ProxyBwapi.Races.Zerg
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 
@@ -53,8 +53,7 @@ object Build extends Action {
     if (blockersMineral.nonEmpty && blockersEnemy.isEmpty) {
       unit.agent.toGather = Some(blockersMineral.head)
       Gather.delegate(unit)
-    }
-    else if(blockersToKill.nonEmpty) {
+    } else if(blockersToKill.nonEmpty) {
       lazy val noThreats  = unit.matchups.threats.isEmpty
       lazy val allWorkers = unit.matchups.threats.size == 1 && unit.matchups.threats.head.unitClass.isWorker
       lazy val healthy    = unit.totalHealth > 10 || unit.totalHealth >= unit.matchups.threats.head.totalHealth
@@ -62,9 +61,8 @@ object Build extends Action {
         Target.choose(unit)
         unit.agent.toAttack = unit.agent.toAttack.orElse(Some(blockersToKill.minBy(_.pixelDistanceEdge(unit))))
         Commander.attack(unit)
-      }
-      else if (unit.matchups.threats.exists( ! _.is(MatchWorker))) {
-        FightOrFlight.consider(unit)
+      } else if (unit.matchups.threats.exists( ! _.is(MatchWorker))) {
+        FightOrFlee.consider(unit)
         Fight.consider(unit)
       }
     }
@@ -74,21 +72,34 @@ object Build extends Action {
     val buildClass = unit.intent.toBuild.get
     val buildTile = unit.intent.toBuildTile.get
 
-    val pushPixel = buildArea.midPixel
+    val pushPixel = buildArea.center
     val priority = if (unit.pixelDistanceCenter(pushPixel) < 128) TrafficPriorities.Shove else TrafficPriorities.Bump
     With.coordinator.pushes.put(new CircularPush(priority, pushPixel, 32 + buildClass.dimensionMax, unit))
 
-    if (unit.tile.tileDistanceFast(buildTile) < 5 && buildTile.visible) {
+    var movePixel = buildTile.topLeftPixel.add(buildClass.tileWidth * 16, buildClass.tileHeight * 16)
+
+    if (buildTile.visible
+        && unit.pixelDistanceCenter(movePixel) < 112 // Addtl reference: McRave uses 96
+        && With.self.minerals >= buildClass.mineralPrice - 8
+        && With.self.gas >= buildClass.gasPrice - 8) {
       Commander.build(unit, buildClass, buildTile)
       return
     }
 
-    var movePixel = buildTile.topLeftPixel
-    if (unit.is(Zerg.Drone)) {
-      movePixel = movePixel.add(buildClass.width / 2, buildClass.height / 2)
+    if (Protoss.Probe(unit)) {
+      // If unit doesn't have to resolve collision after moving it gets back to work faster
+      movePixel = movePixel.add(
+        if (unit.x < movePixel.x) - unit.unitClass.dimensionRight - buildClass.dimensionLeft - 1 else unit.unitClass.dimensionLeft + buildClass.dimensionRight + 1,
+        if (unit.y < movePixel.y) - unit.unitClass.dimensionDown  - buildClass.dimensionUp   - 1 else unit.unitClass.dimensionUp   + buildClass.dimensionDown + 1).nearestWalkablePixel
+    } else if (Zerg.Drone(unit)) {
+      // McRave found that positioning Drone (0, -7) from building location minimizes wiggling
+      movePixel = movePixel.add(buildClass.tileWidth * 16, buildClass.tileHeight * 16 - 7)
     }
+
     unit.agent.toTravel = Some(movePixel)
-    MicroPathing.tryMovingAlongTilePath(unit, MicroPathing.getSneakyPath(unit))
+    if (unit.pixelDistanceTravelling(movePixel) > 256 + (if (unit.agent.lastPath.isEmpty) 0 else 256)) {
+      MicroPathing.tryMovingAlongTilePath(unit, MicroPathing.getSneakyPath(unit))
+    }
     Commander.move(unit)
   }
 }

@@ -72,8 +72,7 @@ object ProtossChoices {
   )
   
   val pvpOpenersTransitioningFrom2Gate = Vector(
-    PvP2Gate1012Goon,
-    PvP2Gate1012DT
+    PvPRobo
   )
   
   val pvpOpenersTransitioningFrom1GateCore = Vector(

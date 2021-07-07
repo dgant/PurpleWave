@@ -1,4 +1,4 @@
-package Micro.Squads
+package Tactics.Squads
 
 import Micro.Agency.Intention
 

@@ -9,6 +9,7 @@ import Planning.UnitPreferences.{PreferAnything, UnitPreference}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 class LockUnits(val owner: Prioritized) {
   var interruptable : Boolean         = true
@@ -19,9 +20,10 @@ class LockUnits(val owner: Prioritized) {
   private var _isSatisfied: Boolean = false
   def satisfied: Boolean = _isSatisfied
 
-  def acquire(prioritized: Prioritized) {
+  def acquire(prioritized: Prioritized): collection.Set[FriendlyUnitInfo] = {
     owner.prioritize()
     With.recruiter.satisfy(this)
+    units
   }
 
   def inquire(prioritized: Prioritized): Option[Vector[FriendlyUnitInfo]] = {
@@ -64,7 +66,7 @@ class LockUnits(val owner: Prioritized) {
 
   private def findMultipleFinalists(candidates: Iterable[FriendlyUnitInfo]): Seq[FriendlyUnitInfo] = {
 
-    val desiredUnits = new mutable.ArrayBuffer[FriendlyUnitInfo]()
+    val desiredUnits = new ArrayBuffer[FriendlyUnitInfo]()
 
     // Build a queue based on whether we need to sort it
     val (candidateQueue, dequeue, preference) =

@@ -34,12 +34,6 @@ object StrategyGroups {
     PvPProxy2Gate, // Proxy builds are temporarily broken due to new building placer
     PvZProxy2Gate, // Proxy builds are temporarily broken due to new building placer
 
-    // AIST4: This was always an exploit build due to inability to deny scouting; disable before probable removal
-    PvP2Gate1012DT,
-    // AIST4: This is horrible against the 4-Gate meta
-    //PvP2GateGoon,
-    // AIST4: Time to retire 2-gating except as win%rr safety pick. Maybe if we can catch an opponent who's skimping on zealots
-    PvP2Gate1012Goon,
     // AIST4: Too many issues; too bad against 4-gate meta; needs polish we don't have time for
     PvP1ZealotExpand,
 

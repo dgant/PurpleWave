@@ -17,7 +17,7 @@ import Mathematics.Points.Tile
 import Micro.Agency.Agency
 import Micro.Coordination.Coordinator
 import Micro.Matchups.MatchupGraph
-import Micro.Squads.Squads
+import Tactics.Squads.Squads
 import Performance.TaskQueue.{TaskQueueGlobal, TaskQueueParallel}
 import Placement.Preplacement
 import Planning.{Blackboard, Yolo}

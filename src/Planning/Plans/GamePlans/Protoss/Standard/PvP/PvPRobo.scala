@@ -4,10 +4,9 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.GamePlans.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat}
-import Planning.Plans.Scouting.ScoutForCannonRush
 import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.{PvPRobo, PvPRobo1012, PvPRobo1Gate, PvPRobo2GateGoon}
+import Strategery.Strategies.Protoss._
 import Utilities.GameTime
 
 class PvPRobo extends GameplanImperative {
@@ -30,7 +29,7 @@ class PvPRobo extends GameplanImperative {
   override def completed: Boolean = complete
 
   override def executeBuild(): Unit = {
-    employing(PvPRobo1Gate) // Because we don't explicitly reference it anywhere else
+    employing(PvPGateCoreTech, PvP3Zealot) // Because we don't explicitly reference these anywhere else
     if (units(Protoss.CyberneticsCore) > 0 && enemyDarkTemplarLikely) {
       buildOrder(
         Get(Protoss.RoboticsFacility),
@@ -148,14 +147,15 @@ class PvPRobo extends GameplanImperative {
     complete ||= bases > 1
     if (units(Protoss.Gateway) > 1 || units(Protoss.Assimilator) == 0) {
       // TODO: Also do vs. 9-9 gate
-      twoGateZealot ||= employing(PvPRobo1012)
+      twoGateZealot ||= employing(PvP1012)
       twoGateZealot ||= enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.gasSteal, With.fingerprints.mannerPylon)
     }
-    if (twoGateZealot) {
+    fiveZealot = employing(PvP5Zealot)
+    if (twoGateZealot && units(Protoss.CyberneticsCore) == 0) {
       // TODO: Do vs. 9-9 gate only
-      fiveZealot == enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate, With.fingerprints.nexusFirst)
+      fiveZealot ||= enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate, With.fingerprints.nexusFirst)
     }
-    twoGateGoon = employing(PvPRobo2GateGoon)
+    twoGateGoon = employing(PvPGateCoreGate)
     twoGateGoon &&= ! twoGateZealot
     if (units(Protoss.CyberneticsCore) == 0) {
       zBeforeCore = With.geography.startLocations.size < 3
@@ -233,7 +233,6 @@ class PvPRobo extends GameplanImperative {
     if (shouldAttack) status("Attack") else status("Defend")
     if (shouldExpand) status("ExpandNow") else status("ExpandLater")
 
-    new ScoutForCannonRush().update()
     if (shouldAttack) { attack() }
     if (enemies(Protoss.Dragoon) == 0) {
       if (twoGateZealot) {

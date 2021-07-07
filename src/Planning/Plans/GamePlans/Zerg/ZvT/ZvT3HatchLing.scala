@@ -11,7 +11,7 @@ import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Scouting.ScoutWithWorkers
+import Planning.Plans.Scouting.ScoutNow
 import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
@@ -43,7 +43,7 @@ class ZvT3HatchLing extends GameplanTemplate {
           new StartPositionsAtLeast(4),
           new MineralsForUnit(Zerg.Overlord, 2)),
         new MineralsForUnit(Zerg.Hatchery, 2)),
-      new ScoutWithWorkers))
+      new ScoutNow))
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new ZvTIdeas.ReactToBarracksCheese,

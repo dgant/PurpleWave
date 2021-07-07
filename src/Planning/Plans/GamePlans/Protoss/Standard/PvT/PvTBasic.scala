@@ -13,7 +13,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural, ProposePlacement}
-import Planning.Plans.Scouting.{ScoutCleared, ScoutOn, ScoutWithWorkers}
+import Planning.Plans.Scouting.{ScoutCleared, ScoutOn, ScoutNow}
 import Planning.Predicates.Compound._
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost}
 import Planning.Predicates.Milestones.{EnemyHasShownWraithCloak, _}
@@ -52,7 +52,7 @@ class PvTBasic extends GameplanTemplate {
     new If(new Employing(PvT32Nexus),           new ScoutOn(Protoss.Pylon)),
     new If(new Employing(PvT2GateRangeExpand),  new ScoutOn(Protoss.Pylon)),
     new If(new Employing(PvT1GateReaver),       new ScoutOn(Protoss.CyberneticsCore)),
-    new If(new Employing(PvT1015DT),            new If(new UpgradeStarted(Protoss.DragoonRange), new ScoutWithWorkers)),
+    new If(new Employing(PvT1015DT),            new If(new UpgradeStarted(Protoss.DragoonRange), new ScoutNow)),
     new If(new Employing(PvTDTExpand),          new ScoutOn(Protoss.CyberneticsCore)))
 
   override val attackPlan = new If(

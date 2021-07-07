@@ -1,4 +1,4 @@
-package Micro.Squads
+package Tactics.Squads
 
 import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Types.Zone

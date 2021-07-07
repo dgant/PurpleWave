@@ -10,7 +10,7 @@ import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAt, Pump}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireBases
-import Planning.Plans.Scouting.ScoutWithWorkers
+import Planning.Plans.Scouting.ScoutNow
 import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, StartPositionsAtLeast}
@@ -34,7 +34,7 @@ class ZvT7Pool extends GameplanTemplate {
       new And(
         new UnitsAtLeast(2, Zerg.Overlord),
         new UnitsAtLeast(8, Zerg.Drone)),
-      new ScoutWithWorkers))
+      new ScoutNow))
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new ZergReactionVsWorkerRush

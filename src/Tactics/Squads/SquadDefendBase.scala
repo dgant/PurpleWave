@@ -1,4 +1,4 @@
-package Micro.Squads
+package Tactics.Squads
 
 import Information.Geography.Types.{Base, Edge, Zone}
 import Lifecycle.With

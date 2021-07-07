@@ -12,7 +12,7 @@ import Planning.Plans.Macro.Build.CancelOrders
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Placement.{BuildCannonsAtNatural, BuildCannonsInMain, ProposePlacement}
-import Planning.Plans.Scouting.{ScoutCleared, ScoutForCannonRush}
+import Planning.Plans.Scouting.ScoutCleared
 import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeAtHome}
@@ -69,8 +69,7 @@ class PvP2GateDT extends GameplanTemplate {
       new Parallel(
         new PvPIdeas.ReactToProxyGateways,
         new PvPIdeas.ReactTo2Gate)),
-    new PvPIdeas.ReactToFFE,
-    new ScoutForCannonRush)
+    new PvPIdeas.ReactToFFE)
 
   val oneGateCoreLogic = new PvP1GateCoreLogic(allowZealotBeforeCore = false)
 

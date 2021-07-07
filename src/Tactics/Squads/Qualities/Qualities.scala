@@ -1,4 +1,4 @@
-package Micro.Squads.Qualities
+package Tactics.Squads.Qualities
 
 import Planning.UnitMatchers.{MatchCombatSpellcaster, MatchWorker}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}

@@ -1,4 +1,4 @@
-package Micro.Squads
+package Tactics.Squads
 
 import Information.Battles.Types.Division
 import Information.Geography.Types.Base

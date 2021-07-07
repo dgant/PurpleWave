@@ -130,8 +130,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
           })
         }
         desiredTile.foreach(With.groundskeeper.reserve(this, _, buildingClass))
-      }
-      else if (buildingClass.isTerran) {
+      } else if (buildingClass.isTerran) {
         builder.intend(this, new Intention {
           toFinishConstruction = building
           canFight = false

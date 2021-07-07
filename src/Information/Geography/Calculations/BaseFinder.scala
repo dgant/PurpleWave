@@ -20,7 +20,7 @@ object BaseFinder {
     
     // Start locations are free base placements.
     val startTiles    = With.game.getStartLocations.asScala.map(new Tile(_)).toArray
-    val startPixels   = startTiles.map(Protoss.Nexus.tileArea.add(_).midPixel)
+    val startPixels   = startTiles.map(Protoss.Nexus.tileArea.add(_).center)
   
     // Get every resource on the map
     val allResources  = With.units.neutral.filter(unit => unit.unitClass.isGas || unit.unitClass.isMinerals)
@@ -120,7 +120,7 @@ object BaseFinder {
         output += base.startInclusive
     
         // Real lazy -- just remove all conflicting candidates (instead of, say, picking the best one or something)
-        val conflicts = basesLeft.filter(_.midPixel.pixelDistance(base.midPixel) < baseMergingRadiusPixels)
+        val conflicts = basesLeft.filter(_.center.pixelDistance(base.center) < baseMergingRadiusPixels)
         basesLeft --= conflicts
     })
     

@@ -407,4 +407,6 @@ object Maff {
   @inline final def toInt(value: Boolean): Int = if (value) 1 else 0
 
   @inline final def toSign(value: Boolean): Int = if (value) 1 else -1
+
+  @inline final def orElse[T](x: Iterable[T]*): Iterable[T] = x.find(_.nonEmpty).getOrElse(x.head)
 }

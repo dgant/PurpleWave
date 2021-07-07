@@ -58,7 +58,7 @@ object PvPIdeas {
             new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
             new Employing(PvP4GateGoon),
             new And(
-              new Employing(PvP3GateGoon, PvP2Gate1012Goon),
+              new Employing(PvP3GateGoon, PvP1012),
               new Not(new EnemyStrategy(With.fingerprints.fourGateGoon))),
             new And(
               new Latch(new UnitsAtLeast(5, Protoss.Gateway, complete = true)),
@@ -80,9 +80,9 @@ object PvPIdeas {
         new UnansweredDarkTemplar,
         new Latch(new And(new UnitsAtLeast(2, Protoss.Reaver, complete = true), new UnitsAtLeast(1, Protoss.Shuttle, complete = true))),
         new Latch(new UnitsAtLeast(15, MatchWarriors))),
-      // Don't mess with 4-Gates
+      // Don't mess with 4-Gates if we're not also aggressive
       new Or(
-        new Employing(PvP2Gate1012Goon, PvPRobo1012, PvP4GateGoon),
+        new Employing(PvP1012, PvP4GateGoon),
         new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
         new UnitsAtLeast(4, Protoss.Gateway, complete = true),
         new And(

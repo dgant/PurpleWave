@@ -7,7 +7,7 @@ import Mathematics.Points.Tile
 import Performance.Cache
 import Performance.Tasks.TimedTask
 import Planning.UnitMatchers.{MatchBuilding, MatchWorker}
-import ProxyBwapi.Races.Zerg
+import ProxyBwapi.Races.{Terran, Zerg}
 import Utilities._
 
 class Scouting extends TimedTask with EnemyTechs {
@@ -32,12 +32,8 @@ class Scouting extends TimedTask with EnemyTechs {
     val output              = startPositionBonus * informationAge / distanceFromEnemy
     output
   }
-  private def scoutableBases: Seq[Base] = {
-    var output = With.geography.bases.filter(b => ! b.owner.isUs)
-    if (output.isEmpty) {
-      output = With.geography.bases
-    }
-    output
+  private def scoutableBases: Iterable[Base] = {
+    Maff.orElse(With.geography.bases.filter(b => ! b.owner.isUs), With.geography.bases)
   }
 
   def mostBaselikeEnemyTile: Tile = mostBaselikeEnemyTileCache()
@@ -51,22 +47,10 @@ class Scouting extends TimedTask with EnemyTechs {
       .headOption
       .getOrElse(cacheBaseIntrigueInitial().maxBy(_._2)._1.townHallArea.midpoint))
 
-  def threatOrigin: Tile = threatOriginCache()
-  private val threatOriginCache = new Cache(() => {
-    var x = 0
-    var y = 0
-    var n = 0
-    With.units.enemy.foreach(u => if (u.likelyStillThere && u.attacksAgainstGround > 0 && ! u.unitClass.isWorker) {
-      x += u.x / 32
-      y += u.y / 32
-      n += 1
-    })
-    val enemyThreatOriginBaseFactor = 3
-    x += enemyThreatOriginBaseFactor * mostBaselikeEnemyTile.x
-    y += enemyThreatOriginBaseFactor * mostBaselikeEnemyTile.y
-    n += enemyThreatOriginBaseFactor
-    val airCentroid = Tile(x/n, y/n)
-    Maff.minBy(With.units.enemy.view.map(_.tile))(_.tileDistanceSquared(airCentroid)).getOrElse(airCentroid)
+  def threatOrigin: Tile = _threatOrigin()
+  private val _threatOrigin = new Cache(() => {
+    val threatUnits = With.units.enemy.filter(u => u.likelyStillThere && u.attacksAgainstGround > 0 && ! u.unitClass.isWorker)
+    Maff.weightedExemplar(threatUnits.map(u => (u.pixel, u.subjectiveValue)) ++ Seq((mostBaselikeEnemyTile.center, 3 * Terran.Marine.subjectiveValue))).tile
   })
 
   def firstEnemyMain: Option[Base] = _firstEnemyMain
@@ -85,9 +69,7 @@ class Scouting extends TimedTask with EnemyTechs {
   override protected def onRun(budgetMs: Long): Unit = {
     updateTechs()
     baseScoutMap.clear()
-    if (_firstEnemyMain.isEmpty) {
-      _firstEnemyMain = With.geography.startBases.find(_.owner.isEnemy)
-    }
+    _firstEnemyMain = _firstEnemyMain.orElse(With.geography.startBases.find(_.owner.isEnemy))
     if (_firstEnemyMain.isEmpty) {
       val possibleMains = With.geography.startBases.filterNot(_.owner.isUs).filter(base => base.owner.isEnemy || ! base.scouted)
       // Infer possible mains from process of elimination
@@ -108,7 +90,7 @@ class Scouting extends TimedTask with EnemyTechs {
         val overlords = With.units.enemy.filter(Zerg.Overlord)
         val overlordMains = overlords.map(overlord => (overlord, With.geography.startBases.filter(base =>
           base.owner.isNeutral
-          && overlord.framesToTravelTo(base.townHallArea.midPixel) < With.frame + Seconds(5)()
+          && overlord.framesToTravelTo(base.townHallArea.center) < With.frame + Seconds(5)()
         )))
         val overlordProofs = overlordMains.find(_._2.size == 1)
         overlordProofs.foreach(overlordProof => {

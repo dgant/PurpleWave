@@ -10,7 +10,7 @@ import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, ExtractorTrick, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Scouting.ScoutWithWorkers
+import Planning.Plans.Scouting.ScoutNow
 import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast}
@@ -41,7 +41,7 @@ class ZvE4Pool extends GameplanTemplate {
           new UnitsAtLeast(1, Zerg.SpawningPool))),
       new Not(new EnemyStrategy(With.fingerprints.twoGate)),
       new UnitsAtLeast(4, MatchOr(Zerg.Drone, Zerg.Extractor))),
-    new ScoutWithWorkers)
+    new ScoutNow)
   
   override def supplyPlan: Plan = NoPlan()
   

@@ -2,7 +2,7 @@ package Tactics
 
 import Lifecycle.With
 import Mathematics.Maff
-import Micro.Squads.SquadRazeProxies
+import Squads.SquadRazeProxies
 import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.{CountEverything, CountUpTo}

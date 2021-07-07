@@ -1,14 +1,13 @@
 package Planning.UnitPreferences
+import Mathematics.Maff
+import Mathematics.Points.{Pixel, SpecificPoints}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-object PreferScout extends UnitPreference {
-  
+class PreferScout(val to: Pixel*) extends UnitPreference {
   override def apply(unit: FriendlyUnitInfo): Double = {
-    if (unit.canMove) (
-      - unit.topSpeed
-      * (if (unit.flying) 1.5 else 1.0)
-      * (if (unit.unitClass.permanentlyCloaked) 1.5 else 1.0))
-    else
-      Double.MaxValue
+    (unit.remainingOccupationFrames
+      + Maff.orElse(to, Seq(SpecificPoints.middle)).view.map(unit.framesToTravelTo).min
+      + (if (unit.intent.toScoutTiles.nonEmpty) 0 else 240)
+      + (if (unit.carrying) 160 else 0))
   }
 }

@@ -1,11 +1,11 @@
-package Micro.Squads
+package Tactics.Squads
 
 import Debugging.ToString
 import Information.Battles.Types.GroupCentroid
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Micro.Formation.Formation
-import Micro.Squads.Qualities.QualityCounter
+import Tactics.Squads.Qualities.QualityCounter
 import Performance.Cache
 import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits

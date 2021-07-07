@@ -13,7 +13,7 @@ import Planning.Plans.Macro.Build.CancelOrders
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Placement.{BuildSunkensAtExpansions, BuildSunkensAtNatural}
-import Planning.Plans.Scouting.ScoutWithWorkers
+import Planning.Plans.Scouting.ScoutNow
 import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
@@ -47,7 +47,7 @@ class ZvT2HatchLurker extends GameplanTemplate {
         new MineralsForUnit(Zerg.Overlord, 2))),
     new If(
       new Not(new EnemyMech),
-      new ScoutWithWorkers))
+      new ScoutNow))
 
   override def attackPlan: Plan = new Parallel(
     new If(new UnitsAtLeast(1, Zerg.Mutalisk, complete = true), new Attack),

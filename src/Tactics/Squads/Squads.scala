@@ -1,4 +1,4 @@
-package Micro.Squads
+package Tactics.Squads
 
 import Lifecycle.With
 import Performance.Tasks.TimedTask

@@ -36,7 +36,7 @@ class TaskQueueGlobal extends TaskQueueParallel(
     }),
     With.tactics,
     // With.squads,
-    // Running Squads inside Tactics for the moment,
+    // Running Tactics.Squads inside Tactics for the moment,
     // because when Tactics adds enemies it clears out the Squad's current enemies, potentially leaving it without enemies for a frame
     With.gathering,
     With.groundskeeper)

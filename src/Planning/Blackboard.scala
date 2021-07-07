@@ -21,6 +21,7 @@ class Blackboard {
   var status                : Property[Seq[String]]       = add(new Property(Seq.empty))
   var aggressionRatio       : Property[Double]            = add(new Property(1.0))
   var wantToAttack          : Property[Boolean]           = add(new Property(false))
+  var wantToHarass          : Property[Boolean]           = add(new Property(false))
   var safeToMoveOut         : Property[Boolean]           = add(new Property(false))
   var scoutPlan             : Property[Plan]              = add(new Property(NoPlan()))
   var maximumScouts         : Property[Int]               = add(new Property(0))

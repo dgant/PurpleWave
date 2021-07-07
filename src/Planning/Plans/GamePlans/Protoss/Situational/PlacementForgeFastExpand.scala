@@ -11,7 +11,7 @@ class PlacementForgeFastExpand extends ProposePlacement {
     val mainZone      = With.geography.ourMain.zone
     val naturalBase   = With.geography.ourNatural
     val naturalZone   = naturalBase.zone
-    val marginPixels  = naturalZone.exit.map(_.pixelCenter.pixelDistance(naturalBase.townHallArea.midPixel) - Protoss.Nexus.radialHypotenuse).getOrElse(128.0)
+    val marginPixels  = naturalZone.exit.map(_.pixelCenter.pixelDistance(naturalBase.townHallArea.center) - Protoss.Nexus.radialHypotenuse).getOrElse(128.0)
     val output = Vector(
       new Blueprint(Protoss.Pylon,           requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.defensive), marginPixels = Some(32*4)),
       new Blueprint(Protoss.Forge,           preferZone  = Some(naturalZone),  placement = Some(PlacementProfiles.defensive), marginPixels = Some(0)),

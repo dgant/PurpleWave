@@ -7,13 +7,13 @@ object Opponents {
   private def add(name: String, policy: StrategySelectionPolicy = StrategySelectionGreedy()): Opponent = { val output = Opponent(name, policy); allKnown = allKnown :+ output; output }
 
   val defaultPvT = StrategySelectionFixed(PvT13Nexus, PvT2BaseReaver, PvT3BaseGateway)
-  val defaultPvP = StrategySelectionFixed(PvPRobo, PvPRobo1Gate)
+  val defaultPvP = StrategySelectionFixed(PvPRobo, PvPGateCoreTech)
   val defaultPvZ = StrategySelectionFixed(PvZ2Gate1012, PvZ4GateGoon, PvZMidgame5GateGoon, PvZLateGameTemplar)
 
   // COG 2021 PREP
-  val stardust    : Opponent = add("Stardust",    StrategySelectionFixed(PvPRobo, PvPRobo1012))
-  val bananabrain : Opponent = add("BananaBrain", StrategySelectionFixed(PvPRobo, PvPRobo1012))
-  val betastar    : Opponent = add("BetaStar",    StrategySelectionFixed(PvPRobo, PvPRobo2GateGoon))
+  val stardust    : Opponent = add("Stardust",    StrategySelectionFixed(PvPRobo, PvP1012, PvP3Zealot))
+  val bananabrain : Opponent = add("BananaBrain", StrategySelectionFixed(PvPRobo, PvP1012, PvP5Zealot))
+  val betastar    : Opponent = add("BetaStar",    StrategySelectionFixed(PvPRobo, PvP1012, PvP5Zealot))
   val metabot     : Opponent = add("MetaBot",     defaultPvP)
   val aiur        : Opponent = add("AIUR",        defaultPvP) // Metabot stand-in
   val skynet      : Opponent = add("Skynet",      defaultPvP) // Metabot stand-in

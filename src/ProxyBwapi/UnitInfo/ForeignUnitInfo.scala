@@ -1,11 +1,8 @@
 package ProxyBwapi.UnitInfo
 
 import Lifecycle.With
-import Micro.Squads.Squad
 import ProxyBwapi.UnitTracking.Imagination
 import bwapi.UnitType
-
-import scala.collection.mutable.ArrayBuffer
 
 final class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(bwapiUnit, id) {
 

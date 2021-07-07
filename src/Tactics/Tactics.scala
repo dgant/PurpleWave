@@ -3,12 +3,12 @@ package Tactics
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
-import Micro.Squads._
+import Squads._
 import Performance.Tasks.TimedTask
 import Planning.Plans.Army._
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTIdeas
-import Planning.Plans.Scouting.{DoScoutWithWorkers, MonitorBases, ScoutExpansions, ScoutWithOverlord}
+import Planning.Plans.Scouting.MonitorBases
 import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.Predicates.Milestones.{EnemiesAtMost, EnemyHasShownWraithCloak, UnitsAtLeast}
 import Planning.Predicates.Strategy.EnemyIsTerran
@@ -21,17 +21,18 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 class Tactics extends TimedTask {
-  private lazy val clearBurrowedBlockers      = new ClearBurrowedBlockers
+  private lazy val clearBurrowedBlockers      = new SquadClearExpansionBlockers
   private lazy val followBuildOrder           = new FollowBuildOrder
   private lazy val ejectScout                 = new SquadEjectScout
-  private lazy val scoutWithOverlord          = new ScoutWithOverlord
+  private lazy val scoutWithOverlord          = new SquadInitialOverlordScout
   private lazy val defendAgainstProxy         = new DefendAgainstProxy
   private lazy val defendFightersAgainstRush  = new DefendFightersAgainstRush
   private lazy val defendAgainstWorkerRush    = new DefendAgainstWorkerRush
   private lazy val defendFFEAgainst4Pool      = new DefendFFEWithProbes
   private lazy val catchDTRunby               = new SquadCatchDTRunby
-  private lazy val scoutWithWorkers           = new DoScoutWithWorkers
-  private lazy val scoutExpansions            = new ScoutExpansions
+  private lazy val scoutWithWorkers           = new SquadWorkerScout
+  private lazy val scoutForCannonRush         = new ScoutForCannonRush
+  private lazy val scoutExpansions            = new SquadScoutExpansions
   private lazy val gather                     = new Gather
   private lazy val chillOverlords             = new ChillOverlords
   private lazy val doFloatBuildings           = new DoFloatBuildings
@@ -67,17 +68,18 @@ class Tactics extends TimedTask {
   private def launchMissions(): Unit = {}
   private def runMissions(): Unit = {}
   private def runPrioritySquads(): Unit = {
-    clearBurrowedBlockers.update()
+    clearBurrowedBlockers.recruit()
     followBuildOrder.update()
     ejectScout.recruit()
-    scoutWithOverlord.update()
+    scoutWithOverlord.recruit()
     With.blackboard.scoutPlan().update()
     defendAgainstProxy.update()
     defendFightersAgainstRush.update()
     defendAgainstWorkerRush.update()
     defendFFEAgainst4Pool.update()
-    scoutWithWorkers.update()
-    scoutExpansions.update()
+    scoutWithWorkers.recruit()
+    scoutForCannonRush.update()
+    scoutExpansions.recruit()
     monitorWithObserver.update()
     // TODO: EscortSettlers is no longer being used but we do need to do it
     // TODO: Hide Carriers until 4x vs. Terran

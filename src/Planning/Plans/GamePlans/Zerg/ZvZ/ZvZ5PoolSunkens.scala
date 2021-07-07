@@ -12,7 +12,7 @@ import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Placement.ProposePlacement
-import Planning.Plans.Scouting.ScoutWithWorkers
+import Planning.Plans.Scouting.ScoutNow
 import Planning.Predicates.Compound.{And, Check}
 import Planning.Predicates.Milestones.{FrameAtLeast, UnitsAtLeast}
 import Planning.Predicates.Strategy.Employing
@@ -72,8 +72,8 @@ class ZvZ5PoolSunkens extends GameplanTemplate {
         new If(
           new FrameAtLeast(GameTime(1, 10)()),
           new Parallel(
-            new ScoutWithWorkers(1),
-            new ScoutWithWorkers(1)))),
+            new ScoutNow(1),
+            new ScoutNow(1)))),
     new Pump(Zerg.Zergling)
   )
 }

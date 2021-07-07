@@ -41,8 +41,8 @@ class PlaceFFE extends Plan {
     val naturalExit     = naturalZone.exit.get
     val naturalSideRaw1 = naturalZone.exit.get.sidePixels.head.tile
     val naturalSideRaw2 = naturalZone.exit.get.sidePixels.last.tile
-    val naturalHomePost = naturalExit.pixelCenter.multiply(3).add(naturalBase.townHallArea.midPixel).divide(4).tile
-    val naturalGoalPost = naturalExit.pixelCenter.project(naturalBase.townHallArea.midPixel, - 5 * 32).tile
+    val naturalHomePost = naturalExit.pixelCenter.multiply(3).add(naturalBase.townHallArea.center).divide(4).tile
+    val naturalGoalPost = naturalExit.pixelCenter.project(naturalBase.townHallArea.center, - 5 * 32).tile
     val naturalHomeTile = Spiral.points(6).map(naturalHomePost.add).filter(_.zone == naturalZone).find(validWalkable)
     val naturalGoalTile = Spiral.points(6).map(naturalGoalPost.add).filterNot(_.zone == naturalZone).find(validWalkable)
     val naturalAltitude = naturalBase.townHallTile.altitude

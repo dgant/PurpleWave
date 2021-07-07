@@ -27,7 +27,7 @@ object ShowBases extends View {
           else if (base.lastScoutedFrame <= 0) "Never scouted"
           else "Last scouted " + With.framesSince(base.lastScoutedFrame) + " frames ago"
         ),
-        base.townHallArea.midPixel,
+        base.townHallArea.center,
         drawBackground = true,
         base.owner.colorDark)
     })

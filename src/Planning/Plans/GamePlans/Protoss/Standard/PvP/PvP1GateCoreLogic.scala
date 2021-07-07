@@ -8,13 +8,13 @@ import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.ReactToDarkTemplarEmergencies
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.BuildOrder
-import Planning.Plans.Scouting.ScoutForCannonRush
 import Planning.Predicates.Compound._
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
 import Planning.Predicates.Strategy._
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPRobo
+import Tactics.ScoutForCannonRush
 
 class PvP1GateCoreLogic(allowZealotBeforeCore: Boolean = true, requireZealotBeforeCore: Boolean = false) {
 
@@ -104,7 +104,6 @@ class PvP1GateCoreLogic(allowZealotBeforeCore: Boolean = true, requireZealotBefo
     new PvPIdeas.ReactToProxyGateways,
     // We don't need to do anything special against standard 2-gate
     // new PvPIdeas.ReactTo2Gate,
-    new ScoutForCannonRush,
     new If(
       new Employing(PvPRobo),
       new If(

@@ -1,4 +1,4 @@
-package Micro.Squads
+package Tactics.Squads
 
 import Lifecycle.With
 import Mathematics.Maff
@@ -63,15 +63,15 @@ class SquadAttack extends Squad {
       return
     }
     vicinity =
+      // Horror proxies/Gas steals
       Maff.minBy(With.geography.ourBasesAndSettlements.flatMap(_.units.filter(u => u.isEnemy && u.unitClass.isBuilding).map(_.pixel)))(_.groundPixels(With.geography.home.center))
+      // Remote proxies
       .orElse(
-        if (With.geography.ourBases.size > 1 && With.frame > Minutes(10)())
-          None
-        else
-          Maff.minBy(With.units.enemy.view.filter(MatchProxied).map(_.pixel))(_.groundPixels(With.geography.home.center)))
+        if (With.geography.ourBases.size > 1 && With.frame > Minutes(10)()) None
+        else Maff.minBy(With.units.enemy.view.filter(MatchProxied).map(_.pixel))(_.groundPixels(With.geography.home.center)))
+      // Enemy base furthest from their army
       .orElse(
-        Maff
-          .maxBy(With.geography.enemyBases)(base => {
+        Maff.maxBy(With.geography.enemyBases)(base => {
             val distance      = With.scouting.threatOrigin.center.pixelDistance(base.heart.center)
             val distanceLog   = 1 + Math.log(1 + distance)
             val defendersLog  = 1 + Math.log(1 + base.defenseValue)
@@ -79,9 +79,9 @@ class SquadAttack extends Squad {
             output
           })
           .map(base => base.natural.filter(_.owner == base.owner).getOrElse(base))
-          .map(base => Maff.minBy(base.units.filter(u => u.isEnemy && u.unitClass.isBuilding))(_.pixelDistanceCenter(base.townHallArea.midPixel))
+          .map(base => Maff.minBy(base.units.filter(u => u.isEnemy && u.unitClass.isBuilding))(_.pixelDistanceCenter(base.townHallArea.center))
             .map(_.pixel)
-            .getOrElse(base.townHallArea.midPixel)))
+            .getOrElse(base.townHallArea.center)))
       .orElse(if (enemyNonTrollyThreats > 0) Some(With.scouting.threatOrigin.center) else None)
       .getOrElse(With.scouting.mostBaselikeEnemyTile.center)
   }

@@ -4,7 +4,7 @@ import Information.Grids.Floody.AbstractGridFloody
 import Lifecycle.With
 import Mathematics.Maff
 import Micro.Agency.{Agent, Intention}
-import Micro.Squads.Squad
+import Tactics.Squads.Squad
 import Performance.Cache
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}

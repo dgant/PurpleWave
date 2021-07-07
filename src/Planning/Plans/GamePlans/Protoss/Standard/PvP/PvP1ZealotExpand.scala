@@ -11,7 +11,6 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Placement.{BuildCannonsAtNatural, BuildCannonsInMain, ProposePlacement}
-import Planning.Plans.Scouting.ScoutForCannonRush
 import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
@@ -20,6 +19,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvP1ZealotExpand, PvP2GateDTExpand, PvPRobo}
+import Tactics.ScoutForCannonRush
 import Utilities.GameTime
 
 class PvP1ZealotExpand extends GameplanTemplate {
@@ -63,8 +63,7 @@ class PvP1ZealotExpand extends GameplanTemplate {
   override def emergencyPlans: Seq[Plan] = Vector(
     new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToProxyGateways,
-    new PvPIdeas.ReactTo2Gate,
-    new ScoutForCannonRush)
+    new PvPIdeas.ReactTo2Gate)
 
   override val buildOrderPlan = new Parallel(
     new BuildOrder(

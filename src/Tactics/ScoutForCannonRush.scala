@@ -1,9 +1,9 @@
-package Planning.Plans.Scouting
+package Tactics
 
 import Lifecycle.With
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
-import Planning.Plan
+import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchNotHoldingResources, MatchWorker}
@@ -11,7 +11,7 @@ import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
 import Utilities.GameTime
 
-class ScoutForCannonRush extends Plan {
+class ScoutForCannonRush extends Prioritized {
   val scouts = new LockUnits(this)
   scouts.matcher = MatchAnd(MatchWorker, MatchNotHoldingResources)
   scouts.counter = CountOne
@@ -29,7 +29,7 @@ class ScoutForCannonRush extends Plan {
     )
   })
 
-  override def onUpdate(): Unit = {
+  def update(): Unit = {
     val gettingCannonRushed = With.fingerprints.cannonRush.matches || (
       With.fingerprints.earlyForge.matches
       && ! With.fingerprints.forgeFe.matches
@@ -38,6 +38,7 @@ class ScoutForCannonRush extends Plan {
 
     var shouldScout = (
       previouslyCannonRushed
+        && With.enemies.exists(_.isUnknownOrProtoss)
         && ! With.units.existsEnemy(MatchAnd(Protoss.PhotonCannon, MatchComplete))
         && ! With.fingerprints.gatewayFirst.matches
         && With.frame > GameTime(1, 30)()

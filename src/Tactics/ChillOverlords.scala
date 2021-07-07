@@ -4,15 +4,12 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Shapes.Circle
 import Micro.Agency.Intention
-import Planning.Predicates.Compound.Latch
-import Planning.Predicates.Milestones.EnemiesAtLeast
+import Planning.Predicates.MacroFacts
 import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountEverything
-import Planning.UnitMatchers.MatchOr
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-
 
 class ChillOverlords extends Prioritized {
   
@@ -20,24 +17,11 @@ class ChillOverlords extends Prioritized {
   overlords.matcher = Zerg.Overlord
   overlords.counter = CountEverything
 
-  val cloakedThreat = new Latch(new EnemiesAtLeast(1, MatchOr(
-    Terran.Wraith,
-    Terran.Ghost,
-    Protoss.DarkTemplar,
-    Protoss.Arbiter,
-    Zerg.Lurker
-  )))
-
   def update() {
-    if ( ! With.self.isZerg) {
-      return
-    }
-    if (With.self.hasUpgrade(Zerg.OverlordSpeed)) {
-      return
-    }
-    if (cloakedThreat.apply) {
-      return
-    }
+    if ( ! With.self.isZerg) return
+    if (With.self.hasUpgrade(Zerg.OverlordSpeed)) return
+    if (MacroFacts.enemyShownCloakedThreat) return
+
     overlords.acquire(this)
     overlords.units.foreach(chillOut(_, overlords.units.size))
   }

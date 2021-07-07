@@ -3,6 +3,7 @@ package Tactics.Squads
 import Information.Geography.Types.{Base, Edge, Zone}
 import Lifecycle.With
 import Mathematics.Maff
+import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Micro.Formation.{Formation, FormationEmpty, FormationGeneric, FormationZone}
 import Performance.Cache
@@ -42,7 +43,7 @@ class SquadDefendBase(base: Base) extends Squad {
   private def guardZone: Zone = zoneAndChoke()._1
   private def guardChoke: Option[Edge] = zoneAndChoke()._2
   lazy val enemyHasVision: Cache[Boolean] = new Cache(() => enemies.exists(e => e.flying || e.altitude >= base.heart.altitude))
-  lazy val heart = if (base.metro == With.geography.ourMain.metro) With.geography.ourMain.heart.center else base.heart.center
+  lazy val heart: Pixel = if (base.metro == With.geography.ourMain.metro) With.geography.ourMain.heart.center else base.heart.center
   val bastion = new Cache(() =>
     Maff.minBy(
         base.units.view.filter(u =>
@@ -57,9 +58,7 @@ class SquadDefendBase(base: Base) extends Squad {
   private var formationReturn: Formation = FormationEmpty
 
   override def run() {
-    formation = None
     if (units.isEmpty) return
-    targetQueue = Some(SquadTargeting.rankForArmy(units, enemies))
     lazy val scourables   = enemies.filter(isHuntable)
     lazy val canScour     = scourables.nonEmpty && (wander || breached)
     lazy val wander       = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || With.blackboard.wantToAttack()
@@ -70,23 +69,23 @@ class SquadDefendBase(base: Base) extends Squad {
       && e.base.exists(_.owner.isUs)
       && ! guardZone.edges.exists(edge => e.pixelDistanceCenter(edge.pixelCenter) < 64 + edge.radiusPixels))
 
+    val targets = if (canScour) scourables else enemies.filter(threateningBase)
+    targetQueue = Some(SquadAutomation.rankForArmy(units, targets))
+    lazy val formationScour = FormationGeneric.engage(units, targetQueue.get.headOption.map(_.pixel))
     lazy val formationBastion = FormationGeneric.march(units, bastion())
     lazy val formationGuard = guardChoke.map(c => FormationZone(units, guardZone, c)).getOrElse(formationBastion)
 
     if (canScour) {
       lastAction = "Scour"
-      formation = Some(FormationGeneric.engage(units, targetQueue.get.headOption.map(_.pixel)))
-      formationReturn = formationGuard
+      formations += formationScour
+      formations += formationGuard
     } else if (canGuard) {
       lastAction = "Guard"
-      formation = Some(formationGuard)
-      formationReturn = formationGuard
+      formations += formationGuard
     } else {
       lastAction = "Hold"
-      formation = Some(formationBastion)
-      formationReturn = formationBastion
+      formations += formationBastion
     }
-    val targets = if (canScour) scourables else enemies.filter(threateningBase)
     intendFormation()
   }
 
@@ -111,8 +110,8 @@ class SquadDefendBase(base: Base) extends Squad {
   private def intendFormation(): Unit = {
     units.foreach(unit => {
       unit.intend(this, new Intention {
-        toTravel = Some(formation.get(unit))
-        toReturn = Some(formationReturn(unit))
+        toTravel = formations.headOption.flatMap(_.placements.get(unit))
+        toReturn = formations.lastOption.flatMap(_.placements.get(unit))
       })
     })
   }

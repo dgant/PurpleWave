@@ -4,7 +4,6 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Performance.Cache
-import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers._
@@ -12,7 +11,7 @@ import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.GameTime
 
-class SquadScoutExpansions extends Squad with Prioritized {
+class SquadScoutExpansions extends Squad {
 
   def frameToScout: GameTime = {
     if (With.self.isProtoss) {
@@ -71,7 +70,7 @@ class SquadScoutExpansions extends Squad with Prioritized {
 
   def run(): Unit = {
     if (units.isEmpty) return
-    targetQueue = Some(SquadTargeting.enRouteTo(units, destination))
+    targetQueue = Some(SquadAutomation.rankedEnRouteTo(units, destination))
     units.foreach(_.intend(this, new Intention {
       toTravel = Some(destination)
     }))

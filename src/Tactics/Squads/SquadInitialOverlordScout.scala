@@ -3,14 +3,13 @@ package Tactics.Squads
 import Lifecycle.With
 import Micro.Agency.Intention
 import Performance.Cache
-import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountEverything
 import Planning.UnitMatchers.{MatchAnd, MatchComplete}
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
-class SquadInitialOverlordScout extends Squad with Prioritized {
+class SquadInitialOverlordScout extends Squad {
   var endScouting: Boolean = false
 
   val overlords = new LockUnits(this)

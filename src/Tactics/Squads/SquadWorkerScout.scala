@@ -16,7 +16,7 @@ import ProxyBwapi.UnitTracking.UnorderedBuffer
 import Strategery.Strategies.Zerg.{ZvE4Pool, ZvT1HatchHydra}
 import Utilities.Seconds
 
-class SquadWorkerScout extends Squad with Prioritized {
+class SquadWorkerScout extends Squad {
 
   var scouts: Iterable[FriendlyUnitInfo] = Iterable.empty
   var abandonScouting: Boolean = false

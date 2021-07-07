@@ -2,7 +2,6 @@ package Tactics.Squads
 
 import Lifecycle.With
 import Micro.Agency.Intention
-import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers.{MatchMobileDetector, MatchOr}
@@ -12,7 +11,7 @@ import Utilities.{Minutes, Seconds}
 
 import scala.util.Random
 
-class SquadClearExpansionBlockers extends Squad with Prioritized {
+class SquadClearExpansionBlockers extends Squad {
   
   val detectors = new LockUnits(this)
   detectors.matcher = MatchMobileDetector
@@ -51,7 +50,7 @@ class SquadClearExpansionBlockers extends Squad with Prioritized {
 
   def run(): Unit = {
     if (units.isEmpty) return
-    targetQueue = Some(SquadTargeting.enRouteTo(units, vicinity))
+    targetQueue = Some(SquadAutomation.rankedEnRouteTo(units, vicinity))
     detectors.units.foreach(_.intend(this, new Intention { toTravel = Some(vicinity.add(64, 48)) }))
     clearers.units.foreach(_.intend(this, new Intention { toTravel = Some(vicinity.add(Random.nextInt(192) - 96, Random.nextInt(160) - 80)) }))
   }

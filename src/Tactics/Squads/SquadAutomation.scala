@@ -5,11 +5,46 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.Maff
+import Micro.Agency.Intention
+import Micro.Formation.FormationGeneric
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 import scala.collection.immutable.ListSet
 
-object SquadTargeting {
+object SquadAutomation {
+
+  def targetAndSend(squad: Squad): Unit = targetAndSend(squad, squad.vicinity)
+  def targetAndSend(squad: Squad, to: Pixel): Unit = targetAndSend(squad, squad.units, to)
+  def targetAndSend(squad: Squad, units: Iterable[FriendlyUnitInfo], to: Pixel): Unit = {
+    lazy val centroid             = Maff.centroid(units.view.map(_.pixel))
+    lazy val fightConsensus       = Maff.mode(units.view.map(_.agent.shouldEngage))
+    lazy val originConsensus      = Maff.mode(units.view.map(_.agent.defaultOrigin))
+    lazy val battleConsensus      = Maff.mode(units.view.map(_.battle))
+    lazy val targetReadyToEngage  = squad.targetQueue.get.find(t => units.exists(u => u.canAttack(t) && u.pixelsToGetInRange(t) < 64))
+    lazy val targetHasEngagedUs   = squad.targetQueue.get.find(t => units.exists(u => t.canAttack(u) && t.inRangeToAttack(u)))
+    if (fightConsensus) {
+      squad.targetQueue = Some(SquadAutomation.rankForArmy(units, SquadAutomation.rankedEnRouteTo(units, to)))
+      if (targetReadyToEngage.isDefined || targetHasEngagedUs.isDefined) {
+        squad.formations += FormationGeneric.engage(units, targetReadyToEngage.orElse(targetHasEngagedUs).map(_.pixel))
+      } else {
+        squad.formations += FormationGeneric.march(units, to)
+      }
+    } else {
+      squad.targetQueue = Some(SquadAutomation.rankForArmy(units, SquadAutomation.rankedEnRouteTo(units, originConsensus)))
+      if (centroid.zone == originConsensus.zone && With.scouting.threatOrigin.zone != originConsensus.zone) {
+        squad.formations += FormationGeneric.guard(units, Some(originConsensus))
+      } else {
+        squad.formations += FormationGeneric.disengage(units)
+      }
+    }
+
+    units.foreach(unit => {
+      unit.intend(this, new Intention {
+        toTravel = squad.formations.find(_.placements.contains(unit)).map(_.placements(unit)).orElse(Some(to))
+      })
+    })
+  }
+
   /*
     Ratio of path distance to (target combined distance from origin and goal)
     required to include a target as "on the way"
@@ -17,7 +52,7 @@ object SquadTargeting {
    */
   private val distanceRatio = 1.2
 
-  def enRouteTo(units: Iterable[FriendlyUnitInfo], goalAir: Pixel): Vector[UnitInfo] = {
+  def unrankedEnRouteTo(units: Iterable[FriendlyUnitInfo], goalAir: Pixel): Vector[UnitInfo] = {
     val flying      = units.forall(_.flying)
     val antiAir     = units.exists(_.canAttackAir)
     val antiGround  = units.exists(_.canAttackGround)
@@ -35,7 +70,7 @@ object SquadTargeting {
     output
   }
 
-  def rankEnRouteTo(units: Iterable[FriendlyUnitInfo], goalAir: Pixel): Seq[UnitInfo] = rankForArmy(units, enRouteTo(units, goalAir))
+  def rankedEnRouteTo(units: Iterable[FriendlyUnitInfo], goalAir: Pixel): Seq[UnitInfo] = rankForArmy(units, unrankedEnRouteTo(units, goalAir))
 
   def rankForArmy(units: Iterable[FriendlyUnitInfo], targets: Seq[UnitInfo]): Seq[UnitInfo] = {
     val centroid  = Maff.exemplar(units.view.map(_.pixel))
@@ -46,4 +81,6 @@ object SquadTargeting {
       + (32.0 * t.totalHealth / Math.max(1.0, t.unitClass.maxTotalHealth)) // Scaling hysteresis: Focus down weak units
       + (if (t.unitClass.attacksOrCastsOrDetectsOrTransports || ! engaged) 0 else With.mapPixelPerimeter))
   }
+
+
 }

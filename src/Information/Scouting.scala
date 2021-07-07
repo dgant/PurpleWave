@@ -8,9 +8,10 @@ import Performance.Cache
 import Performance.Tasks.TimedTask
 import Planning.UnitMatchers.{MatchBuilding, MatchWorker}
 import ProxyBwapi.Races.{Terran, Zerg}
+import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities._
 
-class Scouting extends TimedTask with EnemyTechs {
+final class Scouting extends TimedTask with EnemyTechs {
 
   private val baseScoutMap = new CountMap[Base]
   def baseScouts(base: Base): Int = baseScoutMap(base)
@@ -49,9 +50,15 @@ class Scouting extends TimedTask with EnemyTechs {
 
   def threatOrigin: Tile = _threatOrigin()
   private val _threatOrigin = new Cache(() => {
-    val threatUnits = With.units.enemy.filter(u => u.likelyStillThere && u.attacksAgainstGround > 0 && ! u.unitClass.isWorker)
-    Maff.weightedExemplar(threatUnits.map(u => (u.pixel, u.subjectiveValue)) ++ Seq((mostBaselikeEnemyTile.center, 3 * Terran.Marine.subjectiveValue))).tile
+    Maff.weightedExemplar(With.units.enemy.filter(countMuscle).map(u => (u.pixel, u.subjectiveValue)) ++ Seq((mostBaselikeEnemyTile.center, 5 * Terran.Marine.subjectiveValue))).nearestWalkableTile
   })
+
+  def muscleOrigin: Tile = _muscleOrigin()
+  private val _muscleOrigin = new Cache(() => {
+    Maff.weightedExemplar(With.units.ours.filter(countMuscle).map(u => (u.pixel, u.subjectiveValue))).nearestWalkableTile
+  })
+
+  @inline private def countMuscle(u: UnitInfo): Boolean = u.likelyStillThere && u.attacksAgainstGround > 0 && ! u.unitClass.isWorker && ! u.unitClass.isBuilding
 
   def firstEnemyMain: Option[Base] = _firstEnemyMain
   def enemyMain: Option[Base] = _firstEnemyMain.filter(base => ! base.scouted || base.owner.isEnemy)

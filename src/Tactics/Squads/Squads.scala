@@ -29,7 +29,7 @@ class Squads extends TimedTask {
     _batchNext = batchSwap
     _batchNext.id = _batchActive.id + 1
     _batchNext.squads.clear()
-    all.foreach(_.swapUnits())
+    all.foreach(_.prepareToRun())
     all.foreach(_.run())
   }
 }

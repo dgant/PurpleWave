@@ -17,7 +17,7 @@ import scala.collection.mutable.ArrayBuffer
 trait Squad extends Prioritized {
   var batchId: Int = Int.MinValue
   var vicinity: Pixel = SpecificPoints.middle
-  var formation: Option[Formation] = None
+  var formations: ArrayBuffer[Formation] = ArrayBuffer.empty
   val lock: LockUnits = new LockUnits(this)
   var targetQueue: Option[Seq[UnitInfo]] = None
 
@@ -67,7 +67,7 @@ trait Squad extends Prioritized {
     _unitsNow.clear()
     _enemiesNow.clear()
   }
-  def swapUnits(): Unit = {
+  def prepareToRun(): Unit = {
     val swapUnits = _unitsNow
     _unitsNow = _unitsNext
     _unitsNext = swapUnits
@@ -75,6 +75,8 @@ trait Squad extends Prioritized {
     val swapEnemies = _enemiesNow
     _enemiesNow = _enemiesNext
     _enemiesNext = swapEnemies
+    targetQueue = None
+    formations.clear()
   }
   def run(): Unit
 

@@ -7,14 +7,10 @@ import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-
 object EmergencyBunk extends Action {
   
   // Firebats, Medics, and SCVs can enter bunkers too but it's less obvious when they should
-  def classAllowedToBunk(unit: FriendlyUnitInfo): Boolean = Vector(
-    Terran.Marine,
-    Terran.Ghost
-  ).contains(unit.unitClass)
+  def classAllowedToBunk(unit: FriendlyUnitInfo): Boolean = unit.isAny(Terran.Marine, Terran.Ghost)
   
   def openBunkersFor(forUnit: FriendlyUnitInfo): Iterable[UnitInfo] = {
     if (classAllowedToBunk(forUnit))

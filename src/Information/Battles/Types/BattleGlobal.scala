@@ -5,7 +5,7 @@ import Information.Battles.Prediction.PredictionGlobal
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class BattleGlobal(us: Team, enemy: Team) extends Battle(us, enemy) {
+class BattleGlobal(unitsUs: Vector[UnitInfo], unitsEnemy: Vector[UnitInfo]) extends Battle(unitsUs, unitsEnemy) {
 
   private lazy val estimationAbstractOffense: PredictionGlobal = estimateAvatar(this, weAttack = true)
   private lazy val estimationAbstractDefense: PredictionGlobal = estimateAvatar(this, weAttack = false)

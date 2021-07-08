@@ -35,7 +35,7 @@ object FightOrFlee extends Action {
     decide(true,  "Safe",       () => unit.matchups.threats.isEmpty)
     decide(true,  "Detonated",  () => unit.unitClass.suicides && unit.matchups.targets.exists(t => t.canAttack(unit) && t.matchups.targetsInRange.nonEmpty))
     decide(false, "CantFight",  () => ! unit.intent.canFight)
-    decide(true,  "Berzerk",    () => With.frame < Minutes(6)() && unit.isAny(Protoss.Zealot, Zerg.Zergling) && unit.metro.exists(_.bases.exists(_.owner.isEnemy)) && ! unit.battle.exists(_.teamOf(unit).hasCatchersGround()) && unit.matchups.threats.exists(t => Terran.Vulture(t)))
+    decide(true,  "Berzerk",    () => With.frame < Minutes(6)() && unit.isAny(Protoss.Zealot, Zerg.Zergling) && unit.metro.exists(_.bases.exists(_.owner.isEnemy)) && ! unit.team.exists(_.hasCatchersGround()) && unit.matchups.threats.exists(t => Terran.Vulture(t)))
     decide(true,  "Cloaked",    () => unit.effectivelyCloaked || (unit.is(Terran.Wraith) && unit.energy >= 50 && unit.matchups.enemyDetectors.isEmpty && With.self.hasTech(Terran.WraithCloak)))
     decide(true,  "Lurking",    () => Zerg.Lurker(unit) && unit.matchups.enemyDetectors.isEmpty)
     decide(false, "Scarabs",    () => Protoss.Reaver(unit) && unit.scarabs == 0 && ! unit.trainee.exists(_.remainingCompletionFrames < Math.max(unit.matchups.framesOfSafety, unit.cooldownLeft)))

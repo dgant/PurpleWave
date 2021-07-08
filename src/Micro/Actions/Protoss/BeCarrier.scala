@@ -31,11 +31,7 @@ object BeCarrier extends Action {
   // On the other hand, similar performance against small units could potentially be achieved by
   // having carriers target different enemies, which would reduce the frequency of carriers having to switch targets.
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.aliveAndComplete           &&
-    unit.is(Protoss.Carrier)        &&
-    unit.matchups.enemies.nonEmpty
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.aliveAndComplete && Protoss.Carrier(unit) && unit.matchups.enemies.nonEmpty
 
   protected final def interceptorActive(interceptor: UnitInfo): Boolean = (
     ! interceptor.complete

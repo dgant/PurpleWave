@@ -12,7 +12,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object BeArbiter extends Action {
 
-  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.is(Protoss.Arbiter)
+  override def allowed(unit: FriendlyUnitInfo): Boolean = Protoss.Arbiter(unit)
   
   protected def needsUmbrella(target: UnitInfo): Boolean =
     ! target.isAny(

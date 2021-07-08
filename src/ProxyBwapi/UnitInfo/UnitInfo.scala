@@ -198,7 +198,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   ////////////
 
   @inline final def battle: Option[BattleLocal] = With.battles.byUnit.get(this).orElse(With.matchups.entrants.find(_._2.contains(this)).map(_._1))
-  @inline final def team: Option[Team] = battle.map(_.teamOf(this))
+  @inline final def team: Option[Team] = battle.map(b => if (isFriendly) b.us else b.enemy)
   @inline final def report: Option[ReportCard] = battle.flatMap(_.simulationReport.get(this))
   var matchups: MatchupAnalysis = MatchupAnalysis(this)
   val simulacrum: Simulacrum = new Simulacrum(this)

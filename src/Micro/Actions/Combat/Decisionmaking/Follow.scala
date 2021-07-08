@@ -8,7 +8,8 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Follow extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    ! unit.agent.leader().contains(unit)
+    unit.canMove
+    && ! unit.agent.leader().contains(unit)
     && (
       unit.flying // Performance shortcut
       && unit.isAny(

@@ -17,7 +17,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object BeReaver extends Action {
 
-  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.is(Protoss.Reaver)
+  override def allowed(unit: FriendlyUnitInfo): Boolean = Protoss.Reaver(unit)
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     considerHopping(unit)

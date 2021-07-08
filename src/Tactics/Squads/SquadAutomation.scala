@@ -53,7 +53,9 @@ object SquadAutomation {
   }
 
   def target(squad: Squad): Unit = {
+    if (squad.fightConsensus) {
 
+    }
   }
 
   /*

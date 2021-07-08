@@ -2,7 +2,7 @@ package Information.Battles
 
 import Information.Battles.Clustering.BattleClustering
 import Information.Battles.ProcessingStates.{BattleProcessInitial, BattleProcessState}
-import Information.Battles.Types.{BattleGlobal, BattleLocal, Division, Team}
+import Information.Battles.Types.{BattleGlobal, BattleLocal, Division}
 import Lifecycle.With
 import Performance.TaskQueue.TaskQueueGlobalWeights
 import Performance.Tasks.{StateTasks, TimedTask}
@@ -17,7 +17,7 @@ class Battles extends TimedTask {
   withSkipsMax(3)
   withWeight(TaskQueueGlobalWeights.Battles)
 
-  var global    : BattleGlobal                = new BattleGlobal(new Team(Vector.empty), new Team(Vector.empty))
+  var global    : BattleGlobal                = new BattleGlobal(Vector.empty, Vector.empty)
   var byUnit    : Map[UnitInfo, BattleLocal]  = Map.empty
   var local     : Vector[BattleLocal]         = Vector.empty
   var divisions : Vector[Division]            = Vector.empty

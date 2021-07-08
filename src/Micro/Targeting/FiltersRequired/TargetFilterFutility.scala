@@ -25,7 +25,7 @@ object TargetFilterFutility extends TargetFilter {
     if (actor.pixelRangeAgainst(target) > 96) return true
     if (With.blackboard.pushKiters.get && target.canAttack(actor) && target.pixelRangeAgainst(actor) > 32) return true
     if ( ! With.scouting.enemyScouts().exists(_ == target)) {
-      if (actor.battle.map(_.teamOf(actor)).exists(t => if (target.flying) t.hasCatchersAir() else t.hasCatchersGround())) return true
+      if (actor.team.exists(t => if (target.flying) t.hasCatchersAir() else t.hasCatchersGround())) return true
       if (target.presumptiveTarget.exists(u => u.isOurs && u.unitClass.isWorker)) return true
     }
     false

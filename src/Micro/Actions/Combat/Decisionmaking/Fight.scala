@@ -5,15 +5,11 @@ import Micro.Actions.Combat.Maneuvering.{Sneak, Support}
 import Micro.Actions.Combat.Spells.{BeVulture, Stim}
 import Micro.Actions.Combat.Tactics._
 import Micro.Actions.Protoss._
-import Planning.UnitMatchers.MatchTank
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Fight extends Action {
 
-  override def allowed(unit: FriendlyUnitInfo): Boolean = ! unit.agent.isScout && (
-    unit.canMove
-    || unit.is(MatchTank)
-    || unit.readyForAttackOrder)
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (unit.canAttack || unit.canMove) && ! unit.agent.isScout
 
   override def perform(unit: FriendlyUnitInfo) {
     Follow.consider(unit)

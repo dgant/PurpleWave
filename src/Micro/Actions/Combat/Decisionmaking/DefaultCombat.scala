@@ -180,8 +180,6 @@ object DefaultCombat extends Action {
     lazy val purring = (unit.unitClass.isTerran && unit.unitClass.isMechanical && unit.alliesSquadThenBattle.flatten.exists(a => a.repairing && a.orderTarget.contains(unit)))
     transition(Aim, () => !unit.canMove || purring, () => aim(unit))
 
-    lazy val opponentBlocksGoal = unit.battle.exists(b => b.enemy.zones.contains(unit.agent.destination.zone) || b.teams.minBy(_.centroidAir.pixelDistanceSquared(unit.agent.destination)).enemy)
-
     // COG 2021: Disabling Regroup now that we have marching formations
     // transition(Regroup, () => ! unit.agent.shouldEngage && opponentBlocksGoal && unit.agent.withinSafetyMargin)
     // transition(Regroup, () => unit.agent.shouldEngage && opponentBlocksGoal && unit.team.exists(team => ! team.engaged() && unit.confidence() + team.coherence() + team.impatience() / Seconds(35)() < 1))

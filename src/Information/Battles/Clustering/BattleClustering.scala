@@ -1,7 +1,7 @@
 package Information.Battles.Clustering
 
 import Information.Battles.BattleClassificationFilters
-import Information.Battles.Types.{BattleLocal, Team}
+import Information.Battles.Types.BattleLocal
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -40,8 +40,8 @@ class BattleClustering {
       .view
       .map(cluster =>
         new BattleLocal(
-          new Team(cluster.view.filter(_.isOurs).toVector),
-          new Team(cluster.view.filter(_.isEnemy).toVector)))
+          cluster.view.filter(_.isOurs).toVector,
+          cluster.view.filter(_.isEnemy).toVector))
       .filter(_.teams.forall(_.units.exists(_.unitClass.attacksOrCastsOrDetectsOrTransports)))
       .toVector
     With.battles.nextBattlesLocal = battlesFromClusters

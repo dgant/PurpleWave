@@ -7,9 +7,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Cast extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.energy > 0
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.energy > 0
   
   override protected def perform(unit: FriendlyUnitInfo) {
     spells.foreach(_.consider(unit))

@@ -1,20 +1,19 @@
 package Tactics.Squads
 
 import Debugging.ToString
-import Information.Battles.Types.GroupCentroid
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Micro.Formation.Formation
-import Tactics.Squads.Qualities.QualityCounter
 import Performance.Cache
 import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Tactics.Squads.Qualities.QualityCounter
 
 import scala.collection.mutable.ArrayBuffer
 
-trait Squad extends Prioritized {
+trait Squad extends Prioritized with FriendlyGroupConsensus {
   var batchId: Int = Int.MinValue
   var vicinity: Pixel = SpecificPoints.middle
   var formations: ArrayBuffer[Formation] = ArrayBuffer.empty
@@ -40,8 +39,8 @@ trait Squad extends Prioritized {
     _qualityCounter.utility(candidate)
   }
 
-  def units: Seq[FriendlyUnitInfo] = _unitsNow
-  def unitsNext: Seq[FriendlyUnitInfo] = _unitsNext
+  final def units: Seq[FriendlyUnitInfo] = _unitsNow
+  final def unitsNext: Seq[FriendlyUnitInfo] = _unitsNext
   @inline final def addUnits(units: Iterable[FriendlyUnitInfo]): Unit = units.foreach(addUnit)
   @inline final def addUnit(unit: FriendlyUnitInfo): Unit = {
     commission()
@@ -49,7 +48,7 @@ trait Squad extends Prioritized {
     _qualityCounter.countUnit(unit)
   }
 
-  def enemies: Seq[UnitInfo] = _enemiesNow
+  final def enemies: Seq[UnitInfo] = _enemiesNow
   @inline final def addEnemies(enemies: Iterable[UnitInfo]): Unit = {
     commission()
     enemies.foreach(_includeEnemy)
@@ -63,11 +62,11 @@ trait Squad extends Prioritized {
     _qualityCounter.countUnit(enemy)
   }
 
-  def clearUnits(): Unit = {
+  final def clearUnits(): Unit = {
     _unitsNow.clear()
     _enemiesNow.clear()
   }
-  def prepareToRun(): Unit = {
+  final def prepareToRun(): Unit = {
     val swapUnits = _unitsNow
     _unitsNow = _unitsNext
     _unitsNext = swapUnits
@@ -80,13 +79,12 @@ trait Squad extends Prioritized {
   }
   def run(): Unit
 
-  val centroidAir = new Cache(() => GroupCentroid.air(units))
-  val centroidGround = new Cache(() => GroupCentroid.ground(units))
-  val area = new Cache(() => units.view.map(_.unitClass.area).sum)
   def leader(unitClass: UnitClass): Option[FriendlyUnitInfo] = leaders().get(unitClass)
   private val leaders: Cache[Map[UnitClass, FriendlyUnitInfo]] = new Cache(() =>
     units.groupBy(_.unitClass).map(group => (group._1, group._2.maxBy(unit => 100000L * unit.squadAge - unit.frameDiscovered)))
   )
+
+  final protected def consensusFriendlyUnits: Seq[FriendlyUnitInfo] = units
 
   override def toString: String = ToString(this).replace("Squad", "")
 }

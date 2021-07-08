@@ -38,6 +38,26 @@ class Strategist {
     }
     registeredActive += strategy
   }
+  def deactivate(strategy: Strategy): Unit = {
+    if (registeredActive.contains(strategy)) {
+      With.logger.debug(f"Deactivating strategy $strategy")
+    }
+    registeredActive -= strategy
+  }
+  def swapOut(strategy: Strategy): Unit = {
+    if (selectedCurrently.contains(strategy)) {
+      With.logger.debug(f"Swapping out strategy $strategy")
+      //selectedCurrently -= strategy
+    }
+  }
+  def swapIn(strategy: Strategy): Unit = {
+    if ( ! selectedCurrently.contains(strategy)) {
+      With.logger.debug(f"Swapping in strategy $strategy")
+      //selectedCurrently += strategy
+    }
+  }
+
+  def gameplan: Plan = selectedCurrently.find(_.gameplan.isDefined).map(_.gameplan.get).getOrElse(new StandardGamePlan)
 
   lazy val heightMain       : Double  = With.self.startTile.altitude
   lazy val heightNatural    : Double  = With.geography.ourNatural.townHallTile.altitude
@@ -48,7 +68,6 @@ class Strategist {
   lazy val isPlasma         : Boolean = Plasma.matches
   lazy val isIslandMap      : Boolean = isPlasma || With.geography.startBases.forall(base1 => With.geography.startBases.forall(base2 => base1 == base2 || With.paths.zonePath(base1.zone, base2.zone).isEmpty))
   lazy val isFfa            : Boolean = With.enemies.size > 1 && ! Players.all.exists(p => p.isAlly)
-  lazy val gameplan         : Plan    = selectedInitially.find(_.gameplan.isDefined).map(_.gameplan.get).getOrElse(new StandardGamePlan)
   lazy val gameWeights: Map[HistoricalGame, Double] = With.history.games
     .filter(_.enemyMatches)
     .zipWithIndex

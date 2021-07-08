@@ -7,7 +7,7 @@ import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
 
-class Formation(style: FormationStyle, val placements: Map[UnitInfo, Pixel]) {
+class Formation(val style: FormationStyle, val placements: Map[UnitInfo, Pixel]) {
 
   private lazy val default = if (placements.isEmpty) With.geography.home.center else Maff.exemplar(placements.values)
 

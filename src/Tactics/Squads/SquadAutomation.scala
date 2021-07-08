@@ -16,15 +16,12 @@ object SquadAutomation {
   def targetAndSend(squad: Squad): Unit = targetAndSend(squad, minToForm = 0)
   def targetAndSend(squad: Squad, minToForm: Int): Unit = targetAndSend(squad, squad.vicinity, minToForm)
   def targetAndSend(squad: Squad, to: Pixel): Unit = targetAndSend(squad, to, minToForm = 0)
-  def targetAndSend(squad: Squad, to: Pixel, minToForm: Int): Unit = targetAndSend(squad, squad.units, to, minToForm)
-  def targetAndSend(squad: Squad, units: Iterable[FriendlyUnitInfo], to: Pixel, minToForm: Int): Unit = {
-    lazy val centroid             = Maff.centroid(units.view.map(_.pixel))
-    lazy val fightConsensus       = Maff.mode(units.view.map(_.agent.shouldEngage))
-    lazy val originConsensus      = Maff.mode(units.view.map(_.agent.defaultOrigin))
-    lazy val battleConsensus      = Maff.mode(units.view.map(_.battle))
+  def targetAndSend(squad: Squad, to: Pixel, minToForm: Int): Unit = {
+    val units = squad.units
     lazy val targetReadyToEngage  = squad.targetQueue.get.find(t => units.exists(u => u.canAttack(t) && u.pixelsToGetInRange(t) < 64))
     lazy val targetHasEngagedUs   = squad.targetQueue.get.find(t => units.exists(u => t.canAttack(u) && t.inRangeToAttack(u)))
-    if (fightConsensus) {
+    // If advancing, give a formation for forward movement
+    if (squad.fightConsensus) {
       squad.targetQueue = Some(SquadAutomation.rankForArmy(units, SquadAutomation.rankedEnRouteTo(units, to)))
       if (targetReadyToEngage.isDefined || targetHasEngagedUs.isDefined) {
         squad.formations += FormationGeneric.engage(units, targetReadyToEngage.orElse(targetHasEngagedUs).map(_.pixel))
@@ -32,19 +29,31 @@ object SquadAutomation {
         squad.formations += FormationGeneric.march(units, to)
       }
     } else {
-      squad.targetQueue = Some(SquadAutomation.rankForArmy(units, SquadAutomation.rankedEnRouteTo(units, originConsensus)))
-      if (centroid.zone == originConsensus.zone && With.scouting.threatOrigin.zone != originConsensus.zone) {
-        squad.formations += FormationGeneric.guard(units, Some(originConsensus))
-      } else {
-        squad.formations += FormationGeneric.disengage(units)
-      }
+      squad.targetQueue = Some(SquadAutomation.rankForArmy(units, SquadAutomation.rankedEnRouteTo(units, squad.originConsensus)))
+    }
+    // Always include a disengagey formation for units that want to retreat/kite
+    if (squad.centroidAll.zone == squad.originConsensus.zone && With.scouting.threatOrigin.zone != squad.originConsensus.zone) {
+      squad.formations += FormationGeneric.guard(units, Some(squad.originConsensus))
+    } else {
+      squad.formations += FormationGeneric.disengage(units)
     }
 
+    // Send to the first formation, which will be advancey if we're advancing
     units.foreach(unit => {
       unit.intend(this, new Intention {
-        toTravel = squad.formations.filter(_.placements.size >= minToForm).find(_.placements.contains(unit)).map(_.placements(unit)).orElse(Some(to))
+        toTravel = squad
+          .formations
+          .headOption
+          .filter(_.placements.size >= minToForm)
+          .find(_.placements.contains(unit))
+          .map(_.placements(unit))
+          .orElse(Some(if (squad.fightConsensus) to else squad.originConsensus))
       })
     })
+  }
+
+  def target(squad: Squad): Unit = {
+
   }
 
   /*
@@ -66,14 +75,12 @@ object SquadAutomation {
     val path        = pathfind.find
     val zones       = new ListSet[Zone]() ++ (path.tiles.map(_.view.map(_.zone)).getOrElse(Seq.empty) ++ goal.metro.map(_.zones).getOrElse(Seq(goal.zone)))
     val visible     = units.exists(_.visibleToOpponents)
-    //val hull        = Maff.convexHull(units.view.map(_.pixel.asPoint).toSeq).view.map(_.asPixel)
     val output      = With.units.enemy
       .filter(e => if (e.flying) antiAir else antiGround)
       .filter(_.likelyStillThere)
       .filter(e =>
         e.pixelDistanceTravelling(origin) + e.pixelDistanceTravelling(goal) < distanceRatio * distancePx
         || e.presumptiveTarget.exists(t => units.exists(_ == t) && e.inRangeToAttack(t))
-        //|| hull.exists(u.pixelDistanceCenter(_) <= u.effectiveRangePixels)
       ).toVector
     output
   }

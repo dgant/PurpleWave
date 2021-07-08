@@ -56,7 +56,7 @@ class SquadWorkerScout extends Squad {
       && With.geography.enemyBases.view.map(_.heart).exists(h => scouts.forall(_.framesToTravelTo(h) > u.framesToTravelTo(h) - Seconds(5)())))
 
     // Abandon scouting when they can catch our scout (and we're not counting on the scout to help fight)
-    abandonScouting ||= ( ! ZvE4Pool.registerActive && ! ZvT1HatchHydra.registerActive && With.units.enemy.exists(u => u.complete && u.isAny(
+    abandonScouting ||= ( ! ZvE4Pool.activate && ! ZvT1HatchHydra.activate && With.units.enemy.exists(u => u.complete && u.isAny(
       Terran.Marine,
       Terran.Vulture,
       Terran.Factory,

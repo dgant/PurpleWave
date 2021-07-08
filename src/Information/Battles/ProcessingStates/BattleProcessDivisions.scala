@@ -25,9 +25,9 @@ class BattleProcessDivisions extends BattleProcessState {
 
     val zoneBattles = battles.groupBy(battle => zones.minBy(z =>
       if (battle.enemy.units.forall(_.flying))
-        battle.enemy.centroidAir().pixelDistance(z.heart.center)
+        battle.enemy.centroidAir.pixelDistance(z.heart.center)
       else
-        battle.enemy.centroidGround().groundPixels(z.heart)))
+        battle.enemy.centroidGround.groundPixels(z.heart)))
 
     // Associate each group of enemies with the nearest base
     val baseRelevancePixels = 32 * 32

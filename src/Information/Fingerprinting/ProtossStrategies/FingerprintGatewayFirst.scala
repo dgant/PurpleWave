@@ -7,6 +7,7 @@ import Utilities.GameTime
 
 class FingerprintGatewayFirst extends FingerprintOr(
   With.fingerprints.oneGateCore,
+  With.fingerprints.twoGate,
   With.fingerprints.fourGateGoon,
   new FingerprintCompleteBy(Protoss.Gateway,  GameTime(2, 40)),
   new FingerprintArrivesBy(Protoss.Zealot,    GameTime(3, 45))) {

@@ -7,8 +7,6 @@ import Planning.Plan
 import Strategery.{StarCraftMap, StrategyEvaluation, StrategyLegality}
 import bwapi.Race
 
-import scala.collection.mutable
-
 abstract class Strategy extends SimpleString {
   
   override val toString: String = ToString(this)
@@ -16,7 +14,6 @@ abstract class Strategy extends SimpleString {
   def gameplan: Option[Plan] = { None }
   
   def choices                 : Iterable[Iterable[Strategy]]    = Iterable.empty
-  def alternatives            : mutable.Set[Strategy]           = mutable.HashSet.empty
   def islandMaps              : Boolean                         = false
   def groundMaps              : Boolean                         = true
   def entranceRamped          : Boolean                         = true
@@ -43,18 +40,22 @@ abstract class Strategy extends SimpleString {
     * This allows us to distinguish between strategy choices that had an effect on the game (the opening, perhaps)
     * versus those that didn't impact it at all (a late game strategy for a game lasting three minutes, for example)
     */
-  def registerActive(): Boolean = {
+  def activate(): Boolean = {
     val output = With.strategy.selectedCurrently.contains(this)
     if (output) {
       With.strategy.registerActive(this)
-      // Register any *alternatives* to this strategy as active,
-      // as
-      With.strategy.selectedCurrently.view
-        .map(_.choices)
-        .foreach(_.filter(_.exists(_ == this)).foreach(_.foreach(With.strategy.registerActive)))
     }
     output
   }
+
+  /**
+    * Flag a strategy as inactive, in order to avoid crediting it with our success/failure this game
+    * This is appropriate in situations where our reactions cause us to follow a different strategy
+    * prior to the strategy having had any impact on the game
+    */
+  def deactivate(): Unit = { With.strategy.deactivate(this) }
+  def swapIn(): Unit = { With.strategy.swapIn(this) }
+  def swapOut(): Unit = { With.strategy.swapOut(this) }
 
   def legality: StrategyLegality      = With.strategy.legalities(this)
   def evaluation: StrategyEvaluation  = With.strategy.evaluations(this)

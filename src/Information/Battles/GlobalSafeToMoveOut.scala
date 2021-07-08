@@ -57,44 +57,43 @@ object GlobalSafeToMoveOut {
 
     val zealotsUs       = countOurs(Protoss.Zealot)
     val dragoonsUs      = countOurs(Protoss.Dragoon)
-    val reaversUs       = countOurs(Protoss.Reaver)
-    val shuttlesUs      = countOurs(Protoss.Shuttle)
     val archonsUs       = countOurs(Protoss.Archon)
     val carriersUs      = countOurs(Protoss.Carrier)
+    val reaversUs       = countOurs(Protoss.Reaver)
+    val shuttlesUs      = countOurs(Protoss.Shuttle)
     val zealotsEnemy    = countEnemy(Protoss.Zealot)
     var dragoonsEnemy   = countEnemy(Protoss.Dragoon)
     val archonsEnemy    = countEnemy(Protoss.Archon)
+    val carriersEnemy   = countEnemy(Protoss.Carrier)
     val reaversEnemy    = countEnemy(Protoss.Reaver)
     val shuttlesEnemy   = countEnemy(Protoss.Shuttle)
-    val dragoonsHidden  = Math.max(0, Math.min(if (reaversUs > 0) 4 else 2, (With.frame - Minutes(4)()) / Minutes(1)()))
-    dragoonsEnemy += dragoonsHidden
     
     val scoreDragoon  = 1.0
     val scoreSpeedlot = 1.0
     val scoreTRexArms = 0.5
     val scoreSlowlot  = 0.5
-    val scoreReaver   = 2.0
-    val scoreShuttle  = 1.25
     val scoreArchon   = 2.0
     val scoreCarrier  = 3.0
+    val scoreReaver   = 2.0
+    val scoreShuttle  = 1.25
+    val scoreStorm    = 2.0
 
-    val strengthInfantry = (
-        dragoonsUs  * (if (rangeUs) scoreDragoon else scoreTRexArms)
+    val scoreUs = (
+        dragoonsUs  * (if (rangeUs || ! rangeEnemy) scoreDragoon else scoreTRexArms)
       + zealotsUs   * (if (speedUs) scoreSpeedlot else scoreSlowlot)
       + archonsUs   * scoreArchon
-      + carriersUs  * scoreCarrier)
-    val strengthReaver = (
-        reaversUs * scoreReaver
-      + Math.min(shuttlesUs, reaversUs) * scoreShuttle)
-    
-    val scoreUs = strengthInfantry + Math.min(strengthInfantry / 3, strengthReaver + 2 * storms)
+      + carriersUs  * scoreCarrier
+      + reaversUs   * scoreReaver
+      + Math.min(shuttlesUs, 2 * reaversUs) * scoreShuttle
+      + scoreStorm * storms)
 
     val scoreEnemy = (
-        dragoonsEnemy * (if (rangeEnemy) scoreDragoon else scoreTRexArms)
+        dragoonsEnemy * (if (rangeEnemy || ! rangeUs) scoreDragoon else scoreTRexArms)
       + zealotsEnemy  * (if (speedEnemy) scoreSpeedlot else scoreSlowlot)
-      + Math.min(shuttlesEnemy, shuttlesEnemy) * scoreShuttle
       + archonsEnemy  * scoreArchon
-      + shuttlesEnemy * scoreShuttle
+      + carriersEnemy * scoreCarrier
+      + reaversEnemy * scoreReaver
+      + Math.min(shuttlesEnemy, 2 * reaversEnemy) * scoreShuttle
     )
     val output = scoreEnemy == 0 || scoreEnemy < scoreUs * With.blackboard.aggressionRatio()
     output 
@@ -161,7 +160,7 @@ object GlobalSafeToMoveOut {
     val speedUs = With.self.hasUpgrade(Zerg.ZerglingSpeed)
     val speedEnemy = With.enemy.hasUpgrade(Zerg.ZerglingSpeed)
     val speedExpectedFirst = (
-      ZvZ9PoolSpeed.registerActive
+      ZvZ9PoolSpeed.activate
       || ( ! With.fingerprints.ninePool.matches && ! With.fingerprints.overpool.matches && new EnemyRecentStrategy(With.fingerprints.twelveHatch).apply)
       || With.fingerprints.twelveHatch.matches
       || With.fingerprints.twelvePool.matches)

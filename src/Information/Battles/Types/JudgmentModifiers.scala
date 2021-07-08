@@ -46,7 +46,7 @@ object JudgmentModifiers {
     val centroid      = battleLocal.enemy.centroidGround
     val keyBases      = With.geography.ourBasesAndSettlements.filter(b => b.isOurMain || b.isNaturalOf.exists(_.isOurMain))
     val distanceMax   = With.mapPixelWidth
-    val distanceHome  = (if (keyBases.isEmpty) Seq(With.geography.home) else keyBases.map(_.heart.nearestWalkableTile)).map(centroid().groundPixels).min
+    val distanceHome  = (if (keyBases.isEmpty) Seq(With.geography.home) else keyBases.map(_.heart.nearestWalkableTile)).map(centroid.groundPixels).min
     val distanceRatio = Maff.clamp(distanceHome.toDouble / distanceMax, 0, 1)
     val multiplier    = 1.2 - 0.4 * distanceRatio
     Some(JudgmentModifier(gainedValueMultiplier = multiplier))
@@ -71,7 +71,8 @@ object JudgmentModifiers {
       ally.unitClass.isWorker
       && ally.visibleToOpponents
       && ally.friendly.exists(_.agent.toGather.exists(g =>
-        g.pixelDistanceEdge(ally) <= Gather.defenseRadiusPixels
+        g.base.exists(_.owner.isUs) // Don't assist distance miners
+        && g.pixelDistanceEdge(ally) <= Gather.defenseRadiusPixels
         && ally.matchups.threats.exists(t => t.pixelDistanceEdge(g) - t.pixelRangeAgainst(ally) <= Gather.defenseRadiusPixels))))
     val workersTotal = With.units.countOurs(MatchWorker)
     val workersRatio = Maff.nanToZero(workersImperiled.toDouble / workersTotal)
@@ -119,7 +120,7 @@ object JudgmentModifiers {
   //     and love dying
   def anchored(battleLocal: BattleLocal): Option[JudgmentModifier] = {
     lazy val fragileSlugs = battleLocal.us.units.exists(u => u.isAny(Terran.SiegeTankSieged, Protoss.Reaver) && ! u.friendly.exists(_.agent.ride.isDefined) && u.matchups.pixelsOfEntanglement > -32)
-    if (With.self.isProtoss && battleLocal.us.engaged() && fragileSlugs) {
+    if (With.self.isProtoss && battleLocal.us.engagedUpon && fragileSlugs) {
       Some(JudgmentModifier(targetDelta = -0.25))
     } else None
   }

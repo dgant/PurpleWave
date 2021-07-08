@@ -144,7 +144,7 @@ object DefaultCombat extends Action {
     rangeAgainstUs.map(rangeAgainst => Maff.clamp(rangeAgainst + 64, range - 16, range)).getOrElse(range - 16)
   }
   def regroupGoal(unit: FriendlyUnitInfo): Pixel = {
-    if (unit.battle.exists(_.us.units.size > 1)) unit.battle.get.us.centroidOf(unit)
+    if (unit.battle.exists(_.us.units.size > 1)) unit.battle.get.us.centroidKey
     else if (unit.agent.shouldEngage) unit.agent.destination
     else unit.agent.origin
   }
@@ -180,7 +180,7 @@ object DefaultCombat extends Action {
     lazy val purring = (unit.unitClass.isTerran && unit.unitClass.isMechanical && unit.alliesSquadThenBattle.flatten.exists(a => a.repairing && a.orderTarget.contains(unit)))
     transition(Aim, () => !unit.canMove || purring, () => aim(unit))
 
-    lazy val opponentBlocksGoal = unit.battle.exists(b => b.enemy.zones.contains(unit.agent.destination.zone) || b.teams.minBy(_.centroidAir().pixelDistanceSquared(unit.agent.destination)).enemy)
+    lazy val opponentBlocksGoal = unit.battle.exists(b => b.enemy.zones.contains(unit.agent.destination.zone) || b.teams.minBy(_.centroidAir.pixelDistanceSquared(unit.agent.destination)).enemy)
 
     // COG 2021: Disabling Regroup now that we have marching formations
     // transition(Regroup, () => ! unit.agent.shouldEngage && opponentBlocksGoal && unit.agent.withinSafetyMargin)

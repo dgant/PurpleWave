@@ -4,17 +4,21 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.GamePlans.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat}
+import Planning.Plans.Macro.BuildOrders.BuildOrder
+import Planning.Plans.Placement.BuildCannonsAtNatural
 import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss._
 import Utilities.GameTime
 
-class PvPRobo extends GameplanImperative {
+import scala.util.Random
+
+class PvPOpening extends GameplanImperative {
 
   var complete: Boolean = false
   var twoGateZealot: Boolean = false
   var twoGateGoon: Boolean = false
-  var twoGateReady: Boolean = false
+  var twoGateCommit: Boolean = false
   var zBeforeCore: Boolean = true
   var zAfterCore: Boolean = true
   var fiveZealot: Boolean = false
@@ -28,15 +32,13 @@ class PvPRobo extends GameplanImperative {
   override def activated: Boolean = employing(PvPRobo)
   override def completed: Boolean = complete
 
+  private val buildCannonsAtNatural = new BuildCannonsAtNatural(2)
   override def executeBuild(): Unit = {
     employing(PvPGateCoreTech, PvP3Zealot) // Because we don't explicitly reference these anywhere else
     if (units(Protoss.CyberneticsCore) > 0 && enemyDarkTemplarLikely) {
-      buildOrder(
-        Get(Protoss.RoboticsFacility),
-        Get(Protoss.Observatory),
-        Get(Protoss.Observer))
+      if (fiveZealot) { buildCannonsAtNatural.update() }
+      buildOrder(Get(Protoss.RoboticsFacility), Get(Protoss.Observatory), Get(Protoss.Observer))
     }
-
     buildOrder(
       Get(8, Protoss.Probe),
       Get(Protoss.Pylon),
@@ -69,8 +71,11 @@ class PvPRobo extends GameplanImperative {
           Get(4, Protoss.Pylon),
           Get(Protoss.Assimilator),
           Get(19, Protoss.Probe),
-          Get(Protoss.CyberneticsCore),
+          Get(Protoss.CyberneticsCore))
+        if (With.fingerprints.twoGate.matches) { buildOrder(Get(7, Protoss.Zealot)) } else { buildOrder(Get(3, Protoss.Gateway)) }
+        buildOrder(
           Get(21, Protoss.Probe),
+          Get(3, Protoss.Gateway),
           Get(2, Protoss.Dragoon),
           Get(Protoss.DragoonRange))
       } else {
@@ -82,13 +87,16 @@ class PvPRobo extends GameplanImperative {
           Get(18, Protoss.Probe),
           Get(3, Protoss.Pylon),
           Get(20, Protoss.Probe),
+          Get(4, Protoss.Pylon), // On paper this build requires losing the Zealots to free supply, but with mineral optimization we can easily afford the Pylon
           Get(2, Protoss.Dragoon),
-          Get(Protoss.DragoonRange))
-        // This build relies on losing its Zealots to free supply for Dragoons
-        // If we've somehow kept the Zealots, insert a Pylon here
-        if (units(Protoss.Zealot) > 0) { buildOrder(Get(3, Protoss.Pylon)) }
-        buildOrder(
           Get(21, Protoss.Probe),
+          Get(Protoss.DragoonRange),
+          Get(22, Protoss.Probe),
+          Get(3, Protoss.Gateway), // Also not in the build but we can afford it so let's
+          Get(4, Protoss.Dragoon),
+          Get(23, Protoss.Probe),
+          Get(5, Protoss.Pylon),
+          Get(24, Protoss.Probe),
           Get(6, Protoss.Dragoon))
       }
     } else {
@@ -143,8 +151,21 @@ class PvPRobo extends GameplanImperative {
     }
   }
 
+  trait OpeningContinuation
+  object OpeningRobo extends OpeningContinuation
+  object Opening5ZealotExpand extends OpeningContinuation
+  object Opening3GateExpand extends OpeningContinuation
+  object OpeningDT extends OpeningContinuation
+  object Opening4Gate extends OpeningContinuation
+  val allowReactive5ZealotExpand  : Boolean = Random.nextDouble() > 0.25
+  val allowReactive3GateExpand    : Boolean = Random.nextDouble() > 0.25
+  val allowReactiveDT             : Boolean = Random.nextDouble() > 0.4
+  val allowReactive4Gate          : Boolean = Random.nextDouble() > 0.4
+
   def execute(): Unit = {
     complete ||= bases > 1
+    val notExpectingDt = ! enemyRecentStrategy(With.fingerprints.dtRush)
+    val notExpectingRobo = ! enemyRecentStrategy(With.fingerprints.robo)
     if (units(Protoss.Gateway) > 1 || units(Protoss.Assimilator) == 0) {
       // TODO: Also do vs. 9-9 gate
       twoGateZealot ||= employing(PvP1012)
@@ -153,7 +174,7 @@ class PvPRobo extends GameplanImperative {
     fiveZealot = employing(PvP5Zealot)
     if (twoGateZealot && units(Protoss.CyberneticsCore) == 0) {
       // TODO: Do vs. 9-9 gate only
-      fiveZealot ||= enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate, With.fingerprints.nexusFirst)
+      fiveZealot ||= enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.gasSteal, With.fingerprints.twoGate, With.fingerprints.nexusFirst)
     }
     twoGateGoon = employing(PvPGateCoreGate)
     twoGateGoon &&= ! twoGateZealot
@@ -198,24 +219,24 @@ class PvPRobo extends GameplanImperative {
     shouldExpand = units(Protoss.Gateway) >= 2
     shouldExpand &&= ! With.fingerprints.dtRush.matches || unitsComplete(Protoss.Observer) > 0
     shouldExpand &&= ! With.fingerprints.dtRush.matches || (units(Protoss.Observer) > 0 && enemies(Protoss.DarkTemplar) == 0)
-    shouldExpand &&= shouldExpandTriggered || (
-      (safeToMoveOut && enemyStrategy(With.fingerprints.dtRush, With.fingerprints.twoGate))
-      || (safeToMoveOut && enemyLowUnitStrategy && unitsComplete(Protoss.Reaver) > 0)
+    shouldExpand &&= (
+          ((shouldExpandTriggered || safeToMoveOut) && enemyStrategy(With.fingerprints.dtRush) && unitsComplete(Protoss.Observer) > 0)
+      ||  ((shouldExpandTriggered || safeToMoveOut) && enemyLowUnitStrategy && unitsComplete(Protoss.Reaver) > 0)
       || unitsComplete(Protoss.Reaver, Protoss.Shuttle) >= 2)
     shouldExpandTriggered ||= shouldExpand
     shouldAttack = unitsComplete(Protoss.Zealot) > 0 && enemiesComplete(MatchWarriors, Protoss.PhotonCannon) == 0
     shouldAttack ||= With.fingerprints.cannonRush.matches
-    // Attack when using aggressive builds
-    shouldAttack ||= (twoGateZealot || twoGateGoon) && safeToMoveOut
-    // Counterattack vs. flimsy builds
-    shouldAttack ||= (
-      (enemyLowUnitStrategy || enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate))
-      && unitsComplete(Protoss.Dragoon) > 0
-      && (upgradeComplete(Protoss.DragoonRange) || ! enemyHasUpgrade(Protoss.DragoonRange) || safeToMoveOut))
+    // Attack when using a more aggressive build
+    shouldAttack ||= (twoGateZealot || twoGateGoon || enemyLowUnitStrategy) && safeToMoveOut
+    // Attack when we have range advantage
+    shouldAttack ||= unitsComplete(Protoss.Dragoon) > 0     && ! enemyHasShown(Protoss.Dragoon)         && (enemiesShown(Protoss.Zealot) > 2 || With.fingerprints.twoGate.matches)
+    shouldAttack ||= upgradeComplete(Protoss.DragoonRange)  && ! enemyHasUpgrade(Protoss.DragoonRange)  && (enemiesShown(Protoss.Zealot) > 2 || With.fingerprints.twoGate.matches)
     // Require DT backstab protection before attacking through a DT
     shouldAttack &&= (unitsComplete(Protoss.Observer) > 1 || ! enemyHasShown(Protoss.DarkTemplar))
     // Push out to take our natural
     shouldAttack ||= shouldExpand
+    // Ensure that committed Zealots keep wanting to attack
+    shouldAttack ||= With.units.ours.exists(u => u.agent.commit)
 
     status("PvPRobo")
     if (twoGateZealot) {
@@ -230,9 +251,33 @@ class PvPRobo extends GameplanImperative {
     if (oneGateTech) status("1GateTech") else status("2GateTech")
     if (getObservers) status("Obs") else status("NoObs")
     if (shuttleFirst) status("ShuttleFirst") else status("ShuttleLater")
+    if (twoGateCommit) status("2GateCommit")
     if (shouldAttack) status("Attack") else status("Defend")
     if (shouldExpand) status("ExpandNow") else status("ExpandLater")
 
+    if (twoGateZealot) {
+      PvPGateCoreGate.deactivate()
+      PvPGateCoreTech.deactivate()
+      if (fiveZealot) {
+        PvP3Zealot.deactivate()
+        PvP5Zealot.activate()
+      } else {
+        PvP3Zealot.activate()
+        PvP5Zealot.deactivate()
+      }
+    } else {
+      PvPGateCore.activate()
+      if (twoGateGoon) {
+        PvPGateCoreGate.activate()
+        PvPGateCoreTech.deactivate()
+      } else {
+        PvPGateCoreGate.deactivate()
+        PvPGateCoreTech.activate()
+      }
+    }
+
+
+    oversaturate = units(Protoss.Gateway) > 1
     if (shouldAttack) { attack() }
     if (enemies(Protoss.Dragoon) == 0) {
       if (twoGateZealot) {
@@ -252,12 +297,11 @@ class PvPRobo extends GameplanImperative {
         // Wait until we have at least three Zealots together; then go in hard
         aggression(0.75)
         val zealots = With.units.ours.filter(u => Protoss.Zealot(u) && u.battle.exists(_.us.units.count(Protoss.Zealot) > 2)).toVector
-        twoGateReady ||= zealots.size > 2
-        if (twoGateReady) {
+        twoGateCommit ||= zealots.size > 2
+        if (twoGateCommit) {
           With.blackboard.pushKiters.set(true)
           zealots.foreach(_.agent.commit = true)
         }
-
       }
     }
     else if (With.strategy.isInverted) { aggression(1.2) }
@@ -280,6 +324,12 @@ class PvPRobo extends GameplanImperative {
         Get(Protoss.DragoonRange),
         Get(3, Protoss.Pylon),
         Get(3, Protoss.Dragoon))
+    }
+    if (twoGateZealot) {
+      // We're tight on gas and can fit in a round of Zealots
+      new BuildOrder(
+        Get(5, Protoss.Zealot),
+        Get(3, Protoss.Gateway))
     }
     get(Protoss.RoboticsFacility)
     buildOrder(Get(2, Protoss.Dragoon))
@@ -305,8 +355,6 @@ class PvPRobo extends GameplanImperative {
     trainGatewayUnits()
 
     if (With.fingerprints.dtRush.matches) { get(Protoss.ObserverSpeed) }
-    get(2, Protoss.Gateway)
-    pumpWorkers(oversaturate = true)
     get(3, Protoss.Gateway)
   }
 

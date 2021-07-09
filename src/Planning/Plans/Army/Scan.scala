@@ -1,6 +1,7 @@
 package Planning.Plans.Army
 
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Planning.Plan
@@ -28,7 +29,7 @@ class Scan extends Plan {
         && defender.inRangeToAttack(ninja)))
     
     if (cloakedTargets.nonEmpty) {
-      val biggestThreat = cloakedTargets.maxBy(_.matchups.vpfDealingInRange)
+      val biggestThreat = cloakedTargets.maxBy(t => Maff.max(t.matchups.targetsInRange.map(_.subjectiveValue)).getOrElse(0.0))
       scan(biggestThreat.pixel)
       return
     }

@@ -9,6 +9,7 @@ trait UnitGroup {
   def groupUnits: Seq[UnitInfo]
 
   def attackers       = _attackers()
+  def detectors       = _detectors()
   def attacksAir      = _attacksAir()
   def attacksGround   = _attacksGround()
   def catchesAir      = _catchesAir()
@@ -24,6 +25,7 @@ trait UnitGroup {
   def threatConsensus = _threatConsensus()
 
   private def _attackers()      = groupUnits.view.filter(u => u.unitClass.canAttack  && ! u.unitClass.isWorker)
+  private def _detectors()      = groupUnits.view.filter(u => u.aliveAndComplete && u.unitClass.isDetector)
   private val _attacksAir       = new Cache(() => attackers.exists(_.canAttackAir))
   private val _attacksGround    = new Cache(() => attackers.exists(_.canAttackGround))
   private val _catchesAir       = new Cache(() => attackers.exists(a => (a.pixelRangeAir > 96 || a.flying) && a.canAttackAir))

@@ -13,13 +13,13 @@ import scala.util.Random
 
 class SquadClearExpansionBlockers extends Squad {
   
-  val detectors = new LockUnits(this)
-  detectors.matcher = MatchMobileDetector
-  detectors.counter = CountOne
+  val detectorLock = new LockUnits(this)
+  detectorLock.matcher = MatchMobileDetector
+  detectorLock.counter = CountOne
 
-  val clearers = new LockUnits(this)
-  clearers.matcher = MatchOr(Terran.Marine, Terran.Firebat, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk)
-  clearers.counter = CountOne
+  val sweeperLock = new LockUnits(this)
+  sweeperLock.matcher = MatchOr(Terran.Marine, Terran.Firebat, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk)
+  sweeperLock.counter = CountOne
 
   def recruit(): Unit = {
     if (With.frame < Minutes(6)()) return
@@ -31,27 +31,27 @@ class SquadClearExpansionBlockers extends Squad {
       .flatMap(_.intent.toBuildTile.map(_.topLeftPixel))
 
     if (target.isEmpty) {
-      detectors.release()
-      clearers.release()
+      detectorLock.release()
+      sweeperLock.release()
       return
     }
 
     vicinity = target.get
-    detectors.preference = PreferClose(vicinity)
-    addUnits(detectors.acquire(this))
+    detectorLock.preference = PreferClose(vicinity)
+    addUnits(detectorLock.acquire(this))
 
-    if (With.enemies.exists(_.isZerg) || detectors.units.forall(_.framesToTravelTo(vicinity) > Seconds(5)())) {
-      clearers.preference = PreferClose(vicinity)
-      addUnits(clearers.acquire(this))
+    if (With.enemies.exists(_.isZerg) || detectorLock.units.forall(_.framesToTravelTo(vicinity) > Seconds(5)())) {
+      sweeperLock.preference = PreferClose(vicinity)
+      addUnits(sweeperLock.acquire(this))
     } else {
-      clearers.release()
+      sweeperLock.release()
     }
   }
 
   def run(): Unit = {
     if (units.isEmpty) return
     targetQueue = Some(SquadAutomation.rankedEnRoute(this, vicinity))
-    detectors.units.foreach(_.intend(this, new Intention { toTravel = Some(vicinity.add(64, 48)) }))
-    clearers.units.foreach(_.intend(this, new Intention { toTravel = Some(vicinity.add(Random.nextInt(192) - 96, Random.nextInt(160) - 80)) }))
+    detectorLock.units.foreach(_.intend(this, new Intention { toTravel = Some(vicinity.add(64, 48)) }))
+    sweeperLock.units.foreach(_.intend(this, new Intention { toTravel = Some(vicinity.add(Random.nextInt(192) - 96, Random.nextInt(160) - 80)) }))
   }
 }

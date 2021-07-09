@@ -3,31 +3,37 @@ package Micro.Matchups
 import Information.Battles.BattleClassificationFilters
 import Lifecycle.With
 import Mathematics.Maff
-import Micro.Heuristics.MicroValue
 import Performance.Cache
 import Planning.UnitMatchers.MatchTank
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
-
+import Tactics.Squads.{GenericUnitGroup, UnitGroup}
 
 case class MatchupAnalysis(me: UnitInfo) {
   // Default units allow identification of targets when destroying an empty base, because no Battle is happening
   // The necessity of this is a good argument for defining battles even if they would have trivial simulation results
-  private def defaultUnits  : Seq[UnitInfo]         = if (me.canAttack) me.zone.units.view.filter(u => u.isEnemy && BattleClassificationFilters.isEligibleLocal(u)) else Seq.empty.view
-  private def battleUnits   : Option[Seq[UnitInfo]] = me.battle.map(_.teams.view.flatMap(_.units))
-  private def battleEnemies : Option[Seq[UnitInfo]] = me.team.map(_.opponent.units.view)
+  private def defaultUnits: Seq[UnitInfo] = if (me.canAttack) me.zone.units.view.filter(u => u.isEnemy && BattleClassificationFilters.isEligibleLocal(u)) else Seq.empty.view
+
+  val groupUs: UnitGroup = me.team.orElse(me.friendly.flatMap(_.squad)).getOrElse(GenericUnitGroup(Seq(me)))
+  val groupEnemy: UnitGroup = me.team.map(_.opponent)
+    .orElse(me.friendly.flatMap(_.squad.flatMap(_.targetQueue.map(GenericUnitGroup))))
+    .orElse(me.friendly.flatMap(_.squad.flatMap(s => Some(GenericUnitGroup(s.enemies)))))
+    .getOrElse(GenericUnitGroup(defaultUnits))
+
+  private def battleAll     : Option[Seq[UnitInfo]] = me.battle.map(_.teams.view.flatMap(_.units))
   private def battleUs      : Option[Seq[UnitInfo]] = me.team.map(_.units.view)
+  private def battleEnemies : Option[Seq[UnitInfo]] = me.team.map(_.opponent.units.view)
   private def entrants      : Seq[UnitInfo]         = me.battle.flatMap(With.matchups.entrants.get).getOrElse(Seq.empty).view
 
   private def withEntrants(source: Seq[UnitInfo], filter: (UnitInfo) => Boolean = (unit) => true): Seq[UnitInfo] = source ++ entrants.filter(filter).filterNot(source.contains)
 
-  def allUnits                : Seq[UnitInfo] = battleUnits.map(withEntrants(_)).getOrElse(defaultUnits)
+  def allUnits                : Seq[UnitInfo] = battleAll.map(withEntrants(_)).getOrElse(defaultUnits)
   def enemies                 : Seq[UnitInfo] = battleEnemies.map(withEntrants(_, _.isEnemy)).getOrElse(defaultUnits.filter(_.isEnemyOf(me)))
   def alliesInclSelf          : Seq[UnitInfo] = battleUs.map(withEntrants(_, _.isFriendly)).getOrElse(defaultUnits.filterNot(_.isEnemyOf(me)))
   def alliesInclSelfCloaked   : Seq[UnitInfo] = alliesInclSelf.filter(_.cloakedOrBurrowed)
   def allies                  : Seq[UnitInfo] = alliesInclSelf.filterNot(_.id == me.id)
   def others                  : Seq[UnitInfo] = enemies ++ allies
-  def enemyDetectors          : Seq[UnitInfo] = enemies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
+  def enemyDetectors          : Seq[UnitInfo] = groupEnemy.detectors
   def threats                 : Seq[UnitInfo] = enemies.filter(threatens(_, me)).filterNot(Protoss.Interceptor)
   def targets                 : Seq[UnitInfo] = enemies.filter(threatens(me, _))
   def threatsInRange          : Seq[UnitInfo] = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me))
@@ -39,13 +45,11 @@ case class MatchupAnalysis(me: UnitInfo) {
   lazy val allyTemplarCount           : Cache[Int]        = new Cache(() => allies.count(Protoss.HighTemplar))
   lazy val splashFactorMax            : Double  = splashFactorForUnits(targets)
   lazy val splashFactorInRange        : Double  = splashFactorForUnits(targetsInRange)
-  lazy val valuePerDamage             : Double  = MicroValue.valuePerDamageCurrentHp(me)
-  lazy val vpfDealingInRange          : Double  = splashFactorInRange * Maff.max(targetsInRange.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
   lazy val dpfReceiving               : Double  = threatsInRange.view.map(_.matchups.dpfDealingDiffused(me)).sum
-  lazy val vpfReceiving               : Double  = valuePerDamage * dpfReceiving
   lazy val framesToLive               : Double  = Maff.nanToInfinity(me.totalHealth / dpfReceiving)
   lazy val framesOfSafety             : Double  = - With.latency.latencyFrames - With.reaction.agencyAverage - Maff.nanToZero(pixelsOfEntanglement / me.topSpeed)
   lazy val pixelsOfEntanglement       : Double  = Maff.max(threats.map(me.pixelsOfEntanglement)).getOrElse(- With.mapPixelWidth)
+  lazy val pixelsOfSafety             : Double  = - pixelsOfEntanglement
   lazy val pixelsToReachAnyTarget     : Double  = Maff.max(targets.map(me.pixelsToGetInRange)).getOrElse(With.mapPixelWidth)
 
   protected def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = (

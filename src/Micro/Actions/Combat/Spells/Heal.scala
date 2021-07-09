@@ -6,7 +6,6 @@ import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-
 object Heal extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
@@ -46,11 +45,8 @@ object Heal extends Action {
     val lifetimeFrames  = patient.matchups.framesToLive
     val damage          = patient.unitClass.maxHitPoints - patient.hitPoints
     val safety          = Maff.signum(Math.max(0.0, patient.matchups.framesOfSafety))
-    val receiving       = Maff.signum(patient.matchups.vpfReceiving)
-    val dealing         = Maff.signum(patient.matchups.vpfDealingInRange)
     val valueWorthwhile = Maff.clamp(Math.min(lifetimeFrames, safety) - distanceFrames, 1.0, 24.0)
-    val valueTrading    = (1.0 + receiving) * (1.0 + dealing)
-    val output          = (1.0 + damage) * valueWorthwhile * valueTrading
+    val output          = (1.0 + damage) * valueWorthwhile
     output
   }
 }

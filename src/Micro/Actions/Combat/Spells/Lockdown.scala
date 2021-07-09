@@ -19,7 +19,8 @@ object Lockdown extends TargetedSpell {
     if (target.unitClass.isBuilding)      return 0.0
     if (target.lockedDown)                return 0.0
     
-    val output = target.subjectiveValue / Math.max(1.0, caster.pixelDistanceEdge(target) - 32 * castRangeTiles - caster.matchups.pixelsOfSafety)
+    val reach = caster.pixelDistanceEdge(target) - 32 * castRangeTiles
+    val output = target.subjectiveValue / Math.max(1.0, reach + caster.matchups.pixelsOfEntanglement)
     output
   }
 }

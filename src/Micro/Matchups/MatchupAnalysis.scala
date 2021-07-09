@@ -27,13 +27,12 @@ case class MatchupAnalysis(me: UnitInfo) {
 
   private def withEntrants(source: Seq[UnitInfo], filter: (UnitInfo) => Boolean = (unit) => true): Seq[UnitInfo] = source ++ entrants.filter(filter).filterNot(source.contains)
 
-  def allUnits                : Seq[UnitInfo] = battleAll.map(withEntrants(_)).getOrElse(defaultUnits)
-  def enemies                 : Seq[UnitInfo] = battleEnemies.map(withEntrants(_, _.isEnemy)).getOrElse(defaultUnits.filter(_.isEnemyOf(me)))
-  def alliesInclSelf          : Seq[UnitInfo] = battleUs.map(withEntrants(_, _.isFriendly)).getOrElse(defaultUnits.filterNot(_.isEnemyOf(me)))
-  def alliesInclSelfCloaked   : Seq[UnitInfo] = alliesInclSelf.filter(_.cloakedOrBurrowed)
+  def alliesInclSelf          : Seq[UnitInfo] = battleUs.map(withEntrants(_, _.isFriendly)).getOrElse(groupUs.groupUnits.view)
   def allies                  : Seq[UnitInfo] = alliesInclSelf.filterNot(_.id == me.id)
+  def enemies                 : Seq[UnitInfo] = battleEnemies.map(withEntrants(_, _.isEnemy)).getOrElse(groupEnemy.groupUnits.view)
   def others                  : Seq[UnitInfo] = enemies ++ allies
-  def enemyDetectors          : Seq[UnitInfo] = groupEnemy.detectors
+  def allUnits                : Seq[UnitInfo] = others :+ me
+  def enemyDetectors          : Seq[UnitInfo] = groupEnemy.detectors.view
   def threats                 : Seq[UnitInfo] = enemies.filter(threatens(_, me)).filterNot(Protoss.Interceptor)
   def targets                 : Seq[UnitInfo] = enemies.filter(threatens(me, _))
   def threatsInRange          : Seq[UnitInfo] = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me))
@@ -49,7 +48,6 @@ case class MatchupAnalysis(me: UnitInfo) {
   lazy val framesToLive               : Double  = Maff.nanToInfinity(me.totalHealth / dpfReceiving)
   lazy val framesOfSafety             : Double  = - With.latency.latencyFrames - With.reaction.agencyAverage - Maff.nanToZero(pixelsOfEntanglement / me.topSpeed)
   lazy val pixelsOfEntanglement       : Double  = Maff.max(threats.map(me.pixelsOfEntanglement)).getOrElse(- With.mapPixelWidth)
-  lazy val pixelsOfSafety             : Double  = - pixelsOfEntanglement
   lazy val pixelsToReachAnyTarget     : Double  = Maff.max(targets.map(me.pixelsToGetInRange)).getOrElse(With.mapPixelWidth)
 
   protected def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = (

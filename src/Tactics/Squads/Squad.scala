@@ -13,7 +13,7 @@ import Tactics.Squads.Qualities.QualityCounter
 
 import scala.collection.mutable.ArrayBuffer
 
-trait Squad extends Prioritized with FriendlyGroupConsensus {
+trait Squad extends Prioritized with FriendlyUnitGroup {
   var batchId: Int = Int.MinValue
   var vicinity: Pixel = SpecificPoints.middle
   var formations: ArrayBuffer[Formation] = ArrayBuffer.empty
@@ -84,7 +84,7 @@ trait Squad extends Prioritized with FriendlyGroupConsensus {
     units.groupBy(_.unitClass).map(group => (group._1, group._2.maxBy(unit => 100000L * unit.squadAge - unit.frameDiscovered)))
   )
 
-  final protected def consensusFriendlyUnits: Seq[FriendlyUnitInfo] = units
+  final def groupFriendlyUnits: Seq[FriendlyUnitInfo] = units
 
   override def toString: String = ToString(this).replace("Squad", "")
 }

@@ -45,7 +45,7 @@ class DefendAgainstProxy extends Prioritized {
     proxies.foreach(proxy => {
       val isAnnoying          = proxy.unitClass.isGas || proxy.base.exists(_.resourcePathTiles.exists(proxy.tileArea.contains))
       val isEmergency         = proxy.isAny(Terran.Barracks, Terran.Bunker, Protoss.PhotonCannon, Protoss.Gateway) && (proxy.powered || ! proxy.unitClass.isProtoss || With.units.enemy.exists(u => u.is(Protoss.Pylon) && With.grids.psi3Height.psiPoints.view.map(u.tileTopLeft.add).contains(proxy.tileTopLeft)))
-      val isCloseEnoughToPull = Seq(With.geography.ourMain, With.geography.ourNatural).exists(_.townHallArea.midpoint.groundPixels(proxy.tile) < 32 * 21)
+      val isCloseEnoughToPull = Seq(With.geography.ourMain, With.geography.ourNatural).exists(_.townHallArea.midpoint.pixelDistanceGround(proxy.tile) < 32 * 21)
       val mustPull            = proxy.dpfGround > 0 && With.geography.ourBases.exists(_.resourcePathTiles.exists(_.center.pixelDistance(proxy.pixel) < proxy.effectiveRangePixels + 32))
       val framesBeforeDamage  = Maff
         .min(With.units.enemy.filter(u =>

@@ -15,10 +15,10 @@ class MissionKillExpansion extends Mission {
     With.scouting.enemyMain.map(main =>
       With.geography.enemyBases
         .filterNot(_.metro == main.metro)
-        .filter(b => With.scouting.muscleOrigin.groundPixels(b.heart) + 320 < With.scouting.threatOrigin.groundPixels(b.heart))).getOrElse(Seq.empty)
+        .filter(b => With.scouting.muscleOrigin.pixelDistanceGround(b.heart) + 320 < With.scouting.threatOrigin.pixelDistanceGround(b.heart))).getOrElse(Seq.empty)
   }
 
-  def best: Option[Base] = Maff.maxBy(eligible)(b => b.heart.groundPixels(With.scouting.threatOrigin) - b.heart.groundPixels(With.geography.home))
+  def best: Option[Base] = Maff.maxBy(eligible)(b => b.heart.pixelDistanceGround(With.scouting.threatOrigin) - b.heart.pixelDistanceGround(With.geography.home))
 
   override def shouldForm: Boolean = With.blackboard.wantToAttack() && best.isDefined
 
@@ -44,6 +44,6 @@ class MissionKillExpansion extends Mission {
     if (vicinity.base.exists(b => units.exists(_.base.contains(b)))) {
       lastFrameInBase = With.frame
     }
-    SquadAutomation.targetAndSend(this)
+    SquadAutomation.targetFormAndSend(this)
   }
 }

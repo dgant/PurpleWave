@@ -27,7 +27,7 @@ class Geography extends TimedTask {
   lazy val metros             : Vector[Metro]         = ZoneBuilder.metros.toVector
   lazy val ourMain            : Base                  = With.geography.ourBases.find(_.isStartLocation).getOrElse(With.geography.bases.minBy(_.heart.tileDistanceFast(With.self.startTile)))
   lazy val ourMetro           : Metro                 = ourMain.metro
-  lazy val rushDistances      : Vector[Double]        = startLocations.flatMap(s1 => startLocations.filterNot(_ == s1).map(s2 => s1.groundPixels(s2))).toSet.toVector
+  lazy val rushDistances      : Vector[Double]        = startLocations.flatMap(s1 => startLocations.filterNot(_ == s1).map(s2 => s1.pixelDistanceGround(s2))).toSet.toVector
   def ourNatural              : Base                  = ourNaturalCache()
   def ourZones                : Vector[Zone]          = ourZonesCache()
   def ourBases                : Vector[Base]          = ourBasesCache()
@@ -52,7 +52,7 @@ class Geography extends TimedTask {
   private val ourNaturalCache = new Cache(() =>
     (if (ourMain.owner.isUs) ourMain.natural else None)
       .getOrElse(bases.find(_.isNaturalOf.exists(_.owner.isUs))
-      .getOrElse(bases.minBy(_.townHallTile.groundPixels(ourMain.townHallTile)))))
+      .getOrElse(bases.minBy(_.townHallTile.pixelDistanceGround(ourMain.townHallTile)))))
   
   def zoneByTile(tile: Tile): Zone = if (tile.valid) zoneByTileCacheValid(tile.i) else zoneByTileCacheInvalid(tile)
   def baseByTile(tile: Tile): Option[Base] = if (tile.valid) baseByTileCacheValid(tile.i) else Maff.minBy(zoneByTileCacheInvalid(tile).bases)(_.heart.tileDistanceSquared(tile))

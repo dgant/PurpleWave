@@ -13,5 +13,5 @@ class BuildBunkersAtEnemy(
     towersRequired,
     placement) {
   
-  override def eligibleBases: Iterable[Base] = Maff.minBy(With.geography.enemyBases)(_.heart.groundPixels(With.geography.home))
+  override def eligibleBases: Iterable[Base] = Maff.minBy(With.geography.enemyBases)(_.heart.pixelDistanceGround(With.geography.home))
 }

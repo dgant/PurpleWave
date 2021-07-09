@@ -32,7 +32,7 @@ class PlaceIslandPylons extends ProposePlacement {
       Maff.minBy(
         With.geography.bases
           .filter(b => b != With.geography.ourMain && b != With.geography.ourNatural)
-          .map(_.zone))(_.centroid.groundPixels(With.geography.home)))
+          .map(_.zone))(_.centroid.pixelDistanceGround(With.geography.home)))
 )}
 
 class IslandCarrierUpgrades extends Parallel(

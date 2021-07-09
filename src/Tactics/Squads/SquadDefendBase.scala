@@ -70,7 +70,7 @@ class SquadDefendBase(base: Base) extends Squad {
       && ! guardZone.edges.exists(edge => e.pixelDistanceCenter(edge.pixelCenter) < 64 + edge.radiusPixels))
 
     val targets = if (canScour) scourables else enemies.filter(threateningBase)
-    targetQueue = Some(SquadAutomation.rankForArmy(units, targets))
+    targetQueue = Some(SquadAutomation.rankForArmy(this, targets))
     lazy val formationScour = FormationGeneric.engage(units, targetQueue.get.headOption.map(_.pixel))
     lazy val formationBastion = FormationGeneric.march(units, bastion())
     lazy val formationGuard = guardChoke.map(c => FormationZone(units, guardZone, c)).getOrElse(formationBastion)

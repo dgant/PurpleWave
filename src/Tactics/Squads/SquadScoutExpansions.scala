@@ -1,10 +1,8 @@
 package Tactics.Squads
 
 import Lifecycle.With
-import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Performance.Cache
-import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers._
 import Planning.UnitPreferences.PreferClose
@@ -29,9 +27,8 @@ class SquadScoutExpansions extends Squad {
     }
   }
 
-  val scoutLock = new LockUnits(this)
-  scoutLock.counter = CountOne
-  scoutLock.matcher = MatchOr(
+  lock.counter = CountOne
+  lock.matcher = MatchOr(
     Terran.Marine,
     Terran.Firebat,
     Terran.Vulture,
@@ -54,25 +51,24 @@ class SquadScoutExpansions extends Squad {
       .sortBy(base => -With.scouting.baseIntrigue.getOrElse(base, 0.0))
       .sortBy(_.zone.island))
 
-  def destination: Pixel = scoutableBases().headOption.map(_.townHallArea.center).getOrElse(With.geography.home.center)
-
   def recruit(): Unit = {
     if (With.frame < frameToScout()) return
     if (With.geography.ourBases.size < 2) return
-    if (!With.blackboard.wantToAttack() && !With.blackboard.wantToHarass()) return
+    if ( ! With.blackboard.wantToAttack() &&  ! With.blackboard.wantToHarass()) return
 
     if (scoutableBases().isEmpty) return
-    scoutLock.preference = PreferClose(destination)
-    val scouts = scoutLock.acquire(this)
+    vicinity = scoutableBases().headOption.map(_.townHallArea.center).getOrElse(With.geography.home.center)
+    lock.preference = PreferClose(vicinity)
+    val scouts = lock.acquire(this)
     if (scouts.isEmpty) return
     scouts.foreach(addUnit)
   }
 
   def run(): Unit = {
     if (units.isEmpty) return
-    targetQueue = Some(SquadAutomation.rankedEnRouteTo(units, destination))
+    targetQueue = Some(SquadAutomation.rankedEnRoute(this, vicinity))
     units.foreach(_.intend(this, new Intention {
-      toTravel = Some(destination)
+      toTravel = Some(vicinity)
     }))
   }
 }

@@ -48,7 +48,7 @@ object BeReaver extends Action {
     val here = unit.tile
     var shouldDrop = false
     shouldDrop = shouldDrop || (unit.matchups.targetsInRange.exists(MatchWorker) && unit.matchups.threats.forall(t => MatchWorker(t) || (! t.canMove && t.pixelsToGetInRange(unit) > 32)))
-    shouldDrop = shouldDrop || here.groundPixels(destinationGround) < 32
+    shouldDrop = shouldDrop || here.pixelDistanceGround(destinationGround) < 32
     shouldDrop = shouldDrop || unit.inRangeToAttack(target) && ! With.grids.enemyRangeGround.inRange(here) && ! unit.matchups.threats.exists(t => t.is(Terran.SiegeTankSieged) && t.inRangeToAttack(unit, here.center))
     if (shouldDrop) {
       Commander.attack(unit)
@@ -100,7 +100,7 @@ object BeReaver extends Action {
         t.valid
         && t.walkable
         && With.grids.enemyRangeAirGround.get(t) == 0
-        && t.groundPixels(goalTile) < 1.5 * reaver.effectiveRangePixels
+        && t.pixelDistanceGround(goalTile) < 1.5 * reaver.effectiveRangePixels
         && ! reaver.matchups.threats.exists(t => t.is(Terran.SiegeTankSieged) && t.inRangeToAttack(reaver, t.pixel)))
       .map(tile => (
         tile,

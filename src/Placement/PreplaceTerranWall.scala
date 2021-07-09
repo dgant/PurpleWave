@@ -22,8 +22,8 @@ object PreplaceTerranWall {
     val searchEnd = searchStart.add(2 * searchRadius - 2, 2 * searchRadius - 1)
     val searchArea = TileRectangle(searchStart, searchEnd)
     val zoneOut = zone.exit.get.otherSideof(zone)
-    val tileIn = Maff.minBy(zone.tilesBuildable.view.filterNot(searchArea.expand(1, 1).contains))(_.groundPixels(zone.exit.get.pixelCenter))
-    val tileOut = Maff.minBy(zoneOut.tilesBuildable.view.filterNot(searchArea.expand(1, 1).contains))(_.groundPixels(zone.exit.get.pixelCenter))
+    val tileIn = Maff.minBy(zone.tilesBuildable.view.filterNot(searchArea.expand(1, 1).contains))(_.pixelDistanceGround(zone.exit.get.pixelCenter))
+    val tileOut = Maff.minBy(zoneOut.tilesBuildable.view.filterNot(searchArea.expand(1, 1).contains))(_.pixelDistanceGround(zone.exit.get.pixelCenter))
     if (tileIn.isEmpty) return None
     if (tileOut.isEmpty) return None
     val altitudes = Seq(tileIn.get.altitude, tileOut.get.altitude).distinct

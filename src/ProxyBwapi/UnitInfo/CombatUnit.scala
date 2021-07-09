@@ -125,8 +125,8 @@ trait CombatUnit {
   @inline final def pixelDistanceSquared    (otherPixel:  Pixel)            : Double  = pixel.pixelDistanceSquared(otherPixel)
   @inline final def pixelDistanceTravelling (destination: Pixel)            : Double  = pixelDistanceTravelling(pixel, destination)
   @inline final def pixelDistanceTravelling (destination: Tile)             : Double  = pixelDistanceTravelling(pixel, destination.center)
-  @inline final def pixelDistanceTravelling (from: Pixel, to: Pixel)        : Double  = if (flying) from.pixelDistance(to) else from.nearestWalkableTile.groundPixels(to.nearestWalkableTile)
-  @inline final def pixelDistanceTravelling (from: Tile,  to: Tile)         : Double  = if (flying) from.center.pixelDistance(to.center) else from.nearestWalkableTile.groundPixels(to.nearestWalkableTile)
+  @inline final def pixelDistanceTravelling (from: Pixel, to: Pixel)        : Double  = if (flying) from.pixelDistance(to) else from.nearestWalkableTile.pixelDistanceGround(to.nearestWalkableTile)
+  @inline final def pixelDistanceTravelling (from: Tile,  to: Tile)         : Double  = if (flying) from.center.pixelDistance(to.center) else from.nearestWalkableTile.pixelDistanceGround(to.nearestWalkableTile)
   @inline final def pixelsTravelledMax(framesAhead: Int): Double = if (canMove) topSpeed * framesAhead else 0.0
   @inline final def pixelReachAir     (framesAhead: Int): Double = pixelsTravelledMax(framesAhead) + pixelRangeAir
   @inline final def pixelReachGround  (framesAhead: Int): Double = pixelsTravelledMax(framesAhead) + pixelRangeGround

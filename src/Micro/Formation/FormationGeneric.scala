@@ -64,9 +64,9 @@ object FormationGeneric {
       val path = new PathfindProfile(floodOrigin, Some(floodGoal), employGroundDist = true).find
       if ( ! path.pathExists) return FormationEmpty
       val patht = path.tiles.get.view
-      floodMaxDistanceGoal    = floodOrigin.groundTilesManhattan(floodGoal) - 2
+      floodMaxDistanceGoal    = floodOrigin.tileDistanceGroundManhattan(floodGoal) - 2
       floodMinDistanceGoal    = floodMaxDistanceGoal - 6
-      floodStart              = patht.find(_.groundTilesManhattan(floodGoal) == floodMinDistanceGoal).orElse(patht.find(_.groundTilesManhattan(floodGoal) == floodMinDistanceGoal + 1)).getOrElse(floodGoal)
+      floodStart              = patht.find(_.tileDistanceGroundManhattan(floodGoal) == floodMinDistanceGoal).orElse(patht.find(_.tileDistanceGroundManhattan(floodGoal) == floodMinDistanceGoal + 1)).getOrElse(floodGoal)
       floodMaxThreat          = With.grids.enemyRangeGround.margin
       floodCostDistanceGoal   = 5
       floodCostDistanceOrigin = 1
@@ -104,7 +104,7 @@ object FormationGeneric {
     floodHorizon.foreach(tile => explored.set(tile._1, true))
     while (floodHorizon.nonEmpty && unplaced.exists(_._1.nonEmpty) ) {
       val tile = floodHorizon.dequeue()._1
-      lazy val distanceTileToGoal = tile.groundTilesManhattan(floodGoal)
+      lazy val distanceTileToGoal = tile.tileDistanceGroundManhattan(floodGoal)
       if (tile.walkable
           && (floodMinDistanceGoal  <= 0    || floodMinDistanceGoal  <= distanceTileToGoal)
           && (floodMaxDistanceGoal  >= inf  || floodMaxDistanceGoal  >= distanceTileToGoal)
@@ -145,8 +145,8 @@ object FormationGeneric {
   @inline private final def vGrid = With.grids.enemyVulnerabilityGround
   private final def cost(tile: Tile): Int = {
     if ( ! tile.walkable) return With.mapPixelPerimeter
-    val costDistanceGoal    = if (floodCostDistanceGoal == 0)   0 else floodCostDistanceGoal    * tile.groundTilesManhattan(floodGoal)
-    val costDistanceOrigin  = if (floodCostDistanceOrigin == 0) 0 else floodCostDistanceOrigin  * tile.groundTilesManhattan(floodOrigin)
+    val costDistanceGoal    = if (floodCostDistanceGoal == 0)   0 else floodCostDistanceGoal    * tile.tileDistanceGroundManhattan(floodGoal)
+    val costDistanceOrigin  = if (floodCostDistanceOrigin == 0) 0 else floodCostDistanceOrigin  * tile.tileDistanceGroundManhattan(floodOrigin)
     val costThreat          = if (floodCostThreat == 0)         0 else floodCostThreat          * With.grids.enemyRangeGround(tile)
     val costVulnerability   = if (floodCostVulnerability == 0)  0 else floodCostVulnerability   * Math.max(0, vGrid.margin + vGrid.maxVulnerability - vGrid(tile))
     // TODO: The vulnerability cost should vary based on the range of the unit.

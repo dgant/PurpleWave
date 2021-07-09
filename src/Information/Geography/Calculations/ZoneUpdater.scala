@@ -46,7 +46,7 @@ object ZoneUpdater {
     }))
   
     With.geography.home = Maff
-      .minBy(With.geography.ourBases)(_.townHallTile.nearestWalkableTile.groundTilesManhattan(With.geography.home.nearestWalkableTile))
+      .minBy(With.geography.ourBases)(_.townHallTile.nearestWalkableTile.tileDistanceGroundManhattan(With.geography.home.nearestWalkableTile))
       .map(_.townHallTile)
       .getOrElse(SpecificPoints.tileMiddle)
   }

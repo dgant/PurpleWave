@@ -23,7 +23,7 @@ class SquadCloakedHarass extends Squad {
     val basesToConsider = With.geography.bases.filterNot(_.owner.isUs)
     val basesWithDetection = basesToConsider.map(base => (base, baseHasDetection(base))).toMap
     val basesToHarass = basesToConsider
-      .sortBy(_.heart.groundPixels(With.scouting.mostBaselikeEnemyTile))
+      .sortBy(_.heart.pixelDistanceGround(With.scouting.mostBaselikeEnemyTile))
       .sortBy(_.owner.isNeutral)
       .sortBy( - baseWorkers(_))
       .sortBy(basesWithDetection)

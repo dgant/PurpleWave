@@ -18,7 +18,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   private def isValidGas      (unit: UnitInfo): Boolean = unit.alive && (unit.base.exists(longDistanceBases.contains) || unit.base.exists(isValidBase)) && unit.isOurs && unit.unitClass.isGas && unit.remainingCompletionFrames < 24 * 8
   private class Slot(var resource: UnitInfo, val order: Int) {
     val tile        : Tile    = resource.tileTopLeft
-    val base        : Base    = resource.base.getOrElse(With.geography.bases.minBy(_.heart.groundPixels(resource.tileTopLeft)))
+    val base        : Base    = resource.base.getOrElse(With.geography.bases.minBy(_.heart.pixelDistanceGround(resource.tileTopLeft)))
     val distance    : Double  = Maff.broodWarDistanceBox(resource.topLeft, resource.bottomRight, base.townHallArea.startPixel, base.townHallArea.endPixel)
     var lastUpdate  : Int     = - Forever()
     var worker      : Option[FriendlyUnitInfo] = None
@@ -26,7 +26,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     def mineable    : Boolean = isValidResource(resource)
   }
   private lazy val mineralSlots: Map[Base, Vector[Slot]] = With.units.neutral.filter(_.mineralsLeft > 0)
-    .groupBy(m => m.base.getOrElse(With.geography.bases.minBy(_.heart.groundPixels(m.pixel))))
+    .groupBy(m => m.base.getOrElse(With.geography.bases.minBy(_.heart.pixelDistanceGround(m.pixel))))
     .map(group => {
       val base = group._1
       val sorted = group._2.toVector
@@ -37,7 +37,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
       (base, (sorted.map(new Slot(_, 0)) ++ sorted.reverse.map(new Slot(_, 1)) ++ sorted.reverse.map(new Slot(_, 2)))) })
   private lazy val gasSlots: Map[Base, Vector[Slot]] = With.geography.bases.map(b => (b, Vector[Slot]())).toMap ++ // Not all bases have gas! Make sure map contains them
     With.units.neutral.filter(_.gasLeft > 0)
-      .groupBy(m => m.base.getOrElse(With.geography.bases.minBy(_.heart.groundPixels(m.pixel))))
+      .groupBy(m => m.base.getOrElse(With.geography.bases.minBy(_.heart.pixelDistanceGround(m.pixel))))
       .map(group => {
         val base = group._1
         val sorted = group._2.toVector
@@ -47,7 +47,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   private lazy val slotsByResource: mutable.Map[UnitInfo, Seq[Slot]] = new mutable.HashMap[UnitInfo, Seq[Slot]] ++ (mineralSlots.values.view.flatten ++ gasSlots.values.view.flatten).groupBy(_.resource).map(p => (p._1, p._2.toSeq))
   private lazy val baseCosts: Map[(Base, Base), Double] = With.geography.bases
     .flatMap(baseA => With.geography.bases.map(baseB => (baseA, baseB)))
-    .map(basePair => (basePair, basePair._1.heart.groundPixels(basePair._2.heart))).toMap
+    .map(basePair => (basePair, basePair._1.heart.pixelDistanceGround(basePair._2.heart))).toMap
   private lazy val naturalCost = With.geography.startBases.view.map(b => baseCosts(b, b.natural.getOrElse(b))).max
 
   private val assignments = new mutable.HashMap[FriendlyUnitInfo, Slot]()
@@ -171,7 +171,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   private def issueCommands(): Unit = {
     unassigned.foreach(i => i.intend(this, new Intention {
       toGather = Maff.minBy(With.units.ours.filter(_.unitClass.isGas))(u => i.pixelDistanceTravelling(u.pixel.nearestWalkableTile))
-      toTravel = Some(Maff.sampleSet(nearestBase(i).metro.bases.maxBy(_.heart.groundPixels(With.scouting.threatOrigin)).tiles).center)
+      toTravel = Some(Maff.sampleSet(nearestBase(i).metro.bases.maxBy(_.heart.pixelDistanceGround(With.scouting.threatOrigin)).tiles).center)
       canFight = false }))
     assignments.foreach(a => a._1.intend(this, new Intention { toGather = Some(a._2.resource) }))
   }

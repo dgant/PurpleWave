@@ -45,7 +45,7 @@ class Zone(
   
   def pathTo          (to: Zone): Option[ZonePath]  = With.paths.zonePath(this, to)
   def canWalkTo       (to: Zone): Boolean           = pathTo(to).isDefined
-  def distancePixels  (to: Zone): Double            = centroid.groundPixels(to.centroid)
+  def distancePixels  (to: Zone): Double            = centroid.pixelDistanceGround(to.centroid)
   def heart: Tile = bases.sortBy(_.mineralsLeft).sortBy(_.owner.isNeutral).headOption.map(_.heart).getOrElse(centroid)
 
   // Cached information for pathfinding

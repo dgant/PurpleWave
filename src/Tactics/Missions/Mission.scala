@@ -1,6 +1,7 @@
 package Tactics.Missions
 
 import Lifecycle.With
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Tactics.Squads.Squad
 
 trait Mission extends Squad {
@@ -12,8 +13,8 @@ trait Mission extends Squad {
   var launchFrame: Int = 0
   final def duration: Int = if (launched) With.framesSince(launchFrame) else 0
 
+  private def nextUnits: Iterable[FriendlyUnitInfo] = With.recruiter.lockedBy(this)
   final def consider(): Unit = {
-    def nextUnits = With.recruiter.lockedBy(this)
     if (launched) {
       if (shouldTerminate || nextUnits.isEmpty) {
         terminate()

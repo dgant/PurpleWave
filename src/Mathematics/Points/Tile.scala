@@ -63,6 +63,27 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def midpoint(pixel: Tile): Tile = {
     add(pixel).divide(2)
   }
+  @inline def pixelDistance(tile: Tile): Double = {
+    center.pixelDistance(tile.center)
+  }
+  @inline def pixelDistance(pixel: Pixel): Double = {
+    center.pixelDistance(pixel)
+  }
+  @inline def pixelDistanceGround(other: Pixel): Double = {
+    With.paths.groundPixels(center, other)
+  }
+  @inline def pixelDistanceGround(other: Tile): Double = {
+    With.paths.groundPixels(center, other.center)
+  }
+  @inline def tileDistanceGroundManhattan(other: Tile): Int = {
+    With.paths.groundTilesManhattan(this, other)
+  }
+  @inline def travelPixelsFor(other: Pixel, unit: UnitInfo): Double = {
+    unit.pixelDistanceTravelling(center, other)
+  }
+  @inline def travelPixelsFor(other: Tile, unit: UnitInfo): Double = {
+    unit.pixelDistanceTravelling(this, other)
+  }
   @inline def tileDistanceManhattan(tile: Tile): Int = {
     Math.abs(x-tile.x) + Math.abs(y-tile.y)
   }
@@ -137,21 +158,6 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   }
   @inline def base: Option[Base] = {
     With.geography.baseByTile(this)
-  }
-  @inline def groundPixels(other: Pixel): Double = {
-    With.paths.groundPixels(center, other)
-  }
-  @inline def groundPixels(other: Tile): Double = {
-    With.paths.groundPixels(center, other.center)
-  }
-  @inline def groundTilesManhattan(other: Tile): Int = {
-    With.paths.groundTilesManhattan(this, other)
-  }
-  @inline def travelPixelsFor(other: Pixel, unit: UnitInfo): Double = {
-    unit.pixelDistanceTravelling(center, other)
-  }
-  @inline def travelPixelsFor(other: Tile, unit: UnitInfo): Double = {
-    unit.pixelDistanceTravelling(this, other)
   }
   @inline def altitude: Int = {
     With.game.getGroundHeight(x, y)

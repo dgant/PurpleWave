@@ -20,13 +20,13 @@ object Follow extends Action {
         Protoss.Corsair,
         Protoss.Scout,
         Zerg.Mutalisk)
-      && ! unit.matchups.threats.exists(_.unitClass.dealsRadialSplashDamage)))
+      && ! unit.matchups.groupEnemy.splashesAir))
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val maybeLeader = unit.agent.leader()
     unit.agent.toTravel = maybeLeader.map(_.pixel).orElse(unit.agent.toTravel)
     maybeLeader
-      .withFilter(leader =>
+      .filter(leader =>
         unit.pixelDistanceCenter(leader) < Seq(256, Maff.min(unit.matchups.threats.view.map(_.pixelsToGetInRange(unit).toInt)).getOrElse(0)).max
         && ( ! unit.is(Protoss.Carrier) || leader.matchups.threatsInRange.forall(unit.matchups.threatsInRange.contains))
       )

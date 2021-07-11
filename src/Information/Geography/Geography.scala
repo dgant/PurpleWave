@@ -27,7 +27,7 @@ class Geography extends TimedTask {
   lazy val metros             : Vector[Metro]         = ZoneBuilder.metros.toVector
   lazy val ourMain            : Base                  = With.geography.ourBases.find(_.isStartLocation).getOrElse(With.geography.bases.minBy(_.heart.tileDistanceFast(With.self.startTile)))
   lazy val ourMetro           : Metro                 = ourMain.metro
-  lazy val rushDistances      : Vector[Double]        = startLocations.flatMap(s1 => startLocations.filterNot(_ == s1).map(s2 => s1.pixelDistanceGround(s2))).toSet.toVector
+  lazy val rushDistances      : Vector[Double]        = startLocations.flatMap(s1 => startLocations.filterNot(_ == s1).map(s2 => s1.pixelDistanceGround(s2))).sorted
   def ourNatural              : Base                  = ourNaturalCache()
   def ourZones                : Vector[Zone]          = ourZonesCache()
   def ourBases                : Vector[Base]          = ourBasesCache()

@@ -14,11 +14,13 @@ case class MatchupAnalysis(me: UnitInfo) {
   // The necessity of this is a good argument for defining battles even if they would have trivial simulation results
   private def defaultUnits: Seq[UnitInfo] = if (me.canAttack) me.zone.units.view.filter(u => u.isEnemy && BattleClassificationFilters.isEligibleLocal(u)) else Seq.empty.view
 
-  val groupUs: UnitGroup = me.team.orElse(me.friendly.flatMap(_.squad)).getOrElse(GenericUnitGroup(Seq(me)))
-  val groupEnemy: UnitGroup = me.team.map(_.opponent)
+  def groupUs: UnitGroup = _groupUs()
+  def groupEnemy: UnitGroup = _groupEnemy()
+  private val _groupUs = new Cache(() => me.team.orElse(me.friendly.flatMap(_.squad)).getOrElse(GenericUnitGroup(Seq(me))))
+  private val _groupEnemy = new Cache(() => me.team.map(_.opponent)
     .orElse(me.friendly.flatMap(_.squad.flatMap(_.targetQueue.map(GenericUnitGroup))))
     .orElse(me.friendly.flatMap(_.squad.flatMap(s => Some(GenericUnitGroup(s.enemies)))))
-    .getOrElse(GenericUnitGroup(defaultUnits))
+    .getOrElse(GenericUnitGroup(defaultUnits)))
 
   private def battleAll     : Option[Seq[UnitInfo]] = me.battle.map(_.teams.view.flatMap(_.units))
   private def battleUs      : Option[Seq[UnitInfo]] = me.team.map(_.units.view)

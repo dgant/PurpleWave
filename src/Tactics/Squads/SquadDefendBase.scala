@@ -4,7 +4,6 @@ import Information.Geography.Types.{Base, Edge, Zone}
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
-import Micro.Agency.Intention
 import Micro.Formation.{Formation, FormationEmpty, FormationGeneric, FormationZone}
 import Performance.Cache
 import ProxyBwapi.Races.Zerg
@@ -42,7 +41,6 @@ class SquadDefendBase(base: Base) extends Squad {
   })
   private def guardZone: Zone = zoneAndChoke()._1
   private def guardChoke: Option[Edge] = zoneAndChoke()._2
-  lazy val enemyHasVision: Cache[Boolean] = new Cache(() => enemies.exists(e => e.flying || e.altitude >= base.heart.altitude))
   lazy val heart: Pixel = if (base.metro == With.geography.ourMain.metro) With.geography.ourMain.heart.center else base.heart.center
   val bastion = new Cache(() =>
     Maff.minBy(
@@ -71,9 +69,9 @@ class SquadDefendBase(base: Base) extends Squad {
 
     val targets = if (canScour) scourables else enemies.filter(threateningBase)
     targetQueue = Some(SquadAutomation.rankForArmy(this, targets))
-    lazy val formationScour = FormationGeneric.engage(units, targetQueue.get.headOption.map(_.pixel))
-    lazy val formationBastion = FormationGeneric.march(units, bastion())
-    lazy val formationGuard = guardChoke.map(c => FormationZone(units, guardZone, c)).getOrElse(formationBastion)
+    lazy val formationScour = FormationGeneric.engage(this, targetQueue.get.headOption.map(_.pixel))
+    lazy val formationBastion = FormationGeneric.march(this, bastion())
+    lazy val formationGuard = guardChoke.map(c => FormationZone(this, guardZone, c)).getOrElse(formationBastion)
 
     if (canScour) {
       lastAction = "Scour"
@@ -86,11 +84,11 @@ class SquadDefendBase(base: Base) extends Squad {
       lastAction = "Hold"
       formations += formationBastion
     }
-    intendFormation()
+    SquadAutomation.send(this)
   }
 
   private def isHuntable(enemy: UnitInfo): Boolean = (
-    ! (enemy.is(Zerg.Drone) && With.fingerprints.fourPool.matches) // Don't get baited by 4-pool scouts
+    ! (Zerg.Drone(enemy) && With.fingerprints.fourPool.matches) // Don't get baited by 4-pool scouts
     && (units.exists(_.canAttack(enemy)) || (enemy.cloaked && units.exists(_.unitClass.isDetector)))
     && (enemy.matchups.targets.nonEmpty || enemy.matchups.allies.forall(_.matchups.targets.isEmpty)) // Don't, for example, chase Overlords that have ally Zerglings nearby
     // If we don't really want to fight, wait until they push into the base
@@ -99,6 +97,7 @@ class SquadDefendBase(base: Base) extends Squad {
       || With.blackboard.wantToAttack()
       || (enemy.base.contains(base) && ! base.zone.exit.exists(_.contains(enemy.pixel)))))
 
+  private val enemyHasVision: Cache[Boolean] = new Cache(() => enemies.exists(e => e.flying || e.altitude >= base.heart.altitude))
   private def threateningBase(enemy: UnitInfo): Boolean = {
     if (enemy.zone == base.zone) return true
     // If they're between the bastion and the base
@@ -106,13 +105,5 @@ class SquadDefendBase(base: Base) extends Squad {
     // If they can assault our base from outside it
     if (enemyHasVision() && base.zone.units.view.filter(enemy.inRangeToAttack).exists(u => u.unitClass.melee || ! base.zone.edges.exists(_.contains(u.pixel)))) return true
     false
-  }
-  private def intendFormation(): Unit = {
-    units.foreach(unit => {
-      unit.intend(this, new Intention {
-        toTravel = formations.headOption.flatMap(_.placements.get(unit))
-        toReturn = formations.lastOption.flatMap(_.placements.get(unit))
-      })
-    })
   }
 }

@@ -185,4 +185,10 @@ trait MacroCounting {
   def enemyRecentStrategy(fingerprints: Fingerprint*): Boolean = {
     enemyStrategy(fingerprints: _*) || fingerprints.map(_.toString).exists(With.strategy.enemyRecentFingerprints.contains)
   }
+
+  def trackRecordLacks(fingerprints: Fingerprint*): Boolean = {
+    gamesAgainst >= With.configuration.recentFingerprints && ! enemyRecentStrategy(fingerprints: _*)
+  }
+
+  def gamesAgainst: Int = With.history.gamesVsEnemies.size
 }

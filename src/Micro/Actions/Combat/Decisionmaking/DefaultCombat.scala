@@ -146,7 +146,7 @@ object DefaultCombat extends Action {
   def regroupGoal(unit: FriendlyUnitInfo): Pixel = {
     if (unit.battle.exists(_.us.units.size > 1)) unit.battle.get.us.centroidKey
     else if (unit.agent.shouldEngage) unit.agent.destination
-    else unit.agent.origin
+    else unit.agent.safety
   }
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
@@ -249,7 +249,7 @@ object DefaultCombat extends Action {
     if (goalRegroup && unit.agent.shouldEngage) unit.agent.increaseImpatience()
 
     // Decide where to go
-    unit.agent.toTravel = Some(if (goalRegroup) regroupGoal(unit) else if (goalRetreat) unit.agent.origin else target.map(unit.pixelToFireAt(_, exhaustive = true)).getOrElse(unit.agent.destination))
+    unit.agent.toTravel = Some(if (goalRegroup) regroupGoal(unit) else if (goalRetreat) unit.agent.safety else target.map(unit.pixelToFireAt(_, exhaustive = true)).getOrElse(unit.agent.destination))
     def destination = unit.agent.toTravel.get
 
     // Avoid the hazards and expense of vector travel when we're not in harm's way
@@ -259,8 +259,8 @@ object DefaultCombat extends Action {
     val forces = unit.agent.forces
     var exactDistance: Option[Double] = None
     if (goalRetreat) {
-      val originPixelsUs        = unit.pixelDistanceTravelling(unit.agent.origin)
-      val originPixelsEnemy     = Maff.minBy(unit.matchups.threats)(_.pixelDistanceEdge(unit)).map(t => t.pixelDistanceTravelling(unit.agent.origin) - t.pixelRangeAgainst(unit)).getOrElse(With.mapPixelPerimeter.toDouble)
+      val originPixelsUs        = unit.pixelDistanceTravelling(unit.agent.safety)
+      val originPixelsEnemy     = Maff.minBy(unit.matchups.threats)(_.pixelDistanceEdge(unit)).map(t => t.pixelDistanceTravelling(unit.agent.safety) - t.pixelRangeAgainst(unit)).getOrElse(With.mapPixelPerimeter.toDouble)
       val margin                = 320d
       val marginExit            = originPixelsUs - originPixelsEnemy
       val marginThreat          = unit.matchups.pixelsOfEntanglement

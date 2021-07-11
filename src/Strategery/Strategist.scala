@@ -11,53 +11,62 @@ import Strategery.Strategies.{AllChoices, Strategy}
 import bwapi.Race
 
 import scala.collection.mutable
+import scala.util.Random
 
 class Strategist {
 
   lazy val map: Option[StarCraftMap] = StarCraftMaps.all.find(_.matches)
   lazy val selectedInitially: Set[Strategy] = With.configuration.playbook.policy.chooseBranch.toSet
 
-  private var enemyRaceAtLastCheck: Race = With.enemy.raceInitial
-  private var selectedLast: Option[Set[Strategy]] = None
-  def selectedCurrently: Set[Strategy] = {
-    val enemyRaceNow = With.enemy.raceCurrent
-    if (selectedLast.isEmpty) {
-      selectedLast = Some(selectedInitially)
-    } else if (enemyRaceAtLastCheck != enemyRaceNow) { // Hack fix
-      selectedLast = Some(selectedInitially.filter(_.enemyRaces.exists(r => r == Race.Unknown || r == enemyRaceNow)))
-    }
-    enemyRaceAtLastCheck = enemyRaceNow
-    selectedLast.get
-  }
+  private var _lastEnemyRace  = With.enemy.raceInitial
+  private val _selected       = new mutable.HashSet[Strategy]
+  private val _deselected     = new mutable.HashSet[Strategy]
+  private val _active         = new mutable.HashSet[Strategy]
 
-  private val registeredActive = new mutable.HashSet[Strategy]
-  def isActive(strategy: Strategy): Boolean = selectedCurrently.contains(strategy) && registeredActive.contains(strategy)
-  def registerActive(strategy: Strategy): Unit = {
-    if ( ! registeredActive.contains(strategy)) {
-      With.logger.debug(f"Activating strategy $strategy")
+  def selected: mutable.Set[Strategy] = {
+    val enemyRaceNow = With.enemy.raceCurrent
+    if (_selected.isEmpty) {
+      _selected ++= selectedInitially
+    } else if (_lastEnemyRace != enemyRaceNow) {
+      _selected.filter(_.enemyRaces.exists(r => r != Race.Unknown && r != enemyRaceNow)).foreach(swapOut)
     }
-    registeredActive += strategy
+    _lastEnemyRace = enemyRaceNow
+    _selected
+  }
+  def deselected: Iterator[Strategy] = _deselected.iterator
+  def isActive(strategy: Strategy): Boolean = selected.contains(strategy) && _active.contains(strategy)
+  def activate(strategy: Strategy): Boolean = {
+    val output = selected.contains(strategy)
+    if (output && ! _active.contains(strategy)) {
+      With.logger.debug(f"Activating strategy $strategy")
+      _active += strategy
+    }
+    output
   }
   def deactivate(strategy: Strategy): Unit = {
-    if (registeredActive.contains(strategy)) {
+    if (_active.contains(strategy)) {
       With.logger.debug(f"Deactivating strategy $strategy")
     }
-    registeredActive -= strategy
-  }
-  def swapOut(strategy: Strategy): Unit = {
-    if (selectedCurrently.contains(strategy)) {
-      With.logger.debug(f"Swapping out strategy $strategy")
-      //selectedCurrently -= strategy
-    }
+    _active -= strategy
   }
   def swapIn(strategy: Strategy): Unit = {
-    if ( ! selectedCurrently.contains(strategy)) {
+    if ( ! selected.contains(strategy)) {
       With.logger.debug(f"Swapping in strategy $strategy")
-      //selectedCurrently += strategy
+      _selected += strategy
+      _deselected -= strategy
     }
   }
+  def swapOut(strategy: Strategy): Unit = {
+    if (selected.contains(strategy)) {
+      With.logger.debug(f"Swapping out strategy $strategy")
+      _selected -= strategy
+      _deselected += strategy
+    }
+    deactivate(strategy)
+  }
 
-  def gameplan: Plan = selectedCurrently.find(_.gameplan.isDefined).map(_.gameplan.get).getOrElse(new StandardGamePlan)
+  private lazy val _standardGamePlan = new StandardGamePlan
+  def gameplan: Plan = selected.find(_.gameplan.isDefined).map(_.gameplan.get).getOrElse(_standardGamePlan)
 
   lazy val heightMain       : Double  = With.self.startTile.altitude
   lazy val heightNatural    : Double  = With.geography.ourNatural.townHallTile.altitude
@@ -65,8 +74,7 @@ class Strategist {
   lazy val isFlat           : Boolean = heightMain == heightNatural
   lazy val isInverted       : Boolean = heightMain < heightNatural
   lazy val rushDistanceMean : Double  = Maff.mean(With.geography.rushDistances)
-  lazy val isPlasma         : Boolean = Plasma.matches
-  lazy val isIslandMap      : Boolean = isPlasma || With.geography.startBases.forall(base1 => With.geography.startBases.forall(base2 => base1 == base2 || With.paths.zonePath(base1.zone, base2.zone).isEmpty))
+  lazy val isIslandMap      : Boolean = With.geography.startBases.forall(base1 => With.geography.startBases.forall(base2 => base1 == base2 || With.paths.zonePath(base1.zone, base2.zone).isEmpty))
   lazy val isFfa            : Boolean = With.enemies.size > 1 && ! Players.all.exists(p => p.isAlly)
   lazy val gameWeights: Map[HistoricalGame, Double] = With.history.games
     .filter(_.enemyMatches)
@@ -98,5 +106,16 @@ class Strategist {
   lazy val winProbability: Double = if (gamesVsOpponent.isEmpty) With.configuration.targetWinrate else gamesVsOpponent.filter(_.won).map(_.weight).sum / gamesVsOpponent.map(_.weight).sum
   lazy val winProbabilityByBranch       : Map[Iterable[Strategy], Double] = strategyBranchesUnfiltered.map(b => (b, WinProbability(b))).toMap
   lazy val winProbabilityByBranchLegal  : Map[Iterable[Strategy], Double] = winProbabilityByBranch.filter(_._1.forall(_.legality.isLegal))
+
+  val rolls: mutable.HashMap[String, Boolean] = new mutable.HashMap
+  def roll(key: String, threshold: Double): Boolean = {
+    if ( ! rolls.contains(key)) {
+      val rolled = Random.nextDouble()
+      val success = rolled >= threshold
+      With.logger.debug(f"Roll for $key ${if (success) "PASSED" else "FAILED"} (Rolling $rolled with threshold $threshold)")
+      rolls(key) = success
+    }
+    rolls(key)
+  }
 }
 

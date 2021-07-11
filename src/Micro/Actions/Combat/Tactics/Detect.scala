@@ -45,7 +45,7 @@ object Detect extends Action {
       unit.sightPixels / 2,
       unit.sightPixels - 24)
 
-    val center = ghostbuster.map(_.pixel).getOrElse(unit.agent.origin)
+    val center = ghostbuster.map(_.pixel).getOrElse(unit.agent.safety)
     unit.agent.toTravel = Some(spookiestPixel.get.project(center, idealDistance))
 
     val safetyPixels = if (unit.is(Protoss.Observer)) -48 else -32 * 5

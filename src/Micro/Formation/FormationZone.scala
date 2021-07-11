@@ -2,19 +2,20 @@ package Micro.Formation
 
 import Information.Geography.Types.{Edge, Zone}
 import Lifecycle.With
-import Mathematics.Points._
 import Mathematics.Maff
+import Mathematics.Points._
 import Mathematics.Shapes.Spiral
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Tactics.Squads.FriendlyUnitGroup
 import Utilities.Minutes
 
 import scala.collection.mutable
 
 object FormationZone {
 
-  def apply(units: Iterable[FriendlyUnitInfo], zone: Zone, edge: Edge): Formation = {
+  def apply(group: FriendlyUnitGroup, zone: Zone, edge: Edge): Formation = {
+    val units = group.groupFriendlyOrderable
     if (units.isEmpty) return FormationEmpty
 
     val occupied = With.grids.disposableBoolean()

@@ -10,7 +10,7 @@ object RequestSafeLanding {
 
   def apply(unit: FriendlyUnitInfo, destination: Option[Pixel] = None): Unit = {
     if (unit.transport.exists(_.canMove)) {
-      val goal = destination.getOrElse(if (unit.agent.shouldEngage) unit.agent.destination else unit.agent.origin)
+      val goal = destination.getOrElse(if (unit.agent.shouldEngage) unit.agent.destination else unit.agent.safety)
       val distanceToGoal = unit.pixelDistanceCenter(goal)
       val searchOriginTile = unit.pixel.project(goal, Math.min(distanceToGoal, 96)).tile
       val landingOption = Spiral

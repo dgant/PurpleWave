@@ -40,13 +40,7 @@ abstract class Strategy extends SimpleString {
     * This allows us to distinguish between strategy choices that had an effect on the game (the opening, perhaps)
     * versus those that didn't impact it at all (a late game strategy for a game lasting three minutes, for example)
     */
-  def activate(): Boolean = {
-    val output = With.strategy.selectedCurrently.contains(this)
-    if (output) {
-      With.strategy.registerActive(this)
-    }
-    output
-  }
+  def activate(): Boolean = { With.strategy.activate(this) }
 
   /**
     * Flag a strategy as inactive, in order to avoid crediting it with our success/failure this game
@@ -54,8 +48,22 @@ abstract class Strategy extends SimpleString {
     * prior to the strategy having had any impact on the game
     */
   def deactivate(): Unit = { With.strategy.deactivate(this) }
+
+  /**
+    * Permanently include a branch in our chosen strategy.
+    * This doesn't check whether the new strategy is a branch that would be legal on initial selection;
+    * it's totally fine if it not.
+    */
   def swapIn(): Unit = { With.strategy.swapIn(this) }
+
+  /**
+    * Permanently removes a branch from our chosen strategy.
+    * This doesn't check whether the new strategy is a branch that would be legal on initial selection;
+    * it's totally fine if it not.
+    */
   def swapOut(): Unit = { With.strategy.swapOut(this) }
+
+  def isActive: Boolean = { With.strategy.isActive(this) }
 
   def legality: StrategyLegality      = With.strategy.legalities(this)
   def evaluation: StrategyEvaluation  = With.strategy.evaluations(this)

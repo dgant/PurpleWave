@@ -54,18 +54,19 @@ class Storyteller {
 
   private lazy val interestingTechs = Techs.all.filterNot(defaultTechs.contains)
 
+  lazy val rushDistance = f"Rush distances on ${With.mapCleanName}"
   val stories: Seq[IStory] = Seq(
-    new Story[Iterable[PlayerInfo]]     ("Opponents",           () => With.enemies.filter(_.isEnemy),                                                                                  _.map(_.name).mkString(", ")),
-    new Story[Iterable[Double]]         ("Rush distances",      () => With.geography.rushDistances,                                                                                    _.map(d => (d / 32).toInt.toString).mkString(", ")),
+    new Story[Iterable[PlayerInfo]]     ("Opponents",           () => With.enemies.filter(_.isEnemy),                                                                              _.map(_.name).mkString(", ")),
+    new Story[Iterable[Double]]         (rushDistance,          () => With.geography.rushDistances,                                                                                _.map(d => (d / 32).toInt.toString).mkString(", ")),
     new Story                           ("Playbook",            () => With.configuration.playbook),
     new Story                           ("Policy",              () => With.configuration.playbook.policy),
     new Story                           ("Enemy race",          () => With.enemy.raceCurrent),
-    new Story[Iterable[Strategy]]       ("Strategy",            () => With.strategy.selectedCurrently,                                                                                 _.map(_.toString).mkString(" ")),
+    new Story[mutable.Set[Strategy]]    ("Strategy",            () => With.strategy.selected,                                                                                      _.map(_.toString).mkString(" ")),
     new Story                           ("Our bases",           () => With.geography.ourBases.size),
     new Story                           ("Enemy bases",         () => With.geography.enemyBases.size),
-    new Story[Iterable[Tech]]           ("Our techs",           () => interestingTechs.filter(With.self.hasTech),                                                                      _.map(_.toString).mkString(", ")),
-    new Story[Iterable[Tech]]           ("Enemy techs",         () => interestingTechs.filter(t => With.enemies.exists(_.hasTech(t))),                                                 _.map(_.toString).mkString(", ")),
-    new Story[Iterable[(Upgrade, Int)]] ("Our upgrades",        () => Upgrades.all.map(u => (u, With.self.getUpgradeLevel(u))).filter(_._2 > 0),                                       _.map(u => f"${u._1} = ${u._2}").mkString(", ")),
+    new Story[Iterable[Tech]]           ("Our techs",           () => interestingTechs.filter(With.self.hasTech),                                                                  _.map(_.toString).mkString(", ")),
+    new Story[Iterable[Tech]]           ("Enemy techs",         () => interestingTechs.filter(t => With.enemies.exists(_.hasTech(t))),                                             _.map(_.toString).mkString(", ")),
+    new Story[Iterable[(Upgrade, Int)]] ("Our upgrades",        () => Upgrades.all.map(u => (u, With.self.getUpgradeLevel(u))).filter(_._2 > 0),                                   _.map(u => f"${u._1} = ${u._2}").mkString(", ")),
     new Story[Iterable[(Upgrade, Int)]] ("Enemy upgrades",      () => Upgrades.all.map(u => (u, Maff.max(With.enemies.map(_.getUpgradeLevel(u))).getOrElse(0))).filter(_._2 > 0),  _.map(u => f"${u._1} = ${u._2}").mkString(", ")),
     new Story                           ("Our Factories",       () => With.units.countOurs(Terran.Factory)),
     new Story                           ("Our Barracks",        () => With.units.countOurs(Terran.Barracks)),
@@ -78,8 +79,8 @@ class Storyteller {
     new Story                           ("Safe at home",        () => MacroFacts.safeAtHome),
     new Story                           ("Safe to move out",    () => MacroFacts.safeToMoveOut),
     new Story                           ("Should attack",       () => With.blackboard.wantToAttack.get),
-    new Story[Iterable[String]]         ("Fingerprints",        () => With.fingerprints.status,                                                                                        _.map(_.toString).mkString(" ")),
-    new Story[Iterable[String]]         ("Status",              () => With.blackboard.status.get,                                                                                      _.map(_.toString).mkString(", ")),
+    new Story[Iterable[String]]         ("Fingerprints",        () => With.fingerprints.status,                                                                                    _.map(_.toString).mkString(" ")),
+    new Story[Iterable[String]]         ("Status",              () => With.blackboard.status.get,                                                                                  _.map(_.toString).mkString(", ")),
     new Story                           ("Performance danger",  () => With.performance.danger),
     new Story                           ("Sluggishness",        () => With.reaction.sluggishness),
     new Story                           ("Gas worker floor",    () => With.blackboard.gasWorkerFloor()),

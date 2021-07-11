@@ -1,7 +1,8 @@
 package Micro.Actions
 
 import Micro.Actions.Basic._
-import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlee}
+import Micro.Actions.Combat.Decisionmaking.FightOrFlee
+import Micro.Actions.Combat.Fight
 import Micro.Actions.Combat.Tactics.{Tickle, Unbunk}
 import Micro.Actions.Commands.{Attack, Move}
 import Micro.Actions.Protoss.Meld

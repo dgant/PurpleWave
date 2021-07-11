@@ -23,25 +23,36 @@ object Retreat extends Action {
 
   def getRetreat(unit: FriendlyUnitInfo): RetreatPlan = {
     // Decide our goals in retreating
-    def timeOriginOfThreat(threat: UnitInfo): Double = threat.framesToTravelTo(unit.agent.origin) - threat.pixelRangeAgainst(unit) * threat.topSpeed
-    lazy val distanceOriginUs     = unit.pixelDistanceTravelling(unit.agent.origin)
-    lazy val distanceOriginEnemy  = Maff.min(unit.matchups.threats.view.map(t => t.pixelDistanceTravelling(unit.agent.origin) - t.pixelRangeAgainst(unit))).getOrElse(2.0 * With.mapPixelWidth)
+    def timeOriginOfThreat(threat: UnitInfo): Double = threat.framesToTravelTo(unit.agent.safety) - threat.pixelRangeAgainst(unit) * threat.topSpeed
+    lazy val distanceOriginUs     = unit.pixelDistanceTravelling(unit.agent.safety)
+    lazy val distanceOriginEnemy  = Maff.min(unit.matchups.threats.view.map(t => t.pixelDistanceTravelling(unit.agent.safety) - t.pixelRangeAgainst(unit))).getOrElse(2.0 * With.mapPixelWidth)
     lazy val enemyCloser          = distanceOriginUs + 160 >= distanceOriginEnemy
-    lazy val timeOriginUs         = unit.framesToTravelTo(unit.agent.origin)
+    lazy val timeOriginUs         = unit.framesToTravelTo(unit.agent.safety)
     lazy val timeOriginEnemy      = Maff.takePercentile(0.1, unit.matchups.threats)(Ordering.by(timeOriginOfThreat)).map(timeOriginOfThreat).headOption.getOrElse(Double.PositiveInfinity)
     lazy val enemySooner          = timeOriginUs + 96 >= timeOriginEnemy
     lazy val enemySieging         = unit.matchups.enemies.exists(_.isAny(MatchTank, Zerg.Lurker)) && ! unit.base.exists(_.owner.isEnemy)
-    lazy val goalSidestep         = unit.is(Protoss.DarkTemplar) || (enemySieging && ! enemyCloser && ! enemySooner)
-    lazy val goalHome             = ! unit.agent.isScout && unit.zone != unit.agent.origin.zone && ! goalSidestep && (enemyCloser || enemySooner)
-    lazy val goalSafety           = ! unit.agent.withinSafetyMargin
-
-    // Decide how to retreat
-
+    lazy val goalSidestep         = Protoss.DarkTemplar(unit) || (enemySieging && ! enemyCloser && ! enemySooner)
+    lazy val goalReturn           = ! unit.agent.isScout && ! goalSidestep && unit.agent.toReturn.exists(_.tile.enemyRangeAgainst(unit) < unit.enemyRangeGrid.margin)
+    lazy val goalHome             = ! unit.agent.isScout && ! goalSidestep && (unit.zone != unit.agent.safety.zone && (enemyCloser || enemySooner))
+    lazy val goalOrigin           = goalReturn || goalHome
+    lazy val goalSafety           = ! unit.agent.withinSafetyMargin && ! goalOrigin
     lazy val forceVector = {
-      if (unit.agent.forces.isEmpty) MicroPathing.setDefaultForces(unit, goalHome = goalHome, goalSafety = goalSafety)
+      if (unit.agent.forces.isEmpty) MicroPathing.setDefaultForces(unit, goalOrigin = goalOrigin, goalSafety = goalSafety)
       unit.agent.forces.sum
     }
     lazy val force = forceVector.radians
+
+    // If the return point didn't meet our criteria, let the unit retreat all the way home
+    if ( ! goalReturn) {
+      unit.agent.toReturn = None
+    }
+
+    // Ground units: Shove your way through
+    if ( ! unit.airborne) {
+      unit.agent.escalatePriority(TrafficPriorities.Pardon)
+      if (unit.matchups.pixelsOfEntanglement > -80) unit.agent.escalatePriority(TrafficPriorities.Nudge)
+      if (unit.matchups.pixelsOfEntanglement > -48) unit.agent.escalatePriority(TrafficPriorities.Bump)
+      if (unit.matchups.pixelsOfEntanglement > -16) unit.agent.escalatePriority(TrafficPriorities.Shove)
 
     // Against melee rush: Retreat directly to heart so workers can help
     if (unit.isAny(Terran.Marine, Protoss.Zealot) && unit.metro.contains(With.geography.ourMetro) && unit.matchups.threats.forall(_.pixelRangeAgainst(unit) < 64)) {
@@ -52,21 +63,13 @@ object Retreat extends Action {
     val leadPassenger = unit.agent.ride.flatMap(_.agent.prioritizedPassengers.headOption)
     if (leadPassenger.isDefined && ! leadPassenger.contains(unit)) {
       return RetreatPlan(unit, leadPassenger.get.pixel.add(forceVector.normalize(32).toPoint.asPixel.nearestWalkablePixel), "Shotgun")
-    }
+    }}
 
-    if ( ! unit.airborne) {
-      unit.agent.escalatePriority(TrafficPriorities.Pardon)
-      if (unit.matchups.pixelsOfEntanglement > -80) unit.agent.escalatePriority(TrafficPriorities.Nudge)
-      if (unit.matchups.pixelsOfEntanglement > -48) unit.agent.escalatePriority(TrafficPriorities.Bump)
-      if (unit.matchups.pixelsOfEntanglement > -16) unit.agent.escalatePriority(TrafficPriorities.Shove)
-    }
-
-
-    lazy val tilePath         = MicroPathing.getThreatAwarePath(unit, preferHome = goalHome)
-    lazy val waypointSimple   = MicroPathing.getWaypointInDirection(unit, force, if (goalHome) Some(unit.agent.origin) else None, requireSafety = goalSafety).map((_, "Simple"))
+    lazy val waypointSimple   = MicroPathing.getWaypointInDirection(unit, force, if (goalOrigin) Some(unit.agent.safety) else None, requireSafety = goalSafety).map((_, "Simple"))
     lazy val waypointPath     = MicroPathing.getWaypointAlongTilePath(tilePath).map(_.add(unit.pixel.offsetFromTileCenter)).map((_, "Path"))
     lazy val waypointForces   = Seq(true, false).view.map(safety => MicroPathing.getWaypointInDirection(unit, force, requireSafety = safety)).find(_.nonEmpty).flatten.map((_, "Force"))
-    lazy val waypointOrigin   = (unit.agent.origin, "Origin")
+    lazy val waypointOrigin   = (unit.agent.safety, "Origin")
+    lazy val tilePath         = MicroPathing.getThreatAwarePath(unit, preferHome = goalOrigin)
     val waypoint              = waypointSimple.orElse(waypointPath).orElse(waypointForces).getOrElse(waypointOrigin)
     RetreatPlan(unit, waypoint._1, waypoint._2)
   }

@@ -10,7 +10,9 @@ object TargetFilterFocus extends TargetFilter {
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
     if (actor.agent.commit) return true
     if (With.yolo.active()) return true
-    if (actor.inRangeToAttack(target) && target.unitClass.attacksOrCastsOrDetectsOrTransports) return true
+    if (actor.inRangeToAttack(target)
+      && target.unitClass.attacksOrCastsOrDetectsOrTransports
+      && actor.readyForAttackOrder) return true
     actor.squad.forall(_.targetQueue.forall(_.contains(target)))
   }
 }

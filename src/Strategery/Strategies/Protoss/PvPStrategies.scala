@@ -24,7 +24,7 @@ object PvPGateCore extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvPGateCoreTech, PvPGateCoreGate))
 }
 object PvPRobo extends PvPStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreTech, PvPGateCoreGate))
+  override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCore))
 }
 object PvP2GateDTExpand extends PvPStrategy
 object PvP3GateGoon extends PvPStrategy {

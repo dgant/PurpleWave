@@ -1,7 +1,8 @@
-package Micro.Actions.Combat.Decisionmaking
+package Micro.Actions.Combat
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.{Sneak, Support}
+import Micro.Actions.Combat.Decisionmaking.{Cast, DefaultCombat, Follow, Root}
+import Micro.Actions.Combat.Maneuvering.Sneak
 import Micro.Actions.Combat.Spells.{BeVulture, Stim}
 import Micro.Actions.Combat.Tactics._
 import Micro.Actions.Protoss._
@@ -13,7 +14,6 @@ object Fight extends Action {
 
   override def perform(unit: FriendlyUnitInfo) {
     Follow.consider(unit)
-    Support.consider(unit)
     StrategicNuke.consider(unit)
     Cast.consider(unit)
     Detect.consider(unit)

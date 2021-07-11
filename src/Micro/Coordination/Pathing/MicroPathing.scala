@@ -39,7 +39,7 @@ object MicroPathing {
   def getThreatAwarePath(unit: FriendlyUnitInfo, preferHome: Boolean = true): TilePath = {
     val pathLengthMinimum             = 7
     val pathfindProfile               = new PathfindProfile(unit.tile)
-    pathfindProfile.end               = if (preferHome) Some(unit.agent.origin.tile) else None
+    pathfindProfile.end               = if (preferHome) Some(unit.agent.safety.tile) else None
     pathfindProfile.lengthMinimum     = Some(pathLengthMinimum)
     pathfindProfile.lengthMaximum     = Some(Maff.clamp((unit.matchups.pixelsOfEntanglement + unit.effectiveRangePixels).toInt / 32, pathLengthMinimum, 15))
     pathfindProfile.threatMaximum     = Some(0)
@@ -87,16 +87,13 @@ object MicroPathing {
     exactDistance : Option[Double] = None): Option[Pixel] = {
 
     val distance = exactDistance.getOrElse(waypointDistancePixels.toDouble)
-
     lazy val travelDistanceCurrent = mustApproach.map(unit.pixelDistanceTravelling)
 
-    def acceptableForSafety(pixel: Pixel): Boolean = {
-      ! requireSafety || unit.matchups.threats.forall(t => t.pixelDistanceSquared(pixel) > t.pixelDistanceSquared(unit.pixel))
-    }
+    val enemyRangeNow = unit.tile.enemyRangeAgainst(unit)
 
-    if (mustApproach.exists(a => unit.pixelDistanceCenter(a) < distance && acceptableForSafety(a))) {
-      return mustApproach
-    }
+    def acceptableForSafety(pixel: Pixel): Boolean = ! requireSafety || pixel.tile.enemyRangeAgainst(unit) <= enemyRangeNow
+
+    if (mustApproach.exists(a => unit.pixelDistanceCenter(a) < distance && acceptableForSafety(a))) return mustApproach
 
     val rayStart = unit.pixel
     val waypointDistance = Math.max(distance, if (requireSafety) 64 + unit.matchups.pixelsOfEntanglement else 0)
@@ -138,12 +135,12 @@ object MicroPathing {
       .toIndexedSeq
   }
 
-  def setDefaultForces(unit: FriendlyUnitInfo, goalSafety: Boolean, goalHome: Boolean): Unit = {
-    val to = unit.agent.origin
+  def setDefaultForces(unit: FriendlyUnitInfo, goalSafety: Boolean, goalOrigin: Boolean): Unit = {
+    val to = unit.agent.safety
 
     // Where to go
     unit.agent.forces(Forces.threat)      = (Potential.avoidThreats(unit)     * Maff.toInt(goalSafety))
-    unit.agent.forces(Forces.travel)      = (Potential.preferTravel(unit, to) * Maff.toInt(goalHome))
+    unit.agent.forces(Forces.travel)      = (Potential.preferTravel(unit, to) * Maff.toInt(goalOrigin))
     unit.agent.forces(Forces.sneaking)    = (Potential.detectionRepulsion(unit))
 
     // How to get there

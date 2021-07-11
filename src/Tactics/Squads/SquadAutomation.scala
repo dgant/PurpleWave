@@ -14,7 +14,7 @@ object SquadAutomation {
   // Targeting //
   ///////////////
 
-  def target(squad: Squad): Unit = { target(squad, if (squad.fightConsensus) squad.vicinity else squad.originConsensus) }
+  def target(squad: Squad): Unit = { target(squad, if (squad.fightConsensus) squad.vicinity else squad.homeConsensus) }
   def target(squad: Squad, to: Pixel): Unit = {
     squad.targetQueue = Some(SquadAutomation.rankedEnRoute(squad, to))
   }
@@ -31,7 +31,7 @@ object SquadAutomation {
     // This equates to 34 degree deviation from a straight line
     val distanceRatio = 1.2
     val units         = group.groupUnits
-    val originAir     = group.originConsensus
+    val originAir     = group.homeConsensus
     val origin        = if (group.hasGround) originAir.nearestWalkableTile    else originAir.tile
     val goal          = if (group.hasGround) to.nearestWalkableTile           else to.tile
     val distancePx    = if (group.hasGround) origin.pixelDistanceGround(goal) else origin.pixelDistance(goal)
@@ -57,31 +57,41 @@ object SquadAutomation {
     if (squad.fightConsensus) {
       val engageTarget = squad.targetQueue.flatMap(_.headOption.map(_.pixel))
       if (engageTarget.isDefined && (squad.engagingOn || squad.engagedUpon)) {
-        output += FormationGeneric.engage(squad.units, engageTarget)
+        output += FormationGeneric.engage(squad, engageTarget)
       } else {
-        output += FormationGeneric.march(squad.units, to)
+        output += FormationGeneric.march(squad, to)
       }
     }
     // Always include a disengagey formation for units that want to retreat/kite
-    if (squad.centroidAll.zone == squad.originConsensus.zone && With.scouting.threatOrigin.zone != squad.originConsensus.zone) {
-      output += FormationGeneric.guard(squad.units, Some(squad.originConsensus))
+    if (squad.centroidKey.zone == squad.homeConsensus.zone && With.scouting.threatOrigin.zone != squad.homeConsensus.zone) {
+      output += FormationGeneric.guard(squad, Some(squad.homeConsensus))
     } else {
-      output += FormationGeneric.disengage(squad.units)
+      output += FormationGeneric.disengage(squad)
     }
     output
   }
 
   def send(squad: Squad, minToForm: Int = 0): Unit = {
-    // Send to the first formation, which will be advancey if we're advancing
     squad.units.foreach(unit => {
       unit.intend(this, new Intention {
+        // Send to the first formation, which will be advancey if we're advancing
         toTravel = squad
           .formations
           .headOption
           .filter(_.placements.size >= minToForm)
           .find(_.placements.contains(unit))
           .map(_.placements(unit))
-          .orElse(Some(if (squad.fightConsensus) squad.vicinity else squad.originConsensus))
+          .orElse(Some(if (squad.fightConsensus) squad.vicinity else squad.homeConsensus))
+        // The last formation is the most retreaty formation
+        // If we only have one, let units retreat to their own origin
+        toReturn = squad
+            .formations
+            .view
+            .drop(1)
+            .lastOption
+            .filter(_.placements.size >= minToForm)
+            .find(_.placements.contains(unit))
+            .map(_.placements(unit))
       })
     })
   }
@@ -91,11 +101,10 @@ object SquadAutomation {
   //////////////////////
 
   def targetFormAndSend(squad: Squad): Unit = targetFormAndSend(squad, minToForm = 0)
-  def targetFormAndSend(squad: Squad, minToForm: Int): Unit = targetFormAndSend(squad, from = squad.originConsensus, to = squad.vicinity, minToForm = minToForm)
+  def targetFormAndSend(squad: Squad, minToForm: Int): Unit = targetFormAndSend(squad, from = squad.homeConsensus, to = squad.vicinity, minToForm = minToForm)
   def targetFormAndSend(squad: Squad, from: Pixel, to: Pixel, minToForm: Int): Unit = {
     target(squad)
     squad.formations = form(squad, from, to)
     send(squad, minToForm = minToForm)
   }
-
 }

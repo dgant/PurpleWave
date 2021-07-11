@@ -246,7 +246,7 @@ object Tickle extends Action {
 
     // Mineral walk
     tickler.agent.toGather = With.geography.ourBases.flatMap(_.minerals).headOption
-    tickler.agent.toTravel = Some(tickler.agent.origin)
+    tickler.agent.toTravel = Some(tickler.agent.safety)
     Commander.gather(tickler)
     Commander.move(tickler)
   }

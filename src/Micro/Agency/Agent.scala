@@ -54,16 +54,12 @@ class Agent(val unit: FriendlyUnitInfo) {
     .orElse(toNuke)
     .orElse(unit.intent.toBuildTile.map(_.center))
     .orElse(unit.intent.toScoutTiles.headOption.map(_.center))
-    .getOrElse(origin)
-  def origin: Pixel = toReturn.getOrElse(defaultOrigin)
-  def defaultOrigin: Pixel = defaultOriginCache()
-  private val originCache = new KeyedCache(
-    () =>
-      ride.filterNot(unit.transport.contains).map(_.pixel)
-      .orElse(toReturn)
-      .getOrElse(defaultOrigin),
-    () => unit.agent.toReturn)
-  private val defaultOriginCache = new Cache[Pixel](() =>
+    .getOrElse(safety)
+  def safety: Pixel = ride.filterNot(unit.transport.contains).map(_.pixel)
+    .orElse(toReturn)
+    .getOrElse(home)
+  def home: Pixel = homeCache()
+  private val homeCache = new Cache[Pixel](() =>
     Maff.minBy(
       With.geography.ourBases.filter(base =>
         base.scoutedByEnemy
@@ -77,8 +73,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     .getOrElse(With.geography.home.center))
 
   def isScout: Boolean = unit.intent.toScoutTiles.nonEmpty
-  def safetyMargin: Double = 64 - Math.min(0, unit.confidence()) * 256
-  def withinSafetyMargin: Boolean = unit.matchups.pixelsOfEntanglement < -safetyMargin
+  def withinSafetyMargin: Boolean = unit.matchups.pixelsOfEntanglement <= -128
 
   /////////////////
   // Diagnostics //

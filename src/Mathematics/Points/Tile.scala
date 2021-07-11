@@ -216,8 +216,23 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def enemyDetectedUnchecked: Boolean = {
     With.grids.enemyDetection.inRangeUnchecked(i)
   }
+  @inline def enemyRange: Int = {
+    With.grids.enemyRangeAirGround(this)
+  }
+  @inline def enemyRangeGround: Int = {
+    With.grids.enemyRangeGround(this)
+  }
+  @inline def enemyRangeAir: Int = {
+    With.grids.enemyRangeAir(this)
+  }
+  @inline def enemyRangeAgainst(unit: UnitInfo): Int = {
+    if (unit.flying) enemyRangeAir else enemyRangeGround
+  }
   @inline def visibleBwapi: Boolean = {
     With.game.isVisible(x, y)
+  }
+  @inline def units: Traversable[UnitInfo] = {
+    With.grids.units.get(this)
   }
   @inline def scoutingPathDistanceBases: Int = {
     With.grids.scoutingPathsBases.get(this)

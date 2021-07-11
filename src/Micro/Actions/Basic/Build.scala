@@ -4,7 +4,8 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Tile
 import Micro.Actions.Action
-import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlee}
+import Micro.Actions.Combat.Decisionmaking.FightOrFlee
+import Micro.Actions.Combat.Fight
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.{CircularPush, TrafficPriorities}

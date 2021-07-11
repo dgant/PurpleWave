@@ -16,10 +16,10 @@ object Target extends {
   def best(attacker: FriendlyUnitInfo, filters: TargetFilter*): Option[UnitInfo] = {
     val squadQueueRaw = attacker.squad.flatMap(_.targetQueue)
 
-    // If we have no squad guidance at all, use default targeting
+    // If we have no squad guidance at all, uwse default targeting
     if (squadQueueRaw.isEmpty) return bestUnfiltered(attacker, legal(attacker, filters: _*))
 
-    val squadQueue                    = legal(attacker, squadQueueRaw.get, filters: _*)
+    val squadQueue = legal(attacker, squadQueueRaw.get, filters: _*)
     lazy val combatTargetInRangeSquad = squadQueue.find(t => t.unitClass.attacksOrCastsOrDetectsOrTransports && attacker.inRangeToAttack(t))
     lazy val combatTargetInRangeAny = bestUnfiltered(attacker, legal(attacker, attacker.matchups.targetsInRange.filter(_.unitClass.attacksOrCastsOrDetectsOrTransports), filters: _*))
     val output = combatTargetInRangeSquad

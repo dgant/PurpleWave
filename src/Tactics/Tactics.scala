@@ -22,6 +22,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 class Tactics extends TimedTask {
+  private lazy val makeDarkArchons            = new DoMakeDarkArchons
   private lazy val clearBurrowedBlockers      = new SquadClearExpansionBlockers
   private lazy val followBuildOrder           = new FollowBuildOrder
   private lazy val ejectScout                 = new SquadEjectScout
@@ -71,6 +72,7 @@ class Tactics extends TimedTask {
   }
 
   private def runPrioritySquads(): Unit = {
+    makeDarkArchons.recruit()
     clearBurrowedBlockers.recruit()
     followBuildOrder.update()
     ejectScout.recruit()

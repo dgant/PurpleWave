@@ -8,6 +8,7 @@ import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.UnitTracking.UnorderedBuffer
 import Tactics.Squads.FriendlyUnitGroup
+import Utilities.LightYear
 
 import scala.collection.mutable
 
@@ -37,7 +38,7 @@ object FormationGeneric {
       Maff.minBy(u.matchups.targets.view.map(_.pixel))(u.pixelDistanceCenter).getOrElse(With.scouting.threatOrigin.center)))
   }
 
-  private val inf = With.mapTileArea
+  private val inf = LightYear()
   private def form(group: FriendlyUnitGroup, style: FormationStyle, face: Pixel, approach: Pixel): Formation = {
     val units = group.groupFriendlyOrderable
     val groundUnits = units.filterNot(_.flying)
@@ -119,23 +120,23 @@ object FormationGeneric {
     new Formation(style, placements.toMap)
   }
 
-  private var floodCentroid             = SpecificPoints.tileMiddle
-  private var floodTarget               = SpecificPoints.tileMiddle
-  private var floodApex              = SpecificPoints.tileMiddle
-  private var floodMaxDistanceTarget    = With.mapTileArea
-  private var floodMinDistanceTarget    = - With.mapTileArea
-  private var floodMaxThreat          = With.mapTileArea
+  private var floodCentroid           = SpecificPoints.tileMiddle
+  private var floodTarget             = SpecificPoints.tileMiddle
+  private var floodApex               = SpecificPoints.tileMiddle
+  private var floodMaxDistanceTarget  = inf
+  private var floodMinDistanceTarget  = - inf
+  private var floodMaxThreat          = inf
   private var floodCostDistanceGoal   = 0
-  private var floodCostDistanceApex = 0
+  private var floodCostDistanceApex   = 0
   private var floodCostThreat         = 0
   private var floodCostVulnerability  = 0
   @inline private final def vGrid = With.grids.enemyVulnerabilityGround
   private final def cost(tile: Tile): Int = {
-    if ( ! tile.walkable) return With.mapPixelPerimeter
-    val costDistanceGoal    = if (floodCostDistanceGoal == 0)   0 else floodCostDistanceGoal    * tile.tileDistanceGroundManhattan(floodTarget)
-    val costDistanceOrigin  = if (floodCostDistanceApex == 0) 0 else floodCostDistanceApex  * tile.tileDistanceGroundManhattan(floodCentroid)
-    val costThreat          = if (floodCostThreat == 0)         0 else floodCostThreat          * tile.enemyRangeGround
-    val costVulnerability   = if (floodCostVulnerability == 0)  0 else floodCostVulnerability   * Math.max(0, vGrid.margin + vGrid.maxVulnerability - vGrid(tile))
+    if ( ! tile.walkable) return inf
+    val costDistanceGoal    = if (floodCostDistanceGoal == 0)   0 else floodCostDistanceGoal  * tile.tileDistanceGroundManhattan(floodTarget)
+    val costDistanceOrigin  = if (floodCostDistanceApex == 0)   0 else floodCostDistanceApex  * tile.tileDistanceGroundManhattan(floodCentroid)
+    val costThreat          = if (floodCostThreat == 0)         0 else floodCostThreat        * tile.enemyRangeGround
+    val costVulnerability   = if (floodCostVulnerability == 0)  0 else floodCostVulnerability * Math.max(0, vGrid.margin + vGrid.maxVulnerability - vGrid(tile))
     // TODO: The vulnerability cost should vary based on the range of the unit.
     // Punishing, eg, a dragoon for not being adjacent to its target, doesn't allow sniping units from uphill
     // Our current formula doesn't allow this, as we do a single flood-fill across unit types

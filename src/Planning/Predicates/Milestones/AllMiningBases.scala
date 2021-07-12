@@ -12,4 +12,6 @@ object AllMiningBases {
         base.minerals.size >= 5 &&
         base.mineralsLeft > With.configuration.minimumMineralsBeforeMinedOut)
   }
+
+  def isMiningBase(base: Base): Boolean = base.minerals.size >= 5 && base.mineralsLeft > With.configuration.minimumMineralsBeforeMinedOut
 }

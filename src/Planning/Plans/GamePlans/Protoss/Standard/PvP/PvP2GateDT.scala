@@ -20,12 +20,12 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.{MatchUpgrading, MatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvP2GateDTExpand
+import Strategery.Strategies.Protoss.PvPDT
 import Utilities.GameTime
 
 class PvP2GateDT extends GameplanTemplate {
   
-  override val activationCriteria = new Employing(PvP2GateDTExpand)
+  override val activationCriteria = new Employing(PvPDT)
   override val completionCriteria: Predicate = new Latch(new And(new UnitsAtLeast(1, Protoss.TemplarArchives), new BasesAtLeast(2)))
 
   override val attackPlan = new If(

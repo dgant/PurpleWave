@@ -8,7 +8,6 @@ import Planning.UnitMatchers.{MatchBuilding, MatchWorker}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.EnrichPixel._
 import Utilities.{Forever, Minutes}
 
 import scala.collection.mutable
@@ -25,16 +24,17 @@ class Base(val townHallTile: Tile)
   lazy val  plannedExpo     : Cache[Boolean]    = new Cache(() => owner.isNeutral && (
     With.units.ours.exists(u => u.intent.toBuildTile.exists(t => t.base.contains(this) && (! townHallArea.contains(t) || u.intent.toBuild.exists(_.isTownHall))))
     || units.exists(u => u.isOurs && u.unitClass.isBuilding && ! townHallArea.contains(u.tileTopLeft))))
-  var       isNaturalOf     : Option[Base]      = None
-  var       townHall        : Option[UnitInfo]  = None
-  var       units           : Vector[UnitInfo]  = Vector.empty
-  var       gas             : Vector[UnitInfo]  = Vector.empty
-  var       minerals        : Vector[UnitInfo]  = Vector.empty
-  var       owner           : PlayerInfo        = With.neutral
-  var       name            : String            = "Nowhere"
-  var       defenseValue    : Double            = _
-  var       workerCount     : Int               = _
-  val       saturation      : Cache[Double]     = new Cache(() => workerCount.toDouble / (1 + 3 * gas.size + 2 * minerals.size))
+  var isNaturalOf           : Option[Base]      = None
+  var townHall              : Option[UnitInfo]  = None
+  var units                 : Vector[UnitInfo]  = Vector.empty
+  var gas                   : Vector[UnitInfo]  = Vector.empty
+  var minerals              : Vector[UnitInfo]  = Vector.empty
+  var owner                 : PlayerInfo        = With.neutral
+  var lastOwnerChangeFrame  : Int = 0
+  var name                  : String            = "Nowhere"
+  var defenseValue          : Double            = _
+  var workerCount           : Int               = _
+  val saturation            : Cache[Double]     = new Cache(() => workerCount.toDouble / (1 + 3 * gas.size + 2 * minerals.size))
 
   private var calculatedHarvestingArea: Option[TileRectangle] = None
   private var calculatedHeart: Option[Tile] = None
@@ -46,9 +46,12 @@ class Base(val townHallTile: Tile)
       val dx = centroid.x - townHall.x
       val dy = centroid.y - townHall.y
       val dxBigger = Math.abs(dx) > Math.abs(dy)
-      val boxInitial = (Vector(townHallArea) ++ (minerals.filter(_.mineralsLeft > With.configuration.blockerMineralThreshold) ++ gas)
-        .map(_.tileArea))
-        .boundary
+      val boxInitial = new TileRectangle(
+        (
+          Vector(townHallArea)
+          ++ (minerals.filter(_.mineralsLeft > With.configuration.blockerMineralThreshold)
+          ++ gas)
+        .map(_.tileArea)))
       val output = TileRectangle(
         boxInitial
           .startInclusive

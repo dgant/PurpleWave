@@ -29,7 +29,6 @@ class MeldArchons(maxEnergy: Int = 251) extends Plan {
     val archonsToAdd  = Vector(0, minimumArchons - archonsNow, templarExcess / 2).max
     val templarToMeld = Math.max(templarLow, 2 * archonsToAdd)
     templar.counter = CountUpTo(templarToMeld)
-    With.blackboard.keepingHighTemplar.set(templarExcess < templarNow)
     
     templar.release()
     templar.acquire(this)

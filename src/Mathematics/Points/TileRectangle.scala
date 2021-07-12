@@ -28,6 +28,16 @@ final case class TileRectangle(
         Maff.max(included.view.map(_.y + 1)).getOrElse(0)))
   }
 
+  def this(included: Traversable[TileRectangle]) {
+    this(
+      Tile(
+        Maff.min(included.view.map(_.startInclusive.x)).getOrElse(0),
+        Maff.min(included.view.map(_.startInclusive.y)).getOrElse(0)),
+      Tile(
+        Maff.min(included.view.map(_.endExclusive.x)).getOrElse(0),
+        Maff.min(included.view.map(_.endExclusive.y)).getOrElse(0)))
+  }
+
   if (endExclusive.x < startInclusive.x) {
     throw new Exception("Created an invalid (non-normalized) rectangle")
   }

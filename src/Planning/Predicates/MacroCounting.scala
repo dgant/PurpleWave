@@ -1,8 +1,8 @@
 package Planning.Predicates
 
 import Information.Fingerprinting.Fingerprint
+import Information.Geography.Types.Base
 import Lifecycle.With
-import Planning.Predicates.Milestones.AllMiningBases
 import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchOr, UnitMatcher}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
@@ -25,7 +25,9 @@ trait MacroCounting {
   def supplyBlocked: Boolean = With.self.supplyUsed >= With.self.supplyTotal
 
   def bases: Int = With.geography.ourBases.size
-  def miningBases: Int = AllMiningBases().size
+
+  def isMiningBase(base: Base) = base.minerals.size >= 5 && base.mineralsLeft > With.configuration.minimumMineralsBeforeMinedOut
+  def miningBases: Int = With.geography.ourBases.view.filter(_.townHall.isDefined).count(isMiningBase)
   def mineralOnlyBase: Boolean = With.geography.ourBases.exists(base => base.gas.isEmpty && base.mineralsLeft > With.configuration.minimumMineralsBeforeMinedOut)
   def gasPumps: Int = With.geography.ourBases.map(_.gas.view.filter(_.isOurs).count(_.gasLeft > 300)).sum
 
@@ -147,9 +149,11 @@ trait MacroCounting {
       Zerg.LurkerEgg,
       Zerg.Lurker))
 
-  def enemyDarkTemplarLikely: Boolean = {
-    With.fingerprints.dtRush.matches || With.units.existsEnemy(Protoss.HighTemplar, Protoss.Archon, Protoss.DarkArchon, Protoss.TemplarArchives, Protoss.ArbiterTribunal, Protoss.Arbiter)
-  }
+  def enemyDarkTemplarLikely: Boolean = (
+    With.fingerprints.dtRush.matches
+    || enemyHasUpgrade(Protoss.ZealotSpeed)
+    || enemiesShown(Protoss.HighTemplar, Protoss.Archon, Protoss.DarkArchon, Protoss.TemplarArchives, Protoss.ArbiterTribunal, Protoss.Arbiter) > 0
+  )
 
   def enemyRobo: Boolean = {
     enemyHasShown(Protoss.RoboticsFacility, Protoss.RoboticsSupportBay, Protoss.Observatory, Protoss.Shuttle, Protoss.Reaver, Protoss.Observer)
@@ -163,11 +167,16 @@ trait MacroCounting {
     enemyHasShown(Zerg.Mutalisk, Zerg.Spire) || enemyHasShown(Zerg.Lair) && ! enemyHasShown(Zerg.Hydralisk, Zerg.HydraliskDen, Zerg.Lurker, Zerg.LurkerEgg)
   }
 
+  def enemyCarriersLikely: Boolean = {
+    enemyHasShown(Protoss.Carrier, Protoss.Interceptor, Protoss.FleetBeacon) || enemyHasUpgrade(Protoss.CarrierCapacity)
+  }
+
   def enemyWalledIn: Boolean = {
     With.geography.zones.exists(z => z.walledIn && ! z.owner.isUs)
   }
 
   def enemyBases: Int = With.geography.enemyBases.size
+  def enemyMiningBases: Int = With.geography.enemyBases.count(isMiningBase)
   def foundEnemyBase: Boolean = enemyBases > 0
   def enemyNaturalConfirmed: Boolean = With.geography.enemyBases.exists(b => b.isNaturalOf.isDefined && b.townHall.isDefined)
 

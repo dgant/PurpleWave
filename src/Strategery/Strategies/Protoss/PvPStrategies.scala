@@ -26,7 +26,7 @@ object PvPGateCore extends PvPStrategy {
 object PvPRobo extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCore))
 }
-object PvP2GateDTExpand extends PvPStrategy
+object PvPDT extends PvPStrategy
 object PvP3GateGoon extends PvPStrategy {
   override def responsesWhitelisted: Iterable[Fingerprint] = Iterable(With.fingerprints.robo, With.fingerprints.nexusFirst, With.fingerprints.twoGate, With.fingerprints.fourGateGoon)
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)

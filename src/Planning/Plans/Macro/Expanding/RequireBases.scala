@@ -1,6 +1,5 @@
 package Planning.Plans.Macro.Expanding
 
-import Debugging.English
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.{Plan, Property}
@@ -9,9 +8,7 @@ class RequireBases(basesInitial: Int = 1) extends Plan {
   
   val basesDesired = new Property(basesInitial)
   
-  protected def basesNow: Int = {
-    With.geography.ourBases.size
-  }
+  protected def basesNow: Int = With.geography.ourBases.size
   
   override def onUpdate() {
     val basesAll  = With.geography.ourBases.size

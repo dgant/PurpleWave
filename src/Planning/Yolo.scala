@@ -38,4 +38,12 @@ class Yolo extends TimedTask {
       maxoutYolo = true
     }
   }
+
+  def forceBlackboard(): Unit = {
+    if (active()) {
+      With.blackboard.wantToAttack.set(true)
+      With.blackboard.wantToHarass.set(true)
+      With.blackboard.safeToMoveOut.set(true)
+    }
+  }
 }

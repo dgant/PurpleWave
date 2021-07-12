@@ -1,22 +1,10 @@
 package Planning.Plans.Macro.Protoss
 
-import Lifecycle.With
-import Micro.Agency.Intention
-import Planning.ResourceLocks.LockUnits
 import Planning.Plan
-import ProxyBwapi.Races.Protoss
+import Planning.Plans.GamePlans.MacroActions
 
-class MeldDarkArchons extends Plan {
-  
-  val templar = new LockUnits(this)
-  templar.matcher = Protoss.DarkTemplar
-  
+class MeldDarkArchons extends Plan with MacroActions {
   override def onUpdate() {
-    templar.release() //We don't want them if they're Dark Archons now.
-    templar.acquire(this)
-    templar.units.foreach(_.intend(this, new Intention {
-      toTravel = Some(With.geography.home.center)
-      shouldMeld = true
-    }))
+    makeDarkArchons()
   }
 }

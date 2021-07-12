@@ -18,7 +18,7 @@ import Planning.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.{PvP1ZealotExpand, PvP2GateDTExpand, PvPRobo}
+import Strategery.Strategies.Protoss.{PvP1ZealotExpand, PvPDT, PvPRobo}
 import Tactics.ScoutForCannonRush
 import Utilities.GameTime
 
@@ -29,7 +29,7 @@ class PvP1ZealotExpand extends GameplanTemplate {
     new Employing(PvP1ZealotExpand),
     new And(
       new EnemyStrategy(With.fingerprints.gasSteal),
-      new Employing(PvPRobo, PvP2GateDTExpand)))
+      new Employing(PvPRobo, PvPDT)))
   override val completionCriteria: Predicate = new Latch(new And(
     new BasesAtLeast(2),
     new UnitsAtLeast(5, Protoss.Gateway),

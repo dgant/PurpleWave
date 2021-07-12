@@ -98,7 +98,7 @@ object PvPIdeas {
       new FrameAtMost(GameTime(10, 0)())),
     new Parallel(
       new WriteStatus("ReactToCannonRush"),
-      new BuildOrder(ProtossBuilds.ZZCore: _*),
+      new BuildOrder(ProtossBuilds.ZCoreZ: _*),
       new RequireSufficientSupply,
       new PumpWorkers,
       new Trigger(
@@ -124,11 +124,11 @@ object PvPIdeas {
   class ReactToRoboAsDT extends If(
     new And(
       new Not(new Latch(new UnitsAtLeast(5, Protoss.Gateway))),
-      new Employing(PvP2GateDTExpand),
+      new Employing(PvPDT),
       new EnemyStrategy(With.fingerprints.robo),
       new UnitsAtLeast(25, Protoss.Probe)),
     new Parallel(
-      new WriteStatus("ReactTRoboAsDT"),
+      new WriteStatus("ReactToRoboAsDT"),
       new Pump(Protoss.Dragoon),
       new Build(
         Get(5, Protoss.Gateway),

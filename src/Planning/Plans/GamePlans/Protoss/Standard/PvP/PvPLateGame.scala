@@ -1,180 +1,242 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
+import Debugging.SimpleString
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plan
-import Planning.Plans.Basic.WriteStatus
-import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.Macro.Automatic.{CapGasAt, PumpWorkers, UpgradeContinuously}
-import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
-import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
-import Planning.Predicates.Compound._
-import Planning.Predicates.Milestones._
-import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBasesAtMost, SafeAtHome, SafeToMoveOut}
-import Planning.Predicates.Strategy.{EnemyRecentStrategy, EnemyStrategy}
-import Planning.UnitMatchers.MatchOr
+import Mathematics.Maff
+import Planning.Plans.GamePlans.GameplanImperative
+import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
+import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.Protoss
+import Utilities.{DoQueue, GameTime, Minutes, Seconds}
 
-class PvPLateGame extends GameplanTemplate {
+class PvPLateGame extends GameplanImperative {
+  trait PrimaryTech extends SimpleString
+  object RoboTech extends PrimaryTech
+  object TemplarTech extends PrimaryTech
 
-  override val emergencyPlans: Vector[Plan] = Vector(
-    new PvPIdeas.ReactToDarkTemplarEmergencies,
-    new PvPIdeas.ReactToCannonRush,
-    new PvPIdeas.ReactToRoboAsDT,
-    new PvPIdeas.ReactToArbiters)
+  var fearDeath: Boolean = _
+  var fearDT: Boolean = _
+  var fearMacro: Boolean = _
+  var fearContain: Boolean = _
+  var shouldDetect: Boolean = _
+  var shouldSecondaryTech: Boolean = _
+  var shouldHarass: Boolean = _
+  var shouldAttack: Boolean = _
+  var shouldExpand: Boolean = _
+  var expectCarriers: Boolean = _
+  var primaryTech: Option[PrimaryTech] = None
 
-  override val attackPlan: Plan = new PvPIdeas.AttackSafely
-  override def archonPlan: Plan = new PvPIdeas.MeldArchonsPvP
-  override def workerPlan: Plan = new PumpWorkers(maximumTotal = 25)
+  def primaryTemplar: Boolean = primaryTech.contains(TemplarTech)
+  def primaryRobo: Boolean = primaryTech.contains(RoboTech)
 
-  val goingTemplar = new And(
-    new Not(new EnemyStrategy(With.fingerprints.robo, With.fingerprints.dtRush)),
-    new UnitsAtLeast(1, Protoss.CitadelOfAdun),
-    new UnitsAtMost(0, Protoss.RoboticsFacility),
-    new UnitsAtMost(0, Protoss.RoboticsSupportBay))
+  override def executeBuild(): Unit = {
+    fearDeath   = ! safeAtHome
+    fearMacro   = bases < enemyBases
+    fearDT      = enemyDarkTemplarLikely
+    fearContain =
+      With.scouting.threatOrigin.nearestWalkableTile.tileDistanceGroundManhattan(With.geography.home.nearestWalkableTile) <
+      With.scouting.threatOrigin.nearestWalkableTile.tileDistanceGroundManhattan(With.scouting.mostBaselikeEnemyTile.nearestWalkableTile)
+    // TODO: Don't fear death or contain for a couple of minutes after getting DT if they have no mobile detection or evidence of Robo.
+    // It takes 1:34 to complete an Observer and another ~35 seconds to float it across the map,
+    // so making one DT buys about 2:10 of safety
 
-  val buildCannons = new And(
-    // Templar are reasonably likely
-    new Or(
-      new EnemyHasShownCloakedThreat,
-      new EnemyRecentStrategy(With.fingerprints.dtRush),
-      new And(
-        new EnemyBasesAtMost(1),
-        new Not(new EnemyStrategy(With.fingerprints.robo, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)))),
+    expectCarriers = enemyCarriersLikely || (enemyStrategy(With.fingerprints.forgeFe) && enemies(MatchWarriors) == 0 && (With.frame > Minutes(8)() || enemies(Protoss.PhotonCannon) > 3))
+    shouldDetect = enemyDarkTemplarLikely
+    shouldExpand = (fearMacro || ! fearDeath) || (miningBases < 2 && With.frame > Minutes(13)())
+    shouldExpand &&= ! fearContain
+    shouldExpand &&= ! fearDT
+    shouldExpand &&= (miningBases < 2 || enemyBases > 2 || unitsComplete(Protoss.Gateway) > 3 / miningBases || (expectCarriers && With.frame > GameTime(3, 30)() * miningBases))
+    shouldHarass = fearMacro || fearContain
+    shouldAttack = shouldHarass && ! fearDeath && ! fearDT
+    shouldAttack ||= shouldExpand
+    shouldSecondaryTech = gasPumps > 2 || (unitsComplete(Protoss.Reaver) > 2 && unitsComplete(Protoss.Shuttle) > 0) || techComplete(Protoss.PsionicStorm)
+    oversaturate = shouldExpand && ! fearDeath
 
-    // We can't use a Robotics Facility
-    // Note that this is deliberately placed after the Templar check so it only sticks at the point we're thinking about DTs
-    new Sticky(new And(new UnitsAtMost(0, Protoss.RoboticsFacility), goingTemplar)))
+    lazy val commitToTech = unitsComplete(Protoss.Gateway) >= 5
+    primaryTech = primaryTech
+      .orElse(Some(RoboTech).filter(x => units(Protoss.RoboticsFacility) > 0))
+      .orElse(Some(TemplarTech).filter(x => units(Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.PhotonCannon) > 0))
+      .orElse(Some(RoboTech).filter(x => enemyDarkTemplarLikely))
+      .orElse(Some(RoboTech).filter(x => enemyStrategy(With.fingerprints.cannonRush)))
+      .orElse(Some(TemplarTech).filter(x => commitToTech && expectCarriers))
+      .orElse(Some(TemplarTech).filter(x => commitToTech && bases > 2))
+      .orElse(Some(TemplarTech).filter(x => commitToTech && ! enemyRobo && roll("PrimaryTechTemplar", if (enemyStrategy(With.fingerprints.fourGateGoon)) 0.5 else 0.25)))
+      .orElse(Some(RoboTech).filter(x => commitToTech))
 
-  class EnemyPassiveOpening extends Or(
-    new And(
-      new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)),
-      new EnemyStrategy(With.fingerprints.robo, With.fingerprints.nexusFirst, With.fingerprints.forgeFe)),
-    new EnemyBasesAtLeast(2))
+    if (fearDeath) status("FearDeath")
+    if (fearDT) status("FearDT")
+    if (fearMacro) status("FearMacro")
+    if (fearContain) status("FearContain")
+    if (shouldDetect) status("Detect")
+    if (shouldSecondaryTech) status("SecondTech")
+    if (shouldAttack) attack()
+    if (shouldHarass) harass()
+    primaryTech.map(_.toString).foreach(status)
 
-  class AddEarlyTech extends If(
-    goingTemplar,
-    new Parallel(
-      new Build(
-        Get(Protoss.CitadelOfAdun),
-        Get(2, Protoss.Gateway),
-        Get(Protoss.TemplarArchives),
-        Get(4, Protoss.Gateway),
-        Get(2, Protoss.Assimilator),
-        Get(5, Protoss.Gateway),
-        Get(Protoss.ZealotSpeed),
-        Get(Protoss.Forge),
-        Get(Protoss.GroundDamage),
-        Get(Protoss.PsionicStorm),
-        Get(7, Protoss.Gateway),
-        Get(Protoss.HighTemplarEnergy),
-        Get(2, Protoss.GroundDamage))),
-    new Parallel(
-      new Build(Get(3, Protoss.Gateway)),
-      new FlipIf(
-        new And(
-          new SafeAtHome,
-          new Or(new UnitsAtLeast(1, Protoss.RoboticsFacility), new EnemyBasesAtLeast(2))),
-        new Parallel(
-          new Build(
-            Get(4, Protoss.Gateway),
-            Get(2, Protoss.Assimilator),
-            Get(6, Protoss.Gateway))),
-        new Build(
-          Get(2, Protoss.Assimilator),
-          Get(Protoss.RoboticsFacility),
-          Get(Protoss.Observatory),
-          Get(Protoss.RoboticsSupportBay),
-          Get(4, Protoss.Gateway),
-          Get(Protoss.ShuttleSpeed)))))
+    // Emergency reactions
+    new PvPIdeas.ReactToDarkTemplarEmergencies().update()
+    new PvPIdeas.ReactToCannonRush().update()
+    new PvPIdeas.ReactToArbiters().update()
+  }
 
-  class AddLateTech extends Parallel(
-    new Build(
-      Get(6, Protoss.Gateway),
-      Get(Protoss.Forge),
-      Get(Protoss.CitadelOfAdun),
-      Get(Protoss.GroundDamage),
-      Get(Protoss.ZealotSpeed),
-      Get(Protoss.TemplarArchives)),
-    new If(new Or(new UpgradeStarted(Protoss.GroundDamage, 3), new UnitsAtLeast(2, Protoss.Forge)), new UpgradeContinuously(Protoss.GroundArmor)),
-    new Build(Get(Protoss.RoboticsFacility), Get(Protoss.Observatory)))
+  override def execute(): Unit = {
+    val trainArmy     = new DoQueue(doTrainArmy)
+    val fillerArmy    = new DoQueue(doFillerArmy)
+    val addGates      = new DoQueue(doAddProduction)
+    val primaryTech   = new DoQueue(doPrimaryTech)
+    val secondaryTech = new DoQueue(doSecondaryTech)
+    val expand        = new DoQueue(doExpand)
 
-  class GetReactiveObservers extends If(
-    new And(
-      new EnemyHasShownCloakedThreat,
-      new Or(
-        new And(goingTemplar, new ReadyForThirdIfSafe),
-        new Not(goingTemplar))),
-    new Build(Get(Protoss.RoboticsFacility), Get(Protoss.Observatory), Get(Protoss.ObserverSpeed)))
+    // TODO: Emergency/Proactive detection
+    // TODO: Gas pumps when?
 
-  class ReadyForThirdIfSafe extends And(
-    new Or(
-      new Not(new EnemyHasShownCloakedThreat),
-      new UnitsAtLeast(2, Protoss.Observer)),
-    new Or(
-      new And(
-        goingTemplar,
-        new UpgradeComplete(Protoss.ZealotSpeed),
-        new TechComplete(Protoss.PsionicStorm),
-        new UnitsAtLeast(6, Protoss.Gateway, complete = true)),
-      new And(
-        new Not(goingTemplar),
-        new UnitsAtLeast(4, Protoss.Gateway, complete = true),
-        new UnitsAtLeast(1, Protoss.Shuttle, complete = true),
-        new UnitsAtLeast(2, Protoss.Reaver, complete = true))))
+    if (expectCarriers) { makeDarkArchons() }
 
-  class FinishDarkTemplarRush extends If(
-    new And(new UnitsAtLeast(1, Protoss.TemplarArchives), new Not(new EnemyStrategy(With.fingerprints.robo))),
-    new If(
-      new Or(new EnemiesAtLeast(1, Protoss.Forge), new EnemiesAtLeast(1, Protoss.PhotonCannon), new EnemiesAtLeast(1, Protoss.RoboticsFacility)),
-      new BuildOrder(Get(1, Protoss.DarkTemplar)),
-      new BuildOrder(Get(2, Protoss.DarkTemplar))))
+    get(Protoss.Gateway)
+    get(Protoss.Assimilator)
+    get(Protoss.CyberneticsCore)
+    get(Protoss.DragoonRange)
 
-  class NeedToCutWorkersForGateways extends And(
-    new MiningBasesAtLeast(2),
-    new EnemyBasesAtMost(1),
-    new UnitsAtMost(4, MatchOr(Protoss.Gateway, Protoss.RoboticsFacility, Protoss.RoboticsSupportBay)),
-    new Not(new EnemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.dtRush)))
+    if (fearDeath) {
+      trainArmy()
+      addGates()
+      fillerArmy()
+    }
+    if (fearContain) {
+      primaryTech()
+      trainArmy()
+      addGates()
+    }
+    get(3, Protoss.Gateway)
+    if (shouldExpand) {
+      expand()
+    }
+    get(2, Protoss.Assimilator)
+    if (minerals > 400 || gas < 100) buildGasPumps()
+    primaryTech()
+    if (shouldSecondaryTech) {
+      secondaryTech()
+    }
+    trainArmy()
+    addGates()
+    expand()
+    secondaryTech()
+  }
 
-  override def buildPlans: Seq[Plan] = Seq(
-    new CapGasAt(500),
-    new FinishDarkTemplarRush,
-    new If(
-      new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
-      new PumpWorkers(maximumConcurrently = 2),
-      new If(
-        new NeedToCutWorkersForGateways,
-        new WriteStatus("GatewayCut"),
-        new PumpWorkers(maximumConcurrently = 1))),
+  def doTrainArmy(): Unit = {
+    if (enemyDarkTemplarLikely || enemyShownCloakedThreat) pump(Protoss.Observer, 2)
+    if (expectCarriers && units(Protoss.DarkArchon) + 2 * units(Protoss.DarkTemplar) < Maff.clamp(enemies(Protoss.Carrier), 8, 16)) {
+      pump(Protoss.DarkTemplar)
+      pumpRatio(Protoss.Dragoon, 16, 64, Seq(Enemy(Protoss.Carrier, 6.0)))
+    }
+    if (enemies(Protoss.Observer) == 0) {
+      pump(Protoss.DarkTemplar, 1)
+    }
+    pumpRatio(Protoss.Dragoon, 0, 100, Seq(Enemy(Protoss.Scout, 2.0), Enemy(Protoss.Shuttle, 2.0), Friendly(Protoss.Zealot, 1.0), Friendly(Protoss.Archon, 3.0)))
+    if ( ! expectCarriers && ! fearDeath && ( ! fearContain || ! enemyRobo)) pump(Protoss.Observer, 1)
 
-    new Build(Get(Protoss.Pylon), Get(Protoss.Gateway), Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore), Get(Protoss.DragoonRange), Get(2, Protoss.Gateway)),
+    if (techStarted(Protoss.PsionicStorm)) {
+      pumpRatio(Protoss.Dragoon, 8, 24, Seq(Friendly(Protoss.Zealot, 2.0)))
+      pumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-1), Friendly(MatchWarriors, 1.0 / 4.0)))
+      if (shouldHarass) {
+        pump(Protoss.Shuttle, 1)
+      }
+    } else {
+      pumpShuttleAndReavers(6, shuttleFirst = unitsComplete(Protoss.RoboticsSupportBay) == 0)
+    }
+    if (upgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.Zealot.buildFrames + Seconds(10)())) {
+      pumpRatio(Protoss.Zealot, 2, 16, Seq(Friendly(Protoss.Dragoon, 0.5)))
+    }
+    pump(Protoss.Dragoon)
+  }
 
-    // Detection
-    new If(buildCannons, new BuildCannonsAtNatural(2)),
-    new If(buildCannons, new BuildCannonsAtExpansions(1)),
-    new GetReactiveObservers,
+  def doFillerArmy(): Unit = {
+    if (gas > 200 && techStarted(Protoss.PsionicStorm)) {
+      pump(Protoss.HighTemplar)
+    }
+    if (gas < 42 || minerals > 400) {
+      pump(Protoss.Zealot)
+    }
+  }
 
-    // Expansions
-    new RequireMiningBases(2),
-    new If(new And(new ReadyForThirdIfSafe, new SafeToMoveOut), new RequireMiningBases(3)),
+  def doAddProduction(): Unit = {
+    if (units(Protoss.RoboticsFacility) > 0) { get(Protoss.RoboticsSupportBay) }
+    if (units(Protoss.CitadelOfAdun) > 0 && ! enemyRobo) { get(Protoss.TemplarArchives) }
+    get(miningBases * 4 - 2 * units(Protoss.RoboticsFacility), Protoss.Gateway)
+  }
 
-    // Meat
-    new If(new UnitsAtLeast(1, Protoss.HighTemplar), new Build(Get(Protoss.PsionicStorm))),
-    new PvPIdeas.TrainArmy,
+  def doPrimaryTech(): Unit = {
+    if (primaryTech.contains(RoboTech)) {
+      doRobo()
+    } else if (primaryTech.contains(TemplarTech)) {
+      doTemplar()
+    }
+  }
 
-    // Two-base transition
-    new If(new NeedToCutWorkersForGateways, new Build(Get(5, Protoss.Gateway), Get(2, Protoss.Assimilator))),
-    new AddEarlyTech,
-    new BuildGasPumps,
+  def doSecondaryTech(): Unit = {
+    if (primaryTech.contains(RoboTech)) {
+      doTemplar()
+    } else if (primaryTech.contains(TemplarTech)) {
+      doRobo()
+    }
+  }
 
-    // Three-base (including likely mine-out)t ransition
-    new RequireBases(3),
-    new AddLateTech,
-    new RequireMiningBases(3),
-    new If(new MiningBasesAtLeast(3), new If(goingTemplar, new Build(Get(9, Protoss.Gateway)), new Build(Get(7, Protoss.Gateway)))),
-    new RequireMiningBases(4),
-    new If(new MiningBasesAtLeast(4), new If(goingTemplar, new Build(Get(14, Protoss.Gateway)), new Build(Get(12, Protoss.Gateway)))),
-  )
+  def doExpand(): Unit = {
+    requireMiningBases(Math.min(4, miningBases + 1))
+  }
+
+  def doRobo(): Unit = {
+    get(Protoss.RoboticsFacility)
+    buildOrder(Get(Protoss.Shuttle))
+    if ( ! fearDeath) {
+      get(Protoss.Observatory)
+      buildOrder(Get(Protoss.Observer))
+      if (enemyDarkTemplarLikely || enemyShownCloakedThreat) {
+        upgradeContinuously(Protoss.ObserverSpeed)
+        if (enemyHasShown(Protoss.Arbiter) && upgradeComplete(Protoss.ObserverSpeed)) {
+          get(Protoss.ObserverVisionRange)
+        }
+      }
+    }
+    get(Protoss.RoboticsSupportBay)
+    buildOrder(Get(Protoss.Reaver))
+    if (units(Protoss.Reaver) > 0 || techStarted(Protoss.PsionicStorm)) {
+      get(Protoss.ShuttleSpeed)
+    }
+    if (upgradeComplete(Protoss.ShuttleSpeed) && units(Protoss.Reaver) >= 4) {
+      get(Protoss.ScarabDamage)
+    }
+  }
+
+  def doTemplar(): Unit = {
+    get(Protoss.Forge)
+    get(Protoss.CitadelOfAdun)
+    get(Protoss.TemplarArchives)
+    if (expectCarriers) {
+      get(Protoss.DarkArchonEnergy)
+      if (upgradeComplete(Protoss.DarkArchonEnergy)) {
+        get(Protoss.MindControl)
+      }
+    } else {
+      if ( ! enemyRobo) {
+        buildOrder(Get(Protoss.DarkTemplar))
+      }
+      get(Protoss.PsionicStorm)
+      buildOrder(Get(2, Protoss.HighTemplar))
+      get(Protoss.GroundDamage)
+      get(Protoss.ZealotSpeed)
+      if (techComplete(Protoss.PsionicStorm, withinFrames = Seconds(10)())) {
+        get(Protoss.HighTemplarEnergy)
+      }
+      if (upgradeComplete(Protoss.GroundDamage, 1)) { get(Protoss.GroundArmor,  1) }
+      if (upgradeComplete(Protoss.GroundArmor,  1)) { get(Protoss.GroundDamage, 2) }
+      if (upgradeComplete(Protoss.GroundDamage, 2)) { get(Protoss.GroundArmor,  2) }
+      if (upgradeComplete(Protoss.GroundArmor,  2)) { get(Protoss.GroundDamage, 3) }
+      if (gasPumps >= 3 & miningBases >= 3) {
+        if (upgradeComplete(Protoss.GroundDamage, 3)) { get(Protoss.GroundArmor, 3) }
+        if (upgradeComplete(Protoss.GroundArmor,  3)) { upgradeContinuously(Protoss.Shields) }
+      }
+    }
+  }
 }

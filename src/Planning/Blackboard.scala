@@ -33,7 +33,7 @@ class Blackboard {
   var allIn                 : Property[Boolean]           = add(new Property(false))
   var yoloing               : Property[Boolean]           = add(new Property(true))
   var allowIslandBases      : Property[Boolean]           = add(new Property(false))
-  var keepingHighTemplar    : Property[Boolean]           = add(new Property(true))
+  var makeDarkArchons       : Property[Boolean]           = add(new Property(false))
   var pushKiters            : Property[Boolean]           = add(new Property(false))
   var preferCloseExpansion  : Property[Boolean]           = add(new Property(false))
   var floatableBuildings    : Property[Vector[UnitClass]] = add(new Property(Vector.empty))

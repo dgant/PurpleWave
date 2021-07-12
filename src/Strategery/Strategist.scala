@@ -112,7 +112,7 @@ class Strategist {
     if ( ! rolls.contains(key)) {
       val rolled = Random.nextDouble()
       val success = rolled >= threshold
-      With.logger.debug(f"Roll for $key ${if (success) "PASSED" else "FAILED"} (Rolling $rolled with threshold $threshold)")
+      With.logger.debug(f"Roll for $key ${if (success) "PASSED" else "FAILED"} (Rolled $rolled against $threshold threshold)")
       rolls(key) = success
     }
     rolls(key)

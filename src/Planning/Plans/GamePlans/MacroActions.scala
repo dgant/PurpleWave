@@ -18,6 +18,7 @@ trait MacroActions {
   def status(text: String): Unit = With.blackboard.status.set(With.blackboard.status() :+ text)
 
   def attack(): Unit = With.blackboard.wantToAttack.set(true)
+  def harass(): Unit = With.blackboard.wantToHarass.set(true)
   def allIn(): Unit = { With.blackboard.allIn.set(true); attack() }
   def scoutOn(unitMatcher: UnitMatcher, scoutCount: Int = 1, quantity: Int = 1): Unit = {
     new ScoutOn(unitMatcher, scoutCount = scoutCount, quantity = quantity).update()
@@ -68,6 +69,9 @@ trait MacroActions {
   }
   def pumpShuttleAndReavers(reavers: Int = 50, shuttleFirst: Boolean = true): Unit = {
     new PumpShuttleAndReavers(reavers, shuttleFirst).update()
+  }
+  def makeDarkArchons(): Unit = {
+    With.blackboard.makeDarkArchons.set(true)
   }
   def pylonBlock(): Unit = {
     new PylonBlock().update()

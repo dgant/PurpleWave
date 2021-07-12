@@ -2,6 +2,7 @@ package Strategery.Selection
 
 import Lifecycle.With
 import Strategery.Strategies.Strategy
+import bwapi.Race
 
 object StrategySelectionTournament extends StrategySelectionPolicy {
   
@@ -16,7 +17,14 @@ object StrategySelectionTournament extends StrategySelectionPolicy {
     if (opponent.isEmpty) {
       With.logger.warn("Didn't find opponent plan for " + enemyName)
     }
+
+    var default: StrategySelectionPolicy = StrategySelectionGreedy()
+    if (With.self.raceCurrent == Race.Protoss) {
+      if (With.enemy.raceInitial == Race.Terran) default= Opponents.defaultPvT
+      else if (With.enemy.raceInitial == Race.Protoss) default = Opponents.defaultPvP
+      else if (With.enemy.raceInitial == Race.Zerg) default = Opponents.defaultPvZ
+    }
     
-    opponent.map(_.policy.chooseBranch).getOrElse(StrategySelectionGreedy().chooseBranch)
+    opponent.map(_.policy).getOrElse(default).chooseBranch
   }
 }

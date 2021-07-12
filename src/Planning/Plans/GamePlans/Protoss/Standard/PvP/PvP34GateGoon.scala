@@ -11,6 +11,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Milestones._
+import Planning.Predicates.Never
 import Planning.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyRecentStrategy, EnemyStrategy}
 import Planning.{Plan, Predicate}
@@ -19,7 +20,7 @@ import Strategery.Strategies.Protoss.{PvP3GateGoon, PvP4GateGoon}
 
 class PvP34GateGoon extends GameplanTemplate {
   
-  override val activationCriteria : Predicate = new Employing(PvP3GateGoon, PvP4GateGoon)
+  override val activationCriteria : Predicate = new Never
   override val completionCriteria : Predicate = new Latch(new MiningBasesAtLeast(2))
 
   override def blueprints = Vector(

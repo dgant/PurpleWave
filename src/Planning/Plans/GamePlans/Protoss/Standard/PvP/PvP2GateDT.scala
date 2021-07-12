@@ -15,17 +15,17 @@ import Planning.Plans.Placement.{BuildCannonsAtNatural, BuildCannonsInMain, Prop
 import Planning.Plans.Scouting.ScoutCleared
 import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Milestones._
+import Planning.Predicates.Never
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, EnemyDarkTemplarLikely, SafeAtHome}
-import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
+import Planning.Predicates.Strategy.EnemyStrategy
 import Planning.UnitMatchers.{MatchUpgrading, MatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvPDT
 import Utilities.GameTime
 
 class PvP2GateDT extends GameplanTemplate {
   
-  override val activationCriteria = new Employing(PvPDT)
+  override val activationCriteria = new Never
   override val completionCriteria: Predicate = new Latch(new And(new UnitsAtLeast(1, Protoss.TemplarArchives), new BasesAtLeast(2)))
 
   override val attackPlan = new If(

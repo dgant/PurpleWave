@@ -8,7 +8,7 @@ import Planning.Plans.GamePlans.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.Protoss
-import Utilities.{DoQueue, GameTime, Minutes, Seconds}
+import Utilities._
 
 class PvPLateGame extends GameplanImperative {
   trait PrimaryTech extends SimpleString
@@ -19,6 +19,7 @@ class PvPLateGame extends GameplanImperative {
   var fearDT: Boolean = _
   var fearMacro: Boolean = _
   var fearContain: Boolean = _
+  var dtBravery: Boolean = _
   var shouldDetect: Boolean = _
   var shouldSecondaryTech: Boolean = _
   var shouldHarass: Boolean = _
@@ -30,6 +31,8 @@ class PvPLateGame extends GameplanImperative {
   def primaryTemplar: Boolean = primaryTech.contains(TemplarTech)
   def primaryRobo: Boolean = primaryTech.contains(RoboTech)
 
+  var firstDTFrame: Int = Forever()
+
   override def executeBuild(): Unit = {
     fearDeath   = ! safeAtHome
     fearMacro   = bases < enemyBases
@@ -37,9 +40,16 @@ class PvPLateGame extends GameplanImperative {
     fearContain =
       With.scouting.threatOrigin.nearestWalkableTile.tileDistanceGroundManhattan(With.geography.home.nearestWalkableTile) <
       With.scouting.threatOrigin.nearestWalkableTile.tileDistanceGroundManhattan(With.scouting.mostBaselikeEnemyTile.nearestWalkableTile)
-    // TODO: Don't fear death or contain for a couple of minutes after getting DT if they have no mobile detection or evidence of Robo.
+
+    // Don't fear death or contain for a couple of minutes after getting DT if they have no mobile detection or evidence of Robo.
     // It takes 1:34 to complete an Observer and another ~35 seconds to float it across the map,
-    // so making one DT buys about 2:10 of safety
+    // so making one DT buys about 2:10 of safety, plus the time it takes to actually make the DT
+    Maff.min(With.units.ours.filter(Protoss.DarkTemplar).map(_.frameDiscovered)).foreach(f => firstDTFrame = Math.min(firstDTFrame, f))
+    dtBravery = ! enemyRobo && unitsComplete(Protoss.DarkTemplar) > 0 && With.frame < firstDTFrame + GameTime(2, 42)()
+    if (dtBravery) {
+      fearDeath = false
+      fearContain = false
+    }
 
     expectCarriers = enemyCarriersLikely || (enemyStrategy(With.fingerprints.forgeFe) && enemies(MatchWarriors) == 0 && (With.frame > Minutes(8)() || enemies(Protoss.PhotonCannon) > 3))
     shouldDetect = enemyDarkTemplarLikely
@@ -64,12 +74,13 @@ class PvPLateGame extends GameplanImperative {
       .orElse(Some(TemplarTech).filter(x => commitToTech && ! enemyRobo && roll("PrimaryTechTemplar", if (enemyStrategy(With.fingerprints.fourGateGoon)) 0.5 else 0.25)))
       .orElse(Some(RoboTech).filter(x => commitToTech))
 
+    if (dtBravery) status("DTBravery")
     if (fearDeath) status("FearDeath")
     if (fearDT) status("FearDT")
     if (fearMacro) status("FearMacro")
     if (fearContain) status("FearContain")
     if (shouldDetect) status("Detect")
-    if (shouldSecondaryTech) status("SecondTech")
+    if (shouldSecondaryTech) status("2ndTech")
     if (shouldAttack) attack()
     if (shouldHarass) harass()
     primaryTech.map(_.toString).foreach(status)

@@ -44,7 +44,7 @@ object FormationGeneric {
     val groundUnits = units.filterNot(_.flying)
     if (groundUnits.isEmpty) return FormationEmpty
 
-    lazy val vanguardUnits  = Maff.takePercentile(0.5, groundUnits)(Ordering.by(_.pixelDistanceTravelling(approach)))
+    lazy val vanguardUnits  = Maff.takePercentile(0.5, groundUnits)(Ordering.by(_.pixelDistanceTravelling(face)))
     lazy val centroid       = Maff.weightedExemplar(vanguardUnits.view.map(u => (u.pixel, u.subjectiveValue)))
     lazy val path           = new PathfindProfile(floodCentroid, Some(floodTarget), employGroundDist = true).find
     lazy val patht          = path.tiles.get.view

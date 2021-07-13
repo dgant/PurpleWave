@@ -116,7 +116,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     producer = Some(plan)
   }
   @inline final def getProducer: Option[Prioritized] = {
-    producer.filter(_.isPrioritized)
+    producer.filter(p => p.isPrioritized)
   }
 
   @inline final def addonArea : TileRectangle = TileRectangle(Tile(0, 0), Tile(2, 2)).add(tileTopLeft).add(4,1)

@@ -166,7 +166,7 @@ class PvPOpening extends GameplanImperative {
         getCannons &&= ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
         getCannons &&= roll("DTSkipCannons", 0.5)
       }
-      shouldExpand = unitsComplete(Protoss.DarkTemplar) > 0 || (safeToMoveOut && units(Protoss.DarkTemplar) > 0)
+      shouldExpand ||= unitsComplete(Protoss.DarkTemplar) > 0 || (safeToMoveOut && units(Protoss.DarkTemplar) > 0)
     } else if (employing(PvP3GateGoon)) {
       shouldExpand = unitsComplete(Protoss.Gateway) >= 3 && unitsComplete(MatchWarriors) >= 6
     } else if (employing(PvP4GateGoon)) {
@@ -178,7 +178,10 @@ class PvPOpening extends GameplanImperative {
     shouldAttack = unitsComplete(Protoss.Zealot) > 0 && enemiesComplete(MatchWarriors, Protoss.PhotonCannon) == 0
     shouldAttack ||= With.fingerprints.cannonRush.matches
     // Attack when using a more aggressive build
-    shouldAttack ||= (enemyLowUnitStrategy || employing(PvP1012, PvPGateCoreGate)) && safeToMoveOut
+    shouldAttack ||= safeToMoveOut &&
+      (enemyLowUnitStrategy
+        || (employing(PvP1012) && (unitsComplete(Protoss.Zealot) > 3 || ! enemyStrategy(With.fingerprints.twoGate))
+        || (employing(PvPGateCoreGate) && unitsComplete(Protoss.Dragoon) > 0)))
     // Attack when we have range advantage
     shouldAttack ||= unitsComplete(Protoss.Dragoon) > 0     && ! enemyHasShown(Protoss.Dragoon)         && (enemiesShown(Protoss.Zealot) > 2 || With.fingerprints.twoGate.matches)
     shouldAttack ||= upgradeComplete(Protoss.DragoonRange)  && ! enemyHasUpgrade(Protoss.DragoonRange)  && (enemiesShown(Protoss.Zealot) > 2 || With.fingerprints.twoGate.matches)
@@ -507,7 +510,13 @@ class PvPOpening extends GameplanImperative {
         buildCannonsAtNatural.update()
       }
       if (shouldExpand) { requireMiningBases(2) }
+      if ( ! enemyRobo) pump(Protoss.DarkTemplar, 1)
       trainGatewayUnits()
+      if (units(Protoss.TemplarArchives) > 0) {
+        requireMiningBases(2)
+      } else {
+        get(4, Protoss.Gateway)
+      }
     } else if (employing(PvP3GateGoon)) {
       trainGatewayUnits()
       get(3, Protoss.Gateway)

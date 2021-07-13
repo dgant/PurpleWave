@@ -145,8 +145,6 @@ object MicroPathing {
 
     // How to get there
     unit.agent.forces(Forces.spreading)   = (Potential.preferSpreading(unit)  * Maff.toInt(goalSafety))
-    unit.agent.forces(Forces.regrouping)  = (Potential.preferRegrouping(unit) * Maff.toInt( ! goalSafety))
-    unit.agent.forces(Forces.spacing)     = (Potential.avoidCollision(unit))
 
     ForceMath.rebalance(unit.agent.forces, 1.5, Forces.threat, Forces.travel, Forces.sneaking)
     ForceMath.rebalance(unit.agent.forces, 1.0, Forces.spreading, Forces.regrouping, Forces.spacing)

@@ -40,7 +40,8 @@ class Visualization extends TimedTask {
     ShowPerformanceSummary,
     ShowStoryteller,
 
-    ShowJudgment
+    ShowJudgment,
+    ShowFormations
   )
 
   lazy val knownViews: Vector[View] = Vector[View](
@@ -55,6 +56,7 @@ class Visualization extends TimedTask {
     ShowDoom,
     ShowAccounting,
     ShowFingerprints,
+    ShowFormations,
     ShowGas,
     ShowGradients,
     ShowGrids,

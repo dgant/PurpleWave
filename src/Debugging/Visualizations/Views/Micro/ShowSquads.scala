@@ -16,7 +16,6 @@ object ShowSquads extends View {
   
   def renderSquadMap(squad: Squad) {
     val color = squadColors(squad.hashCode % squadColors.length)
-    squad.formations.foreach(_.renderMap(color))
     squad.units.foreach(unit =>
       DrawMap.label(
         squad.toString,

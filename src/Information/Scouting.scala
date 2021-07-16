@@ -53,10 +53,21 @@ final class Scouting extends TimedTask with EnemyTechs {
     Maff.weightedExemplar(With.units.enemy.filter(countMuscle).map(u => (u.pixel, u.subjectiveValue)) ++ Seq((mostBaselikeEnemyTile.center, 5 * Terran.Marine.subjectiveValue))).nearestWalkableTile
   })
 
-  def muscleOrigin: Tile = _muscleOrigin()
-  private val _muscleOrigin = new Cache(() => {
-    Maff.weightedExemplar(With.units.ours.filter(countMuscle).map(u => (u.pixel, u.subjectiveValue))).nearestWalkableTile
+  def enemyMuscleOrigin: Tile = _enemyMuscleOrigin()
+  private val _enemyMuscleOrigin = new Cache(() => {
+    val muscle = With.units.enemy.filter(countMuscle)
+    if (muscle.isEmpty) mostBaselikeEnemyTile.nearestWalkableTile
+    else Maff.weightedExemplar(muscle.map(u => (u.pixel, u.subjectiveValue))).nearestWalkableTile
   })
+
+  def ourMuscleOrigin: Tile = _ourMuscleOrigin()
+  private val _ourMuscleOrigin = new Cache(() => {
+    val muscle = With.units.ours.filter(countMuscle)
+    if (muscle.isEmpty) With.geography.home
+    else Maff.weightedExemplar(muscle.map(u => (u.pixel, u.subjectiveValue))).nearestWalkableTile
+  })
+
+  def enemyProgress: Double = Maff.clamp(1 - enemyMuscleOrigin.tileDistanceGroundManhattan(With.geography.home).toDouble / With.geography.home.tileDistanceGroundManhattan(mostBaselikeEnemyTile), 0, 1)
 
   @inline private def countMuscle(u: UnitInfo): Boolean = u.likelyStillThere && u.attacksAgainstGround > 0 && ! u.unitClass.isWorker && ! u.unitClass.isBuilding
 

@@ -44,17 +44,17 @@ object ShowSquads extends View {
   
   override def renderScreen() {
     val table =
-      Vector(Vector("Goal", "", "Vicinity", "Recruits", "",  "", "Targets", "", "", "Enemies")) ++
+      Vector(Vector("Goal", "", "Vicinity", "", "", "Recruits", "",  "Targets", "", "Enemies")) ++
       With.squads.all.map(squad =>
         Vector(
           squad.toString,
           "",
           squad.vicinity.base.map(_.toString).getOrElse(squad.vicinity.tile.toString),
+          "",
+          "",
           enumerateUnits(squad.units),
           "",
-          "",
           enumerateUnits(squad.targetQueue.getOrElse(Seq.empty)),
-          "",
           "",
           enumerateUnits(squad.enemies)))
     DrawScreen.table(5, 7 * With.visualization.lineHeightSmall, table)

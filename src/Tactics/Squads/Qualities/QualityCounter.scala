@@ -46,6 +46,7 @@ class QualityCounter {
       .flatMap(friendlyQuality =>
         qualitiesEnemy
           .view
+          .filter(_._2 > 0)
           .flatMap(enemyQuality =>
             enemyQuality._1.counteredBy
               .view
@@ -56,7 +57,7 @@ class QualityCounter {
                 // We have thoroughly surpassed the required value: 0.0
                 // We are already at exact match value: 1.0
                 // We have no existing value: 2.0
-                val score = 1 + Maff.clamp((valueRequired - valuePossessed) / valueRequired, -1, 1)
+                val score = 1 + Maff.nanToZero(Maff.clamp((valueRequired - valuePossessed) / valueRequired, -1, 1))
                 (friendlyQuality, enemyQuality._1, score)
             })))
 }

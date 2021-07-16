@@ -15,7 +15,7 @@ class MissionKillExpansion extends Mission {
     With.scouting.enemyMain.map(main =>
       With.geography.enemyBases
         .filterNot(_.metro == main.metro)
-        .filter(b => With.scouting.muscleOrigin.pixelDistanceGround(b.heart) + 320 < With.scouting.threatOrigin.pixelDistanceGround(b.heart))).getOrElse(Seq.empty)
+        .filter(b => With.scouting.ourMuscleOrigin.pixelDistanceGround(b.heart) + 320 < With.scouting.threatOrigin.pixelDistanceGround(b.heart))).getOrElse(Seq.empty)
   }
 
   def best: Option[Base] = Maff.maxBy(eligible)(b => b.heart.pixelDistanceGround(With.scouting.threatOrigin) - b.heart.pixelDistanceGround(With.geography.home))
@@ -38,6 +38,7 @@ class MissionKillExpansion extends Mission {
     vicinity = targetBase.get.heart.center
     lock.preference = PreferClose(vicinity)
     lock.acquire(this)
+    addUnits(lock.units)
   }
 
   override def run(): Unit = {

@@ -11,6 +11,7 @@ import scala.collection.mutable.ListBuffer
 class Logger {
   
   private val logMessages = new ListBuffer[String]
+  private val performanceMessages = new ListBuffer[String]
   private var errorOcurred = false
   
   def flush(): Unit = {
@@ -23,6 +24,7 @@ class Logger {
     val file = new File(filename)
     val printWriter = new PrintWriter(file)
     printWriter.write(logMessages.mkString("\r\n"))
+    printWriter.write(performanceMessages.mkString("\r\n"))
     printWriter.close()
   }
 
@@ -41,17 +43,20 @@ class Logger {
   }
   
   def debug(message: String) {
-    log("DEBUG | " + message, chat = false)
+    log(f"DEBUG | $message", chat = false)
   }
   
   def warn(message: String) {
-    //log("WARN  | " + message)
-    log("WARN  | " + message, chat = false)
+    log(f"WARN  | $message", chat = false)
   }
   
   def error(message: String) {
     errorOcurred = true
-    log("ERROR | " + message)
+    log(f"ERROR | $message")
+  }
+
+  def performance(message: String): Unit = {
+    log(f"SPEED | $message", chat = false, logstd = false, target = performanceMessages)
   }
 
   private def canRelog(message: String, sleepFrames: Int): Boolean = {
@@ -75,10 +80,10 @@ class Logger {
     if (canRelog(message, sleepFrames)) { error(message) }
   }
   
-  private def log(message: String, chat: Boolean = true) {
-    val logMessage = With.frame.toString + " | " + new GameTime(With.frame).toString + " | " + message
-    logMessages.append(logMessage)
-    if (With.configuration.logstd) {
+  private def log(message: String, chat: Boolean = true, logstd: Boolean = true, target: mutable.Buffer[String] = logMessages) {
+    val logMessage = f"${With.frame} | ${new GameTime(With.frame)} | $message"
+    target.append(logMessage)
+    if (With.configuration.logstd && logstd) {
       System.err.println(logMessage)
     }
     if (chat && With.configuration.debugging && With.manners != null) {

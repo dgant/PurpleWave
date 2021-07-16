@@ -22,15 +22,16 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 class Tactics extends TimedTask {
-  private lazy val makeDarkArchons            = new DoMakeDarkArchons
   private lazy val clearBurrowedBlockers      = new SquadClearExpansionBlockers
-  private lazy val followBuildOrder           = new FollowBuildOrder
   private lazy val ejectScout                 = new SquadEjectScout
+  private lazy val followBuildOrder           = new FollowBuildOrder
   private lazy val scoutWithOverlord          = new SquadInitialOverlordScout
   private lazy val defendAgainstProxy         = new DefendAgainstProxy
   private lazy val defendFightersAgainstRush  = new DefendFightersAgainstRush
   private lazy val defendAgainstWorkerRush    = new DefendAgainstWorkerRush
   private lazy val defendFFEAgainst4Pool      = new DefendFFEWithProbes
+  private lazy val makeDarkArchons            = new SquadMergeDarchons
+  private lazy val mindControl                = new SquadMindControl
   private lazy val catchDTRunby               = new SquadCatchDTRunby
   private lazy val scoutWithWorkers           = new SquadWorkerScout
   private lazy val scoutForCannonRush         = new ScoutForCannonRush
@@ -73,6 +74,7 @@ class Tactics extends TimedTask {
 
   private def runPrioritySquads(): Unit = {
     makeDarkArchons.recruit()
+    mindControl.recruit()
     clearBurrowedBlockers.recruit()
     followBuildOrder.update()
     ejectScout.recruit()

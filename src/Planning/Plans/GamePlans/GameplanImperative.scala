@@ -1,9 +1,10 @@
 package Planning.Plans.GamePlans
 
+import Debugging.SimpleString
 import Planning.Plan
 import Planning.Predicates.MacroCounting
 
-abstract class GameplanImperative extends Plan with Modal with MacroCounting with MacroActions {
+abstract class GameplanImperative extends Plan with Modal with MacroCounting with MacroActions  {
   def activated: Boolean = true
   def completed: Boolean = false
   final def isComplete: Boolean = completed || ! activated
@@ -15,6 +16,8 @@ abstract class GameplanImperative extends Plan with Modal with MacroCounting wit
   override def onUpdate(): Unit = {
     if ( ! activated) return
     if (isComplete) return
+    status(toString)
+    if (oversaturate) status("Oversaturate")
     if (doBasics) {
       requireEssentials()
     }
@@ -23,9 +26,12 @@ abstract class GameplanImperative extends Plan with Modal with MacroCounting wit
     }
     if (doBasics) {
       pumpSupply()
-      pumpWorkers(oversaturate = oversaturate)
+      pumpWorkers(oversaturate = false)
     }
     execute()
+    if (oversaturate) {
+      pumpWorkers(oversaturate = true)
+    }
   }
 
   def executeBuild(): Unit = {}

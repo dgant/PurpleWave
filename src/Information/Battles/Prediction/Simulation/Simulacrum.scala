@@ -49,6 +49,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   var simulation: Simulation = _
   var behavior: SimulacrumBehavior = _
   var target: Option[Simulacrum] = _
+  var threat: Option[Simulacrum] = _
   val targets: UnorderedBuffer[Simulacrum] = new UnorderedBuffer[Simulacrum](50)
   var gridTile: SimulationGridTile = _
   var measureHealth: Boolean = _
@@ -125,6 +126,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   @inline def act(): Unit = { if (alive && (cooldownLeft == 0 || cooldownMoving == 0)) { behavior.act(this) } }
 
   @inline def update(): Unit = {
+    threat = threat.filter(t => t.alive && t.target.contains(this))
     if (alive) {
       if (hitPoints <= 0) {
         alive = false

@@ -1,11 +1,11 @@
 package Planning
 
-import Debugging.ToString
+import Debugging.SimpleString
 import Lifecycle.With
 
-class Plan extends Prioritized {
+class Plan extends Prioritized with SimpleString {
   
-  val description = new Property[String](realName)
+  val description = new Property[String](super.toString)
   
   protected def onUpdate() {}
   
@@ -15,8 +15,7 @@ class Plan extends Prioritized {
     With.prioritizer.prioritize(this)
     onUpdate()
   }
+
   
-  final lazy val realName: String = ToString(this)
-  
-  final override def toString: String = if (description.get == "") realName else description.get
+  final override def toString: String = description.get
 }

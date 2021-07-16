@@ -3,7 +3,7 @@ package Strategery.Strategies.Protoss
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Strategery.Strategies.Strategy
-import Strategery.{MapGroups, StarCraftMap}
+import Strategery.{MapGroups, Python, StarCraftMap}
 import bwapi.Race
 
 abstract class PvPStrategy extends Strategy {
@@ -20,7 +20,9 @@ object PvP5Zealot extends PvPStrategy
 object PvP1012 extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP3Zealot, PvP5Zealot))
 }
-object PvPGateCoreTech extends PvPStrategy
+object PvPGateCoreTech extends PvPStrategy {
+  override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Python)
+}
 object PvPGateCoreGate extends PvPStrategy
 
 ////////////////////////
@@ -33,7 +35,6 @@ object PvPRobo extends PvPStrategy {
 object PvPDT extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreTech))
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.robo)
-  override def minimumGamesVsOpponent: Int = 2
 }
 object PvP3GateGoon extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreTech, PvPGateCoreGate))

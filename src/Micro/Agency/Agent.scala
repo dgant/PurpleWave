@@ -97,7 +97,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     resetState()
     followIntent()
     fightHysteresisFrames = Math.max(0, fightHysteresisFrames - With.framesSince(lastFrame))
-    decreaseImpatience()
     updatePassengers()
     Idle.consider(unit)
   }
@@ -110,14 +109,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     actionsPerformed.clear()
     _rideGoal = None
     unit.orderTarget.foreach(_.removeDamage(unit))
-  }
-
-  def decreaseImpatience(): Unit = {
-    impatience = Math.max(0, impatience - With.framesSince(lastFrame))
-  }
-
-  def increaseImpatience(): Unit = {
-    impatience += 2 * With.framesSince(lastFrame)
   }
 
   private def followIntent() {

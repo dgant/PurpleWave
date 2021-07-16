@@ -4,7 +4,6 @@ import Debugging.ToString
 import Debugging.Visualizations.Forces
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Brawl
@@ -32,10 +31,9 @@ object DefaultCombat extends Action {
   private object Excuse     extends Technique(Dodge) // Let other units shove through us
   private object Dance      extends Technique(Dodge, Excuse) // Stay in fight with better position
   private object Abuse      extends Technique(Dodge, Excuse) // Pick fights from range
-  private object Regroup    extends Technique(Dodge, Excuse, Abuse) // Get into ideal position for future fight
-  private object Fallback   extends Technique(Dodge, Regroup) // Get out of fight while landing shots
-  private object Flee       extends Technique(Dodge, Abuse, Fallback, Regroup) // Get out of fight
-  private object Fight      extends Technique(Dodge, Excuse, Regroup, Abuse, Dance, Flee) // Pick fight ASAP
+  private object Fallback   extends Technique(Dodge) // Get out of fight while landing shots
+  private object Flee       extends Technique(Dodge, Abuse, Fallback) // Get out of fight
+  private object Fight      extends Technique(Dodge, Abuse, Excuse, Dance, Flee) // Pick fight ASAP
 
   def potshot(unit: FriendlyUnitInfo): Boolean = {
     if (unit.unready) return false
@@ -67,7 +65,7 @@ object DefaultCombat extends Action {
   }
   def attackIfReady(unit: FriendlyUnitInfo): Boolean = {
     if (unit.unitClass.ranged && ! unit.readyForAttackOrder) return false
-    if (unit.agent.toAttack.forall(unit.pixelsToGetInRange(_) > Math.max(64, unit.topSpeed * With.reaction.agencyMax))) return false
+    if (unit.agent.toAttack.forall(unit.pixelsToGetInRange(_) > Math.max(80, unit.topSpeed * With.reaction.agencyMax))) return false
     Commander.attack(unit)
     true
   }
@@ -108,7 +106,7 @@ object DefaultCombat extends Action {
 
     // Chasing behaviors
     // Reavers shouldn't even try
-    if (unit.is(Protoss.Reaver)) return range
+    if (Protoss.Reaver(unit)) return range
 
     // Chase if they outrange us
     if (pixelsOutranged.isDefined) return chaseDistance
@@ -143,18 +141,13 @@ object DefaultCombat extends Action {
     // Otherwise, stay near max range. Get a little closer if we can in case they try to flee
     rangeAgainstUs.map(rangeAgainst => Maff.clamp(rangeAgainst + 64, range - 16, range)).getOrElse(range - 16)
   }
-  def regroupGoal(unit: FriendlyUnitInfo): Pixel = {
-    if (unit.battle.exists(_.us.units.size > 1)) unit.battle.get.us.centroidKey
-    else if (unit.agent.shouldEngage) unit.agent.destination
-    else unit.agent.safety
-  }
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
 
     // By now units have already done all non-combat activities
     // So if we have nothing to attack, but are threatened, flee
     lazy val pointlessRisk = unit.matchups.targets.isEmpty && ! unit.matchups.threats.forall(MatchWorker)
-    unit.agent.shouldEngage &&= !pointlessRisk
+    unit.agent.shouldEngage &&= ! pointlessRisk
 
     //////////////////////
     // Choose technique //
@@ -218,11 +211,10 @@ object DefaultCombat extends Action {
 
     def techniqueIs(techniques: Technique*): Boolean = techniques.contains(technique)
 
-    val goalPotshot = techniqueIs(Abuse, Fallback, Aim, Regroup) || unit.is(Protoss.Reaver)
+    val goalPotshot = techniqueIs(Abuse, Fallback, Aim) || Protoss.Reaver(unit)
     val goalDance   = techniqueIs(Abuse, Dance)
     val goalEngage  = techniqueIs(Fight, Abuse, Dance)
     var goalRetreat = techniqueIs(Fallback, Flee, Excuse)
-    val goalRegroup = techniqueIs(Regroup)
     val goalKeepGap = techniqueIs(Abuse)
 
     /////////////
@@ -245,11 +237,16 @@ object DefaultCombat extends Action {
       if (goalEngage && attackIfReady(unit)) return
     }
 
-    // Get impatient with regrouping when we'd rather be fighting
-    if (goalRegroup && unit.agent.shouldEngage) unit.agent.increaseImpatience()
-
     // Decide where to go
-    unit.agent.toTravel = Some(if (goalRegroup) regroupGoal(unit) else if (goalRetreat) unit.agent.safety else target.map(unit.pixelToFireAt(_, exhaustive = true)).getOrElse(unit.agent.destination))
+    lazy val pixelToFireFrom = target.map(unit.pixelToFireAt(_, exhaustive = true))
+    lazy val pixelFormationAttack = unit.agent.toTravel.filter(d =>
+      unit.squad.exists(_.formations.nonEmpty)
+      && target.forall(t =>
+        unit.pixelDistanceEdge(t, unit.agent.destination) < Math.max(unit.pixelDistanceEdge(t), unit.pixelRangeAgainst(t))
+        && (unit.flying
+          || d.nearestWalkableTile.tileDistanceGroundManhattan(t.tile.nearestWalkableTile)
+          <= unit.tile.nearestWalkableTile.tileDistanceGroundManhattan(t.tile.nearestWalkableTile))))
+    unit.agent.toTravel = Some(if (goalRetreat) unit.agent.safety else pixelFormationAttack.orElse(pixelToFireFrom).getOrElse(unit.agent.destination))
     def destination = unit.agent.toTravel.get
 
     // Avoid the hazards and expense of vector travel when we're not in harm's way
@@ -270,12 +267,6 @@ object DefaultCombat extends Action {
       forces(Forces.threat)     = Potential.avoidThreats(unit) * (1 + ratioThreat)
       forces(Forces.spacing)    = Potential.avoidCollision(unit)
       forces(Forces.spreading)  = unit.agent.receivedPushForce()
-    } else if (goalRegroup) {
-      // TODO: If we reenable regrouping, just use the formation position
-
-      forces(Forces.travel)     = Potential.preferTravel(unit, destination)
-      forces(Forces.spacing)    = Potential.avoidCollision(unit)
-      forces(Forces.spreading)  = unit.agent.receivedPushForce()
     } else if (goalDance) {
       if (target.isDefined) {
         val distanceIdeal   = idealTargetDistance(unit, target.get)
@@ -283,7 +274,10 @@ object DefaultCombat extends Action {
         val distanceTowards = distanceCurrent - distanceIdeal
         val danceForce      = if (distanceTowards > 0) Forces.threat else Forces.travel
         exactDistance = Some(Math.abs(distanceTowards))
-        if (exactDistance.exists(_ <= 16) || ! target.get.visible) {
+        if (pixelFormationAttack.isDefined && distanceTowards > 0) {
+          unit.agent.act("FormAttk")
+          Commander.move(unit)
+        } else if (exactDistance.exists(_ <= 16) || ! target.get.visible) {
           unit.agent.act("Stand")
           Commander.attack(unit)
           return
@@ -298,7 +292,7 @@ object DefaultCombat extends Action {
           val chaseGoal = if (step.traversableBy(unit) && unit.pixelDistanceSquared(step) >= unit.pixelDistanceSquared(to)) step else to
           val extraChaseDistance = Math.max(0, unit.pixelDistanceCenter(chaseGoal) - unit.pixelDistanceCenter(to))
           unit.agent.toTravel = Some(unit.pixel.project(chaseGoal, distanceTowards + extraChaseDistance))
-          Move.delegate(unit)
+          Commander.move(unit)
           return
         } else {
           forces(danceForce) = Potential.unitAttraction(unit, target.get, distanceTowards)
@@ -316,7 +310,7 @@ object DefaultCombat extends Action {
 
     if (goalRetreat && retreat(unit)) return
 
-    val mustApproach = if (goalDance || goalRegroup) None else unit.agent.toTravel
+    val mustApproach = if (goalDance) None else unit.agent.toTravel
     unit.agent.toTravel = MicroPathing.getWaypointInDirection(unit, unit.agent.forces.sum.radians, mustApproach = mustApproach, exactDistance = exactDistance)
     Move.delegate(unit)
   }

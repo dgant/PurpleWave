@@ -27,7 +27,10 @@ object BeReaver extends Action {
   def considerHopping(unit: FriendlyUnitInfo) {
     lazy val inRangeNeedlessly = unit.matchups.threatsInRange.exists(t => ! t.flying && t.pixelRangeAgainst(unit) < unit.pixelRangeAgainst(t))
     lazy val attackingSoon = unit.matchups.targetsInRange.nonEmpty && unit.cooldownLeft < Math.min(unit.cooldownMaxGround / 4, unit.matchups.framesToLive)
-    if (unit.transport.isEmpty && inRangeNeedlessly && ! attackingSoon) {
+    if (unit.agent.ride.isDefined
+      && unit.transport.isEmpty
+      && ((inRangeNeedlessly &&  ! attackingSoon)
+        || unit.doomFrame < unit.cooldownLeft + With.latency.latencyFrames)) {
       unit.agent.ride.foreach(Commander.rightClick(unit, _))
       if (Retreat.allowed(unit)) {
         Retreat.consider(unit)

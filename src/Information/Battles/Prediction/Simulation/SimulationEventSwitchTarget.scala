@@ -7,12 +7,14 @@ case class SimulationEventSwitchTarget(unit: Simulacrum, targetBefore: Option[Si
   override def to: Pixel = from
 
   private val formatter = new DecimalFormat("#.##")
-  private val dBefore = targetBefore.map(unit.pixelDistanceEdge(_) / 32.0)
-  private val dAfter = targetAfter.map(unit.pixelDistanceEdge(_) / 32.0)
-  private def describeOpt(unit: Simulacrum, target: Option[Simulacrum], distance: Option[Double]): String =
+  private val pBefore = targetBefore.map(_.pixel)
+  private val pAfter = targetAfter.map(_.pixel)
+  private val dBefore = targetBefore.map(unit.pixelDistanceEdge(_) / 32.0).getOrElse(0.0)
+  private val dAfter = targetAfter.map(unit.pixelDistanceEdge(_) / 32.0).getOrElse(0.0)
+  private def describeOpt(unit: Simulacrum, target: Option[Simulacrum], at: Option[Pixel], distance: Double): String =
     target
-      .map(t => f"${describe(t)} @ ${formatter.format(distance)} tiles")
+      .map(t => f"${describe(t)} ${describePixel(at)} @ ${formatter.format(distance)} tiles")
       .getOrElse("(Nobody)")
 
-  override def toString: String = f"$frame: ${describe(unit)} changes target from ${describeOpt(unit, targetBefore, dBefore)} to ${describeOpt(unit, targetAfter, dAfter)}"
+  override def toString: String = f"$frame: ${describe(unit)} changes target from ${describeOpt(unit, targetBefore, pBefore, dBefore)} to ${describeOpt(unit, targetAfter, pAfter, dAfter)}"
 }

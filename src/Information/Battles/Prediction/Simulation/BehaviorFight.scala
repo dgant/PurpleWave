@@ -9,7 +9,9 @@ object BehaviorFight extends SimulacrumBehavior {
   @inline override def act(simulacrum: Simulacrum): Unit = {
     // Remove target if invalid
     // If no valid target, pick target
-    simulacrum.setTarget(simulacrum.target.filter(t => validTarget(simulacrum, t) && simulacrum.inRangeToAttack(t)).orElse({
+    simulacrum.setTarget(simulacrum.target.filter(t =>
+      validTarget(simulacrum, t)
+      && simulacrum.inRangeToAttack(t)).orElse({
       simulacrum.targets.removeIf(t => ! validTarget(simulacrum, t))
       Maff.maxBy(simulacrum.targets)(Target.baseAttackerToTargetValue(simulacrum, _))
     }))
@@ -22,7 +24,6 @@ object BehaviorFight extends SimulacrumBehavior {
       return
     }
 
-    // TODO: Set target's threat
     // TODO: Siege mode
     // TODO: Lurker burrow/unburrow
     // TODO: Non-Lurker Unburrow
@@ -30,13 +31,24 @@ object BehaviorFight extends SimulacrumBehavior {
     val target = simulacrum.target.get
     val distance = simulacrum.pixelDistanceEdge(target)
     val range = simulacrum.pixelRangeAgainst(target)
+    if (target.threat.forall(t => t.pixelDistanceEdge(target) - t.pixelRangeAgainst(target) > distance - range)) {
+      target.threat = Some(simulacrum)
+    }
+    if (simulacrum.unitClass.abuseAllowed
+      && simulacrum.cooldownLeft > 0
+      && simulacrum.threat.isDefined
+      && ( ! target.canAttack(simulacrum) || simulacrum.pixelRangeAgainst(target) > target.pixelRangeAgainst(simulacrum))) {
+      val freeDistance = simulacrum.cooldownLeft * simulacrum.topSpeed - distance
+      if (freeDistance > 0) {
+        simulacrum.tween(simulacrum.threat.get.pixel.project(simulacrum.pixel, simulacrum.threat.get.pixelDistanceEdge(simulacrum) + freeDistance / 2), Some("Kiting"))
+        return
+      }
+    }
     if (distance <= range) {
       if (simulacrum.cooldownLeft <= 0) {
         simulacrum.dealDamageTo(target)
       }
-      if (false) {
-        // TODO: Kite
-      } else {
+      else {
         simulacrum.sleep(Math.min(simulacrum.cooldownLeft, simulacrum.simulation.resolution), Some("Cooldown"))
       }
     } else if (simulacrum.canMove) {

@@ -30,6 +30,4 @@ case class StrategySelectionGreedy(requiredBranches: Option[Seq[Seq[Strategy]]] 
     branchScores.filter(_._2.isEmpty).foreach(missingScore => With.logger.warn("Missing win probability for: " + missingScore._1.mkString(" + ")))
     branchScores.maxBy(_._2.getOrElse(-1.0))._1
   }
-
-  override def toString = "StrategySelectionGreedy"
 }

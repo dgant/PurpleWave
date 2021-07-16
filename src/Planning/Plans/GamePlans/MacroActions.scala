@@ -42,7 +42,7 @@ trait MacroActions {
   def get(buildRequest: BuildRequest): Unit = {
     With.scheduler.request(_requesterPlan, buildRequest)
   }
-  private val _requesterPlan = new Plan()
+  private def _requesterPlan = new Plan()
 
   def buildOrder(items: BuildRequest*): Unit = {
     new BuildOrder(items: _*).update()

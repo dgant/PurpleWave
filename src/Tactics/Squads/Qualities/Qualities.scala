@@ -9,15 +9,15 @@ object Qualities {
     def apply(u: UnitInfo): Boolean = u.burrowed || u.isAny(
       Terran.Ghost, Terran.Wraith, Terran.SpiderMine,
       Protoss.Arbiter, Protoss.DarkTemplar, Protoss.Observer,
-      Zerg.Lurker, Zerg.LurkerEgg) || (u.is(Terran.Vulture) && u.player.hasTech(Terran.SpiderMinePlant))
+      Zerg.Lurker, Zerg.LurkerEgg) || (Terran.Vulture(u) && u.player.hasTech(Terran.SpiderMinePlant))
     override val counteredBy: Array[Quality] = Array(Detector)
   }
   object SpiderMine extends Quality {
-    override def apply(u: UnitInfo): Boolean = u.is(Terran.SpiderMine)
+    override def apply(u: UnitInfo): Boolean = Terran.SpiderMine(u)
     override val counteredBy: Array[Quality] = Array(AntiVulture)
   }
   object AntiSpiderMine extends Quality {
-    override def apply(u: UnitInfo): Boolean = u.attacksAgainstGround > 0 && (
+    override def apply(u: UnitInfo): Boolean = u.canAttackGround && (
       u.flying
       || u.unitClass.floats
       || u.damageOnHitGround >= Terran.SpiderMine.maxHitPoints
@@ -26,12 +26,11 @@ object Qualities {
     @inline override def counterScaling: Double = 5.0
   }
   object Vulture extends Quality {
-    override def apply(u: UnitInfo): Boolean = u.is(Terran.Vulture)
+    override def apply(u: UnitInfo): Boolean = Terran.Vulture(u)
     override val counteredBy: Array[Quality] = Array(AntiVulture)
   }
   object AntiVulture extends Quality {
-    override def apply(u: UnitInfo): Boolean = (AntiGround.apply(u)
-      && ! u.isAny(Protoss.Zealot, Protoss.DarkTemplar, Protoss.Scout, Protoss.Arbiter, Protoss.Carrier, Zerg.Zergling))
+    override def apply(u: UnitInfo): Boolean = (AntiGround(u) && ! u.isAny(Protoss.Zealot, Protoss.DarkTemplar, Protoss.Scout, Protoss.Arbiter, Protoss.Carrier, Zerg.Zergling))
     override val counteredBy: Array[Quality] = Array.empty
   }
   object Air extends Quality {
@@ -39,7 +38,7 @@ object Qualities {
     override val counteredBy: Array[Quality] = Array(AntiAir)
   }
   object Ground extends Quality {
-    def apply(u: UnitInfo): Boolean = ! u.flying && ! u.isAny(Terran.SpiderMine)
+    def apply(u: UnitInfo): Boolean = ! u.flying && ! Terran.SpiderMine(u)
     override val counteredBy: Array[Quality] = Array(AntiGround)
   }
   object AirCombat extends Quality {
@@ -47,20 +46,20 @@ object Qualities {
     override val counteredBy: Array[Quality] = Array(AntiAirCombat)
   }
   object GroundCombat extends Quality {
-    def apply(u: UnitInfo): Boolean = ! u.flying && ! u.isAny(Terran.SpiderMine)
+    def apply(u: UnitInfo): Boolean = ! u.flying && ! Terran.SpiderMine(u)
     override val counteredBy: Array[Quality] = Array(AntiGroundCombat)
   }
   object AntiAir extends Quality {
-    def apply(u: UnitInfo): Boolean = u.is(MatchCombatSpellcaster) || u.attacksAgainstAir > 0
+    def apply(u: UnitInfo): Boolean = MatchCombatSpellcaster(u) || u.canAttackAir
   }
   object AntiGround extends Quality {
-    def apply(u: UnitInfo): Boolean = u.is(MatchCombatSpellcaster) || (u.attacksAgainstGround > 0 && ! u.unitClass.isWorker)
+    def apply(u: UnitInfo): Boolean = MatchCombatSpellcaster(u) || (u.canAttackGround && ! u.unitClass.isWorker)
   }
   object AntiAirCombat extends Quality {
-    def apply(u: UnitInfo): Boolean = u.attacksAgainstAir > 0 && ! u.isAny(Terran.Ghost, Protoss.Arbiter)
+    def apply(u: UnitInfo): Boolean = u.canAttackAir && ! u.isAny(Terran.Ghost, Protoss.Arbiter)
   }
   object AntiGroundCombat extends Quality {
-    def apply(u: UnitInfo): Boolean = u.attacksAgainstGround > 0 && ! u.isAny(Terran.Ghost, Protoss.Arbiter, MatchWorker)
+    def apply(u: UnitInfo): Boolean = u.canAttackGround && ! u.isAny(Terran.Ghost, Protoss.Arbiter, MatchWorker)
   }
   object Combat extends Quality {
     def apply(u: UnitInfo): Boolean = (u.canAttack && ! u.unitClass.isWorker)
@@ -74,7 +73,7 @@ object Qualities {
     def apply(u: UnitInfo): Boolean = u.unitClass.attacksGround && u.unitClass.isBuilding
   }
   object AntiStaticDefense extends Quality {
-    def apply(u: UnitInfo): Boolean = u.pixelRangeGround > 32.0 * 7.0 || u.is(Terran.SiegeTankUnsieged)
+    def apply(u: UnitInfo): Boolean = u.pixelRangeGround > 32.0 * 7.0 || Terran.SiegeTankUnsieged(u)
   }
   val enemy: Array[Quality] = Array(
     Cloaked,

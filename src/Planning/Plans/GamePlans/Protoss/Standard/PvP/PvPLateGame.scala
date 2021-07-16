@@ -20,12 +20,12 @@ class PvPLateGame extends GameplanImperative {
   var fearMacro: Boolean = _
   var fearContain: Boolean = _
   var dtBravery: Boolean = _
+  var expectCarriers: Boolean = _
   var shouldDetect: Boolean = _
   var shouldSecondaryTech: Boolean = _
   var shouldHarass: Boolean = _
   var shouldAttack: Boolean = _
   var shouldExpand: Boolean = _
-  var expectCarriers: Boolean = _
   var primaryTech: Option[PrimaryTech] = None
 
   def primaryTemplar: Boolean = primaryTech.contains(TemplarTech)
@@ -35,11 +35,9 @@ class PvPLateGame extends GameplanImperative {
 
   override def executeBuild(): Unit = {
     fearDeath   = ! safeAtHome
-    fearMacro   = bases < enemyBases
+    fearMacro   = miningBases < Math.max(2, enemyBases)
     fearDT      = enemyDarkTemplarLikely
-    fearContain =
-      With.scouting.threatOrigin.nearestWalkableTile.tileDistanceGroundManhattan(With.geography.home.nearestWalkableTile) <
-      With.scouting.threatOrigin.nearestWalkableTile.tileDistanceGroundManhattan(With.scouting.mostBaselikeEnemyTile.nearestWalkableTile)
+    fearContain = With.scouting.enemyProgress > 0.6
 
     // Don't fear death or contain for a couple of minutes after getting DT if they have no mobile detection or evidence of Robo.
     // It takes 1:34 to complete an Observer and another ~35 seconds to float it across the map,
@@ -53,15 +51,15 @@ class PvPLateGame extends GameplanImperative {
 
     expectCarriers = enemyCarriersLikely || (enemyStrategy(With.fingerprints.forgeFe) && enemies(MatchWarriors) == 0 && (With.frame > Minutes(8)() || enemies(Protoss.PhotonCannon) > 3))
     shouldDetect = enemyDarkTemplarLikely
-    shouldExpand = (fearMacro || ! fearDeath) || (miningBases < 2 && With.frame > Minutes(13)())
+    shouldExpand = fearMacro || ! fearDeath
     shouldExpand &&= ! fearContain
     shouldExpand &&= ! fearDT
-    shouldExpand &&= (miningBases < 2 || enemyBases > 2 || unitsComplete(Protoss.Gateway) > 3 / miningBases || (expectCarriers && With.frame > GameTime(3, 30)() * miningBases))
+    shouldExpand &&= (miningBases < 2 || enemyBases > miningBases || unitsComplete(Protoss.Gateway) >= miningBases * 3 || (expectCarriers && With.frame > GameTime(3, 30)() * miningBases))
     shouldHarass = fearMacro || fearContain
     shouldAttack = shouldHarass && ! fearDeath && ! fearDT
     shouldAttack ||= shouldExpand
     shouldSecondaryTech = gasPumps > 2 || (unitsComplete(Protoss.Reaver) > 2 && unitsComplete(Protoss.Shuttle) > 0) || techComplete(Protoss.PsionicStorm)
-    oversaturate = shouldExpand && ! fearDeath
+    oversaturate = shouldExpand && ! fearDeath && ! fearContain
 
     lazy val commitToTech = unitsComplete(Protoss.Gateway) >= 5
     primaryTech = primaryTech
@@ -79,6 +77,7 @@ class PvPLateGame extends GameplanImperative {
     if (fearDT) status("FearDT")
     if (fearMacro) status("FearMacro")
     if (fearContain) status("FearContain")
+    if (expectCarriers) status("ExpectCarriers")
     if (shouldDetect) status("Detect")
     if (shouldSecondaryTech) status("2ndTech")
     if (shouldAttack) attack()
@@ -123,13 +122,13 @@ class PvPLateGame extends GameplanImperative {
     if (shouldExpand) {
       expand()
     }
-    get(2, Protoss.Assimilator)
     if (minerals > 400 || gas < 100) buildGasPumps()
     primaryTech()
     if (shouldSecondaryTech) {
       secondaryTech()
     }
     trainArmy()
+    fillerArmy()
     addGates()
     expand()
     secondaryTech()
@@ -137,7 +136,7 @@ class PvPLateGame extends GameplanImperative {
 
   def doTrainArmy(): Unit = {
     if (enemyDarkTemplarLikely || enemyShownCloakedThreat) pump(Protoss.Observer, 2)
-    if (expectCarriers && units(Protoss.DarkArchon) + 2 * units(Protoss.DarkTemplar) < Maff.clamp(enemies(Protoss.Carrier), 8, 16)) {
+    if (expectCarriers && units(Protoss.DarkArchon) + units(Protoss.DarkTemplar) / 2 < Maff.clamp(enemies(Protoss.Carrier), 8, 16)) {
       pump(Protoss.DarkTemplar)
       pumpRatio(Protoss.Dragoon, 16, 64, Seq(Enemy(Protoss.Carrier, 6.0)))
     }
@@ -194,10 +193,13 @@ class PvPLateGame extends GameplanImperative {
   }
 
   def doExpand(): Unit = {
-    requireMiningBases(Math.min(4, miningBases + 1))
+    if (With.units.ours.filter(Protoss.Nexus).forall(_.complete)) {
+      requireMiningBases(Math.min(4, unitsComplete(Protoss.Nexus) + 1))
+    }
   }
 
   def doRobo(): Unit = {
+    get(2, Protoss.Assimilator)
     get(Protoss.RoboticsFacility)
     buildOrder(Get(Protoss.Shuttle))
     if ( ! fearDeath) {
@@ -223,6 +225,7 @@ class PvPLateGame extends GameplanImperative {
   def doTemplar(): Unit = {
     get(Protoss.Forge)
     get(Protoss.CitadelOfAdun)
+    get(2, Protoss.Assimilator)
     get(Protoss.TemplarArchives)
     if (expectCarriers) {
       get(Protoss.DarkArchonEnergy)
@@ -234,7 +237,9 @@ class PvPLateGame extends GameplanImperative {
         buildOrder(Get(Protoss.DarkTemplar))
       }
       get(Protoss.PsionicStorm)
-      buildOrder(Get(2, Protoss.HighTemplar))
+      if (techStarted(Protoss.PsionicStorm)) {
+        buildOrder(Get(2, Protoss.HighTemplar))
+      }
       get(Protoss.GroundDamage)
       get(Protoss.ZealotSpeed)
       if (techComplete(Protoss.PsionicStorm, withinFrames = Seconds(10)())) {

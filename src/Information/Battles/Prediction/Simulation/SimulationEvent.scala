@@ -7,8 +7,13 @@ abstract class SimulationEvent(sim: Simulacrum) {
     f"${(if (sim.isFriendly) "F" else "E")} ${sim.unitClass.toString} #${sim.realUnit.id}"
   }
 
+  protected def describe(sim: Option[Simulacrum]): String = sim.map(describe).getOrElse("(Nobody)")
+  protected def describePixel(pixel: Option[Pixel]): String = pixel.map(_.toString).getOrElse("[Nowhere]")
+
   val frame: Int = sim.simulation.prediction.simulationFrames
   val from: Pixel = sim.pixel
+  val target: Option[Simulacrum] = sim.target
+  val targetAt: Option[Pixel] = target.map(_.pixel)
 
   def to: Pixel
   def draw() {}

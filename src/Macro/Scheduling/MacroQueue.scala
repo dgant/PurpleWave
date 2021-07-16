@@ -3,7 +3,7 @@ package Macro.Scheduling
 import Lifecycle.With
 import Macro.BuildRequests.BuildRequest
 import Macro.Buildables.Buildable
-import Planning.Plan
+import Planning.Prioritized
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
@@ -13,26 +13,26 @@ import scala.collection.mutable
 
 class MacroQueue {
   
-  val requestsByPlan = new mutable.HashMap[Plan, Iterable[BuildRequest]]
-  
+  val requestsByPriority = new mutable.HashMap[Prioritized, Iterable[BuildRequest]]
+
   def reset() {
-    requestsByPlan.clear()
+    requestsByPriority.clear()
   }
-  
-  def request(requester: Plan, theRequest: BuildRequest) {
+
+  def request(requester: Prioritized, theRequest: BuildRequest) {
     request(requester, Iterable(theRequest))
   }
 
-  def request(requester: Plan, requests: Iterable[BuildRequest]): Unit = {
-    requestsByPlan.put(requester, requestsByPlan.getOrElse(requester, Iterable.empty) ++ requests)
+  def request(requester: Prioritized, requests: Iterable[BuildRequest]): Unit = {
+    requestsByPriority.put(requester, requestsByPriority.getOrElse(requester, Iterable.empty) ++ requests)
   }
-  
-  def audit: Vector[(Plan, Iterable[BuildRequest])] = {
-    requestsByPlan.toVector.sortBy(_._1.priority)
+
+  def audit: Vector[(Prioritized, Iterable[BuildRequest])] = {
+    requestsByPriority.toVector.sortBy(_._1.priority)
   }
-  
+
   def queue: Vector[Buildable] = {
-    val requestQueue    = requestsByPlan.keys.toVector.sortBy(_.priority).flatten(requestsByPlan)
+    val requestQueue    = requestsByPriority.keys.toVector.sortBy(_.priority).flatten(requestsByPriority)
     val unitsWanted     = new CountMap[UnitClass]
     val unitsCounted    = new CountMap[UnitClass]
     //val unitsExisting   = new CountMap[UnitClass]
@@ -93,8 +93,7 @@ class MacroQueue {
         unitsCounted(unit) += difference
         val buildables = (0 until difference).map(i => request.buildable)
         buildables
-      }
-      else {
+      } else {
         Vector.empty
       }
     }

@@ -9,7 +9,6 @@ import Planning.UnitCounters.CountOne
 import Planning.UnitPreferences.PreferIdle
 import ProxyBwapi.Techs.Tech
 
-
 class ResearchTech(tech: Tech) extends Production {
 
   override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
@@ -40,4 +39,6 @@ class ResearchTech(tech: Tech) extends Production {
     techers.acquire(this)
     techers.units.foreach(_.intend(this, new Intention { toTech = Some(tech) }))
   }
+
+  override def toString: String = f"Research $tech"
 }

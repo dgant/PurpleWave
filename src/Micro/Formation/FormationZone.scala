@@ -104,11 +104,13 @@ object FormationZone {
       }
     })
 
-    FormationAssignment.outwardFromCentroid(
+    val unassigned = UnassignedFormation(
       FormationStyleGuard,
       (meleeSlots.view ++ arcSlots.view)
         .groupBy(_._1)
         .mapValues(_.map(_._2)),
-      units)
+      group)
+    val output = unassigned.outwardFromCentroid
+    output
   }
 }

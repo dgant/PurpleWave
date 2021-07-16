@@ -78,6 +78,9 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def tileDistanceGroundManhattan(other: Tile): Int = {
     With.paths.groundTilesManhattan(this, other)
   }
+  @inline def tileDistanceGroundManhattan(other: Pixel): Int = {
+    With.paths.groundTilesManhattan(this, other.tile)
+  }
   @inline def travelPixelsFor(other: Pixel, unit: UnitInfo): Double = {
     unit.pixelDistanceTravelling(center, other)
   }

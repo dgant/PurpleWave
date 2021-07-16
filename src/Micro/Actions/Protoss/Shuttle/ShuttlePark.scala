@@ -8,23 +8,25 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object ShuttlePark extends Action {
 
-  override def allowed(unit: FriendlyUnitInfo): Boolean = BeShuttle.allowed(unit) && unit.agent.passengers.exists( ! _.loaded)
+  override def allowed(shuttle: FriendlyUnitInfo): Boolean = BeShuttle.allowed(shuttle) && exposedPassengers(shuttle).nonEmpty
+
+  def exposedPassengers(shuttle: FriendlyUnitInfo) = shuttle.agent.passengers.view.filterNot(_.transport.contains(shuttle))
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
-    Maff.minBy(shuttle.agent.passengers
-      .filter( ! _.loaded))(_.matchups.framesOfSafety)
-      .foreach(passenger => {
-        val eta = Math.max(0, (shuttle.pixelDistanceCenter(passenger) - Shuttling.pickupRadius) / (shuttle.topSpeed + passenger.topSpeed))
-        val curb = passenger.projectFrames(eta)
-        shuttle.agent.toTravel =
-          Maff.minBy(shuttle.matchups.threats)(_.framesBeforeAttacking(shuttle))
-            .map(threat => curb.radiateRadians(threat.pixel.radiansTo(curb), Shuttling.pickupRadius / 2))
-            .orElse(Some(curb))
-
-      if (shuttle.pixelDistanceCenter(shuttle.agent.destination) > 32.0 * 12.0 && shuttle.matchups.framesOfSafety < shuttle.unitClass.framesToTurn180) {
-        Retreat.delegate(shuttle)
+    val radius = Shuttling.pickupRadius
+    val exposed = exposedPassengers(shuttle)
+    var to = exposed.head.pixel.project(shuttle.agent.safety, radius / 2)
+    if (exposed.size > 1) {
+      val centroid = Maff.centroid(exposed.view.map(_.pixel))
+      val slack = exposed.map(_.pixelDistanceCenter(centroid)).max
+      if (slack < radius) {
+        to = centroid.project(shuttle.agent.safety, slack)
       }
-      Commander.move(shuttle)
-    })
+    }
+    shuttle.agent.toTravel = Some(to)
+    if (shuttle.pixelDistanceCenter(to) > 32.0 * 12.0 && shuttle.matchups.framesOfSafety < shuttle.unitClass.framesToTurn180) {
+      Retreat.delegate(shuttle)
+    }
+    Commander.move(shuttle)
   }
 }

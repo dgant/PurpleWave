@@ -15,7 +15,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   private def isValidBase     (base: Base): Boolean = base.townHall.filter(_.isOurs).exists(_.remainingCompletionFrames < 240)
   private def isValidResource (unit: UnitInfo): Boolean = isValidMineral(unit) || isValidGas(unit)
   private def isValidMineral  (unit: UnitInfo): Boolean = unit.alive && (unit.base.exists(longDistanceBases.contains) || unit.base.exists(isValidBase)) && unit.mineralsLeft > 0
-  private def isValidGas      (unit: UnitInfo): Boolean = unit.alive && (unit.base.exists(longDistanceBases.contains) || unit.base.exists(isValidBase)) && unit.isOurs && unit.unitClass.isGas && unit.remainingCompletionFrames < 24 * 8
+  private def isValidGas      (unit: UnitInfo): Boolean = unit.alive && (unit.base.exists(longDistanceBases.contains) || unit.base.exists(isValidBase)) && unit.isOurs && unit.unitClass.isGas && unit.remainingCompletionFrames < 24 * 10
   private class Slot(var resource: UnitInfo, val order: Int) {
     val tile        : Tile    = resource.tileTopLeft
     val base        : Base    = resource.base.getOrElse(With.geography.bases.minBy(_.heart.pixelDistanceGround(resource.tileTopLeft)))
@@ -47,7 +47,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   private lazy val slotsByResource: mutable.Map[UnitInfo, Seq[Slot]] = new mutable.HashMap[UnitInfo, Seq[Slot]] ++ (mineralSlots.values.view.flatten ++ gasSlots.values.view.flatten).groupBy(_.resource).map(p => (p._1, p._2.toSeq))
   private lazy val baseCosts: Map[(Base, Base), Double] = With.geography.bases
     .flatMap(baseA => With.geography.bases.map(baseB => (baseA, baseB)))
-    .map(basePair => (basePair, basePair._1.heart.pixelDistanceGround(basePair._2.heart))).toMap
+    .map(basePair => (basePair, basePair._1.heart.nearestWalkableTile.pixelDistanceGround(basePair._2.heart.nearestWalkableTile))).toMap
   private lazy val naturalCost = With.geography.startBases.view.map(b => baseCosts(b, b.natural.getOrElse(b))).max
 
   private val assignments = new mutable.HashMap[FriendlyUnitInfo, Slot]()
@@ -75,13 +75,17 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     gasPumps = With.units.ours.filter(isValidGas).toVector
     mineralSlotCount = bases.view.flatMap(mineralSlots).count(_.mineable)
     val distanceMineralBases = mineralSlots.view
-      .filter(s => ! isValidBase(s._1) && ! s._1.owner.isEnemy && s._1.townHall.forall(_.isOurs)) // With unoccupied/incomplete bases
+      .filter(s =>
+        ! isValidBase(s._1)
+        && ! s._1.owner.isEnemy
+        && s._1.townHall.forall(_.isOurs)) // With unoccupied/incomplete bases
       .map(p => (p._1, p._2, bases.map(b2 => baseCosts(b2, p._1)).min)) // associate each with the score to the closest extant base
       .filter(p => mineralSlotCount < 14 || (
-        p._3 <= naturalCost // Distance mine only if it's safe or we're desperate
-        && ! p._1.units.exists(u => u.isEnemy && u.unitClass.attacksGround)
-        && (With.blackboard.safeToMoveOut() || With.blackboard.wantToAttack() || With.units.enemy.forall(e => ! e.canAttack || e.pixelDistanceTravelling(p._1.heart) > e.effectiveRangePixels + 320))))
-      .toVector.sortBy(_._3) // sort the closest
+        p._3 <= 1.5 * naturalCost // Distance mine only if it's safe or we're desperate
+        && With.scouting.enemyProgress < 0.6
+        && With.blackboard.wantToAttack()))
+      .toVector
+      .sortBy(_._3) // sort the closest
     val distanceMineralBasesNeeded = distanceMineralBases.indices.find(i => distanceMineralBases.take(i).view.map(_._2.size).sum > 5).getOrElse(distanceMineralBases.size)
     longDistanceBases = distanceMineralBases.view.take(distanceMineralBasesNeeded).map(_._1)
 

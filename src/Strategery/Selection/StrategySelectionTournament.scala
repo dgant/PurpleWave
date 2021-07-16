@@ -24,7 +24,9 @@ object StrategySelectionTournament extends StrategySelectionPolicy {
       else if (With.enemy.raceInitial == Race.Protoss) default = Opponents.defaultPvP
       else if (With.enemy.raceInitial == Race.Zerg) default = Opponents.defaultPvZ
     }
-    
-    opponent.map(_.policy).getOrElse(default).chooseBranch
+
+    val policy = opponent.map(_.policy).getOrElse(default)
+    With.logger.debug(f"Choosing tournament policy $policy")
+    policy.chooseBranch
   }
 }

@@ -48,7 +48,7 @@ class Agency extends TimedTask {
         if (With.configuration.enablePerformancePauses && ! timer.ongoing) {
           val timeAfter = With.performance.frameMs
           val timeDelta = timeAfter - timeBefore
-          With.logger.warn(f"${unit.unitClass} broke ${With.configuration.frameLimitMs}ms: ${timeDelta}ms on ${if (agent.actionsPerformed.isEmpty) agent.lastAction.get else agent.actionsPerformed.map(_.name).mkString(", ")}")
+          With.logger.performance(f"${unit.unitClass} broke ${With.configuration.frameLimitMs}ms: ${timeDelta}ms on ${if (agent.actionsPerformed.isEmpty) agent.lastAction.get else agent.actionsPerformed.map(_.name).mkString(", ")}")
         }
       }
     }

@@ -1,8 +1,19 @@
 package Information.Battles.Prediction.Simulation
 
+import Mathematics.Maff
+import Utilities.Forever
+
 object BehaviorGather extends SimulacrumBehavior {
   val fighting: Boolean = false
   override def act(simulacrum: Simulacrum): Unit = {
-    // TODO: Potshot
+    val base = Maff.minBy(simulacrum.player.bases)(b => simulacrum.pixel.nearestWalkablePixel.groundPixels(b.heart))
+    base.foreach(b => {
+      val to = b.heart.center
+      if (simulacrum.pixelDistanceCenter(to) > 16) {
+        simulacrum.tween(to, Some("Gather"))
+      } else {
+        simulacrum.sleep(Forever(), Some("Gathering"))
+      }
+    })
   }
 }

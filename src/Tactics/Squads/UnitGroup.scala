@@ -28,6 +28,7 @@ trait UnitGroup {
   def centroidKey     = _centroidKey()
   def battleConsensus = _battleConsensus()
   def threatConsensus = _threatConsensus()
+  def meanTopSpeed    = _meanTopSpeed()
 
   private def _attackers()      = groupOrderable.view.filter(u => u.unitClass.canAttack  && ! u.unitClass.isWorker)
   private def _detectors()      = groupOrderable.view.filter(u => u.aliveAndComplete && u.unitClass.isDetector)
@@ -46,4 +47,5 @@ trait UnitGroup {
   private val _centroidKey      = new Cache(() => if (_hasGround()) centroidGround else centroidAir )
   private val _battleConsensus  = new Cache(() => Maff.mode(groupOrderable.view.map(_.battle)))
   private val _threatConsensus  = new Cache(() => battleConsensus.map(_.enemy.centroidGround))
+  private val _meanTopSpeed     = new Cache(() => Maff.mean(groupOrderable.view.filter(_.canMove).map(_.topSpeed)))
 }

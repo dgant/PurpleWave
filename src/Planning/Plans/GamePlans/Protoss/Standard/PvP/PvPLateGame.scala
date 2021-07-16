@@ -6,6 +6,7 @@ import Macro.BuildRequests.Get
 import Mathematics.Maff
 import Planning.Plans.GamePlans.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
+import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.Protoss
 import Utilities._
@@ -33,8 +34,10 @@ class PvPLateGame extends GameplanImperative {
 
   var firstDTFrame: Int = Forever()
 
+  val buildCannonsAtNatural = new BuildCannonsAtNatural(1)
+  val buildCannonsAtExpansions = new BuildCannonsAtExpansions(1)
   override def executeBuild(): Unit = {
-    fearDeath   = ! safeAtHome
+    fearDeath   = ! safeAtHome || unitsComplete(MatchWarriors) < 8
     fearMacro   = miningBases < Math.max(2, enemyBases)
     fearDT      = enemyDarkTemplarLikely
     fearContain = With.scouting.enemyProgress > 0.6
@@ -60,7 +63,15 @@ class PvPLateGame extends GameplanImperative {
       || (expectCarriers && With.frame > GameTime(3, 30)() * miningBases)
       || Math.min(unitsComplete(MatchWarriors) / 16, unitsComplete(Protoss.Gateway) / 3) >= miningBases)
     shouldHarass = fearMacro || fearContain
-    shouldAttack = shouldHarass && ! fearDeath && ! fearDT
+    shouldAttack ||= (unitsComplete(Protoss.Reaver) > 0 && unitsComplete(Protoss.Shuttle) > 0 && unitsComplete(MatchWarriors) > 6)
+    shouldAttack ||= upgradeComplete(Protoss.ZealotSpeed)
+    shouldAttack ||= safeToMoveOut && unitsComplete(Protoss.Gateway) >= targetGateways
+    shouldAttack ||= dtBravery
+    shouldAttack ||= shouldHarass
+    shouldAttack ||= bases > 2
+    shouldAttack ||= enemyBases > 2
+    shouldAttack &&= ! fearDeath
+    shouldAttack &&= ! fearDT
     shouldAttack ||= shouldExpand
     shouldSecondaryTech = gasPumps > 2 || (unitsComplete(Protoss.Reaver) > 2 && unitsComplete(Protoss.Shuttle) > 0) || techComplete(Protoss.PsionicStorm)
     shouldSecondaryTech &&= unitsComplete(Protoss.Gateway) >= targetGateways
@@ -96,13 +107,14 @@ class PvPLateGame extends GameplanImperative {
     new PvPIdeas.ReactToArbiters().update()
   }
 
-  override def execute(): Unit = {
+  override def executeMain(): Unit = {
     val trainArmy     = new DoQueue(doTrainArmy)
     val fillerArmy    = new DoQueue(doFillerArmy)
     val addGates      = new DoQueue(doAddProduction)
     val primaryTech   = new DoQueue(doPrimaryTech)
     val secondaryTech = new DoQueue(doSecondaryTech)
     val expand        = new DoQueue(doExpand)
+    val cannons       = new DoQueue(doCannons)
 
     // TODO: Emergency/Proactive detection
     // TODO: Gas pumps when?
@@ -119,6 +131,7 @@ class PvPLateGame extends GameplanImperative {
       fillerArmy()
       addGates()
     }
+    cannons()
     get(3, Protoss.Gateway)
     if (fearContain) {
       primaryTech()
@@ -242,26 +255,39 @@ class PvPLateGame extends GameplanImperative {
         get(Protoss.MindControl)
       }
     } else {
-      if ( ! enemyRobo) {
+      if (enemies(Protoss.Observer) == 0) {
         buildOrder(Get(Protoss.DarkTemplar))
       }
-      get(Protoss.PsionicStorm)
-      if (techStarted(Protoss.PsionicStorm)) {
-        buildOrder(Get(2, Protoss.HighTemplar))
+      if (unitsComplete(Protoss.Gateway) >= 5) {
+        get(Protoss.PsionicStorm)
+        if (techStarted(Protoss.PsionicStorm)) {
+          buildOrder(Get(2, Protoss.HighTemplar))
+        }
+        get(Protoss.GroundDamage)
+        get(Protoss.ZealotSpeed)
+        if (gasPumps > 2 && techComplete(Protoss.PsionicStorm, withinFrames = Seconds(10)())) {
+          get(Protoss.HighTemplarEnergy)
+        }
+        if (upgradeComplete(Protoss.GroundDamage, 1)) { get(Protoss.GroundArmor,  1) }
+        if (miningBases > 2) {
+          if (upgradeComplete(Protoss.GroundArmor,  1)) { get(Protoss.GroundDamage, 2) }
+          if (upgradeComplete(Protoss.GroundDamage, 2)) { get(Protoss.GroundArmor,  2) }
+          if (upgradeComplete(Protoss.GroundArmor,  2)) { get(Protoss.GroundDamage, 3) }
+          if (gasPumps >= 3 & miningBases >= 3) {
+            if (upgradeComplete(Protoss.GroundDamage, 3)) { get(Protoss.GroundArmor, 3) }
+            if (upgradeComplete(Protoss.GroundArmor,  3)) { upgradeContinuously(Protoss.Shields) }
+          }
+        }
       }
-      get(Protoss.GroundDamage)
-      get(Protoss.ZealotSpeed)
-      if (techComplete(Protoss.PsionicStorm, withinFrames = Seconds(10)())) {
-        get(Protoss.HighTemplarEnergy)
+    }
+  }
+
+  def doCannons(): Unit = {
+    if (units(Protoss.Forge) > 0) {
+      if (bases > 2) {
+        buildCannonsAtExpansions.update()
       }
-      if (upgradeComplete(Protoss.GroundDamage, 1)) { get(Protoss.GroundArmor,  1) }
-      if (upgradeComplete(Protoss.GroundArmor,  1)) { get(Protoss.GroundDamage, 2) }
-      if (upgradeComplete(Protoss.GroundDamage, 2)) { get(Protoss.GroundArmor,  2) }
-      if (upgradeComplete(Protoss.GroundArmor,  2)) { get(Protoss.GroundDamage, 3) }
-      if (gasPumps >= 3 & miningBases >= 3) {
-        if (upgradeComplete(Protoss.GroundDamage, 3)) { get(Protoss.GroundArmor, 3) }
-        if (upgradeComplete(Protoss.GroundArmor,  3)) { upgradeContinuously(Protoss.Shields) }
-      }
+      buildCannonsAtNatural.update()
     }
   }
 }

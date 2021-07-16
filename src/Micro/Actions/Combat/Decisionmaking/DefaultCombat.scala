@@ -65,7 +65,7 @@ object DefaultCombat extends Action {
   }
   def attackIfReady(unit: FriendlyUnitInfo): Boolean = {
     if (unit.unitClass.ranged && ! unit.readyForAttackOrder) return false
-    if (unit.agent.toAttack.forall(unit.pixelsToGetInRange(_) > Math.max(80, unit.topSpeed * With.reaction.agencyMax))) return false
+    if (unit.agent.toAttack.forall(unit.pixelsToGetInRange(_) > Math.max(128, unit.topSpeed * With.reaction.agencyMax))) return false
     Commander.attack(unit)
     true
   }

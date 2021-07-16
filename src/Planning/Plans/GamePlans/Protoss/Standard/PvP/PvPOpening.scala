@@ -25,7 +25,9 @@ class PvPOpening extends GameplanImperative {
   var getObservatory: Boolean = false
   var shuttleFirst: Boolean = false
   // DT properties
+  var timeToStartCannons: Int = 0
   var getCannons: Boolean = false
+  var speedlotAttack: Boolean = false
 
   override def activated: Boolean = employing(PvPRobo, PvPDT, PvP3GateGoon, PvP4GateGoon)
   override def completed: Boolean = { complete ||= bases > 1; complete }
@@ -161,6 +163,15 @@ class PvPOpening extends GameplanImperative {
         }
       }
     }
+    // Oops. We let them scout our DT rush. Maybe we can use it to our advantage.
+    if (employing(PvPDT)
+      && scoutCleared
+      && With.units.ours.filter(Protoss.TemplarArchives).exists(a => a.hasEverBeenVisibleToOpponents
+      && ! a.visibleToOpponents
+      && ! a.zone.units.exists(_.isEnemy)
+      && roll("SpeedlotAttack", 0.65))) {
+      speedlotAttack = true
+    }
 
     /////////////////////////////
     // Tech-specific decisions //
@@ -206,18 +217,28 @@ class PvPOpening extends GameplanImperative {
         ||  ((shouldExpand || safeToMoveOut) && enemyLowUnitStrategy && unitsComplete(Protoss.Reaver) > 0)
         || unitsComplete(Protoss.Reaver) >= 2)
     } else if (employing(PvPDT)) {
+      // Super-fast DT finishes 5:12 and thus arrives at the natural around 5:45
+      // Example: http://www.openbw.com/replay-viewer/?rep=https://data.basil-ladder.net/bots/MegaBot2017/MegaBot2017%20vs%20Florian%20Richoux%20Heartbreak%20Ridge%20CTR_EA637F71.rep
+      // Pylon + Forge + Cannon takes 1:15
+      // So we need to start the cannon process no later than 4:30 (adding some time as a buffer for construction delays)
+      // We can delay this based on things we've seen
+      timeToStartCannons = GameTime(4, 30)()
+      // TODO: Delay if they went Zealot-first into core
+      if (enemyStrategy(With.fingerprints.twoGate)) timeToStartCannons += GameTime(1, 10)()
+      if (enemyStrategy(With.fingerprints.dragoonRange)) timeToStartCannons += GameTime(0, 30)()
       // Look for reasons to avoid getting cannons
       if (enemyDarkTemplarLikely) {
         getCannons = true
       } else {
         getCannons = units(Protoss.TemplarArchives) > 0
+        getCannons &&= With.frame >= timeToStartCannons
         getCannons &&= safeAtHome
         getCannons &&= ! enemyRobo
         getCannons &&= enemyBases < 2
         getCannons &&= ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
-        getCannons &&= roll("DTSkipCannons", 0.5)
+        getCannons &&= roll("DTSkipCannons", if (enemyRecentStrategy(With.fingerprints.dtRush)) 0.2 else 0.5)
       }
-      shouldExpand = unitsComplete(Protoss.DarkTemplar) > 0 || (safeToMoveOut && units(Protoss.DarkTemplar) > 0)
+      shouldExpand = unitsComplete(Protoss.DarkTemplar) > 0 || (safeToMoveOut && units(Protoss.DarkTemplar) > 0) || (upgradeComplete(Protoss.ZealotSpeed) && unitsComplete(MatchWarriors) >= 15)
     } else if (employing(PvP3GateGoon)) {
       shouldExpand = unitsComplete(Protoss.Gateway) >= 3 && unitsComplete(MatchWarriors) >= 6
     } else if (employing(PvP4GateGoon)) {
@@ -254,12 +275,14 @@ class PvPOpening extends GameplanImperative {
         (if (zAfterCore) status("CoreZ") else status("NZCore"))
       }
     }
+    if (sevenZealot) status("SevenZealots")
+    if (commitZealots) status("CommitZealots")
+    if (shuttleFirst) status("ShuttleFirst")
     if (getObservers) status("Obs")
     if (getObservatory) status("Observatory")
-    if (shuttleFirst) status("ShuttleFirst")
+    if (employing(PvPDT)) status(f"Cannon@${new GameTime(timeToStartCannons)}")
     if (getCannons) status("Cannons")
-    if (commitZealots) status("CommitZealots")
-    if (sevenZealot) status("SevenZealots")
+    if (speedlotAttack) status("Speedlot")
     if (shouldAttack) status("Attack")
     if (shouldExpand) status("ExpandNow")
     oversaturate = units(Protoss.Reaver) > 0 || units(Protoss.DarkTemplar) > 0 || units(Protoss.Gateway) > 3
@@ -298,7 +321,8 @@ class PvPOpening extends GameplanImperative {
     /////////////////
 
     if (employing(PvP1012)) {
-      if (enemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway) || enemies(Protoss.Zealot) > 2) {
+      if (enemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway)
+        || enemies(Protoss.Zealot) > Math.min(unitsComplete(Protoss.Zealot), 2)) {
         //With.blackboard.pushKiters.set(false)
         With.units.ours.foreach(_.agent.commit = false)
       } else if (frame < GameTime(4, 15)() && enemiesComplete(Protoss.PhotonCannon) == 0) {
@@ -431,7 +455,8 @@ class PvPOpening extends GameplanImperative {
               Get(3, Protoss.Dragoon),
               Get(Protoss.DragoonRange),
               Get(4, Protoss.Pylon),
-              Get(21, Protoss.Probe))
+              Get(21, Protoss.Probe),
+              Get(4, Protoss.Dragoon))
           }
         }
         buildOrder(Get(17, Protoss.Probe))
@@ -481,7 +506,7 @@ class PvPOpening extends GameplanImperative {
     }
   }
 
-  def execute(): Unit = {
+  def executeMain(): Unit = {
 
     gasLimitCeiling(350)
     if (zBeforeCore && units(Protoss.CyberneticsCore) < 1) {
@@ -543,29 +568,35 @@ class PvPOpening extends GameplanImperative {
         get(Protoss.RoboticsSupportBay)
       }
 
-      if (shouldExpand && ! With.geography.ourNatural.units.exists(u => u.isEnemy && u.canAttack)) { requireMiningBases(2) }
+      if (shouldExpand&& ! With.geography.ourNatural.units.exists(u =>
+        u.isEnemy
+        && u.canAttackGround
+        // Distance check in case map has a degenerate natural
+        && u.pixelDistanceCenter(With.geography.ourNatural.townHallArea.center) < 32 * 15)) {
+        requireMiningBases(2)
+      }
 
       if (With.fingerprints.dtRush.matches) { get(Protoss.ObserverSpeed) }
       trainGatewayUnits()
 
       get(3, Protoss.Gateway)
 
+    } else if (speedlotAttack) {
+      cancelIncomplete(Protoss.TemplarArchives)
+      get(Protoss.CitadelOfAdun)
+      get(Protoss.ZealotSpeed)
+      if (getCannons) { buildCannonsAtNatural.update() }
+      if (shouldExpand) { requireMiningBases(2) }
+      if (safeAtHome && With.scouting.enemyProgress < 0.5) {
+        get(5, Protoss.Gateway)
+      }
+      trainGatewayUnits()
+      get(5, Protoss.Gateway)
     } else if (employing(PvPDT)) {
       get(Protoss.CitadelOfAdun)
       get(Protoss.TemplarArchives)
       buildOrder(Get(Protoss.DarkTemplar))
-      // Super-fast DT finishes 5:12 and thus arrives at the natural around 5:45
-      // Example: http://www.openbw.com/replay-viewer/?rep=https://data.basil-ladder.net/bots/MegaBot2017/MegaBot2017%20vs%20Florian%20Richoux%20Heartbreak%20Ridge%20CTR_EA637F71.rep
-      // Pylon + Forge + Cannon takes 1:15
-      // So we need to start the cannon process no later than 4:30 (adding some time as a buffer for construction delays)
-      // We can delay this based on things we've seen
-      var timeToStartCannons = GameTime(4, 30)()
-      // TODO: Delay if they went Zealot-first into core
-      if (enemyStrategy(With.fingerprints.twoGate)) timeToStartCannons += GameTime(1, 10)()
-      if (enemyStrategy(With.fingerprints.dragoonRange)) timeToStartCannons += GameTime(0, 30)()
-      if (getCannons && With.frame > timeToStartCannons) {
-        buildCannonsAtNatural.update()
-      }
+      if (getCannons) { buildCannonsAtNatural.update() }
       if (shouldExpand) { requireMiningBases(2) }
       if ( ! enemyRobo) pump(Protoss.DarkTemplar, 1)
       trainGatewayUnits()
@@ -610,13 +641,17 @@ class PvPOpening extends GameplanImperative {
     if (zAfterCore && zBeforeCore) buildOrder(Get(2, Protoss.Zealot))
     else if (zAfterCore || zBeforeCore) buildOrder(Get(Protoss.Zealot))
     buildOrder(Get(Protoss.Dragoon))
-    pump(Protoss.Dragoon)
-    if (
-      (enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate) && With.frame < Minutes(4)())
-      || gas < 42
-      || minerals >= 125) {
+    if (upgradeComplete(Protoss.ZealotSpeed, Protoss.Zealot.buildFrames + 72)) {
+      pump(Protoss.Dragoon, maximumConcurrently = 2)
       pump(Protoss.Zealot)
+    } else {
+      pump(Protoss.Dragoon)
+      if (
+        (enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate) && With.frame < Minutes(4)())
+          || gas < 42
+          || minerals >= 125) {
+        pump(Protoss.Zealot)
+      }
     }
   }
-
 }

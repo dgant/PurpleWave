@@ -50,7 +50,7 @@ object FormationGeneric {
     lazy val path           = new PathfindProfile(floodCentroid, Some(floodTarget), employGroundDist = true).find
     lazy val patht          = path.tiles.get.view
 
-    floodCentroid           = centroid.tile
+    floodCentroid           = centroid.tile.nearestWalkableTile
     floodTarget             = approach.nearestWalkableTile
     floodApex               = floodTarget
     floodMinDistanceTarget  = - inf
@@ -67,7 +67,7 @@ object FormationGeneric {
         With.reaction.estimationAverage * group.meanTopSpeed / 32.0 + 0.5).max.toInt
       floodMaxDistanceTarget  = floodCentroid.tileDistanceGroundManhattan(floodTarget) - 1
       floodMinDistanceTarget  = floodMaxDistanceTarget - stepSizeTiles
-      floodApex               = patht.find(_.tileDistanceGroundManhattan(floodTarget) == floodMinDistanceTarget).orElse(patht.find(_.tileDistanceGroundManhattan(floodTarget) == floodMinDistanceTarget + 1)).getOrElse(floodTarget)
+      floodApex               = patht.reverseIterator.filterNot(t => t.zone.edges.exists(_.contains(t.center))).find(_.tileDistanceGroundManhattan(floodTarget) >= floodMinDistanceTarget).orElse(patht.find(_.tileDistanceGroundManhattan(floodTarget) == floodMinDistanceTarget + 1)).getOrElse(floodTarget)
       floodMaxThreat          = if (style == FormationStyleMarch) With.grids.enemyRangeGround.margin else With.grids.enemyRangeGround.defaultValue
       floodCostDistanceGoal   = 5
       floodCostDistanceApex   = 1

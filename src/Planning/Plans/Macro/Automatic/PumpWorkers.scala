@@ -5,9 +5,9 @@ import Lifecycle.With
 class PumpWorkers(oversaturate: Boolean = false, cap: Int = 75, maximumConcurrently: Int = 2, maximumTotal: Int = 200) extends Pump(With.self.workerClass, maximumConcurrently = maximumConcurrently, maximumTotal = maximumTotal) {
   
   protected def builderCount: Int = {
-    if (With.self.isTerran)       4
-    else if (With.self.isProtoss) 2
-    else                          3
+    if (With.self.isTerran)       3
+    else if (With.self.isProtoss) 0
+    else                          2
   }
   override def maxDesirable: Int = Math.min(
     cap,

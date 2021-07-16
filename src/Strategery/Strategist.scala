@@ -108,11 +108,11 @@ class Strategist {
   lazy val winProbabilityByBranchLegal  : Map[Iterable[Strategy], Double] = winProbabilityByBranch.filter(_._1.forall(_.legality.isLegal))
 
   val rolls: mutable.HashMap[String, Boolean] = new mutable.HashMap
-  def roll(key: String, threshold: Double): Boolean = {
+  def roll(key: String, probability: Double): Boolean = {
     if ( ! rolls.contains(key)) {
       val rolled = Random.nextDouble()
-      val success = rolled >= threshold
-      With.logger.debug(f"Roll for $key ${if (success) "PASSED" else "FAILED"} (Rolled $rolled against $threshold threshold)")
+      val success = rolled <= probability
+      With.logger.debug(f"Roll for $key ${if (success) "PASSED" else "FAILED"} (Rolled $rolled into probability $probability)")
       rolls(key) = success
     }
     rolls(key)

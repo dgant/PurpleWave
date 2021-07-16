@@ -26,7 +26,7 @@ class Visualization extends TimedTask {
   // Settings //
   //////////////
   
-  var views = mutable.ArrayBuffer(
+  var views = mutable.ArrayBuffer[View](
     // Evergreen views
     ShowClock,
     ShowStrategyName,
@@ -40,10 +40,7 @@ class Visualization extends TimedTask {
     ShowPerformanceSummary,
     ShowStoryteller,
 
-    ShowJudgment,
-
-    // For new formations
-    ShowProduction,
+    ShowJudgment
   )
 
   lazy val knownViews: Vector[View] = Vector[View](
@@ -56,7 +53,7 @@ class Visualization extends TimedTask {
     ShowClustering,
     ShowDivisions,
     ShowDoom,
-    ShowEconomy,
+    ShowAccounting,
     ShowFingerprints,
     ShowGas,
     ShowGradients,
@@ -67,6 +64,7 @@ class Visualization extends TimedTask {
     ShowIgnorance,
     ShowJudgment,
     ShowKills,
+    ShowMacroSim,
     ShowHealthAndCooldown,
     ShowUnitsEnemy,
     ShowUnitsFriendly,

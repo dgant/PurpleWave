@@ -175,6 +175,12 @@ trait MacroCounting {
     With.geography.zones.exists(z => z.walledIn && ! z.owner.isUs)
   }
 
+  def scoutCleared: Boolean = {
+    With.scouting.enemyScouts().isEmpty || (
+      With.scouting.enemyScouts().forall( ! _.likelyStillThere)
+      && With.scouting.basesToLookForEnemyScouts().forall(_.zone.tiles.forall(_.explored)))
+  }
+
   def enemyBases: Int = With.geography.enemyBases.size
   def enemyMiningBases: Int = With.geography.enemyBases.count(isMiningBase)
   def foundEnemyBase: Boolean = enemyBases > 0

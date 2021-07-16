@@ -12,6 +12,7 @@ import Information.{UnitsShown, _}
 import Macro.Allocation._
 import Macro.Architecture.Architecture
 import Macro.Gathering
+import Macro.MacroSim.MacroSim
 import Macro.Scheduling.{MasterBuildOrderHistory, MasterBuildPlans, Projections, Scheduler}
 import Mathematics.Points.Tile
 import Micro.Agency.Agency
@@ -70,7 +71,7 @@ object With {
   var configuration     : Configuration           = _
   var accounting        : Accounting              = _
   var fingerprints      : Fingerprints            = _
-  var gathering         : Gathering              = _
+  var gathering         : Gathering               = _
   var geography         : Geography               = _
   var grids             : Grids                   = _
   var groundskeeper     : Groundskeeper           = _
@@ -78,6 +79,7 @@ object With {
   var lambdas           : LambdaQueue             = _
   var latency           : Latency                 = _
   var logger            : Logger                  = _
+  var macroSim          : MacroSim                = _
   var manners           : Manners                 = _
   var matchups          : MatchupGraph            = _
   var paths             : Paths                   = _
@@ -179,6 +181,7 @@ object With {
     history           = new History
     lambdas           = new LambdaQueue
     latency           = new Latency
+    macroSim          = new MacroSim
     manners           = new Manners
     matchups          = new MatchupGraph
     paths             = new Paths

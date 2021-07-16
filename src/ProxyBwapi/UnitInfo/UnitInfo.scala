@@ -59,6 +59,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   private var previousPixelIndex  : Int = 0
   @inline final def previousPixel(framesAgo: Int): Pixel = previousPixels((previousPixels.length + previousPixelIndex - Math.min(previousPixels.length, framesAgo)) % previousPixels.length)
   def update() {
+    _hasEverBeenVisibleToOpponents ||= visibleToOpponents
     if (cooldownLeft > lastCooldown) lastFrameStartingAttack = With.frame
     if (totalHealth < lastHitPoints + lastShieldPoints + lastMatrixPoints) lastFrameTakingDamage = With.frame
     if (complete) {
@@ -394,8 +395,11 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   ////////////////
 
   def visibility: Visibility.Value
+  private var _hasEverBeenVisibleToOpponents: Boolean = false
+  @inline final def hasEverBeenVisibleToOpponents: Boolean = _hasEverBeenVisibleToOpponents
   @inline final def visibleToOpponents: Boolean = if (isEnemy) true else (
     tile.visibleToEnemy
+    || (unitClass.tileWidth > 1 && unitClass.tileHeight > 1 && tileArea.tiles.exists(_.visibleToEnemy))
     || With.framesSince(lastFrameTakingDamage) < Seconds(2)()
     || With.framesSince(lastFrameStartingAttack) < Seconds(2)())
   @inline final def likelyStillThere: Boolean = alive && visible || (

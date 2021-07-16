@@ -7,7 +7,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class Accounting extends TimedTask {
   
-  val incomePerFrameMinerals = 0.044 // 0.046 -- trying higher value due to more optimizations
+  val incomePerFrameMinerals = 0.044
   val incomePerFrameGas = 0.069
   
   // Should start at 50, of course,but this -30 offsets the effect of starting workers all being far from minerals

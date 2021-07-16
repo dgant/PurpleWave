@@ -136,7 +136,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   def canAttack(enemy: UnitClass): Boolean = if (enemy.isFlyer) attacksAir else attacksGround
   def canAttack(enemy: UnitInfo): Boolean = if (enemy.flying) attacksAir else attacksGround
 
-  lazy val dealsDamage: Boolean = rawCanAttack || isSpellcaster || Set(Terran.Bunker).contains(this) || this == Zerg.Lurker || this == Protoss.Carrier
+  lazy val dealsDamage: Boolean = rawCanAttack || isSpellcaster || this == Terran.Bunker || this == Protoss.Carrier || this == Protoss.Reaver || this == Zerg.Lurker
 
   lazy val pixelRangeGround: Double =
     if (this == Terran.Bunker) Terran.Marine.pixelRangeGround + 32.0

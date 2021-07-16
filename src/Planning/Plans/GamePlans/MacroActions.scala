@@ -101,5 +101,5 @@ trait MacroActions {
     new RequireMiningBases(count).update()
   }
 
-  def roll(key: String, threshold: Double): Boolean = { With.strategy.roll(key, threshold) }
+  def roll(key: String, orobability: Double): Boolean = { With.strategy.roll(key, orobability) }
 }

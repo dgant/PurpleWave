@@ -1,5 +1,6 @@
 package Planning.UnitMatchers
 
+import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object MatchWarriors extends UnitMatcher {
@@ -8,7 +9,7 @@ object MatchWarriors extends UnitMatcher {
     unit.aliveAndComplete
     && unit.unitClass.dealsDamage
     && unit.unitClass.orderable
-    && (unit.unitClass.canMove || unit.is(MatchTank))
+    && (unit.unitClass.canMove || Terran.SiegeTankSieged(unit))
     && ! unit.unitClass.isWorker
   )
 }

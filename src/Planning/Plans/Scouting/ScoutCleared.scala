@@ -1,12 +1,8 @@
 package Planning.Plans.Scouting
 
-import Lifecycle.With
 import Planning.Predicate
+import Planning.Predicates.MacroFacts
 
 class ScoutCleared extends Predicate {
-  override def apply: Boolean = (
-    With.scouting.enemyScouts().isEmpty
-    || (
-      With.scouting.enemyScouts().forall( ! _.likelyStillThere)
-      && With.scouting.basesToLookForEnemyScouts().forall(_.zone.tiles.forall(_.explored))))
+  override def apply: Boolean = MacroFacts.scoutCleared
 }

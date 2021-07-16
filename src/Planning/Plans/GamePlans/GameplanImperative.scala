@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans
 
-import Debugging.SimpleString
 import Planning.Plan
 import Planning.Predicates.MacroCounting
 
@@ -28,7 +27,7 @@ abstract class GameplanImperative extends Plan with Modal with MacroCounting wit
       pumpSupply()
       pumpWorkers(oversaturate = false)
     }
-    execute()
+    executeMain()
     if (oversaturate) {
       pumpWorkers(oversaturate = true)
     }
@@ -36,5 +35,5 @@ abstract class GameplanImperative extends Plan with Modal with MacroCounting wit
 
   def executeBuild(): Unit = {}
 
-  def execute(): Unit
+  def executeMain(): Unit
 }

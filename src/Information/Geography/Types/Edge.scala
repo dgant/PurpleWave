@@ -6,7 +6,7 @@ import Mathematics.Points.{Direction, Pixel, PixelRay, Tile}
 import Mathematics.Maff
 import bwta.Chokepoint
 
-class Edge(choke: Chokepoint) {
+final class Edge(choke: Chokepoint) {
   
   def otherSideof(zone: Zone): Zone =
     if (zones.head == zone)
@@ -37,7 +37,8 @@ class Edge(choke: Chokepoint) {
   
   val distanceGrid: GridGroundDistance = new GridGroundDistance(tiles: _*)
   
-  def contains(pixel: Pixel): Boolean = pixelCenter.pixelDistance(pixel) <= radiusPixels
+  @inline def contains(pixel: Pixel): Boolean = pixelCenter.pixelDistance(pixel) <= radiusPixels
+  @inline def contains(tile: Tile): Boolean = contains(tile.center)
 
   private lazy val endsWalkable = endPixels.map(_.tile).forall(With.grids.walkableTerrain.get)
   def pixelTowards(zone: Zone): Pixel = if (endsWalkable)

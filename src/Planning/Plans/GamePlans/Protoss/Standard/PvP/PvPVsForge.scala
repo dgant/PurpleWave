@@ -31,7 +31,7 @@ class PvPVsForge extends PvP34GateGoon {
   class ExpandASAP extends Parallel(new RequireMiningBases(2), new CapGasWorkersAt(0))
 
   override def buildOrderPlan: Plan = new Parallel(
-    new PvPIdeas.CancelAirWeapons,
+    new OldPvPIdeas.CancelAirWeapons,
     new If(
       new Not(new EnemyStrategy(With.fingerprints.cannonRush)),
       new Parallel(

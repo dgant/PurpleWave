@@ -5,7 +5,7 @@ import Macro.BuildRequests.Get
 import Planning.Plan
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{If, Parallel}
-import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.ReactToDarkTemplarEmergencies
+import Planning.Plans.GamePlans.Protoss.Standard.PvP.OldPvPIdeas.ReactToDarkTemplarEmergencies
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.BuildOrder
 import Planning.Predicates.Compound._
@@ -14,7 +14,6 @@ import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
 import Planning.Predicates.Strategy._
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPRobo
-import Tactics.ScoutForCannonRush
 
 class PvP1GateCoreLogic(allowZealotBeforeCore: Boolean = true, requireZealotBeforeCore: Boolean = false) {
 
@@ -99,9 +98,8 @@ class PvP1GateCoreLogic(allowZealotBeforeCore: Boolean = true, requireZealotBefo
       new Not(new GateGate))) // We want that second Gateway up quickly instead
 
   def emergencyPlans: Seq[Plan] = Vector(
-    new PvPIdeas.ReactToGasSteal,
-    new PvPIdeas.ReactToCannonRush,
-    new PvPIdeas.ReactToProxyGateways,
+    new OldPvPIdeas.ReactToGasSteal,
+    new OldPvPIdeas.ReactToCannonRush,
     // We don't need to do anything special against standard 2-gate
     // new PvPIdeas.ReactTo2Gate,
     new If(
@@ -110,7 +108,7 @@ class PvP1GateCoreLogic(allowZealotBeforeCore: Boolean = true, requireZealotBefo
         new EnemyDarkTemplarLikely,
         new If(
           new Latch(new UnitsAtMost(0, Protoss.CyberneticsCore)),
-          new PvPIdeas.ReactToDarkTemplarEmergencies,
+          new OldPvPIdeas.ReactToDarkTemplarEmergencies,
           new Parallel(
             new If(new UnitsAtMost(0, Protoss.Observatory), new CancelIncomplete(Protoss.RoboticsSupportBay)),
             new If(new UnitsAtMost(0, Protoss.Observer), new CancelIncomplete(Protoss.Shuttle, Protoss.Reaver)),

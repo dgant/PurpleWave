@@ -57,7 +57,4 @@ object PvPProxy2Gate extends PvPStrategy {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.twoGate, With.fingerprints.proxyGateway, With.fingerprints.forgeFe, With.fingerprints.earlyForge)
 }
-object PvP1ZealotExpand extends PvPStrategy {
-  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.proxyGateway, With.fingerprints.cannonRush)
-  override def minimumGamesVsOpponent: Int = 1
-}
+

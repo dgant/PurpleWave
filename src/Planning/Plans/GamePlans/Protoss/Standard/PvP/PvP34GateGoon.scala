@@ -43,7 +43,7 @@ class PvP34GateGoon extends GameplanTemplate {
           new Employing(PvP4GateGoon),
           new EnemyStrategy(With.fingerprints.dtRush, With.fingerprints.robo, With.fingerprints.twoGate, With.fingerprints.gasSteal),
           new EnemyBasesAtLeast(2)))),
-    new PvPIdeas.AttackSafely)
+    new OldPvPIdeas.AttackSafely)
   
   val oneGateCoreLogic = new PvP1GateCoreLogic(allowZealotBeforeCore = false)
 

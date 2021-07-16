@@ -34,9 +34,6 @@ object StrategyGroups {
     PvPProxy2Gate, // Proxy builds are temporarily broken due to new building placer
     PvZProxy2Gate, // Proxy builds are temporarily broken due to new building placer
 
-    // AIST4: Too many issues; too bad against 4-gate meta; needs polish we don't have time for
-    PvP1ZealotExpand,
-
     PvZDT,       // Requires better micro on one base
     PvZCorsair,  // Requires better micro on one base
     PvZSpeedlot, // Requires better micro on one base

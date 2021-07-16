@@ -7,7 +7,7 @@ import Planning.Plans.Basic.{Do, NoPlan, Write}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.PlaceGatewaysProxied
-import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas
+import Planning.Plans.GamePlans.Protoss.Standard.PvP.OldPvPIdeas
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{RequireBases, RequireMiningBases}
@@ -136,7 +136,7 @@ class PvEProxy2Gate extends GameplanTemplate {
   )
 
   override def emergencyPlans: Seq[Plan] = Seq(
-    new PvPIdeas.ReactToCannonRush
+    new OldPvPIdeas.ReactToCannonRush
   )
   
   override def buildPlans = Vector(

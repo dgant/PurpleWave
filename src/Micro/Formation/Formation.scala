@@ -15,6 +15,7 @@ class Formation(val style: FormationStyle, val placements: Map[UnitInfo, Pixel])
   def apply(unit: UnitInfo): Pixel = placements.getOrElse(unit, default)
 
   def renderMap(): Unit = {
+    path.foreach(_.renderMap(style.color))
     if (placements.nonEmpty) {
       DrawMap.label(style.name, Maff.centroid(placements.values), true, style.color)
     }

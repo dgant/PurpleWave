@@ -96,17 +96,27 @@ object FormationGeneric {
       val tile = floodHorizon.dequeue()._1
       lazy val distanceTileToGoal = tile.tileDistanceGroundManhattan(floodTarget)
       if (tile.walkable
-          && (floodMinDistanceTarget  <= 0    || floodMinDistanceTarget  <= distanceTileToGoal)
-          && (floodMaxDistanceTarget  >= inf  || floodMaxDistanceTarget  >= distanceTileToGoal)
-          && (floodMaxThreat          >= inf  || floodMaxThreat        >= tile.enemyRangeGround)
+          && (floodMinDistanceTarget  <= 0    || floodMinDistanceTarget <= distanceTileToGoal)
+          && (floodMaxDistanceTarget  >= inf  || floodMaxDistanceTarget >= distanceTileToGoal)
+          && (floodMaxThreat          >= inf  || floodMaxThreat         >= tile.enemyRangeGround)
           && (tile.units.forall(u => u.flying || (u.isFriendly && ! u.unitClass.isBuilding)))) {
-        val pixel = tile.center
-        val classSlot = unplaced.find(_._1.slots > 0).get._1
-        classSlot.slots -= 1
-        if ( ! slots.contains(classSlot.unitClass)) {
-          slots(classSlot.unitClass) = ArrayBuffer.empty
+        val unplacedClass = unplaced.find(_._1.slots > 0).get
+
+        // To avoid diving with Engage formations:
+        // If we care about enemy vulnerability, position units only as close as is necessary to hit something
+        // Allow pushing through chokes so we can actually take fights there if necessary
+        if (
+          floodCostVulnerability == 0
+          || tile.enemyRangeGround == 0
+          || tile.zone.edges.exists(_.contains(tile))
+          || unplacedClass._2 < 32 * (vGrid.margin + vGrid.maxVulnerability - vGrid(tile))) {
+          val classSlot = unplacedClass._1
+          classSlot.slots -= 1
+          if (!slots.contains(classSlot.unitClass)) {
+            slots(classSlot.unitClass) = ArrayBuffer.empty
+          }
+          slots(classSlot.unitClass) += tile.center
         }
-        slots(classSlot.unitClass) += pixel
       }
       val neighbors = tile
         .adjacent4
@@ -129,6 +139,7 @@ object FormationGeneric {
       })
     val unassigned = UnassignedFormation(style, slots.toMap, group)
     val output = if (style == FormationStyleGuard || style == FormationStyleEngage) unassigned.outwardFromCentroid else unassigned.sprayToward(approach)
+    if (style == FormationStyleMarch || style == FormationStyleDisengage) { output.path = Some(path) }
     output
   }
 

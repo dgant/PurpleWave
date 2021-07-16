@@ -33,7 +33,7 @@ class PvPOpening extends GameplanImperative {
   override def completed: Boolean = { complete ||= bases > 1; complete }
 
   val buildCannonsAtNatural = new BuildCannonsAtNatural(2)
-  val reactToDTEmergencies = new PvPIdeas.ReactToDarkTemplarEmergencies
+  val reactToDTEmergencies = new OldPvPIdeas.ReactToDarkTemplarEmergencies
   override def executeBuild(): Unit = {
 
     /////////////////////
@@ -214,7 +214,7 @@ class PvPOpening extends GameplanImperative {
       shouldExpand = units(Protoss.Gateway) >= 2
       shouldExpand &&= (
             ((shouldExpand || safeToMoveOut) && enemyStrategy(With.fingerprints.dtRush) && unitsComplete(Protoss.Observer) > 0)
-        ||  ((shouldExpand || safeToMoveOut) && enemyLowUnitStrategy && unitsComplete(Protoss.Reaver) > 0)
+        ||  ((shouldExpand || safeToMoveOut) && PvPIdeas.enemyLowUnitStrategy && unitsComplete(Protoss.Reaver) > 0)
         || unitsComplete(Protoss.Reaver) >= 2)
     } else if (employing(PvPDT)) {
       // Super-fast DT finishes 5:12 and thus arrives at the natural around 5:45
@@ -247,18 +247,8 @@ class PvPOpening extends GameplanImperative {
     shouldExpand &&= ! With.fingerprints.dtRush.matches || unitsComplete(Protoss.Observer, Protoss.PhotonCannon) > 0
     shouldExpand &&= ! With.fingerprints.dtRush.matches || (units(Protoss.Observer, Protoss.PhotonCannon) > 0 && enemies(Protoss.DarkTemplar) == 0)
 
-    shouldAttack = unitsComplete(Protoss.Zealot) > 0 && enemiesComplete(MatchWarriors, Protoss.PhotonCannon) == 0
-    shouldAttack ||= With.fingerprints.cannonRush.matches
-    // Attack when using a more aggressive build
-    shouldAttack ||= safeToMoveOut &&
-      (enemyLowUnitStrategy
-        || (employing(PvP1012) && (unitsComplete(Protoss.Zealot) > 3 || ! enemyStrategy(With.fingerprints.twoGate))
-        || (employing(PvPGateCoreGate) && unitsComplete(Protoss.Dragoon) > 0)))
-    // Attack when we have range advantage
-    shouldAttack ||= unitsComplete(Protoss.Dragoon) > 0     && ! enemyHasShown(Protoss.Dragoon)         && (enemiesShown(Protoss.Zealot) > 2 || With.fingerprints.twoGate.matches)
-    shouldAttack ||= upgradeComplete(Protoss.DragoonRange)  && ! enemyHasUpgrade(Protoss.DragoonRange)  && (enemiesShown(Protoss.Zealot) > 2 || With.fingerprints.twoGate.matches)
-    // Require DT backstab protection before attacking through a DT
-    shouldAttack &&= (unitsComplete(Protoss.Observer) > 1 || ! enemyHasShown(Protoss.DarkTemplar))
+    // Attack when we reach an attack timing
+    shouldAttack = PvPIdeas.shouldAttack
     // Push out to take our natural
     shouldAttack ||= shouldExpand
     // Ensure that committed Zealots keep wanting to attack
@@ -617,14 +607,6 @@ class PvPOpening extends GameplanImperative {
     // our mineral mining is so efficient we keep winding up with lots of minerals anyway
     get(4, Protoss.Gateway)
   }
-
-  private def enemyLowUnitStrategy: Boolean = enemyBases > 1 || enemyStrategy(
-    With.fingerprints.nexusFirst,
-    With.fingerprints.gatewayFe,
-    With.fingerprints.forgeFe,
-    With.fingerprints.robo,
-    With.fingerprints.dtRush,
-    With.fingerprints.cannonRush)
 
   private def trainRoboUnits(): Unit = {
     if (units(Protoss.RoboticsFacility) > 0) {

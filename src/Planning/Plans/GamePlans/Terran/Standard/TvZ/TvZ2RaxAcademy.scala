@@ -5,7 +5,7 @@ import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.AttackSafely
+import Planning.Plans.GamePlans.Protoss.Standard.PvP.OldPvPIdeas.AttackSafely
 import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Expanding.RequireMiningBases

@@ -4,6 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Micro.Formation.{Formation, FormationGeneric}
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable.ArrayBuffer
@@ -36,6 +37,7 @@ object SquadAutomation {
     val goal          = if (group.hasGround) to.nearestWalkableTile           else to.tile
     val distancePx    = if (group.hasGround) origin.pixelDistanceGround(goal) else origin.pixelDistance(goal)
     val output        = With.units.enemy
+      .filterNot(Protoss.Interceptor)
       .filter(e => if (e.flying) group.attacksAir else group.attacksGround)
       .filter(_.likelyStillThere)
       .filter(e =>

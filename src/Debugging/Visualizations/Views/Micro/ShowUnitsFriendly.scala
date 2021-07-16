@@ -3,7 +3,6 @@ package Debugging.Visualizations.Views.Micro
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Debugging.Visualizations.{Colors, Forces}
-import Information.Geography.Pathfinding.Types.TilePath
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
@@ -100,16 +99,7 @@ object ShowUnitsFriendly extends View {
     }
 
     if (showPaths && (unit.selected || unit.transport.exists(_.selected) || With.units.selected.isEmpty)) {
-      def drawTilePath(path: TilePath): Unit = {
-        val offset = unit.pixel.offsetFromTileCenter
-        for (i <- 0 until path.tiles.get.size - 1) {
-          DrawMap.arrow(
-            path.tiles.get(i).center.add(offset),
-            path.tiles.get(i + 1).center.add(offset),
-            unit.unitColor)
-        }
-      }
-      unit.agent.lastPath.foreach(drawTilePath)
+      unit.agent.lastPath.foreach(_.renderMap(unit.unitColor, Some(unit.pixel)))
     }
 
     if (showForces) {

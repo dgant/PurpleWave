@@ -8,7 +8,6 @@ import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvP2GateDT
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -36,7 +35,6 @@ class PvRDT extends GameplanTemplate {
     new EnemyStrategy(With.fingerprints.twelveHatch),
     new ConsiderAttacking)
 
-  override def blueprints: Vector[Blueprint] = new PvP2GateDT().blueprints
   override def buildOrderPlan = new If(
     new EnemyIsZerg,
     new BuildOrder(ProtossBuilds.ZCoreZ: _*),

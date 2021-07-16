@@ -62,14 +62,11 @@ class PvPLateGame extends GameplanImperative {
       || enemyBases > miningBases
       || (expectCarriers && With.frame > GameTime(3, 30)() * miningBases)
       || Math.min(unitsComplete(MatchWarriors) / 16, unitsComplete(Protoss.Gateway) / 3) >= miningBases)
-    shouldHarass = fearMacro || fearContain
-    shouldAttack ||= (unitsComplete(Protoss.Reaver) > 0 && unitsComplete(Protoss.Shuttle) > 0 && unitsComplete(MatchWarriors) > 6)
-    shouldAttack ||= upgradeComplete(Protoss.ZealotSpeed)
-    shouldAttack ||= safeToMoveOut && unitsComplete(Protoss.Gateway) >= targetGateways
+    shouldHarass = fearMacro || fearContain || upgradeComplete(Protoss.ShuttleSpeed)
+    shouldAttack = PvPIdeas.shouldAttack
+    shouldAttack ||= unitsComplete(Protoss.Gateway) >= targetGateways
     shouldAttack ||= dtBravery
     shouldAttack ||= shouldHarass
-    shouldAttack ||= bases > 2
-    shouldAttack ||= enemyBases > 2
     shouldAttack &&= ! fearDeath
     shouldAttack &&= ! fearDT
     shouldAttack ||= shouldExpand
@@ -104,9 +101,9 @@ class PvPLateGame extends GameplanImperative {
     primaryTech.map(_.toString).foreach(status)
 
     // Emergency reactions
-    new PvPIdeas.ReactToDarkTemplarEmergencies().update()
-    new PvPIdeas.ReactToCannonRush().update()
-    new PvPIdeas.ReactToArbiters().update()
+    new OldPvPIdeas.ReactToDarkTemplarEmergencies().update()
+    new OldPvPIdeas.ReactToCannonRush().update()
+    new OldPvPIdeas.ReactToArbiters().update()
   }
 
   override def executeMain(): Unit = {
@@ -157,6 +154,7 @@ class PvPLateGame extends GameplanImperative {
   }
 
   def doTrainArmy(): Unit = {
+    // Pump 2 Observer vs. DT. This is important because we refuse to attack without DT backstab protection
     if (enemyDarkTemplarLikely || enemyShownCloakedThreat) pump(Protoss.Observer, 2)
     if (expectCarriers && units(Protoss.DarkArchon) + units(Protoss.DarkTemplar) / 2 < Maff.clamp(enemies(Protoss.Carrier), 8, 16)) {
       pump(Protoss.DarkTemplar)

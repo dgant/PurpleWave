@@ -44,34 +44,35 @@ trait TilePathfinder {
 
   // Best cost from the start tile to this tile.
   // In common A* parlance, this is the gScore.
+  val maxMobility = 6.0
   @inline private final def costFromStart(profile: PathfindProfile, toTile: Tile, hypotheticalFrom: Option[Tile] = None): Double = {
     val i = toTile.i
     val toState = tiles(i)
     val fromState = hypotheticalFrom.map(t => tiles(t.i)).orElse(toState.cameFrom.map(t => tiles(t.i)))
     if (fromState.isEmpty) return 0
     val fromTile = fromState.get
-    val costSoFar     : Double  = fromState.get.costFromStart
-    val costDistance  : Double  = if (fromTile.tile.x == toTile.x || fromTile.tile.y == toTile.y) 1f else Maff.sqrt2f
-    val costThreat    : Double  = if (profile.costThreat == 0) 0 else profile.costThreat * Math.max(0, profile.threatGrid.getUnchecked(i) - profile.threatGrid.getUnchecked(fromTile.i)) // Max?
-    val costOccupancy : Double  = if (profile.costOccupancy == 0) 0 else {
+    val costSoFar       : Double  = fromState.get.costFromStart
+    val costDistance    : Double  = if (fromTile.tile.x == toTile.x || fromTile.tile.y == toTile.y) 1 else Maff.sqrt2
+    val costEnemyVision : Double  = if (toTile.visibleToEnemy) profile.costEnemyVision else 0.0
+    val costImmobility  : Double  = if (profile.costImmobility == 0) 0.0 else profile.costImmobility * Math.max(0.0, maxMobility - toTile.mobility) / maxMobility
+    val costOccupancy   : Double  = if (profile.costOccupancy == 0) 0 else {
       // Intuition: We want to keep this value scaled around 0-1 so we can reason about costOccupancy
       // Signum: Scale-invariant
       // Sigmoid: Tiebreaks equally signed vectors with different scales
       val diff = With.coordinator.gridPathOccupancy.getUnchecked(i) - With.coordinator.gridPathOccupancy.getUnchecked(fromTile.i)
-      profile.costOccupancy * 0.5f * (Maff.fastSigmoid(diff) + 0.5 + 0.5 * Maff.signum(diff))
+      profile.costOccupancy * 0.5 * (Maff.fastSigmoid(diff) + 0.5 + 0.5 * Maff.signum(diff))
     }
-    val costRepulsion: Double = if (profile.costRepulsion == 0 || profile.maxRepulsion == 0)
-      0
-    else {
+    val costRepulsion: Double = if (profile.costRepulsion == 0 || profile.maxRepulsion == 0) 0 else {
       // Intuition: We want to keep this value scaled around 0-1 so we can reason about costRepulsion
       // and it must be non-negative to preserve heuristic admissibility
       // Signum: Scale-invariant
       // Sigmoid: Tiebreaks equally signed vectors with different scales
       val diff = toState.repulsion - fromState.get.repulsion
-      profile.costRepulsion * 0.5f * (Maff.fastSigmoid(diff) + 0.5 + 0.5 * Maff.signum(diff))
+      profile.costRepulsion * 0.5 * (Maff.fastSigmoid(diff) + 0.5 + 0.5 * Maff.signum(diff))
     }
-
-    costSoFar + costDistance + costThreat + costOccupancy + costRepulsion
+    val costThreat: Double  = if (profile.costThreat == 0) 0 else profile.costThreat * Math.max(0, profile.threatGrid.getUnchecked(i) - profile.threatGrid.getUnchecked(fromTile.i)) // Max?
+    val output = costSoFar + costDistance + costEnemyVision + costImmobility + costOccupancy + costRepulsion + costThreat
+    output
   }
 
   // The A* admissable heuristic: The lowest possible cost to the end of the path.
@@ -199,7 +200,7 @@ trait TilePathfinder {
               neighborState.setCameFrom(bestTileState.tile)
               neighborState.setCostFromStart(neighborCostFromStart)
               neighborState.setTotalCostFloor(neighborCostFromStart + costToEndFloor(profile, neighborTile))
-              neighborState.setPathLength(bestTileState.pathLength + (if (neighborOrthogonal) 1 else Maff.sqrt2f))
+              neighborState.setPathLength(bestTileState.pathLength + (if (neighborOrthogonal) 1 else Maff.sqrt2))
             }
             if ( ! wasEnqueued) {
               neighborState.setRepulsion(totalRepulsion(profile, neighborTile))

@@ -31,6 +31,7 @@ class Grids extends TimedTask {
   val buildableTerrain            = add("bt",   new GridBuildableTerrain)
   val buildableTownHall           = add("bh",   new GridBuildableTownHall)
   val walkableTerrain             = add("wt",   new GridWalkableTerrain)
+  val mobilityTerrain             = add("mt",   new GridMobilityTerrain)
   val scoutingPathsBases          = add("spb",  new GridScoutingPathsBases)
   val scoutingPathsStartLocations = add("sps",  new GridScoutingPathsStartLocations)
 

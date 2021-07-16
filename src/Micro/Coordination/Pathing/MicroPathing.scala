@@ -44,9 +44,9 @@ object MicroPathing {
     pathfindProfile.lengthMaximum     = Some(Maff.clamp((unit.matchups.pixelsOfEntanglement + unit.effectiveRangePixels).toInt / 32, pathLengthMinimum, 15))
     pathfindProfile.threatMaximum     = Some(0)
     pathfindProfile.employGroundDist  = true
-    pathfindProfile.costOccupancy     = if (unit.flying) 0f else 3f
-    pathfindProfile.costRepulsion     = 3f
-    pathfindProfile.costThreat        = 6f
+    pathfindProfile.costOccupancy     = if (unit.flying) 0 else 3
+    pathfindProfile.costRepulsion     = 3
+    pathfindProfile.costThreat        = 6
     pathfindProfile.repulsors         = getPathfindingRepulsors(unit)
     pathfindProfile.unit              = Some(unit)
     pathfindProfile.find

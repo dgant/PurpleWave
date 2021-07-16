@@ -12,7 +12,6 @@ object Maff {
   val halfPI: Double = Math.PI / 2
   val twoPI: Double = 2 * Math.PI
   val sqrt2: Double = Math.sqrt(2)
-  val sqrt2f: Float = sqrt2.toFloat
   val sqrt2m1d: Double = Math.sqrt(2) - 1
 
   @inline final def mode[T](values: Traversable[T]): T = values.groupBy(x => x).maxBy(_._2.size)._1
@@ -253,13 +252,7 @@ object Maff {
     Math.sqrt(dx * dx + dy * dy)
   }
 
-  @inline final def fastSigmoid(x: Float): Float = 0.5f + fastTanh(x) / 2.0f
   @inline final def fastSigmoid(x: Double): Double = 0.5 + fastTanh(x) / 2.0
-  @inline final def fastTanh(x: Float): Float = {
-    if (x.isPosInfinity) return 1f
-    if (x.isNegInfinity) return -1f
-    x / (1f + Math.abs(x))
-  }
   @inline final def fastTanh(x: Double): Double = {
     if (x.isPosInfinity) return 1.0
     if (x.isNegInfinity) return -1.0
@@ -340,7 +333,6 @@ object Maff {
   }
 
   @inline final def square(k: Int): Int = k * k
-  @inline final def square(k: Float): Float = k * k
   @inline final def square(k: Double): Double = k * k
 
   /**

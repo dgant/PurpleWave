@@ -7,22 +7,23 @@ import Mathematics.Points.Tile
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 final class PathfindProfile(
-   var start                    : Tile,
-   var end                      : Option[Tile]    = None,
-   var endDistanceMaximum       : Float           = 0,
-   var threatMaximum            : Option[Int]     = None, // Default: Ignore threat
-   var lengthMinimum            : Option[Float]   = None,
-   var lengthMaximum            : Option[Float]   = None, // It's hazardous to set a maximum with a specific destination when ground distance is off
-   var canCrossUnwalkable       : Option[Boolean] = None, // Default: Reasonable value for unit, otherwise false
-   var canEndUnwalkable         : Option[Boolean] = None, // Default: Reasonable value for unit, otherwise false
-   var employGroundDist         : Boolean         = false,
-   var costOccupancy            : Float           = 0f,
-   var costThreat               : Float           = 0f,
-   var costRepulsion            : Float           = 0f,
-   var costEnemyVision          : Float           = 0f,
-   var alsoUnwalkable           : Set[Tile]       = Set.empty,
-   var repulsors: IndexedSeq[PathfindRepulsor] = IndexedSeq.empty,
-   var unit: Option[FriendlyUnitInfo] = None) {
+  var start               : Tile,
+  var end                 : Option[Tile]    = None,
+  var endDistanceMaximum  : Float           = 0,
+  var threatMaximum       : Option[Int]     = None, // Default: Ignore threat
+  var lengthMinimum       : Option[Float]   = None,
+  var lengthMaximum       : Option[Float]   = None, // It's hazardous to set a maximum with a specific destination when ground distance is off
+  var canCrossUnwalkable  : Option[Boolean] = None, // Default: Reasonable value for unit, otherwise false
+  var canEndUnwalkable    : Option[Boolean] = None, // Default: Reasonable value for unit, otherwise false
+  var employGroundDist    : Boolean         = false,
+  var costEnemyVision     : Double          = 0.0,
+  var costImmobility      : Double          = 0.0,
+  var costOccupancy       : Double          = 0.0,
+  var costRepulsion       : Double          = 0.0,
+  var costThreat          : Double          = 0.0,
+  var alsoUnwalkable      : Set[Tile]       = Set.empty,
+  var repulsors: IndexedSeq[PathfindRepulsor] = IndexedSeq.empty,
+  var unit: Option[FriendlyUnitInfo] = None) {
 
   lazy val crossUnwalkable: Boolean = {
     warnIfUnfinalized()

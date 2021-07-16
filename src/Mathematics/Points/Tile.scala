@@ -162,6 +162,9 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def base: Option[Base] = {
     With.geography.baseByTile(this)
   }
+  @inline def mobility: Int = {
+    With.grids.mobilityTerrain(this)
+  }
   @inline def altitude: Int = {
     With.game.getGroundHeight(x, y)
   }

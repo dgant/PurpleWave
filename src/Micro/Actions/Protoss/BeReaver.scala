@@ -75,7 +75,7 @@ object BeReaver extends Action {
         profile.threatMaximum       = maximumThreat
         profile.canCrossUnwalkable  = Some(true)
         profile.canEndUnwalkable    = Some(false)
-        profile.costRepulsion       = 0.8f
+        profile.costRepulsion       = 0.8
         profile.repulsors           = repulsors
         profile.unit                = Some(unit)
         path = profile.find

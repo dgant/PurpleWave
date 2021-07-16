@@ -76,6 +76,8 @@ class PvPLateGame extends GameplanImperative {
     shouldSecondaryTech = gasPumps > 2 || (unitsComplete(Protoss.Reaver) > 2 && unitsComplete(Protoss.Shuttle) > 0) || techComplete(Protoss.PsionicStorm)
     shouldSecondaryTech &&= unitsComplete(Protoss.Gateway) >= targetGateways
     shouldSecondaryTech &&= With.units.ours.filter(Protoss.Nexus).forall(_.complete)
+    shouldSecondaryTech &&= primaryTech.contains(RoboTech) || (gasPumps > 2 && miningBases > 2)
+    shouldSecondaryTech &&= miningBases > 1
     oversaturate = shouldExpand && ! fearDeath && ! fearContain
 
     lazy val commitToTech = unitsComplete(Protoss.Gateway) >= 5

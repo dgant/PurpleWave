@@ -66,8 +66,8 @@ abstract class AbstractSearch extends Action {
     val profile = new PathfindProfile(unit.tile)
     profile.end                 = Some(tileToScout)
     profile.employGroundDist     = true
-    profile.costOccupancy       = 0.01f
-    profile.costRepulsion       = 5f
+    profile.costOccupancy       = 0.01
+    profile.costRepulsion       = 5
     profile.repulsors           = MicroPathing.getPathfindingRepulsors(unit)
     profile.lengthMaximum       = Some(20)
     profile.unit                = Some(unit)

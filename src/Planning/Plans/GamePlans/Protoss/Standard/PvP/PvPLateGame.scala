@@ -54,11 +54,17 @@ class PvPLateGame extends GameplanImperative {
     shouldExpand = fearMacro || ! fearDeath
     shouldExpand &&= ! fearContain
     shouldExpand &&= ! fearDT
-    shouldExpand &&= (miningBases < 2 || enemyBases > miningBases || unitsComplete(Protoss.Gateway) >= miningBases * 3 || (expectCarriers && With.frame > GameTime(3, 30)() * miningBases))
+    shouldExpand &&= (
+      miningBases < 2
+      || enemyBases > miningBases
+      || (expectCarriers && With.frame > GameTime(3, 30)() * miningBases)
+      || Math.min(unitsComplete(MatchWarriors) / 16, unitsComplete(Protoss.Gateway) / 3) >= miningBases)
     shouldHarass = fearMacro || fearContain
     shouldAttack = shouldHarass && ! fearDeath && ! fearDT
     shouldAttack ||= shouldExpand
     shouldSecondaryTech = gasPumps > 2 || (unitsComplete(Protoss.Reaver) > 2 && unitsComplete(Protoss.Shuttle) > 0) || techComplete(Protoss.PsionicStorm)
+    shouldSecondaryTech &&= unitsComplete(Protoss.Gateway) >= targetGateways
+    shouldSecondaryTech &&= With.units.ours.filter(Protoss.Nexus).forall(_.complete)
     oversaturate = shouldExpand && ! fearDeath && ! fearContain
 
     lazy val commitToTech = unitsComplete(Protoss.Gateway) >= 5
@@ -110,15 +116,16 @@ class PvPLateGame extends GameplanImperative {
 
     if (fearDeath) {
       trainArmy()
-      addGates()
       fillerArmy()
+      addGates()
     }
+    get(3, Protoss.Gateway)
     if (fearContain) {
       primaryTech()
       trainArmy()
       addGates()
+      fillerArmy()
     }
-    get(3, Protoss.Gateway)
     if (shouldExpand) {
       expand()
     }
@@ -128,10 +135,10 @@ class PvPLateGame extends GameplanImperative {
       secondaryTech()
     }
     trainArmy()
-    fillerArmy()
     addGates()
-    expand()
+    fillerArmy()
     secondaryTech()
+    expand()
   }
 
   def doTrainArmy(): Unit = {
@@ -170,10 +177,12 @@ class PvPLateGame extends GameplanImperative {
     }
   }
 
+  def targetGateways: Int = miningBases * 5 - 2 * units(Protoss.RoboticsFacility)
+
   def doAddProduction(): Unit = {
     if (units(Protoss.RoboticsFacility) > 0) { get(Protoss.RoboticsSupportBay) }
     if (units(Protoss.CitadelOfAdun) > 0 && ! enemyRobo) { get(Protoss.TemplarArchives) }
-    get(miningBases * 4 - 2 * units(Protoss.RoboticsFacility), Protoss.Gateway)
+    get(targetGateways, Protoss.Gateway)
   }
 
   def doPrimaryTech(): Unit = {

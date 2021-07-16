@@ -107,6 +107,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     simulation = newSimulation
     behavior = BehaviorInitial
     target = None
+    threat = None
     targets.clear()
     measureHealth = true
     hitPointsInitial = realUnit.hitPoints

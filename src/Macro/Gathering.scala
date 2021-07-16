@@ -15,7 +15,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   private def isValidBase     (base: Base): Boolean = base.townHall.filter(_.isOurs).exists(_.remainingCompletionFrames < 240)
   private def isValidResource (unit: UnitInfo): Boolean = isValidMineral(unit) || isValidGas(unit)
   private def isValidMineral  (unit: UnitInfo): Boolean = unit.alive && (unit.base.exists(longDistanceBases.contains) || unit.base.exists(isValidBase)) && unit.mineralsLeft > 0
-  private def isValidGas      (unit: UnitInfo): Boolean = unit.alive && (unit.base.exists(longDistanceBases.contains) || unit.base.exists(isValidBase)) && unit.isOurs && unit.unitClass.isGas && unit.remainingCompletionFrames < 24 * 10
+  private def isValidGas      (unit: UnitInfo): Boolean = unit.alive && (unit.base.exists(longDistanceBases.contains) || unit.base.exists(isValidBase)) && unit.isOurs && unit.unitClass.isGas && unit.remainingCompletionFrames < 24 * 5
   private class Slot(var resource: UnitInfo, val order: Int) {
     val tile        : Tile    = resource.tileTopLeft
     val base        : Base    = resource.base.getOrElse(With.geography.bases.minBy(_.heart.pixelDistanceGround(resource.tileTopLeft)))

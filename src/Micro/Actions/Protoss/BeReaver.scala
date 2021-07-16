@@ -60,7 +60,7 @@ object BeReaver extends Action {
 
     unit.agent.toTravel = Some(destinationGround.center)
 
-    val endDistanceMaximum = if (unit.is(Protoss.HighTemplar)) 0 else (unit.topSpeed * unit.cooldownLeft / 32).toInt
+    val endDistanceMaximum = (unit.topSpeed * unit.cooldownLeft / 32).toInt
     val repulsors = MicroPathing.getPathfindingRepulsors(unit)
     var path = NoPath.value
     Seq(

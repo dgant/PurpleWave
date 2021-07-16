@@ -55,7 +55,7 @@ case class UnassignedFormation(style: FormationStyle, slots: Map[UnitClass, Iter
         p._2.toVector.sortBy(_.pixelDistanceTravelling(to))))
     val output = new Formation(
       style,
-      orderedUnits.flatMap(p => p._2.indices.map(i => (p._2(i), orderedSlots(p._1)(i)))))
+      orderedUnits.flatMap(p => orderedSlots(p._1).indices.map(i => (p._2(i), orderedSlots(p._1)(i)))))
     output
   }
 }

@@ -338,13 +338,15 @@ object Commander {
     if (unit.unready) return
     autoUnburrow(unit)
     if (unit.carrying) {
-      // Spamming return cargo can cause path wobbling and
+      // Spamming return cargo can cause path wobbling
       if ( ! Vector(Orders.ResetCollision, Orders.ReturnMinerals, Orders.ReturnGas).contains(unit.order)) {
         unit.bwapiUnit.returnCargo()
       }
     } else {
       if (resource.visible) {
-        def doGather() { unit.bwapiUnit.gather(resource.bwapiUnit) }
+        def doGather() {
+          unit.bwapiUnit.rightClick(resource.bwapiUnit)
+        }
         if (resource.unitClass.isGas) {
           if ( ! unit.orderTarget.contains(resource)) {
             doGather()

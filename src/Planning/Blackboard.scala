@@ -23,7 +23,6 @@ class Blackboard {
   var wantToAttack          : Property[Boolean]           = add(new Property(false))
   var wantToHarass          : Property[Boolean]           = add(new Property(false))
   var safeToMoveOut         : Property[Boolean]           = add(new Property(false))
-  var scoutPlan             : Property[Plan]              = add(new Property(NoPlan()))
   var maximumScouts         : Property[Int]               = add(new Property(0))
   var gasWorkerFloor        : Property[Int]               = add(new Property(0))      // Require at least this many gas workers
   var gasWorkerCeiling      : Property[Int]               = add(new Property(200))    // Require no more than this many gas workers (unless saturated on minerals)

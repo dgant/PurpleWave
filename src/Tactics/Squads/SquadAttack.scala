@@ -9,6 +9,8 @@ import Utilities.Minutes
 class SquadAttack extends Squad {
   override def toString: String = f"Atk ${vicinity.base.map(_.name).getOrElse(vicinity.zone.name).take(4)}"
 
+  override def launch(): Unit = { /* This squad is given its recruits externally */ }
+
   override def run() {
     if (units.isEmpty) return
     chooseVicinity()

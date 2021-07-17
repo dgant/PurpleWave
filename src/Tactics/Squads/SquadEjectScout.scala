@@ -20,7 +20,7 @@ class SquadEjectScout extends Squad {
     .getOrElse(Maff.minBy(tilesToConsider())(With.grids.lastSeen.get).getOrElse(With.geography.home).center))
 
   private val scoutCleared = new ScoutCleared
-  def recruit() {
+  def launch() {
     if (With.frame > Minutes(8)()) return
     if (scoutCleared.apply) return
     if (targetScout().isEmpty) return

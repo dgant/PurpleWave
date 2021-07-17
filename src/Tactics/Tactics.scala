@@ -3,94 +3,77 @@ package Tactics
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
-import Squads._
 import Performance.Tasks.TimedTask
 import Planning.Plans.Army._
-import Planning.Plans.Compound.If
-import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTIdeas
-import Planning.Plans.Scouting.MonitorBases
-import Planning.Predicates.Compound.{And, Not, Or}
-import Planning.Predicates.Milestones.{EnemiesAtMost, EnemyHasShownWraithCloak, UnitsAtLeast}
-import Planning.Predicates.Strategy.EnemyIsTerran
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Tactics.Missions.MissionKillExpansion
+import Tactics.Missions.{Mission, MissionKillExpansion}
+import Tactics.Squads._
 import Utilities.Minutes
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 class Tactics extends TimedTask {
-  private lazy val clearBurrowedBlockers      = new SquadClearExpansionBlockers
-  private lazy val ejectScout                 = new SquadEjectScout
-  private lazy val followBuildOrder           = new FollowBuildOrder
-  private lazy val scoutWithOverlord          = new SquadInitialOverlordScout
-  private lazy val defendAgainstProxy         = new DefendAgainstProxy
-  private lazy val defendFightersAgainstRush  = new DefendFightersAgainstRush
-  private lazy val defendAgainstWorkerRush    = new DefendAgainstWorkerRush
-  private lazy val defendFFEAgainst4Pool      = new DefendFFEWithProbes
-  private lazy val makeDarkArchons            = new SquadMergeDarchons
-  private lazy val mindControl                = new SquadMindControl
-  private lazy val catchDTRunby               = new SquadCatchDTRunby
-  private lazy val scoutWithWorkers           = new SquadWorkerScout
-  private lazy val scoutForCannonRush         = new ScoutForCannonRush
-  private lazy val scoutExpansions            = new SquadScoutExpansions
-  private lazy val gather                     = new Gather
-  private lazy val chillOverlords             = new ChillOverlords
-  private lazy val doFloatBuildings           = new DoFloatBuildings
-  private lazy val scan                       = new Scan
-  private lazy val monitorWithObserver        = new If(
-    And(
-      EnemyIsTerran(),
-      EnemiesAtMost(0, MatchMobileDetector),
-      EnemiesAtMost(7, Terran.Factory),
-      Not(new EnemyHasShownWraithCloak),
-      Or(
-        UnitsAtLeast(3, Protoss.Observer, complete = true),
-        Not(new PvTIdeas.EnemyHasMines))),
-    new MonitorBases(Protoss.Observer))
-  private lazy val missionKillExpansion       = new MissionKillExpansion
+  private val missions = new ArrayBuffer[Mission]()
+  private val priorityTactics = new ArrayBuffer[Tactic]()
+  private val backgroundTactics = new ArrayBuffer[Tactic]()
+  private def addMission[T <: Mission](mission: T): T = { missions += mission; mission }
+  private def addPriorityTactic[T <: Tactic](job: T): T = { priorityTactics += job; job }
+  private def addBackgroundTactic[T <: Tactic](job: T): T = { backgroundTactics += job; job }
+
+  //////////////
+  // Missions //
+  //////////////
+
+  private lazy val missionKillExpansion       = addMission(new MissionKillExpansion)
+
+  /////////////////////
+  // Priority squads //
+  ////////////////////
+
+  private lazy val clearBurrowedBlockers      = addPriorityTactic(new SquadClearExpansionBlockers)
+  private lazy val ejectScout                 = addPriorityTactic(new SquadEjectScout)
+  private lazy val followBuildOrder           = addPriorityTactic(new FollowBuildOrder)
+  private lazy val scoutWithOverlord          = addPriorityTactic(new SquadInitialOverlordScout)
+  private lazy val defendAgainstProxy         = addPriorityTactic(new DefendAgainstProxy)
+  private lazy val defendFightersAgainstRush  = addPriorityTactic(new DefendFightersAgainstRush)
+  private lazy val defendAgainstWorkerRush    = addPriorityTactic(new DefendAgainstWorkerRush)
+  private lazy val defendFFEAgainst4Pool      = addPriorityTactic(new DefendFFEWithProbes)
+  private lazy val makeDarkArchons            = addPriorityTactic(new SquadMergeDarchons)
+  private lazy val mindControl                = addPriorityTactic(new SquadMindControl)
+  private lazy val scoutWithWorkers           = addPriorityTactic(new SquadWorkerScout)
+  private lazy val scoutForCannonRush         = addPriorityTactic(new ScoutForCannonRush)
+  private lazy val scoutExpansions            = addPriorityTactic(new SquadScoutExpansions)
+  private lazy val monitorWithObserver        = addPriorityTactic(new MonitorTerranWithObserver)
+
+  //////////////////
+  // Basic squads //
+  //////////////////
+
+  private lazy val baseSquads: Map[Base, SquadDefendBase] = With.geography.bases.map(base => (base, new SquadDefendBase(base))).toMap
+  private lazy val cloakSquad = new SquadCloakedHarass
+  private lazy val catchDTRunby = new SquadCatchDTRunby
+  private lazy val attackSquad = new SquadAttack
+
+  ///////////////////////
+  // Background squads //
+  ///////////////////////
+
+  private lazy val gather                     = addBackgroundTactic(new Gather)
+  private lazy val chillOverlords             = addBackgroundTactic(new ChillOverlords)
+  private lazy val doFloatBuildings           = addBackgroundTactic(new DoFloatBuildings)
+  private lazy val scan                       = addBackgroundTactic(new Scan)
 
   override protected def onRun(budgetMs: Long): Unit = {
-    // TODO: Attack with units that can safely harass:
-    // - Dark Templar/Lurkers/Cloaky Ghosts/Cloaky Wraiths
-    // - Vultures/Zerglings (except against faster enemy units, or ranged units vs short-range vision of lings)
-    // - Air units (except against faster enemy air-to-air)
-    // - Speed Zerglings
-    // - Carriers at 4+ (except against cloaked wraiths and no observer)
-    runMissions()
-    runPrioritySquads()
+    missions.foreach(_.launch())
+    priorityTactics.foreach(_.launch())
     runCoreTactics()
-    runBackgroundSquads()
+    backgroundTactics.foreach(_.launch())
 
     // Moved in here temporarily due to issue where Tactics adding units clears a Squad's current list of enemies
     With.squads.run(budgetMs)
-  }
-
-  private def runMissions(): Unit = {
-    missionKillExpansion.consider()
-  }
-
-  private def runPrioritySquads(): Unit = {
-    makeDarkArchons.recruit()
-    mindControl.recruit()
-    clearBurrowedBlockers.recruit()
-    followBuildOrder.update()
-    ejectScout.recruit()
-    scoutWithOverlord.recruit()
-    With.blackboard.scoutPlan().update()
-    defendAgainstProxy.update()
-    defendFightersAgainstRush.update()
-    defendAgainstWorkerRush.update()
-    defendFFEAgainst4Pool.update()
-    scoutWithWorkers.recruit()
-    scoutForCannonRush.update()
-    scoutExpansions.recruit()
-    monitorWithObserver.update()
-    // TODO: EscortSettlers is no longer being used but we do need to do it
-    // TODO: Hide Carriers until 4x vs. Terran
-    // TODO: Plant Overlords around the map, as appropriate
   }
 
   private def assign(
@@ -111,17 +94,6 @@ class Tactics extends TimedTask {
       }
     }
   }
-
-  // AIST4 last minute hack
-  // Getting bizarre ClassNotFound exceptions when creating this as a lazy, particularly when invoked from inside the practive drop defense
-  // so let's create this manually
-  private var _baseSquads: Option[Map[Base, SquadDefendBase]] = None
-  private def baseSquads: Map[Base, SquadDefendBase] = {
-    _baseSquads = _baseSquads.orElse(Some(With.geography.bases.map(base => (base, new SquadDefendBase(base))).toMap))
-    _baseSquads.get
-  }
-  private lazy val attackSquad = new SquadAttack
-  private lazy val cloakSquad = new SquadCloakedHarass
 
   private def adjustDefenseBase(base: Base): Base = base.natural.filter(b => b.owner.isUs || b.plannedExpoRecently).getOrElse(base)
   private def runCoreTactics(): Unit = {
@@ -177,7 +149,7 @@ class Tactics extends TimedTask {
           && s.unitsNext.size < Math.min(3, freelancerCountInitial / 12))
     }
 
-    catchDTRunby.recruit()
+    catchDTRunby.launch()
     freelancers --= catchDTRunby.lock.units
 
     // If we want to attack and engough freelancers remain, populate the attack squad
@@ -191,12 +163,5 @@ class Tactics extends TimedTask {
         else Maff.maxBy(With.geography.bases.filter(b => b.owner.isUs || b.plannedExpoRecently))(_.economicValue()).map(adjustDefenseBase).map(baseSquads).toSeq
       assign(freelancers, squadsDefendingOrWaiting)
     }
-  }
-
-  private def runBackgroundSquads(): Unit = {
-    gather.update()
-    chillOverlords.update()
-    doFloatBuildings.update()
-    scan.update()
   }
 }

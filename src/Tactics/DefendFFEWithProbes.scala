@@ -19,7 +19,7 @@ import Utilities.Minutes
 
 import scala.collection.mutable.ArrayBuffer
 
-class DefendFFEWithProbes extends Prioritized {
+class DefendFFEWithProbes extends Tactic {
   
   val defenders = new LockUnits(this)
   defenders.matcher = MatchWorker
@@ -36,7 +36,7 @@ class DefendFFEWithProbes extends Prioritized {
 
   var haveMinedEnoughForTwoCannons: Boolean = false
   
-  def update() {
+  def launch() {
     if (With.frame > Minutes(6)()) return
     haveMinedEnoughForTwoCannons ||= With.units.countOurs(Protoss.PhotonCannon) + (With.self.minerals + 24) / 150 >= 2
     if (With.units.countOurs(Protoss.PhotonCannon) == 0) return

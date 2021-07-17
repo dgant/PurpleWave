@@ -14,7 +14,7 @@ class SquadMindControl extends Squad {
   lock.matcher = Protoss.DarkArchon
   lock.counter = CountEverything
 
-  def recruit(): Unit = {
+  def launch(): Unit = {
     if ( ! With.self.hasTech(Protoss.MindControl)) return
     if (stealables.isEmpty) return
     addUnits(lock.acquire(this))

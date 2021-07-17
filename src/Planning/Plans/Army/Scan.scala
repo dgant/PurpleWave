@@ -4,19 +4,19 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
-import Planning.Plan
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitMatchers.MatchTank
 import ProxyBwapi.Races.Terran
+import Tactics.Tactic
 
-class Scan extends Plan {
+class Scan extends Tactic {
   
   val scanners = new LockUnits(this)
   scanners.matcher = Terran.Comsat
   
   var lastScan = 0
   
-  override def onUpdate() {
+  def launch() {
     if ( ! With.units.existsOurs(Terran.Comsat)) return
     if (With.framesSince(lastScan) < 72) return
     

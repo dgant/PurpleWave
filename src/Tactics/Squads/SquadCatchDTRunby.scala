@@ -11,12 +11,11 @@ import ProxyBwapi.Races.Protoss
 
 class SquadCatchDTRunby extends Squad {
 
-  def recruit(): Unit = {
+  def launch(): Unit = {
     lock.matcher = MatchMobileDetector
     lock.counter = CountOne
     lock.preference = PreferClose(destination())
-    lock.acquire(this)
-    addUnits(lock.units)
+    addUnits(lock.acquire(this))
   }
 
   override def run(): Unit = {

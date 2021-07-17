@@ -21,7 +21,7 @@ class SquadClearExpansionBlockers extends Squad {
   sweeperLock.matcher = MatchOr(Terran.Marine, Terran.Firebat, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk)
   sweeperLock.counter = CountOne
 
-  def recruit(): Unit = {
+  def launch(): Unit = {
     if (With.frame < Minutes(6)()) return
     if ( ! With.enemies.exists(_.isZerg) && ! With.enemies.exists(_.isTerran)) return
     if ( ! With.enemies.exists(_.isZerg) &&   With.enemies.forall(With.unitsShown(_, Terran.SpiderMine) == 0)) return

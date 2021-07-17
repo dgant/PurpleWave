@@ -166,7 +166,7 @@ class PvPLateGame extends GameplanImperative {
     pumpRatio(Protoss.Dragoon, 0, 100, Seq(Enemy(Protoss.Scout, 2.0), Enemy(Protoss.Shuttle, 2.0), Friendly(Protoss.Zealot, 1.0), Friendly(Protoss.Archon, 3.0)))
     if ( ! expectCarriers && ! fearDeath && ( ! fearContain || ! enemyRobo)) pump(Protoss.Observer, 1)
 
-    if (techStarted(Protoss.PsionicStorm)) {
+    if (techStarted(Protoss.PsionicStorm) && upgradeStarted(Protoss.ZealotSpeed)) {
       pumpRatio(Protoss.Dragoon, 8, 24, Seq(Friendly(Protoss.Zealot, 2.0)))
       pumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-1), Friendly(MatchWarriors, 1.0 / 4.0)))
       if (shouldHarass) {
@@ -221,7 +221,9 @@ class PvPLateGame extends GameplanImperative {
   }
 
   def doRobo(): Unit = {
-    get(2, Protoss.Assimilator)
+    if (units(Protoss.Gateway) >= 4 && gas < 150 && unitsComplete(Protoss.Nexus) > 1) {
+      get(2, Protoss.Assimilator)
+    }
     get(Protoss.RoboticsFacility)
     buildOrder(Get(Protoss.Shuttle))
     if ( ! fearDeath) {
@@ -245,9 +247,10 @@ class PvPLateGame extends GameplanImperative {
   }
 
   def doTemplar(): Unit = {
-    get(Protoss.Forge)
+    if ( ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)) {
+      get(Protoss.Forge)
+    }
     get(Protoss.CitadelOfAdun)
-    get(2, Protoss.Assimilator)
     get(Protoss.TemplarArchives)
     if (expectCarriers) {
       get(Protoss.DarkArchonEnergy)
@@ -258,36 +261,33 @@ class PvPLateGame extends GameplanImperative {
       if (enemies(Protoss.Observer) == 0) {
         buildOrder(Get(Protoss.DarkTemplar))
       }
-      if (unitsComplete(Protoss.Gateway) >= 5) {
-        get(Protoss.PsionicStorm)
+      get(5, Protoss.Gateway)
+      get(2, Protoss.Assimilator)
+      // We don't want this tech until we have a ton of gas available to us
+      if (unitsComplete(Protoss.Gateway) >= 5 && unitsComplete(Protoss.Nexus) > 1 && unitsComplete(Protoss.Assimilator) > 1) {
+        if (unitsComplete(MatchWarriors) > 15) {
+          get(Protoss.PsionicStorm)
+        }
         if (techStarted(Protoss.PsionicStorm)) {
           buildOrder(Get(2, Protoss.HighTemplar))
         }
-        get(Protoss.GroundDamage)
+        upgradeContinuously(Protoss.GroundDamage)
         get(Protoss.ZealotSpeed)
         if (gasPumps > 2 && techComplete(Protoss.PsionicStorm, withinFrames = Seconds(10)())) {
           get(Protoss.HighTemplarEnergy)
         }
-        if (upgradeComplete(Protoss.GroundDamage, 1)) { get(Protoss.GroundArmor,  1) }
-        if (miningBases > 2) {
-          if (upgradeComplete(Protoss.GroundArmor,  1)) { get(Protoss.GroundDamage, 2) }
-          if (upgradeComplete(Protoss.GroundDamage, 2)) { get(Protoss.GroundArmor,  2) }
-          if (upgradeComplete(Protoss.GroundArmor,  2)) { get(Protoss.GroundDamage, 3) }
-          if (gasPumps >= 3 & miningBases >= 3) {
-            if (upgradeComplete(Protoss.GroundDamage, 3)) { get(Protoss.GroundArmor, 3) }
-            if (upgradeComplete(Protoss.GroundArmor,  3)) { upgradeContinuously(Protoss.Shields) }
-          }
-        }
+        if (upgradeComplete(Protoss.GroundDamage, 3)) { upgradeContinuously(Protoss.GroundArmor) }
+        if (upgradeComplete(Protoss.GroundArmor,  3)) { upgradeContinuously(Protoss.Shields) }
       }
     }
   }
 
   def doCannons(): Unit = {
     if (units(Protoss.Forge) > 0) {
+      buildCannonsAtNatural.update()
       if (bases > 2) {
         buildCannonsAtExpansions.update()
       }
-      buildCannonsAtNatural.update()
     }
   }
 }

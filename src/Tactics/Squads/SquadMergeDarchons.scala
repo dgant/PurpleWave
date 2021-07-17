@@ -11,11 +11,10 @@ class SquadMergeDarchons extends Squad {
   lock.matcher = Protoss.DarkTemplar
   lock.counter = CountEverything
 
-  def recruit(): Unit = {
+  def launch(): Unit = {
+    lock.release() // Ditch units that are already Dark Archons
     if (With.blackboard.makeDarkArchons()) {
-      lock.release() // Ditch units that are already Dark Archons
-      lock.acquire(this)
-      addUnits(lock.units)
+      addUnits(lock.acquire(this))
     }
   }
 

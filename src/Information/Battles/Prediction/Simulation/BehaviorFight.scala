@@ -2,6 +2,7 @@ package Information.Battles.Prediction.Simulation
 
 import Mathematics.Maff
 import Micro.Targeting.Target
+import ProxyBwapi.Races.Protoss
 
 
 object BehaviorFight extends SimulacrumBehavior {
@@ -34,7 +35,7 @@ object BehaviorFight extends SimulacrumBehavior {
     if (target.threat.forall(t => t.pixelDistanceEdge(target) - t.pixelRangeAgainst(target) > distance - range)) {
       target.threat = Some(simulacrum)
     }
-    if (simulacrum.unitClass.abuseAllowed
+    if ((simulacrum.unitClass.abuseAllowed || simulacrum.unitClass == Protoss.Reaver)
       && simulacrum.cooldownLeft > 0
       && simulacrum.threat.isDefined
       && ( ! target.canAttack(simulacrum) || simulacrum.pixelRangeAgainst(target) > target.pixelRangeAgainst(simulacrum))) {

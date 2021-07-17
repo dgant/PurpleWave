@@ -149,7 +149,7 @@ object Commander {
     var to: Pixel = argTo
 
     // Send some units past their destination to maximize acceleration
-    if (unit.isAny(Terran.Dropship, Terran.ScienceVessel, Protoss.Shuttle, Protoss.Observer, Protoss.HighTemplar, Zerg.Mutalisk, Zerg.Overlord, Zerg.Queen)) {
+    if (With.reaction.sluggishness == 0 && unit.isAny(Terran.Dropship, Terran.ScienceVessel, Protoss.Shuttle, Protoss.Observer, Protoss.HighTemplar, Zerg.Mutalisk, Zerg.Overlord, Zerg.Queen)) {
       val overshootDistance = if (unit.flying || unit.transport.exists(_.flying)) 288.0 else 8
       if (to == unit.pixel) {
         val signX = Maff.forcedSignum(SpecificPoints.middle.x - to.x)

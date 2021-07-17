@@ -3,17 +3,12 @@ package Tactics.Squads
 import Lifecycle.With
 import Micro.Agency.Intention
 import Performance.Cache
-import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.CountEverything
 import Planning.UnitMatchers.{MatchAnd, MatchComplete}
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
 class SquadInitialOverlordScout extends Squad {
   var endScouting: Boolean = false
-
-  val overlords = new LockUnits(this)
-  overlords.counter = CountEverything
 
   private val bases = new Cache(() =>
     if (With.scouting.firstEnemyMain.isDefined) {
@@ -49,7 +44,7 @@ class SquadInitialOverlordScout extends Squad {
       })
     })
 
-  def recruit(): Unit = {
+  def launch(): Unit = {
     if ( ! With.self.isZerg) return
 
     endScouting ||= With.units.existsEnemy(Terran.Marine, Terran.Goliath, Terran.Wraith)
@@ -62,14 +57,14 @@ class SquadInitialOverlordScout extends Squad {
     endScouting ||= With.units.existsEnemy(MatchAnd(MatchComplete, Zerg.HydraliskDen))
     endScouting ||= With.units.existsEnemy(Zerg.Spire)
     if (endScouting) {
-      overlords.release()
+      lock.release()
       return
     }
-
     if (bases().isEmpty) return
 
     vicinity = bases().head.townHallArea.center
-    overlords.preference = PreferClose(vicinity)
+    lock.preference = PreferClose(vicinity)
+    addUnits(lock.acquire(this))
   }
 
   def run(): Unit = {

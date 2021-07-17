@@ -14,7 +14,7 @@ trait Mission extends Squad {
   final def duration: Int = if (launched) With.framesSince(launchFrame) else 0
 
   private def nextUnits: Iterable[FriendlyUnitInfo] = With.recruiter.lockedBy(this)
-  final def consider(): Unit = {
+  final def launch(): Unit = {
     if (launched) {
       if (shouldTerminate || nextUnits.isEmpty) {
         terminate()

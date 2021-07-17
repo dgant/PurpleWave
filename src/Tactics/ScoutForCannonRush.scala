@@ -3,7 +3,6 @@ package Tactics
 import Lifecycle.With
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
-import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchNotHoldingResources, MatchWorker}
@@ -11,7 +10,7 @@ import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
 import Utilities.GameTime
 
-class ScoutForCannonRush extends Prioritized {
+class ScoutForCannonRush extends Tactic {
   val scouts = new LockUnits(this)
   scouts.matcher = MatchAnd(MatchWorker, MatchNotHoldingResources)
   scouts.counter = CountOne
@@ -29,7 +28,7 @@ class ScoutForCannonRush extends Prioritized {
     )
   })
 
-  def update(): Unit = {
+  def launch(): Unit = {
     val gettingCannonRushed = With.fingerprints.cannonRush.matches || (
       With.fingerprints.earlyForge.matches
       && ! With.fingerprints.forgeFe.matches

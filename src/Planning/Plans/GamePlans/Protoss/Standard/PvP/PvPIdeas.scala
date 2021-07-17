@@ -20,7 +20,7 @@ object PvPIdeas extends MacroCounting {
     var output = enemyLowUnitStrategy
     output ||= unitsComplete(MatchWarriors) > 0 && enemiesComplete(MatchWarriors, Protoss.PhotonCannon) == 0
     output ||= employing(PvP1012) && (unitsComplete(Protoss.Zealot) > 3 || ! enemyStrategy(With.fingerprints.twoGate))
-    output ||= employing(PvPGateCoreGate) && unitsComplete(Protoss.Dragoon) > 0 && bases < 2
+    output ||= employing(PvPGateCoreGate) && unitsComplete(Protoss.Dragoon) > enemies(Protoss.Dragoon) && bases < 2
     output ||= employing(PvP3GateGoon) && unitsComplete(Protoss.Gateway) >= 3 && unitsComplete(MatchWarriors) >= 6
     output ||= employing(PvP4GateGoon) && unitsComplete(Protoss.Gateway) >= 4 && unitsComplete(MatchWarriors) >= 6
     output ||= enemyStrategy(With.fingerprints.dtRush) && unitsComplete(Protoss.Observer) > 1
@@ -42,11 +42,11 @@ object PvPIdeas extends MacroCounting {
     // Attack when we have range advantage (and they're not hiding behind a wall
     if ( ! enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.forgeFe)) {
       output ||= unitsComplete(Protoss.Dragoon) > 0     && ! enemyHasShown(Protoss.Dragoon)         && (enemiesShown(Protoss.Zealot) > 2 || With.fingerprints.twoGate.matches)
-      output ||= upgradeComplete(Protoss.DragoonRange)  && ! enemyHasUpgrade(Protoss.DragoonRange)  && (enemiesShown(Protoss.Zealot) > 2 || With.fingerprints.twoGate.matches)
+      output ||= upgradeComplete(Protoss.DragoonRange)  && ! enemyHasUpgrade(Protoss.DragoonRange)
     }
 
     // Require DT backstab protection before attacking through a DT
-    output &&= unitsComplete(Protoss.Observer) > 1 || ! enemyHasShown(Protoss.DarkTemplar)
+    output &&= unitsComplete(Protoss.Observer, Protoss.PhotonCannon) > 1 || ! enemyHasShown(Protoss.DarkTemplar)
     output
   }
 }

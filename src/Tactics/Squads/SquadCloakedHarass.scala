@@ -12,6 +12,7 @@ import Utilities.CountMap
 
 class SquadCloakedHarass extends Squad {
   override def toString: String = "Cloak"
+  override def launch(): Unit = { /* This squad is given its recruits externally */ }
   override def run(): Unit = {
     // Desired targets:
     // - Detectors in progress

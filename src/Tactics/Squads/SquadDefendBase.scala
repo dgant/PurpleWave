@@ -11,6 +11,8 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 class SquadDefendBase(base: Base) extends Squad {
 
+  override def launch(): Unit = { /* This squad is given its recruits externally */ }
+
   vicinity = base.heart.center
 
   private var lastAction = "Def"

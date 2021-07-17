@@ -1,11 +1,9 @@
 package Planning.Plans.GamePlans
 
-import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.BuildRequest
-import Planning.{Plan, Predicate}
 import Planning.Plans.Army._
-import Planning.Plans.Basic.{NoPlan, Write, WriteStatus}
+import Planning.Plans.Basic.{NoPlan, WriteStatus}
 import Planning.Plans.Compound.If
 import Planning.Plans.Macro.Automatic.{PumpWorkers, RequireSufficientSupply}
 import Planning.Plans.Macro.BuildOrders.{BuildOrder, RequireEssentials}
@@ -13,9 +11,10 @@ import Planning.Plans.Macro.Expanding.RemoveMineralBlocksAt
 import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Plans.Placement.ProposePlacement
 import Planning.Plans.Scouting._
-import Planning.Predicates.{Always, Never}
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Strategy.WeAreZerg
+import Planning.Predicates.{Always, Never}
+import Planning.{Plan, Predicate}
 
 abstract class GameplanTemplate extends Plan with Modal {
   val activationCriteria    : Predicate         = new Always
@@ -48,7 +47,7 @@ abstract class GameplanTemplate extends Plan with Modal {
     ++ Vector(
       archonPlan,
       new RemoveMineralBlocksAt(removeMineralBlocksAt),
-      new Write(With.blackboard.scoutPlan, scoutPlan),
+      scoutPlan,
       attackPlan))
 
   override def isComplete: Boolean = completionCriteria.apply || ! activationCriteria.apply

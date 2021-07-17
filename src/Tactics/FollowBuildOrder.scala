@@ -1,10 +1,9 @@
 package Tactics
 
 import Lifecycle.With
-import Planning.Prioritized
 
-class FollowBuildOrder extends Prioritized {
-  def update() {
+class FollowBuildOrder extends Tactic {
+  def launch() {
     With.buildPlans.update(this)
     With.buildPlans.getChildren.foreach(_.update())
   }

@@ -2,16 +2,15 @@ package Tactics
 
 import Debugging.ToString
 import Lifecycle.With
-import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitMatchers.MatchWorker
 
-class Gather extends Prioritized {
+class Gather extends Tactic {
 
   val workerLock: LockUnits = new LockUnits(this)
   workerLock.matcher = MatchWorker
 
-  def update() {
+  def launch() {
     workerLock.acquire(this)
     With.gathering.setWorkers(workerLock.units)
   }

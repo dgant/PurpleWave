@@ -5,15 +5,15 @@ import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Micro.Formation.Formation
 import Performance.Cache
-import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactics.Squads.Qualities.QualityCounter
+import Tactics.Tactic
 
 import scala.collection.mutable.ArrayBuffer
 
-trait Squad extends Prioritized with FriendlyUnitGroup {
+abstract class Squad extends Tactic with FriendlyUnitGroup {
   var batchId: Int = Int.MinValue
   var vicinity: Pixel = SpecificPoints.middle
   var formations: ArrayBuffer[Formation] = ArrayBuffer.empty
@@ -34,7 +34,7 @@ trait Squad extends Prioritized with FriendlyUnitGroup {
     }
   }
 
-  def candidateValue(candidate: FriendlyUnitInfo): Double = {
+  final def candidateValue(candidate: FriendlyUnitInfo): Double = {
     commission()
     _qualityCounter.utility(candidate)
   }
@@ -77,6 +77,7 @@ trait Squad extends Prioritized with FriendlyUnitGroup {
     targetQueue = None
     formations.clear()
   }
+
   def run(): Unit
 
   def leader(unitClass: UnitClass): Option[FriendlyUnitInfo] = leaders().get(unitClass)

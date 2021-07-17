@@ -29,7 +29,7 @@ class MissionKillExpansion extends Mission {
   // TODO: Should squads have a built-in default lock? Seems like recipe for bugs
   lock.matcher = MatchAnd(MatchWarriors, MatchAntiGround)
   lock.counter = CountUpTo(4)
-  override protected def recruit(): Unit = {
+  override def recruit(): Unit = {
     val targetBase = best
     if (targetBase.isEmpty) {
       terminate()

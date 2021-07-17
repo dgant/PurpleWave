@@ -5,19 +5,18 @@ import Mathematics.Maff
 import Mathematics.Shapes.Circle
 import Micro.Agency.Intention
 import Planning.Predicates.MacroFacts
-import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountEverything
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class ChillOverlords extends Prioritized {
+class ChillOverlords extends Tactic {
   
   val overlords = new LockUnits(this)
   overlords.matcher = Zerg.Overlord
   overlords.counter = CountEverything
 
-  def update() {
+  def launch() {
     if ( ! With.self.isZerg) return
     if (With.self.hasUpgrade(Zerg.OverlordSpeed)) return
     if (MacroFacts.enemyShownCloakedThreat) return

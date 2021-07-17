@@ -3,7 +3,7 @@ package Planning.Predicates
 import Information.Fingerprinting.Fingerprint
 import Information.Geography.Types.Base
 import Lifecycle.With
-import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchOr, UnitMatcher}
+import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
@@ -23,6 +23,7 @@ trait MacroCounting {
   def supplyUsed200: Int = (With.self.supplyUsed + 1) / 2
   def supplyTotal200: Int = With.self.supplyTotal / 2
   def supplyBlocked: Boolean = With.self.supplyUsed >= With.self.supplyTotal
+  def saturated: Boolean = units(MatchWorker) >= With.geography.ourBases.view.map(b => b.minerals.size* 2 + b.gas.size * 3).sum
 
   def bases: Int = With.geography.ourBases.size
 

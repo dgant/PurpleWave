@@ -8,12 +8,12 @@ import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountUpTo
 import Planning.UnitMatchers.{MatchWarriors, MatchWorker}
 
-class DefendAgainstWorkerRush extends Prioritized {
+class DefendAgainstWorkerRush extends Tactic {
   
   val defenders = new LockUnits(this)
   defenders.matcher = MatchWorker
   
-  def update() {
+  def launch() {
     val attackingWorkers = With.geography.ourBases
       .flatMap(_.units.filter(u =>
         u.isEnemy

@@ -1,7 +1,6 @@
 package Tactics.Squads
 
 import Lifecycle.With
-import Micro.Agency.Intention
 import Performance.Cache
 import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers._
@@ -51,7 +50,7 @@ class SquadScoutExpansions extends Squad {
       .sortBy(base => -With.scouting.baseIntrigue.getOrElse(base, 0.0))
       .sortBy(_.zone.island))
 
-  def recruit(): Unit = {
+  def launch(): Unit = {
     if (With.frame < frameToScout()) return
     if (With.geography.ourBases.size < 2) return
     if ( ! With.blackboard.wantToAttack() &&  ! With.blackboard.wantToHarass()) return
@@ -59,16 +58,10 @@ class SquadScoutExpansions extends Squad {
     if (scoutableBases().isEmpty) return
     vicinity = scoutableBases().headOption.map(_.townHallArea.center).getOrElse(With.geography.home.center)
     lock.preference = PreferClose(vicinity)
-    val scouts = lock.acquire(this)
-    if (scouts.isEmpty) return
-    scouts.foreach(addUnit)
+    addUnits(lock.acquire(this))
   }
 
   def run(): Unit = {
-    if (units.isEmpty) return
-    targetQueue = Some(SquadAutomation.rankedEnRoute(this, vicinity))
-    units.foreach(_.intend(this, new Intention {
-      toTravel = Some(vicinity)
-    }))
+    SquadAutomation.send(this)
   }
 }

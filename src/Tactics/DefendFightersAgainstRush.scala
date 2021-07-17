@@ -3,7 +3,6 @@ package Tactics
 import Lifecycle.With
 import Mathematics.Maff
 import Micro.Agency.Intention
-import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountUpTo
 import Planning.UnitMatchers.{MatchWarriors, MatchWorker}
@@ -12,13 +11,13 @@ import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.Seconds
 
-class DefendFightersAgainstRush extends Prioritized {
+class DefendFightersAgainstRush extends Tactic {
   
   val defenders = new LockUnits(this)
   defenders.matcher = MatchWorker
 
   private def inOurBase(unit: UnitInfo): Boolean = unit.zone.bases.exists(_.owner.isUs)
-  def update() {
+  def launch() {
     lazy val fighters     = With.units.ours .filter(u => u.unitClass.canMove && u.canAttack && ! u.unitClass.isWorker && inOurBase(u) && u.remainingCompletionFrames < Seconds(5)())
     lazy val cannons      = With.units.ours .filter(u => u.aliveAndComplete && u.isAny(Terran.Bunker, Protoss.PhotonCannon))
     lazy val aggressors   = With.units.enemy.filter(u => u.aliveAndComplete && u.is(MatchWarriors) && inOurBase(u))

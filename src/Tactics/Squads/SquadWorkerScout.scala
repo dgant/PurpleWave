@@ -39,7 +39,7 @@ class SquadWorkerScout extends Squad {
     bases.foreach(With.scouting.registerScout)
   }
 
-  def recruit(): Unit = {
+  def launch(): Unit = {
     lazy val unexploredStarts = With.geography.startBases.view.filterNot(_.townHallArea.tiles.exists(_.explored))
     lazy val basesToScout: Seq[Base] = Maff.orElse(
       With.geography.enemyBases.view.filterNot(_.zone.island).sortBy(_.isStartLocation).lastOption.toIterable,

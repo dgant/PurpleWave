@@ -139,18 +139,18 @@ object Maff {
   @inline final def signum(double: Double)  : Int = if (double == 0.0) 0 else if (double < 0) -1 else 1
   @inline final def forcedSignum(int: Int)  : Int = if (int < 0) -1 else 1
 
-  @inline final def normalizeAroundPi(angleRadians: Double): Double = {
-    if      (angleRadians < 0) normalizeAroundPi(angleRadians + twoPI)
-    else if (angleRadians > twoPI) normalizeAroundPi(angleRadians - twoPI)
+  @inline final def normalize0ToPi(angleRadians: Double): Double = {
+    if      (angleRadians < 0) normalize0ToPi(angleRadians + twoPI)
+    else if (angleRadians > twoPI) normalize0ToPi(angleRadians - twoPI)
     else    angleRadians
   }
-  @inline final def normalizeAroundZero(angleRadians: Double): Double = {
-    if      (angleRadians < -Math.PI) normalizeAroundPi(angleRadians + twoPI)
-    else if (angleRadians > Math.PI) normalizeAroundPi(angleRadians - twoPI)
+  @inline final def normalizePiToPi(angleRadians: Double): Double = {
+    if      (angleRadians < -Math.PI) normalize0ToPi(angleRadians + twoPI)
+    else if (angleRadians > Math.PI) normalize0ToPi(angleRadians - twoPI)
     else    angleRadians
   }
   @inline final def radiansTo(from: Double, to: Double): Double = {
-    val distance = normalizeAroundPi(to - from)
+    val distance = normalize0ToPi(to - from)
     if (distance > Math.PI) distance - twoPI else distance
   }
 
@@ -276,7 +276,7 @@ object Maff {
   }
 
   @inline final def slowAtan2(y: Double, x: Double): Double = {
-   normalizeAroundPi(Math.atan2(y, x))
+   normalize0ToPi(Math.atan2(y, x))
   }
 
   @inline final def weightedMean(values: Seq[(Double, Double)]): Double = {
@@ -401,4 +401,14 @@ object Maff {
   @inline final def toSign(value: Boolean): Int = if (value) 1 else -1
 
   @inline final def orElse[T](x: Iterable[T]*): Iterable[T] = x.find(_.nonEmpty).getOrElse(x.head)
+
+  @inline final def itinerary[T](from: T, to: T, rotation: Seq[T]): Seq[T] = {
+    val indexFrom = rotation.indexOf(from)
+    val indexTo = rotation.indexOf(to)
+    if (indexFrom < indexTo) {
+      rotation.view.slice(indexFrom, indexTo + 1)
+    } else {
+      rotation.view.drop(indexTo) ++ rotation.view.take(indexFrom + 1)
+    }
+  }
 }

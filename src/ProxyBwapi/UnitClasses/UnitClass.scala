@@ -40,7 +40,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   lazy val accelerationFrames: Int = if (acceleration > 1) Math.ceil(256.0 * topSpeed / acceleration).toInt else 1
   lazy val framesToTurn180: Int = framesToTurn(Math.PI)
 
-  def framesToTurn(radians: Double): Int = Math.abs(Maff.nanToZero(Math.ceil(127.0 * Maff.normalizeAroundZero(radians) / Math.PI / turnRadius))).toInt
+  def framesToTurn(radians: Double): Int = Math.abs(Maff.nanToZero(Math.ceil(127.0 * Maff.normalizePiToPi(radians) / Math.PI / turnRadius))).toInt
 
   lazy val needsToTurnToShoot: Boolean = ! Vector(Terran.Goliath, Terran.SiegeTankUnsieged, Protoss.Dragoon).contains(this)
   lazy val framesToTurnShootTurnAccelerate: Int = stopFrames + accelerationFrames + (if (needsToTurnToShoot) 2 * framesToTurn180 else 0) + With.latency.latencyFrames

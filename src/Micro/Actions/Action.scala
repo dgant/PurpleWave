@@ -10,7 +10,7 @@ abstract class Action {
 
   protected def requiresReadiness: Boolean = true
   
-  def allowed(unit: FriendlyUnitInfo): Boolean
+  def allowed(unit: FriendlyUnitInfo): Boolean = true
   protected def perform(unit: FriendlyUnitInfo)
   
   final def consider(unit: FriendlyUnitInfo): Boolean = {

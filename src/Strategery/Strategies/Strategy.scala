@@ -27,7 +27,6 @@ abstract class Strategy extends SimpleString {
   def startLocationsMin       : Int                             = 2
   def startLocationsMax       : Int                             = 1000
   def ffa                     : Boolean                         = false
-  def opponentsWhitelisted    : Option[Iterable[String]]        = None
   def mapsBlacklisted         : Iterable[StarCraftMap]          = Vector.empty
   def mapsWhitelisted         : Option[Iterable[StarCraftMap]]  = None
   def responsesBlacklisted    : Iterable[Fingerprint]           = Vector.empty

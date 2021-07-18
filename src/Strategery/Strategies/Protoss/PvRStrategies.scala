@@ -45,20 +45,12 @@ object PvRProxy2Gate extends PvR2GateStrategy {
 object PvR2Gate4Gate extends PvRStrategy {
   override def gameplan: Option[Plan] = Some(new PvR2Gate4Gate)
 }
-abstract class PvRTinfoils extends PvRStrategy {
-  override def opponentsWhitelisted: Option[Iterable[String]] = Some(Iterable(
-    "Kurdiumov",
-    "Churchill",
-    "UAlbertaBot",
-    "OpprimoBot"
-  ))
-}
 
-object PvRTinfoil2018 extends PvRTinfoils {
+object PvRTinfoil2018 extends PvRStrategy {
   override def gameplan: Option[Plan] = Some(new PvRTinfoil)
 }
 
-object PvR1BaseDT extends PvRTinfoils {
+object PvR1BaseDT extends PvRStrategy {
   override def gameplan: Option[Plan] = Some(new PvRForgeDT)
 }
 

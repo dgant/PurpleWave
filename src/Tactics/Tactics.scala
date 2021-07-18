@@ -73,6 +73,7 @@ class Tactics extends TimedTask {
     backgroundTactics.foreach(_.launch())
 
     // Moved in here temporarily due to issue where Tactics adding units clears a Squad's current list of enemies
+    With.squads.all.foreach(squad => squad.addUnits(With.recruiter.lockedBy(squad)))
     With.squads.run(budgetMs)
   }
 

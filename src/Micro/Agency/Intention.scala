@@ -2,6 +2,7 @@ package Micro.Agency
 
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
+import Micro.Actions.{Action, Idle}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -9,6 +10,7 @@ import ProxyBwapi.Upgrades.Upgrade
 
 class Intention {
   val frameCreated          : Int                       = With.frame
+  var action                : Action                    = Idle
   var toTravel              : Option[Pixel]             = None
   var toAttack              : Option[UnitInfo]          = None
   var toScan                : Option[Pixel]             = None

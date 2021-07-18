@@ -7,7 +7,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Physics.ForceMath
 import Mathematics.Points.Pixel
-import Micro.Actions.{Action, Idle}
+import Micro.Actions.Action
 import Micro.Coordination.Pushing.{TrafficPriorities, TrafficPriority}
 import Performance.{Cache, KeyedCache}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -98,7 +98,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     followIntent()
     fightHysteresisFrames = Math.max(0, fightHysteresisFrames - With.framesSince(lastFrame))
     updatePassengers()
-    Idle.consider(unit)
+    unit.intent.action.consider(unit)
   }
   private def resetState() {
     forces.clear()

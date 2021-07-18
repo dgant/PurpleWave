@@ -16,7 +16,25 @@ class Recruiter {
   def available: Iterable[FriendlyUnitInfo] = unlockedUnits.view ++ unitsByLock.view.filter(_._1.interruptable).filterNot(_._1.owner.isPrioritized).flatMap(_._2.view)
   def lockOf(unit: FriendlyUnitInfo): Option[LockUnits] = activeLocks.find(_.units.contains(unit))
   def lockedBy(lock: LockUnits): collection.Set[FriendlyUnitInfo] = unitsByLock.getOrElse(lock, Set.empty)
-  def lockedBy(owner: Prioritized): Iterable[FriendlyUnitInfo] = unitsByLock.view.filter(_._1.owner == owner).flatMap(_._2)
+  def locksOf(owner: Prioritized): Iterable[LockUnits] = unitsByLock.view.filter(_._1.owner == owner).map(_._1)
+  def lockedBy(owner: Prioritized): Iterable[FriendlyUnitInfo] = locksOf(owner).flatMap(_.units.view)
+
+
+  def update() {
+    // Remove ineligible units
+    unitsByLock.values.foreach(_.view.filterNot(recruitable).foreach(unassign))
+
+    // 1. Deactivate all locks that haven't been renewed.
+    // 2. Clear active locks. If they are not renewed on this update, deactivate them on the next.
+    unitsByLock.keys.view.filterNot(activeLocks.contains).foreach(deactivate)
+    activeLocks.clear()
+
+    // Populate unassigned units
+    unlockedUnits.clear()
+    unlockedUnits ++= With.units.ours
+      .filter(recruitable)
+      .filterNot(unit => unitsByLock.values.exists(_.contains(unit)))
+  }
 
   def lockTo(lock: LockUnits, unit: FriendlyUnitInfo): Unit = lockTo(lock, Iterable(unit))
   def lockTo(lock: LockUnits, units: Iterable[FriendlyUnitInfo]): Unit = {
@@ -43,23 +61,6 @@ class Recruiter {
     unitsByLock.keys.view.filter(_.owner == owner).foreach(activate)
   }
 
-  def update() {
-    // Remove ineligible units
-    unitsByLock.values.foreach(_.view.filterNot(recruitable).foreach(unassign))
-
-    // 1. Deactivate all locks that haven't been renewed.
-    // 2. Clear active locks. If they are not renewed on this update, deactivate them on the next.
-    unitsByLock.keys.view.filterNot(activeLocks.contains).foreach(deactivate)
-    activeLocks.clear()
-
-    // Populate unassigned units
-    unlockedUnits.clear()
-    unlockedUnits ++= With.units.ours
-      .filter(recruitable)
-      .filterNot(unit => unitsByLock.values.exists(_.contains(unit)))
-  }
-
-  // Called by LockUnits
   def inquire(lock: LockUnits, isDryRun: Boolean): Option[Iterable[FriendlyUnitInfo]] = {
     lock.offerUnits(lock.units.view ++ available, isDryRun)
   }

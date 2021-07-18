@@ -3,7 +3,7 @@ package Strategery.Strategies.Protoss
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Strategery.Strategies.Strategy
-import Strategery.{MapGroups, Python, StarCraftMap}
+import Strategery._
 import bwapi.Race
 
 abstract class PvPStrategy extends Strategy {
@@ -22,8 +22,11 @@ object PvP1012 extends PvPStrategy {
 }
 object PvPGateCoreTech extends PvPStrategy {
   override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Python)
+  override def entranceInverted: Boolean = false
 }
-object PvPGateCoreGate extends PvPStrategy
+object PvPGateCoreGate extends PvPStrategy {
+  // No blacklisting; Preserve this as our "Always valid" choice
+}
 
 ////////////////////////
 // Core continuations //
@@ -31,6 +34,7 @@ object PvPGateCoreGate extends PvPStrategy
 
 object PvPRobo extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreTech, PvPGateCoreGate))
+  // No blacklisting; Preserve this as our "Always valid" choice
 }
 object PvPDT extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreTech))
@@ -40,11 +44,11 @@ object PvP3GateGoon extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreTech, PvPGateCoreGate))
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
   override def minimumGamesVsOpponent: Int = 5
-  override def entranceRamped = false
 }
 object PvP4GateGoon extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreTech))
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
+  override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Aztec, CircuitBreaker, Destination, Roadrunner, MatchPoint)
   override def minimumGamesVsOpponent: Int = 5
   override def entranceRamped: Boolean = false
 }

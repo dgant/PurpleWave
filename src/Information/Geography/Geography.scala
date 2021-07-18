@@ -28,6 +28,9 @@ class Geography extends TimedTask {
   lazy val ourMain            : Base                  = With.geography.ourBases.find(_.isStartLocation).getOrElse(With.geography.bases.minBy(_.heart.tileDistanceFast(With.self.startTile)))
   lazy val ourMetro           : Metro                 = ourMain.metro
   lazy val rushDistances      : Vector[Double]        = startLocations.flatMap(s1 => startLocations.filterNot(_ == s1).map(s2 => s1.pixelDistanceGround(s2))).sorted
+  lazy val clockwiseBases     : Vector[Base]          = With.geography.bases.sortBy(b => SpecificPoints.middle.radiansTo(b.townHallArea.center))
+  lazy val counterwiseBases   : Vector[Base]          = clockwiseBases.reverse
+
   def ourNatural              : Base                  = ourNaturalCache()
   def ourZones                : Vector[Zone]          = ourZonesCache()
   def ourBases                : Vector[Base]          = ourBasesCache()
@@ -39,6 +42,33 @@ class Geography extends TimedTask {
   def enemyZones              : Vector[Zone]          = enemyZonesCache()
   def enemyBases              : Vector[Base]          = enemyBasesCache()
   def neutralBases            : Vector[Base]          = With.geography.bases.filter(_.owner.isNeutral)
+
+  def zoneByTile(tile: Tile): Zone = if (tile.valid) zoneByTileCacheValid(tile.i) else zoneByTileCacheInvalid(tile)
+  def baseByTile(tile: Tile): Option[Base] = if (tile.valid) baseByTileCacheValid(tile.i) else Maff.minBy(zoneByTileCacheInvalid(tile).bases)(_.heart.tileDistanceSquared(tile))
+
+  def itinerary(start: Base, end: Base): Iterable[Base] = {
+    val radians = Maff.normalizePiToPi(Maff.radiansTo(start.radians, end.radians))
+    if (radians > 0) itineraryClockwise(start, end) else itineraryCounterwise(start, end)
+  }
+
+  def itineraryClockwise(start: Base, end: Base): Iterable[Base] = Maff.itinerary(start, end, clockwiseBases)
+  def itineraryCounterwise(start: Base, end: Base): Iterable[Base] = Maff.itinerary(start, end, counterwiseBases)
+
+  override def onRun(budgetMs: Long) {
+    if (With.frame == 0) {
+      With.grids.walkableTerrain.initialize()
+      With.grids.walkableTerrain.update()
+      With.grids.unwalkableUnits.initialize()
+      With.grids.unwalkableUnits.update()
+    }
+    ZoneUpdater.update()
+    zones.foreach(_.distanceGrid.initialize())
+    zones.foreach(_.edges.foreach(_.distanceGrid.initialize()))
+    bases.filter(base => With.game.isVisible(base.townHallArea.midpoint.bwapi)).foreach(base => base.lastScoutedFrame = With.frame)
+  }
+
+  var home: Tile = SpecificPoints.tileMiddle
+  var naturalsSearched: Boolean = false
   
   private val ourZonesCache           = new Cache(() => zones.filter(_.owner.isUs))
   private val ourBasesCache           = new Cache(() => bases.filter(_.owner.isUs))
@@ -53,9 +83,6 @@ class Geography extends TimedTask {
     (if (ourMain.owner.isUs) ourMain.natural else None)
       .getOrElse(bases.find(_.isNaturalOf.exists(_.owner.isUs))
       .getOrElse(bases.minBy(_.townHallTile.pixelDistanceGround(ourMain.townHallTile)))))
-  
-  def zoneByTile(tile: Tile): Zone = if (tile.valid) zoneByTileCacheValid(tile.i) else zoneByTileCacheInvalid(tile)
-  def baseByTile(tile: Tile): Option[Base] = if (tile.valid) baseByTileCacheValid(tile.i) else Maff.minBy(zoneByTileCacheInvalid(tile).bases)(_.heart.tileDistanceSquared(tile))
 
   private lazy val zoneByTileCacheValid = allTiles.map(tile => zones.find(_.tiles.contains(tile)).getOrElse(getZoneForTile(tile)))
   private lazy val baseByTileCacheValid = allTiles.map(getBaseForTile)
@@ -110,21 +137,4 @@ class Geography extends TimedTask {
       .flatten
       .filterNot(_.owner.isUs)
     ).distinct
-  
-  var home: Tile = SpecificPoints.tileMiddle
-  
-  var naturalsSearched: Boolean = false
-  
-  override def onRun(budgetMs: Long) {
-    if (With.frame == 0) {
-      With.grids.walkableTerrain.initialize()
-      With.grids.walkableTerrain.update()
-      With.grids.unwalkableUnits.initialize()
-      With.grids.unwalkableUnits.update()
-    }
-    ZoneUpdater.update()
-    zones.foreach(_.distanceGrid.initialize())
-    zones.foreach(_.edges.foreach(_.distanceGrid.initialize()))
-    bases.filter(base => With.game.isVisible(base.townHallArea.midpoint.bwapi)).foreach(base => base.lastScoutedFrame = With.frame)
-  }
 }

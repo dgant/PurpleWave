@@ -530,7 +530,7 @@ object Commander {
     sleep(unit, 8)
   }
   
-  private def sleep(unit: FriendlyUnitInfo, requiredDelay: Int = 2): Unit = {
+  def sleep(unit: FriendlyUnitInfo, requiredDelay: Int = 2): Unit = {
     val sleepUntil = Array(
       With.frame + requiredDelay,
       With.frame + With.latency.turnSize,

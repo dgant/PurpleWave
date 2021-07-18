@@ -8,6 +8,7 @@ import Planning.Plans.Macro.BuildOrders.BuildOrder
 import Planning.Plans.Placement.BuildCannonsAtNatural
 import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.Protoss
+import Strategery._
 import Strategery.Strategies.Protoss._
 import Utilities.{GameTime, Minutes}
 
@@ -61,8 +62,8 @@ class PvPOpening extends GameplanImperative {
     if (employing(PvP1012)) {
       if (units(Protoss.Assimilator) == 0) {
         // TODO: Against 10-12 it's okay to stay 3-Zealot. We only need 5-Zealot vs 9-9.
-        var fiveZealot = employing(PvP5Zealot)
         PvP3Zealot.activate()
+        var fiveZealot = employing(PvP5Zealot)
         fiveZealot ||= enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate, With.fingerprints.nexusFirst, With.fingerprints.gasSteal)
         if (fiveZealot) {
           PvP5Zealot.swapIn()
@@ -114,6 +115,13 @@ class PvPOpening extends GameplanImperative {
     // https://tl.net/forum/bw-strategy/526298-pvp-common-builds-and-what-counters-it-t-l
     // has some good details on the metagame rock-paper-scissors.
 
+    // These maps are too long for 2-Gate unless we're failing to hold proxies otherwise
+    if (units(Protoss.Gateway) == 0 && ! enemyRecentStrategy(With.fingerprints.proxyGateway) && Seq(Arcadia, Aztec, Benzene, Longinus, MatchPoint, Heartbreak, Roadkill).exists(_.matches)) {
+      PvP1012.swapOut()
+      PvP3Zealot.swapOut()
+      PvP5Zealot.swapOut()
+      (if (Seq(Heartbreak, Roadkill).exists(_.matches) || roll("1012ToGateCoreGate", 0.35)) PvPGateCoreGate else PvPGateCoreTech).swapIn()
+    }
     // If we catch them going Robo against our DT, go goon-only
     if (employing(PvPDT) && (enemyRobo || enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe))) {
       PvPDT.swapOut()

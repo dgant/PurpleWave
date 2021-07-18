@@ -8,6 +8,7 @@ trait Mission extends Squad {
   protected def shouldForm: Boolean
   protected def shouldTerminate: Boolean
   protected def recruit(): Unit
+  protected def reset(): Unit = {}
 
   var launched: Boolean = false
   var launchFrame: Int = 0
@@ -16,7 +17,11 @@ trait Mission extends Squad {
   private def nextUnits: Iterable[FriendlyUnitInfo] = With.recruiter.lockedBy(this)
   final def launch(): Unit = {
     if (launched) {
-      if (shouldTerminate || nextUnits.isEmpty) {
+      if (nextUnits.isEmpty) {
+        With.logger.debug(f"Terminating $this (nextUnits is empty)")
+        terminate()
+      } else if (shouldTerminate) {
+        With.logger.debug(f"Terminating $this (Termination condition reached)")
         terminate()
       } else {
         With.recruiter.renew(this)
@@ -29,6 +34,7 @@ trait Mission extends Squad {
     }
     if (launched) {
       addUnits(nextUnits)
+      With.recruiter.locksOf(this).foreach(_.interruptable = false)
     } else {
       terminate()
     }
@@ -40,5 +46,6 @@ trait Mission extends Squad {
     }
     launched = false
     With.recruiter.release(this)
+    reset()
   }
 }

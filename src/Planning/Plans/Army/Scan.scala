@@ -61,7 +61,7 @@ class Scan extends Tactic {
   }
   
   def scan(targetPixel: Pixel) {
-    scanners.acquire(this)
+    scanners.acquire()
     val units = scanners.units
     if (units.nonEmpty) {
       units.maxBy(_.energy).intend(this, new Intention { toScan = Some(targetPixel) })

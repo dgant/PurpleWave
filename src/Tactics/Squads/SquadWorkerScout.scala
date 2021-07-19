@@ -81,7 +81,7 @@ class SquadWorkerScout extends Squad {
     if (scoutLock.units.size > scoutCount) { scoutLock.release() }
     scoutLock.counter = CountUpTo(scoutCount)
     scoutLock.preference = new PreferScout(basesToScout.map(_.townHallArea.center): _*)
-    scouts = scoutLock.acquire(this).toVector // The copy is important since the source is mutable
+    scouts = scoutLock.acquire().toVector // The copy is important since the source is mutable
     if (scouts.isEmpty) return
 
     val enemyHasCombatUnits = With.units.enemy.exists(u  => u.canAttack && ! MatchWorker(u))

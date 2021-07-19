@@ -28,7 +28,7 @@ class SquadEjectScout extends Squad {
     lock.matcher = MatchAnd(MatchScoutCatcher, (unit) => unit.base.exists(With.scouting.basesToLookForEnemyScouts().contains) || unit.pixelsToGetInRange(targetScout().get) < 32)
     lock.counter = CountOne
     lock.preference = PreferClose(targetScout().get.pixel)
-    lock.acquire(this)
+    lock.acquire()
     addUnits(lock.units)
   }
   

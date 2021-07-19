@@ -64,7 +64,7 @@ class WorkerRush extends Trigger {
         }
         workerLock.counter = CountUpTo(goalWorkers)
         workerLock.preference = PreferClose(With.geography.home.center)
-        workerLock.acquire(this)
+        workerLock.acquire()
         With.gathering.setWorkers(workerLock.units)
       }
     },

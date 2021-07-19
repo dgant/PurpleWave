@@ -3,7 +3,7 @@ package Planning.ResourceLocks
 import Lifecycle.With
 import Planning.Prioritized
 
-class LockCurrency {
+class LockCurrency(prioritized: Prioritized) {
   
   var framesPreordered    = 0
   var minerals            = 0
@@ -16,7 +16,7 @@ class LockCurrency {
   
   def satisfied: Boolean = isSatisfied || isSpent
   
-  def acquire(prioritized: Prioritized) {
+  def acquire() {
     owner = prioritized
     owner.prioritize()
     With.bank.request(this)

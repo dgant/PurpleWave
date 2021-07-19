@@ -21,7 +21,7 @@ class ChillOverlords extends Tactic {
     if (With.self.hasUpgrade(Zerg.OverlordSpeed)) return
     if (MacroFacts.enemyShownCloakedThreat) return
 
-    overlords.acquire(this)
+    overlords.acquire()
     overlords.units.foreach(chillOut(_, overlords.units.size))
   }
   

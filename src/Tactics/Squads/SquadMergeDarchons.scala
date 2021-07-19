@@ -14,7 +14,7 @@ class SquadMergeDarchons extends Squad {
   def launch(): Unit = {
     lock.release() // Ditch units that are already Dark Archons
     if (With.blackboard.makeDarkArchons()) {
-      addUnits(lock.acquire(this))
+      addUnits(lock.acquire())
     }
   }
 

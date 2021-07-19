@@ -82,7 +82,7 @@ class HackySparkleExpansion extends Plan {
   override def onUpdate(): Unit = {
     if (With.units.countOurs(Protoss.Nexus) > 1) return
     if (base.exists(_.townHall.isEmpty)) {
-      lock.acquire(this)
+      lock.acquire()
       lock.units.foreach(_.intend(this, new Intention {
         toBuild = Some(Protoss.Nexus)
         toBuildTile = Some(base.get.townHallTile)

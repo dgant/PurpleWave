@@ -19,7 +19,7 @@ class TrainUnit(val traineeClass: UnitClass) extends Production {
   override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
   override def buildable: Buildable = BuildableUnit(traineeClass)
 
-  val currencyLock    = new LockCurrencyForUnit(traineeClass)
+  val currencyLock    = new LockCurrencyForUnit(this, traineeClass)
   val trainerClass    = traineeClass.whatBuilds._1
   val addonsRequired  = traineeClass.buildUnitsEnabling.find(b => b.isAddon && b.whatBuilds._1 == trainerClass)
   val matchTrainer    = MatchAnd(trainerClass, MatchNot(MatchMobileFlying))
@@ -52,9 +52,9 @@ class TrainUnit(val traineeClass: UnitClass) extends Production {
       :+ With.projections.unit(trainerClass)
       :+ trainer.map(_.remainingOccupationFrames).getOrElse(0)).max
     currencyLock.isSpent = trainee.isDefined
-    currencyLock.acquire(this)
+    currencyLock.acquire()
     if (currencyLock.satisfied) {
-      trainerLock.acquire(this)
+      trainerLock.acquire()
       if (trainee.isEmpty && trainer.forall(_.buildUnit.exists( ! _.completeOrNearlyComplete))) {
         // If this trainer is occupied right now, release it,
         // because maybe we can get a free trainer next time

@@ -18,7 +18,7 @@ class PylonBlock extends Plan {
   blockerLock.matcher = MatchWorker
   blockerLock.counter = CountOne
 
-  val currencyLock = new LockCurrency
+  val currencyLock = new LockCurrency(this)
   currencyLock.minerals = 100
 
   var lastWorkerDeathFrame: Int = 0
@@ -57,7 +57,7 @@ class PylonBlock extends Plan {
 
     val basesUnblocked = basesEligible.filterNot(base => base.zone.units.exists(u => u.isFriendly && u.unitClass.isBuilding && u.tileArea.intersects(base.townHallArea)))
     basesUnblocked.headOption.foreach(baseToBlock => {
-      blockerLock.acquire(this)
+      blockerLock.acquire()
       blockerLock.units.headOption.foreach(blocker => {
         lastWorker = Some(blocker)
         val tileToBlock = baseToBlock.townHallTile.add(1, 1)
@@ -66,7 +66,7 @@ class PylonBlock extends Plan {
           canFight = false
         }
         if (blocker.pixelDistanceCenter(tileToBlock.center) < 256 && With.self.supplyUsed + 24 >= With.self.supplyTotal) {
-          currencyLock.acquire(this)
+          currencyLock.acquire()
           intent = new Intention {
             toBuild = Some(Protoss.Pylon)
             toBuildTile = Some(tileToBlock)

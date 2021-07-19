@@ -34,7 +34,7 @@ class PopulateBunkers extends Plan {
   
   private def updateBunker(bunker: FriendlyUnitInfo) {
     val lock = bunkerLocks(bunker)
-    lock.acquire(this)
+    lock.acquire()
     lock.units.foreach(unit => {
       val intent = new Intention
       intent.toTravel = Some(bunker.pixel)

@@ -31,7 +31,7 @@ class MeldArchons(maxEnergy: Int = 251) extends Plan {
     templar.counter = CountUpTo(templarToMeld)
     
     templar.release()
-    templar.acquire(this)
+    templar.acquire()
     templar.units.foreach(_.intend(this, new Intention {
       toTravel = Some(With.geography.home.center)
       shouldMeld = true

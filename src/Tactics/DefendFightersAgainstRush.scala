@@ -37,7 +37,7 @@ class DefendFightersAgainstRush extends Tactic {
     
     defenders.counter = CountUpTo(workersToFight.toInt)
     defenders.preference = PreferClose(target)
-    defenders.acquire(this)
+    defenders.acquire()
     defenders.units.foreach(_.intend(this, new Intention {
       toTravel = Some(target)
       canFlee = false

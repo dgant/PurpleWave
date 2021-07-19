@@ -15,7 +15,7 @@ class KillPsiDisruptor extends Plan() {
   override def onUpdate() {
     val targets = With.geography.ourZones.flatMap(_.units.filter(Neutral.PsiDisruptor))
     if (targets.isEmpty) return
-    killers.acquire(this)
+    killers.acquire()
     killers.units.foreach(killer => killer.intend(this, new Intention {
       toAttack = targets.headOption
     }))

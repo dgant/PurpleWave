@@ -20,13 +20,13 @@ class LockUnits(val owner: Prioritized) {
   private var _isSatisfied: Boolean = false
   def satisfied: Boolean = _isSatisfied
 
-  def acquire(prioritized: Prioritized): collection.Set[FriendlyUnitInfo] = {
+  def acquire(): collection.Set[FriendlyUnitInfo] = {
     owner.prioritize()
     With.recruiter.satisfy(this)
     units
   }
 
-  def inquire(prioritized: Prioritized): Option[Vector[FriendlyUnitInfo]] = {
+  def inquire(): Option[Vector[FriendlyUnitInfo]] = {
     owner.prioritize()
     With.recruiter.inquire(this, isDryRun = true).map(_.toVector) // toVector ensures we don't return a view with invalid owner
   }

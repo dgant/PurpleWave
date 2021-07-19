@@ -36,7 +36,7 @@ class DefendAgainstProxy extends Tactic {
     defenders.release()
     defenders.counter = CountEverything
     defenders.matcher = MatchOr(MatchWorker, MatchWarriors)
-    defenders.inquire(this).toVector.foreach(defendersAvailable ++= _)
+    defenders.inquire().toVector.foreach(defendersAvailable ++= _)
 
     val isCannony = proxies.exists(_.isAny(Terran.Bunker, Protoss.PhotonCannon, Zerg.CreepColony))
 
@@ -87,7 +87,7 @@ class DefendAgainstProxy extends Tactic {
 
     defenders.counter = CountUpTo(defendersAssigned.size)
     defenders.matcher = Match(_.friendly.exists(defendersAssigned.contains))
-    defenders.acquire(this)
+    defenders.acquire()
     if (defenders.units.isEmpty) return
     With.blackboard.status.set(With.blackboard.status.get :+ "DefendingProxy")
     val squad = new SquadRazeProxies(defendersAssigned.toMap)

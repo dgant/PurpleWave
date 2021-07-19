@@ -18,7 +18,7 @@ class Chill(initialMatcher: UnitMatcher) extends Plan {
   chillers.counter = CountEverything
 
   override def onUpdate() {
-    chillers.acquire(this)
+    chillers.acquire()
     chillers.units.foreach(chillOut(_, chillers.units.size))
   }
   

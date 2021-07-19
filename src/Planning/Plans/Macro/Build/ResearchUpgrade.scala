@@ -16,7 +16,7 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Production {
   override def buildable: Buildable = BuildableUpgrade(upgrade, level)
   
   val upgraderClass = upgrade.whatUpgrades
-  val currencyLock = new LockCurrencyForUpgrade(upgrade, level)
+  val currencyLock = new LockCurrencyForUpgrade(this, upgrade, level)
   val upgraders = new LockUnits(this)
   upgraders.counter = CountOne
   upgraders.matcher = MatchAnd(upgraderClass, MatchIdle)
@@ -36,11 +36,11 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Production {
     currencyLock.framesPreordered = (
       upgraders.units.view.map(_.remainingOccupationFrames)
       ++ requiredClasses.map(With.projections.unit)).max
-    currencyLock.acquire(this)
+    currencyLock.acquire()
     currencyLock.isSpent = With.units.ours.exists(upgrader => upgrader.upgrading && upgrader.upgradingType == upgrade)
     if ( ! currencyLock.satisfied) return
     
-    upgraders.acquire(this)
+    upgraders.acquire()
     upgraders.units.foreach(_.intend(this, new Intention { toUpgrade = Some(upgrade) }))
   }
 

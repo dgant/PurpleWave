@@ -27,13 +27,18 @@ object PvPGateCoreTech extends PvPStrategy {
 object PvPGateCoreGate extends PvPStrategy {
   // No blacklisting; Preserve this as our "Always valid" choice
 }
+object PvPRoboBeforeRange extends PvPStrategy {
+  override def entranceInverted: Boolean = false
+  override def entranceFlat: Boolean = false
+  // TODO: Add a minimumGames = 1
+}
 
 ////////////////////////
 // Core continuations //
 ////////////////////////
 
 object PvPRobo extends PvPStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreTech, PvPGateCoreGate))
+  override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreTech, PvPGateCoreGate, PvPRoboBeforeRange))
   // No blacklisting; Preserve this as our "Always valid" choice
 }
 object PvPDT extends PvPStrategy {

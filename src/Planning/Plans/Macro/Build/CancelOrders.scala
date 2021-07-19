@@ -11,7 +11,7 @@ class CancelOrders(matchers: UnitMatcher*) extends Plan {
   lock.matcher = MatchOr(matchers: _*)
 
   override def onUpdate(): Unit = {
-    lock.acquire(this)
+    lock.acquire()
     lock.units.foreach(_.intend(this, new Intention {
       shouldCancel = true
     }))

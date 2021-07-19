@@ -16,7 +16,7 @@ class BuildAddon(val addonClass: UnitClass) extends Production {
   override def buildable: Buildable = BuildableUnit(addonClass)
 
   val buildingDescriptor  = new Blueprint(addonClass)
-  val currencyLock        = new LockCurrencyForUnit(addonClass)
+  val currencyLock        = new LockCurrencyForUnit(this, addonClass)
   
   private var addon: Option[UnitInfo] = None
   
@@ -38,9 +38,9 @@ class BuildAddon(val addonClass: UnitClass) extends Production {
       
     currencyLock.framesPreordered = (addonClass.buildUnitsEnabling.map(With.projections.unit) :+ 0).max
     currencyLock.isSpent = addon.isDefined
-    currencyLock.acquire(this)
+    currencyLock.acquire()
     
-    builderLock.acquire(this)
+    builderLock.acquire()
     if (currencyLock.satisfied && builderLock.satisfied) {
       val builder = builderLock.units.head
       addon = builder.addon

@@ -17,7 +17,7 @@ class SquadMindControl extends Squad {
   def launch(): Unit = {
     if ( ! With.self.hasTech(Protoss.MindControl)) return
     if (stealables.isEmpty) return
-    addUnits(lock.acquire(this))
+    addUnits(lock.acquire())
   }
 
   def stealables: Iterable[ForeignUnitInfo] = With.units.enemy.filter(_.isAny(

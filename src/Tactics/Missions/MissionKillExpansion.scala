@@ -37,7 +37,7 @@ class MissionKillExpansion extends Mission {
     }
     vicinity = targetBase.get.heart.center
     lock.preference = PreferClose(vicinity)
-    lock.acquire(this)
+    lock.acquire()
     addUnits(lock.units)
   }
 

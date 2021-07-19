@@ -11,7 +11,7 @@ class Gather extends Tactic {
   workerLock.matcher = MatchWorker
 
   def launch() {
-    workerLock.acquire(this)
+    workerLock.acquire()
     With.gathering.setWorkers(workerLock.units)
   }
 

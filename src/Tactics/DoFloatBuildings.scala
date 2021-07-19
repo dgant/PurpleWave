@@ -15,7 +15,7 @@ class DoFloatBuildings extends Tactic {
     floaties.matcher = MatchAnd(
       MatchNot(MatchMobileFlying),
       MatchOr(With.blackboard.floatableBuildings(): _*))
-    floaties.acquire(this)
+    floaties.acquire()
     floaties.units.foreach(_.intend(this, new Intention { shouldLiftoff = true }))
   }
 }

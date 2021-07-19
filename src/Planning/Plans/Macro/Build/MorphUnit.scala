@@ -19,7 +19,7 @@ class MorphUnit(val classToMorph: UnitClass) extends Production {
   override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
   override def buildable: Buildable = BuildableUnit(classToMorph)
   
-  val currencyLock  = new LockCurrencyForUnit(classToMorph)
+  val currencyLock  = new LockCurrencyForUnit(this, classToMorph)
   val morpherClass  = classToMorph.whatBuilds._1
   val morpherLock   = new LockUnits(this)
   morpherLock.matcher = MatchOr(morpherClass, MatchMorphingInto(classToMorph))
@@ -47,11 +47,11 @@ class MorphUnit(val classToMorph: UnitClass) extends Production {
       :+ With.projections.unit(morpherClass)).max
     
     currencyLock.isSpent = morpher.exists(m => MacroCounter.countCompleteOrIncomplete(m)(classToMorph) > 0)
-    currencyLock.acquire(this)
+    currencyLock.acquire()
     if (currencyLock.satisfied && ! currencyLock.isSpent) {
       setPreference()
       morpherLock.matcher = morpher.map(m => new MatchSpecific(Set(m))).getOrElse(morpherClass)
-      morpherLock.acquire(this)
+      morpherLock.acquire()
       morpher = morpherLock.units.headOption
       morpher.foreach(_.intend(this, new Intention {
         toTrain = Some(classToMorph)

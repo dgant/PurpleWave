@@ -6,15 +6,15 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.SpecificPoints
-import Micro.Actions.{Action, Idle}
 import Micro.Actions.Basic.DoNothing
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Potshot
+import Micro.Actions.{Action, Idle}
 import Micro.Agency.{Commander, Intention}
 import Micro.Coordination.Pathing.MicroPathing
 import Planning.UnitMatchers.{MatchTransport, MatchWorker}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.Seconds
+import Utilities.{Minutes, Seconds}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -58,10 +58,43 @@ abstract class MissionDrop extends Mission {
   }
 
   final private def skipBase(base: Base): Boolean = {
-    if (With.framesSince(base.lastScoutedFrame) < Seconds(45)()) return false
-    if ( ! base.owner.isEnemy) return true
+    if (state == Evacuating || state == Escaping && units.exists(_.base.contains(base))) return true
+    if (base.owner.isUs) return true
     if (requireWorkers && base.heart.visible && base.units.forall(u => ! u.isEnemy || ! MatchWorker(u))) return true
-    false
+    if (itinerary.size > 1 && With.frame < Minutes(10)() && ! base.owner.isEnemy) return true
+    if ( ! base.owner.isEnemy && base.units.exists(u => u.likelyStillThere && u.isEnemy)) return true
+    With.framesSince(base.lastScoutedFrame) < Seconds(45)() && ! base.owner.isEnemy
+  }
+
+  protected def populateItinerary(): Unit = {
+    val bases = Maff.orElse(
+      With.geography.enemyBases,
+      With.geography.neutralBases.filter(b => With.framesSince(b.lastScoutedFrame) > Minutes(2)()),
+      With.geography.neutralBases).toVector
+    if (bases.isEmpty) return
+    val targetBase = Maff.sampleWeighted[Base](bases, b =>
+      if (b.owner.isNeutral) With.framesSince(b.lastScoutedFrame)
+      else if (b.mineralsLeft < 5000) 10
+      else if (With.scouting.enemyMain.contains(b)) if (With.frame > Minutes(12)()) 0 else 25
+      else if (With.scouting.enemyNatural.contains(b)) if (With.frame > Minutes(16)()) 0 else 10
+      else b.heart.tileDistanceGroundManhattan(With.scouting.enemyMuscleOrigin)).get
+    val itineraries = Vector(With.geography.itineraryCounterwise(With.geography.ourMain, targetBase), With.geography.itineraryClockwise(targetBase, With.geography.ourMain))
+      .sortBy(_.size)
+      .sortBy(_.count(_.owner.isEnemy))
+    itinerary ++= itineraries.head
+  }
+
+  final protected def updateVicinity(): Unit = {
+    if (itinerary.isEmpty) {
+      vicinity = With.geography.home.center
+      return
+    }
+    val base = itinerary.head
+    lazy val sightPixels = Maff.max(transports.view.map(_.sightPixels)).getOrElse(0)
+    vicinity =
+      if (base.owner.isEnemy) base.heart.center
+      else if (itinerary.size > 1) base.townHallArea.center.project(itinerary(1).townHallArea.center, sightPixels)
+      else base.heart.center
   }
 
   final override def run(): Unit = {
@@ -69,20 +102,22 @@ abstract class MissionDrop extends Mission {
     passengers --= passengers.view.filterNot(_.alive)
     if (passengers.isEmpty) { terminate(); return }
     if (transports.isEmpty) {
-      if (Seq(Raiding, Evacuating).contains(state)) { passengers.foreach(_.agent.commit) }
+      if (Seq(Raiding, Evacuating).contains(state)) { passengers.foreach(_.agent.commit = true) }
       terminate()
       return
     }
     while (itinerary.headOption.exists(skipBase)) { itinerary.dequeue() }
-    itinerary.headOption.foreach(b => vicinity = b.heart.center)
     if (itinerary.isEmpty) { terminate(); return }
+    updateVicinity()
+
 
     if (state == Recruiting)                                                                { transition(Assembling)  }
     if (state == Assembling && passengers.forall(_.transport.exists(transports.contains)))  { transition(Travelling)  }
     if (state == Travelling && passengers.forall(_.base.exists(vicinity.base.contains)))    { transition(Landing)     }
     if (state == Landing    && passengers.forall( ! _.loaded))                              { transition(Raiding)     }
+    if (state == Raiding    && ! vicinity.base.exists(itinerary.contains))                  { transition(Evacuating)  }
     if (state == Raiding    && shouldStopRaiding)                                           { transition(Evacuating)  }
-    if (state == Evacuating && passengers.forall(_.loaded))                                 { transition(Escaping)    }
+    if (state == Evacuating && passengers.forall(_.loaded))                                 { transition(if (itinerary.isEmpty) Escaping else Travelling) }
     if (state == Escaping   && units.forall(u => u.base.exists(_.owner.isUs) || ! u.visibleToOpponents)) { terminate(); return }
     state match {
       case Assembling => assemble()
@@ -103,13 +138,15 @@ abstract class MissionDrop extends Mission {
   }
   private def land(): Unit = {
     transports.foreach(_.intend(this, new Intention { action = new ActionLandTransport }))
-    passengers.foreach(_.intend(this, new Intention { action = DoNothing }))
+    passengers.foreach(_.intend(this, new Intention { action = new ActionLandPassenger }))
   }
   private def evacuate(): Unit = {
+    passengers.foreach(_.agent.commit = false)
     transports.foreach(_.intend(this, new Intention { action = new ActionEvacuateTransport }))
     passengers.foreach(_.intend(this, new Intention { action = new ActionEvacuatePassenger }))
   }
   private def escape(): Unit = {
+    passengers.foreach(_.agent.commit = false)
     transports.foreach(_.intend(this, new Intention { action = new ActionEscapeTransport }))
     passengers.foreach(_.intend(this, new Intention { action = DoNothing }))
   }
@@ -142,7 +179,7 @@ abstract class MissionDrop extends Mission {
       profile.costThreat          = 125
       profile.canCrossUnwalkable  = Some(true)
       profile.canEndUnwalkable    = Some(true)
-      profile.repulsors           = Vector(PathfindRepulsor(SpecificPoints.middle, 1.0, Math.min(With.mapPixelWidth, With.mapPixelHeight) / 2))
+      profile.repulsors           = Vector(PathfindRepulsor(SpecificPoints.middle, 1.0, Math.min(With.mapPixelWidth, With.mapPixelHeight) * 2 / 3))
       val path = profile.find
       if (path.pathExists) { MicroPathing.tryMovingAlongTilePath(transport, path) }
       else {
@@ -165,6 +202,12 @@ abstract class MissionDrop extends Mission {
       droppables.headOption.foreach(Commander.unload(transport, _))
       transport.agent.toTravel = Some(vicinity)
       Commander.move(transport)
+    }
+  }
+
+  class ActionLandPassenger extends Action {
+    override protected def perform(unit: FriendlyUnitInfo): Unit = {
+      if ( ! unit.loaded) Idle.consider(unit)
     }
   }
 

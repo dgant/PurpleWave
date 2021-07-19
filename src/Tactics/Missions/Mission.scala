@@ -27,6 +27,7 @@ trait Mission extends Squad {
         With.recruiter.renew(this)
       }
     } else if (shouldForm && ! shouldTerminate) {
+      reset()
       launched = true
       launchFrame = With.frame
       recruit()

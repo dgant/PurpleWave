@@ -1,8 +1,9 @@
 package Planning.ResourceLocks
 
+import Planning.Prioritized
 import ProxyBwapi.UnitClasses.UnitClass
 
-class LockCurrencyForUnit(unitClass: UnitClass) extends LockCurrency {
+class LockCurrencyForUnit(prioritized: Prioritized, unitClass: UnitClass) extends LockCurrency(prioritized) {
   minerals  = unitClass.mineralPrice
   gas       = unitClass.gasPrice
   supply    = unitClass.supplyRequired

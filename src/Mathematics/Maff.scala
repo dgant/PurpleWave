@@ -305,9 +305,9 @@ object Maff {
     if (seq.isEmpty) return None
     val denominator = seq.map(extract).sum
     val numerator   = Random.nextDouble() * denominator
-    val shuffled    = Random.shuffle(seq).toVector
     var passed      = 0.0
     var index       = 0
+    if (denominator <= 0) return Some(sample(seq))
     for (value <- seq) {
       passed += extract(value)
       if (passed > numerator) {
@@ -315,8 +315,8 @@ object Maff {
       }
     }
     // Oops, we screwed up.
-    With.logger.warn("Failed to get weighted sample!")
-    Some(seq.maxBy(extract))
+    With.logger.warn(f"Failed to get weighted sample! Numerator: $numerator. Denominator: $denominator")
+    Some(sample(seq))
   }
 
   @inline final def softmaxSample[T](seq: Seq[T], extract: (T) => Double): Option[T] = {

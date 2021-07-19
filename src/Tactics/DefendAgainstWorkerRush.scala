@@ -34,7 +34,7 @@ class DefendAgainstWorkerRush extends Tactic {
       defenders.release()
     }
     defenders.counter = CountUpTo(workersToDefend)
-    defenders.acquire(this)
+    defenders.acquire()
     defenders.units.foreach(unit => unit.intend(this, new Intention {
       canFlee   = false
       toTravel  = Some(attackingCentroid)

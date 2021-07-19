@@ -15,7 +15,7 @@ class ResearchTech(tech: Tech) extends Production {
   override def buildable: Buildable = BuildableTech(tech)
 
   val techerClass = tech.whatResearches
-  val currencyLock = new LockCurrencyForTech(tech)
+  val currencyLock = new LockCurrencyForTech(this, tech)
   val techers = new LockUnits(this)
   techers.matcher = techerClass
   techers.counter = CountOne
@@ -32,11 +32,11 @@ class ResearchTech(tech: Tech) extends Production {
     currencyLock.framesPreordered = Math.max(
       Maff.max(techers.units.map(_.remainingOccupationFrames)).getOrElse(0),
       With.projections.unit(techerClass))
-    currencyLock.acquire(this)
+    currencyLock.acquire()
     currencyLock.isSpent = With.units.ours.exists(techer => techer.teching && techer.techingType == tech)
     if ( ! currencyLock.satisfied) return
   
-    techers.acquire(this)
+    techers.acquire()
     techers.units.foreach(_.intend(this, new Intention { toTech = Some(tech) }))
   }
 

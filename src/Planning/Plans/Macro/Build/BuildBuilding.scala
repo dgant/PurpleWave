@@ -24,7 +24,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
   private var orderedTile : Option[Tile]              = None
   private var building    : Option[FriendlyUnitInfo]  = None
   
-  val currencyLock = new LockCurrencyForUnit(buildingClass)
+  val currencyLock = new LockCurrencyForUnit(this, buildingClass)
 
   val builderMatcher: UnitClass = buildingClass.whatBuilds._1
   val builderLock: LockUnits = new LockUnits(this)
@@ -69,7 +69,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
     if (desiredTile.isDefined) {
       currencyLock.framesPreordered = (buildingClass.buildUnitsEnabling.map(With.projections.unit) :+ 0).max
       currencyLock.isSpent = building.isDefined
-      currencyLock.acquire(this)
+      currencyLock.acquire()
     }
 
     if ( ! needBuilder) {
@@ -92,7 +92,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
       builderLock.release()
     }
     builderLock.preference = PreferCloseAndNotMining(desiredTile.get.center)
-    builderLock.acquire(this)
+    builderLock.acquire()
     
     if (waitForBuilderToRecallUntil.isDefined) {
       if (With.frame < waitForBuilderToRecallUntil.get) {
@@ -147,7 +147,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
     } else  if (currencyLock.expectedFrames > With.blackboard.maxFramesToSendAdvanceBuilder) {
       return false
     }
-    val proposedBuilder = builderLock.inquire(this).flatMap(_.headOption)
+    val proposedBuilder = builderLock.inquire().flatMap(_.headOption)
     if (proposedBuilder.isEmpty) {
       return false
     }

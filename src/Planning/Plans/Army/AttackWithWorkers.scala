@@ -22,7 +22,7 @@ class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
   var haveSeenABase = false
   
   override def onUpdate() {
-    fighters.acquire(this)
+    fighters.acquire()
     
     haveSeenABase ||= With.geography.enemyBases.nonEmpty
     

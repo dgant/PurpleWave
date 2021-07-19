@@ -40,65 +40,50 @@ class PvPOpening extends GameplanImperative {
     // Update strategy //
     /////////////////////
 
-    if (units(Protoss.Assimilator) == 0 || units(Protoss.Gateway) < 2) {
-      // TODO: Also react vs. 9-9 gate
-      var twoGate = employing(PvP1012)
-      twoGate ||= enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.gasSteal, With.fingerprints.mannerPylon)
-      twoGate &&= ! enemyStrategy(With.fingerprints.cannonRush)
-      if (twoGate) {
+    if (units(Protoss.Assimilator) == 0) {
+      if (enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.gasSteal, With.fingerprints.mannerPylon) && ! enemyStrategy(With.fingerprints.cannonRush)) {
         PvP1012.swapIn()
         PvPGateCoreTech.swapOut()
         PvPGateCoreGate.swapOut()
-        PvPRoboBeforeRange.swapOut()
-      } else {
-        PvP1012.swapOut()
-        // Revert to the original Core strategy if possible
-        (With.strategy.selected.toVector.view ++ With.strategy.selectedInitially)
-          .find(x => x == PvPGateCoreTech || x == PvPGateCoreGate)
-          .getOrElse(PvPGateCoreTech)
-          .swapIn()
+        PvPTechBeforeRange.swapOut()
       }
     }
     if (employing(PvP1012)) {
       if (units(Protoss.Assimilator) == 0) {
-        // TODO: Against 10-12 it's okay to stay 3-Zealot. We only need 5-Zealot vs 9-9.
         PvP3Zealot.activate()
-        var fiveZealot = employing(PvP5Zealot)
-        fiveZealot ||= enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate, With.fingerprints.nexusFirst, With.fingerprints.gasSteal)
-        if (fiveZealot) {
+        PvP5Zealot.activate()
+        // TODO: Against 10-12 it's okay to stay 3-Zealot. We only need 5-Zealot vs 9-9.
+        if (enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate, With.fingerprints.nexusFirst, With.fingerprints.gasSteal)) {
           PvP5Zealot.swapIn()
           PvP3Zealot.swapOut()
-        } else {
-          PvP3Zealot.swapIn()
-          PvP5Zealot.swapOut()
         }
       }
       if (unitsComplete(Protoss.CyberneticsCore) == 0) {
         sevenZealot = employing(PvP5Zealot)
         sevenZealot &&= enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate, With.fingerprints.nexusFirst)
       }
-    } else if (employing(PvPGateCoreTech, PvPGateCoreGate)) {
+    } else {
       if (units(Protoss.CyberneticsCore) == 0) {
         zBeforeCore = With.geography.startLocations.size < 3
         zBeforeCore &&= ! employing(PvPDT)
         zBeforeCore &&= ! enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.oneGateCore)
         zBeforeCore ||= enemyRecentStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway, With.fingerprints.mannerPylon, With.fingerprints.gasSteal)
         zBeforeCore ||= employing(PvPGateCoreGate, PvP3GateGoon, PvP4GateGoon)
-        zBeforeCore &&= ! employing(PvPRoboBeforeRange)
+        zBeforeCore &&= ! employing(PvPTechBeforeRange)
       }
       if (unitsComplete(Protoss.CyberneticsCore) == 0) {
         zAfterCore = zBeforeCore
         zAfterCore &&= ! enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.oneGateCore)
         zAfterCore ||= enemyStrategy(With.fingerprints.mannerPylon, With.fingerprints.gasSteal)
         zAfterCore ||= enemyRecentStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway)
-        zAfterCore ||= employing(PvPGateCoreGate, PvPRoboBeforeRange)
+        zAfterCore ||= employing(PvPGateCoreGate, PvPTechBeforeRange)
 
       }
       if (units(Protoss.Gateway) < 2 && units(Protoss.RoboticsFacility) < 1 && units(Protoss.CitadelOfAdun) < 1) {
         if (enemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway, With.fingerprints.nexusFirst)) {
           PvPGateCoreGate.swapIn()
           PvPGateCoreTech.swapOut()
-          PvPRoboBeforeRange.swapOut()
+          PvPTechBeforeRange.swapOut()
         }
       }
     }
@@ -202,7 +187,7 @@ class PvPOpening extends GameplanImperative {
         getObservatory = true
         getObservers = true
 
-        if (employing(PvPRoboBeforeRange)) {
+        if (employing(PvPTechBeforeRange)) {
           // This strategy demands a ton of gas; we can't afford the Observer
           getObservatory = false
           getObservers = false
@@ -221,7 +206,7 @@ class PvPOpening extends GameplanImperative {
         }
       }
 
-      shouldExpand = units(Protoss.Gateway) >= 2
+      shouldExpand = unitsComplete(Protoss.Gateway) >= 2 && unitsComplete(Protoss.Reaver) > 0
       shouldExpand &&= (
             ((shouldExpand || safeToMoveOut) && enemyStrategy(With.fingerprints.dtRush) && unitsComplete(Protoss.Observer) > 0)
         ||  ((shouldExpand || safeToMoveOut) && PvPIdeas.enemyLowUnitStrategy && unitsComplete(Protoss.Reaver) > 0)
@@ -262,7 +247,7 @@ class PvPOpening extends GameplanImperative {
     // Push out to take our natural
     shouldAttack ||= shouldExpand
     // Ensure that committed Zealots keep wanting to attack
-    shouldAttack ||= With.units.ours.exists(u => u.agent.commit)
+    shouldAttack ||= With.units.ours.exists(u => u.agent.commit) && With.frame < Minutes(5)()
 
     /////////////
     // Logging //
@@ -287,6 +272,7 @@ class PvPOpening extends GameplanImperative {
     if (shouldExpand) status("ExpandNow")
     oversaturate = units(Protoss.Reaver) > 0 || units(Protoss.DarkTemplar) > 0 || units(Protoss.Gateway) > 3
     if (shouldAttack) { attack() }
+    if (upgradeStarted(Protoss.ShuttleSpeed)) { harass() }
 
     ////////////////////////////
     // Emergency DT reactions //
@@ -481,7 +467,7 @@ class PvPOpening extends GameplanImperative {
           // Robo before range //
           ///////////////////////
 
-          if (employing(PvPRoboBeforeRange)) {
+          if (employing(PvPTechBeforeRange)) {
             buildOrder(
               Get(Protoss.RoboticsFacility),
               Get(17, Protoss.Probe),
@@ -542,7 +528,7 @@ class PvPOpening extends GameplanImperative {
     buildOrder(Get(Protoss.Gateway), Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore))
     if (employing(PvPGateCoreGate) || employing(PvP1012)) { get(2, Protoss.Gateway) }
     buildOrder(Get(Protoss.Dragoon))
-    if ( ! employing(PvPRoboBeforeRange)) { get(Protoss.DragoonRange) }
+    if ( ! employing(PvPTechBeforeRange)) { get(Protoss.DragoonRange) }
 
     //////////
     // Tech //
@@ -551,9 +537,7 @@ class PvPOpening extends GameplanImperative {
     if (employing(PvPRobo)) {
       get(Protoss.RoboticsFacility)
 
-      trainRoboUnits()
-
-      if (getObservers) {
+      if (getObservers || getObservatory) {
         if (enemyDarkTemplarLikely && units(Protoss.Observer) == 0) {
           if (units(Protoss.Observatory) == 0 && gas < 100) {
             cancelIncomplete(Protoss.RoboticsSupportBay)
@@ -572,17 +556,22 @@ class PvPOpening extends GameplanImperative {
           get(Protoss.RoboticsSupportBay)
         }
       } else {
-        cancelIncomplete(Protoss.Observatory)
+        if ( ! getObservatory) { cancelIncomplete(Protoss.Observatory) }
         cancelIncomplete(Protoss.Observer)
         get(Protoss.RoboticsSupportBay)
-        if (employing(PvPRoboBeforeRange)) {
-          get(Protoss.ShuttleSpeed)
-        }
       }
 
-      if (unitsComplete(Protoss.Reaver) > 1 && upgradeStarted(Protoss.ShuttleSpeed)) {
-        harass()
+      if (employing(PvPTechBeforeRange) && ! getObservers) {
+        get(Protoss.ShuttleSpeed)
+        pump(Protoss.Reaver, 1)
+        pump(Protoss.Shuttle, 1)
+        pump(Protoss.Reaver)
+      } else {
+        trainRoboUnits()
       }
+
+      get(2, Protoss.Gateway)
+      get(Protoss.DragoonRange)
 
       if (shouldExpand && ! With.geography.ourNatural.units.exists(u =>
         u.isEnemy
@@ -593,9 +582,6 @@ class PvPOpening extends GameplanImperative {
       }
 
       trainGatewayUnits()
-
-      get(2, Protoss.Gateway)
-      get(Protoss.DragoonRange)
       get(3, Protoss.Gateway)
     } else if (speedlotAttack) {
       cancelIncomplete(Protoss.TemplarArchives)

@@ -97,7 +97,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     resetState()
     followIntent()
     fightHysteresisFrames = Math.max(0, fightHysteresisFrames - With.framesSince(lastFrame))
-    updatePassengers()
+    updateRiding()
     unit.intent.action.consider(unit)
   }
   private def resetState() {
@@ -160,7 +160,8 @@ class Agent(val unit: FriendlyUnitInfo) {
     passenger.agent._ride = passenger.agent._ride.filter(_ != unit)
     _passengers -= passenger
   }
-  def updatePassengers(): Unit = {
+  def updateRiding(): Unit = {
+    ride.filterNot(_.alive).foreach(_.agent.removePassenger(unit))
     passengers.view.filter(u => ! u.alive || ! u.isOurs || u.unitClass.isBuilding).foreach(removePassenger)
     unit.loadedUnits.filterNot(_passengers.contains).foreach(addPassenger)
   }

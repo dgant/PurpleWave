@@ -22,8 +22,6 @@ class MissionKillExpansion extends Mission {
 
   override def shouldForm: Boolean = With.blackboard.wantToAttack() && best.isDefined
 
-  override def shouldTerminate: Boolean = launched && (duration > Minutes(3)() || With.framesSince(lastFrameInBase) > Minutes(1)())
-
   var lastFrameInBase = 0
 
   // TODO: Should squads have a built-in default lock? Seems like recipe for bugs
@@ -38,12 +36,15 @@ class MissionKillExpansion extends Mission {
     vicinity = targetBase.get.heart.center
     lock.preference = PreferClose(vicinity)
     lock.acquire()
-    addUnits(lock.units)
   }
 
   override def run(): Unit = {
     if (vicinity.base.exists(b => units.exists(_.base.contains(b)))) {
       lastFrameInBase = With.frame
+    }
+    if (duration > Minutes(3)() || With.framesSince(lastFrameInBase) > Minutes(1)()) {
+      terminate()
+      return
     }
     SquadAutomation.targetFormAndSend(this)
   }

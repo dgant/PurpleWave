@@ -272,7 +272,6 @@ object DefaultCombat extends Action {
         val distanceIdeal   = idealTargetDistance(unit, target.get)
         val distanceCurrent = unit.pixelDistanceEdge(target.get)
         val distanceTowards = distanceCurrent - distanceIdeal
-        val danceForce      = if (distanceTowards > 0) Forces.threat else Forces.travel
         exactDistance = Some(Math.abs(distanceTowards))
         if (pixelFormationAttack.isDefined && distanceTowards > 0) {
           unit.agent.act("FormAttk")
@@ -295,7 +294,7 @@ object DefaultCombat extends Action {
           Commander.move(unit)
           return
         } else {
-          forces(danceForce) = Potential.unitAttraction(unit, target.get, distanceTowards)
+          forces(Forces.threat) = Potential.avoidThreats(unit)
           forces(Forces.spreading) = unit.agent.receivedPushForce()
           if (retreat(unit)) {
             unit.agent.act(unit.agent.lastAction.map(_.replaceAll("Retreat", "Kite")).getOrElse("Kite"))

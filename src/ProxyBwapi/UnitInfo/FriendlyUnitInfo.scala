@@ -2,15 +2,14 @@ package ProxyBwapi.UnitInfo
 
 import Information.Grids.Floody.AbstractGridFloody
 import Lifecycle.With
-import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Agency.{Agent, Intention}
 import Micro.Formation._
-import Tactics.Squads.Squad
 import Performance.Cache
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
+import Tactics.Squads.Squad
 import Utilities.Forever
 
 import scala.collection.JavaConverters._
@@ -30,13 +29,14 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
     _knownToEnemy = _knownToEnemy || visibleToOpponents
     lazy val tryingToAttackHere = canAttack && target.exists(t => t.isEnemyOf(this) &&   inRangeToAttack(t))
     lazy val tryingToAttackAway = canAttack && target.exists(t => t.isEnemyOf(this) && ! inRangeToAttack(t))
-    _framesFailingToMove += 1 - Maff.fromBoolean(flying || unitClass.floats || pixel != previousPixel(1) || ! canMove || ( ! agent.tryingToMove && ! tryingToAttackAway))
-    _framesFailingToAttack += 1 - Maff.fromBoolean(cooldownLeft > 0 || ! tryingToAttackHere)
+    if (flying || unitClass.floats || pixel != previousPixel(1) || ! canMove || ( ! agent.tryingToMove && ! tryingToAttackAway))
+      _framesFailingToMove = 0 else _framesFailingToMove += 1
+    if (cooldownLeft > 0 || ! tryingToAttackHere) _framesFailingToAttack = 0 else _framesFailingToAttack += 1
     if (remainingOccupationFrames > 0) _lastFrameOccupied = With.frame
   }
 
   def knownToEnemy  : Boolean = _knownToEnemy
-  def seeminglyStuck: Boolean = _framesFailingToMove > 24 || _framesFailingToAttack > 24
+  def seeminglyStuck: Boolean = _framesFailingToMove > 24 || _framesFailingToAttack > Math.max(24, cooldownMaxAirGround + 2)
   def resetSticking(): Unit = {
     _framesFailingToMove = 0
     _framesFailingToAttack = 0

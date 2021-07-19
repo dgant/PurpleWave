@@ -29,6 +29,7 @@ class Preplacement extends TimedTask {
 
   private def preplaceZone(zone: Zone): Unit = {
     val bounds        = zone.boundary
+    if (bounds.cornerTilesInclusive.distinct.length < 4) return // Alchemist has a degenerate 1xN zone
     val exitDirection = zone.exit.map(_.direction).getOrElse(zone.centroid.subtract(SpecificPoints.tileMiddle).direction)
     val exitTile      = zone.exit.map(_.pixelCenter.tile).getOrElse(zone.centroid)
     val tilesFront    = bounds.cornerTilesInclusive.sortBy(t => Math.min(Math.abs(t.x - exitTile.x), Math.abs(t.y - exitTile.y))).take(2)

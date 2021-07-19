@@ -13,7 +13,7 @@ class Bank {
   private var gasLeft         = 0
   private var supplyLeft      = 0
 
-  val requests = new mutable.PriorityQueue[LockCurrency]()(Ordering.by( - _.owner.priority))
+  val requests = new mutable.PriorityQueue[LockCurrency]()(Ordering.by( - _.owner.priorityUntouched))
   var requestsLast: Seq[LockCurrency] = Seq.empty
   
   def update() {

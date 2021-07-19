@@ -15,7 +15,7 @@ class SquadCatchDTRunby extends Squad {
     lock.matcher = MatchMobileDetector
     lock.counter = CountOne
     lock.preference = PreferClose(destination())
-    addUnits(lock.acquire())
+    lock.acquire()
   }
 
   override def run(): Unit = {

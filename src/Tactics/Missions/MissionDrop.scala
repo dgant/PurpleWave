@@ -50,8 +50,6 @@ abstract class MissionDrop extends Mission {
     With.blackboard.wantToHarass() && With.units.existsOurs(MatchTransport) && additionalFormationConditions
   }
 
-  final override protected def shouldTerminate: Boolean = itinerary.isEmpty || duration > Seconds(75)() && state != Raiding
-
   final private def transition(newState: DropState): Unit = {
     if (state != newState) { With.logger.debug(f"$this transitioning from $state to $newState") }
     state = newState
@@ -100,14 +98,15 @@ abstract class MissionDrop extends Mission {
   final override def run(): Unit = {
     transports --= transports.view.filterNot(_.alive)
     passengers --= passengers.view.filterNot(_.alive)
-    if (passengers.isEmpty) { terminate(); return }
+    if (duration > Seconds(75)() && state != Raiding && state != Evacuating) { terminate("Expired"); return }
+    if (passengers.isEmpty) { terminate("No passengers left"); return }
     if (transports.isEmpty) {
+      // Godspeed you poor souls
       if (Seq(Raiding, Evacuating).contains(state)) { passengers.foreach(_.agent.commit = true) }
-      terminate()
-      return
+      terminate("No transports left"); return
     }
     while (itinerary.headOption.exists(skipBase)) { itinerary.dequeue() }
-    if (itinerary.isEmpty) { terminate(); return }
+    if (itinerary.isEmpty) { terminate("Empty itinerary"); return }
     updateVicinity()
 
 
@@ -118,7 +117,7 @@ abstract class MissionDrop extends Mission {
     if (state == Raiding    && ! vicinity.base.exists(itinerary.contains))                  { transition(Evacuating)  }
     if (state == Raiding    && shouldStopRaiding)                                           { transition(Evacuating)  }
     if (state == Evacuating && passengers.forall(_.loaded))                                 { transition(if (itinerary.isEmpty) Escaping else Travelling) }
-    if (state == Escaping   && units.forall(u => u.base.exists(_.owner.isUs) || ! u.visibleToOpponents)) { terminate(); return }
+    if (state == Escaping   && units.forall(u => u.base.exists(_.owner.isUs) || ! u.visibleToOpponents)) { terminate("Escaped!"); return }
     state match {
       case Assembling => assemble()
       case Travelling => travel()

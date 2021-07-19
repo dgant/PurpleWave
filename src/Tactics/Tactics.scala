@@ -8,7 +8,7 @@ import Planning.Plans.Army._
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Tactics.Missions.{Mission, MissionKillExpansion}
+import Tactics.Missions.{Mission, MissionKillExpansion, MissionReaverDrop}
 import Tactics.Squads._
 import Utilities.Minutes
 
@@ -27,44 +27,45 @@ class Tactics extends TimedTask {
   // Missions //
   //////////////
 
-  private lazy val missionKillExpansion       = addMission(new MissionKillExpansion)
+  private val missionKillExpansion      = addMission(new MissionKillExpansion)
+  private val missionReaverDrop         = addMission(new MissionReaverDrop)
 
   /////////////////////
   // Priority squads //
   ////////////////////
 
-  private lazy val clearBurrowedBlockers      = addPriorityTactic(new SquadClearExpansionBlockers)
-  private lazy val ejectScout                 = addPriorityTactic(new SquadEjectScout)
-  private lazy val followBuildOrder           = addPriorityTactic(new FollowBuildOrder)
-  private lazy val scoutWithOverlord          = addPriorityTactic(new SquadInitialOverlordScout)
-  private lazy val defendAgainstProxy         = addPriorityTactic(new DefendAgainstProxy)
-  private lazy val defendFightersAgainstRush  = addPriorityTactic(new DefendFightersAgainstRush)
-  private lazy val defendAgainstWorkerRush    = addPriorityTactic(new DefendAgainstWorkerRush)
-  private lazy val defendFFEAgainst4Pool      = addPriorityTactic(new DefendFFEWithProbes)
-  private lazy val makeDarkArchons            = addPriorityTactic(new SquadMergeDarchons)
-  private lazy val mindControl                = addPriorityTactic(new SquadMindControl)
-  private lazy val scoutWithWorkers           = addPriorityTactic(new SquadWorkerScout)
-  private lazy val scoutForCannonRush         = addPriorityTactic(new ScoutForCannonRush)
-  private lazy val scoutExpansions            = addPriorityTactic(new SquadScoutExpansions)
-  private lazy val monitorWithObserver        = addPriorityTactic(new MonitorTerranWithObserver)
+  private val clearBurrowedBlockers     = addPriorityTactic(new SquadClearExpansionBlockers)
+  private val ejectScout                = addPriorityTactic(new SquadEjectScout)
+  private val followBuildOrder          = addPriorityTactic(new FollowBuildOrder)
+  private val scoutWithOverlord         = addPriorityTactic(new SquadInitialOverlordScout)
+  private val defendAgainstProxy        = addPriorityTactic(new DefendAgainstProxy)
+  private val defendFightersAgainstRush = addPriorityTactic(new DefendFightersAgainstRush)
+  private val defendAgainstWorkerRush   = addPriorityTactic(new DefendAgainstWorkerRush)
+  private val defendFFEAgainst4Pool     = addPriorityTactic(new DefendFFEWithProbes)
+  private val makeDarkArchons           = addPriorityTactic(new SquadMergeDarchons)
+  private val mindControl               = addPriorityTactic(new SquadMindControl)
+  private val scoutWithWorkers          = addPriorityTactic(new SquadWorkerScout)
+  private val scoutForCannonRush        = addPriorityTactic(new ScoutForCannonRush)
+  private val scoutExpansions           = addPriorityTactic(new SquadScoutExpansions)
+  private val monitorWithObserver       = addPriorityTactic(new MonitorTerranWithObserver)
 
   //////////////////
   // Basic squads //
   //////////////////
 
   private lazy val baseSquads: Map[Base, SquadDefendBase] = With.geography.bases.map(base => (base, new SquadDefendBase(base))).toMap
-  private lazy val cloakSquad = new SquadCloakedHarass
-  private lazy val catchDTRunby = new SquadCatchDTRunby
-  private lazy val attackSquad = new SquadAttack
+  private val cloakSquad = new SquadCloakedHarass
+  private val catchDTRunby = new SquadCatchDTRunby
+  private val attackSquad = new SquadAttack
 
   ///////////////////////
   // Background squads //
   ///////////////////////
 
-  private lazy val gather                     = addBackgroundTactic(new Gather)
-  private lazy val chillOverlords             = addBackgroundTactic(new ChillOverlords)
-  private lazy val doFloatBuildings           = addBackgroundTactic(new DoFloatBuildings)
-  private lazy val scan                       = addBackgroundTactic(new Scan)
+  private val gather                     = addBackgroundTactic(new Gather)
+  private val chillOverlords             = addBackgroundTactic(new ChillOverlords)
+  private val doFloatBuildings           = addBackgroundTactic(new DoFloatBuildings)
+  private val scan                       = addBackgroundTactic(new Scan)
 
   override protected def onRun(budgetMs: Long): Unit = {
     missions.foreach(_.launch())
@@ -73,7 +74,6 @@ class Tactics extends TimedTask {
     backgroundTactics.foreach(_.launch())
 
     // Moved in here temporarily due to issue where Tactics adding units clears a Squad's current list of enemies
-    With.squads.all.foreach(squad => squad.addUnits(With.recruiter.lockedBy(squad)))
     With.squads.run(budgetMs)
   }
 

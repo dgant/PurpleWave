@@ -28,11 +28,11 @@ class MacroQueue {
   }
 
   def audit: Vector[(Prioritized, Iterable[BuildRequest])] = {
-    requestsByPriority.toVector.sortBy(_._1.priority)
+    requestsByPriority.toVector.sortBy(_._1.priorityUntouched)
   }
 
   def queue: Vector[Buildable] = {
-    val requestQueue    = requestsByPriority.keys.toVector.sortBy(_.priority).flatten(requestsByPriority)
+    val requestQueue    = requestsByPriority.keys.toVector.sortBy(_.priorityUntouched).flatten(requestsByPriority)
     val unitsWanted     = new CountMap[UnitClass]
     val unitsCounted    = new CountMap[UnitClass]
     //val unitsExisting   = new CountMap[UnitClass]

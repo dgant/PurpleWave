@@ -15,7 +15,6 @@ object Unstick extends Action {
     && ! Protoss.Reaver(unit)
     && unit.canAttack
     && unit.seeminglyStuck
-
   )
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {

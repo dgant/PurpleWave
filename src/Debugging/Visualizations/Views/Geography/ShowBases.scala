@@ -4,6 +4,7 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
+import Mathematics.Points.TileRectangle
 
 object ShowBases extends View {
   
@@ -30,6 +31,7 @@ object ShowBases extends View {
         base.townHallArea.center,
         drawBackground = true,
         base.owner.colorDark)
+        DrawMap.tileRectangle(new TileRectangle(base.heart), Colors.DarkRed)
     })
   }
 }

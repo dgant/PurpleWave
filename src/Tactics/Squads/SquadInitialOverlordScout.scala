@@ -64,7 +64,7 @@ class SquadInitialOverlordScout extends Squad {
 
     vicinity = bases().head.townHallArea.center
     lock.preference = PreferClose(vicinity)
-    addUnits(lock.acquire())
+    lock.acquire()
   }
 
   def run(): Unit = {

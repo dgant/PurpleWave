@@ -24,6 +24,7 @@ class Squads extends TimedTask {
   override protected def onRun(budgetMs: Long): Unit = {
     With.units.ours.foreach(_.setSquad(None))
     all.foreach(_.clearUnits())
+    all.foreach(squad => squad.addUnits(With.recruiter.lockedBy(squad)))
     val batchSwap = _batchActive
     _batchActive = _batchNext
     _batchNext = batchSwap

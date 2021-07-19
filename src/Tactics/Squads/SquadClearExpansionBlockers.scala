@@ -38,11 +38,11 @@ class SquadClearExpansionBlockers extends Squad {
 
     vicinity = target.get
     detectorLock.preference = PreferClose(vicinity)
-    addUnits(detectorLock.acquire())
+    detectorLock.acquire()
 
     if (With.enemies.exists(_.isZerg) || detectorLock.units.forall(_.framesToTravelTo(vicinity) > Seconds(5)())) {
       sweeperLock.preference = PreferClose(vicinity)
-      addUnits(sweeperLock.acquire())
+      sweeperLock.acquire()
     } else {
       sweeperLock.release()
     }

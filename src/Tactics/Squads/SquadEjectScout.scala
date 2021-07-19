@@ -29,7 +29,6 @@ class SquadEjectScout extends Squad {
     lock.counter = CountOne
     lock.preference = PreferClose(targetScout().get.pixel)
     lock.acquire()
-    addUnits(lock.units)
   }
   
   override def run() {

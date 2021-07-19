@@ -6,9 +6,9 @@ import Tactics.Squads.Squad
 
 trait Mission extends Squad {
   protected def shouldForm: Boolean
-  protected def shouldTerminate: Boolean
   protected def recruit(): Unit
   protected def reset(): Unit = {}
+  protected def onRun(): Unit = {}
 
   var launched: Boolean = false
   var launchFrame: Int = 0
@@ -17,36 +17,22 @@ trait Mission extends Squad {
   private def nextUnits: Iterable[FriendlyUnitInfo] = With.recruiter.lockedBy(this)
   final def launch(): Unit = {
     if (launched) {
-      if (nextUnits.isEmpty) {
-        With.logger.debug(f"Terminating $this (nextUnits is empty)")
-        terminate()
-      } else if (shouldTerminate) {
-        With.logger.debug(f"Terminating $this (Termination condition reached)")
-        terminate()
-      } else {
-        With.recruiter.renew(this)
-      }
-    } else if (shouldForm && ! shouldTerminate) {
+      With.recruiter.renew(this)
+    } else if (shouldForm) {
       reset()
       launched = true
       launchFrame = With.frame
       recruit()
-      With.logger.debug(f"Launching $this to ${vicinity.base.getOrElse(vicinity.tile)} with ${unitsNext.view.map(_.toString).mkString(", ")}")
+      With.logger.debug(f"Launching $this to ${vicinity.base.getOrElse(vicinity.tile)} with ${With.recruiter.lockedBy(this).view.map(_.toString).mkString(", ")}")
     }
-    if (launched) {
-      addUnits(nextUnits)
-      With.recruiter.locksOf(this).foreach(_.interruptable = false)
-    } else {
-      terminate()
-    }
+    With.recruiter.locksOf(this).foreach(_.interruptable = false)
   }
 
-  final def terminate(): Unit = {
+  final def terminate(reason: String = ""): Unit = {
     if (launched) {
-      With.logger.debug(f"Terminating $this")
+      With.logger.debug(f"Terminating $this: $reason")
     }
     launched = false
     With.recruiter.release(this)
-    reset()
   }
 }

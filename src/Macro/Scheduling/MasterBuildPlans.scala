@@ -58,7 +58,7 @@ class MasterBuildPlans {
     plans.keys.foreach(build => {
       // TODO: This can break really badly!
       while (plans(build).size > buildsNeeded.getOrElse(build, 0)) {
-        val removablePlan = Maff.maxBy(plans(build).filterNot(With.bank.hasSpentRequest))(_.priority)
+        val removablePlan = Maff.maxBy(plans(build).filterNot(With.bank.hasSpentRequest))(_.priorityUntouched)
         removablePlan.foreach(plans(build).-=)
       }
     })

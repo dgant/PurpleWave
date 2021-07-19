@@ -73,7 +73,7 @@ class SquadScoutExpansions extends Squad {
     vicinity = toScoutBaseSorted.head.townHallArea.center
 
     lock.preference = PreferClose(vicinity)
-    addUnits(lock.acquire())
+    lock.acquire()
   }
 
   def run(): Unit = {

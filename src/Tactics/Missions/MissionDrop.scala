@@ -61,7 +61,7 @@ abstract class MissionDrop extends Mission {
     if (base.heart.tileDistanceFast(SpecificPoints.tileMiddle) < 32 && ! base.zone.island) return true
     if (requireWorkers && base.heart.visible && base.units.forall(u => ! u.isEnemy || ! MatchWorker(u))) return true
     if (itinerary.size > 1 && With.frame < Minutes(10)() && ! base.owner.isEnemy) return true
-    if ( ! base.owner.isEnemy && base.units.exists(u => u.likelyStillThere && u.isEnemy)) return true
+    if ( ! base.owner.isEnemy && base.units.exists(u => u.likelyStillThere && u.isEnemy && u.canAttack && u.canMove && ! u.unitClass.isWorker)) return true
     With.framesSince(base.lastScoutedFrame) < Seconds(45)() && ! base.owner.isEnemy
   }
 
@@ -74,8 +74,8 @@ abstract class MissionDrop extends Mission {
     val targetBase = Maff.sampleWeighted[Base](bases, b =>
       if (b.owner.isNeutral) With.framesSince(b.lastScoutedFrame)
       else if (b.mineralsLeft < 5000) 1
-      else if (With.scouting.enemyMain.contains(b)) if (With.frame > Minutes(12)()) 0 else 32
-      else if (With.scouting.enemyNatural.contains(b)) if (With.frame > Minutes(16)()) 0 else 8
+      else if (With.scouting.enemyMain.contains(b)) if (With.frame > Minutes(12)()) 0 else 32 + 32 * With.scouting.enemyProgress
+      else if (With.scouting.enemyNatural.contains(b)) if (With.frame > Minutes(16)()) 0 else 1 + 32 * With.scouting.enemyProgress
       else b.heart.tileDistanceGroundManhattan(With.scouting.enemyMuscleOrigin)).get
     val itineraries = Vector(With.geography.itineraryCounterwise(With.geography.ourMain, targetBase), With.geography.itineraryClockwise(targetBase, With.geography.ourMain))
       .sortBy(_.size)

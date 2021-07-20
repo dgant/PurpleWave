@@ -214,7 +214,7 @@ object DefaultCombat extends Action {
     val goalPotshot = techniqueIs(Abuse, Fallback, Aim) || Protoss.Reaver(unit)
     val goalDance   = techniqueIs(Abuse, Dance)
     val goalEngage  = techniqueIs(Fight, Abuse, Dance)
-    var goalRetreat = techniqueIs(Fallback, Flee, Excuse)
+    val goalRetreat = techniqueIs(Fallback, Flee, Excuse)
     val goalKeepGap = techniqueIs(Abuse)
 
     /////////////

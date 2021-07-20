@@ -568,7 +568,9 @@ class PvPOpening extends GameplanImperative {
       if (employing(PvPTechBeforeRange) && ! getObservers) {
         get(Protoss.ShuttleSpeed)
         pump(Protoss.Reaver, 1)
-        pump(Protoss.Shuttle, 1)
+        if (unitsEver(Protoss.Shuttle) == 0) {
+          pump(Protoss.Shuttle, 1) // Conditional pump() instead of buildOrder to ensure smooth usage of robo
+        }
         pump(Protoss.Reaver)
       } else {
         trainRoboUnits()

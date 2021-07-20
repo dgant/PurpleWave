@@ -64,6 +64,10 @@ trait MacroCounting {
     With.units.countOurs(MatchAnd(MatchComplete, MatchOr(matchers: _*)))
   }
 
+  def unitsEver(matchers: UnitMatcher*): Int = {
+    With.units.countEver(u => u.isOurs && u.isAny(matchers: _*))
+  }
+
   def framesUntilUnit(unitClass: UnitClass): Int = {
     With.projections.unit(unitClass)
   }

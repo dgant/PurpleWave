@@ -72,6 +72,7 @@ class MissionReaverDrop extends MissionDrop {
 
   override protected def raid(): Unit = {
     SquadAutomation.target(this)
+    targetQueue = targetQueue.map(_.filter(t => t.unitClass.isWorker || units.exists(u => t.canAttack(u) && t.inRangeToAttack(u))))
     transports.foreach(_.intend(this, new Intention { action = new ActionRaidTransport}))
     passengers.foreach(_.intend(this, new Intention { toTravel = Some(vicinity) }))
     passengers.foreach(_.agent.commit = true)

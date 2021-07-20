@@ -430,6 +430,8 @@ object Commander {
       unit.bwapiUnit.cancelResearch()
     } else if (unit.upgrading) {
       unit.bwapiUnit.cancelUpgrade()
+    } else if (unit.training) {
+      unit.bwapiUnit.cancelTrain()
     } else {
       unit.bwapiUnit.cancelConstruction()
     }

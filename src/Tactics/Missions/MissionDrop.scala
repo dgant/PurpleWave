@@ -97,8 +97,8 @@ abstract class MissionDrop extends Mission {
   }
 
   final override def run(): Unit = {
-    transports --= transports.view.filterNot(_.alive)
-    passengers --= passengers.view.filterNot(_.alive)
+    transports --= transports.filterNot(_.alive)
+    passengers --= passengers.filterNot(_.alive)
     if (duration > Seconds(75)() && state != Raiding && state != Evacuating) { terminate("Expired"); return }
     if (passengers.isEmpty) { terminate("No passengers left"); return }
     if (transports.isEmpty) {
@@ -158,10 +158,16 @@ abstract class MissionDrop extends Mission {
   class ActionAssembleTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
       val unloaded = passengers.filterNot(_.loaded)
-      if (unloaded.isEmpty) Idle.consider(transport) else {
-        // TODO: Avoid danger
+      if (unloaded.isEmpty) {
+        transport.agent.toTravel = Some(vicinity)
+        Idle.consider(transport)
+      } else {
         val centroid = Maff.centroid(unloaded.view.map(_.pixel))
-        Commander.rightClick(transport, unloaded.minBy(_.pixelDistanceSquared(centroid)))
+        if (transport.agent.withinSafetyMargin) {
+          Commander.rightClick(transport, unloaded.minBy(_.pixelDistanceSquared(centroid)))
+        } else {
+          Retreat.consider(transport)
+        }
       }
     }
   }
@@ -199,9 +205,9 @@ abstract class MissionDrop extends Mission {
       val runway = itinerary.headOption.map(_.heart.center).getOrElse(vicinity)
       val droppables = transport.loadedUnits
         .filter(p =>
-          p.pixelDistanceCenter(runway) <= Math.max(0, p.effectiveRangePixels - 64)
-          || (p.canAttack && transport.tile.enemyRangeAir >= With.grids.enemyRangeAir.margin)
-          || p.matchups.targetsInRange.exists(t => t.unitClass.isWorker || t.canAttack))
+          p.pixelDistanceCenter(runway) <= Math.max(48, p.effectiveRangePixels - 96)
+          || transport.doomed
+          || p.matchups.targetsInRange.exists(_.gathering))
         .sortBy(_.subjectiveValue * (if (transport.tile.enemyRangeAir > 0) -1 else 1))
       droppables.headOption.foreach(Commander.unload(transport, _))
       transport.agent.toTravel = Some(runway)

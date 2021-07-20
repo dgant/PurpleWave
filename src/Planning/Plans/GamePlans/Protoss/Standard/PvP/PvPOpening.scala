@@ -586,8 +586,9 @@ class PvPOpening extends GameplanImperative {
       }
 
       trainGatewayUnits()
-      get(3, Protoss.Gateway)
+      get(2, Protoss.Gateway)
       get(Protoss.DragoonRange)
+      get(3, Protoss.Gateway)
     } else if (speedlotAttack) {
       cancelIncomplete(Protoss.TemplarArchives)
       get(Protoss.CitadelOfAdun)

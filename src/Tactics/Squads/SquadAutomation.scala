@@ -19,6 +19,14 @@ object SquadAutomation {
   def target(squad: Squad, to: Pixel): Unit = {
     squad.targetQueue = Some(SquadAutomation.rankedEnRoute(squad, to))
   }
+  def targetRaid(squad: Squad): Unit = targetRaid(squad, squad.vicinity)
+  def targetRaid(squad: Squad, to: Pixel): Unit = {
+    squad.targetQueue = Some(SquadAutomation.rankForArmy(
+      squad,
+      unrankedTargetsTo(squad, to).view
+        .filter(t => t.unitClass.isWorker || squad.units.exists(u => t.canAttack(u) && t.inRangeToAttack(u)))))
+  }
+
   def rankForArmy(group: UnitGroup, targets: Seq[UnitInfo]): Seq[UnitInfo] = {
     targets.sortBy(t =>
       (t.pixelDistanceCenter(group.centroidKey)

@@ -9,11 +9,14 @@ import Mathematics.Points.SpecificPoints
 import Micro.Actions.Basic.DoNothing
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Potshot
+import Micro.Actions.Commands.Move
+import Micro.Actions.Protoss.Shuttle.Shuttling
 import Micro.Actions.{Action, Idle}
 import Micro.Agency.{Commander, Intention}
 import Micro.Coordination.Pathing.MicroPathing
 import Planning.UnitMatchers.{MatchTransport, MatchWorker}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Tactics.Squads.SquadAutomation
 import Utilities.{Minutes, Seconds}
 
 import scala.collection.mutable
@@ -30,9 +33,9 @@ abstract class MissionDrop extends Mission {
   object Escaping extends DropState
 
   protected def additionalFormationConditions: Boolean
-  protected def shouldStopRaiding: Boolean = false
   protected def requireWorkers: Boolean = false
-  protected def raid(): Unit
+  protected def shouldStopRaiding: Boolean = false
+  protected def shouldGoHome: Boolean = false
 
   val itinerary = new mutable.Queue[Base]
   val transports = new ArrayBuffer[FriendlyUnitInfo]
@@ -110,6 +113,12 @@ abstract class MissionDrop extends Mission {
     if (itinerary.isEmpty) { terminate("Empty itinerary"); return }
     updateVicinity()
 
+    if (shouldGoHome) {
+      state match {
+        case Recruiting | Assembling | Travelling | Landing => transition(Escaping)
+        case Raiding => transition(Evacuating)
+      }
+    }
     if (state == Recruiting)                                                                { transition(Assembling)  }
     if (state == Assembling && passengers.forall(_.transport.exists(transports.contains)))  { transition(Travelling)  }
     if (state == Travelling && passengers.forall(_.base.exists(vicinity.base.contains)))    { transition(Landing)     }
@@ -144,6 +153,12 @@ abstract class MissionDrop extends Mission {
     transports.foreach(_.intend(this, new Intention { action = new ActionLandTransport }))
     passengers.foreach(_.intend(this, new Intention { action = new ActionLandPassenger }))
   }
+  protected def raid(): Unit = {
+    SquadAutomation.targetRaid(this)
+    transports.foreach(_.intend(this, new Intention { action = new ActionRaidTransport}))
+    passengers.foreach(_.intend(this, new Intention { toTravel = Some(vicinity) }))
+    passengers.foreach(_.agent.commit = true)
+  }
   private def evacuate(): Unit = {
     passengers.foreach(_.agent.commit = false)
     transports.foreach(_.intend(this, new Intention { action = new ActionEvacuateTransport }))
@@ -164,7 +179,15 @@ abstract class MissionDrop extends Mission {
       } else {
         val centroid = Maff.centroid(unloaded.view.map(_.pixel))
         if (transport.agent.withinSafetyMargin) {
-          Commander.rightClick(transport, unloaded.minBy(_.pixelDistanceSquared(centroid)))
+          val toPickup = unloaded.minBy(_.pixelDistanceSquared(centroid))
+          if (transport.pixelDistanceCenter(toPickup) < Shuttling.pickupRadius) {
+            Commander.rightClick(transport, toPickup)
+          } else {
+            // Let Commander overshoot the Shuttle to keep it moving
+            transport.agent.toTravel = Some(toPickup.pixel)
+            Commander.move(transport)
+          }
+
         } else {
           Retreat.consider(transport)
         }
@@ -175,12 +198,21 @@ abstract class MissionDrop extends Mission {
   class ActionAssemblePassenger extends Action {
     override protected def perform(passenger: FriendlyUnitInfo): Unit = {
       Potshot.delegate(passenger)
-      if (transports.isEmpty) Idle.consider(passenger) else Commander.rightClick(passenger, transports.minBy(_.pixelDistanceSquared(passenger)))
+      if (passenger.visibleToOpponents || ! passenger.agent.withinSafetyMargin) {
+        Retreat.consider(passenger)
+      } else {
+        if (transports.isEmpty) Idle.consider(passenger) else Commander.rightClick(passenger, transports.minBy(_.pixelDistanceSquared(passenger)))
+      }
     }
   }
 
   class ActionTravelTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
+      val mapEdgeMarginTiles = Math.min(With.mapPixelWidth, With.mapPixelHeight) - Math.max(3, Seq(
+        vicinity.tile.x,
+        vicinity.tile.y,
+        With.mapTileWidth - vicinity.tile.x,
+        With.mapTileHeight - vicinity.tile.y).min)
       val profile = new PathfindProfile(transport.tile)
       profile.end                 = Some(vicinity.tile)
       profile.costEnemyVision     = 5
@@ -188,14 +220,18 @@ abstract class MissionDrop extends Mission {
       profile.costThreat          = 125
       profile.canCrossUnwalkable  = Some(true)
       profile.canEndUnwalkable    = Some(true)
-      profile.repulsors           = Vector(PathfindRepulsor(SpecificPoints.middle, 1.0, Math.min(With.mapPixelWidth, With.mapPixelHeight) * 2 / 3))
+      profile.repulsors           = Vector(PathfindRepulsor(SpecificPoints.middle, 1.0, 32 * mapEdgeMarginTiles))
+      // CPU sparing since this gets expensive. Use a length that's enough to path around, say, a cannon or turret
+      profile.lengthMaximum       = Some(32)
       val path = profile.find
-      if (path.pathExists) { MicroPathing.tryMovingAlongTilePath(transport, path) }
-      else {
+      if (path.pathExists) {
+        MicroPathing.tryMovingAlongTilePath(transport, path)
+      } else {
         With.logger.debug(f"$this: No path available to $vicinity")
         transport.agent.toTravel = Some(vicinity)
         transport.agent.toReturn = Some(vicinity)
         Retreat.consider(transport)
+        Move.consider(transport)
       }
     }
   }
@@ -204,10 +240,9 @@ abstract class MissionDrop extends Mission {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
       val runway = itinerary.headOption.map(_.heart.center).getOrElse(vicinity)
       val droppables = transport.loadedUnits
-        .filter(p =>
-          p.pixelDistanceCenter(runway) <= Math.max(48, p.effectiveRangePixels - 96)
-          || transport.doomed
-          || p.matchups.targetsInRange.exists(_.gathering))
+        .filter(passenger =>
+          transport.doomFrame < transport.topSpeed * transport.pixelDistanceCenter(runway) + Seconds(3)()
+          || passenger.pixelDistanceCenter(runway) <= Math.max(64, passenger.effectiveRangePixels - 96))
         .sortBy(_.subjectiveValue * (if (transport.tile.enemyRangeAir > 0) -1 else 1))
       droppables.headOption.foreach(Commander.unload(transport, _))
       transport.agent.toTravel = Some(runway)

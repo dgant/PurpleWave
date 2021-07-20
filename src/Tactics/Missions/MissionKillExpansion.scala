@@ -3,6 +3,7 @@ package Tactics.Missions
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
+import Planning.Predicates.MacroFacts
 import Planning.UnitCounters.CountUpTo
 import Planning.UnitMatchers.{MatchAnd, MatchAntiGround, MatchWarriors}
 import Planning.UnitPreferences.PreferClose
@@ -12,25 +13,30 @@ import Utilities.Minutes
 class MissionKillExpansion extends Mission {
 
   def eligible: Seq[Base] = {
-    With.scouting.enemyMain.map(main =>
-      With.geography.enemyBases
-        .filterNot(_.metro == main.metro)
-        .filter(b => With.scouting.ourMuscleOrigin.pixelDistanceGround(b.heart) + 320 < With.scouting.threatOrigin.pixelDistanceGround(b.heart))).getOrElse(Seq.empty)
+    With.geography.enemyBases
+      .filterNot(base => With.scouting.enemyMain.exists(_.metro == base.metro))
+      .filter(base =>
+          base.heart.pixelDistanceGround(With.scouting.ourMuscleOrigin) + 320
+        < base.heart.pixelDistanceGround(With.scouting.threatOrigin))
   }
 
-  def best: Option[Base] = Maff.maxBy(eligible)(b => b.heart.pixelDistanceGround(With.scouting.threatOrigin) - b.heart.pixelDistanceGround(With.geography.home))
+  def best: Option[Base] = Maff.maxBy(eligible)(base =>
+    2 * base.heart.pixelDistanceGround(With.scouting.threatOrigin)
+      - base.heart.pixelDistanceGround(With.scouting.ourMuscleOrigin))
 
-  override def shouldForm: Boolean = With.blackboard.wantToAttack() && best.isDefined
+  override def shouldForm: Boolean = (
+    With.blackboard.wantToAttack()
+    && MacroFacts.unitsComplete(MatchWarriors) >= 20
+    && best.isDefined)
 
   var lastFrameInBase = 0
 
-  // TODO: Should squads have a built-in default lock? Seems like recipe for bugs
   lock.matcher = MatchAnd(MatchWarriors, MatchAntiGround)
   lock.counter = CountUpTo(4)
   override def recruit(): Unit = {
     val targetBase = best
     if (targetBase.isEmpty) {
-      terminate()
+      terminate("No target base remaining")
       return
     }
     vicinity = targetBase.get.heart.center
@@ -42,8 +48,12 @@ class MissionKillExpansion extends Mission {
     if (vicinity.base.exists(b => units.exists(_.base.contains(b)))) {
       lastFrameInBase = With.frame
     }
-    if (duration > Minutes(3)() || With.framesSince(lastFrameInBase) > Minutes(1)()) {
-      terminate()
+    if (duration > Minutes(3)()) {
+      terminate("Exceeded duration")
+      return
+    }
+    if (With.framesSince(lastFrameInBase) > Minutes(1)()) {
+      terminate("Left or never made it to the base")
       return
     }
     SquadAutomation.targetFormAndSend(this)

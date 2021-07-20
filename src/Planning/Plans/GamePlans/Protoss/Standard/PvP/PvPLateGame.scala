@@ -71,11 +71,14 @@ class PvPLateGame extends GameplanImperative {
     shouldAttack &&= ! fearDeath
     shouldAttack &&= ! fearDT
     shouldAttack ||= shouldExpand
-    shouldSecondaryTech = gasPumps > 2 || (unitsComplete(Protoss.Reaver) > 2 && unitsComplete(Protoss.Shuttle) > 0) || techComplete(Protoss.PsionicStorm)
+    shouldSecondaryTech = miningBases > 2
+    shouldSecondaryTech ||= (unitsComplete(Protoss.Reaver) > 2 && unitsComplete(Protoss.Shuttle) > 0)
     shouldSecondaryTech &&= unitsComplete(Protoss.Gateway) >= targetGateways
     shouldSecondaryTech &&= With.units.ours.filter(Protoss.Nexus).forall(_.complete)
-    shouldSecondaryTech &&= primaryTech.contains(RoboTech) || (gasPumps > 2 && miningBases > 2)
+    shouldSecondaryTech &&= gasPumps > 1
     shouldSecondaryTech &&= miningBases > 1
+    shouldSecondaryTech &&= ! fearDeath
+    shouldSecondaryTech ||= units(Protoss.RoboticsSupportBay) > 0 && units(Protoss.TemplarArchives) > 0
     oversaturate = shouldExpand && ! fearDeath && ! fearContain
 
     lazy val commitToTech = unitsComplete(Protoss.Gateway) >= 5
@@ -150,8 +153,8 @@ class PvPLateGame extends GameplanImperative {
     trainArmy()
     addGates()
     fillerArmy()
-    secondaryTech()
     expand()
+    secondaryTech()
   }
 
   def doTrainArmy(): Unit = {

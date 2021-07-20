@@ -15,8 +15,13 @@ abstract class PvPStrategy extends Strategy {
 // Opening steps //
 ///////////////////
 
-object PvP3Zealot extends PvPStrategy
-object PvP5Zealot extends PvPStrategy
+object PvP3Zealot extends PvPStrategy {
+  // Longer maps
+  override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Arcadia, Heartbreak, Aztec, MatchPoint, TauCross)
+}
+object PvP5Zealot extends PvPStrategy {
+  // No blacklisting: Preserve this option against someone who insists on proxying
+}
 object PvP1012 extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP3Zealot, PvP5Zealot))
 }
@@ -43,7 +48,7 @@ object PvPRobo extends PvPStrategy {
 }
 object PvPDT extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreTech))
-  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.robo)
+  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.robo, With.fingerprints.forgeFe)
 }
 object PvP3GateGoon extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreTech, PvPGateCoreGate))

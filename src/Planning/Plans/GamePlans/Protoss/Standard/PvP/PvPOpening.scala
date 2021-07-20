@@ -157,10 +157,11 @@ class PvPOpening extends GameplanImperative {
     // Oops. We let them scout our DT rush. Maybe we can use it to our advantage.
     if (employing(PvPDT)
       && scoutCleared
-      && With.units.ours.filter(Protoss.TemplarArchives).exists(a => a.hasEverBeenVisibleToOpponents
-      && ! a.visibleToOpponents
-      && ! a.zone.units.exists(_.isEnemy)
-      && roll("SpeedlotAttack", 0.65))) {
+      && With.units.ours.filter(Protoss.TemplarArchives).exists(a =>
+        a.hasEverBeenVisibleToOpponents
+        && ! a.visibleToOpponents
+        && ! a.zone.units.exists(_.isEnemy))
+      && roll("SpeedlotAttack", 0.65)) {
       speedlotAttack = true
     }
 
@@ -235,7 +236,7 @@ class PvPOpening extends GameplanImperative {
         getCannons &&= ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
         getCannons &&= roll("DTSkipCannons", if (enemyRecentStrategy(With.fingerprints.dtRush)) 0.2 else 0.5)
       }
-      shouldExpand = unitsComplete(Protoss.DarkTemplar) > 0 || (safeToMoveOut && units(Protoss.DarkTemplar) > 0) || (upgradeComplete(Protoss.ZealotSpeed) && unitsComplete(MatchWarriors) >= 15)
+      shouldExpand = unitsComplete(Protoss.DarkTemplar) > 0 || (safeToMoveOut && units(Protoss.DarkTemplar) > 0) || (upgradeComplete(Protoss.ZealotSpeed) && unitsComplete(MatchWarriors) >= 20)
     } else if (employing(PvP3GateGoon)) {
       shouldExpand = unitsComplete(Protoss.Gateway) >= 3 && unitsComplete(MatchWarriors) >= 6
     } else if (employing(PvP4GateGoon)) {
@@ -274,7 +275,7 @@ class PvPOpening extends GameplanImperative {
     if (speedlotAttack) status("Speedlot")
     if (shouldAttack) status("Attack")
     if (shouldExpand) status("ExpandNow")
-    oversaturate = units(Protoss.Reaver) > 0 || units(Protoss.DarkTemplar) > 0 || units(Protoss.Gateway) > 3
+    oversaturate = (units(Protoss.Reaver) > 0 || units(Protoss.DarkTemplar) > 0 || minerals >= 450) && ! speedlotAttack && ! employing(PvP3GateGoon, PvP4GateGoon)
     if (shouldAttack) { attack() }
     if (upgradeStarted(Protoss.ShuttleSpeed)) { harass() }
 
@@ -543,14 +544,14 @@ class PvPOpening extends GameplanImperative {
 
       if (getObservers || getObservatory) {
         if (enemyDarkTemplarLikely && units(Protoss.Observer) == 0) {
-          if (units(Protoss.Observatory) == 0 && gas < 100) {
-            cancelIncomplete(Protoss.RoboticsSupportBay)
-            cancelOrders(Protoss.RoboticsSupportBay)
-          }
-          if (units(Protoss.Observer) == 0) {
+          if (units(Protoss.Observatory) == 0) {
+            if (gas < 100) {
+              cancelIncomplete(Protoss.RoboticsSupportBay)
+              cancelOrders(Protoss.RoboticsSupportBay)
+            }
+          } else if (unitsComplete(Protoss.Observatory) > 0 && units(Protoss.Observer) == 0) {
             cancelIncomplete(Protoss.Shuttle, Protoss.Reaver)
           }
-          cancelIncomplete()
         }
         get(Protoss.Observatory)
         if (With.fingerprints.dtRush.matches) {
@@ -643,15 +644,15 @@ class PvPOpening extends GameplanImperative {
     if (zAfterCore && zBeforeCore) buildOrder(Get(2, Protoss.Zealot))
     else if (zAfterCore || zBeforeCore) buildOrder(Get(Protoss.Zealot))
     buildOrder(Get(Protoss.Dragoon))
-    if (upgradeComplete(Protoss.ZealotSpeed, Protoss.Zealot.buildFrames + 72)) {
-      pump(Protoss.Dragoon, maximumConcurrently = 2)
-      pump(Protoss.Zealot)
+    if (upgradeComplete(Protoss.ZealotSpeed, 2 * Protoss.Zealot.buildFrames)) {
+      pump(Protoss.Dragoon, maximumConcurrently = 1)
+      pump(Protoss.Zealot, 12)
+      pump(Protoss.Dragoon)
     } else {
       pump(Protoss.Dragoon)
       if (
         (enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate) && With.frame < Minutes(4)())
-          || gas < 42
-          || minerals >= 125) {
+        || (gas < 42 && minerals >= 175 && ! employing(PvP3GateGoon, PvP4GateGoon))) {
         pump(Protoss.Zealot)
       }
     }

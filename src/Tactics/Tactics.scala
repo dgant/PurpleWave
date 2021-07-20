@@ -8,7 +8,7 @@ import Planning.Plans.Army._
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Tactics.Missions.{Mission, MissionKillExpansion, MissionReaverDrop}
+import Tactics.Missions._
 import Tactics.Squads._
 import Utilities.Minutes
 
@@ -28,6 +28,8 @@ class Tactics extends TimedTask {
   //////////////
 
   private val missionKillExpansion      = addMission(new MissionKillExpansion)
+  private val missionStormDrop          = addMission(new MissionStormDrop)
+  private val missionSpeedlotDrop       = addMission(new MissionSpeedlotDrop)
   private val missionReaverDrop         = addMission(new MissionReaverDrop)
 
   /////////////////////

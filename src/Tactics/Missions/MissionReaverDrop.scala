@@ -2,19 +2,29 @@ package Tactics.Missions
 
 import Lifecycle.With
 import Mathematics.Maff
-import Micro.Agency.Intention
 import Planning.Predicates.MacroFacts
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.{CountOne, CountUpTo}
-import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchTransport}
+import Planning.UnitMatchers._
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
-import Tactics.Squads.SquadAutomation
+import Utilities.Seconds
 
 class MissionReaverDrop extends MissionDrop {
 
-  override protected def additionalFormationConditions: Boolean = With.units.existsOurs(MatchAnd(Protoss.Reaver, MatchComplete))
+  override protected def additionalFormationConditions: Boolean = (
+    ! With.blackboard.wantToAttack()
+    && With.scouting.enemyProgress > 0.5
+    && MacroFacts.upgradeComplete(Protoss.ShuttleSpeed, Seconds(15)())
+    && With.units.existsOurs(MatchAnd(Protoss.Reaver, MatchComplete)))
+
+  override protected def shouldStopRaiding: Boolean = passengers.view
+    .filter(Protoss.Reaver)
+    .forall(reaver =>
+      reaver.doomed
+      || (reaver.matchups.threatsInRange.exists(MatchWarriors) && ! reaver.matchups.targetsInRange.exists(MatchWorker)))
+  override protected def shouldGoHome: Boolean = ! passengers.exists(Protoss.Reaver)
 
   private def recruitable(unit: UnitInfo) = unit.complete && ! unit.visibleToOpponents
 
@@ -39,7 +49,7 @@ class MissionReaverDrop extends MissionDrop {
     transportLock.preference = PreferClose(vicinity)
     transportLock.acquire()
     if (transportLock.units.isEmpty) {
-      failToRecruit()
+      terminate("No transports available")
       return
     }
 
@@ -51,7 +61,7 @@ class MissionReaverDrop extends MissionDrop {
     reaverLock.counter = CountUpTo(Maff.clamp(MacroFacts.unitsComplete(Protoss.Reaver) - 1, 1, 2))
     reaverLock.acquire()
     if (reaverLock.units.isEmpty) {
-      failToRecruit()
+      terminate("No reavers available")
       return
     }
     zealotDTLock.acquire()
@@ -63,18 +73,5 @@ class MissionReaverDrop extends MissionDrop {
     passengers ++= reaverLock.units
     passengers ++= zealotDTLock.units
     passengers ++= dragoonArchonLock.units
-  }
-
-  private def failToRecruit(): Unit = {
-    transportLock.release()
-    reaverLock.release()
-  }
-
-  override protected def raid(): Unit = {
-    SquadAutomation.target(this)
-    targetQueue = targetQueue.map(_.filter(t => t.unitClass.isWorker || units.exists(u => t.canAttack(u) && t.inRangeToAttack(u))))
-    transports.foreach(_.intend(this, new Intention { action = new ActionRaidTransport}))
-    passengers.foreach(_.intend(this, new Intention { toTravel = Some(vicinity) }))
-    passengers.foreach(_.agent.commit = true)
   }
 }

@@ -67,9 +67,11 @@ final class Scouting extends TimedTask with EnemyTechs {
     else Maff.weightedExemplar(muscle.map(u => (u.pixel, u.subjectiveValue))).nearestWalkableTile
   })
 
-  def enemyProgress: Double = Maff.clamp(1 - enemyMuscleOrigin.tileDistanceGroundManhattan(With.geography.home).toDouble / With.geography.home.tileDistanceGroundManhattan(mostBaselikeEnemyTile), 0, 1)
-
   @inline private def countMuscle(u: UnitInfo): Boolean = u.likelyStillThere && u.attacksAgainstGround > 0 && ! u.unitClass.isWorker && ! u.unitClass.isBuilding
+
+  def tugDistance: Int = With.geography.home.tileDistanceGroundManhattan(mostBaselikeEnemyTile)
+  def ourProgress: Double = Maff.clamp(1 - ourMuscleOrigin.tileDistanceGroundManhattan(With.scouting.mostBaselikeEnemyTile).toDouble / tugDistance, 0, 1)
+  def enemyProgress: Double = Maff.clamp(1 - enemyMuscleOrigin.tileDistanceGroundManhattan(With.geography.home).toDouble / tugDistance, 0, 1)
 
   def firstEnemyMain: Option[Base] = _firstEnemyMain
   def enemyMain: Option[Base] = _firstEnemyMain.filter(base => ! base.scouted || base.owner.isEnemy)

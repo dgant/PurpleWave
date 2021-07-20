@@ -32,7 +32,7 @@ object Retreat extends Action {
     lazy val enemySooner          = timeOriginUs + 96 >= timeOriginEnemy
     lazy val enemySieging         = unit.matchups.enemies.exists(_.isAny(MatchTank, Zerg.Lurker)) && ! unit.base.exists(_.owner.isEnemy)
     lazy val goalSidestep         = Protoss.DarkTemplar(unit) || (enemySieging && ! enemyCloser && ! enemySooner)
-    lazy val goalReturn           = ! unit.agent.isScout && ! goalSidestep && unit.agent.toReturn.exists(_.tile.enemyRangeAgainst(unit) < unit.enemyRangeGrid.margin)
+    lazy val goalReturn           = ! unit.agent.isScout && ! goalSidestep && unit.agent.toReturn.exists(_.tile.enemyRangeAgainst(unit) == 0)
     lazy val goalHome             = ! unit.agent.isScout && ! goalSidestep && (unit.zone != unit.agent.safety.zone && (enemyCloser || enemySooner))
     lazy val goalOrigin           = goalReturn || goalHome
     lazy val goalSafety           = ! unit.agent.withinSafetyMargin && ! goalOrigin

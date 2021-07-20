@@ -7,6 +7,7 @@ import scala.collection.immutable
 object Ring {
 
   private def pointsForRadius(radius: Int): immutable.IndexedSeq[Point] = {
+    if (radius == 0) return Vector(Point(0, 0))
     val rOut = radius * radius
     val rIn = if (radius < 1) 0 else (radius - 1) * (radius - 1)
     (-radius to radius).flatten(x =>

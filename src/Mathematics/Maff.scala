@@ -408,7 +408,7 @@ object Maff {
     if (indexFrom < indexTo) {
       rotation.view.slice(indexFrom, indexTo + 1)
     } else {
-      rotation.view.drop(indexTo) ++ rotation.view.take(indexFrom + 1)
+      rotation.view.drop(indexFrom) ++ rotation.view.take(indexTo + 1)
     }
   }
 }

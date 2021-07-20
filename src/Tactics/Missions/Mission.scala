@@ -25,6 +25,9 @@ trait Mission extends Squad {
       recruit()
       With.logger.debug(f"Launching $this to ${vicinity.base.getOrElse(vicinity.tile)} with ${With.recruiter.lockedBy(this).view.map(_.toString).mkString(", ")}")
     }
+    if (launched) {
+      With.squads.commission(this)
+    }
     With.recruiter.locksOf(this).foreach(_.interruptable = false)
   }
 

@@ -2,6 +2,7 @@ package Tactics.Missions
 
 import Lifecycle.With
 import Mathematics.Maff
+import Micro.Agency.Intention
 import Planning.Predicates.MacroFacts
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.{CountOne, CountUpTo}
@@ -19,10 +20,10 @@ class MissionReaverDrop extends MissionDrop {
 
   val transportLock = new LockUnits(this)
   transportLock.matcher = unit => MatchTransport(unit) && recruitable(unit)
+  transportLock.counter = CountOne
 
   val reaverLock = new LockUnits(this)
   reaverLock.matcher = unit => Protoss.Reaver(unit) && recruitable(unit)
-  reaverLock.counter = CountUpTo(2)
 
   val zealotDTLock = new LockUnits(this)
   zealotDTLock.matcher = unit => unit.isAny(Protoss.Zealot, Protoss.DarkTemplar) && recruitable(unit)
@@ -36,8 +37,6 @@ class MissionReaverDrop extends MissionDrop {
     populateItinerary()
     vicinity = itinerary.headOption.map(_.heart).getOrElse(With.scouting.mostBaselikeEnemyTile).center
     transportLock.preference = PreferClose(vicinity)
-
-    transportLock.counter = CountUpTo(Maff.clamp(MacroFacts.unitsComplete(Protoss.Reaver) - 1, 1, 2))
     transportLock.acquire()
     if (transportLock.units.isEmpty) {
       failToRecruit()
@@ -49,6 +48,7 @@ class MissionReaverDrop extends MissionDrop {
     zealotDTLock.preference = PreferClose(transportPixel)
     dragoonArchonLock.preference = PreferClose(transportPixel)
 
+    reaverLock.counter = CountUpTo(Maff.clamp(MacroFacts.unitsComplete(Protoss.Reaver) - 1, 1, 2))
     reaverLock.acquire()
     if (reaverLock.units.isEmpty) {
       failToRecruit()
@@ -72,6 +72,8 @@ class MissionReaverDrop extends MissionDrop {
 
   override protected def raid(): Unit = {
     SquadAutomation.target(this)
+    transports.foreach(_.intend(this, new Intention { action = new ActionRaidTransport}))
+    passengers.foreach(_.intend(this, new Intention { toTravel = Some(vicinity) }))
     passengers.foreach(_.agent.commit = true)
   }
 }

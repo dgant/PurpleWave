@@ -29,8 +29,7 @@ object BeReaver extends Action {
     lazy val attackingSoon = unit.matchups.targetsInRange.nonEmpty && unit.cooldownLeft < Math.min(unit.cooldownMaxGround / 4, unit.matchups.framesToLive)
     if (unit.agent.ride.isDefined
       && unit.transport.isEmpty
-      && ((inRangeNeedlessly &&  ! attackingSoon)
-        || unit.doomFrame < unit.cooldownLeft + With.latency.latencyFrames)) {
+      && ((inRangeNeedlessly &&  ! attackingSoon) || unit.doomFrame < unit.cooldownLeft + With.latency.latencyFrames)) {
       unit.agent.ride.foreach(Commander.rightClick(unit, _))
       if (Retreat.allowed(unit)) {
         Retreat.consider(unit)

@@ -39,7 +39,7 @@ class PvPLateGame extends GameplanImperative {
   override def executeBuild(): Unit = {
     fearDeath   = ! safeAtHome || unitsComplete(MatchWarriors) < 8
     fearMacro   = miningBases < Math.max(2, enemyBases)
-    fearDT      = enemyDarkTemplarLikely
+    fearDT      = enemyDarkTemplarLikely && unitsComplete(Protoss.Observer) == 0
     fearContain = With.scouting.enemyProgress > 0.6
 
     // Don't fear death or contain for a couple of minutes after getting DT if they have no mobile detection or evidence of Robo.
@@ -62,6 +62,7 @@ class PvPLateGame extends GameplanImperative {
       || enemyBases > miningBases
       || (expectCarriers && With.frame > GameTime(3, 30)() * miningBases)
       || Math.min(unitsComplete(MatchWarriors) / 16, unitsComplete(Protoss.Gateway) / 3) >= miningBases)
+    shouldExpand ||= miningBases < 1
     shouldHarass = fearMacro || fearContain || upgradeComplete(Protoss.ShuttleSpeed)
     shouldAttack = PvPIdeas.shouldAttack
     shouldAttack ||= unitsComplete(Protoss.Gateway) >= targetGateways

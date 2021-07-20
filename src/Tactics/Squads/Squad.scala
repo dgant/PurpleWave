@@ -16,9 +16,9 @@ import scala.collection.mutable.ArrayBuffer
 abstract class Squad extends Tactic with FriendlyUnitGroup {
   var batchId: Int = Int.MinValue
   var vicinity: Pixel = SpecificPoints.middle
+  var targetQueue: Option[Seq[UnitInfo]] = None
   var formations: ArrayBuffer[Formation] = ArrayBuffer.empty
   val lock: LockUnits = new LockUnits(this)
-  var targetQueue: Option[Seq[UnitInfo]] = None
 
   private var _unitsNow = new ArrayBuffer[FriendlyUnitInfo]
   private var _unitsNext = new ArrayBuffer[FriendlyUnitInfo]
@@ -44,22 +44,20 @@ abstract class Squad extends Tactic with FriendlyUnitGroup {
   @inline final def addUnits(units: Iterable[FriendlyUnitInfo]): Unit = units.foreach(addUnit)
   @inline final def addUnit(unit: FriendlyUnitInfo): Unit = {
     commission()
-    _unitsNext += unit
-    _qualityCounter.countUnit(unit)
+    if ( ! _unitsNext.contains(unit)) {
+      _unitsNext += unit
+      _qualityCounter.countUnit(unit)
+    }
   }
 
   final def enemies: Seq[UnitInfo] = _enemiesNow
-  @inline final def addEnemies(enemies: Iterable[UnitInfo]): Unit = {
-    commission()
-    enemies.foreach(_includeEnemy)
-  }
+  @inline final def addEnemies(enemies: Iterable[UnitInfo]): Unit = enemies.foreach(addEnemy)
   @inline final def addEnemy(enemy: UnitInfo): Unit = {
     commission()
-    _includeEnemy(enemy)
-  }
-  private def _includeEnemy(enemy: UnitInfo): Unit = {
-    _enemiesNext += enemy
-    _qualityCounter.countUnit(enemy)
+    if ( ! _enemiesNext.contains(enemy)) {
+      _enemiesNext += enemy
+      _qualityCounter.countUnit(enemy)
+    }
   }
 
   final def clearUnits(): Unit = {

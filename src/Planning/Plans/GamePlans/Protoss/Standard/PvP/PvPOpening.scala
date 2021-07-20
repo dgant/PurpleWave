@@ -207,10 +207,12 @@ class PvPOpening extends GameplanImperative {
       }
 
       shouldExpand = unitsComplete(Protoss.Gateway) >= 2 && unitsComplete(Protoss.Reaver) > 0
+      shouldExpand &&= safeToMoveOut
       shouldExpand &&= (
-            ((shouldExpand || safeToMoveOut) && enemyStrategy(With.fingerprints.dtRush) && unitsComplete(Protoss.Observer) > 0)
-        ||  ((shouldExpand || safeToMoveOut) && PvPIdeas.enemyLowUnitStrategy && unitsComplete(Protoss.Reaver) > 0)
-        || unitsComplete(Protoss.Reaver) >= 2)
+        enemyStrategy(With.fingerprints.dtRush) && unitsComplete(Protoss.Observer) > 0
+        || PvPIdeas.enemyLowUnitStrategy && unitsComplete(Protoss.Reaver) > 0)
+      shouldExpand &&= ! employing(PvPTechBeforeRange)
+      shouldExpand ||= unitsComplete(Protoss.Reaver) >= 2
     } else if (employing(PvPDT)) {
       // Super-fast DT finishes 5:12 and thus arrives at the natural around 5:45
       // Example: http://www.openbw.com/replay-viewer/?rep=https://data.basil-ladder.net/bots/MegaBot2017/MegaBot2017%20vs%20Florian%20Richoux%20Heartbreak%20Ridge%20CTR_EA637F71.rep
@@ -248,6 +250,8 @@ class PvPOpening extends GameplanImperative {
     shouldAttack ||= shouldExpand
     // Ensure that committed Zealots keep wanting to attack
     shouldAttack ||= With.units.ours.exists(u => u.agent.commit) && With.frame < Minutes(5)()
+    // Don't attack if we're also dropping (unless it's time to take our natural)
+    shouldAttack &&= ( ! upgradeStarted(Protoss.ShuttleSpeed) || shouldExpand)
 
     /////////////
     // Logging //
@@ -570,9 +574,9 @@ class PvPOpening extends GameplanImperative {
         trainRoboUnits()
       }
 
-      get(2, Protoss.Gateway)
-      get(Protoss.DragoonRange)
-
+      if (units(Protoss.Reaver) > 1) {
+        get(Protoss.DragoonRange)
+      }
       if (shouldExpand && ! With.geography.ourNatural.units.exists(u =>
         u.isEnemy
         && u.canAttackGround
@@ -583,6 +587,7 @@ class PvPOpening extends GameplanImperative {
 
       trainGatewayUnits()
       get(3, Protoss.Gateway)
+      get(Protoss.DragoonRange)
     } else if (speedlotAttack) {
       cancelIncomplete(Protoss.TemplarArchives)
       get(Protoss.CitadelOfAdun)

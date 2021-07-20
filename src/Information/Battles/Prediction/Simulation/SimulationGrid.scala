@@ -15,7 +15,7 @@ final class SimulationGrid {
     //if (unit.gridTile.tile.contains(to) || (to.valid && tiles(to.tile.i).occupancy + unit.unitClass.occupancy <= occupancyMax)) {
       unit.gridTile -= unit
       unit.pixel = to
-      unit.gridTile = tiles(to.tile.i)
+      unit.gridTile = tiles(to.tile.clip.i)
       unit.gridTile += unit
       true
     //} else {

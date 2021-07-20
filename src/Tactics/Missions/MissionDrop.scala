@@ -58,6 +58,7 @@ abstract class MissionDrop extends Mission {
   final private def skipBase(base: Base): Boolean = {
     if (state == Evacuating || state == Escaping && units.exists(_.base.contains(base))) return true
     if (base.owner.isUs) return true
+    if (base.heart.tileDistanceFast(SpecificPoints.tileMiddle) < 32 && ! base.zone.island) return true
     if (requireWorkers && base.heart.visible && base.units.forall(u => ! u.isEnemy || ! MatchWorker(u))) return true
     if (itinerary.size > 1 && With.frame < Minutes(10)() && ! base.owner.isEnemy) return true
     if ( ! base.owner.isEnemy && base.units.exists(u => u.likelyStillThere && u.isEnemy)) return true
@@ -72,9 +73,9 @@ abstract class MissionDrop extends Mission {
     if (bases.isEmpty) return
     val targetBase = Maff.sampleWeighted[Base](bases, b =>
       if (b.owner.isNeutral) With.framesSince(b.lastScoutedFrame)
-      else if (b.mineralsLeft < 5000) 10
-      else if (With.scouting.enemyMain.contains(b)) if (With.frame > Minutes(12)()) 0 else 25
-      else if (With.scouting.enemyNatural.contains(b)) if (With.frame > Minutes(16)()) 0 else 10
+      else if (b.mineralsLeft < 5000) 1
+      else if (With.scouting.enemyMain.contains(b)) if (With.frame > Minutes(12)()) 0 else 32
+      else if (With.scouting.enemyNatural.contains(b)) if (With.frame > Minutes(16)()) 0 else 8
       else b.heart.tileDistanceGroundManhattan(With.scouting.enemyMuscleOrigin)).get
     val itineraries = Vector(With.geography.itineraryCounterwise(With.geography.ourMain, targetBase), With.geography.itineraryClockwise(targetBase, With.geography.ourMain))
       .sortBy(_.size)
@@ -109,7 +110,6 @@ abstract class MissionDrop extends Mission {
     if (itinerary.isEmpty) { terminate("Empty itinerary"); return }
     updateVicinity()
 
-
     if (state == Recruiting)                                                                { transition(Assembling)  }
     if (state == Assembling && passengers.forall(_.transport.exists(transports.contains)))  { transition(Travelling)  }
     if (state == Travelling && passengers.forall(_.base.exists(vicinity.base.contains)))    { transition(Landing)     }
@@ -118,6 +118,11 @@ abstract class MissionDrop extends Mission {
     if (state == Raiding    && shouldStopRaiding)                                           { transition(Evacuating)  }
     if (state == Evacuating && passengers.forall(_.loaded))                                 { transition(if (itinerary.isEmpty) Escaping else Travelling) }
     if (state == Escaping   && units.forall(u => u.base.exists(_.owner.isUs) || ! u.visibleToOpponents)) { terminate("Escaped!"); return }
+    transports.foreach(t => {
+      t.agent.passengers.view.filterNot(passengers.contains).foreach(t.agent.removePassenger)
+      passengers.foreach(t.agent.addPassenger)
+      t.loadedUnits.view.filterNot(passengers.contains).foreach(Commander.unload(t, _))
+    })
     state match {
       case Assembling => assemble()
       case Travelling => travel()
@@ -129,7 +134,7 @@ abstract class MissionDrop extends Mission {
   }
   private def assemble(): Unit = {
     transports.foreach(_.intend(this, new Intention { action = new ActionAssembleTransport }))
-    passengers.foreach(_.intend(this, new Intention { action = new ActionAssembleTransport }))
+    passengers.foreach(_.intend(this, new Intention { action = new ActionAssemblePassenger }))
   }
   private def travel(): Unit = {
     transports.foreach(_.intend(this, new Intention { action = new ActionTravelTransport }))
@@ -155,8 +160,8 @@ abstract class MissionDrop extends Mission {
       val unloaded = passengers.filterNot(_.loaded)
       if (unloaded.isEmpty) Idle.consider(transport) else {
         // TODO: Avoid danger
-        val centroid = Maff.centroid(passengers.view.map(_.pixel))
-        Commander.rightClick(transport, passengers.minBy(_.pixelDistanceSquared(centroid)))
+        val centroid = Maff.centroid(unloaded.view.map(_.pixel))
+        Commander.rightClick(transport, unloaded.minBy(_.pixelDistanceSquared(centroid)))
       }
     }
   }
@@ -172,7 +177,6 @@ abstract class MissionDrop extends Mission {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
       val profile = new PathfindProfile(transport.tile)
       profile.end                 = Some(vicinity.tile)
-      profile.endDistanceMaximum  = 7 * 32
       profile.costEnemyVision     = 5
       profile.costRepulsion       = 25
       profile.costThreat          = 125
@@ -192,14 +196,15 @@ abstract class MissionDrop extends Mission {
 
   class ActionLandTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
+      val runway = itinerary.headOption.map(_.heart.center).getOrElse(vicinity)
       val droppables = transport.loadedUnits
         .filter(p =>
-          p.pixelDistanceCenter(vicinity) <= Math.max(0, p.effectiveRangePixels - 64)
+          p.pixelDistanceCenter(runway) <= Math.max(0, p.effectiveRangePixels - 64)
           || (p.canAttack && transport.tile.enemyRangeAir >= With.grids.enemyRangeAir.margin)
           || p.matchups.targetsInRange.exists(t => t.unitClass.isWorker || t.canAttack))
         .sortBy(_.subjectiveValue * (if (transport.tile.enemyRangeAir > 0) -1 else 1))
       droppables.headOption.foreach(Commander.unload(transport, _))
-      transport.agent.toTravel = Some(vicinity)
+      transport.agent.toTravel = Some(runway)
       Commander.move(transport)
     }
   }

@@ -47,12 +47,12 @@ object FormationGeneric {
 
     lazy val vanguardUnits  = Maff.takePercentile(0.5, groundUnits)(Ordering.by(_.pixelDistanceTravelling(face)))
     lazy val centroid       = Maff.weightedExemplar(vanguardUnits.view.map(u => (u.pixel, u.subjectiveValue)))
-    lazy val path           = new PathfindProfile(floodCentroid, Some(floodTarget), employGroundDist = true, costImmobility = 1.5).find
+    lazy val path           = new PathfindProfile(floodCentroid, Some(floodGoal), lengthMaximum = Some(20), employGroundDist = true, costImmobility = 1.5).find
     lazy val patht          = path.tiles.get.view
 
-    floodCentroid           = centroid.tile.nearestWalkableTile
-    floodTarget             = approach.nearestWalkableTile
-    floodApex               = floodTarget
+    floodCentroid           = centroid.nearestWalkableTile
+    floodGoal               = approach.nearestWalkableTile
+    floodApex               = floodGoal
     floodMinDistanceTarget  = - inf
     floodMaxDistanceTarget  = inf
     floodMaxThreat          = inf
@@ -63,11 +63,11 @@ object FormationGeneric {
     if (style == FormationStyleMarch || style == FormationStyleDisengage) {
       if ( ! path.pathExists) return FormationEmpty
       val stepSizeTiles = Seq(3.0,
-        if (style == FormationStyleDisengage) 2.0 + floodCentroid.enemyRange else 0.0,
+        if (style == FormationStyleDisengage) 5.0 + floodCentroid.enemyRange else 0.0,
         With.reaction.estimationAverage * group.meanTopSpeed / 32.0 + 0.5).max.toInt
-      floodMaxDistanceTarget  = floodCentroid.tileDistanceGroundManhattan(floodTarget) - 1
+      floodMaxDistanceTarget  = floodCentroid.tileDistanceGroundManhattan(floodGoal) - 1
       floodMinDistanceTarget  = floodMaxDistanceTarget - stepSizeTiles
-      floodApex               = patht.reverseIterator.filterNot(t => t.zone.edges.exists(_.contains(t.center))).find(_.tileDistanceGroundManhattan(floodTarget) >= floodMinDistanceTarget).orElse(patht.find(_.tileDistanceGroundManhattan(floodTarget) == floodMinDistanceTarget + 1)).getOrElse(floodTarget)
+      floodApex               = patht.reverseIterator.filterNot(t => t.zone.edges.exists(_.contains(t.center))).find(_.tileDistanceGroundManhattan(floodGoal) >= floodMinDistanceTarget).orElse(patht.find(_.tileDistanceGroundManhattan(floodGoal) == floodMinDistanceTarget + 1)).getOrElse(floodGoal)
       floodMaxThreat          = if (style == FormationStyleMarch) With.grids.enemyRangeGround.margin else With.grids.enemyRangeGround.defaultValue
       floodCostDistanceGoal   = 5
       floodCostDistanceApex   = 1
@@ -76,10 +76,11 @@ object FormationGeneric {
       floodCostDistanceGoal   = 5
       floodCostDistanceApex   = 1
     } else if (style == FormationStyleEngage) {
-      floodCostVulnerability  = 125
-      floodCostThreat         = 25
+      floodGoal               = floodCentroid
+      floodCostVulnerability  = 1
+      floodCostThreat         = 1
       floodCostDistanceApex   = 1
-      floodCostDistanceGoal   = 5
+      floodCostDistanceGoal   = 1
     }
 
     val slots         = new mutable.HashMap[UnitClass, ArrayBuffer[Pixel]]()
@@ -87,18 +88,18 @@ object FormationGeneric {
     val explored      = With.grids.disposableBoolean()
     val unplaced      = groundUnits
       .groupBy(_.unitClass)
-      .map(g => (ClassSlots(g._1, g._2.size), g._2.head.formationRange))
+      .map(g => (ClassSlots(g._1, g._2.size), g._2.head.formationRangePixels / 32))
       .toVector
       .sortBy(_._2)
     floodHorizon += ((floodApex, cost(floodApex)))
     floodHorizon.foreach(tile => explored.set(tile._1, true))
     while (floodHorizon.nonEmpty && unplaced.exists(_._1.slots > 0) ) {
       val tile = floodHorizon.dequeue()._1
-      lazy val distanceTileToGoal = tile.tileDistanceGroundManhattan(floodTarget)
+      lazy val distanceTileToGoal = tile.tileDistanceGroundManhattan(floodGoal)
       if (tile.walkable
           && (floodMinDistanceTarget  <= 0    || floodMinDistanceTarget <= distanceTileToGoal)
           && (floodMaxDistanceTarget  >= inf  || floodMaxDistanceTarget >= distanceTileToGoal)
-          && (floodMaxThreat          >= inf  || floodMaxThreat         >= tile.enemyRangeGround)
+          && (floodMaxThreat >= tile.enemyRangeGroundUnchecked)
           && (tile.units.forall(u => u.flying || (u.isFriendly && ! u.unitClass.isBuilding)))) {
         val unplacedClass = unplaced.find(_._1.slots > 0).get
 
@@ -109,7 +110,7 @@ object FormationGeneric {
           floodCostVulnerability == 0
           || tile.enemyRangeGround == 0
           || tile.zone.edges.exists(_.contains(tile))
-          || unplacedClass._2 < 32 * (vGrid.margin + vGrid.maxVulnerability - vGrid(tile))) {
+          || unplacedClass._2 < (vGrid.margin + vGrid.maxVulnerability - vGrid(tile))) {
           val classSlot = unplacedClass._1
           classSlot.slots -= 1
           if (!slots.contains(classSlot.unitClass)) {
@@ -135,7 +136,7 @@ object FormationGeneric {
         if ( ! slots.contains(u.unitClass)) {
           slots(u.unitClass) = ArrayBuffer.empty
         }
-        slots(u.unitClass) += floodCentroid.center.project(floodApex.center, Math.max(0, floodCentroid.center.pixelDistance(floodApex.center) - u.formationRange))
+        slots(u.unitClass) += floodApex.center
       })
     val unassigned = UnassignedFormation(style, slots.toMap, group)
     val output = if (style == FormationStyleGuard || style == FormationStyleEngage) unassigned.outwardFromCentroid else unassigned.sprayToward(approach)
@@ -144,7 +145,7 @@ object FormationGeneric {
   }
 
   private var floodCentroid           = SpecificPoints.tileMiddle
-  private var floodTarget             = SpecificPoints.tileMiddle
+  private var floodGoal               = SpecificPoints.tileMiddle
   private var floodApex               = SpecificPoints.tileMiddle
   private var floodMaxDistanceTarget  = inf
   private var floodMinDistanceTarget  = - inf
@@ -156,13 +157,10 @@ object FormationGeneric {
   @inline private final def vGrid = With.grids.enemyVulnerabilityGround
   private final def cost(tile: Tile): Int = {
     if ( ! tile.walkable) return inf
-    val costDistanceGoal    = if (floodCostDistanceGoal == 0)   0 else floodCostDistanceGoal  * tile.tileDistanceGroundManhattan(floodTarget)
+    val costDistanceGoal    = if (floodCostDistanceGoal == 0)   0 else floodCostDistanceGoal  * tile.tileDistanceGroundManhattan(floodGoal)
     val costDistanceOrigin  = if (floodCostDistanceApex == 0)   0 else floodCostDistanceApex  * tile.tileDistanceGroundManhattan(floodCentroid)
     val costThreat          = if (floodCostThreat == 0)         0 else floodCostThreat        * tile.enemyRangeGround
-    val costVulnerability   = if (floodCostVulnerability == 0)  0 else floodCostVulnerability * Math.max(0, vGrid.margin + vGrid.maxVulnerability - vGrid(tile))
-    // TODO: The vulnerability cost should vary based on the range of the unit.
-    // Punishing, eg, a dragoon for not being adjacent to its target, doesn't allow sniping units from uphill
-    // Our current formula doesn't allow this, as we do a single flood-fill across unit types
+    val costVulnerability   = if (floodCostVulnerability == 0)  0 else floodCostVulnerability * Maff.fromBoolean(vGrid(tile) == 0)
     costDistanceGoal + costDistanceOrigin + costThreat + costVulnerability
   }
 }

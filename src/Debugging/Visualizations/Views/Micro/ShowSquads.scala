@@ -69,7 +69,7 @@ object ShowSquads extends View {
     val output = counts
       .toSeq
       .sortBy(-_._2.size)
-      .map(p => p._2.size + p._1.toString.toLowerCase.take(2))
+      .map(p => p._2.size + p._1.abbr)
       .mkString(".")
     
     output

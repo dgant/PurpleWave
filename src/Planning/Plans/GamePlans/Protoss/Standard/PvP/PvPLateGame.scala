@@ -81,7 +81,7 @@ class PvPLateGame extends GameplanImperative {
     shouldSecondaryTech ||= units(Protoss.RoboticsSupportBay) > 0 && units(Protoss.TemplarArchives) > 0
     oversaturate = shouldExpand && ! fearDeath && ! fearContain
 
-    lazy val commitToTech = unitsComplete(Protoss.Gateway) >= 5
+    lazy val commitToTech = unitsComplete(Protoss.Gateway) >= 5 && saturated
     primaryTech = primaryTech
       .orElse(Some(RoboTech).filter(x => units(Protoss.RoboticsFacility) > 0))
       .orElse(Some(TemplarTech).filter(x => units(Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.PhotonCannon) > 0))

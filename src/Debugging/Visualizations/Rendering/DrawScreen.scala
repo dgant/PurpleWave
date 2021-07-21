@@ -115,11 +115,11 @@ object DrawScreen {
       val thickness = if (weWin == isUs) 2 else 5
       (0 until thickness).foreach(t => DrawMap.circle(centroid, radius + t, if (isUs) ourColorNeon else enemyColorNeon))
     })
-    DrawMap.circle  (battle.focus,            8,                        neutralColor)
-    DrawMap.circle  (battle.us.vanguard(),    8,                        ourColorDark)
-    DrawMap.circle  (battle.enemy.vanguard(), 8,                        enemyColorDark)
-    DrawMap.line    (battle.focus,            battle.us.vanguard(),     ourColorDark)
-    DrawMap.line    (battle.focus,            battle.enemy.vanguard(),  enemyColorDark)
+    DrawMap.circle  (battle.focus,                8,                          neutralColor)
+    DrawMap.circle  (battle.us.vanguardAll(),     8,                          ourColorDark)
+    DrawMap.circle  (battle.enemy.vanguardAll(),  8,                          enemyColorDark)
+    DrawMap.line    (battle.focus,                battle.us.vanguardAll(),    ourColorDark)
+    DrawMap.line    (battle.focus,                battle.enemy.vanguardAll(), enemyColorDark)
     With.game.drawCircleMap(battle.focus.bwapi, (battle.us.units ++ battle.enemy.units).map(_.pixelDistanceCenter(battle.focus)).max.toInt, neutralColor)
 
   }

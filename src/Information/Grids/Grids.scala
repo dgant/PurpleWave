@@ -68,8 +68,6 @@ class Grids extends TimedTask {
       _selected = Some(With.scouting.mostBaselikeEnemyTile.zone.distanceGrid)
     } else if (code == "g") {
       _selected = None
-    } else {
-      With.manners.chat(f"No grid named $code")
     }
     _selected.nonEmpty
   }

@@ -60,7 +60,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def previousPixel(framesAgo: Int): Pixel = previousPixels((previousPixels.length + previousPixelIndex - Math.min(previousPixels.length, framesAgo)) % previousPixels.length)
   def update() {
     _hasEverBeenVisibleToOpponents ||= visibleToOpponents
-    if (cooldownLeft > lastCooldown) lastFrameStartingAttack = With.frame
+    // We use cooldownGround/Air because for incomplete units cooldown is equal to remaining completion frames
+    if (Math.max(cooldownGround, cooldownAir) > lastCooldown) lastFrameStartingAttack = With.frame
     if (totalHealth < lastHitPoints + lastShieldPoints + lastMatrixPoints) lastFrameTakingDamage = With.frame
     if (complete) {
       // If the unit class changes (eg. Geyser -> Extractor) update the completion frame

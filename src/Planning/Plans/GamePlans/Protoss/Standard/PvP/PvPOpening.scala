@@ -99,7 +99,9 @@ class PvPOpening extends GameplanImperative {
     // has some good details on the metagame rock-paper-scissors.
 
     // These maps are too long for 2-Gate unless we're failing to hold proxies otherwise
-    if (units(Protoss.Gateway) == 0 && ! enemyRecentStrategy(With.fingerprints.proxyGateway) && Seq(Arcadia, Aztec, Benzene, Longinus, MatchPoint, Heartbreak, Roadkill).exists(_.matches)) {
+    if (employing(PvP1012)
+      && units(Protoss.Gateway) == 0
+      && ! enemyRecentStrategy(With.fingerprints.proxyGateway) && Seq(Arcadia, Aztec, Benzene, Longinus, MatchPoint, Heartbreak, Roadkill).exists(_.matches)) {
       PvP1012.swapOut()
       PvP3Zealot.swapOut()
       PvP5Zealot.swapOut()
@@ -160,9 +162,16 @@ class PvPOpening extends GameplanImperative {
       && With.units.ours.filter(Protoss.TemplarArchives).exists(a =>
         a.hasEverBeenVisibleToOpponents
         && ! a.visibleToOpponents
-        && ! a.zone.units.exists(_.isEnemy))
-      && roll("SpeedlotAttack", 0.65)) {
-      speedlotAttack = true
+        && ! a.zone.units.exists(_.isEnemy))) {
+      if ( ! enemyRecentStrategy(With.fingerprints.dtRush) && roll("DTTo3Gate", 0.5)) {
+        cancelIncomplete(Protoss.TemplarArchives)
+        PvPDT.swapOut()
+        PvP3GateGoon.swapIn()
+      }
+      if (roll("DTToSpeedlot", 0.3)) {
+        cancelIncomplete(Protoss.TemplarArchives)
+        speedlotAttack = true
+      }
     }
 
     /////////////////////////////
@@ -593,7 +602,6 @@ class PvPOpening extends GameplanImperative {
       get(Protoss.DragoonRange)
       get(3, Protoss.Gateway)
     } else if (speedlotAttack) {
-      cancelIncomplete(Protoss.TemplarArchives)
       get(Protoss.CitadelOfAdun)
       get(Protoss.ZealotSpeed)
       if (getCannons) { buildCannonsAtNatural.update() }

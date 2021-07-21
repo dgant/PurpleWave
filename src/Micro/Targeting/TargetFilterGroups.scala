@@ -1,6 +1,6 @@
 package Micro.Targeting
 
-import Micro.Targeting.FiltersOptional.{TargetFilterArchonOptional, TargetFilterCarrierInLeash, TargetFilterCarrierInRange, TargetFilterCombatants}
+import Micro.Targeting.FiltersOptional.{TargetFilterCarrierInLeash, TargetFilterCarrierInRange, TargetFilterCombatants}
 import Micro.Targeting.FiltersRequired._
 
 object TargetFilterGroups {
@@ -22,7 +22,6 @@ object TargetFilterGroups {
   val filtersPreferred = Vector(
     TargetFilterCarrierInRange,
     TargetFilterCarrierInLeash,
-    TargetFilterArchonOptional,
     TargetFilterCombatants,
   )
 }

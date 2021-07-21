@@ -23,7 +23,7 @@ trait MacroCounting {
   def supplyUsed200: Int = (With.self.supplyUsed + 1) / 2
   def supplyTotal200: Int = With.self.supplyTotal / 2
   def supplyBlocked: Boolean = With.self.supplyUsed >= With.self.supplyTotal
-  def saturated: Boolean = units(MatchWorker) >= With.geography.ourBases.view.map(b => b.minerals.size* 2 + b.gas.size * 3).sum
+  def saturated: Boolean = units(MatchWorker) >= Math.min(60, With.geography.ourBases.view.map(b => b.minerals.size* 2 + b.gas.size * 3).sum)
 
   def bases: Int = With.geography.ourBases.size
 

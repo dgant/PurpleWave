@@ -228,8 +228,14 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def enemyRangeGround: Int = {
     With.grids.enemyRangeGround(this)
   }
+  @inline def enemyRangeGroundUnchecked: Int = {
+    With.grids.enemyRangeGround.getUnchecked(this)
+  }
   @inline def enemyRangeAir: Int = {
     With.grids.enemyRangeAir(this)
+  }
+  @inline def enemyRangeAirUnchecked: Int = {
+    With.grids.enemyRangeAir.getUnchecked(this)
   }
   @inline def enemyRangeAgainst(unit: UnitInfo): Int = {
     if (unit.flying) enemyRangeAir else enemyRangeGround

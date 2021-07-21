@@ -35,7 +35,6 @@ class MacroQueue {
     val requestQueue    = requestsByPriority.keys.toVector.sortBy(_.priorityUntouched).flatten(requestsByPriority)
     val unitsWanted     = new CountMap[UnitClass]
     val unitsCounted    = new CountMap[UnitClass]
-    //val unitsExisting   = new CountMap[UnitClass]
     val upgradesCounted = new CountMap[Upgrade]
     val techsCounted    = new mutable.HashSet[Tech]
 
@@ -46,7 +45,6 @@ class MacroQueue {
       // Require completion of Terran buildings
       //MacroCounter.countCompleteOrIncomplete(unit).foreach(p => unitsExisting(p._1) += p._2)
     })
-    //unitsExisting.foreach(pair => unitsWanted(pair._1) = Math.max(unitsWanted(pair._1), pair._2))
 
     // Count upgrades and tech
     Upgrades.all.map(u => (u, With.self.getUpgradeLevel(u))).foreach(u => upgradesCounted(u._1) = u._2)
@@ -65,7 +63,7 @@ class MacroQueue {
     
     if (request.buildable.upgradeOption.nonEmpty) {
       val upgrade = request.buildable.upgradeOption.get
-      if (With.self.getUpgradeLevel(upgrade) < request.buildable.upgradeLevel) {
+      if (upgradesCounted(upgrade) < request.buildable.upgradeLevel) {
         upgradesCounted(upgrade) = request.buildable.upgradeLevel
         Vector(request.buildable)
       } else {

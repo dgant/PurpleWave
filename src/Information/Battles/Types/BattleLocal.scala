@@ -13,5 +13,5 @@ class BattleLocal(unitsUs: Vector[UnitInfo], unitsEnemy: Vector[UnitInfo]) exten
 
   def units: Seq[UnitInfo] = us.units.view ++ enemy.units
 
-  def focus: Pixel = Maff.centroid(teams.map(_.vanguard()))
+  def focus: Pixel = Maff.centroid(teams.map(_.vanguardAll()))
 }

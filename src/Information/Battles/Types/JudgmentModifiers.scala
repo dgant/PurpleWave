@@ -1,11 +1,12 @@
 package Information.Battles.Types
 
 import Debugging.Visualizations.Colors
+import Information.Geography.Pathfinding.PathfindProfile
 import Lifecycle.With
 import Mathematics.Maff
 import Micro.Actions.Basic.Gather
 import Planning.UnitMatchers.{MatchTank, MatchWorker}
-import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import bwapi.Color
 
 import scala.collection.mutable.ArrayBuffer
@@ -21,6 +22,7 @@ object JudgmentModifiers {
         output += m })
     }
     add("Aggression", Colors.MidnightRed,   aggression(battle))
+    add("Choke",      Colors.BrightGreen,   choke(battle))
     add("Proximity",  Colors.NeonRed,       proximity(battle))
     add("Maxed",      Colors.MediumTeal,    maxed(battle))
     add("Gatherers",  Colors.MediumBlue,    gatherers(battle))
@@ -35,6 +37,40 @@ object JudgmentModifiers {
   def aggression(local: BattleLocal): Option[JudgmentModifier] = {
     val aggro = With.blackboard.aggressionRatio()
     if (aggro == 1) None else Some(JudgmentModifier(gainedValueMultiplier = aggro))
+  }
+
+  // Avoid fighting through a choke
+  // Prefer fighting when the enemy is passing through one
+  def choke(local: BattleLocal): Option[JudgmentModifier] = {
+    if (local.us.attackers.forall(_.flying)) return None
+    if (local.enemy.attackers.forall(_.flying)) return None
+    val start   = local.us.centroidGround.tile
+    val profile = new PathfindProfile(start)
+    profile.end = Some(local.enemy.vanguardGround().tile)
+    profile.employGroundDist = true
+    profile.lengthMaximum = Some(1 + local.enemy.attackers.view.map(_.effectiveRangePixels).max.toInt / 32)
+    val path = profile.find
+    if ( ! path.pathExists) return None
+    val chokeTile = path.tiles.get.view.map(t => (t, t.zone.edges.find(_.contains(t)))).find(_._2.isDefined)
+    if (chokeTile.isDefined) {
+      val tile                = chokeTile.get._1
+      val choke               = chokeTile.get._2.get
+      val ourSide             = choke.endPixels.minBy(_.groundPixels(start))
+      val enemySide           = choke.endPixels.maxBy(_.groundPixels(start))
+      val distance            = tile.pixelDistanceGround(start)
+      val enemiesThrough      = local.enemy.units.count(u => u.flying || u.pixelDistanceTravelling(start) < distance)
+      val enemiesIn           = local.enemy.units.count(u => ! u.flying && choke.contains(u.pixel) && u.pixelDistanceSquared(ourSide) < u.pixelDistanceSquared(enemySide))
+      val denominator         = Math.max(1, local.enemy.units.size)
+      val enemiesThroughRatio = enemiesThrough / denominator
+      val enemiesInRatio      = enemiesIn / denominator
+      if (enemiesThroughRatio == 0 && enemiesInRatio == 0) {
+        val speedRatio        = Math.max(0.25, choke.radiusPixels / Math.max(1, local.us.widthPixels))
+        return Some(JudgmentModifier(speedMultiplier = speedRatio))
+      } else if (enemiesInRatio > 0 && enemiesThroughRatio < 0.25) {
+        return Some(JudgmentModifier(targetDelta = -0.1))
+      }
+    }
+    None
   }
 
   // Prefer fighting
@@ -119,7 +155,10 @@ object JudgmentModifiers {
   //     because they are crawly slugs
   //     and love dying
   def anchored(battleLocal: BattleLocal): Option[JudgmentModifier] = {
-    lazy val fragileSlugs = battleLocal.us.units.exists(u => u.isAny(Terran.SiegeTankSieged, Protoss.Reaver) && ! u.friendly.exists(_.agent.ride.isDefined) && u.matchups.pixelsOfEntanglement > -32)
+    lazy val fragileSlugs = battleLocal.us.units.exists(u =>
+      u.isAny(Terran.SiegeTankSieged, Protoss.Reaver, Zerg.Lurker)
+      && ! u.friendly.exists(_.agent.ride.isDefined)
+      && u.matchups.pixelsOfEntanglement > -32)
     if (With.self.isProtoss && battleLocal.us.engagedUpon && fragileSlugs) {
       Some(JudgmentModifier(targetDelta = -0.25))
     } else None

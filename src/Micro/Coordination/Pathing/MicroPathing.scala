@@ -139,15 +139,15 @@ object MicroPathing {
     val to = unit.agent.safety
 
     // Where to go
-    unit.agent.forces(Forces.threat)      = (Potential.avoidThreats(unit)     * Maff.toInt(goalSafety))
     unit.agent.forces(Forces.travel)      = (Potential.preferTravel(unit, to) * Maff.toInt(goalOrigin))
+    unit.agent.forces(Forces.threat)      = (Potential.avoidThreats(unit)     * Maff.toInt(goalSafety))
     unit.agent.forces(Forces.sneaking)    = (Potential.detectionRepulsion(unit))
 
     // How to get there
     unit.agent.forces(Forces.spreading)   = (Potential.preferSpreading(unit)  * Maff.toInt(goalSafety))
+    unit.agent.forces(Forces.spacing)     = unit.agent.receivedPushForce()
 
     ForceMath.rebalance(unit.agent.forces, 1.5, Forces.threat, Forces.travel, Forces.sneaking)
-    ForceMath.rebalance(unit.agent.forces, 1.0, Forces.spreading, Forces.regrouping, Forces.spacing)
   }
 
   def getPushForces(unit: FriendlyUnitInfo): Seq[(Push, Force)] = {

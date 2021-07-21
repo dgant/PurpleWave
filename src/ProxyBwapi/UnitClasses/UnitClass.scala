@@ -550,5 +550,23 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     .replace("Vulture_Spider", "Spider")
     .replaceAll("_", " ")
 
+  val abbr: String = bwapiType match {
+    case UnitType.Terran_Firebat        => "fb"
+    case UnitType.Terran_Dropship       => "ds"
+    case UnitType.Terran_Science_Vessel => "sv"
+    case UnitType.Terran_Battlecruiser  => "bc"
+    case UnitType.Protoss_Zealot        => "zt"
+    case UnitType.Protoss_Dragoon       => "dg"
+    case UnitType.Protoss_Dark_Templar  => "dt"
+    case UnitType.Protoss_High_Templar  => "ht"
+    case UnitType.Zerg_Larva            => "lv"
+    case UnitType.Zerg_Zergling         => "zg"
+    case UnitType.Zerg_Lurker           => "lk"
+    case UnitType.Zerg_Lurker_Egg       => "le"
+    case UnitType.Zerg_Guardian         => "gd"
+    case UnitType.Zerg_Devourer         => "dv"
+    case _                              => toString.take(2).toLowerCase
+  }
+
   override val hashCode: Int = toString.hashCode
 }

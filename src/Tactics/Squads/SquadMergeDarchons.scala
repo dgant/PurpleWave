@@ -20,9 +20,9 @@ class SquadMergeDarchons extends Squad {
 
   override def run(): Unit = {
     val partyCentral = Maff.maxBy(With.geography.ourBases)(_.heart.tileDistanceSquared(With.scouting.threatOrigin)).map(_.heart).getOrElse(With.geography.home).center
-    units.foreach(u => u.intend(this, new Intention {
+    lock.units.foreach(u => u.intend(this, new Intention {
       toTravel = Some(partyCentral)
-      shouldMeld = u.matchups.pixelsOfEntanglement < -128
+      shouldMeld = u.matchups.threatsInRange.isEmpty
     }))
   }
 }

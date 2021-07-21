@@ -34,6 +34,7 @@ object FightOrFlee extends Action {
     decide(true,  "Hug",        () => ! unit.flying && unit.matchups.targetsInRange.exists(t => unit.pixelDistanceEdge(t) < t.pixelRangeMin))
     decide(true,  "Safe",       () => unit.matchups.threats.isEmpty)
     decide(true,  "Detonated",  () => unit.unitClass.suicides && unit.matchups.targets.exists(t => t.canAttack(unit) && t.matchups.targetsInRange.nonEmpty))
+    decide(true,  "Archon",     () => Protoss.Archon(unit) && unit.matchups.targetsInRange.exists(_.unitClass.attacksOrCastsOrDetectsOrTransports))
     decide(false, "CantFight",  () => ! unit.intent.canFight)
     decide(true,  "Berzerk",    () => With.frame < Minutes(6)() && unit.isAny(Protoss.Zealot, Zerg.Zergling) && unit.metro.exists(_.bases.exists(_.owner.isEnemy)) && ! unit.team.exists(_.catchesGround) && unit.matchups.threats.exists(t => Terran.Vulture(t)))
     decide(true,  "Cloaked",    () => unit.effectivelyCloaked || (unit.is(Terran.Wraith) && unit.energy >= 50 && unit.matchups.enemyDetectors.isEmpty && With.self.hasTech(Terran.WraithCloak)))

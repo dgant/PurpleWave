@@ -3,7 +3,7 @@ package Tactics.Squads
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
-import Micro.Formation.{Formation, FormationGeneric}
+import Micro.Formation.{Formation, FormationGeneric, FormationStyleDisengage, FormationStyleGuard}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -24,7 +24,7 @@ object SquadAutomation {
     squad.targetQueue = Some(SquadAutomation.rankForArmy(
       squad,
       unrankedTargetsTo(squad, to).view
-        .filter(t => t.unitClass.isWorker || squad.units.exists(u => t.canAttack(u) && t.inRangeToAttack(u)))))
+        .filter(t => t.unitClass.isWorker || squad.units.exists(u => (t.canAttack(u) || t.unitClass.canAttack(u)) && t.inRangeToAttack(u)))))
   }
 
   def rankForArmy(group: UnitGroup, targets: Seq[UnitInfo]): Seq[UnitInfo] = {
@@ -92,16 +92,12 @@ object SquadAutomation {
           .find(_.placements.contains(unit))
           .map(_.placements(unit))
           .orElse(Some(if (squad.fightConsensus) squad.vicinity else squad.homeConsensus))
-        // The last formation is the most retreaty formation
-        // If we only have one, let units retreat to their own origin
         toReturn = squad
-            .formations
-            .view
-            .drop(1)
-            .lastOption
-            .filter(_.placements.size >= minToForm)
-            .find(_.placements.contains(unit))
-            .map(_.placements(unit))
+          .formations
+          .find(f => f.style == FormationStyleGuard || f.style == FormationStyleDisengage)
+          .filter(_.placements.size >= minToForm)
+          .find(_.placements.contains(unit))
+          .map(_.placements(unit))
       })
     })
   }

@@ -19,7 +19,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   private val _groupUs = new Cache(() => me.team.orElse(me.friendly.flatMap(_.squad)).getOrElse(GenericUnitGroup(Seq(me))))
   private val _groupEnemy = new Cache(() => me.team.map(_.opponent)
     .orElse(me.friendly.flatMap(_.squad.flatMap(_.targetQueue.map(GenericUnitGroup))))
-    .orElse(me.friendly.flatMap(_.squad.flatMap(s => Some(GenericUnitGroup(s.enemies)))))
+    .orElse(me.friendly.flatMap(_.squad.flatMap(s => Some(s.enemies).filter(_.nonEmpty).map(GenericUnitGroup))))
     .getOrElse(GenericUnitGroup(defaultUnits)))
 
   private def battleAll     : Option[Seq[UnitInfo]] = me.battle.map(_.teams.view.flatMap(_.units))

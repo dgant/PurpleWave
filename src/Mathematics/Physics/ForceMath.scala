@@ -28,7 +28,7 @@ object ForceMath {
       x += f.x
       y += f.y
     })
-    Force(x/i, y/i)
+    Force(Maff.nanToZero(x/i), Maff.nanToZero(y/i))
   }
   
   def fromPixels(from: Pixel, to: Pixel, magnitude: Double = 1.0): Force = if (from == to) new Force() else fromRadians(from.radiansTo(to), magnitude)

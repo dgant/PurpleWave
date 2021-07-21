@@ -39,7 +39,6 @@ abstract class Action {
     val nanosAfter = System.nanoTime()
     performance.durationNanos += Math.max(0, nanosAfter - nanosBefore)
     performance.invocations += 1
-
-   unit.unready
+    unit.unready
   }
 }

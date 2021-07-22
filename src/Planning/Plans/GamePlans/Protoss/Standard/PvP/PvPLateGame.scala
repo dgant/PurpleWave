@@ -230,7 +230,7 @@ class PvPLateGame extends GameplanImperative {
     }
     get(Protoss.RoboticsFacility)
     buildOrder(Get(Protoss.Shuttle))
-    if ( ! fearDeath) {
+    if (shouldDetect || ! fearDeath ) {
       get(Protoss.Observatory)
       buildOrder(Get(Protoss.Observer))
       if (enemyDarkTemplarLikely || enemyShownCloakedThreat) {

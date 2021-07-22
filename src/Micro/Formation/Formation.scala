@@ -24,7 +24,14 @@ class Formation(val style: FormationStyle, val placements: Map[UnitInfo, Pixel])
       val slot = p._2
       val c = unit.unitClass
       DrawMap.line(p._1.pixel, slot, style.color)
-      DrawMap.box(slot.subtract(c.dimensionLeft, c.dimensionUp), slot.add(c.dimensionRight, c.dimensionDown), style.color)
+      DrawMap.box(
+        slot
+          .subtract(c.dimensionLeft, c.dimensionUp)
+          .add(style.offset, style.offset),
+        slot
+          .add(c.dimensionRight, c.dimensionDown)
+          .subtract(style.offset, style.offset),
+        style.color)
     })
   }
 }

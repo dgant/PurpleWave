@@ -50,13 +50,13 @@ class Tactics extends TimedTask {
   private val scoutForCannonRush        = addPriorityTactic(new ScoutForCannonRush)
   private val scoutExpansions           = addPriorityTactic(new SquadScoutExpansions)
   private val monitorWithObserver       = addPriorityTactic(new MonitorTerranWithObserver)
+  private val darkTemplar               = addPriorityTactic(new SquadDarkTemplar)
 
   //////////////////
   // Basic squads //
   //////////////////
 
   private lazy val baseSquads: Map[Base, SquadDefendBase] = With.geography.bases.map(base => (base, new SquadDefendBase(base))).toMap
-  private val cloakSquad = new SquadCloakedHarass
   private val catchDTRunby = new SquadCatchDTRunby
   private val attackSquad = new SquadAttack
 
@@ -134,9 +134,6 @@ class Tactics extends TimedTask {
 
     // First satisfy each defense squad
     assign(freelancers, squadsDefending.view.map(_._2), 1.0)
-
-    // Always attack with Dark Templar
-    assign(freelancers, Seq(cloakSquad), filter = (f, s) => Protoss.DarkTemplar(f))
 
     // Proactive drop/harassment defense
     if ((With.geography.ourBases.map(_.metro).distinct.size > 1 && With.frame > Minutes(10)()) || With.unitsShown.any(Terran.Dropship)) {

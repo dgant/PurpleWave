@@ -8,7 +8,11 @@ class UnitLinearGroundPush(val priority: TrafficPriority, val pusher: FriendlyUn
   override protected def source: Pixel = pusher.pixel
   override protected val sourceWidth: Double = pusher.unitClass.dimensionMax
   override def force(recipient: FriendlyUnitInfo): Option[Force] =
-    if (recipient == pusher || recipient.flying || recipient.agent.priority >= pusher.agent.priority)
+    if (
+      recipient == pusher
+      || recipient.flying
+      || recipient.agent.priority >= pusher.agent.priority
+      || recipient.matchups.pixelsOfEntanglement > pusher.matchups.pixelsOfEntanglement)
       None
     else
       super.force(recipient)

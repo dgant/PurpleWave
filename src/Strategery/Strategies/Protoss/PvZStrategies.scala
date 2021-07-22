@@ -2,6 +2,8 @@ package Strategery.Strategies.Protoss
 
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
+import Planning.Plan
+import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZ2GateNew
 import Strategery.Strategies.Strategy
 import Strategery.{MapGroups, StarCraftMap}
 import bwapi.Race
@@ -21,6 +23,9 @@ abstract class PvZ2GateOpening extends PvZStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     ProtossChoices.pvzOpenersTransitioningFrom2Gate
   )
+}
+object PvZ2Gate4Gate extends PvZStrategy {
+  override def gameplan: Option[Plan] = Some(new PvZ2GateNew)
 }
 object PvZ1BaseForgeTech extends PvZStrategy {
   override def allowedVsHuman: Boolean = false

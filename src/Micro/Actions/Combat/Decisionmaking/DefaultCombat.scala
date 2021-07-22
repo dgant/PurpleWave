@@ -194,7 +194,7 @@ object DefaultCombat extends Action {
         unit.agent.receivedPushPriority() < TrafficPriorities.Shove
         && unit.matchups.threatsInFrames(unit.unitClass.framesToTurnShootTurnAccelerate).forall(_.topSpeed > unit.topSpeed))))
     transition(Dance,     () => target.map(unit.pixelRangeAgainst).exists(_ > 64))
-    transition(Excuse,    () => unit.agent.receivedPushPriority() > unit.agent.priority)
+    //transition(Excuse,    () => unit.agent.receivedPushPriority() > unit.agent.priority)
 
     if (unit.unready) return
 

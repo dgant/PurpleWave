@@ -14,7 +14,7 @@ class SquadAttack extends Squad {
   override def run() {
     if (units.isEmpty) return
     chooseVicinity()
-    SquadAutomation.targetFormAndSend(this, minToForm = 5)
+    SquadAutomation.targetFormAndSend(this, minToForm = 6)
   }
 
   protected def chooseVicinity(): Unit = {

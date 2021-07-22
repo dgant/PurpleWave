@@ -652,8 +652,8 @@ class PvPOpening extends GameplanImperative {
     if (zAfterCore && zBeforeCore) buildOrder(Get(2, Protoss.Zealot))
     else if (zAfterCore || zBeforeCore) buildOrder(Get(Protoss.Zealot))
     buildOrder(Get(Protoss.Dragoon))
-    if (upgradeComplete(Protoss.ZealotSpeed, 2 * Protoss.Zealot.buildFrames)) {
-      pump(Protoss.Dragoon, maximumConcurrently = 1)
+    if (upgradeComplete(Protoss.ZealotSpeed, 1, 2 * Protoss.Zealot.buildFrames)) {
+      pump(Protoss.Dragoon, maximumConcurrently = 2)
       pump(Protoss.Zealot, 12)
       pump(Protoss.Dragoon)
     } else {

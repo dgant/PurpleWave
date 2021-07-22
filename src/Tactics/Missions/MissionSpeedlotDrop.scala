@@ -8,8 +8,8 @@ import Utilities.Seconds
 
 class MissionSpeedlotDrop extends MissionDrop {
   override protected def additionalFormationConditions: Boolean = (
-    MacroFacts.upgradeComplete(Protoss.ShuttleSpeed, Seconds(15)())
-    && MacroFacts.upgradeComplete(Protoss.ZealotSpeed, Seconds(15)())
+    MacroFacts.upgradeComplete(Protoss.ShuttleSpeed, 1, Seconds(15)())
+    && MacroFacts.upgradeComplete(Protoss.ZealotSpeed, 1, Seconds(15)())
     && With.units.countOurs(MatchAnd(Protoss.Zealot, MatchComplete)) >= 4)
 
   override protected def raid(): Unit = ???

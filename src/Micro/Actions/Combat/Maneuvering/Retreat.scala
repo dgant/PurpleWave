@@ -56,7 +56,8 @@ object Retreat extends Action {
 
     // Against melee rush: Retreat directly to heart so workers can help
     if (unit.isAny(Terran.Marine, Protoss.Zealot) && unit.metro.contains(With.geography.ourMetro) && unit.matchups.threats.forall(_.pixelRangeAgainst(unit) < 64)) {
-      return RetreatPlan(unit, With.geography.ourMain.heart.center, "Run")
+      val baseToRunTo = Maff.orElse(With.geography.ourBases, Seq(With.geography.ourMain)).minBy(_.heart.tileDistanceGroundManhattan(With.scouting.threatOrigin))
+      return RetreatPlan(unit, baseToRunTo.heart.center, "Run")
     }
 
     // Enshuttled VIPs: If not primary passenger, retreat towards primary passenger

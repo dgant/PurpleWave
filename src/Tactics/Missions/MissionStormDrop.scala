@@ -16,7 +16,7 @@ class MissionStormDrop extends MissionDrop {
 
   override protected def additionalFormationConditions: Boolean = (
     With.self.hasTech(Protoss.PsionicStorm)
-    && MacroFacts.upgradeComplete(Protoss.ShuttleSpeed, Seconds(15)())
+    && MacroFacts.upgradeComplete(Protoss.ShuttleSpeed, 1, Seconds(15)())
     && With.units.existsOurs(MatchStormDroppable))
   override protected def requireWorkers = true
   override protected def shouldStopRaiding: Boolean = shouldGoHome

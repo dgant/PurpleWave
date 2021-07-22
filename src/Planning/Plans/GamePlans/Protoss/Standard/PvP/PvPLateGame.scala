@@ -179,7 +179,7 @@ class PvPLateGame extends GameplanImperative {
     } else {
       pumpShuttleAndReavers(6, shuttleFirst = unitsComplete(Protoss.RoboticsSupportBay) == 0)
     }
-    if (upgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.Zealot.buildFrames + Seconds(10)())) {
+    if (upgradeComplete(Protoss.ZealotSpeed, 1, withinFrames = Protoss.Zealot.buildFrames + Seconds(10)())) {
       pumpRatio(Protoss.Zealot, 2, 16, Seq(Friendly(Protoss.Dragoon, 0.5)))
     }
     pump(Protoss.Dragoon)

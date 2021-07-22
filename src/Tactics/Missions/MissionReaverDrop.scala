@@ -16,7 +16,7 @@ class MissionReaverDrop extends MissionDrop {
   override protected def additionalFormationConditions: Boolean = (
     ! With.blackboard.wantToAttack()
     && With.scouting.enemyProgress > 0.5
-    && MacroFacts.upgradeComplete(Protoss.ShuttleSpeed, Seconds(15)())
+    && MacroFacts.upgradeComplete(Protoss.ShuttleSpeed, 1, Seconds(15)())
     && With.units.existsOurs(MatchAnd(Protoss.Reaver, MatchComplete)))
 
   override protected def shouldStopRaiding: Boolean = passengers.view

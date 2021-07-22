@@ -26,7 +26,7 @@ abstract class Squad extends Tactic with FriendlyUnitGroup {
   private var _enemiesNext = new ArrayBuffer[UnitInfo]
   private val _qualityCounter = new QualityCounter
 
-  private def commission(): Unit = {
+  def commission(): Unit = {
     if ( ! With.squads.isCommissioned(this)) {
       With.squads.commission(this)
       _enemiesNow.clear()

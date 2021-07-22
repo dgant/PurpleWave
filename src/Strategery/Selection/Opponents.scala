@@ -8,7 +8,8 @@ object Opponents {
 
   val defaultPvT = StrategySelectionFixed(PvT13Nexus, PvT2BaseReaver, PvT3BaseGateway)
   val defaultPvP = StrategySelectionFixed(PvPRobo, PvPGateCoreTech)
-  val defaultPvZ = StrategySelectionFixed(PvZ2Gate1012, PvZ4GateGoon, PvZMidgame5GateGoon, PvZLateGameTemplar)
+  //val defaultPvZ = StrategySelectionFixed(PvZ2Gate1012, PvZ4GateGoon, PvZMidgame5GateGoon, PvZLateGameTemplar)
+  val defaultPvZ = StrategySelectionFixed(PvZ2Gate4Gate)
 
   // COG 2021 PREP
   //val stardust    : Opponent = add("Stardust",    StrategySelectionFixed(PvPRobo, PvP1012, PvP3Zealot))

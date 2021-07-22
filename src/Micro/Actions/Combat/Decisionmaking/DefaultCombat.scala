@@ -147,7 +147,7 @@ object DefaultCombat extends Action {
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
 
     lazy val target = Target.choose(unit)
-    unit.agent.shouldEngage &&= target.nonEmpty || unit.matchups.threats.forall(MatchWorker)
+    unit.agent.shouldEngage &&= target.nonEmpty || unit.matchups.threats.forall(MatchWorker) || unit.battle.isEmpty
 
     //////////////////////////
     // Set traffic priority //
@@ -167,7 +167,7 @@ object DefaultCombat extends Action {
     //////////////////////
 
     var technique: Technique =
-      if (unit.agent.shouldEngage && (unit.agent.withinSafetyMargin || unit.matchups.targets.nonEmpty || unit.matchups.threatsInFrames(48).forall(MatchWorker)))
+      if ((unit.agent.shouldEngage || unit.battle.isEmpty) && (unit.agent.withinSafetyMargin || unit.matchups.targets.nonEmpty || unit.matchups.threatsInFrames(48).forall(MatchWorker)))
         Fight else Flee
 
     def transition(newTechnique: Technique, predicate: () => Boolean = () => true, action: () => Unit = () => {}): Unit = {
@@ -193,7 +193,7 @@ object DefaultCombat extends Action {
       || (
         unit.agent.receivedPushPriority() < TrafficPriorities.Shove
         && unit.matchups.threatsInFrames(unit.unitClass.framesToTurnShootTurnAccelerate).forall(_.topSpeed > unit.topSpeed))))
-    transition(Dance,     () => target.map(unit.pixelRangeAgainst).exists(_ > 64))
+    transition(Dance,     () => unit.unitClass.danceAllowed && target.map(unit.pixelRangeAgainst).exists(_ > 64))
     //transition(Excuse,    () => unit.agent.receivedPushPriority() > unit.agent.priority)
 
     if (unit.unready) return

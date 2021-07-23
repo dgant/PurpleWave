@@ -7,7 +7,7 @@ import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Utilities.GameTime
 
-class PvZ2Gate4Gate extends GameplanImperative{
+class PvZ2GateFlex extends GameplanImperative{
 
   override def executeBuild(): Unit = {
     buildOrder(
@@ -33,9 +33,8 @@ class PvZ2Gate4Gate extends GameplanImperative{
       Get(Protoss.CyberneticsCore),
       Get(7, Protoss.Zealot),
       Get(21, Protoss.Probe),
-      Get(3, Protoss.Gateway),
-      Get(2, Protoss.Dragoon),
-      Get(Protoss.DragoonRange))
+      Get(8, Protoss.Zealot),
+      Get(1, Protoss.Dragoon))
   }
   override def executeMain(): Unit = {
     if (enemyHydralisksLikely) status("Hydras")
@@ -59,8 +58,19 @@ class PvZ2Gate4Gate extends GameplanImperative{
       status("Expand")
       requireMiningBases(2)
     }
+
+    if (enemyMutalisksLikely) {
+      get(Protoss.Stargate)
+      pump(Protoss.Corsair, 5)
+    } else if ( ! enemyHydralisksLikely) {
+      get(Protoss.Stargate)
+      pump(Protoss.Corsair, 2)
+    }
+
     pump(Protoss.Dragoon)
+    get(Protoss.DragoonRange)
     get(4, Protoss.Gateway)
+    pump(Protoss.Zealot)
   }
 
   def restOfGame(): Unit = {

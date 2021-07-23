@@ -104,7 +104,7 @@ object ProtossChoices {
   val pvzOpenersTransitioningFrom2Gate = Vector(
     PvZ2Gate910,
     PvZ2Gate1012,
-    PvZ2Gate4Gate
+    PvZ2GateFlex
   )
   
   val pvzMidgameTransitioningFromTwoBases = Vector(

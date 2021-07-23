@@ -98,6 +98,9 @@ object Maff {
     val valuesCentroid = centroid(values)
     values.minBy(_.pixelDistanceSquared(valuesCentroid))
   }
+  @inline final def exemplarOption(values: Traversable[Pixel]): Option[Pixel] = {
+    if (values.isEmpty) None else Some(exemplar(values))
+  }
 
   @inline final def weightedCentroid(values: Traversable[(Pixel, Double)]): Pixel = {
     if (values.isEmpty) return SpecificPoints.middle

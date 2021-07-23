@@ -3,7 +3,7 @@ package Strategery.Strategies.Protoss
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.Plan
-import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZ2Gate4Gate
+import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZ2GateFlex
 import Strategery.Strategies.Strategy
 import Strategery.{MapGroups, StarCraftMap}
 import bwapi.Race
@@ -24,8 +24,8 @@ abstract class PvZ2GateOpening extends PvZStrategy {
     ProtossChoices.pvzOpenersTransitioningFrom2Gate
   )
 }
-object PvZ2Gate4Gate extends PvZStrategy {
-  override def gameplan: Option[Plan] = Some(new PvZ2Gate4Gate)
+object PvZ2GateFlex extends PvZStrategy {
+  override def gameplan: Option[Plan] = Some(new PvZ2GateFlex)
 }
 object PvZ1BaseForgeTech extends PvZStrategy {
   override def allowedVsHuman: Boolean = false

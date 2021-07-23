@@ -81,36 +81,48 @@ object SquadAutomation {
     output
   }
 
-  def send(squad: Squad, minToForm: Int = 0): Unit = {
-    squad.units.foreach(unit => {
-      unit.intend(this, new Intention {
-        // Send to the first formation, which will be advancey if we're advancing
-        toTravel = squad
-          .formations
-          .headOption
-          .filter(_.placements.size >= minToForm)
-          .find(_.placements.contains(unit))
-          .map(_.placements(unit))
-          .orElse(Some(if (squad.fightConsensus) squad.vicinity else squad.homeConsensus))
-        toReturn = squad
-          .formations
-          .find(f => f.style == FormationStyleGuard || f.style == FormationStyleDisengage)
-          .filter(_.placements.size >= minToForm)
-          .find(_.placements.contains(unit))
-          .map(_.placements(unit))
+  def send(squad: Squad, toReturn: Option[Pixel] = None, minToForm: Int = 0): Unit = {
+    if (squad.formations.isEmpty) {
+      squad.units.foreach(_.intend(squad, new Intention { toTravel = Some(squad.vicinity); toReturn = toReturn }))
+    } else {
+      squad.units.foreach(unit => {
+        unit.intend(squad, new Intention {
+          // Send to the first formation, which will be advancey if we're advancing
+          toTravel = squad
+            .formations
+            .headOption
+            .filter(_.placements.size >= minToForm)
+            .find(_.placements.contains(unit))
+            .map(_.placements(unit))
+            .orElse(Some(if (squad.fightConsensus) squad.vicinity else toReturn.getOrElse(squad.homeConsensus)))
+          toReturn = squad
+            .formations
+            .find(f => f.style == FormationStyleGuard || f.style == FormationStyleDisengage)
+            .filter(_.placements.size >= minToForm)
+            .find(_.placements.contains(unit))
+            .map(_.placements(unit))
+            .orElse(toReturn)
+            .orElse(Some(squad.homeConsensus))
+        })
       })
-    })
+    }
   }
 
   //////////////////////
   // Full automation! //
   //////////////////////
 
+  def targetAndSend(squad: Squad): Unit = targetAndSend(squad, from = squad.homeConsensus, to = squad.vicinity)
+  def targetAndSend(squad: Squad, from: Pixel, to: Pixel): Unit = {
+    target(squad)
+    send(squad, Some(from))
+  }
+
   def targetFormAndSend(squad: Squad): Unit = targetFormAndSend(squad, minToForm = 0)
   def targetFormAndSend(squad: Squad, minToForm: Int): Unit = targetFormAndSend(squad, from = squad.homeConsensus, to = squad.vicinity, minToForm = minToForm)
   def targetFormAndSend(squad: Squad, from: Pixel, to: Pixel, minToForm: Int): Unit = {
     target(squad)
     squad.formations = form(squad, from, to)
-    send(squad, minToForm = minToForm)
+    send(squad, Some(from), minToForm = minToForm)
   }
 }

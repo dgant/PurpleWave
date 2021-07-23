@@ -1,11 +1,12 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
+import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.GamePlans.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Friendly}
 import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Utilities.GameTime
+import Utilities.{DoQueue, GameTime}
 
 class PvZ2GateFlex extends GameplanImperative{
 
@@ -40,9 +41,12 @@ class PvZ2GateFlex extends GameplanImperative{
     if (enemyHydralisksLikely) status("Hydras")
     if (enemyMutalisksLikely) status("Mutas")
     if (enemyLurkersLikely) status("Lurkers")
+    if (enemyHasUpgrade(Zerg.ZerglingSpeed)) status("LingSpeed")
     if (bases < 2) {
+      status("Early")
       earlyGame()
     } else {
+      status("Late")
       restOfGame()
     }
   }
@@ -51,7 +55,6 @@ class PvZ2GateFlex extends GameplanImperative{
     // Goal is to be home before any Mutalisks can pop.
     // Optimization: Detect 2 vs 3 hatch muta and stay out the extra 30s vs 3hatch
     scoutOn(Protoss.Gateway, quantity = 2)
-    if ((frame < GameTime(6, 10)() || enemyHydralisksLikely) && safeToMoveOut) { attack() }
 
     val shouldExpand = (safeAtHome || unitsComplete(MatchWarriors) >= 9) && (enemiesComplete(Zerg.SunkenColony) > 2 || frame > GameTime(5, 40)())
     if (shouldExpand) {
@@ -59,18 +62,28 @@ class PvZ2GateFlex extends GameplanImperative{
       requireMiningBases(2)
     }
 
+    var shouldAttack = frame < GameTime(6, 10)()
+    shouldAttack || enemyHydralisksLikely
+    shouldAttack &&= safeToMoveOut
+    shouldAttack ||= shouldExpand
+    if (shouldAttack) { attack() }
+
     if (enemyMutalisksLikely) {
       get(Protoss.Stargate)
       pump(Protoss.Corsair, 5)
     } else if ( ! enemyHydralisksLikely) {
       get(Protoss.Stargate)
-      pump(Protoss.Corsair, 2)
+      pump(Protoss.Corsair, 1)
     }
 
     pump(Protoss.Dragoon)
     get(Protoss.DragoonRange)
-    get(4, Protoss.Gateway)
+    get(3, Protoss.Gateway)
+    if (enemyHasUpgrade(Zerg.ZerglingSpeed)) {
+      get(4, Protoss.Gateway)
+    }
     pump(Protoss.Zealot)
+    requireMiningBases(2)
   }
 
   def restOfGame(): Unit = {
@@ -82,32 +95,42 @@ class PvZ2GateFlex extends GameplanImperative{
       requireMiningBases(2)
     }
 
-    // We want this up ASAP in case of Mutalisks
-    get(Protoss.Stargate)
-    buildGasPumps()
+    val trainCorsairs = new DoQueue(doTrainCorsairs)
+    val trainMainArmy = new DoQueue(doTrainMainArmy)
+    val upgrades      = new DoQueue(doUpgrades)
+    val tech2Base     = new DoQueue(doTech2Base)
+    val techRobo      = new DoQueue(doTechRobo)
+    val endgame       = new DoQueue(doEndgame)
+    val expand        = new DoQueue(doExpand)
 
-    trainCorsairs()
+    get(Protoss.Gateway); get(Protoss.Assimilator); get(3, Protoss.Gateway); get(Protoss.Stargate)
+    if (saturated || (gas < 200 && units(Protoss.Gateway, Protoss.Stargate) >= 4)) buildGasPumps()
 
-    upgradeContinuously(Protoss.GroundDamage)
-    if (unitsComplete(Protoss.Forge) > 1 || upgradeComplete(Protoss.GroundDamage, 3)) {
-      upgradeContinuously(Protoss.GroundArmor)
+    var shouldConsiderExpanding = upgradeComplete(Protoss.ZealotSpeed)
+    shouldConsiderExpanding ||= miningBases < 2 && safeAtHome
+    if (shouldConsiderExpanding) {
+      status("ExpandUnlocked")
+      expand()
     }
-    requireMiningBases(2 + Math.min(unitsComplete(MatchWarriors) / 20, 2))
-
-    trainLateArmy()
-
-
-    if (frame > GameTime(10, 0)() || enemyLurkersLikely) {
+    upgrades()
+    trainCorsairs()
+    if (safeAtHome && unitsComplete(MatchWarriors) >= 10) {
+      tech2Base()
+    }
+    if (enemyLurkersLikely) {
       techRobo()
     }
-    twoBaseTech()
-
-    if (unitsComplete(Protoss.Gateway) > 7) {
-      lategame()
+    trainMainArmy()
+    tech2Base()
+    get(6, Protoss.Gateway)
+    techRobo()
+    get(8, Protoss.Gateway)
+    if (unitsComplete(Protoss.Gateway) >= 6) {
+      endgame()
     }
   }
 
-  def trainCorsairs(): Unit = {
+  def doTrainCorsairs(): Unit = {
     buildOrder(Get(Protoss.Corsair))
     if (enemyMutalisksLikely) {
       pumpRatio(Protoss.Corsair, 5, 10, Seq(Enemy(Zerg.Mutalisk, 1.0)))
@@ -116,12 +139,12 @@ class PvZ2GateFlex extends GameplanImperative{
       if (upgradeComplete(Protoss.AirDamage)) {
         get(Protoss.AirArmor)
       }
-    } else if (safeAtHome && unitsComplete(MatchWarriors) >= 8) {
-      pump(Protoss.Corsair, if (enemyHydralisksLikely) 1 else 3)
+    } else if (safeAtHome || unitsComplete(MatchWarriors) >= 8) {
+      pumpRatio(Protoss.Corsair, 1, 4, Seq(Friendly(MatchWarriors, 0.1)))
     }
   }
 
-  def trainLateArmy(): Unit = {
+  def doTrainMainArmy(): Unit = {
     if (upgradeComplete(Protoss.ZealotSpeed, 1, 2 * Protoss.Zealot.buildFrames)) {
       pumpRatio(Protoss.Dragoon, 1, 24, Seq(Friendly(Protoss.Zealot, 1.0), Enemy(Zerg.Mutalisk, 1.0), Enemy(Zerg.Lurker, 1.5)))
       pump(Protoss.DarkTemplar, 1)
@@ -130,25 +153,35 @@ class PvZ2GateFlex extends GameplanImperative{
       pump(Protoss.Zealot)
     } else {
       pump(Protoss.Dragoon, 16)
+      pump(Protoss.Zealot)
     }
   }
 
-  def techRobo(): Unit = {
+  def doUpgrades(): Unit = {
+    upgradeContinuously(Protoss.GroundDamage)
+    if (unitsComplete(Protoss.Forge) > 1 || upgradeComplete(Protoss.GroundDamage, 3)) {
+      upgradeContinuously(Protoss.GroundArmor)
+    }
+  }
+
+  def doTech2Base(): Unit = {
+    get(Protoss.Forge)
+    get(Protoss.CitadelOfAdun)
+    get(Protoss.GroundDamage)
+    get(Protoss.ZealotSpeed)
+    get(Protoss.TemplarArchives)
+    get(Protoss.PsionicStorm)
+  }
+
+  def doTechRobo(): Unit = {
     get(Protoss.RoboticsFacility)
     get(Protoss.Observatory)
     pump(Protoss.Observer, if (enemyLurkersLikely) 2 else 1)
     if (enemyLurkersLikely) upgradeContinuously(Protoss.ObserverSpeed)
   }
 
-  def twoBaseTech(): Unit = {
-    get(Protoss.Forge)
-    get(Protoss.CitadelOfAdun)
-    get(Protoss.ZealotSpeed)
-    get(Protoss.TemplarArchives)
+  def doEndgame(): Unit = {
     get(8, Protoss.Gateway)
-  }
-
-  def lategame(): Unit = {
     requireBases(3)
     get(Protoss.HighTemplarEnergy)
     requireMiningBases(3)
@@ -157,5 +190,11 @@ class PvZ2GateFlex extends GameplanImperative{
     pump(Protoss.Shuttle, 1)
     get(14, Protoss.Gateway)
     requireBases(4)
+  }
+
+  def doExpand(): Unit = {
+    if (With.units.ours.filter(Protoss.Nexus).forall(_.complete)) {
+      requireMiningBases(Math.min(miningBases + 1, 2 + Math.min(unitsComplete(MatchWarriors) / 20, 2)))
+    }
   }
 }

@@ -83,7 +83,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
       .filter(p => mineralSlotCount < 14 || (
         p._3 <= 1.5 * naturalCost // Distance mine only if it's safe or we're desperate
         && With.scouting.enemyProgress < 0.6
-        && With.blackboard.wantToAttack()))
+        && (With.blackboard.wantToAttack() || p._1.townHall.exists(_.isOurs))))
       .toVector
       .sortBy(_._3) // sort the closest
     val distanceMineralBasesNeeded = distanceMineralBases.indices.find(i => distanceMineralBases.take(i).view.map(_._2.size).sum > 5).getOrElse(distanceMineralBases.size)

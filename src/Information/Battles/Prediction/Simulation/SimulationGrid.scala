@@ -13,10 +13,11 @@ final class SimulationGrid {
     // TODO: Check walkability
     // TODO: Walk around obstacles
     //if (unit.gridTile.tile.contains(to) || (to.valid && tiles(to.tile.i).occupancy + unit.unitClass.occupancy <= occupancyMax)) {
-      unit.gridTile -= unit
-      unit.pixel = to
-      unit.gridTile = tiles(to.tile.clip.i)
-      unit.gridTile += unit
+      val toClamped = to.clamp()
+      //unit.gridTile -= unit
+      unit.pixel = toClamped
+      //unit.gridTile = tiles(to.tile.clip.i)
+      //unit.gridTile += unit
       true
     //} else {
     //  false

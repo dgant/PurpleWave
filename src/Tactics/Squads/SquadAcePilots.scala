@@ -22,6 +22,9 @@ class SquadAcePilots extends Squad {
     lock.acquire()
   }
 
+  var activity: String = toString
+  override def toString = activity
+
   override def run(): Unit = {
     // Help other squads with anti-air
     val otherSquads = With.squads.all.view.filterNot(_ == this)
@@ -30,6 +33,7 @@ class SquadAcePilots extends Squad {
       val squad = squadsToCover
         .sortBy(_.isInstanceOf[SquadDefendBase])
         .maxBy(_.targetQueue.get.count(MatchFlyingWarriors))
+      activity = "AceHelpSquad"
       vicinity = squad.centroidAll
       SquadAutomation.targetAndSend(this)
       return
@@ -44,6 +48,7 @@ class SquadAcePilots extends Squad {
     val requireFleet = MacroFacts.enemyHasShown(acePilots: _*) || With.units.enemy.exists(u => u.complete && Zerg.Spire(u))
     lazy val hasFleet = units.size >= Math.max(6, if (weSplash && ! enemySplashes) 0 else MacroFacts.enemies(acePilots: _*))
     if (requireFleet && ! hasFleet) {
+      activity = "AceChill"
       chill()
       return
     }
@@ -55,14 +60,16 @@ class SquadAcePilots extends Squad {
         .filter(_.enemies.exists(MatchFlyingWarriors))
         .filter(d => hasFleet || units.size > d.enemies.count(MatchFlyingWarriors)))(_.centroidAir.pixelDistanceSquared(centroidAir))
     if (aceDivision.isDefined) {
+      activity = "AceAir2Air"
       vicinity = aceDivision.get.centroidAir
       SquadAutomation.targetAndSend(this)
       return
     }
 
     // Help clear detection
-    val squadsFacingDetection = otherSquads.filter(s => s.units.exists(u => Protoss.DarkTemplar(u) && u.matchups.enemyDetectors.nonEmpty)).toVector
+    val squadsFacingDetection = otherSquads.filter(s => s.units.exists(u => Protoss.DarkTemplar(u) && u.matchups.enemyDetectors.forall(_.flying))).toVector
     if (squadsFacingDetection.nonEmpty) {
+      activity = "AceCloakDT"
       val squad = squadsFacingDetection.minBy(_.centroidAir.pixelDistanceSquared(centroidAir))
       vicinity = squad.centroidAll
       SquadAutomation.targetAndSend(this)
@@ -71,9 +78,10 @@ class SquadAcePilots extends Squad {
 
     // Scout their bases
     // Don't look to target anything; just get scouting information first
-    val unscouted = With.geography.enemyBases.filter(b => With.framesSince(b.lastScoutedFrame) > Seconds(30)())
+    val unscouted = With.geography.enemyBases.filter(b => With.framesSince(b.lastScoutedFrame) > Seconds(30)() && ! b.units.exists(u => u.isEnemy && u.canAttackAir))
     if (unscouted.nonEmpty) {
-      val base = unscouted.minBy(_.townHallArea.center.pixelDistanceSquared(centroidAir))
+      activity = "AceScout"
+      val base = unscouted.minBy(_.units.count(u => u.isEnemy && u.canAttackAir))
       vicinity = base.townHallArea.center
       SquadAutomation.send(this)
       return
@@ -82,6 +90,7 @@ class SquadAcePilots extends Squad {
     // Just snipe anything we can
     val nearestFlier = Maff.minBy(With.units.enemy.filter(u => u.flying && ! u.unitClass.isBuilding))(_.pixelDistanceSquared(centroidAir))
     if (nearestFlier.isDefined) {
+      activity = "AceHunt"
       vicinity = nearestFlier.get.pixel
       SquadAutomation.targetAndSend(this)
       return

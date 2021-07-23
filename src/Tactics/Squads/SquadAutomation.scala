@@ -23,7 +23,7 @@ object SquadAutomation {
   def targetRaid(squad: Squad, to: Pixel): Unit = {
     squad.targetQueue = Some(SquadAutomation.rankForArmy(
       squad,
-      unrankedTargetsTo(squad, to).view
+      unrankedEnRouteTo(squad, to).view
         .filter(t => t.unitClass.isWorker || squad.units.exists(u => (t.canAttack(u) || t.unitClass.canAttack(u)) && t.inRangeToAttack(u)))))
   }
 
@@ -35,10 +35,10 @@ object SquadAutomation {
       + 160)
       * (if (t.unitClass.attacksOrCastsOrDetectsOrTransports || ! group.engagedUpon) 1 else 2))
   }
-  def unrankedTargetsTo(group: FriendlyUnitGroup, to: Pixel): Vector[UnitInfo] = {
-    // Ratio of path distance to (target combined distance from origin and goal) required to include a target as "on the way"
-    // This equates to 34 degree deviation from a straight line
-    val distanceRatio = 1.2
+  // Ratio of path distance to (target combined distance from origin and goal) required to include a target as "on the way"
+  // This equates to 34 degree deviation from a straight line
+  val distanceRatio = 1.2
+  def unrankedEnRouteTo(group: FriendlyUnitGroup, to: Pixel): Vector[UnitInfo] = {
     val units         = group.groupUnits
     val originAir     = group.homeConsensus
     val origin        = if (group.hasGround) originAir.nearestWalkableTile    else originAir.tile
@@ -55,7 +55,7 @@ object SquadAutomation {
     output
   }
   def rankedEnRoute(squad: Squad): Seq[UnitInfo] = rankedEnRoute(squad, squad.vicinity)
-  def rankedEnRoute(group: FriendlyUnitGroup, goalAir: Pixel): Seq[UnitInfo] = rankForArmy(group, unrankedTargetsTo(group, goalAir))
+  def rankedEnRoute(group: FriendlyUnitGroup, goalAir: Pixel): Seq[UnitInfo] = rankForArmy(group, unrankedEnRouteTo(group, goalAir))
 
   ////////////////
   // Formations //
@@ -98,7 +98,7 @@ object SquadAutomation {
           toReturn = squad
             .formations
             .find(f => f.style == FormationStyleGuard || f.style == FormationStyleDisengage)
-            .filter(_.placements.size >= minToForm)
+            .filter(_.placements.size >= 2)
             .find(_.placements.contains(unit))
             .map(_.placements(unit))
             .orElse(toReturn)

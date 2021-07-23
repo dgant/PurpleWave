@@ -4,6 +4,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Performance.Cache
 import Planning.UnitMatchers.{MatchAnd, MatchComplete}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
@@ -111,7 +112,15 @@ class Projections {
     }
 
     // Do we need to build the thing that upgrades this?
+    // or the thing that lets us get advanced levels of this?
+    val framesToHighLevels = if (level < 2) 0 else upgrade match {
+      case Terran.BioDamage | Terran.BioArmor | Terran.MechDamage | Terran.MechArmor | Terran.AirDamage | Terran.AirArmor => framesToUnits(Terran.ScienceFacility)
+      case Protoss.GroundDamage | Protoss.GroundArmor => framesToUnits(Protoss.TemplarArchives)
+      case Protoss.AirDamage | Protoss.AirArmor => framesToUnits(Protoss.FleetBeacon)
+      case Zerg.GroundMeleeDamage | Zerg.GroundRangeDamage | Zerg.GroundArmor | Zerg.AirDamage | Zerg.AirArmor => framesToUnits(if (level == 2) Zerg.Lair else Zerg.Hive)
+      case _ => 0
+    }
     val framesToUpgrader = framesToUnits(upgrade.whatUpgrades)
-    framesToUpgrader + upgrade.upgradeFrames(level)
+    Math.max(framesToHighLevels, framesToUpgrader) + upgrade.upgradeFrames(level)
   }
 }

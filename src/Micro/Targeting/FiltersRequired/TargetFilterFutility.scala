@@ -3,12 +3,12 @@ package Micro.Targeting.FiltersRequired
 import Lifecycle.With
 import Micro.Targeting.TargetFilter
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Tactics.Squads.SquadAutomation
 
 object TargetFilterFutility extends TargetFilter {
 
   // Ignore targets we have no chance of reaching
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
-
     if (actor.inRangeToAttack(target)) return true
     if ( ! actor.canMove ) return false
 
@@ -28,7 +28,8 @@ object TargetFilterFutility extends TargetFilter {
       if (actor.team.exists(t => if (target.flying) t.catchesAir else t.catchesGround)) return true
       if (target.presumptiveTarget.exists(u => u.isOurs && u.unitClass.isWorker)) return true
     }
+    val to = actor.agent.destination.nearestWalkablePixel
+    if (target.pixelDistanceTravelling(to) < actor.pixelDistanceTravelling(to) * SquadAutomation.distanceRatio) return true
     false
   }
-  
 }

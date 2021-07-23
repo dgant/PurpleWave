@@ -72,8 +72,6 @@ abstract class Squad extends Tactic with FriendlyUnitGroup {
     val swapEnemies = _enemiesNow
     _enemiesNow = _enemiesNext
     _enemiesNext = swapEnemies
-    targetQueue = None
-    formations.clear()
   }
 
   def run(): Unit

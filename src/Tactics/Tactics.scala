@@ -36,6 +36,7 @@ class Tactics extends TimedTask {
   // Priority squads //
   ////////////////////
 
+  private val acePilots                 = addPriorityTactic(new SquadAcePilots)
   private val clearBurrowedBlockers     = addPriorityTactic(new SquadClearExpansionBlockers)
   private val ejectScout                = addPriorityTactic(new SquadEjectScout)
   private val followBuildOrder          = addPriorityTactic(new FollowBuildOrder)

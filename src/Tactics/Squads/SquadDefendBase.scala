@@ -75,6 +75,7 @@ class SquadDefendBase(base: Base) extends Squad {
     lazy val formationBastion = FormationGeneric.march(this, bastion())
     lazy val formationGuard = guardChoke.map(c => FormationZone(this, guardZone, c)).getOrElse(formationBastion)
 
+    formations.clear()
     if (canScour) {
       lastAction = "Scour"
       formations += formationScour

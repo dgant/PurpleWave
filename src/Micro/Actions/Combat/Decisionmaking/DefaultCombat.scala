@@ -217,7 +217,7 @@ object DefaultCombat extends Action {
     if (goalRetreat) unit.agent.toTravel = Some(unit.agent.safety)
 
     val breakFormationThreshold = 64
-    lazy val breakFormationToAttack = target.exists(targ =>
+    lazy val breakFormationToAttack = unit.squad.forall(_.formations.isEmpty) || target.exists(targ =>
       // If we're not ready to attack yet, just slide into formation
       readyToAttackTarget(unit) && (
         // Break if we are already in range

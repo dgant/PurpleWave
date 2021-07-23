@@ -73,7 +73,10 @@ class Agent(val unit: FriendlyUnitInfo) {
     .getOrElse(With.geography.home.center))
 
   def isScout: Boolean = unit.intent.toScoutTiles.nonEmpty
-  def withinSafetyMargin: Boolean = unit.matchups.pixelsOfEntanglement <= -128
+  def withinSafetyMargin: Boolean = {
+    unit.matchups.pixelsOfEntanglement <=
+      (if (unit.flying && unit.topSpeed > Maff.max(unit.matchups.threats.view.map(_.topSpeed)).getOrElse(0.0)) -32 else -128)
+  }
 
   /////////////////
   // Diagnostics //

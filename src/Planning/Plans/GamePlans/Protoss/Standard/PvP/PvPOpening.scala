@@ -258,10 +258,16 @@ class PvPOpening extends GameplanImperative {
     shouldAttack = PvPIdeas.shouldAttack
     // Push out to take our natural
     shouldAttack ||= shouldExpand
-    // Ensure that committed Zealots keep wanting to attack
-    shouldAttack ||= With.units.ours.exists(u => u.agent.commit) && With.frame < Minutes(5)()
     // Don't attack if we're also dropping (unless it's time to take our natural)
     shouldAttack &&= ( ! upgradeStarted(Protoss.ShuttleSpeed) || shouldExpand)
+    // 2-Gate vs 1-Gate core needs to wait until range before venturing out again, to avoid rangeless goons fighting ranged goons
+    shouldAttack &&= ! (With.frame > GameTime(5, 10)()
+      && employing(PvP1012)
+      && enemyStrategy(With.fingerprints.oneGateCore)
+      && ! upgradeComplete(Protoss.DragoonRange)
+      && unitsComplete(Protoss.DarkTemplar, Protoss.Reaver) == 0)
+    // Ensure that committed Zealots keep wanting to attack
+    shouldAttack ||= With.units.ours.exists(u => u.agent.commit) && With.frame < Minutes(5)()
 
     /////////////
     // Logging //
@@ -311,7 +317,7 @@ class PvPOpening extends GameplanImperative {
         }
       } else if (starts > 3) {
         scoutOn(Protoss.Gateway)
-      } else {
+      } else if ( ! zBeforeCore) {
         scoutOn(Protoss.CyberneticsCore)
       }
     }

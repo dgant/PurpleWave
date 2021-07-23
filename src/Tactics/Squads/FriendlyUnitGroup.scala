@@ -1,5 +1,6 @@
 package Tactics.Squads
 
+import Lifecycle.With
 import Mathematics.Maff
 import Performance.Cache
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -15,6 +16,6 @@ trait FriendlyUnitGroup extends UnitGroup {
   def fightConsensus  = _fightConsensus()
   def homeConsensus   = _homeConsensus()
 
-  private val _fightConsensus = new Cache(() => Maff.mode(groupFriendlyOrderable.view.map(u => u.agent.shouldEngage || u.battle.forall(_.judgement.exists(_.shouldFight)))))
-  private val _homeConsensus  = new Cache(() => Maff.mode(groupFriendlyOrderable.view.map(_.agent.home)))
+  private val _fightConsensus = new Cache(() => Maff.modeOpt(groupFriendlyOrderable.view.map(u => u.agent.shouldEngage || u.battle.forall(_.judgement.exists(_.shouldFight)))).getOrElse(true))
+  private val _homeConsensus  = new Cache(() => Maff.modeOpt(groupFriendlyOrderable.view.map(_.agent.home)).getOrElse(With.geography.home.center))
 }

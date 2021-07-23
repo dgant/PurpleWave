@@ -30,7 +30,7 @@ object PvPGateCoreTech extends PvPStrategy {
   override def entranceInverted: Boolean = false
 }
 object PvPGateCoreGate extends PvPStrategy {
-  // No blacklisting; Preserve this as our "Always valid" choice
+  override def entranceRamped: Boolean = false
 }
 object PvPTechBeforeRange extends PvPStrategy {
   override def entranceInverted: Boolean = false

@@ -50,7 +50,7 @@ class Pump(
   
   private def getBuilderReadiness(builders: Iterable[FriendlyUnitInfo]): Double =
     Maff
-      .optMean(builders.map(b => 1.0 - Math.min(1.0, Math.max(b.remainingTrainFrames, b.remainingCompletionFrames).toDouble / unitClass.buildFrames)))
+      .meanOpt(builders.map(b => 1.0 - Math.min(1.0, Math.max(b.remainingTrainFrames, b.remainingCompletionFrames).toDouble / unitClass.buildFrames)))
       .getOrElse(0.5)
   
   protected def canBuild: Boolean = (

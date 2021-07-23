@@ -23,7 +23,7 @@ object Opponents {
   val skynet      : Opponent = add("Skynet",      defaultPvP) // Metabot stand-in
   val ximp        : Opponent = add("XIMP",        defaultPvP) // Metabot stand-in
   val xiaoyi      : Opponent = add("XIAOYI",      defaultPvT)
-  val mcrave      : Opponent = add("McRave",      StrategySelectionFixed(PvZFFEEconomic, PvZMidgameCorsairReaverGoon, PvZLateGameReaver))
+  val mcrave      : Opponent = add("McRave",      defaultPvZ)
   val microwave   : Opponent = add("Microwave",   defaultPvZ)
   val cunybot     : Opponent = add("CUNYBot",     defaultPvZ)
 

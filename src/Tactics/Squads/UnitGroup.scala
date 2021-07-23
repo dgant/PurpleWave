@@ -1,6 +1,6 @@
 package Tactics.Squads
 
-import Information.Battles.Types.GroupCentroid
+import Information.Battles.Types.{BattleLocal, GroupCentroid}
 import Mathematics.Maff
 import Performance.Cache
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -31,8 +31,6 @@ trait UnitGroup {
   def attackCentroidAir       = _centroidAir()
   def attackCentroidGround    = _centroidGround()
   def attackCentroidKey       = _centroidKey()
-  def battleConsensus         = _battleConsensus()
-  def threatConsensus         = _threatConsensus()
   def meanTopSpeed            = _meanTopSpeed()
 
   private def _attackers()      = groupOrderable.view.filter(u => u.unitClass.canAttack  && ! u.unitClass.isWorker)
@@ -55,7 +53,5 @@ trait UnitGroup {
   private val _attackCentroidAir        = new Cache(() => GroupCentroid.air(attackers))
   private val _attackCentroidGround     = new Cache(() => GroupCentroid.ground(attackers))
   private val _attackCentroidKey        = new Cache(() => if (_hasGround()) attackCentroidGround else attackCentroidAir)
-  private val _battleConsensus          = new Cache(() => Maff.mode(groupOrderable.view.map(_.battle)))
-  private val _threatConsensus          = new Cache(() => battleConsensus.map(_.enemy.centroidGround))
   private val _meanTopSpeed             = new Cache(() => Maff.mean(groupOrderable.view.filter(_.canMove).map(_.topSpeed)))
 }

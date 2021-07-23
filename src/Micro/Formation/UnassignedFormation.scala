@@ -55,11 +55,15 @@ case class UnassignedFormation(style: FormationStyle, slots: Map[UnitClass, Iter
         p._2.toVector.sortBy(_.pixelDistanceTravelling(to))))
     val output = new Formation(
       style,
-      orderedUnits.flatMap(p =>
-        //The .take() is protection against array bounds issues I never investigated
-        orderedSlots(p._1).indices.take(p._2.size).map(i =>
-          (p._2(i),
-          orderedSlots(p._1)(i)))))
+      orderedUnits
+        .view
+        .filter(p => orderedSlots.contains(p._1))
+        .flatMap(p =>
+          //The .take() is protection against array bounds issues I never investigated
+          orderedSlots(p._1).indices.take(p._2.size).map(i =>
+            (p._2(i),
+            orderedSlots(p._1)(i))))
+        .toMap)
     output
   }
 }

@@ -6,7 +6,7 @@ import Planning.Plans.GamePlans.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Friendly}
 import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Utilities.{DoQueue, GameTime}
+import Utilities.{DoQueue, GameTime, Minutes}
 
 class PvZ2GateFlex extends GameplanImperative{
 
@@ -117,7 +117,7 @@ class PvZ2GateFlex extends GameplanImperative{
     if (safeAtHome && unitsComplete(MatchWarriors) >= 10) {
       tech2Base()
     }
-    if (enemyLurkersLikely) {
+    if (enemyLurkersLikely || shouldConsiderExpanding && after(Minutes(9))) {
       techRobo()
     }
     trainMainArmy()
@@ -149,8 +149,9 @@ class PvZ2GateFlex extends GameplanImperative{
       pumpRatio(Protoss.Dragoon, 1, 24, Seq(Friendly(Protoss.Zealot, 1.0), Enemy(Zerg.Mutalisk, 1.0), Enemy(Zerg.Lurker, 1.5)))
       pump(Protoss.DarkTemplar, 1)
       get(Protoss.PsionicStorm)
-      pump(Protoss.HighTemplar)
-      pump(Protoss.Zealot)
+      pumpRatio(Protoss.HighTemplar, 2, 12, Seq(Friendly(MatchWarriors, 0.15)))
+      pump(Protoss.Zealot, 24)
+      pump(Protoss.Dragoon)
     } else {
       pump(Protoss.Dragoon, 16)
       pump(Protoss.Zealot)

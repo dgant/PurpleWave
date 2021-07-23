@@ -117,6 +117,7 @@ abstract class MissionDrop extends Mission {
       state match {
         case Recruiting | Assembling | Travelling | Landing => transition(Escaping)
         case Raiding => transition(Evacuating)
+        case _ => {}
       }
     }
     if (state == Recruiting)                                                                { transition(Assembling)  }
@@ -221,8 +222,6 @@ abstract class MissionDrop extends Mission {
       profile.canCrossUnwalkable  = Some(true)
       profile.canEndUnwalkable    = Some(true)
       profile.repulsors           = Vector(PathfindRepulsor(SpecificPoints.middle, 1.0, 32 * mapEdgeMarginTiles))
-      // CPU sparing since this gets expensive. Use a length that's enough to path around, say, a cannon or turret
-      profile.lengthMaximum       = Some(32)
       val path = profile.find
       if (path.pathExists) {
         MicroPathing.tryMovingAlongTilePath(transport, path)

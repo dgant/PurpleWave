@@ -39,7 +39,7 @@ class PvPLateGame extends GameplanImperative {
   override def executeBuild(): Unit = {
     fearDeath   = ! safeAtHome || unitsComplete(MatchWarriors) < 8
     fearMacro   = miningBases < Math.max(2, enemyBases)
-    fearDT      = enemyDarkTemplarLikely && unitsComplete(Protoss.Observer) == 0
+    fearDT      = enemyDarkTemplarLikely && unitsComplete(Protoss.Observer) == 0 && (enemies(Protoss.DarkTemplar) > 0 && unitsComplete(Protoss.PhotonCannon) == 0)
     fearContain = With.scouting.enemyProgress > 0.6
 
     // Don't fear death or contain for a couple of minutes after getting DT if they have no mobile detection or evidence of Robo.
@@ -73,6 +73,7 @@ class PvPLateGame extends GameplanImperative {
     shouldAttack ||= shouldExpand
     shouldSecondaryTech = miningBases > 2
     shouldSecondaryTech ||= (unitsComplete(Protoss.Reaver) > 2 && unitsComplete(Protoss.Shuttle) > 0)
+    shouldSecondaryTech ||= fearDT && primaryTech.contains(TemplarTech)
     shouldSecondaryTech &&= unitsComplete(Protoss.Gateway) >= targetGateways
     shouldSecondaryTech &&= With.units.ours.filter(Protoss.Nexus).forall(_.complete)
     shouldSecondaryTech &&= gasPumps > 1
@@ -230,7 +231,7 @@ class PvPLateGame extends GameplanImperative {
     }
     get(Protoss.RoboticsFacility)
     buildOrder(Get(Protoss.Shuttle))
-    if (shouldDetect || ! fearDeath ) {
+    if (shouldDetect || ( ! fearDeath && ! fearContain)) {
       get(Protoss.Observatory)
       buildOrder(Get(Protoss.Observer))
       if (enemyDarkTemplarLikely || enemyShownCloakedThreat) {
@@ -241,10 +242,11 @@ class PvPLateGame extends GameplanImperative {
       }
     }
     get(Protoss.RoboticsSupportBay)
-    buildOrder(Get(Protoss.Reaver))
-    if (units(Protoss.Reaver) > 0 || techStarted(Protoss.PsionicStorm)) {
+    if (fearContain && ! fearDeath) {
       get(Protoss.ShuttleSpeed)
     }
+    buildOrder(Get(Protoss.Reaver))
+    get(Protoss.ShuttleSpeed)
     if (upgradeComplete(Protoss.ShuttleSpeed) && units(Protoss.Reaver) >= 4) {
       get(Protoss.ScarabDamage)
     }

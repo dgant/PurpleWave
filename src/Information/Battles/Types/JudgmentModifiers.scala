@@ -44,7 +44,7 @@ object JudgmentModifiers {
   def choke(local: BattleLocal): Option[JudgmentModifier] = {
     if (local.us.attackers.forall(_.flying)) return None
     if (local.enemy.attackers.forall(_.flying)) return None
-    val start   = local.us.centroidGround.tile
+    val start   = local.us.vanguardGround().tile
     val profile = new PathfindProfile(start)
     profile.end = Some(local.enemy.vanguardGround().tile)
     profile.employGroundDist = true

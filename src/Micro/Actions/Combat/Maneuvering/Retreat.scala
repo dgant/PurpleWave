@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Maneuvering
 
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.Pixel
+import Mathematics.Points.{Pixel, PixelRay}
 import Micro.Actions.Action
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
@@ -10,6 +10,7 @@ import Micro.Coordination.Pushing.TrafficPriorities
 import Planning.UnitMatchers.MatchTank
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.Minutes
 
 object Retreat extends Action {
   
@@ -32,10 +33,10 @@ object Retreat extends Action {
     lazy val enemySooner          = timeOriginUs + 96 >= timeOriginEnemy
     lazy val enemySieging         = unit.matchups.enemies.exists(_.isAny(MatchTank, Zerg.Lurker)) && ! unit.base.exists(_.owner.isEnemy)
     lazy val goalSidestep         = Protoss.DarkTemplar(unit) || (enemySieging && ! enemyCloser && ! enemySooner)
-    lazy val goalReturn           = ! unit.agent.isScout && ! goalSidestep && unit.agent.toReturn.exists(_.tile.enemyRangeAgainst(unit) == 0)
+    lazy val goalReturn           = ! unit.agent.isScout && ! goalSidestep && (unit.zone == unit.agent.safety.zone && PixelRay(unit.pixel, unit.agent.safety).forall(_.enemyRangeAgainst(unit) <= unit.tile.enemyRangeAgainst(unit)))
     lazy val goalHome             = ! unit.agent.isScout && ! goalSidestep && (unit.zone != unit.agent.safety.zone && (enemyCloser || enemySooner))
     lazy val goalOrigin           = goalReturn || goalHome
-    lazy val goalSafety           = ! unit.agent.withinSafetyMargin && ! goalOrigin
+    lazy val goalSafety           = ! unit.agent.withinSafetyMargin
     lazy val forceVector = {
       if (unit.agent.forces.isEmpty) MicroPathing.setDefaultForces(unit, goalOrigin = goalOrigin, goalSafety = goalSafety)
       unit.agent.forces.sum
@@ -55,7 +56,7 @@ object Retreat extends Action {
       if (unit.matchups.pixelsOfEntanglement > -16) unit.agent.escalatePriority(TrafficPriorities.Shove)
 
     // Against melee rush: Retreat directly to heart so workers can help
-    if (unit.isAny(Terran.Marine, Protoss.Zealot) && unit.metro.contains(With.geography.ourMetro) && unit.matchups.threats.forall(_.pixelRangeAgainst(unit) < 64)) {
+    if (With.frame < Minutes(6)() && unit.isAny(Terran.Marine, Protoss.Zealot) && unit.squad.forall(_.units.size < 5) && unit.metro.contains(With.geography.ourMetro) && unit.matchups.threats.forall(_.pixelRangeAgainst(unit) < 64)) {
       val baseToRunTo = Maff.orElse(With.geography.ourBases, Seq(With.geography.ourMain)).minBy(_.heart.tileDistanceGroundManhattan(With.scouting.threatOrigin))
       return RetreatPlan(unit, baseToRunTo.heart.center, "Run")
     }

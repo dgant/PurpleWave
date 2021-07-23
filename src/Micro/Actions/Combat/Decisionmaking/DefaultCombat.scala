@@ -64,7 +64,7 @@ object DefaultCombat extends Action {
   }
   def readyToAttackTarget(unit: FriendlyUnitInfo): Boolean = {
     if (unit.agent.toAttack.isEmpty) return false
-    if (unit.unitClass.ranged && unit.framesToGetInRange(unit.agent.toAttack.get) < unit.cooldownLeft + 4) return false
+    if (unit.unitClass.ranged && unit.framesToGetInRange(unit.agent.toAttack.get) + 4 < unit.cooldownLeft) return false
     true
   }
   def attackIfReady(unit: FriendlyUnitInfo): Boolean = {
@@ -218,8 +218,8 @@ object DefaultCombat extends Action {
 
     val breakFormationThreshold = 64
     lazy val breakFormationToAttack = unit.squad.forall(_.formations.isEmpty) || target.exists(targ =>
-      // If we're not ready to attack yet, just slide into formation
-      readyToAttackTarget(unit) && (
+        // If we're not ready to attack yet, just slide into formation
+        readyToAttackTarget(unit) && (
         // Break if we are already in range
         unit.inRangeToAttack(targ)
         // Break if we are approaching our shot

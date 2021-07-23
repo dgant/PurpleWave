@@ -12,7 +12,7 @@ import Utilities.CountMap
 import scala.collection.mutable
 
 class MacroQueue {
-  
+
   val requestsByPriority = new mutable.HashMap[Prioritized, Iterable[BuildRequest]]
 
   def reset() {
@@ -52,7 +52,7 @@ class MacroQueue {
 
     requestQueue.flatten(getUnfulfilledBuildables(_, unitsWanted, unitsCounted, upgradesCounted, techsCounted))
   }
-  
+
   private def getUnfulfilledBuildables(
     request         : BuildRequest,
     unitsWanted     : CountMap[UnitClass],
@@ -60,7 +60,7 @@ class MacroQueue {
     upgradesCounted : CountMap[Upgrade],
     techsCounted    : mutable.Set[Tech])
       : Iterable[Buildable] = {
-    
+
     if (request.buildable.upgradeOption.nonEmpty) {
       val upgrade = request.buildable.upgradeOption.get
       if (upgradesCounted(upgrade) < request.buildable.upgradeLevel) {

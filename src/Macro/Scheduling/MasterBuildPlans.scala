@@ -20,7 +20,7 @@ class MasterBuildPlans {
   def update(invoker: FollowBuildOrder) {
 
     // Add plans to match number of builds we need
-    val queue = With.scheduler.macroQueue.queue.take(maxToFollow)
+    val queue = With.scheduler.queue.take(maxToFollow)
 
     val buildsNeeded =
       queue

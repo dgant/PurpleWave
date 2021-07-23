@@ -9,7 +9,7 @@ object ShowScheduler extends View {
   override def renderScreen() {
     With.game.drawTextScreen(5, 5 * With.visualization.lineHeightSmall, "Scheduler queue")
     DrawScreen.table(5, 7 * With.visualization.lineHeightSmall,
-      With.scheduler.macroQueue.queue
+      With.scheduler.queue
         .take(15)
         .map(buildable => Vector(buildable.toString)))
   }

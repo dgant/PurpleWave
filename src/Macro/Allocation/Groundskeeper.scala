@@ -138,7 +138,7 @@ class Groundskeeper extends TimedTask {
     } else {
       // Where I've seen this, it's been:
       // 1. A plan calls reserve()
-      // 2. But it calls it on a tile reserved by a plan with a highier priotiy
+      // 2. But it calls it on a tile reserved by a plan with a highier priority
       With.logger.warn(f"Attempting to reserve unreservable tiles ${tiles.toVector} for $plan")
     }
     canReserve

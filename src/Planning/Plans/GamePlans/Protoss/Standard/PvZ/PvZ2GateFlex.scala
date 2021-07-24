@@ -117,7 +117,7 @@ class PvZ2GateFlex extends GameplanImperative{
     if (safeAtHome && unitsComplete(MatchWarriors) >= 10) {
       tech2Base()
     }
-    if (enemyLurkersLikely || shouldConsiderExpanding && after(Minutes(9))) {
+    if (enemyLurkersLikely || after(Minutes(9))) {
       techRobo()
     }
     trainMainArmy()
@@ -133,7 +133,7 @@ class PvZ2GateFlex extends GameplanImperative{
   def doTrainCorsairs(): Unit = {
     buildOrder(Get(Protoss.Corsair))
     if (enemyMutalisksLikely) {
-      pumpRatio(Protoss.Corsair, 5, 10, Seq(Enemy(Zerg.Mutalisk, 1.0)))
+      pumpRatio(Protoss.Corsair, 6, 10, Seq(Enemy(Zerg.Mutalisk, 1.0)))
       get(2, Protoss.Stargate)
       get(Protoss.AirDamage)
       if (upgradeComplete(Protoss.AirDamage)) {
@@ -145,13 +145,20 @@ class PvZ2GateFlex extends GameplanImperative{
   }
 
   def doTrainMainArmy(): Unit = {
+    if (minerals > 800 && gas < 50) {
+      pump(Protoss.Zealot)
+    }
     if (upgradeComplete(Protoss.ZealotSpeed, 1, 2 * Protoss.Zealot.buildFrames)) {
-      pumpRatio(Protoss.Dragoon, 1, 24, Seq(Friendly(Protoss.Zealot, 1.0), Enemy(Zerg.Mutalisk, 1.0), Enemy(Zerg.Lurker, 1.5)))
+      pumpRatio(Protoss.Dragoon, 1, 24, Seq(Friendly(Protoss.Zealot, 1.0), Friendly(Protoss.Corsair, -1.5), Enemy(Zerg.Mutalisk, 1.0), Enemy(Zerg.Lurker, 1.5)))
       pump(Protoss.DarkTemplar, 1)
       get(Protoss.PsionicStorm)
       pumpRatio(Protoss.HighTemplar, 2, 12, Seq(Friendly(MatchWarriors, 0.15)))
+      if (upgradeComplete(Protoss.ShuttleSpeed, 1, Protoss.Shuttle.buildFrames)) {
+        pump(Protoss.Shuttle, 1)
+      }
       pump(Protoss.Zealot, 24)
       pump(Protoss.Dragoon)
+      pump(Protoss.Zealot)
     } else {
       pump(Protoss.Dragoon, 16)
       pump(Protoss.Zealot)
@@ -177,25 +184,28 @@ class PvZ2GateFlex extends GameplanImperative{
   def doTechRobo(): Unit = {
     get(Protoss.RoboticsFacility)
     get(Protoss.Observatory)
-    pump(Protoss.Observer, if (enemyLurkersLikely) 2 else 1)
+    pump(Protoss.Observer, if (enemies(Zerg.Lurker) > 1) 3 else if (enemyLurkersLikely) 2 else 1)
     if (enemyLurkersLikely) upgradeContinuously(Protoss.ObserverSpeed)
   }
 
   def doEndgame(): Unit = {
     get(8, Protoss.Gateway)
     requireBases(3)
-    get(Protoss.HighTemplarEnergy)
-    requireMiningBases(3)
     get(Protoss.RoboticsSupportBay)
     get(Protoss.ShuttleSpeed)
-    pump(Protoss.Shuttle, 1)
-    get(14, Protoss.Gateway)
+    get(Protoss.HighTemplarEnergy)
+    requireMiningBases(3)
+    get(12, Protoss.Gateway)
     requireBases(4)
+    get(14, Protoss.Gateway)
   }
 
   def doExpand(): Unit = {
     if (With.units.ours.filter(Protoss.Nexus).forall(_.complete)) {
-      requireMiningBases(Math.min(miningBases + 1, 2 + Math.min(unitsComplete(MatchWarriors) / 20, 2)))
+      requireMiningBases(
+        Math.min(
+          miningBases + 1,
+          2 + Math.min(unitsComplete(MatchWarriors) / 20, 2)))
     }
   }
 }

@@ -4,7 +4,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
 import Planning.Predicates.MacroFacts
-import Planning.UnitCounters.CountUpTo
+import Planning.UnitCounters.CountExactly
 import Planning.UnitMatchers.{MatchAnd, MatchAntiGround, MatchWarriors}
 import Planning.UnitPreferences.PreferClose
 import Tactics.Squads.SquadAutomation
@@ -13,49 +13,45 @@ import Utilities.Minutes
 class MissionKillExpansion extends Mission {
 
   def eligible: Seq[Base] = {
-    With.geography.enemyBases
-      .filterNot(base => With.scouting.enemyMain.exists(_.metro == base.metro))
-      .filter(base =>
-          base.heart.pixelDistanceGround(With.scouting.ourMuscleOrigin) + 320
-        < base.heart.pixelDistanceGround(With.scouting.threatOrigin))
+    With.geography.bases.filter(b => baseIsEnemy(b) && baseFarFromMain(b) && baseCloserToOurArmy(b))
   }
-
   def best: Option[Base] = Maff.maxBy(eligible)(base =>
     2 * base.heart.pixelDistanceGround(With.scouting.threatOrigin)
       - base.heart.pixelDistanceGround(With.scouting.ourMuscleOrigin))
 
-  override def shouldForm: Boolean = (
-    With.blackboard.wantToAttack()
-    && MacroFacts.unitsComplete(MatchWarriors) >= 20
-    && best.isDefined)
+  override def shouldForm: Boolean = (With.blackboard.wantToAttack()
+    && With.scouting.ourProgress > 0.5
+    && eligible.nonEmpty
+    && MacroFacts.unitsComplete(MatchWarriors) >= 20)
 
   var lastFrameInBase = 0
 
   lock.matcher = MatchAnd(MatchWarriors, MatchAntiGround)
-  lock.counter = CountUpTo(4)
+
   override def recruit(): Unit = {
     val targetBase = best
-    if (targetBase.isEmpty) {
-      terminate("No target base remaining")
-      return
-    }
+    if (targetBase.isEmpty) { terminate("No target base available"); return }
     vicinity = targetBase.get.heart.center
     lock.preference = PreferClose(vicinity)
+    lock.counter = CountExactly(unitsRequired(targetBase.get))
     lock.acquire()
   }
+
+  def unitsRequired(base: Base): Int = Math.max(4, base.units.view.count(u => u.isEnemy && u.canAttack && ! u.unitClass.isWorker) * 3)
+
+  private def baseFarFromMain(base: Base): Boolean = With.scouting.enemyMain.forall(_.metro != base.metro)
+  private def baseCloserToOurArmy(base: Base): Boolean = base.heart.pixelDistanceGround(With.scouting.ourMuscleOrigin) + 320 < base.heart.pixelDistanceGround(With.scouting.threatOrigin)
+  private def baseIsEnemy(base: Base): Boolean = base.owner.isEnemy
+  private def enoughKillers: Boolean = vicinity.base.forall(unitsRequired(_) > Maff.orElse(units, With.units.ours.filter(MatchWarriors)).size)
 
   override def run(): Unit = {
     if (vicinity.base.exists(b => units.exists(_.base.contains(b)))) {
       lastFrameInBase = With.frame
     }
-    if (duration > Minutes(3)()) {
-      terminate("Exceeded duration")
-      return
-    }
-    if (With.framesSince(lastFrameInBase) > Minutes(1)()) {
-      terminate("Left or never made it to the base")
-      return
-    }
+    if (duration > Minutes(3)()) { terminate("Exceeded duration"); return }
+    if (With.framesSince(lastFrameInBase) > Minutes(1)()) { terminate("Left or never made it to the base"); return }
+    if ( ! vicinity.base.exists(baseIsEnemy)) { terminate("Vicinity not an eligible base"); return }
+    if ( ! enoughKillers) { terminate(f"Not enough fighters: ${units.size} vs ${unitsRequired(vicinity.base.get)} "); return }
     SquadAutomation.targetFormAndSend(this)
   }
 }

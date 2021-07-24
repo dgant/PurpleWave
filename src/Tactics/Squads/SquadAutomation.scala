@@ -55,8 +55,14 @@ object SquadAutomation {
       .toVector
     output
   }
+  def unrankedAround(group: FriendlyUnitGroup, to: Pixel): Vector[UnitInfo] = {
+    With.units.enemy.filter(u => u.zone == to.zone || u.pixelDistanceCenter(to) < 32 * 12).toVector
+  }
+
   def rankedEnRoute(squad: Squad): Seq[UnitInfo] = rankedEnRoute(squad, squad.vicinity)
   def rankedEnRoute(squad: Squad, goalAir: Pixel): Seq[UnitInfo] = rankForArmy(squad, unrankedEnRouteTo(squad, goalAir))
+  def rankedAround(squad: Squad): Seq[UnitInfo] = rankedAround(squad, squad.vicinity)
+  def rankedAround(squad: Squad, goalAir: Pixel): Seq[UnitInfo] = rankForArmy(squad, unrankedAround(squad, goalAir))
 
   ////////////////
   // Formations //

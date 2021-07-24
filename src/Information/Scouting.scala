@@ -90,6 +90,7 @@ final class Scouting extends TimedTask with EnemyTechs {
     updateTechs()
     baseScoutMap.clear()
     _firstEnemyMain = _firstEnemyMain.orElse(With.geography.startBases.find(_.owner.isEnemy))
+    _firstEnemyMain = _firstEnemyMain.orElse(With.geography.startBases.view.filter(_.owner.isNeutral).find(_.isNaturalOf.exists(_.owner.isEnemy)))
     if (_firstEnemyMain.isEmpty) {
       val possibleMains = With.geography.startBases.filterNot(_.owner.isUs).filter(base => base.owner.isEnemy || ! base.scouted)
       // Infer possible mains from process of elimination

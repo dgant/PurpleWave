@@ -62,7 +62,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
     building.foreach(_.friendly.foreach(_.setProducer(this)))
 
     if (building.isEmpty) {
-      placement = Some(With.groundskeeper.request(this, buildingClass))
+      placement = Some(With.groundskeeper.request(this, buildingClass)).filter(_.tile.isDefined)
     }
 
     // Reserve money if we have a place to build

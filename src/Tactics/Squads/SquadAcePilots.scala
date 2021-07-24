@@ -1,5 +1,6 @@
 package Tactics.Squads
 
+import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
 import Micro.Agency.Intention
@@ -34,8 +35,7 @@ class SquadAcePilots extends Squad {
         .sortBy(_.isInstanceOf[SquadDefendBase])
         .maxBy(_.targetQueue.get.count(MatchFlyingWarriors))
       activity = "AceHelpSquad"
-      vicinity = squad.centroidAll
-      SquadAutomation.targetAndSend(this)
+      followSquad(squad)
       return
     }
 
@@ -71,17 +71,16 @@ class SquadAcePilots extends Squad {
     if (squadsFacingDetection.nonEmpty) {
       activity = "AceCloakDT"
       val squad = squadsFacingDetection.minBy(_.centroidAir.pixelDistanceSquared(centroidAir))
-      vicinity = squad.centroidAll
-      SquadAutomation.targetAndSend(this)
+      followSquad(squad)
       return
     }
 
-    // Scout their bases
+    // Monitor their bases
     // Don't look to target anything; just get scouting information first
-    val unscouted = With.geography.enemyBases.filter(b => With.framesSince(b.lastScoutedFrame) > Seconds(30)() && ! b.units.exists(u => u.isEnemy && u.canAttackAir))
-    if (unscouted.nonEmpty) {
-      activity = "AceScout"
-      val base = unscouted.minBy(_.units.count(u => u.isEnemy && u.canAttackAir))
+    val unscoutedEnemy = getStaleBase(With.geography.enemyBases)
+    if (unscoutedEnemy.nonEmpty) {
+      activity = "AceMonitor"
+      val base = unscoutedEnemy.minBy(_.units.count(u => u.isEnemy && u.canAttackAir))
       vicinity = base.townHallArea.center
       SquadAutomation.send(this)
       return
@@ -96,13 +95,41 @@ class SquadAcePilots extends Squad {
       return
     }
 
+    // Explore
+    val unscoutedNeutral = getStaleBase(With.geography.enemyBases)
+    if (unscoutedNeutral.nonEmpty) {
+      activity = "AceExplore"
+      val base = unscoutedNeutral
+        .sortBy(_.townHallArea.center.pixelDistanceSquared(centroidAir))
+        .minBy(_.units.count(u => u.isEnemy && u.canAttackAir))
+      vicinity = base.townHallArea.center
+      SquadAutomation.send(this)
+      return
+    }
+
     chill()
   }
 
+  private def getStaleBase(bases: Seq[Base]): Seq[Base] = {
+    bases.filter(b => With.framesSince(b.lastScoutedFrame) > Seconds(30)() && ! b.units.exists(u => u.isEnemy && u.canAttackAir))
+  }
+
   private def chill(): Unit = {
+    activity = "AceChill"
     val groundToAir = Maff.exemplarOption(With.units.ours.filter(u => u.canAttackAir && ! u.flying).map(_.pixel))
     vicinity = groundToAir.getOrElse(homeConsensus)
     SquadAutomation.target(this)
     units.foreach(_.intend(this, new Intention { toTravel = Some(vicinity); toReturn = Some(vicinity)}))
+  }
+
+  private def followSquad(otherSquad: Squad): Unit = {
+    vicinity = otherSquad.centroidAll
+    targetQueue = otherSquad.targetQueue
+      .map(_.filter(_.flying))
+      .orElse(Some(SquadAutomation.rankForArmy(this,
+        Maff.orElse(
+          SquadAutomation.unrankedEnRouteTo(this, vicinity),
+          SquadAutomation.unrankedAround(this, vicinity)).toVector)))
+    SquadAutomation.send(this)
   }
 }

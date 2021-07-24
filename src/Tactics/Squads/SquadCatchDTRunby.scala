@@ -12,6 +12,7 @@ import ProxyBwapi.Races.Protoss
 class SquadCatchDTRunby extends Squad {
 
   def launch(): Unit = {
+    if ( ! With.enemies.exists(_.isProtoss)) return
     lock.matcher = MatchMobileDetector
     lock.counter = CountOne
     lock.preference = PreferClose(destination())

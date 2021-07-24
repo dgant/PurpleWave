@@ -76,7 +76,7 @@ class PvPOpening extends GameplanImperative {
         zAfterCore &&= ! enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.oneGateCore)
         zAfterCore ||= enemyStrategy(With.fingerprints.mannerPylon, With.fingerprints.gasSteal)
         zAfterCore ||= enemyRecentStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway)
-        zAfterCore ||= employing(PvPGateCoreGate, PvPTechBeforeRange)
+        zAfterCore ||= employing(PvPGateCoreGate, PvPTechBeforeRange, PvPDT)
 
       }
       if (units(Protoss.Gateway) < 2 && units(Protoss.RoboticsFacility) < 1 && units(Protoss.CitadelOfAdun) < 1) {

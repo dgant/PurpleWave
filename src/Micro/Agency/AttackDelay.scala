@@ -62,7 +62,8 @@ object AttackDelay {
   }
   
   def nextSafeOrderFrame(unit: FriendlyUnitInfo): Int = {
-    unit.lastFrameStartingAttack + unit.unitClass.stopFrames - With.latency.latencyFrames
+    // The +1 is an attempt to make units stick less after an attack
+    unit.lastFrameStartingAttack + unit.unitClass.stopFrames - With.latency.latencyFrames + 1
   }
   
   /*

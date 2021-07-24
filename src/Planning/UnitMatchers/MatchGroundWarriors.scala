@@ -1,3 +1,3 @@
 package Planning.UnitMatchers
 
-object MatchGroundWarriors extends MatchAnd(MatchWarriors, MatchNot(MatchMobileFlying))
+object MatchGroundWarriors extends MatchAnd(MatchWarriors, ! _.flying)

@@ -2,6 +2,7 @@ package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
+import Macro.Scheduling.MacroCounter
 import Planning.Plan
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Terran, Zerg}
@@ -13,13 +14,17 @@ class Pump(
   maximumTotal        : Int = Int.MaxValue,
   maximumConcurrently : Int = Int.MaxValue)
     extends Plan {
+
+  protected def maxDesirable: Int = Int.MaxValue
+
+  val builderClass: UnitClass = unitClass.whatBuilds._1
   
   override def onUpdate() {
     if ( ! canBuild) return
   
-    val unitsNow            = PumpCount.currentCount(unitClass)
-    val unitsToAddCeiling   = Math.max(0, Math.min(maximumTotal, maxDesirable) - unitsNow) // TODO: Clamp Nukes to #Silos
-    val larvaSpawning       = if (unitClass.whatBuilds._1 == Zerg.Larva) With.units.countOurs(MatchAnd(MatchHatchlike, MatchComplete)) else 0
+    val unitsComplete       = With.units.ours.filter(unitClass).map(MacroCounter.countComplete(_)(unitClass)).sum
+    val unitsToAddCeiling   = Math.max(0, Math.min(maximumTotal, maxDesirable) - unitsComplete) // TODO: Clamp Nukes to #Silos
+    val larvaSpawning       = if (builderClass == Zerg.Larva) With.units.countOurs(MatchAnd(MatchHatchlike, MatchComplete)) else 0
     val buildersExisting    = getBuildersExisting
     val buildersAllocated   = getBuildersAllocated
     val buildersTotal       = buildersExisting.size + larvaSpawning
@@ -35,7 +40,7 @@ class Pump(
 
     val buildersToConsume   = Math.max(0, Vector(maximumConcurrently, buildersAllocatable, budgeted, unitsToAddCeiling / unitClass.copiesProduced).min.toInt)
     val unitsToAdd          = buildersToConsume * unitClass.copiesProduced
-    val unitsToRequest      = unitsNow + unitsToAdd
+    val unitsToRequest      = unitsComplete + unitsToAdd
 
     // This check is necessitated by our tendency to request Scourge even when unitsToAdd is 0
     if (unitsToAdd == 0) return
@@ -43,18 +48,18 @@ class Pump(
     With.scheduler.request(this, Get(unitsToRequest, unitClass))
   }
 
-  protected def canBuild: Boolean = (
+  final protected def canBuild: Boolean = (
     unitClass.buildTechEnabling.forall(With.self.hasTech)
     && unitClass.buildUnitsEnabling.forall(With.units.existsOurs(_))
     && unitClass.buildUnitsBorrowed.forall(With.units.existsOurs(_))
   )
 
-  protected def getBuildersExisting: Iterable[FriendlyUnitInfo] = With.units.ours
+  final protected def getBuildersExisting: Iterable[FriendlyUnitInfo] = With.units.ours
     .view
     .filter(builder =>
       builder.alive
-        && unitClass.whatBuilds._1(builder)
-        && builder.remainingCompletionFrames < unitClass.buildFrames
+        && builderClass(builder)
+        && MacroCounter.countComplete(builder)(builderClass) > 0
         && ( unitClass != Terran.NuclearMissile                           || ! builder.hasNuke)
         && ( ! unitClass.requiresPsi                                      || builder.powered)
         && ( ! unitClass.isAddon                                          || builder.addon.isEmpty)
@@ -62,15 +67,12 @@ class Pump(
         && ( ! unitClass.buildUnitsEnabling.contains(Terran.MachineShop)  || builder.addon.isDefined)
         && ( ! unitClass.buildUnitsEnabling.contains(Terran.ControlTower) || builder.addon.isDefined))
 
-  protected def getBuildersAllocated: Int = unitClass.whatBuilds._1.unitsTrained.view.map(u => With.scheduler.unitsWanted(u) - With.scheduler.unitsCounted(u)).sum
+  final protected def getBuildersAllocated: Int = builderClass.unitsTrained.view.map(u =>
+    (
+      Math.max(0, With.scheduler.unitsWanted(u) - With.scheduler.unitsCounted(u))
+      + unitClass.copiesProduced
+      - 1
+    ) / unitClass.copiesProduced).sum
 
-  protected def buildCapacity: Int = {
-    Vector(
-      getBuildersExisting.size * unitClass.copiesProduced,
-      if (unitClass.isAddon) getBuildersExisting.count(_.addon.isEmpty) else Int.MaxValue,
-      if (unitClass.supplyRequired == 0) 400 else (400 - With.self.supplyUsed) / unitClass.supplyRequired
-    ).min
-  }
-  
-  protected def maxDesirable: Int = Int.MaxValue
+  description.set(f"Pump $unitClass")
 }

@@ -52,6 +52,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
 
   lazy val ranged: Boolean = canAttack && pixelRangeMax > 32 * 2
   lazy val melee: Boolean = canAttack && ! ranged
+  lazy val logHealth: Double = Math.log10(maxTotalHealth)
 
   lazy val suicides: Boolean = Array(
     Terran.SpiderMine,
@@ -428,7 +429,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else if (this == Terran.Valkyrie) 40
     else if (this == Protoss.Probe) 2
     else if (this == Protoss.Zealot) 7
-    else if (this == Protoss.Dragoon) 2
+    else if (this == Protoss.Dragoon) 7
     else if (this == Protoss.DarkTemplar) 9
     else if (this == Protoss.Archon) 15
     else if (this == Protoss.Reaver) 1

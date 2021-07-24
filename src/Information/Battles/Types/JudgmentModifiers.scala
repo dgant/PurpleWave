@@ -64,7 +64,7 @@ object JudgmentModifiers {
       val enemiesThroughRatio = enemiesThrough / denominator
       val enemiesInRatio      = enemiesIn / denominator
       if (enemiesThroughRatio == 0 && enemiesInRatio == 0) {
-        val speedRatio        = Math.max(0.25, choke.radiusPixels / Math.max(1, local.us.widthPixels))
+        val speedRatio        = Maff.clamp(4 * choke.radiusPixels / Math.max(1, local.us.widthPixels), 0.25, 1.0)
         return Some(JudgmentModifier(speedMultiplier = speedRatio))
       } else if (enemiesInRatio > 0 && enemiesThroughRatio < 0.25) {
         return Some(JudgmentModifier(targetDelta = -0.1))

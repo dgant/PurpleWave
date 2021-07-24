@@ -25,7 +25,8 @@ object FormationGeneric {
 
   def engage(group: FriendlyUnitGroup, towards: Option[Pixel]): Formation = {
     val finalTowards = towards.getOrElse(targetPixel(group))
-    form(group, FormationStyleEngage, face = finalTowards, approach = finalTowards)
+    //form(group, FormationStyleEngage, face = finalTowards, approach = finalTowards)
+    form(group, FormationStyleMarch, face = finalTowards, approach = finalTowards)
   }
 
   def disengage(group: FriendlyUnitGroup): Formation = {
@@ -62,9 +63,12 @@ object FormationGeneric {
     floodCostVulnerability  = 0
     if (style == FormationStyleMarch || style == FormationStyleDisengage) {
       if ( ! path.pathExists) return FormationEmpty
-      val stepSizeTiles = Seq(3.0,
+      var stepSizeTiles = Seq(4.0,
         if (style == FormationStyleDisengage) 5.0 + floodCentroid.enemyRange else 0.0,
         With.reaction.estimationAverage * group.meanTopSpeed / 32.0 + 0.5).max.toInt
+      if (style == FormationStyleDisengage) {
+        stepSizeTiles = Math.max(stepSizeTiles, 2 + Maff.max(units.view.map(_.matchups.pixelsOfEntanglement.toInt)).getOrElse(0) / 32)
+      }
       floodMaxDistanceTarget  = floodCentroid.tileDistanceGroundManhattan(floodGoal) - 1
       floodMinDistanceTarget  = floodMaxDistanceTarget - stepSizeTiles
       floodApex               = patht.reverseIterator.filterNot(t => t.zone.edges.exists(_.contains(t.center))).find(_.tileDistanceGroundManhattan(floodGoal) >= floodMinDistanceTarget).orElse(patht.find(_.tileDistanceGroundManhattan(floodGoal) == floodMinDistanceTarget + 1)).getOrElse(floodGoal)
@@ -109,7 +113,6 @@ object FormationGeneric {
         if (
           floodCostVulnerability == 0
           || tile.enemyRangeGround == 0
-          || tile.zone.edges.exists(_.contains(tile))
           || unplacedClass._2 < (vGrid.margin + vGrid.maxVulnerability - vGrid(tile))) {
           val classSlot = unplacedClass._1
           classSlot.slots -= 1
@@ -139,7 +142,8 @@ object FormationGeneric {
         slots(u.unitClass) += floodApex.center
       })
     val unassigned = UnassignedFormation(style, slots.toMap, group)
-    val output = if (style == FormationStyleGuard || style == FormationStyleEngage) unassigned.outwardFromCentroid else unassigned.sprayToward(approach)
+    //val output = if (style == FormationStyleGuard || style == FormationStyleEngage) unassigned.outwardFromCentroid else unassigned.sprayToward(approach)
+    val output = unassigned.outwardFromCentroid
     if (style == FormationStyleMarch || style == FormationStyleDisengage) { output.path = Some(path) }
     output
   }

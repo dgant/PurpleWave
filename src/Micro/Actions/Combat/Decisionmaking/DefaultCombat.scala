@@ -217,19 +217,16 @@ object DefaultCombat extends Action {
     if (goalRetreat) unit.agent.toTravel = Some(unit.agent.safety)
 
     val breakFormationThreshold = 64
+    lazy val targetDistanceHere = unit.pixelDistanceEdge(target.get)
+    lazy val targetDistanceThere = unit.pixelDistanceEdgeFrom(target.get, unit.agent.destination)
+    lazy val formationHelpsEngage = targetDistanceThere <= Math.min(targetDistanceHere, unit.pixelRangeAgainst(target.get))
     lazy val breakFormationToAttack = unit.squad.forall(_.formations.isEmpty) || target.exists(targ =>
         // If we're not ready to attack yet, just slide into formation
         readyToAttackTarget(unit) && (
         // Break if we are already in range
         unit.inRangeToAttack(targ)
-        // Break if we are approaching our shot
-        || unit.pixelDistanceTravelling(unit.agent.destination) <= breakFormationThreshold
-        || unit.pixelsToGetInRange(targ) <= breakFormationThreshold
-        // Break if we are closer to the target now than we would be in formation.
-        // TODO: If we do not trust the formation to get us in range of the target,
-        //   we also need to consider whether we'd have to cross a wall to reach the target,
-        //   thus requiring travel distance checks on both ends and maybe use of a proposed firing pixel
-        || unit.pixelDistanceEdge(targ) <= unit.pixelDistanceEdgeFrom(targ, unit.agent.destination)))
+        // Break if the fight has already begun and the formation isn't helping us
+        || (unit.team.exists(_.engagedUpon) && ! formationHelpsEngage)))
     if (goalEngage && Brawl.consider(unit)) return
     if (goalPotshot && potshot(unit)) return
     if (goalEngage && breakFormationToAttack && attackIfReady(unit)) return

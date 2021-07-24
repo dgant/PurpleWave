@@ -27,13 +27,14 @@ object SquadAutomation {
         .filter(t => t.unitClass.isWorker || squad.units.exists(u => (t.canAttack(u) || t.unitClass.canAttack(u)) && t.inRangeToAttack(u)))))
   }
 
-  def rankForArmy(group: UnitGroup, targets: Seq[UnitInfo]): Seq[UnitInfo] = {
+  def rankForArmy(squad: Squad, targets: Seq[UnitInfo]): Seq[UnitInfo] = {
     targets.sortBy(t =>
-      (t.pixelDistanceCenter(group.centroidKey)
+      (t.pixelDistanceCenter(squad.centroidKey)
       + (if (t.totalHealth < t.unitClass.maxTotalHealth) -16.0 else 0)
       + (16.0 * t.totalHealth / Math.max(1.0, t.unitClass.maxTotalHealth))
+      + (if (t.unitClass.isWorker || squad.engagedUpon) 0 else 160)
       + 160)
-      * (if (t.unitClass.attacksOrCastsOrDetectsOrTransports || ! group.engagedUpon) 1 else 2))
+      * (if (t.unitClass.attacksOrCastsOrDetectsOrTransports || ! squad.engagedUpon) 1 else 2))
   }
   // Ratio of path distance to (target combined distance from origin and goal) required to include a target as "on the way"
   // This equates to 34 degree deviation from a straight line
@@ -55,7 +56,7 @@ object SquadAutomation {
     output
   }
   def rankedEnRoute(squad: Squad): Seq[UnitInfo] = rankedEnRoute(squad, squad.vicinity)
-  def rankedEnRoute(group: FriendlyUnitGroup, goalAir: Pixel): Seq[UnitInfo] = rankForArmy(group, unrankedEnRouteTo(group, goalAir))
+  def rankedEnRoute(squad: Squad, goalAir: Pixel): Seq[UnitInfo] = rankForArmy(squad, unrankedEnRouteTo(squad, goalAir))
 
   ////////////////
   // Formations //

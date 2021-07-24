@@ -249,8 +249,9 @@ trait CombatUnit {
   def clearDamage() {
     damageQueue.clear()
   }
-  def doomed: Boolean = doomFrame < Forever()
-  def doomFrame: Int = {
+  def doomed: Boolean = doomFrameAbsolute < Forever()
+  def doomedInFrames: Int = doomFrameAbsolute - With.frame
+  def doomFrameAbsolute: Int = {
     var damageRequired = totalHealth
     var i = 0
     var frame = 0

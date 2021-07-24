@@ -630,13 +630,18 @@ class PvPOpening extends GameplanImperative {
       }
     } else if (employing(PvP3GateGoon)) {
       if (shouldExpand) { requireMiningBases(2) }
-      trainGatewayUnits()
+      buildOrder(Get(2, Protoss.Dragoon))
       get(3, Protoss.Gateway)
+      trainGatewayUnits()
       buildOrder(Get(8, Protoss.Dragoon))
-      requireMiningBases(2)
+      if (unitsComplete(Protoss.Gateway) >= 3) { requireMiningBases(2) }
     } else {
       if (shouldExpand) { requireMiningBases(2) }
+      buildOrder(Get(2, Protoss.Dragoon))
+      get(4, Protoss.Gateway)
       trainGatewayUnits()
+      buildOrder(Get(10, Protoss.Dragoon))
+      if (unitsComplete(Protoss.Gateway) >= 4) { requireMiningBases(2) }
     }
     // Even for builds that shouldn't get 4 Gateways in theory,
     // our mineral mining is so efficient we keep winding up with lots of minerals anyway

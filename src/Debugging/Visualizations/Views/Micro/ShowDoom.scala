@@ -13,7 +13,7 @@ object ShowDoom extends View {
 
   @inline private final def renderUnit(unit: UnitInfo): Unit = {
     if (unit.doomed) {
-      val frames = With.framesUntil(unit.doomFrame)
+      val frames = With.framesUntil(unit.doomFrameAbsolute)
       if (frames < 96) {
         DrawMap.drawSkull(unit.pixel, f = 3 - Maff.clamp(frames / 24, 0, 2))
       }
@@ -26,7 +26,7 @@ object ShowDoom extends View {
       DrawScreen.column(5, 5 * With.visualization.lineHeightSmall,
         Seq(
           u.toString,
-          if (u.doomed) f"DOOMED in ${With.framesUntil(u.doomFrame)}" else "")
+          if (u.doomed) f"DOOMED in ${With.framesUntil(u.doomFrameAbsolute)}" else "")
           ++ u.damageQueue.map(_.toString))
     }
   }

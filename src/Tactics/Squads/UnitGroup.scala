@@ -1,8 +1,9 @@
 package Tactics.Squads
 
-import Information.Battles.Types.{BattleLocal, GroupCentroid}
+import Information.Battles.Types.GroupCentroid
 import Mathematics.Maff
 import Performance.Cache
+import Planning.UnitMatchers.MatchGroundWarriors
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.SeqView
@@ -44,7 +45,7 @@ trait UnitGroup {
   private val _hasGround                = new Cache(() => groupOrderable.exists( ! _.flying))
   private val _engagingOn               = new Cache(() => groupOrderable.exists(_.matchups.targetsInRange.nonEmpty))
   private val _engagedUpon              = new Cache(() => groupOrderable.exists(_.matchups.pixelsOfEntanglement >= 0))
-  private val _widthPixels              = new Cache(() => groupOrderable.view.filterNot(_.flying).filter(_.canMove).map(_.unitClass.dimensionMax).sum)
+  private val _widthPixels              = new Cache(() => groupOrderable.view.filter(MatchGroundWarriors).filter(_.canMove).map(_.unitClass.dimensionMax).sum)
   private val _centroidAll              = new Cache(() => Maff.centroid(groupOrderable.view.map(_.pixel)))
   private val _centroidAir              = new Cache(() => GroupCentroid.air(groupOrderable))
   private val _centroidGround           = new Cache(() => GroupCentroid.ground(groupOrderable))

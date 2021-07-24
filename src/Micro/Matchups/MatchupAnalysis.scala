@@ -4,8 +4,7 @@ import Information.Battles.BattleClassificationFilters
 import Lifecycle.With
 import Mathematics.Maff
 import Performance.Cache
-import Planning.UnitMatchers.MatchTank
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Tactics.Squads.{GenericUnitGroup, UnitGroup}
 
@@ -40,17 +39,14 @@ case class MatchupAnalysis(me: UnitInfo) {
   def threatsInRange          : Seq[UnitInfo] = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me))
   def threatsInFrames(f: Int) : Seq[UnitInfo] = threats.filter(_.framesToGetInRange(me) < f)
   def targetsInRange          : Seq[UnitInfo] = targets.filter(target => target.visible && me.pixelRangeAgainst(target) >= target.pixelDistanceEdge(me) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
-  lazy val anchor                     : Option[UnitInfo]  = Maff.minBy(anchors.filter(_.unitClass.subjectiveValue == anchors.view.map(_.unitClass.subjectiveValue).max))(a => a.pixelDistanceEdge(me) + a.presumptiveTarget.map(a.pixelsToGetInRange).getOrElse(a.pixelDistanceTravelling(a.presumptiveDestination)))
-  lazy val anchors                    : Vector[UnitInfo]  = me.friendly.map(_.alliesSquad).getOrElse(allies).filter(doesAnchor(_, me)).toVector
   lazy val arbiterCovering            : Cache[Boolean]    = new Cache(() => allies.exists(a => Protoss.Arbiter(a) && a.pixelDistanceEdge(me) < 160))
   lazy val allyTemplarCount           : Cache[Int]        = new Cache(() => allies.count(Protoss.HighTemplar))
-  lazy val splashFactorMax            : Double  = splashFactorForUnits(targets)
-  lazy val splashFactorInRange        : Double  = splashFactorForUnits(targetsInRange)
-  lazy val dpfReceiving               : Double  = threatsInRange.view.map(_.matchups.dpfDealingDiffused(me)).sum
-  lazy val framesToLive               : Double  = Maff.nanToInfinity(me.totalHealth / dpfReceiving)
+  lazy val dpfReceiving               : Cache[Double]     = new Cache(() => threatsInRange.view.map(_.matchups.dpfDealingDiffused(me)).sum)
+  lazy val framesToLive               : Double  = _framesToLive()
   lazy val framesOfSafety             : Double  = - With.latency.latencyFrames - With.reaction.agencyAverage - Maff.nanToZero(pixelsOfEntanglement / me.topSpeed)
-  lazy val pixelsOfEntanglement       : Double  = Maff.max(threats.map(me.pixelsOfEntanglement)).getOrElse(- With.mapPixelWidth)
-  lazy val pixelsToReachAnyTarget     : Double  = Maff.max(targets.map(me.pixelsToGetInRange)).getOrElse(With.mapPixelWidth)
+  lazy val pixelsOfEntanglement       : Double  = _pixelsOfEntanglement()
+  private val _framesToLive = new Cache(() => me.doomedInFrames)
+  private val _pixelsOfEntanglement = new Cache(() => Maff.max(threats.map(me.pixelsOfEntanglement)).getOrElse(-With.mapPixelWidth.toDouble))
 
   protected def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = (
     shooter.canAttack(victim)
@@ -64,28 +60,7 @@ case class MatchupAnalysis(me: UnitInfo) {
     allies.view.filter(a => a.unitClass == Terran.SCV && a.friendly.map(_.agent.toRepair.contains(me)).getOrElse(a.orderTarget.contains(me)))
   }
 
-  protected def splashFactorForUnits(targetsConsidered: Iterable[UnitInfo]): Double = {
-    if (With.reaction.sluggishness > 0) me.unitClass.splashFactor else Maff.clamp(me.unitClass.splashFactor, 1.0, targetsConsidered.size)
-  }
-
-  def dpfDealingDiffused(target: UnitInfo): Double = {
-    splashFactorInRange * me.dpfOnNextHitAgainst(target) / Math.max(1.0, targetsInRange.size)
-  }
-
-  private def doesAnchor(anchor: UnitInfo, support: UnitInfo): Boolean = {
-    if (anchor.unitClass == support.unitClass) return false // Safety valve
-    var output = false
-    output ||= anchor.unitClass.isBuilding && anchor.unitClass.canAttack  && support.isAny(Terran.Marine, Terran.Goliath)
-    output ||= anchor.isAny(MatchTank, Terran.Battlecruiser)              && ! support.isAny(MatchTank, Terran.Battlecruiser)
-    output ||= anchor.isAny(Terran.Medic)                                 && support.isAny(Terran.Marine, Terran.Firebat)
-    output ||= anchor.isAny(Terran.Marine)                                && support.isAny(Terran.SCV)
-    output ||= anchor.isAny(Protoss.Carrier)                              && ! support.isAny(Protoss.Carrier)
-    output ||= anchor.isAny(Protoss.Arbiter, Protoss.Reaver)              && support.isAny(Protoss.Zealot, Protoss.Dragoon, Protoss.Archon, Protoss.HighTemplar, Protoss.Corsair)
-    //output ||= anchor.isAny(Protoss.HighTemplar) && anchor.energy > 65 && anchor.player.hasTech(Protoss.PsionicStorm)    && support.isAny(Protoss.Zealot, Protoss.Dragoon, Protoss.Archon)
-    output ||= anchor.isAny(Protoss.Dragoon, Protoss.Archon)              && support.isAny(Protoss.Zealot)
-    output ||= anchor.isAny(Zerg.Lurker, Zerg.Ultralisk)                  && support.isAny(Zerg.Zergling, Zerg.Hydralisk)
-    output ||= anchor.isAny(Zerg.Guardian)                                && ! support.isAny(Zerg.Guardian)
-    output ||= anchor.isAny(Zerg.Mutalisk, Zerg.Devourer)                 && ! support.isAny(Zerg.Scourge)
-    output
+  private def dpfDealingDiffused(target: UnitInfo): Double = {
+    me.dpfOnNextHitAgainst(target) / Math.max(1.0, targetsInRange.size)
   }
 }

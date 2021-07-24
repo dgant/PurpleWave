@@ -240,7 +240,7 @@ abstract class MissionDrop extends Mission {
       val runway = itinerary.headOption.map(_.heart.center).getOrElse(vicinity)
       val droppables = transport.loadedUnits
         .filter(passenger =>
-          transport.doomFrame < transport.topSpeed * transport.pixelDistanceCenter(runway) + Seconds(3)()
+          transport.doomFrameAbsolute < transport.topSpeed * transport.pixelDistanceCenter(runway) + Seconds(3)()
           || passenger.pixelDistanceCenter(runway) <= Math.max(64, passenger.effectiveRangePixels - 96))
         .sortBy(_.subjectiveValue * (if (transport.tile.enemyRangeAir > 0) -1 else 1))
       droppables.headOption.foreach(Commander.unload(transport, _))

@@ -14,9 +14,9 @@ import scala.collection.mutable
 
 class Base(val townHallTile: Tile)
 {
+  val townHallArea          : TileRectangle     = Protoss.Nexus.tileArea.add(townHallTile)
   lazy val zone             : Zone              = With.geography.zoneByTile(townHallTile)
   lazy val metro            : Metro             = With.geography.metros.find(_.bases.contains(this)).get
-  lazy val townHallArea     : TileRectangle     = Protoss.Nexus.tileArea.add(townHallTile)
   lazy val isStartLocation  : Boolean           = With.geography.startLocations.contains(townHallTile)
   lazy val isOurMain        : Boolean           = With.geography.ourMain == this
   lazy val tiles            : Set[Tile]         = zone.tiles.view.filter(t => t.tileDistanceSlow(heart) < 50 && ! zone.bases.view.filter(_.heart != heart).exists(_.heart.pixelDistanceGround(t) < heart.pixelDistanceGround(t))).toSet
@@ -37,50 +37,17 @@ class Base(val townHallTile: Tile)
   var workerCount           : Int               = _
   val saturation            : Cache[Double]     = new Cache(() => workerCount.toDouble / (1 + 3 * gas.size + 2 * minerals.size))
 
-  private var calculatedHarvestingArea: Option[TileRectangle] = None
-  private var calculatedHeart: Option[Tile] = None
-  def harvestingArea: TileRectangle = {
-    if (calculatedHarvestingArea.isDefined) calculatedHarvestingArea.get else {
-      // This is called during initialization! So variables like heart aren't populated yet
-      val centroid = Maff.centroidTiles(minerals.map(_.tileTopLeft))
-      val townHall = townHallTile.add(2, 1)
-      val dx = centroid.x - townHall.x
-      val dy = centroid.y - townHall.y
-      val dxBigger = Math.abs(dx) > Math.abs(dy)
-      val boxInitial = new TileRectangle(
-        (
-          Vector(townHallArea)
-          ++ (minerals.filter(_.mineralsLeft > With.configuration.blockerMineralThreshold)
-          ++ gas)
-        .map(_.tileArea)))
-      val output = TileRectangle(
-        boxInitial
-          .startInclusive
-          .add(
-            if (   dxBigger) Maff.clamp(dx, -1, 0) else 0,
-            if ( ! dxBigger) Maff.clamp(dy, -1, 0) else 0)
-          .clip,
-      boxInitial
-        .endExclusive
-        .add(
-          if (   dxBigger) Maff.clamp(dx, 0, 1) else 0,
-          if ( ! dxBigger) Maff.clamp(dy, 0, 1) else 0)
-        .clip)
-      if (minerals.nonEmpty || gas.nonEmpty) {
-        calculatedHarvestingArea = Some(output)
-      }
-      output
-    }
+  private val _initialResources = With.units.all.filter(u => u.mineralsLeft > With.configuration.blockerMineralThreshold || u.gasLeft > 0).filter(_.pixelDistanceCenter(townHallTile.topLeftPixel.add(64, 48)) < 32 * 9).toVector
+  val harvestingArea = new TileRectangle(_initialResources.view.flatMap(_.tiles) ++ townHallArea.tiles)
+  val heart: Tile = {
+    val centroid = if (_initialResources.isEmpty) townHallArea.center.subtract(SpecificPoints.middle) else Maff.centroid(_initialResources.view.map(_.pixel))
+    val direction = centroid.subtract(townHallArea.center)
+    val xDominant = Math.abs(direction.x) > Math.abs(direction.y)
+    if (xDominant)
+          if (direction.x < 0) townHallTile.add(-2, 1) else townHallTile.add(5, 1)
+    else if (direction.y < 0) townHallTile.add(1, -2) else townHallTile.add(1, 4)
   }
-  def heart: Tile = {
-    if (calculatedHeart.isDefined) calculatedHeart.get else {
-      val output = harvestingArea.midpoint
-      if (calculatedHarvestingArea.isDefined) {
-        calculatedHeart = Some(output)
-      }
-      output
-    }
-  }
+
   private def resourcePathTiles(resource: UnitInfo): Iterable[Tile] = {
     // Draw a shortest-path line from each resource to the town hall.
     // Where multiple equally-short lines are available, take the one closest to the heart.

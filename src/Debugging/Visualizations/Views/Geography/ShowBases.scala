@@ -31,7 +31,7 @@ object ShowBases extends View {
         base.townHallArea.center,
         drawBackground = true,
         base.owner.colorDark)
-        DrawMap.tileRectangle(new TileRectangle(base.heart), Colors.DarkRed)
+        DrawMap.tileRectangle(new TileRectangle(base.heart), Colors.BrightYellow)
     })
   }
 }

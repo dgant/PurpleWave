@@ -5,6 +5,7 @@ import Planning.Predicates.MacroCounting
 import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss._
+import Utilities.Minutes
 
 object PvPIdeas extends MacroCounting {
   def enemyLowUnitStrategy: Boolean = enemyBases > 1 || enemyStrategy(
@@ -15,10 +16,14 @@ object PvPIdeas extends MacroCounting {
     With.fingerprints.dtRush,
     With.fingerprints.cannonRush)
 
+  def attackFirstZealot: Boolean = trackRecordLacks(With.fingerprints.twoGate, With.fingerprints.proxyGateway)
+
+  def recentlyExpandedFirst: Boolean = With.scouting.weExpandedFirst && With.framesSince(With.scouting.firstExpansionFrameUs) < Minutes(3)()
+
   def shouldAttack: Boolean = {
     // Attack subject to global safety
     var output = enemyLowUnitStrategy
-    output ||= unitsComplete(MatchWarriors) > 0 && enemiesComplete(MatchWarriors, Protoss.PhotonCannon) == 0
+    output ||= unitsComplete(MatchWarriors) > 0 && enemiesComplete(MatchWarriors, Protoss.PhotonCannon) == 0 && (attackFirstZealot || With.frame > Minutes(4)() || unitsComplete(MatchWarriors) > 2)
     output ||= employing(PvP1012) && (unitsComplete(Protoss.Zealot) > 3 || ! enemyStrategy(With.fingerprints.twoGate))
     output ||= employing(PvPGateCoreGate) && unitsComplete(Protoss.Dragoon) > enemies(Protoss.Dragoon) && bases < 2
     output ||= employing(PvP3GateGoon) && unitsComplete(Protoss.Gateway) >= 3 && unitsComplete(MatchWarriors) >= 6
@@ -31,6 +36,7 @@ object PvPIdeas extends MacroCounting {
     output ||= bases > 2
     output ||= bases > miningBases
     output &&= safeToMoveOut
+    output &&= ! recentlyExpandedFirst
 
     // Attack disregarding global safety
     output ||= enemyBases > 1 && miningBases < 2

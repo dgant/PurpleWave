@@ -50,7 +50,7 @@ abstract class MissionDrop extends Mission {
   }
 
   final override protected def shouldForm: Boolean = {
-    With.blackboard.wantToHarass() && With.units.existsOurs(MatchTransport) && additionalFormationConditions
+    With.blackboard.wantToHarass() && With.recruiter.available.exists(MatchTransport) && additionalFormationConditions
   }
 
   final private def transition(newState: DropState): Unit = {
@@ -65,6 +65,7 @@ abstract class MissionDrop extends Mission {
     if (requireWorkers && base.heart.visible && base.units.forall(u => ! u.isEnemy || ! MatchWorker(u))) return true
     if (itinerary.size > 1 && With.frame < Minutes(10)() && ! base.owner.isEnemy) return true
     if ( ! base.owner.isEnemy && base.units.exists(u => u.likelyStillThere && u.isEnemy && u.canAttack && u.canMove && ! u.unitClass.isWorker)) return true
+    if (shouldStopRaiding && units.exists(_.base.contains(base))) return true
     With.framesSince(base.lastScoutedFrame) < Seconds(45)() && ! base.owner.isEnemy
   }
 
@@ -117,16 +118,15 @@ abstract class MissionDrop extends Mission {
       state match {
         case Recruiting | Assembling | Travelling | Landing => transition(Escaping)
         case Raiding => transition(Evacuating)
-        case _ => {}
+        case _ =>
       }
     }
-    if (state == Recruiting)                                                                { transition(Assembling)  }
-    if (state == Assembling && passengers.forall(_.transport.exists(transports.contains)))  { transition(Travelling)  }
-    if (state == Travelling && passengers.forall(_.base.exists(vicinity.base.contains)))    { transition(Landing)     }
-    if (state == Landing    && passengers.forall( ! _.loaded))                              { transition(Raiding)     }
-    if (state == Raiding    && ! vicinity.base.exists(itinerary.contains))                  { transition(Evacuating)  }
-    if (state == Raiding    && shouldStopRaiding)                                           { transition(Evacuating)  }
-    if (state == Evacuating && passengers.forall(_.loaded))                                 { transition(if (itinerary.isEmpty) Escaping else Travelling) }
+    if (state == Recruiting)                                                                              { transition(Assembling)  }
+    if (state == Assembling && passengers.forall(_.transport.exists(transports.contains)))                { transition(Travelling)  }
+    if (state == Travelling && transports.exists(_.base.exists(vicinity.base.contains)))                  { transition(Landing)     }
+    if (state == Landing    && passengers.forall( ! _.loaded))                                            { transition(Raiding)     }
+    if (Seq(Travelling, Landing, Raiding).contains(state) && ! vicinity.base.exists(itinerary.contains))  { transition(Evacuating)  }
+    if (state == Evacuating && passengers.forall(_.loaded))                                               { transition(if (itinerary.isEmpty) Escaping else Travelling) }
     if (state == Escaping   && units.forall(u => u.base.exists(_.owner.isUs) || ! u.visibleToOpponents)) { terminate("Escaped!"); return }
     transports.foreach(t => {
       t.agent.passengers.view.filterNot(passengers.contains).foreach(t.agent.removePassenger)

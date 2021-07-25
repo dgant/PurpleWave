@@ -14,14 +14,15 @@ import Utilities.Seconds
 class MissionReaverDrop extends MissionDrop {
 
   override protected def additionalFormationConditions: Boolean = (
-    With.scouting.enemyProgress > 0.5
+    (With.scouting.enemyProgress > 0.5 || MacroFacts.enemyBases > 2)
     && MacroFacts.upgradeComplete(Protoss.ShuttleSpeed, 1, Seconds(15)())
-    && With.units.existsOurs(MatchAnd(Protoss.Reaver, MatchComplete)))
+    && With.recruiter.available.exists(Protoss.Reaver))
 
   override protected def shouldStopRaiding: Boolean = passengers.view
     .filter(Protoss.Reaver)
     .forall(reaver =>
       reaver.doomed
+      || itinerary.headOption.exists(_.units.view.map(u => if (u.isEnemy && MatchWarriors(u) && u.canAttackGround) u.subjectiveValue else 0).sum > passengers.view.map(_.subjectiveValue).sum)
       || (reaver.matchups.threatsInRange.exists(MatchWarriors) && ! reaver.matchups.targetsInRange.exists(MatchWorker)))
   override protected def shouldGoHome: Boolean = ! passengers.exists(Protoss.Reaver)
 

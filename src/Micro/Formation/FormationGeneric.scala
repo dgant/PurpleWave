@@ -34,8 +34,7 @@ object FormationGeneric {
   }
 
   private def targetPixel(group: FriendlyUnitGroup): Pixel = {
-    Maff.mode(group.groupFriendlyOrderable.view.map(u =>
-      Maff.minBy(u.matchups.targets.view.map(_.pixel))(u.pixelDistanceCenter).getOrElse(With.scouting.threatOrigin.center)))
+    Maff.modeOpt(group.groupFriendlyOrderable.view.flatMap(u => Maff.minBy(u.matchups.targets.view.map(_.pixel))(u.pixelDistanceCenter))).getOrElse(With.scouting.threatOrigin.center)
   }
 
   private case class ClassSlots(unitClass: UnitClass, var slots: Int)

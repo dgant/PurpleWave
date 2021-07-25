@@ -8,6 +8,7 @@ import Planning.Predicates.MacroFacts
 import Planning.UnitCounters.CountEverything
 import Planning.UnitMatchers.{MatchFlyingWarriors, MatchOr}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import Tactics.Missions.MissionDrop
 import Utilities.Seconds
 
 class SquadAcePilots extends Squad {
@@ -70,9 +71,15 @@ class SquadAcePilots extends Squad {
     val squadsFacingDetection = otherSquads.filter(s => s.units.exists(u => Protoss.DarkTemplar(u) && u.matchups.enemyDetectors.forall(_.flying))).toVector
     if (squadsFacingDetection.nonEmpty) {
       activity = "AceCloakDT"
-      val squad = squadsFacingDetection.minBy(_.centroidAir.pixelDistanceSquared(centroidAir))
-      followSquad(squad)
+      followSquad(squadsFacingDetection.minBy(_.centroidAir.pixelDistanceSquared(centroidAir)))
       return
+    }
+
+    // Help drop missions
+    val dropMissions = otherSquads.filter(_.isInstanceOf[MissionDrop]).map(_.asInstanceOf[MissionDrop])
+    if (dropMissions.nonEmpty) {
+      activity = "AceEscortDrop"
+      followSquad(dropMissions.maxBy(_.duration))
     }
 
     // Monitor their bases

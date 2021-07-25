@@ -25,16 +25,22 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     def free        : Boolean = worker.isEmpty && mineable
     def mineable    : Boolean = isValidResource(resource)
   }
-  private lazy val mineralSlots: Map[Base, Vector[Slot]] = With.units.neutral.filter(_.mineralsLeft > 0)
-    .groupBy(m => m.base.getOrElse(With.geography.bases.minBy(_.heart.pixelDistanceGround(m.pixel))))
-    .map(group => {
-      val base = group._1
-      val sorted = group._2.toVector
-        .sortBy(m =>
-          // Give slight edge to patches near the 3rd starting worker and where future workers will spawn if Terran/Protoss
-          Maff.broodWarDistanceBox(m.topLeft, m.bottomRight, base.townHallArea.startPixel.add(47, 80), base.townHallArea.startPixel.add(70, 103)) * 0.1 +
-          Maff.broodWarDistanceBox(m.topLeft, m.bottomRight, base.townHallArea.startPixel, base.townHallArea.endPixel))
-      (base, (sorted.map(new Slot(_, 0)) ++ sorted.reverse.map(new Slot(_, 1)) ++ sorted.reverse.map(new Slot(_, 2)))) })
+  private lazy val mineralSlots: Map[Base, Vector[Slot]] = {
+    val basesWithMinerals = With.units.neutral.filter(_.mineralsLeft > 0)
+      .groupBy(m => m.base.getOrElse(With.geography.bases.minBy(_.heart.pixelDistanceGround(m.pixel))))
+      .map(group => {
+        val base = group._1
+        val sorted = group._2.toVector
+          .sortBy(m =>
+            // Give slight edge to patches near the 3rd starting worker and where future workers will spawn if Terran/Protoss
+            Maff.broodWarDistanceBox(m.topLeft, m.bottomRight, base.townHallArea.startPixel.add(47, 80), base.townHallArea.startPixel.add(70, 103)) * 0.1 +
+              Maff.broodWarDistanceBox(m.topLeft, m.bottomRight, base.townHallArea.startPixel, base.townHallArea.endPixel))
+        (base, (sorted.map(new Slot(_, 0)) ++ sorted.reverse.map(new Slot(_, 1)) ++ sorted.reverse.map(new Slot(_, 2)))) })
+    // A base doesn't *have* to have any minerals in it
+    val omitted = With.geography.bases.filterNot(basesWithMinerals.contains)
+    basesWithMinerals ++ omitted.map(b => (b, Vector.empty)).toMap
+  }
+
   private lazy val gasSlots: Map[Base, Vector[Slot]] = With.geography.bases.map(b => (b, Vector[Slot]())).toMap ++ // Not all bases have gas! Make sure map contains them
     With.units.neutral.filter(_.gasLeft > 0)
       .groupBy(m => m.base.getOrElse(With.geography.bases.minBy(_.heart.pixelDistanceGround(m.pixel))))

@@ -173,6 +173,7 @@ class PvZ2GateFlex extends GameplanImperative{
   }
 
   def doTech2Base(): Unit = {
+    get(Protoss.DragoonRange)
     get(Protoss.Forge)
     get(Protoss.CitadelOfAdun)
     get(Protoss.GroundDamage)
@@ -185,7 +186,9 @@ class PvZ2GateFlex extends GameplanImperative{
     get(Protoss.RoboticsFacility)
     get(Protoss.Observatory)
     pump(Protoss.Observer, if (enemies(Zerg.Lurker) > 1) 3 else if (enemyLurkersLikely) 2 else 1)
-    if (enemyLurkersLikely) upgradeContinuously(Protoss.ObserverSpeed)
+    if (enemyLurkersLikely && safeAtHome) {
+      if (upgradeComplete(Protoss.ObserverSpeed)) upgradeContinuously(Protoss.ObserverVisionRange) else upgradeContinuously(Protoss.ObserverSpeed)
+    }
   }
 
   def doEndgame(): Unit = {

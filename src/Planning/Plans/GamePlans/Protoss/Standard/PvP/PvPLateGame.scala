@@ -37,7 +37,7 @@ class PvPLateGame extends GameplanImperative {
   val buildCannonsAtNatural = new BuildCannonsAtNatural(1)
   val buildCannonsAtExpansions = new BuildCannonsAtExpansions(1)
   override def executeBuild(): Unit = {
-    fearDeath   = ! safeAtHome || unitsComplete(MatchWarriors) < 8
+    fearDeath   = ! safeAtHome || unitsComplete(MatchWarriors) < 8 || PvPIdeas.recentlyExpandedFirst
     fearMacro   = miningBases < Math.max(2, enemyBases)
     fearDT      = enemyDarkTemplarLikely && unitsComplete(Protoss.Observer) == 0 && (enemies(Protoss.DarkTemplar) > 0 && unitsComplete(Protoss.PhotonCannon) == 0)
     fearContain = With.scouting.enemyProgress > 0.6
@@ -93,6 +93,7 @@ class PvPLateGame extends GameplanImperative {
       .orElse(Some(TemplarTech).filter(x => commitToTech && ! enemyRobo && roll("PrimaryTechTemplar", if (enemyStrategy(With.fingerprints.fourGateGoon)) 0.5 else 0.25)))
       .orElse(Some(RoboTech).filter(x => commitToTech))
 
+    if (PvPIdeas.recentlyExpandedFirst) status("Pioneer")
     if (dtBravery) status("DTBravery")
     if (fearDeath) status("FearDeath")
     if (fearDT) status("FearDT")
@@ -113,7 +114,6 @@ class PvPLateGame extends GameplanImperative {
 
   override def executeMain(): Unit = {
     val trainArmy     = new DoQueue(doTrainArmy)
-    val fillerArmy    = new DoQueue(doFillerArmy)
     val addGates      = new DoQueue(doAddProduction)
     val primaryTech   = new DoQueue(doPrimaryTech)
     val secondaryTech = new DoQueue(doSecondaryTech)
@@ -121,7 +121,6 @@ class PvPLateGame extends GameplanImperative {
     val cannons       = new DoQueue(doCannons)
 
     // TODO: Emergency/Proactive detection
-    // TODO: Gas pumps when?
 
     if (expectCarriers) { makeDarkArchons() }
 
@@ -132,7 +131,6 @@ class PvPLateGame extends GameplanImperative {
 
     if (fearDeath) {
       trainArmy()
-      fillerArmy()
       addGates()
     }
     cannons()
@@ -141,7 +139,6 @@ class PvPLateGame extends GameplanImperative {
       primaryTech()
       trainArmy()
       addGates()
-      fillerArmy()
     }
     if (shouldExpand) {
       expand()
@@ -153,7 +150,6 @@ class PvPLateGame extends GameplanImperative {
     }
     trainArmy()
     addGates()
-    fillerArmy()
     expand()
     secondaryTech()
   }
@@ -184,13 +180,10 @@ class PvPLateGame extends GameplanImperative {
       pumpRatio(Protoss.Zealot, 2, 16, Seq(Friendly(Protoss.Dragoon, 0.5)))
     }
     pump(Protoss.Dragoon)
-  }
-
-  def doFillerArmy(): Unit = {
-    if (gas > 200 && techStarted(Protoss.PsionicStorm)) {
+    if (gas > 400 && techStarted(Protoss.PsionicStorm)) {
       pump(Protoss.HighTemplar)
     }
-    if (gas < 42 || minerals > 400) {
+    if (gas < 42 || minerals > 225) {
       pump(Protoss.Zealot)
     }
   }
@@ -200,6 +193,8 @@ class PvPLateGame extends GameplanImperative {
   def doAddProduction(): Unit = {
     if (units(Protoss.RoboticsFacility) > 0) { get(Protoss.RoboticsSupportBay) }
     if (units(Protoss.CitadelOfAdun) > 0 && ! enemyRobo) { get(Protoss.TemplarArchives) }
+    get(5, Protoss.Gateway)
+    get(2, Protoss.Assimilator)
     get(targetGateways, Protoss.Gateway)
   }
 
@@ -253,7 +248,7 @@ class PvPLateGame extends GameplanImperative {
   }
 
   def doTemplar(): Unit = {
-    if ( ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)) {
+    if (safeAtHome || shouldDetect) {
       get(Protoss.Forge)
     }
     get(Protoss.CitadelOfAdun)
@@ -264,11 +259,6 @@ class PvPLateGame extends GameplanImperative {
         get(Protoss.MindControl)
       }
     } else {
-      if (enemies(Protoss.Observer) == 0) {
-        buildOrder(Get(Protoss.DarkTemplar))
-      }
-      get(5, Protoss.Gateway)
-      get(2, Protoss.Assimilator)
       // We don't want this tech until we have a ton of gas available to us
       if (unitsComplete(Protoss.Gateway) >= 5 && unitsComplete(Protoss.Nexus) > 1 && unitsComplete(Protoss.Assimilator) > 1) {
         if (unitsComplete(MatchWarriors) > 15) {

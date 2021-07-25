@@ -28,9 +28,9 @@ class Zone(
   lazy val  tilesBuildable    : Vector[Tile]        = { With.grids.buildableTerrain.initialize(); tiles.view.filter(With.grids.buildableTerrain.get).toVector }
   lazy val  metro             : Option[Metro]       = With.geography.metros.find(_.zones.contains(this))
 
-  lazy val exitDistanceGrid: GridGroundDistance = exit.map(_.distanceGrid).getOrElse(new GridGroundDistance(centroid))
   lazy val exit: Option[Edge] = calculateExit
   lazy val distanceGrid: GridGroundDistance = new GridGroundDistance(if (bases.length == 1) bases.head.heart else centroid)
+  lazy val exitDistanceGrid: GridGroundDistance = exit.map(_.distanceGrid).getOrElse(new GridGroundDistance(centroid))
   
   def units: Seq[UnitInfo] = unitBuffer
   var unitBuffer: mutable.ArrayBuffer[UnitInfo] = new mutable.ArrayBuffer[UnitInfo]()

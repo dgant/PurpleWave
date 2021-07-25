@@ -2,7 +2,7 @@ package Micro.Agency
 
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders}
 
 object AttackDelay {
 
@@ -62,8 +62,8 @@ object AttackDelay {
   }
   
   def nextSafeOrderFrame(unit: FriendlyUnitInfo): Int = {
-    // The +1 is an attempt to make units stick less after an attack
-    unit.lastFrameStartingAttack + unit.unitClass.stopFrames - With.latency.latencyFrames + 1
+    // The +2 is an attempt to make units stick less after an attack
+    unit.lastFrameStartingAttack + unit.unitClass.stopFrames - With.latency.latencyFrames + 2
   }
   
   /*

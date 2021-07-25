@@ -15,8 +15,6 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 class Geography extends TimedTask {
-  val baseMaxRadiusTiles = 50
-
   lazy val mapArea            : TileRectangle         = TileRectangle(Tile(0, 0), Tile(With.mapTileWidth, With.mapTileHeight))
   lazy val allTiles           : Array[Tile]           = mapArea.tiles.indices.map(new Tile(_)).toArray
   lazy val startBases         : Vector[Base]          = bases.filter(_.isStartLocation)

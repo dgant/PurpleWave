@@ -12,13 +12,13 @@ object TaskQueueGlobalWeights {
 }
 
 class TaskQueueGlobal extends TaskQueueParallel(
-  new TaskQueueSerial("Fingerprinting", With.fingerprints.relevant.map(f => new SimpleTask(f.toString, f.update)): _*),
   With.geography,
   With.grids,
   With.preplacement,
+  With.scouting,
+  new TaskQueueSerial("Fingerprinting", With.fingerprints.relevant.map(f => new SimpleTask(f.toString, f.update)): _*),
   With.yolo,
   With.battles,
-  With.scouting,
   new TaskQueueSerial(
     "Planning",
     With.accounting,

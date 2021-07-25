@@ -47,7 +47,7 @@ object PvPRobo extends PvPStrategy {
   // No blacklisting; Preserve this as our "Always valid" choice
 }
 object PvPDT extends PvPStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreTech))
+  override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvPGateCoreTech, PvPGateCoreGate))
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.robo, With.fingerprints.forgeFe)
 }
 object PvP3GateGoon extends PvPStrategy {

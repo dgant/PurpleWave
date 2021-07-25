@@ -4,7 +4,7 @@ import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.Predicates.MacroFacts
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.CountOne
+import Planning.UnitCounters.{CountOne, CountUpTo}
 import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchTransport}
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
@@ -16,13 +16,12 @@ class MissionStormDrop extends MissionDrop {
 
   override protected def additionalFormationConditions: Boolean = (
     With.self.hasTech(Protoss.PsionicStorm)
-    && MacroFacts.upgradeComplete(Protoss.ShuttleSpeed, 1, Seconds(15)())
-    && With.units.existsOurs(MatchStormDroppable))
+    && With.recruiter.available.exists(MatchStormDroppable))
   override protected def requireWorkers = true
   override protected def shouldStopRaiding: Boolean = shouldGoHome
   override protected def shouldGoHome: Boolean = passengers.forall(_.energy < 75)
 
-  object MatchStormDroppable extends MatchAnd(MatchComplete, Protoss.HighTemplar, _.energy >= 70)
+  object MatchStormDroppable extends MatchAnd(MatchComplete, Protoss.HighTemplar, _.energy >= 75)
 
   private def recruitable(unit: UnitInfo) = unit.complete && ! unit.visibleToOpponents
 
@@ -32,7 +31,10 @@ class MissionStormDrop extends MissionDrop {
 
   val stormLock = new LockUnits(this)
   stormLock.matcher = MatchStormDroppable
-  stormLock.counter = CountOne
+  stormLock.counter = CountUpTo(2)
+
+  val zealotLock = new LockUnits(this)
+  zealotLock.matcher = Protoss.Zealot
 
   override protected def recruit(): Unit = {
     populateItinerary()
@@ -40,7 +42,7 @@ class MissionStormDrop extends MissionDrop {
     transportLock.preference = PreferClose(vicinity)
     transportLock.acquire()
     if (transportLock.units.isEmpty) {
-      terminate("No transports avaialble")
+      terminate("No transports available")
       return
     }
 
@@ -48,12 +50,16 @@ class MissionStormDrop extends MissionDrop {
     stormLock.preference = PreferClose(transportPixel)
     stormLock.acquire()
     if (stormLock.units.isEmpty) {
-      terminate("No storms avaialble")
+      terminate("No storms available")
       return
     }
+    zealotLock.counter = CountUpTo(4 - stormLock.units.size)
+    zealotLock.preference = PreferClose(transportPixel)
+    zealotLock.acquire()
 
     transports ++= transportLock.units
     passengers ++= stormLock.units
+    passengers ++= zealotLock.units
   }
 
   override protected def raid(): Unit = {

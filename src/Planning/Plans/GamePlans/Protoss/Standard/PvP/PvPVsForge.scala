@@ -38,7 +38,7 @@ class PvPVsForge extends PvP34GateGoon {
         new If(new UnitsAtMost(0, Protoss.CyberneticsCore), new CapGasWorkersAt(1)),
 
         // Vs. Gateway FE we need some Zealot production so they don't just walk into our mineral line
-        new If(new EnemyStrategy(With.fingerprints.gatewayFe),  new Parallel(new Build(Get(Protoss.Gateway)), new If(new UnitsAtMost(0, Protoss.CyberneticsCore)), new Pump(Protoss.Zealot))),
+        new If(new EnemyStrategy(With.fingerprints.gatewayFe),  new Parallel(new Build(Get(Protoss.Gateway)), new If(new UnitsAtMost(0, Protoss.CyberneticsCore), new Pump(Protoss.Zealot)))),
         // If they've bought a Nexus, we can too
         new If(new EnemyNaturalConfirmed,                       new ExpandASAP),
         // If they've bought two cannons or gone Forge-first, we can buy a Nexus

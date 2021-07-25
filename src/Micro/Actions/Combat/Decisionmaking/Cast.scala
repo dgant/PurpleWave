@@ -7,10 +7,12 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Cast extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.energy > 0
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.energyMax > 0
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    spells.foreach(_.consider(unit))
+    if (unit.cooldownSpell == 0 ) {
+      spells.foreach(_.consider(unit))
+    }
     if (unit.ready && unit.isAny(
       Terran.ScienceVessel,
       Protoss.Arbiter,

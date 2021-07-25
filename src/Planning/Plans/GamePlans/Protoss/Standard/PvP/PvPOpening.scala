@@ -14,12 +14,15 @@ import Utilities.{GameTime, Minutes}
 class PvPOpening extends GameplanImperative {
 
   var complete: Boolean = false
-  var commitZealots: Boolean = false
-  var zBeforeCore: Boolean = false
-  var zAfterCore: Boolean = false
-  var sevenZealot: Boolean = false
+  // General properties
   var shouldExpand: Boolean = false
   var shouldAttack: Boolean = false
+  // 10-12 properties
+  var commitZealots: Boolean = false
+  var sevenZealot: Boolean = false
+  // 1 Gate Core properties
+  var zBeforeCore: Boolean = false
+  var zAfterCore: Boolean = false
   // Robo properties
   var getObservers: Boolean = false
   var getObservatory: Boolean = false
@@ -77,7 +80,6 @@ class PvPOpening extends GameplanImperative {
         zAfterCore ||= enemyStrategy(With.fingerprints.mannerPylon, With.fingerprints.gasSteal)
         zAfterCore ||= enemyRecentStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway)
         zAfterCore ||= employing(PvPGateCoreGate, PvPTechBeforeRange, PvPDT)
-
       }
       if (units(Protoss.Gateway) < 2 && units(Protoss.RoboticsFacility) < 1 && units(Protoss.CitadelOfAdun) < 1) {
         if (enemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway, With.fingerprints.nexusFirst)) {
@@ -317,7 +319,7 @@ class PvPOpening extends GameplanImperative {
         }
       } else if (starts > 3) {
         scoutOn(Protoss.Gateway)
-      } else if ( ! zBeforeCore) {
+      } else if ( ! zBeforeCore || ! PvPIdeas.attackFirstZealot) {
         scoutOn(Protoss.CyberneticsCore)
       }
     }
@@ -489,11 +491,11 @@ class PvPOpening extends GameplanImperative {
 
           if (employing(PvPTechBeforeRange)) {
             buildOrder(
-              Get(Protoss.RoboticsFacility),
               Get(17, Protoss.Probe),
-              Get(2, Protoss.Gateway),
-              Get(2, Protoss.Dragoon),
+              Get(Protoss.RoboticsFacility),
               Get(18, Protoss.Probe),
+              Get(2, Protoss.Dragoon),
+              Get(19, Protoss.Probe),
               Get(3, Protoss.Pylon))
 
           /////////////////

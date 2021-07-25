@@ -76,7 +76,13 @@ final class Scouting extends TimedTask with EnemyTechs {
   def firstEnemyMain: Option[Base] = _firstEnemyMain
   def enemyMain: Option[Base] = _firstEnemyMain.filter(base => ! base.scouted || base.owner.isEnemy)
   def enemyNatural: Option[Base] = enemyMain.flatMap(_.natural)
+  def firstExpansionFrameEnemy: Int = _firstExpansionFrameEnemy
+  def firstExpansionFrameUs: Int = _firstExpansionFrameUs
+  def weExpandedFirst: Boolean = _firstExpansionFrameUs < _firstExpansionFrameEnemy
+  def enemyExpandedFirst: Boolean = _firstExpansionFrameEnemy < _firstExpansionFrameUs
   private var _firstEnemyMain: Option[Base] = None
+  private var _firstExpansionFrameEnemy: Int = Forever()
+  private var _firstExpansionFrameUs: Int = Forever()
 
   def enemyHasScoutedUs: Boolean = _enemyHasScoutedUs
   def enemyHasScoutedUsWithWorker: Boolean = _enemyHasScoutedUsWithWorker
@@ -122,5 +128,11 @@ final class Scouting extends TimedTask with EnemyTechs {
     }
     _enemyHasScoutedUsWithWorker = _enemyHasScoutedUsWithWorker || With.geography.ourBases.exists(_.units.exists(u => u.isEnemy && u.is(MatchWorker)))
     _enemyHasScoutedUs = _enemyHasScoutedUs || _enemyHasScoutedUsWithWorker || With.units.ours.view.filter(MatchBuilding).exists(u => u.tileArea.tiles.exists(With.grids.enemyVision.inRange))
+    if (With.geography.bases.size > 1) {
+      _firstExpansionFrameUs = Math.min(_firstExpansionFrameUs, With.frame)
+    }
+    if (With.enemies.exists(_.bases.size > 1)) {
+      _firstExpansionFrameEnemy = Math.min(_firstExpansionFrameEnemy, With.frame)
+    }
   }
 }

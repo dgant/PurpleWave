@@ -57,6 +57,14 @@ object BaseUpdater {
       base.natural.filter(_.owner.isEnemy).foreach(natural => base.owner = natural.owner)
     }
 
+    // Assume they've taken their natural not too long after us
+    if ( ! With.self.isZerg && With.geography.ourNatural.townHall.exists(_.isOurs)) {
+      val ourNaturalFrame = With.geography.ourNatural.townHall.get.frameDiscovered
+      if (With.scouting.enemyMain.flatMap(_.natural).exists(nat => With.framesSince(base.lastScoutedFrame) > With.framesSince(ourNaturalFrame) + Minutes(2)())) {
+        base.owner = With.enemy
+      }
+    }
+
     if (originalOwner != base.owner) {
       base.lastOwnerChangeFrame = With.frame
     }

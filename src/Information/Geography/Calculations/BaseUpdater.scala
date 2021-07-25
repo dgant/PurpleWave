@@ -10,16 +10,14 @@ import Utilities.Minutes
 object BaseUpdater {
   
   def updateBase(base: Base) {
-    if (base.townHallTile.visibleUnchecked) {
+    if (base.townHallArea.tiles.exists(_.visibleUnchecked)) {
       base.lastScoutedFrame = With.frame
     }
-
     if (With.grids.enemyVision.inRange(base.townHallTile)) {
       base.lastScoutedByEnemyFrame = With.frame
     }
-
     base.units            = base.zone.units.filter(u => u.base.contains(base) && u.likelyStillThere).toVector
-    base.townHall         = Maff.minBy(base.units.view.filter(u => u.unitClass.isTownHall && ! u.flying))(_.tileTopLeft.tileDistanceManhattan(base.townHallTile))
+    base.townHall         = Maff.minBy(base.units.view.filter(u => u.unitClass.isTownHall && ! u.flying && u.tileTopLeft.tileDistanceFast(base.townHallTile) < 12))(_.tileTopLeft.tileDistanceManhattan(base.townHallTile))
     base.minerals         = base.units.filter(u => u.mineralsLeft > 0 && ! u.isBlocker)
     base.gas              = base.units.filter(_.unitClass.isGas)
     base.workerCount      = base.units.count(u => u.player == base.owner && u.is(MatchWorker))
@@ -37,33 +35,51 @@ object BaseUpdater {
     
     // Derive the owner from the current town hall
     // If we have previously inferred the base's owner, maintain the inference
-    base.owner = base.townHall.map(_.player).getOrElse(if (base.scouted) With.neutral else base.owner)
-    
-    if (base.owner.isNeutral && With.scouting.enemyMain.contains(base)) {
-      With.logger.debug("Assuming ownership of implicit starting location")
-      base.owner = With.enemy
-    }
+    if (base.townHall.exists(_.player != base.owner)) {
+      val hall = base.townHall.get
+      With.logger.debug(f"Detecting ownership of base from visible town hall: $hall")
+      base.owner = hall.player
+    } else {
 
-    if (base.owner.isNeutral && With.framesSince(base.lastScoutedFrame) > Protoss.Nexus.buildFrames) {
-      With.logger.debug("Assuming ownership of of occupied base we haven't seen lately")
-      val building = base.zone.units.find(unit => unit.isEnemy && ! unit.flying && unit.unitClass.isBuilding)
-      if (building.exists(_.lastSeen > base.lastScoutedFrame + Minutes(3)())) {
-        base.owner = building.get.player
+      val scoutingNow = base.lastScoutedFrame == With.frame
+      val framesSinceScouting = With.framesSince(base.lastScoutedFrame)
+      val hiddenNaturalDelay = Minutes(3)()
+
+      if (scoutingNow) {
+        if (base.townHall.isEmpty) {
+          base.owner = With.neutral
+          With.logger.debug(f"Detecting absent base: $base")
+        }
+      } else if (base.owner.isNeutral) {
+
+        if (With.scouting.enemyMain.contains(base)) {
+          base.owner = With.enemy
+          With.logger.debug(f"Assuming ${base.owner} owns $base as implicit starting location")
+        }
+
+        if (framesSinceScouting > Protoss.Nexus.buildFrames) {
+          val building = base.zone.units.find(unit => unit.isEnemy && ! unit.flying && unit.unitClass.isBuilding)
+          if (building.exists(_.lastSeen > base.lastScoutedFrame + hiddenNaturalDelay)) {
+            base.owner = building.get.player
+            With.logger.debug(f"Assuming ${base.owner} owns $base due to presence of $building")
+          }
+        }
+
+        if ( ! With.self.isZerg
+          && With.scouting.weExpandedFirst
+          && base.isNaturalOf.exists(With.scouting.enemyMain.contains)
+          && framesSinceScouting > hiddenNaturalDelay) {
+          base.owner = base.isNaturalOf.get.owner
+          With.logger.debug(f"Assuming ${base.owner} has taken $base after we expanded")
+        }
+
+        if ( ! base.scouted && base.owner.bases.forall(base.natural.contains)) {
+          base.natural.filter(_.owner.isEnemy).foreach(natural => {
+            base.owner = natural.owner
+            With.logger.debug(f"Assuming ${base.owner} owns unscouted main $base due to possession of its natural {$base.natural}")
+          })
+        }
       }
-    }
-
-    if (base.owner.isNeutral && ! base.scouted && base.owner.bases.forall(base.natural.contains)) {
-      With.logger.debug("Assuming ownership of unscouted main from natural if we haven't found any main yet")
-      base.natural.filter(_.owner.isEnemy).foreach(natural => base.owner = natural.owner)
-    }
-
-    if (base.owner.isNeutral
-      && ! With.self.isZerg
-      && With.scouting.weExpandedFirst
-      && base.isNaturalOf.exists(With.scouting.enemyMain.contains)
-      && With.framesSince(base.lastScoutedFrame) > Protoss.Nexus.buildFrames + Minutes(1)()) {
-      With.logger.debug("Assuming they've taken their natural not too long after us")
-      base.owner = base.isNaturalOf.get.owner
     }
 
     if (originalOwner != base.owner) {

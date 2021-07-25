@@ -1,26 +1,31 @@
 package Lifecycle
 
+import java.lang.management.ManagementFactory
+
 import bwapi.BWClientConfiguration
 
-object Main {
+import scala.collection.JavaConverters._
 
-  val configuration: BWClientConfiguration = new BWClientConfiguration()
+object Main {
+  private val JBWAPIClientDataSizeBytes =  33017048
+  private val botRequiredDataSizeBytes  = 500000000
+
+  private val memoryFree  : Long            = Math.min(Runtime.getRuntime.maxMemory, Runtime.getRuntime.totalMemory)
+  val jvmRuntimeArguments : Vector[String]  = ManagementFactory.getRuntimeMXBean.getInputArguments.asScala.toVector
+  val liveDebugging       : Boolean         = jvmRuntimeArguments.exists(_.contains("purpledebug"))
+  val framesBufferable    : Int             = Math.min(10, (memoryFree - botRequiredDataSizeBytes) / JBWAPIClientDataSizeBytes).toInt
+  val useFrameBuffer      : Boolean         = framesBufferable > 1 && ! liveDebugging
+
+  val jbwapiConfiguration: BWClientConfiguration = new BWClientConfiguration()
     .withAutoContinue(true)
     .withMaxFrameDurationMs(40)
-
-  // Go async if we have the memory for it
-  // and aren't doing live debugging
-  private val JBWAPIClientDataSizeBytes = 33017048
-  private lazy val memoryFree: Long = Runtime.getRuntime.freeMemory
-  private lazy val framesBufferable = Math.min(10, memoryFree / JBWAPIClientDataSizeBytes - 3) // Subtract flat amount as dumb estimate of what the bot needs
-  // TODO: Also check that we aren't live-debugging
-  if (framesBufferable > 1) {
-    //configuration.withAsyncFrameBufferCapacity(framesBufferable.toInt)
-    //configuration.withAsync(true)
-    //configuration.withAsyncUnsafe(true)
+  jbwapiConfiguration.withAsyncFrameBufferCapacity(framesBufferable)
+  if (useFrameBuffer) {
+    jbwapiConfiguration.withAsync(true)
+    jbwapiConfiguration.withAsyncUnsafe(true)
   }
 
   def main(args: Array[String]) {
-    JBWAPIClient.startGame(configuration)
+    JBWAPIClient.startGame(jbwapiConfiguration)
   }
 }

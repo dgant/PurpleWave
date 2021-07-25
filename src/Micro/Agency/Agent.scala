@@ -153,8 +153,10 @@ class Agent(val unit: FriendlyUnitInfo) {
   private val _passengers: ArrayBuffer[FriendlyUnitInfo] = new ArrayBuffer[FriendlyUnitInfo]
   def ride: Option[FriendlyUnitInfo] = _ride
   def passengers: Seq[FriendlyUnitInfo] = (_passengers ++ unit.loadedUnits).distinct
+  def passengerSize: Int = passengers.view.map(_.unitClass.spaceRequired).sum
   def addPassenger(passenger: FriendlyUnitInfo): Unit = {
-    if (unit.loadedUnitsSize + passenger.unitClass.spaceRequired > 8 && ! passenger.transport.contains(unit)) return
+    if (passengerSize + passenger.unitClass.spaceRequired > 8 && ! passenger.transport.contains(unit)) return
+    passenger.agent.ride.foreach(_.agent.removePassenger(passenger))
     passenger.agent._ride = Some(unit)
     _passengers -= passenger
     _passengers += passenger
@@ -162,6 +164,10 @@ class Agent(val unit: FriendlyUnitInfo) {
   def removePassenger(passenger: FriendlyUnitInfo): Unit = {
     passenger.agent._ride = passenger.agent._ride.filter(_ != unit)
     _passengers -= passenger
+  }
+  def removeAllPassengers(): Unit = {
+    val all = passengers.toVector
+    all.foreach(removePassenger)
   }
   def updateRiding(): Unit = {
     ride.filterNot(_.alive).foreach(_.agent.removePassenger(unit))

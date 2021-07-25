@@ -8,7 +8,6 @@ import Planning.UnitCounters.{CountOne, CountUpTo}
 import Planning.UnitMatchers._
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.Seconds
 
 class MissionReaverDrop extends MissionDrop {
@@ -26,21 +25,13 @@ class MissionReaverDrop extends MissionDrop {
       || (reaver.matchups.threatsInRange.exists(MatchWarriors) && ! reaver.matchups.targetsInRange.exists(MatchWorker)))
   override protected def shouldGoHome: Boolean = ! passengers.exists(Protoss.Reaver)
 
-  private def recruitable(unit: UnitInfo) = unit.complete && ! unit.visibleToOpponents
-
-  val transportLock = new LockUnits(this)
-  transportLock.matcher = unit => MatchTransport(unit) && recruitable(unit)
-  transportLock.counter = CountOne
-
   val reaverLock = new LockUnits(this)
-  reaverLock.matcher = unit => Protoss.Reaver(unit) && recruitable(unit)
-
+  reaverLock.matcher = unit => Protoss.Reaver(unit) && recruitablePassenger(unit)
   val zealotDTLock = new LockUnits(this)
-  zealotDTLock.matcher = unit => unit.isAny(Protoss.Zealot, Protoss.DarkTemplar) && recruitable(unit)
+  zealotDTLock.matcher = unit => unit.isAny(Protoss.Zealot, Protoss.DarkTemplar) && recruitablePassenger(unit)
   zealotDTLock.counter = CountUpTo(2)
-
   val dragoonArchonLock = new LockUnits(this)
-  dragoonArchonLock.matcher = unit => unit.isAny(Protoss.Archon, Protoss.Dragoon) && recruitable(unit)
+  dragoonArchonLock.matcher = unit => unit.isAny(Protoss.Archon, Protoss.Dragoon) && recruitablePassenger(unit)
   dragoonArchonLock.counter = CountOne
 
   override protected def recruit(): Unit = {
@@ -48,10 +39,7 @@ class MissionReaverDrop extends MissionDrop {
     vicinity = itinerary.headOption.map(_.heart).getOrElse(With.scouting.mostBaselikeEnemyTile).center
     transportLock.preference = PreferClose(vicinity)
     transportLock.acquire()
-    if (transportLock.units.isEmpty) {
-      terminate("No transports available")
-      return
-    }
+    if (transportLock.units.isEmpty) { terminate("No transports available"); return }
 
     val transportPixel = transportLock.units.head.pixel
     reaverLock.preference = PreferClose(transportPixel)
@@ -60,15 +48,13 @@ class MissionReaverDrop extends MissionDrop {
 
     reaverLock.counter = CountUpTo(Maff.clamp(MacroFacts.unitsComplete(Protoss.Reaver) - 1, 1, 2))
     reaverLock.acquire()
-    if (reaverLock.units.isEmpty) {
-      terminate("No reavers available")
-      return
+    if (reaverLock.units.isEmpty) { terminate("No reavers available"); return }
+    if (reaverLock.units.size < 2) {
+      zealotDTLock.acquire()
+      if (zealotDTLock.units.isEmpty) {
+        dragoonArchonLock.acquire()
+      }
     }
-    zealotDTLock.acquire()
-    if (zealotDTLock.units.isEmpty) {
-      dragoonArchonLock.acquire()
-    }
-
     transports ++= transportLock.units
     passengers ++= reaverLock.units
     passengers ++= zealotDTLock.units

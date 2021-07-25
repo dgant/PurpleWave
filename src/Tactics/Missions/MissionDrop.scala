@@ -14,8 +14,10 @@ import Micro.Actions.Protoss.Shuttle.Shuttling
 import Micro.Actions.{Action, Idle}
 import Micro.Agency.{Commander, Intention}
 import Micro.Coordination.Pathing.MicroPathing
+import Planning.ResourceLocks.LockUnits
+import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers.{MatchTransport, MatchWorker}
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactics.Squads.SquadAutomation
 import Utilities.{Minutes, Seconds}
 
@@ -24,7 +26,6 @@ import scala.collection.mutable.ArrayBuffer
 
 abstract class MissionDrop extends Mission {
   trait DropState extends SimpleString
-  object Recruiting extends DropState
   object Assembling extends DropState
   object Travelling extends DropState
   object Landing extends DropState
@@ -36,17 +37,22 @@ abstract class MissionDrop extends Mission {
   protected def requireWorkers: Boolean = false
   protected def shouldStopRaiding: Boolean = false
   protected def shouldGoHome: Boolean = false
+  protected def recruitable(unit: UnitInfo): Boolean = unit.complete && ! unit.visibleToOpponents && ! unit.team.exists(t => t.engagingOn || t.engagedUpon)
+  protected def recruitablePassenger(unit: UnitInfo): Boolean = recruitable(unit) && transportLock.units.exists(_.pixelDistanceCenter(unit) < 640)
+  protected val transportLock = new LockUnits(this)
+  transportLock.matcher = unit => MatchTransport(unit) && recruitable(unit)
+  transportLock.counter = CountOne
 
   val itinerary = new mutable.Queue[Base]
   val transports = new ArrayBuffer[FriendlyUnitInfo]
   val passengers = new ArrayBuffer[FriendlyUnitInfo]
-  var state: DropState = Recruiting
+  var state: DropState = Assembling
 
   override def reset(): Unit = {
     itinerary.clear()
     transports.clear()
     passengers.clear()
-    state = Recruiting
+    state = Assembling
   }
 
   final override protected def shouldForm: Boolean = {
@@ -85,51 +91,50 @@ abstract class MissionDrop extends Mission {
       .sortBy(_.size)
       .sortBy(_.count(_.owner.isEnemy))
     itinerary ++= itineraries.head
+    With.logger.debug(f"$this itinerary: ${itinerary.view.map(_.toString).mkString(" -> ")}")
   }
 
-  final protected def updateVicinity(): Unit = {
-    if (itinerary.isEmpty) {
-      vicinity = With.geography.home.center
-      return
-    }
-    val base = itinerary.head
-    lazy val sightPixels = Maff.max(transports.view.map(_.sightPixels)).getOrElse(0)
-    vicinity =
-      if (base.owner.isEnemy) base.heart.center
-      else if (itinerary.size > 1) base.townHallArea.center.project(itinerary(1).townHallArea.center, sightPixels)
-      else base.heart.center
-  }
-
+  private def allAboard: Boolean = passengers.forall(_.transport.exists(transports.contains))
+  private def allLanded: Boolean = passengers.forall( ! _.loaded)
+  private def allHome: Boolean = units.forall(_.base.exists(_.owner.isUs))
   final override def run(): Unit = {
     transports --= transports.filterNot(_.alive)
     passengers --= passengers.filterNot(_.alive)
-    if (duration > Seconds(75)() && state != Raiding && state != Evacuating) { terminate("Expired"); return }
+    if (duration > Seconds(45)() && state != Raiding && state != Evacuating) { terminate("Expired (not raiding)"); return }
+    if (duration > Seconds(90)()) { terminate("Expired"); return }
     if (passengers.isEmpty) { terminate("No passengers left"); return }
+    lazy val interruptedPassengers = passengers.filterNot(recruitablePassenger)
+    if (state == Assembling && interruptedPassengers.nonEmpty) { terminate(f"Assembly interrupted: $interruptedPassengers") }
     if (transports.isEmpty) {
-      // Godspeed you poor souls
-      if (Seq(Raiding, Evacuating).contains(state)) { passengers.foreach(_.agent.commit = true) }
+      if (Seq(Raiding, Evacuating).contains(state)) { passengers.filter(_.base.exists(_.owner.isEnemy)).foreach(_.agent.commit = true) } // Godspeed you poor souls
       terminate("No transports left"); return
     }
-    while (itinerary.headOption.exists(skipBase)) { itinerary.dequeue() }
+    while (itinerary.headOption.exists(skipBase)) {
+      With.logger.debug(f"$this: Removing ${itinerary.head} from itinerary. Next base: ${itinerary.drop(1).headOption}")
+      itinerary.dequeue()
+    }
     if (itinerary.isEmpty) { terminate("Empty itinerary"); return }
-    updateVicinity()
+    val base = itinerary.head
+    vicinity =
+      if (base.owner.isEnemy) base.heart.center
+      else if (itinerary.size > 1) base.townHallArea.center.project(itinerary(1).townHallArea.center, Maff.max(transports.view.map(_.sightPixels)).getOrElse(0).toDouble)
+      else base.heart.center
 
     if (shouldGoHome) {
       state match {
-        case Recruiting | Assembling | Travelling | Landing => transition(Escaping)
+        case Assembling | Travelling | Landing => transition(Escaping)
         case Raiding => transition(Evacuating)
         case _ =>
       }
     }
-    if (state == Recruiting)                                                                              { transition(Assembling)  }
-    if (state == Assembling && passengers.forall(_.transport.exists(transports.contains)))                { transition(Travelling)  }
+    if (state == Assembling && allAboard)                                                                 { transition(Travelling)  }
     if (state == Travelling && transports.exists(_.base.exists(vicinity.base.contains)))                  { transition(Landing)     }
-    if (state == Landing    && passengers.forall( ! _.loaded))                                            { transition(Raiding)     }
+    if (state == Landing    && allLanded)                                                                 { transition(Raiding)     }
     if (Seq(Travelling, Landing, Raiding).contains(state) && ! vicinity.base.exists(itinerary.contains))  { transition(Evacuating)  }
-    if (state == Evacuating && passengers.forall(_.loaded))                                               { transition(if (itinerary.isEmpty) Escaping else Travelling) }
-    if (state == Escaping   && units.forall(u => u.base.exists(_.owner.isUs) || ! u.visibleToOpponents)) { terminate("Escaped!"); return }
+    if (state == Evacuating && allAboard)                                                                 { transition(if (itinerary.isEmpty) Escaping else Travelling) }
+    if (state == Escaping   && allHome)                                                                   { terminate("Escaped!"); return }
     transports.foreach(t => {
-      t.agent.passengers.view.filterNot(passengers.contains).foreach(t.agent.removePassenger)
+      t.agent.removeAllPassengers()
       passengers.foreach(t.agent.addPassenger)
       t.loadedUnits.view.filterNot(passengers.contains).foreach(Commander.unload(t, _))
     })
@@ -173,6 +178,7 @@ abstract class MissionDrop extends Mission {
 
   class ActionAssembleTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
+      passengers.foreach(transport.agent.addPassenger)
       val unloaded = passengers.filterNot(_.loaded)
       if (unloaded.isEmpty) {
         transport.agent.toTravel = Some(vicinity)
@@ -188,7 +194,6 @@ abstract class MissionDrop extends Mission {
             transport.agent.toTravel = Some(toPickup.pixel)
             Commander.move(transport)
           }
-
         } else {
           Retreat.consider(transport)
         }
@@ -198,12 +203,10 @@ abstract class MissionDrop extends Mission {
 
   class ActionAssemblePassenger extends Action {
     override protected def perform(passenger: FriendlyUnitInfo): Unit = {
+      passenger.agent.toTravel = Maff.minBy(transports.view.map(_.pixel))(passenger.pixelDistanceSquared)
+      passenger.agent.toReturn = passenger.agent.toTravel
       Potshot.delegate(passenger)
-      if (passenger.visibleToOpponents || ! passenger.agent.withinSafetyMargin) {
-        Retreat.consider(passenger)
-      } else {
-        if (transports.isEmpty) Idle.consider(passenger) else Commander.rightClick(passenger, transports.minBy(_.pixelDistanceSquared(passenger)))
-      }
+      Retreat.consider(passenger)
     }
   }
 
@@ -286,7 +289,7 @@ abstract class MissionDrop extends Mission {
 
   class ActionEscapeTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
-      transport.agent.toTravel = Some(With.geography.home.center)
+      transport.agent.toTravel = Some(transport.agent.home)
       Retreat.consider(transport)
       Commander.move(transport)
     }

@@ -264,14 +264,20 @@ class PvPOpening extends GameplanImperative {
 
     // Attack when we reach an attack timing
     shouldAttack = PvPIdeas.shouldAttack
+    // Don't attack if we're also dropping
+    shouldAttack &&= ! upgradeStarted(Protoss.ShuttleSpeed)
+    // Don't attack with just Gateway units if doing tech build vs non-tech one gate core
+    shouldAttack &&= (employing(PvPGateCoreTech, PvPTechBeforeRange)
+      && units(Protoss.CitadelOfAdun, Protoss.RoboticsFacility) > 0
+      && unitsComplete(Protoss.Reaver, Protoss.DarkTemplar) == 0
+      && (enemyStrategy(With.fingerprints.oneGateCore) || enemyHasUpgrade(Protoss.DragoonRange))
+      && ! PvPIdeas.enemyLowUnitStrategy)
     // Push out to take our natural
     shouldAttack ||= shouldExpand
-    // Don't attack if we're also dropping (unless it's time to take our natural)
-    shouldAttack &&= ( ! upgradeStarted(Protoss.ShuttleSpeed) || shouldExpand)
     // 2-Gate vs 1-Gate core needs to wait until range before venturing out again, to avoid rangeless goons fighting ranged goons
     shouldAttack &&= ! (With.frame > GameTime(5, 10)()
       && employing(PvP1012)
-      && enemyStrategy(With.fingerprints.oneGateCore)
+      && (enemyStrategy(With.fingerprints.oneGateCore) || enemyHasUpgrade(Protoss.DragoonRange))
       && ! upgradeComplete(Protoss.DragoonRange)
       && unitsComplete(Protoss.DarkTemplar, Protoss.Reaver) == 0)
     // Ensure that committed Zealots keep wanting to attack
@@ -677,9 +683,7 @@ class PvPOpening extends GameplanImperative {
       pump(Protoss.Dragoon)
     } else {
       pump(Protoss.Dragoon)
-      if (
-        (enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate) && With.frame < Minutes(4)())
-        || (gas < 42 && minerals >= 175 && ! employing(PvP3GateGoon, PvP4GateGoon))) {
+      if (gas < 42) {
         pump(Protoss.Zealot)
       }
     }

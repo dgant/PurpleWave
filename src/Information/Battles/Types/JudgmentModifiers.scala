@@ -64,10 +64,11 @@ object JudgmentModifiers {
       val enemiesThroughRatio = enemiesThrough / denominator
       val enemiesInRatio      = enemiesIn / denominator
       if (enemiesThroughRatio == 0 && enemiesInRatio == 0) {
-        val speedRatio        = Maff.clamp(4 * choke.radiusPixels / Math.max(1, local.us.widthPixels), 0.25, 1.0)
+        val speedRatio        = Maff.clamp(4 * choke.radiusPixels / Math.max(1, local.us.widthPixels), 0.15, 1.0)
         return Some(JudgmentModifier(speedMultiplier = speedRatio))
       } else if (enemiesInRatio > 0 && enemiesThroughRatio < 0.25) {
-        return Some(JudgmentModifier(targetDelta = -0.1))
+        // COG 2021: Disabling this based on no evidence at the last minute because it could explain some poor decisions we're seeing
+        //return Some(JudgmentModifier(targetDelta = -0.1))
       }
     }
     None

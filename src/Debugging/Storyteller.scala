@@ -154,7 +154,7 @@ class Storyteller {
       Seq(10000, With.performance.framesOver10000)).map(line => "Bot frames over " + line.head.toString + "ms: " + line.last.toString).mkString("\n"))
     tell(
       "The bot believes its performance"
-      + (if (Main.configuration.getAsync) ", if it were running synchronously, would have been " else " was ")
+      + (if (Main.jbwapiConfiguration.getAsync) ", if it were running synchronously, would have been " else " was ")
       + (if (With.performance.disqualified) "BAD" else if (With.performance.danger) "DANGEROUS" else "good"))
     tell(JBWAPIClient.getPerformanceMetrics.toString)
     tell(
@@ -202,6 +202,10 @@ class Storyteller {
     tell("JRE:              " + System.getProperty("java.vendor") + " - " + System.getProperty("java.version"))
     tell("CPUs available:   " + Runtime.getRuntime.availableProcessors())
     tell("System memory:    " + ManagementFactory.getOperatingSystemMXBean.asInstanceOf[OperatingSystemMXBean].getTotalPhysicalMemorySize / 1000000 + " MB")
+    tell("JVM arguments     " + Main.jvmRuntimeArguments.mkString(" "))
+    tell("Live debugging:   " + Main.liveDebugging)
+    tell("Buffer capacity:  " + Main.framesBufferable)
+    tell("Using buffer?     " + Main.useFrameBuffer)
     logMemoryUsage()
 
     try {
@@ -210,13 +214,13 @@ class Storyteller {
     try {
       tell(f"This copy of PurpleWave came from Git revision ${Source.fromFile(With.bwapiData.ai + "revision.txt").getLines.mkString}")
     } catch { case exception: Exception => tell("No deployment Git revision available") }
-    tell("JBWAPI autocontinue: " + Main.configuration.getAutoContinue)
-    tell("JBWAPI debugConnection: " + Main.configuration.getDebugConnection)
-    tell("JBWAPI async: " + Main.configuration.getAsync)
-    tell("JBWAPI async unsafe: " + Main.configuration.getAsyncUnsafe)
-    tell("JBWAPI async frame buffer size: " + Main.configuration.getAsyncFrameBufferCapacity)
-    tell("JBWAPI unlimited frame zero: " + Main.configuration.getUnlimitedFrameZero)
-    tell("JBWAPI max frame duration: " + Main.configuration.getMaxFrameDurationMs + "ms")
+    tell("JBWAPI autocontinue: " + Main.jbwapiConfiguration.getAutoContinue)
+    tell("JBWAPI debugConnection: " + Main.jbwapiConfiguration.getDebugConnection)
+    tell("JBWAPI async: " + Main.jbwapiConfiguration.getAsync)
+    tell("JBWAPI async unsafe: " + Main.jbwapiConfiguration.getAsyncUnsafe)
+    tell("JBWAPI async frame buffer size: " + Main.jbwapiConfiguration.getAsyncFrameBufferCapacity)
+    tell("JBWAPI unlimited frame zero: " + Main.jbwapiConfiguration.getUnlimitedFrameZero)
+    tell("JBWAPI max frame duration: " + Main.jbwapiConfiguration.getMaxFrameDurationMs + "ms")
     tell(f"Map file: ${With.mapFileName}")
     tell(f"Map hash: ${With.game.mapHash}")
     tell(f"Map id: ${With.mapCleanName}")

@@ -12,11 +12,9 @@ case class Upgrade(bwapiType: UpgradeType) {
   val upgradeTimeFactor    = bwapiType.upgradeTimeFactor
   val mineralPrice         = levels.map(i => (i, bwapiType.mineralPrice(i))).toMap
   lazy val whatUpgrades    = UnitClasses.get(bwapiType.whatUpgrades)
-  val asString             = bwapiType.toString.replaceAll("_", " ")
-
   val gasPrice             = levels.map(i => (i, bwapiType.gasPrice(i))).toMap
   val upgradeFrames        = levels.map(i => (i, bwapiType.upgradeTime(i))).toMap
-  lazy val whatsRequired        = levels.map(i => (i, UnitClasses.get(bwapiType.whatsRequired(i)))).toMap
+  lazy val whatsRequired   = levels.map(i => (i, UnitClasses.get(bwapiType.whatsRequired(i)))).toMap
   
-  override def toString:String = asString
+  override val toString :String =  bwapiType.toString.replaceAll("_", " ")
 }

@@ -372,6 +372,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     friendly.flatMap(_.agent.toAttack)
       .orElse(target)
       .orElse(orderTarget)
+      .orElse(friendly.flatMap(_.squad.flatMap(_.targetQueue.flatMap(_.find(canAttack)))))
       .orElse(Maff.minBy(matchups.targets)(_.pixelDistanceEdge(targetPixel.orElse(orderTargetPixel).getOrElse(pixel))))
 
   @inline final def isBeingViolent: Boolean = {
@@ -412,7 +413,12 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     cloakedOrBurrowed
     && ! ensnared
     && ! plagued
-    && (if (isFriendly) ! tile.enemyDetected else ! detected))
+    && (
+      if (isOurs) (
+        ! tile.enemyDetected
+        && ! matchups.enemies.exists(_.orderTarget.contains(this))
+        && ! With.bullets.all.exists(_.targetUnit.contains(this)))
+      else ! detected))
 
   @inline final def teamColor: Color =
     if      (visible)             player.colorBright

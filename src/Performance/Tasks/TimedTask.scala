@@ -47,7 +47,7 @@ abstract class TimedTask {
   final val runMsRecentMean     = new Cache(() => runMsPast.view.map(Math.min(_, 100)).sum / Math.max(1, runMsPast.size))
   final val runMsRecentTotal    = new Cache(() => runMsPast.sum)
   final val runMsSamplesMax     = 8
-  private def runMsProjected: Double = Math.max(if (runsTotal < 10) 5 else 1, if (With.performance.danger && Main.configuration.getAsync) runMsRecentMax() else runMsRecentMean())
+  private def runMsProjected: Double = Math.max(if (runsTotal < 10) 5 else 1, if (With.performance.danger && Main.jbwapiConfiguration.getAsync) runMsRecentMax() else runMsRecentMean())
   private def runMsEnqueue(value: Long): Unit = {
     runMsPast.enqueue(Math.max(0L, value))
     while (runMsPast.size > runMsSamplesMax) runMsPast.dequeue()

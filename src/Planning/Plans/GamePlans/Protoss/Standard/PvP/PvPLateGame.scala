@@ -141,6 +141,9 @@ class PvPLateGame extends GameplanImperative {
       addGates()
     }
     if (shouldExpand) {
+      if (enemyBases < 2 && ! enemyHasShown(Protoss.Shuttle, Protoss.Reaver, Protoss.DarkTemplar, Protoss.HighTemplar, Protoss.TemplarArchives) && ! enemyHasUpgrade(Protoss.ZealotSpeed) && ! enemyHasUpgrade(Protoss.ShuttleSpeed)) {
+        addGates()
+      }
       expand()
     }
     if (minerals > 400 || gas < 100) buildGasPumps()
@@ -248,33 +251,30 @@ class PvPLateGame extends GameplanImperative {
   }
 
   def doTemplar(): Unit = {
-    if (safeAtHome || shouldDetect) {
-      get(Protoss.Forge)
-    }
+    lazy val readyForStorm = (
+      unitsComplete(Protoss.Nexus) > 1
+      && unitsComplete(Protoss.Gateway) >= 5
+      && unitsComplete(Protoss.Assimilator) > 1
+      && unitsComplete(MatchWarriors) >= 12
+      && (unitsComplete(MatchWarriors) >= 24 || enemyStrategy(With.fingerprints.robo, With.fingerprints.dtRush) || techStarted(Protoss.PsionicStorm)))
+    if (shouldDetect) { get(Protoss.Forge) }
     get(Protoss.CitadelOfAdun)
     get(Protoss.TemplarArchives)
     if (expectCarriers) {
-      get(Protoss.DarkArchonEnergy)
-      if (upgradeComplete(Protoss.DarkArchonEnergy)) {
-        get(Protoss.MindControl)
+      if (upgradeComplete(Protoss.DarkArchonEnergy)) get(Protoss.MindControl) else get(Protoss.DarkArchonEnergy)
+    } else if (readyForStorm) {
+      get(Protoss.Forge)
+      get(Protoss.PsionicStorm)
+      if (techStarted(Protoss.PsionicStorm)) {
+        buildOrder(Get(2, Protoss.HighTemplar))
       }
-    } else {
-      // We don't want this tech until we have a ton of gas available to us
-      if (unitsComplete(Protoss.Gateway) >= 5 && unitsComplete(Protoss.Nexus) > 1 && unitsComplete(Protoss.Assimilator) > 1) {
-        if (unitsComplete(MatchWarriors) > 15) {
-          get(Protoss.PsionicStorm)
-        }
-        if (techStarted(Protoss.PsionicStorm)) {
-          buildOrder(Get(2, Protoss.HighTemplar))
-        }
-        upgradeContinuously(Protoss.GroundDamage)
-        get(Protoss.ZealotSpeed)
-        if (gasPumps > 2 && techComplete(Protoss.PsionicStorm, withinFrames = Seconds(10)())) {
-          get(Protoss.HighTemplarEnergy)
-        }
-        if (upgradeComplete(Protoss.GroundDamage, 3)) { upgradeContinuously(Protoss.GroundArmor) }
-        if (upgradeComplete(Protoss.GroundArmor,  3)) { upgradeContinuously(Protoss.Shields) }
+      upgradeContinuously(Protoss.GroundDamage)
+      get(Protoss.ZealotSpeed)
+      if (gasPumps > 2 && techComplete(Protoss.PsionicStorm, withinFrames = Seconds(10)())) {
+        get(Protoss.HighTemplarEnergy)
       }
+      if (upgradeComplete(Protoss.GroundDamage, 3)) { upgradeContinuously(Protoss.GroundArmor) }
+      if (upgradeComplete(Protoss.GroundArmor,  3)) { upgradeContinuously(Protoss.Shields) }
     }
   }
 

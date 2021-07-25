@@ -15,16 +15,11 @@ object Sneak extends Action {
     && ! With.yolo.active()
     && ( ! unit.agent.shouldEngage || unit.presumptiveTarget.exists(_.base.exists(_.owner.isUs)))
     && ! unit.alliesBattle.exists(Protoss.Arbiter)
-    && unit.matchups.enemyDetectors.isEmpty
-    && unit.matchups.enemies.exists(e => e.complete && ! e.unitClass.isWorker && (if (unit.flying) e.unitClass.attacksGround else e.unitClass.attacksAir))
-  )
+    && unit.matchups.enemies.exists(e => e.complete && ! e.unitClass.isWorker && e.attacksAgainst(unit) > 0))
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    Potshot.delegate(unit)
-
-    if (unit.unready) return
-
     if ( ! unit.effectivelyCloaked || unit.tileArea.expand(2, 2).tiles.exists(With.grids.enemyDetection.inRange)) {
+      Potshot.delegate(unit)
       Retreat.delegate(unit)
     }
   }

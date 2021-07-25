@@ -2,15 +2,12 @@ package Tactics.Missions
 
 import Lifecycle.With
 import Micro.Agency.Intention
-import Planning.Predicates.MacroFacts
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.{CountOne, CountUpTo}
-import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchTransport}
+import Planning.UnitCounters.CountUpTo
+import Planning.UnitMatchers.{MatchAnd, MatchComplete}
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitInfo.UnitInfo
 import Tactics.Squads.SquadAutomation
-import Utilities.Seconds
 
 class MissionStormDrop extends MissionDrop {
 
@@ -21,20 +18,13 @@ class MissionStormDrop extends MissionDrop {
   override protected def shouldStopRaiding: Boolean = shouldGoHome
   override protected def shouldGoHome: Boolean = passengers.forall(_.energy < 75)
 
-  object MatchStormDroppable extends MatchAnd(MatchComplete, Protoss.HighTemplar, _.energy >= 75)
-
-  private def recruitable(unit: UnitInfo) = unit.complete && ! unit.visibleToOpponents
-
-  val transportLock = new LockUnits(this)
-  transportLock.matcher = unit => MatchTransport(unit) && recruitable(unit)
-  transportLock.counter = CountOne
+  object MatchStormDroppable extends MatchAnd(MatchComplete, Protoss.HighTemplar, _.energy >= 75, recruitablePassenger)
 
   val stormLock = new LockUnits(this)
   stormLock.matcher = MatchStormDroppable
   stormLock.counter = CountUpTo(2)
-
   val zealotLock = new LockUnits(this)
-  zealotLock.matcher = Protoss.Zealot
+  zealotLock.matcher = u => Protoss.Zealot(u) && recruitablePassenger(u)
 
   override protected def recruit(): Unit = {
     populateItinerary()
@@ -49,10 +39,7 @@ class MissionStormDrop extends MissionDrop {
     val transportPixel = transportLock.units.head.pixel
     stormLock.preference = PreferClose(transportPixel)
     stormLock.acquire()
-    if (stormLock.units.isEmpty) {
-      terminate("No storms available")
-      return
-    }
+    if (stormLock.units.isEmpty) { terminate("No storms available"); return }
     zealotLock.counter = CountUpTo(4 - stormLock.units.size)
     zealotLock.preference = PreferClose(transportPixel)
     zealotLock.acquire()

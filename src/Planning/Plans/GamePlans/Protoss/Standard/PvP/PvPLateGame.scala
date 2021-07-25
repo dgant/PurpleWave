@@ -164,7 +164,7 @@ class PvPLateGame extends GameplanImperative {
       pump(Protoss.DarkTemplar)
       pumpRatio(Protoss.Dragoon, 16, 64, Seq(Enemy(Protoss.Carrier, 6.0)))
     }
-    if (enemies(Protoss.Observer) == 0) {
+    if (enemies(Protoss.Observer) == 0 || (With.geography.enemyBases.size > 2 && With.geography.enemyBases.exists(b => ! b.units.exists(u => u.player == b.owner && u.unitClass.isDetector)))) {
       pump(Protoss.DarkTemplar, 1)
     }
     pumpRatio(Protoss.Dragoon, 0, 100, Seq(Enemy(Protoss.Scout, 2.0), Enemy(Protoss.Shuttle, 2.0), Friendly(Protoss.Zealot, 1.0), Friendly(Protoss.Archon, 3.0)))

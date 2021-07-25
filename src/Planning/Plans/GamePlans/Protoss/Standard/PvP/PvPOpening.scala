@@ -267,9 +267,10 @@ class PvPOpening extends GameplanImperative {
     // Don't attack if we're also dropping
     shouldAttack &&= ! upgradeStarted(Protoss.ShuttleSpeed)
     // Don't attack with just Gateway units if doing tech build vs non-tech one gate core
-    shouldAttack &&= (employing(PvPGateCoreTech, PvPTechBeforeRange)
+    shouldAttack &&= ! (employing(PvPGateCoreTech, PvPTechBeforeRange)
       && units(Protoss.CitadelOfAdun, Protoss.RoboticsFacility) > 0
-      && unitsComplete(Protoss.Reaver, Protoss.DarkTemplar) == 0
+      && unitsComplete(Protoss.DarkTemplar) == 0
+      && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) == 0
       && (enemyStrategy(With.fingerprints.oneGateCore) || enemyHasUpgrade(Protoss.DragoonRange))
       && ! PvPIdeas.enemyLowUnitStrategy)
     // Push out to take our natural

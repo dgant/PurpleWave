@@ -128,11 +128,13 @@ final class Scouting extends TimedTask with EnemyTechs {
     }
     _enemyHasScoutedUsWithWorker = _enemyHasScoutedUsWithWorker || With.geography.ourBases.exists(_.units.exists(u => u.isEnemy && u.is(MatchWorker)))
     _enemyHasScoutedUs = _enemyHasScoutedUs || _enemyHasScoutedUsWithWorker || With.units.ours.view.filter(MatchBuilding).exists(u => u.tileArea.tiles.exists(With.grids.enemyVision.inRange))
-    if (With.geography.bases.size > 1) {
-      _firstExpansionFrameUs = Math.min(_firstExpansionFrameUs, With.frame)
+    if (With.geography.ourBases.size > 1 && _firstExpansionFrameUs == Forever()) {
+      With.logger.debug(f"Recording our first expansion frame")
+      _firstExpansionFrameUs = With.frame
     }
-    if (With.enemies.exists(_.bases.size > 1)) {
-      _firstExpansionFrameEnemy = Math.min(_firstExpansionFrameEnemy, With.frame)
+    if (With.enemies.exists(_.bases.size > 1) && _firstExpansionFrameEnemy == Forever()) {
+      With.logger.debug(f"Recording first enemy expansion frame")
+      _firstExpansionFrameEnemy = With.frame
     }
   }
 }

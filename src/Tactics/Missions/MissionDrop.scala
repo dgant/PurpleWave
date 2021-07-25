@@ -6,7 +6,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.SpecificPoints
-import Micro.Actions.Basic.DoNothing
+import Micro.Actions.Basic.{DoNothing, ReloadScarabs}
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Commands.Move
@@ -182,7 +182,7 @@ abstract class MissionDrop extends Mission {
       val unloaded = passengers.filterNot(_.loaded)
       if (unloaded.isEmpty) {
         transport.agent.toTravel = Some(vicinity)
-        Idle.consider(transport)
+        Idle.delegate(transport)
       } else {
         val centroid = Maff.centroid(unloaded.view.map(_.pixel))
         if (transport.agent.withinSafetyMargin) {
@@ -195,7 +195,7 @@ abstract class MissionDrop extends Mission {
             Commander.move(transport)
           }
         } else {
-          Retreat.consider(transport)
+          Retreat.delegate(transport)
         }
       }
     }
@@ -205,8 +205,9 @@ abstract class MissionDrop extends Mission {
     override protected def perform(passenger: FriendlyUnitInfo): Unit = {
       passenger.agent.toTravel = Maff.minBy(transports.view.map(_.pixel))(passenger.pixelDistanceSquared)
       passenger.agent.toReturn = passenger.agent.toTravel
+      ReloadScarabs.delegate(passenger)
       Potshot.delegate(passenger)
-      Retreat.consider(passenger)
+      Retreat.delegate(passenger)
     }
   }
 
@@ -232,8 +233,8 @@ abstract class MissionDrop extends Mission {
         With.logger.debug(f"$this: No path available to $vicinity")
         transport.agent.toTravel = Some(vicinity)
         transport.agent.toReturn = Some(vicinity)
-        Retreat.consider(transport)
-        Move.consider(transport)
+        Retreat.delegate(transport)
+        Move.delegate(transport)
       }
     }
   }
@@ -254,13 +255,13 @@ abstract class MissionDrop extends Mission {
 
   class ActionLandPassenger extends Action {
     override protected def perform(unit: FriendlyUnitInfo): Unit = {
-      if ( ! unit.loaded) Idle.consider(unit)
+      if ( ! unit.loaded) Idle.delegate(unit)
     }
   }
 
   class ActionRaidTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
-      if (passengers.isEmpty) new ActionEscapeTransport().consider(transport) else {
+      if (passengers.isEmpty) new ActionEscapeTransport().delegate(transport) else {
         transport.agent.toTravel = Some(Maff.centroid(Maff.orElse(passengers.view.filterNot(_.loaded), passengers.view).map(_.pixel)))
         Commander.move(transport)
       }
@@ -270,7 +271,7 @@ abstract class MissionDrop extends Mission {
   class ActionEvacuateTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
       val unloaded = passengers.filterNot(_.loaded)
-      if (unloaded.isEmpty) new ActionEscapeTransport().consider(transport) else {
+      if (unloaded.isEmpty) new ActionEscapeTransport().delegate(transport) else {
         Commander.rightClick(transport, unloaded.minBy(_.pixelDistanceSquared(Maff.centroid(unloaded.view.map(_.pixel)))))
       }
     }
@@ -280,8 +281,9 @@ abstract class MissionDrop extends Mission {
     override protected def perform(passenger: FriendlyUnitInfo): Unit = {
       if (transports.isEmpty) {
         passenger.agent.commit = true
-        Idle.consider(passenger)
+        Idle.delegate(passenger)
       } else {
+        ReloadScarabs.delegate(passenger)
         Commander.rightClick(passenger, transports.minBy(_.pixelDistanceSquared(passenger)))
       }
     }
@@ -290,7 +292,7 @@ abstract class MissionDrop extends Mission {
   class ActionEscapeTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
       transport.agent.toTravel = Some(transport.agent.home)
-      Retreat.consider(transport)
+      Retreat.delegate(transport)
       Commander.move(transport)
     }
   }

@@ -4,7 +4,6 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
 import Planning.UnitMatchers.MatchWorker
-import ProxyBwapi.Races.Protoss
 import Utilities.Minutes
 
 object BaseUpdater {
@@ -46,7 +45,7 @@ object BaseUpdater {
       val hiddenNaturalDelay = Minutes(3)()
 
       if (scoutingNow) {
-        if (base.townHall.isEmpty) {
+        if (base.townHall.isEmpty && ! base.owner.isNeutral) {
           base.owner = With.neutral
           With.logger.debug(f"Detecting absent base: $base")
         }
@@ -57,20 +56,20 @@ object BaseUpdater {
           With.logger.debug(f"Assuming ${base.owner} owns $base as implicit starting location")
         }
 
-        if (framesSinceScouting > Protoss.Nexus.buildFrames) {
-          val building = base.zone.units.find(unit => unit.isEnemy && ! unit.flying && unit.unitClass.isBuilding)
-          if (building.exists(_.lastSeen > base.lastScoutedFrame + hiddenNaturalDelay)) {
+        if (framesSinceScouting > hiddenNaturalDelay) {
+          val building = base.zone.units.find(u => u.isEnemy && ! u.flying && u.unitClass.isBuilding)
+          if (building.isDefined && With.frame > base.lastScoutedFrame + hiddenNaturalDelay) {
             base.owner = building.get.player
-            With.logger.debug(f"Assuming ${base.owner} owns $base due to presence of $building")
+            With.logger.debug(f"Assuming ${base.owner} owns $base last scouted at ${base.lastScoutedFrame} due to presence of $building")
           }
         }
 
         if ( ! With.self.isZerg
           && With.scouting.weExpandedFirst
           && base.isNaturalOf.exists(With.scouting.enemyMain.contains)
-          && framesSinceScouting > hiddenNaturalDelay) {
+          && With.frame > Math.max(With.scouting.firstExpansionFrameUs, base.lastScoutedFrame) + hiddenNaturalDelay) {
           base.owner = base.isNaturalOf.get.owner
-          With.logger.debug(f"Assuming ${base.owner} has taken $base after we expanded")
+          With.logger.debug(f"Assuming ${base.owner} has taken $base last scouted at ${base.lastScoutedFrame} after we expanded on ${With.scouting.firstExpansionFrameUs}")
         }
 
         if ( ! base.scouted && base.owner.bases.forall(base.natural.contains)) {

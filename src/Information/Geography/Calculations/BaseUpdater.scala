@@ -39,30 +39,31 @@ object BaseUpdater {
     // If we have previously inferred the base's owner, maintain the inference
     base.owner = base.townHall.map(_.player).getOrElse(if (base.scouted) With.neutral else base.owner)
     
-    // Assume ownership of implicit starting location
     if (base.owner.isNeutral && With.scouting.enemyMain.contains(base)) {
+      With.logger.debug("Assuming ownership of implicit starting location")
       base.owner = With.enemy
     }
-    
-    // Assume ownership of occupied base we haven't seen lately
+
     if (base.owner.isNeutral && With.framesSince(base.lastScoutedFrame) > Protoss.Nexus.buildFrames) {
+      With.logger.debug("Assuming ownership of of occupied base we haven't seen lately")
       val building = base.zone.units.find(unit => unit.isEnemy && ! unit.flying && unit.unitClass.isBuilding)
       if (building.exists(_.lastSeen > base.lastScoutedFrame + Minutes(3)())) {
         base.owner = building.get.player
       }
     }
-    
-    // Assume ownership of unscouted main from natural if we haven't found any main yet
+
     if (base.owner.isNeutral && ! base.scouted && base.owner.bases.forall(base.natural.contains)) {
+      With.logger.debug("Assuming ownership of unscouted main from natural if we haven't found any main yet")
       base.natural.filter(_.owner.isEnemy).foreach(natural => base.owner = natural.owner)
     }
 
-    // Assume they've taken their natural not too long after us
-    if ( ! With.self.isZerg && With.geography.ourNatural.townHall.exists(_.isOurs)) {
-      val ourNaturalFrame = With.geography.ourNatural.townHall.get.frameDiscovered
-      if (With.scouting.enemyMain.flatMap(_.natural).exists(nat => With.framesSince(base.lastScoutedFrame) > With.framesSince(ourNaturalFrame) + Minutes(2)())) {
-        base.owner = With.enemy
-      }
+    if (base.owner.isNeutral
+      && ! With.self.isZerg
+      && With.scouting.weExpandedFirst
+      && base.isNaturalOf.exists(With.scouting.enemyMain.contains)
+      && With.framesSince(base.lastScoutedFrame) > Protoss.Nexus.buildFrames + Minutes(1)()) {
+      With.logger.debug("Assuming they've taken their natural not too long after us")
+      base.owner = base.isNaturalOf.get.owner
     }
 
     if (originalOwner != base.owner) {

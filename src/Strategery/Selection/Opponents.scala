@@ -7,9 +7,10 @@ object Opponents {
   private def add(name: String, policy: StrategySelectionPolicy = StrategySelectionGreedy()): Opponent = { val output = Opponent(name, policy); allKnown = allKnown :+ output; output }
 
   val defaultPvT = StrategySelectionFixed(PvT13Nexus, PvT2BaseReaver, PvT3BaseGateway)
-  val defaultPvP = StrategySelectionFixed(PvPRobo, PvPGateCoreTech)
-  //val defaultPvZ = StrategySelectionFixed(PvZ2Gate1012, PvZ4GateGoon, PvZMidgame5GateGoon, PvZLateGameTemplar)
+  val defaultPvP = new StrategySelectionRecommended(StrategySelectionGreedy(), PvPRobo, PvPGateCoreGate)
   val defaultPvZ = StrategySelectionFixed(PvZ2GateFlex)
+
+  private val cogFixedPvP = StrategySelectionFixed(PvPRobo, PvPGateCoreGate)
 
   // COG 2021 PREP
   //val stardust    : Opponent = add("Stardust",    StrategySelectionFixed(PvPRobo, PvP1012, PvP3Zealot))
@@ -18,10 +19,10 @@ object Opponents {
   val stardust    : Opponent = add("Stardust",    StrategySelectionGreedy())
   val bananabrain : Opponent = add("BananaBrain", StrategySelectionGreedy())
   val betastar    : Opponent = add("BetaStar",    StrategySelectionGreedy())
-  val metabot     : Opponent = add("MetaBot",     defaultPvP)
-  val aiur        : Opponent = add("AIUR",        defaultPvP) // Metabot stand-in
-  val skynet      : Opponent = add("Skynet",      defaultPvP) // Metabot stand-in
-  val ximp        : Opponent = add("XIMP",        defaultPvP) // Metabot stand-in
+  val metabot     : Opponent = add("MetaBot",     cogFixedPvP)
+  val aiur        : Opponent = add("AIUR",        cogFixedPvP) // Metabot stand-in
+  val skynet      : Opponent = add("Skynet",      cogFixedPvP) // Metabot stand-in
+  val ximp        : Opponent = add("XIMP",        cogFixedPvP) // Metabot stand-in
   val xiaoyi      : Opponent = add("XIAOYI",      defaultPvT)
   val mcrave      : Opponent = add("McRave",      defaultPvZ)
   val microwave   : Opponent = add("Microwave",   defaultPvZ)

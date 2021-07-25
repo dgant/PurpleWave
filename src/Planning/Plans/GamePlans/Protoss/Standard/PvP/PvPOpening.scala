@@ -43,6 +43,12 @@ class PvPOpening extends GameplanImperative {
     // Update strategy //
     /////////////////////
 
+    // Last minute COG2021 hack to ensure we can use GateCoreGate as a default
+    if (employing(PvPGateCoreGate) && With.strategy.isRamped) {
+      PvPGateCoreGate.swapOut()
+      PvPGateCoreTech.swapIn()
+    }
+
     if (units(Protoss.Assimilator) == 0) {
       if (enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.gasSteal, With.fingerprints.mannerPylon) && ! enemyStrategy(With.fingerprints.cannonRush)) {
         PvP1012.swapIn()

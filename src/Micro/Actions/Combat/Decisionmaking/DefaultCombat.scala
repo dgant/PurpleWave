@@ -222,11 +222,13 @@ object DefaultCombat extends Action {
     lazy val formationHelpsEngage = targetDistanceThere <= Math.min(targetDistanceHere, unit.pixelRangeAgainst(target.get))
     lazy val breakFormationToAttack = unit.squad.forall(_.formations.isEmpty) || target.exists(targ =>
         // If we're not ready to attack yet, just slide into formation
-        readyToAttackTarget(unit) && (
-        // Break if we are already in range
-        unit.inRangeToAttack(targ)
-        // Break if the fight has already begun and the formation isn't helping us
-        || (unit.team.exists(_.engagedUpon) && ! formationHelpsEngage)))
+        (readyToAttackTarget(unit) || unit.unitClass.melee) && (
+          // Break if we are already in range
+          unit.inRangeToAttack(targ)
+          // Break if we are closer to range than the formation, and already pretty close
+          || targetDistanceHere < Math.min(targetDistanceThere, 32 * 8)
+          // Break if the fight has already begun and the formation isn't helping us
+          || (unit.team.exists(_.engagedUpon) && ! formationHelpsEngage)))
     if (goalEngage && Brawl.consider(unit)) return
     if (goalPotshot && potshot(unit)) return
     if (goalEngage && breakFormationToAttack && attackIfReady(unit)) return

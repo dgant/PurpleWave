@@ -43,12 +43,13 @@ class PvPOpening extends GameplanImperative {
     // Update strategy //
     /////////////////////
 
-    // Last minute COG2021 hack to ensure we can use GateCoreGate as a default
+    // Last minute COG2021 hack to ensure we can use GateCoreGate as a default fixed strategy
     if (employing(PvPGateCoreGate) && With.strategy.isRamped) {
       PvPGateCoreGate.swapOut()
       PvPGateCoreTech.swapIn()
     }
 
+    // Swap into 2-Gate
     if (units(Protoss.Assimilator) == 0) {
       if (enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.gasSteal, With.fingerprints.mannerPylon) && ! enemyStrategy(With.fingerprints.cannonRush)) {
         PvP1012.swapIn()
@@ -146,6 +147,7 @@ class PvPOpening extends GameplanImperative {
 
       // 4-Gating quickly becomes a lot less appealing with more DT in the mix.
       if (employing(PvPRobo)
+        && ! With.strategy.isFixedOpponent
         && trackRecordLacks(With.fingerprints.robo)) {
         if (roll("SwapRoboIntoDT", if (enemyRecentStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)) 0.6 else 0.3)) {
           PvPRobo.swapOut()
@@ -154,7 +156,9 @@ class PvPOpening extends GameplanImperative {
       }
       // 3/4-Gate Goon are advantaged against most Robo variants.
       // But we don't want to make this switch too predictably, as it's abusable.
-      if (employing(PvPRobo) && enemyRecentStrategy(With.fingerprints.robo)) {
+      if (employing(PvPRobo)
+        && ! With.strategy.isFixedOpponent
+        && enemyRecentStrategy(With.fingerprints.robo) ) {
         if (roll("SwapRoboInto3Gate", if (enemyStrategy(With.fingerprints.robo)) 0.35 else 0.2)) {
           PvPRobo.swapOut()
           PvP3GateGoon.swapIn()
@@ -213,6 +217,8 @@ class PvPOpening extends GameplanImperative {
           // These builds generally let us rule out DT entirely
           getObservatory = false
           getObservers = false
+        } else if (With.strategy.isFixedOpponent) {
+          // Obs is what we're here for, so let's not get too cute
         } else if (trackRecordLacks(With.fingerprints.dtRush) || enemyStrategy(With.fingerprints.dragoonRange, With.fingerprints.twoGate, With.fingerprints.proxyGateway)) {
           if (enemyRecentStrategy(With.fingerprints.fourGateGoon, With.fingerprints.threeGateGoon) && ! enemyRecentStrategy(With.fingerprints.dtRush)) {
             getObservatory = false

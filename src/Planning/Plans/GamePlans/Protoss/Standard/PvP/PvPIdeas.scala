@@ -51,8 +51,8 @@ object PvPIdeas extends MacroCounting {
       output ||= upgradeComplete(Protoss.DragoonRange)  && ! enemyHasUpgrade(Protoss.DragoonRange)
     }
 
-    // Require DT backstab protection before attacking through a DT
-    output &&= unitsComplete(Protoss.Observer, Protoss.PhotonCannon) > 1 || ! enemyHasShown(Protoss.DarkTemplar)
+    // Require DT backstab protection before attacking through a DT (unless we're going into a base trade! how exciting)
+    output &&= unitsComplete(Protoss.Observer, Protoss.PhotonCannon) > 1 || ! enemyHasShown(Protoss.DarkTemplar) || (unitsComplete(Protoss.DarkTemplar) > 0 && enemiesComplete(Protoss.PhotonCannon, Protoss.Observer) == 0)
     output
   }
 }

@@ -74,7 +74,7 @@ class PvPLateGame extends GameplanImperative {
     shouldSecondaryTech = miningBases > 2
     shouldSecondaryTech ||= (unitsComplete(Protoss.Reaver) > 2 && unitsComplete(Protoss.Shuttle) > 0)
     shouldSecondaryTech ||= fearDT && primaryTech.contains(TemplarTech)
-    shouldSecondaryTech &&= unitsComplete(Protoss.Gateway) >= targetGateways
+    shouldSecondaryTech &&= unitsComplete(Protoss.Gateway) >= Math.min(7, targetGateways)
     shouldSecondaryTech &&= With.units.ours.filter(Protoss.Nexus).forall(_.complete)
     shouldSecondaryTech &&= gasPumps > 1
     shouldSecondaryTech &&= miningBases > 1
@@ -102,7 +102,9 @@ class PvPLateGame extends GameplanImperative {
     if (expectCarriers) status("ExpectCarriers")
     if (shouldDetect) status("Detect")
     if (shouldSecondaryTech) status("2ndTech")
+    if (shouldExpand) status("shouldExpand")
     if (shouldAttack) attack()
+
     if (shouldHarass) harass()
     primaryTech.map(_.toString).foreach(status)
 
@@ -220,9 +222,7 @@ class PvPLateGame extends GameplanImperative {
   }
 
   def doExpand(): Unit = {
-    if (With.units.ours.filter(Protoss.Nexus).forall(_.complete)) {
-      requireMiningBases(Math.min(4, unitsComplete(Protoss.Nexus) + 1))
-    }
+    get(unitsComplete(Protoss.Nexus) + 1, Protoss.Nexus)
   }
 
   def doRobo(): Unit = {

@@ -21,10 +21,10 @@ object SquadAutomation {
   }
   def targetRaid(squad: Squad): Unit = targetRaid(squad, squad.vicinity)
   def targetRaid(squad: Squad, to: Pixel): Unit = {
-    squad.targetQueue = Some(SquadAutomation.rankForArmy(
-      squad,
-      unrankedEnRouteTo(squad, to).view
-        .filter(t => t.unitClass.isWorker || squad.units.exists(u => (t.canAttack(u) || t.unitClass.canAttack(u)) && t.inRangeToAttack(u)))))
+    squad.targetQueue = Some(
+      SquadAutomation.rankForArmy(squad, unrankedEnRouteTo(squad, to).filter(t => t.unitClass.isWorker || squad.units.exists(u => (t.canAttack(u) || t.unitClass.canAttack(u)) && t.inRangeToAttack(u))))
+        .sortBy(t => ! t.unitClass.isWorker)
+        .sortBy(t => - squad.units.count(_.inRangeToAttack(t))))
   }
 
   def rankForArmy(squad: Squad, targets: Seq[UnitInfo]): Seq[UnitInfo] = {

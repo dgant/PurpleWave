@@ -4,6 +4,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Pixel, PixelRay}
 import Micro.Actions.Action
+import Micro.Actions.Protoss.Shuttle.Shuttling
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.TrafficPriorities
@@ -42,6 +43,11 @@ object Retreat extends Action {
       unit.agent.forces.sum
     }
     lazy val force = forceVector.radians
+
+    if (unit.agent.ride.exists(_.pixelDistanceCenter(unit) < Shuttling.pickupRadius) && unit.matchups.targetsInRange.isEmpty) {
+      Commander.rightClick(unit, unit.agent.ride.get)
+      return RetreatPlan(unit, unit.agent.ride.get.pixel, "Hail")
+    }
 
     // If the return point didn't meet our criteria, let the unit retreat all the way home
     if ( ! goalReturn) {

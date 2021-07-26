@@ -311,7 +311,7 @@ class PvPOpening extends GameplanImperative {
     if (shouldExpand) status("ExpandNow")
     oversaturate = (units(Protoss.Reaver) > 0 || units(Protoss.DarkTemplar) > 0 || minerals >= 450) && ! speedlotAttack && ! employing(PvP3GateGoon, PvP4GateGoon)
     if (shouldAttack) { attack() }
-    if (upgradeStarted(Protoss.ShuttleSpeed)) { harass() }
+    if (upgradeStarted(Protoss.ShuttleSpeed) && unitsComplete(Protoss.Reaver) > 1) { harass() }
 
     ////////////////////////////
     // Emergency DT reactions //
@@ -541,8 +541,9 @@ class PvPOpening extends GameplanImperative {
               Get(Protoss.RoboticsFacility),
               Get(18, Protoss.Probe),
               Get(2, Protoss.Dragoon),
+              Get(3, Protoss.Pylon),
               Get(19, Protoss.Probe),
-              Get(3, Protoss.Pylon))
+              Get(3, Protoss.Dragoon))
 
           /////////////////
           // Range-first //
@@ -631,8 +632,7 @@ class PvPOpening extends GameplanImperative {
 
       if (employing(PvPTechBeforeRange) && ! getObservers) {
         get(Protoss.ShuttleSpeed)
-        pump(Protoss.Reaver, 1)
-        if (unitsEver(Protoss.Shuttle) == 0) {
+        if (unitsEver(Protoss.Shuttle) == 0 && unitsComplete(Protoss.Reaver) > 0) {
           pump(Protoss.Shuttle, 1) // Conditional pump() instead of buildOrder to ensure smooth usage of robo
         }
         pump(Protoss.Reaver)
@@ -647,7 +647,7 @@ class PvPOpening extends GameplanImperative {
         u.isEnemy
         && u.canAttackGround
         // Distance check in case map has a degenerate natural
-        && u.pixelDistanceCenter(With.geography.ourNatural.townHallArea.center) < 32 * 15)) {
+        && u.pixelDistanceCenter(With.geography.ourNatural.townHallArea.center) < 32 * 12)) {
         requireMiningBases(2)
       }
 
@@ -676,6 +676,7 @@ class PvPOpening extends GameplanImperative {
       if (units(Protoss.TemplarArchives) > 0) {
         requireMiningBases(2)
       }
+      get(4, Protoss.Gateway)
     } else if (employing(PvP3GateGoon)) {
       if (shouldExpand) { requireMiningBases(2) }
       buildOrder(Get(2, Protoss.Dragoon))
@@ -691,9 +692,11 @@ class PvPOpening extends GameplanImperative {
       buildOrder(Get(10, Protoss.Dragoon))
       if (unitsComplete(Protoss.Gateway) >= 4) { requireMiningBases(2) }
     }
-    // Even for builds that shouldn't get 4 Gateways in theory,
-    // our mineral mining is so efficient we keep winding up with lots of minerals anyway
+    if (oversaturate) {
+      pumpWorkers(oversaturate = true)
+    }
     get(4, Protoss.Gateway)
+
   }
 
   private def trainRoboUnits(): Unit = {

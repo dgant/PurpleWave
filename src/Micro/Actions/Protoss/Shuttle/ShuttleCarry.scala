@@ -9,7 +9,7 @@ object ShuttleCarry extends Action {
   override def allowed(shuttle: FriendlyUnitInfo): Boolean = BeShuttle.allowed(shuttle) && shuttle.loadedUnits.nonEmpty
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
-    shuttle.agent.prioritizedPassengers
+    shuttle.agent.passengersPrioritized
       .find(_.agent.rideGoal.nonEmpty)
       .foreach(passenger => {
         shuttle.agent.toTravel = passenger.agent.rideGoal

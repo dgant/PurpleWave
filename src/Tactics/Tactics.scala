@@ -137,7 +137,7 @@ class Tactics extends TimedTask {
     assign(freelancers, squadsDefending.view.map(_._2), 1.0)
 
     // Proactive drop/harassment defense
-    if ((With.geography.ourBases.map(_.metro).distinct.size > 1 && With.frame > Minutes(10)()) || With.unitsShown.any(Terran.Dropship)) {
+    if (With.scouting.enemyProgress < 0.5 && (With.geography.ourBases.map(_.metro).distinct.size > 1 && With.frame > Minutes(10)()) || With.unitsShown.any(Terran.Dropship)) {
       val dropVulnerableBases = With.geography.ourBases.filter(b =>
         b.workerCount > 5
         && ! divisionsDefending.exists(_.bases.contains(b)) // If it was in a defense division, it should have received some defenders already

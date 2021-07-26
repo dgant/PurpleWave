@@ -368,6 +368,35 @@ class PvPOpening extends GameplanImperative {
       Get(10, Protoss.Probe),
       Get(Protoss.Gateway))
 
+
+    /////////////////////////
+    // React against proxy //
+    /////////////////////////
+
+    if (enemyStrategy(With.fingerprints.proxyGateway) && With.frame < Minutes(5)() && unitsComplete(MatchWarriors) < 7) {
+      pumpSupply()
+      pumpWorkers()
+      if (units(Protoss.Gateway) < 2) {
+        cancelIncomplete(Protoss.Assimilator)
+        cancelIncomplete(Protoss.CyberneticsCore)
+        cancelOrders(Protoss.CyberneticsCore)
+        gasWorkerCeiling(0)
+      } else if (units(Protoss.CyberneticsCore) == 0) {
+        gasWorkerCeiling(1)
+      } else if (unitsComplete(Protoss.CyberneticsCore) == 0) {
+        gasWorkerCeiling(2)
+      }
+      get(2, Protoss.Gateway)
+      pump(Protoss.Dragoon)
+      pump(Protoss.Zealot)
+      get(Protoss.ShieldBattery)
+      get(Protoss.Assimilator)
+      get(Protoss.CyberneticsCore)
+      get(3, Protoss.Gateway)
+      get(Protoss.DragoonRange)
+      return
+    }
+
     ////////////
     // 2-Gate //
     ////////////
@@ -635,7 +664,7 @@ class PvPOpening extends GameplanImperative {
     } else if (employing(PvPDT)) {
       get(Protoss.CitadelOfAdun)
       get(Protoss.TemplarArchives)
-      buildOrder(Get(Protoss.DarkTemplar))
+      buildOrder(Get(2, Protoss.DarkTemplar))
       if (getCannons) { buildCannonsAtNatural.update() }
       if (shouldExpand) { requireMiningBases(2) }
       if ( ! enemyRobo) pump(Protoss.DarkTemplar, 1)
@@ -670,7 +699,7 @@ class PvPOpening extends GameplanImperative {
         if (With.fingerprints.dtRush.matches) pump(Protoss.Observer, 2)
       }
       if (shuttleFirst) buildOrder(Get(Protoss.Shuttle))
-      if (units(Protoss.Reaver) >= (if (enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)) 3 else 2)) pumpShuttleAndReavers() else pump(Protoss.Reaver)
+      if (units(Protoss.Reaver) >= 3) pumpShuttleAndReavers() else pump(Protoss.Reaver)
     }
   }
 
@@ -684,7 +713,7 @@ class PvPOpening extends GameplanImperative {
       pump(Protoss.Dragoon)
     } else {
       pump(Protoss.Dragoon)
-      if (gas < 42) {
+      if (gas < 42 || ! employing(PvP3GateGoon, PvP4GateGoon)) {
         pump(Protoss.Zealot)
       }
     }

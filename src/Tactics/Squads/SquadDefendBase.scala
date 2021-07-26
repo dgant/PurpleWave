@@ -13,7 +13,8 @@ class SquadDefendBase(base: Base) extends Squad {
 
   override def launch(): Unit = { /* This squad is given its recruits externally */ }
 
-  vicinity = base.heart.center
+  lazy val heart: Pixel = if (base.metro == With.geography.ourMain.metro) With.geography.ourMain.heart.center else base.heart.center
+  vicinity = heart
 
   private var lastAction = "Def"
   override def toString: String = f"$lastAction ${base.name.take(5)}"
@@ -43,15 +44,14 @@ class SquadDefendBase(base: Base) extends Squad {
   })
   private def guardZone: Zone = zoneAndChoke()._1
   private def guardChoke: Option[Edge] = zoneAndChoke()._2
-  lazy val heart: Pixel = if (base.metro == With.geography.ourMain.metro) With.geography.ourMain.heart.center else base.heart.center
   val bastion = new Cache(() =>
     Maff.minBy(
-        base.units.view.filter(u =>
-          u.isOurs
-          && u.unitClass.isBuilding
-          && u.hitPoints < 300
-          && (u.friendly.exists(_.knownToEnemy) || u.canAttack)
-          && (u.zone != With.geography.ourMain.zone || u.matchups.threats.exists( ! _.unitClass.isWorker))))(u => u.matchups.framesOfSafety + 0.0001 * u.pixelDistanceCenter(heart))
+      base.units.view.filter(u =>
+        u.isOurs
+        && u.unitClass.isBuilding
+        && u.hitPoints < 300
+        && (u.friendly.exists(_.knownToEnemy) || u.canAttack)
+        && (u.zone != With.geography.ourMain.zone || u.matchups.threats.exists( ! _.unitClass.isWorker))))(u => u.matchups.framesOfSafety + 0.0001 * u.pixelDistanceCenter(heart))
       .map(_.pixel)
       .getOrElse(heart))
 
@@ -59,24 +59,25 @@ class SquadDefendBase(base: Base) extends Squad {
 
   override def run() {
     if (units.isEmpty) return
-    lazy val scourables   = enemies.filter(isHuntable)
-    lazy val canScour     = scourables.nonEmpty && (wander || breached)
-    lazy val wander       = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || With.blackboard.wantToAttack()
-    lazy val canGuard     = guardChoke.isDefined && (units.size > 3 || ! With.enemies.exists(_.isZerg))
-    lazy val breached     = scourables.exists(e =>
-      e.canAttackGround
-      && ! e.unitClass.isWorker
-      && e.base.exists(_.owner.isUs)
-      && ! guardZone.edges.exists(edge => e.pixelDistanceCenter(edge.pixelCenter) < 64 + edge.radiusPixels))
-
-    val targets = if (canScour) scourables else enemies.filter(threateningBase)
+    lazy val withdrawing        = units.count( ! _.metro.contains(base.metro))
+    lazy val wander             = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || With.blackboard.wantToAttack()
+    lazy val breached           = scourables.exists(isBreaching)
+    lazy val scourables         = enemies.filter(isScourable)
+    lazy val canWithdraw        = withdrawing >= Math.max(2, 0.25 * units.size)
+    lazy val canScour           = scourables.nonEmpty && (wander || breached)
+    lazy val canGuard           = guardChoke.isDefined && (units.size > 3 || ! With.enemies.exists(_.isZerg))
+    lazy val formationWithdraw  = FormationGeneric.disengage(this, Some(vicinity))
+    lazy val formationScour     = FormationGeneric.engage(this, targetQueue.get.headOption.map(_.pixel))
+    lazy val formationBastion   = FormationGeneric.march(this, bastion())
+    lazy val formationGuard     = guardChoke.map(c => FormationZone(this, guardZone, c)).getOrElse(formationBastion)
+    val targets = if (canWithdraw) SquadAutomation.unrankedEnRouteTo(this, vicinity) else if (canScour) scourables else enemies.filter(threateningBase)
     targetQueue = Some(SquadAutomation.rankForArmy(this, targets))
-    lazy val formationScour = FormationGeneric.engage(this, targetQueue.get.headOption.map(_.pixel))
-    lazy val formationBastion = FormationGeneric.march(this, bastion())
-    lazy val formationGuard = guardChoke.map(c => FormationZone(this, guardZone, c)).getOrElse(formationBastion)
 
     formations.clear()
-    if (canScour) {
+    if (canWithdraw) {
+      lastAction = "Withdraw"
+      formations += formationWithdraw
+    } else if (canScour) {
       lastAction = "Scour"
       formations += formationScour
       formations += formationGuard
@@ -90,7 +91,13 @@ class SquadDefendBase(base: Base) extends Squad {
     SquadAutomation.send(this)
   }
 
-  private def isHuntable(enemy: UnitInfo): Boolean = (
+  private def isBreaching(enemy: UnitInfo): Boolean = (
+    enemy.canAttackGround
+      && enemy.base.exists(_.owner.isUs)
+      && ! enemy.unitClass.isWorker
+      && ! guardZone.edges.exists(edge => enemy.pixelDistanceCenter(edge.pixelCenter) < 64 + edge.radiusPixels))
+
+  private def isScourable(enemy: UnitInfo): Boolean = (
     ! (Zerg.Drone(enemy) && With.fingerprints.fourPool.matches) // Don't get baited by 4-pool scouts
     && (units.exists(_.canAttack(enemy)) || (enemy.cloaked && units.exists(_.unitClass.isDetector)))
     && (enemy.matchups.targets.nonEmpty || enemy.matchups.allies.forall(_.matchups.targets.isEmpty)) // Don't, for example, chase Overlords that have ally Zerglings nearby

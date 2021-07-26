@@ -147,7 +147,7 @@ object DefaultCombat extends Action {
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
 
     lazy val target = Target.choose(unit)
-    unit.agent.shouldEngage &&= target.nonEmpty || unit.matchups.threats.forall(MatchWorker) || unit.battle.isEmpty
+    unit.agent.shouldEngage &&= target.nonEmpty || unit.matchups.threats.forall(MatchWorker) || unit.matchups.targets.nonEmpty
 
     //////////////////////////
     // Set traffic priority //

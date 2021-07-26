@@ -13,7 +13,7 @@ object Main {
   private val memoryFree  : Long            = Math.min(Runtime.getRuntime.maxMemory, Runtime.getRuntime.totalMemory)
   val jvmRuntimeArguments : Vector[String]  = ManagementFactory.getRuntimeMXBean.getInputArguments.asScala.toVector
   val liveDebugging       : Boolean         = jvmRuntimeArguments.exists(_.contains("purpledebug"))
-  val framesBufferable    : Int             = Math.min(10, (memoryFree - botRequiredDataSizeBytes) / JBWAPIClientDataSizeBytes).toInt
+  val framesBufferable    : Int             = Math.min(24, (memoryFree - botRequiredDataSizeBytes) / JBWAPIClientDataSizeBytes).toInt
   val useFrameBuffer      : Boolean         = framesBufferable > 1 && ! liveDebugging
 
   val jbwapiConfiguration: BWClientConfiguration = new BWClientConfiguration()

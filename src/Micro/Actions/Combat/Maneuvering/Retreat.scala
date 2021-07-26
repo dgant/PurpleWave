@@ -62,7 +62,7 @@ object Retreat extends Action {
     }
 
     // Enshuttled VIPs: If not primary passenger, retreat towards primary passenger
-    val leadPassenger = unit.agent.ride.flatMap(_.agent.prioritizedPassengers.headOption)
+    val leadPassenger = unit.agent.ride.flatMap(_.agent.passengersPrioritized.headOption)
     if (leadPassenger.isDefined && ! leadPassenger.contains(unit)) {
       return RetreatPlan(unit, leadPassenger.get.pixel.add(forceVector.normalize(32).toPoint.asPixel.nearestWalkablePixel), "Shotgun")
     }}

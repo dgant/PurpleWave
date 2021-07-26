@@ -166,6 +166,7 @@ class PvPLateGame extends GameplanImperative {
     }
     if (enemies(Protoss.Observer) == 0 || (With.geography.enemyBases.size > 2 && With.geography.enemyBases.exists(b => ! b.units.exists(u => u.player == b.owner && u.unitClass.isDetector)))) {
       pump(Protoss.DarkTemplar, 1)
+      buildOrder(Get(2, Protoss.DarkTemplar))
     }
     pumpRatio(Protoss.Dragoon, 0, 100, Seq(Enemy(Protoss.Scout, 2.0), Enemy(Protoss.Shuttle, 2.0), Friendly(Protoss.Zealot, 1.0), Friendly(Protoss.Archon, 3.0)))
     if ( ! expectCarriers && ! fearDeath && ( ! fearContain || ! enemyRobo)) pump(Protoss.Observer, 1)
@@ -198,6 +199,7 @@ class PvPLateGame extends GameplanImperative {
     if (units(Protoss.CitadelOfAdun) > 0 && ! enemyRobo) { get(Protoss.TemplarArchives) }
     get(5, Protoss.Gateway)
     get(2, Protoss.Assimilator)
+    if (gas < 400) { buildGasPumps() }
     get(targetGateways, Protoss.Gateway)
   }
 
@@ -224,8 +226,8 @@ class PvPLateGame extends GameplanImperative {
   }
 
   def doRobo(): Unit = {
-    if (units(Protoss.Gateway) >= 4 && gas < 150 && unitsComplete(Protoss.Nexus) > 1) {
-      get(2, Protoss.Assimilator)
+    if (unitsComplete(Protoss.Gateway) >= 4 && gas < 400 && unitsComplete(Protoss.Nexus) > 1) {
+      buildGasPumps()
     }
     get(Protoss.RoboticsFacility)
     buildOrder(Get(Protoss.Shuttle))

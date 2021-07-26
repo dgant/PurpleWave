@@ -29,8 +29,8 @@ object FormationGeneric {
     form(group, FormationStyleMarch, face = finalTowards, approach = finalTowards)
   }
 
-  def disengage(group: FriendlyUnitGroup): Formation = {
-    form(group, FormationStyleDisengage, face = targetPixel(group), approach = group.homeConsensus)
+  def disengage(group: FriendlyUnitGroup, towards: Option[Pixel] = None): Formation = {
+    form(group, FormationStyleDisengage, face = targetPixel(group), approach = towards.getOrElse(group.homeConsensus))
   }
 
   private def targetPixel(group: FriendlyUnitGroup): Pixel = {

@@ -55,11 +55,9 @@ object Commander {
     unit.agent.setRideGoal(target.pixel)
     unit.agent.tryingToMove = unit.pixelsToGetInRange(target) > tryingToMoveThreshold
     if (unit.unready) return
-
     if (Protoss.Reaver(unit)) {
       With.coordinator.pushes.put(new UnitLinearGroundPush(TrafficPriorities.Bump, unit, target.pixel))
     }
-
     // Drop out of transport
     val dropship = unit.transport.find(_.isAny(Terran.Dropship, Protoss.Shuttle, Zerg.Overlord))
     val delay = unit.cooldownMaxAirGround
@@ -241,23 +239,15 @@ object Commander {
     if (unit.unready) return
     autoUnburrow(unit)
     val to = getAdjustedDestination(unit, destination)
-    if (unit.is(Terran.Medic) && unit.agent.shouldEngage) {
+    if (Terran.Medic(unit) && unit.agent.shouldEngage) {
       attackMove(unit, to)
     } else if (unit.pixelDistanceCenter(to) > 3) {
-      // When bot is slowing down, use attack-move
-      if (unit.agent.shouldEngage
+      // When bot is sluggish, use attack-move
+      if (  ! unit.unitClass.isWorker
+        && unit.agent.shouldEngage
         && With.reaction.sluggishness >= 3
-        && ! unit.unitClass.isWorker
         && unit.canAttack) {
         attackMove(unit, to)
-      } else if (
-        // If we have a ride which can get us there faster, take it
-        unit.agent.ride.exists( ! _.loadedUnits.contains(unit))
-          && unit.framesToTravelTo(to) >
-          4 * unit.unitClass.groundDamageCooldown
-            + unit.agent.ride.get.framesToTravelTo(unit.pixel)
-            + unit.agent.ride.get.framesToTravelPixels(unit.pixelDistanceCenter(to))) {
-        rightClick(unit, unit.agent.ride.get)
       } else {
         unit.bwapiUnit.move(to.bwapi)
       }
@@ -268,7 +258,6 @@ object Commander {
           unit.pixel.project(to, Math.min(unit.pixelDistanceCenter(to), 80))))
       }
     }
-
     sleep(unit)
   }
   

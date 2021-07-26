@@ -3,7 +3,6 @@ package Micro.Targeting.FiltersRequired
 import Lifecycle.With
 import Micro.Targeting.TargetFilter
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Tactics.Squads.SquadAutomation
 
 object TargetFilterFutility extends TargetFilter {
 
@@ -29,7 +28,8 @@ object TargetFilterFutility extends TargetFilter {
       if (target.presumptiveTarget.exists(u => u.isOurs && u.unitClass.isWorker)) return true
     }
     val to = actor.agent.destination.nearestWalkablePixel
-    if (target.pixelDistanceTravelling(to) < actor.pixelDistanceTravelling(to) * SquadAutomation.distanceRatio) return true
+    // COG 2021: Horrifyingly disabling this at the last minute to restore traditional Futility filter behavior
+    //if (target.pixelDistanceTravelling(to) < actor.pixelDistanceTravelling(to) * SquadAutomation.distanceRatio) return true
     false
   }
 }

@@ -151,8 +151,11 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   private var _ride: Option[FriendlyUnitInfo] = None
   private val _passengers: ArrayBuffer[FriendlyUnitInfo] = new ArrayBuffer[FriendlyUnitInfo]
+  //private var _wantsPickup: Boolean = false
+  private var _rideGoal: Option[Pixel] = None
   def ride: Option[FriendlyUnitInfo] = _ride
   def passengers: Seq[FriendlyUnitInfo] = (_passengers ++ unit.loadedUnits).distinct
+  def passengersPrioritized: Seq[FriendlyUnitInfo] = passengers.sortBy(p => p.unitClass.subjectiveValue - p.frameDiscovered / 10000.0)
   def passengerSize: Int = passengers.view.map(_.unitClass.spaceRequired).sum
   def addPassenger(passenger: FriendlyUnitInfo): Unit = {
     if (passengerSize + passenger.unitClass.spaceRequired > 8 && ! passenger.transport.contains(unit)) return
@@ -169,16 +172,14 @@ class Agent(val unit: FriendlyUnitInfo) {
     val all = passengers.toVector
     all.foreach(removePassenger)
   }
+  //def wantsPickup: Boolean = _wantsPickup
+  //def requestPickup: Unit = { _wantsPickup = true }
+  def rideGoal: Option[Pixel] = _rideGoal
+  def setRideGoal(to: Pixel): Unit = { _rideGoal = Some(to) }
+
   def updateRiding(): Unit = {
     ride.filterNot(_.alive).foreach(_.agent.removePassenger(unit))
     passengers.view.filter(u => ! u.alive || ! u.isOurs || u.unitClass.isBuilding).foreach(removePassenger)
     unit.loadedUnits.filterNot(_passengers.contains).foreach(addPassenger)
-  }
-  private var _rideGoal: Option[Pixel] = None
-  def rideGoal: Option[Pixel] = _rideGoal
-  def setRideGoal(to: Pixel): Unit = { _rideGoal = Some(to) }
-  def prioritizedPassengers: Seq[FriendlyUnitInfo] = {
-    passengers
-      .sortBy(p => p.unitClass.subjectiveValue - p.frameDiscovered / 10000.0)
   }
 }

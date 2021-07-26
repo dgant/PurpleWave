@@ -43,7 +43,7 @@ object PvPTechBeforeRange extends PvPStrategy {
 ////////////////////////
 
 object PvPRobo extends PvPStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreTech, PvPGateCoreGate, PvPTechBeforeRange))
+  override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvPGateCoreTech, PvPGateCoreGate, PvPTechBeforeRange))
   // No blacklisting; Preserve this as our "Always valid" choice
 }
 object PvPDT extends PvPStrategy {

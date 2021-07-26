@@ -56,7 +56,7 @@ abstract class MissionDrop extends Mission {
   }
 
   final override protected def shouldForm: Boolean = {
-    With.blackboard.wantToHarass() && With.recruiter.available.exists(MatchTransport) && additionalFormationConditions
+    With.blackboard.wantToHarass() && With.recruiter.available.exists(transportLock.matcher) && additionalFormationConditions
   }
 
   final private def transition(newState: DropState): Unit = {
@@ -245,8 +245,10 @@ abstract class MissionDrop extends Mission {
       val droppables = transport.loadedUnits
         .filter(passenger =>
           transport.doomFrameAbsolute < transport.topSpeed * transport.pixelDistanceCenter(runway) + Seconds(3)()
-          || passenger.pixelDistanceCenter(runway) <= Math.max(64, passenger.effectiveRangePixels - 96))
-        .sortBy(_.subjectiveValue * (if (transport.tile.enemyRangeAir > 0) -1 else 1))
+          || passenger.pixelDistanceCenter(runway) <= Math.max(64, passenger.effectiveRangePixels - 96)
+          || (passenger.pixelDistanceCenter(runway) < passenger.effectiveRangePixels
+            && passenger.matchups.threats.exists(t => t.inRangeToAttack(passenger, runway) && ! t.inRangeToAttack(passenger))))
+        .sortBy(_.subjectiveValue * (if (transport.tile.enemyRange > 0) -1 else 1))
       droppables.headOption.foreach(Commander.unload(transport, _))
       transport.agent.toTravel = Some(runway)
       Commander.move(transport)

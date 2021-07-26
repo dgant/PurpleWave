@@ -37,7 +37,7 @@ class PvPLateGame extends GameplanImperative {
   val buildCannonsAtNatural = new BuildCannonsAtNatural(1)
   val buildCannonsAtExpansions = new BuildCannonsAtExpansions(1)
   override def executeBuild(): Unit = {
-    fearDeath   = ! safeAtHome || unitsComplete(MatchWarriors) < 8 || PvPIdeas.recentlyExpandedFirst
+    fearDeath   = ! safeAtHome || unitsComplete(MatchWarriors) < 8 || (PvPIdeas.recentlyExpandedFirst && unitsComplete(Protoss.Shuttle) * unitsComplete(Protoss.Reaver) < 2 && ! dtBravery)
     fearMacro   = miningBases < Math.max(2, enemyBases)
     fearDT      = enemyDarkTemplarLikely && unitsComplete(Protoss.Observer) == 0 && (enemies(Protoss.DarkTemplar) > 0 && unitsComplete(Protoss.PhotonCannon) == 0)
     fearContain = With.scouting.enemyProgress > 0.6

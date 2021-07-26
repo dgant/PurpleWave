@@ -3,7 +3,6 @@ package Tactics.Missions
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
-import Planning.Predicates.MacroFacts
 import Planning.UnitCounters.CountExactly
 import Planning.UnitMatchers.{MatchAnd, MatchAntiGround, MatchWarriors}
 import Planning.UnitPreferences.PreferClose
@@ -22,10 +21,9 @@ class MissionKillExpansion extends Mission {
   override def shouldForm: Boolean = (With.blackboard.wantToAttack()
     && With.scouting.ourProgress > 0.5
     && eligible.nonEmpty
-    && MacroFacts.unitsComplete(MatchWarriors) >= 20)
+    && With.recruiter.available.count(lock.matcher) >= 20)
 
   var lastFrameInBase = 0
-
   lock.matcher = MatchAnd(MatchWarriors, MatchAntiGround)
 
   override def recruit(): Unit = {

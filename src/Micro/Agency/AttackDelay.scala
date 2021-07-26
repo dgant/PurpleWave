@@ -2,7 +2,7 @@ package Micro.Agency
 
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders}
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object AttackDelay {
 
@@ -58,11 +58,15 @@ object AttackDelay {
       // Need a better answer than this
       return 24
     }
-    unit.unitClass.stopFrames
+    Math.max(2, unit.unitClass.stopFrames)
   }
   
   def nextSafeOrderFrame(unit: FriendlyUnitInfo): Int = {
-    // The +2 is an attempt to make units stick less after an attack
+    // The +2 is to make units stick less after an attack
+    // I tested this prior to COG 2021.
+    // +0 lead to a lot of sticking.
+    // +1 lead to some sticking, enough to lose games because of it.
+    // +2 appeared to prevent all sticking
     unit.lastFrameStartingAttack + unit.unitClass.stopFrames - With.latency.latencyFrames + 2
   }
   

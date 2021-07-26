@@ -58,15 +58,8 @@ object Commander {
     if (Protoss.Reaver(unit)) {
       With.coordinator.pushes.put(new UnitLinearGroundPush(TrafficPriorities.Bump, unit, target.pixel))
     }
-    // Drop out of transport
-    val dropship = unit.transport.find(_.isAny(Terran.Dropship, Protoss.Shuttle, Zerg.Overlord))
-    val delay = unit.cooldownMaxAirGround
-    if (dropship.isDefined
-      && Math.min(unit.pixelDistanceEdge(target), unit.pixelDistanceEdge(target.projectFrames(delay)))
-      <= unit.pixelRangeAgainst(target)
-        + With.reaction.agencyAverage
-        + delay * unit.topSpeed) {
-      unload(dropship.get, unit)
+    if (unit.transport.exists(_.flying)) {
+      unload(unit.transport.get, unit)
       return
     }
 

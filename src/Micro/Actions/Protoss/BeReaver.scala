@@ -1,12 +1,10 @@
 package Micro.Actions.Protoss
 
-import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.LightYear
 
 object BeReaver extends Action {
 
@@ -14,10 +12,6 @@ object BeReaver extends Action {
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     considerHopping(unit)
-    val distanceToGetInRange = Maff.min(unit.matchups.targets.map(unit.pixelsToGetInRange)).getOrElse(LightYear().toDouble)
-    if ( ! unit.agent.commit && unit.pixelDistanceTravelling(unit.agent.destination) > Math.max(64.0, distanceToGetInRange)) {
-      demandPickup(unit)
-    }
   }
 
   def considerHopping(unit: FriendlyUnitInfo) {

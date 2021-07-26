@@ -13,9 +13,9 @@ import Utilities.Seconds
 class MissionReaverDrop extends MissionDrop {
 
   override protected def additionalFormationConditions: Boolean = (
-    (With.scouting.enemyProgress > 0.5 || MacroFacts.enemyBases > 2)
+    (With.scouting.enemyProgress > 0.5 || MacroFacts.enemyBases > 2 || With.geography.enemyBases.exists(_.zone.island))
     && MacroFacts.upgradeComplete(Protoss.ShuttleSpeed, 1, Seconds(15)())
-    && With.recruiter.available.exists(Protoss.Reaver))
+    && With.recruiter.available.exists(reaverLock.matcher))
 
   override protected def shouldStopRaiding: Boolean = passengers.view
     .filter(Protoss.Reaver)

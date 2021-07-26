@@ -131,14 +131,14 @@ object FormationGeneric {
       neighbors.foreach(neighbor => explored.set(neighbor._1, true))
     }
 
-    lazy val groundPlacementCentroid = Maff.centroid(slots.values.view.flatten)
+    lazy val groundPlacementCentroid = Maff.exemplarOption(slots.values.view.flatten).getOrElse(floodApex.center)
     units
       .filter(_.flying)
       .foreach(u => {
         if ( ! slots.contains(u.unitClass)) {
           slots(u.unitClass) = ArrayBuffer.empty
         }
-        slots(u.unitClass) += floodApex.center
+        slots(u.unitClass) += groundPlacementCentroid
       })
     val unassigned = UnassignedFormation(style, slots.toMap, group)
     //val output = if (style == FormationStyleGuard || style == FormationStyleEngage) unassigned.outwardFromCentroid else unassigned.sprayToward(approach)

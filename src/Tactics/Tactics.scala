@@ -27,7 +27,7 @@ class Tactics extends TimedTask {
   // Missions //
   //////////////
 
-  private val missionKillExpansion      = addMission(new MissionKillExpansion)
+  //private val missionKillExpansion      = addMission(new MissionKillExpansion)
   private val missionStormDrop          = addMission(new MissionStormDrop)
   private val missionSpeedlotDrop       = addMission(new MissionSpeedlotDrop)
   private val missionReaverDrop         = addMission(new MissionReaverDrop)

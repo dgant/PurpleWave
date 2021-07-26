@@ -7,6 +7,7 @@ import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Brawl
+import Micro.Actions.Protoss.BeReaver
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.TrafficPriorities
@@ -51,7 +52,7 @@ object DefaultCombat extends Action {
     val towards = MicroPathing.getPushRadians(unit).flatMap(MicroPathing.getWaypointInDirection(unit, _))
     if (towards.isDefined) {
       unit.agent.toTravel = towards
-      Commander.move(unit)
+      move(unit)
     }
     unit.unready
   }
@@ -63,6 +64,7 @@ object DefaultCombat extends Action {
     unit.unready
   }
   def readyToAttackTarget(unit: FriendlyUnitInfo): Boolean = {
+    if (unit.agent.ride.exists(_.flying)) return true
     if (unit.agent.toAttack.isEmpty) return false
     if (unit.unitClass.ranged && unit.framesToGetInRange(unit.agent.toAttack.get) + 4 < unit.cooldownLeft) return false
     true
@@ -228,7 +230,7 @@ object DefaultCombat extends Action {
           // Break if we are closer to range than the formation, and already pretty close
           || targetDistanceHere < Math.min(targetDistanceThere, 32 * 8)
           // Break if the fight has already begun and the formation isn't helping us
-          || (unit.team.exists(_.engagedUpon) && ! formationHelpsEngage)))
+          || (unit.team.exists(_.engagedUpon) && ! formationHelpsEngage && ! unit.transport.exists(_.loaded))))
     if (goalEngage && Brawl.consider(unit)) return
     if (goalPotshot && potshot(unit)) return
     if (goalEngage && breakFormationToAttack && attackIfReady(unit)) return
@@ -249,7 +251,7 @@ object DefaultCombat extends Action {
             val chaseGoal           = if (step.traversableBy(unit) && unit.pixelDistanceSquared(step) >= unit.pixelDistanceSquared(to)) step else to
             val extraChaseDistance  = Math.max(0, unit.pixelDistanceCenter(chaseGoal) - unit.pixelDistanceCenter(to))
             unit.agent.toTravel     = Some(unit.pixel.project(chaseGoal, distanceTowards + extraChaseDistance))
-            Commander.move(unit)
+            move(unit)
             return
           } else {
             unit.agent.act("Charge")
@@ -257,7 +259,7 @@ object DefaultCombat extends Action {
             return
           }
         } else {
-          Commander.move(unit)
+          move(unit)
           return
         }
       } else {
@@ -266,6 +268,17 @@ object DefaultCombat extends Action {
         retreat(unit)
         unit.agent.act(unit.agent.lastAction.map(_.replaceAll("Retreat", "Kite")).getOrElse("Kite"))
         return
+      }
+    }
+    move(unit)
+  }
+
+  val pickupCutoff = 64
+  def move(unit: FriendlyUnitInfo): Unit = {
+    if (Protoss.Reaver(unit) && unit.agent.ride.isDefined && ! unit.agent.commit && ! unit.loaded) {
+      val destination = unit.agent.destination
+      if (unit.agent.toAttack.forall(unit.pixelsToGetInRange(_) > pickupCutoff)) {
+        BeReaver.demandPickup(unit)
       }
     }
     Commander.move(unit)

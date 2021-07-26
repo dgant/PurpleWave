@@ -18,7 +18,7 @@ object Opponents {
   //val betastar    : Opponent = add("BetaStar",    StrategySelectionFixed(PvPRobo, PvP1012, PvP5Zealot))
   val stardust    : Opponent = add("Stardust",    StrategySelectionGreedy())
   val bananabrain : Opponent = add("BananaBrain", StrategySelectionGreedy())
-  val betastar    : Opponent = add("BetaStar",    StrategySelectionGreedy())
+  val betastar    : Opponent = add("BetaStar",    cogFixedPvP)
   val metabot     : Opponent = add("MetaBot",     cogFixedPvP)
   val aiur        : Opponent = add("AIUR",        cogFixedPvP) // Metabot stand-in
   val skynet      : Opponent = add("Skynet",      cogFixedPvP) // Metabot stand-in

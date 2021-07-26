@@ -18,6 +18,7 @@ object Opponents {
   //val betastar    : Opponent = add("BetaStar",    StrategySelectionFixed(PvPRobo, PvP1012, PvP5Zealot))
   val stardust    : Opponent = add("Stardust",    StrategySelectionGreedy())
   val bananabrain : Opponent = add("BananaBrain", StrategySelectionGreedy())
+  val granite     : Opponent = add("Granite",     defaultPvP)
   val betastar    : Opponent = add("BetaStar",    cogFixedPvP)
   val metabot     : Opponent = add("MetaBot",     cogFixedPvP)
   val aiur        : Opponent = add("AIUR",        cogFixedPvP) // Metabot stand-in
@@ -26,7 +27,7 @@ object Opponents {
   val xiaoyi      : Opponent = add("XIAOYI",      defaultPvT)
   val mcrave      : Opponent = add("McRave",      defaultPvZ)
   val microwave   : Opponent = add("Microwave",   defaultPvZ)
-  val cunybot     : Opponent = add("CUNYBot",     defaultPvZ)
+  val cunybot     : Opponent = add("CUNYbot",     defaultPvZ)
 
   /*
   // AIST4

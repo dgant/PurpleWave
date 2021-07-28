@@ -34,40 +34,12 @@ object PvZ1BaseForgeTech extends PvZStrategy {
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.twelvePool, With.fingerprints.overpool)
   override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgameBisu))
 }
-object PvZSpeedlot extends PvZStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgameBisu))
-}
-object PvZ4GateGoon extends PvZStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgame5GateGoon, PvZMidgame5GateGoonReaver))
-}
-object PvZCorsair extends PvZStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgameBisu))
-}
-object PvZDT extends PvZStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(Seq(PvZMidgameBisu))
-}
 object PvZProxy2Gate extends PvZ2GateOpening {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
   override def responsesWhitelisted = Iterable(With.fingerprints.twelveHatch, With.fingerprints.twelvePool, With.fingerprints.overpool)
   override def responsesBlacklisted = Iterable(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.tenHatch)
 }
-object PvZ10Gate extends PvZ2GateOpening {
-  override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(PvZSpeedlot, PvZ4GateGoon, PvZDT, PvZCorsair))
-  override def responsesBlacklisted = Iterable(With.fingerprints.fourPool)
-  override def minimumGamesVsOpponent: Int = 1
-}
-object PvZ2Gate1012 extends PvZ2GateOpening {
-  override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(PvZSpeedlot, PvZ4GateGoon, PvZDT))
-}
-object PvZ2Gate910 extends PvZ2GateOpening {
-  override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(PvZSpeedlot, PvZ4GateGoon, PvZDT))
-  override def responsesWhitelisted: Iterable[Fingerprint] = Vector(With.fingerprints.fourPool, With.fingerprints.twelveHatch)
-}
-object PvZFFEConservative extends PvZFFEOpening {
-  override def responsesWhitelisted: Iterable[Fingerprint] = Vector(With.fingerprints.fourPool)
-  override def allowedVsHuman: Boolean = false
-}
-object PvZFFEEconomic     extends PvZFFEOpening
+object PvZFFE     extends PvZFFEOpening
 object PvZGatewayFE       extends PvZFFEOpening {
   override def minimumGamesVsOpponent: Int = 2
   override def responsesWhitelisted = Seq(With.fingerprints.twelveHatch, With.fingerprints.tenHatch)

@@ -4,11 +4,9 @@ import Debugging.SimpleString
 import Lifecycle.With
 import Strategery.Selection._
 import Strategery.Strategies.AllRaces.{Sandbox, WorkerRushes}
-import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss._
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TvR.TvR1Rax
-import Strategery.Strategies.Zerg._
 
 class Playbook extends SimpleString {
   lazy val disabled   : Seq[Strategy]           = Seq.empty
@@ -24,9 +22,6 @@ object StrategyGroups {
 
     TvR1Rax, // Why is this disabled? Is it broken?
 
-    PvE15BaseIslandCarrier, // Disabled for Sparkle in TorchUp
-    PvE2BaseIslandCarrier, // Disabled for Sparkle in TorchUp
-
     //PvEStormNo, // Let's try storming again with the fixed storm micro
     PvT13Nexus, // Good Terran bots are bunker rushing this too effectively
 
@@ -34,17 +29,7 @@ object StrategyGroups {
     PvPProxy2Gate, // Proxy builds are temporarily broken due to new building placer
     PvZProxy2Gate, // Proxy builds are temporarily broken due to new building placer
 
-    PvZDT,       // Requires better micro on one base
-    PvZCorsair,  // Requires better micro on one base
-    PvZSpeedlot, // Requires better micro on one base
     PvZ1BaseForgeTech,
-
-    // Experimentally reenabling these 12-19-2020
-    //PvZGatewayFE, // Execution needs work; in particular, Zealots need to protect cannons
-    //PvZMidgameCorsairReaverGoon, // Too fragile
-    //PvZMidgameCorsairReaverZealot, // Too fragile; especially bad at dealing with Mutalisks
-
-    ZvZ5PoolSunkens,         // Proxy builds are temporarily broken due to new building placer
 
     PvTStove, // TODO: For ladder/fun play only
   )

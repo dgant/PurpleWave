@@ -1,7 +1,6 @@
 package Strategery.Strategies.Protoss
 
 import Strategery.Strategies.Protoss.FFA._
-import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies._
 
 object ProtossChoices {
@@ -22,9 +21,6 @@ object ProtossChoices {
     ProtossHuntersFFAFFEScoutReaver,
     ProtossHuntersFFAFFECarriers,
     ProtossBigFFACarriers,
-    PvE1BaseIslandCarrier,
-    PvE15BaseIslandCarrier,
-    PvE2BaseIslandCarrier,
   )
   
   /////////
@@ -59,12 +55,6 @@ object ProtossChoices {
   // PvP //
   /////////
 
-  val pvpSpecialtyOpeners = Vector(
-    PvE1BaseIslandCarrier,
-    PvE15BaseIslandCarrier,
-    PvE2BaseIslandCarrier,
-  )
-
   val pvpOpenersWithoutTransitions = Vector(
     PvPProxy2Gate
   )
@@ -90,20 +80,17 @@ object ProtossChoices {
   /////////
   
   val pvzOpenersWithoutTransitions = Vector(
-    PvZFFEConservative,
-    PvZFFEEconomic,
+    PvZFFE,
     PvZGatewayFE,
     PvZProxy2Gate,
     PvZ1BaseForgeTech,
   )
 
   val pvzOpenersTransitioningFrom1GateCore = Vector(
-    PvZ10Gate
+    PvZ2GateFlex
   )
 
   val pvzOpenersTransitioningFrom2Gate = Vector(
-    PvZ2Gate910,
-    PvZ2Gate1012,
     PvZ2GateFlex
   )
   

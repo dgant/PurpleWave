@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Protoss.Standard.PvE
+package Planning.Plans.GamePlans.Protoss
 
 import Planning.Plans.Compound.SwitchEnemyRace
 import Planning.Plans.GamePlans.ModalGameplan

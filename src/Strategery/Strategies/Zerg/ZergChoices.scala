@@ -33,7 +33,6 @@ object ZergChoices {
   )
 
   val zvz = Vector(
-    ZvZ5PoolSunkens,
     ZvZ9PoolSpeed,
     ZvZ12Pool,
     ZvZ10HatchLing

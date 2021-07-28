@@ -184,7 +184,7 @@ trait MacroCounting {
   }
 
   def enemyWalledIn: Boolean = {
-    With.geography.zones.exists(z => z.walledIn && ! z.owner.isUs)
+    With.geography.zones.exists(z => z.walledIn && ! z.metro.exists(_.bases.exists(_.owner.isUs)))
   }
 
   def scoutCleared: Boolean = {

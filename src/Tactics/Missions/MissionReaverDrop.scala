@@ -8,14 +8,15 @@ import Planning.UnitCounters.{CountOne, CountUpTo}
 import Planning.UnitMatchers._
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
-import Utilities.Seconds
+import Utilities.{Minutes, Seconds}
 
 class MissionReaverDrop extends MissionDrop {
 
   override protected def additionalFormationConditions: Boolean = (
-    (With.scouting.enemyProgress > 0.5 || MacroFacts.enemyBases > 2 || With.geography.enemyBases.exists(_.zone.island))
-    && MacroFacts.upgradeComplete(Protoss.ShuttleSpeed, 1, Seconds(15)())
-    && With.recruiter.available.exists(reaverLock.matcher))
+    (With.enemies.exists(_.isTerran) && With.frame < Minutes(8)())
+    || ((With.scouting.enemyProgress > 0.5 || MacroFacts.enemyBases > 2 || With.geography.enemyBases.exists(_.zone.island))
+      && (MacroFacts.upgradeComplete(Protoss.ShuttleSpeed, 1, Seconds(15)()))
+      && With.recruiter.available.exists(reaverLock.matcher)))
 
   override protected def shouldStopRaiding: Boolean = passengers.view
     .filter(Protoss.Reaver)

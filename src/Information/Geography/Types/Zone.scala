@@ -1,6 +1,5 @@
 package Information.Geography.Types
 
-import Information.Geography.Pathfinding.Types.ZonePath
 import Information.Grids.Movement.GridGroundDistance
 import Lifecycle.With
 import Mathematics.Maff
@@ -42,9 +41,7 @@ class Zone(
   def calculateExit: Option[Edge] = Maff.minBy(edges)(edge =>
     Maff.min(With.geography.enemyBases.map(enemyBase => edge.distanceGrid.get(enemyBase.heart)))
       .getOrElse(edge.distanceGrid.get(With.scouting.threatOrigin)))
-  
-  def pathTo          (to: Zone): Option[ZonePath]  = With.paths.zonePath(this, to)
-  def canWalkTo       (to: Zone): Boolean           = pathTo(to).isDefined
+
   def distancePixels  (to: Zone): Double            = centroid.pixelDistanceGround(to.centroid)
   def heart: Tile = bases.sortBy(_.mineralsLeft).sortBy(_.owner.isNeutral).headOption.map(_.heart).getOrElse(centroid)
 

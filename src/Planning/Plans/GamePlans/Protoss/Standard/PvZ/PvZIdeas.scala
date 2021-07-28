@@ -22,8 +22,7 @@ object PvZIdeas {
   class ConditionalAttack extends If(
     new Or(
       new SafeToMoveOut,
-      new BasesAtLeast(3),
-      new Employing(PvZProxy2Gate, PvZ2Gate910, PvZ2Gate1012)),
+      new BasesAtLeast(3)),
     new Attack)
 
   class TemplarUpToEight extends MeldArchons(49) { override def maximumTemplar = 8 }

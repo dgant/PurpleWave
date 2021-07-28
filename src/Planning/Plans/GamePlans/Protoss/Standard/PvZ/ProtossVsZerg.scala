@@ -5,9 +5,6 @@ import Planning.Plans.GamePlans.ModalGameplan
 class ProtossVsZerg extends ModalGameplan(
   // Openings
   new PvZ1BaseForgeTech,
-  new PvZ10Gate,
-  new PvZ2Gate910,
-  new PvZ2Gate1012,
   new PvZFFE,
 
   // Midgames

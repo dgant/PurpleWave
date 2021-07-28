@@ -15,7 +15,13 @@ class PvZ2GateFlex extends GameplanImperative{
       Get(8, Protoss.Probe),
       Get(Protoss.Pylon),
       Get(10, Protoss.Probe),
-      Get(Protoss.Gateway),
+      Get(Protoss.Gateway))
+    if (enemyStrategy(With.fingerprints.fourPool) && unitsComplete(MatchWarriors) < 5) {
+      pumpSupply()
+      pumpWorkers()
+      pump(Protoss.Zealot)
+    }
+    buildOrder(
       Get(12, Protoss.Probe),
       Get(2, Protoss.Gateway),
       Get(13, Protoss.Probe),

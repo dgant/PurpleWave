@@ -23,6 +23,7 @@ object PsionicStorm extends TargetedSpell {
     if (target.underStorm)  return 0.0
     if (target.stasised)    return 0.0
     if (target.invincible)  return 0.0
+    if ( ! target.visible)  return 0.0
     if (target.isAny(
       Protoss.Interceptor,
       Zerg.Larva,

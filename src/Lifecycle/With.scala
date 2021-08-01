@@ -18,6 +18,7 @@ import Mathematics.Points.Tile
 import Micro.Agency.Agency
 import Micro.Coordination.Coordinator
 import Micro.Matchups.MatchupGraph
+import NeoGeo.{MapIdentifier, NeoGeo, NeoRender}
 import Tactics.Squads.Squads
 import Performance.TaskQueue.{TaskQueueGlobal, TaskQueueParallel}
 import Placement.Preplacement
@@ -27,7 +28,7 @@ import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.ProxyBWAPI
 import ProxyBwapi.UnitTracking.UnitTracker
 import Strategery.History.History
-import Strategery.{StarCraftMapMatcher, Strategist}
+import Strategery.Strategist
 import Tactics.Tactics
 import _root_.Performance.{Latency, PerformanceMonitor, ReactionTimes}
 import bwapi.Flag
@@ -72,6 +73,7 @@ object With {
   var accounting        : Accounting              = _
   var fingerprints      : Fingerprints            = _
   var gathering         : Gathering               = _
+  var geo               : NeoGeo                  = _
   var geography         : Geography               = _
   var grids             : Grids                   = _
   var groundskeeper     : Groundskeeper           = _
@@ -130,8 +132,8 @@ object With {
     neutral           = Players.get(game.neutral)
     enemies           = game.enemies.asScala.map(Players.get).toVector
     mapFileName       = game.mapFileName
-    mapCleanName      = StarCraftMapMatcher.clean(mapFileName)
-    mapClock          = StarCraftMapMatcher.clock(new Tile(With.game.self.getUnits.asScala.maxBy(_.getHitPoints).getTilePosition).center)
+    mapCleanName      = MapIdentifier.apply(mapFileName)
+    mapClock          = MapIdentifier.clock(new Tile(With.game.self.getUnits.asScala.maxBy(_.getHitPoints).getTilePosition).center)
     mapTileWidth      = game.mapWidth
     mapTileHeight     = game.mapHeight
     mapTileArea       = mapTileWidth * mapTileHeight
@@ -156,6 +158,10 @@ object With {
     ////////////////////
 
     analyzeTerrain()
+    geo = new NeoGeo(game)
+    if (With.configuration.visualizeDebug) {
+      NeoRender(geo)
+    }
 
     // Order-dependent initialization:
     // PerformanceMonitor required to exist for creating any task

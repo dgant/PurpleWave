@@ -23,22 +23,25 @@ final class NeoGeo(game: Game) {
   - Jomsat
    */
   val mapFileName : String = game.mapFileName()
+  val mapNickname : String = MapIdentifier(mapFileName)
   val mapHash     : String = game.mapHash()
   val tileWidth   : Int = game.mapWidth
   val tileHeight  : Int = game.mapHeight
   val tileArea    : Int = tileWidth * tileHeight
-  val walkWidth   : Int = 4 * tileHeight
-  val walkHeight  : Int = 4 * tileWidth
+  val walkWidth   : Int = 4 * tileWidth
+  val walkHeight  : Int = 4 * tileHeight
   val walkArea    : Int = walkWidth * walkHeight
-  val pixelWidth  : Int = 32 * tileHeight
-  val pixelHeight : Int = 32 * tileWidth
+  val pixelWidth  : Int = 32 * tileWidth
+  val pixelHeight : Int = 32 * tileHeight
   val pixelArea   : Int = pixelWidth * pixelHeight
-  def tileX(i: Int)   : Int = i % tileWidth
-  def tileY(i: Int)   : Int = i / tileWidth
-  def walkX(i: Int)   : Int = i % walkWidth
-  def walkY(i: Int)   : Int = i / walkWidth
-  def pixelX(i: Int)  : Int = i % pixelWidth
-  def pixelY(i: Int)  : Int = i / pixelWidth
+  def tileX(i: Int)         : Int = i % tileWidth
+  def tileY(i: Int)         : Int = i / tileWidth
+  def tileI(x: Int, y: Int) : Int = x + y * tileWidth
+  def walkX(i: Int)         : Int = i % walkWidth
+  def walkY(i: Int)         : Int = i / walkWidth
+  def walkI(x: Int, y: Int) : Int = x + y * walkWidth
+  def pixelX(i: Int)        : Int = i % pixelWidth
+  def pixelY(i: Int)        : Int = i / pixelWidth
   val walkability     : Array[Boolean]            = Array.fill(walkArea)(false)
   val buildability    : Array[Boolean]            = Array.fill(tileArea)(false)
   val unoccupied      : Array[Boolean]            = Array.fill(tileArea)(false)
@@ -63,19 +66,23 @@ final class NeoGeo(game: Game) {
         i = x + y * walkWidth
         walkability(i) = game.isWalkable(x, y)
         x += 1
+        i += 1
       }
+      x = 0
       y += 1
     }
     // Populate tile grids
     x = 0
     y = 0
+    i = 0
     while (y < tileHeight) {
       while (x < tileWidth) {
-        i = x + y * tileWidth
         buildability(i) = game.isBuildable(x, y)
         groundHeight(i) = game.getGroundHeight(x, y)
         x += 1
+        i += 1
       }
+      x = 0
       y += 1
     }
     // TODO: Populate unoccupied (eg no neutral buildings/resources standing on top)

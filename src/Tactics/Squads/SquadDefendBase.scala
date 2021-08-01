@@ -4,10 +4,12 @@ import Information.Geography.Types.{Base, Edge, Zone}
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
+import Micro.Agency.Intention
 import Micro.Formation.{Formation, FormationEmpty, FormationGeneric, FormationZone}
 import Performance.Cache
 import ProxyBwapi.Races.Zerg
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitTracking.UnorderedBuffer
 
 class SquadDefendBase(base: Base) extends Squad {
 
@@ -67,28 +69,65 @@ class SquadDefendBase(base: Base) extends Squad {
     lazy val canScour           = scourables.nonEmpty && (wander || breached)
     lazy val canGuard           = guardChoke.isDefined && (units.size > 3 || ! With.enemies.exists(_.isZerg))
     lazy val formationWithdraw  = FormationGeneric.disengage(this, Some(vicinity))
-    lazy val formationScour     = FormationGeneric.engage(this, targetQueue.get.headOption.map(_.pixel))
+    lazy val formationScour     = FormationGeneric.engage(this, targets.get.headOption.map(_.pixel))
     lazy val formationBastion   = FormationGeneric.march(this, bastion())
     lazy val formationGuard     = guardChoke.map(c => FormationZone(this, guardZone, c)).getOrElse(formationBastion)
-    val targets = if (canWithdraw) SquadAutomation.unrankedEnRouteTo(this, vicinity) else if (canScour) scourables else enemies.filter(threateningBase)
-    targetQueue = Some(SquadAutomation.rankForArmy(this, targets))
+    val targetsUnranked = if (canWithdraw) SquadAutomation.unrankedEnRouteTo(this, vicinity) else if (canScour) scourables else enemies.filter(threateningBase)
+    targets = Some(targetsUnranked.sortBy(_.pixelDistanceTravelling(heart)))
 
     formations.clear()
     if (canWithdraw) {
       lastAction = "Withdraw"
       formations += formationWithdraw
+      scour()
     } else if (canScour) {
       lastAction = "Scour"
       formations += formationScour
       formations += formationGuard
+      scour()
     } else if (canGuard) {
       lastAction = "Guard"
       formations += formationGuard
+      SquadAutomation.send(this)
     } else {
       lastAction = "Hold"
       formations += formationBastion
+      SquadAutomation.send(this)
     }
-    SquadAutomation.send(this)
+  }
+
+  def intendScouring(scourer: FriendlyUnitInfo, target: UnitInfo): Unit = {
+    val squad = this
+    scourer.intend(this, new Intention {
+      targets = targets.map(target +: _)
+      toTravel = Some(target.pixel.nearestTraversableBy(scourer))
+      toReturn = SquadAutomation.getReturn(scourer, squad)
+    })
+  }
+
+  def scour(): Unit = {
+    val assigned = new UnorderedBuffer[FriendlyUnitInfo]()
+    val antiAir = new UnorderedBuffer[FriendlyUnitInfo](units.view.filter(_.canAttackAir))
+    val antiGround = new UnorderedBuffer[FriendlyUnitInfo](units.view.filter(_.canAttackGround))
+    targets.get.foreach(target => {
+      val antiTarget = if (target.flying) antiAir else antiGround
+      assigned.clear()
+      var valueAssigned: Double = 0
+      while (antiTarget.nonEmpty && valueAssigned < 3 * target.subjectiveValue) {
+        val next = antiTarget.minBy(_.framesToGetInRange(target))
+        assigned.add(next)
+        antiAir.remove(next)
+        antiGround.remove(next)
+        valueAssigned += next.subjectiveValue
+      }
+      val squad = this
+      assigned.foreach(intendScouring(_, target))
+    })
+    if (targets.get.isEmpty) {
+      SquadAutomation.send(this)
+    } else {
+      (antiAir.view ++ antiGround).distinct.foreach(intendScouring(_, targets.get.head))
+    }
   }
 
   private def isBreaching(enemy: UnitInfo): Boolean = (

@@ -14,18 +14,16 @@ object Target extends {
   }
 
   def best(attacker: FriendlyUnitInfo, filters: TargetFilter*): Option[UnitInfo] = {
-    val squadQueueRaw = attacker.squad.flatMap(_.targetQueue)
+    // If we have no squad guidance at all, use default targeting
+    if (attacker.targetsAssigned.isEmpty) return bestUnfiltered(attacker, legal(attacker, filters: _*))
 
-    // If we have no squad guidance at all, uwse default targeting
-    if (squadQueueRaw.isEmpty) return bestUnfiltered(attacker, legal(attacker, filters: _*))
-
-    val squadQueue = legal(attacker, squadQueueRaw.get, filters: _*)
-    lazy val combatTargetInRangeSquad = squadQueue.find(t => t.unitClass.attacksOrCastsOrDetectsOrTransports && attacker.inRangeToAttack(t))
+    val targets = legal(attacker, attacker.targets, filters: _*)
+    lazy val combatTargetInRangeSquad = targets.find(t => t.unitClass.attacksOrCastsOrDetectsOrTransports && attacker.inRangeToAttack(t))
     lazy val combatTargetInRangeAny = bestUnfiltered(attacker, legal(attacker, attacker.matchups.targetsInRange.filter(_.unitClass.attacksOrCastsOrDetectsOrTransports), filters: _*))
     val output = combatTargetInRangeSquad
       .orElse(combatTargetInRangeAny)
-      .orElse(squadQueue.find(t => t.doomFrameAbsolute > With.frame + attacker.framesToConnectDamage(t) + 24)) // The +delta is a buffer to avoid being too greedy about hastening a unit's death
-      .orElse(squadQueue.headOption)
+      .orElse(targets.find(t => t.doomFrameAbsolute > With.frame + attacker.framesToConnectDamage(t) + 24)) // The +delta is a buffer to avoid being too greedy about hastening a unit's death
+      .orElse(targets.headOption)
     output
   }
 

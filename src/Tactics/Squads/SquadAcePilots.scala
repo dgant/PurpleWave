@@ -30,11 +30,11 @@ class SquadAcePilots extends Squad {
   override def run(): Unit = {
     // Help other squads with anti-air
     val otherSquads = With.squads.all.view.filterNot(_ == this)
-    val squadsToCover = otherSquads.filter(_.targetQueue.exists(_.exists(MatchFlyingWarriors))).toVector
+    val squadsToCover = otherSquads.filter(_.targets.exists(_.exists(MatchFlyingWarriors))).toVector
     if (squadsToCover.nonEmpty) {
       val squad = squadsToCover
         .sortBy(_.isInstanceOf[SquadDefendBase])
-        .maxBy(_.targetQueue.get.count(MatchFlyingWarriors))
+        .maxBy(_.targets.get.count(MatchFlyingWarriors))
       activity = "AceHelpSquad"
       followSquad(squad)
       return
@@ -131,7 +131,7 @@ class SquadAcePilots extends Squad {
 
   private def followSquad(otherSquad: Squad): Unit = {
     vicinity = otherSquad.centroidAll
-    targetQueue = otherSquad.targetQueue
+    targets = otherSquad.targets
       .map(_.filter(_.flying))
       .orElse(Some(SquadAutomation.rankForArmy(this,
         Maff.orElse(

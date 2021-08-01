@@ -372,7 +372,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     friendly.flatMap(_.agent.toAttack)
       .orElse(target)
       .orElse(orderTarget)
-      .orElse(friendly.flatMap(_.squad.flatMap(_.targetQueue.flatMap(_.find(canAttack)))))
+      .orElse(friendly.flatMap(_.targetsAssigned).flatMap(_.headOption))
       .orElse(Maff.minBy(matchups.targets)(_.pixelDistanceEdge(targetPixel.orElse(orderTargetPixel).getOrElse(pixel))))
 
   @inline final def isBeingViolent: Boolean = {

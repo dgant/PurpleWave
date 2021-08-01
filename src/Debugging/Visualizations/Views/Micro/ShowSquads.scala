@@ -28,7 +28,7 @@ object ShowSquads extends View {
     val centroid = Maff.centroid(squad.units.view.map(_.pixel))
     With.game.drawCircleMap(centroid.bwapi, squad.units.map(_.pixelDistanceCenter(centroid)).max.toInt, color)
 
-    squad.targetQueue.foreach(q => {
+    squad.targets.foreach(q => {
       var i = 0
       if (q.nonEmpty) {
         val targetColor = Colors.BrightYellow
@@ -53,7 +53,7 @@ object ShowSquads extends View {
           "",
           enumerateUnits(squad.units),
           "",
-          enumerateUnits(squad.targetQueue.getOrElse(Seq.empty)),
+          enumerateUnits(squad.targets.getOrElse(Seq.empty)),
           "",
           enumerateUnits(squad.enemies)))
     DrawScreen.table(5, 7 * With.visualization.lineHeightSmall, table)

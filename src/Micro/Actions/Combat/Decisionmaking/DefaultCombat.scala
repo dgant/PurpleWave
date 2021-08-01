@@ -109,8 +109,8 @@ object DefaultCombat extends Action {
     }
 
     // Chasing behaviors
-    // Reavers shouldn't even try
-    if (Protoss.Reaver(unit)) return range
+    // Some units shouldn't even try
+    if (unit.isAny(Terran.SiegeTankUnsieged, Protoss.Reaver)) return range
 
     // Chase if they outrange us
     if (pixelsOutranged.isDefined) return chaseDistance

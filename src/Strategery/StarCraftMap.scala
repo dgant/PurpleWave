@@ -2,9 +2,10 @@ package Strategery
 
 import Debugging.ToString
 import Lifecycle.With
+import NeoGeo.MapIdentifier
 abstract class StarCraftMap {
   val name: String = ToString(this)
-  val nameStub: String = StarCraftMapMatcher.clean(name)
+  val nameStub: String = MapIdentifier.apply(name)
   def matches: Boolean = nameStub.contains(With.mapCleanName) || With.mapCleanName.contains(nameStub)
   var mineralWalkingOkay: Boolean = true
 }

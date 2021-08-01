@@ -51,6 +51,9 @@ final class UnorderedBuffer[T >: Null](capacity: Int = 8) extends IndexedSeq[T] 
     }
   }
 
+  @inline def addAll(values: TraversableOnce[T]): Unit = { values.foreach(add) }
+  @inline def removeAll(values: TraversableOnce[T]): Unit = { values.foreach(remove) }
+
   // Swap-and-pop for fast removal
   @inline def removeIf(predicate: (T) => Boolean): Unit = {
     var i = 0
@@ -66,8 +69,17 @@ final class UnorderedBuffer[T >: Null](capacity: Int = 8) extends IndexedSeq[T] 
     }
   }
 
-  @inline def addAll(values: TraversableOnce[T]): Unit = { values.foreach(add) }
-  @inline def removeAll(values: TraversableOnce[T]): Unit = { values.foreach(remove) }
+  @inline def popMinBy[B: Ordering](feature: T => B): T = {
+    val value = values.minBy(feature)
+    remove(value)
+    value
+  }
+
+  @inline def popMaxBy[B: Ordering](feature: T => B): T = {
+    val value = values.maxBy(feature)
+    remove(value)
+    value
+  }
 
   @inline def clear(): Unit = {
     // Empty all populated values without losing allocated space

@@ -5,7 +5,7 @@ import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Micro.Formation.{Formation, FormationGeneric, FormationStyleDisengage, FormationStyleGuard}
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -17,11 +17,11 @@ object SquadAutomation {
 
   def target(squad: Squad): Unit = { target(squad, if (squad.fightConsensus) squad.vicinity else squad.homeConsensus) }
   def target(squad: Squad, to: Pixel): Unit = {
-    squad.targetQueue = Some(SquadAutomation.rankedEnRoute(squad, to))
+    squad.targets = Some(SquadAutomation.rankedEnRoute(squad, to))
   }
   def targetRaid(squad: Squad): Unit = targetRaid(squad, squad.vicinity)
   def targetRaid(squad: Squad, to: Pixel): Unit = {
-    squad.targetQueue = Some(
+    squad.targets = Some(
       SquadAutomation.rankForArmy(squad, unrankedEnRouteTo(squad, to).filter(t => t.unitClass.isWorker || squad.units.exists(u => (t.canAttack(u) || t.unitClass.canAttack(u)) && t.inRangeToAttack(u))))
         .sortBy(t => ! t.unitClass.isWorker)
         .sortBy(t => - squad.units.count(_.inRangeToAttack(t))))
@@ -72,7 +72,7 @@ object SquadAutomation {
     var output: ArrayBuffer[Formation] = ArrayBuffer.empty
     // If advancing, give a formation for forward movement
     if (squad.fightConsensus) {
-      val engageTarget = squad.targetQueue.flatMap(_.headOption.map(_.pixel))
+      val engageTarget = squad.targets.flatMap(_.headOption.map(_.pixel))
       if (engageTarget.isDefined && (squad.engagingOn || squad.engagedUpon)) {
         output += FormationGeneric.engage(squad, engageTarget)
       } else {
@@ -94,26 +94,29 @@ object SquadAutomation {
     } else {
       squad.units.foreach(unit => {
         unit.intend(squad, new Intention {
-          // Send to the first formation, which will be advancey if we're advancing
-          toTravel = squad
-            .formations
-            .headOption
-            .filter(_.placements.size >= minToForm)
-            .find(_.placements.contains(unit))
-            .map(_.placements(unit))
-            .orElse(Some(if (squad.fightConsensus) squad.vicinity else toReturn.getOrElse(squad.homeConsensus)))
-          toReturn = squad
-            .formations
-            .find(f => f.style == FormationStyleGuard || f.style == FormationStyleDisengage)
-            .filter(_.placements.size >= 2)
-            .find(_.placements.contains(unit))
-            .map(_.placements(unit))
-            .orElse(toReturn)
-            .orElse(Some(squad.homeConsensus))
+          toTravel = getTravel(unit, squad, toReturn, minToForm)
+          toReturn = getReturn(unit, squad, toReturn, minToForm)
         })
       })
     }
   }
+
+  def getReturn(unit: FriendlyUnitInfo, squad: Squad, defaultReturn: Option[Pixel] = None, minToForm: Int = 0): Option[Pixel] = squad
+    .formations
+    .find(f => f.style == FormationStyleGuard || f.style == FormationStyleDisengage)
+    .filter(_.placements.size >= 2)
+    .find(_.placements.contains(unit))
+    .map(_.placements(unit))
+    .orElse(defaultReturn)
+    .orElse(Some(squad.homeConsensus))
+
+  def getTravel(unit: FriendlyUnitInfo, squad: Squad, defaultReturn: Option[Pixel] = None, minToForm: Int = 0): Option[Pixel] = squad
+    .formations
+    .headOption
+    .filter(_.placements.size >= minToForm)
+    .find(_.placements.contains(unit))
+    .map(_.placements(unit))
+    .orElse(Some(if (squad.fightConsensus) squad.vicinity else getReturn(unit, squad, defaultReturn, minToForm).getOrElse(squad.homeConsensus)))
 
   //////////////////////
   // Full automation! //

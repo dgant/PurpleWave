@@ -32,19 +32,19 @@ class SquadMindControl extends Squad {
 
   override def run(): Unit = {
     if (units.isEmpty) return
-    targetQueue = Some(stealables.toVector.sortBy(_.pixelDistanceTravelling(centroidGround)))
-    val targetCenter = Maff.centroid(targetQueue.get.view.map(_.pixel) :+ centroidGround)
-    def isReady(unit: FriendlyUnitInfo): Boolean = targetQueue.exists(_.nonEmpty) && unit.energy >= 150
+    targets = Some(stealables.toVector.sortBy(_.pixelDistanceTravelling(centroidGround)))
+    val targetCenter = Maff.centroid(targets.get.view.map(_.pixel) :+ centroidGround)
+    def isReady(unit: FriendlyUnitInfo): Boolean = targets.exists(_.nonEmpty) && unit.energy >= 150
     val ready = units.filter(isReady).sortBy(_.pixelDistanceTravelling(targetCenter.nearestWalkableTile))
     val unready = new UnorderedBuffer[FriendlyUnitInfo]
     unready.addAll(units.filterNot(isReady))
 
     var i = 0
     ready.foreach(darchon => {
-      if (targetQueue.get.size <= i ) {
+      if (targets.get.size <= i ) {
         unready.add(darchon)
       } else {
-        darchon.intend(this, new Intention { toTravel = Some(targetQueue.head(i).pixel.nearestWalkablePixel) })
+        darchon.intend(this, new Intention { toTravel = Some(targets.head(i).pixel.nearestWalkablePixel) })
       }
       i += 1
     })

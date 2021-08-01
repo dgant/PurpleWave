@@ -1,10 +1,10 @@
-package Strategery
+package NeoGeo
 
-import Mathematics.Points.{Pixel, SpecificPoints}
 import Mathematics.Maff
+import Mathematics.Points.{Pixel, SpecificPoints}
 
-object StarCraftMapMatcher {
-  def clean(mapString: String): String = {
+object MapIdentifier {
+  def apply(mapString: String): String = {
     mapString.toLowerCase
       .replaceAll(".scm", "")
       .replaceAll(".scx", "")

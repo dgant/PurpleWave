@@ -21,6 +21,7 @@ object NeoRender {
     renderWalks(geo, "altitude",      i => grayscale(64 * Math.min(1, geo.altitude(i)) + 191 * geo.altitude(i) / 64))
     renderTiles(geo, "buildable",     i => binary(geo.buildability(i)))
     renderTiles(geo, "groundheight",  i => grayscale(255 * geo.groundHeight(i) / 5))
+    geo.directions.indices.foreach(d => renderWalks(geo, f"clearance-$d", i => grayscale(64 * Math.min(1, geo.altitude(i)) + 191 * geo.clearance(d)(i) / 64)))
   }
 
   def renderTiles(geo: NeoGeo, name: String, color: Int => Color): Unit = {

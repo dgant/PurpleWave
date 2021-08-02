@@ -22,17 +22,21 @@ final class NeoGeo(game: Game) {
   - Comsat
   - Jomsat
    */
+  val directions: Array[(Double, Double)] = Array((1, 0), (1, 0.5), (1, 1), (0.5, 1), (0, 1), (-0.5, 1), (-1, 1), (-1, 0.5), (-1, 0), (-1, -0.5), (-1, -1), (-0.5, -1), (0, -1), (0.5, -1), (1, -1), (1, -0.5))
   val mapFileName : String = game.mapFileName()
   val mapNickname : String = MapIdentifier(mapFileName)
   val mapHash     : String = game.mapHash()
   val tileWidth   : Int = game.mapWidth
   val tileHeight  : Int = game.mapHeight
+  val tileMaxDim  : Int = Math.max(tileWidth, tileHeight)
   val tileArea    : Int = tileWidth * tileHeight
   val walkWidth   : Int = 4 * tileWidth
   val walkHeight  : Int = 4 * tileHeight
+  val walkMaxDim  : Int = Math.max(walkWidth, walkHeight)
   val walkArea    : Int = walkWidth * walkHeight
   val pixelWidth  : Int = 32 * tileWidth
   val pixelHeight : Int = 32 * tileHeight
+  val pixelMaxDim : Int = Math.max(pixelWidth, pixelHeight)
   val pixelArea   : Int = pixelWidth * pixelHeight
   def tileX(i: Int)         : Int = i % tileWidth
   def tileY(i: Int)         : Int = i / tileWidth
@@ -47,6 +51,7 @@ final class NeoGeo(game: Game) {
   val unoccupied      : Array[Boolean]            = Array.fill(tileArea)(false)
   val groundHeight    : Array[Int]                = Array.fill(tileArea)(0)
   val altitude        : Array[Int]                = Array.fill(walkArea)(0)
+  val clearance       : Array[Array[Int]]         = directions.map(x => Array.fill(walkArea)(0))
   val continentByTile : Array[NeoContinent]       = Array.fill(tileArea)(null)
   val metroByTile     : Array[NeoMetro]           = Array.fill(tileArea)(null)
   val regionByTile    : Array[NeoRegion]          = Array.fill(tileArea)(null)
@@ -123,5 +128,52 @@ final class NeoGeo(game: Game) {
       }
       altitudeNext += 1
     }
+  }
+  // Populate clearance
+  private def populateClearance(values: Array[Int], sx: Int, sy: Int, dx: Double, dy: Double): Unit = {
+    val zMax = walkMaxDim / Math.min(Math.abs(dx), Math.abs(dy))
+    var contiguous = 0
+    var z = 0
+    while (z < zMax) {
+      val x = sx + (dx * z).toInt
+      val y = sy + (dy * z).toInt
+      if (x < 0 || y < 0 || x >= walkWidth || y >= walkHeight) return
+      val i = walkI(x, y)
+      if (walkability(i)) {
+        contiguous += 1
+        values(i) = contiguous
+      } else {
+        contiguous = 0
+      }
+      z += 1
+    }
+  }
+  {
+    // For each direction tuple, iterate over walktiles from the map edge.
+    // Trace a line and count contiguous walkable tiles in that direction.
+    // For each tile, set its clearance in the opposite direction to be the number
+    // of contiguous walkable tiles thusfar.
+    directions.indices.foreach(directionIndex => {
+      val clearanceIndex = (directionIndex + directions.length / 2) % directions.length
+      val clearanceArray = clearance(clearanceIndex)
+      val dx: Double = directions(directionIndex)._1
+      val dy: Double = directions(directionIndex)._2
+      if (dx != 0) {
+        var sx = if (dx > 0) 0 else walkWidth - 1
+        var sy = 0
+        while (sy < walkHeight) {
+          populateClearance(clearanceArray, sx, sy, dx, dy)
+          sy += 1
+        }
+      }
+      if (dy != 0) {
+        var sy = if (dy > 0) 0 else walkHeight - 1
+        var sx = 0
+        while (sx < walkWidth) {
+          populateClearance(clearanceArray, sx, sy, dx, dy)
+          sx += 1
+        }
+      }
+    })
   }
 }

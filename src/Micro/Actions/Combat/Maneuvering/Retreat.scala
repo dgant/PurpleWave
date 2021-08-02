@@ -34,6 +34,7 @@ object Retreat extends Action {
     lazy val enemySooner          = timeOriginUs + 96 >= timeOriginEnemy
     lazy val enemySieging         = unit.matchups.enemies.exists(_.isAny(MatchTank, Zerg.Lurker)) && ! unit.base.exists(_.owner.isEnemy)
     lazy val goalSidestep         = Protoss.DarkTemplar(unit) || (enemySieging && ! enemyCloser && ! enemySooner)
+    lazy val safetyIsSafe         = unit.agent.safety.tile.enemyRangeAgainst(unit) < unit.tile.enemyRangeAgainst(unit)
     lazy val goalReturn           = ! unit.agent.isScout && ! goalSidestep && (unit.zone == unit.agent.safety.zone && PixelRay(unit.pixel, unit.agent.safety).forall(_.enemyRangeAgainst(unit) <= unit.tile.enemyRangeAgainst(unit)))
     lazy val goalHome             = ! unit.agent.isScout && ! goalSidestep && (unit.zone != unit.agent.safety.zone && (enemyCloser || enemySooner))
     lazy val goalOrigin           = goalReturn || goalHome
@@ -73,7 +74,7 @@ object Retreat extends Action {
       return RetreatPlan(unit, leadPassenger.get.pixel.add(forceVector.normalize(32).toPoint.asPixel.nearestWalkablePixel), "Shotgun")
     }}
 
-    lazy val waypointSimple   = MicroPathing.getWaypointInDirection(unit, force, if (goalOrigin) Some(unit.agent.safety) else None, requireSafety = goalSafety).map((_, "Simple"))
+    lazy val waypointSimple   = MicroPathing.getWaypointInDirection(unit, force, if (goalOrigin) Some(unit.agent.safety) else None, requireSafety = goalSafety && safetyIsSafe).map((_, "Simple"))
     lazy val waypointPath     = MicroPathing.getWaypointAlongTilePath(tilePath).map(_.add(unit.pixel.offsetFromTileCenter)).map((_, "Path"))
     lazy val waypointForces   = Seq(true, false).view.map(safety => MicroPathing.getWaypointInDirection(unit, force, requireSafety = safety)).find(_.nonEmpty).flatten.map((_, "Force"))
     lazy val waypointOrigin   = (unit.agent.safety, "Origin")

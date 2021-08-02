@@ -56,8 +56,8 @@ final class NeoGeo(game: Game) {
   val regions         : ArrayBuffer[NeoRegion]    = ArrayBuffer.empty
   val bases           : ArrayBuffer[NeoBase]      = ArrayBuffer.empty
 
+  // Populate walk grids
   {
-    // Populate walk grids
     var x = 0
     var y = 0
     var i = 0
@@ -71,10 +71,12 @@ final class NeoGeo(game: Game) {
       x = 0
       y += 1
     }
-    // Populate tile grids
-    x = 0
-    y = 0
-    i = 0
+  }
+  // Populate tile grids
+  {
+    var x = 0
+    var y = 0
+    var i = 0
     while (y < tileHeight) {
       while (x < tileWidth) {
         buildability(i) = game.isBuildable(x, y)
@@ -85,8 +87,41 @@ final class NeoGeo(game: Game) {
       x = 0
       y += 1
     }
-    // TODO: Populate unoccupied (eg no neutral buildings/resources standing on top)
-    // Populate altitude by floodfilling from unwalkable tiles
-    //val horizon =
+  }
+  // Populate altitude
+  {
+    var altitudeNext  = 0
+    val horizon       = Array.fill(walkArea)(false)
+    val horizonNext   = Array.fill(walkArea)(false)
+    val explored      = Array.fill(walkArea)(false)
+    def explore(j: Int): Unit = {
+      if (j >= 0 && j < walkArea) {
+        horizonNext(j) = ! explored(j) && ! horizon(j)
+      }
+    }
+    var proceed = true
+    while(proceed) {
+      var i = 0
+      proceed = false
+      while (i < walkArea) {
+        if (if (altitudeNext == 0) ! walkability(i) else horizon(i)) {
+          proceed = true
+          explored(i) = true
+          altitude(i) = altitudeNext
+          explore(i - 1)
+          explore(i + 1)
+          explore(i - walkWidth)
+          explore(i + walkWidth)
+        }
+        i += 1
+      }
+      i = 0
+      while (i < walkArea) {
+        horizon(i) = horizonNext(i)
+        horizonNext(i) = false
+        i += 1
+      }
+      altitudeNext += 1
+    }
   }
 }

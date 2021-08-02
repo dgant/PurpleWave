@@ -13,12 +13,14 @@ object NeoRender {
     if (boolean) new Color(255, 255, 255) else new Color(0, 0, 0)
   }
   private def grayscale(int: Int): Color = {
-    new Color(int, int, int)
+    val v = Math.max(0, Math.min(255, int))
+    new Color(v, v, v)
   }
   def apply(geo: NeoGeo): Unit = {
     renderWalks(geo, "walkable",      i => binary(geo.walkability(i)))
+    renderWalks(geo, "altitude",      i => grayscale(64 * Math.min(1, geo.altitude(i)) + 191 * geo.altitude(i) / 64))
     renderTiles(geo, "buildable",     i => binary(geo.buildability(i)))
-    renderTiles(geo, "groundheight",  i => grayscale(geo.groundHeight(i) * 255 / 5))
+    renderTiles(geo, "groundheight",  i => grayscale(255 * geo.groundHeight(i) / 5))
   }
 
   def renderTiles(geo: NeoGeo, name: String, color: Int => Color): Unit = {

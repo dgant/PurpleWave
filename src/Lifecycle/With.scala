@@ -157,8 +157,8 @@ object With {
     // Normal systems //
     ////////////////////
 
-    analyzeTerrain()
     geo = new NeoGeo(game)
+    analyzeTerrain()
 
     if (With.configuration.visualizeDebug) {
       NeoRender(geo)

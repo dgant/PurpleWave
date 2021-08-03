@@ -4,6 +4,7 @@ import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.File
 
+import NeoGeo.Internal.NeoContinentRaw
 import javax.imageio.ImageIO
 
 object NeoRender {
@@ -19,6 +20,7 @@ object NeoRender {
   def apply(geo: NeoGeo): Unit = {
     renderWalks(geo, "walkable",      i => binary(geo.walkability(i)))
     renderWalks(geo, "altitude",      i => grayscale((if (geo.walkability(i)) 64 else 0) + (191 * geo.altitude(i) / 64).toInt))
+    renderWalks(geo, "continents",    i => if(geo.continentByWalk(i) == null) new Color(0, 0, 0) else geo.continentByWalk(i).asInstanceOf[NeoContinentRaw].color)
     renderTiles(geo, "buildable",     i => binary(geo.buildability(i)))
     renderTiles(geo, "groundheight",  i => grayscale(255 * geo.groundHeight(i) / 5))
     geo.directions.indices.foreach(d => renderWalks(geo, f"clearance-$d", i => grayscale((if (geo.walkability(i)) 64 else 0) + 191 * geo.clearance(d)(i) / 128)))

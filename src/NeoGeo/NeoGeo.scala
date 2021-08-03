@@ -1,9 +1,10 @@
 package NeoGeo
 
+import NeoGeo.Internal.{NeoColors, NeoContinentRaw}
 import bwapi.Game
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
-import scala.util.Sorting
 
 /**
   * NeoGeo is a reliable and easy-to-use Java-compatible terrain analyzer for the StarCraft: Brood War API (BWAPI).
@@ -28,7 +29,7 @@ final class NeoGeo(game: Game) {
   @inline def isWalkableUnsafe(walkI: Int): Boolean = walkability(walkI)
   @inline def isWalkableUnsafe(walkX: Int, walkY: Int): Boolean = isWalkableUnsafe(walkI(walkX, walkY))
   @inline def isWalkableUnsafe(walk: (Int, Int)): Boolean = isWalkableUnsafe(walk._1, walk._2)
-  @inline def isWalkable(walkI: Int): Boolean = isValidWalk(walkI)
+  @inline def isWalkable(walkI: Int): Boolean = isValidWalk(walkI) && isWalkableUnsafe(walkI)
   @inline def isWalkable(walkX: Int, walkY: Int): Boolean = isValidWalk(walkX, walkY) && isWalkableUnsafe(walkX, walkY)
   @inline def isWalkable(walk: (Int, Int)): Boolean = isWalkable(walk._1, walk._2)
   @inline def adjacentWalks4(walkI: Int): Array[Int] = Array(walkI - walkWidth, walkI - 1, walkI + 1, walkI + walkWidth)
@@ -57,10 +58,10 @@ final class NeoGeo(game: Game) {
   val groundHeight    : Array[Int]                = Array.fill(tileArea)(0)
   val altitude        : Array[Double]             = Array.fill(walkArea)(walkMaxDim)
   val clearance       : Array[Array[Int]]         = directions.map(x => Array.fill(walkArea)(0))
-  val continentByTile : Array[NeoContinent]       = Array.fill(tileArea)(null)
-  val metroByTile     : Array[NeoMetro]           = Array.fill(tileArea)(null)
-  val regionByTile    : Array[NeoRegion]          = Array.fill(tileArea)(null)
-  val baseByTile      : Array[Option[NeoBase]]    = Array.fill(tileArea)(null)
+  val continentByWalk : Array[NeoContinent]       = Array.fill(walkArea)(null)
+  val metroByWalk     : Array[NeoMetro]           = Array.fill(walkArea)(null)
+  val regionByWalk    : Array[NeoRegion]          = Array.fill(walkArea)(null)
+  val baseByWalk      : Array[Option[NeoBase]]    = Array.fill(walkArea)(null)
   val continents      : ArrayBuffer[NeoContinent] = ArrayBuffer.empty
   val metros          : ArrayBuffer[NeoMetro]     = ArrayBuffer.empty
   val regions         : ArrayBuffer[NeoRegion]    = ArrayBuffer.empty
@@ -99,6 +100,7 @@ final class NeoGeo(game: Game) {
     }
   }
   // Populate altitude
+  /*
   private val walkCoast: Array[(Int, Int)] = (-1 to walkWidth).flatMap(dx => (-1 to walkHeight).map((dx, _))).filterNot(isWalkable).filter(adjacentWalks4(_).exists(isWalkable)).toArray
   private val distances: Array[((Int, Int), Double)] = (0 until walkMaxDim / 2  + 3).flatMap(dx => (dx until walkMaxDim / 2  + 3).map((dx, _))).map(p => (p, NeoMath.lengthBW(p))).toArray
   Sorting.quickSort(distances)(Ordering.by(_._2))
@@ -131,6 +133,7 @@ final class NeoGeo(game: Game) {
       i += 1
     }
   }
+  */
   // Populate clearance
   private def populateClearance(values: Array[Int], sx: Int, sy: Int, dx: Double, dy: Double): Unit = {
     val zMax = walkMaxDim / Math.min(Math.abs(dx), Math.abs(dy))
@@ -177,5 +180,27 @@ final class NeoGeo(game: Game) {
         }
       }
     })
+  }
+  // Populate continents
+  {
+    var i = 0
+    val horizon = new mutable.Queue[Int]
+    while (i < walkArea) {
+      if (walkability(i) && continentByWalk(i) == null) {
+        horizon.enqueue(i)
+        val continent = new NeoContinentRaw
+        continent.color = NeoColors.allContrasted(continents.size % NeoColors.allContrasted.length)
+        continents += continent
+        while (horizon.nonEmpty) {
+          val nextI = horizon.dequeue() // Intentionally reusing name to avoid reaching out of scope
+          if (isWalkable(nextI) && continentByWalk(nextI) == null) {
+            continent.walks += nextI
+            continentByWalk(nextI) = continent
+            horizon ++= adjacentWalks4(nextI)
+          }
+        }
+      }
+      i += 1
+    }
   }
 }

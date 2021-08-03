@@ -18,10 +18,10 @@ object NeoRender {
   }
   def apply(geo: NeoGeo): Unit = {
     renderWalks(geo, "walkable",      i => binary(geo.walkability(i)))
-    renderWalks(geo, "altitude",      i => grayscale(64 * Math.min(1, geo.altitude(i)) + 191 * geo.altitude(i) / 64))
+    renderWalks(geo, "altitude",      i => grayscale((if (geo.walkability(i)) 64 else 0) + (191 * geo.altitude(i) / 64).toInt))
     renderTiles(geo, "buildable",     i => binary(geo.buildability(i)))
     renderTiles(geo, "groundheight",  i => grayscale(255 * geo.groundHeight(i) / 5))
-    geo.directions.indices.foreach(d => renderWalks(geo, f"clearance-$d", i => grayscale(64 * Math.min(1, geo.altitude(i)) + 191 * geo.clearance(d)(i) / 64)))
+    geo.directions.indices.foreach(d => renderWalks(geo, f"clearance-$d", i => grayscale((if (geo.walkability(i)) 64 else 0) + 191 * geo.clearance(d)(i) / 128)))
   }
 
   def renderTiles(geo: NeoGeo, name: String, color: Int => Color): Unit = {

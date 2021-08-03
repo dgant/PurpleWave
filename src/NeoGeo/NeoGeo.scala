@@ -3,6 +3,7 @@ package NeoGeo
 import bwapi.Game
 
 import scala.collection.mutable.ArrayBuffer
+import scala.util.Sorting
 
 /**
   * NeoGeo is a reliable and easy-to-use Java-compatible terrain analyzer for the StarCraft: Brood War API (BWAPI).
@@ -11,17 +12,29 @@ import scala.collection.mutable.ArrayBuffer
   * A JBWAPI Game object
   */
 final class NeoGeo(game: Game) {
-  /*
-  Alternate names:
-  - NeoJeo
-  - HappyMappy
-  - Jeography
-  - Jeo
-  - Jography
-  - Javigator
-  - Comsat
-  - Jomsat
-   */
+  @inline def tileX(i: Int)         : Int = i % tileWidth
+  @inline def tileY(i: Int)         : Int = i / tileWidth
+  @inline def tileI(x: Int, y: Int) : Int = x + y * tileWidth
+  @inline def tileI(xy: (Int, Int)) : Int = tileI(xy._1, xy._2)
+  @inline def walkX(i: Int)         : Int = i % walkWidth
+  @inline def walkY(i: Int)         : Int = i / walkWidth
+  @inline def walkI(x: Int, y: Int) : Int = x + y * walkWidth
+  @inline def walkI(xy: (Int, Int)) : Int = walkI(xy._1, xy._2)
+  @inline def pixelX(i: Int)        : Int = i % pixelWidth
+  @inline def pixelY(i: Int)        : Int = i / pixelWidth
+  @inline def isValidWalk(walkI: Int): Boolean = walkI >= 0 && walkI < walkArea
+  @inline def isValidWalk(walkX: Int, walkY: Int): Boolean = walkX >= 0 && walkY >= 0 && walkX < walkWidth && walkY < walkHeight
+  @inline def isValidWalk(walk: (Int, Int)): Boolean = isValidWalk(walk._1, walk._2)
+  @inline def isWalkableUnsafe(walkI: Int): Boolean = walkability(walkI)
+  @inline def isWalkableUnsafe(walkX: Int, walkY: Int): Boolean = isWalkableUnsafe(walkI(walkX, walkY))
+  @inline def isWalkableUnsafe(walk: (Int, Int)): Boolean = isWalkableUnsafe(walk._1, walk._2)
+  @inline def isWalkable(walkI: Int): Boolean = isValidWalk(walkI)
+  @inline def isWalkable(walkX: Int, walkY: Int): Boolean = isValidWalk(walkX, walkY) && isWalkableUnsafe(walkX, walkY)
+  @inline def isWalkable(walk: (Int, Int)): Boolean = isWalkable(walk._1, walk._2)
+  @inline def adjacentWalks4(walkI: Int): Array[Int] = Array(walkI - walkWidth, walkI - 1, walkI + 1, walkI + walkWidth)
+  @inline def adjacentWalks4(walkX: Int, walkY: Int): Array[(Int, Int)] = Array((walkX, walkY - 1), (walkX - 1, walkY), (walkX + 1, walkY), (walkX, walkY + 1))
+  @inline def adjacentWalks4(walk: (Int, Int)): Array[(Int, Int)] = adjacentWalks4(walk._1, walk._2)
+
   val directions: Array[(Double, Double)] = Array((1, 0), (1, 0.5), (1, 1), (0.5, 1), (0, 1), (-0.5, 1), (-1, 1), (-1, 0.5), (-1, 0), (-1, -0.5), (-1, -1), (-0.5, -1), (0, -1), (0.5, -1), (1, -1), (1, -0.5))
   val mapFileName : String = game.mapFileName()
   val mapNickname : String = MapIdentifier(mapFileName)
@@ -38,19 +51,11 @@ final class NeoGeo(game: Game) {
   val pixelHeight : Int = 32 * tileHeight
   val pixelMaxDim : Int = Math.max(pixelWidth, pixelHeight)
   val pixelArea   : Int = pixelWidth * pixelHeight
-  def tileX(i: Int)         : Int = i % tileWidth
-  def tileY(i: Int)         : Int = i / tileWidth
-  def tileI(x: Int, y: Int) : Int = x + y * tileWidth
-  def walkX(i: Int)         : Int = i % walkWidth
-  def walkY(i: Int)         : Int = i / walkWidth
-  def walkI(x: Int, y: Int) : Int = x + y * walkWidth
-  def pixelX(i: Int)        : Int = i % pixelWidth
-  def pixelY(i: Int)        : Int = i / pixelWidth
   val walkability     : Array[Boolean]            = Array.fill(walkArea)(false)
   val buildability    : Array[Boolean]            = Array.fill(tileArea)(false)
   val unoccupied      : Array[Boolean]            = Array.fill(tileArea)(false)
   val groundHeight    : Array[Int]                = Array.fill(tileArea)(0)
-  val altitude        : Array[Int]                = Array.fill(walkArea)(0)
+  val altitude        : Array[Double]             = Array.fill(walkArea)(walkMaxDim)
   val clearance       : Array[Array[Int]]         = directions.map(x => Array.fill(walkArea)(0))
   val continentByTile : Array[NeoContinent]       = Array.fill(tileArea)(null)
   val metroByTile     : Array[NeoMetro]           = Array.fill(tileArea)(null)
@@ -94,39 +99,36 @@ final class NeoGeo(game: Game) {
     }
   }
   // Populate altitude
-  {
-    var altitudeNext  = 0
-    val horizon       = Array.fill(walkArea)(false)
-    val horizonNext   = Array.fill(walkArea)(false)
-    val explored      = Array.fill(walkArea)(false)
-    def explore(j: Int): Unit = {
-      if (j >= 0 && j < walkArea) {
-        horizonNext(j) = ! explored(j) && ! horizon(j)
+  private val walkCoast: Array[(Int, Int)] = (-1 to walkWidth).flatMap(dx => (-1 to walkHeight).map((dx, _))).filterNot(isWalkable).filter(adjacentWalks4(_).exists(isWalkable)).toArray
+  private val distances: Array[((Int, Int), Double)] = (0 until walkMaxDim / 2  + 3).flatMap(dx => (dx until walkMaxDim / 2  + 3).map((dx, _))).map(p => (p, NeoMath.lengthBW(p))).toArray
+  Sorting.quickSort(distances)(Ordering.by(_._2))
+  @inline private def populateAltitudeAt(walkX: Int, walkY: Int, distance: Double): Unit = {
+    if (isValidWalk(walkX, walkY)) {
+      val i = walkI(walkX, walkY)
+      if (distance < altitude(i)) {
+        altitude(i) = distance
       }
     }
-    var proceed = true
-    while(proceed) {
-      var i = 0
-      proceed = false
-      while (i < walkArea) {
-        if (if (altitudeNext == 0) ! walkability(i) else horizon(i)) {
-          proceed = true
-          explored(i) = true
-          altitude(i) = altitudeNext
-          explore(i - 1)
-          explore(i + 1)
-          explore(i - walkWidth)
-          explore(i + walkWidth)
-        }
-        i += 1
+  }
+  @inline private def populateAltitudeFrom(coastX: Int, coastY: Int, da: Int, db: Int, distance: Double): Unit = {
+    populateAltitudeAt(coastX + da, coastY + db, distance)
+    populateAltitudeAt(coastX - da, coastY + db, distance)
+    populateAltitudeAt(coastX + da, coastY - db, distance)
+    populateAltitudeAt(coastX - da, coastY - db, distance)
+    populateAltitudeAt(coastX + db, coastY + da, distance)
+    populateAltitudeAt(coastX - db, coastY + da, distance)
+    populateAltitudeAt(coastX + db, coastY - da, distance)
+    populateAltitudeAt(coastX - db, coastY - da, distance)
+  }
+  {
+    var i = 0
+    while (i < distances.length) {
+      var j = 0
+      while (j < walkCoast.length) {
+        populateAltitudeFrom(walkCoast(j)._1, walkCoast(j)._2, distances(i)._1._1, distances(i)._1._2, distances(i)._2)
+        j += 1
       }
-      i = 0
-      while (i < walkArea) {
-        horizon(i) = horizonNext(i)
-        horizonNext(i) = false
-        i += 1
-      }
-      altitudeNext += 1
+      i += 1
     }
   }
   // Populate clearance

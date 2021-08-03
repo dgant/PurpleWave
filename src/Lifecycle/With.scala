@@ -159,6 +159,7 @@ object With {
 
     analyzeTerrain()
     geo = new NeoGeo(game)
+
     if (With.configuration.visualizeDebug) {
       NeoRender(geo)
     }

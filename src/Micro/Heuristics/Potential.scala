@@ -130,7 +130,7 @@ object Potential {
     if (other.unitClass.isBuilding) return 0.0
     val maximumDistance   = Math.max(unit.unitClass.dimensionMax, other.unitClass.dimensionMax)
     val blockerDistance   = other.pixelDistanceEdge(unit)
-    val magnitudeDistance = 1.0 - Maff.clampToOne(blockerDistance / (1.0 + maximumDistance))
+    val magnitudeDistance = 1.0 - Maff.clamp(blockerDistance / (1.0 + maximumDistance), 0.0, 1.0)
     val magnitudeSize     = unit.unitClass.dimensionMax * other.unitClass.dimensionMax * tts
     val output            = magnitudeSize * magnitudeDistance
     output

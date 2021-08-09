@@ -5,20 +5,17 @@ import java.awt.Color
 object NeoColors {
   object Hues {
     val Red           = 0
-    val OrangeRed     = 12
     val Orange        = 24
-    val OrangeYellow  = 42
     val Yellow        = 64
-    val YellowGreen   = 80
     val Green         = 96
-    val Sky           = 112
     val Teal          = 128
-    val Sea           = 144
     val Blue          = 160
     val Indigo        = 192
     val Violet        = 224
-    val rainbow = Seq(Green, Teal, Blue, Indigo, Violet, Red, Orange, Yellow)
-    val contrasted = Seq(Red, Yellow, Teal, Indigo, Orange, Green, Blue, Violet, OrangeRed, Sky, OrangeYellow, Sea, YellowGreen)
+
+    val allRainbow = Seq(Red, Orange, Yellow, Green, Teal, Blue, Indigo, Violet)
+    val allContrasted = Seq(Green, Blue, Violet, Red, Yellow, Teal, Indigo, Orange)
+    val eight: Seq[Int] = allRainbow
   }
 
   // Via http://stackoverflow.com/questions/3018313/algorithm-to-convert-rgb-to-hsv-and-hsv-to-rgb-in-range-0-255-for-both
@@ -43,6 +40,6 @@ object NeoColors {
 
   val allContrasted: Array[Color] =
     Seq(255, 192, 128, 96).flatMap(s =>
-      Hues.contrasted.flatMap(h =>
+      Hues.allContrasted.flatMap(h =>
         (255 to 64 by -32).map(hsv(h, s, _)))).toArray
 }

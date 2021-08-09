@@ -4,6 +4,7 @@ import Debugging.Visualizations.Views.Economy.ShowProduction
 import Lifecycle.With
 import Planning.Prioritized
 import Planning.ResourceLocks.LockCurrency
+import Utilities.Forever
 
 import scala.collection.mutable
 
@@ -47,22 +48,17 @@ class Bank {
     // If the request is so far in advance that we don't need to save money for it, then don't.
     //
     val framesToEarnCost = Math.max(framesToEarnMinerals(request.minerals), framesToEarnGas(request.gas))
-    if (request.framesPreordered > framesToEarnCost
-      || (request.framesPreordered > 0 && framesToEarnCost > 24 * 60 * 90)) {
+    if (request.framesPreordered > framesToEarnCost || (request.framesPreordered > 0 && framesToEarnCost > 24 * 60 * 90)) {
       request.isSatisfied = false
-      request.expectedFrames = expectedFrames(request)
-    }
-    else {
+    } else {
       request.isSatisfied = request.isSpent || isAvailableNow(request)
-  
       if ( ! request.isSpent) {
         mineralsLeft -= request.minerals
         gasLeft      -= request.gas
         supplyLeft   -= request.supply
       }
-  
-      request.expectedFrames = expectedFrames(request)
     }
+    request.expectedFrames = expectedFrames(request)
   }
   
   private def isAvailableNow(request: LockCurrency): Boolean = {
@@ -72,12 +68,9 @@ class Bank {
   }
   
   private def framesToEarn(value: Int, rate: Double): Int = {
-    if (value <= 0)
-      0
-    else if (rate <= 0.0)
-      Int.MaxValue
-    else
-      Math.ceil(value / With.accounting.ourIncomePerFrameMinerals).toInt
+    if (value <= 0) 0
+    else if (rate <= 0.0) Forever()
+    else Math.ceil(value / With.accounting.ourIncomePerFrameMinerals).toInt
   }
   
   private def framesToEarnMinerals(minerals: Int): Int = {
@@ -93,7 +86,7 @@ class Bank {
     Math.max(
       request.framesPreordered,
       Math.max(
-        framesToEarnMinerals(-mineralsLeft),
-        framesToEarnGas(-gasLeft)))
+        if (request.minerals == 0) 0 else framesToEarnMinerals(-mineralsLeft),
+        if (request.gas == 0) 0 else framesToEarnGas(-gasLeft)))
   }
 }

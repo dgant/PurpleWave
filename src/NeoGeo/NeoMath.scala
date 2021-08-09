@@ -14,4 +14,16 @@ object NeoMath {
   }
   @inline final def lengthBW(x0: Int, y0: Int): Double = distanceBW(x0, y0, 0, 0)
   @inline final def lengthBW(p: (Int, Int)): Double = distanceBW(p._1, p._2, 0, 0)
+
+  @inline final def clamp(value: Int, bound1: Int, bound2: Int): Int = {
+    val min = Math.min(bound1, bound2)
+    val max = Math.max(bound1, bound2)
+    Math.min(max, Math.max(min, value))
+  }
+
+  @inline final def clamp(value: Double, bound1: Double, bound2: Double): Double = {
+    val min = Math.min(bound1, bound2)
+    val max = Math.max(bound1, bound2)
+    Math.min(max, Math.max(value, min))
+  }
 }

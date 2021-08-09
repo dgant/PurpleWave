@@ -136,8 +136,6 @@ object Maff {
     Math.min(max, Math.max(value, min))
   }
 
-  @inline final def clampToOne(value: Double): Double = clamp(value, 0.0, 1.0)
-
   @inline final def signum(int: Int)        : Int = if (int == 0) 0 else if (int < 0) -1 else 1
   @inline final def signum(double: Double)  : Int = if (double == 0.0) 0 else if (double < 0) -1 else 1
   @inline final def forcedSignum(int: Int)  : Int = if (int < 0) -1 else 1

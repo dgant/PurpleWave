@@ -1,6 +1,6 @@
 package NeoGeo
 
-import NeoGeo.Internal.{NeoColors, NeoContinentRaw}
+import NeoGeo.Internal.{NeoColors, NeoContinentBackend}
 import bwapi.Game
 
 import scala.collection.mutable
@@ -52,20 +52,25 @@ final class NeoGeo(game: Game) {
   val pixelHeight : Int = 32 * tileHeight
   val pixelMaxDim : Int = Math.max(pixelWidth, pixelHeight)
   val pixelArea   : Int = pixelWidth * pixelHeight
-  val walkability     : Array[Boolean]            = Array.fill(walkArea)(false)
-  val buildability    : Array[Boolean]            = Array.fill(tileArea)(false)
-  val unoccupied      : Array[Boolean]            = Array.fill(tileArea)(false)
-  val groundHeight    : Array[Int]                = Array.fill(tileArea)(0)
-  val altitude        : Array[Double]             = Array.fill(walkArea)(walkMaxDim)
-  val clearance       : Array[Array[Int]]         = directions.map(x => Array.fill(walkArea)(0))
-  val continentByWalk : Array[NeoContinent]       = Array.fill(walkArea)(null)
-  val metroByWalk     : Array[NeoMetro]           = Array.fill(walkArea)(null)
-  val regionByWalk    : Array[NeoRegion]          = Array.fill(walkArea)(null)
-  val baseByWalk      : Array[Option[NeoBase]]    = Array.fill(walkArea)(null)
-  val continents      : ArrayBuffer[NeoContinent] = ArrayBuffer.empty
-  val metros          : ArrayBuffer[NeoMetro]     = ArrayBuffer.empty
-  val regions         : ArrayBuffer[NeoRegion]    = ArrayBuffer.empty
-  val bases           : ArrayBuffer[NeoBase]      = ArrayBuffer.empty
+  val walkability       : Array[Boolean]            = Array.fill(walkArea)(false)
+  val buildability      : Array[Boolean]            = Array.fill(tileArea)(false)
+  val unoccupied        : Array[Boolean]            = Array.fill(tileArea)(false)
+  val groundHeight      : Array[Int]                = Array.fill(tileArea)(0)
+  val altitude          : Array[Double]             = Array.fill(walkArea)(walkMaxDim)
+  val clearance         : Array[Array[Int]]         = directions.map(x => Array.fill(walkArea)(0))
+  val clearanceMinDir   : Array[Int]                = Array.fill(walkArea)(0)
+  val clearanceMaxDir   : Array[Int]                = Array.fill(walkArea)(0)
+  val clearanceMinWalks : Array[Int]                = Array.fill(walkArea)(0)
+  val clearanceMaxWalks : Array[Int]                = Array.fill(walkArea)(0)
+  val continentByWalk   : Array[NeoContinent]       = Array.fill(walkArea)(null)
+  val metroByWalk       : Array[NeoMetro]           = Array.fill(walkArea)(null)
+  val regionByWalk      : Array[NeoRegion]          = Array.fill(walkArea)(null)
+  val baseByWalk        : Array[Option[NeoBase]]    = Array.fill(walkArea)(null)
+  val continents        : ArrayBuffer[NeoContinent] = ArrayBuffer.empty
+  val metros            : ArrayBuffer[NeoMetro]     = ArrayBuffer.empty
+  val regions           : ArrayBuffer[NeoRegion]    = ArrayBuffer.empty
+  val bases             : ArrayBuffer[NeoBase]      = ArrayBuffer.empty
+  val chokes            : ArrayBuffer[NeoRegion]    = ArrayBuffer.empty
 
   // Populate walk grids
   {
@@ -181,6 +186,38 @@ final class NeoGeo(game: Game) {
       }
     })
   }
+  // Populate minimum/maximum cross-sectional clearance
+  {
+    val axes = directions.length / 2
+    var i = 0
+    while (i < walkArea) {
+      if (walkability(i)) {
+        var j = 0
+        var minWalks = walkArea
+        var minDir = 0
+        var maxWalks = - 1
+        var maxDir = 0
+        while (j < axes) {
+          val axisWidth = clearance(j)(i) + clearance(j + axes)(i)
+          if (axisWidth < minWalks) {
+            minWalks = axisWidth
+            minDir = j
+          }
+          if (axisWidth > maxWalks) {
+            maxWalks = axisWidth
+            maxDir = j
+          }
+          j += 1
+        }
+        clearanceMinWalks(i) = minWalks
+        clearanceMinDir(i) = minDir
+        clearanceMaxWalks(i) = maxWalks
+        clearanceMaxDir(i) = maxDir
+      }
+      i += 1
+    }
+  }
+
   // Populate continents
   {
     var i = 0
@@ -188,7 +225,7 @@ final class NeoGeo(game: Game) {
     while (i < walkArea) {
       if (walkability(i) && continentByWalk(i) == null) {
         horizon.enqueue(i)
-        val continent = new NeoContinentRaw
+        val continent = new NeoContinentBackend
         continent.color = NeoColors.allContrasted(continents.size % NeoColors.allContrasted.length)
         continents += continent
         while (horizon.nonEmpty) {
@@ -202,5 +239,22 @@ final class NeoGeo(game: Game) {
       }
       i += 1
     }
+  }
+
+  // Populate chokes
+  {
+    val minima = new mutable.Queue[Int]
+    continents.foreach(continent => {
+      minima.clear()
+      var j = 0
+      while (j < continent.walkable.size) {
+        val i = continent.walkable(j)
+        val clearance = clearanceMinWalks(i)
+        if ( ! adjacentWalks4(i).exists(a => isValidWalk(a) && clearanceMinWalks(a) < clearance)) {
+          minima += j
+        }
+      }
+      //val chokeTiles =
+    })
   }
 }

@@ -1,6 +1,6 @@
 package Debugging
 
-import java.lang.management.ManagementFactory
+import java.lang.management.{ManagementFactory, MemoryType}
 import java.text.DecimalFormat
 import java.util.Calendar
 
@@ -20,6 +20,7 @@ import Strategery.Strategies.Strategy
 import Utilities.{GameTime, Minutes}
 import com.sun.management.OperatingSystemMXBean
 
+import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
@@ -190,10 +191,20 @@ class Storyteller {
             Vector("Tiles explored, mean:", (With.paths.aStarTilesExploredTotal / With.paths.aStarPathfinds).toString)))))
   }
 
+  private def fmtMem(value: Long): String = f"${value / 1000000} MB"
   private def logMemoryUsage(): Unit = {
-    tell("JVM Max memory:   " + Runtime.getRuntime.maxMemory()   / 1000000 + " MB")
-    tell("JVM Total memory: " + Runtime.getRuntime.totalMemory() / 1000000 + " MB")
-    tell("JVM Free memory:  " + Runtime.getRuntime.freeMemory()  / 1000000 + " MB")
+    val totalHeap = ManagementFactory.getMemoryPoolMXBeans.asScala.filter(_.getType == MemoryType.HEAP).map(_.getUsage.getUsed).sum
+    tell(f"JVM Max memory:   ${fmtMem(Runtime.getRuntime.maxMemory)}")
+    tell(f"JVM Total memory: ${fmtMem(Runtime.getRuntime.totalMemory)}")
+    tell(f"JVM Free memory:  ${fmtMem(Runtime.getRuntime.freeMemory)}")
+    tell(f"JVM Used memory:  ${fmtMem(Runtime.getRuntime.totalMemory - Runtime.getRuntime.freeMemory)}") // https://stackoverflow.com/a/18375641
+    tell(f"JVM Used, heap:   ${fmtMem(totalHeap)}")
+    ManagementFactory.getMemoryPoolMXBeans.asScala.sortBy(_.getUsage.getUsed).foreach(bean => {
+      val u = bean.getUsage
+      val p = bean.getPeakUsage
+      tell(f"${bean.getType} ${bean.getName}, current: ".padTo(49, ' ') + f"${fmtMem(u.getUsed)} used | ${fmtMem(u.getInit)} init | ${fmtMem(u.getMax)} max | ${fmtMem(u.getCommitted)} committed")
+      tell(f"${bean.getType} ${bean.getName}, peak:    ".padTo(49, ' ') + f"${fmtMem(p.getUsed)} used | ${fmtMem(p.getInit)} init | ${fmtMem(p.getMax)} max | ${fmtMem(p.getCommitted)} committed")
+    })
   }
 
   private def logEnvironment(): Unit = {

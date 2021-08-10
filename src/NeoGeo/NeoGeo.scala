@@ -242,6 +242,7 @@ final class NeoGeo(game: Game) {
   }
 
   // Populate chokes
+  /*
   {
     val minima = new mutable.Queue[Int]
     continents.foreach(continent => {
@@ -256,5 +257,5 @@ final class NeoGeo(game: Game) {
       }
       //val chokeTiles =
     })
-  }
+  }*/
 }

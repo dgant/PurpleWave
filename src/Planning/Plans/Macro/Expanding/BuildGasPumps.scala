@@ -27,7 +27,7 @@ class BuildGasPumps(quantity: Int = Int.MaxValue, pumpType: UnitClass = With.sel
     val eligibleBlueprints  = eligibleGasToTake.map(_.tileTopLeft).flatMap(blueprints.get)
     val finalBlueprints     = eligibleBlueprints.take(quantity)
     val gasToRequest        = Math.min(quantity, eligibleGas.size)
-    finalBlueprints.foreach(With.groundskeeper.suggest)
+    //finalBlueprints.foreach(With.groundskeeper.suggest)
     With.scheduler.request(this, Get(gasToRequest, pumpType))
   }
 }

@@ -169,7 +169,8 @@ object DefaultCombat extends Action {
     //////////////////////
 
     var technique: Technique =
-      if ((unit.agent.shouldEngage || unit.battle.isEmpty) && (unit.agent.withinSafetyMargin || unit.matchups.targets.nonEmpty || unit.matchups.threatsInFrames(48).forall(MatchWorker)))
+      if ( ! unit.canMove) Fight
+      else if ((unit.agent.shouldEngage || unit.battle.isEmpty) && (unit.agent.withinSafetyMargin || unit.matchups.targets.nonEmpty || unit.matchups.threatsInFrames(48).forall(MatchWorker)))
         Fight else Flee
 
     def transition(newTechnique: Technique, predicate: () => Boolean = () => true, action: () => Unit = () => {}): Unit = {
@@ -275,6 +276,7 @@ object DefaultCombat extends Action {
 
   val pickupCutoff = 64
   def move(unit: FriendlyUnitInfo): Unit = {
+    if ( ! unit.canMove) return
     if (Protoss.Reaver(unit) && unit.agent.ride.isDefined && ! unit.agent.commit && ! unit.loaded) {
       val destination = unit.agent.destination
       if (unit.agent.toAttack.forall(unit.pixelsToGetInRange(_) > pickupCutoff)) {

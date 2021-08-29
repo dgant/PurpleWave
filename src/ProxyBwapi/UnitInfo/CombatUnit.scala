@@ -260,10 +260,23 @@ trait CombatUnit {
       if (next.guaranteed) {
         damageRequired -= next.damageTotal
         frame = next.onFrame
-        if (damageRequired <= 0) {
-          return frame
-        }
+        if (damageRequired <= 0) return frame
       }
+      i += 1
+    }
+    Forever()
+  }
+  def likelyDoomed: Boolean = likelyDoomFrameAbsolute < Forever()
+  def likelyDoomedInFrames: Int = likelyDoomFrameAbsolute - With.frame
+  def likelyDoomFrameAbsolute: Int = {
+    var damageRequired = totalHealth
+    var i = 0
+    var frame = 0
+    while (damageRequired > 0 && i < damageQueue.size) {
+      val next: DamageSource = damageQueue(i)
+      damageRequired -= next.damageTotal
+      frame = next.onFrame
+      if (damageRequired <= 0) return frame
       i += 1
     }
     Forever()

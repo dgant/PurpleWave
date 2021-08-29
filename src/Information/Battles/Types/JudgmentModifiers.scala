@@ -160,9 +160,12 @@ object JudgmentModifiers {
       u.isAny(Terran.SiegeTankSieged, Protoss.Reaver, Zerg.Lurker)
       && ! u.friendly.exists(_.agent.ride.isDefined)
       && u.matchups.pixelsOfEntanglement > -32)
+    /* Disabled due to this causing index out of bounds on engagedUpon()
     if (With.self.isProtoss && battleLocal.us.engagedUpon && fragileSlugs) {
       Some(JudgmentModifier(targetDelta = -0.25))
     } else None
+    */
+    None
   }
 
   // Avoid fighting

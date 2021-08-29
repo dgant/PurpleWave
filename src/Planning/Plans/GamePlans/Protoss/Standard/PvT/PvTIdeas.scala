@@ -5,7 +5,6 @@ import Macro.BuildRequests.Get
 import Planning.Plans.Army.Attack
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.GamePlans.Protoss.Situational.BuildHuggingNexus
 import Planning.Plans.Macro.Automatic.{PumpWorkers, _}
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -99,7 +98,6 @@ object PvTIdeas {
         Get(Protoss.Gateway),
         Get(12, Protoss.Probe)),
       new PumpWorkers,
-      new BuildHuggingNexus,
       new Build(Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore), Get(2, Protoss.Pylon), Get(2, Protoss.Gateway), Get(Protoss.DragoonRange))))
 
   class ReactToBunkerRush extends If(

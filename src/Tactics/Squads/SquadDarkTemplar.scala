@@ -14,6 +14,7 @@ class SquadDarkTemplar extends Squad {
   lock.counter = CountEverything
 
   override def launch(): Unit = {
+    if ( ! With.blackboard.darkTemplarHarass()) return
     if (bases().isEmpty) return
     lock.acquire()
   }

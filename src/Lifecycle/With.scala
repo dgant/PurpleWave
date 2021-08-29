@@ -18,8 +18,7 @@ import Mathematics.Points.Tile
 import Micro.Agency.Agency
 import Micro.Coordination.Coordinator
 import Micro.Matchups.MatchupGraph
-import NeoGeo.{MapIdentifier, NeoGeo, NeoRender}
-import Tactics.Squads.Squads
+import NeoGeo.{MapIdentifier, NeoGeo}
 import Performance.TaskQueue.{TaskQueueGlobal, TaskQueueParallel}
 import Placement.Preplacement
 import Planning.{Blackboard, Yolo}
@@ -29,6 +28,7 @@ import ProxyBwapi.ProxyBWAPI
 import ProxyBwapi.UnitTracking.UnitTracker
 import Strategery.History.History
 import Strategery.Strategist
+import Tactics.Squads.Squads
 import Tactics.Tactics
 import _root_.Performance.{Latency, PerformanceMonitor, ReactionTimes}
 import bwapi.Flag
@@ -157,11 +157,11 @@ object With {
     // Normal systems //
     ////////////////////
 
-    geo = new NeoGeo(game)
+    //geo = new NeoGeo(game)
     analyzeTerrain()
 
     if (With.configuration.visualizeDebug) {
-      NeoRender(geo)
+      //NeoRender(geo)
     }
 
     // Order-dependent initialization:

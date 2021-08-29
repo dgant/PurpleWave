@@ -126,6 +126,7 @@ object FormationGeneric {
         .view
         .filter(_.valid)
         .filterNot(explored.get)
+        .filter(floodMaxDistanceTarget >= _.tileDistanceGroundManhattan(floodGoal))
         .map(tile => (tile, cost(tile)))
       floodHorizon ++= neighbors
       neighbors.foreach(neighbor => explored.set(neighbor._1, true))

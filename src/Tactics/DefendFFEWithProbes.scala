@@ -38,6 +38,7 @@ class DefendFFEWithProbes extends Tactic {
   
   def launch() {
     if (With.frame > Minutes(6)()) return
+    if (With.enemies.size > 1) return
     haveMinedEnoughForTwoCannons ||= With.units.countOurs(Protoss.PhotonCannon) + (With.self.minerals + 24) / 150 >= 2
     if (With.units.countOurs(Protoss.PhotonCannon) == 0) return
     if (With.units.countOurs(MatchAnd(Protoss.PhotonCannon, MatchComplete)) > 3) return

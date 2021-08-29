@@ -1,7 +1,6 @@
 package Planning
 
 import Lifecycle.With
-import Planning.Plans.Basic.NoPlan
 import ProxyBwapi.UnitClasses.UnitClass
 
 class Blackboard {
@@ -34,6 +33,7 @@ class Blackboard {
   var allowIslandBases      : Property[Boolean]           = add(new Property(false))
   var makeDarkArchons       : Property[Boolean]           = add(new Property(false))
   var pushKiters            : Property[Boolean]           = add(new Property(false))
+  var darkTemplarHarass     : Property[Boolean]           = add(new Property(true))
   var preferCloseExpansion  : Property[Boolean]           = add(new Property(false))
   var floatableBuildings    : Property[Vector[UnitClass]] = add(new Property(Vector.empty))
 }

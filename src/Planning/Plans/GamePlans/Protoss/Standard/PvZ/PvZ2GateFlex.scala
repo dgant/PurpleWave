@@ -94,7 +94,7 @@ class PvZ2GateFlex extends GameplanImperative{
 
   def restOfGame(): Unit = {
     val safeFromMutalisks = ! enemyMutalisksLikely || unitsComplete(Protoss.Corsair) >= 5
-    val safeFromGround = upgradeComplete(Protoss.ZealotSpeed) && upgradeComplete(Protoss.GroundDamage)
+    val safeFromGround = (upgradeComplete(Protoss.ZealotSpeed) && upgradeComplete(Protoss.GroundDamage)) || enemyMutalisksLikely
     if (safeFromGround && safeFromMutalisks && safeToMoveOut) {
       attack()
       harass()
@@ -139,7 +139,7 @@ class PvZ2GateFlex extends GameplanImperative{
   def doTrainCorsairs(): Unit = {
     buildOrder(Get(Protoss.Corsair))
     if (enemyMutalisksLikely) {
-      pumpRatio(Protoss.Corsair, 6, 10, Seq(Enemy(Zerg.Mutalisk, 1.0)))
+      pumpRatio(Protoss.Corsair, 7, 12, Seq(Enemy(Zerg.Mutalisk, 1.0), Enemy(Zerg.Scourge, 0.5)))
       get(2, Protoss.Stargate)
       get(Protoss.AirDamage)
       if (upgradeComplete(Protoss.AirDamage)) {

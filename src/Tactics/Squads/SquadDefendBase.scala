@@ -67,7 +67,7 @@ class SquadDefendBase(base: Base) extends Squad {
     lazy val scourables         = enemies.filter(isScourable)
     lazy val canWithdraw        = withdrawing >= Math.max(2, 0.25 * units.size) && formationWithdraw.placements.size > units.size * .75
     lazy val canScour           = scourables.nonEmpty && (wander || breached)
-    lazy val canGuard           = guardChoke.isDefined && (units.size > 3 || ! With.enemies.exists(_.isZerg))
+    lazy val canGuard           = guardChoke.isDefined && (units.size > 5 || ! With.enemies.exists(_.isZerg))
     lazy val formationWithdraw  = FormationGeneric.disengage(this, Some(vicinity))
     lazy val formationScour     = FormationGeneric.engage(this, targets.get.headOption.map(_.pixel))
     lazy val formationBastion   = FormationGeneric.march(this, bastion())

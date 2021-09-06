@@ -12,14 +12,14 @@ object TargetFilterFutility extends TargetFilter {
     if ( ! actor.canMove ) return false
 
     val targetReachable = (
-      target.visible
-      || actor.flying
+      actor.flying
       || ! target.flying
       || target.pixel.walkable
       || With.reaction.sluggishness > 0 // The next check is moderately expensive
       || Vector(actor.pixelToFireAt(target).tile, target.tile).exists(t => t.walkable && t.altitude >= target.tile.altitude))
     if ( ! targetReachable) return false
 
+    if (target.gathering || (target.unitClass.isWorker && target.base.exists(_.harvestingArea.contains(target.pixel)))) return true
     if (actor.topSpeed >= target.topSpeed) return true
     if (actor.pixelRangeAgainst(target) > 96) return true
     if (With.blackboard.pushKiters.get && target.canAttack(actor) && target.pixelRangeAgainst(actor) > 32) return true

@@ -94,7 +94,7 @@ class SquadAcePilots extends Squad {
     }
 
     // Just snipe anything we can
-    val nearestFlier = Maff.minBy(With.units.enemy.filter(u => u.flying && ! u.unitClass.isBuilding))(_.pixelDistanceSquared(centroidAir))
+    val nearestFlier = Maff.minBy(With.units.enemy.filter(u => u.likelyStillThere && u.flying && ! u.unitClass.isBuilding))(_.pixelDistanceSquared(centroidAir))
     if (nearestFlier.isDefined) {
       activity = "AceHunt"
       vicinity = nearestFlier.get.pixel
@@ -130,7 +130,7 @@ class SquadAcePilots extends Squad {
   }
 
   private def followSquad(otherSquad: Squad): Unit = {
-    vicinity = otherSquad.centroidAll
+    vicinity = otherSquad.centroidAir
     targets = otherSquad.targets
       .map(_.filter(_.flying))
       .orElse(Some(SquadAutomation.rankForArmy(this,

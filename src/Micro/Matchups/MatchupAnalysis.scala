@@ -40,7 +40,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   def targetsInRange          : Seq[UnitInfo] = targets.filter(target => target.visible && me.pixelRangeAgainst(target) >= target.pixelDistanceEdge(me) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
   lazy val arbiterCovering            : Cache[Boolean]    = new Cache(() => allies.exists(a => Protoss.Arbiter(a) && a.pixelDistanceEdge(me) < 160))
   lazy val allyTemplarCount           : Cache[Int]        = new Cache(() => allies.count(Protoss.HighTemplar))
-  lazy val dpfReceiving               : Cache[Double]     = new Cache(() => threatsInRange.view.map(_.matchups.dpfDealingDiffused(me)).sum)
+  lazy val dpfReceiving               : Cache[Double]     = new Cache(() => threatsInRange.view.map(t => t.dpfOnNextHitAgainst(me) / t.matchups.targetsInRange.size).sum)
   lazy val framesToLive               : Double  = _framesToLive()
   lazy val framesOfSafety             : Double  = - With.latency.latencyFrames - With.reaction.agencyAverage - Maff.nanToZero(pixelsOfEntanglement / me.topSpeed)
   lazy val pixelsOfEntanglement       : Double  = _pixelsOfEntanglement()
@@ -57,9 +57,5 @@ case class MatchupAnalysis(me: UnitInfo) {
 
   def repairers: Seq[UnitInfo] = {
     allies.view.filter(a => a.unitClass == Terran.SCV && a.friendly.map(_.agent.toRepair.contains(me)).getOrElse(a.orderTarget.contains(me)))
-  }
-
-  private def dpfDealingDiffused(target: UnitInfo): Double = {
-    me.dpfOnNextHitAgainst(target) / Math.max(1.0, targetsInRange.size)
   }
 }

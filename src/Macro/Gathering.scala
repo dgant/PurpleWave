@@ -7,7 +7,7 @@ import Mathematics.Maff
 import Micro.Agency.Intention
 import Performance.Tasks.TimedTask
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.Forever
+import Utilities.Time.Forever
 
 import scala.collection.mutable
 

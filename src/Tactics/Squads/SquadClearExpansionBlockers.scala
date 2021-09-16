@@ -7,7 +7,7 @@ import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers.{MatchMobileDetector, MatchOr}
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import Utilities.{Minutes, Seconds}
+import Utilities.Time.{Minutes, Seconds}
 
 import scala.util.Random
 

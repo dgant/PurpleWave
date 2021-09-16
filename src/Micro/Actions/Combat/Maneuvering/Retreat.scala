@@ -11,7 +11,7 @@ import Micro.Coordination.Pushing.TrafficPriorities
 import Planning.UnitMatchers.MatchTank
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.Minutes
+import Utilities.Time.Minutes
 
 object Retreat extends Action {
   

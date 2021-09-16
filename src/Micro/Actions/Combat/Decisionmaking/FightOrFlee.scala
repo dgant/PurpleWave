@@ -7,7 +7,7 @@ import Micro.Actions.Action
 import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.Minutes
+import Utilities.Time.Minutes
 
 object FightOrFlee extends Action {
 

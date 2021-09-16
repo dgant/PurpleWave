@@ -5,7 +5,7 @@ import Micro.Targeting.TargetFilter
 import Planning.UnitMatchers.MatchProxied
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 object TargetFilterRush extends TargetFilter {
   simulationSafe = true

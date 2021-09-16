@@ -10,7 +10,7 @@ import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 class PylonBlock extends Plan {
 

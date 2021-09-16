@@ -4,35 +4,19 @@ import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.UnitMatchers.MatchTank
 import ProxyBwapi.Races.Terran
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 class FingerprintBio extends Fingerprint {
   override protected def investigate: Boolean = {
-    if (With.units.countEnemy(Terran.Barracks) > 2) {
-      return true
-    }
-    if (With.units.countEnemy(Terran.Barracks) > 1 && ! With.fingerprints.bbs.matches) {
-      return true
-    }
+    if (With.units.countEnemy(Terran.Barracks) > 2) return true
+    if (With.units.countEnemy(Terran.Barracks) > 1 && ! With.fingerprints.bbs.matches) return true
     if (With.unitsShown.allEnemies(Terran.Vulture) < 4) {
-      if (With.enemies.exists(_.hasUpgrade(Terran.MarineRange))) {
-        return true
-      }
-      if (With.enemies.exists(_.hasTech(Terran.Stim))) {
-        return true
-      }
-      if (With.unitsShown.allEnemies(Terran.Medic) > 0) {
-        return true
-      }
-      if (With.unitsShown.allEnemies(Terran.Firebat) > 0) {
-        return true
-      }
-      if (With.unitsShown.allEnemies(Terran.Marine) > 15) {
-        return true
-      }
-      if (With.units.existsEnemy(u => u.is(Terran.Academy) && u.upgrading)) {
-        return true
-      }
+      if (With.enemies.exists(_.hasUpgrade(Terran.MarineRange))) return true
+      if (With.enemies.exists(_.hasTech(Terran.Stim))) return true
+      if (With.unitsShown.allEnemies(Terran.Medic) > 0) return true
+      if (With.unitsShown.allEnemies(Terran.Firebat) > 0) return true
+      if (With.unitsShown.allEnemies(Terran.Marine) > 15) return true
+      if (With.units.existsEnemy(u => u.is(Terran.Academy) && u.upgrading)) return true
     }
 
     val enemyMech = (
@@ -54,6 +38,5 @@ class FingerprintBio extends Fingerprint {
     )
     enemyBio > Math.max(8, enemyMech)
   }
-
   override protected def sticky: Boolean = With.frame > GameTime(10, 0)()
 }

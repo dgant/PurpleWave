@@ -12,7 +12,7 @@ import Planning.UnitPreferences.UnitPreference
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.Seconds
+import Utilities.Time.Seconds
 
 class TrainUnit(val traineeClass: UnitClass) extends Production {
 

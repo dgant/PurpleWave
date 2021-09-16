@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.Minutes
+import Utilities.Time.Minutes
 import bwapi.BulletType
 
 import scala.collection.JavaConverters._

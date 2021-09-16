@@ -2,7 +2,7 @@ package Performance
 
 import Lifecycle.{JBWAPIClient, With}
 import Performance.Tasks.TimedTask
-import Utilities.Forever
+import Utilities.Time.Forever
 
 import scala.collection.mutable.ArrayBuffer
 

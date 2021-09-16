@@ -3,7 +3,7 @@ package Information.Fingerprinting.TerranStrategies
 import Information.Fingerprinting.Generic._
 import Lifecycle.With
 import ProxyBwapi.Races.Terran
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 class Fingerprint3Fac extends FingerprintOr(
   With.fingerprints.threeFacVultures,

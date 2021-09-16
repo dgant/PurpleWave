@@ -8,7 +8,7 @@ import Planning.UnitMatchers.{MatchBuilding, MatchWorker}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.{Forever, Minutes}
+import Utilities.Time.{Forever, Minutes}
 
 import scala.collection.mutable
 

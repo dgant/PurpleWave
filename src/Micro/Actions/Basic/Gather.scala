@@ -12,7 +12,7 @@ import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Strategery.Benzene
-import Utilities.Seconds
+import Utilities.Time.Seconds
 
 object Gather extends Action {
   

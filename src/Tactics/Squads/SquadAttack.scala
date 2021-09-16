@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Planning.UnitMatchers.{MatchProxied, MatchWarriors}
 import ProxyBwapi.Races.Terran
-import Utilities.Minutes
+import Utilities.Time.Minutes
 
 class SquadAttack extends Squad {
   override def toString: String = f"Atk ${vicinity.base.map(_.name).getOrElse(vicinity.zone.name).take(4)}"

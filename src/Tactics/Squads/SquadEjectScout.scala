@@ -8,7 +8,7 @@ import Planning.Plans.Scouting.ScoutCleared
 import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers.{MatchAnd, MatchScoutCatcher}
 import Planning.UnitPreferences.PreferClose
-import Utilities.Minutes
+import Utilities.Time.Minutes
 
 class SquadEjectScout extends Squad {
   override def toString: String = "Eject"

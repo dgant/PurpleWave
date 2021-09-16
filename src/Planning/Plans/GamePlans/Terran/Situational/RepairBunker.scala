@@ -8,7 +8,7 @@ import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountUpTo
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import Utilities.Seconds
+import Utilities.Time.Seconds
 
 class RepairBunker extends Plan {
   val lock = new LockUnits(this)

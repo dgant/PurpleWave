@@ -5,7 +5,7 @@ import Planning.Predicates.Strategy.EnemyRecentStrategy
 import Planning.UnitMatchers.{MatchAnd, MatchComplete, UnitMatcher}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvZ9PoolSpeed
-import Utilities.Minutes
+import Utilities.Time.Minutes
 
 object GlobalSafeToMoveOut {
   def apply(): Boolean = {

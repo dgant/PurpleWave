@@ -1,10 +1,7 @@
 package Information.Fingerprinting.ZergStrategies
 
 import Information.Fingerprinting.Generic._
-import ProxyBwapi.Races.Zerg
-import Utilities.GameTime
+import Information.Fingerprinting.Strategies.ZergTimings
+import Utilities.Time.Seconds
 
-class Fingerprint9PoolGas extends FingerprintOr(
-  new FingerprintCompleteBy(Zerg.Extractor, GameTime(1, 50)),
-  new FingerprintUpgradeBy(Zerg.ZerglingSpeed, GameTime(3, 30)),
-  new FingerprintExistsBy(Zerg.Lair, GameTime(3, 30)))
+class Fingerprint9PoolGas extends FingerprintGasCompleteBy(ZergTimings.Overpool8Gas_GasCompleteBy - Seconds(5))

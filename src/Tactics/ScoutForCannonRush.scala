@@ -8,7 +8,7 @@ import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchNotHoldingResources, MatchWorker}
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 class ScoutForCannonRush extends Tactic {
   val scouts = new LockUnits(this)

@@ -22,7 +22,7 @@ import Planning.UnitMatchers._
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvT2HatchLurker
-import Utilities.Seconds
+import Utilities.Time.Seconds
 
 class ZvT2HatchLurker extends GameplanTemplate {
 

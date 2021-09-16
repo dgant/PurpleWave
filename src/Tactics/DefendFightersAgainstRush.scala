@@ -9,7 +9,7 @@ import Planning.UnitMatchers.{MatchWarriors, MatchWorker}
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.Seconds
+import Utilities.Time.Seconds
 
 class DefendFightersAgainstRush extends Tactic {
   

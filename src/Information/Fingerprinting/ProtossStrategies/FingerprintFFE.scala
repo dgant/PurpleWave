@@ -6,7 +6,7 @@ import Mathematics.Maff
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.GameTime
+import Utilities.Time.GameTime
 import bwapi.Race
 
 abstract class FingerprintFFE extends FingerprintAnd(

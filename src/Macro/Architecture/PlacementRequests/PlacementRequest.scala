@@ -5,7 +5,7 @@ import Macro.Architecture.Blueprint
 import Mathematics.Points.Tile
 import Planning.Prioritized
 import ProxyBwapi.UnitClasses.UnitClass
-import Utilities.Forever
+import Utilities.Time.Forever
 
 class PlacementRequest(
   val blueprint: Blueprint,

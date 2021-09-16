@@ -20,7 +20,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss._
-import Utilities.{GameTime, Seconds}
+import Utilities.Time.{GameTime, Seconds}
 
 object OldPvPIdeas {
 

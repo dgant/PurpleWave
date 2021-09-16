@@ -5,7 +5,7 @@ import Information.Fingerprinting.Generic._
 import Lifecycle.With
 import Planning.UnitMatchers.{MatchAnd, MatchProxied}
 import ProxyBwapi.Races.Protoss
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 class FingerprintProxyGateway extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.nexusFirst),
@@ -20,14 +20,12 @@ class FingerprintProxyGateway extends FingerprintAnd(
         && With.frame < GameTime(4, 0)()
         && With.units.countEnemy(Protoss.Gateway) == 0
         && With.units.countEnemy(Protoss.Forge) == 0
-        && With.geography.enemyBases.exists(_.owner.isProtoss)
-        && With.geography.enemyBases.filter(_.isStartLocation).forall(base => {
-          val scoutableTiles = base.zone.tiles.view.filter(With.grids.buildableTerrain.get)
-          val tilesSeen = scoutableTiles.count(_.explored)
-          tilesSeen >= scoutableTiles.size * 0.9
-        }))
+        && With.scouting.enemyMainFullyScouted)
+      override protected val reason: String = "Main empty"
     })) {
 
+
+
   // Stick only once we have some affirmative proof, so we don't permanently overreact against Nexus-first (which has an empty main)
-  override def sticky = With.units.countEnemy(Protoss.Zealot) > 0 || With.units.countEnemy(Protoss.Gateway) > 0
+  override def sticky: Boolean = With.units.countEnemy(Protoss.Zealot) > 0 || With.units.countEnemy(Protoss.Gateway) > 0
 }

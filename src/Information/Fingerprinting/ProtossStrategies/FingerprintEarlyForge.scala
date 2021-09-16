@@ -2,7 +2,7 @@ package Information.Fingerprinting.ProtossStrategies
 
 import Information.Fingerprinting.Generic._
 import ProxyBwapi.Races.Protoss
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 class FingerprintEarlyForge extends FingerprintOr(
   new FingerprintCompleteBy(Protoss.Forge,        GameTime(4, 0)),

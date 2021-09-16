@@ -13,7 +13,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural, ProposePlacement}
-import Planning.Plans.Scouting.{ScoutCleared, ScoutOn, ScoutNow}
+import Planning.Plans.Scouting.{ScoutCleared, ScoutNow, ScoutOn}
 import Planning.Predicates.Compound._
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost}
 import Planning.Predicates.Milestones.{EnemyHasShownWraithCloak, _}
@@ -22,7 +22,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyIsRandom, EnemyRecentStrate
 import Planning.UnitMatchers.{MatchOr, MatchTank, MatchWorker}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 class PvTBasic extends GameplanTemplate {
 

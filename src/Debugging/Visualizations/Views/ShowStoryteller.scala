@@ -2,7 +2,7 @@ package Debugging.Visualizations.Views
 
 import Debugging.Visualizations.Rendering.DrawScreen
 import Lifecycle.With
-import Utilities.Seconds
+import Utilities.Time.Seconds
 
 object ShowStoryteller extends View {
   val duration = Seconds(10)()

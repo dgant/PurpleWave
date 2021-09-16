@@ -1,6 +1,7 @@
 package ProxyBwapi.UnitInfo
 
 import Lifecycle.With
+import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitTracking.Imagination
 import bwapi.UnitType
 
@@ -25,7 +26,13 @@ final class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends BWAPICachedU
     output.toInt
   }
   def remainingCompletionFrames: Int = {
-    if (complete) return 0
+    if (complete) {
+      return 0
+    }
+    if (morphing && isAny(Zerg.Lair, Zerg.Hive, Zerg.SunkenColony, Zerg.SporeColony, Zerg.GreaterSpire, Zerg.LurkerEgg, Zerg.Cocoon)) {
+      val buildFrames = if (Zerg.LurkerEgg(this)) Zerg.Lurker.buildFrames else if (Zerg.Cocoon(this)) Zerg.Guardian.buildFrames else unitClass.buildFrames
+      return Math.max(1, buildFrames + lastClassChange - With.frame)
+    }
     // Use both the initial projection and the up-to-date projection
     // We can't always trust the most up-to-date projection in case the unit has taken damage
     val remainingNow      = remainingFrames(hitPoints, shieldPoints, lastSeen)

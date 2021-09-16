@@ -19,7 +19,7 @@ import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers.{MatchTransport, MatchWorker}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactics.Squads.SquadAutomation
-import Utilities.{Minutes, Seconds}
+import Utilities.Time.{Minutes, Seconds}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer

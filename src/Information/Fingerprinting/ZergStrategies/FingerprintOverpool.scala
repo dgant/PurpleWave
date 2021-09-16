@@ -3,7 +3,7 @@ package Information.Fingerprinting.ZergStrategies
 import Information.Fingerprinting.Generic._
 import Lifecycle.With
 import ProxyBwapi.Races.Zerg
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 class FingerprintOverpool extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.fourPool),

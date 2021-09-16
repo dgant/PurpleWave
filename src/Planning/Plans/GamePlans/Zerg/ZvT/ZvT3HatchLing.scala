@@ -19,7 +19,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtL
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvT3HatchLing
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 class ZvT3HatchLing extends GameplanTemplate {
 

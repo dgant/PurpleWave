@@ -7,7 +7,8 @@ import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.{CountMap, Seconds}
+import Utilities.CountMap
+import Utilities.Time.Seconds
 import mjson.Json
 
 import scala.collection.mutable

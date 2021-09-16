@@ -1,11 +1,12 @@
 package Information.Fingerprinting.ZergStrategies
 
-import Information.Fingerprinting.Generic.{FingerprintCompleteBy, FingerprintOr}
-import ProxyBwapi.Races.Zerg
-import Utilities.GameTime
+import Information.Fingerprinting.Generic._
+import Information.Fingerprinting.Strategies.ZergTimings
+import Lifecycle.With
+import Utilities.Time.Seconds
 
 class Fingerprint1HatchGas extends FingerprintOr(
-  new FingerprintCompleteBy(Zerg.Extractor, GameTime(2, 20))) { // 10 Hatch 9 Pool 9 Gas finishes gas 2:29
-
-  override val sticky = true
-}
+  new FingerprintGasCompleteBy(ZergTimings.TwoHatchGasCompleteBy - Seconds(5)),
+  With.fingerprints.ninePoolGas,
+  With.fingerprints.overpoolGas,
+  With.fingerprints.twelvePoolGas)

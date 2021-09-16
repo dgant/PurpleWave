@@ -1,7 +1,7 @@
 package Information.Battles.Prediction.Simulation
 
 import Mathematics.Maff
-import Utilities.Forever
+import Utilities.Time.Forever
 
 object BehaviorGather extends SimulacrumBehavior {
   val fighting: Boolean = false

@@ -6,7 +6,8 @@ import Planning.Plans.GamePlans.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Friendly}
 import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Utilities.{DoQueue, GameTime, Minutes}
+import Utilities.Time.{GameTime, Minutes}
+import Utilities.DoQueue
 
 class PvZ2GateFlex extends GameplanImperative{
 

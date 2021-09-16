@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Tile
-import Utilities.Forever
+import Utilities.Time.Forever
 
 object PlacementHeuristicPowering extends PlacementHeuristic {
   

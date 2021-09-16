@@ -8,7 +8,7 @@ import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactics.Squads.SquadRazeProxies
-import Utilities.{Forever, Minutes}
+import Utilities.Time.{Forever, Minutes}
 
 import scala.collection.mutable
 

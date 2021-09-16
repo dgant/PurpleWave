@@ -37,7 +37,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
   private var _morphing               : Boolean = _
   private var _constructing           : Boolean = _
   private var _repairing              : Boolean = _
-  private var _teching            : Boolean = _
+  private var _teching                : Boolean = _
   private var _training               : Boolean = _
   private var _upgrading              : Boolean = _
   private var _beingConstructed       : Boolean = _
@@ -54,6 +54,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
   private var _hasNuke                : Boolean = _
   private var _loaded                 : Boolean = _
   private var _lastSeen               : Int = _
+  private var _lastTypeChange         : Int = _
   private var _resourcesInitial       : Int = _
   private var _resourcesLeft          : Int = _
   private var _hitPoints              : Int = _
@@ -126,6 +127,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
   @inline final def hasNuke                 : Boolean           = _hasNuke
   @inline final def loaded                  : Boolean           = _loaded
   @inline final def lastSeen                : Int               = _lastSeen
+  @inline final def lastClassChange          : Int               = _lastTypeChange
   @inline final def initialResources        : Int               = _resourcesInitial
   @inline final def resourcesLeft           : Int               = _resourcesLeft
   @inline final def hitPoints               : Int               = _hitPoints
@@ -160,9 +162,9 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
   @inline final def transport               : Option[FriendlyUnitInfo] = _transport
   def readProxy(): Unit = {
     if (With.frame == 0 || bwapiUnit.isVisible(With.self.bwapiPlayer)) {
+      changeUnitType(UnitClasses.get(bwapiUnit.getType))
       changeVisibility(Visibility.Visible)
       _player                 = Players.get(bwapiUnit.getPlayer)
-      _unitClass              = UnitClasses.get(bwapiUnit.getType)
       _pixelObserved          = new Pixel(bwapiUnit.getPosition)
       changePixel(_pixelObserved)
       _tileTopLeft            = new Tile(bwapiUnit.getTilePosition) // Set this via changePixel()
@@ -250,8 +252,13 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
     }
     _pixel = pixelNew
     _tile  = pixelNew.tile
-    // TODO: Track previous values
-    // TODO: On position change, update grids
+  }
+
+  @inline final def changeUnitType(unitClassNew: UnitClass): Unit = {
+    if (unitClassNew != _unitClass) {
+      _lastTypeChange = With.frame
+      _unitClass = unitClassNew
+    }
   }
 
   final def changeVisibility(value: Visibility.Value): Unit = {

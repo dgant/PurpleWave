@@ -7,7 +7,7 @@ import Planning.UnitCounters.CountExactly
 import Planning.UnitMatchers.{MatchAnd, MatchAntiGround, MatchWarriors}
 import Planning.UnitPreferences.PreferClose
 import Tactics.Squads.SquadAutomation
-import Utilities.Minutes
+import Utilities.Time.Minutes
 
 class MissionKillExpansion extends Mission {
 

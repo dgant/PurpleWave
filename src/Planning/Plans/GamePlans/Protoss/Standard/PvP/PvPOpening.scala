@@ -9,7 +9,7 @@ import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss._
 import Strategery._
-import Utilities.{GameTime, Minutes}
+import Utilities.Time.{Frames, GameTime, Minutes}
 
 class PvPOpening extends GameplanImperative {
 
@@ -304,7 +304,7 @@ class PvPOpening extends GameplanImperative {
     if (shuttleFirst) status("ShuttleFirst")
     if (getObservers) status("Obs")
     if (getObservatory) status("Observatory")
-    if (employing(PvPDT)) status(f"Cannon@${new GameTime(timeToStartCannons)}")
+    if (employing(PvPDT)) status(f"Cannon@${Frames(timeToStartCannons)}")
     if (getCannons) status("Cannons")
     if (speedlotAttack) status("Speedlot")
     if (shouldAttack) status("Attack")

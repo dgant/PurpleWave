@@ -3,7 +3,7 @@ package Strategery.Strategies.Zerg
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.Plan
-import Planning.Plans.GamePlans.Zerg.ZvE.{ZvE4Pool, ZvE9Pool2HatchSpeed, ZvESparkle}
+import Planning.Plans.GamePlans.Zerg.ZvE.{ZvE4Pool, ZvE9Pool2HatchSpeed}
 import Strategery.{Benzene, StarCraftMap}
 import Strategery.Strategies.Strategy
 import bwapi.Race
@@ -30,10 +30,4 @@ object ZvE9Pool2HatchSpeed extends ZergStrategy {
     With.fingerprints.twoGate,
     With.fingerprints.tenHatch,
   )
-}
-
-object ZvESparkle extends ZergStrategy {
-  override def gameplan: Option[Plan] = Some(new ZvESparkle)
-  override def islandMaps: Boolean = true
-  override def groundMaps: Boolean = false
 }

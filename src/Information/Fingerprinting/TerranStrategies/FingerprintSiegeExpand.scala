@@ -4,7 +4,7 @@ import Information.Fingerprinting.Fingerprint
 import Information.Fingerprinting.Generic.{FingerprintAnd, FingerprintNot}
 import Lifecycle.With
 import ProxyBwapi.Races.Terran
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 class FingerprintSiegeExpand extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.oneRaxFE),
@@ -17,11 +17,12 @@ class FingerprintSiegeExpand extends FingerprintAnd(
           + With.unitsShown(e, Terran.SiegeTankSieged)) > 0
         val expand = (
           With.unitsShown(e, Terran.CommandCenter) > 1
-          || With.units.enemy.exists(u => u.player == e && u.is(Terran.CommandCenter) && ! With.geography.startLocations.contains(u.tileTopLeft))
+          || With.units.enemy.exists(u => u.player == e && Terran.CommandCenter(u) && ! With.geography.startLocations.contains(u.tileTopLeft))
           || e.bases.size > 1)
         siege && expand
       })
     }
-    override val sticky: Boolean = true
     override protected def lockAfter: Int = GameTime(7, 0)()
+    override val sticky: Boolean = true
+    override protected def reason: String = "Enemy has siege and has expanded"
   })

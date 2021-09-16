@@ -6,7 +6,7 @@ import Mathematics.Points.{Pixel, SpecificPoints, Tile, TileRectangle}
 import Performance.Tasks.TimedTask
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.Seconds
+import Utilities.Time.Seconds
 import bwapi.MouseButton
 
 class Camera extends TimedTask {

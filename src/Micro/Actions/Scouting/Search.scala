@@ -11,11 +11,11 @@ import Micro.Coordination.Pathing.MicroPathing
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Search extends AbstractSearch {
-  override protected val boredomFrames = 24 * 30
+  override protected val boredomFrames: Int = 24 * 30
 }
 
 object SearchWhenBored extends AbstractSearch {
-  override protected val boredomFrames = 24 * 3
+  override protected val boredomFrames: Int = 24 * 3
 }
 
 abstract class AbstractSearch extends Action {
@@ -64,13 +64,13 @@ abstract class AbstractSearch extends Action {
     val tileToScout = tilesToScout.minBy(_.center.pixelDistance(target))
 
     val profile = new PathfindProfile(unit.tile)
-    profile.end                 = Some(tileToScout)
-    profile.employGroundDist     = true
-    profile.costOccupancy       = 0.01
-    profile.costRepulsion       = 5
-    profile.repulsors           = MicroPathing.getPathfindingRepulsors(unit)
-    profile.lengthMaximum       = Some(20)
-    profile.unit                = Some(unit)
+    profile.end               = Some(tileToScout)
+    profile.employGroundDist  = true
+    profile.costOccupancy     = 0.01
+    profile.costRepulsion     = 5
+    profile.repulsors         = MicroPathing.getPathfindingRepulsors(unit)
+    profile.lengthMaximum     = Some(20)
+    profile.unit              = Some(unit)
     val path = profile.find
     unit.agent.toTravel = Some(tileToScout.center)
     MicroPathing.tryMovingAlongTilePath(unit, path)

@@ -9,7 +9,7 @@ import Planning.Plans.Basic.NoPlan
 import Planning.Prioritized
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.Forever
+import Utilities.Time.Forever
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer

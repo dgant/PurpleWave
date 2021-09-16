@@ -7,7 +7,7 @@ import Macro.Architecture.PlacementRequests.PlacementRequest
 import Mathematics.Points.{Tile, TileRectangle}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
-import Utilities.{Forever, Seconds}
+import Utilities.Time.{Forever, Seconds}
 
 class Architecture {
   val unbuildable       : GridExclusion = new GridExclusion

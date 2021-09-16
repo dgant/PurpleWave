@@ -5,7 +5,7 @@ import Planning.Predicates.MacroCounting
 import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss._
-import Utilities.Minutes
+import Utilities.Time.Minutes
 
 object PvPIdeas extends MacroCounting {
   def enemyLowUnitStrategy: Boolean = enemyBases > 1 || enemyStrategy(

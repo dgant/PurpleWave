@@ -18,7 +18,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers.MatchOr
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Zerg.ZvE4Pool
-import Utilities.Seconds
+import Utilities.Time.Seconds
 
 class ZvE4Pool extends GameplanTemplate {
   

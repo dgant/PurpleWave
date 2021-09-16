@@ -1,13 +1,17 @@
 package Information.Fingerprinting.ZergStrategies
 
-import Information.Fingerprinting.Generic.{FingerprintAnd, FingerprintCompleteBy}
+import Information.Fingerprinting.Generic.{FingerprintAnd, FingerprintCompleteBy, FingerprintNot}
+import Information.Fingerprinting.Strategies.ZergTimings
 import Lifecycle.With
+import Planning.UnitMatchers.MatchHatchlike
 import ProxyBwapi.Races.Zerg
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 class Fingerprint10Hatch9Pool extends FingerprintAnd(
-  new FingerprintCompleteBy(Zerg.Hatchery, GameTime(2, 40), 2),
-  new FingerprintCompleteBy(Zerg.SpawningPool, GameTime(2, 50)) // This timing is about equal to overhatch and early for 10h9p
-) {
-  override def sticky: Boolean = With.geography.enemyBases.exists(b => b.isNaturalOf.isDefined && b.townHall.isDefined)
-}
+  new FingerprintCompleteBy(MatchHatchlike, ZergTimings.TwelveHatch_HatchCompleteBy, 2),
+  new FingerprintCompleteBy(Zerg.SpawningPool, GameTime(2, 40)),
+  new FingerprintNot(
+    With.fingerprints.twelvePool,
+    With.fingerprints.overpool,
+    With.fingerprints.ninePool),
+)

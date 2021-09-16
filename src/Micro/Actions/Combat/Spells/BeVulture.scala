@@ -10,7 +10,7 @@ import Micro.Targeting.TargetFilter
 import Planning.UnitMatchers.{MatchTank, MatchWorker}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.Seconds
+import Utilities.Time.Seconds
 
 import scala.collection.mutable
 

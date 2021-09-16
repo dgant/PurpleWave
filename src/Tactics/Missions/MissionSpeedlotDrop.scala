@@ -8,7 +8,7 @@ import Planning.UnitMatchers.MatchAnd
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
 import Tactics.Squads.SquadAutomation
-import Utilities.Seconds
+import Utilities.Time.Seconds
 
 class MissionSpeedlotDrop extends MissionDrop {
   override protected def additionalFormationConditions: Boolean = (

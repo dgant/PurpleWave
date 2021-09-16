@@ -2,7 +2,7 @@ package Planning.Predicates.Compound
 
 import Planning.Predicates.Never
 import Planning.{Predicate, Property}
-import Utilities.Forever
+import Utilities.Time.Forever
 
 case class Sticky(initialPredicate: Predicate = new Never, duration: Int = Forever()) extends Predicate {
   

@@ -5,7 +5,7 @@ import Performance.Cache
 import Performance.Tasks.TimedTask
 import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.Protoss
-import Utilities.Minutes
+import Utilities.Time.Minutes
 
 class Yolo extends TimedTask {
 

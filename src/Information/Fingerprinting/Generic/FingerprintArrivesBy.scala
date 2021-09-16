@@ -3,18 +3,18 @@ package Information.Fingerprinting.Generic
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.UnitMatchers.UnitMatcher
-import Utilities.GameTime
+import Utilities.Time.FrameCount
 
 class FingerprintArrivesBy(
-                            unitMatcher : UnitMatcher,
-                            gameTime    : GameTime,
-                            quantity    : Int = 1)
+  unitMatcher : UnitMatcher,
+  gameTime    : FrameCount,
+  quantity    : Int = 1)
     extends Fingerprint {
   
   override val sticky = true
   
   override def investigate: Boolean = {
-    val targetFrame = gameTime.frames
+    val targetFrame = gameTime()
 
     // Important performance short-circuit
     if (With.frame > targetFrame) return false

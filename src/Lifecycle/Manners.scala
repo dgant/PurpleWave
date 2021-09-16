@@ -2,7 +2,7 @@ package Lifecycle
 
 import Performance.Tasks.TimedTask
 import Planning.UnitMatchers.MatchWorker
-import Utilities.Seconds
+import Utilities.Time.Seconds
 
 class Manners extends TimedTask {
   

@@ -4,7 +4,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
 import Planning.UnitMatchers.MatchWorker
-import Utilities.Minutes
+import Utilities.Time.Minutes
 
 object BaseUpdater {
   

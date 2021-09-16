@@ -8,7 +8,7 @@ import Mathematics.Shapes.Spiral
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
 import Tactics.Squads.FriendlyUnitGroup
-import Utilities.Minutes
+import Utilities.Time.Minutes
 
 import scala.collection.mutable
 

@@ -13,7 +13,7 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import ProxyBwapi.UnitTracking.UnorderedBuffer
 import Strategery.Strategies.Zerg.{ZvE4Pool, ZvT1HatchHydra}
-import Utilities.Seconds
+import Utilities.Time.Seconds
 
 class SquadWorkerScout extends Squad {
 

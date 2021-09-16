@@ -7,7 +7,7 @@ import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers._
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import Utilities.{GameTime, Seconds}
+import Utilities.Time.{GameTime, Seconds}
 
 class SquadScoutExpansions extends Squad {
 

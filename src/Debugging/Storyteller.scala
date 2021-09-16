@@ -17,7 +17,7 @@ import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 import Strategery.Strategies.Strategy
-import Utilities.{GameTime, Minutes}
+import Utilities.Time.{Frames, GameTime, Minutes}
 import com.sun.management.OperatingSystemMXBean
 
 import scala.collection.JavaConverters._
@@ -125,12 +125,12 @@ class Storyteller {
             tell(unit + " is already complete")
           } else {
             val remainingFrames = unit.completionFrame - With.frame
-            tell(unit + " projects to complete in " + remainingFrames + " frames at " + new GameTime(unit.completionFrame) + "")
+            tell(unit + " projects to complete in " + remainingFrames + " frames at " + new Frames(unit.completionFrame) + "")
           }
         } else {
           val arrivalFrame = unit.arrivalFrame()
           val arrivalFramesAhead = arrivalFrame - With.frame
-          tell(unit + " projects to arrive in " + arrivalFramesAhead + " frames at " + new GameTime(arrivalFrame))
+          tell(unit + " projects to arrive in " + arrivalFramesAhead + " frames at " + new Frames(arrivalFrame))
         }
       })
     })

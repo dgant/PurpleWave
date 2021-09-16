@@ -3,7 +3,7 @@ package Information.Fingerprinting.ProtossStrategies
 import Information.Fingerprinting.Generic._
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 class Fingerprint2Gate extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.oneGateCore),

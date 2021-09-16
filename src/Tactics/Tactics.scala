@@ -10,7 +10,7 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Tactics.Missions._
 import Tactics.Squads._
-import Utilities.Minutes
+import Utilities.Time.Minutes
 
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}

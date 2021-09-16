@@ -5,7 +5,6 @@ import Strategery.Strategies.Strategy
 object ZergChoices {
 
   val zvr = Vector(
-    ZvESparkle,
     ZvE4Pool,
     ZvR9Pool,
     ZvE9Pool2HatchSpeed

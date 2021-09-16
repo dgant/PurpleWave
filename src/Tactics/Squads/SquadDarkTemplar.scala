@@ -7,7 +7,7 @@ import Performance.Cache
 import Planning.UnitCounters.CountEverything
 import Planning.UnitMatchers.MatchMobileDetector
 import ProxyBwapi.Races.Protoss
-import Utilities.Seconds
+import Utilities.Time.Seconds
 
 class SquadDarkTemplar extends Squad {
   lock.matcher = Protoss.DarkTemplar

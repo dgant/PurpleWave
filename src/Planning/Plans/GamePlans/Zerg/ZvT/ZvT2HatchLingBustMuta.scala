@@ -15,7 +15,7 @@ import Planning.Predicates.Strategy.Employing
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvT2HatchLingBustMuta
-import Utilities.Seconds
+import Utilities.Time.Seconds
 
 class ZvT2HatchLingBustMuta extends GameplanTemplate {
 

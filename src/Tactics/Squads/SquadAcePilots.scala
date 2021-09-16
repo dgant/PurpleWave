@@ -9,7 +9,7 @@ import Planning.UnitCounters.CountEverything
 import Planning.UnitMatchers.{MatchFlyingWarriors, MatchOr}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Tactics.Missions.MissionDrop
-import Utilities.Seconds
+import Utilities.Time.Seconds
 
 class SquadAcePilots extends Squad {
   val acePilots = Seq(Terran.Wraith, Terran.Valkyrie, Protoss.Corsair, Zerg.Mutalisk, Zerg.Scourge)

@@ -3,7 +3,7 @@ package Information.Fingerprinting.TerranStrategies
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 class FingerprintNGateways(thresholdGateways: Int) extends Fingerprint {
   override protected def investigate: Boolean = {

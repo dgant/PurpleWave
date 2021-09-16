@@ -7,7 +7,7 @@ import Mathematics.Maff
 import Mathematics.Points.SpecificPoints
 import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.Terran
-import Utilities.Minutes
+import Utilities.Time.Minutes
 
 object ZoneUpdater {
   

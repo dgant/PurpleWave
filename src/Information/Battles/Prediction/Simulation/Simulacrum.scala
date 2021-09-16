@@ -7,7 +7,7 @@ import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{CombatUnit, UnitInfo}
 import ProxyBwapi.UnitTracking.{UnorderedBuffer, Visibility}
-import Utilities.Forever
+import Utilities.Time.Forever
 
 import scala.collection.mutable.ArrayBuffer
 

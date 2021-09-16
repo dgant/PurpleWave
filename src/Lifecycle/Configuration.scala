@@ -1,7 +1,7 @@
 package Lifecycle
 
 import Strategery.{DefaultPlaybook, Playbook}
-import Utilities.Seconds
+import Utilities.Time.Seconds
 
 class Configuration {
 

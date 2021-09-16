@@ -10,7 +10,7 @@ import Planning.Predicates.Milestones.{FrameAtMost, UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Placement.BuildSunkensInMain
 import Planning.Predicates.Strategy.EnemyStrategy
 import ProxyBwapi.Races.Zerg
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 object ZvZIdeas {
 

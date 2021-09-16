@@ -3,7 +3,7 @@ package Information.Fingerprinting.ZergStrategies
 import Information.Fingerprinting.Generic._
 import Lifecycle.With
 import Planning.UnitMatchers.MatchNonStartingTownHall
-import Utilities.GameTime
+import Utilities.Time.GameTime
 import bwapi.Race
 
 class Fingerprint12Hatch extends FingerprintAnd(

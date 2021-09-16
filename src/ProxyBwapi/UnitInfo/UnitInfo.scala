@@ -21,7 +21,7 @@ import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitTracking.Visibility
 import ProxyBwapi.Upgrades.Upgrade
-import Utilities._
+import Utilities.Time.{Forever, Frames, Seconds}
 import bwapi._
 
 abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProxy with CombatUnit {
@@ -30,7 +30,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   def foreign   : Option[ForeignUnitInfo]   = None
 
   @inline final override val hashCode: Int = id + With.frame * 10000
-  @inline final override def toString: String = f"${if (isFriendly) "Our" else if (isEnemy) "Foe" else "Neutral"} $unitClass ${if (selected) "*" else ""} #$id $hitPoints/${unitClass.maxHitPoints} ${if (shieldPoints > 0) f"($shieldPoints/${unitClass.maxShields})" else ""} $pixel"
+  @inline final override def toString: String = f"${if (isFriendly) "Our" else if (isEnemy) "Foe" else "Neutral"} $unitClass${if (selected) "*" else ""} ${if (complete) "" else Frames(With.frame + remainingCompletionFrames)} #$id $hitPoints/${unitClass.maxHitPoints} ${if (shieldPoints > 0) f"($shieldPoints/${unitClass.maxShields})" else ""} $pixel"
 
   @inline final def is(unitMatcher: UnitMatcher): Boolean = unitMatcher.apply(this)
   @inline final def isPrerequisite(unitMatcher: UnitMatcher): Boolean = (

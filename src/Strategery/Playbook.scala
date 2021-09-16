@@ -3,7 +3,7 @@ package Strategery
 import Debugging.SimpleString
 import Lifecycle.With
 import Strategery.Selection._
-import Strategery.Strategies.AllRaces.{Sandbox, WorkerRushes}
+import Strategery.Strategies.AllRaces.Sandbox
 import Strategery.Strategies.Protoss._
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TvR.TvR1Rax
@@ -17,7 +17,7 @@ class Playbook extends SimpleString {
 }
 
 object StrategyGroups {
-  val disabled: Vector[Strategy] = WorkerRushes.all ++ Vector[Strategy](
+  val disabled: Vector[Strategy] = Vector[Strategy](
     Sandbox,
 
     TvR1Rax, // Why is this disabled? Is it broken?

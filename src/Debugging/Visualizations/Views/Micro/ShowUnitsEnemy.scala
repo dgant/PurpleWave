@@ -7,7 +7,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
-import Utilities.GameTime
+import Utilities.Time.Frames
 
 object ShowUnitsEnemy extends View {
   
@@ -52,7 +52,7 @@ object ShowUnitsEnemy extends View {
     }
     if (showCountdown) {
       if ( ! unit.complete && unit.remainingCompletionFrames > 0) {
-        val time = new GameTime(unit.remainingCompletionFrames)
+        val time = new Frames(unit.remainingCompletionFrames)
         val pctHp = unit.hitPoints.toDouble / unit.unitClass.maxHitPoints
         DrawMap.labelBox(Array(time.toString, "%02f".format(pctHp) + "%"), Pixel(unit.x, unit.bottom), drawBackground = true, unit.teamColor)
       }

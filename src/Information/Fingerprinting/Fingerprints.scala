@@ -1,5 +1,6 @@
 package Information.Fingerprinting
 
+import Information.Fingerprinting.Generic.FingerprintGasSteal
 import Information.Fingerprinting.ProtossStrategies._
 import Information.Fingerprinting.TerranStrategies._
 import Information.Fingerprinting.ZergStrategies._
@@ -108,12 +109,25 @@ class Fingerprints {
   lazy val mannerPylon    = addFingerprint(new FingerprintMannerPylon)
   
   // Zerg
-  lazy val fourPool       = addFingerprint(new Fingerprint4Pool)
-  lazy val ninePool       = addFingerprint(new Fingerprint9Pool)
-  lazy val ninePoolGas    = addFingerprint(new Fingerprint9PoolGas)
-  lazy val overpool       = addFingerprint(new FingerprintOverpool)
-  lazy val tenHatch       = addFingerprint(new Fingerprint10Hatch9Pool)
-  lazy val twelvePool     = addFingerprint(new Fingerprint12Pool)
-  lazy val twelveHatch    = addFingerprint(new Fingerprint12Hatch)
-  lazy val oneHatchGas    = addFingerprint(new Fingerprint1HatchGas)
+  lazy val fourPool                     = addFingerprint(new Fingerprint4Pool)
+  lazy val ninePool                     = addFingerprint(new Fingerprint9Pool)
+  lazy val ninePoolGas                  = addFingerprint(new Fingerprint9PoolGas)
+  lazy val ninePoolHatch                = addFingerprint(new Fingerprint9PoolHatch)
+  lazy val overpool                     = addFingerprint(new FingerprintOverpool)
+  lazy val overpoolGas                  = addFingerprint(new FingerprintOverpoolGas)
+  lazy val overpoolHatch                = addFingerprint(new FingerprintOverpoolHatch)
+  lazy val twelvePool                   = addFingerprint(new Fingerprint12Pool)
+  lazy val twelvePoolGas                = addFingerprint(new Fingerprint12Pool11Gas)
+  lazy val tenHatch                     = addFingerprint(new Fingerprint10Hatch)
+  lazy val tenHatchPool                 = addFingerprint(new Fingerprint10Hatch9Pool)
+  lazy val tenHatchPoolGas              = addFingerprint(new Fingerprint10Hatch9Pool8Gas)
+  lazy val twelveHatch                  = addFingerprint(new Fingerprint12Hatch)
+  lazy val twelveHatchPool              = addFingerprint(new Fingerprint12Hatch11Pool)
+  lazy val twelveHatchPoolHatch         = addFingerprint(new Fingerprint12Hatch11Pool13Hatch)
+  lazy val twelveHatchPoolGas           = addFingerprint(new Fingerprint12Hatch11Pool10Gas)
+  lazy val twelveHatchHatch             = addFingerprint(new Fingerprint12HatchHatch)
+  lazy val oneHatchGas                  = addFingerprint(new Fingerprint1HatchGas)
+  lazy val twoHatchGas                  = addFingerprint(new Fingerprint2HatchGas)
+  lazy val threeHatchGas                = addFingerprint(new Fingerprint3HatchGas)
+  lazy val twoHatchMain                 = addFingerprint(new Fingerprint2HatchMain)
 }

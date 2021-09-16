@@ -14,7 +14,7 @@ import scala.collection.mutable
 trait EnemyTechs {
   lazy val techsOwned: Map[PlayerInfo, mutable.HashSet[Tech]] = With.enemies.map(e => (e, new mutable.HashSet[Tech])).toMap
 
-  protected def updateTechs(): Unit = {
+  protected def updateEnemyTechs(): Unit = {
     val ours = With.units.ours
 
     // TODO: This logic is bogus in FFA (and needlessly slow)

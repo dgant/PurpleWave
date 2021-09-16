@@ -18,7 +18,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
-import Utilities.{GameTime, Minutes}
+import Utilities.Time.{GameTime, Minutes}
 
 object PvTIdeas {
 

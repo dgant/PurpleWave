@@ -20,7 +20,7 @@ import Planning.UnitCounters.{CountExcept, CountUpTo}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran.TvZ8Rax
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 class TvZ8Rax extends GameplanTemplate {
 

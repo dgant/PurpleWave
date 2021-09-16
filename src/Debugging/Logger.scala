@@ -3,7 +3,7 @@ package Debugging
 import java.io.{File, PrintWriter}
 
 import Lifecycle.With
-import Utilities.{Forever, GameTime, Seconds}
+import Utilities.Time.{Forever, Frames, Seconds}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -81,7 +81,7 @@ class Logger {
   }
   
   private def log(message: String, chat: Boolean = true, logstd: Boolean = true, target: mutable.Buffer[String] = logMessages) {
-    val logMessage = f"${With.frame} | ${new GameTime(With.frame)} | $message"
+    val logMessage = f"${With.frame} | ${Frames(With.frame)} | $message"
     target.append(logMessage)
     if (With.configuration.logstd && logstd) {
       System.err.println(logMessage)

@@ -4,7 +4,7 @@ import Lifecycle.With
 import Micro.Targeting.TargetFilter
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.Minutes
+import Utilities.Time.Minutes
 
 object TargetFilterVulture extends TargetFilter {
   simulationSafe = true

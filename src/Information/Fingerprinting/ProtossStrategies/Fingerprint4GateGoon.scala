@@ -3,7 +3,7 @@ package Information.Fingerprinting.ProtossStrategies
 import Information.Fingerprinting.Generic._
 import Information.Fingerprinting.TerranStrategies.FingerprintNGateways
 import ProxyBwapi.Races.Protoss
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 class Fingerprint4GateGoon extends FingerprintOr(
   new FingerprintNGateways(4),

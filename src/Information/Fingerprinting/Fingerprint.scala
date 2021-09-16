@@ -2,7 +2,7 @@ package Information.Fingerprinting
 
 import Debugging.ToString
 import Lifecycle.With
-import Utilities.{Forever, Minutes}
+import Utilities.Time.{Forever, Minutes}
 
 abstract class Fingerprint {
   private var _lastUpdateFrame: Int = -Forever()
@@ -22,9 +22,15 @@ abstract class Fingerprint {
     children.foreach(_.update())
     if (sticky && matched) return
     if (With.frame < lockAfter) {
+      val matchedBefore = matched
       matched = investigate
+      if (matched != matchedBefore) {
+        With.logger.debug(explanation)
+      }
     }
   }
-  
+
+  protected def reason: String = "(No reason)"
+  def explanation: String = f"$this ${if (matched) "matched" else "unmatched"}: $reason"
   override val toString: String = ToString(this).replace("Fingerprint", "Finger")
 }

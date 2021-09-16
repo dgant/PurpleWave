@@ -7,6 +7,7 @@ import Mathematics.Shapes.Circle
 import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, Orders}
+import Utilities.Time.{Forever, Minutes, Seconds}
 import Utilities._
 
 object Imagination {

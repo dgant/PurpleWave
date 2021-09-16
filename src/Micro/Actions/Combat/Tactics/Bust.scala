@@ -8,7 +8,7 @@ import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.{Minutes, Seconds}
+import Utilities.Time.{Minutes, Seconds}
 import bwapi.Race
 
 import scala.util.Random

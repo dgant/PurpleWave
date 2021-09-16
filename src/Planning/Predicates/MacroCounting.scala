@@ -10,7 +10,7 @@ import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
 import Strategery.StarCraftMap
 import Strategery.Strategies.Strategy
-import Utilities.AbstractGameTime
+import Utilities.Time.FrameCount
 import bwapi.Race
 
 /**
@@ -27,8 +27,8 @@ trait MacroCounting {
   def saturated: Boolean = units(MatchWorker) >= Math.min(60, With.geography.ourBases.view.map(b => b.minerals.size* 2 + b.gas.size * 3).sum)
 
   def bases: Int = With.geography.ourBases.size
-  def after(gameTime: AbstractGameTime): Boolean = frame > gameTime()
-  def before(gameTime: AbstractGameTime): Boolean = frame < gameTime()
+  def after(gameTime: FrameCount): Boolean = frame > gameTime()
+  def before(gameTime: FrameCount): Boolean = frame < gameTime()
 
   def isMiningBase(base: Base) = base.minerals.size >= 5 && base.mineralsLeft > With.configuration.minimumMineralsBeforeMinedOut
   def miningBases: Int = With.geography.ourBases.view.filter(_.townHall.isDefined).count(isMiningBase)

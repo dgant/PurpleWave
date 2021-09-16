@@ -6,7 +6,7 @@ import Micro.Agency.Commander
 import Planning.UnitMatchers.MatchBuilding
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.{Minutes, Seconds}
+import Utilities.Time.{Minutes, Seconds}
 
 object Cancel extends Action {
   

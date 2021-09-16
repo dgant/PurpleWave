@@ -12,7 +12,7 @@ import Planning.Predicates.Economy.MineralsAtMost
 import Planning.Predicates.Milestones.{FrameAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.EnemyStrategy
 import ProxyBwapi.Races.Terran
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 object TvZIdeas {
 

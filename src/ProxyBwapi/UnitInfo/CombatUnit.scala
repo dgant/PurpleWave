@@ -9,7 +9,8 @@ import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitTracking.Visibility
-import Utilities.{Forever, LightYear}
+import Utilities.LightYear
+import Utilities.Time.Forever
 
 import scala.collection.mutable
 

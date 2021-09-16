@@ -10,7 +10,7 @@ import Planning.Predicates.Compound.{And, Check, Or}
 import Planning.Predicates.Milestones.{EnemiesAtMost, EnemyHasShown, FrameAtMost, UpgradeComplete}
 import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 object ZergIdeas {
   

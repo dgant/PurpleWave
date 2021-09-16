@@ -20,7 +20,7 @@ import Planning.UnitMatchers.{MatchMobile, MatchWorker}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Terran.TvE.TvE2RaxSCVMarine
-import Utilities.Seconds
+import Utilities.Time.Seconds
 
 class TvE2RaxSCVMarine extends GameplanTemplate {
 

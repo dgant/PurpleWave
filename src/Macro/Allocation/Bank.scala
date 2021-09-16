@@ -4,7 +4,7 @@ import Debugging.Visualizations.Views.Economy.ShowProduction
 import Lifecycle.With
 import Planning.Prioritized
 import Planning.ResourceLocks.LockCurrency
-import Utilities.Forever
+import Utilities.Time.Forever
 
 import scala.collection.mutable
 

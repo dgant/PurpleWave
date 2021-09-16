@@ -3,14 +3,12 @@ package Information.Fingerprinting.ProtossStrategies
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.UnitMatchers.{MatchAnd, MatchWarriors, MatchWorker}
-import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.GameTime
+import ProxyBwapi.UnitInfo.{ForeignUnitInfo, UnitInfo}
+import Utilities.Time.GameTime
 
 class FingerprintWorkerRush extends Fingerprint {
-  
-  override val sticky = true
 
-  protected object MatchAttackingWorker$ extends MatchAnd(
+  protected object MatchAttackingWorker extends MatchAnd(
       MatchWorker,
       (unit: UnitInfo) => {
         val distanceOurBase = unit.pixelDistanceTravelling(With.geography.ourMain.heart.center)
@@ -20,10 +18,17 @@ class FingerprintWorkerRush extends Fingerprint {
       }
     )
 
-  override protected def investigate: Boolean = (
-     (
-      (With.frame < GameTime(4, 0)() && With.units.countEnemy(MatchAttackingWorker$) > 2) ||
-      (With.frame < GameTime(6, 0)() && With.units.countEnemy(MatchAttackingWorker$) > 4)
-     ) && ! With.units.existsEnemy(MatchWarriors)
-  )
+  override protected def investigate: Boolean = {
+    val attackingWorkerCount = attackingWorkers.size
+    if (With.units.existsEnemy(MatchWarriors)) return false
+    if (With.frame < GameTime(4, 0)() && attackingWorkerCount > 2) return true
+    if (With.frame < GameTime(6, 0)() && attackingWorkerCount > 4) return true
+    false
+  }
+
+  override val sticky = true
+
+  override def reason: String = f"[${attackingWorkers.mkString(", ")}]"
+
+  protected def attackingWorkers: Iterable[ForeignUnitInfo] = With.units.enemy.filter(MatchAttackingWorker)
 }

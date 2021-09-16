@@ -8,7 +8,7 @@ import Planning.UnitCounters.{CountOne, CountUpTo}
 import Planning.UnitMatchers._
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
-import Utilities.{Minutes, Seconds}
+import Utilities.Time.{Minutes, Seconds}
 
 class MissionReaverDrop extends MissionDrop {
 

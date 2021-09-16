@@ -5,7 +5,7 @@ import Micro.Actions.Action
 import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.Seconds
+import Utilities.Time.Seconds
 
 object EmergencyRepair extends Action {
   

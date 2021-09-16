@@ -3,7 +3,7 @@ package Information.Fingerprinting.TerranStrategies
 import Information.Fingerprinting.Generic.{FingerprintAnd, FingerprintCompleteBy, FingerprintNot}
 import Lifecycle.With
 import ProxyBwapi.Races.Terran
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 class Fingerprint14CC extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.oneRaxFE),

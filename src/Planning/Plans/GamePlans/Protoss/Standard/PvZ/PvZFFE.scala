@@ -16,7 +16,7 @@ import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvZFFE, PvZGatewayFE}
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 class PvZFFE extends GameplanTemplate {
 

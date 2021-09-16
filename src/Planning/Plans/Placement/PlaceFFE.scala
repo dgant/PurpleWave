@@ -7,7 +7,7 @@ import Performance.Cache
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
-import Utilities.Forever
+import Utilities.Time.Forever
 
 import scala.collection.mutable
 

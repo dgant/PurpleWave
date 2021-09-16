@@ -8,14 +8,13 @@ import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Planning.Predicates.Strategy.EnemyRecentStrategy
-import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.CountUpTo
 import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchWorker}
 import Planning.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.Minutes
+import Utilities.Time.Minutes
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -49,7 +48,7 @@ class DefendFFEWithProbes extends Tactic {
     if (With.fingerprints.twelvePool.matches) return
     if (With.fingerprints.overpool.matches) return
     if (With.fingerprints.ninePool.matches) return
-    if ( ! new EnemyRecentStrategy(With.fingerprints.fourPool).apply) return
+    if ( ! EnemyRecentStrategy(With.fingerprints.fourPool).apply) return
     if ( ! With.fingerprints.fourPool.matches && ! With.scouting.enemyHasScoutedUsWithWorker) return
 
     var cannons = With.units.ours.filter(Protoss.PhotonCannon)

@@ -4,7 +4,7 @@ import Information.Fingerprinting.Generic._
 import Information.Fingerprinting.TerranStrategies.FingerprintNGateways
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
-import Utilities.GameTime
+import Utilities.Time.GameTime
 
 class Fingerprint2GateGoon extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.twoGate),

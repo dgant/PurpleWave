@@ -22,7 +22,6 @@ class FingerprintCompleteBy(
     }
     if (With.frame > endFrame) return false
 
-
     observed >= quantity
   }
 

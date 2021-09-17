@@ -8,7 +8,6 @@ import bwapi.Race
 
 class Fingerprint12Hatch extends FingerprintAnd(
   new FingerprintRace(Race.Zerg),
-  new FingerprintProvenBases(2),
   new FingerprintNot(With.fingerprints.fourPool),
   new FingerprintNot(With.fingerprints.ninePool),
   new FingerprintNot(With.fingerprints.overpool),

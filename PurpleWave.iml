@@ -6,6 +6,8 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/3rdparty/jbwapi/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/3rdparty/mjson/src/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/3rdparty/jbweb/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/3rdparty/javajps/src/main/java" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/bwapi-data" />
       <excludeFolder url="file://$MODULE_DIR$/lib" />
     </content>

@@ -4,3 +4,9 @@
 [submodule "3rdparty/mjson"]
 	path = 3rdparty/mjson
 	url = https://github.com/bolerio/mjson
+[submodule "3rdparty/jbweb"]
+	path = 3rdparty/jbweb
+	url = https://github.com/MrTate/JBWEB
+[submodule "3rdparty/javajps"]
+	path = 3rdparty/javajps
+	url = https://github.com/MrTate/JavaJPS

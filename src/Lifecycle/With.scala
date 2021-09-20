@@ -217,15 +217,15 @@ object With {
   }
   
   private def analyzeTerrain() {
-    With.logger.debug(f"Loading fake BWTA for ${With.game.mapName} at ${With.game.mapFileName()}")
+    With.logger.debug(f"Loading fake BWTA for ${game.mapName} at ${game.mapFileName()}")
     try {
-      BWTA.readMap(With.game)
+      BWTA.readMap(game)
       BWTA.analyze()
     } catch { case exception: Exception =>
       With.logger.quietlyOnException(exception)
       With.logger.debug("Retrying terrain analysis with assertions disabled.")
       // With the error logged, try again
-      BWTA.readMap(With.game)
+      BWTA.readMap(game)
       BWTA.setFailOnError(false)
       BWTA.analyze()
     }

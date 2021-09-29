@@ -44,7 +44,7 @@ object PvTIdeas {
             new SafeToMoveOut,
             new And(
               new FrameAtMost(GameTime(4, 0)()),
-              new Employing(PvT32Nexus, PvT1015Expand, PvT1015DT, PvTStove))),
+              new Employing(PvTZZCoreZ, PvT1015Expand, PvT1015DT, PvTStove))),
           // We won't die to Vulture rush
           new Or(
             new MiningBasesAtLeast(3),

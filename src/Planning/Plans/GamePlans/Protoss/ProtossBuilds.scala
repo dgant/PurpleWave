@@ -221,6 +221,33 @@ object ProtossBuilds {
     Get(20, Protoss.Probe),
     Get(2,  Protoss.Nexus))
 
+  // Reference: https://www.youtube.com/watch?v=MXYRhJOmOkc
+  val PvTZZCoreZ = Vector[BuildRequest] (
+    Get(8,  Protoss.Probe),
+    Get(Protoss.Pylon),
+    Get(10, Protoss.Probe),
+    Get(Protoss.Gateway),
+    Get(12, Protoss.Probe),
+    Get(2, Protoss.Pylon),
+    Get(13, Protoss.Probe),
+    Get(Protoss.Zealot),
+    Get(14, Protoss.Probe),
+    Get(Protoss.Assimilator),
+    Get(15, Protoss.Probe),
+    Get(2, Protoss.Zealot),
+    Get(16, Protoss.Probe),
+    Get(Protoss.CyberneticsCore),
+    Get(17, Protoss.Probe),
+    Get(3, Protoss.Zealot),
+    Get(18, Protoss.Probe),
+    Get(3, Protoss.Pylon),
+    Get(20, Protoss.Probe),
+    Get(Protoss.DragoonRange),
+    Get(Protoss.Dragoon),
+    Get(21, Protoss.Probe),
+    Get(2, Protoss.Nexus)
+  )
+
   val PvT32Nexus = Vector[BuildRequest] (
     Get(8,  Protoss.Probe),
     Get(Protoss.Pylon),

@@ -24,6 +24,7 @@ import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
 import Utilities.Time.GameTime
 
+//noinspection RedundantNewCaseClass,RedundantNewCaseClass
 class PvTBasic extends GameplanTemplate {
 
   override def archonPlan: Plan = new If(
@@ -37,7 +38,7 @@ class PvTBasic extends GameplanTemplate {
   override def placementPlan: Plan = new If(
     new And(
       new FrameAtMost(GameTime(5, 0)()),
-      new Employing(PvT32Nexus),
+      new Employing(PvTZZCoreZ),
       new Not(new EnemyRecentStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.workerRush))),
     new ProposePlacement(
       new Blueprint(Protoss.Pylon,           preferZone = Some(With.geography.ourNatural.zone)),
@@ -49,8 +50,8 @@ class PvTBasic extends GameplanTemplate {
     new If(new EnemyIsRandom,                   new ScoutOn(Protoss.Pylon)), // Continue scouting from a PvR opening
     new If(new Employing(PvT13Nexus),           new ScoutOn(Protoss.Nexus, quantity = 2)),
     new If(new Employing(PvT24Nexus),           new ScoutOn(Protoss.Gateway)),
-    new If(new Employing(PvT32Nexus),           new ScoutOn(Protoss.Pylon)),
-    new If(new Employing(PvT2GateRangeExpand),  new ScoutOn(Protoss.Pylon)),
+    new If(new Employing(PvTZZCoreZ),           new ScoutOn(Protoss.Gateway)),
+    new If(new Employing(PvT2GateRangeExpand),  new ScoutOn(Protoss.Gateway)),
     new If(new Employing(PvT1GateReaver),       new ScoutOn(Protoss.CyberneticsCore)),
     new If(new Employing(PvT1015DT),            new If(new UpgradeStarted(Protoss.DragoonRange), new ScoutNow)),
     new If(new Employing(PvTDTExpand),          new ScoutOn(Protoss.CyberneticsCore)))
@@ -67,7 +68,7 @@ class PvTBasic extends GameplanTemplate {
   override def buildOrderPlan: Plan = new Parallel(
     new If(new Employing(PvT13Nexus),           new BuildOrder(ProtossBuilds.PvT13Nexus_GateCoreGateZ: _*)),
     new If(new Employing(PvT24Nexus),           new BuildOrder(ProtossBuilds.PvT24Nexus: _*)),
-    new If(new Employing(PvT32Nexus),           new BuildOrder(ProtossBuilds.PvT32Nexus: _*)),
+    new If(new Employing(PvTZZCoreZ),           new BuildOrder(ProtossBuilds.PvTZZCoreZ: _*)),
     new If(new Employing(PvT2GateRangeExpand),  new BuildOrder(ProtossBuilds.PvT2GateRangeExpand: _*)),
     new If(new Employing(PvT1015DT),            new BuildOrder(ProtossBuilds.PvT1015GateGoonDT: _*)),
     new If(new Employing(PvT1GateReaver),       new BuildOrder(ProtossBuilds.PvT1GateReaver: _*)),
@@ -279,17 +280,20 @@ class PvTBasic extends GameplanTemplate {
           // On one base, we usually just need the gas for 1-2 gate Goon production
           new BasesAtMost(1),
           new If(
-            new And(new GasForUpgrade(Protoss.DragoonRange), new UnitsAtLeast(1, Protoss.Dragoon)),
+            new Employing(PvTZZCoreZ),
+            new CapGasWorkersAt(2),
             new If(
-              new Employing(PvT24Nexus, PvT32Nexus),
-              new CapGasWorkersAt(1),
+              new And(new GasForUpgrade(Protoss.DragoonRange), new UnitsAtLeast(1, Protoss.Dragoon)),
               new If(
-                new Employing(PvT1015Expand, PvT2GateRangeExpand),
-                new CapGasWorkersAt(2),
-                new Parallel(
-                  new If(
-                    new And(new Employing(PvTDTExpand), new UnitsAtMost(0, Protoss.DarkTemplar), new GasAtMost(300)),
-                    new FloorGasWorkersAt(3))))))),
+                new Employing(PvT24Nexus, PvTZZCoreZ),
+                new CapGasWorkersAt(1),
+                new If(
+                  new Employing(PvT1015Expand, PvT2GateRangeExpand),
+                  new CapGasWorkersAt(2),
+                  new Parallel(
+                    new If(
+                      new And(new Employing(PvTDTExpand), new UnitsAtMost(0, Protoss.DarkTemplar), new GasAtMost(300)),
+                      new FloorGasWorkersAt(3)))))))),
           new If(
             // On two base, we only want gas if we're fast teching
             new BasesAtMost(2),

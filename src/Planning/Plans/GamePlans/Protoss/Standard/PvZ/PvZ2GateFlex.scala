@@ -11,6 +11,8 @@ import Utilities.DoQueue
 
 class PvZ2GateFlex extends GameplanImperative{
 
+  var massZealot: Boolean = false
+
   override def executeBuild(): Unit = {
     buildOrder(
       Get(8, Protoss.Probe),
@@ -35,14 +37,18 @@ class PvZ2GateFlex extends GameplanImperative{
       Get(17, Protoss.Probe),
       Get(5, Protoss.Zealot),
       Get(18, Protoss.Probe),
-      Get(4, Protoss.Pylon),
-      Get(Protoss.Assimilator),
-      Get(19, Protoss.Probe),
-      Get(Protoss.CyberneticsCore),
-      Get(7, Protoss.Zealot),
-      Get(21, Protoss.Probe),
-      Get(8, Protoss.Zealot),
-      Get(1, Protoss.Dragoon))
+      Get(4, Protoss.Pylon))
+    if (massZealot) {
+    } else {
+      buildOrder(
+        Get(Protoss.Assimilator),
+        Get(19, Protoss.Probe),
+        Get(Protoss.CyberneticsCore),
+        Get(7, Protoss.Zealot),
+        Get(21, Protoss.Probe),
+        Get(8, Protoss.Zealot),
+        Get(1, Protoss.Dragoon))
+    }
   }
   override def executeMain(): Unit = {
     if (enemyHydralisksLikely) status("Hydras")

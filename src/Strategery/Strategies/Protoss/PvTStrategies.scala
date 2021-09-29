@@ -33,11 +33,7 @@ object PvT13Nexus extends PvTBasicOpener {
     With.fingerprints.twoRax1113)
 }
 object PvT24Nexus extends PvTBasicOpener
-object PvT32Nexus extends PvTBasicOpener {
-  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
-    With.fingerprints.wallIn
-  )
-}
+object PvTZZCoreZ extends PvTBasicOpener
 object PvT4Gate extends PvTBasicOpener
 object PvT2GateRangeExpand extends PvTBasicOpener {
   override def responsesWhitelisted: Iterable[Fingerprint] = Seq(

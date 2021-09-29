@@ -22,11 +22,22 @@ PurpleWave has also ranked #1 on the [BASIL](https://basil.bytekeeper.org/rankin
 ## Credits
 Thanks to:
 * Nathan Roth (Antiga/Iruian) for strategy advice and consulting -- so much of the polish in PurpleWave's strategies comes from his wisdom and replay analysis
+* @JasperGeurtz @Bytekeeper and @N00byEdge for [JBWAPI](https://github.com/JavaBWAPI/JBWAPI)
+* @vjurenka for [BWMirror](https://github.com/vjurenka/BWMirror)
+* @Cmccrave for [Horizon](https://github.com/Cmccrave/Horizon) and [BWEB](https://github.com/Cmccrave/BWEB)
+* @MrTate for [JBWEB](https://github.com/MrTate/JBWEB)
+* @lowerlogic for [BWTA](https://code.google.com/archive/p/bwta/)
+* Igor Dimitrijevic for [BWEM](http://bwem.sourceforge.net/)
+* @JasperGeurtz for the [Java port of BWEM](https://github.com/JavaBWAPI/JBWAPI/tree/develop/src/main/java/bwem)
+* @kovarex and @heinermann for [BWAPI](https://github.com/bwapi/bwapi)
+* @jabbo16 for configuring PurpleWave's Maven build
+* @davechurchill @certicky @krasi0 @Bytekeeper @bgweber @SonkoMagnus Nathan Roth and the Cognition & Intelligence Lab at Sejong University for hosting Brood War competitions and environments that have given PurpleWave visibility and purpose
+* @chriscoxe for diagnosing and solving technical issues in tournament environments that have affected PurpleWave's ability to compete
 * @jaj22/JohnJ for lots of advice navigating Brood War mechanics
 * @IMP42 @AdakiteSystems and @tscmoo for helping me get BWAPI up and running when I was getting started
-* @davechurchill @certicky @krasi0 @Bytekeeper @bgweber Nathan Roth and the Cognition & Intelligence Lab at Sejong University for hosting Brood War competitions
-* @kovarex and @heinermann for [BWAPI](https://github.com/bwapi/bwapi), @JasperGeurtz @Bytekeeper and @N00byEdge for [JBWAPI](https://github.com/JavaBWAPI/JBWAPI), @vjurenka for [BWMirror](https://github.com/vjurenka/BWMirror), @tscmoo for [OpenBW](https://github.com/OpenBW/openbw/), Luke Perkins for BWTA, and @CMcCrave for [MCRS/Horizon](https://github.com/Cmccrave/Horizon)
-* @chriscoxe for solving technical issues in tournament environments that have affected PurpleWave  
+* @tscmoo for [OpenBW](https://github.com/OpenBW/openbw/)
+* NepetaNigra, ChoboSwaggins, @Nitekat, and CH Miner for sharing PurpleWave's games with the world and helping tell our story 
+The community around BWAPI and StarCraft AI is amazing and PurpleWave could not exist without building on the decade of work these folks have done.
 
 ## How to build PurpleWave
 [See build instructions in install.md](install/install.md)

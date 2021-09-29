@@ -15,7 +15,7 @@ import Micro.Heuristics.Potential
 import Micro.Targeting.FiltersSituational.{TargetFilterPotshot, TargetFilterVisibleInRange}
 import Micro.Targeting.Target
 import Planning.UnitMatchers.MatchWorker
-import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object DefaultCombat extends Action {
@@ -94,6 +94,7 @@ object DefaultCombat extends Action {
     lazy val rangeEqual         = rangeAgainstUs.contains(range)
     lazy val pixelsOutranged    = rangeAgainstUs.map(_ - unit.pixelRangeAgainst(target)).filter(_ > 0)
     lazy val confidentToChase   = unit.confidence() > .25
+    lazy val scourgeApproaching = unit.matchups.threats.exists(t => Zerg.Scourge(t) && t.pixelDistanceEdge(unit) < 32 * 5)
     lazy val projectedUs        = unit.pixel.projectUpTo(target.pixel, 16)
     lazy val projectedTarget    = target.pixel.projectUpTo(target.presumptiveStep, 16)
     lazy val targetApproaching  = unit.pixelDistanceSquared(target) > unit.pixelDistanceSquared(projectedTarget)
@@ -111,6 +112,9 @@ object DefaultCombat extends Action {
     // Chasing behaviors
     // Some units shouldn't even try
     if (unit.isAny(Terran.SiegeTankUnsieged, Protoss.Reaver)) return range
+
+    // Some units should usually chase flying targets
+    if (unit.isAny(Terran.Wraith, Protoss.Corsair, Protoss.Scout, Zerg.Mutalisk) && target.flying && ! scourgeApproaching) return 0
 
     // Chase if they outrange us
     if (pixelsOutranged.isDefined) return chaseDistance
